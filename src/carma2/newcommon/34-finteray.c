@@ -47,9 +47,6 @@ static float C2_HOOK_FASTCALL FinterayScalar(double value) {
 
 /* VC5 crashes when it expands the scalar stores into the edge arithmetic.
  * Keep this private call boundary without changing the existing ray helpers. */
-#if defined(_MSC_VER) && _MSC_VER < 1300
-#pragma auto_inline(off)
-#endif
 static br_scalar C2_HOOK_FASTCALL FinterayEdgeScalar(double value) {
     br_scalar scalar = FinterayScalar(value);
     br_uint_32 bits;
@@ -61,9 +58,6 @@ static br_scalar C2_HOOK_FASTCALL FinterayEdgeScalar(double value) {
     memcpy(&scalar, &bits, sizeof(scalar));
     return scalar;
 }
-#if defined(_MSC_VER) && _MSC_VER < 1300
-#pragma auto_inline(on)
-#endif
 
 // FUNCTION: CARMA2_HW 0x0045cd90
 int C2_HOOK_FASTCALL PickBoundsTestRay__finteray(br_bounds* b, br_vector3* rp, br_vector3* rd, br_scalar t_near, br_scalar t_far, br_scalar* new_t_near, br_scalar* new_t_far) {

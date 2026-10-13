@@ -203,9 +203,6 @@ static double C2_HOOK_FASTCALL TrigArcTanRatio(float y, float x, float abs_y, fl
     return x_less_y ? 2.0 - (double)abs_x / abs_y : (double)abs_y / abs_x;
 }
 
-#if defined(_MSC_VER) && _MSC_VER < 1300
-#pragma auto_inline(off)
-#endif
 // FUNCTION: CARMA2_HW 0x00511ce0
 double C2_HOOK_STDCALL FastFloatArcTan2(float pY, float pX) {
     float abs_x = TrigArcTanAbs(pX);
@@ -219,18 +216,12 @@ double C2_HOOK_STDCALL FastFloatArcTan2(float pY, float pX) {
     }
     return TrigArcTanRatio(pY, pX, abs_y, abs_x) * 45.0;
 }
-#if defined(_MSC_VER) && _MSC_VER < 1300
-#pragma auto_inline(on)
-#endif
 
 // FUNCTION: CARMA2_HW 0x00511e50
 double C2_HOOK_STDCALL FastScalarArcTan2(br_scalar pY, br_scalar pX) {
     return FastFloatArcTan2(pY, pX);
 }
 
-#if defined(_MSC_VER) && _MSC_VER < 1300
-#pragma auto_inline(off)
-#endif
 // FUNCTION: CARMA2_HW 0x00511e70
 br_angle C2_HOOK_STDCALL FastFloatArcTan2Angle(float pY, float pX) {
     float abs_x = TrigArcTanAbs(pX);
@@ -244,9 +235,6 @@ br_angle C2_HOOK_STDCALL FastFloatArcTan2Angle(float pY, float pX) {
     }
     return (br_angle)(br_int_64)(TrigArcTanRatio(pY, pX, abs_y, abs_x) * 8192.0);
 }
-#if defined(_MSC_VER) && _MSC_VER < 1300
-#pragma auto_inline(on)
-#endif
 
 // FUNCTION: CARMA2_HW 0x00512010
 br_angle C2_HOOK_STDCALL FastScalarArcTan2Angle(br_scalar pY, br_scalar pX) {

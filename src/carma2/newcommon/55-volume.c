@@ -82,9 +82,6 @@ typedef tU32 tVolumeWord;
 static void C2_HOOK_CDECL AutoVolumeCopy(void* out, const void* in) {
     *(tVolumeWord*)out = *(const tVolumeWord*)in;
 }
-#if defined(_MSC_VER) && _MSC_VER < 1300
-#pragma auto_inline(off)
-#endif
 static double C2_HOOK_CDECL AutoVolumeScalar(double value) {
     float scalar;
     double result;
@@ -92,9 +89,6 @@ static double C2_HOOK_CDECL AutoVolumeScalar(double value) {
     result = scalar;
     return result;
 }
-#if defined(_MSC_VER) && _MSC_VER < 1300
-#pragma auto_inline(on)
-#endif
 static int C2_HOOK_CDECL AutoVolumeUnordered(double value) {
     union {
         double d;

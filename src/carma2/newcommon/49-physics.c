@@ -1415,9 +1415,6 @@ static tPhysics_object** C2_HOOK_CDECL GroupReducedSlot(tPhysics_object* object)
     return (tPhysics_object**)((tU8*)object + 0x234);
 }
 
-#if defined(__GNUC__)
-__attribute__((noinline))
-#endif
 static tPhysics_object** C2_HOOK_CDECL
 GroupTemporaryHead(tPhysics_object** head) {
     return head;
@@ -2593,16 +2590,10 @@ static int C2_HOOK_CDECL ForceMatrixHasPartner(const tPhysics_object* object) {
     return value != 0;
 }
 
-#if defined(_MSC_VER) && _MSC_VER < 1300
-#pragma auto_inline(off)
-#endif
 static double C2_HOOK_CDECL ForceMatrixScalar(double value) {
     br_scalar result = (br_scalar)value;
     return result;
 }
-#if defined(_MSC_VER) && _MSC_VER < 1300
-#pragma auto_inline(on)
-#endif
 
 static double C2_HOOK_CDECL ForceMatrixResponse(const tPhysics_joint_force* row,
     int side, const br_vector3* angular, const br_vector3* linear, int source_torque, int row_torque) {
@@ -3354,9 +3345,6 @@ int C2_HOOK_FASTCALL MakeVelocitiesVector2(br_scalar* pOutput, tPhysics_joint_fo
 
 // NewAddFrictionObjectObject
 
-#if defined(_MSC_VER) && _MSC_VER < 1300
-#pragma auto_inline(off)
-#endif
 static void* C2_HOOK_CDECL FrictionPointer(const void* base, unsigned offset) {
     return (void*)(uintptr_t)(*(const tU32*)((const tU8*)base + offset));
 }
@@ -3387,9 +3375,6 @@ static const br_scalar* C2_HOOK_CDECL FrictionAt(const void* base, unsigned offs
     return (const br_scalar*)((const tU8*)base + offset);
 }
 
-#if defined(_MSC_VER) && _MSC_VER < 1300
-#pragma auto_inline(on)
-#endif
 // FUNCTION: CARMA2_HW 0x004c0ac0
 void C2_HOOK_FASTCALL NewAddFriction(tPhysics_joint_force* force, tWorld_callbacks* callbacks) {
     tPhysics_object* object_a = FrictionPointer(force, 4);
