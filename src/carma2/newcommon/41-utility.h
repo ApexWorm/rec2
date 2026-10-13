@@ -21,13 +21,13 @@ extern int C2_HOOK_FASTCALL PercentageChance(int pC);
 
 extern int C2_HOOK_FASTCALL IRandomPosNeg(int pN);
 
-extern double C2_HOOK_STDCALL FRandomBetween(float pA, float pB);
+extern float C2_HOOK_STDCALL FRandomBetween(float pA, float pB);
 
-extern double C2_HOOK_STDCALL FRandomPosNeg(float pN);
+extern float C2_HOOK_STDCALL FRandomPosNeg(float pN);
 
-extern double C2_HOOK_STDCALL SRandomBetween(br_scalar pA, br_scalar pB);
+extern br_scalar C2_HOOK_STDCALL SRandomBetween(br_scalar pA, br_scalar pB);
 
-extern double C2_HOOK_STDCALL SRandomPosNeg(br_scalar pN);
+extern br_scalar C2_HOOK_STDCALL SRandomPosNeg(br_scalar pN);
 
 extern void C2_HOOK_FASTCALL PathCat(char* pDestn_str, const char* pStr_1, const char* pStr_2);
 
@@ -148,7 +148,7 @@ extern int C2_HOOK_FASTCALL DRVector3TestForNan(const br_vector3* pV);
 
 extern void C2_HOOK_FASTCALL DRScaleModel(br_model* pModel, float pScale);
 
-extern double C2_HOOK_FASTCALL DistanceFromFaceND(const br_vector3* pP, const br_vector3* pN, br_scalar pF);
+extern float C2_HOOK_FASTCALL DistanceFromFaceND(const br_vector3* pP, const br_vector3* pN, br_scalar pF);
 
 extern int C2_HOOK_FASTCALL DRVector3NonZero(const br_vector3* pV);
 

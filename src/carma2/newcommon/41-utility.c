@@ -137,113 +137,39 @@ int C2_HOOK_FASTCALL IRandomPosNeg(int pN) {
     return IRandomBetween(-pN, pN);
 }
 
-/* Preserve x87 load order, NaN selection and the PosNeg store before rand. */
-static void C2_HOOK_FASTCALL UtilityRandomNegative(float* output, const float* input) {
-#if defined(_MSC_VER) && defined(_M_IX86)
-    __asm {
-        mov eax, output
-        mov ecx, input
-        fld dword ptr [ecx]
-        fchs
-        fstp dword ptr [eax]
-    }
-#elif defined(__GNUC__) && defined(__i386__)
-    __asm__ volatile("flds %1; fchs; fstps %0" : "=m" (*output) : "m" (*input) : "memory", "st");
-#else
-    volatile double value = *input;
-
-    *output = (float)-value;
-#endif
-}
-
-static double C2_HOOK_FASTCALL UtilityRandomScalar(const float* pA, const float* pB, int number) {
-#if (defined(_MSC_VER) && defined(_M_IX86)) || (defined(__GNUC__) && defined(__i386__))
-    double result;
-    const float negative_inverse = -1.f / 32768.f;
-
-#if defined(_MSC_VER)
-    __asm {
-        mov ecx, pA
-        mov edx, pB
-        fld dword ptr [edx]
-        fsub dword ptr [ecx]
-        fild number
-        fxch st(1)
-        fmulp st(1), st(0)
-        fmul negative_inverse
-        fsubr dword ptr [ecx]
-        fstp result
-    }
-#else
-    __asm__ volatile("flds (%2); fsubs (%1); fildl %3; fxch %%st(1); fmulp %%st, %%st(1); fmuls %4; fsubrs (%1); fstpl %0"
-        : "=m" (result) : "r" (pA), "r" (pB), "m" (number), "m" (negative_inverse) : "memory", "st", "st(1)");
-#endif
-    return result;
-#else
-    return *pA - (((double)*pB - *pA) * number) * (-1.0 / 32768.0);
-#endif
-}
-
 // FUNCTION: CARMA2_HW 0x005135b0
-double C2_HOOK_STDCALL FRandomBetween(float pA, float pB) {
-#if defined(_MSC_VER) && _MSC_VER < 1300
-    /* MSVC5 retains this arithmetic on x87 without a scalar return spill. */
-    return (float)rand() * (pB - pA) / 32768.f + pA;
-#else
-    int number = rand();
+float C2_HOOK_STDCALL FRandomBetween(float pA, float pB) {
 
-    return UtilityRandomScalar(&pA, &pB, number);
+#if RAND_MAX == 0x7fff
+    return (float)rand() * (pB - pA) / (float)RAND_MAX + pA;
+#else
+    return (float)(rand() % 0x10000) * (pB - pA) / (float)(0x7fff + 1) + pA;
 #endif
 }
 
 // FUNCTION: CARMA2_HW 0x005135e0
-double C2_HOOK_STDCALL FRandomPosNeg(float pN) {
-#if defined(_MSC_VER) && _MSC_VER < 1300
-    return FRandomBetween(-pN, pN);
-#else
-    float negative;
-    int number;
+float C2_HOOK_STDCALL FRandomPosNeg(float pN) {
 
-    UtilityRandomNegative(&negative, &pN);
-    number = rand();
-    return UtilityRandomScalar(&negative, &pN, number);
-#endif
+    return FRandomBetween(-pN, pN);
 }
 
 // FUNCTION: CARMA2_HW 0x00513620
-double C2_HOOK_STDCALL SRandomBetween(br_scalar pA, br_scalar pB) {
-#if defined(_MSC_VER) && _MSC_VER < 1300
-    return FRandomBetween(pA, pB);
-#else
-    int number = rand();
+br_scalar C2_HOOK_STDCALL SRandomBetween(br_scalar pA, br_scalar pB) {
 
-#if defined(__GNUC__) && defined(__i386__)
-    /* Prevent identical-function folding from reloading float arguments before rand. */
-    __asm__ volatile("" : : : "memory");
-#endif
-    return UtilityRandomScalar(&pA, &pB, number);
-#endif
+    return FRandomBetween(pA, pB);
 }
 
 // FUNCTION: CARMA2_HW 0x00513650
-double C2_HOOK_STDCALL SRandomPosNeg(br_scalar pN) {
-#if defined(_MSC_VER) && _MSC_VER < 1300
-    return SRandomBetween(-pN, pN);
-#else
-    br_scalar negative;
-    int number;
+br_scalar C2_HOOK_STDCALL SRandomPosNeg(br_scalar pN) {
 
-    UtilityRandomNegative(&negative, &pN);
-    number = rand();
-    return UtilityRandomScalar(&negative, &pN, number);
-#endif
+    return SRandomBetween(-pN, pN);
 }
 
 // FUNCTION: CARMA2_HW 0x00513690
 void C2_HOOK_FASTCALL PathCat(char* pDestn_str, const char* pStr_1, const char* pStr_2) {
 
-#if defined(REC2_FIX_BUGS) || !defined(REC2_MATCHING)
-    if (pDestn_str != pStr_1) {
+#ifdef REC2_FIX_BUGS
+    if (pDestn_str != pStr_1) { // Added to avoid strcpy overlap checks
         strcpy(pDestn_str, pStr_1);
     }
 #else
@@ -954,141 +880,17 @@ void C2_HOOK_FASTCALL PossibleService(void) {
 /* Original PC53 grouping, NaN operands and sequential writes require x87 here. */
 // FUNCTION: CARMA2_HW 0x00515610
 void C2_HOOK_FASTCALL DRMatrix34TApplyP(br_vector3* pA, const br_vector3* pB, const br_matrix34* pC) {
-#if defined(_MSC_VER) && defined(_M_IX86)
-    __asm {
-        mov ecx, pA
-        mov edx, pB
-        mov eax, pC
-        fld dword ptr [edx + 4]
-        fld dword ptr [edx + 8]
-        fld dword ptr [edx]
-        fxch st(2)
-        fsub dword ptr [eax + 0x28]
-        fxch st(1)
-        fsub dword ptr [eax + 0x2c]
-        fxch st(2)
-        fsub dword ptr [eax + 0x24]
-        fld dword ptr [eax + 8]
-        fld dword ptr [eax + 4]
-        fmul st(0), st(3)
-        fxch st(1)
-        fmul st(0), st(4)
-        fld st(2)
-        fmul dword ptr [eax]
-        fxch st(1)
-        faddp st(2), st(0)
-        faddp st(1), st(0)
-        fstp dword ptr [ecx]
-        fld dword ptr [eax + 0xc]
-        fld dword ptr [eax + 0x10]
-        fld dword ptr [eax + 0x14]
-        fxch st(2)
-        fmul st(0), st(3)
-        fxch st(1)
-        fmul st(0), st(4)
-        fxch st(2)
-        fmul st(0), st(5)
-        fxch st(2)
-        faddp st(1), st(0)
-        fxch st(1)
-        faddp st(1), st(0)
-        fstp dword ptr [ecx + 4]
-        fld dword ptr [eax + 0x18]
-        fld dword ptr [eax + 0x1c]
-        fld dword ptr [eax + 0x20]
-        fxch st(2)
-        fmul st(0), st(3)
-        fxch st(1)
-        fmul st(0), st(4)
-        fxch st(2)
-        fmul st(0), st(5)
-        fxch st(2)
-        faddp st(1), st(0)
-        fxch st(1)
-        faddp st(1), st(0)
-        fstp dword ptr [ecx + 8]
-        fstp st(0)
-        fxch st(1)
-        fstp st(0)
-        fstp st(0)
-    }
-#elif defined(__GNUC__) && defined(__i386__)
-    __asm__ volatile(
-        ".intel_syntax noprefix\n\t"
-        "fld dword ptr [edx + 4]\n\t"
-        "fld dword ptr [edx + 8]\n\t"
-        "fld dword ptr [edx]\n\t"
-        "fxch st(2)\n\t"
-        "fsub dword ptr [eax + 0x28]\n\t"
-        "fxch st(1)\n\t"
-        "fsub dword ptr [eax + 0x2c]\n\t"
-        "fxch st(2)\n\t"
-        "fsub dword ptr [eax + 0x24]\n\t"
-        "fld dword ptr [eax + 8]\n\t"
-        "fld dword ptr [eax + 4]\n\t"
-        "fmul st(0), st(3)\n\t"
-        "fxch st(1)\n\t"
-        "fmul st(0), st(4)\n\t"
-        "fld st(2)\n\t"
-        "fmul dword ptr [eax]\n\t"
-        "fxch st(1)\n\t"
-        "faddp st(2), st(0)\n\t"
-        "faddp st(1), st(0)\n\t"
-        "fstp dword ptr [ecx]\n\t"
-        "fld dword ptr [eax + 0xc]\n\t"
-        "fld dword ptr [eax + 0x10]\n\t"
-        "fld dword ptr [eax + 0x14]\n\t"
-        "fxch st(2)\n\t"
-        "fmul st(0), st(3)\n\t"
-        "fxch st(1)\n\t"
-        "fmul st(0), st(4)\n\t"
-        "fxch st(2)\n\t"
-        "fmul st(0), st(5)\n\t"
-        "fxch st(2)\n\t"
-        "faddp st(1), st(0)\n\t"
-        "fxch st(1)\n\t"
-        "faddp st(1), st(0)\n\t"
-        "fstp dword ptr [ecx + 4]\n\t"
-        "fld dword ptr [eax + 0x18]\n\t"
-        "fld dword ptr [eax + 0x1c]\n\t"
-        "fld dword ptr [eax + 0x20]\n\t"
-        "fxch st(2)\n\t"
-        "fmul st(0), st(3)\n\t"
-        "fxch st(1)\n\t"
-        "fmul st(0), st(4)\n\t"
-        "fxch st(2)\n\t"
-        "fmul st(0), st(5)\n\t"
-        "fxch st(2)\n\t"
-        "faddp st(1), st(0)\n\t"
-        "fxch st(1)\n\t"
-        "faddp st(1), st(0)\n\t"
-        "fstp dword ptr [ecx + 8]\n\t"
-        "fstp st(0)\n\t"
-        "fxch st(1)\n\t"
-        "fstp st(0)\n\t"
-        "fstp st(0)\n\t"
-        ".att_syntax prefix"
-        :
-        : "a" (pC), "c" (pA), "d" (pB)
-        : "memory", "st", "st(1)", "st(2)", "st(3)", "st(4)", "st(5)");
-#else
-    double x = (double)pB->v[0] - pC->m[3][0];
-    double y = (double)pB->v[1] - pC->m[3][1];
-    double z = (double)pB->v[2] - pC->m[3][2];
-    volatile double term_x;
-    volatile double term_y;
-    volatile double term_z;
-    volatile double first_sum;
-    int i;
+    br_scalar t1;
+    br_scalar t2;
+    br_scalar t3;
 
-    for (i = 0; i < 3; i++) {
-        term_x = (double)pC->m[i][0] * x;
-        term_y = (double)pC->m[i][1] * y;
-        term_z = (double)pC->m[i][2] * z;
-        first_sum = i == 0 ? term_y + term_z : term_x + term_y;
-        pA->v[i] = (br_scalar)(first_sum + (i == 0 ? term_x : term_z));
-    }
-#endif
+    t1 = pB->v[0] - pC->m[3][0];
+    t2 = pB->v[1] - pC->m[3][1];
+    t3 = pB->v[2] - pC->m[3][2];
+
+    pA->v[0] = pC->m[0][2] * t3 + pC->m[0][0] * t1 + pC->m[0][1] * t2;
+    pA->v[1] = pC->m[1][2] * t3 + pC->m[1][0] * t1 + pC->m[1][1] * t2;
+    pA->v[2] = pC->m[2][2] * t3 + pC->m[2][0] * t1 + pC->m[2][1] * t2;
 }
 
 // FUNCTION: CARMA2_HW 0x00515690
@@ -1400,47 +1202,9 @@ void C2_HOOK_FASTCALL DRScaleModel(br_model* pModel, float pScale) {
 }
 
 // FUNCTION: CARMA2_HW 0x005162a0
-double C2_HOOK_FASTCALL DistanceFromFaceND(const br_vector3* pP, const br_vector3* pN, br_scalar pF) {
-#if defined(_MSC_VER) && defined(_M_IX86)
-    double result;
+float C2_HOOK_FASTCALL DistanceFromFaceND(const br_vector3* pP, const br_vector3* pN, br_scalar pF) {
 
-    __asm {
-        mov ecx, pP
-        mov edx, pN
-        fld dword ptr [edx + 4]
-        fld dword ptr [edx + 8]
-        fld dword ptr [ecx + 4]
-        fld dword ptr [ecx + 8]
-        fld dword ptr [edx]
-        fxch st(4)
-        fmulp st(2), st(0)
-        fxch st(2)
-        fmulp st(2), st(0)
-        fxch st(2)
-        fmul dword ptr [ecx]
-        fxch st(1)
-        faddp st(2), st(0)
-        faddp st(1), st(0)
-        fsub pF
-        fstp result
-    }
-    return result;
-#elif defined(__GNUC__) && defined(__i386__)
-    double result;
-
-    __asm__ volatile(
-        "flds 4(%%edx); flds 8(%%edx); flds 4(%%ecx); flds 8(%%ecx); flds (%%edx); "
-        "fxch %%st(4); fmulp %%st,%%st(2); fxch %%st(2); fmulp %%st,%%st(2); "
-        "fxch %%st(2); fmuls (%%ecx); fxch %%st(1); faddp %%st,%%st(2); "
-        "faddp %%st,%%st(1); fsubs %3; fstpl %0"
-        : "=m" (result) : "c" (pP), "d" (pN), "m" (pF)
-        : "st", "st(1)", "st(2)", "st(3)", "st(4)");
-    return result;
-#else
-    volatile double yz = (double)pP->v[1] * pN->v[1] + (double)pP->v[2] * pN->v[2];
-
-    return (yz + (double)pP->v[0] * pN->v[0]) - pF;
-#endif
+    return BrVector3Dot(pP, pN) - pF;
 }
 
 // FUNCTION: CARMA2_HW 0x00516350
@@ -1452,60 +1216,20 @@ int C2_HOOK_FASTCALL DRVector3NonZero(const br_vector3* pV) {
     }
 }
 
-#if defined(__GNUC__)
-typedef tU32 tDiminishRawWord __attribute__((__may_alias__));
-#else
-typedef tU32 tDiminishRawWord;
-#endif
-
-static double C2_HOOK_CDECL DiminishSubtractScalar(double left, volatile const br_scalar* right) {
-    double result;
-#if defined(_MSC_VER) && defined(_M_IX86)
-    __asm {
-        mov edx, right
-        fld qword ptr left
-        fsub dword ptr [edx]
-        fstp qword ptr result
-    }
-#elif defined(__GNUC__) && defined(__i386__)
-    __asm__ __volatile__("fldl %1; fsubs %2; fstpl %0" : "=m"(result) : "m"(left), "m"(*right) : "st");
-#else
-    result = left - (double)*right;
-#endif
-    return result;
-}
-
 // FUNCTION: CARMA2_HW 0x00516390
 void C2_HOOK_FASTCALL DRVector3Diminish(br_vector3* pV1, const br_vector3* pV2) {
-    volatile tU32 old_bits[3];
-    tU32 copied_bits[3];
-    br_vector3 old;
-    double difference, product;
+    br_vector3 v1 = *pV1;
 
-    /* Original computes X before its raw three-word snapshot, then stores X
-     * before loading Y/Z operands. These aliases and fault paths are live. */
-    difference = DiminishSubtractScalar((double)*(volatile const br_scalar*)&pV1->v[0], &pV2->v[0]);
-    old_bits[0] = *(volatile const tDiminishRawWord*)(const void*)&pV1->v[0];
-    old_bits[1] = *(volatile const tDiminishRawWord*)(const void*)&pV1->v[1];
-    old_bits[2] = *(volatile const tDiminishRawWord*)(const void*)&pV1->v[2];
-    *(volatile br_scalar*)&pV1->v[0] = (br_scalar)difference;
-    difference = DiminishSubtractScalar((double)*(volatile const br_scalar*)&pV1->v[1], &pV2->v[1]);
-    *(volatile br_scalar*)&pV1->v[1] = (br_scalar)difference;
-    difference = DiminishSubtractScalar((double)*(volatile const br_scalar*)&pV1->v[2], &pV2->v[2]);
-    *(volatile br_scalar*)&pV1->v[2] = (br_scalar)difference;
-
-    copied_bits[0] = old_bits[0];
-    copied_bits[1] = old_bits[1];
-    copied_bits[2] = old_bits[2];
-    memcpy(&old, copied_bits, sizeof(old));
-    /* The product remains wide at PC53; unordered, zero and negative clamp
-     * to raw positive zero, exactly as the original TEST AH,0x41. */
-    product = (double)old.v[0] * (double)*(volatile const br_scalar*)&pV1->v[0];
-    if (!(product > 0.0)) *(volatile br_scalar*)&pV1->v[0] = 0.0f;
-    product = (double)old.v[1] * (double)*(volatile const br_scalar*)&pV1->v[1];
-    if (!(product > 0.0)) *(volatile br_scalar*)&pV1->v[1] = 0.0f;
-    product = (double)old.v[2] * (double)*(volatile const br_scalar*)&pV1->v[2];
-    if (!(product > 0.0)) *(volatile br_scalar*)&pV1->v[2] = 0.0f;
+    BrVector3Sub(pV1, pV1, pV2);
+    if (v1.v[0] * pV1->v[0] <= 0.0f) {
+        pV1->v[0] = 0.0f;
+    }
+    if (v1.v[1] * pV1->v[1] <= 0.0f) {
+        pV1->v[1] = 0.0f;
+    }
+    if (v1.v[2] * pV1->v[2] <= 0.0f) {
+        pV1->v[2] = 0.0f;
+    }
 }
 
 // FUNCTION: CARMA2_HW 0x00516410
