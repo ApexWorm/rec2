@@ -23,7 +23,7 @@ extern void* gPhysics_other_buffer;
 
 // count
 
-void C2_HOOK_FASTCALL DrMatrix34ApplyLPInverse(br_vector3* dest,const br_vector3* source,const br_matrix34* matrix);
+void C2_HOOK_FASTCALL DrMatrix34ApplyLPInverse(br_vector3* dest, const br_vector3* source, const br_matrix34* matrix);
 
 typedef struct {
     br_scalar t;

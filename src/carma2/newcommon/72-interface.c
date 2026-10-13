@@ -1510,7 +1510,6 @@ typedef tU32 tFrontendScrollWord __attribute__((__may_alias__));
 typedef tU32 tFrontendScrollWord;
 #endif
 
-
 // FUNCTION: CARMA2_HW 0x00471cf0
 tFrontend_slider* C2_HOOK_FASTCALL GetAnyActiveSlider(void) {
     tFrontend_slider* slider = gCurrent_frontend_scrollbars;

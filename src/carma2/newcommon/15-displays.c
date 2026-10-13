@@ -96,16 +96,16 @@ void C2_HOOK_FASTCALL InitHeadups(void) {
     gBR_fonts[1] = BrFontProp7x9;
     gBR_fonts[2] = gFont_7;
     gBR_fonts[3] = gHeadup_font;
-    gRevs[ 0] = LoadPixelmap("rev1.tif");
-    gRevs[ 1] = LoadPixelmap("rev2.tif");
-    gRevs[ 2] = LoadPixelmap("rev3.tif");
-    gRevs[ 3] = LoadPixelmap("rev4.tif");
-    gRevs[ 4] = LoadPixelmap("rev5.tif");
-    gRevs[ 5] = LoadPixelmap("rev6.tif");
-    gRevs[ 6] = LoadPixelmap("rev7.tif");
-    gRevs[ 7] = LoadPixelmap("rev8.tif");
-    gRevs[ 8] = LoadPixelmap("rev9.tif");
-    gRevs[ 9] = LoadPixelmap("rev10.tif");
+    gRevs[0] = LoadPixelmap("rev1.tif");
+    gRevs[1] = LoadPixelmap("rev2.tif");
+    gRevs[2] = LoadPixelmap("rev3.tif");
+    gRevs[3] = LoadPixelmap("rev4.tif");
+    gRevs[4] = LoadPixelmap("rev5.tif");
+    gRevs[5] = LoadPixelmap("rev6.tif");
+    gRevs[6] = LoadPixelmap("rev7.tif");
+    gRevs[7] = LoadPixelmap("rev8.tif");
+    gRevs[8] = LoadPixelmap("rev9.tif");
+    gRevs[9] = LoadPixelmap("rev10.tif");
     gRevs[10] = LoadPixelmap("rev11.tif");
     gRevs[11] = LoadPixelmap("rev12.tif");
     gRevs[12] = LoadPixelmap("rev13.tif");
@@ -207,8 +207,8 @@ void C2_HOOK_FASTCALL InitHeadups(void) {
         }
         for (i = 0; i < count; i++) {
             char s[256];
-            char *str;
-            tHud_message *hud_message;
+            char* str;
+            tHud_message* hud_message;
             int len;
             int j;
 

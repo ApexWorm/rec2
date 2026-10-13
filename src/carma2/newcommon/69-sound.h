@@ -97,7 +97,6 @@ extern void C2_HOOK_FASTCALL WriteOutSoundSpec(FILE* pF, tSpecial_volume_soundfx
 
 extern void C2_HOOK_FASTCALL SetDefaultSoundFolderName(void);
 
-
 extern const char* gPed_sound_path;
 
 void C2_HOOK_FASTCALL ConfigureZombiePedSoundPath(void);

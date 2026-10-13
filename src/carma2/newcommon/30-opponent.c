@@ -35,8 +35,6 @@ int gRoute_search_total_calls;
 // GLOBAL: CARMA2_HW 0x00691778
 int gRoute_search_max_calls;
 
-
-
 static double C2_HOOK_CDECL OpponentAdd(double pA, double pB) {
     double result = pA + pB;
     return result;
@@ -57,10 +55,15 @@ static double C2_HOOK_CDECL OpponentDivide(double pA, double pB) {
     return result;
 }
 
-
 static float C2_HOOK_CDECL OpponentScalarRound(double pA) {
-    union { float scalar; tU32 bits; } stored;
-    union { float scalar; tU32 bits; } result;
+    union {
+        float scalar;
+        tU32 bits;
+    } stored;
+    union {
+        float scalar;
+        tU32 bits;
+    } result;
 
     stored.scalar = (float)pA;
     result.bits = stored.bits;
@@ -289,7 +292,9 @@ void C2_HOOK_FASTCALL CalcRaceRoute(tOpponent_spec* pOpponent_spec) {
             }
         }
         if (race_count != 0 || forward_count != 0 || reverse_count != 0) {
-            index = IRandomBetween(0, (race_count != 0 ? race_count : forward_count != 0 ? forward_count : reverse_count) - 1);
+            index = IRandomBetween(0, (race_count != 0 ? race_count : forward_count != 0 ? forward_count
+                                                                                         : reverse_count)
+                    - 1);
             AddToOpponentsProjectedRoute(pOpponent_spec, candidates[index], race_count != 0 || forward_count != 0);
         } else if (!pOpponent_spec->complete_race_data.found_race_section) {
             section = pOpponent_spec->next_sections[pOpponent_spec->nnext_sections - 1].section_no;
@@ -332,8 +337,8 @@ void C2_HOOK_FASTCALL TopUpRandomRoute(tOpponent_spec* pOpponent_spec, int pSect
             for (i = 0; i < path_node->number_of_sections; i++) {
                 section = (tS16)path_node->sections[i];
                 if (section != previous
-                        && (!sections[section].one_way || (tS16)sections[section].node_indices[1] != node)
-                        && (pOpponent_spec->cheating || sections[section].type != ePST_cheat_only)) {
+                    && (!sections[section].one_way || (tS16)sections[section].node_indices[1] != node)
+                    && (pOpponent_spec->cheating || sections[section].type != ePST_cheat_only)) {
                     candidates[count++] = section;
                 }
             }
@@ -860,7 +865,7 @@ int C2_HOOK_FASTCALL GetOpponentsFirstSection(const tOpponent_spec* pOpponent_sp
 int C2_HOOK_FASTCALL GetOpponentsNextSection(const tOpponent_spec* pOpponent_spec, tS16 pCurrent_section) {
     if (pCurrent_section >= 20000) {
         if (pCurrent_section - 19999 >= pOpponent_spec->nnext_sections
-                || (!pOpponent_spec->cheating && gProgram_state.AI_vehicles.path_sections[pCurrent_section - 19999].type == ePST_cheat_only)) {
+            || (!pOpponent_spec->cheating && gProgram_state.AI_vehicles.path_sections[pCurrent_section - 19999].type == ePST_cheat_only)) {
             return -1;
         }
         return pCurrent_section + 1;

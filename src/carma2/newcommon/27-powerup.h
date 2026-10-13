@@ -407,7 +407,6 @@ extern void C2_HOOK_FASTCALL TurnOffCloaking(tPowerup* pPowerup, tCar_spec* pCar
 
 // PeriodicCloaking
 
-
 extern const char* gPowerup_txt_path;
 
 void C2_HOOK_FASTCALL ConfigureZombiePedPowerupTxtPath(void);

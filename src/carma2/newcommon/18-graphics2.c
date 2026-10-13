@@ -369,7 +369,8 @@ int C2_HOOK_FASTCALL DoMouseCursor(void) {
             gCursor_zero_count = 0;
             gCursor_delta_x = (br_int_32)(((tU32)pos_x - (tU32)gMouse_last_pos.x) * 1000u) / delta_time;
         }
-        required = gCursor_delta_x < -10 ? 0 : gCursor_delta_x > 10 ? 3 : 2;
+        required = gCursor_delta_x < -10 ? 0 : gCursor_delta_x > 10 ? 3
+                                                                    : 2;
         if (required != gCursor_required_cursor && time_now - gCursor_last_required_change >= 200) {
             gCursor_last_required_change = time_now;
             gCursor_required_cursor = required;

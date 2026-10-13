@@ -83,10 +83,26 @@ br_model* gLollipop_model;
 
 // GLOBAL: CARMA2_HW 0x00660118
 static tU8 gFlame_frame_size[20][2] = {
-    { 20, 25 }, { 24, 32 }, { 24, 34 }, { 28, 44 }, { 28, 49 },
-    { 32, 53 }, { 28, 61 }, { 28, 69 }, { 24, 61 }, { 28, 64 },
-    { 24, 70 }, { 20, 65 }, { 20, 64 }, { 20, 74 }, { 28, 55 },
-    { 24, 62 }, { 28, 47 }, { 20, 51 }, { 20, 45 }, { 20, 45 },
+    { 20, 25 },
+    { 24, 32 },
+    { 24, 34 },
+    { 28, 44 },
+    { 28, 49 },
+    { 32, 53 },
+    { 28, 61 },
+    { 28, 69 },
+    { 24, 61 },
+    { 28, 64 },
+    { 24, 70 },
+    { 20, 65 },
+    { 20, 64 },
+    { 20, 74 },
+    { 28, 55 },
+    { 24, 62 },
+    { 28, 47 },
+    { 20, 51 },
+    { 20, 45 },
+    { 20, 45 },
 };
 
 // GLOBAL: CARMA2_HW 0x006a8638
@@ -499,7 +515,7 @@ void C2_HOOK_FASTCALL RenderSparks(br_pixelmap* pScreen, br_pixelmap* pDepth, br
                 gSpark_flags = (int)((tU32)gSpark_flags & ~bit);
             }
             dot = ((double)spark->normal.v[2] * spark->v.v[2]
-                + (double)spark->normal.v[0] * spark->v.v[0])
+                      + (double)spark->normal.v[0] * spark->v.v[0])
                 + (double)spark->normal.v[1] * spark->v.v[1];
             for (j = 0; j < 3; j++) {
                 temp.v[j] = SmokeScalarRound((double)spark->normal.v[j] * dot);
@@ -567,9 +583,7 @@ void C2_HOOK_FASTCALL RenderSparks(br_pixelmap* pScreen, br_pixelmap* pDepth, br
             new_z = (double)temp.v[2] + spark->v.v[2];
             spark->v.v[2] = SmokeScalarRound(new_z);
             float_time = SmokeScalarRound((double)pTime);
-            damping = 1.0 - sqrt(((double)spark->v.v[0] * spark->v.v[0]
-                + (double)spark->v.v[1] * spark->v.v[1]) + new_z * spark->v.v[2])
-                * .7142857313156128f * float_time * .001f;
+            damping = 1.0 - sqrt(((double)spark->v.v[0] * spark->v.v[0] + (double)spark->v.v[1] * spark->v.v[1]) + new_z * spark->v.v[2]) * .7142857313156128f * float_time * .001f;
             /* The original AH bit test also clamps unordered results. */
             if (!(damping >= .1f)) {
                 damping = .1f;
@@ -699,7 +713,7 @@ void C2_HOOK_FASTCALL MungeShrapnel(tU32 pTime) {
     if (gNum_splash_types != 0) {
         if (gAction_replay_mode && SplashReplayMoving()) {
             for (type = 1; type <= 3; type++) {
-                for (i = 0; ; i++) {
+                for (i = 0;; i++) {
                     if (i >= (type == 0 ? 1 : GetCarCount((tVehicle_type)type))) {
                         break;
                     }
@@ -727,7 +741,9 @@ void C2_HOOK_FASTCALL MungeShrapnel(tU32 pTime) {
                     actor = replay_splash->object.actor;
                     identifier = actor->identifier;
                     owner = (tU32)((((tS8)identifier[4] * 10 + (tS8)identifier[5]) * 10
-                        + (tS8)identifier[6]) * 10 + (tS8)identifier[7] - 53328);
+                                       + (tS8)identifier[6])
+                            * 10
+                        + (tS8)identifier[7] - 53328);
                     chunk = FindNextChunk(ePipe_chunk_non_car, owner);
                     if (chunk != NULL) {
                         matrix = &actor->t.t.mat;
@@ -854,9 +870,7 @@ void C2_HOOK_FASTCALL MungeShrapnel(tU32 pTime) {
             - (double)(pTime * 10u) * .00014492752961814404f);
         DrMatrix34Rotate(matrix, (br_angle)((tU16)shrapnel->age * 182), &shrapnel->axis);
         BrMatrix34PreShearX(matrix, shrapnel->shear1, shrapnel->shear2);
-        damping = 1.0 - sqrt(((double)shrapnel->v.v[0] * shrapnel->v.v[0]
-            + (double)shrapnel->v.v[1] * shrapnel->v.v[1]) + (double)shrapnel->v.v[2] * shrapnel->v.v[2])
-            * .7142857313156128f * (double)pTime * .001f;
+        damping = 1.0 - sqrt(((double)shrapnel->v.v[0] * shrapnel->v.v[0] + (double)shrapnel->v.v[1] * shrapnel->v.v[1]) + (double)shrapnel->v.v[2] * shrapnel->v.v[2]) * .7142857313156128f * (double)pTime * .001f;
         if (!(damping >= .1f)) {
             damping = .1f;
         }
@@ -872,7 +886,6 @@ void C2_HOOK_FASTCALL MungeShrapnel(tU32 pTime) {
     }
     AREndPipingSession();
 }
-
 
 // FUNCTION: CARMA2_HW 0x004f9e80
 void C2_HOOK_FASTCALL DrMatrix34Rotate(br_matrix34* pMat, br_angle pAngle, const br_vector3* pAxis) {
@@ -905,7 +918,6 @@ void C2_HOOK_FASTCALL DrMatrix34Rotate(br_matrix34* pMat, br_angle pAngle, const
     pMat->m[2][1] = tyz - sx;
     pMat->m[2][2] = t * pAxis->v[2] * pAxis->v[2] + c;
 }
-
 
 // FUNCTION: CARMA2_HW 0x004fb2f0
 int C2_HOOK_CDECL CmpSmokeZ(const void* p1, const void* p2) {
@@ -1042,8 +1054,14 @@ void C2_HOOK_FASTCALL RenderRecordedSmokeCircles(void) {
 
 /* Force the original float spills even with MSVC5's x87 value reuse. */
 static br_scalar C2_HOOK_CDECL SmokeScalarRound(double pValue) {
-    union { br_scalar scalar; tU32 bits; } stored;
-    union { br_scalar scalar; tU32 bits; } result;
+    union {
+        br_scalar scalar;
+        tU32 bits;
+    } stored;
+    union {
+        br_scalar scalar;
+        tU32 bits;
+    } result;
 
     stored.scalar = (br_scalar)pValue;
     result.bits = stored.bits;
@@ -1210,7 +1228,10 @@ void C2_HOOK_FASTCALL RenderSmoke(br_pixelmap* pRender_screen, br_pixelmap* pDep
     tU32 not_lonely;
     double time_scale;
     double radius_sum;
-    union { double scalar; tU32 words[2]; } radius_squared;
+    union {
+        double scalar;
+        tU32 words[2];
+    } radius_squared;
     double damping;
     br_scalar aspect;
     br_scalar radius;
@@ -1615,7 +1636,7 @@ void C2_HOOK_FASTCALL FlameAnimate(int pColumn, const br_vector3* pPos, tU32 pTi
     br_scalar sy;
     double speed_squared;
     int can_start;
-    typedef void (C2_HOOK_FASTCALL* raw_flame_fn)(int, int, tU32, tU32, tU32, tU32);
+    typedef void(C2_HOOK_FASTCALL * raw_flame_fn)(int, int, tU32, tU32, tU32, tU32);
     uintptr_t record_address;
 
     column = &gSmoke_column[pColumn];
@@ -1740,8 +1761,8 @@ void C2_HOOK_FASTCALL DoSmokeColumn(int pColumn, tU32 pTime, br_vector3* pRet_ca
         /* MSVC5's inverse branch for a mixed-width > admits unordered values;
          * the original FCOM/test 0x41 sends them to the subtraction branch. */
         if ((SmokeScalarBits(&column->core.car->driver_z_offset) & 0x7fffffffu) <= 0x7f800000u
-                && (SmokeScalarBits(&pRet_car_pos->v[2]) & 0x7fffffffu) <= 0x7f800000u
-                && (double)column->core.car->driver_z_offset - (-.2) > pRet_car_pos->v[2]) {
+            && (SmokeScalarBits(&pRet_car_pos->v[2]) & 0x7fffffffu) <= 0x7f800000u
+            && (double)column->core.car->driver_z_offset - (-.2) > pRet_car_pos->v[2]) {
             vertex = &(*model_slot)->prepared->groups[0].vertices[*vertex_index].p;
             BrMatrix34ApplyP(pRet_car_pos, vertex, local_matrix);
         } else {
@@ -2150,7 +2171,8 @@ void C2_HOOK_FASTCALL SingleSplash(tPhysics_object* pObject, const br_matrix34* 
         velocity.v[i] = SmokeScalarRound((double)velocity.v[i] + scaled);
     }
     speed = SmokeScalarRound(sqrt(((double)velocity.v[0] * velocity.v[0]
-        + (double)velocity.v[1] * velocity.v[1]) + (double)velocity.v[2] * velocity.v[2]));
+                                      + (double)velocity.v[1] * velocity.v[1])
+        + (double)velocity.v[2] * velocity.v[2]));
     dot = ((double)pNormal->v[1] * velocity.v[1] + (double)pNormal->v[2] * velocity.v[2])
         + (double)pNormal->v[0] * velocity.v[0];
     wide = (speed + fabs(dot) * 5.f) * .006666666828095913f + .04782608523964882f;
@@ -2188,16 +2210,19 @@ void C2_HOOK_FASTCALL SingleSplash(tPhysics_object* pObject, const br_matrix34* 
                 recoil.v[1] = SmokeScalarRound((double)recoil.v[1] - random * -.14492753623188406);
                 BrMatrix34TApplyV(&velocity, &recoil, &pObject->actor->t.t.mat);
                 cross.v[0] = SmokeScalarRound(((double)pObject->water_normal.v[2] * velocity.v[1]
-                    - (double)pObject->water_normal.v[1] * velocity.v[2]) * .5f);
+                                                  - (double)pObject->water_normal.v[1] * velocity.v[2])
+                    * .5f);
                 cross.v[1] = SmokeScalarRound(((double)pObject->water_normal.v[0] * velocity.v[2]
-                    - (double)pObject->water_normal.v[2] * velocity.v[0]) * .5f);
+                                                  - (double)pObject->water_normal.v[2] * velocity.v[0])
+                    * .5f);
                 cross.v[2] = SmokeScalarRound(((double)pObject->water_normal.v[1] * velocity.v[0]
-                    - (double)pObject->water_normal.v[0] * velocity.v[1]) * .5f);
+                                                  - (double)pObject->water_normal.v[0] * velocity.v[1])
+                    * .5f);
                 dot = ((double)pPoint->v[1] * cross.v[1] + (double)pPoint->v[2] * cross.v[2])
                     + (double)pPoint->v[0] * cross.v[0];
                 for (i = 0; i < 3; i++) {
                     velocity.v[i] = SmokeScalarRound(dot > 0.0 ? (double)velocity.v[i] + cross.v[i]
-                        : (double)velocity.v[i] - cross.v[i]);
+                                                               : (double)velocity.v[i] - cross.v[i]);
                 }
                 index = gSpark_next;
                 for (i = 0; i < 3; i++) {
@@ -2224,14 +2249,13 @@ void C2_HOOK_FASTCALL SingleSplash(tPhysics_object* pObject, const br_matrix34* 
     }
 }
 
-
 #if defined(_MSC_VER)
 #if _MSC_VER >= 1300
 #pragma warning(push)
 #endif
 /* The original copies the unwritten private minimum point before assigning
  * its first candidate. Keep that stack-history copy; do not initialize it. */
-#pragma warning(disable: 4700)
+#pragma warning(disable : 4700)
 #endif
 // FUNCTION: CARMA2_HW 0x004fcbb0
 void C2_HOOK_FASTCALL GeneralCreateSplash(tPhysics_object* pObject, const br_vector3* pVelocity, const br_vector3* pOmega, const br_vector3* pNormal, br_scalar pWater_distance, const br_bounds3* pBounds, const br_matrix34* pMatrix, tU32 pTime) {
@@ -2320,7 +2344,8 @@ void C2_HOOK_FASTCALL GeneralCreateSplash(tPhysics_object* pObject, const br_vec
             point.v[a] = SmokeScalarRound((pattern & 1) ? bounds.min.v[a] : bounds.max.v[a]);
             point.v[b] = SmokeScalarRound((pattern & 2) ? bounds.min.v[b] : bounds.max.v[b]);
             coordinate = (((double)plane_distance - (double)point.v[a] * local_normal.v[a])
-                - (double)point.v[b] * local_normal.v[b]) / local_normal.v[axis];
+                             - (double)point.v[b] * local_normal.v[b])
+                / local_normal.v[axis];
             value = SmokeScalarRound(coordinate);
             if (!(coordinate >= bounds.min.v[axis]) || value > bounds.max.v[axis]) {
                 continue;
@@ -2415,11 +2440,11 @@ void C2_HOOK_FASTCALL GeneralCreateSplash(tPhysics_object* pObject, const br_vec
                         + value * 6.9 * local_normal.v[0]);
                 near_distance = SmokeScalarRound(wide_near);
                 far_distance = SmokeScalarRound(((double)pObject->shape->common.bb.max.v[1] - .01f)
-                    * local_normal.v[1] * 6.900000095367432f + near_distance);
+                        * local_normal.v[1] * 6.900000095367432f
+                    + near_distance);
                 if ((wide_near > 0.f) != (far_distance > 0.f)) {
                     point.v[0] = SmokeScalarRound(value * 6.9 * .14492753148078918f);
-                    point.v[1] = SmokeScalarRound(((double)height - (wide_height - .01)
-                        * ((double)near_distance / ((double)near_distance - far_distance))) * .14492753148078918f);
+                    point.v[1] = SmokeScalarRound(((double)height - (wide_height - .01) * ((double)near_distance / ((double)near_distance - far_distance))) * .14492753148078918f);
                     point.v[2] = SmokeScalarRound((double)car->wpos[i].v[2] * .14492753148078918f);
                     SingleSplash(pObject, pMatrix, pVelocity, &local_velocity, pOmega, &point, &local_normal, pTime);
                 }
@@ -2428,12 +2453,11 @@ void C2_HOOK_FASTCALL GeneralCreateSplash(tPhysics_object* pObject, const br_vec
     }
 }
 
-
 #if defined(_MSC_VER)
 #if _MSC_VER >= 1300
 #pragma warning(pop)
 #else
-#pragma warning(default: 4700)
+#pragma warning(default : 4700)
 #endif
 #endif
 
@@ -2442,7 +2466,6 @@ void C2_HOOK_FASTCALL CreateSplash(tPhysics_object* pObject, tU32 pTime) {
     GeneralCreateSplash(pObject, &pObject->v, &pObject->omega, &pObject->water_normal,
         pObject->water_d, &pObject->bb1, &pObject->actor->t.t.mat, pTime);
 }
-
 
 // FUNCTION: CARMA2_HW 0x004fda70
 void C2_HOOK_FASTCALL GetVelocitiesFromMatrices(br_vector3* pVelocity, br_vector3* pOmega, const br_matrix34* pMatrix, const br_matrix34* pNext_matrix, tU32 pTime) {
@@ -2468,7 +2491,6 @@ void C2_HOOK_FASTCALL GetVelocitiesFromMatrices(br_vector3* pVelocity, br_vector
     pOmega->v[1] = SmokeScalarRound(((double)difference.y + difference.y) / interval);
     pOmega->v[2] = SmokeScalarRound(((double)difference.z + difference.z) / interval);
 }
-
 
 // MungeSplash
 

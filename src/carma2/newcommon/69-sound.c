@@ -959,8 +959,6 @@ void C2_HOOK_FASTCALL SetDefaultSoundFolderName(void) {
     gPed_sound_path = NULL;
 }
 
-
-
 // FUNCTION: CARMA2_HW 0x00457590
 void C2_HOOK_FASTCALL ConfigureZombiePedSoundPath(void) {
     gPed_sound_path = "ZOMSOUND";

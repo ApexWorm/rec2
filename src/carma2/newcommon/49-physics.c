@@ -51,7 +51,7 @@ tU32 gPhysics_contact_679438;
 
 /* Original writable box-edge table. */
 // GLOBAL: CARMA2_HW 0x0058f7f0
-tPolyhedron_edge_indexes gPhysics_box_edges_58f7f0[12]={{0,1},{2,3},{4,5},{6,7},{0,2},{1,3},{4,6},{5,7},{0,4},{1,5},{2,6},{3,7}};
+tPolyhedron_edge_indexes gPhysics_box_edges_58f7f0[12] = { { 0, 1 }, { 2, 3 }, { 4, 5 }, { 6, 7 }, { 0, 2 }, { 1, 3 }, { 4, 6 }, { 5, 7 }, { 0, 4 }, { 1, 5 }, { 2, 6 }, { 3, 7 } };
 
 // GLOBAL: CARMA2_HW 0x00676920
 char gPhysics_empty_message;
@@ -236,16 +236,18 @@ tFace_ref* C2_HOOK_FASTCALL RayCastThruFaceList(br_vector3* pPosition, br_vector
 // FaceOnCount
 
 static int C2_HOOK_FASTCALL PhysicsWallNaN(double value) {
-    union { double d; tU32 w[2]; } u;
-    u.d=value;
-    return (u.w[1]&0x7ff00000u)==0x7ff00000u && ((u.w[1]&0xfffffu)||u.w[0]);
+    union {
+        double d;
+        tU32 w[2];
+    } u;
+    u.d = value;
+    return (u.w[1] & 0x7ff00000u) == 0x7ff00000u && ((u.w[1] & 0xfffffu) || u.w[0]);
 }
-
 
 // FUNCTION: CARMA2_HW 0x00423320
 int C2_HOOK_FASTCALL EliminateFaces(tPhysics_object* pObject, tPhysics_shape* pShape, br_matrix34* pTransform) {
-    br_matrix34* actor_matrix=&pObject->actor->t.t.mat;
-    br_bounds* bounds=&pShape->common.field_0x1c;
+    br_matrix34* actor_matrix = &pObject->actor->t.t.mat;
+    br_bounds* bounds = &pShape->common.field_0x1c;
     br_vector3 center;
     br_vector3 scaled[3];
     br_scalar extent_scalar;
@@ -259,72 +261,78 @@ int C2_HOOK_FASTCALL EliminateFaces(tPhysics_object* pObject, tPhysics_shape* pS
     double x;
     double y;
     double z;
-    int count=0;
+    int count = 0;
     int i;
     int j;
-    int ordinal=0;
+    int ordinal = 0;
     tFace_ref* face;
     br_material* material;
 
-    GetNewBoundingBox(bounds,&pShape->common.bb,pTransform);
-    for (i=0;i<3;i++) {
-        if (bounds->min.v[i]>pShape->common.bb.min.v[i]) {
-            PhysicsCopyWord(&bounds->min.v[i],&pShape->common.bb.min.v[i]);
+    GetNewBoundingBox(bounds, &pShape->common.bb, pTransform);
+    for (i = 0; i < 3; i++) {
+        if (bounds->min.v[i] > pShape->common.bb.min.v[i]) {
+            PhysicsCopyWord(&bounds->min.v[i], &pShape->common.bb.min.v[i]);
         }
-        if (PhysicsScalarNaN(&bounds->max.v[i])||PhysicsScalarNaN(&pShape->common.bb.max.v[i])||bounds->max.v[i]<pShape->common.bb.max.v[i]) {
-            PhysicsCopyWord(&bounds->max.v[i],&pShape->common.bb.max.v[i]);
+        if (PhysicsScalarNaN(&bounds->max.v[i]) || PhysicsScalarNaN(&pShape->common.bb.max.v[i]) || bounds->max.v[i] < pShape->common.bb.max.v[i]) {
+            PhysicsCopyWord(&bounds->max.v[i], &pShape->common.bb.max.v[i]);
         }
     }
-    BrMatrix34ApplyV(&center,&bounds->min,actor_matrix);
-    for (i=0;i<3;i++) center.v[i]=PhysicsScalar((double)center.v[i]+actor_matrix->m[3][i]);
-    for (i=0;i<3;i++) {
-        extent=(double)bounds->max.v[i]-bounds->min.v[i];
-        for (j=0;j<3;j++) scaled[i].v[j]=PhysicsScalar(actor_matrix->m[i][j]*extent);
+    BrMatrix34ApplyV(&center, &bounds->min, actor_matrix);
+    for (i = 0; i < 3; i++)
+        center.v[i] = PhysicsScalar((double)center.v[i] + actor_matrix->m[3][i]);
+    for (i = 0; i < 3; i++) {
+        extent = (double)bounds->max.v[i] - bounds->min.v[i];
+        for (j = 0; j < 3; j++)
+            scaled[i].v[j] = PhysicsScalar(actor_matrix->m[i][j] * extent);
     }
-    face=&gFace_list__car[pObject->box_face_start];
-    while (ordinal<(int)pObject->box_face_end-(int)pObject->box_face_start) {
-        x=((double)center.v[0]-face->v[0].v[0])*face->normal.v[0];
-        z=((double)center.v[2]-face->v[0].v[2])*face->normal.v[2];
-        y=((double)center.v[1]-face->v[0].v[1])*face->normal.v[1];
-        low=x+z+y;
-        high=low;
-        for (i=0;i<3;i++) {
-            extent=((double)scaled[i].v[0]*face->normal.v[0]+(double)scaled[i].v[1]*face->normal.v[1])+(double)scaled[i].v[2]*face->normal.v[2];
-            extent_scalar=PhysicsScalar(extent);
-            if (PhysicsWallNaN(extent)||extent<0.0) low+=extent_scalar;
-            else high+=extent_scalar;
+    face = &gFace_list__car[pObject->box_face_start];
+    while (ordinal < (int)pObject->box_face_end - (int)pObject->box_face_start) {
+        x = ((double)center.v[0] - face->v[0].v[0]) * face->normal.v[0];
+        z = ((double)center.v[2] - face->v[0].v[2]) * face->normal.v[2];
+        y = ((double)center.v[1] - face->v[0].v[1]) * face->normal.v[1];
+        low = x + z + y;
+        high = low;
+        for (i = 0; i < 3; i++) {
+            extent = ((double)scaled[i].v[0] * face->normal.v[0] + (double)scaled[i].v[1] * face->normal.v[1]) + (double)scaled[i].v[2] * face->normal.v[2];
+            extent_scalar = PhysicsScalar(extent);
+            if (PhysicsWallNaN(extent) || extent < 0.0)
+                low += extent_scalar;
+            else
+                high += extent_scalar;
         }
-        low_scalar=PhysicsScalar(low);
-        if ((!PhysicsWallNaN(high)&&high>(double)0.005f && !PhysicsWallNaN(low)&&low>(double)0.005f)
-            ||((PhysicsWallNaN(high)||high<(double)-0.005f)&&(PhysicsScalarNaN((const br_scalar*)&low_scalar)||low_scalar<-0.005f))) {
-            *(int*)&face->flags=face->flags|0x80;
+        low_scalar = PhysicsScalar(low);
+        if ((!PhysicsWallNaN(high) && high > (double)0.005f && !PhysicsWallNaN(low) && low > (double)0.005f)
+            || ((PhysicsWallNaN(high) || high < (double)-0.005f) && (PhysicsScalarNaN((const br_scalar*)&low_scalar) || low_scalar < -0.005f))) {
+            *(int*)&face->flags = face->flags | 0x80;
         } else {
-            material=face->material;
-            if ((material!=NULL&&material->identifier[0]=='!')||material->identifier[0]=='>') {
-                *(int*)&face->flags=face->flags|0x80;
+            material = face->material;
+            if ((material != NULL && material->identifier[0] == '!') || material->identifier[0] == '>') {
+                *(int*)&face->flags = face->flags | 0x80;
             } else {
-                for (i=0;i<3;i++) {
-                    translated=(double)actor_matrix->m[3][2]*actor_matrix->m[i][2]+(double)actor_matrix->m[3][0]*actor_matrix->m[i][0]+(double)actor_matrix->m[3][1]*actor_matrix->m[i][1];
-                    vertex=((double)face->v[0].v[2]*actor_matrix->m[i][2]+(double)face->v[0].v[0]*actor_matrix->m[i][0])+(double)face->v[0].v[1]*actor_matrix->m[i][1];
-                    threshold=PhysicsScalar((double)bounds->min.v[i]-0.005f+translated);
-                    if (PhysicsWallNaN(vertex)||PhysicsScalarNaN((const br_scalar*)&threshold)||vertex<threshold) {
-                        vertex=((double)face->v[1].v[2]*actor_matrix->m[i][2]+(double)face->v[1].v[0]*actor_matrix->m[i][0])+(double)face->v[1].v[1]*actor_matrix->m[i][1];
-                        if (PhysicsWallNaN(vertex)||PhysicsScalarNaN((const br_scalar*)&threshold)||vertex<threshold) {
-                            vertex=((double)face->v[2].v[2]*actor_matrix->m[i][2]+(double)face->v[2].v[0]*actor_matrix->m[i][0])+(double)face->v[2].v[1]*actor_matrix->m[i][1];
-                            if (PhysicsWallNaN(vertex)||PhysicsScalarNaN((const br_scalar*)&threshold)||vertex<threshold) *(int*)&face->flags=face->flags|0x80;
+                for (i = 0; i < 3; i++) {
+                    translated = (double)actor_matrix->m[3][2] * actor_matrix->m[i][2] + (double)actor_matrix->m[3][0] * actor_matrix->m[i][0] + (double)actor_matrix->m[3][1] * actor_matrix->m[i][1];
+                    vertex = ((double)face->v[0].v[2] * actor_matrix->m[i][2] + (double)face->v[0].v[0] * actor_matrix->m[i][0]) + (double)face->v[0].v[1] * actor_matrix->m[i][1];
+                    threshold = PhysicsScalar((double)bounds->min.v[i] - 0.005f + translated);
+                    if (PhysicsWallNaN(vertex) || PhysicsScalarNaN((const br_scalar*)&threshold) || vertex < threshold) {
+                        vertex = ((double)face->v[1].v[2] * actor_matrix->m[i][2] + (double)face->v[1].v[0] * actor_matrix->m[i][0]) + (double)face->v[1].v[1] * actor_matrix->m[i][1];
+                        if (PhysicsWallNaN(vertex) || PhysicsScalarNaN((const br_scalar*)&threshold) || vertex < threshold) {
+                            vertex = ((double)face->v[2].v[2] * actor_matrix->m[i][2] + (double)face->v[2].v[0] * actor_matrix->m[i][0]) + (double)face->v[2].v[1] * actor_matrix->m[i][1];
+                            if (PhysicsWallNaN(vertex) || PhysicsScalarNaN((const br_scalar*)&threshold) || vertex < threshold)
+                                *(int*)&face->flags = face->flags | 0x80;
                         }
                     } else {
-                        threshold=PhysicsScalar((double)bounds->max.v[i]+translated-(-0.005f));
-                        if (!PhysicsWallNaN(vertex)&&!PhysicsScalarNaN((const br_scalar*)&threshold)&&vertex>threshold) {
-                            vertex=((double)face->v[1].v[2]*actor_matrix->m[i][2]+(double)face->v[1].v[0]*actor_matrix->m[i][0])+(double)face->v[1].v[1]*actor_matrix->m[i][1];
-                            if (!PhysicsWallNaN(vertex)&&!PhysicsScalarNaN((const br_scalar*)&threshold)&&vertex>threshold) {
-                                vertex=((double)face->v[2].v[2]*actor_matrix->m[i][2]+(double)face->v[2].v[0]*actor_matrix->m[i][0])+(double)face->v[2].v[1]*actor_matrix->m[i][1];
-                                if (!PhysicsWallNaN(vertex)&&!PhysicsScalarNaN((const br_scalar*)&threshold)&&vertex>threshold) *(int*)&face->flags=face->flags|0x80;
+                        threshold = PhysicsScalar((double)bounds->max.v[i] + translated - (-0.005f));
+                        if (!PhysicsWallNaN(vertex) && !PhysicsScalarNaN((const br_scalar*)&threshold) && vertex > threshold) {
+                            vertex = ((double)face->v[1].v[2] * actor_matrix->m[i][2] + (double)face->v[1].v[0] * actor_matrix->m[i][0]) + (double)face->v[1].v[1] * actor_matrix->m[i][1];
+                            if (!PhysicsWallNaN(vertex) && !PhysicsScalarNaN((const br_scalar*)&threshold) && vertex > threshold) {
+                                vertex = ((double)face->v[2].v[2] * actor_matrix->m[i][2] + (double)face->v[2].v[0] * actor_matrix->m[i][0]) + (double)face->v[2].v[1] * actor_matrix->m[i][1];
+                                if (!PhysicsWallNaN(vertex) && !PhysicsScalarNaN((const br_scalar*)&threshold) && vertex > threshold)
+                                    *(int*)&face->flags = face->flags | 0x80;
                             }
                         }
                     }
                 }
-                *(int*)&face->flags=face->flags&~0x80;
+                *(int*)&face->flags = face->flags & ~0x80;
                 count++;
             }
         }
@@ -354,48 +362,61 @@ int C2_HOOK_FASTCALL CheckSingleEdgeWithSphere(br_vector3* pEdge_start, br_vecto
     double scale;
     int i;
 
-    SphereEdgeCollide(pEdge_start,pEdge_end,pSphere_start,pSphere_end,pSphere,&point,&normal,(br_scalar*)&time,0,0);
-    if (!PhysicsScalarNaN((const br_scalar*)&time) && time>1.0f) return pCount;
-    BrMatrix34TApplyV(&trial_normal,&normal,&pObject->transform_matrix);
-    actor=*(br_actor**)&pObject->actor;
-    BrMatrix34TApplyV(&actor_normal,&normal,&actor->t.t.mat);
-    remainder=1.0-(double)time;
-    for (i=0;i<3;i++) scaled_normal.v[i]=PhysicsScalar((double)time*actor_normal.v[i]);
-    x=(double)trial_normal.v[0]*remainder+scaled_normal.v[0];
-    y=(double)trial_normal.v[1]*remainder+scaled_normal.v[1];
-    z=(double)trial_normal.v[2]*remainder+scaled_normal.v[2];
-    length=sqrt(x*x+y*y+z*z);
-    if (PhysicsWallNaN(length)||length<=2.3841858e-7f) {
-        x=1.0;y=0.0;normalized_z=0.0f;
+    SphereEdgeCollide(pEdge_start, pEdge_end, pSphere_start, pSphere_end, pSphere, &point, &normal, (br_scalar*)&time, 0, 0);
+    if (!PhysicsScalarNaN((const br_scalar*)&time) && time > 1.0f)
+        return pCount;
+    BrMatrix34TApplyV(&trial_normal, &normal, &pObject->transform_matrix);
+    actor = *(br_actor**)&pObject->actor;
+    BrMatrix34TApplyV(&actor_normal, &normal, &actor->t.t.mat);
+    remainder = 1.0 - (double)time;
+    for (i = 0; i < 3; i++)
+        scaled_normal.v[i] = PhysicsScalar((double)time * actor_normal.v[i]);
+    x = (double)trial_normal.v[0] * remainder + scaled_normal.v[0];
+    y = (double)trial_normal.v[1] * remainder + scaled_normal.v[1];
+    z = (double)trial_normal.v[2] * remainder + scaled_normal.v[2];
+    length = sqrt(x * x + y * y + z * z);
+    if (PhysicsWallNaN(length) || length <= 2.3841858e-7f) {
+        x = 1.0;
+        y = 0.0;
+        normalized_z = 0.0f;
     } else {
-        scale=1.0/length;x=scale*x;y=scale*y;normalized_z=PhysicsScalar(scale*z);
+        scale = 1.0 / length;
+        x = scale * x;
+        y = scale * y;
+        normalized_z = PhysicsScalar(scale * z);
     }
-    radius_product[0]=PhysicsScalar(pSphere->radius*x);
-    radius_product[1]=PhysicsScalar(pSphere->radius*y);
-    radius_product[2]=PhysicsScalar(pSphere->radius*(double)normalized_z);
-    surface_point.v[0]=PhysicsScalar((double)pSphere->center.v[0] + radius_product[0]);
-    surface_point.v[1]=PhysicsScalar((double)pSphere->center.v[1] + radius_product[1]);
-    surface_point.v[2]=PhysicsScalar((double)pSphere->center.v[2] + radius_product[2]);
-    for(i=0;i<3;i++) trial_normal.v[i]=PhysicsScalar(-(double)trial_normal.v[i]);
-    return AddObjectWallForce(pContacts,&surface_point,time,&trial_normal,0,pCount,pObject,4,pFace,NULL);
+    radius_product[0] = PhysicsScalar(pSphere->radius * x);
+    radius_product[1] = PhysicsScalar(pSphere->radius * y);
+    radius_product[2] = PhysicsScalar(pSphere->radius * (double)normalized_z);
+    surface_point.v[0] = PhysicsScalar((double)pSphere->center.v[0] + radius_product[0]);
+    surface_point.v[1] = PhysicsScalar((double)pSphere->center.v[1] + radius_product[1]);
+    surface_point.v[2] = PhysicsScalar((double)pSphere->center.v[2] + radius_product[2]);
+    for (i = 0; i < 3; i++)
+        trial_normal.v[i] = PhysicsScalar(-(double)trial_normal.v[i]);
+    return AddObjectWallForce(pContacts, &surface_point, time, &trial_normal, 0, pCount, pObject, 4, pFace, NULL);
 }
 
 // FUNCTION: CARMA2_HW 0x00423c00
 int C2_HOOK_FASTCALL GetSphereToEdgePoints(tPhysics_object* pObject, tCollision_shape_sphere_data* pSphere, tPhysics_contact* pContacts, int pCount, int pUnused_capacity, br_vector3* pSphere_start, br_vector3* pSphere_end, br_matrix34* pUnused_matrix) {
-    int index=pObject->box_face_start;
-    tFace_ref* face=&gFace_list__car[index];
+    int index = pObject->box_face_start;
+    tFace_ref* face = &gFace_list__car[index];
 
     (void)pUnused_capacity;
     (void)pUnused_matrix;
-    if(index>=(int)pObject->box_face_end) return pCount;
+    if (index >= (int)pObject->box_face_end)
+        return pCount;
     do {
-        if((*(int*)&face->flags&0x80)==0) {
-            if((*(int*)&face->flags&1)==0) pCount=CheckSingleEdgeWithSphere(&face->v[0],&face->v[1],pObject,pSphere,pContacts,pCount,pSphere_start,pSphere_end,face);
-            if((*(int*)&face->flags&2)==0) pCount=CheckSingleEdgeWithSphere(&face->v[1],&face->v[2],pObject,pSphere,pContacts,pCount,pSphere_start,pSphere_end,face);
-            if((*(int*)&face->flags&4)==0) pCount=CheckSingleEdgeWithSphere(&face->v[2],&face->v[0],pObject,pSphere,pContacts,pCount,pSphere_start,pSphere_end,face);
+        if ((*(int*)&face->flags & 0x80) == 0) {
+            if ((*(int*)&face->flags & 1) == 0)
+                pCount = CheckSingleEdgeWithSphere(&face->v[0], &face->v[1], pObject, pSphere, pContacts, pCount, pSphere_start, pSphere_end, face);
+            if ((*(int*)&face->flags & 2) == 0)
+                pCount = CheckSingleEdgeWithSphere(&face->v[1], &face->v[2], pObject, pSphere, pContacts, pCount, pSphere_start, pSphere_end, face);
+            if ((*(int*)&face->flags & 4) == 0)
+                pCount = CheckSingleEdgeWithSphere(&face->v[2], &face->v[0], pObject, pSphere, pContacts, pCount, pSphere_start, pSphere_end, face);
         }
-        index++;face++;
-    }while(index<(int)*(tU16*)&pObject->box_face_end);
+        index++;
+        face++;
+    } while (index < (int)*(tU16*)&pObject->box_face_end);
     return pCount;
 }
 
@@ -411,7 +432,7 @@ int C2_HOOK_FASTCALL GetSphereToEdgePoints(tPhysics_object* pObject, tCollision_
  * is remaining capacity, not existing contact count; Ghidra mislabels it. */
 // FUNCTION: CARMA2_HW 0x00423ed0
 int C2_HOOK_FASTCALL GetCornerToFacePoints(tPhysics_object* pObject, tPhysics_shape* pUnused_shape, tPhysics_contact* pContacts, int pCount, int pCapacity, tPhysics_wall_workspace* pWorkspace, void* pUnused_argument) {
-    br_matrix34* matrix=&pObject->transform_matrix;
+    br_matrix34* matrix = &pObject->transform_matrix;
     br_vector3 direction;
     br_vector3 extension;
     br_vector3 normal;
@@ -429,145 +450,160 @@ int C2_HOOK_FASTCALL GetCornerToFacePoints(tPhysics_object* pObject, tPhysics_sh
     double scale;
     double unit_x;
     tFace_ref* face;
-    tU32* flags=pWorkspace->vertex_flags;
-    br_vector3* first=pWorkspace->original_points;
-    br_vector3* second=pWorkspace->trial_points;
+    tU32* flags = pWorkspace->vertex_flags;
+    br_vector3* first = pWorkspace->original_points;
+    br_vector3* second = pWorkspace->trial_points;
     int i;
 
     (void)pUnused_shape;
     (void)pUnused_argument;
-    if(pCapacity<4) return 0;
-    gPhysics_contact_679434=0;
-    for(i=0;i<(int)*(tU16*)&pWorkspace->count_points;i++,flags++,first++,second++) {
-        if(*flags!=0) continue;
-        x=(double)second->v[0]-first->v[0];
-        y=(double)second->v[1]-first->v[1];
-        z=(double)second->v[2]-first->v[2];
-        direction.v[1]=PhysicsScalar(y);
-        direction.v[2]=PhysicsScalar(z);
-        length=sqrt(x*x+y*direction.v[1]+z*direction.v[2]);
-        if(PhysicsWallNaN(length)||length<=2.3841858e-7f) {
-            unit_x=1.0;
-            extension.v[1]=0.0f;
-            extension.v[2]=0.0f;
+    if (pCapacity < 4)
+        return 0;
+    gPhysics_contact_679434 = 0;
+    for (i = 0; i < (int)*(tU16*)&pWorkspace->count_points; i++, flags++, first++, second++) {
+        if (*flags != 0)
+            continue;
+        x = (double)second->v[0] - first->v[0];
+        y = (double)second->v[1] - first->v[1];
+        z = (double)second->v[2] - first->v[2];
+        direction.v[1] = PhysicsScalar(y);
+        direction.v[2] = PhysicsScalar(z);
+        length = sqrt(x * x + y * direction.v[1] + z * direction.v[2]);
+        if (PhysicsWallNaN(length) || length <= 2.3841858e-7f) {
+            unit_x = 1.0;
+            extension.v[1] = 0.0f;
+            extension.v[2] = 0.0f;
         } else {
-            scale=1.0/length;
-            unit_x=scale*x;
-            extension.v[1]=PhysicsScalar(scale*direction.v[1]);
-            extension.v[2]=PhysicsScalar(scale*direction.v[2]);
+            scale = 1.0 / length;
+            unit_x = scale * x;
+            extension.v[1] = PhysicsScalar(scale * direction.v[1]);
+            extension.v[2] = PhysicsScalar(scale * direction.v[2]);
         }
-        extension.v[0]=PhysicsScalar(unit_x*0.0010434782598167658f);
-        extension.v[1]=PhysicsScalar((double)extension.v[1]*0.0010434782598167658f);
-        extension.v[2]=PhysicsScalar((double)extension.v[2]*0.0010434782598167658f);
-        direction.v[0]=PhysicsScalar((double)extension.v[0]+x);
-        direction.v[1]=PhysicsScalar((double)direction.v[1]+extension.v[1]);
-        direction.v[2]=PhysicsScalar((double)direction.v[2]+extension.v[2]);
-        face=RayCastThruFaceList(first,&direction,&normal,&time,&intersection,&gFace_list__car[pObject->box_face_start],(int)pObject->box_face_end-(int)pObject->box_face_start);
-        if(face==NULL) continue;
-        BrMatrix34TApplyV(&transformed_normal,&normal,matrix);
-        penetration=PhysicsScalar((double)normal.v[0]*direction.v[0]+(double)normal.v[1]*direction.v[1]+(double)normal.v[2]*direction.v[2]);
-        PhysicsSubtractScalar(&relative.v[0],&first->v[0],&matrix->m[3][0]);
-        PhysicsSubtractScalar(&relative.v[1],&first->v[1],&matrix->m[3][1]);
-        PhysicsSubtractScalar(&relative.v[2],&first->v[2],&matrix->m[3][2]);
-        BrMatrix34TApplyV(&local_position,&relative,matrix);
-        PhysicsCopyWord(&penetration_word,&penetration);
-        pCount=AddObjectWallForce(pContacts,&local_position,time,&transformed_normal,(int)penetration_word,pCount,pObject,1,face,NULL);
+        extension.v[0] = PhysicsScalar(unit_x * 0.0010434782598167658f);
+        extension.v[1] = PhysicsScalar((double)extension.v[1] * 0.0010434782598167658f);
+        extension.v[2] = PhysicsScalar((double)extension.v[2] * 0.0010434782598167658f);
+        direction.v[0] = PhysicsScalar((double)extension.v[0] + x);
+        direction.v[1] = PhysicsScalar((double)direction.v[1] + extension.v[1]);
+        direction.v[2] = PhysicsScalar((double)direction.v[2] + extension.v[2]);
+        face = RayCastThruFaceList(first, &direction, &normal, &time, &intersection, &gFace_list__car[pObject->box_face_start], (int)pObject->box_face_end - (int)pObject->box_face_start);
+        if (face == NULL)
+            continue;
+        BrMatrix34TApplyV(&transformed_normal, &normal, matrix);
+        penetration = PhysicsScalar((double)normal.v[0] * direction.v[0] + (double)normal.v[1] * direction.v[1] + (double)normal.v[2] * direction.v[2]);
+        PhysicsSubtractScalar(&relative.v[0], &first->v[0], &matrix->m[3][0]);
+        PhysicsSubtractScalar(&relative.v[1], &first->v[1], &matrix->m[3][1]);
+        PhysicsSubtractScalar(&relative.v[2], &first->v[2], &matrix->m[3][2]);
+        BrMatrix34TApplyV(&local_position, &relative, matrix);
+        PhysicsCopyWord(&penetration_word, &penetration);
+        pCount = AddObjectWallForce(pContacts, &local_position, time, &transformed_normal, (int)penetration_word, pCount, pObject, 1, face, NULL);
     }
-    return pCount>=4?4:pCount;
+    return pCount >= 4 ? 4 : pCount;
 }
 
 /* Preserve the wide center-to-hit vector and its normalization. */
 static double C2_HOOK_CDECL WallEdgeAlignment(const br_vector3* centre, const br_vector3* hit, const br_vector3* normal) {
-    double x=(double)centre->v[0]-hit->v[0];
-    double y=(double)centre->v[1]-hit->v[1];
-    double z=(double)centre->v[2]-hit->v[2];
-    double length=sqrt(x*x+y*y+z*z);
+    double x = (double)centre->v[0] - hit->v[0];
+    double y = (double)centre->v[1] - hit->v[1];
+    double z = (double)centre->v[2] - hit->v[2];
+    double length = sqrt(x * x + y * y + z * z);
     double scale;
-    if(PhysicsWallNaN(length)||length<=2.384185791015625e-7f) {
-        x=1.0;y=0.0;z=0.0;
+    if (PhysicsWallNaN(length) || length <= 2.384185791015625e-7f) {
+        x = 1.0;
+        y = 0.0;
+        z = 0.0;
     } else {
-        scale=1.0/length;x=scale*x;y=scale*y;z=scale*z;
+        scale = 1.0 / length;
+        x = scale * x;
+        y = scale * y;
+        z = scale * z;
     }
-    return (x*normal->v[0]+y*normal->v[1])+z*normal->v[2];
+    return (x * normal->v[0] + y * normal->v[1]) + z * normal->v[2];
 }
 
 // FUNCTION: CARMA2_HW 0x004236a0
 int C2_HOOK_FASTCALL FUN_004236a0(tPhysics_object* object, tPhysics_shape* shape, tPhysics_contact* contacts, int count, int capacity, tPhysics_wall_workspace* workspace, void* unused, int* touched) {
-    br_vector3 centre,direction,reverse,normal,hit,other_normal,other_hit;
-    br_vector3 relative,local,previous,local_normal;
+    br_vector3 centre, direction, reverse, normal, hit, other_normal, other_hit;
+    br_vector3 relative, local, previous, local_normal;
     br_vector3* first;
     br_vector3* second;
     tFace_ref* face;
     tFace_ref* other_face;
-    br_scalar time,other_time,alignment,depth;
+    br_scalar time, other_time, alignment, depth;
     tU32 depth_word;
-    double other_alignment,wide_depth;
-    unsigned first_index,second_index;
-    int edge,selected;
-    (void)capacity;(void)unused;
-    if(shape->common.type==4) return count;
-    BrMatrix34ApplyP(&centre,&object->cmpos,&object->transform_matrix);
-    for(edge=0;edge<(int)*(tU16*)&workspace->count_edges;edge++) {
-        first_index=((const tU8*)workspace->edges)[edge*2];
-        second_index=((const tU8*)workspace->edges)[edge*2+1];
-        first=&workspace->original_points[first_index];
-        second=&workspace->original_points[second_index];
-        PhysicsSubtractScalar(&direction.v[0],&second->v[0],&first->v[0]);
-        PhysicsSubtractScalar(&direction.v[1],&second->v[1],&first->v[1]);
-        PhysicsSubtractScalar(&direction.v[2],&second->v[2],&first->v[2]);
-        face=RayCastThruFaceList(first,&direction,&normal,&time,&hit,&gFace_list__car[object->box_face_start],(int)object->box_face_end-(int)object->box_face_start);
-        PhysicsSubtractScalar(&reverse.v[0],&first->v[0],&second->v[0]);
-        PhysicsSubtractScalar(&reverse.v[1],&first->v[1],&second->v[1]);
-        PhysicsSubtractScalar(&reverse.v[2],&first->v[2],&second->v[2]);
-        selected=0;
-        if(face==NULL) {
-            face=RayCastThruFaceList(second,&reverse,&normal,&time,&hit,&gFace_list__car[object->box_face_start],(int)object->box_face_end-(int)object->box_face_start);
-            if(face!=NULL) {
-                other_alignment=WallEdgeAlignment(&centre,&hit,&normal);
-                if(!PhysicsWallNaN(other_alignment)&&other_alignment>=0.009999999776482582f) {
-                    workspace->vertex_flags[first_index]=1;selected=1;
+    double other_alignment, wide_depth;
+    unsigned first_index, second_index;
+    int edge, selected;
+    (void)capacity;
+    (void)unused;
+    if (shape->common.type == 4)
+        return count;
+    BrMatrix34ApplyP(&centre, &object->cmpos, &object->transform_matrix);
+    for (edge = 0; edge < (int)*(tU16*)&workspace->count_edges; edge++) {
+        first_index = ((const tU8*)workspace->edges)[edge * 2];
+        second_index = ((const tU8*)workspace->edges)[edge * 2 + 1];
+        first = &workspace->original_points[first_index];
+        second = &workspace->original_points[second_index];
+        PhysicsSubtractScalar(&direction.v[0], &second->v[0], &first->v[0]);
+        PhysicsSubtractScalar(&direction.v[1], &second->v[1], &first->v[1]);
+        PhysicsSubtractScalar(&direction.v[2], &second->v[2], &first->v[2]);
+        face = RayCastThruFaceList(first, &direction, &normal, &time, &hit, &gFace_list__car[object->box_face_start], (int)object->box_face_end - (int)object->box_face_start);
+        PhysicsSubtractScalar(&reverse.v[0], &first->v[0], &second->v[0]);
+        PhysicsSubtractScalar(&reverse.v[1], &first->v[1], &second->v[1]);
+        PhysicsSubtractScalar(&reverse.v[2], &first->v[2], &second->v[2]);
+        selected = 0;
+        if (face == NULL) {
+            face = RayCastThruFaceList(second, &reverse, &normal, &time, &hit, &gFace_list__car[object->box_face_start], (int)object->box_face_end - (int)object->box_face_start);
+            if (face != NULL) {
+                other_alignment = WallEdgeAlignment(&centre, &hit, &normal);
+                if (!PhysicsWallNaN(other_alignment) && other_alignment >= 0.009999999776482582f) {
+                    workspace->vertex_flags[first_index] = 1;
+                    selected = 1;
                 }
             }
         } else {
-            alignment=PhysicsScalar(WallEdgeAlignment(&centre,&hit,&normal));
-            other_face=RayCastThruFaceList(second,&reverse,&other_normal,&other_time,&other_hit,&gFace_list__car[object->box_face_start],(int)object->box_face_end-(int)object->box_face_start);
-            if(other_face==NULL) {
-                if(!PhysicsWallNaN(alignment)&&alignment>0.009999999776482582f) {
-                    workspace->vertex_flags[second_index]=1;selected=1;
+            alignment = PhysicsScalar(WallEdgeAlignment(&centre, &hit, &normal));
+            other_face = RayCastThruFaceList(second, &reverse, &other_normal, &other_time, &other_hit, &gFace_list__car[object->box_face_start], (int)object->box_face_end - (int)object->box_face_start);
+            if (other_face == NULL) {
+                if (!PhysicsWallNaN(alignment) && alignment > 0.009999999776482582f) {
+                    workspace->vertex_flags[second_index] = 1;
+                    selected = 1;
                 }
             } else {
-                other_alignment=WallEdgeAlignment(&centre,&other_hit,&other_normal);
-                if((!PhysicsWallNaN(alignment)&&alignment>=0.05000000074505806f)||(!PhysicsWallNaN(other_alignment)&&other_alignment>=0.05000000074505806f)) {
-                    if(PhysicsWallNaN(other_alignment)||PhysicsWallNaN(alignment)||other_alignment<=alignment) {
-                        workspace->vertex_flags[second_index]=1;
+                other_alignment = WallEdgeAlignment(&centre, &other_hit, &other_normal);
+                if ((!PhysicsWallNaN(alignment) && alignment >= 0.05000000074505806f) || (!PhysicsWallNaN(other_alignment) && other_alignment >= 0.05000000074505806f)) {
+                    if (PhysicsWallNaN(other_alignment) || PhysicsWallNaN(alignment) || other_alignment <= alignment) {
+                        workspace->vertex_flags[second_index] = 1;
                     } else {
-                        PhysicsCopyWord(&hit.v[0],&other_hit.v[0]);PhysicsCopyWord(&hit.v[1],&other_hit.v[1]);PhysicsCopyWord(&hit.v[2],&other_hit.v[2]);
-                        PhysicsCopyWord(&normal.v[0],&other_normal.v[0]);PhysicsCopyWord(&normal.v[1],&other_normal.v[1]);PhysicsCopyWord(&normal.v[2],&other_normal.v[2]);
-                        workspace->vertex_flags[first_index]=1;
+                        PhysicsCopyWord(&hit.v[0], &other_hit.v[0]);
+                        PhysicsCopyWord(&hit.v[1], &other_hit.v[1]);
+                        PhysicsCopyWord(&hit.v[2], &other_hit.v[2]);
+                        PhysicsCopyWord(&normal.v[0], &other_normal.v[0]);
+                        PhysicsCopyWord(&normal.v[1], &other_normal.v[1]);
+                        PhysicsCopyWord(&normal.v[2], &other_normal.v[2]);
+                        workspace->vertex_flags[first_index] = 1;
                     }
-                    selected=1;
+                    selected = 1;
                 }
             }
         }
-        if(selected) {
-            PhysicsSubtractScalar(&relative.v[0],&hit.v[0],&object->transform_matrix.m[3][0]);
-            PhysicsSubtractScalar(&relative.v[1],&hit.v[1],&object->transform_matrix.m[3][1]);
-            PhysicsSubtractScalar(&relative.v[2],&hit.v[2],&object->transform_matrix.m[3][2]);
-            BrMatrix34TApplyV(&local,&relative,&object->transform_matrix);
-            BrMatrix34ApplyP(&previous,&local,&object->actor->t.t.mat);
-            wide_depth=(((double)hit.v[0]-previous.v[0])*normal.v[0]+((double)hit.v[1]-previous.v[1])*normal.v[1])+((double)hit.v[2]-previous.v[2])*normal.v[2];
-            depth=PhysicsScalar(wide_depth);
-            if(!PhysicsWallNaN(wide_depth)&&wide_depth>0.0) {
-                BrMatrix34TApplyV(&local_normal,&normal,&object->transform_matrix);
-                PhysicsCopyWord(&depth_word,&depth);
-                count=AddObjectWallForce(contacts,&local,0.0f,&local_normal,(int)depth_word,count,object,1,face,NULL);
+        if (selected) {
+            PhysicsSubtractScalar(&relative.v[0], &hit.v[0], &object->transform_matrix.m[3][0]);
+            PhysicsSubtractScalar(&relative.v[1], &hit.v[1], &object->transform_matrix.m[3][1]);
+            PhysicsSubtractScalar(&relative.v[2], &hit.v[2], &object->transform_matrix.m[3][2]);
+            BrMatrix34TApplyV(&local, &relative, &object->transform_matrix);
+            BrMatrix34ApplyP(&previous, &local, &object->actor->t.t.mat);
+            wide_depth = (((double)hit.v[0] - previous.v[0]) * normal.v[0] + ((double)hit.v[1] - previous.v[1]) * normal.v[1]) + ((double)hit.v[2] - previous.v[2]) * normal.v[2];
+            depth = PhysicsScalar(wide_depth);
+            if (!PhysicsWallNaN(wide_depth) && wide_depth > 0.0) {
+                BrMatrix34TApplyV(&local_normal, &normal, &object->transform_matrix);
+                PhysicsCopyWord(&depth_word, &depth);
+                count = AddObjectWallForce(contacts, &local, 0.0f, &local_normal, (int)depth_word, count, object, 1, face, NULL);
             }
-            *touched=1;
+            *touched = 1;
         }
     }
     return count;
 }
-
 
 /* Traverse actual wall-face edges; original lexical name unknown. */
 // FUNCTION: CARMA2_HW 0x00424140
@@ -581,23 +617,30 @@ int C2_HOOK_FASTCALL FUN_00424140(tPhysics_object* object, tPhysics_shape* shape
 
     (void)unused_capacity;
     (void)unused;
-    gPhysics_contact_679430=0;
-    PhysicsCopyWord(&actor,&object->actor);
-    BrMatrix34TApplyV(&translation,(const br_vector3*)&actor->t.t.mat.m[3],&actor->t.t.mat);
-    for(axis=0;axis<3;axis++)shape->common.field_0x1c.min.v[axis]=PhysicsScalar((double)translation.v[axis] + shape->common.field_0x1c.min.v[axis]);
-    for(axis=0;axis<3;axis++)shape->common.field_0x1c.max.v[axis]=PhysicsScalar((double)translation.v[axis] + shape->common.field_0x1c.max.v[axis]);
-    index=object->box_face_start;
-    face=&gFace_list__car[index];
-    if(index>=(int)object->box_face_end)return count;
+    gPhysics_contact_679430 = 0;
+    PhysicsCopyWord(&actor, &object->actor);
+    BrMatrix34TApplyV(&translation, (const br_vector3*)&actor->t.t.mat.m[3], &actor->t.t.mat);
+    for (axis = 0; axis < 3; axis++)
+        shape->common.field_0x1c.min.v[axis] = PhysicsScalar((double)translation.v[axis] + shape->common.field_0x1c.min.v[axis]);
+    for (axis = 0; axis < 3; axis++)
+        shape->common.field_0x1c.max.v[axis] = PhysicsScalar((double)translation.v[axis] + shape->common.field_0x1c.max.v[axis]);
+    index = object->box_face_start;
+    face = &gFace_list__car[index];
+    if (index >= (int)object->box_face_end)
+        return count;
     do {
-        flags=*(tU32*)&face->flags;
-        if((flags&0x80)==0) {
-            if((flags&1)==0)count=FUN_00424270(&face->v[0],&face->v[1],object,shape,contacts,count,face,workspace);
-            if((*(tU8*)&face->flags&2)==0)count=FUN_00424270(&face->v[1],&face->v[2],object,shape,contacts,count,face,workspace);
-            if((*(tU8*)&face->flags&4)==0)count=FUN_00424270(&face->v[2],&face->v[0],object,shape,contacts,count,face,workspace);
+        flags = *(tU32*)&face->flags;
+        if ((flags & 0x80) == 0) {
+            if ((flags & 1) == 0)
+                count = FUN_00424270(&face->v[0], &face->v[1], object, shape, contacts, count, face, workspace);
+            if ((*(tU8*)&face->flags & 2) == 0)
+                count = FUN_00424270(&face->v[1], &face->v[2], object, shape, contacts, count, face, workspace);
+            if ((*(tU8*)&face->flags & 4) == 0)
+                count = FUN_00424270(&face->v[2], &face->v[0], object, shape, contacts, count, face, workspace);
         }
-        index++;face++;
-    }while(index<(int)*(tU16*)&object->box_face_end);
+        index++;
+        face++;
+    } while (index < (int)*(tU16*)&object->box_face_end);
     return count;
 }
 
@@ -607,326 +650,422 @@ int C2_HOOK_FASTCALL FUN_00424270(br_vector3* start, br_vector3* end, tPhysics_o
     /* Preserve the original private-buffer overlaps and initialize only slots
      * explicitly initialized by the authentic body. Offset0x10 begins locals;
      * offsets0..0xf describe saved registers and are not read here. */
-    union { tU8 bytes[0x180];tU32 words[0x60];br_scalar values[0x60]; } frame;
+    union {
+        tU8 bytes[0x180];
+        tU32 words[0x60];
+        br_scalar values[0x60];
+    } frame;
     br_actor* actor;
     br_matrix34* matrix;
-    br_vector3* relative20=(br_vector3*)(void*)&frame.bytes[0x20];
-    br_vector3* change=(br_vector3*)(void*)&frame.bytes[0x2c];
-    br_vector3* relative38=(br_vector3*)(void*)&frame.bytes[0x38];
-    br_vector3* edge=(br_vector3*)(void*)&frame.bytes[0x44];
-    br_vector3* velocity=(br_vector3*)(void*)&frame.bytes[0x54];
-    br_vector3* buffer60=(br_vector3*)(void*)&frame.bytes[0x60];
-    br_vector3* direction=(br_vector3*)(void*)&frame.bytes[0x6c];
-    br_vector3* buffer78=(br_vector3*)(void*)&frame.bytes[0x78];
-    br_vector3* buffer84=(br_vector3*)(void*)&frame.bytes[0x84];
-    br_vector3* buffer90=(br_vector3*)(void*)&frame.bytes[0x90];
-    br_vector3* gate_end=(br_vector3*)(void*)&frame.bytes[0x9c];
-    br_vector3* gate_start=(br_vector3*)(void*)&frame.bytes[0xa8];
-    br_vector3* gate_point=(br_vector3*)(void*)&frame.bytes[0x174];
-    tPhysics_contact* candidates=(tPhysics_contact*)(void*)&frame.bytes[0xb4];
+    br_vector3* relative20 = (br_vector3*)(void*)&frame.bytes[0x20];
+    br_vector3* change = (br_vector3*)(void*)&frame.bytes[0x2c];
+    br_vector3* relative38 = (br_vector3*)(void*)&frame.bytes[0x38];
+    br_vector3* edge = (br_vector3*)(void*)&frame.bytes[0x44];
+    br_vector3* velocity = (br_vector3*)(void*)&frame.bytes[0x54];
+    br_vector3* buffer60 = (br_vector3*)(void*)&frame.bytes[0x60];
+    br_vector3* direction = (br_vector3*)(void*)&frame.bytes[0x6c];
+    br_vector3* buffer78 = (br_vector3*)(void*)&frame.bytes[0x78];
+    br_vector3* buffer84 = (br_vector3*)(void*)&frame.bytes[0x84];
+    br_vector3* buffer90 = (br_vector3*)(void*)&frame.bytes[0x90];
+    br_vector3* gate_end = (br_vector3*)(void*)&frame.bytes[0x9c];
+    br_vector3* gate_start = (br_vector3*)(void*)&frame.bytes[0xa8];
+    br_vector3* gate_point = (br_vector3*)(void*)&frame.bytes[0x174];
+    tPhysics_contact* candidates = (tPhysics_contact*)(void*)&frame.bytes[0xb4];
     br_vector3* first;
     br_vector3* second;
     br_vector3* trial_first;
     br_vector3* trial_second;
-    double projected_start,low,wide_change_z,normal_side;
-    br_scalar projected_end,high;
-    int axis,component,result,selector;
-    tU8 index1,index2;
+    double projected_start, low, wide_change_z, normal_side;
+    br_scalar projected_end, high;
+    int axis, component, result, selector;
+    tU8 index1, index2;
     tU32 current;
-    frame.words[0x18/4]=1;frame.words[0x1c/4]=1;
-    PhysicsCopyWord(&actor,&object->actor);
-    matrix=&actor->t.t.mat;
-    for(axis=0;axis<3;axis++) {
-        projected_start=(double)matrix->m[axis][0]*start->v[0]+(double)matrix->m[axis][2]*start->v[2]+(double)matrix->m[axis][1]*start->v[1];
-        projected_end=PhysicsScalar((double)matrix->m[axis][0]*end->v[0]+(double)matrix->m[axis][2]*end->v[2]+(double)matrix->m[axis][1]*end->v[1]);
-        low=(double)shape->common.field_0x1c.min.v[axis]-.005;
-        if((PhysicsWallNaN(projected_start)||PhysicsWallNaN(low)||projected_start<low)&&(PhysicsWallNaN(projected_end)||PhysicsWallNaN(low)||projected_end<low))return count;
-        frame.words[0x18/4]|=(tU32)(PhysicsWallNaN(projected_start)||PhysicsWallNaN(low)||projected_start<low);
-        frame.words[0x1c/4]|=(tU32)(PhysicsWallNaN(projected_end)||PhysicsWallNaN(low)||projected_end<low);
-        high=PhysicsScalar((double)shape->common.field_0x1c.max.v[axis]-(-.005));
-        frame.words[0x18/4]|=(tU32)(PhysicsWallNaN(projected_start)||PhysicsWallNaN(high)||projected_start<high);
-        frame.words[0x1c/4]|=(tU32)(PhysicsWallNaN(projected_end)||PhysicsWallNaN(high)||projected_end<high);
-        if(!PhysicsWallNaN(projected_start)&&!PhysicsWallNaN(high)&&projected_start>high&&!PhysicsWallNaN(projected_end)&&projected_end>high)return count;
+    frame.words[0x18 / 4] = 1;
+    frame.words[0x1c / 4] = 1;
+    PhysicsCopyWord(&actor, &object->actor);
+    matrix = &actor->t.t.mat;
+    for (axis = 0; axis < 3; axis++) {
+        projected_start = (double)matrix->m[axis][0] * start->v[0] + (double)matrix->m[axis][2] * start->v[2] + (double)matrix->m[axis][1] * start->v[1];
+        projected_end = PhysicsScalar((double)matrix->m[axis][0] * end->v[0] + (double)matrix->m[axis][2] * end->v[2] + (double)matrix->m[axis][1] * end->v[1]);
+        low = (double)shape->common.field_0x1c.min.v[axis] - .005;
+        if ((PhysicsWallNaN(projected_start) || PhysicsWallNaN(low) || projected_start < low) && (PhysicsWallNaN(projected_end) || PhysicsWallNaN(low) || projected_end < low))
+            return count;
+        frame.words[0x18 / 4] |= (tU32)(PhysicsWallNaN(projected_start) || PhysicsWallNaN(low) || projected_start < low);
+        frame.words[0x1c / 4] |= (tU32)(PhysicsWallNaN(projected_end) || PhysicsWallNaN(low) || projected_end < low);
+        high = PhysicsScalar((double)shape->common.field_0x1c.max.v[axis] - (-.005));
+        frame.words[0x18 / 4] |= (tU32)(PhysicsWallNaN(projected_start) || PhysicsWallNaN(high) || projected_start < high);
+        frame.words[0x1c / 4] |= (tU32)(PhysicsWallNaN(projected_end) || PhysicsWallNaN(high) || projected_end < high);
+        if (!PhysicsWallNaN(projected_start) && !PhysicsWallNaN(high) && projected_start > high && !PhysicsWallNaN(projected_end) && projected_end > high)
+            return count;
     }
-    if(object->field_0xed==0) {
-        if(frame.words[0x18/4]!=0) {
-            for(component=0;component<3;component++)PhysicsSubtractScalar(&relative38->v[component],&start->v[component],&object->transform_matrix.m[3][component]);
-            BrMatrix34TApplyV(buffer84,relative38,&object->transform_matrix);
-            PhysicsCopyWord(&actor,&object->actor);
-            for(component=0;component<3;component++)PhysicsSubtractScalar(&relative20->v[component],&start->v[component],&actor->t.t.mat.m[3][component]);
-            BrMatrix34TApplyV(buffer90,relative20,&actor->t.t.mat);
-            result=ShapeRayCastWithSphere(buffer84,buffer90,shape,buffer60,buffer78,(br_scalar*)(void*)&frame.values[0x10/4]);
-            if(result>0) {
-                if(result>64)frame.values[0x10/4]=1.1f;
-                count=AddObjectWallForce(contacts,buffer60,frame.values[0x10/4],buffer78,0,count,object,2,face,NULL);
+    if (object->field_0xed == 0) {
+        if (frame.words[0x18 / 4] != 0) {
+            for (component = 0; component < 3; component++)
+                PhysicsSubtractScalar(&relative38->v[component], &start->v[component], &object->transform_matrix.m[3][component]);
+            BrMatrix34TApplyV(buffer84, relative38, &object->transform_matrix);
+            PhysicsCopyWord(&actor, &object->actor);
+            for (component = 0; component < 3; component++)
+                PhysicsSubtractScalar(&relative20->v[component], &start->v[component], &actor->t.t.mat.m[3][component]);
+            BrMatrix34TApplyV(buffer90, relative20, &actor->t.t.mat);
+            result = ShapeRayCastWithSphere(buffer84, buffer90, shape, buffer60, buffer78, (br_scalar*)(void*)&frame.values[0x10 / 4]);
+            if (result > 0) {
+                if (result > 64)
+                    frame.values[0x10 / 4] = 1.1f;
+                count = AddObjectWallForce(contacts, buffer60, frame.values[0x10 / 4], buffer78, 0, count, object, 2, face, NULL);
             }
         }
-        if(frame.words[0x1c/4]!=0) {
-            for(component=0;component<3;component++)PhysicsSubtractScalar(&relative20->v[component],&end->v[component],&object->transform_matrix.m[3][component]);
-            BrMatrix34TApplyV(buffer78,relative20,&object->transform_matrix);
-            PhysicsCopyWord(&actor,&object->actor);
-            for(component=0;component<3;component++)PhysicsSubtractScalar(&relative38->v[component],&end->v[component],&actor->t.t.mat.m[3][component]);
-            BrMatrix34TApplyV(buffer60,relative38,&actor->t.t.mat);
-            result=ShapeRayCastWithSphere(buffer78,buffer60,shape,buffer90,buffer84,(br_scalar*)(void*)&frame.values[0x10/4]);
-            if(result>0) {
-                if(result>64)frame.values[0x10/4]=1.1f;
-                count=AddObjectWallForce(contacts,buffer90,frame.values[0x10/4],buffer84,0,count,object,2,face,NULL);
+        if (frame.words[0x1c / 4] != 0) {
+            for (component = 0; component < 3; component++)
+                PhysicsSubtractScalar(&relative20->v[component], &end->v[component], &object->transform_matrix.m[3][component]);
+            BrMatrix34TApplyV(buffer78, relative20, &object->transform_matrix);
+            PhysicsCopyWord(&actor, &object->actor);
+            for (component = 0; component < 3; component++)
+                PhysicsSubtractScalar(&relative38->v[component], &end->v[component], &actor->t.t.mat.m[3][component]);
+            BrMatrix34TApplyV(buffer60, relative38, &actor->t.t.mat);
+            result = ShapeRayCastWithSphere(buffer78, buffer60, shape, buffer90, buffer84, (br_scalar*)(void*)&frame.values[0x10 / 4]);
+            if (result > 0) {
+                if (result > 64)
+                    frame.values[0x10 / 4] = 1.1f;
+                count = AddObjectWallForce(contacts, buffer90, frame.values[0x10 / 4], buffer84, 0, count, object, 2, face, NULL);
             }
         }
     }
-    for(component=0;component<3;component++)PhysicsSubtractScalar(&direction->v[component],&end->v[component],&start->v[component]);
-    selector=0;candidates[0].face=face;candidates[1].face=face;
-    candidates[0].t=2.f;candidates[1].t=2.f;
-    frame.words[0x14/4]=0xffffffffu;frame.words[0x10/4]=0;
-    if(*(tU16*)&workspace->count_edges!=0) {
+    for (component = 0; component < 3; component++)
+        PhysicsSubtractScalar(&direction->v[component], &end->v[component], &start->v[component]);
+    selector = 0;
+    candidates[0].face = face;
+    candidates[1].face = face;
+    candidates[0].t = 2.f;
+    candidates[1].t = 2.f;
+    frame.words[0x14 / 4] = 0xffffffffu;
+    frame.words[0x10 / 4] = 0;
+    if (*(tU16*)&workspace->count_edges != 0) {
         do {
-            current=frame.words[0x10/4];
-            index1=workspace->edges[current].index1;index2=workspace->edges[current].index2;
-            first=&workspace->original_points[index1];second=&workspace->original_points[index2];
-            trial_first=&workspace->trial_points[index1];trial_second=&workspace->trial_points[index2];
-            for(component=0;component<3;component++)PhysicsSubtractScalar(&velocity->v[component],&trial_first->v[component],&first->v[component]);
-            for(component=0;component<3;component++)PhysicsSubtractScalar(&edge->v[component],&second->v[component],&first->v[component]);
-            PhysicsSubtractScalar(&change->v[0],&trial_second->v[0],&trial_first->v[0]);
-            PhysicsSubtractScalar(&change->v[1],&trial_second->v[1],&trial_first->v[1]);
-            wide_change_z=(double)trial_second->v[2]-trial_first->v[2];
-            PhysicsSubtractScalar(&change->v[0],&change->v[0],&edge->v[0]);
-            PhysicsSubtractScalar(&change->v[1],&change->v[1],&edge->v[1]);
-            change->v[2]=PhysicsScalar(wide_change_z-edge->v[2]);
-            result=FUN_00424990(start,direction,first,edge,velocity,change,(tPhysics_contact*)(void*)&candidates[selector],count,object,NULL);
-            if(result!=0) {
-                frame.words[0x14/4]=current;
-                if(PhysicsWallNaN(candidates[selector].t)||PhysicsWallNaN(candidates[!selector].t)||candidates[selector].t<candidates[!selector].t)selector=!selector;
+            current = frame.words[0x10 / 4];
+            index1 = workspace->edges[current].index1;
+            index2 = workspace->edges[current].index2;
+            first = &workspace->original_points[index1];
+            second = &workspace->original_points[index2];
+            trial_first = &workspace->trial_points[index1];
+            trial_second = &workspace->trial_points[index2];
+            for (component = 0; component < 3; component++)
+                PhysicsSubtractScalar(&velocity->v[component], &trial_first->v[component], &first->v[component]);
+            for (component = 0; component < 3; component++)
+                PhysicsSubtractScalar(&edge->v[component], &second->v[component], &first->v[component]);
+            PhysicsSubtractScalar(&change->v[0], &trial_second->v[0], &trial_first->v[0]);
+            PhysicsSubtractScalar(&change->v[1], &trial_second->v[1], &trial_first->v[1]);
+            wide_change_z = (double)trial_second->v[2] - trial_first->v[2];
+            PhysicsSubtractScalar(&change->v[0], &change->v[0], &edge->v[0]);
+            PhysicsSubtractScalar(&change->v[1], &change->v[1], &edge->v[1]);
+            change->v[2] = PhysicsScalar(wide_change_z - edge->v[2]);
+            result = FUN_00424990(start, direction, first, edge, velocity, change, (tPhysics_contact*)(void*)&candidates[selector], count, object, NULL);
+            if (result != 0) {
+                frame.words[0x14 / 4] = current;
+                if (PhysicsWallNaN(candidates[selector].t) || PhysicsWallNaN(candidates[!selector].t) || candidates[selector].t < candidates[!selector].t)
+                    selector = !selector;
             }
-            current=frame.words[0x10/4]+1;frame.words[0x10/4]=current;
-        } while((int)current<(int)*(tU16*)&workspace->count_edges);
+            current = frame.words[0x10 / 4] + 1;
+            frame.words[0x10 / 4] = current;
+        } while ((int)current < (int)*(tU16*)&workspace->count_edges);
     }
-    if(!PhysicsWallNaN(candidates[0].t)&&!(candidates[0].t<2.f))return count;
-    normal_side=((double)face->normal.v[2]*(double)*(br_scalar*)(void*)(candidates[0].field_0x38+8)+(double)face->normal.v[1]*(double)*(br_scalar*)(void*)(candidates[0].field_0x38+4))+(double)face->normal.v[0]*(double)*(br_scalar*)(void*)candidates[0].field_0x38;
-    if(PhysicsWallNaN(normal_side)||normal_side<0.0) {
-        matrix=&object->transform_matrix;
-        for(component=0;component<3;component++)PhysicsSubtractScalar(&relative20->v[component],&start->v[component],&matrix->m[3][component]);
-        BrMatrix34TApplyV(gate_start,relative20,matrix);
-        for(component=0;component<3;component++)PhysicsSubtractScalar(&relative20->v[component],&end->v[component],&matrix->m[3][component]);
-        BrMatrix34TApplyV(gate_end,relative20,matrix);
-        result=ShapeRayCast(gate_start,gate_end,shape,gate_point,(br_scalar*)(void*)&frame.values[0x18/4],NULL);
-        if(result!=0)return count;
+    if (!PhysicsWallNaN(candidates[0].t) && !(candidates[0].t < 2.f))
+        return count;
+    normal_side = ((double)face->normal.v[2] * (double)*(br_scalar*)(void*)(candidates[0].field_0x38 + 8) + (double)face->normal.v[1] * (double)*(br_scalar*)(void*)(candidates[0].field_0x38 + 4)) + (double)face->normal.v[0] * (double)*(br_scalar*)(void*)candidates[0].field_0x38;
+    if (PhysicsWallNaN(normal_side) || normal_side < 0.0) {
+        matrix = &object->transform_matrix;
+        for (component = 0; component < 3; component++)
+            PhysicsSubtractScalar(&relative20->v[component], &start->v[component], &matrix->m[3][component]);
+        BrMatrix34TApplyV(gate_start, relative20, matrix);
+        for (component = 0; component < 3; component++)
+            PhysicsSubtractScalar(&relative20->v[component], &end->v[component], &matrix->m[3][component]);
+        BrMatrix34TApplyV(gate_end, relative20, matrix);
+        result = ShapeRayCast(gate_start, gate_end, shape, gate_point, (br_scalar*)(void*)&frame.values[0x18 / 4], NULL);
+        if (result != 0)
+            return count;
     }
-    gPhysics_contact_679430|=(tU32)1<<(frame.words[0x14/4]&31);
-    count=AddObjectWallForce(contacts,(const br_vector3*)(const void*)&candidates[0].position,candidates[0].t,(const br_vector3*)(const void*)&candidates[0].normal,0,count,object,0,face,(const br_vector3*)(const void*)&candidates[0].reference_position);
-    if(PhysicsWallNaN(candidates[1].t)||candidates[1].t<2.f)count=AddObjectWallForce(contacts,(const br_vector3*)(const void*)&candidates[1].position,candidates[1].t,(const br_vector3*)(const void*)&candidates[1].normal,0,count,object,0,face,(const br_vector3*)(const void*)&candidates[1].reference_position);
+    gPhysics_contact_679430 |= (tU32)1 << (frame.words[0x14 / 4] & 31);
+    count = AddObjectWallForce(contacts, (const br_vector3*)(const void*)&candidates[0].position, candidates[0].t, (const br_vector3*)(const void*)&candidates[0].normal, 0, count, object, 0, face, (const br_vector3*)(const void*)&candidates[0].reference_position);
+    if (PhysicsWallNaN(candidates[1].t) || candidates[1].t < 2.f)
+        count = AddObjectWallForce(contacts, (const br_vector3*)(const void*)&candidates[1].position, candidates[1].t, (const br_vector3*)(const void*)&candidates[1].normal, 0, count, object, 0, face, (const br_vector3*)(const void*)&candidates[1].reference_position);
     return count;
 }
 
 /* Complete quadratic moving-edge contact; original lexical name unknown. */
 // FUNCTION: CARMA2_HW 0x00424990
 int C2_HOOK_FASTCALL FUN_00424990(const br_vector3* old_origin, const br_vector3* old_direction, const br_vector3* moving_origin, const br_vector3* moving_direction, const br_vector3* velocity, const br_vector3* direction_change, tPhysics_contact* output, int unused, tPhysics_object* object, tPhysics_object* other) {
-    br_vector3 n0,n1,delta,normal,edge,origin,local,world,relative,previous_normal;
-    double a,c,ac4,b2,root,wide_time,normal_square,normal_length,scale;
+    br_vector3 n0, n1, delta, normal, edge, origin, local, world, relative, previous_normal;
+    double a, c, ac4, b2, root, wide_time, normal_square, normal_length, scale;
     br_scalar b;
-    double dot,numerator,denominator,orientation,mixed[3],wide_delta[3],wide_edge_x;
-    br_scalar negative_square,projection[3],stored_dot,stored_z_product;
-    br_scalar stored_current[3],stored_blend[3];
-    br_scalar time,stored_two_a,stored_root,stored_ac4,stored_b2,edge_fraction,old_fraction;
+    double dot, numerator, denominator, orientation, mixed[3], wide_delta[3], wide_edge_x;
+    br_scalar negative_square, projection[3], stored_dot, stored_z_product;
+    br_scalar stored_current[3], stored_blend[3];
+    br_scalar time, stored_two_a, stored_root, stored_ac4, stored_b2, edge_fraction, old_fraction;
     br_scalar complement;
-    unsigned axis,i;
-    n0.v[0]=PhysicsScalar((double)moving_direction->v[1]*old_direction->v[2]-(double)old_direction->v[1]*moving_direction->v[2]);
-    n0.v[1]=PhysicsScalar((double)moving_direction->v[2]*old_direction->v[0]-(double)old_direction->v[2]*moving_direction->v[0]);
-    n0.v[2]=PhysicsScalar((double)old_direction->v[1]*moving_direction->v[0]-(double)moving_direction->v[1]*old_direction->v[0]);
-    n1.v[0]=PhysicsScalar((double)direction_change->v[1]*old_direction->v[2]-(double)direction_change->v[2]*old_direction->v[1]);
-    n1.v[1]=PhysicsScalar((double)direction_change->v[2]*old_direction->v[0]-(double)old_direction->v[2]*direction_change->v[0]);
-    n1.v[2]=PhysicsScalar((double)old_direction->v[1]*direction_change->v[0]-(double)direction_change->v[1]*old_direction->v[0]);
-    for(i=0;i<3;i++)PhysicsSubtractScalar(&delta.v[i],&moving_origin->v[i],&old_origin->v[i]);
-    a=(double)velocity->v[1]*n1.v[1]+(double)velocity->v[2]*n1.v[2]+(double)n1.v[0]*velocity->v[0];
-    b=PhysicsScalar(((double)moving_origin->v[2]*n1.v[2]+(double)moving_origin->v[1]*n1.v[1]+(double)n1.v[0]*moving_origin->v[0]+
-        ((double)velocity->v[1]*n0.v[1]+(double)velocity->v[2]*n0.v[2]+(double)n0.v[0]*velocity->v[0]))-
-        ((double)old_origin->v[2]*n1.v[2]+(double)old_origin->v[1]*n1.v[1]+(double)n1.v[0]*old_origin->v[0]+
-        ((double)old_direction->v[2]*n0.v[2]+(double)old_direction->v[1]*n0.v[1]+(double)n0.v[0]*old_direction->v[0])));
-    c=(double)delta.v[0]*n0.v[0]+(double)delta.v[1]*n0.v[1]+(double)delta.v[2]*n0.v[2];
-    if(PhysicsWallNaN(a)||a<0.0) {a=-a;b=-b;c=-c;}
-    ac4=(c*a)*4.f;
-    stored_ac4=PhysicsScalar(ac4);
-    b2=b*b;
-    stored_b2=PhysicsScalar(b2);
-    if((double)stored_b2<fabs(ac4)*1000.f) {
-        root=(double)stored_b2-stored_ac4;
-        if(PhysicsWallNaN(root)||root<0.0)goto fallback;
-        stored_root=PhysicsScalar(sqrt(root));
-        stored_two_a=PhysicsScalar(a+a);
-        wide_time=(-b-stored_root)/stored_two_a;
-        time=PhysicsScalar(wide_time);
-        if(wide_time>1.0)goto fallback;
-        if(!PhysicsWallNaN(time)&&time>=0.f) {
-            for(i=0;i<3;i++) {mixed[i]=(double)time*n1.v[i]+n0.v[i];normal.v[i]=PhysicsScalar(mixed[i]);}
-            normal_square=mixed[0]*normal.v[0]+mixed[1]*normal.v[1]+mixed[2]*normal.v[2];
-            if(PhysicsWallNaN(normal_square)||normal_square<1e-7)goto fallback;
-        }
-        if(PhysicsWallNaN(time)||time<0.f)time=PhysicsScalar(((double)stored_root-b)/stored_two_a);
-    } else {
-        if(!(fabs(b)>1e-7))goto fallback;
-        wide_time=-(c/b)-(((c*c*a)/((double)stored_b2*b))*(double)-1.3333333730697632f);
-        time=PhysicsScalar(wide_time);
-        if(PhysicsWallNaN(wide_time)||wide_time<0.0||time>1.f||gPhysics_contact_679438!=0)time=PhysicsScalar(-(b/a)-time);
+    unsigned axis, i;
+    n0.v[0] = PhysicsScalar((double)moving_direction->v[1] * old_direction->v[2] - (double)old_direction->v[1] * moving_direction->v[2]);
+    n0.v[1] = PhysicsScalar((double)moving_direction->v[2] * old_direction->v[0] - (double)old_direction->v[2] * moving_direction->v[0]);
+    n0.v[2] = PhysicsScalar((double)old_direction->v[1] * moving_direction->v[0] - (double)moving_direction->v[1] * old_direction->v[0]);
+    n1.v[0] = PhysicsScalar((double)direction_change->v[1] * old_direction->v[2] - (double)direction_change->v[2] * old_direction->v[1]);
+    n1.v[1] = PhysicsScalar((double)direction_change->v[2] * old_direction->v[0] - (double)old_direction->v[2] * direction_change->v[0]);
+    n1.v[2] = PhysicsScalar((double)old_direction->v[1] * direction_change->v[0] - (double)direction_change->v[1] * old_direction->v[0]);
+    for (i = 0; i < 3; i++)
+        PhysicsSubtractScalar(&delta.v[i], &moving_origin->v[i], &old_origin->v[i]);
+    a = (double)velocity->v[1] * n1.v[1] + (double)velocity->v[2] * n1.v[2] + (double)n1.v[0] * velocity->v[0];
+    b = PhysicsScalar(((double)moving_origin->v[2] * n1.v[2] + (double)moving_origin->v[1] * n1.v[1] + (double)n1.v[0] * moving_origin->v[0] + ((double)velocity->v[1] * n0.v[1] + (double)velocity->v[2] * n0.v[2] + (double)n0.v[0] * velocity->v[0])) - ((double)old_origin->v[2] * n1.v[2] + (double)old_origin->v[1] * n1.v[1] + (double)n1.v[0] * old_origin->v[0] + ((double)old_direction->v[2] * n0.v[2] + (double)old_direction->v[1] * n0.v[1] + (double)n0.v[0] * old_direction->v[0])));
+    c = (double)delta.v[0] * n0.v[0] + (double)delta.v[1] * n0.v[1] + (double)delta.v[2] * n0.v[2];
+    if (PhysicsWallNaN(a) || a < 0.0) {
+        a = -a;
+        b = -b;
+        c = -c;
     }
-    if(!(time>=0.f)||!(time<=1.f))goto fallback;
-    for(i=0;i<3;i++) {mixed[i]=(double)time*n1.v[i]+n0.v[i];normal.v[i]=PhysicsScalar(mixed[i]);}
-    normal_square=mixed[0]*normal.v[0]+mixed[1]*normal.v[1]+mixed[2]*normal.v[2];
-    if(PhysicsWallNaN(normal_square)||normal_square<1e-7)goto fallback;
-    if(!PhysicsWallNaN(output->t)&&!(time<output->t))return 0;
-    normal_length=sqrt((double)normal.v[0]*normal.v[0]+(double)normal.v[1]*normal.v[1]+(double)normal.v[2]*normal.v[2]);
-    if(PhysicsWallNaN(normal_length)||normal_length<=2.384185791015625e-7f) {
-        normal.v[0]=1.f;normal.v[1]=0.f;normal.v[2]=0.f;
-    } else {
-        scale=1.0/normal_length;
-        for(i=0;i<3;i++)normal.v[i]=PhysicsScalar(scale*normal.v[i]);
-    }
-    wide_edge_x=(double)time*direction_change->v[0]+moving_direction->v[0];
-    edge.v[0]=PhysicsScalar(wide_edge_x);
-    for(i=1;i<3;i++)edge.v[i]=PhysicsScalar((double)direction_change->v[i]*time+moving_direction->v[i]);
-    for(i=0;i<3;i++)origin.v[i]=PhysicsScalar((double)time*velocity->v[i]+moving_origin->v[i]);
-    dot=(double)old_direction->v[1]*edge.v[1]+(double)old_direction->v[2]*edge.v[2]+wide_edge_x*old_direction->v[0];
-    stored_dot=PhysicsScalar(dot);
-    negative_square=PhysicsScalar(-((double)old_direction->v[1]*old_direction->v[1]+(double)old_direction->v[2]*old_direction->v[2]+(double)old_direction->v[0]*old_direction->v[0]));
-    projection[0]=PhysicsScalar((double)edge.v[0]*negative_square+dot*old_direction->v[0]);
-    projection[1]=PhysicsScalar((double)edge.v[1]*negative_square+(double)old_direction->v[1]*stored_dot);
-    stored_z_product=PhysicsScalar((double)old_direction->v[2]*stored_dot);
-    projection[2]=PhysicsScalar((double)edge.v[2]*negative_square+stored_z_product);
-    for(i=0;i<3;i++) {wide_delta[i]=(double)old_origin->v[i]-origin.v[i];delta.v[i]=PhysicsScalar(wide_delta[i]);}
-    numerator=wide_delta[0]*projection[0]+wide_delta[1]*projection[1]+wide_delta[2]*projection[2];
-    denominator=(double)edge.v[0]*projection[0]+(double)edge.v[1]*projection[1]+(double)edge.v[2]*projection[2];
-    edge_fraction=PhysicsScalar(numerator/denominator);
-    if(!(edge_fraction>=0.f)||!(edge_fraction<=1.f))goto fallback;
-    axis=!(fabs((double)old_direction->v[0])>=fabs((double)old_direction->v[1]));
-    if(!(fabs((double)old_direction->v[2])<=fabs((double)old_direction->v[axis])))axis=2;
-    old_fraction=PhysicsScalar(((double)edge.v[axis]*edge_fraction+origin.v[axis]-old_origin->v[axis])/old_direction->v[axis]);
-    if(!(old_fraction>=0.f)||!(old_fraction<=1.f))goto fallback;
-    for(i=0;i<3;i++)PhysicsSubtractScalar(&delta.v[i],&moving_origin->v[i],&old_origin->v[i]);
-    orientation=(double)delta.v[0]*n0.v[0]+(double)delta.v[1]*n0.v[1]+(double)delta.v[2]*n0.v[2];
-    if(PhysicsWallNaN(orientation)||orientation<0.0)for(i=0;i<3;i++)normal.v[i]=-normal.v[i];
-    if(other!=NULL) {
-        BrMatrix34ApplyV(&output->normal,&normal,&other->transform_matrix);
-        BrMatrix34ApplyV(&previous_normal,&normal,&other->actor->t.t.mat);
-        complement=PhysicsScalar(1.f-time);
-        for(i=0;i<3;i++)stored_current[i]=PhysicsScalar((double)output->normal.v[i]*time);
-        output->normal.v[0]=stored_current[0];
-        for(i=0;i<3;i++) {
-            mixed[i]=(double)previous_normal.v[i]*complement+stored_current[i];
-            stored_blend[i]=PhysicsScalar(mixed[i]);
+    ac4 = (c * a) * 4.f;
+    stored_ac4 = PhysicsScalar(ac4);
+    b2 = b * b;
+    stored_b2 = PhysicsScalar(b2);
+    if ((double)stored_b2 < fabs(ac4) * 1000.f) {
+        root = (double)stored_b2 - stored_ac4;
+        if (PhysicsWallNaN(root) || root < 0.0)
+            goto fallback;
+        stored_root = PhysicsScalar(sqrt(root));
+        stored_two_a = PhysicsScalar(a + a);
+        wide_time = (-b - stored_root) / stored_two_a;
+        time = PhysicsScalar(wide_time);
+        if (wide_time > 1.0)
+            goto fallback;
+        if (!PhysicsWallNaN(time) && time >= 0.f) {
+            for (i = 0; i < 3; i++) {
+                mixed[i] = (double)time * n1.v[i] + n0.v[i];
+                normal.v[i] = PhysicsScalar(mixed[i]);
+            }
+            normal_square = mixed[0] * normal.v[0] + mixed[1] * normal.v[1] + mixed[2] * normal.v[2];
+            if (PhysicsWallNaN(normal_square) || normal_square < 1e-7)
+                goto fallback;
         }
-        normal_length=sqrt(mixed[0]*stored_blend[0]+mixed[1]*stored_blend[1]+mixed[2]*stored_blend[2]);
-        output->normal.v[1]=stored_current[1];output->normal.v[1]=stored_blend[1];
-        output->normal.v[2]=stored_current[2];output->normal.v[0]=stored_blend[0];output->normal.v[2]=stored_blend[2];
-        if(PhysicsWallNaN(normal_length)||normal_length<=2.384185791015625e-7f) {
-            output->normal.v[0]=1.f;output->normal.v[1]=0.f;output->normal.v[2]=0.f;
+        if (PhysicsWallNaN(time) || time < 0.f)
+            time = PhysicsScalar(((double)stored_root - b) / stored_two_a);
+    } else {
+        if (!(fabs(b) > 1e-7))
+            goto fallback;
+        wide_time = -(c / b) - (((c * c * a) / ((double)stored_b2 * b)) * (double)-1.3333333730697632f);
+        time = PhysicsScalar(wide_time);
+        if (PhysicsWallNaN(wide_time) || wide_time < 0.0 || time > 1.f || gPhysics_contact_679438 != 0)
+            time = PhysicsScalar(-(b / a) - time);
+    }
+    if (!(time >= 0.f) || !(time <= 1.f))
+        goto fallback;
+    for (i = 0; i < 3; i++) {
+        mixed[i] = (double)time * n1.v[i] + n0.v[i];
+        normal.v[i] = PhysicsScalar(mixed[i]);
+    }
+    normal_square = mixed[0] * normal.v[0] + mixed[1] * normal.v[1] + mixed[2] * normal.v[2];
+    if (PhysicsWallNaN(normal_square) || normal_square < 1e-7)
+        goto fallback;
+    if (!PhysicsWallNaN(output->t) && !(time < output->t))
+        return 0;
+    normal_length = sqrt((double)normal.v[0] * normal.v[0] + (double)normal.v[1] * normal.v[1] + (double)normal.v[2] * normal.v[2]);
+    if (PhysicsWallNaN(normal_length) || normal_length <= 2.384185791015625e-7f) {
+        normal.v[0] = 1.f;
+        normal.v[1] = 0.f;
+        normal.v[2] = 0.f;
+    } else {
+        scale = 1.0 / normal_length;
+        for (i = 0; i < 3; i++)
+            normal.v[i] = PhysicsScalar(scale * normal.v[i]);
+    }
+    wide_edge_x = (double)time * direction_change->v[0] + moving_direction->v[0];
+    edge.v[0] = PhysicsScalar(wide_edge_x);
+    for (i = 1; i < 3; i++)
+        edge.v[i] = PhysicsScalar((double)direction_change->v[i] * time + moving_direction->v[i]);
+    for (i = 0; i < 3; i++)
+        origin.v[i] = PhysicsScalar((double)time * velocity->v[i] + moving_origin->v[i]);
+    dot = (double)old_direction->v[1] * edge.v[1] + (double)old_direction->v[2] * edge.v[2] + wide_edge_x * old_direction->v[0];
+    stored_dot = PhysicsScalar(dot);
+    negative_square = PhysicsScalar(-((double)old_direction->v[1] * old_direction->v[1] + (double)old_direction->v[2] * old_direction->v[2] + (double)old_direction->v[0] * old_direction->v[0]));
+    projection[0] = PhysicsScalar((double)edge.v[0] * negative_square + dot * old_direction->v[0]);
+    projection[1] = PhysicsScalar((double)edge.v[1] * negative_square + (double)old_direction->v[1] * stored_dot);
+    stored_z_product = PhysicsScalar((double)old_direction->v[2] * stored_dot);
+    projection[2] = PhysicsScalar((double)edge.v[2] * negative_square + stored_z_product);
+    for (i = 0; i < 3; i++) {
+        wide_delta[i] = (double)old_origin->v[i] - origin.v[i];
+        delta.v[i] = PhysicsScalar(wide_delta[i]);
+    }
+    numerator = wide_delta[0] * projection[0] + wide_delta[1] * projection[1] + wide_delta[2] * projection[2];
+    denominator = (double)edge.v[0] * projection[0] + (double)edge.v[1] * projection[1] + (double)edge.v[2] * projection[2];
+    edge_fraction = PhysicsScalar(numerator / denominator);
+    if (!(edge_fraction >= 0.f) || !(edge_fraction <= 1.f))
+        goto fallback;
+    axis = !(fabs((double)old_direction->v[0]) >= fabs((double)old_direction->v[1]));
+    if (!(fabs((double)old_direction->v[2]) <= fabs((double)old_direction->v[axis])))
+        axis = 2;
+    old_fraction = PhysicsScalar(((double)edge.v[axis] * edge_fraction + origin.v[axis] - old_origin->v[axis]) / old_direction->v[axis]);
+    if (!(old_fraction >= 0.f) || !(old_fraction <= 1.f))
+        goto fallback;
+    for (i = 0; i < 3; i++)
+        PhysicsSubtractScalar(&delta.v[i], &moving_origin->v[i], &old_origin->v[i]);
+    orientation = (double)delta.v[0] * n0.v[0] + (double)delta.v[1] * n0.v[1] + (double)delta.v[2] * n0.v[2];
+    if (PhysicsWallNaN(orientation) || orientation < 0.0)
+        for (i = 0; i < 3; i++)
+            normal.v[i] = -normal.v[i];
+    if (other != NULL) {
+        BrMatrix34ApplyV(&output->normal, &normal, &other->transform_matrix);
+        BrMatrix34ApplyV(&previous_normal, &normal, &other->actor->t.t.mat);
+        complement = PhysicsScalar(1.f - time);
+        for (i = 0; i < 3; i++)
+            stored_current[i] = PhysicsScalar((double)output->normal.v[i] * time);
+        output->normal.v[0] = stored_current[0];
+        for (i = 0; i < 3; i++) {
+            mixed[i] = (double)previous_normal.v[i] * complement + stored_current[i];
+            stored_blend[i] = PhysicsScalar(mixed[i]);
+        }
+        normal_length = sqrt(mixed[0] * stored_blend[0] + mixed[1] * stored_blend[1] + mixed[2] * stored_blend[2]);
+        output->normal.v[1] = stored_current[1];
+        output->normal.v[1] = stored_blend[1];
+        output->normal.v[2] = stored_current[2];
+        output->normal.v[0] = stored_blend[0];
+        output->normal.v[2] = stored_blend[2];
+        if (PhysicsWallNaN(normal_length) || normal_length <= 2.384185791015625e-7f) {
+            output->normal.v[0] = 1.f;
+            output->normal.v[1] = 0.f;
+            output->normal.v[2] = 0.f;
         } else {
-            scale=1.0/normal_length;
-            output->normal.v[0]=PhysicsScalar(scale*mixed[0]);
-            output->normal.v[1]=PhysicsScalar(scale*stored_blend[1]);
-            output->normal.v[2]=PhysicsScalar(scale*stored_blend[2]);
+            scale = 1.0 / normal_length;
+            output->normal.v[0] = PhysicsScalar(scale * mixed[0]);
+            output->normal.v[1] = PhysicsScalar(scale * stored_blend[1]);
+            output->normal.v[2] = PhysicsScalar(scale * stored_blend[2]);
         }
-        for(i=0;i<3;i++)wide_delta[i]=(double)old_fraction*old_direction->v[i];
-        for(i=0;i<3;i++)output->reference_position.v[i]=PhysicsScalar(wide_delta[i]+old_origin->v[i]);
-        for(i=0;i<3;i++)local.v[i]=PhysicsScalar((double)edge_fraction*moving_direction->v[i]+moving_origin->v[i]);
-        BrMatrix34ApplyP(&world,&local,&other->transform_matrix);
-        for(i=0;i<3;i++)PhysicsSubtractScalar(&relative.v[i],&world.v[i],&object->transform_matrix.m[3][i]);
-        BrMatrix34TApplyV(&output->position,&relative,&object->transform_matrix);
-        output->t=time;
+        for (i = 0; i < 3; i++)
+            wide_delta[i] = (double)old_fraction * old_direction->v[i];
+        for (i = 0; i < 3; i++)
+            output->reference_position.v[i] = PhysicsScalar(wide_delta[i] + old_origin->v[i]);
+        for (i = 0; i < 3; i++)
+            local.v[i] = PhysicsScalar((double)edge_fraction * moving_direction->v[i] + moving_origin->v[i]);
+        BrMatrix34ApplyP(&world, &local, &other->transform_matrix);
+        for (i = 0; i < 3; i++)
+            PhysicsSubtractScalar(&relative.v[i], &world.v[i], &object->transform_matrix.m[3][i]);
+        BrMatrix34TApplyV(&output->position, &relative, &object->transform_matrix);
+        output->t = time;
     } else {
-        BrMatrix34TApplyV(&output->normal,&normal,&object->transform_matrix);
-        for(i=0;i<3;i++)PhysicsCopyWord(output->field_0x38+4*i,&normal.v[i]);
-        for(i=0;i<3;i++) {
-            mixed[i]=(double)edge_fraction*moving_direction->v[i]+moving_origin->v[i];
-            relative.v[i]=PhysicsScalar(mixed[i]-object->transform_matrix.m[3][i]);
+        BrMatrix34TApplyV(&output->normal, &normal, &object->transform_matrix);
+        for (i = 0; i < 3; i++)
+            PhysicsCopyWord(output->field_0x38 + 4 * i, &normal.v[i]);
+        for (i = 0; i < 3; i++) {
+            mixed[i] = (double)edge_fraction * moving_direction->v[i] + moving_origin->v[i];
+            relative.v[i] = PhysicsScalar(mixed[i] - object->transform_matrix.m[3][i]);
         }
-        BrMatrix34TApplyV(&output->position,&relative,&object->transform_matrix);
-        for(i=0;i<3;i++)output->reference_position.v[i]=PhysicsScalar((double)old_fraction*old_direction->v[i]);
-        for(i=0;i<3;i++)output->reference_position.v[i]=PhysicsScalar((double)output->reference_position.v[i]+old_origin->v[i]);
-        output->t=time;
+        BrMatrix34TApplyV(&output->position, &relative, &object->transform_matrix);
+        for (i = 0; i < 3; i++)
+            output->reference_position.v[i] = PhysicsScalar((double)old_fraction * old_direction->v[i]);
+        for (i = 0; i < 3; i++)
+            output->reference_position.v[i] = PhysicsScalar((double)output->reference_position.v[i] + old_origin->v[i]);
+        output->t = time;
     }
     return 1;
 fallback:
-    return FUN_00425630(&n0,&n1,old_origin,old_direction,moving_origin,moving_direction,velocity,direction_change,output,unused,object,other);
+    return FUN_00425630(&n0, &n1, old_origin, old_direction, moving_origin, moving_direction, velocity, direction_change, output, unused, object, other);
 }
 
 // FUNCTION: CARMA2_HW 0x00425630
 int C2_HOOK_FASTCALL FUN_00425630(const br_vector3* n0, const br_vector3* n1, const br_vector3* old_origin, const br_vector3* old_direction, const br_vector3* moving_origin, const br_vector3* velocity0, const br_vector3* edge_change, const br_vector3* velocity1, tPhysics_contact* output, int unused, tPhysics_object* object, tPhysics_object* other) {
-    br_vector3 normal,delta,speed,point,relative,world;
-    double combined[3],unit[3],cross[3],wide_delta[3],wide_point[3];
-    double length,projection,denominator,numerator,scaled_x,parameter,distance,orientation;
-    br_scalar stored_length,time,segment,orientation_y,direction_y,direction_z;
-    union { br_scalar value; tU32 word; } scaled_y,scaled_z;
+    br_vector3 normal, delta, speed, point, relative, world;
+    double combined[3], unit[3], cross[3], wide_delta[3], wide_point[3];
+    double length, projection, denominator, numerator, scaled_x, parameter, distance, orientation;
+    br_scalar stored_length, time, segment, orientation_y, direction_y, direction_z;
+    union {
+        br_scalar value;
+        tU32 word;
+    } scaled_y, scaled_z;
     tU32 rounded_word;
     int i;
     (void)unused;
-    if(!((double)output->t>1.0)) return 0;
-    combined[0]=(double)n0->v[0]+n1->v[0];
-    combined[1]=(double)n1->v[1]+n0->v[1];
-    combined[2]=(double)n1->v[2]+n0->v[2];
-    for(i=0;i<3;i++)normal.v[i]=PhysicsScalar(combined[i]);
-    length=sqrt(combined[0]*normal.v[0]+combined[1]*normal.v[1]+combined[2]*normal.v[2]);
-    stored_length=PhysicsScalar(length);
-    if(!(length>1e-7)) return 0;
-    for(i=0;i<3;i++) {
-        wide_delta[i]=(double)moving_origin->v[i]+edge_change->v[i]-old_origin->v[i];
-        delta.v[i]=PhysicsScalar(wide_delta[i]);
+    if (!((double)output->t > 1.0))
+        return 0;
+    combined[0] = (double)n0->v[0] + n1->v[0];
+    combined[1] = (double)n1->v[1] + n0->v[1];
+    combined[2] = (double)n1->v[2] + n0->v[2];
+    for (i = 0; i < 3; i++)
+        normal.v[i] = PhysicsScalar(combined[i]);
+    length = sqrt(combined[0] * normal.v[0] + combined[1] * normal.v[1] + combined[2] * normal.v[2]);
+    stored_length = PhysicsScalar(length);
+    if (!(length > 1e-7))
+        return 0;
+    for (i = 0; i < 3; i++) {
+        wide_delta[i] = (double)moving_origin->v[i] + edge_change->v[i] - old_origin->v[i];
+        delta.v[i] = PhysicsScalar(wide_delta[i]);
     }
-    projection=fabs((wide_delta[0]*normal.v[0]+wide_delta[1]*normal.v[1]+wide_delta[2]*normal.v[2])/stored_length);
-    if(!PhysicsWallNaN(projection)&&!(projection<.002)) return 0;
-    for(i=0;i<3;i++)unit[i]=(double)normal.v[i]/stored_length;
-    for(i=0;i<3;i++)normal.v[i]=PhysicsScalar(unit[i]);
-    speed.v[0]=PhysicsScalar((double)velocity1->v[0]+velocity0->v[0]);
-    speed.v[1]=PhysicsScalar((double)velocity1->v[1]+velocity0->v[1]);
-    speed.v[2]=PhysicsScalar((double)velocity1->v[2]+velocity0->v[2]);
-    cross[0]=(double)old_direction->v[1]*normal.v[2]-(double)old_direction->v[2]*normal.v[1];
-    cross[1]=(double)old_direction->v[2]*normal.v[0]-unit[2]*old_direction->v[0];
-    cross[2]=unit[1]*old_direction->v[0]-(double)old_direction->v[1]*normal.v[0];
-    denominator=(cross[0]*((double)velocity1->v[0]+velocity0->v[0])+cross[1]*speed.v[1])+cross[2]*speed.v[2];
-    if(!(fabs(denominator)>1e-7)) return 0;
-    numerator=cross[0]*delta.v[0]+cross[1]*delta.v[1]+cross[2]*delta.v[2];
-    time=PhysicsScalar(-(numerator/denominator));
-    if(!(time>=0.f)||!(time<=1.f)) return 0;
-    scaled_x=(double)time*speed.v[0]+delta.v[0];
-    scaled_y.value=PhysicsScalar((double)time*speed.v[1]+delta.v[1]);
-    scaled_z.value=PhysicsScalar((double)time*speed.v[2]+delta.v[2]);
-    rounded_word=scaled_y.word;PhysicsCopyWord(&delta.v[1],&rounded_word);
-    rounded_word=scaled_z.word;PhysicsCopyWord(&delta.v[2],&rounded_word);
-    for(i=0;i<3;i++)normal.v[i]=PhysicsScalar(unit[i]);
-    parameter=((double)old_direction->v[1]*delta.v[1]+(double)old_direction->v[2]*delta.v[2]+scaled_x*old_direction->v[0])/
-        ((double)old_direction->v[1]*old_direction->v[1]+(double)old_direction->v[2]*old_direction->v[2]+(double)old_direction->v[0]*old_direction->v[0]);
-    segment=PhysicsScalar(parameter);
-    if(!(segment>=0.f)||!(segment<=1.f)) return 0;
-    output->t=1.f;
-    scaled_y.value=PhysicsScalar((double)moving_origin->v[1]-old_origin->v[1]);
-    rounded_word=scaled_y.word;PhysicsCopyWord(&orientation_y,&rounded_word);
-    orientation=((double)orientation_y*n0->v[1]+((double)moving_origin->v[2]-old_origin->v[2])*n0->v[2])+((double)moving_origin->v[0]-old_origin->v[0])*n0->v[0];
-    if(PhysicsWallNaN(orientation)||orientation<0.0) {
-        for(i=0;i<3;i++)normal.v[i]=-normal.v[i];
+    projection = fabs((wide_delta[0] * normal.v[0] + wide_delta[1] * normal.v[1] + wide_delta[2] * normal.v[2]) / stored_length);
+    if (!PhysicsWallNaN(projection) && !(projection < .002))
+        return 0;
+    for (i = 0; i < 3; i++)
+        unit[i] = (double)normal.v[i] / stored_length;
+    for (i = 0; i < 3; i++)
+        normal.v[i] = PhysicsScalar(unit[i]);
+    speed.v[0] = PhysicsScalar((double)velocity1->v[0] + velocity0->v[0]);
+    speed.v[1] = PhysicsScalar((double)velocity1->v[1] + velocity0->v[1]);
+    speed.v[2] = PhysicsScalar((double)velocity1->v[2] + velocity0->v[2]);
+    cross[0] = (double)old_direction->v[1] * normal.v[2] - (double)old_direction->v[2] * normal.v[1];
+    cross[1] = (double)old_direction->v[2] * normal.v[0] - unit[2] * old_direction->v[0];
+    cross[2] = unit[1] * old_direction->v[0] - (double)old_direction->v[1] * normal.v[0];
+    denominator = (cross[0] * ((double)velocity1->v[0] + velocity0->v[0]) + cross[1] * speed.v[1]) + cross[2] * speed.v[2];
+    if (!(fabs(denominator) > 1e-7))
+        return 0;
+    numerator = cross[0] * delta.v[0] + cross[1] * delta.v[1] + cross[2] * delta.v[2];
+    time = PhysicsScalar(-(numerator / denominator));
+    if (!(time >= 0.f) || !(time <= 1.f))
+        return 0;
+    scaled_x = (double)time * speed.v[0] + delta.v[0];
+    scaled_y.value = PhysicsScalar((double)time * speed.v[1] + delta.v[1]);
+    scaled_z.value = PhysicsScalar((double)time * speed.v[2] + delta.v[2]);
+    rounded_word = scaled_y.word;
+    PhysicsCopyWord(&delta.v[1], &rounded_word);
+    rounded_word = scaled_z.word;
+    PhysicsCopyWord(&delta.v[2], &rounded_word);
+    for (i = 0; i < 3; i++)
+        normal.v[i] = PhysicsScalar(unit[i]);
+    parameter = ((double)old_direction->v[1] * delta.v[1] + (double)old_direction->v[2] * delta.v[2] + scaled_x * old_direction->v[0]) / ((double)old_direction->v[1] * old_direction->v[1] + (double)old_direction->v[2] * old_direction->v[2] + (double)old_direction->v[0] * old_direction->v[0]);
+    segment = PhysicsScalar(parameter);
+    if (!(segment >= 0.f) || !(segment <= 1.f))
+        return 0;
+    output->t = 1.f;
+    scaled_y.value = PhysicsScalar((double)moving_origin->v[1] - old_origin->v[1]);
+    rounded_word = scaled_y.word;
+    PhysicsCopyWord(&orientation_y, &rounded_word);
+    orientation = ((double)orientation_y * n0->v[1] + ((double)moving_origin->v[2] - old_origin->v[2]) * n0->v[2]) + ((double)moving_origin->v[0] - old_origin->v[0]) * n0->v[0];
+    if (PhysicsWallNaN(orientation) || orientation < 0.0) {
+        for (i = 0; i < 3; i++)
+            normal.v[i] = -normal.v[i];
     }
-    for(i=0;i<3;i++)wide_delta[i]=(double)moving_origin->v[i]+edge_change->v[i]-old_origin->v[i];
-    distance=wide_delta[0]*normal.v[0]+wide_delta[1]*normal.v[1]+wide_delta[2]*normal.v[2];
-    if(PhysicsWallNaN(distance)||distance<0.0) {
-        for(i=0;i<3;i++)normal.v[i]=-normal.v[i];
+    for (i = 0; i < 3; i++)
+        wide_delta[i] = (double)moving_origin->v[i] + edge_change->v[i] - old_origin->v[i];
+    distance = wide_delta[0] * normal.v[0] + wide_delta[1] * normal.v[1] + wide_delta[2] * normal.v[2];
+    if (PhysicsWallNaN(distance) || distance < 0.0) {
+        for (i = 0; i < 3; i++)
+            normal.v[i] = -normal.v[i];
     }
-    if(other==NULL&&(PhysicsWallNaN(distance)||fabs(distance)<.001))output->t=1.1f;
-    for(i=0;i<3;i++) {
-        wide_point[i]=(double)time*velocity0->v[i]+moving_origin->v[i];
-        point.v[i]=PhysicsScalar(wide_point[i]);
+    if (other == NULL && (PhysicsWallNaN(distance) || fabs(distance) < .001))
+        output->t = 1.1f;
+    for (i = 0; i < 3; i++) {
+        wide_point[i] = (double)time * velocity0->v[i] + moving_origin->v[i];
+        point.v[i] = PhysicsScalar(wide_point[i]);
     }
-    if(other!=NULL) {
-        BrMatrix34ApplyP(&world,&point,&other->transform_matrix);
-        for(i=0;i<3;i++)PhysicsSubtractScalar(&relative.v[i],&world.v[i],&object->transform_matrix.m[3][i]);
-        BrMatrix34TApplyV(&output->position,&relative,&object->transform_matrix);
-        BrMatrix34ApplyV(&output->normal,&normal,&other->transform_matrix);
+    if (other != NULL) {
+        BrMatrix34ApplyP(&world, &point, &other->transform_matrix);
+        for (i = 0; i < 3; i++)
+            PhysicsSubtractScalar(&relative.v[i], &world.v[i], &object->transform_matrix.m[3][i]);
+        BrMatrix34TApplyV(&output->position, &relative, &object->transform_matrix);
+        BrMatrix34ApplyV(&output->normal, &normal, &other->transform_matrix);
     } else {
-        for(i=0;i<3;i++)relative.v[i]=PhysicsScalar(wide_point[i]-object->transform_matrix.m[3][i]);
-        BrMatrix34TApplyV(&output->position,&relative,&object->transform_matrix);
-        BrMatrix34TApplyV(&output->normal,&normal,&object->transform_matrix);
-        for(i=0;i<3;i++)PhysicsCopyWord(output->field_0x38+4*i,&normal.v[i]);
+        for (i = 0; i < 3; i++)
+            relative.v[i] = PhysicsScalar(wide_point[i] - object->transform_matrix.m[3][i]);
+        BrMatrix34TApplyV(&output->position, &relative, &object->transform_matrix);
+        BrMatrix34TApplyV(&output->normal, &normal, &object->transform_matrix);
+        for (i = 0; i < 3; i++)
+            PhysicsCopyWord(output->field_0x38 + 4 * i, &normal.v[i]);
     }
-    PhysicsCopyWord(&direction_y,&old_direction->v[1]);
-    PhysicsCopyWord(&direction_z,&old_direction->v[2]);
-    output->reference_position.v[0]=PhysicsScalar((double)segment*old_direction->v[0]+old_origin->v[0]);
-    output->reference_position.v[1]=PhysicsScalar((double)direction_y*segment+old_origin->v[1]);
-    output->reference_position.v[2]=PhysicsScalar((double)direction_z*segment+old_origin->v[2]);
+    PhysicsCopyWord(&direction_y, &old_direction->v[1]);
+    PhysicsCopyWord(&direction_z, &old_direction->v[2]);
+    output->reference_position.v[0] = PhysicsScalar((double)segment * old_direction->v[0] + old_origin->v[0]);
+    output->reference_position.v[1] = PhysicsScalar((double)direction_y * segment + old_origin->v[1]);
+    output->reference_position.v[2] = PhysicsScalar((double)direction_z * segment + old_origin->v[2]);
     return 1;
 }
 
@@ -945,142 +1084,161 @@ int C2_HOOK_FASTCALL FUN_00425630(const br_vector3* n0, const br_vector3* n1, co
 /* Complete wall-contact consumer; original lexical name unknown. */
 // FUNCTION: CARMA2_HW 0x004228b0
 int C2_HOOK_FASTCALL FUN_004228b0(tPhysics_object* object, tPhysics_contact* contacts, int initial_count) {
-    union {tU8 bytes[0x7e8];tU32 words[0x1fa];br_scalar values[0x1fa];} frame;
-    tPhysics_wall_workspace* workspace=(tPhysics_wall_workspace*)(void*)&frame.bytes[0xe0];
-    br_matrix34* delta=(br_matrix34*)(void*)&frame.bytes[0x80];
-    br_matrix34* inverse=(br_matrix34*)(void*)&frame.bytes[0xb0];
-    br_vector3* corner=(br_vector3*)(void*)&frame.bytes[0x48];
-    br_vector3* intersection=(br_vector3*)(void*)&frame.bytes[0x34];
-    br_vector3* trial_normal=(br_vector3*)(void*)&frame.bytes[0x54];
-    br_vector3* best_normal=(br_vector3*)(void*)&frame.bytes[0x68];
-    br_vector3* previous_normal=(br_vector3*)(void*)&frame.bytes[0x74];
-    br_matrix34* current=&object->transform_matrix;
+    union {
+        tU8 bytes[0x7e8];
+        tU32 words[0x1fa];
+        br_scalar values[0x1fa];
+    } frame;
+    tPhysics_wall_workspace* workspace = (tPhysics_wall_workspace*)(void*)&frame.bytes[0xe0];
+    br_matrix34* delta = (br_matrix34*)(void*)&frame.bytes[0x80];
+    br_matrix34* inverse = (br_matrix34*)(void*)&frame.bytes[0xb0];
+    br_vector3* corner = (br_vector3*)(void*)&frame.bytes[0x48];
+    br_vector3* intersection = (br_vector3*)(void*)&frame.bytes[0x34];
+    br_vector3* trial_normal = (br_vector3*)(void*)&frame.bytes[0x54];
+    br_vector3* best_normal = (br_vector3*)(void*)&frame.bytes[0x68];
+    br_vector3* previous_normal = (br_vector3*)(void*)&frame.bytes[0x74];
+    br_matrix34* current = &object->transform_matrix;
     br_matrix34* previous;
-    tPhysics_shape* shape=object->shape;
+    tPhysics_shape* shape = object->shape;
     tPhysics_contact* first_contact;
     tPhysics_contact* next_contact;
     tCollision_shape_sphere_data* sphere;
     tFace_ref* face;
     tFace_ref* best_face;
     br_vector3* source;
-    br_scalar* radius_product_x=(br_scalar*)(void*)&frame.values[0x34/4];
-    br_scalar* radius_product_y=(br_scalar*)(void*)&frame.values[0x38/4];
+    br_scalar* radius_product_x = (br_scalar*)(void*)&frame.values[0x34 / 4];
+    br_scalar* radius_product_y = (br_scalar*)(void*)&frame.values[0x38 / 4];
     double negative_radius;
     double radius_product_z;
     double normal_dot;
-    int count=0,touched_all=0,touched;
-    int result,ordinal,point,component,sphere_count,classification=1;
+    int count = 0, touched_all = 0, touched;
+    int result, ordinal, point, component, sphere_count, classification = 1;
 
-    if(object->box_face_start==object->box_face_end)return 0;
-    if(initial_count>36)return 0;
-    BrMatrix34LPInverse(inverse,&object->actor->t.t.mat);
-    BrMatrix34Mul(delta,current,inverse);
-    while(shape!=NULL) {
-        result=EliminateFaces(object,shape,delta);
-        if(result!=0) {
-            previous=gPhysics_contact_679438?current:&object->actor->t.t.mat;
-            switch(shape->common.type) {
+    if (object->box_face_start == object->box_face_end)
+        return 0;
+    if (initial_count > 36)
+        return 0;
+    BrMatrix34LPInverse(inverse, &object->actor->t.t.mat);
+    BrMatrix34Mul(delta, current, inverse);
+    while (shape != NULL) {
+        result = EliminateFaces(object, shape, delta);
+        if (result != 0) {
+            previous = gPhysics_contact_679438 ? current : &object->actor->t.t.mat;
+            switch (shape->common.type) {
             case kCollisionShapeType_Box:
-                workspace->count_points=8;workspace->count_edges=12;
-                for(point=0;point<8;point++) {
-                    PhysicsCopyWord(&corner->v[0],(point&2)?&shape->common.bb.min.v[0]:&shape->common.bb.max.v[0]);
-                    PhysicsCopyWord(&corner->v[1],(point&1)?&shape->common.bb.min.v[1]:&shape->common.bb.max.v[1]);
-                    PhysicsCopyWord(&corner->v[2],(point&4)?&shape->common.bb.min.v[2]:&shape->common.bb.max.v[2]);
-                    BrMatrix34ApplyP(&workspace->original_points[point],corner,current);
-                    BrMatrix34ApplyP(&workspace->trial_points[point],corner,previous);
-                    workspace->vertex_flags[point]=0;
+                workspace->count_points = 8;
+                workspace->count_edges = 12;
+                for (point = 0; point < 8; point++) {
+                    PhysicsCopyWord(&corner->v[0], (point & 2) ? &shape->common.bb.min.v[0] : &shape->common.bb.max.v[0]);
+                    PhysicsCopyWord(&corner->v[1], (point & 1) ? &shape->common.bb.min.v[1] : &shape->common.bb.max.v[1]);
+                    PhysicsCopyWord(&corner->v[2], (point & 4) ? &shape->common.bb.min.v[2] : &shape->common.bb.max.v[2]);
+                    BrMatrix34ApplyP(&workspace->original_points[point], corner, current);
+                    BrMatrix34ApplyP(&workspace->trial_points[point], corner, previous);
+                    workspace->vertex_flags[point] = 0;
                 }
-                workspace->edges=gPhysics_box_edges_58f7f0;
+                workspace->edges = gPhysics_box_edges_58f7f0;
                 break;
             case kCollisionShapeType_Wireframe:
-                workspace->count_points=(tU16)shape->wireframe.wireframe.count_points;
-                workspace->count_edges=(tU16)shape->wireframe.wireframe.count_lines;
-                for(point=0;point<(int)workspace->count_points;point++) {
-                    source=&shape->wireframe.wireframe.points[point];
-                    BrMatrix34ApplyP(&workspace->original_points[point],source,current);
-                    source=&shape->wireframe.wireframe.points[point];
-                    BrMatrix34ApplyP(&workspace->trial_points[point],source,previous);
-                    workspace->vertex_flags[point]=0;
+                workspace->count_points = (tU16)shape->wireframe.wireframe.count_points;
+                workspace->count_edges = (tU16)shape->wireframe.wireframe.count_lines;
+                for (point = 0; point < (int)workspace->count_points; point++) {
+                    source = &shape->wireframe.wireframe.points[point];
+                    BrMatrix34ApplyP(&workspace->original_points[point], source, current);
+                    source = &shape->wireframe.wireframe.points[point];
+                    BrMatrix34ApplyP(&workspace->trial_points[point], source, previous);
+                    workspace->vertex_flags[point] = 0;
                 }
-                workspace->edges=shape->wireframe.wireframe.lines;
+                workspace->edges = shape->wireframe.wireframe.lines;
                 break;
             case kCollisionShapeType_Polyhedron:
             case kCollisionShapeType_Wireframe_Polyhedron:
-                workspace->count_points=(tU16)shape->polyhedron.polyhedron.count_points;
-                workspace->count_edges=(tU16)shape->polyhedron.polyhedron.count_edges;
-                for(point=0;point<(int)workspace->count_points;point++) {
-                    source=&shape->polyhedron.polyhedron.points[point];
-                    BrMatrix34ApplyP(&workspace->original_points[point],source,current);
-                    source=&shape->polyhedron.polyhedron.points[point];
-                    BrMatrix34ApplyP(&workspace->trial_points[point],source,previous);
-                    workspace->vertex_flags[point]=0;
+                workspace->count_points = (tU16)shape->polyhedron.polyhedron.count_points;
+                workspace->count_edges = (tU16)shape->polyhedron.polyhedron.count_edges;
+                for (point = 0; point < (int)workspace->count_points; point++) {
+                    source = &shape->polyhedron.polyhedron.points[point];
+                    BrMatrix34ApplyP(&workspace->original_points[point], source, current);
+                    source = &shape->polyhedron.polyhedron.points[point];
+                    BrMatrix34ApplyP(&workspace->trial_points[point], source, previous);
+                    workspace->vertex_flags[point] = 0;
                 }
-                workspace->edges=shape->polyhedron.polyhedron.edges;
+                workspace->edges = shape->polyhedron.polyhedron.edges;
                 break;
             case kCollisionShapeType_Sphere:
-                workspace->count_points=1;workspace->count_edges=0;
-                BrMatrix34ApplyP(&workspace->original_points[0],&shape->sphere.sphere.center,current);
-                BrMatrix34ApplyP(&workspace->trial_points[0],&shape->sphere.sphere.center,previous);
+                workspace->count_points = 1;
+                workspace->count_edges = 0;
+                BrMatrix34ApplyP(&workspace->original_points[0], &shape->sphere.sphere.center, current);
+                BrMatrix34ApplyP(&workspace->trial_points[0], &shape->sphere.sphere.center, previous);
                 break;
             default:
-                PhysicsError(ePhysicsError_UnknownShapeType,&gPhysics_empty_message);
+                PhysicsError(ePhysicsError_UnknownShapeType, &gPhysics_empty_message);
             }
-            if(gPhysics_contact_679438!=0) {
-                BrMatrix34ApplyP(&workspace->original_points[0],&object->cmpos,current);
-                for(point=1;point<(int)workspace->count_points;point++)for(component=0;component<3;component++)PhysicsCopyWord(&workspace->original_points[point].v[component],&workspace->original_points[0].v[component]);
+            if (gPhysics_contact_679438 != 0) {
+                BrMatrix34ApplyP(&workspace->original_points[0], &object->cmpos, current);
+                for (point = 1; point < (int)workspace->count_points; point++)
+                    for (component = 0; component < 3; component++)
+                        PhysicsCopyWord(&workspace->original_points[point].v[component], &workspace->original_points[0].v[component]);
             }
-            if(shape->common.type!=kCollisionShapeType_Sphere) {
-                touched=0;
-                if(object->field_0xed!=0)count=FUN_004236a0(object,shape,contacts+initial_count,count,40-initial_count,workspace,delta,&touched);
-                touched_all|=touched;
-                count=GetCornerToFacePoints(object,shape,contacts+initial_count,count,40-initial_count,workspace,delta);
-                if(touched==0)count=FUN_00424140(object,shape,contacts+initial_count,count,40-initial_count,workspace,delta);
+            if (shape->common.type != kCollisionShapeType_Sphere) {
+                touched = 0;
+                if (object->field_0xed != 0)
+                    count = FUN_004236a0(object, shape, contacts + initial_count, count, 40 - initial_count, workspace, delta, &touched);
+                touched_all |= touched;
+                count = GetCornerToFacePoints(object, shape, contacts + initial_count, count, 40 - initial_count, workspace, delta);
+                if (touched == 0)
+                    count = FUN_00424140(object, shape, contacts + initial_count, count, 40 - initial_count, workspace, delta);
             } else {
-                sphere=&shape->sphere.sphere;
-                sphere_count=count;
-                frame.values[0x28/4]=2.f;
-                ordinal=object->box_face_start;
-                face=&gFace_list__car[ordinal];
-                while(ordinal<(int)*(tU16*)&object->box_face_end) {
-                    SphereFaceCollide(face,&workspace->original_points[0],&workspace->trial_points[0],sphere->radius,intersection,trial_normal,(br_scalar*)(void*)&frame.values[0x40/4]);
-                    if(PhysicsWallNaN(frame.values[0x40/4])||PhysicsWallNaN(frame.values[0x28/4])||frame.values[0x40/4]<frame.values[0x28/4]) {
-                        PhysicsCopyWord((void*)&frame.values[0x28/4],(const void*)&frame.values[0x40/4]);
-                        PhysicsCopyWord((void*)&frame.words[0x60/4],&face);
-                        for(component=0;component<3;component++)PhysicsCopyWord(&best_normal->v[component],&trial_normal->v[component]);
+                sphere = &shape->sphere.sphere;
+                sphere_count = count;
+                frame.values[0x28 / 4] = 2.f;
+                ordinal = object->box_face_start;
+                face = &gFace_list__car[ordinal];
+                while (ordinal < (int)*(tU16*)&object->box_face_end) {
+                    SphereFaceCollide(face, &workspace->original_points[0], &workspace->trial_points[0], sphere->radius, intersection, trial_normal, (br_scalar*)(void*)&frame.values[0x40 / 4]);
+                    if (PhysicsWallNaN(frame.values[0x40 / 4]) || PhysicsWallNaN(frame.values[0x28 / 4]) || frame.values[0x40 / 4] < frame.values[0x28 / 4]) {
+                        PhysicsCopyWord((void*)&frame.values[0x28 / 4], (const void*)&frame.values[0x40 / 4]);
+                        PhysicsCopyWord((void*)&frame.words[0x60 / 4], &face);
+                        for (component = 0; component < 3; component++)
+                            PhysicsCopyWord(&best_normal->v[component], &trial_normal->v[component]);
                     }
-                    ordinal++;face++;
+                    ordinal++;
+                    face++;
                 }
-                if(PhysicsWallNaN(frame.values[0x28/4])||frame.values[0x28/4]<=1.f) {
-                    BrMatrix34TApplyV(trial_normal,best_normal,current);
-                    BrMatrix34TApplyV(previous_normal,best_normal,&object->actor->t.t.mat);
-                    negative_radius=-(double)sphere->radius;
-                    *radius_product_x=PhysicsScalar((double)previous_normal->v[0]*negative_radius);
-                    *radius_product_y=PhysicsScalar((double)previous_normal->v[1]*negative_radius);
-                    radius_product_z=negative_radius*previous_normal->v[2];
-                    intersection->v[0]=PhysicsScalar((double)sphere->center.v[0] + *radius_product_x);
-                    intersection->v[1]=PhysicsScalar((double)sphere->center.v[1] + *radius_product_y);
-                    intersection->v[2]=PhysicsScalar((double)sphere->center.v[2]+radius_product_z);
-                    PhysicsCopyWord(&best_face,(const void*)&frame.words[0x60/4]);
-                    sphere_count=AddObjectWallForce(contacts+initial_count,intersection,frame.values[0x28/4],trial_normal,0,sphere_count,object,3,best_face,NULL);
+                if (PhysicsWallNaN(frame.values[0x28 / 4]) || frame.values[0x28 / 4] <= 1.f) {
+                    BrMatrix34TApplyV(trial_normal, best_normal, current);
+                    BrMatrix34TApplyV(previous_normal, best_normal, &object->actor->t.t.mat);
+                    negative_radius = -(double)sphere->radius;
+                    *radius_product_x = PhysicsScalar((double)previous_normal->v[0] * negative_radius);
+                    *radius_product_y = PhysicsScalar((double)previous_normal->v[1] * negative_radius);
+                    radius_product_z = negative_radius * previous_normal->v[2];
+                    intersection->v[0] = PhysicsScalar((double)sphere->center.v[0] + *radius_product_x);
+                    intersection->v[1] = PhysicsScalar((double)sphere->center.v[1] + *radius_product_y);
+                    intersection->v[2] = PhysicsScalar((double)sphere->center.v[2] + radius_product_z);
+                    PhysicsCopyWord(&best_face, (const void*)&frame.words[0x60 / 4]);
+                    sphere_count = AddObjectWallForce(contacts + initial_count, intersection, frame.values[0x28 / 4], trial_normal, 0, sphere_count, object, 3, best_face, NULL);
                 }
-                result=GetSphereToEdgePoints(object,sphere,contacts+initial_count,sphere_count,40-initial_count,&workspace->original_points[0],&workspace->trial_points[0],delta);
-                if(result>count)count++;
+                result = GetSphereToEdgePoints(object, sphere, contacts + initial_count, sphere_count, 40 - initial_count, &workspace->original_points[0], &workspace->trial_points[0], delta);
+                if (result > count)
+                    count++;
             }
         }
-        PhysicsCopyWord(&shape,&shape->common.next);
+        PhysicsCopyWord(&shape, &shape->common.next);
     }
-    object->field_0xed=(tU8)touched_all;
-    if(count==0)return 0;
-    if(count>1) {
-        first_contact=contacts+initial_count;
-        next_contact=first_contact+1;
+    object->field_0xed = (tU8)touched_all;
+    if (count == 0)
+        return 0;
+    if (count > 1) {
+        first_contact = contacts + initial_count;
+        next_contact = first_contact + 1;
         do {
-            normal_dot=(double)first_contact->normal.v[0]*next_contact->normal.v[0]+(double)first_contact->normal.v[1]*next_contact->normal.v[1]+(double)first_contact->normal.v[2]*next_contact->normal.v[2];
-            if(PhysicsWallNaN(normal_dot)||normal_dot<=.95)break;
-            classification++;next_contact++;
-        }while(classification<count);
+            normal_dot = (double)first_contact->normal.v[0] * next_contact->normal.v[0] + (double)first_contact->normal.v[1] * next_contact->normal.v[1] + (double)first_contact->normal.v[2] * next_contact->normal.v[2];
+            if (PhysicsWallNaN(normal_dot) || normal_dot <= .95)
+                break;
+            classification++;
+            next_contact++;
+        } while (classification < count);
     }
-    for(component=0;component<3;component++)PhysicsCopyWord(&object->omega.v[component],&object->rotate_omega.v[component]);
+    for (component = 0; component < 3; component++)
+        PhysicsCopyWord(&object->omega.v[component], &object->rotate_omega.v[component]);
     return classification;
 }
 
@@ -1165,10 +1323,6 @@ static double C2_HOOK_CDECL PhysicsJointScalar(double pValue) {
     return rounded;
 }
 
-
-
-
-
 static void C2_HOOK_CDECL PhysicsJointVelocityA(br_scalar* pOutput, const tPhysics_joint_force* pForce, const tPhysics_object* pObject, int pTorque) {
     const tPhysics_joint_force* force = pForce;
     const tPhysics_object* object = pObject;
@@ -1249,11 +1403,17 @@ typedef struct tForce_group_container {
     br_scalar* matrix;
 } tForce_group_container;
 
-typedef void (C2_HOOK_FASTCALL *tForce_group_callback)(tPhysics_object* object);
+typedef void(C2_HOOK_FASTCALL* tForce_group_callback)(tPhysics_object* object);
 
 static br_scalar C2_HOOK_CDECL GroupScalar(double value) {
-    union { br_scalar value; tU32 bits; } stored;
-    union { br_scalar value; tU32 bits; } result;
+    union {
+        br_scalar value;
+        tU32 bits;
+    } stored;
+    union {
+        br_scalar value;
+        tU32 bits;
+    } result;
     stored.value = (br_scalar)value;
     result.bits = stored.bits;
     return result.value;
@@ -1275,7 +1435,8 @@ static tPhysics_object** C2_HOOK_CDECL GroupReducedSlot(tPhysics_object* object)
 #if defined(__GNUC__)
 __attribute__((noinline))
 #endif
-static tPhysics_object** C2_HOOK_CDECL GroupTemporaryHead(tPhysics_object** head) {
+static tPhysics_object** C2_HOOK_CDECL
+GroupTemporaryHead(tPhysics_object** head) {
     return head;
 }
 
@@ -1523,16 +1684,18 @@ static tU32 C2_HOOK_CDECL HierarchyTimeWord(const br_scalar* pTime) {
     memcpy(&word, pTime, sizeof(word));
     return word;
 }
-typedef void (C2_HOOK_FASTCALL *tHierarchyRawRecursive)(tPhysics_object*, tPhysics_object**, tU32);
-typedef void (C2_HOOK_FAKE_THISCALL *tHierarchyRawMotion)(tPhysics_object*, undefined4, tU32);
-#define HIERARCHY_RECURSE(object, selected, time) do { \
-    tHierarchyRawRecursive function = (tHierarchyRawRecursive)(void*)FUN_004b9230; \
-    function(object, selected, HierarchyTimeWord(&time)); \
-} while (0)
-#define HIERARCHY_MOTION(function_name, object, time) do { \
-    tHierarchyRawMotion function = (tHierarchyRawMotion)(void*)(function_name); \
-    function(object, 0, HierarchyTimeWord(&time)); \
-} while (0)
+typedef void(C2_HOOK_FASTCALL* tHierarchyRawRecursive)(tPhysics_object*, tPhysics_object**, tU32);
+typedef void(C2_HOOK_FAKE_THISCALL* tHierarchyRawMotion)(tPhysics_object*, undefined4, tU32);
+#define HIERARCHY_RECURSE(object, selected, time)                                      \
+    do {                                                                               \
+        tHierarchyRawRecursive function = (tHierarchyRawRecursive)(void*)FUN_004b9230; \
+        function(object, selected, HierarchyTimeWord(&time));                          \
+    } while (0)
+#define HIERARCHY_MOTION(function_name, object, time)                               \
+    do {                                                                            \
+        tHierarchyRawMotion function = (tHierarchyRawMotion)(void*)(function_name); \
+        function(object, 0, HierarchyTimeWord(&time));                              \
+    } while (0)
 #else
 #define HIERARCHY_RECURSE(object, selected, time) FUN_004b9230(object, selected, time)
 #define HIERARCHY_MOTION(function_name, object, time) (function_name)(object, 0, time)
@@ -1817,8 +1980,6 @@ static int C2_HOOK_FASTCALL PhysicsScalarNaN(const br_scalar* value) {
     return (bits & 0x7fffffffu) > 0x7f800000u;
 }
 
-
-
 static br_scalar C2_HOOK_FASTCALL PhysicsScalar(double value) {
     br_scalar rounded = (br_scalar)value;
 
@@ -1925,7 +2086,7 @@ void C2_HOOK_FASTCALL PrepareForCollisions(tPhysics_object* pObject, tWorld_call
     }
     pObject->box_face_start = (tU16)gFace_count;
     gPling_face = NULL;
-    gActorBoxPick_StopGroovidelics = ((tU8)~(tU8)pObject->flags) >> 7;
+    gActorBoxPick_StopGroovidelics = ((tU8) ~(tU8)pObject->flags) >> 7;
     if (pWorld_callbacks != NULL && pWorld_callbacks->find_faces_in_box != NULL) {
         found = pWorld_callbacks->find_faces_in_box(&bounds, &gFace_list__car[gFace_count], (int)(300u - (tU32)gFace_count), pWorld_callbacks);
         gFace_count = (int)((tU32)gFace_count + (tU32)found);
@@ -2095,29 +2256,36 @@ typedef struct {
     tU8 padding_0x2c[12];
     br_matrix34 relative_matrix;
 } tForce_workspace_view;
-typedef char force_workspace_layout[sizeof(tForce_workspace_view)==104 && offsetof(tForce_workspace_view,partner)==4 && offsetof(tForce_workspace_view,response)==8 && offsetof(tForce_workspace_view,relative_matrix)==0x38 ? 1:-1];
+typedef char force_workspace_layout[sizeof(tForce_workspace_view) == 104 && offsetof(tForce_workspace_view, partner) == 4 && offsetof(tForce_workspace_view, response) == 8 && offsetof(tForce_workspace_view, relative_matrix) == 0x38 ? 1 : -1];
 
 static tU8* ForceBytes(const void* pBase, unsigned pOffset) {
     return (tU8*)(uintptr_t)pBase + pOffset;
 }
 static uintptr_t ForcePointerAt(const void* pBase, unsigned pOffset) {
-    const tU32* field=(const tU32*)ForceBytes(pBase,pOffset);
+    const tU32* field = (const tU32*)ForceBytes(pBase, pOffset);
     return *field;
 }
 #if defined(_MSC_VER) && _MSC_VER >= 1300
 __declspec(noinline)
 #endif
-static br_scalar ForceScalarRound(double pValue) {
-    union {br_scalar scalar;tU32 bits;} stored;
-    union {br_scalar scalar;tU32 bits;} result;
-    stored.scalar=(br_scalar)pValue;result.bits=stored.bits;return result.scalar;
+static br_scalar
+ForceScalarRound(double pValue) {
+    union {
+        br_scalar scalar;
+        tU32 bits;
+    } stored;
+    union {
+        br_scalar scalar;
+        tU32 bits;
+    } result;
+    stored.scalar = (br_scalar)pValue;
+    result.bits = stored.bits;
+    return result.scalar;
 }
 
-
-static const br_scalar* PartnerScalarPtr(const void* base,unsigned offset) {
+static const br_scalar* PartnerScalarPtr(const void* base, unsigned offset) {
     return (const br_scalar*)ForceBytes(base, offset);
 }
-
 
 /* Semantic name inferred from the original hinge response. */
 // FUNCTION: CARMA2_HW 0x004be550
@@ -2286,7 +2454,6 @@ tPhysics_object* C2_HOOK_FASTCALL SetUpTorqueHingePartners(br_vector3* pAngular,
     return partner;
 }
 
-
 /* Semantic name inferred from the original hinge response. */
 // FUNCTION: CARMA2_HW 0x004becf0
 tPhysics_object* C2_HOOK_FASTCALL SetUpHingePartners(br_vector3* pAngular, br_vector3* pLinear, br_vector3* pPartner_angular, br_vector3* pPartner_linear, tPhysics_object* pObject) {
@@ -2445,13 +2612,9 @@ tPhysics_object* C2_HOOK_FASTCALL SetUpHingePartners(br_vector3* pAngular, br_ve
     return partner;
 }
 
-
-
-
-
 static int C2_HOOK_CDECL ForceMatrixHasPartner(const tPhysics_object* object) {
     tU32 value;
-    memcpy(&value,(const char*)object+0x1e4,4);
+    memcpy(&value, (const char*)object + 0x1e4, 4);
     return value != 0;
 }
 
@@ -2459,49 +2622,43 @@ static int C2_HOOK_CDECL ForceMatrixHasPartner(const tPhysics_object* object) {
 #pragma auto_inline(off)
 #endif
 static double C2_HOOK_CDECL ForceMatrixScalar(double value) {
-    br_scalar result=(br_scalar)value;
+    br_scalar result = (br_scalar)value;
     return result;
 }
 #if defined(_MSC_VER) && _MSC_VER < 1300
 #pragma auto_inline(on)
 #endif
 
-
-
-
-
-
-
 /* Source torque and force routes have different original sum and spill orders. */
 static double C2_HOOK_CDECL ForceMatrixResponse(const tPhysics_joint_force* row,
     int side, const br_vector3* angular, const br_vector3* linear, int source_torque, int row_torque) {
     const br_vector3* point;
     const br_vector3* direction;
-    double x,y,z;
+    double x, y, z;
 
-    point=side ? &row->point_b : &row->point_a;
-    direction=side ? &row->direction_b : &row->direction_a;
+    point = side ? &row->point_b : &row->point_a;
+    direction = side ? &row->direction_b : &row->direction_a;
     if (row_torque) {
-        x=(double)direction->v[0] * angular->v[0];
-        y=(double)direction->v[1] * angular->v[1];
-        z=(double)direction->v[2] * angular->v[2];
+        x = (double)direction->v[0] * angular->v[0];
+        y = (double)direction->v[1] * angular->v[1];
+        z = (double)direction->v[2] * angular->v[2];
         if (source_torque) {
             return side ? (y + x + z) : (z + y + x);
         }
         return side ? (z + x + y) : (x + y + z);
     }
-    x=((((double)point->v[2] * angular->v[1] - ((double)point->v[1] * angular->v[2]))) + linear->v[0]);
-    y=((((double)point->v[0] * angular->v[2] - ((double)point->v[2] * angular->v[0]))) + linear->v[1]);
-    z=((((double)point->v[1] * angular->v[0] - ((double)point->v[0] * angular->v[1]))) + linear->v[2]);
+    x = ((((double)point->v[2] * angular->v[1] - ((double)point->v[1] * angular->v[2]))) + linear->v[0]);
+    y = ((((double)point->v[0] * angular->v[2] - ((double)point->v[2] * angular->v[0]))) + linear->v[1]);
+    z = ((((double)point->v[1] * angular->v[0] - ((double)point->v[0] * angular->v[1]))) + linear->v[2]);
     if (source_torque || side) {
-        x=ForceMatrixScalar(x);
+        x = ForceMatrixScalar(x);
     } else {
-        y=ForceMatrixScalar(y);
+        y = ForceMatrixScalar(y);
     }
-    z=ForceMatrixScalar(z);
-    x=(double)direction->v[0] * x;
-    y=(double)direction->v[1] * y;
-    z=(double)direction->v[2] * z;
+    z = ForceMatrixScalar(z);
+    x = (double)direction->v[0] * x;
+    y = (double)direction->v[1] * y;
+    z = (double)direction->v[2] * z;
     if (source_torque) {
         return side ? (x + y + z) : (y + z + x);
     }
@@ -2510,100 +2667,100 @@ static double C2_HOOK_CDECL ForceMatrixResponse(const tPhysics_joint_force* row,
 
 // FUNCTION: CARMA2_HW 0x004bf490
 void C2_HOOK_FASTCALL MakeMatrix(br_scalar* matrix, int dimension, tPhysics_joint_force* const* records, int count) {
-    br_vector3 angular_a,linear_a,angular_b,linear_b;
-    br_vector3 angular_partner_a,linear_partner_a,angular_partner_b,linear_partner_b;
-    tPhysics_object *object_a,*object_b,*partner_a,*partner_b;
-    tPhysics_joint_force *source,*row;
-    br_scalar *column_cell,*row_cell;
-    int index,j,source_torque,row_torque;
+    br_vector3 angular_a, linear_a, angular_b, linear_b;
+    br_vector3 angular_partner_a, linear_partner_a, angular_partner_b, linear_partner_b;
+    tPhysics_object *object_a, *object_b, *partner_a, *partner_b;
+    tPhysics_joint_force *source, *row;
+    br_scalar *column_cell, *row_cell;
+    int index, j, source_torque, row_torque;
 
-    C2_HOOK_BUG_ON(sizeof(tPhysics_joint_force)!=0x60);
-    for (index=0;index<count;index++) {
-        source=records[index];
-        object_a=source->object_a;
-        object_b=source->object_b;
-        if (object_b!=NULL && source->type==14) {
-            object_b=NULL;
+    C2_HOOK_BUG_ON(sizeof(tPhysics_joint_force) != 0x60);
+    for (index = 0; index < count; index++) {
+        source = records[index];
+        object_a = source->object_a;
+        object_b = source->object_b;
+        if (object_b != NULL && source->type == 14) {
+            object_b = NULL;
         }
-        source_torque=source->type==11;
-        partner_a=NULL;
-        partner_b=NULL;
+        source_torque = source->type == 11;
+        partner_a = NULL;
+        partner_b = NULL;
         if (source_torque) {
-            object_a=source->object_a;
-            object_b=source->object_b;
-            partner_a=SetUpTorqueHingePartners(&angular_a,&linear_a,
-                &angular_partner_a,&linear_partner_a,&source->direction_a,object_a);
-            if (object_b!=NULL) {
-                partner_b=SetUpTorqueHingePartners(&angular_b,&linear_b,
-                    &angular_partner_b,&linear_partner_b,&source->direction_b,object_b);
+            object_a = source->object_a;
+            object_b = source->object_b;
+            partner_a = SetUpTorqueHingePartners(&angular_a, &linear_a,
+                &angular_partner_a, &linear_partner_a, &source->direction_a, object_a);
+            if (object_b != NULL) {
+                partner_b = SetUpTorqueHingePartners(&angular_b, &linear_b,
+                    &angular_partner_b, &linear_partner_b, &source->direction_b, object_b);
             }
         } else {
-            SetUpForce(&angular_a,&linear_a,&source->point_a,&source->direction_a,object_a);
+            SetUpForce(&angular_a, &linear_a, &source->point_a, &source->direction_a, object_a);
             if (ForceMatrixHasPartner(object_a)) {
-                partner_a=SetUpHingePartners(&angular_a,&linear_a,
-                    &angular_partner_a,&linear_partner_a,object_a);
+                partner_a = SetUpHingePartners(&angular_a, &linear_a,
+                    &angular_partner_a, &linear_partner_a, object_a);
             }
-            if (object_b!=NULL) {
-                SetUpForce(&angular_b,&linear_b,&source->point_b,&source->direction_b,object_b);
+            if (object_b != NULL) {
+                SetUpForce(&angular_b, &linear_b, &source->point_b, &source->direction_b, object_b);
                 if (ForceMatrixHasPartner(object_b)) {
-                    partner_b=SetUpHingePartners(&angular_b,&linear_b,
-                        &angular_partner_b,&linear_partner_b,object_b);
+                    partner_b = SetUpHingePartners(&angular_b, &linear_b,
+                        &angular_partner_b, &linear_partner_b, object_b);
                 }
             }
         }
-        column_cell=matrix+index;
-        row_cell=matrix+(tU32)index*(tU32)dimension;
-        for (j=0;j<=index;j++) {
+        column_cell = matrix + index;
+        row_cell = matrix + (tU32)index * (tU32)dimension;
+        for (j = 0; j <= index; j++) {
             if (!source_torque) {
-                *column_cell=0.f;
+                *column_cell = 0.f;
             }
-            row=records[j];
-            row_torque=row->type==11;
-            if (row->object_a==object_a) {
-                *column_cell=(br_scalar)ForceMatrixResponse(row,0,&angular_a,&linear_a,source_torque,row_torque);
-            } else if (row->object_b==object_a && (source_torque || row->type!=14)) {
-                *column_cell=(br_scalar)-ForceMatrixResponse(row,1,&angular_a,&linear_a,source_torque,row_torque);
+            row = records[j];
+            row_torque = row->type == 11;
+            if (row->object_a == object_a) {
+                *column_cell = (br_scalar)ForceMatrixResponse(row, 0, &angular_a, &linear_a, source_torque, row_torque);
+            } else if (row->object_b == object_a && (source_torque || row->type != 14)) {
+                *column_cell = (br_scalar)-ForceMatrixResponse(row, 1, &angular_a, &linear_a, source_torque, row_torque);
             } else if (source_torque) {
-                *column_cell=0.f;
+                *column_cell = 0.f;
             }
-            if (source_torque && partner_a!=NULL) {
-                row=records[j];
-                if (row->object_a==partner_a) {
-                    *column_cell=(br_scalar)((ForceMatrixResponse(row,0,&angular_partner_a,&linear_partner_a,1,row_torque)) + *column_cell);
-                } else if (row->object_b==partner_a) {
-                    *column_cell=(br_scalar)(*column_cell - (ForceMatrixResponse(row,1,&angular_partner_a,&linear_partner_a,1,row_torque)));
+            if (source_torque && partner_a != NULL) {
+                row = records[j];
+                if (row->object_a == partner_a) {
+                    *column_cell = (br_scalar)((ForceMatrixResponse(row, 0, &angular_partner_a, &linear_partner_a, 1, row_torque)) + *column_cell);
+                } else if (row->object_b == partner_a) {
+                    *column_cell = (br_scalar)(*column_cell - (ForceMatrixResponse(row, 1, &angular_partner_a, &linear_partner_a, 1, row_torque)));
                 }
             }
-            if (object_b!=NULL) {
+            if (object_b != NULL) {
                 if (source_torque) {
-                    row=records[j];
+                    row = records[j];
                 }
-                if (row->object_a==object_b) {
-                    *column_cell=(br_scalar)(*column_cell - (ForceMatrixResponse(row,0,&angular_b,&linear_b,source_torque,row_torque)));
-                } else if (row->object_b==object_b && (source_torque || row->type!=14)) {
-                    *column_cell=(br_scalar)((ForceMatrixResponse(row,1,&angular_b,&linear_b,source_torque,row_torque)) + *column_cell);
-                }
-            }
-            if (!source_torque && partner_a!=NULL) {
-                if (row->object_a==partner_a) {
-                    *column_cell=(br_scalar)((ForceMatrixResponse(row,0,&angular_partner_a,&linear_partner_a,0,row_torque)) + *column_cell);
-                } else if (row->object_b==partner_a) {
-                    *column_cell=(br_scalar)(*column_cell - (ForceMatrixResponse(row,1,&angular_partner_a,&linear_partner_a,0,row_torque)));
+                if (row->object_a == object_b) {
+                    *column_cell = (br_scalar)(*column_cell - (ForceMatrixResponse(row, 0, &angular_b, &linear_b, source_torque, row_torque)));
+                } else if (row->object_b == object_b && (source_torque || row->type != 14)) {
+                    *column_cell = (br_scalar)((ForceMatrixResponse(row, 1, &angular_b, &linear_b, source_torque, row_torque)) + *column_cell);
                 }
             }
-            if (partner_b!=NULL) {
+            if (!source_torque && partner_a != NULL) {
+                if (row->object_a == partner_a) {
+                    *column_cell = (br_scalar)((ForceMatrixResponse(row, 0, &angular_partner_a, &linear_partner_a, 0, row_torque)) + *column_cell);
+                } else if (row->object_b == partner_a) {
+                    *column_cell = (br_scalar)(*column_cell - (ForceMatrixResponse(row, 1, &angular_partner_a, &linear_partner_a, 0, row_torque)));
+                }
+            }
+            if (partner_b != NULL) {
                 if (source_torque) {
-                    row=records[j];
+                    row = records[j];
                 }
-                if (row->object_a==partner_b) {
-                    *column_cell=(br_scalar)(*column_cell - (ForceMatrixResponse(row,0,&angular_partner_b,&linear_partner_b,source_torque,row_torque)));
-                } else if (row->object_b==partner_b) {
-                    *column_cell=(br_scalar)((ForceMatrixResponse(row,1,&angular_partner_b,&linear_partner_b,source_torque,row_torque)) + *column_cell);
+                if (row->object_a == partner_b) {
+                    *column_cell = (br_scalar)(*column_cell - (ForceMatrixResponse(row, 0, &angular_partner_b, &linear_partner_b, source_torque, row_torque)));
+                } else if (row->object_b == partner_b) {
+                    *column_cell = (br_scalar)((ForceMatrixResponse(row, 1, &angular_partner_b, &linear_partner_b, source_torque, row_torque)) + *column_cell);
                 }
             }
-            memcpy(row_cell,column_cell,4);
+            memcpy(row_cell, column_cell, 4);
             row_cell++;
-            column_cell+=dimension;
+            column_cell += dimension;
         }
     }
 }
@@ -2651,9 +2808,9 @@ static void C2_HOOK_CDECL ApplicationDirect(tPhysics_joint_force* record, tPhysi
     PhysicsJointAddVelocity(&object->v.v[1], cross.v[1]);
     PhysicsJointAddVelocity(&object->v.v[2], cross.v[2]);
     if (!(flags & 0x800)) {
-        x = ((double)point->v[1] * force.v[2]-((double)point->v[2] * force.v[1]));
-        y = ((double)point->v[2] * force.v[0]-((double)point->v[0] * force.v[2]));
-        z = ((double)point->v[0] * force.v[1]-((double)point->v[1] * force.v[0]));
+        x = ((double)point->v[1] * force.v[2] - ((double)point->v[2] * force.v[1]));
+        y = ((double)point->v[2] * force.v[0] - ((double)point->v[0] * force.v[2]));
+        z = ((double)point->v[0] * force.v[1] - ((double)point->v[1] * force.v[0]));
         cross.v[0] = (br_scalar)PhysicsJointScalar(x);
         cross.v[1] = (br_scalar)PhysicsJointScalar(y);
         cross.v[2] = (br_scalar)PhysicsJointScalar(z);
@@ -2796,7 +2953,7 @@ static void C2_HOOK_CDECL ApplicationInlineTorque(tPhysics_object* object, tPhys
         PhysicsSubtractScalar(&record->point_b.v[i], &ApplicationJoint(object, 0)->field_0x14.v[i], &root->cmpos.v[i]);
     }
     for (i = 0; i < 3; i++) {
-        PhysicsCopyWord(&record->direction_a.v[i], (tU8*)ApplicationJoint(object, 0) + axis + 4*i);
+        PhysicsCopyWord(&record->direction_a.v[i], (tU8*)ApplicationJoint(object, 0) + axis + 4 * i);
     }
     BrMatrix34ApplyV(&world, &record->direction_a, &object->transform_matrix);
     BrMatrix34TApplyV(&record->direction_b, &world, &root->transform_matrix);
@@ -2815,7 +2972,7 @@ static void C2_HOOK_CDECL ApplicationSecondary(tPhysics_object* object, tPhysics
         }
     }
     for (i = 0; i < 3; i++) {
-        PhysicsCopyWord(&record->direction_a.v[i], (tU8*)ApplicationJoint(object, 1) + axis + 4*i);
+        PhysicsCopyWord(&record->direction_a.v[i], (tU8*)ApplicationJoint(object, 1) + axis + 4 * i);
     }
     record->type = kind;
 }
@@ -2928,7 +3085,7 @@ int C2_HOOK_FASTCALL AllocateObjectWorkspace(tPhysics_object* object, tPhysics_j
                 PhysicsSubtractScalar(&response.v[i], &response.v[i], &cross.v[i]);
             }
             high = (double)joint->hinge_axis.v[2] * response.v[2] + (double)joint->hinge_axis.v[0] * response.v[0] + (double)joint->hinge_axis.v[1] * response.v[1];
-            projection = (high-((double)object->velocity_car_space.v[2] * joint->hinge_axis.v[2] + (double)object->velocity_car_space.v[0] * joint->hinge_axis.v[0] + (double)object->velocity_car_space.v[1] * joint->hinge_axis.v[1]));
+            projection = (high - ((double)object->velocity_car_space.v[2] * joint->hinge_axis.v[2] + (double)object->velocity_car_space.v[0] * joint->hinge_axis.v[0] + (double)object->velocity_car_space.v[1] * joint->hinge_axis.v[1]));
             for (i = 0; i < 3; i++) {
                 temp.v[i] = (br_scalar)PhysicsJointScalar((double)joint->hinge_axis.v[i] * projection);
             }
@@ -2981,10 +3138,28 @@ int C2_HOOK_FASTCALL AllocateObjectWorkspace(tPhysics_object* object, tPhysics_j
     return count;
 }
 
-static br_scalar* C2_HOOK_CDECL VelocityField(void* base,unsigned offset) {return (br_scalar*)((tU8*)base+offset);}
-static double C2_HOOK_CDECL VelocityRead(const void* base,unsigned offset) {return *(const br_scalar*)((const tU8*)base+offset);}
-static uintptr_t C2_HOOK_CDECL VelocityPointer(const void* base,unsigned offset) {return *(const tU32*)((const tU8*)base+offset);}
-static br_scalar C2_HOOK_CDECL VelocityScalar(double value) {union {br_scalar f;tU32 u;} stored;union {br_scalar f;tU32 u;} result;stored.f=(br_scalar)value;result.u=stored.u;return result.f;}
+static br_scalar* C2_HOOK_CDECL VelocityField(void* base, unsigned offset) {
+    return (br_scalar*)((tU8*)base + offset);
+}
+static double C2_HOOK_CDECL VelocityRead(const void* base, unsigned offset) {
+    return *(const br_scalar*)((const tU8*)base + offset);
+}
+static uintptr_t C2_HOOK_CDECL VelocityPointer(const void* base, unsigned offset) {
+    return *(const tU32*)((const tU8*)base + offset);
+}
+static br_scalar C2_HOOK_CDECL VelocityScalar(double value) {
+    union {
+        br_scalar f;
+        tU32 u;
+    } stored;
+    union {
+        br_scalar f;
+        tU32 u;
+    } result;
+    stored.f = (br_scalar)value;
+    result.u = stored.u;
+    return result.f;
+}
 // FUNCTION: CARMA2_HW 0x004c03f0
 void C2_HOOK_FASTCALL RestoreListOmega(tPhysics_object* object) {
     while (object != NULL) {
@@ -2997,7 +3172,7 @@ void C2_HOOK_FASTCALL RestoreListOmega(tPhysics_object* object) {
     }
 }
 // FUNCTION: CARMA2_HW 0x004225b0
-void C2_HOOK_FASTCALL DrMatrix34ApplyLPInverse(br_vector3* dest,const br_vector3* source,const br_matrix34* matrix) {
+void C2_HOOK_FASTCALL DrMatrix34ApplyLPInverse(br_vector3* dest, const br_vector3* source, const br_matrix34* matrix) {
     br_vector3 relative;
     relative.v[0] = (br_scalar)(VelocityScalar((double)source->v[0] - matrix->m[3][0]));
     relative.v[1] = (br_scalar)(VelocityScalar((double)source->v[1] - matrix->m[3][1]));
@@ -3217,8 +3392,14 @@ static void* C2_HOOK_CDECL FrictionPointer(const void* base, unsigned offset) {
     return (void*)(uintptr_t)(*(const tU32*)((const tU8*)base + offset));
 }
 static br_scalar C2_HOOK_CDECL FrictionScalar(double value) {
-    union { br_scalar scalar; tU32 bits; } stored;
-    union { br_scalar scalar; tU32 bits; } result;
+    union {
+        br_scalar scalar;
+        tU32 bits;
+    } stored;
+    union {
+        br_scalar scalar;
+        tU32 bits;
+    } result;
     stored.scalar = (br_scalar)value;
     result.bits = stored.bits;
     return result.scalar;
@@ -3240,14 +3421,6 @@ static void C2_HOOK_CDECL FrictionFlag(void* object, unsigned flag) {
 static const br_scalar* C2_HOOK_CDECL FrictionAt(const void* base, unsigned offset) {
     return (const br_scalar*)((const tU8*)base + offset);
 }
-
-
-
-
-
-
-
-
 
 #if defined(_MSC_VER) && _MSC_VER < 1300
 #pragma auto_inline(on)
@@ -3275,12 +3448,14 @@ void C2_HOOK_FASTCALL NewAddFriction(tPhysics_joint_force* force, tWorld_callbac
         velocity_b.v[0] = FrictionScalar(object_b->omega.v[1] * force->point_b.v[2] - object_b->omega.v[2] * force->point_b.v[1]);
         velocity_b.v[1] = FrictionScalar(force->point_b.v[0] * object_b->omega.v[2] - object_b->omega.v[0] * force->point_b.v[2]);
         velocity_b.v[2] = FrictionScalar(object_b->omega.v[0] * force->point_b.v[1] - object_b->omega.v[1] * force->point_b.v[0]);
-        for (i = 0; i < 3; i++) velocity_b.v[i] = FrictionScalar((double)velocity_b.v[i] + (*(const br_scalar*)((const tU8*)object_b + (0x1a8 + 4 * i))));
+        for (i = 0; i < 3; i++)
+            velocity_b.v[i] = FrictionScalar((double)velocity_b.v[i] + (*(const br_scalar*)((const tU8*)object_b + (0x1a8 + 4 * i))));
         actor_matrix = FrictionActorMatrix(object_b);
         BrMatrix34ApplyV(&world, &velocity_b, actor_matrix);
         actor_matrix = FrictionActorMatrix(object_a);
         BrMatrix34TApplyV(&velocity_b, &world, actor_matrix);
-        for (i = 0; i < 3; i++) velocity_a.v[i] = FrictionScalar((double)velocity_a.v[i] - velocity_b.v[i]);
+        for (i = 0; i < 3; i++)
+            velocity_a.v[i] = FrictionScalar((double)velocity_a.v[i] - velocity_b.v[i]);
         BrMatrix34ApplyV(&world, (const br_vector3*)((const tU8*)force + 0x2c), (const br_matrix34*)((const tU8*)object_a + 0x8c));
         actor_matrix = FrictionActorMatrix(object_a);
         BrMatrix34TApplyV(&normal, &world, actor_matrix);
@@ -3327,11 +3502,14 @@ void C2_HOOK_FASTCALL NewAddFriction(tPhysics_joint_force* force, tWorld_callbac
             denominator = (double)direction_b.v[1] * world.v[1] + (double)direction_b.v[0] * world.v[0] + (double)direction_b.v[2] * world.v[2] + base;
             if (((fabs(denominator)) > ((double)9.999999747378752e-05f))) {
                 impulse = (double)stored_speed / denominator;
-                if (impulse > maximum) impulse = maximum;
+                if (impulse > maximum)
+                    impulse = maximum;
                 scale = impulse / object_a->M;
-                for (i = 0; i < 3; i++) direction_a.v[i] = FrictionScalar((double)direction_a.v[i] * scale);
+                for (i = 0; i < 3; i++)
+                    direction_a.v[i] = FrictionScalar((double)direction_a.v[i] * scale);
                 scale = FrictionScalar(-(impulse / object_b->M));
-                for (i = 0; i < 3; i++) direction_b.v[i] = FrictionScalar((double)direction_b.v[i] * scale);
+                for (i = 0; i < 3; i++)
+                    direction_b.v[i] = FrictionScalar((double)direction_b.v[i] * scale);
                 FrictionWrite(force, 0x44, object_a->M * direction_a.v[0]);
                 FrictionWrite(force, 0x48, object_a->M * direction_a.v[1]);
                 FrictionWrite(force, 0x4c, object_a->M * direction_a.v[2]);
@@ -3340,19 +3518,24 @@ void C2_HOOK_FASTCALL NewAddFriction(tPhysics_joint_force* force, tWorld_callbac
                 response = object_b->M;
                 force->type = force->type | 0x100;
                 FrictionWrite(force, 0x58, response * direction_b.v[2]);
-                for (i = 0; i < 3; i++) FrictionWrite(object_a, 0x74 + 4 * i, impulse * angular_a.v[i] + (*(const br_scalar*)((const tU8*)object_a + (0x74 + 4 * i))));
+                for (i = 0; i < 3; i++)
+                    FrictionWrite(object_a, 0x74 + 4 * i, impulse * angular_a.v[i] + (*(const br_scalar*)((const tU8*)object_a + (0x74 + 4 * i))));
                 negative = FrictionScalar(-impulse);
                 FrictionWrite(object_b, 0x74, angular_b_x * negative + object_b->omega.v[0]);
                 FrictionWrite(object_b, 0x78, angular_b_y * negative + object_b->omega.v[1]);
                 FrictionWrite(object_b, 0x7c, angular_b_z * negative + object_b->omega.v[2]);
                 actor_matrix = FrictionActorMatrix(object_a);
                 BrMatrix34ApplyV(&world, &direction_a, actor_matrix);
-                for (i = 0; i < 3; i++) FrictionWrite(object_a, 0x68 + 4 * i, (double)world.v[i] + (*(const br_scalar*)((const tU8*)object_a + (0x68 + 4 * i))));
-                for (i = 0; i < 3; i++) FrictionWrite(object_a, 0x1a8 + 4 * i, (double)direction_a.v[i] + (*(const br_scalar*)((const tU8*)object_a + (0x1a8 + 4 * i))));
+                for (i = 0; i < 3; i++)
+                    FrictionWrite(object_a, 0x68 + 4 * i, (double)world.v[i] + (*(const br_scalar*)((const tU8*)object_a + (0x68 + 4 * i))));
+                for (i = 0; i < 3; i++)
+                    FrictionWrite(object_a, 0x1a8 + 4 * i, (double)direction_a.v[i] + (*(const br_scalar*)((const tU8*)object_a + (0x1a8 + 4 * i))));
                 actor_matrix = FrictionActorMatrix(object_b);
                 BrMatrix34ApplyV(&world, &direction_b, actor_matrix);
-                for (i = 0; i < 3; i++) FrictionWrite(object_b, 0x68 + 4 * i, (double)world.v[i] + (*(const br_scalar*)((const tU8*)object_b + (0x68 + 4 * i))));
-                for (i = 0; i < 3; i++) FrictionWrite(object_b, 0x1a8 + 4 * i, (double)direction_b.v[i] + (*(const br_scalar*)((const tU8*)object_b + (0x1a8 + 4 * i))));
+                for (i = 0; i < 3; i++)
+                    FrictionWrite(object_b, 0x68 + 4 * i, (double)world.v[i] + (*(const br_scalar*)((const tU8*)object_b + (0x68 + 4 * i))));
+                for (i = 0; i < 3; i++)
+                    FrictionWrite(object_b, 0x1a8 + 4 * i, (double)direction_b.v[i] + (*(const br_scalar*)((const tU8*)object_b + (0x1a8 + 4 * i))));
             }
         }
         PostAddFriction(FrictionPointer(force, 4));
@@ -3364,7 +3547,8 @@ void C2_HOOK_FASTCALL NewAddFriction(tPhysics_joint_force* force, tWorld_callbac
     memcpy(&coefficient, force, sizeof(coefficient));
     FrictionFlag(object_a, 1);
     if (force->type == 1) {
-        for (i = 0; i < 3; i++) scaled_lever.v[i] = FrictionScalar((*(const br_scalar*)((const tU8*)force + (0x14 + 4 * i))) * (double)-0.004999999888241291f + (*(const br_scalar*)((const tU8*)force + (0x14 + 4 * i))));
+        for (i = 0; i < 3; i++)
+            scaled_lever.v[i] = FrictionScalar((*(const br_scalar*)((const tU8*)force + (0x14 + 4 * i))) * (double)-0.004999999888241291f + (*(const br_scalar*)((const tU8*)force + (0x14 + 4 * i))));
     } else {
         memcpy(&scaled_lever, (const tU8*)force + 0x14, sizeof(scaled_lever));
     }
@@ -3375,8 +3559,10 @@ void C2_HOOK_FASTCALL NewAddFriction(tPhysics_joint_force* force, tWorld_callbac
     actor_matrix = FrictionActorMatrix(object_a);
     BrMatrix34TApplyV(&normal, &world, actor_matrix);
     response = (double)normal.v[1] * velocity_a.v[1] + (double)normal.v[0] * velocity_a.v[0] + (double)normal.v[2] * velocity_a.v[2];
-    for (i = 0; i < 3; i++) world.v[i] = FrictionScalar(response * normal.v[i]);
-    for (i = 0; i < 3; i++) velocity_a.v[i] = FrictionScalar((double)velocity_a.v[i] - world.v[i]);
+    for (i = 0; i < 3; i++)
+        world.v[i] = FrictionScalar(response * normal.v[i]);
+    for (i = 0; i < 3; i++)
+        velocity_a.v[i] = FrictionScalar((double)velocity_a.v[i] - world.v[i]);
     if (callbacks != NULL && (*(const tU32*)((const tU8*)callbacks + 0x18)) != 0 && force->field_c != 0) {
         callback_coefficient = (double)callbacks->get_friction_from_face(FrictionPointer(force, 0xc)) * (double)coefficient;
     } else {
@@ -3388,12 +3574,14 @@ void C2_HOOK_FASTCALL NewAddFriction(tPhysics_joint_force* force, tWorld_callbac
     maximum = FrictionScalar(object_a->world_friction * base + base);
     if (!(!(speed >= (double)0.0010000000474974513f))) {
         inverse_speed = 1.0 / -(double)stored_speed;
-        for (i = 0; i < 3; i++) direction_a.v[i] = FrictionScalar(inverse_speed * velocity_a.v[i]);
+        for (i = 0; i < 3; i++)
+            direction_a.v[i] = FrictionScalar(inverse_speed * velocity_a.v[i]);
         if ((object_a->flags & 0x800) == 0) {
             angular_a.v[0] = FrictionScalar(force->point_a.v[1] * direction_a.v[2] - force->point_a.v[2] * direction_a.v[1]);
             angular_a.v[1] = FrictionScalar(force->point_a.v[2] * direction_a.v[0] - force->point_a.v[0] * direction_a.v[2]);
             angular_a.v[2] = FrictionScalar(force->point_a.v[0] * direction_a.v[1] - force->point_a.v[1] * direction_a.v[0]);
-            for (i = 0; i < 3; i++) angular_a.v[i] = FrictionScalar((double)angular_a.v[i] / (*(const br_scalar*)((const tU8*)object_a + (8 + 4 * i))));
+            for (i = 0; i < 3; i++)
+                angular_a.v[i] = FrictionScalar((double)angular_a.v[i] / (*(const br_scalar*)((const tU8*)object_a + (8 + 4 * i))));
         } else {
             angular_a.v[0] = angular_a.v[1] = angular_a.v[2] = 0.0f;
         }
@@ -3402,15 +3590,18 @@ void C2_HOOK_FASTCALL NewAddFriction(tPhysics_joint_force* force, tWorld_callbac
         response = object_a->omega.v[0] * angular_a.v[0] + object_a->omega.v[2] * angular_a.v[2] + object_a->omega.v[1] * angular_a.v[1];
         speed = object_a->v.v[0] * object_a->v.v[0] + object_a->v.v[1] * object_a->v.v[1] + object_a->v.v[2] * object_a->v.v[2];
         if ((!((fabs(wide_dot)) >= (double)0.10000000149011612f)) && (!(response >= 0.0)) && (!(speed >= 0.001))) {
-            for (i = 0; i < 3; i++) world.v[i] = FrictionScalar((*(const br_scalar*)((const tU8*)force + (0x2c + 4 * i))) * dot);
-            for (i = 0; i < 3; i++) FrictionWrite(object_a, 0x74 + 4 * i, (*(const br_scalar*)((const tU8*)object_a + (0x74 + 4 * i))) - world.v[i]);
+            for (i = 0; i < 3; i++)
+                world.v[i] = FrictionScalar((*(const br_scalar*)((const tU8*)force + (0x2c + 4 * i))) * dot);
+            for (i = 0; i < 3; i++)
+                FrictionWrite(object_a, 0x74 + 4 * i, (*(const br_scalar*)((const tU8*)object_a + (0x74 + 4 * i))) - world.v[i]);
             BrVector3SetFloat(&angular_a, 0.0f, 0.0f, 0.0f);
             direction_a.v[0] = FrictionScalar(object_a->velocity_car_space.v[0]);
             direction_a.v[2] = FrictionScalar(object_a->velocity_car_space.v[2]);
             world.v[1] = FrictionScalar(object_a->velocity_car_space.v[1]);
             speed = sqrt((double)direction_a.v[0] * direction_a.v[0] + (double)world.v[1] * world.v[1] + (double)direction_a.v[2] * direction_a.v[2]);
             stored_speed = FrictionScalar(speed);
-            if ((!(speed >= (double)0.0010000000474974513f))) return;
+            if ((!(speed >= (double)0.0010000000474974513f)))
+                return;
             negative = -(double)stored_speed;
             direction_a.v[0] = FrictionScalar((double)direction_a.v[0] / negative);
             direction_a.v[1] = FrictionScalar((double)world.v[1] / negative);
@@ -3422,20 +3613,26 @@ void C2_HOOK_FASTCALL NewAddFriction(tPhysics_joint_force* force, tWorld_callbac
         denominator = (double)direction_a.v[1] * cross.v[1] + (double)direction_a.v[0] * cross.v[0] + (double)direction_a.v[2] * cross.v[2] + 1.0 / object_a->M;
         if (((fabs(denominator)) > ((double)9.999999747378752e-05f))) {
             impulse = (double)stored_speed / denominator;
-            if (impulse > maximum) impulse = maximum;
-            for (i = 0; i < 3; i++) angular_a.v[i] = FrictionScalar(impulse * angular_a.v[i]);
+            if (impulse > maximum)
+                impulse = maximum;
+            for (i = 0; i < 3; i++)
+                angular_a.v[i] = FrictionScalar(impulse * angular_a.v[i]);
             scale = impulse / object_a->M;
-            for (i = 0; i < 3; i++) direction_a.v[i] = FrictionScalar((double)direction_a.v[i] * scale);
+            for (i = 0; i < 3; i++)
+                direction_a.v[i] = FrictionScalar((double)direction_a.v[i] * scale);
             FrictionWrite(force, 0x44, object_a->M * direction_a.v[0]);
             FrictionWrite(force, 0x48, object_a->M * direction_a.v[1]);
             response = object_a->M;
             force->type = force->type | 0x100;
             FrictionWrite(force, 0x4c, response * direction_a.v[2]);
-            for (i = 0; i < 3; i++) FrictionWrite(object_a, 0x74 + 4 * i, (double)angular_a.v[i] + (*(const br_scalar*)((const tU8*)object_a + (0x74 + 4 * i))));
+            for (i = 0; i < 3; i++)
+                FrictionWrite(object_a, 0x74 + 4 * i, (double)angular_a.v[i] + (*(const br_scalar*)((const tU8*)object_a + (0x74 + 4 * i))));
             actor_matrix = FrictionActorMatrix(object_a);
             BrMatrix34ApplyV(&world, &direction_a, actor_matrix);
-            for (i = 0; i < 3; i++) FrictionWrite(object_a, 0x68 + 4 * i, (double)world.v[i] + (*(const br_scalar*)((const tU8*)object_a + (0x68 + 4 * i))));
-            for (i = 0; i < 3; i++) FrictionWrite(object_a, 0x1a8 + 4 * i, (double)direction_a.v[i] + (*(const br_scalar*)((const tU8*)object_a + (0x1a8 + 4 * i))));
+            for (i = 0; i < 3; i++)
+                FrictionWrite(object_a, 0x68 + 4 * i, (double)world.v[i] + (*(const br_scalar*)((const tU8*)object_a + (0x68 + 4 * i))));
+            for (i = 0; i < 3; i++)
+                FrictionWrite(object_a, 0x1a8 + 4 * i, (double)direction_a.v[i] + (*(const br_scalar*)((const tU8*)object_a + (0x1a8 + 4 * i))));
             PostAddFriction(FrictionPointer(force, 4));
         }
     }
@@ -3500,7 +3697,8 @@ void C2_HOOK_FASTCALL DoJointFriction(tPhysics_object* object) {
         }
         if (accumulated > limit) {
             scale = sqrt((double)limit / accumulated);
-            for (i = 0; i < 3; i++) impulse[i] = FrictionScalar(scale * impulse[i]);
+            for (i = 0; i < 3; i++)
+                impulse[i] = FrictionScalar(scale * impulse[i]);
         }
         for (i = 0; i < 3; i++) {
             response = ((((double)impulse[i] / (double)*(FrictionAt(object, 8 + 4 * i)))) + (double)*(FrictionAt(object, 0x74 + 4 * i)));
@@ -3530,7 +3728,8 @@ void C2_HOOK_FASTCALL DoJointFriction(tPhysics_object* object) {
         }
         if (sum > wide_limit) {
             scale = sqrt(wide_limit / sum);
-            for (i = 0; i < 3; i++) impulse[i] = FrictionScalar(scale * impulse[i]);
+            for (i = 0; i < 3; i++)
+                impulse[i] = FrictionScalar(scale * impulse[i]);
         }
         for (i = 0; i < 3; i++) {
             response = ((double)impulse[i] / (double)*(FrictionAt(object, 8 + 4 * i)));
@@ -3539,7 +3738,8 @@ void C2_HOOK_FASTCALL DoJointFriction(tPhysics_object* object) {
     }
     child = FrictionPointer(object, 0x224);
     while (child != NULL) {
-        if (*((const tU8*)child + 0xec) == 0) DoJointFriction(child);
+        if (*((const tU8*)child + 0xec) == 0)
+            DoJointFriction(child);
         child = FrictionPointer(child, 0x220);
     }
 }
@@ -3596,11 +3796,15 @@ int C2_HOOK_FASTCALL FUN_004baa00(tPhysics_object* objects) {
             if (RestByte(object, 0x1dd) == 0 && RestByte(object, 0x1df) != 0) {
                 linear_energy = 0.0;
             } else {
-                x = object->v.v[0]; y = object->v.v[1]; z = object->v.v[2];
+                x = object->v.v[0];
+                y = object->v.v[1];
+                z = object->v.v[2];
                 linear_energy = y * y + x * x + z * z;
             }
             if (!(linear_energy >= 0.001) && !(angular_energy >= 8.999999999999999e-05)) {
-                x = object->field_0x54.v[0]; y = object->field_0x54.v[1]; z = object->field_0x54.v[2];
+                x = object->field_0x54.v[0];
+                y = object->field_0x54.v[1];
+                z = object->field_0x54.v[2];
                 gravity_energy = y * y + x * x + z * z;
                 gravity_length = FrictionScalar(sqrt(gravity_energy));
                 direction[0] = FrictionScalar((double)object->field_0x54.v[0] / gravity_length);
@@ -3611,7 +3815,8 @@ int C2_HOOK_FASTCALL FUN_004baa00(tPhysics_object* objects) {
                 if (RestByte(object, 0x1df) == 0) {
                     speed_change = (double)downward_speed - previous_downward_speed;
                     change_limit = (double)gravity_length * 0.9f;
-                    if (downward_speed >= 0.012f || change_limit >= speed_change) goto update_transform;
+                    if (downward_speed >= 0.012f || change_limit >= speed_change)
+                        goto update_transform;
                     base[0] = FrictionScalar((double)object->omega.v[1] * object->cmpos.v[2] - (double)object->omega.v[2] * object->cmpos.v[1] + object->velocity_car_space.v[0]);
                     base[1] = FrictionScalar((double)object->omega.v[2] * object->cmpos.v[0] - (double)object->cmpos.v[2] * object->omega.v[0] + object->velocity_car_space.v[1]);
                     base[2] = FrictionScalar((double)object->cmpos.v[1] * object->omega.v[0] - (double)object->omega.v[1] * object->cmpos.v[0] + object->velocity_car_space.v[2]);
@@ -3622,9 +3827,11 @@ int C2_HOOK_FASTCALL FUN_004baa00(tPhysics_object* objects) {
                         x = (double)object->omega.v[1] * corner_z - (double)object->omega.v[2] * corner_y + base[0];
                         y = (double)object->omega.v[2] * corner_x - (double)object->omega.v[0] * corner_z + base[1];
                         z = (double)object->omega.v[0] * corner_y - (double)object->omega.v[1] * corner_x + base[2];
-                        point_y = FrictionScalar(y); point_z = FrictionScalar(z);
+                        point_y = FrictionScalar(y);
+                        point_z = FrictionScalar(z);
                         point_energy = x * x + y * point_y + z * point_z;
-                        if (point_energy > 0.0004f) goto update_transform;
+                        if (point_energy > 0.0004f)
+                            goto update_transform;
                     }
                 }
                 if (object->physics_joint2 == NULL || RestByte(object, 0x1dd) != 0 || object->transform_matrix.m[1][1] > 0.999) {
@@ -3635,7 +3842,7 @@ int C2_HOOK_FASTCALL FUN_004baa00(tPhysics_object* objects) {
                 }
             }
         }
-update_transform:
+    update_transform:
         RestSetByte(object, 0x1df, at_rest);
         BrMatrix34Copy(&object->transform_matrix, &object->actor->t.t.mat);
         BrMatrix34ApplyP(&object->pos, &object->cmpos, &object->transform_matrix);
@@ -3644,7 +3851,8 @@ update_transform:
             RestSetByte(object, 0x1df, (tU8)(RestByte(object, 0x1df) * 3));
         } else {
             child_at_rest = FUN_004baa00(child);
-            if (RestByte(object, 0x1df) != 0) RestSetByte(object, 0x1df, (tU8)(child_at_rest * 2 + RestByte(object, 0x1df)));
+            if (RestByte(object, 0x1df) != 0)
+                RestSetByte(object, 0x1df, (tU8)(child_at_rest * 2 + RestByte(object, 0x1df)));
         }
         all_at_rest &= (RestByte(object, 0x1df) >> 1) & 1;
         object = object->next;
@@ -3654,12 +3862,9 @@ update_transform:
 
 // ApplyForces
 
-
 // ListDoJointFriction
 
-
 // RotateObjectSecondOrder
-
 
 // FUNCTION: CARMA2_HW 0x004c1f10
 void C2_HOOK_FAKE_THISCALL RotateObjectFirstOrder(tPhysics_object* pObject, undefined4 pUnused, br_scalar pTime) {
@@ -3718,7 +3923,9 @@ void C2_HOOK_FAKE_THISCALL RotateObject(tPhysics_object* pObject, undefined4 pUn
             br_scalar next_y_scalar, next_z_scalar, next_length;
             br_angle integer_angle;
 
-            x = pObject->omega.v[0]; y = pObject->omega.v[1]; z = pObject->omega.v[2];
+            x = pObject->omega.v[0];
+            y = pObject->omega.v[1];
+            z = pObject->omega.v[2];
             length = PhysicsJointScalar(sqrt(x * x + y * y + z * z));
             axis.v[0] = (br_scalar)PhysicsJointScalar((double)pObject->omega.v[0] / length);
             axis.v[1] = (br_scalar)PhysicsJointScalar((double)pObject->omega.v[1] / length);
@@ -3789,7 +3996,7 @@ void C2_HOOK_FAKE_THISCALL TranslateObject(tPhysics_object* pObject, undefined4 
         actor->t.t.mat.m[3][2] = (br_scalar)PhysicsJointScalar((double)delta.v[2] + actor->t.t.mat.m[3][2]);
         actor = object->actor;
         projection = (double)actor->t.t.mat.m[3][0] * axis.v[0] + (double)actor->t.t.mat.m[3][2] * axis.v[2] + (double)actor->t.t.mat.m[3][1] * axis.v[1];
-        correction = before-projection;
+        correction = before - projection;
         delta.v[0] = (br_scalar)PhysicsJointScalar((double)correction * axis.v[0]);
         delta.v[1] = (br_scalar)PhysicsJointScalar((double)correction * axis.v[1]);
         delta.v[2] = (br_scalar)PhysicsJointScalar((double)correction * axis.v[2]);
@@ -3935,11 +4142,6 @@ static br_scalar C2_HOOK_CDECL RQScalar(double x) {
     return result;
 }
 
-
-
-
-
-
 /* The original diagnostic entry is a single RET. */
 // FUNCTION: CARMA2_HW 0x004c61e0
 void C2_HOOK_FASTCALL FUN_004c61e0(const char* ignored) {
@@ -3949,7 +4151,8 @@ void C2_HOOK_FASTCALL FUN_004c61e0(const char* ignored) {
 static int C2_HOOK_CDECL RQSolveSeen(const tU32 history[][2], int count, const tU32* mask) {
     int i;
     for (i = 0; i < count; i++) {
-        if (history[i][0] == mask[0] && history[i][1] == mask[1]) return 1;
+        if (history[i][0] == mask[0] && history[i][1] == mask[1])
+            return 1;
     }
     return 0;
 }
@@ -3957,7 +4160,8 @@ static int C2_HOOK_CDECL RQSolveSeen(const tU32 history[][2], int count, const t
 static void C2_HOOK_CDECL RQSolveToggle(tU32* result, const tU32* mask, int index) {
     result[0] = mask[0];
     result[1] = mask[1];
-    if (index >= 0) result[index >> 5] ^= (tU32)1 << (index & 31);
+    if (index >= 0)
+        result[index >> 5] ^= (tU32)1 << (index & 31);
 }
 
 // FUNCTION: CARMA2_HW 0x004c3b60
@@ -3996,11 +4200,13 @@ int C2_HOOK_FASTCALL FUN_004c3b60(br_scalar* original, br_scalar* rhs, br_scalar
         }
         return 0;
     }
-    for (i = 0; i < size; i++) indices[i] = (unsigned char)i;
+    for (i = 0; i < size; i++)
+        indices[i] = (unsigned char)i;
     active = unconstrained + 1;
     rebuilt = active;
     *excluded_count = size - unconstrained - 1;
-    for (i = 0; i < *(int*)excluded_count; i++) excluded[i] = (unsigned char)(i + unconstrained + 1);
+    for (i = 0; i < *(int*)excluded_count; i++)
+        excluded[i] = (unsigned char)(i + unconstrained + 1);
     RQFromCachedGroups(gPhysics_buffer1_ptr, gPhysics_buffer2_ptr, original,
         active_rhs, rhs, indices, active, cached_groups, group_count);
     mask[0] = 1;
@@ -4018,15 +4224,17 @@ int C2_HOOK_FASTCALL FUN_004c3b60(br_scalar* original, br_scalar* rhs, br_scalar
         forward[0] = active_rhs[0] / matrix[0];
         for (i = 1; i < active; i++) {
             sum = 0.0;
-            for (j = 0; j < i; j++) sum = (sum + (double)forward[j] * *(&matrix[i * 100 + j]));
-            forward[i] = RQScalar(((double)active_rhs[i]-sum) / matrix[i * 101]);
+            for (j = 0; j < i; j++)
+                sum = (sum + (double)forward[j] * *(&matrix[i * 100 + j]));
+            forward[i] = RQScalar(((double)active_rhs[i] - sum) / matrix[i * 101]);
         }
         last = active - 1;
         matrix = (br_scalar*)gPhysics_buffer1_ptr;
         tail_limit = RQScalar(fabs((double)matrix[last * 101] * 100000.0f));
         for (j = 0; j < last; j++) {
             value = fabs((double)matrix[last * 100 + j]);
-            if (!PhysicsWallNaN(value) && !PhysicsWallNaN(tail_limit) && value > tail_limit) break;
+            if (!PhysicsWallNaN(value) && !PhysicsWallNaN(tail_limit) && value > tail_limit)
+                break;
         }
         if (j != last) {
             orthogonal = (br_scalar*)gPhysics_buffer2_ptr;
@@ -4055,13 +4263,15 @@ int C2_HOOK_FASTCALL FUN_004c3b60(br_scalar* original, br_scalar* rhs, br_scalar
                         }
                     }
                 }
-                if (chosen != last) removed = chosen;
+                if (chosen != last)
+                    removed = chosen;
             }
             excluded[*excluded_count] = indices[removed];
             bit = indices[removed] - unconstrained;
             mask[bit >> 5] &= ~((tU32)1 << (bit & 31));
             *excluded_count = *excluded_count + 1;
-            for (i = removed; i < last; i++) indices[i] = indices[i + 1];
+            for (i = removed; i < last; i++)
+                indices[i] = indices[i + 1];
             active = last;
             rebuilt = last;
             RQFromCachedGroups(gPhysics_buffer1_ptr, gPhysics_buffer2_ptr, original,
@@ -4071,14 +4281,16 @@ int C2_HOOK_FASTCALL FUN_004c3b60(br_scalar* original, br_scalar* rhs, br_scalar
             for (i = 0; i < active; i++) {
                 forces[i] = 0.0f;
                 sum = forces[i];
-                for (j = 0; j < active; j++) sum = (sum + (double)*(&orthogonal[j * 100 + i]) * forward[j]);
+                for (j = 0; j < active; j++)
+                    sum = (sum + (double)*(&orthogonal[j * 100 + i]) * forward[j]);
                 forces[i] = RQScalar(sum);
             }
             negative = -1;
             if (removed >= 0) {
                 removed = -1;
                 selected = excluded[*excluded_count - 1];
-                if (PhysicsWallNaN(rhs[selected]) || rhs[selected] == 0.0f) rhs[selected] = -10000.0f;
+                if (PhysicsWallNaN(rhs[selected]) || rhs[selected] == 0.0f)
+                    rhs[selected] = -10000.0f;
             }
             best = -0.0001f;
             for (i = unconstrained; i < active; i++) {
@@ -4088,7 +4300,8 @@ int C2_HOOK_FASTCALL FUN_004c3b60(br_scalar* original, br_scalar* rhs, br_scalar
                 }
             }
             if (negative >= 0) {
-                if (PhysicsWallNaN(forces[last]) || forces[last] < 0.0f) boundary = 0;
+                if (PhysicsWallNaN(forces[last]) || forces[last] < 0.0f)
+                    boundary = 0;
                 else {
                     boundary = last;
                     for (; boundary >= rebuilt; boundary--) {
@@ -4107,8 +4320,9 @@ int C2_HOOK_FASTCALL FUN_004c3b60(br_scalar* original, br_scalar* rhs, br_scalar
                         orthogonal = (br_scalar*)gPhysics_buffer2_ptr;
                         for (j = last; j >= i; j--) {
                             sum = 0.0;
-                            for (k = last; k > j; k--) sum = (sum + (double)temporary[k] * *(&matrix[k * 100 + j]));
-                            temporary[j] = RQScalar((((double)orthogonal[j * 100 + i])-sum) / matrix[j * 101]);
+                            for (k = last; k > j; k--)
+                                sum = (sum + (double)temporary[k] * *(&matrix[k * 100 + j]));
+                            temporary[j] = RQScalar((((double)orthogonal[j * 100 + i]) - sum) / matrix[j * 101]);
                         }
                         memcpy(&forward[i], &temporary[i], 4);
                     }
@@ -4137,22 +4351,26 @@ int C2_HOOK_FASTCALL FUN_004c3b60(br_scalar* original, br_scalar* rhs, br_scalar
                 RQFromCachedGroups(gPhysics_buffer1_ptr, gPhysics_buffer2_ptr, original,
                     active_rhs, rhs, indices, active, cached_groups, group_count);
             } else {
-                for (i = 0; i < size; i++) result[i] = 0.0f;
-                for (i = 0; i < active; i++) memcpy(&result[indices[i]], &forces[i], 4);
+                for (i = 0; i < size; i++)
+                    result[i] = 0.0f;
+                for (i = 0; i < active; i++)
+                    memcpy(&result[indices[i]], &forces[i], 4);
                 repeated = RQSolveSeen(history, iteration, history[iteration]);
                 chosen = -1;
                 maximum = 0.0f;
                 for (i = 0; i < *(int*)excluded_count; i++) {
                     sum = 0.0;
                     selected = excluded[i];
-                    for (j = 0; j < size; j++) sum = (sum + (double)*(&original[selected * 100 + j]) * result[j]);
+                    for (j = 0; j < size; j++)
+                        sum = (sum + (double)*(&original[selected * 100 + j]) * result[j]);
                     selected = excluded[i];
                     residual = sum - rhs[selected];
                     scaled = RQScalar(residual / original[selected * 101]);
                     if ((PhysicsWallNaN(residual) || residual < -0.001) && (PhysicsWallNaN(scaled) || PhysicsWallNaN(maximum) || scaled < maximum)) {
                         RQSolveToggle(test_mask, history[iteration], selected - unconstrained);
                         if (repeated && RQSolveSeen(history, iteration, test_mask)) {
-                            if (chosen == -1) chosen = i;
+                            if (chosen == -1)
+                                chosen = i;
                         } else {
                             maximum = scaled;
                             chosen = i;
@@ -4164,23 +4382,27 @@ int C2_HOOK_FASTCALL FUN_004c3b60(br_scalar* original, br_scalar* rhs, br_scalar
                     for (i = 0; i < size; i++) {
                         temporary[i] = 0.0f;
                         sum = temporary[i];
-                        for (j = 0; j < size; j++) sum = (sum + (double)*(&original[i * 100 + j]) * result[j]);
+                        for (j = 0; j < size; j++)
+                            sum = (sum + (double)*(&original[i * 100 + j]) * result[j]);
                         temporary[i] = RQScalar(sum);
                         residual = (double)temporary[i] - rhs[i];
-                        if ((!PhysicsWallNaN(result[i]) && result[i] != 0.0f && !PhysicsWallNaN(residual) && fabs(residual) > 0.01) || PhysicsWallNaN(residual) || residual < -0.01) refine = 1;
+                        if ((!PhysicsWallNaN(result[i]) && result[i] != 0.0f && !PhysicsWallNaN(residual) && fabs(residual) > 0.01) || PhysicsWallNaN(residual) || residual < -0.01)
+                            refine = 1;
                     }
                     if (refine) {
                         for (i = 0; i < active; i++) {
                             sum = -(double)active_rhs[i];
-                            for (j = 0; j < active; j++) sum = (sum + (double)*(&original[indices[i] * 100 + indices[j]]) * forces[j]);
+                            for (j = 0; j < active; j++)
+                                sum = (sum + (double)*(&original[indices[i] * 100 + indices[j]]) * forces[j]);
                             temporary[i] = RQScalar(sum);
                         }
                         matrix = (br_scalar*)gPhysics_buffer1_ptr;
                         forward[0] = temporary[0] / matrix[0];
                         for (i = 1; i < active; i++) {
                             sum = 0.0;
-                            for (j = 0; j < i; j++) sum = (sum + (double)forward[j] * *(&matrix[i * 100 + j]));
-                            forward[i] = RQScalar(((double)temporary[i]-sum) / matrix[i * 101]);
+                            for (j = 0; j < i; j++)
+                                sum = (sum + (double)forward[j] * *(&matrix[i * 100 + j]));
+                            forward[i] = RQScalar(((double)temporary[i] - sum) / matrix[i * 101]);
                         }
                         orthogonal = (br_scalar*)gPhysics_buffer2_ptr;
                         for (i = 0; i < active; i++) {
@@ -4193,7 +4415,8 @@ int C2_HOOK_FASTCALL FUN_004c3b60(br_scalar* original, br_scalar* rhs, br_scalar
                     return 0;
                 }
                 selected = excluded[chosen];
-                for (i = chosen + 1; i < *(int*)excluded_count; i++) excluded[i - 1] = excluded[i];
+                for (i = chosen + 1; i < *(int*)excluded_count; i++)
+                    excluded[i - 1] = excluded[i];
                 *excluded_count = *excluded_count - 1;
                 excluded[*excluded_count] = selected;
                 selected = excluded[*excluded_count];
@@ -4202,8 +4425,10 @@ int C2_HOOK_FASTCALL FUN_004c3b60(br_scalar* original, br_scalar* rhs, br_scalar
                 mask[bit >> 5] |= (tU32)1 << (bit & 31);
                 matrix = (br_scalar*)gPhysics_buffer1_ptr;
                 orthogonal = (br_scalar*)gPhysics_buffer2_ptr;
-                if (gPhysics_rq_mode_6940b8 == 0) RQSingleExpand(matrix, original, active, orthogonal, indices);
-                else RQExpand(matrix, original, active, active + 1, orthogonal, indices);
+                if (gPhysics_rq_mode_6940b8 == 0)
+                    RQSingleExpand(matrix, original, active, orthogonal, indices);
+                else
+                    RQExpand(matrix, original, active, active + 1, orthogonal, indices);
                 memcpy(&active_rhs[active], &rhs[indices[active]], 4);
                 active++;
             }
@@ -4280,7 +4505,7 @@ void C2_HOOK_FASTCALL RQExpand(br_scalar* matrix, const br_scalar* original, int
         if (!(diagonal > 0.0)) {
             length = -length;
         }
-        head = diagonal+length;
+        head = diagonal + length;
         first = RQScalar(head);
         denominator = RQScalar((double)head * length);
         for (j = 0; j < size; j++) {
@@ -4290,9 +4515,9 @@ void C2_HOOK_FASTCALL RQExpand(br_scalar* matrix, const br_scalar* original, int
             }
             coefficient = sum / denominator;
             for (k = old_size; k < size; k++) {
-                orthogonal[k * 100 + j] = RQScalar((*(&orthogonal[k * 100 + j])-(((double)coefficient * *(&matrix[i * 100 + k])))));
+                orthogonal[k * 100 + j] = RQScalar((*(&orthogonal[k * 100 + j]) - (((double)coefficient * *(&matrix[i * 100 + k])))));
             }
-            orthogonal[i * 100 + j] = RQScalar((*(&orthogonal[i * 100 + j])-((double)first * coefficient)));
+            orthogonal[i * 100 + j] = RQScalar((*(&orthogonal[i * 100 + j]) - ((double)first * coefficient)));
         }
         for (j = i + 1; j < size; j++) {
             sum = ((double)first * *(&matrix[j * 100 + i]));
@@ -4301,9 +4526,9 @@ void C2_HOOK_FASTCALL RQExpand(br_scalar* matrix, const br_scalar* original, int
             }
             coefficient = sum / denominator;
             for (k = old_size; k < size; k++) {
-                matrix[j * 100 + k] = RQScalar((*(&matrix[j * 100 + k])-(((double)coefficient * *(&matrix[i * 100 + k])))));
+                matrix[j * 100 + k] = RQScalar((*(&matrix[j * 100 + k]) - (((double)coefficient * *(&matrix[i * 100 + k])))));
             }
-            matrix[j * 100 + i] = RQScalar((*(&matrix[j * 100 + i])-((double)first * coefficient)));
+            matrix[j * 100 + i] = RQScalar((*(&matrix[j * 100 + i]) - ((double)first * coefficient)));
         }
         matrix[i * 101] = RQScalar(-((double)length * maximum));
         for (k = old_size; k < size; k++) {
@@ -4335,7 +4560,7 @@ void C2_HOOK_FASTCALL RQExpand(br_scalar* matrix, const br_scalar* original, int
         if (!(matrix[i * 101] > 0.0f)) {
             length = -length;
         }
-        head = (length+*(&matrix[i * 101]));
+        head = (length + *(&matrix[i * 101]));
         denominator = RQScalar((double)length * head);
         matrix[i * 101] = RQScalar(head);
         for (j = 0; j < size; j++) {
@@ -4411,20 +4636,20 @@ void C2_HOOK_FASTCALL RQSingleExpand(br_scalar* matrix, const br_scalar* origina
         if (!(diagonal > 0.0)) {
             length = -length;
         }
-        head = diagonal+length;
+        head = diagonal + length;
         first = RQScalar(head);
         denominator = head * length;
         second_coefficient = RQScalar((double)second / denominator);
         first_coefficient = RQScalar((double)first / denominator);
         for (j = 0; j <= size; j++) {
-            sum = ((((double)first * *(&orthogonal[i * 100 + j])))+(((double)second * *(&orthogonal[size * 100 + j]))));
-            orthogonal[size * 100 + j] = RQScalar((*(&orthogonal[size * 100 + j])-((double)second_coefficient * sum)));
-            orthogonal[i * 100 + j] = RQScalar((*(&orthogonal[i * 100 + j])-((double)first_coefficient * sum)));
+            sum = ((((double)first * *(&orthogonal[i * 100 + j]))) + (((double)second * *(&orthogonal[size * 100 + j]))));
+            orthogonal[size * 100 + j] = RQScalar((*(&orthogonal[size * 100 + j]) - ((double)second_coefficient * sum)));
+            orthogonal[i * 100 + j] = RQScalar((*(&orthogonal[i * 100 + j]) - ((double)first_coefficient * sum)));
         }
         for (j = i + 1; j <= size; j++) {
-            sum = ((((double)first * *(&matrix[j * 100 + i])))+(double)second * row[j]);
-            updated_row = RQScalar((row[j]-((double)second_coefficient * sum)));
-            updated_matrix = RQScalar((*(&matrix[j * 100 + i])-((double)first_coefficient * sum)));
+            sum = ((((double)first * *(&matrix[j * 100 + i]))) + (double)second * row[j]);
+            updated_row = RQScalar((row[j] - ((double)second_coefficient * sum)));
+            updated_matrix = RQScalar((*(&matrix[j * 100 + i]) - ((double)first_coefficient * sum)));
             row[j] = updated_row;
             matrix[j * 100 + i] = updated_matrix;
         }
@@ -4739,7 +4964,8 @@ tCollision_shape_polyhedron* C2_HOOK_FASTCALL AllocateShapePolyhedron(int pCount
 
     count_edges = (pCount_points - 2) * 3;
     result = BrMemAllocate(sizeof(tCollision_shape_polyhedron) + pCount_points * sizeof(br_vector3)
-        + count_edges * sizeof(tPolyhedron_edge_indexes) + (pCount_points - 2) * 2 * sizeof(br_vector4), (br_uint_8)pType);
+            + count_edges * sizeof(tPolyhedron_edge_indexes) + (pCount_points - 2) * 2 * sizeof(br_vector4),
+        (br_uint_8)pType);
     raw_memory = (tU8*)result + sizeof(tCollision_shape_polyhedron);
     result->polyhedron.points = (br_vector3*)raw_memory;
     raw_memory += pCount_points * sizeof(br_vector3);
@@ -4759,7 +4985,8 @@ tCollision_shape_wireframe* C2_HOOK_FASTCALL AllocateShapeWireFrame(int pCount_p
     tU8* raw_memory;
 
     result = BrMemAllocate(sizeof(tCollision_shape_wireframe) + pCount_points * sizeof(br_vector3)
-        + pCount_lines * sizeof(tPolyhedron_edge_indexes), (br_uint_8)pType);
+            + pCount_lines * sizeof(tPolyhedron_edge_indexes),
+        (br_uint_8)pType);
     raw_memory = (tU8*)result + sizeof(tCollision_shape_wireframe);
     result->wireframe.points = (br_vector3*)raw_memory;
     raw_memory += pCount_points * sizeof(br_vector3);
@@ -5081,16 +5308,16 @@ static tU8* C2_HOOK_CDECL LimitRecord(tPhysics_joint_force* records, int index) 
 }
 /* The arguments preserve original product and accumulation ordering. */
 static double C2_HOOK_CDECL LimitDot(const void* a, unsigned ax, const void* b, unsigned bx, unsigned i, unsigned j, unsigned k) {
-    double first = ((double)*(LimitScalarAt(a, ax + 4*i)) * (double)*(LimitScalarAt(b, bx + 4*i)));
-    double second = ((double)*(LimitScalarAt(a, ax + 4*j)) * (double)*(LimitScalarAt(b, bx + 4*j)));
-    double third = ((double)*(LimitScalarAt(a, ax + 4*k)) * (double)*(LimitScalarAt(b, bx + 4*k)));
+    double first = ((double)*(LimitScalarAt(a, ax + 4 * i)) * (double)*(LimitScalarAt(b, bx + 4 * i)));
+    double second = ((double)*(LimitScalarAt(a, ax + 4 * j)) * (double)*(LimitScalarAt(b, bx + 4 * j)));
+    double third = ((double)*(LimitScalarAt(a, ax + 4 * k)) * (double)*(LimitScalarAt(b, bx + 4 * k)));
     return (first + second + third);
 }
 static double C2_HOOK_CDECL LimitCross(br_vector3* out, const void* axis, unsigned offset, const br_vector3* vector) {
     double z, length;
-    FrictionWrite(out, 0, ((((double)*(LimitScalarAt(axis, offset+8)) * (double)*(LimitScalarAt(vector, 4))))-(((double)*(LimitScalarAt(axis, offset+4)) * (double)*(LimitScalarAt(vector, 8))))));
-    FrictionWrite(out, 4, ((((double)*(LimitScalarAt(axis, offset)) * (double)*(LimitScalarAt(vector, 8))))-(((double)*(LimitScalarAt(axis, offset+8)) * (double)*(LimitScalarAt(vector, 0))))));
-    z = ((((double)*(LimitScalarAt(axis, offset+4)) * (double)*(LimitScalarAt(vector, 0))))-(((double)*(LimitScalarAt(axis, offset)) * (double)*(LimitScalarAt(vector, 4)))));
+    FrictionWrite(out, 0, ((((double)*(LimitScalarAt(axis, offset + 8)) * (double)*(LimitScalarAt(vector, 4)))) - (((double)*(LimitScalarAt(axis, offset + 4)) * (double)*(LimitScalarAt(vector, 8))))));
+    FrictionWrite(out, 4, ((((double)*(LimitScalarAt(axis, offset)) * (double)*(LimitScalarAt(vector, 8)))) - (((double)*(LimitScalarAt(axis, offset + 8)) * (double)*(LimitScalarAt(vector, 0))))));
+    z = ((((double)*(LimitScalarAt(axis, offset + 4)) * (double)*(LimitScalarAt(vector, 0)))) - (((double)*(LimitScalarAt(axis, offset)) * (double)*(LimitScalarAt(vector, 4)))));
     FrictionWrite(out, 8, z);
     /* Original keeps z wide while its FST scalar copy feeds the last product. */
     length = ((((((double)*(LimitScalarAt(out, 0)) * (double)*(LimitScalarAt(out, 0)))) + (((double)*(LimitScalarAt(out, 4)) * (double)*(LimitScalarAt(out, 4)))))) + z * out->v[2]);
@@ -5146,7 +5373,7 @@ void C2_HOOK_FASTCALL FUN_004bd4f0(const br_matrix34* child_matrix, const br_mat
     z = ((double)*(LimitScalarAt(bisector, 8)) * (double)twice_dot);
     reflected_x = ((double)*(LimitScalarAt(reflected, 0)) - x);
     product_z = FrictionScalar(z);
-    reflected_y = reflected_y-y;
+    reflected_y = reflected_y - y;
     reflected_z = reflected_z - (double)product_z;
     stored_y = FrictionScalar(reflected_y);
     stored_z = FrictionScalar(reflected_z);
@@ -5165,8 +5392,8 @@ void C2_HOOK_FASTCALL FUN_004bd4f0(const br_matrix34* child_matrix, const br_mat
     FrictionWrite(reflected, 0, ((double)*(LimitScalarAt(reflected, 0)) - x));
     reflected_z = reflected->v[2];
     reflected_y = reflected->v[1];
-    FrictionWrite(reflected, 4, reflected_y-y);
-    FrictionWrite(reflected, 8, reflected_z-z);
+    FrictionWrite(reflected, 4, reflected_y - y);
+    FrictionWrite(reflected, 8, reflected_z - z);
 }
 
 // FUNCTION: CARMA2_HW 0x004bca10
@@ -5185,22 +5412,24 @@ int C2_HOOK_FASTCALL FUN_004bca10(tPhysics_object* object, tPhysics_joint_force*
     joint = FrictionPointer(object, 0x188);
     if (joint != NULL) {
         partner = FrictionPointer(object, 0x230);
-        if (partner == NULL) PhysicsError((tPhysicsError)11, &gPhysics_empty_message);
+        if (partner == NULL)
+            PhysicsError((tPhysicsError)11, &gPhysics_empty_message);
         row_index = 0;
         row_offset = 0;
         record = LimitRecord(records, count);
         while (row_index < (int)(*(const tU32*)((const tU8*)(FrictionPointer(object, 0x188)) + 0x50))) {
-            if (count >= capacity) break;
+            if (count >= capacity)
+                break;
             row = LimitRow(object, 0x188, row_offset);
             kind = (int)(*(const tU32*)((const tU8*)row + 0x54));
             if (kind == 0) {
-                BrMatrix34ApplyV(&temporary, (br_vector3*)(row+0x5c), LimitActorMatrix(object));
+                BrMatrix34ApplyV(&temporary, (br_vector3*)(row + 0x5c), LimitActorMatrix(object));
                 BrMatrix34TApplyV(&current, &temporary, LimitActorMatrix(partner));
                 row = LimitRow(object, 0x188, row_offset);
                 wide = LimitDot(row, 0x68, &current, 0, 0, 1, 2);
                 current_dot = FrictionScalar(wide);
                 if (!(wide >= 0.001)) {
-                    BrMatrix34ApplyV(&temporary, (br_vector3*)(row+0x5c), &object->transform_matrix);
+                    BrMatrix34ApplyV(&temporary, (br_vector3*)(row + 0x5c), &object->transform_matrix);
                     partner_matrix = &partner->transform_matrix;
                     BrMatrix34TApplyV(&predicted, &temporary, partner_matrix);
                     row = LimitRow(object, 0x188, row_offset);
@@ -5219,28 +5448,28 @@ int C2_HOOK_FASTCALL FUN_004bca10(tPhysics_object* object, tPhysics_joint_force*
                             FrictionWrite(record, 0x40, (*(const br_scalar*)((const tU8*)(&cross) + 8)) / length);
                         } else {
                             BrMatrix34ApplyV(&cross, &object->omega, &object->transform_matrix);
-                            BrMatrix34TApplyV((br_vector3*)(record+0x38), &cross, partner_matrix);
+                            BrMatrix34TApplyV((br_vector3*)(record + 0x38), &cross, partner_matrix);
                             FrictionWrite(record, 0x38, (((*(const br_scalar*)((const tU8*)record + 0x38))) - (double)*(LimitScalarAt(partner, 0x74))));
                             FrictionWrite(record, 0x3c, (((*(const br_scalar*)((const tU8*)record + 0x3c))) - (double)*(LimitScalarAt(partner, 0x78))));
                             next = (((*(const br_scalar*)((const tU8*)record + 0x40))) - (double)*(LimitScalarAt(partner, 0x7c)));
                             FrictionWrite(record, 0x40, next);
-                            length = sqrt((((((*(const br_scalar*)((const tU8*)record + 0x38))*(*(const br_scalar*)((const tU8*)record + 0x38))) + next*next)) + ((*(const br_scalar*)((const tU8*)record + 0x3c))*(*(const br_scalar*)((const tU8*)record + 0x3c)))));
+                            length = sqrt((((((*(const br_scalar*)((const tU8*)record + 0x38)) * (*(const br_scalar*)((const tU8*)record + 0x38))) + next * next)) + ((*(const br_scalar*)((const tU8*)record + 0x3c)) * (*(const br_scalar*)((const tU8*)record + 0x3c)))));
                             if (length > (double)2.384185791015625e-7f) {
                                 wide = 1.0 / length;
-                                FrictionWrite(record, 0x38, (*(const br_scalar*)((const tU8*)record + 0x38))*wide);
-                                FrictionWrite(record, 0x3c, (*(const br_scalar*)((const tU8*)record + 0x3c))*wide);
-                                FrictionWrite(record, 0x40, (*(const br_scalar*)((const tU8*)record + 0x40))*wide);
+                                FrictionWrite(record, 0x38, (*(const br_scalar*)((const tU8*)record + 0x38)) * wide);
+                                FrictionWrite(record, 0x3c, (*(const br_scalar*)((const tU8*)record + 0x3c)) * wide);
+                                FrictionWrite(record, 0x40, (*(const br_scalar*)((const tU8*)record + 0x40)) * wide);
                             } else {
                                 LimitWord(record, 0x38, 0x3f800000);
                                 LimitWord(record, 0x3c, 0);
                                 LimitWord(record, 0x40, 0);
                             }
                         }
-                        BrMatrix34ApplyV(&cross, (br_vector3*)(record+0x38), partner_matrix);
-                        BrMatrix34TApplyV((br_vector3*)(record+0x2c), &cross, &object->transform_matrix);
-                        for (word_offset=0; word_offset<24; word_offset+=4) {
-                            joint=FrictionPointer(object, 0x188);
-                            LimitCopyWord(record, 0x14+word_offset, joint, 8+word_offset);
+                        BrMatrix34ApplyV(&cross, (br_vector3*)(record + 0x38), partner_matrix);
+                        BrMatrix34TApplyV((br_vector3*)(record + 0x2c), &cross, &object->transform_matrix);
+                        for (word_offset = 0; word_offset < 24; word_offset += 4) {
+                            joint = FrictionPointer(object, 0x188);
+                            LimitCopyWord(record, 0x14 + word_offset, joint, 8 + word_offset);
                         }
                         ++count;
                         record += 96;
@@ -5248,160 +5477,166 @@ int C2_HOOK_FASTCALL FUN_004bca10(tPhysics_object* object, tPhysics_joint_force*
                 }
             } else if (kind == 1) {
                 FUN_004bd4f0(LimitActorMatrix(object), LimitActorMatrix(partner),
-                    (br_vector3*)(row+0x5c), (br_vector3*)(row+0x68),
-                    (br_vector3*)(row+0x7c), (br_vector3*)(row+0x88), &current, &cross);
-                row=LimitRow(object, 0x188, row_offset);
-                wide=LimitDot(row, 0x88, &current, 0, 0, 2, 1);
-                current_dot=FrictionScalar(wide);
-                threshold=(*(const br_scalar*)((const tU8*)row + 0x58))-(-0.001);
+                    (br_vector3*)(row + 0x5c), (br_vector3*)(row + 0x68),
+                    (br_vector3*)(row + 0x7c), (br_vector3*)(row + 0x88), &current, &cross);
+                row = LimitRow(object, 0x188, row_offset);
+                wide = LimitDot(row, 0x88, &current, 0, 0, 2, 1);
+                current_dot = FrictionScalar(wide);
+                threshold = (*(const br_scalar*)((const tU8*)row + 0x58)) - (-0.001);
                 if (wide < threshold) {
-                    partner_matrix=&partner->transform_matrix;
+                    partner_matrix = &partner->transform_matrix;
                     FUN_004bd4f0(&object->transform_matrix, partner_matrix,
-                        (br_vector3*)(row+0x5c), (br_vector3*)(row+0x68),
-                        (br_vector3*)(row+0x7c), (br_vector3*)(row+0x88), &predicted, (br_vector3*)(record+0x38));
-                    row=LimitRow(object, 0x188, row_offset);
-                    wide=LimitDot(row, 0x88, &predicted, 0, 2, 1, 0);
-                    predicted_dot=FrictionScalar(wide);
+                        (br_vector3*)(row + 0x5c), (br_vector3*)(row + 0x68),
+                        (br_vector3*)(row + 0x7c), (br_vector3*)(row + 0x88), &predicted, (br_vector3*)(record + 0x38));
+                    row = LimitRow(object, 0x188, row_offset);
+                    wide = LimitDot(row, 0x88, &predicted, 0, 2, 1, 0);
+                    predicted_dot = FrictionScalar(wide);
                     if (wide > (*(const br_scalar*)((const tU8*)row + 0x58))) {
                         /* Original cross: predicted x current, stored componentwise. */
-                        FrictionWrite(&cross, 0, ((((double)*(LimitScalarAt(&predicted, 8)) * (double)*(LimitScalarAt(&current, 4))))-(((double)*(LimitScalarAt(&predicted, 4)) * (double)*(LimitScalarAt(&current, 8))))));
-                        FrictionWrite(&cross, 4, ((((double)*(LimitScalarAt(&predicted, 0)) * (double)*(LimitScalarAt(&current, 8))))-(((double)*(LimitScalarAt(&predicted, 8)) * (double)*(LimitScalarAt(&current, 0))))));
-                        FrictionWrite(&cross, 8, ((((double)*(LimitScalarAt(&predicted, 4)) * (double)*(LimitScalarAt(&current, 0))))-(((double)*(LimitScalarAt(&predicted, 0)) * (double)*(LimitScalarAt(&current, 4))))));
-                        wide=LimitDot(record, 0x38, &cross, 0, 1, 2, 0);
+                        FrictionWrite(&cross, 0, ((((double)*(LimitScalarAt(&predicted, 8)) * (double)*(LimitScalarAt(&current, 4)))) - (((double)*(LimitScalarAt(&predicted, 4)) * (double)*(LimitScalarAt(&current, 8))))));
+                        FrictionWrite(&cross, 4, ((((double)*(LimitScalarAt(&predicted, 0)) * (double)*(LimitScalarAt(&current, 8)))) - (((double)*(LimitScalarAt(&predicted, 8)) * (double)*(LimitScalarAt(&current, 0))))));
+                        FrictionWrite(&cross, 8, ((((double)*(LimitScalarAt(&predicted, 4)) * (double)*(LimitScalarAt(&current, 0)))) - (((double)*(LimitScalarAt(&predicted, 0)) * (double)*(LimitScalarAt(&current, 4))))));
+                        wide = LimitDot(record, 0x38, &cross, 0, 1, 2, 0);
                         if (!(wide >= 0.0)) {
                             FrictionWrite(record, 0x38, -(*(const br_scalar*)((const tU8*)record + 0x38)));
                             FrictionWrite(record, 0x3c, -(*(const br_scalar*)((const tU8*)record + 0x3c)));
                             FrictionWrite(record, 0x40, -(*(const br_scalar*)((const tU8*)record + 0x40)));
                         }
-                        BrMatrix34ApplyV(&cross, (br_vector3*)(record+0x38), partner_matrix);
-                        BrMatrix34TApplyV((br_vector3*)(record+0x2c), &cross, &object->transform_matrix);
+                        BrMatrix34ApplyV(&cross, (br_vector3*)(record + 0x38), partner_matrix);
+                        BrMatrix34TApplyV((br_vector3*)(record + 0x2c), &cross, &object->transform_matrix);
                         FrictionWrite(record, 0, current_dot - (double)predicted_dot);
                         LimitWord(record, 0x5c, 11);
                         LimitWord(record, 4, (tU32)(uintptr_t)object);
                         LimitWord(record, 8, (tU32)(uintptr_t)partner);
                         ++count;
-                        record+=96;
+                        record += 96;
                     }
                 }
                 ++row_index;
-                row_offset+=32;
-            } else PhysicsError((tPhysicsError)8, &gPhysics_empty_message);
+                row_offset += 32;
+            } else
+                PhysicsError((tPhysicsError)8, &gPhysics_empty_message);
             ++row_index;
-            row_offset+=32;
+            row_offset += 32;
         }
     }
-    joint=FrictionPointer(object, 0x18c);
-    row_index=0;
-    row_offset=0;
+    joint = FrictionPointer(object, 0x18c);
+    row_index = 0;
+    row_offset = 0;
     /* Only the entry guard checks NULL. Original post-write reload reads the
      * new joint count unconditionally, including the authentic alias fault. */
     if (joint != NULL) {
         while (row_index < (int)(*(const tU32*)((const tU8*)joint + 0x50))) {
-            row=joint+row_offset;
-            kind=(int)(*(const tU32*)((const tU8*)row + 0x54));
+            row = joint + row_offset;
+            kind = (int)(*(const tU32*)((const tU8*)row + 0x54));
             if (kind == 0) {
-                BrMatrix34ApplyV(&current, (br_vector3*)(row+0x5c), LimitActorMatrix(object));
-                row=LimitRow(object, 0x18c, row_offset);
-                wide=LimitDot(row, 0x68, &current, 0, 1, 0, 2);
+                BrMatrix34ApplyV(&current, (br_vector3*)(row + 0x5c), LimitActorMatrix(object));
+                row = LimitRow(object, 0x18c, row_offset);
+                wide = LimitDot(row, 0x68, &current, 0, 1, 0, 2);
                 if (!(wide >= 0.001)) {
-                    if (count == capacity) return count;
-                    record=LimitRecord(records, count);
+                    if (count == capacity)
+                        return count;
+                    record = LimitRecord(records, count);
                     FrictionWrite(record, 0, wide);
                     LimitWord(record, 0x5c, 11);
                     LimitWord(record, 4, (tU32)(uintptr_t)object);
                     LimitWord(record, 8, 0);
-                    row=LimitRow(object, 0x18c, row_offset);
-                    length=LimitCross(&cross, row, 0x68, &current);
+                    row = LimitRow(object, 0x18c, row_offset);
+                    length = LimitCross(&cross, row, 0x68, &current);
                     if (length > 1.0e-6) {
-                        FrictionWrite(record, 0x38, (*(const br_scalar*)((const tU8*)(&cross) + 0))/length);
-                        FrictionWrite(record, 0x3c, (*(const br_scalar*)((const tU8*)(&cross) + 4))/length);
-                        FrictionWrite(record, 0x40, (*(const br_scalar*)((const tU8*)(&cross) + 8))/length);
+                        FrictionWrite(record, 0x38, (*(const br_scalar*)((const tU8*)(&cross) + 0)) / length);
+                        FrictionWrite(record, 0x3c, (*(const br_scalar*)((const tU8*)(&cross) + 4)) / length);
+                        FrictionWrite(record, 0x40, (*(const br_scalar*)((const tU8*)(&cross) + 8)) / length);
                     }
                     /* Original writes this slot without increasing count. */
                 }
             } else if (kind == 10) {
-                if (*(tU8*)((tU8*)object+0x1e0)) {
-                    gPhysics_group_limit_692dd8=1;
-                    scan=(tU8*)records;
-                    for (index=0; index<count; ++index,scan+=96) {
-                        if ((*(const tU32*)((const tU8*)scan + 4))==(tU32)(uintptr_t)object) {
-                            if ((*(const tU32*)((const tU8*)scan + 8))==0) {
+                if (*(tU8*)((tU8*)object + 0x1e0)) {
+                    gPhysics_group_limit_692dd8 = 1;
+                    scan = (tU8*)records;
+                    for (index = 0; index < count; ++index, scan += 96) {
+                        if ((*(const tU32*)((const tU8*)scan + 4)) == (tU32)(uintptr_t)object) {
+                            if ((*(const tU32*)((const tU8*)scan + 8)) == 0) {
                                 /* Forward MOVSD copy includes the trailing sentinel. */
-                                for (remaining=0;remaining<count-index;++remaining)
-                                    for (word_offset=0;word_offset<96;word_offset+=4)
-                                        LimitCopyWord(scan,96u*remaining+word_offset,scan,96u*(remaining+1)+word_offset);
+                                for (remaining = 0; remaining < count - index; ++remaining)
+                                    for (word_offset = 0; word_offset < 96; word_offset += 4)
+                                        LimitCopyWord(scan, 96u * remaining + word_offset, scan, 96u * (remaining + 1) + word_offset);
                                 --count;
                                 --index;
-                                scan-=96;
+                                scan -= 96;
                                 continue;
                             }
-                            wide=-(*(const br_scalar*)((const tU8*)scan + 0x2c));
-                            current_dot=FrictionScalar(-(*(const br_scalar*)((const tU8*)scan + 0x30)));
-                            predicted_dot=FrictionScalar(-(*(const br_scalar*)((const tU8*)scan + 0x34)));
-                            FrictionWrite(scan,0x2c,-(*(const br_scalar*)((const tU8*)scan + 0x38)));
-                            FrictionWrite(scan,0x30,-(*(const br_scalar*)((const tU8*)scan + 0x3c)));
-                            next=-(*(const br_scalar*)((const tU8*)scan + 0x40));
-                            FrictionWrite(scan,0x34,next);
-                            FrictionWrite(scan,0x38,wide);
-                            LimitCopyWord(scan,0x3c,&current_dot,0);
-                            LimitCopyWord(scan,0x40,&predicted_dot,0);
-                            wide=(*(const br_scalar*)((const tU8*)scan + 0x14));
-                            LimitCopyWord(&current_dot,0,scan,0x18);
-                            LimitCopyWord(&predicted_dot,0,scan,0x1c);
-                            LimitCopyWord(scan,0x14,scan,0x20);
-                            LimitCopyWord(scan,0x18,scan,0x24);
-                            LimitCopyWord(scan,0x1c,scan,0x28);
-                            FrictionWrite(scan,0x20,wide);
-                            LimitCopyWord(scan,0x24,&current_dot,0);
-                            LimitCopyWord(scan,0x28,&predicted_dot,0);
-                            LimitCopyWord(scan,4,scan,8);
-                            LimitWord(scan,8,(tU32)(uintptr_t)object);
-                            LimitWord(scan,0x5c,14);
-                        } else if ((*(const tU32*)((const tU8*)scan + 8))==(tU32)(uintptr_t)object) LimitWord(scan,0x5c,14);
+                            wide = -(*(const br_scalar*)((const tU8*)scan + 0x2c));
+                            current_dot = FrictionScalar(-(*(const br_scalar*)((const tU8*)scan + 0x30)));
+                            predicted_dot = FrictionScalar(-(*(const br_scalar*)((const tU8*)scan + 0x34)));
+                            FrictionWrite(scan, 0x2c, -(*(const br_scalar*)((const tU8*)scan + 0x38)));
+                            FrictionWrite(scan, 0x30, -(*(const br_scalar*)((const tU8*)scan + 0x3c)));
+                            next = -(*(const br_scalar*)((const tU8*)scan + 0x40));
+                            FrictionWrite(scan, 0x34, next);
+                            FrictionWrite(scan, 0x38, wide);
+                            LimitCopyWord(scan, 0x3c, &current_dot, 0);
+                            LimitCopyWord(scan, 0x40, &predicted_dot, 0);
+                            wide = (*(const br_scalar*)((const tU8*)scan + 0x14));
+                            LimitCopyWord(&current_dot, 0, scan, 0x18);
+                            LimitCopyWord(&predicted_dot, 0, scan, 0x1c);
+                            LimitCopyWord(scan, 0x14, scan, 0x20);
+                            LimitCopyWord(scan, 0x18, scan, 0x24);
+                            LimitCopyWord(scan, 0x1c, scan, 0x28);
+                            FrictionWrite(scan, 0x20, wide);
+                            LimitCopyWord(scan, 0x24, &current_dot, 0);
+                            LimitCopyWord(scan, 0x28, &predicted_dot, 0);
+                            LimitCopyWord(scan, 4, scan, 8);
+                            LimitWord(scan, 8, (tU32)(uintptr_t)object);
+                            LimitWord(scan, 0x5c, 14);
+                        } else if ((*(const tU32*)((const tU8*)scan + 8)) == (tU32)(uintptr_t)object)
+                            LimitWord(scan, 0x5c, 14);
                     }
                 }
             } else if (kind == 11) {
-                BrMatrix34ApplyV(&temporary,(br_vector3*)(joint+0x38),&object->transform_matrix);
-                reference=LimitDot(object,0x17c,&temporary,0,1,2,0);
-                reference_dot=FrictionScalar(reference);
-                row=LimitRow(object,0x18c,row_offset);
-                threshold=(*(const br_scalar*)((const tU8*)row + 0x58))+reference_dot;
-                current_dot=FrictionScalar(threshold);
-                actor_position=LimitDot(FrictionPointer(object,0),0x50,&temporary,0,2,1,0);
-                actor_dot=FrictionScalar(actor_position);
-                predicted_position=LimitDot(object,0xb0,&temporary,0,0,1,2);
-                predicted_dot=FrictionScalar(predicted_position);
-                if (actor_position > current_dot && predicted_dot < current_dot-(-0.001)) {
-                    if (count == capacity) return count;
-                    record=LimitRecord(records,count);
-                    FrictionWrite(record,0,(current_dot-(double)predicted_dot)/(actor_dot-(double)predicted_dot));
-                    LimitWord(record,0xc,0);
-                    LimitWord(record,0x5c,2);
-                    LimitWord(record,4,(tU32)(uintptr_t)object);
-                    LimitWord(record,8,0);
-                    FrictionWrite(record,0x2c,-(*(const br_scalar*)((const tU8*)(FrictionPointer(object,0x18c)) + 0x38)));
-                    FrictionWrite(record,0x30,-(*(const br_scalar*)((const tU8*)(FrictionPointer(object,0x18c)) + 0x3c)));
-                    FrictionWrite(record,0x34,-(*(const br_scalar*)((const tU8*)(FrictionPointer(object,0x18c)) + 0x40)));
-                    BrVector3SetFloat((br_vector3*)(record+0x14),0,0,0);
+                BrMatrix34ApplyV(&temporary, (br_vector3*)(joint + 0x38), &object->transform_matrix);
+                reference = LimitDot(object, 0x17c, &temporary, 0, 1, 2, 0);
+                reference_dot = FrictionScalar(reference);
+                row = LimitRow(object, 0x18c, row_offset);
+                threshold = (*(const br_scalar*)((const tU8*)row + 0x58)) + reference_dot;
+                current_dot = FrictionScalar(threshold);
+                actor_position = LimitDot(FrictionPointer(object, 0), 0x50, &temporary, 0, 2, 1, 0);
+                actor_dot = FrictionScalar(actor_position);
+                predicted_position = LimitDot(object, 0xb0, &temporary, 0, 0, 1, 2);
+                predicted_dot = FrictionScalar(predicted_position);
+                if (actor_position > current_dot && predicted_dot < current_dot - (-0.001)) {
+                    if (count == capacity)
+                        return count;
+                    record = LimitRecord(records, count);
+                    FrictionWrite(record, 0, (current_dot - (double)predicted_dot) / (actor_dot - (double)predicted_dot));
+                    LimitWord(record, 0xc, 0);
+                    LimitWord(record, 0x5c, 2);
+                    LimitWord(record, 4, (tU32)(uintptr_t)object);
+                    LimitWord(record, 8, 0);
+                    FrictionWrite(record, 0x2c, -(*(const br_scalar*)((const tU8*)(FrictionPointer(object, 0x18c)) + 0x38)));
+                    FrictionWrite(record, 0x30, -(*(const br_scalar*)((const tU8*)(FrictionPointer(object, 0x18c)) + 0x3c)));
+                    FrictionWrite(record, 0x34, -(*(const br_scalar*)((const tU8*)(FrictionPointer(object, 0x18c)) + 0x40)));
+                    BrVector3SetFloat((br_vector3*)(record + 0x14), 0, 0, 0);
                     ++count;
-                } else if (actor_dot < reference_dot-0.001 && !(predicted_dot <= reference_dot-0.002)) {
-                    if (count == capacity) return count;
-                    record=LimitRecord(records,count);
-                    FrictionWrite(record,0,(reference_dot-(double)predicted_dot)/(actor_dot-(double)predicted_dot));
-                    LimitWord(record,0xc,0);
-                    LimitWord(record,0x5c,2);
-                    LimitWord(record,4,(tU32)(uintptr_t)object);
-                    LimitWord(record,8,0);
-                    LimitCopyWord(record,0x2c,FrictionPointer(object,0x18c),0x38);
-                    LimitCopyWord(record,0x30,FrictionPointer(object,0x18c),0x3c);
-                    LimitCopyWord(record,0x34,FrictionPointer(object,0x18c),0x40);
-                    BrVector3SetFloat((br_vector3*)(record+0x14),0,0,0);
+                } else if (actor_dot < reference_dot - 0.001 && !(predicted_dot <= reference_dot - 0.002)) {
+                    if (count == capacity)
+                        return count;
+                    record = LimitRecord(records, count);
+                    FrictionWrite(record, 0, (reference_dot - (double)predicted_dot) / (actor_dot - (double)predicted_dot));
+                    LimitWord(record, 0xc, 0);
+                    LimitWord(record, 0x5c, 2);
+                    LimitWord(record, 4, (tU32)(uintptr_t)object);
+                    LimitWord(record, 8, 0);
+                    LimitCopyWord(record, 0x2c, FrictionPointer(object, 0x18c), 0x38);
+                    LimitCopyWord(record, 0x30, FrictionPointer(object, 0x18c), 0x3c);
+                    LimitCopyWord(record, 0x34, FrictionPointer(object, 0x18c), 0x40);
+                    BrVector3SetFloat((br_vector3*)(record + 0x14), 0, 0, 0);
                     ++count;
                 }
-            } else PhysicsError((tPhysicsError)8, &gPhysics_empty_message);
-            joint=FrictionPointer(object,0x18c);
+            } else
+                PhysicsError((tPhysicsError)8, &gPhysics_empty_message);
+            joint = FrictionPointer(object, 0x18c);
             ++row_index;
-            row_offset+=32;
+            row_offset += 32;
         }
     }
     return count;
@@ -5411,10 +5646,11 @@ int C2_HOOK_FASTCALL FUN_004bca10(tPhysics_object* object, tPhysics_joint_force*
 int C2_HOOK_FASTCALL FUN_004bd6d0(tPhysics_object* list, tPhysics_joint_force* records, int count, int capacity) {
     tPhysics_object* child;
     while (list != NULL) {
-        count=FUN_004bca10(list,records,count,capacity);
-        child=FrictionPointer(list,0x224);
-        if (child != NULL) count=FUN_004bd6d0(child,records,count,capacity);
-        list=FrictionPointer(list,0x220);
+        count = FUN_004bca10(list, records, count, capacity);
+        child = FrictionPointer(list, 0x224);
+        if (child != NULL)
+            count = FUN_004bd6d0(child, records, count, capacity);
+        list = FrictionPointer(list, 0x220);
     }
     return count;
 }
@@ -5455,10 +5691,11 @@ static void C2_HOOK_CDECL JointedMotionEnergyPass(tPhysics_object* first) {
 /* Reuse the proven original raw-time forwarding rule for this parent.
  * Integration must share the existing GNU-only helper/type declarations. */
 #if defined(__GNUC__) && defined(__i386__)
-#define JOINTED_MOTION(function_name, object, time) do { \
-    tHierarchyRawMotion function = (tHierarchyRawMotion)(void*)(function_name); \
-    function(object, 0, HierarchyTimeWord(&time)); \
-} while (0)
+#define JOINTED_MOTION(function_name, object, time)                                 \
+    do {                                                                            \
+        tHierarchyRawMotion function = (tHierarchyRawMotion)(void*)(function_name); \
+        function(object, 0, HierarchyTimeWord(&time));                              \
+    } while (0)
 #else
 #define JOINTED_MOTION(function_name, object, time) (function_name)(object, 0, time)
 #endif
@@ -5582,22 +5819,42 @@ static int C2_HOOK_CDECL AngularForceNextIndex(const tPhysics_joint_force* pReco
     joint = object->physics_joint1;
     if (joint != NULL) {
         switch ((tU32)joint->type) {
-        case 1: index += 5; break;
-        case 2: index += 4; break;
-        case 3: index += 3; break;
-        case 4: index += 2; break;
-        default: PhysicsError((tPhysicsError)5, &gPhysics_empty_message); break;
+        case 1:
+            index += 5;
+            break;
+        case 2:
+            index += 4;
+            break;
+        case 3:
+            index += 3;
+            break;
+        case 4:
+            index += 2;
+            break;
+        default:
+            PhysicsError((tPhysicsError)5, &gPhysics_empty_message);
+            break;
         }
     }
     object = record->object_a;
     joint = object->physics_joint2;
     if (joint != NULL) {
         switch ((tU32)joint->type) {
-        case 1: index += 5; break;
-        case 2: index += 4; break;
-        case 3: index += 3; break;
-        case 5: index += 2; break;
-        default: PhysicsError((tPhysicsError)5, &gPhysics_empty_message); break;
+        case 1:
+            index += 5;
+            break;
+        case 2:
+            index += 4;
+            break;
+        case 3:
+            index += 3;
+            break;
+        case 5:
+            index += 2;
+            break;
+        default:
+            PhysicsError((tPhysicsError)5, &gPhysics_empty_message);
+            break;
         }
     }
     return (int)index;
@@ -5656,7 +5913,9 @@ void C2_HOOK_FASTCALL FUN_004bc190(tPhysics_joint_force* const* pForces, br_scal
                             dot_c = (double)third->direction_b.v[1] * axis.v[1] + (double)third->direction_b.v[0] * axis.v[0] + (double)third->direction_b.v[2] * axis.v[2];
                             dot = (dot_a * impulses[inner] + dot_b * impulses[(tU32)inner + 1]) + dot_c * impulses[(tU32)inner + 2];
                             if (!(!(dot >= cutoff))) {
-                                x = live->omega.v[0]; y = live->omega.v[1]; z = live->omega.v[2];
+                                x = live->omega.v[0];
+                                y = live->omega.v[1];
+                                z = live->omega.v[2];
                                 length = sqrt(x * x + y * y + z * z);
                                 omega_axis.v[0] = (br_scalar)PhysicsJointScalar((double)live->omega.v[0] / length);
                                 omega_axis.v[1] = (br_scalar)PhysicsJointScalar((double)live->omega.v[1] / length);
@@ -5664,7 +5923,9 @@ void C2_HOOK_FASTCALL FUN_004bc190(tPhysics_joint_force* const* pForces, br_scal
                                 angle = AngularForceAngle((length * (double)0.03999999910593033f) * 10430.378350470453);
                                 BrMatrix34Rotate(&rotation, angle, &omega_axis);
                                 BrMatrix34ApplyV(&rotated, &axis, &rotation);
-                                x = impulses[outer]; y = impulses[outer + 1]; z = impulses[outer + 2];
+                                x = impulses[outer];
+                                y = impulses[outer + 1];
+                                z = impulses[outer + 2];
                                 length = sqrt(x * x + y * y + z * z);
                                 if ((length > (2.384185791015625e-7))) {
                                     inverse = 1.0 / length;
@@ -5672,7 +5933,9 @@ void C2_HOOK_FASTCALL FUN_004bc190(tPhysics_joint_force* const* pForces, br_scal
                                     force_y = inverse * y;
                                     force_z = (br_scalar)PhysicsJointScalar(inverse * z);
                                 } else {
-                                    force_x = 1.0; force_y = 0.0; force_z = 0.0f;
+                                    force_x = 1.0;
+                                    force_y = 0.0;
+                                    force_z = 0.0f;
                                 }
                                 cross_a = ((double)axis.v[1] * force_z - (double)axis.v[2] * force_y) * ((double)force_z * rotated.v[1] - force_y * rotated.v[2]);
                                 cross_b = ((double)axis.v[2] * force_x - (double)axis.v[0] * force_z) * (force_x * rotated.v[2] - (double)force_z * rotated.v[0]);
@@ -5702,26 +5965,29 @@ void C2_HOOK_FASTCALL FUN_004bc190(tPhysics_joint_force* const* pForces, br_scal
 // GLOBAL: CARMA2_HW 0x006940a0
 tU32 gPhysics_group_counter_6940a0 = 0;
 
-static tPhysics_object* C2_HOOK_CDECL WakePointer(const void* base, unsigned offset) { return (tPhysics_object*)(uintptr_t)*(const tU32*)((const tU8*)base+offset); }
-#define WakeParent(p) WakePointer(p,0x228)
-#define WakeChild(p) WakePointer(p,0x224)
-#define WakeNext(p) WakePointer(p,0x220)
-#define WakeJoint(p) ((tPhysics_joint*)WakePointer(p,0x188))
-#define WAKE_LABEL(p) (*(tU8*)((tU8*)(p)+0x1dc))
-#define WAKE_RING(p) (*(tU32*)((tU8*)(p)+0x1d8))
+static tPhysics_object* C2_HOOK_CDECL WakePointer(const void* base, unsigned offset) {
+    return (tPhysics_object*)(uintptr_t) * (const tU32*)((const tU8*)base + offset);
+}
+#define WakeParent(p) WakePointer(p, 0x228)
+#define WakeChild(p) WakePointer(p, 0x224)
+#define WakeNext(p) WakePointer(p, 0x220)
+#define WakeJoint(p) ((tPhysics_joint*)WakePointer(p, 0x188))
+#define WAKE_LABEL(p) (*(tU8*)((tU8*)(p) + 0x1dc))
+#define WAKE_RING(p) (*(tU32*)((tU8*)(p) + 0x1d8))
 #define WAKE_COUNTER (gPhysics_group_counter_6940a0)
-#define WAKE_DISABLED(p) (*(tU8*)((tU8*)(p)+0xec))
-#define WAKE_FACE(p) (*(tU16*)((tU8*)(p)+0x178))
+#define WAKE_DISABLED(p) (*(tU8*)((tU8*)(p) + 0xec))
+#define WAKE_FACE(p) (*(tU16*)((tU8*)(p) + 0x178))
 
 // FUNCTION: CARMA2_HW 0x004bae80
 void C2_HOOK_FASTCALL FUN_004bae80(tPhysics_object* object, tU32 label) {
-    tPhysics_object* child=WakeChild(object);
+    tPhysics_object* child = WakeChild(object);
     tPhysics_joint* joint;
-    WAKE_LABEL(object)=(tU8)label;
-    while(child!=NULL) {
-        joint=WakeJoint(child);
-        if(joint!=NULL && *(int*)joint!=0)FUN_004bae80(child,label);
-        child=WakeNext(child);
+    WAKE_LABEL(object) = (tU8)label;
+    while (child != NULL) {
+        joint = WakeJoint(child);
+        if (joint != NULL && *(int*)joint != 0)
+            FUN_004bae80(child, label);
+        child = WakeNext(child);
     }
 }
 
@@ -5734,13 +6000,13 @@ void C2_HOOK_FASTCALL FUN_004bddd0(tPhysics_object* object, tPhysics_object* oth
 
     parent = WakeParent(object);
     while (parent != NULL && WakeJoint(object) != NULL
-            && *(int*)WakeJoint(object) != 0) {
+        && *(int*)WakeJoint(object) != 0) {
         object = parent;
         parent = WakeParent(object);
     }
     parent = WakeParent(other);
     while (parent != NULL && WakeJoint(other) != NULL
-            && *(int*)WakeJoint(other) != 0) {
+        && *(int*)WakeJoint(other) != 0) {
         other = parent;
         parent = WakeParent(other);
     }
@@ -5847,18 +6113,23 @@ void C2_HOOK_FASTCALL FUN_004bddd0(tPhysics_object* object, tPhysics_object* oth
  * differences pass, exactly original TEST AH,41 / JE reject. */
 static int C2_HOOK_CDECL WakeBounds(const tPhysics_object* a, const tPhysics_object* b) {
     unsigned i;
-    for(i=0;i<3;i++)if((((*(const br_scalar*)((const tU8*)a + (0xf4+4*i)))) - (double)*((const br_scalar*)((const tU8*)b+0x100+4*i)))>0.01)return 0;
-    for(i=0;i<3;i++)if((((*(const br_scalar*)((const tU8*)b + (0xf4+4*i)))) - (double)*((const br_scalar*)((const tU8*)a+0x100+4*i)))>0.01)return 0;
+    for (i = 0; i < 3; i++)
+        if ((((*(const br_scalar*)((const tU8*)a + (0xf4 + 4 * i)))) - (double)*((const br_scalar*)((const tU8*)b + 0x100 + 4 * i))) > 0.01)
+            return 0;
+    for (i = 0; i < 3; i++)
+        if ((((*(const br_scalar*)((const tU8*)b + (0xf4 + 4 * i)))) - (double)*((const br_scalar*)((const tU8*)a + 0x100 + 4 * i))) > 0.01)
+            return 0;
     return 1;
 }
 static tPhysics_object* C2_HOOK_CDECL WakeAncestor(tPhysics_object* object) {
-    tPhysics_object* parent=WakeParent(object);
+    tPhysics_object* parent = WakeParent(object);
     tPhysics_joint* joint;
-    while(parent!=NULL) {
-        joint=WakeJoint(object);
-        if(joint==NULL || *(int*)joint==0)break;
-        object=parent;
-        parent=WakeParent(object);
+    while (parent != NULL) {
+        joint = WakeJoint(object);
+        if (joint == NULL || *(int*)joint == 0)
+            break;
+        object = parent;
+        parent = WakeParent(object);
     }
     return object;
 }
@@ -5866,16 +6137,18 @@ static tPhysics_object* C2_HOOK_CDECL WakeAncestor(tPhysics_object* object) {
  * descendant wake execute their actual published bodies; no substitute. */
 static void C2_HOOK_CDECL WakeDescendants(tPhysics_object* object) {
     tPhysics_object* child;
-    if(WakePointer(object,0x218)==NULL)MoveJointedObject(object,0,0.f);
-    child=WakeChild(object);
-    while(child!=NULL) {
-        if(WAKE_DISABLED(child)!=0) {
-            tU32 face=(tU32)gFace_num__car;
-            WAKE_DISABLED(child)=0;
-            WAKE_FACE(child)=(tU16)(face-2u);
+    if (WakePointer(object, 0x218) == NULL)
+        MoveJointedObject(object, 0, 0.f);
+    child = WakeChild(object);
+    while (child != NULL) {
+        if (WAKE_DISABLED(child) != 0) {
+            tU32 face = (tU32)gFace_num__car;
+            WAKE_DISABLED(child) = 0;
+            WAKE_FACE(child) = (tU16)(face - 2u);
         }
-        if(WakeChild(child)!=NULL)MakeObjectListDoSomething(WakeChild(child));
-        child=WakeNext(child);
+        if (WakeChild(child) != NULL)
+            MakeObjectListDoSomething(WakeChild(child));
+        child = WakeNext(child);
     }
 }
 // FUNCTION: CARMA2_HW 0x004ba190
@@ -5884,36 +6157,39 @@ void C2_HOOK_FASTCALL CheckForObjectHierachyTouchingObjectList(tPhysics_object* 
     tPhysics_object* child;
     tPhysics_object* captured_child;
     tU32 face;
-    while(list!=NULL) {
-        if(WAKE_DISABLED(list)!=0) {
-            if(WakeBounds(object,list)) {
-                root=WakeAncestor(list);
-                face=(tU32)gFace_num__car;
-                WAKE_DISABLED(root)=0;
-                WAKE_FACE(root)=(tU16)(face-2u);
-                if(WakeChild(root)!=NULL || WakeJoint(root)!=NULL || WakePointer(root,0x18c)!=NULL)WakeDescendants(root);
-                CheckForObjectHierachyTouchingObjectList(root,original_list,original_list);
+    while (list != NULL) {
+        if (WAKE_DISABLED(list) != 0) {
+            if (WakeBounds(object, list)) {
+                root = WakeAncestor(list);
+                face = (tU32)gFace_num__car;
+                WAKE_DISABLED(root) = 0;
+                WAKE_FACE(root) = (tU16)(face - 2u);
+                if (WakeChild(root) != NULL || WakeJoint(root) != NULL || WakePointer(root, 0x18c) != NULL)
+                    WakeDescendants(root);
+                CheckForObjectHierachyTouchingObjectList(root, original_list, original_list);
             }
-            child=WakeChild(object);
-            if(child!=NULL && WAKE_DISABLED(list)!=0) {
-                while(child!=NULL) {
-                    if(WakeBounds(child,list)) {
-                        root=WakeAncestor(list);
-                        face=(tU32)gFace_num__car;
-                        captured_child=WakeChild(root);
-                        WAKE_FACE(root)=(tU16)(face-2u);
-                        WAKE_DISABLED(root)=0;
-                        if(captured_child!=NULL || WakeJoint(root)!=NULL || WakePointer(root,0x18c)!=NULL)WakeDescendants(root);
-                        CheckForObjectHierachyTouchingObjectList(root,original_list,original_list);
+            child = WakeChild(object);
+            if (child != NULL && WAKE_DISABLED(list) != 0) {
+                while (child != NULL) {
+                    if (WakeBounds(child, list)) {
+                        root = WakeAncestor(list);
+                        face = (tU32)gFace_num__car;
+                        captured_child = WakeChild(root);
+                        WAKE_FACE(root) = (tU16)(face - 2u);
+                        WAKE_DISABLED(root) = 0;
+                        if (captured_child != NULL || WakeJoint(root) != NULL || WakePointer(root, 0x18c) != NULL)
+                            WakeDescendants(root);
+                        CheckForObjectHierachyTouchingObjectList(root, original_list, original_list);
                         break;
                     }
-                    child=WakeNext(child);
+                    child = WakeNext(child);
                 }
             }
-            child=WakeChild(list);
-            if(child!=NULL)CheckForObjectHierachyTouchingObjectList(object,child,original_list);
+            child = WakeChild(list);
+            if (child != NULL)
+                CheckForObjectHierachyTouchingObjectList(object, child, original_list);
         }
-        list=WakeNext(list);
+        list = WakeNext(list);
     }
 }
 // FUNCTION: CARMA2_HW 0x004be0e0
@@ -5922,33 +6198,36 @@ void C2_HOOK_FASTCALL FUN_004be0e0(tPhysics_object* object, tPhysics_object* ori
     tPhysics_object* current;
     tPhysics_object* child;
     tU32 face;
-    if(WAKE_DISABLED(object)==0)return;
-    root=WakeAncestor(object);
-    face=(tU32)gFace_num__car;
-    WAKE_DISABLED(root)=0;
-    WAKE_FACE(root)=(tU16)(face-2u);
-    if(WakeChild(root)!=NULL || WakeJoint(root)!=NULL || WakePointer(root,0x18c)!=NULL)WakeDescendants(root);
-    current=original_list;
-    while(current!=NULL) {
-        if(WAKE_DISABLED(current)!=0) {
-            if(WakeBounds(root,current))FUN_004be0e0(current,original_list);
-            child=WakeChild(root);
-            if(child!=NULL && WAKE_DISABLED(current)!=0) {
-                while(child!=NULL) {
-                    if(WakeBounds(child,current)) {
-                        FUN_004be0e0(current,original_list);
+    if (WAKE_DISABLED(object) == 0)
+        return;
+    root = WakeAncestor(object);
+    face = (tU32)gFace_num__car;
+    WAKE_DISABLED(root) = 0;
+    WAKE_FACE(root) = (tU16)(face - 2u);
+    if (WakeChild(root) != NULL || WakeJoint(root) != NULL || WakePointer(root, 0x18c) != NULL)
+        WakeDescendants(root);
+    current = original_list;
+    while (current != NULL) {
+        if (WAKE_DISABLED(current) != 0) {
+            if (WakeBounds(root, current))
+                FUN_004be0e0(current, original_list);
+            child = WakeChild(root);
+            if (child != NULL && WAKE_DISABLED(current) != 0) {
+                while (child != NULL) {
+                    if (WakeBounds(child, current)) {
+                        FUN_004be0e0(current, original_list);
                         break;
                     }
-                    child=WakeNext(child);
+                    child = WakeNext(child);
                 }
             }
-            child=WakeChild(current);
-            if(child!=NULL)CheckForObjectHierachyTouchingObjectList(root,child,original_list);
+            child = WakeChild(current);
+            if (child != NULL)
+                CheckForObjectHierachyTouchingObjectList(root, child, original_list);
         }
-        current=WakeNext(current);
+        current = WakeNext(current);
     }
 }
-
 
 // GLOBAL: CARMA2_HW 0x00692dcc
 tU32 gPhysics_prepared_objects_692dcc = 0;
@@ -6125,7 +6404,8 @@ void C2_HOOK_FASTCALL InternalPrepareObject(tPhysics_object* object) {
                 }
             }
         }
-        if (!same) PrepareWriteByte(object, 0xec, 0);
+        if (!same)
+            PrepareWriteByte(object, 0xec, 0);
         child = PreparePointer(object, 0x224);
         while (child != NULL) {
             InternalPrepareObject(child);
@@ -6171,22 +6451,27 @@ void C2_HOOK_FASTCALL PrepareObject(tPhysics_object* object, tPhysics_object** l
         do {
             before = PreparePointer(neighbor, 0x22c);
             after = PreparePointer(object, 0x220);
-            if (before != NULL) PrepareWriteWord(before, 0x220, (tU32)(uintptr_t)object);
-            if (after != NULL) PrepareWriteWord(after, 0x22c, (tU32)(uintptr_t)neighbor);
+            if (before != NULL)
+                PrepareWriteWord(before, 0x220, (tU32)(uintptr_t)object);
+            if (after != NULL)
+                PrepareWriteWord(after, 0x22c, (tU32)(uintptr_t)neighbor);
             PrepareWriteWord(neighbor, 0x22c, (tU32)(uintptr_t)object);
             PrepareWriteWord(object, 0x22c, (tU32)(uintptr_t)before);
             PrepareWriteWord(neighbor, 0x220, (tU32)(uintptr_t)after);
             PrepareWriteWord(object, 0x220, (tU32)(uintptr_t)neighbor);
             neighbor = PreparePointer(object, 0x22c);
         } while (neighbor != NULL && (*(PrepareScalarPointer(object, 0xb0)) < *(PrepareScalarPointer(neighbor, 0xb0)) || PhysicsScalarNaN((PrepareScalarPointer(object, 0xb0))) || PhysicsScalarNaN((PrepareScalarPointer(neighbor, 0xb0)))));
-        if (neighbor == NULL) PrepareWriteWord(list_head, 0, (tU32)(uintptr_t)object);
+        if (neighbor == NULL)
+            PrepareWriteWord(list_head, 0, (tU32)(uintptr_t)object);
     } else {
         neighbor = PreparePointer(object, 0x220);
         while (neighbor != NULL && (*(PrepareScalarPointer(object, 0xb0)) > *(PrepareScalarPointer(neighbor, 0xb0)) && !PhysicsScalarNaN((PrepareScalarPointer(object, 0xb0))) && !PhysicsScalarNaN((PrepareScalarPointer(neighbor, 0xb0))))) {
             before = PreparePointer(object, 0x22c);
             after = PreparePointer(neighbor, 0x220);
-            if (before != NULL) PrepareWriteWord(before, 0x220, (tU32)(uintptr_t)neighbor);
-            if (after != NULL) PrepareWriteWord(after, 0x22c, (tU32)(uintptr_t)object);
+            if (before != NULL)
+                PrepareWriteWord(before, 0x220, (tU32)(uintptr_t)neighbor);
+            if (after != NULL)
+                PrepareWriteWord(after, 0x22c, (tU32)(uintptr_t)object);
             PrepareWriteWord(object, 0x22c, (tU32)(uintptr_t)neighbor);
             PrepareWriteWord(neighbor, 0x22c, (tU32)(uintptr_t)before);
             PrepareWriteWord(object, 0x220, (tU32)(uintptr_t)after);
@@ -6203,7 +6488,8 @@ void C2_HOOK_FASTCALL PrepareObject(tPhysics_object* object, tPhysics_object** l
             face = (tU32)gFace_num__car;
             PrepareWriteByte(root, 0xec, 0);
             *(tU16*)((tU8*)root + 0x178) = (tU16)(face - 2u);
-            if (PreparePointer(root, 0x224) != NULL || PreparePointer(root, 0x188) != NULL || PreparePointer(root, 0x18c) != NULL) WakeDescendants(root);
+            if (PreparePointer(root, 0x224) != NULL || PreparePointer(root, 0x188) != NULL || PreparePointer(root, 0x18c) != NULL)
+                WakeDescendants(root);
             current = original_list;
             while (current != NULL) {
                 if (PrepareByte(current, 0xec) != 0) {
@@ -6211,12 +6497,14 @@ void C2_HOOK_FASTCALL PrepareObject(tPhysics_object* object, tPhysics_object** l
                     child = PreparePointer(root, 0x224);
                     if (child != NULL && PrepareByte(current, 0xec) != 0) {
                         while (child != NULL) {
-                            if (CheckForObjectHierachyTouchingAnotherObject(child, current, original_list)) break;
+                            if (CheckForObjectHierachyTouchingAnotherObject(child, current, original_list))
+                                break;
                             child = PreparePointer(child, 0x220);
                         }
                     }
                     child = PreparePointer(current, 0x224);
-                    if (child != NULL) CheckForObjectHierachyTouchingObjectList(root, child, original_list);
+                    if (child != NULL)
+                        CheckForObjectHierachyTouchingObjectList(root, child, original_list);
                 }
                 current = PreparePointer(current, 0x220);
             }
@@ -6259,7 +6547,8 @@ int C2_HOOK_FASTCALL FUN_004ba550(tPhysics_joint_force* records, br_scalar* impu
     for (i = 0; i < selected_count; ++i) {
         sum = sum + (double)*ClampScalar(impulses, index[i] * 4u);
     }
-    if (PhysicsWallNaN(sum) || PhysicsWallNaN((double)maximum) || !(sum > (double)maximum)) return 0;
+    if (PhysicsWallNaN(sum) || PhysicsWallNaN((double)maximum) || !(sum > (double)maximum))
+        return 0;
 
     wide_ratio = (double)maximum / sum;
     gPhysics_joints_changed_692dc8 = 1;
@@ -6291,7 +6580,8 @@ int C2_HOOK_FASTCALL FUN_004ba550(tPhysics_joint_force* records, br_scalar* impu
     for (i = 0; i < count; ++i) {
         impulse = ClampScalar(impulses, (tU32)i * 4u);
         loaded = (double)*impulse;
-        if (loaded < 0.0 || PhysicsWallNaN(loaded)) *ClampWord(impulses, (tU32)i * 4u) = 0;
+        if (loaded < 0.0 || PhysicsWallNaN(loaded))
+            *ClampWord(impulses, (tU32)i * 4u) = 0;
         *ClampWord(records, (tU32)i * 96u + 0x5c) = 9;
     }
     return 1;
@@ -6301,8 +6591,8 @@ static double C2_HOOK_CDECL PhysicsJointScalar(double value);
 static tPhysics_object* C2_HOOK_CDECL WakePointer(const void* base, unsigned offset);
 static br_angle C2_HOOK_CDECL AngularForceAngle(double value);
 
-typedef void (C2_HOOK_FAKE_THISCALL *tInterpolation_scalar_call)(tPhysics_object*, undefined4, br_scalar);
-typedef void (C2_HOOK_FAKE_THISCALL *tInterpolation_word_call)(tPhysics_object*, undefined4, tU32);
+typedef void(C2_HOOK_FAKE_THISCALL* tInterpolation_scalar_call)(tPhysics_object*, undefined4, br_scalar);
+typedef void(C2_HOOK_FAKE_THISCALL* tInterpolation_word_call)(tPhysics_object*, undefined4, tU32);
 
 /* The original internal calls MOV/PUSH the scalar stack word. GCC instead
  * quiets a signaling NaN while forwarding a typed float argument. These exact
@@ -6331,7 +6621,8 @@ void C2_HOOK_FAKE_THISCALL FUN_004c2670(tPhysics_object* object, undefined4 unus
     br_angle integer_angle;
 
     (void)unused_edx;
-    if (((const tPhysics_object*)object)->disable_move_rotate != 0) return;
+    if (((const tPhysics_object*)object)->disable_move_rotate != 0)
+        return;
     x = object->rotate_omega.v[0];
     y = object->rotate_omega.v[1];
     z = object->rotate_omega.v[2];
@@ -6342,7 +6633,8 @@ void C2_HOOK_FAKE_THISCALL FUN_004c2670(tPhysics_object* object, undefined4 unus
     axis.v[2] = (br_scalar)PhysicsJointScalar(((double)*(snapshot + 2) / (double)magnitude));
     angle_wide = ((double)((double)magnitude) * time);
     angle = (br_scalar)PhysicsJointScalar(angle_wide);
-    if ((!((fabs(angle_wide)) >= 0.0001))) return;
+    if ((!((fabs(angle_wide)) >= 0.0001)))
+        return;
 
     actor = InterpolationActor(object);
     center = (const br_vector3*)((const tU8*)object + 0x14);
@@ -6417,13 +6709,14 @@ void C2_HOOK_FAKE_THISCALL FUN_004c28a0(tPhysics_object* list, undefined4 unused
         *(br_scalar*)&actor->t.t.mat.m[3][2] = (br_scalar)PhysicsJointScalar(z + (double)actor->t.t.mat.m[3][2]);
         InterpolationForward(FUN_004c2670, list, unused_edx, &time);
         child = WakePointer(list, 0x224);
-        if (child != NULL) InterpolationForward(FUN_004c28a0, child, unused_edx, &time);
+        if (child != NULL)
+            InterpolationForward(FUN_004c28a0, child, unused_edx, &time);
         list = WakePointer(list, 0x220);
     }
 }
 
 static tPhysics_object* C2_HOOK_CDECL ListMatrixPointer(const void* base, tU32 offset) {
-    return (tPhysics_object*)(uintptr_t)*(const tU32*)((const tU8*)base + offset);
+    return (tPhysics_object*)(uintptr_t) * (const tU32*)((const tU8*)base + offset);
 }
 static br_matrix34* C2_HOOK_CDECL ListMatrixActor(const tPhysics_object* object) {
     return (br_matrix34*)(uintptr_t)((tU32)(uintptr_t)ListMatrixPointer(object, 0) + 0x2cu);
@@ -6509,7 +6802,8 @@ void C2_HOOK_FASTCALL UpdateCollisionObject(tPhysics_object* object) {
     const br_scalar* other_high;
     double x, y, z, squared, radius;
 
-    if (shape == NULL) return;
+    if (shape == NULL)
+        return;
     CollisionBoundsCopy(bounds, (const tU8*)shape + 4);
     shape = (tPhysics_shape*)(uintptr_t)(*(const tU32*)((const tU8*)shape + 0x34));
     while (shape != NULL) {
@@ -6534,7 +6828,6 @@ void C2_HOOK_FASTCALL UpdateCollisionObject(tPhysics_object* object) {
     object->radius_squared = (br_scalar)PhysicsJointScalar(radius);
 }
 
-
 static void C2_HOOK_CDECL GravityStoreWord(void* base, tU32 offset, tU32 value) {
     *(tU32*)((tU32)(uintptr_t)base + offset) = value;
 }
@@ -6543,12 +6836,10 @@ static tPhysics_object* C2_HOOK_CDECL GravityPointer(const void* base, tU32 offs
     return (tPhysics_object*)(uintptr_t)(*(const tU32*)((tU32)(uintptr_t)base + offset));
 }
 
-
 static br_scalar C2_HOOK_CDECL GravityRound(double value) {
     br_scalar result = (br_scalar)value;
     return result;
 }
-
 
 static const br_scalar* C2_HOOK_CDECL GravityScalarPointer(const void* base, tU32 offset) {
     return (const br_scalar*)((tU32)(uintptr_t)base + offset);
@@ -6624,9 +6915,12 @@ void C2_HOOK_FASTCALL FUN_004c2c90(tPhysics_object* object, const br_vector3* da
     rounded_z = FrictionScalar(new_z);
     FrictionWrite(object, 0x78, new_y);
     FrictionWrite(object, 0x7c, new_z);
-    if (!(sign_x > 0.0)) *(tU32*)((tU8*)object + 0x74) = 0;
-    if (!(((double)old_omega[1] * new_y) > 0.0)) *(tU32*)((tU8*)object + 0x78) = 0;
-    if (!(((double)old_omega[2] * (double)rounded_z) > 0.0)) *(tU32*)((tU8*)object + 0x7c) = 0;
+    if (!(sign_x > 0.0))
+        *(tU32*)((tU8*)object + 0x74) = 0;
+    if (!(((double)old_omega[1] * new_y) > 0.0))
+        *(tU32*)((tU8*)object + 0x78) = 0;
+    if (!(((double)old_omega[2] * (double)rounded_z) > 0.0))
+        *(tU32*)((tU8*)object + 0x7c) = 0;
 }
 
 // FUNCTION: CARMA2_HW 0x004c2970
@@ -6647,7 +6941,8 @@ void C2_HOOK_FASTCALL FUN_004c2970(tPhysics_object* list) {
             list->v.v[2] = (br_scalar)PhysicsJointScalar(z);
         }
         child = WakePointer(list, 0x224);
-        if (child != NULL) FUN_004c2970(child);
+        if (child != NULL)
+            FUN_004c2970(child);
         list = WakePointer(list, 0x220);
     }
 }

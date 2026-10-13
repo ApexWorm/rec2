@@ -29,7 +29,7 @@ tKey_array gKey_array;
 int gKey_poll_counter;
 
 // GLOBAL: CARMA2_HW 0x006571f8
-tMouse_coord gCurrent_mouse_position = {-1, -1};
+tMouse_coord gCurrent_mouse_position = { -1, -1 };
 
 // GLOBAL: CARMA2_HW 0x0068c144
 tU32 gLast_roll;
@@ -93,7 +93,6 @@ tU32 gLast_key_down_time;
 
 // GLOBAL: CARMA2_HW 0x0068bed8
 int gModifiers_down;
-
 
 // FUNCTION: CARMA2_HW 0x00482770
 void C2_HOOK_FASTCALL SetJoystickArrays(int* pKeys, int pMark) {
@@ -162,8 +161,7 @@ void C2_HOOK_FASTCALL SetJoystickArrays(int* pKeys, int pMark) {
                     pKeys[145] = pMark;
                 }
                 gJoy_array[2] = 2 * (0x8000 - new_joy1_y);
-            }
-            else {
+            } else {
                 if (new_joy1_y > 0xc000 && gJoy1_y <= 0xc000) {
                     pKeys[146] = pMark;
                 }
@@ -367,12 +365,12 @@ int C2_HOOK_FASTCALL PDAnyKeyDown(void) {
                 return i;
             }
             switch (EdgeTriggeryKey(i, 0)) {
-                case tKey_down_no:
-                case tKey_down_still:
-                    return -1;
-                case tKey_down_yes:
-                case tKey_down_repeat:
-                    return i;
+            case tKey_down_no:
+            case tKey_down_still:
+                return -1;
+            case tKey_down_yes:
+            case tKey_down_repeat:
+                return i;
             }
         }
     }

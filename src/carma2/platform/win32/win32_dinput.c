@@ -262,7 +262,7 @@ tDirectInputJoystickInfo* C2_HOOK_FASTCALL JoystickDInputGetInfo(int pJoystickIn
         count = 0;
         for (i = 0; count < caps.dwButtons && i < REC2_ASIZE(((tJoystickInputState*)NULL)->buttons); i++) {
             hRes = IDirectInputDevice2_GetObjectInfo(gDirectInputJoystickDevices[pJoystickIndex], &device_obj_descr,
-                                                     offsetof(tJoystickInputState, buttons) + i, DIPH_BYOFFSET);
+                offsetof(tJoystickInputState, buttons) + i, DIPH_BYOFFSET);
             if (hRes == DI_OK) {
                 info->buttonMask |= 1 << i;
                 if (pButtonMask != NULL) {
@@ -275,7 +275,7 @@ tDirectInputJoystickInfo* C2_HOOK_FASTCALL JoystickDInputGetInfo(int pJoystickIn
         count = 0;
         for (i = 0; count < caps.dwAxes && i < REC2_ASIZE(axis_offsets); i++) {
             hRes = IDirectInputDevice2_GetObjectInfo(gDirectInputJoystickDevices[pJoystickIndex], &device_obj_descr,
-                                                     axis_offsets[i], DIPH_BYOFFSET);
+                axis_offsets[i], DIPH_BYOFFSET);
             if (hRes == DI_OK) {
                 info->axisMask |= 1 << i;
                 if (pAxisMask != NULL) {
@@ -342,7 +342,7 @@ BOOL CALLBACK Win32DInputJoystickEnum(const DIDEVICEINSTANCEA* pDeviceInstance, 
         return DIENUM_CONTINUE;
     }
     hResult = IDirectInputDevice_QueryInterface(device, &IID_IDirectInputDevice2A,
-                                                (void **)&gDirectInputJoystickDevices[gCountEnumeratedJoystickDinputDevices]);
+        (void**)&gDirectInputJoystickDevices[gCountEnumeratedJoystickDinputDevices]);
     if (hResult != DI_OK) {
         dr_dprintf("QueryInterface did not return DI_OK\n");
         IDirectInputDevice_Release(device);
@@ -527,7 +527,7 @@ void C2_HOOK_FASTCALL UnloadDinputFFBEffectAtIndex(int index) {
 // FUNCTION: CARMA2_HW 0x00457c20
 int C2_HOOK_FASTCALL CreateDinputEffect(int joystick_index, tJoystick_effect_description* description, const char *name) {
     int effect_id = gCount_joystick_effects;
-    IDirectInputDevice2A *device;
+    IDirectInputDevice2A* device;
     // GLOBAL: CARMA2_HW 0x00684620
     static DWORD axis[2];
 
@@ -626,7 +626,7 @@ int C2_HOOK_FASTCALL CreateDinputEffect(int joystick_index, tJoystick_effect_des
 }
 
 // FUNCTION: CARMA2_HW 0x0045a390
-int C2_HOOK_FASTCALL ReadIforceEffectsNames(const char *path, char **names, int capacity) {
+int C2_HOOK_FASTCALL ReadIforceEffectsNames(const char* path, char** names, int capacity) {
     FILE *f;
     int count;
     int i;
@@ -1495,7 +1495,7 @@ int C2_HOOK_FASTCALL PDEnableJoysticks(void) {
         gJoystick_index = gLast_joystick_index != -1 ? gLast_joystick_index : 0;
     }
     if (gDirectInputJoystickDevices[gJoystick_index] != NULL
-            && (gJoystickFFB & (1 << gJoystick_index))) {
+        && (gJoystickFFB & (1 << gJoystick_index))) {
         gForceFeedbackAvailable = 1;
     }
     return count;

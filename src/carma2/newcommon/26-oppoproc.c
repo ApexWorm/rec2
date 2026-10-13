@@ -7,16 +7,15 @@
 #include <math.h>
 #include <string.h>
 
-
-
-
-
-
-
-
 static float C2_HOOK_CDECL NavigationScalarRound(double pA) {
-    union { float scalar; tU32 bits; } stored;
-    union { float scalar; tU32 bits; } result;
+    union {
+        float scalar;
+        tU32 bits;
+    } stored;
+    union {
+        float scalar;
+        tU32 bits;
+    } result;
 
     stored.scalar = (float)pA;
     result.bits = stored.bits;
@@ -35,9 +34,6 @@ static int C2_HOOK_CDECL NavigationLessOrUnordered(double pA, double pB) {
     return pA < pB || pA != pA || pB != pB;
     return (status & 0x100) != 0;
 }
-
-
-
 
 // DoNotDprintf
 
@@ -149,7 +145,7 @@ int C2_HOOK_FASTCALL CalcCorners(tCorner* pCorners, int pSection, float pWidth, 
             sine = -sine;
         }
         if (NavigationLessOrUnordered(sine, 0.001f)) {
-fudge:
+        fudge:
             memcpy(&corner->field_0x00, &start, sizeof(start));
             if (NavigationLessOrUnordered(pWidth, width)) {
                 memcpy(&corner->field_0x08, &pWidth, 4);

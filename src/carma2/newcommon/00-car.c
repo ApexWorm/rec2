@@ -211,39 +211,43 @@ static void C2_HOOK_CDECL AutoVolumeCopy(void* out, const void* in) {
 }
 
 static int C2_HOOK_CDECL AutoVolumeUnordered(double value) {
-    union { double d; tU32 w[2]; } bits;
-    bits.d=value;
-    return (bits.w[1]&0x7ff00000u)==0x7ff00000u && ((bits.w[1]&0xfffffu)||bits.w[0]);
+    union {
+        double d;
+        tU32 w[2];
+    } bits;
+    bits.d = value;
+    return (bits.w[1] & 0x7ff00000u) == 0x7ff00000u && ((bits.w[1] & 0xfffffu) || bits.w[0]);
 }
 
 /* The face interval end is reloaded after each face test. */
 // FUNCTION: CARMA2_HW 0x0041e480
 int C2_HOOK_FASTCALL FUN_0041e480(br_vector3* pPosition, br_vector3* pDirection, br_vector3* pNormal, br_scalar* pDistance, tPhysics_object* pObject) {
-    br_vector3 normal,collision;
+    br_vector3 normal, collision;
     br_scalar distance;
-    tU32 best=(tU32)(size_t)pNormal;
+    tU32 best = (tU32)(size_t)pNormal;
     tU32 index;
     tFace_ref* face;
-    *pDistance=2.f;
-    index=((tPhysics_object*)pObject)->box_face_start;
-    face=&gFace_list__car[index];
+    *pDistance = 2.f;
+    index = ((tPhysics_object*)pObject)->box_face_start;
+    face = &gFace_list__car[index];
     while ((tS32)index < ((tPhysics_object*)pObject)->box_face_end) {
-        if (!gCollision_skip_pling_faces || !(face->flags&0x80)) {
-            CheckSingleFace(face,pPosition,pDirection,&normal,&distance,&collision);
+        if (!gCollision_skip_pling_faces || !(face->flags & 0x80)) {
+            CheckSingleFace(face, pPosition, pDirection, &normal, &distance, &collision);
             if (AutoVolumeUnordered(distance) || AutoVolumeUnordered(*pDistance) || distance < *pDistance) {
-                AutoVolumeCopy(pDistance,&distance);
-                best=index;
-                AutoVolumeCopy(&pNormal->v[0],&normal.v[0]);
-                AutoVolumeCopy(&pNormal->v[1],&normal.v[1]);
-                AutoVolumeCopy(&pNormal->v[2],&normal.v[2]);
+                AutoVolumeCopy(pDistance, &distance);
+                best = index;
+                AutoVolumeCopy(&pNormal->v[0], &normal.v[0]);
+                AutoVolumeCopy(&pNormal->v[1], &normal.v[1]);
+                AutoVolumeCopy(&pNormal->v[2], &normal.v[2]);
             }
         }
         index++;
         face++;
     }
     if (AutoVolumeUnordered(*pDistance) || *pDistance < 2.f) {
-        int material_index=(signed char)gFace_list__car[best].material->identifier[0]-'/';
-        if (material_index>=0 && material_index<11) return material_index;
+        int material_index = (signed char)gFace_list__car[best].material->identifier[0] - '/';
+        if (material_index >= 0 && material_index < 11)
+            return material_index;
     }
     return 0;
 }

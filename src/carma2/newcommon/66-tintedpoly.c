@@ -42,8 +42,6 @@ br_token_value gTinted_poly_tokens[9] = {
 #define gTinted_poly_zero_opacity_tokens (&gTinted_poly_tokens[2])
 #define gTinted_poly_custom_opacity_tokens (&gTinted_poly_tokens[4])
 
-
-
 // GLOBAL: CARMA2_HW 0x006a0434
 br_colour* gTinted_poly_palette;
 // GLOBAL: CARMA2_HW 0x006a0438
@@ -61,7 +59,7 @@ int gTinted_fire_cooling;
 
 // FUNCTION: CARMA2_HW 0x004d7040
 void C2_HOOK_FASTCALL InitTintedPolyStuff(void) {
-    br_camera *camera;
+    br_camera* camera;
 
     memset(gTintedPolys, 0, sizeof(gTintedPolys));
 
@@ -79,7 +77,7 @@ void C2_HOOK_FASTCALL InitTintedPolyStuff(void) {
 }
 
 static br_material* C2_HOOK_FASTCALL BuildTintedPolyMaterial(int pOpacity) {
-    br_material *material;
+    br_material* material;
 
     material = BrMaterialAllocate("Tint Poly Mat");
     if (material == NULL) {
@@ -142,140 +140,141 @@ int C2_HOOK_FASTCALL CreateTintedPoly(int x0, int y0, int width, int height, int
         return -1;
     }
     switch (class) {
-        case 2:
-            gTintedPolys[tintedIndex].class = class;
-            gTintedPolys[tintedIndex].material = BuildTintedPolyMaterial(gDefaultOpacity_TintedPoly);
-            gTintedPolys[tintedIndex].model = BuildTintedPolyModel(x0, y0, width, height, 1, 1);
-            gTintedPolys[tintedIndex].actor = BrActorAllocate(BR_ACTOR_MODEL, NULL);
-            gTintedPolys[tintedIndex].actor->material = gTintedPolys[tintedIndex].material;
-            for (i = 0; i < gTintedPolys[tintedIndex].model->nfaces; i++) {
-                gTintedPolys[tintedIndex].model->faces[i].material = gTintedPolys[tintedIndex].material;
+    case 2:
+        gTintedPolys[tintedIndex].class = class;
+        gTintedPolys[tintedIndex].material = BuildTintedPolyMaterial(gDefaultOpacity_TintedPoly);
+        gTintedPolys[tintedIndex].model = BuildTintedPolyModel(x0, y0, width, height, 1, 1);
+        gTintedPolys[tintedIndex].actor = BrActorAllocate(BR_ACTOR_MODEL, NULL);
+        gTintedPolys[tintedIndex].actor->material = gTintedPolys[tintedIndex].material;
+        for (i = 0; i < gTintedPolys[tintedIndex].model->nfaces; i++) {
+            gTintedPolys[tintedIndex].model->faces[i].material = gTintedPolys[tintedIndex].material;
+        }
+        gTintedPolys[tintedIndex].actor->model = gTintedPolys[tintedIndex].model;
+        BrModelAdd(gTintedPolys[tintedIndex].model);
+        break;
+    case 3:
+        gTintedPolys[tintedIndex].class = class;
+        gTintedPolys[tintedIndex].material = BuildTintedPolyMaterial(gDefaultOpacity_TintedPoly);
+        gTintedPolys[tintedIndex].material->flags |= BR_MATF_PRELIT | BR_MATF_SMOOTH;
+        BrMaterialUpdate(gTintedPolys[tintedIndex].material, BR_MATU_ALL);
+        gTintedPolys[tintedIndex].model = BuildTintedPolyModel(x0, y0, width, height, 4, 4);
+        gTintedPolys[tintedIndex].actor = BrActorAllocate(BR_ACTOR_MODEL, NULL);
+        gTintedPolys[tintedIndex].actor->material = gTintedPolys[tintedIndex].material;
+        for (i = 0; i < gTintedPolys[tintedIndex].model->nfaces; i++) {
+            gTintedPolys[tintedIndex].model->faces[i].material = gTintedPolys[tintedIndex].material;
+        }
+        gTintedPolys[tintedIndex].actor->model = gTintedPolys[tintedIndex].model;
+        gTintedPolys[tintedIndex].colour = arg1;
+        BrModelAdd(gTintedPolys[tintedIndex].model);
+        break;
+    case 4:
+        gTintedPolys[tintedIndex].class = class;
+        gTintedPolys[tintedIndex].material = BuildTintedPolyMaterial(0);
+        gTintedPolys[tintedIndex].material->flags |= BR_MATF_QUAD_MAPPING;
+        PathCat(the_path, gApplication_path, "fire");
+        LoadAllImagesInDirectory(&gMisc_storage_space, the_path);
+        map = BrMapFind("testfire");
+        gTintedPolys[tintedIndex].pixelmap = map;
+        gTintedPolys[tintedIndex].material->colour_map = map;
+        BrMaterialUpdate(gTintedPolys[tintedIndex].material, BR_MATU_ALL);
+
+        map = BrMapFind("firepal1");
+        for (i = 0; i < 256; i++) {
+            gTintedPolys[tintedIndex].colours[i] = BrPixelmapPixelGet(map, 0, i);
+        }
+
+        map = BrMapFind("coolmapx");
+        GetRangeOfValuesFromPixelmap(map, &darkest_colour, &brightest_colour);
+
+        // Map `coolmapx` colors to [0, arg1]
+        colour_scale = (br_scalar)((double)(br_uint_32)arg1 / (brightest_colour - darkest_colour));
+        for (y = 0; y < 64; y++) {
+            for (x = 0; x < 32; x++) {
+                int v;
+                colour = BrPixelmapPixelGet(map, x, y);
+                /* Preserve x87 multiplication and __ftol's low 32 bits. */
+                v = (int)(br_int_64)(((int)REC2_RGB555_B(colour) - darkest_colour) * (double)colour_scale);
+                gTintedPolys[tintedIndex].tints1[y + x * 64] = v < 0 ? 0 : (br_uint_32)v > (br_uint_32)arg1 ? (br_uint_32)arg1
+                                                                                                            : (br_uint_32)v;
             }
-            gTintedPolys[tintedIndex].actor->model = gTintedPolys[tintedIndex].model;
-            BrModelAdd(gTintedPolys[tintedIndex].model);
+        }
+        memset(gTintedPolys[tintedIndex].tints2, 0, sizeof(gTintedPolys[tintedIndex].tints2));
+        memset(gTintedPolys[tintedIndex].tints3, 0, sizeof(gTintedPolys[tintedIndex].tints3));
+
+        gTintedPolys[tintedIndex].model = BuildTintedPolyModel(x0, y0, width, height, 1, 1);
+        gTintedPolys[tintedIndex].actor = BrActorAllocate(BR_ACTOR_MODEL, NULL);
+        gTintedPolys[tintedIndex].actor->material = gTintedPolys[tintedIndex].material;
+        for (i = 0; i < gTintedPolys[tintedIndex].model->nfaces; i++) {
+            gTintedPolys[tintedIndex].model->faces[i].material = gTintedPolys[tintedIndex].material;
+        }
+        gTintedPolys[tintedIndex].actor->model = gTintedPolys[tintedIndex].model;
+        BrModelAdd(gTintedPolys[tintedIndex].model);
+        break;
+    case 5:
+        gTintedPolys[tintedIndex].class = class;
+        gTintedPolys[tintedIndex].material = BuildTintedPolyMaterial(gDefaultOpacity_TintedPoly);
+        gTintedPolys[tintedIndex].material->flags |= BR_MATF_PRELIT | BR_MATF_SMOOTH;
+        gTintedPolys[tintedIndex].material->extra_prim = gTinted_poly_zero_opacity_tokens;
+        gTintedPolys[tintedIndex].material->extra_prim[1].v.x = BR_FIXED_INT(0);
+        BrMaterialUpdate(gTintedPolys[tintedIndex].material, BR_MATU_ALL);
+        gTintedPolys[tintedIndex].model = BuildTintedPolyModel(x0, y0, width, height, 1, 1);
+        gTintedPolys[tintedIndex].actor = BrActorAllocate(BR_ACTOR_MODEL, NULL);
+        gTintedPolys[tintedIndex].actor->material = gTintedPolys[tintedIndex].material;
+        for (i = 0; i < gTintedPolys[tintedIndex].model->nfaces; i++) {
+            gTintedPolys[tintedIndex].model->faces[i].material = gTintedPolys[tintedIndex].material;
+        }
+        gTintedPolys[tintedIndex].actor->model = gTintedPolys[tintedIndex].model;
+        gTintedPolys[tintedIndex].unknown_1 = 0;
+        gTintedPolys[tintedIndex].unknown_2 = arg1;
+        BrModelAdd(gTintedPolys[tintedIndex].model);
+        SetTintedPolyColour(tintedIndex, 0, 0, 0);
+        break;
+    case 6:
+        gTintedPolys[tintedIndex].class = class;
+        gTintedPolys[tintedIndex].material = BuildTintedPolyMaterial(gDefaultOpacity_TintedPoly);
+        gTintedPolys[tintedIndex].model = BuildTintedPolyModel(x0, y0, width, height, 1, 1);
+        gTintedPolys[tintedIndex].actor = BrActorAllocate(BR_ACTOR_MODEL, NULL);
+        gTintedPolys[tintedIndex].actor->material = gTintedPolys[tintedIndex].material;
+        for (i = 0; i < gTintedPolys[tintedIndex].model->nfaces; i++) {
+            gTintedPolys[tintedIndex].model->faces[i].material = gTintedPolys[tintedIndex].material;
+        }
+        gTintedPolys[tintedIndex].actor->model = gTintedPolys[tintedIndex].model;
+        BrModelAdd(gTintedPolys[tintedIndex].model);
+        gTintedPolys[tintedIndex].subClass = arg1;
+        switch (arg1) {
+        case 0:
+            gTintedPolys[tintedIndex].color2_red = REC2_RGB888_R(arg2);
+            gTintedPolys[tintedIndex].color2_grn = REC2_RGB888_G(arg2);
+            gTintedPolys[tintedIndex].color2_blu = REC2_RGB888_B(arg2);
+            gTintedPolys[tintedIndex].colour = arg3;
+            gTintedPolys[tintedIndex].material->colour = BR_COLOUR_RGB(gTintedPolys[tintedIndex].color2_red, gTintedPolys[tintedIndex].color2_grn, gTintedPolys[tintedIndex].color2_blu);
+            BrMaterialUpdate(gTintedPolys[tintedIndex].material, BR_MATU_ALL);
             break;
-        case 3:
-            gTintedPolys[tintedIndex].class = class;
-            gTintedPolys[tintedIndex].material = BuildTintedPolyMaterial(gDefaultOpacity_TintedPoly);
+        case 1:
             gTintedPolys[tintedIndex].material->flags |= BR_MATF_PRELIT | BR_MATF_SMOOTH;
             BrMaterialUpdate(gTintedPolys[tintedIndex].material, BR_MATU_ALL);
-            gTintedPolys[tintedIndex].model = BuildTintedPolyModel(x0, y0, width, height, 4, 4);
-            gTintedPolys[tintedIndex].actor = BrActorAllocate(BR_ACTOR_MODEL, NULL);
-            gTintedPolys[tintedIndex].actor->material = gTintedPolys[tintedIndex].material;
-            for (i = 0; i < gTintedPolys[tintedIndex].model->nfaces; i++) {
-                gTintedPolys[tintedIndex].model->faces[i].material = gTintedPolys[tintedIndex].material;
-            }
-            gTintedPolys[tintedIndex].actor->model = gTintedPolys[tintedIndex].model;
-            gTintedPolys[tintedIndex].colour = arg1;
-            BrModelAdd(gTintedPolys[tintedIndex].model);
-            break;
-        case 4:
-            gTintedPolys[tintedIndex].class = class;
-            gTintedPolys[tintedIndex].material = BuildTintedPolyMaterial(0);
-            gTintedPolys[tintedIndex].material->flags |= BR_MATF_QUAD_MAPPING;
-            PathCat(the_path, gApplication_path, "fire");
-            LoadAllImagesInDirectory(&gMisc_storage_space, the_path);
-            map = BrMapFind("testfire");
-            gTintedPolys[tintedIndex].pixelmap = map;
-            gTintedPolys[tintedIndex].material->colour_map = map;
-            BrMaterialUpdate(gTintedPolys[tintedIndex].material, BR_MATU_ALL);
-
-            map = BrMapFind("firepal1");
-            for (i = 0; i < 256; i++) {
-                gTintedPolys[tintedIndex].colours[i] = BrPixelmapPixelGet(map, 0, i);
-            }
-
-            map = BrMapFind("coolmapx");
-            GetRangeOfValuesFromPixelmap(map, &darkest_colour, &brightest_colour);
-
-            // Map `coolmapx` colors to [0, arg1]
-            colour_scale = (br_scalar)((double)(br_uint_32)arg1 / (brightest_colour - darkest_colour));
-            for (y = 0; y < 64; y++) {
-                for (x = 0; x < 32; x++) {
-                    int v;
-                    colour = BrPixelmapPixelGet(map, x, y);
-                    /* Preserve x87 multiplication and __ftol's low 32 bits. */
-                    v = (int)(br_int_64)(((int)REC2_RGB555_B(colour) - darkest_colour) * (double)colour_scale);
-                    gTintedPolys[tintedIndex].tints1[y + x * 64] = v < 0 ? 0 : (br_uint_32)v > (br_uint_32)arg1 ? (br_uint_32)arg1 : (br_uint_32)v;
-                }
-            }
-            memset(gTintedPolys[tintedIndex].tints2, 0, sizeof(gTintedPolys[tintedIndex].tints2));
-            memset(gTintedPolys[tintedIndex].tints3, 0, sizeof(gTintedPolys[tintedIndex].tints3));
-
-            gTintedPolys[tintedIndex].model = BuildTintedPolyModel(x0, y0, width, height, 1, 1);
-            gTintedPolys[tintedIndex].actor = BrActorAllocate(BR_ACTOR_MODEL, NULL);
-            gTintedPolys[tintedIndex].actor->material = gTintedPolys[tintedIndex].material;
-            for (i = 0; i < gTintedPolys[tintedIndex].model->nfaces; i++) {
-                gTintedPolys[tintedIndex].model->faces[i].material = gTintedPolys[tintedIndex].material;
-            }
-            gTintedPolys[tintedIndex].actor->model = gTintedPolys[tintedIndex].model;
-            BrModelAdd(gTintedPolys[tintedIndex].model);
-            break;
-        case 5:
-            gTintedPolys[tintedIndex].class = class;
-            gTintedPolys[tintedIndex].material = BuildTintedPolyMaterial(gDefaultOpacity_TintedPoly);
-            gTintedPolys[tintedIndex].material->flags |= BR_MATF_PRELIT | BR_MATF_SMOOTH;
-            gTintedPolys[tintedIndex].material->extra_prim = gTinted_poly_zero_opacity_tokens;
-            gTintedPolys[tintedIndex].material->extra_prim[1].v.x = BR_FIXED_INT(0);
-            BrMaterialUpdate(gTintedPolys[tintedIndex].material, BR_MATU_ALL);
-            gTintedPolys[tintedIndex].model = BuildTintedPolyModel(x0, y0, width, height, 1, 1);
-            gTintedPolys[tintedIndex].actor = BrActorAllocate(BR_ACTOR_MODEL, NULL);
-            gTintedPolys[tintedIndex].actor->material = gTintedPolys[tintedIndex].material;
-            for (i = 0; i < gTintedPolys[tintedIndex].model->nfaces; i++) {
-                gTintedPolys[tintedIndex].model->faces[i].material = gTintedPolys[tintedIndex].material;
-            }
-            gTintedPolys[tintedIndex].actor->model = gTintedPolys[tintedIndex].model;
-            gTintedPolys[tintedIndex].unknown_1 = 0;
-            gTintedPolys[tintedIndex].unknown_2 = arg1;
-            BrModelAdd(gTintedPolys[tintedIndex].model);
-            SetTintedPolyColour(tintedIndex, 0, 0, 0);
-            break;
-        case 6:
-            gTintedPolys[tintedIndex].class = class;
-            gTintedPolys[tintedIndex].material = BuildTintedPolyMaterial(gDefaultOpacity_TintedPoly);
-            gTintedPolys[tintedIndex].model = BuildTintedPolyModel(x0, y0, width, height, 1, 1);
-            gTintedPolys[tintedIndex].actor = BrActorAllocate(BR_ACTOR_MODEL, NULL);
-            gTintedPolys[tintedIndex].actor->material = gTintedPolys[tintedIndex].material;
-            for (i = 0; i < gTintedPolys[tintedIndex].model->nfaces; i++) {
-                gTintedPolys[tintedIndex].model->faces[i].material = gTintedPolys[tintedIndex].material;
-            }
-            gTintedPolys[tintedIndex].actor->model = gTintedPolys[tintedIndex].model;
-            BrModelAdd(gTintedPolys[tintedIndex].model);
-            gTintedPolys[tintedIndex].subClass = arg1;
-            switch (arg1) {
-                case 0:
-                    gTintedPolys[tintedIndex].color2_red = REC2_RGB888_R(arg2);
-                    gTintedPolys[tintedIndex].color2_grn = REC2_RGB888_G(arg2);
-                    gTintedPolys[tintedIndex].color2_blu = REC2_RGB888_B(arg2);
-                    gTintedPolys[tintedIndex].colour = arg3;
-                    gTintedPolys[tintedIndex].material->colour = BR_COLOUR_RGB(gTintedPolys[tintedIndex].color2_red, gTintedPolys[tintedIndex].color2_grn, gTintedPolys[tintedIndex].color2_blu);
-                    BrMaterialUpdate(gTintedPolys[tintedIndex].material, BR_MATU_ALL);
-                    break;
-                case 1:
-                    gTintedPolys[tintedIndex].material->flags |= BR_MATF_PRELIT | BR_MATF_SMOOTH;
-                    BrMaterialUpdate(gTintedPolys[tintedIndex].material, BR_MATU_ALL);
-                    gTintedPolys[tintedIndex].colour = arg2;
-                    break;
-                default:
-                    PDFatalError("Invalid Pulse Poly subclass");
-            }
+            gTintedPolys[tintedIndex].colour = arg2;
             break;
         default:
-            gTintedPolys[tintedIndex].class = class;
-            gTintedPolys[tintedIndex].material = BuildTintedPolyMaterial(gDefaultOpacity_TintedPoly);
-            gTintedPolys[tintedIndex].model = BuildTintedPolyModel(x0, y0, width, height, 1, 1);
-            gTintedPolys[tintedIndex].actor = BrActorAllocate(BR_ACTOR_MODEL, NULL);
-            gTintedPolys[tintedIndex].actor->material = gTintedPolys[tintedIndex].material;
-            for (i = 0; i < gTintedPolys[tintedIndex].model->nfaces; i++) {
-                gTintedPolys[tintedIndex].model->faces[i].material = gTintedPolys[tintedIndex].material;
-            }
-            gTintedPolys[tintedIndex].actor->model = gTintedPolys[tintedIndex].model;
-            BrModelAdd(gTintedPolys[tintedIndex].model);
-            gTintedPolys[tintedIndex].material->colour = arg1;
-            gTintedPolys[tintedIndex].material->extra_prim = gTinted_poly_custom_opacity_tokens;
-            gTintedPolys[tintedIndex].material->extra_prim[1].v.x = BR_FIXED_INT(arg2);
-            BrMaterialUpdate(gTintedPolys[tintedIndex].material, BR_MATU_ALL);
-            break;
+            PDFatalError("Invalid Pulse Poly subclass");
+        }
+        break;
+    default:
+        gTintedPolys[tintedIndex].class = class;
+        gTintedPolys[tintedIndex].material = BuildTintedPolyMaterial(gDefaultOpacity_TintedPoly);
+        gTintedPolys[tintedIndex].model = BuildTintedPolyModel(x0, y0, width, height, 1, 1);
+        gTintedPolys[tintedIndex].actor = BrActorAllocate(BR_ACTOR_MODEL, NULL);
+        gTintedPolys[tintedIndex].actor->material = gTintedPolys[tintedIndex].material;
+        for (i = 0; i < gTintedPolys[tintedIndex].model->nfaces; i++) {
+            gTintedPolys[tintedIndex].model->faces[i].material = gTintedPolys[tintedIndex].material;
+        }
+        gTintedPolys[tintedIndex].actor->model = gTintedPolys[tintedIndex].model;
+        BrModelAdd(gTintedPolys[tintedIndex].model);
+        gTintedPolys[tintedIndex].material->colour = arg1;
+        gTintedPolys[tintedIndex].material->extra_prim = gTinted_poly_custom_opacity_tokens;
+        gTintedPolys[tintedIndex].material->extra_prim[1].v.x = BR_FIXED_INT(arg2);
+        BrMaterialUpdate(gTintedPolys[tintedIndex].material, BR_MATU_ALL);
+        break;
     }
     if (gTintedPolys[tintedIndex].actor != NULL) {
         BrActorAdd(gTintedPolyCamera, gTintedPolys[tintedIndex].actor);
@@ -333,9 +332,9 @@ br_model* C2_HOOK_FASTCALL BuildTintedPolyModel(int x0, int y0, int width, int h
         vert_above = j * (nbX + 1);
         vert_below = (j + 1) * (nbX + 1);
         for (i = 0; i < nbX; i++) {
-            face[0].vertices[0] = (br_uint_16)(vert_above + i );
+            face[0].vertices[0] = (br_uint_16)(vert_above + i);
             face[0].vertices[1] = (br_uint_16)(vert_above + i + 1);
-            face[0].vertices[2] = (br_uint_16)(vert_below + i );
+            face[0].vertices[2] = (br_uint_16)(vert_below + i);
             face[1].vertices[0] = (br_uint_16)(vert_above + i + 1);
             face[1].vertices[1] = (br_uint_16)(vert_below + i + 1);
             face[1].vertices[2] = (br_uint_16)(vert_below + i);
@@ -365,7 +364,7 @@ void C2_HOOK_FASTCALL SetTintedPolyColour(int pTintedIndex, int pRed, int pGreen
     }
     if (changed) {
         (gTintedPolys[pTintedIndex].material)->colour = BR_COLOUR_RGB(gTintedPolys[pTintedIndex].color_red, gTintedPolys[pTintedIndex].color_grn, gTintedPolys[pTintedIndex].color_blu);
-        BrMaterialUpdate(gTintedPolys[pTintedIndex].material ,BR_MATU_LIGHTING);
+        BrMaterialUpdate(gTintedPolys[pTintedIndex].material, BR_MATU_LIGHTING);
     }
 }
 
@@ -612,7 +611,8 @@ void C2_HOOK_FASTCALL UpdatePolyVertexColours(int pTintedIndex) {
         return;
     }
     maximum = (br_int_32)gTintedPolys[pTintedIndex].color_red > (br_int_32)gTintedPolys[pTintedIndex].color_grn
-        ? gTintedPolys[pTintedIndex].color_red : gTintedPolys[pTintedIndex].color_grn;
+        ? gTintedPolys[pTintedIndex].color_red
+        : gTintedPolys[pTintedIndex].color_grn;
     if (maximum <= gTintedPolys[pTintedIndex].color_blu) {
         maximum = gTintedPolys[pTintedIndex].color_blu;
     }
@@ -690,14 +690,15 @@ void C2_HOOK_FASTCALL UpdateFirePoly(int pIndex) {
 
     for (i = 0; i < 62; i++) {
         for (j = 0; j < 30; j++) {
-            int avg =
-                ((gTintedPolys[pIndex].tints2[i + (j + 2) * 64 + 1]
-                + gTintedPolys[pIndex].tints2[i + (j + 0) * 64 + 1]
-                + gTintedPolys[pIndex].tints2[i + (j + 1) * 64 + 2]
-                + gTintedPolys[pIndex].tints2[i + (j + 1) * 64 + 0]) / 4
-                + gTintedPolys[pIndex].tints2[i + (j + 1) * 64 + 1]) / 2
-            - gTintedPolys[pIndex].tints1[i + (j + 1) * 64 + 1]
-            - gTinted_fire_cooling;
+            int avg = ((gTintedPolys[pIndex].tints2[i + (j + 2) * 64 + 1]
+                           + gTintedPolys[pIndex].tints2[i + (j + 0) * 64 + 1]
+                           + gTintedPolys[pIndex].tints2[i + (j + 1) * 64 + 2]
+                           + gTintedPolys[pIndex].tints2[i + (j + 1) * 64 + 0])
+                              / 4
+                          + gTintedPolys[pIndex].tints2[i + (j + 1) * 64 + 1])
+                    / 2
+                - gTintedPolys[pIndex].tints1[i + (j + 1) * 64 + 1]
+                - gTinted_fire_cooling;
             gTintedPolys[pIndex].tints3[i + (j + 1) * 64] = MAX(0, avg);
         }
     }
@@ -755,7 +756,7 @@ void C2_HOOK_FASTCALL ProcessTintedPoly(int pIndex) {
     }
     switch (gTintedPolys[pIndex].class) {
     case 2: {
-        tSpecial_volume *volume = gCar_to_view->collision_info->last_special_volume;
+        tSpecial_volume* volume = gCar_to_view->collision_info->last_special_volume;
         /* The original x87 below test also accepts unordered gravity. */
         if ((volume != NULL && !(volume->gravity_multiplier >= 1.0f)) || gAction_replay_mode) {
             UpdateTintedPolyByMaterial(pIndex);
@@ -814,7 +815,7 @@ void C2_HOOK_FASTCALL UpdateTintedPolys(void) {
         }
         switch (gTintedPolys[i].class) {
         case 2: {
-            tSpecial_volume *volume = gCar_to_view->collision_info->last_special_volume;
+            tSpecial_volume* volume = gCar_to_view->collision_info->last_special_volume;
             if ((volume != NULL && !(volume->gravity_multiplier >= 1.0f)) || gAction_replay_mode) {
                 UpdateTintedPolyByMaterial(i);
             }

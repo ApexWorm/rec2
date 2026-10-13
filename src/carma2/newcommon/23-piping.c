@@ -1094,8 +1094,14 @@ void C2_HOOK_FASTCALL AddShrapnelToPipingSession(int pShrapnel_index, const br_v
 
 /* Preserve the explicit original single-precision Z difference spill. */
 static br_scalar C2_HOOK_CDECL ReplayScalarRound(double pValue) {
-    union { br_scalar scalar; tU32 bits; } stored;
-    union { br_scalar scalar; tU32 bits; } result;
+    union {
+        br_scalar scalar;
+        tU32 bits;
+    } stored;
+    union {
+        br_scalar scalar;
+        tU32 bits;
+    } result;
 
     stored.scalar = (br_scalar)pValue;
     result.bits = stored.bits;
@@ -1250,7 +1256,6 @@ typedef tU32 tCompletion_word __attribute__((__may_alias__));
 #else
 typedef tU32 tCompletion_word;
 #endif
-
 
 // FUNCTION: CARMA2_HW 0x004c8cc0
 void C2_HOOK_FASTCALL PipeSinglePHILObject(tPhysics_object* object) {

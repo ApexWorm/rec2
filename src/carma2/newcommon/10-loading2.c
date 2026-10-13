@@ -778,8 +778,6 @@ void C2_HOOK_FASTCALL SetDefaultTextFileName(void) {
     gPedTextTxtPath = "TEXT.TXT";
 }
 
-
-
 // FUNCTION: CARMA2_HW 0x0048ea20
 void C2_HOOK_FASTCALL ConfigureZombiePedTextTxtPath(void) {
     gPedTextTxtPath = "ZOMTEXT.TXT";

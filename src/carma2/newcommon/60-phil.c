@@ -51,7 +51,10 @@ static void C2_HOOK_CDECL PhilCopyWords(void* pOutput, const void* pInput, int p
 // FractionToScalar
 
 static double C2_HOOK_CDECL PhilOrientationScalar(double value) {
-    union { br_scalar scalar; tU32 word; } bits;
+    union {
+        br_scalar scalar;
+        tU32 word;
+    } bits;
     tU32 stored;
 
     /* The integer reload forces the scalar rounding even with MSVC5. */
@@ -165,7 +168,6 @@ typedef tU32 tRegistrationWord;
 static void* C2_HOOK_CDECL RegistrationAddress(const void* base, tU32 offset) {
     return (void*)(uintptr_t)((tU32)(uintptr_t)base + offset);
 }
-
 
 static void C2_HOOK_CDECL RegistrationWrite(void* base, tU32 offset, tU32 value) {
     *(tRegistrationWord*)RegistrationAddress(base, offset) = value;
@@ -644,7 +646,6 @@ typedef tU32 tCompletion_word __attribute__((__may_alias__));
 typedef tU32 tCompletion_word;
 #endif
 
-
 static void* C2_HOOK_CDECL CompletionPointer(const void* base, tU32 offset) {
     return (void*)(uintptr_t)(*(const tCompletion_word*)((tU32)(uintptr_t)base + offset));
 }
@@ -674,8 +675,8 @@ static tU32 C2_HOOK_CDECL CompletionStatus(tPhysics_object* object) {
 
 // FUNCTION: CARMA2_HW 0x004b6be0
 void C2_HOOK_FASTCALL ChangedObjectsCallbacks(tPhysics_object* objects, tPhysics_callbacks* callbacks, tU32 period) {
-    typedef int (C2_HOOK_FASTCALL *halted_fn)(tPhysics_object*);
-    typedef void (C2_HOOK_FASTCALL *changed_fn)(tPhysics_object*, tU32);
+    typedef int(C2_HOOK_FASTCALL * halted_fn)(tPhysics_object*);
+    typedef void(C2_HOOK_FASTCALL * changed_fn)(tPhysics_object*, tU32);
     halted_fn halted;
     changed_fn changed;
     tU32 address;
@@ -747,17 +748,15 @@ void C2_HOOK_FASTCALL MarkObjectAndChildrenAsPassive(tPhysics_object* object) {
 
 // SetStandardGravity
 
-
 // PHILMungeObjects
 
-typedef void (C2_HOOK_FASTCALL *tActivation_original_call)(tPhysics_object*, undefined4);
-typedef int (C2_HOOK_FASTCALL *tActivation_permission_call)(tPhysics_object*, undefined4);
+typedef void(C2_HOOK_FASTCALL* tActivation_original_call)(tPhysics_object*, undefined4);
+typedef int(C2_HOOK_FASTCALL* tActivation_permission_call)(tPhysics_object*, undefined4);
 #if defined(__GNUC__)
 typedef tU32 tActivation_raw_word __attribute__((__may_alias__));
 #else
 typedef tU32 tActivation_raw_word;
 #endif
-
 
 // FUNCTION: CARMA2_HW 0x004b71b0
 void C2_HOOK_FASTCALL PHILActivatePassive(tPhysics_object* object, undefined4 captured_edx) {
@@ -795,9 +794,6 @@ void C2_HOOK_FASTCALL PHILActivatePassive(tPhysics_object* object, undefined4 ca
 
 // PHILApplyPHILObject
 
-
-
-
 static br_scalar C2_HOOK_CDECL GravityRound(double value) {
     br_scalar result = (br_scalar)value;
     return result;
@@ -809,8 +805,6 @@ static int C2_HOOK_CDECL GravityNaN(double value) {
     return (words[1] & 0x7ff00000u) == 0x7ff00000u
         && ((words[1] & 0xfffffu) != 0 || words[0] != 0);
 }
-
-
 
 static double C2_HOOK_CDECL GravitySubtractPopWide(double left, double right) {
     if (GravityNaN(left) && GravityNaN(right)) {
@@ -874,8 +868,14 @@ static void* C2_HOOK_CDECL FrictionPointer(const void* base, unsigned offset) {
 }
 
 static br_scalar C2_HOOK_CDECL FrictionScalar(double value) {
-    union { br_scalar scalar; tU32 bits; } stored;
-    union { br_scalar scalar; tU32 bits; } result;
+    union {
+        br_scalar scalar;
+        tU32 bits;
+    } stored;
+    union {
+        br_scalar scalar;
+        tU32 bits;
+    } result;
     stored.scalar = (br_scalar)value;
     result.bits = stored.bits;
     return result.scalar;
@@ -885,15 +885,9 @@ static const br_scalar* C2_HOOK_CDECL FrictionAt(const void* base, unsigned offs
     return (const br_scalar*)((const tU8*)base + offset);
 }
 
+typedef void(C2_HOOK_FASTCALL* tDragFunction)(tPHIL_queued_header*, tPhysics_object*, br_scalar, int, tSpecial_volume*);
 
-
-
-
-
-
-typedef void (C2_HOOK_FASTCALL* tDragFunction)(tPHIL_queued_header*, tPhysics_object*, br_scalar, int, tSpecial_volume*);
-
-typedef void (C2_HOOK_FASTCALL* tDragWordsFunction)(tPHIL_queued_header*, tPhysics_object*, tU32, int, tSpecial_volume*);
+typedef void(C2_HOOK_FASTCALL* tDragWordsFunction)(tPHIL_queued_header*, tPhysics_object*, tU32, int, tSpecial_volume*);
 
 static void C2_HOOK_CDECL DragForward(tDragFunction target, tPHIL_queued_header* header, tPhysics_object* object, const br_scalar* drag, int flags, tSpecial_volume* volume) {
     tDragWordsFunction words_target;
@@ -961,9 +955,6 @@ static void C2_HOOK_CDECL FrictionWrite(void* base, unsigned offset, double valu
     *(br_scalar*)((tU8*)base + offset) = FrictionScalar(value);
 }
 
-
-
-
 // FUNCTION: CARMA2_HW 0x004b6fb0
 void C2_HOOK_FASTCALL LevelOutOnSurface(tPhysics_object* object) {
     const br_scalar negative_one = -1.0f; /* original58a758 */
@@ -986,7 +977,8 @@ void C2_HOOK_FASTCALL LevelOutOnSurface(tPhysics_object* object) {
     if (first > second) {
         first = object->I.v[0];
         second = object->I.v[2];
-        if (first > second) axis_row = 0;
+        if (first > second)
+            axis_row = 0;
     }
     if (axis_row != 0) {
         first = object->I.v[1];
@@ -994,7 +986,8 @@ void C2_HOOK_FASTCALL LevelOutOnSurface(tPhysics_object* object) {
         if (first > second) {
             first = object->I.v[1];
             second = object->I.v[0];
-            if (first > second) axis_row = 1;
+            if (first > second)
+                axis_row = 1;
         }
     }
     actor_matrix = (br_matrix34*)((tU8*)FrictionPointer(object, 0) + 0x2c);
@@ -1013,7 +1006,8 @@ void C2_HOOK_FASTCALL LevelOutOnSurface(tPhysics_object* object) {
     product_y = (double)normal_y * axis.v[1];
     dot = product_z + product_x + product_y;
     rounded_dot = FrictionScalar(dot);
-    if (!(dot > (-0.99))) return; /* original58a760 */
+    if (!(dot > (-0.99)))
+        return; /* original58a760 */
 
     /* Six original normal loads precede the cross products. */
     normal_x = object->water_normal.v[0];
@@ -1022,12 +1016,12 @@ void C2_HOOK_FASTCALL LevelOutOnSurface(tPhysics_object* object) {
     normal_z = object->water_normal.v[2];
     second = object->water_normal.v[2];
     axis_x = object->water_normal.v[0];
-    cross_x = ((double)first * axis.v[2]-((double)normal_z * axis.v[1]));
+    cross_x = ((double)first * axis.v[2] - ((double)normal_z * axis.v[1]));
     product_x = (double)cross_x * cross_x;
-    cross_y = ((double)second * axis.v[0]-((double)axis_x * axis.v[2]));
+    cross_y = ((double)second * axis.v[0] - ((double)axis_x * axis.v[2]));
     rounded_y = FrictionScalar(cross_y);
     product_y = (double)cross_y * rounded_y;
-    cross_z = ((double)normal_x * axis.v[1]-((double)normal_y * axis.v[0]));
+    cross_z = ((double)normal_x * axis.v[1] - ((double)normal_y * axis.v[0]));
     rounded_z = FrictionScalar(cross_z);
     error = (double)rounded_dot - (double)negative_one;
     rounded_error = FrictionScalar(error);

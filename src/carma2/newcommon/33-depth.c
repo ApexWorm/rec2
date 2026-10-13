@@ -346,7 +346,7 @@ void C2_HOOK_FASTCALL InitDepthEffects(void) {
         BrTableAdd(gHorizon_material->index_blend);
         for (i = 0; i < 256; i++) {
             for (j = 0; j < 256; j++) {
-                ((br_uint_8*)gHorizon_material->index_blend->pixels)[256*i + j] = (br_uint_8)j;
+                ((br_uint_8*)gHorizon_material->index_blend->pixels)[256 * i + j] = (br_uint_8)j;
             }
         }
         gHorizon_material->flags |= BR_MATF_PERSPECTIVE;
@@ -502,4 +502,3 @@ void C2_HOOK_FASTCALL SkyTextureChanged(void) {
 void C2_HOOK_FASTCALL SetSkyColour(br_colour c) {
     gHorizon_material->colour = c;
 }
-

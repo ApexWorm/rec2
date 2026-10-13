@@ -390,7 +390,6 @@ typedef tU32 tPedCacheWord __attribute__((__may_alias__));
 typedef tU32 tPedCacheWord;
 #endif
 
-
 static void C2_HOOK_CDECL PedCacheWrite(void* base, tU32 offset, tU32 value) {
     *(tPedCacheWord*)(uintptr_t)((tU32)(uintptr_t)base + offset) = value;
 }

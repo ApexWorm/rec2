@@ -114,7 +114,6 @@ extern int C2_HOOK_FASTCALL RestoreOptions(void);
 
 extern void C2_HOOK_FASTCALL SetDefaultTextFileName(void);
 
-
 extern const char* gPedTextTxtPath;
 
 void C2_HOOK_FASTCALL ConfigureZombiePedTextTxtPath(void);
