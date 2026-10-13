@@ -31,7 +31,6 @@ tSpecial_volume* C2_HOOK_FASTCALL GetDefaultSpecialVolumeForWater(void) {
 
 // MungeSpecialVolume
 
-/* The original scans the complete identifier even though only emptiness is used. */
 static int C2_HOOK_CDECL VolumeIdentifierHasLength(const char* pIdentifier) {
     const char* end = pIdentifier;
 

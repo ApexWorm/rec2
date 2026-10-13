@@ -7,7 +7,6 @@
 #include "rec2_macros.h"
 #include "c2_string.h"
 
-/* The original names occupy writable data; both tables share OILSMEAR. */
 // GLOBAL: CARMA2_HW 0x0065fe38
 static char gOil_smear_material_name[] = "OILSMEAR.MAT";
 // GLOBAL: CARMA2_HW 0x0065fe28

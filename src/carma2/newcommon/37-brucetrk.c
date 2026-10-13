@@ -63,7 +63,6 @@ void C2_HOOK_FASTCALL XZToColumnXZ(tU8* pColumn_x, tU8* pColumn_z, br_scalar pX,
 
     column_x = ((double)pX - pTrack_spec->origin_x) / pTrack_spec->column_size_x;
     column_z = ((double)pZ - pTrack_spec->origin_z) / pTrack_spec->column_size_z;
-    /* Only X is spilled to a scalar before the original upper clamp and conversion. */
     rounded_x = (br_scalar)column_x;
     if (!(column_x >= 0.0)) {
         rounded_x = 0.0f;

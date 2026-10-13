@@ -83,7 +83,6 @@ tU32 gPipe_sound_time_window;
 // GLOBAL: CARMA2_HW 0x0069410c
 tU32 gUNK_0069410c;
 
-/* The original inline memcpy copies forward in four-byte groups, then bytes. */
 static void C2_HOOK_CDECL ReplayCopyForward(void* pDest, const void* pSource, tU32 pSize) {
     tU8* dest;
     const tU8* source;
@@ -115,7 +114,6 @@ int C2_HOOK_FASTCALL ARReplayForwards(void) {
         return 1;
     }
     memcpy(&rate_bits, &gReplay_rate, sizeof(rate_bits));
-    /* The original tests x87 C3, which is set for zero and unordered. */
     if (gReplay_rate == 0.0f || (rate_bits & 0x7fffffffu) > 0x7f800000u) {
         return gPlay_direction > 0;
     }
@@ -145,7 +143,6 @@ void C2_HOOK_FASTCALL ARSetReplayRate(float pRate) {
     tU32 bits;
     tU32 stored_bits;
 
-    /* MOV copies preserve signaling NaNs in the stored replay rate. */
     memcpy(&bits, &pRate, sizeof(bits));
     stored_bits = bits;
     bits = stored_bits;
@@ -162,8 +159,6 @@ void C2_HOOK_FASTCALL ARSetReplayDirection(float pDirection) {
     tU32 bits;
 
     memcpy(&bits, &pDirection, sizeof(bits));
-    /* _ftol stores a signed 64-bit integer and this caller keeps EAX. Its
-     * indefinite result for NaN, infinity or overflow has a zero low word. */
     if ((bits & 0x7fffffffu) >= 0x5f000000u) {
         gPlay_direction = 0;
     } else {
@@ -263,7 +258,6 @@ void C2_HOOK_FASTCALL ARAdvanceChunkPtr(tU8** pChunk, int pType) {
     const tReplay_callback* callbacks;
 
     disabled = gDisable_advance;
-    /* The original reads the pointer even when advancement is disabled. */
     old_chunk = *(tU8**)pChunk;
     if (disabled) {
         return;
@@ -277,7 +271,6 @@ void C2_HOOK_FASTCALL ARAdvanceChunkPtr(tU8** pChunk, int pType) {
         length = callbacks[pType].length + 4;
     }
     *pChunk = (tU8*)((uintptr_t)*pChunk + length);
-    /* This particular original boundary comparison is signed. */
     if ((intptr_t)*pChunk >= (intptr_t)gPipe_chunk_end) {
         *pChunk = old_chunk;
     }
@@ -418,7 +411,6 @@ void C2_HOOK_CDECL ARAddVariedDataToSession(int pType, uintptr_t pOwner, int pCo
         offset = va_arg(args, int);
         value = va_arg(args, uintptr_t);
         if (size < 0) {
-            /* The original scalar FLD/FSTP quiets signaling NaNs. */
             if ((value & 0x7f800000u) == 0x7f800000u && (value & 0x7fffffu) != 0) {
                 value |= 0x400000u;
             }
@@ -475,7 +467,6 @@ void C2_HOOK_CDECL ARDoSingleVariedSession(int pType, uintptr_t pOwner, int pCou
             offset = va_arg(args, int);
             value = va_arg(args, uintptr_t);
             if (size < 0) {
-                /* The original scalar FLD/FSTP quiets signaling NaNs. */
                 if ((value & 0x7f800000u) == 0x7f800000u && (value & 0x7fffffu) != 0) {
                     value |= 0x400000u;
                 }
@@ -650,8 +641,6 @@ int C2_HOOK_FASTCALL SoundTimeout(tU32 pTime) {
         || gPipe_sound_start_time - pTime < gPipe_sound_time_window;
 }
 
-/* _ftol returns a signed 64-bit integer; these original callers use its low
- * word. The indefinite result for nonfinite/out-of-range input has low word0. */
 static tU32 C2_HOOK_FASTCALL ReplayFtolLow(double pValue) {
     tU32 bits[2];
 
@@ -1092,7 +1081,6 @@ void C2_HOOK_FASTCALL AddShrapnelToPipingSession(int pShrapnel_index, const br_v
 
 // AddNonCarToPipingSession
 
-/* Preserve the explicit original single-precision Z difference spill. */
 static br_scalar C2_HOOK_CDECL ReplayScalarRound(double pValue) {
     union {
         br_scalar scalar;
@@ -1143,7 +1131,6 @@ void C2_HOOK_FASTCALL AddFlameToPipingSession(int pIndex, int pFrame, br_scalar 
     (void)pOffset_z;
     memcpy(&bits, &pScale_x, sizeof(bits));
     gUNK_0069410c = bits;
-    /* The original MOV sequence reuses scale_x for all four scalar fields. */
     ARAddVariedDataToSession((tPipe_chunk_type)18, pIndex, 5,
         2, 0, pFrame, 4, 4, bits, 4, 8, bits, 4, 12, bits, 4, 16, bits);
 }
@@ -1192,8 +1179,6 @@ void C2_HOOK_FASTCALL PipeSingleSound(tS3_outlet* pOutlet, int pSound, tS3_volum
     if (pPosition == NULL) {
         pPosition = &gZero_vector__smash;
     }
-    /* Original SHL/ADD wraps32 bits, including negative/out-of-range ints.
-     * The varied writer stores the low16 bits of this raw DWORD. */
     packed_volume = ((tU32)pR_volume << 8) + (tU32)pL_volume;
     outlet_index = GetIndexFromOutlet(pOutlet);
     ARDoSingleVariedSession(2, (uintptr_t)(tU32)pSound, 4,

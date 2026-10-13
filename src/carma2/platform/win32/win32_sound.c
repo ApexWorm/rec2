@@ -162,7 +162,6 @@ int C2_HOOK_FASTCALL PDReverseAudio(tS3_channel* pChannel) {
         return 1;
     }
     sample_size = pChannel->descriptor->buffer_description->sample_size;
-    /* The original accepts exactly zero and checks the limit after Lock. */
     if (IDirectSoundBuffer_Lock(buffer, 0, sample_size, (void**)&buffer_data, &buffer_data_size, NULL, NULL, 0) != 0) {
         return 0;
     }
@@ -171,7 +170,6 @@ int C2_HOOK_FASTCALL PDReverseAudio(tS3_channel* pChannel) {
     }
     tmp_buffer = S3MemAllocate(sample_size, kMem_S3_Windows_95_create_temp_buffer_space_to_reverse_sample);
     if (tmp_buffer == NULL) {
-        /* Preserve the original early return without Unlock. */
         return 1;
     }
     memmove(tmp_buffer, buffer_data, buffer_data_size);

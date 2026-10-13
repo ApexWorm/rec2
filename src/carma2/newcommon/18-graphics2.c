@@ -443,7 +443,6 @@ void C2_HOOK_FASTCALL AllocateCursorActors(void) {
         gTintedPolys[gCursor_tinted_right].material->colour_map = line;
         BrMaterialUpdate(gTintedPolys[gCursor_tinted_right].material, BR_MATU_ALL);
         gTintedPolys[gCursor_tinted_top].material->colour_map = line;
-        /* Preserve the original encoded angle 0x3ffc, just below a quarter turn. */
         BrMatrix23Rotate(&gTintedPolys[gCursor_tinted_top].material->map_transform, 0x3ffc);
         BrMaterialUpdate(gTintedPolys[gCursor_tinted_top].material, BR_MATU_ALL);
         gTintedPolys[gCursor_tinted_bottom].material->colour_map = line;
@@ -510,7 +509,6 @@ void C2_HOOK_FASTCALL ClearEntireScreen(void) {
 // FUNCTION: CARMA2_HW 0x0047b910
 double C2_HOOK_FASTCALL DistanceFromPlane(const br_vector3* pPos, br_scalar pA, br_scalar pB, br_scalar pC, br_scalar pD) {
 
-    /* The original caller uses unspilled PC53 ST0 for its first component. */
     return fabs(((double)pPos->v[0] * pA + (double)pPos->v[1] * pB + (double)pPos->v[2] * pC + pD)
         / ((double)pA * pA + (double)pB * pB + (double)pC * pC));
 }
@@ -636,7 +634,6 @@ void C2_HOOK_FASTCALL DRPixelmapRectangleMaskedCopy(br_pixelmap* pDest, br_int_1
 void C2_HOOK_FASTCALL PoshDrawLine(br_pixelmap* pDest, int pX1, br_scalar pAngle, int pY1, int pX2, int pY2, int pColour) {
 
     if (pColour < 0) {
-        /* NEG and coordinate offsets wrap as original 32-bit integer operations. */
         if (pAngle >= 0.785 && pAngle <= 5.498 && (pAngle <= 2.356 || pAngle >= 3.926)) {
             if ((pAngle <= 0.785 || pAngle >= 1.57) && (pAngle <= 3.926 || pAngle >= 4.712)) {
                 DRDrawLine(pDest, (int)((tU32)pX1 - 1u), pY1, (int)((tU32)pX2 - 1u), pY2, (int)(0u - (tU32)pColour - 1u));

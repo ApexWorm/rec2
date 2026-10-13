@@ -90,7 +90,6 @@ int gMaxTimeOpponentRepair;
 
 // FUNCTION: CARMA2_HW 0x004a8160
 void C2_HOOK_CDECL DoNotDprintf_opponent(const char* pMessage, ...) {
-    /* The original diagnostic function is a single RET. */
     (void)pMessage;
 }
 
@@ -113,7 +112,6 @@ tS16 C2_HOOK_FASTCALL FindNearestGeneralSection(tCar_spec* pCar, const br_vector
     int nearest_node_section = -1;
     float closest = 3.4028234663852886e38f;
     float nearest_distance = 3.4028234663852886e38f;
-    /* The original leaves this slot indeterminate when no segment qualifies. */
     float nearest_t;
     tPath_section* sections = gProgram_state.AI_vehicles.path_sections;
     br_vector3 a;
@@ -210,7 +208,6 @@ tS16 C2_HOOK_FASTCALL FindNearestGeneralSection(tCar_spec* pCar, const br_vector
         pIntersect->v[0] = OpponentScalarRound(px);
         pIntersect->v[1] = OpponentScalarRound(py);
         pIntersect->v[2] = OpponentScalarRound(pz);
-        /* Even the trail case uses global path nodes in this original branch. */
         start = &gProgram_state.AI_vehicles.path_nodes[(tS16)gProgram_state.AI_vehicles.path_sections[nearest_section].node_indices[0]].pos;
         pIntersect->v[0] = OpponentScalarRound(OpponentAdd(start->v[0], px));
         start = &gProgram_state.AI_vehicles.path_nodes[(tS16)gProgram_state.AI_vehicles.path_sections[nearest_section].node_indices[0]].pos;
@@ -521,7 +518,6 @@ void C2_HOOK_FASTCALL NewCalcGetNearPlayerRoute(tOpponent_spec* pOpponent_spec, 
         }
         index = -1;
         for (i = 0; i < pOpponent_spec->nnext_sections; i++) {
-            /* The original writes before testing section against zero. */
             pOpponent_spec->next_sections[i].section_no = section;
             if (section != 0) {
                 index = i;
@@ -653,7 +649,6 @@ int C2_HOOK_FASTCALL AddToOpponentsProjectedRoute(tOpponent_spec* pOpponent_spec
     if (*count >= 12) {
         return 0;
     }
-    /* An unchecked negative slot can alias the count: retain each reload. */
     pOpponent_spec->next_sections[*count].section_no = pSection_no;
     pOpponent_spec->next_sections[*count].direction = (tU8)pDirection;
     *count = (int)((unsigned int)*count + 1u);

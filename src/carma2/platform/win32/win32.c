@@ -670,7 +670,6 @@ tU32 C2_HOOK_FASTCALL PDGetTotalTime(void) {
 
     if (gPerformanceCounterInitialized) {
         QueryPerformanceCounter(&perfCountValue);
-        /* The original subtracts modulo 64 bits and calls unsigned __aulldiv. */
         delta = (br_uint_64)perfCountValue.QuadPart - (br_uint_64)gPerformanceCounterStart.QuadPart;
         return (tU32)(delta / (br_uint_64)gPerformanceCounterFrequency_ms.QuadPart);
     }

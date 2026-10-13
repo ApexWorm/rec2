@@ -33,11 +33,6 @@ br_token_value gTinted_poly_tokens[9] = {
     { BR_NULL_TOKEN, { 0 } },
 };
 
-/* The original three unterminated lists share their suffixes. The renderer
- * also consumes the following two decal tokens, then ignores string data up
- * to a zero token. Keep the observable token stream within one bounded array.
- * Entry 6's value is also the original default-opacity global at 0x0065e874.
- */
 #define gTinted_poly_material_tokens (&gTinted_poly_tokens[0])
 #define gTinted_poly_zero_opacity_tokens (&gTinted_poly_tokens[2])
 #define gTinted_poly_custom_opacity_tokens (&gTinted_poly_tokens[4])
@@ -192,7 +187,6 @@ int C2_HOOK_FASTCALL CreateTintedPoly(int x0, int y0, int width, int height, int
             for (x = 0; x < 32; x++) {
                 int v;
                 colour = BrPixelmapPixelGet(map, x, y);
-                /* Preserve x87 multiplication and __ftol's low 32 bits. */
                 v = (int)(br_int_64)(((int)REC2_RGB555_B(colour) - darkest_colour) * (double)colour_scale);
                 gTintedPolys[tintedIndex].tints1[y + x * 64] = v < 0 ? 0 : (br_uint_32)v > (br_uint_32)arg1 ? (br_uint_32)arg1
                                                                                                             : (br_uint_32)v;
@@ -321,7 +315,6 @@ br_model* C2_HOOK_FASTCALL BuildTintedPolyModel(int x0, int y0, int width, int h
             vertex->p.v[0] = (br_scalar)(x0 + dx);
             vertex->p.v[1] = (br_scalar)(-(y0 + dy));
             vertex->p.v[2] = -1.02f;
-            /* Keep integer operands exact through the floating divide, as in the original x87 code. */
             vertex->map.v[0] = (br_scalar)((double)dx / width);
             vertex->map.v[1] = (br_scalar)((double)dy / height);
             vertex++;
@@ -441,7 +434,6 @@ void C2_HOOK_FASTCALL SetTintedPolyRefMaterial(int pTintedIndex, br_vector3* pPo
     br_material* mat;
 
     volume = gCar_to_view->collision_info->last_special_volume;
-    /* The original x87 below tests also accept unordered values. */
     if ((volume != NULL && !(volume->gravity_multiplier >= 1.0f)) || gAction_replay_mode) {
         BrVector3Set(&dir, 0.0f, 200.0f, 0.0f);
         DisablePlingMaterials();
@@ -529,7 +521,6 @@ void C2_HOOK_FASTCALL UpdateTintedPolyByMaterial(int pTintedIndex) {
     new_red = gTintedColourMap_red;
     if (map != NULL && map->pixels != NULL) {
         br_uint_32 v_tl, v_tr, v_bl, v_br;
-        /* The original fixes sample coordinates once, but reloads the map after each pixel callback. */
         br_uint_32 width = map->width, height = map->height;
 
         v_tl = BrPixelmapPixelGet(map, width / 4, height / 4);
@@ -757,7 +748,6 @@ void C2_HOOK_FASTCALL ProcessTintedPoly(int pIndex) {
     switch (gTintedPolys[pIndex].class) {
     case 2: {
         tSpecial_volume* volume = gCar_to_view->collision_info->last_special_volume;
-        /* The original x87 below test also accepts unordered gravity. */
         if ((volume != NULL && !(volume->gravity_multiplier >= 1.0f)) || gAction_replay_mode) {
             UpdateTintedPolyByMaterial(pIndex);
         }
@@ -808,7 +798,6 @@ void C2_HOOK_FASTCALL UpdateTintedPolys(void) {
     br_uint_32 grn = 0;
     br_uint_32 blu = 0;
 
-    /* The original inlined pulse path retains these colours between slots. */
     for (i = 0; i < (int)REC2_ASIZE(gTintedPolys); i++) {
         if (!gTintedPolys[i].used) {
             continue;

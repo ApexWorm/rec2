@@ -68,7 +68,6 @@ int C2_HOOK_FASTCALL CheckSingleEdgeWithSphere(br_vector3* pEdge_start, br_vecto
 
 int C2_HOOK_FASTCALL GetSphereToEdgePoints(tPhysics_object* pObject, tCollision_shape_sphere_data* pSphere, tPhysics_contact* pContacts, int pCount, int pUnused_capacity, br_vector3* pSphere_start, br_vector3* pSphere_end, br_matrix34* pUnused_matrix);
 
-/* The original wall-contact workspace contains two arrays of 64 points. */
 typedef struct {
     br_vector3 original_points[64];
     br_vector3 trial_points[64];

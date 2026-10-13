@@ -1636,7 +1636,6 @@ int C2_HOOK_FASTCALL ScrollSet_TranslateItemToIndex(tConnected_items* pConnected
         if (pItem >= start) {
             tU32 length = (*(const tFrontendScrollWord*)(uintptr_t)(base + 4u));
             if (pItem < (tS32)((tU32)start + length)) {
-                /* Original SUB reads the matching start word again. */
                 offset = (tS32)((tU32)pItem - (*(const tFrontendScrollWord*)(uintptr_t)(base + 0x10u + index * 4u)));
                 break;
             }

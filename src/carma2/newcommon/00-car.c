@@ -219,7 +219,6 @@ static int C2_HOOK_CDECL AutoVolumeUnordered(double value) {
     return (bits.w[1] & 0x7ff00000u) == 0x7ff00000u && ((bits.w[1] & 0xfffffu) || bits.w[0]);
 }
 
-/* The face interval end is reloaded after each face test. */
 // FUNCTION: CARMA2_HW 0x0041e480
 int C2_HOOK_FASTCALL FUN_0041e480(br_vector3* pPosition, br_vector3* pDirection, br_vector3* pNormal, br_scalar* pDistance, tPhysics_object* pObject) {
     br_vector3 normal, collision;

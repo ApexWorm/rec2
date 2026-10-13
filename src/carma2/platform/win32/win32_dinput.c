@@ -152,7 +152,6 @@ static int C2_HOOK_FASTCALL InitDirectInput(void) {
     return 0;
 }
 
-/* The original GetInfo creation path leaves the enumeration flag unchanged. */
 static int C2_HOOK_FASTCALL InitDirectInputForInfo(void) {
     int i;
 

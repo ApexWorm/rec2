@@ -22,7 +22,6 @@ static float C2_HOOK_CDECL NavigationScalarRound(double pA) {
     return result.scalar;
 }
 
-/* MSVC5 folds self-comparisons and otherwise accepts unordered greater-than. */
 static int C2_HOOK_CDECL NavigationOrderedGreater(double pA, double pB) {
     unsigned short status;
     return pA > pB;
@@ -264,7 +263,6 @@ static int C2_HOOK_CDECL NavigationTruncate(double pValue) {
     return (int)(tU32)result;
 }
 
-/* This original measurement starts at the corner section, not the current section. */
 static double C2_HOOK_CDECL NavigationCornerSectionLength(tOpponent_spec* pOpponent_spec, tCorner* pCorner, int pSection) {
     const br_vector3* start = GetOpponentsSectionStartNodePoint(pOpponent_spec, (tS16)pCorner->section);
     const br_vector3* finish = GetOpponentsSectionFinishNodePoint(pOpponent_spec, (tS16)pSection);

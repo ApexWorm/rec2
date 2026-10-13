@@ -57,7 +57,6 @@ static double C2_HOOK_CDECL PhilOrientationScalar(double value) {
     } bits;
     tU32 stored;
 
-    /* The integer reload forces the scalar rounding even with MSVC5. */
     bits.scalar = (br_scalar)value;
     stored = bits.word;
     bits.word = stored;
@@ -76,7 +75,6 @@ void C2_HOOK_FASTCALL GetOrientationFromMatrix(tU16* pOrientation, const br_matr
         if (value > 1.0) {
             value = 1.0;
         }
-        /* Original C0 test replaces unordered values with the lower bound. */
         if (!(value >= -1.0)) {
             value = -1.0;
         }
@@ -97,7 +95,6 @@ void C2_HOOK_FASTCALL GetMatrixFromOrientation(br_matrix34* pMatrix, const tU16*
     parts[2] = pOrientation[2];
     parts[3] = pOrientation[3];
     for (i = 0; i < 4; i++) {
-        /* 0x37800100 is the original scalar; double its product unspilled. */
         value = (double)parts[i] * 1.5259254723787308e-05;
         (&quaternion.x)[i] = (br_scalar)PhilOrientationScalar(value + value - 1.0);
     }
@@ -158,7 +155,6 @@ void C2_HOOK_FASTCALL PHILDisable(void) {
     gPHIL_disabled = 1;
 }
 
-/* Registry access order follows the original overlapping Win32 storage. */
 #if defined(__GNUC__)
 typedef tU32 tRegistrationWord __attribute__((__may_alias__));
 #else
@@ -185,8 +181,6 @@ static void* C2_HOOK_CDECL RegistrationPointer(const void* base, tU32 offset) {
     return (void*)(uintptr_t)(*(const tRegistrationWord*)RegistrationAddress(base, offset));
 }
 
-/* REP MOVSD captures both bases once then sequentially copies each rawDWORD.
-   Use the genuine published identical PhilCopyWords in the future verifier. */
 static void C2_HOOK_CDECL RegistrationCopyWords(void* output, const void* input, int count) {
     int i;
     for (i = 0; i < count; i++) {
@@ -211,7 +205,6 @@ int C2_HOOK_FASTCALL PHILAddObject(tPhysics_object* object) {
         return 0;
     }
     if ((*(const tRegistrationWord*)RegistrationAddress(&gPHIL_munging_objects, 0)) != 0 && (*(const tRegistrationWord*)RegistrationAddress(&gPHIL_registry.object_added, 0)) == 0) {
-        /* Original100*count moduloDWORD; no added capacity clamp. */
         index = (*(const tRegistrationWord*)RegistrationAddress(&gPHIL_registry.count_adds, 0));
         queued = RegistrationAddress(&gPHIL_registry, 0x10u + index * 100u);
         RegistrationWrite(queued, 0, (tU32)(uintptr_t)object);
@@ -696,8 +689,6 @@ void C2_HOOK_FASTCALL ChangedObjectsCallbacks(tPhysics_object* objects, tPhysics
                             continue;
                         }
                     }
-                    /* Complete original inline passive transition, after the
-                     * callback's mutations and a fresh disabled/type/header. */
                     if ((*(const tCompletion_word*)((tU32)(uintptr_t)(&gPHIL_disabled) + 0)) == 0) {
                         if (CompletionByte(objects, 0x239) == 2) {
                             header = CompletionPointer(objects, 0x240);
@@ -719,8 +710,6 @@ void C2_HOOK_FASTCALL ChangedObjectsCallbacks(tPhysics_object* objects, tPhysics
                 }
                 header = CompletionPointer(objects, 0x240);
                 if (header != NULL && (CompletionByte(header, 4) & 4) != 0) {
-                    /* Raw original follows the child chain only. Siblings
-                     * here are not traversed or recursively enumerated. */
                     pipe_object = objects;
                     do {
                         PipeSinglePHILObject(pipe_object);
@@ -770,14 +759,12 @@ void C2_HOOK_FASTCALL PHILActivatePassive(tPhysics_object* object, undefined4 ca
         address = *(const tActivation_raw_word*)(const void*)&gPHIL_registry.original_activate_passive;
         if (address != 0) {
             memcpy(&original, &address, sizeof(original));
-            /* EDX is still the entry word at the first original call. */
             original(object, captured_edx);
         }
         callbacks = *(const tActivation_raw_word*)(const void*)&gPHIL_registry.callbacks;
         address = (*(const tActivation_raw_word*)((tU32)(uintptr_t)((const void*)(uintptr_t)callbacks) + 0x14));
         if (address != 0) {
             memcpy(&permission, &address, sizeof(permission));
-            /* Original explicitly restores the captured entry EDX here. */
             if (permission(object, captured_edx) == 0) {
                 return;
             }
@@ -892,8 +879,6 @@ typedef void(C2_HOOK_FASTCALL* tDragWordsFunction)(tPHIL_queued_header*, tPhysic
 static void C2_HOOK_CDECL DragForward(tDragFunction target, tPHIL_queued_header* header, tPhysics_object* object, const br_scalar* drag, int flags, tSpecial_volume* volume) {
     tDragWordsFunction words_target;
     tU32 bits;
-    /* The original recursion MOV/PUSH forwards the unmodified stack DWORD.
-     * Same-width ABI view is intentional for the supported32-bit x86 builds. */
     memcpy(&words_target, &target, sizeof(words_target));
     memcpy(&bits, drag, sizeof(bits));
     words_target(header, object, bits, flags, volume);
@@ -913,7 +898,7 @@ static double C2_HOOK_CDECL DragLength(const void* object, unsigned offset) {
 
 // FUNCTION: CARMA2_HW 0x004b6ce0
 void C2_HOOK_FASTCALL ProcessDrag2(tPHIL_queued_header* header, tPhysics_object* object, br_scalar drag, int flags, tSpecial_volume* volume) {
-    br_scalar effective_drag = FrictionScalar((double)drag * 2e-05); /* original58a728 */
+    br_scalar effective_drag = FrictionScalar((double)drag * 2e-05);
     double length, scale;
     br_vector3 damping;
     tPhysics_object* child;
@@ -932,7 +917,7 @@ void C2_HOOK_FASTCALL ProcessDrag2(tPHIL_queued_header* header, tPhysics_object*
     }
     length = DragLength(object, 0x68);
     scale = (double)length * effective_drag;
-    scale = scale * 6.9 / object->M; /* original58a738 */
+    scale = scale * 6.9 / object->M;
     damping.v[0] = FrictionScalar((double)object->v.v[0] * scale);
     damping.v[1] = FrictionScalar((double)object->v.v[1] * scale);
     damping.v[2] = FrictionScalar((double)object->v.v[2] * scale);
@@ -957,7 +942,7 @@ static void C2_HOOK_CDECL FrictionWrite(void* base, unsigned offset, double valu
 
 // FUNCTION: CARMA2_HW 0x004b6fb0
 void C2_HOOK_FASTCALL LevelOutOnSurface(tPhysics_object* object) {
-    const br_scalar negative_one = -1.0f; /* original58a758 */
+    const br_scalar negative_one = -1.0f;
     double first, second;
     unsigned axis_row = 2;
     br_matrix34* actor_matrix;
@@ -970,8 +955,6 @@ void C2_HOOK_FASTCALL LevelOutOnSurface(tPhysics_object* object) {
     br_scalar rounded_dot, rounded_y, rounded_z, rounded_error;
     br_scalar rounded_y_product, rounded_z_product, rounded_x_product;
 
-    /* Comparisons and their loads follow the original ordered > tests.
-     * Ties and unordered values choose the final Z axis. */
     first = object->I.v[0];
     second = object->I.v[1];
     if (first > second) {
@@ -1007,9 +990,8 @@ void C2_HOOK_FASTCALL LevelOutOnSurface(tPhysics_object* object) {
     dot = product_z + product_x + product_y;
     rounded_dot = FrictionScalar(dot);
     if (!(dot > (-0.99)))
-        return; /* original58a760 */
+        return;
 
-    /* Six original normal loads precede the cross products. */
     normal_x = object->water_normal.v[0];
     normal_y = object->water_normal.v[1];
     first = object->water_normal.v[1];
@@ -1029,8 +1011,6 @@ void C2_HOOK_FASTCALL LevelOutOnSurface(tPhysics_object* object) {
     product_z = (double)cross_z * rounded_z;
     rounded_z_product = FrictionScalar(product_z);
 
-    /* The original successively recomputes each denominator after changing
-     * the preceding component. These three unequal normalizations are real. */
     denominator = sqrt(product_x + (double)rounded_z_product + (double)rounded_y_product);
     correction_x = ((double)(error / denominator) * cross_x);
     correction.v[0] = FrictionScalar(correction_x);

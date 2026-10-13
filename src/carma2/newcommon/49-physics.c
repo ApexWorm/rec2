@@ -49,7 +49,6 @@ tU32 gPhysics_contact_679434;
 // GLOBAL: CARMA2_HW 0x00679438
 tU32 gPhysics_contact_679438;
 
-/* Original writable box-edge table. */
 // GLOBAL: CARMA2_HW 0x0058f7f0
 tPolyhedron_edge_indexes gPhysics_box_edges_58f7f0[12] = { { 0, 1 }, { 2, 3 }, { 4, 5 }, { 6, 7 }, { 0, 2 }, { 1, 3 }, { 4, 6 }, { 5, 7 }, { 0, 4 }, { 1, 5 }, { 2, 6 }, { 3, 7 } };
 
@@ -89,7 +88,6 @@ static void C2_HOOK_FASTCALL PhysicsCopyWord(void* output, const void* input) {
     memcpy(output, (const void*)&value, sizeof(value));
 }
 
-/* The original memory-operand subtraction selects distinct NaNs by x87 rules. */
 static void C2_HOOK_FASTCALL PhysicsSubtractScalar(br_scalar* output, const br_scalar* a, const br_scalar* b) {
     *output = (br_scalar)((double)*a - *b);
 }
@@ -428,8 +426,6 @@ int C2_HOOK_FASTCALL GetSphereToEdgePoints(tPhysics_object* pObject, tCollision_
 
 // GetSphereToFacePoints
 
-/* Original0x423ed0: ECX object, EDX unused shape, RET20. Third stack word
- * is remaining capacity, not existing contact count; Ghidra mislabels it. */
 // FUNCTION: CARMA2_HW 0x00423ed0
 int C2_HOOK_FASTCALL GetCornerToFacePoints(tPhysics_object* pObject, tPhysics_shape* pUnused_shape, tPhysics_contact* pContacts, int pCount, int pCapacity, tPhysics_wall_workspace* pWorkspace, void* pUnused_argument) {
     br_matrix34* matrix = &pObject->transform_matrix;
@@ -605,7 +601,6 @@ int C2_HOOK_FASTCALL FUN_004236a0(tPhysics_object* object, tPhysics_shape* shape
     return count;
 }
 
-/* Traverse actual wall-face edges; original lexical name unknown. */
 // FUNCTION: CARMA2_HW 0x00424140
 int C2_HOOK_FASTCALL FUN_00424140(tPhysics_object* object, tPhysics_shape* shape, tPhysics_contact* contacts, int count, int unused_capacity, tPhysics_wall_workspace* workspace, void* unused) {
     br_actor* actor;
@@ -644,12 +639,8 @@ int C2_HOOK_FASTCALL FUN_00424140(tPhysics_object* object, tPhysics_shape* shape
     return count;
 }
 
-/* Complete moving wall-edge consumer; original lexical name unknown. */
 // FUNCTION: CARMA2_HW 0x00424270
 int C2_HOOK_FASTCALL FUN_00424270(br_vector3* start, br_vector3* end, tPhysics_object* object, tPhysics_shape* shape, tPhysics_contact* contacts, int count, tFace_ref* face, tPhysics_wall_workspace* workspace) {
-    /* Preserve the original private-buffer overlaps and initialize only slots
-     * explicitly initialized by the authentic body. Offset0x10 begins locals;
-     * offsets0..0xf describe saved registers and are not read here. */
     union {
         tU8 bytes[0x180];
         tU32 words[0x60];
@@ -790,7 +781,6 @@ int C2_HOOK_FASTCALL FUN_00424270(br_vector3* start, br_vector3* end, tPhysics_o
     return count;
 }
 
-/* Complete quadratic moving-edge contact; original lexical name unknown. */
 // FUNCTION: CARMA2_HW 0x00424990
 int C2_HOOK_FASTCALL FUN_00424990(const br_vector3* old_origin, const br_vector3* old_direction, const br_vector3* moving_origin, const br_vector3* moving_direction, const br_vector3* velocity, const br_vector3* direction_change, tPhysics_contact* output, int unused, tPhysics_object* object, tPhysics_object* other) {
     br_vector3 n0, n1, delta, normal, edge, origin, local, world, relative, previous_normal;
@@ -1081,7 +1071,6 @@ int C2_HOOK_FASTCALL FUN_00425630(const br_vector3* n0, const br_vector3* n1, co
 
 // SetUpWorkspace
 
-/* Complete wall-contact consumer; original lexical name unknown. */
 // FUNCTION: CARMA2_HW 0x004228b0
 int C2_HOOK_FASTCALL FUN_004228b0(tPhysics_object* object, tPhysics_contact* contacts, int initial_count) {
     union {
@@ -1274,7 +1263,6 @@ int C2_HOOK_FASTCALL FUN_004228b0(tPhysics_object* object, tPhysics_contact* con
 
 // TestForObjectInSensiblePlace
 
-/* Original x87 operand order preserves the tested distinct NaN payloads. */
 static br_scalar C2_HOOK_FASTCALL PhysicsObjectEnergy(tPhysics_object* object) {
     br_scalar energy;
     double total = 0.;
@@ -1311,7 +1299,6 @@ br_scalar C2_HOOK_FASTCALL HierarchyCalcEnergy(tPhysics_object* pObject) {
 
 // CheckCollisionList
 
-/* MSVC5 can return the pre-spill ST0 value from a scalar-return C helper. */
 static double C2_HOOK_CDECL PhysicsJointScalar(double pValue) {
     br_scalar scalar;
     double rounded;
@@ -1342,7 +1329,6 @@ static void C2_HOOK_CDECL PhysicsJointVelocityA(br_scalar* pOutput, const tPhysi
     *pOutput = (br_scalar)PhysicsJointScalar(-value);
 }
 
-/* FADD32 keeps the original tie-breaking between opposite-sign NaNs. */
 static void C2_HOOK_CDECL PhysicsJointAddVelocity(br_scalar* pOutput, double pValue) {
     *pOutput = (br_scalar)(pValue + *pOutput);
 }
@@ -1393,7 +1379,6 @@ void C2_HOOK_FASTCALL MakeJointVelocitiesVector(br_scalar* pOutput, tPhysics_joi
 
 // SkipForces
 
-/* Complete force-group foundation; original lexical names unknown. */
 
 typedef struct tForce_group_container {
     int count;
@@ -1429,9 +1414,6 @@ static tPhysics_object** C2_HOOK_CDECL GroupReducedSlot(tPhysics_object* object)
     return (tPhysics_object**)((tU8*)object + 0x234);
 }
 
-/* A nonempty child list makes its final slot an object field, never this
- * temporary head. Keep the temporary's address opaque to GCC's local-return
- * heuristic; the original returns the recursively produced slot verbatim. */
 #if defined(__GNUC__)
 __attribute__((noinline))
 #endif
@@ -1440,7 +1422,6 @@ GroupTemporaryHead(tPhysics_object** head) {
     return head;
 }
 
-/* Original ECX object / stack float / RET4; EDX is not consumed. */
 // FUNCTION: CARMA2_HW 0x004bc8e0
 void C2_HOOK_FAKE_THISCALL FUN_004bc8e0(tPhysics_object* object, undefined4 unused, br_scalar factor) {
     double x, y, z, scale;
@@ -1673,11 +1654,7 @@ void C2_HOOK_FASTCALL CreateJointTorque(tPhysics_object* pObject, tPhysics_objec
 
 // PositionWorldJointedObject
 
-/* Complete hierarchy motion entries; original lexical names unknown. */
 
-/* Original calls push the time DWORD with MOV/PUSH. GNU's typed float
- * forwarding can instead FLD/FSTP it, quieting sNaNs before a raw-memory
- * multiply. These i386 call views preserve the actual three-DWORD ABI. */
 #if defined(__GNUC__) && defined(__i386__)
 static tU32 C2_HOOK_CDECL HierarchyTimeWord(const br_scalar* pTime) {
     tU32 word;
@@ -2287,7 +2264,6 @@ static const br_scalar* PartnerScalarPtr(const void* base, unsigned offset) {
     return (const br_scalar*)ForceBytes(base, offset);
 }
 
-/* Semantic name inferred from the original hinge response. */
 // FUNCTION: CARMA2_HW 0x004be550
 tPhysics_object* C2_HOOK_FASTCALL SetUpTorqueHingePartners(br_vector3* pAngular, br_vector3* pLinear, br_vector3* pPartner_angular, br_vector3* pPartner_linear, const br_vector3* pTorque, tPhysics_object* pObject) {
     br_scalar* angular = pAngular->v;
@@ -2454,7 +2430,6 @@ tPhysics_object* C2_HOOK_FASTCALL SetUpTorqueHingePartners(br_vector3* pAngular,
     return partner;
 }
 
-/* Semantic name inferred from the original hinge response. */
 // FUNCTION: CARMA2_HW 0x004becf0
 tPhysics_object* C2_HOOK_FASTCALL SetUpHingePartners(br_vector3* pAngular, br_vector3* pLinear, br_vector3* pPartner_angular, br_vector3* pPartner_linear, tPhysics_object* pObject) {
     br_scalar* angular = pAngular->v;
@@ -2629,7 +2604,6 @@ static double C2_HOOK_CDECL ForceMatrixScalar(double value) {
 #pragma auto_inline(on)
 #endif
 
-/* Source torque and force routes have different original sum and spill orders. */
 static double C2_HOOK_CDECL ForceMatrixResponse(const tPhysics_joint_force* row,
     int side, const br_vector3* angular, const br_vector3* linear, int source_torque, int row_torque) {
     const br_vector3* point;
@@ -2938,8 +2912,6 @@ static tPhysics_joint* C2_HOOK_CDECL ApplicationJoint(tPhysics_object* object, i
     return (tPhysics_joint*)ForcePointerAt(object, secondary ? 0x18c : 0x188);
 }
 
-/* Unlike CreateJointTorque, the inlined constructors reload the joint pointer
- * at each source load. Record storage may overlap the object's joint pointer. */
 static void C2_HOOK_CDECL ApplicationInlineTorque(tPhysics_object* object, tPhysics_object* root, tPhysics_joint_force* record, unsigned axis) {
     br_vector3 world;
     int i;
@@ -3192,9 +3164,6 @@ static const double VelocityConstant58a838 = -0.1;
 static const double VelocityConstant58a840 = 0.0099;
 // FUNCTION: CARMA2_HW 0x004c0430
 int C2_HOOK_FASTCALL MakeVelocitiesVector2(br_scalar* pOutput, tPhysics_joint_force* const* pForces, int pCapacity, int pCount) {
-    /* The public pointers describe the real ABI. Raw word cursors preserve
-     * output/pointer-array aliases and opaque field_0/field_10 scalar reads;
-     * every original pointer-array reload remains. */
     tU32* output_words = (tU32*)pOutput;
     tU32* force_words = (tU32*)pForces;
     int capacity = pCapacity;
@@ -3414,10 +3383,6 @@ static void C2_HOOK_CDECL FrictionFlag(void* object, unsigned flag) {
     tU8* field = (tU8*)object + 0x1dd;
     *field = (tU8)(*field | flag);
 }
-/* Paired signaling/quiet NaN fixtures show that promoting both operands
- * changes original raw-memory selection. Keep only these scalar operand
- * forms x87; complete consumer control flow and accumulation stay readable C.
- */
 static const br_scalar* C2_HOOK_CDECL FrictionAt(const void* base, unsigned offset) {
     return (const br_scalar*)((const tU8*)base + offset);
 }
@@ -3754,7 +3719,6 @@ static void C2_HOOK_CDECL RestSetByte(tPhysics_object* object, unsigned offset, 
     *((tU8*)object + offset) = value;
 }
 
-/* Complete original post-friction rest-state pass. Numeric name retained. */
 // FUNCTION: CARMA2_HW 0x004baa00
 int C2_HOOK_FASTCALL FUN_004baa00(tPhysics_object* objects) {
     tPhysics_object* object = objects;
@@ -3979,7 +3943,6 @@ void C2_HOOK_FAKE_THISCALL TranslateObject(tPhysics_object* pObject, undefined4 
     if (joint->type == 5) {
         BrMatrix34ApplyV(&axis, &joint->hinge_axis, &pObject->transform_matrix);
         actor = object->actor;
-        /* Original FADDP first combines Z+Y, then adds X before the scalar spill. */
         before = (br_scalar)PhysicsJointScalar((double)actor->t.t.mat.m[3][2] * axis.v[2] + (double)actor->t.t.mat.m[3][1] * axis.v[1] + (double)actor->t.t.mat.m[3][0] * axis.v[0]);
         joint = object->physics_joint2;
         BrMatrix34ApplyP(&point, &joint->field_0x08, &actor->t.t.mat);
@@ -4083,7 +4046,6 @@ void C2_HOOK_FASTCALL WriteNewPositions(tPhysics_object* pObject) {
 
 // TrialPositionChildren
 
-/* The original stores all three differences before adding child translation. */
 static void C2_HOOK_CDECL PhysicsPositionChildrenAdjust(br_vector3* pParent_point, const br_vector3* pChild_point, br_vector3* pTranslation) {
     int i;
 
@@ -4136,13 +4098,11 @@ void C2_HOOK_FASTCALL PositionChildren(tPhysics_object* pObject) {
 
 // RQIterativeImprovement
 
-/* RQ arithmetic preserves the original scalar spills and NaN operand order. */
 static br_scalar C2_HOOK_CDECL RQScalar(double x) {
     br_scalar result = (br_scalar)x;
     return result;
 }
 
-/* The original diagnostic entry is a single RET. */
 // FUNCTION: CARMA2_HW 0x004c61e0
 void C2_HOOK_FASTCALL FUN_004c61e0(const char* ignored) {
     (void)ignored;
@@ -4177,15 +4137,6 @@ int C2_HOOK_FASTCALL FUN_004c3b60(br_scalar* original, br_scalar* rhs, br_scalar
     int i, j, k, last, chosen, boundary, bit, repeated, refine;
     unsigned char selected;
 
-    /* Original entry S reserves 0x8e4 and saves four registers.
-     * Its negative slot at final ESP+0x2c is S-0x8c8, while &result
-     * is S+4. Capture before C locals/dependency calls can reuse it.
-     * Its first nonsingular pass initializes the slot. Earlier singular
-     * passes can reach the iteration limit using the incoming stack value.
-     * In CDECL builds two register arguments become stack arguments; the
-     * original slot is therefore 0x8c0 below the incoming return address.
-     */
-    /* Other architectures have no original x86 stack-history contract. */
     negative = -1;
 
     (void)unused1;
@@ -4411,7 +4362,6 @@ int C2_HOOK_FASTCALL FUN_004c3b60(br_scalar* original, br_scalar* rhs, br_scalar
                             }
                         }
                     }
-                    /* Original refinement changes only private forces. */
                     return 0;
                 }
                 selected = excluded[chosen];
@@ -4536,7 +4486,6 @@ void C2_HOOK_FASTCALL RQExpand(br_scalar* matrix, const br_scalar* original, int
         }
     }
 
-    /* Factor the new rows with the original fixed matrix stride. */
     for (i = old_size; i < size; i++) {
         maximum_scalar = 0.0f;
         for (k = i; k < size; k++) {
@@ -4594,9 +4543,7 @@ void C2_HOOK_FASTCALL RQExpand(br_scalar* matrix, const br_scalar* original, int
 void C2_HOOK_FASTCALL RQSingleExpand(br_scalar* matrix, const br_scalar* original, int size, br_scalar* orthogonal, const unsigned char* indices) {
     br_scalar row[100];
     br_scalar magnitude, second, second_coefficient, first_coefficient;
-    /* The original reloads the rounded head for its coefficient division. */
     br_scalar first;
-    /* Keep FABS after sqrt: GCC otherwise drops it even for negative NaNs. */
     double root;
     br_scalar updated_row, updated_matrix;
     double sum, maximum, diagonal, length, head, denominator;
@@ -4658,9 +4605,6 @@ void C2_HOOK_FASTCALL RQSingleExpand(br_scalar* matrix, const br_scalar* origina
     memcpy(&matrix[size * 101], &row[size], sizeof(br_scalar));
 }
 
-/* Semantic name inferred from the complete original 0x004c5220 entry.
- * Cached records expose a count at0, Q pointer at0x14 and R pointer at0x18;
- * the rest of their layout is not required or inferred here. */
 // FUNCTION: CARMA2_HW 0x004c5220
 void C2_HOOK_FASTCALL RQFromCachedGroups(br_scalar* matrix, br_scalar* orthogonal, const br_scalar* original, br_scalar* result, const br_scalar* rhs, const unsigned char* indices, int size, const void* const* cached_groups, int group_count) {
     int total, group, count, i, j, k;
@@ -5212,7 +5156,6 @@ void C2_HOOK_FASTCALL DoPhysicsError(tPhysicsError pError, const char* pMessage)
         break;
     case ePhysicsError_UnknownHingeType:
         strcpy(s, "Unknown hinge type");
-        /* The original overwrites this message with the code. */
         /* fall through */
     default:
         sprintf(s, "%d ", pError);
@@ -5306,7 +5249,6 @@ static tU8* C2_HOOK_CDECL LimitRow(const tPhysics_object* object, unsigned joint
 static tU8* C2_HOOK_CDECL LimitRecord(tPhysics_joint_force* records, int index) {
     return (tU8*)(uintptr_t)((tU32)(uintptr_t)records + 96u * (tU32)index);
 }
-/* The arguments preserve original product and accumulation ordering. */
 static double C2_HOOK_CDECL LimitDot(const void* a, unsigned ax, const void* b, unsigned bx, unsigned i, unsigned j, unsigned k) {
     double first = ((double)*(LimitScalarAt(a, ax + 4 * i)) * (double)*(LimitScalarAt(b, bx + 4 * i)));
     double second = ((double)*(LimitScalarAt(a, ax + 4 * j)) * (double)*(LimitScalarAt(b, bx + 4 * j)));
@@ -5319,7 +5261,6 @@ static double C2_HOOK_CDECL LimitCross(br_vector3* out, const void* axis, unsign
     FrictionWrite(out, 4, ((((double)*(LimitScalarAt(axis, offset)) * (double)*(LimitScalarAt(vector, 8)))) - (((double)*(LimitScalarAt(axis, offset + 8)) * (double)*(LimitScalarAt(vector, 0))))));
     z = ((((double)*(LimitScalarAt(axis, offset + 4)) * (double)*(LimitScalarAt(vector, 0)))) - (((double)*(LimitScalarAt(axis, offset)) * (double)*(LimitScalarAt(vector, 4)))));
     FrictionWrite(out, 8, z);
-    /* Original keeps z wide while its FST scalar copy feeds the last product. */
     length = ((((((double)*(LimitScalarAt(out, 0)) * (double)*(LimitScalarAt(out, 0)))) + (((double)*(LimitScalarAt(out, 4)) * (double)*(LimitScalarAt(out, 4)))))) + z * out->v[2]);
     return sqrt(length);
 }
@@ -5365,7 +5306,6 @@ void C2_HOOK_FASTCALL FUN_004bd4f0(const br_matrix34* child_matrix, const br_mat
     BrMatrix34TApplyV(reflected, &intermediate, parent_matrix);
     dot = LimitDot(bisector, 0, reflected, 0, 0, 2, 1);
     twice_dot = FrictionScalar(dot + dot);
-    /* The original spills each of the first reflection's products independently. */
     reflected_y = reflected->v[1];
     reflected_z = reflected->v[2];
     x = ((double)twice_dot * (double)*(LimitScalarAt(bisector, 0)));
@@ -5492,7 +5432,6 @@ int C2_HOOK_FASTCALL FUN_004bca10(tPhysics_object* object, tPhysics_joint_force*
                     wide = LimitDot(row, 0x88, &predicted, 0, 2, 1, 0);
                     predicted_dot = FrictionScalar(wide);
                     if (wide > (*(const br_scalar*)((const tU8*)row + 0x58))) {
-                        /* Original cross: predicted x current, stored componentwise. */
                         FrictionWrite(&cross, 0, ((((double)*(LimitScalarAt(&predicted, 8)) * (double)*(LimitScalarAt(&current, 4)))) - (((double)*(LimitScalarAt(&predicted, 4)) * (double)*(LimitScalarAt(&current, 8))))));
                         FrictionWrite(&cross, 4, ((((double)*(LimitScalarAt(&predicted, 0)) * (double)*(LimitScalarAt(&current, 8)))) - (((double)*(LimitScalarAt(&predicted, 8)) * (double)*(LimitScalarAt(&current, 0))))));
                         FrictionWrite(&cross, 8, ((((double)*(LimitScalarAt(&predicted, 4)) * (double)*(LimitScalarAt(&current, 0)))) - (((double)*(LimitScalarAt(&predicted, 0)) * (double)*(LimitScalarAt(&current, 4))))));
@@ -5523,8 +5462,6 @@ int C2_HOOK_FASTCALL FUN_004bca10(tPhysics_object* object, tPhysics_joint_force*
     joint = FrictionPointer(object, 0x18c);
     row_index = 0;
     row_offset = 0;
-    /* Only the entry guard checks NULL. Original post-write reload reads the
-     * new joint count unconditionally, including the authentic alias fault. */
     if (joint != NULL) {
         while (row_index < (int)(*(const tU32*)((const tU8*)joint + 0x50))) {
             row = joint + row_offset;
@@ -5548,7 +5485,6 @@ int C2_HOOK_FASTCALL FUN_004bca10(tPhysics_object* object, tPhysics_joint_force*
                         FrictionWrite(record, 0x3c, (*(const br_scalar*)((const tU8*)(&cross) + 4)) / length);
                         FrictionWrite(record, 0x40, (*(const br_scalar*)((const tU8*)(&cross) + 8)) / length);
                     }
-                    /* Original writes this slot without increasing count. */
                 }
             } else if (kind == 10) {
                 if (*(tU8*)((tU8*)object + 0x1e0)) {
@@ -5655,8 +5591,6 @@ int C2_HOOK_FASTCALL FUN_004bd6d0(tPhysics_object* list, tPhysics_joint_force* r
     return count;
 }
 
-/* Both original inline passes execute even though their accumulated energy
- * is not consumed. Keep the reads, child calls and scalar accumulation. */
 static void C2_HOOK_CDECL JointedMotionEnergyPass(tPhysics_object* first) {
     br_scalar total = 0.f;
     br_scalar energy;
@@ -5688,8 +5622,6 @@ static void C2_HOOK_CDECL JointedMotionEnergyPass(tPhysics_object* first) {
     }
 }
 
-/* Reuse the proven original raw-time forwarding rule for this parent.
- * Integration must share the existing GNU-only helper/type declarations. */
 #if defined(__GNUC__) && defined(__i386__)
 #define JOINTED_MOTION(function_name, object, time)                                 \
     do {                                                                            \
@@ -5767,7 +5699,6 @@ void C2_HOOK_FAKE_THISCALL MoveJointedObject(tPhysics_object* pObject, undefined
 
 #undef JOINTED_MOTION
 
-/* Original clears the published container before invoking time-zero setup. */
 // FUNCTION: CARMA2_HW 0x004b9750
 void C2_HOOK_FASTCALL FUN_004b9750(tPhysics_object* object) {
     void* empty = NULL;
@@ -5800,8 +5731,6 @@ void C2_HOOK_FASTCALL FUN_004c25a0(tPhysics_object* pObject) {
     }
 }
 
-/* Original __ftol truncates with FISTP qword. An invalid conversion writes
- * integer-indefinite, whose low 16 bits (the BRender angle) are zero. */
 static br_angle C2_HOOK_CDECL AngularForceAngle(double pValue) {
     if (pValue >= -9223372036854775808.0 && pValue < 9223372036854775808.0) {
         return (br_angle)(br_int_64)pValue;
@@ -5860,7 +5789,6 @@ static int C2_HOOK_CDECL AngularForceNextIndex(const tPhysics_joint_force* pReco
     return (int)index;
 }
 
-/* ECX record pointer array, EDX impulses, count/callbacks on the stack; RET8. */
 // FUNCTION: CARMA2_HW 0x004bc190
 void C2_HOOK_FASTCALL FUN_004bc190(tPhysics_joint_force* const* pForces, br_scalar* pImpulses, int pCount, tWorld_callbacks* pCallbacks) {
     tPhysics_joint_force* const* forces = pForces;
@@ -6109,8 +6037,6 @@ void C2_HOOK_FASTCALL FUN_004bddd0(tPhysics_object* object, tPhysics_object* oth
     }
 }
 
-/* Exact qword epsilon58a798=0.01. Reject only ordered greater; unordered
- * differences pass, exactly original TEST AH,41 / JE reject. */
 static int C2_HOOK_CDECL WakeBounds(const tPhysics_object* a, const tPhysics_object* b) {
     unsigned i;
     for (i = 0; i < 3; i++)
@@ -6133,8 +6059,6 @@ static tPhysics_object* C2_HOOK_CDECL WakeAncestor(tPhysics_object* object) {
     }
     return object;
 }
-/* Only call sites with a genuine child/joint enter this routine. Motion and
- * descendant wake execute their actual published bodies; no substitute. */
 static void C2_HOOK_CDECL WakeDescendants(tPhysics_object* object) {
     tPhysics_object* child;
     if (WakePointer(object, 0x218) == NULL)
@@ -6245,8 +6169,6 @@ int C2_HOOK_FASTCALL CheckForObjectHierachyTouchingAnotherObject(tPhysics_object
     tPhysics_object* child;
     tU32 face;
 
-    /* Original ordered-greater rejects; equality and unordered overlap.
-     * Failure is the only EAX0 return, before any wake-state mutation. */
     if (!WakeBounds(object, other)) {
         return 0;
     }
@@ -6314,7 +6236,6 @@ void C2_HOOK_FASTCALL InternalPrepareObject(tPhysics_object* object) {
     br_scalar zero = 0.f;
     int row, lane, same;
 
-    /* Original TEST AH,40 treats zero and unordered mass alike. */
     if ((PhysicsScalarNaN((PrepareScalarPointer(object, 4))) || PhysicsScalarNaN(&zero) || (double)*(PrepareScalarPointer(object, 4)) == (double)zero)) {
         PrepareWriteWord(object, 4, 0x3c23d70a);
         BrVector3SetFloat((br_vector3*)((tU8*)object + 8), .01f, .01f, .01f);
@@ -6481,7 +6402,6 @@ void C2_HOOK_FASTCALL PrepareObject(tPhysics_object* object, tPhysics_object** l
     }
     if (gPhysics_stationary_filter_6940ac != 0) {
         disabled = PrepareByte(object, 0xec);
-        /* The original dereferences list_head even for an active object. */
         original_list = PreparePointer(list_head, 0);
         if (disabled != 0) {
             root = WakeAncestor(object);
@@ -6594,9 +6514,6 @@ static br_angle C2_HOOK_CDECL AngularForceAngle(double value);
 typedef void(C2_HOOK_FAKE_THISCALL* tInterpolation_scalar_call)(tPhysics_object*, undefined4, br_scalar);
 typedef void(C2_HOOK_FAKE_THISCALL* tInterpolation_word_call)(tPhysics_object*, undefined4, tU32);
 
-/* The original internal calls MOV/PUSH the scalar stack word. GCC instead
- * quiets a signaling NaN while forwarding a typed float argument. These exact
- * supported 32-bit ABI views differ only in the representation of that word. */
 static void C2_HOOK_CDECL InterpolationForward(tInterpolation_scalar_call target, tPhysics_object* object, undefined4 unused_edx, const br_scalar* time) {
     tInterpolation_word_call function;
     tU32 bits;
@@ -6759,8 +6676,6 @@ void C2_HOOK_FASTCALL FUN_004c62e0(tPhysics_object* object, const br_matrix34* m
     }
     if (child != NULL) {
         BrMatrix34LPInverse(&inverse, transform);
-        /* Original overwrites the selected local normalized matrix here.
-         * With an external matrix this full computation remains unused. */
         BrMatrix34Mul(&working, &inverse, ListMatrixActor(object));
         while (child != NULL) {
             FUN_004c62e0(child, selected);
@@ -6783,8 +6698,6 @@ static double C2_HOOK_CDECL CollisionBoundsSquared(const void* bounds, unsigned 
     br_scalar maximum_scalar = (br_scalar)PhysicsJointScalar(maximum);
     double square_maximum = PhysicsJointScalar((double)maximum * maximum_scalar);
 
-    /* The original compares the wide minimum square against a scalar32
-     * maximum square, and selects the latter on equality or unordered. */
     if (!PhysicsWallNaN(square_minimum) && !PhysicsWallNaN(square_maximum) && square_minimum > square_maximum) {
         return square_minimum;
     }
@@ -6881,7 +6794,7 @@ void C2_HOOK_FASTCALL FUN_004c2910(tPhysics_object* object) {
 
 // FUNCTION: CARMA2_HW 0x004c2c90
 void C2_HOOK_FASTCALL FUN_004c2c90(tPhysics_object* object, const br_vector3* damping) {
-    const br_scalar factor = 0.02100399136543274f; /* original58a8b0 */
+    const br_scalar factor = 0.02100399136543274f;
     double scaled_x = (double)damping->v[0] * factor;
     double inertia_x = object->I.v[0];
     double input_y = damping->v[1];
@@ -6893,8 +6806,6 @@ void C2_HOOK_FASTCALL FUN_004c2c90(tPhysics_object* object, const br_vector3* da
     double new_y, new_z, sign_x;
     br_scalar numerator_y, rounded_z;
 
-    /* Original raw MOV snapshots are ordered before any public omega store.
-     * The retained modern-MSVC page-fault probes reject memcpy load order. */
     old_bits[0] = (*(const tU32*)((const tU8*)object + 0x74));
     old_bits[1] = (*(const tU32*)((const tU8*)object + 0x78));
     old_bits[2] = (*(const tU32*)((const tU8*)object + 0x7c));
@@ -6949,7 +6860,7 @@ void C2_HOOK_FASTCALL FUN_004c2970(tPhysics_object* list) {
 
 // FUNCTION: CARMA2_HW 0x004c2c30
 void C2_HOOK_FASTCALL FUN_004c2c30(tPhysics_object* object, const br_vector3* delta) {
-    const br_scalar scale = 0.02100399136543274f; /* Original 0x3cac1090. */
+    const br_scalar scale = 0.02100399136543274f;
     double y = delta->v[1];
     double z = delta->v[2];
     double x = delta->v[0];
@@ -6964,8 +6875,6 @@ void C2_HOOK_FASTCALL FUN_004c2c30(tPhysics_object* object, const br_vector3* de
     iz = object->I.v[2];
     y_scalar = (br_scalar)PhysicsJointScalar(y);
     y = (double)y_scalar / iy;
-    /* Both operands have passed through FLD. The original register division
-     * selects the same quiet NaN as the existing x87 sum helper. */
     z = PhysicsWallNaN(z) && PhysicsWallNaN(iz) ? (z + iz) : z / iz;
     x = PhysicsWallNaN(x) && PhysicsWallNaN(ix) ? (x + ix) : x / ix;
     y = (y + (double)*((const br_scalar*)((const tU8*)object + 0x78)));

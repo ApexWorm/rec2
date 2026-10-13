@@ -180,7 +180,6 @@ static float C2_HOOK_FASTCALL TrigArcTanAbs(float value) {
 
     memcpy(&bits, &value, sizeof(bits));
     bits &= 0x7fffffffu;
-    /* The original FABS/FST32 sequence also quiets signaling NaNs. */
     if ((bits & 0x7f800000u) == 0x7f800000u && (bits & 0x7fffffu) != 0) {
         bits |= 0x400000u;
     }
@@ -204,7 +203,6 @@ static double C2_HOOK_FASTCALL TrigArcTanRatio(float y, float x, float abs_y, fl
     return x_less_y ? 2.0 - (double)abs_x / abs_y : (double)abs_y / abs_x;
 }
 
-/* Preserve the original out-of-line calls from the scalar wrappers in MSVC5. */
 #if defined(_MSC_VER) && _MSC_VER < 1300
 #pragma auto_inline(off)
 #endif
@@ -219,7 +217,6 @@ double C2_HOOK_STDCALL FastFloatArcTan2(float pY, float pX) {
         }
         return pY > 0.f ? 90.0 : 0.0;
     }
-    /* Callers use the unspilled x87 PC53 result before rounding to a scalar. */
     return TrigArcTanRatio(pY, pX, abs_y, abs_x) * 45.0;
 }
 #if defined(_MSC_VER) && _MSC_VER < 1300

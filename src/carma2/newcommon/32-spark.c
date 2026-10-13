@@ -168,11 +168,9 @@ static int C2_HOOK_CDECL SplashReplayMoving(void) {
 
     rate = ARGetReplayRate();
     bits = SmokeScalarBits(&rate) & 0x7fffffffu;
-    /* Original FCOMP/TEST AH,40 treats unordered rates as paused. */
     return bits != 0 && bits <= 0x7f800000u;
 }
 
-/* These callers consume only the original _ftol result's low DWORD. */
 static tS32 C2_HOOK_CDECL SparkFtol(double pValue) {
     tU32 words[2];
 
@@ -222,7 +220,6 @@ int C2_HOOK_FASTCALL DrawLine3D(const br_vector3* pStart, const br_vector3* pEnd
         BrZbsSceneRenderAdd(gLine_actor);
         return 999;
     }
-    /* X is MOV-copied; the other original FLD/FSTP pairs quiet sNaNs. */
     memcpy(&start.v[0], &pStart->v[0], sizeof(br_scalar));
     start.v[1] = SmokeScalarRound(pStart->v[1]);
     start.v[2] = SmokeScalarRound(pStart->v[2]);
@@ -498,8 +495,6 @@ void C2_HOOK_FASTCALL RenderSparks(br_pixelmap* pScreen, br_pixelmap* pDepth, br
         spark = &gSpark[i];
         if (replay) {
             if (spark->car != NULL) {
-                /* The original first transforms this unwritten private endpoint,
-                 * then replaces it below. Preserve the call and its ordering. */
                 BrMatrix34ApplyP(&temp, &world_end, &spark->car->car_master_actor->t.t.mat);
                 memcpy(&world_end, &temp, sizeof(world_end));
                 BrMatrix34ApplyP(&world_pos, &spark->pos, &spark->car->car_master_actor->t.t.mat);
@@ -584,7 +579,6 @@ void C2_HOOK_FASTCALL RenderSparks(br_pixelmap* pScreen, br_pixelmap* pDepth, br
             spark->v.v[2] = SmokeScalarRound(new_z);
             float_time = SmokeScalarRound((double)pTime);
             damping = 1.0 - sqrt(((double)spark->v.v[0] * spark->v.v[0] + (double)spark->v.v[1] * spark->v.v[1]) + new_z * spark->v.v[2]) * .7142857313156128f * float_time * .001f;
-            /* The original AH bit test also clamps unordered results. */
             if (!(damping >= .1f)) {
                 damping = .1f;
             }
@@ -926,7 +920,6 @@ int C2_HOOK_CDECL CmpSmokeZ(const void* p1, const void* p2) {
 
     a = *(tBRender_smoke* const*)p1;
     b = *(tBRender_smoke* const*)p2;
-    /* The original x87 comparison also orders unordered values first. */
     if (!(a->pos.v[2] >= b->pos.v[2])) {
         return -1;
     }
@@ -1000,7 +993,6 @@ void C2_HOOK_FASTCALL InitSmokeStuff(void) {
         gBR_smoke_structs[i].material->colour_map = map;
         BrMaterialAdd(gBR_smoke_structs[i].material);
     }
-    /* Round once after the original x87 division and subtraction. */
     BrVector2Set(&gBlend_model->vertices[0].map, 0.f, (br_scalar)(1.0 - 1.0 / map->height));
     BrVector2Set(&gBlend_model->vertices[1].map, 0.f, 0.f);
     BrVector2Set(&gBlend_model->vertices[2].map, (br_scalar)(1.0 - 1.0 / map->width), 0.f);
@@ -1030,11 +1022,9 @@ void C2_HOOK_FASTCALL RenderRecordedSmokeCircles(void) {
     for (i = gN_BR_smoke_structs - 1; i >= 0; i--) {
         smoke = gBR_smoke_pointers[i];
         BrVector3Copy(&gBlend_actor->t.t.translate.t, &smoke->pos);
-        /* The original copies this radius with MOV before dividing it. */
         memcpy(&gBlend_actor->t.t.mat.m[0][0], &smoke->r, sizeof(br_scalar));
         gBlend_actor->t.t.mat.m[1][1] = smoke->r / smoke->aspect;
         gBlend_actor->material = smoke->material;
-        /* Preserve extended multiplication and __ftol's low 32 result bits. */
         smoke->material->extra_prim[1].v.x = (br_fixed_ls)(br_int_64)((double)smoke->strength * 150.0 * 65536.0);
         BrMaterialUpdate(smoke->material, BR_MATU_EXTRA_PRIM);
         red = BR_RED(smoke->col);
@@ -1052,7 +1042,6 @@ void C2_HOOK_FASTCALL RenderRecordedSmokeCircles(void) {
     }
 }
 
-/* Force the original float spills even with MSVC5's x87 value reuse. */
 static br_scalar C2_HOOK_CDECL SmokeScalarRound(double pValue) {
     union {
         br_scalar scalar;
@@ -1068,7 +1057,6 @@ static br_scalar C2_HOOK_CDECL SmokeScalarRound(double pValue) {
     return result.scalar;
 }
 
-/* Preserve raw copied scalar bits across the originally inlined helper calls. */
 static tU32 C2_HOOK_CDECL SmokeScalarBits(const br_scalar* pValue) {
     tU32 bits;
 
@@ -1076,7 +1064,6 @@ static tU32 C2_HOOK_CDECL SmokeScalarBits(const br_scalar* pValue) {
     return bits;
 }
 
-/* These smoke drawing helpers were inlined in the original hardware build. */
 static void C2_HOOK_CDECL RecordSmokeCircle(br_vector3* pCent, tU32 pRadius_bits, tU32 pStrength_bits, br_colour pShade, tU32 pAspect_bits) {
     tBRender_smoke* smoke;
 
@@ -1279,12 +1266,10 @@ void C2_HOOK_FASTCALL RenderSmoke(br_pixelmap* pRender_screen, br_pixelmap* pDep
                 if ((gSmoke[i].type & 0xf) == 7) {
                     not_lonely |= 1u << i;
                 } else if ((not_lonely & (1u << i)) == 0) {
-                    /* The original optimized the self-position subtraction to zero. */
                     for (j = i + 1; j < (int)REC2_ASIZE(gSmoke); j++) {
                         if ((gSmoke_flags & (1u << j)) != 0) {
                             radius_sum = (double)gSmoke[i].radius + gSmoke[j].radius;
                             radius_squared.scalar = radius_sum * radius_sum;
-                            /* MSVC5 otherwise folds !<= into ordered > for NaNs. */
                             if (((radius_squared.words[1] & 0x7ff00000) == 0x7ff00000
                                     && ((radius_squared.words[1] & 0x000fffff) != 0 || radius_squared.words[0] != 0))
                                 || radius_squared.scalar > 0.f) {
@@ -1400,7 +1385,6 @@ void C2_HOOK_FASTCALL CreatePuffOfSmoke(br_vector3* pPos, br_vector3* pV, float 
     if (pStrength > 1.f) {
         strength_bits = 0x3f800000;
     }
-    /* The original x87 load/store quiets signaling NaNs, retaining sign/payload. */
     if ((strength_bits & 0x7fc00000) == 0x7f800000 && (strength_bits & 0x003fffff) != 0) {
         strength_bits |= 0x00400000;
     }
@@ -1442,7 +1426,6 @@ void C2_HOOK_FASTCALL AdjustSmokeColumn(int pIndex, const tSmoke_column_core* pC
     bit = 1u << (pIndex & 31);
     gColumn_flags ^= bit;
     column = &gSmoke_column[pIndex];
-    /* Four separate MOVs preserve the original forward overlap ordering. */
     column->core.field_0x0 = pCore->field_0x0;
     column->core.car = pCore->car;
     column->core.collision_info = pCore->collision_info;
@@ -1609,7 +1592,6 @@ void C2_HOOK_FASTCALL AdjustFlame(int pIndex, int pFrame, br_scalar pScale_x, br
     dest[2] = &column->offset_x[flame];
     dest[3] = &column->offset_z[flame];
     for (i = 0; i < 4; i++) {
-        /* Original FLD/FSTP stores quiet sNaNs, preserving sign and payload. */
         if ((bits[i] & 0x7fc00000u) == 0x7f800000u && (bits[i] & 0x003fffffu) != 0) {
             bits[i] |= 0x00400000u;
         }
@@ -1758,8 +1740,6 @@ void C2_HOOK_FASTCALL DoSmokeColumn(int pColumn, tU32 pTime, br_vector3* pRet_ca
         }
     }
     if (column->core.field_0x0 == 1 && gProgram_state.cockpit_on && column->core.car != NULL && column->core.car->driver == 8) {
-        /* MSVC5's inverse branch for a mixed-width > admits unordered values;
-         * the original FCOM/test 0x41 sends them to the subtraction branch. */
         if ((SmokeScalarBits(&column->core.car->driver_z_offset) & 0x7fffffffu) <= 0x7f800000u
             && (SmokeScalarBits(&pRet_car_pos->v[2]) & 0x7fffffffu) <= 0x7f800000u
             && (double)column->core.car->driver_z_offset - (-.2) > pRet_car_pos->v[2]) {
@@ -1993,7 +1973,6 @@ void C2_HOOK_FASTCALL InitSplash(FILE* pF) {
         gNum_splash_types = 0;
         for (i = 0; i < count; i++) {
             GetAString(pF, name);
-            /* Preserve the original private path call and subsequent overwrite. */
             PathCat(path, path, name);
             strcpy(path, name);
             loaded = LoadTextureTryAllLocations(path, &maps[gNum_splash_types], (int)(20u - (tU32)gNum_splash_types));
@@ -2253,8 +2232,6 @@ void C2_HOOK_FASTCALL SingleSplash(tPhysics_object* pObject, const br_matrix34* 
 #if _MSC_VER >= 1300
 #pragma warning(push)
 #endif
-/* The original copies the unwritten private minimum point before assigning
- * its first candidate. Keep that stack-history copy; do not initialize it. */
 #pragma warning(disable : 4700)
 #endif
 // FUNCTION: CARMA2_HW 0x004fcbb0
@@ -2262,7 +2239,6 @@ void C2_HOOK_FASTCALL GeneralCreateSplash(tPhysics_object* pObject, const br_vec
     br_vector3 local_normal;
     br_vector3 world_min;
     br_vector3 local_velocity;
-    /* Original spills this projection, but passes local_velocity below. */
     br_vector3 normal_velocity;
     br_vector3 point;
     br_vector3 minimum_point;
@@ -2482,7 +2458,6 @@ void C2_HOOK_FASTCALL GetVelocitiesFromMatrices(br_vector3* pVelocity, br_vector
     for (i = 0; i < 3; i++) {
         pVelocity->v[i] = SmokeScalarRound((double)pVelocity->v[i] / interval);
     }
-    /* Both original calls deliberately read the current matrix. */
     BrMatrix34ToQuat(&current, pMatrix);
     BrMatrix34ToQuat(&next, pMatrix);
     BrQuatInvert(&current, &current);

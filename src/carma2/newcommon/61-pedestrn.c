@@ -445,7 +445,7 @@ void C2_HOOK_FASTCALL SetZombiePedFolderNames(void) {
     ConfigureZombiePedSoundPath();
     ConfigureZombiePedPowerupTxtPath();
     ConfigureZombiePedTextTxtPath();
-    ConfigureZombiePedTexturePath(); /* genuine final tail edge */
+    ConfigureZombiePedTexturePath();
 }
 
 // FUNCTION: CARMA2_HW 0x004d6f30
@@ -454,7 +454,7 @@ void C2_HOOK_FASTCALL SetBloodPedFolderNames(void) {
     ConfigureBloodPedSoundPath();
     ConfigureBloodPedPowerupTxtPath();
     ConfigureBloodPedTextTxtPath();
-    ConfigureBloodPedTexturePath(); /* genuine final tail edge */
+    ConfigureBloodPedTexturePath();
 }
 
 // FUNCTION: CARMA2_HW 0x004d6f70
@@ -463,7 +463,7 @@ void C2_HOOK_FASTCALL SetAlienPedFolderNames(void) {
     ConfigureAlienPedSoundPath();
     ConfigureAlienPedPowerupTxtPath();
     ConfigureAlienPedTextTxtPath();
-    ConfigureAlienPedTexturePath(); /* genuine final tail edge */
+    ConfigureAlienPedTexturePath();
 }
 
 // AddChangedPoint

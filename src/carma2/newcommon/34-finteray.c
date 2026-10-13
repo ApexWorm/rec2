@@ -39,8 +39,6 @@ int gNearest_face_group;
 // GLOBAL: CARMA2_HW 0x00686198
 br_matrix34 gPick_model_to_view__finteray;
 
-/* Original x87 scalar stores are rounding points even when GCC retains
- * float expressions in registers. Keep those stores explicit at PC53. */
 static float C2_HOOK_FASTCALL FinterayScalar(double value) {
     float scalar = (float)value;
 
@@ -57,8 +55,6 @@ static br_scalar C2_HOOK_FASTCALL FinterayEdgeScalar(double value) {
     br_uint_32 bits;
     br_uint_32 stored;
 
-    /* VC5 otherwise returns the unrounded ST0 value after FST scalar and
-     * reuses it for the next product. The original reloads that float slot. */
     memcpy(&bits, &scalar, sizeof(bits));
     stored = bits;
     bits = stored;
@@ -973,14 +969,12 @@ static void C2_HOOK_FASTCALL FinterayBoxCopyScalar(br_scalar* output, const br_s
     memcpy(output, &value, sizeof(value));
 }
 
-/* Unlike raw vector copies, the original equation-D load/store quiets sNaNs. */
 static void C2_HOOK_FASTCALL FinterayBoxStoreScalar(br_scalar* output, const br_scalar* input) {
     double value = *input;
 
     *output = (br_scalar)value;
 }
 
-/* The original six clipping passes are inlined inside ModelPickBox. */
 static int C2_HOOK_FASTCALL FinterayBoxClip(br_vector3* polygon, int count, int axis, br_scalar limit, int upper) {
     br_vector3 clipped[12];
     int previous = count - 1;
@@ -1155,7 +1149,6 @@ int C2_HOOK_FASTCALL ModelPickBox(br_actor* actor, tBounds* bnds, br_model* mode
     return max_face;
 }
 
-/* Original fast actor rejection is inlined, with X/Z/Y evaluation order. */
 static int C2_HOOK_FASTCALL FinterayBoxBoundsTransform(br_bounds* input, br_bounds* target, br_matrix34* matrix) {
     br_vector3 width;
     int order[3] = { 0, 2, 1 };

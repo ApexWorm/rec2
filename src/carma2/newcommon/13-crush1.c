@@ -637,7 +637,6 @@ void C2_HOOK_FASTCALL CompletelyUnBendCollisionShape(tCar_crush_shape_info* pSha
     }
     i = 0;
     do {
-        /* Original reloads the array pointer after each raw coordinate store. */
         points = live->field_0x18;
         memcpy(&bits, &points[i].field_0x2c.v[0], sizeof(bits));
         memcpy(&points[i].field_0x18.v[0], &bits, sizeof(bits));

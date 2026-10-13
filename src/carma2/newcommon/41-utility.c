@@ -877,7 +877,6 @@ void C2_HOOK_FASTCALL PossibleService(void) {
     }
 }
 
-/* Original PC53 grouping, NaN operands and sequential writes require x87 here. */
 // FUNCTION: CARMA2_HW 0x00515610
 void C2_HOOK_FASTCALL DRMatrix34TApplyP(br_vector3* pA, const br_vector3* pB, const br_matrix34* pC) {
     br_scalar t1;
@@ -1758,7 +1757,6 @@ tU32 C2_HOOK_FASTCALL FudgeBRenderIntoTheNinetiesWithSomeProperFuckingColourSupp
     case BR_PMT_RGBA_8888:
         return (((((alp << 8) | red) << 8) | grn) << 8) | blu;
     case BR_PMT_RGBA_4444:
-        /* The original masks AL only, retaining the upper alpha bits. */
         return ((((alp & 0xfffffff0u) << 4) | (red & 0xfffffff0u)) << 4) | (blu >> 4) | (grn & 0xfffffff0u);
     case BR_PMT_ARGB_1555:
         colour = ((alp & 0xffffff80u) << 1) | (red & 0xf8);
