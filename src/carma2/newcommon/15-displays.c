@@ -83,6 +83,8 @@ tHud_message gHud_messages[46];
 // GLOBAL: CARMA2_HW 0x00655e54
 int gHeadup_detail_level = 5;
 
+// LoadHeadupMessageFile
+
 // FUNCTION: CARMA2_HW 0x00449090
 void C2_HOOK_FASTCALL InitHeadups(void) {
     int i;

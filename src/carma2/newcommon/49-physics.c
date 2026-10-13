@@ -1377,6 +1377,8 @@ void C2_HOOK_FASTCALL MakeJointVelocitiesVector(br_scalar* pOutput, tPhysics_joi
 
 // ApplySingleForce
 
+// ApplyJointForces
+
 // SkipForces
 
 typedef struct tForce_group_container {
@@ -5051,6 +5053,10 @@ void C2_HOOK_FASTCALL FUN_004c6410(tPhysics_object* object) {
     ((tPhysics_object*)object)->parent = NULL;
     ((tPhysics_object*)object)->next = NULL;
 }
+
+// PhysicsAddObjectList
+
+// PhysicsRemoveObject
 
 // FUNCTION: CARMA2_HW 0x004c6470
 int C2_HOOK_FASTCALL PhysicsObjectRecurse(tPhysics_object* pObject, tEnumCollision_cbfn* pCallback, void* pContext) {

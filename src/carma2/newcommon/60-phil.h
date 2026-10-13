@@ -93,6 +93,10 @@ extern int C2_HOOK_FASTCALL FUN_004b62b0(tPhysics_object* object);
 
 extern int C2_HOOK_FASTCALL FUN_004b62e0(tPhysics_object* object, const br_matrix34* matrix, const br_vector3* velocity, const br_vector3* omega);
 
+// PHILAddObjectImmediately
+
+// PHILAddActiveObjectImmediately
+
 extern int C2_HOOK_CDECL PHILSetObjectProperty(tPhysics_object* pObject, int pProperty, ...);
 
 extern double C2_HOOK_FASTCALL PHILGetObjectProperty(tPhysics_object* pObject, int pProperty);

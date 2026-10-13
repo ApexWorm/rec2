@@ -30,6 +30,8 @@ extern br_pixelmap* gIcon_litBloc1;
 extern br_pixelmap* gIcon_grnBlock1;
 extern tHud_message gHud_messages[46];
 
+// LoadHeadupMessageFile
+
 extern void C2_HOOK_FASTCALL InitHeadups(void);
 
 // ClearHeadup

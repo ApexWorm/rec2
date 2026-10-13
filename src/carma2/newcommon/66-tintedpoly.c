@@ -649,6 +649,10 @@ void C2_HOOK_FASTCALL UpdatePulsePoly(int pIndex) {
     }
 }
 
+// ClearTheFlame
+
+// GetUniqueFileName
+
 // FUNCTION: CARMA2_HW 0x004d86e0
 void C2_HOOK_FASTCALL UpdateFirePoly(int pIndex) {
     int i;

@@ -526,6 +526,10 @@ int C2_HOOK_FASTCALL FUN_004b62e0(tPhysics_object* object, const br_matrix34* ma
     return result;
 }
 
+// PHILAddObjectImmediately
+
+// PHILAddActiveObjectImmediately
+
 // FUNCTION: CARMA2_HW 0x004b63b0
 int C2_HOOK_CDECL PHILSetObjectProperty(tPhysics_object* pObject, int pProperty, ...) {
     tPHIL_queued_header* info;

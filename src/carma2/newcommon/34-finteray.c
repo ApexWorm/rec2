@@ -116,6 +116,10 @@ int C2_HOOK_FASTCALL PickBoundsTestRay__finteray(br_bounds* b, br_vector3* rp, b
     return 1;
 }
 
+// BadDiv
+
+// DRVector2AccumulateScale
+
 // FUNCTION: CARMA2_HW 0x0045cb70
 int C2_HOOK_FASTCALL ActorRayPick2D(br_actor* ap, br_vector3* pPosition, br_vector3* pDir, br_model* model, br_material* material, dr_pick2d_cbfn* callback) {
     br_actor* a;
@@ -355,6 +359,8 @@ int C2_HOOK_CDECL FindHighestCallBack__finteray(br_actor* pActor, br_model* pMod
     DRModelPick2D__finteray(pModel, pMaterial, pActor, pRay_pos, pRay_dir, pT_near, pT_far, FindHighestPolyCallBack__finteray, pArg);
     return 0;
 }
+
+// DRSceneRayPick2D
 
 // FUNCTION: CARMA2_HW 0x0045ca60
 void C2_HOOK_FASTCALL ActorFindFace(br_vector3* pPosition, br_vector3* pDir, br_actor* pWorld, br_vector3* nor, br_scalar* t, br_material** material, br_actor** actor) {
