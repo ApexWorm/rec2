@@ -625,7 +625,7 @@ int C2_HOOK_FASTCALL IsOnNonCarHalf(tCar_spec* pCar, const br_vector3* pPos) {
 
 // FUNCTION: CARMA2_HW 0x00439fd0
 void C2_HOOK_FASTCALL CompletelyUnBendCollisionShape(tCar_crush_shape_info* pShape) {
-    const volatile tCar_crush_shape_info* live = pShape;
+    const tCar_crush_shape_info* live = pShape;
     tCar_crush_reordered_shape_info* points;
     tU32 bits;
     int count = pShape->original_count_points;

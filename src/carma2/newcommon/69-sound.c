@@ -963,15 +963,15 @@ void C2_HOOK_FASTCALL SetDefaultSoundFolderName(void) {
 
 // FUNCTION: CARMA2_HW 0x00457590
 void C2_HOOK_FASTCALL ConfigureZombiePedSoundPath(void) {
-    *(const char* volatile*)&gPed_sound_path = "ZOMSOUND";
+    gPed_sound_path = "ZOMSOUND";
 }
 
 // FUNCTION: CARMA2_HW 0x00457580
 void C2_HOOK_FASTCALL ConfigureBloodPedSoundPath(void) {
-    *(const char* volatile*)&gPed_sound_path = NULL;
+    gPed_sound_path = NULL;
 }
 
 // FUNCTION: CARMA2_HW 0x004575a0
 void C2_HOOK_FASTCALL ConfigureAlienPedSoundPath(void) {
-    *(const char* volatile*)&gPed_sound_path = "ALSOUND";
+    gPed_sound_path = "ALSOUND";
 }

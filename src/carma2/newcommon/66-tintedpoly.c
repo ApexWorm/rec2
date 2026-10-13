@@ -534,11 +534,11 @@ void C2_HOOK_FASTCALL UpdateTintedPolyByMaterial(int pTintedIndex) {
         br_uint_32 width = map->width, height = map->height;
 
         v_tl = BrPixelmapPixelGet(map, width / 4, height / 4);
-        map = (*(br_material* volatile*)&gTintedPolys[pTintedIndex].material2)->colour_map;
+        map = (*(br_material**)&gTintedPolys[pTintedIndex].material2)->colour_map;
         v_tr = BrPixelmapPixelGet(map, width - width / 4, height / 4);
-        map = (*(br_material* volatile*)&gTintedPolys[pTintedIndex].material2)->colour_map;
+        map = (*(br_material**)&gTintedPolys[pTintedIndex].material2)->colour_map;
         v_bl = BrPixelmapPixelGet(map, width / 4, height - height / 4);
-        map = (*(br_material* volatile*)&gTintedPolys[pTintedIndex].material2)->colour_map;
+        map = (*(br_material**)&gTintedPolys[pTintedIndex].material2)->colour_map;
         v_br = BrPixelmapPixelGet(map, width - width / 4, height - height / 4);
 
         new_red = (REC2_RGB888_R(v_tl) + REC2_RGB888_R(v_tr) + REC2_RGB888_R(v_bl) + REC2_RGB888_R(v_br)) / 4;

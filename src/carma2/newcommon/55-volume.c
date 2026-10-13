@@ -33,7 +33,7 @@ tSpecial_volume* C2_HOOK_FASTCALL GetDefaultSpecialVolumeForWater(void) {
 
 /* The original scans the complete identifier even though only emptiness is used. */
 static int C2_HOOK_CDECL VolumeIdentifierHasLength(const char* pIdentifier) {
-    const volatile char* end = pIdentifier;
+    const char* end = pIdentifier;
 
     while (*end != '\0') {
         end++;
@@ -81,7 +81,7 @@ typedef tU32 tVolumeWord __attribute__((__may_alias__));
 typedef tU32 tVolumeWord;
 #endif
 static void C2_HOOK_CDECL AutoVolumeCopy(void* out, const void* in) {
-    *(volatile tVolumeWord*)out = *(const volatile tVolumeWord*)in;
+    *(tVolumeWord*)out = *(const tVolumeWord*)in;
 }
 #if defined(_MSC_VER) && _MSC_VER < 1300
 #pragma auto_inline(off)

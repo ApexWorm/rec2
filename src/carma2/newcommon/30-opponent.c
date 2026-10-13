@@ -50,22 +50,22 @@ static double C2_HOOK_CDECL OpponentFloatAdd(const float* pA, const float* pB) {
 }
 
 static double C2_HOOK_CDECL OpponentAdd(double pA, double pB) {
-    volatile double result = pA + pB;
+    double result = pA + pB;
     return result;
 }
 
 static double C2_HOOK_CDECL OpponentSubtract(double pA, double pB) {
-    volatile double result = pA - pB;
+    double result = pA - pB;
     return result;
 }
 
 static double C2_HOOK_CDECL OpponentMultiply(double pA, double pB) {
-    volatile double result = pA * pB;
+    double result = pA * pB;
     return result;
 }
 
 static double C2_HOOK_CDECL OpponentDivide(double pA, double pB) {
-    volatile double result = pA / pB;
+    double result = pA / pB;
     return result;
 }
 
@@ -76,7 +76,7 @@ static double C2_HOOK_CDECL OpponentSqrt(double pA) {
 }
 
 static float C2_HOOK_CDECL OpponentScalarRound(double pA) {
-    volatile union { float scalar; tU32 bits; } stored;
+    union { float scalar; tU32 bits; } stored;
     union { float scalar; tU32 bits; } result;
 
     stored.scalar = (float)pA;
@@ -128,7 +128,7 @@ tS16 C2_HOOK_FASTCALL FindNearestGeneralSection(tCar_spec* pCar, const br_vector
     float closest = 3.4028234663852886e38f;
     float nearest_distance = 3.4028234663852886e38f;
     /* The original leaves this slot indeterminate when no segment qualifies. */
-    volatile float nearest_t;
+    float nearest_t;
     tPath_section* sections = gProgram_state.AI_vehicles.path_sections;
     br_vector3 a;
     br_vector3 p;
@@ -660,7 +660,7 @@ void C2_HOOK_FASTCALL CalcReturnToStartPointRoute(tOpponent_spec* pOpponent_spec
 
 // FUNCTION: CARMA2_HW 0x004ab150
 int C2_HOOK_FASTCALL AddToOpponentsProjectedRoute(tOpponent_spec* pOpponent_spec, tS16 pSection_no, int pDirection) {
-    volatile int* count = &pOpponent_spec->nnext_sections;
+    int* count = &pOpponent_spec->nnext_sections;
 
     if (*count >= 12) {
         return 0;

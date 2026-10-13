@@ -38,7 +38,7 @@ tU32 gPHIL_last_physics_tick;
 /* REP MOVSD copies overlapping buffers in forward DWORD order. */
 static void C2_HOOK_CDECL PhilCopyWords(void* pOutput, const void* pInput, int pCount) {
     int i;
-    volatile tU32 word;
+    tU32 word;
 
     for (i = 0; i < pCount; i++) {
         memcpy((void*)&word, (const char*)pInput + 4 * i, 4);
@@ -52,7 +52,7 @@ static void C2_HOOK_CDECL PhilCopyWords(void* pOutput, const void* pInput, int p
 
 static double C2_HOOK_CDECL PhilOrientationScalar(double value) {
     union { br_scalar scalar; tU32 word; } bits;
-    volatile tU32 stored;
+    tU32 stored;
 
     /* The integer reload forces the scalar rounding even with MSVC5. */
     bits.scalar = (br_scalar)value;
@@ -167,19 +167,19 @@ static void* C2_HOOK_CDECL RegistrationAddress(const void* base, tU32 offset) {
 }
 
 static tU32 C2_HOOK_CDECL RegistrationRead(const void* base, tU32 offset) {
-    return *(volatile const tRegistrationWord*)RegistrationAddress(base, offset);
+    return *(const tRegistrationWord*)RegistrationAddress(base, offset);
 }
 
 static void C2_HOOK_CDECL RegistrationWrite(void* base, tU32 offset, tU32 value) {
-    *(volatile tRegistrationWord*)RegistrationAddress(base, offset) = value;
+    *(tRegistrationWord*)RegistrationAddress(base, offset) = value;
 }
 
 static tU8 C2_HOOK_CDECL RegistrationByte(const void* base, tU32 offset) {
-    return *(volatile const tU8*)RegistrationAddress(base, offset);
+    return *(const tU8*)RegistrationAddress(base, offset);
 }
 
 static void C2_HOOK_CDECL RegistrationWriteByte(void* base, tU32 offset, tU8 value) {
-    *(volatile tU8*)RegistrationAddress(base, offset) = value;
+    *(tU8*)RegistrationAddress(base, offset) = value;
 }
 
 static void* C2_HOOK_CDECL RegistrationPointer(const void* base, tU32 offset) {
@@ -648,7 +648,7 @@ typedef tU32 tCompletion_word;
 #endif
 
 static tU32 C2_HOOK_CDECL CompletionWord(const void* base, tU32 offset) {
-    return *(volatile const tCompletion_word*)((tU32)(uintptr_t)base + offset);
+    return *(const tCompletion_word*)((tU32)(uintptr_t)base + offset);
 }
 
 static void* C2_HOOK_CDECL CompletionPointer(const void* base, tU32 offset) {
@@ -656,11 +656,11 @@ static void* C2_HOOK_CDECL CompletionPointer(const void* base, tU32 offset) {
 }
 
 static tU8 C2_HOOK_CDECL CompletionByte(const void* base, tU32 offset) {
-    return *(volatile const tU8*)((tU32)(uintptr_t)base + offset);
+    return *(const tU8*)((tU32)(uintptr_t)base + offset);
 }
 
 static void C2_HOOK_CDECL CompletionStore(void* base, tU32 offset, tU32 value) {
-    *(volatile tCompletion_word*)((tU32)(uintptr_t)base + offset) = value;
+    *(tCompletion_word*)((tU32)(uintptr_t)base + offset) = value;
 }
 
 static tU32 C2_HOOK_CDECL CompletionStatus(tPhysics_object* object) {
@@ -765,7 +765,7 @@ typedef tU32 tActivation_raw_word;
 #endif
 
 static tU32 C2_HOOK_CDECL ActivationWord(const void* base, tU32 offset) {
-    return *(volatile const tActivation_raw_word*)((tU32)(uintptr_t)base + offset);
+    return *(const tActivation_raw_word*)((tU32)(uintptr_t)base + offset);
 }
 
 // FUNCTION: CARMA2_HW 0x004b71b0
@@ -777,13 +777,13 @@ void C2_HOOK_FASTCALL PHILActivatePassive(tPhysics_object* object, undefined4 ca
     tActivation_permission_call permission;
 
     if (header != 0 && ActivationWord((const void*)(uintptr_t)header, 8) == 1) {
-        address = *(volatile const tActivation_raw_word*)(const void*)&gPHIL_registry.original_activate_passive;
+        address = *(const tActivation_raw_word*)(const void*)&gPHIL_registry.original_activate_passive;
         if (address != 0) {
             memcpy(&original, &address, sizeof(original));
             /* EDX is still the entry word at the first original call. */
             original(object, captured_edx);
         }
-        callbacks = *(volatile const tActivation_raw_word*)(const void*)&gPHIL_registry.callbacks;
+        callbacks = *(const tActivation_raw_word*)(const void*)&gPHIL_registry.callbacks;
         address = ActivationWord((const void*)(uintptr_t)callbacks, 0x14);
         if (address != 0) {
             memcpy(&permission, &address, sizeof(permission));
@@ -794,7 +794,7 @@ void C2_HOOK_FASTCALL PHILActivatePassive(tPhysics_object* object, undefined4 ca
         }
         PHILMakeObjectActive(object, NULL, NULL, 1);
     } else {
-        *(volatile tActivation_raw_word*)((tU32)(uintptr_t)object + 0x19c) = ActivationWord(object, 0x19c) | 0x1000u;
+        *(tActivation_raw_word*)((tU32)(uintptr_t)object + 0x19c) = ActivationWord(object, 0x19c) | 0x1000u;
     }
 }
 
@@ -806,15 +806,15 @@ void C2_HOOK_FASTCALL PHILActivatePassive(tPhysics_object* object, undefined4 ca
 
 
 static tU32 C2_HOOK_CDECL GravityWord(const void* base, tU32 offset) {
-    return *(volatile const tU32*)((tU32)(uintptr_t)base + offset);
+    return *(const tU32*)((tU32)(uintptr_t)base + offset);
 }
 
 static double C2_HOOK_CDECL GravityRead(const void* base, tU32 offset) {
-    return *(volatile const br_scalar*)((tU32)(uintptr_t)base + offset);
+    return *(const br_scalar*)((tU32)(uintptr_t)base + offset);
 }
 
 static br_scalar C2_HOOK_CDECL GravityRound(double value) {
-    volatile br_scalar result = (br_scalar)value;
+    br_scalar result = (br_scalar)value;
     return result;
 }
 
@@ -825,7 +825,7 @@ static int C2_HOOK_CDECL GravityNaN(double value) {
         && ((words[1] & 0xfffffu) != 0 || words[0] != 0);
 }
 
-static double C2_HOOK_CDECL GravityMultiplyScalar(double left, volatile const br_scalar* right) {
+static double C2_HOOK_CDECL GravityMultiplyScalar(double left, const br_scalar* right) {
     double result;
     result = left * (double)*right;
     return result;
@@ -845,8 +845,8 @@ static double C2_HOOK_CDECL GravitySubtractPopWide(double left, double right) {
     return left - right;
 }
 
-static volatile const br_scalar* C2_HOOK_CDECL GravityScalarPointer(const void* base, tU32 offset) {
-    return (volatile const br_scalar*)((tU32)(uintptr_t)base + offset);
+static const br_scalar* C2_HOOK_CDECL GravityScalarPointer(const void* base, tU32 offset) {
+    return (const br_scalar*)((tU32)(uintptr_t)base + offset);
 }
 
 // FUNCTION: CARMA2_HW 0x004b6ec0
@@ -854,7 +854,7 @@ void C2_HOOK_FASTCALL ProcessGravity(tPHIL_queued_header* header, tPhysics_objec
     const tSpecial_volume* volume = NULL;
     br_vector3 vector;
     double value;
-    if ((*(volatile const tU8*)((tU32)(uintptr_t)header + 4) & 8) != 0) {
+    if ((*(const tU8*)((tU32)(uintptr_t)header + 4) & 8) != 0) {
         volume = (const tSpecial_volume*)(uintptr_t)GravityWord(object, 0x258);
     }
     if (volume != NULL) {
@@ -866,7 +866,7 @@ void C2_HOOK_FASTCALL ProcessGravity(tPHIL_queued_header* header, tPhysics_objec
                 double buoyancy = 1.0 - GravityRead(volume, 0x88);
                 double standard = (double)gravity;
                 buoyancy = GravityMultiplyScalar(buoyancy, GravityScalarPointer(object, 0x254));
-                standard = GravityMultiplyScalar(standard, (volatile const br_scalar*)&gGravity_multiplier);
+                standard = GravityMultiplyScalar(standard, (const br_scalar*)&gGravity_multiplier);
                 buoyancy = GravityMultiplyScalar(buoyancy, GravityScalarPointer(header, 0x14));
                 standard = standard * 1.4202898550724639;
                 value = GravitySubtractPopWide(buoyancy, standard) * 0.04;
@@ -874,18 +874,18 @@ void C2_HOOK_FASTCALL ProcessGravity(tPHIL_queued_header* header, tPhysics_objec
                 value = GravityRead(volume, 0x88);
                 value = GravityMultiplyScalar(value, GravityScalarPointer(object, 0x254));
                 value = GravityMultiplyScalar(value, &gravity);
-                value = GravityMultiplyScalar(value, (volatile const br_scalar*)&gGravity_multiplier);
+                value = GravityMultiplyScalar(value, (const br_scalar*)&gGravity_multiplier);
                 value = value * -0.05681159420289855;
             }
         } else {
             value = GravityRead(volume, 0x88);
             value = GravityMultiplyScalar(value, GravityScalarPointer(object, 0x254));
             value = GravityMultiplyScalar(value, &gravity);
-            value = GravityMultiplyScalar(value, (volatile const br_scalar*)&gGravity_multiplier);
+            value = GravityMultiplyScalar(value, (const br_scalar*)&gGravity_multiplier);
             value = value * -0.05681159420289855;
         }
     } else {
-        value = GravityMultiplyScalar((double)gravity, (volatile const br_scalar*)&gGravity_multiplier);
+        value = GravityMultiplyScalar((double)gravity, (const br_scalar*)&gGravity_multiplier);
         value = value * -0.05681159420289855;
     }
     vector.v[0] = 0.0f;
@@ -900,11 +900,11 @@ static tU8* ForceBytes(const void* pBase, unsigned pOffset) {
 }
 
 static double C2_HOOK_CDECL FrictionRead(const void* base, unsigned offset) {
-    return *(volatile const br_scalar*)((const tU8*)base + offset);
+    return *(const br_scalar*)((const tU8*)base + offset);
 }
 
 static tU32 C2_HOOK_CDECL FrictionWord(const void* base, unsigned offset) {
-    return *(volatile const tU32*)((const tU8*)base + offset);
+    return *(const tU32*)((const tU8*)base + offset);
 }
 
 static void* C2_HOOK_CDECL FrictionPointer(const void* base, unsigned offset) {
@@ -912,18 +912,18 @@ static void* C2_HOOK_CDECL FrictionPointer(const void* base, unsigned offset) {
 }
 
 static br_scalar C2_HOOK_CDECL FrictionScalar(double value) {
-    volatile union { br_scalar scalar; tU32 bits; } stored;
+    union { br_scalar scalar; tU32 bits; } stored;
     union { br_scalar scalar; tU32 bits; } result;
     stored.scalar = (br_scalar)value;
     result.bits = stored.bits;
     return result.scalar;
 }
 
-static volatile const br_scalar* C2_HOOK_CDECL FrictionAt(const void* base, unsigned offset) {
-    return (volatile const br_scalar*)((const tU8*)base + offset);
+static const br_scalar* C2_HOOK_CDECL FrictionAt(const void* base, unsigned offset) {
+    return (const br_scalar*)((const tU8*)base + offset);
 }
 
-static double C2_HOOK_CDECL FrictionProductScalars(volatile const br_scalar* left, volatile const br_scalar* right) {
+static double C2_HOOK_CDECL FrictionProductScalars(const br_scalar* left, const br_scalar* right) {
     double result;
     result = (double)*left * (double)*right;
     return result;
@@ -1023,16 +1023,16 @@ void C2_HOOK_FASTCALL ProcessDrag2(tPHIL_queued_header* header, tPhysics_object*
 }
 
 static void C2_HOOK_CDECL FrictionWrite(void* base, unsigned offset, double value) {
-    *(volatile br_scalar*)((tU8*)base + offset) = FrictionScalar(value);
+    *(br_scalar*)((tU8*)base + offset) = FrictionScalar(value);
 }
 
-static double C2_HOOK_CDECL FrictionAddScalar(double left, volatile const br_scalar* right) {
+static double C2_HOOK_CDECL FrictionAddScalar(double left, const br_scalar* right) {
     double result;
     result = left + (double)*right;
     return result;
 }
 
-static double C2_HOOK_CDECL FrictionSubtractScalar(double left, volatile const br_scalar* right) {
+static double C2_HOOK_CDECL FrictionSubtractScalar(double left, const br_scalar* right) {
     double result;
     result = left - (double)*right;
     return result;

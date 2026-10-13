@@ -30,7 +30,7 @@ static int C2_HOOK_FASTCALL PhysicsGreaterOrdered(const br_scalar* a, const br_s
 static br_scalar C2_HOOK_FASTCALL PhysicsScalar(double value);
 static void C2_HOOK_FASTCALL PhysicsScalarStore(br_scalar* output, const br_scalar* input);
 static double C2_HOOK_CDECL FrictionRead(const void* base, unsigned offset);
-static double C2_HOOK_CDECL FrictionSubtractScalar(double left, volatile const br_scalar* right);
+static double C2_HOOK_CDECL FrictionSubtractScalar(double left, const br_scalar* right);
 
 // GLOBAL: CARMA2_HW 0x0074a5e4
 int gPHIL_mechanics_time_sync;
@@ -87,7 +87,7 @@ void* gPhysics_scratch_ptr;
 // count
 
 static void C2_HOOK_FASTCALL PhysicsCopyWord(void* output, const void* input) {
-    volatile tU32 value;
+    tU32 value;
 
     memcpy((void*)&value, input, sizeof(value));
     memcpy(output, (const void*)&value, sizeof(value));
@@ -245,7 +245,7 @@ static int C2_HOOK_FASTCALL PhysicsWallNaN(double value) {
     return (u.w[1]&0x7ff00000u)==0x7ff00000u && ((u.w[1]&0xfffffu)||u.w[0]);
 }
 
-static double C2_HOOK_FASTCALL PhysicsWallAddScalar(const br_scalar* a, const volatile br_scalar* b) {
+static double C2_HOOK_FASTCALL PhysicsWallAddScalar(const br_scalar* a, const br_scalar* b) {
     double result;
     result = (double)*a + *b;
     return result;
@@ -256,10 +256,10 @@ int C2_HOOK_FASTCALL EliminateFaces(tPhysics_object* pObject, tPhysics_shape* pS
     br_matrix34* actor_matrix=&pObject->actor->t.t.mat;
     br_bounds* bounds=&pShape->common.field_0x1c;
     br_vector3 center;
-    volatile br_vector3 scaled[3];
-    volatile br_scalar extent_scalar;
-    volatile br_scalar low_scalar;
-    volatile br_scalar threshold;
+    br_vector3 scaled[3];
+    br_scalar extent_scalar;
+    br_scalar low_scalar;
+    br_scalar threshold;
     double extent;
     double low;
     double high;
@@ -306,11 +306,11 @@ int C2_HOOK_FASTCALL EliminateFaces(tPhysics_object* pObject, tPhysics_shape* pS
         low_scalar=PhysicsScalar(low);
         if ((!PhysicsWallNaN(high)&&high>(double)0.005f && !PhysicsWallNaN(low)&&low>(double)0.005f)
             ||((PhysicsWallNaN(high)||high<(double)-0.005f)&&(PhysicsScalarNaN((const br_scalar*)&low_scalar)||low_scalar<-0.005f))) {
-            *(volatile int*)&face->flags=face->flags|0x80;
+            *(int*)&face->flags=face->flags|0x80;
         } else {
             material=face->material;
             if ((material!=NULL&&material->identifier[0]=='!')||material->identifier[0]=='>') {
-                *(volatile int*)&face->flags=face->flags|0x80;
+                *(int*)&face->flags=face->flags|0x80;
             } else {
                 for (i=0;i<3;i++) {
                     translated=((double)actor_matrix->m[3][2]*actor_matrix->m[i][2]+(double)actor_matrix->m[3][0]*actor_matrix->m[i][0])+(double)actor_matrix->m[3][1]*actor_matrix->m[i][1];
@@ -320,7 +320,7 @@ int C2_HOOK_FASTCALL EliminateFaces(tPhysics_object* pObject, tPhysics_shape* pS
                         vertex=((double)face->v[1].v[2]*actor_matrix->m[i][2]+(double)face->v[1].v[0]*actor_matrix->m[i][0])+(double)face->v[1].v[1]*actor_matrix->m[i][1];
                         if (PhysicsWallNaN(vertex)||PhysicsScalarNaN((const br_scalar*)&threshold)||vertex<threshold) {
                             vertex=((double)face->v[2].v[2]*actor_matrix->m[i][2]+(double)face->v[2].v[0]*actor_matrix->m[i][0])+(double)face->v[2].v[1]*actor_matrix->m[i][1];
-                            if (PhysicsWallNaN(vertex)||PhysicsScalarNaN((const br_scalar*)&threshold)||vertex<threshold) *(volatile int*)&face->flags=face->flags|0x80;
+                            if (PhysicsWallNaN(vertex)||PhysicsScalarNaN((const br_scalar*)&threshold)||vertex<threshold) *(int*)&face->flags=face->flags|0x80;
                         }
                     } else {
                         threshold=PhysicsScalar(((double)bounds->max.v[i]+translated)-(-0.005f));
@@ -328,12 +328,12 @@ int C2_HOOK_FASTCALL EliminateFaces(tPhysics_object* pObject, tPhysics_shape* pS
                             vertex=((double)face->v[1].v[2]*actor_matrix->m[i][2]+(double)face->v[1].v[0]*actor_matrix->m[i][0])+(double)face->v[1].v[1]*actor_matrix->m[i][1];
                             if (!PhysicsWallNaN(vertex)&&!PhysicsScalarNaN((const br_scalar*)&threshold)&&vertex>threshold) {
                                 vertex=((double)face->v[2].v[2]*actor_matrix->m[i][2]+(double)face->v[2].v[0]*actor_matrix->m[i][0])+(double)face->v[2].v[1]*actor_matrix->m[i][1];
-                                if (!PhysicsWallNaN(vertex)&&!PhysicsScalarNaN((const br_scalar*)&threshold)&&vertex>threshold) *(volatile int*)&face->flags=face->flags|0x80;
+                                if (!PhysicsWallNaN(vertex)&&!PhysicsScalarNaN((const br_scalar*)&threshold)&&vertex>threshold) *(int*)&face->flags=face->flags|0x80;
                             }
                         }
                     }
                 }
-                *(volatile int*)&face->flags=face->flags&~0x80;
+                *(int*)&face->flags=face->flags&~0x80;
                 count++;
             }
         }
@@ -349,12 +349,12 @@ int C2_HOOK_FASTCALL CheckSingleEdgeWithSphere(br_vector3* pEdge_start, br_vecto
     br_vector3 normal;
     br_vector3 trial_normal;
     br_vector3 actor_normal;
-    volatile br_vector3 scaled_normal;
+    br_vector3 scaled_normal;
     br_vector3 surface_point;
     br_actor* actor;
-    volatile br_scalar time;
-    volatile br_scalar normalized_z;
-    volatile br_scalar radius_product[3];
+    br_scalar time;
+    br_scalar normalized_z;
+    br_scalar radius_product[3];
     double remainder;
     double x;
     double y;
@@ -366,7 +366,7 @@ int C2_HOOK_FASTCALL CheckSingleEdgeWithSphere(br_vector3* pEdge_start, br_vecto
     SphereEdgeCollide(pEdge_start,pEdge_end,pSphere_start,pSphere_end,pSphere,&point,&normal,(br_scalar*)&time,0,0);
     if (!PhysicsScalarNaN((const br_scalar*)&time) && time>1.0f) return pCount;
     BrMatrix34TApplyV(&trial_normal,&normal,&pObject->transform_matrix);
-    actor=*(br_actor* volatile*)&pObject->actor;
+    actor=*(br_actor**)&pObject->actor;
     BrMatrix34TApplyV(&actor_normal,&normal,&actor->t.t.mat);
     remainder=1.0-(double)time;
     for (i=0;i<3;i++) scaled_normal.v[i]=PhysicsScalar((double)time*actor_normal.v[i]);
@@ -398,13 +398,13 @@ int C2_HOOK_FASTCALL GetSphereToEdgePoints(tPhysics_object* pObject, tCollision_
     (void)pUnused_matrix;
     if(index>=(int)pObject->box_face_end) return pCount;
     do {
-        if((*(volatile int*)&face->flags&0x80)==0) {
-            if((*(volatile int*)&face->flags&1)==0) pCount=CheckSingleEdgeWithSphere(&face->v[0],&face->v[1],pObject,pSphere,pContacts,pCount,pSphere_start,pSphere_end,face);
-            if((*(volatile int*)&face->flags&2)==0) pCount=CheckSingleEdgeWithSphere(&face->v[1],&face->v[2],pObject,pSphere,pContacts,pCount,pSphere_start,pSphere_end,face);
-            if((*(volatile int*)&face->flags&4)==0) pCount=CheckSingleEdgeWithSphere(&face->v[2],&face->v[0],pObject,pSphere,pContacts,pCount,pSphere_start,pSphere_end,face);
+        if((*(int*)&face->flags&0x80)==0) {
+            if((*(int*)&face->flags&1)==0) pCount=CheckSingleEdgeWithSphere(&face->v[0],&face->v[1],pObject,pSphere,pContacts,pCount,pSphere_start,pSphere_end,face);
+            if((*(int*)&face->flags&2)==0) pCount=CheckSingleEdgeWithSphere(&face->v[1],&face->v[2],pObject,pSphere,pContacts,pCount,pSphere_start,pSphere_end,face);
+            if((*(int*)&face->flags&4)==0) pCount=CheckSingleEdgeWithSphere(&face->v[2],&face->v[0],pObject,pSphere,pContacts,pCount,pSphere_start,pSphere_end,face);
         }
         index++;face++;
-    }while(index<(int)*(volatile tU16*)&pObject->box_face_end);
+    }while(index<(int)*(tU16*)&pObject->box_face_end);
     return pCount;
 }
 
@@ -447,7 +447,7 @@ int C2_HOOK_FASTCALL GetCornerToFacePoints(tPhysics_object* pObject, tPhysics_sh
     (void)pUnused_argument;
     if(pCapacity<4) return 0;
     gPhysics_contact_679434=0;
-    for(i=0;i<(int)*(volatile tU16*)&pWorkspace->count_points;i++,flags++,first++,second++) {
+    for(i=0;i<(int)*(tU16*)&pWorkspace->count_points;i++,flags++,first++,second++) {
         if(*flags!=0) continue;
         x=(double)second->v[0]-first->v[0];
         y=(double)second->v[1]-first->v[1];
@@ -516,7 +516,7 @@ int C2_HOOK_FASTCALL FUN_004236a0(tPhysics_object* object, tPhysics_shape* shape
     (void)capacity;(void)unused;
     if(shape->common.type==4) return count;
     BrMatrix34ApplyP(&centre,&object->cmpos,&object->transform_matrix);
-    for(edge=0;edge<(int)*(volatile tU16*)&workspace->count_edges;edge++) {
+    for(edge=0;edge<(int)*(tU16*)&workspace->count_edges;edge++) {
         first_index=((const tU8*)workspace->edges)[edge*2];
         second_index=((const tU8*)workspace->edges)[edge*2+1];
         first=&workspace->original_points[first_index];
@@ -599,14 +599,14 @@ int C2_HOOK_FASTCALL FUN_00424140(tPhysics_object* object, tPhysics_shape* shape
     face=&gFace_list__car[index];
     if(index>=(int)object->box_face_end)return count;
     do {
-        flags=*(volatile tU32*)&face->flags;
+        flags=*(tU32*)&face->flags;
         if((flags&0x80)==0) {
             if((flags&1)==0)count=FUN_00424270(&face->v[0],&face->v[1],object,shape,contacts,count,face,workspace);
-            if((*(volatile tU8*)&face->flags&2)==0)count=FUN_00424270(&face->v[1],&face->v[2],object,shape,contacts,count,face,workspace);
-            if((*(volatile tU8*)&face->flags&4)==0)count=FUN_00424270(&face->v[2],&face->v[0],object,shape,contacts,count,face,workspace);
+            if((*(tU8*)&face->flags&2)==0)count=FUN_00424270(&face->v[1],&face->v[2],object,shape,contacts,count,face,workspace);
+            if((*(tU8*)&face->flags&4)==0)count=FUN_00424270(&face->v[2],&face->v[0],object,shape,contacts,count,face,workspace);
         }
         index++;face++;
-    }while(index<(int)*(volatile tU16*)&object->box_face_end);
+    }while(index<(int)*(tU16*)&object->box_face_end);
     return count;
 }
 
@@ -616,7 +616,7 @@ int C2_HOOK_FASTCALL FUN_00424270(br_vector3* start, br_vector3* end, tPhysics_o
     /* Preserve the original private-buffer overlaps and initialize only slots
      * explicitly initialized by the authentic body. Offset0x10 begins locals;
      * offsets0..0xf describe saved registers and are not read here. */
-    volatile union { tU8 bytes[0x180];tU32 words[0x60];br_scalar values[0x60]; } frame;
+    union { tU8 bytes[0x180];tU32 words[0x60];br_scalar values[0x60]; } frame;
     br_actor* actor;
     br_matrix34* matrix;
     br_vector3* relative20=(br_vector3*)(void*)&frame.bytes[0x20];
@@ -632,13 +632,13 @@ int C2_HOOK_FASTCALL FUN_00424270(br_vector3* start, br_vector3* end, tPhysics_o
     br_vector3* gate_end=(br_vector3*)(void*)&frame.bytes[0x9c];
     br_vector3* gate_start=(br_vector3*)(void*)&frame.bytes[0xa8];
     br_vector3* gate_point=(br_vector3*)(void*)&frame.bytes[0x174];
-    volatile tPhysics_contact* candidates=(volatile tPhysics_contact*)(void*)&frame.bytes[0xb4];
+    tPhysics_contact* candidates=(tPhysics_contact*)(void*)&frame.bytes[0xb4];
     br_vector3* first;
     br_vector3* second;
     br_vector3* trial_first;
     br_vector3* trial_second;
     double projected_start,low,wide_change_z,normal_side;
-    volatile br_scalar projected_end,high;
+    br_scalar projected_end,high;
     int axis,component,result,selector;
     tU8 index1,index2;
     tU32 current;
@@ -687,7 +687,7 @@ int C2_HOOK_FASTCALL FUN_00424270(br_vector3* start, br_vector3* end, tPhysics_o
     selector=0;candidates[0].face=face;candidates[1].face=face;
     candidates[0].t=2.f;candidates[1].t=2.f;
     frame.words[0x14/4]=0xffffffffu;frame.words[0x10/4]=0;
-    if(*(volatile tU16*)&workspace->count_edges!=0) {
+    if(*(tU16*)&workspace->count_edges!=0) {
         do {
             current=frame.words[0x10/4];
             index1=workspace->edges[current].index1;index2=workspace->edges[current].index2;
@@ -707,10 +707,10 @@ int C2_HOOK_FASTCALL FUN_00424270(br_vector3* start, br_vector3* end, tPhysics_o
                 if(PhysicsWallNaN(candidates[selector].t)||PhysicsWallNaN(candidates[!selector].t)||candidates[selector].t<candidates[!selector].t)selector=!selector;
             }
             current=frame.words[0x10/4]+1;frame.words[0x10/4]=current;
-        } while((int)current<(int)*(volatile tU16*)&workspace->count_edges);
+        } while((int)current<(int)*(tU16*)&workspace->count_edges);
     }
     if(!PhysicsWallNaN(candidates[0].t)&&!(candidates[0].t<2.f))return count;
-    normal_side=((double)face->normal.v[2]*(double)*(volatile br_scalar*)(void*)(candidates[0].field_0x38+8)+(double)face->normal.v[1]*(double)*(volatile br_scalar*)(void*)(candidates[0].field_0x38+4))+(double)face->normal.v[0]*(double)*(volatile br_scalar*)(void*)candidates[0].field_0x38;
+    normal_side=((double)face->normal.v[2]*(double)*(br_scalar*)(void*)(candidates[0].field_0x38+8)+(double)face->normal.v[1]*(double)*(br_scalar*)(void*)(candidates[0].field_0x38+4))+(double)face->normal.v[0]*(double)*(br_scalar*)(void*)candidates[0].field_0x38;
     if(PhysicsWallNaN(normal_side)||normal_side<0.0) {
         matrix=&object->transform_matrix;
         for(component=0;component<3;component++)PhysicsSubtractScalar(&relative20->v[component],&start->v[component],&matrix->m[3][component]);
@@ -731,12 +731,12 @@ int C2_HOOK_FASTCALL FUN_00424270(br_vector3* start, br_vector3* end, tPhysics_o
 int C2_HOOK_FASTCALL FUN_00424990(const br_vector3* old_origin, const br_vector3* old_direction, const br_vector3* moving_origin, const br_vector3* moving_direction, const br_vector3* velocity, const br_vector3* direction_change, tPhysics_contact* output, int unused, tPhysics_object* object, tPhysics_object* other) {
     br_vector3 n0,n1,delta,normal,edge,origin,local,world,relative,previous_normal;
     double a,c,ac4,b2,root,wide_time,normal_square,normal_length,scale;
-    volatile br_scalar b;
+    br_scalar b;
     double dot,numerator,denominator,orientation,mixed[3],wide_delta[3],wide_edge_x;
-    volatile br_scalar negative_square,projection[3],stored_dot,stored_z_product;
-    volatile br_scalar stored_current[3],stored_blend[3];
-    volatile br_scalar time,stored_two_a,stored_root,stored_ac4,stored_b2,edge_fraction,old_fraction;
-    volatile br_scalar complement;
+    br_scalar negative_square,projection[3],stored_dot,stored_z_product;
+    br_scalar stored_current[3],stored_blend[3];
+    br_scalar time,stored_two_a,stored_root,stored_ac4,stored_b2,edge_fraction,old_fraction;
+    br_scalar complement;
     unsigned axis,i;
     n0.v[0]=PhysicsScalar((double)moving_direction->v[1]*old_direction->v[2]-(double)old_direction->v[1]*moving_direction->v[2]);
     n0.v[1]=PhysicsScalar((double)moving_direction->v[2]*old_direction->v[0]-(double)old_direction->v[2]*moving_direction->v[0]);
@@ -862,7 +862,7 @@ int C2_HOOK_FASTCALL FUN_00425630(const br_vector3* n0, const br_vector3* n1, co
     double combined[3],unit[3],cross[3],wide_delta[3],wide_point[3];
     double length,projection,denominator,numerator,scaled_x,parameter,distance,orientation;
     br_scalar stored_length,time,segment,orientation_y,direction_y,direction_z;
-    volatile union { br_scalar value; tU32 word; } scaled_y,scaled_z;
+    union { br_scalar value; tU32 word; } scaled_y,scaled_z;
     tU32 rounded_word;
     int i;
     (void)unused;
@@ -954,7 +954,7 @@ int C2_HOOK_FASTCALL FUN_00425630(const br_vector3* n0, const br_vector3* n1, co
 /* Complete wall-contact consumer; original lexical name unknown. */
 // FUNCTION: CARMA2_HW 0x004228b0
 int C2_HOOK_FASTCALL FUN_004228b0(tPhysics_object* object, tPhysics_contact* contacts, int initial_count) {
-    volatile union {tU8 bytes[0x7e8];tU32 words[0x1fa];br_scalar values[0x1fa];} frame;
+    union {tU8 bytes[0x7e8];tU32 words[0x1fa];br_scalar values[0x1fa];} frame;
     tPhysics_wall_workspace* workspace=(tPhysics_wall_workspace*)(void*)&frame.bytes[0xe0];
     br_matrix34* delta=(br_matrix34*)(void*)&frame.bytes[0x80];
     br_matrix34* inverse=(br_matrix34*)(void*)&frame.bytes[0xb0];
@@ -1050,7 +1050,7 @@ int C2_HOOK_FASTCALL FUN_004228b0(tPhysics_object* object, tPhysics_contact* con
                 frame.values[0x28/4]=2.f;
                 ordinal=object->box_face_start;
                 face=&gFace_list__car[ordinal];
-                while(ordinal<(int)*(volatile tU16*)&object->box_face_end) {
+                while(ordinal<(int)*(tU16*)&object->box_face_end) {
                     SphereFaceCollide(face,&workspace->original_points[0],&workspace->trial_points[0],sphere->radius,intersection,trial_normal,(br_scalar*)(void*)&frame.values[0x40/4]);
                     if(PhysicsWallNaN(frame.values[0x40/4])||PhysicsWallNaN(frame.values[0x28/4])||frame.values[0x40/4]<frame.values[0x28/4]) {
                         PhysicsCopyWord((void*)&frame.values[0x28/4],(const void*)&frame.values[0x40/4]);
@@ -1141,7 +1141,7 @@ static br_scalar C2_HOOK_FASTCALL PhysicsObjectEnergy(tPhysics_object* object) {
 
 static br_scalar C2_HOOK_FASTCALL PhysicsAccumulateEnergy(br_scalar total, br_scalar energy, br_scalar children) {
     br_scalar result;
-    volatile double subtotal = (double)energy + total;
+    double subtotal = (double)energy + total;
 
     result = (br_scalar)(subtotal + children);
     return result;
@@ -1167,7 +1167,7 @@ static double C2_HOOK_CDECL PhysicsJointScalar(double pValue) {
     br_scalar scalar;
     double rounded;
 
-    volatile br_scalar stored = (br_scalar)pValue;
+    br_scalar stored = (br_scalar)pValue;
 
     scalar = stored;
     rounded = scalar;
@@ -1204,8 +1204,8 @@ static double C2_HOOK_CDECL PhysicsJointAddScalar(double pValue, const br_scalar
 }
 
 static void C2_HOOK_CDECL PhysicsJointVelocityA(br_scalar* pOutput, const tPhysics_joint_force* pForce, const tPhysics_object* pObject, int pTorque) {
-    const volatile tPhysics_joint_force* force = pForce;
-    const volatile tPhysics_object* object = pObject;
+    const tPhysics_joint_force* force = pForce;
+    const tPhysics_object* object = pObject;
     br_scalar x;
     br_scalar y;
     br_scalar z;
@@ -1228,8 +1228,8 @@ static void C2_HOOK_CDECL PhysicsJointAddVelocity(br_scalar* pOutput, double pVa
 }
 
 static void C2_HOOK_CDECL PhysicsJointVelocityB(br_scalar* pOutput, const tPhysics_joint_force* pForce, const tPhysics_object* pObject, int pTorque) {
-    const volatile tPhysics_joint_force* force = pForce;
-    const volatile tPhysics_object* object = pObject;
+    const tPhysics_joint_force* force = pForce;
+    const tPhysics_object* object = pObject;
     br_scalar x;
     double y;
     br_scalar z;
@@ -1248,7 +1248,7 @@ static void C2_HOOK_CDECL PhysicsJointVelocityB(br_scalar* pOutput, const tPhysi
 
 // FUNCTION: CARMA2_HW 0x004b77b0
 void C2_HOOK_FASTCALL MakeJointVelocitiesVector(br_scalar* pOutput, tPhysics_joint_force* const* pForces, int pCount) {
-    tPhysics_joint_force* const volatile* forces = pForces;
+    tPhysics_joint_force* const* forces = pForces;
     tPhysics_joint_force* force;
     tPhysics_object* object;
     int torque;
@@ -1274,7 +1274,7 @@ void C2_HOOK_FASTCALL MakeJointVelocitiesVector(br_scalar* pOutput, tPhysics_joi
 // SkipForces
 
 /* Complete force-group foundation; original lexical names unknown. */
-static double C2_HOOK_CDECL FrictionProductScalars(volatile const br_scalar* left, volatile const br_scalar* right);
+static double C2_HOOK_CDECL FrictionProductScalars(const br_scalar* left, const br_scalar* right);
 
 typedef struct tForce_group_container {
     int count;
@@ -1287,7 +1287,7 @@ typedef struct tForce_group_container {
 typedef void (C2_HOOK_FASTCALL *tForce_group_callback)(tPhysics_object* object);
 
 static br_scalar C2_HOOK_CDECL GroupScalar(double value) {
-    volatile union { br_scalar value; tU32 bits; } stored;
+    union { br_scalar value; tU32 bits; } stored;
     union { br_scalar value; tU32 bits; } result;
     stored.value = (br_scalar)value;
     result.bits = stored.bits;
@@ -1562,11 +1562,11 @@ static tU32 C2_HOOK_CDECL HierarchyTimeWord(const br_scalar* pTime) {
 typedef void (C2_HOOK_FASTCALL *tHierarchyRawRecursive)(tPhysics_object*, tPhysics_object**, tU32);
 typedef void (C2_HOOK_FAKE_THISCALL *tHierarchyRawMotion)(tPhysics_object*, undefined4, tU32);
 #define HIERARCHY_RECURSE(object, selected, time) do { \
-    tHierarchyRawRecursive volatile function = (tHierarchyRawRecursive)(void*)FUN_004b9230; \
+    tHierarchyRawRecursive function = (tHierarchyRawRecursive)(void*)FUN_004b9230; \
     function((object), (selected), HierarchyTimeWord(&(time))); \
 } while (0)
 #define HIERARCHY_MOTION(function_name, object, time) do { \
-    tHierarchyRawMotion volatile function = (tHierarchyRawMotion)(void*)(function_name); \
+    tHierarchyRawMotion function = (tHierarchyRawMotion)(void*)(function_name); \
     function((object), 0, HierarchyTimeWord(&(time))); \
 } while (0)
 #else
@@ -1575,7 +1575,7 @@ typedef void (C2_HOOK_FAKE_THISCALL *tHierarchyRawMotion)(tPhysics_object*, unde
 #endif
 // FUNCTION: CARMA2_HW 0x004b9230
 void C2_HOOK_FASTCALL FUN_004b9230(tPhysics_object* pObject, tPhysics_object** pSelected, br_scalar pTime) {
-    volatile tPhysics_object* object = pObject;
+    tPhysics_object* object = pObject;
     tPhysics_object* partner;
     tPhysics_object* child;
     tPhysics_joint* joint;
@@ -1678,7 +1678,7 @@ void C2_HOOK_FASTCALL FUN_004b9230(tPhysics_object* pObject, tPhysics_object** p
     child = object->child;
     while (child != NULL) {
         HIERARCHY_RECURSE(child, pSelected, pTime);
-        child = ((volatile tPhysics_object*)child)->next;
+        child = ((tPhysics_object*)child)->next;
     }
     if (object->physics_joint2 != NULL) {
         *pSelected = pObject;
@@ -1696,10 +1696,10 @@ void C2_HOOK_FAKE_THISCALL FUN_004b8ee0(tPhysics_object* pObject, undefined4 pUn
 
     (void)pUnused;
     HIERARCHY_RECURSE(pObject, &selected, pTime);
-    if (selected != NULL && ((volatile tPhysics_object*)selected)->field_0x230 != NULL) {
+    if (selected != NULL && ((tPhysics_object*)selected)->field_0x230 != NULL) {
         current = selected;
         HIERARCHY_MOTION(TranslateObject, selected, pTime);
-        next = ((volatile tPhysics_object*)current)->field_0x230;
+        next = ((tPhysics_object*)current)->field_0x230;
         do {
             BrMatrix34ApplyP(&point, &current->physics_joint1->field_0x08, &current->actor->t.t.mat);
             BrMatrix34ApplyP(&other, &current->physics_joint1->field_0x14, &next->actor->t.t.mat);
@@ -1707,11 +1707,11 @@ void C2_HOOK_FAKE_THISCALL FUN_004b8ee0(tPhysics_object* pObject, undefined4 pUn
                 point.v[i] = (br_scalar)PhysicsJointScalar((double)point.v[i] - other.v[i]);
             }
             for (i = 0; i < 3; ++i) {
-                actor = ((volatile tPhysics_object*)((volatile tPhysics_object*)current)->parent)->actor;
+                actor = ((tPhysics_object*)((tPhysics_object*)current)->parent)->actor;
                 actor->t.t.mat.m[3][i] = (br_scalar)PhysicsJointScalar((double)point.v[i] + actor->t.t.mat.m[3][i]);
             }
-            current = ((volatile tPhysics_object*)current)->field_0x230;
-            next = ((volatile tPhysics_object*)current)->field_0x230;
+            current = ((tPhysics_object*)current)->field_0x230;
+            next = ((tPhysics_object*)current)->field_0x230;
         } while (next != NULL);
         WriteNewPositions(pObject);
     }
@@ -1833,11 +1833,11 @@ void C2_HOOK_FASTCALL GetWorldBoundingBoxForObject(tPhysics_object* pObject, br_
             }
         }
     } else {
-        double extent = FrictionSubtractScalar(FrictionRead(pObject, 0x118), (volatile const br_scalar*)((const tU8*)pObject + 0xb0));
+        double extent = FrictionSubtractScalar(FrictionRead(pObject, 0x118), (const br_scalar*)((const tU8*)pObject + 0xb0));
         if (!(gPhysics_bounds_max_x > extent)) {
             gPhysics_bounds_max_x = (br_scalar)extent;
         }
-        extent = FrictionSubtractScalar(FrictionRead(pObject, 0x10c), (volatile const br_scalar*)((const tU8*)pObject + 0xb0));
+        extent = FrictionSubtractScalar(FrictionRead(pObject, 0x10c), (const br_scalar*)((const tU8*)pObject + 0xb0));
         if (gPhysics_bounds_min_x >= extent) {
             gPhysics_bounds_min_x = (br_scalar)extent;
         }
@@ -1862,13 +1862,13 @@ static int C2_HOOK_FASTCALL PhysicsGreaterOrdered(const br_scalar* a, const br_s
 }
 
 static br_scalar C2_HOOK_FASTCALL PhysicsScalar(double value) {
-    volatile br_scalar rounded = (br_scalar)value;
+    br_scalar rounded = (br_scalar)value;
 
     return rounded;
 }
 
 static void C2_HOOK_FASTCALL PhysicsScalarStore(br_scalar* output, const br_scalar* input) {
-    volatile double value = *input;
+    double value = *input;
 
     *output = (br_scalar)value;
 }
@@ -2143,14 +2143,14 @@ static tU8* ForceBytes(const void* pBase, unsigned pOffset) {
     return (tU8*)(uintptr_t)pBase + pOffset;
 }
 static uintptr_t ForcePointerAt(const void* pBase, unsigned pOffset) {
-    volatile const tU32* field=(volatile const tU32*)ForceBytes(pBase,pOffset);
+    const tU32* field=(const tU32*)ForceBytes(pBase,pOffset);
     return *field;
 }
 #if defined(_MSC_VER) && _MSC_VER >= 1300
 __declspec(noinline)
 #endif
 static br_scalar ForceScalarRound(double pValue) {
-    volatile union {br_scalar scalar;tU32 bits;} stored;
+    union {br_scalar scalar;tU32 bits;} stored;
     union {br_scalar scalar;tU32 bits;} result;
     stored.scalar=(br_scalar)pValue;result.bits=stored.bits;return result.scalar;
 }
@@ -2564,7 +2564,7 @@ static int C2_HOOK_CDECL ForceMatrixHasPartner(const tPhysics_object* object) {
 #pragma auto_inline(off)
 #endif
 static double C2_HOOK_CDECL ForceMatrixScalar(double value) {
-    volatile br_scalar result=(br_scalar)value;
+    br_scalar result=(br_scalar)value;
     return result;
 }
 #if defined(_MSC_VER) && _MSC_VER < 1300
@@ -3122,9 +3122,9 @@ int C2_HOOK_FASTCALL AllocateObjectWorkspace(tPhysics_object* object, tPhysics_j
 }
 
 static br_scalar* C2_HOOK_CDECL VelocityField(void* base,unsigned offset) {return (br_scalar*)((tU8*)base+offset);}
-static double C2_HOOK_CDECL VelocityRead(const void* base,unsigned offset) {return *(const volatile br_scalar*)((const tU8*)base+offset);}
-static uintptr_t C2_HOOK_CDECL VelocityPointer(const void* base,unsigned offset) {return *(const volatile tU32*)((const tU8*)base+offset);}
-static br_scalar C2_HOOK_CDECL VelocityScalar(double value) {volatile union {br_scalar f;tU32 u;} stored;union {br_scalar f;tU32 u;} result;stored.f=(br_scalar)value;result.u=stored.u;return result.f;}
+static double C2_HOOK_CDECL VelocityRead(const void* base,unsigned offset) {return *(const br_scalar*)((const tU8*)base+offset);}
+static uintptr_t C2_HOOK_CDECL VelocityPointer(const void* base,unsigned offset) {return *(const tU32*)((const tU8*)base+offset);}
+static br_scalar C2_HOOK_CDECL VelocityScalar(double value) {union {br_scalar f;tU32 u;} stored;union {br_scalar f;tU32 u;} result;stored.f=(br_scalar)value;result.u=stored.u;return result.f;}
 /* MSVC5 reverses a scalar comparison and drops unordered for !(value >= 0).
  * Keep the original FCOMP C0 test for the demonstrated nonfinite cases. */
 static int C2_HOOK_CDECL VelocityBelowOrUnordered(double value,double threshold) {
@@ -3172,7 +3172,7 @@ static const double VelocityConstant58a840 = 0.0099;
 int C2_HOOK_FASTCALL MakeVelocitiesVector2(br_scalar* pOutput, tPhysics_joint_force* const* pForces, int pCapacity, int pCount) {
   /* The public pointers describe the real ABI. Raw word cursors preserve
    * output/pointer-array aliases and opaque field_0/field_10 scalar reads;
-   * every original pointer-array reload remains volatile. */
+   * every original pointer-array reload remains. */
   tU32* output_words = (tU32*)pOutput;
   tU32* force_words = (tU32*)pForces;
   int capacity = pCapacity;
@@ -3197,7 +3197,7 @@ int C2_HOOK_FASTCALL MakeVelocitiesVector2(br_scalar* pOutput, tPhysics_joint_fo
   if (count < capacity) {
     output_tail = output_words + count;
     for (capacity = capacity - count; capacity != 0; capacity = capacity + -1) {
-      *(volatile tU32*)output_tail = 0;
+      *(tU32*)output_tail = 0;
       output_tail = output_tail + 1;
     }
   }
@@ -3206,13 +3206,13 @@ int C2_HOOK_FASTCALL MakeVelocitiesVector2(br_scalar* pOutput, tPhysics_joint_fo
     force_cursor = force_words;
     remaining = count;
     do {
-      force_address = *(const volatile tU32*)force_cursor;
+      force_address = *(const tU32*)force_cursor;
       object_a_address = *(int *)(force_address + 4);
       if (*(int *)(force_address + 0x5c) == 0xb) {
         *VelocityField((void*)(output_delta+(intptr_t)force_cursor),0) = VelocityScalar(-((VelocityRead((const void*)(object_a_address + 0x74),0) * VelocityRead((const void*)(force_address + 0x2c),0) +
               VelocityRead((const void*)(object_a_address + 0x78),0) * VelocityRead((const void*)(force_address + 0x30),0)) +
               VelocityRead((const void*)(object_a_address + 0x7c),0) * VelocityRead((const void*)(force_address + 0x34),0)));
-        force_address = *(const volatile tU32*)force_cursor;
+        force_address = *(const tU32*)force_cursor;
         object_a_address = *(int *)(force_address + 8);
         if (object_a_address != 0) {
           *VelocityField((void*)(output_delta+(intptr_t)force_cursor),0) = VelocityScalar(((VelocityRead((const void*)(object_a_address + 0x7c),0) * VelocityRead((const void*)(force_address + 0x40),0) +
@@ -3224,7 +3224,7 @@ int C2_HOOK_FASTCALL MakeVelocitiesVector2(br_scalar* pOutput, tPhysics_joint_fo
           has_velocity = 1;
         }
         else {
-          *(volatile tU32 *)(output_delta + (intptr_t)force_cursor) = 0x3a83126f;
+          *(tU32 *)(output_delta + (intptr_t)force_cursor) = 0x3a83126f;
         }
       }
       else {
@@ -3239,7 +3239,7 @@ int C2_HOOK_FASTCALL MakeVelocitiesVector2(br_scalar* pOutput, tPhysics_joint_fo
         projected.v[2] = VelocityScalar(VelocityRead((const void*)(object_a_address + 0x1b0),0) + (double)projected.v[2]);
         *VelocityField((void*)(output_delta+(intptr_t)force_cursor),0) = VelocityScalar(-((VelocityRead((const void*)(force_address + 0x2c),0) * projected.v[0] +
               VelocityRead((const void*)(force_address + 0x30),0) * projected.v[1]) + VelocityRead((const void*)(force_address + 0x34),0) * projected.v[2]));
-        force_address = *(const volatile tU32*)force_cursor;
+        force_address = *(const tU32*)force_cursor;
         object_b_address = *(int *)(force_address + 8);
         if (object_b_address != 0) {
           projected.v[0] = VelocityScalar(VelocityRead((const void*)(object_b_address + 0x78),0) * VelocityRead((const void*)(force_address + 0x28),0) -
@@ -3259,7 +3259,7 @@ int C2_HOOK_FASTCALL MakeVelocitiesVector2(br_scalar* pOutput, tPhysics_joint_fo
           has_velocity = 1;
         }
         if (VelocityConstant58a830 < VelocityRead((const void*)(output_delta+(intptr_t)force_cursor),0)) {
-          value = VelocityConstant58a830 - (VelocityRead((const void*)*(const volatile tU32*)force_cursor,0) - VelocityConstant58a800);
+          value = VelocityConstant58a830 - (VelocityRead((const void*)*(const tU32*)force_cursor,0) - VelocityConstant58a800);
           if (VelocityGreater(value,VelocityConstant58a800)) {
             value = VelocityConstant58a800;
           }
@@ -3270,7 +3270,7 @@ int C2_HOOK_FASTCALL MakeVelocitiesVector2(br_scalar* pOutput, tPhysics_joint_fo
                VelocityConstant58a838);
         }
         if (VelocityBelowOrUnordered(VelocityRead((const void*)(output_delta+(intptr_t)force_cursor),0),VelocityConstant58a768)) {
-          *(volatile tU32 *)(output_delta + (intptr_t)force_cursor) = 0;
+          *(tU32 *)(output_delta + (intptr_t)force_cursor) = 0;
         }
         value = VelocityConstant58a798 - VelocityRead((const void*)(output_delta+(intptr_t)force_cursor),0) * VelocityConstant58a7d8;
         *VelocityField((void*)(output_delta+(intptr_t)force_cursor),0) = VelocityScalar(value);
@@ -3290,7 +3290,7 @@ int C2_HOOK_FASTCALL MakeVelocitiesVector2(br_scalar* pOutput, tPhysics_joint_fo
       capacity = count;
       force_cursor = force_words;
       do {
-        force_fields = (float *)*(const volatile tU32*)force_cursor;
+        force_fields = (float *)*(const tU32*)force_cursor;
         if (*(const tU32*)((tU8*)force_fields+0x5c) == 11) {
           value = (VelocityConstant58a7a0 - *force_fields) * VelocityConstant58a7e0;
           minimum = VelocityConstant58a7a0;
@@ -3299,7 +3299,7 @@ int C2_HOOK_FASTCALL MakeVelocitiesVector2(br_scalar* pOutput, tPhysics_joint_fo
             has_velocity = 1;
           }
           else {
-            *(volatile tU32 *)((intptr_t)force_cursor + cursor_delta) = 0x3a83126f;
+            *(tU32 *)((intptr_t)force_cursor + cursor_delta) = 0x3a83126f;
           }
         }
         else {
@@ -3312,7 +3312,7 @@ int C2_HOOK_FASTCALL MakeVelocitiesVector2(br_scalar* pOutput, tPhysics_joint_fo
             delta.v[0] = VelocityScalar((double)delta.v[0] - point.v[0]);
             delta.v[1] = VelocityScalar((double)delta.v[1] - point.v[1]);
             delta.v[2] = VelocityScalar((double)delta.v[2] - point.v[2]);
-            current_force_address = *(const volatile tU32*)force_cursor;
+            current_force_address = *(const tU32*)force_cursor;
             *VelocityField((void*)((intptr_t)force_cursor+cursor_delta),0) = VelocityScalar(VelocityConstant58a798 -
                  ((VelocityRead((const void*)(current_force_address + 0x30),0) * delta.v[1] +
                  VelocityRead((const void*)(current_force_address + 0x34),0) * delta.v[2]) + VelocityRead((const void*)(current_force_address + 0x2c),0) * delta.v[0]) *
@@ -3327,13 +3327,13 @@ int C2_HOOK_FASTCALL MakeVelocitiesVector2(br_scalar* pOutput, tPhysics_joint_fo
             BrMatrix34ApplyP(&projected,&point,(const br_matrix34*)(VelocityPointer((const void*)(VelocityPointer((const void*)VelocityPointer(force_cursor,0),4)),0)+0x2c));
             DrMatrix34ApplyLPInverse(&other,&projected,(const br_matrix34*)(VelocityPointer((const void*)VelocityPointer((const void*)VelocityPointer(force_cursor,0),8),0)+0x2c));
             delta.v[0] = VelocityScalar((double)other.v[0] - delta.v[0]);
-            current_force_address = *(const volatile tU32*)force_cursor;
+            current_force_address = *(const tU32*)force_cursor;
             delta.v[1] = VelocityScalar((double)other.v[1] - delta.v[1]);
             delta.v[2] = VelocityScalar((double)other.v[2] - delta.v[2]);
             *VelocityField((void*)((intptr_t)force_cursor+cursor_delta),0) = VelocityScalar(-(((VelocityRead((const void*)(current_force_address + 0x38),0) * delta.v[0] +
                    VelocityRead((const void*)(current_force_address + 0x3c),0) * delta.v[1]) + VelocityRead((const void*)(current_force_address + 0x40),0) * delta.v[2]) *
                   VelocityConstant58a7c8));
-            current_force_address = *(const volatile tU32*)force_cursor;
+            current_force_address = *(const tU32*)force_cursor;
             if (*(int *)(current_force_address + 0x5c) == 5) {
               BrMatrix34ApplyV(&projected,(const br_vector3*)(current_force_address+0x38),(const br_matrix34*)(VelocityPointer((const void*)current_force_address,8)+0x8c));
               BrMatrix34TApplyV(&other,&projected,(const br_matrix34*)(VelocityPointer((const void*)VelocityPointer((const void*)VelocityPointer(force_cursor,0),8),0)+0x2c));
@@ -3343,19 +3343,19 @@ int C2_HOOK_FASTCALL MakeVelocitiesVector2(br_scalar* pOutput, tPhysics_joint_fo
                 *VelocityField((void*)((intptr_t)force_cursor+cursor_delta),0) = VelocityScalar(value);
               }
             }
-            if ((VelocityConstant58a768 < VelocityRead((const void*)(*(const volatile tU32*)force_cursor + 0x10),0)) &&
-               (value = VelocityRead((const void*)(*(const volatile tU32*)force_cursor + 0x10),0) * VelocityConstant58a7c8,
+            if ((VelocityConstant58a768 < VelocityRead((const void*)(*(const tU32*)force_cursor + 0x10),0)) &&
+               (value = VelocityRead((const void*)(*(const tU32*)force_cursor + 0x10),0) * VelocityConstant58a7c8,
                VelocityGreater(value,VelocityRead((const void*)((intptr_t)force_cursor+cursor_delta),0)))) {
               *VelocityField((void*)((intptr_t)force_cursor+cursor_delta),0) = VelocityScalar(value);
             }
           }
           if (!(VelocityRead((const void*)((intptr_t)force_cursor+cursor_delta),0) > VelocityConstant58a830)) {
             if (VelocityBelowOrUnordered(VelocityRead((const void*)((intptr_t)force_cursor+cursor_delta),0),VelocityConstant58a768)) {
-              *(volatile tU32 *)((intptr_t)force_cursor + cursor_delta) = 0;
+              *(tU32 *)((intptr_t)force_cursor + cursor_delta) = 0;
             }
           }
           else {
-            value = VelocityConstant58a830 - (VelocityRead((const void*)*(const volatile tU32*)force_cursor,0) - VelocityConstant58a800);
+            value = VelocityConstant58a830 - (VelocityRead((const void*)*(const tU32*)force_cursor,0) - VelocityConstant58a800);
             if (VelocityGreater(value,VelocityConstant58a800)) {
               value = VelocityConstant58a800;
             }
@@ -3378,7 +3378,7 @@ int C2_HOOK_FASTCALL MakeVelocitiesVector2(br_scalar* pOutput, tPhysics_joint_fo
       cursor_delta = (intptr_t)force_words - (intptr_t)output_words;
       do {
         if (*(int *)(*(int *)(cursor_delta + (intptr_t)output_words) + 0x5c) != 0xb) {
-          *(volatile tU32*)output_words = 0x3d4ccccd;
+          *(tU32*)output_words = 0x3d4ccccd;
         }
         output_words = output_words + 1;
         count = count + -1;
@@ -3398,70 +3398,70 @@ int C2_HOOK_FASTCALL MakeVelocitiesVector2(br_scalar* pOutput, tPhysics_joint_fo
 #pragma auto_inline(off)
 #endif
 static double C2_HOOK_CDECL FrictionRead(const void* base, unsigned offset) {
-    return *(volatile const br_scalar*)((const tU8*)base + offset);
+    return *(const br_scalar*)((const tU8*)base + offset);
 }
 static tU32 C2_HOOK_CDECL FrictionWord(const void* base, unsigned offset) {
-    return *(volatile const tU32*)((const tU8*)base + offset);
+    return *(const tU32*)((const tU8*)base + offset);
 }
 static void* C2_HOOK_CDECL FrictionPointer(const void* base, unsigned offset) {
     return (void*)(uintptr_t)FrictionWord(base, offset);
 }
 static br_scalar C2_HOOK_CDECL FrictionScalar(double value) {
-    volatile union { br_scalar scalar; tU32 bits; } stored;
+    union { br_scalar scalar; tU32 bits; } stored;
     union { br_scalar scalar; tU32 bits; } result;
     stored.scalar = (br_scalar)value;
     result.bits = stored.bits;
     return result.scalar;
 }
 static void C2_HOOK_CDECL FrictionWrite(void* base, unsigned offset, double value) {
-    *(volatile br_scalar*)((tU8*)base + offset) = FrictionScalar(value);
+    *(br_scalar*)((tU8*)base + offset) = FrictionScalar(value);
 }
 static br_matrix34* C2_HOOK_CDECL FrictionActorMatrix(const void* object) {
     return (br_matrix34*)((tU8*)FrictionPointer(object, 0) + 0x2c);
 }
 static void C2_HOOK_CDECL FrictionFlag(void* object, unsigned flag) {
-    volatile tU8* field = (volatile tU8*)object + 0x1dd;
+    tU8* field = (tU8*)object + 0x1dd;
     *field = (tU8)(*field | flag);
 }
 /* Paired signaling/quiet NaN fixtures show that promoting both operands
  * changes original raw-memory selection. Keep only these scalar operand
  * forms x87; complete consumer control flow and accumulation stay readable C.
  */
-static volatile const br_scalar* C2_HOOK_CDECL FrictionAt(const void* base, unsigned offset) {
-    return (volatile const br_scalar*)((const tU8*)base + offset);
+static const br_scalar* C2_HOOK_CDECL FrictionAt(const void* base, unsigned offset) {
+    return (const br_scalar*)((const tU8*)base + offset);
 }
 
-static double C2_HOOK_CDECL FrictionProductScalars(volatile const br_scalar* left, volatile const br_scalar* right) {
+static double C2_HOOK_CDECL FrictionProductScalars(const br_scalar* left, const br_scalar* right) {
     double result;
     result = (double)*left * (double)*right;
     return result;
 }
 
-static double C2_HOOK_CDECL FrictionDivideScalars(volatile const br_scalar* left, volatile const br_scalar* right) {
+static double C2_HOOK_CDECL FrictionDivideScalars(const br_scalar* left, const br_scalar* right) {
     double result;
     result = (double)*left / (double)*right;
     return result;
 }
 
-static double C2_HOOK_CDECL FrictionSubtractScalar(double left, volatile const br_scalar* right) {
+static double C2_HOOK_CDECL FrictionSubtractScalar(double left, const br_scalar* right) {
     double result;
     result = left - (double)*right;
     return result;
 }
 
-static double C2_HOOK_CDECL FrictionAddScalar(double left, volatile const br_scalar* right) {
+static double C2_HOOK_CDECL FrictionAddScalar(double left, const br_scalar* right) {
     double result;
     result = left + (double)*right;
     return result;
 }
 
-static double C2_HOOK_CDECL FrictionReverseSubtractScalar(double right, volatile const br_scalar* left) {
+static double C2_HOOK_CDECL FrictionReverseSubtractScalar(double right, const br_scalar* left) {
     double result;
     result = (double)*left - right;
     return result;
 }
 
-static double C2_HOOK_CDECL FrictionReverseDivideScalar(double divisor, volatile const br_scalar* numerator) {
+static double C2_HOOK_CDECL FrictionReverseDivideScalar(double divisor, const br_scalar* numerator) {
     double result;
     result = (double)*numerator / divisor;
     return result;
@@ -3577,7 +3577,7 @@ void C2_HOOK_FASTCALL NewAddFriction(tPhysics_joint_force* force, tWorld_callbac
                 FrictionWrite(force, 0x50, FrictionRead(object_b, 4) * direction_b.v[0]);
                 FrictionWrite(force, 0x54, FrictionRead(object_b, 4) * direction_b.v[1]);
                 response = FrictionRead(object_b, 4);
-                *(volatile tU32*)((tU8*)force + 0x5c) = FrictionWord(force, 0x5c) | 0x100;
+                *(tU32*)((tU8*)force + 0x5c) = FrictionWord(force, 0x5c) | 0x100;
                 FrictionWrite(force, 0x58, response * direction_b.v[2]);
                 for (i = 0; i < 3; i++) FrictionWrite(object_a, 0x74 + 4 * i, impulse * angular_a.v[i] + FrictionRead(object_a, 0x74 + 4 * i));
                 negative = FrictionScalar(-impulse);
@@ -3668,7 +3668,7 @@ void C2_HOOK_FASTCALL NewAddFriction(tPhysics_joint_force* force, tWorld_callbac
             FrictionWrite(force, 0x44, FrictionRead(object_a, 4) * direction_a.v[0]);
             FrictionWrite(force, 0x48, FrictionRead(object_a, 4) * direction_a.v[1]);
             response = FrictionRead(object_a, 4);
-            *(volatile tU32*)((tU8*)force + 0x5c) = FrictionWord(force, 0x5c) | 0x100;
+            *(tU32*)((tU8*)force + 0x5c) = FrictionWord(force, 0x5c) | 0x100;
             FrictionWrite(force, 0x4c, response * direction_a.v[2]);
             for (i = 0; i < 3; i++) FrictionWrite(object_a, 0x74 + 4 * i, (double)angular_a.v[i] + FrictionRead(object_a, 0x74 + 4 * i));
             actor_matrix = FrictionActorMatrix(object_a);
@@ -3778,7 +3778,7 @@ void C2_HOOK_FASTCALL DoJointFriction(tPhysics_object* object) {
     }
     child = FrictionPointer(object, 0x224);
     while (child != NULL) {
-        if (*((volatile const tU8*)child + 0xec) == 0) DoJointFriction(child);
+        if (*((const tU8*)child + 0xec) == 0) DoJointFriction(child);
         child = FrictionPointer(child, 0x220);
     }
 }
@@ -3787,10 +3787,10 @@ static br_scalar* C2_HOOK_CDECL RestScalar(tPhysics_object* object, unsigned off
     return (br_scalar*)((tU8*)object + offset);
 }
 static tU8 C2_HOOK_CDECL RestByte(tPhysics_object* object, unsigned offset) {
-    return *((volatile tU8*)object + offset);
+    return *((tU8*)object + offset);
 }
 static void C2_HOOK_CDECL RestSetByte(tPhysics_object* object, unsigned offset, tU8 value) {
-    *((volatile tU8*)object + offset) = value;
+    *((tU8*)object + offset) = value;
 }
 
 /* Complete original post-friction rest-state pass. Numeric name retained. */
@@ -3808,7 +3808,7 @@ int C2_HOOK_FASTCALL FUN_004baa00(tPhysics_object* objects) {
     tU8 at_rest;
 
     while (object != NULL) {
-        if (*(volatile tU32*)RestScalar(object, 0x21c) != 0x3f800000u) {
+        if (*(tU32*)RestScalar(object, 0x21c) != 0x3f800000u) {
             object->I.v[0] = FrictionScalar(FrictionDivideScalars(&object->I.v[0], RestScalar(object, 0x21c)));
             object->I.v[1] = FrictionScalar(FrictionDivideScalars(&object->I.v[1], RestScalar(object, 0x21c)));
             object->I.v[2] = FrictionScalar(FrictionDivideScalars(&object->I.v[2], RestScalar(object, 0x21c)));
@@ -4004,7 +4004,7 @@ void C2_HOOK_FAKE_THISCALL RotateObject(tPhysics_object* pObject, undefined4 pUn
 
 // FUNCTION: CARMA2_HW 0x004b8fe0
 void C2_HOOK_FAKE_THISCALL TranslateObject(tPhysics_object* pObject, undefined4 pUnused, br_scalar pTime) {
-    volatile tPhysics_object* object = pObject;
+    tPhysics_object* object = pObject;
     tPhysics_joint* joint = object->physics_joint2;
     br_vector3 axis, point, delta;
     br_scalar before, speed[3];
@@ -4072,7 +4072,7 @@ void C2_HOOK_FAKE_THISCALL TranslateObject(tPhysics_object* pObject, undefined4 
 
 // FUNCTION: CARMA2_HW 0x004c2a10
 void C2_HOOK_FASTCALL WriteNewPositions(tPhysics_object* pObject) {
-    volatile tPhysics_object* object = pObject;
+    tPhysics_object* object = pObject;
     tPhysics_object* child = object->child;
     tPhysics_object* root = pObject;
     br_vector3 parent_point, child_point;
@@ -4090,14 +4090,14 @@ void C2_HOOK_FASTCALL WriteNewPositions(tPhysics_object* pObject) {
                 parent_point.v[i] = (br_scalar)PhysicsJointScalar(PartnerDifferenceScalars(&parent_point.v[i], &child_point.v[i]));
             }
             for (i = 0; i < 3; i++) {
-                actor = ((volatile tPhysics_object*)child)->actor;
+                actor = ((tPhysics_object*)child)->actor;
                 actor->t.t.mat.m[3][i] = (br_scalar)PhysicsJointScalar(PhysicsJointAddScalar((double)parent_point.v[i], &actor->t.t.mat.m[3][i]));
             }
         } else {
             BrMatrix34Mul(&object->actor->t.t.mat, &pObject->field_0x1e8, &root->actor->t.t.mat);
         }
         WriteNewPositions(child);
-        child = ((volatile tPhysics_object*)child)->next;
+        child = ((tPhysics_object*)child)->next;
     }
 }
 
@@ -4174,7 +4174,7 @@ void C2_HOOK_FASTCALL PositionChildren(tPhysics_object* pObject) {
 
 /* RQ arithmetic preserves the original scalar spills and NaN operand order. */
 static br_scalar C2_HOOK_CDECL RQScalar(double x) {
-    volatile br_scalar result = (br_scalar)x;
+    br_scalar result = (br_scalar)x;
     return result;
 }
 
@@ -4185,7 +4185,7 @@ static int C2_HOOK_CDECL RQNaN(double x) {
 /* The retained NaN191/192 probes first diverge at the x87 dot accumulation.
  * Head, denominator and all preceding public writes match; SSE accumulation
  * chooses a different sign when equal NaN payloads have opposite signs. */
-static double C2_HOOK_CDECL RQAccumulate(double sum, const volatile br_scalar* left, const volatile br_scalar* right) {
+static double C2_HOOK_CDECL RQAccumulate(double sum, const br_scalar* left, const br_scalar* right) {
     double result;
     result = sum + (double)*left * *right;
     return result;
@@ -4207,7 +4207,7 @@ static br_scalar C2_HOOK_CDECL RQDivideScalars(const br_scalar* numerator, const
     return result;
 }
 
-static br_scalar C2_HOOK_CDECL RQMultiplyScalars(const br_scalar* left, const volatile br_scalar* right) {
+static br_scalar C2_HOOK_CDECL RQMultiplyScalars(const br_scalar* left, const br_scalar* right) {
     br_scalar result;
     result = *left * *right;
     return result;
@@ -4273,7 +4273,7 @@ int C2_HOOK_FASTCALL FUN_004c3b60(br_scalar* original, br_scalar* rhs, br_scalar
     active = unconstrained + 1;
     rebuilt = active;
     *excluded_count = size - unconstrained - 1;
-    for (i = 0; i < *(volatile int*)excluded_count; i++) excluded[i] = (unsigned char)(i + unconstrained + 1);
+    for (i = 0; i < *(int*)excluded_count; i++) excluded[i] = (unsigned char)(i + unconstrained + 1);
     RQFromCachedGroups(gPhysics_buffer1_ptr, gPhysics_buffer2_ptr, original,
         active_rhs, rhs, indices, active, cached_groups, group_count);
     mask[0] = 1;
@@ -4415,7 +4415,7 @@ int C2_HOOK_FASTCALL FUN_004c3b60(br_scalar* original, br_scalar* rhs, br_scalar
                 repeated = RQSolveSeen(history, iteration, history[iteration]);
                 chosen = -1;
                 maximum = 0.0f;
-                for (i = 0; i < *(volatile int*)excluded_count; i++) {
+                for (i = 0; i < *(int*)excluded_count; i++) {
                     sum = 0.0;
                     selected = excluded[i];
                     for (j = 0; j < size; j++) sum = RQAccumulate(sum, &original[selected * 100 + j], &result[j]);
@@ -4466,7 +4466,7 @@ int C2_HOOK_FASTCALL FUN_004c3b60(br_scalar* original, br_scalar* rhs, br_scalar
                     return 0;
                 }
                 selected = excluded[chosen];
-                for (i = chosen + 1; i < *(volatile int*)excluded_count; i++) excluded[i - 1] = excluded[i];
+                for (i = chosen + 1; i < *(int*)excluded_count; i++) excluded[i - 1] = excluded[i];
                 *excluded_count = *excluded_count - 1;
                 excluded[*excluded_count] = selected;
                 selected = excluded[*excluded_count];
@@ -4489,8 +4489,8 @@ int C2_HOOK_FASTCALL FUN_004c3b60(br_scalar* original, br_scalar* rhs, br_scalar
 void C2_HOOK_FASTCALL RQExpand(br_scalar* matrix, const br_scalar* original, int old_size, int size, br_scalar* orthogonal, const unsigned char* indices) {
     br_scalar row[100];
     br_scalar maximum_scalar, diagonal_scalar, denominator, coefficient_scalar;
-    volatile br_scalar first;
-    volatile double root;
+    br_scalar first;
+    double root;
     double value, sum, maximum, diagonal, length, head, coefficient;
     const br_scalar* selected;
     int i, j, k;
@@ -4643,9 +4643,9 @@ void C2_HOOK_FASTCALL RQSingleExpand(br_scalar* matrix, const br_scalar* origina
     br_scalar row[100];
     br_scalar magnitude, second, second_coefficient, first_coefficient;
     /* The original reloads the rounded head for its coefficient division. */
-    volatile br_scalar first;
+    br_scalar first;
     /* Keep FABS after sqrt: GCC otherwise drops it even for negative NaNs. */
-    volatile double root;
+    double root;
     br_scalar updated_row, updated_matrix;
     double sum, maximum, diagonal, length, head, denominator;
     int i, j;
@@ -4825,7 +4825,7 @@ void C2_HOOK_FASTCALL SparseRQDcmpV(br_scalar* matrix, br_scalar* orthogonal, co
     br_scalar values[40];
     unsigned char columns[40];
     unsigned short rows[40];
-    volatile br_scalar intermediate[100];
+    br_scalar intermediate[100];
     int i, j, k, count;
     br_scalar maximum, denominator, coefficient, other_coefficient;
     double value, sum, length, head;
@@ -4945,7 +4945,7 @@ int C2_HOOK_FASTCALL MatrixProcess(br_scalar* matrix, br_scalar* orthogonal, int
 
 // FUNCTION: CARMA2_HW 0x004c5b60
 void C2_HOOK_FASTCALL RqBackSub(br_scalar* matrix, br_scalar* orthogonal, const br_scalar* rhs, br_scalar* result, int size) {
-    volatile br_scalar intermediate[100];
+    br_scalar intermediate[100];
     int i, j;
     double sum;
     intermediate[0] = RQDivideScalars(&rhs[0], &matrix[0]);
@@ -5110,10 +5110,10 @@ void C2_HOOK_FASTCALL PhysicsSetErrorHandler(tPhysicsError_cbfn* pError_cbfn) {
 
 // FUNCTION: CARMA2_HW 0x004c63b0
 void C2_HOOK_FASTCALL PhysicsAddObject(tPhysics_object* parent, tPhysics_object* child) {
-    tPhysics_object* previous = ((volatile const tPhysics_object*)parent)->child;
-    ((volatile tPhysics_object*)child)->next = previous;
-    ((volatile tPhysics_object*)parent)->child = child;
-    ((volatile tPhysics_object*)child)->parent = parent;
+    tPhysics_object* previous = ((const tPhysics_object*)parent)->child;
+    ((tPhysics_object*)child)->next = previous;
+    ((tPhysics_object*)parent)->child = child;
+    ((tPhysics_object*)child)->parent = parent;
 }
 
 // FUNCTION: CARMA2_HW 0x004c63d0
@@ -5122,38 +5122,38 @@ void C2_HOOK_FASTCALL AddCollisionInfoChild(tPhysics_object* parent, tPhysics_ob
     tPhysics_object* last = list;
     tPhysics_object* previous;
 
-    ((volatile tPhysics_object*)list)->parent = parent;
-    current = ((volatile const tPhysics_object*)list)->next;
+    ((tPhysics_object*)list)->parent = parent;
+    current = ((const tPhysics_object*)list)->next;
     while (current != NULL) {
         last = current;
-        ((volatile tPhysics_object*)last)->parent = parent;
-        current = ((volatile const tPhysics_object*)last)->next;
+        ((tPhysics_object*)last)->parent = parent;
+        current = ((const tPhysics_object*)last)->next;
     }
-    previous = ((volatile const tPhysics_object*)parent)->child;
-    ((volatile tPhysics_object*)last)->next = previous;
-    ((volatile tPhysics_object*)parent)->child = list;
+    previous = ((const tPhysics_object*)parent)->child;
+    ((tPhysics_object*)last)->next = previous;
+    ((tPhysics_object*)parent)->child = list;
 }
 
 // FUNCTION: CARMA2_HW 0x004c6410
 void C2_HOOK_FASTCALL FUN_004c6410(tPhysics_object* object) {
-    tPhysics_object* parent = ((volatile const tPhysics_object*)object)->parent;
-    tPhysics_object* previous = ((volatile const tPhysics_object*)parent)->child;
+    tPhysics_object* parent = ((const tPhysics_object*)object)->parent;
+    tPhysics_object* previous = ((const tPhysics_object*)parent)->child;
     tPhysics_object* next;
 
     if (previous == object) {
-        next = ((volatile const tPhysics_object*)object)->next;
-        ((volatile tPhysics_object*)parent)->child = next;
+        next = ((const tPhysics_object*)object)->next;
+        ((tPhysics_object*)parent)->child = next;
     } else {
-        next = ((volatile const tPhysics_object*)previous)->next;
+        next = ((const tPhysics_object*)previous)->next;
         while (next != object) {
             previous = next;
-            next = ((volatile const tPhysics_object*)previous)->next;
+            next = ((const tPhysics_object*)previous)->next;
         }
-        next = ((volatile const tPhysics_object*)object)->next;
-        ((volatile tPhysics_object*)previous)->next = next;
+        next = ((const tPhysics_object*)object)->next;
+        ((tPhysics_object*)previous)->next = next;
     }
-    ((volatile tPhysics_object*)object)->parent = NULL;
-    ((volatile tPhysics_object*)object)->next = NULL;
+    ((tPhysics_object*)object)->parent = NULL;
+    ((tPhysics_object*)object)->next = NULL;
 }
 
 // FUNCTION: CARMA2_HW 0x004c6470
@@ -5333,11 +5333,11 @@ int C2_HOOK_FASTCALL FUN_00428cf0(tPhysics_contact* output, int count, const tPh
     return count;
 }
 
-static volatile br_scalar* C2_HOOK_CDECL LimitScalarAt(const void* base, unsigned offset) {
-    return (volatile br_scalar*)((tU8*)(uintptr_t)base + offset);
+static br_scalar* C2_HOOK_CDECL LimitScalarAt(const void* base, unsigned offset) {
+    return (br_scalar*)((tU8*)(uintptr_t)base + offset);
 }
 static void C2_HOOK_CDECL LimitWord(void* base, unsigned offset, tU32 value) {
-    *(volatile tU32*)((tU8*)base + offset) = value;
+    *(tU32*)((tU8*)base + offset) = value;
 }
 static void C2_HOOK_CDECL LimitCopyWord(void* dest, unsigned dest_offset, const void* source, unsigned source_offset) {
     tU32 value = FrictionWord(source, source_offset);
@@ -5614,7 +5614,7 @@ int C2_HOOK_FASTCALL FUN_004bca10(tPhysics_object* object, tPhysics_joint_force*
                     /* Original writes this slot without increasing count. */
                 }
             } else if (kind == 10) {
-                if (*(volatile tU8*)((tU8*)object+0x1e0)) {
+                if (*(tU8*)((tU8*)object+0x1e0)) {
                     gPhysics_group_limit_692dd8=1;
                     scan=(tU8*)records;
                     for (index=0; index<count; ++index,scan+=96) {
@@ -5716,8 +5716,8 @@ int C2_HOOK_FASTCALL FUN_004bd6d0(tPhysics_object* list, tPhysics_joint_force* r
 /* Both original inline passes execute even though their accumulated energy
  * is not consumed. Keep the reads, child calls and scalar accumulation. */
 static void C2_HOOK_CDECL JointedMotionEnergyPass(tPhysics_object* first) {
-    volatile br_scalar total = 0.f;
-    volatile br_scalar energy;
+    br_scalar total = 0.f;
+    br_scalar energy;
     br_scalar children;
     br_scalar omega;
     double sum, velocity, angular, inertia, mass, subtotal;
@@ -5740,7 +5740,7 @@ static void C2_HOOK_CDECL JointedMotionEnergyPass(tPhysics_object* first) {
         energy = (br_scalar)PhysicsJointScalar(sum);
         children = HierarchyCalcEnergy(object->child);
         subtotal = (double)energy + total;
-        next = ((volatile tPhysics_object*)object)->next;
+        next = ((tPhysics_object*)object)->next;
         total = (br_scalar)PhysicsJointScalar(subtotal + children);
         object = next;
     }
@@ -5750,7 +5750,7 @@ static void C2_HOOK_CDECL JointedMotionEnergyPass(tPhysics_object* first) {
  * Integration must share the existing GNU-only helper/type declarations. */
 #if defined(__GNUC__) && defined(__i386__)
 #define JOINTED_MOTION(function_name, object, time) do { \
-    tHierarchyRawMotion volatile function = (tHierarchyRawMotion)(void*)(function_name); \
+    tHierarchyRawMotion function = (tHierarchyRawMotion)(void*)(function_name); \
     function((object), 0, HierarchyTimeWord(&(time))); \
 } while (0)
 #else
@@ -5759,7 +5759,7 @@ static void C2_HOOK_CDECL JointedMotionEnergyPass(tPhysics_object* first) {
 
 // FUNCTION: CARMA2_HW 0x004b7510
 void C2_HOOK_FAKE_THISCALL MoveJointedObject(tPhysics_object* pObject, undefined4 pUnused, br_scalar pTime) {
-    volatile tPhysics_object* observed = pObject;
+    tPhysics_object* observed = pObject;
     tPhysics_joint_force* records[40];
     br_scalar velocity[100];
     br_scalar impulses[100];
@@ -5802,7 +5802,7 @@ void C2_HOOK_FAKE_THISCALL MoveJointedObject(tPhysics_object* pObject, undefined
         }
         return;
     }
-    if (((volatile tPhysics_object*)pObject)->child != NULL) {
+    if (((tPhysics_object*)pObject)->child != NULL) {
         JOINTED_MOTION(FUN_004b8ee0, pObject, pTime);
         return;
     }
@@ -5831,7 +5831,7 @@ void C2_HOOK_FASTCALL FUN_004b9750(tPhysics_object* object) {
     memcpy((tU8*)object + 0x218, &empty, sizeof(empty));
 #if defined(__GNUC__) && defined(__i386__)
     {
-        tHierarchyRawMotion volatile function = (tHierarchyRawMotion)(void*)MoveJointedObject;
+        tHierarchyRawMotion function = (tHierarchyRawMotion)(void*)MoveJointedObject;
         function(object, 0, 0);
     }
 #else
@@ -5842,7 +5842,7 @@ void C2_HOOK_FASTCALL FUN_004b9750(tPhysics_object* object) {
 
 // FUNCTION: CARMA2_HW 0x004c25a0
 void C2_HOOK_FASTCALL FUN_004c25a0(tPhysics_object* pObject) {
-    volatile tPhysics_object* object = pObject;
+    tPhysics_object* object = pObject;
     tPhysics_object* child;
 
     if (object->field_0xf0 == 1) {
@@ -5853,7 +5853,7 @@ void C2_HOOK_FASTCALL FUN_004c25a0(tPhysics_object* pObject) {
     child = object->child;
     while (child != NULL) {
         FUN_004c25a0(child);
-        child = ((volatile tPhysics_object*)child)->next;
+        child = ((tPhysics_object*)child)->next;
     }
 }
 
@@ -5867,9 +5867,9 @@ static br_angle C2_HOOK_CDECL AngularForceAngle(double pValue) {
 }
 
 static int C2_HOOK_CDECL AngularForceNextIndex(const tPhysics_joint_force* pRecord, int pIndex) {
-    const volatile tPhysics_joint_force* record = pRecord;
-    const volatile tPhysics_object* object;
-    const volatile tPhysics_joint* joint;
+    const tPhysics_joint_force* record = pRecord;
+    const tPhysics_object* object;
+    const tPhysics_joint* joint;
     tU32 index = (tU32)pIndex;
 
     object = record->object_a;
@@ -5900,18 +5900,18 @@ static int C2_HOOK_CDECL AngularForceNextIndex(const tPhysics_joint_force* pReco
 /* ECX record pointer array, EDX impulses, count/callbacks on the stack; RET8. */
 // FUNCTION: CARMA2_HW 0x004bc190
 void C2_HOOK_FASTCALL FUN_004bc190(tPhysics_joint_force* const* pForces, br_scalar* pImpulses, int pCount, tWorld_callbacks* pCallbacks) {
-    tPhysics_joint_force* const volatile* forces = pForces;
-    const volatile br_scalar* impulses = pImpulses;
+    tPhysics_joint_force* const* forces = pForces;
+    const br_scalar* impulses = pImpulses;
     int outer = 0;
     (void)pCallbacks;
 
     while (outer < pCount) {
         tPhysics_object* object = forces[outer]->object_a;
-        volatile tPhysics_object* live = object;
+        tPhysics_object* live = object;
         int inner = outer;
         if (live->child != NULL) {
             while (inner < pCount) {
-                const volatile tPhysics_joint_force* record = forces[inner];
+                const tPhysics_joint_force* record = forces[inner];
                 if (record->object_b == object) {
                     double x = live->rotate_omega.v[0];
                     double y = live->rotate_omega.v[1];
@@ -5923,9 +5923,9 @@ void C2_HOOK_FASTCALL FUN_004bc190(tPhysics_joint_force* const* pForces, br_scal
                     z = live->omega.v[2];
                     new_norm = (x * x + y * y) + z * z;
                     if (FrictionGreater(new_norm, old_norm)) {
-                        const volatile tPhysics_object* other = record->object_a;
-                        const volatile tPhysics_joint_force* second;
-                        const volatile tPhysics_joint_force* third;
+                        const tPhysics_object* other = record->object_a;
+                        const tPhysics_joint_force* second;
+                        const tPhysics_joint_force* third;
                         br_vector3 axis, omega_axis, rotated;
                         br_matrix34 rotation;
                         br_scalar length_scalar, force_z;
@@ -5996,16 +5996,16 @@ void C2_HOOK_FASTCALL FUN_004bc190(tPhysics_joint_force* const* pForces, br_scal
 // GLOBAL: CARMA2_HW 0x006940a0
 tU32 gPhysics_group_counter_6940a0 = 0;
 
-static tPhysics_object* C2_HOOK_CDECL WakePointer(const void* base, unsigned offset) { return (tPhysics_object*)(uintptr_t)*(volatile const tU32*)((const tU8*)base+offset); }
+static tPhysics_object* C2_HOOK_CDECL WakePointer(const void* base, unsigned offset) { return (tPhysics_object*)(uintptr_t)*(const tU32*)((const tU8*)base+offset); }
 #define WakeParent(p) WakePointer((p),0x228)
 #define WakeChild(p) WakePointer((p),0x224)
 #define WakeNext(p) WakePointer((p),0x220)
 #define WakeJoint(p) ((tPhysics_joint*)WakePointer((p),0x188))
-#define WAKE_LABEL(p) (*(volatile tU8*)((tU8*)(p)+0x1dc))
-#define WAKE_RING(p) (*(volatile tU32*)((tU8*)(p)+0x1d8))
-#define WAKE_COUNTER (*(volatile tU32*)&gPhysics_group_counter_6940a0)
-#define WAKE_DISABLED(p) (*(volatile tU8*)((tU8*)(p)+0xec))
-#define WAKE_FACE(p) (*(volatile tU16*)((tU8*)(p)+0x178))
+#define WAKE_LABEL(p) (*(tU8*)((tU8*)(p)+0x1dc))
+#define WAKE_RING(p) (*(tU32*)((tU8*)(p)+0x1d8))
+#define WAKE_COUNTER (*(tU32*)&gPhysics_group_counter_6940a0)
+#define WAKE_DISABLED(p) (*(tU8*)((tU8*)(p)+0xec))
+#define WAKE_FACE(p) (*(tU16*)((tU8*)(p)+0x178))
 
 // FUNCTION: CARMA2_HW 0x004bae80
 void C2_HOOK_FASTCALL FUN_004bae80(tPhysics_object* object, tU32 label) {
@@ -6014,7 +6014,7 @@ void C2_HOOK_FASTCALL FUN_004bae80(tPhysics_object* object, tU32 label) {
     WAKE_LABEL(object)=(tU8)label;
     while(child!=NULL) {
         joint=WakeJoint(child);
-        if(joint!=NULL && *(volatile int*)joint!=0)FUN_004bae80(child,label);
+        if(joint!=NULL && *(int*)joint!=0)FUN_004bae80(child,label);
         child=WakeNext(child);
     }
 }
@@ -6028,13 +6028,13 @@ void C2_HOOK_FASTCALL FUN_004bddd0(tPhysics_object* object, tPhysics_object* oth
 
     parent = WakeParent(object);
     while (parent != NULL && WakeJoint(object) != NULL
-            && *(volatile int*)WakeJoint(object) != 0) {
+            && *(int*)WakeJoint(object) != 0) {
         object = parent;
         parent = WakeParent(object);
     }
     parent = WakeParent(other);
     while (parent != NULL && WakeJoint(other) != NULL
-            && *(volatile int*)WakeJoint(other) != 0) {
+            && *(int*)WakeJoint(other) != 0) {
         other = parent;
         parent = WakeParent(other);
     }
@@ -6047,7 +6047,7 @@ void C2_HOOK_FASTCALL FUN_004bddd0(tPhysics_object* object, tPhysics_object* oth
             state = WAKE_COUNTER;
             WAKE_LABEL(object) = (tU8)state;
             while (child != NULL) {
-                if (WakeJoint(child) != NULL && *(volatile int*)WakeJoint(child) != 0) {
+                if (WakeJoint(child) != NULL && *(int*)WakeJoint(child) != 0) {
                     FUN_004bae80(child, state);
                 }
                 child = WakeNext(child);
@@ -6063,7 +6063,7 @@ void C2_HOOK_FASTCALL FUN_004bddd0(tPhysics_object* object, tPhysics_object* oth
             state = WAKE_COUNTER;
             WAKE_LABEL(object) = (tU8)state;
             while (child != NULL) {
-                if (WakeJoint(child) != NULL && *(volatile int*)WakeJoint(child) != 0) {
+                if (WakeJoint(child) != NULL && *(int*)WakeJoint(child) != 0) {
                     FUN_004bae80(child, state);
                 }
                 child = WakeNext(child);
@@ -6072,7 +6072,7 @@ void C2_HOOK_FASTCALL FUN_004bddd0(tPhysics_object* object, tPhysics_object* oth
             state = WAKE_COUNTER;
             WAKE_LABEL(other) = (tU8)state;
             while (child != NULL) {
-                if (WakeJoint(child) != NULL && *(volatile int*)WakeJoint(child) != 0) {
+                if (WakeJoint(child) != NULL && *(int*)WakeJoint(child) != 0) {
                     FUN_004bae80(child, state);
                 }
                 child = WakeNext(child);
@@ -6085,7 +6085,7 @@ void C2_HOOK_FASTCALL FUN_004bddd0(tPhysics_object* object, tPhysics_object* oth
             state = (tU32)(tS32)(tS8)WAKE_LABEL(other);
             WAKE_LABEL(object) = (tU8)state;
             while (child != NULL) {
-                if (WakeJoint(child) != NULL && *(volatile int*)WakeJoint(child) != 0) {
+                if (WakeJoint(child) != NULL && *(int*)WakeJoint(child) != 0) {
                     FUN_004bae80(child, state);
                 }
                 child = WakeNext(child);
@@ -6100,7 +6100,7 @@ void C2_HOOK_FASTCALL FUN_004bddd0(tPhysics_object* object, tPhysics_object* oth
         state = (tU32)(tS32)(tS8)WAKE_LABEL(object);
         WAKE_LABEL(other) = (tU8)state;
         while (child != NULL) {
-            if (WakeJoint(child) != NULL && *(volatile int*)WakeJoint(child) != 0) {
+            if (WakeJoint(child) != NULL && *(int*)WakeJoint(child) != 0) {
                 FUN_004bae80(child, state);
             }
             child = WakeNext(child);
@@ -6116,7 +6116,7 @@ void C2_HOOK_FASTCALL FUN_004bddd0(tPhysics_object* object, tPhysics_object* oth
             child = WakeChild(current);
             WAKE_LABEL(current) = (tU8)state;
             while (child != NULL) {
-                if (WakeJoint(child) != NULL && *(volatile int*)WakeJoint(child) != 0) {
+                if (WakeJoint(child) != NULL && *(int*)WakeJoint(child) != 0) {
                     FUN_004bae80(child, state);
                 }
                 child = WakeNext(child);
@@ -6127,7 +6127,7 @@ void C2_HOOK_FASTCALL FUN_004bddd0(tPhysics_object* object, tPhysics_object* oth
         child = WakeChild(current);
         WAKE_LABEL(current) = (tU8)state;
         while (child != NULL) {
-            if (WakeJoint(child) != NULL && *(volatile int*)WakeJoint(child) != 0) {
+            if (WakeJoint(child) != NULL && *(int*)WakeJoint(child) != 0) {
                 FUN_004bae80(child, state);
             }
             child = WakeNext(child);
@@ -6141,8 +6141,8 @@ void C2_HOOK_FASTCALL FUN_004bddd0(tPhysics_object* object, tPhysics_object* oth
  * differences pass, exactly original TEST AH,41 / JE reject. */
 static int C2_HOOK_CDECL WakeBounds(const tPhysics_object* a, const tPhysics_object* b) {
     unsigned i;
-    for(i=0;i<3;i++)if(FrictionSubtractScalar(FrictionRead(a,0xf4+4*i),(volatile const br_scalar*)((const tU8*)b+0x100+4*i))>0.01)return 0;
-    for(i=0;i<3;i++)if(FrictionSubtractScalar(FrictionRead(b,0xf4+4*i),(volatile const br_scalar*)((const tU8*)a+0x100+4*i))>0.01)return 0;
+    for(i=0;i<3;i++)if(FrictionSubtractScalar(FrictionRead(a,0xf4+4*i),(const br_scalar*)((const tU8*)b+0x100+4*i))>0.01)return 0;
+    for(i=0;i<3;i++)if(FrictionSubtractScalar(FrictionRead(b,0xf4+4*i),(const br_scalar*)((const tU8*)a+0x100+4*i))>0.01)return 0;
     return 1;
 }
 static tPhysics_object* C2_HOOK_CDECL WakeAncestor(tPhysics_object* object) {
@@ -6150,7 +6150,7 @@ static tPhysics_object* C2_HOOK_CDECL WakeAncestor(tPhysics_object* object) {
     tPhysics_joint* joint;
     while(parent!=NULL) {
         joint=WakeJoint(object);
-        if(joint==NULL || *(volatile int*)joint==0)break;
+        if(joint==NULL || *(int*)joint==0)break;
         object=parent;
         parent=WakeParent(object);
     }
@@ -6164,7 +6164,7 @@ static void C2_HOOK_CDECL WakeDescendants(tPhysics_object* object) {
     child=WakeChild(object);
     while(child!=NULL) {
         if(WAKE_DISABLED(child)!=0) {
-            tU32 face=(tU32)*(volatile int*)&gFace_num__car;
+            tU32 face=(tU32)*(int*)&gFace_num__car;
             WAKE_DISABLED(child)=0;
             WAKE_FACE(child)=(tU16)(face-2u);
         }
@@ -6182,7 +6182,7 @@ void C2_HOOK_FASTCALL CheckForObjectHierachyTouchingObjectList(tPhysics_object* 
         if(WAKE_DISABLED(list)!=0) {
             if(WakeBounds(object,list)) {
                 root=WakeAncestor(list);
-                face=(tU32)*(volatile int*)&gFace_num__car;
+                face=(tU32)*(int*)&gFace_num__car;
                 WAKE_DISABLED(root)=0;
                 WAKE_FACE(root)=(tU16)(face-2u);
                 if(WakeChild(root)!=NULL || WakeJoint(root)!=NULL || WakePointer(root,0x18c)!=NULL)WakeDescendants(root);
@@ -6193,7 +6193,7 @@ void C2_HOOK_FASTCALL CheckForObjectHierachyTouchingObjectList(tPhysics_object* 
                 while(child!=NULL) {
                     if(WakeBounds(child,list)) {
                         root=WakeAncestor(list);
-                        face=(tU32)*(volatile int*)&gFace_num__car;
+                        face=(tU32)*(int*)&gFace_num__car;
                         captured_child=WakeChild(root);
                         WAKE_FACE(root)=(tU16)(face-2u);
                         WAKE_DISABLED(root)=0;
@@ -6218,7 +6218,7 @@ void C2_HOOK_FASTCALL FUN_004be0e0(tPhysics_object* object, tPhysics_object* ori
     tU32 face;
     if(WAKE_DISABLED(object)==0)return;
     root=WakeAncestor(object);
-    face=(tU32)*(volatile int*)&gFace_num__car;
+    face=(tU32)*(int*)&gFace_num__car;
     WAKE_DISABLED(root)=0;
     WAKE_FACE(root)=(tU16)(face-2u);
     if(WakeChild(root)!=NULL || WakeJoint(root)!=NULL || WakePointer(root,0x18c)!=NULL)WakeDescendants(root);
@@ -6267,7 +6267,7 @@ int C2_HOOK_FASTCALL CheckForObjectHierachyTouchingAnotherObject(tPhysics_object
     }
     if (WAKE_DISABLED(other) != 0) {
         root = WakeAncestor(other);
-        face = (tU32)*(volatile int*)&gFace_num__car;
+        face = (tU32)*(int*)&gFace_num__car;
         WAKE_DISABLED(root) = 0;
         WAKE_FACE(root) = (tU16)(face - 2u);
         if (WakeChild(root) != NULL || WakeJoint(root) != NULL || WakePointer(root, 0x18c) != NULL) {
@@ -6301,19 +6301,19 @@ int C2_HOOK_FASTCALL CheckForObjectHierachyTouchingAnotherObject(tPhysics_object
 }
 
 static tU32 C2_HOOK_CDECL PrepareWord(const void* base, unsigned offset) {
-    return *(const volatile tU32*)((const tU8*)base + offset);
+    return *(const tU32*)((const tU8*)base + offset);
 }
 static void C2_HOOK_CDECL PrepareWriteWord(void* base, unsigned offset, tU32 value) {
-    *(volatile tU32*)((tU8*)base + offset) = value;
+    *(tU32*)((tU8*)base + offset) = value;
 }
 static tPhysics_object* C2_HOOK_CDECL PreparePointer(const void* base, unsigned offset) {
     return (tPhysics_object*)(uintptr_t)PrepareWord(base, offset);
 }
 static tU8 C2_HOOK_CDECL PrepareByte(const void* base, unsigned offset) {
-    return *(const volatile tU8*)((const tU8*)base + offset);
+    return *(const tU8*)((const tU8*)base + offset);
 }
 static void C2_HOOK_CDECL PrepareWriteByte(void* base, unsigned offset, tU8 value) {
-    *(volatile tU8*)((tU8*)base + offset) = value;
+    *(tU8*)((tU8*)base + offset) = value;
 }
 static const br_scalar* C2_HOOK_CDECL PrepareScalarPointer(const void* base, unsigned offset) {
     return (const br_scalar*)((const tU8*)base + offset);
@@ -6380,10 +6380,10 @@ void C2_HOOK_FASTCALL InternalPrepareObject(tPhysics_object* object) {
         y *= 50.0;
         z *= 50.0;
         scale *= 50.0;
-        *(volatile br_scalar*)((tU8*)object + 8) = (br_scalar)PhysicsJointScalar(x);
-        *(volatile br_scalar*)((tU8*)object + 0xc) = (br_scalar)PhysicsJointScalar(y);
-        *(volatile br_scalar*)((tU8*)object + 0x10) = (br_scalar)PhysicsJointScalar(z);
-        *(volatile br_scalar*)((tU8*)object + 0x21c) = (br_scalar)PhysicsJointScalar(scale);
+        *(br_scalar*)((tU8*)object + 8) = (br_scalar)PhysicsJointScalar(x);
+        *(br_scalar*)((tU8*)object + 0xc) = (br_scalar)PhysicsJointScalar(y);
+        *(br_scalar*)((tU8*)object + 0x10) = (br_scalar)PhysicsJointScalar(z);
+        *(br_scalar*)((tU8*)object + 0x21c) = (br_scalar)PhysicsJointScalar(scale);
     }
     mode = PrepareWord(object, 0xf0);
     /* TEST CL,DL tests only the low bit of the disabled byte. */
@@ -6465,7 +6465,7 @@ void C2_HOOK_FASTCALL PrepareObject(tPhysics_object* object, tPhysics_object** l
     tU8 disabled;
 
     InternalPrepareObject(object);
-    *(volatile tU32*)&gPhysics_prepared_objects_692dcc = 1;
+    *(tU32*)&gPhysics_prepared_objects_692dcc = 1;
     neighbor = PreparePointer(object, 0x22c);
     if (neighbor != NULL && PhysicsLessOrUnordered(PrepareScalarPointer(object, 0xb0), PrepareScalarPointer(neighbor, 0xb0))) {
         do {
@@ -6494,15 +6494,15 @@ void C2_HOOK_FASTCALL PrepareObject(tPhysics_object* object, tPhysics_object** l
             neighbor = PreparePointer(object, 0x220);
         }
     }
-    if (*(volatile tU32*)&gPhysics_stationary_filter_6940ac != 0) {
+    if (*(tU32*)&gPhysics_stationary_filter_6940ac != 0) {
         disabled = PrepareByte(object, 0xec);
         /* The original dereferences list_head even for an active object. */
         original_list = PreparePointer(list_head, 0);
         if (disabled != 0) {
             root = WakeAncestor(object);
-            face = (tU32)*(volatile int*)&gFace_num__car;
+            face = (tU32)*(int*)&gFace_num__car;
             PrepareWriteByte(root, 0xec, 0);
-            *(volatile tU16*)((tU8*)root + 0x178) = (tU16)(face - 2u);
+            *(tU16*)((tU8*)root + 0x178) = (tU16)(face - 2u);
             if (PreparePointer(root, 0x224) != NULL || PreparePointer(root, 0x188) != NULL || PreparePointer(root, 0x18c) != NULL) WakeDescendants(root);
             current = original_list;
             while (current != NULL) {
@@ -6522,7 +6522,7 @@ void C2_HOOK_FASTCALL PrepareObject(tPhysics_object* object, tPhysics_object** l
             }
         }
     }
-    reduced = *(tPhysics_object** volatile*)&gReduced_object_list;
+    reduced = *(tPhysics_object***)&gReduced_object_list;
     if (reduced != NULL) {
         before = PreparePointer(reduced, 0);
         PrepareWriteWord(object, 0x234, (tU32)(uintptr_t)before);
@@ -6530,29 +6530,29 @@ void C2_HOOK_FASTCALL PrepareObject(tPhysics_object* object, tPhysics_object** l
     }
 }
 
-static volatile br_scalar* C2_HOOK_CDECL ClampScalar(void* base, tU32 offset) {
-    return (volatile br_scalar*)(uintptr_t)((tU32)(uintptr_t)base + offset);
+static br_scalar* C2_HOOK_CDECL ClampScalar(void* base, tU32 offset) {
+    return (br_scalar*)(uintptr_t)((tU32)(uintptr_t)base + offset);
 }
-static volatile tU32* C2_HOOK_CDECL ClampWord(void* base, tU32 offset) {
-    return (volatile tU32*)(uintptr_t)((tU32)(uintptr_t)base + offset);
+static tU32* C2_HOOK_CDECL ClampWord(void* base, tU32 offset) {
+    return (tU32*)(uintptr_t)((tU32)(uintptr_t)base + offset);
 }
-static void* C2_HOOK_CDECL ClampRecord(tPhysics_joint_force* records, const volatile tU32* index) {
+static void* C2_HOOK_CDECL ClampRecord(tPhysics_joint_force* records, const tU32* index) {
     return (void*)(uintptr_t)((tU32)(uintptr_t)records + *index * 96u);
 }
-static void C2_HOOK_CDECL ClampScale(void* record, tU32 offset, const volatile br_scalar* ratio) {
-    volatile double loaded = (double)*ClampScalar(record, offset);
+static void C2_HOOK_CDECL ClampScale(void* record, tU32 offset, const br_scalar* ratio) {
+    double loaded = (double)*ClampScalar(record, offset);
     *ClampScalar(record, offset) = (br_scalar)(loaded * (double)*ratio);
 }
 
 // FUNCTION: CARMA2_HW 0x004ba550
 int C2_HOOK_FASTCALL FUN_004ba550(tPhysics_joint_force* records, br_scalar* impulses, int count, const int* indices, int selected_count, br_scalar maximum) {
-    const volatile tU32* index = (const volatile tU32*)indices;
-    volatile double sum = 0.0;
-    volatile double loaded;
-    volatile br_scalar ratio;
-    volatile double negative_ratio;
-    volatile double wide_ratio;
-    volatile br_scalar* impulse;
+    const tU32* index = (const tU32*)indices;
+    double sum = 0.0;
+    double loaded;
+    br_scalar ratio;
+    double negative_ratio;
+    double wide_ratio;
+    br_scalar* impulse;
     void* record;
     int i;
 
@@ -6562,7 +6562,7 @@ int C2_HOOK_FASTCALL FUN_004ba550(tPhysics_joint_force* records, br_scalar* impu
     if (PhysicsWallNaN(sum) || PhysicsWallNaN((double)maximum) || !(sum > (double)maximum)) return 0;
 
     wide_ratio = (double)maximum / sum;
-    *(volatile tU32*)&gPhysics_joints_changed_692dc8 = 1;
+    *(tU32*)&gPhysics_joints_changed_692dc8 = 1;
     ratio = (br_scalar)wide_ratio;
     for (i = 0; i < count; ++i) {
         impulse = ClampScalar(impulses, (tU32)i * 4u);
@@ -6600,9 +6600,9 @@ int C2_HOOK_FASTCALL FUN_004ba550(tPhysics_joint_force* records, br_scalar* impu
 static double C2_HOOK_CDECL PhysicsJointScalar(double value);
 static double C2_HOOK_CDECL PhysicsJointSum(double a, double b);
 static double C2_HOOK_CDECL FrictionRead(const void* base, unsigned offset);
-static double C2_HOOK_CDECL FrictionDivideScalars(volatile const br_scalar* left, volatile const br_scalar* right);
-static double C2_HOOK_CDECL FrictionAddScalar(double value, volatile const br_scalar* scalar);
-static double C2_HOOK_CDECL FrictionSubtractScalar(double value, volatile const br_scalar* scalar);
+static double C2_HOOK_CDECL FrictionDivideScalars(const br_scalar* left, const br_scalar* right);
+static double C2_HOOK_CDECL FrictionAddScalar(double value, const br_scalar* scalar);
+static double C2_HOOK_CDECL FrictionSubtractScalar(double value, const br_scalar* scalar);
 static double C2_HOOK_CDECL PartnerMultiplyRawScalar(double value, const br_scalar* scalar);
 static int C2_HOOK_CDECL FrictionLessOrUnordered(double left, double right);
 static tPhysics_object* C2_HOOK_CDECL WakePointer(const void* base, unsigned offset);
@@ -6638,7 +6638,7 @@ void C2_HOOK_FAKE_THISCALL FUN_004c2670(tPhysics_object* object, undefined4 unus
     br_angle integer_angle;
 
     (void)unused_edx;
-    if (((volatile const tPhysics_object*)object)->disable_move_rotate != 0) return;
+    if (((const tPhysics_object*)object)->disable_move_rotate != 0) return;
     x = FrictionRead(object, 0x1c0);
     y = FrictionRead(object, 0x1c4);
     z = FrictionRead(object, 0x1c8);
@@ -6655,22 +6655,22 @@ void C2_HOOK_FAKE_THISCALL FUN_004c2670(tPhysics_object* object, undefined4 unus
     center = (const br_vector3*)((const tU8*)object + 0x14);
     BrMatrix34ApplyV(&projected, center, &actor->t.t.mat);
     actor = InterpolationActor(object);
-    *(volatile br_scalar*)&actor->t.t.mat.m[3][0] = (br_scalar)PhysicsJointScalar(FrictionAddScalar((double)projected.v[0], &actor->t.t.mat.m[3][0]));
+    *(br_scalar*)&actor->t.t.mat.m[3][0] = (br_scalar)PhysicsJointScalar(FrictionAddScalar((double)projected.v[0], &actor->t.t.mat.m[3][0]));
     actor = InterpolationActor(object);
-    *(volatile br_scalar*)&actor->t.t.mat.m[3][1] = (br_scalar)PhysicsJointScalar(FrictionAddScalar((double)projected.v[1], &actor->t.t.mat.m[3][1]));
+    *(br_scalar*)&actor->t.t.mat.m[3][1] = (br_scalar)PhysicsJointScalar(FrictionAddScalar((double)projected.v[1], &actor->t.t.mat.m[3][1]));
     actor = InterpolationActor(object);
-    *(volatile br_scalar*)&actor->t.t.mat.m[3][2] = (br_scalar)PhysicsJointScalar(FrictionAddScalar((double)projected.v[2], &actor->t.t.mat.m[3][2]));
+    *(br_scalar*)&actor->t.t.mat.m[3][2] = (br_scalar)PhysicsJointScalar(FrictionAddScalar((double)projected.v[2], &actor->t.t.mat.m[3][2]));
     integer_angle = AngularForceAngle((double)angle * 10430.378350470453);
     actor = InterpolationActor(object);
     BrMatrix34PreRotate(&actor->t.t.mat, integer_angle, &axis);
     actor = InterpolationActor(object);
     BrMatrix34ApplyV(&projected, center, &actor->t.t.mat);
     actor = InterpolationActor(object);
-    *(volatile br_scalar*)&actor->t.t.mat.m[3][0] = (br_scalar)PhysicsJointScalar(FrictionSubtractScalar(FrictionRead(actor, 0x50), &projected.v[0]));
+    *(br_scalar*)&actor->t.t.mat.m[3][0] = (br_scalar)PhysicsJointScalar(FrictionSubtractScalar(FrictionRead(actor, 0x50), &projected.v[0]));
     actor = InterpolationActor(object);
-    *(volatile br_scalar*)&actor->t.t.mat.m[3][1] = (br_scalar)PhysicsJointScalar(FrictionSubtractScalar(FrictionRead(actor, 0x54), &projected.v[1]));
+    *(br_scalar*)&actor->t.t.mat.m[3][1] = (br_scalar)PhysicsJointScalar(FrictionSubtractScalar(FrictionRead(actor, 0x54), &projected.v[1]));
     actor = InterpolationActor(object);
-    *(volatile br_scalar*)&actor->t.t.mat.m[3][2] = (br_scalar)PhysicsJointScalar(FrictionSubtractScalar(FrictionRead(actor, 0x58), &projected.v[2]));
+    *(br_scalar*)&actor->t.t.mat.m[3][2] = (br_scalar)PhysicsJointScalar(FrictionSubtractScalar(FrictionRead(actor, 0x58), &projected.v[2]));
 }
 
 // FUNCTION: CARMA2_HW 0x004c2830
@@ -6686,13 +6686,13 @@ void C2_HOOK_FAKE_THISCALL InterpolateSingleObject(tPhysics_object* object, unde
     x = FrictionAddScalar(x, &actor->t.t.mat.m[3][0]);
     z = FrictionRead(object, 0x70);
     y = PartnerMultiplyRawScalar(y, &time);
-    *(volatile br_scalar*)&actor->t.t.mat.m[3][0] = (br_scalar)PhysicsJointScalar(x);
+    *(br_scalar*)&actor->t.t.mat.m[3][0] = (br_scalar)PhysicsJointScalar(x);
     actor = InterpolationActor(object);
     y = FrictionAddScalar(y, &actor->t.t.mat.m[3][1]);
     z = PartnerMultiplyRawScalar(z, &time);
-    *(volatile br_scalar*)&actor->t.t.mat.m[3][1] = (br_scalar)PhysicsJointScalar(y);
+    *(br_scalar*)&actor->t.t.mat.m[3][1] = (br_scalar)PhysicsJointScalar(y);
     actor = InterpolationActor(object);
-    *(volatile br_scalar*)&actor->t.t.mat.m[3][2] = (br_scalar)PhysicsJointScalar(FrictionAddScalar(z, &actor->t.t.mat.m[3][2]));
+    *(br_scalar*)&actor->t.t.mat.m[3][2] = (br_scalar)PhysicsJointScalar(FrictionAddScalar(z, &actor->t.t.mat.m[3][2]));
     InterpolationForward(FUN_004c2670, object, unused_edx, &time);
     child = WakePointer(object, 0x224);
     while (child != NULL) {
@@ -6715,13 +6715,13 @@ void C2_HOOK_FAKE_THISCALL FUN_004c28a0(tPhysics_object* list, undefined4 unused
         x = FrictionAddScalar(x, &actor->t.t.mat.m[3][0]);
         z = FrictionRead(list, 0x70);
         y = PartnerMultiplyRawScalar(y, &time);
-        *(volatile br_scalar*)&actor->t.t.mat.m[3][0] = (br_scalar)PhysicsJointScalar(x);
+        *(br_scalar*)&actor->t.t.mat.m[3][0] = (br_scalar)PhysicsJointScalar(x);
         actor = InterpolationActor(list);
         y = FrictionAddScalar(y, &actor->t.t.mat.m[3][1]);
         z = PartnerMultiplyRawScalar(z, &time);
-        *(volatile br_scalar*)&actor->t.t.mat.m[3][1] = (br_scalar)PhysicsJointScalar(y);
+        *(br_scalar*)&actor->t.t.mat.m[3][1] = (br_scalar)PhysicsJointScalar(y);
         actor = InterpolationActor(list);
-        *(volatile br_scalar*)&actor->t.t.mat.m[3][2] = (br_scalar)PhysicsJointScalar(FrictionAddScalar(z, &actor->t.t.mat.m[3][2]));
+        *(br_scalar*)&actor->t.t.mat.m[3][2] = (br_scalar)PhysicsJointScalar(FrictionAddScalar(z, &actor->t.t.mat.m[3][2]));
         InterpolationForward(FUN_004c2670, list, unused_edx, &time);
         child = WakePointer(list, 0x224);
         if (child != NULL) InterpolationForward(FUN_004c28a0, child, unused_edx, &time);
@@ -6730,7 +6730,7 @@ void C2_HOOK_FAKE_THISCALL FUN_004c28a0(tPhysics_object* list, undefined4 unused
 }
 
 static tPhysics_object* C2_HOOK_CDECL ListMatrixPointer(const void* base, tU32 offset) {
-    return (tPhysics_object*)(uintptr_t)*(volatile const tU32*)((const tU8*)base + offset);
+    return (tPhysics_object*)(uintptr_t)*(const tU32*)((const tU8*)base + offset);
 }
 static br_matrix34* C2_HOOK_CDECL ListMatrixActor(const tPhysics_object* object) {
     return (br_matrix34*)(uintptr_t)((tU32)(uintptr_t)ListMatrixPointer(object, 0) + 0x2cu);
@@ -6740,7 +6740,7 @@ static br_matrix34* C2_HOOK_CDECL ListMatrixActor(const tPhysics_object* object)
 void C2_HOOK_FASTCALL ResetObjectList(tPhysics_object* list) {
     tPhysics_object* child;
     while (list != NULL) {
-        if (*(volatile const tU32*)((const tU8*)list + 0xf0) == 1) {
+        if (*(const tU32*)((const tU8*)list + 0xf0) == 1) {
             BrMatrix34Copy(ListMatrixActor(list), (const br_matrix34*)((const tU8*)list + 0xbc));
         } else {
             BrMatrix34LPNormalise(ListMatrixActor(list), (const br_matrix34*)((const tU8*)list + 0x8c));
@@ -6785,18 +6785,18 @@ void C2_HOOK_FASTCALL FUN_004c62e0(tPhysics_object* object, const br_matrix34* m
 }
 
 static tU32 C2_HOOK_CDECL CollisionBoundsReadWord(const void* base, unsigned offset) {
-    return *(volatile const tU32*)((const tU8*)base + offset);
+    return *(const tU32*)((const tU8*)base + offset);
 }
 static void C2_HOOK_CDECL CollisionBoundsCopy(void* destination, const void* source) {
     int i;
     for (i = 0; i < 6; ++i) {
-        *(volatile tU32*)((tU8*)destination + i * 4) = CollisionBoundsReadWord(source, i * 4);
+        *(tU32*)((tU8*)destination + i * 4) = CollisionBoundsReadWord(source, i * 4);
     }
 }
 static double C2_HOOK_CDECL CollisionBoundsSquared(const void* bounds, unsigned axis) {
     double minimum = FrictionRead(bounds, axis * 4);
     double maximum = FrictionRead(bounds, 12 + axis * 4);
-    volatile double square_minimum = minimum * minimum;
+    double square_minimum = minimum * minimum;
     br_scalar maximum_scalar = (br_scalar)PhysicsJointScalar(maximum);
     double square_maximum = PhysicsJointScalar(PartnerMultiplyRawScalar(maximum, &maximum_scalar));
 
@@ -6840,16 +6840,16 @@ void C2_HOOK_FASTCALL UpdateCollisionObject(tPhysics_object* object) {
     squared = PhysicsJointSum(x, PhysicsJointSum(z, y));
     radius = sqrt(squared);
     /* Preserve actual stores despite the current struct's reversed names. */
-    *(volatile br_scalar*)((tU8*)object + 0x140) = (br_scalar)PhysicsJointScalar(squared);
-    *(volatile br_scalar*)((tU8*)object + 0x13c) = (br_scalar)PhysicsJointScalar(radius);
+    *(br_scalar*)((tU8*)object + 0x140) = (br_scalar)PhysicsJointScalar(squared);
+    *(br_scalar*)((tU8*)object + 0x13c) = (br_scalar)PhysicsJointScalar(radius);
 }
 
 static tU32 C2_HOOK_CDECL GravityWord(const void* base, tU32 offset) {
-    return *(volatile const tU32*)((tU32)(uintptr_t)base + offset);
+    return *(const tU32*)((tU32)(uintptr_t)base + offset);
 }
 
 static void C2_HOOK_CDECL GravityStoreWord(void* base, tU32 offset, tU32 value) {
-    *(volatile tU32*)((tU32)(uintptr_t)base + offset) = value;
+    *(tU32*)((tU32)(uintptr_t)base + offset) = value;
 }
 
 static tPhysics_object* C2_HOOK_CDECL GravityPointer(const void* base, tU32 offset) {
@@ -6857,22 +6857,22 @@ static tPhysics_object* C2_HOOK_CDECL GravityPointer(const void* base, tU32 offs
 }
 
 static double C2_HOOK_CDECL GravityRead(const void* base, tU32 offset) {
-    return *(volatile const br_scalar*)((tU32)(uintptr_t)base + offset);
+    return *(const br_scalar*)((tU32)(uintptr_t)base + offset);
 }
 
 static br_scalar C2_HOOK_CDECL GravityRound(double value) {
-    volatile br_scalar result = (br_scalar)value;
+    br_scalar result = (br_scalar)value;
     return result;
 }
 
-static double C2_HOOK_CDECL GravityAddScalar(double left, volatile const br_scalar* right) {
+static double C2_HOOK_CDECL GravityAddScalar(double left, const br_scalar* right) {
     double result;
     result = left + (double)*right;
     return result;
 }
 
-static volatile const br_scalar* C2_HOOK_CDECL GravityScalarPointer(const void* base, tU32 offset) {
-    return (volatile const br_scalar*)((tU32)(uintptr_t)base + offset);
+static const br_scalar* C2_HOOK_CDECL GravityScalarPointer(const void* base, tU32 offset) {
+    return (const br_scalar*)((tU32)(uintptr_t)base + offset);
 }
 
 // FUNCTION: CARMA2_HW 0x004c29d0
@@ -6891,16 +6891,16 @@ void C2_HOOK_FASTCALL FUN_004c29d0(tPhysics_object* object, const br_vector3* ve
 // FUNCTION: CARMA2_HW 0x004c2910
 void C2_HOOK_FASTCALL FUN_004c2910(tPhysics_object* object) {
     tPhysics_object* child;
-    if (*(volatile const tU8*)((tU32)(uintptr_t)object + 0xec) == 0) {
+    if (*(const tU8*)((tU32)(uintptr_t)object + 0xec) == 0) {
         double x = GravityRead(object, 0x54);
         double y = GravityRead(object, 0x58);
         double z = GravityRead(object, 0x5c);
         x = GravityAddScalar(x, GravityScalarPointer(object, 0x68));
         y = GravityAddScalar(y, GravityScalarPointer(object, 0x6c));
         z = GravityAddScalar(z, GravityScalarPointer(object, 0x70));
-        *(volatile br_scalar*)((tU32)(uintptr_t)object + 0x68) = GravityRound(x);
-        *(volatile br_scalar*)((tU32)(uintptr_t)object + 0x6c) = GravityRound(y);
-        *(volatile br_scalar*)((tU32)(uintptr_t)object + 0x70) = GravityRound(z);
+        *(br_scalar*)((tU32)(uintptr_t)object + 0x68) = GravityRound(x);
+        *(br_scalar*)((tU32)(uintptr_t)object + 0x6c) = GravityRound(y);
+        *(br_scalar*)((tU32)(uintptr_t)object + 0x70) = GravityRound(z);
     }
     child = GravityPointer(object, 0x224);
     while (child != NULL) {
@@ -6945,9 +6945,9 @@ void C2_HOOK_FASTCALL FUN_004c2c90(tPhysics_object* object, const br_vector3* da
     rounded_z = FrictionScalar(new_z);
     FrictionWrite(object, 0x78, new_y);
     FrictionWrite(object, 0x7c, new_z);
-    if (!FrictionGreater(sign_x, 0.0)) *(volatile tU32*)((tU8*)object + 0x74) = 0;
-    if (!FrictionGreater(PartnerMultiplyScalarWide(&old_omega[1], new_y), 0.0)) *(volatile tU32*)((tU8*)object + 0x78) = 0;
-    if (!FrictionGreater(FrictionProductScalars(&old_omega[2], &rounded_z), 0.0)) *(volatile tU32*)((tU8*)object + 0x7c) = 0;
+    if (!FrictionGreater(sign_x, 0.0)) *(tU32*)((tU8*)object + 0x74) = 0;
+    if (!FrictionGreater(PartnerMultiplyScalarWide(&old_omega[1], new_y), 0.0)) *(tU32*)((tU8*)object + 0x78) = 0;
+    if (!FrictionGreater(FrictionProductScalars(&old_omega[2], &rounded_z), 0.0)) *(tU32*)((tU8*)object + 0x7c) = 0;
 }
 
 // FUNCTION: CARMA2_HW 0x004c2970
@@ -6956,16 +6956,16 @@ void C2_HOOK_FASTCALL FUN_004c2970(tPhysics_object* list) {
     double x, y, z;
 
     while (list != NULL) {
-        if (((volatile const tPhysics_object*)list)->disable_move_rotate == 0) {
+        if (((const tPhysics_object*)list)->disable_move_rotate == 0) {
             x = FrictionRead(list, 0x54);
             y = FrictionRead(list, 0x58);
             z = FrictionRead(list, 0x5c);
             x = FrictionAddScalar(x, (const br_scalar*)((const tU8*)list + 0x68));
             y = FrictionAddScalar(y, (const br_scalar*)((const tU8*)list + 0x6c));
             z = FrictionAddScalar(z, (const br_scalar*)((const tU8*)list + 0x70));
-            *(volatile br_scalar*)((tU8*)list + 0x68) = (br_scalar)PhysicsJointScalar(x);
-            *(volatile br_scalar*)((tU8*)list + 0x6c) = (br_scalar)PhysicsJointScalar(y);
-            *(volatile br_scalar*)((tU8*)list + 0x70) = (br_scalar)PhysicsJointScalar(z);
+            *(br_scalar*)((tU8*)list + 0x68) = (br_scalar)PhysicsJointScalar(x);
+            *(br_scalar*)((tU8*)list + 0x6c) = (br_scalar)PhysicsJointScalar(y);
+            *(br_scalar*)((tU8*)list + 0x70) = (br_scalar)PhysicsJointScalar(z);
         }
         child = WakePointer(list, 0x224);
         if (child != NULL) FUN_004c2970(child);
@@ -6997,7 +6997,7 @@ void C2_HOOK_FASTCALL FUN_004c2c30(tPhysics_object* object, const br_vector3* de
     y = FrictionAddScalar(y, (const br_scalar*)((const tU8*)object + 0x78));
     z = FrictionAddScalar(z, (const br_scalar*)((const tU8*)object + 0x7c));
     x = FrictionAddScalar(x, (const br_scalar*)((const tU8*)object + 0x74));
-    *(volatile br_scalar*)((tU8*)object + 0x78) = (br_scalar)PhysicsJointScalar(y);
-    *(volatile br_scalar*)((tU8*)object + 0x7c) = (br_scalar)PhysicsJointScalar(z);
-    *(volatile br_scalar*)((tU8*)object + 0x74) = (br_scalar)PhysicsJointScalar(x);
+    *(br_scalar*)((tU8*)object + 0x78) = (br_scalar)PhysicsJointScalar(y);
+    *(br_scalar*)((tU8*)object + 0x7c) = (br_scalar)PhysicsJointScalar(z);
+    *(br_scalar*)((tU8*)object + 0x74) = (br_scalar)PhysicsJointScalar(x);
 }

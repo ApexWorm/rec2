@@ -43,7 +43,7 @@ br_matrix34 gPick_model_to_view__finteray;
 /* Original x87 scalar stores are rounding points even when GCC retains
  * float expressions in registers. Keep those stores explicit at PC53. */
 static float C2_HOOK_FASTCALL FinterayScalar(double value) {
-    volatile float scalar = (float)value;
+    float scalar = (float)value;
 
     return scalar;
 }
@@ -56,7 +56,7 @@ static float C2_HOOK_FASTCALL FinterayScalar(double value) {
 static br_scalar C2_HOOK_FASTCALL FinterayEdgeScalar(double value) {
     br_scalar scalar = FinterayScalar(value);
     br_uint_32 bits;
-    volatile br_uint_32 stored;
+    br_uint_32 stored;
 
     /* VC5 otherwise returns the unrounded ST0 value after FST scalar and
      * reuses it for the next product. The original reloads that float slot. */
@@ -417,10 +417,10 @@ void C2_HOOK_FASTCALL StationarySphereEdgeCollide(br_vector3* pEdge_start, br_ve
     double limit;
     double length;
     double radius_squared;
-    volatile br_scalar ratio;
+    br_scalar ratio;
     br_scalar normal_x;
     br_scalar normal_y;
-    volatile br_scalar squared;
+    br_scalar squared;
 
     x = FinterayShapeLoadScalar(&pSphere_end->v[0]) - FinterayShapeLoadScalar(&pEdge_start->v[0]);
     y = FinterayShapeLoadScalar(&pSphere_end->v[1]) - FinterayShapeLoadScalar(&pEdge_start->v[1]);
@@ -482,11 +482,11 @@ void C2_HOOK_FASTCALL PointSphereCollision(br_vector3* pVertex, br_vector3* pSph
     double length;
     double scale;
     double point_z;
-    volatile br_vector3 delta;
-    volatile br_scalar direction_squared;
-    volatile br_scalar projection_scalar;
-    volatile br_scalar distance_squared;
-    volatile br_scalar time_scalar;
+    br_vector3 delta;
+    br_scalar direction_squared;
+    br_scalar projection_scalar;
+    br_scalar distance_squared;
+    br_scalar time_scalar;
 
     (void)pSphere_end;
     direction_y = FinterayShapeLoadScalar(&pSphere_direction->v[1]);
@@ -541,20 +541,20 @@ void C2_HOOK_FASTCALL PointSphereCollision(br_vector3* pVertex, br_vector3* pSph
 
 // FUNCTION: CARMA2_HW 0x0045d920
 void C2_HOOK_FASTCALL SphereEdgeCollide(br_vector3* pEdge_start, br_vector3* pEdge_end, br_vector3* pSphere_start, br_vector3* pSphere_end, tCollision_shape_sphere_data* pSphere, br_vector3* pPoint, br_vector3* pNormal, br_scalar* pT, int pStart_flags, int pEnd_flags) {
-    volatile br_vector3 edge;
-    volatile br_vector3 sphere_direction;
-    volatile br_vector3 along;
-    volatile br_vector3 perpendicular;
-    volatile br_vector3 offset;
-    volatile br_vector3 shifted;
-    volatile br_vector3 movement;
-    volatile br_scalar edge_squared;
-    volatile br_scalar perpendicular_squared;
-    volatile br_scalar projection;
-    volatile br_scalar time;
-    volatile br_scalar distance_scalar;
-    volatile br_scalar point_z;
-    volatile br_scalar motion_x;
+    br_vector3 edge;
+    br_vector3 sphere_direction;
+    br_vector3 along;
+    br_vector3 perpendicular;
+    br_vector3 offset;
+    br_vector3 shifted;
+    br_vector3 movement;
+    br_scalar edge_squared;
+    br_scalar perpendicular_squared;
+    br_scalar projection;
+    br_scalar time;
+    br_scalar distance_scalar;
+    br_scalar point_z;
+    br_scalar motion_x;
     double ex;
     double ey;
     double ez;
@@ -766,16 +766,16 @@ void C2_HOOK_FASTCALL CheckSingleFace(tFace_ref* pFace, br_vector3* ray_pos, br_
     float numerator;
     float t;
     double ratio;
-    volatile br_vector3* point = coll_pos;
-    const volatile br_vector3* direction = ray_dir;
-    const volatile br_vector3* position = ray_pos;
-    volatile br_vector3* output_normal = normal;
-    const volatile br_vector3* face_normal = &pFace->normal;
+    br_vector3* point = coll_pos;
+    const br_vector3* direction = ray_dir;
+    const br_vector3* position = ray_pos;
+    br_vector3* output_normal = normal;
+    const br_vector3* face_normal = &pFace->normal;
 
     material = pFace->material;
     *rt = 100.f;
     d = FinterayScalar(((double)pFace->normal.v[0] * ray_dir->v[0] + (double)pFace->normal.v[2] * ray_dir->v[2]) + (double)pFace->normal.v[1] * ray_dir->v[1]);
-    if (material != NULL && (*(const volatile br_uint_32*)&material->flags & (BR_MATF_ALWAYS_VISIBLE | BR_MATF_TWO_SIDED)) == 0 && d > 0.f) {
+    if (material != NULL && (*(const br_uint_32*)&material->flags & (BR_MATF_ALWAYS_VISIBLE | BR_MATF_TWO_SIDED)) == 0 && d > 0.f) {
         return;
     }
     if (material != NULL && material->identifier != NULL && (material->identifier[0] == '!' || material->identifier[0] == '>' || material->identifier[0] == '?') && gPling_materials) {
@@ -830,8 +830,8 @@ void C2_HOOK_FASTCALL MultiRayCheckSingleFace(int pNum_rays, tFace_ref* pFace, b
     float numerator;
     double ratio;
     int i;
-    volatile br_vector3* output_normal = normal;
-    const volatile br_vector3* face_normal = &pFace->normal;
+    br_vector3* output_normal = normal;
+    const br_vector3* face_normal = &pFace->normal;
 
     material = pFace->material;
     d = FinterayScalar(((double)pFace->normal.v[0] * ray_dir->v[0] + (double)ray_dir->v[1] * pFace->normal.v[1]) + (double)ray_dir->v[2] * pFace->normal.v[2]);
@@ -985,7 +985,7 @@ static void C2_HOOK_FASTCALL FinterayBoxCopyScalar(br_scalar* output, const br_s
 
 /* Unlike raw vector copies, the original equation-D load/store quiets sNaNs. */
 static void C2_HOOK_FASTCALL FinterayBoxStoreScalar(br_scalar* output, const br_scalar* input) {
-    volatile double value = *input;
+    double value = *input;
 
     *output = (br_scalar)value;
 }
@@ -1028,7 +1028,7 @@ static int C2_HOOK_FASTCALL FinterayBoxClip(br_vector3* polygon, int count, int 
 
 // FUNCTION: CARMA2_HW 0x0045ff90
 int C2_HOOK_FASTCALL ModelPickBox(br_actor* actor, tBounds* bnds, br_model* model, br_material* model_material, tFace_ref* face_list, int max_face, br_matrix34* pMat) {
-    v11model* prepared = ((volatile br_model*)model)->prepared;
+    v11model* prepared = ((br_model*)model)->prepared;
     v11group* prepared_group;
     v11face* face;
     br_vector3 polygon[12];
@@ -1453,7 +1453,7 @@ int C2_HOOK_FASTCALL LineBoxCollWithSphere(br_vector3* pStart, br_vector3* pEnd,
 /* Shape data can overlap the intersection/normal outputs. Reload each scalar
  * at the original arithmetic read boundary rather than retaining a member. */
 static double C2_HOOK_FASTCALL FinterayShapeLoadScalar(const br_scalar* input) {
-    return *(const volatile br_scalar*)input;
+    return *(const br_scalar*)input;
 }
 
 // FUNCTION: CARMA2_HW 0x00460f60
@@ -1598,8 +1598,8 @@ int C2_HOOK_FASTCALL LineSphereCollWithSphere(br_vector3* pStart, br_vector3* pE
 // FUNCTION: CARMA2_HW 0x00461310
 int C2_HOOK_FASTCALL LinePolyColl(br_vector3* pStart, br_vector3* pEnd, tCollision_shape_polyhedron_data* pPoly, br_vector3* pPoint, br_scalar pRadius, br_scalar* pT) {
     br_vector3 direction;
-    volatile br_scalar candidate[64];
-    volatile br_scalar denominators[64];
+    br_scalar candidate[64];
+    br_scalar denominators[64];
     int count;
     int plane;
     int selected = -1;
@@ -1673,11 +1673,11 @@ int C2_HOOK_FASTCALL LinePolyColl(br_vector3* pStart, br_vector3* pEnd, tCollisi
 
 /* Normal outputs may overwrite the shape's own plane pointer/count. */
 static br_vector4* C2_HOOK_FASTCALL FinterayShapePlanes(tCollision_shape_polyhedron_data* poly) {
-    return *(br_vector4* volatile*)&poly->planes;
+    return *(br_vector4**)&poly->planes;
 }
 
 static int C2_HOOK_FASTCALL FinterayShapePlaneCount(tCollision_shape_polyhedron_data* poly) {
-    return *(volatile int*)&poly->count_planes;
+    return *(int*)&poly->count_planes;
 }
 
 // FUNCTION: CARMA2_HW 0x00461520
@@ -1804,22 +1804,22 @@ int C2_HOOK_FASTCALL ShapeRayCastWithSphere(br_vector3* pStart, br_vector3* pEnd
     }
 }
 
-static int C2_HOOK_FASTCALL FinteraySphereFacePoint(tFace_ref* face, const volatile br_vector3* normal, const volatile br_vector3* point) {
+static int C2_HOOK_FASTCALL FinteraySphereFacePoint(tFace_ref* face, const br_vector3* normal, const br_vector3* point) {
     int axis;
     int axis_0;
     int axis_1;
-    volatile br_scalar u0;
-    volatile br_scalar v0;
-    volatile br_scalar v1;
-    volatile br_scalar v2;
-    volatile br_scalar u2_scalar;
-    volatile br_scalar du_scalar;
-    volatile br_scalar dv;
-    volatile br_scalar product_1;
-    volatile br_scalar product_2;
-    volatile br_scalar numerator;
-    volatile br_scalar denominator;
-    volatile br_scalar beta;
+    br_scalar u0;
+    br_scalar v0;
+    br_scalar v1;
+    br_scalar v2;
+    br_scalar u2_scalar;
+    br_scalar du_scalar;
+    br_scalar dv;
+    br_scalar product_1;
+    br_scalar product_2;
+    br_scalar numerator;
+    br_scalar denominator;
+    br_scalar beta;
     double u1;
     double u2;
     double du;
@@ -1871,12 +1871,12 @@ static int C2_HOOK_FASTCALL FinteraySphereFacePoint(tFace_ref* face, const volat
 // FUNCTION: CARMA2_HW 0x0045e850
 void C2_HOOK_FASTCALL SphereFaceCollide(tFace_ref* pFace, br_vector3* pStart, br_vector3* pEnd, br_scalar pRadius, void* pUnused_point, br_vector3* pNormal, br_scalar* pT) {
     br_material* material;
-    volatile br_vector3 normal;
-    volatile br_vector3 center;
-    volatile br_vector3 point;
-    volatile br_scalar start_scalar;
-    volatile br_scalar time;
-    volatile br_scalar plane_offset;
+    br_vector3 normal;
+    br_vector3 center;
+    br_vector3 point;
+    br_scalar start_scalar;
+    br_scalar time;
+    br_scalar plane_offset;
     double distance;
     double end_distance;
     double ratio;

@@ -17,7 +17,7 @@ typedef tU32 tEditorDeleteWord;
 #endif
 
 static tU32 C2_HOOK_CDECL EditorDeleteRead(const void* base, tU32 offset) {
-    return *(const volatile tEditorDeleteWord*)(uintptr_t)((tU32)(uintptr_t)base + offset);
+    return *(const tEditorDeleteWord*)(uintptr_t)((tU32)(uintptr_t)base + offset);
 }
 
 static int C2_HOOK_CDECL EditorDeleteZeroOrUnordered(const br_matrix34* matrix, tU32 offset) {
@@ -34,9 +34,9 @@ br_uint_32 C2_HOOK_FASTCALL DeleteBastards(br_actor* actor, br_matrix34* matrix,
 
     (void)data;
 
-    if (actor_word != *(const volatile tEditorDeleteWord*)&gAdditional_actors) {
+    if (actor_word != *(const tEditorDeleteWord*)&gAdditional_actors) {
         identifier = EditorDeleteRead(actor, 0x14);
-        if (identifier == 0 || *(const volatile unsigned char*)(uintptr_t)identifier == '&') {
+        if (identifier == 0 || *(const unsigned char*)(uintptr_t)identifier == '&') {
             if (EditorDeleteZeroOrUnordered(matrix, 0x24)
                     && EditorDeleteZeroOrUnordered(matrix, 0x28)
                     && EditorDeleteZeroOrUnordered(matrix, 0x2c)) {
@@ -45,20 +45,20 @@ br_uint_32 C2_HOOK_FASTCALL DeleteBastards(br_actor* actor, br_matrix34* matrix,
         }
     }
     if (EditorDeleteRead(actor, 0x18) != 0
-            || *(const volatile unsigned char*)(uintptr_t)((tU32)(uintptr_t)actor + 0x12u) != 1) {
+            || *(const unsigned char*)(uintptr_t)((tU32)(uintptr_t)actor + 0x12u) != 1) {
         return 0;
     }
 
 add_actor:
-    count = *(const volatile int*)&gDelete_count;
+    count = *(const int*)&gDelete_count;
     while ((tS32)index < count) {
         if (EditorDeleteRead(gDelete_list, index * 4u) == actor_word) {
             return 0;
         }
         index += 1u;
     }
-    *(volatile tEditorDeleteWord*)(uintptr_t)((tU32)(uintptr_t)gDelete_list + (tU32)count * 4u) = actor_word;
-    *(volatile tEditorDeleteWord*)&gDelete_count = (tU32)count + 1u;
+    *(tEditorDeleteWord*)(uintptr_t)((tU32)(uintptr_t)gDelete_list + (tU32)count * 4u) = actor_word;
+    *(tEditorDeleteWord*)&gDelete_count = (tU32)count + 1u;
     return 0;
 }
 
@@ -89,7 +89,7 @@ static double C2_HOOK_CDECL SpecVolSum(double a, double b) {
 }
 
 static double C2_HOOK_CDECL SpecVolRowLength(const br_matrix34* matrix, tU32 axis) {
-    const volatile br_scalar* row = (const volatile br_scalar*)(uintptr_t)
+    const br_scalar* row = (const br_scalar*)(uintptr_t)
         ((tU32)(uintptr_t)matrix + axis * 12u);
     double x = row[0];
     double y = row[1];
@@ -100,9 +100,9 @@ static double C2_HOOK_CDECL SpecVolRowLength(const br_matrix34* matrix, tU32 axi
 
 // FUNCTION: CARMA2_HW 0x005074d0
 void C2_HOOK_FASTCALL MungeMaterialSV(br_matrix34* matrix, br_material* material1, br_material* material2, int axis0, int axis1) {
-    volatile br_scalar* first = (volatile br_scalar*)(uintptr_t)
+    br_scalar* first = (br_scalar*)(uintptr_t)
         ((tU32)(uintptr_t)material1 + 0x24u);
-    volatile br_scalar* second = (volatile br_scalar*)(uintptr_t)
+    br_scalar* second = (br_scalar*)(uintptr_t)
         ((tU32)(uintptr_t)material1 + 0x30u);
 
     *first = (br_scalar)(SpecVolRowLength(matrix, (tU32)axis0) * 6.0);

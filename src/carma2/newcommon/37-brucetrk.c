@@ -59,7 +59,7 @@ void C2_HOOK_FASTCALL DisposeColumns(tTrack_spec* pTrack_spec) {
 void C2_HOOK_FASTCALL XZToColumnXZ(tU8* pColumn_x, tU8* pColumn_z, br_scalar pX, br_scalar pZ, tTrack_spec* pTrack_spec) {
     double column_x;
     double column_z;
-    volatile br_scalar rounded_x;
+    br_scalar rounded_x;
 
     column_x = ((double)pX - pTrack_spec->origin_x) / pTrack_spec->column_size_x;
     column_z = ((double)pZ - pTrack_spec->origin_z) / pTrack_spec->column_size_z;

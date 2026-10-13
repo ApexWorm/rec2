@@ -413,22 +413,22 @@ int C2_HOOK_FASTCALL TranslationMode(void) {
 
 // FUNCTION: CARMA2_HW 0x00461a00
 void C2_HOOK_FASTCALL PlayFlicsFromDisk(void) {
-    *(volatile int*)&gPlay_from_disk = 1;
+    *(int*)&gPlay_from_disk = 1;
 }
 
 // FUNCTION: CARMA2_HW 0x00461a10
 void C2_HOOK_FASTCALL PlayFlicsFromMemory(void) {
-    *(volatile int*)&gPlay_from_disk = 0;
+    *(int*)&gPlay_from_disk = 0;
 }
 
 // FUNCTION: CARMA2_HW 0x00461a20
 void C2_HOOK_FASTCALL TurnOffPanelFlics(void) {
-    *(volatile int*)&gPanel_flic_disable = 1;
+    *(int*)&gPanel_flic_disable = 1;
 }
 
 // FUNCTION: CARMA2_HW 0x00461a30
 void C2_HOOK_FASTCALL TurnOnPanelFlics(void) {
-    *(volatile int*)&gPanel_flic_disable = 0;
+    *(int*)&gPanel_flic_disable = 0;
 }
 
 // FUNCTION: CARMA2_HW 0x00461a60
@@ -581,14 +581,14 @@ void C2_HOOK_FASTCALL LoadInterfaceStrings(void) {
 
 // FUNCTION: CARMA2_HW 0x00463700
 void C2_HOOK_FASTCALL SuspendPendingFlic(void) {
-    int pending = *(volatile int*)&gPending_flic;
-    *(volatile int*)&gPending_flic = -1;
-    *(volatile int*)&gPending_pending_flic = pending;
+    int pending = *(int*)&gPending_flic;
+    *(int*)&gPending_flic = -1;
+    *(int*)&gPending_pending_flic = pending;
 }
 
 // FUNCTION: CARMA2_HW 0x00463720
 void C2_HOOK_FASTCALL ResumePendingFlic(void) {
-    int pending = *(volatile int*)&gPending_pending_flic;
-    *(volatile int*)&gPending_flic = pending;
+    int pending = *(int*)&gPending_pending_flic;
+    *(int*)&gPending_flic = pending;
 }
 

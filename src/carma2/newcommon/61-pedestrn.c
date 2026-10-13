@@ -391,17 +391,17 @@ typedef tU32 tPedCacheWord;
 #endif
 
 static tU32 C2_HOOK_CDECL PedCacheRead(const void* base, tU32 offset) {
-    return *(const volatile tPedCacheWord*)(uintptr_t)((tU32)(uintptr_t)base + offset);
+    return *(const tPedCacheWord*)(uintptr_t)((tU32)(uintptr_t)base + offset);
 }
 
 static void C2_HOOK_CDECL PedCacheWrite(void* base, tU32 offset, tU32 value) {
-    *(volatile tPedCacheWord*)(uintptr_t)((tU32)(uintptr_t)base + offset) = value;
+    *(tPedCacheWord*)(uintptr_t)((tU32)(uintptr_t)base + offset) = value;
 }
 
 // FUNCTION: CARMA2_HW 0x004d6c70
 void C2_HOOK_FASTCALL FlushAllPedCaches(void) {
-    tS32 count = *(volatile int*)&gPed_count;
-    tPedestrian* base = *(tPedestrian* volatile*)&gPedestrian_array;
+    tS32 count = *(int*)&gPed_count;
+    tPedestrian* base = *(tPedestrian**)&gPedestrian_array;
     tU32 row = (tU32)(uintptr_t)base + 0x0cu;
     tU32 index = 0;
     tU32 object;
@@ -420,7 +420,7 @@ void C2_HOOK_FASTCALL FlushAllPedCaches(void) {
                 PedCacheWrite((void*)(uintptr_t)object, 0xb0, 0);
             }
         }
-        count = *(volatile int*)&gPed_count;
+        count = *(int*)&gPed_count;
         index += 1u;
         row += 0x54u;
     } while ((tS32)index < count);
@@ -445,7 +445,7 @@ void C2_HOOK_FASTCALL SetDefaultPedFolderNames(void) {
 
 // FUNCTION: CARMA2_HW 0x004d6f50
 void C2_HOOK_FASTCALL SetZombiePedFolderNames(void) {
-    *(const char* volatile*)&gPedsFolder = "ZOMBIES";
+    gPedsFolder = "ZOMBIES";
     ConfigureZombiePedSoundPath();
     ConfigureZombiePedPowerupTxtPath();
     ConfigureZombiePedTextTxtPath();
@@ -454,7 +454,7 @@ void C2_HOOK_FASTCALL SetZombiePedFolderNames(void) {
 
 // FUNCTION: CARMA2_HW 0x004d6f30
 void C2_HOOK_FASTCALL SetBloodPedFolderNames(void) {
-    *(const char* volatile*)&gPedsFolder = "PEDS";
+    gPedsFolder = "PEDS";
     ConfigureBloodPedSoundPath();
     ConfigureBloodPedPowerupTxtPath();
     ConfigureBloodPedTextTxtPath();
@@ -463,7 +463,7 @@ void C2_HOOK_FASTCALL SetBloodPedFolderNames(void) {
 
 // FUNCTION: CARMA2_HW 0x004d6f70
 void C2_HOOK_FASTCALL SetAlienPedFolderNames(void) {
-    *(const char* volatile*)&gPedsFolder = "ALIENS";
+    gPedsFolder = "ALIENS";
     ConfigureAlienPedSoundPath();
     ConfigureAlienPedPowerupTxtPath();
     ConfigureAlienPedTextTxtPath();
@@ -474,23 +474,23 @@ void C2_HOOK_FASTCALL SetAlienPedFolderNames(void) {
 
 // FUNCTION: CARMA2_HW 0x004d6fc0
 int C2_HOOK_FASTCALL GetHowMuchBloodAndSnotToSmearAbout(void) {
-    tU32 level = (tU32)*(volatile int*)&gGoreLevel;
+    tU32 level = (tU32)*(int*)&gGoreLevel;
     return (tS32)(2u - level);
 }
 
 // FUNCTION: CARMA2_HW 0x004d6fd0
 int C2_HOOK_FASTCALL GetAnimalsOn(void) {
-    return *(volatile int*)&gAnimalsOn;
+    return *(int*)&gAnimalsOn;
 }
 
 // FUNCTION: CARMA2_HW 0x004d6fe0
 int C2_HOOK_FASTCALL IsItOkayToFireHorribleBallsOfNastyNapalmDeathAtPerfectlyInnocentPassersByAndByInnocentIDoMeanInTheBiblicalSense(void) {
-    return *(volatile int*)&gFlameThrowerOn;
+    return *(int*)&gFlameThrowerOn;
 }
 
 // FUNCTION: CARMA2_HW 0x004d6ff0
 int C2_HOOK_FASTCALL IsItReallyOKThatWeDontMakeAnyEffortToProtectAnySadFuckersOutThereThatDontWishToSeeInnocentPeopleBlownToBitsByHighExplosiveMinesAndShells(void) {
-    return *(volatile int*)&gExplosives_on;
+    return *(int*)&gExplosives_on;
 }
 
 // FUNCTION: CARMA2_HW 0x004d7000

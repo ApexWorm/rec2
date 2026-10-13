@@ -1042,7 +1042,7 @@ void C2_HOOK_FASTCALL RenderRecordedSmokeCircles(void) {
 
 /* Force the original float spills even with MSVC5's x87 value reuse. */
 static br_scalar C2_HOOK_CDECL SmokeScalarRound(double pValue) {
-    volatile union { br_scalar scalar; tU32 bits; } stored;
+    union { br_scalar scalar; tU32 bits; } stored;
     union { br_scalar scalar; tU32 bits; } result;
 
     stored.scalar = (br_scalar)pValue;
@@ -1137,9 +1137,9 @@ static void C2_HOOK_CDECL ReplaySmoke(br_pixelmap* pScreen, br_pixelmap* pDepth,
 void C2_HOOK_FASTCALL GenerateContinuousSmoke(tCar_spec* pCar, int pWheel, tU32 pTime) {
     br_vector3 pos;
     br_vector3 v;
-    volatile br_vector3 vcs;
-    volatile br_vector3 tv;
-    volatile br_scalar decay_factor;
+    br_vector3 vcs;
+    br_vector3 tv;
+    br_scalar decay_factor;
     br_scalar alpha;
     double beta;
     double speed_squared;
@@ -1334,7 +1334,7 @@ void C2_HOOK_FASTCALL CreatePuffOfSmoke(br_vector3* pPos, br_vector3* pV, float 
     double z;
     br_scalar rounded_x;
     br_scalar rounded_y;
-    volatile tSmoke* smoke;
+    tSmoke* smoke;
     tU32 strength_bits;
 
     memcpy(&strength_bits, &pStrength, sizeof(strength_bits));
@@ -1616,7 +1616,7 @@ void C2_HOOK_FASTCALL FlameAnimate(int pColumn, const br_vector3* pPos, tU32 pTi
     double speed_squared;
     int can_start;
     typedef void (C2_HOOK_FASTCALL* raw_flame_fn)(int, int, tU32, tU32, tU32, tU32);
-    volatile uintptr_t record_address;
+    uintptr_t record_address;
 
     column = &gSmoke_column[pColumn];
     actor = column->flame_actor;
@@ -1700,9 +1700,9 @@ void C2_HOOK_FASTCALL FlameAnimate(int pColumn, const br_vector3* pPos, tU32 pTi
 void C2_HOOK_FASTCALL DoSmokeColumn(int pColumn, tU32 pTime, br_vector3* pRet_car_pos) {
     tSmoke_column* column;
     br_actor* actor;
-    br_model* volatile* model_slot;
+    br_model** model_slot;
     br_matrix34* local_matrix;
-    volatile int* vertex_index;
+    int* vertex_index;
     const br_vector3* vertex;
     br_scalar value;
     tU32 bits;
@@ -2239,7 +2239,7 @@ void C2_HOOK_FASTCALL GeneralCreateSplash(tPhysics_object* pObject, const br_vec
     br_vector3 world_min;
     br_vector3 local_velocity;
     /* Original spills this projection, but passes local_velocity below. */
-    volatile br_vector3 normal_velocity;
+    br_vector3 normal_velocity;
     br_vector3 point;
     br_vector3 minimum_point;
     br_vector3 maximum_point;

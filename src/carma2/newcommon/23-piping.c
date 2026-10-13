@@ -143,7 +143,7 @@ float C2_HOOK_FASTCALL ARGetReplayRate(void) {
 // FUNCTION: CARMA2_HW 0x004023a0
 void C2_HOOK_FASTCALL ARSetReplayRate(float pRate) {
     tU32 bits;
-    volatile tU32 stored_bits;
+    tU32 stored_bits;
 
     /* MOV copies preserve signaling NaNs in the stored replay rate. */
     memcpy(&bits, &pRate, sizeof(bits));
@@ -264,7 +264,7 @@ void C2_HOOK_FASTCALL ARAdvanceChunkPtr(tU8** pChunk, int pType) {
 
     disabled = gDisable_advance;
     /* The original reads the pointer even when advancement is disabled. */
-    old_chunk = *(tU8* volatile*)pChunk;
+    old_chunk = *(tU8**)pChunk;
     if (disabled) {
         return;
     }
@@ -1094,7 +1094,7 @@ void C2_HOOK_FASTCALL AddShrapnelToPipingSession(int pShrapnel_index, const br_v
 
 /* Preserve the explicit original single-precision Z difference spill. */
 static br_scalar C2_HOOK_CDECL ReplayScalarRound(double pValue) {
-    volatile union { br_scalar scalar; tU32 bits; } stored;
+    union { br_scalar scalar; tU32 bits; } stored;
     union { br_scalar scalar; tU32 bits; } result;
 
     stored.scalar = (br_scalar)pValue;
@@ -1179,8 +1179,8 @@ void C2_HOOK_FASTCALL PipeSingleSound(tS3_outlet* pOutlet, int pSound, tS3_volum
     tU32 packed_volume;
     int outlet_index;
 
-    if (*(const volatile int*)&gAction_replay_mode != 0
-        || !((const volatile tProgram_state*)&gProgram_state)->racing) {
+    if (*(const int*)&gAction_replay_mode != 0
+        || !((const tProgram_state*)&gProgram_state)->racing) {
         return;
     }
     if (pPosition == NULL) {
@@ -1252,7 +1252,7 @@ typedef tU32 tCompletion_word;
 #endif
 
 static tU32 C2_HOOK_CDECL CompletionWord(const void* base, tU32 offset) {
-    return *(volatile const tCompletion_word*)((tU32)(uintptr_t)base + offset);
+    return *(const tCompletion_word*)((tU32)(uintptr_t)base + offset);
 }
 
 // FUNCTION: CARMA2_HW 0x004c8cc0

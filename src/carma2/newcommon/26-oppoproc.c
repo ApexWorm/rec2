@@ -47,7 +47,7 @@ static double C2_HOOK_CDECL NavigationSqrt(double pA) {
 }
 
 static float C2_HOOK_CDECL NavigationScalarRound(double pA) {
-    volatile union { float scalar; tU32 bits; } stored;
+    union { float scalar; tU32 bits; } stored;
     union { float scalar; tU32 bits; } result;
 
     stored.scalar = (float)pA;

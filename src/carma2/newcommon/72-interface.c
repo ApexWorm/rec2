@@ -1511,18 +1511,18 @@ typedef tU32 tFrontendScrollWord;
 #endif
 
 static tU32 C2_HOOK_CDECL FrontendScrollRead(tU32 address) {
-    return *(const volatile tFrontendScrollWord*)(uintptr_t)address;
+    return *(const tFrontendScrollWord*)(uintptr_t)address;
 }
 
 // FUNCTION: CARMA2_HW 0x00471cf0
 tFrontend_slider* C2_HOOK_FASTCALL GetAnyActiveSlider(void) {
-    tFrontend_slider* slider = *(tFrontend_slider* volatile*)&gCurrent_frontend_scrollbars;
+    tFrontend_slider* slider = *(tFrontend_slider**)&gCurrent_frontend_scrollbars;
     tS32 selected;
 
     if (slider == NULL) {
         return NULL;
     }
-    selected = *(const volatile tS32*)&gFrontend_selected_item_index;
+    selected = *(const tS32*)&gFrontend_selected_item_index;
     do {
         tU32 base = (tU32)(uintptr_t)slider;
         tS32 start = (tS32)FrontendScrollRead(base + 4u);
@@ -1601,7 +1601,7 @@ void C2_HOOK_FASTCALL Generic_LinkOutEffect(void) {
 
 // FUNCTION: CARMA2_HW 0x00471d30
 tConnected_items* C2_HOOK_FASTCALL GetScrollSet(int pItem) {
-    tConnected_items* scrollset = *(tConnected_items* volatile*)&gConnected_items;
+    tConnected_items* scrollset = *(tConnected_items**)&gConnected_items;
 
     while (scrollset != NULL) {
         tU32 base = (tU32)(uintptr_t)scrollset;
