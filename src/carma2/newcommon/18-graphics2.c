@@ -442,7 +442,7 @@ void C2_HOOK_FASTCALL AllocateCursorActors(void) {
         gTintedPolys[gCursor_tinted_right].material->colour_map = line;
         BrMaterialUpdate(gTintedPolys[gCursor_tinted_right].material, BR_MATU_ALL);
         gTintedPolys[gCursor_tinted_top].material->colour_map = line;
-        /* Preserve the original encoded angle (0x3ffc), just below a quarter turn. */
+        /* Preserve the original encoded angle 0x3ffc, just below a quarter turn. */
         BrMatrix23Rotate(&gTintedPolys[gCursor_tinted_top].material->map_transform, 0x3ffc);
         BrMaterialUpdate(gTintedPolys[gCursor_tinted_top].material, BR_MATU_ALL);
         gTintedPolys[gCursor_tinted_bottom].material->colour_map = line;

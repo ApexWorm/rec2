@@ -96,7 +96,7 @@ void C2_HOOK_FASTCALL GetMatrixFromOrientation(br_matrix34* pMatrix, const tU16*
     for (i = 0; i < 4; i++) {
         /* 0x37800100 is the original scalar; double its product unspilled. */
         value = (double)parts[i] * 1.5259254723787308e-05;
-        (&quaternion.x)[i] = (br_scalar)PhilOrientationScalar((value + value) - 1.0);
+        (&quaternion.x)[i] = (br_scalar)PhilOrientationScalar(value + value - 1.0);
     }
     BrQuatNormalise(&quaternion, &quaternion);
     BrQuatToMatrix34(pMatrix, &quaternion);
@@ -188,7 +188,7 @@ static void* C2_HOOK_CDECL RegistrationPointer(const void* base, tU32 offset) {
 static void C2_HOOK_CDECL RegistrationCopyWords(void* output, const void* input, int count) {
     int i;
     for (i = 0; i < count; i++) {
-        tU32 value = (*(const tRegistrationWord*)RegistrationAddress(input, ((tU32)i * 4u)));
+        tU32 value = (*(const tRegistrationWord*)RegistrationAddress(input, (tU32)i * 4u));
         RegistrationWrite(output, (tU32)i * 4u, value);
     }
 }
@@ -847,14 +847,14 @@ void C2_HOOK_FASTCALL ProcessGravity(tPHIL_queued_header* header, tPhysics_objec
             } else {
                 value = (*(const br_scalar*)((tU32)(uintptr_t)volume + 0x88));
                 value = (value * (double)*(GravityScalarPointer(object, 0x254)));
-                value = (value * (double)gravity);
+                value = value * (double)gravity;
                 value = (value * (double)*((const br_scalar*)&gGravity_multiplier));
                 value = value * -0.05681159420289855;
             }
         } else {
             value = (*(const br_scalar*)((tU32)(uintptr_t)volume + 0x88));
             value = (value * (double)*(GravityScalarPointer(object, 0x254)));
-            value = (value * (double)gravity);
+            value = value * (double)gravity;
             value = (value * (double)*((const br_scalar*)&gGravity_multiplier));
             value = value * -0.05681159420289855;
         }
@@ -911,10 +911,10 @@ static double C2_HOOK_CDECL DragLength(const void* object, unsigned offset) {
     double z = (*(const br_scalar*)((const tU8*)object + (offset + 8)));
     br_scalar rounded_x = FrictionScalar(x);
     br_scalar rounded_z = FrictionScalar(z);
-    double xx = ((double)x * rounded_x);
-    double yy = ((double)y * y);
-    double zz = ((double)z * rounded_z);
-    return sqrt(((xx + yy) + zz));
+    double xx = (double)x * rounded_x;
+    double yy = (double)y * y;
+    double zz = (double)z * rounded_z;
+    return sqrt(xx + yy + zz);
 }
 
 // FUNCTION: CARMA2_HW 0x004b6ce0
@@ -929,26 +929,26 @@ void C2_HOOK_FASTCALL ProcessDrag2(tPHIL_queued_header* header, tPhysics_object*
         double viscosity = volume->viscosity_multiplier;
         if (queued_gravity != 0.0 && queued_gravity == queued_gravity && (viscosity > 2.0)) {
             scale = ((double)*(FrictionAt(object, 0x254)) * (double)*(FrictionAt(volume, 0x8c)));
-            scale = ((double)scale * effective_drag);
+            scale = (double)scale * effective_drag;
             effective_drag = FrictionScalar(scale * 0.5);
         } else {
             scale = ((double)*(FrictionAt(volume, 0x8c)) * (double)*(FrictionAt(object, 0x254)));
-            effective_drag = FrictionScalar(((double)scale * effective_drag));
+            effective_drag = FrictionScalar((double)scale * effective_drag);
         }
     }
     length = DragLength(object, 0x68);
-    scale = ((double)length * effective_drag);
-    scale = scale * 6.9 / (object->M); /* original58a738 */
-    damping.v[0] = FrictionScalar(((double)object->v.v[0] * scale));
-    damping.v[1] = FrictionScalar(((double)object->v.v[1] * scale));
-    damping.v[2] = FrictionScalar(((double)object->v.v[2] * scale));
+    scale = (double)length * effective_drag;
+    scale = scale * 6.9 / object->M; /* original58a738 */
+    damping.v[0] = FrictionScalar((double)object->v.v[0] * scale);
+    damping.v[1] = FrictionScalar((double)object->v.v[1] * scale);
+    damping.v[2] = FrictionScalar((double)object->v.v[2] * scale);
     DRVector3Diminish((br_vector3*)((tU8*)object + 0x68), &damping);
 
     length = DragLength(object, 0x74);
-    scale = ((double)length * effective_drag);
-    damping.v[0] = FrictionScalar(((double)object->omega.v[0] * scale));
-    damping.v[1] = FrictionScalar(((double)object->omega.v[1] * scale));
-    damping.v[2] = FrictionScalar(((double)object->omega.v[2] * scale));
+    scale = (double)length * effective_drag;
+    damping.v[0] = FrictionScalar((double)object->omega.v[0] * scale);
+    damping.v[1] = FrictionScalar((double)object->omega.v[1] * scale);
+    damping.v[2] = FrictionScalar((double)object->omega.v[2] * scale);
     FUN_004c2c90(object, &damping);
     child = (tPhysics_object*)FrictionPointer(object, 0x224);
     while (child != NULL) {
@@ -998,20 +998,20 @@ void C2_HOOK_FASTCALL LevelOutOnSurface(tPhysics_object* object) {
         }
     }
     actor_matrix = (br_matrix34*)((tU8*)FrictionPointer(object, 0) + 0x2c);
-    axis_x = (*(const br_scalar*)((const tU8*)actor_matrix + (axis_row * 12)));
+    axis_x = (*(const br_scalar*)((const tU8*)actor_matrix + axis_row * 12));
     axis_y = (*(const br_scalar*)((const tU8*)actor_matrix + (axis_row * 12 + 4)));
     axis_z = (*(const br_scalar*)((const tU8*)actor_matrix + (axis_row * 12 + 8)));
-    axis.v[0] = FrictionScalar(((double)axis_x * negative_one));
-    axis.v[1] = FrictionScalar(((double)axis_y * negative_one));
-    axis.v[2] = FrictionScalar(((double)axis_z * negative_one));
+    axis.v[0] = FrictionScalar((double)axis_x * negative_one);
+    axis.v[1] = FrictionScalar((double)axis_y * negative_one);
+    axis.v[2] = FrictionScalar((double)axis_z * negative_one);
 
     normal_z = object->water_normal.v[2];
     normal_x = object->water_normal.v[0];
     normal_y = object->water_normal.v[1];
-    product_z = ((double)normal_z * axis.v[2]);
-    product_x = ((double)normal_x * axis.v[0]);
-    product_y = ((double)normal_y * axis.v[1]);
-    dot = ((product_z + product_x) + product_y);
+    product_z = (double)normal_z * axis.v[2];
+    product_x = (double)normal_x * axis.v[0];
+    product_y = (double)normal_y * axis.v[1];
+    dot = product_z + product_x + product_y;
     rounded_dot = FrictionScalar(dot);
     if (!(dot > (-0.99))) return; /* original58a760 */
 
@@ -1022,31 +1022,31 @@ void C2_HOOK_FASTCALL LevelOutOnSurface(tPhysics_object* object) {
     normal_z = object->water_normal.v[2];
     second = object->water_normal.v[2];
     axis_x = object->water_normal.v[0];
-    cross_x = ((((double)first * axis.v[2]))-(((double)normal_z * axis.v[1])));
-    product_x = ((double)cross_x * cross_x);
-    cross_y = ((((double)second * axis.v[0]))-(((double)axis_x * axis.v[2])));
+    cross_x = ((double)first * axis.v[2]-((double)normal_z * axis.v[1]));
+    product_x = (double)cross_x * cross_x;
+    cross_y = ((double)second * axis.v[0]-((double)axis_x * axis.v[2]));
     rounded_y = FrictionScalar(cross_y);
-    product_y = ((double)cross_y * rounded_y);
-    cross_z = ((((double)normal_x * axis.v[1]))-(((double)normal_y * axis.v[0])));
+    product_y = (double)cross_y * rounded_y;
+    cross_z = ((double)normal_x * axis.v[1]-((double)normal_y * axis.v[0]));
     rounded_z = FrictionScalar(cross_z);
-    error = (((double)rounded_dot) - (double)negative_one);
+    error = (double)rounded_dot - (double)negative_one;
     rounded_error = FrictionScalar(error);
     rounded_y_product = FrictionScalar(product_y);
-    product_z = ((double)cross_z * rounded_z);
+    product_z = (double)cross_z * rounded_z;
     rounded_z_product = FrictionScalar(product_z);
 
     /* The original successively recomputes each denominator after changing
      * the preceding component. These three unequal normalizations are real. */
-    denominator = sqrt((((product_x + (double)rounded_z_product)) + (double)rounded_y_product));
+    denominator = sqrt(product_x + (double)rounded_z_product + (double)rounded_y_product);
     correction_x = ((double)(error / denominator) * cross_x);
     correction.v[0] = FrictionScalar(correction_x);
-    product_x = ((double)correction_x * correction.v[0]);
+    product_x = (double)correction_x * correction.v[0];
     rounded_x_product = FrictionScalar(product_x);
-    denominator = sqrt((((double)rounded_z_product + (double)rounded_y_product) + (double)rounded_x_product));
+    denominator = sqrt((double)rounded_z_product + (double)rounded_y_product + (double)rounded_x_product);
     correction_y = ((double)rounded_y * ((double)rounded_error / denominator));
     correction.v[1] = FrictionScalar(correction_y);
-    product_y = ((double)correction_y * correction.v[1]);
-    denominator = sqrt((((product_y + (double)rounded_z_product)) + (double)rounded_x_product));
+    product_y = (double)correction_y * correction.v[1];
+    denominator = sqrt(product_y + (double)rounded_z_product + (double)rounded_x_product);
     correction.v[2] = FrictionScalar(((double)((double)rounded_error / denominator) * rounded_z));
 
     BrMatrix34TApplyV(&local_correction, &correction, actor_matrix);

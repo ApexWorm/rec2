@@ -110,13 +110,13 @@ void C2_HOOK_FASTCALL TestAutoSpecialVolume(tPhysics_object* pObject) {
     br_scalar first_distance,second_distance;
     tSpecial_volume* default_water;
     int i;
-    for(i=0;i<3;i++) lower=(lower+(((((((double)pObject->transform_matrix.m[i][1]*pObject->water_normal.v[1])+((double)pObject->transform_matrix.m[i][0]*pObject->water_normal.v[0])))+((double)pObject->transform_matrix.m[i][2]*pObject->water_normal.v[2])))*pObject->bb2.min.v[i]));
-    lower=(lower+((((((double)pObject->transform_matrix.m[3][2]*pObject->water_normal.v[2])+((double)pObject->transform_matrix.m[3][1]*pObject->water_normal.v[1])))+((double)pObject->transform_matrix.m[3][0]*pObject->water_normal.v[0]))));
+    for(i=0;i<3;i++) lower=(lower+(((double)pObject->transform_matrix.m[i][1]*pObject->water_normal.v[1]+(double)pObject->transform_matrix.m[i][0]*pObject->water_normal.v[0]+(double)pObject->transform_matrix.m[i][2]*pObject->water_normal.v[2])*pObject->bb2.min.v[i]));
+    lower=(lower+((double)pObject->transform_matrix.m[3][2]*pObject->water_normal.v[2]+(double)pObject->transform_matrix.m[3][1]*pObject->water_normal.v[1]+(double)pObject->transform_matrix.m[3][0]*pObject->water_normal.v[0]));
     upper=lower;
     for(i=0;i<3;i++) {
         const br_scalar* row=pObject->transform_matrix.m[i];
         width=(double)pObject->bb2.max.v[i]-pObject->bb2.min.v[i];
-        increment=(((((double)row[0]*pObject->water_normal.v[0])+((double)row[2]*pObject->water_normal.v[2])))+((double)row[1]*pObject->water_normal.v[1]))*width;
+        increment=((double)row[0]*pObject->water_normal.v[0]+(double)row[2]*pObject->water_normal.v[2]+(double)row[1]*pObject->water_normal.v[1])*width;
         if(AutoVolumeUnordered(increment)||increment<0.) lower=(lower+(AutoVolumeScalar(increment)));
         else upper=(upper+(AutoVolumeScalar(increment)));
     }
@@ -142,7 +142,7 @@ void C2_HOOK_FASTCALL TestAutoSpecialVolume(tPhysics_object* pObject) {
             edge.v[0]=(br_scalar)AutoVolumeScalar((double)row[0]*width);
             edge.v[2]=(br_scalar)AutoVolumeScalar((double)row[2]*width);
             edge.v[1]=(br_scalar)AutoVolumeScalar((double)row[1]*width);
-            dot=(((((double)pObject->water_normal.v[0]*edge.v[0])+((double)pObject->water_normal.v[2]*edge.v[2])))+((double)pObject->water_normal.v[1]*edge.v[1]));
+            dot=(double)pObject->water_normal.v[0]*edge.v[0]+(double)pObject->water_normal.v[2]*edge.v[2]+(double)pObject->water_normal.v[1]*edge.v[1];
             if(!AutoVolumeUnordered(dot)&&dot>0.) {
                 high_x+=edge.v[0];
                 high.v[1]=(br_scalar)AutoVolumeScalar((double)high.v[1]+edge.v[1]);

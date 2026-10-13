@@ -137,14 +137,14 @@ tS16 C2_HOOK_FASTCALL FindNearestGeneralSection(tCar_spec* pCar, const br_vector
             start = &gProgram_state.AI_vehicles.path_nodes[(tS16)sections[i].node_indices[0]].pos;
             finish = &gProgram_state.AI_vehicles.path_nodes[(tS16)sections[i].node_indices[1]].pos;
         }
-        px = ((double)pActor_coords->v[0] - (double)start->v[0]);
-        py = ((double)pActor_coords->v[1] - (double)start->v[1]);
+        px = (double)pActor_coords->v[0] - (double)start->v[0];
+        py = (double)pActor_coords->v[1] - (double)start->v[1];
         py = OpponentAdd(py, py);
-        pz = ((double)pActor_coords->v[2] - (double)start->v[2]);
-        a.v[0] = OpponentScalarRound(((double)finish->v[0] - (double)start->v[0]));
-        y = ((double)finish->v[1] - (double)start->v[1]);
+        pz = (double)pActor_coords->v[2] - (double)start->v[2];
+        a.v[0] = OpponentScalarRound((double)finish->v[0] - (double)start->v[0]);
+        y = (double)finish->v[1] - (double)start->v[1];
         a.v[1] = OpponentScalarRound(OpponentAdd(y, y));
-        a.v[2] = OpponentScalarRound(((double)finish->v[2] - (double)start->v[2]));
+        a.v[2] = OpponentScalarRound((double)finish->v[2] - (double)start->v[2]);
         p.v[0] = OpponentScalarRound(px);
         p.v[1] = OpponentScalarRound(py);
         p.v[2] = OpponentScalarRound(pz);
@@ -192,9 +192,9 @@ tS16 C2_HOOK_FASTCALL FindNearestGeneralSection(tCar_spec* pCar, const br_vector
         start = &gProgram_state.AI_vehicles.path_nodes[(tS16)gProgram_state.AI_vehicles.path_sections[nearest_section].node_indices[0]].pos;
         finish = &gProgram_state.AI_vehicles.path_nodes[(tS16)gProgram_state.AI_vehicles.path_sections[nearest_section].node_indices[1]].pos;
     }
-    x = ((double)finish->v[0] - (double)start->v[0]);
-    y = ((double)finish->v[1] - (double)start->v[1]);
-    z = ((double)finish->v[2] - (double)start->v[2]);
+    x = (double)finish->v[0] - (double)start->v[0];
+    y = (double)finish->v[1] - (double)start->v[1];
+    z = (double)finish->v[2] - (double)start->v[2];
     if (nearest_node >= 0) {
         for (i = 0; i < 3; i++) {
             start = pCar != NULL ? &pCar->my_trail.trail_nodes[nearest_node] : &gProgram_state.AI_vehicles.path_nodes[nearest_node].pos;
@@ -220,9 +220,9 @@ tS16 C2_HOOK_FASTCALL FindNearestGeneralSection(tCar_spec* pCar, const br_vector
     pPath_direction->v[0] = OpponentScalarRound(OpponentMultiply(inv, x));
     pPath_direction->v[1] = OpponentScalarRound(OpponentMultiply(inv, y));
     pPath_direction->v[2] = OpponentScalarRound(OpponentMultiply(inv, z));
-    px = ((double)pActor_coords->v[0] - (double)pIntersect->v[0]);
-    py = ((double)pActor_coords->v[1] - (double)pIntersect->v[1]);
-    pz = ((double)pActor_coords->v[2] - (double)pIntersect->v[2]);
+    px = (double)pActor_coords->v[0] - (double)pIntersect->v[0];
+    py = (double)pActor_coords->v[1] - (double)pIntersect->v[1];
+    pz = (double)pActor_coords->v[2] - (double)pIntersect->v[2];
     *pDistance = OpponentScalarRound((sqrt((OpponentHybridLengthSquared(px, py, pz)))));
     return (tS16)(nearest_section + (pCar != NULL ? 15000 : 0));
 }
@@ -414,7 +414,7 @@ int C2_HOOK_FASTCALL SearchForSection(tRoute_section* pRoute, tRoute_section* pB
         DoNotDprintf_opponent("%sSearchForSection() - adding section #%d to list", prefix, section);
         pRoute[pDepth].section_no = section;
         pRoute[pDepth].direction = (tU8)direction;
-        length = OpponentScalarRound(((double)gProgram_state.AI_vehicles.path_sections[section].length + (double)pLength));
+        length = OpponentScalarRound((double)gProgram_state.AI_vehicles.path_sections[section].length + (double)pLength);
         if (section == pTarget && (length < gShortest_route_length || length != length || gShortest_route_length != gShortest_route_length)) {
             gShortest_route_length = length;
             *pBest_count = pDepth + 1;
@@ -532,9 +532,9 @@ void C2_HOOK_FASTCALL NewCalcGetNearPlayerRoute(tOpponent_spec* pOpponent_spec, 
                 /* This first lookup uses the route ordinal, not section_no. */
                 node = (tS16)gProgram_state.AI_vehicles.path_sections[index].node_indices[pOpponent_spec->next_sections[index].direction];
                 point = &gProgram_state.AI_vehicles.path_nodes[node].pos;
-                x = ((double)point->v[0] - (double)intersect.v[0]);
-                y = ((double)point->v[1] - (double)intersect.v[1]);
-                z = ((double)point->v[2] - (double)intersect.v[2]);
+                x = (double)point->v[0] - (double)intersect.v[0];
+                y = (double)point->v[1] - (double)intersect.v[1];
+                z = (double)point->v[2] - (double)intersect.v[2];
                 length = (sqrt((OpponentHybridLengthSquared(x, y, z))));
                 while (index < pOpponent_spec->nnext_sections - 1 && (length < stopping || length != length || stopping != stopping)) {
                     stopping = OpponentSubtract(stopping, length);
@@ -546,9 +546,9 @@ void C2_HOOK_FASTCALL NewCalcGetNearPlayerRoute(tOpponent_spec* pOpponent_spec, 
         } else {
             pOpponent_spec->nnext_sections = 0;
             transform = &pOpponent_spec->car_spec->car_master_actor->t.t.mat;
-            x = ((double)intersect.v[0] - (double)transform->m[3][0]);
-            y = ((double)intersect.v[1] - (double)transform->m[3][1]);
-            z = ((double)intersect.v[2] - (double)transform->m[3][2]);
+            x = (double)intersect.v[0] - (double)transform->m[3][0];
+            y = (double)intersect.v[1] - (double)transform->m[3][1];
+            z = (double)intersect.v[2] - (double)transform->m[3][2];
             length = OpponentAdd(OpponentAdd(OpponentMultiply(z, transform->m[2][2]), OpponentMultiply(x, transform->m[2][0])), OpponentMultiply(y, transform->m[2][1]));
             AddToOpponentsProjectedRoute(pOpponent_spec, section, length >= 0.f);
         }

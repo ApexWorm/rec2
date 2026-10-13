@@ -144,9 +144,9 @@ int C2_HOOK_FASTCALL AddObjectWallForce(tPhysics_contact* pContacts, const br_ve
         }
         rounded_x = PhysicsScalar(difference[0]);
         rounded_y = PhysicsScalar(difference[1]);
-        distance_squared = (difference[0] * rounded_x + difference[1] * rounded_y) + difference[2] * difference[2];
+        distance_squared = difference[0] * rounded_x + difference[1] * rounded_y + difference[2] * difference[2];
         if (!(distance_squared >= .0045000000000000005)) {
-            normal_dot = ((double)contact->normal.v[2] * pNormal->v[2] + (double)contact->normal.v[1] * pNormal->v[1]) + (double)contact->normal.v[0] * pNormal->v[0];
+            normal_dot = (double)contact->normal.v[2] * pNormal->v[2] + (double)contact->normal.v[1] * pNormal->v[1] + (double)contact->normal.v[0] * pNormal->v[0];
             if (normal_dot > .95 && !(PhysicsScalar(distance_squared) >= .0005)) {
                 return pCount;
             }
@@ -286,7 +286,7 @@ int C2_HOOK_FASTCALL EliminateFaces(tPhysics_object* pObject, tPhysics_shape* pS
         x=((double)center.v[0]-face->v[0].v[0])*face->normal.v[0];
         z=((double)center.v[2]-face->v[0].v[2])*face->normal.v[2];
         y=((double)center.v[1]-face->v[0].v[1])*face->normal.v[1];
-        low=(x+z)+y;
+        low=x+z+y;
         high=low;
         for (i=0;i<3;i++) {
             extent=((double)scaled[i].v[0]*face->normal.v[0]+(double)scaled[i].v[1]*face->normal.v[1])+(double)scaled[i].v[2]*face->normal.v[2];
@@ -304,9 +304,9 @@ int C2_HOOK_FASTCALL EliminateFaces(tPhysics_object* pObject, tPhysics_shape* pS
                 *(int*)&face->flags=face->flags|0x80;
             } else {
                 for (i=0;i<3;i++) {
-                    translated=((double)actor_matrix->m[3][2]*actor_matrix->m[i][2]+(double)actor_matrix->m[3][0]*actor_matrix->m[i][0])+(double)actor_matrix->m[3][1]*actor_matrix->m[i][1];
+                    translated=(double)actor_matrix->m[3][2]*actor_matrix->m[i][2]+(double)actor_matrix->m[3][0]*actor_matrix->m[i][0]+(double)actor_matrix->m[3][1]*actor_matrix->m[i][1];
                     vertex=((double)face->v[0].v[2]*actor_matrix->m[i][2]+(double)face->v[0].v[0]*actor_matrix->m[i][0])+(double)face->v[0].v[1]*actor_matrix->m[i][1];
-                    threshold=PhysicsScalar(((double)bounds->min.v[i]-0.005f)+translated);
+                    threshold=PhysicsScalar((double)bounds->min.v[i]-0.005f+translated);
                     if (PhysicsWallNaN(vertex)||PhysicsScalarNaN((const br_scalar*)&threshold)||vertex<threshold) {
                         vertex=((double)face->v[1].v[2]*actor_matrix->m[i][2]+(double)face->v[1].v[0]*actor_matrix->m[i][0])+(double)face->v[1].v[1]*actor_matrix->m[i][1];
                         if (PhysicsWallNaN(vertex)||PhysicsScalarNaN((const br_scalar*)&threshold)||vertex<threshold) {
@@ -314,7 +314,7 @@ int C2_HOOK_FASTCALL EliminateFaces(tPhysics_object* pObject, tPhysics_shape* pS
                             if (PhysicsWallNaN(vertex)||PhysicsScalarNaN((const br_scalar*)&threshold)||vertex<threshold) *(int*)&face->flags=face->flags|0x80;
                         }
                     } else {
-                        threshold=PhysicsScalar(((double)bounds->max.v[i]+translated)-(-0.005f));
+                        threshold=PhysicsScalar((double)bounds->max.v[i]+translated-(-0.005f));
                         if (!PhysicsWallNaN(vertex)&&!PhysicsScalarNaN((const br_scalar*)&threshold)&&vertex>threshold) {
                             vertex=((double)face->v[1].v[2]*actor_matrix->m[i][2]+(double)face->v[1].v[0]*actor_matrix->m[i][0])+(double)face->v[1].v[1]*actor_matrix->m[i][1];
                             if (!PhysicsWallNaN(vertex)&&!PhysicsScalarNaN((const br_scalar*)&threshold)&&vertex>threshold) {
@@ -364,7 +364,7 @@ int C2_HOOK_FASTCALL CheckSingleEdgeWithSphere(br_vector3* pEdge_start, br_vecto
     x=(double)trial_normal.v[0]*remainder+scaled_normal.v[0];
     y=(double)trial_normal.v[1]*remainder+scaled_normal.v[1];
     z=(double)trial_normal.v[2]*remainder+scaled_normal.v[2];
-    length=sqrt((x*x+y*y)+z*z);
+    length=sqrt(x*x+y*y+z*z);
     if (PhysicsWallNaN(length)||length<=2.3841858e-7f) {
         x=1.0;y=0.0;normalized_z=0.0f;
     } else {
@@ -373,9 +373,9 @@ int C2_HOOK_FASTCALL CheckSingleEdgeWithSphere(br_vector3* pEdge_start, br_vecto
     radius_product[0]=PhysicsScalar(pSphere->radius*x);
     radius_product[1]=PhysicsScalar(pSphere->radius*y);
     radius_product[2]=PhysicsScalar(pSphere->radius*(double)normalized_z);
-    surface_point.v[0]=PhysicsScalar(((double)pSphere->center.v[0] + radius_product[0]));
-    surface_point.v[1]=PhysicsScalar(((double)pSphere->center.v[1] + radius_product[1]));
-    surface_point.v[2]=PhysicsScalar(((double)pSphere->center.v[2] + radius_product[2]));
+    surface_point.v[0]=PhysicsScalar((double)pSphere->center.v[0] + radius_product[0]);
+    surface_point.v[1]=PhysicsScalar((double)pSphere->center.v[1] + radius_product[1]);
+    surface_point.v[2]=PhysicsScalar((double)pSphere->center.v[2] + radius_product[2]);
     for(i=0;i<3;i++) trial_normal.v[i]=PhysicsScalar(-(double)trial_normal.v[i]);
     return AddObjectWallForce(pContacts,&surface_point,time,&trial_normal,0,pCount,pObject,4,pFace,NULL);
 }
@@ -445,7 +445,7 @@ int C2_HOOK_FASTCALL GetCornerToFacePoints(tPhysics_object* pObject, tPhysics_sh
         z=(double)second->v[2]-first->v[2];
         direction.v[1]=PhysicsScalar(y);
         direction.v[2]=PhysicsScalar(z);
-        length=sqrt((x*x+y*direction.v[1])+z*direction.v[2]);
+        length=sqrt(x*x+y*direction.v[1]+z*direction.v[2]);
         if(PhysicsWallNaN(length)||length<=2.3841858e-7f) {
             unit_x=1.0;
             extension.v[1]=0.0f;
@@ -465,7 +465,7 @@ int C2_HOOK_FASTCALL GetCornerToFacePoints(tPhysics_object* pObject, tPhysics_sh
         face=RayCastThruFaceList(first,&direction,&normal,&time,&intersection,&gFace_list__car[pObject->box_face_start],(int)pObject->box_face_end-(int)pObject->box_face_start);
         if(face==NULL) continue;
         BrMatrix34TApplyV(&transformed_normal,&normal,matrix);
-        penetration=PhysicsScalar(((double)normal.v[0]*direction.v[0]+(double)normal.v[1]*direction.v[1])+(double)normal.v[2]*direction.v[2]);
+        penetration=PhysicsScalar((double)normal.v[0]*direction.v[0]+(double)normal.v[1]*direction.v[1]+(double)normal.v[2]*direction.v[2]);
         PhysicsSubtractScalar(&relative.v[0],&first->v[0],&matrix->m[3][0]);
         PhysicsSubtractScalar(&relative.v[1],&first->v[1],&matrix->m[3][1]);
         PhysicsSubtractScalar(&relative.v[2],&first->v[2],&matrix->m[3][2]);
@@ -481,7 +481,7 @@ static double C2_HOOK_CDECL WallEdgeAlignment(const br_vector3* centre, const br
     double x=(double)centre->v[0]-hit->v[0];
     double y=(double)centre->v[1]-hit->v[1];
     double z=(double)centre->v[2]-hit->v[2];
-    double length=sqrt((x*x+y*y)+z*z);
+    double length=sqrt(x*x+y*y+z*z);
     double scale;
     if(PhysicsWallNaN(length)||length<=2.384185791015625e-7f) {
         x=1.0;y=0.0;z=0.0;
@@ -584,8 +584,8 @@ int C2_HOOK_FASTCALL FUN_00424140(tPhysics_object* object, tPhysics_shape* shape
     gPhysics_contact_679430=0;
     PhysicsCopyWord(&actor,&object->actor);
     BrMatrix34TApplyV(&translation,(const br_vector3*)&actor->t.t.mat.m[3],&actor->t.t.mat);
-    for(axis=0;axis<3;axis++)shape->common.field_0x1c.min.v[axis]=PhysicsScalar(((double)translation.v[axis] + shape->common.field_0x1c.min.v[axis]));
-    for(axis=0;axis<3;axis++)shape->common.field_0x1c.max.v[axis]=PhysicsScalar(((double)translation.v[axis] + shape->common.field_0x1c.max.v[axis]));
+    for(axis=0;axis<3;axis++)shape->common.field_0x1c.min.v[axis]=PhysicsScalar((double)translation.v[axis] + shape->common.field_0x1c.min.v[axis]);
+    for(axis=0;axis<3;axis++)shape->common.field_0x1c.max.v[axis]=PhysicsScalar((double)translation.v[axis] + shape->common.field_0x1c.max.v[axis]);
     index=object->box_face_start;
     face=&gFace_list__car[index];
     if(index>=(int)object->box_face_end)return count;
@@ -637,8 +637,8 @@ int C2_HOOK_FASTCALL FUN_00424270(br_vector3* start, br_vector3* end, tPhysics_o
     PhysicsCopyWord(&actor,&object->actor);
     matrix=&actor->t.t.mat;
     for(axis=0;axis<3;axis++) {
-        projected_start=((double)matrix->m[axis][0]*start->v[0]+(double)matrix->m[axis][2]*start->v[2])+(double)matrix->m[axis][1]*start->v[1];
-        projected_end=PhysicsScalar(((double)matrix->m[axis][0]*end->v[0]+(double)matrix->m[axis][2]*end->v[2])+(double)matrix->m[axis][1]*end->v[1]);
+        projected_start=(double)matrix->m[axis][0]*start->v[0]+(double)matrix->m[axis][2]*start->v[2]+(double)matrix->m[axis][1]*start->v[1];
+        projected_end=PhysicsScalar((double)matrix->m[axis][0]*end->v[0]+(double)matrix->m[axis][2]*end->v[2]+(double)matrix->m[axis][1]*end->v[1]);
         low=(double)shape->common.field_0x1c.min.v[axis]-.005;
         if((PhysicsWallNaN(projected_start)||PhysicsWallNaN(low)||projected_start<low)&&(PhysicsWallNaN(projected_end)||PhysicsWallNaN(low)||projected_end<low))return count;
         frame.words[0x18/4]|=(tU32)(PhysicsWallNaN(projected_start)||PhysicsWallNaN(low)||projected_start<low);
@@ -736,12 +736,12 @@ int C2_HOOK_FASTCALL FUN_00424990(const br_vector3* old_origin, const br_vector3
     n1.v[1]=PhysicsScalar((double)direction_change->v[2]*old_direction->v[0]-(double)old_direction->v[2]*direction_change->v[0]);
     n1.v[2]=PhysicsScalar((double)old_direction->v[1]*direction_change->v[0]-(double)direction_change->v[1]*old_direction->v[0]);
     for(i=0;i<3;i++)PhysicsSubtractScalar(&delta.v[i],&moving_origin->v[i],&old_origin->v[i]);
-    a=((double)velocity->v[1]*n1.v[1]+(double)velocity->v[2]*n1.v[2])+(double)n1.v[0]*velocity->v[0];
-    b=PhysicsScalar(((((double)moving_origin->v[2]*n1.v[2]+(double)moving_origin->v[1]*n1.v[1])+(double)n1.v[0]*moving_origin->v[0])+
-        (((double)velocity->v[1]*n0.v[1]+(double)velocity->v[2]*n0.v[2])+(double)n0.v[0]*velocity->v[0]))-
-        ((((double)old_origin->v[2]*n1.v[2]+(double)old_origin->v[1]*n1.v[1])+(double)n1.v[0]*old_origin->v[0])+
-        (((double)old_direction->v[2]*n0.v[2]+(double)old_direction->v[1]*n0.v[1])+(double)n0.v[0]*old_direction->v[0])));
-    c=((double)delta.v[0]*n0.v[0]+(double)delta.v[1]*n0.v[1])+(double)delta.v[2]*n0.v[2];
+    a=(double)velocity->v[1]*n1.v[1]+(double)velocity->v[2]*n1.v[2]+(double)n1.v[0]*velocity->v[0];
+    b=PhysicsScalar(((double)moving_origin->v[2]*n1.v[2]+(double)moving_origin->v[1]*n1.v[1]+(double)n1.v[0]*moving_origin->v[0]+
+        ((double)velocity->v[1]*n0.v[1]+(double)velocity->v[2]*n0.v[2]+(double)n0.v[0]*velocity->v[0]))-
+        ((double)old_origin->v[2]*n1.v[2]+(double)old_origin->v[1]*n1.v[1]+(double)n1.v[0]*old_origin->v[0]+
+        ((double)old_direction->v[2]*n0.v[2]+(double)old_direction->v[1]*n0.v[1]+(double)n0.v[0]*old_direction->v[0])));
+    c=(double)delta.v[0]*n0.v[0]+(double)delta.v[1]*n0.v[1]+(double)delta.v[2]*n0.v[2];
     if(PhysicsWallNaN(a)||a<0.0) {a=-a;b=-b;c=-c;}
     ac4=(c*a)*4.f;
     stored_ac4=PhysicsScalar(ac4);
@@ -757,7 +757,7 @@ int C2_HOOK_FASTCALL FUN_00424990(const br_vector3* old_origin, const br_vector3
         if(wide_time>1.0)goto fallback;
         if(!PhysicsWallNaN(time)&&time>=0.f) {
             for(i=0;i<3;i++) {mixed[i]=(double)time*n1.v[i]+n0.v[i];normal.v[i]=PhysicsScalar(mixed[i]);}
-            normal_square=(mixed[0]*normal.v[0]+mixed[1]*normal.v[1])+mixed[2]*normal.v[2];
+            normal_square=mixed[0]*normal.v[0]+mixed[1]*normal.v[1]+mixed[2]*normal.v[2];
             if(PhysicsWallNaN(normal_square)||normal_square<1e-7)goto fallback;
         }
         if(PhysicsWallNaN(time)||time<0.f)time=PhysicsScalar(((double)stored_root-b)/stored_two_a);
@@ -769,10 +769,10 @@ int C2_HOOK_FASTCALL FUN_00424990(const br_vector3* old_origin, const br_vector3
     }
     if(!(time>=0.f)||!(time<=1.f))goto fallback;
     for(i=0;i<3;i++) {mixed[i]=(double)time*n1.v[i]+n0.v[i];normal.v[i]=PhysicsScalar(mixed[i]);}
-    normal_square=(mixed[0]*normal.v[0]+mixed[1]*normal.v[1])+mixed[2]*normal.v[2];
+    normal_square=mixed[0]*normal.v[0]+mixed[1]*normal.v[1]+mixed[2]*normal.v[2];
     if(PhysicsWallNaN(normal_square)||normal_square<1e-7)goto fallback;
     if(!PhysicsWallNaN(output->t)&&!(time<output->t))return 0;
-    normal_length=sqrt(((double)normal.v[0]*normal.v[0]+(double)normal.v[1]*normal.v[1])+(double)normal.v[2]*normal.v[2]);
+    normal_length=sqrt((double)normal.v[0]*normal.v[0]+(double)normal.v[1]*normal.v[1]+(double)normal.v[2]*normal.v[2]);
     if(PhysicsWallNaN(normal_length)||normal_length<=2.384185791015625e-7f) {
         normal.v[0]=1.f;normal.v[1]=0.f;normal.v[2]=0.f;
     } else {
@@ -783,24 +783,24 @@ int C2_HOOK_FASTCALL FUN_00424990(const br_vector3* old_origin, const br_vector3
     edge.v[0]=PhysicsScalar(wide_edge_x);
     for(i=1;i<3;i++)edge.v[i]=PhysicsScalar((double)direction_change->v[i]*time+moving_direction->v[i]);
     for(i=0;i<3;i++)origin.v[i]=PhysicsScalar((double)time*velocity->v[i]+moving_origin->v[i]);
-    dot=((double)old_direction->v[1]*edge.v[1]+(double)old_direction->v[2]*edge.v[2])+wide_edge_x*old_direction->v[0];
+    dot=(double)old_direction->v[1]*edge.v[1]+(double)old_direction->v[2]*edge.v[2]+wide_edge_x*old_direction->v[0];
     stored_dot=PhysicsScalar(dot);
-    negative_square=PhysicsScalar(-(((double)old_direction->v[1]*old_direction->v[1]+(double)old_direction->v[2]*old_direction->v[2])+(double)old_direction->v[0]*old_direction->v[0]));
+    negative_square=PhysicsScalar(-((double)old_direction->v[1]*old_direction->v[1]+(double)old_direction->v[2]*old_direction->v[2]+(double)old_direction->v[0]*old_direction->v[0]));
     projection[0]=PhysicsScalar((double)edge.v[0]*negative_square+dot*old_direction->v[0]);
     projection[1]=PhysicsScalar((double)edge.v[1]*negative_square+(double)old_direction->v[1]*stored_dot);
     stored_z_product=PhysicsScalar((double)old_direction->v[2]*stored_dot);
     projection[2]=PhysicsScalar((double)edge.v[2]*negative_square+stored_z_product);
     for(i=0;i<3;i++) {wide_delta[i]=(double)old_origin->v[i]-origin.v[i];delta.v[i]=PhysicsScalar(wide_delta[i]);}
-    numerator=(wide_delta[0]*projection[0]+wide_delta[1]*projection[1])+wide_delta[2]*projection[2];
-    denominator=((double)edge.v[0]*projection[0]+(double)edge.v[1]*projection[1])+(double)edge.v[2]*projection[2];
+    numerator=wide_delta[0]*projection[0]+wide_delta[1]*projection[1]+wide_delta[2]*projection[2];
+    denominator=(double)edge.v[0]*projection[0]+(double)edge.v[1]*projection[1]+(double)edge.v[2]*projection[2];
     edge_fraction=PhysicsScalar(numerator/denominator);
     if(!(edge_fraction>=0.f)||!(edge_fraction<=1.f))goto fallback;
     axis=!(fabs((double)old_direction->v[0])>=fabs((double)old_direction->v[1]));
     if(!(fabs((double)old_direction->v[2])<=fabs((double)old_direction->v[axis])))axis=2;
-    old_fraction=PhysicsScalar((((double)edge.v[axis]*edge_fraction+origin.v[axis])-old_origin->v[axis])/old_direction->v[axis]);
+    old_fraction=PhysicsScalar(((double)edge.v[axis]*edge_fraction+origin.v[axis]-old_origin->v[axis])/old_direction->v[axis]);
     if(!(old_fraction>=0.f)||!(old_fraction<=1.f))goto fallback;
     for(i=0;i<3;i++)PhysicsSubtractScalar(&delta.v[i],&moving_origin->v[i],&old_origin->v[i]);
-    orientation=((double)delta.v[0]*n0.v[0]+(double)delta.v[1]*n0.v[1])+(double)delta.v[2]*n0.v[2];
+    orientation=(double)delta.v[0]*n0.v[0]+(double)delta.v[1]*n0.v[1]+(double)delta.v[2]*n0.v[2];
     if(PhysicsWallNaN(orientation)||orientation<0.0)for(i=0;i<3;i++)normal.v[i]=-normal.v[i];
     if(other!=NULL) {
         BrMatrix34ApplyV(&output->normal,&normal,&other->transform_matrix);
@@ -812,7 +812,7 @@ int C2_HOOK_FASTCALL FUN_00424990(const br_vector3* old_origin, const br_vector3
             mixed[i]=(double)previous_normal.v[i]*complement+stored_current[i];
             stored_blend[i]=PhysicsScalar(mixed[i]);
         }
-        normal_length=sqrt((mixed[0]*stored_blend[0]+mixed[1]*stored_blend[1])+mixed[2]*stored_blend[2]);
+        normal_length=sqrt(mixed[0]*stored_blend[0]+mixed[1]*stored_blend[1]+mixed[2]*stored_blend[2]);
         output->normal.v[1]=stored_current[1];output->normal.v[1]=stored_blend[1];
         output->normal.v[2]=stored_current[2];output->normal.v[0]=stored_blend[0];output->normal.v[2]=stored_blend[2];
         if(PhysicsWallNaN(normal_length)||normal_length<=2.384185791015625e-7f) {
@@ -862,14 +862,14 @@ int C2_HOOK_FASTCALL FUN_00425630(const br_vector3* n0, const br_vector3* n1, co
     combined[1]=(double)n1->v[1]+n0->v[1];
     combined[2]=(double)n1->v[2]+n0->v[2];
     for(i=0;i<3;i++)normal.v[i]=PhysicsScalar(combined[i]);
-    length=sqrt((combined[0]*normal.v[0]+combined[1]*normal.v[1])+combined[2]*normal.v[2]);
+    length=sqrt(combined[0]*normal.v[0]+combined[1]*normal.v[1]+combined[2]*normal.v[2]);
     stored_length=PhysicsScalar(length);
     if(!(length>1e-7)) return 0;
     for(i=0;i<3;i++) {
-        wide_delta[i]=((double)moving_origin->v[i]+edge_change->v[i])-old_origin->v[i];
+        wide_delta[i]=(double)moving_origin->v[i]+edge_change->v[i]-old_origin->v[i];
         delta.v[i]=PhysicsScalar(wide_delta[i]);
     }
-    projection=fabs(((wide_delta[0]*normal.v[0]+wide_delta[1]*normal.v[1])+wide_delta[2]*normal.v[2])/stored_length);
+    projection=fabs((wide_delta[0]*normal.v[0]+wide_delta[1]*normal.v[1]+wide_delta[2]*normal.v[2])/stored_length);
     if(!PhysicsWallNaN(projection)&&!(projection<.002)) return 0;
     for(i=0;i<3;i++)unit[i]=(double)normal.v[i]/stored_length;
     for(i=0;i<3;i++)normal.v[i]=PhysicsScalar(unit[i]);
@@ -881,7 +881,7 @@ int C2_HOOK_FASTCALL FUN_00425630(const br_vector3* n0, const br_vector3* n1, co
     cross[2]=unit[1]*old_direction->v[0]-(double)old_direction->v[1]*normal.v[0];
     denominator=(cross[0]*((double)velocity1->v[0]+velocity0->v[0])+cross[1]*speed.v[1])+cross[2]*speed.v[2];
     if(!(fabs(denominator)>1e-7)) return 0;
-    numerator=(cross[0]*delta.v[0]+cross[1]*delta.v[1])+cross[2]*delta.v[2];
+    numerator=cross[0]*delta.v[0]+cross[1]*delta.v[1]+cross[2]*delta.v[2];
     time=PhysicsScalar(-(numerator/denominator));
     if(!(time>=0.f)||!(time<=1.f)) return 0;
     scaled_x=(double)time*speed.v[0]+delta.v[0];
@@ -890,8 +890,8 @@ int C2_HOOK_FASTCALL FUN_00425630(const br_vector3* n0, const br_vector3* n1, co
     rounded_word=scaled_y.word;PhysicsCopyWord(&delta.v[1],&rounded_word);
     rounded_word=scaled_z.word;PhysicsCopyWord(&delta.v[2],&rounded_word);
     for(i=0;i<3;i++)normal.v[i]=PhysicsScalar(unit[i]);
-    parameter=(((double)old_direction->v[1]*delta.v[1]+(double)old_direction->v[2]*delta.v[2])+scaled_x*old_direction->v[0])/
-        (((double)old_direction->v[1]*old_direction->v[1]+(double)old_direction->v[2]*old_direction->v[2])+(double)old_direction->v[0]*old_direction->v[0]);
+    parameter=((double)old_direction->v[1]*delta.v[1]+(double)old_direction->v[2]*delta.v[2]+scaled_x*old_direction->v[0])/
+        ((double)old_direction->v[1]*old_direction->v[1]+(double)old_direction->v[2]*old_direction->v[2]+(double)old_direction->v[0]*old_direction->v[0]);
     segment=PhysicsScalar(parameter);
     if(!(segment>=0.f)||!(segment<=1.f)) return 0;
     output->t=1.f;
@@ -901,8 +901,8 @@ int C2_HOOK_FASTCALL FUN_00425630(const br_vector3* n0, const br_vector3* n1, co
     if(PhysicsWallNaN(orientation)||orientation<0.0) {
         for(i=0;i<3;i++)normal.v[i]=-normal.v[i];
     }
-    for(i=0;i<3;i++)wide_delta[i]=((double)moving_origin->v[i]+edge_change->v[i])-old_origin->v[i];
-    distance=(wide_delta[0]*normal.v[0]+wide_delta[1]*normal.v[1])+wide_delta[2]*normal.v[2];
+    for(i=0;i<3;i++)wide_delta[i]=(double)moving_origin->v[i]+edge_change->v[i]-old_origin->v[i];
+    distance=wide_delta[0]*normal.v[0]+wide_delta[1]*normal.v[1]+wide_delta[2]*normal.v[2];
     if(PhysicsWallNaN(distance)||distance<0.0) {
         for(i=0;i<3;i++)normal.v[i]=-normal.v[i];
     }
@@ -1057,8 +1057,8 @@ int C2_HOOK_FASTCALL FUN_004228b0(tPhysics_object* object, tPhysics_contact* con
                     *radius_product_x=PhysicsScalar((double)previous_normal->v[0]*negative_radius);
                     *radius_product_y=PhysicsScalar((double)previous_normal->v[1]*negative_radius);
                     radius_product_z=negative_radius*previous_normal->v[2];
-                    intersection->v[0]=PhysicsScalar(((double)sphere->center.v[0] + *radius_product_x));
-                    intersection->v[1]=PhysicsScalar(((double)sphere->center.v[1] + *radius_product_y));
+                    intersection->v[0]=PhysicsScalar((double)sphere->center.v[0] + *radius_product_x);
+                    intersection->v[1]=PhysicsScalar((double)sphere->center.v[1] + *radius_product_y);
                     intersection->v[2]=PhysicsScalar((double)sphere->center.v[2]+radius_product_z);
                     PhysicsCopyWord(&best_face,(const void*)&frame.words[0x60/4]);
                     sphere_count=AddObjectWallForce(contacts+initial_count,intersection,frame.values[0x28/4],trial_normal,0,sphere_count,object,3,best_face,NULL);
@@ -1075,7 +1075,7 @@ int C2_HOOK_FASTCALL FUN_004228b0(tPhysics_object* object, tPhysics_contact* con
         first_contact=contacts+initial_count;
         next_contact=first_contact+1;
         do {
-            normal_dot=((double)first_contact->normal.v[0]*next_contact->normal.v[0]+(double)first_contact->normal.v[1]*next_contact->normal.v[1])+(double)first_contact->normal.v[2]*next_contact->normal.v[2];
+            normal_dot=(double)first_contact->normal.v[0]*next_contact->normal.v[0]+(double)first_contact->normal.v[1]*next_contact->normal.v[1]+(double)first_contact->normal.v[2]*next_contact->normal.v[2];
             if(PhysicsWallNaN(normal_dot)||normal_dot<=.95)break;
             classification++;next_contact++;
         }while(classification<count);
@@ -1178,12 +1178,12 @@ static void C2_HOOK_CDECL PhysicsJointVelocityA(br_scalar* pOutput, const tPhysi
     double value;
 
     if (pTorque) {
-        value = ((((((double)pObject->omega.v[1] * pForce->direction_a.v[1])) + (((double)pForce->direction_a.v[2] * pObject->omega.v[2])))) + (((double)pObject->omega.v[0] * pForce->direction_a.v[0])));
+        value = (double)pObject->omega.v[1] * pForce->direction_a.v[1] + (double)pForce->direction_a.v[2] * pObject->omega.v[2] + (double)pObject->omega.v[0] * pForce->direction_a.v[0];
     } else {
-        x = (br_scalar)PhysicsJointScalar((((double)force->point_a.v[2] * object->omega.v[1] - (double)force->point_a.v[1] * object->omega.v[2]) + pObject->velocity_car_space.v[0]));
-        y = (br_scalar)PhysicsJointScalar((((double)force->point_a.v[0] * object->omega.v[2] - (double)force->point_a.v[2] * object->omega.v[0]) + pObject->velocity_car_space.v[1]));
-        z = (br_scalar)PhysicsJointScalar((((double)force->point_a.v[1] * object->omega.v[0] - (double)force->point_a.v[0] * object->omega.v[1]) + pObject->velocity_car_space.v[2]));
-        value = ((((((double)pForce->direction_a.v[1] * y)) + (((double)pForce->direction_a.v[2] * z)))) + (((double)pForce->direction_a.v[0] * x)));
+        x = (br_scalar)PhysicsJointScalar((double)force->point_a.v[2] * object->omega.v[1] - (double)force->point_a.v[1] * object->omega.v[2] + pObject->velocity_car_space.v[0]);
+        y = (br_scalar)PhysicsJointScalar((double)force->point_a.v[0] * object->omega.v[2] - (double)force->point_a.v[2] * object->omega.v[0] + pObject->velocity_car_space.v[1]);
+        z = (br_scalar)PhysicsJointScalar((double)force->point_a.v[1] * object->omega.v[0] - (double)force->point_a.v[0] * object->omega.v[1] + pObject->velocity_car_space.v[2]);
+        value = (double)pForce->direction_a.v[1] * y + (double)pForce->direction_a.v[2] * z + (double)pForce->direction_a.v[0] * x;
     }
     *pOutput = (br_scalar)PhysicsJointScalar(-value);
 }
@@ -1202,12 +1202,12 @@ static void C2_HOOK_CDECL PhysicsJointVelocityB(br_scalar* pOutput, const tPhysi
     double value;
 
     if (pTorque) {
-        value = ((((((double)pObject->omega.v[1] * pForce->direction_b.v[1])) + (((double)pForce->direction_b.v[0] * pObject->omega.v[0])))) + (((double)pObject->omega.v[2] * pForce->direction_b.v[2])));
+        value = (double)pObject->omega.v[1] * pForce->direction_b.v[1] + (double)pForce->direction_b.v[0] * pObject->omega.v[0] + (double)pObject->omega.v[2] * pForce->direction_b.v[2];
     } else {
-        x = (br_scalar)PhysicsJointScalar((((double)force->point_b.v[2] * object->omega.v[1] - (double)force->point_b.v[1] * object->omega.v[2]) + pObject->velocity_car_space.v[0]));
-        y = (((double)force->point_b.v[0] * object->omega.v[2] - (double)force->point_b.v[2] * object->omega.v[0]) + pObject->velocity_car_space.v[1]);
-        z = (br_scalar)PhysicsJointScalar((((double)force->point_b.v[1] * object->omega.v[0] - (double)force->point_b.v[0] * object->omega.v[1]) + pObject->velocity_car_space.v[2]));
-        value = ((((((double)pForce->direction_b.v[0] * x)) + (((double)pForce->direction_b.v[2] * z)))) + ((double)force->direction_b.v[1] * y));
+        x = (br_scalar)PhysicsJointScalar((double)force->point_b.v[2] * object->omega.v[1] - (double)force->point_b.v[1] * object->omega.v[2] + pObject->velocity_car_space.v[0]);
+        y = (double)force->point_b.v[0] * object->omega.v[2] - (double)force->point_b.v[2] * object->omega.v[0] + pObject->velocity_car_space.v[1];
+        z = (br_scalar)PhysicsJointScalar((double)force->point_b.v[1] * object->omega.v[0] - (double)force->point_b.v[0] * object->omega.v[1] + pObject->velocity_car_space.v[2]);
+        value = (double)pForce->direction_b.v[0] * x + (double)pForce->direction_b.v[2] * z + (double)force->direction_b.v[1] * y;
     }
     PhysicsJointAddVelocity(pOutput, value);
 }
@@ -1290,10 +1290,10 @@ void C2_HOOK_FAKE_THISCALL FUN_004bc8e0(tPhysics_object* object, undefined4 unus
     void* workspace;
     int index;
     (void)unused;
-    x = ((double)object->I.v[0] * (double)factor);
-    y = ((double)object->I.v[1] * (double)factor);
-    z = ((double)object->I.v[2] * (double)factor);
-    scale = ((double)factor * (double)object->field_0x21c);
+    x = (double)object->I.v[0] * (double)factor;
+    y = (double)object->I.v[1] * (double)factor;
+    z = (double)object->I.v[2] * (double)factor;
+    scale = (double)factor * (double)object->field_0x21c;
     object->I.v[0] = GroupScalar(x);
     workspace = GroupPointer(object, 0x1e4);
     object->I.v[1] = GroupScalar(y);
@@ -1301,10 +1301,10 @@ void C2_HOOK_FAKE_THISCALL FUN_004bc8e0(tPhysics_object* object, undefined4 unus
     object->field_0x21c = GroupScalar(scale);
     if (workspace != NULL) {
         partner = GroupPointer(workspace, 4);
-        x = ((double)partner->I.v[0] * (double)factor);
-        y = ((double)partner->I.v[1] * (double)factor);
-        z = ((double)partner->I.v[2] * (double)factor);
-        scale = ((double)factor * (double)partner->field_0x21c);
+        x = (double)partner->I.v[0] * (double)factor;
+        y = (double)partner->I.v[1] * (double)factor;
+        z = (double)partner->I.v[2] * (double)factor;
+        scale = (double)factor * (double)partner->field_0x21c;
         partner->I.v[0] = GroupScalar(x);
         partner->I.v[1] = GroupScalar(y);
         partner->I.v[2] = GroupScalar(z);
@@ -1334,7 +1334,7 @@ int C2_HOOK_FASTCALL FUN_004bd720(tPhysics_object* object) {
     x = object->omega.v[0];
     y = object->omega.v[1];
     z = object->omega.v[2];
-    energy = ((x * x + y * y) + z * z) * (double)0.0015999999595806003f;
+    energy = (x * x + y * y + z * z) * (double)0.0015999999595806003f;
     if (!(energy > (double)2.464900016784668f)) {
         return 0;
     }
@@ -1527,11 +1527,11 @@ typedef void (C2_HOOK_FASTCALL *tHierarchyRawRecursive)(tPhysics_object*, tPhysi
 typedef void (C2_HOOK_FAKE_THISCALL *tHierarchyRawMotion)(tPhysics_object*, undefined4, tU32);
 #define HIERARCHY_RECURSE(object, selected, time) do { \
     tHierarchyRawRecursive function = (tHierarchyRawRecursive)(void*)FUN_004b9230; \
-    function(object, selected, HierarchyTimeWord(&(time))); \
+    function(object, selected, HierarchyTimeWord(&time)); \
 } while (0)
 #define HIERARCHY_MOTION(function_name, object, time) do { \
     tHierarchyRawMotion function = (tHierarchyRawMotion)(void*)(function_name); \
-    function(object, 0, HierarchyTimeWord(&(time))); \
+    function(object, 0, HierarchyTimeWord(&time)); \
 } while (0)
 #else
 #define HIERARCHY_RECURSE(object, selected, time) FUN_004b9230(object, selected, time)
@@ -1590,7 +1590,7 @@ void C2_HOOK_FASTCALL FUN_004b9230(tPhysics_object* pObject, tPhysics_object** p
                 x = ((double)object->omega.v[0] - relative_omega.v[0]) * joint->hinge_axis.v[0];
                 y = ((double)object->omega.v[1] - relative_omega.v[1]) * joint->hinge_axis.v[1];
                 z = ((double)object->omega.v[2] - relative_omega.v[2]) * joint->hinge_axis.v[2];
-                angle = (br_scalar)PhysicsJointScalar(((x + y) + z) * pTime);
+                angle = (br_scalar)PhysicsJointScalar((x + y + z) * pTime);
                 BrMatrix34LPInverse(&inverse, &partner->transform_matrix);
                 BrMatrix34Mul(&relative, &pObject->transform_matrix, &inverse);
                 BrMatrix34Mul(&object->actor->t.t.mat, &relative, &partner->actor->t.t.mat);
@@ -1623,16 +1623,16 @@ void C2_HOOK_FASTCALL FUN_004b9230(tPhysics_object* pObject, tPhysics_object** p
             HIERARCHY_MOTION(RotateObject, pObject, pTime);
             HIERARCHY_MOTION(TranslateObject, pObject, pTime);
         } else {
-            x = ((double)pObject->v.v[0] * pTime);
+            x = (double)pObject->v.v[0] * pTime;
             actor = object->actor;
             y = object->v.v[1];
             x = x + actor->t.t.mat.m[3][0];
             z = object->v.v[2];
-            y = ((double)y * pTime);
+            y = (double)y * pTime;
             actor->t.t.mat.m[3][0] = (br_scalar)PhysicsJointScalar(x);
             actor = object->actor;
             y = y + actor->t.t.mat.m[3][1];
-            z = ((double)z * pTime);
+            z = (double)z * pTime;
             actor->t.t.mat.m[3][1] = (br_scalar)PhysicsJointScalar(y);
             actor = object->actor;
             actor->t.t.mat.m[3][2] = (br_scalar)PhysicsJointScalar(z + actor->t.t.mat.m[3][2]);
@@ -1797,11 +1797,11 @@ void C2_HOOK_FASTCALL GetWorldBoundingBoxForObject(tPhysics_object* pObject, br_
             }
         }
     } else {
-        double extent = ((pObject->field_0x10c.max.v[0]) - (double)*((const br_scalar*)((const tU8*)pObject + 0xb0)));
+        double extent = (pObject->field_0x10c.max.v[0] - (double)*((const br_scalar*)((const tU8*)pObject + 0xb0)));
         if (!(gPhysics_bounds_max_x > extent)) {
             gPhysics_bounds_max_x = (br_scalar)extent;
         }
-        extent = ((pObject->field_0x10c.min.v[0]) - (double)*((const br_scalar*)((const tU8*)pObject + 0xb0)));
+        extent = (pObject->field_0x10c.min.v[0] - (double)*((const br_scalar*)((const tU8*)pObject + 0xb0)));
         if (gPhysics_bounds_min_x >= extent) {
             gPhysics_bounds_min_x = (br_scalar)extent;
         }
@@ -2141,9 +2141,9 @@ tPhysics_object* C2_HOOK_FASTCALL SetUpTorqueHingePartners(br_vector3* pAngular,
     double local_4, lever_z_wide;
 
     if ((pObject->flags & 0x800) == 0) {
-        *angular = ForceScalarRound((*torque / (double)pObject->I.v[0]));
-        angular[1] = ForceScalarRound(((double)torque[1] / pObject->I.v[1]));
-        angular[2] = ForceScalarRound(((double)torque[2] / pObject->I.v[2]));
+        *angular = ForceScalarRound(*torque / (double)pObject->I.v[0]);
+        angular[1] = ForceScalarRound((double)torque[1] / pObject->I.v[1]);
+        angular[2] = ForceScalarRound((double)torque[2] / pObject->I.v[2]);
     } else {
         *angular = ForceScalarRound(0.0);
         angular[1] = ForceScalarRound(0.0);
@@ -2164,30 +2164,30 @@ tPhysics_object* C2_HOOK_FASTCALL SetUpTorqueHingePartners(br_vector3* pAngular,
         rhs.v[1] = ForceScalarRound((-((((((((double)*(PartnerScalarPtr((const void*)(uintptr_t)(cursor), 0x20)) * *angular)) + (((double)*(PartnerScalarPtr((const void*)(uintptr_t)(cursor), 0x24)) * angular[1])))) + (((double)*(PartnerScalarPtr((const void*)(uintptr_t)(cursor), 0x28)) * angular[2])))))));
         rhs.v[2] = ForceScalarRound((-((((((((double)*(PartnerScalarPtr((const void*)(uintptr_t)(cursor), 0x34)) * angular[2])) + (((double)*(PartnerScalarPtr((const void*)(uintptr_t)(cursor), 0x30)) * angular[1])))) + (((double)*(PartnerScalarPtr((const void*)(uintptr_t)(cursor), 0x2c)) * *angular)))))));
         BrMatrix34ApplyV((br_vector3*)(response.v), (const br_vector3*)(rhs.v), (const br_matrix34*)(state + 8));
-        fVar1 = (response.v[0] / (double)pObject->M);
+        fVar1 = response.v[0] / (double)pObject->M;
         *linear = ForceScalarRound(((double)*(PartnerScalarPtr((const void*)ForcePointerAt((const void*)(uintptr_t)(pObject), 0x188), 0x38)) * fVar1));
         linear[1] = ForceScalarRound(((double)*(PartnerScalarPtr((const void*)ForcePointerAt((const void*)(uintptr_t)(pObject), 0x188), 0x3c)) * fVar1));
         linear[2] = ForceScalarRound(((double)*(PartnerScalarPtr((const void*)ForcePointerAt((const void*)(uintptr_t)(pObject), 0x188), 0x40)) * fVar1));
-        fVar1 = (-(((response.v[0] / (double)partner->M))));
+        fVar1 = (-(response.v[0] / (double)partner->M));
         *partner_linear = ForceScalarRound(((double)*(PartnerScalarPtr((const void*)ForcePointerAt((const void*)(uintptr_t)(pObject), 0x188), 0x44)) * fVar1));
         partner_linear[1] = ForceScalarRound(((double)*(PartnerScalarPtr((const void*)ForcePointerAt((const void*)(uintptr_t)(pObject), 0x188), 0x48)) * fVar1));
         cursor = 3;
         partner_linear[2] = ForceScalarRound(((double)*(PartnerScalarPtr((const void*)ForcePointerAt((const void*)(uintptr_t)(pObject), 0x188), 0x4c)) * fVar1));
         state = ForcePointerAt((const void*)(uintptr_t)(pObject), 0x188);
         rotated.v[0] = ForceScalarRound(((double)*(PartnerScalarPtr((const void*)(uintptr_t)(state), 0x20)) * ((double)response.v[1])));
-        rotated.v[0] = ForceScalarRound(((((double)*(PartnerScalarPtr((const void*)(uintptr_t)(state), 0x2c)) * ((double)response.v[2]))) + ((double)rotated.v[0])));
+        rotated.v[0] = ForceScalarRound(((((double)*(PartnerScalarPtr((const void*)(uintptr_t)(state), 0x2c)) * ((double)response.v[2]))) + (double)rotated.v[0]));
         rotated.v[1] = ForceScalarRound(((double)*(PartnerScalarPtr((const void*)(uintptr_t)(state), 0x24)) * ((double)response.v[1])));
-        rotated.v[1] = ForceScalarRound(((((double)*(PartnerScalarPtr((const void*)(uintptr_t)(state), 0x30)) * ((double)response.v[2]))) + ((double)rotated.v[1])));
+        rotated.v[1] = ForceScalarRound(((((double)*(PartnerScalarPtr((const void*)(uintptr_t)(state), 0x30)) * ((double)response.v[2]))) + (double)rotated.v[1]));
         rotated.v[2] = ForceScalarRound(((double)*(PartnerScalarPtr((const void*)(uintptr_t)(state), 0x28)) * ((double)response.v[1])));
-        rotated.v[2] = ForceScalarRound(((((double)*(PartnerScalarPtr((const void*)(uintptr_t)(state), 0x34)) * ((double)response.v[2]))) + ((double)rotated.v[2])));
+        rotated.v[2] = ForceScalarRound(((((double)*(PartnerScalarPtr((const void*)(uintptr_t)(state), 0x34)) * ((double)response.v[2]))) + (double)rotated.v[2]));
         fVar1 = ForceScalarRound(((double)*(PartnerScalarPtr((const void*)(uintptr_t)(state), 0x38)) * ((double)response.v[0])));
         fVar3 = ForceScalarRound(((double)*(PartnerScalarPtr((const void*)(uintptr_t)(state), 0x3c)) * ((double)response.v[0])));
         fVar4 = ForceScalarRound(((double)*(PartnerScalarPtr((const void*)(uintptr_t)(state), 0x40)) * ((double)response.v[0])));
         pfVar7 = (br_scalar*)ForceBytes(pObject, 8);
         local_4 = (((((double)((double)lever.v[0]) * fVar3)) - (((double)((double)lever.v[1]) * fVar1))));
-        angular_temp.v[1] = ForceScalarRound((((((((double)((double)lever.v[2]) * fVar1)) - (((double)((double)lever.v[0]) * fVar4))))) + ((double)rotated.v[1])));
-        angular_temp.v[2] = ForceScalarRound((local_4 + ((double)rotated.v[2])));
-        angular_temp.v[0] = ForceScalarRound((((((((double)((double)lever.v[1]) * fVar4)) - (((double)((double)lever.v[2]) * fVar3))))) + ((double)rotated.v[0])));
+        angular_temp.v[1] = ForceScalarRound((((((((double)((double)lever.v[2]) * fVar1)) - (((double)((double)lever.v[0]) * fVar4))))) + (double)rotated.v[1]));
+        angular_temp.v[2] = ForceScalarRound(local_4 + (double)rotated.v[2]);
+        angular_temp.v[0] = ForceScalarRound((((((((double)((double)lever.v[1]) * fVar4)) - (((double)((double)lever.v[2]) * fVar3))))) + (double)rotated.v[0]));
         pfVar10 = angular;
         do {
             fVar1 = (double)*pfVar7;
@@ -2206,10 +2206,10 @@ tPhysics_object* C2_HOOK_FASTCALL SetUpTorqueHingePartners(br_vector3* pAngular,
         fVar5 = ((double)*(PartnerScalarPtr((const void*)(uintptr_t)(state), 0x1c)) - *(PartnerScalarPtr((const void*)(uintptr_t)(partner), 0x1c)));
         fVar6 = ForceScalarRound(((double)*(PartnerScalarPtr((const void*)(uintptr_t)(state), 0x48)) * ((double)response.v[0])));
         response.v[0] = ForceScalarRound(((double)*(PartnerScalarPtr((const void*)(uintptr_t)(state), 0x4c)) * ((double)response.v[0])));
-        *partner_angular = ForceScalarRound((((((((double)fVar4 * ((double)response.v[0]))) - (((double)fVar5 * fVar6))))) + *partner_angular));
+        *partner_angular = ForceScalarRound((((((((double)fVar4 * ((double)response.v[0]))) - ((double)fVar5 * fVar6)))) + *partner_angular));
         state = 3;
         partner_angular[1] = ForceScalarRound((((((((double)((double)ForceScalarRound(fVar5)) * fVar1)) - (((double)fVar3 * ((double)response.v[0])))))) + partner_angular[1]));
-        partner_angular[2] = ForceScalarRound((((((((double)fVar3 * fVar6)) - (((double)((double)ForceScalarRound(fVar4)) * fVar1))))) + partner_angular[2]));
+        partner_angular[2] = ForceScalarRound((((((double)fVar3 * fVar6 - (((double)((double)ForceScalarRound(fVar4)) * fVar1))))) + partner_angular[2]));
         do {
             fVar1 = (double)*pfVar7;
             pfVar7 = pfVar7 + 1;
@@ -2231,11 +2231,11 @@ tPhysics_object* C2_HOOK_FASTCALL SetUpTorqueHingePartners(br_vector3* pAngular,
     state = ForcePointerAt((const void*)(uintptr_t)(partner), 0x188);
     rhs.v[2] = ForceScalarRound(((((((double)*(PartnerScalarPtr((const void*)(uintptr_t)(state), 0x2c)) * ((double)angular_temp.v[0]))) + (((double)*(PartnerScalarPtr((const void*)(uintptr_t)(state), 0x34)) * ((double)angular_temp.v[2]))))) + (((double)*(PartnerScalarPtr((const void*)(uintptr_t)(state), 0x30)) * ((double)angular_temp.v[1])))));
     BrMatrix34ApplyV((br_vector3*)(response.v), (const br_vector3*)(rhs.v), (const br_matrix34*)(ForcePointerAt((const void*)(uintptr_t)(partner), 0x1e4) + 8));
-    fVar1 = (response.v[0] / (double)partner->M);
+    fVar1 = response.v[0] / (double)partner->M;
     *partner_linear = ForceScalarRound(((double)*(PartnerScalarPtr((const void*)ForcePointerAt((const void*)(uintptr_t)(partner), 0x188), 0x38)) * fVar1));
     partner_linear[1] = ForceScalarRound(((double)*(PartnerScalarPtr((const void*)ForcePointerAt((const void*)(uintptr_t)(partner), 0x188), 0x3c)) * fVar1));
     partner_linear[2] = ForceScalarRound(((double)*(PartnerScalarPtr((const void*)ForcePointerAt((const void*)(uintptr_t)(partner), 0x188), 0x40)) * fVar1));
-    fVar1 = (-(((response.v[0] / (double)pObject->M))));
+    fVar1 = (-(response.v[0] / (double)pObject->M));
     *linear = ForceScalarRound(((double)*(PartnerScalarPtr((const void*)ForcePointerAt((const void*)(uintptr_t)(partner), 0x188), 0x44)) * fVar1));
     linear[1] = ForceScalarRound(((double)*(PartnerScalarPtr((const void*)ForcePointerAt((const void*)(uintptr_t)(partner), 0x188), 0x48)) * fVar1));
     linear[2] = ForceScalarRound(((double)*(PartnerScalarPtr((const void*)ForcePointerAt((const void*)(uintptr_t)(partner), 0x188), 0x4c)) * fVar1));
@@ -2251,9 +2251,9 @@ tPhysics_object* C2_HOOK_FASTCALL SetUpTorqueHingePartners(br_vector3* pAngular,
     pfVar10 = (br_scalar*)ForceBytes(pObject, 8);
     fVar3 = ForceScalarRound(((double)*(PartnerScalarPtr((const void*)ForcePointerAt((const void*)(uintptr_t)(partner), 0x188), 0x48)) * ((double)response.v[0])));
     fVar4 = ForceScalarRound(((double)*(PartnerScalarPtr((const void*)ForcePointerAt((const void*)(uintptr_t)(partner), 0x188), 0x4c)) * ((double)response.v[0])));
-    rotated.v[0] = ForceScalarRound((((((((double)((double)lever.v[1]) * fVar4)) - (((double)((double)lever.v[2]) * fVar3))))) + ((double)rotated.v[0])));
-    rotated.v[1] = ForceScalarRound((((((((double)((double)lever.v[2]) * fVar1)) - (((double)((double)lever.v[0]) * fVar4))))) + ((double)rotated.v[1])));
-    rotated.v[2] = ForceScalarRound((((((((double)((double)lever.v[0]) * fVar3)) - (((double)((double)lever.v[1]) * fVar1))))) + ((double)rotated.v[2])));
+    rotated.v[0] = ForceScalarRound((((((((double)((double)lever.v[1]) * fVar4)) - (((double)((double)lever.v[2]) * fVar3))))) + (double)rotated.v[0]));
+    rotated.v[1] = ForceScalarRound((((((((double)((double)lever.v[2]) * fVar1)) - (((double)((double)lever.v[0]) * fVar4))))) + (double)rotated.v[1]));
+    rotated.v[2] = ForceScalarRound((((((((double)((double)lever.v[0]) * fVar3)) - (((double)((double)lever.v[1]) * fVar1))))) + (double)rotated.v[2]));
     state = ForcePointerAt((const void*)(uintptr_t)(partner), 0x188);
     angular_temp.v[0] = ForceScalarRound(((double)*(PartnerScalarPtr((const void*)(uintptr_t)(state), 0x38)) * ((double)response.v[0])));
     fVar1 = ((double)*(PartnerScalarPtr((const void*)(uintptr_t)(state), 8)) - *(PartnerScalarPtr((const void*)(uintptr_t)(partner), 0x14)));
@@ -2320,30 +2320,30 @@ tPhysics_object* C2_HOOK_FASTCALL SetUpHingePartners(br_vector3* pAngular, br_ve
         rhs.v[1] = ForceScalarRound((-((((((((double)*(PartnerScalarPtr((const void*)(uintptr_t)(cursor), 0x20)) * *angular)) + (((double)*(PartnerScalarPtr((const void*)(uintptr_t)(cursor), 0x28)) * angular[2])))) + (((double)*(PartnerScalarPtr((const void*)(uintptr_t)(cursor), 0x24)) * angular[1])))))));
         rhs.v[2] = ForceScalarRound((-((((((((double)*(PartnerScalarPtr((const void*)(uintptr_t)(cursor), 0x2c)) * *angular)) + (((double)*(PartnerScalarPtr((const void*)(uintptr_t)(cursor), 0x30)) * angular[1])))) + (((double)*(PartnerScalarPtr((const void*)(uintptr_t)(cursor), 0x34)) * angular[2])))))));
         BrMatrix34ApplyV((br_vector3*)(response.v), (const br_vector3*)(rhs.v), (const br_matrix34*)(ForcePointerAt(pObject, 0x1e4) + 8));
-        fVar1 = (response.v[0] / (double)pObject->M);
+        fVar1 = response.v[0] / (double)pObject->M;
         *linear = ForceScalarRound(((((double)*(PartnerScalarPtr((const void*)ForcePointerAt((const void*)(uintptr_t)(pObject), 0x188), 0x38)) * fVar1)) + *linear));
         linear[1] = ForceScalarRound(((((double)*(PartnerScalarPtr((const void*)ForcePointerAt((const void*)(uintptr_t)(pObject), 0x188), 0x3c)) * fVar1)) + linear[1]));
         linear[2] = ForceScalarRound(((((double)*(PartnerScalarPtr((const void*)ForcePointerAt((const void*)(uintptr_t)(pObject), 0x188), 0x40)) * fVar1)) + linear[2]));
-        fVar1 = (-(((response.v[0] / (double)partner->M))));
+        fVar1 = (-(response.v[0] / (double)partner->M));
         *partner_linear = ForceScalarRound(((double)*(PartnerScalarPtr((const void*)ForcePointerAt((const void*)(uintptr_t)(pObject), 0x188), 0x44)) * fVar1));
         partner_linear[1] = ForceScalarRound(((double)*(PartnerScalarPtr((const void*)ForcePointerAt((const void*)(uintptr_t)(pObject), 0x188), 0x48)) * fVar1));
         partner_linear[2] = ForceScalarRound(((double)*(PartnerScalarPtr((const void*)ForcePointerAt((const void*)(uintptr_t)(pObject), 0x188), 0x4c)) * fVar1));
         cursor = ForcePointerAt((const void*)(uintptr_t)(pObject), 0x188);
         rotated.v[0] = ForceScalarRound(((double)*(PartnerScalarPtr((const void*)(uintptr_t)(cursor), 0x20)) * ((double)response.v[1])));
-        rotated.v[0] = ForceScalarRound(((((double)*(PartnerScalarPtr((const void*)(uintptr_t)(cursor), 0x2c)) * ((double)response.v[2]))) + ((double)rotated.v[0])));
+        rotated.v[0] = ForceScalarRound(((((double)*(PartnerScalarPtr((const void*)(uintptr_t)(cursor), 0x2c)) * ((double)response.v[2]))) + (double)rotated.v[0]));
         rotated.v[1] = ForceScalarRound(((double)*(PartnerScalarPtr((const void*)(uintptr_t)(cursor), 0x24)) * ((double)response.v[1])));
-        rotated.v[1] = ForceScalarRound(((((double)*(PartnerScalarPtr((const void*)(uintptr_t)(cursor), 0x30)) * ((double)response.v[2]))) + ((double)rotated.v[1])));
+        rotated.v[1] = ForceScalarRound(((((double)*(PartnerScalarPtr((const void*)(uintptr_t)(cursor), 0x30)) * ((double)response.v[2]))) + (double)rotated.v[1]));
         rotated.v[2] = ForceScalarRound(((double)*(PartnerScalarPtr((const void*)(uintptr_t)(cursor), 0x28)) * ((double)response.v[1])));
-        rotated.v[2] = ForceScalarRound(((((double)*(PartnerScalarPtr((const void*)(uintptr_t)(cursor), 0x34)) * ((double)response.v[2]))) + ((double)rotated.v[2])));
+        rotated.v[2] = ForceScalarRound(((((double)*(PartnerScalarPtr((const void*)(uintptr_t)(cursor), 0x34)) * ((double)response.v[2]))) + (double)rotated.v[2]));
         fVar1 = ForceScalarRound(((double)*(PartnerScalarPtr((const void*)(uintptr_t)(cursor), 0x38)) * ((double)response.v[0])));
         fVar3 = ForceScalarRound(((double)*(PartnerScalarPtr((const void*)(uintptr_t)(cursor), 0x3c)) * ((double)response.v[0])));
         fVar4 = ForceScalarRound(((double)*(PartnerScalarPtr((const void*)(uintptr_t)(cursor), 0x40)) * ((double)response.v[0])));
         local_4 = (((((double)((double)lever.v[0]) * fVar3)) - (((double)((double)lever.v[1]) * fVar1))));
-        angular_temp.v[1] = ForceScalarRound((((((((double)((double)lever.v[2]) * fVar1)) - (((double)((double)lever.v[0]) * fVar4))))) + ((double)rotated.v[1])));
+        angular_temp.v[1] = ForceScalarRound((((((((double)((double)lever.v[2]) * fVar1)) - (((double)((double)lever.v[0]) * fVar4))))) + (double)rotated.v[1]));
         pfVar7 = (br_scalar*)ForceBytes(pObject, 8);
-        angular_temp.v[2] = ForceScalarRound((local_4 + ((double)rotated.v[2])));
+        angular_temp.v[2] = ForceScalarRound(local_4 + (double)rotated.v[2]);
         cursor = 3;
-        angular_temp.v[0] = ForceScalarRound((((((((double)((double)lever.v[1]) * fVar4)) - (((double)((double)lever.v[2]) * fVar3))))) + ((double)rotated.v[0])));
+        angular_temp.v[0] = ForceScalarRound((((((((double)((double)lever.v[1]) * fVar4)) - (((double)((double)lever.v[2]) * fVar3))))) + (double)rotated.v[0]));
         pfVar9 = angular;
         do {
             fVar1 = (double)*pfVar7;
@@ -2362,10 +2362,10 @@ tPhysics_object* C2_HOOK_FASTCALL SetUpHingePartners(br_vector3* pAngular, br_ve
         fVar5 = ((double)*(PartnerScalarPtr((const void*)(uintptr_t)(cursor), 0x1c)) - *(PartnerScalarPtr((const void*)(uintptr_t)(partner), 0x1c)));
         fVar6 = ForceScalarRound(((double)*(PartnerScalarPtr((const void*)(uintptr_t)(cursor), 0x48)) * ((double)response.v[0])));
         response.v[0] = ForceScalarRound(((double)*(PartnerScalarPtr((const void*)(uintptr_t)(cursor), 0x4c)) * ((double)response.v[0])));
-        *partner_angular = ForceScalarRound((((((((double)fVar4 * ((double)response.v[0]))) - (((double)fVar5 * fVar6))))) + *partner_angular));
+        *partner_angular = ForceScalarRound((((((((double)fVar4 * ((double)response.v[0]))) - ((double)fVar5 * fVar6)))) + *partner_angular));
         cursor = 3;
         partner_angular[1] = ForceScalarRound((((((((double)((double)ForceScalarRound(fVar5)) * fVar1)) - (((double)fVar3 * ((double)response.v[0])))))) + partner_angular[1]));
-        partner_angular[2] = ForceScalarRound((((((((double)fVar3 * fVar6)) - (((double)((double)ForceScalarRound(fVar4)) * fVar1))))) + partner_angular[2]));
+        partner_angular[2] = ForceScalarRound((((((double)fVar3 * fVar6 - (((double)((double)ForceScalarRound(fVar4)) * fVar1))))) + partner_angular[2]));
         do {
             fVar1 = (double)*pfVar7;
             pfVar7 = pfVar7 + 1;
@@ -2391,11 +2391,11 @@ tPhysics_object* C2_HOOK_FASTCALL SetUpHingePartners(br_vector3* pAngular, br_ve
     cursor = ForcePointerAt((const void*)(uintptr_t)(partner), 0x188);
     rhs.v[2] = ForceScalarRound(((((((double)*(PartnerScalarPtr((const void*)(uintptr_t)(cursor), 0x34)) * ((double)angular_temp.v[2]))) + (((double)*(PartnerScalarPtr((const void*)(uintptr_t)(cursor), 0x30)) * ((double)angular_temp.v[1]))))) + (((double)*(PartnerScalarPtr((const void*)(uintptr_t)(cursor), 0x2c)) * ((double)angular_temp.v[0])))));
     BrMatrix34ApplyV((br_vector3*)(response.v), (const br_vector3*)(rhs.v), (const br_matrix34*)(ForcePointerAt((const void*)(uintptr_t)(partner), 0x1e4) + 8));
-    fVar1 = (response.v[0] / (double)partner->M);
+    fVar1 = response.v[0] / (double)partner->M;
     *partner_linear = ForceScalarRound(((double)*(PartnerScalarPtr((const void*)ForcePointerAt((const void*)(uintptr_t)(partner), 0x188), 0x38)) * fVar1));
     partner_linear[1] = ForceScalarRound(((double)*(PartnerScalarPtr((const void*)ForcePointerAt((const void*)(uintptr_t)(partner), 0x188), 0x3c)) * fVar1));
     partner_linear[2] = ForceScalarRound(((double)*(PartnerScalarPtr((const void*)ForcePointerAt((const void*)(uintptr_t)(partner), 0x188), 0x40)) * fVar1));
-    fVar1 = (-(((response.v[0] / (double)pObject->M))));
+    fVar1 = (-(response.v[0] / (double)pObject->M));
     *linear = ForceScalarRound(((((double)*(PartnerScalarPtr((const void*)ForcePointerAt((const void*)(uintptr_t)(partner), 0x188), 0x44)) * fVar1)) + *linear));
     linear[1] = ForceScalarRound(((((double)*(PartnerScalarPtr((const void*)ForcePointerAt((const void*)(uintptr_t)(partner), 0x188), 0x48)) * fVar1)) + linear[1]));
     linear[2] = ForceScalarRound(((((double)*(PartnerScalarPtr((const void*)ForcePointerAt((const void*)(uintptr_t)(partner), 0x188), 0x4c)) * fVar1)) + linear[2]));
@@ -2411,10 +2411,10 @@ tPhysics_object* C2_HOOK_FASTCALL SetUpHingePartners(br_vector3* pAngular, br_ve
     angular_temp.v[1] = ForceScalarRound(((double)*(PartnerScalarPtr((const void*)ForcePointerAt((const void*)(uintptr_t)(partner), 0x188), 0x48)) * ((double)response.v[0])));
     angular_temp.v[2] = ForceScalarRound(((double)*(PartnerScalarPtr((const void*)ForcePointerAt((const void*)(uintptr_t)(partner), 0x188), 0x4c)) * ((double)response.v[0])));
     pfVar9 = (br_scalar*)ForceBytes(pObject, 8);
-    rotated.v[0] = ForceScalarRound((((((((double)((double)lever.v[1]) * ((double)angular_temp.v[2]))) - (((double)((double)lever.v[2]) * ((double)angular_temp.v[1])))))) + ((double)rotated.v[0])));
+    rotated.v[0] = ForceScalarRound((((((((double)((double)lever.v[1]) * ((double)angular_temp.v[2]))) - (((double)((double)lever.v[2]) * ((double)angular_temp.v[1])))))) + (double)rotated.v[0]));
     cursor = 3;
-    rotated.v[1] = ForceScalarRound((((((((double)((double)lever.v[2]) * ((double)angular_temp.v[0]))) - (((double)((double)lever.v[0]) * ((double)angular_temp.v[2])))))) + ((double)rotated.v[1])));
-    rotated.v[2] = ForceScalarRound((((((((double)((double)lever.v[0]) * ((double)angular_temp.v[1]))) - (((double)((double)lever.v[1]) * ((double)angular_temp.v[0])))))) + ((double)rotated.v[2])));
+    rotated.v[1] = ForceScalarRound((((((((double)((double)lever.v[2]) * ((double)angular_temp.v[0]))) - (((double)((double)lever.v[0]) * ((double)angular_temp.v[2])))))) + (double)rotated.v[1]));
+    rotated.v[2] = ForceScalarRound((((((((double)((double)lever.v[0]) * ((double)angular_temp.v[1]))) - (((double)((double)lever.v[1]) * ((double)angular_temp.v[0])))))) + (double)rotated.v[2]));
     pfVar7 = angular;
     do {
         fVar1 = (double)*pfVar9;
@@ -2432,9 +2432,9 @@ tPhysics_object* C2_HOOK_FASTCALL SetUpHingePartners(br_vector3* pAngular, br_ve
     fVar6 = ForceScalarRound(((double)*(PartnerScalarPtr((const void*)ForcePointerAt((const void*)(uintptr_t)(partner), 0x188), 0x3c)) * ((double)response.v[0])));
     cursor = 3;
     response.v[0] = ForceScalarRound(((double)*(PartnerScalarPtr((const void*)ForcePointerAt((const void*)(uintptr_t)(partner), 0x188), 0x40)) * ((double)response.v[0])));
-    *partner_angular = ForceScalarRound((((double)ForceScalarRound(((((double)((double)ForceScalarRound(fVar4)) * ((double)response.v[0]))) - (((double)fVar5 * fVar6))))) + *partner_angular));
+    *partner_angular = ForceScalarRound((((double)ForceScalarRound(((((double)((double)ForceScalarRound(fVar4)) * ((double)response.v[0]))) - ((double)fVar5 * fVar6)))) + *partner_angular));
     partner_angular[1] = ForceScalarRound((((((((double)((double)ForceScalarRound(fVar5)) * fVar1)) - (((double)fVar3 * ((double)response.v[0])))))) + partner_angular[1]));
-    partner_angular[2] = ForceScalarRound((((((((double)fVar3 * fVar6)) - (((double)((double)ForceScalarRound(fVar4)) * fVar1))))) + partner_angular[2]));
+    partner_angular[2] = ForceScalarRound((((((double)fVar3 * fVar6 - (((double)((double)ForceScalarRound(fVar4)) * fVar1))))) + partner_angular[2]));
     do {
         fVar1 = (double)*pfVar7;
         pfVar7 = pfVar7 + 1;
@@ -2482,30 +2482,30 @@ static double C2_HOOK_CDECL ForceMatrixResponse(const tPhysics_joint_force* row,
     point=side ? &row->point_b : &row->point_a;
     direction=side ? &row->direction_b : &row->direction_a;
     if (row_torque) {
-        x=((double)direction->v[0] * angular->v[0]);
-        y=((double)direction->v[1] * angular->v[1]);
-        z=((double)direction->v[2] * angular->v[2]);
+        x=(double)direction->v[0] * angular->v[0];
+        y=(double)direction->v[1] * angular->v[1];
+        z=(double)direction->v[2] * angular->v[2];
         if (source_torque) {
-            return side ? ((y + x) + z) : ((z + y) + x);
+            return side ? (y + x + z) : (z + y + x);
         }
-        return side ? ((z + x) + y) : ((x + y) + z);
+        return side ? (z + x + y) : (x + y + z);
     }
-    x=((((((double)point->v[2] * angular->v[1])) - (((double)point->v[1] * angular->v[2])))) + linear->v[0]);
-    y=((((((double)point->v[0] * angular->v[2])) - (((double)point->v[2] * angular->v[0])))) + linear->v[1]);
-    z=((((((double)point->v[1] * angular->v[0])) - (((double)point->v[0] * angular->v[1])))) + linear->v[2]);
+    x=((((double)point->v[2] * angular->v[1] - ((double)point->v[1] * angular->v[2]))) + linear->v[0]);
+    y=((((double)point->v[0] * angular->v[2] - ((double)point->v[2] * angular->v[0]))) + linear->v[1]);
+    z=((((double)point->v[1] * angular->v[0] - ((double)point->v[0] * angular->v[1]))) + linear->v[2]);
     if (source_torque || side) {
         x=ForceMatrixScalar(x);
     } else {
         y=ForceMatrixScalar(y);
     }
     z=ForceMatrixScalar(z);
-    x=((double)direction->v[0] * x);
-    y=((double)direction->v[1] * y);
-    z=((double)direction->v[2] * z);
+    x=(double)direction->v[0] * x;
+    y=(double)direction->v[1] * y;
+    z=(double)direction->v[2] * z;
     if (source_torque) {
-        return side ? ((x + y) + z) : ((y + z) + x);
+        return side ? (x + y + z) : (y + z + x);
     }
-    return side ? ((z + y) + x) : ((x + z) + y);
+    return side ? (z + y + x) : (x + z + y);
 }
 
 // FUNCTION: CARMA2_HW 0x004bf490
@@ -2637,11 +2637,11 @@ static void C2_HOOK_CDECL ApplicationDirect(tPhysics_joint_force* record, tPhysi
     double z;
     tU32 flags;
     force.v[0] = (br_scalar)PhysicsJointScalar((double)direction->v[0] * impulse);
-    delta.v[0] = (br_scalar)PhysicsJointScalar((force.v[0] / (double)object->M));
+    delta.v[0] = (br_scalar)PhysicsJointScalar(force.v[0] / (double)object->M);
     force.v[1] = (br_scalar)PhysicsJointScalar((double)direction->v[1] * impulse);
-    delta.v[1] = (br_scalar)PhysicsJointScalar((force.v[1] / (double)object->M));
+    delta.v[1] = (br_scalar)PhysicsJointScalar(force.v[1] / (double)object->M);
     force.v[2] = (br_scalar)PhysicsJointScalar((double)direction->v[2] * impulse);
-    delta.v[2] = (br_scalar)PhysicsJointScalar((force.v[2] / (double)object->M));
+    delta.v[2] = (br_scalar)PhysicsJointScalar(force.v[2] / (double)object->M);
     PhysicsJointAddVelocity(&object->velocity_car_space.v[0], delta.v[0]);
     PhysicsJointAddVelocity(&object->velocity_car_space.v[1], delta.v[1]);
     PhysicsJointAddVelocity(&object->velocity_car_space.v[2], delta.v[2]);
@@ -2651,15 +2651,15 @@ static void C2_HOOK_CDECL ApplicationDirect(tPhysics_joint_force* record, tPhysi
     PhysicsJointAddVelocity(&object->v.v[1], cross.v[1]);
     PhysicsJointAddVelocity(&object->v.v[2], cross.v[2]);
     if (!(flags & 0x800)) {
-        x = ((((double)point->v[1] * force.v[2]))-(((double)point->v[2] * force.v[1])));
-        y = ((((double)point->v[2] * force.v[0]))-(((double)point->v[0] * force.v[2])));
-        z = ((((double)point->v[0] * force.v[1]))-(((double)point->v[1] * force.v[0])));
+        x = ((double)point->v[1] * force.v[2]-((double)point->v[2] * force.v[1]));
+        y = ((double)point->v[2] * force.v[0]-((double)point->v[0] * force.v[2]));
+        z = ((double)point->v[0] * force.v[1]-((double)point->v[1] * force.v[0]));
         cross.v[0] = (br_scalar)PhysicsJointScalar(x);
         cross.v[1] = (br_scalar)PhysicsJointScalar(y);
         cross.v[2] = (br_scalar)PhysicsJointScalar(z);
-        PhysicsJointAddVelocity(&object->omega.v[0], (cross.v[0] / (double)object->I.v[0]));
-        PhysicsJointAddVelocity(&object->omega.v[1], (cross.v[1] / (double)object->I.v[1]));
-        PhysicsJointAddVelocity(&object->omega.v[2], (cross.v[2] / (double)object->I.v[2]));
+        PhysicsJointAddVelocity(&object->omega.v[0], cross.v[0] / (double)object->I.v[0]);
+        PhysicsJointAddVelocity(&object->omega.v[1], cross.v[1] / (double)object->I.v[1]);
+        PhysicsJointAddVelocity(&object->omega.v[2], cross.v[2] / (double)object->I.v[2]);
     }
 }
 
@@ -2888,9 +2888,9 @@ int C2_HOOK_FASTCALL AllocateObjectWorkspace(tPhysics_object* object, tPhysics_j
             *(tU32*)ForcePointerAt(partner, 0x1e4) = 1;
             RedoQuickHingeVelocities(object);
             joint = ApplicationJoint(object, 0);
-            projection = ((((((double)joint->parent_bone_axis.v[1] * root->omega.v[1])) + (((double)root->omega.v[0] * joint->parent_bone_axis.v[0])))) + (((double)joint->parent_bone_axis.v[2] * root->omega.v[2])));
+            projection = (double)joint->parent_bone_axis.v[1] * root->omega.v[1] + (double)root->omega.v[0] * joint->parent_bone_axis.v[0] + (double)joint->parent_bone_axis.v[2] * root->omega.v[2];
             for (i = 0; i < 3; i++) {
-                temp.v[i] = (br_scalar)PhysicsJointScalar(((double)joint->parent_bone_axis.v[i] * projection));
+                temp.v[i] = (br_scalar)PhysicsJointScalar((double)joint->parent_bone_axis.v[i] * projection);
             }
             for (i = 0; i < 3; i++) {
                 PhysicsSubtractScalar(&temp.v[i], &root->omega.v[i], &temp.v[i]);
@@ -2898,10 +2898,10 @@ int C2_HOOK_FASTCALL AllocateObjectWorkspace(tPhysics_object* object, tPhysics_j
             BrMatrix34ApplyV(&world, &temp, &root->transform_matrix);
             BrMatrix34TApplyV(&temp, &world, &object->transform_matrix);
             joint = ApplicationJoint(object, 0);
-            projection = ((((((double)object->omega.v[0] * joint->hinge_axis.v[0])) + (((double)joint->hinge_axis.v[2] * object->omega.v[2])))) + (((double)joint->hinge_axis.v[1] * object->omega.v[1])));
-            object->omega.v[0] = (br_scalar)PhysicsJointScalar(((double)joint->hinge_axis.v[0] * projection));
-            object->omega.v[1] = (br_scalar)PhysicsJointScalar(((double)joint->hinge_axis.v[1] * projection));
-            high = ((double)joint->hinge_axis.v[2] * projection);
+            projection = (double)object->omega.v[0] * joint->hinge_axis.v[0] + (double)joint->hinge_axis.v[2] * object->omega.v[2] + (double)joint->hinge_axis.v[1] * object->omega.v[1];
+            object->omega.v[0] = (br_scalar)PhysicsJointScalar((double)joint->hinge_axis.v[0] * projection);
+            object->omega.v[1] = (br_scalar)PhysicsJointScalar((double)joint->hinge_axis.v[1] * projection);
+            high = (double)joint->hinge_axis.v[2] * projection;
             PhysicsJointAddVelocity(&object->omega.v[0], temp.v[0]);
             PhysicsJointAddVelocity(&object->omega.v[1], temp.v[1]);
             object->omega.v[2] = (br_scalar)PhysicsJointScalar(high);
@@ -2927,10 +2927,10 @@ int C2_HOOK_FASTCALL AllocateObjectWorkspace(tPhysics_object* object, tPhysics_j
             for (i = 0; i < 3; i++) {
                 PhysicsSubtractScalar(&response.v[i], &response.v[i], &cross.v[i]);
             }
-            high = ((((((double)joint->hinge_axis.v[2] * response.v[2])) + (((double)joint->hinge_axis.v[0] * response.v[0])))) + (((double)joint->hinge_axis.v[1] * response.v[1])));
-            projection = (high-(((((((double)object->velocity_car_space.v[2] * joint->hinge_axis.v[2])) + (((double)object->velocity_car_space.v[0] * joint->hinge_axis.v[0])))) + (((double)object->velocity_car_space.v[1] * joint->hinge_axis.v[1])))));
+            high = (double)joint->hinge_axis.v[2] * response.v[2] + (double)joint->hinge_axis.v[0] * response.v[0] + (double)joint->hinge_axis.v[1] * response.v[1];
+            projection = (high-((double)object->velocity_car_space.v[2] * joint->hinge_axis.v[2] + (double)object->velocity_car_space.v[0] * joint->hinge_axis.v[0] + (double)object->velocity_car_space.v[1] * joint->hinge_axis.v[1]));
             for (i = 0; i < 3; i++) {
-                temp.v[i] = (br_scalar)PhysicsJointScalar(((double)joint->hinge_axis.v[i] * projection));
+                temp.v[i] = (br_scalar)PhysicsJointScalar((double)joint->hinge_axis.v[i] * projection);
             }
             for (i = 0; i < 3; i++) {
                 PhysicsJointAddVelocity(&object->velocity_car_space.v[i], temp.v[i]);
@@ -3158,7 +3158,7 @@ int C2_HOOK_FASTCALL MakeVelocitiesVector2(br_scalar* pOutput, tPhysics_joint_fo
                         if (*(int*)(current_force_address + 0x5c) == 5) {
                             BrMatrix34ApplyV(&projected, (const br_vector3*)(current_force_address + 0x38), (const br_matrix34*)(VelocityPointer((const void*)current_force_address, 8) + 0x8c));
                             BrMatrix34TApplyV(&other, &projected, (const br_matrix34*)(VelocityPointer((const void*)VelocityPointer((const void*)VelocityPointer(force_cursor, 0), 8), 0) + 0x2c));
-                            value = -((((double)other.v[0] * delta.v[0] + (double)other.v[1] * delta.v[1]) + (double)other.v[2] * delta.v[2]) * VelocityConstant58a7c8);
+                            value = -(((double)other.v[0] * delta.v[0] + (double)other.v[1] * delta.v[1] + (double)other.v[2] * delta.v[2]) * VelocityConstant58a7c8);
                             if ((value > (VelocityRead((const void*)((intptr_t)force_cursor + cursor_delta), 0)))) {
                                 *VelocityField((void*)((intptr_t)force_cursor + cursor_delta), 0) = VelocityScalar(value);
                             }
@@ -3265,16 +3265,16 @@ void C2_HOOK_FASTCALL NewAddFriction(tPhysics_joint_force* force, tWorld_callbac
     double callback_coefficient, wide_dot;
     unsigned i;
 
-    if (object_b != NULL && (force->type) != 14) {
+    if (object_b != NULL && force->type != 14) {
         coefficient = FrictionScalar((*(const br_scalar*)((const tU8*)force + 0)));
         FrictionFlag(object_a, 2);
         FrictionFlag(object_b, 2);
-        velocity_a.v[0] = FrictionScalar((force->point_a.v[2]) * (object_a->omega.v[1]) - (force->point_a.v[1]) * (object_a->omega.v[2]) + (object_a->velocity_car_space.v[0]));
-        velocity_a.v[1] = FrictionScalar((object_a->omega.v[2]) * (force->point_a.v[0]) - (object_a->omega.v[0]) * (force->point_a.v[2]) + (object_a->velocity_car_space.v[1]));
-        velocity_a.v[2] = FrictionScalar((object_a->omega.v[0]) * (force->point_a.v[1]) - (object_a->omega.v[1]) * (force->point_a.v[0]) + (object_a->velocity_car_space.v[2]));
-        velocity_b.v[0] = FrictionScalar((object_b->omega.v[1]) * (force->point_b.v[2]) - (object_b->omega.v[2]) * (force->point_b.v[1]));
-        velocity_b.v[1] = FrictionScalar((force->point_b.v[0]) * (object_b->omega.v[2]) - (object_b->omega.v[0]) * (force->point_b.v[2]));
-        velocity_b.v[2] = FrictionScalar((object_b->omega.v[0]) * (force->point_b.v[1]) - (object_b->omega.v[1]) * (force->point_b.v[0]));
+        velocity_a.v[0] = FrictionScalar(force->point_a.v[2] * object_a->omega.v[1] - force->point_a.v[1] * object_a->omega.v[2] + object_a->velocity_car_space.v[0]);
+        velocity_a.v[1] = FrictionScalar(object_a->omega.v[2] * force->point_a.v[0] - object_a->omega.v[0] * force->point_a.v[2] + object_a->velocity_car_space.v[1]);
+        velocity_a.v[2] = FrictionScalar(object_a->omega.v[0] * force->point_a.v[1] - object_a->omega.v[1] * force->point_a.v[0] + object_a->velocity_car_space.v[2]);
+        velocity_b.v[0] = FrictionScalar(object_b->omega.v[1] * force->point_b.v[2] - object_b->omega.v[2] * force->point_b.v[1]);
+        velocity_b.v[1] = FrictionScalar(force->point_b.v[0] * object_b->omega.v[2] - object_b->omega.v[0] * force->point_b.v[2]);
+        velocity_b.v[2] = FrictionScalar(object_b->omega.v[0] * force->point_b.v[1] - object_b->omega.v[1] * force->point_b.v[0]);
         for (i = 0; i < 3; i++) velocity_b.v[i] = FrictionScalar((double)velocity_b.v[i] + (*(const br_scalar*)((const tU8*)object_b + (0x1a8 + 4 * i))));
         actor_matrix = FrictionActorMatrix(object_b);
         BrMatrix34ApplyV(&world, &velocity_b, actor_matrix);
@@ -3284,7 +3284,7 @@ void C2_HOOK_FASTCALL NewAddFriction(tPhysics_joint_force* force, tWorld_callbac
         BrMatrix34ApplyV(&world, (const br_vector3*)((const tU8*)force + 0x2c), (const br_matrix34*)((const tU8*)object_a + 0x8c));
         actor_matrix = FrictionActorMatrix(object_a);
         BrMatrix34TApplyV(&normal, &world, actor_matrix);
-        response = ((double)normal.v[1] * velocity_a.v[1] + (double)normal.v[0] * velocity_a.v[0]) + (double)normal.v[2] * velocity_a.v[2];
+        response = (double)normal.v[1] * velocity_a.v[1] + (double)normal.v[0] * velocity_a.v[0] + (double)normal.v[2] * velocity_a.v[2];
         world.v[0] = FrictionScalar((double)normal.v[0] * response);
         world.v[1] = FrictionScalar((double)normal.v[1] * response);
         world.v[2] = FrictionScalar((double)normal.v[2] * response);
@@ -3292,12 +3292,12 @@ void C2_HOOK_FASTCALL NewAddFriction(tPhysics_joint_force* force, tWorld_callbac
         tangent_y = (double)velocity_a.v[1] - world.v[1];
         tangent_z = (double)velocity_a.v[2] - world.v[2];
         velocity_a.v[1] = FrictionScalar(tangent_y);
-        speed = sqrt((tangent_y * velocity_a.v[1] + tangent_x * tangent_x) + tangent_z * tangent_z);
+        speed = sqrt(tangent_y * velocity_a.v[1] + tangent_x * tangent_x + tangent_z * tangent_z);
         stored_speed = FrictionScalar(speed);
         base = FrictionScalar((double)coefficient * (double)0.3499999940395355f);
-        maximum = FrictionScalar((object_a->object_friction) * base + base);
-        maximum = FrictionScalar((object_b->object_friction) * maximum + maximum);
-        if (!(!(speed >= ((double)0.0010000000474974513f)))) {
+        maximum = FrictionScalar(object_a->object_friction * base + base);
+        maximum = FrictionScalar(object_b->object_friction * maximum + maximum);
+        if (!(!(speed >= (double)0.0010000000474974513f))) {
             inverse_speed = 1.0 / -(double)stored_speed;
             direction_a.v[0] = FrictionScalar(inverse_speed * tangent_x);
             direction_a.v[1] = FrictionScalar(inverse_speed * velocity_a.v[1]);
@@ -3306,45 +3306,45 @@ void C2_HOOK_FASTCALL NewAddFriction(tPhysics_joint_force* force, tWorld_callbac
             BrMatrix34ApplyV(&world, &direction_a, actor_matrix);
             actor_matrix = FrictionActorMatrix(object_b);
             BrMatrix34TApplyV(&direction_b, &world, actor_matrix);
-            if (((object_a->flags) & 0x800) == 0) {
-                angular_a.v[0] = FrictionScalar(((force->point_a.v[1]) * direction_a.v[2] - (force->point_a.v[2]) * direction_a.v[1]) / (object_a->I.v[0]));
-                angular_a.v[1] = FrictionScalar(((force->point_a.v[2]) * direction_a.v[0] - (force->point_a.v[0]) * direction_a.v[2]) / (object_a->I.v[1]));
-                angular_a.v[2] = FrictionScalar(((force->point_a.v[0]) * direction_a.v[1] - (force->point_a.v[1]) * direction_a.v[0]) / (object_a->I.v[2]));
+            if ((object_a->flags & 0x800) == 0) {
+                angular_a.v[0] = FrictionScalar((force->point_a.v[1] * direction_a.v[2] - force->point_a.v[2] * direction_a.v[1]) / object_a->I.v[0]);
+                angular_a.v[1] = FrictionScalar((force->point_a.v[2] * direction_a.v[0] - force->point_a.v[0] * direction_a.v[2]) / object_a->I.v[1]);
+                angular_a.v[2] = FrictionScalar((force->point_a.v[0] * direction_a.v[1] - force->point_a.v[1] * direction_a.v[0]) / object_a->I.v[2]);
             } else {
                 angular_a.v[0] = angular_a.v[1] = angular_a.v[2] = 0.0f;
             }
-            if (((object_b->flags) & 0x800) == 0) {
-                angular_b_z = FrictionScalar(((force->point_b.v[0]) * direction_b.v[1] - (force->point_b.v[1]) * direction_b.v[0]) / (object_b->I.v[2]));
-                angular_b_x = ((force->point_b.v[1]) * direction_b.v[2] - (force->point_b.v[2]) * direction_b.v[1]) / (object_b->I.v[0]);
-                angular_b_y = ((force->point_b.v[2]) * direction_b.v[0] - (force->point_b.v[0]) * direction_b.v[2]) / (object_b->I.v[1]);
+            if ((object_b->flags & 0x800) == 0) {
+                angular_b_z = FrictionScalar((force->point_b.v[0] * direction_b.v[1] - force->point_b.v[1] * direction_b.v[0]) / object_b->I.v[2]);
+                angular_b_x = (force->point_b.v[1] * direction_b.v[2] - force->point_b.v[2] * direction_b.v[1]) / object_b->I.v[0];
+                angular_b_y = (force->point_b.v[2] * direction_b.v[0] - force->point_b.v[0] * direction_b.v[2]) / object_b->I.v[1];
             } else {
                 angular_b_z = angular_b_x = angular_b_y = 0.0;
             }
-            world.v[0] = FrictionScalar((force->point_b.v[2]) * angular_b_y - (force->point_b.v[1]) * angular_b_z);
-            world.v[1] = FrictionScalar((force->point_b.v[0]) * angular_b_z - (force->point_b.v[2]) * angular_b_x);
-            world.v[2] = FrictionScalar((force->point_b.v[1]) * angular_b_x - (force->point_b.v[0]) * angular_b_y);
-            base = FrictionScalar((((force->point_a.v[0]) * angular_a.v[2] - (force->point_a.v[2]) * angular_a.v[0]) * direction_a.v[1] + ((force->point_a.v[2]) * angular_a.v[1] - (force->point_a.v[1]) * angular_a.v[2]) * direction_a.v[0]) + ((force->point_a.v[1]) * angular_a.v[0] - (force->point_a.v[0]) * angular_a.v[1]) * direction_a.v[2] + 1.0 / (object_a->M) + 1.0 / (object_b->M));
-            denominator = ((double)direction_b.v[1] * world.v[1] + (double)direction_b.v[0] * world.v[0]) + (double)direction_b.v[2] * world.v[2] + base;
+            world.v[0] = FrictionScalar(force->point_b.v[2] * angular_b_y - force->point_b.v[1] * angular_b_z);
+            world.v[1] = FrictionScalar(force->point_b.v[0] * angular_b_z - force->point_b.v[2] * angular_b_x);
+            world.v[2] = FrictionScalar(force->point_b.v[1] * angular_b_x - force->point_b.v[0] * angular_b_y);
+            base = FrictionScalar(((force->point_a.v[0] * angular_a.v[2] - force->point_a.v[2] * angular_a.v[0]) * direction_a.v[1] + (force->point_a.v[2] * angular_a.v[1] - force->point_a.v[1] * angular_a.v[2]) * direction_a.v[0]) + (force->point_a.v[1] * angular_a.v[0] - force->point_a.v[0] * angular_a.v[1]) * direction_a.v[2] + 1.0 / object_a->M + 1.0 / object_b->M);
+            denominator = (double)direction_b.v[1] * world.v[1] + (double)direction_b.v[0] * world.v[0] + (double)direction_b.v[2] * world.v[2] + base;
             if (((fabs(denominator)) > ((double)9.999999747378752e-05f))) {
                 impulse = (double)stored_speed / denominator;
                 if (impulse > maximum) impulse = maximum;
-                scale = impulse / (object_a->M);
+                scale = impulse / object_a->M;
                 for (i = 0; i < 3; i++) direction_a.v[i] = FrictionScalar((double)direction_a.v[i] * scale);
-                scale = FrictionScalar(-(impulse / (object_b->M)));
+                scale = FrictionScalar(-(impulse / object_b->M));
                 for (i = 0; i < 3; i++) direction_b.v[i] = FrictionScalar((double)direction_b.v[i] * scale);
-                FrictionWrite(force, 0x44, (object_a->M) * direction_a.v[0]);
-                FrictionWrite(force, 0x48, (object_a->M) * direction_a.v[1]);
-                FrictionWrite(force, 0x4c, (object_a->M) * direction_a.v[2]);
-                FrictionWrite(force, 0x50, (object_b->M) * direction_b.v[0]);
-                FrictionWrite(force, 0x54, (object_b->M) * direction_b.v[1]);
+                FrictionWrite(force, 0x44, object_a->M * direction_a.v[0]);
+                FrictionWrite(force, 0x48, object_a->M * direction_a.v[1]);
+                FrictionWrite(force, 0x4c, object_a->M * direction_a.v[2]);
+                FrictionWrite(force, 0x50, object_b->M * direction_b.v[0]);
+                FrictionWrite(force, 0x54, object_b->M * direction_b.v[1]);
                 response = object_b->M;
-                force->type = (force->type) | 0x100;
+                force->type = force->type | 0x100;
                 FrictionWrite(force, 0x58, response * direction_b.v[2]);
                 for (i = 0; i < 3; i++) FrictionWrite(object_a, 0x74 + 4 * i, impulse * angular_a.v[i] + (*(const br_scalar*)((const tU8*)object_a + (0x74 + 4 * i))));
                 negative = FrictionScalar(-impulse);
-                FrictionWrite(object_b, 0x74, angular_b_x * negative + (object_b->omega.v[0]));
-                FrictionWrite(object_b, 0x78, angular_b_y * negative + (object_b->omega.v[1]));
-                FrictionWrite(object_b, 0x7c, angular_b_z * negative + (object_b->omega.v[2]));
+                FrictionWrite(object_b, 0x74, angular_b_x * negative + object_b->omega.v[0]);
+                FrictionWrite(object_b, 0x78, angular_b_y * negative + object_b->omega.v[1]);
+                FrictionWrite(object_b, 0x7c, angular_b_z * negative + object_b->omega.v[2]);
                 actor_matrix = FrictionActorMatrix(object_a);
                 BrMatrix34ApplyV(&world, &direction_a, actor_matrix);
                 for (i = 0; i < 3; i++) FrictionWrite(object_a, 0x68 + 4 * i, (double)world.v[i] + (*(const br_scalar*)((const tU8*)object_a + (0x68 + 4 * i))));
@@ -3363,73 +3363,73 @@ void C2_HOOK_FASTCALL NewAddFriction(tPhysics_joint_force* force, tWorld_callbac
     /* The single-object branch saves the raw coefficient before the callback. */
     memcpy(&coefficient, force, sizeof(coefficient));
     FrictionFlag(object_a, 1);
-    if ((force->type) == 1) {
+    if (force->type == 1) {
         for (i = 0; i < 3; i++) scaled_lever.v[i] = FrictionScalar((*(const br_scalar*)((const tU8*)force + (0x14 + 4 * i))) * (double)-0.004999999888241291f + (*(const br_scalar*)((const tU8*)force + (0x14 + 4 * i))));
     } else {
         memcpy(&scaled_lever, (const tU8*)force + 0x14, sizeof(scaled_lever));
     }
-    velocity_a.v[0] = FrictionScalar((object_a->omega.v[1]) * scaled_lever.v[2] - (object_a->omega.v[2]) * scaled_lever.v[1] + (object_a->velocity_car_space.v[0]));
-    velocity_a.v[1] = FrictionScalar((object_a->omega.v[2]) * scaled_lever.v[0] - (object_a->omega.v[0]) * scaled_lever.v[2] + (object_a->velocity_car_space.v[1]));
-    velocity_a.v[2] = FrictionScalar((object_a->omega.v[0]) * scaled_lever.v[1] - (object_a->omega.v[1]) * scaled_lever.v[0] + (object_a->velocity_car_space.v[2]));
+    velocity_a.v[0] = FrictionScalar(object_a->omega.v[1] * scaled_lever.v[2] - object_a->omega.v[2] * scaled_lever.v[1] + object_a->velocity_car_space.v[0]);
+    velocity_a.v[1] = FrictionScalar(object_a->omega.v[2] * scaled_lever.v[0] - object_a->omega.v[0] * scaled_lever.v[2] + object_a->velocity_car_space.v[1]);
+    velocity_a.v[2] = FrictionScalar(object_a->omega.v[0] * scaled_lever.v[1] - object_a->omega.v[1] * scaled_lever.v[0] + object_a->velocity_car_space.v[2]);
     BrMatrix34ApplyV(&world, (const br_vector3*)((const tU8*)force + 0x2c), (const br_matrix34*)((const tU8*)object_a + 0x8c));
     actor_matrix = FrictionActorMatrix(object_a);
     BrMatrix34TApplyV(&normal, &world, actor_matrix);
-    response = ((double)normal.v[1] * velocity_a.v[1] + (double)normal.v[0] * velocity_a.v[0]) + (double)normal.v[2] * velocity_a.v[2];
+    response = (double)normal.v[1] * velocity_a.v[1] + (double)normal.v[0] * velocity_a.v[0] + (double)normal.v[2] * velocity_a.v[2];
     for (i = 0; i < 3; i++) world.v[i] = FrictionScalar(response * normal.v[i]);
     for (i = 0; i < 3; i++) velocity_a.v[i] = FrictionScalar((double)velocity_a.v[i] - world.v[i]);
-    if (callbacks != NULL && (*(const tU32*)((const tU8*)callbacks + 0x18)) != 0 && (force->field_c) != 0) {
+    if (callbacks != NULL && (*(const tU32*)((const tU8*)callbacks + 0x18)) != 0 && force->field_c != 0) {
         callback_coefficient = (double)callbacks->get_friction_from_face(FrictionPointer(force, 0xc)) * (double)coefficient;
     } else {
         callback_coefficient = coefficient;
     }
-    speed = sqrt(((double)velocity_a.v[0] * velocity_a.v[0] + (double)velocity_a.v[1] * velocity_a.v[1]) + (double)velocity_a.v[2] * velocity_a.v[2]);
+    speed = sqrt((double)velocity_a.v[0] * velocity_a.v[0] + (double)velocity_a.v[1] * velocity_a.v[1] + (double)velocity_a.v[2] * velocity_a.v[2]);
     stored_speed = FrictionScalar(speed);
     base = FrictionScalar(callback_coefficient * (double)0.3499999940395355f);
-    maximum = FrictionScalar((object_a->world_friction) * base + base);
-    if (!(!(speed >= ((double)0.0010000000474974513f)))) {
+    maximum = FrictionScalar(object_a->world_friction * base + base);
+    if (!(!(speed >= (double)0.0010000000474974513f))) {
         inverse_speed = 1.0 / -(double)stored_speed;
         for (i = 0; i < 3; i++) direction_a.v[i] = FrictionScalar(inverse_speed * velocity_a.v[i]);
-        if (((object_a->flags) & 0x800) == 0) {
-            angular_a.v[0] = FrictionScalar((force->point_a.v[1]) * direction_a.v[2] - (force->point_a.v[2]) * direction_a.v[1]);
-            angular_a.v[1] = FrictionScalar((force->point_a.v[2]) * direction_a.v[0] - (force->point_a.v[0]) * direction_a.v[2]);
-            angular_a.v[2] = FrictionScalar((force->point_a.v[0]) * direction_a.v[1] - (force->point_a.v[1]) * direction_a.v[0]);
+        if ((object_a->flags & 0x800) == 0) {
+            angular_a.v[0] = FrictionScalar(force->point_a.v[1] * direction_a.v[2] - force->point_a.v[2] * direction_a.v[1]);
+            angular_a.v[1] = FrictionScalar(force->point_a.v[2] * direction_a.v[0] - force->point_a.v[0] * direction_a.v[2]);
+            angular_a.v[2] = FrictionScalar(force->point_a.v[0] * direction_a.v[1] - force->point_a.v[1] * direction_a.v[0]);
             for (i = 0; i < 3; i++) angular_a.v[i] = FrictionScalar((double)angular_a.v[i] / (*(const br_scalar*)((const tU8*)object_a + (8 + 4 * i))));
         } else {
             angular_a.v[0] = angular_a.v[1] = angular_a.v[2] = 0.0f;
         }
-        wide_dot = ((object_a->omega.v[0]) * (force->direction_a.v[0]) + (force->direction_a.v[2]) * (object_a->omega.v[2])) + (object_a->omega.v[1]) * (force->direction_a.v[1]);
+        wide_dot = object_a->omega.v[0] * force->direction_a.v[0] + force->direction_a.v[2] * object_a->omega.v[2] + object_a->omega.v[1] * force->direction_a.v[1];
         dot = FrictionScalar(wide_dot);
-        response = ((object_a->omega.v[0]) * angular_a.v[0] + (object_a->omega.v[2]) * angular_a.v[2]) + (object_a->omega.v[1]) * angular_a.v[1];
-        speed = ((object_a->v.v[0]) * (object_a->v.v[0]) + (object_a->v.v[1]) * (object_a->v.v[1])) + (object_a->v.v[2]) * (object_a->v.v[2]);
-        if ((!((fabs(wide_dot)) >= ((double)0.10000000149011612f))) && (!(response >= 0.0)) && (!(speed >= 0.001))) {
+        response = object_a->omega.v[0] * angular_a.v[0] + object_a->omega.v[2] * angular_a.v[2] + object_a->omega.v[1] * angular_a.v[1];
+        speed = object_a->v.v[0] * object_a->v.v[0] + object_a->v.v[1] * object_a->v.v[1] + object_a->v.v[2] * object_a->v.v[2];
+        if ((!((fabs(wide_dot)) >= (double)0.10000000149011612f)) && (!(response >= 0.0)) && (!(speed >= 0.001))) {
             for (i = 0; i < 3; i++) world.v[i] = FrictionScalar((*(const br_scalar*)((const tU8*)force + (0x2c + 4 * i))) * dot);
             for (i = 0; i < 3; i++) FrictionWrite(object_a, 0x74 + 4 * i, (*(const br_scalar*)((const tU8*)object_a + (0x74 + 4 * i))) - world.v[i]);
             BrVector3SetFloat(&angular_a, 0.0f, 0.0f, 0.0f);
             direction_a.v[0] = FrictionScalar(object_a->velocity_car_space.v[0]);
             direction_a.v[2] = FrictionScalar(object_a->velocity_car_space.v[2]);
             world.v[1] = FrictionScalar(object_a->velocity_car_space.v[1]);
-            speed = sqrt(((double)direction_a.v[0] * direction_a.v[0] + (double)world.v[1] * world.v[1]) + (double)direction_a.v[2] * direction_a.v[2]);
+            speed = sqrt((double)direction_a.v[0] * direction_a.v[0] + (double)world.v[1] * world.v[1] + (double)direction_a.v[2] * direction_a.v[2]);
             stored_speed = FrictionScalar(speed);
-            if ((!(speed >= ((double)0.0010000000474974513f)))) return;
+            if ((!(speed >= (double)0.0010000000474974513f))) return;
             negative = -(double)stored_speed;
             direction_a.v[0] = FrictionScalar((double)direction_a.v[0] / negative);
             direction_a.v[1] = FrictionScalar((double)world.v[1] / negative);
             direction_a.v[2] = FrictionScalar((double)direction_a.v[2] / negative);
         }
-        cross.v[0] = FrictionScalar((force->point_a.v[2]) * angular_a.v[1] - (force->point_a.v[1]) * angular_a.v[2]);
-        cross.v[1] = FrictionScalar((force->point_a.v[0]) * angular_a.v[2] - (force->point_a.v[2]) * angular_a.v[0]);
-        cross.v[2] = FrictionScalar((force->point_a.v[1]) * angular_a.v[0] - (force->point_a.v[0]) * angular_a.v[1]);
-        denominator = ((double)direction_a.v[1] * cross.v[1] + (double)direction_a.v[0] * cross.v[0]) + (double)direction_a.v[2] * cross.v[2] + 1.0 / (object_a->M);
+        cross.v[0] = FrictionScalar(force->point_a.v[2] * angular_a.v[1] - force->point_a.v[1] * angular_a.v[2]);
+        cross.v[1] = FrictionScalar(force->point_a.v[0] * angular_a.v[2] - force->point_a.v[2] * angular_a.v[0]);
+        cross.v[2] = FrictionScalar(force->point_a.v[1] * angular_a.v[0] - force->point_a.v[0] * angular_a.v[1]);
+        denominator = (double)direction_a.v[1] * cross.v[1] + (double)direction_a.v[0] * cross.v[0] + (double)direction_a.v[2] * cross.v[2] + 1.0 / object_a->M;
         if (((fabs(denominator)) > ((double)9.999999747378752e-05f))) {
             impulse = (double)stored_speed / denominator;
             if (impulse > maximum) impulse = maximum;
             for (i = 0; i < 3; i++) angular_a.v[i] = FrictionScalar(impulse * angular_a.v[i]);
-            scale = impulse / (object_a->M);
+            scale = impulse / object_a->M;
             for (i = 0; i < 3; i++) direction_a.v[i] = FrictionScalar((double)direction_a.v[i] * scale);
-            FrictionWrite(force, 0x44, (object_a->M) * direction_a.v[0]);
-            FrictionWrite(force, 0x48, (object_a->M) * direction_a.v[1]);
+            FrictionWrite(force, 0x44, object_a->M * direction_a.v[0]);
+            FrictionWrite(force, 0x48, object_a->M * direction_a.v[1]);
             response = object_a->M;
-            force->type = (force->type) | 0x100;
+            force->type = force->type | 0x100;
             FrictionWrite(force, 0x4c, response * direction_a.v[2]);
             for (i = 0; i < 3; i++) FrictionWrite(object_a, 0x74 + 4 * i, (double)angular_a.v[i] + (*(const br_scalar*)((const tU8*)object_a + (0x74 + 4 * i))));
             actor_matrix = FrictionActorMatrix(object_a);
@@ -3446,7 +3446,7 @@ void C2_HOOK_FASTCALL PostAddFriction(tPhysics_object* object) {
     double x = object->omega.v[0];
     double y = object->omega.v[1];
     double z = object->omega.v[2];
-    double energy = ((x * x + y * y) + z * z) * (double)0.0015999999595806003f;
+    double energy = (x * x + y * y + z * z) * (double)0.0015999999595806003f;
     if ((energy > ((double)2.464900016784668f))) {
         double denominator = sqrt(energy) * (double)0.6369426250457764f;
         br_scalar stored_denominator;
@@ -3485,18 +3485,18 @@ void C2_HOOK_FASTCALL DoJointFriction(tPhysics_object* object) {
             x = ((double)*(FrictionAt(parent, 0x74)) * (double)axis.v[0]);
             z = ((double)*(FrictionAt(parent, 0x7c)) * (double)axis.v[2]);
             y = ((double)*(FrictionAt(parent, 0x78)) * (double)axis.v[1]);
-            numerator = FrictionScalar(((((x + z) + y)) - (double)*(FrictionAt(object, 0x74 + 4 * i))));
+            numerator = FrictionScalar((x + z + y - (double)*(FrictionAt(object, 0x74 + 4 * i))));
             for (j = 0; j < 3; j++) {
                 responses[i][j] = FrictionScalar(((double)axis.v[j] / (double)*(FrictionAt(parent, 8 + 4 * j))));
             }
-            x = ((double)responses[i][0] * (double)axis.v[0]);
-            z = ((double)responses[i][2] * (double)axis.v[2]);
-            y = ((double)responses[i][1] * (double)axis.v[1]);
-            denominator = ((((x + z) + y)) + (1.0 / (*(const br_scalar*)((const tU8*)object + (8 + 4 * i)))));
+            x = (double)responses[i][0] * (double)axis.v[0];
+            z = (double)responses[i][2] * (double)axis.v[2];
+            y = (double)responses[i][1] * (double)axis.v[1];
+            denominator = (x + z + y + (1.0 / (*(const br_scalar*)((const tU8*)object + (8 + 4 * i)))));
             base_numerator = FrictionScalar(numerator);
-            response = ((double)base_numerator / denominator);
+            response = (double)base_numerator / denominator;
             impulse[i] = FrictionScalar(response);
-            accumulated = FrictionScalar(((response * response) + (double)accumulated));
+            accumulated = FrictionScalar(response * response + (double)accumulated);
         }
         if (accumulated > limit) {
             scale = sqrt((double)limit / accumulated);
@@ -3511,9 +3511,9 @@ void C2_HOOK_FASTCALL DoJointFriction(tPhysics_object* object) {
             responses[i][1] = FrictionScalar(responses[i][1] * negative);
             response = negative * responses[i][2];
             responses[i][2] = FrictionScalar(response);
-            FrictionWrite(parent, 0x74, (((double)responses[i][0]) + (double)*(FrictionAt(parent, 0x74))));
+            FrictionWrite(parent, 0x74, ((double)responses[i][0] + (double)*(FrictionAt(parent, 0x74))));
             parent = FrictionPointer(object, 0x230);
-            FrictionWrite(parent, 0x78, (((double)responses[i][1]) + (double)*(FrictionAt(parent, 0x78))));
+            FrictionWrite(parent, 0x78, ((double)responses[i][1] + (double)*(FrictionAt(parent, 0x78))));
             parent = FrictionPointer(object, 0x230);
             FrictionWrite(parent, 0x7c, (response + (double)*(FrictionAt(parent, 0x7c))));
         }
@@ -3525,7 +3525,7 @@ void C2_HOOK_FASTCALL DoJointFriction(tPhysics_object* object) {
         sum = 0.0;
         for (i = 0; i < 3; i++) {
             response = ((double)*(FrictionAt(object, 0x74 + 4 * i)) * (double)*(FrictionAt(object, 8 + 4 * i)));
-            sum = (sum + (response * response));
+            sum = sum + response * response;
             impulse[i] = FrictionScalar(response);
         }
         if (sum > wide_limit) {
@@ -3597,33 +3597,33 @@ int C2_HOOK_FASTCALL FUN_004baa00(tPhysics_object* objects) {
                 linear_energy = 0.0;
             } else {
                 x = object->v.v[0]; y = object->v.v[1]; z = object->v.v[2];
-                linear_energy = (y * y + x * x) + z * z;
+                linear_energy = y * y + x * x + z * z;
             }
             if (!(linear_energy >= 0.001) && !(angular_energy >= 8.999999999999999e-05)) {
                 x = object->field_0x54.v[0]; y = object->field_0x54.v[1]; z = object->field_0x54.v[2];
-                gravity_energy = (y * y + x * x) + z * z;
+                gravity_energy = y * y + x * x + z * z;
                 gravity_length = FrictionScalar(sqrt(gravity_energy));
                 direction[0] = FrictionScalar((double)object->field_0x54.v[0] / gravity_length);
                 direction[1] = FrictionScalar((double)object->field_0x54.v[1] / gravity_length);
                 direction[2] = FrictionScalar((double)object->field_0x54.v[2] / gravity_length);
-                downward_speed = FrictionScalar(-(((double)object->v.v[1] * direction[1] + (double)object->v.v[0] * direction[0]) + (double)object->v.v[2] * direction[2]));
+                downward_speed = FrictionScalar(-((double)object->v.v[1] * direction[1] + (double)object->v.v[0] * direction[0] + (double)object->v.v[2] * direction[2]));
                 previous_downward_speed = FrictionScalar(-(((double)*RestScalar(object, 0x1b8) * direction[1] + (double)*RestScalar(object, 0x1b4) * direction[0]) + (double)*RestScalar(object, 0x1bc) * direction[2]));
                 if (RestByte(object, 0x1df) == 0) {
                     speed_change = (double)downward_speed - previous_downward_speed;
                     change_limit = (double)gravity_length * 0.9f;
                     if (downward_speed >= 0.012f || change_limit >= speed_change) goto update_transform;
-                    base[0] = FrictionScalar(((double)object->omega.v[1] * object->cmpos.v[2] - (double)object->omega.v[2] * object->cmpos.v[1]) + object->velocity_car_space.v[0]);
-                    base[1] = FrictionScalar(((double)object->omega.v[2] * object->cmpos.v[0] - (double)object->cmpos.v[2] * object->omega.v[0]) + object->velocity_car_space.v[1]);
-                    base[2] = FrictionScalar(((double)object->cmpos.v[1] * object->omega.v[0] - (double)object->omega.v[1] * object->cmpos.v[0]) + object->velocity_car_space.v[2]);
+                    base[0] = FrictionScalar((double)object->omega.v[1] * object->cmpos.v[2] - (double)object->omega.v[2] * object->cmpos.v[1] + object->velocity_car_space.v[0]);
+                    base[1] = FrictionScalar((double)object->omega.v[2] * object->cmpos.v[0] - (double)object->cmpos.v[2] * object->omega.v[0] + object->velocity_car_space.v[1]);
+                    base[2] = FrictionScalar((double)object->cmpos.v[1] * object->omega.v[0] - (double)object->omega.v[1] * object->cmpos.v[0] + object->velocity_car_space.v[2]);
                     for (corner = 0; corner < 8; corner++) {
                         corner_x = (corner & 2) ? object->bb1.min.v[0] : object->bb1.max.v[0];
                         corner_y = (corner & 1) ? object->bb1.min.v[1] : object->bb1.max.v[1];
                         corner_z = (corner & 4) ? object->bb1.min.v[2] : object->bb1.max.v[2];
-                        x = ((double)object->omega.v[1] * corner_z - (double)object->omega.v[2] * corner_y) + base[0];
-                        y = ((double)object->omega.v[2] * corner_x - (double)object->omega.v[0] * corner_z) + base[1];
-                        z = ((double)object->omega.v[0] * corner_y - (double)object->omega.v[1] * corner_x) + base[2];
+                        x = (double)object->omega.v[1] * corner_z - (double)object->omega.v[2] * corner_y + base[0];
+                        y = (double)object->omega.v[2] * corner_x - (double)object->omega.v[0] * corner_z + base[1];
+                        z = (double)object->omega.v[0] * corner_y - (double)object->omega.v[1] * corner_x + base[2];
                         point_y = FrictionScalar(y); point_z = FrictionScalar(z);
-                        point_energy = (x * x + y * point_y) + z * point_z;
+                        point_energy = x * x + y * point_y + z * point_z;
                         if (point_energy > 0.0004f) goto update_transform;
                     }
                 }
@@ -3666,7 +3666,7 @@ void C2_HOOK_FAKE_THISCALL RotateObjectFirstOrder(tPhysics_object* pObject, unde
     br_matrix34 rotation;
     br_vector3 axis, momentum, rotated;
     double x = pObject->omega.v[0], y = pObject->omega.v[1], z = pObject->omega.v[2];
-    double length = sqrt((x * x + y * y) + z * z);
+    double length = sqrt(x * x + y * y + z * z);
     double angle_wide = length * pTime;
     br_scalar angle = (br_scalar)PhysicsJointScalar(angle_wide);
     br_angle integer_angle;
@@ -3699,7 +3699,7 @@ void C2_HOOK_FAKE_THISCALL RotateObject(tPhysics_object* pObject, undefined4 pUn
     tU16 packed[4];
     tU32 translation[3];
     double x = pObject->omega.v[0], y = pObject->omega.v[1], z = pObject->omega.v[2];
-    br_scalar amount = (br_scalar)PhysicsJointScalar(((x * x + y * y) + z * z) * ((double)pTime * pTime));
+    br_scalar amount = (br_scalar)PhysicsJointScalar((x * x + y * y + z * z) * ((double)pTime * pTime));
     int count, iteration;
 
     (void)pUnused;
@@ -3719,7 +3719,7 @@ void C2_HOOK_FAKE_THISCALL RotateObject(tPhysics_object* pObject, undefined4 pUn
             br_angle integer_angle;
 
             x = pObject->omega.v[0]; y = pObject->omega.v[1]; z = pObject->omega.v[2];
-            length = PhysicsJointScalar(sqrt((x * x + y * y) + z * z));
+            length = PhysicsJointScalar(sqrt(x * x + y * y + z * z));
             axis.v[0] = (br_scalar)PhysicsJointScalar((double)pObject->omega.v[0] / length);
             axis.v[1] = (br_scalar)PhysicsJointScalar((double)pObject->omega.v[1] / length);
             axis.v[2] = (br_scalar)PhysicsJointScalar((double)pObject->omega.v[2] / length);
@@ -3734,7 +3734,7 @@ void C2_HOOK_FAKE_THISCALL RotateObject(tPhysics_object* pObject, undefined4 pUn
             next_z = (double)rotated.v[2] / pObject->I.v[2];
             next_y_scalar = (br_scalar)PhysicsJointScalar(next_y);
             next_z_scalar = (br_scalar)PhysicsJointScalar(next_z);
-            next_length = (br_scalar)PhysicsJointScalar(sqrt((next_x * next_x + (double)next_y_scalar * next_y_scalar) + (double)next_z_scalar * next_z_scalar));
+            next_length = (br_scalar)PhysicsJointScalar(sqrt(next_x * next_x + (double)next_y_scalar * next_y_scalar + (double)next_z_scalar * next_z_scalar));
             axis.v[0] = (br_scalar)PhysicsJointScalar(next_x / next_length);
             axis.v[1] = (br_scalar)PhysicsJointScalar((double)next_y_scalar / next_length);
             axis.v[2] = (br_scalar)PhysicsJointScalar((double)next_z_scalar / next_length);
@@ -3773,57 +3773,57 @@ void C2_HOOK_FAKE_THISCALL TranslateObject(tPhysics_object* pObject, undefined4 
         BrMatrix34ApplyV(&axis, &joint->hinge_axis, &pObject->transform_matrix);
         actor = object->actor;
         /* Original FADDP first combines Z+Y, then adds X before the scalar spill. */
-        before = (br_scalar)PhysicsJointScalar(((((((double)actor->t.t.mat.m[3][2] * axis.v[2])) + (((double)actor->t.t.mat.m[3][1] * axis.v[1])))) + (((double)actor->t.t.mat.m[3][0] * axis.v[0]))));
+        before = (br_scalar)PhysicsJointScalar((double)actor->t.t.mat.m[3][2] * axis.v[2] + (double)actor->t.t.mat.m[3][1] * axis.v[1] + (double)actor->t.t.mat.m[3][0] * axis.v[0]);
         joint = object->physics_joint2;
         BrMatrix34ApplyP(&point, &joint->field_0x08, &actor->t.t.mat);
-        x = ((double)pObject->field_0x17c.v[0] - point.v[0]);
-        z = ((double)pObject->field_0x17c.v[2] - point.v[2]);
-        y = ((double)pObject->field_0x17c.v[1] - point.v[1]);
+        x = (double)pObject->field_0x17c.v[0] - point.v[0];
+        z = (double)pObject->field_0x17c.v[2] - point.v[2];
+        y = (double)pObject->field_0x17c.v[1] - point.v[1];
         delta.v[1] = (br_scalar)PhysicsJointScalar(y);
         delta.v[2] = (br_scalar)PhysicsJointScalar(z);
         actor = object->actor;
         actor->t.t.mat.m[3][0] = (br_scalar)PhysicsJointScalar(x + actor->t.t.mat.m[3][0]);
         actor = object->actor;
-        actor->t.t.mat.m[3][1] = (br_scalar)PhysicsJointScalar((((double)delta.v[1]) + actor->t.t.mat.m[3][1]));
+        actor->t.t.mat.m[3][1] = (br_scalar)PhysicsJointScalar((double)delta.v[1] + actor->t.t.mat.m[3][1]);
         actor = object->actor;
-        actor->t.t.mat.m[3][2] = (br_scalar)PhysicsJointScalar((((double)delta.v[2]) + actor->t.t.mat.m[3][2]));
+        actor->t.t.mat.m[3][2] = (br_scalar)PhysicsJointScalar((double)delta.v[2] + actor->t.t.mat.m[3][2]);
         actor = object->actor;
-        projection = ((((((double)actor->t.t.mat.m[3][0] * axis.v[0])) + (((double)actor->t.t.mat.m[3][2] * axis.v[2])))) + (((double)actor->t.t.mat.m[3][1] * axis.v[1])));
+        projection = (double)actor->t.t.mat.m[3][0] * axis.v[0] + (double)actor->t.t.mat.m[3][2] * axis.v[2] + (double)actor->t.t.mat.m[3][1] * axis.v[1];
         correction = before-projection;
-        delta.v[0] = (br_scalar)PhysicsJointScalar(((double)correction * axis.v[0]));
-        delta.v[1] = (br_scalar)PhysicsJointScalar(((double)correction * axis.v[1]));
-        delta.v[2] = (br_scalar)PhysicsJointScalar(((double)correction * axis.v[2]));
-        actor->t.t.mat.m[3][0] = (br_scalar)PhysicsJointScalar((((double)delta.v[0]) + actor->t.t.mat.m[3][0]));
+        delta.v[0] = (br_scalar)PhysicsJointScalar((double)correction * axis.v[0]);
+        delta.v[1] = (br_scalar)PhysicsJointScalar((double)correction * axis.v[1]);
+        delta.v[2] = (br_scalar)PhysicsJointScalar((double)correction * axis.v[2]);
+        actor->t.t.mat.m[3][0] = (br_scalar)PhysicsJointScalar((double)delta.v[0] + actor->t.t.mat.m[3][0]);
         actor = object->actor;
-        actor->t.t.mat.m[3][1] = (br_scalar)PhysicsJointScalar((((double)delta.v[1]) + actor->t.t.mat.m[3][1]));
+        actor->t.t.mat.m[3][1] = (br_scalar)PhysicsJointScalar((double)delta.v[1] + actor->t.t.mat.m[3][1]);
         actor = object->actor;
-        actor->t.t.mat.m[3][2] = (br_scalar)PhysicsJointScalar((((double)delta.v[2]) + actor->t.t.mat.m[3][2]));
-        projection = ((((((double)pObject->v.v[2] * axis.v[2])) + (((double)pObject->v.v[1] * axis.v[1])))) + (((double)pObject->v.v[0] * axis.v[0])));
-        speed[0] = (br_scalar)PhysicsJointScalar(((double)projection * axis.v[0]));
-        speed[1] = (br_scalar)PhysicsJointScalar(((double)projection * axis.v[1]));
-        speed[2] = (br_scalar)PhysicsJointScalar(((double)projection * axis.v[2]));
+        actor->t.t.mat.m[3][2] = (br_scalar)PhysicsJointScalar((double)delta.v[2] + actor->t.t.mat.m[3][2]);
+        projection = (double)pObject->v.v[2] * axis.v[2] + (double)pObject->v.v[1] * axis.v[1] + (double)pObject->v.v[0] * axis.v[0];
+        speed[0] = (br_scalar)PhysicsJointScalar((double)projection * axis.v[0]);
+        speed[1] = (br_scalar)PhysicsJointScalar((double)projection * axis.v[1]);
+        speed[2] = (br_scalar)PhysicsJointScalar((double)projection * axis.v[2]);
         object->v.v[1] = speed[1];
         object->v.v[2] = speed[2];
         object->v.v[0] = speed[0];
         actor = object->actor;
-        actor->t.t.mat.m[3][0] = (br_scalar)PhysicsJointScalar(((((double)pTime * speed[0])) + actor->t.t.mat.m[3][0]));
+        actor->t.t.mat.m[3][0] = (br_scalar)PhysicsJointScalar((double)pTime * speed[0] + actor->t.t.mat.m[3][0]);
         actor = object->actor;
-        actor->t.t.mat.m[3][1] = (br_scalar)PhysicsJointScalar(((((double)pTime * speed[1])) + actor->t.t.mat.m[3][1]));
+        actor->t.t.mat.m[3][1] = (br_scalar)PhysicsJointScalar((double)pTime * speed[1] + actor->t.t.mat.m[3][1]);
         actor = object->actor;
-        actor->t.t.mat.m[3][2] = (br_scalar)PhysicsJointScalar(((((double)pTime * speed[2])) + actor->t.t.mat.m[3][2]));
+        actor->t.t.mat.m[3][2] = (br_scalar)PhysicsJointScalar((double)pTime * speed[2] + actor->t.t.mat.m[3][2]);
     } else {
         BrMatrix34ApplyP(&point, &joint->field_0x08, &object->actor->t.t.mat);
-        x = ((double)pObject->field_0x17c.v[0] - point.v[0]);
-        z = ((double)pObject->field_0x17c.v[2] - point.v[2]);
-        y = ((double)pObject->field_0x17c.v[1] - point.v[1]);
+        x = (double)pObject->field_0x17c.v[0] - point.v[0];
+        z = (double)pObject->field_0x17c.v[2] - point.v[2];
+        y = (double)pObject->field_0x17c.v[1] - point.v[1];
         delta.v[1] = (br_scalar)PhysicsJointScalar(y);
         delta.v[2] = (br_scalar)PhysicsJointScalar(z);
         actor = object->actor;
         actor->t.t.mat.m[3][0] = (br_scalar)PhysicsJointScalar(x + actor->t.t.mat.m[3][0]);
         actor = object->actor;
-        actor->t.t.mat.m[3][1] = (br_scalar)PhysicsJointScalar((((double)delta.v[1]) + actor->t.t.mat.m[3][1]));
+        actor->t.t.mat.m[3][1] = (br_scalar)PhysicsJointScalar((double)delta.v[1] + actor->t.t.mat.m[3][1]);
         actor = object->actor;
-        actor->t.t.mat.m[3][2] = (br_scalar)PhysicsJointScalar((((double)delta.v[2]) + actor->t.t.mat.m[3][2]));
+        actor->t.t.mat.m[3][2] = (br_scalar)PhysicsJointScalar((double)delta.v[2] + actor->t.t.mat.m[3][2]);
     }
 }
 
@@ -3844,11 +3844,11 @@ void C2_HOOK_FASTCALL WriteNewPositions(tPhysics_object* pObject) {
             BrMatrix34ApplyP(&parent_point, &child->physics_joint1->field_0x14, &object->actor->t.t.mat);
             BrMatrix34ApplyP(&child_point, &child->physics_joint1->field_0x08, &child->actor->t.t.mat);
             for (i = 0; i < 3; i++) {
-                parent_point.v[i] = (br_scalar)PhysicsJointScalar(((double)parent_point.v[i] - child_point.v[i]));
+                parent_point.v[i] = (br_scalar)PhysicsJointScalar((double)parent_point.v[i] - child_point.v[i]);
             }
             for (i = 0; i < 3; i++) {
                 actor = ((tPhysics_object*)child)->actor;
-                actor->t.t.mat.m[3][i] = (br_scalar)PhysicsJointScalar((((double)parent_point.v[i]) + actor->t.t.mat.m[3][i]));
+                actor->t.t.mat.m[3][i] = (br_scalar)PhysicsJointScalar((double)parent_point.v[i] + actor->t.t.mat.m[3][i]);
             }
         } else {
             BrMatrix34Mul(&object->actor->t.t.mat, &pObject->field_0x1e8, &root->actor->t.t.mat);
@@ -4019,7 +4019,7 @@ int C2_HOOK_FASTCALL FUN_004c3b60(br_scalar* original, br_scalar* rhs, br_scalar
         for (i = 1; i < active; i++) {
             sum = 0.0;
             for (j = 0; j < i; j++) sum = (sum + (double)forward[j] * *(&matrix[i * 100 + j]));
-            forward[i] = RQScalar((((double)active_rhs[i])-sum) / matrix[i * 101]);
+            forward[i] = RQScalar(((double)active_rhs[i]-sum) / matrix[i * 101]);
         }
         last = active - 1;
         matrix = (br_scalar*)gPhysics_buffer1_ptr;
@@ -4180,7 +4180,7 @@ int C2_HOOK_FASTCALL FUN_004c3b60(br_scalar* original, br_scalar* rhs, br_scalar
                         for (i = 1; i < active; i++) {
                             sum = 0.0;
                             for (j = 0; j < i; j++) sum = (sum + (double)forward[j] * *(&matrix[i * 100 + j]));
-                            forward[i] = RQScalar((((double)temporary[i])-sum) / matrix[i * 101]);
+                            forward[i] = RQScalar(((double)temporary[i]-sum) / matrix[i * 101]);
                         }
                         orthogonal = (br_scalar*)gPhysics_buffer2_ptr;
                         for (i = 0; i < active; i++) {
@@ -4282,7 +4282,7 @@ void C2_HOOK_FASTCALL RQExpand(br_scalar* matrix, const br_scalar* original, int
         }
         head = diagonal+length;
         first = RQScalar(head);
-        denominator = RQScalar(((double)head * length));
+        denominator = RQScalar((double)head * length);
         for (j = 0; j < size; j++) {
             sum = ((double)first * *(&orthogonal[i * 100 + j]));
             for (k = old_size; k < size; k++) {
@@ -4292,7 +4292,7 @@ void C2_HOOK_FASTCALL RQExpand(br_scalar* matrix, const br_scalar* original, int
             for (k = old_size; k < size; k++) {
                 orthogonal[k * 100 + j] = RQScalar((*(&orthogonal[k * 100 + j])-(((double)coefficient * *(&matrix[i * 100 + k])))));
             }
-            orthogonal[i * 100 + j] = RQScalar((*(&orthogonal[i * 100 + j])-(((double)first * coefficient))));
+            orthogonal[i * 100 + j] = RQScalar((*(&orthogonal[i * 100 + j])-((double)first * coefficient)));
         }
         for (j = i + 1; j < size; j++) {
             sum = ((double)first * *(&matrix[j * 100 + i]));
@@ -4303,7 +4303,7 @@ void C2_HOOK_FASTCALL RQExpand(br_scalar* matrix, const br_scalar* original, int
             for (k = old_size; k < size; k++) {
                 matrix[j * 100 + k] = RQScalar((*(&matrix[j * 100 + k])-(((double)coefficient * *(&matrix[i * 100 + k])))));
             }
-            matrix[j * 100 + i] = RQScalar((*(&matrix[j * 100 + i])-(((double)first * coefficient))));
+            matrix[j * 100 + i] = RQScalar((*(&matrix[j * 100 + i])-((double)first * coefficient)));
         }
         matrix[i * 101] = RQScalar(-((double)length * maximum));
         for (k = old_size; k < size; k++) {
@@ -4336,7 +4336,7 @@ void C2_HOOK_FASTCALL RQExpand(br_scalar* matrix, const br_scalar* original, int
             length = -length;
         }
         head = (length+*(&matrix[i * 101]));
-        denominator = RQScalar(((double)length * head));
+        denominator = RQScalar((double)length * head);
         matrix[i * 101] = RQScalar(head);
         for (j = 0; j < size; j++) {
             sum = 0.0;
@@ -4418,13 +4418,13 @@ void C2_HOOK_FASTCALL RQSingleExpand(br_scalar* matrix, const br_scalar* origina
         first_coefficient = RQScalar((double)first / denominator);
         for (j = 0; j <= size; j++) {
             sum = ((((double)first * *(&orthogonal[i * 100 + j])))+(((double)second * *(&orthogonal[size * 100 + j]))));
-            orthogonal[size * 100 + j] = RQScalar((*(&orthogonal[size * 100 + j])-(((double)second_coefficient * sum))));
-            orthogonal[i * 100 + j] = RQScalar((*(&orthogonal[i * 100 + j])-(((double)first_coefficient * sum))));
+            orthogonal[size * 100 + j] = RQScalar((*(&orthogonal[size * 100 + j])-((double)second_coefficient * sum)));
+            orthogonal[i * 100 + j] = RQScalar((*(&orthogonal[i * 100 + j])-((double)first_coefficient * sum)));
         }
         for (j = i + 1; j <= size; j++) {
-            sum = ((((double)first * *(&matrix[j * 100 + i])))+(((double)second * row[j])));
-            updated_row = RQScalar((row[j]-(((double)second_coefficient * sum))));
-            updated_matrix = RQScalar((*(&matrix[j * 100 + i])-(((double)first_coefficient * sum))));
+            sum = ((((double)first * *(&matrix[j * 100 + i])))+(double)second * row[j]);
+            updated_row = RQScalar((row[j]-((double)second_coefficient * sum)));
+            updated_matrix = RQScalar((*(&matrix[j * 100 + i])-((double)first_coefficient * sum)));
             row[j] = updated_row;
             matrix[j * 100 + i] = updated_matrix;
         }
@@ -4593,7 +4593,7 @@ void C2_HOOK_FASTCALL SparseRQDcmpV(br_scalar* matrix, br_scalar* orthogonal, co
             }
             sum = 0.0;
             for (k = 0; k < count; k++) {
-                sum = (sum + (double)values[k] * values[k]);
+                sum = sum + (double)values[k] * values[k];
             }
             length = fabs(sqrt(sum));
             if (!(values[0] > 0.0f)) {
@@ -5084,7 +5084,7 @@ static double C2_HOOK_CDECL LimitDot(const void* a, unsigned ax, const void* b, 
     double first = ((double)*(LimitScalarAt(a, ax + 4*i)) * (double)*(LimitScalarAt(b, bx + 4*i)));
     double second = ((double)*(LimitScalarAt(a, ax + 4*j)) * (double)*(LimitScalarAt(b, bx + 4*j)));
     double third = ((double)*(LimitScalarAt(a, ax + 4*k)) * (double)*(LimitScalarAt(b, bx + 4*k)));
-    return ((first + second) + third);
+    return (first + second + third);
 }
 static double C2_HOOK_CDECL LimitCross(br_vector3* out, const void* axis, unsigned offset, const br_vector3* vector) {
     double z, length;
@@ -5093,7 +5093,7 @@ static double C2_HOOK_CDECL LimitCross(br_vector3* out, const void* axis, unsign
     z = ((((double)*(LimitScalarAt(axis, offset+4)) * (double)*(LimitScalarAt(vector, 0))))-(((double)*(LimitScalarAt(axis, offset)) * (double)*(LimitScalarAt(vector, 4)))));
     FrictionWrite(out, 8, z);
     /* Original keeps z wide while its FST scalar copy feeds the last product. */
-    length = ((((((double)*(LimitScalarAt(out, 0)) * (double)*(LimitScalarAt(out, 0)))) + (((double)*(LimitScalarAt(out, 4)) * (double)*(LimitScalarAt(out, 4)))))) + (z * (out->v[2])));
+    length = ((((((double)*(LimitScalarAt(out, 0)) * (double)*(LimitScalarAt(out, 0)))) + (((double)*(LimitScalarAt(out, 4)) * (double)*(LimitScalarAt(out, 4)))))) + z * out->v[2]);
     return sqrt(length);
 }
 
@@ -5116,14 +5116,14 @@ void C2_HOOK_FASTCALL FUN_004bd4f0(const br_matrix34* child_matrix, const br_mat
     z = (z + (double)*(LimitScalarAt(parent_axis0, 8)));
     stored_y = FrictionScalar(bisector->v[1]);
     stored_z = FrictionScalar(z);
-    length = (((((double)stored_y * stored_y) + (z * stored_z))) + (x * x));
+    length = (double)stored_y * stored_y + z * stored_z + x * x;
     FrictionWrite(bisector, 8, z);
     length = sqrt(length);
     if (length > (double)2.384185791015625e-7f) {
         reciprocal = 1.0 / length;
         z = bisector->v[2];
         y = bisector->v[1];
-        x = (bisector->v[0]) * reciprocal;
+        x = bisector->v[0] * reciprocal;
         y *= reciprocal;
         z *= reciprocal;
         FrictionWrite(bisector, 0, x);
@@ -5147,7 +5147,7 @@ void C2_HOOK_FASTCALL FUN_004bd4f0(const br_matrix34* child_matrix, const br_mat
     reflected_x = ((double)*(LimitScalarAt(reflected, 0)) - x);
     product_z = FrictionScalar(z);
     reflected_y = reflected_y-y;
-    reflected_z = (reflected_z - (double)product_z);
+    reflected_z = reflected_z - (double)product_z;
     stored_y = FrictionScalar(reflected_y);
     stored_z = FrictionScalar(reflected_z);
     FrictionWrite(reflected, 0, reflected_x);
@@ -5160,13 +5160,13 @@ void C2_HOOK_FASTCALL FUN_004bd4f0(const br_matrix34* child_matrix, const br_mat
     wide_twice_dot = dot + dot;
     twice_dot = FrictionScalar(wide_twice_dot);
     x = ((double)wide_twice_dot * *((const br_scalar*)LimitScalarAt(parent_axis0, 0)));
-    y = ((double)parent_y * twice_dot);
-    z = ((double)parent_z * twice_dot);
+    y = (double)parent_y * twice_dot;
+    z = (double)parent_z * twice_dot;
     FrictionWrite(reflected, 0, ((double)*(LimitScalarAt(reflected, 0)) - x));
     reflected_z = reflected->v[2];
     reflected_y = reflected->v[1];
-    FrictionWrite(reflected, 4, (reflected_y-y));
-    FrictionWrite(reflected, 8, (reflected_z-z));
+    FrictionWrite(reflected, 4, reflected_y-y);
+    FrictionWrite(reflected, 8, reflected_z-z);
 }
 
 // FUNCTION: CARMA2_HW 0x004bca10
@@ -5206,8 +5206,8 @@ int C2_HOOK_FASTCALL FUN_004bca10(tPhysics_object* object, tPhysics_joint_force*
                     row = LimitRow(object, 0x188, row_offset);
                     wide = LimitDot(row, 0x68, &predicted, 0, 0, 1, 2);
                     predicted_dot = FrictionScalar(wide);
-                    if (wide >= 0.0 && (predicted_dot >= 0.001 || (object->field_0xf0))) {
-                        FrictionWrite(record, 0, (current_dot - (double)predicted_dot));
+                    if (wide >= 0.0 && (predicted_dot >= 0.001 || object->field_0xf0)) {
+                        FrictionWrite(record, 0, current_dot - (double)predicted_dot);
                         LimitWord(record, 0x5c, 11);
                         LimitWord(record, 4, (tU32)(uintptr_t)object);
                         LimitWord(record, 8, (tU32)(uintptr_t)partner);
@@ -5224,7 +5224,7 @@ int C2_HOOK_FASTCALL FUN_004bca10(tPhysics_object* object, tPhysics_joint_force*
                             FrictionWrite(record, 0x3c, (((*(const br_scalar*)((const tU8*)record + 0x3c))) - (double)*(LimitScalarAt(partner, 0x78))));
                             next = (((*(const br_scalar*)((const tU8*)record + 0x40))) - (double)*(LimitScalarAt(partner, 0x7c)));
                             FrictionWrite(record, 0x40, next);
-                            length = sqrt((((((*(const br_scalar*)((const tU8*)record + 0x38))*(*(const br_scalar*)((const tU8*)record + 0x38))) + (next*next))) + ((*(const br_scalar*)((const tU8*)record + 0x3c))*(*(const br_scalar*)((const tU8*)record + 0x3c)))));
+                            length = sqrt((((((*(const br_scalar*)((const tU8*)record + 0x38))*(*(const br_scalar*)((const tU8*)record + 0x38))) + next*next)) + ((*(const br_scalar*)((const tU8*)record + 0x3c))*(*(const br_scalar*)((const tU8*)record + 0x3c)))));
                             if (length > (double)2.384185791015625e-7f) {
                                 wide = 1.0 / length;
                                 FrictionWrite(record, 0x38, (*(const br_scalar*)((const tU8*)record + 0x38))*wide);
@@ -5275,7 +5275,7 @@ int C2_HOOK_FASTCALL FUN_004bca10(tPhysics_object* object, tPhysics_joint_force*
                         }
                         BrMatrix34ApplyV(&cross, (br_vector3*)(record+0x38), partner_matrix);
                         BrMatrix34TApplyV((br_vector3*)(record+0x2c), &cross, &object->transform_matrix);
-                        FrictionWrite(record, 0, (current_dot - (double)predicted_dot));
+                        FrictionWrite(record, 0, current_dot - (double)predicted_dot);
                         LimitWord(record, 0x5c, 11);
                         LimitWord(record, 4, (tU32)(uintptr_t)object);
                         LimitWord(record, 8, (tU32)(uintptr_t)partner);
@@ -5457,7 +5457,7 @@ static void C2_HOOK_CDECL JointedMotionEnergyPass(tPhysics_object* first) {
 #if defined(__GNUC__) && defined(__i386__)
 #define JOINTED_MOTION(function_name, object, time) do { \
     tHierarchyRawMotion function = (tHierarchyRawMotion)(void*)(function_name); \
-    function(object, 0, HierarchyTimeWord(&(time))); \
+    function(object, 0, HierarchyTimeWord(&time)); \
 } while (0)
 #else
 #define JOINTED_MOTION(function_name, object, time) (function_name)(object, 0, time)
@@ -5512,16 +5512,16 @@ void C2_HOOK_FAKE_THISCALL MoveJointedObject(tPhysics_object* pObject, undefined
         JOINTED_MOTION(FUN_004b8ee0, pObject, pTime);
         return;
     }
-    x = ((double)pObject->v.v[0] * pTime);
+    x = (double)pObject->v.v[0] * pTime;
     actor = observed->actor;
     y = observed->v.v[1];
     x = x + actor->t.t.mat.m[3][0];
     z = observed->v.v[2];
-    y = ((double)y * pTime);
+    y = (double)y * pTime;
     actor->t.t.mat.m[3][0] = (br_scalar)PhysicsJointScalar(x);
     actor = observed->actor;
     y = y + actor->t.t.mat.m[3][1];
-    z = ((double)z * pTime);
+    z = (double)z * pTime;
     actor->t.t.mat.m[3][1] = (br_scalar)PhysicsJointScalar(y);
     actor = observed->actor;
     actor->t.t.mat.m[3][2] = (br_scalar)PhysicsJointScalar(z + actor->t.t.mat.m[3][2]);
@@ -5622,12 +5622,12 @@ void C2_HOOK_FASTCALL FUN_004bc190(tPhysics_joint_force* const* pForces, br_scal
                     double x = live->rotate_omega.v[0];
                     double y = live->rotate_omega.v[1];
                     double z = live->rotate_omega.v[2];
-                    double old_norm = (x * x + y * y) + z * z;
+                    double old_norm = x * x + y * y + z * z;
                     double new_norm;
                     x = live->omega.v[0];
                     y = live->omega.v[1];
                     z = live->omega.v[2];
-                    new_norm = (x * x + y * y) + z * z;
+                    new_norm = x * x + y * y + z * z;
                     if (new_norm > old_norm) {
                         const tPhysics_object* other = record->object_a;
                         const tPhysics_joint_force* second;
@@ -5642,22 +5642,22 @@ void C2_HOOK_FASTCALL FUN_004bc190(tPhysics_joint_force* const* pForces, br_scal
                         axis.v[0] = (br_scalar)PhysicsJointScalar((double)live->physics_joint1->field_0x08.v[0] - other->physics_joint1->field_0x14.v[0]);
                         axis.v[1] = (br_scalar)PhysicsJointScalar((double)live->physics_joint1->field_0x08.v[1] - other->physics_joint1->field_0x14.v[1]);
                         axis.v[2] = (br_scalar)PhysicsJointScalar((double)live->physics_joint1->field_0x08.v[2] - other->physics_joint1->field_0x14.v[2]);
-                        length_scalar = (br_scalar)PhysicsJointScalar(sqrt(((double)axis.v[0] * axis.v[0] + (double)axis.v[1] * axis.v[1]) + (double)axis.v[2] * axis.v[2]));
+                        length_scalar = (br_scalar)PhysicsJointScalar(sqrt((double)axis.v[0] * axis.v[0] + (double)axis.v[1] * axis.v[1] + (double)axis.v[2] * axis.v[2]));
                         axis.v[0] = (br_scalar)PhysicsJointScalar((double)axis.v[0] / length_scalar);
                         axis.v[1] = (br_scalar)PhysicsJointScalar((double)axis.v[1] / length_scalar);
                         axis.v[2] = (br_scalar)PhysicsJointScalar((double)axis.v[2] / length_scalar);
                         cutoff = (double)live->M * 0.5;
-                        dot = ((double)impulses[outer] * axis.v[0] + (double)impulses[outer + 1] * axis.v[1]) + (double)impulses[outer + 2] * axis.v[2];
+                        dot = (double)impulses[outer] * axis.v[0] + (double)impulses[outer + 1] * axis.v[1] + (double)impulses[outer + 2] * axis.v[2];
                         if (!(!(dot >= cutoff))) {
                             second = forces[(tU32)inner + 1];
                             third = forces[(tU32)inner + 2];
-                            dot_a = ((double)record->direction_b.v[2] * axis.v[2] + (double)record->direction_b.v[0] * axis.v[0]) + (double)record->direction_b.v[1] * axis.v[1];
-                            dot_b = ((double)second->direction_b.v[1] * axis.v[1] + (double)second->direction_b.v[0] * axis.v[0]) + (double)second->direction_b.v[2] * axis.v[2];
-                            dot_c = ((double)third->direction_b.v[1] * axis.v[1] + (double)third->direction_b.v[0] * axis.v[0]) + (double)third->direction_b.v[2] * axis.v[2];
+                            dot_a = (double)record->direction_b.v[2] * axis.v[2] + (double)record->direction_b.v[0] * axis.v[0] + (double)record->direction_b.v[1] * axis.v[1];
+                            dot_b = (double)second->direction_b.v[1] * axis.v[1] + (double)second->direction_b.v[0] * axis.v[0] + (double)second->direction_b.v[2] * axis.v[2];
+                            dot_c = (double)third->direction_b.v[1] * axis.v[1] + (double)third->direction_b.v[0] * axis.v[0] + (double)third->direction_b.v[2] * axis.v[2];
                             dot = (dot_a * impulses[inner] + dot_b * impulses[(tU32)inner + 1]) + dot_c * impulses[(tU32)inner + 2];
                             if (!(!(dot >= cutoff))) {
                                 x = live->omega.v[0]; y = live->omega.v[1]; z = live->omega.v[2];
-                                length = sqrt((x * x + y * y) + z * z);
+                                length = sqrt(x * x + y * y + z * z);
                                 omega_axis.v[0] = (br_scalar)PhysicsJointScalar((double)live->omega.v[0] / length);
                                 omega_axis.v[1] = (br_scalar)PhysicsJointScalar((double)live->omega.v[1] / length);
                                 omega_axis.v[2] = (br_scalar)PhysicsJointScalar((double)live->omega.v[2] / length);
@@ -5665,7 +5665,7 @@ void C2_HOOK_FASTCALL FUN_004bc190(tPhysics_joint_force* const* pForces, br_scal
                                 BrMatrix34Rotate(&rotation, angle, &omega_axis);
                                 BrMatrix34ApplyV(&rotated, &axis, &rotation);
                                 x = impulses[outer]; y = impulses[outer + 1]; z = impulses[outer + 2];
-                                length = sqrt((x * x + y * y) + z * z);
+                                length = sqrt(x * x + y * y + z * z);
                                 if ((length > (2.384185791015625e-7))) {
                                     inverse = 1.0 / length;
                                     force_x = inverse * x;
@@ -5677,12 +5677,12 @@ void C2_HOOK_FASTCALL FUN_004bc190(tPhysics_joint_force* const* pForces, br_scal
                                 cross_a = ((double)axis.v[1] * force_z - (double)axis.v[2] * force_y) * ((double)force_z * rotated.v[1] - force_y * rotated.v[2]);
                                 cross_b = ((double)axis.v[2] * force_x - (double)axis.v[0] * force_z) * (force_x * rotated.v[2] - (double)force_z * rotated.v[0]);
                                 cross_c = ((double)axis.v[0] * force_y - (double)axis.v[1] * force_x) * (force_y * rotated.v[0] - force_x * rotated.v[1]);
-                                dot = (cross_a + cross_b) + cross_c;
+                                dot = cross_a + cross_b + cross_c;
                                 if ((!(dot >= 0.0))) {
                                     br_scalar scale = 0.10000000149011612f;
-                                    x = ((double)live->omega.v[0] * (double)scale);
-                                    y = ((double)live->omega.v[1] * (double)scale);
-                                    z = ((double)live->omega.v[2] * (double)scale);
+                                    x = (double)live->omega.v[0] * (double)scale;
+                                    y = (double)live->omega.v[1] * (double)scale;
+                                    z = (double)live->omega.v[2] * (double)scale;
                                     live->omega.v[0] = (br_scalar)PhysicsJointScalar(x);
                                     live->omega.v[1] = (br_scalar)PhysicsJointScalar(y);
                                     live->omega.v[2] = (br_scalar)PhysicsJointScalar(z);
@@ -6040,7 +6040,7 @@ void C2_HOOK_FASTCALL InternalPrepareObject(tPhysics_object* object) {
         PrepareWriteWord(object, 4, 0x3c23d70a);
         BrVector3SetFloat((br_vector3*)((tU8*)object + 8), .01f, .01f, .01f);
     }
-    a = (object->flags) & 0xffffedffu;
+    a = object->flags & 0xffffedffu;
     disabled = PrepareByte(object, 0xec);
     PrepareWriteWord(object, 0x19c, a);
     PrepareWriteByte(object, 0x1de, 0);
@@ -6104,12 +6104,12 @@ void C2_HOOK_FASTCALL InternalPrepareObject(tPhysics_object* object) {
         actor = (br_actor*)PreparePointer(object, 0);
         PrepareWriteWord(object, 0x230, (tU32)(uintptr_t)parent);
         x = actor->t.t.mat.m[3][0];
-        y = ((actor->t.t.mat.m[3][1]) - (double)*(PrepareScalarPointer(object, 0xb4)));
+        y = (actor->t.t.mat.m[3][1] - (double)*(PrepareScalarPointer(object, 0xb4)));
         x = (x - (double)*(PrepareScalarPointer(object, 0xb0)));
-        z = ((actor->t.t.mat.m[3][2]) - (double)*(PrepareScalarPointer(object, 0xb8)));
+        z = (actor->t.t.mat.m[3][2] - (double)*(PrepareScalarPointer(object, 0xb8)));
         rounded_y = PhysicsJointScalar(y);
         rounded_z = PhysicsJointScalar(z);
-        distance_squared = ((x * x) + (y * rounded_y)) + rounded_z * rounded_z;
+        distance_squared = x * x + y * rounded_y + rounded_z * rounded_z;
         if (distance_squared > 1.0) {
             FUN_004c61e0("Stupid trial position");
             actor = (br_actor*)PreparePointer(object, 0);
@@ -6335,9 +6335,9 @@ void C2_HOOK_FAKE_THISCALL FUN_004c2670(tPhysics_object* object, undefined4 unus
     x = object->rotate_omega.v[0];
     y = object->rotate_omega.v[1];
     z = object->rotate_omega.v[2];
-    norm = ((((x * x) + (y * y))) + (z * z));
+    norm = x * x + y * y + z * z;
     magnitude = (br_scalar)PhysicsJointScalar(sqrt(norm));
-    axis.v[0] = (br_scalar)PhysicsJointScalar(((double)*snapshot / (double)magnitude));
+    axis.v[0] = (br_scalar)PhysicsJointScalar((double)*snapshot / (double)magnitude);
     axis.v[1] = (br_scalar)PhysicsJointScalar(((double)*(snapshot + 1) / (double)magnitude));
     axis.v[2] = (br_scalar)PhysicsJointScalar(((double)*(snapshot + 2) / (double)magnitude));
     angle_wide = ((double)((double)magnitude) * time);
@@ -6348,22 +6348,22 @@ void C2_HOOK_FAKE_THISCALL FUN_004c2670(tPhysics_object* object, undefined4 unus
     center = (const br_vector3*)((const tU8*)object + 0x14);
     BrMatrix34ApplyV(&projected, center, &actor->t.t.mat);
     actor = InterpolationActor(object);
-    *(br_scalar*)&actor->t.t.mat.m[3][0] = (br_scalar)PhysicsJointScalar((((double)projected.v[0]) + (double)actor->t.t.mat.m[3][0]));
+    *(br_scalar*)&actor->t.t.mat.m[3][0] = (br_scalar)PhysicsJointScalar((double)projected.v[0] + (double)actor->t.t.mat.m[3][0]);
     actor = InterpolationActor(object);
-    *(br_scalar*)&actor->t.t.mat.m[3][1] = (br_scalar)PhysicsJointScalar((((double)projected.v[1]) + (double)actor->t.t.mat.m[3][1]));
+    *(br_scalar*)&actor->t.t.mat.m[3][1] = (br_scalar)PhysicsJointScalar((double)projected.v[1] + (double)actor->t.t.mat.m[3][1]);
     actor = InterpolationActor(object);
-    *(br_scalar*)&actor->t.t.mat.m[3][2] = (br_scalar)PhysicsJointScalar((((double)projected.v[2]) + (double)actor->t.t.mat.m[3][2]));
+    *(br_scalar*)&actor->t.t.mat.m[3][2] = (br_scalar)PhysicsJointScalar((double)projected.v[2] + (double)actor->t.t.mat.m[3][2]);
     integer_angle = AngularForceAngle((double)angle * 10430.378350470453);
     actor = InterpolationActor(object);
     BrMatrix34PreRotate(&actor->t.t.mat, integer_angle, &axis);
     actor = InterpolationActor(object);
     BrMatrix34ApplyV(&projected, center, &actor->t.t.mat);
     actor = InterpolationActor(object);
-    *(br_scalar*)&actor->t.t.mat.m[3][0] = (br_scalar)PhysicsJointScalar(((actor->t.t.mat.m[3][0]) - (double)projected.v[0]));
+    *(br_scalar*)&actor->t.t.mat.m[3][0] = (br_scalar)PhysicsJointScalar(actor->t.t.mat.m[3][0] - (double)projected.v[0]);
     actor = InterpolationActor(object);
-    *(br_scalar*)&actor->t.t.mat.m[3][1] = (br_scalar)PhysicsJointScalar(((actor->t.t.mat.m[3][1]) - (double)projected.v[1]));
+    *(br_scalar*)&actor->t.t.mat.m[3][1] = (br_scalar)PhysicsJointScalar(actor->t.t.mat.m[3][1] - (double)projected.v[1]);
     actor = InterpolationActor(object);
-    *(br_scalar*)&actor->t.t.mat.m[3][2] = (br_scalar)PhysicsJointScalar(((actor->t.t.mat.m[3][2]) - (double)projected.v[2]));
+    *(br_scalar*)&actor->t.t.mat.m[3][2] = (br_scalar)PhysicsJointScalar(actor->t.t.mat.m[3][2] - (double)projected.v[2]);
 }
 
 // FUNCTION: CARMA2_HW 0x004c2830
@@ -6374,18 +6374,18 @@ void C2_HOOK_FAKE_THISCALL InterpolateSingleObject(tPhysics_object* object, unde
     double y, z;
 
     actor = InterpolationActor(object);
-    x = ((double)x * time);
+    x = (double)x * time;
     y = object->v.v[1];
-    x = (x + (double)actor->t.t.mat.m[3][0]);
+    x = x + (double)actor->t.t.mat.m[3][0];
     z = object->v.v[2];
-    y = ((double)y * time);
+    y = (double)y * time;
     *(br_scalar*)&actor->t.t.mat.m[3][0] = (br_scalar)PhysicsJointScalar(x);
     actor = InterpolationActor(object);
-    y = (y + (double)actor->t.t.mat.m[3][1]);
-    z = ((double)z * time);
+    y = y + (double)actor->t.t.mat.m[3][1];
+    z = (double)z * time;
     *(br_scalar*)&actor->t.t.mat.m[3][1] = (br_scalar)PhysicsJointScalar(y);
     actor = InterpolationActor(object);
-    *(br_scalar*)&actor->t.t.mat.m[3][2] = (br_scalar)PhysicsJointScalar((z + (double)actor->t.t.mat.m[3][2]));
+    *(br_scalar*)&actor->t.t.mat.m[3][2] = (br_scalar)PhysicsJointScalar(z + (double)actor->t.t.mat.m[3][2]);
     InterpolationForward(FUN_004c2670, object, unused_edx, &time);
     child = WakePointer(object, 0x224);
     while (child != NULL) {
@@ -6403,18 +6403,18 @@ void C2_HOOK_FAKE_THISCALL FUN_004c28a0(tPhysics_object* list, undefined4 unused
     while (list != NULL) {
         x = list->v.v[0];
         actor = InterpolationActor(list);
-        x = ((double)x * time);
+        x = (double)x * time;
         y = list->v.v[1];
-        x = (x + (double)actor->t.t.mat.m[3][0]);
+        x = x + (double)actor->t.t.mat.m[3][0];
         z = list->v.v[2];
-        y = ((double)y * time);
+        y = (double)y * time;
         *(br_scalar*)&actor->t.t.mat.m[3][0] = (br_scalar)PhysicsJointScalar(x);
         actor = InterpolationActor(list);
-        y = (y + (double)actor->t.t.mat.m[3][1]);
-        z = ((double)z * time);
+        y = y + (double)actor->t.t.mat.m[3][1];
+        z = (double)z * time;
         *(br_scalar*)&actor->t.t.mat.m[3][1] = (br_scalar)PhysicsJointScalar(y);
         actor = InterpolationActor(list);
-        *(br_scalar*)&actor->t.t.mat.m[3][2] = (br_scalar)PhysicsJointScalar((z + (double)actor->t.t.mat.m[3][2]));
+        *(br_scalar*)&actor->t.t.mat.m[3][2] = (br_scalar)PhysicsJointScalar(z + (double)actor->t.t.mat.m[3][2]);
         InterpolationForward(FUN_004c2670, list, unused_edx, &time);
         child = WakePointer(list, 0x224);
         if (child != NULL) InterpolationForward(FUN_004c28a0, child, unused_edx, &time);
@@ -6480,15 +6480,15 @@ void C2_HOOK_FASTCALL FUN_004c62e0(tPhysics_object* object, const br_matrix34* m
 static void C2_HOOK_CDECL CollisionBoundsCopy(void* destination, const void* source) {
     int i;
     for (i = 0; i < 6; ++i) {
-        *(tU32*)((tU8*)destination + i * 4) = (*(const tU32*)((const tU8*)source + (i * 4)));
+        *(tU32*)((tU8*)destination + i * 4) = (*(const tU32*)((const tU8*)source + i * 4));
     }
 }
 static double C2_HOOK_CDECL CollisionBoundsSquared(const void* bounds, unsigned axis) {
-    double minimum = (*(const br_scalar*)((const tU8*)bounds + (axis * 4)));
+    double minimum = (*(const br_scalar*)((const tU8*)bounds + axis * 4));
     double maximum = (*(const br_scalar*)((const tU8*)bounds + (12 + axis * 4)));
     double square_minimum = minimum * minimum;
     br_scalar maximum_scalar = (br_scalar)PhysicsJointScalar(maximum);
-    double square_maximum = PhysicsJointScalar(((double)maximum * maximum_scalar));
+    double square_maximum = PhysicsJointScalar((double)maximum * maximum_scalar);
 
     /* The original compares the wide minimum square against a scalar32
      * maximum square, and selects the latter on equality or unordered. */
@@ -6591,7 +6591,7 @@ void C2_HOOK_FASTCALL FUN_004c2910(tPhysics_object* object) {
 // FUNCTION: CARMA2_HW 0x004c2c90
 void C2_HOOK_FASTCALL FUN_004c2c90(tPhysics_object* object, const br_vector3* damping) {
     const br_scalar factor = 0.02100399136543274f; /* original58a8b0 */
-    double scaled_x = ((double)(damping->v[0]) * factor);
+    double scaled_x = (double)damping->v[0] * factor;
     double inertia_x = object->I.v[0];
     double input_y = damping->v[1];
     double input_z = damping->v[2];
@@ -6608,12 +6608,12 @@ void C2_HOOK_FASTCALL FUN_004c2c90(tPhysics_object* object, const br_vector3* da
     old_bits[1] = (*(const tU32*)((const tU8*)object + 0x78));
     old_bits[2] = (*(const tU32*)((const tU8*)object + 0x7c));
     memcpy(old_omega, old_bits, sizeof(old_omega));
-    scaled_y = ((double)input_y * factor);
+    scaled_y = (double)input_y * factor;
     inertia_y = object->I.v[1];
-    scaled_z = ((double)input_z * factor);
+    scaled_z = (double)input_z * factor;
     inertia_z = object->I.v[2];
     numerator_y = FrictionScalar(scaled_y);
-    decrement_y = ((double)numerator_y / inertia_y);
+    decrement_y = (double)numerator_y / inertia_y;
     decrement_z = scaled_z / inertia_z;
 
     scaled_x = ((double)*(FrictionAt(object, 0x74)) - decrement_x);
@@ -6625,8 +6625,8 @@ void C2_HOOK_FASTCALL FUN_004c2c90(tPhysics_object* object, const br_vector3* da
     FrictionWrite(object, 0x78, new_y);
     FrictionWrite(object, 0x7c, new_z);
     if (!(sign_x > 0.0)) *(tU32*)((tU8*)object + 0x74) = 0;
-    if (!((((double)old_omega[1] * new_y)) > 0.0)) *(tU32*)((tU8*)object + 0x78) = 0;
-    if (!((((double)old_omega[2] * (double)rounded_z)) > 0.0)) *(tU32*)((tU8*)object + 0x7c) = 0;
+    if (!(((double)old_omega[1] * new_y) > 0.0)) *(tU32*)((tU8*)object + 0x78) = 0;
+    if (!(((double)old_omega[2] * (double)rounded_z) > 0.0)) *(tU32*)((tU8*)object + 0x7c) = 0;
 }
 
 // FUNCTION: CARMA2_HW 0x004c2970
@@ -6661,14 +6661,14 @@ void C2_HOOK_FASTCALL FUN_004c2c30(tPhysics_object* object, const br_vector3* de
     double ix, iy, iz;
     br_scalar y_scalar;
 
-    x = ((double)x * scale);
-    y = ((double)y * scale);
-    z = ((double)z * scale);
+    x = (double)x * scale;
+    y = (double)y * scale;
+    z = (double)z * scale;
     ix = object->I.v[0];
     iy = object->I.v[1];
     iz = object->I.v[2];
     y_scalar = (br_scalar)PhysicsJointScalar(y);
-    y = ((double)y_scalar / iy);
+    y = (double)y_scalar / iy;
     /* Both operands have passed through FLD. The original register division
      * selects the same quiet NaN as the existing x87 sum helper. */
     z = PhysicsWallNaN(z) && PhysicsWallNaN(iz) ? (z + iz) : z / iz;
