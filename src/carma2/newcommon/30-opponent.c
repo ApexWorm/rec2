@@ -39,37 +39,13 @@ int gRoute_search_max_calls;
  * In particular, a scalar store need not discard its unrounded register value. */
 static double C2_HOOK_CDECL OpponentFloatDifference(const float* pA, const float* pB) {
     double result;
-#if defined(_MSC_VER) && defined(_M_IX86)
-    __asm {
-        mov eax, pA
-        mov edx, pB
-        fld dword ptr [eax]
-        fsub dword ptr [edx]
-        fstp qword ptr [result]
-    }
-#elif defined(__GNUC__) && defined(__i386__)
-    __asm__ volatile ("flds %1; fsubs %2; fstpl %0" : "=m"(result) : "m"(*pA), "m"(*pB) : "st");
-#else
     result = (double)*pA - (double)*pB;
-#endif
     return result;
 }
 
 static double C2_HOOK_CDECL OpponentFloatAdd(const float* pA, const float* pB) {
     double result;
-#if defined(_MSC_VER) && defined(_M_IX86)
-    __asm {
-        mov eax, pA
-        mov edx, pB
-        fld dword ptr [eax]
-        fadd dword ptr [edx]
-        fstp qword ptr [result]
-    }
-#elif defined(__GNUC__) && defined(__i386__)
-    __asm__ volatile ("flds %1; fadds %2; fstpl %0" : "=m"(result) : "m"(*pA), "m"(*pB) : "st");
-#else
     result = (double)*pA + (double)*pB;
-#endif
     return result;
 }
 
@@ -95,17 +71,7 @@ static double C2_HOOK_CDECL OpponentDivide(double pA, double pB) {
 
 static double C2_HOOK_CDECL OpponentSqrt(double pA) {
     double result;
-#if defined(_MSC_VER) && defined(_M_IX86)
-    __asm {
-        fld qword ptr [pA]
-        fsqrt
-        fstp qword ptr [result]
-    }
-#elif defined(__GNUC__) && defined(__i386__)
-    __asm__ volatile ("fldl %1; fsqrt; fstpl %0" : "=m"(result) : "m"(pA) : "st");
-#else
     result = sqrt(pA);
-#endif
     return result;
 }
 

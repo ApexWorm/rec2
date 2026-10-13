@@ -11,100 +11,38 @@
  * In particular, a scalar store need not discard its unrounded register value. */
 static double C2_HOOK_CDECL NavigationFloatDifference(const float* pA, const float* pB) {
     double result;
-#if defined(_MSC_VER) && defined(_M_IX86)
-    __asm {
-        mov eax, pA
-        mov edx, pB
-        fld dword ptr [eax]
-        fsub dword ptr [edx]
-        fstp qword ptr [result]
-    }
-#elif defined(__GNUC__) && defined(__i386__)
-    __asm__ volatile ("flds %1; fsubs %2; fstpl %0" : "=m"(result) : "m"(*pA), "m"(*pB) : "st");
-#else
     result = (double)*pA - (double)*pB;
-#endif
     return result;
 }
 
 
 static double C2_HOOK_CDECL NavigationAdd(double pA, double pB) {
     double result;
-#if defined(_MSC_VER) && defined(_M_IX86)
-    __asm {
-        fld qword ptr [pA]
-        fadd qword ptr [pB]
-        fstp qword ptr [result]
-    }
-#elif defined(__GNUC__) && defined(__i386__)
-    __asm__ volatile ("fldl %1; faddl %2; fstpl %0" : "=m"(result) : "m"(pA), "m"(pB) : "st");
-#else
     result = pA + pB;
-#endif
     return result;
 }
 
 static double C2_HOOK_CDECL NavigationSubtract(double pA, double pB) {
     double result;
-#if defined(_MSC_VER) && defined(_M_IX86)
-    __asm {
-        fld qword ptr [pA]
-        fsub qword ptr [pB]
-        fstp qword ptr [result]
-    }
-#elif defined(__GNUC__) && defined(__i386__)
-    __asm__ volatile ("fldl %1; fsubl %2; fstpl %0" : "=m"(result) : "m"(pA), "m"(pB) : "st");
-#else
     result = pA - pB;
-#endif
     return result;
 }
 
 static double C2_HOOK_CDECL NavigationMultiply(double pA, double pB) {
     double result;
-#if defined(_MSC_VER) && defined(_M_IX86)
-    __asm {
-        fld qword ptr [pA]
-        fmul qword ptr [pB]
-        fstp qword ptr [result]
-    }
-#elif defined(__GNUC__) && defined(__i386__)
-    __asm__ volatile ("fldl %1; fmull %2; fstpl %0" : "=m"(result) : "m"(pA), "m"(pB) : "st");
-#else
     result = pA * pB;
-#endif
     return result;
 }
 
 static double C2_HOOK_CDECL NavigationDivide(double pA, double pB) {
     double result;
-#if defined(_MSC_VER) && defined(_M_IX86)
-    __asm {
-        fld qword ptr [pA]
-        fdiv qword ptr [pB]
-        fstp qword ptr [result]
-    }
-#elif defined(__GNUC__) && defined(__i386__)
-    __asm__ volatile ("fldl %1; fdivl %2; fstpl %0" : "=m"(result) : "m"(pA), "m"(pB) : "st");
-#else
     result = pA / pB;
-#endif
     return result;
 }
 
 static double C2_HOOK_CDECL NavigationSqrt(double pA) {
     double result;
-#if defined(_MSC_VER) && defined(_M_IX86)
-    __asm {
-        fld qword ptr [pA]
-        fsqrt
-        fstp qword ptr [result]
-    }
-#elif defined(__GNUC__) && defined(__i386__)
-    __asm__ volatile ("fldl %1; fsqrt; fstpl %0" : "=m"(result) : "m"(pA) : "st");
-#else
     result = sqrt(pA);
-#endif
     return result;
 }
 
@@ -120,33 +58,13 @@ static float C2_HOOK_CDECL NavigationScalarRound(double pA) {
 /* MSVC5 folds self-comparisons and otherwise accepts unordered greater-than. */
 static int C2_HOOK_CDECL NavigationOrderedGreater(double pA, double pB) {
     unsigned short status;
-#if defined(_MSC_VER) && defined(_M_IX86)
-    __asm {
-        fld qword ptr [pA]
-        fcomp qword ptr [pB]
-        fnstsw status
-    }
-#elif defined(__GNUC__) && defined(__i386__)
-    __asm__ volatile ("fldl %1; fcompl %2; fnstsw %0" : "=m"(status) : "m"(pA), "m"(pB) : "st");
-#else
     return pA > pB;
-#endif
     return (status & 0x4100) == 0;
 }
 
 static int C2_HOOK_CDECL NavigationLessOrUnordered(double pA, double pB) {
     unsigned short status;
-#if defined(_MSC_VER) && defined(_M_IX86)
-    __asm {
-        fld qword ptr [pA]
-        fcomp qword ptr [pB]
-        fnstsw status
-    }
-#elif defined(__GNUC__) && defined(__i386__)
-    __asm__ volatile ("fldl %1; fcompl %2; fnstsw %0" : "=m"(status) : "m"(pA), "m"(pB) : "st");
-#else
     return pA < pB || pA != pA || pB != pB;
-#endif
     return (status & 0x100) != 0;
 }
 
@@ -378,26 +296,7 @@ void C2_HOOK_FASTCALL SetMaxSpeedFromSOCs(tSOC* pSocs, int pCount_socs, float* p
 
 static int C2_HOOK_CDECL NavigationTruncate(double pValue) {
     br_int_64 result;
-#if defined(_MSC_VER) && defined(_M_IX86)
-    unsigned short control;
-    unsigned short truncate_control;
-    __asm { fnstcw control }
-    truncate_control = control | 0xc00;
-    __asm {
-        fldcw truncate_control
-        fld qword ptr [pValue]
-        fistp qword ptr [result]
-        fldcw control
-    }
-#elif defined(__GNUC__) && defined(__i386__)
-    unsigned short control;
-    unsigned short truncate_control;
-    __asm__ volatile ("fnstcw %0" : "=m"(control));
-    truncate_control = control | 0xc00;
-    __asm__ volatile ("fldcw %1; fldl %2; fistpll %0; fldcw %3" : "=m"(result) : "m"(truncate_control), "m"(pValue), "m"(control) : "st");
-#else
     result = (br_int_64)pValue;
-#endif
     return (int)(tU32)result;
 }
 

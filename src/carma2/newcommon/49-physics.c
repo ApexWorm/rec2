@@ -95,21 +95,7 @@ static void C2_HOOK_FASTCALL PhysicsCopyWord(void* output, const void* input) {
 
 /* The original memory-operand subtraction selects distinct NaNs by x87 rules. */
 static void C2_HOOK_FASTCALL PhysicsSubtractScalar(br_scalar* output, const br_scalar* a, const br_scalar* b) {
-#if defined(_MSC_VER) && defined(_M_IX86)
-    __asm {
-        mov eax, a
-        mov ecx, b
-        mov edx, output
-        fld dword ptr [eax]
-        fsub dword ptr [ecx]
-        fstp dword ptr [edx]
-    }
-#elif defined(__GNUC__) && defined(__i386__)
-    __asm__ volatile("flds %1; fsubs %2; fstps %0"
-        : "=m" (*output) : "m" (*a), "m" (*b) : "st");
-#else
     *output = (br_scalar)((double)*a - *b);
-#endif
 }
 
 // FUNCTION: CARMA2_HW 0x00422fe0
@@ -261,19 +247,7 @@ static int C2_HOOK_FASTCALL PhysicsWallNaN(double value) {
 
 static double C2_HOOK_FASTCALL PhysicsWallAddScalar(const br_scalar* a, const volatile br_scalar* b) {
     double result;
-#if defined(_MSC_VER) && defined(_M_IX86)
-    __asm {
-        mov eax, a
-        mov ecx, b
-        fld dword ptr [eax]
-        fadd dword ptr [ecx]
-        fstp qword ptr result
-    }
-#elif defined(__GNUC__) && defined(__i386__)
-    __asm__ __volatile__("flds %1\n\tfadds %2\n\tfstpl %0" : "=m"(result) : "m"(*a), "m"(*b) : "st");
-#else
     result = (double)*a + *b;
-#endif
     return result;
 }
 
@@ -1154,50 +1128,6 @@ int C2_HOOK_FASTCALL FUN_004228b0(tPhysics_object* object, tPhysics_contact* con
 /* Original x87 operand order preserves the tested distinct NaN payloads. */
 static br_scalar C2_HOOK_FASTCALL PhysicsObjectEnergy(tPhysics_object* object) {
     br_scalar energy;
-#if defined(_MSC_VER) && defined(_M_IX86)
-    br_scalar omega;
-    __asm {
-        mov esi, object
-        lea eax, [esi + 8]
-        mov ecx, 3
-        fldz
-    energy_component:
-        fld dword ptr [eax + 60h]
-        fld dword ptr [eax + 6ch]
-        fst omega
-        fld st(1)
-        fmul st(0), st(2)
-        fld dword ptr [esi + 4]
-        fxch st(2)
-        fmul omega
-        fld dword ptr [eax]
-        fxch st(3)
-        fmulp st(2), st(0)
-        fxch st(2)
-        fmulp st(2), st(0)
-        fxch st(1)
-        faddp st(1), st(0)
-        add eax, 4
-        dec ecx
-        faddp st(2), st(0)
-        fstp st(0)
-        jnz energy_component
-        fstp energy
-    }
-#elif defined(__GNUC__) && defined(__i386__)
-    br_scalar omega;
-    br_scalar* component = object->I.v;
-    int count = 3;
-    __asm__ volatile(
-        "fldz; 1: flds 0x60(%[p]); flds 0x6c(%[p]); fsts %[omega]; "
-        "fld %%st(1); fmul %%st(2),%%st; flds 4(%[object]); fxch %%st(2); "
-        "fmuls %[omega]; flds (%[p]); fxch %%st(3); fmulp %%st,%%st(2); "
-        "fxch %%st(2); fmulp %%st,%%st(2); fxch %%st(1); faddp %%st,%%st(1); "
-        "add $4,%[p]; dec %[n]; faddp %%st,%%st(2); fstp %%st(0); jnz 1b; fstps %[energy]"
-        : [energy] "=m" (energy), [omega] "=m" (omega), [p] "+&a" (component), [n] "+&c" (count)
-        : [object] "r" (object)
-        : "memory", "cc", "st", "st(1)", "st(2)", "st(3)", "st(4)", "st(5)");
-#else
     double total = 0.;
     int i;
     for (i = 0; i < 3; i++) {
@@ -1206,28 +1136,14 @@ static br_scalar C2_HOOK_FASTCALL PhysicsObjectEnergy(tPhysics_object* object) {
         total += (double)object->M * velocity_squared + (double)object->I.v[i] * omega_squared;
     }
     energy = (br_scalar)total;
-#endif
     return energy;
 }
 
 static br_scalar C2_HOOK_FASTCALL PhysicsAccumulateEnergy(br_scalar total, br_scalar energy, br_scalar children) {
     br_scalar result;
-#if defined(_MSC_VER) && defined(_M_IX86)
-    __asm {
-        fld children
-        fld energy
-        fadd total
-        faddp st(1), st(0)
-        fstp result
-    }
-#elif defined(__GNUC__) && defined(__i386__)
-    __asm__ volatile("flds %1; flds %2; fadds %3; faddp %%st,%%st(1); fstps %0"
-        : "=m" (result) : "m" (children), "m" (energy), "m" (total) : "st", "st(1)");
-#else
     volatile double subtotal = (double)energy + total;
 
     result = (br_scalar)(subtotal + children);
-#endif
     return result;
 }
 
@@ -1251,22 +1167,10 @@ static double C2_HOOK_CDECL PhysicsJointScalar(double pValue) {
     br_scalar scalar;
     double rounded;
 
-#if defined(_MSC_VER) && defined(_M_IX86)
-    __asm {
-        fld pValue
-        fstp scalar
-        fld scalar
-        fstp rounded
-    }
-#elif defined(__GNUC__) && defined(__i386__)
-    __asm__ volatile("fldl %2; fstps %0; flds %0; fstpl %1"
-        : "=m" (scalar), "=m" (rounded) : "m" (pValue) : "st");
-#else
     volatile br_scalar stored = (br_scalar)pValue;
 
     scalar = stored;
     rounded = scalar;
-#endif
     return rounded;
 }
 
@@ -1274,79 +1178,28 @@ static double C2_HOOK_CDECL PhysicsJointScalar(double pValue) {
 static double C2_HOOK_CDECL PhysicsJointSum(double pA, double pB) {
     double result;
 
-#if defined(_MSC_VER) && defined(_M_IX86)
-    __asm {
-        fld pA
-        fld pB
-        faddp st(1), st(0)
-        fstp result
-    }
-#elif defined(__GNUC__) && defined(__i386__)
-    __asm__ volatile("fldl %1; fldl %2; faddp; fstpl %0"
-        : "=m" (result) : "m" (pA), "m" (pB) : "st", "st(1)");
-#else
     result = pA + pB;
-#endif
     return result;
 }
 
 static double C2_HOOK_CDECL PhysicsJointProduct(const br_scalar* pA, const br_scalar* pB) {
     double result;
 
-#if defined(_MSC_VER) && defined(_M_IX86)
-    __asm {
-        mov eax, pA
-        mov edx, pB
-        fld dword ptr [eax]
-        fld dword ptr [edx]
-        fmulp st(1), st(0)
-        fstp result
-    }
-#elif defined(__GNUC__) && defined(__i386__)
-    __asm__ volatile("flds %1; flds %2; fmulp; fstpl %0"
-        : "=m" (result) : "m" (*pA), "m" (*pB) : "st", "st(1)");
-#else
     result = (double)*pA * *pB;
-#endif
     return result;
 }
 
 static double C2_HOOK_CDECL PhysicsJointProductMemory(const br_scalar* pA, const br_scalar* pB) {
     double result;
 
-#if defined(_MSC_VER) && defined(_M_IX86)
-    __asm {
-        mov eax, pA
-        mov edx, pB
-        fld dword ptr [eax]
-        fmul dword ptr [edx]
-        fstp result
-    }
-#elif defined(__GNUC__) && defined(__i386__)
-    __asm__ volatile("flds %1; fmuls %2; fstpl %0"
-        : "=m" (result) : "m" (*pA), "m" (*pB) : "st");
-#else
     result = (double)*pA * *pB;
-#endif
     return result;
 }
 
 static double C2_HOOK_CDECL PhysicsJointAddScalar(double pValue, const br_scalar* pScalar) {
     double result;
 
-#if defined(_MSC_VER) && defined(_M_IX86)
-    __asm {
-        mov eax, pScalar
-        fld pValue
-        fadd dword ptr [eax]
-        fstp result
-    }
-#elif defined(__GNUC__) && defined(__i386__)
-    __asm__ volatile("fldl %1; fadds %2; fstpl %0"
-        : "=m" (result) : "m" (pValue), "m" (*pScalar) : "st");
-#else
     result = pValue + *pScalar;
-#endif
     return result;
 }
 
@@ -1371,19 +1224,7 @@ static void C2_HOOK_CDECL PhysicsJointVelocityA(br_scalar* pOutput, const tPhysi
 
 /* FADD32 keeps the original tie-breaking between opposite-sign NaNs. */
 static void C2_HOOK_CDECL PhysicsJointAddVelocity(br_scalar* pOutput, double pValue) {
-#if defined(_MSC_VER) && defined(_M_IX86)
-    __asm {
-        mov eax, pOutput
-        fld pValue
-        fadd dword ptr [eax]
-        fstp dword ptr [eax]
-    }
-#elif defined(__GNUC__) && defined(__i386__)
-    __asm__ volatile("fldl %1; fadds %0; fstps %0"
-        : "+m" (*pOutput) : "m" (pValue) : "st");
-#else
     *pOutput = (br_scalar)(pValue + *pOutput);
-#endif
 }
 
 static void C2_HOOK_CDECL PhysicsJointVelocityB(br_scalar* pOutput, const tPhysics_joint_force* pForce, const tPhysics_object* pObject, int pTorque) {
@@ -2027,20 +1868,9 @@ static br_scalar C2_HOOK_FASTCALL PhysicsScalar(double value) {
 }
 
 static void C2_HOOK_FASTCALL PhysicsScalarStore(br_scalar* output, const br_scalar* input) {
-#if defined(_MSC_VER) && defined(_M_IX86)
-    __asm {
-        mov eax, output
-        mov ecx, input
-        fld dword ptr [ecx]
-        fstp dword ptr [eax]
-    }
-#elif defined(__GNUC__) && defined(__i386__)
-    __asm__ volatile("flds %1; fstps %0" : "=m" (*output) : "m" (*input) : "st");
-#else
     volatile double value = *input;
 
     *output = (br_scalar)value;
-#endif
 }
 
 // FUNCTION: CARMA2_HW 0x004c2060
@@ -2258,331 +2088,23 @@ void C2_HOOK_FASTCALL MakeObjectListDoSomething(tPhysics_object* pObject) {
 
 // AddDoubleTorqueToMatrix
 
-/* Original cofactor spills and source reloads preserve x87 rounding and NaN operand order. */
 // FUNCTION: CARMA2_HW 0x004be350
 void C2_HOOK_FASTCALL DRMatrix33Inverse(br_scalar* result, const br_scalar* pInput) {
-    const double one = 1.0;
-#if defined(_MSC_VER) && defined(_M_IX86)
-    __asm {
-        mov ecx, result
-        mov edx, pInput
-        fld dword ptr [edx + 0x14]
-        fld dword ptr [edx + 0x20]
-        fld dword ptr [edx + 0x1c]
-        fxch st(2)
-        fchs
-        fxch st(1)
-        fmul dword ptr [edx + 0x10]
-        fxch st(1)
-        fmulp st(2), st(0)
-        fxch st(1)
-        faddp st(1), st(0)
-        fstp dword ptr [ecx]
-        fld dword ptr [edx + 8]
-        fld dword ptr [edx + 0x20]
-        fld dword ptr [edx + 4]
-        fld dword ptr [edx + 0x1c]
-        fxch st(3)
-        fchs
-        fxch st(1)
-        fmulp st(2), st(0)
-        fmulp st(2), st(0)
-        fxch st(1)
-        faddp st(1), st(0)
-        fchs
-        fstp dword ptr [ecx + 4]
-        fld dword ptr [edx + 8]
-        fld dword ptr [edx + 0x14]
-        fld dword ptr [edx + 4]
-        fld dword ptr [edx + 0x10]
-        fxch st(3)
-        fchs
-        fxch st(1)
-        fmulp st(2), st(0)
-        fmulp st(2), st(0)
-        fld dword ptr [ecx + 4]
-        fxch st(2)
-        faddp st(1), st(0)
-        fxch st(1)
-        fld st(1)
-        fstp dword ptr [ecx + 8]
-        fld dword ptr [edx + 8]
-        fld dword ptr [edx]
-        fmul dword ptr [ecx]
-        fld dword ptr [edx + 4]
-        fxch st(2)
-        fmul st(0), st(4)
-        fxch st(2)
-        fmulp st(3), st(0)
-        fxch st(1)
-        faddp st(1), st(0)
-        fxch st(1)
-        faddp st(1), st(0)
-        fstp st(1)
-        fdivr one
-        fld dword ptr [ecx]
-        fmul st(0), st(1)
-        fld dword ptr [ecx + 4]
-        fxch st(1)
-        fstp dword ptr [ecx]
-        fld dword ptr [edx + 0x14]
-        fld dword ptr [edx + 0xc]
-        fld dword ptr [edx + 0x20]
-        fld dword ptr [edx + 0x18]
-        fxch st(3)
-        fchs
-        fxch st(1)
-        fmulp st(2), st(0)
-        fmulp st(2), st(0)
-        fxch st(2)
-        fmul st(0), st(3)
-        fxch st(1)
-        faddp st(2), st(0)
-        fld dword ptr [ecx + 8]
-        fxch st(2)
-        fmul st(0), st(3)
-        fxch st(2)
-        fmul st(0), st(3)
-        fxch st(2)
-        fchs
-        fstp dword ptr [ecx + 0xc]
-        fld dword ptr [edx + 0x10]
-        fld dword ptr [edx + 0xc]
-        fld dword ptr [edx + 0x1c]
-        fld dword ptr [edx + 0x18]
-        fxch st(1)
-        fmulp st(2), st(0)
-        fxch st(2)
-        fchs
-        fmulp st(2), st(0)
-        fxch st(2)
-        fstp dword ptr [ecx + 4]
-        faddp st(1), st(0)
-        fmul st(0), st(2)
-        fstp dword ptr [ecx + 0x18]
-        fld dword ptr [edx + 8]
-        fld dword ptr [edx + 0x20]
-        fld dword ptr [edx + 0x18]
-        fxch st(2)
-        fchs
-        fxch st(1)
-        fmul dword ptr [edx]
-        fxch st(1)
-        fmulp st(2), st(0)
-        fxch st(1)
-        faddp st(1), st(0)
-        fmul st(0), st(2)
-        fstp dword ptr [ecx + 0x10]
-        fld dword ptr [edx + 4]
-        fld dword ptr [edx + 0x1c]
-        fld dword ptr [edx + 0x18]
-        fxch st(2)
-        fchs
-        fxch st(1)
-        fmul dword ptr [edx]
-        fxch st(1)
-        fmulp st(2), st(0)
-        fxch st(2)
-        fstp dword ptr [ecx + 8]
-        faddp st(1), st(0)
-        fmul st(0), st(1)
-        fchs
-        fstp dword ptr [ecx + 0x1c]
-        fld dword ptr [edx + 8]
-        fld dword ptr [edx + 0x14]
-        fld dword ptr [edx + 0xc]
-        fxch st(2)
-        fchs
-        fxch st(1)
-        fmul dword ptr [edx]
-        fxch st(1)
-        fmulp st(2), st(0)
-        fxch st(1)
-        faddp st(1), st(0)
-        fmul st(0), st(1)
-        fchs
-        fstp dword ptr [ecx + 0x14]
-        fld dword ptr [edx + 4]
-        fld dword ptr [edx + 0x10]
-        fld dword ptr [edx + 0xc]
-        fxch st(2)
-        fchs
-        fxch st(1)
-        fmul dword ptr [edx]
-        fxch st(1)
-        fmulp st(2), st(0)
-        fxch st(1)
-        faddp st(1), st(0)
-        fmul st(0), st(1)
-        fstp dword ptr [ecx + 0x20]
-        fstp st(0)
-    }
-#elif defined(__GNUC__) && defined(__i386__)
-    {
-        const double* one_ptr = &one;
-        __asm__ volatile (
-            "movl %[result], %%ecx\n\t"
-            "movl %[input], %%edx\n\t"
-            "movl %[one], %%eax\n\t"
-            ".intel_syntax noprefix\n\t"
-            "fld dword ptr [edx + 0x14]\n\t"
-            "fld dword ptr [edx + 0x20]\n\t"
-            "fld dword ptr [edx + 0x1c]\n\t"
-            "fxch st(2)\n\t"
-            "fchs\n\t"
-            "fxch st(1)\n\t"
-            "fmul dword ptr [edx + 0x10]\n\t"
-            "fxch st(1)\n\t"
-            "fmulp st(2), st(0)\n\t"
-            "fxch st(1)\n\t"
-            "faddp st(1), st(0)\n\t"
-            "fstp dword ptr [ecx]\n\t"
-            "fld dword ptr [edx + 8]\n\t"
-            "fld dword ptr [edx + 0x20]\n\t"
-            "fld dword ptr [edx + 4]\n\t"
-            "fld dword ptr [edx + 0x1c]\n\t"
-            "fxch st(3)\n\t"
-            "fchs\n\t"
-            "fxch st(1)\n\t"
-            "fmulp st(2), st(0)\n\t"
-            "fmulp st(2), st(0)\n\t"
-            "fxch st(1)\n\t"
-            "faddp st(1), st(0)\n\t"
-            "fchs\n\t"
-            "fstp dword ptr [ecx + 4]\n\t"
-            "fld dword ptr [edx + 8]\n\t"
-            "fld dword ptr [edx + 0x14]\n\t"
-            "fld dword ptr [edx + 4]\n\t"
-            "fld dword ptr [edx + 0x10]\n\t"
-            "fxch st(3)\n\t"
-            "fchs\n\t"
-            "fxch st(1)\n\t"
-            "fmulp st(2), st(0)\n\t"
-            "fmulp st(2), st(0)\n\t"
-            "fld dword ptr [ecx + 4]\n\t"
-            "fxch st(2)\n\t"
-            "faddp st(1), st(0)\n\t"
-            "fxch st(1)\n\t"
-            "fld st(1)\n\t"
-            "fstp dword ptr [ecx + 8]\n\t"
-            "fld dword ptr [edx + 8]\n\t"
-            "fld dword ptr [edx]\n\t"
-            "fmul dword ptr [ecx]\n\t"
-            "fld dword ptr [edx + 4]\n\t"
-            "fxch st(2)\n\t"
-            "fmul st(0), st(4)\n\t"
-            "fxch st(2)\n\t"
-            "fmulp st(3), st(0)\n\t"
-            "fxch st(1)\n\t"
-            "faddp st(1), st(0)\n\t"
-            "fxch st(1)\n\t"
-            "faddp st(1), st(0)\n\t"
-            "fstp st(1)\n\t"
-            "fdivr qword ptr [eax]\n\t"
-            "fld dword ptr [ecx]\n\t"
-            "fmul st(0), st(1)\n\t"
-            "fld dword ptr [ecx + 4]\n\t"
-            "fxch st(1)\n\t"
-            "fstp dword ptr [ecx]\n\t"
-            "fld dword ptr [edx + 0x14]\n\t"
-            "fld dword ptr [edx + 0xc]\n\t"
-            "fld dword ptr [edx + 0x20]\n\t"
-            "fld dword ptr [edx + 0x18]\n\t"
-            "fxch st(3)\n\t"
-            "fchs\n\t"
-            "fxch st(1)\n\t"
-            "fmulp st(2), st(0)\n\t"
-            "fmulp st(2), st(0)\n\t"
-            "fxch st(2)\n\t"
-            "fmul st(0), st(3)\n\t"
-            "fxch st(1)\n\t"
-            "faddp st(2), st(0)\n\t"
-            "fld dword ptr [ecx + 8]\n\t"
-            "fxch st(2)\n\t"
-            "fmul st(0), st(3)\n\t"
-            "fxch st(2)\n\t"
-            "fmul st(0), st(3)\n\t"
-            "fxch st(2)\n\t"
-            "fchs\n\t"
-            "fstp dword ptr [ecx + 0xc]\n\t"
-            "fld dword ptr [edx + 0x10]\n\t"
-            "fld dword ptr [edx + 0xc]\n\t"
-            "fld dword ptr [edx + 0x1c]\n\t"
-            "fld dword ptr [edx + 0x18]\n\t"
-            "fxch st(1)\n\t"
-            "fmulp st(2), st(0)\n\t"
-            "fxch st(2)\n\t"
-            "fchs\n\t"
-            "fmulp st(2), st(0)\n\t"
-            "fxch st(2)\n\t"
-            "fstp dword ptr [ecx + 4]\n\t"
-            "faddp st(1), st(0)\n\t"
-            "fmul st(0), st(2)\n\t"
-            "fstp dword ptr [ecx + 0x18]\n\t"
-            "fld dword ptr [edx + 8]\n\t"
-            "fld dword ptr [edx + 0x20]\n\t"
-            "fld dword ptr [edx + 0x18]\n\t"
-            "fxch st(2)\n\t"
-            "fchs\n\t"
-            "fxch st(1)\n\t"
-            "fmul dword ptr [edx]\n\t"
-            "fxch st(1)\n\t"
-            "fmulp st(2), st(0)\n\t"
-            "fxch st(1)\n\t"
-            "faddp st(1), st(0)\n\t"
-            "fmul st(0), st(2)\n\t"
-            "fstp dword ptr [ecx + 0x10]\n\t"
-            "fld dword ptr [edx + 4]\n\t"
-            "fld dword ptr [edx + 0x1c]\n\t"
-            "fld dword ptr [edx + 0x18]\n\t"
-            "fxch st(2)\n\t"
-            "fchs\n\t"
-            "fxch st(1)\n\t"
-            "fmul dword ptr [edx]\n\t"
-            "fxch st(1)\n\t"
-            "fmulp st(2), st(0)\n\t"
-            "fxch st(2)\n\t"
-            "fstp dword ptr [ecx + 8]\n\t"
-            "faddp st(1), st(0)\n\t"
-            "fmul st(0), st(1)\n\t"
-            "fchs\n\t"
-            "fstp dword ptr [ecx + 0x1c]\n\t"
-            "fld dword ptr [edx + 8]\n\t"
-            "fld dword ptr [edx + 0x14]\n\t"
-            "fld dword ptr [edx + 0xc]\n\t"
-            "fxch st(2)\n\t"
-            "fchs\n\t"
-            "fxch st(1)\n\t"
-            "fmul dword ptr [edx]\n\t"
-            "fxch st(1)\n\t"
-            "fmulp st(2), st(0)\n\t"
-            "fxch st(1)\n\t"
-            "faddp st(1), st(0)\n\t"
-            "fmul st(0), st(1)\n\t"
-            "fchs\n\t"
-            "fstp dword ptr [ecx + 0x14]\n\t"
-            "fld dword ptr [edx + 4]\n\t"
-            "fld dword ptr [edx + 0x10]\n\t"
-            "fld dword ptr [edx + 0xc]\n\t"
-            "fxch st(2)\n\t"
-            "fchs\n\t"
-            "fxch st(1)\n\t"
-            "fmul dword ptr [edx]\n\t"
-            "fxch st(1)\n\t"
-            "fmulp st(2), st(0)\n\t"
-            "fxch st(1)\n\t"
-            "faddp st(1), st(0)\n\t"
-            "fmul st(0), st(1)\n\t"
-            "fstp dword ptr [ecx + 0x20]\n\t"
-            "fstp st(0)\n\t"
-            ".att_syntax prefix\n\t"
-            :
-            : [result] "m" (result), [input] "m" (pInput), [one] "m" (one_ptr)
-            : "eax", "ecx", "edx", "memory", "st", "st(1)", "st(2)", "st(3)", "st(4)", "st(5)", "st(6)", "st(7)");
-    }
-#else
-#error DRMatrix33Inverse requires the original x86 floating-point behavior
-#endif
+    br_scalar inv_det;
+
+    result[0] = pInput[4] * pInput[8] - pInput[5] * pInput[7];
+    result[1] = pInput[2] * pInput[7] - pInput[1] * pInput[8];
+    result[2] = pInput[1] * pInput[5] - pInput[2] * pInput[4];
+    inv_det = 1.f / (pInput[0] * result[0] + pInput[1] * (pInput[5] * pInput[6] - pInput[3] * pInput[8]) + pInput[2] * (pInput[3] * pInput[7] - pInput[4] * pInput[6]));
+    result[0] *= inv_det;
+    result[1] *= inv_det;
+    result[2] *= inv_det;
+    result[3] = (pInput[5] * pInput[6] - pInput[3] * pInput[8]) * inv_det;
+    result[4] = (pInput[0] * pInput[8] - pInput[2] * pInput[6]) * inv_det;
+    result[5] = (pInput[2] * pInput[3] - pInput[0] * pInput[5]) * inv_det;
+    result[6] = (pInput[3] * pInput[7] - pInput[4] * pInput[6]) * inv_det;
+    result[7] = (pInput[1] * pInput[6] - pInput[0] * pInput[7]) * inv_det;
+    result[8] = (pInput[0] * pInput[4] - pInput[1] * pInput[3]) * inv_det;
 }
 
 // SetUpQuickHingeData
@@ -2591,147 +2113,21 @@ void C2_HOOK_FASTCALL DRMatrix33Inverse(br_scalar* result, const br_scalar* pInp
 
 // CalcQuickHingeData
 
-/* Keep the sequential cross-product stores, inertia divisions and wide mass reciprocal. */
 // FUNCTION: CARMA2_HW 0x004be4b0
 void C2_HOOK_FASTCALL SetUpForce(br_vector3* out_omega, br_vector3* out_velocity, const br_vector3* lever, const br_vector3* force, const tPhysics_object* object) {
-    const double one = 1.0;
-#if defined(__GNUC__) && defined(__i386__)
-    const double* one_ptr = &one;
-#endif
+    br_scalar inv_mass;
+
     if (!(object->flags & 0x800)) {
-#if defined(_MSC_VER) && defined(_M_IX86)
-        __asm {
-            mov eax, out_omega
-            mov ecx, lever
-            mov edx, force
-            mov esi, object
-            fld dword ptr [edx + 8]
-            fld dword ptr [ecx + 4]
-            fld dword ptr [ecx + 8]
-            fxch st(1)
-            fmulp st(2), st(0)
-            fmul dword ptr [edx + 4]
-            fsubp st(1), st(0)
-            fstp dword ptr [eax]
-            fld dword ptr [edx + 8]
-            fld dword ptr [ecx + 8]
-            fmul dword ptr [edx]
-            fxch st(1)
-            fmul dword ptr [ecx]
-            fsubp st(1), st(0)
-            fstp dword ptr [eax + 4]
-            fld dword ptr [ecx + 4]
-            fld dword ptr [edx + 4]
-            fmul dword ptr [ecx]
-            fxch st(1)
-            fmul dword ptr [edx]
-            fsubp st(1), st(0)
-            fstp dword ptr [eax + 8]
-            fld dword ptr [eax]
-            fdiv dword ptr [esi + 8]
-            fstp dword ptr [eax]
-            fld dword ptr [eax + 4]
-            fdiv dword ptr [esi + 12]
-            fstp dword ptr [eax + 4]
-            fld dword ptr [eax + 8]
-            fdiv dword ptr [esi + 16]
-            fstp dword ptr [eax + 8]
-        }
-#elif defined(__GNUC__) && defined(__i386__)
-        __asm__ volatile (
-            "movl %[out_omega], %%eax\n\t"
-            "movl %[lever], %%ecx\n\t"
-            "movl %[force], %%edx\n\t"
-            "movl %[object], %%esi\n\t"
-            ".intel_syntax noprefix\n\t"
-            "fld dword ptr [edx + 8]\n\t"
-            "fld dword ptr [ecx + 4]\n\t"
-            "fld dword ptr [ecx + 8]\n\t"
-            "fxch st(1)\n\t"
-            "fmulp st(2), st(0)\n\t"
-            "fmul dword ptr [edx + 4]\n\t"
-            "fsubp st(1), st(0)\n\t"
-            "fstp dword ptr [eax]\n\t"
-            "fld dword ptr [edx + 8]\n\t"
-            "fld dword ptr [ecx + 8]\n\t"
-            "fmul dword ptr [edx]\n\t"
-            "fxch st(1)\n\t"
-            "fmul dword ptr [ecx]\n\t"
-            "fsubp st(1), st(0)\n\t"
-            "fstp dword ptr [eax + 4]\n\t"
-            "fld dword ptr [ecx + 4]\n\t"
-            "fld dword ptr [edx + 4]\n\t"
-            "fmul dword ptr [ecx]\n\t"
-            "fxch st(1)\n\t"
-            "fmul dword ptr [edx]\n\t"
-            "fsubp st(1), st(0)\n\t"
-            "fstp dword ptr [eax + 8]\n\t"
-            "fld dword ptr [eax]\n\t"
-            "fdiv dword ptr [esi + 8]\n\t"
-            "fstp dword ptr [eax]\n\t"
-            "fld dword ptr [eax + 4]\n\t"
-            "fdiv dword ptr [esi + 12]\n\t"
-            "fstp dword ptr [eax + 4]\n\t"
-            "fld dword ptr [eax + 8]\n\t"
-            "fdiv dword ptr [esi + 16]\n\t"
-            "fstp dword ptr [eax + 8]\n\t"
-            ".att_syntax prefix\n\t"
-            :
-            : [out_omega] "m" (out_omega), [lever] "m" (lever), [force] "m" (force), [object] "m" (object)
-            : "eax", "ecx", "edx", "esi", "memory", "st", "st(1)", "st(2)");
-#else
-#error SetUpForce requires the original x86 floating-point behavior
-#endif
+        BrVector3Cross(out_omega, lever, force);
+        out_omega->v[0] /= object->I.v[0];
+        out_omega->v[1] /= object->I.v[1];
+        out_omega->v[2] /= object->I.v[2];
     } else {
-        out_omega->v[0] = 0.f;
-        out_omega->v[1] = 0.f;
-        out_omega->v[2] = 0.f;
+        BrVector3Set(out_omega, 0.f, 0.f, 0.f);
     }
-#if defined(_MSC_VER) && defined(_M_IX86)
-        __asm {
-            mov eax, out_velocity
-            mov edx, force
-            mov esi, object
-            fld dword ptr [esi + 4]
-            fdivr one
-            fld dword ptr [edx]
-            fmul st(0), st(1)
-            fstp dword ptr [eax]
-            fld dword ptr [edx + 4]
-            fmul st(0), st(1)
-            fstp dword ptr [eax + 4]
-            fld dword ptr [edx + 8]
-            fmul st(0), st(1)
-            fstp dword ptr [eax + 8]
-            fstp st(0)
-        }
-#elif defined(__GNUC__) && defined(__i386__)
-        __asm__ volatile (
-            "movl %[out_velocity], %%eax\n\t"
-            "movl %[force], %%edx\n\t"
-            "movl %[object], %%esi\n\t"
-            "movl %[one_ptr], %%ecx\n\t"
-            ".intel_syntax noprefix\n\t"
-            "fld dword ptr [esi + 4]\n\t"
-            "fdivr qword ptr [ecx]\n\t"
-            "fld dword ptr [edx]\n\t"
-            "fmul st(0), st(1)\n\t"
-            "fstp dword ptr [eax]\n\t"
-            "fld dword ptr [edx + 4]\n\t"
-            "fmul st(0), st(1)\n\t"
-            "fstp dword ptr [eax + 4]\n\t"
-            "fld dword ptr [edx + 8]\n\t"
-            "fmul st(0), st(1)\n\t"
-            "fstp dword ptr [eax + 8]\n\t"
-            "fstp st(0)\n\t"
-            ".att_syntax prefix\n\t"
-            :
-            : [out_velocity] "m" (out_velocity), [force] "m" (force), [object] "m" (object), [one_ptr] "m" (one_ptr)
-            : "eax", "ecx", "edx", "esi", "memory", "st", "st(1)", "st(2)");
-#else
-#error SetUpForce requires the original x86 floating-point behavior
-#endif
- }
+    inv_mass = 1.f / object->M;
+    BrVector3Scale(out_velocity, force, inv_mass);
+}
 
 /* Hinge response workspace. */
 typedef struct {
@@ -2763,64 +2159,23 @@ static br_scalar ForceScalarRound(double pValue) {
  * in combined additions/subtractions. Keep these small wide operations x87. */
 static double C2_HOOK_CDECL PartnerAddWide(double a,double b) {
  double result;
-#if defined(_MSC_VER) && defined(_M_IX86)
- __asm {
- fld qword ptr a
- fadd qword ptr b
- fstp qword ptr result
- }
-#elif defined(__GNUC__) && defined(__i386__)
- __asm__ __volatile__("fldl %1; faddl %2; fstpl %0" : "=m"(result) : "m"(a),"m"(b) : "st");
-#else
  result=a+b;
-#endif
  return result;
 }
 static double C2_HOOK_CDECL PartnerSubtractWide(double a, double b) {
  double result;
-#if defined(_MSC_VER) && defined(_M_IX86)
- __asm {
- fld qword ptr a
- fsub qword ptr b
- fstp qword ptr result
- }
-#elif defined(__GNUC__) && defined(__i386__)
- __asm__ __volatile__("fldl %1; fsubl %2; fstpl %0" : "=m"(result) : "m"(a),"m"(b) : "st");
-#else
  result=a-b;
-#endif
  return result;
 }
 static double C2_HOOK_CDECL PartnerNegateWide(double a) {
  double result;
-#if defined(_MSC_VER) && defined(_M_IX86)
- __asm {
- fld qword ptr a
- fchs
- fstp qword ptr result
- }
-#elif defined(__GNUC__) && defined(__i386__)
- __asm__ __volatile__("fldl %1; fchs; fstpl %0" : "=m"(result) : "m"(a) : "st");
-#else
  result=-a;
-#endif
  return result;
 }
 
 static double C2_HOOK_CDECL PartnerAddScalar(double a,const br_scalar* b) {
  double result;
-#if defined(_MSC_VER) && defined(_M_IX86)
- __asm {
- mov eax,b
- fld qword ptr a
- fadd dword ptr [eax]
- fstp qword ptr result
- }
-#elif defined(__GNUC__) && defined(__i386__)
- __asm__ __volatile__("fldl %1; fadds %2; fstpl %0" : "=m"(result) : "m"(a),"m"(*b) : "st");
-#else
  result=a+*b;
-#endif
  return result;
 }
 static const br_scalar* PartnerScalarPtr(const void* base,unsigned offset) {
@@ -2828,134 +2183,43 @@ static const br_scalar* PartnerScalarPtr(const void* base,unsigned offset) {
 }
 static double C2_HOOK_CDECL PartnerDifferenceScalars(const br_scalar* a,const br_scalar* b) {
  double result;
-#if defined(_MSC_VER) && defined(_M_IX86)
- __asm {
- mov eax,a
- mov ecx,b
- fld dword ptr [eax]
- fsub dword ptr [ecx]
- fstp qword ptr result
- }
-#elif defined(__GNUC__) && defined(__i386__)
- __asm__ __volatile__("flds %1; fsubs %2; fstpl %0" : "=m"(result) : "m"(*a),"m"(*b) : "st");
-#else
  result=(double)*a - *b;
-#endif
  return result;
 }
 static double C2_HOOK_CDECL PartnerDivideScalars(const br_scalar* a,const br_scalar* b) {
  double result;
-#if defined(_MSC_VER) && defined(_M_IX86)
- __asm {
- mov eax,a
- mov ecx,b
- fld dword ptr [eax]
- fdiv dword ptr [ecx]
- fstp qword ptr result
- }
-#elif defined(__GNUC__) && defined(__i386__)
- __asm__ __volatile__("flds %1; fdivs %2; fstpl %0" : "=m"(result) : "m"(*a),"m"(*b) : "st");
-#else
  result=(double)*a / *b;
-#endif
  return result;
 }
 static double C2_HOOK_CDECL PartnerReverseDivideScalars(const br_scalar* a,const br_scalar* b) {
  double result;
-#if defined(_MSC_VER) && defined(_M_IX86)
- __asm {
- mov eax,a
- mov ecx,b
- fld dword ptr [eax]
- fdivr dword ptr [ecx]
- fstp qword ptr result
- }
-#elif defined(__GNUC__) && defined(__i386__)
- __asm__ __volatile__("flds %1; fdivrs %2; fstpl %0" : "=m"(result) : "m"(*a),"m"(*b) : "st");
-#else
  result=*b / (double)*a;
-#endif
  return result;
 }
 static double C2_HOOK_CDECL PartnerReverseSubtractScalar(double a,const br_scalar* b) {
  double result;
-#if defined(_MSC_VER) && defined(_M_IX86)
- __asm {
- mov eax,b
- fld qword ptr a
- fsubr dword ptr [eax]
- fstp qword ptr result
- }
-#elif defined(__GNUC__) && defined(__i386__)
- __asm__ __volatile__("fldl %1; fsubrs %2; fstpl %0" : "=m"(result) : "m"(a),"m"(*b) : "st");
-#else
  result=*b-a;
-#endif
  return result;
 }
 
 static double C2_HOOK_CDECL PartnerMultiplyWide(double a, double b) {
  double result;
-#if defined(_MSC_VER) && defined(_M_IX86)
- __asm {
- fld qword ptr a
- fmul qword ptr b
- fstp qword ptr result
- }
-#elif defined(__GNUC__) && defined(__i386__)
- __asm__ __volatile__("fldl %1; fmull %2; fstpl %0" : "=m"(result) : "m"(a),"m"(b) : "st");
-#else
  result=(double)a * b;
-#endif
  return result;
 }
 static double C2_HOOK_CDECL PartnerMultiplyScalars(const br_scalar* a,const br_scalar* b) {
  double result;
-#if defined(_MSC_VER) && defined(_M_IX86)
- __asm {
- mov eax,a
- fld dword ptr [eax]
- mov ecx,b
- fmul dword ptr [ecx]
- fstp qword ptr result
- }
-#elif defined(__GNUC__) && defined(__i386__)
- __asm__ __volatile__("flds %1; fmuls %2; fstpl %0" : "=m"(result) : "m"(*a),"m"(*b) : "st");
-#else
  result=(double)*a * *b;
-#endif
  return result;
 }
 static double C2_HOOK_CDECL PartnerMultiplyScalarWide(const br_scalar* a,double b) {
  double result;
-#if defined(_MSC_VER) && defined(_M_IX86)
- __asm {
- mov eax,a
- fld dword ptr [eax]
- fmul qword ptr b
- fstp qword ptr result
- }
-#elif defined(__GNUC__) && defined(__i386__)
- __asm__ __volatile__("flds %1; fmull %2; fstpl %0" : "=m"(result) : "m"(*a),"m"(b) : "st");
-#else
  result=(double)*a * b;
-#endif
  return result;
 }
 static double C2_HOOK_CDECL PartnerMultiplyRawScalar(double a,const br_scalar* b) {
  double result;
-#if defined(_MSC_VER) && defined(_M_IX86)
- __asm {
- fld qword ptr a
- mov ecx,b
- fmul dword ptr [ecx]
- fstp qword ptr result
- }
-#elif defined(__GNUC__) && defined(__i386__)
- __asm__ __volatile__("fldl %1; fmuls %2; fstpl %0" : "=m"(result) : "m"(a),"m"(*b) : "st");
-#else
  result=(double)a * *b;
-#endif
  return result;
 }
 
@@ -3300,20 +2564,8 @@ static int C2_HOOK_CDECL ForceMatrixHasPartner(const tPhysics_object* object) {
 #pragma auto_inline(off)
 #endif
 static double C2_HOOK_CDECL ForceMatrixScalar(double value) {
-#if defined(_MSC_VER) && defined(_M_IX86)
-    br_scalar scalar;
-    double result;
-    __asm {
-        fld qword ptr value
-        fstp dword ptr scalar
-        fld dword ptr scalar
-        fstp qword ptr result
-    }
-    return result;
-#else
     volatile br_scalar result=(br_scalar)value;
     return result;
-#endif
 }
 #if defined(_MSC_VER) && _MSC_VER < 1300
 #pragma auto_inline(on)
@@ -3323,102 +2575,37 @@ static double C2_HOOK_CDECL ForceMatrixScalar(double value) {
  * These small operations retain the original FLD and arithmetic operand order. */
 static double C2_HOOK_CDECL ForceMatrixMultiplyScalars(const br_scalar* a, const br_scalar* b) {
     double result;
-#if defined(_MSC_VER) && defined(_M_IX86)
-    __asm {
-        mov eax, a
-        mov ecx, b
-        fld dword ptr [eax]
-        fmul dword ptr [ecx]
-        fstp qword ptr result
-    }
-#elif defined(__GNUC__) && defined(__i386__)
-    __asm__ __volatile__("flds %1; fmuls %2; fstpl %0" : "=m"(result) : "m"(*a), "m"(*b) : "st");
-#else
     result=(double)*a * *b;
-#endif
     return result;
 }
 
 static double C2_HOOK_CDECL ForceMatrixMultiplyWide(const br_scalar* a, double b) {
     double result;
-#if defined(_MSC_VER) && defined(_M_IX86)
-    __asm {
-        mov eax, a
-        fld dword ptr [eax]
-        fmul qword ptr b
-        fstp qword ptr result
-    }
-#elif defined(__GNUC__) && defined(__i386__)
-    __asm__ __volatile__("flds %1; fmull %2; fstpl %0" : "=m"(result) : "m"(*a), "m"(b) : "st");
-#else
     result=(double)*a * b;
-#endif
     return result;
 }
 
 static double C2_HOOK_CDECL ForceMatrixAddScalar(double a, const br_scalar* b) {
     double result;
-#if defined(_MSC_VER) && defined(_M_IX86)
-    __asm {
-        mov eax, b
-        fld qword ptr a
-        fadd dword ptr [eax]
-        fstp qword ptr result
-    }
-#elif defined(__GNUC__) && defined(__i386__)
-    __asm__ __volatile__("fldl %1; fadds %2; fstpl %0" : "=m"(result) : "m"(a), "m"(*b) : "st");
-#else
     result=a + *b;
-#endif
     return result;
 }
 
 static double C2_HOOK_CDECL ForceMatrixReverseSubtractScalar(double a, const br_scalar* b) {
     double result;
-#if defined(_MSC_VER) && defined(_M_IX86)
-    __asm {
-        mov eax, b
-        fld qword ptr a
-        fsubr dword ptr [eax]
-        fstp qword ptr result
-    }
-#elif defined(__GNUC__) && defined(__i386__)
-    __asm__ __volatile__("fldl %1; fsubrs %2; fstpl %0" : "=m"(result) : "m"(a), "m"(*b) : "st");
-#else
     result=*b - a;
-#endif
     return result;
 }
 
 static double C2_HOOK_CDECL ForceMatrixAddWide(double a, double b) {
     double result;
-#if defined(_MSC_VER) && defined(_M_IX86)
-    __asm {
-        fld qword ptr a
-        fadd qword ptr b
-        fstp qword ptr result
-    }
-#elif defined(__GNUC__) && defined(__i386__)
-    __asm__ __volatile__("fldl %1; faddl %2; fstpl %0" : "=m"(result) : "m"(a), "m"(b) : "st");
-#else
     result=a + b;
-#endif
     return result;
 }
 
 static double C2_HOOK_CDECL ForceMatrixSubtractWide(double a, double b) {
     double result;
-#if defined(_MSC_VER) && defined(_M_IX86)
-    __asm {
-        fld qword ptr a
-        fsub qword ptr b
-        fstp qword ptr result
-    }
-#elif defined(__GNUC__) && defined(__i386__)
-    __asm__ __volatile__("fldl %1; fsubl %2; fstpl %0" : "=m"(result) : "m"(a), "m"(b) : "st");
-#else
     result=a - b;
-#endif
     return result;
 }
 
@@ -3941,34 +3128,10 @@ static br_scalar C2_HOOK_CDECL VelocityScalar(double value) {volatile union {br_
 /* MSVC5 reverses a scalar comparison and drops unordered for !(value >= 0).
  * Keep the original FCOMP C0 test for the demonstrated nonfinite cases. */
 static int C2_HOOK_CDECL VelocityBelowOrUnordered(double value,double threshold) {
-#if defined(_MSC_VER) && defined(_M_IX86)
- unsigned status;
- __asm {
- fld qword ptr value
- fcomp qword ptr threshold
- fnstsw ax
- movzx eax,ax
- mov status,eax
- }
- return (status & 0x100)!=0;
-#else
  return !(value >= threshold);
-#endif
 }
 static int C2_HOOK_CDECL VelocityGreater(double value,double threshold) {
-#if defined(_MSC_VER) && defined(_M_IX86)
- unsigned status;
- __asm {
- fld qword ptr value
- fcomp qword ptr threshold
- fnstsw ax
- movzx eax,ax
- mov status,eax
- }
- return (status & 0x4100)==0;
-#else
  return value > threshold;
-#endif
 }
 // FUNCTION: CARMA2_HW 0x004c03f0
 void C2_HOOK_FASTCALL RestoreListOmega(tPhysics_object* object) {
@@ -3984,19 +3147,7 @@ void C2_HOOK_FASTCALL RestoreListOmega(tPhysics_object* object) {
  * promote the raw matrix operand before subtraction. Keep original FLD source
  * / FSUB matrix operand form on both Microsoft x86 compilers. */
 static br_scalar C2_HOOK_CDECL VelocitySubtractScalar(const br_scalar* source,const br_scalar* translation) {
-#if defined(_MSC_VER) && defined(_M_IX86)
- br_scalar result;
- __asm {
- mov eax,source
- fld dword ptr [eax]
- mov eax,translation
- fsub dword ptr [eax]
- fstp dword ptr result
- }
- return result;
-#else
  return VelocityScalar((double)*source-*translation);
-#endif
 }
 // FUNCTION: CARMA2_HW 0x004225b0
 void C2_HOOK_FASTCALL DrMatrix34ApplyLPInverse(br_vector3* dest,const br_vector3* source,const br_matrix34* matrix) {
@@ -4282,177 +3433,59 @@ static volatile const br_scalar* C2_HOOK_CDECL FrictionAt(const void* base, unsi
 
 static double C2_HOOK_CDECL FrictionProductScalars(volatile const br_scalar* left, volatile const br_scalar* right) {
     double result;
-#if defined(_MSC_VER) && defined(_M_IX86)
-    __asm {
-        mov eax, left
-        mov edx, right
-        fld dword ptr [eax]
-        fmul dword ptr [edx]
-        fstp qword ptr result
-    }
-#elif defined(__GNUC__) && defined(__i386__)
-    __asm__ __volatile__("flds %1; fmuls %2; fstpl %0" : "=m"(result) : "m"(*left), "m"(*right) : "st");
-#else
     result = (double)*left * (double)*right;
-#endif
     return result;
 }
 
 static double C2_HOOK_CDECL FrictionDivideScalars(volatile const br_scalar* left, volatile const br_scalar* right) {
     double result;
-#if defined(_MSC_VER) && defined(_M_IX86)
-    __asm {
-        mov eax, left
-        mov edx, right
-        fld dword ptr [eax]
-        fdiv dword ptr [edx]
-        fstp qword ptr result
-    }
-#elif defined(__GNUC__) && defined(__i386__)
-    __asm__ __volatile__("flds %1; fdivs %2; fstpl %0" : "=m"(result) : "m"(*left), "m"(*right) : "st");
-#else
     result = (double)*left / (double)*right;
-#endif
     return result;
 }
 
 static double C2_HOOK_CDECL FrictionSubtractScalar(double left, volatile const br_scalar* right) {
     double result;
-#if defined(_MSC_VER) && defined(_M_IX86)
-    __asm {
-        mov edx, right
-        fld qword ptr left
-        fsub dword ptr [edx]
-        fstp qword ptr result
-    }
-#elif defined(__GNUC__) && defined(__i386__)
-    __asm__ __volatile__("fldl %1; fsubs %2; fstpl %0" : "=m"(result) : "m"(left), "m"(*right) : "st");
-#else
     result = left - (double)*right;
-#endif
     return result;
 }
 
 static double C2_HOOK_CDECL FrictionAddScalar(double left, volatile const br_scalar* right) {
     double result;
-#if defined(_MSC_VER) && defined(_M_IX86)
-    __asm {
-        mov edx, right
-        fld qword ptr left
-        fadd dword ptr [edx]
-        fstp qword ptr result
-    }
-#elif defined(__GNUC__) && defined(__i386__)
-    __asm__ __volatile__("fldl %1; fadds %2; fstpl %0" : "=m"(result) : "m"(left), "m"(*right) : "st");
-#else
     result = left + (double)*right;
-#endif
     return result;
 }
 
 static double C2_HOOK_CDECL FrictionReverseSubtractScalar(double right, volatile const br_scalar* left) {
     double result;
-#if defined(_MSC_VER) && defined(_M_IX86)
-    __asm {
-        mov eax, left
-        fld qword ptr right
-        fsubr dword ptr [eax]
-        fstp qword ptr result
-    }
-#elif defined(__GNUC__) && defined(__i386__)
-    __asm__ __volatile__("fldl %1; fsubrs %2; fstpl %0" : "=m"(result) : "m"(right), "m"(*left) : "st");
-#else
     result = (double)*left - right;
-#endif
     return result;
 }
 
 static double C2_HOOK_CDECL FrictionReverseDivideScalar(double divisor, volatile const br_scalar* numerator) {
     double result;
-#if defined(_MSC_VER) && defined(_M_IX86)
-    __asm {
-        mov eax, numerator
-        fld qword ptr divisor
-        fdivr dword ptr [eax]
-        fstp qword ptr result
-    }
-#elif defined(__GNUC__) && defined(__i386__)
-    __asm__ __volatile__("fldl %1; fdivrs %2; fstpl %0" : "=m"(result) : "m"(divisor), "m"(*numerator) : "st");
-#else
     result = (double)*numerator / divisor;
-#endif
     return result;
 }
 
 static double C2_HOOK_CDECL FrictionAddWide(double left, double right) {
     double result;
-#if defined(_MSC_VER) && defined(_M_IX86)
-    __asm {
-
-        fld qword ptr left
-        fadd qword ptr right
-        fstp qword ptr result
-    }
-#elif defined(__GNUC__) && defined(__i386__)
-    __asm__ __volatile__("fldl %1; faddl %2; fstpl %0" : "=m"(result) : "m"(left), "m"(right) : "st");
-#else
     result = left + right;
-#endif
     return result;
 }
 
 static double C2_HOOK_CDECL FrictionProductWide(double left, double right) {
     double result;
-#if defined(_MSC_VER) && defined(_M_IX86)
-    __asm {
-
-        fld qword ptr left
-        fmul qword ptr right
-        fstp qword ptr result
-    }
-#elif defined(__GNUC__) && defined(__i386__)
-    __asm__ __volatile__("fldl %1; fmull %2; fstpl %0" : "=m"(result) : "m"(left), "m"(right) : "st");
-#else
     result = left * right;
-#endif
     return result;
 }
-#if defined(_MSC_VER) && _MSC_VER < 1300
-/* The retained nonfinite probes demonstrate that MSVC5 reverses some C
- * comparisons and thereby changes their unordered result. Preserve only
- * the original FCOM status-bit predicate, with the arithmetic still in C.
- */
-static unsigned C2_HOOK_CDECL FrictionStatus(double left, double right) {
-    unsigned short status;
-    __asm {
-        fld qword ptr left
-        fcomp qword ptr right
-        fnstsw ax
-        mov status, ax
-    }
-    return status;
-}
-#endif
 static int C2_HOOK_CDECL FrictionGreater(double left, double right) {
-#if defined(_MSC_VER) && _MSC_VER < 1300
-    return (FrictionStatus(left, right) & 0x4100) == 0;
-#else
     return left > right;
-#endif
 }
 static int C2_HOOK_CDECL FrictionLessOrUnordered(double left, double right) {
-#if defined(_MSC_VER) && _MSC_VER < 1300
-    return (FrictionStatus(left, right) & 0x100) != 0;
-#else
     return !(left >= right);
-#endif
 }
 static int C2_HOOK_CDECL FrictionNonZero(double value) {
-#if defined(_MSC_VER) && _MSC_VER < 1300
-    return (FrictionStatus(value, 0.0) & 0x4000) == 0;
-#else
     return value > 0.0 || value < 0.0;
-#endif
 }
 
 #if defined(_MSC_VER) && _MSC_VER < 1300
@@ -5088,56 +4121,6 @@ void C2_HOOK_FASTCALL WriteNewPositions(tPhysics_object* pObject) {
 
 /* The original stores all three differences before adding child translation. */
 static void C2_HOOK_CDECL PhysicsPositionChildrenAdjust(br_vector3* pParent_point, const br_vector3* pChild_point, br_vector3* pTranslation) {
-#if defined(_MSC_VER) && defined(_M_IX86)
-    __asm {
-        mov eax, pParent_point
-        mov ecx, pChild_point
-        mov edx, pTranslation
-        fld dword ptr [eax]
-        fsub dword ptr [ecx]
-        fstp dword ptr [eax]
-        fld dword ptr [eax + 4]
-        fsub dword ptr [ecx + 4]
-        fstp dword ptr [eax + 4]
-        fld dword ptr [eax + 8]
-        fsub dword ptr [ecx + 8]
-        fstp dword ptr [eax + 8]
-        fld dword ptr [eax]
-        fadd dword ptr [edx]
-        fstp dword ptr [edx]
-        fld dword ptr [eax + 4]
-        fadd dword ptr [edx + 4]
-        fstp dword ptr [edx + 4]
-        fld dword ptr [eax + 8]
-        fadd dword ptr [edx + 8]
-        fstp dword ptr [edx + 8]
-    }
-#elif defined(__GNUC__) && defined(__i386__)
-    __asm__ volatile(
-        ".intel_syntax noprefix\n\t"
-        "fld dword ptr [eax]\n\t"
-        "fsub dword ptr [ecx]\n\t"
-        "fstp dword ptr [eax]\n\t"
-        "fld dword ptr [eax + 4]\n\t"
-        "fsub dword ptr [ecx + 4]\n\t"
-        "fstp dword ptr [eax + 4]\n\t"
-        "fld dword ptr [eax + 8]\n\t"
-        "fsub dword ptr [ecx + 8]\n\t"
-        "fstp dword ptr [eax + 8]\n\t"
-        "fld dword ptr [eax]\n\t"
-        "fadd dword ptr [edx]\n\t"
-        "fstp dword ptr [edx]\n\t"
-        "fld dword ptr [eax + 4]\n\t"
-        "fadd dword ptr [edx + 4]\n\t"
-        "fstp dword ptr [edx + 4]\n\t"
-        "fld dword ptr [eax + 8]\n\t"
-        "fadd dword ptr [edx + 8]\n\t"
-        "fstp dword ptr [edx + 8]\n\t"
-        ".att_syntax prefix\n\t"
-        :
-        : "a"(pParent_point), "c"(pChild_point), "d"(pTranslation)
-        : "memory", "st");
-#else
     int i;
 
     for (i = 0; i < 3; i++) {
@@ -5146,7 +4129,6 @@ static void C2_HOOK_CDECL PhysicsPositionChildrenAdjust(br_vector3* pParent_poin
     for (i = 0; i < 3; i++) {
         pTranslation->v[i] = PhysicsScalar((double)pParent_point->v[i] + pTranslation->v[i]);
     }
-#endif
 }
 
 // FUNCTION: CARMA2_HW 0x004c2b20
@@ -5205,22 +4187,7 @@ static int C2_HOOK_CDECL RQNaN(double x) {
  * chooses a different sign when equal NaN payloads have opposite signs. */
 static double C2_HOOK_CDECL RQAccumulate(double sum, const volatile br_scalar* left, const volatile br_scalar* right) {
     double result;
-#if defined(_MSC_VER) && defined(_M_IX86)
-    __asm {
-        fld qword ptr sum
-        mov eax, left
-        fld dword ptr [eax]
-        mov eax, right
-        fmul dword ptr [eax]
-        faddp st(1), st(0)
-        fstp qword ptr result
-    }
-#elif defined(__GNUC__) && defined(__i386__)
-    __asm__ __volatile__("fldl %1; flds %2; fmuls %3; faddp; fstpl %0"
-        : "=m"(result) : "m"(sum), "m"(*left), "m"(*right) : "st", "st(1)");
-#else
-#error RQAccumulate requires x86
-#endif
+    result = sum + (double)*left * *right;
     return result;
 }
 
@@ -5228,21 +4195,7 @@ static double C2_HOOK_CDECL RQAccumulate(double sum, const volatile br_scalar* l
  * next public update still differs under SSE when multiplier NaN signs tie. */
 static br_scalar C2_HOOK_CDECL RQSubtractProduct(br_scalar coefficient, const br_scalar* factor, const br_scalar* value) {
     br_scalar result;
-#if defined(_MSC_VER) && defined(_M_IX86)
-    __asm {
-        fld dword ptr coefficient
-        mov eax, factor
-        fmul dword ptr [eax]
-        mov eax, value
-        fsubr dword ptr [eax]
-        fstp dword ptr result
-    }
-#elif defined(__GNUC__) && defined(__i386__)
-    __asm__ __volatile__("flds %1; fmuls %2; fsubrs %3; fstps %0"
-        : "=m"(result) : "m"(coefficient), "m"(*factor), "m"(*value) : "st");
-#else
-#error RQSubtractProduct requires x86
-#endif
+    result = *value - coefficient * *factor;
     return result;
 }
 
@@ -5250,39 +4203,13 @@ static br_scalar C2_HOOK_CDECL RQSubtractProduct(br_scalar coefficient, const br
  * division and multiplication before the scalar spill. */
 static br_scalar C2_HOOK_CDECL RQDivideScalars(const br_scalar* numerator, const br_scalar* denominator) {
     br_scalar result;
-#if defined(_MSC_VER) && defined(_M_IX86)
-    __asm {
-        mov eax, numerator
-        fld dword ptr [eax]
-        mov eax, denominator
-        fdiv dword ptr [eax]
-        fstp dword ptr result
-    }
-#elif defined(__GNUC__) && defined(__i386__)
-    __asm__ __volatile__("flds %1; fdivs %2; fstps %0"
-        : "=m"(result) : "m"(*numerator), "m"(*denominator) : "st");
-#else
-#error RQDivideScalars requires x86
-#endif
+    result = *numerator / *denominator;
     return result;
 }
 
 static br_scalar C2_HOOK_CDECL RQMultiplyScalars(const br_scalar* left, const volatile br_scalar* right) {
     br_scalar result;
-#if defined(_MSC_VER) && defined(_M_IX86)
-    __asm {
-        mov eax, left
-        fld dword ptr [eax]
-        mov eax, right
-        fmul dword ptr [eax]
-        fstp dword ptr result
-    }
-#elif defined(__GNUC__) && defined(__i386__)
-    __asm__ __volatile__("flds %1; fmuls %2; fstps %0"
-        : "=m"(result) : "m"(*left), "m"(*right) : "st");
-#else
-#error RQMultiplyScalars requires x86
-#endif
+    result = *left * *right;
     return result;
 }
 
@@ -5327,30 +4254,8 @@ int C2_HOOK_FASTCALL FUN_004c3b60(br_scalar* original, br_scalar* rhs, br_scalar
      * In CDECL builds two register arguments become stack arguments; the
      * original slot is therefore 0x8c0 below the incoming return address.
      */
-#if defined(_MSC_VER) && _MSC_VER >= 1300 && defined(_M_IX86)
-    void* entry_return_slot = _AddressOfReturnAddress();
-    __asm {
-        mov eax, entry_return_slot
-#if defined(REC2_MATCHING)
-        mov eax, dword ptr [eax - 08c8h]
-#else
-        mov eax, dword ptr [eax - 08c0h]
-#endif
-        mov negative, eax
-    }
-#elif defined(_MSC_VER) && defined(_M_IX86)
-    __asm {
-        lea eax, result
-        mov eax, dword ptr [eax - 08cch]
-        mov negative, eax
-    }
-#elif defined(__GNUC__) && defined(__i386__)
-    __asm__ volatile("movl -2252(%1), %0"
-        : "=r" (negative) : "r" (&result) : "memory");
-#else
     /* Other architectures have no original x86 stack-history contract. */
     negative = -1;
-#endif
 
     (void)unused1;
     (void)unused2;
@@ -7962,18 +6867,7 @@ static br_scalar C2_HOOK_CDECL GravityRound(double value) {
 
 static double C2_HOOK_CDECL GravityAddScalar(double left, volatile const br_scalar* right) {
     double result;
-#if defined(_MSC_VER) && defined(_M_IX86)
-    __asm {
-        mov edx, right
-        fld qword ptr left
-        fadd dword ptr [edx]
-        fstp qword ptr result
-    }
-#elif defined(__GNUC__) && defined(__i386__)
-    __asm__ __volatile__("fldl %1; fadds %2; fstpl %0" : "=m"(result) : "m"(left), "m"(*right) : "st");
-#else
     result = left + (double)*right;
-#endif
     return result;
 }
 

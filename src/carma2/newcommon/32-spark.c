@@ -670,27 +670,6 @@ void C2_HOOK_FASTCALL RestoreCarPixelmaps(tCar_spec* pCar_spec) {
     NOT_IMPLEMENTED();
 }
 
-/* The original loads scale_x before multiplying raw size. A signaling NaN
- * in size must remain a memory operand; paired physical probes demonstrate
- * that loading it first changes the chosen NaN sign/payload. */
-static double C2_HOOK_CDECL SplashScaleProduct(const tSplash* pSplash) {
-    double result;
-#if defined(_MSC_VER) && defined(_M_IX86)
-    __asm {
-        mov eax, pSplash
-        fld dword ptr [eax + 0x18]
-        fmul dword ptr [eax + 0x14]
-        fstp qword ptr result
-    }
-#elif defined(__GNUC__) && defined(__i386__)
-    __asm__ __volatile__("flds %1; fmuls %2; fstpl %0"
-        : "=m"(result) : "m"(pSplash->scale_x), "m"(pSplash->size) : "st");
-#else
-#error SplashScaleProduct requires the original x86 floating-point behavior
-#endif
-    return result;
-}
-
 // FUNCTION: CARMA2_HW 0x004f9790
 void C2_HOOK_FASTCALL MungeShrapnel(tU32 pTime) {
     tPhysics_object* object;
@@ -803,7 +782,7 @@ void C2_HOOK_FASTCALL MungeShrapnel(tU32 pTime) {
                         BrActorRemove(splash->actor);
                     }
                 } else {
-                    scale = SplashScaleProduct(splash);
+                    scale = splash->size * splash->scale_x;
                     for (j = 0; j < 3; j++) {
                         splash->actor->t.t.mat.m[0][j] = SmokeScalarRound(scale * gCamera_to_world.m[0][j]);
                     }
@@ -897,203 +876,34 @@ void C2_HOOK_FASTCALL MungeShrapnel(tU32 pTime) {
 
 // FUNCTION: CARMA2_HW 0x004f9e80
 void C2_HOOK_FASTCALL DrMatrix34Rotate(br_matrix34* pMat, br_angle pAngle, const br_vector3* pAxis) {
-    br_scalar scratch[9];
-    const br_scalar one = 1.f;
+    br_scalar t;
+    br_scalar s;
+    br_scalar c;
+    br_scalar txy;
+    br_scalar txz;
+    br_scalar tyz;
+    br_scalar sx;
+    br_scalar sy;
+    br_scalar sz;
 
-    scratch[4] = SmokeScalarRound(FastScalarSinAngle(pAngle));
-    scratch[3] = SmokeScalarRound(FastScalarCosAngle(pAngle));
-    /* Retain original intermediate spills, live operands and source reloads
-     * while writing only the nine rotation components. */
-#if defined(_MSC_VER) && defined(_M_IX86)
-    __asm {
-        mov esi, pMat
-        mov eax, pAxis
-        lea ecx, scratch
-        fld one
-        fsub dword ptr [ecx + 0xc]
-        fld dword ptr [eax]
-        fld dword ptr [eax + 8]
-        fxch st(2)
-        fst dword ptr [ecx + 0x8]
-        fmul dword ptr [eax]
-        fld dword ptr [eax + 4]
-        fld dword ptr [eax + 8]
-        fxch st(3)
-        fst dword ptr [ecx + 0x20]
-        fmul dword ptr [ecx + 0x20]
-        fld dword ptr [eax + 4]
-        fxch st(3)
-        fstp dword ptr [ecx + 0x20]
-        fxch st(4)
-        fmul dword ptr [ecx + 0x20]
-        fxch st(1)
-        fmul dword ptr [ecx + 0x20]
-        fxch st(3)
-        fmul dword ptr [ecx + 0x10]
-        fxch st(2)
-        fmul dword ptr [ecx + 0x10]
-        fxch st(4)
-        fmul dword ptr [ecx + 0x8]
-        fxch st(1)
-        fst dword ptr [ecx + 0x18]
-        fxch st(3)
-        fst dword ptr [ecx + 0x20]
-        fxch st(2)
-        fst dword ptr [ecx + 0x14]
-        fadd dword ptr [ecx + 0x20]
-        fxch st(2)
-        fsub dword ptr [ecx + 0x14]
-        fxch st(4)
-        fstp dword ptr [ecx + 0x14]
-        fxch st(2)
-        fsub dword ptr [ecx + 0x14]
-        fld dword ptr [ecx + 0x10]
-        fxch st(3)
-        fadd dword ptr [ecx + 0xc]
-        fld dword ptr [eax + 8]
-        fmul dword ptr [eax + 4]
-        fmul dword ptr [ecx + 0x8]
-        fstp dword ptr [ecx + 0x10]
-        fxch st(3)
-        fmul dword ptr [eax]
-        fxch st(3)
-        fstp dword ptr [esi]
-        fxch st(1)
-        fstp dword ptr [esi + 4]
-        fstp dword ptr [esi + 8]
-        fxch st(1)
-        fstp dword ptr [esi + 0xc]
-        fld dword ptr [eax + 4]
-        fst dword ptr [ecx + 0x20]
-        fmul dword ptr [ecx + 0x20]
-        fxch st(1)
-        fstp dword ptr [ecx + 0x20]
-        fmul dword ptr [ecx + 0x8]
-        fadd dword ptr [ecx + 0xc]
-        fstp dword ptr [esi + 0x10]
-        fld dword ptr [ecx + 0x20]
-        fld dword ptr [ecx + 0x14]
-        fld dword ptr [ecx + 0x10]
-        fxch st(2)
-        fadd dword ptr [ecx + 0x10]
-        fxch st(1)
-        fadd dword ptr [ecx + 0x18]
-        fxch st(2)
-        fsub dword ptr [ecx + 0x20]
-        fxch st(1)
-        fstp dword ptr [esi + 0x14]
-        fxch st(1)
-        fstp dword ptr [esi + 0x18]
-        fstp dword ptr [esi + 0x1c]
-        fld dword ptr [eax + 8]
-        fld st(0)
-        fmul st(0), st(1)
-        fmul dword ptr [ecx + 0x8]
-        fadd dword ptr [ecx + 0xc]
-        fstp dword ptr [esi + 0x20]
-        fstp st(0)
-    }
-#elif defined(__GNUC__) && defined(__i386__)
-    {
-        br_scalar* scratch_ptr = scratch;
-        const br_scalar* one_ptr = &one;
-        __asm__ volatile (
-            "movl %[matrix], %%esi\n\t"
-            "movl %[axis], %%eax\n\t"
-            "movl %[scratch], %%ecx\n\t"
-            "movl %[one], %%edx\n\t"
-            ".intel_syntax noprefix\n\t"
-            "fld dword ptr [edx]\n\t"
-            "fsub dword ptr [ecx + 0xc]\n\t"
-            "fld dword ptr [eax]\n\t"
-            "fld dword ptr [eax + 8]\n\t"
-            "fxch st(2)\n\t"
-            "fst dword ptr [ecx + 0x8]\n\t"
-            "fmul dword ptr [eax]\n\t"
-            "fld dword ptr [eax + 4]\n\t"
-            "fld dword ptr [eax + 8]\n\t"
-            "fxch st(3)\n\t"
-            "fst dword ptr [ecx + 0x20]\n\t"
-            "fmul dword ptr [ecx + 0x20]\n\t"
-            "fld dword ptr [eax + 4]\n\t"
-            "fxch st(3)\n\t"
-            "fstp dword ptr [ecx + 0x20]\n\t"
-            "fxch st(4)\n\t"
-            "fmul dword ptr [ecx + 0x20]\n\t"
-            "fxch st(1)\n\t"
-            "fmul dword ptr [ecx + 0x20]\n\t"
-            "fxch st(3)\n\t"
-            "fmul dword ptr [ecx + 0x10]\n\t"
-            "fxch st(2)\n\t"
-            "fmul dword ptr [ecx + 0x10]\n\t"
-            "fxch st(4)\n\t"
-            "fmul dword ptr [ecx + 0x8]\n\t"
-            "fxch st(1)\n\t"
-            "fst dword ptr [ecx + 0x18]\n\t"
-            "fxch st(3)\n\t"
-            "fst dword ptr [ecx + 0x20]\n\t"
-            "fxch st(2)\n\t"
-            "fst dword ptr [ecx + 0x14]\n\t"
-            "fadd dword ptr [ecx + 0x20]\n\t"
-            "fxch st(2)\n\t"
-            "fsub dword ptr [ecx + 0x14]\n\t"
-            "fxch st(4)\n\t"
-            "fstp dword ptr [ecx + 0x14]\n\t"
-            "fxch st(2)\n\t"
-            "fsub dword ptr [ecx + 0x14]\n\t"
-            "fld dword ptr [ecx + 0x10]\n\t"
-            "fxch st(3)\n\t"
-            "fadd dword ptr [ecx + 0xc]\n\t"
-            "fld dword ptr [eax + 8]\n\t"
-            "fmul dword ptr [eax + 4]\n\t"
-            "fmul dword ptr [ecx + 0x8]\n\t"
-            "fstp dword ptr [ecx + 0x10]\n\t"
-            "fxch st(3)\n\t"
-            "fmul dword ptr [eax]\n\t"
-            "fxch st(3)\n\t"
-            "fstp dword ptr [esi]\n\t"
-            "fxch st(1)\n\t"
-            "fstp dword ptr [esi + 4]\n\t"
-            "fstp dword ptr [esi + 8]\n\t"
-            "fxch st(1)\n\t"
-            "fstp dword ptr [esi + 0xc]\n\t"
-            "fld dword ptr [eax + 4]\n\t"
-            "fst dword ptr [ecx + 0x20]\n\t"
-            "fmul dword ptr [ecx + 0x20]\n\t"
-            "fxch st(1)\n\t"
-            "fstp dword ptr [ecx + 0x20]\n\t"
-            "fmul dword ptr [ecx + 0x8]\n\t"
-            "fadd dword ptr [ecx + 0xc]\n\t"
-            "fstp dword ptr [esi + 0x10]\n\t"
-            "fld dword ptr [ecx + 0x20]\n\t"
-            "fld dword ptr [ecx + 0x14]\n\t"
-            "fld dword ptr [ecx + 0x10]\n\t"
-            "fxch st(2)\n\t"
-            "fadd dword ptr [ecx + 0x10]\n\t"
-            "fxch st(1)\n\t"
-            "fadd dword ptr [ecx + 0x18]\n\t"
-            "fxch st(2)\n\t"
-            "fsub dword ptr [ecx + 0x20]\n\t"
-            "fxch st(1)\n\t"
-            "fstp dword ptr [esi + 0x14]\n\t"
-            "fxch st(1)\n\t"
-            "fstp dword ptr [esi + 0x18]\n\t"
-            "fstp dword ptr [esi + 0x1c]\n\t"
-            "fld dword ptr [eax + 8]\n\t"
-            "fld st(0)\n\t"
-            "fmul st(0), st(1)\n\t"
-            "fmul dword ptr [ecx + 0x8]\n\t"
-            "fadd dword ptr [ecx + 0xc]\n\t"
-            "fstp dword ptr [esi + 0x20]\n\t"
-            "fstp st(0)\n\t"
-            ".att_syntax prefix\n\t"
-            :
-            : [matrix] "m" (pMat), [axis] "m" (pAxis), [scratch] "m" (scratch_ptr), [one] "m" (one_ptr)
-            : "eax", "ecx", "edx", "esi", "memory", "st", "st(1)", "st(2)", "st(3)", "st(4)", "st(5)", "st(6)", "st(7)");
-    }
-#else
-#error DrMatrix34Rotate requires the original x86 floating-point behavior
-#endif
+    s = FastScalarSinAngle(pAngle);
+    c = FastScalarCosAngle(pAngle);
+    t = 1.f - c;
+    txy = t * pAxis->v[0] * pAxis->v[1];
+    txz = t * pAxis->v[0] * pAxis->v[2];
+    tyz = t * pAxis->v[1] * pAxis->v[2];
+    sx = s * pAxis->v[0];
+    sy = s * pAxis->v[1];
+    sz = s * pAxis->v[2];
+    pMat->m[0][0] = t * pAxis->v[0] * pAxis->v[0] + c;
+    pMat->m[0][1] = txy + sz;
+    pMat->m[0][2] = txz - sy;
+    pMat->m[1][0] = txy - sz;
+    pMat->m[1][1] = t * pAxis->v[1] * pAxis->v[1] + c;
+    pMat->m[1][2] = tyz + sx;
+    pMat->m[2][0] = txz + sy;
+    pMat->m[2][1] = tyz - sx;
+    pMat->m[2][2] = t * pAxis->v[2] * pAxis->v[2] + c;
 }
 
 
@@ -2314,31 +2124,6 @@ void C2_HOOK_FASTCALL ConditionalSmokeColumn(tCar_spec* pCar, int pFire_point, i
     }
 }
 
-/* FSUBR selects its live x87 NaN operand before the scalar speed operand. */
-static double C2_HOOK_CDECL SplashSubtractFromScalar(double pValue, const br_scalar* pScalar) {
-    double result;
-
-#if defined(_MSC_VER) && defined(_M_IX86)
-    __asm {
-        mov ecx, pScalar
-        fld pValue
-        fsubr dword ptr [ecx]
-        fstp result
-    }
-#elif defined(__GNUC__) && defined(__i386__)
-    __asm__ volatile (
-        "fldl %[value]\n\t"
-        "fsubrs %[scalar]\n\t"
-        "fstpl %[result]\n\t"
-        : [result] "=m" (result)
-        : [value] "m" (pValue), [scalar] "m" (*pScalar)
-        : "st", "memory");
-#else
-#error SplashSubtractFromScalar requires the original x86 floating-point behavior
-#endif
-    return result;
-}
-
 // FUNCTION: CARMA2_HW 0x004fd530
 void C2_HOOK_FASTCALL SingleSplash(tPhysics_object* pObject, const br_matrix34* pMatrix, const br_vector3* pVelocity, const br_vector3* pNormal_velocity, const br_vector3* pOmega, const br_vector3* pPoint, const br_vector3* pNormal, tU32 pTime) {
     br_vector3 cross;
@@ -2368,7 +2153,7 @@ void C2_HOOK_FASTCALL SingleSplash(tPhysics_object* pObject, const br_matrix34* 
         + (double)velocity.v[1] * velocity.v[1]) + (double)velocity.v[2] * velocity.v[2]));
     dot = ((double)pNormal->v[1] * velocity.v[1] + (double)pNormal->v[2] * velocity.v[2])
         + (double)pNormal->v[0] * velocity.v[0];
-    wide = SplashSubtractFromScalar(fabs(dot) * -5.f, &speed) * .006666666828095913f - -.04782608523964882f;
+    wide = (speed + fabs(dot) * 5.f) * .006666666828095913f + .04782608523964882f;
     size = SmokeScalarRound(wide);
     if (wide > .5f) {
         size = .5f;

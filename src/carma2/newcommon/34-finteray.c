@@ -75,19 +75,7 @@ static br_scalar C2_HOOK_FASTCALL FinterayEdgeScalar(double value) {
 static double C2_HOOK_FASTCALL FinterayEdgeDifference(const br_scalar* a, const br_scalar* b) {
     double result;
 
-#if defined(_MSC_VER) && defined(_M_IX86)
-    __asm {
-        mov eax, a
-        mov ecx, b
-        fld dword ptr [eax]
-        fsub dword ptr [ecx]
-        fstp qword ptr result
-    }
-#elif defined(__GNUC__) && defined(__i386__)
-    __asm__ __volatile__("flds %1\n\tfsubs %2\n\tfstpl %0" : "=m"(result) : "m"(*a), "m"(*b) : "st");
-#else
     result = (double)*a - *b;
-#endif
     return result;
 }
 
@@ -904,19 +892,7 @@ void C2_HOOK_FASTCALL MultiRayCheckSingleFace(int pNum_rays, tFace_ref* pFace, b
 /* Preserve the original NaN operand choice during bounds accumulation. */
 static double C2_HOOK_FASTCALL FinterayBoundsAdd(const br_scalar* a, const br_scalar* b) {
     double result;
-#if defined(_MSC_VER) && defined(_M_IX86)
-    __asm {
-        mov eax, a
-        mov ecx, b
-        fld dword ptr [eax]
-        fadd dword ptr [ecx]
-        fstp qword ptr result
-    }
-#elif defined(__GNUC__) && defined(__i386__)
-    __asm__ __volatile__("flds %1\n\tfadds %2\n\tfstpl %0" : "=m"(result) : "m"(*a), "m"(*b) : "st");
-#else
     result = (double)*a + *b;
-#endif
     return result;
 }
 
@@ -1009,20 +985,9 @@ static void C2_HOOK_FASTCALL FinterayBoxCopyScalar(br_scalar* output, const br_s
 
 /* Unlike raw vector copies, the original equation-D load/store quiets sNaNs. */
 static void C2_HOOK_FASTCALL FinterayBoxStoreScalar(br_scalar* output, const br_scalar* input) {
-#if defined(_MSC_VER) && defined(_M_IX86)
-    __asm {
-        mov eax, output
-        mov ecx, input
-        fld dword ptr [ecx]
-        fstp dword ptr [eax]
-    }
-#elif defined(__GNUC__) && defined(__i386__)
-    __asm__ volatile("flds %1; fstps %0" : "=m" (*output) : "m" (*input) : "st");
-#else
     volatile double value = *input;
 
     *output = (br_scalar)value;
-#endif
 }
 
 /* The original six clipping passes are inlined inside ModelPickBox. */

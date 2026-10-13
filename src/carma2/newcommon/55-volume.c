@@ -89,20 +89,8 @@ static void C2_HOOK_CDECL AutoVolumeCopy(void* out, const void* in) {
 static double C2_HOOK_CDECL AutoVolumeScalar(double value) {
     float scalar;
     double result;
-#if defined(_MSC_VER) && defined(_M_IX86)
-    __asm {
-        fld qword ptr value
-        fstp dword ptr scalar
-        fld dword ptr scalar
-        fstp qword ptr result
-    }
-#elif defined(__GNUC__) && defined(__i386__)
-    __asm__ __volatile__("fldl %2; fstps %1; flds %1; fstpl %0"
-        : "=m"(result),"=m"(scalar) : "m"(value) : "st");
-#else
     scalar=(float)value;
     result=scalar;
-#endif
     return result;
 }
 #if defined(_MSC_VER) && _MSC_VER < 1300
@@ -116,19 +104,7 @@ static int C2_HOOK_CDECL AutoVolumeUnordered(double value) {
 /* Paired payloads571..586 expose modern MSVC's different NaN selection. */
 static double C2_HOOK_CDECL AutoVolumeAdd(double a,double b) {
     double result;
-#if defined(_MSC_VER) && defined(_M_IX86)
-    __asm {
-        fld qword ptr a
-        fld qword ptr b
-        faddp st(1),st(0)
-        fstp qword ptr result
-    }
-#elif defined(__GNUC__) && defined(__i386__)
-    __asm__ __volatile__("fldl %1; fldl %2; faddp %%st,%%st(1); fstpl %0"
-        : "=m"(result) : "m"(a),"m"(b) : "st","st(1)");
-#else
     result=a+b;
-#endif
     return result;
 }
 

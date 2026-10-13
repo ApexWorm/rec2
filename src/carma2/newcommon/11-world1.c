@@ -77,19 +77,7 @@ static int C2_HOOK_FASTCALL PhysicsWallNaN(double value) {
 static double C2_HOOK_CDECL PhysicsJointSum(double pA, double pB) {
     double result;
 
-#if defined(_MSC_VER) && defined(_M_IX86)
-    __asm {
-        fld pA
-        fld pB
-        faddp st(1), st(0)
-        fstp result
-    }
-#elif defined(__GNUC__) && defined(__i386__)
-    __asm__ volatile("fldl %1; fldl %2; faddp; fstpl %0"
-        : "=m" (result) : "m" (pA), "m" (pB) : "st", "st(1)");
-#else
     result = pA + pB;
-#endif
     return result;
 }
 

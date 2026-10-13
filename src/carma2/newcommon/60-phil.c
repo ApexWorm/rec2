@@ -827,37 +827,14 @@ static int C2_HOOK_CDECL GravityNaN(double value) {
 
 static double C2_HOOK_CDECL GravityMultiplyScalar(double left, volatile const br_scalar* right) {
     double result;
-#if defined(_MSC_VER) && defined(_M_IX86)
-    __asm {
-        mov ecx, right
-        fld qword ptr left
-        fmul dword ptr [ecx]
-        fstp qword ptr result
-    }
-#elif defined(__GNUC__) && defined(__i386__)
-    __asm__ __volatile__("fldl %1; fmuls %2; fstpl %0" : "=m"(result) : "m"(left), "m"(*right) : "st");
-#else
     result = left * (double)*right;
-#endif
     return result;
 }
 
 static double C2_HOOK_CDECL PhysicsJointSum(double pA, double pB) {
     double result;
 
-#if defined(_MSC_VER) && defined(_M_IX86)
-    __asm {
-        fld pA
-        fld pB
-        faddp st(1), st(0)
-        fstp result
-    }
-#elif defined(__GNUC__) && defined(__i386__)
-    __asm__ volatile("fldl %1; fldl %2; faddp; fstpl %0"
-        : "=m" (result) : "m" (pA), "m" (pB) : "st", "st(1)");
-#else
     result = pA + pB;
-#endif
     return result;
 }
 
@@ -948,69 +925,25 @@ static volatile const br_scalar* C2_HOOK_CDECL FrictionAt(const void* base, unsi
 
 static double C2_HOOK_CDECL FrictionProductScalars(volatile const br_scalar* left, volatile const br_scalar* right) {
     double result;
-#if defined(_MSC_VER) && defined(_M_IX86)
-    __asm {
-        mov eax, left
-        mov edx, right
-        fld dword ptr [eax]
-        fmul dword ptr [edx]
-        fstp qword ptr result
-    }
-#elif defined(__GNUC__) && defined(__i386__)
-    __asm__ __volatile__("flds %1; fmuls %2; fstpl %0" : "=m"(result) : "m"(*left), "m"(*right) : "st");
-#else
     result = (double)*left * (double)*right;
-#endif
     return result;
 }
 
 static double C2_HOOK_CDECL PartnerMultiplyWide(double a, double b) {
  double result;
-#if defined(_MSC_VER) && defined(_M_IX86)
- __asm {
- fld qword ptr a
- fmul qword ptr b
- fstp qword ptr result
- }
-#elif defined(__GNUC__) && defined(__i386__)
- __asm__ __volatile__("fldl %1; fmull %2; fstpl %0" : "=m"(result) : "m"(a),"m"(b) : "st");
-#else
  result=(double)a * b;
-#endif
  return result;
 }
 
 static double C2_HOOK_CDECL PartnerMultiplyRawScalar(double a,const br_scalar* b) {
  double result;
-#if defined(_MSC_VER) && defined(_M_IX86)
- __asm {
- fld qword ptr a
- mov ecx,b
- fmul dword ptr [ecx]
- fstp qword ptr result
- }
-#elif defined(__GNUC__) && defined(__i386__)
- __asm__ __volatile__("fldl %1; fmuls %2; fstpl %0" : "=m"(result) : "m"(a),"m"(*b) : "st");
-#else
  result=(double)a * *b;
-#endif
  return result;
 }
 
 static double C2_HOOK_CDECL PartnerMultiplyScalarWide(const br_scalar* a,double b) {
  double result;
-#if defined(_MSC_VER) && defined(_M_IX86)
- __asm {
- mov eax,a
- fld dword ptr [eax]
- fmul qword ptr b
- fstp qword ptr result
- }
-#elif defined(__GNUC__) && defined(__i386__)
- __asm__ __volatile__("flds %1; fmull %2; fstpl %0" : "=m"(result) : "m"(*a),"m"(b) : "st");
-#else
  result=(double)*a * b;
-#endif
  return result;
 }
 
@@ -1018,25 +951,9 @@ static const br_scalar* PartnerScalarPtr(const void* base,unsigned offset) {
  return (const br_scalar*)ForceBytes(base,offset);
 }
 
-#if defined(_MSC_VER) && _MSC_VER < 1300
-static unsigned C2_HOOK_CDECL FrictionStatus(double left, double right) {
-    unsigned short status;
-    __asm {
-        fld qword ptr left
-        fcomp qword ptr right
-        fnstsw ax
-        mov status, ax
-    }
-    return status;
-}
-#endif
 
 static int C2_HOOK_CDECL FrictionGreater(double left, double right) {
-#if defined(_MSC_VER) && _MSC_VER < 1300
-    return (FrictionStatus(left, right) & 0x4100) == 0;
-#else
     return left > right;
-#endif
 }
 
 typedef void (C2_HOOK_FASTCALL* tDragFunction)(tPHIL_queued_header*, tPhysics_object*, br_scalar, int, tSpecial_volume*);
@@ -1111,51 +1028,19 @@ static void C2_HOOK_CDECL FrictionWrite(void* base, unsigned offset, double valu
 
 static double C2_HOOK_CDECL FrictionAddScalar(double left, volatile const br_scalar* right) {
     double result;
-#if defined(_MSC_VER) && defined(_M_IX86)
-    __asm {
-        mov edx, right
-        fld qword ptr left
-        fadd dword ptr [edx]
-        fstp qword ptr result
-    }
-#elif defined(__GNUC__) && defined(__i386__)
-    __asm__ __volatile__("fldl %1; fadds %2; fstpl %0" : "=m"(result) : "m"(left), "m"(*right) : "st");
-#else
     result = left + (double)*right;
-#endif
     return result;
 }
 
 static double C2_HOOK_CDECL FrictionSubtractScalar(double left, volatile const br_scalar* right) {
     double result;
-#if defined(_MSC_VER) && defined(_M_IX86)
-    __asm {
-        mov edx, right
-        fld qword ptr left
-        fsub dword ptr [edx]
-        fstp qword ptr result
-    }
-#elif defined(__GNUC__) && defined(__i386__)
-    __asm__ __volatile__("fldl %1; fsubs %2; fstpl %0" : "=m"(result) : "m"(left), "m"(*right) : "st");
-#else
     result = left - (double)*right;
-#endif
     return result;
 }
 
 static double C2_HOOK_CDECL PartnerSubtractWide(double a, double b) {
  double result;
-#if defined(_MSC_VER) && defined(_M_IX86)
- __asm {
- fld qword ptr a
- fsub qword ptr b
- fstp qword ptr result
- }
-#elif defined(__GNUC__) && defined(__i386__)
- __asm__ __volatile__("fldl %1; fsubl %2; fstpl %0" : "=m"(result) : "m"(a),"m"(b) : "st");
-#else
  result=a-b;
-#endif
  return result;
 }
 
