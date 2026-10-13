@@ -9,7 +9,7 @@ extern char gS3_sound_dirname[256];
 
 tS3_buffer_desc* C2_HOOK_FASTCALL S3GetBufferDescription(int pSample_id);
 
-int C2_HOOK_FASTCALL S3GetSampleDuration(int pSample_id);
+extern int C2_HOOK_FASTCALL S3GetSampleDuration(int pSample_id);
 
 tS3_error_codes C2_HOOK_FASTCALL S3LoadSample(int pSample_id);
 

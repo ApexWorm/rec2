@@ -364,13 +364,13 @@ extern void C2_HOOK_FASTCALL SetAlienPedFolderNames(void);
 
 // AddChangedPoint
 
-int C2_HOOK_FASTCALL GetHowMuchBloodAndSnotToSmearAbout(void);
+extern int C2_HOOK_FASTCALL GetHowMuchBloodAndSnotToSmearAbout(void);
 
-int C2_HOOK_FASTCALL GetAnimalsOn(void);
+extern int C2_HOOK_FASTCALL GetAnimalsOn(void);
 
-int C2_HOOK_FASTCALL IsItOkayToFireHorribleBallsOfNastyNapalmDeathAtPerfectlyInnocentPassersByAndByInnocentIDoMeanInTheBiblicalSense(void);
+extern int C2_HOOK_FASTCALL IsItOkayToFireHorribleBallsOfNastyNapalmDeathAtPerfectlyInnocentPassersByAndByInnocentIDoMeanInTheBiblicalSense(void);
 
-int C2_HOOK_FASTCALL IsItReallyOKThatWeDontMakeAnyEffortToProtectAnySadFuckersOutThereThatDontWishToSeeInnocentPeopleBlownToBitsByHighExplosiveMinesAndShells(void);
+extern int C2_HOOK_FASTCALL IsItReallyOKThatWeDontMakeAnyEffortToProtectAnySadFuckersOutThereThatDontWishToSeeInnocentPeopleBlownToBitsByHighExplosiveMinesAndShells(void);
 
 extern void C2_HOOK_FASTCALL SetAnimalsOn(int pNewAnimalsOn);
 

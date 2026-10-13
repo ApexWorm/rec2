@@ -23,7 +23,7 @@ extern void* gPhysics_other_buffer;
 
 // count
 
-void C2_HOOK_FASTCALL DrMatrix34ApplyLPInverse(br_vector3* dest, const br_vector3* source, const br_matrix34* matrix);
+extern void C2_HOOK_FASTCALL DrMatrix34ApplyLPInverse(br_vector3* dest, const br_vector3* source, const br_matrix34* matrix);
 
 typedef struct {
     br_scalar t;
@@ -38,11 +38,11 @@ typedef struct {
     int type;
 } tPhysics_contact;
 
-int C2_HOOK_FASTCALL AddObjectWallForce(tPhysics_contact* pContacts, const br_vector3* pPosition, br_scalar pT, const br_vector3* pNormal, int pUnused, int pCount, tPhysics_object* pObject, int pType, tFace_ref* pFace, const br_vector3* pReference_position);
+extern int C2_HOOK_FASTCALL AddObjectWallForce(tPhysics_contact* pContacts, const br_vector3* pPosition, br_scalar pT, const br_vector3* pNormal, int pUnused, int pCount, tPhysics_object* pObject, int pType, tFace_ref* pFace, const br_vector3* pReference_position);
 
 // AddObjectObjectForce
 
-tFace_ref* C2_HOOK_FASTCALL RayCastThruFaceList(br_vector3* pPosition, br_vector3* pDirection, br_vector3* pNormal, br_scalar* pT, br_vector3* pCollision_position, tFace_ref* pFaces, int pCount);
+extern tFace_ref* C2_HOOK_FASTCALL RayCastThruFaceList(br_vector3* pPosition, br_vector3* pDirection, br_vector3* pNormal, br_scalar* pT, br_vector3* pCollision_position, tFace_ref* pFaces, int pCount);
 
 // RayCastThruFaceList2
 
@@ -54,7 +54,7 @@ tFace_ref* C2_HOOK_FASTCALL RayCastThruFaceList(br_vector3* pPosition, br_vector
 
 // FaceOnCount
 
-int C2_HOOK_FASTCALL EliminateFaces(tPhysics_object* pObject, tPhysics_shape* pShape, br_matrix34* pTransform);
+extern int C2_HOOK_FASTCALL EliminateFaces(tPhysics_object* pObject, tPhysics_shape* pShape, br_matrix34* pTransform);
 
 // GetShapePoint
 
@@ -64,9 +64,9 @@ int C2_HOOK_FASTCALL EliminateFaces(tPhysics_object* pObject, tPhysics_shape* pS
 
 // GetSphereToFacePoints
 
-int C2_HOOK_FASTCALL CheckSingleEdgeWithSphere(br_vector3* pEdge_start, br_vector3* pEdge_end, tPhysics_object* pObject, tCollision_shape_sphere_data* pSphere, tPhysics_contact* pContacts, int pCount, br_vector3* pSphere_start, br_vector3* pSphere_end, tFace_ref* pFace);
+extern int C2_HOOK_FASTCALL CheckSingleEdgeWithSphere(br_vector3* pEdge_start, br_vector3* pEdge_end, tPhysics_object* pObject, tCollision_shape_sphere_data* pSphere, tPhysics_contact* pContacts, int pCount, br_vector3* pSphere_start, br_vector3* pSphere_end, tFace_ref* pFace);
 
-int C2_HOOK_FASTCALL GetSphereToEdgePoints(tPhysics_object* pObject, tCollision_shape_sphere_data* pSphere, tPhysics_contact* pContacts, int pCount, int pUnused_capacity, br_vector3* pSphere_start, br_vector3* pSphere_end, br_matrix34* pUnused_matrix);
+extern int C2_HOOK_FASTCALL GetSphereToEdgePoints(tPhysics_object* pObject, tCollision_shape_sphere_data* pSphere, tPhysics_contact* pContacts, int pCount, int pUnused_capacity, br_vector3* pSphere_start, br_vector3* pSphere_end, br_matrix34* pUnused_matrix);
 
 typedef struct {
     br_vector3 original_points[64];
@@ -77,33 +77,33 @@ typedef struct {
     tPolyhedron_edge_indexes* edges;
 } tPhysics_wall_workspace;
 
-int C2_HOOK_FASTCALL GetCornerToFacePoints(tPhysics_object* pObject, tPhysics_shape* pUnused_shape, tPhysics_contact* pContacts, int pCount, int pCapacity, tPhysics_wall_workspace* pWorkspace, void* pUnused_argument);
+extern int C2_HOOK_FASTCALL GetCornerToFacePoints(tPhysics_object* pObject, tPhysics_shape* pUnused_shape, tPhysics_contact* pContacts, int pCount, int pCapacity, tPhysics_wall_workspace* pWorkspace, void* pUnused_argument);
 
-int C2_HOOK_FASTCALL FUN_004236a0(tPhysics_object* object, tPhysics_shape* shape, tPhysics_contact* contacts, int count, int capacity, tPhysics_wall_workspace* workspace, void* unused, int* touched);
+extern int C2_HOOK_FASTCALL FUN_004236a0(tPhysics_object* object, tPhysics_shape* shape, tPhysics_contact* contacts, int count, int capacity, tPhysics_wall_workspace* workspace, void* unused, int* touched);
 
-int C2_HOOK_FASTCALL FUN_00424140(tPhysics_object* object, tPhysics_shape* shape, tPhysics_contact* contacts, int count, int unused_capacity, tPhysics_wall_workspace* workspace, void* unused);
+extern int C2_HOOK_FASTCALL FUN_00424140(tPhysics_object* object, tPhysics_shape* shape, tPhysics_contact* contacts, int count, int unused_capacity, tPhysics_wall_workspace* workspace, void* unused);
 
-int C2_HOOK_FASTCALL FUN_00424270(br_vector3* start, br_vector3* end, tPhysics_object* object, tPhysics_shape* shape, tPhysics_contact* contacts, int count, tFace_ref* face, tPhysics_wall_workspace* workspace);
+extern int C2_HOOK_FASTCALL FUN_00424270(br_vector3* start, br_vector3* end, tPhysics_object* object, tPhysics_shape* shape, tPhysics_contact* contacts, int count, tFace_ref* face, tPhysics_wall_workspace* workspace);
 
-int C2_HOOK_FASTCALL FUN_00424990(const br_vector3* old_origin, const br_vector3* old_direction, const br_vector3* moving_origin, const br_vector3* moving_direction, const br_vector3* velocity, const br_vector3* direction_change, tPhysics_contact* output, int unused, tPhysics_object* object, tPhysics_object* other);
+extern int C2_HOOK_FASTCALL FUN_00424990(const br_vector3* old_origin, const br_vector3* old_direction, const br_vector3* moving_origin, const br_vector3* moving_direction, const br_vector3* velocity, const br_vector3* direction_change, tPhysics_contact* output, int unused, tPhysics_object* object, tPhysics_object* other);
 
-int C2_HOOK_FASTCALL FUN_00425630(const br_vector3* n0, const br_vector3* n1, const br_vector3* old_origin, const br_vector3* old_direction, const br_vector3* moving_origin, const br_vector3* velocity0, const br_vector3* edge_change, const br_vector3* velocity1, tPhysics_contact* output, int unused, tPhysics_object* object, tPhysics_object* other);
+extern int C2_HOOK_FASTCALL FUN_00425630(const br_vector3* n0, const br_vector3* n1, const br_vector3* old_origin, const br_vector3* old_direction, const br_vector3* moving_origin, const br_vector3* velocity0, const br_vector3* edge_change, const br_vector3* velocity1, tPhysics_contact* output, int unused, tPhysics_object* object, tPhysics_object* other);
 
-int C2_HOOK_FASTCALL FUN_004228b0(tPhysics_object* object, tPhysics_contact* contacts, int initial_count);
+extern int C2_HOOK_FASTCALL FUN_004228b0(tPhysics_object* object, tPhysics_contact* contacts, int initial_count);
 
-void C2_HOOK_FASTCALL FUN_004b9230(tPhysics_object* pObject, tPhysics_object** pSelected, br_scalar pTime);
+extern void C2_HOOK_FASTCALL FUN_004b9230(tPhysics_object* pObject, tPhysics_object** pSelected, br_scalar pTime);
 
-void C2_HOOK_FAKE_THISCALL FUN_004b8ee0(tPhysics_object* pObject, undefined4 pUnused, br_scalar pTime);
+extern void C2_HOOK_FAKE_THISCALL FUN_004b8ee0(tPhysics_object* pObject, undefined4 pUnused, br_scalar pTime);
 
-void C2_HOOK_FAKE_THISCALL FUN_004bc8e0(tPhysics_object* object, undefined4 unused, br_scalar factor);
+extern void C2_HOOK_FAKE_THISCALL FUN_004bc8e0(tPhysics_object* object, undefined4 unused, br_scalar factor);
 
-int C2_HOOK_FASTCALL FUN_004bd720(tPhysics_object* object);
+extern int C2_HOOK_FASTCALL FUN_004bd720(tPhysics_object* object);
 
-int C2_HOOK_FASTCALL FUN_004bd7f0(tPhysics_object* list);
+extern int C2_HOOK_FASTCALL FUN_004bd7f0(tPhysics_object* list);
 
-tPhysics_object** C2_HOOK_FASTCALL FUN_004bd830(tPhysics_object* scan, tPhysics_object* context, tPhysics_object** output);
+extern tPhysics_object** C2_HOOK_FASTCALL FUN_004bd830(tPhysics_object* scan, tPhysics_object* context, tPhysics_object** output);
 
-void C2_HOOK_FASTCALL FUN_004bd9b0(tPhysics_object* object, tU32 state);
+extern void C2_HOOK_FASTCALL FUN_004bd9b0(tPhysics_object* object, tU32 state);
 
 // CylinderCheck
 
@@ -149,7 +149,7 @@ void C2_HOOK_FASTCALL FUN_004bd9b0(tPhysics_object* object, tU32 state);
 
 // TestForObjectInSensiblePlace
 
-br_scalar C2_HOOK_FASTCALL HierarchyCalcEnergy(tPhysics_object* pObject);
+extern br_scalar C2_HOOK_FASTCALL HierarchyCalcEnergy(tPhysics_object* pObject);
 
 // CheckCollisionList
 
@@ -167,11 +167,11 @@ typedef struct {
     int type;
 } tPhysics_joint_force;
 
-void C2_HOOK_FASTCALL MakeJointVelocitiesVector(br_scalar* pOutput, tPhysics_joint_force* const* pForces, int pCount);
+extern void C2_HOOK_FASTCALL MakeJointVelocitiesVector(br_scalar* pOutput, tPhysics_joint_force* const* pForces, int pCount);
 
 // ApplySingleForce
 
-void C2_HOOK_FAKE_THISCALL ApplySingleForce(tPhysics_joint_force* record, undefined4 unused, br_scalar impulse);
+extern void C2_HOOK_FAKE_THISCALL ApplySingleForce(tPhysics_joint_force* record, undefined4 unused, br_scalar impulse);
 
 // SkipForces
 
@@ -179,13 +179,13 @@ void C2_HOOK_FAKE_THISCALL ApplySingleForce(tPhysics_joint_force* record, undefi
 
 // CheckForTwang
 
-void C2_HOOK_FASTCALL CreateJointForce(tPhysics_object* pObject, tPhysics_object* pPartner, tPhysics_joint_force* pForce, const br_vector3* pDirection);
+extern void C2_HOOK_FASTCALL CreateJointForce(tPhysics_object* pObject, tPhysics_object* pPartner, tPhysics_joint_force* pForce, const br_vector3* pDirection);
 
-void C2_HOOK_FASTCALL CreateJointTorque(tPhysics_object* pObject, tPhysics_object* pPartner, tPhysics_joint_force* pForce, const br_vector3* pDirection);
+extern void C2_HOOK_FASTCALL CreateJointTorque(tPhysics_object* pObject, tPhysics_object* pPartner, tPhysics_joint_force* pForce, const br_vector3* pDirection);
 
-int C2_HOOK_FASTCALL AllocateObjectWorkspace(tPhysics_object* object, tPhysics_joint_force* output);
+extern int C2_HOOK_FASTCALL AllocateObjectWorkspace(tPhysics_object* object, tPhysics_joint_force* output);
 
-void C2_HOOK_FASTCALL RedoQuickHingeVelocities(tPhysics_object* object);
+extern void C2_HOOK_FASTCALL RedoQuickHingeVelocities(tPhysics_object* object);
 
 // GetJointForces
 
@@ -213,7 +213,7 @@ void C2_HOOK_FASTCALL RedoQuickHingeVelocities(tPhysics_object* object);
 
 // TranslateAndRotateJointedObject
 
-int C2_HOOK_FASTCALL CountJointForces(tPhysics_object* pObject, tPhysics_object* pRoot);
+extern int C2_HOOK_FASTCALL CountJointForces(tPhysics_object* pObject, tPhysics_object* pRoot);
 
 // MoveJointedObject
 
@@ -223,7 +223,7 @@ int C2_HOOK_FASTCALL CountJointForces(tPhysics_object* pObject, tPhysics_object*
 
 // GetWorldBoundingBoxForObjects
 
-void C2_HOOK_FASTCALL GetWorldBoundingBoxForObject(tPhysics_object* pObject, br_bounds* pBounds);
+extern void C2_HOOK_FASTCALL GetWorldBoundingBoxForObject(tPhysics_object* pObject, br_bounds* pBounds);
 
 // MatricesAreIdentical
 
@@ -235,13 +235,13 @@ extern void C2_HOOK_FASTCALL PrepareForCollisions(tPhysics_object* pObject, tWor
 
 // CheckPointVelocities
 
-void C2_HOOK_FASTCALL WriteNewPositions(tPhysics_object* pObject);
+extern void C2_HOOK_FASTCALL WriteNewPositions(tPhysics_object* pObject);
 
-void C2_HOOK_FASTCALL SetListDoingNothingFlag(tPhysics_object* pObject, tU8 pFlag);
+extern void C2_HOOK_FASTCALL SetListDoingNothingFlag(tPhysics_object* pObject, tU8 pFlag);
 
-void C2_HOOK_FASTCALL SetGroupDoingNothingFlag(tPhysics_object* pObject, tU8 pFlag);
+extern void C2_HOOK_FASTCALL SetGroupDoingNothingFlag(tPhysics_object* pObject, tU8 pFlag);
 
-void C2_HOOK_FASTCALL SetHierarchyDoingNothingFlag(tPhysics_object* pObject, tU8 pFlag);
+extern void C2_HOOK_FASTCALL SetHierarchyDoingNothingFlag(tPhysics_object* pObject, tU8 pFlag);
 
 // CheckDoingNothingFlag
 
@@ -251,7 +251,7 @@ void C2_HOOK_FASTCALL SetHierarchyDoingNothingFlag(tPhysics_object* pObject, tU8
 
 // GetPreCalculatedJointForces
 
-void C2_HOOK_FASTCALL MakeObjectListDoSomething(tPhysics_object* pObject);
+extern void C2_HOOK_FASTCALL MakeObjectListDoSomething(tPhysics_object* pObject);
 
 // CheckForObjectTouchingAnotherObject
 
@@ -291,7 +291,7 @@ void C2_HOOK_FASTCALL MakeObjectListDoSomething(tPhysics_object* pObject);
 
 // AddDoubleTorqueToMatrix
 
-void C2_HOOK_FASTCALL DRMatrix33Inverse(br_scalar* result, const br_scalar* pInput);
+extern void C2_HOOK_FASTCALL DRMatrix33Inverse(br_scalar* result, const br_scalar* pInput);
 
 // SetUpQuickHingeData
 
@@ -299,43 +299,43 @@ void C2_HOOK_FASTCALL DRMatrix33Inverse(br_scalar* result, const br_scalar* pInp
 
 // CalcQuickHingeData
 
-void C2_HOOK_FASTCALL SetUpForce(br_vector3* out_omega, br_vector3* out_velocity, const br_vector3* lever, const br_vector3* force, const tPhysics_object* object);
+extern void C2_HOOK_FASTCALL SetUpForce(br_vector3* out_omega, br_vector3* out_velocity, const br_vector3* lever, const br_vector3* force, const tPhysics_object* object);
 
-tPhysics_object* C2_HOOK_FASTCALL SetUpTorqueHingePartners(br_vector3* pAngular, br_vector3* pLinear, br_vector3* pPartner_angular, br_vector3* pPartner_linear, const br_vector3* pTorque, tPhysics_object* pObject);
+extern tPhysics_object* C2_HOOK_FASTCALL SetUpTorqueHingePartners(br_vector3* pAngular, br_vector3* pLinear, br_vector3* pPartner_angular, br_vector3* pPartner_linear, const br_vector3* pTorque, tPhysics_object* pObject);
 
-tPhysics_object* C2_HOOK_FASTCALL SetUpHingePartners(br_vector3* pAngular, br_vector3* pLinear, br_vector3* pPartner_angular, br_vector3* pPartner_linear, tPhysics_object* pObject);
+extern tPhysics_object* C2_HOOK_FASTCALL SetUpHingePartners(br_vector3* pAngular, br_vector3* pLinear, br_vector3* pPartner_angular, br_vector3* pPartner_linear, tPhysics_object* pObject);
 
-void C2_HOOK_FASTCALL MakeMatrix(br_scalar* matrix, int dimension, tPhysics_joint_force* const* records, int count);
+extern void C2_HOOK_FASTCALL MakeMatrix(br_scalar* matrix, int dimension, tPhysics_joint_force* const* records, int count);
 
-void C2_HOOK_FASTCALL RestoreListOmega(tPhysics_object* object);
+extern void C2_HOOK_FASTCALL RestoreListOmega(tPhysics_object* object);
 
 // RestoreGroupOmegas
 
-int C2_HOOK_FASTCALL MakeVelocitiesVector2(br_scalar* pOutput, tPhysics_joint_force* const* pForces, int pCapacity, int pCount);
+extern int C2_HOOK_FASTCALL MakeVelocitiesVector2(br_scalar* pOutput, tPhysics_joint_force* const* pForces, int pCapacity, int pCount);
 
 // MakeVelocitiesVector
 
 // NewAddFrictionObjectObject
 
-void C2_HOOK_FASTCALL NewAddFriction(tPhysics_joint_force* force, tWorld_callbacks* callbacks);
+extern void C2_HOOK_FASTCALL NewAddFriction(tPhysics_joint_force* force, tWorld_callbacks* callbacks);
 
-int C2_HOOK_FASTCALL FUN_004baa00(tPhysics_object* objects);
+extern int C2_HOOK_FASTCALL FUN_004baa00(tPhysics_object* objects);
 
 // ApplyForces
 
-void C2_HOOK_FASTCALL DoJointFriction(tPhysics_object* object);
+extern void C2_HOOK_FASTCALL DoJointFriction(tPhysics_object* object);
 
 // ListDoJointFriction
 
-void C2_HOOK_FASTCALL PostAddFriction(tPhysics_object* object);
+extern void C2_HOOK_FASTCALL PostAddFriction(tPhysics_object* object);
 
 // RotateObjectSecondOrder
 
-void C2_HOOK_FAKE_THISCALL RotateObjectFirstOrder(tPhysics_object* pObject, undefined4 pUnused, br_scalar pTime);
+extern void C2_HOOK_FAKE_THISCALL RotateObjectFirstOrder(tPhysics_object* pObject, undefined4 pUnused, br_scalar pTime);
 
-void C2_HOOK_FAKE_THISCALL RotateObject(tPhysics_object* pObject, undefined4 pUnused, br_scalar pTime);
+extern void C2_HOOK_FAKE_THISCALL RotateObject(tPhysics_object* pObject, undefined4 pUnused, br_scalar pTime);
 
-void C2_HOOK_FAKE_THISCALL TranslateObject(tPhysics_object* pObject, undefined4 pUnused, br_scalar pTime);
+extern void C2_HOOK_FAKE_THISCALL TranslateObject(tPhysics_object* pObject, undefined4 pUnused, br_scalar pTime);
 
 // GetFacesNearObject
 
@@ -355,9 +355,9 @@ void C2_HOOK_FAKE_THISCALL TranslateObject(tPhysics_object* pObject, undefined4 
 
 // TrialPositionChildren
 
-void C2_HOOK_FASTCALL InternalPositionChildren(tPhysics_object* pParent, tPhysics_object* pRoot);
+extern void C2_HOOK_FASTCALL InternalPositionChildren(tPhysics_object* pParent, tPhysics_object* pRoot);
 
-void C2_HOOK_FASTCALL PositionChildren(tPhysics_object* pObject);
+extern void C2_HOOK_FASTCALL PositionChildren(tPhysics_object* pObject);
 
 // ApplyTorque
 
@@ -375,21 +375,21 @@ void C2_HOOK_FASTCALL PositionChildren(tPhysics_object* pObject);
 
 extern int gPhysics_rq_mode_6940b8;
 
-int C2_HOOK_FASTCALL FUN_004c3b60(br_scalar* original, br_scalar* rhs, br_scalar* result, int size, int unused1, unsigned char* excluded, int* excluded_count, int unconstrained, int unused2, const void* const* cached_groups, int group_count);
+extern int C2_HOOK_FASTCALL FUN_004c3b60(br_scalar* original, br_scalar* rhs, br_scalar* result, int size, int unused1, unsigned char* excluded, int* excluded_count, int unconstrained, int unused2, const void* const* cached_groups, int group_count);
 
-void C2_HOOK_FASTCALL FUN_004c61e0(const char* ignored);
+extern void C2_HOOK_FASTCALL FUN_004c61e0(const char* ignored);
 
-void C2_HOOK_FASTCALL RQExpand(br_scalar* matrix, const br_scalar* original, int old_size, int size, br_scalar* orthogonal, const unsigned char* indices);
+extern void C2_HOOK_FASTCALL RQExpand(br_scalar* matrix, const br_scalar* original, int old_size, int size, br_scalar* orthogonal, const unsigned char* indices);
 
-void C2_HOOK_FASTCALL RQSingleExpand(br_scalar* matrix, const br_scalar* original, int size, br_scalar* orthogonal, const unsigned char* indices);
+extern void C2_HOOK_FASTCALL RQSingleExpand(br_scalar* matrix, const br_scalar* original, int size, br_scalar* orthogonal, const unsigned char* indices);
 
-void C2_HOOK_FASTCALL RQFromCachedGroups(br_scalar* matrix, br_scalar* orthogonal, const br_scalar* original, br_scalar* result, const br_scalar* rhs, const unsigned char* indices, int size, const void* const* cached_groups, int group_count);
+extern void C2_HOOK_FASTCALL RQFromCachedGroups(br_scalar* matrix, br_scalar* orthogonal, const br_scalar* original, br_scalar* result, const br_scalar* rhs, const unsigned char* indices, int size, const void* const* cached_groups, int group_count);
 
-int C2_HOOK_FASTCALL RQDcmpV(br_scalar* matrix, int size, br_scalar* orthogonal);
+extern int C2_HOOK_FASTCALL RQDcmpV(br_scalar* matrix, int size, br_scalar* orthogonal);
 
 // MakeIdentity
 
-void C2_HOOK_FASTCALL SparseRQDcmpV(br_scalar* matrix, br_scalar* orthogonal, const br_scalar* rhs, br_scalar* result, int size);
+extern void C2_HOOK_FASTCALL SparseRQDcmpV(br_scalar* matrix, br_scalar* orthogonal, const br_scalar* rhs, br_scalar* result, int size);
 
 // MakeMatrixFromIndices
 
@@ -407,17 +407,17 @@ void C2_HOOK_FASTCALL SparseRQDcmpV(br_scalar* matrix, br_scalar* orthogonal, co
 
 // RQMatrixSolveWithNegatives
 
-int C2_HOOK_FASTCALL MatrixProcess(br_scalar* matrix, br_scalar* orthogonal, int size);
+extern int C2_HOOK_FASTCALL MatrixProcess(br_scalar* matrix, br_scalar* orthogonal, int size);
 
-void C2_HOOK_FASTCALL RqBackSub(br_scalar* matrix, br_scalar* orthogonal, const br_scalar* rhs, br_scalar* result, int size);
+extern void C2_HOOK_FASTCALL RqBackSub(br_scalar* matrix, br_scalar* orthogonal, const br_scalar* rhs, br_scalar* result, int size);
 
 extern void* gPhysics_scratch_ptr;
 
-void* C2_HOOK_FASTCALL GetPhysicsScratchPointer(int pSize);
+extern void* C2_HOOK_FASTCALL GetPhysicsScratchPointer(int pSize);
 
-void C2_HOOK_FASTCALL IncreasePhysicsScratchPointer(int pSize);
+extern void C2_HOOK_FASTCALL IncreasePhysicsScratchPointer(int pSize);
 
-void C2_HOOK_FASTCALL ClearPhysicsScratchSpace(void);
+extern void C2_HOOK_FASTCALL ClearPhysicsScratchSpace(void);
 
 extern tCollision_shape_sphere* C2_HOOK_FASTCALL AllocateShapeSphere(int pType);
 
@@ -451,11 +451,11 @@ extern void C2_HOOK_FASTCALL PhysicsSetErrorHandler(tPhysicsError_cbfn* pError_c
 
 // RepositionAndOrientateChildren
 
-void C2_HOOK_FASTCALL PhysicsAddObject(tPhysics_object* parent, tPhysics_object* child);
+extern void C2_HOOK_FASTCALL PhysicsAddObject(tPhysics_object* parent, tPhysics_object* child);
 
-void C2_HOOK_FASTCALL AddCollisionInfoChild(tPhysics_object* parent, tPhysics_object* list);
+extern void C2_HOOK_FASTCALL AddCollisionInfoChild(tPhysics_object* parent, tPhysics_object* list);
 
-void C2_HOOK_FASTCALL FUN_004c6410(tPhysics_object* object);
+extern void C2_HOOK_FASTCALL FUN_004c6410(tPhysics_object* object);
 
 extern int C2_HOOK_FASTCALL PhysicsObjectRecurse(tPhysics_object* pObject, tEnumCollision_cbfn* pCallback, void* pContext);
 
@@ -490,51 +490,51 @@ extern void C2_HOOK_FASTCALL InitPhysics(void);
 extern tU32 gPhysics_joints_changed_692dc8;
 extern tU32 gPhysics_group_limit_692dd8;
 
-void C2_HOOK_FASTCALL FUN_004b7220(tPhysics_object* pObject, const br_matrix34* pMatrix);
+extern void C2_HOOK_FASTCALL FUN_004b7220(tPhysics_object* pObject, const br_matrix34* pMatrix);
 
-int C2_HOOK_FASTCALL FUN_00428cf0(tPhysics_contact* output, int count, const tPhysics_contact* input, int input_count);
+extern int C2_HOOK_FASTCALL FUN_00428cf0(tPhysics_contact* output, int count, const tPhysics_contact* input, int input_count);
 
-void C2_HOOK_FASTCALL FUN_004bd4f0(const br_matrix34* child_matrix, const br_matrix34* parent_matrix, const br_vector3* child_axis0, const br_vector3* parent_axis0, const br_vector3* child_axis1, const br_vector3* unused_parent_axis1, br_vector3* reflected, br_vector3* bisector);
+extern void C2_HOOK_FASTCALL FUN_004bd4f0(const br_matrix34* child_matrix, const br_matrix34* parent_matrix, const br_vector3* child_axis0, const br_vector3* parent_axis0, const br_vector3* child_axis1, const br_vector3* unused_parent_axis1, br_vector3* reflected, br_vector3* bisector);
 
-int C2_HOOK_FASTCALL FUN_004bca10(tPhysics_object* object, tPhysics_joint_force* records, int count, int capacity);
+extern int C2_HOOK_FASTCALL FUN_004bca10(tPhysics_object* object, tPhysics_joint_force* records, int count, int capacity);
 
-int C2_HOOK_FASTCALL FUN_004bd6d0(tPhysics_object* list, tPhysics_joint_force* records, int count, int capacity);
+extern int C2_HOOK_FASTCALL FUN_004bd6d0(tPhysics_object* list, tPhysics_joint_force* records, int count, int capacity);
 
-void C2_HOOK_FAKE_THISCALL MoveJointedObject(tPhysics_object* pObject, undefined4 pUnused, br_scalar pTime);
+extern void C2_HOOK_FAKE_THISCALL MoveJointedObject(tPhysics_object* pObject, undefined4 pUnused, br_scalar pTime);
 
-void C2_HOOK_FASTCALL FUN_004b9750(tPhysics_object* object);
+extern void C2_HOOK_FASTCALL FUN_004b9750(tPhysics_object* object);
 
-void C2_HOOK_FASTCALL FUN_004c25a0(tPhysics_object* pObject);
+extern void C2_HOOK_FASTCALL FUN_004c25a0(tPhysics_object* pObject);
 
-void C2_HOOK_FASTCALL FUN_004bc190(tPhysics_joint_force* const* pForces, br_scalar* pImpulses, int pCount, tWorld_callbacks* pCallbacks);
+extern void C2_HOOK_FASTCALL FUN_004bc190(tPhysics_joint_force* const* pForces, br_scalar* pImpulses, int pCount, tWorld_callbacks* pCallbacks);
 
 extern tU32 gPhysics_group_counter_6940a0;
 
-void C2_HOOK_FASTCALL FUN_004bae80(tPhysics_object* object, tU32 label);
-void C2_HOOK_FASTCALL FUN_004bddd0(tPhysics_object* object, tPhysics_object* other);
-void C2_HOOK_FASTCALL CheckForObjectHierachyTouchingObjectList(tPhysics_object* object, tPhysics_object* list, tPhysics_object* original_list);
-void C2_HOOK_FASTCALL FUN_004be0e0(tPhysics_object* object, tPhysics_object* original_list);
+extern void C2_HOOK_FASTCALL FUN_004bae80(tPhysics_object* object, tU32 label);
+extern void C2_HOOK_FASTCALL FUN_004bddd0(tPhysics_object* object, tPhysics_object* other);
+extern void C2_HOOK_FASTCALL CheckForObjectHierachyTouchingObjectList(tPhysics_object* object, tPhysics_object* list, tPhysics_object* original_list);
+extern void C2_HOOK_FASTCALL FUN_004be0e0(tPhysics_object* object, tPhysics_object* original_list);
 
 extern tU32 gPhysics_prepared_objects_692dcc;
 extern tPhysics_object** gReduced_object_list;
 extern tU32 gPhysics_stationary_filter_6940ac;
 
-int C2_HOOK_FASTCALL CheckForObjectHierachyTouchingAnotherObject(tPhysics_object* object, tPhysics_object* other, tPhysics_object* original_list);
-void C2_HOOK_FASTCALL InternalPrepareObject(tPhysics_object* object);
-void C2_HOOK_FASTCALL PrepareObject(tPhysics_object* object, tPhysics_object** list_head);
-int C2_HOOK_FASTCALL FUN_004ba550(tPhysics_joint_force* records, br_scalar* impulses, int count, const int* indices, int selected_count, br_scalar maximum);
+extern int C2_HOOK_FASTCALL CheckForObjectHierachyTouchingAnotherObject(tPhysics_object* object, tPhysics_object* other, tPhysics_object* original_list);
+extern void C2_HOOK_FASTCALL InternalPrepareObject(tPhysics_object* object);
+extern void C2_HOOK_FASTCALL PrepareObject(tPhysics_object* object, tPhysics_object** list_head);
+extern int C2_HOOK_FASTCALL FUN_004ba550(tPhysics_joint_force* records, br_scalar* impulses, int count, const int* indices, int selected_count, br_scalar maximum);
 
-void C2_HOOK_FAKE_THISCALL FUN_004c2670(tPhysics_object* object, undefined4 unused_edx, br_scalar time);
-void C2_HOOK_FAKE_THISCALL InterpolateSingleObject(tPhysics_object* object, undefined4 unused_edx, br_scalar time);
-void C2_HOOK_FAKE_THISCALL FUN_004c28a0(tPhysics_object* list, undefined4 unused_edx, br_scalar time);
-void C2_HOOK_FASTCALL ResetObjectList(tPhysics_object* list);
-void C2_HOOK_FASTCALL FUN_004c62e0(tPhysics_object* object, const br_matrix34* matrix);
-void C2_HOOK_FASTCALL UpdateCollisionObject(tPhysics_object* object);
+extern void C2_HOOK_FAKE_THISCALL FUN_004c2670(tPhysics_object* object, undefined4 unused_edx, br_scalar time);
+extern void C2_HOOK_FAKE_THISCALL InterpolateSingleObject(tPhysics_object* object, undefined4 unused_edx, br_scalar time);
+extern void C2_HOOK_FAKE_THISCALL FUN_004c28a0(tPhysics_object* list, undefined4 unused_edx, br_scalar time);
+extern void C2_HOOK_FASTCALL ResetObjectList(tPhysics_object* list);
+extern void C2_HOOK_FASTCALL FUN_004c62e0(tPhysics_object* object, const br_matrix34* matrix);
+extern void C2_HOOK_FASTCALL UpdateCollisionObject(tPhysics_object* object);
 
-void C2_HOOK_FASTCALL FUN_004c29d0(tPhysics_object* object, const br_vector3* vector);
-void C2_HOOK_FASTCALL FUN_004c2910(tPhysics_object* object);
-void C2_HOOK_FASTCALL FUN_004c2c90(tPhysics_object* object, const br_vector3* damping);
-void C2_HOOK_FASTCALL FUN_004c2970(tPhysics_object* list);
-void C2_HOOK_FASTCALL FUN_004c2c30(tPhysics_object* object, const br_vector3* delta);
+extern void C2_HOOK_FASTCALL FUN_004c29d0(tPhysics_object* object, const br_vector3* vector);
+extern void C2_HOOK_FASTCALL FUN_004c2910(tPhysics_object* object);
+extern void C2_HOOK_FASTCALL FUN_004c2c90(tPhysics_object* object, const br_vector3* damping);
+extern void C2_HOOK_FASTCALL FUN_004c2970(tPhysics_object* list);
+extern void C2_HOOK_FASTCALL FUN_004c2c30(tPhysics_object* object, const br_vector3* delta);
 
 #endif // GUARD_49_PHYSICS_H

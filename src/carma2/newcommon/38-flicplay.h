@@ -31,13 +31,13 @@ extern int C2_HOOK_FASTCALL TranslationMode(void);
 
 // TurnFlicTransparencyOff
 
-void C2_HOOK_FASTCALL PlayFlicsFromDisk(void);
+extern void C2_HOOK_FASTCALL PlayFlicsFromDisk(void);
 
-void C2_HOOK_FASTCALL PlayFlicsFromMemory(void);
+extern void C2_HOOK_FASTCALL PlayFlicsFromMemory(void);
 
-void C2_HOOK_FASTCALL TurnOffPanelFlics(void);
+extern void C2_HOOK_FASTCALL TurnOffPanelFlics(void);
 
-void C2_HOOK_FASTCALL TurnOnPanelFlics(void);
+extern void C2_HOOK_FASTCALL TurnOnPanelFlics(void);
 
 extern void C2_HOOK_FASTCALL FlicPaletteAllocate(void);
 
@@ -89,8 +89,8 @@ extern void C2_HOOK_FASTCALL FlushFlicQueue(void);
 
 extern void C2_HOOK_FASTCALL LoadInterfaceStrings(void);
 
-void C2_HOOK_FASTCALL SuspendPendingFlic(void);
+extern void C2_HOOK_FASTCALL SuspendPendingFlic(void);
 
-void C2_HOOK_FASTCALL ResumePendingFlic(void);
+extern void C2_HOOK_FASTCALL ResumePendingFlic(void);
 
 #endif // GUARD_38_FLICPLAY_H

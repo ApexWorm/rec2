@@ -41,8 +41,8 @@ extern void C2_HOOK_FASTCALL SetDefaultPixelmapFolderName(void);
 
 extern char* gPedTexturePath;
 
-void C2_HOOK_FASTCALL ConfigureZombiePedTexturePath(void);
-void C2_HOOK_FASTCALL ConfigureBloodPedTexturePath(void);
-void C2_HOOK_FASTCALL ConfigureAlienPedTexturePath(void);
+extern void C2_HOOK_FASTCALL ConfigureZombiePedTexturePath(void);
+extern void C2_HOOK_FASTCALL ConfigureBloodPedTexturePath(void);
+extern void C2_HOOK_FASTCALL ConfigureAlienPedTexturePath(void);
 
 #endif // GUARD_63_LOADING3_H

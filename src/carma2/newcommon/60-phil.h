@@ -35,9 +35,9 @@ extern tU32 gPHIL_last_physics_tick;
 
 // FractionToScalar
 
-void C2_HOOK_FASTCALL GetOrientationFromMatrix(tU16* pOrientation, const br_matrix34* pMatrix);
+extern void C2_HOOK_FASTCALL GetOrientationFromMatrix(tU16* pOrientation, const br_matrix34* pMatrix);
 
-void C2_HOOK_FASTCALL GetMatrixFromOrientation(br_matrix34* pMatrix, const tU16* pOrientation);
+extern void C2_HOOK_FASTCALL GetMatrixFromOrientation(br_matrix34* pMatrix, const tU16* pOrientation);
 
 // OmegaCompScalarTo16
 
@@ -107,11 +107,11 @@ extern void C2_HOOK_FASTCALL MarkObjectAndChildrenAsPassive(tPhysics_object* obj
 
 // SetStandardGravity
 
-void C2_HOOK_FASTCALL LevelOutOnSurface(tPhysics_object* object);
+extern void C2_HOOK_FASTCALL LevelOutOnSurface(tPhysics_object* object);
 
 // PHILMungeObjects
 
-void C2_HOOK_FASTCALL PHILActivatePassive(tPhysics_object* object, undefined4 captured_edx);
+extern void C2_HOOK_FASTCALL PHILActivatePassive(tPhysics_object* object, undefined4 captured_edx);
 
 // PHILInterpolateObjects
 
@@ -119,7 +119,7 @@ void C2_HOOK_FASTCALL PHILActivatePassive(tPhysics_object* object, undefined4 ca
 
 // PHILApplyPHILObject
 
-void C2_HOOK_FASTCALL ProcessGravity(tPHIL_queued_header* header, tPhysics_object* object, br_scalar gravity);
-void C2_HOOK_FASTCALL ProcessDrag2(tPHIL_queued_header* header, tPhysics_object* object, br_scalar drag, int flags, tSpecial_volume* volume);
+extern void C2_HOOK_FASTCALL ProcessGravity(tPHIL_queued_header* header, tPhysics_object* object, br_scalar gravity);
+extern void C2_HOOK_FASTCALL ProcessDrag2(tPHIL_queued_header* header, tPhysics_object* object, br_scalar drag, int flags, tSpecial_volume* volume);
 
 #endif // GUARD_60_PHIL_H

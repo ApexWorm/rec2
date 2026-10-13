@@ -1379,7 +1379,6 @@ void C2_HOOK_FASTCALL MakeJointVelocitiesVector(br_scalar* pOutput, tPhysics_joi
 
 // SkipForces
 
-
 typedef struct tForce_group_container {
     int count;
     tPhysics_joint_force* records;
@@ -1653,7 +1652,6 @@ void C2_HOOK_FASTCALL CreateJointTorque(tPhysics_object* pObject, tPhysics_objec
 // GroupLimitOmega
 
 // PositionWorldJointedObject
-
 
 #if defined(__GNUC__) && defined(__i386__)
 static tU32 C2_HOOK_CDECL HierarchyTimeWord(const br_scalar* pTime) {

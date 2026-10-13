@@ -116,8 +116,8 @@ extern void C2_HOOK_FASTCALL SetDefaultTextFileName(void);
 
 extern const char* gPedTextTxtPath;
 
-void C2_HOOK_FASTCALL ConfigureZombiePedTextTxtPath(void);
-void C2_HOOK_FASTCALL ConfigureBloodPedTextTxtPath(void);
-void C2_HOOK_FASTCALL ConfigureAlienPedTextTxtPath(void);
+extern void C2_HOOK_FASTCALL ConfigureZombiePedTextTxtPath(void);
+extern void C2_HOOK_FASTCALL ConfigureBloodPedTextTxtPath(void);
+extern void C2_HOOK_FASTCALL ConfigureAlienPedTextTxtPath(void);
 
 #endif // GUARD_10_LOADING2_H

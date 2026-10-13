@@ -131,7 +131,7 @@ extern int gTraffic_disabled;
 
 extern void C2_HOOK_FASTCALL SetTrafficOn(int pTraffic_on);
 
-int C2_HOOK_FASTCALL GetDronesOn(void);
+extern int C2_HOOK_FASTCALL GetDronesOn(void);
 
 // LoadPanGameDroneInfo
 
