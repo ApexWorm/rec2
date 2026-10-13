@@ -228,7 +228,7 @@ int C2_HOOK_FASTCALL FUN_0041e480(br_vector3* pPosition, br_vector3* pDirection,
     index=((tPhysics_object*)pObject)->box_face_start;
     face=&gFace_list__car[index];
     while ((tS32)index < ((tPhysics_object*)pObject)->box_face_end) {
-        if (!*(const int*)&gCollision_skip_pling_faces || !(face->flags&0x80)) {
+        if (!gCollision_skip_pling_faces || !(face->flags&0x80)) {
             CheckSingleFace(face,pPosition,pDirection,&normal,&distance,&collision);
             if (AutoVolumeUnordered(distance) || AutoVolumeUnordered(*pDistance) || distance < *pDistance) {
                 AutoVolumeCopy(pDistance,&distance);

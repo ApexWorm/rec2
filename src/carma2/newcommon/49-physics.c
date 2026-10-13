@@ -6003,7 +6003,7 @@ static tPhysics_object* C2_HOOK_CDECL WakePointer(const void* base, unsigned off
 #define WakeJoint(p) ((tPhysics_joint*)WakePointer((p),0x188))
 #define WAKE_LABEL(p) (*(tU8*)((tU8*)(p)+0x1dc))
 #define WAKE_RING(p) (*(tU32*)((tU8*)(p)+0x1d8))
-#define WAKE_COUNTER (*(tU32*)&gPhysics_group_counter_6940a0)
+#define WAKE_COUNTER (gPhysics_group_counter_6940a0)
 #define WAKE_DISABLED(p) (*(tU8*)((tU8*)(p)+0xec))
 #define WAKE_FACE(p) (*(tU16*)((tU8*)(p)+0x178))
 
@@ -6164,7 +6164,7 @@ static void C2_HOOK_CDECL WakeDescendants(tPhysics_object* object) {
     child=WakeChild(object);
     while(child!=NULL) {
         if(WAKE_DISABLED(child)!=0) {
-            tU32 face=(tU32)*(int*)&gFace_num__car;
+            tU32 face=(tU32)gFace_num__car;
             WAKE_DISABLED(child)=0;
             WAKE_FACE(child)=(tU16)(face-2u);
         }
@@ -6182,7 +6182,7 @@ void C2_HOOK_FASTCALL CheckForObjectHierachyTouchingObjectList(tPhysics_object* 
         if(WAKE_DISABLED(list)!=0) {
             if(WakeBounds(object,list)) {
                 root=WakeAncestor(list);
-                face=(tU32)*(int*)&gFace_num__car;
+                face=(tU32)gFace_num__car;
                 WAKE_DISABLED(root)=0;
                 WAKE_FACE(root)=(tU16)(face-2u);
                 if(WakeChild(root)!=NULL || WakeJoint(root)!=NULL || WakePointer(root,0x18c)!=NULL)WakeDescendants(root);
@@ -6193,7 +6193,7 @@ void C2_HOOK_FASTCALL CheckForObjectHierachyTouchingObjectList(tPhysics_object* 
                 while(child!=NULL) {
                     if(WakeBounds(child,list)) {
                         root=WakeAncestor(list);
-                        face=(tU32)*(int*)&gFace_num__car;
+                        face=(tU32)gFace_num__car;
                         captured_child=WakeChild(root);
                         WAKE_FACE(root)=(tU16)(face-2u);
                         WAKE_DISABLED(root)=0;
@@ -6218,7 +6218,7 @@ void C2_HOOK_FASTCALL FUN_004be0e0(tPhysics_object* object, tPhysics_object* ori
     tU32 face;
     if(WAKE_DISABLED(object)==0)return;
     root=WakeAncestor(object);
-    face=(tU32)*(int*)&gFace_num__car;
+    face=(tU32)gFace_num__car;
     WAKE_DISABLED(root)=0;
     WAKE_FACE(root)=(tU16)(face-2u);
     if(WakeChild(root)!=NULL || WakeJoint(root)!=NULL || WakePointer(root,0x18c)!=NULL)WakeDescendants(root);
@@ -6267,7 +6267,7 @@ int C2_HOOK_FASTCALL CheckForObjectHierachyTouchingAnotherObject(tPhysics_object
     }
     if (WAKE_DISABLED(other) != 0) {
         root = WakeAncestor(other);
-        face = (tU32)*(int*)&gFace_num__car;
+        face = (tU32)gFace_num__car;
         WAKE_DISABLED(root) = 0;
         WAKE_FACE(root) = (tU16)(face - 2u);
         if (WakeChild(root) != NULL || WakeJoint(root) != NULL || WakePointer(root, 0x18c) != NULL) {
@@ -6465,7 +6465,7 @@ void C2_HOOK_FASTCALL PrepareObject(tPhysics_object* object, tPhysics_object** l
     tU8 disabled;
 
     InternalPrepareObject(object);
-    *(tU32*)&gPhysics_prepared_objects_692dcc = 1;
+    gPhysics_prepared_objects_692dcc = 1;
     neighbor = PreparePointer(object, 0x22c);
     if (neighbor != NULL && PhysicsLessOrUnordered(PrepareScalarPointer(object, 0xb0), PrepareScalarPointer(neighbor, 0xb0))) {
         do {
@@ -6494,13 +6494,13 @@ void C2_HOOK_FASTCALL PrepareObject(tPhysics_object* object, tPhysics_object** l
             neighbor = PreparePointer(object, 0x220);
         }
     }
-    if (*(tU32*)&gPhysics_stationary_filter_6940ac != 0) {
+    if (gPhysics_stationary_filter_6940ac != 0) {
         disabled = PrepareByte(object, 0xec);
         /* The original dereferences list_head even for an active object. */
         original_list = PreparePointer(list_head, 0);
         if (disabled != 0) {
             root = WakeAncestor(object);
-            face = (tU32)*(int*)&gFace_num__car;
+            face = (tU32)gFace_num__car;
             PrepareWriteByte(root, 0xec, 0);
             *(tU16*)((tU8*)root + 0x178) = (tU16)(face - 2u);
             if (PreparePointer(root, 0x224) != NULL || PreparePointer(root, 0x188) != NULL || PreparePointer(root, 0x18c) != NULL) WakeDescendants(root);
@@ -6522,7 +6522,7 @@ void C2_HOOK_FASTCALL PrepareObject(tPhysics_object* object, tPhysics_object** l
             }
         }
     }
-    reduced = *(tPhysics_object***)&gReduced_object_list;
+    reduced = gReduced_object_list;
     if (reduced != NULL) {
         before = PreparePointer(reduced, 0);
         PrepareWriteWord(object, 0x234, (tU32)(uintptr_t)before);
@@ -6562,7 +6562,7 @@ int C2_HOOK_FASTCALL FUN_004ba550(tPhysics_joint_force* records, br_scalar* impu
     if (PhysicsWallNaN(sum) || PhysicsWallNaN((double)maximum) || !(sum > (double)maximum)) return 0;
 
     wide_ratio = (double)maximum / sum;
-    *(tU32*)&gPhysics_joints_changed_692dc8 = 1;
+    gPhysics_joints_changed_692dc8 = 1;
     ratio = (br_scalar)wide_ratio;
     for (i = 0; i < count; ++i) {
         impulse = ClampScalar(impulses, (tU32)i * 4u);

@@ -50,7 +50,7 @@ br_uint_32 C2_HOOK_FASTCALL DeleteBastards(br_actor* actor, br_matrix34* matrix,
     }
 
 add_actor:
-    count = *(const int*)&gDelete_count;
+    count = gDelete_count;
     while ((tS32)index < count) {
         if (EditorDeleteRead(gDelete_list, index * 4u) == actor_word) {
             return 0;

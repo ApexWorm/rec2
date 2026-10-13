@@ -135,7 +135,7 @@ void C2_HOOK_FASTCALL SetTrafficOn(int pTraffic_on) {
 
 // FUNCTION: CARMA2_HW 0x0044ed00
 int C2_HOOK_FASTCALL GetDronesOn(void) {
-    return *(int*)&gTraffic_disabled == 0;
+    return gTraffic_disabled == 0;
 }
 
 // LoadPanGameDroneInfo

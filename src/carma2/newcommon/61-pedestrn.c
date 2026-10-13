@@ -400,8 +400,8 @@ static void C2_HOOK_CDECL PedCacheWrite(void* base, tU32 offset, tU32 value) {
 
 // FUNCTION: CARMA2_HW 0x004d6c70
 void C2_HOOK_FASTCALL FlushAllPedCaches(void) {
-    tS32 count = *(int*)&gPed_count;
-    tPedestrian* base = *(tPedestrian**)&gPedestrian_array;
+    tS32 count = gPed_count;
+    tPedestrian* base = gPedestrian_array;
     tU32 row = (tU32)(uintptr_t)base + 0x0cu;
     tU32 index = 0;
     tU32 object;
@@ -420,7 +420,7 @@ void C2_HOOK_FASTCALL FlushAllPedCaches(void) {
                 PedCacheWrite((void*)(uintptr_t)object, 0xb0, 0);
             }
         }
-        count = *(int*)&gPed_count;
+        count = gPed_count;
         index += 1u;
         row += 0x54u;
     } while ((tS32)index < count);
@@ -474,23 +474,23 @@ void C2_HOOK_FASTCALL SetAlienPedFolderNames(void) {
 
 // FUNCTION: CARMA2_HW 0x004d6fc0
 int C2_HOOK_FASTCALL GetHowMuchBloodAndSnotToSmearAbout(void) {
-    tU32 level = (tU32)*(int*)&gGoreLevel;
+    tU32 level = (tU32)gGoreLevel;
     return (tS32)(2u - level);
 }
 
 // FUNCTION: CARMA2_HW 0x004d6fd0
 int C2_HOOK_FASTCALL GetAnimalsOn(void) {
-    return *(int*)&gAnimalsOn;
+    return gAnimalsOn;
 }
 
 // FUNCTION: CARMA2_HW 0x004d6fe0
 int C2_HOOK_FASTCALL IsItOkayToFireHorribleBallsOfNastyNapalmDeathAtPerfectlyInnocentPassersByAndByInnocentIDoMeanInTheBiblicalSense(void) {
-    return *(int*)&gFlameThrowerOn;
+    return gFlameThrowerOn;
 }
 
 // FUNCTION: CARMA2_HW 0x004d6ff0
 int C2_HOOK_FASTCALL IsItReallyOKThatWeDontMakeAnyEffortToProtectAnySadFuckersOutThereThatDontWishToSeeInnocentPeopleBlownToBitsByHighExplosiveMinesAndShells(void) {
-    return *(int*)&gExplosives_on;
+    return gExplosives_on;
 }
 
 // FUNCTION: CARMA2_HW 0x004d7000

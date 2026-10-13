@@ -1179,7 +1179,7 @@ void C2_HOOK_FASTCALL PipeSingleSound(tS3_outlet* pOutlet, int pSound, tS3_volum
     tU32 packed_volume;
     int outlet_index;
 
-    if (*(const int*)&gAction_replay_mode != 0
+    if (gAction_replay_mode != 0
         || !((const tProgram_state*)&gProgram_state)->racing) {
         return;
     }

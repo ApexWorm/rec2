@@ -214,7 +214,7 @@ int C2_HOOK_FASTCALL SetPedSpeed(tPowerup* powerup, tCar_spec* car) {
 
     (void)car;
     *(tPedPowerupWord*)&gPedestrian_speed_factor = speed;
-    captured_array = *(tPowerup**)&gPowerup_array;
+    captured_array = gPowerup_array;
     return PedPowerupIndex(powerup, captured_array);
 }
 
@@ -224,19 +224,19 @@ int C2_HOOK_FASTCALL SetPedSpeed(tPowerup* powerup, tCar_spec* car) {
 
 // FUNCTION: CARMA2_HW 0x004dc7d0
 int C2_HOOK_FASTCALL SetPedExplode(tPowerup* powerup, tCar_spec* car) {
-    tPowerup* captured_array = *(tPowerup**)&gPowerup_array;
+    tPowerup* captured_array = gPowerup_array;
 
     (void)car;
-    *(int*)&gExploding_pedestrians = 1;
+    gExploding_pedestrians = 1;
     return PedPowerupIndex(powerup, captured_array);
 }
 
 // FUNCTION: CARMA2_HW 0x004dc800
 int C2_HOOK_FASTCALL SetPedBrittle(tPowerup* powerup, tCar_spec* car) {
-    tPowerup* captured_array = *(tPowerup**)&gPowerup_array;
+    tPowerup* captured_array = gPowerup_array;
 
     (void)car;
-    *(int*)&gPed_dismemberfest = 1;
+    gPed_dismemberfest = 1;
     return PedPowerupIndex(powerup, captured_array);
 }
 
@@ -249,9 +249,9 @@ int C2_HOOK_FASTCALL SetFreeRepairs(tPowerup* powerup, tCar_spec* car) {
     tPowerup* captured_array;
 
     if (car != NULL && *(const tPedPowerupWord*)(uintptr_t)((tU32)(uintptr_t)car + 0xcu) == 8u) {
-        *(int*)&gFree_repairs = 1;
+        gFree_repairs = 1;
     }
-    captured_array = *(tPowerup**)&gPowerup_array;
+    captured_array = gPowerup_array;
     return PedPowerupIndex(powerup, captured_array);
 }
 
@@ -259,16 +259,16 @@ int C2_HOOK_FASTCALL SetFreeRepairs(tPowerup* powerup, tCar_spec* car) {
 void C2_HOOK_FASTCALL ResetFreeRepairs(tPowerup* powerup, tCar_spec* car) {
     (void)powerup;
     if (car != NULL && *(const tPedPowerupWord*)(uintptr_t)((tU32)(uintptr_t)car + 0xcu) == 8u) {
-        *(int*)&gFree_repairs = 0;
+        gFree_repairs = 0;
     }
 }
 
 // FUNCTION: CARMA2_HW 0x004dc8f0
 int C2_HOOK_FASTCALL SetStupidPedestrians(tPowerup* powerup, tCar_spec* car) {
-    tPowerup* captured_array = *(tPowerup**)&gPowerup_array;
+    tPowerup* captured_array = gPowerup_array;
 
     (void)car;
-    *(int*)&gBlind_pedestrians = 1;
+    gBlind_pedestrians = 1;
     return PedPowerupIndex(powerup, captured_array);
 }
 
@@ -284,9 +284,9 @@ int C2_HOOK_FASTCALL FreezeTimer(tPowerup* powerup, tCar_spec* car) {
     tPowerup* captured_array;
 
     if (car != NULL && *(const tPedPowerupWord*)(uintptr_t)((tU32)(uintptr_t)car + 0xcu) == 8u) {
-        *(int*)&gFreeze_timer = (*(int*)&gFreeze_timer == 0);
+        gFreeze_timer = (gFreeze_timer == 0);
     }
-    captured_array = *(tPowerup**)&gPowerup_array;
+    captured_array = gPowerup_array;
     return PedPowerupIndex(powerup, captured_array);
 }
 
@@ -294,7 +294,7 @@ int C2_HOOK_FASTCALL FreezeTimer(tPowerup* powerup, tCar_spec* car) {
 void C2_HOOK_FASTCALL UnfreezeTimer(tPowerup* powerup, tCar_spec* car) {
     (void)powerup;
     if (car != NULL && *(const tPedPowerupWord*)(uintptr_t)((tU32)(uintptr_t)car + 0xcu) == 8u) {
-        *(int*)&gFreeze_timer = 0;
+        gFreeze_timer = 0;
     }
 }
 
@@ -315,14 +315,14 @@ void C2_HOOK_FASTCALL ResetPedSpeed(tPowerup* powerup, tCar_spec* car) {
 void C2_HOOK_FASTCALL ResetPedExplode(tPowerup* powerup, tCar_spec* car) {
     (void)powerup;
     (void)car;
-    *(int*)&gExploding_pedestrians = 0;
+    gExploding_pedestrians = 0;
 }
 
 // FUNCTION: CARMA2_HW 0x004dca20
 void C2_HOOK_FASTCALL ResetPedBrittle(tPowerup* powerup, tCar_spec* car) {
     (void)powerup;
     (void)car;
-    *(int*)&gPed_dismemberfest = 0;
+    gPed_dismemberfest = 0;
 }
 
 // SetEngineFactor
@@ -332,7 +332,7 @@ int C2_HOOK_FASTCALL SetUnderwater(tPowerup* powerup, tCar_spec* car) {
     tPowerup* captured_array;
 
     *(tPedPowerupWord*)(uintptr_t)((tU32)(uintptr_t)car + 0x1b0u) = 1u;
-    captured_array = *(tPowerup**)&gPowerup_array;
+    captured_array = gPowerup_array;
     return PedPowerupIndex(powerup, captured_array);
 }
 
@@ -354,7 +354,7 @@ int C2_HOOK_FASTCALL SetCopsSpeed(tPowerup* powerup, tCar_spec* car) {
 
     (void)car;
     *(tPedPowerupWord*)&gCop_speed_factor = value;
-    captured_array = *(tPowerup**)&gPowerup_array;
+    captured_array = gPowerup_array;
     return PedPowerupIndex(powerup, captured_array);
 }
 
@@ -386,7 +386,7 @@ int C2_HOOK_FASTCALL SetPinball(tPowerup* powerup, tCar_spec* car) {
 
     (void)car;
     *(tPedPowerupWord*)&gPinball_factor = value;
-    captured_array = *(tPowerup**)&gPowerup_array;
+    captured_array = gPowerup_array;
     return PedPowerupIndex(powerup, captured_array);
 }
 
@@ -395,7 +395,7 @@ int C2_HOOK_FASTCALL SetWallclimb(tPowerup* powerup, tCar_spec* car) {
     tPowerup* captured_array;
 
     *(tPedPowerupWord*)(uintptr_t)((tU32)(uintptr_t)car + 0x1c4u) = 1u;
-    captured_array = *(tPowerup**)&gPowerup_array;
+    captured_array = gPowerup_array;
     return PedPowerupIndex(powerup, captured_array);
 }
 
@@ -411,7 +411,7 @@ int C2_HOOK_FASTCALL SetBouncey(tPowerup* powerup, tCar_spec* car) {
     amount = *(const tPedPowerupWord*)(uintptr_t)(parameters + 4u);
     *(tPedPowerupWord*)(uintptr_t)((tU32)(uintptr_t)car + 0x1598u) = 0u;
     *(tPedPowerupWord*)(uintptr_t)((tU32)(uintptr_t)car + 0x4c4u) = amount;
-    captured_array = *(tPowerup**)&gPowerup_array;
+    captured_array = gPowerup_array;
     return PedPowerupIndex(powerup, captured_array);
 }
 
@@ -424,16 +424,16 @@ int C2_HOOK_FASTCALL SetTyreGrip(tPowerup* powerup, tCar_spec* car) {
     tPowerup* captured_array;
 
     *(tPedPowerupWord*)(uintptr_t)((tU32)(uintptr_t)car + 0x4d0u) = value;
-    captured_array = *(tPowerup**)&gPowerup_array;
+    captured_array = gPowerup_array;
     return PedPowerupIndex(powerup, captured_array);
 }
 
 // FUNCTION: CARMA2_HW 0x004dcf00
 int C2_HOOK_FASTCALL SetImmortalPeds(tPowerup* powerup, tCar_spec* car) {
-    tPowerup* captured_array = *(tPowerup**)&gPowerup_array;
+    tPowerup* captured_array = gPowerup_array;
 
     (void)car;
-    *(int*)&gImmortal_peds = 1;
+    gImmortal_peds = 1;
     return PedPowerupIndex(powerup, captured_array);
 }
 
@@ -446,10 +446,10 @@ void C2_HOOK_FASTCALL ResetImmortalPeds(tPowerup* powerup, tCar_spec* car) {
 
 // FUNCTION: CARMA2_HW 0x004dcf40
 int C2_HOOK_FASTCALL SetSuicidalPedestrians(tPowerup* powerup, tCar_spec* car) {
-    tPowerup* captured_array = *(tPowerup**)&gPowerup_array;
+    tPowerup* captured_array = gPowerup_array;
 
     (void)car;
-    *(int*)&gPeds_suicidal = 1;
+    gPeds_suicidal = 1;
     return PedPowerupIndex(powerup, captured_array);
 }
 
@@ -467,7 +467,7 @@ int C2_HOOK_FASTCALL SetDamageMultiplier(tPowerup* powerup, tCar_spec* car) {
     tPowerup* captured_array;
 
     *(tPedPowerupWord*)(uintptr_t)((tU32)(uintptr_t)car + 0x4ccu) = value;
-    captured_array = *(tPowerup**)&gPowerup_array;
+    captured_array = gPowerup_array;
     return PedPowerupIndex(powerup, captured_array);
 }
 
@@ -588,9 +588,9 @@ int C2_HOOK_FASTCALL SetInstantHandbrake(tPowerup* powerup, tCar_spec* car) {
     tPowerup* captured_array;
 
     if (car != NULL && *(const tPedPowerupWord*)(uintptr_t)((tU32)(uintptr_t)car + 0xcu) == 8u) {
-        *(int*)&gInstant_handbrake = 1;
+        gInstant_handbrake = 1;
     }
-    captured_array = *(tPowerup**)&gPowerup_array;
+    captured_array = gPowerup_array;
     return PedPowerupIndex(powerup, captured_array);
 }
 
@@ -598,25 +598,25 @@ int C2_HOOK_FASTCALL SetInstantHandbrake(tPowerup* powerup, tCar_spec* car) {
 void C2_HOOK_FASTCALL ResetInstantHandbrake(tPowerup* powerup, tCar_spec* car) {
     (void)powerup;
     if (car != NULL && *(const tPedPowerupWord*)(uintptr_t)((tU32)(uintptr_t)car + 0xcu) == 8u) {
-        *(int*)&gInstant_handbrake = 0;
+        gInstant_handbrake = 0;
     }
 }
 
 // FUNCTION: CARMA2_HW 0x004de870
 int C2_HOOK_FASTCALL SetDancingPeds(tPowerup* powerup, tCar_spec* car) {
-    tPowerup* captured_array = *(tPowerup**)&gPowerup_array;
+    tPowerup* captured_array = gPowerup_array;
 
     (void)car;
-    *(int*)&gDancing_peds = 1;
+    gDancing_peds = 1;
     return PedPowerupIndex(powerup, captured_array);
 }
 
 // FUNCTION: CARMA2_HW 0x004de8a0
 int C2_HOOK_FASTCALL SetPanickingPeds(tPowerup* powerup, tCar_spec* car) {
-    tPowerup* captured_array = *(tPowerup**)&gPowerup_array;
+    tPowerup* captured_array = gPowerup_array;
 
     (void)car;
-    *(int*)&gPanicking_peds = 1;
+    gPanicking_peds = 1;
     return PedPowerupIndex(powerup, captured_array);
 }
 
@@ -636,10 +636,10 @@ int C2_HOOK_FASTCALL SetLowGravityPeds(tPowerup* pPowerup, tCar_spec* pCar) {
 
 // FUNCTION: CARMA2_HW 0x004de900
 int C2_HOOK_FASTCALL SetPissedPeds(tPowerup* powerup, tCar_spec* car) {
-    tPowerup* captured_array = *(tPowerup**)&gPowerup_array;
+    tPowerup* captured_array = gPowerup_array;
 
     (void)car;
-    *(int*)&gDrunk_pedestrians = 1;
+    gDrunk_pedestrians = 1;
     return PedPowerupIndex(powerup, captured_array);
 }
 
@@ -649,14 +649,14 @@ int C2_HOOK_FASTCALL SetPissedPeds(tPowerup* powerup, tCar_spec* car) {
 void C2_HOOK_FASTCALL ResetDancingPeds(tPowerup* powerup, tCar_spec* car) {
     (void)powerup;
     (void)car;
-    *(int*)&gDancing_peds = 0;
+    gDancing_peds = 0;
 }
 
 // FUNCTION: CARMA2_HW 0x004de970
 void C2_HOOK_FASTCALL ResetPanickingPeds(tPowerup* powerup, tCar_spec* car) {
     (void)powerup;
     (void)car;
-    *(int*)&gPanicking_peds = 0;
+    gPanicking_peds = 0;
 }
 
 // FUNCTION: CARMA2_HW 0x004de980
@@ -670,7 +670,7 @@ void C2_HOOK_FASTCALL ResetLowGravityPeds(tPowerup* pPowerup, tCar_spec* pCar) {
 void C2_HOOK_FASTCALL ResetPissedPeds(tPowerup* powerup, tCar_spec* car) {
     (void)powerup;
     (void)car;
-    *(int*)&gDrunk_pedestrians = 0;
+    gDrunk_pedestrians = 0;
 }
 
 // ResetGhostPeds
@@ -688,9 +688,9 @@ int C2_HOOK_FASTCALL ShowPedestrians(tPowerup* powerup, tCar_spec* car) {
     tPowerup* captured_array;
 
     if (car != NULL && *(const tPedPowerupWord*)(uintptr_t)((tU32)(uintptr_t)car + 0xcu) == 8u) {
-        *(int*)&gShow_peds_on_map = 1;
+        gShow_peds_on_map = 1;
     }
-    captured_array = *(tPowerup**)&gPowerup_array;
+    captured_array = gPowerup_array;
     return PedPowerupIndex(powerup, captured_array);
 }
 
@@ -698,7 +698,7 @@ int C2_HOOK_FASTCALL ShowPedestrians(tPowerup* powerup, tCar_spec* car) {
 void C2_HOOK_FASTCALL HidePedestrians(tPowerup* powerup, tCar_spec* car) {
     (void)powerup;
     if (car != NULL && *(const tPedPowerupWord*)(uintptr_t)((tU32)(uintptr_t)car + 0xcu) == 8u) {
-        *(int*)&gShow_peds_on_map = 0;
+        gShow_peds_on_map = 0;
     }
 }
 
@@ -710,7 +710,7 @@ int C2_HOOK_FASTCALL SetElectroBastard(tPowerup* powerup, tCar_spec* car) {
     tPowerup* captured_array;
 
     *(float*)(uintptr_t)((tU32)(uintptr_t)car + 0x170cu) = (float)squared;
-    captured_array = *(tPowerup**)&gPowerup_array;
+    captured_array = gPowerup_array;
     return PedPowerupIndex(powerup, captured_array);
 }
 
@@ -728,7 +728,7 @@ int C2_HOOK_FASTCALL SetMutantCorpses(tPowerup* powerup, tCar_spec* car) {
 
     (void)car;
     *(tPedPowerupWord*)&gMutant_speed = value;
-    captured_array = *(tPowerup**)&gPowerup_array;
+    captured_array = gPowerup_array;
     return PedPowerupIndex(powerup, captured_array);
 }
 

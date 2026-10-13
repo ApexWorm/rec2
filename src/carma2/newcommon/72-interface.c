@@ -1516,7 +1516,7 @@ static tU32 C2_HOOK_CDECL FrontendScrollRead(tU32 address) {
 
 // FUNCTION: CARMA2_HW 0x00471cf0
 tFrontend_slider* C2_HOOK_FASTCALL GetAnyActiveSlider(void) {
-    tFrontend_slider* slider = *(tFrontend_slider**)&gCurrent_frontend_scrollbars;
+    tFrontend_slider* slider = gCurrent_frontend_scrollbars;
     tS32 selected;
 
     if (slider == NULL) {
@@ -1601,7 +1601,7 @@ void C2_HOOK_FASTCALL Generic_LinkOutEffect(void) {
 
 // FUNCTION: CARMA2_HW 0x00471d30
 tConnected_items* C2_HOOK_FASTCALL GetScrollSet(int pItem) {
-    tConnected_items* scrollset = *(tConnected_items**)&gConnected_items;
+    tConnected_items* scrollset = gConnected_items;
 
     while (scrollset != NULL) {
         tU32 base = (tU32)(uintptr_t)scrollset;
