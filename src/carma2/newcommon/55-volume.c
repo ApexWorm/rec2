@@ -101,16 +101,7 @@ static int C2_HOOK_CDECL AutoVolumeUnordered(double value) {
     bits.d=value;
     return (bits.w[1]&0x7ff00000u)==0x7ff00000u && ((bits.w[1]&0xfffffu)||bits.w[0]);
 }
-/* Paired payloads571..586 expose modern MSVC's different NaN selection. */
-static double C2_HOOK_CDECL AutoVolumeAdd(double a,double b) {
-    double result;
-    result=a+b;
-    return result;
-}
 
-static double C2_HOOK_CDECL AutoVolumeRow(const br_scalar* pRow,const br_vector3* pNormal) {
-    return AutoVolumeAdd(AutoVolumeAdd((double)pRow[1]*pNormal->v[1],(double)pRow[0]*pNormal->v[0]),(double)pRow[2]*pNormal->v[2]);
-}
 
 // FUNCTION: CARMA2_HW 0x004ff5d0
 void C2_HOOK_FASTCALL TestAutoSpecialVolume(tPhysics_object* pObject) {
@@ -119,15 +110,15 @@ void C2_HOOK_FASTCALL TestAutoSpecialVolume(tPhysics_object* pObject) {
     br_scalar first_distance,second_distance;
     tSpecial_volume* default_water;
     int i;
-    for(i=0;i<3;i++) lower=AutoVolumeAdd(lower,AutoVolumeRow(pObject->transform_matrix.m[i],&pObject->water_normal)*pObject->bb2.min.v[i]);
-    lower=AutoVolumeAdd(lower,AutoVolumeAdd(AutoVolumeAdd((double)pObject->transform_matrix.m[3][2]*pObject->water_normal.v[2],(double)pObject->transform_matrix.m[3][1]*pObject->water_normal.v[1]),(double)pObject->transform_matrix.m[3][0]*pObject->water_normal.v[0]));
+    for(i=0;i<3;i++) lower=(lower+(((((((double)pObject->transform_matrix.m[i][1]*pObject->water_normal.v[1])+((double)pObject->transform_matrix.m[i][0]*pObject->water_normal.v[0])))+((double)pObject->transform_matrix.m[i][2]*pObject->water_normal.v[2])))*pObject->bb2.min.v[i]));
+    lower=(lower+((((((double)pObject->transform_matrix.m[3][2]*pObject->water_normal.v[2])+((double)pObject->transform_matrix.m[3][1]*pObject->water_normal.v[1])))+((double)pObject->transform_matrix.m[3][0]*pObject->water_normal.v[0]))));
     upper=lower;
     for(i=0;i<3;i++) {
         const br_scalar* row=pObject->transform_matrix.m[i];
         width=(double)pObject->bb2.max.v[i]-pObject->bb2.min.v[i];
-        increment=AutoVolumeAdd(AutoVolumeAdd((double)row[0]*pObject->water_normal.v[0],(double)row[2]*pObject->water_normal.v[2]),(double)row[1]*pObject->water_normal.v[1])*width;
-        if(AutoVolumeUnordered(increment)||increment<0.) lower=AutoVolumeAdd(lower,AutoVolumeScalar(increment));
-        else upper=AutoVolumeAdd(upper,AutoVolumeScalar(increment));
+        increment=(((((double)row[0]*pObject->water_normal.v[0])+((double)row[2]*pObject->water_normal.v[2])))+((double)row[1]*pObject->water_normal.v[1]))*width;
+        if(AutoVolumeUnordered(increment)||increment<0.) lower=(lower+(AutoVolumeScalar(increment)));
+        else upper=(upper+(AutoVolumeScalar(increment)));
     }
     if(!AutoVolumeUnordered(lower)&&!AutoVolumeUnordered(pObject->water_d)&&!(lower<pObject->water_d)) {
         pObject->auto_special_volume=NULL;
@@ -151,7 +142,7 @@ void C2_HOOK_FASTCALL TestAutoSpecialVolume(tPhysics_object* pObject) {
             edge.v[0]=(br_scalar)AutoVolumeScalar((double)row[0]*width);
             edge.v[2]=(br_scalar)AutoVolumeScalar((double)row[2]*width);
             edge.v[1]=(br_scalar)AutoVolumeScalar((double)row[1]*width);
-            dot=AutoVolumeAdd(AutoVolumeAdd((double)pObject->water_normal.v[0]*edge.v[0],(double)pObject->water_normal.v[2]*edge.v[2]),(double)pObject->water_normal.v[1]*edge.v[1]);
+            dot=(((((double)pObject->water_normal.v[0]*edge.v[0])+((double)pObject->water_normal.v[2]*edge.v[2])))+((double)pObject->water_normal.v[1]*edge.v[1]));
             if(!AutoVolumeUnordered(dot)&&dot>0.) {
                 high_x+=edge.v[0];
                 high.v[1]=(br_scalar)AutoVolumeScalar((double)high.v[1]+edge.v[1]);

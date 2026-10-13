@@ -8,7 +8,6 @@
 
 static int C2_HOOK_FASTCALL FinterayBoxNaN(double value);
 static void C2_HOOK_FASTCALL FinterayBoxCopyScalar(br_scalar* output, const br_scalar* input);
-static double C2_HOOK_FASTCALL FinterayShapeLoadScalar(const br_scalar* input);
 
 // GLOBAL: CARMA2_HW 0x005964c0
 int gPling_materials = 1;
@@ -70,14 +69,6 @@ static br_scalar C2_HOOK_FASTCALL FinterayEdgeScalar(double value) {
 #pragma auto_inline(on)
 #endif
 
-/* Modern SSE subtraction selects a different NaN operand from the original
- * FLD/FSUB. Retain that instruction order and the unspilled PC53 difference. */
-static double C2_HOOK_FASTCALL FinterayEdgeDifference(const br_scalar* a, const br_scalar* b) {
-    double result;
-
-    result = (double)*a - *b;
-    return result;
-}
 
 // FUNCTION: CARMA2_HW 0x0045cd90
 int C2_HOOK_FASTCALL PickBoundsTestRay__finteray(br_bounds* b, br_vector3* rp, br_vector3* rd, br_scalar t_near, br_scalar t_far, br_scalar* new_t_near, br_scalar* new_t_far) {
@@ -422,48 +413,48 @@ void C2_HOOK_FASTCALL StationarySphereEdgeCollide(br_vector3* pEdge_start, br_ve
     br_scalar normal_y;
     br_scalar squared;
 
-    x = FinterayShapeLoadScalar(&pSphere_end->v[0]) - FinterayShapeLoadScalar(&pEdge_start->v[0]);
-    y = FinterayShapeLoadScalar(&pSphere_end->v[1]) - FinterayShapeLoadScalar(&pEdge_start->v[1]);
-    z = FinterayShapeLoadScalar(&pSphere_end->v[2]) - FinterayShapeLoadScalar(&pEdge_start->v[2]);
-    projection = ((x * FinterayShapeLoadScalar(&pEdge_direction->v[0])
-        + FinterayShapeLoadScalar(&pEdge_direction->v[1]) * y) + z * FinterayShapeLoadScalar(&pEdge_direction->v[2])) / pEdge_length_squared;
+    x = (*(const br_scalar*)(&pSphere_end->v[0])) - (*(const br_scalar*)(&pEdge_start->v[0]));
+    y = (*(const br_scalar*)(&pSphere_end->v[1])) - (*(const br_scalar*)(&pEdge_start->v[1]));
+    z = (*(const br_scalar*)(&pSphere_end->v[2])) - (*(const br_scalar*)(&pEdge_start->v[2]));
+    projection = ((x * (*(const br_scalar*)(&pEdge_direction->v[0]))
+        + (*(const br_scalar*)(&pEdge_direction->v[1])) * y) + z * (*(const br_scalar*)(&pEdge_direction->v[2]))) / pEdge_length_squared;
     ratio = FinterayEdgeScalar(projection);
     if (FinterayBoxNaN(projection) || !(projection > 0.0)) {
         FinterayBoxCopyScalar(&pPoint->v[0], &pEdge_start->v[0]);
         FinterayBoxCopyScalar(&pPoint->v[1], &pEdge_start->v[1]);
         FinterayBoxCopyScalar(&pPoint->v[2], &pEdge_start->v[2]);
     } else if (ratio < 1.0f || FinterayBoxNaN(ratio)) {
-        pPoint->v[0] = FinterayEdgeScalar(FinterayShapeLoadScalar(&pEdge_direction->v[0]) * ratio);
-        product = FinterayShapeLoadScalar(&pEdge_direction->v[1]) * ratio;
-        point_x = FinterayShapeLoadScalar(&pPoint->v[0]);
+        pPoint->v[0] = FinterayEdgeScalar((*(const br_scalar*)(&pEdge_direction->v[0])) * ratio);
+        product = (*(const br_scalar*)(&pEdge_direction->v[1])) * ratio;
+        point_x = (*(const br_scalar*)(&pPoint->v[0]));
         pPoint->v[1] = FinterayEdgeScalar(product);
-        pPoint->v[2] = FinterayEdgeScalar(FinterayShapeLoadScalar(&pEdge_direction->v[2]) * ratio);
-        pPoint->v[0] = FinterayEdgeScalar(point_x + FinterayShapeLoadScalar(&pEdge_start->v[0]));
-        pPoint->v[1] = FinterayEdgeScalar(FinterayShapeLoadScalar(&pEdge_start->v[1]) + FinterayShapeLoadScalar(&pPoint->v[1]));
-        pPoint->v[2] = FinterayEdgeScalar(FinterayShapeLoadScalar(&pEdge_start->v[2]) + FinterayShapeLoadScalar(&pPoint->v[2]));
+        pPoint->v[2] = FinterayEdgeScalar((*(const br_scalar*)(&pEdge_direction->v[2])) * ratio);
+        pPoint->v[0] = FinterayEdgeScalar(point_x + (*(const br_scalar*)(&pEdge_start->v[0])));
+        pPoint->v[1] = FinterayEdgeScalar((*(const br_scalar*)(&pEdge_start->v[1])) + (*(const br_scalar*)(&pPoint->v[1])));
+        pPoint->v[2] = FinterayEdgeScalar((*(const br_scalar*)(&pEdge_start->v[2])) + (*(const br_scalar*)(&pPoint->v[2])));
     } else {
         FinterayBoxCopyScalar(&pPoint->v[0], &pEdge_end->v[0]);
         FinterayBoxCopyScalar(&pPoint->v[1], &pEdge_end->v[1]);
         FinterayBoxCopyScalar(&pPoint->v[2], &pEdge_end->v[2]);
     }
-    pNormal->v[0] = FinterayEdgeScalar(FinterayEdgeDifference(&pPoint->v[0], &pSphere_end->v[0]));
-    product = FinterayEdgeDifference(&pPoint->v[1], &pSphere_end->v[1]);
+    pNormal->v[0] = FinterayEdgeScalar(((double)pPoint->v[0] - pSphere_end->v[0]));
+    product = ((double)pPoint->v[1] - pSphere_end->v[1]);
     FinterayBoxCopyScalar(&normal_x, &pNormal->v[0]);
     pNormal->v[1] = FinterayEdgeScalar(product);
-    z = FinterayEdgeDifference(&pPoint->v[2], &pSphere_end->v[2]);
-    normal_y = FinterayEdgeScalar(FinterayShapeLoadScalar(&pNormal->v[1]));
+    z = ((double)pPoint->v[2] - pSphere_end->v[2]);
+    normal_y = FinterayEdgeScalar((*(const br_scalar*)(&pNormal->v[1])));
     squared = FinterayEdgeScalar((normal_y * (double)normal_y + z * z) + normal_x * (double)normal_x);
     pNormal->v[2] = FinterayEdgeScalar(z);
-    radius_squared = FinterayShapeLoadScalar(&pSphere->radius_squared);
+    radius_squared = (*(const br_scalar*)(&pSphere->radius_squared));
     if (!FinterayBoxNaN(squared) && !FinterayBoxNaN(radius_squared) && squared > radius_squared) {
-        limit = FinterayShapeLoadScalar(&pSphere->radius) * 0.002f;
-        limit = FinterayShapeLoadScalar(&pSphere->radius_squared) - limit * -2.0f;
+        limit = (*(const br_scalar*)(&pSphere->radius)) * 0.002f;
+        limit = (*(const br_scalar*)(&pSphere->radius_squared)) - limit * -2.0f;
         if (squared < limit || FinterayBoxNaN(limit)) {
             length = sqrt((double)squared);
             *pT = 1.0f;
-            pNormal->v[0] = FinterayEdgeScalar(FinterayShapeLoadScalar(&pNormal->v[0]) / length);
-            pNormal->v[1] = FinterayEdgeScalar(FinterayShapeLoadScalar(&pNormal->v[1]) / length);
-            pNormal->v[2] = FinterayEdgeScalar(FinterayShapeLoadScalar(&pNormal->v[2]) / length);
+            pNormal->v[0] = FinterayEdgeScalar((*(const br_scalar*)(&pNormal->v[0])) / length);
+            pNormal->v[1] = FinterayEdgeScalar((*(const br_scalar*)(&pNormal->v[1])) / length);
+            pNormal->v[2] = FinterayEdgeScalar((*(const br_scalar*)(&pNormal->v[2])) / length);
         }
     }
 }
@@ -489,41 +480,41 @@ void C2_HOOK_FASTCALL PointSphereCollision(br_vector3* pVertex, br_vector3* pSph
     br_scalar time_scalar;
 
     (void)pSphere_end;
-    direction_y = FinterayShapeLoadScalar(&pSphere_direction->v[1]);
-    direction_z = FinterayShapeLoadScalar(&pSphere_direction->v[2]);
-    y = FinterayShapeLoadScalar(&pVertex->v[1]) - FinterayShapeLoadScalar(&pSphere_start->v[1]);
-    z = FinterayShapeLoadScalar(&pVertex->v[2]) - FinterayShapeLoadScalar(&pSphere_start->v[2]);
-    direction_x = FinterayShapeLoadScalar(&pSphere_direction->v[0]);
-    x = FinterayShapeLoadScalar(&pVertex->v[0]) - FinterayShapeLoadScalar(&pSphere_start->v[0]);
+    direction_y = (*(const br_scalar*)(&pSphere_direction->v[1]));
+    direction_z = (*(const br_scalar*)(&pSphere_direction->v[2]));
+    y = (*(const br_scalar*)(&pVertex->v[1])) - (*(const br_scalar*)(&pSphere_start->v[1]));
+    z = (*(const br_scalar*)(&pVertex->v[2])) - (*(const br_scalar*)(&pSphere_start->v[2]));
+    direction_x = (*(const br_scalar*)(&pSphere_direction->v[0]));
+    x = (*(const br_scalar*)(&pVertex->v[0])) - (*(const br_scalar*)(&pSphere_start->v[0]));
     delta.v[0] = FinterayEdgeScalar(x);
     delta.v[1] = FinterayEdgeScalar(y);
     delta.v[2] = FinterayEdgeScalar(z);
     direction_squared = FinterayEdgeScalar((direction_y * direction_y + direction_z * direction_z) + direction_x * direction_x);
-    projection = ((direction_z * delta.v[2] + FinterayShapeLoadScalar(&pSphere_direction->v[1]) * delta.v[1])
-        + FinterayShapeLoadScalar(&pSphere_direction->v[0]) * delta.v[0]) / direction_squared;
+    projection = ((direction_z * delta.v[2] + (*(const br_scalar*)(&pSphere_direction->v[1])) * delta.v[1])
+        + (*(const br_scalar*)(&pSphere_direction->v[0])) * delta.v[0]) / direction_squared;
     projection_scalar = FinterayEdgeScalar(projection);
     distance = ((x * delta.v[0] + y * delta.v[1]) + z * delta.v[2]) - (projection * projection_scalar) * direction_squared;
     distance_squared = FinterayEdgeScalar(distance);
-    if (distance_squared > FinterayShapeLoadScalar(&pSphere->radius_squared)) {
+    if (distance_squared > (*(const br_scalar*)(&pSphere->radius_squared))) {
         return;
     }
-    time = projection_scalar - sqrt((FinterayShapeLoadScalar(&pSphere->radius_squared) - distance_squared) / direction_squared);
+    time = projection_scalar - sqrt(((*(const br_scalar*)(&pSphere->radius_squared)) - distance_squared) / direction_squared);
     time_scalar = FinterayEdgeScalar(time);
     if (!(time >= 0.0) || time_scalar > 1.0f) {
         return;
     }
     FinterayBoxCopyScalar(&pPoint->v[0], &pVertex->v[0]);
     FinterayBoxCopyScalar(&pPoint->v[1], &pVertex->v[1]);
-    point_z = FinterayShapeLoadScalar(&pVertex->v[2]);
+    point_z = (*(const br_scalar*)(&pVertex->v[2]));
     pPoint->v[2] = FinterayEdgeScalar(point_z);
-    direction_y = FinterayShapeLoadScalar(&pSphere_direction->v[1]) * time_scalar;
-    direction_x = FinterayShapeLoadScalar(&pSphere_direction->v[0]) * time_scalar;
-    direction_z = FinterayShapeLoadScalar(&pSphere_direction->v[2]) * time_scalar;
-    direction_x += FinterayShapeLoadScalar(&pSphere_start->v[0]);
-    direction_y += FinterayShapeLoadScalar(&pSphere_start->v[1]);
-    direction_z += FinterayShapeLoadScalar(&pSphere_start->v[2]);
-    x = FinterayShapeLoadScalar(&pPoint->v[0]) - direction_x;
-    y = FinterayShapeLoadScalar(&pPoint->v[1]) - direction_y;
+    direction_y = (*(const br_scalar*)(&pSphere_direction->v[1])) * time_scalar;
+    direction_x = (*(const br_scalar*)(&pSphere_direction->v[0])) * time_scalar;
+    direction_z = (*(const br_scalar*)(&pSphere_direction->v[2])) * time_scalar;
+    direction_x += (*(const br_scalar*)(&pSphere_start->v[0]));
+    direction_y += (*(const br_scalar*)(&pSphere_start->v[1]));
+    direction_z += (*(const br_scalar*)(&pSphere_start->v[2]));
+    x = (*(const br_scalar*)(&pPoint->v[0])) - direction_x;
+    y = (*(const br_scalar*)(&pPoint->v[1])) - direction_y;
     z = point_z - direction_z;
     length = sqrt((x * x + y * y) + z * z);
     if (length > 2.3841858e-7f) {
@@ -575,12 +566,12 @@ void C2_HOOK_FASTCALL SphereEdgeCollide(br_vector3* pEdge_start, br_vector3* pEd
     int endpoint;
 
     *pT = 100.0f;
-    ex = FinterayEdgeDifference(&pEdge_end->v[0], &pEdge_start->v[0]);
-    ey = FinterayEdgeDifference(&pEdge_end->v[1], &pEdge_start->v[1]);
-    sx = FinterayEdgeDifference(&pSphere_end->v[0], &pSphere_start->v[0]);
-    sy = FinterayEdgeDifference(&pSphere_end->v[1], &pSphere_start->v[1]);
-    ez = FinterayEdgeDifference(&pEdge_end->v[2], &pEdge_start->v[2]);
-    sz = FinterayEdgeDifference(&pSphere_end->v[2], &pSphere_start->v[2]);
+    ex = ((double)pEdge_end->v[0] - pEdge_start->v[0]);
+    ey = ((double)pEdge_end->v[1] - pEdge_start->v[1]);
+    sx = ((double)pSphere_end->v[0] - pSphere_start->v[0]);
+    sy = ((double)pSphere_end->v[1] - pSphere_start->v[1]);
+    ez = ((double)pEdge_end->v[2] - pEdge_start->v[2]);
+    sz = ((double)pSphere_end->v[2] - pSphere_start->v[2]);
     edge.v[0] = FinterayEdgeScalar(ex);
     edge.v[1] = FinterayEdgeScalar(ey);
     edge.v[2] = FinterayEdgeScalar(ez);
@@ -595,9 +586,9 @@ void C2_HOOK_FASTCALL SphereEdgeCollide(br_vector3* pEdge_start, br_vector3* pEd
     perpendicular.v[0] = FinterayEdgeScalar(sphere_direction.v[0] - (double)along.v[0]);
     perpendicular.v[1] = FinterayEdgeScalar(sphere_direction.v[1] - (double)along.v[1]);
     perpendicular.v[2] = FinterayEdgeScalar(sphere_direction.v[2] - (double)along.v[2]);
-    offset.v[0] = FinterayEdgeScalar(FinterayEdgeDifference(&pEdge_start->v[0], &pSphere_start->v[0]));
-    offset.v[1] = FinterayEdgeScalar(FinterayEdgeDifference(&pEdge_start->v[1], &pSphere_start->v[1]));
-    offset.v[2] = FinterayEdgeScalar(FinterayEdgeDifference(&pEdge_start->v[2], &pSphere_start->v[2]));
+    offset.v[0] = FinterayEdgeScalar(((double)pEdge_start->v[0] - pSphere_start->v[0]));
+    offset.v[1] = FinterayEdgeScalar(((double)pEdge_start->v[1] - pSphere_start->v[1]));
+    offset.v[2] = FinterayEdgeScalar(((double)pEdge_start->v[2] - pSphere_start->v[2]));
     edge_squared = FinterayEdgeScalar(edge_length);
     projection = FinterayEdgeScalar(-((offset.v[0] * (double)edge.v[0] + offset.v[1] * (double)edge.v[1])
         + offset.v[2] * (double)edge.v[2]) / edge_squared);
@@ -621,12 +612,12 @@ void C2_HOOK_FASTCALL SphereEdgeCollide(br_vector3* pEdge_start, br_vector3* pEd
     distance = ((shifted.v[0] * (double)shifted.v[0] + shifted.v[1] * (double)shifted.v[1])
         + shifted.v[2] * (double)shifted.v[2]) - ((x * perpendicular.v[0] + y * perpendicular.v[1]) + z * z);
     distance_scalar = FinterayEdgeScalar(distance);
-    limit = FinterayShapeLoadScalar(&pSphere->radius) * 0.002f;
-    limit = FinterayShapeLoadScalar(&pSphere->radius_squared) - limit * -2.0f;
+    limit = (*(const br_scalar*)(&pSphere->radius)) * 0.002f;
+    limit = (*(const br_scalar*)(&pSphere->radius_squared)) - limit * -2.0f;
     if (!FinterayBoxNaN(distance) && !FinterayBoxNaN(limit) && distance > limit) {
         return;
     }
-    closest = FinterayShapeLoadScalar(&pSphere->radius_squared);
+    closest = (*(const br_scalar*)(&pSphere->radius_squared));
     if (FinterayBoxNaN(distance_scalar) || FinterayBoxNaN(closest) || distance_scalar <= closest) {
         time = FinterayEdgeScalar(time - sqrt((closest - distance_scalar) / perpendicular_squared));
         x = (along.v[0] * (double)time + shifted.v[0]) - offset.v[0];
@@ -645,18 +636,18 @@ void C2_HOOK_FASTCALL SphereEdgeCollide(br_vector3* pEdge_start, br_vector3* pEd
                 return;
             }
         } else if (!FinterayBoxNaN(time) && time >= 0.0f && time <= 1.0f) {
-            pPoint->v[0] = FinterayEdgeScalar(FinterayShapeLoadScalar(&pEdge_start->v[0]) + movement.v[0]);
-            pPoint->v[1] = FinterayEdgeScalar(movement.v[1] + FinterayShapeLoadScalar(&pEdge_start->v[1]));
-            point_z = FinterayEdgeScalar(movement.v[2] + FinterayShapeLoadScalar(&pEdge_start->v[2]));
+            pPoint->v[0] = FinterayEdgeScalar((*(const br_scalar*)(&pEdge_start->v[0])) + movement.v[0]);
+            pPoint->v[1] = FinterayEdgeScalar(movement.v[1] + (*(const br_scalar*)(&pEdge_start->v[1])));
+            point_z = FinterayEdgeScalar(movement.v[2] + (*(const br_scalar*)(&pEdge_start->v[2])));
             pPoint->v[2] = point_z;
-            motion_x = FinterayEdgeScalar(FinterayEdgeDifference(&pSphere_end->v[0], &pSphere_start->v[0]) * time);
-            y = FinterayEdgeDifference(&pSphere_end->v[1], &pSphere_start->v[1]) * time;
-            z = FinterayEdgeDifference(&pSphere_end->v[2], &pSphere_start->v[2]) * time;
-            x = FinterayShapeLoadScalar(&pSphere_start->v[0]) + motion_x;
-            y += FinterayShapeLoadScalar(&pSphere_start->v[1]);
-            z += FinterayShapeLoadScalar(&pSphere_start->v[2]);
-            x = FinterayShapeLoadScalar(&pPoint->v[0]) - x;
-            y = FinterayShapeLoadScalar(&pPoint->v[1]) - y;
+            motion_x = FinterayEdgeScalar(((double)pSphere_end->v[0] - pSphere_start->v[0]) * time);
+            y = ((double)pSphere_end->v[1] - pSphere_start->v[1]) * time;
+            z = ((double)pSphere_end->v[2] - pSphere_start->v[2]) * time;
+            x = (*(const br_scalar*)(&pSphere_start->v[0])) + motion_x;
+            y += (*(const br_scalar*)(&pSphere_start->v[1]));
+            z += (*(const br_scalar*)(&pSphere_start->v[2]));
+            x = (*(const br_scalar*)(&pPoint->v[0])) - x;
+            y = (*(const br_scalar*)(&pPoint->v[1])) - y;
             z = point_z - z;
             length = sqrt((x * x + y * y) + z * z);
             if (!FinterayBoxNaN(length) && length > 2.3841858e-7f) {
@@ -889,12 +880,6 @@ void C2_HOOK_FASTCALL MultiRayCheckSingleFace(int pNum_rays, tFace_ref* pFace, b
     }
 }
 
-/* Preserve the original NaN operand choice during bounds accumulation. */
-static double C2_HOOK_FASTCALL FinterayBoundsAdd(const br_scalar* a, const br_scalar* b) {
-    double result;
-    result = (double)*a + *b;
-    return result;
-}
 
 // FUNCTION: CARMA2_HW 0x0045f5b0
 void C2_HOOK_FASTCALL GetNewBoundingBox(br_bounds* b2, br_bounds* b1, br_matrix34* m) {
@@ -916,9 +901,9 @@ void C2_HOOK_FASTCALL GetNewBoundingBox(br_bounds* b2, br_bounds* b1, br_matrix3
     for (i = 0; i < 3; i++) {
         for (j = 0; j < 3; j++) {
             if (!(c[j].v[i] >= 0.f)) {
-                b2->min.v[i] = FinterayScalar(FinterayBoundsAdd(&b2->min.v[i], &c[j].v[i]));
+                b2->min.v[i] = FinterayScalar(((double)b2->min.v[i] + c[j].v[i]));
             } else {
-                b2->max.v[i] = FinterayScalar(FinterayBoundsAdd(&b2->max.v[i], &c[j].v[i]));
+                b2->max.v[i] = FinterayScalar(((double)b2->max.v[i] + c[j].v[i]));
             }
         }
     }
@@ -1450,11 +1435,6 @@ int C2_HOOK_FASTCALL LineBoxCollWithSphere(br_vector3* pStart, br_vector3* pEnd,
     return 0x40;
 }
 
-/* Shape data can overlap the intersection/normal outputs. Reload each scalar
- * at the original arithmetic read boundary rather than retaining a member. */
-static double C2_HOOK_FASTCALL FinterayShapeLoadScalar(const br_scalar* input) {
-    return *(const br_scalar*)input;
-}
 
 // FUNCTION: CARMA2_HW 0x00460f60
 int C2_HOOK_FASTCALL LineSphereColl(br_vector3* pStart, br_vector3* pEnd, tCollision_shape_sphere_data* pSphere, br_vector3* pPoint, br_vector3* pNormal, br_scalar* pT) {
@@ -1481,7 +1461,7 @@ int C2_HOOK_FASTCALL LineSphereColl(br_vector3* pStart, br_vector3* pEnd, tColli
     offset.v[0] = FinterayScalar(x);
     offset.v[1] = FinterayScalar(y);
     offset.v[2] = FinterayScalar(z);
-    squared = (x * FinterayShapeLoadScalar(&offset.v[0]) + y * FinterayShapeLoadScalar(&offset.v[1])) + FinterayShapeLoadScalar(&offset.v[2]) * FinterayShapeLoadScalar(&offset.v[2]);
+    squared = (x * (*(const br_scalar*)(&offset.v[0])) + y * (*(const br_scalar*)(&offset.v[1]))) + (*(const br_scalar*)(&offset.v[2])) * (*(const br_scalar*)(&offset.v[2]));
     offset_squared = FinterayScalar(squared);
     if (!(squared >= pSphere->radius_squared)) {
         return -1;
@@ -1492,40 +1472,40 @@ int C2_HOOK_FASTCALL LineSphereColl(br_vector3* pStart, br_vector3* pEnd, tColli
     direction.v[0] = FinterayScalar(x);
     direction.v[1] = FinterayScalar(y);
     direction.v[2] = FinterayScalar(z);
-    squared = (x * FinterayShapeLoadScalar(&direction.v[0]) + y * FinterayShapeLoadScalar(&direction.v[1])) + FinterayShapeLoadScalar(&direction.v[2]) * FinterayShapeLoadScalar(&direction.v[2]);
+    squared = (x * (*(const br_scalar*)(&direction.v[0])) + y * (*(const br_scalar*)(&direction.v[1]))) + (*(const br_scalar*)(&direction.v[2])) * (*(const br_scalar*)(&direction.v[2]));
     direction_squared = FinterayScalar(squared);
     if (!(squared >= 1e-6)) {
         return 0;
     }
-    projection = ((FinterayShapeLoadScalar(&offset.v[0]) * FinterayShapeLoadScalar(&direction.v[0]) + FinterayShapeLoadScalar(&offset.v[1]) * FinterayShapeLoadScalar(&direction.v[1])) + FinterayShapeLoadScalar(&offset.v[2]) * FinterayShapeLoadScalar(&direction.v[2])) / FinterayShapeLoadScalar(&direction_squared);
-    perpendicular = FinterayShapeLoadScalar(&offset_squared) - projection * projection * FinterayShapeLoadScalar(&direction_squared);
+    projection = (((*(const br_scalar*)(&offset.v[0])) * (*(const br_scalar*)(&direction.v[0])) + (*(const br_scalar*)(&offset.v[1])) * (*(const br_scalar*)(&direction.v[1]))) + (*(const br_scalar*)(&offset.v[2])) * (*(const br_scalar*)(&direction.v[2]))) / (*(const br_scalar*)(&direction_squared));
+    perpendicular = (*(const br_scalar*)(&offset_squared)) - projection * projection * (*(const br_scalar*)(&direction_squared));
     if (perpendicular > pSphere->radius_squared) {
         return 0;
     }
-    t = FinterayScalar(projection - sqrt(((double)pSphere->radius_squared - perpendicular) / FinterayShapeLoadScalar(&direction_squared)));
+    t = FinterayScalar(projection - sqrt(((double)pSphere->radius_squared - perpendicular) / (*(const br_scalar*)(&direction_squared))));
     FinterayBoxStoreScalar(pT, &t);
     if (!(t >= 0.0f) || t > 1.0f) {
         return 0;
     }
-    point_x = FinterayShapeLoadScalar(&direction.v[0]) * t + pStart->v[0];
-    point_y = FinterayShapeLoadScalar(&direction.v[1]) * t;
-    point_z = FinterayShapeLoadScalar(&direction.v[2]) * t;
+    point_x = (*(const br_scalar*)(&direction.v[0])) * t + pStart->v[0];
+    point_y = (*(const br_scalar*)(&direction.v[1])) * t;
+    point_z = (*(const br_scalar*)(&direction.v[2])) * t;
     pPoint->v[0] = FinterayScalar(point_x);
     pPoint->v[1] = FinterayScalar(point_y + pStart->v[1]);
     pPoint->v[2] = FinterayScalar(point_z + pStart->v[2]);
     if (pNormal != NULL) {
-        pNormal->v[0] = FinterayScalar(FinterayShapeLoadScalar(&pSphere->center.v[0]) - FinterayShapeLoadScalar(&pPoint->v[0]));
-        pNormal->v[1] = FinterayScalar(FinterayShapeLoadScalar(&pSphere->center.v[1]) - FinterayShapeLoadScalar(&pPoint->v[1]));
-        z = FinterayShapeLoadScalar(&pSphere->center.v[2]) - FinterayShapeLoadScalar(&pPoint->v[2]);
-        x = FinterayShapeLoadScalar(&pNormal->v[0]);
-        y = FinterayShapeLoadScalar(&pNormal->v[1]);
+        pNormal->v[0] = FinterayScalar((*(const br_scalar*)(&pSphere->center.v[0])) - (*(const br_scalar*)(&pPoint->v[0])));
+        pNormal->v[1] = FinterayScalar((*(const br_scalar*)(&pSphere->center.v[1])) - (*(const br_scalar*)(&pPoint->v[1])));
+        z = (*(const br_scalar*)(&pSphere->center.v[2])) - (*(const br_scalar*)(&pPoint->v[2]));
+        x = (*(const br_scalar*)(&pNormal->v[0]));
+        y = (*(const br_scalar*)(&pNormal->v[1]));
         length = sqrt((x * x + y * y) + z * FinterayScalar(z));
         pNormal->v[2] = FinterayScalar(z);
         if (length > 2.3841858e-7f) {
             scale = 1.0 / length;
-            y = FinterayShapeLoadScalar(&pNormal->v[1]);
-            z = FinterayShapeLoadScalar(&pNormal->v[2]);
-            pNormal->v[0] = FinterayScalar(scale * FinterayShapeLoadScalar(&pNormal->v[0]));
+            y = (*(const br_scalar*)(&pNormal->v[1]));
+            z = (*(const br_scalar*)(&pNormal->v[2]));
+            pNormal->v[0] = FinterayScalar(scale * (*(const br_scalar*)(&pNormal->v[0])));
             pNormal->v[1] = FinterayScalar(y * scale);
             pNormal->v[2] = FinterayScalar(z * scale);
         } else {
@@ -1555,24 +1535,24 @@ int C2_HOOK_FASTCALL LineSphereCollWithSphere(br_vector3* pStart, br_vector3* pE
     if (result != 0) {
         return result;
     }
-    pNormal->v[0] = FinterayScalar(FinterayShapeLoadScalar(&pSphere->center.v[0]) - pEnd->v[0]);
-    pNormal->v[1] = FinterayScalar(FinterayShapeLoadScalar(&pSphere->center.v[1]) - pEnd->v[1]);
-    z = FinterayShapeLoadScalar(&pSphere->center.v[2]) - pEnd->v[2];
-    squared = ((double)FinterayShapeLoadScalar(&pNormal->v[0]) * FinterayShapeLoadScalar(&pNormal->v[0]) + (double)FinterayShapeLoadScalar(&pNormal->v[1]) * FinterayShapeLoadScalar(&pNormal->v[1])) + z * FinterayScalar(z);
+    pNormal->v[0] = FinterayScalar((*(const br_scalar*)(&pSphere->center.v[0])) - pEnd->v[0]);
+    pNormal->v[1] = FinterayScalar((*(const br_scalar*)(&pSphere->center.v[1])) - pEnd->v[1]);
+    z = (*(const br_scalar*)(&pSphere->center.v[2])) - pEnd->v[2];
+    squared = ((double)(*(const br_scalar*)(&pNormal->v[0])) * (*(const br_scalar*)(&pNormal->v[0])) + (double)(*(const br_scalar*)(&pNormal->v[1])) * (*(const br_scalar*)(&pNormal->v[1]))) + z * FinterayScalar(z);
     pNormal->v[2] = FinterayScalar(z);
     squared_scalar = FinterayScalar(squared);
-    if (squared > FinterayShapeLoadScalar(&pSphere->radius_squared) - (FinterayShapeLoadScalar(&pSphere->radius_squared) * 0.002f) * -2.0f) {
+    if (squared > (*(const br_scalar*)(&pSphere->radius_squared)) - ((*(const br_scalar*)(&pSphere->radius_squared)) * 0.002f) * -2.0f) {
         return 0;
     }
-    if (!(squared >= FinterayShapeLoadScalar(&pSphere->radius_squared))) {
+    if (!(squared >= (*(const br_scalar*)(&pSphere->radius_squared)))) {
         return 0;
     }
     length = sqrt((double)squared_scalar);
     if (length > 2.3841858e-7f) {
         scale = 1.0 / length;
-        y = FinterayShapeLoadScalar(&pNormal->v[1]);
-        normal_z = FinterayShapeLoadScalar(&pNormal->v[2]);
-        pNormal->v[0] = FinterayScalar(scale * FinterayShapeLoadScalar(&pNormal->v[0]));
+        y = (*(const br_scalar*)(&pNormal->v[1]));
+        normal_z = (*(const br_scalar*)(&pNormal->v[2]));
+        pNormal->v[0] = FinterayScalar(scale * (*(const br_scalar*)(&pNormal->v[0])));
         pNormal->v[1] = FinterayScalar(y * scale);
         pNormal->v[2] = FinterayScalar(normal_z * scale);
     } else {
@@ -1580,17 +1560,17 @@ int C2_HOOK_FASTCALL LineSphereCollWithSphere(br_vector3* pStart, br_vector3* pE
         pNormal->v[1] = 0.0f;
         pNormal->v[2] = 0.0f;
     }
-    pPoint->v[0] = FinterayScalar(FinterayShapeLoadScalar(&pSphere->radius) * FinterayShapeLoadScalar(&pNormal->v[0]));
-    point_x = (br_scalar)FinterayShapeLoadScalar(&pPoint->v[0]);
-    point_y = (double)FinterayShapeLoadScalar(&pNormal->v[1]) * FinterayShapeLoadScalar(&pSphere->radius);
+    pPoint->v[0] = FinterayScalar((*(const br_scalar*)(&pSphere->radius)) * (*(const br_scalar*)(&pNormal->v[0])));
+    point_x = (br_scalar)(*(const br_scalar*)(&pPoint->v[0]));
+    point_y = (double)(*(const br_scalar*)(&pNormal->v[1])) * (*(const br_scalar*)(&pSphere->radius));
     pPoint->v[1] = FinterayScalar(point_y);
-    point_y = FinterayShapeLoadScalar(&pPoint->v[1]);
-    point_z = (double)FinterayShapeLoadScalar(&pNormal->v[2]) * FinterayShapeLoadScalar(&pSphere->radius);
+    point_y = (*(const br_scalar*)(&pPoint->v[1]));
+    point_z = (double)(*(const br_scalar*)(&pNormal->v[2])) * (*(const br_scalar*)(&pSphere->radius));
     pPoint->v[2] = FinterayScalar(point_z);
-    point_z = FinterayShapeLoadScalar(&pPoint->v[2]);
-    pPoint->v[0] = FinterayScalar((double)point_x + FinterayShapeLoadScalar(&pSphere->center.v[0]));
-    pPoint->v[1] = FinterayScalar(point_y + FinterayShapeLoadScalar(&pSphere->center.v[1]));
-    pPoint->v[2] = FinterayScalar(point_z + FinterayShapeLoadScalar(&pSphere->center.v[2]));
+    point_z = (*(const br_scalar*)(&pPoint->v[2]));
+    pPoint->v[0] = FinterayScalar((double)point_x + (*(const br_scalar*)(&pSphere->center.v[0])));
+    pPoint->v[1] = FinterayScalar(point_y + (*(const br_scalar*)(&pSphere->center.v[1])));
+    pPoint->v[2] = FinterayScalar(point_z + (*(const br_scalar*)(&pSphere->center.v[2])));
     *pT = 1.0f;
     return 2;
 }
@@ -1620,13 +1600,13 @@ int C2_HOOK_FASTCALL LinePolyColl(br_vector3* pStart, br_vector3* pEnd, tCollisi
     direction.v[2] = FinterayScalar((double)pEnd->v[2] - pStart->v[2]);
     equation = pPoly->planes;
     for (plane = 0; plane < count; plane++, equation++) {
-        denominator = ((FinterayShapeLoadScalar(&equation->v[2]) * FinterayShapeLoadScalar(&direction.v[2])
-            + FinterayShapeLoadScalar(&equation->v[1]) * FinterayShapeLoadScalar(&direction.v[1]))
-            + FinterayShapeLoadScalar(&equation->v[0]) * FinterayShapeLoadScalar(&direction.v[0]));
+        denominator = (((*(const br_scalar*)(&equation->v[2])) * (*(const br_scalar*)(&direction.v[2]))
+            + (*(const br_scalar*)(&equation->v[1])) * (*(const br_scalar*)(&direction.v[1])))
+            + (*(const br_scalar*)(&equation->v[0])) * (*(const br_scalar*)(&direction.v[0])));
         denominators[plane] = FinterayScalar(denominator);
-        dot = FinterayScalar(((FinterayShapeLoadScalar(&equation->v[0]) * pStart->v[0]
-            + (double)pStart->v[1] * equation->v[1]) + FinterayShapeLoadScalar(&equation->v[2]) * pStart->v[2]) + pRadius);
-        distance = FinterayShapeLoadScalar(&equation->v[3]) + FinterayShapeLoadScalar(&dot);
+        dot = FinterayScalar((((*(const br_scalar*)(&equation->v[0])) * pStart->v[0]
+            + (double)pStart->v[1] * equation->v[1]) + (*(const br_scalar*)(&equation->v[2])) * pStart->v[2]) + pRadius);
+        distance = (*(const br_scalar*)(&equation->v[3])) + (*(const br_scalar*)(&dot));
         if (!(distance >= 0.0)) {
             inside = 0;
         }
@@ -1656,9 +1636,9 @@ int C2_HOOK_FASTCALL LinePolyColl(br_vector3* pStart, br_vector3* pEnd, tCollisi
             return 0;
         }
     }
-    point_x = best_t * FinterayShapeLoadScalar(&direction.v[0]);
-    point_y = best_t * FinterayShapeLoadScalar(&direction.v[1]);
-    point_z = best_t * FinterayShapeLoadScalar(&direction.v[2]);
+    point_x = best_t * (*(const br_scalar*)(&direction.v[0]));
+    point_y = best_t * (*(const br_scalar*)(&direction.v[1]));
+    point_z = best_t * (*(const br_scalar*)(&direction.v[2]));
     pPoint->v[0] = FinterayScalar(point_x);
     pPoint->v[1] = FinterayScalar(point_y);
     pPoint->v[2] = FinterayScalar(point_z);
@@ -1676,9 +1656,6 @@ static br_vector4* C2_HOOK_FASTCALL FinterayShapePlanes(tCollision_shape_polyhed
     return *(br_vector4**)&poly->planes;
 }
 
-static int C2_HOOK_FASTCALL FinterayShapePlaneCount(tCollision_shape_polyhedron_data* poly) {
-    return *(int*)&poly->count_planes;
-}
 
 // FUNCTION: CARMA2_HW 0x00461520
 int C2_HOOK_FASTCALL LinePolyCollWithSphere(br_vector3* pStart, br_vector3* pEnd, tCollision_shape_polyhedron* pShape, br_vector3* pPoint, br_vector3* pNormal, br_scalar* pT) {
@@ -1708,11 +1685,11 @@ int C2_HOOK_FASTCALL LinePolyCollWithSphere(br_vector3* pStart, br_vector3* pEnd
         FinterayBoxCopyScalar(&pNormal->v[2], &FinterayShapePlanes(poly)[selected].v[2]);
         return result;
     }
-    count = FinterayShapePlaneCount(poly);
+    count = (*(int*)&poly->count_planes);
     equation = FinterayShapePlanes(poly);
     for (plane = 0; plane < count; plane++, equation++) {
-        extended = ((FinterayShapeLoadScalar(&equation->v[0]) * pEnd->v[0]
-            + (double)pEnd->v[2] * equation->v[2]) + FinterayShapeLoadScalar(&equation->v[1]) * pEnd->v[1]) + equation->v[3];
+        extended = (((*(const br_scalar*)(&equation->v[0])) * pEnd->v[0]
+            + (double)pEnd->v[2] * equation->v[2]) + (*(const br_scalar*)(&equation->v[1])) * pEnd->v[1]) + equation->v[3];
         distance[plane] = FinterayScalar(extended);
         if (!(extended >= -0.005f)) {
             return 0;
@@ -1722,22 +1699,22 @@ int C2_HOOK_FASTCALL LinePolyCollWithSphere(br_vector3* pStart, br_vector3* pEnd
     pNormal->v[1] = 0.0f;
     pNormal->v[2] = 0.0f;
     selected = 0;
-    for (plane = 0; plane < FinterayShapePlaneCount(poly); plane++) {
-        if (!(FinterayShapeLoadScalar(&distance[plane]) >= 0.0)) {
+    for (plane = 0; plane < (*(int*)&poly->count_planes); plane++) {
+        if (!((*(const br_scalar*)(&distance[plane])) >= 0.0)) {
             selected++;
-            pNormal->v[0] = FinterayScalar(FinterayShapeLoadScalar(&FinterayShapePlanes(poly)[plane].v[0]) + pNormal->v[0]);
-            pNormal->v[1] = FinterayScalar(FinterayShapeLoadScalar(&FinterayShapePlanes(poly)[plane].v[1]) + pNormal->v[1]);
-            pNormal->v[2] = FinterayScalar(FinterayShapeLoadScalar(&FinterayShapePlanes(poly)[plane].v[2]) + pNormal->v[2]);
+            pNormal->v[0] = FinterayScalar((*(const br_scalar*)(&FinterayShapePlanes(poly)[plane].v[0])) + pNormal->v[0]);
+            pNormal->v[1] = FinterayScalar((*(const br_scalar*)(&FinterayShapePlanes(poly)[plane].v[1])) + pNormal->v[1]);
+            pNormal->v[2] = FinterayScalar((*(const br_scalar*)(&FinterayShapePlanes(poly)[plane].v[2])) + pNormal->v[2]);
         }
     }
     if (selected > 1) {
-        x = FinterayShapeLoadScalar(&pNormal->v[0]);
-        y = FinterayShapeLoadScalar(&pNormal->v[1]);
-        z = FinterayShapeLoadScalar(&pNormal->v[2]);
+        x = (*(const br_scalar*)(&pNormal->v[0]));
+        y = (*(const br_scalar*)(&pNormal->v[1]));
+        z = (*(const br_scalar*)(&pNormal->v[2]));
         length = sqrt((y * y + z * z) + x * x);
         if (length > 2.3841858e-7f) {
             scale = 1.0 / length;
-            pNormal->v[0] = FinterayScalar(scale * FinterayShapeLoadScalar(&pNormal->v[0]));
+            pNormal->v[0] = FinterayScalar(scale * (*(const br_scalar*)(&pNormal->v[0])));
             pNormal->v[1] = FinterayScalar(y * scale);
             pNormal->v[2] = FinterayScalar(z * scale);
         } else {
@@ -1891,7 +1868,7 @@ void C2_HOOK_FASTCALL SphereFaceCollide(tFace_ref* pFace, br_vector3* pStart, br
         && (material->identifier[0] == '!' || material->identifier[0] == '>' || material->identifier[0] == '?')) {
         return;
     }
-    distance = ((FinterayShapeLoadScalar(&pFace->normal.v[0]) * pStart->v[0]
+    distance = (((*(const br_scalar*)(&pFace->normal.v[0])) * pStart->v[0]
         + (double)pStart->v[1] * pFace->normal.v[1]) + (double)pStart->v[2] * pFace->normal.v[2]) - pFace->d;
     start_scalar = FinterayEdgeScalar(distance);
     if (!(distance >= 0.0)) {
@@ -1901,18 +1878,18 @@ void C2_HOOK_FASTCALL SphereFaceCollide(tFace_ref* pFace, br_vector3* pStart, br
         if (material == NULL || !(material->flags & BR_MATF_TWO_SIDED)) {
             return;
         }
-        normal.v[1] = FinterayEdgeScalar(-FinterayShapeLoadScalar(&pFace->normal.v[1]));
-        normal.v[2] = FinterayEdgeScalar(-FinterayShapeLoadScalar(&pFace->normal.v[2]));
-        normal.v[0] = FinterayEdgeScalar(-FinterayShapeLoadScalar(&pFace->normal.v[0]));
+        normal.v[1] = FinterayEdgeScalar(-(*(const br_scalar*)(&pFace->normal.v[1])));
+        normal.v[2] = FinterayEdgeScalar(-(*(const br_scalar*)(&pFace->normal.v[2])));
+        normal.v[0] = FinterayEdgeScalar(-(*(const br_scalar*)(&pFace->normal.v[0])));
         end_distance = (((double)pEnd->v[2] * normal.v[2] + (double)pEnd->v[1] * normal.v[1])
             + normal.v[0] * (double)pEnd->v[0]) + pFace->d;
     } else {
         if (!(start_scalar >= pRadius)) {
             return;
         }
-        normal.v[2] = FinterayEdgeScalar(FinterayShapeLoadScalar(&pFace->normal.v[2]));
+        normal.v[2] = FinterayEdgeScalar((*(const br_scalar*)(&pFace->normal.v[2])));
         normal.v[1] = pFace->normal.v[1];
-        normal.v[0] = FinterayEdgeScalar(FinterayShapeLoadScalar(&pFace->normal.v[0]));
+        normal.v[0] = FinterayEdgeScalar((*(const br_scalar*)(&pFace->normal.v[0])));
         end_distance = (((double)pEnd->v[2] * normal.v[2] + (double)pEnd->v[1] * normal.v[1])
             + normal.v[0] * (double)pEnd->v[0]) - pFace->d;
     }

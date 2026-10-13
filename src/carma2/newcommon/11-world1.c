@@ -16,12 +16,9 @@ typedef tU32 tEditorDeleteWord __attribute__((__may_alias__));
 typedef tU32 tEditorDeleteWord;
 #endif
 
-static tU32 C2_HOOK_CDECL EditorDeleteRead(const void* base, tU32 offset) {
-    return *(const tEditorDeleteWord*)(uintptr_t)((tU32)(uintptr_t)base + offset);
-}
 
 static int C2_HOOK_CDECL EditorDeleteZeroOrUnordered(const br_matrix34* matrix, tU32 offset) {
-    tU32 bits = EditorDeleteRead(matrix, offset) & 0x7fffffffu;
+    tU32 bits = (*(const tEditorDeleteWord*)(uintptr_t)((tU32)(uintptr_t)matrix + offset)) & 0x7fffffffu;
     return bits == 0 || bits > 0x7f800000u;
 }
 
@@ -35,7 +32,7 @@ br_uint_32 C2_HOOK_FASTCALL DeleteBastards(br_actor* actor, br_matrix34* matrix,
     (void)data;
 
     if (actor_word != *(const tEditorDeleteWord*)&gAdditional_actors) {
-        identifier = EditorDeleteRead(actor, 0x14);
+        identifier = (*(const tEditorDeleteWord*)(uintptr_t)((tU32)(uintptr_t)actor + 0x14));
         if (identifier == 0 || *(const unsigned char*)(uintptr_t)identifier == '&') {
             if (EditorDeleteZeroOrUnordered(matrix, 0x24)
                     && EditorDeleteZeroOrUnordered(matrix, 0x28)
@@ -44,7 +41,7 @@ br_uint_32 C2_HOOK_FASTCALL DeleteBastards(br_actor* actor, br_matrix34* matrix,
             }
         }
     }
-    if (EditorDeleteRead(actor, 0x18) != 0
+    if ((*(const tEditorDeleteWord*)(uintptr_t)((tU32)(uintptr_t)actor + 0x18)) != 0
             || *(const unsigned char*)(uintptr_t)((tU32)(uintptr_t)actor + 0x12u) != 1) {
         return 0;
     }
@@ -52,7 +49,7 @@ br_uint_32 C2_HOOK_FASTCALL DeleteBastards(br_actor* actor, br_matrix34* matrix,
 add_actor:
     count = gDelete_count;
     while ((tS32)index < count) {
-        if (EditorDeleteRead(gDelete_list, index * 4u) == actor_word) {
+        if ((*(const tEditorDeleteWord*)(uintptr_t)((tU32)(uintptr_t)gDelete_list + (index * 4u))) == actor_word) {
             return 0;
         }
         index += 1u;
@@ -74,16 +71,10 @@ static int C2_HOOK_FASTCALL PhysicsWallNaN(double value) {
     return (u.w[1]&0x7ff00000u)==0x7ff00000u && ((u.w[1]&0xfffffu)||u.w[0]);
 }
 
-static double C2_HOOK_CDECL PhysicsJointSum(double pA, double pB) {
-    double result;
-
-    result = pA + pB;
-    return result;
-}
 
 static double C2_HOOK_CDECL SpecVolSum(double a, double b) {
     if (PhysicsWallNaN(a) && PhysicsWallNaN(b)) {
-        return PhysicsJointSum(a, b);
+        return (a + b);
     }
     return a + b;
 }

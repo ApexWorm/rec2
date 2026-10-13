@@ -7,44 +7,12 @@
 #include <math.h>
 #include <string.h>
 
-/* PC53 operations retain the original x87 rounding and NaN operand selection.
- * In particular, a scalar store need not discard its unrounded register value. */
-static double C2_HOOK_CDECL NavigationFloatDifference(const float* pA, const float* pB) {
-    double result;
-    result = (double)*pA - (double)*pB;
-    return result;
-}
 
 
-static double C2_HOOK_CDECL NavigationAdd(double pA, double pB) {
-    double result;
-    result = pA + pB;
-    return result;
-}
 
-static double C2_HOOK_CDECL NavigationSubtract(double pA, double pB) {
-    double result;
-    result = pA - pB;
-    return result;
-}
 
-static double C2_HOOK_CDECL NavigationMultiply(double pA, double pB) {
-    double result;
-    result = pA * pB;
-    return result;
-}
 
-static double C2_HOOK_CDECL NavigationDivide(double pA, double pB) {
-    double result;
-    result = pA / pB;
-    return result;
-}
 
-static double C2_HOOK_CDECL NavigationSqrt(double pA) {
-    double result;
-    result = sqrt(pA);
-    return result;
-}
 
 static float C2_HOOK_CDECL NavigationScalarRound(double pA) {
     union { float scalar; tU32 bits; } stored;
@@ -101,17 +69,17 @@ int C2_HOOK_FASTCALL GetStraight(br_vector2* pStart, br_vector2* pFinish, float*
     while (section != -1) {
         memcpy(&finish.v[0], &GetOpponentsSectionFinishNodePoint(pOpponent_spec, (tS16)section)->v[2], 4);
         memcpy(&finish.v[1], &GetOpponentsSectionFinishNodePoint(pOpponent_spec, (tS16)section)->v[0], 4);
-        dx = NavigationFloatDifference(&pFinish->v[0], &pStart->v[0]);
-        dy = NavigationFloatDifference(&pFinish->v[1], &pStart->v[1]);
-        x = NavigationAdd(NavigationFloatDifference(&finish.v[0], &pFinish->v[0]), dx);
-        y = NavigationAdd(NavigationFloatDifference(&finish.v[1], &pFinish->v[1]), dy);
+        dx = ((double)pFinish->v[0] - (double)pStart->v[0]);
+        dy = ((double)pFinish->v[1] - (double)pStart->v[1]);
+        x = ((((double)finish.v[0] - (double)pFinish->v[0])) + dx);
+        y = ((((double)finish.v[1] - (double)pFinish->v[1])) + dy);
         rounded_x = NavigationScalarRound(x);
-        if (NavigationLessOrUnordered(NavigationAdd(NavigationMultiply(x, dx), NavigationMultiply(y, dy)), 0.0)) {
+        if (NavigationLessOrUnordered(((x * dx) + (y * dy)), 0.0)) {
             break;
         }
-        length = NavigationSqrt(NavigationAdd(NavigationMultiply(rounded_x, rounded_x), NavigationMultiply(y, y)));
-        cross = NavigationAdd(NavigationMultiply(-dy, rounded_x), NavigationMultiply(dx, y));
-        cross = fabs(NavigationDivide(cross, length));
+        length = (sqrt((((rounded_x * rounded_x) + (y * y)))));
+        cross = ((((-dy) * rounded_x)) + (dx * y));
+        cross = fabs(cross / length);
         if (!NavigationLessOrUnordered(cross, 0.1f)) {
             break;
         }
@@ -148,28 +116,28 @@ int C2_HOOK_FASTCALL CalcCorners(tCorner* pCorners, int pSection, float pWidth, 
         corner = &pCorners[count];
         corner->section = (tU32)pSection;
         pSection = GetStraight(&start, &finish, &width, pSection, pOpponent_spec);
-        x = NavigationFloatDifference(&previous.v[0], &start.v[0]);
-        y = NavigationFloatDifference(&previous.v[1], &start.v[1]);
+        x = ((double)previous.v[0] - (double)start.v[0]);
+        y = ((double)previous.v[1] - (double)start.v[1]);
         ax = NavigationScalarRound(x);
         ay = NavigationScalarRound(y);
-        previous_length_wide = NavigationAdd(NavigationMultiply(x, ax), NavigationMultiply(y, ay));
+        previous_length_wide = ((x * ax) + (y * ay));
         previous_length = NavigationScalarRound(previous_length_wide);
-        x = NavigationFloatDifference(&finish.v[0], &start.v[0]);
-        y = NavigationFloatDifference(&finish.v[1], &start.v[1]);
+        x = ((double)finish.v[0] - (double)start.v[0]);
+        y = ((double)finish.v[1] - (double)start.v[1]);
         bx = NavigationScalarRound(x);
         by = NavigationScalarRound(y);
-        next_length = NavigationScalarRound(NavigationAdd(NavigationMultiply(x, bx), NavigationMultiply(y, by)));
+        next_length = NavigationScalarRound(((x * bx) + (y * by)));
         if (previous_length_wide == 0.0 || previous_length_wide != previous_length_wide || next_length == 0.f || next_length != next_length) {
             goto fudge;
         }
-        dot = NavigationAdd(NavigationMultiply(bx, ax), NavigationMultiply(by, ay));
+        dot = ((bx * ax) + (by * ay));
         negative_by = NavigationScalarRound(-(double)by);
-        cross = NavigationAdd(NavigationMultiply(ax, negative_by), NavigationMultiply(bx, ay));
-        norm = NavigationSqrt(NavigationAdd(NavigationMultiply(dot, dot), NavigationMultiply(cross, cross)));
+        cross = ((ax * negative_by) + (bx * ay));
+        norm = (sqrt((((dot * dot) + (cross * cross)))));
         if (NavigationOrderedGreater(norm, 2.384185791015625e-7f)) {
-            norm = NavigationDivide(1.0, norm);
-            cosine = NavigationMultiply(norm, dot);
-            sine = NavigationMultiply(norm, cross);
+            norm = 1.0 / norm;
+            cosine = norm * dot;
+            sine = norm * cross;
         } else {
             cosine = 1.0;
             sine = 0.0;
@@ -188,42 +156,42 @@ fudge:
             } else {
                 memcpy(&corner->field_0x08, &width, 4);
             }
-            corner->field_0x0c = NavigationScalarRound(NavigationMultiply(corner->field_0x08, 0.7f));
+            corner->field_0x0c = NavigationScalarRound(corner->field_0x08 * 0.7f);
             corner->left_not_right = (tU32)IRandomBetween(0, 1);
         } else {
-            base = NavigationDivide(NavigationAdd(NavigationMultiply(cosine, width), pWidth), sine);
-            ratio = NavigationDivide(sine, NavigationSubtract(cosine, -1.f));
+            base = ((((cosine * width) + pWidth)) / sine);
+            ratio = (sine / ((cosine - (-1.f))));
             rounded_base = NavigationScalarRound(base);
-            extent = NavigationMultiply(ratio, width);
-            x = NavigationMultiply(ratio, ratio);
-            x = NavigationMultiply(x, width);
-            x = NavigationSubtract(x, NavigationMultiply(NavigationMultiply(base, ratio), -2.f));
-            x = NavigationMultiply(NavigationSubtract(x, width), width);
-            extent = NavigationAdd(NavigationAdd(NavigationSqrt(x), extent), rounded_base);
+            extent = ratio * width;
+            x = ratio * ratio;
+            x = x * width;
+            x = (x - (((base * ratio) * (-2.f))));
+            x = ((x - width) * width);
+            extent = (((((sqrt(x))) + extent)) + rounded_base);
             corner->field_0x0c = NavigationScalarRound(extent);
-            x = NavigationMultiply(NavigationMultiply(extent, extent), 9.f);
+            x = ((extent * extent) * 9.f);
             if (NavigationOrderedGreater(x, previous_length)) {
-                corner->field_0x0c = NavigationScalarRound(NavigationMultiply(NavigationSqrt(previous_length), 0.3333333432674408f));
+                corner->field_0x0c = NavigationScalarRound((((sqrt(previous_length))) * 0.3333333432674408f));
             }
-            x = NavigationMultiply(NavigationMultiply(corner->field_0x0c, corner->field_0x0c), 9.f);
+            x = ((corner->field_0x0c * corner->field_0x0c) * 9.f);
             if (NavigationOrderedGreater(x, next_length)) {
-                corner->field_0x0c = NavigationScalarRound(NavigationMultiply(NavigationSqrt(next_length), 0.3333333432674408f));
+                corner->field_0x0c = NavigationScalarRound((((sqrt(next_length))) * 0.3333333432674408f));
             }
-            radius = NavigationMultiply(ratio, corner->field_0x0c);
+            radius = ratio * corner->field_0x0c;
             corner->field_0x08 = NavigationScalarRound(radius);
             if (corner->left_not_right != 0) {
-                x = NavigationAdd(NavigationMultiply(bx, corner->field_0x0c), NavigationMultiply(radius, negative_by));
+                x = ((bx * corner->field_0x0c) + (radius * negative_by));
                 corner->field_0x00.v[0] = NavigationScalarRound(x);
-                y = NavigationAdd(NavigationMultiply(bx, corner->field_0x08), NavigationMultiply(by, corner->field_0x0c));
+                y = ((bx * corner->field_0x08) + (by * corner->field_0x0c));
             } else {
-                x = NavigationAdd(NavigationMultiply(bx, corner->field_0x0c), NavigationMultiply(by, radius));
+                x = ((bx * corner->field_0x0c) + (by * radius));
                 corner->field_0x00.v[0] = NavigationScalarRound(x);
-                y = NavigationAdd(NavigationMultiply(by, corner->field_0x0c), NavigationMultiply(-corner->field_0x08, bx));
+                y = ((by * corner->field_0x0c) + (((-corner->field_0x08) * bx)));
             }
             corner->field_0x00.v[1] = NavigationScalarRound(y);
-            norm = NavigationSqrt(next_length);
-            x = NavigationAdd(NavigationDivide(corner->field_0x00.v[0], norm), start.v[0]);
-            y = NavigationAdd(NavigationDivide(corner->field_0x00.v[1], norm), start.v[1]);
+            norm = (sqrt(next_length));
+            x = ((corner->field_0x00.v[0] / norm) + start.v[0]);
+            y = ((corner->field_0x00.v[1] / norm) + start.v[1]);
             corner->field_0x00.v[0] = NavigationScalarRound(x);
             corner->field_0x00.v[1] = NavigationScalarRound(y);
         }
@@ -254,16 +222,16 @@ void C2_HOOK_FASTCALL SetMaxSpeedFromSOCs(tSOC* pSocs, int pCount_socs, float* p
     float stopping_distance;
     double x, y, length, offset, threshold;
 
-    speed_squared = NavigationScalarRound(NavigationMultiply(pSpeed, pSpeed));
+    speed_squared = NavigationScalarRound(pSpeed * pSpeed);
     memcpy(&previous, pPos2d, sizeof(previous));
-    threshold = NavigationSubtract(NavigationMultiply(speed_squared, 0.0625f), NavigationMultiply(NavigationMultiply((double)gFrame_period_for_this_munging, pSpeed), -0.001f));
-    stopping_distance = NavigationScalarRound(NavigationMultiply(threshold, 0.14492753148078918f));
+    threshold = ((speed_squared * 0.0625f) - ((((((double)gFrame_period_for_this_munging) * pSpeed)) * (-0.001f))));
+    stopping_distance = NavigationScalarRound(threshold * 0.14492753148078918f);
     for (i = 0; i < pCount_socs; i++) {
         if (!NavigationLessOrUnordered(distance, stopping_distance)) {
             return;
         }
         if (previous_corner) {
-            distance = NavigationScalarRound(NavigationSubtract(distance, previous_extent));
+            distance = NavigationScalarRound(distance - previous_extent);
         }
         previous_corner = !pSocs[i].field_0x0;
         offset = distance;
@@ -271,23 +239,23 @@ void C2_HOOK_FASTCALL SetMaxSpeedFromSOCs(tSOC* pSocs, int pCount_socs, float* p
             point = GetOpponentsSectionStartNodePoint(pOpponent_spec, (tS16)pCorners[pSocs[i].field_0x4].section);
             speed = (int)pCorners[pSocs[i].field_0x4].field_0x18;
             memcpy(&previous_extent, &pCorners[pSocs[i].field_0x4].field_0x0c, 4);
-            offset = NavigationSubtract(distance, previous_extent);
+            offset = distance - previous_extent;
         } else {
             point = GetOpponentsSectionFinishNodePoint(pOpponent_spec, (tS16)pSocs[i].field_0x4);
             speed = GetOpponentsSectionMaxSpeed(pOpponent_spec, (tS16)pSocs[i].field_0x4, 1);
         }
         memcpy(&position.v[0], &point->v[2], 4);
         memcpy(&position.v[1], &point->v[0], 4);
-        x = NavigationFloatDifference(&previous.v[0], &position.v[0]);
-        y = NavigationFloatDifference(&previous.v[1], &position.v[1]);
-        length = NavigationSqrt(NavigationAdd(NavigationMultiply(x, NavigationScalarRound(x)), NavigationMultiply(y, y)));
-        distance = NavigationScalarRound(NavigationAdd(length, offset));
+        x = ((double)previous.v[0] - (double)position.v[0]);
+        y = ((double)previous.v[1] - (double)position.v[1]);
+        length = (sqrt(((((x * (NavigationScalarRound(x)))) + (y * y)))));
+        distance = NavigationScalarRound(length + offset);
         if (NavigationLessOrUnordered(distance, 0.f)) {
             distance = 0.f;
         }
-        threshold = NavigationMultiply(NavigationSubtract(speed_squared, NavigationMultiply((double)speed, (double)speed)), 0.0625f);
-        threshold = NavigationSubtract(threshold, NavigationMultiply(NavigationMultiply((double)gFrame_period_for_this_munging, pSpeed), -0.001f));
-        if (NavigationOrderedGreater(threshold, NavigationMultiply(distance, 6.9f)) && NavigationLessOrUnordered((double)speed, *pDesired_speed)) {
+        threshold = (((speed_squared - ((((double)speed) * ((double)speed))))) * 0.0625f);
+        threshold = (threshold - ((((((double)gFrame_period_for_this_munging) * pSpeed)) * (-0.001f))));
+        if (NavigationOrderedGreater(threshold, (distance * 6.9f)) && NavigationLessOrUnordered((double)speed, *pDesired_speed)) {
             *pDesired_speed = NavigationScalarRound((double)speed);
         }
         memcpy(&previous, &position, sizeof(previous));
@@ -304,9 +272,9 @@ static int C2_HOOK_CDECL NavigationTruncate(double pValue) {
 static double C2_HOOK_CDECL NavigationCornerSectionLength(tOpponent_spec* pOpponent_spec, tCorner* pCorner, int pSection) {
     const br_vector3* start = GetOpponentsSectionStartNodePoint(pOpponent_spec, (tS16)pCorner->section);
     const br_vector3* finish = GetOpponentsSectionFinishNodePoint(pOpponent_spec, (tS16)pSection);
-    double x = NavigationFloatDifference(&finish->v[0], &start->v[0]);
-    double z = NavigationFloatDifference(&finish->v[2], &start->v[2]);
-    return NavigationSqrt(NavigationAdd(NavigationMultiply(x, NavigationScalarRound(x)), NavigationMultiply(z, z)));
+    double x = ((double)finish->v[0] - (double)start->v[0]);
+    double z = ((double)finish->v[2] - (double)start->v[2]);
+    return (sqrt(((((x * (NavigationScalarRound(x)))) + (z * z)))));
 }
 
 // FUNCTION: CARMA2_HW 0x004b1ab0
@@ -331,8 +299,8 @@ int C2_HOOK_FASTCALL CalcSOCs(int pNext_section, int pCount_corners, tCorner* pC
         if (count < 10) {
             pSocs[count].field_0x0 = 0;
             pSocs[count].field_0x4 = i;
-            length = NavigationMultiply(NavigationMultiply(NavigationMultiply(pCorners[i].field_0x08, 6.9f), 7.5f), 1.9600000381469727f);
-            pCorners[i].field_0x18 = (tU32)NavigationTruncate(NavigationSqrt(length));
+            length = ((((pCorners[i].field_0x08 * 6.9f) * 7.5f)) * 1.9600000381469727f);
+            pCorners[i].field_0x18 = (tU32)NavigationTruncate((sqrt(length)));
             while (pNext_section != (int)pCorners[i].section) {
                 speed = GetOpponentsSectionMaxSpeed(pOpponent_spec, (tS16)pNext_section, 1);
                 if (speed < (int)pCorners[i].field_0x18) {

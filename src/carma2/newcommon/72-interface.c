@@ -1510,9 +1510,6 @@ typedef tU32 tFrontendScrollWord __attribute__((__may_alias__));
 typedef tU32 tFrontendScrollWord;
 #endif
 
-static tU32 C2_HOOK_CDECL FrontendScrollRead(tU32 address) {
-    return *(const tFrontendScrollWord*)(uintptr_t)address;
-}
 
 // FUNCTION: CARMA2_HW 0x00471cf0
 tFrontend_slider* C2_HOOK_FASTCALL GetAnyActiveSlider(void) {
@@ -1525,16 +1522,16 @@ tFrontend_slider* C2_HOOK_FASTCALL GetAnyActiveSlider(void) {
     selected = *(const tS32*)&gFrontend_selected_item_index;
     do {
         tU32 base = (tU32)(uintptr_t)slider;
-        tS32 start = (tS32)FrontendScrollRead(base + 4u);
+        tS32 start = (tS32)(*(const tFrontendScrollWord*)(uintptr_t)(base + 4u));
 
         if (selected >= start && selected < (tS32)((tU32)start + 3u)) {
             return slider;
         }
-        start = (tS32)FrontendScrollRead(base + 8u);
+        start = (tS32)(*(const tFrontendScrollWord*)(uintptr_t)(base + 8u));
         if (selected >= start && selected < (tS32)((tU32)start + 3u)) {
             return slider;
         }
-        slider = (tFrontend_slider*)(uintptr_t)FrontendScrollRead(base + 0x20u);
+        slider = (tFrontend_slider*)(uintptr_t)(*(const tFrontendScrollWord*)(uintptr_t)(base + 0x20u));
     } while (slider != NULL);
     return NULL;
 }
@@ -1605,19 +1602,19 @@ tConnected_items* C2_HOOK_FASTCALL GetScrollSet(int pItem) {
 
     while (scrollset != NULL) {
         tU32 base = (tU32)(uintptr_t)scrollset;
-        tS32 count = (tS32)FrontendScrollRead(base + 0xcu);
+        tS32 count = (tS32)(*(const tFrontendScrollWord*)(uintptr_t)(base + 0xcu));
         tU32 index;
 
         for (index = 0; (tS32)index < count; ++index) {
-            tS32 start = (tS32)FrontendScrollRead(base + 0x10u + index * 4u);
+            tS32 start = (tS32)(*(const tFrontendScrollWord*)(uintptr_t)(base + 0x10u + index * 4u));
             if (pItem >= start) {
-                tU32 length = FrontendScrollRead(base + 4u);
+                tU32 length = (*(const tFrontendScrollWord*)(uintptr_t)(base + 4u));
                 if (pItem < (tS32)((tU32)start + length)) {
                     return scrollset;
                 }
             }
         }
-        scrollset = (tConnected_items*)(uintptr_t)FrontendScrollRead(base + 0x2cu);
+        scrollset = (tConnected_items*)(uintptr_t)(*(const tFrontendScrollWord*)(uintptr_t)(base + 0x2cu));
     }
     return NULL;
 }
@@ -1631,17 +1628,17 @@ tConnected_items* C2_HOOK_FASTCALL GetScrollSet(int pItem) {
 // FUNCTION: CARMA2_HW 0x00471d70
 int C2_HOOK_FASTCALL ScrollSet_TranslateItemToIndex(tConnected_items* pConnected, int pItem) {
     tU32 base = (tU32)(uintptr_t)pConnected;
-    tS32 count = (tS32)FrontendScrollRead(base + 0xcu);
+    tS32 count = (tS32)(*(const tFrontendScrollWord*)(uintptr_t)(base + 0xcu));
     tS32 offset = -1;
     tU32 index;
 
     for (index = 0; (tS32)index < count; ++index) {
-        tS32 start = (tS32)FrontendScrollRead(base + 0x10u + index * 4u);
+        tS32 start = (tS32)(*(const tFrontendScrollWord*)(uintptr_t)(base + 0x10u + index * 4u));
         if (pItem >= start) {
-            tU32 length = FrontendScrollRead(base + 4u);
+            tU32 length = (*(const tFrontendScrollWord*)(uintptr_t)(base + 4u));
             if (pItem < (tS32)((tU32)start + length)) {
                 /* Original SUB reads the matching start word again. */
-                offset = (tS32)((tU32)pItem - FrontendScrollRead(base + 0x10u + index * 4u));
+                offset = (tS32)((tU32)pItem - (*(const tFrontendScrollWord*)(uintptr_t)(base + 0x10u + index * 4u)));
                 break;
             }
         }
@@ -1649,7 +1646,7 @@ int C2_HOOK_FASTCALL ScrollSet_TranslateItemToIndex(tConnected_items* pConnected
     if (offset == -1) {
         return -1;
     }
-    return (tS32)(FrontendScrollRead(base + 8u) + (tU32)offset);
+    return (tS32)((*(const tFrontendScrollWord*)(uintptr_t)(base + 8u)) + (tU32)offset);
 }
 
 // Generic_FindNextActiveItem

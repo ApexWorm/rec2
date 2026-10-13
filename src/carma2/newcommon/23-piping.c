@@ -1251,13 +1251,10 @@ typedef tU32 tCompletion_word __attribute__((__may_alias__));
 typedef tU32 tCompletion_word;
 #endif
 
-static tU32 C2_HOOK_CDECL CompletionWord(const void* base, tU32 offset) {
-    return *(const tCompletion_word*)((tU32)(uintptr_t)base + offset);
-}
 
 // FUNCTION: CARMA2_HW 0x004c8cc0
 void C2_HOOK_FASTCALL PipeSinglePHILObject(tPhysics_object* object) {
-    tU32 actor = CompletionWord(object, 0);
+    tU32 actor = (*(const tCompletion_word*)((tU32)(uintptr_t)object + 0));
     void* matrix = (void*)(uintptr_t)(actor + 0x2cu);
 
     ARDoSingleVariedSession(0x30, (uintptr_t)object, 1, 0x30, 0, (uintptr_t)matrix);

@@ -390,9 +390,6 @@ typedef tU32 tPedCacheWord __attribute__((__may_alias__));
 typedef tU32 tPedCacheWord;
 #endif
 
-static tU32 C2_HOOK_CDECL PedCacheRead(const void* base, tU32 offset) {
-    return *(const tPedCacheWord*)(uintptr_t)((tU32)(uintptr_t)base + offset);
-}
 
 static void C2_HOOK_CDECL PedCacheWrite(void* base, tU32 offset, tU32 value) {
     *(tPedCacheWord*)(uintptr_t)((tU32)(uintptr_t)base + offset) = value;
@@ -411,12 +408,12 @@ void C2_HOOK_FASTCALL FlushAllPedCaches(void) {
         return;
     }
     do {
-        object = PedCacheRead((void*)(uintptr_t)row, 0);
+        object = (*(const tPedCacheWord*)(uintptr_t)((tU32)(uintptr_t)((void*)(uintptr_t)row) + 0));
         if (object != 0) {
-            cache = PedCacheRead((void*)(uintptr_t)object, 0xb0);
+            cache = (*(const tPedCacheWord*)(uintptr_t)((tU32)(uintptr_t)((void*)(uintptr_t)object) + 0xb0));
             if (cache != 0) {
                 PedCacheWrite((void*)(uintptr_t)cache, 0x14, 0);
-                object = PedCacheRead((void*)(uintptr_t)row, 0);
+                object = (*(const tPedCacheWord*)(uintptr_t)((tU32)(uintptr_t)((void*)(uintptr_t)row) + 0));
                 PedCacheWrite((void*)(uintptr_t)object, 0xb0, 0);
             }
         }

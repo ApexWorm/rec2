@@ -166,9 +166,6 @@ static void* C2_HOOK_CDECL RegistrationAddress(const void* base, tU32 offset) {
     return (void*)(uintptr_t)((tU32)(uintptr_t)base + offset);
 }
 
-static tU32 C2_HOOK_CDECL RegistrationRead(const void* base, tU32 offset) {
-    return *(const tRegistrationWord*)RegistrationAddress(base, offset);
-}
 
 static void C2_HOOK_CDECL RegistrationWrite(void* base, tU32 offset, tU32 value) {
     *(tRegistrationWord*)RegistrationAddress(base, offset) = value;
@@ -183,7 +180,7 @@ static void C2_HOOK_CDECL RegistrationWriteByte(void* base, tU32 offset, tU8 val
 }
 
 static void* C2_HOOK_CDECL RegistrationPointer(const void* base, tU32 offset) {
-    return (void*)(uintptr_t)RegistrationRead(base, offset);
+    return (void*)(uintptr_t)(*(const tRegistrationWord*)RegistrationAddress(base, offset));
 }
 
 /* REP MOVSD captures both bases once then sequentially copies each rawDWORD.
@@ -191,7 +188,7 @@ static void* C2_HOOK_CDECL RegistrationPointer(const void* base, tU32 offset) {
 static void C2_HOOK_CDECL RegistrationCopyWords(void* output, const void* input, int count) {
     int i;
     for (i = 0; i < count; i++) {
-        tU32 value = RegistrationRead(input, (tU32)i * 4u);
+        tU32 value = (*(const tRegistrationWord*)RegistrationAddress(input, ((tU32)i * 4u)));
         RegistrationWrite(output, (tU32)i * 4u, value);
     }
 }
@@ -208,19 +205,19 @@ int C2_HOOK_FASTCALL PHILAddObject(tPhysics_object* object) {
     tU32 index, count, flags;
     int i;
 
-    if (RegistrationRead(&gPHIL_disabled, 0) != 0) {
+    if ((*(const tRegistrationWord*)RegistrationAddress(&gPHIL_disabled, 0)) != 0) {
         return 0;
     }
-    if (RegistrationRead(&gPHIL_munging_objects, 0) != 0 && RegistrationRead(&gPHIL_registry.object_added, 0) == 0) {
+    if ((*(const tRegistrationWord*)RegistrationAddress(&gPHIL_munging_objects, 0)) != 0 && (*(const tRegistrationWord*)RegistrationAddress(&gPHIL_registry.object_added, 0)) == 0) {
         /* Original100*count moduloDWORD; no added capacity clamp. */
-        index = RegistrationRead(&gPHIL_registry.count_adds, 0);
+        index = (*(const tRegistrationWord*)RegistrationAddress(&gPHIL_registry.count_adds, 0));
         queued = RegistrationAddress(&gPHIL_registry, 0x10u + index * 100u);
         RegistrationWrite(queued, 0, (tU32)(uintptr_t)object);
         RegistrationWrite(queued, 8, 1);
         RegistrationWriteByte(queued, 0x60, 0);
         RegistrationWrite(object, 0x240, (tU32)(uintptr_t)queued);
         RegistrationWriteByte(object, 0x239, 2);
-        count = RegistrationRead(&gPHIL_registry.count_adds, 0);
+        count = (*(const tRegistrationWord*)RegistrationAddress(&gPHIL_registry.count_adds, 0));
         RegistrationWrite(&gPHIL_registry.count_adds, 0, count + 1u);
         return 0;
     }
@@ -245,11 +242,11 @@ int C2_HOOK_FASTCALL PHILAddObject(tPhysics_object* object) {
     }
     RegistrationWrite(info, 0, (tU32)(uintptr_t)object);
     RegistrationWrite(info, 8, 1);
-    flags = RegistrationRead(object, 0x19c) | 0x20u;
+    flags = (*(const tRegistrationWord*)RegistrationAddress(object, 0x19c)) | 0x20u;
     RegistrationWrite(object, 0x240, (tU32)(uintptr_t)info);
     RegistrationWrite(object, 0x19c, flags);
     RegistrationWriteByte(object, 0x239, 1);
-    count = RegistrationRead(&gPHIL_registry.count_list, 0);
+    count = (*(const tRegistrationWord*)RegistrationAddress(&gPHIL_registry.count_list, 0));
     head = RegistrationPointer(&gPHIL_list_collision_infos, 0);
     RegistrationWrite(&gPHIL_registry.count_list, 0, count + 1u);
     if (head != NULL) {
@@ -268,7 +265,7 @@ int C2_HOOK_FASTCALL PHILAddObject(tPhysics_object* object) {
         RegistrationWrite(object, 0x220, 0);
         RegistrationWrite(object, 0x22c, 0);
     }
-    if (RegistrationRead(&gPHIL_doing_physics, 0) != 0) {
+    if ((*(const tRegistrationWord*)RegistrationAddress(&gPHIL_doing_physics, 0)) != 0) {
         PrepareObject(object, &gPHIL_list_collision_infos);
     }
     return 0;
@@ -448,14 +445,14 @@ int C2_HOOK_FASTCALL PHILAddActiveObject(tPhysics_object* object, const br_matri
     void* actor;
     tU8 type;
 
-    if (RegistrationRead(&gPHIL_disabled, 0) != 0) {
+    if ((*(const tRegistrationWord*)RegistrationAddress(&gPHIL_disabled, 0)) != 0) {
         return 0;
     }
     result = PHILAddObject(object);
     if (result != 0) {
         return result;
     }
-    if (matrix != NULL && RegistrationRead(&gPHIL_disabled, 0) == 0) {
+    if (matrix != NULL && (*(const tRegistrationWord*)RegistrationAddress(&gPHIL_disabled, 0)) == 0) {
         type = RegistrationByte(object, 0x239);
         info = RegistrationPointer(object, 0x240);
         if (type == 2) {
@@ -465,7 +462,7 @@ int C2_HOOK_FASTCALL PHILAddActiveObject(tPhysics_object* object, const br_matri
             if (info == NULL) {
                 return 3;
             }
-            if (RegistrationRead(info, 8) != 1) {
+            if ((*(const tRegistrationWord*)RegistrationAddress(info, 8)) != 1) {
                 return 4;
             }
             info_object = RegistrationPointer(info, 0);
@@ -479,10 +476,10 @@ int C2_HOOK_FASTCALL PHILAddActiveObject(tPhysics_object* object, const br_matri
 // FUNCTION: CARMA2_HW 0x004b62b0
 int C2_HOOK_FASTCALL FUN_004b62b0(tPhysics_object* object) {
     int result;
-    if (RegistrationRead(&gPHIL_disabled, 0) != 0) {
+    if ((*(const tRegistrationWord*)RegistrationAddress(&gPHIL_disabled, 0)) != 0) {
         return 0;
     }
-    if (RegistrationRead(&gPHIL_munging_objects, 0) != 0) {
+    if ((*(const tRegistrationWord*)RegistrationAddress(&gPHIL_munging_objects, 0)) != 0) {
         RegistrationWrite(&gPHIL_registry.object_added, 0, 1);
     }
     result = PHILAddObject(object);
@@ -498,10 +495,10 @@ int C2_HOOK_FASTCALL FUN_004b62e0(tPhysics_object* object, const br_matrix34* ma
     void* actor;
     tU8 type;
 
-    if (RegistrationRead(&gPHIL_disabled, 0) != 0) {
+    if ((*(const tRegistrationWord*)RegistrationAddress(&gPHIL_disabled, 0)) != 0) {
         return 0;
     }
-    if (RegistrationRead(&gPHIL_munging_objects, 0) != 0) {
+    if ((*(const tRegistrationWord*)RegistrationAddress(&gPHIL_munging_objects, 0)) != 0) {
         RegistrationWrite(&gPHIL_registry.object_added, 0, 1);
     }
     result = PHILAddObject(object);
@@ -509,7 +506,7 @@ int C2_HOOK_FASTCALL FUN_004b62e0(tPhysics_object* object, const br_matrix34* ma
         RegistrationWrite(&gPHIL_registry.object_added, 0, 0);
         return result;
     }
-    if (matrix != NULL && RegistrationRead(&gPHIL_disabled, 0) == 0) {
+    if (matrix != NULL && (*(const tRegistrationWord*)RegistrationAddress(&gPHIL_disabled, 0)) == 0) {
         type = RegistrationByte(object, 0x239);
         info = RegistrationPointer(object, 0x240);
         if (type == 2) {
@@ -520,7 +517,7 @@ int C2_HOOK_FASTCALL FUN_004b62e0(tPhysics_object* object, const br_matrix34* ma
                 RegistrationWrite(&gPHIL_registry.object_added, 0, 0);
                 return 3;
             }
-            if (RegistrationRead(info, 8) != 1) {
+            if ((*(const tRegistrationWord*)RegistrationAddress(info, 8)) != 1) {
                 RegistrationWrite(&gPHIL_registry.object_added, 0, 0);
                 return 4;
             }
@@ -647,12 +644,9 @@ typedef tU32 tCompletion_word __attribute__((__may_alias__));
 typedef tU32 tCompletion_word;
 #endif
 
-static tU32 C2_HOOK_CDECL CompletionWord(const void* base, tU32 offset) {
-    return *(const tCompletion_word*)((tU32)(uintptr_t)base + offset);
-}
 
 static void* C2_HOOK_CDECL CompletionPointer(const void* base, tU32 offset) {
-    return (void*)(uintptr_t)CompletionWord(base, offset);
+    return (void*)(uintptr_t)(*(const tCompletion_word*)((tU32)(uintptr_t)base + offset));
 }
 
 static tU8 C2_HOOK_CDECL CompletionByte(const void* base, tU32 offset) {
@@ -667,15 +661,15 @@ static tU32 C2_HOOK_CDECL CompletionStatus(tPhysics_object* object) {
     tU8 type;
     void* header;
 
-    if (CompletionWord(&gPHIL_disabled, 0) != 0) {
+    if ((*(const tCompletion_word*)((tU32)(uintptr_t)(&gPHIL_disabled) + 0)) != 0) {
         return 0;
     }
     type = CompletionByte(object, 0x239);
     header = CompletionPointer(object, 0x240);
     if (type == 2) {
-        return CompletionWord(header, 8);
+        return (*(const tCompletion_word*)((tU32)(uintptr_t)header + 8));
     }
-    return header != NULL ? CompletionWord(header, 8) : 0;
+    return header != NULL ? (*(const tCompletion_word*)((tU32)(uintptr_t)header + 8)) : 0;
 }
 
 // FUNCTION: CARMA2_HW 0x004b6be0
@@ -693,7 +687,7 @@ void C2_HOOK_FASTCALL ChangedObjectsCallbacks(tPhysics_object* objects, tPhysics
             if (CompletionByte(objects, 0xec) != 0) {
                 header = CompletionPointer(objects, 0x240);
                 if (header != NULL && (CompletionByte(header, 4) & 2) != 0) {
-                    address = CompletionWord(callbacks, 0x10);
+                    address = (*(const tCompletion_word*)((tU32)(uintptr_t)callbacks + 0x10));
                     if (address != 0) {
                         memcpy(&halted, &address, 4);
                         if (halted(objects) == 0) {
@@ -703,7 +697,7 @@ void C2_HOOK_FASTCALL ChangedObjectsCallbacks(tPhysics_object* objects, tPhysics
                     }
                     /* Complete original inline passive transition, after the
                      * callback's mutations and a fresh disabled/type/header. */
-                    if (CompletionWord(&gPHIL_disabled, 0) == 0) {
+                    if ((*(const tCompletion_word*)((tU32)(uintptr_t)(&gPHIL_disabled) + 0)) == 0) {
                         if (CompletionByte(objects, 0x239) == 2) {
                             header = CompletionPointer(objects, 0x240);
                             CompletionStore(header, 8, 1);
@@ -711,13 +705,13 @@ void C2_HOOK_FASTCALL ChangedObjectsCallbacks(tPhysics_object* objects, tPhysics
                             header = CompletionPointer(objects, 0x240);
                             if (header != NULL) {
                                 CompletionStore(header, 8, 1);
-                                CompletionStore(objects, 0x19c, CompletionWord(objects, 0x19c) | 0x20u);
+                                CompletionStore(objects, 0x19c, (*(const tCompletion_word*)((tU32)(uintptr_t)objects + 0x19c)) | 0x20u);
                             }
                         }
                     }
                 }
             } else {
-                address = CompletionWord(callbacks, 0xc);
+                address = (*(const tCompletion_word*)((tU32)(uintptr_t)callbacks + 0xc));
                 if (address != 0) {
                     memcpy(&changed, &address, 4);
                     changed(objects, period);
@@ -764,19 +758,16 @@ typedef tU32 tActivation_raw_word __attribute__((__may_alias__));
 typedef tU32 tActivation_raw_word;
 #endif
 
-static tU32 C2_HOOK_CDECL ActivationWord(const void* base, tU32 offset) {
-    return *(const tActivation_raw_word*)((tU32)(uintptr_t)base + offset);
-}
 
 // FUNCTION: CARMA2_HW 0x004b71b0
 void C2_HOOK_FASTCALL PHILActivatePassive(tPhysics_object* object, undefined4 captured_edx) {
-    tU32 header = ActivationWord(object, 0x240);
+    tU32 header = (*(const tActivation_raw_word*)((tU32)(uintptr_t)object + 0x240));
     tU32 address;
     tU32 callbacks;
     tActivation_original_call original;
     tActivation_permission_call permission;
 
-    if (header != 0 && ActivationWord((const void*)(uintptr_t)header, 8) == 1) {
+    if (header != 0 && (*(const tActivation_raw_word*)((tU32)(uintptr_t)((const void*)(uintptr_t)header) + 8)) == 1) {
         address = *(const tActivation_raw_word*)(const void*)&gPHIL_registry.original_activate_passive;
         if (address != 0) {
             memcpy(&original, &address, sizeof(original));
@@ -784,7 +775,7 @@ void C2_HOOK_FASTCALL PHILActivatePassive(tPhysics_object* object, undefined4 ca
             original(object, captured_edx);
         }
         callbacks = *(const tActivation_raw_word*)(const void*)&gPHIL_registry.callbacks;
-        address = ActivationWord((const void*)(uintptr_t)callbacks, 0x14);
+        address = (*(const tActivation_raw_word*)((tU32)(uintptr_t)((const void*)(uintptr_t)callbacks) + 0x14));
         if (address != 0) {
             memcpy(&permission, &address, sizeof(permission));
             /* Original explicitly restores the captured entry EDX here. */
@@ -794,7 +785,7 @@ void C2_HOOK_FASTCALL PHILActivatePassive(tPhysics_object* object, undefined4 ca
         }
         PHILMakeObjectActive(object, NULL, NULL, 1);
     } else {
-        *(tActivation_raw_word*)((tU32)(uintptr_t)object + 0x19c) = ActivationWord(object, 0x19c) | 0x1000u;
+        *(tActivation_raw_word*)((tU32)(uintptr_t)object + 0x19c) = (*(const tActivation_raw_word*)((tU32)(uintptr_t)object + 0x19c)) | 0x1000u;
     }
 }
 
@@ -805,13 +796,7 @@ void C2_HOOK_FASTCALL PHILActivatePassive(tPhysics_object* object, undefined4 ca
 // PHILApplyPHILObject
 
 
-static tU32 C2_HOOK_CDECL GravityWord(const void* base, tU32 offset) {
-    return *(const tU32*)((tU32)(uintptr_t)base + offset);
-}
 
-static double C2_HOOK_CDECL GravityRead(const void* base, tU32 offset) {
-    return *(const br_scalar*)((tU32)(uintptr_t)base + offset);
-}
 
 static br_scalar C2_HOOK_CDECL GravityRound(double value) {
     br_scalar result = (br_scalar)value;
@@ -825,22 +810,11 @@ static int C2_HOOK_CDECL GravityNaN(double value) {
         && ((words[1] & 0xfffffu) != 0 || words[0] != 0);
 }
 
-static double C2_HOOK_CDECL GravityMultiplyScalar(double left, const br_scalar* right) {
-    double result;
-    result = left * (double)*right;
-    return result;
-}
 
-static double C2_HOOK_CDECL PhysicsJointSum(double pA, double pB) {
-    double result;
-
-    result = pA + pB;
-    return result;
-}
 
 static double C2_HOOK_CDECL GravitySubtractPopWide(double left, double right) {
     if (GravityNaN(left) && GravityNaN(right)) {
-        return PhysicsJointSum(left, right);
+        return (left + right);
     }
     return left - right;
 }
@@ -855,37 +829,37 @@ void C2_HOOK_FASTCALL ProcessGravity(tPHIL_queued_header* header, tPhysics_objec
     br_vector3 vector;
     double value;
     if ((*(const tU8*)((tU32)(uintptr_t)header + 4) & 8) != 0) {
-        volume = (const tSpecial_volume*)(uintptr_t)GravityWord(object, 0x258);
+        volume = (const tSpecial_volume*)(uintptr_t)(*(const tU32*)((tU32)(uintptr_t)object + 0x258));
     }
     if (volume != NULL) {
-        double magnitude = GravityRead(header, 0x14);
+        double magnitude = (*(const br_scalar*)((tU32)(uintptr_t)header + 0x14));
         double viscosity;
         if (!GravityNaN(magnitude) && magnitude != 0.0) {
-            viscosity = GravityRead(volume, 0x8c);
+            viscosity = (*(const br_scalar*)((tU32)(uintptr_t)volume + 0x8c));
             if (!GravityNaN(viscosity) && viscosity > 2.0) {
-                double buoyancy = 1.0 - GravityRead(volume, 0x88);
+                double buoyancy = 1.0 - (*(const br_scalar*)((tU32)(uintptr_t)volume + 0x88));
                 double standard = (double)gravity;
-                buoyancy = GravityMultiplyScalar(buoyancy, GravityScalarPointer(object, 0x254));
-                standard = GravityMultiplyScalar(standard, (const br_scalar*)&gGravity_multiplier);
-                buoyancy = GravityMultiplyScalar(buoyancy, GravityScalarPointer(header, 0x14));
+                buoyancy = (buoyancy * (double)*(GravityScalarPointer(object, 0x254)));
+                standard = (standard * (double)*((const br_scalar*)&gGravity_multiplier));
+                buoyancy = (buoyancy * (double)*(GravityScalarPointer(header, 0x14)));
                 standard = standard * 1.4202898550724639;
                 value = GravitySubtractPopWide(buoyancy, standard) * 0.04;
             } else {
-                value = GravityRead(volume, 0x88);
-                value = GravityMultiplyScalar(value, GravityScalarPointer(object, 0x254));
-                value = GravityMultiplyScalar(value, &gravity);
-                value = GravityMultiplyScalar(value, (const br_scalar*)&gGravity_multiplier);
+                value = (*(const br_scalar*)((tU32)(uintptr_t)volume + 0x88));
+                value = (value * (double)*(GravityScalarPointer(object, 0x254)));
+                value = (value * (double)gravity);
+                value = (value * (double)*((const br_scalar*)&gGravity_multiplier));
                 value = value * -0.05681159420289855;
             }
         } else {
-            value = GravityRead(volume, 0x88);
-            value = GravityMultiplyScalar(value, GravityScalarPointer(object, 0x254));
-            value = GravityMultiplyScalar(value, &gravity);
-            value = GravityMultiplyScalar(value, (const br_scalar*)&gGravity_multiplier);
+            value = (*(const br_scalar*)((tU32)(uintptr_t)volume + 0x88));
+            value = (value * (double)*(GravityScalarPointer(object, 0x254)));
+            value = (value * (double)gravity);
+            value = (value * (double)*((const br_scalar*)&gGravity_multiplier));
             value = value * -0.05681159420289855;
         }
     } else {
-        value = GravityMultiplyScalar((double)gravity, (const br_scalar*)&gGravity_multiplier);
+        value = (((double)gravity) * (double)*((const br_scalar*)&gGravity_multiplier));
         value = value * -0.05681159420289855;
     }
     vector.v[0] = 0.0f;
@@ -895,20 +869,8 @@ void C2_HOOK_FASTCALL ProcessGravity(tPHIL_queued_header* header, tPhysics_objec
     FUN_004c2910(object);
 }
 
-static tU8* ForceBytes(const void* pBase, unsigned pOffset) {
-    return (tU8*)(uintptr_t)pBase + pOffset;
-}
-
-static double C2_HOOK_CDECL FrictionRead(const void* base, unsigned offset) {
-    return *(const br_scalar*)((const tU8*)base + offset);
-}
-
-static tU32 C2_HOOK_CDECL FrictionWord(const void* base, unsigned offset) {
-    return *(const tU32*)((const tU8*)base + offset);
-}
-
 static void* C2_HOOK_CDECL FrictionPointer(const void* base, unsigned offset) {
-    return (void*)(uintptr_t)FrictionWord(base, offset);
+    return (void*)(uintptr_t)(*(const tU32*)((const tU8*)base + offset));
 }
 
 static br_scalar C2_HOOK_CDECL FrictionScalar(double value) {
@@ -923,38 +885,11 @@ static const br_scalar* C2_HOOK_CDECL FrictionAt(const void* base, unsigned offs
     return (const br_scalar*)((const tU8*)base + offset);
 }
 
-static double C2_HOOK_CDECL FrictionProductScalars(const br_scalar* left, const br_scalar* right) {
-    double result;
-    result = (double)*left * (double)*right;
-    return result;
-}
-
-static double C2_HOOK_CDECL PartnerMultiplyWide(double a, double b) {
- double result;
- result=(double)a * b;
- return result;
-}
-
-static double C2_HOOK_CDECL PartnerMultiplyRawScalar(double a,const br_scalar* b) {
- double result;
- result=(double)a * *b;
- return result;
-}
-
-static double C2_HOOK_CDECL PartnerMultiplyScalarWide(const br_scalar* a,double b) {
- double result;
- result=(double)*a * b;
- return result;
-}
-
-static const br_scalar* PartnerScalarPtr(const void* base,unsigned offset) {
- return (const br_scalar*)ForceBytes(base,offset);
-}
 
 
-static int C2_HOOK_CDECL FrictionGreater(double left, double right) {
-    return left > right;
-}
+
+
+
 
 typedef void (C2_HOOK_FASTCALL* tDragFunction)(tPHIL_queued_header*, tPhysics_object*, br_scalar, int, tSpecial_volume*);
 
@@ -971,15 +906,15 @@ static void C2_HOOK_CDECL DragForward(tDragFunction target, tPHIL_queued_header*
 }
 
 static double C2_HOOK_CDECL DragLength(const void* object, unsigned offset) {
-    double x = FrictionRead(object, offset);
-    double y = FrictionRead(object, offset + 4);
-    double z = FrictionRead(object, offset + 8);
+    double x = (*(const br_scalar*)((const tU8*)object + offset));
+    double y = (*(const br_scalar*)((const tU8*)object + (offset + 4)));
+    double z = (*(const br_scalar*)((const tU8*)object + (offset + 8)));
     br_scalar rounded_x = FrictionScalar(x);
     br_scalar rounded_z = FrictionScalar(z);
-    double xx = PartnerMultiplyRawScalar(x, &rounded_x);
-    double yy = PartnerMultiplyWide(y, y);
-    double zz = PartnerMultiplyRawScalar(z, &rounded_z);
-    return sqrt(PhysicsJointSum(PhysicsJointSum(xx, yy), zz));
+    double xx = ((double)x * rounded_x);
+    double yy = ((double)y * y);
+    double zz = ((double)z * rounded_z);
+    return sqrt(((xx + yy) + zz));
 }
 
 // FUNCTION: CARMA2_HW 0x004b6ce0
@@ -990,30 +925,30 @@ void C2_HOOK_FASTCALL ProcessDrag2(tPHIL_queued_header* header, tPhysics_object*
     tPhysics_object* child;
 
     if ((flags & 8) != 0 && volume != NULL) {
-        double queued_gravity = FrictionRead(header, 0x14);
-        double viscosity = FrictionRead(volume, 0x8c);
-        if (queued_gravity != 0.0 && queued_gravity == queued_gravity && FrictionGreater(viscosity, 2.0)) {
-            scale = FrictionProductScalars(FrictionAt(object, 0x254), FrictionAt(volume, 0x8c));
-            scale = PartnerMultiplyRawScalar(scale, &effective_drag);
+        double queued_gravity = header->field_0x14;
+        double viscosity = volume->viscosity_multiplier;
+        if (queued_gravity != 0.0 && queued_gravity == queued_gravity && (viscosity > 2.0)) {
+            scale = ((double)*(FrictionAt(object, 0x254)) * (double)*(FrictionAt(volume, 0x8c)));
+            scale = ((double)scale * effective_drag);
             effective_drag = FrictionScalar(scale * 0.5);
         } else {
-            scale = FrictionProductScalars(FrictionAt(volume, 0x8c), FrictionAt(object, 0x254));
-            effective_drag = FrictionScalar(PartnerMultiplyRawScalar(scale, &effective_drag));
+            scale = ((double)*(FrictionAt(volume, 0x8c)) * (double)*(FrictionAt(object, 0x254)));
+            effective_drag = FrictionScalar(((double)scale * effective_drag));
         }
     }
     length = DragLength(object, 0x68);
-    scale = PartnerMultiplyRawScalar(length, &effective_drag);
-    scale = scale * 6.9 / FrictionRead(object, 4); /* original58a738 */
-    damping.v[0] = FrictionScalar(PartnerMultiplyScalarWide(PartnerScalarPtr(object, 0x68), scale));
-    damping.v[1] = FrictionScalar(PartnerMultiplyScalarWide(PartnerScalarPtr(object, 0x6c), scale));
-    damping.v[2] = FrictionScalar(PartnerMultiplyScalarWide(PartnerScalarPtr(object, 0x70), scale));
+    scale = ((double)length * effective_drag);
+    scale = scale * 6.9 / (object->M); /* original58a738 */
+    damping.v[0] = FrictionScalar(((double)object->v.v[0] * scale));
+    damping.v[1] = FrictionScalar(((double)object->v.v[1] * scale));
+    damping.v[2] = FrictionScalar(((double)object->v.v[2] * scale));
     DRVector3Diminish((br_vector3*)((tU8*)object + 0x68), &damping);
 
     length = DragLength(object, 0x74);
-    scale = PartnerMultiplyRawScalar(length, &effective_drag);
-    damping.v[0] = FrictionScalar(PartnerMultiplyScalarWide(PartnerScalarPtr(object, 0x74), scale));
-    damping.v[1] = FrictionScalar(PartnerMultiplyScalarWide(PartnerScalarPtr(object, 0x78), scale));
-    damping.v[2] = FrictionScalar(PartnerMultiplyScalarWide(PartnerScalarPtr(object, 0x7c), scale));
+    scale = ((double)length * effective_drag);
+    damping.v[0] = FrictionScalar(((double)object->omega.v[0] * scale));
+    damping.v[1] = FrictionScalar(((double)object->omega.v[1] * scale));
+    damping.v[2] = FrictionScalar(((double)object->omega.v[2] * scale));
     FUN_004c2c90(object, &damping);
     child = (tPhysics_object*)FrictionPointer(object, 0x224);
     while (child != NULL) {
@@ -1026,23 +961,8 @@ static void C2_HOOK_CDECL FrictionWrite(void* base, unsigned offset, double valu
     *(br_scalar*)((tU8*)base + offset) = FrictionScalar(value);
 }
 
-static double C2_HOOK_CDECL FrictionAddScalar(double left, const br_scalar* right) {
-    double result;
-    result = left + (double)*right;
-    return result;
-}
 
-static double C2_HOOK_CDECL FrictionSubtractScalar(double left, const br_scalar* right) {
-    double result;
-    result = left - (double)*right;
-    return result;
-}
 
-static double C2_HOOK_CDECL PartnerSubtractWide(double a, double b) {
- double result;
- result=a-b;
- return result;
-}
 
 // FUNCTION: CARMA2_HW 0x004b6fb0
 void C2_HOOK_FASTCALL LevelOutOnSurface(tPhysics_object* object) {
@@ -1061,76 +981,76 @@ void C2_HOOK_FASTCALL LevelOutOnSurface(tPhysics_object* object) {
 
     /* Comparisons and their loads follow the original ordered > tests.
      * Ties and unordered values choose the final Z axis. */
-    first = FrictionRead(object, 8);
-    second = FrictionRead(object, 12);
-    if (FrictionGreater(first, second)) {
-        first = FrictionRead(object, 8);
-        second = FrictionRead(object, 16);
-        if (FrictionGreater(first, second)) axis_row = 0;
+    first = object->I.v[0];
+    second = object->I.v[1];
+    if (first > second) {
+        first = object->I.v[0];
+        second = object->I.v[2];
+        if (first > second) axis_row = 0;
     }
     if (axis_row != 0) {
-        first = FrictionRead(object, 12);
-        second = FrictionRead(object, 16);
-        if (FrictionGreater(first, second)) {
-            first = FrictionRead(object, 12);
-            second = FrictionRead(object, 8);
-            if (FrictionGreater(first, second)) axis_row = 1;
+        first = object->I.v[1];
+        second = object->I.v[2];
+        if (first > second) {
+            first = object->I.v[1];
+            second = object->I.v[0];
+            if (first > second) axis_row = 1;
         }
     }
     actor_matrix = (br_matrix34*)((tU8*)FrictionPointer(object, 0) + 0x2c);
-    axis_x = FrictionRead(actor_matrix, axis_row * 12);
-    axis_y = FrictionRead(actor_matrix, axis_row * 12 + 4);
-    axis_z = FrictionRead(actor_matrix, axis_row * 12 + 8);
-    axis.v[0] = FrictionScalar(PartnerMultiplyRawScalar(axis_x, &negative_one));
-    axis.v[1] = FrictionScalar(PartnerMultiplyRawScalar(axis_y, &negative_one));
-    axis.v[2] = FrictionScalar(PartnerMultiplyRawScalar(axis_z, &negative_one));
+    axis_x = (*(const br_scalar*)((const tU8*)actor_matrix + (axis_row * 12)));
+    axis_y = (*(const br_scalar*)((const tU8*)actor_matrix + (axis_row * 12 + 4)));
+    axis_z = (*(const br_scalar*)((const tU8*)actor_matrix + (axis_row * 12 + 8)));
+    axis.v[0] = FrictionScalar(((double)axis_x * negative_one));
+    axis.v[1] = FrictionScalar(((double)axis_y * negative_one));
+    axis.v[2] = FrictionScalar(((double)axis_z * negative_one));
 
-    normal_z = FrictionRead(object, 0x24c);
-    normal_x = FrictionRead(object, 0x244);
-    normal_y = FrictionRead(object, 0x248);
-    product_z = PartnerMultiplyRawScalar(normal_z, &axis.v[2]);
-    product_x = PartnerMultiplyRawScalar(normal_x, &axis.v[0]);
-    product_y = PartnerMultiplyRawScalar(normal_y, &axis.v[1]);
-    dot = PhysicsJointSum(PhysicsJointSum(product_z, product_x), product_y);
+    normal_z = object->water_normal.v[2];
+    normal_x = object->water_normal.v[0];
+    normal_y = object->water_normal.v[1];
+    product_z = ((double)normal_z * axis.v[2]);
+    product_x = ((double)normal_x * axis.v[0]);
+    product_y = ((double)normal_y * axis.v[1]);
+    dot = ((product_z + product_x) + product_y);
     rounded_dot = FrictionScalar(dot);
-    if (!FrictionGreater(dot, -0.99)) return; /* original58a760 */
+    if (!(dot > (-0.99))) return; /* original58a760 */
 
     /* Six original normal loads precede the cross products. */
-    normal_x = FrictionRead(object, 0x244);
-    normal_y = FrictionRead(object, 0x248);
-    first = FrictionRead(object, 0x248);
-    normal_z = FrictionRead(object, 0x24c);
-    second = FrictionRead(object, 0x24c);
-    axis_x = FrictionRead(object, 0x244);
-    cross_x = PartnerSubtractWide(PartnerMultiplyRawScalar(first, &axis.v[2]), PartnerMultiplyRawScalar(normal_z, &axis.v[1]));
-    product_x = PartnerMultiplyWide(cross_x, cross_x);
-    cross_y = PartnerSubtractWide(PartnerMultiplyRawScalar(second, &axis.v[0]), PartnerMultiplyRawScalar(axis_x, &axis.v[2]));
+    normal_x = object->water_normal.v[0];
+    normal_y = object->water_normal.v[1];
+    first = object->water_normal.v[1];
+    normal_z = object->water_normal.v[2];
+    second = object->water_normal.v[2];
+    axis_x = object->water_normal.v[0];
+    cross_x = ((((double)first * axis.v[2]))-(((double)normal_z * axis.v[1])));
+    product_x = ((double)cross_x * cross_x);
+    cross_y = ((((double)second * axis.v[0]))-(((double)axis_x * axis.v[2])));
     rounded_y = FrictionScalar(cross_y);
-    product_y = PartnerMultiplyRawScalar(cross_y, &rounded_y);
-    cross_z = PartnerSubtractWide(PartnerMultiplyRawScalar(normal_x, &axis.v[1]), PartnerMultiplyRawScalar(normal_y, &axis.v[0]));
+    product_y = ((double)cross_y * rounded_y);
+    cross_z = ((((double)normal_x * axis.v[1]))-(((double)normal_y * axis.v[0])));
     rounded_z = FrictionScalar(cross_z);
-    error = FrictionSubtractScalar((double)rounded_dot, &negative_one);
+    error = (((double)rounded_dot) - (double)negative_one);
     rounded_error = FrictionScalar(error);
     rounded_y_product = FrictionScalar(product_y);
-    product_z = PartnerMultiplyRawScalar(cross_z, &rounded_z);
+    product_z = ((double)cross_z * rounded_z);
     rounded_z_product = FrictionScalar(product_z);
 
     /* The original successively recomputes each denominator after changing
      * the preceding component. These three unequal normalizations are real. */
-    denominator = sqrt(FrictionAddScalar(FrictionAddScalar(product_x, &rounded_z_product), &rounded_y_product));
-    correction_x = PartnerMultiplyWide(error / denominator, cross_x);
+    denominator = sqrt((((product_x + (double)rounded_z_product)) + (double)rounded_y_product));
+    correction_x = ((double)(error / denominator) * cross_x);
     correction.v[0] = FrictionScalar(correction_x);
-    product_x = PartnerMultiplyRawScalar(correction_x, &correction.v[0]);
+    product_x = ((double)correction_x * correction.v[0]);
     rounded_x_product = FrictionScalar(product_x);
-    denominator = sqrt(FrictionAddScalar((double)rounded_z_product + (double)rounded_y_product, &rounded_x_product));
-    correction_y = PartnerMultiplyScalarWide(&rounded_y, (double)rounded_error / denominator);
+    denominator = sqrt((((double)rounded_z_product + (double)rounded_y_product) + (double)rounded_x_product));
+    correction_y = ((double)rounded_y * ((double)rounded_error / denominator));
     correction.v[1] = FrictionScalar(correction_y);
-    product_y = PartnerMultiplyRawScalar(correction_y, &correction.v[1]);
-    denominator = sqrt(FrictionAddScalar(FrictionAddScalar(product_y, &rounded_z_product), &rounded_x_product));
-    correction.v[2] = FrictionScalar(PartnerMultiplyRawScalar((double)rounded_error / denominator, &rounded_z));
+    product_y = ((double)correction_y * correction.v[1]);
+    denominator = sqrt((((product_y + (double)rounded_z_product)) + (double)rounded_x_product));
+    correction.v[2] = FrictionScalar(((double)((double)rounded_error / denominator) * rounded_z));
 
     BrMatrix34TApplyV(&local_correction, &correction, actor_matrix);
-    FrictionWrite(object, 0x74, FrictionAddScalar(FrictionRead(&local_correction, 0), FrictionAt(object, 0x74)));
-    FrictionWrite(object, 0x78, FrictionAddScalar(FrictionRead(&local_correction, 4), FrictionAt(object, 0x78)));
-    FrictionWrite(object, 0x7c, FrictionAddScalar(FrictionRead(&local_correction, 8), FrictionAt(object, 0x7c)));
+    FrictionWrite(object, 0x74, (((*(const br_scalar*)((const tU8*)(&local_correction) + 0))) + (double)*(FrictionAt(object, 0x74))));
+    FrictionWrite(object, 0x78, (((*(const br_scalar*)((const tU8*)(&local_correction) + 4))) + (double)*(FrictionAt(object, 0x78))));
+    FrictionWrite(object, 0x7c, (((*(const br_scalar*)((const tU8*)(&local_correction) + 8))) + (double)*(FrictionAt(object, 0x7c))));
 }
