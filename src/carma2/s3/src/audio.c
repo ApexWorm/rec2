@@ -1028,6 +1028,12 @@ tS3_channel* C2_HOOK_FASTCALL S3GetChannelForTag(int pTag) {
     return NULL;
 }
 
+// FUNCTION: CARMA2_HW 0x00569f85
+int C2_HOOK_FASTCALL nop0_FUN_00569f85(tS3_channel* pChannel) {
+    (void)pChannel;
+    return 0;
+}
+
 // FUNCTION: CARMA2_HW 0x0056a818
 tS3_error_codes C2_HOOK_FASTCALL S3ClearBufferOfMidiChannel(int pTag) {
 
