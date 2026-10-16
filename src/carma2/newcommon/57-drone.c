@@ -133,6 +133,11 @@ void C2_HOOK_FASTCALL SetTrafficOn(int pTraffic_on) {
     gTraffic_disabled = !pTraffic_on;
 }
 
+// FUNCTION: CARMA2_HW 0x0044ed00
+int C2_HOOK_FASTCALL GetDronesOn(void) {
+    return !gTraffic_disabled;
+}
+
 // OtherPerambulatoryInstasificationIsEnablificated
 
 // LoadPanGameDroneInfo
