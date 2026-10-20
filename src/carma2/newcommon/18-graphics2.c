@@ -11,7 +11,9 @@
 #include "16-graphics1.h"
 #include "25-grafdata.h"
 #include "33-depth.h"
+#include "35-intrface.h"
 #include "41-utility.h"
+#include "42-input.h"
 #include "52-errors.h"
 #include "63-loading3.h"
 #include "66-tintedpoly.h"
@@ -137,6 +139,15 @@ br_pixelmap* gBlend_palettes[4];
 // GLOBAL: CARMA2_HW 0x0068be20
 // GLOBAL: CARMA2_SW 0x00685e64
 br_pixelmap* gCurrent_splash;
+
+// GLOBAL: CARMA2_HW 0x0067be90
+int gCurrent_cursor_index;
+
+// GLOBAL: CARMA2_HW 0x0079ecb0
+tMouse_coord gMouse_last_pos;
+
+// GLOBAL: CARMA2_HW 0x0067be94
+int gTransient_bitmap_index;
 
 // FUNCTION: CARMA2_HW 0x0047d470
 // FUNCTION: CARMA2_SW 0x0047d7a0
@@ -542,9 +553,17 @@ void C2_HOOK_FASTCALL AllocateCursorTransient(void) {
 
 // InitMouseTargetLines
 
-// STUB: CARMA2_HW 0x0043e6c0
+// FUNCTION: CARMA2_HW 0x0043e6c0
 void C2_HOOK_FASTCALL StartMouseCursor(void) {
-    NOT_IMPLEMENTED();
+    if (gCursor_tinted_top == -1) {
+        AllocateCursorTransient();
+    }
+    gNext_transient = 0;
+    gTransient_bitmap_index = 0;
+    GetMousePosition(&gMouse_last_pos.x, &gMouse_last_pos.y);
+    gMouse_in_use = 0;
+    gCurrent_cursor_index = 2;
+    gMouse_started = 1;
 }
 
 // FUNCTION: CARMA2_HW 0x0043e710
