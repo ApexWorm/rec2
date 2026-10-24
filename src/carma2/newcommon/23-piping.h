@@ -31,6 +31,7 @@ extern tU8* gPipe_buffer_oldest;
 extern tU8* gPipe_record_ptr;
 extern tU32 gPipe_sound_start_time;
 extern tU32 gPipe_sound_time_window;
+extern int gDisable_advance;
 
 // ARReplayForwards
 
@@ -114,7 +115,7 @@ extern int C2_HOOK_FASTCALL SoundTimeout(tU32 pTime);
 
 // ARDisableAdvance
 
-// AREnableAdvance
+extern void C2_HOOK_FASTCALL AREnableAdvance(void);
 
 // FindNextChunk
 

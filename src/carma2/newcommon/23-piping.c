@@ -88,6 +88,10 @@ tU32 gPipe_sound_start_time;
 // GLOBAL: CARMA2_SW 0x00671018
 tU32 gPipe_sound_time_window;
 
+// GLOBAL: CARMA2_HW 0x0067690c
+// GLOBAL: CARMA2_SW 0x0067107c
+int gDisable_advance;
+
 // ARReplayForwards
 
 // FUNCTION: CARMA2_HW 0x00402360
@@ -283,7 +287,11 @@ int C2_HOOK_FASTCALL SoundTimeout(tU32 pTime) {
 
 // ARDisableAdvance
 
-// AREnableAdvance
+// FUNCTION: CARMA2_HW 0x004030e0
+// FUNCTION: CARMA2_SW 0x004030e0
+void C2_HOOK_FASTCALL AREnableAdvance(void) {
+    gDisable_advance = 0;
+}
 
 // FindNextChunk
 
