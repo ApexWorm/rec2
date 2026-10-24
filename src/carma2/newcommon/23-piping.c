@@ -14,6 +14,7 @@
 #include "27-powerup.h"
 #include "32-spark.h"
 
+#include "13-crush1.h"
 #include "51-smash.h"
 #include "61-pedestrn.h"
 #include "69-sound.h"
@@ -935,7 +936,16 @@ void C2_HOOK_FASTCALL ApplySmokeColumn(tPipe_chunk** pChunk) {
 
 // ApplySkidAdjustment
 
-// ApplyFlap
+// FUNCTION: CARMA2_HW 0x004c9830
+// FUNCTION: CARMA2_SW 0x004c5f60
+void C2_HOOK_FASTCALL ApplyFlap(tPipe_chunk** pChunk) {
+    tPipe_chunk* chunk;
+
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk_flap, angle, 0x4);
+
+    chunk = *pChunk;
+    ARApplyFlap(chunk->data.flap.actor, chunk->data.flap.angle);
+}
 
 // ApplyModelMash
 
