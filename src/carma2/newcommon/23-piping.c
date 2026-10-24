@@ -11,6 +11,7 @@
 #include "00-car.h"
 #include "09-funks.h"
 #include "16-graphics1.h"
+#include "22-replay.h"
 #include "27-powerup.h"
 #include "32-spark.h"
 
@@ -96,7 +97,12 @@ int C2_HOOK_FASTCALL ARReplayIsReallyPaused(void) {
     return gReplay_rate == 0.f;
 }
 
-// ARReplayPauseState
+// FUNCTION: CARMA2_HW 0x00402380
+// FUNCTION: CARMA2_SW 0x00402380
+int C2_HOOK_FASTCALL ARReplayPauseState(void) {
+
+    return gPaused;
+}
 
 // FUNCTION: CARMA2_HW 0x00402390
 // FUNCTION: CARMA2_SW 0x00402390
@@ -154,7 +160,12 @@ int C2_HOOK_FASTCALL LengthOfChunk(tPipe_chunk* pChunk, int pType) {
 
 // ARPipeSearchForwards
 
-// ARIsActionReplayAvailable
+// FUNCTION: CARMA2_HW 0x004025a0
+// FUNCTION: CARMA2_SW 0x004025a0
+int C2_HOOK_FASTCALL ARIsActionReplayAvailable(void) {
+
+    return gPipe_buffer_start != NULL;
+}
 
 // FUNCTION: CARMA2_HW 0x004025b0
 // FUNCTION: CARMA2_SW 0x004025b0
