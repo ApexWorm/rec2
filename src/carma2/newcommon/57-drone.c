@@ -302,18 +302,22 @@ void C2_HOOK_FASTCALL PipeDroneMatrix(tDrone_spec* pDrone) {
     br_scalar radius;
     br_scalar speed;
 
-    compressed_mat.m[0].v[0] = DRScalarToU16(pDrone->actor->t.t.mat.m[0][0], -1.f, 1.f);
-    compressed_mat.m[0].v[1] = DRScalarToU16(pDrone->actor->t.t.mat.m[0][1], -1.f, 1.f);
-    compressed_mat.m[0].v[2] = DRScalarToU16(pDrone->actor->t.t.mat.m[0][2], -1.f, 1.f);
-    compressed_mat.m[1].v[0] = DRScalarToU16(pDrone->actor->t.t.mat.m[1][0], -1.f, 1.f);
-    compressed_mat.m[1].v[1] = DRScalarToU16(pDrone->actor->t.t.mat.m[1][1], -1.f, 1.f);
-    compressed_mat.m[1].v[2] = DRScalarToU16(pDrone->actor->t.t.mat.m[1][2], -1.f, 1.f);
-    compressed_mat.m[2].v[0] = DRScalarToU16(pDrone->actor->t.t.mat.m[2][0], -1.f, 1.f);
-    compressed_mat.m[2].v[1] = DRScalarToU16(pDrone->actor->t.t.mat.m[2][1], -1.f, 1.f);
-    compressed_mat.m[2].v[2] = DRScalarToU16(pDrone->actor->t.t.mat.m[2][2], -1.f, 1.f);
-    compressed_mat.m[3].v[0] = DRScalarToU16(pDrone->actor->t.t.mat.m[3][0], -1000.f, 1000.f);
-    compressed_mat.m[3].v[1] = DRScalarToU16(pDrone->actor->t.t.mat.m[3][1], -1000.f, 1000.f);
-    compressed_mat.m[3].v[2] = DRScalarToU16(pDrone->actor->t.t.mat.m[3][2], -1000.f, 1000.f);
+    BrVector3Set(&compressed_mat.m[0],
+        DRScalarToU16(pDrone->actor->t.t.mat.m[0][0], -1.f, 1.f),
+        DRScalarToU16(pDrone->actor->t.t.mat.m[0][1], -1.f, 1.f),
+        DRScalarToU16(pDrone->actor->t.t.mat.m[0][2], -1.f, 1.f));
+    BrVector3Set(&compressed_mat.m[1],
+        DRScalarToU16(pDrone->actor->t.t.mat.m[1][0], -1.f, 1.f),
+        DRScalarToU16(pDrone->actor->t.t.mat.m[1][1], -1.f, 1.f),
+        DRScalarToU16(pDrone->actor->t.t.mat.m[1][2], -1.f, 1.f));
+    BrVector3Set(&compressed_mat.m[2],
+        DRScalarToU16(pDrone->actor->t.t.mat.m[2][0], -1.f, 1.f),
+        DRScalarToU16(pDrone->actor->t.t.mat.m[2][1], -1.f, 1.f),
+        DRScalarToU16(pDrone->actor->t.t.mat.m[2][2], -1.f, 1.f));
+    BrVector3Set(&compressed_mat.m[3],
+        DRScalarToU16(pDrone->actor->t.t.mat.m[3][0], -1000.f, 1000.f),
+        DRScalarToU16(pDrone->actor->t.t.mat.m[3][1], -1000.f, 1000.f),
+        DRScalarToU16(pDrone->actor->t.t.mat.m[3][2], -1000.f, 1000.f));
 
     radius = MIN(pDrone->h_radius, 100.f);
     speed = pDrone->left_turn ? pDrone->field_0x48 : -pDrone->field_0x48;
