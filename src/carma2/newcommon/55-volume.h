@@ -16,6 +16,7 @@
 
 extern tSpecial_volume gDefault_default_water_spec_vol;
 extern tSpecial_volume* gDefault_water_spec_vol_real;
+extern const char* gSpecial_effects_boundary_choices[4];
 
 extern tSpecial_volume* C2_HOOK_FASTCALL GetDefaultSpecialVolumeForWater(void);
 
@@ -33,6 +34,6 @@ extern void C2_HOOK_FASTCALL SaveSpecialVolumes(void);
 
 extern void C2_HOOK_FASTCALL FindInverseAndWorldBox(tSpecial_volume* pSpec);
 
-// ReadSpecialVolumes
+extern void C2_HOOK_FASTCALL ReadSpecialVolumes(FILE* pF);
 
 #endif // GUARD_55_VOLUME_H
