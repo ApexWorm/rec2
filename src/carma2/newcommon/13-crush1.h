@@ -259,6 +259,10 @@ extern void C2_HOOK_FASTCALL StopFlapping(br_actor* pActor, tCar_spec* pCar_spec
 
 // ToggleFlaps
 
+extern int C2_HOOK_FASTCALL ToggleDoorsCollisionInfoCallback(tPhysics_object* pCollision_info, tCar_spec* pCar);
+
+extern intptr_t C2_HOOK_CDECL ToggleDoorsActorCallback(br_actor* pActor, void* pCar);
+
 extern int C2_HOOK_FASTCALL BitObjectIsSufficientlyOutsideCarObjectToDetach(tPhysics_object* pObject);
 
 // FullyDetachBit

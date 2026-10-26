@@ -945,6 +945,19 @@ void C2_HOOK_FASTCALL StopFlapping(br_actor* pActor, tCar_spec* pCar_spec) {
 
 // ToggleFlaps
 
+// FUNCTION: CARMA2_HW 0x0042ddb0
+// FUNCTION: CARMA2_SW 0x0042de20
+int C2_HOOK_FASTCALL ToggleDoorsCollisionInfoCallback(tPhysics_object* pCollision_info, tCar_spec* pCar) {
+    DRActorEnumRecurse(pCollision_info->actor, ToggleDoorsActorCallback, pCar);
+    return 0;
+}
+
+// STUB: CARMA2_HW 0x0042ddc0
+// STUB: CARMA2_SW 0x0042de30
+intptr_t C2_HOOK_CDECL ToggleDoorsActorCallback(br_actor* pActor, void* pCar) {
+    NOT_IMPLEMENTED();
+}
+
 // FUNCTION: CARMA2_HW 0x00434910
 // FUNCTION: CARMA2_SW 0x00434940
 int C2_HOOK_FASTCALL BitObjectIsSufficientlyOutsideCarObjectToDetach(tPhysics_object* pObject) {
