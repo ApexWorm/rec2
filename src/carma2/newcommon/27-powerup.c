@@ -11,6 +11,7 @@
 #include "00-car.h"
 #include "01-network.h"
 #include "13-crush1.h"
+#include "15-displays.h"
 
 #include "16-graphics1.h"
 #include "18-graphics2.h"
@@ -1232,7 +1233,18 @@ void C2_HOOK_FASTCALL SetSpinningPowerup(br_actor* pActor, int pOpacity) {
 
 // SetChangingPowerup
 
-// PedValium
+// FUNCTION: CARMA2_HW 0x004dfec0
+// FUNCTION: CARMA2_SW 0x004dc3c0
+int C2_HOOK_FASTCALL PedValium(tPowerup* pPowerup, tCar_spec* pCar) {
+
+    if (CalmDownAllPeds()) {
+        NewTextHeadupSlot(4, 0, 3000, -4, GetMiscString(eMiscString_pedestrians_are_calm_now));
+        DRS3StartSound2(gCar_outlet, eSoundId_PedValium, 1, 0xff, 0xff, -1, -1);
+        return pPowerup - gPowerup_array;
+    } else {
+        return -1;
+    }
+}
 
 // PowerupCancel
 
