@@ -197,7 +197,19 @@ char* C2_HOOK_FASTCALL GetPowerupMessage(int pPowerup_index) {
 
 // ExcludedPowerup
 
-// GotPowerupX
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_HW 0x004d9150
+// STUB: CARMA2_SW 0x004d5680
+int C2_HOOK_FASTCALL GotPowerupX(tCar_spec* pCar, int pIndex, int pArg3, int pMessage, tU32 pTime) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // GotPowerupXX
 
@@ -417,7 +429,20 @@ void C2_HOOK_FASTCALL GotPowerup9(void) {
 
 // GainAPO
 
-// GotTimeOrPower
+// FUNCTION: CARMA2_HW 0x004dc470
+// FUNCTION: CARMA2_SW 0x004d8970
+int C2_HOOK_FASTCALL GotTimeOrPower(tPowerup* pPowerup, tCar_spec* pCar) {
+    int time;
+
+    if (gNet_mode != eNet_mode_none) {
+        return GotPowerupX(pCar, gNet_powerup_time_replacement, 1, 1, 0);
+    }
+    if (pCar != NULL && pCar->driver == eDriver_local_human) {
+        time = IRandomBetween(pPowerup->integer_params[0], pPowerup->integer_params[1]);
+        AwardTime(time);
+    }
+    return pPowerup - gPowerup_array;
+}
 
 // GainAPOPotential
 
