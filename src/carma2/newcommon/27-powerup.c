@@ -11,6 +11,7 @@
 #include "00-car.h"
 #include "01-network.h"
 #include "13-crush1.h"
+#include "15-displays.h"
 
 #include "16-graphics1.h"
 #include "18-graphics2.h"
@@ -408,7 +409,20 @@ void C2_HOOK_FASTCALL GotPowerup9(void) {
     GotPowerupN(9);
 }
 
-// GotCredits
+// FUNCTION: CARMA2_HW 0x004dc170
+// FUNCTION: CARMA2_SW 0x004d8670
+int C2_HOOK_FASTCALL GotCredits(tPowerup* pPowerup, tCar_spec* pCar) {
+    int credits;
+    char s[256];
+
+    if (pCar != NULL && pCar->driver == eDriver_local_human) {
+        credits = 100 * (IRandomBetween(pPowerup->integer_params[0], pPowerup->integer_params[1]) / 100);
+        strcpy(s, pPowerup->message);
+        strcat(s, " ");
+        EarnCredits2(credits, s);
+    }
+    return pPowerup - gPowerup_array;
+}
 
 // GainAPO2
 
