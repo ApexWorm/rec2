@@ -35,6 +35,9 @@ extern int gFrontend_wrecks_pending_hscroll;
 extern int gFrontend_wrecks_rotate_prev_x;
 extern int gFrontend_wrecks_rotate_prev_y;
 
+extern int gFrontend_controls_count_keys;
+extern int gINT_00688748;
+
 // SetGameTarget
 
 extern void C2_HOOK_FASTCALL SetOptions(tNet_game_type pGame_type, tNet_game_options* pGame_options);
@@ -399,9 +402,9 @@ extern int C2_HOOK_FASTCALL Controls_KeyDown(tFrontend_spec* pFrontend);
 
 // Controls_Outfunc
 
-// Controls_SlotActivated
+extern int C2_HOOK_FASTCALL Controls_SlotActivated(tFrontend_spec* pFrontend);
 
-// Controls_Ok
+extern int C2_HOOK_FASTCALL Controls_Ok(tFrontend_spec* pFrontend);
 
 // DisplayNetworkOptions
 

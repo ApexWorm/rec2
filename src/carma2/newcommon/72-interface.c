@@ -115,9 +115,17 @@ tFrontend_item_spec gDefault_last_interface_item = {
 // GLOBAL: CARMA2_SW 0x00680c34
 int gFrontend_scrollbars_updated;
 
+// GLOBAL: CARMA2_HW 0x006864f8
+// GLOBAL: CARMA2_SW 0x00680c38
+int gFrontend_controls_count_keys;
+
 // GLOBAL: CARMA2_HW 0x006864fc
 // GLOBAL: CARMA2_SW 0x00680c3c
 int gFrontend_netsummary_first_iteration;
+
+// GLOBAL: CARMA2_HW 0x00688748
+// GLOBAL: CARMA2_SW 0x00682ca8
+int gINT_00688748;
 
 // GLOBAL: CARMA2_HW 0x00686850
 // GLOBAL: CARMA2_SW 0x00680f90
@@ -2735,9 +2743,75 @@ int C2_HOOK_FASTCALL Controls_KeyDown(tFrontend_spec* pFrontend) {
 
 // Controls_Outfunc
 
-// Controls_SlotActivated
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
 
-// Controls_Ok
+// STUB: CARMA2_HW 0x00472b00
+// STUB: CARMA2_SW 0x00472090
+int C2_HOOK_FASTCALL Controls_SlotActivated(tFrontend_spec* pFrontend) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
+
+// FUNCTION: CARMA2_HW 0x00472d80
+// FUNCTION: CARMA2_SW 0x004722f0
+int C2_HOOK_FASTCALL Controls_Ok(tFrontend_spec* pFrontend) {
+    int i;
+    int prev_item;
+
+    C2_HOOK_BUG_ON(REC2_ASIZE(gKey_mapping) != 77);
+
+    gINT_00688748 = -1;
+    WaitForNoKeys();
+    for (i = 28; i <= (int)REC2_ASIZE(gKey_mapping) - 1; i++) {
+        if (gKey_mapping[i] == -2) {
+            gINT_00688748 = i;
+            break;
+        }
+    }
+    if (gJoystick_index == -1) {
+        for (i = 28; i <= (int)REC2_ASIZE(gKey_mapping) - 1; i++) {
+            if (gKey_mapping[i] >= 107 && gKey_mapping[i] < 139) {
+                gINT_00688748 = i;
+            } else if (gKey_mapping[i] >= 139 && gKey_mapping[i] < 143) {
+                gINT_00688748 = i;
+            }
+        }
+    }
+    if (gINT_00688748 != -1) {
+        for (i = 0; i < gFrontend_controls_count_keys; i++) {
+            if (gControls_frontend_to_key_mapping_lut[i] == gINT_00688748) {
+                break;
+            }
+        }
+        if (i < gControls_scroller.field_0x8 || i >= gControls_scroller.field_0x8 + gControls_scroller.range_length) {
+            gControls_scroller.field_0x8 = i;
+            if (i >= gControls_scroller.field_0x0 - gControls_scroller.range_length) {
+                gControls_scroller.field_0x8 = gControls_scroller.field_0x0 - gControls_scroller.range_length;
+            }
+        }
+        RefreshScrollSet(pFrontend);
+        prev_item = gFrontend_selected_item_index;
+        if (i < gControls_scroller.field_0x8 || i > gControls_scroller.field_0x8 + gControls_scroller.range_length) {
+            gFrontend_selected_item_index = -1;
+        } else {
+            gFrontend_selected_item_index = i - gControls_scroller.field_0x8 + gControls_scroller.range_starts[0];
+        }
+        if (gFrontend_selected_item_index == -1) {
+            PDFatalError("Screwed up in Controls_Ok().");
+            return 0;
+        }
+        Controls_SlotActivated(pFrontend);
+        gFrontend_selected_item_index = prev_item;
+        return 4;
+    }
+    SaveJoystickPreferences();
+    return 0;
+}
 
 // DisplayNetworkOptions
 
