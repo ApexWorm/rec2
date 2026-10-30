@@ -171,6 +171,10 @@ int gFrontend_maximum_input_length = 9;
 // GLOBAL: CARMA2_SW 0x00759e84
 int gHierarchy_has_actor;
 
+// GLOBAL: CARMA2_HW 0x00763920
+// GLOBAL: CARMA2_SW 0x00759e80
+tNet_game_type gFrontend_game_type;
+
 // GLOBAL: CARMA2_HW 0x00763928
 // GLOBAL: CARMA2_SW 0x00759e88
 int gPicked_wreck;
@@ -267,6 +271,10 @@ int gPrev_frontend_mouse_down;
 // GLOBAL: CARMA2_SW 0x00682908
 int gFrontend_leave_current_menu;
 
+// GLOBAL: CARMA2_HW 0x006883b0
+// GLOBAL: CARMA2_SW 0x00682910
+tStruct_00686508 gUNK_006883b0;
+
 // GLOBAL: CARMA2_HW 0x00688abc
 // GLOBAL: CARMA2_SW 0x0068301c
 tFrontend_spec* gCurrent_frontend_spec;
@@ -323,6 +331,10 @@ br_model* gFrontend_B_model_from;
 
 // GLOBAL: CARMA2_HW 0x006886e0
 br_model* gFrontend_B_model_to;
+
+// GLOBAL: CARMA2_HW 0x006886e8
+// GLOBAL: CARMA2_SW 0x00682c48
+tStruct_00686508 gUNK_006886e8;
 
 // GLOBAL: CARMA2_HW 0x00686504
 br_model* gFrontend_C_model_from;
@@ -2745,7 +2757,124 @@ int C2_HOOK_FASTCALL Controls_KeyDown(tFrontend_spec* pFrontend) {
 
 // RestoreNetworkOptions
 
-// NetOptions_Infunc
+// FUNCTION: CARMA2_HW 0x00472ed0
+// FUNCTION: CARMA2_SW 0x00472440
+int C2_HOOK_FASTCALL NetOptions_Infunc(tFrontend_spec* pFrontend) {
+
+    C2_HOOK_BUG_ON(sizeof(tNet_game_options) != 0x30);
+
+    Generic_Infunc(pFrontend);
+    if (gFrontend_net_options.show_players_on_map) {
+        SelectThisItemIn(pFrontend, 1, 2);
+    } else {
+        SelectThisItemIn(pFrontend, 1, 3);
+    }
+    if (gFrontend_net_options.powerup_respawn) {
+        SelectThisItemIn(pFrontend, 2, 5);
+    } else {
+        SelectThisItemIn(pFrontend, 2, 6);
+    }
+    if (gFrontend_net_options.open_game) {
+        SelectThisItemIn(pFrontend, 3, 8);
+    } else {
+        SelectThisItemIn(pFrontend, 3, 9);
+    }
+    if (gFrontend_net_options.grid_start) {
+        SelectThisItemIn(pFrontend, 4, 11);
+    } else {
+        SelectThisItemIn(pFrontend, 4, 12);
+    }
+    switch (gFrontend_net_options.race_sequence_type) {
+    case eNet_sequence_sequential:
+        SelectThisItemIn(pFrontend, 5, 14);
+        break;
+    case eNet_sequence_random:
+        SelectThisItemIn(pFrontend, 5, 15);
+        break;
+    }
+    if (gFrontend_net_options.random_car_choice) {
+        SelectThisItemIn(pFrontend, 6, 17);
+    } else {
+        SelectThisItemIn(pFrontend, 6, 18);
+    }
+    switch (gFrontend_net_options.car_choice) {
+    case eNet_car_eagle:
+        SelectThisItemIn(pFrontend, 7, 20);
+        break;
+    case eNet_car_novelty:
+        SelectThisItemIn(pFrontend, 7, 21);
+        break;
+    case eNet_car_all:
+        SelectThisItemIn(pFrontend, 7, 22);
+        break;
+    }
+    sprintf(pFrontend->items[24].text, "%i", gFrontend_net_options.starting_credits);
+    switch (gFrontend_game_type) {
+    case eNet_game_type_1:
+        pFrontend->items[25].stringId = 233;
+        break;
+    case eNet_game_type_5:
+        pFrontend->items[25].stringId = 234;
+        break;
+    case eNet_game_type_foxy:
+        pFrontend->items[25].stringId = 235;
+        break;
+    case eNet_game_type_fight_to_death:
+    case eNet_game_type_2:
+    case eNet_game_type_checkpoint:
+    case eNet_game_type_4:
+    case eNet_game_type_6:
+        pFrontend->items[25].stringId = 232;
+        break;
+    }
+    pFrontend->items[25].enabled = kFrontendItemEnabled_enabled;
+    pFrontend->items[26].enabled = kFrontendItemEnabled_enabled;
+    pFrontend->items[30].enabled = kFrontendItemEnabled_enabled;
+    pFrontend->items[29].enabled = kFrontendItemEnabled_enabled;
+    switch (gFrontend_game_type) {
+    case eNet_game_type_1:
+    case eNet_game_type_5:
+        sprintf(pFrontend->items[26].text, "%i", gFrontend_net_options.starting_target);
+        break;
+    case eNet_game_type_foxy:
+        {
+            int seconds = gFrontend_net_options.starting_target / 1000;
+            int hours = seconds / 3600;
+            int minutes = (seconds / 60) % 60;
+
+            seconds %= 60;
+            if (hours != 0) {
+                sprintf(pFrontend->items[26].text, "%02i:%02i:%02i", hours, minutes, seconds);
+            } else {
+                sprintf(pFrontend->items[26].text, "%02i:%02i", minutes, seconds);
+            }
+        }
+        break;
+    case eNet_game_type_fight_to_death:
+    case eNet_game_type_2:
+    case eNet_game_type_checkpoint:
+    case eNet_game_type_4:
+    case eNet_game_type_6:
+        pFrontend->items[25].enabled = kFrontendItemEnabled_disabled;
+        pFrontend->items[26].enabled = kFrontendItemEnabled_disabled;
+        pFrontend->items[30].enabled = kFrontendItemEnabled_disabled;
+        pFrontend->items[29].enabled = kFrontendItemEnabled_disabled;
+        strcpy(pFrontend->items[26].text, "----");
+        break;
+    }
+    FuckWithWidths(pFrontend);
+    gUNK_006883b0.next = NULL;
+    gFrontend_backup_net_options = gFrontend_net_options;
+    gUNK_006886e8.field_0x0 = 24;
+    gUNK_006886e8.field_0x4 = 28;
+    gUNK_006886e8.field_0x8 = 27;
+    gUNK_006883b0.field_0x0 = 26;
+    gUNK_006883b0.field_0x4 = 30;
+    gUNK_006883b0.field_0x8 = 29;
+    gUNK_006886e8.next = &gUNK_006883b0;
+    gPTR_00686508 = &gUNK_006886e8;
+    return 0;
+}
 
 // FUNCTION: CARMA2_HW 0x00473210
 // FUNCTION: CARMA2_SW 0x00472780
