@@ -29,6 +29,11 @@ extern int gCount_changed_points;
 extern br_vector3 gChanged_points[10];
 extern int gPed_nearness;
 extern tTWTVFS gTwtPeds;
+extern tU32 DAT_006a0418;
+extern tPedestrian* PTR_00694120;
+extern int gPed_points[3];
+extern int gPed_score_multiplier;
+extern int gPed_recent_points;
 extern float gMutant_speed;
 extern tMovement_spec gPed_spurt_initial_speed;
 extern tSmashable_initial_position_spec gPed_spurt_initial_position;
@@ -189,7 +194,7 @@ extern void C2_HOOK_FASTCALL PedApplyBloodSpurt(tU32 pId, tU32 pTime, unsigned i
 
 // OneLessPed
 
-// ScoreForKilledPedestrian
+extern void C2_HOOK_FASTCALL ScoreForKilledPedestrian(tPedestrian* pPed, float pHeight);
 
 // KillPedestrian
 

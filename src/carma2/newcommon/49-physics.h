@@ -26,6 +26,7 @@ extern int gPhysics_other_buffer_capacity;
 extern tProximity_ray gProximity_rays[20];
 extern br_model* gPed_spurt_model;
 extern int gPed_spurty_lumps_count;
+extern int gPed_times[3];
 extern br_actor* gPed_limbed_actors[30];
 extern tShrapnel_time_info gPed_spurt_min_max_time;
 extern void* gPhysics_other_buffer;
