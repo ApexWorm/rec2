@@ -3,7 +3,8 @@
 This records the first file-by-file import from the supplied
 `C:\Users\user\Documents\ChatGPT\rec2\common` snapshot, reviewed on
 2026-10-31. The local integration branch is `codex/qwen-common-port`, based on
-rec2 master commit `32e90cd2ef`. The larger snapshot remains in progress.
+rec2 master commit `32e90cd2ef`, then rebased onto `8698a00be4` for submission.
+The larger snapshot remains in progress.
 
 | Supplied file | rec2 destination | Result |
 | --- | --- | --- |
@@ -48,6 +49,23 @@ The check also verifies the shared system-info object, both page-cache mappings,
 and distinct storage for the two caches. Its JSON report includes executable and
 PDB hashes. Build and comparison logs are under `build-audit/qwen-import`.
 These checks cover this import batch, rather than full-game runtime acceptance.
+
+## Submission branches
+
+Each branch contains one function's changes and builds independently with all
+three compilers. The seven hardware and six software comparisons also pass
+independently at 100%. Open a comparison link to review and submit its PR.
+
+- [FreeExplosionAnimation](https://github.com/madebr/rec2/compare/master...ApexWorm:codex/qwen-free-explosion-animation?expand=1)
+- [ChangeCameraType](https://github.com/madebr/rec2/compare/master...ApexWorm:codex/qwen-change-camera-type?expand=1)
+- [TouchMemoryPages and page-cache fixes](https://github.com/madebr/rec2/compare/master...ApexWorm:codex/qwen-touch-memory-pages?expand=1)
+- [Replay-buffer callback](https://github.com/madebr/rec2/compare/master...ApexWorm:codex/qwen-replay-buffer-callback?expand=1)
+- [NearestPowerOfTwo](https://github.com/madebr/rec2/compare/master...ApexWorm:codex/qwen-nearest-power-of-two?expand=1)
+- [Lighting callback](https://github.com/madebr/rec2/compare/master...ApexWorm:codex/qwen-lighting-noop?expand=1)
+- [PackfileNoOp](https://github.com/madebr/rec2/compare/master...ApexWorm:codex/qwen-packfile-noop?expand=1)
+
+The independent build logs and comparison results are saved under
+`build-audit/qwen-import/publish`.
 
 ## Next file
 
