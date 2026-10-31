@@ -93,6 +93,10 @@ int gFreeze_mechanics;
 // GLOBAL: CARMA2_SW 0x00673b4c
 int gNum_active_non_cars;
 
+// GLOBAL: CARMA2_HW 0x006793dc
+// GLOBAL: CARMA2_SW 0x00673b4c
+int gNum_active_non_cars;
+
 // GLOBAL: CARMA2_HW 0x006793d0
 // GLOBAL: CARMA2_SW 0x00673b40
 int gEliminate_faces;
@@ -159,6 +163,11 @@ void C2_HOOK_FASTCALL DamageEngine(int pDamage_amount) {
 void C2_HOOK_FASTCALL DamageTrans(int pAmount) {
     DamageUnit(&gProgram_state.current_car, eDamage_transmission, pAmount);
     SortOutSmoke(&gProgram_state.current_car);
+}
+
+// STUB: CARMA2_HW 0x00413d60
+void C2_HOOK_FASTCALL DamageSteering(int pDamage_amount) {
+    NOT_IMPLEMENTED();
 }
 
 // FUNCTION: CARMA2_HW 0x00413d90
