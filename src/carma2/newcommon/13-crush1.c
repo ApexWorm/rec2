@@ -506,11 +506,64 @@ intptr_t C2_HOOK_CDECL InitModelCrushDataCB(br_actor* pActor, void* pData) {
 
 // PointEdgeDistSq
 
-// SetFlapCheckVertices
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_HW 0x0042c0e0
+// STUB: CARMA2_SW 0x0042c170
+void C2_HOOK_FASTCALL SetFlapCheckVertices(tCar_crush_flap_data* pFlap_data, const br_model* pModel, tModel_detail_vertex_data* pVertex_data) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // InitModelVertexData
 
-// InitVertexDataCB
+// FUNCTION: CARMA2_HW 0x0042bf80
+// FUNCTION: CARMA2_SW 0x0042c010
+intptr_t C2_HOOK_CDECL InitVertexDataCB(br_actor* pActor, void* pData) {
+    tUser_crush_data* user_crush_data;
+    tCar_crush_buffer_entry* crush_data;
+    tCar_spec* car_spec;
+    tCar_crush_spec* car_crush_spec;
+    tUser_detail_level_model* model_user_data;
+    tModel_detail_vertex_data* vertex_data;
+    br_model* model;
+    int i;
+    int j;
+    int invalid;
+
+    C2_HOOK_BUG_ON(sizeof(tModel_detail_vertex_data) != 10);
+
+    user_crush_data = pActor->user;
+    car_spec = pData;
+    if (user_crush_data == NULL || (crush_data = user_crush_data->crush_data) == NULL || (car_crush_spec = car_spec->car_crush_spec) == NULL) {
+        return 0;
+    }
+    for (i = 0; i < car_spec->count_detail_levels; i++) {
+        model = user_crush_data->models[i];
+        if (model != NULL && model->nvertices != 0 && (model_user_data = model->user) != NULL) {
+            vertex_data = BrMemAllocate(model->nvertices * sizeof(tModel_detail_vertex_data), kMem_crush_data);
+            model_user_data->field_0x4 = vertex_data;
+            for (j = 0; j < model->nvertices; j++) {
+                CompressVector3(&vertex_data[j].p, &model->vertices[j].p, -10.0f, 10.0f);
+                vertex_data[j].limit_number = CrushLimitNumber(&model->vertices[j].p, &car_crush_spec->limits, &car_crush_spec->count_limits, &invalid);
+            }
+            if (i == 0) {
+                if (crush_data->flap_data != NULL) {
+                    SetFlapCheckVertices(crush_data->flap_data, model, vertex_data);
+                }
+            }
+            if (i == 0) {
+                LinkSmashies(pActor, crush_data, model_user_data->field_0x4);
+            }
+        }
+    }
+    return 0;
+}
 
 // InitVertexData
 
