@@ -19,6 +19,7 @@
 #include "41-utility.h"
 #include "42-input.h"
 #include "49-physics.h"
+#include "51-smash.h"
 #include "52-errors.h"
 #include "62-graphics3.h"
 
@@ -33,6 +34,7 @@
 #include "rec2_macros.h"
 
 #include "c2_stdio.h"
+#include "c2_stdlib.h"
 #include "c2_string.h"
 
 // GLOBAL: CARMA2_HW 0x006a0414
@@ -100,6 +102,14 @@ int gPed_nearness;
 // GLOBAL: CARMA2_HW 0x00694498
 // GLOBAL: CARMA2_SW 0x0068e4f0
 tTWTVFS gTwtPeds;
+
+// GLOBAL: CARMA2_HW 0x006944a0
+// GLOBAL: CARMA2_SW 0x0068e4f8
+tMovement_spec gPed_spurt_initial_speed;
+
+// GLOBAL: CARMA2_HW 0x0069fda8
+// GLOBAL: CARMA2_SW 0x00699e00
+tSmashable_initial_position_spec gPed_spurt_initial_position;
 
 // GLOBAL: CARMA2_HW 0x007447a4
 // GLOBAL: CARMA2_SW 0x0073b264
@@ -520,7 +530,26 @@ void C2_HOOK_FASTCALL CBFillInObject(tPhysics_object* pObject, undefined4 pType)
 
 // DoSpurt
 
-// PedApplyBloodSpurt
+// FUNCTION: CARMA2_HW 0x004cccc0
+// FUNCTION: CARMA2_SW 0x004c93c0
+void C2_HOOK_FASTCALL PedApplyBloodSpurt(tU32 pId, tU32 pTime, unsigned int pSeed, br_vector3* pPosition, br_vector3* pImpactee_velocity, br_vector3* pNormal) {
+    int seed;
+    int i;
+    tSmash_vertex* fragment;
+    br_scalar scale;
+
+    seed = rand();
+    srand(pSeed);
+    for (i = 0; i < gPed_spurty_lumps_count; i++) {
+        fragment = FindShrapnelFragment(gPed_spurt_model, pId, 1);
+        if (fragment == NULL) {
+            break;
+        }
+        scale = SetInitPosition(fragment->actor, &gPed_spurt_initial_position, NULL, pPosition, pPosition, NULL, NULL, NULL);
+        SetShrapnelFragment(fragment, &gPed_spurt_initial_speed, pImpactee_velocity, scale, &gPed_spurt_min_max_time, pTime, pNormal, NULL, NULL);
+    }
+    srand(seed);
+}
 
 // PedUndoBloodSpurt
 
