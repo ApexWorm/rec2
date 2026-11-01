@@ -128,3 +128,55 @@ Track loading and model processing remain. The supplied face-copy size needs
 original-binary review, and the pipeline needs pedestrian and powerup functions
 that are not yet implemented in active rec2. Existing implementations are
 retained; missing dependencies have not been replaced with stubs.
+
+
+## Third batch: ten independent functions (2026-11-01)
+
+The integration branch now includes upstream `0862dbd8f0`. The accepted upstream
+`FreeExplosionAnimation` implementation is retained, and the earlier packfile
+no-op uses upstream's name, `TurnOnPaletteConversion`.
+
+This batch ports scalar trigonometry from `trig.c`, string/table and plane
+helpers from `utility.c`, three powerup helpers from `powerups.c`, and the smash
+material check from `world.c`. The smash check supports the remaining track
+model-processing work. Sine and cosine expand the original inlined lookup
+bodies, so their branches do not depend on missing float-wrapper functions.
+
+Each branch contains one function and any necessary declarations or verified
+global annotations. All ten branches independently build both game editions
+with MSVC 5 SP3, modern x86 MSVC, and i686 MinGW. Existing unrelated compiler
+warnings and reccmp diagnostics remain.
+
+| Submission | Hardware comparison | Software comparison |
+| --- | ---: | ---: |
+| [FastScalarSin](https://github.com/madebr/rec2/compare/master...ApexWorm:codex/qwen-fast-scalar-sin?expand=1) | 91.67% | 88.89% |
+| [FastScalarCos](https://github.com/madebr/rec2/compare/master...ApexWorm:codex/qwen-fast-scalar-cos?expand=1) | 94.44% | 91.67% |
+| [FastScalarArcSin](https://github.com/madebr/rec2/compare/master...ApexWorm:codex/qwen-fast-scalar-arcsin?expand=1) | 100.00% | 100.00% |
+| [CopyMiscString](https://github.com/madebr/rec2/compare/master...ApexWorm:codex/qwen-copy-misc-string?expand=1) | 100.00% | 100.00% |
+| [GetBlendTableName](https://github.com/madebr/rec2/compare/master...ApexWorm:codex/qwen-blend-table-name?expand=1) | 100.00% | 100.00% |
+| [DistanceFromFace](https://github.com/madebr/rec2/compare/master...ApexWorm:codex/qwen-distance-from-face?expand=1) | 57.14% | 57.14% |
+| [GetPowerupMessage](https://github.com/madebr/rec2/compare/master...ApexWorm:codex/qwen-powerup-message?expand=1) | 100.00% | 100.00% |
+| [SetDancingPeds](https://github.com/madebr/rec2/compare/master...ApexWorm:codex/qwen-dancing-peds?expand=1) | 100.00% | 100.00% |
+| [SetPanickingPeds](https://github.com/madebr/rec2/compare/master...ApexWorm:codex/qwen-panicking-peds?expand=1) | 100.00% | 100.00% |
+| [SmashFaceMustBeUpdateable](https://github.com/madebr/rec2/compare/master...ApexWorm:codex/qwen-smash-face-updateable?expand=1) | 100.00% | 100.00% |
+
+Seven new functions match both originals exactly and are included in
+`scripts/verify_qwen_common_ports.py`. The integration check now covers 16
+hardware and 15 software functions plus the page-cache mappings.
+
+Sine/cosine comparison differences include attribution of table-offset operands
+to nearby symbols; sine also differs in equivalent index-address arithmetic.
+`DistanceFromFace` retains the reviewed dot-product arithmetic, with different
+x87 scheduling. Their comparison scores remain partial rather than being
+reported as exact matches.
+
+Focused checks pass in both edition configurations for 2,161 signed/wrapped
+angles, 201 arcsine values, and nine geometric plane-residual fixtures. Run:
+
+```powershell
+python scripts/verify_qwen_common_behavior.py --cc path/to/i686-w64-mingw32-gcc.exe
+```
+
+These numerical checks and the original-instruction review do not constitute
+full-game runtime acceptance. Build logs, comparisons, and branch publication
+receipts are under `build-audit/qwen-batch3/publish`.

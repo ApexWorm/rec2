@@ -92,6 +92,8 @@ extern void C2_HOOK_FASTCALL TimerString(tU32 pTime, char* pStr, undefined4 pArg
 
 extern const char* C2_HOOK_FASTCALL GetMiscString(int pIndex);
 
+extern void C2_HOOK_FASTCALL CopyMiscString(int pIndex, char* pDestination);
+
 extern int C2_HOOK_FASTCALL Flash(tU32 pPeriod, tU32* pLast_change, int* pCurrent_state);
 
 extern double C2_HOOK_FASTCALL RGBDifferenceSqr(tRGB_colour* pColour_1, tRGB_colour* pColour_2);
@@ -134,6 +136,8 @@ extern intptr_t C2_HOOK_CDECL FindMaterialCB(br_actor* pActor, void* data);
 
 extern br_material* C2_HOOK_FASTCALL FindMaterial(const char* pName, br_actor* pActor, int pRecursive);
 
+extern void C2_HOOK_FASTCALL GetBlendTableName(int pPercent, char* pDest);
+
 extern void C2_HOOK_FASTCALL BlendifyMaterialTablishly(br_material* pMaterial, int pPercent);
 
 extern void C2_HOOK_FASTCALL BlendifyMaterialPrimitively(br_material* pMaterial, int pPercent);
@@ -144,7 +148,7 @@ extern void C2_HOOK_FASTCALL DRModelUpdateAndKevificateMaterials(br_model* pMode
 
 extern int C2_HOOK_FASTCALL DRModelUpdateDeluxTurbo(br_actor* pActor, br_model* pModel, br_uint_16 pFlags);
 
-// DistanceFromFace
+extern br_scalar C2_HOOK_FASTCALL DistanceFromFace(const br_vector3* pPoint, const tFace_ref* pFace);
 
 extern void C2_HOOK_FASTCALL DRBoundsCopy(br_bounds3* pDest, const br_bounds3* pSrc);
 

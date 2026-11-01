@@ -18,9 +18,9 @@ extern float gFloat_sine_table[91];
 
 // FastFloatCos
 
-// FastScalarSin
+extern br_scalar C2_HOOK_FASTCALL FastScalarSin(int pAngle_degrees);
 
-// FastScalarCos
+extern br_scalar C2_HOOK_FASTCALL FastScalarCos(int pAngle_degrees);
 
 // FastScalarSinAngle
 
@@ -29,6 +29,8 @@ extern float gFloat_sine_table[91];
 extern float C2_HOOK_STDCALL FastFloatArcSin(float pValue);
 
 extern float C2_HOOK_STDCALL FastFloatArcCos(float pValue);
+
+extern br_scalar C2_HOOK_STDCALL FastScalarArcSin(br_scalar pValue);
 
 extern br_scalar C2_HOOK_STDCALL FastScalarArcCos(br_scalar pValue);
 

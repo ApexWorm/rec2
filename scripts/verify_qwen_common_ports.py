@@ -32,6 +32,13 @@ FUNCTIONS = (
     ("TurnOnPaletteConversion", 0x004b4eb0, 0x004b1020),
     ("GetModelTextureArea", 0x004f5ae0, 0x004f1740),
     ("GetGlassFragmentCounts", 0x004f5c70, 0x004f18d0),
+    ("FastScalarArcSin", 0x00511b50, 0x0050cfa0),
+    ("CopyMiscString", 0x00514d80, 0x005101f0),
+    ("GetBlendTableName", 0x00515e10, 0x00511280),
+    ("GetPowerupMessage", 0x004d8d10, 0x004d5240),
+    ("SetDancingPeds", 0x004de870, 0x004dad70),
+    ("SetPanickingPeds", 0x004de8a0, 0x004dada0),
+    ("SmashFaceMustBeUpdateable", 0x004f5470, 0x004f10d0),
 )
 VARIABLES = (
     ("gSystem_info", 0x0079ea80, 0x00794fe0),

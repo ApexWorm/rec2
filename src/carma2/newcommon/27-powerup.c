@@ -77,6 +77,7 @@ float gPed_gravity_multiplier;
 int gPed_dismemberfest;
 
 // GLOBAL: CARMA2_HW 0x007447f8
+// GLOBAL: CARMA2_SW 0x0073b2b8
 int gPanicking_peds;
 
 // GLOBAL: CARMA2_HW 0x007059c0
@@ -130,6 +131,13 @@ int gInstant_handbrake;
 // GLOBAL: CARMA2_HW 0x006a0a54
 // GLOBAL: CARMA2_SW 0x0069aaac
 tPowerup* gPowerup_array;
+
+// FUNCTION: CARMA2_HW 0x004d8d10
+// FUNCTION: CARMA2_SW 0x004d5240
+char* C2_HOOK_FASTCALL GetPowerupMessage(int pPowerup_index) {
+
+    return gPowerup_array[pPowerup_index].message;
+}
 
 // GetNextGoodyTime
 
@@ -832,9 +840,21 @@ void C2_HOOK_FASTCALL ResetInstantHandbrake(tPowerup* pPowerup, tCar_spec* pCar)
     }
 }
 
-// SetDancingPeds
+// FUNCTION: CARMA2_HW 0x004de870
+// FUNCTION: CARMA2_SW 0x004dad70
+int C2_HOOK_FASTCALL SetDancingPeds(tPowerup* pPowerup, tCar_spec* pCar) {
 
-// SetPanickingPeds
+    gDancing_peds = 1;
+    return pPowerup - gPowerup_array;
+}
+
+// FUNCTION: CARMA2_HW 0x004de8a0
+// FUNCTION: CARMA2_SW 0x004dada0
+int C2_HOOK_FASTCALL SetPanickingPeds(tPowerup* pPowerup, tCar_spec* pCar) {
+
+    gPanicking_peds = 1;
+    return pPowerup - gPowerup_array;
+}
 
 // SetLowGravityPeds
 

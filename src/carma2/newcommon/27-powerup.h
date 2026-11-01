@@ -36,6 +36,8 @@ extern int gInventory_cycling;
 extern tU32 gInventory_timeout;
 extern tU32* gReal_render_palette;
 
+extern char* C2_HOOK_FASTCALL GetPowerupMessage(int pPowerup_index);
+
 // GetNextGoodyTime
 
 // DoPowerupTextHeadup
@@ -316,9 +318,9 @@ extern int C2_HOOK_FASTCALL SetInstantHandbrake(tPowerup* pPowerup, tCar_spec* p
 
 extern void C2_HOOK_FASTCALL ResetInstantHandbrake(tPowerup* pPowerup, tCar_spec* pCar);
 
-// SetDancingPeds
+extern int C2_HOOK_FASTCALL SetDancingPeds(tPowerup* pPowerup, tCar_spec* pCar);
 
-// SetPanickingPeds
+extern int C2_HOOK_FASTCALL SetPanickingPeds(tPowerup* pPowerup, tCar_spec* pCar);
 
 // SetLowGravityPeds
 

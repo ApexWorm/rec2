@@ -691,6 +691,13 @@ const char* C2_HOOK_FASTCALL GetMiscString(int pIndex) {
     return gMisc_strings[pIndex];
 }
 
+// FUNCTION: CARMA2_HW 0x00514d80
+// FUNCTION: CARMA2_SW 0x005101f0
+void C2_HOOK_FASTCALL CopyMiscString(int pIndex, char* pDestination) {
+
+    strcpy(pDestination, gMisc_strings[pIndex]);
+}
+
 // FUNCTION: CARMA2_HW 0x00514db0
 // FUNCTION: CARMA2_SW 0x00510220
 int C2_HOOK_FASTCALL Flash(tU32 pPeriod, tU32* pLast_change, int* pCurrent_state) {
@@ -1040,6 +1047,13 @@ br_material* C2_HOOK_FASTCALL FindMaterial(const char* pName, br_actor* pActor, 
     }
 }
 
+// FUNCTION: CARMA2_HW 0x00515e10
+// FUNCTION: CARMA2_SW 0x00511280
+void C2_HOOK_FASTCALL GetBlendTableName(int pPercent, char* pDest) {
+
+    sprintf(pDest, "BLEND%d.TAB", 100 - pPercent);
+}
+
 void C2_HOOK_FASTCALL BlendifyMaterialTablishly(br_material* pMaterial, int pPercent) {
     char* s;
 
@@ -1153,7 +1167,12 @@ int C2_HOOK_FASTCALL DRModelUpdateDeluxTurbo(br_actor* pActor, br_model* pModel,
     }
 }
 
-// DistanceFromFace
+// FUNCTION: CARMA2_HW 0x00516090
+// FUNCTION: CARMA2_SW 0x00511500
+br_scalar C2_HOOK_FASTCALL DistanceFromFace(const br_vector3* pPoint, const tFace_ref* pFace) {
+
+    return BrVector3Dot(pPoint, &pFace->normal) - pFace->d;
+}
 
 // FUNCTION: CARMA2_HW 0x005160c0
 void C2_HOOK_FASTCALL DRBoundsCopy(br_bounds3* pDest, const br_bounds3* pSrc) {
