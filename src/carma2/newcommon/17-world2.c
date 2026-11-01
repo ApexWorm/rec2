@@ -390,11 +390,14 @@ int C2_HOOK_FASTCALL HasThisSuffix(const char* pIdent, const char* pSuffix) {
 // FUNCTION: CARMA2_SW 0x00449190
 br_material* C2_HOOK_FASTCALL UnsuffixedMaterial(const char* pOld_ident, const char* pSuffix) {
     br_material* result;
+    size_t old_len;
     int unsuffixed_len;
     char* new_id;
 
-    unsuffixed_len = strlen(pOld_ident) - strlen(pSuffix);
+    old_len = strlen(pOld_ident);
+    unsuffixed_len = old_len - strlen(pSuffix);
     new_id = BrMemAllocate(unsuffixed_len + 1, kMem_new_mat_id);
+    // STRING: CARMA2_SW 0x58c3a4
     sprintf(new_id, "%.*s", unsuffixed_len, pOld_ident);
     result = BrMaterialFind(new_id);
     BrMemFree(new_id);
