@@ -114,6 +114,8 @@ extern void C2_HOOK_FASTCALL DRMatrix34TApplyP(br_vector3* pA, const br_vector3*
 
 extern void C2_HOOK_FASTCALL DRPixelmapRectangleCopy(br_pixelmap* dst, br_int_16 dx, br_int_16 dy, br_pixelmap* src, br_int_16 sx, br_int_16 sy, br_uint_16 w, br_uint_16 h);
 
+extern void C2_HOOK_FASTCALL DRPixelmapRectangleFill(br_pixelmap* pDestination, br_int_16 pX, br_int_16 pY, br_uint_16 pWidth, br_uint_16 pHeight, br_uint_32 pColour);
+
 extern int C2_HOOK_FASTCALL NormalSideOfPlane(br_vector3* pPoint, br_vector3* pNormal, br_scalar pD);
 
 extern br_material* C2_HOOK_FASTCALL DRMaterialClone(br_material* pMaterial, int pSet_identifier);

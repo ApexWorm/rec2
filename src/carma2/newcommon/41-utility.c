@@ -891,6 +891,13 @@ void C2_HOOK_FASTCALL DRPixelmapRectangleCopy(br_pixelmap* dst, br_int_16 dx, br
     BrPixelmapRectangleCopy(dst, dx, dy, src, sx, sy, w, h);
 }
 
+// FUNCTION: CARMA2_HW 0x005156d0
+// FUNCTION: CARMA2_SW 0x00510b40
+void C2_HOOK_FASTCALL DRPixelmapRectangleFill(br_pixelmap* pDestination, br_int_16 pX, br_int_16 pY, br_uint_16 pWidth, br_uint_16 pHeight, br_uint_32 pColour) {
+
+    BrPixelmapRectangleFill(pDestination, pX, pY, pWidth, pHeight, pColour);
+}
+
 // FUNCTION: CARMA2_HW 0x00515700
 // FUNCTION: CARMA2_SW 0x00510b70
 int C2_HOOK_FASTCALL NormalSideOfPlane(br_vector3* pPoint, br_vector3* pNormal, br_scalar pD) {
