@@ -67,9 +67,64 @@ independently at 100%. Open a comparison link to review and submit its PR.
 The independent build logs and comparison results are saved under
 `build-audit/qwen-import/publish`.
 
-## Next file
+## Second batch: brucetrk.c (2026-11-01)
 
-`brucetrk.c` still needs track loading, model processing, rendering, and actor-query
-work. Its supplied code needs review of the face-copy size and range-update
-loops, plus several pedestrian and powerup dependencies. Compare those bodies
-with the original instructions before importing them.
+The supplied file mixes track code with two smash helpers. This batch adds
+`GetModelTextureArea` and `GetGlassFragmentCounts` to `51-smash.c`, and
+`ProcessNearbyActors` and `RenderTrack` to `37-brucetrk.c`.
+
+The actor query had incorrect upper-bound updates, a z clamp that checked x,
+exclusive final-row/final-column loops, and a missing return value. The port
+restores the behavior present in both originals, including the unusual
+unsigned callback-result conversion through floating point. The callback
+context now uses the existing calling-convention-aware typedef.
+
+The renderer's whole-world fallback must call `BrZbsSceneRenderAdd`, as it does
+for individual columns. The supplied fallback called `BrZbSceneRenderAdd`.
+Frustum selection, the one-cell margin, traversal order, and actor selection
+were checked against both original executables.
+
+The texture-area and glass-fragment helpers match both originals at 100% and
+are included in `scripts/verify_qwen_common_ports.py`. Rendering and actor-query
+instruction matching remain incomplete:
+
+| Function | Hardware | Software |
+| --- | ---: | ---: |
+| `GetModelTextureArea` | 100% | 100% |
+| `GetGlassFragmentCounts` | 100% | 100% |
+| `ProcessNearbyActors` | 93.36% | 92.53% |
+| `RenderTrack` | 95.10% | 79.11% |
+
+Matching scores measure instruction similarity and do not replace runtime testing.
+
+Seven isolated actor-query regression cases cover inclusive bounds, expansion
+on both axes, unequal grid dimensions, clamping, null cells, early termination,
+and callback fields. The harness uses the actual function body with enumeration
+and filtering test doubles. Fourteen renderer cases check fallback calls,
+axis/sign traversal order, alternate actors, null cells, and edge expansion.
+Projection and transform functions are mocked. Both harnesses pass in hardware
+and software configurations; they do not test full-game geometry or hierarchy.
+Run them with a native GCC-compatible compiler (i686 MinGW on Windows):
+
+```powershell
+python scripts/verify_qwen_brucetrk.py --cc path/to/i686-w64-mingw32-gcc.exe
+```
+
+Each second-batch submission branch is based on upstream `0862dbd8f0` and is checked
+independently with MSVC 5 SP3, modern x86 MSVC, and i686 MinGW. Existing unrelated
+warnings remain. No full-game runtime acceptance is claimed.
+
+- [GetModelTextureArea](https://github.com/madebr/rec2/compare/master...ApexWorm:codex/qwen-model-texture-area?expand=1)
+- [GetGlassFragmentCounts](https://github.com/madebr/rec2/compare/master...ApexWorm:codex/qwen-glass-fragment-counts?expand=1)
+- [ProcessNearbyActors](https://github.com/madebr/rec2/compare/master...ApexWorm:codex/qwen-process-nearby-actors?expand=1)
+- [RenderTrack](https://github.com/madebr/rec2/compare/master...ApexWorm:codex/qwen-render-track?expand=1)
+
+Evidence and the reusable focused harnesses are in
+`build-audit/qwen-brucetrk`; independent branch logs are in its `publish` folder.
+
+## Remaining brucetrk.c work
+
+Track loading and model processing remain. The supplied face-copy size needs
+original-binary review, and the pipeline needs pedestrian and powerup functions
+that are not yet implemented in active rec2. Existing implementations are
+retained; missing dependencies have not been replaced with stubs.

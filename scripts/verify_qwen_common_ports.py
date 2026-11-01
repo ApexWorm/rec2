@@ -5,7 +5,7 @@
 #
 # Copyright 2026 rec2 developers
 
-"""Compare the first common-source ports with the retail hardware/software EXEs.
+"""Compare the exactly matched common-source ports with the retail hardware/software EXEs.
 
 Run with reccmp installed, after building with MSVC 5 SP3 and configuring
 reccmp-user.yml. A successful check requires exact instruction matches, correct
@@ -30,6 +30,8 @@ FUNCTIONS = (
     ("NearestPowerOfTwo", 0x00497830, 0x00494460),
     ("FUN_00486d90", 0x00486d90, 0x00483ec0),
     ("PackfileNoOp", 0x004b4eb0, 0x004b1020),
+    ("GetModelTextureArea", 0x004f5ae0, 0x004f1740),
+    ("GetGlassFragmentCounts", 0x004f5c70, 0x004f18d0),
 )
 VARIABLES = (
     ("gSystem_info", 0x0079ea80, 0x00794fe0),
