@@ -29,7 +29,7 @@ FUNCTIONS = (
     ("FUN_DisposeReplayBuffer", 0x0051b9d0, None),
     ("NearestPowerOfTwo", 0x00497830, 0x00494460),
     ("FUN_00486d90", 0x00486d90, 0x00483ec0),
-    ("PackfileNoOp", 0x004b4eb0, 0x004b1020),
+    ("TurnOnPaletteConversion", 0x004b4eb0, 0x004b1020),
     ("GetModelTextureArea", 0x004f5ae0, 0x004f1740),
     ("GetGlassFragmentCounts", 0x004f5c70, 0x004f18d0),
 )
