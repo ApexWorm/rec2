@@ -1188,6 +1188,16 @@ int C2_HOOK_FASTCALL DRVector3TestForNan(const br_vector3* pV) {
     }
 }
 
+// FUNCTION: CARMA2_HW 0x005161c0
+// FUNCTION: CARMA2_SW 0x00511630
+int C2_HOOK_FASTCALL DRVector4TestForNan(const float* pVector) {
+
+    if (pVector != NULL) {
+        return TestForNan(&pVector[0]) || TestForNan(&pVector[1]) || TestForNan(&pVector[2]) || TestForNan(&pVector[3]);
+    }
+    return 0;
+}
+
 // FUNCTION: CARMA2_HW 0x00516240
 // FUNCTION: CARMA2_SW 0x005116b0
 void C2_HOOK_FASTCALL DRScaleModel(br_model* pModel, float pScale) {
