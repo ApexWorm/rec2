@@ -388,9 +388,9 @@ extern void C2_HOOK_CDECL RenderChangingPowerup(br_actor* pActor, br_model* pMod
 
 // SetSpinningPowerup
 
-// DuplicateModel
+extern br_model* C2_HOOK_FASTCALL DuplicateModel(br_model* pModel, const char* pName);
 
-// SetChangingPowerup
+extern void C2_HOOK_FASTCALL SetChangingPowerup(br_actor* pActor);
 
 // PedValium
 
