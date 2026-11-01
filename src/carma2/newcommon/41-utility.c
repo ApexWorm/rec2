@@ -967,6 +967,69 @@ int C2_HOOK_FASTCALL PDCheckDriveExists(const char* pThe_path) {
     return PDCheckDriveExists2(pThe_path, NULL, 0);
 }
 
+// FUNCTION: CARMA2_HW 0x00515960
+// FUNCTION: CARMA2_SW 0x00510dd0
+void* C2_HOOK_FASTCALL RunLengthEncode8bitPixelmap(br_pixelmap* pPixelmap) {
+    tU8 row_buffer[800];
+    tU8* source_row;
+    tU8* scratch;
+    tU8* result;
+    tU8* row_cursor;
+    tU8 pixel;
+    int zero_run;
+    int row;
+    int packets;
+    int run_length;
+    unsigned int x;
+    unsigned int width;
+    unsigned int row_size;
+    unsigned int output_size;
+
+    scratch = BrMemAllocate(pPixelmap->row_bytes * pPixelmap->height, kMem_misc);
+    *(tU16*)scratch = pPixelmap->height;
+    output_size = 2;
+    for (row = 0; row < pPixelmap->height; row++) {
+        source_row = (tU8*)pPixelmap->pixels + row * pPixelmap->row_bytes;
+        row_size = 2;
+        zero_run = *source_row == 0;
+        run_length = 0;
+        x = 0;
+        width = pPixelmap->width;
+        packets = 0;
+        row_cursor = row_buffer + 2;
+        for (;;) {
+            for (; run_length < 127 && x != width && ((pixel = source_row[x]) == 0) == zero_run; x++) {
+                if (!zero_run) {
+                    *row_cursor++ = pixel;
+                    row_size++;
+                }
+                run_length++;
+            }
+            if (zero_run) {
+                row_cursor[-1] = (tU8)run_length;
+            } else {
+                row_buffer[row_size - run_length - 1] = (tU8)-run_length;
+            }
+            run_length = 0;
+            packets++;
+            if (x == width) {
+                break;
+            }
+            /* Retain the last inspected pixel at the 127-pixel limit. */
+            zero_run = pixel == 0;
+            row_size++;
+            row_cursor++;
+        }
+        row_buffer[0] = (tU8)packets;
+        memcpy(scratch + output_size, row_buffer, row_size);
+        output_size += row_size;
+    }
+    result = BrMemAllocate(output_size, kMem_misc);
+    memcpy(result, scratch, output_size);
+    BrMemFree(scratch);
+    return result;
+}
+
 br_actor* C2_HOOK_FASTCALL CloneActor(br_actor* pActor) {
     br_actor *clone;
     br_actor *child;
