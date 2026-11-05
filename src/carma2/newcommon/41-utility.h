@@ -74,6 +74,8 @@ extern br_uint_32 C2_HOOK_FASTCALL DRActorEnumRecurseWithTrans(br_actor* pActor,
 
 extern int C2_HOOK_FASTCALL sign(int pNumber);
 
+extern float C2_HOOK_FASTCALL fsign(float pValue);
+
 extern FILE* C2_HOOK_FASTCALL OpenUniqueFileB(char* pPrefix, char* pExtension);
 
 extern void C2_HOOK_FASTCALL PrintScreenFile(FILE* pF);
@@ -122,6 +124,8 @@ extern br_material* C2_HOOK_FASTCALL DRMaterialClone(br_material* pMaterial, int
 
 extern int C2_HOOK_FASTCALL DRStricmp(const char* p1, const char* p2);
 
+extern void C2_HOOK_FASTCALL DRstrupr(char* s);
+
 extern void C2_HOOK_FASTCALL DRstrlwr(char* s);
 
 int C2_HOOK_FASTCALL PDCheckDriveExists(const char* pThe_path);
@@ -148,7 +152,7 @@ extern void C2_HOOK_FASTCALL DRModelUpdateAndKevificateMaterials(br_model* pMode
 
 extern int C2_HOOK_FASTCALL DRModelUpdateDeluxTurbo(br_actor* pActor, br_model* pModel, br_uint_16 pFlags);
 
-// DistanceFromFace
+extern br_scalar C2_HOOK_FASTCALL DistanceFromFace(const br_vector3* pPoint, const tFace_ref* pFace);
 
 extern void C2_HOOK_FASTCALL DRBoundsCopy(br_bounds3* pDest, const br_bounds3* pSrc);
 
