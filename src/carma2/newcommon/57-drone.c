@@ -428,7 +428,10 @@ void C2_HOOK_FASTCALL DoDroneFunkyGroovyThings(tDrone_spec* pDrone) {
 
 // MoveMyDroneBaby
 
-// DroneLookWhereYoureGoingYouBlindCunt
+// FUNCTION: CARMA2_HW 0x004525c0
+// FUNCTION: CARMA2_SW 0x00452350
+void C2_HOOK_FASTCALL DroneLookWhereYoureGoingYouBlindCunt(void) {
+}
 
 // FUNCTION: CARMA2_HW 0x004525d0
 // FUNCTION: CARMA2_SW 0x00452360
@@ -507,7 +510,11 @@ void C2_HOOK_FASTCALL ApplyDroneCornerPos2(int pDrone_id, tU16 pSpeed, tU16 pFie
     DoDroneFunkyGroovyThings(drone);
 }
 
-// ReallocModelFacesAndVertices
+// STUB: CARMA2_HW 0x00452f40
+void C2_HOOK_FASTCALL ReallocModelFacesAndVertices(br_model* pModel, int pCount_faces, int pCount_vertices) {
+    BrBlockFill(NULL, 0, 0);
+    NOT_IMPLEMENTED();
+}
 
 // CalcNFacesAndVerticesInEditModel
 

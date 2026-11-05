@@ -215,6 +215,27 @@ typedef struct {
 } tSmoke_column_core;
 
 typedef struct {
+    float opacity;
+    br_pixelmap* map;
+} tExplosion_frame;
+
+typedef struct {
+    tU32 start;
+    tU32 period;
+    undefined field_0x8;
+    tU8 count_frames;
+    tU8 finished;
+    undefined field_0xb;
+    br_actor* collision_actor;
+    br_actor* actor;
+    float field_0x14;
+    br_angle angle;
+    undefined padding[2];
+    br_vector3 field_0x1c;
+    tExplosion_frame frames[10];
+} tExplosion;
+
+typedef struct {
     tU16 v[3];
 } tCompressed_vector3;
 
@@ -454,12 +475,17 @@ typedef struct {
 
 typedef struct {
     tU32 time;
-} tPipe_chunk_frame_finish;
+} tPipe_chunk_frame_boundary;
 
 typedef struct {
     br_vector3 p;
     br_vector3 v;
 } tPipe_chunk_spark;
+
+typedef struct {
+    tU32 size; // size is size of complete chunk (including size member)
+    tU8 data[];
+} tPipe_chunk_bend;
 
 typedef struct {
     tS16 v[3];
@@ -480,6 +506,10 @@ typedef struct {
 
 typedef struct {
     br_matrix34 m;
+} tPipe_chunk_shit_mine;
+
+typedef struct {
+    br_matrix34 m;
 } tPipe_chunk_end_shit_mine;
 
 typedef struct {
@@ -490,6 +520,10 @@ typedef struct {
 typedef struct {
     br_actor* actor;
 } tPipe_chunk_identity;
+
+typedef struct {
+    tExplosion explosion;
+} tPipe_chunk_explosion;
 
 typedef enum {
     ePipe_chunk_frame_finish = 0,
@@ -556,6 +590,7 @@ typedef struct {
 typedef struct tPipe_chunk {
     uintptr_t subject_index;
     union {
+        tPipe_chunk_frame_boundary frame_boundary;
         tPipe_chunk_non_car non_car;
         tPipe_ped_physics_data ped_physics;
         tPipe_single_ped_dismember ped_dismember;
@@ -568,9 +603,16 @@ typedef struct tPipe_chunk {
         tPipe_single_vector vector;
         tPipe_chunk_powerup_lose powerup_lose;
         tPipe_chunk_powerup_respawn powerup_respawn;
-        tPipe_single_vanished_dismembered vanished_dismembered;
-        br_matrix34 shit_mine;
+        tPipe_chunk_shit_mine shit_mine;
         tPipe_chunk_end_shit_mine end_shit_mine;
+        tPipe_smudge_data smudge;
+        tPipe_model_mash model_mash;
+        tPipe_chunk_bend bend;
+        tPipe_chunk_screen_wobble wobble;
+        tPipe_chunk_smoke_column smoke_column;
+        tPipe_chunk_explosion explosion;
+        tPipe_single_groove_on_of groove;
+        tPipe_single_vanished_dismembered vanished_dismembered;
         char raw_data[0];
     } data;
 } tPipe_chunk;
@@ -1938,27 +1980,6 @@ typedef struct {
 } tQueued_headup;
 
 typedef struct {
-    float opacity;
-    br_pixelmap* map;
-} tExplosion_frame;
-
-typedef struct {
-    tU32 start;
-    tU32 period;
-    undefined field_0x8;
-    tU8 count_frames;
-    tU8 finished;
-    undefined field_0xb;
-    br_actor* collision_actor;
-    br_actor* actor;
-    float field_0x14;
-    br_angle angle;
-    undefined padding[2];
-    br_vector3 field_0x1c;
-    tExplosion_frame frames[10];
-} tExplosion;
-
-typedef struct {
     br_actor* actor;
     tU32 time;
 } tDelayed_non_car_actor_item;
@@ -2348,6 +2369,7 @@ typedef struct {
 } tDamage_condition;
 
 typedef enum {
+    eDamage_start = 0,
     eDamage_engine = 0,
     eDamage_transmission = 1,
     eDamage_driver = 2,
@@ -2359,7 +2381,8 @@ typedef enum {
     eDamage_lf_wheel = 8,
     eDamage_rf_wheel = 9,
     eDamage_lr_wheel = 10,
-    eDamage_rr_wheel = 11
+    eDamage_rr_wheel = 11,
+    eDamage_count = 12,
 } tDamage_type;
 
 typedef struct  {
@@ -5431,6 +5454,7 @@ enum {
     eMiscString_repairing_for_free = 4,
     eMiscString_repair_cost_colon = 5,
     eMiscString_recovery_cost_colon = 7,
+    eMiscString_every_opponent_wasted = 10,
     eMiscString_credits = 12,
     eMiscString_credit = 13,
     eMiscString_lost_credits_prefix = 14,
@@ -5752,6 +5776,7 @@ enum {
     kFatalError_ConfusedByFormatOfConditionalDamageInCarFile = 0x5c,
     kFatalError_TooManyExtraPointsForCarIndex_S = 0x5d,
     kFatalError_OOM_S = 0x5e,
+    kFatalError_SomethingInThePipingSystemWentWrong = 0x62,
     kFatalError_CannotOpenTEXT_TXT = 0x63,
     kFatalError_CannotFindFlicReferencedTranslation_S = 0x65,
     kFatalError_CannotOpenHeadupsFile = 0x66,

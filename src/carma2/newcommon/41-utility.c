@@ -458,6 +458,21 @@ int C2_HOOK_FASTCALL sign(int pNumber) {
     }
 }
 
+// FUNCTION: CARMA2_HW 0x00514950
+// FUNCTION: CARMA2_SW 0x0050fd90
+float C2_HOOK_FASTCALL fsign(float pValue) {
+    int result;
+
+    if (pValue > 0.0f) {
+        result = 1;
+    } else if (pValue < 0.0f) {
+        result = -1;
+    } else {
+        result = 0;
+    }
+    return (float)result;
+}
+
 // FUNCTION: CARMA2_HW 0x005149a0
 // FUNCTION: CARMA2_SW 0x0050fde0
 FILE* C2_HOOK_FASTCALL OpenUniqueFileB(char* pPrefix, char* pExtension) {
@@ -958,12 +973,25 @@ int C2_HOOK_FASTCALL DRStricmp(const char* p1, const char* p2) {
 }
 
 // FUNCTION: CARMA2_HW 0x005158d0
-void C2_HOOK_FASTCALL DRstrlwr(char* s) {
+// FUNCTION: CARMA2_SW 0x00510d40
+void C2_HOOK_FASTCALL DRstrupr(char* s) {
     int l = (int)strlen(s);
     int i;
 
     for (i = 0; i < l; i++) {
         s[i] = toupper(s[i]);
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x00515910
+// FUNCTION: CARMA2_SW 0x00510d80
+void C2_HOOK_FASTCALL DRstrlwr(char* s) {
+    int i;
+    int length;
+
+    length = (int)strlen(s);
+    for (i = 0; i < length; i++) {
+        s[i] = (char)tolower(s[i]);
     }
 }
 
@@ -1167,7 +1195,12 @@ int C2_HOOK_FASTCALL DRModelUpdateDeluxTurbo(br_actor* pActor, br_model* pModel,
     }
 }
 
-// DistanceFromFace
+// FUNCTION: CARMA2_HW 0x00516090
+// FUNCTION: CARMA2_SW 0x00511500
+br_scalar C2_HOOK_FASTCALL DistanceFromFace(const br_vector3* pPoint, const tFace_ref* pFace) {
+
+    return BrVector3Dot(pPoint, &pFace->normal) - pFace->d;
+}
 
 // FUNCTION: CARMA2_HW 0x005160c0
 void C2_HOOK_FASTCALL DRBoundsCopy(br_bounds3* pDest, const br_bounds3* pSrc) {
