@@ -15,6 +15,7 @@
 #include "27-powerup.h"
 #include "37-brucetrk.h"
 #include "41-utility.h"
+#include "42-input.h"
 #include "43-pratcam.h"
 #include "69-sound.h"
 #include "70-packfile.h"
@@ -565,5 +566,21 @@ void C2_HOOK_FASTCALL DisposeAbuseomatic(void) {
 
 // RichardsSphere
 
-// ToggleHeadupLevel
+// FUNCTION: CARMA2_HW 0x00444f40
+// FUNCTION: CARMA2_SW 0x00445020
+void C2_HOOK_FASTCALL ToggleHeadupLevel(void) {
+
+    if (PDKeyDown(0)) {
+        gHeadup_detail_level--;
+        if (gHeadup_detail_level < 0) {
+            gHeadup_detail_level = 5;
+        }
+    } else {
+        gHeadup_detail_level++;
+        if (gHeadup_detail_level > 5) {
+            gHeadup_detail_level = 0;
+        }
+    }
+    NewTextHeadupSlot2(4, 0, 250, -4, GetMiscString(eMiscString_no_HUD + gHeadup_detail_level % 3), 0);
+}
 
