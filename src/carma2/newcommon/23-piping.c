@@ -488,6 +488,18 @@ void C2_HOOK_FASTCALL AddFlapToPipingSession(br_actor* pActor, br_angle pAngle) 
 
 // AddNapalmBoltToPipingSession
 
+// FUNCTION: CARMA2_HW 0x004c7e70
+// FUNCTION: CARMA2_SW 0x004c45a0
+void C2_HOOK_FASTCALL AddBurningPedToSession(int pIndex, tPedestrian* pPed, br_vector3* pPositions) {
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_burning_ped, ped, 0x4);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_burning_ped, positions, 0x4);
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_burning_ped, positions, 0x54);
+
+    ARAddVariedDataToSession(ePipe_chunk_burning_ped, pIndex, 2,
+        SIZE_OFFSET_PIPING(tPipe_burning_ped, ped), pPed,
+        SIZE_OFFSET_PIPING(tPipe_burning_ped, positions), pPositions);
+}
+
 // PipeSingleCrush
 
 // FUNCTION: CARMA2_HW 0x004c8090
@@ -1373,7 +1385,7 @@ int C2_HOOK_FASTCALL CalcSmudgeLength(tPipe_chunk* pChunk) {
     C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_smudge_data, vertex_count, 0x0);
     C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_smudge_data, vertex_count, 0x2);
 
-    return offsetof(tPipe_smudge_data, vertex_changes) + ((tPipe_smudge_data*)pChunk->data.raw_data)->vertex_count * sizeof(tSmudged_vertex);
+    return offsetof(tPipe_smudge_data, vertex_changes) + pChunk->data.smudge.vertex_count * sizeof(tSmudged_vertex);
 }
 
 // FUNCTION: CARMA2_HW 0x004ca430
@@ -1384,7 +1396,7 @@ int C2_HOOK_FASTCALL CalcModelMashLength(tPipe_chunk* pChunk) {
     C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(br_model, nvertices, 0x10);
     C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(br_model, nvertices, 0x2);
 
-    return offsetof(tPipe_model_mash, vectors) + ((tPipe_model_mash*)pChunk->data.raw_data)->model->nvertices * sizeof(tCompressed_vector3);
+    return offsetof(tPipe_model_mash, vectors) + pChunk->data.model_mash.model->nvertices * sizeof(tCompressed_vector3);
 }
 
 // FUNCTION: CARMA2_HW 0x004ca450
@@ -1392,7 +1404,7 @@ int C2_HOOK_FASTCALL CalcModelMashLength(tPipe_chunk* pChunk) {
 int C2_HOOK_FASTCALL CalcEndMyBendLength(tPipe_chunk* pChunk) {
     C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk, data, 0x4);
 
-    return *(int*)pChunk->data.raw_data;
+    return pChunk->data.bend.size;
 }
 
 // CalcRemoveFacesLength
