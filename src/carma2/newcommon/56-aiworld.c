@@ -49,7 +49,17 @@ void C2_HOOK_FASTCALL LoadAIWorldTrackInfo(FILE* pF) {
     PrintMemoryDump(0, "AFTER LoadInDronePaths()");
 }
 
-// LoadAIWorldForRace
+// FUNCTION: CARMA2_HW 0x00401070
+// FUNCTION: CARMA2_SW 0x00401070
+void C2_HOOK_FASTCALL LoadAIWorldForRace(tRace_info* pRace_info) {
+
+    PrintMemoryDump(0, "BEFORE LoadOpponentsCars()");
+    LoadOpponentsCars(pRace_info);
+    LoadCopCars(pRace_info);
+    PrintMemoryDump(0, "AFTER LoadOpponentsCars(), BEFORE LoadPerRaceDroneStuff()");
+    LoadPerRaceDroneStuff();
+    PrintMemoryDump(0, "AFTER LoadPerRaceDroneStuff()");
+}
 
 // InitialiseAIWorldForRace
 
@@ -72,6 +82,18 @@ void C2_HOOK_FASTCALL PointActorAlongThisBloodyVector(br_actor* pThe_actor, br_v
     BrVector3Copy(&trans.t.look_up.t, &pThe_actor->t.t.translate.t);
     BrVector3Copy(&trans.t.look_up.look, pThe_vector);
     BrVector3Set(&trans.t.look_up.up, 0.f, 1.f, 0.f);
+    BrTransformToTransform(&pThe_actor->t, &trans);
+}
+
+// FUNCTION: CARMA2_HW 0x00401430
+// FUNCTION: CARMA2_SW 0x00401430
+void C2_HOOK_FASTCALL PointActorAlongVectorWithUp(br_actor* pThe_actor, br_vector3* pLook, br_vector3* pUp) {
+    br_transform trans;
+
+    trans.type = BR_TRANSFORM_LOOK_UP;
+    BrVector3Copy(&trans.t.look_up.t, &pThe_actor->t.t.translate.t);
+    BrVector3Copy(&trans.t.look_up.look, pLook);
+    BrVector3Copy(&trans.t.look_up.up, pUp);
     BrTransformToTransform(&pThe_actor->t, &trans);
 }
 

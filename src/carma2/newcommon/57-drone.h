@@ -15,11 +15,15 @@
 extern br_vector3 gRender_bounds_centre;
 extern int gINT_00681fb0;
 extern int gFrame;
-
 extern int gCurrent_selected_drone;
-
+extern int gCount_drones;
+extern tDrone_form gDrone_forms[64];
+extern int gCount_drone_forms;
+extern int gCount_drone_path_nodes;
 extern tDrone_spec* gDrone_specs;
 extern tDrone_path_node* gDrone_path_nodes;
+extern int gCount_drones;
+extern int gCurrent_selected_drone;
 
 // DoNotDprintf
 
@@ -33,9 +37,9 @@ extern FILE* C2_HOOK_FASTCALL OpenDroneFile(char* pDrone_name);
 
 // LoadDroneTypeInfo
 
-// ReallyRemoveDroneFromPHIL
+extern void C2_HOOK_FASTCALL ReallyRemoveDroneFromPHIL(tDrone_spec* pDrone);
 
-// RemoveDroneFromPHIL
+extern void C2_HOOK_FASTCALL RemoveDroneFromPHIL(tDrone_spec* pDrone);
 
 // InitDroneCollisionObject
 
@@ -45,7 +49,7 @@ extern FILE* C2_HOOK_FASTCALL OpenDroneFile(char* pDrone_name);
 
 // PreprocessDronePaths
 
-// LinkyCallback
+extern int C2_HOOK_CDECL LinkyCallback(br_actor* pActor, void* pData);
 
 // LinkDroneActorsToModelsAndSetRenderStyle
 
@@ -155,7 +159,7 @@ extern void C2_HOOK_FASTCALL LoadPanGameDroneInfo(void);
 
 extern void C2_HOOK_FASTCALL DisposeDronesRaceStuff(void);
 
-// LoadPerRaceDroneStuff
+extern void C2_HOOK_FASTCALL LoadPerRaceDroneStuff(void);
 
 // GetDroneCrushData
 
@@ -175,7 +179,9 @@ extern void C2_HOOK_FASTCALL DoDroneFunkyGroovyThings(tDrone_spec* pDrone);
 
 // MoveMyDroneBaby
 
-// DroneLookWhereYoureGoingYouBlindCunt
+extern void C2_HOOK_FASTCALL DroneLookWhereYoureGoingYouBlindCunt(void);
+
+extern void C2_HOOK_FASTCALL SelectNextDrone(void);
 
 extern int C2_HOOK_FASTCALL OKToViewDrones(void);
 
@@ -189,7 +195,7 @@ extern void C2_HOOK_FASTCALL ApplyDroneStraightPos2(int pDrone_id, tDrone_path_n
 
 extern void C2_HOOK_FASTCALL ApplyDroneCornerPos2(int pDrone_id, tU16 pSpeed, tU16 pField_0x74, tU16 pRadius, const tCompressed_matrix34* pMatrix);
 
-// ReallocModelFacesAndVertices
+extern void C2_HOOK_FASTCALL ReallocModelFacesAndVertices(br_model* pModel, int pCount_faces, int pCount_vertices);
 
 // CalcNFacesAndVerticesInEditModel
 

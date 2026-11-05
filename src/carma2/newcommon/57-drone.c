@@ -9,18 +9,41 @@
 #include "57-drone.h"
 
 #include "08-loading1.h"
+#include "15-displays.h"
+#include "28-world3.h"
+
 #include "41-utility.h"
+#include "49-physics.h"
 #include "52-errors.h"
 #include "56-aiworld.h"
-#include "globvars.h"
-
+#include "60-phil.h"
 #include "c2_string.h"
+#include "globvars.h"
+#include "platform.h"
+
+#include "c2_stdio.h"
 
 #include <math.h>
 
 // GLOBAL: CARMA2_HW 0x006820c0
 // GLOBAL: CARMA2_SW 0x0067c800
 br_vector3 gRender_bounds_centre;
+
+// GLOBAL: CARMA2_HW 0x006820d0
+// GLOBAL: CARMA2_SW 0x0067c810
+int gCount_drones;
+
+// GLOBAL: CARMA2_HW 0x00682178
+// GLOBAL: CARMA2_SW 0x0067c8b8
+tDrone_form gDrone_forms[64];
+
+// GLOBAL: CARMA2_HW 0x0068450c
+// GLOBAL: CARMA2_SW 0x0067ec4c
+int gCount_drone_forms;
+
+// GLOBAL: CARMA2_HW 0x00684510
+// GLOBAL: CARMA2_SW 0x0067ec50
+int gCount_drone_path_nodes;
 
 // GLOBAL: CARMA2_HW 0x006844f8
 // GLOBAL: CARMA2_SW 0x0067ec38
@@ -74,9 +97,13 @@ FILE* C2_HOOK_FASTCALL OpenDroneFile(char* pDrone_name) {
 
 // LoadDroneTypeInfo
 
-// ReallyRemoveDroneFromPHIL
+void C2_HOOK_FASTCALL ReallyRemoveDroneFromPHIL(tDrone_spec* pDrone) {
+    PHILRemoveObject(&pDrone->collision_info);
+}
 
-// RemoveDroneFromPHIL
+void C2_HOOK_FASTCALL RemoveDroneFromPHIL(tDrone_spec* pDrone) {
+    ReallyRemoveDroneFromPHIL(pDrone);
+}
 
 // InitDroneCollisionObject
 
@@ -86,7 +113,26 @@ FILE* C2_HOOK_FASTCALL OpenDroneFile(char* pDrone_name) {
 
 // PreprocessDronePaths
 
-// LinkyCallback
+// FUNCTION: CARMA2_HW 0x00450600
+// FUNCTION: CARMA2_SW 0x00450390
+int C2_HOOK_CDECL LinkyCallback(br_actor* pActor, void* pData) {
+    tLinkyCallback_context* context;
+    int i;
+
+    context = pData;
+    if (pActor->type != BR_ACTOR_MODEL) {
+        return 0;
+    }
+    pActor->render_style = BR_RSTYLE_DEFAULT;
+    for (i = context->model_start; i < context->model_start + context->model_end; i++) {
+        if (DRStricmp(gDroneStorage.models[i]->identifier, pActor->model->identifier) == 0) {
+            pActor->model = gDroneStorage.models[i];
+            return 0;
+        }
+    }
+    PDFatalError("No drone model");
+    return 0;
+}
 
 // LinkDroneActorsToModelsAndSetRenderStyle
 
@@ -282,13 +328,66 @@ void C2_HOOK_FASTCALL LoadPanGameDroneInfo(void) {
 
 // InitDrones
 
-// STUB: CARMA2_HW 0x0044fc10
-// STUB: CARMA2_SW 0x0044f9b0
+// FUNCTION: CARMA2_HW 0x0044fc10
+// FUNCTION: CARMA2_SW 0x0044f9b0
 void C2_HOOK_FASTCALL DisposeDronesRaceStuff(void) {
-    NOT_IMPLEMENTED();
+    int i;
+
+    if (gCount_drones == 0) {
+        return;
+    }
+
+    for (i = 0; i < gCount_drones; i++) {
+
+        if (gDrone_specs[i].actor->parent != NULL) {
+            BrActorRemove(gDrone_specs[i].actor);
+        }
+        BrActorFree(gDrone_specs[i].actor);
+        RemoveDroneFromPHIL(&gDrone_specs[i]);
+        if (gDrone_specs[i].field_0x46) {
+            FreeShape(gDrone_specs[i].collision_info.shape);
+            gDrone_specs[i].field_0x46 = 0;
+        }
+
+        if (gDrone_specs[i].funk_grooves != NULL) {
+            BrMemFree(gDrone_specs[i].funk_grooves);
+            gDrone_specs[i].funk_grooves = NULL;
+        }
+    }
+
+    for (i = 0; i < gCount_drone_forms; i++) {
+
+        if (gDrone_forms[i].field_0x80 != NULL) {
+            int j;
+
+            BrMemFree(gDrone_forms[i].field_0x80);
+            gDrone_forms[i].field_0x80 = NULL;
+            for (j = 0; j < gDrone_forms[i].count_models; j++) {
+                BrModelRemove(gDrone_forms[i].models[j]);
+                gDrone_forms[i].models[j]->nfaces = 0;
+                gDrone_forms[i].models[j]->faces = NULL;
+                BrModelFree(gDrone_forms[i].models[j]);
+            }
+            if (gDrone_forms[i].models != NULL) {
+                BrMemFree(gDrone_forms[i].models);
+                gDrone_forms[i].models = NULL;
+            }
+        }
+    }
+    ClearOutStorageSpace(&gDroneStorage);
+    BrMemFree(gDrone_specs);
+    gDrone_specs = NULL;
+    gCount_drones = 0;
+    BrMemFree(gDrone_path_nodes);
+    gDrone_path_nodes = NULL;
+    gCount_drone_path_nodes = 0;
 }
 
-// LoadPerRaceDroneStuff
+// STUB: CARMA2_HW 0x0044fda0
+// STUB: CARMA2_SW 0x0044fb40
+void C2_HOOK_FASTCALL LoadPerRaceDroneStuff(void) {
+    NOT_IMPLEMENTED();
+}
 
 // GetDroneCrushData
 
@@ -329,7 +428,23 @@ void C2_HOOK_FASTCALL DoDroneFunkyGroovyThings(tDrone_spec* pDrone) {
 
 // MoveMyDroneBaby
 
-// DroneLookWhereYoureGoingYouBlindCunt
+// FUNCTION: CARMA2_HW 0x004525c0
+// FUNCTION: CARMA2_SW 0x00452350
+void C2_HOOK_FASTCALL DroneLookWhereYoureGoingYouBlindCunt(void) {
+}
+
+// FUNCTION: CARMA2_HW 0x004525d0
+// FUNCTION: CARMA2_SW 0x00452360
+void C2_HOOK_FASTCALL SelectNextDrone(void) {
+    char s[64];
+
+    gCurrent_selected_drone++;
+    if (gCurrent_selected_drone >= gCount_drones) {
+        gCurrent_selected_drone = 0;
+    }
+    sprintf(s, "Drone %d", gCurrent_selected_drone);
+    NewTextHeadupSlot(4, 0, 3000, -1, s);
+}
 
 // FUNCTION: CARMA2_HW 0x00452680
 // FUNCTION: CARMA2_SW 0x00452410
@@ -395,7 +510,11 @@ void C2_HOOK_FASTCALL ApplyDroneCornerPos2(int pDrone_id, tU16 pSpeed, tU16 pFie
     DoDroneFunkyGroovyThings(drone);
 }
 
-// ReallocModelFacesAndVertices
+// STUB: CARMA2_HW 0x00452f40
+void C2_HOOK_FASTCALL ReallocModelFacesAndVertices(br_model* pModel, int pCount_faces, int pCount_vertices) {
+    BrBlockFill(NULL, 0, 0);
+    NOT_IMPLEMENTED();
+}
 
 // CalcNFacesAndVerticesInEditModel
 

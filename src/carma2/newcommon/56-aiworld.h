@@ -10,6 +10,7 @@
 #define GUARD_56_AIWORLD_H
 
 #include "c2_hooks.h"
+#include "rec2_types.h"
 
 #include "brender/brender.h"
 
@@ -23,7 +24,7 @@ extern void C2_HOOK_FASTCALL InitPanGameAIWorld(void);
 
 extern void C2_HOOK_FASTCALL LoadAIWorldTrackInfo(FILE* pF);
 
-// LoadAIWorldForRace
+extern void C2_HOOK_FASTCALL LoadAIWorldForRace(tRace_info* pRace_info);
 
 // InitialiseAIWorldForRace
 
@@ -32,6 +33,8 @@ extern void C2_HOOK_FASTCALL DisposeAIWorldRaceStuff(void);
 // MungeAIWorld
 
 extern void C2_HOOK_FASTCALL PointActorAlongThisBloodyVector(br_actor* pThe_actor, br_vector3* pThe_vector);
+
+extern void C2_HOOK_FASTCALL PointActorAlongVectorWithUp(br_actor* pThe_actor, br_vector3* pLook, br_vector3* pUp);
 
 extern br_material* C2_HOOK_FASTCALL CreateSimpleMaterial(int pIndex);
 

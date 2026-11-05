@@ -53,6 +53,7 @@ typedef struct tPedestrian_distances tPedestrian_distances;
 typedef struct tRace_pedestrian tRace_pedestrian;
 typedef struct tDrone_spec tDrone_spec;
 typedef struct tDrone_path_node tDrone_path_node;
+typedef struct tDrone_path_node_section tDrone_path_node_section;
 typedef struct tSave_game tSave_game;
 typedef struct tPipe_smudge_data tPipe_smudge_data;
 typedef struct tPath_node tPath_node;
@@ -288,6 +289,12 @@ typedef struct {
 } tPipe_ped_physics_data;
 
 typedef struct {
+    tS16 bone_index;
+    tS8 old_value;
+    tS8 new_value;
+} tPipe_single_ped_dismember;
+
+typedef struct {
     tS16 field_0x48;
     tS16 field_0x74;
     tS16 field_0x70;
@@ -322,9 +329,9 @@ typedef struct {
 } tPipe_funk_enable;
 
 typedef struct {
-    undefined4 field_0x0;
-    tU16 field_0x4;
-    tU16 field_0x6;
+    tDrone_path_node_section* section;
+    tU16 speed;
+    tU16 distance;
 } tPipe_single_drone_straight_pos;
 
 typedef struct {
@@ -427,6 +434,10 @@ typedef struct {
 } tPipe_chunk_smoke_column;
 
 typedef struct {
+    tCar_spec* car;
+} tPipe_chunk_powerup_lose;
+
+typedef struct {
     int index;
 } tPipe_chunk_powerup_respawn;
 
@@ -485,7 +496,7 @@ typedef enum {
     ePipe_chunk_ped_incident = 1,
     ePipe_chunk_single_sound = 2,
     ePipe_chunk_car = 5,
-    ePipe_chunk_single_graphpical_wheel_stuff = 6,
+    ePipe_chunk_single_graphical_wheel_stuff = 6,
     ePipe_chunk_damage = 7,
     ePipe_chunk_special = 8,
     ePipe_chunk_spark = 10,
@@ -510,10 +521,12 @@ typedef enum {
     ePipe_chunk_ped_dir = 41,
     ePipe_chunk_ped_move = 42,
     ePipe_chunk_ped_physics = 43,
+    ePipe_chunk_single_ped_dismember = 44,
     ePipe_chunk_single_ped_pos = 46,
     ePipe_chunk_single_ped_model_change = 47,
     ePipe_chunk_phil_object = 48,
     ePipe_single_groove_on_off = 51,
+    ePipe_chunk_powerup_lose = 53,
     ePipe_funk_enable = 54,
     ePipe_chunk_single_vanished_dismembered = 55,
     ePipe_single_ds_model = 56,
@@ -523,7 +536,7 @@ typedef enum {
     ePipe_chunk_single_drone_straight_pos = 62,
     ePipe_chunk_burning_ped = 64,
     ePipe_chunk_powerup_respawn = 65,
-    ePipe_chunk_end_shit_mine = 65,
+    ePipe_chunk_end_shit_mine = 67,
     ePipe_single_transform_type = 68,
     ePipe_chunk_single_oppo_renderage = 69,
 } tPipe_chunk_type;
@@ -545,6 +558,7 @@ typedef struct tPipe_chunk {
     union {
         tPipe_chunk_non_car non_car;
         tPipe_ped_physics_data ped_physics;
+        tPipe_single_ped_dismember ped_dismember;
         tPipe_phil_object phil_object;
         tPipe_chunk_shrapnel shrapnel;
         tPipe_chunk_identity identity;
@@ -552,6 +566,8 @@ typedef struct tPipe_chunk {
         tPipe_smash_texture_change smash_texture_change;
         tPipe_single_transform_type transform_type;
         tPipe_single_vector vector;
+        tPipe_chunk_powerup_lose powerup_lose;
+        tPipe_chunk_powerup_respawn powerup_respawn;
         char raw_data[0];
     } data;
 } tPipe_chunk;
@@ -594,7 +610,7 @@ typedef struct {
     float max_dist_axis;
     float max_dist_squared;
     br_vector3* pos;
-    int (C2_HOOK_FASTCALL * callback)(br_actor*, void*);
+    tNearbyActors_cbfn* callback;
     void* callback_context;
 } tFoundAnActor_context;
 
@@ -2329,6 +2345,7 @@ typedef struct {
 } tDamage_condition;
 
 typedef enum {
+    eDamage_start = 0,
     eDamage_engine = 0,
     eDamage_transmission = 1,
     eDamage_driver = 2,
@@ -2340,7 +2357,8 @@ typedef enum {
     eDamage_lf_wheel = 8,
     eDamage_rf_wheel = 9,
     eDamage_lr_wheel = 10,
-    eDamage_rr_wheel = 11
+    eDamage_rr_wheel = 11,
+    eDamage_count = 12,
 } tDamage_type;
 
 typedef struct  {
@@ -2365,6 +2383,7 @@ typedef enum tDriver {
     eDriver_detached_bit = 2,
     eDriver_split_car = 3,
     eDriver_4 = 4,
+    eDriver_5 = 5,
     eDriver_oppo = 6,
     eDriver_net_human = 7,
     eDriver_local_human = 8
@@ -2633,7 +2652,7 @@ typedef struct tCar_spec {
     undefined field_0x1348[12];
     float max_force_front;
     float max_force_rear;
-    float gear; /* FIXME: should be an int? */
+    int gear;
     int just_changed_gear;
     int max_gear;
     float speed_revs_ratio;
@@ -5172,6 +5191,7 @@ typedef enum {
     eNet_message_chunk_type_oil_spill = 0x1f,
     eNet_message_chunk_type_car_crush = 0x20,
     eNet_message_chunk_type_reattach_bit = 0x26,
+    eNet_message_chunk_type_reattach_all_bits = 0x2b,
     eNet_message_chunk_type_toggle_doors = 0x2c,
     eNet_message_chunk_type_view_car = 0x2f,
     eNet_message_chunk_type_mine_explosion = 0x31,
@@ -5236,6 +5256,12 @@ typedef struct {
     tU8 uid;
     tU32 time;
 } tNet_message_chunk_reattach_bit;
+
+typedef struct {
+    tNet_message_chunk_header header;
+    tPlayer_ID player;
+    tU32 time;
+} tNet_message_chunk_reattach_all_bits;
 
 typedef struct {
     tNet_message_chunk_header header;
@@ -5355,6 +5381,7 @@ typedef union {
     tNet_message_chunk_oil_spill oil_spill; /* type = 0x1f*/
     tNet_message_car_crush car_crush; /* type = 0x20 */
     tNet_message_chunk_reattach_bit reattach_bit; /* type = 0x26 */
+    tNet_message_chunk_reattach_all_bits reattach_all_bits; /* type = 0x2b */
     tNet_message_chunk_toggle_doors toggle_doors; /* type = 0x2c */
     tNet_message_chunk_view_car view_car; /* type = 0x2f */
     tNet_message_chunk_mine_explode mine_explode; /* type = 0x31 */
@@ -5403,6 +5430,7 @@ enum {
     eMiscString_repairing_for_free = 4,
     eMiscString_repair_cost_colon = 5,
     eMiscString_recovery_cost_colon = 7,
+    eMiscString_every_opponent_wasted = 10,
     eMiscString_credits = 12,
     eMiscString_credit = 13,
     eMiscString_lost_credits_prefix = 14,

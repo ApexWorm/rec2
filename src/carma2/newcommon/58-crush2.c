@@ -8,14 +8,20 @@
 
 #include "58-crush2.h"
 
+#include "00-car.h"
 #include "07-structur.h"
 #include "09-funks.h"
 #include "15-displays.h"
+#include "17-world2.h"
 #include "21-mainloop.h"
+#include "23-piping.h"
 #include "30-opponent.h"
+#include "32-spark.h"
 #include "39-oil.h"
 #include "41-utility.h"
 #include "43-pratcam.h"
+#include "51-smash.h"
+#include "69-sound.h"
 #include "globvars.h"
 #include "globvrpb.h"
 
@@ -49,11 +55,32 @@ int gTime_wasting_car[3];
 // GLOBAL: CARMA2_SW 0x00759a90
 int gTime_per_ped_kill[3];
 
-// CheckLastCar
+// GLOBAL: CARMA2_HW 0x00590020
+// GLOBAL: CARMA2_SW 0x0058b018
+float gWobble_spam_y[8] = { 0.0f, -0.15f, 0.4f, 0.15f, -0.4f, 0.25f, 0.0f, -0.25f };
+
+// GLOBAL: CARMA2_HW 0x00590040
+// GLOBAL: CARMA2_SW 0x0058b038
+float gWobble_spam_z[8] = { 0.4f, -0.25f, 0.0f, 0.25f, 0.0f, 0.15f, -0.4f, -0.15f };
+
+// GLOBAL: CARMA2_HW 0x00590060
+// GLOBAL: CARMA2_SW 0x0058b058
+float gWheel_circ_to_width = 0.16f;
+
+void C2_HOOK_FASTCALL CheckLastCar(void) {
+    if (gNet_mode == eNet_mode_none && GetCarCount(eVehicle_opponent) != 0 && NumberOfOpponentsLeft() == 0) {
+        if (gCurrent_race.race_spec->race_type == kRaceType_Carma1 || gCurrent_race.race_spec->race_type == kRaceType_Cars) {
+            if (gCurrent_race.race_spec->race_type == kRaceType_Carma1) {
+                NewTextHeadupSlot(4, 0, 5000, -4, GetMiscString(eMiscString_every_opponent_wasted));
+            }
+            RaceCompleted(eRace_over_2);
+        }
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x0043f5f0
 // FUNCTION: CARMA2_SW 0x0043f6d0
-void C2_HOOK_FASTCALL KnackerThisCar(tCar_spec* pCar) {
+inline void C2_HOOK_FASTCALL KnackerThisCar(tCar_spec* pCar) {
 
     if (pCar->invulnerable_no_wastage) {
         return;
@@ -66,14 +93,7 @@ void C2_HOOK_FASTCALL KnackerThisCar(tCar_spec* pCar) {
     }
     pCar->knackered = 1;
     QueueWastedMassage(pCar->index);
-    if (gNet_mode == eNet_mode_none && GetCarCount(eVehicle_opponent) != 0 && NumberOfOpponentsLeft() == 0) {
-        if (gCurrent_race.race_spec->race_type == kRaceType_Carma1 || gCurrent_race.race_spec->race_type == kRaceType_Cars) {
-            if (gCurrent_race.race_spec->race_type == kRaceType_Carma1) {
-                NewTextHeadupSlot(4, 0, 5000, -4, GetMiscString(10));
-            }
-            RaceCompleted(eRace_over_2);
-        }
-    }
+    CheckLastCar();
     QueueOilSpill(pCar);
     if (gNet_mode == eNet_mode_none) {
         KillGroovadelic(pCar->index);
@@ -81,17 +101,66 @@ void C2_HOOK_FASTCALL KnackerThisCar(tCar_spec* pCar) {
     }
 }
 
-// ExplodeMeCarUpMeOldMatey
+// FUNCTION: CARMA2_HW 0x0043f6c0
+// FUNCTION: CARMA2_SW 0x0043f7a0
+void C2_HOOK_FASTCALL ExplodeMeCarUpMeOldMatey(tCar_spec* pCar) {
 
-// SetKnackeredFlag
+    Explode(&gExplosion_pix_animation_groups, pCar->car_master_actor,
+        &pCar->car_actor->model->bounds, NULL);
+    if ((pCar != NULL && pCar->driver ==  eDriver_local_human)) {
+        DRS3StartSound(gCar_outlet, gExplosion_sound_id);
+    } else {
+        DRS3StartSound3D(gCar_outlet, gExplosion_sound_id, &pCar->pos, &gZero_v__car, 1, 255, BR_FIXED_INT(1), BR_FIXED_INT(1));
+    }
+}
 
-// DamageUnit2
+// FUNCTION: CARMA2_HW 0x0043f730
+// FUNCTION: CARMA2_SW 0x0043f810
+int C2_HOOK_FASTCALL SetKnackeredFlag(tCar_spec* pCar) {
+
+    if (gNet_mode == eNet_mode_client
+            || pCar->knackered
+            || ((pCar->damage_units[eDamage_engine].damage_level < 99
+                && (pCar->damage_units[eDamage_transmission].damage_level < 99)
+                && pCar->damage_units[eDamage_driver].damage_level < 99)
+                && (pCar->damage_units[eDamage_lf_wheel].damage_level < 99
+                    || pCar->damage_units[eDamage_rf_wheel].damage_level < 99
+                    || pCar->damage_units[eDamage_lr_wheel].damage_level < 99
+                    || pCar->damage_units[eDamage_rr_wheel].damage_level < 99))) {
+        return 0;
+    }
+    ExplodeMeCarUpMeOldMatey(pCar);
+    KnackerThisCar(pCar);
+    if (gNet_mode == eNet_mode_none) {
+        if (IRandomBetween(0,1) && gNet_mode == eNet_mode_none) {
+            StopCarSmoking(pCar);
+            CreateSmokeColumn(pCar, 0, IRandomBetween(0,  11), 20000);
+        }
+        CreateSmokeColumn(pCar, 0, IRandomBetween(0, 11), 180000);
+    }
+    return 1;
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_HW 0x0043f930
+// STUB: CARMA2_SW 0x0043fa10
+void C2_HOOK_FASTCALL DamageUnit2(tCar_spec *pCar, tDamage_type pDamage_type, int pMagnitude) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // RecordLastDamage
 
 // DoDamage
 
 // FUNCTION: CARMA2_HW 0x0043f9f0
+// FUNCTION: CARMA2_SW 0x0043fad0
 void C2_HOOK_FASTCALL CalcModifiedLocation(tCar_spec* pCar) {
     int i;
 
@@ -186,7 +255,88 @@ int C2_HOOK_FASTCALL DoCrashEarnings(tCar_spec* pCar1, tCar_spec* pCar2) {
 #pragma auto_inline(on)
 #endif
 
-// DoWheelDamage
+// FUNCTION: CARMA2_HW 0x00440350
+// FUNCTION: CARMA2_SW 0x00440430
+void C2_HOOK_FASTCALL DoWheelDamage(tU32 pFrame_period) {
+    int i;
+    br_vector3 temp_vector;
+    br_vector3 wonky_vector;
+
+    if (gAction_replay_mode && ARReplayIsReallyPaused()) {
+        return;
+    }
+
+    for (i = 0; i < gNum_active_cars; i++) {
+        tCar_spec* car;
+
+        car = gActive_car_list[i];
+        if ((car != NULL && car->driver > eDriver_5) && !(car->car_crush_spec != NULL && car->car_crush_spec->field_0x144)) {
+            int j;
+
+            for (j = 0; j < (int)REC2_ASIZE(car->wheel_dam_offset); j++) {
+                int damage;
+                br_scalar y_amount;
+                br_scalar z_amount;
+                br_scalar wheel_circum;
+
+                if (car->wheel_actors[j] == NULL) {
+                    continue;
+                }
+                damage = car->damage_units[8 + j].damage_level;
+                if (damage <= 30 || gRace_finished) {
+                    car->wheel_dam_offset[j] = 0.f;
+                    continue;
+                }
+                if (PointOutOfSight(&car->pos, 32.f)) {
+                    break;
+                }
+                y_amount = (damage - 30) * gWobble_spam_y[damage & 7];
+                z_amount = (damage - 30) * gWobble_spam_z[damage & 7];
+                BrMatrix34PreRotateY(&car->wheel_actors[j]->t.t.mat, BrDegreeToAngle(y_amount < 0.f ? y_amount + 360.f : y_amount));
+                BrMatrix34PreRotateZ(&car->wheel_actors[j]->t.t.mat, BrDegreeToAngle(z_amount < 0.f ? z_amount + 360.f : z_amount));
+                if (j < 2 && car->wheel_actors[4 + j] != NULL) {
+                    BrMatrix34PreRotateY(&car->wheel_actors[4 + j]->t.t.mat, BrDegreeToAngle(y_amount < 0.f ? y_amount + 360.f : y_amount));
+                    BrMatrix34PreRotateZ(&car->wheel_actors[4 + j]->t.t.mat, BrDegreeToAngle(z_amount < 0.f ? z_amount + 360.f : z_amount));
+                }
+                switch (j) {
+                case 0:
+                    if (car->driven_wheels_spin_ref_1 >= 0) {
+                        wheel_circum = car->driven_wheels_circum;
+                    } else {
+                        wheel_circum = car->non_driven_wheels_circum;
+                    }
+                    break;
+                case 1:
+                    if (car->driven_wheels_spin_ref_2 >= 0) {
+                        wheel_circum = car->driven_wheels_circum;
+                    } else {
+                        wheel_circum = car->non_driven_wheels_circum;
+                    }
+                    break;
+                case 2:
+                    if (car->driven_wheels_spin_ref_3 >= 0) {
+                        wheel_circum = car->driven_wheels_circum;
+                    } else {
+                        wheel_circum = car->non_driven_wheels_circum;
+                    }
+                    break;
+                case 3:
+                    if (car->driven_wheels_spin_ref_4 >= 0) {
+                        wheel_circum = car->driven_wheels_circum;
+                    } else {
+                        wheel_circum = car->non_driven_wheels_circum;
+                    }
+                    break;
+                }
+                if (gNet_mode == eNet_mode_none || car->driver == eDriver_local_human) {
+                    BrVector3Set(&temp_vector, wheel_circum * gWheel_circ_to_width, 0.f, 0.f);
+                    BrMatrix34ApplyV(&wonky_vector, &temp_vector, &car->wheel_actors[j]->t.t.mat);
+                    car->wheel_dam_offset[j] = (float)fabs(wonky_vector.v[1]);
+                }
+            }
+        }
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x00440640
 // FUNCTION: CARMA2_SW 0x00440720
@@ -200,5 +350,25 @@ void C2_HOOK_FASTCALL CrashEarnings(tCar_spec* pCar1, tCar_spec* pCar2) {
 
 // PercentageCarHealth
 
-// ChristmasLights
+// FUNCTION: CARMA2_HW 0x00441420
+// FUNCTION: CARMA2_SW 0x00441500
+void C2_HOOK_FASTCALL ChristmasLights(tCar_spec* pCar, int pMin_damage, int pMax_damage) {
+    int restarts = 0;
+    tDamage_type damage_type = eDamage_start;
 
+    for (;;) {
+        DamageUnit2(pCar, damage_type, IRandomBetween(pMin_damage, pMax_damage));
+        if (damage_type == eDamage_engine && pCar->damage_units[damage_type].damage_level < 80) {
+            restarts += 1;
+            if (restarts < 30) {
+                continue;
+            }
+        }
+        damage_type++;
+        if (damage_type >= eDamage_count) {
+            break;
+
+        }
+    }
+    pCar->damage_magnitude_accumulator += 0.5f;
+}
