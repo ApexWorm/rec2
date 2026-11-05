@@ -414,12 +414,6 @@ void C2_HOOK_FASTCALL FadePaletteUp(void) {
 // FUNCTION: CARMA2_HW 0x004b55f0
 // FUNCTION: CARMA2_SW 0x004b1d20
 void C2_HOOK_FASTCALL EnsurePaletteUp(void) {
-    int i;
-    int start_time;
-    int the_time;
-    int j;
-
-    C2_HOOK_BUG_ON(sizeof(br_colour) != 4);
 
     if (gFaded_palette) {
         FadePaletteUp();
