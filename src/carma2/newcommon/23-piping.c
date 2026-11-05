@@ -907,9 +907,9 @@ void C2_HOOK_FASTCALL DoSmudge(tPipe_chunk** pChunk, int pDir) {
         car = GetCarSpec((*pChunk)->subject_index >> 8, (*pChunk)->subject_index & 0xff);
     }
     model_ptr = car->car_actor->model;
-    for (i = 0; i < ((tPipe_smudge_data*)(*pChunk)->data.raw_data)->vertex_count; i++) {
-        v = ((tPipe_smudge_data*)(*pChunk)->data.raw_data)->vertex_changes[i].vertex_index;
-        inc = ((tPipe_smudge_data*)(*pChunk)->data.raw_data)->vertex_changes[i].light_index * pDir;
+    for (i = 0; i < (*pChunk)->data.smudge.vertex_count; i++) {
+        v = (*pChunk)->data.smudge.vertex_changes[i].vertex_index;
+        inc = (*pChunk)->data.smudge.vertex_changes[i].light_index * pDir;
         model_ptr->prepared->groups->vertex_colours[v] = ((model_ptr->prepared->groups->vertex_colours[v] & 0xff000000u) + ((br_colour)inc << 24)) & 0xff000000u;
         if (model_ptr->flags & BR_MODF_UPDATEABLE) {
             model_ptr->vertices[model_ptr->prepared->groups->vertex_user[v]].index = BR_ALPHA(model_ptr->prepared->groups->vertex_colours[v]) + inc;
@@ -968,7 +968,7 @@ void C2_HOOK_FASTCALL ApplyFrameBoundary(tPipe_chunk** pChunk) {
     C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk, data, 0x4);
     C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk_frame_finish, time, 0x0);
 
-    ApplyTime(((tPipe_chunk_frame_finish*)(*pChunk)->data.raw_data)->time);
+    ApplyTime((*pChunk)->data.frame_boundary.time);
 }
 
 // ApplySound
