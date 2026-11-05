@@ -328,20 +328,20 @@ int C2_HOOK_FASTCALL SoundTimeout(tU32 pTime) {
 // FUNCTION: CARMA2_HW 0x00403020
 // FUNCTION: CARMA2_SW 0x00403020
 tU32 C2_HOOK_FASTCALL ARGetStartTime(void) {
-    tU8* session;
+    tPipe_session* session;
 
     C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_session, type, 0x0);
     C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_session, data, 0x8);
     C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk, data, 0x4);
     C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk_frame_finish, time, 0x0);
 
-    session = gPipe_buffer_oldest;
+    session = (tPipe_session*)gPipe_buffer_oldest;
     do {
-        if (MoveSessionPointerForwardOne(&session)) {
+        if (MoveSessionPointerForwardOne((tU8**)&session)) {
             return 0;
         }
-    } while (((tPipe_session*)session)->type != ePipe_chunk_frame_finish);
-    return ((tPipe_chunk_frame_finish*)((tPipe_chunk*)((tPipe_session*)session)->data)->data.raw_data)->time;
+    } while (session->type != ePipe_chunk_frame_finish);
+    return ((tPipe_chunk*)session->data)->data.frame_boundary.time;
 }
 
 // ARDisableAdvance
