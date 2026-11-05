@@ -289,6 +289,12 @@ typedef struct {
 } tPipe_ped_physics_data;
 
 typedef struct {
+    tS16 bone_index;
+    tS8 old_value;
+    tS8 new_value;
+} tPipe_single_ped_dismember;
+
+typedef struct {
     tS16 field_0x48;
     tS16 field_0x74;
     tS16 field_0x70;
@@ -490,7 +496,7 @@ typedef enum {
     ePipe_chunk_ped_incident = 1,
     ePipe_chunk_single_sound = 2,
     ePipe_chunk_car = 5,
-    ePipe_chunk_single_graphpical_wheel_stuff = 6,
+    ePipe_chunk_single_graphical_wheel_stuff = 6,
     ePipe_chunk_damage = 7,
     ePipe_chunk_special = 8,
     ePipe_chunk_spark = 10,
@@ -515,6 +521,7 @@ typedef enum {
     ePipe_chunk_ped_dir = 41,
     ePipe_chunk_ped_move = 42,
     ePipe_chunk_ped_physics = 43,
+    ePipe_chunk_single_ped_dismember = 44,
     ePipe_chunk_single_ped_pos = 46,
     ePipe_chunk_single_ped_model_change = 47,
     ePipe_chunk_phil_object = 48,
@@ -529,7 +536,7 @@ typedef enum {
     ePipe_chunk_single_drone_straight_pos = 62,
     ePipe_chunk_burning_ped = 64,
     ePipe_chunk_powerup_respawn = 65,
-    ePipe_chunk_end_shit_mine = 65,
+    ePipe_chunk_end_shit_mine = 67,
     ePipe_single_transform_type = 68,
     ePipe_chunk_single_oppo_renderage = 69,
 } tPipe_chunk_type;
@@ -551,6 +558,7 @@ typedef struct tPipe_chunk {
     union {
         tPipe_chunk_non_car non_car;
         tPipe_ped_physics_data ped_physics;
+        tPipe_single_ped_dismember ped_dismember;
         tPipe_phil_object phil_object;
         tPipe_chunk_shrapnel shrapnel;
         tPipe_chunk_identity identity;
@@ -602,7 +610,7 @@ typedef struct {
     float max_dist_axis;
     float max_dist_squared;
     br_vector3* pos;
-    int (C2_HOOK_FASTCALL * callback)(br_actor*, void*);
+    tNearbyActors_cbfn* callback;
     void* callback_context;
 } tFoundAnActor_context;
 
@@ -2337,6 +2345,7 @@ typedef struct {
 } tDamage_condition;
 
 typedef enum {
+    eDamage_start = 0,
     eDamage_engine = 0,
     eDamage_transmission = 1,
     eDamage_driver = 2,
@@ -2348,7 +2357,8 @@ typedef enum {
     eDamage_lf_wheel = 8,
     eDamage_rf_wheel = 9,
     eDamage_lr_wheel = 10,
-    eDamage_rr_wheel = 11
+    eDamage_rr_wheel = 11,
+    eDamage_count = 12,
 } tDamage_type;
 
 typedef struct  {
@@ -2642,7 +2652,7 @@ typedef struct tCar_spec {
     undefined field_0x1348[12];
     float max_force_front;
     float max_force_rear;
-    float gear; /* FIXME: should be an int? */
+    int gear;
     int just_changed_gear;
     int max_gear;
     float speed_revs_ratio;
@@ -5420,6 +5430,7 @@ enum {
     eMiscString_repairing_for_free = 4,
     eMiscString_repair_cost_colon = 5,
     eMiscString_recovery_cost_colon = 7,
+    eMiscString_every_opponent_wasted = 10,
     eMiscString_credits = 12,
     eMiscString_credit = 13,
     eMiscString_lost_credits_prefix = 14,

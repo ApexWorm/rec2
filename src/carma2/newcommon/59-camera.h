@@ -42,13 +42,13 @@ extern void C2_HOOK_FASTCALL CheckDisablePlingMaterials(tCar_spec* pCar);
 
 // SetPanningFieldOfView
 
-// IsCameraTypeAllowed
+extern int C2_HOOK_FASTCALL IsCameraTypeAllowed(int pCamera_mode);
 
 extern void C2_HOOK_FASTCALL MungeCarMaterials(tCar_spec* pCar, int pInternal_cam);
 
 extern void C2_HOOK_FASTCALL SetCameraType(tActionReplayCameraMode pCamPos);
 
-// ChangeCameraType
+extern void C2_HOOK_FASTCALL ChangeCameraType(void);
 
 extern void C2_HOOK_FASTCALL ToggleCockpit(void);
 
@@ -96,7 +96,7 @@ extern void C2_HOOK_FASTCALL RestoreCameraPosition(int pIndex);
 
 // CollideCamera2
 
-// CollideCameraWithOtherCars
+extern int C2_HOOK_FASTCALL CollideCameraWithOtherCars(br_vector3* pPos, br_vector3* pCamera_pos);
 
 extern void C2_HOOK_FASTCALL InitialiseExternalCamera(void);
 

@@ -14,6 +14,9 @@
 #include <s3/s3.h>
 
 extern tU8* gLocal_buffer;
+extern tU8* gPipe_buffer_working_end;
+extern int gReentrancy_count;
+extern tU8* gPipe_buffer_phys_end;
 extern tU32 gLocal_buffer_size;
 extern tU8* gMr_chunky;
 extern tU8* gPipe_buffer_start;
@@ -43,7 +46,7 @@ extern int C2_HOOK_FASTCALL ARGetReplayDirection(void);
 
 extern void C2_HOOK_FASTCALL ARSetReplayDirection(float pDirection);
 
-// ARResetPiping
+extern void C2_HOOK_FASTCALL ARResetPiping(void);
 
 // ARInitialise
 
@@ -197,6 +200,8 @@ extern void C2_HOOK_FASTCALL AddFlapToPipingSession(br_actor* pActor, br_angle p
 
 // AddNapalmBoltToPipingSession
 
+extern void C2_HOOK_FASTCALL AddBurningPedToSession(int pIndex, tPedestrian* pPed, br_vector3* pPositions);
+
 // PipeSingleCrush
 
 extern void C2_HOOK_FASTCALL PipeSingleScreenWobble(int pWobble_x, int pWobble_y);
@@ -253,7 +258,7 @@ extern void C2_HOOK_FASTCALL PipeSinglePedDir(int pId, const br_vector3* pDir);
 
 extern void C2_HOOK_FASTCALL PipeSinglePedPhysics(int pId, br_matrix34* pMat);
 
-// PipeSinglePedDismember
+extern void C2_HOOK_FASTCALL PipeSinglePedDismember(tPedestrian* pPed, tU8 pBone_index, tS8 pOld_value, tS8 pNew_value);
 
 // PipeSinglePedFPChange
 
@@ -277,11 +282,11 @@ extern void C2_HOOK_FASTCALL PipeSingleFunkEnable(int pIndex, tU16 pFlags);
 
 extern void C2_HOOK_FASTCALL PipeSingleVanishedDismembered(const tPedestrian* pPed, tU32 pOld_value, tU32 pNew_value);
 
-// PipeSingleDSModel
+extern void C2_HOOK_FASTCALL PipeSingleDSModel(int pDouble_sided, void* pThing);
 
 extern void C2_HOOK_FASTCALL PipeSingleVector3(br_vector3* pDest, br_vector3* pValue);
 
-// PipeSingleDroneRender
+extern void C2_HOOK_FASTCALL PipeSingleDroneRender(tDrone_spec* pDrone_spec, int pRender);
 
 // PipeSingleDroneCornerPos
 
@@ -291,11 +296,11 @@ extern void C2_HOOK_FASTCALL PipeSinglePowerupRespawn(br_actor* pActor, int pPow
 
 // PipeSingleShitMine
 
-// PipeSingleEndShitMine
+extern void C2_HOOK_FASTCALL PipeSingleEndShitMine(br_actor* pActor);
 
 extern void C2_HOOK_FASTCALL PipeSingleTransformType(br_actor* pActor, tS16 pTransform_type);
 
-// PipeSingleOppoRenderage
+extern void C2_HOOK_FASTCALL PipeSingleOppoRenderage(tOpponent_spec* pOpponent_spec, int pEnable);
 
 // ApplyCrush
 
@@ -477,7 +482,7 @@ extern void C2_HOOK_FASTCALL UndoSmashTextureChange(tPipe_chunk** pChunk, tPipe_
 
 // UndoPedMove
 
-// UndoPedDismember
+extern void C2_HOOK_FASTCALL UndoPedDismember(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk);
 
 // UndoPedFPChange
 
@@ -499,7 +504,7 @@ extern void C2_HOOK_FASTCALL UndoGrooveOnOff(tPipe_chunk** pChunk, tPipe_chunk* 
 
 // UndoVanishDismembered
 
-// UndoVector3
+extern void C2_HOOK_FASTCALL UndoVector3(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk);
 
 // UndoNapalmBolt
 

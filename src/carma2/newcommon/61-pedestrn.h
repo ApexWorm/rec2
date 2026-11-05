@@ -13,6 +13,7 @@
 #include "rec2_types.h"
 
 extern int gPed_count_limbed_actors;
+extern br_actor* gLimbs_actor;
 
 extern int gPed_retain_root_mode;
 extern float gPedestrian_speed_factor;
@@ -28,6 +29,9 @@ extern float gMutant_speed;
 extern int gDancing_peds;
 extern int gDrunk_pedestrians;
 extern int gPeds_already_munged;
+extern int gPed_cache_sizes_1[4];
+extern tPed_face_cache_0x34* gPed_face_cache_heads[4];
+extern int gPed_cache_notify_flags;
 
 // OrientationChanged
 
@@ -43,7 +47,7 @@ extern int gPeds_already_munged;
 
 // SetCharacterDirectionAR
 
-// PedApplyPedDir
+extern void C2_HOOK_FASTCALL PedApplyPedDir(tU32 pId, const br_vector3* pDir);
 
 // SetCharacterMoveAR
 
@@ -285,7 +289,7 @@ extern void C2_HOOK_FASTCALL SetThisPedPhysicing(tPedestrian* pPed);
 
 // SetRandomOmega
 
-// RenderLimbs
+extern void C2_HOOK_FASTCALL RenderLimbs(void);
 
 // MungePedestrians
 
@@ -320,6 +324,8 @@ extern void C2_HOOK_FASTCALL PrevPedCam(void);
 // FindNearestPed
 
 extern void C2_HOOK_FASTCALL ResetPedNearness(void);
+
+extern void C2_HOOK_FASTCALL GetPedestrianDebugInfo(char* pBuffer, int pPed_index);
 
 // PedPreCollisionStuff
 
@@ -405,7 +411,7 @@ extern void C2_HOOK_FASTCALL SetGoreLevel(int pNewLevel);
 
 // ReadRemap
 
-// DisposeRemap
+extern void C2_HOOK_FASTCALL DisposeRemap(tPed_remap* pRemap);
 
 // DisposeAllLoadedRemaps
 
@@ -429,7 +435,7 @@ extern void C2_HOOK_FASTCALL SetGoreLevel(int pNewLevel);
 
 // DisposeAllLoadedForms
 
-// DisposeCharacterInstance
+extern void C2_HOOK_FASTCALL DisposeCharacterInstance(tPed_character_instance* pCharacter);
 
 // FindOrOpenForm
 
@@ -517,7 +523,7 @@ extern void C2_HOOK_FASTCALL SetObjectV(tPhysics_object* pObject, const br_vecto
 
 // DropPointOntoPlane
 
-// SetCharacterDirection
+extern void C2_HOOK_FASTCALL SetCharacterDirection(tPed_character_instance* pPed, const br_vector3* pDir, const br_vector3* pUp);
 
 // SetCharacterPosition
 
