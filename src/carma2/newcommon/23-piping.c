@@ -1189,19 +1189,9 @@ void C2_HOOK_FASTCALL ApplyGrooveOnOff(tPipe_chunk** pChunk) {
     }
 }
 
-// FUNCTION: CARMA2_HW 0x004c9c00
-// FUNCTION: CARMA2_SW 0x004c6330
-void C2_HOOK_FASTCALL ApplyPowerupGot(tPipe_chunk** pChunk) {
+// ApplyPowerupGot
 
-    ARPowerupGot((tPowerup*)(*pChunk)->subject_index, (*pChunk)->data.powerup_lose.car);
-}
-
-// FUNCTION: CARMA2_HW 0x004c9c10
-// FUNCTION: CARMA2_SW 0x004c6340
-void C2_HOOK_FASTCALL ApplyPowerupLose(tPipe_chunk** pChunk) {
-
-    ARPowerupLose((tPowerup*)(*pChunk)->subject_index, (*pChunk)->data.powerup_lose.car);
-}
+// ApplyPowerupLose
 
 // ApplyFunkEnable
 
@@ -1389,19 +1379,9 @@ void C2_HOOK_FASTCALL UndoGrooveOnOff(tPipe_chunk** pChunk, tPipe_chunk* pPrev_c
     }
 }
 
-// FUNCTION: CARMA2_HW 0x004ca2f0
-// FUNCTION: CARMA2_SW 0x004c6a20
-void C2_HOOK_FASTCALL UndoPowerupGot(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
+// UndoPowerupGot
 
-    ARPowerupLose((tPowerup*)(*pChunk)->subject_index, (*pChunk)->data.powerup_lose.car);
-}
-
-// FUNCTION: CARMA2_HW 0x004ca300
-// FUNCTION: CARMA2_SW 0x004c6a30
-void C2_HOOK_FASTCALL UndoPowerupLose(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
-
-    ARPowerupGot((tPowerup*)(*pChunk)->subject_index, (*pChunk)->data.powerup_lose.car);
-}
+// UndoPowerupLose
 
 // UndoFunkEnable
 
