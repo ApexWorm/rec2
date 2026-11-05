@@ -88,8 +88,6 @@ tU32 gPipe_sound_start_time;
 // GLOBAL: CARMA2_SW 0x00671018
 tU32 gPipe_sound_time_window;
 
-// ARReplayForwards
-
 // FUNCTION: CARMA2_HW 0x00402300
 // FUNCTION: CARMA2_SW 0x00402300
 int C2_HOOK_FASTCALL ARReplayForwards(void) {
