@@ -59,15 +59,15 @@ extern void C2_HOOK_FASTCALL MungePalette(void);
 
 extern void C2_HOOK_FASTCALL ResetPalette(void);
 
-// Darken
+extern void C2_HOOK_FASTCALL Darken(tU8 *pPtr, tU32 pDarken_amount);
 
-// SetFadedPalette
+extern void C2_HOOK_FASTCALL SetFadedPalette(tU32 pDegree);
 
 extern void C2_HOOK_FASTCALL FadePaletteDown(void);
 
 extern void C2_HOOK_FASTCALL FadePaletteUp(void);
 
-// EnsurePaletteUp
+extern void C2_HOOK_FASTCALL EnsurePaletteUp(void);
 
 extern void C2_HOOK_FASTCALL EnsureRenderPalette(void);
 
