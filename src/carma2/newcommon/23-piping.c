@@ -167,8 +167,8 @@ tU32 C2_HOOK_FASTCALL LengthOfSession(tPipe_session* pSession) {
         running_total += LengthOfChunk(the_chunk, pSession->type);
     }
     running_total += offsetof(tPipe_session, data) + sizeof(tU16);
-    if (running_total & 1) {
-        FatalError(0x62);
+    if (running_total & 0x1) {
+        FatalError(kFatalError_SomethingInThePipingSystemWentWrong);
     }
     return running_total;
 }

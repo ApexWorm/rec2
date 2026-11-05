@@ -5769,6 +5769,7 @@ enum {
     kFatalError_ConfusedByFormatOfConditionalDamageInCarFile = 0x5c,
     kFatalError_TooManyExtraPointsForCarIndex_S = 0x5d,
     kFatalError_OOM_S = 0x5e,
+    kFatalError_SomethingInThePipingSystemWentWrong = 0x62,
     kFatalError_CannotOpenTEXT_TXT = 0x63,
     kFatalError_CannotFindFlicReferencedTranslation_S = 0x65,
     kFatalError_CannotOpenHeadupsFile = 0x66,
