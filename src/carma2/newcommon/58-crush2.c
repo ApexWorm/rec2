@@ -8,6 +8,7 @@
 
 #include "58-crush2.h"
 
+#include "00-car.h"
 #include "07-structur.h"
 #include "09-funks.h"
 #include "15-displays.h"
@@ -15,9 +16,12 @@
 #include "21-mainloop.h"
 #include "23-piping.h"
 #include "30-opponent.h"
+#include "32-spark.h"
 #include "39-oil.h"
 #include "41-utility.h"
 #include "43-pratcam.h"
+#include "51-smash.h"
+#include "69-sound.h"
 #include "globvars.h"
 #include "globvrpb.h"
 
@@ -61,13 +65,22 @@ float gWobble_spam_z[8] = { 0.4f, -0.25f, 0.0f, 0.25f, 0.0f, 0.15f, -0.4f, -0.15
 
 // GLOBAL: CARMA2_HW 0x00590060
 // GLOBAL: CARMA2_SW 0x0058b058
-float gWheel_circ_to_width = .16f;
+float gWheel_circ_to_width = 0.16f;
 
-// CheckLastCar
+void C2_HOOK_FASTCALL CheckLastCar(void) {
+    if (gNet_mode == eNet_mode_none && GetCarCount(eVehicle_opponent) != 0 && NumberOfOpponentsLeft() == 0) {
+        if (gCurrent_race.race_spec->race_type == kRaceType_Carma1 || gCurrent_race.race_spec->race_type == kRaceType_Cars) {
+            if (gCurrent_race.race_spec->race_type == kRaceType_Carma1) {
+                NewTextHeadupSlot(4, 0, 5000, -4, GetMiscString(eMiscString_every_opponent_wasted));
+            }
+            RaceCompleted(eRace_over_2);
+        }
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x0043f5f0
 // FUNCTION: CARMA2_SW 0x0043f6d0
-void C2_HOOK_FASTCALL KnackerThisCar(tCar_spec* pCar) {
+inline void C2_HOOK_FASTCALL KnackerThisCar(tCar_spec* pCar) {
 
     if (pCar->invulnerable_no_wastage) {
         return;
@@ -80,14 +93,7 @@ void C2_HOOK_FASTCALL KnackerThisCar(tCar_spec* pCar) {
     }
     pCar->knackered = 1;
     QueueWastedMassage(pCar->index);
-    if (gNet_mode == eNet_mode_none && GetCarCount(eVehicle_opponent) != 0 && NumberOfOpponentsLeft() == 0) {
-        if (gCurrent_race.race_spec->race_type == kRaceType_Carma1 || gCurrent_race.race_spec->race_type == kRaceType_Cars) {
-            if (gCurrent_race.race_spec->race_type == kRaceType_Carma1) {
-                NewTextHeadupSlot(4, 0, 5000, -4, GetMiscString(10));
-            }
-            RaceCompleted(eRace_over_2);
-        }
-    }
+    CheckLastCar();
     QueueOilSpill(pCar);
     if (gNet_mode == eNet_mode_none) {
         KillGroovadelic(pCar->index);
@@ -95,17 +101,66 @@ void C2_HOOK_FASTCALL KnackerThisCar(tCar_spec* pCar) {
     }
 }
 
-// ExplodeMeCarUpMeOldMatey
+// FUNCTION: CARMA2_HW 0x0043f6c0
+// FUNCTION: CARMA2_SW 0x0043f7a0
+void C2_HOOK_FASTCALL ExplodeMeCarUpMeOldMatey(tCar_spec* pCar) {
 
-// SetKnackeredFlag
+    Explode(&gExplosion_pix_animation_groups, pCar->car_master_actor,
+        &pCar->car_actor->model->bounds, NULL);
+    if ((pCar != NULL && pCar->driver ==  eDriver_local_human)) {
+        DRS3StartSound(gCar_outlet, gExplosion_sound_id);
+    } else {
+        DRS3StartSound3D(gCar_outlet, gExplosion_sound_id, &pCar->pos, &gZero_v__car, 1, 255, BR_FIXED_INT(1), BR_FIXED_INT(1));
+    }
+}
 
-// DamageUnit2
+// FUNCTION: CARMA2_HW 0x0043f730
+// FUNCTION: CARMA2_SW 0x0043f810
+int C2_HOOK_FASTCALL SetKnackeredFlag(tCar_spec* pCar) {
+
+    if (gNet_mode == eNet_mode_client
+            || pCar->knackered
+            || ((pCar->damage_units[eDamage_engine].damage_level < 99
+                && (pCar->damage_units[eDamage_transmission].damage_level < 99)
+                && pCar->damage_units[eDamage_driver].damage_level < 99)
+                && (pCar->damage_units[eDamage_lf_wheel].damage_level < 99
+                    || pCar->damage_units[eDamage_rf_wheel].damage_level < 99
+                    || pCar->damage_units[eDamage_lr_wheel].damage_level < 99
+                    || pCar->damage_units[eDamage_rr_wheel].damage_level < 99))) {
+        return 0;
+    }
+    ExplodeMeCarUpMeOldMatey(pCar);
+    KnackerThisCar(pCar);
+    if (gNet_mode == eNet_mode_none) {
+        if (IRandomBetween(0,1) && gNet_mode == eNet_mode_none) {
+            StopCarSmoking(pCar);
+            CreateSmokeColumn(pCar, 0, IRandomBetween(0,  11), 20000);
+        }
+        CreateSmokeColumn(pCar, 0, IRandomBetween(0, 11), 180000);
+    }
+    return 1;
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_HW 0x0043f930
+// STUB: CARMA2_SW 0x0043fa10
+void C2_HOOK_FASTCALL DamageUnit2(tCar_spec *pCar, tDamage_type pDamage_type, int pMagnitude) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // RecordLastDamage
 
 // DoDamage
 
 // FUNCTION: CARMA2_HW 0x0043f9f0
+// FUNCTION: CARMA2_SW 0x0043fad0
 void C2_HOOK_FASTCALL CalcModifiedLocation(tCar_spec* pCar) {
     int i;
 
@@ -295,5 +350,25 @@ void C2_HOOK_FASTCALL CrashEarnings(tCar_spec* pCar1, tCar_spec* pCar2) {
 
 // PercentageCarHealth
 
-// ChristmasLights
+// FUNCTION: CARMA2_HW 0x00441420
+// FUNCTION: CARMA2_SW 0x00441500
+void C2_HOOK_FASTCALL ChristmasLights(tCar_spec* pCar, int pMin_damage, int pMax_damage) {
+    int restarts = 0;
+    tDamage_type damage_type = eDamage_start;
 
+    for (;;) {
+        DamageUnit2(pCar, damage_type, IRandomBetween(pMin_damage, pMax_damage));
+        if (damage_type == eDamage_engine && pCar->damage_units[damage_type].damage_level < 80) {
+            restarts += 1;
+            if (restarts < 30) {
+                continue;
+            }
+        }
+        damage_type++;
+        if (damage_type >= eDamage_count) {
+            break;
+
+        }
+    }
+    pCar->damage_magnitude_accumulator += 0.5f;
+}
