@@ -32,7 +32,6 @@ extern void* gPalette_pixels;
 extern br_pixelmap* gPalette;
 extern tTranslation_record* gTranslations;
 extern tFlic_descriptor gPanel_flic[2];
-
 extern tU8* gPanel_flic_data[2];
 extern tU32 gPanel_flic_data_length[2];
 extern tU32 gLast_panel_frame_time[2];

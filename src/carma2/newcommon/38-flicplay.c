@@ -135,7 +135,6 @@ tTranslation_record* gTranslations;
 // GLOBAL: CARMA2_SW 0x00680958
 tFlic_descriptor gPanel_flic[2];
 
-
 // GLOBAL: CARMA2_HW 0x006861d0
 // GLOBAL: CARMA2_SW 0x00680910
 tU8* gPanel_flic_data[2];
