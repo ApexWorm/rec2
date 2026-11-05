@@ -273,6 +273,7 @@ void C2_HOOK_FASTCALL MasterDisableCarFunks(tCar_spec* pCar) {
 }
 
 // STUB: CARMA2_HW 0x004f8e10
+// STUB: CARMA2_SW 0x004f4490
 void C2_HOOK_FASTCALL MasterEnableCarFunks(tCar_spec* pCar) {
     NOT_IMPLEMENTED();
 }
@@ -358,6 +359,7 @@ int C2_HOOK_FASTCALL RestorePixelmap(br_material* pMaterial) {
 }
 
 // STUB: CARMA2_HW 0x004f9620
+// STUB: CARMA2_SW 0x004f4ca0
 void C2_HOOK_FASTCALL RestoreCarPixelmaps(tCar_spec* pCar_spec) {
     NOT_IMPLEMENTED();
 }
@@ -521,7 +523,11 @@ void C2_HOOK_FASTCALL AdjustSmokeColumn(int pIndex, const tSmoke_column_core* pC
 
 // CreateSmokeColumn2
 
-// CreateSmokeColumn
+// STUB: CARMA2_HW 0x004fb890
+// STUB: CARMA2_SW 0x004f6dd0
+void C2_HOOK_FASTCALL CreateSmokeColumn(tCar_spec *pCar, br_colour pColour, int pVertex_index, tU32 pLifetime) {
+    NOT_IMPLEMENTED();
+}
 
 // FUNCTION: CARMA2_HW 0x004fb910
 // FUNCTION: CARMA2_SW 0x004f6e50
@@ -893,10 +899,10 @@ void C2_HOOK_FASTCALL BlendifyCar(tCar_spec* pCar) {
     ForEveryCarMaterial(pCar, BlendifyMaterialCB, 1);
 }
 
-// STUB: CARMA2_HW 0x004fed50
-// STUB: CARMA2_SW 0x004fa630
+// FUNCTION: CARMA2_HW 0x004fed50
+// FUNCTION: CARMA2_SW 0x004fa630
 int C2_HOOK_FASTCALL UnBlendifyMaterialCB(br_material* pMaterial) {
-    NOT_IMPLEMENTED();
+    return MightBlendifyMaterial(pMaterial, 100);
 }
 
 // FUNCTION: CARMA2_HW 0x004fed40
