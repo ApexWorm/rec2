@@ -98,9 +98,9 @@ extern void C2_HOOK_FASTCALL TDamageLFWheel(void);
 
 // CheckToggles
 
-// CarWorldOffFallenCheckThingy
+extern int C2_HOOK_FASTCALL CarWorldOffFallenCheckThingy(tCar_spec* pCar, int pCheck_around);
 
-// HasCarFallenOffWorld
+extern int C2_HOOK_FASTCALL HasCarFallenOffWorld(tCar_spec* pCar);
 
 // CheckForBeingOutOfThisWorld
 
