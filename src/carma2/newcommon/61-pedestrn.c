@@ -101,6 +101,7 @@ tTWTVFS gTwtPeds;
 float gMutant_speed;
 
 // GLOBAL: CARMA2_HW 0x007447a8
+// GLOBAL: CARMA2_SW 0x0073b268
 int gDancing_peds;
 
 // GLOBAL: CARMA2_HW 0x007447b8
@@ -1064,7 +1065,19 @@ void C2_HOOK_FASTCALL SetGoreLevel(int pNewLevel) {
 
 // ReadRemap
 
-// DisposeRemap
+// FUNCTION: CARMA2_HW 0x004046d0
+// FUNCTION: CARMA2_SW 0x004046d0
+void C2_HOOK_FASTCALL DisposeRemap(tPed_remap* pRemap) {
+
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPed_remap, bones, 0x2c);
+
+    if (pRemap != NULL) {
+        if (pRemap->bones != NULL) {
+            BrMemFree(pRemap->bones);
+        }
+        BrMemFree(pRemap);
+    }
+}
 
 // DisposeAllLoadedRemaps
 
@@ -1088,7 +1101,14 @@ void C2_HOOK_FASTCALL SetGoreLevel(int pNewLevel) {
 
 // DisposeAllLoadedForms
 
-// DisposeCharacterInstance
+// FUNCTION: CARMA2_HW 0x00406a30
+// FUNCTION: CARMA2_SW 0x00406a30
+void C2_HOOK_FASTCALL DisposeCharacterInstance(tPed_character_instance* pCharacter) {
+
+    if (pCharacter != NULL) {
+        BrMemFree(pCharacter);
+    }
+}
 
 // FindOrOpenForm
 

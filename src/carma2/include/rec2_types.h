@@ -610,7 +610,7 @@ typedef struct {
     float max_dist_axis;
     float max_dist_squared;
     br_vector3* pos;
-    int (C2_HOOK_FASTCALL * callback)(br_actor*, void*);
+    tNearbyActors_cbfn* callback;
     void* callback_context;
 } tFoundAnActor_context;
 
@@ -2345,6 +2345,7 @@ typedef struct {
 } tDamage_condition;
 
 typedef enum {
+    eDamage_start = 0,
     eDamage_engine = 0,
     eDamage_transmission = 1,
     eDamage_driver = 2,
@@ -2356,7 +2357,8 @@ typedef enum {
     eDamage_lf_wheel = 8,
     eDamage_rf_wheel = 9,
     eDamage_lr_wheel = 10,
-    eDamage_rr_wheel = 11
+    eDamage_rr_wheel = 11,
+    eDamage_count = 12,
 } tDamage_type;
 
 typedef struct  {
@@ -5428,6 +5430,7 @@ enum {
     eMiscString_repairing_for_free = 4,
     eMiscString_repair_cost_colon = 5,
     eMiscString_recovery_cost_colon = 7,
+    eMiscString_every_opponent_wasted = 10,
     eMiscString_credits = 12,
     eMiscString_credit = 13,
     eMiscString_lost_credits_prefix = 14,
