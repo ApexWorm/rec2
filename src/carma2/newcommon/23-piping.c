@@ -1042,7 +1042,15 @@ void C2_HOOK_FASTCALL ApplyFrameBoundary(tPipe_chunk** pChunk) {
 
 // ApplySpecial
 
-// ApplyProxRay
+// FUNCTION: CARMA2_HW 0x004c97f0
+// FUNCTION: CARMA2_SW 0x004c5f20
+void C2_HOOK_FASTCALL ApplyProxRay(tPipe_chunk** pChunk) {
+
+    AdjustProxRay((*pChunk)->subject_index,
+        (*pChunk)->data.prox_ray.car_ID,
+        (*pChunk)->data.prox_ray.ped_index,
+        (*pChunk)->data.prox_ray.time);
+}
 
 // ApplySkidAdjustment
 
@@ -1181,9 +1189,19 @@ void C2_HOOK_FASTCALL ApplyGrooveOnOff(tPipe_chunk** pChunk) {
     }
 }
 
-// ApplyPowerupGot
+// FUNCTION: CARMA2_HW 0x004c9c00
+// FUNCTION: CARMA2_SW 0x004c6330
+void C2_HOOK_FASTCALL ApplyPowerupGot(tPipe_chunk** pChunk) {
 
-// ApplyPowerupLose
+    ARPowerupGot((tPowerup*)(*pChunk)->subject_index, (*pChunk)->data.powerup_lose.car);
+}
+
+// FUNCTION: CARMA2_HW 0x004c9c10
+// FUNCTION: CARMA2_SW 0x004c6340
+void C2_HOOK_FASTCALL ApplyPowerupLose(tPipe_chunk** pChunk) {
+
+    ARPowerupLose((tPowerup*)(*pChunk)->subject_index, (*pChunk)->data.powerup_lose.car);
+}
 
 // ApplyFunkEnable
 
@@ -1371,9 +1389,19 @@ void C2_HOOK_FASTCALL UndoGrooveOnOff(tPipe_chunk** pChunk, tPipe_chunk* pPrev_c
     }
 }
 
-// UndoPowerupGot
+// FUNCTION: CARMA2_HW 0x004ca2f0
+// FUNCTION: CARMA2_SW 0x004c6a20
+void C2_HOOK_FASTCALL UndoPowerupGot(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
 
-// UndoPowerupLose
+    ARPowerupLose((tPowerup*)(*pChunk)->subject_index, (*pChunk)->data.powerup_lose.car);
+}
+
+// FUNCTION: CARMA2_HW 0x004ca300
+// FUNCTION: CARMA2_SW 0x004c6a30
+void C2_HOOK_FASTCALL UndoPowerupLose(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
+
+    ARPowerupGot((tPowerup*)(*pChunk)->subject_index, (*pChunk)->data.powerup_lose.car);
+}
 
 // UndoFunkEnable
 
