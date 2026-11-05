@@ -260,6 +260,13 @@ void C2_HOOK_FASTCALL TDamageLFWheel(void) {
     DamageLFWheel(21);
 }
 
+// FUNCTION: CARMA2_HW 0x00442060
+// FUNCTION: CARMA2_SW 0x00442140
+void C2_HOOK_FASTCALL TDamageLFBrake(void) {
+
+    DamageLFBrake(21);
+}
+
 // ToggleMiniMap
 
 // CheckToggles
