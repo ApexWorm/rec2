@@ -31,6 +31,8 @@ extern tS32 C2_HOOK_FASTCALL ReadS32(FILE* pF);
 
 extern tS16 C2_HOOK_FASTCALL ReadS16(FILE* pF);
 
+extern tS8 C2_HOOK_FASTCALL ReadS8(FILE* pF);
+
 extern void C2_HOOK_FASTCALL WriteU32L(FILE* pF, tU32 pNumber);
 
 extern void C2_HOOK_FASTCALL WriteU16L(FILE* pF, tU16 pNumber);
@@ -54,6 +56,8 @@ extern void C2_HOOK_FASTCALL MemSkipBytes(char** pPtr, int pBytes_to_skip);
 extern int C2_HOOK_FASTCALL GetALineAndInterpretCommand(FILE* pF, const char** pString_list, int pCount);
 
 extern int C2_HOOK_FASTCALL GetAnInt(FILE* pF);
+
+extern unsigned int C2_HOOK_FASTCALL BinIntegerToInteger(unsigned int pValue);
 
 extern float C2_HOOK_FASTCALL GetAFloat(FILE* pF);
 
@@ -94,6 +98,8 @@ extern void C2_HOOK_FASTCALL EncodeLine_DEMO(char* pS);
 extern void C2_HOOK_FASTCALL EncodeFile(char* pThe_path);
 
 extern void C2_HOOK_FASTCALL SkipNLines(FILE* pF);
+
+extern void C2_HOOK_FASTCALL EncodeFileWrapper(char* pThe_path);
 
 extern char* C2_HOOK_FASTCALL GetALineWithNoPossibleService(FILE* pF, char* pS);
 

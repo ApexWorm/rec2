@@ -215,6 +215,27 @@ typedef struct {
 } tSmoke_column_core;
 
 typedef struct {
+    float opacity;
+    br_pixelmap* map;
+} tExplosion_frame;
+
+typedef struct {
+    tU32 start;
+    tU32 period;
+    undefined field_0x8;
+    tU8 count_frames;
+    tU8 finished;
+    undefined field_0xb;
+    br_actor* collision_actor;
+    br_actor* actor;
+    float field_0x14;
+    br_angle angle;
+    undefined padding[2];
+    br_vector3 field_0x1c;
+    tExplosion_frame frames[10];
+} tExplosion;
+
+typedef struct {
     tU16 v[3];
 } tCompressed_vector3;
 
@@ -402,7 +423,7 @@ typedef struct {
 typedef struct {
     tPedestrian* ped;
     br_vector3 positions[7];
-} tPipe_burning_ped;
+} tPipe_chunk_napalm_bolt;
 
 typedef struct {
     void (C2_HOOK_FASTCALL * reset)(void);
@@ -454,12 +475,17 @@ typedef struct {
 
 typedef struct {
     tU32 time;
-} tPipe_chunk_frame_finish;
+} tPipe_chunk_frame_boundary;
 
 typedef struct {
     br_vector3 p;
     br_vector3 v;
 } tPipe_chunk_spark;
+
+typedef struct {
+    tU32 size; // size is size of complete chunk (including size member)
+    tU8 data[];
+} tPipe_chunk_bend;
 
 typedef struct {
     tS16 v[3];
@@ -480,6 +506,10 @@ typedef struct {
 
 typedef struct {
     br_matrix34 m;
+} tPipe_chunk_shit_mine;
+
+typedef struct {
+    br_matrix34 m;
 } tPipe_chunk_end_shit_mine;
 
 typedef struct {
@@ -490,6 +520,10 @@ typedef struct {
 typedef struct {
     br_actor* actor;
 } tPipe_chunk_identity;
+
+typedef struct {
+    tExplosion explosion;
+} tPipe_chunk_explosion;
 
 typedef enum {
     ePipe_chunk_frame_finish = 0,
@@ -556,18 +590,34 @@ typedef struct {
 typedef struct tPipe_chunk {
     uintptr_t subject_index;
     union {
+        tPipe_chunk_frame_boundary frame_boundary;
         tPipe_chunk_non_car non_car;
         tPipe_ped_physics_data ped_physics;
         tPipe_single_ped_dismember ped_dismember;
         tPipe_phil_object phil_object;
+        tPipe_funk_enable funk_enable;
         tPipe_chunk_shrapnel shrapnel;
         tPipe_chunk_identity identity;
+        tPipe_chunk_flap flap;
         tPipe_chunk_smash_model_change smash_model_change;
         tPipe_smash_texture_change smash_texture_change;
         tPipe_single_transform_type transform_type;
         tPipe_single_vector vector;
         tPipe_chunk_powerup_lose powerup_lose;
         tPipe_chunk_powerup_respawn powerup_respawn;
+        tPipe_chunk_shit_mine shit_mine;
+        tPipe_chunk_end_shit_mine end_shit_mine;
+        tPipe_smudge_data smudge;
+        tPipe_model_mash model_mash;
+        tPipe_chunk_bend bend;
+        tPipe_chunk_screen_wobble wobble;
+        tPipe_chunk_smoke_column smoke_column;
+        tPipe_chunk_explosion explosion;
+        tPipe_single_groove_on_of groove;
+        tPipe_single_vanished_dismembered vanished_dismembered;
+        tPipe_chunk_napalm_bolt napalm_bolt;
+        tPipe_ped_dir_data ped_dir;
+        tPipe_chunk_repulse_ray repulse_ray;
         char raw_data[0];
     } data;
 } tPipe_chunk;
@@ -1933,27 +1983,6 @@ typedef struct {
     int font_index;
     char text[256];
 } tQueued_headup;
-
-typedef struct {
-    float opacity;
-    br_pixelmap* map;
-} tExplosion_frame;
-
-typedef struct {
-    tU32 start;
-    tU32 period;
-    undefined field_0x8;
-    tU8 count_frames;
-    tU8 finished;
-    undefined field_0xb;
-    br_actor* collision_actor;
-    br_actor* actor;
-    float field_0x14;
-    br_angle angle;
-    undefined padding[2];
-    br_vector3 field_0x1c;
-    tExplosion_frame frames[10];
-} tExplosion;
 
 typedef struct {
     br_actor* actor;
@@ -4647,7 +4676,7 @@ typedef struct {
     undefined4 field_0x10;
     undefined4 field_0x14;
     undefined4 field_0x18;
-    undefined2 field_0x1c;
+    tS16 field_0x1c;
     undefined2 field_0x1e;
     undefined2 field_0x20;
     undefined field_0x22[0x2];
@@ -4897,11 +4926,11 @@ typedef struct {
 
 typedef enum {
     eNet_game_type_fight_to_death = 0,
-    eNet_game_type_1 = 1, /* FIXME */
+    eNet_game_type_1 = 1, /* target = none */
     eNet_game_type_2 = 2, /* FIXME */
     eNet_game_type_checkpoint = 3,
     eNet_game_type_4 = 4, /* FIXME */
-    eNet_game_type_5 = 5, /* FIXME */
+    eNet_game_type_5 = 5, /* target = kills */
     eNet_game_type_6 = 6, /* FIXME */
     eNet_game_type_foxy = 7
 } tNet_game_type;
@@ -5417,13 +5446,6 @@ typedef struct tNet_message_memory {
 } tNet_message_memory;
 
 enum {
-    kMiscString_ShadowNone = 104,
-    kMiscString_ShadowUsOnly = 105,
-    kMiscString_ShadowUsAndOpponents = 106,
-    kMiscString_ShadowEveryone = 107,
-};
-
-enum {
     eMiscString_timer_frozen = 1,
     eMiscString_minimap_on = 2,
     eMiscString_minimap_off = 3,
@@ -5484,6 +5506,10 @@ enum {
     eMiscString_track_appears_quite_quickly = 101,
     eMiscString_track_appears_quite_late = 102,
     eMiscString_track_appears_very_late = 103,
+    eMiscString_ShadowNone = 104,
+    eMiscString_ShadowUsOnly = 105,
+    eMiscString_ShadowUsAndOpponents = 106,
+    eMiscString_ShadowEveryone = 107,
     eMiscString_sky_texture_on = 108,
     eMiscString_sky_texture_off = 109,
     eMiscString_no_sky_texture_for_this_race = 110,
@@ -5563,6 +5589,13 @@ enum {
     eMiscString_network_type_start = eMiscString_driven_to_destruction,
     eMiscString_network_type_description_start = eMiscString_driven_to_destruction_description,
     eMiscString_player_status_start = eMiscString_status_unknown,
+};
+
+enum {
+    eInterfaceString_target_none = 232,
+    eInterfaceString_target_kills = 233,
+    eInterfaceString_target_laps = 234,
+    eInterfaceString_target_time = 235,
 };
 
 enum {
@@ -5752,6 +5785,7 @@ enum {
     kFatalError_ConfusedByFormatOfConditionalDamageInCarFile = 0x5c,
     kFatalError_TooManyExtraPointsForCarIndex_S = 0x5d,
     kFatalError_OOM_S = 0x5e,
+    kFatalError_SomethingInThePipingSystemWentWrong = 0x62,
     kFatalError_CannotOpenTEXT_TXT = 0x63,
     kFatalError_CannotFindFlicReferencedTranslation_S = 0x65,
     kFatalError_CannotOpenHeadupsFile = 0x66,
@@ -5861,6 +5895,10 @@ enum {
     eSoundId_NapalmHitCrackls = 3702,
     eSoundId_PedValium = 3801,
     eSoundId_SmashRepair = 4550,
+    eSoundId_Smash1 = 5000,
+    eSoundId_Smash2 = 5001,
+    eSoundId_Smash3 = 5002,
+    eSoundId_Smash4 = 5003,
     eSoundId_BendCar = 5099,
     eSoundId_DamageRepair = 5200,
     eSoundId_Horn = 5209,
@@ -5881,6 +5919,7 @@ enum {
     eSoundId_Clap = 8015,
     eSoundId_HeyYou = 8016,
     eSoundId_TyreScreeching = 9000,
+    eSoundId_Boing = 9010,
 
     eSoundId_Countdown_Start = eSoundId_Countdown_Go,
 };
