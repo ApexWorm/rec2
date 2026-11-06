@@ -529,7 +529,7 @@ tNet_message_chunk* C2_HOOK_FASTCALL NetGetToPlayerContentsSize(tNet_game_player
         pPlayer->field_0xcc = message = NULL;
     }
     if (message == NULL) {
-        pPlayer->field_0xcc = message = NetAllocateMessage(sizeof(tMax_message) - sizeof(void*));
+        message = pPlayer->field_0xcc = NetAllocateMessage(sizeof(tMax_message) - sizeof(void*));
         message->header.field_0x16 = (tU16)sizeof(tNet_message_header);
         message->header.field_0x14 = 0;
     }
