@@ -12,6 +12,7 @@
 #include "09-funks.h"
 #include "13-crush1.h"
 #include "16-graphics1.h"
+#include "20-skidmark.h"
 #include "22-replay.h"
 #include "27-powerup.h"
 #include "30-opponent.h"
@@ -361,6 +362,10 @@ tU32 C2_HOOK_FASTCALL ARGetStartTime(void) {
     return ((tPipe_chunk*)session->data)->data.frame_boundary.time;
 }
 
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
 // FUNCTION: CARMA2_HW 0x004030d0
 // FUNCTION: CARMA2_SW 0x004030d0
 void C2_HOOK_FASTCALL ARDisableAdvance(void) {
@@ -372,6 +377,10 @@ void C2_HOOK_FASTCALL ARDisableAdvance(void) {
 void C2_HOOK_FASTCALL AREnableAdvance(void) {
     gDisable_advance = 0;
 }
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // FindNextChunk
 
@@ -1231,7 +1240,13 @@ void C2_HOOK_FASTCALL ApplyPedDir(tPipe_chunk** pChunk) {
 
 // ApplyPedDismember
 
-// ApplyPedFPChange
+// FUNCTION: CARMA2_HW 0x004c9b40
+void C2_HOOK_FASTCALL ApplyPedFPChange(tPipe_chunk** pChunk) {
+
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_ped_fp_change_data, new_speed, 0x4);
+
+    PedApplyPedFPChange((tPedestrian*)(*pChunk)->subject_index, (*pChunk)->data.ped_fp_change.new_speed);
+}
 
 // ApplyPedPos
 
@@ -1393,13 +1408,35 @@ void C2_HOOK_FASTCALL UndoSmudge(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk)
 
 // UndoSpecial
 
-// UndoScreenWobble
+// FUNCTION: CARMA2_HW 0x004c9e50
+void C2_HOOK_FASTCALL UndoScreenWobble(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
+
+    ARDisableAdvance();
+    if (pPrev_chunk != NULL) {
+        SetScreenWobble(pPrev_chunk->data.wobble.wobble_x, pPrev_chunk->data.wobble.wobble_y);
+    } else {
+        SetScreenWobble(0, 0);
+    }
+    AREnableAdvance();
+}
 
 // UndoSplash
 
 // UndoExtendedSplash
 
-// UndoSkidAdjustment
+// FUNCTION: CARMA2_HW 0x004c9f20
+void C2_HOOK_FASTCALL UndoSkidAdjustment(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
+
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk_skid_adjustment, material, 0x30);
+
+    ARDisableAdvance();
+    if (pPrev_chunk != NULL) {
+        AdjustSkid(pPrev_chunk->subject_index, &pPrev_chunk->data.skid_adjustment.matrix, pPrev_chunk->data.skid_adjustment.material);
+    } else {
+        HideSkid((*pChunk)->subject_index);
+    }
+    AREnableAdvance();
+}
 
 // UndoFlap
 
@@ -1506,7 +1543,14 @@ void C2_HOOK_FASTCALL UndoPedDismember(tPipe_chunk** pChunk, tPipe_chunk* pPrev_
         old_value);
 }
 
-// UndoPedFPChange
+// FUNCTION: CARMA2_HW 0x004ca230
+void C2_HOOK_FASTCALL UndoPedFPChange(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
+
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_ped_fp_change_data, old_speed, 0x0);
+
+    (void)pPrev_chunk;
+    PedApplyPedFPChange((tPedestrian*)(*pChunk)->subject_index, (*pChunk)->data.ped_fp_change.old_speed);
+}
 
 // UndoPedPos
 
