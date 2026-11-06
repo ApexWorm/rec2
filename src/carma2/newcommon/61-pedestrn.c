@@ -13,11 +13,15 @@
 #include "21-mainloop.h"
 #include "22-replay.h"
 #include "27-powerup.h"
+#include "28-world3.h"
 #include "30-opponent.h"
+
 #include "41-utility.h"
 #include "42-input.h"
 #include "49-physics.h"
+#include "52-errors.h"
 #include "62-graphics3.h"
+
 #include "63-loading3.h"
 #include "66-tintedpoly.h"
 #include "69-sound.h"
@@ -78,6 +82,7 @@ int gPeds_suicidal;
 int gExploding_pedestrians;
 
 // GLOBAL: CARMA2_HW 0x0069b9f0
+// GLOBAL: CARMA2_SW 0x00695a48
 tNapalm_bolt gNapalm_bolts[5];
 
 // GLOBAL: CARMA2_HW 0x0069412c
@@ -154,7 +159,14 @@ void C2_HOOK_FASTCALL PedApplyPedDir(tU32 pId, const br_vector3* pDir) {
 
 // PedUndoPedMove
 
-// PedApplyPedFPChange
+// FUNCTION: CARMA2_HW 0x004ca650
+// FUNCTION: CARMA2_SW 0x004c6d80
+void C2_HOOK_FASTCALL PedApplyPedFPChange(tPedestrian* pPed, float pSpeed) {
+
+    if (gBOOL_00744804 == 0) {
+        SetCharacterMove(pPed->character, -1, pSpeed, 0, 0, GetTotalTime());
+    }
+}
 
 // PedApplyStatus
 
@@ -305,7 +317,18 @@ FILE* C2_HOOK_FASTCALL BonerOpenRemaps(const char* pFile_name) {
     return DRfopen(path, "rb");
 }
 
-// BonerReadPersonalityModels
+// FUNCTION: CARMA2_HW 0x004cbc10
+// FUNCTION: CARMA2_SW 0x004c8310
+void C2_HOOK_FASTCALL BonerReadPersonalityModels(const char* pName) {
+    tPath_name path;
+
+    PathCat(path, gApplication_path, gPedsFolder);
+    PathCat(path, path, "PEEPS");
+    PathCat(path, path, pName);
+    DisallowDuplicates();
+    LoadAllStuffInDirectory(&gPedStorage, path, kRendererShadingType_Diffuse1);
+    AllowDuplicates();
+}
 
 // FUNCTION: CARMA2_HW 0x004cbc70
 // FUNCTION: CARMA2_SW 0x004c8370
@@ -418,7 +441,47 @@ void C2_HOOK_FASTCALL CBLoadForm(tPed_form* pPed_form, FILE* pF) {
 void C2_HOOK_FASTCALL CBDisposeForm(tPed_form* pForm) {
 }
 
-// CBLoadPersonality
+// FUNCTION: CARMA2_HW 0x004cc950
+// FUNCTION: CARMA2_SW 0x004c9050
+void C2_HOOK_FASTCALL CBLoadPersonality(tPed_personality* pPersonality, FILE* pF) {
+    char s[256];
+    tPath_name path;
+    FILE* sound_f;
+    tPed_personality_sounds* sounds;
+    int i;
+    int j;
+
+    C2_HOOK_BUG_ON(sizeof(tPed_personality_sounds) != 0x84);
+    C2_HOOK_BUG_ON(REC2_ASIZE(sounds->sounds) != 11);
+
+    GetAString(pF, s);
+    PathCat(path, gApplication_path, gPedsFolder);
+    PathCat(path, path, "SOUND");
+    PathCat(path, path, s);
+    sound_f = DRfopen(path, "rt");
+    if (sound_f == NULL) {
+        FatalError(kFatalError_CannotOpenPedFile_S, s);
+    }
+
+    sounds = BrMemAllocate(sizeof(*sounds), kMem_misc_poly_ped);
+    pPersonality->sounds = sounds;
+    for (i = 0; i < REC2_ASIZE(sounds->sounds); i++) {
+        sounds->sounds[i].count_sounds = (tU16)GetAnInt(sound_f);
+        for (j = 0; j < sounds->sounds[i].count_sounds; j++) {
+            sounds->sounds[i].sounds[j] = (tU16)LoadSingleSound(&gPedStorage, GetAnInt(sound_f));
+        }
+    }
+    PFfclose(sound_f);
+
+    pPersonality->jump_height = 0.f;
+    if (!PFfeof(pF)) {
+        GetAString(pF, s);
+        if (DRStricmp(s, "JUMPHEIGHT") == 0) {
+            pPersonality->jump_height = GetAScalar(pF);
+        }
+    }
+    ClosePackFileAndSetTiffLoading(gTwtPeds);
+}
 
 // FUNCTION: CARMA2_HW 0x004ccaa0
 // FUNCTION: CARMA2_SW 0x004c91a0
@@ -653,6 +716,7 @@ void C2_HOOK_FASTCALL RenderLimbs(void) {
 // ARResetNapalmBolts
 
 // FUNCTION: CARMA2_HW 0x004d5b40
+// FUNCTION: CARMA2_SW 0x004d2230
 void C2_HOOK_FASTCALL AdjustNapalmBolt(int pIndex, tPedestrian* pPed, br_vector3* pPositions) {
     int i;
 
@@ -1286,7 +1350,19 @@ void C2_HOOK_FASTCALL SetObjectV(tPhysics_object* pObject, const br_vector3* pV)
 
 // ResetAnimation
 
-// SetCharacterMove
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_HW 0x0040a050
+// STUB: CARMA2_SW 0x0040a050
+int C2_HOOK_FASTCALL SetCharacterMove(tPed_character_instance* pPed, int pMove_action, float pSpeed, int pArg4, int pArg5, tU32 pTime) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // DRMatrix34RotateCos
 
