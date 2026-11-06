@@ -571,7 +571,13 @@ void C2_HOOK_FASTCALL DoMapOverlays(br_pixelmap* pScreen) {
 
 // StartMap
 
-// FinishMap
+void C2_HOOK_FASTCALL FinishMap(void) {
+
+    gBack_screen->origin_x = (br_int_16)gBack_original_origin_x;
+    gBack_screen->origin_y = (br_int_16)gBack_original_origin_y;
+    gBack_screen->base_x = (br_uint_16)gBack_original_base_x;
+    gBack_screen->base_y = (br_uint_16)gBack_original_base_y;
+}
 
 // FUNCTION: CARMA2_HW 0x00496b10
 void C2_HOOK_FASTCALL CheckpointLine(br_pixelmap* pMap, int pCheckpoint, tU32 pTime, int pTarget) {
@@ -631,10 +637,7 @@ void C2_HOOK_FASTCALL MapStuffAfterRender(void) {
     if (gMap_view == 2) {
         BrVector2Set(&gOrigin_headup_map, 0.f, 0.f);
         DoMapOverlays(gBack_screen);
-        gBack_screen->origin_x = (br_int_16)gBack_original_origin_x;
-        gBack_screen->origin_y = (br_int_16)gBack_original_origin_y;
-        gBack_screen->base_x = (br_uint_16)gBack_original_base_x;
-        gBack_screen->base_y = (br_uint_16)gBack_original_base_y;
+        FinishMap();
     } else if (gMap_view == 1) {
         if (!gAction_replay_mode
                 && !(gNet_mode != eNet_mode_none && gCurrent_net_game->type == eNet_game_type_foxy && gThis_net_player_index == gIt_or_fox)) {

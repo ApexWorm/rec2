@@ -78,7 +78,7 @@ extern void C2_HOOK_FASTCALL DoMapOverlays(br_pixelmap* pScreen);
 
 // StartMap
 
-// FinishMap
+extern void C2_HOOK_FASTCALL FinishMap(void);
 
 extern void C2_HOOK_FASTCALL CheckpointLine(br_pixelmap* pMap, int pCheckpoint, tU32 pTime, int pTarget);
 
