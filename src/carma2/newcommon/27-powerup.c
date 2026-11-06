@@ -17,13 +17,16 @@
 #include "32-spark.h"
 #include "41-utility.h"
 #include "42-input.h"
+#include "43-pratcam.h"
 
 #include "49-physics.h"
 #include "53-controls.h"
 #include "60-phil.h"
 #include "61-pedestrn.h"
+#include "69-sound.h"
 #include "globvars.h"
 #include "globvrpb.h"
+#include "joystick.h"
 #include "rec2_macros.h"
 
 #include "c2_string.h"
@@ -571,7 +574,18 @@ int C2_HOOK_FASTCALL SetUnderwater(tPowerup* pPowerup, tCar_spec* pCar) {
     return pPowerup - gPowerup_array;
 }
 
-// TrashBodywork
+// FUNCTION: CARMA2_HW 0x004dcae0
+// FUNCTION: CARMA2_SW 0x004d8fe0
+int C2_HOOK_FASTCALL TrashBodywork(tPowerup* pPowerup, tCar_spec* pCar) {
+
+    TotallySpamTheCar(pCar, (br_scalar)(pCar->softness_factor * 1.4285715f * 0.1));
+    if (pCar != NULL && pCar->driver == eDriver_local_human) {
+        DRS3StartSound2(gCar_outlet, eSoundId_Smash1, 1, 255, 255, -1, -1);
+        DRS3StartSound2(gCar_outlet, eSoundId_Smash2, 1, 255, 255, -1, -1);
+        DRS3StartSound2(gCar_outlet, eSoundId_Smash3, 1, 255, 255, -1, -1);
+    }
+    return pPowerup - gPowerup_array;
+}
 
 // FUNCTION: CARMA2_HW 0x004dcb90
 // FUNCTION: CARMA2_SW 0x004d9090
@@ -768,7 +782,18 @@ void C2_HOOK_FASTCALL ARUndoShitMine(br_actor* pActor, br_matrix34* pMatrix) {
 
 // PissOutOil
 
-// KangerooJump
+// FUNCTION: CARMA2_HW 0x004de0c0
+// FUNCTION: CARMA2_SW 0x004da5c0
+int C2_HOOK_FASTCALL KangerooJump(tPowerup* pPowerup, tCar_spec* pCar) {
+    PlayExclusiveFFBEffect("Kangeroo", 0);
+    PratcamEvent(42);
+    pCar->collision_info->v.v[1] += (br_scalar)(pPowerup->float_params[0] / WORLD_SCALE_D);
+    if (pCar != NULL && pCar->driver == eDriver_local_human) {
+        DRS3StartSound(gCar_outlet, eSoundId_Boing);
+    }
+    pCar->collision_info->disable_move_rotate = 0;
+    return pPowerup - gPowerup_array;
+}
 
 // AnnihilatePeds
 

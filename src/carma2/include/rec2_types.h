@@ -4925,11 +4925,11 @@ typedef struct {
 
 typedef enum {
     eNet_game_type_fight_to_death = 0,
-    eNet_game_type_1 = 1, /* FIXME */
+    eNet_game_type_1 = 1, /* target = none */
     eNet_game_type_2 = 2, /* FIXME */
     eNet_game_type_checkpoint = 3,
     eNet_game_type_4 = 4, /* FIXME */
-    eNet_game_type_5 = 5, /* FIXME */
+    eNet_game_type_5 = 5, /* target = kills */
     eNet_game_type_6 = 6, /* FIXME */
     eNet_game_type_foxy = 7
 } tNet_game_type;
@@ -5445,13 +5445,6 @@ typedef struct tNet_message_memory {
 } tNet_message_memory;
 
 enum {
-    kMiscString_ShadowNone = 104,
-    kMiscString_ShadowUsOnly = 105,
-    kMiscString_ShadowUsAndOpponents = 106,
-    kMiscString_ShadowEveryone = 107,
-};
-
-enum {
     eMiscString_timer_frozen = 1,
     eMiscString_minimap_on = 2,
     eMiscString_minimap_off = 3,
@@ -5512,6 +5505,10 @@ enum {
     eMiscString_track_appears_quite_quickly = 101,
     eMiscString_track_appears_quite_late = 102,
     eMiscString_track_appears_very_late = 103,
+    eMiscString_ShadowNone = 104,
+    eMiscString_ShadowUsOnly = 105,
+    eMiscString_ShadowUsAndOpponents = 106,
+    eMiscString_ShadowEveryone = 107,
     eMiscString_sky_texture_on = 108,
     eMiscString_sky_texture_off = 109,
     eMiscString_no_sky_texture_for_this_race = 110,
@@ -5591,6 +5588,13 @@ enum {
     eMiscString_network_type_start = eMiscString_driven_to_destruction,
     eMiscString_network_type_description_start = eMiscString_driven_to_destruction_description,
     eMiscString_player_status_start = eMiscString_status_unknown,
+};
+
+enum {
+    eInterfaceString_target_none = 232,
+    eInterfaceString_target_kills = 233,
+    eInterfaceString_target_laps = 234,
+    eInterfaceString_target_time = 235,
 };
 
 enum {
@@ -5890,6 +5894,10 @@ enum {
     eSoundId_NapalmHitCrackls = 3702,
     eSoundId_PedValium = 3801,
     eSoundId_SmashRepair = 4550,
+    eSoundId_Smash1 = 5000,
+    eSoundId_Smash2 = 5001,
+    eSoundId_Smash3 = 5002,
+    eSoundId_Smash4 = 5003,
     eSoundId_BendCar = 5099,
     eSoundId_DamageRepair = 5200,
     eSoundId_Horn = 5209,
@@ -5910,6 +5918,7 @@ enum {
     eSoundId_Clap = 8015,
     eSoundId_HeyYou = 8016,
     eSoundId_TyreScreeching = 9000,
+    eSoundId_Boing = 9010,
 
     eSoundId_Countdown_Start = eSoundId_Countdown_Go,
 };

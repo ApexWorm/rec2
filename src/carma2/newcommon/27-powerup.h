@@ -213,7 +213,7 @@ extern void C2_HOOK_FASTCALL ResetPedBrittle(tPowerup* pPowerup, tCar_spec* pCar
 
 extern int C2_HOOK_FASTCALL SetUnderwater(tPowerup* pPowerup, tCar_spec* pCar);
 
-// TrashBodywork
+extern int C2_HOOK_FASTCALL TrashBodywork(tPowerup* pPowerup, tCar_spec* pCar);
 
 extern int C2_HOOK_FASTCALL TakeDrugs(tPowerup* pPowerup, tCar_spec* pCar);
 
@@ -279,7 +279,7 @@ extern void C2_HOOK_FASTCALL ARUndoShitMine(br_actor* pActor, br_matrix34* pMatr
 
 // PissOutOil
 
-// KangerooJump
+extern int C2_HOOK_FASTCALL KangerooJump(tPowerup* pPowerup, tCar_spec* pCar);
 
 // AnnihilatePeds
 
