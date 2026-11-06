@@ -588,35 +588,12 @@ tNet_message_chunk* C2_HOOK_FASTCALL NetStartBroadcastContents(tNet_message_type
 // FUNCTION: CARMA2_HW 0x0049fb70
 // FUNCTION: CARMA2_SW 0x0049bcf0
 void C2_HOOK_FASTCALL NetBroadcastContents(tNet_message_chunk* pMessage) {
-    int i;
-    tNet_game_player_info* player;
-    tNet_message* message;
-    int size;
     tNet_message_chunk* contents;
-
-    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tNet_message, contents, 0x18);
+    int i;
 
     for (i = 0; i < gNumber_of_net_players; i++) {
-        player = &gNet_players[i];
         if (i != gThis_net_player_index && i != INT_00659d34) {
-            size = pMessage->raw.header.size;
-            if (player == &gNet_players[gThis_net_player_index]) {
-                PDFatalError("Trying to send network message to self");
-            }
-            message = player->field_0xcc;
-            if (message != NULL && message->header.field_0x16 + size > 512) {
-                NetReallySendMessageToPlayer(gCurrent_net_game, message, player->ID);
-                player->field_0xcc = NULL;
-                message = NULL;
-            }
-            if (message == NULL) {
-                message = player->field_0xcc = NetAllocateMessage(512);
-                message->header.field_0x16 = offsetof(tNet_message, contents);
-                message->header.field_0x14 = 0;
-            }
-            contents = (tNet_message_chunk*)((tU8*)message + message->header.field_0x16);
-            message->header.field_0x14++;
-            message->header.field_0x16 += size;
+            contents = NetGetToPlayerContentsSize(&gNet_players[i], pMessage->raw.header.size);
             memcpy(contents, pMessage, pMessage->raw.header.size);
         }
     }
