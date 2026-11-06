@@ -15,7 +15,6 @@
 #include "27-powerup.h"
 #include "28-world3.h"
 #include "30-opponent.h"
-
 #include "41-utility.h"
 #include "42-input.h"
 #include "49-physics.h"
