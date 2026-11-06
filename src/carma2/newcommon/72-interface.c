@@ -2784,19 +2784,8 @@ int C2_HOOK_FASTCALL Controls_KeyDown(tFrontend_spec* pFrontend) {
 
 // Controls_Ok
 
-// DisplayNetworkOptions
+inline void C2_HOOK_FASTCALL DisplayNetworkOptions(tFrontend_spec* pFrontend) {
 
-// BackupNetworkOptions
-
-// RestoreNetworkOptions
-
-// FUNCTION: CARMA2_HW 0x00472ed0
-// FUNCTION: CARMA2_SW 0x00472440
-int C2_HOOK_FASTCALL NetOptions_Infunc(tFrontend_spec* pFrontend) {
-
-    C2_HOOK_BUG_ON(sizeof(tNet_game_options) != 0x30);
-
-    Generic_Infunc(pFrontend);
     if (gFrontend_net_options.show_players_on_map) {
         SelectThisItemIn(pFrontend, 1, 2);
     } else {
@@ -2844,20 +2833,20 @@ int C2_HOOK_FASTCALL NetOptions_Infunc(tFrontend_spec* pFrontend) {
     sprintf(pFrontend->items[24].text, "%i", gFrontend_net_options.starting_credits);
     switch (gFrontend_game_type) {
     case eNet_game_type_1:
-        pFrontend->items[25].stringId = 233;
+        pFrontend->items[25].stringId = eInterfaceString_target_kills;
         break;
     case eNet_game_type_5:
-        pFrontend->items[25].stringId = 234;
+        pFrontend->items[25].stringId = eInterfaceString_target_laps;
         break;
     case eNet_game_type_foxy:
-        pFrontend->items[25].stringId = 235;
+        pFrontend->items[25].stringId = eInterfaceString_target_time;
         break;
     case eNet_game_type_fight_to_death:
     case eNet_game_type_2:
     case eNet_game_type_checkpoint:
     case eNet_game_type_4:
     case eNet_game_type_6:
-        pFrontend->items[25].stringId = 232;
+        pFrontend->items[25].stringId = eInterfaceString_target_none;
         break;
     }
     pFrontend->items[25].enabled = kFrontendItemEnabled_enabled;
@@ -2896,8 +2885,24 @@ int C2_HOOK_FASTCALL NetOptions_Infunc(tFrontend_spec* pFrontend) {
         break;
     }
     FuckWithWidths(pFrontend);
-    gUNK_006883b0.next = NULL;
+}
+
+void C2_HOOK_FASTCALL BackupNetworkOptions(void) {
+
     gFrontend_backup_net_options = gFrontend_net_options;
+}
+
+// RestoreNetworkOptions
+
+// FUNCTION: CARMA2_HW 0x00472ed0
+// FUNCTION: CARMA2_SW 0x00472440
+int C2_HOOK_FASTCALL NetOptions_Infunc(tFrontend_spec* pFrontend) {
+
+    C2_HOOK_BUG_ON(sizeof(tNet_game_options) != 0x30);
+
+    Generic_Infunc(pFrontend);
+    DisplayNetworkOptions(pFrontend);
+    BackupNetworkOptions();
     gUNK_006886e8.field_0x0 = 24;
     gUNK_006886e8.field_0x4 = 28;
     gUNK_006886e8.field_0x8 = 27;
@@ -2905,6 +2910,7 @@ int C2_HOOK_FASTCALL NetOptions_Infunc(tFrontend_spec* pFrontend) {
     gUNK_006883b0.field_0x4 = 30;
     gUNK_006883b0.field_0x8 = 29;
     gUNK_006886e8.next = &gUNK_006883b0;
+    gUNK_006883b0.next = NULL;
     gPTR_00686508 = &gUNK_006886e8;
     return 0;
 }

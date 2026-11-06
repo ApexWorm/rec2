@@ -409,9 +409,9 @@ extern int C2_HOOK_FASTCALL Controls_KeyDown(tFrontend_spec* pFrontend);
 
 // Controls_Ok
 
-// DisplayNetworkOptions
+extern void C2_HOOK_FASTCALL DisplayNetworkOptions(tFrontend_spec* pFrontend);
 
-// BackupNetworkOptions
+extern void C2_HOOK_FASTCALL BackupNetworkOptions(void);
 
 // RestoreNetworkOptions
 
