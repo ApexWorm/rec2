@@ -1241,6 +1241,7 @@ void C2_HOOK_FASTCALL ApplyPedDir(tPipe_chunk** pChunk) {
 // ApplyPedDismember
 
 // FUNCTION: CARMA2_HW 0x004c9b40
+// FUNCTION: CARMA2_SW 0x004c6270
 void C2_HOOK_FASTCALL ApplyPedFPChange(tPipe_chunk** pChunk) {
 
     C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_ped_fp_change_data, new_speed, 0x4);
@@ -1409,6 +1410,7 @@ void C2_HOOK_FASTCALL UndoSmudge(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk)
 // UndoSpecial
 
 // FUNCTION: CARMA2_HW 0x004c9e50
+// FUNCTION: CARMA2_SW 0x004c6580
 void C2_HOOK_FASTCALL UndoScreenWobble(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
 
     ARDisableAdvance();
@@ -1425,6 +1427,7 @@ void C2_HOOK_FASTCALL UndoScreenWobble(tPipe_chunk** pChunk, tPipe_chunk* pPrev_
 // UndoExtendedSplash
 
 // FUNCTION: CARMA2_HW 0x004c9f20
+// FUNCTION: CARMA2_SW 0x004c6650
 void C2_HOOK_FASTCALL UndoSkidAdjustment(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
 
     C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk_skid_adjustment, material, 0x30);
@@ -1544,6 +1547,7 @@ void C2_HOOK_FASTCALL UndoPedDismember(tPipe_chunk** pChunk, tPipe_chunk* pPrev_
 }
 
 // FUNCTION: CARMA2_HW 0x004ca230
+// FUNCTION: CARMA2_SW 0x004c6960
 void C2_HOOK_FASTCALL UndoPedFPChange(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
 
     C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_ped_fp_change_data, old_speed, 0x0);
