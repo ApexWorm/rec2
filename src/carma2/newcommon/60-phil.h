@@ -22,7 +22,7 @@ extern tU32 gPHIL_last_physics_tick;
 
 extern void C2_HOOK_FASTCALL GetOrientationFromMatrix(tFixed_quat* pOrientation, const br_matrix34* pMatrix);
 
-// GetMatrixFromOrientation
+extern void C2_HOOK_FASTCALL GetMatrixFromOrientation(br_matrix34* pMatrix, const tFixed_quat* pOrientation);
 
 // OmegaCompScalarTo16
 

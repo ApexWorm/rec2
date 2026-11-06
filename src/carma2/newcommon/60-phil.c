@@ -76,7 +76,18 @@ void C2_HOOK_FASTCALL GetOrientationFromMatrix(tFixed_quat* pOrientation, const 
     pOrientation->v[3] = (tU16)(value + .5f);
 }
 
-// GetMatrixFromOrientation
+// FUNCTION: CARMA2_HW 0x0049c000
+// FUNCTION: CARMA2_SW 0x00498180
+void C2_HOOK_FASTCALL GetMatrixFromOrientation(br_matrix34* pMatrix, const tFixed_quat* pOrientation) {
+    br_quat quaternion;
+
+    quaternion.x = ((2.f * ((br_scalar)pOrientation->v[0] / 65534.f))) - 1.f;
+    quaternion.y = ((2.f * ((br_scalar)pOrientation->v[1] / 65534.f))) - 1.f;
+    quaternion.z = ((2.f * ((br_scalar)pOrientation->v[2] / 65534.f))) - 1.f;
+    quaternion.w = ((2.f * ((br_scalar)pOrientation->v[3] / 65534.f))) - 1.f;
+    BrQuatNormalise(&quaternion, &quaternion);
+    BrQuatToMatrix34(pMatrix, &quaternion);
+}
 
 // OmegaCompScalarTo16
 
