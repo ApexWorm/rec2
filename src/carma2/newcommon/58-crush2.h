@@ -23,15 +23,15 @@ extern float gWobble_spam_y[8];
 extern float gWobble_spam_z[8];
 extern float gWheel_circ_to_width;
 
-// CheckLastCar
+extern void C2_HOOK_FASTCALL CheckLastCar(void);
 
 extern void C2_HOOK_FASTCALL KnackerThisCar(tCar_spec* pCar);
 
-// ExplodeMeCarUpMeOldMatey
+extern void C2_HOOK_FASTCALL ExplodeMeCarUpMeOldMatey(tCar_spec* pCar);
 
-// SetKnackeredFlag
+extern int C2_HOOK_FASTCALL SetKnackeredFlag(tCar_spec* pCar);
 
-// DamageUnit2
+extern void C2_HOOK_FASTCALL DamageUnit2(tCar_spec *pCar, tDamage_type pDamage_type, int pMagnitude);
 
 // RecordLastDamage
 
@@ -57,6 +57,6 @@ extern void C2_HOOK_FASTCALL CrashEarnings(tCar_spec* pCar1, tCar_spec* pCar2);
 
 // PercentageCarHealth
 
-// ChristmasLights
+extern void C2_HOOK_FASTCALL ChristmasLights(tCar_spec* pCar, int pMin_damage, int pMax_damage);
 
 #endif // GUARD_58_CRUSH2_H
