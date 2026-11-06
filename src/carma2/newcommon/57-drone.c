@@ -11,9 +11,7 @@
 #include "08-loading1.h"
 #include "15-displays.h"
 #include "23-piping.h"
-
 #include "28-world3.h"
-
 #include "41-utility.h"
 #include "49-physics.h"
 #include "52-errors.h"
