@@ -18,6 +18,8 @@
 #include "51-smash.h"
 #include "60-phil.h"
 #include "globvars.h"
+#include "globvrpb.h"
+
 #include "platform.h"
 #include "rec2_macros.h"
 
@@ -143,6 +145,14 @@ tDriver gSplit_car_driver;
 // GLOBAL: CARMA2_HW 0x006796b4
 // GLOBAL: CARMA2_SW 0x00673e24
 tPhysics_shape* gGonad_sphere_collision_shape;
+
+// GLOBAL: CARMA2_HW 0x0067bd58
+// GLOBAL: CARMA2_SW 0x006764c8
+int gCount_toggled_doors;
+
+// GLOBAL: CARMA2_HW 0x00679450
+// GLOBAL: CARMA2_SW 0x00673bc0
+tToggled_door gToggled_doors[16];
 
 // FUNCTION: CARMA2_HW 0x00429bb0
 // FUNCTION: CARMA2_SW 0x00429c40
@@ -350,7 +360,23 @@ intptr_t C2_HOOK_CDECL z(br_actor* pActor, void* pData) {
 
 // InitModelMasterCrushData
 
-// InitNetworkShapesStuff
+// FUNCTION: CARMA2_HW 0x0042a9b0
+// FUNCTION: CARMA2_SW 0x0042aa40
+void C2_HOOK_FASTCALL InitNetworkShapesStuff(tCar_crush_spec* pCar_crush) {
+    int i;
+
+    C2_HOOK_BUG_ON(sizeof(tCar_crush_network_shapes) != 0x60);
+
+    pCar_crush->field_0x24 = 0;
+    pCar_crush->field_0x26 = 0;
+    if (gNet_mode == eNet_mode_host) {
+        pCar_crush->network_stuff = BrMemAllocate(sizeof(tCar_crush_network_shapes), kMem_crush_data);
+        for (i = 1; i < gNumber_of_net_players; i++) {
+            pCar_crush->network_stuff->items[i - 1].network_id = gNet_players[i].ID;
+            pCar_crush->network_stuff->items[i - 1].field_0x4 = 0;
+        }
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x0042acb0
 // FUNCTION: CARMA2_SW 0x0042ad40
@@ -744,7 +770,26 @@ void C2_HOOK_FASTCALL SetCrush(tCar_crush* pCrush, int pCount_vectors, br_vector
 
 // SetBitForDetachment
 
-// SetFlappage
+// FUNCTION: CARMA2_HW 0x0042d8f0
+// FUNCTION: CARMA2_SW 0x0042d960
+void C2_HOOK_FASTCALL SetFlappage(br_actor* pActor, tCar_spec* pCar, int pFlags, float pScalar) {
+    int i;
+
+    C2_HOOK_BUG_ON(REC2_ASIZE(gToggled_doors) != 16);
+
+    if (gCount_toggled_doors != REC2_ASIZE(gToggled_doors)) {
+        for (i = 0; i < gCount_toggled_doors; i++) {
+            if (gToggled_doors[i].actor == pActor) {
+                return;
+            }
+        }
+        gToggled_doors[gCount_toggled_doors].actor = pActor;
+        gToggled_doors[gCount_toggled_doors].car = pCar;
+        gToggled_doors[gCount_toggled_doors].field_0x8 = pFlags;
+        gToggled_doors[gCount_toggled_doors].field_0xc = pScalar;
+        gCount_toggled_doors += 1;
+    }
+}
 
 // GetUniqueID
 
@@ -937,9 +982,18 @@ void C2_HOOK_FASTCALL StopFlapping(br_actor* pActor, tCar_spec* pCar_spec) {
 
 // DoFlapping
 
-// ToggleFlapsCB2
+// STUB: CARMA2_HW 0x0042ddc0
+// STUB: CARMA2_SW 0x0042de30
+intptr_t C2_HOOK_CDECL ToggleFlapsCB2(br_actor* pActor, void* pCar) {
+    NOT_IMPLEMENTED();
+}
 
-// ToggleFlapsCB
+// FUNCTION: CARMA2_HW 0x0042ddb0
+// FUNCTION: CARMA2_SW 0x0042de20
+int C2_HOOK_FASTCALL ToggleFlapsCB(tPhysics_object* pCollision_info, tCar_spec* pCar) {
+    DRActorEnumRecurse(pCollision_info->actor, ToggleFlapsCB2, pCar);
+    return 0;
+}
 
 // SendToggleFlaps
 

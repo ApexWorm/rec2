@@ -24,6 +24,8 @@ extern tCrush_info_buffer gSplit_car_crush_info_buffer;
 extern tPhysics_object* gSplit_car_collision_infos;
 extern tDriver gSplit_car_driver;
 extern tPhysics_shape* gGonad_sphere_collision_shape;
+extern int gCount_toggled_doors;
+extern tToggled_door gToggled_doors[16];
 
 extern void C2_HOOK_FASTCALL ReadCrushSettings(FILE* pF);
 
@@ -57,7 +59,7 @@ extern intptr_t C2_HOOK_CDECL AccumulateSquashVertices(br_actor* pActor, void* p
 
 // InitModelMasterCrushData
 
-// InitNetworkShapesStuff
+extern void C2_HOOK_FASTCALL InitNetworkShapesStuff(tCar_crush_spec* pCar_crush);
 
 extern int C2_HOOK_CDECL IncreasingCompare(const void* pValue1, const void* pValue2);
 
@@ -185,7 +187,7 @@ extern void C2_HOOK_FASTCALL SetCrush(tCar_crush* pCrush, int pCount_vectors, br
 
 // SetBitForDetachment
 
-// SetFlappage
+extern void C2_HOOK_FASTCALL SetFlappage(br_actor* pActor, tCar_spec* pCar, int pFlags, float pScalar);
 
 // GetUniqueID
 
@@ -251,9 +253,9 @@ extern void C2_HOOK_FASTCALL StopFlapping(br_actor* pActor, tCar_spec* pCar_spec
 
 // DoFlapping
 
-// ToggleFlapsCB2
+extern intptr_t C2_HOOK_CDECL ToggleFlapsCB2(br_actor* pActor, void* pCar);
 
-// ToggleFlapsCB
+extern int C2_HOOK_FASTCALL ToggleFlapsCB(tPhysics_object* pCollision_info, tCar_spec* pCar);
 
 // SendToggleFlaps
 
