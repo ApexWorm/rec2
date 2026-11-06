@@ -1052,13 +1052,11 @@ void C2_HOOK_FASTCALL ApplyFrameBoundary(tPipe_chunk** pChunk) {
 // FUNCTION: CARMA2_HW 0x004c9840
 // FUNCTION: CARMA2_SW 0x004c5f70
 void C2_HOOK_FASTCALL ApplyModelMash(tPipe_chunk** pChunk) {
-    tPipe_chunk* chunk = *pChunk;
-    tPipe_model_mash* data = (tPipe_model_mash*)chunk->data.raw_data;
 
     C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk, data, 0x4);
     C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_model_mash, vectors, 0x4);
 
-    ARApplyModelMash(data->model, (tCompressed_vector3*)(chunk->data.raw_data + offsetof(tPipe_model_mash, vectors)));
+    ARApplyModelMash((*pChunk)->data.model_mash.model, (*pChunk)->data.model_mash.vectors);
 }
 
 // ApplyRelink
@@ -1361,14 +1359,12 @@ void C2_HOOK_FASTCALL UndoSmudge(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk)
 // FUNCTION: CARMA2_HW 0x004c9f80
 // FUNCTION: CARMA2_SW 0x004c66b0
 void C2_HOOK_FASTCALL UndoModelMash(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
-    tPipe_chunk* chunk = *pChunk;
-    tPipe_model_mash* data = (tPipe_model_mash*)chunk->data.raw_data;
 
     C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk, data, 0x4);
     C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_model_mash, vectors, 0x4);
 
     (void)pPrev_chunk;
-    ARUndoModelMash(data->model, (tCompressed_vector3*)(chunk->data.raw_data + offsetof(tPipe_model_mash, vectors)));
+    ARUndoModelMash((*pChunk)->data.model_mash.model, (*pChunk)->data.model_mash.vectors);
 }
 
 // UndoRelink
