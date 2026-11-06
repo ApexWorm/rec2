@@ -776,9 +776,9 @@ void C2_HOOK_FASTCALL ARUndoShitMine(br_actor* pActor, br_matrix34* pMatrix) {
 int C2_HOOK_FASTCALL KangerooJump(tPowerup* pPowerup, tCar_spec* pCar) {
     PlayExclusiveFFBEffect("Kangeroo", 0);
     PratcamEvent(42);
-    pCar->collision_info->v.v[1] += (br_scalar)(pPowerup->float_params[0] * (1.0 / 6.9));
+    pCar->collision_info->v.v[1] += (br_scalar)(pPowerup->float_params[0] / WORLD_SCALE_D);
     if (pCar != NULL && pCar->driver == eDriver_local_human) {
-        DRS3StartSound(gCar_outlet, 9010);
+        DRS3StartSound(gCar_outlet, eSoundId_Boing);
     }
     pCar->collision_info->disable_move_rotate = 0;
     return pPowerup - gPowerup_array;
