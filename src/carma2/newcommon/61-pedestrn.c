@@ -18,7 +18,6 @@
 #include "42-input.h"
 #include "49-physics.h"
 #include "62-graphics3.h"
-
 #include "63-loading3.h"
 #include "66-tintedpoly.h"
 #include "69-sound.h"
