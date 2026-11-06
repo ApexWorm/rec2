@@ -194,11 +194,11 @@ void C2_HOOK_FASTCALL SaveSpecialVolumes(void) {
 
 // FUNCTION: CARMA2_HW 0x004ffd20
 // FUNCTION: CARMA2_SW 0x004fb600
-void C2_HOOK_FASTCALL FindInverseAndWorldBox(tSpecial_volume* pSpec) {
+void C2_HOOK_FASTCALL FindInverseAndWorlBox(tSpecial_volume* pSpec) {
     br_bounds bnds;
 
-    BrVector3Set(&bnds.min, -1.f, -1.f, -1.f);
-    BrVector3Set(&bnds.max, 1.f, 1.f, 1.f);
+    BrVector3Set(&bnds.min, -1.0f, -1.0f, -1.0f);
+    BrVector3Set(&bnds.max, 1.0f, 1.0f, 1.0f);
     GetNewBoundingBox(&pSpec->boundary.box.bounds, &bnds, &pSpec->boundary.box.mat);
     BrMatrix34Inverse(&pSpec->boundary.box.inv_mat, &pSpec->boundary.box.mat);
 }
@@ -210,7 +210,6 @@ void C2_HOOK_FASTCALL ReadSpecialVolumes(FILE* pF) {
     int j;
     tSpecial_volume* spec;
     tSpecial_volume_boundary_type boundary_type;
-    br_bounds unit_bounds;
 
     C2_HOOK_BUG_ON(sizeof(tSpecial_volume) != 0xdc);
     C2_HOOK_BUG_ON(REC2_ASIZE(gSpecial_effects_boundary_choices) != 4);
@@ -233,20 +232,17 @@ void C2_HOOK_FASTCALL ReadSpecialVolumes(FILE* pF) {
                 GetThreeScalars(pF, &spec->boundary.box.mat.m[1][0], &spec->boundary.box.mat.m[1][1], &spec->boundary.box.mat.m[1][2]);
                 GetThreeScalars(pF, &spec->boundary.box.mat.m[2][0], &spec->boundary.box.mat.m[2][1], &spec->boundary.box.mat.m[2][2]);
                 GetThreeScalars(pF, &spec->boundary.box.mat.m[3][0], &spec->boundary.box.mat.m[3][1], &spec->boundary.box.mat.m[3][2]);
-                BrVector3Set(&unit_bounds.min, -1.f, -1.f, -1.f);
-                BrVector3Set(&unit_bounds.max, 1.f, 1.f, 1.f);
-                GetNewBoundingBox(&spec->boundary.box.bounds, &unit_bounds, &spec->boundary.box.mat);
-                BrMatrix34Inverse(&spec->boundary.box.inv_mat, &spec->boundary.box.mat);
+                FindInverseAndWorlBox(spec);
                 spec->boundary.box.axis_length.v[0] = BrVector3Length((br_vector3*)spec->boundary.box.inv_mat.m[0]);
                 spec->boundary.box.axis_length.v[1] = BrVector3Length((br_vector3*)spec->boundary.box.inv_mat.m[1]);
                 spec->boundary.box.axis_length.v[2] = BrVector3Length((br_vector3*)spec->boundary.box.inv_mat.m[2]);
                 ParseSpecialVolume(pF, spec, NULL, boundary_type == eFx_boundary_box);
                 if (spec->soundfx_type != kSoundFx_None) {
                     for (j = 0; j < REC2_ASIZE(spec->boundary.box.bounds.min.v); j++) {
-                        spec->boundary.box.bounds.min.v[j] -= 10.f;
+                        spec->boundary.box.bounds.min.v[j] -= 10.0f;
                     }
                     for (j = 0; j < REC2_ASIZE(spec->boundary.box.bounds.max.v); j++) {
-                        spec->boundary.box.bounds.max.v[j] += 10.f;
+                        spec->boundary.box.bounds.max.v[j] += 10.0f;
                     }
                 }
                 break;

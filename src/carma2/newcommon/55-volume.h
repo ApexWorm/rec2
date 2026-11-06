@@ -32,7 +32,7 @@ extern void C2_HOOK_FASTCALL ParseSpecialVolume(FILE* pF, tSpecial_volume* pSpec
 
 extern void C2_HOOK_FASTCALL SaveSpecialVolumes(void);
 
-extern void C2_HOOK_FASTCALL FindInverseAndWorldBox(tSpecial_volume* pSpec);
+extern void C2_HOOK_FASTCALL FindInverseAndWorlBox(tSpecial_volume* pSpec);
 
 extern void C2_HOOK_FASTCALL ReadSpecialVolumes(FILE* pF);
 
