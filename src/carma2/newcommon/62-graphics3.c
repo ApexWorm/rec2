@@ -561,6 +561,7 @@ void C2_HOOK_FASTCALL DrawOffsetCheckpoint(br_pixelmap* pMap, int pCheckpoint, t
 #endif
 
 // STUB: CARMA2_HW 0x00495e10
+// STUB: CARMA2_SW 0x004927b0
 void C2_HOOK_FASTCALL DoMapOverlays(br_pixelmap* pScreen) {
     NOT_IMPLEMENTED();
 }
