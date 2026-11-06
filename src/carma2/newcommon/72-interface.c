@@ -381,12 +381,14 @@ tFrontend_slider gOptions_sound_slider;
 int gValid_stashed_save_game; // FIXME: rename variable?
 
 // GLOBAL: CARMA2_HW 0x00688408
+// GLOBAL: CARMA2_SW 0x00682968
 tConnected_items gControls_scroller;
 
 // GLOBAL: CARMA2_HW 0x00688458
 char* gKey_names[153];
 
 // GLOBAL: CARMA2_HW 0x00604888
+// GLOBAL: CARMA2_SW 0x005ff7b8
 const int gControls_frontend_to_key_mapping_lut[29] = {
     49, 50, 47, 48, 54, 45, 60, 58, 56, 46,
     57, 67, 68, 69, 71, 61, 62, 63, 64, 74,
@@ -2686,6 +2688,7 @@ void C2_HOOK_FASTCALL StripControls(char* pStr) {
 // DisposeKeyNames
 
 // FUNCTION: CARMA2_HW 0x004720e0
+// FUNCTION: CARMA2_SW 0x00471670
 void C2_HOOK_FASTCALL RefreshScrollSet(tFrontend_spec* pFrontend) {
     int i;
 
