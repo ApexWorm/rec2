@@ -1154,14 +1154,12 @@ void C2_HOOK_FASTCALL ApplySmashTextureChange(tPipe_chunk** pChunk) {
 // FUNCTION: CARMA2_HW 0x004c9a50
 // FUNCTION: CARMA2_SW 0x004c6180
 void C2_HOOK_FASTCALL ApplyRepulseRay(tPipe_chunk** pChunk) {
-    tPipe_chunk* chunk = *pChunk;
-    tPipe_chunk_repulse_ray* data = (tPipe_chunk_repulse_ray*)chunk->data.raw_data;
 
     C2_HOOK_BUG_ON(sizeof(tPipe_chunk_repulse_ray) != 0xc);
     C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk_repulse_ray, victim, 0x4);
     C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk_repulse_ray, time, 0x8);
-
-    AdjustRepulseRay(chunk->subject_index, data->origin, data->victim, data->time);
+    
+    AdjustRepulseRay((*pChunk)->subject_index, (*pChunk)->data.repulse_ray.origin, (*pChunk)->data.repulse_ray.victim, (*pChunk)->data.repulse_ray.time);
 }
 
 // ApplyActorTrans
