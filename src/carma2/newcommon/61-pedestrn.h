@@ -57,7 +57,7 @@ extern void C2_HOOK_FASTCALL PedApplyPedDir(tU32 pId, const br_vector3* pDir);
 
 // PedUndoPedMove
 
-// PedApplyPedFPChange
+extern void C2_HOOK_FASTCALL PedApplyPedFPChange(tPedestrian* pPed, float pSpeed);
 
 // PedApplyStatus
 
@@ -117,7 +117,7 @@ extern FILE* C2_HOOK_FASTCALL BonerOpenMoves(const char* pName);
 
 extern FILE* C2_HOOK_FASTCALL BonerOpenRemaps(const char* pFile_name);
 
-// BonerReadPersonalityModels
+extern void C2_HOOK_FASTCALL BonerReadPersonalityModels(const char* pName);
 
 extern void C2_HOOK_FASTCALL MakeActorRenderable(br_actor* pActor, int pBone_index, tPed_character_instance* pCharacter);
 
@@ -517,7 +517,7 @@ extern void C2_HOOK_FASTCALL StopCharacterMorphing(tPed_character_instance* pCha
 
 // ResetAnimation
 
-// SetCharacterMove
+extern int C2_HOOK_FASTCALL SetCharacterMove(tPed_character_instance* pPed, int pMove_action, float pSpeed, int pArg4, int pArg5, tU32 pTime);
 
 // DRMatrix34RotateCos
 

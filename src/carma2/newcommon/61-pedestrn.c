@@ -13,6 +13,7 @@
 #include "21-mainloop.h"
 #include "22-replay.h"
 #include "27-powerup.h"
+#include "28-world3.h"
 #include "30-opponent.h"
 #include "41-utility.h"
 #include "42-input.h"
@@ -78,6 +79,7 @@ int gPeds_suicidal;
 int gExploding_pedestrians;
 
 // GLOBAL: CARMA2_HW 0x0069b9f0
+// GLOBAL: CARMA2_SW 0x00695a48
 tNapalm_bolt gNapalm_bolts[5];
 
 // GLOBAL: CARMA2_HW 0x0069412c
@@ -154,7 +156,14 @@ void C2_HOOK_FASTCALL PedApplyPedDir(tU32 pId, const br_vector3* pDir) {
 
 // PedUndoPedMove
 
-// PedApplyPedFPChange
+// FUNCTION: CARMA2_HW 0x004ca650
+// FUNCTION: CARMA2_SW 0x004c6d80
+void C2_HOOK_FASTCALL PedApplyPedFPChange(tPedestrian* pPed, float pSpeed) {
+
+    if (gBOOL_00744804 == 0) {
+        SetCharacterMove(pPed->character, -1, pSpeed, 0, 0, GetTotalTime());
+    }
+}
 
 // PedApplyStatus
 
@@ -305,7 +314,18 @@ FILE* C2_HOOK_FASTCALL BonerOpenRemaps(const char* pFile_name) {
     return DRfopen(path, "rb");
 }
 
-// BonerReadPersonalityModels
+// FUNCTION: CARMA2_HW 0x004cbc10
+// FUNCTION: CARMA2_SW 0x004c8310
+void C2_HOOK_FASTCALL BonerReadPersonalityModels(const char* pName) {
+    tPath_name path;
+
+    PathCat(path, gApplication_path, gPedsFolder);
+    PathCat(path, path, "PEEPS");
+    PathCat(path, path, pName);
+    DisallowDuplicates();
+    LoadAllStuffInDirectory(&gPedStorage, path, kRendererShadingType_Diffuse1);
+    AllowDuplicates();
+}
 
 // FUNCTION: CARMA2_HW 0x004cbc70
 // FUNCTION: CARMA2_SW 0x004c8370
@@ -653,6 +673,7 @@ void C2_HOOK_FASTCALL RenderLimbs(void) {
 // ARResetNapalmBolts
 
 // FUNCTION: CARMA2_HW 0x004d5b40
+// FUNCTION: CARMA2_SW 0x004d2230
 void C2_HOOK_FASTCALL AdjustNapalmBolt(int pIndex, tPedestrian* pPed, br_vector3* pPositions) {
     int i;
 
@@ -1307,7 +1328,19 @@ void C2_HOOK_FASTCALL StopCharacterMorphing(tPed_character_instance* pCharacter)
 
 // ResetAnimation
 
-// SetCharacterMove
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_HW 0x0040a050
+// STUB: CARMA2_SW 0x0040a050
+int C2_HOOK_FASTCALL SetCharacterMove(tPed_character_instance* pPed, int pMove_action, float pSpeed, int pArg4, int pArg5, tU32 pTime) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // DRMatrix34RotateCos
 

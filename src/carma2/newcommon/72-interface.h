@@ -21,9 +21,15 @@ extern int gFrontend_netsummary_first_iteration;
 extern tNet_game_options gFrontend_net_options;
 extern int gPicked_wreck;
 extern tWreck_gallery_car_info gWreck_gallery_car_infos[30];
+extern tNet_game_type gFrontend_game_type;
+extern tStruct_00686508 gUNK_006883b0;
+extern tStruct_00686508 gUNK_006886e8;
 
 extern tU32 gFrontend_last_scroll;
 extern tU32 gNet_synch_start;
+
+extern int gFrontend_wrecks_current;
+extern tWreck_gallery_sell_info gWreck_gallery_sell_infos[32];
 
 extern tFrontend_brender_item gFrontend_brender_items[100];
 extern tFrontend_spec* gCurrent_frontend_spec;
@@ -255,7 +261,7 @@ extern int C2_HOOK_FASTCALL ScrollToNextCar(tFrontend_spec* pFrontend);
 
 extern int C2_HOOK_FASTCALL ScrollToPrevCar(tFrontend_spec* pFrontend);
 
-// BuyCurrentCar
+extern int C2_HOOK_FASTCALL BuyCurrentCar(tFrontend_spec* pFrontend);
 
 // WrecksInFunc
 
@@ -403,13 +409,13 @@ extern int C2_HOOK_FASTCALL Controls_KeyDown(tFrontend_spec* pFrontend);
 
 // Controls_Ok
 
-// DisplayNetworkOptions
+extern void C2_HOOK_FASTCALL DisplayNetworkOptions(tFrontend_spec* pFrontend);
 
-// BackupNetworkOptions
+extern void C2_HOOK_FASTCALL BackupNetworkOptions(void);
 
 // RestoreNetworkOptions
 
-// NetOptions_Infunc
+extern int C2_HOOK_FASTCALL NetOptions_Infunc(tFrontend_spec* pFrontend);
 
 extern int C2_HOOK_FASTCALL NetOptions_Outfunc(tFrontend_spec* pFrontend);
 
