@@ -1287,7 +1287,17 @@ void C2_HOOK_FASTCALL SetObjectV(tPhysics_object* pObject, const br_vector3* pV)
 
 // MakeCharacterPhysicworthy
 
-// RecalculateOrientationOfRoot
+void C2_HOOK_FASTCALL RecalculateOrientationOfRoot(tPed_character_instance* pCharacter) {
+    tPed_form* form;
+    br_matrix34* character_matrix;
+    br_matrix34 mat;
+
+    form = pCharacter->personality->form;
+    character_matrix = GetCharacterMatrixPtr(pCharacter);
+    BrMatrix34LPInverse(&mat, &form->moves[pCharacter->field_0x7].move->frames[pCharacter->field_0x1c].mat);
+    BrMatrix34Mul(&pCharacter->field_0x8c, &mat, character_matrix);
+    BrVector3Set((br_vector3*)pCharacter->field_0x8c.m[3], 0.0f, 0.0f, 0.0f);
+}
 
 // BonerActiveHalted2
 
@@ -1298,20 +1308,13 @@ void C2_HOOK_FASTCALL SetObjectV(tPhysics_object* pObject, const br_vector3* pV)
 // FUNCTION: CARMA2_HW 0x004096f0
 // FUNCTION: CARMA2_SW 0x004096f0
 void C2_HOOK_FASTCALL StopCharacterMorphing(tPed_character_instance* pCharacter) {
-    tPed_form* form;
-    br_matrix34* character_matrix;
-    br_matrix34 mat;
 
     C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPed_character_instance, field_0x1c, 0x1c);
 
     if (pCharacter->field_0xbc != NULL) {
         pCharacter->field_0xbc->field_0x4 = 0.f;
         if (pCharacter->field_0xbc->field_0x2c) {
-            form = pCharacter->personality->form;
-            character_matrix = GetBoneMatrixPtr(pCharacter, 0);
-            BrMatrix34LPInverse(&mat, &form->moves[pCharacter->field_0x7].move->frames[pCharacter->field_0x1c].mat);
-            BrMatrix34Mul(&pCharacter->field_0x8c, &mat, character_matrix);
-            BrVector3Set((br_vector3*)pCharacter->field_0x8c.m[3], 0.f, 0.f, 0.f);
+            RecalculateOrientationOfRoot(pCharacter);
         }
         pCharacter->field_0xbc = NULL;
         SetCharacterBonePositions(pCharacter, 0, 0);
