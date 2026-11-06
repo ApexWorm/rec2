@@ -578,9 +578,9 @@ int C2_HOOK_FASTCALL TrashBodywork(tPowerup* pPowerup, tCar_spec* pCar) {
 
     TotallySpamTheCar(pCar, (br_scalar)(pCar->softness_factor * 1.4285715f * 0.1));
     if (pCar != NULL && pCar->driver == eDriver_local_human) {
-        DRS3StartSound2(gCar_outlet, 5000, 1, 255, 255, -1, -1);
-        DRS3StartSound2(gCar_outlet, 5001, 1, 255, 255, -1, -1);
-        DRS3StartSound2(gCar_outlet, 5002, 1, 255, 255, -1, -1);
+        DRS3StartSound2(gCar_outlet, eSoundId_Smash1, 1, 255, 255, -1, -1);
+        DRS3StartSound2(gCar_outlet, eSoundId_Smash2, 1, 255, 255, -1, -1);
+        DRS3StartSound2(gCar_outlet, eSoundId_Smash3, 1, 255, 255, -1, -1);
     }
     return pPowerup - gPowerup_array;
 }
