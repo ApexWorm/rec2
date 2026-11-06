@@ -1151,13 +1151,11 @@ void C2_HOOK_FASTCALL ApplySmashTextureChange(tPipe_chunk** pChunk) {
 // FUNCTION: CARMA2_HW 0x004c9ad0
 // FUNCTION: CARMA2_SW 0x004c6200
 void C2_HOOK_FASTCALL ApplyPedDir(tPipe_chunk** pChunk) {
-    tPipe_chunk* chunk = *pChunk;
-    tPipe_ped_dir_data* data = (tPipe_ped_dir_data*)chunk->data.raw_data;
 
     C2_HOOK_BUG_ON(sizeof(tPipe_ped_dir_data) != 0xc);
     C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_ped_dir_data, direction, 0x0);
 
-    PedApplyPedDir(chunk->subject_index, &data->direction);
+    PedApplyPedDir((*pChunk)->subject_index, &(*pChunk)->data.ped_dir.direction);
 }
 
 // ApplyPedMove
