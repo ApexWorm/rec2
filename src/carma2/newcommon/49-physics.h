@@ -149,13 +149,13 @@ extern void C2_HOOK_FASTCALL CreateJointTorque(tPhysics_object* pObject, tPhysic
 
 // LimitOmega
 
-// CapOmega
+extern void C2_HOOK_FASTCALL CapOmega(tPhysics_object* pObject);
 
 // ListLimitOmega
 
 // GroupLimitOmega
 
-// PositionWorldJointedObject
+extern void C2_HOOK_FASTCALL PositionWorldJointedObject(tPhysics_object* pObject, br_scalar pDelta_time);
 
 // TranslateAndRotatePartialObject
 
@@ -281,7 +281,7 @@ extern void C2_HOOK_FASTCALL RotateObjectFirstOrder(tPhysics_object* pObject, br
 
 // RotateObject
 
-// TranslateObject
+extern void C2_HOOK_FASTCALL TranslateObject(tPhysics_object* pObject, br_scalar pDelta_time);
 
 // GetFacesNearObject
 
@@ -387,7 +387,7 @@ extern void C2_HOOK_FASTCALL FillInShape(tPhysics_shape* pShape);
 
 extern void C2_NORETURN C2_HOOK_FASTCALL PhysicsError(tPhysicsError pError, const char* pMessage);
 
-// PhysicsWarning
+extern void C2_HOOK_FASTCALL PhysicsWarning(const char* pMessage);
 
 extern void C2_HOOK_FASTCALL PhysicsSetErrorHandler(tPhysicsError_cbfn* pError_cbfn);
 
