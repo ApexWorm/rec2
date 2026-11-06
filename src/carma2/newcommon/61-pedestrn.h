@@ -18,6 +18,7 @@ extern br_actor* gLimbs_actor;
 extern int gPed_retain_root_mode;
 extern float gPedestrian_speed_factor;
 extern int gSelected_ped;
+extern int gCount_active_peds;
 extern int gPeds_suicidal;
 extern int gExploding_pedestrians;
 extern tNapalm_bolt gNapalm_bolts[5];
@@ -327,6 +328,8 @@ extern void C2_HOOK_FASTCALL ResetPedNearness(void);
 
 extern void C2_HOOK_FASTCALL GetPedestrianDebugInfo(char* pBuffer, int pPed_index);
 
+extern void C2_HOOK_FASTCALL ShowActivePedCount(void);
+
 // PedPreCollisionStuff
 
 // UpdateIfBackwardsAR
@@ -344,6 +347,8 @@ extern void C2_HOOK_FASTCALL UnmakeMaterialBlendy(br_material* pMaterial);
 // TurnOnCollisions
 
 extern void C2_HOOK_FASTCALL BlendifyMaterial25(br_material* pMaterial);
+
+extern void C2_HOOK_FASTCALL StartEtherealPedestrians(void);
 
 extern void C2_HOOK_FASTCALL ModelUpdatePrimitiveMaterials(br_model* pModel);
 

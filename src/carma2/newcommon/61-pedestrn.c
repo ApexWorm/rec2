@@ -10,6 +10,7 @@
 
 #include "08-loading1.h"
 #include "10-loading2.h"
+#include "15-displays.h"
 #include "21-mainloop.h"
 #include "22-replay.h"
 #include "27-powerup.h"
@@ -68,6 +69,10 @@ int gPed_retain_root_mode = 0;
 // GLOBAL: CARMA2_HW 0x007447e0
 // GLOBAL: CARMA2_SW 0x0073b2a0
 float gPedestrian_speed_factor;
+
+// GLOBAL: CARMA2_HW 0x007447ec
+// GLOBAL: CARMA2_SW 0x0073b2ac
+int gCount_active_peds;
 
 // GLOBAL: CARMA2_HW 0x007447f0
 // GLOBAL: CARMA2_SW 0x0073b2b0
@@ -907,6 +912,15 @@ void C2_HOOK_FASTCALL GetPedestrianDebugInfo(char* pBuffer, int pPed_index) {
     }
 }
 
+// FUNCTION: CARMA2_HW 0x004d6820
+// FUNCTION: CARMA2_SW 0x004d2e20
+void C2_HOOK_FASTCALL ShowActivePedCount(void) {
+    char text[256];
+
+    sprintf(text, "%d out of %d peds are active", gCount_active_peds, gPed_count);
+    NewTextHeadupSlot2(4, 0, 1000, -4, text, 0);
+}
+
 // PedPreCollisionStuff
 
 // UpdateIfBackwardsAR
@@ -938,6 +952,12 @@ void C2_HOOK_FASTCALL UnmakeMaterialBlendy(br_material* pMaterial) {
 void C2_HOOK_FASTCALL BlendifyMaterial25(br_material* pMaterial) {
     BlendifyMaterial(pMaterial, 25);
     BrMaterialUpdate(pMaterial, BR_MATU_ALL);
+}
+
+// STUB: CARMA2_HW 0x004d6b40
+// STUB: CARMA2_SW 0x004d3140
+void C2_HOOK_FASTCALL StartEtherealPedestrians(void) {
+    NOT_IMPLEMENTED();
 }
 
 // FUNCTION: CARMA2_HW 0x004d6ba0
