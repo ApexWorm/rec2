@@ -2545,9 +2545,24 @@ tConnected_items* C2_HOOK_FASTCALL GetScrollSet(int pItem) {
     return NULL;
 }
 
-// ScrollSet_DisplayEntry
+void C2_HOOK_FASTCALL ScrollSet_DisplayEntry(tConnected_items* pScroll_set, int pIndex) {
 
-// ScrollSet_GetItem
+    if (pIndex < pScroll_set->field_0x8 || pIndex >= pScroll_set->field_0x8 + pScroll_set->range_length) {
+        pScroll_set->field_0x8 = pIndex;
+        if (pIndex >= pScroll_set->field_0x0 - pScroll_set->range_length) {
+            pScroll_set->field_0x8 = pScroll_set->field_0x0 - pScroll_set->range_length;
+        }
+    }
+}
+
+int C2_HOOK_FASTCALL ScrollSet_GetItem(tConnected_items* pScroll_set, int pIndex) {
+
+    if (pIndex < pScroll_set->field_0x8 || pIndex > pScroll_set->field_0x8 + pScroll_set->range_length) {
+        return -1;
+    } else {
+        return pIndex - pScroll_set->field_0x8 + pScroll_set->range_starts[0];
+    }
+}
 
 // GetUpdown
 
@@ -2788,19 +2803,10 @@ int C2_HOOK_FASTCALL Controls_Ok(tFrontend_spec* pFrontend) {
                 break;
             }
         }
-        if (i < gControls_scroller.field_0x8 || i >= gControls_scroller.field_0x8 + gControls_scroller.range_length) {
-            gControls_scroller.field_0x8 = i;
-            if (i >= gControls_scroller.field_0x0 - gControls_scroller.range_length) {
-                gControls_scroller.field_0x8 = gControls_scroller.field_0x0 - gControls_scroller.range_length;
-            }
-        }
+        ScrollSet_DisplayEntry(&gControls_scroller, i);
         RefreshScrollSet(pFrontend);
         prev_item = gFrontend_selected_item_index;
-        if (i < gControls_scroller.field_0x8 || i > gControls_scroller.field_0x8 + gControls_scroller.range_length) {
-            gFrontend_selected_item_index = -1;
-        } else {
-            gFrontend_selected_item_index = i - gControls_scroller.field_0x8 + gControls_scroller.range_starts[0];
-        }
+        gFrontend_selected_item_index = ScrollSet_GetItem(&gControls_scroller, i);
         if (gFrontend_selected_item_index == -1) {
             PDFatalError("Screwed up in Controls_Ok().");
             return 0;

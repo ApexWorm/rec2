@@ -346,9 +346,9 @@ extern void C2_HOOK_FASTCALL Generic_LinkOutEffect(void);
 
 extern tConnected_items* C2_HOOK_FASTCALL GetScrollSet(int pItem);
 
-// ScrollSet_DisplayEntry
+extern void C2_HOOK_FASTCALL ScrollSet_DisplayEntry(tConnected_items* pScroll_set, int pIndex);
 
-// ScrollSet_GetItem
+extern int C2_HOOK_FASTCALL ScrollSet_GetItem(tConnected_items* pScroll_set, int pIndex);
 
 // GetUpdown
 
@@ -390,7 +390,7 @@ extern void C2_HOOK_FASTCALL Slider_ForceProc(tFrontend_slider* pSlider);
 
 extern void C2_HOOK_FASTCALL DisplayJoystickSettings(tFrontend_spec* pFrontend);
 
-// SaveAllJoystickData
+extern void C2_HOOK_FASTCALL SaveAllJoystickData(void);
 
 // Controls_SwitchKeymapSet
 
