@@ -546,7 +546,20 @@ void C2_HOOK_FASTCALL SetFlapCheckVertices(tCar_crush_flap_data* pFlap_data, con
 #pragma auto_inline(on)
 #endif
 
-// InitModelVertexData
+void C2_HOOK_FASTCALL InitModelVertexData(tModel_detail_vertex_data* pVertex_data, br_model* pModel, int pDetail_level, tCar_crush_buffer_entry* pCrush_data, tCar_crush_spec* pCar_crush_spec) {
+    int invalid;
+    int i;
+
+    for (i = 0; i < pModel->nvertices; i++) {
+        CompressVector3(&pVertex_data[i].p, &pModel->vertices[i].p, -10.0f, 10.0f);
+        pVertex_data[i].limit_number = CrushLimitNumber(&pModel->vertices[i].p, &pCar_crush_spec->limits, &pCar_crush_spec->count_limits, &invalid);
+    }
+    if (pDetail_level == 0) {
+        if (pCrush_data->flap_data != NULL) {
+            SetFlapCheckVertices(pCrush_data->flap_data, pModel, pVertex_data);
+        }
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x0042bf80
 // FUNCTION: CARMA2_SW 0x0042c010
@@ -556,11 +569,8 @@ intptr_t C2_HOOK_CDECL InitVertexDataCB(br_actor* pActor, void* pData) {
     tCar_spec* car_spec;
     tCar_crush_spec* car_crush_spec;
     tUser_detail_level_model* model_user_data;
-    tModel_detail_vertex_data* vertex_data;
     br_model* model;
     int i;
-    int j;
-    int invalid;
 
     C2_HOOK_BUG_ON(sizeof(tModel_detail_vertex_data) != 10);
 
@@ -572,17 +582,8 @@ intptr_t C2_HOOK_CDECL InitVertexDataCB(br_actor* pActor, void* pData) {
     for (i = 0; i < car_spec->count_detail_levels; i++) {
         model = user_crush_data->models[i];
         if (model != NULL && model->nvertices != 0 && (model_user_data = model->user) != NULL) {
-            vertex_data = BrMemAllocate(model->nvertices * sizeof(tModel_detail_vertex_data), kMem_crush_data);
-            model_user_data->field_0x4 = vertex_data;
-            for (j = 0; j < model->nvertices; j++) {
-                CompressVector3(&vertex_data[j].p, &model->vertices[j].p, -10.0f, 10.0f);
-                vertex_data[j].limit_number = CrushLimitNumber(&model->vertices[j].p, &car_crush_spec->limits, &car_crush_spec->count_limits, &invalid);
-            }
-            if (i == 0) {
-                if (crush_data->flap_data != NULL) {
-                    SetFlapCheckVertices(crush_data->flap_data, model, vertex_data);
-                }
-            }
+            model_user_data->field_0x4 = BrMemAllocate(model->nvertices * sizeof(tModel_detail_vertex_data), kMem_crush_data);
+            InitModelVertexData(model_user_data->field_0x4, model, i, crush_data, car_crush_spec);
             if (i == 0) {
                 LinkSmashies(pActor, crush_data, model_user_data->field_0x4);
             }
