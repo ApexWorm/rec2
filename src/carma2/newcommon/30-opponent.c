@@ -334,9 +334,18 @@ int C2_HOOK_FASTCALL AddToOpponentsProjectedRoute(tOpponent_spec* pOpponent_spec
     }
 }
 
-// StunTheBugger
+void C2_HOOK_FASTCALL StunTheBugger(tOpponent_spec* pOpponent, int pMilliseconds) {
 
-// UnStunTheBugger
+    pOpponent->car_spec->acc_force = 0.0f;
+    pOpponent->car_spec->brake_force = 0.0f;
+    pOpponent->car_spec->curvature = 0.0f;
+    pOpponent->stun_time_ends = MAX(pOpponent->stun_time_ends, gTime_stamp_for_this_munging + pMilliseconds);
+}
+
+void C2_HOOK_FASTCALL UnStunTheBugger(tOpponent_spec* pOpponent) {
+
+    pOpponent->stun_time_ends = 0;
+}
 
 // ProcessCompleteRace
 
@@ -599,26 +608,17 @@ void C2_HOOK_FASTCALL DisposeOpponents(void) {
 // FUNCTION: CARMA2_SW 0x004aa790
 void C2_HOOK_FASTCALL WakeUpOpponentsToTheFactThatTheStartHasBeenJumped(int pWhat_the_countdown_was) {
     int i;
-    int milliseconds;
     tOpponent_spec* opponent;
 
     for (i = 0; i < gProgram_state.AI_vehicles.number_of_opponents; i++) {
         opponent = &gProgram_state.AI_vehicles.opponents[i];
-        opponent->stun_time_ends = 0;
-        milliseconds = MIN(IRandomBetween(1000, 2500), 1000 * pWhat_the_countdown_was);
-        opponent->car_spec->acc_force = 0.f;
-        opponent->car_spec->brake_force = 0.f;
-        opponent->car_spec->curvature = 0.f;
-        opponent->stun_time_ends = MAX(opponent->stun_time_ends, gTime_stamp_for_this_munging + milliseconds);
+        UnStunTheBugger(opponent);
+        StunTheBugger(opponent, MIN(IRandomBetween(1000, 2500), 1000 * pWhat_the_countdown_was));
     }
     for (i = 0; i < gProgram_state.AI_vehicles.number_of_cops; i++) {
         opponent = &gProgram_state.AI_vehicles.cops[i];
-        opponent->stun_time_ends = 0;
-        milliseconds = MIN(IRandomBetween(1000, 2500), 1000 * pWhat_the_countdown_was);
-        opponent->car_spec->acc_force = 0.f;
-        opponent->car_spec->brake_force = 0.f;
-        opponent->car_spec->curvature = 0.f;
-        opponent->stun_time_ends = MAX(opponent->stun_time_ends, gTime_stamp_for_this_munging + milliseconds);
+        UnStunTheBugger(opponent);
+        StunTheBugger(opponent, MIN(IRandomBetween(1000, 2500), 1000 * pWhat_the_countdown_was));
     }
     gAcknowledged_start = 1;
     gStart_jumped = 1;
