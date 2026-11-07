@@ -30,6 +30,8 @@ extern br_vector3 gChanged_points[10];
 extern int gPed_nearness;
 extern tTWTVFS gTwtPeds;
 extern float gMutant_speed;
+extern tMovement_spec gPed_spurt_initial_speed;
+extern tSmashable_initial_position_spec gPed_spurt_initial_position;
 extern int gDancing_peds;
 extern int gDrunk_pedestrians;
 extern int gPeds_already_munged;
@@ -181,7 +183,7 @@ extern void C2_HOOK_FASTCALL CBFillInObject(tPhysics_object* pObject, undefined4
 
 // DoSpurt
 
-// PedApplyBloodSpurt
+extern void C2_HOOK_FASTCALL PedApplyBloodSpurt(tU32 pId, tU32 pTime, unsigned int pSeed, br_vector3* pPosition, br_vector3* pImpactee_velocity, br_vector3* pNormal);
 
 // PedUndoBloodSpurt
 
