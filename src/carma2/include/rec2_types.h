@@ -780,6 +780,7 @@ typedef struct tPipe_chunk {
         tPipe_ped_fp_change_data ped_fp_change;
         tPipe_chunk_repulse_ray repulse_ray;
         tPipe_chunk_oil_spill oil_spill;
+        tPipe_single_graphical_wheel_stuff graphical_wheel_stuff;
         char raw_data[0];
     } data;
 } tPipe_chunk;

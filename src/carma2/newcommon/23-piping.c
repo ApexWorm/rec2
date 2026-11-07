@@ -1250,7 +1250,28 @@ void C2_HOOK_FASTCALL ApplyFrameBoundary(tPipe_chunk** pChunk) {
 
 // ApplyCar
 
-// ApplyGWS
+// FUNCTION: CARMA2_HW 0x004c96c0
+// FUNCTION: CARMA2_SW 0x004c5df0
+void C2_HOOK_FASTCALL ApplyGWS(tPipe_chunk** pChunk) {
+    tCar_spec* car;
+
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk, data, 0x4);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_single_graphical_wheel_stuff, lf_sus_position, 0x2);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_single_graphical_wheel_stuff, rf_sus_position, 0x3);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_single_graphical_wheel_stuff, lr_sus_position, 0x4);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_single_graphical_wheel_stuff, rr_sus_position, 0x5);
+
+    if (((*pChunk)->subject_index >> 8) == eVehicle_self) {
+        car = &gProgram_state.current_car;
+    } else {
+        car = GetCarSpec((*pChunk)->subject_index >> 8, (*pChunk)->subject_index & 0xff);
+    }
+    car->lf_sus_position = (br_scalar)((tS8)(*pChunk)->data.graphical_wheel_stuff.lf_sus_position * (3.0 / 20.0 / 127.0));
+    car->rf_sus_position = (br_scalar)((tS8)(*pChunk)->data.graphical_wheel_stuff.rf_sus_position * (3.0 / 20.0 / 127.0));
+    car->lr_sus_position = (br_scalar)((tS8)(*pChunk)->data.graphical_wheel_stuff.lr_sus_position * (3.0 / 20.0 / 127.0));
+    car->rr_sus_position = (br_scalar)((tS8)(*pChunk)->data.graphical_wheel_stuff.rr_sus_position * (3.0 / 20.0 / 127.0));
+    car->steering_angle = (br_scalar)((tS16)(*pChunk)->data.graphical_wheel_stuff.steering_angle * (60.0 / 32767.0));
+}
 
 // ApplyDamage
 
