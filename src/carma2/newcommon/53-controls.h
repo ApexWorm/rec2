@@ -154,7 +154,7 @@ extern void C2_HOOK_FASTCALL GetPowerup(int pNum);
 
 // CheckSystemKeys
 
-// CheckForCheatingGits
+extern void C2_HOOK_FASTCALL CheckForCheatingGits(void);
 
 // CheckKevKeys
 
