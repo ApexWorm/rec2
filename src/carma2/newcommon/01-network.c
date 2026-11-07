@@ -244,7 +244,7 @@ void C2_HOOK_FASTCALL NetSendHeadupToPlayer(char* pMessage, tPlayer_ID pPlayer) 
     tNet_message* message;
 
     if (gNet_mode != eNet_mode_none) {
-        if (gLocal_net_ID == pPlayer) {
+        if (pPlayer == gLocal_net_ID) {
             if (gProgram_state.racing) {
                 NewTextHeadupSlot(4, 0, 3000, -4, pMessage);
             }
