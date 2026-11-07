@@ -10,19 +10,23 @@
 
 #include "00-car.h"
 #include "01-network.h"
+#include "13-crush1.h"
 
 #include "16-graphics1.h"
 #include "18-graphics2.h"
 #include "32-spark.h"
 #include "41-utility.h"
 #include "42-input.h"
+#include "43-pratcam.h"
 
 #include "49-physics.h"
 #include "53-controls.h"
 #include "60-phil.h"
 #include "61-pedestrn.h"
+#include "69-sound.h"
 #include "globvars.h"
 #include "globvrpb.h"
+#include "joystick.h"
 #include "rec2_macros.h"
 
 #include "c2_string.h"
@@ -42,6 +46,10 @@ int gINT_006a0a5c;
 // GLOBAL: CARMA2_HW 0x006a0a58
 // GLOBAL: CARMA2_SW 0x0069aab0
 int gInventory_selected = 0;
+
+// GLOBAL: CARMA2_HW 0x006a0960
+// GLOBAL: CARMA2_SW 0x0069a9b8
+tRepulse_link gRepulse_links[6];
 
 // GLOBAL: CARMA2_HW 0x006a0ad4
 // GLOBAL: CARMA2_SW 0x0069ab2c
@@ -274,9 +282,31 @@ void C2_HOOK_FASTCALL CloseDownPowerUps(void) {
 
 // MungeRepulseRays
 
-// AdjustRepulseRay
+// FUNCTION: CARMA2_HW 0x004da960
+// FUNCTION: CARMA2_SW 0x004d6e30
+void C2_HOOK_FASTCALL AdjustRepulseRay(int pIndex, br_vector3* pOrigin, br_vector3* pVictim, tU32 pTime) {
+    C2_HOOK_BUG_ON(sizeof(tRepulse_link) != 0x28);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tRepulse_link, pos_origin, 0x4);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tRepulse_link, pos_victim, 0x8);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tRepulse_link, actor, 0xc);
 
-// ResetRepulseRay
+    gRepulse_links[pIndex].pos_origin = pOrigin;
+    gRepulse_links[pIndex].pos_victim = pVictim;
+    gRepulse_links[pIndex].time = pTime;
+}
+
+// FUNCTION: CARMA2_HW 0x004da990
+// FUNCTION: CARMA2_SW 0x004d6e60
+void C2_HOOK_FASTCALL ResetRepulseRay(void) {
+    int i;
+
+    for (i = 0; i < (int)REC2_ASIZE(gRepulse_links); i++) {
+        if (gRepulse_links[i].actor->parent == gNon_track_actor) {
+            BrActorRemove(gRepulse_links[i].actor);
+        }
+        gRepulse_links[i].time = 0;
+    }
+}
 
 // DrawSinglePowerupIcon
 
@@ -498,7 +528,15 @@ void C2_HOOK_FASTCALL UnfreezeTimer(tPowerup* pPowerup, tCar_spec* pCar) {
     }
 }
 
-// DoInstantRepair
+// FUNCTION: CARMA2_HW 0x004dc990
+// FUNCTION: CARMA2_SW 0x004d8e90
+int C2_HOOK_FASTCALL DoInstantRepair(tPowerup* pPowerup, tCar_spec* pCar) {
+
+    if (pCar != NULL && pCar->driver == eDriver_local_human) {
+        TotallyRepairCar();
+    }
+    return pPowerup - gPowerup_array;
+}
 
 // FUNCTION: CARMA2_HW 0x004dc9c0
 // FUNCTION: CARMA2_SW 0x004d8ec0
@@ -536,7 +574,18 @@ int C2_HOOK_FASTCALL SetUnderwater(tPowerup* pPowerup, tCar_spec* pCar) {
     return pPowerup - gPowerup_array;
 }
 
-// TrashBodywork
+// FUNCTION: CARMA2_HW 0x004dcae0
+// FUNCTION: CARMA2_SW 0x004d8fe0
+int C2_HOOK_FASTCALL TrashBodywork(tPowerup* pPowerup, tCar_spec* pCar) {
+
+    TotallySpamTheCar(pCar, (br_scalar)(pCar->softness_factor * 1.4285715f * 0.1));
+    if (pCar != NULL && pCar->driver == eDriver_local_human) {
+        DRS3StartSound2(gCar_outlet, eSoundId_Smash1, 1, 255, 255, -1, -1);
+        DRS3StartSound2(gCar_outlet, eSoundId_Smash2, 1, 255, 255, -1, -1);
+        DRS3StartSound2(gCar_outlet, eSoundId_Smash3, 1, 255, 255, -1, -1);
+    }
+    return pPowerup - gPowerup_array;
+}
 
 // FUNCTION: CARMA2_HW 0x004dcb90
 // FUNCTION: CARMA2_SW 0x004d9090
@@ -628,7 +677,23 @@ int C2_HOOK_FASTCALL SetBouncey(tPowerup* pPowerup, tCar_spec* pCar) {
     return pPowerup - gPowerup_array;
 }
 
-// SetSuspension
+// FUNCTION: CARMA2_HW 0x004dce80
+// FUNCTION: CARMA2_SW 0x004d9380
+int C2_HOOK_FASTCALL SetSuspension(tPowerup* pPowerup, tCar_spec* pCar) {
+    float front_give;
+    float rear_give;
+    float damping;
+    float front_height;
+    float rear_height;
+
+    front_give = pPowerup->float_params[0];
+    rear_give = pPowerup->float_params[1];
+    front_height = pPowerup->float_params[2];
+    rear_height = pPowerup->float_params[3];
+    damping = pPowerup->float_params[4];
+    SetCarSuspGiveAndHeight(pCar, front_give, rear_give, damping, front_height, rear_height);
+    return pPowerup - gPowerup_array;
+}
 
 // FUNCTION: CARMA2_HW 0x004dced0
 // FUNCTION: CARMA2_SW 0x004d93d0
@@ -733,7 +798,18 @@ void C2_HOOK_FASTCALL ARUndoShitMine(br_actor* pActor, br_matrix34* pMatrix) {
 
 // PissOutOil
 
-// KangerooJump
+// FUNCTION: CARMA2_HW 0x004de0c0
+// FUNCTION: CARMA2_SW 0x004da5c0
+int C2_HOOK_FASTCALL KangerooJump(tPowerup* pPowerup, tCar_spec* pCar) {
+    PlayExclusiveFFBEffect("Kangeroo", 0);
+    PratcamEvent(42);
+    pCar->collision_info->v.v[1] += (br_scalar)(pPowerup->float_params[0] / WORLD_SCALE_D);
+    if (pCar != NULL && pCar->driver == eDriver_local_human) {
+        DRS3StartSound(gCar_outlet, eSoundId_Boing);
+    }
+    pCar->collision_info->disable_move_rotate = 0;
+    return pPowerup - gPowerup_array;
+}
 
 // AnnihilatePeds
 

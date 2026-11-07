@@ -18,6 +18,8 @@
 #include "51-smash.h"
 #include "60-phil.h"
 #include "globvars.h"
+#include "globvrpb.h"
+
 #include "platform.h"
 #include "rec2_macros.h"
 
@@ -108,6 +110,14 @@ br_vector3 gBatty_gravity;
 // GLOBAL: CARMA2_SW 0x00674900
 undefined4 gCrush_array_0067a190[10];
 
+// GLOBAL: CARMA2_HW 0x0067b7c8
+// GLOBAL: CARMA2_SW 0x00675f38
+int gCount_net_crush_reattach_bit_list;
+
+// GLOBAL: CARMA2_HW 0x0067be10
+// GLOBAL: CARMA2_SW 0x00676580
+tCrush_net_reattach_bit_list_item gNet_crush_reattach_bit_list[8];
+
 // GLOBAL: CARMA2_HW 0x00679440
 // GLOBAL: CARMA2_SW 0x00673bb0
 undefined4 gDAT_00679440;
@@ -143,6 +153,14 @@ tDriver gSplit_car_driver;
 // GLOBAL: CARMA2_HW 0x006796b4
 // GLOBAL: CARMA2_SW 0x00673e24
 tPhysics_shape* gGonad_sphere_collision_shape;
+
+// GLOBAL: CARMA2_HW 0x0067bd58
+// GLOBAL: CARMA2_SW 0x006764c8
+int gCount_toggled_doors;
+
+// GLOBAL: CARMA2_HW 0x00679450
+// GLOBAL: CARMA2_SW 0x00673bc0
+tToggled_door gToggled_doors[16];
 
 // FUNCTION: CARMA2_HW 0x00429bb0
 // FUNCTION: CARMA2_SW 0x00429c40
@@ -350,7 +368,23 @@ intptr_t C2_HOOK_CDECL z(br_actor* pActor, void* pData) {
 
 // InitModelMasterCrushData
 
-// InitNetworkShapesStuff
+// FUNCTION: CARMA2_HW 0x0042a9b0
+// FUNCTION: CARMA2_SW 0x0042aa40
+void C2_HOOK_FASTCALL InitNetworkShapesStuff(tCar_crush_spec* pCar_crush) {
+    int i;
+
+    C2_HOOK_BUG_ON(sizeof(tCar_crush_network_shapes) != 0x60);
+
+    pCar_crush->field_0x24 = 0;
+    pCar_crush->field_0x26 = 0;
+    if (gNet_mode == eNet_mode_host) {
+        pCar_crush->network_stuff = BrMemAllocate(sizeof(tCar_crush_network_shapes), kMem_crush_data);
+        for (i = 1; i < gNumber_of_net_players; i++) {
+            pCar_crush->network_stuff->items[i - 1].network_id = gNet_players[i].ID;
+            pCar_crush->network_stuff->items[i - 1].field_0x4 = 0;
+        }
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x0042acb0
 // FUNCTION: CARMA2_SW 0x0042ad40
@@ -506,11 +540,65 @@ intptr_t C2_HOOK_CDECL InitModelCrushDataCB(br_actor* pActor, void* pData) {
 
 // PointEdgeDistSq
 
-// SetFlapCheckVertices
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
 
-// InitModelVertexData
+// STUB: CARMA2_HW 0x0042c0e0
+// STUB: CARMA2_SW 0x0042c170
+void C2_HOOK_FASTCALL SetFlapCheckVertices(tCar_crush_flap_data* pFlap_data, const br_model* pModel, tModel_detail_vertex_data* pVertex_data) {
+    NOT_IMPLEMENTED();
+}
 
-// InitVertexDataCB
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
+
+void C2_HOOK_FASTCALL InitModelVertexData(tModel_detail_vertex_data* pVertex_data, br_model* pModel, int pDetail_level, tCar_crush_buffer_entry* pCrush_data, tCar_crush_spec* pCar_crush_spec) {
+    int invalid;
+    int i;
+
+    for (i = 0; i < pModel->nvertices; i++) {
+        CompressVector3(&pVertex_data[i].p, &pModel->vertices[i].p, -10.0f, 10.0f);
+        pVertex_data[i].limit_number = CrushLimitNumber(&pModel->vertices[i].p, &pCar_crush_spec->limits, &pCar_crush_spec->count_limits, &invalid);
+    }
+    if (pDetail_level == 0) {
+        if (pCrush_data->flap_data != NULL) {
+            SetFlapCheckVertices(pCrush_data->flap_data, pModel, pVertex_data);
+        }
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x0042bf80
+// FUNCTION: CARMA2_SW 0x0042c010
+intptr_t C2_HOOK_CDECL InitVertexDataCB(br_actor* pActor, void* pData) {
+    tUser_crush_data* user_crush_data;
+    tCar_crush_buffer_entry* crush_data;
+    tCar_spec* car_spec;
+    tCar_crush_spec* car_crush_spec;
+    tUser_detail_level_model* model_user_data;
+    br_model* model;
+    int i;
+
+    C2_HOOK_BUG_ON(sizeof(tModel_detail_vertex_data) != 10);
+
+    user_crush_data = pActor->user;
+    car_spec = pData;
+    if (user_crush_data == NULL || (crush_data = user_crush_data->crush_data) == NULL || (car_crush_spec = car_spec->car_crush_spec) == NULL) {
+        return 0;
+    }
+    for (i = 0; i < car_spec->count_detail_levels; i++) {
+        model = user_crush_data->models[i];
+        if (model != NULL && model->nvertices != 0 && (model_user_data = model->user) != NULL) {
+            model_user_data->field_0x4 = BrMemAllocate(model->nvertices * sizeof(tModel_detail_vertex_data), kMem_crush_data);
+            InitModelVertexData(model_user_data->field_0x4, model, i, crush_data, car_crush_spec);
+            if (i == 0) {
+                LinkSmashies(pActor, crush_data, model_user_data->field_0x4);
+            }
+        }
+    }
+    return 0;
+}
 
 // InitVertexData
 
@@ -744,7 +832,26 @@ void C2_HOOK_FASTCALL SetCrush(tCar_crush* pCrush, int pCount_vectors, br_vector
 
 // SetBitForDetachment
 
-// SetFlappage
+// FUNCTION: CARMA2_HW 0x0042d8f0
+// FUNCTION: CARMA2_SW 0x0042d960
+void C2_HOOK_FASTCALL SetFlappage(br_actor* pActor, tCar_spec* pCar, int pFlags, float pScalar) {
+    int i;
+
+    C2_HOOK_BUG_ON(REC2_ASIZE(gToggled_doors) != 16);
+
+    if (gCount_toggled_doors != REC2_ASIZE(gToggled_doors)) {
+        for (i = 0; i < gCount_toggled_doors; i++) {
+            if (gToggled_doors[i].actor == pActor) {
+                return;
+            }
+        }
+        gToggled_doors[gCount_toggled_doors].actor = pActor;
+        gToggled_doors[gCount_toggled_doors].car = pCar;
+        gToggled_doors[gCount_toggled_doors].field_0x8 = pFlags;
+        gToggled_doors[gCount_toggled_doors].field_0xc = pScalar;
+        gCount_toggled_doors += 1;
+    }
+}
 
 // GetUniqueID
 
@@ -937,9 +1044,18 @@ void C2_HOOK_FASTCALL StopFlapping(br_actor* pActor, tCar_spec* pCar_spec) {
 
 // DoFlapping
 
-// ToggleFlapsCB2
+// STUB: CARMA2_HW 0x0042ddc0
+// STUB: CARMA2_SW 0x0042de30
+intptr_t C2_HOOK_CDECL ToggleFlapsCB2(br_actor* pActor, void* pCar) {
+    NOT_IMPLEMENTED();
+}
 
-// ToggleFlapsCB
+// FUNCTION: CARMA2_HW 0x0042ddb0
+// FUNCTION: CARMA2_SW 0x0042de20
+int C2_HOOK_FASTCALL ToggleFlapsCB(tPhysics_object* pCollision_info, tCar_spec* pCar) {
+    DRActorEnumRecurse(pCollision_info->actor, ToggleFlapsCB2, pCar);
+    return 0;
+}
 
 // SendToggleFlaps
 
@@ -1126,7 +1242,11 @@ void C2_HOOK_FASTCALL SetModelForUpdate(br_model* pModel) {
 
 // RandomlyBendCar
 
-// TotallySpamTheCar
+// STUB: CARMA2_HW 0x00431610
+// STUB: CARMA2_SW 0x00431640
+void C2_HOOK_FASTCALL TotallySpamTheCar(tCar_spec* pCar, br_scalar pDamage) {
+    NOT_IMPLEMENTED();
+}
 
 // FUNCTION: CARMA2_HW 0x00435dd0
 // FUNCTION: CARMA2_SW 0x00435e00
@@ -1408,7 +1528,11 @@ void C2_HOOK_FASTCALL ARUndoModelMash(br_model* pModel, tCompressed_vector3* pSr
     SetModelForUpdate(pModel);
 }
 
-// ARApplyFlap
+// STUB: CARMA2_HW 0x0043c0e0
+// STUB: CARMA2_SW 0x0043c130
+void C2_HOOK_FASTCALL ARApplyFlap(br_actor* pActor, br_angle pAngle) {
+    NOT_IMPLEMENTED();
+}
 
 // ARApplySplitWeld
 
@@ -1434,7 +1558,23 @@ void C2_HOOK_FASTCALL ARUndoModelMash(br_model* pModel, tCompressed_vector3* pSr
 
 // ReceivedReAttachBit
 
-// ReceivedReAttachAllBits
+// FUNCTION: CARMA2_HW 0x0043ce60
+// FUNCTION: CARMA2_SW 0x0043ceb0
+void C2_HOOK_FASTCALL ReceivedReAttachAllBits(tNet_message_chunk* pContents) {
+    tCar_spec* car;
+
+    if (gCount_net_crush_reattach_bit_list == REC2_ASIZE(gNet_crush_reattach_bit_list)) {
+        return;
+    }
+    car = NetCarFromPlayerID(pContents->reattach_all_bits.player);
+    if (car == NULL) {
+        return;
+    }
+    gNet_crush_reattach_bit_list[gCount_net_crush_reattach_bit_list].car = car;
+    gNet_crush_reattach_bit_list[gCount_net_crush_reattach_bit_list].actor = NULL;
+    gNet_crush_reattach_bit_list[gCount_net_crush_reattach_bit_list].time = pContents->reattach_all_bits.time;
+    gCount_net_crush_reattach_bit_list += 1;
+}
 
 // DoQueuedNetDetaching
 
@@ -1458,7 +1598,32 @@ void C2_HOOK_FASTCALL ARUndoModelMash(br_model* pModel, tCompressed_vector3* pSr
 
 // ReceivedSHNonCar
 
-// GetNetShapeDataLengthFromShape
+// FUNCTION: CARMA2_HW 0x0043d900
+// FUNCTION: CARMA2_SW 0x0043d950
+int C2_HOOK_FASTCALL GetNetShapeDataLengthFromShape(tCar_spec* pCar) {
+    int i;
+    int count;
+    int length;
+    tPhysics_shape* shape;
+
+    C2_HOOK_BUG_ON(sizeof(tCompressed_vector3) != 6);
+
+    if (pCar->car_crush_spec->field_0x4b8) {
+        length = sizeof(tU8);
+        for (shape = pCar->collision_info->shape; shape != NULL; shape = shape->common.next) {
+            if (shape->common.type == kCollisionShapeType_Polyhedron || shape->common.type == kCollisionShapeType_Wireframe_Polyhedron) {
+                length += sizeof(tU8) + shape->polyhedron.polyhedron.count_points * sizeof(tCompressed_vector3);
+            }
+        }
+        return length;
+    } else {
+        count = 0;
+        for (i = 0; i < pCar->car_crush_spec->count_shapes; i++) {
+            count += pCar->car_crush_spec->field_0x4[i].count_points;
+        }
+        return sizeof(tU8) + count * sizeof(tCompressed_vector3);
+    }
+}
 
 // GetNetShapeDataLengthFromData
 

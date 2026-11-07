@@ -12,10 +12,14 @@
 #include "15-displays.h"
 #include "16-graphics1.h"
 #include "17-world2.h"
+#include "18b-graphics2.h"
+#include "19-font.h"
+#include "25-grafdata.h"
 #include "27-powerup.h"
 #include "37-brucetrk.h"
 #include "41-utility.h"
 #include "43-pratcam.h"
+#include "59-camera.h"
 #include "69-sound.h"
 #include "70-packfile.h"
 #include "globvars.h"
@@ -258,6 +262,55 @@ void C2_HOOK_FASTCALL TDamageTrans(void) {
 void C2_HOOK_FASTCALL TDamageLFWheel(void) {
 
     DamageLFWheel(21);
+}
+
+// FUNCTION: CARMA2_HW 0x00442060
+// FUNCTION: CARMA2_SW 0x00442140
+void C2_HOOK_FASTCALL TDamageLFBrake(void) {
+
+    DamageLFBrake(21);
+}
+
+// FUNCTION: CARMA2_HW 0x00442070
+// FUNCTION: CARMA2_SW 0x00442150
+void C2_HOOK_FASTCALL TDamageLRBrake(void) {
+
+    DamageLRBrake(21);
+}
+
+// FUNCTION: CARMA2_HW 0x00442080
+// FUNCTION: CARMA2_SW 0x00442160
+void C2_HOOK_FASTCALL TDamageLRWheel(void) {
+
+    DamageLRWheel(21);
+}
+
+// FUNCTION: CARMA2_HW 0x00442090
+// FUNCTION: CARMA2_SW 0x00442170
+void C2_HOOK_FASTCALL TDamageRFWheel(void) {
+
+    DamageRFWheel(21);
+}
+
+// FUNCTION: CARMA2_HW 0x004420a0
+// FUNCTION: CARMA2_SW 0x00442180
+void C2_HOOK_FASTCALL TDamageRFBrake(void) {
+
+    DamageRFBrake(21);
+}
+
+// FUNCTION: CARMA2_HW 0x004420b0
+// FUNCTION: CARMA2_SW 0x00442190
+void C2_HOOK_FASTCALL TDamageRRBrake(void) {
+
+    DamageRRBrake(21);
+}
+
+// FUNCTION: CARMA2_HW 0x004420c0
+// FUNCTION: CARMA2_SW 0x004421a0
+void C2_HOOK_FASTCALL TDamageRRWheel(void) {
+
+    DamageRRWheel(21);
 }
 
 // ToggleMiniMap
@@ -508,7 +561,41 @@ void C2_HOOK_FASTCALL UserSendMessage(void) {
 
 // EnterUserMessage
 
-// DisplayUserMessage
+// FUNCTION: CARMA2_HW 0x00444c00
+// FUNCTION: CARMA2_SW 0x00444ce0
+void C2_HOOK_FASTCALL DisplayUserMessage(void) {
+    int len;
+
+    if (!gEntering_message || gNet_mode == eNet_mode_none) {
+        return;
+    }
+    len = strlen(&gString[20]);
+    if (len < 63 && (PDGetTotalTime() & 0x200)) {
+        gString[20 + len] = '_';
+        gString[21 + len] = '\0';
+    }
+    DimRectangle(gBack_screen,
+        15 * gBack_screen->width / 100,
+        gCurrent_graf_data->net_message_enter_y - gFonts[6].height,
+        85 * gBack_screen->width / 100,
+        gCurrent_graf_data->net_message_enter_y + 6 * gFonts[6].height,
+        1);
+    DRPixelmapText(gBack_screen,
+        20 * gBack_screen->width / 100,
+        gCurrent_graf_data->net_message_enter_y,
+        &gFonts[6],
+        GetMiscString(eMiscString_enter_message),
+        100);
+    OoerrIveGotTextInMeBoxMissus(6,
+        &gString[20],
+        gBack_screen,
+        20 * gBack_screen->width / 100,
+        gCurrent_graf_data->net_message_enter_y + 2 * gFonts[6].height,
+        80 * gBack_screen->width / 100,
+        gCurrent_graf_data->net_message_enter_y + 6 * gFonts[6].height,
+        0);
+    gString[20 + len] = '\0';
+}
 
 // FUNCTION: CARMA2_HW 0x00444d70
 // FUNCTION: CARMA2_SW 0x00444e50
@@ -559,7 +646,15 @@ void C2_HOOK_FASTCALL DisposeAbuseomatic(void) {
     }
 }
 
-// ChangeCameraTypeInGame
+// FUNCTION: CARMA2_HW 0x00444ed0
+// FUNCTION: CARMA2_SW 0x00444fb0
+void C2_HOOK_FASTCALL ChangeCameraTypeInGame(void) {
+
+    if (!gAction_replay_mode) {
+        ChangeCameraType();
+        NewTextHeadupSlot2(4, 0, 1000, -4, GetMiscString(eMiscString_standard_cam + gAction_replay_camera_mode), 0);
+    }
+}
 
 // SteelBollock
 
