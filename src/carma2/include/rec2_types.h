@@ -423,7 +423,7 @@ typedef struct {
 typedef struct {
     tPedestrian* ped;
     br_vector3 positions[7];
-} tPipe_burning_ped;
+} tPipe_chunk_napalm_bolt;
 
 typedef struct {
     void (C2_HOOK_FASTCALL * reset)(void);
@@ -503,6 +503,10 @@ typedef struct {
     tU16 car_ID;
     tU32 time;
 } tPipe_chunk_prox_ray;
+
+typedef struct {
+    br_matrix34 m;
+} tPipe_chunk_shit_mine;
 
 typedef struct {
     br_matrix34 m;
@@ -591,14 +595,19 @@ typedef struct tPipe_chunk {
         tPipe_ped_physics_data ped_physics;
         tPipe_single_ped_dismember ped_dismember;
         tPipe_phil_object phil_object;
+        tPipe_funk_enable funk_enable;
         tPipe_chunk_shrapnel shrapnel;
         tPipe_chunk_identity identity;
+        tPipe_chunk_flap flap;
         tPipe_chunk_smash_model_change smash_model_change;
         tPipe_smash_texture_change smash_texture_change;
         tPipe_single_transform_type transform_type;
         tPipe_single_vector vector;
         tPipe_chunk_powerup_lose powerup_lose;
         tPipe_chunk_powerup_respawn powerup_respawn;
+        tPipe_chunk_shit_mine shit_mine;
+        tPipe_chunk_end_shit_mine end_shit_mine;
+        tPipe_chunk_prox_ray prox_ray;
         tPipe_smudge_data smudge;
         tPipe_model_mash model_mash;
         tPipe_chunk_bend bend;
@@ -606,6 +615,10 @@ typedef struct tPipe_chunk {
         tPipe_chunk_smoke_column smoke_column;
         tPipe_chunk_explosion explosion;
         tPipe_single_groove_on_of groove;
+        tPipe_single_vanished_dismembered vanished_dismembered;
+        tPipe_chunk_napalm_bolt napalm_bolt;
+        tPipe_ped_dir_data ped_dir;
+        tPipe_chunk_repulse_ray repulse_ray;
         char raw_data[0];
     } data;
 } tPipe_chunk;
@@ -4043,8 +4056,9 @@ typedef struct tCrush_net_full_detach_bit_list_item {
 } tCrush_net_full_detach_bit_list_item;
 
 typedef struct tCrush_net_reattach_bit_list_item {
+    br_actor* actor;
     tCar_spec* car;
-    undefined field_0x4[8];
+    tU32 time;
 } tCrush_net_reattach_bit_list_item;
 
 typedef struct tCrush_detach_list_item {
@@ -4664,7 +4678,7 @@ typedef struct {
     undefined4 field_0x10;
     undefined4 field_0x14;
     undefined4 field_0x18;
-    undefined2 field_0x1c;
+    tS16 field_0x1c;
     undefined2 field_0x1e;
     undefined2 field_0x20;
     undefined field_0x22[0x2];
@@ -4914,11 +4928,11 @@ typedef struct {
 
 typedef enum {
     eNet_game_type_fight_to_death = 0,
-    eNet_game_type_1 = 1, /* FIXME */
+    eNet_game_type_1 = 1, /* target = none */
     eNet_game_type_2 = 2, /* FIXME */
     eNet_game_type_checkpoint = 3,
     eNet_game_type_4 = 4, /* FIXME */
-    eNet_game_type_5 = 5, /* FIXME */
+    eNet_game_type_5 = 5, /* target = kills */
     eNet_game_type_6 = 6, /* FIXME */
     eNet_game_type_foxy = 7
 } tNet_game_type;
@@ -5434,13 +5448,6 @@ typedef struct tNet_message_memory {
 } tNet_message_memory;
 
 enum {
-    kMiscString_ShadowNone = 104,
-    kMiscString_ShadowUsOnly = 105,
-    kMiscString_ShadowUsAndOpponents = 106,
-    kMiscString_ShadowEveryone = 107,
-};
-
-enum {
     eMiscString_timer_frozen = 1,
     eMiscString_minimap_on = 2,
     eMiscString_minimap_off = 3,
@@ -5501,6 +5508,10 @@ enum {
     eMiscString_track_appears_quite_quickly = 101,
     eMiscString_track_appears_quite_late = 102,
     eMiscString_track_appears_very_late = 103,
+    eMiscString_ShadowNone = 104,
+    eMiscString_ShadowUsOnly = 105,
+    eMiscString_ShadowUsAndOpponents = 106,
+    eMiscString_ShadowEveryone = 107,
     eMiscString_sky_texture_on = 108,
     eMiscString_sky_texture_off = 109,
     eMiscString_no_sky_texture_for_this_race = 110,
@@ -5540,7 +5551,7 @@ enum {
     eMiscString_watching = 217,
     eMiscString_race_leader = 218,
     eMiscString_message_sent = 226,
-    eMiscString_enter_message = 226,
+    eMiscString_enter_message = 227,
     eMiscString_too_late_to_cancel = 242,
     eMiscString_could_not_find_carmageddon_cd = 243,
     eMiscString_no_target_to_lock_onto = 250,
@@ -5580,6 +5591,13 @@ enum {
     eMiscString_network_type_start = eMiscString_driven_to_destruction,
     eMiscString_network_type_description_start = eMiscString_driven_to_destruction_description,
     eMiscString_player_status_start = eMiscString_status_unknown,
+};
+
+enum {
+    eInterfaceString_target_none = 232,
+    eInterfaceString_target_kills = 233,
+    eInterfaceString_target_laps = 234,
+    eInterfaceString_target_time = 235,
 };
 
 enum {
@@ -5879,6 +5897,10 @@ enum {
     eSoundId_NapalmHitCrackls = 3702,
     eSoundId_PedValium = 3801,
     eSoundId_SmashRepair = 4550,
+    eSoundId_Smash1 = 5000,
+    eSoundId_Smash2 = 5001,
+    eSoundId_Smash3 = 5002,
+    eSoundId_Smash4 = 5003,
     eSoundId_BendCar = 5099,
     eSoundId_DamageRepair = 5200,
     eSoundId_Horn = 5209,
@@ -5899,6 +5921,7 @@ enum {
     eSoundId_Clap = 8015,
     eSoundId_HeyYou = 8016,
     eSoundId_TyreScreeching = 9000,
+    eSoundId_Boing = 9010,
 
     eSoundId_Countdown_Start = eSoundId_Countdown_Go,
 };

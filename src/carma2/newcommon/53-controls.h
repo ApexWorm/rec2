@@ -94,13 +94,27 @@ extern void C2_HOOK_FASTCALL TDamageTrans(void);
 
 extern void C2_HOOK_FASTCALL TDamageLFWheel(void);
 
+extern void C2_HOOK_FASTCALL TDamageLFBrake(void);
+
+extern void C2_HOOK_FASTCALL TDamageLRBrake(void);
+
+extern void C2_HOOK_FASTCALL TDamageLRWheel(void);
+
+extern void C2_HOOK_FASTCALL TDamageRFWheel(void);
+
+extern void C2_HOOK_FASTCALL TDamageRFBrake(void);
+
+extern void C2_HOOK_FASTCALL TDamageRRBrake(void);
+
+extern void C2_HOOK_FASTCALL TDamageRRWheel(void);
+
 // ToggleMiniMap
 
 // CheckToggles
 
-// CarWorldOffFallenCheckThingy
+extern int C2_HOOK_FASTCALL CarWorldOffFallenCheckThingy(tCar_spec* pCar, int pCheck_around);
 
-// HasCarFallenOffWorld
+extern int C2_HOOK_FASTCALL HasCarFallenOffWorld(tCar_spec* pCar);
 
 // CheckForBeingOutOfThisWorld
 
@@ -186,13 +200,13 @@ extern void C2_HOOK_FASTCALL UserSendMessage(void);
 
 // EnterUserMessage
 
-// DisplayUserMessage
+extern void C2_HOOK_FASTCALL DisplayUserMessage(void);
 
 extern void C2_HOOK_FASTCALL InitAbuseomatic(void);
 
 extern void C2_HOOK_FASTCALL DisposeAbuseomatic(void);
 
-// ChangeCameraTypeInGame
+extern void C2_HOOK_FASTCALL ChangeCameraTypeInGame(void);
 
 // SteelBollock
 

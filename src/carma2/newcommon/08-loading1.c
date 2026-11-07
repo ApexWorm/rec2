@@ -138,6 +138,15 @@ tS16 C2_HOOK_FASTCALL ReadS16(FILE* pF) {
     return raw_short;
 }
 
+// FUNCTION: CARMA2_HW 0x0048f8f0
+// FUNCTION: CARMA2_SW 0x0048cb60
+tS8 C2_HOOK_FASTCALL ReadS8(FILE* pF) {
+    tS8 raw_byte;
+
+    PFfread(&raw_byte, sizeof(raw_byte), 1, pF);
+    return raw_byte;
+}
+
 // FUNCTION: CARMA2_HW 0x0048f910
 void C2_HOOK_FASTCALL WriteU32L(FILE* pF, tU32 pNumber) {
     tU32 raw_long;
@@ -262,6 +271,18 @@ int C2_HOOK_FASTCALL GetAnInt(FILE* pF) {
     str = strtok(s, "\t ,/");
     sscanf(str, "%d", &value);
     return value;
+}
+
+// FUNCTION: CARMA2_HW 0x0048fb50
+// FUNCTION: CARMA2_SW 0x0048cdc0
+unsigned int C2_HOOK_FASTCALL BinIntegerToInteger(unsigned int pValue) {
+    unsigned int result;
+
+    result = 0;
+    for (; pValue != 0; pValue /= 10) {
+        result = (result << 1) | (pValue % 10);
+    }
+    return result;
 }
 
 // FUNCTION: CARMA2_HW 0x004900e0
@@ -711,6 +732,29 @@ void C2_HOOK_FASTCALL EncodeFile(char* pThe_path) {
     PDFileUnlock(pThe_path);
     remove(pThe_path);
     rename(new_file, pThe_path);
+}
+
+// FUNCTION: CARMA2_HW 0x00490bc0
+// FUNCTION: CARMA2_SW 0x0048de30
+void C2_HOOK_FASTCALL EncodeFileWrapper(char* pThe_path) {
+    int len;
+
+    len = strlen(pThe_path);
+    if (strcmp(pThe_path + len - 4, ".TXT") == 0
+            && strcmp(pThe_path + len - 12, "DKEYMAP0.TXT") != 0
+            && strcmp(pThe_path + len - 12, "DKEYMAP1.TXT") != 0
+            && strcmp(pThe_path + len - 12, "DKEYMAP2.TXT") != 0
+            && strcmp(pThe_path + len - 12, "DKEYMAP3.TXT") != 0
+            && strcmp(pThe_path + len - 12, "KEYMAP_0.TXT") != 0
+            && strcmp(pThe_path + len - 12, "KEYMAP_1.TXT") != 0
+            && strcmp(pThe_path + len - 12, "KEYMAP_2.TXT") != 0
+            && strcmp(pThe_path + len - 12, "KEYMAP_3.TXT") != 0
+            && strcmp(pThe_path + len - 11, "OPTIONS.TXT") != 0
+            && strcmp(pThe_path + len - 12, "KEYNAMES.TXT") != 0
+            && strcmp(pThe_path + len - 10, "KEYMAP.TXT") != 0
+            && strcmp(pThe_path + len - 9, "PATHS.TXT") != 0) {
+        EncodeFile(pThe_path);
+    }
 }
 
 // FUNCTION: CARMA2_HW 0x00490ec0
