@@ -85,9 +85,9 @@ void C2_HOOK_FASTCALL MungeSpecialVolume(tPhysics_object* pObject) {
             new_special_volume = pObject->auto_special_volume;
         }
     }
-    if (pObject->last_special_volume != new_special_volume && car != NULL && car->driver == eDriver_local_human) {
+    if (new_special_volume != pObject->last_special_volume && car != NULL && car->driver == eDriver_local_human) {
         if (pObject->last_special_volume != NULL && pObject->last_special_volume->exit_noise >= 0
-            && (new_special_volume == NULL || pObject->last_special_volume->exit_noise != new_special_volume->exit_noise)) {
+            && (new_special_volume == NULL || new_special_volume->exit_noise != pObject->last_special_volume->exit_noise)) {
             DRS3StartSound(gCar_outlet, pObject->last_special_volume->exit_noise);
         }
         if (new_special_volume != NULL && new_special_volume->entry_noise >= 0
