@@ -187,7 +187,7 @@ void C2_HOOK_FASTCALL SignalToStartRace(void) {
 // SignalToRepositionCar
 
 // FUNCTION: CARMA2_HW 0x00499000
-// STUB: CARMA2_SW 0x00495c30
+// FUNCTION: CARMA2_SW 0x00495c30
 void C2_HOOK_FASTCALL SetUpNetCarPositions(void) {
     int i;
     int j;
