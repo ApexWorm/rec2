@@ -108,7 +108,7 @@ extern void C2_HOOK_FASTCALL PlayerIsIt(tNet_game_player_info* pPlayer);
 
 extern void C2_HOOK_FASTCALL CalcPlayerScores(void);
 
-// SendPlayerScores
+extern void C2_HOOK_FASTCALL SendPlayerScores(void);
 
 extern void C2_HOOK_FASTCALL DoNetGameManagement(void);
 
