@@ -275,32 +275,45 @@ void C2_HOOK_FASTCALL ReadPedSpecs(FILE* pF) {
     C2_HOOK_BUG_ON(sizeof(tPed_group_spec) != 8);
     C2_HOOK_BUG_ON(sizeof(tPedestrian) != 0x54);
 
+    /* Number of ped spawn sets */
     gCount_race_pedestrian_specs = GetAnInt(pF);
     gRace_pedestrian_specs = BrMemAllocate(gCount_race_pedestrian_specs * sizeof(tRace_ped_spec), kMem_misc_poly_ped);
     for (i = 0; i < gCount_race_pedestrian_specs; i++) {
+        /* Material name */
         GetAString(pF, s);
         gRace_pedestrian_specs[i].spawn_material = BrMaterialFind(s);
         if (gRace_pedestrian_specs[i].spawn_material == NULL) {
             FatalError(kFatalError_CannotFindPedSpawnMaterial_S, s);
         }
+
+        /* Movement index */
         index = GetAnInt(pF);
         if (index < 0 || index >= gPed_movements_count) {
             FatalError(kFatalError_CannotMovePedIndexOutOfRangeForMaterial_S, s);
         }
         gRace_pedestrian_specs[i].movement = &gPed_movements[index];
+
+        /* Group index */
         index = GetAnInt(pF);
         if (index < 0 || index >= gPed_groups_count) {
             FatalError(kFatalError_CannotGroupPedIndexOutOfRangeForMaterial_S, s);
         }
         gRace_pedestrian_specs[i].group = &gPed_groups[index];
+
+        /* Peds per 100 square metres */
         gRace_pedestrian_specs[i].density = GetAScalar(pF);
         gRace_pedestrian_specs[i].field_0x10 = 0;
+
+        /* Number of exclusion materials */
         gRace_pedestrian_specs[i].exclusion.count_exclusion_materials = (tU8)GetAnInt(pF);
         gRace_pedestrian_specs[i].exclusion.exclusion_materials = BrMemAllocate(gRace_pedestrian_specs[i].exclusion.count_exclusion_materials * sizeof(tRace_spec_exclusion_material), kMem_misc_poly_ped);
         exclusions_ok_when_scared = 0x1;
         for (j = 0; j < gRace_pedestrian_specs[i].exclusion.count_exclusion_materials; j++) {
+            /* Exclusion flags (1 = OK when scared) */
             gRace_pedestrian_specs[i].exclusion.exclusion_materials[j].flags = (tU8)GetAnInt(pF);
             exclusions_ok_when_scared &= gRace_pedestrian_specs[i].exclusion.exclusion_materials[j].flags;
+
+            /* Exclusion material #1 name */
             GetAString(pF, s2);
             gRace_pedestrian_specs[i].exclusion.exclusion_materials[j].material = BrMaterialFind(s2);
             if (gRace_pedestrian_specs[i].exclusion.exclusion_materials[j].material == NULL) {
@@ -310,6 +323,8 @@ void C2_HOOK_FASTCALL ReadPedSpecs(FILE* pF) {
         if (exclusions_ok_when_scared & 0x1) {
             gRace_pedestrian_specs[i].exclusion.exclusions_ok_when_scared = 1;
         }
+
+        /* Number of exception materials */
         gRace_pedestrian_specs[i].exclusion.count_exception_materials = (tU8)GetAnInt(pF);
         gRace_pedestrian_specs[i].exclusion.exception_materials = BrMemAllocate(gRace_pedestrian_specs[i].exclusion.count_exception_materials * sizeof(br_material*), kMem_misc_poly_ped);
         for (j = 0; j < gRace_pedestrian_specs[i].exclusion.count_exception_materials; j++) {
