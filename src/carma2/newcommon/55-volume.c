@@ -128,7 +128,11 @@ void C2_HOOK_FASTCALL ResetCarSpecialVolume(tPhysics_object* pObject) {
     pObject->water_depth_factor = 1.f;
 }
 
-// TestAutoSpecialVolume
+// STUB: CARMA2_HW 0x004ff5d0
+// STUB: CARMA2_SW 0x004faeb0
+void C2_HOOK_FASTCALL TestAutoSpecialVolume(tPhysics_object* pObject) {
+    NOT_IMPLEMENTED();
+}
 
 // FUNCTION: CARMA2_HW 0x004ff8d0
 // FUNCTION: CARMA2_SW 0x004fb1b0
