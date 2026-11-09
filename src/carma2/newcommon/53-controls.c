@@ -19,6 +19,7 @@
 #include "29-raycast.h"
 #include "37-brucetrk.h"
 #include "41-utility.h"
+#include "42-input.h"
 #include "43-pratcam.h"
 #include "59-camera.h"
 #include "62-graphics3.h"
@@ -32,6 +33,7 @@
 
 #include "c2_string.h"
 
+#include <s3/internal/audio.h>
 #include <stdio.h>
 
 // GLOBAL: CARMA2_HW 0x00659b28
@@ -94,9 +96,17 @@ int gAllow_car_flying;
 // GLOBAL: CARMA2_SW 0x00676bec
 int gEntering_message;
 
+// GLOBAL: CARMA2_HW 0x0067c47c
+// GLOBAL: CARMA2_SW 0x00676bf4
+tU32 gToo_poor_for_recovery_timeout;
+
 // GLOBAL: CARMA2_HW 0x006b781c
 // GLOBAL: CARMA2_SW 0x006ae4fc
 tRace_over_reason gRace_over_reason;
+
+// GLOBAL: CARMA2_HW 0x0067c478
+// GLOBAL: CARMA2_SW 0x00676bf0
+tU32 gPalette_fade_time;
 
 void C2_HOOK_FASTCALL CompleteRace(void) {
     gRace_over_reason = eRace_over_0;
@@ -396,7 +406,24 @@ int C2_HOOK_FASTCALL HasCarFallenOffWorld(tCar_spec* pCar) {
 
 // CheckHornLocal
 
-// CheckHorn3D
+// FUNCTION: CARMA2_HW 0x00443ba0
+// FUNCTION: CARMA2_SW 0x00443c80
+void C2_HOOK_FASTCALL CheckHorn3D(tCar_spec* pCar) {
+
+    if (pCar->keys.horn && pCar->horn_sound_tag == 0) {
+        pCar->horn_sound_tag = DRS3StartSound3D(gEffects_outlet, 5209,
+            &pCar->car_master_actor->t.t.translate.t, &pCar->vel,
+            0, 255, ((pCar->car_ID & 0x7) + 12) * 0x1000, 0x10000);
+    } else if (!pCar->keys.horn && pCar->horn_sound_tag != 0) {
+        while (S3SoundStillPlaying(pCar->horn_sound_tag)) {
+            DRS3StopSound(pCar->horn_sound_tag);
+            DRS3StopOutletSound(gEffects_outlet);
+        }
+        if (!S3SoundStillPlaying(pCar->horn_sound_tag)) {
+            pCar->horn_sound_tag = 0;
+        }
+    }
+}
 
 // CheckHorns
 
@@ -731,5 +758,21 @@ void C2_HOOK_FASTCALL ChangeCameraTypeInGame(void) {
 
 // RichardsSphere
 
-// ToggleHeadupLevel
+// FUNCTION: CARMA2_HW 0x00444f40
+// FUNCTION: CARMA2_SW 0x00445020
+void C2_HOOK_FASTCALL ToggleHeadupLevel(void) {
+
+    if (PDKeyDown(0)) {
+        gHeadup_detail_level--;
+        if (gHeadup_detail_level < 0) {
+            gHeadup_detail_level = 5;
+        }
+    } else {
+        gHeadup_detail_level++;
+        if (gHeadup_detail_level > 5) {
+            gHeadup_detail_level = 0;
+        }
+    }
+    NewTextHeadupSlot2(4, 0, 250, -4, GetMiscString(eMiscString_no_HUD + gHeadup_detail_level % 3), 0);
+}
 

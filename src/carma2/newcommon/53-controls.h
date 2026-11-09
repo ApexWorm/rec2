@@ -14,6 +14,7 @@
 
 extern int gAllow_car_flying;
 extern int gEntering_message;
+extern tU32 gToo_poor_for_recovery_timeout;
 extern int gCheckpoint_finder_enabled;
 extern float gMap_render_x;
 extern float gMap_render_y;
@@ -25,8 +26,8 @@ extern int gHeadup_map_y;
 extern int gHeadup_map_w;
 extern int gHeadup_map_h;
 extern int gRecovery_voucher_count;
-
 extern tRace_over_reason gRace_over_reason;
+extern tU32 gPalette_fade_time;
 
 extern void C2_HOOK_FASTCALL CompleteRace(void);
 
@@ -120,7 +121,7 @@ extern int C2_HOOK_FASTCALL HasCarFallenOffWorld(tCar_spec* pCar);
 
 // CheckHornLocal
 
-// CheckHorn3D
+extern void C2_HOOK_FASTCALL CheckHorn3D(tCar_spec* pCar);
 
 // CheckHorns
 
@@ -212,6 +213,6 @@ extern void C2_HOOK_FASTCALL ChangeCameraTypeInGame(void);
 
 // RichardsSphere
 
-// ToggleHeadupLevel
+extern void C2_HOOK_FASTCALL ToggleHeadupLevel(void);
 
 #endif // GUARD_53_CONTROLS_H
