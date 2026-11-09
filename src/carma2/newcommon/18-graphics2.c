@@ -142,12 +142,19 @@ br_pixelmap* gBlend_palettes[4];
 br_pixelmap* gCurrent_splash;
 
 // GLOBAL: CARMA2_HW 0x0067be90
+// GLOBAL: CARMA2_SW 0x00676600
 int gCurrent_cursor_index;
 
 // GLOBAL: CARMA2_HW 0x0079ecb0
-tMouse_coord gMouse_last_pos;
+// GLOBAL: CARMA2_SW 0x00795210
+int gMouse_last_x_coord;
+
+// GLOBAL: CARMA2_HW 0x0079ecb4
+// GLOBAL: CARMA2_SW 0x00795240
+int gMouse_last_y_coord;
 
 // GLOBAL: CARMA2_HW 0x0067be94
+// GLOBAL: CARMA2_SW 0x00676604
 int gCursor_transient_index;
 
 // FUNCTION: CARMA2_HW 0x0047d470
@@ -563,10 +570,10 @@ int C2_HOOK_FASTCALL AllocateCursorTransient(void) {
     largest_width = 0;
     largest_height = 0;
     for (i = 0; i < (int)REC2_ASIZE(gCursors); i++) {
-        if (largest_width < gCursors[i]->width) {
+        if (gCursors[i]->width > largest_width) {
             largest_width = gCursors[i]->width;
         }
-        if (largest_height < gCursors[i]->height) {
+        if (gCursors[i]->height > largest_height) {
             largest_height = gCursors[i]->height;
         }
     }
@@ -609,12 +616,14 @@ void C2_HOOK_FASTCALL InitMouseTargetLines(void) {
 // FUNCTION: CARMA2_HW 0x0043e6c0
 // FUNCTION: CARMA2_SW 0x0043e750
 void C2_HOOK_FASTCALL StartMouseCursor(void) {
+#ifdef REC2_HW
     if (gCursor_tinted_top == -1) {
         InitMouseTargetLines();
     }
+#endif
     gNext_transient = 0;
     gCursor_transient_index = AllocateCursorTransient();
-    GetMousePosition(&gMouse_last_pos.x, &gMouse_last_pos.y);
+    GetMousePosition(&gMouse_last_x_coord, &gMouse_last_y_coord);
     gMouse_in_use = 0;
     gCurrent_cursor_index = 2;
     gMouse_started = 1;
