@@ -1076,13 +1076,20 @@ int C2_HOOK_FASTCALL ToggleFlapsCB(tPhysics_object* pCollision_info, void* pCar)
     return 0;
 }
 
-// SendToggleFlaps
+void C2_HOOK_FASTCALL SendToggleFlaps(tCar_spec* pCar) {
+    tNet_message_chunk* chunk;
+    tNet_game_player_info* player;
+
+    chunk = NetGetToHostContents(eNet_message_chunk_type_toggle_doors, 0);
+    player = NetPlayerFromCar(pCar);
+    if (player != NULL) {
+        chunk->toggle_doors.id = player->ID;
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x0042dd50
 // FUNCTION: CARMA2_SW 0x0042ddc0
 void C2_HOOK_FASTCALL ToggleFlaps(void) {
-    tNet_message_chunk* chunk;
-    tNet_game_player_info* player;
 
     if (gCountdown || gToo_poor_for_recovery_timeout) {
         return;
@@ -1090,11 +1097,7 @@ void C2_HOOK_FASTCALL ToggleFlaps(void) {
     if (gNet_mode == eNet_mode_none || gNet_mode == eNet_mode_host) {
         PhysicsObjectRecurse(gProgram_state.current_car.collision_info, ToggleFlapsCB, &gProgram_state.current_car);
     } else {
-        chunk = NetGetToHostContents(eNet_message_chunk_type_toggle_doors, 0);
-        player = NetPlayerFromCar(&gProgram_state.current_car);
-        if (player != NULL) {
-            chunk->toggle_doors.id = player->ID;
-        }
+        SendToggleFlaps(&gProgram_state.current_car);
     }
 }
 
