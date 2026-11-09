@@ -171,6 +171,18 @@ void C2_HOOK_FASTCALL S3Disable(void) {
     gS3_enabled = 0;
 }
 
+// FUNCTION: CARMA2_HW 0x00564d0a
+// FUNCTION: CARMA2_SW 0x005603aa
+void C2_HOOK_FASTCALL S3Toggle(void) {
+
+    if (gS3_enabled) {
+        S3StopAllOutletSounds();
+        gS3_enabled = 0;
+    } else {
+        gS3_enabled = 1;
+    }
+}
+
 // FUNCTION: CARMA2_HW 0x00564bfd
 // FUNCTION: CARMA2_SW 0x0056029d
 int C2_HOOK_FASTCALL S3StopChannel(tS3_channel* pChannel) {
@@ -942,6 +954,26 @@ void C2_HOOK_FASTCALL S3StopMidi(void) {
     gS3_enable_midi = 0;
 }
 
+// FUNCTION: CARMA2_HW 0x0056a433
+void C2_HOOK_FASTCALL S3ToggleMidi(void) {
+
+    if (gS3_enable_midi) {
+        S3StopMidiInternal();
+        gS3_enable_midi = 0;
+    } else {
+        gS3_enable_midi = 1;
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x0056a45c
+int C2_HOOK_FASTCALL S3IsMidiEnabled(void) {
+
+    if (gS3_enable_midi) {
+        return 1;
+    }
+    return 0;
+}
+
 
 // FUNCTION: CARMA2_HW 0x00565b7f
 // FUNCTION: CARMA2_SW 0x0056121f
@@ -1154,6 +1186,12 @@ int C2_HOOK_FASTCALL S3IRandomBetween(int pMin, int pMax, int pDefault) {
     }
 }
 
+// FUNCTION: CARMA2_HW 0x0056432c
+double C2_HOOK_FASTCALL S3FRandomBetween2(double pMin, double pMax) {
+
+    return (pMax - pMin) * (double)rand() / 32767.0 + pMin;
+}
+
 // FUNCTION: CARMA2_HW 0x005663a0
 int C2_HOOK_FASTCALL S3IRandomBetween__dup(int pMin, int pMax, int pDefault) {
 
@@ -1198,6 +1236,37 @@ int C2_HOOK_FASTCALL S3FreeUnboundChannels(void) {
     return 0;
 }
 
+// FUNCTION: CARMA2_HW 0x005656ea
+int C2_HOOK_FASTCALL S3GetTerminationReason(tS3_channel* pChannel) {
+
+    return pChannel->termination_reason;
+}
+
+// FUNCTION: CARMA2_HW 0x005656fb
+int C2_HOOK_FASTCALL S3GetRepetitions(tS3_channel* pChannel) {
+
+    return pChannel->repetitions;
+}
+
+// FUNCTION: CARMA2_HW 0x0056570c
+int C2_HOOK_FASTCALL S3CountActiveChannels(tS3_outlet* pOutlet) {
+    int count;
+    tS3_channel* channel;
+
+    count = 0;
+    if (gS3_enabled != 0) {
+        channel = pOutlet->channel_list;
+        while (channel != NULL) {
+            if (channel->active != 0) {
+                count += 1;
+            }
+            channel = channel->next;
+        }
+        return count;
+    }
+    return 0;
+}
+
 // FUNCTION: CARMA2_HW 0x005657f5
 // FUNCTION: CARMA2_SW 0x00560e95
 int C2_HOOK_FASTCALL S3SoundStillPlaying(int pTag) {
@@ -1221,6 +1290,12 @@ int C2_HOOK_FASTCALL S3SoundStillPlaying(int pTag) {
     return 0;
 }
 
+// FUNCTION: CARMA2_HW 0x0056583f
+int C2_HOOK_FASTCALL S3GetLastError(void) {
+
+    return gS3_last_error;
+}
+
 // FUNCTION: CARMA2_HW 0x005649c8
 // FUNCTION: CARMA2_SW 0x00560068
 int C2_HOOK_FASTCALL S3SetVolume(int pVolume) {
@@ -1240,6 +1315,29 @@ int C2_HOOK_FASTCALL S3SetVolume(int pVolume) {
         }
     }
     return 0;
+}
+
+// FUNCTION: CARMA2_HW 0x00564a56
+tS3_error_codes C2_HOOK_FASTCALL S3UpdateFrequencySampleChannel(tS3_sound_tag pChannel_tag, int pPitch) {
+    tS3_channel* channel;
+
+    if (gS3_enabled) {
+        if (pPitch == -1) {
+            pPitch = 0x10000;
+        }
+        channel = S3GetChannelForTag(pChannel_tag);
+        if (channel == NULL) {
+            return eS3_error_bad_stag;
+        }
+        if (channel->type == 0) {
+            channel->rate = (int)((double)channel->descriptor->buffer_description->sample_rate
+                    * ldexp((double)pPitch, -16));
+            if (!PDS3UpdateChannelFrequency(channel)) {
+                return eS3_error_function_failed;
+            }
+        }
+    }
+    return eS3_error_none;
 }
 
 // FUNCTION: CARMA2_HW 0x00569752
@@ -1262,6 +1360,12 @@ int C2_HOOK_FASTCALL S3ServiceSpatialSound(tS3_channel* pChannel) {
 
     (void) pChannel;
     return 0;
+}
+
+// FUNCTION: CARMA2_HW 0x0056a410
+void C2_HOOK_FASTCALL S3EnableMidi(void) {
+
+    gS3_enable_midi = 1;
 }
 
 // FUNCTION: CARMA2_HW 0x005665d4
@@ -1617,6 +1721,29 @@ int C2_HOOK_FASTCALL S3SetChannelVolume(int pChannel_tag, int pVolume) {
             S3SetMIDIVolume(channel, pVolume);
         } else if (channel->type == 2) {
             S3UpdateCDAVolume(channel, pVolume);
+        }
+    }
+    return eS3_error_none;
+}
+
+// FUNCTION: CARMA2_HW 0x005648c3
+tS3_error_codes C2_HOOK_FASTCALL S3SetChannelPitch(tS3_sound_tag pChannel_tag, int pPitch) {
+    tS3_channel* channel;
+
+    if (gS3_enabled) {
+        if (pPitch == -1) {
+            pPitch = 0x10000;
+        }
+        channel = S3GetChannelForTag(pChannel_tag);
+        if (channel == NULL) {
+            return eS3_error_bad_stag;
+        }
+        if (channel->type == 0) {
+            channel->rate = (int)((double)channel->descriptor->buffer_description->sample_rate
+                    * ldexp((double)pPitch, -16));
+            if (!PDS3UpdateChannelFrequency(channel)) {
+                return eS3_error_function_failed;
+            }
         }
     }
     return eS3_error_none;

@@ -14,6 +14,8 @@
 
 extern int gAllow_car_flying;
 extern int gEntering_message;
+extern tU32 gToo_poor_for_recovery_timeout;
+extern tCamera_key_flags gCamera_key_flags;
 extern int gCheckpoint_finder_enabled;
 extern float gMap_render_x;
 extern float gMap_render_y;
@@ -25,8 +27,8 @@ extern int gHeadup_map_y;
 extern int gHeadup_map_w;
 extern int gHeadup_map_h;
 extern int gRecovery_voucher_count;
-
 extern tRace_over_reason gRace_over_reason;
+extern tU32 gPalette_fade_time;
 
 extern void C2_HOOK_FASTCALL CompleteRace(void);
 
@@ -94,19 +96,33 @@ extern void C2_HOOK_FASTCALL TDamageTrans(void);
 
 extern void C2_HOOK_FASTCALL TDamageLFWheel(void);
 
-// ToggleMiniMap
+extern void C2_HOOK_FASTCALL TDamageLFBrake(void);
+
+extern void C2_HOOK_FASTCALL TDamageLRBrake(void);
+
+extern void C2_HOOK_FASTCALL TDamageLRWheel(void);
+
+extern void C2_HOOK_FASTCALL TDamageRFWheel(void);
+
+extern void C2_HOOK_FASTCALL TDamageRFBrake(void);
+
+extern void C2_HOOK_FASTCALL TDamageRRBrake(void);
+
+extern void C2_HOOK_FASTCALL TDamageRRWheel(void);
+
+extern void C2_HOOK_FASTCALL ToggleMiniMap(void);
 
 // CheckToggles
 
-// CarWorldOffFallenCheckThingy
+extern int C2_HOOK_FASTCALL CarWorldOffFallenCheckThingy(tCar_spec* pCar, int pCheck_around);
 
-// HasCarFallenOffWorld
+extern int C2_HOOK_FASTCALL HasCarFallenOffWorld(tCar_spec* pCar);
 
 // CheckForBeingOutOfThisWorld
 
 // CheckHornLocal
 
-// CheckHorn3D
+extern void C2_HOOK_FASTCALL CheckHorn3D(tCar_spec* pCar);
 
 // CheckHorns
 
@@ -148,7 +164,7 @@ extern void C2_HOOK_FASTCALL GetPowerup(int pNum);
 
 // PollCarControls
 
-// PollCameraControls
+extern void C2_HOOK_FASTCALL PollCameraControls(tU32 pCamera_period);
 
 extern void C2_HOOK_FASTCALL SetFlag2(int pArg);
 
@@ -186,18 +202,18 @@ extern void C2_HOOK_FASTCALL UserSendMessage(void);
 
 // EnterUserMessage
 
-// DisplayUserMessage
+extern void C2_HOOK_FASTCALL DisplayUserMessage(void);
 
 extern void C2_HOOK_FASTCALL InitAbuseomatic(void);
 
 extern void C2_HOOK_FASTCALL DisposeAbuseomatic(void);
 
-// ChangeCameraTypeInGame
+extern void C2_HOOK_FASTCALL ChangeCameraTypeInGame(void);
 
 // SteelBollock
 
 // RichardsSphere
 
-// ToggleHeadupLevel
+extern void C2_HOOK_FASTCALL ToggleHeadupLevel(void);
 
 #endif // GUARD_53_CONTROLS_H

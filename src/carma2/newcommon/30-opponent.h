@@ -29,11 +29,16 @@ extern int gRoute_search_calls;
 extern int gRoute_search_last_target_count;
 extern int gRoute_search_target_count;
 extern float gShortest_route_length;
+extern int gStart_jumped;
+extern int gAcknowledged_start;
 extern tCar_spec* gActive_car_list[139];
 extern int gNum_active_cars;
 extern int gNum_of_opponents_pursuing;
 extern int gNum_of_opponents_getting_near;
 extern int gNum_of_opponents_completing_race;
+extern int gRoute_search_attempts;
+extern int gRoute_search_max_calls;
+extern int gRoute_search_total_calls;
 
 extern void C2_HOOK_CDECL DoNotDprintf(const char* pMessage, ...);
 
@@ -47,9 +52,9 @@ extern int C2_HOOK_FASTCALL PointVisibleFromHere(br_vector3* pFrom, br_vector3* 
 
 // WeightedFindNearestNodeAndSection
 
-// FindNearestGeneralSection
+extern tS16 C2_HOOK_FASTCALL FindNearestGeneralSection(tCar_spec* pCar, const br_vector3* pActor_coords, br_vector3* pPath_direction, br_vector3* pIntersect, br_scalar* pDistance);
 
-// FindNearestPathSection
+extern tS16 C2_HOOK_FASTCALL FindNearestPathSection(const br_vector3* pActor_coords, br_vector3* pPath_direction, br_vector3* pIntersect, br_scalar* pDistance);
 
 // DeadStopCar
 
@@ -63,7 +68,7 @@ extern void C2_HOOK_CDECL NewObjective(tOpponent_spec* pOpponent_spec, tOpponent
 
 // CalcRaceRoute
 
-// TopUpRandomRoute
+extern void C2_HOOK_FASTCALL TopUpRandomRoute(tOpponent_spec* pOpponent_spec, int pSections_to_add);
 
 extern void C2_HOOK_FASTCALL CalcOpponentConspicuousnessWithAViewToCheatingLikeFuck(tOpponent_spec* pOpponent_spec);
 
@@ -77,15 +82,15 @@ extern int C2_HOOK_FASTCALL ShiftOpponentsProjectedRoute(tOpponent_spec* pOppone
 
 // NewCalcGetNearPlayerRoute
 
-// CalcReturnToStartPointRoute
+extern void C2_HOOK_FASTCALL CalcReturnToStartPointRoute(tOpponent_spec* pOpponent_spec);
 
-// ClearOpponentsProjectedRoute
+extern void C2_HOOK_FASTCALL ClearOpponentsProjectedRoute(tOpponent_spec* pOpponent_spec);
 
 extern int C2_HOOK_FASTCALL AddToOpponentsProjectedRoute(tOpponent_spec* pOpponent_spec, tS16 pSection_no, int pDirection);
 
-// StunTheBugger
+extern void C2_HOOK_FASTCALL StunTheBugger(tOpponent_spec* pOpponent, int pMilliseconds);
 
-// UnStunTheBugger
+extern void C2_HOOK_FASTCALL UnStunTheBugger(tOpponent_spec* pOpponent);
 
 // ProcessCompleteRace
 

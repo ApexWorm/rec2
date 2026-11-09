@@ -193,6 +193,30 @@ int gPicked_wreck;
 // GLOBAL: CARMA2_SW 0x0075a0bc
 tWreck_gallery_car_info gWreck_gallery_car_infos[30];
 
+// GLOBAL: CARMA2_HW 0x00688aec
+// GLOBAL: CARMA2_SW 0x0068304c
+br_actor* gFrontend_wrecks_actor;
+
+// GLOBAL: CARMA2_HW 0x00688af0
+// GLOBAL: CARMA2_SW 0x00683050
+br_actor* gFrontend_wrecks_camera;
+
+// GLOBAL: CARMA2_HW 0x00688afc
+// GLOBAL: CARMA2_SW 0x0068305c
+int gFrontend_wrecks_hscroll;
+
+// GLOBAL: CARMA2_HW 0x007635e4
+// GLOBAL: CARMA2_SW 0x00759b44
+br_pixelmap* gFrontend_wrecks_pixelmap;
+
+// GLOBAL: CARMA2_HW 0x007635ec
+// GLOBAL: CARMA2_SW 0x00759b4c
+tU32 gFrontend_wrecks_previous_update;
+
+// GLOBAL: CARMA2_HW 0x00763844
+// GLOBAL: CARMA2_SW 0x00759da4
+br_actor* gFrontend_wrecks_light;
+
 // GLOBAL: CARMA2_HW 0x00686834
 // GLOBAL: CARMA2_SW 0x00680f74
 tU32 gCredits_scroll_start;
@@ -312,6 +336,26 @@ tWreck_gallery_sell_info gWreck_gallery_sell_infos[32];
 // GLOBAL: CARMA2_HW 0x0068650c
 // GLOBAL: CARMA2_SW 0x00680c4c
 br_actor* gFrontend_actor;
+
+// GLOBAL: CARMA2_HW 0x00686f10
+br_material* gFrontend_backdrop_materials[3];
+
+// GLOBAL: CARMA2_HW 0x00686f20
+br_token_value gFrontend_backdrop1_material_prims[3];
+
+// GLOBAL: CARMA2_HW 0x00686f38
+br_token_value gFrontend_backdrop2_material_prims[3];
+
+// GLOBAL: CARMA2_HW 0x00686f50
+br_token_value gFrontend_backdrop0_material_prims[3];
+
+// GLOBAL: CARMA2_HW 0x00686f94
+// GLOBAL: CARMA2_SW 0x006816d4
+br_actor* gFrontend_camera;
+
+// GLOBAL: CARMA2_HW 0x00687030
+// GLOBAL: CARMA2_SW 0x006829ac
+br_actor* gFrontend_backdrop_actors[3];
 
 // GLOBAL: CARMA2_HW 0x0068683c
 // GLOBAL: CARMA2_SW 0x00680f7c
@@ -655,6 +699,41 @@ br_pixelmap* C2_HOOK_FASTCALL GetThisFuckingPixelmapPleaseMrTwatter(const char* 
         EnsurePixelmapAllowed(result, 0);
         return result;
     }
+}
+
+// FUNCTION: CARMA2_HW 0x0046ad00
+// FUNCTION: CARMA2_SW 0x0046aa40
+int C2_HOOK_FASTCALL FUN_0046ad00(tFrontend_spec* pFrontend) {
+    if (!pFrontend->loaded) {
+        LoadMenuSettings(pFrontend);
+        FuckWithWidths(pFrontend);
+        if (pFrontend->previous != NULL) {
+            pFrontend->previous->isPreviousSomeOtherMenu = 1;
+        }
+    }
+    gFrontend_scrollbars_updated = 0;
+    EdgeTriggerModeOff();
+    WaitForNoKeys();
+    EdgeTriggerModeOn();
+    if (gProgram_state.racing != 0) {
+        pFrontend->items[0].enabled = kFrontendItemEnabled_enabled;
+        pFrontend->items[1].enabled = kFrontendItemEnabled_enabled;
+        if (gNet_mode == eNet_mode_none) {
+            pFrontend->items[5].enabled = kFrontendItemEnabled_disabled;
+        } else {
+            pFrontend->items[5].enabled = kFrontendItemEnabled_enabled;
+        }
+    } else {
+        pFrontend->items[0].enabled = kFrontendItemEnabled_disabled;
+        pFrontend->items[1].enabled = kFrontendItemEnabled_disabled;
+    }
+    return 1;
+}
+
+// FUNCTION: CARMA2_HW 0x0046ada0
+// FUNCTION: CARMA2_SW 0x0046aae0
+int C2_HOOK_FASTCALL FUN_0046ada0(tFrontend_spec* pFrontend) {
+    return 1;
 }
 
 // FUNCTION: CARMA2_HW 0x00466760
@@ -1201,7 +1280,20 @@ int C2_HOOK_FASTCALL MainMenuOutfunc(tFrontend_spec* pFrontend) {
 
 // MainMenuSelectRace
 
-// testUp
+// FUNCTION: CARMA2_HW 0x0046a010
+// FUNCTION: CARMA2_SW 0x00469d70
+int C2_HOOK_FASTCALL testUp(tFrontend_spec* pFrontend) {
+
+    if (PDGetTotalTime() - gFrontend_last_scroll > 400) {
+        gFrontend_last_scroll = PDGetTotalTime();
+        if ((gCurrent_race_group - gRace_groups) % 10 > 0) {
+            gCurrent_race_group -= 1;
+        }
+        RefreshRacesScroller(pFrontend);
+        FuckWithWidths(pFrontend);
+    }
+    return 0;
+}
 
 // FUNCTION: CARMA2_HW 0x0046a080
 // FUNCTION: CARMA2_SW 0x00469de0
@@ -1715,7 +1807,72 @@ void C2_HOOK_FASTCALL FRONTEND_PingPongFlash(void) {
 
 // FRONTEND_DrawMenu
 
-// FRONTEND_Setup2D
+// FUNCTION: CARMA2_HW 0x0046cf10
+// FUNCTION: CARMA2_SW 0x0046cbd0
+void C2_HOOK_FASTCALL FRONTEND_Setup2D(void) {
+    br_camera* camera;
+
+    gFrontend_actor = BrActorAllocate(BR_ACTOR_NONE, NULL);
+    gFrontend_camera = BrActorAllocate(BR_ACTOR_CAMERA, NULL);
+    camera = gFrontend_camera->type_data;
+    camera->type = BR_CAMERA_PARALLEL;
+    camera->field_of_view = BR_ANGLE_DEG(45);
+    camera->hither_z = 1.f;
+    camera->yon_z = 3.f;
+    camera->width = 640.f;
+    camera->height = 480.f;
+    BrActorAdd(gFrontend_actor, gFrontend_camera);
+#ifdef REC2_HW
+    gFrontend_backdrop0_material_prims[0].t = BRT_BLEND_B;
+    gFrontend_backdrop0_material_prims[0].v.b = 1;
+    gFrontend_backdrop0_material_prims[1].t = BRT_OPACITY_X;
+    gFrontend_backdrop0_material_prims[1].v.x = BR_FIXED_INT(176);
+    gFrontend_backdrop0_material_prims[2].t = BR_NULL_TOKEN;
+    gFrontend_backdrop0_material_prims[2].v.u32 = 0;
+    gFrontend_backdrop1_material_prims[0].t = BRT_BLEND_B;
+    gFrontend_backdrop1_material_prims[0].v.b = 1;
+    gFrontend_backdrop1_material_prims[1].t = BRT_OPACITY_X;
+    gFrontend_backdrop1_material_prims[1].v.x = BR_FIXED_INT(176);
+    gFrontend_backdrop1_material_prims[2].t = BR_NULL_TOKEN;
+    gFrontend_backdrop1_material_prims[2].v.u32 = 0;
+    gFrontend_backdrop2_material_prims[0].t = BRT_BLEND_B;
+    gFrontend_backdrop2_material_prims[0].v.b = 1;
+    gFrontend_backdrop2_material_prims[1].t = BRT_OPACITY_X;
+    gFrontend_backdrop2_material_prims[1].v.x = BR_FIXED_INT(176);
+    gFrontend_backdrop2_material_prims[2].t = BR_NULL_TOKEN;
+    gFrontend_backdrop2_material_prims[2].v.u32 = 0;
+    gFrontend_backdrop_materials[0] = BrMaterialAllocate("Backdrop_material1");
+    gFrontend_backdrop_materials[1] = BrMaterialAllocate("Backdrop_material2");
+    gFrontend_backdrop_materials[2] = BrMaterialAllocate("Backdrop_material3");
+    gFrontend_backdrop_actors[0] = BrActorAllocate(BR_ACTOR_MODEL, NULL);
+    gFrontend_backdrop_actors[1] = BrActorAllocate(BR_ACTOR_MODEL, NULL);
+    gFrontend_backdrop_actors[2] = BrActorAllocate(BR_ACTOR_MODEL, NULL);
+    gFrontend_backdrop_materials[0]->colour = 0;
+    gFrontend_backdrop_materials[1]->colour = 0;
+    gFrontend_backdrop_materials[2]->colour = 0;
+    gFrontend_backdrop_materials[0]->index_base = 0;
+    gFrontend_backdrop_materials[1]->index_base = 0;
+    gFrontend_backdrop_materials[2]->index_base = 0;
+    gFrontend_backdrop_materials[0]->index_range = 1;
+    gFrontend_backdrop_materials[1]->index_range = 1;
+    gFrontend_backdrop_materials[2]->index_range = 1;
+    gFrontend_backdrop_materials[0]->extra_prim = gFrontend_backdrop0_material_prims;
+    gFrontend_backdrop_materials[1]->extra_prim = gFrontend_backdrop1_material_prims;
+    gFrontend_backdrop_materials[2]->extra_prim = gFrontend_backdrop2_material_prims;
+    BrMaterialAdd(gFrontend_backdrop_materials[0]);
+    BrMaterialAdd(gFrontend_backdrop_materials[1]);
+    BrMaterialAdd(gFrontend_backdrop_materials[2]);
+    gFrontend_backdrop_actors[0]->material = gFrontend_backdrop_materials[0];
+    gFrontend_backdrop_actors[0]->identifier = BrResStrDup(gFrontend_backdrop_actors[0], "Backdrop");
+    gFrontend_backdrop_actors[1]->material = gFrontend_backdrop_materials[1];
+    gFrontend_backdrop_actors[1]->identifier = BrResStrDup(gFrontend_backdrop_actors[1], "Backdrop");
+    gFrontend_backdrop_actors[2]->material = gFrontend_backdrop_materials[2];
+    gFrontend_backdrop_actors[2]->identifier = BrResStrDup(gFrontend_backdrop_actors[2], "Backdrop");
+    BrActorAdd(gFrontend_actor, gFrontend_backdrop_actors[0]);
+    BrActorAdd(gFrontend_actor, gFrontend_backdrop_actors[1]);
+    BrActorAdd(gFrontend_actor, gFrontend_backdrop_actors[2]);
+#endif
+}
 
 // FRONTEND_Setup
 
@@ -1814,7 +1971,32 @@ int C2_HOOK_FASTCALL StartGettingInputString(char* pBuffer, int pBuffer_size) {
     return 1;
 }
 
-// DisposeWrecksGallery
+// FUNCTION: CARMA2_HW 0x0046e620
+// FUNCTION: CARMA2_SW 0x0046dcc0
+void C2_HOOK_FASTCALL DisposeWrecksGallery(void) {
+    int i;
+
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tWreck_gallery_car_info, actor, 0x10);
+    C2_HOOK_BUG_ON(sizeof(tWreck_gallery_car_info) != 0xa4);
+
+    for (i = 0; i < gFrontend_wrecks_car_count; i++) {
+        BrActorRemove(gWreck_gallery_car_infos[i].actor);
+    }
+    if (gFrontend_wrecks_camera != NULL) {
+        if (gFrontend_wrecks_camera->parent != NULL) {
+            BrActorRemove(gFrontend_wrecks_camera);
+        }
+        BrActorFree(gFrontend_wrecks_camera);
+    }
+    if (gFrontend_wrecks_actor != NULL) {
+        if (gFrontend_wrecks_actor->parent != NULL) {
+            BrActorRemove(gFrontend_wrecks_actor);
+        }
+        BrActorFree(gFrontend_wrecks_actor);
+    }
+    gFrontend_wrecks_actor = NULL;
+    gFrontend_wrecks_camera = NULL;
+}
 
 // FUNCTION: CARMA2_HW 0x0046e6c0
 // FUNCTION: CARMA2_SW 0x0046dd60
@@ -1869,7 +2051,80 @@ int C2_HOOK_FASTCALL BuyCurrentCar(tFrontend_spec* pFrontend) {
     return 0;
 }
 
-// WrecksInFunc
+// FUNCTION: CARMA2_HW 0x0046e830
+// FUNCTION: CARMA2_SW 0x0046ded0
+int C2_HOOK_FASTCALL WrecksInFunc(tFrontend_spec* pFrontend) {
+    int car_count;
+    int i;
+
+    C2_HOOK_BUG_ON(sizeof(gWreck_gallery_sell_infos) != 0x100);
+    C2_HOOK_BUG_ON(sizeof(tWreck_gallery_car_info) != 0xa4);
+
+    gCurrent_frontend_spec = pFrontend;
+    DRS3StartSound(gEffects_outlet, eSoundId_Swingin);
+    if (!pFrontend->loaded) {
+        LoadMenuSettings(pFrontend);
+    }
+    gFrontend_wrecks_actor = BrActorAllocate(BR_ACTOR_NONE, NULL);
+    gFrontend_wrecks_camera = BrActorAllocate(BR_ACTOR_CAMERA, NULL);
+    gFrontend_wrecks_light = BrActorAllocate(BR_ACTOR_LIGHT, NULL);
+
+    ((br_camera*)gFrontend_wrecks_camera->type_data)->aspect = 1.6346154f;
+    ((br_camera*)gFrontend_wrecks_camera->type_data)->field_of_view = BR_ANGLE_DEG(55);
+    ((br_camera*)gFrontend_wrecks_camera->type_data)->hither_z = 1.f;
+    ((br_camera*)gFrontend_wrecks_camera->type_data)->yon_z = 100.f;
+    ((br_camera*)gFrontend_wrecks_camera->type_data)->type = BR_CAMERA_PERSPECTIVE_FOV;
+    ((br_camera*)gFrontend_wrecks_camera->type_data)->width = 640.f;
+    ((br_camera*)gFrontend_wrecks_camera->type_data)->height = 480.f;
+    BrActorAdd(gFrontend_wrecks_actor, gFrontend_wrecks_camera);
+
+    gFrontend_wrecks_pixelmap = BrPixelmapAllocateSub(gBack_screen, 65, 55, 510, 312);
+    gFrontend_wrecks_pixelmap->origin_x = 255;
+    gFrontend_wrecks_pixelmap->origin_y = 120;
+
+    BrMatrix34RotateY(&gFrontend_wrecks_camera->t.t.mat, BR_ANGLE_DEG(180));
+    BrMatrix34PostTranslate(&gFrontend_wrecks_camera->t.t.mat, 0.f, 0.f, -3.f);
+
+    car_count = GetCarCount(eVehicle_opponent);
+    gFrontend_wrecks_car_count = 0;
+    for (i = 0; i < car_count; i++) {
+        tCar_spec* car;
+        br_actor* actor;
+
+        car = GetCarSpec(eVehicle_opponent, i);
+        actor = car->car_master_actor;
+        actor->render_style = BR_RSTYLE_FACES;
+        if (actor->parent != NULL) {
+            BrActorRemove(actor);
+        }
+        BrActorAdd(gFrontend_wrecks_actor, actor);
+        gWreck_gallery_car_infos[gFrontend_wrecks_car_count].original_matrix = actor->t.t.mat;
+        BrMatrix34Identity(&actor->t.t.mat);
+        BrMatrix34Identity(&gWreck_gallery_car_infos[gFrontend_wrecks_car_count].field_0x14);
+        BrMatrix34Identity(&gWreck_gallery_car_infos[gFrontend_wrecks_car_count].field_0x74);
+        gWreck_gallery_car_infos[gFrontend_wrecks_car_count].actor = actor;
+        gFrontend_wrecks_car_count++;
+    }
+    memset(gWreck_gallery_sell_infos, 0, sizeof(gWreck_gallery_sell_infos));
+    gFrontend_wreck_bought_car_dz = 0;
+
+    gFrontend_selected_item_index = 0;
+    gFrontend_wrecks_current = 0;
+    gFrontend_wrecks_hscroll = 0;
+    gFrontend_wrecks_pending_hscroll = 0;
+    gFrontend_wrecks_previous_update = PDGetTotalTime();
+    gFrontend_wrecks_rotate_prev_x = -1;
+    gFrontend_wrecks_rotate_prev_y = -1;
+    FuckWithWidths(pFrontend);
+    gFrontend_opponent_profile_pic_needs_update = 1;
+#ifdef REC2_SW
+    pFrontend->items[1].visible = 0;
+    pFrontend->items[11].visible = 0;
+    pFrontend->items[1].enabled = kFrontendItemEnabled_default;
+    pFrontend->items[11].enabled = kFrontendItemEnabled_default;
+#endif
+    return 1;
+}
 
 // FUNCTION: CARMA2_HW 0x0046eab0
 // FUNCTION: CARMA2_SW 0x0046e170
