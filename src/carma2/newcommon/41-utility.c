@@ -493,6 +493,7 @@ FILE* C2_HOOK_FASTCALL OpenUniqueFileB(char* pPrefix, char* pExtension) {
 }
 
 // FUNCTION: CARMA2_HW 0x00514ab0
+// FUNCTION: CARMA2_SW 0x0050fef0
 void C2_HOOK_FASTCALL PrintScreenFile(FILE* pF) {
     int i;
     int j;
@@ -558,6 +559,7 @@ void C2_HOOK_FASTCALL PrintScreenFile(FILE* pF) {
     WriteU16L(pF, 0);
 }
 
+#ifdef REC2_HW
 void C2_HOOK_FASTCALL PrintScreenFile16(FILE* pF) {
     int i;
     int j;
@@ -638,6 +640,7 @@ void C2_HOOK_FASTCALL PrintScreenFile16(FILE* pF) {
         BrPixelmapDirectUnlock(gBack_screen);
     }
 }
+#endif
 
 // FUNCTION: CARMA2_HW 0x00514c30
 // FUNCTION: CARMA2_SW 0x00510070
@@ -724,6 +727,23 @@ int C2_HOOK_FASTCALL Flash(tU32 pPeriod, tU32* pLast_change, int* pCurrent_state
         *pLast_change = the_time;
     }
     return *pCurrent_state;
+}
+
+// FUNCTION: CARMA2_HW 0x00514de0
+// FUNCTION: CARMA2_SW 0x00510250
+void C2_HOOK_FASTCALL MaterialCopy(br_material* pDestination, const br_material* pSource) {
+    pDestination->flags = pSource->flags;
+    pDestination->ka = pSource->ka;
+    pDestination->kd = pSource->kd;
+    pDestination->ks = pSource->ks;
+    pDestination->power = pSource->power;
+    pDestination->colour = pSource->colour;
+    pDestination->index_base = pSource->index_base;
+    pDestination->index_range = pSource->index_range;
+    pDestination->index_shade = pSource->index_shade;
+    pDestination->colour_map = pSource->colour_map;
+    pDestination->map_transform = pSource->map_transform;
+    pDestination->identifier = pSource->identifier;
 }
 
 double C2_HOOK_FASTCALL RGBDifferenceSqr(tRGB_colour* pColour_1, tRGB_colour* pColour_2) {
@@ -913,6 +933,13 @@ void C2_HOOK_FASTCALL DRPixelmapRectangleCopy(br_pixelmap* dst, br_int_16 dx, br
     BrPixelmapRectangleCopy(dst, dx, dy, src, sx, sy, w, h);
 }
 
+// FUNCTION: CARMA2_HW 0x005156d0
+// FUNCTION: CARMA2_SW 0x00510b40
+void C2_HOOK_FASTCALL DRPixelmapRectangleFill(br_pixelmap* dst, br_int_16 x, br_int_16 y, br_uint_16 w, br_uint_16 h, br_uint_32 colour) {
+
+    BrPixelmapRectangleFill(dst, x, y, w, h, colour);
+}
+
 // FUNCTION: CARMA2_HW 0x00515700
 // FUNCTION: CARMA2_SW 0x00510b70
 int C2_HOOK_FASTCALL NormalSideOfPlane(br_vector3* pPoint, br_vector3* pNormal, br_scalar pD) {
@@ -1023,6 +1050,7 @@ br_actor* C2_HOOK_FASTCALL CloneActor(br_actor* pActor) {
 }
 
 // FUNCTION: CARMA2_HW 0x00515b80
+// FUNCTION: CARMA2_SW 0x00510ff0
 void C2_HOOK_FASTCALL CalcActorGlobalPos(br_vector3* pResult, br_actor* pActor) {
     br_vector3 tv;
 
@@ -1038,12 +1066,14 @@ void C2_HOOK_FASTCALL CalcActorGlobalPos(br_vector3* pResult, br_actor* pActor) 
 }
 
 // FUNCTION: CARMA2_HW 0x00515c20
+// FUNCTION: CARMA2_SW 0x00511090
 float C2_HOOK_STDCALL frac(float pN) {
 
     return pN - (float)(int)pN;
 }
 
 // FUNCTION: CARMA2_HW 0x00515d90
+// FUNCTION: CARMA2_SW 0x00511200
 intptr_t C2_HOOK_CDECL FindMaterialCB(br_actor* pActor, void* data) {
     const char* name = data;
     br_model* model = pActor->model;
@@ -1066,6 +1096,7 @@ intptr_t C2_HOOK_CDECL FindMaterialCB(br_actor* pActor, void* data) {
 }
 
 // FUNCTION: CARMA2_HW 0x00515c40
+// FUNCTION: CARMA2_SW 0x005110b0
 br_material* C2_HOOK_FASTCALL FindMaterial(const char* pName, br_actor* pActor, int pRecursive) {
 
     if (pRecursive) {
@@ -1245,6 +1276,17 @@ int C2_HOOK_FASTCALL DRVector3TestForNan(const br_vector3* pV) {
     }
 }
 
+// FUNCTION: CARMA2_HW 0x005161c0
+// FUNCTION: CARMA2_SW 0x00511630
+int C2_HOOK_FASTCALL DRVector4TestForNan(const float* pV) {
+
+    if (pV != NULL) {
+        return TestForNan(&pV[0]) || TestForNan(&pV[1]) || TestForNan(&pV[2]) || TestForNan(&pV[3]);
+    } else {
+        return 0;
+    }
+}
+
 // FUNCTION: CARMA2_HW 0x00516240
 // FUNCTION: CARMA2_SW 0x005116b0
 void C2_HOOK_FASTCALL DRScaleModel(br_model* pModel, float pScale) {
@@ -1415,9 +1457,18 @@ tU16 C2_HOOK_FASTCALL PaletteEntry16Bit(br_pixelmap* pPal, int pEntry) {
     }
 }
 
-// STUB: CARMA2_HW 0x00517050
+// FUNCTION: CARMA2_HW 0x00517050
 tU16 C2_HOOK_FASTCALL Colour24BitTo16Bit(br_colour pColour) {
-    NOT_IMPLEMENTED();
+
+    switch (gBack_screen->type) {
+    default:
+        BrFailure("Unsupported back buffer type.");
+        break;
+    case BR_PMT_RGB_565:
+        return (((((pColour >> 3) & 0x1f0000) | (pColour & 0xfc00)) >> 2) | (pColour & 0xf8)) >> 3;
+    case BR_PMT_RGB_555:
+        return (((((pColour >> 3) & 0x1f0000) | (pColour & 0xf800)) >> 3) | (pColour & 0xf8)) >> 3;
+    }
 }
 
 // FUNCTION: CARMA2_HW 0x005170c0
@@ -1584,6 +1635,7 @@ void C2_HOOK_FASTCALL GlorifyMaterial(br_material** pMaterials, int pCount, tRen
 }
 
 // FUNCTION: CARMA2_HW 0x005184c0
+// FUNCTION: CARMA2_SW 0x005121a0
 int C2_HOOK_FASTCALL FindBestColourMatch(br_colour pColour) {
     tRGB_colour rgb;
 
@@ -1593,7 +1645,44 @@ int C2_HOOK_FASTCALL FindBestColourMatch(br_colour pColour) {
     return FindBestMatch(&rgb, gRender_palette);
 }
 
+// FUNCTION: CARMA2_HW 0x00518590
+// FUNCTION: CARMA2_SW 0x00512270
+br_actor* C2_HOOK_FASTCALL CreateBoundsActor(br_actor* pParent, const br_bounds* pBounds) {
+    br_actor* actor;
+
+    actor = BrActorAllocate(1, NULL);
+    actor->model = BrModelAllocate("Bounds", 3, 1);
+    actor->model->faces->vertices[0] = 0;
+    actor->model->faces->vertices[1] = 1;
+    actor->model->faces->vertices[2] = 2;
+    actor->model->vertices[0].p.v[0] = 0.0f;
+    actor->model->vertices[0].p.v[1] = 0.0f;
+    actor->model->vertices[0].p.v[2] = 1.0f;
+    actor->model->vertices[1].p.v[0] = 0.0f;
+    actor->model->vertices[1].p.v[1] = 1.0f;
+    actor->model->vertices[1].p.v[2] = 1.0f;
+    actor->model->vertices[2].p.v[0] = 1.0f;
+    actor->model->vertices[2].p.v[1] = 0.0f;
+    actor->model->vertices[2].p.v[2] = 1.0f;
+    BrModelAdd(actor->model);
+    actor->model->bounds = *pBounds;
+    actor->render_style = BR_RSTYLE_BOUNDING_EDGES;
+    BrActorAdd(pParent, actor);
+    return actor;
+}
+
+// FUNCTION: CARMA2_HW 0x00518660
+// FUNCTION: CARMA2_SW 0x00512340
+void C2_HOOK_FASTCALL DisposeActorAndModel(br_actor* pActor) {
+
+    BrModelRemove(pActor->model);
+    BrModelFree(pActor->model);
+    BrActorRemove(pActor);
+    BrActorFree(pActor);
+}
+
 // FUNCTION: CARMA2_HW 0x00518690
+// FUNCTION: CARMA2_SW 0x00512370
 void C2_HOOK_FASTCALL WhitenVertexRGB(br_model** pModels, int pCount) {
     int i;
     br_vertex* vertex;
@@ -1692,16 +1781,22 @@ void C2_HOOK_FASTCALL BRPM_convert(br_pixelmap* pMap, int pPixel_type) {
 #endif
 
 // FUNCTION: CARMA2_HW 0x00518780
+// FUNCTION: CARMA2_SW 0x00512460
 void C2_HOOK_FASTCALL PrintScreen(void) {
     FILE* f;
 
     f = OpenUniqueFileB("DUMP", "BMP");
     if (f != NULL) {
+#ifdef REC2_HW
         if (gBack_screen->type == BR_PMT_INDEX_8) {
             PrintScreenFile(f);
         } else {
             PrintScreenFile16(f);
         }
+#endif
+#ifdef REC2_SW
+        PrintScreenFile(f);
+#endif
         PFfclose(f);
     }
 }

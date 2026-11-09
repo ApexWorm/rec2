@@ -17,6 +17,7 @@
 #include "30-opponent.h"
 #include "32-spark.h"
 #include "41-utility.h"
+#include "46-win95sys.h"
 
 #include "13-crush1.h"
 #include "51-smash.h"
@@ -99,7 +100,25 @@ tU32 gPipe_sound_time_window;
 // GLOBAL: CARMA2_SW 0x0067107c
 int gDisable_advance;
 
-// ARReplayForwards
+// FUNCTION: CARMA2_HW 0x00402300
+// FUNCTION: CARMA2_SW 0x00402300
+int C2_HOOK_FASTCALL ARReplayForwards(void) {
+    if (gPipe_play_ptr == gPipe_record_ptr) {
+        return 0;
+    }
+    if (gPipe_play_ptr == gPipe_buffer_oldest) {
+        return 1;
+    }
+    if (gReplay_rate != 0.f) {
+        if (gReplay_rate > 0.f) {
+            return 1;
+        } else {
+            return 0;
+        }
+    } else {
+        return ARGetReplayDirection() > 0;
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x00402360
 // FUNCTION: CARMA2_SW 0x00402360
@@ -149,7 +168,19 @@ void C2_HOOK_FASTCALL ARResetPiping(void) {
 
 // ARInitialise
 
-// ARDispose
+// FUNCTION: CARMA2_HW 0x004024a0
+// FUNCTION: CARMA2_SW 0x004024a0
+void C2_HOOK_FASTCALL ARDispose(void) {
+
+    if (gPipe_buffer_start != NULL) {
+        PDDisposeActionReplayBuffer(gPipe_buffer_start);
+    }
+    gPipe_buffer_start = NULL;
+    if (gLocal_buffer != NULL) {
+        BrMemFree(gLocal_buffer);
+        gLocal_buffer = NULL;
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x00403720
 // FUNCTION: CARMA2_SW 0x00403720
@@ -609,7 +640,19 @@ void C2_HOOK_FASTCALL PipeSingleScreenWobble(int pWobble_x, int pWobble_y) {
         SIZE_OFFSET_PIPING(tPipe_chunk_screen_wobble, wobble_y), pWobble_y);
 }
 
-// PipeSingleGrooveStop
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_HW 0x004c80b0
+// STUB: CARMA2_SW 0x004c47e0
+void C2_HOOK_FASTCALL PipeSingleGrooveStop(int pGroove_index, br_matrix34* pMatrix, int pPath_interrupt, int pObject_interrupt, float pPath_resumption, float pObject_resumption) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // FUNCTION: CARMA2_HW 0x004c80f0
 // FUNCTION: CARMA2_SW 0x004c3720
@@ -683,6 +726,23 @@ void C2_HOOK_FASTCALL PipeSingleSpecial(tSpecial_type pType) {
 // FUNCTION: CARMA2_HW 0x004c85b0
 // FUNCTION: CARMA2_SW 0x004c4ce0
 void C2_HOOK_FASTCALL PipeSingleWallIncident(float pSeverity, br_vector3* pImpact_point) {
+}
+
+// FUNCTION: CARMA2_HW 0x004c85c0
+// FUNCTION: CARMA2_SW 0x004c4cf0
+void C2_HOOK_FASTCALL PipeSingleProxRay(int pRay_index, tCar_spec* pCar, tU16 pPed_index, tU32 pTime) {
+
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk_prox_ray, ped_index, 0x0);
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_chunk_prox_ray, ped_index, 0x2);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk_prox_ray, car_ID, 0x2);
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_chunk_prox_ray, car_ID, 0x2);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk_prox_ray, time, 0x4);
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_chunk_prox_ray, time, 0x4);
+
+    ARDoSingleVariedSession(ePipe_chunk_prox_ray, pRay_index, 3,
+        SIZE_OFFSET_PIPING(tPipe_chunk_prox_ray, ped_index), (tU16)pPed_index,
+        SIZE_OFFSET_PIPING(tPipe_chunk_prox_ray, car_ID), (tU16)pCar->car_ID,
+        SIZE_OFFSET_PIPING(tPipe_chunk_prox_ray, time), pTime);
 }
 
 // FUNCTION: CARMA2_HW 0x004c8600
@@ -778,6 +838,23 @@ void C2_HOOK_FASTCALL PipeSingleSmashTextureChange(tCar_spec* pCar_spec, br_mate
         SIZE_OFFSET_PIPING(tPipe_smash_texture_change, texture2), pTexture);
 }
 
+// FUNCTION: CARMA2_HW 0x004c8a40
+// FUNCTION: CARMA2_SW 0x004c5170
+void C2_HOOK_FASTCALL PipeSingleRepulseRay(int pIndex, br_vector3* pOrigin, br_vector3* pVictim, tU32 pTime) {
+
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk_repulse_ray, origin, 0x0);
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_chunk_repulse_ray, origin, 0x4);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk_repulse_ray, victim, 0x4);
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_chunk_repulse_ray, victim, 0x4);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk_repulse_ray, time, 0x8);
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_chunk_repulse_ray, time, 0x4);
+
+    ARDoSingleVariedSession(ePipe_chunk_repulse_ray, (uintptr_t)pIndex, 3,
+        SIZE_OFFSET_PIPING(tPipe_chunk_repulse_ray, origin), pOrigin,
+        SIZE_OFFSET_PIPING(tPipe_chunk_repulse_ray, victim), pVictim,
+        SIZE_OFFSET_PIPING(tPipe_chunk_repulse_ray, time), pTime);
+}
+
 // PipeSinglePedStatus
 
 // FUNCTION: CARMA2_HW 0x004c8b10
@@ -789,7 +866,11 @@ void C2_HOOK_FASTCALL PipeSinglePedDir(int pId, const br_vector3* pDir) {
         SIZE_OFFSET_PIPING(tPipe_ped_dir_data, direction), pDir);
 }
 
-// PipeSinglePedMove
+// STUB: CARMA2_HW 0x004c8b30
+// STUB: CARMA2_SW 0x004c5260
+void C2_HOOK_FASTCALL PipeSinglePedMove(tPedestrian* pPed, tS16 pArg2, tS16 pOriginal_move_id, tS16 pMove_id, float pOriginal_speed, float pSpeed, int pArg7, int pArg8, br_vector3* pOriginal_pos, br_vector3* pPos, int pOriginal_action, int pAction, br_matrix34* pMatrix) {
+    NOT_IMPLEMENTED();
+}
 
 // FUNCTION: CARMA2_HW 0x004c8bd0
 // FUNCTION: CARMA2_SW 0x004c5300
@@ -883,7 +964,7 @@ void C2_HOOK_FASTCALL PipeSingleVanishedDismembered(const tPedestrian* pPed, tU3
     C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_single_vanished_dismembered, field_0x4, 0x4);
     C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_single_vanished_dismembered, field_0x4, 0x4);
 
-    ARDoSingleVariedSession(ePipe_chunk_single_vanished_dismembered, (uintptr_t)pPed, 2,
+    ARDoSingleVariedSession(ePipe_chunk_vanished_dismembered, (uintptr_t)pPed, 2,
         SIZE_OFFSET_PIPING(tPipe_single_vanished_dismembered, field_0x0), pOld_value,
         SIZE_OFFSET_PIPING(tPipe_single_vanished_dismembered, field_0x4), pNew_value);
 }
@@ -893,8 +974,18 @@ void C2_HOOK_FASTCALL PipeSingleVanishedDismembered(const tPedestrian* pPed, tU3
 void C2_HOOK_FASTCALL PipeSingleDSModel(int pDouble_sided, void* pThing) {
     C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_single_ds_model, field_0x0, 0x2);
 
-    ARDoSingleVariedSession(ePipe_single_ds_model, (uintptr_t)pThing, 1,
+    ARDoSingleVariedSession(ePipe_chunk_ds_model, (uintptr_t)pThing, 1,
         SIZE_OFFSET_PIPING(tPipe_single_ds_model, field_0x0), pDouble_sided);
+}
+
+// FUNCTION: CARMA2_HW 0x004c8e50
+// FUNCTION: CARMA2_SW 0x004c5580
+void C2_HOOK_FASTCALL PipeSinglePedDiagnostic(tPedestrian* pPed) {
+
+    ARDoSingleVariedSession(ePipe_ped_diagnostic, (uintptr_t)pPed, 3,
+        SIZE_OFFSET_PIPING(tPipe_ped_diagnostic, ped), pPed,
+        SIZE_OFFSET_PIPING(tPipe_ped_diagnostic, instance), pPed->character,
+        SIZE_OFFSET_PIPING(tPipe_ped_diagnostic, cache), pPed->field_0x0c);
 }
 
 // FUNCTION: CARMA2_HW 0x004c8e80
@@ -902,7 +993,7 @@ void C2_HOOK_FASTCALL PipeSingleDSModel(int pDouble_sided, void* pThing) {
 void C2_HOOK_FASTCALL PipeSingleVector3(br_vector3* pDest, br_vector3* pValue) {
     C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_single_vector, vector, 0xc);
 
-    ARDoSingleVariedSession(ePipe_single_vector3, (uintptr_t)pDest, 1,
+    ARDoSingleVariedSession(ePipe_chunk_vector3, (uintptr_t)pDest, 1,
         SIZE_OFFSET_PIPING(tPipe_single_vector, vector), pValue);
 }
 
@@ -966,7 +1057,7 @@ void C2_HOOK_FASTCALL PipeSingleTransformType(br_actor* pActor, tS16 pTransform_
     C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_single_transform_type, type_to, 0x1);
     C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_single_transform_type, type_to, 0x1);
 
-    ARDoSingleVariedSession(ePipe_single_transform_type, (uintptr_t)pActor, 2,
+    ARDoSingleVariedSession(ePipe_chunk_transform_type, (uintptr_t)pActor, 2,
         SIZE_OFFSET_PIPING(tPipe_single_transform_type, type_from), type_from,
         SIZE_OFFSET_PIPING(tPipe_single_transform_type, type_to), (tU16)pTransform_type);
 }
@@ -1083,7 +1174,15 @@ void C2_HOOK_FASTCALL ApplyFrameBoundary(tPipe_chunk** pChunk) {
 
 // ApplySpecial
 
-// ApplyProxRay
+// FUNCTION: CARMA2_HW 0x004c97f0
+// FUNCTION: CARMA2_SW 0x004c5f20
+void C2_HOOK_FASTCALL ApplyProxRay(tPipe_chunk** pChunk) {
+
+    AdjustProxRay((*pChunk)->subject_index,
+        (*pChunk)->data.prox_ray.car_ID,
+        (*pChunk)->data.prox_ray.ped_index,
+        (*pChunk)->data.prox_ray.time);
+}
 
 // ApplySkidAdjustment
 
@@ -1376,7 +1475,17 @@ void C2_HOOK_FASTCALL ApplyEndShitMine(tPipe_chunk** pChunk) {
     ARUndoShitMine((br_actor*)(*pChunk)->subject_index, &(*pChunk)->data.end_shit_mine.m);
 }
 
-// ApplyTransformType
+// FUNCTION: CARMA2_HW 0x004c9d70
+// FUNCTION: CARMA2_SW 0x004c64a0
+void C2_HOOK_FASTCALL ApplyTransformType(tPipe_chunk** pChunk) {
+    tPipe_chunk* chunk;
+
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk, data, 0x4);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_single_transform_type, type_to, 0x1);
+
+    chunk = *pChunk;
+    ((br_actor*)chunk->subject_index)->t.type = chunk->data.transform_type.type_to;
+}
 
 // ApplyOppoRenderage
 
