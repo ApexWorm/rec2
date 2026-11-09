@@ -326,16 +326,16 @@ void C2_HOOK_FASTCALL TDamageRRWheel(void) {
 }
 
 // FUNCTION: CARMA2_HW 0x004420e0
+// FUNCTION: CARMA2_SW 0x004421c0
 void C2_HOOK_FASTCALL ToggleMiniMap(void) {
-    int message;
 
-    message = eMiscString_minimap_on;
     if (gMap_view != 2) {
         gMini_map_visible = !gMini_map_visible;
         if (!gMini_map_visible) {
-            message = eMiscString_minimap_off;
+            NewTextHeadupSlot(4, 0, 500, -4, GetMiscString(eMiscString_minimap_off));
+        } else {
+            NewTextHeadupSlot(4, 0, 500, -4, GetMiscString(eMiscString_minimap_on));
         }
-        NewTextHeadupSlot(4, 0, 500, -4, GetMiscString(message));
         MapChanged();
     }
 }
