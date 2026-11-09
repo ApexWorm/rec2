@@ -15,6 +15,8 @@
 #include <stdio.h>
 
 extern undefined4 gCrush_array_0067a190[10];
+extern int gCount_net_crush_reattach_bit_list;
+extern tCrush_net_reattach_bit_list_item gNet_crush_reattach_bit_list[8];
 extern undefined4 gDAT_00679440;
 extern tCrush_info_buffer gDetached_bit_crush_info_buffer;
 extern tPhysics_object* gDetached_bit_collision_infos;
@@ -255,11 +257,11 @@ extern void C2_HOOK_FASTCALL StopFlapping(br_actor* pActor, tCar_spec* pCar_spec
 
 extern intptr_t C2_HOOK_CDECL ToggleFlapsCB2(br_actor* pActor, void* pCar);
 
-extern int C2_HOOK_FASTCALL ToggleFlapsCB(tPhysics_object* pCollision_info, tCar_spec* pCar);
+extern int C2_HOOK_FASTCALL ToggleFlapsCB(tPhysics_object* pCollision_info, void* pCar);
 
-// SendToggleFlaps
+extern void C2_HOOK_FASTCALL SendToggleFlaps(tCar_spec* pCar);
 
-// ToggleFlaps
+extern void C2_HOOK_FASTCALL ToggleFlaps(void);
 
 extern int C2_HOOK_FASTCALL BitObjectIsSufficientlyOutsideCarObjectToDetach(tPhysics_object* pObject);
 
@@ -503,7 +505,7 @@ extern void C2_HOOK_FASTCALL ARApplyFlap(br_actor* pActor, br_angle pAngle);
 
 // ReceivedReAttachBit
 
-// ReceivedReAttachAllBits
+extern void C2_HOOK_FASTCALL ReceivedReAttachAllBits(tNet_message_chunk* pContents);
 
 // DoQueuedNetDetaching
 
@@ -517,7 +519,7 @@ extern void C2_HOOK_FASTCALL ARApplyFlap(br_actor* pActor, br_angle pAngle);
 
 // ReceivedDBNonCarPosition
 
-// ReceivedToggleFlaps
+extern void C2_HOOK_FASTCALL ReceivedToggleFlaps(tNet_message_chunk* pContents);
 
 // SHNonCarOwner
 
@@ -539,9 +541,9 @@ extern void C2_HOOK_FASTCALL EncodeNetShapeData(tU8* pData, tCar_spec* pCar);
 
 // Vector4Equal
 
-// CompressPlane
+extern void C2_HOOK_FASTCALL CompressPlane(tCompressed_vector4* pDest, const br_vector4* pSrc);
 
-// ExpandPlane
+extern void C2_HOOK_FASTCALL ExpandPlane(br_vector4* pDest, const tCompressed_vector4* pSrc);
 
 // CopySplitInMessage
 
