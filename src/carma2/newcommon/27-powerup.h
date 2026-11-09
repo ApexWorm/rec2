@@ -67,7 +67,7 @@ extern char* C2_HOOK_FASTCALL GetPowerupMessage(int pPowerup_index);
 
 // ExcludedPowerup
 
-// GotPowerupX
+extern int C2_HOOK_FASTCALL GotPowerupX(tCar_spec* pCar, int pIndex, int pArg3, int pMessage, tU32 pTime);
 
 // GotPowerupXX
 
@@ -159,7 +159,7 @@ extern void C2_HOOK_FASTCALL GotPowerup8(void);
 
 extern void C2_HOOK_FASTCALL GotPowerup9(void);
 
-// GotCredits
+extern int C2_HOOK_FASTCALL GotCredits(tPowerup* pPowerup, tCar_spec* pCar);
 
 // GainAPO2
 
@@ -167,7 +167,7 @@ extern void C2_HOOK_FASTCALL GotPowerup9(void);
 
 // GainAPO
 
-// GotTimeOrPower
+extern int C2_HOOK_FASTCALL GotTimeOrPower(tPowerup* pPowerup, tCar_spec* pCar);
 
 // GainAPOPotential
 
@@ -233,7 +233,7 @@ extern int C2_HOOK_FASTCALL SetWallclimb(tPowerup* pPowerup, tCar_spec* pCar);
 
 extern int C2_HOOK_FASTCALL SetBouncey(tPowerup* pPowerup, tCar_spec* pCar);
 
-// SetSuspension
+extern int C2_HOOK_FASTCALL SetSuspension(tPowerup* pPowerup, tCar_spec* pCar);
 
 extern int C2_HOOK_FASTCALL SetTyreGrip(tPowerup* pPowerup, tCar_spec* pCar);
 
@@ -335,7 +335,7 @@ extern int C2_HOOK_FASTCALL SetLowGravityPeds(tPowerup* pPowerup, tCar_spec* pCa
 
 extern int C2_HOOK_FASTCALL SetPissedPeds(tPowerup* pPowerup, tCar_spec* pCar);
 
-// SetGhostPeds
+extern int C2_HOOK_FASTCALL SetGhostPeds(tPowerup* pPowerup, tCar_spec* pCar);
 
 extern void C2_HOOK_FASTCALL ResetDancingPeds(tPowerup* pPowerup, tCar_spec* pCar);
 
@@ -399,7 +399,7 @@ extern void C2_HOOK_FASTCALL SetSpinningPowerup(br_actor* pActor, int pOpacity);
 
 // SetChangingPowerup
 
-// PedValium
+extern int C2_HOOK_FASTCALL PedValium(tPowerup* pPowerup, tCar_spec* pCar);
 
 // PowerupCancel
 

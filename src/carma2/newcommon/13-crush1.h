@@ -15,6 +15,8 @@
 #include <stdio.h>
 
 extern undefined4 gCrush_array_0067a190[10];
+extern int gCount_net_crush_reattach_bit_list;
+extern tCrush_net_reattach_bit_list_item gNet_crush_reattach_bit_list[8];
 extern undefined4 gDAT_00679440;
 extern tCrush_info_buffer gDetached_bit_crush_info_buffer;
 extern tPhysics_object* gDetached_bit_collision_infos;
@@ -503,7 +505,7 @@ extern void C2_HOOK_FASTCALL ARApplyFlap(br_actor* pActor, br_angle pAngle);
 
 // ReceivedReAttachBit
 
-// ReceivedReAttachAllBits
+extern void C2_HOOK_FASTCALL ReceivedReAttachAllBits(tNet_message_chunk* pContents);
 
 // DoQueuedNetDetaching
 
@@ -539,9 +541,9 @@ extern void C2_HOOK_FASTCALL EncodeNetShapeData(tU8* pData, tCar_spec* pCar);
 
 // Vector4Equal
 
-// CompressPlane
+extern void C2_HOOK_FASTCALL CompressPlane(tCompressed_vector4* pDest, const br_vector4* pSrc);
 
-// ExpandPlane
+extern void C2_HOOK_FASTCALL ExpandPlane(br_vector4* pDest, const tCompressed_vector4* pSrc);
 
 // CopySplitInMessage
 
