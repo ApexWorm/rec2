@@ -314,7 +314,7 @@ int gCursor_line_width = 5;
 
 
 // GLOBAL: CARMA2_HW 0x0067be94
-int gTransient_bitmap_index;
+int gCursor_transient_index;
 
 // GLOBAL: CARMA2_HW 0x0079ecb0
 tMouse_coord gMouse_last_pos;
@@ -739,7 +739,7 @@ void C2_HOOK_FASTCALL StartMouseCursor(void) {
         AllocateCursorActors();
     }
     gNext_transient = 0;
-    gTransient_bitmap_index = 0;
+    gCursor_transient_index = 0;
     GetMousePosition(&gMouse_last_pos.x, &gMouse_last_pos.y);
     gMouse_in_use = 0;
     gCurrent_cursor_index = 2;
@@ -970,7 +970,7 @@ int C2_HOOK_FASTCALL DoMouseCursor(void) {
         gCurrent_cursor_index = 2;
         if (!gNoTransients) {
             br_pixelmap *map;
-            int idx = gTransient_bitmap_index;
+            int idx = gCursor_transient_index;
 
             gTransient_bitmaps[idx].x_coord = (pos_x - 7) & ~3;
             gTransient_bitmaps[idx].y_coord = pos_y - 7;
