@@ -49,6 +49,10 @@ typedef struct tMax_message tMax_message;
 typedef struct tSmashable_level tSmashable_level;
 typedef union tPhysics_shape tPhysics_shape;
 typedef struct tPedestrian tPedestrian;
+typedef struct tRace_ped_exclusion_spec tRace_ped_exclusion_spec;
+typedef struct tPed_character_instance tPed_character_instance;
+typedef struct tPed_movement_spec tPed_movement_spec;
+typedef struct tPed_cache_006944c0 tPed_cache_006944c0;
 typedef struct tPedestrian_distances tPedestrian_distances;
 typedef struct tRace_pedestrian tRace_pedestrian;
 typedef struct tDrone_spec tDrone_spec;
@@ -67,6 +71,7 @@ typedef struct tPed_personality tPed_personality;
 typedef struct tCar_crush_vertex_data tCar_crush_vertex_data;
 typedef struct tPed_face_cache_0x34 tPed_face_cache_0x34;
 typedef struct tPed_anim_seq tPed_anim_seq;
+typedef struct tPed_morph tPed_morph;
 
 typedef char tPed_animal_name[50]; /* FIXME: should not really exist */
 
@@ -235,9 +240,127 @@ typedef struct {
     tExplosion_frame frames[10];
 } tExplosion;
 
+typedef enum {
+    ePed_action_walking = 0,
+    ePed_action_running = 1,
+    ePed_action_panicking = 2,
+    ePed_action_falling = 3,
+    ePed_action_getting_up = 4,
+    ePed_action_impacting = 5,
+    ePed_action_dead = 6,
+} tPed_action;
+
+typedef struct tPedestrian {
+    tPed_character_instance* character;
+    tS8 hit_points;
+    undefined field_0x05;
+    undefined2 field_0x06;
+    tU16 flags;
+    undefined field_0x0a;
+    undefined field_0x0b;
+    tPed_cache_006944c0* field_0x0c;
+    tPed_action action;
+    tPed_movement_spec* movement_spec;
+    tRace_ped_exclusion_spec* exclusion_spec;
+    br_vector3 pos;
+    tU32 field_0x28;
+    undefined field_0x2c[0x4c - 0x2c];
+    float speed_factor;
+    tPedestrian* next;
+} tPedestrian;
+
+typedef struct tPed_character_instance {
+    tPed_personality* personality;
+    tS8 field_0x4;
+    undefined field_0x5;
+    undefined field_0x6;
+    tS8 field_0x7;
+    tS8 field_0x8;
+    tU8 field_0x9;
+    tS8 field_0xa;
+    undefined field_0xb;
+    undefined4 field_0xc;
+    undefined4 field_0x10;
+    undefined4 field_0x14;
+    undefined4 field_0x18;
+    tS16 field_0x1c;
+    undefined2 field_0x1e;
+    undefined2 field_0x20;
+    undefined field_0x22[0x2];
+    undefined4 field_0x24;
+    undefined4 field_0x28;
+    br_matrix34 field_0x2c;
+    br_matrix34 field_0x5c;
+    br_matrix34 field_0x8c;
+    tPed_morph* field_0xbc;
+    br_vector3 field_0xc0;
+    br_vector3 field_0xcc;
+    br_vector3 field_0xd8;
+    tPedestrian* ped;
+    br_matrix34* field_0xe8;
+} tPed_character_instance;
+
+typedef struct tPed_cache_006944c0 {
+    br_vector3 field_0x00;
+    br_vector3 field_0x0c;
+    undefined field_0x18;
+    undefined field_0x19;
+    undefined field_0x1a;
+    undefined field_0x1b[0x1b-0x1a];
+    const tPed_anim_seq* field_0x1c;
+    undefined field_0x20[1];
+    undefined field_0x21;
+    undefined field_0x22[1];
+    undefined field_0x23[10];
+    undefined field_0x2d[1];
+    undefined2 field_0x2e;
+    br_vector3 field_0x30;
+    br_vector3 field_0x3c;
+    br_vector3 field_0x48;
+    br_vector3 field_0x54;
+    br_vector3 field_0x60;
+    tU32 field_0x6c;
+    tU32 field_0x70;
+    tU32 field_0x74;
+    tU32 field_0x78;
+    tU32 next_turn_time;
+    undefined4 field_0x80;
+    tU32 field_0x84;
+    tU32 field_0x88;
+    tU32 field_0x8c;
+    tU32 field_0x90;
+    tU32 field_0x94;
+    int field_0x98;
+    undefined4 field_0x9c;
+    int field_0xa0;
+    br_vector3 field_0xa4;
+    tPed_face_cache_0x34* field_0xb0;
+    tPedestrian* field_0xb4;
+    float field_0xb8;
+    undefined field_0xbc[0x4];
+    tCar_spec* field_0xc0;
+    int field_0xc4;
+    tS16 field_0xc8;
+    undefined field_0xca;
+    undefined field_0xcb[1];
+    br_vector3 field_0xcc;
+    br_vector3 field_0xd8;
+    br_vector3 field_0xe4;
+    br_vector3 field_0xf0;
+    br_vector3 field_0xfc;
+    br_vector3 field_0x108;
+    undefined field_0x114[0x124-0x114];
+    float field_0x124;
+    float field_0x128;
+} tPed_cache_006944c0;
+
 typedef struct {
     tU16 v[3];
 } tCompressed_vector3;
+
+typedef struct {
+    tU16 v[4];
+} tCompressed_vector4;
 
 typedef struct {
     tCompressed_vector3 m0;
@@ -331,13 +454,19 @@ typedef struct {
 } tPipe_single_vector;
 
 typedef struct {
+    tPedestrian ped;
+    tPed_character_instance instance;
+    tPed_cache_006944c0 cache;
+} tPipe_ped_diagnostic;
+
+typedef struct {
     int enable;
     int block_flags;
 } tPipe_single_groove_on_of;
 
 typedef struct {
     tU8 type_from;
-    tS8 type_to;
+    tU8 type_to;
 } tPipe_single_transform_type;
 
 typedef struct {
@@ -551,7 +680,7 @@ typedef enum {
     ePipe_chunk_smash_decal = 35,
     ePipe_smash_texture_change = 36,
     ePipe_chunk_repulse_ray = 37,
-    ePipe_chunk_single_ped_status = 40,
+    ePipe_chunk_ped_status = 40,
     ePipe_chunk_ped_dir = 41,
     ePipe_chunk_ped_move = 42,
     ePipe_chunk_ped_physics = 43,
@@ -562,16 +691,17 @@ typedef enum {
     ePipe_single_groove_on_off = 51,
     ePipe_chunk_powerup_lose = 53,
     ePipe_funk_enable = 54,
-    ePipe_chunk_single_vanished_dismembered = 55,
-    ePipe_single_ds_model = 56,
-    ePipe_single_vector3 = 58,
+    ePipe_chunk_vanished_dismembered = 55,
+    ePipe_chunk_ds_model = 56,
+    ePipe_ped_diagnostic = 57,
+    ePipe_chunk_vector3 = 58,
     ePipe_chunk_drone_render = 60,
     ePipe_chunk_drone_corner_pos = 61,
     ePipe_chunk_single_drone_straight_pos = 62,
     ePipe_chunk_burning_ped = 64,
     ePipe_chunk_powerup_respawn = 65,
     ePipe_chunk_end_shit_mine = 67,
-    ePipe_single_transform_type = 68,
+    ePipe_chunk_transform_type = 68,
     ePipe_chunk_single_oppo_renderage = 69,
 } tPipe_chunk_type;
 
@@ -607,6 +737,7 @@ typedef struct tPipe_chunk {
         tPipe_chunk_powerup_respawn powerup_respawn;
         tPipe_chunk_shit_mine shit_mine;
         tPipe_chunk_end_shit_mine end_shit_mine;
+        tPipe_chunk_prox_ray prox_ray;
         tPipe_smudge_data smudge;
         tPipe_model_mash model_mash;
         tPipe_chunk_bend bend;
@@ -1958,14 +2089,7 @@ typedef struct tHeadup {
             tU32 start_time;
         } fancy_info;
         struct {
-            char text[252];
-            tDR_font* font;
-            tU32 font_index;
-            undefined4 field_0x104;
-            undefined4 field_0x108;
-            undefined4 field_0x10c;
-            undefined4 field_0x110;
-            undefined4 field_0x114;
+            br_pixelmap* image;
         } image_info;
         struct {
             char text[252];
@@ -3712,7 +3836,7 @@ typedef struct {
     tS8 axis_when_lying_down_B;
 } tPed_form;
 
-typedef struct {
+typedef struct tPed_morph {
     float field_0x0;
     float field_0x4;
     br_vector3 field_0x8;
@@ -3848,7 +3972,7 @@ typedef struct  {
     tU8 field_0x0;
     undefined field_0x1;
     tU16 field_0x2;
-    tU16 field_0x4;
+    br_angle field_0x4;
     tU16 field_0x6;
     tU16 field_0x8;
     tU16 hinge0;
@@ -4055,8 +4179,9 @@ typedef struct tCrush_net_full_detach_bit_list_item {
 } tCrush_net_full_detach_bit_list_item;
 
 typedef struct tCrush_net_reattach_bit_list_item {
+    br_actor* actor;
     tCar_spec* car;
-    undefined field_0x4[8];
+    tU32 time;
 } tCrush_net_reattach_bit_list_item;
 
 typedef struct tCrush_detach_list_item {
@@ -4482,7 +4607,7 @@ typedef struct {
     undefined4 field_0x24;
 } tRepulse_link;
 
-typedef struct {
+typedef struct tPed_movement_spec{
     tU32 min_time_between;
     tU32 max_time_between;
     float min_walk_speed_factor;
@@ -4490,60 +4615,6 @@ typedef struct {
     br_angle max_random_angle;
     tU8 padding_0x12[2];
 } tPed_movement_spec;
-
-typedef struct {
-    br_vector3 field_0x00;
-    br_vector3 field_0x0c;
-    undefined field_0x18;
-    undefined field_0x19;
-    undefined field_0x1a;
-    undefined field_0x1b[0x1b-0x1a];
-    const tPed_anim_seq* field_0x1c;
-    undefined field_0x20[1];
-    undefined field_0x21;
-    undefined field_0x22[1];
-    undefined field_0x23[10];
-    undefined field_0x2d[1];
-    undefined2 field_0x2e;
-    br_vector3 field_0x30;
-    br_vector3 field_0x3c;
-    br_vector3 field_0x48;
-    br_vector3 field_0x54;
-    br_vector3 field_0x60;
-    tU32 field_0x6c;
-    tU32 field_0x70;
-    tU32 field_0x74;
-    tU32 field_0x78;
-    tU32 next_turn_time;
-    undefined4 field_0x80;
-    tU32 field_0x84;
-    tU32 field_0x88;
-    tU32 field_0x8c;
-    tU32 field_0x90;
-    tU32 field_0x94;
-    int field_0x98;
-    undefined4 field_0x9c;
-    int field_0xa0;
-    br_vector3 field_0xa4;
-    tPed_face_cache_0x34* field_0xb0;
-    tPedestrian* field_0xb4;
-    float field_0xb8;
-    undefined field_0xbc[0x4];
-    tCar_spec* field_0xc0;
-    int field_0xc4;
-    tS16 field_0xc8;
-    undefined field_0xca;
-    undefined field_0xcb[1];
-    br_vector3 field_0xcc;
-    br_vector3 field_0xd8;
-    br_vector3 field_0xe4;
-    br_vector3 field_0xf0;
-    br_vector3 field_0xfc;
-    br_vector3 field_0x108;
-    undefined field_0x114[0x124-0x114];
-    float field_0x124;
-    float field_0x128;
-} tPed_cache_006944c0;
 
 typedef struct {
     undefined field_0x0[0x50];
@@ -4601,7 +4672,7 @@ typedef struct {
     br_material* material;
 } tRace_spec_exclusion_material;
 
-typedef struct {
+typedef struct tRace_ped_exclusion_spec {
     tU8 count_exclusion_materials;
     tU8 count_exception_materials;
     tU8 exclusions_ok_when_scared;
@@ -4661,66 +4732,6 @@ typedef struct tPed_personality {
     float radius;
     tPed_personality_sounds* sounds;
 } tPed_personality;
-
-typedef struct {
-    tPed_personality* personality;
-    tS8 field_0x4;
-    undefined field_0x5;
-    undefined field_0x6;
-    tS8 field_0x7;
-    tS8 field_0x8;
-    tU8 field_0x9;
-    tS8 field_0xa;
-    undefined field_0xb;
-    undefined4 field_0xc;
-    undefined4 field_0x10;
-    undefined4 field_0x14;
-    undefined4 field_0x18;
-    tS16 field_0x1c;
-    undefined2 field_0x1e;
-    undefined2 field_0x20;
-    undefined field_0x22[0x2];
-    undefined4 field_0x24;
-    undefined4 field_0x28;
-    br_matrix34 field_0x2c;
-    br_matrix34 field_0x5c;
-    br_matrix34 field_0x8c;
-    tPed_morph* field_0xbc;
-    br_vector3 field_0xc0;
-    br_vector3 field_0xcc;
-    br_vector3 field_0xd8;
-    tPedestrian* ped;
-    br_matrix34* field_0xe8;
-} tPed_character_instance;
-
-typedef enum {
-    ePed_action_walking = 0,
-    ePed_action_running = 1,
-    ePed_action_panicking = 2,
-    ePed_action_falling = 3,
-    ePed_action_getting_up = 4,
-    ePed_action_impacting = 5,
-    ePed_action_dead = 6,
-} tPed_action;
-
-typedef struct tPedestrian {
-    tPed_character_instance* character;
-    tS8 hit_points;
-    undefined field_0x05;
-    undefined2 field_0x06;
-    tU16 flags;
-    undefined field_0x0a;
-    undefined field_0x0b;
-    tPed_cache_006944c0* field_0x0c;
-    tPed_action action;
-    tPed_movement_spec* movement_spec;
-    tRace_ped_exclusion_spec* exclusion_spec;
-    br_vector3 pos;
-    tU32 field_0x28;
-    undefined field_0x2c[0x4c - 0x2c];
-    float speed_factor;
-    tPedestrian* next;
-} tPedestrian;
 
 typedef struct tPed_anim_seq {
     tU8 count;
@@ -5549,7 +5560,7 @@ enum {
     eMiscString_watching = 217,
     eMiscString_race_leader = 218,
     eMiscString_message_sent = 226,
-    eMiscString_enter_message = 226,
+    eMiscString_enter_message = 227,
     eMiscString_too_late_to_cancel = 242,
     eMiscString_could_not_find_carmageddon_cd = 243,
     eMiscString_no_target_to_lock_onto = 250,
