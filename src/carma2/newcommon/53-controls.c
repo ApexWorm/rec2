@@ -95,9 +95,17 @@ int gAllow_car_flying;
 // GLOBAL: CARMA2_SW 0x00676bec
 int gEntering_message;
 
+// GLOBAL: CARMA2_HW 0x0067c47c
+// GLOBAL: CARMA2_SW 0x00676bf4
+tU32 gToo_poor_for_recovery_timeout;
+
 // GLOBAL: CARMA2_HW 0x006b781c
 // GLOBAL: CARMA2_SW 0x006ae4fc
 tRace_over_reason gRace_over_reason;
+
+// GLOBAL: CARMA2_HW 0x0067c478
+// GLOBAL: CARMA2_SW 0x00676bf0
+tU32 gPalette_fade_time;
 
 void C2_HOOK_FASTCALL CompleteRace(void) {
     gRace_over_reason = eRace_over_0;

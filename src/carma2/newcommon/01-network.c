@@ -275,8 +275,8 @@ void C2_HOOK_FASTCALL DisposeCurrentJoinPollGame(void) {
     }
 }
 
-// STUB: CARMA2_HW 0x0049ec70
-// STUB: CARMA2_SW 0x0049adf0
+// FUNCTION: CARMA2_HW 0x0049ec70
+// FUNCTION: CARMA2_SW 0x0049adf0
 void C2_HOOK_FASTCALL DoNextJoinPoll(void) {
 
     if (gTime_for_next_one) {
@@ -531,6 +531,8 @@ tNet_message* C2_HOOK_FASTCALL NetBuildGuaranteedMessage(tU8 pNet_message_type, 
     return the_message;
 }
 
+// FUNCTION: CARMA2_HW 0x004a5140
+// FUNCTION: CARMA2_SW 0x004a12c0
 tNet_message_chunk* C2_HOOK_FASTCALL NetGetToPlayerContentsSize(tNet_game_player_info* pPlayer, int pContents_size) {
     tNet_message* message;
     tNet_message_chunk* contents;
@@ -1027,4 +1029,3 @@ void C2_HOOK_FASTCALL GetCheckSum(tNet_message* pMessage) {
 // StatReceivePacket
 
 // StatSendPacket
-
