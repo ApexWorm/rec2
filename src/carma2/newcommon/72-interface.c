@@ -1784,6 +1784,7 @@ void C2_HOOK_FASTCALL FRONTEND_PingPongFlash(void) {
 // FRONTEND_DrawMenu
 
 // FUNCTION: CARMA2_HW 0x0046cf10
+// FUNCTION: CARMA2_SW 0x0046cbd0
 void C2_HOOK_FASTCALL FRONTEND_Setup2D(void) {
     br_camera* camera;
 
@@ -1797,6 +1798,7 @@ void C2_HOOK_FASTCALL FRONTEND_Setup2D(void) {
     camera->width = 640.f;
     camera->height = 480.f;
     BrActorAdd(gFrontend_actor, gFrontend_camera);
+#ifdef REC2_HW
     gFrontend_backdrop0_material_prims[0].t = BRT_BLEND_B;
     gFrontend_backdrop0_material_prims[0].v.b = 1;
     gFrontend_backdrop0_material_prims[1].t = BRT_OPACITY_X;
@@ -1845,6 +1847,7 @@ void C2_HOOK_FASTCALL FRONTEND_Setup2D(void) {
     BrActorAdd(gFrontend_actor, gFrontend_backdrop_actors[0]);
     BrActorAdd(gFrontend_actor, gFrontend_backdrop_actors[1]);
     BrActorAdd(gFrontend_actor, gFrontend_backdrop_actors[2]);
+#endif
 }
 
 // FRONTEND_Setup
