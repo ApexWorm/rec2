@@ -243,15 +243,15 @@ void C2_HOOK_FASTCALL GrooveThisDelic(tGroovidelic_spec* pGroove, tU32 pTime, in
             || pGroove->object_mode == eMove_controlled
             || pGroove->object_mode == eMove_absolute)
         && !(pGroove->block_flags & 0x2)) {
-        the_mat->m[0][0] = 1.f;
-        the_mat->m[0][1] = 0.f;
-        the_mat->m[0][2] = 0.f;
-        the_mat->m[1][0] = 0.f;
-        the_mat->m[1][1] = 1.f;
-        the_mat->m[1][2] = 0.f;
-        the_mat->m[2][0] = 0.f;
-        the_mat->m[2][1] = 0.f;
-        the_mat->m[2][2] = 1.f;
+        the_mat->m[0][0] = 1.0f;
+        the_mat->m[0][1] = 0.0f;
+        the_mat->m[0][2] = 0.0f;
+        the_mat->m[1][0] = 0.0f;
+        the_mat->m[1][1] = 1.0f;
+        the_mat->m[1][2] = 0.0f;
+        the_mat->m[2][0] = 0.0f;
+        the_mat->m[2][1] = 0.0f;
+        the_mat->m[2][2] = 1.0f;
         the_mat->m[3][0] = -pGroove->object_centre.v[0];
         the_mat->m[3][1] = -pGroove->object_centre.v[1];
         the_mat->m[3][2] = -pGroove->object_centre.v[2];
