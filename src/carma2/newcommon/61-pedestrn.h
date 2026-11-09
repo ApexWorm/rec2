@@ -356,13 +356,11 @@ extern void C2_HOOK_FASTCALL TurnOnCollisions(tPhysics_object* pObject);
 
 extern void C2_HOOK_FASTCALL BlendifyMaterial25(br_material* pMaterial);
 
-extern void C2_HOOK_FASTCALL StartEtherealPedestrians(void);
-
 extern void C2_HOOK_FASTCALL ModelUpdatePrimitiveMaterials(br_model* pModel);
 
 // UpdateModels
 
-// TurnOnGhostPeds
+extern void C2_HOOK_FASTCALL TurnOnGhostPeds(void);
 
 // TurnOffGhostPeds
 

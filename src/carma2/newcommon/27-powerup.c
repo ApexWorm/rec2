@@ -1037,7 +1037,7 @@ int C2_HOOK_FASTCALL SetPissedPeds(tPowerup* pPowerup, tCar_spec* pCar) {
 // FUNCTION: CARMA2_SW 0x004dae30
 int C2_HOOK_FASTCALL SetGhostPeds(tPowerup* pPowerup, tCar_spec* pCar) {
 
-    StartEtherealPedestrians();
+    TurnOnGhostPeds();
     return pPowerup - gPowerup_array;
 }
 

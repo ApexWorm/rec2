@@ -980,12 +980,6 @@ void C2_HOOK_FASTCALL BlendifyMaterial25(br_material* pMaterial) {
     BrMaterialUpdate(pMaterial, BR_MATU_ALL);
 }
 
-// STUB: CARMA2_HW 0x004d6b40
-// STUB: CARMA2_SW 0x004d3140
-void C2_HOOK_FASTCALL StartEtherealPedestrians(void) {
-    NOT_IMPLEMENTED();
-}
-
 // FUNCTION: CARMA2_HW 0x004d6ba0
 // FUNCTION: CARMA2_SW 0x004d31a0
 void C2_HOOK_FASTCALL ModelUpdatePrimitiveMaterials(br_model* pModel) {
@@ -995,7 +989,11 @@ void C2_HOOK_FASTCALL ModelUpdatePrimitiveMaterials(br_model* pModel) {
 
 // UpdateModels
 
-// TurnOnGhostPeds
+// STUB: CARMA2_HW 0x004d6b40
+// STUB: CARMA2_SW 0x004d3140
+void C2_HOOK_FASTCALL TurnOnGhostPeds(void) {
+    NOT_IMPLEMENTED();
+}
 
 // TurnOffGhostPeds
 
