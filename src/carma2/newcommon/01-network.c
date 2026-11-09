@@ -249,7 +249,7 @@ void C2_HOOK_FASTCALL NetSendHeadupToPlayer(char* pMessage, tPlayer_ID pPlayer) 
                 NewTextHeadupSlot(4, 0, 3000, -4, pMessage);
             }
         } else {
-            message = NetBuildGuaranteedMessage(13, 0);
+            message = NetBuildGuaranteedMessage(eNet_message_chunk_type_headup, 0);
             strcpy((char*)message->contents.raw.data, pMessage);
             NetGuaranteedSendMessageToPlayer(gCurrent_net_game, message, pPlayer, NULL);
         }
