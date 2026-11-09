@@ -2117,6 +2117,12 @@ int C2_HOOK_FASTCALL WrecksInFunc(tFrontend_spec* pFrontend) {
     gFrontend_wrecks_rotate_prev_y = -1;
     FuckWithWidths(pFrontend);
     gFrontend_opponent_profile_pic_needs_update = 1;
+#ifdef REC2_SW
+    pFrontend->items[1].visible = 0;
+    pFrontend->items[11].visible = 0;
+    pFrontend->items[1].enabled = kFrontendItemEnabled_default;
+    pFrontend->items[11].enabled = kFrontendItemEnabled_default;
+#endif
     return 1;
 }
 
