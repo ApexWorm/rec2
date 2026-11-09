@@ -11,6 +11,7 @@
 #include "00-car.h"
 #include "01-network.h"
 #include "13-crush1.h"
+#include "15-displays.h"
 
 #include "16-graphics1.h"
 #include "18-graphics2.h"
@@ -196,7 +197,19 @@ char* C2_HOOK_FASTCALL GetPowerupMessage(int pPowerup_index) {
 
 // ExcludedPowerup
 
-// GotPowerupX
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_HW 0x004d9150
+// STUB: CARMA2_SW 0x004d5680
+int C2_HOOK_FASTCALL GotPowerupX(tCar_spec* pCar, int pIndex, int pArg3, int pMessage, tU32 pTime) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // GotPowerupXX
 
@@ -408,7 +421,20 @@ void C2_HOOK_FASTCALL GotPowerup9(void) {
     GotPowerupN(9);
 }
 
-// GotCredits
+// FUNCTION: CARMA2_HW 0x004dc170
+// FUNCTION: CARMA2_SW 0x004d8670
+int C2_HOOK_FASTCALL GotCredits(tPowerup* pPowerup, tCar_spec* pCar) {
+    int credits;
+    char s[256];
+
+    if (pCar != NULL && pCar->driver == eDriver_local_human) {
+        credits = 100 * (IRandomBetween(pPowerup->integer_params[0], pPowerup->integer_params[1]) / 100);
+        strcpy(s, pPowerup->message);
+        strcat(s, " ");
+        EarnCredits2(credits, s);
+    }
+    return pPowerup - gPowerup_array;
+}
 
 // GainAPO2
 
@@ -416,7 +442,20 @@ void C2_HOOK_FASTCALL GotPowerup9(void) {
 
 // GainAPO
 
-// GotTimeOrPower
+// FUNCTION: CARMA2_HW 0x004dc470
+// FUNCTION: CARMA2_SW 0x004d8970
+int C2_HOOK_FASTCALL GotTimeOrPower(tPowerup* pPowerup, tCar_spec* pCar) {
+    int time;
+
+    if (gNet_mode != eNet_mode_none) {
+        return GotPowerupX(pCar, gNet_powerup_time_replacement, 1, 1, 0);
+    }
+    if (pCar != NULL && pCar->driver == eDriver_local_human) {
+        time = IRandomBetween(pPowerup->integer_params[0], pPowerup->integer_params[1]);
+        AwardTime(time);
+    }
+    return pPowerup - gPowerup_array;
+}
 
 // GainAPOPotential
 
@@ -677,7 +716,23 @@ int C2_HOOK_FASTCALL SetBouncey(tPowerup* pPowerup, tCar_spec* pCar) {
     return pPowerup - gPowerup_array;
 }
 
-// SetSuspension
+// FUNCTION: CARMA2_HW 0x004dce80
+// FUNCTION: CARMA2_SW 0x004d9380
+int C2_HOOK_FASTCALL SetSuspension(tPowerup* pPowerup, tCar_spec* pCar) {
+    float front_give;
+    float rear_give;
+    float damping;
+    float front_height;
+    float rear_height;
+
+    front_give = pPowerup->float_params[0];
+    rear_give = pPowerup->float_params[1];
+    front_height = pPowerup->float_params[2];
+    rear_height = pPowerup->float_params[3];
+    damping = pPowerup->float_params[4];
+    SetCarSuspGiveAndHeight(pCar, front_give, rear_give, damping, front_height, rear_height);
+    return pPowerup - gPowerup_array;
+}
 
 // FUNCTION: CARMA2_HW 0x004dced0
 // FUNCTION: CARMA2_SW 0x004d93d0
@@ -733,7 +788,11 @@ int C2_HOOK_FASTCALL SetDamageMultiplier(tPowerup* pPowerup, tCar_spec* pCar) {
 
 // SendMines
 
-// MinePreCollisionStuff
+// STUB: CARMA2_HW 0x004dd1b0
+// STUB: CARMA2_SW 0x004d96b0
+void C2_HOOK_FASTCALL MinePreCollisionStuff(void) {
+    NOT_IMPLEMENTED();
+}
 
 // ActivateMine
 
@@ -991,7 +1050,13 @@ int C2_HOOK_FASTCALL SetPissedPeds(tPowerup* pPowerup, tCar_spec* pCar) {
     return pPowerup - gPowerup_array;
 }
 
-// SetGhostPeds
+// FUNCTION: CARMA2_HW 0x004de930
+// FUNCTION: CARMA2_SW 0x004dae30
+int C2_HOOK_FASTCALL SetGhostPeds(tPowerup* pPowerup, tCar_spec* pCar) {
+
+    TurnOnGhostPeds();
+    return pPowerup - gPowerup_array;
+}
 
 // FUNCTION: CARMA2_HW 0x004de960
 void C2_HOOK_FASTCALL ResetDancingPeds(tPowerup* pPowerup, tCar_spec* pCar) {
@@ -1232,7 +1297,18 @@ void C2_HOOK_FASTCALL SetSpinningPowerup(br_actor* pActor, int pOpacity) {
 
 // SetChangingPowerup
 
-// PedValium
+// FUNCTION: CARMA2_HW 0x004dfec0
+// FUNCTION: CARMA2_SW 0x004dc3c0
+int C2_HOOK_FASTCALL PedValium(tPowerup* pPowerup, tCar_spec* pCar) {
+
+    if (CalmDownAllPeds()) {
+        NewTextHeadupSlot(4, 0, 3000, -4, GetMiscString(eMiscString_pedestrians_are_calm_now));
+        DRS3StartSound2(gCar_outlet, eSoundId_PedValium, 1, 0xff, 0xff, -1, -1);
+        return pPowerup - gPowerup_array;
+    } else {
+        return -1;
+    }
+}
 
 // PowerupCancel
 

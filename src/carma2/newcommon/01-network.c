@@ -9,6 +9,7 @@
 #include "01-network.h"
 
 #include "04-netgame.h"
+#include "15-displays.h"
 #include "32-spark.h"
 #include "53-controls.h"
 #include "platform.h"
@@ -18,8 +19,10 @@
 #include "rec2_macros.h"
 
 #include "c2_string.h"
+#include <stddef.h>
 
 #include <stdlib.h>
+#include <string.h>
 
 // GLOBAL: CARMA2_HW 0x0068d95c
 // GLOBAL: CARMA2_SW 0x006879b4
@@ -239,9 +242,23 @@ void C2_HOOK_FASTCALL HaltNetServiceReentrancy(void) {
 // STUB: CARMA2_SW 0x00499900
 // NetSendHeadupToEverybody
 
-// STUB: CARMA2_HW 0x0049daf0
-// STUB: CARMA2_SW 0x00499c70
-// NetSendHeadupToPlayer
+// FUNCTION: CARMA2_HW 0x0049daf0
+// FUNCTION: CARMA2_SW 0x00499c70
+void C2_HOOK_FASTCALL NetSendHeadupToPlayer(char* pMessage, tPlayer_ID pPlayer) {
+    tNet_message* message;
+
+    if (gNet_mode != eNet_mode_none) {
+        if (pPlayer == gLocal_net_ID) {
+            if (gProgram_state.racing) {
+                NewTextHeadupSlot(4, 0, 3000, -4, pMessage);
+            }
+        } else {
+            message = NetBuildGuaranteedMessage(eNet_message_chunk_type_headup, 0);
+            strcpy((char*)message->contents.raw.data, pMessage);
+            NetGuaranteedSendMessageToPlayer(gCurrent_net_game, message, pPlayer, NULL);
+        }
+    }
+}
 
 // InitialisePlayerStati
 
@@ -262,8 +279,8 @@ void C2_HOOK_FASTCALL DisposeCurrentJoinPollGame(void) {
     }
 }
 
-// STUB: CARMA2_HW 0x0049ec70
-// STUB: CARMA2_SW 0x0049adf0
+// FUNCTION: CARMA2_HW 0x0049ec70
+// FUNCTION: CARMA2_SW 0x0049adf0
 void C2_HOOK_FASTCALL DoNextJoinPoll(void) {
 
     if (gTime_for_next_one) {
@@ -518,6 +535,8 @@ tNet_message* C2_HOOK_FASTCALL NetBuildGuaranteedMessage(tU8 pNet_message_type, 
     return the_message;
 }
 
+// FUNCTION: CARMA2_HW 0x004a5140
+// FUNCTION: CARMA2_SW 0x004a12c0
 tNet_message_chunk* C2_HOOK_FASTCALL NetGetToPlayerContentsSize(tNet_game_player_info* pPlayer, int pContents_size) {
     tNet_message* message;
     tNet_message_chunk* contents;
@@ -531,7 +550,7 @@ tNet_message_chunk* C2_HOOK_FASTCALL NetGetToPlayerContentsSize(tNet_game_player
         pPlayer->field_0xcc = message = NULL;
     }
     if (message == NULL) {
-        pPlayer->field_0xcc = message = NetAllocateMessage(sizeof(tMax_message) - sizeof(void*));
+        message = pPlayer->field_0xcc = NetAllocateMessage(sizeof(tMax_message) - sizeof(void*));
         message->header.field_0x16 = (tU16)sizeof(tNet_message_header);
         message->header.field_0x14 = 0;
     }
@@ -587,7 +606,20 @@ tNet_message_chunk* C2_HOOK_FASTCALL NetStartBroadcastContents(tNet_message_type
     return NULL;
 }
 
-// NetBroadcastContents
+// FUNCTION: CARMA2_HW 0x0049fb70
+// FUNCTION: CARMA2_SW 0x0049bcf0
+void C2_HOOK_FASTCALL NetBroadcastContents(tNet_message_chunk* pMessage) {
+    tNet_message_chunk* contents;
+    int i;
+
+    for (i = 0; i < gNumber_of_net_players; i++) {
+        if (i != gThis_net_player_index && i != INT_00659d34) {
+            contents = NetGetToPlayerContentsSize(&gNet_players[i], pMessage->raw.header.size);
+            memcpy(contents, pMessage, pMessage->raw.header.size);
+        }
+    }
+    INT_00659d34 = -1;
+}
 
 // FUNCTION: CARMA2_HW 0x0049fcf0
 // FUNCTION: CARMA2_SW 0x0049be70
@@ -1001,4 +1033,3 @@ void C2_HOOK_FASTCALL GetCheckSum(tNet_message* pMessage) {
 // StatReceivePacket
 
 // StatSendPacket
-
