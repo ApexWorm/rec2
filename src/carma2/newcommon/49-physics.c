@@ -81,6 +81,7 @@ br_model* gPed_spurt_model;
 // GLOBAL: CARMA2_HW 0x0069427c
 // GLOBAL: CARMA2_SW 0x0068e2d4
 int gPed_spurty_lumps_count;
+
 // GLOBAL: CARMA2_HW 0x00694268
 // GLOBAL: CARMA2_SW 0x0068e2c0
 int gPed_times[3];
