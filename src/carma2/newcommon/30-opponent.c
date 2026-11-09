@@ -179,7 +179,10 @@ tS16 C2_HOOK_FASTCALL FindNearestGeneralSection(tCar_spec* pCar, const br_vector
 #pragma auto_inline(on)
 #endif
 
-// FindNearestPathSection
+tS16 C2_HOOK_FASTCALL FindNearestPathSection(const br_vector3* pActor_coords, br_vector3* pPath_direction, br_vector3* pIntersect, br_scalar* pDistance) {
+
+    return FindNearestGeneralSection(NULL, pActor_coords, pPath_direction, pIntersect, pDistance);
+}
 
 // DeadStopCar
 
@@ -365,8 +368,8 @@ void C2_HOOK_FASTCALL CalcReturnToStartPointRoute(tOpponent_spec* pOpponent_spec
     C2_HOOK_BUG_ON(REC2_ASIZE(pOpponent_spec->next_sections) != 12);
     C2_HOOK_BUG_ON(sizeof(tRoute_section) != 4);
 
-    pOpponent_spec->nnext_sections = 0;
-    section = FindNearestGeneralSection(NULL, &pOpponent_spec->car_spec->car_master_actor->t.t.translate.t, &direction, &intersect, &distance);
+    ClearOpponentsProjectedRoute(pOpponent_spec);
+    section = FindNearestPathSection(&pOpponent_spec->car_spec->car_master_actor->t.t.translate.t, &direction, &intersect, &distance);
     BrVector3Normalise(&direction, &direction);
     if (BrVector3Dot(&pOpponent_spec->car_spec->direction, &direction) > 0.f) {
         AddToOpponentsProjectedRoute(pOpponent_spec, section, 1);
@@ -396,7 +399,10 @@ void C2_HOOK_FASTCALL CalcReturnToStartPointRoute(tOpponent_spec* pOpponent_spec
     }
 }
 
-// ClearOpponentsProjectedRoute
+void C2_HOOK_FASTCALL ClearOpponentsProjectedRoute(tOpponent_spec* pOpponent_spec) {
+
+    pOpponent_spec->nnext_sections = 0;
+}
 
 // FUNCTION: CARMA2_HW 0x004ab150
 // FUNCTION: CARMA2_SW 0x004a72c0
