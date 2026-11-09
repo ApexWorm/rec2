@@ -259,7 +259,7 @@ extern intptr_t C2_HOOK_CDECL ToggleFlapsCB2(br_actor* pActor, void* pCar);
 
 extern int C2_HOOK_FASTCALL ToggleFlapsCB(tPhysics_object* pCollision_info, void* pCar);
 
-// SendToggleFlaps
+extern void C2_HOOK_FASTCALL SendToggleFlaps(tCar_spec* pCar);
 
 extern void C2_HOOK_FASTCALL ToggleFlaps(void);
 
@@ -541,9 +541,9 @@ extern void C2_HOOK_FASTCALL EncodeNetShapeData(tU8* pData, tCar_spec* pCar);
 
 // Vector4Equal
 
-// CompressPlane
+extern void C2_HOOK_FASTCALL CompressPlane(tCompressed_vector4* pDest, const br_vector4* pSrc);
 
-// ExpandPlane
+extern void C2_HOOK_FASTCALL ExpandPlane(br_vector4* pDest, const tCompressed_vector4* pSrc);
 
 // CopySplitInMessage
 

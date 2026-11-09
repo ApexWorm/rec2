@@ -1076,13 +1076,20 @@ int C2_HOOK_FASTCALL ToggleFlapsCB(tPhysics_object* pCollision_info, void* pCar)
     return 0;
 }
 
-// SendToggleFlaps
+void C2_HOOK_FASTCALL SendToggleFlaps(tCar_spec* pCar) {
+    tNet_message_chunk* chunk;
+    tNet_game_player_info* player;
+
+    chunk = NetGetToHostContents(eNet_message_chunk_type_toggle_doors, 0);
+    player = NetPlayerFromCar(pCar);
+    if (player != NULL) {
+        chunk->toggle_doors.id = player->ID;
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x0042dd50
 // FUNCTION: CARMA2_SW 0x0042ddc0
 void C2_HOOK_FASTCALL ToggleFlaps(void) {
-    tNet_message_chunk* chunk;
-    tNet_game_player_info* player;
 
     if (gCountdown || gToo_poor_for_recovery_timeout) {
         return;
@@ -1090,11 +1097,7 @@ void C2_HOOK_FASTCALL ToggleFlaps(void) {
     if (gNet_mode == eNet_mode_none || gNet_mode == eNet_mode_host) {
         PhysicsObjectRecurse(gProgram_state.current_car.collision_info, ToggleFlapsCB, &gProgram_state.current_car);
     } else {
-        chunk = NetGetToHostContents(eNet_message_chunk_type_toggle_doors, 0);
-        player = NetPlayerFromCar(&gProgram_state.current_car);
-        if (player != NULL) {
-            chunk->toggle_doors.id = player->ID;
-        }
+        SendToggleFlaps(&gProgram_state.current_car);
     }
 }
 
@@ -1565,10 +1568,39 @@ void C2_HOOK_FASTCALL ARUndoModelMash(br_model* pModel, tCompressed_vector3* pSr
     SetModelForUpdate(pModel);
 }
 
-// STUB: CARMA2_HW 0x0043c0e0
-// STUB: CARMA2_SW 0x0043c130
+// FUNCTION: CARMA2_HW 0x0043c0e0
+// FUNCTION: CARMA2_SW 0x0043c130
 void C2_HOOK_FASTCALL ARApplyFlap(br_actor* pActor, br_angle pAngle) {
-    NOT_IMPLEMENTED();
+    tUser_crush_data* user;
+    tUser_crush_data* parent_user;
+    br_model* parent_model;
+    tCar_crush_flap_data* flap;
+    const br_vector3* hinge;
+    br_vector3 axis;
+
+    user = pActor->user;
+    if (user == NULL || user->crush_data == NULL) {
+        return;
+    }
+    flap = user->crush_data->flap_data;
+    if (flap == NULL) {
+        return;
+    }
+    flap->field_0x4 = (tU16)(flap->field_0x4 + pAngle);
+    hinge = &user->models[0]->vertices[flap->hinge0].p;
+    BrVector3Sub(&axis, &user->models[0]->vertices[flap->hinge1].p, hinge);
+    BrVector3Normalise(&axis, &axis);
+    BrMatrix34Translate(&pActor->t.t.mat,
+        -hinge->v[0],
+        -hinge->v[1],
+        -hinge->v[2]);
+    BrMatrix34PostRotate(&pActor->t.t.mat, flap->field_0x4, &axis);
+    parent_user = (tUser_crush_data*)pActor->parent->user;
+    parent_model = parent_user->models[0];
+    BrMatrix34PostTranslate(&pActor->t.t.mat,
+        parent_model->vertices[flap->field_0xc].p.v[0],
+        parent_model->vertices[flap->field_0xc].p.v[1],
+        parent_model->vertices[flap->field_0xc].p.v[2]);
 }
 
 // ARApplySplitWeld
@@ -1727,9 +1759,21 @@ void C2_HOOK_FASTCALL EncodeNetShapeData(tU8* pData, tCar_spec* pCar) {
 
 // Vector4Equal
 
-// CompressPlane
+// FUNCTION: CARMA2_HW 0x0043deb0
+// FUNCTION: CARMA2_SW 0x0043df00
+void C2_HOOK_FASTCALL CompressPlane(tCompressed_vector4* pDest, const br_vector4* pSrc) {
 
-// ExpandPlane
+    CompressVector3((tCompressed_vector3*)pDest, (const br_vector3*)pSrc, -1.0f, 1.0f);
+    pDest->v[3] = DRScalarToU16(pSrc->v[3], -2.5f, 2.5f);
+}
+
+// FUNCTION: CARMA2_HW 0x0043dee0
+// FUNCTION: CARMA2_SW 0x0043df30
+void C2_HOOK_FASTCALL ExpandPlane(br_vector4* pDest, const tCompressed_vector4* pSrc) {
+
+    ExpandVector3((br_vector3*)pDest, (const tCompressed_vector3*)pSrc, -1.0f, 1.0f);
+    pDest->v[3] = DRU16ToScalar(pSrc->v[3], -2.5f, 2.5f);
+}
 
 // CopySplitInMessage
 
@@ -1747,4 +1791,3 @@ void C2_HOOK_FASTCALL SetAllShapeStatusFlags(tCar_crush_network_shapes* pShapes)
         }
     }
 }
-
