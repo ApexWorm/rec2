@@ -627,6 +627,7 @@ void C2_HOOK_FASTCALL PipeSingleScreenWobble(int pWobble_x, int pWobble_y) {
 #endif
 
 // STUB: CARMA2_HW 0x004c80b0
+// STUB: CARMA2_SW 0x004c47e0
 void C2_HOOK_FASTCALL PipeSingleGrooveStop(int pGroove_index, br_matrix34* pMatrix, int pPath_interrupt, int pObject_interrupt, float pPath_resumption, float pObject_resumption) {
     NOT_IMPLEMENTED();
 }
