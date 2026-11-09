@@ -66,6 +66,14 @@ int gExplosives_on = 1;
 // GLOBAL: CARMA2_SW 0x006719a4
 int gPed_retain_root_mode = 0;
 
+// GLOBAL: CARMA2_HW 0x00677238
+// GLOBAL: CARMA2_SW 0x006719a8
+tPed_remap* gPed_remaps[10] = { 0 };
+
+// GLOBAL: CARMA2_HW 0x00677260
+// GLOBAL: CARMA2_SW 0x006719d0
+tPed_personality* gPed_personalities[50] = { 0 };
+
 // GLOBAL: CARMA2_HW 0x007447e0
 // GLOBAL: CARMA2_SW 0x0073b2a0
 float gPedestrian_speed_factor;
@@ -666,6 +674,14 @@ void C2_HOOK_FASTCALL SetThisPedPhysicing(tPedestrian* pPed) {
     SetCharacterPhysicsLevelAR(pPed->character, 5);
 }
 
+#ifdef REC2_MATCHING
+// FUNCTION: CARMA2_HW 0x004d3600
+// FUNCTION: CARMA2_SW 0x004cfcf0
+void C2_HOOK_FASTCALL FUN_004d3600(void) {
+    /* Unused */
+}
+#endif
+
 // InitProcessData
 
 // PedFallingForever
@@ -943,9 +959,19 @@ void C2_HOOK_FASTCALL UnmakeMaterialBlendy(br_material* pMaterial) {
   BrMaterialUpdate(pMaterial, BR_MATU_ALL);
 }
 
-// TurnOffCollisions
+// FUNCTION: CARMA2_HW 0x004d6b90
+// FUNCTION: CARMA2_SW 0x004d3190
+void C2_HOOK_FASTCALL TurnOffCollisions(tPhysics_object* pObject) {
 
-// TurnOnCollisions
+    pObject->flags |= 0x4;
+}
+
+// FUNCTION: CARMA2_HW 0x004d6c00
+// FUNCTION: CARMA2_SW 0x004d3200
+void C2_HOOK_FASTCALL TurnOnCollisions(tPhysics_object* pObject) {
+
+    pObject->flags &= ~0x4;
+}
 
 // FUNCTION: CARMA2_HW 0x004d6b70
 // FUNCTION: CARMA2_SW 0x004d3170
@@ -972,12 +998,6 @@ void C2_HOOK_FASTCALL ModelUpdatePrimitiveMaterials(br_model* pModel) {
 // TurnOnGhostPeds
 
 // TurnOffGhostPeds
-
-// FUNCTION: CARMA2_HW 0x004d6b90
-// FUNCTION: CARMA2_SW 0x004d3190
-void C2_HOOK_FASTCALL DisableCollisionsForEthereal(tPhysics_object* pCollision_info) {
-    pCollision_info->flags |= 0x4;
-}
 
 // FUNCTION: CARMA2_HW 0x004d6c10
 // FUNCTION: CARMA2_SW 0x004d3210
@@ -1025,7 +1045,11 @@ void C2_HOOK_FASTCALL AdjustPedDiagnostics(tU32 pSubject_index, void* pUnused2, 
     (void)pUnused4;
 }
 
-// CalmDownAllPeds
+// STUB: CARMA2_HW 0x004d6dc0
+// STUB: CARMA2_SW 0x004d33c0
+int C2_HOOK_FASTCALL CalmDownAllPeds(void) {
+    NOT_IMPLEMENTED();
+}
 
 // FUNCTION: CARMA2_HW 0x004d6f10
 // FUNCTION: CARMA2_SW 0x004d3510
@@ -1163,7 +1187,18 @@ void C2_HOOK_FASTCALL DisposeRemap(tPed_remap* pRemap) {
     }
 }
 
-// DisposeAllLoadedRemaps
+// FUNCTION: CARMA2_HW 0x00404700
+// FUNCTION: CARMA2_SW 0x00404700
+void C2_HOOK_FASTCALL DisposeAllLoadedRemaps(void) {
+    int i;
+
+    for (i = 0; i < 10; i++) {
+        if (gPed_remaps[i] != NULL) {
+            DisposeRemap(gPed_remaps[i]);
+            gPed_remaps[i] = NULL;
+        }
+    }
+}
 
 // FindOrOpenRemap
 
@@ -1350,6 +1385,8 @@ void C2_HOOK_FASTCALL SetObjectV(tPhysics_object* pObject, const br_vector3* pV)
 
 // MakeCharacterPhysicworthy
 
+// FUNCTION: CARMA2_HW 0x00409340
+// FUNCTION: CARMA2_SW 0x00409340
 void C2_HOOK_FASTCALL RecalculateOrientationOfRoot(tPed_character_instance* pCharacter) {
     tPed_form* form;
     br_matrix34* character_matrix;
@@ -1362,9 +1399,30 @@ void C2_HOOK_FASTCALL RecalculateOrientationOfRoot(tPed_character_instance* pCha
     BrVector3Set((br_vector3*)pCharacter->field_0x8c.m[3], 0.0f, 0.0f, 0.0f);
 }
 
-// BonerActiveHalted2
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
 
-// CharacterNoLongerPhysicworthy
+// STUB: CARMA2_HW 0x00409400
+// STUB: CARMA2_SW 0x00409400
+int C2_HOOK_FASTCALL BonerActiveHalted2(tPed_character_instance* pCharacter, undefined4 pArg2) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
+
+// FUNCTION: CARMA2_HW 0x004093e0
+// FUNCTION: CARMA2_SW 0x004093e0
+int C2_HOOK_FASTCALL CharacterNoLongerPhysicworthy(tPed_character_instance* pCharacter) {
+
+    if ((pCharacter->field_0x14 & 4) == 0) {
+        return 0x1f;
+    }
+    BonerActiveHalted2(pCharacter, 1);
+    return 0;
+}
 
 // SetCharacterPhysicsLevel
 
@@ -1474,7 +1532,14 @@ int C2_HOOK_FASTCALL SetCharacterBoneModel(tPed_character_instance* pCharacter, 
     return 1;
 }
 
-// SetCharacterBoneModelP
+// FUNCTION: CARMA2_HW 0x0040b500
+// FUNCTION: CARMA2_SW 0x0040b4f0
+void C2_HOOK_FASTCALL SetCharacterBoneModelP(tPed_character_instance* pCharacter, int pBone_index, br_model* pModel, int pArg4) {
+    if (pCharacter->field_0x4 >= 0) {
+        pCharacter->field_0xa = (tS8)pArg4;
+        pCharacter->personality->form->actor_sets[(tS8)pCharacter->field_0x4].actors[pBone_index]->model = pModel;
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x0040b530
 // FUNCTION: CARMA2_SW 0x0040b520
@@ -1503,7 +1568,12 @@ int C2_HOOK_FASTCALL GetCharacterModelSet(tPed_character_instance* pCharacter) {
 
 // BonerPassiveCollision
 
-// BonerActiveHalted
+// FUNCTION: CARMA2_HW 0x0040b760
+// FUNCTION: CARMA2_SW 0x0040b750
+int C2_HOOK_FASTCALL BonerActiveHalted(tPed_character_instance* pCharacter) {
+
+    return BonerActiveHalted2(pCharacter, 0);
+}
 
 // BonerPedMovedByPhysics
 
