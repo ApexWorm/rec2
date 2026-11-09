@@ -214,6 +214,7 @@ br_pixelmap* gFrontend_wrecks_pixelmap;
 tU32 gFrontend_wrecks_previous_update;
 
 // GLOBAL: CARMA2_HW 0x00763844
+// GLOBAL: CARMA2_SW 0x00759da4
 br_actor* gFrontend_wrecks_light;
 
 // GLOBAL: CARMA2_HW 0x00686834
@@ -2051,6 +2052,7 @@ int C2_HOOK_FASTCALL BuyCurrentCar(tFrontend_spec* pFrontend) {
 }
 
 // FUNCTION: CARMA2_HW 0x0046e830
+// FUNCTION: CARMA2_SW 0x0046ded0
 int C2_HOOK_FASTCALL WrecksInFunc(tFrontend_spec* pFrontend) {
     int car_count;
     int i;
