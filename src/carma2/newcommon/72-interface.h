@@ -410,7 +410,7 @@ extern void C2_HOOK_FASTCALL DisplayJoystickSettings(tFrontend_spec* pFrontend);
 
 extern void C2_HOOK_FASTCALL SaveAllJoystickData(void);
 
-// Controls_SwitchKeymapSet
+extern int C2_HOOK_FASTCALL Controls_SwitchKeymapSet(tFrontend_spec* pFrontend);
 
 extern int C2_HOOK_FASTCALL Controls_KeyUp(tFrontend_spec* pFrontend);
 
@@ -418,7 +418,7 @@ extern int C2_HOOK_FASTCALL Controls_KeyDown(tFrontend_spec* pFrontend);
 
 // Controls_Infunc
 
-// Controls_Outfunc
+extern int C2_HOOK_FASTCALL Controls_Outfunc(tFrontend_spec* pFrontend);
 
 extern int C2_HOOK_FASTCALL Controls_SlotActivated(tFrontend_spec* pFrontend);
 

@@ -401,9 +401,6 @@ tStruct_00686508 gUNK_006886e8;
 // GLOBAL: CARMA2_HW 0x00686504
 br_model* gFrontend_C_model_from;
 
-// GLOBAL: CARMA2_HW 0x006886bc
-br_model* gFrontend_C_model_to;
-
 // GLOBAL: CARMA2_HW 0x006864e0
 int gFrontend_backdrop0_opacity_mode;
 
@@ -429,7 +426,10 @@ int gValid_stashed_save_game; // FIXME: rename variable?
 tConnected_items gControls_scroller;
 
 // GLOBAL: CARMA2_HW 0x00688458
-char* gKey_names[153];
+char* gKey_names[153] = { 0 };
+
+// GLOBAL: CARMA2_HW 0x006886bc
+br_model* gFrontend_C_model_to = NULL;
 
 // GLOBAL: CARMA2_HW 0x00604888
 // GLOBAL: CARMA2_SW 0x005ff7b8
@@ -3033,7 +3033,52 @@ void C2_HOOK_FASTCALL DisplayJoystickSettings(tFrontend_spec* pFrontend) {
 
 // SaveAllJoystickData
 
-// Controls_SwitchKeymapSet
+// FUNCTION: CARMA2_HW 0x00472440
+int C2_HOOK_FASTCALL Controls_SwitchKeymapSet(tFrontend_spec* pFrontend) {
+    int new_index;
+
+    new_index = gFrontend_selected_item_index - 39;
+    {
+        FILE* f;
+        tPath_name the_path;
+        int i;
+
+        PathCat(the_path, gApplication_path, "KEYMAP_X.TXT");
+        the_path[strlen(the_path) - 5] = '0' + gKey_map_index;
+        PDFileUnlock(the_path);
+        f = DRfopen(the_path, "wb");
+        if (f == NULL) {
+            FatalError(kFatalError_CouldNotOpenKeyMapFile);
+        }
+        for (i = 0; i < (int)REC2_ASIZE(gKey_mapping); i++) {
+            fprintf(f, "%d", gKey_mapping[i]);
+            fputc('\r', f);
+            fputc('\n', f);
+        }
+        PFfclose(f);
+    }
+    gKey_map_index = new_index;
+    {
+        FILE* f;
+        tPath_name the_path;
+        int i;
+
+        PathCat(the_path, gApplication_path, "KEYMAP_X.TXT");
+        the_path[strlen(the_path) - 5] = '0' + gKey_map_index;
+        f = DRfopen(the_path, "rt");
+        if (f == NULL) {
+            FatalError(kFatalError_CouldNotOpenKeyMapFile);
+        }
+        for (i = 0; i < (int)REC2_ASIZE(gKey_mapping); i++) {
+            fscanf(f, "%d", &gKey_mapping[i]);
+        }
+        PFfclose(f);
+    }
+    SelectThisItemIn(pFrontend, 2, gKey_map_index + 39);
+    RefreshScrollSet(pFrontend);
+    FuckWithWidths(pFrontend);
+    return 0;
+}
 
 // FUNCTION: CARMA2_HW 0x004725a0
 // FUNCTION: CARMA2_SW 0x00471b30
@@ -3059,7 +3104,31 @@ int C2_HOOK_FASTCALL Controls_KeyDown(tFrontend_spec* pFrontend) {
 
 // Controls_Infunc
 
-// Controls_Outfunc
+// FUNCTION: CARMA2_HW 0x00472a30
+int C2_HOOK_FASTCALL Controls_Outfunc(tFrontend_spec* pFrontend) {
+    FILE* f;
+    tPath_name the_path;
+    int i;
+
+    Generic_Outfunc(pFrontend);
+    for (i = 0; i < (int)REC2_ASIZE(gKey_names); i++) {
+        BrMemFree(gKey_names[i]);
+    }
+    PathCat(the_path, gApplication_path, "KEYMAP_X.TXT");
+    the_path[strlen(the_path) - 5] = '0' + gKey_map_index;
+    PDFileUnlock(the_path);
+    f = DRfopen(the_path, "wb");
+    if (f == NULL) {
+        FatalError(kFatalError_CouldNotOpenKeyMapFile);
+    }
+    for (i = 0; i < (int)REC2_ASIZE(gKey_mapping); i++) {
+        fprintf(f, "%d", gKey_mapping[i]);
+        fputc('\r', f);
+        fputc('\n', f);
+    }
+    PFfclose(f);
+    return 1;
+}
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)

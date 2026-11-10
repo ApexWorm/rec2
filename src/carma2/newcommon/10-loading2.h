@@ -13,6 +13,7 @@
 #include "rec2_types.h"
 
 extern int gCamera_type;
+extern int gKey_map_index;
 
 extern const char* gPedTextTxtPath;
 extern int gGroove_funk_offset;
