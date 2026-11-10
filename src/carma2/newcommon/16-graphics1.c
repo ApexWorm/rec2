@@ -54,11 +54,24 @@ br_pixelmap* gRear_pixelmap;
 br_pixelmap* gEvalu;
 
 // GLOBAL: CARMA2_HW 0x006a22f8
-tWobble_spec gWobble_array[5];
+tWobble_spec gWobble_array[5] = { 0 };
+
+// GLOBAL: CARMA2_HW 0x006a2348
+int gINT_006a2348 = 0;
+
+// GLOBAL: CARMA2_HW 0x006a234c
+float gPrevious_rear_yon = 0.f;
+
+// GLOBAL: CARMA2_HW 0x006a2350
+int gINT_006a2350[2] = { 0 };
 
 // GLOBAL: CARMA2_HW 0x00705080
 // GLOBAL: CARMA2_SW 0x006fbb40
-float gCosine_array[64];
+float gCosine_array[65] = { 0 };
+
+// GLOBAL: CARMA2_HW 0x00705184
+// GLOBAL: CARMA2_SW 0x006fbc44
+int gScreen_wobble_y = 0;
 
 // GLOBAL: CARMA2_HW 0x0065fdc8
 // GLOBAL: CARMA2_SW 0x0065a708
@@ -107,10 +120,6 @@ br_actor* gShadow_actor;
 // GLOBAL: CARMA2_HW 0x00705188
 // GLOBAL: CARMA2_SW 0x006fbc48
 int gScreen_wobble_x;
-
-// GLOBAL: CARMA2_HW 0x00705184
-// GLOBAL: CARMA2_SW 0x006fbc44
-int gScreen_wobble_y;
 
 // GLOBAL: CARMA2_HW 0x0070518c
 // GLOBAL: CARMA2_SW 0x006fbc4c
