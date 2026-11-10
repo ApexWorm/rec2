@@ -213,8 +213,14 @@ void C2_HOOK_FASTCALL DimRectangleClipped(br_pixelmap* pPixelmap, int pLeft, int
 
 // FUNCTION: CARMA2_HW 0x0047d260
 void C2_HOOK_FASTCALL DRPixelmapBlendedLine(br_pixelmap* pMap, int pX1, int pY1, int pX2, int pY2, br_uint_32 pColour, br_pixelmap* pPalette) {
+    br_uint_32 colour;
+
     (void)pPalette;
-    DRDrawLine(pMap, pX1, pY1, pX2, pY2, (int)pColour);
+    colour = pColour;
+    if (gBack_screen->type != BR_PMT_INDEX_8) {
+        colour = PaletteEntry16Bit(gRender_palette, colour);
+    }
+    BrPixelmapLine(pMap, pX1, pY1, pX2, pY2, colour);
 }
 
 // DR8BitFancyDrawLine
