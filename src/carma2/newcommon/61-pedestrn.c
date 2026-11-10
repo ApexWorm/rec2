@@ -829,7 +829,10 @@ void C2_HOOK_FASTCALL ScoreForKilledPedestrian(tPedestrian* pPed, float pHeight)
 
 // DismemberPed
 
-// DamagePedestrian
+// STUB: CARMA2_HW 0x004cd640
+void C2_HOOK_FASTCALL DamagePedestrian(tPedestrian* pPed, int pDamage, int pArg3, int pArg4, tPhysics_object* pObject) {
+    NOT_IMPLEMENTED();
+}
 
 // SetLastHitter
 

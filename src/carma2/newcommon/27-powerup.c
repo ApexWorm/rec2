@@ -253,7 +253,41 @@ void C2_HOOK_FASTCALL LoadPowerups(void) {
 
 // InitTail
 
-// ThisObjectHitAMineSoSpamItUpUsingThisPowerupsSettings
+// FUNCTION: CARMA2_HW 0x004d9d00
+void C2_HOOK_FASTCALL ThisObjectHitAMineSoSpamItUpUsingThisPowerupsSettings(tPhysics_object* pObject, int pPowerup_index) {
+    tPedestrian* ped;
+    int old_dismemberfest;
+
+    if (pObject->field_0x1a0 & 0xf0000) {
+        if (IsItReallyOKThatWeDontMakeAnyEffortToProtectAnySadFuckersOutThereThatDontWishToSeeInnocentPeopleBlownToBitsByHighExplosiveMinesAndShells()) {
+            ped = ((tPed_character_instance*)pObject->owner)->ped;
+            if (!(ped->character->field_0x14 & 0x4) && !gPHIL_doing_physics) {
+                SetThisPedPhysicing(ped);
+            }
+            if (pPowerup_index != 14) {
+                BrVector3Set(&pObject->v, 0.f, 0.f, 0.f);
+            }
+            pObject->v.v[1] += FRandomBetween(0.7f, 1.f) / (pObject->M * 6.9);
+            pObject->omega.v[2] += (FRandomPosNeg(0.5f) * TAU) / pObject->M;
+            pObject->omega.v[0] += (FRandomPosNeg(0.5f) * TAU) / pObject->M;
+            pObject->disable_move_rotate = 0;
+            old_dismemberfest = gPed_dismemberfest;
+            gPed_dismemberfest = 1;
+            DamagePedestrian(((tPed_character_instance*)pObject->owner)->ped, 500, 0x61, 0x61, gProgram_state.current_car.collision_info);
+            gPed_dismemberfest = old_dismemberfest;
+        }
+    } else if (pObject != NULL && pObject->flags_0x238 == 0x10) {
+        pObject->v.v[1] += FRandomBetween(3.f, 4.f) / (pObject->M * 6.9);
+        pObject->omega.v[2] += (FRandomPosNeg(1.75f) * TAU) / pObject->M;
+        pObject->omega.v[0] += (FRandomPosNeg(1.75f) * TAU) / pObject->M;
+        pObject->disable_move_rotate = 0;
+    } else {
+        pObject->v.v[1] += FRandomBetween(1.f, 2.f) / (pObject->M * 6.9);
+        pObject->omega.v[2] += (FRandomPosNeg(0.5f) * TAU) / pObject->M;
+        pObject->omega.v[0] += (FRandomPosNeg(0.5f) * TAU) / pObject->M;
+        pObject->disable_move_rotate = 0;
+    }
+}
 
 // InitMineShit
 
