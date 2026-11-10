@@ -21,6 +21,7 @@
 #include "60-phil.h"
 #include "63-loading3.h"
 #include "72-interface.h"
+#include "c2_stdio.h"
 #include "globvars.h"
 #include "globvrpb.h"
 #include "platform.h"
@@ -395,7 +396,37 @@ void C2_HOOK_FASTCALL CheckForVampireWinner(void) {
     }
 }
 
-// PlayerIsInfected
+// FUNCTION: CARMA2_HW 0x0049b540
+// FUNCTION: CARMA2_SW 0x004976c0
+void C2_HOOK_FASTCALL PlayerIsInfected(tNet_game_player_info* pPlayer) {
+    int i;
+    char s[256];
+
+    C2_HOOK_BUG_ON(REC2_ASIZE(pPlayer->car->power_up_levels) != 3);
+
+    if (!pPlayer->field_0x80) {
+        MakeCarIt(pPlayer->car);
+        pPlayer->car->invulnerable_no_wastage = 1;
+        pPlayer->car->invulnerable_no_crushage = 1;
+        pPlayer->car->invulnerable_no_damage = 1;
+        pPlayer->field_0x80 = 1;
+        for (i = 0; i < (int)REC2_ASIZE(pPlayer->car->power_up_levels); i++) {
+            pPlayer->car->power_up_levels[i] = pPlayer->car->power_up_slots[i];
+        }
+        if (gNet_mode == eNet_mode_host) {
+            sprintf(s, "%s", GetMiscString(186));
+            NetSendHeadupToPlayer(s, pPlayer->ID);
+            for (i = 0; i < gNumber_of_net_players; i++) {
+                if (&gNet_players[i] != pPlayer) {
+                    sprintf(s, "%s %s", pPlayer->player_name, GetMiscString(185));
+                    NetSendHeadupToPlayer(s, gNet_players[i].ID);
+                }
+            }
+        }
+        pPlayer->score2 = -1 - GetTotalTime();
+        CheckForVampireWinner();
+    }
+}
 
 // FarEnoughAway
 

@@ -836,7 +836,10 @@ void C2_HOOK_FASTCALL FreeSmokeShadeTables(void) {
 
 // DisposeKevStuffCar
 
-// MakeCarIt
+// STUB: CARMA2_HW 0x004fe360
+void C2_HOOK_FASTCALL MakeCarIt(tCar_spec* pCar) {
+    NOT_IMPLEMENTED();
+}
 
 // StopCarBeingIt
 

@@ -96,7 +96,7 @@ extern void C2_HOOK_FASTCALL DeclareWinner(int pWinner_index);
 
 extern void C2_HOOK_FASTCALL CheckForVampireWinner(void);
 
-// PlayerIsInfected
+extern void C2_HOOK_FASTCALL PlayerIsInfected(tNet_game_player_info* pPlayer);
 
 // FarEnoughAway
 
