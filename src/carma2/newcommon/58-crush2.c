@@ -67,6 +67,10 @@ float gWobble_spam_z[8] = { 0.4f, -0.25f, 0.0f, 0.25f, 0.0f, 0.15f, -0.4f, -0.15
 // GLOBAL: CARMA2_SW 0x0058b058
 float gWheel_circ_to_width = 0.16f;
 
+// GLOBAL: CARMA2_HW 0x00590068
+// GLOBAL: CARMA2_SW 0x0058b060
+tU8 DAT_00590068[12] = { 20, 20, 0, 10, 10, 10, 10, 10, 10, 10, 10, 10 };
+
 void C2_HOOK_FASTCALL CheckLastCar(void) {
     if (gNet_mode == eNet_mode_none && GetCarCount(eVehicle_opponent) != 0 && NumberOfOpponentsLeft() == 0) {
         if (gCurrent_race.race_spec->race_type == kRaceType_Carma1 || gCurrent_race.race_spec->race_type == kRaceType_Cars) {
@@ -248,19 +252,44 @@ void C2_HOOK_FASTCALL SetSmokeLastDamageLevel(tCar_spec* pCar) {
     }
 }
 
-#ifdef REC2_MATCHING
-#pragma auto_inline(off)
-#endif
-
-// STUB: CARMA2_HW 0x00440230
-// STUB: CARMA2_SW 0x00440310
+// FUNCTION: CARMA2_HW 0x00440230
+// FUNCTION: CARMA2_SW 0x00440310
 void C2_HOOK_FASTCALL SortOutSmoke(tCar_spec* pCar) {
-    NOT_IMPLEMENTED();
-}
+    int i;
+    int colour;
+    int old_colour;
+    int step;
+    int smoking;
 
-#ifdef REC2_MATCHING
-#pragma auto_inline(on)
-#endif
+    C2_HOOK_BUG_ON(REC2_ASIZE(DAT_00590068) != 12);
+
+    smoking = 0;
+    if (pCar != NULL && pCar->driver > eDriver_5) {
+        for (i = 0; i < (int)REC2_ASIZE(pCar->damage_units); i++) {
+            step = DAT_00590068[i];
+            if (step != 0) {
+                colour = (99 - pCar->damage_units[i].damage_level) / step;
+                if (colour <= 2) {
+                    smoking = 1;
+                }
+                if (pCar->damage_units[i].damage_level == pCar->damage_units[i].smoke_last_level) {
+                    continue;
+                }
+                step = DAT_00590068[i];
+                if (step != 0 && pCar->damage_units[i].damage_level > pCar->damage_units[i].smoke_last_level) {
+                    old_colour = (99 - pCar->damage_units[i].smoke_last_level) / step;
+                    if (step > 0 && colour != old_colour && colour <= 2) {
+                        ConditionalSmokeColumn(pCar, i, colour);
+                    }
+                }
+            }
+        }
+        if (!smoking && IsCarSmoking(pCar)) {
+            StopCarSmoking(pCar);
+        }
+        SetSmokeLastDamageLevel(pCar);
+    }
+}
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)

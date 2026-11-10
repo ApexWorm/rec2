@@ -22,6 +22,7 @@ extern int gTime_per_ped_kill[3];
 extern float gWobble_spam_y[8];
 extern float gWobble_spam_z[8];
 extern float gWheel_circ_to_width;
+extern tU8 DAT_00590068[12];
 
 extern void C2_HOOK_FASTCALL CheckLastCar(void);
 
