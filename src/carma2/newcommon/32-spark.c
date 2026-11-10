@@ -81,6 +81,10 @@ int gN_BR_smoke_structs;
 // GLOBAL: CARMA2_HW 0x006a8638
 br_pixelmap* gFlame_map[20];
 
+// GLOBAL: CARMA2_HW 0x006a9180
+// GLOBAL: CARMA2_SW 0x006a2bd0
+tShrapnel gShrapnel[30] = { 0 };
+
 // GLOBAL: CARMA2_HW 0x006a96a8
 // GLOBAL: CARMA2_SW 0x006a30f8
 tSmoke_column gSmoke_column[10] = { 0 };
@@ -96,6 +100,10 @@ br_model* gLollipop_model;
 // GLOBAL: CARMA2_HW 0x006aa59c
 // GLOBAL: CARMA2_SW 0x006a3fec
 int gColumn_flags;
+
+// GLOBAL: CARMA2_HW 0x006aa584
+// GLOBAL: CARMA2_SW 0x006a3fd0
+int gShrapnel_flags;
 
 // GLOBAL: CARMA2_HW 0x006aa588
 // GLOBAL: CARMA2_SW 0x006a3fd8
@@ -265,7 +273,27 @@ void C2_HOOK_FASTCALL LoadInShrapnel(void) {
 
 // KillShrapnel
 
-// DisposeShrapnel
+// FUNCTION: CARMA2_HW 0x004f8c10
+// FUNCTION: CARMA2_SW 0x004f4290
+void C2_HOOK_FASTCALL DisposeShrapnel(void) {
+    int i;
+
+    C2_HOOK_BUG_ON(REC2_ASIZE(gShrapnel) != 30);
+    C2_HOOK_BUG_ON(sizeof(tShrapnel) != 0x2c);
+    C2_HOOK_BUG_ON(REC2_ASIZE(gSmoke_column) != 10);
+
+    for (i = 0; i < (int)REC2_ASIZE(gShrapnel); i++) {
+        if ((gShrapnel_flags & (1 << i)) && gShrapnel[i].actor->parent != NULL) {
+            BrActorRemove(gShrapnel[i].actor);
+        }
+        BrActorFree(gShrapnel[i].actor);
+    }
+    gShrapnel_flags = 0;
+    BrModelRemove(gShrapnel_model[0]);
+    BrModelRemove(gShrapnel_model[1]);
+    BrModelFree(gShrapnel_model[0]);
+    BrModelFree(gShrapnel_model[1]);
+}
 
 // ReplayShrapnel
 
