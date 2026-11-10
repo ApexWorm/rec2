@@ -1126,8 +1126,8 @@ int C2_HOOK_FASTCALL InsertQuad(tSmash_quad_mapping* pMapping, br_actor* pActor,
     memset(v, 0, sizeof(v));
     max_vertices = BrResSize(model->vertices) / sizeof(br_vertex);
     max_faces = BrResSize(model->faces) / sizeof(br_face);
-    mid_u = (pCorners[0]->map.v[0] + pCorners[1]->map.v[0] + pCorners[2]->map.v[0] + pCorners[3]->map.v[0]) * 0.25f;
-    mid_v = (pCorners[0]->map.v[1] + pCorners[1]->map.v[1] + pCorners[2]->map.v[1] + pCorners[3]->map.v[1]) * 0.25f;
+    mid_u = (((pCorners[1]->map.v[0] + pCorners[3]->map.v[0]) + pCorners[2]->map.v[0]) + pCorners[0]->map.v[0]) * 0.25f;
+    mid_v = (((pCorners[2]->map.v[1] + pCorners[3]->map.v[1]) + pCorners[1]->map.v[1]) + pCorners[0]->map.v[1]) * 0.25f;
     for (i = 0; i < 4; i++) {
         if (pCorners[i]->map.v[0] < mid_u) {
             index = 0;
