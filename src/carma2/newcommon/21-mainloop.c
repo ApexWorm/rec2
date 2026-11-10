@@ -49,6 +49,7 @@ int gPed_count;
 int gQueued_wasted_messages[5] = { 0 };
 
 // GLOBAL: CARMA2_HW 0x0068c75c
+// GLOBAL: CARMA2_SW 0x006867ac
 int gCompletion_bonus_post_race = 0;
 
 // GLOBAL: CARMA2_HW 0x0068c760
