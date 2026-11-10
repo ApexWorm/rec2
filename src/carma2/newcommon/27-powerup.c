@@ -41,17 +41,25 @@ int gInventory[20];
 // GLOBAL: CARMA2_SW 0x0069aac4
 int gINT_006a0a6c;
 
-// GLOBAL: CARMA2_HW 0x006a0a5c
-// GLOBAL: CARMA2_SW 0x0069aab4
-int gINT_006a0a5c;
+// GLOBAL: CARMA2_HW 0x006a0960
+// GLOBAL: CARMA2_SW 0x0069a9b8
+tRepulse_link gRepulse_links[6] = { 0 };
+
+// GLOBAL: CARMA2_HW 0x006a0a50
+// GLOBAL: CARMA2_SW 0x0069aaa8
+tU8* gRace_powerup_respawn_bools = NULL;
+
+// GLOBAL: CARMA2_HW 0x006a0a54
+// GLOBAL: CARMA2_SW 0x0069aaac
+tPowerup* gPowerup_array = NULL;
 
 // GLOBAL: CARMA2_HW 0x006a0a58
 // GLOBAL: CARMA2_SW 0x0069aab0
 int gInventory_selected = 0;
 
-// GLOBAL: CARMA2_HW 0x006a0960
-// GLOBAL: CARMA2_SW 0x0069a9b8
-tRepulse_link gRepulse_links[6];
+// GLOBAL: CARMA2_HW 0x006a0a5c
+// GLOBAL: CARMA2_SW 0x0069aab4
+int gINT_006a0a5c = 0;
 
 // GLOBAL: CARMA2_HW 0x006a0ad4
 // GLOBAL: CARMA2_SW 0x0069ab2c
@@ -170,14 +178,6 @@ tU32 gInventory_timeout;
 // GLOBAL: CARMA2_HW 0x0079ec50
 // GLOBAL: CARMA2_SW 0x007951b0
 int gInstant_handbrake;
-
-// GLOBAL: CARMA2_HW 0x006a0a54
-// GLOBAL: CARMA2_SW 0x0069aaac
-tPowerup* gPowerup_array;
-
-// GLOBAL: CARMA2_HW 0x006a0a50
-// GLOBAL: CARMA2_SW 0x0069aaa8
-tU8* gRace_powerup_respawn_bools;
 
 // FUNCTION: CARMA2_HW 0x004d8d10
 // FUNCTION: CARMA2_SW 0x004d5240
