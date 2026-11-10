@@ -45,7 +45,10 @@ const char* gExplosion_rotate_names[2] = {
 
 // GLOBAL: CARMA2_HW 0x006a27f0
 // GLOBAL: CARMA2_SW 0x0069c848
-tSkid gSkids[100];
+tSkid gSkids[100] = { 0 };
+
+// GLOBAL: CARMA2_HW 0x006a32e0
+int gINT_006a32e0 = 0;
 
 // GLOBAL: CARMA2_HW 0x006a27e8
 // GLOBAL: CARMA2_SW 0x0069c840
@@ -284,5 +287,14 @@ void C2_HOOK_FASTCALL InitCarSkidStuff(tCar_spec* pCar) {
     }
 }
 
-// SkidsPerFrame
+// FUNCTION: CARMA2_HW 0x004ea720
+void C2_HOOK_FASTCALL SkidsPerFrame(void) {
+    int skid;
+
+    for (skid = 0; skid < (int)REC2_ASIZE(gSkids); skid++) {
+        if (gSkids[skid].actor->render_style != BR_RSTYLE_NONE) {
+            gSkids[skid].actor->t.t.translate.t = gSkids[skid].pos;
+        }
+    }
+}
 
