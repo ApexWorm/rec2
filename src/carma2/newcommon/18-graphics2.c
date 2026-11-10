@@ -46,11 +46,11 @@ int gCursor_line_width = 5;
 
 // GLOBAL: CARMA2_HW 0x0067be98
 // GLOBAL: CARMA2_SW 0x00676608
-tTransient_bm gTransient_bitmaps[50];
+tTransient_bm gTransient_bitmaps[50] = { 0 };
 
 // GLOBAL: CARMA2_HW 0x0067c348
 // GLOBAL: CARMA2_SW 0x00676ab8
-int gNext_transient;
+int gNext_transient = 0;
 
 // GLOBAL: CARMA2_HW 0x0067c390
 // GLOBAL: CARMA2_SW 0x00676b04
