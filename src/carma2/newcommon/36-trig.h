@@ -48,13 +48,13 @@ extern void C2_HOOK_FASTCALL DRMatrix34RotateY(br_matrix34* mat, br_angle ry);
 
 // DRMatrix34RotateZ
 
-extern void C2_HOOK_FASTCALL DRMatrix34PostRotateX(br_matrix34* pMat, br_angle pAngle);
+extern void C2_HOOK_FASTCALL DRMatrix34PostRotateX(br_matrix34* mat, br_angle rx);
 
 extern void C2_HOOK_FASTCALL DRMatrix34PostRotateY(br_matrix34* mat, br_angle ry);
 
 // DRMatrix34PreRotateZ
 
-extern void C2_HOOK_FASTCALL DRMatrix34PostRotateZ(br_matrix34* pMat, br_angle pAngle);
+extern void C2_HOOK_FASTCALL DRMatrix34PostRotateZ(br_matrix34* mat, br_angle rz);
 
 // DRMatrix23Rotate
 

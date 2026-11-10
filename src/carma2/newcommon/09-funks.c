@@ -226,7 +226,7 @@ void C2_HOOK_FASTCALL PathGrooveBastard(tGroovidelic_spec* pGroove, tU32 pTime, 
                       : ((MODE) == eMove_absolute \
                                 ? (PERIOD) \
                                 : ((MODE) == eMove_linear \
-                                          ? ((PERIOD) != 0.0f ? MapSawToTriangle(SAW(TIME, PERIOD)) * 360.0 : 0.0) \
+                                          ? ((PERIOD) != 0.0f ? MapSawToTriangle((float)(SAW(TIME, PERIOD))) * 360.0 : 0.0) \
                                           : ((MODE) == eMove_flash \
                                                     ? (fmod((TIME), (PERIOD)) * 2.0 > (PERIOD) ? -360.0 : 360.0) \
                                                     : ((MODE) == eMove_texturebits \
@@ -241,7 +241,7 @@ void C2_HOOK_FASTCALL PathGrooveBastard(tGroovidelic_spec* pGroove, tU32 pTime, 
                       : ((MODE) == eMove_absolute \
                                 ? (PERIOD) \
                                 : ((MODE) == eMove_linear \
-                                          ? ((PERIOD) != 0.0f ? MapSawToTriangle(SAW(TIME, PERIOD)) * (AMPLITUDE) : 0.0f) \
+                                          ? ((PERIOD) != 0.0f ? MapSawToTriangle((float)(SAW(TIME, PERIOD))) * (AMPLITUDE) : 0.0f) \
                                           : ((MODE) == eMove_flash \
                                                     ? (fmod((TIME), (PERIOD)) * 2.0 > (PERIOD) ? -(AMPLITUDE) : (AMPLITUDE)) \
                                                     : ((MODE) == eMove_texturebits \
@@ -274,8 +274,8 @@ void C2_HOOK_FASTCALL ObjectGrooveBastard(tGroovidelic_spec* pGroove, tU32 pTime
         break;
     case eGroove_object_rock:
         rock_it = 1;
-        pos = GROOVE_FLOAT(pGroove->object_mode, pTime,
-            pGroove->object_data.rock_info.period.value, pGroove->object_data.rock_info.texture_info.data, pGroove->object_data.rock_info.max_angle);
+        pos = (br_scalar)(GROOVE_FLOAT(pGroove->object_mode, pTime,
+            pGroove->object_data.rock_info.period.value, pGroove->object_data.rock_info.texture_info.data, pGroove->object_data.rock_info.max_angle));
 
         if (pInterrupt_it) {
             pGroove->object_resumption_value = pos;
@@ -315,15 +315,15 @@ void C2_HOOK_FASTCALL ObjectGrooveBastard(tGroovidelic_spec* pGroove, tU32 pTime
         break;
     case eGroove_object_throb:
         BrMatrix34PostScale(pMat,
-            GROOVE_FLOAT(pGroove->object_mode, pTime,
+            (br_scalar)(GROOVE_FLOAT(pGroove->object_mode, pTime,
                     pGroove->object_data.throb_info.x_period.value, pGroove->object_data.throb_info.x_texture_info.data, pGroove->object_data.throb_info.x_magnitude)
-                + 1.0,
-            GROOVE_FLOAT(pGroove->object_mode, pTime,
+                + 1.0),
+            (br_scalar)(GROOVE_FLOAT(pGroove->object_mode, pTime,
                     pGroove->object_data.throb_info.y_period.value, pGroove->object_data.throb_info.y_texture_info.data, pGroove->object_data.throb_info.y_magnitude)
-                + 1.0,
-            GROOVE_FLOAT(pGroove->object_mode, pTime,
+                + 1.0),
+            (br_scalar)(GROOVE_FLOAT(pGroove->object_mode, pTime,
                     pGroove->object_data.throb_info.z_period.value, pGroove->object_data.throb_info.z_texture_info.data, pGroove->object_data.throb_info.z_magnitude)
-                + 1.0);
+                + 1.0));
         /* FALLTHROUGH */
     case eGroove_object_shear:
         bounds = &pGroove->actor->model->bounds;
@@ -332,28 +332,28 @@ void C2_HOOK_FASTCALL ObjectGrooveBastard(tGroovidelic_spec* pGroove, tU32 pTime
         z_size = bounds->max.v[2] - bounds->min.v[2];
         if (pGroove->object_data.shear_info.x_magnitude == 0.0f) {
             BrMatrix34PostShearX(pMat,
-                GROOVE_FLOAT(pGroove->object_mode, pTime,
+                (br_scalar)(GROOVE_FLOAT(pGroove->object_mode, pTime,
                     pGroove->object_data.shear_info.y_period.value, pGroove->object_data.shear_info.y_texture_info.data, pGroove->object_data.shear_info.y_magnitude)
-                    / y_size,
-                GROOVE_FLOAT(pGroove->object_mode, pTime,
+                    / y_size),
+                (br_scalar)(GROOVE_FLOAT(pGroove->object_mode, pTime,
                     pGroove->object_data.shear_info.z_period.value, pGroove->object_data.shear_info.z_texture_info.data, pGroove->object_data.shear_info.z_magnitude)
-                    / z_size);
+                    / z_size));
         } else if (pGroove->object_data.shear_info.y_magnitude == 0.0f) {
             BrMatrix34PostShearY(pMat,
-                GROOVE_FLOAT(pGroove->object_mode, pTime,
+                (br_scalar)(GROOVE_FLOAT(pGroove->object_mode, pTime,
                     pGroove->object_data.shear_info.x_period.value, pGroove->object_data.shear_info.x_texture_info.data, pGroove->object_data.shear_info.x_magnitude)
-                    / x_size,
-                GROOVE_FLOAT(pGroove->object_mode, pTime,
+                    / x_size),
+                (br_scalar)(GROOVE_FLOAT(pGroove->object_mode, pTime,
                     pGroove->object_data.shear_info.z_period.value, pGroove->object_data.shear_info.z_texture_info.data, pGroove->object_data.shear_info.z_magnitude)
-                    / z_size);
+                    / z_size));
         } else {
             BrMatrix34PostShearZ(pMat,
-                GROOVE_FLOAT(pGroove->object_mode, pTime,
+                (br_scalar)(GROOVE_FLOAT(pGroove->object_mode, pTime,
                     pGroove->object_data.shear_info.x_period.value, pGroove->object_data.shear_info.x_texture_info.data, pGroove->object_data.shear_info.x_magnitude)
-                    / x_size,
-                GROOVE_FLOAT(pGroove->object_mode, pTime,
+                    / x_size),
+                (br_scalar)(GROOVE_FLOAT(pGroove->object_mode, pTime,
                     pGroove->object_data.shear_info.y_period.value, pGroove->object_data.shear_info.y_texture_info.data, pGroove->object_data.shear_info.y_magnitude)
-                    / y_size);
+                    / y_size));
         }
         break;
     default:
