@@ -60,6 +60,7 @@ tWobble_spec gWobble_array[5] = { 0 };
 int gINT_006a2348 = 0;
 
 // GLOBAL: CARMA2_HW 0x006a234c
+// GLOBAL: CARMA2_SW 0x0069c3a4
 float gPrevious_rear_yon = 0.f;
 
 // GLOBAL: CARMA2_HW 0x006a2350
