@@ -2141,7 +2141,14 @@ int C2_HOOK_FASTCALL KeepInRange(int pIndex, int pRange) {
     return pIndex;
 }
 
-// WrecksOutFunc
+// FUNCTION: CARMA2_HW 0x0046ead0
+// FUNCTION: CARMA2_SW 0x0046e190
+int C2_HOOK_FASTCALL WrecksOutFunc(tFrontend_spec* pFrontend) {
+
+    DisposeWrecksGallery();
+    DRS3StartSound(gEffects_outlet, eSoundId_Swingout);
+    return 1;
+}
 
 // WrecksUpdateFunc
 
