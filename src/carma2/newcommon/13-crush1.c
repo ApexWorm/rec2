@@ -40,30 +40,39 @@ br_scalar gForce_to_movement_factor;
 br_scalar gMax_detach_time_ms;
 
 // GLOBAL: CARMA2_HW 0x006796c8
+// GLOBAL: CARMA2_SW 0x00673e38
 tCrush_list_item gCrush_lists[8];
 
 // GLOBAL: CARMA2_HW 0x006796bc
+// GLOBAL: CARMA2_SW 0x00673e2c
 int gCount_queued_drone_crushes;
 
 // GLOBAL: CARMA2_HW 0x0067bad0
+// GLOBAL: CARMA2_SW 0x00676240
 int gCount_crush_detach_list;
 
 // GLOBAL: CARMA2_HW 0x0067bdfc
+// GLOBAL: CARMA2_SW 0x0067656c
 int gINT_0067bdfc;
 
 // GLOBAL: CARMA2_HW 0x0067be08
+// GLOBAL: CARMA2_SW 0x00676578
 tU8 gCrush_data_entry_counter;
 
 // GLOBAL: CARMA2_HW 0x0067bdf0
+// GLOBAL: CARMA2_SW 0x00676560
 int gCount_net_crush_detach_list;
 
 // GLOBAL: CARMA2_HW 0x0067b838
+// GLOBAL: CARMA2_SW 0x00675fa8
 int gCount_net_crush_semi_detach_bit_list;
 
 // GLOBAL: CARMA2_HW 0x0067bd60
+// GLOBAL: CARMA2_SW 0x006764d0
 int gCount_net_crush_full_detach_bit_list;
 
 // GLOBAL: CARMA2_HW 0x0067b7cc
+// GLOBAL: CARMA2_SW 0x00675f3c
 int gCount_car_damage_crush_list;
 
 // GLOBAL: CARMA2_HW 0x006796b8
@@ -308,6 +317,7 @@ void C2_HOOK_FASTCALL InitCrushSystems(void) {
 }
 
 // FUNCTION: CARMA2_HW 0x0042a190
+// FUNCTION: CARMA2_SW 0x0042a220
 void C2_HOOK_FASTCALL ResetCrushSystems(void) {
     int i;
     tCrush_list_item* list;
