@@ -67,6 +67,9 @@ int gFlameThrowerOn = 1;
 // GLOBAL: CARMA2_HW 0x0065d7d0
 int gExplosives_on = 1;
 
+// GLOBAL: CARMA2_HW 0x0067697c
+tPedForms_vtable* gPed_vtable = NULL;
+
 // GLOBAL: CARMA2_HW 0x00677234
 // GLOBAL: CARMA2_SW 0x006719a4
 int gPed_retain_root_mode = 0;
@@ -1502,7 +1505,90 @@ void C2_HOOK_FASTCALL DisposeAllLoadedRemaps(void) {
 
 // SetUpCharacterForm
 
-// DisposeCharacterForm
+#if defined(REC2_MATCHING) && defined(_MSC_VER)
+#pragma inline_depth(0)
+#endif
+
+// FUNCTION: CARMA2_HW 0x004067e0
+void C2_HOOK_FASTCALL DisposeCharacterForm(tPed_form* pForm) {
+    int i;
+    int j;
+    tPhysics_object* object;
+
+    if (gPed_vtable->dispose_form != NULL) {
+        gPed_vtable->dispose_form(pForm);
+    }
+    for (i = 0; i < pForm->max_rendering_at_once; i++) {
+        for (j = 0; j < pForm->count_bones; j++) {
+            if (IsActorRenderworthy(pForm->actor_sets[i].actors[j])) {
+                StopActorBeingRenderable(pForm->actor_sets[i].actors[j]);
+            }
+            BrActorFree(pForm->actor_sets[i].actors[j]);
+        }
+        if (pForm->actor_sets[i].actors != NULL) {
+            BrMemFree(pForm->actor_sets[i].actors);
+        }
+    }
+    for (i = 0; i < pForm->count_bones; i++) {
+        if (pForm->boned_physicing[0].collision_infos[i] != NULL) {
+            if (pForm->bones[i].hinge != NULL) {
+                FreePhysicsJoint(pForm->bones[i].hinge);
+            }
+            for (j = 0; j < pForm->max_boned_physicing_at_once; j++) {
+                if (pForm->boned_physicing[j].collision_infos[i]->shape != NULL) {
+                    FreeShape(pForm->boned_physicing[j].collision_infos[i]->shape);
+                }
+                if (pForm->boned_physicing[j].collision_infos[i] != NULL) {
+                    object = pForm->boned_physicing[j].collision_infos[i];
+                    if (object != NULL) {
+                        BrMemFree(object);
+                    }
+                }
+            }
+        }
+    }
+    for (i = 0; i < pForm->max_boned_physicing_at_once; i++) {
+        if (pForm->boned_physicing[i].collision_infos != NULL) {
+            BrMemFree(pForm->boned_physicing[i].collision_infos);
+        }
+    }
+    for (i = 0; i < pForm->max_simple_physicing_at_once; i++) {
+        FreeShape(pForm->simple_physicing[i].collision_info->shape);
+        if (pForm->simple_physicing[i].collision_info != NULL) {
+            BrMemFree(pForm->simple_physicing[i].collision_info);
+        }
+    }
+    for (i = 0; i < pForm->max_stored_dismembered_characters; i++) {
+        if (pForm->stored_dismembered_characters[i] != NULL) {
+            BrMemFree(pForm->stored_dismembered_characters[i]);
+        }
+    }
+    if (pForm->stored_dismembered_characters != NULL) {
+        BrMemFree(pForm->stored_dismembered_characters);
+    }
+    if (pForm->moves != NULL) {
+        BrMemFree(pForm->moves);
+    }
+    if (pForm->actor_sets != NULL) {
+        BrMemFree(pForm->actor_sets);
+    }
+    if (pForm->simple_physicing != NULL) {
+        BrMemFree(pForm->simple_physicing);
+    }
+    if (pForm->boned_physicing != NULL) {
+        BrMemFree(pForm->boned_physicing);
+    }
+    if (pForm->bones != NULL) {
+        BrMemFree(pForm->bones);
+    }
+    if (pForm != NULL) {
+        BrMemFree(pForm);
+    }
+}
+
+#if defined(REC2_MATCHING) && defined(_MSC_VER)
+#pragma inline_depth()
+#endif
 
 // DisposeAllLoadedForms
 
