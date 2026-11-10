@@ -1098,7 +1098,6 @@ void C2_HOOK_FASTCALL ExtrapolateGeometryCoordinates(tSmash_quad_mapping* pMappi
 
 // AddDecal
 
-//@IQ@
 // FUNCTION: CARMA2_HW 0x004f39a0
 int C2_HOOK_FASTCALL InsertQuad(tSmash_quad_mapping* pMapping, br_actor* pActor, br_vertex* pVertices, tU8* pOn_edge, br_vertex** pCorners, br_material* pMaterial, tU16* pFace_points, tU16* pPoint_indices) {
     br_model* model;
@@ -1411,7 +1410,6 @@ int C2_HOOK_FASTCALL InsertQuad(tSmash_quad_mapping* pMapping, br_actor* pActor,
     }
     return 1;
 }
-//@/IQ@
 
 // SpawnSmashAndMungeFaces
 
