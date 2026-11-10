@@ -1029,13 +1029,23 @@ inline void* C2_HOOK_FASTCALL CloneMemory(void* pSource, br_size_t pSize) {
     return result;
 }
 
+#if defined(REC2_MATCHING) && defined(_MSC_VER)
+#pragma inline_depth(0)
+#endif
+
 inline void C2_HOOK_FASTCALL CloneEnvSmash(tSmashable_item_spec* pSource, tSmashable_item_spec* pDest) {
 
     *pDest = *pSource;
     if (pSource->trigger_type != -1
         && (pSource->mode == kSmashableMode_Decal || pSource->mode == kSmashableMode_TextureChange)
         && pSource->mode_data.texture_change.levels != NULL) {
-        pDest->mode_data.texture_change.levels = CloneMemory(pSource->mode_data.texture_change.levels, pSource->mode_data.texture_change.count_levels * sizeof(tSmashable_level));
+        void* clone;
+        br_size_t size;
+
+        size = pSource->mode_data.texture_change.count_levels * sizeof(tSmashable_level);
+        clone = BrMemAllocate(size, kMem_cloned_block);
+        memcpy(clone, pSource->mode_data.texture_change.levels, size);
+        pDest->mode_data.texture_change.levels = clone;
     }
     if (pDest->trigger_object.material != NULL) {
         pDest->trigger_object.material = DRMaterialClone(pDest->trigger_object.material, 0);
@@ -1045,6 +1055,10 @@ inline void C2_HOOK_FASTCALL CloneEnvSmash(tSmashable_item_spec* pSource, tSmash
         SplondificatalizeIdentifier(pDest->trigger_object.material, &pDest->trigger_object.material->identifier, pDest - gTrack_smashable_environment_specs);
     }
 }
+
+#if defined(REC2_MATCHING) && defined(_MSC_VER)
+#pragma inline_depth()
+#endif
 
 // FUNCTION: CARMA2_HW 0x004f09c0
 // FUNCTION: CARMA2_SW 0x004ec620
