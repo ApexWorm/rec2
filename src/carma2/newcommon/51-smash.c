@@ -46,6 +46,12 @@ int gINT_006a3334;
 // GLOBAL: CARMA2_HW 0x006a4688
 br_vector3 gVector3_006a4688;
 
+// GLOBAL: CARMA2_HW 0x006b78a0
+br_vector3 gVector3_006b78a0[4] = { { { 0.f } } };
+
+// GLOBAL: CARMA2_HW 0x006b78d0
+int gINT_006b78d0 = 0;
+
 // GLOBAL: CARMA2_HW 0x006a3338
 // GLOBAL: CARMA2_SW 0x0069d398
 int gShrapnel_child_count;
