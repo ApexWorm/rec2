@@ -267,7 +267,7 @@ extern int C2_HOOK_FASTCALL CBActiveHalted(tPed_character_instance* pCharacter, 
 
 extern int C2_HOOK_FASTCALL GetPedCount(void);
 
-// GetPedPosition
+extern int C2_HOOK_FASTCALL GetPedPosition(int pIndex, br_vector3* pPos);
 
 extern void C2_HOOK_CDECL TurnLimbsOnAndOff(br_actor* pActor, br_model* pModel, br_material* pMaterial, void* pOrder_table, br_uint_8 pStyle, int pOn_screen);
 
@@ -281,7 +281,7 @@ extern void C2_HOOK_CDECL TurnLimbsOnAndOff(br_actor* pActor, br_model* pModel, 
 
 // SpawnPedsOnFace
 
-// FinishUpLoadingPeds
+extern void C2_HOOK_FASTCALL FinishUpLoadingPeds(void);
 
 extern void C2_HOOK_FASTCALL MakeFlagWavingBastardWaveHisFlagWhichIsTheProbablyTheLastThingHeWillEverDo(void);
 
@@ -505,7 +505,7 @@ extern int C2_HOOK_FASTCALL MakeCharacterCollideworthy2(tPed_character_instance*
 
 extern int C2_HOOK_FASTCALL MakeCharacterCollideworthy(tPed_character_instance* pCharacter, int pArg2, int pArg3);
 
-// GetRootObject
+extern tPhysics_object* C2_HOOK_FASTCALL GetRootObject(tPed_character_instance* pPed);
 
 // CharacterNoLongerCollideworthy
 

@@ -909,7 +909,22 @@ int C2_HOOK_FASTCALL GetPedCount(void) {
     return gPed_count;
 }
 
-// GetPedPosition
+// FUNCTION: CARMA2_HW 0x004d2c50
+// FUNCTION: CARMA2_SW 0x004cf340
+int C2_HOOK_FASTCALL GetPedPosition(int pIndex, br_vector3* pPos) {
+    tPedestrian* ped;
+
+    ped = &gPedestrian_array[pIndex];
+    if (ped->hit_points > 0
+            && ((ped->flags & 0x1) || gMap_view == 2)
+            && (gCurrent_race.race_spec->race_type != kRaceType_Peds || ((tS16)ped->flags & 0x200) != 0)) {
+        pPos->v[0] = ped->pos.v[0];
+        pPos->v[1] = ped->pos.v[1];
+        pPos->v[2] = ped->pos.v[2];
+        return 1;
+    }
+    return 0;
+}
 
 // FUNCTION: CARMA2_HW 0x004d34e0
 // FUNCTION: CARMA2_SW 0x004cfbd0
@@ -933,7 +948,31 @@ void C2_HOOK_CDECL TurnLimbsOnAndOff(br_actor* pActor, br_model* pModel, br_mate
 
 // SpawnPedsOnFace
 
-// FinishUpLoadingPeds
+// FUNCTION: CARMA2_HW 0x004d3520
+// FUNCTION: CARMA2_SW 0x004cfc10
+void C2_HOOK_FASTCALL FinishUpLoadingPeds(void) {
+    tPedestrian* new_pedestrians;
+    int i;
+
+    dr_dprintf("%d pedestrians, %d bytes each, total = %d bytes\n", gPed_count, sizeof(tRace_pedestrian), gPed_count * sizeof(tRace_pedestrian));
+    C2_HOOK_BUG_ON(sizeof(tRace_pedestrian) != 0x140);
+
+    new_pedestrians = BrMemAllocate(gPed_count * sizeof(tPedestrian), kMem_ped_array);
+    C2_HOOK_BUG_ON(sizeof(tPedestrian) != 0x54);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPedestrian, character, 0x0);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPed_character_instance, ped, 0xe4);
+
+    memcpy(new_pedestrians, gPedestrian_array, gPed_count * sizeof(tPedestrian));
+
+    BrMemFree(gPedestrian_array);
+    gPedestrian_array = new_pedestrians;
+
+    for (i = 0; i < gPed_count; i++) {
+
+        gPedestrian_array[i].character->ped = &gPedestrian_array[i];
+        C2_HOOK_BUG_ON(offsetof(tRace_pedestrian, ped) != 0xe4);
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x004d35d0
 // FUNCTION: CARMA2_SW 0x004cfcc0
@@ -1648,7 +1687,22 @@ int C2_HOOK_FASTCALL MakeCharacterCollideworthy(tPed_character_instance* pCharac
     return MakeCharacterCollideworthy2(pCharacter, pArg2, pArg3, -1);
 }
 
-// GetRootObject
+// FUNCTION: CARMA2_HW 0x00409040
+// FUNCTION: CARMA2_SW 0x00409040
+tPhysics_object* C2_HOOK_FASTCALL GetRootObject(tPed_character_instance* pPed) {
+    tPed_form* form;
+    tPed_form_boned_phys* boned;
+    int i;
+
+    form = pPed->personality->form;
+    boned = &form->boned_physicing[(tS8)pPed->field_0x5];
+    for (i = 0; i < form->count_bones; i++) {
+        if (boned->collision_infos[i]->shape != NULL) {
+            return boned->collision_infos[i];
+        }
+    }
+    return NULL;
+}
 
 // CharacterNoLongerCollideworthy
 
