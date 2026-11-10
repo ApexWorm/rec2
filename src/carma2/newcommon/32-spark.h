@@ -37,6 +37,7 @@ extern br_model* gShrapnel_model[2];
 extern br_pixelmap* gFlame_map[20];
 extern br_model* gLollipop_model;
 extern tSmoke_column gSmoke_column[10];
+extern tSpark gSparks[32];
 extern br_matrix4 gCameraToScreen;
 extern br_camera* gSpark_cam;
 extern tCar_spec* gCar_of_material;
@@ -186,6 +187,8 @@ extern void C2_HOOK_FASTCALL InitFlame(void);
 extern void C2_HOOK_FASTCALL SmudgeCar(tCar_spec* pCar, int pFire_point);
 
 void C2_HOOK_FASTCALL SetSmokeOn(int pSmoke_on);
+
+extern void C2_HOOK_FASTCALL ReallySetSmokeOn(int pSmoke_on);
 
 extern int C2_HOOK_FASTCALL GetSmokeOn(void);
 
