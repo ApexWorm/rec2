@@ -254,6 +254,7 @@ void C2_HOOK_FASTCALL LoadPowerups(void) {
 // InitTail
 
 // FUNCTION: CARMA2_HW 0x004d9d00
+// FUNCTION: CARMA2_SW 0x004d61d0
 void C2_HOOK_FASTCALL ThisObjectHitAMineSoSpamItUpUsingThisPowerupsSettings(tPhysics_object* pObject, int pPowerup_index) {
     tPedestrian* ped;
     int old_dismemberfest;
@@ -267,9 +268,9 @@ void C2_HOOK_FASTCALL ThisObjectHitAMineSoSpamItUpUsingThisPowerupsSettings(tPhy
             if (pPowerup_index != 14) {
                 BrVector3Set(&pObject->v, 0.f, 0.f, 0.f);
             }
-            pObject->v.v[1] += FRandomBetween(0.7f, 1.f) / (pObject->M * 6.9);
-            pObject->omega.v[2] += (FRandomPosNeg(0.5f) * TAU) / pObject->M;
-            pObject->omega.v[0] += (FRandomPosNeg(0.5f) * TAU) / pObject->M;
+            pObject->v.v[1] = (br_scalar)(FRandomBetween(0.7f, 1.f) / (pObject->M * 6.9) + pObject->v.v[1]);
+            pObject->omega.v[2] = (br_scalar)((FRandomPosNeg(0.5f) * TAU) / pObject->M + pObject->omega.v[2]);
+            pObject->omega.v[0] = (br_scalar)((FRandomPosNeg(0.5f) * TAU) / pObject->M + pObject->omega.v[0]);
             pObject->disable_move_rotate = 0;
             old_dismemberfest = gPed_dismemberfest;
             gPed_dismemberfest = 1;
@@ -277,14 +278,14 @@ void C2_HOOK_FASTCALL ThisObjectHitAMineSoSpamItUpUsingThisPowerupsSettings(tPhy
             gPed_dismemberfest = old_dismemberfest;
         }
     } else if (pObject != NULL && pObject->flags_0x238 == 0x10) {
-        pObject->v.v[1] += FRandomBetween(3.f, 4.f) / (pObject->M * 6.9);
-        pObject->omega.v[2] += (FRandomPosNeg(1.75f) * TAU) / pObject->M;
-        pObject->omega.v[0] += (FRandomPosNeg(1.75f) * TAU) / pObject->M;
+        pObject->v.v[1] = (br_scalar)(FRandomBetween(3.f, 4.f) / (pObject->M * 6.9) + pObject->v.v[1]);
+        pObject->omega.v[2] = (br_scalar)((FRandomPosNeg(1.75f) * TAU) / pObject->M + pObject->omega.v[2]);
+        pObject->omega.v[0] = (br_scalar)((FRandomPosNeg(1.75f) * TAU) / pObject->M + pObject->omega.v[0]);
         pObject->disable_move_rotate = 0;
     } else {
-        pObject->v.v[1] += FRandomBetween(1.f, 2.f) / (pObject->M * 6.9);
-        pObject->omega.v[2] += (FRandomPosNeg(0.5f) * TAU) / pObject->M;
-        pObject->omega.v[0] += (FRandomPosNeg(0.5f) * TAU) / pObject->M;
+        pObject->v.v[1] = (br_scalar)(FRandomBetween(1.f, 2.f) / (pObject->M * 6.9) + pObject->v.v[1]);
+        pObject->omega.v[2] = (br_scalar)((FRandomPosNeg(0.5f) * TAU) / pObject->M + pObject->omega.v[2]);
+        pObject->omega.v[0] = (br_scalar)((FRandomPosNeg(0.5f) * TAU) / pObject->M + pObject->omega.v[0]);
         pObject->disable_move_rotate = 0;
     }
 }
