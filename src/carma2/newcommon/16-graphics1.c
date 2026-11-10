@@ -489,7 +489,10 @@ void C2_HOOK_FASTCALL InitWobbleStuff(void) {
     gEvalu = LoadPixelmap("Evalu01.PIX");
 }
 
-// NewScreenWobble
+// STUB: CARMA2_HW 0x004e4db0
+void C2_HOOK_STDCALL NewScreenWobble(double pAmplitude_x, double pAmplitude_y, double pPeriod) {
+    NOT_IMPLEMENTED();
+}
 
 // FUNCTION: CARMA2_HW 0x004e4e20
 // FUNCTION: CARMA2_SW 0x004e1180
