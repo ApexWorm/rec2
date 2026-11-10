@@ -82,7 +82,10 @@ char gString[84];
 
 // GLOBAL: CARMA2_HW 0x0067c3c8
 // GLOBAL: CARMA2_SW 0x00676b40
-char* gAbuse_text[10];
+char* gAbuse_text[10] = { 0 };
+
+// GLOBAL: CARMA2_HW 0x0067c3f0
+int gINT_0067c3f0 = 0;
 
 // GLOBAL: CARMA2_HW 0x0067c3f8
 // GLOBAL: CARMA2_SW 0x00676b70
