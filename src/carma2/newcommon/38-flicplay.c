@@ -20,13 +20,6 @@
 #include "c2_stdio.h"
 #include "c2_string.h"
 
-// GLOBAL: CARMA2_HW 0x00599920
-// GLOBAL: CARMA2_SW 0x00594868
-int gFlic_bunch0[29] = {
-    10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 35, 26,
-    27, 36, 28, 29, 130, 131, 132, 42, 43, 135, 45
-};
-
 // GLOBAL: CARMA2_HW 0x00599998
 // GLOBAL: CARMA2_SW 0x005948e0
 
@@ -526,6 +519,13 @@ tFlic_spec gMain_flic_list[372] = {
     { "MAI2NNGL.FLI", 0, 0, 0, 0, 0, 0, },
     { "MAI2OPFL.FLI", 0, 0, 0, 0, 0, 0, },
     { "MAI2OPGL.FLI", 0, 0, 0, 0, 0, 0, },
+};
+
+// GLOBAL: CARMA2_HW 0x00599920
+// GLOBAL: CARMA2_SW 0x00594868
+int gFlic_bunch0[29] = {
+    10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 35, 26,
+    27, 36, 28, 29, 130, 131, 132, 42, 43, 135, 45
 };
 
 // FUNCTION: CARMA2_HW 0x00461990
