@@ -3468,6 +3468,24 @@ typedef struct {
     br_actor* actor;
     tU32 time;
 } tDecal;
+
+typedef struct {
+    br_vector3 origin;
+    br_vector2 map_origin;
+    br_vector2 map_other;
+    br_scalar geometry_from_map[2][2];
+    br_face* face;
+} tSmash_triangle_mapping;
+
+typedef struct {
+    int axis_0;
+    int axis_1;
+    int axis_2;
+    br_vector3 normal;
+    br_scalar d;
+    br_vector2 map_edge;
+    tSmash_triangle_mapping triangles[2];
+} tSmash_quad_mapping;
 typedef struct {
     undefined4 field_0x0;
     undefined4 field_0x4;

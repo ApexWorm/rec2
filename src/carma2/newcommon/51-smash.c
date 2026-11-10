@@ -40,6 +40,12 @@ int gAllow_material_adapt;
 // GLOBAL: CARMA2_HW 0x006a3340
 br_material* gMaterials_to_adapt[200];
 
+// GLOBAL: CARMA2_HW 0x006a3334
+int gINT_006a3334;
+
+// GLOBAL: CARMA2_HW 0x006a4688
+br_vector3 gVector3_006a4688;
+
 // GLOBAL: CARMA2_HW 0x006a3338
 // GLOBAL: CARMA2_SW 0x0069d398
 int gShrapnel_child_count;
@@ -1069,13 +1075,337 @@ void C2_HOOK_FASTCALL FreeConnotations(tConnotations* pConnotations, int pKeep_a
 
 // ExtrapolateGeometryCoordinates2
 
-// ExtrapolateGeometryCoordinates
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_HW 0x004f36c0
+void C2_HOOK_FASTCALL ExtrapolateGeometryCoordinates(tSmash_quad_mapping* pMapping, br_vector2* pMap, br_vertex* pVertex) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // ExtractDeTiledFaces
 
 // AddDecal
 
-// InsertQuad
+//@IQ@
+// FUNCTION: CARMA2_HW 0x004f39a0
+int C2_HOOK_FASTCALL InsertQuad(tSmash_quad_mapping* pMapping, br_actor* pActor, br_vertex* pVertices, tU8* pOn_edge, br_vertex** pCorners, br_material* pMaterial, tU16* pFace_points, tU16* pPoint_indices) {
+    br_model* model;
+    br_vertex* v[12];
+    br_vertex temp;
+    int max_vertices;
+    int max_faces;
+    int i;
+    int index;
+    br_scalar mid_u;
+    br_scalar mid_v;
+    br_material* old_material;
+    br_scalar d1;
+    br_scalar d2;
+    br_face* face1;
+    br_face* face2;
+
+    model = pActor->model;
+    pFace_points[0] = 0;
+    pFace_points[1] = 1;
+    pFace_points[2] = 3;
+    pFace_points[3] = 0;
+    pFace_points[4] = 3;
+    pFace_points[5] = 2;
+    memset(v, 0, sizeof(v));
+    max_vertices = BrResSize(model->vertices) / sizeof(br_vertex);
+    max_faces = BrResSize(model->faces) / sizeof(br_face);
+    mid_u = (pCorners[0]->map.v[0] + pCorners[1]->map.v[0] + pCorners[2]->map.v[0] + pCorners[3]->map.v[0]) * 0.25f;
+    mid_v = (pCorners[0]->map.v[1] + pCorners[1]->map.v[1] + pCorners[2]->map.v[1] + pCorners[3]->map.v[1]) * 0.25f;
+    for (i = 0; i < 4; i++) {
+        if (pCorners[i]->map.v[0] < mid_u) {
+            index = 0;
+        } else {
+            index = 1;
+        }
+        if (pCorners[i]->map.v[1] > mid_v) {
+            index |= 0x2;
+        }
+        v[index] = pCorners[i];
+    }
+    for (i = 0; i < 4; i++) {
+        if (v[i] == NULL) {
+            return 0;
+        }
+    }
+    if (pOn_edge[0] & pOn_edge[1] & pOn_edge[2] & pOn_edge[3]) {
+        for (i = 0; i < 4; i++) {
+            gVector3_006b78a0[i] = v[i]->p;
+        }
+        gVector3_006a4688 = pMapping->normal;
+        gINT_006a3334 = 1;
+        for (i = 0; i < 4; i++) {
+            pPoint_indices[i] = v[i] - model->vertices;
+        }
+        pMapping->triangles[0].face->material = pMaterial;
+        pMapping->triangles[0].face->flags = 0x0;
+        pMapping->triangles[0].face->vertices[0] = v[0] - model->vertices;
+        pMapping->triangles[0].face->vertices[1] = v[1] - model->vertices;
+        pMapping->triangles[0].face->vertices[2] = v[3] - model->vertices;
+        pMapping->triangles[1].face->material = pMaterial;
+        pMapping->triangles[1].face->flags = 0x0;
+        pMapping->triangles[1].face->vertices[0] = v[0] - model->vertices;
+        pMapping->triangles[1].face->vertices[1] = v[3] - model->vertices;
+        pMapping->triangles[1].face->vertices[2] = v[2] - model->vertices;
+        pMapping->triangles[0].face->flags = 0x4;
+        pMapping->triangles[1].face->flags = 0x1;
+        return 1;
+    }
+
+    if (pOn_edge[0] && pOn_edge[1]) {
+        v[4] = v[0];
+    } else {
+        if (model->nvertices >= max_vertices) {
+            return 0;
+        }
+        v[4] = &model->vertices[model->nvertices++];
+        *v[4] = pVertices[0];
+    }
+    if (pOn_edge[2] && pOn_edge[1]) {
+        v[5] = v[1];
+    } else {
+        if (model->nvertices >= max_vertices) {
+            return 0;
+        }
+        v[5] = &model->vertices[model->nvertices++];
+        *v[5] = pVertices[1];
+    }
+    if (pOn_edge[3] && pOn_edge[0]) {
+        v[6] = v[2];
+    } else {
+        if (model->nvertices >= max_vertices) {
+            return 0;
+        }
+        v[6] = &model->vertices[model->nvertices++];
+        *v[6] = pVertices[2];
+    }
+    if (pOn_edge[2] && pOn_edge[3]) {
+        v[7] = v[3];
+    } else {
+        if (model->nvertices >= max_vertices) {
+            return 0;
+        }
+        v[7] = &model->vertices[model->nvertices++];
+        *v[7] = pVertices[3];
+    }
+    if (pOn_edge[1]) {
+        v[8] = v[5];
+    } else {
+        temp = *v[5];
+        temp.map.v[1] = (temp.map.v[0] - v[0]->map.v[0]) / (v[1]->map.v[0] - v[0]->map.v[0]) * (v[1]->map.v[1] - v[0]->map.v[1]) + v[0]->map.v[1];
+        ExtrapolateGeometryCoordinates(pMapping, &temp.map, &temp);
+        if (model->nvertices >= max_vertices) {
+            return 0;
+        }
+        v[8] = &model->vertices[model->nvertices++];
+        *v[8] = temp;
+    }
+    if (pOn_edge[2]) {
+        v[9] = v[7];
+    } else {
+        temp = *v[7];
+        temp.map.v[0] = (temp.map.v[1] - v[1]->map.v[1]) / (v[3]->map.v[1] - v[1]->map.v[1]) * (v[3]->map.v[0] - v[1]->map.v[0]) + v[1]->map.v[0];
+        ExtrapolateGeometryCoordinates(pMapping, &temp.map, &temp);
+        if (model->nvertices >= max_vertices) {
+            return 0;
+        }
+        v[9] = &model->vertices[model->nvertices++];
+        *v[9] = temp;
+    }
+    if (pOn_edge[3]) {
+        v[10] = v[6];
+    } else {
+        temp = *v[6];
+        temp.map.v[1] = (temp.map.v[0] - v[3]->map.v[0]) / (v[2]->map.v[0] - v[3]->map.v[0]) * (v[2]->map.v[1] - v[3]->map.v[1]) + v[3]->map.v[1];
+        ExtrapolateGeometryCoordinates(pMapping, &temp.map, &temp);
+        if (model->nvertices >= max_vertices) {
+            return 0;
+        }
+        v[10] = &model->vertices[model->nvertices++];
+        *v[10] = temp;
+    }
+    if (pOn_edge[0]) {
+        v[11] = v[4];
+    } else {
+        temp = *v[4];
+        temp.map.v[0] = (temp.map.v[1] - v[2]->map.v[1]) / (v[0]->map.v[1] - v[2]->map.v[1]) * (v[0]->map.v[0] - v[2]->map.v[0]) + v[2]->map.v[0];
+        ExtrapolateGeometryCoordinates(pMapping, &temp.map, &temp);
+        if (model->nvertices >= max_vertices) {
+            return 0;
+        }
+        v[11] = &model->vertices[model->nvertices++];
+        *v[11] = temp;
+    }
+    old_material = pMapping->triangles[0].face->material;
+    pMapping->triangles[0].face->material = pMaterial;
+    pMapping->triangles[0].face->flags = 0x0;
+    pMapping->triangles[0].face->vertices[0] = v[4] - model->vertices;
+    pMapping->triangles[0].face->vertices[1] = v[5] - model->vertices;
+    pMapping->triangles[0].face->vertices[2] = v[7] - model->vertices;
+    pMapping->triangles[1].face->material = pMaterial;
+    pMapping->triangles[1].face->flags = 0x0;
+    pMapping->triangles[1].face->vertices[0] = v[4] - model->vertices;
+    pMapping->triangles[1].face->vertices[1] = v[7] - model->vertices;
+    pMapping->triangles[1].face->vertices[2] = v[6] - model->vertices;
+    pMapping->triangles[0].face->flags = 0x4;
+    pMapping->triangles[1].face->flags = 0x1;
+    for (i = 0; i < 4; i++) {
+        gVector3_006b78a0[i] = v[i + 4]->p;
+    }
+    gVector3_006a4688 = pMapping->normal;
+    gINT_006a3334 = 1;
+    if (!pOn_edge[0]) {
+        if (model->nfaces + 1 >= max_faces) {
+            return 0;
+        }
+        face1 = &model->faces[model->nfaces++];
+        face2 = &model->faces[model->nfaces++];
+        *face1 = model->faces[0];
+        *face2 = model->faces[0];
+        d1 = (v[11]->p.v[0] - v[10]->p.v[0]) * (v[11]->p.v[0] - v[10]->p.v[0]) + (v[11]->p.v[1] - v[10]->p.v[1]) * (v[11]->p.v[1] - v[10]->p.v[1]) + (v[11]->p.v[2] - v[10]->p.v[2]) * (v[11]->p.v[2] - v[10]->p.v[2]);
+        d2 = (v[4]->p.v[0] - v[2]->p.v[0]) * (v[4]->p.v[0] - v[2]->p.v[0]) + (v[4]->p.v[1] - v[2]->p.v[1]) * (v[4]->p.v[1] - v[2]->p.v[1]) + (v[4]->p.v[2] - v[2]->p.v[2]) * (v[4]->p.v[2] - v[2]->p.v[2]);
+        if (d1 > d2) {
+            face1->flags = 0x0;
+            face1->material = old_material;
+            face1->vertices[0] = v[11] - model->vertices;
+            face1->vertices[1] = v[4] - model->vertices;
+            face1->vertices[2] = v[10] - model->vertices;
+            face2->material = old_material;
+            face2->flags = 0x0;
+            face2->vertices[0] = v[11] - model->vertices;
+            face2->vertices[1] = v[10] - model->vertices;
+            face2->vertices[2] = v[2] - model->vertices;
+        } else {
+            face1->flags = 0x0;
+            face1->material = old_material;
+            face1->vertices[0] = v[4] - model->vertices;
+            face1->vertices[1] = v[10] - model->vertices;
+            face1->vertices[2] = v[2] - model->vertices;
+            face2->material = old_material;
+            face2->flags = 0x0;
+            face2->vertices[0] = v[4] - model->vertices;
+            face2->vertices[1] = v[2] - model->vertices;
+            face2->vertices[2] = v[11] - model->vertices;
+        }
+    }
+    if (!pOn_edge[1]) {
+        if (model->nfaces + 1 >= max_faces) {
+            return 0;
+        }
+        face1 = &model->faces[model->nfaces++];
+        face2 = &model->faces[model->nfaces++];
+        *face1 = model->faces[0];
+        *face2 = model->faces[0];
+        d1 = (v[0]->p.v[0] - v[5]->p.v[0]) * (v[0]->p.v[0] - v[5]->p.v[0]) + (v[0]->p.v[1] - v[5]->p.v[1]) * (v[0]->p.v[1] - v[5]->p.v[1]) + (v[0]->p.v[2] - v[5]->p.v[2]) * (v[0]->p.v[2] - v[5]->p.v[2]);
+        d2 = (v[8]->p.v[0] - v[11]->p.v[0]) * (v[8]->p.v[0] - v[11]->p.v[0]) + (v[8]->p.v[1] - v[11]->p.v[1]) * (v[8]->p.v[1] - v[11]->p.v[1]) + (v[8]->p.v[2] - v[11]->p.v[2]) * (v[8]->p.v[2] - v[11]->p.v[2]);
+        if (d1 > d2) {
+            face1->flags = 0x0;
+            face1->material = old_material;
+            face1->vertices[0] = v[0] - model->vertices;
+            face1->vertices[1] = v[8] - model->vertices;
+            face1->vertices[2] = v[5] - model->vertices;
+            face2->material = old_material;
+            face2->flags = 0x0;
+            face2->vertices[0] = v[0] - model->vertices;
+            face2->vertices[1] = v[5] - model->vertices;
+            face2->vertices[2] = v[11] - model->vertices;
+        } else {
+            face1->flags = 0x0;
+            face1->material = old_material;
+            face1->vertices[0] = v[8] - model->vertices;
+            face1->vertices[1] = v[5] - model->vertices;
+            face1->vertices[2] = v[11] - model->vertices;
+            face2->material = old_material;
+            face2->flags = 0x0;
+            face2->vertices[0] = v[8] - model->vertices;
+            face2->vertices[1] = v[11] - model->vertices;
+            face2->vertices[2] = v[0] - model->vertices;
+        }
+    }
+    if (!pOn_edge[2]) {
+        if (model->nfaces + 1 >= max_faces) {
+            return 0;
+        }
+        face1 = &model->faces[model->nfaces++];
+        face2 = &model->faces[model->nfaces++];
+        *face1 = model->faces[0];
+        *face2 = model->faces[0];
+        d1 = (v[8]->p.v[0] - v[9]->p.v[0]) * (v[8]->p.v[0] - v[9]->p.v[0]) + (v[8]->p.v[1] - v[9]->p.v[1]) * (v[8]->p.v[1] - v[9]->p.v[1]) + (v[8]->p.v[2] - v[9]->p.v[2]) * (v[8]->p.v[2] - v[9]->p.v[2]);
+        d2 = (v[1]->p.v[0] - v[7]->p.v[0]) * (v[1]->p.v[0] - v[7]->p.v[0]) + (v[1]->p.v[1] - v[7]->p.v[1]) * (v[1]->p.v[1] - v[7]->p.v[1]) + (v[1]->p.v[2] - v[7]->p.v[2]) * (v[1]->p.v[2] - v[7]->p.v[2]);
+        if (d1 > d2) {
+            face1->flags = 0x0;
+            face1->material = old_material;
+            face1->vertices[0] = v[8] - model->vertices;
+            face1->vertices[1] = v[1] - model->vertices;
+            face1->vertices[2] = v[9] - model->vertices;
+            face2->material = old_material;
+            face2->flags = 0x0;
+            face2->vertices[0] = v[8] - model->vertices;
+            face2->vertices[1] = v[9] - model->vertices;
+            face2->vertices[2] = v[7] - model->vertices;
+        } else {
+            face1->flags = 0x0;
+            face1->material = old_material;
+            face1->vertices[0] = v[1] - model->vertices;
+            face1->vertices[1] = v[9] - model->vertices;
+            face1->vertices[2] = v[7] - model->vertices;
+            face2->material = old_material;
+            face2->flags = 0x0;
+            face2->vertices[0] = v[1] - model->vertices;
+            face2->vertices[1] = v[7] - model->vertices;
+            face2->vertices[2] = v[8] - model->vertices;
+        }
+    }
+    if (!pOn_edge[3]) {
+        if (model->nfaces + 1 >= max_faces) {
+            return 0;
+        }
+        face1 = &model->faces[model->nfaces++];
+        face2 = &model->faces[model->nfaces++];
+        *face1 = model->faces[0];
+        *face2 = model->faces[0];
+        d1 = (v[6]->p.v[0] - v[3]->p.v[0]) * (v[6]->p.v[0] - v[3]->p.v[0]) + (v[6]->p.v[1] - v[3]->p.v[1]) * (v[6]->p.v[1] - v[3]->p.v[1]) + (v[6]->p.v[2] - v[3]->p.v[2]) * (v[6]->p.v[2] - v[3]->p.v[2]);
+        d2 = (v[9]->p.v[0] - v[10]->p.v[0]) * (v[9]->p.v[0] - v[10]->p.v[0]) + (v[9]->p.v[1] - v[10]->p.v[1]) * (v[9]->p.v[1] - v[10]->p.v[1]) + (v[9]->p.v[2] - v[10]->p.v[2]) * (v[9]->p.v[2] - v[10]->p.v[2]);
+        if (d1 > d2) {
+            face1->flags = 0x0;
+            face1->material = old_material;
+            face1->vertices[0] = v[6] - model->vertices;
+            face1->vertices[1] = v[9] - model->vertices;
+            face1->vertices[2] = v[3] - model->vertices;
+            face2->material = old_material;
+            face2->flags = 0x0;
+            face2->vertices[0] = v[6] - model->vertices;
+            face2->vertices[1] = v[3] - model->vertices;
+            face2->vertices[2] = v[10] - model->vertices;
+        } else {
+            face1->flags = 0x0;
+            face1->material = old_material;
+            face1->vertices[0] = v[9] - model->vertices;
+            face1->vertices[1] = v[3] - model->vertices;
+            face1->vertices[2] = v[10] - model->vertices;
+            face2->material = old_material;
+            face2->flags = 0x0;
+            face2->vertices[0] = v[9] - model->vertices;
+            face2->vertices[1] = v[10] - model->vertices;
+            face2->vertices[2] = v[6] - model->vertices;
+        }
+    }
+    for (i = 4; i < 8; i++) {
+        pPoint_indices[i - 4] = v[i] - model->vertices;
+    }
+    return 1;
+}
+//@/IQ@
 
 // SpawnSmashAndMungeFaces
 

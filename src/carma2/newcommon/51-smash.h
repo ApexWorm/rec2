@@ -251,13 +251,13 @@ extern void C2_HOOK_FASTCALL FreeConnotations(tConnotations* pConnotations, int 
 
 // ExtrapolateGeometryCoordinates2
 
-// ExtrapolateGeometryCoordinates
+extern void C2_HOOK_FASTCALL ExtrapolateGeometryCoordinates(tSmash_quad_mapping* pMapping, br_vector2* pMap, br_vertex* pVertex);
 
 // ExtractDeTiledFaces
 
 // AddDecal
 
-// InsertQuad
+extern int C2_HOOK_FASTCALL InsertQuad(tSmash_quad_mapping* pMapping, br_actor* pActor, br_vertex* pVertices, tU8* pOn_edge, br_vertex** pCorners, br_material* pMaterial, tU16* pFace_points, tU16* pPoint_indices);
 
 // SpawnSmashAndMungeFaces
 
