@@ -607,7 +607,11 @@ void C2_HOOK_FASTCALL ToggleHeadupMap(int pArg) {
 
 // HackyMapFixForMac3dfx
 
-// ToggleMap
+// STUB: CARMA2_HW 0x00444610
+// STUB: CARMA2_SW 0x004446f0
+void C2_HOOK_FASTCALL ToggleMap(void) {
+    NOT_IMPLEMENTED();
+}
 
 // FUNCTION: CARMA2_HW 0x004446f0
 // FUNCTION: CARMA2_SW 0x004447d0

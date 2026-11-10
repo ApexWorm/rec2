@@ -255,6 +255,6 @@ extern void* C2_HOOK_FASTCALL GetSplashIndex(tPhysics_object* pObject);
 
 // AdjustSplashReplay
 
-// InitReplaySplashes
+extern void C2_HOOK_FASTCALL InitReplaySplashes(void);
 
 #endif // GUARD_32_SPARK_H

@@ -8,9 +8,43 @@
 
 #include "22-replay.h"
 
+#include "04-netgame.h"
+#include "10-loading2.h"
 #include "18-graphics2.h"
+#include "23-piping.h"
 #include "30-opponent.h"
+#include "32-spark.h"
+#include "41-utility.h"
+#include "53-controls.h"
+#include "59-camera.h"
+#include "61-pedestrn.h"
 #include "globvars.h"
+#include "globvrpb.h"
+#include "platform.h"
+
+// GLOBAL: CARMA2_HW 0x006a2360
+// GLOBAL: CARMA2_SW 0x0069c3b8
+tU32 gDAT_006a2360;
+
+// GLOBAL: CARMA2_HW 0x006a2364
+// GLOBAL: CARMA2_SW 0x0069c3bc
+tU32 gDAT_006a2364;
+
+// GLOBAL: CARMA2_HW 0x006a2374
+// GLOBAL: CARMA2_SW 0x0069c3cc
+int gKey_down;
+
+// GLOBAL: CARMA2_HW 0x006a2378
+// GLOBAL: CARMA2_SW 0x0069c3d0
+float gPending_replay_rate;
+
+// GLOBAL: CARMA2_HW 0x006a237c
+// GLOBAL: CARMA2_SW 0x0069c3d4
+tU32 gUINT_006a237c;
+
+// GLOBAL: CARMA2_HW 0x006a23c8
+// GLOBAL: CARMA2_SW 0x0069c420
+tU32 gCam_change_time;
 
 // GLOBAL: CARMA2_HW 0x006768fc
 // GLOBAL: CARMA2_SW 0x0067106c
@@ -96,7 +130,32 @@ void C2_HOOK_FASTCALL DoActionReplayPostSwap(void) {
 
 // SynchronizeActionReplay
 
-// TurnOnActionReplay
+// FUNCTION: CARMA2_HW 0x004e71c0
+// FUNCTION: CARMA2_SW 0x004e3000
+void C2_HOOK_FASTCALL TurnOnActionReplay(void) {
+
+    SavePedStuff();
+    if (gMap_view == 2) {
+        ToggleMap();
+    }
+    if (gNet_mode == eNet_mode_host) {
+        SendGameplayToAllPlayers(eNet_gameplay_host_paused, 0, 0, 0, 0);
+    }
+    gUINT_006a237c = PDGetTotalTime();
+    gDAT_006a2360 = ARGetStartTime();
+    LoadInterfaceStuff(1);
+    StartMouseCursor();
+    gKey_down = 52;
+    gPending_replay_rate = 0.f;
+    gCam_change_time = PDGetTotalTime();
+    gDAT_006a2364 = GetTotalTime();
+    if (gRace_finished == 0) {
+        SaveCameraPosition(0);
+    }
+    gCamera_type = gAction_replay_camera_mode;
+    SetCameraType(gAR_camera_type);
+    InitReplaySplashes();
+}
 
 // TurnOffActionReplay
 
