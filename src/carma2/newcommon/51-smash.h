@@ -33,7 +33,7 @@ typedef struct {
     br_vector3 origin;
     br_vector2 map_origin;
     br_vector2 map_other;
-    br_scalar geometry_from_map[2][2];
+    br_scalar map_from_geometry[2][2];
     br_face* face;
 } tSmash_triangle_mapping;
 
