@@ -41,15 +41,19 @@ int gAllow_material_adapt;
 br_material* gMaterials_to_adapt[200];
 
 // GLOBAL: CARMA2_HW 0x006a3334
+// GLOBAL: CARMA2_SW 0x0069d394
 int gINT_006a3334;
 
 // GLOBAL: CARMA2_HW 0x006a4688
+// GLOBAL: CARMA2_SW 0x0069e6e8
 br_vector3 gVector3_006a4688;
 
 // GLOBAL: CARMA2_HW 0x006b78a0
+// GLOBAL: CARMA2_SW 0x006ae580
 br_vector3 gVector3_006b78a0[4] = { { { 0.f } } };
 
 // GLOBAL: CARMA2_HW 0x006b78d0
+// GLOBAL: CARMA2_SW 0x006ae5b0
 int gINT_006b78d0 = 0;
 
 // GLOBAL: CARMA2_HW 0x006a3338
@@ -1086,6 +1090,7 @@ void C2_HOOK_FASTCALL FreeConnotations(tConnotations* pConnotations, int pKeep_a
 #endif
 
 // STUB: CARMA2_HW 0x004f36c0
+// STUB: CARMA2_SW 0x004ef320
 void C2_HOOK_FASTCALL ExtrapolateGeometryCoordinates(tSmash_quad_mapping* pMapping, br_vector2* pMap, br_vertex* pVertex) {
     NOT_IMPLEMENTED();
 }
@@ -1099,6 +1104,7 @@ void C2_HOOK_FASTCALL ExtrapolateGeometryCoordinates(tSmash_quad_mapping* pMappi
 // AddDecal
 
 // FUNCTION: CARMA2_HW 0x004f39a0
+// FUNCTION: CARMA2_SW 0x004ef600
 int C2_HOOK_FASTCALL InsertQuad(tSmash_quad_mapping* pMapping, br_actor* pActor, br_vertex* pVertices, tU8* pOn_edge, br_vertex** pCorners, br_material* pMaterial, tU16* pFace_points, tU16* pPoint_indices) {
     br_model* model;
     br_vertex* v[12];
