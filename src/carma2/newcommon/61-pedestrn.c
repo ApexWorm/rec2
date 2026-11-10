@@ -68,6 +68,7 @@ int gFlameThrowerOn = 1;
 int gExplosives_on = 1;
 
 // GLOBAL: CARMA2_HW 0x0067697c
+// GLOBAL: CARMA2_SW 0x006710ec
 tPedForms_vtable* gPed_vtable = NULL;
 
 // GLOBAL: CARMA2_HW 0x00677234
@@ -1510,6 +1511,7 @@ void C2_HOOK_FASTCALL DisposeAllLoadedRemaps(void) {
 #endif
 
 // FUNCTION: CARMA2_HW 0x004067e0
+// FUNCTION: CARMA2_SW 0x004067e0
 void C2_HOOK_FASTCALL DisposeCharacterForm(tPed_form* pForm) {
     int i;
     int j;
