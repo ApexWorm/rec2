@@ -28,6 +28,7 @@ extern tExplosion gExplosions[50];
 extern br_vector3 gZero_vector__smash;
 extern tDecal gDecals[50];
 extern int gCount_queued_smashes;
+extern int gCapacity_track_smashables;
 
 typedef struct {
     br_vector3 origin;
@@ -145,7 +146,7 @@ extern void C2_HOOK_FASTCALL InitSmashQueue(void);
 
 // FlushSmashQueue
 
-// QueueSmashIfNecessary3
+extern tSmashable_level* C2_HOOK_FASTCALL QueueSmashIfNecessary3(tCar_spec* pCar, tPhysics_object* pObject, br_vector3* pPoint, br_vector3* pVelocity, br_actor* pActor, tSmashable_item_spec* pTrigger_spec, tSmashable_item_spec_texture_change* pTexture_change, float pImpulse, int pTexture_change_mode, int pParam_10);
 
 // QueueSmashIfNecessary2
 
@@ -243,7 +244,7 @@ extern void C2_HOOK_FASTCALL DisposeSmashData(tCar_crush_buffer_entry* pCrush_da
 
 // InitRepairAnimations
 
-extern void C2_HOOK_FASTCALL SplondificatalizeIdentifier(br_actor* pActor, char **pIdentifier, int pIndex);
+extern void C2_HOOK_FASTCALL SplondificatalizeIdentifier(void* pParent, char **pIdentifier, int pIndex);
 
 // ReadSmashReplace
 
@@ -255,9 +256,9 @@ extern void C2_HOOK_FASTCALL DisposeSmashEnvNonCars(void);
 
 extern void C2_HOOK_FASTCALL DisposeSmashableEnvironment(void);
 
-// CloneMemory
+extern void* C2_HOOK_FASTCALL CloneMemory(void* pSource, br_size_t pSize);
 
-// CloneEnvSmash
+extern void C2_HOOK_FASTCALL CloneEnvSmash(tSmashable_item_spec* pSource, tSmashable_item_spec* pDest);
 
 extern void C2_HOOK_FASTCALL FreeEnvSmash(tSmashable_item_spec* pSmash);
 
@@ -265,27 +266,27 @@ extern void C2_HOOK_FASTCALL FreeConnotations(tConnotations* pConnotations, int 
 
 // MungeSmashMaterialNames
 
-// ExtrapolateTextureCoordinates
+extern void C2_HOOK_FASTCALL ExtrapolateTextureCoordinates(tSmash_quad_mapping* pMapping, tSmash_triangle_mapping* pTriangle, br_vector3* pPoint, br_vector2* pMap);
 
 // ExtrapolateGeometryCoordinates2
 
 extern void C2_HOOK_FASTCALL ExtrapolateGeometryCoordinates(tSmash_quad_mapping* pMapping, br_vector2* pMap, br_vertex* pVertex);
 
-// ExtractDeTiledFaces
+extern int C2_HOOK_FASTCALL ExtractDeTiledFaces(tFace_ref* pFace, br_vector3* pPoint, br_vertex* pVertices, tU8* pCrossed, tU8* pOn_edge, br_vertex** pCorners, tSmash_quad_mapping* pMapping, int pUse_face_bounds);
 
-// AddDecal
+extern br_actor* C2_HOOK_FASTCALL AddDecal(tFace_ref* pFace, br_vertex* pVertices, br_material* pMaterial, tU16* pFace_points, tU16* pPoint_indices);
 
 extern int C2_HOOK_FASTCALL InsertQuad(tSmash_quad_mapping* pMapping, br_actor* pActor, br_vertex* pVertices, tU8* pOn_edge, br_vertex** pCorners, br_material* pMaterial, tU16* pFace_points, tU16* pPoint_indices);
 
-// SpawnSmashAndMungeFaces
+extern tSmashable_item_spec* C2_HOOK_FASTCALL SpawnSmashAndMungeFaces(tPhysics_object* pObject, tSmash_quad_mapping* pMapping, tFace_ref* pFace, tSmashable_item_spec* pSpec, br_vertex* pVertices, tU8* pOn_edge, br_vertex** pCorners, br_actor** pActor);
 
 // DistanceFromFaceND
 
 // PointInFace
 
-// FindFaceWithPoint
+extern int C2_HOOK_FASTCALL FindFaceWithPoint(tFace_ref* pFace, br_vector3* pPoint, tFace_ref* pResult, int pParam_4);
 
-// ProcessTexture
+extern float C2_HOOK_FASTCALL ProcessTexture(tPhysics_object* pObject, br_material* pMaterial, br_actor* pActor, tSmashable_item_spec* pTrigger_spec, tSmashable_item_spec* pSpec, tFace_ref* pFace, float pImpulse, br_vector3* pPoint, void* pParam_9, br_vector3* pVelocity, int pEdge, int pParam_12, int* pDone, int pParam_14);
 
 // ProcessMesh
 

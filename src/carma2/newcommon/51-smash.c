@@ -8,6 +8,7 @@
 
 #include "51-smash.h"
 
+#include "00-car.h"
 #include "08-loading1.h"
 #include "17-world2.h"
 #include "20-skidmark.h"
@@ -27,6 +28,7 @@
 
 #include "c2_string.h"
 
+#include <math.h>
 #include <stdio.h>
 
 // GLOBAL: CARMA2_HW 0x006a6d38
@@ -39,6 +41,12 @@ int gAllow_material_adapt;
 
 // GLOBAL: CARMA2_HW 0x006a3340
 br_material* gMaterials_to_adapt[200];
+
+// GLOBAL: CARMA2_HW 0x006a8290
+int gINT_006a8290;
+
+// GLOBAL: CARMA2_HW 0x006a3330
+int gCapacity_track_smashables;
 
 // GLOBAL: CARMA2_HW 0x006a3334
 int gINT_006a3334;
@@ -398,7 +406,20 @@ void C2_HOOK_FASTCALL InitSmashQueue(void) {
 
 // FlushSmashQueue
 
-// QueueSmashIfNecessary3
+//@PT:QueueSmashIfNecessary3@
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_HW 0x004ee290
+tSmashable_level* C2_HOOK_FASTCALL QueueSmashIfNecessary3(tCar_spec* pCar, tPhysics_object* pObject, br_vector3* pPoint, br_vector3* pVelocity, br_actor* pActor, tSmashable_item_spec* pTrigger_spec, tSmashable_item_spec_texture_change* pTexture_change, float pImpulse, int pTexture_change_mode, int pParam_10) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
+//@/PT:QueueSmashIfNecessary3@
 
 // QueueSmashIfNecessary2
 
@@ -945,7 +966,7 @@ void C2_HOOK_FASTCALL DisposeSmashData(tCar_crush_buffer_entry* pCrush_data) {
 
 // FUNCTION: CARMA2_HW 0x004f3560
 // FUNCTION: CARMA2_SW 0x004ef1c0
-void C2_HOOK_FASTCALL SplondificatalizeIdentifier(br_actor* pActor, char **pIdentifier, int pIndex) {
+void C2_HOOK_FASTCALL SplondificatalizeIdentifier(void* pParent, char **pIdentifier, int pIndex) {
     char s[64];
     char s2[64];
     int len;
@@ -964,7 +985,7 @@ void C2_HOOK_FASTCALL SplondificatalizeIdentifier(br_actor* pActor, char **pIden
     s[11] = '\0';
     if (strlen(*pIdentifier) < 12) {
         BrResFree(*pIdentifier);
-        *pIdentifier = BrResStrDup(pActor, s);
+        *pIdentifier = BrResStrDup(pParent, s);
     } else {
         strcpy(*pIdentifier, s);
     }
@@ -1002,9 +1023,34 @@ void C2_HOOK_FASTCALL DisposeSmashableEnvironment(void) {
     }
 }
 
-// CloneMemory
+//@PT:CloneMemory@
+inline void* C2_HOOK_FASTCALL CloneMemory(void* pSource, br_size_t pSize) {
+    void* result;
 
-// CloneEnvSmash
+    result = BrMemAllocate(pSize, kMem_cloned_block);
+    memcpy(result, pSource, pSize);
+    return result;
+}
+//@/PT:CloneMemory@
+
+//@PT:CloneEnvSmash@
+inline void C2_HOOK_FASTCALL CloneEnvSmash(tSmashable_item_spec* pSource, tSmashable_item_spec* pDest) {
+
+    *pDest = *pSource;
+    if (pSource->trigger_type != -1
+        && (pSource->mode == kSmashableMode_Decal || pSource->mode == kSmashableMode_TextureChange)
+        && pSource->mode_data.texture_change.levels != NULL) {
+        pDest->mode_data.texture_change.levels = CloneMemory(pSource->mode_data.texture_change.levels, pSource->mode_data.texture_change.count_levels * sizeof(tSmashable_level));
+    }
+    if (pDest->trigger_object.material != NULL) {
+        pDest->trigger_object.material = DRMaterialClone(pDest->trigger_object.material, 0);
+        pDest->trigger_object.material->identifier = BrResStrDup(pDest->trigger_object.material, pSource->trigger_object.material->identifier);
+        pDest->mode_data.texture_change.trigger.material = pDest->trigger_object.material;
+        pDest->flags |= 0x80000000;
+        SplondificatalizeIdentifier(pDest->trigger_object.material, &pDest->trigger_object.material->identifier, pDest - gTrack_smashable_environment_specs);
+    }
+}
+//@/PT:CloneEnvSmash@
 
 // FUNCTION: CARMA2_HW 0x004f09c0
 // FUNCTION: CARMA2_SW 0x004ec620
@@ -1077,7 +1123,17 @@ void C2_HOOK_FASTCALL FreeConnotations(tConnotations* pConnotations, int pKeep_a
 
 // MungeSmashMaterialNames
 
-// ExtrapolateTextureCoordinates
+//@PT:ExtrapolateTextureCoordinates@
+inline void C2_HOOK_FASTCALL ExtrapolateTextureCoordinates(tSmash_quad_mapping* pMapping, tSmash_triangle_mapping* pTriangle, br_vector3* pPoint, br_vector2* pMap) {
+
+    pMap->v[0] = pTriangle->map_from_geometry[0][0] * (pPoint->v[pMapping->axis_0] - pTriangle->origin.v[pMapping->axis_0])
+        + pTriangle->map_from_geometry[0][1] * (pPoint->v[pMapping->axis_1] - pTriangle->origin.v[pMapping->axis_1])
+        + pTriangle->map_origin.v[0];
+    pMap->v[1] = pTriangle->map_from_geometry[1][0] * (pPoint->v[pMapping->axis_0] - pTriangle->origin.v[pMapping->axis_0])
+        + pTriangle->map_from_geometry[1][1] * (pPoint->v[pMapping->axis_1] - pTriangle->origin.v[pMapping->axis_1])
+        + pTriangle->map_origin.v[1];
+}
+//@/PT:ExtrapolateTextureCoordinates@
 
 // ExtrapolateGeometryCoordinates2
 
@@ -1094,9 +1150,349 @@ void C2_HOOK_FASTCALL ExtrapolateGeometryCoordinates(tSmash_quad_mapping* pMappi
 #pragma auto_inline(on)
 #endif
 
-// ExtractDeTiledFaces
+//@PT:ExtractDeTiledFaces@
+inline int C2_HOOK_FASTCALL ExtractDeTiledFaces(tFace_ref* pFace, br_vector3* pPoint, br_vertex* pVertices, tU8* pCrossed, tU8* pOn_edge, br_vertex** pCorners, tSmash_quad_mapping* pMapping, int pUse_face_bounds) {
+    br_model* model;
+    br_face* faces;
+    br_face* face;
+    br_face* other_face;
+    br_vertex* vertices;
+    br_vertex* temp_vertex;
+    v11group* group;
+    v11face* group_faces;
+    v11face* group_face;
+    v11face* other_group_face;
+    fmt_vertex* group_vertices;
+    fmt_vertex* group_corners[4];
+    fmt_vertex* temp_group_vertex;
+    br_vector3* p0;
+    br_vector3* p1;
+    br_vector3* p2;
+    br_vector3* p3;
+    br_vector2 map[4];
+    br_vector4 plane;
+    br_vector3 origin;
+    br_vector3 e2;
+    br_vector3 e1;
+    br_vector2 map_edge;
+    br_vector2 uv;
+    int i;
+    int count;
+    int index_0;
+    int index_1;
+    int axis_0;
+    int axis_1;
+    int axis_2;
+    br_scalar d01;
+    br_scalar d02;
+    br_scalar d12;
+    br_scalar det_1;
+    br_scalar det_2;
+    br_scalar min_u;
+    br_scalar min_v;
+    br_scalar max_u;
+    br_scalar max_v;
+    br_scalar low_u;
+    br_scalar low_v;
+    br_scalar high_u;
+    br_scalar high_v;
 
-// AddDecal
+    model = pFace->a->model;
+    if (pFace->g < 0) {
+        faces = model->faces;
+        vertices = model->vertices;
+        face = &faces[(tU16)pFace->f];
+        for (i = 0; i < 3; i++) {
+            pCorners[i] = &vertices[face->vertices[i]];
+        }
+        count = model->nfaces;
+        d01 = (pCorners[0]->p.v[0] - pCorners[1]->p.v[0]) * (pCorners[0]->p.v[0] - pCorners[1]->p.v[0]) + (pCorners[0]->p.v[1] - pCorners[1]->p.v[1]) * (pCorners[0]->p.v[1] - pCorners[1]->p.v[1]) + (pCorners[0]->p.v[2] - pCorners[1]->p.v[2]) * (pCorners[0]->p.v[2] - pCorners[1]->p.v[2]);
+        d02 = (pCorners[0]->p.v[0] - pCorners[2]->p.v[0]) * (pCorners[0]->p.v[0] - pCorners[2]->p.v[0]) + (pCorners[0]->p.v[1] - pCorners[2]->p.v[1]) * (pCorners[0]->p.v[1] - pCorners[2]->p.v[1]) + (pCorners[0]->p.v[2] - pCorners[2]->p.v[2]) * (pCorners[0]->p.v[2] - pCorners[2]->p.v[2]);
+        d12 = (pCorners[1]->p.v[0] - pCorners[2]->p.v[0]) * (pCorners[1]->p.v[0] - pCorners[2]->p.v[0]) + (pCorners[1]->p.v[1] - pCorners[2]->p.v[1]) * (pCorners[1]->p.v[1] - pCorners[2]->p.v[1]) + (pCorners[1]->p.v[2] - pCorners[2]->p.v[2]) * (pCorners[1]->p.v[2] - pCorners[2]->p.v[2]);
+        if (d02 > d01 && d02 > d12) {
+            temp_vertex = pCorners[1];
+            pCorners[1] = pCorners[2];
+            pCorners[2] = temp_vertex;
+        } else if (d12 > d01 && d12 > d02) {
+            temp_vertex = pCorners[0];
+            pCorners[0] = pCorners[2];
+            pCorners[2] = temp_vertex;
+        }
+        index_0 = pCorners[0] - vertices;
+        index_1 = pCorners[1] - vertices;
+        other_face = faces;
+        for (i = 0; i < count; i++, other_face++) {
+            if (face != other_face && face->material == other_face->material) {
+                if (other_face->vertices[0] == index_0 && other_face->vertices[1] == index_1) {
+                    pCorners[3] = &vertices[other_face->vertices[2]];
+                    break;
+                }
+                if (other_face->vertices[1] == index_0 && other_face->vertices[0] == index_1) {
+                    pCorners[3] = &vertices[other_face->vertices[2]];
+                    break;
+                }
+                if (other_face->vertices[0] == index_0 && other_face->vertices[2] == index_1) {
+                    pCorners[3] = &vertices[other_face->vertices[1]];
+                    break;
+                }
+                if (other_face->vertices[2] == index_0 && other_face->vertices[0] == index_1) {
+                    pCorners[3] = &vertices[other_face->vertices[1]];
+                    break;
+                }
+                if (other_face->vertices[1] == index_0 && other_face->vertices[2] == index_1) {
+                    pCorners[3] = &vertices[other_face->vertices[0]];
+                    break;
+                }
+                if (other_face->vertices[2] == index_0 && other_face->vertices[1] == index_1) {
+                    pCorners[3] = &vertices[other_face->vertices[0]];
+                    break;
+                }
+            }
+        }
+        if (i >= count) {
+            return 0;
+        }
+        for (i = 0; i < 4; i++) {
+            BrMatrix23ApplyP(&map[i], &pCorners[i]->map, &pFace->material->map_transform);
+        }
+        BrVector3Copy(&plane, &face->n);
+        plane.v[3] = face->d;
+        p0 = &pCorners[0]->p;
+        p1 = &pCorners[1]->p;
+        p2 = &pCorners[2]->p;
+        p3 = &pCorners[3]->p;
+    } else {
+        group = &model->prepared->groups[pFace->g];
+        group_faces = group->faces;
+        group_vertices = group->vertices;
+        group_face = &group_faces[(tU16)pFace->f];
+        for (i = 0; i < 3; i++) {
+            group_corners[i] = &group_vertices[group_face->vertices[i]];
+        }
+        count = group->nfaces;
+        d01 = (group_corners[0]->p.v[0] - group_corners[1]->p.v[0]) * (group_corners[0]->p.v[0] - group_corners[1]->p.v[0]) + (group_corners[0]->p.v[1] - group_corners[1]->p.v[1]) * (group_corners[0]->p.v[1] - group_corners[1]->p.v[1]) + (group_corners[0]->p.v[2] - group_corners[1]->p.v[2]) * (group_corners[0]->p.v[2] - group_corners[1]->p.v[2]);
+        d02 = (group_corners[0]->p.v[0] - group_corners[2]->p.v[0]) * (group_corners[0]->p.v[0] - group_corners[2]->p.v[0]) + (group_corners[0]->p.v[1] - group_corners[2]->p.v[1]) * (group_corners[0]->p.v[1] - group_corners[2]->p.v[1]) + (group_corners[0]->p.v[2] - group_corners[2]->p.v[2]) * (group_corners[0]->p.v[2] - group_corners[2]->p.v[2]);
+        d12 = (group_corners[1]->p.v[0] - group_corners[2]->p.v[0]) * (group_corners[1]->p.v[0] - group_corners[2]->p.v[0]) + (group_corners[1]->p.v[1] - group_corners[2]->p.v[1]) * (group_corners[1]->p.v[1] - group_corners[2]->p.v[1]) + (group_corners[1]->p.v[2] - group_corners[2]->p.v[2]) * (group_corners[1]->p.v[2] - group_corners[2]->p.v[2]);
+        if (d02 > d01 && d02 > d12) {
+            temp_group_vertex = group_corners[1];
+            group_corners[1] = group_corners[2];
+            group_corners[2] = temp_group_vertex;
+        } else if (d12 > d01 && d12 > d02) {
+            temp_group_vertex = group_corners[0];
+            group_corners[0] = group_corners[2];
+            group_corners[2] = temp_group_vertex;
+        }
+        index_0 = group_corners[0] - group_vertices;
+        index_1 = group_corners[1] - group_vertices;
+        other_group_face = group_faces;
+        for (i = 0; i < count; i++, other_group_face++) {
+            if (group_face != other_group_face) {
+                if (other_group_face->vertices[0] == index_0 && other_group_face->vertices[1] == index_1) {
+                    group_corners[3] = &group_vertices[other_group_face->vertices[2]];
+                    break;
+                }
+                if (other_group_face->vertices[1] == index_0 && other_group_face->vertices[0] == index_1) {
+                    group_corners[3] = &group_vertices[other_group_face->vertices[2]];
+                    break;
+                }
+                if (other_group_face->vertices[0] == index_0 && other_group_face->vertices[2] == index_1) {
+                    group_corners[3] = &group_vertices[other_group_face->vertices[1]];
+                    break;
+                }
+                if (other_group_face->vertices[2] == index_0 && other_group_face->vertices[0] == index_1) {
+                    group_corners[3] = &group_vertices[other_group_face->vertices[1]];
+                    break;
+                }
+                if (other_group_face->vertices[1] == index_0 && other_group_face->vertices[2] == index_1) {
+                    group_corners[3] = &group_vertices[other_group_face->vertices[0]];
+                    break;
+                }
+                if (other_group_face->vertices[2] == index_0 && other_group_face->vertices[1] == index_1) {
+                    group_corners[3] = &group_vertices[other_group_face->vertices[0]];
+                    break;
+                }
+            }
+        }
+        if (i >= count) {
+            return 0;
+        }
+        for (i = 0; i < 4; i++) {
+            BrMatrix23ApplyP(&map[i], &group_corners[i]->map, &pFace->material->map_transform);
+        }
+        plane = group_face->eqn;
+        p0 = &group_corners[0]->p;
+        p1 = &group_corners[1]->p;
+        p2 = &group_corners[2]->p;
+        p3 = &group_corners[3]->p;
+    }
+    BrVector3Copy(&origin, p0);
+    BrVector3Sub(&e1, p1, p0);
+    BrVector3Sub(&e2, p2, p0);
+    map_edge.v[0] = map[1].v[0] - map[0].v[0];
+    map_edge.v[1] = map[1].v[1] - map[0].v[1];
+    if ((float)fabs(pFace->normal.v[0]) > (float)fabs(pFace->normal.v[1]) && (float)fabs(pFace->normal.v[0]) > (float)fabs(pFace->normal.v[2])) {
+        axis_0 = 2;
+        axis_1 = 1;
+        axis_2 = 0;
+    } else if ((float)fabs(pFace->normal.v[1]) > (float)fabs(pFace->normal.v[0]) && (float)fabs(pFace->normal.v[1]) > (float)fabs(pFace->normal.v[2])) {
+        axis_0 = 0;
+        axis_1 = 2;
+        axis_2 = 1;
+    } else {
+        axis_0 = 0;
+        axis_1 = 1;
+        axis_2 = 2;
+    }
+    pMapping->axis_0 = axis_0;
+    pMapping->axis_1 = axis_1;
+    pMapping->axis_2 = axis_2;
+    BrVector3Copy(&pMapping->normal, &plane);
+    pMapping->d = plane.v[3];
+    BrVector3Copy(&pMapping->triangles[0].origin, &origin);
+    BrVector2Copy(&pMapping->triangles[0].map_origin, &map[0]);
+    det_1 = e1.v[axis_0] * e2.v[axis_1] - e1.v[axis_1] * e2.v[axis_0];
+    det_2 = e1.v[axis_1] * e2.v[axis_0] - e1.v[axis_0] * e2.v[axis_1];
+    pMapping->triangles[0].map_from_geometry[0][0] = (map_edge.v[0] * e2.v[axis_1] - (map[2].v[0] - map[0].v[0]) * e1.v[axis_1]) / det_1;
+    pMapping->triangles[0].map_from_geometry[0][1] = (map_edge.v[0] * e2.v[axis_0] - (map[2].v[0] - map[0].v[0]) * e1.v[axis_0]) / det_2;
+    pMapping->triangles[0].map_from_geometry[1][0] = (map_edge.v[1] * e2.v[axis_1] - (map[2].v[1] - map[0].v[1]) * e1.v[axis_1]) / det_1;
+    pMapping->triangles[0].map_from_geometry[1][1] = (map_edge.v[1] * e2.v[axis_0] - (map[2].v[1] - map[0].v[1]) * e1.v[axis_0]) / det_2;
+    BrVector2Copy(&pMapping->triangles[0].map_other, &map[2]);
+    BrVector3Sub(&e2, p3, p0);
+    BrVector3Copy(&pMapping->triangles[1].origin, &origin);
+    BrVector2Copy(&pMapping->triangles[1].map_origin, &map[0]);
+    det_1 = e1.v[axis_0] * e2.v[axis_1] - e1.v[axis_1] * e2.v[axis_0];
+    det_2 = e1.v[axis_1] * e2.v[axis_0] - e1.v[axis_0] * e2.v[axis_1];
+    pMapping->triangles[1].map_from_geometry[0][0] = (map_edge.v[0] * e2.v[axis_1] - (map[3].v[0] - map[0].v[0]) * e1.v[axis_1]) / det_1;
+    pMapping->triangles[1].map_from_geometry[0][1] = (map_edge.v[0] * e2.v[axis_0] - (map[3].v[0] - map[0].v[0]) * e1.v[axis_0]) / det_2;
+    pMapping->triangles[1].map_from_geometry[1][0] = (map_edge.v[1] * e2.v[axis_1] - (map[3].v[1] - map[0].v[1]) * e1.v[axis_1]) / det_1;
+    pMapping->triangles[1].map_from_geometry[1][1] = (map_edge.v[1] * e2.v[axis_0] - (map[3].v[1] - map[0].v[1]) * e1.v[axis_0]) / det_2;
+    BrVector2Copy(&pMapping->triangles[1].map_other, &map[3]);
+    if (pMapping->triangles[1].map_other.v[0] == pMapping->triangles[0].map_other.v[0] && pMapping->triangles[1].map_other.v[1] == pMapping->triangles[0].map_other.v[1]) {
+        return 0;
+    }
+    BrVector2Copy(&pMapping->map_edge, &map_edge);
+    ExtrapolateTextureCoordinates(pMapping, &pMapping->triangles[0], pPoint, &uv);
+    pMapping->triangles[0].face = face;
+    pMapping->triangles[1].face = other_face;
+    min_u = (float)floor(uv.v[0]);
+    min_v = (float)floor(uv.v[1]);
+    max_u = (float)ceil(uv.v[0]);
+    max_v = (float)ceil(uv.v[1]);
+    low_u = map[0].v[0];
+    high_u = map[0].v[0];
+    low_v = map[0].v[1];
+    high_v = map[0].v[1];
+    for (i = 1; i < 4; i++) {
+        if (map[i].v[0] < low_u) {
+            low_u = map[i].v[0];
+        }
+        if (map[i].v[1] < low_v) {
+            low_v = map[i].v[1];
+        }
+        if (map[i].v[0] > high_u) {
+            high_u = map[i].v[0];
+        }
+        if (map[i].v[1] > high_v) {
+            high_v = map[i].v[1];
+        }
+    }
+    if (pUse_face_bounds) {
+        min_u = low_u;
+        min_v = low_v;
+        max_u = high_u;
+        max_v = high_v;
+    }
+    pCrossed[0] = 0;
+    pCrossed[1] = 0;
+    pCrossed[2] = 0;
+    pCrossed[3] = 0;
+    pOn_edge[0] = 0;
+    pOn_edge[1] = 0;
+    pOn_edge[2] = 0;
+    pOn_edge[3] = 0;
+    if (fabs(min_u - low_u) < 0.01) {
+        pOn_edge[0] = 1;
+        min_u = low_u;
+    } else if (min_u < low_u) {
+        pOn_edge[0] = 1;
+        min_u = low_u;
+        pCrossed[0] = 1;
+    }
+    if (fabs(min_v - low_v) < 0.01) {
+        pOn_edge[1] = 1;
+        min_v = low_v;
+    } else if (min_v < low_v) {
+        pOn_edge[1] = 1;
+        min_v = low_v;
+        pCrossed[1] = 1;
+    }
+    if (fabs(max_u - high_u) < 0.01) {
+        pOn_edge[2] = 1;
+        max_u = high_u;
+    } else if (max_u > high_u) {
+        pOn_edge[2] = 1;
+        max_u = high_u;
+        pCrossed[2] = 1;
+    }
+    if (fabs(max_v - high_v) < 0.01) {
+        pOn_edge[3] = 1;
+        max_v = high_v;
+    } else if (max_v > high_v) {
+        pOn_edge[3] = 1;
+        max_v = high_v;
+        pCrossed[3] = 1;
+    }
+    if (min_u == max_u) {
+        return 0;
+    }
+    if (min_v == max_v) {
+        return 0;
+    }
+    pVertices[0].map.v[0] = min_u;
+    pVertices[0].map.v[1] = min_v;
+    BrVector3Copy(&pVertices[0].n, &pFace->normal);
+    pVertices[1].map.v[0] = max_u;
+    pVertices[1].map.v[1] = min_v;
+    BrVector3Copy(&pVertices[1].n, &pFace->normal);
+    pVertices[2].map.v[0] = min_u;
+    pVertices[2].map.v[1] = max_v;
+    BrVector3Copy(&pVertices[2].n, &pFace->normal);
+    pVertices[3].map.v[0] = max_u;
+    pVertices[3].map.v[1] = max_v;
+    BrVector3Copy(&pVertices[3].n, &pFace->normal);
+    pVertices[0].red = 0xff;
+    pVertices[0].grn = 0xff;
+    pVertices[0].blu = 0xff;
+    pVertices[1].red = 0xff;
+    pVertices[1].grn = 0xff;
+    pVertices[1].blu = 0xff;
+    pVertices[2].red = 0xff;
+    pVertices[2].grn = 0xff;
+    pVertices[2].blu = 0xff;
+    pVertices[3].red = 0xff;
+    pVertices[3].grn = 0xff;
+    pVertices[3].blu = 0xff;
+    for (i = 0; i < 4; i++) {
+        ExtrapolateGeometryCoordinates(pMapping, &pVertices[i].map, &pVertices[i]);
+    }
+    return 1;
+}
+//@/PT:ExtractDeTiledFaces@
+
+//@PT:AddDecal@
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_HW 0x004f3820
+br_actor* C2_HOOK_FASTCALL AddDecal(tFace_ref* pFace, br_vertex* pVertices, br_material* pMaterial, tU16* pFace_points, tU16* pPoint_indices) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
+//@/PT:AddDecal@
 
 // FUNCTION: CARMA2_HW 0x004f39a0
 int C2_HOOK_FASTCALL InsertQuad(tSmash_quad_mapping* pMapping, br_actor* pActor, br_vertex* pVertices, tU8* pOn_edge, br_vertex** pCorners, br_material* pMaterial, tU16* pFace_points, tU16* pPoint_indices) {
@@ -1411,15 +1807,374 @@ int C2_HOOK_FASTCALL InsertQuad(tSmash_quad_mapping* pMapping, br_actor* pActor,
     return 1;
 }
 
-// SpawnSmashAndMungeFaces
+//@PT:SpawnSmashAndMungeFaces@
+inline tSmashable_item_spec* C2_HOOK_FASTCALL SpawnSmashAndMungeFaces(tPhysics_object* pObject, tSmash_quad_mapping* pMapping, tFace_ref* pFace, tSmashable_item_spec* pSpec, br_vertex* pVertices, tU8* pOn_edge, br_vertex** pCorners, br_actor** pActor) {
+    tSmashable_item_spec* spec;
+
+    CloneEnvSmash(pSpec, &gTrack_smashable_environment_specs[gCount_track_smashable_environment_specs]);
+    spec = &gTrack_smashable_environment_specs[gCount_track_smashable_environment_specs++];
+    spec->mode_data.texture_change.field_0x74 = 2;
+    spec->mode_data.texture_change.field_0x78 = BrMemAllocate(2 * 3 * sizeof(tU16), kMem_smash_poly_array);
+    spec->mode_data.texture_change.field_0x6c = 4;
+    spec->mode_data.texture_change.field_0x70 = BrMemAllocate(4 * sizeof(tU16), kMem_smash_vertex_array);
+    spec->mode_data.texture_change.faces[0] = NULL;
+    spec->mode_data.texture_change.faces[1] = NULL;
+    spec->field_0x2dc = 1;
+    FogAccordingToGPSCDE(spec->trigger_object.material);
+    if (spec->mode == kSmashableMode_Decal) {
+        *pActor = AddDecal(pFace, pVertices, spec->trigger_object.material, spec->mode_data.texture_change.field_0x78, spec->mode_data.texture_change.field_0x70);
+        spec->field_0x2d4 = *pActor;
+    } else {
+        if (!InsertQuad(pMapping, pFace->a, pVertices, pOn_edge, pCorners, spec->trigger_object.material, spec->mode_data.texture_change.field_0x78, spec->mode_data.texture_change.field_0x70)) {
+            FreeEnvSmash(spec);
+            gCount_track_smashable_environment_specs--;
+            return NULL;
+        }
+        pObject->box_face_ref = gFace_num__car - 2;
+        pObject->box_face_end = 0;
+        pObject->box_face_start = 0;
+    }
+    spec->field_0x2d8 = pSpec->field_0x2d8;
+    pSpec->field_0x2d8 = spec;
+    return spec;
+}
+//@/PT:SpawnSmashAndMungeFaces@
 
 // DistanceFromFaceND
 
 // PointInFace
 
-// FindFaceWithPoint
+//@PT:FindFaceWithPoint@
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
 
-// ProcessTexture
+// STUB: CARMA2_HW 0x004f4c70
+int C2_HOOK_FASTCALL FindFaceWithPoint(tFace_ref* pFace, br_vector3* pPoint, tFace_ref* pResult, int pParam_4) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
+//@/PT:FindFaceWithPoint@
+
+//@PT:ProcessTexture@
+// FUNCTION: CARMA2_HW 0x004f18d0
+float C2_HOOK_FASTCALL ProcessTexture(tPhysics_object* pObject, br_material* pMaterial, br_actor* pActor, tSmashable_item_spec* pTrigger_spec, tSmashable_item_spec* pSpec, tFace_ref* pFace, float pImpulse, br_vector3* pPoint, void* pParam_9, br_vector3* pVelocity, int pEdge, int pParam_12, int* pDone, int pParam_14) {
+    int edge_start[4] = { 0, 0, 1, 2 };
+    int edge_end[4] = { 2, 1, 3, 3 };
+    tFace_ref face_1;
+    tFace_ref face_2;
+    int dummy;
+    br_vertex vertices[4];
+    tSmash_quad_mapping mapping;
+    br_vector3 point;
+    float result;
+    br_vertex* corners[4];
+    int already_there;
+    br_vector3 edge_point;
+    br_vector3 opposite_point;
+    tU8 on_edge[4];
+    tU8 crossed[4];
+    br_actor* actor;
+    tSmashable_item_spec* spec;
+    tSmashable_level* level;
+    int edges_only;
+    int i;
+    int j;
+    int index;
+    int opposite;
+    br_scalar d;
+    br_scalar mid_u;
+    br_scalar mid_v;
+
+    already_there = 0;
+    *pDone = 0;
+    result = -1.0f;
+    if (gINT_006a8290++ >= 16) {
+        return -1.0f;
+    }
+    if ((pSpec->mode == kSmashableMode_Decal) == ((pActor->model->flags & 0x80) != 0)) {
+        return -1.0f;
+    }
+    if (gCount_track_smashable_environment_specs >= gCapacity_track_smashables) {
+        return -1.0f;
+    }
+    if (pSpec->mode_data.texture_change.count_levels <= 1) {
+        return -1.0f;
+    }
+    if (pImpulse < 0.1) {
+        return -1.0f;
+    }
+    if (pSpec->mode_data.texture_change.field_0x4c >= pSpec->mode_data.texture_change.count_levels - 1) {
+        return -1.0f;
+    }
+    d = -DistanceFromFace(pPoint, pFace);
+    point.v[0] = pFace->normal.v[0] * d + pPoint->v[0];
+    point.v[1] = pFace->normal.v[1] * d + pPoint->v[1];
+    point.v[2] = pFace->normal.v[2] * d + pPoint->v[2];
+    if (pEdge < 0 && pTrigger_spec->field_0x2d8 != NULL && pTrigger_spec->mode == kSmashableMode_TextureChange) {
+        if (!FindFaceWithPoint(pFace, &point, &face_1, 1)) {
+            return -1.0f;
+        }
+        pFace = &face_1;
+        pMaterial = face_1.material;
+        pSpec = &gTrack_smashable_environment_specs[(tU8)face_1.material->identifier[6] - 1];
+        pTrigger_spec = pSpec;
+        pParam_12 = !pSpec->field_0x2dc;
+    }
+    if (!ExtractDeTiledFaces(pFace, &point, vertices, crossed, on_edge, corners, &mapping, pSpec->mode_data.texture_change.levels[1].flags & 0x2)) {
+        return -1.0f;
+    }
+    actor = pActor;
+    mid_u = (vertices[0].map.v[0] + vertices[1].map.v[0] + vertices[3].map.v[0] + vertices[2].map.v[0]) * 0.25f;
+    mid_v = (vertices[0].map.v[1] + vertices[1].map.v[1] + vertices[3].map.v[1] + vertices[2].map.v[1]) * 0.25f;
+    for (i = 0; i < 4; i++) {
+        if (vertices[i].map.v[0] < mid_u) {
+            index = 0;
+        } else {
+            index = 1;
+        }
+        if (vertices[i].map.v[1] > mid_v) {
+            index |= 0x2;
+        }
+        BrVector3Copy(&gVector3_006b78a0[index], &vertices[i].p);
+    }
+    BrVector3Copy(&gVector3_006a4688, &mapping.normal);
+    gINT_006a3334 = 1;
+    spec = pSpec;
+    if (!pSpec->field_0x2dc) {
+        for (spec = pTrigger_spec->field_0x2d8; spec != NULL && !already_there; spec = spec->field_0x2d8) {
+            if (spec->field_0x2d4 != NULL) {
+                for (i = 0; i < 4; i++) {
+                    if (fabs(spec->field_0x2d4->model->vertices[i].p.v[0] - vertices[i].p.v[0]) >= 0.01
+                        || fabs(spec->field_0x2d4->model->vertices[i].p.v[1] - vertices[i].p.v[1]) >= 0.01
+                        || fabs(spec->field_0x2d4->model->vertices[i].p.v[2] - vertices[i].p.v[2]) >= 0.01) {
+                        break;
+                    }
+                }
+                if (i == 4) {
+                    already_there = 1;
+                    pSpec = spec;
+                    actor = spec->field_0x2d4;
+                }
+            }
+        }
+        spec = pSpec;
+        if (!already_there && !(pSpec->flags & 0x80000000)) {
+            spec = SpawnSmashAndMungeFaces(pObject, &mapping, pFace, pSpec, vertices, on_edge, corners, &actor);
+            if (spec == NULL) {
+                return -1.0f;
+            }
+        }
+    }
+    level = QueueSmashIfNecessary3(NULL, pObject, &point, pVelocity, actor, pTrigger_spec, &spec->mode_data.texture_change, pImpulse, spec->mode != kSmashableMode_Decal, pParam_14);
+    if (level != NULL && level->collision_type == kTextureLevelCollisionChange_Edges) {
+        edges_only = 1;
+    } else {
+        edges_only = 0;
+    }
+    if (level != NULL && (level->collision_type == kTextureLevelCollisionChange_PassThrough || level->collision_type == kTextureLevelCollisionChange_Edges)) {
+        result = level->trigger_threshold;
+    }
+    *pDone = 1;
+    if (pEdge >= 0) {
+        if (edges_only && (spec->mode_data.texture_change.faces[0] != NULL || spec->mode_data.texture_change.faces[1] != NULL)) {
+            if (spec->mode_data.texture_change.faces[0] != NULL) {
+                spec->mode_data.texture_change.faces[0]->flags |= spec->mode_data.texture_change.face_flags[0];
+            }
+            if (spec->mode_data.texture_change.faces[1] != NULL) {
+                spec->mode_data.texture_change.faces[1]->flags |= spec->mode_data.texture_change.face_flags[1];
+            }
+        } else {
+            switch (pEdge) {
+            case 0:
+                if (edges_only) {
+                    mapping.triangles[1].face->flags |= 0x4;
+                } else if (pParam_12) {
+                    if (spec->mode_data.texture_change.faces[0] == mapping.triangles[1].face) {
+                        spec->mode_data.texture_change.face_flags[0] |= 0x4;
+                    } else if (spec->mode_data.texture_change.faces[1] == mapping.triangles[1].face) {
+                        spec->mode_data.texture_change.face_flags[1] |= 0x4;
+                    }
+                    if (spec->mode_data.texture_change.faces[0] == NULL) {
+                        spec->mode_data.texture_change.face_flags[0] |= 0x4;
+                        spec->mode_data.texture_change.faces[0] = mapping.triangles[1].face;
+                    } else {
+                        spec->mode_data.texture_change.face_flags[1] |= 0x4;
+                        spec->mode_data.texture_change.faces[1] = mapping.triangles[1].face;
+                    }
+                }
+                break;
+            case 1:
+                if (edges_only) {
+                    mapping.triangles[0].face->flags |= 0x1;
+                } else if (pParam_12) {
+                    if (spec->mode_data.texture_change.faces[0] == mapping.triangles[0].face) {
+                        spec->mode_data.texture_change.face_flags[0] |= 0x1;
+                    } else if (spec->mode_data.texture_change.faces[1] == mapping.triangles[0].face) {
+                        spec->mode_data.texture_change.face_flags[1] |= 0x1;
+                    }
+                    if (spec->mode_data.texture_change.faces[0] == NULL) {
+                        spec->mode_data.texture_change.face_flags[0] |= 0x1;
+                        spec->mode_data.texture_change.faces[0] = mapping.triangles[0].face;
+                    } else {
+                        spec->mode_data.texture_change.face_flags[1] |= 0x1;
+                        spec->mode_data.texture_change.faces[1] = mapping.triangles[0].face;
+                    }
+                }
+                break;
+            case 2:
+                if (edges_only) {
+                    mapping.triangles[0].face->flags |= 0x2;
+                } else if (pParam_12) {
+                    if (spec->mode_data.texture_change.faces[0] == mapping.triangles[0].face) {
+                        spec->mode_data.texture_change.face_flags[0] |= 0x2;
+                    } else if (spec->mode_data.texture_change.faces[1] == mapping.triangles[0].face) {
+                        spec->mode_data.texture_change.face_flags[1] |= 0x2;
+                    }
+                    if (spec->mode_data.texture_change.faces[0] == NULL) {
+                        spec->mode_data.texture_change.face_flags[0] |= 0x2;
+                        spec->mode_data.texture_change.faces[0] = mapping.triangles[0].face;
+                    } else {
+                        spec->mode_data.texture_change.face_flags[1] |= 0x2;
+                        spec->mode_data.texture_change.faces[1] = mapping.triangles[0].face;
+                    }
+                }
+                break;
+            case 3:
+                if (edges_only) {
+                    mapping.triangles[1].face->flags |= 0x2;
+                } else if (pParam_12) {
+                    if (spec->mode_data.texture_change.faces[0] == mapping.triangles[1].face) {
+                        spec->mode_data.texture_change.face_flags[0] |= 0x2;
+                    } else if (spec->mode_data.texture_change.faces[1] == mapping.triangles[1].face) {
+                        spec->mode_data.texture_change.face_flags[1] |= 0x2;
+                    }
+                    if (spec->mode_data.texture_change.faces[0] == NULL) {
+                        spec->mode_data.texture_change.face_flags[0] |= 0x2;
+                        spec->mode_data.texture_change.faces[0] = mapping.triangles[1].face;
+                    } else {
+                        spec->mode_data.texture_change.face_flags[1] |= 0x2;
+                        spec->mode_data.texture_change.faces[1] = mapping.triangles[1].face;
+                    }
+                }
+                break;
+            }
+        }
+    }
+    for (i = 0; i < 4; i++) {
+        if (i != pEdge && crossed[i]) {
+            opposite = (i + 2) % 4;
+            BrVector3Add(&edge_point, &vertices[edge_start[i]].p, &vertices[edge_end[i]].p);
+            BrVector3Scale(&edge_point, &edge_point, 0.5f);
+            BrVector3Add(&opposite_point, &vertices[edge_end[opposite]].p, &vertices[edge_start[opposite]].p);
+            BrVector3Scale(&opposite_point, &opposite_point, 0.5f);
+            BrVector3Sub(&opposite_point, &edge_point, &opposite_point);
+            BrVector3Scale(&opposite_point, &opposite_point, 0.001f);
+            BrVector3Accumulate(&edge_point, &opposite_point);
+            if (FindFaceWithPoint(pFace, &edge_point, &face_2, 0)) {
+                if (edges_only && (spec->mode_data.texture_change.faces[0] != NULL || spec->mode_data.texture_change.faces[1] != NULL)) {
+                    if (spec->mode_data.texture_change.faces[0] != NULL) {
+                        spec->mode_data.texture_change.faces[0]->flags |= spec->mode_data.texture_change.face_flags[0];
+                    }
+                    if (spec->mode_data.texture_change.faces[1] != NULL) {
+                        spec->mode_data.texture_change.faces[1]->flags |= spec->mode_data.texture_change.face_flags[1];
+                    }
+                } else {
+                    switch (i) {
+                    case 0:
+                        if (edges_only) {
+                            mapping.triangles[1].face->flags |= 0x4;
+                        } else if (pParam_12) {
+                            if (spec->mode_data.texture_change.faces[0] == mapping.triangles[1].face) {
+                                spec->mode_data.texture_change.face_flags[0] |= 0x4;
+                            } else if (spec->mode_data.texture_change.faces[1] == mapping.triangles[1].face) {
+                                spec->mode_data.texture_change.face_flags[1] |= 0x4;
+                            }
+                            if (spec->mode_data.texture_change.faces[0] == NULL) {
+                                spec->mode_data.texture_change.face_flags[0] |= 0x4;
+                                spec->mode_data.texture_change.faces[0] = mapping.triangles[1].face;
+                            } else {
+                                spec->mode_data.texture_change.face_flags[1] |= 0x4;
+                                spec->mode_data.texture_change.faces[1] = mapping.triangles[1].face;
+                            }
+                        }
+                        break;
+                    case 1:
+                        if (edges_only) {
+                            mapping.triangles[0].face->flags |= 0x1;
+                        } else if (pParam_12) {
+                            if (spec->mode_data.texture_change.faces[0] == mapping.triangles[0].face) {
+                                spec->mode_data.texture_change.face_flags[0] |= 0x1;
+                            } else if (spec->mode_data.texture_change.faces[1] == mapping.triangles[0].face) {
+                                spec->mode_data.texture_change.face_flags[1] |= 0x1;
+                            }
+                            if (spec->mode_data.texture_change.faces[0] == NULL) {
+                                spec->mode_data.texture_change.face_flags[0] |= 0x1;
+                                spec->mode_data.texture_change.faces[0] = mapping.triangles[0].face;
+                            } else {
+                                spec->mode_data.texture_change.face_flags[1] |= 0x1;
+                                spec->mode_data.texture_change.faces[1] = mapping.triangles[0].face;
+                            }
+                        }
+                        break;
+                    case 2:
+                        if (edges_only) {
+                            mapping.triangles[0].face->flags |= 0x2;
+                        } else if (pParam_12) {
+                            if (spec->mode_data.texture_change.faces[0] == mapping.triangles[0].face) {
+                                spec->mode_data.texture_change.face_flags[0] |= 0x2;
+                            } else if (spec->mode_data.texture_change.faces[1] == mapping.triangles[0].face) {
+                                spec->mode_data.texture_change.face_flags[1] |= 0x2;
+                            }
+                            if (spec->mode_data.texture_change.faces[0] == NULL) {
+                                spec->mode_data.texture_change.face_flags[0] |= 0x2;
+                                spec->mode_data.texture_change.faces[0] = mapping.triangles[0].face;
+                            } else {
+                                spec->mode_data.texture_change.face_flags[1] |= 0x2;
+                                spec->mode_data.texture_change.faces[1] = mapping.triangles[0].face;
+                            }
+                        }
+                        break;
+                    case 3:
+                        if (edges_only) {
+                            mapping.triangles[1].face->flags |= 0x2;
+                        } else if (pParam_12) {
+                            if (spec->mode_data.texture_change.faces[0] == mapping.triangles[1].face) {
+                                spec->mode_data.texture_change.face_flags[0] |= 0x2;
+                            } else if (spec->mode_data.texture_change.faces[1] == mapping.triangles[1].face) {
+                                spec->mode_data.texture_change.face_flags[1] |= 0x2;
+                            }
+                            if (spec->mode_data.texture_change.faces[0] == NULL) {
+                                spec->mode_data.texture_change.face_flags[0] |= 0x2;
+                                spec->mode_data.texture_change.faces[0] = mapping.triangles[1].face;
+                            } else {
+                                spec->mode_data.texture_change.face_flags[1] |= 0x2;
+                                spec->mode_data.texture_change.faces[1] = mapping.triangles[1].face;
+                            }
+                        }
+                        break;
+                    }
+                }
+                if (pSpec->field_0x2dc) {
+                    for (j = 0; j < gCount_track_smashable_environment_specs; j++) {
+                        if (gTrack_smashable_environment_specs[j].trigger_type == kSmashableTrigger_Material
+                            && gTrack_smashable_environment_specs[j].trigger_object.material == face_2.material
+                            && (gTrack_smashable_environment_specs[j].mode == kSmashableMode_TextureChange || gTrack_smashable_environment_specs[j].mode == kSmashableMode_Decal)) {
+                            pSpec = &gTrack_smashable_environment_specs[j];
+                            break;
+                        }
+                    }
+                }
+                ProcessTexture(pObject, pMaterial, pActor, pTrigger_spec, pSpec, &face_2, pImpulse, &edge_point, pParam_9, pVelocity, opposite, pParam_12, &dummy, pParam_14);
+            }
+        }
+    }
+    return result;
+}
+//@/PT:ProcessTexture@
 
 // ProcessMesh
 
