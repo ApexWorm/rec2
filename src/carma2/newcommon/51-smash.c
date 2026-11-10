@@ -1408,7 +1408,32 @@ void C2_HOOK_FASTCALL SmashRemoveSomeFaces(br_model* pModel, tS16 pCount) {
     DRModelUpdateAndKevificateMaterials(pModel, BR_MODU_ALL);
 }
 
-// SmashRestoreSomeFaces
+// FUNCTION: CARMA2_HW 0x004f5fa0
+// FUNCTION: CARMA2_SW 0x004f1c00
+void C2_HOOK_FASTCALL SmashRestoreSomeFaces(br_model* pModel, int pFace_count, const tU16* pFace_data, br_material* pMaterial) {
+    br_face* face;
+    const tU16* face_data;
+    int i;
+
+    face = &pModel->faces[pModel->nfaces];
+    if (pFace_count > 0) {
+        face_data = pFace_data;
+        i = pFace_count;
+        do {
+            face->material = pMaterial;
+            face->vertices[0] = face_data[0];
+            face->vertices[1] = face_data[1];
+            face->vertices[2] = face_data[2];
+            face->smoothing = face_data[3];
+            face->flags = 0;
+            face++;
+            face_data += 4;
+            i--;
+        } while (i != 0);
+    }
+    pModel->nfaces += (br_int_16)pFace_count;
+    DRModelUpdateAndKevificateMaterials(pModel, BR_MODU_ALL);
+}
 
 // FUNCTION: CARMA2_HW 0x004f6020
 // FUNCTION: CARMA2_SW 0x004f1c80
