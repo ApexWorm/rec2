@@ -406,7 +406,6 @@ void C2_HOOK_FASTCALL InitSmashQueue(void) {
 
 // FlushSmashQueue
 
-//@PT:QueueSmashIfNecessary3@
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
 #endif
@@ -419,7 +418,6 @@ tSmashable_level* C2_HOOK_FASTCALL QueueSmashIfNecessary3(tCar_spec* pCar, tPhys
 #ifdef REC2_MATCHING
 #pragma auto_inline(on)
 #endif
-//@/PT:QueueSmashIfNecessary3@
 
 // QueueSmashIfNecessary2
 
@@ -1023,7 +1021,6 @@ void C2_HOOK_FASTCALL DisposeSmashableEnvironment(void) {
     }
 }
 
-//@PT:CloneMemory@
 inline void* C2_HOOK_FASTCALL CloneMemory(void* pSource, br_size_t pSize) {
     void* result;
 
@@ -1031,9 +1028,7 @@ inline void* C2_HOOK_FASTCALL CloneMemory(void* pSource, br_size_t pSize) {
     memcpy(result, pSource, pSize);
     return result;
 }
-//@/PT:CloneMemory@
 
-//@PT:CloneEnvSmash@
 inline void C2_HOOK_FASTCALL CloneEnvSmash(tSmashable_item_spec* pSource, tSmashable_item_spec* pDest) {
 
     *pDest = *pSource;
@@ -1050,7 +1045,6 @@ inline void C2_HOOK_FASTCALL CloneEnvSmash(tSmashable_item_spec* pSource, tSmash
         SplondificatalizeIdentifier(pDest->trigger_object.material, &pDest->trigger_object.material->identifier, pDest - gTrack_smashable_environment_specs);
     }
 }
-//@/PT:CloneEnvSmash@
 
 // FUNCTION: CARMA2_HW 0x004f09c0
 // FUNCTION: CARMA2_SW 0x004ec620
@@ -1123,7 +1117,6 @@ void C2_HOOK_FASTCALL FreeConnotations(tConnotations* pConnotations, int pKeep_a
 
 // MungeSmashMaterialNames
 
-//@PT:ExtrapolateTextureCoordinates@
 inline void C2_HOOK_FASTCALL ExtrapolateTextureCoordinates(tSmash_quad_mapping* pMapping, tSmash_triangle_mapping* pTriangle, br_vector3* pPoint, br_vector2* pMap) {
 
     pMap->v[0] = pTriangle->map_from_geometry[0][0] * (pPoint->v[pMapping->axis_0] - pTriangle->origin.v[pMapping->axis_0])
@@ -1133,7 +1126,6 @@ inline void C2_HOOK_FASTCALL ExtrapolateTextureCoordinates(tSmash_quad_mapping* 
         + pTriangle->map_from_geometry[1][1] * (pPoint->v[pMapping->axis_1] - pTriangle->origin.v[pMapping->axis_1])
         + pTriangle->map_origin.v[1];
 }
-//@/PT:ExtrapolateTextureCoordinates@
 
 // ExtrapolateGeometryCoordinates2
 
@@ -1150,7 +1142,6 @@ void C2_HOOK_FASTCALL ExtrapolateGeometryCoordinates(tSmash_quad_mapping* pMappi
 #pragma auto_inline(on)
 #endif
 
-//@PT:ExtractDeTiledFaces@
 inline int C2_HOOK_FASTCALL ExtractDeTiledFaces(tFace_ref* pFace, br_vector3* pPoint, br_vertex* pVertices, tU8* pCrossed, tU8* pOn_edge, br_vertex** pCorners, tSmash_quad_mapping* pMapping, int pUse_face_bounds) {
     br_model* model;
     br_face* faces;
@@ -1477,9 +1468,7 @@ inline int C2_HOOK_FASTCALL ExtractDeTiledFaces(tFace_ref* pFace, br_vector3* pP
     }
     return 1;
 }
-//@/PT:ExtractDeTiledFaces@
 
-//@PT:AddDecal@
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
 #endif
@@ -1492,7 +1481,6 @@ br_actor* C2_HOOK_FASTCALL AddDecal(tFace_ref* pFace, br_vertex* pVertices, br_m
 #ifdef REC2_MATCHING
 #pragma auto_inline(on)
 #endif
-//@/PT:AddDecal@
 
 // FUNCTION: CARMA2_HW 0x004f39a0
 int C2_HOOK_FASTCALL InsertQuad(tSmash_quad_mapping* pMapping, br_actor* pActor, br_vertex* pVertices, tU8* pOn_edge, br_vertex** pCorners, br_material* pMaterial, tU16* pFace_points, tU16* pPoint_indices) {
@@ -1807,7 +1795,6 @@ int C2_HOOK_FASTCALL InsertQuad(tSmash_quad_mapping* pMapping, br_actor* pActor,
     return 1;
 }
 
-//@PT:SpawnSmashAndMungeFaces@
 inline tSmashable_item_spec* C2_HOOK_FASTCALL SpawnSmashAndMungeFaces(tPhysics_object* pObject, tSmash_quad_mapping* pMapping, tFace_ref* pFace, tSmashable_item_spec* pSpec, br_vertex* pVertices, tU8* pOn_edge, br_vertex** pCorners, br_actor** pActor) {
     tSmashable_item_spec* spec;
 
@@ -1838,13 +1825,11 @@ inline tSmashable_item_spec* C2_HOOK_FASTCALL SpawnSmashAndMungeFaces(tPhysics_o
     pSpec->field_0x2d8 = spec;
     return spec;
 }
-//@/PT:SpawnSmashAndMungeFaces@
 
 // DistanceFromFaceND
 
 // PointInFace
 
-//@PT:FindFaceWithPoint@
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
 #endif
@@ -1857,9 +1842,7 @@ int C2_HOOK_FASTCALL FindFaceWithPoint(tFace_ref* pFace, br_vector3* pPoint, tFa
 #ifdef REC2_MATCHING
 #pragma auto_inline(on)
 #endif
-//@/PT:FindFaceWithPoint@
 
-//@PT:ProcessTexture@
 // FUNCTION: CARMA2_HW 0x004f18d0
 float C2_HOOK_FASTCALL ProcessTexture(tPhysics_object* pObject, br_material* pMaterial, br_actor* pActor, tSmashable_item_spec* pTrigger_spec, tSmashable_item_spec* pSpec, tFace_ref* pFace, float pImpulse, br_vector3* pPoint, void* pParam_9, br_vector3* pVelocity, int pEdge, int pParam_12, int* pDone, int pParam_14) {
     int edge_start[4] = { 0, 0, 1, 2 };
@@ -2174,7 +2157,6 @@ float C2_HOOK_FASTCALL ProcessTexture(tPhysics_object* pObject, br_material* pMa
     }
     return result;
 }
-//@/PT:ProcessTexture@
 
 // ProcessMesh
 
