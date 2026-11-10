@@ -32,6 +32,7 @@ const char* gForm_non_humanoid_names[1] = {
 tTintedPoly gTintedPolys[10] = { 0 };
 
 // GLOBAL: CARMA2_HW 0x007447a0
+// GLOBAL: CARMA2_SW 0x0073b260
 int gINT_007447a0 = 0;
 
 // GLOBAL: CARMA2_HW 0x006a0430
