@@ -429,6 +429,7 @@ tConnected_items gControls_scroller;
 char* gKey_names[153] = { 0 };
 
 // GLOBAL: CARMA2_HW 0x006886bc
+// GLOBAL: CARMA2_SW 0x00682c1c
 br_model* gFrontend_C_model_to = NULL;
 
 // GLOBAL: CARMA2_HW 0x00604888
@@ -3034,6 +3035,7 @@ void C2_HOOK_FASTCALL DisplayJoystickSettings(tFrontend_spec* pFrontend) {
 // SaveAllJoystickData
 
 // FUNCTION: CARMA2_HW 0x00472440
+// FUNCTION: CARMA2_SW 0x004719d0
 int C2_HOOK_FASTCALL Controls_SwitchKeymapSet(tFrontend_spec* pFrontend) {
     int new_index;
 
@@ -3105,6 +3107,7 @@ int C2_HOOK_FASTCALL Controls_KeyDown(tFrontend_spec* pFrontend) {
 // Controls_Infunc
 
 // FUNCTION: CARMA2_HW 0x00472a30
+// FUNCTION: CARMA2_SW 0x00471fc0
 int C2_HOOK_FASTCALL Controls_Outfunc(tFrontend_spec* pFrontend) {
     FILE* f;
     tPath_name the_path;

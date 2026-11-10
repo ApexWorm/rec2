@@ -23,6 +23,7 @@
 int gKey_mapping[77] = { 0 };
 
 // GLOBAL: CARMA2_HW 0x0074b714
+// GLOBAL: CARMA2_SW 0x00741dd4
 int gINT_0074b714 = 0;
 
 // GLOBAL: CARMA2_HW 0x0068c1c4
