@@ -123,9 +123,13 @@ int gPanicking_peds;
 // GLOBAL: CARMA2_SW 0x006fc480
 int gCount_mutant_tail_parts;
 
+// GLOBAL: CARMA2_HW 0x006a0458
+// GLOBAL: CARMA2_SW 0x0069a4b0
+tRespawn_powerup gRespawn_powerups[100] = { 0 };
+
 // GLOBAL: CARMA2_HW 0x006a0908
 // GLOBAL: CARMA2_SW 0x0069a960
-tPhysics_object* gMutant_tail_object;
+tPhysics_object* gMutant_tail_object = NULL;
 
 // GLOBAL: CARMA2_HW 0x006a0acc
 // GLOBAL: CARMA2_SW 0x0069ab24
@@ -170,6 +174,10 @@ int gInstant_handbrake;
 // GLOBAL: CARMA2_HW 0x006a0a54
 // GLOBAL: CARMA2_SW 0x0069aaac
 tPowerup* gPowerup_array;
+
+// GLOBAL: CARMA2_HW 0x006a0a50
+// GLOBAL: CARMA2_SW 0x0069aaa8
+tU8* gRace_powerup_respawn_bools;
 
 // FUNCTION: CARMA2_HW 0x004d8d10
 // FUNCTION: CARMA2_SW 0x004d5240
@@ -1368,7 +1376,25 @@ void C2_HOOK_FASTCALL UndoInitialTail(void) {
     }
 }
 
-// MayQueuePowerupRespawn
+// FUNCTION: CARMA2_HW 0x004e0750
+// FUNCTION: CARMA2_SW 0x004dcc50
+void C2_HOOK_FASTCALL MayQueuePowerupRespawn(int pPowerup_index, br_actor* pActor) {
+    int i;
+
+    C2_HOOK_BUG_ON(REC2_ASIZE(gRespawn_powerups) != 100);
+    C2_HOOK_BUG_ON(sizeof(tRespawn_powerup) != 0xc);
+
+    if (pActor != NULL && gRace_powerup_respawn_bools[pPowerup_index] && (gNet_mode == eNet_mode_none || gCurrent_net_game->options.powerup_respawn)) {
+        for (i = 0; i < (int)REC2_ASIZE(gRespawn_powerups); i++) {
+            if (gRespawn_powerups[i].actor == NULL) {
+                gRespawn_powerups[i].actor = pActor;
+                gRespawn_powerups[i].index = pPowerup_index;
+                gRespawn_powerups[i].respawn_time = GetTotalTime() + gPickup_respawn_max_extra_time_ms / 2 + gPickup_respawn_min_time_ms;
+                break;
+            }
+        }
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x004e07d0
 // FUNCTION: CARMA2_SW 0x004dccd0

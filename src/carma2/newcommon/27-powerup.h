@@ -37,6 +37,8 @@ extern int gCount_mutant_tail_parts;
 extern tPhysics_joint* gMutant_tail_first_joint;
 extern int gMutant_tail_state;
 extern tPhysics_object* gMutant_tail_object;
+extern tRespawn_powerup gRespawn_powerups[100];
+extern tU8* gRace_powerup_respawn_bools;
 extern float gMass_mutant_tail_link;
 extern float gMass_mutant_tail_ball;
 extern float gMass_mine;
@@ -413,7 +415,7 @@ extern void C2_HOOK_FASTCALL DoInitialTail(void);
 
 extern void C2_HOOK_FASTCALL UndoInitialTail(void);
 
-// MayQueuePowerupRespawn
+extern void C2_HOOK_FASTCALL MayQueuePowerupRespawn(int pPowerup_index, br_actor* pActor);
 
 extern void C2_HOOK_FASTCALL ARDoPowerupRespawn(br_actor* pActor, int pPowerup_id);
 
