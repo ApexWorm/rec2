@@ -304,7 +304,7 @@ void C2_HOOK_FASTCALL DamageSystems(tCar_spec* pCar, br_vector3* pImpact_point, 
         z = z2;
     }
     if (z <= x && z <= y) {
-        impact_location = z2 <= z1 ? eImpact_back : eImpact_front;
+        impact_location = z1 >= z2 ? eImpact_back : eImpact_front;
         proportion_x = x1 / (crushed_car_bounds.max.v[0] - crushed_car_bounds.min.v[0]);
         proportion_y = y1 / (crushed_car_bounds.max.v[1] - crushed_car_bounds.min.v[1]);
     } else if (x <= y && x <= z) {
