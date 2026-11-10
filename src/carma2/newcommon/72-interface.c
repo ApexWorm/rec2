@@ -125,9 +125,17 @@ int gFrontend_controls_count_keys;
 // GLOBAL: CARMA2_SW 0x00680c3c
 int gFrontend_netsummary_first_iteration;
 
+// GLOBAL: CARMA2_HW 0x00688718
+// GLOBAL: CARMA2_SW 0x00682c78
+tJoinable_game gGames_to_join[6] = { 0 };
+
 // GLOBAL: CARMA2_HW 0x00688748
 // GLOBAL: CARMA2_SW 0x00682ca8
-int gINT_00688748;
+int gINT_00688748 = 0;
+
+// GLOBAL: CARMA2_HW 0x00688760
+// GLOBAL: CARMA2_SW 0x00682cc0
+int gLast_graph_sel;
 
 // GLOBAL: CARMA2_HW 0x00686850
 // GLOBAL: CARMA2_SW 0x00680f90
@@ -1133,7 +1141,24 @@ int C2_HOOK_FASTCALL MultiplayerSetup(tFrontend_spec* pFrontend) {
 
 // StopAllThatJoinyStuffThisInstant
 
-// NetworkJoinMenuOutfunc
+// FUNCTION: CARMA2_HW 0x00468260
+// FUNCTION: CARMA2_SW 0x00467fe0
+int C2_HOOK_FASTCALL NetworkJoinMenuOutfunc(tFrontend_spec* pFrontend) {
+    int i;
+    int exemption;
+
+    C2_HOOK_BUG_ON(REC2_ASIZE(gGames_to_join) != 6);
+
+    NetEndJoinList();
+    exemption = gLast_graph_sel;
+    for (i = 0; i < (int)REC2_ASIZE(gGames_to_join); i++) {
+        if (i != exemption && gGames_to_join[i].game != NULL) {
+            NetDisposeGameDetails(gGames_to_join[i].game);
+            gGames_to_join[i].game = NULL;
+        }
+    }
+    return 0;
+}
 
 // NetJoinChooseThisGame
 

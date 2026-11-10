@@ -49,6 +49,8 @@ extern int gFrontend_wrecks_rotate_prev_y;
 
 extern int gFrontend_controls_count_keys;
 extern int gINT_00688748;
+extern tJoinable_game gGames_to_join[6];
+extern int gLast_graph_sel;
 extern br_material* gFrontend_backdrop_materials[3];
 extern br_token_value gFrontend_backdrop1_material_prims[3];
 extern br_token_value gFrontend_backdrop2_material_prims[3];
@@ -170,7 +172,7 @@ extern int C2_HOOK_FASTCALL MultiplayerSetup(tFrontend_spec* pFrontend);
 
 // StopAllThatJoinyStuffThisInstant
 
-// NetworkJoinMenuOutfunc
+extern int C2_HOOK_FASTCALL NetworkJoinMenuOutfunc(tFrontend_spec* pFrontend);
 
 // NetJoinChooseThisGame
 
