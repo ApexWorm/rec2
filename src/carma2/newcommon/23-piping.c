@@ -956,7 +956,26 @@ void C2_HOOK_FASTCALL PipeSinglePedPos(const tPedestrian* pPed, const br_vector3
         SIZE_OFFSET_PIPING(tPipe_single_ped_pos, v), pVelocity);
 }
 
-// PipeSinglePedModelChange
+// FUNCTION: CARMA2_HW 0x004c8c80
+// FUNCTION: CARMA2_SW 0x004c53b0
+void C2_HOOK_FASTCALL PipeSinglePedModelChange(tPedestrian* pPed, int pBone_index, br_model* pOld_model, int pModel_index, int pOld_model_set, int pModel_set) {
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_single_ped_model_change, field_0x0, 0x2);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_single_ped_model_change, field_0x2, 0x2);
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_single_ped_model_change, field_0x2, 0x2);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_single_ped_model_change, field_0x4, 0x4);
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_single_ped_model_change, field_0x4, 0x2);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_single_ped_model_change, field_0x6, 0x6);
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_single_ped_model_change, field_0x6, 0x2);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_single_ped_model_change, model, 0x8);
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_single_ped_model_change, model, 0x4);
+
+    ARDoSingleVariedSession(ePipe_chunk_single_ped_model_change, (uintptr_t)pPed, 5,
+        SIZE_OFFSET_PIPING(tPipe_single_ped_model_change, field_0x0), pBone_index,
+        SIZE_OFFSET_PIPING(tPipe_single_ped_model_change, model), pOld_model,
+        SIZE_OFFSET_PIPING(tPipe_single_ped_model_change, field_0x2), pModel_index,
+        SIZE_OFFSET_PIPING(tPipe_single_ped_model_change, field_0x6), pOld_model_set,
+        SIZE_OFFSET_PIPING(tPipe_single_ped_model_change, field_0x4), pModel_set);
+}
 
 // FUNCTION: CARMA2_HW 0x004c8cc0
 // FUNCTION: CARMA2_SW 0x004c53f0
