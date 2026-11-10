@@ -48,6 +48,7 @@ const char* gExplosion_rotate_names[2] = {
 tSkid gSkids[100] = { 0 };
 
 // GLOBAL: CARMA2_HW 0x006a32e0
+// GLOBAL: CARMA2_SW 0x0069d338
 int gINT_006a32e0 = 0;
 
 // GLOBAL: CARMA2_HW 0x006a27e8
@@ -288,6 +289,7 @@ void C2_HOOK_FASTCALL InitCarSkidStuff(tCar_spec* pCar) {
 }
 
 // FUNCTION: CARMA2_HW 0x004ea720
+// FUNCTION: CARMA2_SW 0x004e64c0
 void C2_HOOK_FASTCALL SkidsPerFrame(void) {
     int skid;
 
