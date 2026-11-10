@@ -354,7 +354,10 @@ void C2_HOOK_FASTCALL DRMatrix34RotateY(br_matrix34* mat, br_angle ry) {
 
 // DRMatrix34RotateZ
 
-// DRMatrix34PostRotateX
+// STUB: CARMA2_HW 0x005127b0
+void C2_HOOK_FASTCALL DRMatrix34PostRotateX(br_matrix34* pMat, br_angle pAngle) {
+    NOT_IMPLEMENTED();
+}
 
 // FUNCTION: CARMA2_HW 0x00512ad0
 // FUNCTION: CARMA2_SW 0x0050df10
@@ -366,7 +369,10 @@ void C2_HOOK_FASTCALL DRMatrix34PostRotateY(br_matrix34* mat, br_angle ry) {
 
 // DRMatrix34PreRotateZ
 
-// DRMatrix34PostRotateZ
+// STUB: CARMA2_HW 0x00512df0
+void C2_HOOK_FASTCALL DRMatrix34PostRotateZ(br_matrix34* pMat, br_angle pAngle) {
+    NOT_IMPLEMENTED();
+}
 
 // DRMatrix23Rotate
 

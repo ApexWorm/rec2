@@ -11,6 +11,7 @@
 #include "16-graphics1.h"
 #include "17-world2.h"
 #include "23-piping.h"
+#include "36-trig.h"
 #include "41-utility.h"
 #include "52-errors.h"
 #include "globvars.h"
@@ -43,9 +44,27 @@ tGroove_funk_binding gGroove_funk_bindings[1440];
 // GLOBAL: CARMA2_SW 0x00685da4
 int gFunkotronics_array_size;
 
-// CalculateTextureBitsValue
+inline int C2_HOOK_FASTCALL CalculateTextureBitsValue(tFunk_texturebits* pTexturebits) {
+    int i;
+    int value;
 
-// MapSawToTriangle
+    value = 0;
+    for (i = 0; i < pTexturebits->count; i++) {
+        if (pTexturebits->car->field_0x18cc & (1 << pTexturebits->bits[i])) {
+            value += 1 << i;
+        }
+    }
+    return value;
+}
+
+inline float C2_HOOK_FASTCALL MapSawToTriangle(float pNumber) {
+
+    if (pNumber < 0.5) {
+        return pNumber * 4.0f - 1.0f;
+    } else {
+        return 3.0f - pNumber * 4.0f;
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x00474880
 // FUNCTION: CARMA2_SW 0x00473de0
@@ -197,19 +216,150 @@ void C2_HOOK_FASTCALL PathGrooveBastard(tGroovidelic_spec* pGroove, tU32 pTime, 
 #pragma auto_inline(on)
 #endif
 
-#ifdef REC2_MATCHING
-#pragma auto_inline(off)
-#endif
+#define SAW(T, PERIOD) fmod((T), PERIOD) / (PERIOD)
 
-// STUB: CARMA2_HW 0x00479890
-// STUB: CARMA2_SW 0x00478df0
+#define GROOVE_ANGLE(MODE, TIME, PERIOD, TEXTUREBITS) \
+    BrDegreeToAngle(((MODE) == eMove_continuous \
+            ? ((PERIOD) != 0.0f ? SAW(TIME, PERIOD) * 360.0 : 0.0) \
+            : ((MODE) == eMove_controlled \
+                      ? (PERIOD) * 360.0 \
+                      : ((MODE) == eMove_absolute \
+                                ? (PERIOD) \
+                                : ((MODE) == eMove_linear \
+                                          ? ((PERIOD) != 0.0f ? MapSawToTriangle(SAW(TIME, PERIOD)) * 360.0 : 0.0) \
+                                          : ((MODE) == eMove_flash \
+                                                    ? (fmod((TIME), (PERIOD)) * 2.0 > (PERIOD) ? -360.0 : 360.0) \
+                                                    : ((MODE) == eMove_texturebits \
+                                                              ? CalculateTextureBitsValue(TEXTUREBITS) \
+                                                              : ((PERIOD) != 0.0f ? sin(BrAngleToRadian(BrDegreeToAngle(SAW(TIME, PERIOD) * 360.0))) * 360.0 : 0.0))))))))
+
+#define GROOVE_FLOAT(MODE, TIME, PERIOD, TEXTUREBITS, AMPLITUDE) \
+    ((MODE) == eMove_continuous \
+            ? ((PERIOD) != 0.0f ? SAW(TIME, PERIOD) * (AMPLITUDE) : 0.0) \
+            : ((MODE) == eMove_controlled \
+                      ? (PERIOD) * (AMPLITUDE) \
+                      : ((MODE) == eMove_absolute \
+                                ? (PERIOD) \
+                                : ((MODE) == eMove_linear \
+                                          ? ((PERIOD) != 0.0f ? MapSawToTriangle(SAW(TIME, PERIOD)) * (AMPLITUDE) : 0.0f) \
+                                          : ((MODE) == eMove_flash \
+                                                    ? (fmod((TIME), (PERIOD)) * 2.0 > (PERIOD) ? -(AMPLITUDE) : (AMPLITUDE)) \
+                                                    : ((MODE) == eMove_texturebits \
+                                                              ? CalculateTextureBitsValue(TEXTUREBITS) \
+                                                              : ((PERIOD) != 0.0f ? BR_SIN(BrDegreeToAngle(SAW(TIME, PERIOD) * 360.0)) * (AMPLITUDE) : 0.0f)))))))
+
+// FUNCTION: CARMA2_HW 0x00479890
+// FUNCTION: CARMA2_SW 0x00478df0
 void C2_HOOK_FASTCALL ObjectGrooveBastard(tGroovidelic_spec* pGroove, tU32 pTime, br_matrix34* pMat, int pInterrupt_it) {
-    NOT_IMPLEMENTED();
-}
+    int rock_it;
+    br_scalar x_size;
+    br_scalar y_size;
+    br_scalar z_size;
+    br_scalar pos;
+    br_bounds* bounds;
 
-#ifdef REC2_MATCHING
-#pragma auto_inline(on)
-#endif
+    switch (pGroove->object_type) {
+    case eGroove_object_spin:
+        switch (pGroove->object_data.spin_info.axis) {
+        case eAxis_x:
+            DRMatrix34PostRotateX(pMat, GROOVE_ANGLE(pGroove->object_mode, pTime, pGroove->object_data.spin_info.period.value, pGroove->object_data.spin_info.texture_info.data));
+            break;
+        case eAxis_y:
+            DRMatrix34PostRotateY(pMat, GROOVE_ANGLE(pGroove->object_mode, pTime, pGroove->object_data.spin_info.period.value, pGroove->object_data.spin_info.texture_info.data));
+            break;
+        case eAxis_z:
+            DRMatrix34PostRotateZ(pMat, GROOVE_ANGLE(pGroove->object_mode, pTime, pGroove->object_data.spin_info.period.value, pGroove->object_data.spin_info.texture_info.data));
+            break;
+        }
+        break;
+    case eGroove_object_rock:
+        rock_it = 1;
+        pos = GROOVE_FLOAT(pGroove->object_mode, pTime,
+            pGroove->object_data.rock_info.period.value, pGroove->object_data.rock_info.texture_info.data, pGroove->object_data.rock_info.max_angle);
+
+        if (pInterrupt_it) {
+            pGroove->object_resumption_value = pos;
+            if (pGroove->object_data.rock_info.current_angle > pos) {
+                pGroove->object_interrupt_status = eInterrupt_less_than;
+            } else {
+                pGroove->object_interrupt_status = eInterrupt_greater_than;
+            }
+        } else if (pGroove->object_interrupt_status == eInterrupt_less_than) {
+            if (pGroove->object_resumption_value > pos && !gAction_replay_mode) {
+                pGroove->object_interrupt_status = eInterrupt_none;
+            } else {
+                rock_it = 0;
+            }
+        } else if (pGroove->object_interrupt_status == eInterrupt_greater_than) {
+            if (pGroove->object_resumption_value < pos && !gAction_replay_mode) {
+                pGroove->object_interrupt_status = eInterrupt_none;
+            } else {
+                rock_it = 0;
+            }
+        }
+        if (rock_it) {
+            pGroove->object_data.rock_info.current_angle = pos;
+        }
+
+        switch (pGroove->object_data.rock_info.axis) {
+        case eAxis_x:
+            DRMatrix34PostRotateX(pMat, BrDegreeToAngle(pGroove->object_data.rock_info.current_angle));
+            break;
+        case eAxis_y:
+            DRMatrix34PostRotateY(pMat, BrDegreeToAngle(pGroove->object_data.rock_info.current_angle));
+            break;
+        case eAxis_z:
+            DRMatrix34PostRotateZ(pMat, BrDegreeToAngle(pGroove->object_data.rock_info.current_angle));
+            break;
+        }
+        break;
+    case eGroove_object_throb:
+        BrMatrix34PostScale(pMat,
+            GROOVE_FLOAT(pGroove->object_mode, pTime,
+                    pGroove->object_data.throb_info.x_period.value, pGroove->object_data.throb_info.x_texture_info.data, pGroove->object_data.throb_info.x_magnitude)
+                + 1.0,
+            GROOVE_FLOAT(pGroove->object_mode, pTime,
+                    pGroove->object_data.throb_info.y_period.value, pGroove->object_data.throb_info.y_texture_info.data, pGroove->object_data.throb_info.y_magnitude)
+                + 1.0,
+            GROOVE_FLOAT(pGroove->object_mode, pTime,
+                    pGroove->object_data.throb_info.z_period.value, pGroove->object_data.throb_info.z_texture_info.data, pGroove->object_data.throb_info.z_magnitude)
+                + 1.0);
+        /* FALLTHROUGH */
+    case eGroove_object_shear:
+        bounds = &pGroove->actor->model->bounds;
+        x_size = bounds->max.v[0] - bounds->min.v[0];
+        y_size = bounds->max.v[1] - bounds->min.v[1];
+        z_size = bounds->max.v[2] - bounds->min.v[2];
+        if (pGroove->object_data.shear_info.x_magnitude == 0.0f) {
+            BrMatrix34PostShearX(pMat,
+                GROOVE_FLOAT(pGroove->object_mode, pTime,
+                    pGroove->object_data.shear_info.y_period.value, pGroove->object_data.shear_info.y_texture_info.data, pGroove->object_data.shear_info.y_magnitude)
+                    / y_size,
+                GROOVE_FLOAT(pGroove->object_mode, pTime,
+                    pGroove->object_data.shear_info.z_period.value, pGroove->object_data.shear_info.z_texture_info.data, pGroove->object_data.shear_info.z_magnitude)
+                    / z_size);
+        } else if (pGroove->object_data.shear_info.y_magnitude == 0.0f) {
+            BrMatrix34PostShearY(pMat,
+                GROOVE_FLOAT(pGroove->object_mode, pTime,
+                    pGroove->object_data.shear_info.x_period.value, pGroove->object_data.shear_info.x_texture_info.data, pGroove->object_data.shear_info.x_magnitude)
+                    / x_size,
+                GROOVE_FLOAT(pGroove->object_mode, pTime,
+                    pGroove->object_data.shear_info.z_period.value, pGroove->object_data.shear_info.z_texture_info.data, pGroove->object_data.shear_info.z_magnitude)
+                    / z_size);
+        } else {
+            BrMatrix34PostShearZ(pMat,
+                GROOVE_FLOAT(pGroove->object_mode, pTime,
+                    pGroove->object_data.shear_info.x_period.value, pGroove->object_data.shear_info.x_texture_info.data, pGroove->object_data.shear_info.x_magnitude)
+                    / x_size,
+                GROOVE_FLOAT(pGroove->object_mode, pTime,
+                    pGroove->object_data.shear_info.y_period.value, pGroove->object_data.shear_info.y_texture_info.data, pGroove->object_data.shear_info.y_magnitude)
+                    / y_size);
+        }
+        break;
+    default:
+        return;
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x00478c80
 // FUNCTION: CARMA2_SW 0x004781e0
