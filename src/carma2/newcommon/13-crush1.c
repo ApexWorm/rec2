@@ -1345,7 +1345,11 @@ intptr_t C2_HOOK_FASTCALL DRActorEnumRecurseUltraPlus(br_actor* pActor, br_actor
 
 // SphericizePhysics
 
-// SphericizeCar
+// STUB: CARMA2_HW 0x004391d0
+// STUB: CARMA2_SW 0x00439210
+void C2_HOOK_FASTCALL SphericizeCar(tCar_spec* pCar) {
+    NOT_IMPLEMENTED();
+}
 
 // FUNCTION: CARMA2_HW 0x004398d0
 // FUNCTION: CARMA2_SW 0x00439910

@@ -212,7 +212,7 @@ extern void C2_HOOK_FASTCALL ChangeCameraTypeInGame(void);
 
 // SteelBollock
 
-// RichardsSphere
+extern void C2_HOOK_FASTCALL RichardsSphere(int pNum);
 
 extern void C2_HOOK_FASTCALL ToggleHeadupLevel(void);
 

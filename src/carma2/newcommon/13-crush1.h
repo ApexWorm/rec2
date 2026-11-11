@@ -391,7 +391,7 @@ extern intptr_t C2_HOOK_FASTCALL DRActorEnumRecurseUltraPlus(br_actor* pActor, b
 
 // SphericizePhysics
 
-// SphericizeCar
+extern void C2_HOOK_FASTCALL SphericizeCar(tCar_spec* pCar);
 
 extern intptr_t C2_HOOK_CDECL BattenDownTheHatches(br_actor* pActor, void* pUser);
 
