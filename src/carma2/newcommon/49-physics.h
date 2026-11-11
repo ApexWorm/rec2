@@ -22,6 +22,7 @@ extern int gBOOL_00744804;
 extern tPedestrian* gPedestrian_array;
 extern void* gPhysics_buffer3_ptr;
 extern int gPHIL_mechanics_time_sync;
+extern int gPHIL_munging_objects;
 extern int gPhysics_other_buffer_capacity;
 extern tProximity_ray gProximity_rays[20];
 extern br_model* gPed_spurt_model;
