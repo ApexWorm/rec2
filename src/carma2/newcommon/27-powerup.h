@@ -89,7 +89,7 @@ extern void C2_HOOK_FASTCALL LoadPowerups(void);
 
 // InitTail
 
-// ThisObjectHitAMineSoSpamItUpUsingThisPowerupsSettings
+extern void C2_HOOK_FASTCALL ThisObjectHitAMineSoSpamItUpUsingThisPowerupsSettings(tPhysics_object* pObject, int pPowerup_index);
 
 // InitMineShit
 
