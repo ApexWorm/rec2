@@ -1928,7 +1928,10 @@ intptr_t C2_HOOK_CDECL DumpVisibleActorsCB(br_actor* pActor, void* pData) {
     return BrActorEnum(pActor, DumpVisibleActorsCB, pData);
 }
 
-// FudgeBRenderIntoTheNinetiesWithSomeProperFuckingColourSupport
+// STUB: CARMA2_HW 0x00518d60
+tU32 C2_HOOK_FASTCALL FudgeBRenderIntoTheNinetiesWithSomeProperFuckingColourSupport(br_pixelmap* pm, tU32 red, tU32 grn, tU32 blu, tU32 alp) {
+    NOT_IMPLEMENTED();
+}
 
 // GetBlenficatiousnessOfMaterialTablishly
 

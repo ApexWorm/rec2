@@ -300,7 +300,7 @@ extern void C2_HOOK_FASTCALL MorphBlob(br_model* pModel_from, br_model* pModel_t
 
 extern void C2_HOOK_FASTCALL ScrollCredits(void);
 
-// LoadGameInFunc
+extern int C2_HOOK_FASTCALL LoadGameInFunc(tFrontend_spec* pFrontend);
 
 extern br_actor* C2_HOOK_FASTCALL CreateAPOactor(void);
 
