@@ -456,7 +456,7 @@ extern void C2_HOOK_FASTCALL DisposeAllLoadedRemaps(void);
 
 // RemapModelAxis
 
-// SetUpCharacterForm
+extern tPed_form* C2_HOOK_FASTCALL SetUpCharacterForm(const char* pName);
 
 extern void C2_HOOK_FASTCALL DisposeCharacterForm(tPed_form* pForm);
 
@@ -464,7 +464,7 @@ extern void C2_HOOK_FASTCALL DisposeCharacterForm(tPed_form* pForm);
 
 extern void C2_HOOK_FASTCALL DisposeCharacterInstance(tPed_character_instance* pCharacter);
 
-// FindOrOpenForm
+extern tPed_form* C2_HOOK_FASTCALL FindOrOpenForm(const char* pName);
 
 // MakeRotationMatrix
 
