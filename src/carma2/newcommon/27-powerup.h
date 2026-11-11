@@ -201,7 +201,7 @@ extern int C2_HOOK_FASTCALL DoInstantRepair(tPowerup* pPowerup, tCar_spec* pCar)
 
 extern void C2_HOOK_FASTCALL ResetPedSpeed(tPowerup* powerup, tCar_spec* car);
 
-// ResetPedSize
+extern void C2_HOOK_FASTCALL ResetPedSize(tPowerup* pPowerup, tCar_spec* pCar);
 
 // ResetPedHeadSize
 
