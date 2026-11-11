@@ -33,9 +33,14 @@
 #include "69-sound.h"
 #include "70-packfile.h"
 #include "72-interface-main.h"
+#include "72-interface-netsync.h"
 #include "72-interface-network.h"
+#include "72-interface-networksummary.h"
+#include "72-interface-newgame.h"
+#include "72-interface-options.h"
 #include "72-interface-quit.h"
 #include "72-interface-startgame.h"
+#include "72-interface-wrecks.h"
 #include "globvars.h"
 #include "globvrpb.h"
 #include "joystick.h"
@@ -176,6 +181,9 @@ int gFrontend_wrecks_rotate_prev_x = -1;
 // GLOBAL: CARMA2_HW 0x0059b0e0
 // GLOBAL: CARMA2_SW 0x00596010
 int gFrontend_wrecks_rotate_prev_y = -1;
+
+// GLOBAL: CARMA2_HW 0x0059b0d0
+int gFrontend_stuff_not_loaded = 1;
 
 // GLOBAL: CARMA2_HW 0x0059b0d4
 // GLOBAL: CARMA2_SW 0x00596004
@@ -865,9 +873,105 @@ void C2_HOOK_FASTCALL LoadMenuSettings(tFrontend_spec* pFrontend) {
 #endif
 }
 
-// LoadMenuImages
+inline void C2_HOOK_FASTCALL LoadMenuImages(void) {
+    int i;
+    char s[256];
+    char s2[256];
+    FILE* f;
+    int count;
 
-// LoadMenuModels
+    for (i = 1; i < 8; i++) {
+        gFrontend_images[i] = LoadPixelmap("64by64.tif");
+    }
+    PathCat(s, gApplication_path, "INTRFACE");
+    PathCat(s, s, "MENUIMAGES.TXT");
+
+    f = DRfopen(s, "rt");
+    if (f == NULL) {
+        FatalError(kFatalError_Mysterious_SS);
+    }
+
+    count = GetAnInt(f);
+    for (i = 0; i < count; i++) {
+        GetAString(f, s2);
+        strcpy(s, s2);
+        strcat(s, ".TIF");
+        gFrontend_images[i + 8] = LoadPixelmap(s);
+    }
+}
+
+inline void C2_HOOK_FASTCALL LoadMenuModels(void) {
+    char s[256];
+    char s2[256];
+    char s3[256];
+    FILE* f;
+    int count;
+    int i;
+
+    PathCat(s, gApplication_path, "INTRFACE");
+    PathCat(s2, s, "MENUMODELS.TXT");
+    f = DRfopen(s2, "rt");
+    if (f == NULL) {
+        FatalError(kFatalError_Mysterious_SS);
+    }
+
+    C2_HOOK_BUG_ON(sizeof(tFrontend_model) != 16);
+    PathCat(s, gApplication_path, "INTRFACE");
+
+    count = GetAnInt(f);
+    for (i = 0; i < count; i++) {
+        GetAString(f, s3);
+        PathCat(s2, s, s3);
+        strcat(s2, ".DAT");
+        gFrontend_A_models[i].model = BrModelLoad(s2);
+        gFrontend_A_models[i].model->flags |= BR_MODF_KEEP_ORIGINAL;
+        BrModelAdd(gFrontend_A_models[i].model);
+        if (i == 0) {
+            gFrontend_backdrop_actors[0]->model = BrModelLoad(s2);
+            gFrontend_backdrop_actors[0]->model->flags |= BR_MODF_KEEP_ORIGINAL;
+            BrModelAdd(gFrontend_backdrop_actors[0]->model);
+            BrMatrix34Translate(&gFrontend_backdrop_actors[0]->t.t.mat, 300.f, -250.f, -2.5f);
+            BrMatrix34PreScale(&gFrontend_backdrop_actors[0]->t.t.mat, 1.25f, 1.25f, 1.0f);
+            gFrontend_backdrop_actors[0]->render_style = BR_RSTYLE_FACES;
+        }
+    }
+
+    count = GetAnInt(f);
+    for (i = 0; i < count; i++) {
+        GetAString(f, s3);
+        PathCat(s2, s, s3);
+        strcat(s2, ".DAT");
+        gFrontend_B_models[i].model = BrModelLoad(s2);
+        gFrontend_B_models[i].model->flags |= BR_MODF_KEEP_ORIGINAL;
+        BrModelAdd(gFrontend_B_models[i].model);
+        if (i == 0) {
+            gFrontend_backdrop_actors[1]->model = BrModelLoad(s2);
+            gFrontend_backdrop_actors[1]->model->flags |= BR_MODF_KEEP_ORIGINAL;
+            BrModelAdd(gFrontend_backdrop_actors[1]->model);
+            BrMatrix34Translate(&gFrontend_backdrop_actors[1]->t.t.mat, 300.f, -250.f, -2.5f);
+            BrMatrix34PreScale(&gFrontend_backdrop_actors[1]->t.t.mat, 1.25f, 1.25f, 1.0f);
+            gFrontend_backdrop_actors[1]->render_style = BR_RSTYLE_FACES;
+        }
+    }
+
+    count = GetAnInt(f);
+    for (i = 0; i < count; i++) {
+        GetAString(f, s3);
+        PathCat(s2, s, s3);
+        strcat(s2, ".DAT");
+        gFrontend_C_models[i].model = BrModelLoad(s2);
+        gFrontend_C_models[i].model->flags |= BR_MODF_KEEP_ORIGINAL;
+        BrModelAdd(gFrontend_C_models[i].model);
+        if (i == 0) {
+            gFrontend_backdrop_actors[2]->model = BrModelLoad(s2);
+            gFrontend_backdrop_actors[2]->model->flags |= BR_MODF_KEEP_ORIGINAL;
+            BrModelAdd(gFrontend_backdrop_actors[2]->model);
+            BrMatrix34Translate(&gFrontend_backdrop_actors[2]->t.t.mat, 300.f, -250.f, -2.5f);
+            BrMatrix34PreScale(&gFrontend_backdrop_actors[2]->t.t.mat, 1.25f, 1.25f, 1.0f);
+            gFrontend_backdrop_actors[2]->render_style = BR_RSTYLE_FACES;
+        }
+    }
+}
 
 void C2_HOOK_FASTCALL DefaultInfunc(tFrontend_spec* pFrontend) {
 
@@ -1878,7 +1982,66 @@ void C2_HOOK_FASTCALL FRONTEND_Setup2D(void) {
 #endif
 }
 
-// FRONTEND_Setup
+// FUNCTION: CARMA2_HW 0x0046d1c0
+void C2_HOOK_FASTCALL FRONTEND_Setup(tFrontendMenuType pType) {
+
+    PrintMemoryDump(0, "START OF FRONTEND_Setup");
+    LoadInterfaceStuff(gProgram_state.racing);
+    if (gFrontend_stuff_not_loaded) {
+        IString_Load();
+        InitPolyFonts();
+        LoadMenuImages();
+        PrintMemoryDump(0, "AFTER LoadMenuImages");
+        FRONTEND_Setup2D();
+        LoadMenuModels();
+        PrintMemoryDump(0, "AFTER LoadMenuModels");
+        gFrontend_stuff_not_loaded = 0;
+    }
+    switch (pType) {
+    case kFrontend_menu_main:
+        FRONTEND_CreateMenu(&gFrontend_MAIN);
+        gCurrent_frontend_spec = &gFrontend_MAIN;
+        break;
+    case kFrontend_menu_options:
+        FRONTEND_CreateMenu(&gFrontend_OPTIONS);
+        gCurrent_frontend_spec = &gFrontend_OPTIONS;
+        break;
+    case kFrontend_menu_wrecks:
+        FRONTEND_CreateMenu(&gFrontend_WRECKS);
+        gCurrent_frontend_spec = &gFrontend_WRECKS;
+        break;
+    case kFrontend_menu_netsync:
+        FRONTEND_CreateMenu(&gFrontend_NETSYNC);
+        gCurrent_frontend_spec = &gFrontend_NETSYNC;
+        break;
+    case kFrontend_menu_networksummary:
+        FRONTEND_CreateMenu(&gFrontend_NETWORK_SUMMARY);
+        gCurrent_frontend_spec = &gFrontend_NETWORK_SUMMARY;
+        break;
+    case kFrontend_menu_credits:
+        FRONTEND_CreateMenu(&gFrontend_CREDITS);
+        gCurrent_frontend_spec = &gFrontend_CREDITS;
+        break;
+    case kFrontend_menu_newgame:
+        FRONTEND_CreateMenu(&gFrontend_NEWGAME);
+        gCurrent_frontend_spec = &gFrontend_NEWGAME;
+        break;
+    }
+    PrintMemoryDump(0, "AFTER FRONTEND_CreateMenu");
+
+    gCurrent_frontend_spec->previous = NULL;
+    gFrontend_A_model_from = gFrontend_A_models[0].model;
+    gFrontend_A_model_to = gFrontend_A_models[gCurrent_frontend_spec->model_A_index].model;
+    gFrontend_backdrop0_opacity_mode = gCurrent_frontend_spec->model_A_index != 0 ? 1 : -2;
+    gFrontend_B_model_from = gFrontend_B_models[0].model;
+    gFrontend_B_model_to = gFrontend_B_models[gCurrent_frontend_spec->model_B_index].model;
+    gFrontend_backdrop1_opacity_mode = gCurrent_frontend_spec->model_B_index != 0 ? 1 : -2;
+    gFrontend_C_model_from = gFrontend_C_models[0].model;
+    gFrontend_C_model_to = gFrontend_C_models[gCurrent_frontend_spec->model_C_index].model;
+    gFrontend_backdrop2_opacity_mode = gCurrent_frontend_spec->model_C_index != 0 ? 1 : -2;
+    gFrontend_interpolate_steps_left = 16;
+    PrintMemoryDump(0, "END OF FRONTEND_Setup");
+}
 
 // FRONTEND_Redraw
 

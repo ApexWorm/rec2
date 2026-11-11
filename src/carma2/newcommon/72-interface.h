@@ -14,6 +14,7 @@
 
 extern int gNet_storage_space_initialized;
 extern tNet_mode gFrontend_net_mode;
+extern int gFrontend_stuff_not_loaded;
 extern tNet_game_options gNet_settings[9];
 extern tU32 gFrontend_net_current_roll;
 extern tU32 gFrontend_net_last_roll;
@@ -103,9 +104,9 @@ extern br_pixelmap* C2_HOOK_FASTCALL GetThisFuckingPixelmapPleaseMrTwatter(const
 
 extern void C2_HOOK_FASTCALL LoadMenuSettings(tFrontend_spec* pFrontend);
 
-// LoadMenuImages
+extern void C2_HOOK_FASTCALL LoadMenuImages(void);
 
-// LoadMenuModels
+extern void C2_HOOK_FASTCALL LoadMenuModels(void);
 
 extern void C2_HOOK_FASTCALL DefaultInfunc(tFrontend_spec* pFrontend);
 
@@ -255,7 +256,7 @@ extern void C2_HOOK_FASTCALL FRONTEND_PingPongFlash(void);
 
 extern void C2_HOOK_FASTCALL FRONTEND_Setup2D(void);
 
-// FRONTEND_Setup
+extern void C2_HOOK_FASTCALL FRONTEND_Setup(tFrontendMenuType pType);
 
 // FRONTEND_Redraw
 
