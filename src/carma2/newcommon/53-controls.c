@@ -9,6 +9,8 @@
 #include "53-controls.h"
 
 #include "00-car.h"
+#include "01-network.h"
+#include "04-netgame.h"
 #include "15-displays.h"
 #include "16-graphics1.h"
 #include "17-world2.h"
@@ -474,7 +476,17 @@ void C2_HOOK_FASTCALL CheckHorn3D(tCar_spec* pCar) {
 
 // SortOutRecover
 
-// SetFlipUpCar
+// FUNCTION: CARMA2_HW 0x00442970
+// FUNCTION: CARMA2_SW 0x00442a50
+void C2_HOOK_FASTCALL SetFlipUpCar(tCar_spec* pCar) {
+    if (gNet_mode == eNet_mode_none || pCar == NULL || pCar->driver != eDriver_local_human) {
+        FlipUpCar(pCar);
+        return;
+    }
+    DisableCar(pCar);
+    gPalette_fade_time = GetRaceTime();
+    NetPlayerStatusChanged(ePlayer_status_recovering);
+}
 
 
 // FUNCTION: CARMA2_HW 0x00442e10
@@ -497,7 +509,19 @@ void C2_HOOK_FASTCALL AlignChildren(tPhysics_object* pCollision_info) {
     }
 }
 
-// FlipUpCar
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_HW 0x004429b0
+// STUB: CARMA2_SW 0x00442a90
+void C2_HOOK_FASTCALL FlipUpCar(tCar_spec* pCar_spec) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // FUNCTION: CARMA2_HW 0x00442e80
 // FUNCTION: CARMA2_SW 0x00442f60
