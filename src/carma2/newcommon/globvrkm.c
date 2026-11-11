@@ -27,6 +27,9 @@ int gCar_flying;
 // GLOBAL: CARMA2_SW 0x00650d64
 tCar_spec* gCar_to_view = &gProgram_state.current_car;
 
+// GLOBAL: CARMA2_HW 0x0068d93c
+int DAT_0068d93c;
+
 // GLOBAL: CARMA2_HW 0x0068d940
 // GLOBAL: CARMA2_SW 0x00687998
 tU32 gCar_to_view_id;

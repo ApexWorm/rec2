@@ -78,7 +78,7 @@ extern void C2_HOOK_FASTCALL EnableCar(tCar_spec* pCar);
 
 // ClipName
 
-// CreateBoxes
+extern void C2_HOOK_FASTCALL CreateBoxes(void);
 
 // DrawScoreBoxes
 

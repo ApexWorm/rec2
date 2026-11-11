@@ -23,6 +23,7 @@
 #include "72-interface.h"
 #include "c2_stdio.h"
 #include "globvars.h"
+#include "globvrkm.h"
 #include "globvrpb.h"
 #include "platform.h"
 #include "rec2_macros.h"
@@ -313,7 +314,69 @@ void C2_HOOK_FASTCALL EnableCar(tCar_spec* pCar) {
 
 // ClipName
 
-// CreateBoxes
+// FUNCTION: CARMA2_HW 0x0049a410
+void C2_HOOK_FASTCALL CreateBoxes(void) {
+    br_camera* camera;
+    br_pixelmap* pixelmap;
+    br_material* material;
+    int i;
+    char name[32];
+
+    C2_HOOK_BUG_ON(REC2_ASIZE(PTR_ARRAY_0074a720) != 4);
+    C2_HOOK_BUG_ON(REC2_ASIZE(PTR_ARRAY_0074a740) != 12);
+
+    PTR_0074a71c = BrActorAllocate(BR_ACTOR_NONE, NULL);
+    for (i = 0; i < (int)REC2_ASIZE(PTR_ARRAY_0074a740); i++) {
+        PTR_ARRAY_0074a740[i] = BrActorAllocate(BR_ACTOR_MODEL, NULL);
+        if (PTR_ARRAY_0074a740[i] == NULL) {
+            BrFailure("Out of memory for NetPlay");
+        }
+        PTR_ARRAY_0074a740[i]->render_style = BR_RSTYLE_FACES;
+    }
+    PTR_0074a73c = BrModelAllocate("NetScore Model", 4, 2);
+    PTR_0074a73c->faces[0].vertices[0] = 0;
+    PTR_0074a73c->faces[0].vertices[1] = 1;
+    PTR_0074a73c->faces[0].vertices[2] = 2;
+    PTR_0074a73c->faces[1].vertices[0] = 1;
+    PTR_0074a73c->faces[1].vertices[1] = 3;
+    PTR_0074a73c->faces[1].vertices[2] = 2;
+    PTR_0074a73c->faces[0].material = NULL;
+    PTR_0074a73c->faces[1].material = NULL;
+    BrVector3Set(&PTR_0074a73c->vertices[0].p, 0.f, 0.f, -2.f);
+    BrVector3Set(&PTR_0074a73c->vertices[1].p, 100.f, 0.f, -2.f);
+    BrVector3Set(&PTR_0074a73c->vertices[2].p, 0.f, -38.f, -2.f);
+    BrVector3Set(&PTR_0074a73c->vertices[3].p, 100.f, -38.f, -2.f);
+    BrVector2Set(&PTR_0074a73c->vertices[0].map, 0.f, 0.f);
+    BrVector2Set(&PTR_0074a73c->vertices[1].map, 0.78125f, 0.f);
+    BrVector2Set(&PTR_0074a73c->vertices[2].map, 0.f, 0.296875f);
+    BrVector2Set(&PTR_0074a73c->vertices[3].map, 0.78125f, 0.296875f);
+    PTR_0074a73c->flags |= BR_MODF_KEEP_ORIGINAL;
+    BrModelAdd(PTR_0074a73c);
+    for (i = 0; i < (int)REC2_ASIZE(PTR_ARRAY_0074a720); i++) {
+        sprintf(name, "NETBOX%i.PIX", i + 1);
+        pixelmap = LoadPixelmap(name);
+        if (pixelmap == NULL) {
+            BrFailure("Cannot find headup graphic %s", name);
+        }
+        BrMapAdd(pixelmap);
+        material = BrMaterialAllocate("NetScore Material");
+        material->colour = 0;
+        material->colour_map = pixelmap;
+        material->flags = BR_MATF_FORCE_FRONT | BR_MATF_ALWAYS_VISIBLE;
+        BrMaterialAdd(material);
+        PTR_ARRAY_0074a720[i] = material;
+    }
+    DAT_0074a730 = BrActorAllocate(BR_ACTOR_CAMERA, NULL);
+    DAT_0074a730->identifier = "Net HUD Camera";
+    camera = DAT_0074a730->type_data;
+    camera->type = BR_CAMERA_PARALLEL;
+    camera->hither_z = 1.f;
+    camera->yon_z = 3.f;
+    camera->width = gScreen->width;
+    camera->height = gScreen->height;
+    BrActorAdd(PTR_0074a71c, DAT_0074a730);
+    DAT_0068d93c = 1;
+}
 
 // DrawScoreBoxes
 
