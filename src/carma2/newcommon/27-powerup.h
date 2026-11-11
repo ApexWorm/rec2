@@ -403,7 +403,7 @@ extern int C2_HOOK_FASTCALL PedValium(tPowerup* pPowerup, tCar_spec* pCar);
 
 // PowerupCancel
 
-// GrowATail
+extern int C2_HOOK_FASTCALL GrowATail(tPowerup* pPowerup, tCar_spec* pCar);
 
 // CutOffTail
 
