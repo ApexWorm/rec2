@@ -525,6 +525,7 @@ void C2_HOOK_FASTCALL StopActorBeingRenderable(br_actor* pActor) {
 }
 
 // FUNCTION: CARMA2_HW 0x004cbcc0
+// FUNCTION: CARMA2_SW 0x004c83c0
 int C2_HOOK_FASTCALL IsActorRenderworthy(br_actor* pActor) {
     if (pActor->parent != NULL) {
         return 1;
