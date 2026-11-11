@@ -573,6 +573,21 @@ int C2_HOOK_FASTCALL AddModels(tBrender_storage* pStorage_space, const char* pPa
     return new_ones;
 }
 
+// FUNCTION: CARMA2_HW 0x00501fe0
+// FUNCTION: CARMA2_SW 0x004fd930
+void C2_HOOK_FASTCALL LoadSomeMaterials(tBrender_storage* pStorage, FILE* pFile, tRendererShadingType pShading) {
+    tPath_name the_path;
+    char s[256];
+    char* str;
+
+    PossibleService();
+    GetALineAndDontArgue(pFile, s);
+    str = strtok(s, "\t ,/");
+    PathCat(the_path, gApplication_path, "MATERIAL");
+    PathCat(the_path, the_path, str);
+    AddMaterials(pStorage, the_path, pShading);
+}
+
 // FUNCTION: CARMA2_HW 0x00502060
 // FUNCTION: CARMA2_SW 0x004fd9b0
 int C2_HOOK_FASTCALL AddMaterials(tBrender_storage* pStorage_space, const char* pPath, tRendererShadingType pShading) {
