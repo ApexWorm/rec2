@@ -279,7 +279,7 @@ void C2_HOOK_FASTCALL DamageSystems(tCar_spec* pCar, br_vector3* pImpact_point, 
         return;
     }
 
-    energy_magnitude = pCar->softness_factor * pure_energy_magnitude / 0.7;
+    energy_magnitude = (float)(pCar->softness_factor * pure_energy_magnitude / 0.7);
     crushed_car_bounds = pCar->collision_info->bb1;
 
     x1 = pImpact_point->v[0] - crushed_car_bounds.min.v[0];
