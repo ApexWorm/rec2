@@ -115,6 +115,11 @@ typedef void C2_HOOK_FASTCALL tZappy_AR_callback(void);
 typedef void C2_HOOK_FASTCALL tPreprocess_AR_callback(int pFrame_period);
 typedef void C2_HOOK_FASTCALL tPostProcess_AR_callback(int pFrame_period);
 
+typedef union {
+    float f;
+    tU32 u32;
+} tFloat_u32_union;
+
 typedef enum {
     eFPR_OK = 0,
     eFPR_end_of_path = 1,
@@ -661,6 +666,17 @@ typedef struct {
     tExplosion explosion;
 } tPipe_chunk_explosion;
 
+typedef struct {
+    br_matrix34 mat;
+    br_scalar size_min;
+    br_scalar size_max;
+    tU32 spill_time;
+    tU32 previous_stop_time;
+    tCar_spec* car;
+    br_vector3 original_pos;
+    br_pixelmap* pixelmap;
+} tPipe_chunk_oil_spill;
+
 typedef enum {
     ePipe_chunk_frame_finish = 0,
     ePipe_chunk_ped_incident = 1,
@@ -674,6 +690,7 @@ typedef enum {
     ePipe_chunk_screen_wobble = 12,
     ePipe_chunk_non_car = 14,
     ePipe_chunk_smoke = 15,
+    ePipe_chunk_oil_spill = 16,
     ePipe_chunk_smoke_column = 17,
     ePipe_chunk_smudge = 19,
     ePipe_chunk_splash = 20,
@@ -761,6 +778,7 @@ typedef struct tPipe_chunk {
         tPipe_ped_dir_data ped_dir;
         tPipe_ped_fp_change_data ped_fp_change;
         tPipe_chunk_repulse_ray repulse_ray;
+        tPipe_chunk_oil_spill oil_spill;
         char raw_data[0];
     } data;
 } tPipe_chunk;
@@ -2548,7 +2566,7 @@ typedef enum tDriver {
     eDriver_detached_bit = 2,
     eDriver_split_car = 3,
     eDriver_4 = 4,
-    eDriver_5 = 5,
+    eDriver_5 = 5, /* eDriver_non_car? */
     eDriver_oppo = 6,
     eDriver_net_human = 7,
     eDriver_local_human = 8
@@ -2864,7 +2882,7 @@ typedef struct tCar_spec {
     br_vector3 nor[4];
     br_vector3 prev_nor[4];
     float oil_remaining[4];
-    float maybe_blood_remaining[4];
+    float oil_wheel_friction[4];
     float total_length[4];
     br_material* field_0x16fc[4];
     float proxy_ray_distance;
@@ -3731,7 +3749,7 @@ typedef struct {
     float field_0x44;
     float field_0x48;
     float field_0x4c;
-    undefined4 field_0x50;
+    br_material* field_0x50;
 } tOil_spill_info;
 
 typedef struct {
