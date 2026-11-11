@@ -85,7 +85,7 @@ extern void C2_HOOK_CDECL SetCharacterPhysicsLevelAR(tPed_character_instance* pC
 
 // PedApplyPedPhysics
 
-// PedApplyPedPos
+extern void C2_HOOK_FASTCALL PedApplyPedPos(tPedestrian* pPedestrian, br_vector3* pPos);
 
 extern void C2_HOOK_FASTCALL PedApplyVanishDismembered(tPedestrian* pPedestrian, tU32 pValue);
 
