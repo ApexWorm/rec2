@@ -6,7 +6,10 @@
 #include "33-depth.h"
 #include "41-utility.h"
 #include "globvars.h"
+#include "globvrpb.h"
 #include "platform.h"
+
+#include <string.h>
 
 // FUNCTION: CARMA2_HW 0x0047c650
 // FUNCTION: CARMA2_SW 0x0047b8d0
@@ -243,6 +246,25 @@ void C2_HOOK_FASTCALL EnableLights(void) {
 
     for (i = 0; i < gNumber_of_lights; i++) {
         BrLightEnable(gLight_array[i]);
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x0047d700
+void C2_HOOK_FASTCALL CopyPIxelmap_CompleteWidthDY(br_pixelmap* pDest, br_pixelmap* pSource, br_uint_16 pDest_x, br_uint_16 pDest_y, br_uint_16 pWidth, br_uint_16 pHeight) {
+    int x;
+    int y;
+    tU16* source_ptr;
+    tU16* dest_ptr;
+
+    C2_HOOK_BUG_ON(sizeof(tU16) != 2);
+
+    for (y = 0; y < pHeight; y++) {
+        source_ptr = (tU16*)((tU8*)pSource->pixels + y * pSource->row_bytes);
+        dest_ptr = (tU16*)((tU8*)pDest->pixels + (pDest_y + y) * pDest->row_bytes);
+        for (x = 0; x < pWidth; x++) {
+            screenRowBuffer[x] = source_ptr[x];
+        }
+        memcpy(dest_ptr, screenRowBuffer, pWidth * sizeof(screenRowBuffer[0]));
     }
 }
 
