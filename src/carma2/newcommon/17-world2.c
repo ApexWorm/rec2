@@ -562,6 +562,18 @@ int C2_HOOK_FASTCALL GetCarSimplificationLevel(void) {
     return gCar_simplification_level;
 }
 
+// FUNCTION: CARMA2_HW 0x00448f70
+// FUNCTION: CARMA2_SW 0x00449390
+intptr_t C2_HOOK_CDECL SwitchRenderStyleCallback(br_actor* pActor, void* pData) {
+
+    if (pActor->render_style == BR_RSTYLE_FACES) {
+        pActor->render_style = BR_RSTYLE_EDGES;
+    } else if (pActor->render_style == BR_RSTYLE_EDGES) {
+        pActor->render_style = BR_RSTYLE_FACES;
+    }
+    return 0;
+}
+
 // FUNCTION: CARMA2_HW 0x00448f90
 // FUNCTION: CARMA2_SW 0x004493b0
 intptr_t C2_HOOK_CDECL ProcessMaterials(br_actor* pActor, void* pContext) {
