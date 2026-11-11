@@ -9,14 +9,17 @@
 #include "51-smash.h"
 
 #include "08-loading1.h"
+#include "09-funks.h"
 #include "17-world2.h"
 #include "20-skidmark.h"
+#include "23-piping.h"
 #include "28-world3.h"
 #include "32-spark.h"
 #include "33-depth.h"
 #include "39-oil.h"
 #include "41-utility.h"
 #include "52-errors.h"
+#include "59-camera.h"
 #include "62-graphics3.h"
 
 #include "globvars.h"
@@ -87,6 +90,14 @@ tStored_smash* gNet_host_smashes;
 // GLOBAL: CARMA2_HW 0x006a55c8
 // GLOBAL: CARMA2_SW 0x0069f628
 tExplosion gExplosions[50];
+
+// GLOBAL: CARMA2_HW 0x006a7fc8
+// GLOBAL: CARMA2_SW 0x006a2028
+tRepair_animation gRepair_animations[25] = { 0 };
+
+// GLOBAL: CARMA2_HW 0x006a80f4
+// GLOBAL: CARMA2_SW 0x006a2154
+int gINT_006a80f4 = 0;
 
 // GLOBAL: CARMA2_HW 0x006a80f8
 // GLOBAL: CARMA2_SW 0x006a2158
@@ -333,7 +344,75 @@ void C2_HOOK_FASTCALL SetShrapnelFragment(tSmash_vertex* pFragment, tMovement_sp
 
 // MungeInternalCarGlass
 
-// ActuallySmashPart
+// FUNCTION: CARMA2_HW 0x004ed2b0
+// FUNCTION: CARMA2_SW 0x004e8f80
+void C2_HOOK_FASTCALL ActuallySmashPart(tCar_spec* pCar_spec, tCar_crush_smashable_part* pSmash, int pLevel) {
+    int i;
+    int flags;
+    br_pixelmap* texture;
+    br_scalar temp;
+
+    texture = NULL;
+    if (pCar_spec != NULL) {
+        for (i = 0; i < (int)REC2_ASIZE(gRepair_animations); i++) {
+            if (gRepair_animations[i].field_0x0 == pSmash) {
+                gRepair_animations[i].field_0x0 = NULL;
+                break;
+            }
+        }
+    }
+    if (pSmash->levels[pLevel].count_pixelmaps != 0) {
+        texture = pSmash->levels[pLevel].pixelmaps[IRandomBetween(0, pSmash->levels[pLevel].count_pixelmaps - 1)];
+    }
+    PipeSingleSmashTextureChange(pCar_spec, pSmash->funk_material, texture);
+    pSmash->funk_material->user = texture;
+    if (pCar_spec == NULL || pCar_spec->field_0x1960 == NULL) {
+        pSmash->funk_material->colour_map = texture;
+    }
+    pSmash->field_0x4c = pLevel;
+    flags = pSmash->levels[pLevel].flags;
+    if (pCar_spec == NULL || (flags & 0x1c) != 0) {
+        if ((flags & 0x4) != 0 && PercentageChance(50)) {
+            pSmash->funk_material->map_transform.m[0][0] *= -1.f;
+        }
+        if ((flags & 0x8) != 0 && PercentageChance(50)) {
+            pSmash->funk_material->map_transform.m[1][1] *= -1.f;
+        }
+        if ((flags & 0x10) != 0) {
+            switch (IRandomBetween(0, 3)) {
+            case 0:
+                pSmash->funk_material->map_transform.m[0][0] *= -1.f;
+                pSmash->funk_material->map_transform.m[1][1] *= -1.f;
+                break;
+            case 1:
+                temp = pSmash->funk_material->map_transform.m[0][0];
+                pSmash->funk_material->map_transform.m[0][0] = pSmash->funk_material->map_transform.m[0][1];
+                pSmash->funk_material->map_transform.m[0][1] = temp;
+                temp = pSmash->funk_material->map_transform.m[1][0];
+                pSmash->funk_material->map_transform.m[1][0] = -pSmash->funk_material->map_transform.m[0][1];
+                pSmash->funk_material->map_transform.m[1][1] = -temp;
+                break;
+            case 2:
+                temp = pSmash->funk_material->map_transform.m[0][0];
+                pSmash->funk_material->map_transform.m[0][0] = -pSmash->funk_material->map_transform.m[0][1];
+                pSmash->funk_material->map_transform.m[0][1] = -temp;
+                temp = pSmash->funk_material->map_transform.m[1][0];
+                pSmash->funk_material->map_transform.m[1][0] = pSmash->funk_material->map_transform.m[0][1];
+                pSmash->funk_material->map_transform.m[1][1] = temp;
+                break;
+            }
+        }
+    } else {
+        BrMatrix23Identity(&pSmash->funk_material->map_transform);
+    }
+    BrMaterialUpdate(pSmash->funk_material, BR_MATU_ALL);
+    if (pCar_spec == &gProgram_state.current_car && gAction_replay_camera_mode == kActionReplayCameraMode_Internal) {
+        MungeCarMaterials(pCar_spec, 1);
+    }
+    if (pSmash->funk >= 0) {
+        DisableFunkotronic(pSmash->funk);
+    }
+}
 
 // MakeSmashSound
 
@@ -945,7 +1024,18 @@ void C2_HOOK_FASTCALL DisposeSmashData(tCar_crush_buffer_entry* pCrush_data) {
 
 // DoBackwardShrapnel
 
-// InitRepairAnimations
+// FUNCTION: CARMA2_HW 0x004f0430
+// FUNCTION: CARMA2_SW 0x004ec090
+void C2_HOOK_FASTCALL InitRepairAnimations(void) {
+    int i;
+
+    C2_HOOK_BUG_ON(sizeof(tRepair_animation) != 0xc);
+    C2_HOOK_BUG_ON(REC2_ASIZE(gRepair_animations) != 25);
+
+    for (i = 0; i < (int)REC2_ASIZE(gRepair_animations); i++) {
+        gRepair_animations[i].field_0x0 = NULL;
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x004f3560
 // FUNCTION: CARMA2_SW 0x004ef1c0
