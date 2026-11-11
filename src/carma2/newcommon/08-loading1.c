@@ -176,6 +176,13 @@ void C2_HOOK_FASTCALL WriteU8L(FILE* pF, tU8 pNumber) {
     PFfwrite(&raw_byte, sizeof(raw_byte), 1, pF);
 }
 
+// FUNCTION: CARMA2_HW 0x0048f9f0
+// FUNCTION: CARMA2_SW 0x0048cc60
+void C2_HOOK_FASTCALL SkipBytes(FILE* pF, int pBytes_to_skip) {
+
+    PFfseek(pF, pBytes_to_skip, SEEK_CUR);
+}
+
 // FUNCTION: CARMA2_HW 0x0048fa00
 // FUNCTION: CARMA2_SW 0x0048cc70
 tU32 C2_HOOK_FASTCALL MemReadU32(char** pPtr) {

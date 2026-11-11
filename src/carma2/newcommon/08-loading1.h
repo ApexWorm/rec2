@@ -39,6 +39,8 @@ extern void C2_HOOK_FASTCALL WriteU16L(FILE* pF, tU16 pNumber);
 
 extern void C2_HOOK_FASTCALL WriteU8L(FILE* pF, tU8 pNumber);
 
+extern void C2_HOOK_FASTCALL SkipBytes(FILE* pF, int pBytes_to_skip);
+
 extern tU32 C2_HOOK_FASTCALL MemReadU32(char** pPtr);
 
 extern tU16 C2_HOOK_FASTCALL MemReadU16(char** pPtr);
