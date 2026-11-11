@@ -53,6 +53,7 @@ tTransient_bm gTransient_bitmaps[50] = { 0 };
 int gNext_transient = 0;
 
 // GLOBAL: CARMA2_HW 0x0067c34c
+// GLOBAL: CARMA2_SW 0x00676abc
 int gINT_0067c34c = 0;
 
 // GLOBAL: CARMA2_HW 0x0067c350
@@ -62,6 +63,7 @@ int gINT_0067c350 = 0;
 int gINT_0067c354 = 0;
 
 // GLOBAL: CARMA2_HW 0x0067c358
+// GLOBAL: CARMA2_SW 0x00676ac8
 int gINT_0067c358 = 0;
 
 // GLOBAL: CARMA2_HW 0x0067c390
