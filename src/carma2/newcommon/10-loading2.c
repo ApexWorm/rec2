@@ -182,6 +182,12 @@ tHeadup_info gHeadup_image_info[45] = {
     { "MISSIONDONE.PIX", eNet_or_otherwise },
 };
 
+// GLOBAL: CARMA2_HW 0x00657488
+char* gYour_car_names[2][6] = {
+    { "CARFRANK.PIX", "CARANNIE.PIX", "CARFR2.PIX", "CARFR3.PIX", "CARFR4.PIX", "CARFR5.PIX" },
+    { "CARFRANK.PIX", "CARANNIE.PIX", "CARAN2.PIX", "CARAN3.PIX", "CARAN4.PIX", "CARAN5.PIX" },
+};
+
 // GLOBAL: CARMA2_HW 0x0079eb60
 // GLOBAL: CARMA2_SW 0x007950c0
 br_pixelmap* gHeadup_images[45];
