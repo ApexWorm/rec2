@@ -490,6 +490,7 @@ void C2_HOOK_FASTCALL InitWobbleStuff(void) {
 }
 
 // STUB: CARMA2_HW 0x004e4db0
+// STUB: CARMA2_SW 0x004e1110
 void C2_HOOK_STDCALL NewScreenWobble(double pAmplitude_x, double pAmplitude_y, double pPeriod) {
     NOT_IMPLEMENTED();
 }
