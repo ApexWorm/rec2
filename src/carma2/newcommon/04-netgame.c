@@ -418,12 +418,12 @@ void C2_HOOK_FASTCALL PlayerIsInfected(tNet_game_player_info* pPlayer) {
             NetSendHeadupToPlayer(s, pPlayer->ID);
             for (i = 0; i < gNumber_of_net_players; i++) {
                 if (&gNet_players[i] != pPlayer) {
-                    sprintf(s, "%s %s", pPlayer->player_name, GetMiscString(185));
+                    sprintf(s, "%s %s", pPlayer->player_name, GetMiscString(eMiscString_is_undead));
                     NetSendHeadupToPlayer(s, gNet_players[i].ID);
                 }
             }
         }
-        pPlayer->score2 = -1 - GetTotalTime();
+        pPlayer->score2 = -(GetTotalTime() + 1);
         CheckForVampireWinner();
     }
 }
