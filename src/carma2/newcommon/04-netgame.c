@@ -423,7 +423,7 @@ void C2_HOOK_FASTCALL PlayerIsInfected(tNet_game_player_info* pPlayer) {
                 }
             }
         }
-        pPlayer->score2 = -(1 + GetTotalTime());
+        pPlayer->score2 = -(int)(1 + GetTotalTime());
         CheckForVampireWinner();
     }
 }
