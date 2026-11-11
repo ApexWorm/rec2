@@ -678,9 +678,6 @@ tGraf_data gGraf_data[2] = {
     }
 };
 
-// GLOBAL: CARMA2_HW 0x00656998
-int gINT_00656998[2] = { 1, 2 };
-
 // GLOBAL: CARMA2_HW 0x0074d630
 // GLOBAL: CARMA2_SW 0x00743b90
 int gGraf_data_index;
