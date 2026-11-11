@@ -46,6 +46,10 @@ void* gPhysics_buffer1_ptr;
 // GLOBAL: CARMA2_SW 0x0073b2d4
 void* gPhysics_buffer2_ptr;
 
+// GLOBAL: CARMA2_HW 0x0074480c
+// GLOBAL: CARMA2_SW 0x0073b2cc
+int gTotal_count_smash_peds;
+
 // GLOBAL: CARMA2_HW 0x00744810
 // GLOBAL: CARMA2_SW 0x0073b2d0
 int gImmortal_peds;

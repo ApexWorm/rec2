@@ -105,6 +105,10 @@ int gPickup_respawn_min_time_ms;
 // GLOBAL: CARMA2_SW 0x0073b2a8
 int gPickup_respawn_max_extra_time_ms;
 
+// GLOBAL: CARMA2_HW 0x007447cc
+// GLOBAL: CARMA2_SW 0x0073b28c
+int gCount_killed_peds;
+
 // GLOBAL: CARMA2_HW 0x007447d0
 int gBlind_pedestrians;
 
