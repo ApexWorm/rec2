@@ -268,7 +268,11 @@ void C2_HOOK_CDECL SetCharacterPhysicsLevelAR(tPed_character_instance* pCharacte
 
 // PedApplyPedPhysics
 
-// PedApplyPedPos
+// STUB: CARMA2_HW 0x004ca830
+// STUB: CARMA2_SW 0x004c6f60
+void C2_HOOK_FASTCALL PedApplyPedPos(tPedestrian* pPedestrian, br_vector3* pPos) {
+    NOT_IMPLEMENTED();
+}
 
 // FUNCTION: CARMA2_HW 0x004ca890
 // FUNCTION: CARMA2_SW 0x004c6fc0
