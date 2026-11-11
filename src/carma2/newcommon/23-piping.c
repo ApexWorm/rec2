@@ -937,7 +937,44 @@ void C2_HOOK_FASTCALL PipeSingleRepulseRay(int pIndex, br_vector3* pOrigin, br_v
         SIZE_OFFSET_PIPING(tPipe_chunk_repulse_ray, time), pTime);
 }
 
-// PipeSinglePedStatus
+// FUNCTION: CARMA2_HW 0x004c8a90
+// FUNCTION: CARMA2_SW 0x004c51c0
+void C2_HOOK_FASTCALL PipeSinglePedStatus(const tPedestrian* pPed, tS8 pArg2, tS8 pArg3, tS8 pArg4, tS8 pArg5, tS8 pArg6, tU8 pArg7, tS8 pArg8, tU8 pArg9, const br_vector3* pArg10, const br_vector3* pArg11, const br_matrix34* pArg12) {
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_single_ped_status, field_0x00, 0x1);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_single_ped_status, field_0x01, 0x1);
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_single_ped_status, field_0x01, 0x1);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_single_ped_status, field_0x02, 0x2);
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_single_ped_status, field_0x02, 0x1);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_single_ped_status, field_0x03, 0x3);
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_single_ped_status, field_0x03, 0x1);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_single_ped_status, field_0x04, 0x4);
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_single_ped_status, field_0x04, 0x1);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_single_ped_status, field_0x05, 0x5);
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_single_ped_status, field_0x05, 0x1);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_single_ped_status, field_0x06, 0x6);
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_single_ped_status, field_0x06, 0x1);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_single_ped_status, field_0x07, 0x7);
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_single_ped_status, field_0x07, 0x1);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_single_ped_status, field_0x08, 0x8);
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_single_ped_status, field_0x08, 0xc);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_single_ped_status, field_0x14, 0x14);
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_single_ped_status, field_0x14, 0xc);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_single_ped_status, field_0x20, 0x20);
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_single_ped_status, field_0x20, 0x30);
+
+    ARDoSingleVariedSession(ePipe_chunk_ped_status, (uintptr_t)pPed, 11,
+        SIZE_OFFSET_PIPING(tPipe_single_ped_status, field_0x00), pArg2,
+        SIZE_OFFSET_PIPING(tPipe_single_ped_status, field_0x01), pArg3,
+        SIZE_OFFSET_PIPING(tPipe_single_ped_status, field_0x02), pArg4,
+        SIZE_OFFSET_PIPING(tPipe_single_ped_status, field_0x03), pArg5,
+        SIZE_OFFSET_PIPING(tPipe_single_ped_status, field_0x04), pArg6,
+        SIZE_OFFSET_PIPING(tPipe_single_ped_status, field_0x05), (tS8)pArg7,
+        SIZE_OFFSET_PIPING(tPipe_single_ped_status, field_0x06), pArg8,
+        SIZE_OFFSET_PIPING(tPipe_single_ped_status, field_0x07), (tS8)pArg9,
+        SIZE_OFFSET_PIPING(tPipe_single_ped_status, field_0x08), pArg10,
+        SIZE_OFFSET_PIPING(tPipe_single_ped_status, field_0x14), pArg11,
+        SIZE_OFFSET_PIPING(tPipe_single_ped_status, field_0x20), pArg12);
+}
 
 // FUNCTION: CARMA2_HW 0x004c8b10
 // FUNCTION: CARMA2_SW 0x004c5240
