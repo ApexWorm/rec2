@@ -31,6 +31,9 @@ tOil_spill_info gOily_spills[32] = { 0 };
 // GLOBAL: CARMA2_HW 0x00691710
 int gNext_oil_pixie = 0;
 
+// GLOBAL: CARMA2_HW 0x00691714
+int gINT_00691714 = 0;
+
 // GLOBAL: CARMA2_HW 0x0074a68c
 // GLOBAL: CARMA2_SW 0x0074114c
 br_material* oily_material;
