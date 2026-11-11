@@ -265,7 +265,13 @@ void C2_HOOK_FASTCALL ReadCrushSettings(FILE* pF) {
     }
 }
 
-// ClearCrushLists
+void C2_HOOK_FASTCALL ClearCrushLists(void) {
+    tCrush_list_item* list;
+
+    for (list = gCrush_lists; list->car_spec != NULL; list++) {
+        list->car_spec = NULL;
+    }
+}
 
 // RemoveCarFromCrushLists
 
@@ -320,16 +326,13 @@ void C2_HOOK_FASTCALL InitCrushSystems(void) {
 // FUNCTION: CARMA2_SW 0x0042a220
 void C2_HOOK_FASTCALL ResetCrushSystems(void) {
     int i;
-    tCrush_list_item* list;
 
     for (i = 0; i < (int)REC2_ASIZE(gTrack_crush_joints); i++) {
         gTrack_crush_joints[i]->type = eJoint_none;
     }
     gDetached_bit_crush_info_buffer.field_0x8 = 0;
     gSplit_car_crush_info_buffer.field_0x8 = 0;
-    for (list = gCrush_lists; list->car_spec != NULL; list++) {
-        list->car_spec = NULL;
-    }
+    ClearCrushLists();
     gCount_queued_drone_crushes = 0;
     gCount_crush_detach_list = 0;
     gINT_0067bdfc = 0;

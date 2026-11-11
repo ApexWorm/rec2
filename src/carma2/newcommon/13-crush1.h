@@ -40,7 +40,7 @@ extern tToggled_door gToggled_doors[16];
 
 extern void C2_HOOK_FASTCALL ReadCrushSettings(FILE* pF);
 
-// ClearCrushLists
+extern void C2_HOOK_FASTCALL ClearCrushLists(void);
 
 // RemoveCarFromCrushLists
 
