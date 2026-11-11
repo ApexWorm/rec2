@@ -101,6 +101,10 @@ tU32 gPipe_sound_time_window;
 // GLOBAL: CARMA2_SW 0x0067107c
 int gDisable_advance;
 
+// GLOBAL: CARMA2_HW 0x00694104
+// GLOBAL: CARMA2_SW 0x0068e15c
+tPipe_smudge_data* gCrush_space;
+
 // GLOBAL: CARMA2_HW 0x0069410c
 // GLOBAL: CARMA2_SW 0x0068e164
 tFloat_u32_union gFloat_pipe_union;
@@ -542,11 +546,24 @@ void C2_HOOK_FASTCALL ResetCars(void) {
 
 // InitialiseActionReplay
 
-// STUB: CARMA2_HW 0x004c6c60
-// STUB: CARMA2_SW 0x004c3390
+#if defined(REC2_MATCHING) && defined(_MSC_VER)
+#pragma inline_depth(0)
+#endif
+
+// FUNCTION: CARMA2_HW 0x004c6c60
+// FUNCTION: CARMA2_SW 0x004c3390
 void C2_HOOK_FASTCALL DisposeActionReplay(void) {
-    NOT_IMPLEMENTED();
+
+    ARDispose();
+    if (gCrush_space != NULL) {
+        BrMemFree(gCrush_space);
+        gCrush_space = NULL;
+    }
 }
+
+#if defined(REC2_MATCHING) && defined(_MSC_VER)
+#pragma inline_depth()
+#endif
 
 // CheckIncident
 

@@ -32,6 +32,7 @@ extern tU8* gPipe_record_ptr;
 extern tU32 gPipe_sound_start_time;
 extern tU32 gPipe_sound_time_window;
 extern int gDisable_advance;
+extern tPipe_smudge_data* gCrush_space;
 
 extern int C2_HOOK_FASTCALL ARReplayForwards(void);
 
