@@ -98,6 +98,8 @@ extern void C2_HOOK_FASTCALL OoerrIveGotTextInMeBoxMissus(int pFont_index, const
 
 extern br_font* C2_HOOK_FASTCALL LoadBRFont(const char* pName);
 
+extern br_pixelmap* C2_HOOK_FASTCALL LoadChromeFont(void);
+
 extern int C2_HOOK_FASTCALL GetPolyFontIndexToReplaceDRfontWith(const tDR_font* pFont);
 
 extern br_model* C2_HOOK_FASTCALL CloneModel(const br_model* pModel);

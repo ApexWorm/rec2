@@ -15,6 +15,7 @@
 #include "41-utility.h"
 #include "52-errors.h"
 #include "62-graphics3.h"
+#include "63-loading3.h"
 #include "70-packfile.h"
 #include "globvars.h"
 #include "platform.h"
@@ -1335,6 +1336,17 @@ br_font* C2_HOOK_FASTCALL LoadBRFont(const char* pName) {
     PFfread(the_font->glyphs, data_size, 1u, f);
     PFfclose(f);
     return the_font;
+}
+
+// FUNCTION: CARMA2_HW 0x004661f0
+br_pixelmap* C2_HOOK_FASTCALL LoadChromeFont(void) {
+    br_pixelmap* result;
+
+    result = LoadPixelmap("CHRMFONT.PIX");
+    if (result == NULL) {
+        FatalError(kFatalError_CannotLoadChromeFontFile);
+    }
+    return result;
 }
 
 // FUNCTION: CARMA2_HW 0x00466210
