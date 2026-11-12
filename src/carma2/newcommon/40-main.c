@@ -75,7 +75,11 @@ void C2_HOOK_FASTCALL ServiceGame(void) {
     NOT_IMPLEMENTED();
 }
 
-// ServiceGameInRace
+// STUB: CARMA2_HW 0x004922a0
+// STUB: CARMA2_SW 0x0048f4e0
+void C2_HOOK_FASTCALL ServiceGameInRace(void) {
+    NOT_IMPLEMENTED();
+}
 
 // FUNCTION: CARMA2_HW 0x004924a0
 // FUNCTION: CARMA2_SW 0x0048f6d0
