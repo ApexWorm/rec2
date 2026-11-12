@@ -357,7 +357,7 @@ void C2_HOOK_FASTCALL ObjectGrooveBastard(tGroovidelic_spec* pGroove, tU32 pTime
         }
         break;
     default:
-        return;
+        break;
     }
 }
 
