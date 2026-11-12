@@ -1339,6 +1339,7 @@ br_font* C2_HOOK_FASTCALL LoadBRFont(const char* pName) {
 }
 
 // FUNCTION: CARMA2_HW 0x004661f0
+// FUNCTION: CARMA2_SW 0x00465f80
 br_pixelmap* C2_HOOK_FASTCALL LoadChromeFont(void) {
     br_pixelmap* result;
 
