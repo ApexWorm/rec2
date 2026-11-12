@@ -167,7 +167,7 @@ int gCursor_transient_index;
 
 // FUNCTION: CARMA2_HW 0x0047d470
 // FUNCTION: CARMA2_SW 0x0047d7a0
-void C2_HOOK_FASTCALL RectangleFill_TopBottomLine(br_pixelmap* pMap, int pX, int pY, int pWidth, int pHeight, br_uint_32 pColour) {
+void C2_HOOK_FASTCALL DRPixelmapShadedHRectFill(br_pixelmap* pMap, int pX, int pY, int pWidth, int pHeight, br_uint_32 pColour) {
 
 #ifdef REC2_HW
     if (gBack_screen->type != BR_PMT_INDEX_8) {
@@ -181,7 +181,7 @@ void C2_HOOK_FASTCALL RectangleFill_TopBottomLine(br_pixelmap* pMap, int pX, int
 
 // FUNCTION: CARMA2_HW 0x0047d510
 // FUNCTION: CARMA2_SW 0x0047d810
-void C2_HOOK_FASTCALL RectangleFill_LeftRightLine(br_pixelmap* pMap, int pX, int pY, int pWidth, int pHeight, br_colour pColour) {
+void C2_HOOK_FASTCALL DRPixelmapShadedVRectFill(br_pixelmap* pMap, int pX, int pY, int pWidth, int pHeight, br_colour pColour) {
 
 #ifdef REC2_HW
     if (gBack_screen->type != BR_PMT_INDEX_8) {

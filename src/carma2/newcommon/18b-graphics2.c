@@ -437,16 +437,46 @@ void C2_HOOK_FASTCALL DimRectangleClipped(br_pixelmap* pPixelmap, int pLeft, int
 
 // DRPixelmapRotatedAndFeatheredCopy
 
-// FUNCTION: CARMA2_HW 0x0047d260
-void C2_HOOK_FASTCALL DRPixelmapBlendedLine(br_pixelmap* pMap, int pX1, int pY1, int pX2, int pY2, br_uint_32 pColour, br_pixelmap* pPalette) {
+// DRPixelmapBlendedLine
 
-    DRDrawLine(pMap, pX1, pY1, pX2, pY2, pColour);
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_SW 0x0047c440
+void C2_HOOK_FASTCALL DR8BitPixelmapBlendedLine(br_pixelmap* pDest, int pX1, int pY1, int pX2, int pY2, int pColour, br_pixelmap *pPalette) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
+
+// FUNCTION: CARMA2_HW 0x0047d260
+// FUNCTION: CARMA2_SW 0x0047c3e0
+void C2_HOOK_FASTCALL DRPixelmapBlendedLine(br_pixelmap* pDest, int pX1, int pY1, int pX2, int pY2, br_uint_32 pColour, br_pixelmap* pPalette) {
+#ifdef REC2_HW
+    (void)pPalette;
+    DRDrawLine(pDest, pX1, pY1, pX2, pY2, (int)pColour);
+#endif
+#ifdef REC2_SW
+    if ((uintptr_t)pPalette != (uintptr_t)(-1)) {
+        if (pPalette == NULL) {
+            DRDrawLine(pDest, pX1, pY1, pX2, pY2, pColour);
+        } else if (pDest->type == BR_PMT_INDEX_8) {
+            DR8BitPixelmapBlendedLine(pDest, pX1, pY1, pX2, pY2, pColour, pPalette);
+        } else {
+            DR8BitPixelmapBlendedLine(pDest, pX1, pY1, pX2, pY2, pColour, NULL);
+        }
+    }
+#endif
 }
 
 // DR8BitFancyDrawLine
 
 // STUB: CARMA2_HW 0x0047d2b0
-void C2_HOOK_FASTCALL FancyDrawLine(br_pixelmap* pMap, int pX1, int pY1, int pX2, int pY2, br_uint_32 pColour, tU32 pTime_period) {
+// STUB: CARMA2_SW 0x0047d2b0
+void C2_HOOK_FASTCALL FancyDrawLine(br_pixelmap* pMpDestap, int pX1, int pY1, int pX2, int pY2, br_uint_32 pColour, tU32 pTime_period) {
     NOT_IMPLEMENTED();
 }
 
@@ -474,7 +504,7 @@ void C2_HOOK_FASTCALL EnableLights(void) {
 
 // FUNCTION: CARMA2_HW 0x0047d7b0
 // FUNCTION: CARMA2_SW 0x0047d970
-void C2_HOOK_FASTCALL DRPixelmapBlend75Copy(br_pixelmap* pDest, br_int_16 pDest_x, br_int_16 pDest_y, br_pixelmap* pSource) {
+void C2_HOOK_FASTCALL DRPixelmapBlendyCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_int_16 pDest_y, br_pixelmap* pSource) {
     int x;
     int y;
     tU8* dest_ptr;

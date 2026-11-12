@@ -53,11 +53,15 @@ extern void C2_HOOK_FASTCALL DimRectangleClipped(br_pixelmap* pPixelmap, int pLe
 
 // DRPixelmapRotatedAndFeatheredCopy
 
-extern void C2_HOOK_FASTCALL DRPixelmapBlendedLine(br_pixelmap* pMap, int pX1, int pY1, int pX2, int pY2, br_uint_32 pColour, br_pixelmap* pPalette);
+// DRPixelmapBlendedLine
+
+extern void C2_HOOK_FASTCALL DR8BitPixelmapBlendedLine(br_pixelmap* pDest, int pX1, int pY1, int pX2, int pY2, int pColour, br_pixelmap *pPalette);
+
+extern void C2_HOOK_FASTCALL DRPixelmapBlendedLine(br_pixelmap* pDest, int pX1, int pY1, int pX2, int pY2, br_uint_32 pColour, br_pixelmap* pPalette);
 
 // DR8BitFancyDrawLine
 
-extern void C2_HOOK_FASTCALL FancyDrawLine(br_pixelmap* pMap, int pX1, int pY1, int pX2, int pY2, br_uint_32 pColour, tU32 pTime_period);
+extern void C2_HOOK_FASTCALL FancyDrawLine(br_pixelmap* pDest, int pX1, int pY1, int pX2, int pY2, br_uint_32 pColour, tU32 pTime_period);
 
 // DRPixelmapCopyMapBlack8Bit
 
@@ -67,6 +71,6 @@ extern void C2_HOOK_FASTCALL DisableLights(void);
 
 extern void C2_HOOK_FASTCALL EnableLights(void);
 
-extern void C2_HOOK_FASTCALL DRPixelmapBlend75Copy(br_pixelmap* pDest, br_int_16 pDest_x, br_int_16 pDest_y, br_pixelmap* pSource);
+extern void C2_HOOK_FASTCALL DRPixelmapBlendyCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_int_16 pDest_y, br_pixelmap* pSource);
 
 #endif // GUARD_18B_GRAPHICS2_H
