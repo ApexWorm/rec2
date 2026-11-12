@@ -269,7 +269,7 @@ extern void C2_HOOK_FASTCALL PipeSinglePedDismember(tPedestrian* pPed, tU8 pBone
 
 extern void C2_HOOK_FASTCALL PipeSinglePedPos(const tPedestrian* pPed, const br_vector3* pPos, const br_vector3* pVelocity);
 
-// PipeSinglePedModelChange
+extern void C2_HOOK_FASTCALL PipeSinglePedModelChange(tPedestrian* pPed, int pBone_index, br_model* pOld_model, int pModel_index, int pOld_model_set, int pModel_set);
 
 extern void C2_HOOK_FASTCALL PipeSinglePHILObject(tPhysics_object* pObject);
 
