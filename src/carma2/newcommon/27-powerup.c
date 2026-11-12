@@ -41,17 +41,25 @@ int gInventory[20];
 // GLOBAL: CARMA2_SW 0x0069aac4
 int gINT_006a0a6c;
 
-// GLOBAL: CARMA2_HW 0x006a0a5c
-// GLOBAL: CARMA2_SW 0x0069aab4
-int gINT_006a0a5c;
+// GLOBAL: CARMA2_HW 0x006a0960
+// GLOBAL: CARMA2_SW 0x0069a9b8
+tRepulse_link gRepulse_links[6] = { 0 };
+
+// GLOBAL: CARMA2_HW 0x006a0a50
+// GLOBAL: CARMA2_SW 0x0069aaa8
+tU8* gRace_powerup_respawn_bools = NULL;
+
+// GLOBAL: CARMA2_HW 0x006a0a54
+// GLOBAL: CARMA2_SW 0x0069aaac
+tPowerup* gPowerup_array = NULL;
 
 // GLOBAL: CARMA2_HW 0x006a0a58
 // GLOBAL: CARMA2_SW 0x0069aab0
 int gInventory_selected = 0;
 
-// GLOBAL: CARMA2_HW 0x006a0960
-// GLOBAL: CARMA2_SW 0x0069a9b8
-tRepulse_link gRepulse_links[6];
+// GLOBAL: CARMA2_HW 0x006a0a5c
+// GLOBAL: CARMA2_SW 0x0069aab4
+int gINT_006a0a5c = 0;
 
 // GLOBAL: CARMA2_HW 0x006a0ad4
 // GLOBAL: CARMA2_SW 0x0069ab2c
@@ -113,6 +121,7 @@ int gBlind_pedestrians;
 float gPed_gravity_multiplier;
 
 // GLOBAL: CARMA2_HW 0x007447e4
+// GLOBAL: CARMA2_SW 0x0073b2a4
 int gPed_dismemberfest;
 
 // GLOBAL: CARMA2_HW 0x007447f8
@@ -123,9 +132,13 @@ int gPanicking_peds;
 // GLOBAL: CARMA2_SW 0x006fc480
 int gCount_mutant_tail_parts;
 
+// GLOBAL: CARMA2_HW 0x006a0458
+// GLOBAL: CARMA2_SW 0x0069a4b0
+tRespawn_powerup gRespawn_powerups[100] = { 0 };
+
 // GLOBAL: CARMA2_HW 0x006a0908
 // GLOBAL: CARMA2_SW 0x0069a960
-tPhysics_object* gMutant_tail_object;
+tPhysics_object* gMutant_tail_object = NULL;
 
 // GLOBAL: CARMA2_HW 0x006a0acc
 // GLOBAL: CARMA2_SW 0x0069ab24
@@ -170,6 +183,10 @@ int gInstant_handbrake;
 // GLOBAL: CARMA2_HW 0x006a0a54
 // GLOBAL: CARMA2_SW 0x0069aaac
 tPowerup* gPowerup_array;
+
+// GLOBAL: CARMA2_HW 0x006a0a50
+// GLOBAL: CARMA2_SW 0x0069aaa8
+tU8* gRace_powerup_respawn_bools;
 
 // FUNCTION: CARMA2_HW 0x004d8d10
 // FUNCTION: CARMA2_SW 0x004d5240
@@ -253,7 +270,42 @@ void C2_HOOK_FASTCALL LoadPowerups(void) {
 
 // InitTail
 
-// ThisObjectHitAMineSoSpamItUpUsingThisPowerupsSettings
+// FUNCTION: CARMA2_HW 0x004d9d00
+// FUNCTION: CARMA2_SW 0x004d61d0
+void C2_HOOK_FASTCALL ThisObjectHitAMineSoSpamItUpUsingThisPowerupsSettings(tPhysics_object* pObject, int pPowerup_index) {
+    tPedestrian* ped;
+    int old_dismemberfest;
+
+    if (pObject->field_0x1a0 & 0xf0000) {
+        if (IsItReallyOKThatWeDontMakeAnyEffortToProtectAnySadFuckersOutThereThatDontWishToSeeInnocentPeopleBlownToBitsByHighExplosiveMinesAndShells()) {
+            ped = ((tPed_character_instance*)pObject->owner)->ped;
+            if (!(ped->character->field_0x14 & 0x4) && !gPHIL_doing_physics) {
+                SetThisPedPhysicing(ped);
+            }
+            if (pPowerup_index != 14) {
+                BrVector3Set(&pObject->v, 0.0f, 0.0f, 0.0f);
+            }
+            pObject->v.v[1] = (br_scalar)(pObject->v.v[1] + FRandomBetween(0.7f, 1.0f) / (pObject->M * WORLD_SCALE_D));
+            pObject->omega.v[2] = (br_scalar)(pObject->omega.v[2] + (FRandomPosNeg(0.5f) * TAU) / pObject->M);
+            pObject->omega.v[0] = (br_scalar)(pObject->omega.v[0] + (FRandomPosNeg(0.5f) * TAU) / pObject->M);
+            pObject->disable_move_rotate = 0;
+            old_dismemberfest = gPed_dismemberfest;
+            gPed_dismemberfest = 1;
+            DamagePedestrian(((tPed_character_instance*)pObject->owner)->ped, 500, 0x61, 0x61, gProgram_state.current_car.collision_info);
+            gPed_dismemberfest = old_dismemberfest;
+        }
+    } else if (pObject != NULL && pObject->flags_0x238 == 0x10) {
+        pObject->v.v[1] = (br_scalar)(pObject->v.v[1] + FRandomBetween(3.0f, 4.0f) / (pObject->M * WORLD_SCALE_D));
+        pObject->omega.v[2] = (br_scalar)(pObject->omega.v[2] + (FRandomPosNeg(1.75f) * TAU) / pObject->M);
+        pObject->omega.v[0] = (br_scalar)(pObject->omega.v[0] + (FRandomPosNeg(1.75f) * TAU) / pObject->M);
+        pObject->disable_move_rotate = 0;
+    } else {
+        pObject->v.v[1] = (br_scalar)(pObject->v.v[1] + FRandomBetween(1.0f, 2.0f) / (pObject->M * WORLD_SCALE_D));
+        pObject->omega.v[2] = (br_scalar)(pObject->omega.v[2] + (FRandomPosNeg(0.5f) * TAU) / pObject->M);
+        pObject->omega.v[0] = (br_scalar)(pObject->omega.v[0] + (FRandomPosNeg(0.5f) * TAU) / pObject->M);
+        pObject->disable_move_rotate = 0;
+    }
+}
 
 // InitMineShit
 
@@ -602,7 +654,31 @@ void C2_HOOK_FASTCALL ResetPedBrittle(tPowerup* pPowerup, tCar_spec* pCar) {
     gPed_dismemberfest = 0;
 }
 
-// SetEngineFactor
+// FUNCTION: CARMA2_HW 0x004dca30
+// FUNCTION: CARMA2_SW 0x004d8f30
+int C2_HOOK_FASTCALL SetEngineFactor(tPowerup* pPowerup, tCar_spec* pCar) {
+    float front_give;
+    float rear_give;
+    float damping;
+    float front_height;
+    float rear_height;
+
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tCar_spec, field_0x4d4, 0x4d4);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tCar_spec, grip_multiplier, 0x4d0);
+
+    if (pPowerup->initial_value > 0) {
+        PlayExclusiveFFBEffect("Afterburner", 1);
+    }
+    pCar->field_0x4d4 = pPowerup->float_params[0];
+    pCar->grip_multiplier = pPowerup->float_params[1];
+    front_give = pPowerup->float_params[2];
+    rear_give = pPowerup->float_params[3];
+    front_height = pPowerup->float_params[4];
+    rear_height = pPowerup->float_params[5];
+    damping = pPowerup->float_params[6];
+    SetCarSuspGiveAndHeight(pCar, front_give, rear_give, damping, front_height, rear_height);
+    return pPowerup - gPowerup_array;
+}
 
 // FUNCTION: CARMA2_HW 0x004dcab0
 // FUNCTION: CARMA2_SW 0x004d8fb0
@@ -1368,7 +1444,25 @@ void C2_HOOK_FASTCALL UndoInitialTail(void) {
     }
 }
 
-// MayQueuePowerupRespawn
+// FUNCTION: CARMA2_HW 0x004e0750
+// FUNCTION: CARMA2_SW 0x004dcc50
+void C2_HOOK_FASTCALL MayQueuePowerupRespawn(int pPowerup_index, br_actor* pActor) {
+    int i;
+
+    C2_HOOK_BUG_ON(REC2_ASIZE(gRespawn_powerups) != 100);
+    C2_HOOK_BUG_ON(sizeof(tRespawn_powerup) != 0xc);
+
+    if (pActor != NULL && gRace_powerup_respawn_bools[pPowerup_index] && (gNet_mode == eNet_mode_none || gCurrent_net_game->options.powerup_respawn)) {
+        for (i = 0; i < (int)REC2_ASIZE(gRespawn_powerups); i++) {
+            if (gRespawn_powerups[i].actor == NULL) {
+                gRespawn_powerups[i].actor = pActor;
+                gRespawn_powerups[i].index = pPowerup_index;
+                gRespawn_powerups[i].respawn_time = GetTotalTime() + gPickup_respawn_max_extra_time_ms / 2 + gPickup_respawn_min_time_ms;
+                break;
+            }
+        }
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x004e07d0
 // FUNCTION: CARMA2_SW 0x004dccd0
