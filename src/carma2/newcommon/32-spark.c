@@ -761,7 +761,11 @@ void C2_HOOK_FASTCALL StopObjectSmokingInstantly(tPhysics_object* pObject) {
     }
 }
 
-// ConditionalSmokeColumn
+// STUB: CARMA2_HW 0x004fcab0
+// STUB: CARMA2_SW 0x004f8010
+void C2_HOOK_FASTCALL ConditionalSmokeColumn(tCar_spec* pCar, int pFire_point, int pColour) {
+    NOT_IMPLEMENTED();
+}
 
 // SingleSplash
 
@@ -836,7 +840,11 @@ void C2_HOOK_FASTCALL FreeSmokeShadeTables(void) {
 
 // DisposeKevStuffCar
 
-// MakeCarIt
+// STUB: CARMA2_HW 0x004fe360
+// STUB: CARMA2_SW 0x004f9900
+void C2_HOOK_FASTCALL MakeCarIt(tCar_spec* pCar) {
+    NOT_IMPLEMENTED();
+}
 
 // StopCarBeingIt
 

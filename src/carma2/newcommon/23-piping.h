@@ -211,7 +211,7 @@ extern void C2_HOOK_FASTCALL PipeSingleGrooveStop(int pGroove_index, br_matrix34
 
 extern void C2_HOOK_FASTCALL PipeSingleNonCar(uintptr_t pId, br_actor* pActor);
 
-// PipeSingleOilSpill
+extern void C2_HOOK_FASTCALL PipeSingleOilSpill(int pIndex, br_matrix34* pMat, br_scalar pFull_size, br_scalar pGrow_rate, tU32 pSpill_time, tU32 pStop_time, tCar_spec* pCar, br_vector3* pOriginal_pos, br_pixelmap* pPixelmap);
 
 extern void C2_HOOK_FASTCALL PipeSingleFrameFinish(void);
 
@@ -493,7 +493,7 @@ extern void C2_HOOK_FASTCALL UndoPedDismember(tPipe_chunk** pChunk, tPipe_chunk*
 
 extern void C2_HOOK_FASTCALL UndoPedFPChange(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk);
 
-// UndoPedPos
+extern void C2_HOOK_FASTCALL UndoPedPos(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk);
 
 // UndoPedModelChange
 
