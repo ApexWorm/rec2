@@ -12,6 +12,13 @@
 #include "c2_hooks.h"
 #include "rec2_types.h"
 
+extern tU32 gDAT_006a2360;
+extern tU32 gDAT_006a2364;
+extern int gKey_down;
+extern float gPending_replay_rate;
+extern tU32 gUINT_006a237c;
+extern tU32 gCam_change_time;
+
 extern int gPaused;
 
 extern const int gPow2_array[32];
@@ -54,7 +61,7 @@ extern void C2_HOOK_FASTCALL DoActionReplayPostSwap(void);
 
 // SynchronizeActionReplay
 
-// TurnOnActionReplay
+extern void C2_HOOK_FASTCALL TurnOnActionReplay(void);
 
 // TurnOffActionReplay
 
