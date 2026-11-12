@@ -445,6 +445,7 @@ int C2_HOOK_FASTCALL NetReallySendMessageToPlayer(tNet_game_details* pNet_game, 
 }
 
 // FUNCTION: CARMA2_HW 0x0049ef20
+// FUNCTION: CARMA2_SW 0x0049b0a0
 int C2_HOOK_FASTCALL NetSendMessageToPlayer(tNet_game_details* pDetails, tNet_message* pMessage, tPlayer_ID pPlayer) {
     int i;
     int size;
