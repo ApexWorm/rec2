@@ -83,7 +83,11 @@ br_pixelmap* gFlame_map[20];
 
 // GLOBAL: CARMA2_HW 0x006a96a8
 // GLOBAL: CARMA2_SW 0x006a30f8
-tSmoke_column gSmoke_column[10];
+tSmoke_column gSmoke_column[10] = { 0 };
+
+// GLOBAL: CARMA2_HW 0x006a9b80
+// GLOBAL: CARMA2_SW 0x006a35d0
+tSpark gSparks[32] = { 0 };
 
 // GLOBAL: CARMA2_HW 0x006aa380
 // GLOBAL: CARMA2_SW 0x006a3dd0
