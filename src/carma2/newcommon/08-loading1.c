@@ -366,6 +366,7 @@ void C2_HOOK_FASTCALL GetThreeInts(FILE* pF, int* pF1, int* pF2, int* pF3) {
 }
 
 // FUNCTION: CARMA2_HW 0x0048fed0
+// FUNCTION: CARMA2_SW 0x0048d140
 void C2_HOOK_FASTCALL GetThreeIntsAndAString(FILE* pF, int* pF1, int* pF2, int* pF3, char* pS) {
     char s[256];
     char* str;
@@ -382,6 +383,7 @@ void C2_HOOK_FASTCALL GetThreeIntsAndAString(FILE* pF, int* pF1, int* pF2, int* 
 }
 
 // FUNCTION: CARMA2_HW 0x0048ffa0
+// FUNCTION: CARMA2_SW 0x0048d210
 void C2_HOOK_FASTCALL GetIntAndAString(FILE* pF, int* pF1, char* pS) {
     char s[256];
     char* str;
