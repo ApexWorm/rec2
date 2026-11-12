@@ -29,11 +29,11 @@ const char* gForm_non_humanoid_names[1] = {
 
 // GLOBAL: CARMA2_HW 0x00705c80
 // GLOBAL: CARMA2_SW 0x006fc740
-tTintedPoly gTintedPolys[10];
+tTintedPoly gTintedPolys[10] = {0};
 
 // GLOBAL: CARMA2_HW 0x007447a0
 // GLOBAL: CARMA2_SW 0x0073b260
-int gGhost_pedestrians;
+int gGhost_pedestrians = 0;
 
 // GLOBAL: CARMA2_HW 0x006a0430
 // GLOBAL: CARMA2_SW 0x0069a488
