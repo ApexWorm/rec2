@@ -11,7 +11,7 @@
 #include "05-drmem.h"
 #include "08-loading1.h"
 #include "16-graphics1.h"
-#include "18-graphics2.h"
+#include "18b-graphics2.h"
 #include "41-utility.h"
 #include "52-errors.h"
 #include "62-graphics3.h"
