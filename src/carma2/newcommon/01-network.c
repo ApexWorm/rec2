@@ -764,6 +764,7 @@ void C2_HOOK_FASTCALL NetReallyDisposeMessage(tNet_message* pMessage) {
 #endif
 
 // STUB: CARMA2_HW 0x0049ff70
+// STUB: CARMA2_SW 0x0049c0f0
 tNet_message* C2_HOOK_FASTCALL NetGetNextMessage(tNet_game_details* pDetails, void** pSender_address) {
     NOT_IMPLEMENTED();
 }
@@ -841,6 +842,7 @@ tNet_message* C2_HOOK_FASTCALL NetGetNextMessage(tNet_game_details* pDetails, vo
 #endif
 
 // STUB: CARMA2_HW 0x004a0260
+// STUB: CARMA2_SW 0x0049c3e0
 void C2_HOOK_FASTCALL ReceivedMessage(tNet_message* pMessage, void* pSender_address, tU32 pReceive_time) {
     NOT_IMPLEMENTED();
 }
@@ -850,6 +852,7 @@ void C2_HOOK_FASTCALL ReceivedMessage(tNet_message* pMessage, void* pSender_addr
 #endif
 
 // FUNCTION: CARMA2_HW 0x004a4a40
+// FUNCTION: CARMA2_SW 0x004a0bc0
 void C2_HOOK_FASTCALL NetReceiveAndProcessMessages(void) {
     tNet_message* message;
     void* sender_address;
