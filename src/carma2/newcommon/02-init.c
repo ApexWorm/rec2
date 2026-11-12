@@ -45,6 +45,7 @@
 #include "63-loading3.h"
 #include "66-tintedpoly.h"
 #include "67-lighting.h"
+#include "72-interface.h"
 #include "globvars.h"
 #include "globvrkm.h"
 #include "globvrbm.h"
