@@ -388,7 +388,13 @@ extern void C2_HOOK_FASTCALL StripControls(char* pStr);
 
 // LoadKeyNames
 
-// DisposeKeyNames
+extern void C2_HOOK_FASTCALL DisposeKeyNames(void);
+
+extern void C2_HOOK_FASTCALL LoadKeyMapping(void);
+
+extern void C2_HOOK_FASTCALL SaveKeyMapping(void);
+
+extern void C2_HOOK_FASTCALL ChengeKeyMapIndex(int pIndex);
 
 extern void C2_HOOK_FASTCALL RefreshScrollSet(tFrontend_spec* pFrontend);
 
@@ -410,7 +416,7 @@ extern void C2_HOOK_FASTCALL DisplayJoystickSettings(tFrontend_spec* pFrontend);
 
 extern void C2_HOOK_FASTCALL SaveAllJoystickData(void);
 
-// Controls_SwitchKeymapSet
+extern int C2_HOOK_FASTCALL Controls_SwitchKeymapSet(tFrontend_spec* pFrontend);
 
 extern int C2_HOOK_FASTCALL Controls_KeyUp(tFrontend_spec* pFrontend);
 
@@ -418,7 +424,7 @@ extern int C2_HOOK_FASTCALL Controls_KeyDown(tFrontend_spec* pFrontend);
 
 // Controls_Infunc
 
-// Controls_Outfunc
+extern int C2_HOOK_FASTCALL Controls_Outfunc(tFrontend_spec* pFrontend);
 
 extern int C2_HOOK_FASTCALL Controls_SlotActivated(tFrontend_spec* pFrontend);
 
