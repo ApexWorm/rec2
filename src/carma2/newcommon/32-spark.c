@@ -954,4 +954,8 @@ void* C2_HOOK_FASTCALL GetSplashIndex(tPhysics_object* pObject) {
 
 // AdjustSplashReplay
 
-// InitReplaySplashes
+// STUB: CARMA2_HW 0x004ff030
+// STUB: CARMA2_SW 0x004fa910
+void C2_HOOK_FASTCALL InitReplaySplashes(void) {
+    NOT_IMPLEMENTED();
+}
