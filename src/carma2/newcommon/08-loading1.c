@@ -176,6 +176,35 @@ void C2_HOOK_FASTCALL WriteU8L(FILE* pF, tU8 pNumber) {
     PFfwrite(&raw_byte, sizeof(raw_byte), 1, pF);
 }
 
+// FUNCTION: CARMA2_HW 0x0048f980
+// FUNCTION: CARMA2_SW 0x0048cbf0
+void C2_HOOK_FASTCALL WriteS32L(FILE* pF, tS32 pNumber) {
+    tS32 raw_long;
+
+    raw_long = pNumber;
+    PFfwrite(&raw_long, sizeof(raw_long), 1, pF);
+    // FIXME: byteswap for BE
+}
+
+// FUNCTION: CARMA2_HW 0x0048f9a0
+// FUNCTION: CARMA2_SW 0x0048cc10
+void C2_HOOK_FASTCALL WriteS16L(FILE* pF, tS16 pNumber) {
+    tS16 raw_short;
+
+    raw_short = pNumber;
+    PFfwrite(&raw_short, sizeof(raw_short), 1, pF);
+    // FIXME: byteswap for BE
+}
+
+// FUNCTION: CARMA2_HW 0x0048f9d0
+// FUNCTION: CARMA2_SW 0x0048cc40
+void C2_HOOK_FASTCALL WriteS8L(FILE* pF, tS8 pNumber) {
+    tS8 raw_byte;
+
+    raw_byte = pNumber;
+    PFfwrite(&raw_byte, sizeof(raw_byte), 1, pF);
+}
+
 // FUNCTION: CARMA2_HW 0x0048f9f0
 // FUNCTION: CARMA2_SW 0x0048cc60
 void C2_HOOK_FASTCALL SkipBytes(FILE* pF, int pBytes_to_skip) {
