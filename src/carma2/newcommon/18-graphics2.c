@@ -26,6 +26,14 @@
 #include <limits.h>
 #include <string.h>
 
+// GLOBAL: CARMA2_HW 0x00656998
+// GLOBAL: CARMA2_SW 0x006517a8
+int gFancy_line_center_palette_indexes[5] = { 1, 2, 3, 2, 1 };
+
+// GLOBAL: CARMA2_HW 0x006569b0
+// GLOBAL: CARMA2_SW 0x006517a8
+int gFancy_line_side_palette_indexes[5] = { 1, 2, 3, 2, 1 };
+
 // GLOBAL: CARMA2_HW 0x0058fdc8
 int gCursor_tinted_top = -1;
 
@@ -46,11 +54,11 @@ int gCursor_line_width = 5;
 
 // GLOBAL: CARMA2_HW 0x0067be98
 // GLOBAL: CARMA2_SW 0x00676608
-tTransient_bm gTransient_bitmaps[50];
+tTransient_bm gTransient_bitmaps[50] = { 0 };
 
 // GLOBAL: CARMA2_HW 0x0067c348
 // GLOBAL: CARMA2_SW 0x00676ab8
-int gNext_transient;
+int gNext_transient = 0;
 
 // GLOBAL: CARMA2_HW 0x0067c390
 // GLOBAL: CARMA2_SW 0x00676b04

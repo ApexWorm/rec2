@@ -26,14 +26,15 @@ br_pixelmap* gOil_pixies[1];
 
 // GLOBAL: CARMA2_HW 0x00690c90
 // GLOBAL: CARMA2_SW 0x0068ace8
-tOil_spill_info gOily_spills[32];
+tOil_spill_info gOily_spills[32] = { 0 };
+
+// GLOBAL: CARMA2_HW 0x00691710
+// GLOBAL: CARMA2_SW 0x0068b768
+int gNext_oil_pixie = 0;
 
 // GLOBAL: CARMA2_HW 0x0074a68c
 // GLOBAL: CARMA2_SW 0x0074114c
 br_material* oily_material;
-
-// GLOBAL: CARMA2_HW 0x00691710
-int gNext_oil_pixie;
 
 // FUNCTION: CARMA2_HW 0x004a6a10
 // FUNCTION: CARMA2_SW 0x004a2b90
@@ -226,9 +227,81 @@ void C2_HOOK_FASTCALL GetOilSpillDetails(int pIndex, br_actor** pActor, br_scala
     }
 }
 
-// PointInSpill
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
 
-// GetOilFrictionFactors
+// STUB: CARMA2_HW 0x004a77d0
+// STUB: CARMA2_SW 0x004a3940
+int C2_HOOK_FASTCALL PointInSpill(const br_vector3* pPoint, int pIndex) {
+
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
+
+// FUNCTION: CARMA2_HW 0x004a7530
+// FUNCTION: CARMA2_SW 0x004a36a0
+void C2_HOOK_FASTCALL GetOilFrictionFactors(tCar_spec* pCar, br_scalar* pFl_factor, br_scalar* pFr_factor, br_scalar* pRl_factor, br_scalar* pRr_factor) {
+    int i;
+    br_vector3 wheel_world;
+
+    *pFl_factor = 1.0f;
+    *pFr_factor = 1.0f;
+    *pRl_factor = 1.0f;
+    *pRr_factor = 1.0f;
+
+    if (pCar != NULL && pCar->driver > eDriver_5) {
+        if (pCar->shadow_intersection_flags != 0) {
+            for (i = 0; i < (int)REC2_ASIZE(gOily_spills); i++) {
+                float oil_min = gOily_spills[i].field_0x48;
+                float oil_max = gOily_spills[i].field_0x4c;
+                if (oil_max != 0.0f && ((1 << i) & pCar->shadow_intersection_flags)) {
+                    float friction_min = gOily_spills[i].field_0x40;
+                    float friction_max = gOily_spills[i].field_0x44;
+                    BrMatrix34ApplyP(&wheel_world, &pCar->wpos[2], &pCar->car_master_actor->t.t.mat);
+                    if (PointInSpill(&wheel_world, i)) {
+                        pCar->oil_remaining[2] = SRandomBetween(oil_min, oil_max);
+                        pCar->oil_wheel_friction[2] = SRandomBetween(friction_min, friction_max);
+                        pCar->field_0x16fc[2] = gOily_spills[i].field_0x50;
+                    }
+                    BrMatrix34ApplyP(&wheel_world, &pCar->wpos[3], &pCar->car_master_actor->t.t.mat);
+                    if (PointInSpill(&wheel_world, i)) {
+                        pCar->oil_remaining[3] = SRandomBetween(oil_min, oil_max);
+                        pCar->oil_wheel_friction[3] = SRandomBetween(friction_min, friction_max);
+                        pCar->field_0x16fc[3] = gOily_spills[i].field_0x50;
+                    }
+                    BrMatrix34ApplyP(&wheel_world, &pCar->wpos[0], &pCar->car_master_actor->t.t.mat);
+                    if (PointInSpill(&wheel_world, i)) {
+                        pCar->oil_remaining[0] = SRandomBetween(oil_min, oil_max);
+                        pCar->oil_wheel_friction[0] = SRandomBetween(friction_min, friction_max);
+                        pCar->field_0x16fc[0] = gOily_spills[i].field_0x50;
+                    }
+                    BrMatrix34ApplyP(&wheel_world, &pCar->wpos[1], &pCar->car_master_actor->t.t.mat);
+                    if (PointInSpill(&wheel_world, i)) {
+                        pCar->oil_remaining[1] = SRandomBetween(oil_min, oil_max);
+                        pCar->oil_wheel_friction[1] = SRandomBetween(friction_min, friction_max);
+                        pCar->field_0x16fc[1] = gOily_spills[i].field_0x50;
+                    }
+                }
+            }
+        }
+        if (pCar->oil_remaining[2] != 0.0f) {
+            *pFl_factor = pCar->oil_wheel_friction[2];
+        }
+        if (pCar->oil_remaining[3] != 0.0f) {
+            *pFr_factor = pCar->oil_wheel_friction[3];
+        }
+        if (pCar->oil_remaining[0] != 0.0f) {
+            *pRl_factor = pCar->oil_wheel_friction[0];
+        }
+        if (pCar->oil_remaining[1] != 0.0f) {
+            *pRr_factor = pCar->oil_wheel_friction[1];
+        }
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x004a7860
 void C2_HOOK_FASTCALL AdjustOilSpill(int pIndex, br_matrix34* pMat, br_scalar pFull_size, br_scalar pGrow_rate, tU32 pSpill_time, tU32 pStop_time, tCar_spec* pCar, br_vector3* pOriginal_pos, br_pixelmap* pPixelmap) {
