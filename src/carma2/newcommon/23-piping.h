@@ -193,7 +193,7 @@ extern void C2_HOOK_FASTCALL AddExtendedSplashToPipingSession(tPhysics_object* p
 
 // AddDamageToPipingSession
 
-// AddProxRayToPipingSession
+extern void C2_HOOK_FASTCALL AddProxRayToPipingSession(int pRay_index, tCar_spec* pCar, tU16 pPed_index, tU32 pTime);
 
 extern void C2_HOOK_FASTCALL AddFlapToPipingSession(br_actor* pActor, br_angle pAngle);
 
