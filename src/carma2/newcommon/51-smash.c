@@ -1131,8 +1131,8 @@ int C2_HOOK_FASTCALL InsertQuad(tSmash_quad_mapping* pMapping, br_actor* pActor,
     memset(v, 0, sizeof(v));
     max_vertices = BrResSize(model->vertices) / sizeof(br_vertex);
     max_faces = BrResSize(model->faces) / sizeof(br_face);
-    mid_u = (((pCorners[1]->map.v[0] + pCorners[3]->map.v[0]) + pCorners[2]->map.v[0]) + pCorners[0]->map.v[0]) * 0.25f;
-    mid_v = (((pCorners[2]->map.v[1] + pCorners[3]->map.v[1]) + pCorners[1]->map.v[1]) + pCorners[0]->map.v[1]) * 0.25f;
+    mid_u = (((pCorners[1]->map.v[0] + pCorners[3]->map.v[0]) + pCorners[2]->map.v[0]) + pCorners[0]->map.v[0]) / 4.0f;
+    mid_v = (((pCorners[2]->map.v[1] + pCorners[3]->map.v[1]) + pCorners[1]->map.v[1]) + pCorners[0]->map.v[1]) / 4.0f;
     for (i = 0; i < 4; i++) {
         if (pCorners[i]->map.v[0] < mid_u) {
             index = 0;
@@ -1168,8 +1168,8 @@ int C2_HOOK_FASTCALL InsertQuad(tSmash_quad_mapping* pMapping, br_actor* pActor,
         pMapping->triangles[1].face->vertices[0] = v[0] - model->vertices;
         pMapping->triangles[1].face->vertices[1] = v[3] - model->vertices;
         pMapping->triangles[1].face->vertices[2] = v[2] - model->vertices;
-        pMapping->triangles[0].face->flags = 0x4;
-        pMapping->triangles[1].face->flags = 0x1;
+        pMapping->triangles[0].face->flags = BR_FACEF_COPLANAR_2;
+        pMapping->triangles[1].face->flags = BR_FACEF_COPLANAR_0;
         return 1;
     }
 
@@ -1268,8 +1268,8 @@ int C2_HOOK_FASTCALL InsertQuad(tSmash_quad_mapping* pMapping, br_actor* pActor,
     pMapping->triangles[1].face->vertices[0] = v[4] - model->vertices;
     pMapping->triangles[1].face->vertices[1] = v[7] - model->vertices;
     pMapping->triangles[1].face->vertices[2] = v[6] - model->vertices;
-    pMapping->triangles[0].face->flags = 0x4;
-    pMapping->triangles[1].face->flags = 0x1;
+    pMapping->triangles[0].face->flags = BR_FACEF_COPLANAR_2;
+    pMapping->triangles[1].face->flags = BR_FACEF_COPLANAR_0;
     for (i = 0; i < 4; i++) {
         gVector3_006b78a0[i] = v[i + 4]->p;
     }
