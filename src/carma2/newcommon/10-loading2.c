@@ -182,11 +182,20 @@ tHeadup_info gHeadup_image_info[45] = {
     { "MISSIONDONE.PIX", eNet_or_otherwise },
 };
 
+#ifdef REC2_MATCHING
 // GLOBAL: CARMA2_HW 0x00657488
-char* gYour_car_names[2][6] = {
+// GLOBAL: CARMA2_SW 0x00651e38
+const char* gDev_car_pix_names[2][6] = {
     { "CARFRANK.PIX", "CARANNIE.PIX", "CARFR2.PIX", "CARFR3.PIX", "CARFR4.PIX", "CARFR5.PIX" },
     { "CARFRANK.PIX", "CARANNIE.PIX", "CARAN2.PIX", "CARAN3.PIX", "CARAN4.PIX", "CARAN5.PIX" },
 };
+
+// GLOBAL: CARMA2_HW 0x006574b8
+// GLOBAL: CARMA2_SW 0x00651e68
+const char* gDev_car_names[6] = {
+    "BLKEAGLE.TXT", "ANNIE.TXT", "ED101.TXT", "OFFROAD.TXT", "APC.TXT", "YANK.TXT"
+};
+#endif
 
 // GLOBAL: CARMA2_HW 0x0079eb60
 // GLOBAL: CARMA2_SW 0x007950c0
