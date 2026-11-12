@@ -12,9 +12,11 @@
 // FUNCTION: CARMA2_HW 0x0047b450
 void C2_HOOK_FASTCALL DRDrawLine(br_pixelmap* pDestn, int pX1, int pY1, int pX2, int pY2, int pColour) {
 
+#ifdef REC2_HW
     if (gBack_screen->type != BR_PMT_INDEX_8) {
         pColour = PaletteEntry16Bit(gRender_palette, pColour);
     }
+#endif
     BrPixelmapLine(pDestn, pX1, pY1, pX2, pY2, pColour);
 }
 
