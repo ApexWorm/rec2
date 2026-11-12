@@ -29,6 +29,7 @@ br_pixelmap* gOil_pixies[1];
 tOil_spill_info gOily_spills[32] = { 0 };
 
 // GLOBAL: CARMA2_HW 0x00691710
+// GLOBAL: CARMA2_SW 0x0068b768
 int gNext_oil_pixie = 0;
 
 // GLOBAL: CARMA2_HW 0x00691714

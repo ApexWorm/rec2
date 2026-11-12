@@ -11,7 +11,7 @@
 #include "05-drmem.h"
 #include "08-loading1.h"
 #include "16-graphics1.h"
-#include "18-graphics2.h"
+#include "18b-graphics2.h"
 #include "41-utility.h"
 #include "52-errors.h"
 #include "62-graphics3.h"
@@ -23,13 +23,13 @@
 
 #include <string.h>
 
-// GLOBAL: CARMA2_HW 0x0076c960
-// GLOBAL: CARMA2_SW 0x00762ec0
-br_pixelmap* gTexture_maps[1024];
-
 // GLOBAL: CARMA2_HW 0x007663e0
 // GLOBAL: CARMA2_SW 0x0075c940
-tDR_font gFonts[24];
+tDR_font gFonts[28] = { 0 };
+
+// GLOBAL: CARMA2_HW 0x0076c960
+// GLOBAL: CARMA2_SW 0x00762ec0
+br_pixelmap* gTexture_maps[1024] = { 0 };
 
 // GLOBAL: CARMA2_HW 0x0059ad30
 // GLOBAL: CARMA2_SW 0x00595c78
