@@ -260,7 +260,7 @@ void C2_HOOK_FASTCALL NetSendHeadupToPlayer(char* pMessage, tPlayer_ID pPlayer) 
             }
         } else {
             message = NetBuildGuaranteedMessage(eNet_message_chunk_type_headup, 0);
-            strcpy((char*)message->contents.raw.data, pMessage);
+            strcpy(message->contents.headup.text, pMessage);
             NetGuaranteedSendMessageToPlayer(gCurrent_net_game, message, pPlayer, NULL);
         }
     }

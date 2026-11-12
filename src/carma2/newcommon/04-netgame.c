@@ -463,11 +463,11 @@ void C2_HOOK_FASTCALL PlayerIsIt(tNet_game_player_info* pPlayer) {
     }
     MakeCarIt(pPlayer->car);
     gIt_or_fox = pPlayer - gNet_players;
-    sprintf(s, "%s", GetMiscString(0xbc));
+    sprintf(s, "%s", GetMiscString(eMiscString_you_re_the_fox));
     NetSendHeadupToPlayer(s, pPlayer->ID);
     for (i = 0; i < gNumber_of_net_players; i++) {
         if (&gNet_players[i] != pPlayer) {
-            sprintf(s, "%s %s", pPlayer->player_name, GetMiscString(0xbb));
+            sprintf(s, "%s %s", pPlayer->player_name, GetMiscString(eMiscString_is_the_fox));
             NetSendHeadupToPlayer(s, gNet_players[i].ID);
         }
     }
