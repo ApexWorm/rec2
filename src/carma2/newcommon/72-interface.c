@@ -2949,6 +2949,53 @@ void C2_HOOK_FASTCALL DisposeKeyNames(void) {
     }
 }
 
+// FUNCTION: CARMA2_HW 0x00487e10
+// FUNCTION: CARMA2_SW 0x00484f40
+void C2_HOOK_FASTCALL LoadKeyMapping(void) {
+    FILE* f;
+    tPath_name the_path;
+    int i;
+
+    PathCat(the_path, gApplication_path, "KEYMAP_X.TXT");
+    the_path[strlen(the_path) - 5] = '0' + gKey_map_index;
+    f = DRfopen(the_path, "rt");
+    if (f == NULL) {
+        FatalError(kFatalError_CouldNotOpenKeyMapFile);
+    }
+
+    for (i = 0; i < (int)REC2_ASIZE(gKey_mapping); i++) {
+        fscanf(f, "%d", &gKey_mapping[i]);
+    }
+    PFfclose(f);
+}
+
+void C2_HOOK_FASTCALL SaveKeyMapping(void) {
+    FILE* f;
+    tPath_name the_path;
+    int i;
+
+    PathCat(the_path, gApplication_path, "KEYMAP_X.TXT");
+    the_path[strlen(the_path) - 5] = '0' + gKey_map_index;
+    PDFileUnlock(the_path);
+    f = DRfopen(the_path, "wb");
+    if (f == NULL) {
+        FatalError(kFatalError_CouldNotOpenKeyMapFile);
+    }
+    for (i = 0; i < (int)REC2_ASIZE(gKey_mapping); i++) {
+        fprintf(f, "%d", gKey_mapping[i]);
+        fputc('\r', f);
+        fputc('\n', f);
+    }
+    PFfclose(f);
+}
+
+void C2_HOOK_FASTCALL ChengeKeyMapIndex(int pIndex) {
+
+    SaveKeyMapping();
+    gKey_map_index = pIndex;
+    LoadKeyMapping();
+}
+
 // FUNCTION: CARMA2_HW 0x004720e0
 // FUNCTION: CARMA2_SW 0x00471670
 void C2_HOOK_FASTCALL RefreshScrollSet(tFrontend_spec* pFrontend) {
@@ -3039,53 +3086,6 @@ void C2_HOOK_FASTCALL DisplayJoystickSettings(tFrontend_spec* pFrontend) {
 #endif
 
 // SaveAllJoystickData
-
-// FUNCTION: CARMA2_HW 0x00487e10
-// FUNCTION: CARMA2_SW 0x00484f40
-void C2_HOOK_FASTCALL LoadKeyMapping(void) {
-    FILE* f;
-    tPath_name the_path;
-    int i;
-
-    PathCat(the_path, gApplication_path, "KEYMAP_X.TXT");
-    the_path[strlen(the_path) - 5] = '0' + gKey_map_index;
-    f = DRfopen(the_path, "rt");
-    if (f == NULL) {
-        FatalError(kFatalError_CouldNotOpenKeyMapFile);
-    }
-
-    for (i = 0; i < (int)REC2_ASIZE(gKey_mapping); i++) {
-        fscanf(f, "%d", &gKey_mapping[i]);
-    }
-    PFfclose(f);
-}
-
-void C2_HOOK_FASTCALL SaveKeyMapping(void) {
-    FILE* f;
-    tPath_name the_path;
-    int i;
-
-    PathCat(the_path, gApplication_path, "KEYMAP_X.TXT");
-    the_path[strlen(the_path) - 5] = '0' + gKey_map_index;
-    PDFileUnlock(the_path);
-    f = DRfopen(the_path, "wb");
-    if (f == NULL) {
-        FatalError(kFatalError_CouldNotOpenKeyMapFile);
-    }
-    for (i = 0; i < (int)REC2_ASIZE(gKey_mapping); i++) {
-        fprintf(f, "%d", gKey_mapping[i]);
-        fputc('\r', f);
-        fputc('\n', f);
-    }
-    PFfclose(f);
-}
-
-void C2_HOOK_FASTCALL ChengeKeyMapIndex(int pIndex) {
-
-    SaveKeyMapping();
-    gKey_map_index = pIndex;
-    LoadKeyMapping();
-}
 
 // FUNCTION: CARMA2_HW 0x00472440
 // FUNCTION: CARMA2_SW 0x004719d0
