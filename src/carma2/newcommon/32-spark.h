@@ -219,7 +219,7 @@ extern void C2_HOOK_FASTCALL FreeSmokeShadeTables(void);
 
 extern void C2_HOOK_FASTCALL MakeCarIt(tCar_spec* pCar);
 
-// StopCarBeingIt
+extern void C2_HOOK_FASTCALL StopCarBeingIt(tCar_spec* pCar);
 
 // ForEveryModelMaterial
 

@@ -846,7 +846,18 @@ void C2_HOOK_FASTCALL MakeCarIt(tCar_spec* pCar) {
     NOT_IMPLEMENTED();
 }
 
-// StopCarBeingIt
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_HW 0x004fe570
+void C2_HOOK_FASTCALL StopCarBeingIt(tCar_spec* pCar) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // ForEveryModelMaterial
 

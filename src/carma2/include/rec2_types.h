@@ -5378,6 +5378,11 @@ typedef struct {
 
 typedef struct {
     tNet_message_chunk_header header;
+    char text[0x80];
+} tNet_message_headup;
+
+typedef struct {
+    tNet_message_chunk_header header;
     tU8 data[];
 } tNet_message_chunk_raw;
 
@@ -5470,6 +5475,7 @@ typedef struct {
 typedef union {
     tNet_message_chunk_raw raw;
     tNet_message_chunk_start_race start_race; /* type = 0xc */
+    tNet_message_headup headup; /* type = 0xd */
     tNet_message_chunk_scores scores; /* type = 0x18 */
     tNet_message_chunk_gameplay gameplay; /* type = 0x1b */
     tNet_message_chunk_oil_spill oil_spill; /* type = 0x1f*/
@@ -5599,6 +5605,8 @@ enum {
     eMiscString_increased_offsensive = 177,
     eMiscString_cannot_afford_it_credits_S = 179,
     eMiscString_is_undead = 185,
+    eMiscString_is_the_fox = 187,
+    eMiscString_you_re_the_fox = 188,
     eMiscString_driven_to_destruction_description = 194,
     eMiscString_car_crusher_description = 195,
     eMiscString_smashy_things_description = 196,

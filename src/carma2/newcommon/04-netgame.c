@@ -27,6 +27,7 @@
 #include "platform.h"
 #include "rec2_macros.h"
 
+#include <stdio.h>
 #include <stdlib.h>
 
 // GLOBAL: CARMA2_HW 0x0075b8f8
@@ -445,19 +446,32 @@ void C2_HOOK_FASTCALL CarInContactWithFox(tNet_game_player_info* pPlayer) {
     }
 }
 
-#ifdef REC2_MATCHING
-#pragma auto_inline(off)
-#endif
-
-// STUB: CARMA2_HW 0x0049a9e0
-// STUB: CARMA2_SW 0x00496b60
+// FUNCTION: CARMA2_HW 0x0049a9e0
+// FUNCTION: CARMA2_SW 0x00496b60
 void C2_HOOK_FASTCALL PlayerIsIt(tNet_game_player_info* pPlayer) {
-    NOT_IMPLEMENTED();
-}
+    int i;
+    char s[256];
 
-#ifdef REC2_MATCHING
-#pragma auto_inline(on)
-#endif
+    if (gIt_or_fox == pPlayer - gNet_players) {
+        return;
+    }
+    for (i = 0; i < gNumber_of_net_players; i++) {
+        StopCarBeingIt(gNet_players[i].car);
+    }
+    if (gCurrent_net_game->type == eNet_game_type_foxy) {
+        pPlayer->car->power_up_levels[1] = 0;
+    }
+    MakeCarIt(pPlayer->car);
+    gIt_or_fox = pPlayer - gNet_players;
+    sprintf(s, "%s", GetMiscString(eMiscString_you_re_the_fox));
+    NetSendHeadupToPlayer(s, pPlayer->ID);
+    for (i = 0; i < gNumber_of_net_players; i++) {
+        if (&gNet_players[i] != pPlayer) {
+            sprintf(s, "%s %s", pPlayer->player_name, GetMiscString(eMiscString_is_the_fox));
+            NetSendHeadupToPlayer(s, gNet_players[i].ID);
+        }
+    }
+}
 
 // SelectRandomFox
 
