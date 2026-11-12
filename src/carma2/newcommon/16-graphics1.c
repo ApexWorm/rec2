@@ -51,14 +51,36 @@ int gBrZb_initialized;
 br_pixelmap* gRear_pixelmap;
 
 // GLOBAL: CARMA2_HW 0x006a22b8
+// GLOBAL: CARMA2_SW 0x0069c310
 br_pixelmap* gEvalu;
 
 // GLOBAL: CARMA2_HW 0x006a22f8
-tWobble_spec gWobble_array[5];
+// GLOBAL: CARMA2_SW 0x0069c350
+tWobble_spec gWobble_array[5] = { 0 };
+
+#ifdef REC2_MATCHING
+// GLOBAL: CARMA2_HW 0x006a2348
+// GLOBAL: CARMA2_SW 0x0069c3a0
+int gINT_006a2348 = 0;
+#endif
+
+// GLOBAL: CARMA2_HW 0x006a234c
+// GLOBAL: CARMA2_SW 0x0069c3a4
+float gPrevious_rear_yon = 0.0f;
+
+#ifdef REC2_MATCHING
+// GLOBAL: CARMA2_HW 0x006a2350
+// GLOBAL: CARMA2_SW 0x0069c3a8
+int gINT_006a2350[2] = { 0 };
+#endif
 
 // GLOBAL: CARMA2_HW 0x00705080
 // GLOBAL: CARMA2_SW 0x006fbb40
-float gCosine_array[64];
+float gCosine_array[65] = { 0 };
+
+// GLOBAL: CARMA2_HW 0x00705184
+// GLOBAL: CARMA2_SW 0x006fbc44
+int gScreen_wobble_y = 0;
 
 // GLOBAL: CARMA2_HW 0x0065fdc8
 // GLOBAL: CARMA2_SW 0x0065a708
@@ -107,10 +129,6 @@ br_actor* gShadow_actor;
 // GLOBAL: CARMA2_HW 0x00705188
 // GLOBAL: CARMA2_SW 0x006fbc48
 int gScreen_wobble_x;
-
-// GLOBAL: CARMA2_HW 0x00705184
-// GLOBAL: CARMA2_SW 0x006fbc44
-int gScreen_wobble_y;
 
 // GLOBAL: CARMA2_HW 0x0070518c
 // GLOBAL: CARMA2_SW 0x006fbc4c
@@ -311,7 +329,17 @@ void C2_HOOK_FASTCALL DisposeSavedShadeTables(void) {
     }
 }
 
-// ShadowMode
+// FUNCTION: CARMA2_HW 0x004e9b90
+// FUNCTION: CARMA2_SW 0x004e5950
+void C2_HOOK_FASTCALL ShadowMode(void) {
+
+    gFancy_shadow = !gFancy_shadow;
+    if (gFancy_shadow) {
+        NewTextHeadupSlot(4, 0, 2000, -4, "Translucent shadow");
+    } else {
+        NewTextHeadupSlot(4, 0, 2000, -4, "Solid shadow");
+    }
+}
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
