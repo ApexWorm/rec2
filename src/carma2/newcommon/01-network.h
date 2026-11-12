@@ -143,7 +143,7 @@ extern void C2_HOOK_FASTCALL NetReallyDisposeMessage(tNet_message* pMessage);
 
 // ReceivedLeave
 
-// NetFullScreenMessage
+extern void C2_HOOK_FASTCALL NetFullScreenMessage(int pStr_index, int pLeave_it_up_there);
 
 // HostHasBittenTheDust
 
@@ -242,5 +242,7 @@ extern void C2_HOOK_FASTCALL GetCheckSum(tNet_message* pMessage);
 // StatReceivePacket
 
 // StatSendPacket
+
+extern int DAT_0068d954;
 
 #endif // GUARD_01_NETWORK_H

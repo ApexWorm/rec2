@@ -122,7 +122,7 @@ extern void C2_HOOK_FASTCALL InitialisePlayerScore(tNet_game_player_info* pPlaye
 
 extern void C2_HOOK_FASTCALL CheckForNeedyEnvironmentRecipients(void);
 
-// ReceivedGameplay
+extern void C2_HOOK_FASTCALL ReceivedGameplay(tNet_message_chunk* pContents, tNet_message* pMessage, tU32 pReceive_time);
 
 // SendGameplay
 
