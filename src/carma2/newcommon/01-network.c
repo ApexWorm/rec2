@@ -125,6 +125,7 @@ tU16 gGuarantee_number = 1;
 int INT_00659d34 = -1;
 
 // GLOBAL: CARMA2_HW 0x0068d954
+// GLOBAL: CARMA2_SW 0x006879ac
 int DAT_0068d954;
 
 // GLOBAL: CARMA2_HW 0x0068d958
@@ -776,6 +777,7 @@ void C2_HOOK_FASTCALL NetReallyDisposeMessage(tNet_message* pMessage) {
 // ReceivedLeave
 
 // STUB: CARMA2_HW 0x004a0080
+// STUB: CARMA2_SW 0x0049c200
 void C2_HOOK_FASTCALL NetFullScreenMessage(int pStr_index, int pLeave_it_up_there) {
     NOT_IMPLEMENTED();
 }

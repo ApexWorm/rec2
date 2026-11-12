@@ -583,6 +583,7 @@ void C2_HOOK_FASTCALL CheckForNeedyEnvironmentRecipients(void) {
 }
 
 // FUNCTION: CARMA2_HW 0x0049bad0
+// FUNCTION: CARMA2_SW 0x00497c50
 void C2_HOOK_FASTCALL ReceivedGameplay(tNet_message_chunk* pContents, tNet_message* pMessage, tU32 pReceive_time) {
     int must_revert_reentrancy;
 
