@@ -426,6 +426,7 @@ int gValid_stashed_save_game; // FIXME: rename variable?
 tConnected_items gControls_scroller;
 
 // GLOBAL: CARMA2_HW 0x00688458
+// GLOBAL: CARMA2_SW 0x006829b8
 char* gKey_names[153] = { 0 };
 
 // GLOBAL: CARMA2_HW 0x006886bc
