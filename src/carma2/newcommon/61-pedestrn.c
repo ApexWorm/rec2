@@ -931,9 +931,7 @@ int C2_HOOK_FASTCALL GetPedPosition(int pIndex, br_vector3* pPos) {
     if (ped->hit_points > 0
             && ((ped->flags & 0x1) || gMap_view == 2)
             && (gCurrent_race.race_spec->race_type != kRaceType_Peds || ((tS16)ped->flags & 0x200) != 0)) {
-        pPos->v[0] = ped->pos.v[0];
-        pPos->v[1] = ped->pos.v[1];
-        pPos->v[2] = ped->pos.v[2];
+        BrVector3Copy(pPos, &ped->pos);
         return 1;
     }
     return 0;
