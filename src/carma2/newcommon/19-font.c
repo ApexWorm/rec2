@@ -23,13 +23,13 @@
 
 #include <string.h>
 
-// GLOBAL: CARMA2_HW 0x0076c960
-// GLOBAL: CARMA2_SW 0x00762ec0
-br_pixelmap* gTexture_maps[1024];
-
 // GLOBAL: CARMA2_HW 0x007663e0
 // GLOBAL: CARMA2_SW 0x0075c940
-tDR_font gFonts[24];
+tDR_font gFonts[28] = { 0 };
+
+// GLOBAL: CARMA2_HW 0x0076c960
+// GLOBAL: CARMA2_SW 0x00762ec0
+br_pixelmap* gTexture_maps[1024] = { 0 };
 
 // GLOBAL: CARMA2_HW 0x0059ad30
 // GLOBAL: CARMA2_SW 0x00595c78
