@@ -107,7 +107,19 @@ void C2_HOOK_FASTCALL RemoveDroneFromPHIL(tDrone_spec* pDrone) {
 
 // InitDroneCollisionObject
 
-// ReallyAddDroneToPHIL
+// FUNCTION: CARMA2_HW 0x00451650
+// FUNCTION: CARMA2_SW 0x004513e0
+int C2_HOOK_FASTCALL ReallyAddDroneToPHIL(tDrone_spec* pDrone) {
+
+    if (PHILAddObject(&pDrone->collision_info)) {
+        return 0;
+    }
+    PHILSetObjectProperty(&pDrone->collision_info, 0, 1.0);
+    PHILSetObjectProperty(&pDrone->collision_info, 3, 1);
+    PHILSetObjectProperty(&pDrone->collision_info, 7, 1);
+    PHILSetObjectProperty(&pDrone->collision_info, 6, 1);
+    return 1;
+}
 
 // AddDroneToPHIL
 

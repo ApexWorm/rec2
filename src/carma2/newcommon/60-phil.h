@@ -58,7 +58,7 @@ extern int C2_HOOK_FASTCALL GetNetworkDataSize(tU8* pNet_data);
 
 extern void C2_HOOK_FASTCALL PHILDisable(void);
 
-// PHILAddObject
+extern int C2_HOOK_FASTCALL PHILAddObject(tPhysics_object* pObject);
 
 extern int C2_HOOK_FASTCALL PHILRemoveObject(tPhysics_object* pObject);
 
@@ -80,7 +80,7 @@ extern int C2_HOOK_FASTCALL PHILSetPassiveObjectsMatrix(tPhysics_object* pObject
 
 // PHILAddActiveObjectImmediately
 
-// PHILSetObjectProperty
+extern int C2_HOOK_CDECL PHILSetObjectProperty(tPhysics_object* pCollision_info, int pParam, ...);
 
 extern float C2_HOOK_FASTCALL PHILGetObjectProperty(tPhysics_object* pObject, int pProperty);
 
