@@ -113,6 +113,7 @@ int gBlind_pedestrians;
 float gPed_gravity_multiplier;
 
 // GLOBAL: CARMA2_HW 0x007447e4
+// GLOBAL: CARMA2_SW 0x0073b2a4
 int gPed_dismemberfest;
 
 // GLOBAL: CARMA2_HW 0x007447f8
@@ -253,7 +254,42 @@ void C2_HOOK_FASTCALL LoadPowerups(void) {
 
 // InitTail
 
-// ThisObjectHitAMineSoSpamItUpUsingThisPowerupsSettings
+// FUNCTION: CARMA2_HW 0x004d9d00
+// FUNCTION: CARMA2_SW 0x004d61d0
+void C2_HOOK_FASTCALL ThisObjectHitAMineSoSpamItUpUsingThisPowerupsSettings(tPhysics_object* pObject, int pPowerup_index) {
+    tPedestrian* ped;
+    int old_dismemberfest;
+
+    if (pObject->field_0x1a0 & 0xf0000) {
+        if (IsItReallyOKThatWeDontMakeAnyEffortToProtectAnySadFuckersOutThereThatDontWishToSeeInnocentPeopleBlownToBitsByHighExplosiveMinesAndShells()) {
+            ped = ((tPed_character_instance*)pObject->owner)->ped;
+            if (!(ped->character->field_0x14 & 0x4) && !gPHIL_doing_physics) {
+                SetThisPedPhysicing(ped);
+            }
+            if (pPowerup_index != 14) {
+                BrVector3Set(&pObject->v, 0.0f, 0.0f, 0.0f);
+            }
+            pObject->v.v[1] = (br_scalar)(pObject->v.v[1] + FRandomBetween(0.7f, 1.0f) / (pObject->M * WORLD_SCALE_D));
+            pObject->omega.v[2] = (br_scalar)(pObject->omega.v[2] + (FRandomPosNeg(0.5f) * TAU) / pObject->M);
+            pObject->omega.v[0] = (br_scalar)(pObject->omega.v[0] + (FRandomPosNeg(0.5f) * TAU) / pObject->M);
+            pObject->disable_move_rotate = 0;
+            old_dismemberfest = gPed_dismemberfest;
+            gPed_dismemberfest = 1;
+            DamagePedestrian(((tPed_character_instance*)pObject->owner)->ped, 500, 0x61, 0x61, gProgram_state.current_car.collision_info);
+            gPed_dismemberfest = old_dismemberfest;
+        }
+    } else if (pObject != NULL && pObject->flags_0x238 == 0x10) {
+        pObject->v.v[1] = (br_scalar)(pObject->v.v[1] + FRandomBetween(3.0f, 4.0f) / (pObject->M * WORLD_SCALE_D));
+        pObject->omega.v[2] = (br_scalar)(pObject->omega.v[2] + (FRandomPosNeg(1.75f) * TAU) / pObject->M);
+        pObject->omega.v[0] = (br_scalar)(pObject->omega.v[0] + (FRandomPosNeg(1.75f) * TAU) / pObject->M);
+        pObject->disable_move_rotate = 0;
+    } else {
+        pObject->v.v[1] = (br_scalar)(pObject->v.v[1] + FRandomBetween(1.0f, 2.0f) / (pObject->M * WORLD_SCALE_D));
+        pObject->omega.v[2] = (br_scalar)(pObject->omega.v[2] + (FRandomPosNeg(0.5f) * TAU) / pObject->M);
+        pObject->omega.v[0] = (br_scalar)(pObject->omega.v[0] + (FRandomPosNeg(0.5f) * TAU) / pObject->M);
+        pObject->disable_move_rotate = 0;
+    }
+}
 
 // InitMineShit
 
@@ -602,7 +638,31 @@ void C2_HOOK_FASTCALL ResetPedBrittle(tPowerup* pPowerup, tCar_spec* pCar) {
     gPed_dismemberfest = 0;
 }
 
-// SetEngineFactor
+// FUNCTION: CARMA2_HW 0x004dca30
+// FUNCTION: CARMA2_SW 0x004d8f30
+int C2_HOOK_FASTCALL SetEngineFactor(tPowerup* pPowerup, tCar_spec* pCar) {
+    float front_give;
+    float rear_give;
+    float damping;
+    float front_height;
+    float rear_height;
+
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tCar_spec, field_0x4d4, 0x4d4);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tCar_spec, grip_multiplier, 0x4d0);
+
+    if (pPowerup->initial_value > 0) {
+        PlayExclusiveFFBEffect("Afterburner", 1);
+    }
+    pCar->field_0x4d4 = pPowerup->float_params[0];
+    pCar->grip_multiplier = pPowerup->float_params[1];
+    front_give = pPowerup->float_params[2];
+    rear_give = pPowerup->float_params[3];
+    front_height = pPowerup->float_params[4];
+    rear_height = pPowerup->float_params[5];
+    damping = pPowerup->float_params[6];
+    SetCarSuspGiveAndHeight(pCar, front_give, rear_give, damping, front_height, rear_height);
+    return pPowerup - gPowerup_array;
+}
 
 // FUNCTION: CARMA2_HW 0x004dcab0
 // FUNCTION: CARMA2_SW 0x004d8fb0

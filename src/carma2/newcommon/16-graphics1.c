@@ -321,7 +321,17 @@ void C2_HOOK_FASTCALL DisposeSavedShadeTables(void) {
     }
 }
 
-// ShadowMode
+// FUNCTION: CARMA2_HW 0x004e9b90
+// FUNCTION: CARMA2_SW 0x004e5950
+void C2_HOOK_FASTCALL ShadowMode(void) {
+
+    gFancy_shadow = !gFancy_shadow;
+    if (gFancy_shadow) {
+        NewTextHeadupSlot(4, 0, 2000, -4, "Translucent shadow");
+    } else {
+        NewTextHeadupSlot(4, 0, 2000, -4, "Solid shadow");
+    }
+}
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)

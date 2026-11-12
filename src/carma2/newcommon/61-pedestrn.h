@@ -15,6 +15,8 @@
 extern int gPed_count_limbed_actors;
 extern br_actor* gLimbs_actor;
 
+extern tPedForms_vtable* gPed_vtable;
+
 extern int gPed_retain_root_mode;
 
 extern tPed_remap* gPed_remaps[10];
@@ -85,7 +87,7 @@ extern void C2_HOOK_CDECL SetCharacterPhysicsLevelAR(tPed_character_instance* pC
 
 // PedApplyPedPhysics
 
-// PedApplyPedPos
+extern void C2_HOOK_FASTCALL PedApplyPedPos(tPedestrian* pPedestrian, br_vector3* pPos);
 
 extern void C2_HOOK_FASTCALL PedApplyVanishDismembered(tPedestrian* pPedestrian, tU32 pValue);
 
@@ -207,7 +209,7 @@ extern void C2_HOOK_FASTCALL ScoreForKilledPedestrian(tPedestrian* pPed, float p
 
 // DismemberPed
 
-// DamagePedestrian
+extern void C2_HOOK_FASTCALL DamagePedestrian(tPedestrian* pPed, int pDamage, int pArg3, int pArg4, tPhysics_object* pObject);
 
 // SetLastHitter
 
@@ -267,7 +269,7 @@ extern int C2_HOOK_FASTCALL CBActiveHalted(tPed_character_instance* pCharacter, 
 
 extern int C2_HOOK_FASTCALL GetPedCount(void);
 
-// GetPedPosition
+extern int C2_HOOK_FASTCALL GetPedPosition(int pIndex, br_vector3* pPos);
 
 extern void C2_HOOK_CDECL TurnLimbsOnAndOff(br_actor* pActor, br_model* pModel, br_material* pMaterial, void* pOrder_table, br_uint_8 pStyle, int pOn_screen);
 
@@ -281,7 +283,7 @@ extern void C2_HOOK_CDECL TurnLimbsOnAndOff(br_actor* pActor, br_model* pModel, 
 
 // SpawnPedsOnFace
 
-// FinishUpLoadingPeds
+extern void C2_HOOK_FASTCALL FinishUpLoadingPeds(void);
 
 extern void C2_HOOK_FASTCALL MakeFlagWavingBastardWaveHisFlagWhichIsTheProbablyTheLastThingHeWillEverDo(void);
 
@@ -453,7 +455,7 @@ extern void C2_HOOK_FASTCALL DisposeAllLoadedRemaps(void);
 
 // SetUpCharacterForm
 
-// DisposeCharacterForm
+extern void C2_HOOK_FASTCALL DisposeCharacterForm(tPed_form* pForm);
 
 // DisposeAllLoadedForms
 
@@ -505,7 +507,7 @@ extern int C2_HOOK_FASTCALL MakeCharacterCollideworthy2(tPed_character_instance*
 
 extern int C2_HOOK_FASTCALL MakeCharacterCollideworthy(tPed_character_instance* pCharacter, int pArg2, int pArg3);
 
-// GetRootObject
+extern tPhysics_object* C2_HOOK_FASTCALL GetRootObject(tPed_character_instance* pPed);
 
 // CharacterNoLongerCollideworthy
 
