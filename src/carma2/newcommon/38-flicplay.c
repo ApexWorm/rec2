@@ -882,6 +882,7 @@ void C2_HOOK_FASTCALL DoUncompressedTrans(tFlic_descriptor* pFlic_info, tU32 pCh
 #endif
 
 // STUB: CARMA2_HW 0x00461da0
+// STUB: CARMA2_SW 0x00461830
 int C2_HOOK_FASTCALL PlayNextFlicFrame(tFlic_descriptor* pFlic_info) {
     NOT_IMPLEMENTED();
 }
