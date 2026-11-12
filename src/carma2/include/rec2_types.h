@@ -5598,6 +5598,7 @@ enum {
     eMiscString_engine_power_increased = 176,
     eMiscString_increased_offsensive = 177,
     eMiscString_cannot_afford_it_credits_S = 179,
+    eMiscString_is_undead = 185,
     eMiscString_driven_to_destruction_description = 194,
     eMiscString_car_crusher_description = 195,
     eMiscString_smashy_things_description = 196,
