@@ -388,7 +388,7 @@ extern void C2_HOOK_FASTCALL StripControls(char* pStr);
 
 // LoadKeyNames
 
-// DisposeKeyNames
+extern void C2_HOOK_FASTCALL DisposeKeyNames(void);
 
 extern void C2_HOOK_FASTCALL RefreshScrollSet(tFrontend_spec* pFrontend);
 
@@ -409,6 +409,12 @@ extern void C2_HOOK_FASTCALL Slider_ForceProc(tFrontend_slider* pSlider);
 extern void C2_HOOK_FASTCALL DisplayJoystickSettings(tFrontend_spec* pFrontend);
 
 extern void C2_HOOK_FASTCALL SaveAllJoystickData(void);
+
+extern void C2_HOOK_FASTCALL LoadKeyMapping(void);
+
+extern void C2_HOOK_FASTCALL SaveKeyMapping(void);
+
+extern void C2_HOOK_FASTCALL ChengeKeyMapIndex(int pIndex);
 
 extern int C2_HOOK_FASTCALL Controls_SwitchKeymapSet(tFrontend_spec* pFrontend);
 
