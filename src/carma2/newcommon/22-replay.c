@@ -146,10 +146,10 @@ void C2_HOOK_FASTCALL TurnOnActionReplay(void) {
     LoadInterfaceStuff(1);
     StartMouseCursor();
     gKey_down = 52;
-    gPending_replay_rate = 0.f;
+    gPending_replay_rate = 0.0f;
     gCam_change_time = PDGetTotalTime();
     gDAT_006a2364 = GetTotalTime();
-    if (gRace_finished == 0) {
+    if (!gRace_finished) {
         SaveCameraPosition(0);
     }
     gCamera_type = gAction_replay_camera_mode;

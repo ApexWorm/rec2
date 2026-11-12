@@ -1326,6 +1326,7 @@ void C2_HOOK_FASTCALL FlushAllPedCaches(void) {
 }
 
 // FUNCTION: CARMA2_HW 0x004d6d90
+// FUNCTION: CARMA2_SW 0x004d6d90
 void C2_HOOK_FASTCALL SavePedStuff(void) {
 
 }
