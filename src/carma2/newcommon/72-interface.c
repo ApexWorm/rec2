@@ -55,9 +55,11 @@ int gNet_storage_space_initialized;
 // GLOBAL: CARMA2_SW 0x00759ec0
 tNet_game_options gNet_settings[9] = { 0 };
 
+#ifdef REC2_MATCHING
 // GLOBAL: CARMA2_HW 0x00763b10
 // GLOBAL: CARMA2_SW 0x0075a070
 int gINT_00763b10 = 0;
+#endif
 
 // GLOBAL: CARMA2_HW 0x00688aa8
 // GLOBAL: CARMA2_SW 0x00683008
