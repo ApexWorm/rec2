@@ -35,6 +35,8 @@ extern tFlic_descriptor gPanel_flic[2];
 extern tU8* gPanel_flic_data[2];
 extern tU32 gPanel_flic_data_length[2];
 extern tU32 gLast_panel_frame_time[2];
+extern int gPanel_flic_left[2];
+extern int gPanel_flic_top[2];
 extern br_pixelmap* gPanel_buffer[2];
 extern tDR_font* gTrans_fonts[2];
 extern int gTranslation_count;
