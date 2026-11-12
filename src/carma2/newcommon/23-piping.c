@@ -1479,7 +1479,14 @@ void C2_HOOK_FASTCALL PipeSingleGrooveOnOff(int pOn, br_actor* pActor, int pBloc
         SIZE_OFFSET_PIPING(tPipe_single_groove_on_of, block_flags), pBlock_flags);
 }
 
-// PipeSinglePowerupGot
+// FUNCTION: CARMA2_HW 0x004c8da0
+// FUNCTION: CARMA2_SW 0x004c54d0
+void C2_HOOK_FASTCALL PipeSinglePowerupGot(tPowerup* pPowerup, tCar_spec* pCar_spec) {
+    C2_HOOK_BUG_ON(sizeof(pCar_spec) != 0x4);
+
+    ARDoSingleVariedSession(ePipe_chunk_powerup_got, (uintptr_t)pPowerup, 1,
+        SIZE_OFFSET_PIPING(tPipe_chunk_powerup_got, car), pCar_spec);
+}
 
 // FUNCTION: CARMA2_HW 0x004c8dc0
 // FUNCTION: CARMA2_SW 0x004c54f0
