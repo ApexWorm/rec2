@@ -550,25 +550,7 @@ void C2_HOOK_FASTCALL FinishLoadingGeneral(void) {
     PFfclose(gTempFile);
 }
 
-// FUNCTION: CARMA2_HW 0x00487e10
-// FUNCTION: CARMA2_SW 0x00484f40
-void C2_HOOK_FASTCALL LoadKeyMapping(void) {
-    FILE* f;
-    tPath_name the_path;
-    int i;
-
-    PathCat(the_path, gApplication_path, "KEYMAP_X.TXT");
-    the_path[strlen(the_path) - 5] = '0' + gKey_map_index;
-    f = DRfopen(the_path, "rt");
-    if (f == NULL) {
-        FatalError(kFatalError_CouldNotOpenKeyMapFile);
-    }
-
-    for (i = 0; i < (int)REC2_ASIZE(gKey_mapping); i++) {
-        fscanf((FILE*)f, "%d", &gKey_mapping[i]);
-    }
-    PFfclose(f);
-}
+// LoadKeyMapping (see 72-interface)
 
 // FUNCTION: CARMA2_HW 0x00487ea0
 // FUNCTION: CARMA2_SW 0x00484fd0
