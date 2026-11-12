@@ -200,7 +200,7 @@ extern void C2_HOOK_FASTCALL StopCarSmokingInstantly(tCar_spec* pCar_spec);
 
 extern void C2_HOOK_FASTCALL StopObjectSmokingInstantly(tPhysics_object* pObject);
 
-// ConditionalSmokeColumn
+extern void C2_HOOK_FASTCALL ConditionalSmokeColumn(tCar_spec* pCar, int pFire_point, int pColour);
 
 // SingleSplash
 
@@ -222,7 +222,7 @@ extern void C2_HOOK_FASTCALL FreeSmokeShadeTables(void);
 
 // DisposeKevStuffCar
 
-// MakeCarIt
+extern void C2_HOOK_FASTCALL MakeCarIt(tCar_spec* pCar);
 
 // StopCarBeingIt
 
