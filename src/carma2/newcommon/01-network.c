@@ -11,6 +11,7 @@
 #include "04-netgame.h"
 #include "15-displays.h"
 #include "32-spark.h"
+#include "41-utility.h"
 #include "53-controls.h"
 #include "platform.h"
 #include "globvars.h"
@@ -758,7 +759,18 @@ void C2_HOOK_FASTCALL NetReallyDisposeMessage(tNet_message* pMessage) {
     pMessage->contents.raw.header.type = eNetMsg_none;
 }
 
-// NetGetNextMessage
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_HW 0x0049ff70
+tNet_message* C2_HOOK_FASTCALL NetGetNextMessage(tNet_game_details* pDetails, void** pSender_address) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // ReceivedSendMeDetails
 
@@ -824,11 +836,43 @@ void C2_HOOK_FASTCALL NetReallyDisposeMessage(tNet_message* pMessage) {
 
 // ProcessGuaranteeStuff
 
-// ReceivedMessage
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
 
-// STUB: CARMA2_HW 0x004a4a40
-void C2_HOOK_FASTCALL NetReceiveAndProcessMessages(void) {
+// STUB: CARMA2_HW 0x004a0260
+void C2_HOOK_FASTCALL ReceivedMessage(tNet_message* pMessage, void* pSender_address, tU32 pReceive_time) {
     NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
+
+// FUNCTION: CARMA2_HW 0x004a4a40
+void C2_HOOK_FASTCALL NetReceiveAndProcessMessages(void) {
+    tNet_message* message;
+    void* sender_address;
+    tU32 receive_time;
+    int old_net_service;
+
+    if (gNet_mode != eNet_mode_none || gJoin_list_mode) {
+        old_net_service = gIn_net_service;
+        gIn_net_service = 1;
+        do {
+            message = NetGetNextMessage(gCurrent_net_game, &sender_address);
+            if (message != NULL) {
+                if (message->header.field_0x14 != 0) {
+                    receive_time = GetRaceTime();
+                    if (message->header.field_0x4 == 0x763a5059) {
+                        ReceivedMessage(message, sender_address, receive_time);
+                    }
+                    NetReallyDisposeMessage(message);
+                }
+            }
+        } while (message != NULL);
+        gIn_net_service = old_net_service;
+    }
 }
 
 // STUB: CARMA2_HW 0x004a4ac0

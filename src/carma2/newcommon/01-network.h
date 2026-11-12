@@ -129,7 +129,7 @@ extern int C2_HOOK_FASTCALL NetDisposeMessage(tNet_game_details* pDetails, tNet_
 
 extern void C2_HOOK_FASTCALL NetReallyDisposeMessage(tNet_message* pMessage);
 
-// NetGetNextMessage
+extern tNet_message* C2_HOOK_FASTCALL NetGetNextMessage(tNet_game_details* pDetails, void** pSender_address);
 
 // ReceivedSendMeDetails
 
@@ -195,7 +195,7 @@ extern void C2_HOOK_FASTCALL NetReallyDisposeMessage(tNet_message* pMessage);
 
 // ProcessGuaranteeStuff
 
-// ReceivedMessage
+extern void C2_HOOK_FASTCALL ReceivedMessage(tNet_message* pMessage, void* pSender_address, tU32 pReceive_time);
 
 extern void C2_HOOK_FASTCALL NetReceiveAndProcessMessages(void);
 
