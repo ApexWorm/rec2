@@ -328,86 +328,86 @@ void C2_HOOK_FASTCALL DamageSystems(tCar_spec* pCar, br_vector3* pImpact_point, 
     }
 
     if (energy_magnitude == 0.0f || pCar->invulnerable_no_damage) {
-    } else {
-        if (!pWas_hitting_a_car && impact_location == eImpact_bottom) {
-            energy_magnitude = energy_magnitude / 2.0f;
-        }
+        return;
+    }
+    if (!pWas_hitting_a_car && impact_location == eImpact_bottom) {
+        energy_magnitude = energy_magnitude / 2.0f;
+    }
 
-        the_program = &pCar->damage_programs[impact_location];
-        for (i = 0, the_clause = the_program->clauses; i < the_program->clause_count; i++, the_clause++) {
-            result = 1;
-            for (j = 0, the_condition = the_clause->conditions; j < the_clause->condition_count && result; j++, the_condition++) {
-                switch (the_condition->axis_comp) {
-                case eAxis_x:
-                    if (the_condition->condition_operator == eCondition_less_than) {
-                        result &= proportion_x < the_condition->comparitor;
-                    } else {
-                        result &= proportion_x > the_condition->comparitor;
-                    }
-                    break;
-                case eAxis_y:
-                    if (the_condition->condition_operator == eCondition_less_than) {
-                        result &= proportion_y < the_condition->comparitor;
-                    } else {
-                        result &= proportion_y > the_condition->comparitor;
-                    }
-                    break;
-                case eAxis_z:
-                    if (the_condition->condition_operator == eCondition_less_than) {
-                        result &= proportion_z < the_condition->comparitor;
-                    } else {
-                        result &= proportion_z > the_condition->comparitor;
-                    }
-                    break;
+    the_program = &pCar->damage_programs[impact_location];
+    for (i = 0, the_clause = the_program->clauses; i < the_program->clause_count; i++, the_clause++) {
+        result = 1;
+        for (j = 0, the_condition = the_clause->conditions; j < the_clause->condition_count && result; j++, the_condition++) {
+            switch (the_condition->axis_comp) {
+            case eAxis_x:
+                if (the_condition->condition_operator == eCondition_less_than) {
+                    result &= proportion_x < the_condition->comparitor;
+                } else {
+                    result &= proportion_x > the_condition->comparitor;
                 }
-            }
-            if (result) {
-                for (j = 0, the_effect = the_clause->effects; j < the_clause->effect_count; j++, the_effect++) {
-                    DoDamage(pCar, the_effect->type, energy_magnitude, the_effect->weakness_factor);
+                break;
+            case eAxis_y:
+                if (the_condition->condition_operator == eCondition_less_than) {
+                    result &= proportion_y < the_condition->comparitor;
+                } else {
+                    result &= proportion_y > the_condition->comparitor;
                 }
+                break;
+            case eAxis_z:
+                if (the_condition->condition_operator == eCondition_less_than) {
+                    result &= proportion_z < the_condition->comparitor;
+                } else {
+                    result &= proportion_z > the_condition->comparitor;
+                }
+                break;
             }
         }
-        if (pCar != NULL && pCar->driver == eDriver_local_human) {
-            switch (impact_location) {
-            case eImpact_left:
-                NewScreenWobble(
-                    FRandomBetween(energy_magnitude * 50.0f, energy_magnitude * 100.0f),
-                    FRandomBetween(energy_magnitude * 5.0f, energy_magnitude * 20.0f),
-                    FRandomBetween(4.0f / energy_magnitude, 7.0f / energy_magnitude));
-                break;
-            case eImpact_right:
-                NewScreenWobble(
-                    -FRandomBetween(energy_magnitude * 50.0f, energy_magnitude * 100.0f),
-                    FRandomBetween(energy_magnitude * 5.0f, energy_magnitude * 20.0f),
-                    FRandomBetween(4.0f / energy_magnitude, 7.0f / energy_magnitude));
-                break;
-            case eImpact_bottom:
-                NewScreenWobble(
-                    FRandomBetween(energy_magnitude * 5.0f, energy_magnitude * 20.0f),
-                    FRandomBetween(energy_magnitude * 30.0f, energy_magnitude * 60.0f),
-                    FRandomBetween(1.0f / energy_magnitude, 5.0f / energy_magnitude));
-                break;
-            case eImpact_top:
-                NewScreenWobble(
-                    FRandomBetween(energy_magnitude * 5.0f, energy_magnitude * 20.0f),
-                    FRandomBetween(energy_magnitude * 30.0f, energy_magnitude * 60.0f),
-                    FRandomBetween(1.0f / energy_magnitude, 5.0f / energy_magnitude));
-                break;
-            case eImpact_front:
-                NewScreenWobble(
-                    FRandomBetween(energy_magnitude * 5.0f, energy_magnitude * 20.0f),
-                    FRandomBetween(energy_magnitude * 50.0f, energy_magnitude * 150.0f),
-                    FRandomBetween(7.0f / energy_magnitude, 25.0f / energy_magnitude));
-                break;
-            case eImpact_back:
-                NewScreenWobble(
-                    FRandomBetween(energy_magnitude * 5.0f, energy_magnitude * 20.0f),
-                    FRandomBetween(-energy_magnitude * 50.0f, energy_magnitude * 150.0f),
-                    FRandomBetween(7.0f / energy_magnitude, 25.0f / energy_magnitude));
-                break;
-            default:
-                break;
+        if (result) {
+            for (j = 0, the_effect = the_clause->effects; j < the_clause->effect_count; j++, the_effect++) {
+                DoDamage(pCar, the_effect->type, energy_magnitude, the_effect->weakness_factor);
             }
+        }
+    }
+    if (pCar != NULL && pCar->driver == eDriver_local_human) {
+        switch (impact_location) {
+        case eImpact_left:
+            NewScreenWobble(
+                FRandomBetween(energy_magnitude * 50.0f, energy_magnitude * 100.0f),
+                FRandomBetween(energy_magnitude * 5.0f, energy_magnitude * 20.0f),
+                FRandomBetween(4.0f / energy_magnitude, 7.0f / energy_magnitude));
+            break;
+        case eImpact_right:
+            NewScreenWobble(
+                -FRandomBetween(energy_magnitude * 50.0f, energy_magnitude * 100.0f),
+                FRandomBetween(energy_magnitude * 5.0f, energy_magnitude * 20.0f),
+                FRandomBetween(4.0f / energy_magnitude, 7.0f / energy_magnitude));
+            break;
+        case eImpact_bottom:
+            NewScreenWobble(
+                FRandomBetween(energy_magnitude * 5.0f, energy_magnitude * 20.0f),
+                FRandomBetween(energy_magnitude * 30.0f, energy_magnitude * 60.0f),
+                FRandomBetween(1.0f / energy_magnitude, 5.0f / energy_magnitude));
+            break;
+        case eImpact_top:
+            NewScreenWobble(
+                FRandomBetween(energy_magnitude * 5.0f, energy_magnitude * 20.0f),
+                FRandomBetween(energy_magnitude * 30.0f, energy_magnitude * 60.0f),
+                FRandomBetween(1.0f / energy_magnitude, 5.0f / energy_magnitude));
+            break;
+        case eImpact_front:
+            NewScreenWobble(
+                FRandomBetween(energy_magnitude * 5.0f, energy_magnitude * 20.0f),
+                FRandomBetween(energy_magnitude * 50.0f, energy_magnitude * 150.0f),
+                FRandomBetween(7.0f / energy_magnitude, 25.0f / energy_magnitude));
+            break;
+        case eImpact_back:
+            NewScreenWobble(
+                FRandomBetween(energy_magnitude * 5.0f, energy_magnitude * 20.0f),
+                FRandomBetween(-energy_magnitude * 50.0f, energy_magnitude * 150.0f),
+                FRandomBetween(7.0f / energy_magnitude, 25.0f / energy_magnitude));
+            break;
+        default:
+            break;
         }
     }
 }
