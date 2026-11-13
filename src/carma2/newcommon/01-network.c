@@ -338,7 +338,11 @@ void C2_HOOK_FASTCALL NetStartProducingJoinList(tAddToJoinListProc* pAdd_proc) {
     PDNetStartProducingJoinList();
 }
 
-// NetEndJoinList
+// STUB: CARMA2_HW 0x0049dc00
+// STUB: CARMA2_SW 0x00499d80
+void C2_HOOK_FASTCALL NetEndJoinList(void) {
+    NOT_IMPLEMENTED();
+}
 
 // FUNCTION: CARMA2_HW 0x0049dc70
 // FUNCTION: CARMA2_SW 0x00499df0
