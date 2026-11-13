@@ -2848,8 +2848,9 @@ typedef struct tCar_spec {
     br_vector3 pre_car_col_velocity;
     br_vector3 pre_car_col_velocity_car_space;
     br_vector3 vel;
-    undefined field_0x13cc[8];
-    float field_0x13e0;
+    float last_col_prop_x;
+    float last_col_prop_y;
+    float last_col_prop_z;
     int time_last_hit;
     int time_last_victim;
     tCar_spec* last_hit_by;
