@@ -25,7 +25,6 @@ extern int gCount_track_smashable_environment_specs;
 extern tStored_smash* gNet_host_smashes;
 
 extern tExplosion gExplosions[50];
-extern tRepair_animation gRepair_animations[25];
 extern br_vector3 gZero_vector__smash;
 extern tDecal gDecals[50];
 extern int gCount_queued_smashes;
@@ -92,7 +91,7 @@ extern void C2_HOOK_FASTCALL SetShrapnelFragment(tSmash_vertex* pFragment, tMove
 
 // MungeInternalCarGlass
 
-extern void C2_HOOK_FASTCALL ActuallySmashPart(tCar_spec* pCar_spec, tCar_crush_smashable_part* pSmash, int pLevel);
+// ActuallySmashPart
 
 // MakeSmashSound
 
@@ -242,7 +241,7 @@ extern void C2_HOOK_FASTCALL DisposeSmashData(tCar_crush_buffer_entry* pCrush_da
 
 // DoBackwardShrapnel
 
-extern void C2_HOOK_FASTCALL InitRepairAnimations(void);
+// InitRepairAnimations
 
 extern void C2_HOOK_FASTCALL SplondificatalizeIdentifier(br_actor* pActor, char **pIdentifier, int pIndex);
 
