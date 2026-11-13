@@ -342,7 +342,12 @@ void C2_HOOK_FASTCALL SetShrapnelFragment(tSmash_vertex* pFragment, tMovement_sp
 
 // ShatterObject
 
-// MungeInternalCarGlass
+void C2_HOOK_FASTCALL MungeInternalCarGlass(tCar_spec* pCar_spec) {
+
+    if (pCar_spec == &gProgram_state.current_car && gAction_replay_camera_mode == kActionReplayCameraMode_Internal) {
+        MungeCarMaterials(pCar_spec, 1);
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x004ed2b0
 // FUNCTION: CARMA2_SW 0x004e8f80
@@ -371,18 +376,18 @@ void C2_HOOK_FASTCALL ActuallySmashPart(tCar_spec* pCar_spec, tCar_crush_smashab
     }
     pSmash->field_0x4c = pLevel;
     flags = pSmash->levels[pLevel].flags;
-    if (pCar_spec == NULL || (flags & 0x1c) != 0) {
-        if ((flags & 0x4) != 0 && PercentageChance(50)) {
-            pSmash->funk_material->map_transform.m[0][0] *= -1.f;
+    if (pCar_spec == NULL || (flags & 0x1c)) {
+        if ((flags & 0x4) && PercentageChance(50)) {
+            pSmash->funk_material->map_transform.m[0][0] *= -1.0f;
         }
-        if ((flags & 0x8) != 0 && PercentageChance(50)) {
-            pSmash->funk_material->map_transform.m[1][1] *= -1.f;
+        if ((flags & 0x8) && PercentageChance(50)) {
+            pSmash->funk_material->map_transform.m[1][1] *= -1.0f;
         }
-        if ((flags & 0x10) != 0) {
+        if (flags & 0x10) {
             switch (IRandomBetween(0, 3)) {
             case 0:
-                pSmash->funk_material->map_transform.m[0][0] *= -1.f;
-                pSmash->funk_material->map_transform.m[1][1] *= -1.f;
+                pSmash->funk_material->map_transform.m[0][0] *= -1.0f;
+                pSmash->funk_material->map_transform.m[1][1] *= -1.0f;
                 break;
             case 1:
                 temp = pSmash->funk_material->map_transform.m[0][0];
@@ -406,9 +411,7 @@ void C2_HOOK_FASTCALL ActuallySmashPart(tCar_spec* pCar_spec, tCar_crush_smashab
         BrMatrix23Identity(&pSmash->funk_material->map_transform);
     }
     BrMaterialUpdate(pSmash->funk_material, BR_MATU_ALL);
-    if (pCar_spec == &gProgram_state.current_car && gAction_replay_camera_mode == kActionReplayCameraMode_Internal) {
-        MungeCarMaterials(pCar_spec, 1);
-    }
+    MungeInternalCarGlass(pCar_spec);
     if (pSmash->funk >= 0) {
         DisableFunkotronic(pSmash->funk);
     }

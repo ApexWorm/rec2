@@ -90,7 +90,7 @@ extern void C2_HOOK_FASTCALL SetShrapnelFragment(tSmash_vertex* pFragment, tMove
 
 // ShatterObject
 
-// MungeInternalCarGlass
+extern void C2_HOOK_FASTCALL MungeInternalCarGlass(tCar_spec* pCar_spec);
 
 extern void C2_HOOK_FASTCALL ActuallySmashPart(tCar_spec* pCar_spec, tCar_crush_smashable_part* pSmash, int pLevel);
 
