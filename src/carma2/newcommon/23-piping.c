@@ -32,6 +32,7 @@
 #include <s3/internal/audio.h>
 
 #include <limits.h>
+#include <stdarg.h>
 #include <stddef.h>
 #include <string.h>
 
@@ -302,10 +303,49 @@ void C2_HOOK_FASTCALL ARAddDataToSession(int pType, uintptr_t pOwner, void* pDat
     }
 }
 
-// STUB: CARMA2_HW 0x00402930
-// STUB: CARMA2_SW 0x00402930
+// FUNCTION: CARMA2_HW 0x00402930
+// FUNCTION: CARMA2_SW 0x00402930
 void C2_HOOK_CDECL ARAddVariedDataToSession(int pType, uintptr_t pOwner, int pCount, ...) {
-    NOT_IMPLEMENTED();
+    va_list ap;
+    int i;
+    int size;
+    int offset;
+    void* data;
+    float value;
+    tU8 buffer[5000];
+
+    if (gPipe_buffer_start != NULL && !gAction_replay_mode && gProgram_state.racing) {
+        va_start(ap, pCount);
+        for (i = 0; i < pCount; i++) {
+            size = va_arg(ap, int);
+            offset = va_arg(ap, int);
+            if (size < 0) {
+                value = va_arg(ap, tFloat_u32_union).f;
+                *(float*)&buffer[offset] = value;
+            } else {
+                data = va_arg(ap, void*);
+                switch (size) {
+                case 1:
+                    *(tU8*)&buffer[offsetof(tPipe_chunk, data) + offset] = (tU8)(uintptr_t)data;
+                    break;
+                case 2:
+                    *(tU16*)&buffer[offsetof(tPipe_chunk, data) + offset] = (tU16)(uintptr_t)data;
+                    break;
+                case 4:
+                    *(tU32*)&buffer[offsetof(tPipe_chunk, data) + offset] = (tU32)(uintptr_t)data;
+                    break;
+                default:
+                    if (data != NULL) {
+                        memcpy(&buffer[offsetof(tPipe_chunk, data) + offset], data, size);
+                    }
+                    break;
+                }
+            }
+        }
+        va_end(ap);
+        ((tPipe_chunk*)buffer)->subject_index = pOwner;
+        ARAddDataToSession(pType, pOwner, &buffer[offsetof(tPipe_chunk, data)], LengthOfChunk((tPipe_chunk*)buffer, pType) - offsetof(tPipe_chunk, data));
+    }
 }
 
 #ifdef REC2_MATCHING
