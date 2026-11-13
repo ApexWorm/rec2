@@ -33,13 +33,13 @@ extern int gCar_car_collisions;
 extern const float gCar_simplification_factor[2][5];
 extern tPolyhedron_edge_indexes gDefault_box_collision_wireframe_edges[12];
 
-// ActualActionReplayHeadups
+extern void C2_HOOK_FASTCALL ActualActionReplayHeadups(int pSpecial_zappy_bastard);
 
 extern void C2_HOOK_FASTCALL DoActionReplayPostSwap(void);
 
 // DoZappyActionReplayHeadups
 
-// DoActionReplayHeadups
+extern void C2_HOOK_FASTCALL DoActionReplayHeadups(void);
 
 // PreProcess
 
