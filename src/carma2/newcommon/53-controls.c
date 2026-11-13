@@ -489,11 +489,11 @@ void C2_HOOK_FASTCALL CheckHorn3D(tCar_spec* pCar) {
 void C2_HOOK_FASTCALL SetFlipUpCar(tCar_spec* pCar) {
     if (gNet_mode == eNet_mode_none || pCar == NULL || pCar->driver != eDriver_local_human) {
         FlipUpCar(pCar);
-        return;
+    } else {
+        DisableCar(pCar);
+        gPalette_fade_time = GetRaceTime();
+        NetPlayerStatusChanged(ePlayer_status_recovering);
     }
-    DisableCar(pCar);
-    gPalette_fade_time = GetRaceTime();
-    NetPlayerStatusChanged(ePlayer_status_recovering);
 }
 
 
