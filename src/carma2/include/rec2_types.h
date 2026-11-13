@@ -5669,6 +5669,9 @@ enum {
 };
 
 enum {
+    eInterfaceString_car_colon = 14,
+    eInterfaceString_abort_race = 21,
+    eInterfaceString_closed = 179,
     eInterfaceString_target_none = 232,
     eInterfaceString_target_kills = 233,
     eInterfaceString_target_laps = 234,

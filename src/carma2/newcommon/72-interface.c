@@ -3487,21 +3487,21 @@ int C2_HOOK_FASTCALL NetSync_Infunc(tFrontend_spec* pFrontend) {
             pFrontend->items[26].visible = 1;
             pFrontend->items[27].enabled = kFrontendItemEnabled_enabled;
             pFrontend->items[27].visible = 1;
-            pFrontend->items[26].stringId = 14;
-            pFrontend->items[27].stringId = 21;
+            pFrontend->items[26].stringId = eInterfaceString_car_colon;
+            pFrontend->items[27].stringId = eInterfaceString_abort_race;
         } else {
             pFrontend->items[26].enabled = kFrontendItemEnabled_disabled;
             pFrontend->items[26].visible = 0;
             pFrontend->items[27].enabled = kFrontendItemEnabled_enabled;
             pFrontend->items[27].visible = 1;
-            pFrontend->items[27].stringId = 21;
+            pFrontend->items[27].stringId = eInterfaceString_abort_race;
         }
     } else {
         pFrontend->items[26].enabled = kFrontendItemEnabled_disabled;
         pFrontend->items[26].visible = 0;
         pFrontend->items[27].enabled = kFrontendItemEnabled_enabled;
         pFrontend->items[27].visible = 1;
-        pFrontend->items[27].stringId = 179;
+        pFrontend->items[27].stringId = eInterfaceString_closed;
     }
     FuckWithWidths(pFrontend);
     return 0;
