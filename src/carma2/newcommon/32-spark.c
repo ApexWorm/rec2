@@ -719,11 +719,35 @@ void C2_HOOK_FASTCALL SmudgeCar(tCar_spec* pCar, int pFire_point) {
     (void)pFire_point;
 }
 
+void C2_HOOK_FASTCALL ResetSmokeColumns(void) {
+    int i;
+
+    for (i = 0; i < (int)REC2_ASIZE(gSmoke_column); i++) {
+        if (gColumn_flags & (1 << i)) {
+            BrActorRemove(gSmoke_column[i].flame_actor);
+        }
+    }
+    gColumn_flags = 0;
+}
+
 // FUNCTION: CARMA2_HW 0x004fc9d0
 // FUNCTION: CARMA2_SW 0x004f7f30
 void C2_HOOK_FASTCALL SetSmokeOn(int pSmoke_on) {
 
     gSmoke_on = pSmoke_on;
+}
+
+// FUNCTION: CARMA2_HW 0x004fc9e0
+// FUNCTION: CARMA2_SW 0x004f7f40
+void C2_HOOK_FASTCALL ReallySetSmokeOn(int pSmoke_on) {
+
+    C2_HOOK_BUG_ON(REC2_ASIZE(gSmoke_column) != 10);
+    C2_HOOK_BUG_ON(sizeof(tSmoke_column) != 0x7c);
+    C2_HOOK_BUG_ON(REC2_ASIZE(gSparks) != 32);
+
+    (void)pSmoke_on;
+    ResetSmoke();
+    ResetSmokeColumns();
 }
 
 // FUNCTION: CARMA2_HW 0x004fca30
