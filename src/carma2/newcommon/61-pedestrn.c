@@ -301,10 +301,10 @@ inline int C2_HOOK_FASTCALL DismemberCharacterAR(tPed_character_instance* pChara
     int result;
     int old_value;
 
-    old_value = (tS8)pCharacter->field_0x6;
+    old_value = pCharacter->field_0x6;
     result = DismemberCharacter(pCharacter, pBone_index, pVelocity, pAngular_velocity);
-    if (result != 0 && (tS8)pCharacter->field_0x6 >= 0) {
-        PipeSinglePedDismember(pCharacter->ped, (tU8)pBone_index, (tS8)old_value, (tS8)pCharacter->field_0x6);
+    if (result != 0 && pCharacter->field_0x6 >= 0) {
+        PipeSinglePedDismember(pCharacter->ped, (tU8)pBone_index, (tS8)old_value, pCharacter->field_0x6);
         actor_set = &pCharacter->personality->form->actor_sets[pCharacter->field_0x4];
         MakeActorRenderable(actor_set->actors[pBone_index], pBone_index, pCharacter);
     }
@@ -872,13 +872,15 @@ int C2_HOOK_FASTCALL DismemberPed(tPedestrian* pPed, int pBone_index) {
     }
     pPed->field_0x0c->field_0x23[pBone_index] = (tU8)gPed_dismember_spurting_member_count;
     if (gExploding_pedestrians) {
-        velocity.v[0] = SRandomPosNeg(3.f);
-        velocity.v[1] = SRandomBetween(0.f, 3.f);
-        velocity.v[2] = SRandomPosNeg(3.f);
+        BrVector3Set(&velocity,
+            SRandomPosNeg(3.0f),
+            SRandomBetween(0.0f, 3.0f),
+            SRandomPosNeg(3.0f));
         BrVector3Add(&velocity, &character->field_0xd8, &velocity);
-        angular_velocity.v[0] = SRandomPosNeg(20.f);
-        angular_velocity.v[1] = SRandomPosNeg(20.f);
-        angular_velocity.v[2] = SRandomPosNeg(20.f);
+        BrVector3Set(&angular_velocity,
+            SRandomPosNeg(20.0f),
+            SRandomPosNeg(20.0f),
+            SRandomPosNeg(20.0f));
         result = DismemberCharacterAR(character, pBone_index, &velocity, &angular_velocity);
         return result + count;
     } else {

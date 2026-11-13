@@ -280,7 +280,7 @@ typedef struct tPed_character_instance {
     tPed_personality* personality;
     tS8 field_0x4;
     undefined field_0x5;
-    undefined field_0x6;
+    tS8 field_0x6;
     tS8 field_0x7;
     tS8 field_0x8;
     tU8 field_0x9;
