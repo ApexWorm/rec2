@@ -39,6 +39,14 @@ extern void C2_HOOK_FASTCALL WriteU16L(FILE* pF, tU16 pNumber);
 
 extern void C2_HOOK_FASTCALL WriteU8L(FILE* pF, tU8 pNumber);
 
+extern void C2_HOOK_FASTCALL WriteS32L(FILE* pF, tS32 pNumber);
+
+extern void C2_HOOK_FASTCALL WriteS16L(FILE* pF, tS16 pNumber);
+
+extern void C2_HOOK_FASTCALL WriteS8L(FILE* pF, tS8 pNumber);
+
+extern void C2_HOOK_FASTCALL SkipBytes(FILE* pF, int pBytes_to_skip);
+
 extern tU32 C2_HOOK_FASTCALL MemReadU32(char** pPtr);
 
 extern tU16 C2_HOOK_FASTCALL MemReadU16(char** pPtr);
@@ -80,6 +88,8 @@ extern void GetPairOfScalars(FILE* pF, br_scalar* pS1, br_scalar* pS2);
 extern void C2_HOOK_FASTCALL GetThreeScalars(FILE* pF, br_scalar* pS1, br_scalar* pS2, br_scalar* pS3);
 
 extern void C2_HOOK_FASTCALL GetFourScalars(FILE* pF, br_scalar* pS1, br_scalar* pS2, br_scalar* pS3, br_scalar* pS4);
+
+extern void C2_HOOK_FASTCALL GetFiveScalars(FILE* pF, br_scalar* pS1, br_scalar* pS2, br_scalar* pS3, br_scalar* pS4, br_scalar* pS5);
 
 extern void C2_HOOK_FASTCALL GetNScalars(FILE* pF, int n, br_scalar* pS);
 
