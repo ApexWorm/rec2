@@ -424,7 +424,7 @@ void C2_HOOK_CDECL ARDoSingleVariedSession(int pType, uintptr_t pOwner, int pCou
                     *(tU16*)&buffer[offsetof(tPipe_chunk, data) + offset] = (tU16)(uintptr_t)data;
                     break;
                 case 4:
-                    *(void**)&buffer[offsetof(tPipe_chunk, data) + offset] = data;
+                    *(tU32*)&buffer[offsetof(tPipe_chunk, data) + offset] = (tU32)(uintptr_t)data;
                     break;
                 default:
                     if (data != NULL) {
