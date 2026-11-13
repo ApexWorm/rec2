@@ -36,16 +36,16 @@ tU32 last_service;
 
 // GLOBAL: CARMA2_HW 0x006b5f40
 // GLOBAL: CARMA2_SW 0x006acc20
-char* gMisc_strings[300];
+char* gMisc_strings[300] = { 0 };
+
+// GLOBAL: CARMA2_HW 0x006b63f0
+br_pixelmap* gPalette_source = NULL;
 
 // GLOBAL: CARMA2_HW 0x0074ca04
 tMaterial_exception* gMaterial_exceptions;
 
 // GLOBAL: CARMA2_HW 0x006b63f4
 br_pixelmap* g16bit_palette;
-
-// GLOBAL: CARMA2_HW 0x006b63f0
-br_pixelmap* gPalette_source;
 
 // GLOBAL: CARMA2_HW 0x006abef4
 // GLOBAL: CARMA2_SW 0x006a5444

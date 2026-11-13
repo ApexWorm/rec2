@@ -13,6 +13,7 @@
 #include "rec2_types.h"
 
 extern int gCamera_type;
+extern int gKey_map_index;
 
 extern const char* gPedTextTxtPath;
 extern int gGroove_funk_offset;
@@ -35,7 +36,7 @@ extern void C2_HOOK_FASTCALL LoadGeneralParameters(void);
 
 extern void C2_HOOK_FASTCALL FinishLoadingGeneral(void);
 
-extern void C2_HOOK_FASTCALL LoadKeyMapping(void);
+// LoadKeyMapping (see 72-interface)
 
 extern void C2_HOOK_FASTCALL LoadInterfaceStuff(int pWithin_race);
 

@@ -182,6 +182,21 @@ tHeadup_info gHeadup_image_info[45] = {
     { "MISSIONDONE.PIX", eNet_or_otherwise },
 };
 
+#ifdef REC2_MATCHING
+// GLOBAL: CARMA2_HW 0x00657488
+// GLOBAL: CARMA2_SW 0x00651e38
+const char* gDev_car_pix_names[2][6] = {
+    { "CARFRANK.PIX", "CARANNIE.PIX", "CARFR2.PIX", "CARFR3.PIX", "CARFR4.PIX", "CARFR5.PIX" },
+    { "CARFRANK.PIX", "CARANNIE.PIX", "CARAN2.PIX", "CARAN3.PIX", "CARAN4.PIX", "CARAN5.PIX" },
+};
+
+// GLOBAL: CARMA2_HW 0x006574b8
+// GLOBAL: CARMA2_SW 0x00651e68
+const char* gDev_car_names[6] = {
+    "BLKEAGLE.TXT", "ANNIE.TXT", "ED101.TXT", "OFFROAD.TXT", "APC.TXT", "YANK.TXT"
+};
+#endif
+
 // GLOBAL: CARMA2_HW 0x0079eb60
 // GLOBAL: CARMA2_SW 0x007950c0
 br_pixelmap* gHeadup_images[45];
@@ -550,25 +565,7 @@ void C2_HOOK_FASTCALL FinishLoadingGeneral(void) {
     PFfclose(gTempFile);
 }
 
-// FUNCTION: CARMA2_HW 0x00487e10
-// FUNCTION: CARMA2_SW 0x00484f40
-void C2_HOOK_FASTCALL LoadKeyMapping(void) {
-    FILE* f;
-    tPath_name the_path;
-    int i;
-
-    PathCat(the_path, gApplication_path, "KEYMAP_X.TXT");
-    the_path[strlen(the_path) - 5] = '0' + gKey_map_index;
-    f = DRfopen(the_path, "rt");
-    if (f == NULL) {
-        FatalError(kFatalError_CouldNotOpenKeyMapFile);
-    }
-
-    for (i = 0; i < (int)REC2_ASIZE(gKey_mapping); i++) {
-        fscanf((FILE*)f, "%d", &gKey_mapping[i]);
-    }
-    PFfclose(f);
-}
+// LoadKeyMapping (see 72-interface)
 
 // FUNCTION: CARMA2_HW 0x00487ea0
 // FUNCTION: CARMA2_SW 0x00484fd0
