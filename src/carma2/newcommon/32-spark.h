@@ -194,8 +194,6 @@ extern void C2_HOOK_FASTCALL SetSmokeOn(int pSmoke_on);
 
 extern void C2_HOOK_FASTCALL ReallySetSmokeOn(int pSmoke_on);
 
-extern void C2_HOOK_FASTCALL ReallySetSmokeOn(int pSmoke_on);
-
 extern int C2_HOOK_FASTCALL GetSmokeOn(void);
 
 extern void C2_HOOK_FASTCALL StopCarSmoking(tCar_spec* pCar);
