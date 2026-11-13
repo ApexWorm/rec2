@@ -244,7 +244,7 @@ extern void C2_HOOK_FASTCALL SendSemiDetachBit(tCar_spec* pCar, br_actor* pActor
 
 extern void C2_HOOK_FASTCALL SendAllSemiDetachedBits(tNet_game_player_info* pPlayer);
 
-// AddNonCar
+extern void C2_HOOK_FASTCALL AddNonCar(tNon_car_spec* pNon_car, tDriver pDriver);
 
 // DetachBit
 

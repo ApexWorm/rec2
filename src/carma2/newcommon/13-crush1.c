@@ -1090,7 +1090,16 @@ void C2_HOOK_FASTCALL SendAllSemiDetachedBits(tNet_game_player_info* pPlayer) {
     }
 }
 
-// AddNonCar
+void C2_HOOK_FASTCALL AddNonCar(tNon_car_spec* pNon_car, tDriver pDriver) {
+
+    C2_HOOK_BUG_ON(REC2_ASIZE(gActive_non_car_list) != 99);
+
+    if (gNum_active_non_cars == REC2_ASIZE(gActive_non_car_list)) {
+        pNon_car->driver = pDriver;
+        gActive_non_car_list[gNum_active_non_cars++] = pNon_car;
+        PHILAddActiveObjectImmediately(pNon_car->collision_info, NULL, NULL, NULL);
+    }
+}
 
 // DetachBit
 
@@ -1222,8 +1231,6 @@ void C2_HOOK_FASTCALL FullyDetachBit(tCar_spec* pCar, tPhysics_object* pObject) 
     tCar_crush_detach_data* detach_data;
     tNon_car_spec* non_car;
 
-    C2_HOOK_BUG_ON(REC2_ASIZE(gActive_non_car_list) != 99);
-
     actor = pObject->actor;
     if (actor != NULL && (user_crush = actor->user) != NULL && user_crush->crush_data != NULL
             && (detach_data = user_crush->crush_data->detach_data) != NULL && detach_data->field_0x28 == 1) {
@@ -1237,12 +1244,7 @@ void C2_HOOK_FASTCALL FullyDetachBit(tCar_spec* pCar, tPhysics_object* pObject) 
         }
         pObject->flags |= 0x100;
         non_car = actor->type_data;
-        if (gNum_active_non_cars != REC2_ASIZE(gActive_non_car_list)) {
-            non_car->driver = gDetached_bit_driver;
-            gActive_non_car_list[gNum_active_non_cars] = non_car;
-            gNum_active_non_cars++;
-            PHILAddActiveObjectImmediately(non_car->collision_info, NULL, NULL, NULL);
-        }
+        AddNonCar(non_car, gDetached_bit_driver);
         PipeSingleNonCar((tU16)non_car->car_ID, actor);
         actor->identifier[3] = '!';
         detach_data->field_0x28 = 2;
