@@ -186,7 +186,9 @@ extern void C2_HOOK_FASTCALL InitFlame(void);
 
 extern void C2_HOOK_FASTCALL SmudgeCar(tCar_spec* pCar, int pFire_point);
 
-void C2_HOOK_FASTCALL SetSmokeOn(int pSmoke_on);
+extern void C2_HOOK_FASTCALL ResetSmokeColumns(void);
+
+extern void C2_HOOK_FASTCALL SetSmokeOn(int pSmoke_on);
 
 extern void C2_HOOK_FASTCALL ReallySetSmokeOn(int pSmoke_on);
 
