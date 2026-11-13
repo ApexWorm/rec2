@@ -5840,6 +5840,7 @@ enum {
     kFatalError_CannotOpenRacesFile = 0x32,
     kFatalError_CannotOpenOpponentsFile = 0x36,
     kFatalError_OpponentCountMismatchesActualNumberOfOpponents = 0x37,
+    kFatalError_CannotLoadChromeFontFile = 0x3b,
     kFatalError_FunkotronicFile = 0x3e,
     kFatalError_ErrorWithinGroovidelicFile = 0x3f,
     kFatalError_CannotFindMainMaterialInFunkotronicFile_S = 0x40,
