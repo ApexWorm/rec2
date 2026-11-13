@@ -570,11 +570,23 @@ void C2_HOOK_FASTCALL DefaultNetSettings(void) {
     PFfclose(file);
 }
 
-// DisposeJoinableGame
+void C2_HOOK_FASTCALL DisposeJoinableGame(int pIndex) {
+
+    NetDisposeGameDetails(gGames_to_join[pIndex].game);
+    gGames_to_join[pIndex].game = NULL;
+}
 
 // InitGamesToJoin
 
-// DisposeJoinList
+void C2_HOOK_FASTCALL DisposeJoinList(int pException) {
+    int i;
+
+    for (i = 0; i < (int)REC2_ASIZE(gGames_to_join); i++) {
+        if (i != pException && gGames_to_join[i].game != NULL) {
+            DisposeJoinableGame(i);
+        }
+    }
+}
 
 // AddToJoinList
 
@@ -1152,24 +1164,18 @@ int C2_HOOK_FASTCALL MultiplayerSetup(tFrontend_spec* pFrontend) {
 
 // NetworkJoinMenuInfunc
 
-// StopAllThatJoinyStuffThisInstant
+void C2_HOOK_FASTCALL StopAllThatJoinyStuffThisInstant(void) {
+
+    C2_HOOK_BUG_ON(REC2_ASIZE(gGames_to_join) != 6);
+    NetEndJoinList();
+    DisposeJoinList(gLast_graph_sel);
+}
 
 // FUNCTION: CARMA2_HW 0x00468260
 // FUNCTION: CARMA2_SW 0x00467fe0
 int C2_HOOK_FASTCALL NetworkJoinMenuOutfunc(tFrontend_spec* pFrontend) {
-    int i;
-    int exemption;
 
-    C2_HOOK_BUG_ON(REC2_ASIZE(gGames_to_join) != 6);
-
-    NetEndJoinList();
-    exemption = gLast_graph_sel;
-    for (i = 0; i < (int)REC2_ASIZE(gGames_to_join); i++) {
-        if (i != exemption && gGames_to_join[i].game != NULL) {
-            NetDisposeGameDetails(gGames_to_join[i].game);
-            gGames_to_join[i].game = NULL;
-        }
-    }
+    StopAllThatJoinyStuffThisInstant();
     return 0;
 }
 

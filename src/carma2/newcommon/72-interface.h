@@ -74,11 +74,11 @@ extern void C2_HOOK_FASTCALL SetNetAvailability(tNet_game_options* pOptions);
 
 extern void C2_HOOK_FASTCALL DefaultNetSettings(void);
 
-// DisposeJoinableGame
+extern void C2_HOOK_FASTCALL DisposeJoinableGame(int pIndex);
 
 // InitGamesToJoin
 
-// DisposeJoinList
+extern void C2_HOOK_FASTCALL DisposeJoinList(int pException);
 
 // AddToJoinList
 
@@ -170,7 +170,7 @@ extern int C2_HOOK_FASTCALL MultiplayerSetup(tFrontend_spec* pFrontend);
 
 // NetworkJoinMenuInfunc
 
-// StopAllThatJoinyStuffThisInstant
+extern void C2_HOOK_FASTCALL StopAllThatJoinyStuffThisInstant(void);
 
 extern int C2_HOOK_FASTCALL NetworkJoinMenuOutfunc(tFrontend_spec* pFrontend);
 
