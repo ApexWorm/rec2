@@ -26,14 +26,19 @@ br_pixelmap* gOil_pixies[1];
 
 // GLOBAL: CARMA2_HW 0x00690c90
 // GLOBAL: CARMA2_SW 0x0068ace8
-tOil_spill_info gOily_spills[32];
+tOil_spill_info gOily_spills[32] = { 0 };
+
+// GLOBAL: CARMA2_HW 0x00691710
+// GLOBAL: CARMA2_SW 0x0068b768
+int gNext_oil_pixie = 0;
+
+// GLOBAL: CARMA2_HW 0x00691714
+// GLOBAL: CARMA2_SW 0x0068b76c
+int gBig_bang = 0;
 
 // GLOBAL: CARMA2_HW 0x0074a68c
 // GLOBAL: CARMA2_SW 0x0074114c
 br_material* oily_material;
-
-// GLOBAL: CARMA2_HW 0x00691710
-int gNext_oil_pixie;
 
 // FUNCTION: CARMA2_HW 0x004a6a10
 // FUNCTION: CARMA2_SW 0x004a2b90
