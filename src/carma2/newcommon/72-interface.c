@@ -51,6 +51,10 @@
 // GLOBAL: CARMA2_SW 0x0068307c
 int gNet_storage_space_initialized;
 
+// GLOBAL: CARMA2_HW 0x0059c820
+// GLOBAL: CARMA2_SW 0x00597750
+tNet_mode gFrontend_net_mode = eNet_mode_thinking_about_it;
+
 // GLOBAL: CARMA2_HW 0x00763960
 // GLOBAL: CARMA2_SW 0x00759ec0
 tNet_game_options gNet_settings[9] = { 0 };
@@ -3378,7 +3382,30 @@ int C2_HOOK_FASTCALL NetOptions_CreditsRoller(tFrontend_spec* pFrontend) {
 
 // NetOptions_Cancel
 
-// CheckPlayersAreResponding
+void C2_HOOK_FASTCALL CheckPlayersAreResponding2(tU32 pDeadline) {
+    tU32 now;
+    tNet_message* message;
+    int i;
+
+    now = PDGetTotalTime();
+    for (i = 0; i < gNumber_of_net_players; i++) {
+        if (i != gThis_net_player_index && now - gNet_players[i].last_heard_from_him > pDeadline) {
+            gNet_players[i].player_status = ePlayer_status_not_responding;
+        }
+    }
+    if (gNet_mode == eNet_mode_client && gLast_host_query == 0) {
+        message = NetBuildGuaranteedMessage(eNet_message_chunk_type_netsynch, 0);
+        NetGuaranteedSendMessageToHost(gCurrent_net_game, message, NULL);
+        gLast_host_query = now;
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x004e2c30
+// FUNCTION: CARMA2_SW 0x004defb0
+void C2_HOOK_FASTCALL CheckPlayersAreResponding(void) {
+
+    CheckPlayersAreResponding2(20000);
+}
 
 // MungePlayers
 
@@ -3424,7 +3451,61 @@ int C2_HOOK_FASTCALL NetSync_Abort(tFrontend_spec* pFrontend) {
     return 1;
 }
 
-// NetSync_Infunc
+// FUNCTION: CARMA2_HW 0x00473610
+// FUNCTION: CARMA2_SW 0x00472b80
+int C2_HOOK_FASTCALL NetSync_Infunc(tFrontend_spec* pFrontend) {
+    int i;
+
+    Generic_Infunc(pFrontend);
+    CheckPlayersAreResponding2(60000);
+    if (gFrontend_net_mode == eNet_mode_host) {
+        if (gNo_races_yet) {
+            NetSynchRaceStart2(eNet_synch_host_first);
+        } else {
+            NetSynchRaceStart2(eNet_synch_host_subsequent);
+        }
+    } else {
+        NetSynchRaceStart2(eNet_synch_client);
+    }
+    for (i = 0; i < kMax_netplayers; i++) {
+        pFrontend->items[2 + i].x = 160;
+    }
+    if (gCurrent_net_game->options.open_game) {
+        sprintf(pFrontend->items[1].text, "%s: %s (%s)",
+            GetMiscString(eMiscString_game_type),
+            GetMiscString(eMiscString_network_type_start + gCurrent_net_game->type),
+            GetMiscString(eMiscString_open));
+    } else {
+        sprintf(pFrontend->items[1].text, "%s: %s (%s)",
+            GetMiscString(eMiscString_game_type),
+            GetMiscString(eMiscString_network_type_start + gCurrent_net_game->type),
+            GetMiscString(eMiscString_closed));
+    }
+    if (gNet_mode == eNet_mode_host) {
+        if (gNo_races_yet) {
+            pFrontend->items[26].enabled = kFrontendItemEnabled_enabled;
+            pFrontend->items[26].visible = 1;
+            pFrontend->items[27].enabled = kFrontendItemEnabled_enabled;
+            pFrontend->items[27].visible = 1;
+            pFrontend->items[26].stringId = eInterfaceString_car_colon;
+            pFrontend->items[27].stringId = eInterfaceString_abort_race;
+        } else {
+            pFrontend->items[26].enabled = kFrontendItemEnabled_disabled;
+            pFrontend->items[26].visible = 0;
+            pFrontend->items[27].enabled = kFrontendItemEnabled_enabled;
+            pFrontend->items[27].visible = 1;
+            pFrontend->items[27].stringId = eInterfaceString_abort_race;
+        }
+    } else {
+        pFrontend->items[26].enabled = kFrontendItemEnabled_disabled;
+        pFrontend->items[26].visible = 0;
+        pFrontend->items[27].enabled = kFrontendItemEnabled_enabled;
+        pFrontend->items[27].visible = 1;
+        pFrontend->items[27].stringId = eInterfaceString_closed;
+    }
+    FuckWithWidths(pFrontend);
+    return 0;
+}
 
 // NetSync_MenuHandler
 

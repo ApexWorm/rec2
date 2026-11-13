@@ -13,6 +13,7 @@
 #include "rec2_types.h"
 
 extern int gNet_storage_space_initialized;
+extern tNet_mode gFrontend_net_mode;
 extern tNet_game_options gNet_settings[9];
 extern tU32 gFrontend_net_current_roll;
 extern tU32 gFrontend_net_last_roll;
@@ -448,7 +449,9 @@ extern int C2_HOOK_FASTCALL NetOptions_CreditsRoller(tFrontend_spec* pFrontend);
 
 // NetOptions_Cancel
 
-// CheckPlayersAreResponding
+extern void C2_HOOK_FASTCALL CheckPlayersAreResponding2(tU32 pDeadline);
+
+extern void C2_HOOK_FASTCALL CheckPlayersAreResponding(void);
 
 // MungePlayers
 
@@ -460,7 +463,7 @@ extern int C2_HOOK_FASTCALL NetSync_Start(tFrontend_spec* pFrontend);
 
 extern int C2_HOOK_FASTCALL NetSync_Abort(tFrontend_spec* pFrontend);
 
-// NetSync_Infunc
+extern int C2_HOOK_FASTCALL NetSync_Infunc(tFrontend_spec* pFrontend);
 
 // NetSync_MenuHandler
 
