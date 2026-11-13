@@ -29,6 +29,24 @@ extern br_vector3 gZero_vector__smash;
 extern tDecal gDecals[50];
 extern int gCount_queued_smashes;
 
+typedef struct {
+    br_vector3 origin;
+    br_vector2 map_origin;
+    br_vector2 map_other;
+    br_scalar map_from_geometry[2][2];
+    br_face* face;
+} tSmash_triangle_mapping;
+
+typedef struct {
+    int axis_0;
+    int axis_1;
+    int axis_2;
+    br_vector3 normal;
+    br_scalar d;
+    br_vector2 map_edge;
+    tSmash_triangle_mapping triangles[2];
+} tSmash_quad_mapping;
+
 extern void C2_HOOK_FASTCALL InitFogificateMaterials(void);
 
 extern void C2_HOOK_FASTCALL FogificateMaterials(tRendererShadingType pShading_type);
@@ -251,13 +269,13 @@ extern void C2_HOOK_FASTCALL FreeConnotations(tConnotations* pConnotations, int 
 
 // ExtrapolateGeometryCoordinates2
 
-// ExtrapolateGeometryCoordinates
+extern void C2_HOOK_FASTCALL ExtrapolateGeometryCoordinates(tSmash_quad_mapping* pMapping, br_vector2* pMap, br_vertex* pVertex);
 
 // ExtractDeTiledFaces
 
 // AddDecal
 
-// InsertQuad
+extern int C2_HOOK_FASTCALL InsertQuad(tSmash_quad_mapping* pMapping, br_actor* pActor, br_vertex* pVertices, tU8* pOn_edge, br_vertex** pCorners, br_material* pMaterial, tU16* pFace_points, tU16* pPoint_indices);
 
 // SpawnSmashAndMungeFaces
 

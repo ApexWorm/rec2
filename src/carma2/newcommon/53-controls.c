@@ -84,9 +84,17 @@ int gHeadup_map_h;
 // GLOBAL: CARMA2_SW 0x00676b78
 char gString[84];
 
+// GLOBAL: CARMA2_HW 0x0067c498
+// GLOBAL: CARMA2_SW 0x00676c10
+int gInvulnerability;
+
 // GLOBAL: CARMA2_HW 0x0067c3c8
 // GLOBAL: CARMA2_SW 0x00676b40
-char* gAbuse_text[10];
+char* gAbuse_text[10] = { 0 };
+
+// GLOBAL: CARMA2_HW 0x0067c3f0
+// GLOBAL: CARMA2_SW 0x00676b68
+int gINT_0067c3f0 = 0;
 
 // GLOBAL: CARMA2_HW 0x0067c3f8
 // GLOBAL: CARMA2_SW 0x00676b70
@@ -483,11 +491,11 @@ void C2_HOOK_FASTCALL CheckHorn3D(tCar_spec* pCar) {
 void C2_HOOK_FASTCALL SetFlipUpCar(tCar_spec* pCar) {
     if (gNet_mode == eNet_mode_none || pCar == NULL || pCar->driver != eDriver_local_human) {
         FlipUpCar(pCar);
-        return;
+    } else {
+        DisableCar(pCar);
+        gPalette_fade_time = GetRaceTime();
+        NetPlayerStatusChanged(ePlayer_status_recovering);
     }
-    DisableCar(pCar);
-    gPalette_fade_time = GetRaceTime();
-    NetPlayerStatusChanged(ePlayer_status_recovering);
 }
 
 
@@ -744,7 +752,30 @@ void C2_HOOK_FASTCALL ToggleFlying(void) {
     }
 }
 
-// CycleInvulnerability
+// FUNCTION: CARMA2_HW 0x00444420
+// FUNCTION: CARMA2_SW 0x00444500
+void C2_HOOK_FASTCALL CycleInvulnerability(void) {
+    char message[256];
+
+    gInvulnerability = (gInvulnerability + 1) % 8;
+    gCar_to_view->invulnerable_no_damage = gInvulnerability & 0x1;
+    gCar_to_view->invulnerable_no_crushage = gInvulnerability & 0x2;
+    gCar_to_view->invulnerable_no_wastage = gInvulnerability & 0x4;
+    message[0] = '\0';
+    if (gInvulnerability == 0) {
+        strcpy(message, "FULLY VULNERABLE");
+    }
+    if (gCar_to_view->invulnerable_no_damage) {
+        strcat(message, " NO DAMAGE");
+    }
+    if (gCar_to_view->invulnerable_no_crushage != 0) {
+        strcat(message, " NO CRUSHAGE");
+    }
+    if (gCar_to_view->invulnerable_no_wastage != 0) {
+        strcat(message, " NO WASTAGE");
+    }
+    NewTextHeadupSlot(4, 0, 1000, -4, message);
+}
 
 // FUNCTION: CARMA2_HW 0x00444590
 void C2_HOOK_FASTCALL ToggleTimerFreeze(void) {
@@ -777,7 +808,11 @@ void C2_HOOK_FASTCALL ToggleHeadupMap(int pArg) {
 
 // HackyMapFixForMac3dfx
 
-// ToggleMap
+// STUB: CARMA2_HW 0x00444610
+// STUB: CARMA2_SW 0x004446f0
+void C2_HOOK_FASTCALL ToggleMap(void) {
+    NOT_IMPLEMENTED();
+}
 
 // FUNCTION: CARMA2_HW 0x004446f0
 // FUNCTION: CARMA2_SW 0x004447d0
