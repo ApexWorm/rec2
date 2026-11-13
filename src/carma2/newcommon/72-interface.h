@@ -449,6 +449,8 @@ extern int C2_HOOK_FASTCALL NetOptions_CreditsRoller(tFrontend_spec* pFrontend);
 
 // NetOptions_Cancel
 
+extern void C2_HOOK_FASTCALL CheckPlayersAreResponding2(tU32 pDeadline);
+
 extern void C2_HOOK_FASTCALL CheckPlayersAreResponding(void);
 
 // MungePlayers
