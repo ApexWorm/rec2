@@ -110,7 +110,19 @@ tPolyhedron_edge_indexes gDefault_box_collision_wireframe_edges[12] = {
     { 0, 4 }, { 1, 5 }, { 2, 6 }, { 3, 7 },
 };
 
-// ActualActionReplayHeadups
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_HW 0x004e6280
+// STUB: CARMA2_SW 0x004e22a0
+void C2_HOOK_FASTCALL ActualActionReplayHeadups(int pSpecial_zappy_bastard) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // FUNCTION: CARMA2_HW 0x004e6260
 // FUNCTION: CARMA2_SW 0x004e2280
@@ -120,7 +132,11 @@ void C2_HOOK_FASTCALL DoActionReplayPostSwap(void) {
 
 // DoZappyActionReplayHeadups
 
-// DoActionReplayHeadups
+// FUNCTION: CARMA2_HW 0x004e6270
+// FUNCTION: CARMA2_SW 0x004e2290
+void C2_HOOK_FASTCALL DoActionReplayHeadups(void) {
+    ActualActionReplayHeadups(0);
+}
 
 // PreProcess
 

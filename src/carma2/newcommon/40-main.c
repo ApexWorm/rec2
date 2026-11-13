@@ -25,7 +25,7 @@
 #include "60-phil.h"
 #include "28-world3.h"
 #include "11-world1.h"
-#include "18-graphics2.h"
+#include "18b-graphics2.h"
 
 #include <string.h>
 

@@ -15,6 +15,11 @@
 extern int gPHIL_disabled;
 extern tPhysics_object* gPHIL_list_collision_infos;
 extern tU32 gPHIL_last_physics_tick;
+extern int gPHIL_count_list_collision_infos;
+extern int gPHIL_object_added;
+extern tPHIL_queued_objects gPhil_queued_objects;
+extern int gPHIL_count_queued_objects_for_removal;
+extern int gPHIL_count_queued_objects;
 
 // ScalarToFraction
 
@@ -54,7 +59,7 @@ extern int C2_HOOK_FASTCALL GetNetworkDataSize(tU8* pNet_data);
 
 // GetSingleMatrixFromNetworkData
 
-// PHILInit
+extern int C2_HOOK_FASTCALL PHILInit(void);
 
 extern void C2_HOOK_FASTCALL PHILDisable(void);
 
