@@ -777,7 +777,19 @@ void C2_HOOK_FASTCALL TheEffectsOfDrugs(tPowerup* pPowerup, tU32 pPeriod) {
     ResetPalette();
 }
 
-// SetOpponentsSpeed
+// FUNCTION: CARMA2_HW 0x004dcca0
+// FUNCTION: CARMA2_SW 0x004d91a0
+int C2_HOOK_FASTCALL SetOpponentsSpeed(tPowerup* pPowerup, tCar_spec* pCar) {
+    int i;
+
+    for (i = 0; i < gCurrent_race.number_of_racers && gCurrent_race.opponent_list[i].index != 29; i++) {
+    }
+    if (i < gCurrent_race.number_of_racers) {
+        SetEngineFactor(&gPowerup_array[5], gCurrent_race.opponent_list[i].car_spec);
+    }
+    gOpponent_speed_factor = pPowerup->float_params[0];
+    return pPowerup - gPowerup_array;
+}
 
 // FUNCTION: CARMA2_HW 0x004dcd70
 // FUNCTION: CARMA2_SW 0x004d9270
