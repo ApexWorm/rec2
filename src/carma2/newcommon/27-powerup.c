@@ -280,10 +280,10 @@ tPhysics_object* C2_HOOK_FASTCALL MungeShereObject(br_model* pModel, float pWeig
 
     collision_info = BrMemAllocate(sizeof(tPhysics_object), kMem_collision_object);
     collision_info->shape = (tPhysics_shape*)AllocateShapeSphere(kMem_collision_shape);
-    BrVector3Set(&collision_info->shape->sphere.sphere.center, 0.f, 0.f, 0.f);
+    BrVector3Set(&collision_info->shape->sphere.sphere.center, 0.0f, 0.0f, 0.0f);
     collision_info->shape->sphere.sphere.radius = (pModel->bounds.max.v[0] - pModel->bounds.min.v[0]
         + pModel->bounds.max.v[1] - pModel->bounds.min.v[1]
-        + pModel->bounds.max.v[2] - pModel->bounds.min.v[2]) / 6.f;
+        + pModel->bounds.max.v[2] - pModel->bounds.min.v[2]) / 6.0f;
     FillInShape(collision_info->shape);
     collision_info->uid = (tU8)gCollision_info_uid_counter;
     gCollision_info_uid_counter++;
@@ -291,10 +291,10 @@ tPhysics_object* C2_HOOK_FASTCALL MungeShereObject(br_model* pModel, float pWeig
     shape = collision_info->shape;
     collision_info->M = pWeight;
     BrVector3Set(&collision_info->I,
-        REC2_SQR(shape->sphere.sphere.radius) * pWeight / 6.f,
-        REC2_SQR(shape->sphere.sphere.radius) * pWeight / 6.f,
-        REC2_SQR(shape->sphere.sphere.radius) * pWeight / 6.f);
-    BrVector3SetFloat(&collision_info->field_0x54, 0.f, -0.057971016f, 0.f);
+        REC2_SQR(shape->sphere.sphere.radius) * pWeight / 6.0f,
+        REC2_SQR(shape->sphere.sphere.radius) * pWeight / 6.0f,
+        REC2_SQR(shape->sphere.sphere.radius) * pWeight / 6.0f);
+    BrVector3SetFloat(&collision_info->field_0x54, 0.0f, (br_scalar)(-1.0 / (2.5 * 6.9)), 0.0f);
     collision_info->actor = BrActorAllocate(BR_ACTOR_MODEL, NULL);
     BrMatrix34Copy(&collision_info->actor->t.t.mat, &collision_info->transform_matrix);
     collision_info->actor->model = pModel;
