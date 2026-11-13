@@ -22,6 +22,7 @@ extern int gBOOL_00744804;
 extern tPedestrian* gPedestrian_array;
 extern void* gPhysics_buffer3_ptr;
 extern int gPHIL_mechanics_time_sync;
+extern int gPHIL_munging_objects;
 extern int gPhysics_other_buffer_capacity;
 extern tProximity_ray gProximity_rays[20];
 extern br_model* gPed_spurt_model;
@@ -388,7 +389,7 @@ extern void C2_HOOK_FASTCALL GetBoundsFromPointList(const br_vector3* pVertices,
 
 extern void C2_HOOK_FASTCALL FillInShape(tPhysics_shape* pShape);
 
-// UpdateCollisionObject
+extern void C2_HOOK_FASTCALL UpdateCollisionObject(tPhysics_object* pCollision_info);
 
 extern void C2_NORETURN C2_HOOK_FASTCALL PhysicsError(tPhysicsError pError, const char* pMessage);
 
