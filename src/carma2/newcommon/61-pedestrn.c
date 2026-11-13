@@ -83,6 +83,10 @@ tPed_remap* gPed_remaps[10] = { 0 };
 // GLOBAL: CARMA2_SW 0x006719d0
 tPed_personality* gPed_personalities[50] = { 0 };
 
+// GLOBAL: CARMA2_HW 0x00677328
+// GLOBAL: CARMA2_SW 0x00671a98
+float gPed_sin_table[256] = { 0 };
+
 // GLOBAL: CARMA2_HW 0x007447e0
 // GLOBAL: CARMA2_SW 0x0073b2a0
 float gPedestrian_speed_factor;
@@ -1711,13 +1715,42 @@ void C2_HOOK_FASTCALL DisposeCharacterInstance(tPed_character_instance* pCharact
 
 // BonerCloneModel
 
-// ReadPersonality
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_HW 0x00406ab0
+// STUB: CARMA2_SW 0x00406ab0
+tPed_personality* C2_HOOK_FASTCALL ReadPersonality(const char* pName) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // DisposePersonality
 
 // DisposeAllLoadedPersonalities
 
-// FindOrOpenPersonality
+// FUNCTION: CARMA2_HW 0x00407930
+// FUNCTION: CARMA2_SW 0x00407920
+tPed_personality* C2_HOOK_FASTCALL FindOrOpenPersonality(const char* pName) {
+    int i;
+
+    C2_HOOK_BUG_ON(REC2_ASIZE(gPed_personalities) != 50);
+    C2_HOOK_BUG_ON(REC2_ASIZE(gPed_sin_table) != 256);
+
+    for (i = 0; i < (int)REC2_ASIZE(gPed_personalities); i++) {
+        if (gPed_personalities[i] == NULL) {
+            continue;
+        }
+        if (strcmp(pName, gPed_personalities[i]->name) == 0) {
+            return gPed_personalities[i];
+        }
+    }
+    return ReadPersonality(pName);
+}
 
 // BuildCharacterInstance
 

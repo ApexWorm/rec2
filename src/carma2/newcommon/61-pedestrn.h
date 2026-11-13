@@ -22,6 +22,7 @@ extern int gPed_retain_root_mode;
 extern tPed_remap* gPed_remaps[10];
 
 extern tPed_personality* gPed_personalities[50];
+extern float gPed_sin_table[256];
 extern float gPedestrian_speed_factor;
 extern int gSelected_ped;
 extern int gCount_active_peds;
@@ -472,13 +473,13 @@ extern void C2_HOOK_FASTCALL DisposeCharacterInstance(tPed_character_instance* p
 
 // BonerCloneModel
 
-// ReadPersonality
+extern tPed_personality* C2_HOOK_FASTCALL ReadPersonality(const char* pName);
 
 // DisposePersonality
 
 // DisposeAllLoadedPersonalities
 
-// FindOrOpenPersonality
+extern tPed_personality* C2_HOOK_FASTCALL FindOrOpenPersonality(const char* pName);
 
 // BuildCharacterInstance
 
