@@ -79,7 +79,11 @@ tBRender_smoke* gBR_smoke_pointers[35];
 int gN_BR_smoke_structs;
 
 // GLOBAL: CARMA2_HW 0x006a8638
-br_pixelmap* gFlame_map[20];
+br_pixelmap* gFlame_map[20] = { 0 };
+
+// GLOBAL: CARMA2_HW 0x006a8688
+// GLOBAL: CARMA2_SW 0x006a26e8
+int gINT_006a8688 = 0;
 
 // GLOBAL: CARMA2_HW 0x006a9180
 // GLOBAL: CARMA2_SW 0x006a2bd0
@@ -675,7 +679,34 @@ void C2_HOOK_FASTCALL AdjustFlame(int pIndex, int pFrame_count, br_scalar pScale
 
 // MungeSmokeColumn
 
-// DisposeFlame
+// FUNCTION: CARMA2_HW 0x004fc2e0
+// FUNCTION: CARMA2_SW 0x004f7840
+void C2_HOOK_FASTCALL DisposeFlame(void) {
+    int i;
+    int j;
+    br_actor* actor;
+
+    C2_HOOK_BUG_ON(REC2_ASIZE(gFlame_map) != 20);
+
+    for (i = 0; i < (int)REC2_ASIZE(gFlame_map); i++) {
+        BrMapRemove(gFlame_map[i]);
+        BrPixelmapFree(gFlame_map[i]);
+    }
+    for (i = 0; i < (int)REC2_ASIZE(gSmoke_column); i++) {
+        if ((gColumn_flags & (1 << i)) != 0 && gSmoke_column[i].colour == 0) {
+            BrActorRemove(gSmoke_column[i].flame_actor);
+        }
+        actor = gSmoke_column[i].flame_actor->children;
+        for (j = 0; j < (int)REC2_ASIZE(gSmoke_column[0].frame_count); j++) {
+            BrMaterialRemove(actor->material);
+            BrMaterialFree(actor->material);
+            actor = actor->next;
+        }
+        BrActorFree(gSmoke_column[i].flame_actor);
+    }
+    BrModelRemove(gLollipop_model);
+    BrModelFree(gLollipop_model);
+}
 
 // FUNCTION: CARMA2_HW 0x004fc3a0
 // FUNCTION: CARMA2_SW 0x004f7900
