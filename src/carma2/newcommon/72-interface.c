@@ -3382,7 +3382,23 @@ int C2_HOOK_FASTCALL NetOptions_CreditsRoller(tFrontend_spec* pFrontend) {
 
 // NetOptions_Cancel
 
-// CheckPlayersAreResponding
+void C2_HOOK_FASTCALL CheckPlayersAreResponding(void) {
+    tU32 now;
+    tNet_message* message;
+    int i;
+
+    now = PDGetTotalTime();
+    for (i = 0; i < gNumber_of_net_players; i++) {
+        if (i != gThis_net_player_index && now - gNet_players[i].last_heard_from_him > 60000) {
+            gNet_players[i].player_status = ePlayer_status_not_responding;
+        }
+    }
+    if (gNet_mode == eNet_mode_client && gLast_host_query == 0) {
+        message = NetBuildGuaranteedMessage(eNet_message_chunk_type_netsynch, 0);
+        NetGuaranteedSendMessageToHost(gCurrent_net_game, message, NULL);
+        gLast_host_query = now;
+    }
+}
 
 // MungePlayers
 
@@ -3432,21 +3448,9 @@ int C2_HOOK_FASTCALL NetSync_Abort(tFrontend_spec* pFrontend) {
 // FUNCTION: CARMA2_SW 0x00472b80
 int C2_HOOK_FASTCALL NetSync_Infunc(tFrontend_spec* pFrontend) {
     int i;
-    tU32 now;
-    tNet_message* message;
 
     Generic_Infunc(pFrontend);
-    now = PDGetTotalTime();
-    for (i = 0; i < gNumber_of_net_players; i++) {
-        if (i != gThis_net_player_index && now - gNet_players[i].last_heard_from_him > 60000) {
-            gNet_players[i].player_status = ePlayer_status_not_responding;
-        }
-    }
-    if (gNet_mode == eNet_mode_client && gLast_host_query == 0) {
-        message = NetBuildGuaranteedMessage(eNet_message_chunk_type_netsynch, 0);
-        NetGuaranteedSendMessageToHost(gCurrent_net_game, message, NULL);
-        gLast_host_query = now;
-    }
+    CheckPlayersAreResponding();
     if (gFrontend_net_mode == eNet_mode_host) {
         if (gNo_races_yet) {
             NetSynchRaceStart2(eNet_synch_host_first);
