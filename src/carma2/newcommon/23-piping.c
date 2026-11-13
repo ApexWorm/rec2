@@ -1434,7 +1434,18 @@ void C2_HOOK_FASTCALL DoSmudge(tPipe_chunk** pChunk, int pDir) {
 
 // ApplySpark
 
-// ApplyShrapnel
+// FUNCTION: CARMA2_HW 0x004c9160
+// FUNCTION: CARMA2_SW 0x004c5890
+void C2_HOOK_FASTCALL ApplyShrapnel(tPipe_chunk** pChunk) {
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk, data, 0x4);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk_shrapnel, age, 0xc);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk_shrapnel, material, 0x10);
+
+    AdjustShrapnel((*pChunk)->subject_index,
+        &(*pChunk)->data.shrapnel.pos,
+        (*pChunk)->data.shrapnel.age,
+        (*pChunk)->data.shrapnel.material);
+}
 
 // FUNCTION: CARMA2_HW 0x004c9180
 // FUNCTION: CARMA2_SW 0x004c58b0

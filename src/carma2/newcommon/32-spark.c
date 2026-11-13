@@ -230,7 +230,11 @@ void C2_HOOK_FASTCALL SetLineModelCols(tU8 pCol) {
 
 // AdjustSpark
 
-// AdjustShrapnel
+// STUB: CARMA2_HW 0x004f86f0
+// STUB: CARMA2_SW 0x004f3d70
+void C2_HOOK_FASTCALL AdjustShrapnel(int pShrapnel_num, br_vector3* pPos, tU16 pAge, br_material* pMaterial) {
+    NOT_IMPLEMENTED();
+}
 
 // FUNCTION: CARMA2_HW 0x004f87a0
 // FUNCTION: CARMA2_SW 0x004f3e20
