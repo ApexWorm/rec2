@@ -30,6 +30,7 @@ extern int gExploding_pedestrians;
 extern tNapalm_bolt gNapalm_bolts[5];
 extern int gCount_changed_points;
 extern br_vector3 gChanged_points[10];
+extern int gPed_dismember_spurting_member_count;
 extern int gPed_nearness;
 extern tTWTVFS gTwtPeds;
 extern tU32 DAT_006a0418;
@@ -99,7 +100,7 @@ extern void C2_HOOK_FASTCALL PedApplyVanishDismembered(tPedestrian* pPedestrian,
 
 // PedApplyPedModelChange
 
-// DismemberCharacterAR
+extern int C2_HOOK_FASTCALL DismemberCharacterAR(tPed_character_instance* pCharacter, int pBone_index, br_vector3* pVelocity, br_vector3* pAngular_velocity);
 
 // PedApplyDismember
 
@@ -207,7 +208,7 @@ extern void C2_HOOK_FASTCALL ScoreForKilledPedestrian(tPedestrian* pPed, float p
 
 // KillPedestrian
 
-// DismemberPed
+extern int C2_HOOK_FASTCALL DismemberPed(tPedestrian* pPed, int pBone_index);
 
 extern void C2_HOOK_FASTCALL DamagePedestrian(tPedestrian* pPed, int pDamage, int pArg3, int pArg4, tPhysics_object* pObject);
 
@@ -571,7 +572,7 @@ extern int C2_HOOK_FASTCALL BonerActiveHalted(tPed_character_instance* pCharacte
 
 // BonerPedMovedByPhysics
 
-// DismemberCharacter
+extern int C2_HOOK_FASTCALL DismemberCharacter(tPed_character_instance* pCharacter, int pBone_index, br_vector3* pVelocity, br_vector3* pAngular_velocity);
 
 extern float C2_HOOK_FASTCALL GetClearanceFromCharacterInstance(tPed_character_instance* pCharacter, int pMoveNum);
 
