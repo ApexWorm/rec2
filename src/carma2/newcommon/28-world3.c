@@ -534,6 +534,21 @@ int C2_HOOK_FASTCALL AddShadeTables(tBrender_storage* pStorage_space, const char
     return total;
 }
 
+// FUNCTION: CARMA2_HW 0x00501dd0
+// FUNCTION: CARMA2_SW 0x004fd730
+void C2_HOOK_FASTCALL LoadModelsFromLineInto(tBrender_storage* pStorage_space, FILE* pF) {
+    tPath_name the_path;
+    char s[256];
+    char* str;
+
+    PossibleService();
+    GetALineAndDontArgue(pF, s);
+    str = strtok(s, "\t ,/");
+    PathCat(the_path, gApplication_path, "MODELS");
+    PathCat(the_path, the_path, str);
+    AddModels(pStorage_space, the_path);
+}
+
 // FUNCTION: CARMA2_HW 0x00501e40
 // FUNCTION: CARMA2_SW 0x004fd7a0
 int C2_HOOK_FASTCALL AddModels(tBrender_storage* pStorage_space, const char* pPath) {
@@ -571,6 +586,21 @@ int C2_HOOK_FASTCALL AddModels(tBrender_storage* pStorage_space, const char* pPa
         }
     }
     return new_ones;
+}
+
+// FUNCTION: CARMA2_HW 0x00501fe0
+// FUNCTION: CARMA2_SW 0x004fd930
+void C2_HOOK_FASTCALL LoadSomeMaterials(tBrender_storage* pStorage, FILE* pFile, tRendererShadingType pShading) {
+    tPath_name the_path;
+    char s[256];
+    char* str;
+
+    PossibleService();
+    GetALineAndDontArgue(pFile, s);
+    str = strtok(s, "\t ,/");
+    PathCat(the_path, gApplication_path, "MATERIAL");
+    PathCat(the_path, the_path, str);
+    AddMaterials(pStorage, the_path, pShading);
 }
 
 // FUNCTION: CARMA2_HW 0x00502060

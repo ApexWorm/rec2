@@ -13,6 +13,7 @@
 #include "rec2_types.h"
 
 extern int gNet_storage_space_initialized;
+extern tNet_mode gFrontend_net_mode;
 extern tNet_game_options gNet_settings[9];
 extern tU32 gFrontend_net_current_roll;
 extern tU32 gFrontend_net_last_roll;
@@ -49,6 +50,8 @@ extern int gFrontend_wrecks_rotate_prev_y;
 
 extern int gFrontend_controls_count_keys;
 extern int gINT_00688748;
+extern tJoinable_game gGames_to_join[6];
+extern int gLast_graph_sel;
 extern br_material* gFrontend_backdrop_materials[3];
 extern br_token_value gFrontend_backdrop1_material_prims[3];
 extern br_token_value gFrontend_backdrop2_material_prims[3];
@@ -72,11 +75,11 @@ extern void C2_HOOK_FASTCALL SetNetAvailability(tNet_game_options* pOptions);
 
 extern void C2_HOOK_FASTCALL DefaultNetSettings(void);
 
-// DisposeJoinableGame
+extern void C2_HOOK_FASTCALL DisposeJoinableGame(int pIndex);
 
 // InitGamesToJoin
 
-// DisposeJoinList
+extern void C2_HOOK_FASTCALL DisposeJoinList(int pException);
 
 // AddToJoinList
 
@@ -168,9 +171,9 @@ extern int C2_HOOK_FASTCALL MultiplayerSetup(tFrontend_spec* pFrontend);
 
 // NetworkJoinMenuInfunc
 
-// StopAllThatJoinyStuffThisInstant
+extern void C2_HOOK_FASTCALL StopAllThatJoinyStuffThisInstant(void);
 
-// NetworkJoinMenuOutfunc
+extern int C2_HOOK_FASTCALL NetworkJoinMenuOutfunc(tFrontend_spec* pFrontend);
 
 // NetJoinChooseThisGame
 
@@ -282,7 +285,7 @@ extern int C2_HOOK_FASTCALL WrecksInFunc(tFrontend_spec* pFrontend);
 
 extern int C2_HOOK_FASTCALL KeepInRange(int pIndex, int pRange);
 
-// WrecksOutFunc
+extern int C2_HOOK_FASTCALL WrecksOutFunc(tFrontend_spec* pFrontend);
 
 // WrecksUpdateFunc
 
@@ -448,7 +451,9 @@ extern int C2_HOOK_FASTCALL NetOptions_CreditsRoller(tFrontend_spec* pFrontend);
 
 // NetOptions_Cancel
 
-// CheckPlayersAreResponding
+extern void C2_HOOK_FASTCALL CheckPlayersAreResponding2(tU32 pDeadline);
+
+extern void C2_HOOK_FASTCALL CheckPlayersAreResponding(void);
 
 // MungePlayers
 
@@ -460,7 +465,7 @@ extern int C2_HOOK_FASTCALL NetSync_Start(tFrontend_spec* pFrontend);
 
 extern int C2_HOOK_FASTCALL NetSync_Abort(tFrontend_spec* pFrontend);
 
-// NetSync_Infunc
+extern int C2_HOOK_FASTCALL NetSync_Infunc(tFrontend_spec* pFrontend);
 
 // NetSync_MenuHandler
 

@@ -51,9 +51,19 @@
 // GLOBAL: CARMA2_SW 0x0068307c
 int gNet_storage_space_initialized;
 
+// GLOBAL: CARMA2_HW 0x0059c820
+// GLOBAL: CARMA2_SW 0x00597750
+tNet_mode gFrontend_net_mode = eNet_mode_thinking_about_it;
+
 // GLOBAL: CARMA2_HW 0x00763960
 // GLOBAL: CARMA2_SW 0x00759ec0
-tNet_game_options gNet_settings[9];
+tNet_game_options gNet_settings[9] = { 0 };
+
+#ifdef REC2_MATCHING
+// GLOBAL: CARMA2_HW 0x00763b10
+// GLOBAL: CARMA2_SW 0x0075a070
+int gINT_00763b10 = 0;
+#endif
 
 // GLOBAL: CARMA2_HW 0x00688aa8
 // GLOBAL: CARMA2_SW 0x00683008
@@ -125,9 +135,17 @@ int gFrontend_controls_count_keys;
 // GLOBAL: CARMA2_SW 0x00680c3c
 int gFrontend_netsummary_first_iteration;
 
+// GLOBAL: CARMA2_HW 0x00688718
+// GLOBAL: CARMA2_SW 0x00682c78
+tJoinable_game gGames_to_join[6] = { 0 };
+
 // GLOBAL: CARMA2_HW 0x00688748
 // GLOBAL: CARMA2_SW 0x00682ca8
-int gINT_00688748;
+int gINT_00688748 = 0;
+
+// GLOBAL: CARMA2_HW 0x00688760
+// GLOBAL: CARMA2_SW 0x00682cc0
+int gLast_graph_sel;
 
 // GLOBAL: CARMA2_HW 0x00686850
 // GLOBAL: CARMA2_SW 0x00680f90
@@ -556,11 +574,23 @@ void C2_HOOK_FASTCALL DefaultNetSettings(void) {
     PFfclose(file);
 }
 
-// DisposeJoinableGame
+void C2_HOOK_FASTCALL DisposeJoinableGame(int pIndex) {
+
+    NetDisposeGameDetails(gGames_to_join[pIndex].game);
+    gGames_to_join[pIndex].game = NULL;
+}
 
 // InitGamesToJoin
 
-// DisposeJoinList
+void C2_HOOK_FASTCALL DisposeJoinList(int pException) {
+    int i;
+
+    for (i = 0; i < (int)REC2_ASIZE(gGames_to_join); i++) {
+        if (i != pException && gGames_to_join[i].game != NULL) {
+            DisposeJoinableGame(i);
+        }
+    }
+}
 
 // AddToJoinList
 
@@ -675,7 +705,12 @@ br_pixelmap* C2_HOOK_FASTCALL GetThisFuckingPixelmapPleaseMrTwatter(const char* 
     size_t i;
 
     result = NULL;
+#ifdef REC2_HW
+    PathCat(the_path, pFolder, "PIXIES.P16");
+#endif
+#ifdef REC2_SW
     PathCat(the_path, pFolder, "PIXIES.P08");
+#endif
     f = PFfopen(the_path, "rb");
     if (f != NULL) {
         PFfclose(f);
@@ -1133,9 +1168,20 @@ int C2_HOOK_FASTCALL MultiplayerSetup(tFrontend_spec* pFrontend) {
 
 // NetworkJoinMenuInfunc
 
-// StopAllThatJoinyStuffThisInstant
+void C2_HOOK_FASTCALL StopAllThatJoinyStuffThisInstant(void) {
 
-// NetworkJoinMenuOutfunc
+    C2_HOOK_BUG_ON(REC2_ASIZE(gGames_to_join) != 6);
+    NetEndJoinList();
+    DisposeJoinList(gLast_graph_sel);
+}
+
+// FUNCTION: CARMA2_HW 0x00468260
+// FUNCTION: CARMA2_SW 0x00467fe0
+int C2_HOOK_FASTCALL NetworkJoinMenuOutfunc(tFrontend_spec* pFrontend) {
+
+    StopAllThatJoinyStuffThisInstant();
+    return 0;
+}
 
 // NetJoinChooseThisGame
 
@@ -2143,7 +2189,14 @@ int C2_HOOK_FASTCALL KeepInRange(int pIndex, int pRange) {
     return pIndex;
 }
 
-// WrecksOutFunc
+// FUNCTION: CARMA2_HW 0x0046ead0
+// FUNCTION: CARMA2_SW 0x0046e190
+int C2_HOOK_FASTCALL WrecksOutFunc(tFrontend_spec* pFrontend) {
+
+    DisposeWrecksGallery();
+    DRS3StartSound(gEffects_outlet, eSoundId_Swingout);
+    return 1;
+}
 
 // WrecksUpdateFunc
 
@@ -3360,7 +3413,30 @@ int C2_HOOK_FASTCALL NetOptions_CreditsRoller(tFrontend_spec* pFrontend) {
 
 // NetOptions_Cancel
 
-// CheckPlayersAreResponding
+void C2_HOOK_FASTCALL CheckPlayersAreResponding2(tU32 pDeadline) {
+    tU32 now;
+    tNet_message* message;
+    int i;
+
+    now = PDGetTotalTime();
+    for (i = 0; i < gNumber_of_net_players; i++) {
+        if (i != gThis_net_player_index && now - gNet_players[i].last_heard_from_him > pDeadline) {
+            gNet_players[i].player_status = ePlayer_status_not_responding;
+        }
+    }
+    if (gNet_mode == eNet_mode_client && gLast_host_query == 0) {
+        message = NetBuildGuaranteedMessage(eNet_message_chunk_type_netsynch, 0);
+        NetGuaranteedSendMessageToHost(gCurrent_net_game, message, NULL);
+        gLast_host_query = now;
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x004e2c30
+// FUNCTION: CARMA2_SW 0x004defb0
+void C2_HOOK_FASTCALL CheckPlayersAreResponding(void) {
+
+    CheckPlayersAreResponding2(20000);
+}
 
 // MungePlayers
 
@@ -3406,7 +3482,61 @@ int C2_HOOK_FASTCALL NetSync_Abort(tFrontend_spec* pFrontend) {
     return 1;
 }
 
-// NetSync_Infunc
+// FUNCTION: CARMA2_HW 0x00473610
+// FUNCTION: CARMA2_SW 0x00472b80
+int C2_HOOK_FASTCALL NetSync_Infunc(tFrontend_spec* pFrontend) {
+    int i;
+
+    Generic_Infunc(pFrontend);
+    CheckPlayersAreResponding2(60000);
+    if (gFrontend_net_mode == eNet_mode_host) {
+        if (gNo_races_yet) {
+            NetSynchRaceStart2(eNet_synch_host_first);
+        } else {
+            NetSynchRaceStart2(eNet_synch_host_subsequent);
+        }
+    } else {
+        NetSynchRaceStart2(eNet_synch_client);
+    }
+    for (i = 0; i < kMax_netplayers; i++) {
+        pFrontend->items[2 + i].x = 160;
+    }
+    if (gCurrent_net_game->options.open_game) {
+        sprintf(pFrontend->items[1].text, "%s: %s (%s)",
+            GetMiscString(eMiscString_game_type),
+            GetMiscString(eMiscString_network_type_start + gCurrent_net_game->type),
+            GetMiscString(eMiscString_open));
+    } else {
+        sprintf(pFrontend->items[1].text, "%s: %s (%s)",
+            GetMiscString(eMiscString_game_type),
+            GetMiscString(eMiscString_network_type_start + gCurrent_net_game->type),
+            GetMiscString(eMiscString_closed));
+    }
+    if (gNet_mode == eNet_mode_host) {
+        if (gNo_races_yet) {
+            pFrontend->items[26].enabled = kFrontendItemEnabled_enabled;
+            pFrontend->items[26].visible = 1;
+            pFrontend->items[27].enabled = kFrontendItemEnabled_enabled;
+            pFrontend->items[27].visible = 1;
+            pFrontend->items[26].stringId = eInterfaceString_car_colon;
+            pFrontend->items[27].stringId = eInterfaceString_abort_race;
+        } else {
+            pFrontend->items[26].enabled = kFrontendItemEnabled_disabled;
+            pFrontend->items[26].visible = 0;
+            pFrontend->items[27].enabled = kFrontendItemEnabled_enabled;
+            pFrontend->items[27].visible = 1;
+            pFrontend->items[27].stringId = eInterfaceString_abort_race;
+        }
+    } else {
+        pFrontend->items[26].enabled = kFrontendItemEnabled_disabled;
+        pFrontend->items[26].visible = 0;
+        pFrontend->items[27].enabled = kFrontendItemEnabled_enabled;
+        pFrontend->items[27].visible = 1;
+        pFrontend->items[27].stringId = eInterfaceString_closed;
+    }
+    FuckWithWidths(pFrontend);
+    return 0;
+}
 
 // NetSync_MenuHandler
 
