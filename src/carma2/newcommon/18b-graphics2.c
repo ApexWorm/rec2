@@ -408,6 +408,135 @@ void C2_HOOK_FASTCALL DRPixelmapRectangleVScaledCopy(br_pixelmap* pDest, br_int_
     }
 }
 
+// FUNCTION: CARMA2_HW 0x0047c090
+// FUNCTION: CARMA2_SW 0x0047b310
+void C2_HOOK_FASTCALL DropInImageFromTop(br_pixelmap* pImage, int pLeft, int pTop, int pTop_clip, int pBottom_clip) {
+    tS32 start_time;
+    tS32 the_time;
+    int drop_distance;
+    int offset;
+    int y;
+    int src_y;
+    int src_height;
+    int y_diff;
+
+    drop_distance = pImage->height - pTop_clip + pTop;
+    start_time = PDGetTotalTime();
+    while ((the_time = PDGetTotalTime()) < start_time + 100) {
+        offset = (the_time - start_time - 100) * drop_distance / 100;
+        BrPixelmapRectangleFill(gBack_screen, pLeft, pTop_clip, pImage->width, pBottom_clip - pTop_clip, 0);
+        if (offset != 1000) {
+            src_y = 0;
+            src_height = pImage->height;
+            y = offset + pTop;
+            y_diff = pTop_clip - y;
+            if (y_diff > 0) {
+                src_y += y_diff;
+                src_height -= y_diff;
+                y += y_diff;
+            }
+            y_diff = pBottom_clip - y - pImage->height;
+            if (y_diff < 0) {
+                src_height += y_diff;
+            }
+            BrPixelmapRectangleCopy(gBack_screen, pLeft, y, pImage, 0, src_y, pImage->width, src_height);
+            PDScreenBufferSwap(0);
+        }
+    }
+    BrPixelmapRectangleFill(gBack_screen, pLeft, pTop_clip, pImage->width, pBottom_clip - pTop_clip, 0);
+    src_y = 0;
+    src_height = pImage->height;
+    y = pTop;
+    y_diff = pTop_clip - y;
+    if (y_diff > 0) {
+        src_y += y_diff;
+        src_height -= y_diff;
+        y += y_diff;
+    }
+    y_diff = pBottom_clip - y - pImage->height;
+    if (y_diff < 0) {
+        src_height += y_diff;
+    }
+    BrPixelmapRectangleCopy(gBack_screen, pLeft, y, pImage, 0, src_y, pImage->width, src_height);
+    PDScreenBufferSwap(0);
+}
+
+// FUNCTION: CARMA2_HW 0x0047c220
+// FUNCTION: CARMA2_SW 0x0047b4a0
+void C2_HOOK_FASTCALL DropOutImageThruBottom(br_pixelmap* pImage, int pLeft, int pTop, int pTop_clip, int pBottom_clip) {
+    tS32 start_time;
+    tS32 the_time;
+    int drop_distance;
+    int offset;
+    int y;
+    int src_y;
+    int src_height;
+    int y_diff;
+
+    drop_distance = pBottom_clip - pTop;
+    start_time = PDGetTotalTime();
+    while ((the_time = PDGetTotalTime()) < start_time + 100) {
+        offset = (the_time - start_time) * drop_distance / 100;
+        BrPixelmapRectangleFill(gBack_screen, pLeft, pTop_clip, pImage->width, pBottom_clip - pTop_clip, 0);
+        if (offset != 1000) {
+            src_y = 0;
+            src_height = pImage->height;
+            y = offset + pTop;
+            y_diff = pTop_clip - y;
+            if (y_diff > 0) {
+                src_y += y_diff;
+                src_height -= y_diff;
+                y += y_diff;
+            }
+            y_diff = pBottom_clip - y - pImage->height;
+            if (y_diff < 0) {
+                src_height += y_diff;
+            }
+            BrPixelmapRectangleCopy(gBack_screen, pLeft, y, pImage, 0, src_y, pImage->width, src_height);
+            PDScreenBufferSwap(0);
+        }
+    }
+    BrPixelmapRectangleFill(gBack_screen, pLeft, pTop_clip, pImage->width, pBottom_clip - pTop_clip, 0);
+}
+
+// FUNCTION: CARMA2_HW 0x0047c4f0
+// FUNCTION: CARMA2_SW 0x0047b770
+void C2_HOOK_FASTCALL DropOutImageThruTop(br_pixelmap* pImage, int pLeft, int pTop, int pTop_clip, int pBottom_clip) {
+    tS32 start_time;
+    tS32 the_time;
+    int drop_distance;
+    int offset;
+    int y;
+    int src_y;
+    int src_height;
+    int y_diff;
+
+    drop_distance = pImage->height - pTop_clip + pTop;
+    start_time = PDGetTotalTime();
+    while ((the_time = PDGetTotalTime()) < start_time + 100) {
+        offset = (start_time - the_time) * drop_distance / 100;
+        BrPixelmapRectangleFill(gBack_screen, pLeft, pTop_clip, pImage->width, pBottom_clip - pTop_clip, 0);
+        if (offset != 1000) {
+            src_y = 0;
+            src_height = pImage->height;
+            y = offset + pTop;
+            y_diff = pTop_clip - y;
+            if (y_diff > 0) {
+                src_y += y_diff;
+                src_height -= y_diff;
+                y += y_diff;
+            }
+            y_diff = pBottom_clip - y - pImage->height;
+            if (y_diff < 0) {
+                src_height += y_diff;
+            }
+            BrPixelmapRectangleCopy(gBack_screen, pLeft, y, pImage, 0, src_y, pImage->width, src_height);
+            PDScreenBufferSwap(0);
+        }
+    }
+    BrPixelmapRectangleFill(gBack_screen, pLeft, pTop_clip, pImage->width, pBottom_clip - pTop_clip, 0);
+}
+
 // FUNCTION: CARMA2_HW 0x0047c650
 // FUNCTION: CARMA2_SW 0x0047b8d0
 int C2_HOOK_FASTCALL SwitchToHiresMode(void) {
