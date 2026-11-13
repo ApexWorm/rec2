@@ -33,9 +33,11 @@ extern int gCount_smashable_noncars;
 extern tBRender_smoke* gBR_smoke_pointers[35];
 extern int gN_BR_smoke_structs;
 extern int gColumn_flags;
+extern int gShrapnel_flags;
 extern br_model* gShrapnel_model[2];
 extern br_pixelmap* gFlame_map[20];
 extern br_model* gLollipop_model;
+extern tShrapnel gShrapnel[30];
 extern tSmoke_column gSmoke_column[10];
 extern tSpark gSparks[32];
 extern br_matrix4 gCameraToScreen;
@@ -88,7 +90,7 @@ extern void C2_HOOK_FASTCALL LoadInShrapnel(void);
 
 // KillShrapnel
 
-// DisposeShrapnel
+extern void C2_HOOK_FASTCALL DisposeShrapnel(void);
 
 // ReplayShrapnel
 
