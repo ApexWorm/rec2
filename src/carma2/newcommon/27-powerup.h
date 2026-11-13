@@ -46,6 +46,7 @@ extern int gInstant_handbrake;
 extern int gInventory_cycling;
 extern tU32 gInventory_timeout;
 extern tU32* gReal_render_palette;
+extern int gCollision_info_uid_counter;
 
 extern char* C2_HOOK_FASTCALL GetPowerupMessage(int pPowerup_index);
 
@@ -87,7 +88,7 @@ extern void C2_HOOK_FASTCALL LoadPowerups(void);
 
 // MungeBoxObject
 
-// MungeShereObject
+extern tPhysics_object* C2_HOOK_FASTCALL MungeShereObject(br_model* pModel, float pWeight);
 
 // InitTail
 

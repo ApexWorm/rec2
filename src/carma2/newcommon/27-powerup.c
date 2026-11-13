@@ -69,6 +69,10 @@ const char* gPowerup_txt_path;
 // GLOBAL: CARMA2_SW 0x0069ab30
 tU32* gReal_render_palette;
 
+// GLOBAL: CARMA2_HW 0x006a0adc
+// GLOBAL: CARMA2_SW 0x0069ab34
+int gCollision_info_uid_counter;
+
 // GLOBAL: CARMA2_HW 0x006a0ae0
 // GLOBAL: CARMA2_SW 0x0069ab38
 br_model* gModel_powerup_armor;
@@ -266,7 +270,37 @@ void C2_HOOK_FASTCALL LoadPowerups(void) {
 
 // MungeBoxObject
 
-// MungeShereObject
+// FUNCTION: CARMA2_HW 0x004da400
+// FUNCTION: CARMA2_SW 0x004d68d0
+tPhysics_object* C2_HOOK_FASTCALL MungeShereObject(br_model* pModel, float pWeight) {
+    tPhysics_object* collision_info;
+    tPhysics_shape* shape;
+
+    C2_HOOK_BUG_ON(sizeof(tPhysics_object) != 0x4d8);
+
+    collision_info = BrMemAllocate(sizeof(tPhysics_object), kMem_collision_object);
+    collision_info->shape = (tPhysics_shape*)AllocateShapeSphere(kMem_collision_shape);
+    BrVector3Set(&collision_info->shape->sphere.sphere.center, 0.0f, 0.0f, 0.0f);
+    collision_info->shape->sphere.sphere.radius = (pModel->bounds.max.v[0] - pModel->bounds.min.v[0]
+        + pModel->bounds.max.v[1] - pModel->bounds.min.v[1]
+        + pModel->bounds.max.v[2] - pModel->bounds.min.v[2]) / 6.0f;
+    FillInShape(collision_info->shape);
+    collision_info->uid = (tU8)gCollision_info_uid_counter;
+    gCollision_info_uid_counter++;
+    UpdateCollisionObject(collision_info);
+    shape = collision_info->shape;
+    collision_info->M = pWeight;
+    BrVector3Set(&collision_info->I,
+        REC2_SQR(shape->sphere.sphere.radius) * pWeight / 6.0f,
+        REC2_SQR(shape->sphere.sphere.radius) * pWeight / 6.0f,
+        REC2_SQR(shape->sphere.sphere.radius) * pWeight / 6.0f);
+    BrVector3SetFloat(&collision_info->field_0x54, 0.0f, (br_scalar)(-1.0 / (2.5 * 6.9)), 0.0f);
+    collision_info->actor = BrActorAllocate(BR_ACTOR_MODEL, NULL);
+    BrMatrix34Copy(&collision_info->actor->t.t.mat, &collision_info->transform_matrix);
+    collision_info->actor->model = pModel;
+    collision_info->box_face_ref = (tU16)(gFace_num__car - 2);
+    return collision_info;
+}
 
 // InitTail
 
