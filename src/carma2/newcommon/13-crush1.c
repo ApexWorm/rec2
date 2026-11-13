@@ -39,6 +39,42 @@ br_scalar gForce_to_movement_factor;
 // GLOBAL: CARMA2_SW 0x00673cc0
 br_scalar gMax_detach_time_ms;
 
+// GLOBAL: CARMA2_HW 0x006796c8
+// GLOBAL: CARMA2_SW 0x00673e38
+tCrush_list_item gCrush_lists[8];
+
+// GLOBAL: CARMA2_HW 0x006796bc
+// GLOBAL: CARMA2_SW 0x00673e2c
+int gCount_queued_drone_crushes;
+
+// GLOBAL: CARMA2_HW 0x0067bad0
+// GLOBAL: CARMA2_SW 0x00676240
+int gCount_crush_detach_list;
+
+// GLOBAL: CARMA2_HW 0x0067bdfc
+// GLOBAL: CARMA2_SW 0x0067656c
+int gINT_0067bdfc;
+
+// GLOBAL: CARMA2_HW 0x0067be08
+// GLOBAL: CARMA2_SW 0x00676578
+tU8 gCrush_data_entry_counter;
+
+// GLOBAL: CARMA2_HW 0x0067bdf0
+// GLOBAL: CARMA2_SW 0x00676560
+int gCount_net_crush_detach_list;
+
+// GLOBAL: CARMA2_HW 0x0067b838
+// GLOBAL: CARMA2_SW 0x00675fa8
+int gCount_net_crush_semi_detach_bit_list;
+
+// GLOBAL: CARMA2_HW 0x0067bd60
+// GLOBAL: CARMA2_SW 0x006764d0
+int gCount_net_crush_full_detach_bit_list;
+
+// GLOBAL: CARMA2_HW 0x0067b7cc
+// GLOBAL: CARMA2_SW 0x00675f3c
+int gCount_car_damage_crush_list;
+
 // GLOBAL: CARMA2_HW 0x006796b8
 // GLOBAL: CARMA2_SW 0x00673e28
 br_scalar gMin_crush_force;
@@ -78,10 +114,6 @@ br_scalar gMin_force_to_split_Y_per_tonne;
 // GLOBAL: CARMA2_HW 0x0067bd64
 // GLOBAL: CARMA2_SW 0x006764d4
 int gMin_split_damage;
-
-// GLOBAL: CARMA2_HW 0x0067bde8
-// GLOBAL: CARMA2_SW 0x00676558
-br_scalar gMin_bend_force;
 
 // GLOBAL: CARMA2_HW 0x0067bdec
 // GLOBAL: CARMA2_SW 0x0067655c
@@ -137,7 +169,11 @@ tDriver gDetached_bit_driver;
 
 // GLOBAL: CARMA2_HW 0x0067bd68
 // GLOBAL: CARMA2_SW 0x006764d8
-tPhysics_joint* gTrack_crush_joints[32];
+tPhysics_joint* gTrack_crush_joints[32] = { 0 };
+
+// GLOBAL: CARMA2_HW 0x0067bde8
+// GLOBAL: CARMA2_SW 0x00676558
+br_scalar gMin_bend_force = 0.f;
 
 // GLOBAL: CARMA2_HW 0x0067b7b8
 // GLOBAL: CARMA2_SW 0x00675f28
@@ -229,7 +265,13 @@ void C2_HOOK_FASTCALL ReadCrushSettings(FILE* pF) {
     }
 }
 
-// ClearCrushLists
+void C2_HOOK_FASTCALL ClearCrushLists(void) {
+    tCrush_list_item* list;
+
+    for (list = gCrush_lists; list->car_spec != NULL; list++) {
+        list->car_spec = NULL;
+    }
+}
 
 // RemoveCarFromCrushLists
 
@@ -280,7 +322,28 @@ void C2_HOOK_FASTCALL InitCrushSystems(void) {
     gGonad_sphere_collision_shape = (tPhysics_shape*)AllocateShapeSphere(kMem_crush_data);
 }
 
-// ResetCrushSystems
+// FUNCTION: CARMA2_HW 0x0042a190
+// FUNCTION: CARMA2_SW 0x0042a220
+void C2_HOOK_FASTCALL ResetCrushSystems(void) {
+    int i;
+
+    for (i = 0; i < (int)REC2_ASIZE(gTrack_crush_joints); i++) {
+        gTrack_crush_joints[i]->type = eJoint_none;
+    }
+    gDetached_bit_crush_info_buffer.field_0x8 = 0;
+    gSplit_car_crush_info_buffer.field_0x8 = 0;
+    ClearCrushLists();
+    gCount_queued_drone_crushes = 0;
+    gCount_crush_detach_list = 0;
+    gINT_0067bdfc = 0;
+    gCount_toggled_doors = 0;
+    gCrush_data_entry_counter = 0;
+    gCount_net_crush_detach_list = 0;
+    gCount_net_crush_semi_detach_bit_list = 0;
+    gCount_net_crush_full_detach_bit_list = 0;
+    gCount_net_crush_reattach_bit_list = 0;
+    gCount_car_damage_crush_list = 0;
+}
 
 // ReadCrushData
 
@@ -1251,7 +1314,19 @@ intptr_t C2_HOOK_CDECL MakeCarModelsMaterialsSingleSided(br_actor* pActor, void*
 
 // DoShapeSwapping
 
-// BendPoint
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_HW 0x00434f60
+// STUB: CARMA2_SW 0x00434f90
+void C2_HOOK_FASTCALL BendPoint(br_vector3* pPoint, const tBend_point_context* pContext) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // EdgeCrossesZPlane
 
@@ -1497,7 +1572,16 @@ void C2_HOOK_FASTCALL TotallyRepairCar(void) {
 
 // UnBendActor
 
-// UnBendCollisionShape
+// FUNCTION: CARMA2_HW 0x0043aa20
+// FUNCTION: CARMA2_SW 0x0043aa70
+void C2_HOOK_FASTCALL UnBendCollisionShape(tCar_crush_shape_info* pShape, const tBend_point_context* pContext) {
+    int i;
+
+    for (i = 0; i < pShape->count_points; i++) {
+        BrVector3Copy(&pShape->field_0x18[i].field_0x18, &pShape->field_0x18[i].field_0x2c);
+        BendPoint(&pShape->field_0x18[i].field_0x18, pContext);
+    }
+}
 
 // UnBendCollisionShapes
 

@@ -51,7 +51,7 @@ extern void C2_HOOK_FASTCALL DoNextJoinPoll(void);
 
 extern void C2_HOOK_FASTCALL NetStartProducingJoinList(tAddToJoinListProc* pAdd_proc);
 
-// NetEndJoinList
+extern void C2_HOOK_FASTCALL NetEndJoinList(void);
 
 extern void C2_HOOK_FASTCALL NetDisposePIDGameInfo(tNet_game_details* pDetails);
 
@@ -127,7 +127,7 @@ extern void C2_HOOK_FASTCALL DisposeExcessMemory(void);
 
 extern int C2_HOOK_FASTCALL NetDisposeMessage(tNet_game_details* pDetails, tNet_message* pMessage);
 
-// NetReallyDisposeMessage
+extern void C2_HOOK_FASTCALL NetReallyDisposeMessage(tNet_message* pMessage);
 
 // NetGetNextMessage
 

@@ -27,17 +27,26 @@ extern tPhysics_object* gSplit_car_collision_infos;
 extern tDriver gSplit_car_driver;
 extern tPhysics_shape* gGonad_sphere_collision_shape;
 extern int gCount_toggled_doors;
+extern tCrush_list_item gCrush_lists[8];
+extern int gCount_queued_drone_crushes;
+extern int gCount_crush_detach_list;
+extern int gINT_0067bdfc;
+extern tU8 gCrush_data_entry_counter;
+extern int gCount_net_crush_detach_list;
+extern int gCount_net_crush_semi_detach_bit_list;
+extern int gCount_net_crush_full_detach_bit_list;
+extern int gCount_car_damage_crush_list;
 extern tToggled_door gToggled_doors[16];
 
 extern void C2_HOOK_FASTCALL ReadCrushSettings(FILE* pF);
 
-// ClearCrushLists
+extern void C2_HOOK_FASTCALL ClearCrushLists(void);
 
 // RemoveCarFromCrushLists
 
 extern void C2_HOOK_FASTCALL InitCrushSystems(void);
 
-// ResetCrushSystems
+extern void C2_HOOK_FASTCALL ResetCrushSystems(void);
 
 // ReadCrushData
 
@@ -337,7 +346,7 @@ extern intptr_t C2_HOOK_CDECL MakeCarModelsMaterialsSingleSided(br_actor* pActor
 
 // DoShapeSwapping
 
-// BendPoint
+extern void C2_HOOK_FASTCALL BendPoint(br_vector3* pPoint, const tBend_point_context* pContext);
 
 // EdgeCrossesZPlane
 
@@ -437,7 +446,7 @@ extern void C2_HOOK_FASTCALL TotallyRepairCar(void);
 
 // UnBendActor
 
-// UnBendCollisionShape
+extern void C2_HOOK_FASTCALL UnBendCollisionShape(tCar_crush_shape_info* pShape, const tBend_point_context* pContext);
 
 // UnBendCollisionShapes
 

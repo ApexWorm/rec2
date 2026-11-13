@@ -68,7 +68,7 @@ extern void C2_HOOK_FASTCALL SetLineModelCols(tU8 pCol);
 
 // AdjustSpark
 
-// AdjustShrapnel
+extern void C2_HOOK_FASTCALL AdjustShrapnel(int pShrapnel_num, br_vector3* pPos, tU16 pAge, br_material* pMaterial);
 
 extern void C2_HOOK_FASTCALL ResetSparks(void);
 
@@ -198,7 +198,7 @@ extern void C2_HOOK_FASTCALL StopCarSmokingInstantly(tCar_spec* pCar_spec);
 
 extern void C2_HOOK_FASTCALL StopObjectSmokingInstantly(tPhysics_object* pObject);
 
-// ConditionalSmokeColumn
+extern void C2_HOOK_FASTCALL ConditionalSmokeColumn(tCar_spec* pCar, int pFire_point, int pColour);
 
 // SingleSplash
 
@@ -220,9 +220,9 @@ extern void C2_HOOK_FASTCALL FreeSmokeShadeTables(void);
 
 // DisposeKevStuffCar
 
-// MakeCarIt
+extern void C2_HOOK_FASTCALL MakeCarIt(tCar_spec* pCar);
 
-// StopCarBeingIt
+extern void C2_HOOK_FASTCALL StopCarBeingIt(tCar_spec* pCar);
 
 // ForEveryModelMaterial
 
@@ -258,6 +258,6 @@ extern void* C2_HOOK_FASTCALL GetSplashIndex(tPhysics_object* pObject);
 
 // AdjustSplashReplay
 
-// InitReplaySplashes
+extern void C2_HOOK_FASTCALL InitReplaySplashes(void);
 
 #endif // GUARD_32_SPARK_H

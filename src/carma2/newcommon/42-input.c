@@ -20,7 +20,11 @@
 
 // GLOBAL: CARMA2_HW 0x0074b5e0
 // GLOBAL: CARMA2_SW 0x00741ca0
-int gKey_mapping[77];
+int gKey_mapping[77] = { 0 };
+
+// GLOBAL: CARMA2_HW 0x0074b714
+// GLOBAL: CARMA2_SW 0x00741dd4
+int gINT_0074b714 = 0;
 
 // GLOBAL: CARMA2_HW 0x0068c1c4
 // GLOBAL: CARMA2_SW 0x0068620c
@@ -31,6 +35,7 @@ int gEdge_trigger_mode;
 int gGo_ahead_keys[3] = { 51, 52, 106 };
 
 // GLOBAL: CARMA2_HW 0x0074b5c0
+// GLOBAL: CARMA2_SW 0x00741c80
 tJoy_array gJoy_array;
 
 // GLOBAL: CARMA2_HW 0x0068bee0
