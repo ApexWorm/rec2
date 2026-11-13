@@ -1534,6 +1534,7 @@ void C2_HOOK_FASTCALL DisposeCharacterInstance(tPed_character_instance* pCharact
 #endif
 
 // STUB: CARMA2_HW 0x00406ab0
+// STUB: CARMA2_SW 0x00406ab0
 tPed_personality* C2_HOOK_FASTCALL ReadPersonality(const char* pName) {
     NOT_IMPLEMENTED();
 }
