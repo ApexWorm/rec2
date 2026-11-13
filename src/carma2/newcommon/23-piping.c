@@ -46,6 +46,17 @@ tU8* gLocal_buffer;
 // GLOBAL: CARMA2_SW 0x00671034
 tU8* gPipe_buffer_working_end;
 
+// GLOBAL: CARMA2_HW 0x006768c8
+// GLOBAL: CARMA2_SW 0x00671038
+int gINT_006768c8 = 0;
+
+// GLOBAL: CARMA2_HW 0x006768cc
+// GLOBAL: CARMA2_SW 0x0067103c
+int gINT_006768cc = 0;
+
+// GLOBAL: CARMA2_HW 0x006768d0
+tPipe_chunk_type gReentrancy_array[5] = { 0 };
+
 // GLOBAL: CARMA2_HW 0x006768e4
 // GLOBAL: CARMA2_SW 0x00671054
 int gReentrancy_count;
@@ -250,12 +261,28 @@ int C2_HOOK_FASTCALL ARSomeReplayLeft(void) {
 
 // EnablePipedSounds
 
-// StartPipingSession2
+inline void C2_HOOK_FASTCALL StartPipingSession2(tPipe_chunk_type pType, int pMunge_reentrancy) {
 
-// STUB: CARMA2_HW 0x004025e0
-// STUB: CARMA2_SW 0x004025e0
+    if (gPipe_buffer_start != NULL && !gAction_replay_mode && gProgram_state.racing) {
+        if (pMunge_reentrancy) {
+            if (gReentrancy_count != 0) {
+                gReentrancy_array[gReentrancy_count - 1] = ((tPipe_session*)gLocal_buffer)->type;
+                EndPipingSession2(0);
+            }
+            gReentrancy_count++;
+        }
+        ((tPipe_session*)gLocal_buffer)->type = pType;
+        ((tPipe_session*)gLocal_buffer)->count = 0;
+        gMr_chunky = gLocal_buffer + offsetof(tPipe_session, data);
+        gLocal_buffer_size = offsetof(tPipe_session, data);
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x004025e0
+// FUNCTION: CARMA2_SW 0x004025e0
 void C2_HOOK_FASTCALL ARStartPipingSession(tPipe_chunk_type pType) {
-    NOT_IMPLEMENTED();
+
+    StartPipingSession2(pType, 1);
 }
 
 #ifdef REC2_MATCHING
@@ -352,20 +379,66 @@ void C2_HOOK_CDECL ARAddVariedDataToSession(int pType, uintptr_t pOwner, int pCo
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x00402ab0
-// STUB: CARMA2_SW 0x00402ab0
+// FUNCTION: CARMA2_HW 0x00402ab0
+// FUNCTION: CARMA2_SW 0x00402ab0
 void C2_HOOK_FASTCALL ARDoSingleSession(int pType, uintptr_t pOwner, void* pData, tU32 pSize) {
-    NOT_IMPLEMENTED();
+
+    if (gPipe_buffer_start != NULL && !gAction_replay_mode && gProgram_state.racing) {
+        ARStartPipingSession(pType);
+        ARAddDataToSession(pType, pOwner, pData, pSize);
+        AREndPipingSession();
+    }
 }
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(on)
 #endif
 
-// STUB: CARMA2_HW 0x00402bd0
-// STUB: CARMA2_SW 0x00402bd0
+// FUNCTION: CARMA2_HW 0x00402bd0
+// FUNCTION: CARMA2_SW 0x00402bd0
 void C2_HOOK_CDECL ARDoSingleVariedSession(int pType, uintptr_t pOwner, int pCount, ...) {
-    NOT_IMPLEMENTED();
+    va_list ap;
+    int i;
+    int size;
+    int offset;
+    void* data;
+    float value;
+    tU8 buffer[5000];
+
+    ARStartPipingSession(pType);
+    if (gPipe_buffer_start != NULL && !gAction_replay_mode && gProgram_state.racing) {
+        va_start(ap, pCount);
+        for (i = 0; i < pCount; i++) {
+            size = va_arg(ap, int);
+            offset = va_arg(ap, int);
+            if (size < 0) {
+                value = va_arg(ap, tFloat_u32_union).f;
+                *(float*)&buffer[offset] = value;
+            } else {
+                data = va_arg(ap, void*);
+                switch (size) {
+                case 1:
+                    *(tU8*)&buffer[offsetof(tPipe_chunk, data) + offset] = (tU8)(uintptr_t)data;
+                    break;
+                case 2:
+                    *(tU16*)&buffer[offsetof(tPipe_chunk, data) + offset] = (tU16)(uintptr_t)data;
+                    break;
+                case 4:
+                    *(tU32*)&buffer[offsetof(tPipe_chunk, data) + offset] = (tU32)(uintptr_t)data;
+                    break;
+                default:
+                    if (data != NULL) {
+                        memcpy(&buffer[offsetof(tPipe_chunk, data) + offset], data, size);
+                    }
+                    break;
+                }
+            }
+        }
+        va_end(ap);
+        ((tPipe_chunk*)buffer)->subject_index = pOwner;
+        ARAddDataToSession(pType, pOwner, &buffer[offsetof(tPipe_chunk, data)], LengthOfChunk((tPipe_chunk*)buffer, pType) - offsetof(tPipe_chunk, data));
+    }
+    AREndPipingSession();
 }
 
 // ARResetPipePlayToEnd

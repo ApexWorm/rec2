@@ -72,7 +72,7 @@ extern int C2_HOOK_FASTCALL ARSomeReplayLeft(void);
 
 // EnablePipedSounds
 
-// StartPipingSession2
+extern void C2_HOOK_FASTCALL StartPipingSession2(tPipe_chunk_type pType, int pMunge_reentrancy);
 
 extern void C2_HOOK_FASTCALL ARStartPipingSession(tPipe_chunk_type pType);
 
