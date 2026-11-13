@@ -71,6 +71,8 @@ extern void C2_HOOK_FASTCALL DisableLights(void);
 
 extern void C2_HOOK_FASTCALL EnableLights(void);
 
+extern void C2_HOOK_FASTCALL DRPixelmap16Copy(br_pixelmap* pDest, br_pixelmap* pSource, br_uint_16 pDest_x, br_uint_16 pDest_y, br_uint_16 pWidth, br_uint_16 pHeight);
+
 extern void C2_HOOK_FASTCALL DRPixelmapBlendyCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_int_16 pDest_y, br_pixelmap* pSource);
 
 #endif // GUARD_18B_GRAPHICS2_H

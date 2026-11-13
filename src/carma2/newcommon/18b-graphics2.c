@@ -7,7 +7,10 @@
 #include "41-utility.h"
 #include "63-loading3.h"
 #include "globvars.h"
+#include "globvrpb.h"
 #include "platform.h"
+
+#include <string.h>
 
 // FUNCTION: CARMA2_HW 0x0047b450
 void C2_HOOK_FASTCALL DRDrawLine(br_pixelmap* pDestn, int pX1, int pY1, int pX2, int pY2, int pColour) {
@@ -501,6 +504,25 @@ void C2_HOOK_FASTCALL EnableLights(void) {
 
     for (i = 0; i < gNumber_of_lights; i++) {
         BrLightEnable(gLight_array[i]);
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x0047d700
+void C2_HOOK_FASTCALL DRPixelmap16Copy(br_pixelmap* pDest, br_pixelmap* pSource, br_uint_16 pDest_x, br_uint_16 pDest_y, br_uint_16 pWidth, br_uint_16 pHeight) {
+    int x;
+    int y;
+    tU16* source_ptr;
+    tU16* dest_ptr;
+
+    C2_HOOK_BUG_ON(sizeof(tU16) != 2);
+
+    for (y = 0; y < pHeight; y++) {
+        source_ptr = (tU16*)((tU8*)pSource->pixels + y * pSource->row_bytes);
+        dest_ptr = (tU16*)((tU8*)pDest->pixels + (pDest_y + y) * pDest->row_bytes);
+        for (x = 0; x < pWidth; x++) {
+            gScreen_row_buffer[x] = source_ptr[x];
+        }
+        memcpy(dest_ptr, gScreen_row_buffer, pWidth * sizeof(gScreen_row_buffer[0]));
     }
 }
 
