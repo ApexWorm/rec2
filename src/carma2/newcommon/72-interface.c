@@ -53,7 +53,13 @@ int gNet_storage_space_initialized;
 
 // GLOBAL: CARMA2_HW 0x00763960
 // GLOBAL: CARMA2_SW 0x00759ec0
-tNet_game_options gNet_settings[9];
+tNet_game_options gNet_settings[9] = { 0 };
+
+#ifdef REC2_MATCHING
+// GLOBAL: CARMA2_HW 0x00763b10
+// GLOBAL: CARMA2_SW 0x0075a070
+int gINT_00763b10 = 0;
+#endif
 
 // GLOBAL: CARMA2_HW 0x00688aa8
 // GLOBAL: CARMA2_SW 0x00683008
@@ -675,7 +681,12 @@ br_pixelmap* C2_HOOK_FASTCALL GetThisFuckingPixelmapPleaseMrTwatter(const char* 
     size_t i;
 
     result = NULL;
+#ifdef REC2_HW
+    PathCat(the_path, pFolder, "PIXIES.P16");
+#endif
+#ifdef REC2_SW
     PathCat(the_path, pFolder, "PIXIES.P08");
+#endif
     f = PFfopen(the_path, "rb");
     if (f != NULL) {
         PFfclose(f);
@@ -2143,7 +2154,14 @@ int C2_HOOK_FASTCALL KeepInRange(int pIndex, int pRange) {
     return pIndex;
 }
 
-// WrecksOutFunc
+// FUNCTION: CARMA2_HW 0x0046ead0
+// FUNCTION: CARMA2_SW 0x0046e190
+int C2_HOOK_FASTCALL WrecksOutFunc(tFrontend_spec* pFrontend) {
+
+    DisposeWrecksGallery();
+    DRS3StartSound(gEffects_outlet, eSoundId_Swingout);
+    return 1;
+}
 
 // WrecksUpdateFunc
 

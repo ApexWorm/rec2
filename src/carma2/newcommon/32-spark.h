@@ -219,7 +219,7 @@ extern void C2_HOOK_FASTCALL FreeSmokeShadeTables(void);
 
 extern void C2_HOOK_FASTCALL MakeCarIt(tCar_spec* pCar);
 
-// StopCarBeingIt
+extern void C2_HOOK_FASTCALL StopCarBeingIt(tCar_spec* pCar);
 
 // ForEveryModelMaterial
 
@@ -255,6 +255,6 @@ extern void* C2_HOOK_FASTCALL GetSplashIndex(tPhysics_object* pObject);
 
 // AdjustSplashReplay
 
-// InitReplaySplashes
+extern void C2_HOOK_FASTCALL InitReplaySplashes(void);
 
 #endif // GUARD_32_SPARK_H
