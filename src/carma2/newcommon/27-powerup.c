@@ -1477,7 +1477,7 @@ int C2_HOOK_FASTCALL GrowATail(tPowerup* pPowerup, tCar_spec* pCar) {
     }
     GotPowerupEarwig(pCar, 95, 0, 1);
     gMutant_tail_state = 2;
-    DRS3StartSound2(gCar_outlet, 3901, 1, 0xff, 0xff, -1, -1);
+    DRS3StartSound2(gCar_outlet, eSoundId_GrowATail, 1, 0xff, 0xff, -1, -1);
     return pPowerup - gPowerup_array;
 }
 
