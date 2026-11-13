@@ -96,7 +96,7 @@ extern void C2_HOOK_FASTCALL DeclareWinner(int pWinner_index);
 
 extern void C2_HOOK_FASTCALL CheckForVampireWinner(void);
 
-// PlayerIsInfected
+extern void C2_HOOK_FASTCALL PlayerIsInfected(tNet_game_player_info* pPlayer);
 
 // FarEnoughAway
 
@@ -124,7 +124,7 @@ extern void C2_HOOK_FASTCALL CheckForNeedyEnvironmentRecipients(void);
 
 // ReceivedGameplay
 
-// SendGameplay
+extern void C2_HOOK_FASTCALL SendGameplay(tPlayer_ID pPlayer, tNet_gameplay_mess pMess, int pParam_1, int pParam_2, int pParam_3, int pParam_4);
 
 extern void C2_HOOK_FASTCALL SendGameplayToAllPlayers(tNet_gameplay_mess pMess, int pParam_1, int pParam_2, int pParam_3, int pParam_4);
 

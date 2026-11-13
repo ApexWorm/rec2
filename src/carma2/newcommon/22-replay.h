@@ -12,6 +12,13 @@
 #include "c2_hooks.h"
 #include "rec2_types.h"
 
+extern tU32 gDAT_006a2360;
+extern tU32 gDAT_006a2364;
+extern int gKey_down;
+extern float gPending_replay_rate;
+extern tU32 gUINT_006a237c;
+extern tU32 gCam_change_time;
+
 extern int gPaused;
 
 extern const int gPow2_array[32];
@@ -26,13 +33,13 @@ extern int gCar_car_collisions;
 extern const float gCar_simplification_factor[2][5];
 extern tPolyhedron_edge_indexes gDefault_box_collision_wireframe_edges[12];
 
-// ActualActionReplayHeadups
+extern void C2_HOOK_FASTCALL ActualActionReplayHeadups(int pSpecial_zappy_bastard);
 
 extern void C2_HOOK_FASTCALL DoActionReplayPostSwap(void);
 
 // DoZappyActionReplayHeadups
 
-// DoActionReplayHeadups
+extern void C2_HOOK_FASTCALL DoActionReplayHeadups(void);
 
 // PreProcess
 
@@ -54,7 +61,7 @@ extern void C2_HOOK_FASTCALL DoActionReplayPostSwap(void);
 
 // SynchronizeActionReplay
 
-// TurnOnActionReplay
+extern void C2_HOOK_FASTCALL TurnOnActionReplay(void);
 
 // TurnOffActionReplay
 
