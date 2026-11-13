@@ -13,6 +13,20 @@
 #include "brender/brender.h"
 #include "rec2_types.h"
 
+extern void C2_HOOK_FASTCALL DRDrawLine(br_pixelmap* pDestn, int pX1, int pY1, int pX2, int pY2, int pColour);
+
+extern void C2_HOOK_FASTCALL ClearEntireScreen(void);
+
+// DistanceFromPlane
+
+extern void C2_HOOK_FASTCALL KillSplashScreen(void);
+
+extern void C2_HOOK_FASTCALL SplashScreenWith(const char* pPixmap_name);
+
+extern void C2_HOOK_FASTCALL DRPixelmapRectangleMaskedCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_int_16 pDest_y, const br_pixelmap* pSource, br_int_16 pSource_x, br_int_16 pSource_y, br_int_16 pWidth, br_int_16 pHeight);
+
+extern void C2_HOOK_FASTCALL DRMaskedStamp(br_int_16 pDest_x, br_int_16 pDest_y, br_pixelmap* pSource);
+
 extern int C2_HOOK_FASTCALL SwitchToHiresMode(void);
 
 extern int C2_HOOK_FASTCALL SwitchToLoresMode(void);
@@ -39,11 +53,15 @@ extern void C2_HOOK_FASTCALL DimRectangleClipped(br_pixelmap* pPixelmap, int pLe
 
 // DRPixelmapRotatedAndFeatheredCopy
 
-extern void C2_HOOK_FASTCALL DRPixelmapBlendedLine(br_pixelmap* pMap, int pX1, int pY1, int pX2, int pY2, br_uint_32 pColour, br_pixelmap* pPalette);
+// DRPixelmapBlendedLine
+
+extern void C2_HOOK_FASTCALL DR8BitPixelmapBlendedLine(br_pixelmap* pDest, int pX1, int pY1, int pX2, int pY2, int pColour, br_pixelmap *pPalette);
+
+extern void C2_HOOK_FASTCALL DRPixelmapBlendedLine(br_pixelmap* pDest, int pX1, int pY1, int pX2, int pY2, br_uint_32 pColour, br_pixelmap* pPalette);
 
 // DR8BitFancyDrawLine
 
-extern void C2_HOOK_FASTCALL FancyDrawLine(br_pixelmap* pMap, int pX1, int pY1, int pX2, int pY2, br_uint_32 pColour, tU32 pTime_period);
+extern void C2_HOOK_FASTCALL FancyDrawLine(br_pixelmap* pDest, int pX1, int pY1, int pX2, int pY2, br_uint_32 pColour, tU32 pTime_period);
 
 // DRPixelmapCopyMapBlack8Bit
 
@@ -53,6 +71,6 @@ extern void C2_HOOK_FASTCALL DisableLights(void);
 
 extern void C2_HOOK_FASTCALL EnableLights(void);
 
-extern void C2_HOOK_FASTCALL DRPixelmapBlend75Copy(br_pixelmap* pDest, br_int_16 pDest_x, br_int_16 pDest_y, br_pixelmap* pSource);
+extern void C2_HOOK_FASTCALL DRPixelmapBlendyCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_int_16 pDest_y, br_pixelmap* pSource);
 
 #endif // GUARD_18B_GRAPHICS2_H

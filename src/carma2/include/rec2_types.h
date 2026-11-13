@@ -280,7 +280,7 @@ typedef struct tPed_character_instance {
     tPed_personality* personality;
     tS8 field_0x4;
     undefined field_0x5;
-    undefined field_0x6;
+    tS8 field_0x6;
     tS8 field_0x7;
     tS8 field_0x8;
     tU8 field_0x9;
@@ -750,6 +750,7 @@ typedef struct tPipe_chunk {
         tPipe_chunk_frame_boundary frame_boundary;
         tPipe_chunk_non_car non_car;
         tPipe_ped_physics_data ped_physics;
+        tPipe_single_ped_pos ped_pos;
         tPipe_single_ped_dismember ped_dismember;
         tPipe_phil_object phil_object;
         tPipe_funk_enable funk_enable;
@@ -2847,8 +2848,9 @@ typedef struct tCar_spec {
     br_vector3 pre_car_col_velocity;
     br_vector3 pre_car_col_velocity_car_space;
     br_vector3 vel;
-    undefined field_0x13cc[8];
-    float field_0x13e0;
+    float last_col_prop_x;
+    float last_col_prop_y;
+    float last_col_prop_z;
     int time_last_hit;
     int time_last_victim;
     tCar_spec* last_hit_by;
@@ -5377,6 +5379,11 @@ typedef struct {
 
 typedef struct {
     tNet_message_chunk_header header;
+    char text[0x80];
+} tNet_message_headup;
+
+typedef struct {
+    tNet_message_chunk_header header;
     tU8 data[];
 } tNet_message_chunk_raw;
 
@@ -5469,6 +5476,7 @@ typedef struct {
 typedef union {
     tNet_message_chunk_raw raw;
     tNet_message_chunk_start_race start_race; /* type = 0xc */
+    tNet_message_headup headup; /* type = 0xd */
     tNet_message_chunk_scores scores; /* type = 0x18 */
     tNet_message_chunk_gameplay gameplay; /* type = 0x1b */
     tNet_message_chunk_oil_spill oil_spill; /* type = 0x1f*/
@@ -5597,6 +5605,9 @@ enum {
     eMiscString_engine_power_increased = 176,
     eMiscString_increased_offsensive = 177,
     eMiscString_cannot_afford_it_credits_S = 179,
+    eMiscString_is_undead = 185,
+    eMiscString_is_the_fox = 187,
+    eMiscString_you_re_the_fox = 188,
     eMiscString_driven_to_destruction_description = 194,
     eMiscString_car_crusher_description = 195,
     eMiscString_smashy_things_description = 196,
