@@ -11,10 +11,11 @@
 #include "05-drmem.h"
 #include "08-loading1.h"
 #include "16-graphics1.h"
-#include "18-graphics2.h"
+#include "18b-graphics2.h"
 #include "41-utility.h"
 #include "52-errors.h"
 #include "62-graphics3.h"
+#include "63-loading3.h"
 #include "70-packfile.h"
 #include "globvars.h"
 #include "platform.h"
@@ -23,13 +24,13 @@
 
 #include <string.h>
 
-// GLOBAL: CARMA2_HW 0x0076c960
-// GLOBAL: CARMA2_SW 0x00762ec0
-br_pixelmap* gTexture_maps[1024];
-
 // GLOBAL: CARMA2_HW 0x007663e0
 // GLOBAL: CARMA2_SW 0x0075c940
-tDR_font gFonts[24];
+tDR_font gFonts[28] = { 0 };
+
+// GLOBAL: CARMA2_HW 0x0076c960
+// GLOBAL: CARMA2_SW 0x00762ec0
+br_pixelmap* gTexture_maps[1024] = { 0 };
 
 // GLOBAL: CARMA2_HW 0x0059ad30
 // GLOBAL: CARMA2_SW 0x00595c78
@@ -1335,6 +1336,18 @@ br_font* C2_HOOK_FASTCALL LoadBRFont(const char* pName) {
     PFfread(the_font->glyphs, data_size, 1u, f);
     PFfclose(f);
     return the_font;
+}
+
+// FUNCTION: CARMA2_HW 0x004661f0
+// FUNCTION: CARMA2_SW 0x00465f80
+br_pixelmap* C2_HOOK_FASTCALL LoadChromeFont(void) {
+    br_pixelmap* result;
+
+    result = LoadPixelmap("CHRMFONT.PIX");
+    if (result == NULL) {
+        FatalError(kFatalError_CannotLoadChromeFontFile);
+    }
+    return result;
 }
 
 // FUNCTION: CARMA2_HW 0x00466210
