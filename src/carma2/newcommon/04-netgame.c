@@ -21,11 +21,13 @@
 #include "60-phil.h"
 #include "63-loading3.h"
 #include "72-interface.h"
+#include "c2_stdio.h"
 #include "globvars.h"
 #include "globvrpb.h"
 #include "platform.h"
 #include "rec2_macros.h"
 
+#include <stdio.h>
 #include <stdlib.h>
 
 // GLOBAL: CARMA2_HW 0x0075b8f8
@@ -395,7 +397,37 @@ void C2_HOOK_FASTCALL CheckForVampireWinner(void) {
     }
 }
 
-// PlayerIsInfected
+// FUNCTION: CARMA2_HW 0x0049b540
+// FUNCTION: CARMA2_SW 0x004976c0
+void C2_HOOK_FASTCALL PlayerIsInfected(tNet_game_player_info* pPlayer) {
+    int i;
+    char s[256];
+
+    C2_HOOK_BUG_ON(REC2_ASIZE(pPlayer->car->power_up_levels) != 3);
+
+    if (!pPlayer->field_0x80) {
+        MakeCarIt(pPlayer->car);
+        pPlayer->car->invulnerable_no_wastage = 1;
+        pPlayer->car->invulnerable_no_crushage = 1;
+        pPlayer->car->invulnerable_no_damage = 1;
+        pPlayer->field_0x80 = 1;
+        for (i = 0; i < (int)REC2_ASIZE(pPlayer->car->power_up_levels); i++) {
+            pPlayer->car->power_up_levels[i] = pPlayer->car->power_up_slots[i];
+        }
+        if (gNet_mode == eNet_mode_host) {
+            sprintf(s, "%s", GetMiscString(186));
+            NetSendHeadupToPlayer(s, pPlayer->ID);
+            for (i = 0; i < gNumber_of_net_players; i++) {
+                if (&gNet_players[i] != pPlayer) {
+                    sprintf(s, "%s %s", pPlayer->player_name, GetMiscString(eMiscString_is_undead));
+                    NetSendHeadupToPlayer(s, gNet_players[i].ID);
+                }
+            }
+        }
+        pPlayer->score2 = -(int)(1 + GetTotalTime());
+        CheckForVampireWinner();
+    }
+}
 
 // FarEnoughAway
 
@@ -414,19 +446,32 @@ void C2_HOOK_FASTCALL CarInContactWithFox(tNet_game_player_info* pPlayer) {
     }
 }
 
-#ifdef REC2_MATCHING
-#pragma auto_inline(off)
-#endif
-
-// STUB: CARMA2_HW 0x0049a9e0
-// STUB: CARMA2_SW 0x00496b60
+// FUNCTION: CARMA2_HW 0x0049a9e0
+// FUNCTION: CARMA2_SW 0x00496b60
 void C2_HOOK_FASTCALL PlayerIsIt(tNet_game_player_info* pPlayer) {
-    NOT_IMPLEMENTED();
-}
+    int i;
+    char s[256];
 
-#ifdef REC2_MATCHING
-#pragma auto_inline(on)
-#endif
+    if (gIt_or_fox == pPlayer - gNet_players) {
+        return;
+    }
+    for (i = 0; i < gNumber_of_net_players; i++) {
+        StopCarBeingIt(gNet_players[i].car);
+    }
+    if (gCurrent_net_game->type == eNet_game_type_foxy) {
+        pPlayer->car->power_up_levels[1] = 0;
+    }
+    MakeCarIt(pPlayer->car);
+    gIt_or_fox = pPlayer - gNet_players;
+    sprintf(s, "%s", GetMiscString(eMiscString_you_re_the_fox));
+    NetSendHeadupToPlayer(s, pPlayer->ID);
+    for (i = 0; i < gNumber_of_net_players; i++) {
+        if (&gNet_players[i] != pPlayer) {
+            sprintf(s, "%s %s", pPlayer->player_name, GetMiscString(eMiscString_is_the_fox));
+            NetSendHeadupToPlayer(s, gNet_players[i].ID);
+        }
+    }
+}
 
 // SelectRandomFox
 
@@ -534,7 +579,19 @@ void C2_HOOK_FASTCALL CheckForNeedyEnvironmentRecipients(void) {
 
 // ReceivedGameplay
 
-// SendGameplay
+// FUNCTION: CARMA2_HW 0x0049bc20
+// FUNCTION: CARMA2_SW 0x00497da0
+void C2_HOOK_FASTCALL SendGameplay(tPlayer_ID pPlayer, tNet_gameplay_mess pMess, int pParam_1, int pParam_2, int pParam_3, int pParam_4) {
+    tNet_message* the_message;
+
+    the_message = NetBuildGuaranteedMessage(eNet_message_chunk_type_gameplay, 0);
+    the_message->contents.gameplay.mess = pMess;
+    the_message->contents.gameplay.param_1 = pParam_1;
+    the_message->contents.gameplay.param_2 = pParam_2;
+    the_message->contents.gameplay.param_3 = pParam_3;
+    the_message->contents.gameplay.param_4 = pParam_4;
+    NetGuaranteedSendMessageToPlayer(gCurrent_net_game, the_message, pPlayer, NULL);
+}
 
 // FUNCTION: CARMA2_HW 0x0049bc70
 // FUNCTION: CARMA2_SW 0x00497df0

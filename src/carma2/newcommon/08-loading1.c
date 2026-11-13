@@ -176,6 +176,42 @@ void C2_HOOK_FASTCALL WriteU8L(FILE* pF, tU8 pNumber) {
     PFfwrite(&raw_byte, sizeof(raw_byte), 1, pF);
 }
 
+// FUNCTION: CARMA2_HW 0x0048f980
+// FUNCTION: CARMA2_SW 0x0048cbf0
+void C2_HOOK_FASTCALL WriteS32L(FILE* pF, tS32 pNumber) {
+    tS32 raw_long;
+
+    raw_long = pNumber;
+    PFfwrite(&raw_long, sizeof(raw_long), 1, pF);
+    // FIXME: byteswap for BE
+}
+
+// FUNCTION: CARMA2_HW 0x0048f9a0
+// FUNCTION: CARMA2_SW 0x0048cc10
+void C2_HOOK_FASTCALL WriteS16L(FILE* pF, tS16 pNumber) {
+    tS16 raw_short;
+
+    raw_short = pNumber;
+    PFfwrite(&raw_short, sizeof(raw_short), 1, pF);
+    // FIXME: byteswap for BE
+}
+
+// FUNCTION: CARMA2_HW 0x0048f9d0
+// FUNCTION: CARMA2_SW 0x0048cc40
+void C2_HOOK_FASTCALL WriteS8L(FILE* pF, tS8 pNumber) {
+    tS8 raw_byte;
+
+    raw_byte = pNumber;
+    PFfwrite(&raw_byte, sizeof(raw_byte), 1, pF);
+}
+
+// FUNCTION: CARMA2_HW 0x0048f9f0
+// FUNCTION: CARMA2_SW 0x0048cc60
+void C2_HOOK_FASTCALL SkipBytes(FILE* pF, int pBytes_to_skip) {
+
+    PFfseek(pF, pBytes_to_skip, SEEK_CUR);
+}
+
 // FUNCTION: CARMA2_HW 0x0048fa00
 // FUNCTION: CARMA2_SW 0x0048cc70
 tU32 C2_HOOK_FASTCALL MemReadU32(char** pPtr) {
@@ -436,6 +472,35 @@ void C2_HOOK_FASTCALL GetFourScalars(FILE* pF, br_scalar* pS1, br_scalar* pS2, b
     *pS2 = f2;
     *pS3 = f3;
     *pS4 = f4;
+}
+
+// FUNCTION: CARMA2_HW 0x00490350
+// FUNCTION: CARMA2_SW 0x0048d5c0
+void C2_HOOK_FASTCALL GetFiveScalars(FILE* pF, br_scalar* pS1, br_scalar* pS2, br_scalar* pS3, br_scalar* pS4, br_scalar* pS5) {
+    char s[256];
+    char* str;
+    float f1;
+    float f2;
+    float f3;
+    float f4;
+    float f5;
+
+    GetALineAndDontArgue(pF, s);
+    str = strtok(s, "\t ,/");
+    sscanf(str, "%f", &f1);
+    str = strtok(NULL, "\t ,/");
+    sscanf(str, "%f", &f2);
+    str = strtok(NULL, "\t ,/");
+    sscanf(str, "%f", &f3);
+    str = strtok(NULL, "\t ,/");
+    sscanf(str, "%f", &f4);
+    str = strtok(NULL, "\t ,/");
+    sscanf(str, "%f", &f5);
+    *pS1 = f1;
+    *pS2 = f2;
+    *pS3 = f3;
+    *pS4 = f4;
+    *pS5 = f5;
 }
 
 // FUNCTION: CARMA2_HW 0x00490460

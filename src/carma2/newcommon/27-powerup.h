@@ -37,6 +37,8 @@ extern int gCount_mutant_tail_parts;
 extern tPhysics_joint* gMutant_tail_first_joint;
 extern int gMutant_tail_state;
 extern tPhysics_object* gMutant_tail_object;
+extern tRespawn_powerup gRespawn_powerups[100];
+extern tU8* gRace_powerup_respawn_bools;
 extern float gMass_mutant_tail_link;
 extern float gMass_mutant_tail_ball;
 extern float gMass_mine;
@@ -44,6 +46,7 @@ extern int gInstant_handbrake;
 extern int gInventory_cycling;
 extern tU32 gInventory_timeout;
 extern tU32* gReal_render_palette;
+extern int gCollision_info_uid_counter;
 
 extern char* C2_HOOK_FASTCALL GetPowerupMessage(int pPowerup_index);
 
@@ -85,11 +88,11 @@ extern void C2_HOOK_FASTCALL LoadPowerups(void);
 
 // MungeBoxObject
 
-// MungeShereObject
+extern tPhysics_object* C2_HOOK_FASTCALL MungeShereObject(br_model* pModel, float pWeight);
 
 // InitTail
 
-// ThisObjectHitAMineSoSpamItUpUsingThisPowerupsSettings
+extern void C2_HOOK_FASTCALL ThisObjectHitAMineSoSpamItUpUsingThisPowerupsSettings(tPhysics_object* pObject, int pPowerup_index);
 
 // InitMineShit
 
@@ -209,7 +212,7 @@ extern void C2_HOOK_FASTCALL ResetPedExplode(tPowerup* powerup, tCar_spec* car);
 
 extern void C2_HOOK_FASTCALL ResetPedBrittle(tPowerup* pPowerup, tCar_spec* pCar);
 
-// SetEngineFactor
+extern int C2_HOOK_FASTCALL SetEngineFactor(tPowerup* pPowerup, tCar_spec* pCar);
 
 extern int C2_HOOK_FASTCALL SetUnderwater(tPowerup* pPowerup, tCar_spec* pCar);
 
@@ -221,7 +224,7 @@ extern void C2_HOOK_FASTCALL PaletteFuckedUpByDrugs(br_pixelmap* pPalette, int p
 
 extern void C2_HOOK_FASTCALL TheEffectsOfDrugs(tPowerup* pPowerup, tU32 pPeriod);
 
-// SetOpponentsSpeed
+extern int C2_HOOK_FASTCALL SetOpponentsSpeed(tPowerup* pPowerup, tCar_spec* pCar);
 
 extern int C2_HOOK_FASTCALL SetCopsSpeed(tPowerup* pPowerup, tCar_spec* pCar);
 
@@ -413,7 +416,7 @@ extern void C2_HOOK_FASTCALL DoInitialTail(void);
 
 extern void C2_HOOK_FASTCALL UndoInitialTail(void);
 
-// MayQueuePowerupRespawn
+extern void C2_HOOK_FASTCALL MayQueuePowerupRespawn(int pPowerup_index, br_actor* pActor);
 
 extern void C2_HOOK_FASTCALL ARDoPowerupRespawn(br_actor* pActor, int pPowerup_id);
 
