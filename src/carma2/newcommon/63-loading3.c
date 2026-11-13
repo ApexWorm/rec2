@@ -140,8 +140,7 @@ br_pixelmap* C2_HOOK_FASTCALL LoadPixelmapForcedSize(const char* pName, int pWid
     br_pixelmap* src;
     br_pixelmap* dst;
 
-    src = RealLoadPixelmap(pName);
-    EnsurePixelmapAllowed(src, 0);
+    src = LoadPixelmap(pName);
     if (src == NULL) {
         return NULL;
     }
