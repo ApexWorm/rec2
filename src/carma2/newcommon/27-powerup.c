@@ -15,6 +15,7 @@
 
 #include "16-graphics1.h"
 #include "18-graphics2.h"
+#include "23-piping.h"
 #include "32-spark.h"
 #include "39-oil.h"
 #include "41-utility.h"
@@ -1435,7 +1436,50 @@ int C2_HOOK_FASTCALL PedValium(tPowerup* pPowerup, tCar_spec* pCar) {
 
 // PowerupCancel
 
-// GrowATail
+// FUNCTION: CARMA2_HW 0x004e02b0
+// FUNCTION: CARMA2_SW 0x004dc7b0
+int C2_HOOK_FASTCALL GrowATail(tPowerup* pPowerup, tCar_spec* pCar) {
+    tPhysics_object* object;
+    br_matrix34 mat;
+    br_vector3 pos;
+
+    if (gMutant_tail_state == 2) {
+        return -1;
+    }
+    if (gMutant_tail_state == 1) {
+        PHILRemoveObject(gMutant_tail_object);
+        gMutant_tail_object->physics_joint1 = gMutant_tail_first_joint;
+    } else {
+        PipeSingleSpecial(1);
+    }
+    BrVector3SetFloat(&gMutant_tail_object->physics_joint1->field_0x14,
+        0.0f,
+        (pCar->collision_info->bb1.max.v[1] - pCar->collision_info->bb1.min.v[1]) * 0.5f,
+        (br_scalar)(pCar->collision_info->bb1.max.v[2] * 0.95));
+    PhysicsAddObject(pCar->collision_info, gMutant_tail_object);
+    for (object = gMutant_tail_object; object != NULL; object = object->child) {
+        if (object->actor->parent == NULL) {
+            BrActorAdd(gNon_track_actor, object->actor);
+        }
+        object->owner = pCar;
+        BrMatrix34Translate(&object->actor->t.t.mat,
+            -object->physics_joint1->field_0x08.v[0],
+            -object->physics_joint1->field_0x08.v[1],
+            -object->physics_joint1->field_0x08.v[2]);
+        BrMatrix34Copy(&mat, &pCar->collision_info->actor->t.t.mat);
+        BrMatrix34Post(&object->actor->t.t.mat, &mat);
+        BrMatrix34Rotate(&mat, BR_ANGLE_DEG(350), (br_vector3*)object->actor->t.t.mat.m[0]);
+        BrMatrix34Post(&object->actor->t.t.mat, &mat);
+        BrMatrix34ApplyP(&pos, &object->physics_joint1->field_0x14, &object->parent->actor->t.t.mat);
+        BrMatrix34PostTranslate(&object->actor->t.t.mat, pos.v[0], pos.v[1], pos.v[2]);
+        BrMatrix34Copy(&object->transform_matrix, &object->actor->t.t.mat);
+        object->field_0xed = 1;
+    }
+    GotPowerupEarwig(pCar, 95, 0, 1);
+    gMutant_tail_state = 2;
+    DRS3StartSound2(gCar_outlet, eSoundId_GrowATail, 1, 0xff, 0xff, -1, -1);
+    return pPowerup - gPowerup_array;
+}
 
 // CutOffTail
 

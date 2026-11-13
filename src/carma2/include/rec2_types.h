@@ -5977,6 +5977,7 @@ enum {
     eSoundId_CantAffordPart = 3100,
     eSoundId_NapalmHitCrackls = 3702,
     eSoundId_PedValium = 3801,
+    eSoundId_GrowATail = 3901,
     eSoundId_SmashRepair = 4550,
     eSoundId_Smash1 = 5000,
     eSoundId_Smash2 = 5001,
