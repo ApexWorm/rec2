@@ -18,7 +18,7 @@ extern tU32 gPHIL_last_physics_tick;
 
 // ScalarToFraction
 
-// FractionToScalar
+extern br_scalar C2_HOOK_FASTCALL FractionToScalar(br_scalar pMin, br_scalar pMax, tU16 pFixed);
 
 extern void C2_HOOK_FASTCALL GetOrientationFromMatrix(tFixed_quat* pOrientation, const br_matrix34* pMatrix);
 
