@@ -1094,7 +1094,7 @@ void C2_HOOK_FASTCALL AddNonCar(tNon_car_spec* pNon_car, tDriver pDriver) {
 
     C2_HOOK_BUG_ON(REC2_ASIZE(gActive_non_car_list) != 99);
 
-    if (gNum_active_non_cars == REC2_ASIZE(gActive_non_car_list)) {
+    if (gNum_active_non_cars != REC2_ASIZE(gActive_non_car_list)) {
         pNon_car->driver = pDriver;
         gActive_non_car_list[gNum_active_non_cars++] = pNon_car;
         PHILAddActiveObjectImmediately(pNon_car->collision_info, NULL, NULL, NULL);
