@@ -48,7 +48,7 @@ tU8* gPipe_buffer_working_end;
 
 // GLOBAL: CARMA2_HW 0x006768c8
 // GLOBAL: CARMA2_SW 0x00671038
-int gINT_006768c8 = 0;
+tU8* gEnd_of_session = NULL;
 
 // GLOBAL: CARMA2_HW 0x006768cc
 // GLOBAL: CARMA2_SW 0x0067103c
@@ -237,7 +237,22 @@ tU32 C2_HOOK_FASTCALL LengthOfSession(tPipe_session* pSession) {
     return running_total;
 }
 
-// ARAdvanceChunkPtr
+// FUNCTION: CARMA2_HW 0x004024e0
+// FUNCTION: CARMA2_SW 0x004024e0
+void C2_HOOK_FASTCALL ARAdvanceChunkPtr(tU8** pChunk, int pType) {
+    tU8* old_chunk;
+
+    old_chunk = *pChunk;
+    if (gDisable_advance) {
+        return;
+    }
+    *pChunk += LengthOfChunk((tPipe_chunk*)*pChunk, pType);
+    if (*pChunk == gEnd_of_session) {
+        *pChunk = old_chunk;
+    } else if ((intptr_t)*pChunk > (intptr_t)gEnd_of_session) {
+        *pChunk = old_chunk;
+    }
+}
 
 // PipingFrameReset
 
