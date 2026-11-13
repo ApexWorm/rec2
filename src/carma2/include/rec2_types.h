@@ -37,6 +37,7 @@ typedef tU8 tNet_message_type;
 // FIXME: incomplete type
 typedef struct tCar_spec tCar_spec;
 typedef struct tCar_crush_spec tCar_crush_spec;
+typedef struct tBend_point_context tBend_point_context;
 typedef struct tPhysics_object tPhysics_object;
 typedef struct tFace_ref tFace_ref;
 typedef struct tNon_car_spec tNon_car_spec;
