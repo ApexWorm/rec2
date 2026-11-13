@@ -19,6 +19,9 @@ extern tPedForms_vtable* gPed_vtable;
 
 extern int gPed_retain_root_mode;
 
+extern br_material* gPedestrian_character_cloned_materials[50];
+extern int gCount_pedestrian_personality_cloned_materials;
+
 extern tPed_remap* gPed_remaps[10];
 
 extern tPed_personality* gPed_personalities[50];
@@ -587,7 +590,7 @@ extern float C2_HOOK_FASTCALL GetClearanceFromCharacterInstance(tPed_character_i
 
 // ScaleBone
 
-// MungeAllCharacterMaterials
+extern void C2_HOOK_FASTCALL MungeAllCharacterMaterials(material_cbfn* pCallback);
 
 // MungeAllCharacterObjects
 

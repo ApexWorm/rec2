@@ -75,6 +75,14 @@ tPedForms_vtable* gPed_vtable = NULL;
 // GLOBAL: CARMA2_SW 0x006719a4
 int gPed_retain_root_mode = 0;
 
+// GLOBAL: CARMA2_HW 0x00676d68
+// GLOBAL: CARMA2_SW 0x006714d8
+br_material* gPedestrian_character_cloned_materials[50];
+
+// GLOBAL: CARMA2_HW 0x0067772c
+// GLOBAL: CARMA2_SW 0x00671e9c
+int gCount_pedestrian_personality_cloned_materials;
+
 // GLOBAL: CARMA2_HW 0x00677238
 // GLOBAL: CARMA2_SW 0x006719a8
 tPed_remap* gPed_remaps[10] = { 0 };
@@ -2131,7 +2139,24 @@ float C2_HOOK_FASTCALL GetClearanceFromCharacterInstance(tPed_character_instance
 
 // ScaleBone
 
-// MungeAllCharacterMaterials
+// FUNCTION: CARMA2_HW 0x0040c490
+// FUNCTION: CARMA2_SW 0x0040c480
+void C2_HOOK_FASTCALL MungeAllCharacterMaterials(material_cbfn* pCallback) {
+    int i;
+
+    C2_HOOK_BUG_ON(REC2_ASIZE(gPed_personalities) != 50);
+    C2_HOOK_BUG_ON(REC2_ASIZE(gPedestrian_character_cloned_materials) != 50);
+    C2_HOOK_BUG_ON(REC2_ASIZE(gPed_sin_table) != 256);
+
+    for (i = 0; i < (int)REC2_ASIZE(gPed_personalities); i++) {
+        if (gPed_personalities[i] != NULL) {
+            pCallback(gPed_personalities[i]->bones[0].models[0].models[0]->faces[0].material);
+        }
+    }
+    for (i = 0; i < gCount_pedestrian_personality_cloned_materials; i++) {
+        pCallback(gPedestrian_character_cloned_materials[i]);
+    }
+}
 
 // MungeAllCharacterObjects
 
