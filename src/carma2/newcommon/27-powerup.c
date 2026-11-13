@@ -781,30 +781,11 @@ void C2_HOOK_FASTCALL TheEffectsOfDrugs(tPowerup* pPowerup, tU32 pPeriod) {
 // FUNCTION: CARMA2_SW 0x004d91a0
 int C2_HOOK_FASTCALL SetOpponentsSpeed(tPowerup* pPowerup, tCar_spec* pCar) {
     int i;
-    tCar_spec* car;
-    tPowerup* engine_powerup;
-    float front_give;
-    float rear_give;
-    float damping;
-    float front_height;
-    float rear_height;
 
     for (i = 0; i < gCurrent_race.number_of_racers && gCurrent_race.opponent_list[i].index != 29; i++) {
     }
     if (i < gCurrent_race.number_of_racers) {
-        car = gCurrent_race.opponent_list[i].car_spec;
-        engine_powerup = &gPowerup_array[5];
-        if (engine_powerup->initial_value > 0) {
-            PlayExclusiveFFBEffect("Afterburner", 1);
-        }
-        car->field_0x4d4 = engine_powerup->float_params[0];
-        car->grip_multiplier = engine_powerup->float_params[1];
-        front_give = engine_powerup->float_params[2];
-        rear_give = engine_powerup->float_params[3];
-        front_height = engine_powerup->float_params[4];
-        rear_height = engine_powerup->float_params[5];
-        damping = engine_powerup->float_params[6];
-        SetCarSuspGiveAndHeight(car, front_give, rear_give, damping, front_height, rear_height);
+        SetEngineFactor(&gPowerup_array[5], gCurrent_race.opponent_list[i].car_spec);
     }
     gOpponent_speed_factor = pPowerup->float_params[0];
     return pPowerup - gPowerup_array;
