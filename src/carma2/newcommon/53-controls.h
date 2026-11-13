@@ -14,6 +14,7 @@
 
 extern int gAllow_car_flying;
 extern int gEntering_message;
+extern int gInvulnerability;
 extern tU32 gToo_poor_for_recovery_timeout;
 extern tCamera_key_flags gCamera_key_flags;
 extern int gCheckpoint_finder_enabled;
@@ -146,11 +147,11 @@ extern void C2_HOOK_FASTCALL CheckHorn3D(tCar_spec* pCar);
 
 // SortOutRecover
 
-// SetFlipUpCar
+extern void C2_HOOK_FASTCALL SetFlipUpCar(tCar_spec* pCar);
 
 extern void C2_HOOK_FASTCALL AlignChildren(tPhysics_object* pCollision_info);
 
-// FlipUpCar
+extern void C2_HOOK_FASTCALL FlipUpCar(tCar_spec* pCar_spec);
 
 extern void C2_HOOK_FASTCALL GetPowerup(int pNum);
 
@@ -160,9 +161,9 @@ extern void C2_HOOK_FASTCALL CheckForCheatingGits(void);
 
 // CheckKevKeys
 
-// BrakeInstantly
+extern void C2_HOOK_FASTCALL BrakeInstantly(void);
 
-// PollCarControls
+extern void C2_HOOK_FASTCALL PollCarControls(tU32 pTime_difference);
 
 extern void C2_HOOK_FASTCALL PollCameraControls(tU32 pCamera_period);
 
@@ -170,7 +171,7 @@ extern void C2_HOOK_FASTCALL SetFlag2(int pArg);
 
 extern void C2_HOOK_FASTCALL ToggleFlying(void);
 
-// CycleInvulnerability
+extern void C2_HOOK_FASTCALL CycleInvulnerability(void);
 
 extern void C2_HOOK_FASTCALL ToggleTimerFreeze(void);
 
@@ -182,7 +183,7 @@ extern void C2_HOOK_FASTCALL ToggleHeadupMap(int pArg);
 
 // HackyMapFixForMac3dfx
 
-// ToggleMap
+extern void C2_HOOK_FASTCALL ToggleMap(void);
 
 extern int C2_HOOK_FASTCALL GetRecoverVoucherCount(void);
 

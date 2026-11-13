@@ -724,7 +724,7 @@ void C2_HOOK_FASTCALL DoDamageScreen(tU32 pThe_time) {
             shift_x = 56 - gProgram_state.current_car.damage_background_x;
             shift_y = -gProgram_state.current_car.damage_background_y;
         }
-        DRPixelmapBlend75Copy(gBack_screen,
+        DRPixelmapBlendyCopy(gBack_screen,
             (br_int_16)(gProgram_state.current_car.damage_background_x + shift_x),
             (br_int_16)(gProgram_state.current_car.damage_background_y + shift_y),
             gProgram_state.current_car.damage_background);
