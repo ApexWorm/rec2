@@ -31,7 +31,7 @@
 int gFancy_line_center_palette_indexes[5] = { 1, 2, 3, 2, 1 };
 
 // GLOBAL: CARMA2_HW 0x006569b0
-// GLOBAL: CARMA2_SW 0x006517a8
+// GLOBAL: CARMA2_SW 0x006517c0
 int gFancy_line_side_palette_indexes[5] = { 1, 2, 3, 2, 1 };
 
 // GLOBAL: CARMA2_HW 0x0058fdc8

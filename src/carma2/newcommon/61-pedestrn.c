@@ -1350,7 +1350,12 @@ int C2_HOOK_FASTCALL ChangePedScaling(br_vector3* pScale) {
 
 // ChangeHeadScaling
 
-// MakeMaterialBlendy
+// FUNCTION: CARMA2_HW 0x004d6b70
+// FUNCTION: CARMA2_SW 0x004d3170
+void C2_HOOK_FASTCALL MakeMaterialBlendy(br_material* pMaterial) {
+    BlendifyMaterial(pMaterial, 25);
+    BrMaterialUpdate(pMaterial, BR_MATU_ALL);
+}
 
 // FUNCTION: CARMA2_HW 0x004d6be0
 // FUNCTION: CARMA2_SW 0x004d31e0
@@ -1372,13 +1377,6 @@ void C2_HOOK_FASTCALL TurnOffCollisions(tPhysics_object* pObject) {
 void C2_HOOK_FASTCALL TurnOnCollisions(tPhysics_object* pObject) {
 
     pObject->flags &= ~0x4;
-}
-
-// FUNCTION: CARMA2_HW 0x004d6b70
-// FUNCTION: CARMA2_SW 0x004d3170
-void C2_HOOK_FASTCALL BlendifyMaterial25(br_material* pMaterial) {
-    BlendifyMaterial(pMaterial, 25);
-    BrMaterialUpdate(pMaterial, BR_MATU_ALL);
 }
 
 // FUNCTION: CARMA2_HW 0x004d6ba0

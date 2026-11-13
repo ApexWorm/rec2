@@ -366,15 +366,13 @@ extern int C2_HOOK_FASTCALL ChangePedScaling(br_vector3* pScale);
 
 // ChangeHeadScaling
 
-// MakeMaterialBlendy
+extern void C2_HOOK_FASTCALL MakeMaterialBlendy(br_material* pMaterial);
 
 extern void C2_HOOK_FASTCALL UnmakeMaterialBlendy(br_material* pMaterial);
 
 extern void C2_HOOK_FASTCALL TurnOffCollisions(tPhysics_object* pObject);
 
 extern void C2_HOOK_FASTCALL TurnOnCollisions(tPhysics_object* pObject);
-
-extern void C2_HOOK_FASTCALL BlendifyMaterial25(br_material* pMaterial);
 
 extern void C2_HOOK_FASTCALL ModelUpdatePrimitiveMaterials(br_model* pModel);
 
