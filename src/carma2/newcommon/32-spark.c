@@ -740,7 +740,6 @@ void C2_HOOK_FASTCALL SetSmokeOn(int pSmoke_on) {
 // FUNCTION: CARMA2_HW 0x004fc9e0
 // FUNCTION: CARMA2_SW 0x004f7f40
 void C2_HOOK_FASTCALL ReallySetSmokeOn(int pSmoke_on) {
-    int i;
 
     C2_HOOK_BUG_ON(REC2_ASIZE(gSmoke_column) != 10);
     C2_HOOK_BUG_ON(sizeof(tSmoke_column) != 0x7c);
