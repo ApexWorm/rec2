@@ -579,7 +579,19 @@ void C2_HOOK_FASTCALL CheckForNeedyEnvironmentRecipients(void) {
 
 // ReceivedGameplay
 
-// SendGameplay
+// FUNCTION: CARMA2_HW 0x0049bc20
+// FUNCTION: CARMA2_SW 0x00497da0
+void C2_HOOK_FASTCALL SendGameplay(tPlayer_ID pPlayer, tNet_gameplay_mess pMess, int pParam_1, int pParam_2, int pParam_3, int pParam_4) {
+    tNet_message* the_message;
+
+    the_message = NetBuildGuaranteedMessage(eNet_message_chunk_type_gameplay, 0);
+    the_message->contents.gameplay.mess = pMess;
+    the_message->contents.gameplay.param_1 = pParam_1;
+    the_message->contents.gameplay.param_2 = pParam_2;
+    the_message->contents.gameplay.param_3 = pParam_3;
+    the_message->contents.gameplay.param_4 = pParam_4;
+    NetGuaranteedSendMessageToPlayer(gCurrent_net_game, the_message, pPlayer, NULL);
+}
 
 // FUNCTION: CARMA2_HW 0x0049bc70
 // FUNCTION: CARMA2_SW 0x00497df0
