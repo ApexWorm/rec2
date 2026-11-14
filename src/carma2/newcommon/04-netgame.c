@@ -15,6 +15,7 @@
 #include "13-crush1.h"
 #include "15-displays.h"
 #include "18-graphics2.h"
+#include "18b-graphics2.h"
 #include "27-powerup.h"
 #include "30-opponent.h"
 #include "32-spark.h"
@@ -652,15 +653,19 @@ void C2_HOOK_FASTCALL CheckForNeedyEnvironmentRecipients(void) {
 void C2_HOOK_FASTCALL ReceivedGameplay(tNet_message_chunk* pContents, tNet_message* pMessage, tU32 pReceive_time) {
     int must_revert_reentrancy;
 
+    // GLOBAL: CARMA2_HW 0x0068d954
+    // GLOBAL: CARMA2_SW 0x006879ac
+    static int pause_semaphore;
+
     if (pContents->gameplay.mess == eNet_gameplay_host_paused) {
-        if (!DAT_0068d954) {
-            DAT_0068d954 = 1;
-            NetFullScreenMessage(228, 1);
+        if (!pause_semaphore) {
+            pause_semaphore = 1;
+            NetFullScreenMessage(eMiscString_please_wait_host_has_paused, 1);
             must_revert_reentrancy = PermitNetServiceReentrancy();
             do {
                 NetService(0);
                 if (CheckQuit()) {
-                    NetFullScreenMessage(228, 1);
+                    NetFullScreenMessage(eMiscString_please_wait_host_has_paused, 1);
                 }
             } while (gWaiting_for_unpause
                 && gProgram_state.prog_status != eProg_idling
@@ -672,25 +677,25 @@ void C2_HOOK_FASTCALL ReceivedGameplay(tNet_message_chunk* pContents, tNet_messa
             FadePaletteDown();
             ClearEntireScreen();
             FadePaletteUp();
-            DAT_0068d954 = 0;
+            pause_semaphore = 0;
         }
     } else if (pContents->gameplay.mess == eNet_gameplay_host_unpaused) {
         gWaiting_for_unpause = 0;
-    } else if (pContents->gameplay.mess == 3) {
+    } else if (pContents->gameplay.mess == eNet_gameplay_suicide) {
         KnackerThisCar(NetCarFromPlayerID(pMessage->header.field_0x8));
     } else {
         switch (gCurrent_net_game->type) {
         case eNet_game_type_checkpoint:
         case eNet_game_type_4:
         case eNet_game_type_5:
-            switch ((int)pContents->gameplay.mess) {
+            switch (pContents->gameplay.mess) {
             case eNet_gameplay_checkpoint:
                 Checkpoint(pContents->gameplay.param_1, 1);
                 break;
             case eNet_gameplay_wrong_checkpoint:
                 WrongCheckpoint(pContents->gameplay.param_1);
                 break;
-            case 2:
+            case eNet_gameplay_suddenly_death:
                 DoFancyHeadup(26);
                 ChangeAmbientPratcam(36);
                 gRace_finished = 1;

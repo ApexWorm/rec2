@@ -252,6 +252,4 @@ extern void C2_HOOK_FASTCALL StatReceivePacket(void);
 
 extern void C2_HOOK_FASTCALL StatSendPacket(void);
 
-extern int DAT_0068d954;
-
 #endif // GUARD_01_NETWORK_H

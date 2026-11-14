@@ -174,6 +174,8 @@ typedef enum {
 typedef enum {
     eNet_gameplay_checkpoint = 0,
     eNet_gameplay_wrong_checkpoint = 1,
+    eNet_gameplay_suddenly_death = 2,
+    eNet_gameplay_suicide = 3,
     eNet_gameplay_host_paused = 4,
     eNet_gameplay_host_unpaused = 5,
 } tNet_gameplay_mess;
@@ -5629,6 +5631,7 @@ enum {
     eMiscString_race_leader = 218,
     eMiscString_message_sent = 226,
     eMiscString_enter_message = 227,
+    eMiscString_please_wait_host_has_paused = 228,
     eMiscString_too_late_to_cancel = 242,
     eMiscString_could_not_find_carmageddon_cd = 243,
     eMiscString_no_target_to_lock_onto = 250,
