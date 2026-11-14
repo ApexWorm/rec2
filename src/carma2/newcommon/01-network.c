@@ -835,7 +835,11 @@ tNet_message* C2_HOOK_FASTCALL NetGetNextMessage(tNet_game_details* pDetails, vo
 
 // ReceivedLeave
 
-// NetFullScreenMessage
+// STUB: CARMA2_HW 0x004a0080
+// STUB: CARMA2_SW 0x0049c200
+void C2_HOOK_FASTCALL NetFullScreenMessage(int pStr_index, int pLeave_it_up_there) {
+    NOT_IMPLEMENTED();
+}
 
 // HostHasBittenTheDust
 
