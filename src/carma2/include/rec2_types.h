@@ -781,6 +781,7 @@ typedef struct tPipe_chunk {
         tPipe_ped_fp_change_data ped_fp_change;
         tPipe_chunk_repulse_ray repulse_ray;
         tPipe_chunk_oil_spill oil_spill;
+        tPipe_single_graphical_wheel_stuff graphical_wheel_stuff;
         char raw_data[0];
     } data;
 } tPipe_chunk;
@@ -5538,6 +5539,7 @@ enum {
     eMiscString_cp = 21,
     eMiscString_completion_bonus_colon = 22,
     eMiscString_time_bonus_colon = 23,
+    eMiscString_every_pedestrian_killed = 26,
     eMiscString_action_replay_unavailable = 37,
     eMiscString_instant_repair = 41,
     eMiscString_final_lap = 42,
@@ -5977,6 +5979,7 @@ enum {
     eSoundId_CantAffordPart = 3100,
     eSoundId_NapalmHitCrackls = 3702,
     eSoundId_PedValium = 3801,
+    eSoundId_GrowATail = 3901,
     eSoundId_SmashRepair = 4550,
     eSoundId_Smash1 = 5000,
     eSoundId_Smash2 = 5001,
