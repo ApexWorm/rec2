@@ -133,14 +133,25 @@ const char* gNet_avail_names[4] = {
 };
 
 // GLOBAL: CARMA2_HW 0x0074b500
+// GLOBAL: CARMA2_SW 0x00741bc0
 br_material* gSimple_materials[32];
 
 // GLOBAL: CARMA2_HW 0x006572f0
+// GLOBAL: CARMA2_SW 0x00651ca0
 tU32 gSimple_material_colours[12] = {
     /* Material number is in MSB */
-    (0x00 << 24) | 0x5d0303, (0x02 << 24) | 0xa56e04, (0x03 << 24) | 0xa9a905, 0x08006868,
-    (0x0d << 24) | 0x3c3626, (0x0e << 24) | 0x212121, (0x15 << 24) | 0x284c21, 0x1900326a,
-    (0x1a << 24) | 0x93491d, (0x1e << 24) | 0xc0bfc0, (0x23 << 24) | 0x141414, 0x00000000,
+    (0x00 << 24) | 0x5d0303,
+    (0x02 << 24) | 0xa56e04,
+    (0x03 << 24) | 0xa9a905,
+    (0x08 << 24) | 0x006868,
+    (0x0d << 24) | 0x3c3626,
+    (0x0e << 24) | 0x212121,
+    (0x15 << 24) | 0x284c21,
+    (0x19 << 24) | 0x00326a,
+    (0x1a << 24) | 0x93491d,
+    (0x1e << 24) | 0xc0bfc0,
+    (0x23 << 24) | 0x141414,
+    0,
 };
 
 // GLOBAL: CARMA2_HW 0x00657320
@@ -943,7 +954,7 @@ br_material* C2_HOOK_FASTCALL GetSimpleMaterial(char* pName, tRendererShadingTyp
         colour = gSimple_material_colours[i] & 0xffffff;
     } else {
         sscanf(pName, "%d,%d,%d", &r, &g, &b);
-        colour = ((r << 8) | g) << 8 | b;
+        colour = (r << 16) | (g << 8) | (b << 0);
     }
     for (i = 0; gSimple_materials[i] != NULL; i++) {
         if (gSimple_materials[i]->colour == colour) {
@@ -953,8 +964,10 @@ br_material* C2_HOOK_FASTCALL GetSimpleMaterial(char* pName, tRendererShadingTyp
     if (i < (int)REC2_ASIZE(gSimple_materials)) {
         gSimple_materials[i] = BrMaterialAllocate("Simple");
         gSimple_materials[i]->colour = colour;
+#ifdef REC2_HW
         gSimple_materials[i]->index_base = (br_uint_8)FindBestColourMatch(gSimple_materials[i]->colour);
         gSimple_materials[i]->index_range = 0;
+#endif
         GlorifyMaterial(&gSimple_materials[i], 1, pShading_type);
         BrMaterialAdd(gSimple_materials[i]);
     }
