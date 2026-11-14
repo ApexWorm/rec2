@@ -244,10 +244,12 @@ extern tNet_game_player_info* C2_HOOK_FASTCALL NetPlayerFromCar(tCar_spec* pCar)
 
 extern void C2_HOOK_FASTCALL GetCheckSum(tNet_message* pMessage);
 
-// CheckCheckSum
+extern void C2_HOOK_FASTCALL CheckCheckSum(tNet_message* pMessage);
 
-// StatReceivePacket
+extern void C2_HOOK_FASTCALL StatReceivePacket(void);
 
-// StatSendPacket
+extern void C2_HOOK_FASTCALL StatReceivePacket(void);
+
+extern void C2_HOOK_FASTCALL StatSendPacket(void);
 
 #endif // GUARD_01_NETWORK_H

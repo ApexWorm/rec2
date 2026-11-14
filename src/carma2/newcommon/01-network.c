@@ -918,6 +918,8 @@ void C2_HOOK_FASTCALL NetReceiveAndProcessMessages(void) {
                 if (message->header.field_0x14 != 0) {
                     receive_time = GetRaceTime();
                     if (message->header.field_0x4 == 0x763a5059) {
+                        CheckCheckSum(message);
+                        StatReceivePacket();
                         ReceivedMessage(message, sender_address, receive_time);
                     }
                     NetReallyDisposeMessage(message);
@@ -1167,8 +1169,14 @@ void C2_HOOK_FASTCALL GetCheckSum(tNet_message* pMessage) {
     (void)pMessage;
 }
 
-// CheckCheckSum
+// FUNCTION: CARMA2_HW 0x004a6a00
+// FUNCTION: CARMA2_SW 0x004a2b80
+void C2_HOOK_FASTCALL CheckCheckSum(tNet_message* pMessage) {
+    (void)pMessage;
+}
 
-// StatReceivePacket
+void C2_HOOK_FASTCALL StatReceivePacket(void) {
+}
 
-// StatSendPacket
+void C2_HOOK_FASTCALL StatSendPacket(void) {
+}
