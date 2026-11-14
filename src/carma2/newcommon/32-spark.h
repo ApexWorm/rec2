@@ -33,10 +33,13 @@ extern int gCount_smashable_noncars;
 extern tBRender_smoke* gBR_smoke_pointers[35];
 extern int gN_BR_smoke_structs;
 extern int gColumn_flags;
+extern int gShrapnel_flags;
 extern br_model* gShrapnel_model[2];
 extern br_pixelmap* gFlame_map[20];
 extern br_model* gLollipop_model;
+extern tShrapnel gShrapnel[30];
 extern tSmoke_column gSmoke_column[10];
+extern tSpark gSparks[32];
 extern br_matrix4 gCameraToScreen;
 extern br_camera* gSpark_cam;
 extern tCar_spec* gCar_of_material;
@@ -67,7 +70,7 @@ extern void C2_HOOK_FASTCALL SetLineModelCols(tU8 pCol);
 
 // AdjustSpark
 
-// AdjustShrapnel
+extern void C2_HOOK_FASTCALL AdjustShrapnel(int pShrapnel_num, br_vector3* pPos, tU16 pAge, br_material* pMaterial);
 
 extern void C2_HOOK_FASTCALL ResetSparks(void);
 
@@ -87,7 +90,7 @@ extern void C2_HOOK_FASTCALL LoadInShrapnel(void);
 
 // KillShrapnel
 
-// DisposeShrapnel
+extern void C2_HOOK_FASTCALL DisposeShrapnel(void);
 
 // ReplayShrapnel
 
@@ -185,7 +188,11 @@ extern void C2_HOOK_FASTCALL InitFlame(void);
 
 extern void C2_HOOK_FASTCALL SmudgeCar(tCar_spec* pCar, int pFire_point);
 
-void C2_HOOK_FASTCALL SetSmokeOn(int pSmoke_on);
+extern void C2_HOOK_FASTCALL ResetSmokeColumns(void);
+
+extern void C2_HOOK_FASTCALL SetSmokeOn(int pSmoke_on);
+
+extern void C2_HOOK_FASTCALL ReallySetSmokeOn(int pSmoke_on);
 
 extern int C2_HOOK_FASTCALL GetSmokeOn(void);
 
@@ -219,7 +226,7 @@ extern void C2_HOOK_FASTCALL FreeSmokeShadeTables(void);
 
 extern void C2_HOOK_FASTCALL MakeCarIt(tCar_spec* pCar);
 
-// StopCarBeingIt
+extern void C2_HOOK_FASTCALL StopCarBeingIt(tCar_spec* pCar);
 
 // ForEveryModelMaterial
 
@@ -255,6 +262,6 @@ extern void* C2_HOOK_FASTCALL GetSplashIndex(tPhysics_object* pObject);
 
 // AdjustSplashReplay
 
-// InitReplaySplashes
+extern void C2_HOOK_FASTCALL InitReplaySplashes(void);
 
 #endif // GUARD_32_SPARK_H

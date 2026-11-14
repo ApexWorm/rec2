@@ -36,16 +36,16 @@ tU32 last_service;
 
 // GLOBAL: CARMA2_HW 0x006b5f40
 // GLOBAL: CARMA2_SW 0x006acc20
-char* gMisc_strings[300];
+char* gMisc_strings[300] = { 0 };
+
+// GLOBAL: CARMA2_HW 0x006b63f0
+br_pixelmap* gPalette_source = NULL;
 
 // GLOBAL: CARMA2_HW 0x0074ca04
 tMaterial_exception* gMaterial_exceptions;
 
 // GLOBAL: CARMA2_HW 0x006b63f4
 br_pixelmap* g16bit_palette;
-
-// GLOBAL: CARMA2_HW 0x006b63f0
-br_pixelmap* gPalette_source;
 
 // GLOBAL: CARMA2_HW 0x006abef4
 // GLOBAL: CARMA2_SW 0x006a5444
@@ -1928,7 +1928,11 @@ intptr_t C2_HOOK_CDECL DumpVisibleActorsCB(br_actor* pActor, void* pData) {
     return BrActorEnum(pActor, DumpVisibleActorsCB, pData);
 }
 
-// FudgeBRenderIntoTheNinetiesWithSomeProperFuckingColourSupport
+// STUB: CARMA2_HW 0x00518d60
+// STUB: CARMA2_SW 0x00512820
+tU32 C2_HOOK_FASTCALL FudgeBRenderIntoTheNinetiesWithSomeProperFuckingColourSupport(br_pixelmap* pm, tU32 red, tU32 grn, tU32 blu, tU32 alp) {
+    NOT_IMPLEMENTED();
+}
 
 // GetBlenficatiousnessOfMaterialTablishly
 
