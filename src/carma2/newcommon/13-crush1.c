@@ -1314,7 +1314,19 @@ intptr_t C2_HOOK_CDECL MakeCarModelsMaterialsSingleSided(br_actor* pActor, void*
 
 // DoShapeSwapping
 
-// BendPoint
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_HW 0x00434f60
+// STUB: CARMA2_SW 0x00434f90
+void C2_HOOK_FASTCALL BendPoint(br_vector3* pPoint, const tBend_point_context* pContext) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // EdgeCrossesZPlane
 
@@ -1564,7 +1576,16 @@ void C2_HOOK_FASTCALL TotallyRepairCar(void) {
 
 // UnBendActor
 
-// UnBendCollisionShape
+// FUNCTION: CARMA2_HW 0x0043aa20
+// FUNCTION: CARMA2_SW 0x0043aa70
+void C2_HOOK_FASTCALL UnBendCollisionShape(tCar_crush_shape_info* pShape, const tBend_point_context* pContext) {
+    int i;
+
+    for (i = 0; i < pShape->count_points; i++) {
+        BrVector3Copy(&pShape->field_0x18[i].field_0x18, &pShape->field_0x18[i].field_0x2c);
+        BendPoint(&pShape->field_0x18[i].field_0x18, pContext);
+    }
+}
 
 // UnBendCollisionShapes
 

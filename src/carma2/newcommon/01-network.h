@@ -20,6 +20,13 @@ extern int rr_min;
 extern int rr_mid;
 extern int rr_max;
 extern int gInitialised_grid;
+#ifdef REC2_HW
+extern br_actor* gNetscore_box_universe;
+extern br_material* gNetscore_box_materials[4];
+extern br_actor* gNetscore_box_camera;
+extern br_model* gNetScore_box_model;
+extern br_actor* gNetscore_box_actors[12];
+#endif
 
 extern int C2_HOOK_FASTCALL NetInitialise(void);
 
@@ -51,7 +58,7 @@ extern void C2_HOOK_FASTCALL DoNextJoinPoll(void);
 
 extern void C2_HOOK_FASTCALL NetStartProducingJoinList(tAddToJoinListProc* pAdd_proc);
 
-// NetEndJoinList
+extern void C2_HOOK_FASTCALL NetEndJoinList(void);
 
 extern void C2_HOOK_FASTCALL NetDisposePIDGameInfo(tNet_game_details* pDetails);
 

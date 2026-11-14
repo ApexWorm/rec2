@@ -161,9 +161,9 @@ extern void C2_HOOK_FASTCALL CheckForCheatingGits(void);
 
 // CheckKevKeys
 
-// BrakeInstantly
+extern void C2_HOOK_FASTCALL BrakeInstantly(void);
 
-// PollCarControls
+extern void C2_HOOK_FASTCALL PollCarControls(tU32 pTime_difference);
 
 extern void C2_HOOK_FASTCALL PollCameraControls(tU32 pCamera_period);
 
@@ -183,7 +183,7 @@ extern void C2_HOOK_FASTCALL ToggleHeadupMap(int pArg);
 
 // HackyMapFixForMac3dfx
 
-// ToggleMap
+extern void C2_HOOK_FASTCALL ToggleMap(void);
 
 extern int C2_HOOK_FASTCALL GetRecoverVoucherCount(void);
 
