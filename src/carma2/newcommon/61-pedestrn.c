@@ -120,7 +120,35 @@ int gExploding_pedestrians;
 
 // GLOBAL: CARMA2_HW 0x0069b9f0
 // GLOBAL: CARMA2_SW 0x00695a48
-tNapalm_bolt gNapalm_bolts[5];
+tNapalm_bolt gNapalm_bolts[5] = { 0 };
+
+// GLOBAL: CARMA2_HW 0x0069bc0c
+// GLOBAL: CARMA2_SW 0x00695c64
+int gPed_severing_chance = 0;
+
+// GLOBAL: CARMA2_HW 0x0069bc10
+// GLOBAL: CARMA2_SW 0x00695c68
+br_material* gPed_slick_material = NULL;
+
+// GLOBAL: CARMA2_HW 0x0069fd88
+br_material* gBurning_ped_materials[7] = { 0 };
+
+// GLOBAL: CARMA2_HW 0x0069fda4
+int gINT_0069fda4 = 0;
+
+// GLOBAL: CARMA2_HW 0x00694308
+br_model* gBurning_ped_models[7];
+
+// GLOBAL: CARMA2_HW 0x0065e598
+const char* gBurning_ped_map_names[7] = {
+    "Ex00006",
+    "Ex00006",
+    "Ex00006",
+    "Ex00006",
+    "Ex00006",
+    "Ex00006",
+    "Ex00006",
+};
 
 // GLOBAL: CARMA2_HW 0x0069412c
 // GLOBAL: CARMA2_SW 0x0068e184
@@ -449,7 +477,60 @@ br_vector3* C2_HOOK_FASTCALL GetPedPos(tPedestrian* pPed) {
 
 // InitOtherPedStuff
 
-// InitNapalmNolts
+// FUNCTION: CARMA2_HW 0x004cb630
+void C2_HOOK_FASTCALL InitNapalmNolts(void) {
+    int i;
+    int j;
+
+    C2_HOOK_BUG_ON(REC2_ASIZE(gBurning_ped_map_names) != 7);
+    C2_HOOK_BUG_ON(REC2_ASIZE(gBurning_ped_materials) != REC2_ASIZE(gBurning_ped_map_names));
+    C2_HOOK_BUG_ON(REC2_ASIZE(gBurning_ped_models) != REC2_ASIZE(gBurning_ped_map_names));
+    C2_HOOK_BUG_ON(REC2_ASIZE(gNapalm_bolts[0].actors) != REC2_ASIZE(gBurning_ped_map_names));
+    C2_HOOK_BUG_ON(REC2_ASIZE(gNapalm_bolts) != 5);
+    C2_HOOK_BUG_ON(sizeof(tNapalm_bolt) != 0x6c);
+
+    for (i = 0; i < (int)REC2_ASIZE(gBurning_ped_materials); i++) {
+        gBurning_ped_models[i] = BrModelAllocate(NULL, 4, 2);
+        gBurning_ped_models[i]->faces[0].vertices[0] = 0;
+        gBurning_ped_models[i]->faces[0].vertices[1] = 2;
+        gBurning_ped_models[i]->faces[0].vertices[2] = 1;
+        gBurning_ped_models[i]->faces[0].material = NULL;
+        gBurning_ped_models[i]->faces[0].smoothing = 1;
+        gBurning_ped_models[i]->faces[1].vertices[0] = 0;
+        gBurning_ped_models[i]->faces[1].vertices[1] = 3;
+        gBurning_ped_models[i]->faces[1].vertices[2] = 2;
+        gBurning_ped_models[i]->faces[1].material = NULL;
+        gBurning_ped_models[i]->faces[1].smoothing = 1;
+        BrVector3Set(&gBurning_ped_models[i]->vertices[0].p, -.5f, -.5f, 0.f);
+        BrVector2Set(&gBurning_ped_models[i]->vertices[0].map, 0.f, 1.f);
+        BrVector3Set(&gBurning_ped_models[i]->vertices[1].p, -.5f, .5f, 0.f);
+        BrVector2Set(&gBurning_ped_models[i]->vertices[1].map, 0.f, 0.f);
+        BrVector3Set(&gBurning_ped_models[i]->vertices[2].p, .5f, .5f, 0.f);
+        BrVector2Set(&gBurning_ped_models[i]->vertices[2].map, 1.f, 0.f);
+        BrVector3Set(&gBurning_ped_models[i]->vertices[3].p, .5f, -.5f, 0.f);
+        BrVector2Set(&gBurning_ped_models[i]->vertices[3].map, 1.f, 1.f);
+        BrModelAdd(gBurning_ped_models[i]);
+        gBurning_ped_materials[i] = BrMaterialAllocate("BURN!");
+        gBurning_ped_materials[i]->flags &= ~BR_MATF_LIGHT;
+        gBurning_ped_materials[i]->flags |= BR_MATF_ALWAYS_VISIBLE;
+        gBurning_ped_materials[i]->colour_map = BrMapFind(gBurning_ped_map_names[i]);
+        if (gBurning_ped_materials[i]->colour_map == NULL) {
+            FatalError(kFatalError_CantFindPedTexture_S, gBurning_ped_map_names[i]);
+        }
+        GlorifyMaterial(&gBurning_ped_materials[i], 1, kRendererShadingType_Diffuse2);
+        BrMaterialAdd(gBurning_ped_materials[i]);
+    }
+    for (i = 0; i < (int)REC2_ASIZE(gNapalm_bolts); i++) {
+        gNapalm_bolts[i].ped = NULL;
+        for (j = 0; j < (int)REC2_ASIZE(gNapalm_bolts[i].actors); j++) {
+            gNapalm_bolts[i].actors[j] = BrActorAllocate(BR_ACTOR_MODEL, NULL);
+            gNapalm_bolts[i].actors[j]->material = gBurning_ped_materials[j];
+            gNapalm_bolts[i].actors[j]->model = gBurning_ped_models[j];
+            gNapalm_bolts[i].actors[j]->render_style = BR_RSTYLE_NONE;
+            BrActorAdd(gNon_track_actor, gNapalm_bolts[i].actors[j]);
+        }
+    }
+}
 
 // STUB: CARMA2_HW 0x004cadc0
 // STUB: CARMA2_SW 0x004c74f0
