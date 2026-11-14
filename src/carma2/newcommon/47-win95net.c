@@ -62,7 +62,10 @@ tU32 C2_HOOK_FASTCALL PDNetExtractGameID(const tNet_game_details* pDetails) {
     return addr[8] << 24 | addr[9] << 16 | addr[10] << 8 | addr[11];
 }
 
-// PDNetExtractPlayerID
+// STUB: CARMA2_HW 0x0051a130
+tU32 C2_HOOK_FASTCALL PDNetExtractPlayerID(void) {
+    NOT_IMPLEMENTED();
+}
 
 // PDNetObtainSystemUserName
 
