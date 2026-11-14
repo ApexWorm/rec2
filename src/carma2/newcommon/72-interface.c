@@ -2483,10 +2483,10 @@ int C2_HOOK_FASTCALL LoadGameInFunc(tFrontend_spec* pFrontend) {
     camera = gFrontend_menu_camera->type_data;
     camera->type = BR_CAMERA_PARALLEL;
     camera->field_of_view = BR_ANGLE_DEG(90);
-    camera->hither_z = 1.f;
-    camera->yon_z = 3.f;
-    camera->width = 640.f;
-    camera->height = 480.f;
+    camera->hither_z = 1.0f;
+    camera->yon_z = 3.0f;
+    camera->width = 640.0f;
+    camera->height = 480.0f;
 
     for (i = 0; i < (int)REC2_ASIZE(gFrontend_billboard_actors); i++) {
         gFrontend_billboard_actors[i] = CreateAPOactor();
