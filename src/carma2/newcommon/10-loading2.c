@@ -201,6 +201,34 @@ const char* gDev_car_names[6] = {
 // GLOBAL: CARMA2_SW 0x007950c0
 br_pixelmap* gHeadup_images[45];
 
+// GLOBAL: CARMA2_HW 0x006574d0
+// GLOBAL: CARMA2_SW 0x00651e80
+const char* gDamage_names[12] = {
+    "engine",
+    "transmission",
+    "driver",
+    "steering",
+    "lf_brake",
+    "rf_brake",
+    "lr_brake",
+    "rr_brake",
+    "lf_wheel",
+    "rf_wheel",
+    "lr_wheel",
+    "rr_wheel",
+};
+
+// GLOBAL: CARMA2_HW 0x00657500
+// GLOBAL: CARMA2_SW 0x00651eb0
+const char* gWheel_actor_names[6] = {
+    "FLWHEEL.ACT",
+    "FRWHEEL.ACT",
+    "RLWHEEL.ACT",
+    "RRWHEEL.ACT",
+    "IRLWHEEL.ACT",
+    "IRRWHEEL.ACT",
+};
+
 void C2_HOOK_FASTCALL LoadInRegisteeDir(const char *pRoot, const char *pSubDir, int pInitialize_palettes) {
     tPath_name the_path;
     tPath_name the_path2;
@@ -769,7 +797,75 @@ void C2_HOOK_FASTCALL LoadHeadups(FILE* pF, int pIndex, tCar_spec* pCar_spec) {
 
 // AddRefOffset
 
-// GetDamageProgram
+// FUNCTION: CARMA2_HW 0x0048bca0
+// FUNCTION: CARMA2_SW 0x00488ee0
+void C2_HOOK_FASTCALL GetDamageProgram(FILE* pF, tCar_spec* pCar_spec, tImpact_location pImpact_location) {
+    tDamage_clause* the_clause;
+    int i;
+    int j;
+    int k;
+    int count;
+    char s[256];
+    char delim[64];
+    char* str;
+
+    C2_HOOK_BUG_ON(sizeof(tDamage_clause) != 0x40);
+    C2_HOOK_BUG_ON(REC2_ASIZE(gDamage_names) != 12);
+    C2_HOOK_BUG_ON(REC2_ASIZE(gWheel_actor_names) != 6);
+    C2_HOOK_BUG_ON(REC2_ASIZE(the_clause->conditions) != 2);
+
+    PossibleService();
+    count = GetAnInt(pF);
+    pCar_spec->damage_programs[pImpact_location].clause_count = count;
+    pCar_spec->damage_programs[pImpact_location].clauses = BrMemAllocate(count * sizeof(tDamage_clause), kMem_damage_clauses);
+    strcpy(delim, "\t ,/");
+    strcat(delim, "&");
+
+    for (i = 0, the_clause = pCar_spec->damage_programs[pImpact_location].clauses; i < count; i++, the_clause++) {
+        the_clause->condition_count = 0;
+        GetALineAndDontArgue(pF, s);
+        str = strtok(s, delim);
+        do {
+            if (str[0] == 'x') {
+                the_clause->conditions[the_clause->condition_count].axis_comp = eAxis_x;
+            } else if (str[0] == 'y') {
+                the_clause->conditions[the_clause->condition_count].axis_comp = eAxis_y;
+            } else if (str[0] == 'z') {
+                the_clause->conditions[the_clause->condition_count].axis_comp = eAxis_z;
+            } else {
+                break;
+            }
+            if (str[1] == '>') {
+                the_clause->conditions[the_clause->condition_count].condition_operator = eCondition_greater_than;
+            } else if (str[1] == '<') {
+                the_clause->conditions[the_clause->condition_count].condition_operator = eCondition_less_than;
+            } else {
+                FatalError(kFatalError_ConfusedByFormatOfConditionalDamageInCarFile);
+            }
+            sscanf(str + 2, "%f", &the_clause->conditions[the_clause->condition_count].comparitor);
+            the_clause->condition_count++;
+            str = strtok(NULL, delim);
+        } while (the_clause->condition_count < (int)REC2_ASIZE(the_clause->conditions));
+
+        the_clause->effect_count = GetAnInt(pF);
+        for (j = 0; j < the_clause->effect_count; j++) {
+            the_clause->effects[j].type = (tDamage_type)-1;
+            GetALineAndDontArgue(pF, s);
+            str = strtok(s, "\t ,/");
+            for (k = 0; k < (int)REC2_ASIZE(gDamage_names); k++) {
+                if (strcmp(str, gDamage_names[k]) == 0) {
+                    the_clause->effects[j].type = (tDamage_type)k;
+                    break;
+                }
+            }
+            if ((int)the_clause->effects[j].type < 0) {
+                FatalError(kFatalError_UnknownDamageType_S, str);
+            }
+            str = strtok(NULL, "\t ,/");
+            sscanf(str, "%f", &the_clause->effects[j].weakness_factor);
+        }
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x0048bf20
 // FUNCTION: CARMA2_SW 0x00489160
