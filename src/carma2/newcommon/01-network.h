@@ -100,7 +100,7 @@ extern int C2_HOOK_FASTCALL NetSendMessageToAddress(tNet_game_details* pDetails,
 
 extern int C2_HOOK_FASTCALL NetReallySendMessageToPlayer(tNet_game_details* pNet_game, tNet_message* pMessage, tPlayer_ID pPlayer_id);
 
-// NetSendMessageToPlayer
+extern int C2_HOOK_FASTCALL NetSendMessageToPlayer(tNet_game_details* pDetails, tNet_message* pMessage, tPlayer_ID pPlayer);
 
 extern int C2_HOOK_FASTCALL NetSendMessageToHost(tNet_game_details* pDetails, tNet_message* pMessage);
 

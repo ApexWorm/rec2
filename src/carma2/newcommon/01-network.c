@@ -470,7 +470,31 @@ int C2_HOOK_FASTCALL NetReallySendMessageToPlayer(tNet_game_details* pNet_game, 
     return -3;
 }
 
-// NetSendMessageToPlayer
+// FUNCTION: CARMA2_HW 0x0049ef20
+// FUNCTION: CARMA2_SW 0x0049b0a0
+int C2_HOOK_FASTCALL NetSendMessageToPlayer(tNet_game_details* pDetails, tNet_message* pMessage, tPlayer_ID pPlayer) {
+    int i;
+    int size;
+    void* contents;
+
+    C2_HOOK_BUG_ON(sizeof(tNet_message_header) != 0x18);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tNet_message, contents, 0x18);
+
+    for (i = 0; i < gNumber_of_net_players; i++) {
+        if (gNet_players[i].ID == pPlayer) {
+            size = pMessage->header.field_0x16 - sizeof(tNet_message_header);
+            pMessage->contents.raw.header.size = size;
+            contents = NetGetToPlayerContentsSize(&gNet_players[i], size);
+            if (contents != NULL) {
+                memcpy(contents, &pMessage->contents, size);
+                NetDisposeMessage(pDetails, pMessage);
+                return 0;
+            }
+        }
+    }
+    NetDisposeMessage(pDetails, pMessage);
+    return -3;
+}
 
 // FUNCTION: CARMA2_HW 0x0049f0d0
 int C2_HOOK_FASTCALL NetSendMessageToHost(tNet_game_details* pDetails, tNet_message* pMessage) {
