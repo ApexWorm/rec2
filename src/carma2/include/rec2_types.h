@@ -37,6 +37,7 @@ typedef tU8 tNet_message_type;
 // FIXME: incomplete type
 typedef struct tCar_spec tCar_spec;
 typedef struct tCar_crush_spec tCar_crush_spec;
+typedef struct tBend_point_context tBend_point_context;
 typedef struct tPhysics_object tPhysics_object;
 typedef struct tFace_ref tFace_ref;
 typedef struct tNon_car_spec tNon_car_spec;
@@ -280,7 +281,7 @@ typedef struct tPed_character_instance {
     tPed_personality* personality;
     tS8 field_0x4;
     undefined field_0x5;
-    undefined field_0x6;
+    tS8 field_0x6;
     tS8 field_0x7;
     tS8 field_0x8;
     tU8 field_0x9;
@@ -780,6 +781,7 @@ typedef struct tPipe_chunk {
         tPipe_ped_fp_change_data ped_fp_change;
         tPipe_chunk_repulse_ray repulse_ray;
         tPipe_chunk_oil_spill oil_spill;
+        tPipe_single_graphical_wheel_stuff graphical_wheel_stuff;
         char raw_data[0];
     } data;
 } tPipe_chunk;
@@ -2848,8 +2850,9 @@ typedef struct tCar_spec {
     br_vector3 pre_car_col_velocity;
     br_vector3 pre_car_col_velocity_car_space;
     br_vector3 vel;
-    undefined field_0x13cc[8];
-    float field_0x13e0;
+    float last_col_prop_x;
+    float last_col_prop_y;
+    float last_col_prop_z;
     int time_last_hit;
     int time_last_victim;
     tCar_spec* last_hit_by;
@@ -5536,6 +5539,7 @@ enum {
     eMiscString_cp = 21,
     eMiscString_completion_bonus_colon = 22,
     eMiscString_time_bonus_colon = 23,
+    eMiscString_every_pedestrian_killed = 26,
     eMiscString_action_replay_unavailable = 37,
     eMiscString_instant_repair = 41,
     eMiscString_final_lap = 42,
@@ -5667,6 +5671,9 @@ enum {
 };
 
 enum {
+    eInterfaceString_car_colon = 14,
+    eInterfaceString_abort_race = 21,
+    eInterfaceString_closed = 179,
     eInterfaceString_target_none = 232,
     eInterfaceString_target_kills = 233,
     eInterfaceString_target_laps = 234,
@@ -5839,6 +5846,7 @@ enum {
     kFatalError_CannotOpenRacesFile = 0x32,
     kFatalError_CannotOpenOpponentsFile = 0x36,
     kFatalError_OpponentCountMismatchesActualNumberOfOpponents = 0x37,
+    kFatalError_CannotLoadChromeFontFile = 0x3b,
     kFatalError_FunkotronicFile = 0x3e,
     kFatalError_ErrorWithinGroovidelicFile = 0x3f,
     kFatalError_CannotFindMainMaterialInFunkotronicFile_S = 0x40,
@@ -5971,6 +5979,7 @@ enum {
     eSoundId_CantAffordPart = 3100,
     eSoundId_NapalmHitCrackls = 3702,
     eSoundId_PedValium = 3801,
+    eSoundId_GrowATail = 3901,
     eSoundId_SmashRepair = 4550,
     eSoundId_Smash1 = 5000,
     eSoundId_Smash2 = 5001,

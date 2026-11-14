@@ -78,7 +78,9 @@ extern void C2_HOOK_FASTCALL EnableCar(tCar_spec* pCar);
 
 // ClipName
 
-// CreateBoxes
+#ifdef REC2_HW
+extern void C2_HOOK_FASTCALL CreateBoxes(void);
+#endif
 
 // DrawScoreBoxes
 
@@ -124,7 +126,7 @@ extern void C2_HOOK_FASTCALL CheckForNeedyEnvironmentRecipients(void);
 
 extern void C2_HOOK_FASTCALL ReceivedGameplay(tNet_message_chunk* pContents, tNet_message* pMessage, tU32 pReceive_time);
 
-// SendGameplay
+extern void C2_HOOK_FASTCALL SendGameplay(tPlayer_ID pPlayer, tNet_gameplay_mess pMess, int pParam_1, int pParam_2, int pParam_3, int pParam_4);
 
 extern void C2_HOOK_FASTCALL SendGameplayToAllPlayers(tNet_gameplay_mess pMess, int pParam_1, int pParam_2, int pParam_3, int pParam_4);
 

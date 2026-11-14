@@ -158,6 +158,10 @@ br_matrix34 gRearview_camera_to_world;
 // GLOBAL: CARMA2_SW 0x006fc640
 undefined4 gUnknown_00705b80[20];
 
+// GLOBAL: CARMA2_HW 0x00705be0
+// GLOBAL: CARMA2_SW 0x006fc6a0
+int gCredit_multiplier;
+
 
 // GLOBAL: CARMA2_HW 0x0074d44c
 // GLOBAL: CARMA2_SW 0x007439ac
