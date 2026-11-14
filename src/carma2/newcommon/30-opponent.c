@@ -764,7 +764,19 @@ void C2_HOOK_FASTCALL ChooseNewObjective(tOpponent_spec* pOpponent_spec, int pMu
 
 // NoteCarsCurrentlyUsed
 
-// AddIfNotInList
+// FUNCTION: CARMA2_HW 0x004a7ea0
+// FUNCTION: CARMA2_SW 0x004a4010
+void C2_HOOK_FASTCALL AddIfNotInList(tPhysics_object* pObject, tPhysics_object** pList, int pCount) {
+    int i;
+
+    for (i = 0; i < pCount; i++) {
+        if (pList[i] == pObject) {
+            pList[i] = NULL;
+            return;
+        }
+    }
+    PHILAddActiveObject(pObject, NULL, NULL, NULL);
+}
 
 // FUNCTION: CARMA2_HW 0x004a7ef0
 // FUNCTION: CARMA2_SW 0x004a4060
