@@ -14,6 +14,7 @@
 
 extern int gNet_storage_space_initialized;
 extern tNet_mode gFrontend_net_mode;
+extern int gFrontend_stuff_not_loaded;
 extern tNet_game_options gNet_settings[9];
 extern tU32 gFrontend_net_current_roll;
 extern tU32 gFrontend_net_last_roll;
@@ -50,6 +51,8 @@ extern int gFrontend_wrecks_rotate_prev_y;
 
 extern int gFrontend_controls_count_keys;
 extern int gINT_00688748;
+extern tJoinable_game gGames_to_join[6];
+extern int gLast_graph_sel;
 extern br_material* gFrontend_backdrop_materials[3];
 extern br_token_value gFrontend_backdrop1_material_prims[3];
 extern br_token_value gFrontend_backdrop2_material_prims[3];
@@ -73,11 +76,11 @@ extern void C2_HOOK_FASTCALL SetNetAvailability(tNet_game_options* pOptions);
 
 extern void C2_HOOK_FASTCALL DefaultNetSettings(void);
 
-// DisposeJoinableGame
+extern void C2_HOOK_FASTCALL DisposeJoinableGame(int pIndex);
 
 // InitGamesToJoin
 
-// DisposeJoinList
+extern void C2_HOOK_FASTCALL DisposeJoinList(int pException);
 
 // AddToJoinList
 
@@ -103,9 +106,9 @@ extern br_pixelmap* C2_HOOK_FASTCALL GetThisFuckingPixelmapPleaseMrTwatter(const
 
 extern void C2_HOOK_FASTCALL LoadMenuSettings(tFrontend_spec* pFrontend);
 
-// LoadMenuImages
+extern void C2_HOOK_FASTCALL LoadMenuImages(void);
 
-// LoadMenuModels
+extern void C2_HOOK_FASTCALL LoadMenuModels(void);
 
 extern void C2_HOOK_FASTCALL DefaultInfunc(tFrontend_spec* pFrontend);
 
@@ -169,9 +172,9 @@ extern int C2_HOOK_FASTCALL MultiplayerSetup(tFrontend_spec* pFrontend);
 
 // NetworkJoinMenuInfunc
 
-// StopAllThatJoinyStuffThisInstant
+extern void C2_HOOK_FASTCALL StopAllThatJoinyStuffThisInstant(void);
 
-// NetworkJoinMenuOutfunc
+extern int C2_HOOK_FASTCALL NetworkJoinMenuOutfunc(tFrontend_spec* pFrontend);
 
 // NetJoinChooseThisGame
 
@@ -255,7 +258,7 @@ extern void C2_HOOK_FASTCALL FRONTEND_PingPongFlash(void);
 
 extern void C2_HOOK_FASTCALL FRONTEND_Setup2D(void);
 
-// FRONTEND_Setup
+extern void C2_HOOK_FASTCALL FRONTEND_Setup(tFrontendMenuType pType);
 
 // FRONTEND_Redraw
 
@@ -283,7 +286,7 @@ extern int C2_HOOK_FASTCALL WrecksInFunc(tFrontend_spec* pFrontend);
 
 extern int C2_HOOK_FASTCALL KeepInRange(int pIndex, int pRange);
 
-// WrecksOutFunc
+extern int C2_HOOK_FASTCALL WrecksOutFunc(tFrontend_spec* pFrontend);
 
 // WrecksUpdateFunc
 
@@ -449,7 +452,9 @@ extern int C2_HOOK_FASTCALL NetOptions_CreditsRoller(tFrontend_spec* pFrontend);
 
 // NetOptions_Cancel
 
-// CheckPlayersAreResponding
+extern void C2_HOOK_FASTCALL CheckPlayersAreResponding2(tU32 pDeadline);
+
+extern void C2_HOOK_FASTCALL CheckPlayersAreResponding(void);
 
 // MungePlayers
 
