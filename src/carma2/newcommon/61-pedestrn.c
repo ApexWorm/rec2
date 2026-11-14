@@ -17,6 +17,7 @@
 #include "27-powerup.h"
 #include "28-world3.h"
 #include "30-opponent.h"
+#include "32-spark.h"
 
 #include "41-utility.h"
 #include "42-input.h"
@@ -753,7 +754,23 @@ void C2_HOOK_FASTCALL PedApplyBloodSpurt(tU32 pId, tU32 pTime, unsigned int pSee
     DoBloodSpurt(pId, pTime, pSeed, pPosition, pImpactee_velocity, pNormal);
 }
 
-// PedUndoBloodSpurt
+// FUNCTION: CARMA2_HW 0x004ccd70
+// FUNCTION: CARMA2_SW 0x004c9470
+void C2_HOOK_FASTCALL PedUndoBloodSpurt(tU32 pCurrent_time, tU32 pId, tU32 pTime, unsigned int pSeed, br_vector3* pPosition, br_vector3* pImpactee_velocity, br_vector3* pNormal) {
+    int i;
+    tSmash_vertex* fragment;
+    float delta_time;
+
+    DoBloodSpurt(pId, pTime, pSeed, pPosition, pImpactee_velocity, pNormal);
+    delta_time = (float)(tS32)(pCurrent_time - pTime);
+    for (i = 0, fragment = gSmash_glass_fragments; i < REC2_ASIZE(gSmash_glass_fragments); i++, fragment++) {
+        if (fragment->end_time != 0 && fragment->field_0x18 == pId) {
+            fragment->field_0x34 = 0;
+            DoFragMovement(fragment, GetTotalTime(), delta_time);
+            fragment->field_0x34 = 1;
+        }
+    }
+}
 
 // OneLessPed
 
