@@ -32,6 +32,11 @@ extern int gCount_active_peds;
 extern int gPeds_suicidal;
 extern int gExploding_pedestrians;
 extern tNapalm_bolt gNapalm_bolts[5];
+extern int gPed_severing_chance;
+extern br_material* gPed_slick_material;
+extern br_material* gNapalm_bolt_materials[7];
+extern br_model* gNapalm_bolt_models[7];
+extern const char* gNapalm_bolt_texture_names[7];
 extern int gCount_changed_points;
 extern br_vector3 gChanged_points[10];
 extern int gPed_dismember_spurting_member_count;
@@ -122,7 +127,7 @@ extern br_vector3* C2_HOOK_FASTCALL GetPedPos(tPedestrian* pPed);
 
 // InitOtherPedStuff
 
-// InitNapalmNolts
+extern void C2_HOOK_FASTCALL InitNapalmNolts(void);
 
 extern void C2_HOOK_FASTCALL InitPolyPedSystem(void);
 
@@ -204,9 +209,9 @@ extern void C2_HOOK_FASTCALL DoBloodSpurt(tU32 pId, tU32 pTime, unsigned int pSe
 
 extern void C2_HOOK_FASTCALL PedApplyBloodSpurt(tU32 pId, tU32 pTime, unsigned int pSeed, br_vector3* pPosition, br_vector3* pImpactee_velocity, br_vector3* pNormal);
 
-// PedUndoBloodSpurt
+extern void C2_HOOK_FASTCALL PedUndoBloodSpurt(tU32 pCurrent_time, tU32 pId, tU32 pTime, unsigned int pSeed, br_vector3* pPosition, br_vector3* pImpactee_velocity, br_vector3* pNormal);
 
-// OneLessPed
+extern void C2_HOOK_FASTCALL OneLessPed(tPedestrian* pPed);
 
 extern void C2_HOOK_FASTCALL ScoreForKilledPedestrian(tPedestrian* pPed, float pHeight);
 
