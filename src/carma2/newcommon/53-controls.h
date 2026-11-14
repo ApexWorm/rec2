@@ -201,7 +201,7 @@ extern void C2_HOOK_FASTCALL ToggleAccessoryRendering(void);
 
 extern void C2_HOOK_FASTCALL UserSendMessage(void);
 
-// EnterUserMessage
+extern void C2_HOOK_FASTCALL SteelBollock(void);
 
 extern void C2_HOOK_FASTCALL DisplayUserMessage(void);
 
@@ -213,7 +213,7 @@ extern void C2_HOOK_FASTCALL ChangeCameraTypeInGame(void);
 
 // SteelBollock
 
-// RichardsSphere
+extern void C2_HOOK_FASTCALL RichardsSphere(int pNum);
 
 extern void C2_HOOK_FASTCALL ToggleHeadupLevel(void);
 

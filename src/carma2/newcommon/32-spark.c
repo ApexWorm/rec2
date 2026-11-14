@@ -81,6 +81,10 @@ int gN_BR_smoke_structs;
 // GLOBAL: CARMA2_HW 0x006a8638
 br_pixelmap* gFlame_map[20];
 
+// GLOBAL: CARMA2_HW 0x006a9180
+// GLOBAL: CARMA2_SW 0x006a2bd0
+tShrapnel gShrapnel[30] = { 0 };
+
 // GLOBAL: CARMA2_HW 0x006a96a8
 // GLOBAL: CARMA2_SW 0x006a30f8
 tSmoke_column gSmoke_column[10] = { 0 };
@@ -96,6 +100,10 @@ br_model* gLollipop_model;
 // GLOBAL: CARMA2_HW 0x006aa59c
 // GLOBAL: CARMA2_SW 0x006a3fec
 int gColumn_flags;
+
+// GLOBAL: CARMA2_HW 0x006aa584
+// GLOBAL: CARMA2_SW 0x006a3fd0
+int gShrapnel_flags;
 
 // GLOBAL: CARMA2_HW 0x006aa588
 // GLOBAL: CARMA2_SW 0x006a3fd8
@@ -269,7 +277,27 @@ void C2_HOOK_FASTCALL LoadInShrapnel(void) {
 
 // KillShrapnel
 
-// DisposeShrapnel
+// FUNCTION: CARMA2_HW 0x004f8c10
+// FUNCTION: CARMA2_SW 0x004f4290
+void C2_HOOK_FASTCALL DisposeShrapnel(void) {
+    int i;
+
+    C2_HOOK_BUG_ON(REC2_ASIZE(gShrapnel) != 30);
+    C2_HOOK_BUG_ON(sizeof(tShrapnel) != 0x2c);
+    C2_HOOK_BUG_ON(REC2_ASIZE(gSmoke_column) != 10);
+
+    for (i = 0; i < (int)REC2_ASIZE(gShrapnel); i++) {
+        if ((gShrapnel_flags & (1 << i)) && gShrapnel[i].actor->parent != NULL) {
+            BrActorRemove(gShrapnel[i].actor);
+        }
+        BrActorFree(gShrapnel[i].actor);
+    }
+    gShrapnel_flags = 0;
+    BrModelRemove(gShrapnel_model[0]);
+    BrModelRemove(gShrapnel_model[1]);
+    BrModelFree(gShrapnel_model[0]);
+    BrModelFree(gShrapnel_model[1]);
+}
 
 // ReplayShrapnel
 
@@ -719,11 +747,35 @@ void C2_HOOK_FASTCALL SmudgeCar(tCar_spec* pCar, int pFire_point) {
     (void)pFire_point;
 }
 
+void C2_HOOK_FASTCALL ResetSmokeColumns(void) {
+    int i;
+
+    for (i = 0; i < (int)REC2_ASIZE(gSmoke_column); i++) {
+        if (gColumn_flags & (1 << i)) {
+            BrActorRemove(gSmoke_column[i].flame_actor);
+        }
+    }
+    gColumn_flags = 0;
+}
+
 // FUNCTION: CARMA2_HW 0x004fc9d0
 // FUNCTION: CARMA2_SW 0x004f7f30
 void C2_HOOK_FASTCALL SetSmokeOn(int pSmoke_on) {
 
     gSmoke_on = pSmoke_on;
+}
+
+// FUNCTION: CARMA2_HW 0x004fc9e0
+// FUNCTION: CARMA2_SW 0x004f7f40
+void C2_HOOK_FASTCALL ReallySetSmokeOn(int pSmoke_on) {
+
+    C2_HOOK_BUG_ON(REC2_ASIZE(gSmoke_column) != 10);
+    C2_HOOK_BUG_ON(sizeof(tSmoke_column) != 0x7c);
+    C2_HOOK_BUG_ON(REC2_ASIZE(gSparks) != 32);
+
+    (void)pSmoke_on;
+    ResetSmoke();
+    ResetSmokeColumns();
 }
 
 // FUNCTION: CARMA2_HW 0x004fca30
