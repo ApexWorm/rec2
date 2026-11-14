@@ -668,7 +668,14 @@ void C2_HOOK_FASTCALL ResetPedSpeed(tPowerup* powerup, tCar_spec* car) {
     gPedestrian_speed_factor = 1.f;
 }
 
-// ResetPedSize
+// FUNCTION: CARMA2_HW 0x004dc9d0
+// FUNCTION: CARMA2_SW 0x004d8ed0
+void C2_HOOK_FASTCALL ResetPedSize(tPowerup* pPowerup, tCar_spec* pCar) {
+    br_vector3 scale;
+
+    BrVector3Set(&scale, 1.0f, 1.0f, 1.0f);
+    ChangePedScaling(&scale);
+}
 
 // ResetPedHeadSize
 
