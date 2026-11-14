@@ -132,6 +132,16 @@ const char* gNet_avail_names[4] = {
     "all",
 };
 
+// GLOBAL: CARMA2_HW 0x0074b500
+br_material* gSimple_materials[32];
+
+// GLOBAL: CARMA2_HW 0x006572f0
+tU32 gSimple_material_colours[12] = {
+    0x005d0303, 0x02a56e04, 0x03a9a905, 0x08006868,
+    0x0d3c3626, 0x0e212121, 0x15284c21, 0x1900326a,
+    0x1a93491d, 0x1ec0bfc0, 0x23141414, 0x00000000,
+};
+
 // GLOBAL: CARMA2_HW 0x00657320
 // GLOBAL: CARMA2_SW 0x00651cd0
 tHeadup_info gHeadup_image_info[45] = {
@@ -812,10 +822,46 @@ intptr_t C2_HOOK_CDECL AllocateCarModelData(br_actor* pActor, void* pData) {
 
 // LinkCarModelsToActor
 
-// STUB: CARMA2_HW 0x00488dd0
-// STUB: CARMA2_SW 0x00486010
+// FUNCTION: CARMA2_HW 0x00488dd0
+// FUNCTION: CARMA2_SW 0x00486010
 br_material* C2_HOOK_FASTCALL GetSimpleMaterial(char* pName, tRendererShadingType pShading_type) {
-    NOT_IMPLEMENTED();
+    int i;
+    int material_number;
+    int r, g, b;
+    br_colour colour;
+
+    C2_HOOK_BUG_ON(REC2_ASIZE(gSimple_material_colours) != 12);
+
+    if (pName[0] == 'M') {
+        strtok(pName, "\t ,/");
+        material_number = 10 * (pName[1] - '0') + pName[2] - '0';
+        for (i = 0; gSimple_material_colours[i] != 0; i++) {
+            if ((int)(gSimple_material_colours[i] >> 24) == material_number) {
+                break;
+            }
+        }
+        if (gSimple_material_colours[i] == 0) {
+            PDFatalError("Obsolete simple material");
+        }
+        colour = gSimple_material_colours[i] & 0xffffff;
+    } else {
+        sscanf(pName, "%d,%d,%d", &r, &g, &b);
+        colour = ((r << 8) | g) << 8 | b;
+    }
+    for (i = 0; gSimple_materials[i] != NULL; i++) {
+        if (gSimple_materials[i]->colour == colour) {
+            return gSimple_materials[i];
+        }
+    }
+    if (i < (int)REC2_ASIZE(gSimple_materials)) {
+        gSimple_materials[i] = BrMaterialAllocate("Simple");
+        gSimple_materials[i]->colour = colour;
+        gSimple_materials[i]->index_base = (br_uint_8)FindBestColourMatch(gSimple_materials[i]->colour);
+        gSimple_materials[i]->index_range = 0;
+        GlorifyMaterial(&gSimple_materials[i], 1, pShading_type);
+        BrMaterialAdd(gSimple_materials[i]);
+    }
+    return gSimple_materials[i];
 }
 
 // ReadShrapnelMaterials
