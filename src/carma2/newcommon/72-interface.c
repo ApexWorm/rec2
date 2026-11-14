@@ -197,6 +197,7 @@ int gFrontend_wrecks_rotate_prev_x = -1;
 int gFrontend_wrecks_rotate_prev_y = -1;
 
 // GLOBAL: CARMA2_HW 0x0059b0d0
+// GLOBAL: CARMA2_SW 0x00596000
 int gFrontend_stuff_not_loaded = 1;
 
 // GLOBAL: CARMA2_HW 0x0059b0d4
@@ -954,6 +955,7 @@ inline void C2_HOOK_FASTCALL LoadMenuModels(void) {
     count = GetAnInt(f);
     for (i = 0; i < count; i++) {
         GetAString(f, s3);
+#ifdef REC2_HW
         PathCat(s2, s, s3);
         strcat(s2, ".DAT");
         gFrontend_A_models[i].model = BrModelLoad(s2);
@@ -967,11 +969,13 @@ inline void C2_HOOK_FASTCALL LoadMenuModels(void) {
             BrMatrix34PreScale(&gFrontend_backdrop_actors[0]->t.t.mat, 1.25f, 1.25f, 1.0f);
             gFrontend_backdrop_actors[0]->render_style = BR_RSTYLE_FACES;
         }
+#endif
     }
 
     count = GetAnInt(f);
     for (i = 0; i < count; i++) {
         GetAString(f, s3);
+#ifdef REC2_HW
         PathCat(s2, s, s3);
         strcat(s2, ".DAT");
         gFrontend_B_models[i].model = BrModelLoad(s2);
@@ -985,11 +989,13 @@ inline void C2_HOOK_FASTCALL LoadMenuModels(void) {
             BrMatrix34PreScale(&gFrontend_backdrop_actors[1]->t.t.mat, 1.25f, 1.25f, 1.0f);
             gFrontend_backdrop_actors[1]->render_style = BR_RSTYLE_FACES;
         }
+#endif
     }
 
     count = GetAnInt(f);
     for (i = 0; i < count; i++) {
         GetAString(f, s3);
+#ifdef REC2_HW
         PathCat(s2, s, s3);
         strcat(s2, ".DAT");
         gFrontend_C_models[i].model = BrModelLoad(s2);
@@ -1003,6 +1009,7 @@ inline void C2_HOOK_FASTCALL LoadMenuModels(void) {
             BrMatrix34PreScale(&gFrontend_backdrop_actors[2]->t.t.mat, 1.25f, 1.25f, 1.0f);
             gFrontend_backdrop_actors[2]->render_style = BR_RSTYLE_FACES;
         }
+#endif
     }
 }
 
@@ -1969,10 +1976,10 @@ void C2_HOOK_FASTCALL FRONTEND_Setup2D(void) {
     camera = gFrontend_camera->type_data;
     camera->type = BR_CAMERA_PARALLEL;
     camera->field_of_view = BR_ANGLE_DEG(45);
-    camera->hither_z = 1.f;
-    camera->yon_z = 3.f;
-    camera->width = 640.f;
-    camera->height = 480.f;
+    camera->hither_z = 1.0f;
+    camera->yon_z = 3.0f;
+    camera->width = 640.0f;
+    camera->height = 480.0f;
     BrActorAdd(gFrontend_actor, gFrontend_camera);
 #ifdef REC2_HW
     gFrontend_backdrop0_material_prims[0].t = BRT_BLEND_B;
@@ -2027,6 +2034,7 @@ void C2_HOOK_FASTCALL FRONTEND_Setup2D(void) {
 }
 
 // FUNCTION: CARMA2_HW 0x0046d1c0
+// FUNCTION: CARMA2_SW 0x0046cc40
 void C2_HOOK_FASTCALL FRONTEND_Setup(tFrontendMenuType pType) {
 
     PrintMemoryDump(0, "START OF FRONTEND_Setup");
@@ -2074,6 +2082,8 @@ void C2_HOOK_FASTCALL FRONTEND_Setup(tFrontendMenuType pType) {
     PrintMemoryDump(0, "AFTER FRONTEND_CreateMenu");
 
     gCurrent_frontend_spec->previous = NULL;
+
+#ifdef REC2_HW
     gFrontend_A_model_from = gFrontend_A_models[0].model;
     gFrontend_A_model_to = gFrontend_A_models[gCurrent_frontend_spec->model_A_index].model;
     gFrontend_backdrop0_opacity_mode = gCurrent_frontend_spec->model_A_index != 0 ? 1 : -2;
@@ -2084,6 +2094,8 @@ void C2_HOOK_FASTCALL FRONTEND_Setup(tFrontendMenuType pType) {
     gFrontend_C_model_to = gFrontend_C_models[gCurrent_frontend_spec->model_C_index].model;
     gFrontend_backdrop2_opacity_mode = gCurrent_frontend_spec->model_C_index != 0 ? 1 : -2;
     gFrontend_interpolate_steps_left = 16;
+#endif
+
     PrintMemoryDump(0, "END OF FRONTEND_Setup");
 }
 
