@@ -514,7 +514,16 @@ void C2_HOOK_FASTCALL DoSomeThingsToCheckpoints(br_pixelmap* pMap, tU32 pTime, t
     }
 }
 
-// CalcMapCheckpoint
+// FUNCTION: CARMA2_HW 0x004968f0
+// FUNCTION: CARMA2_SW 0x00493260
+void C2_HOOK_FASTCALL CalcMapCheckpoint(br_pixelmap* pMap, int pCheckpoint, tU32 pTime, int pTarget) {
+    br_vector3 p;
+    tRace_checkpoint_spec* checkpoint;
+
+    checkpoint = &gCurrent_race.checkpoints[pCheckpoint];
+    BrMatrix34ApplyP(&p, &checkpoint->pos, &gCurrent_race.map_transformation);
+    BrVector2Copy(&checkpoint->map_position, &p);
+}
 
 // FUNCTION: CARMA2_HW 0x00496940
 void C2_HOOK_FASTCALL CalcMapCheckpoint2(br_pixelmap* pMap, int pCheckpoint, tU32 pTime, int pTarget) {

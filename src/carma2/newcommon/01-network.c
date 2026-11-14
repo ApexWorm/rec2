@@ -278,7 +278,7 @@ void C2_HOOK_FASTCALL NetSendHeadupToPlayer(char* pMessage, tPlayer_ID pPlayer) 
             }
         } else {
             message = NetBuildGuaranteedMessage(eNet_message_chunk_type_headup, 0);
-            strcpy((char*)message->contents.raw.data, pMessage);
+            strcpy(message->contents.headup.text, pMessage);
             NetGuaranteedSendMessageToPlayer(gCurrent_net_game, message, pPlayer, NULL);
         }
     }
@@ -356,7 +356,11 @@ void C2_HOOK_FASTCALL NetStartProducingJoinList(tAddToJoinListProc* pAdd_proc) {
     PDNetStartProducingJoinList();
 }
 
-// NetEndJoinList
+// STUB: CARMA2_HW 0x0049dc00
+// STUB: CARMA2_SW 0x00499d80
+void C2_HOOK_FASTCALL NetEndJoinList(void) {
+    NOT_IMPLEMENTED();
+}
 
 // FUNCTION: CARMA2_HW 0x0049dc70
 // FUNCTION: CARMA2_SW 0x00499df0
