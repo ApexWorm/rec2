@@ -958,6 +958,7 @@ void C2_HOOK_FASTCALL CheckForPendingStartRace(void) {
 }
 
 // STUB: CARMA2_HW 0x004a5280
+// STUB: CARMA2_SW 0x004a1400
 void C2_HOOK_FASTCALL NetService(int pIn_race) {
     tU32 time;
 
