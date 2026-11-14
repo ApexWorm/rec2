@@ -1023,17 +1023,25 @@ int C2_HOOK_FASTCALL NetGuaranteedSendMessageToAllPlayers(tNet_game_details* pDe
         return err;
     }
     for (i = 0; i < gNumber_of_net_players; i++) {
-        if (gThis_net_player_index != i) {
+        if (i != gThis_net_player_index) {
             err |= NetGuaranteedSendMessageToPlayer(pDetails, pMessage, gNet_players[i].ID, pNotifyFail);
         }
     }
     return err;
 }
 
-// STUB: CARMA2_HW 0x004a5bc0
-// STUB: CARMA2_SW 0x004a1d40
+// FUNCTION: CARMA2_HW 0x004a5bc0
+// FUNCTION: CARMA2_SW 0x004a1d40
 int C2_HOOK_FASTCALL NetGuaranteedSendMessageToEverybody(tNet_game_details* pDetails, tNet_message* pMessage, void* pNotifyFail) {
-    NOT_IMPLEMENTED();
+    pMessage->header.field_0x8 = gLocal_net_ID;
+    pMessage->header.field_0x10 = PDGetTotalTime();
+    if (pMessage->header.field_0x14 != 0xff) {
+        PDFatalError("Guarantee message not built proper");
+    }
+    pMessage->header.field_0x14 = 1;
+    ReceivedMessage(pMessage, &gNet_players[gThis_net_player_index], GetRaceTime());
+    pMessage->header.field_0x14 = 0xff;
+    return NetGuaranteedSendMessageToAllPlayers(pDetails, pMessage, pNotifyFail);
 }
 
 // FUNCTION: CARMA2_HW 0x004a5c80
