@@ -30,6 +30,7 @@ extern int gNet_powerup_time_replacement;
 extern int gPickup_respawn_min_time_ms;
 extern int gPickup_respawn_max_extra_time_ms;
 extern int gBlind_pedestrians;
+extern int gCount_killed_peds;
 extern int gPed_dismemberfest;
 extern int gPanicking_peds;
 extern float gPed_gravity_multiplier;
@@ -37,6 +38,8 @@ extern int gCount_mutant_tail_parts;
 extern tPhysics_joint* gMutant_tail_first_joint;
 extern int gMutant_tail_state;
 extern tPhysics_object* gMutant_tail_object;
+extern tRespawn_powerup gRespawn_powerups[100];
+extern tU8* gRace_powerup_respawn_bools;
 extern float gMass_mutant_tail_link;
 extern float gMass_mutant_tail_ball;
 extern float gMass_mine;
@@ -44,6 +47,7 @@ extern int gInstant_handbrake;
 extern int gInventory_cycling;
 extern tU32 gInventory_timeout;
 extern tU32* gReal_render_palette;
+extern int gCollision_info_uid_counter;
 
 extern char* C2_HOOK_FASTCALL GetPowerupMessage(int pPowerup_index);
 
@@ -85,7 +89,7 @@ extern void C2_HOOK_FASTCALL LoadPowerups(void);
 
 // MungeBoxObject
 
-// MungeShereObject
+extern tPhysics_object* C2_HOOK_FASTCALL MungeShereObject(br_model* pModel, float pWeight);
 
 // InitTail
 
@@ -201,7 +205,7 @@ extern int C2_HOOK_FASTCALL DoInstantRepair(tPowerup* pPowerup, tCar_spec* pCar)
 
 extern void C2_HOOK_FASTCALL ResetPedSpeed(tPowerup* powerup, tCar_spec* car);
 
-// ResetPedSize
+extern void C2_HOOK_FASTCALL ResetPedSize(tPowerup* pPowerup, tCar_spec* pCar);
 
 // ResetPedHeadSize
 
@@ -221,7 +225,7 @@ extern void C2_HOOK_FASTCALL PaletteFuckedUpByDrugs(br_pixelmap* pPalette, int p
 
 extern void C2_HOOK_FASTCALL TheEffectsOfDrugs(tPowerup* pPowerup, tU32 pPeriod);
 
-// SetOpponentsSpeed
+extern int C2_HOOK_FASTCALL SetOpponentsSpeed(tPowerup* pPowerup, tCar_spec* pCar);
 
 extern int C2_HOOK_FASTCALL SetCopsSpeed(tPowerup* pPowerup, tCar_spec* pCar);
 
@@ -403,7 +407,7 @@ extern int C2_HOOK_FASTCALL PedValium(tPowerup* pPowerup, tCar_spec* pCar);
 
 // PowerupCancel
 
-// GrowATail
+extern int C2_HOOK_FASTCALL GrowATail(tPowerup* pPowerup, tCar_spec* pCar);
 
 // CutOffTail
 
@@ -413,7 +417,7 @@ extern void C2_HOOK_FASTCALL DoInitialTail(void);
 
 extern void C2_HOOK_FASTCALL UndoInitialTail(void);
 
-// MayQueuePowerupRespawn
+extern void C2_HOOK_FASTCALL MayQueuePowerupRespawn(int pPowerup_index, br_actor* pActor);
 
 extern void C2_HOOK_FASTCALL ARDoPowerupRespawn(br_actor* pActor, int pPowerup_id);
 
