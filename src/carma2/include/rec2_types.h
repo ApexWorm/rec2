@@ -4007,8 +4007,8 @@ typedef struct  {
     undefined field_0x1;
     tU16 field_0x2;
     br_angle field_0x4;
-    tU16 field_0x6;
-    tU16 field_0x8;
+    br_angle field_0x6;
+    br_angle field_0x8;
     tU16 hinge0;
     tU16 field_0xc;
     tU16 hinge1;
