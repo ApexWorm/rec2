@@ -164,9 +164,9 @@ extern void C2_HOOK_FASTCALL GenerateItFoxShadeTable(void);
 
 extern void C2_HOOK_FASTCALL AdjustFlame(int pIndex, int pFrame_count, br_scalar pScale_x, br_scalar pScale_y, br_scalar pOffset_x, br_scalar pOffset_z);
 
-// ReplayFlame
+extern void C2_HOOK_FASTCALL ReplayFlame(tSmoke_column* pColumn, br_actor* pActor);
 
-// FlameAnimate
+extern void C2_HOOK_FASTCALL FlameAnimate(int pColumn, const br_vector3* pPos, tU32 pTime);
 
 // DoSmokeColumn
 
@@ -228,11 +228,11 @@ extern void C2_HOOK_FASTCALL MakeCarIt(tCar_spec* pCar);
 
 extern void C2_HOOK_FASTCALL StopCarBeingIt(tCar_spec* pCar);
 
-// ForEveryModelMaterial
+extern void C2_HOOK_FASTCALL ForEveryModelMaterial(br_model* pModel, tMaterialMaybeUpdate_cbfn* pCallback);
 
-// ForEveryActorMaterial
+extern intptr_t C2_HOOK_CDECL ForEveryActorMaterial(br_actor* pActor, void* pContext);
 
-// ForEveryActorMaterialNoGrooves
+extern intptr_t C2_HOOK_CDECL ForEveryActorMaterialNoGrooves(br_actor* pActor, void* pContext);
 
 extern void C2_HOOK_FASTCALL ForEveryCarMaterial(tCar_spec* pCar_spec, tMaterialMaybeUpdate_cbfn* pCallback, int pGrooves);
 

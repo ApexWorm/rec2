@@ -8,6 +8,7 @@
 
 #include "61-pedestrn.h"
 
+#include "07-structur.h"
 #include "08-loading1.h"
 #include "10-loading2.h"
 #include "15-displays.h"
@@ -17,6 +18,7 @@
 #include "27-powerup.h"
 #include "28-world3.h"
 #include "30-opponent.h"
+#include "32-spark.h"
 
 #include "41-utility.h"
 #include "42-input.h"
@@ -24,6 +26,7 @@
 #include "49-physics.h"
 #include "51-smash.h"
 #include "52-errors.h"
+#include "54-runtime.h"
 #include "62-graphics3.h"
 
 #include "63-loading3.h"
@@ -753,9 +756,55 @@ void C2_HOOK_FASTCALL PedApplyBloodSpurt(tU32 pId, tU32 pTime, unsigned int pSee
     DoBloodSpurt(pId, pTime, pSeed, pPosition, pImpactee_velocity, pNormal);
 }
 
-// PedUndoBloodSpurt
+// FUNCTION: CARMA2_HW 0x004ccd70
+// FUNCTION: CARMA2_SW 0x004c9470
+void C2_HOOK_FASTCALL PedUndoBloodSpurt(tU32 pCurrent_time, tU32 pId, tU32 pTime, unsigned int pSeed, br_vector3* pPosition, br_vector3* pImpactee_velocity, br_vector3* pNormal) {
+    int i;
+    tSmash_vertex* fragment;
+    float delta_time;
 
-// OneLessPed
+    DoBloodSpurt(pId, pTime, pSeed, pPosition, pImpactee_velocity, pNormal);
+    delta_time = (float)(tS32)(pCurrent_time - pTime);
+    for (i = 0, fragment = gSmash_glass_fragments; i < REC2_ASIZE(gSmash_glass_fragments); i++, fragment++) {
+        if (fragment->end_time != 0 && fragment->field_0x18 == pId) {
+            fragment->field_0x34 = 0;
+            DoFragMovement(fragment, GetTotalTime(), delta_time);
+            fragment->field_0x34 = 1;
+        }
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x004cd160
+// FUNCTION: CARMA2_SW 0x004c9860
+void C2_HOOK_FASTCALL OneLessPed(tPedestrian* pPed) {
+    tS16 flags;
+
+    flags = pPed->flags & 0x100;
+    if (flags == 0) {
+        pPed->flags |= 0x100;
+        if (gCurrent_race.race_spec->race_type == kRaceType_Carma1 && ++gCount_killed_peds >= gPed_count) {
+            NewTextHeadupSlot(4, 0, 5000, -4, GetMiscString(eMiscString_every_pedestrian_killed));
+            RaceCompleted(eRace_over_1);
+            return;
+        }
+        if (gCurrent_race.race_spec->race_type == kRaceType_Peds) {
+            flags = pPed->flags & 0x200;
+            if (flags != 0 && ++gCount_killed_peds >= gTotal_count_smash_peds) {
+                RaceCompleted(eRace_over_1);
+                return;
+            }
+        }
+        if (gCurrent_race.race_spec->race_type == kRaceType_SmashNPed) {
+            flags = pPed->flags & 0x200;
+            if (flags != 0) {
+                AccumulateRuntimeVariable(gCurrent_race.race_spec->options.smash_and_peds.var_smash_number, 1);
+                if (GetRuntimeVariable(gCurrent_race.race_spec->options.smash_and_peds.var_smash_number) >= gCurrent_race.race_spec->options.smash_and_peds.var_smash_target) {
+                    RaceCompleted(eRace_over_3);
+                }
+            }
+        }
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x004cd260
 // FUNCTION: CARMA2_SW 0x004c9960

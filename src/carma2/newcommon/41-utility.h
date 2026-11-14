@@ -224,7 +224,7 @@ extern void C2_HOOK_FASTCALL PrintScreen(void);
 
 extern intptr_t C2_HOOK_CDECL DumpVisibleActorsCB(br_actor* pActor, void* pData);
 
-// FudgeBRenderIntoTheNinetiesWithSomeProperFuckingColourSupport
+extern tU32 C2_HOOK_FASTCALL FudgeBRenderIntoTheNinetiesWithSomeProperFuckingColourSupport(br_pixelmap* pm, tU32 red, tU32 grn, tU32 blu, tU32 alp);
 
 // GetBlenficatiousnessOfMaterialTablishly
 

@@ -260,7 +260,11 @@ void C2_HOOK_FASTCALL PHILDisable(void) {
     gPHIL_disabled = 1;
 }
 
-// PHILAddObject
+// STUB: CARMA2_HW 0x004b5d40
+// STUB: CARMA2_SW 0x004b2460
+int C2_HOOK_FASTCALL PHILAddObject(tPhysics_object* pObject) {
+    NOT_IMPLEMENTED();
+}
 
 // STUB: CARMA2_HW 0x004b5ea0
 // STUB: CARMA2_SW 0x004b25c0
@@ -412,13 +416,21 @@ int C2_HOOK_FASTCALL PHILSetPassiveObjectsMatrix(tPhysics_object* pObject, const
     }
 }
 
-// PHILAddActiveObject
+// STUB: CARMA2_HW 0x004b6210
+// STUB: CARMA2_SW 0x004b2930
+int C2_HOOK_FASTCALL PHILAddActiveObject(tPhysics_object* pInfo, const br_matrix34* pArg2, const br_vector3* pArg3, const br_vector3* pArg4) {
+    NOT_IMPLEMENTED();
+}
 
 // PHILAddObjectImmediately
 
 // PHILAddActiveObjectImmediately
 
-// PHILSetObjectProperty
+// STUB: CARMA2_HW 0x004b63b0
+// STUB: CARMA2_SW 0x004b2ad0
+int C2_HOOK_CDECL PHILSetObjectProperty(tPhysics_object* pCollision_info, int pParam, ...) {
+    NOT_IMPLEMENTED();
+}
 
 // STUB: CARMA2_HW 0x004b6530
 // STUB: CARMA2_SW 0x004b2c50
