@@ -34,6 +34,13 @@ typedef int tTWTVFS;
 typedef tU32 tPlayer_ID;
 typedef tU8 tNet_message_type;
 
+#ifdef REC2_HW
+typedef tU16 tPixel;
+#endif
+#ifdef REC2_SW
+typedef tU8 tPixel;
+#endif
+
 // FIXME: incomplete type
 typedef struct tCar_spec tCar_spec;
 typedef struct tCar_crush_spec tCar_crush_spec;
