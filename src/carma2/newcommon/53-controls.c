@@ -1019,14 +1019,18 @@ void C2_HOOK_FASTCALL ChangeCameraTypeInGame(void) {
     }
 }
 
-// SteelBollock
+void C2_HOOK_FASTCALL SteelBollock(void) {
+
+    SphericizeCar(gCar_to_view);
+    NewTextHeadupSlot(4, 0, 2000, -4, "STEEL GONAD O' DEATH");
+}
 
 // FUNCTION: CARMA2_HW 0x00444f10
 // FUNCTION: CARMA2_SW 0x00444ff0
 void C2_HOOK_FASTCALL RichardsSphere(int pNum) {
+
     TotallyRepairACar(gCar_to_view);
-    SphericizeCar(gCar_to_view);
-    NewTextHeadupSlot(4, 0, 2000, -4, "STEEL GONAD O' DEATH");
+    SteelBollock();
 }
 
 // FUNCTION: CARMA2_HW 0x00444f40

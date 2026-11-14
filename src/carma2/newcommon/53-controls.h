@@ -201,7 +201,7 @@ extern void C2_HOOK_FASTCALL ToggleAccessoryRendering(void);
 
 extern void C2_HOOK_FASTCALL UserSendMessage(void);
 
-// EnterUserMessage
+extern void C2_HOOK_FASTCALL SteelBollock(void);
 
 extern void C2_HOOK_FASTCALL DisplayUserMessage(void);
 
