@@ -766,7 +766,7 @@ void C2_HOOK_FASTCALL OneLessPed(tPedestrian* pPed) {
     if (flags == 0) {
         pPed->flags |= 0x100;
         if (gCurrent_race.race_spec->race_type == kRaceType_Carma1 && ++gCount_killed_peds >= gPed_count) {
-            NewTextHeadupSlot(4, 0, 5000, -4, GetMiscString(26));
+            NewTextHeadupSlot(4, 0, 5000, -4, GetMiscString(eMiscString_every_pedestrian_killed));
             RaceCompleted(eRace_over_1);
             return;
         }
