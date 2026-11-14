@@ -108,14 +108,16 @@ tU32 gUINT_0074a690;
 // GLOBAL: CARMA2_SW 0x007411d8
 tU32 gUINT_0074a718;
 
+#ifdef REC2_HW
 // GLOBAL: CARMA2_HW 0x0074a71c
-br_actor* PTR_0074a71c;
+br_actor* gNetscore_box_universe;
 
 // GLOBAL: CARMA2_HW 0x0074a720
-br_material* PTR_ARRAY_0074a720[4] = { 0 };
+br_material* gNetscore_box_materials[4] = { 0 };
 
 // GLOBAL: CARMA2_HW 0x0074a730
-br_actor* DAT_0074a730 = NULL;
+br_actor* gNetscore_box_camera = NULL;
+#endif
 
 // GLOBAL: CARMA2_HW 0x0074a734
 // GLOBAL: CARMA2_SW 0x007411f4
@@ -125,11 +127,13 @@ int gIt_or_fox;
 // GLOBAL: CARMA2_SW 0x007411f8
 int gInitialised_grid;
 
+#ifdef REC2_HW
 // GLOBAL: CARMA2_HW 0x0074a73c
-br_model* PTR_0074a73c;
+br_model* gNetScore_box_model;
 
 // GLOBAL: CARMA2_HW 0x0074a740
-br_actor* PTR_ARRAY_0074a740[12] = { 0 };
+br_actor* gNetscore_box_actors[12] = { 0 };
+#endif
 
 // GLOBAL: CARMA2_HW 0x0074a770
 int gINT_0074a770 = 0;

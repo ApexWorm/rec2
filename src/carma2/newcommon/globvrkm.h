@@ -17,7 +17,9 @@
 extern br_actor* gCamera_list[2];
 extern int gCar_flying;
 extern tCar_spec* gCar_to_view;
-extern int DAT_0068d93c;
+#ifdef REC2_HW
+extern int gNetscore_box_created;
+#endif
 extern tU32 gCar_to_view_id;
 extern int gCamera_reset;
 extern int gCamera_sign;

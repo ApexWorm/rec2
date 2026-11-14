@@ -315,6 +315,7 @@ void C2_HOOK_FASTCALL EnableCar(tCar_spec* pCar) {
 
 // ClipName
 
+#ifdef REC2_HW
 // FUNCTION: CARMA2_HW 0x0049a410
 void C2_HOOK_FASTCALL CreateBoxes(void) {
     br_camera* camera;
@@ -323,37 +324,37 @@ void C2_HOOK_FASTCALL CreateBoxes(void) {
     int i;
     char name[32];
 
-    C2_HOOK_BUG_ON(REC2_ASIZE(PTR_ARRAY_0074a720) != 4);
-    C2_HOOK_BUG_ON(REC2_ASIZE(PTR_ARRAY_0074a740) != 12);
+    C2_HOOK_BUG_ON(REC2_ASIZE(gNetscore_box_materials) != 4);
+    C2_HOOK_BUG_ON(REC2_ASIZE(gNetscore_box_actors) != 12);
 
-    PTR_0074a71c = BrActorAllocate(BR_ACTOR_NONE, NULL);
-    for (i = 0; i < (int)REC2_ASIZE(PTR_ARRAY_0074a740); i++) {
-        PTR_ARRAY_0074a740[i] = BrActorAllocate(BR_ACTOR_MODEL, NULL);
-        if (PTR_ARRAY_0074a740[i] == NULL) {
+    gNetscore_box_universe = BrActorAllocate(BR_ACTOR_NONE, NULL);
+    for (i = 0; i < (int)REC2_ASIZE(gNetscore_box_actors); i++) {
+        gNetscore_box_actors[i] = BrActorAllocate(BR_ACTOR_MODEL, NULL);
+        if (gNetscore_box_actors[i] == NULL) {
             BrFailure("Out of memory for NetPlay");
         }
-        PTR_ARRAY_0074a740[i]->render_style = BR_RSTYLE_FACES;
+        gNetscore_box_actors[i]->render_style = BR_RSTYLE_FACES;
     }
-    PTR_0074a73c = BrModelAllocate("NetScore Model", 4, 2);
-    PTR_0074a73c->faces[0].vertices[0] = 0;
-    PTR_0074a73c->faces[0].vertices[1] = 1;
-    PTR_0074a73c->faces[0].vertices[2] = 2;
-    PTR_0074a73c->faces[1].vertices[0] = 1;
-    PTR_0074a73c->faces[1].vertices[1] = 3;
-    PTR_0074a73c->faces[1].vertices[2] = 2;
-    PTR_0074a73c->faces[0].material = NULL;
-    PTR_0074a73c->faces[1].material = NULL;
-    BrVector3Set(&PTR_0074a73c->vertices[0].p, 0.f, 0.f, -2.f);
-    BrVector3Set(&PTR_0074a73c->vertices[1].p, 100.f, 0.f, -2.f);
-    BrVector3Set(&PTR_0074a73c->vertices[2].p, 0.f, -38.f, -2.f);
-    BrVector3Set(&PTR_0074a73c->vertices[3].p, 100.f, -38.f, -2.f);
-    BrVector2Set(&PTR_0074a73c->vertices[0].map, 0.f, 0.f);
-    BrVector2Set(&PTR_0074a73c->vertices[1].map, 0.78125f, 0.f);
-    BrVector2Set(&PTR_0074a73c->vertices[2].map, 0.f, 0.296875f);
-    BrVector2Set(&PTR_0074a73c->vertices[3].map, 0.78125f, 0.296875f);
-    PTR_0074a73c->flags |= BR_MODF_KEEP_ORIGINAL;
-    BrModelAdd(PTR_0074a73c);
-    for (i = 0; i < (int)REC2_ASIZE(PTR_ARRAY_0074a720); i++) {
+    gNetScore_box_model = BrModelAllocate("NetScore Model", 4, 2);
+    gNetScore_box_model->faces[0].vertices[0] = 0;
+    gNetScore_box_model->faces[0].vertices[1] = 1;
+    gNetScore_box_model->faces[0].vertices[2] = 2;
+    gNetScore_box_model->faces[1].vertices[0] = 1;
+    gNetScore_box_model->faces[1].vertices[1] = 3;
+    gNetScore_box_model->faces[1].vertices[2] = 2;
+    gNetScore_box_model->faces[0].material = NULL;
+    gNetScore_box_model->faces[1].material = NULL;
+    BrVector3Set(&gNetScore_box_model->vertices[0].p, 0.0f, 0.0f, -2.0f);
+    BrVector3Set(&gNetScore_box_model->vertices[1].p, 100.0f, 0.0f, -2.0f);
+    BrVector3Set(&gNetScore_box_model->vertices[2].p, 0.0f, -38.0f, -2.0f);
+    BrVector3Set(&gNetScore_box_model->vertices[3].p, 100.0f, -38.0f, -2.0f);
+    BrVector2Set(&gNetScore_box_model->vertices[0].map, 0.0f, 0.0f);
+    BrVector2Set(&gNetScore_box_model->vertices[1].map, 1.0f / 1.28f, 0.0f);
+    BrVector2Set(&gNetScore_box_model->vertices[2].map, 0.0f, 0.38f / 1.28f);
+    BrVector2Set(&gNetScore_box_model->vertices[3].map, 1.0f / 1.28f, 0.38f / 1.28f);
+    gNetScore_box_model->flags |= BR_MODF_KEEP_ORIGINAL;
+    BrModelAdd(gNetScore_box_model);
+    for (i = 0; i < (int)REC2_ASIZE(gNetscore_box_materials); i++) {
         sprintf(name, "NETBOX%i.PIX", i + 1);
         pixelmap = LoadPixelmap(name);
         if (pixelmap == NULL) {
@@ -365,19 +366,20 @@ void C2_HOOK_FASTCALL CreateBoxes(void) {
         material->colour_map = pixelmap;
         material->flags = BR_MATF_FORCE_FRONT | BR_MATF_ALWAYS_VISIBLE;
         BrMaterialAdd(material);
-        PTR_ARRAY_0074a720[i] = material;
+        gNetscore_box_materials[i] = material;
     }
-    DAT_0074a730 = BrActorAllocate(BR_ACTOR_CAMERA, NULL);
-    DAT_0074a730->identifier = "Net HUD Camera";
-    camera = DAT_0074a730->type_data;
+    gNetscore_box_camera = BrActorAllocate(BR_ACTOR_CAMERA, NULL);
+    gNetscore_box_camera->identifier = "Net HUD Camera";
+    camera = gNetscore_box_camera->type_data;
     camera->type = BR_CAMERA_PARALLEL;
-    camera->hither_z = 1.f;
-    camera->yon_z = 3.f;
+    camera->hither_z = 1.0f;
+    camera->yon_z = 3.0f;
     camera->width = gScreen->width;
     camera->height = gScreen->height;
-    BrActorAdd(PTR_0074a71c, DAT_0074a730);
-    DAT_0068d93c = 1;
+    BrActorAdd(gNetscore_box_universe, gNetscore_box_camera);
+    gNetscore_box_created = 1;
 }
+#endif
 
 // DrawScoreBoxes
 
