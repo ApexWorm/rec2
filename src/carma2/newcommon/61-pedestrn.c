@@ -131,16 +131,19 @@ int gPed_severing_chance = 0;
 br_material* gPed_slick_material = NULL;
 
 // GLOBAL: CARMA2_HW 0x0069fd88
-br_material* gBurning_ped_materials[7] = { 0 };
+// GLOBAL: CARMA2_SW 0x00699de0
+br_material* gNapalm_bolt_materials[7] = { 0 };
 
 // GLOBAL: CARMA2_HW 0x0069fda4
 int gINT_0069fda4 = 0;
 
 // GLOBAL: CARMA2_HW 0x00694308
-br_model* gBurning_ped_models[7];
+// GLOBAL: CARMA2_SW 0x0068e360
+br_model* gNapalm_bolt_models[7];
 
 // GLOBAL: CARMA2_HW 0x0065e598
-const char* gBurning_ped_map_names[7] = {
+// GLOBAL: CARMA2_SW 0x00658ed0
+const char* gNapalm_bolt_texture_names[7] = {
     "Ex00006",
     "Ex00006",
     "Ex00006",
@@ -478,54 +481,57 @@ br_vector3* C2_HOOK_FASTCALL GetPedPos(tPedestrian* pPed) {
 // InitOtherPedStuff
 
 // FUNCTION: CARMA2_HW 0x004cb630
+// FUNCTION: CARMA2_SW 0x004c7d30
 void C2_HOOK_FASTCALL InitNapalmNolts(void) {
     int i;
     int j;
 
-    C2_HOOK_BUG_ON(REC2_ASIZE(gBurning_ped_map_names) != 7);
-    C2_HOOK_BUG_ON(REC2_ASIZE(gBurning_ped_materials) != REC2_ASIZE(gBurning_ped_map_names));
-    C2_HOOK_BUG_ON(REC2_ASIZE(gBurning_ped_models) != REC2_ASIZE(gBurning_ped_map_names));
-    C2_HOOK_BUG_ON(REC2_ASIZE(gNapalm_bolts[0].actors) != REC2_ASIZE(gBurning_ped_map_names));
+    C2_HOOK_BUG_ON(REC2_ASIZE(gNapalm_bolt_texture_names) != 7);
+    C2_HOOK_BUG_ON(REC2_ASIZE(gNapalm_bolt_materials) != REC2_ASIZE(gNapalm_bolt_texture_names));
+    C2_HOOK_BUG_ON(REC2_ASIZE(gNapalm_bolt_models) != REC2_ASIZE(gNapalm_bolt_texture_names));
+    C2_HOOK_BUG_ON(REC2_ASIZE(gNapalm_bolts[0].actors) != REC2_ASIZE(gNapalm_bolt_texture_names));
     C2_HOOK_BUG_ON(REC2_ASIZE(gNapalm_bolts) != 5);
     C2_HOOK_BUG_ON(sizeof(tNapalm_bolt) != 0x6c);
 
-    for (i = 0; i < (int)REC2_ASIZE(gBurning_ped_materials); i++) {
-        gBurning_ped_models[i] = BrModelAllocate(NULL, 4, 2);
-        gBurning_ped_models[i]->faces[0].vertices[0] = 0;
-        gBurning_ped_models[i]->faces[0].vertices[1] = 2;
-        gBurning_ped_models[i]->faces[0].vertices[2] = 1;
-        gBurning_ped_models[i]->faces[0].material = NULL;
-        gBurning_ped_models[i]->faces[0].smoothing = 1;
-        gBurning_ped_models[i]->faces[1].vertices[0] = 0;
-        gBurning_ped_models[i]->faces[1].vertices[1] = 3;
-        gBurning_ped_models[i]->faces[1].vertices[2] = 2;
-        gBurning_ped_models[i]->faces[1].material = NULL;
-        gBurning_ped_models[i]->faces[1].smoothing = 1;
-        BrVector3Set(&gBurning_ped_models[i]->vertices[0].p, -.5f, -.5f, 0.f);
-        BrVector2Set(&gBurning_ped_models[i]->vertices[0].map, 0.f, 1.f);
-        BrVector3Set(&gBurning_ped_models[i]->vertices[1].p, -.5f, .5f, 0.f);
-        BrVector2Set(&gBurning_ped_models[i]->vertices[1].map, 0.f, 0.f);
-        BrVector3Set(&gBurning_ped_models[i]->vertices[2].p, .5f, .5f, 0.f);
-        BrVector2Set(&gBurning_ped_models[i]->vertices[2].map, 1.f, 0.f);
-        BrVector3Set(&gBurning_ped_models[i]->vertices[3].p, .5f, -.5f, 0.f);
-        BrVector2Set(&gBurning_ped_models[i]->vertices[3].map, 1.f, 1.f);
-        BrModelAdd(gBurning_ped_models[i]);
-        gBurning_ped_materials[i] = BrMaterialAllocate("BURN!");
-        gBurning_ped_materials[i]->flags &= ~BR_MATF_LIGHT;
-        gBurning_ped_materials[i]->flags |= BR_MATF_ALWAYS_VISIBLE;
-        gBurning_ped_materials[i]->colour_map = BrMapFind(gBurning_ped_map_names[i]);
-        if (gBurning_ped_materials[i]->colour_map == NULL) {
-            FatalError(kFatalError_CantFindPedTexture_S, gBurning_ped_map_names[i]);
+    for (i = 0; i < (int)REC2_ASIZE(gNapalm_bolt_materials); i++) {
+        gNapalm_bolt_models[i] = BrModelAllocate(NULL, 4, 2);
+        gNapalm_bolt_models[i]->faces[0].vertices[0] = 0;
+        gNapalm_bolt_models[i]->faces[0].vertices[1] = 2;
+        gNapalm_bolt_models[i]->faces[0].vertices[2] = 1;
+        gNapalm_bolt_models[i]->faces[0].material = NULL;
+        gNapalm_bolt_models[i]->faces[0].smoothing = 1;
+        gNapalm_bolt_models[i]->faces[1].vertices[0] = 0;
+        gNapalm_bolt_models[i]->faces[1].vertices[1] = 3;
+        gNapalm_bolt_models[i]->faces[1].vertices[2] = 2;
+        gNapalm_bolt_models[i]->faces[1].material = NULL;
+        gNapalm_bolt_models[i]->faces[1].smoothing = 1;
+        BrVector3Set(&gNapalm_bolt_models[i]->vertices[0].p, -0.5f, -0.5f, 0.0f);
+        BrVector2Set(&gNapalm_bolt_models[i]->vertices[0].map, 0.0f, 1.0f);
+        BrVector3Set(&gNapalm_bolt_models[i]->vertices[1].p, -0.5f, 0.5f, 0.0f);
+        BrVector2Set(&gNapalm_bolt_models[i]->vertices[1].map, 0.0f, 0.0f);
+        BrVector3Set(&gNapalm_bolt_models[i]->vertices[2].p, 0.5f, 0.5f, 0.0f);
+        BrVector2Set(&gNapalm_bolt_models[i]->vertices[2].map, 1.0f, 0.0f);
+        BrVector3Set(&gNapalm_bolt_models[i]->vertices[3].p, 0.5f, -0.5f, 0.0f);
+        BrVector2Set(&gNapalm_bolt_models[i]->vertices[3].map, 1.0f, 1.0f);
+        BrModelAdd(gNapalm_bolt_models[i]);
+        gNapalm_bolt_materials[i] = BrMaterialAllocate("BURN!");
+        gNapalm_bolt_materials[i]->flags &= ~BR_MATF_LIGHT;
+        gNapalm_bolt_materials[i]->flags |= BR_MATF_ALWAYS_VISIBLE;
+        gNapalm_bolt_materials[i]->colour_map = BrMapFind(gNapalm_bolt_texture_names[i]);
+        if (gNapalm_bolt_materials[i]->colour_map == NULL) {
+            FatalError(kFatalError_CantFindPedTexture_S, gNapalm_bolt_texture_names[i]);
         }
-        GlorifyMaterial(&gBurning_ped_materials[i], 1, kRendererShadingType_Diffuse2);
-        BrMaterialAdd(gBurning_ped_materials[i]);
+#ifdef REC2_HW
+        GlorifyMaterial(&gNapalm_bolt_materials[i], 1, kRendererShadingType_Diffuse2);
+#endif
+        BrMaterialAdd(gNapalm_bolt_materials[i]);
     }
     for (i = 0; i < (int)REC2_ASIZE(gNapalm_bolts); i++) {
         gNapalm_bolts[i].ped = NULL;
         for (j = 0; j < (int)REC2_ASIZE(gNapalm_bolts[i].actors); j++) {
             gNapalm_bolts[i].actors[j] = BrActorAllocate(BR_ACTOR_MODEL, NULL);
-            gNapalm_bolts[i].actors[j]->material = gBurning_ped_materials[j];
-            gNapalm_bolts[i].actors[j]->model = gBurning_ped_models[j];
+            gNapalm_bolts[i].actors[j]->material = gNapalm_bolt_materials[j];
+            gNapalm_bolts[i].actors[j]->model = gNapalm_bolt_models[j];
             gNapalm_bolts[i].actors[j]->render_style = BR_RSTYLE_NONE;
             BrActorAdd(gNon_track_actor, gNapalm_bolts[i].actors[j]);
         }
