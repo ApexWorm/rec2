@@ -673,7 +673,7 @@ void C2_HOOK_FASTCALL ResetPedSpeed(tPowerup* powerup, tCar_spec* car) {
 void C2_HOOK_FASTCALL ResetPedSize(tPowerup* pPowerup, tCar_spec* pCar) {
     br_vector3 scale;
 
-    BrVector3Set(&scale, 1.f, 1.f, 1.f);
+    BrVector3Set(&scale, 1.0f, 1.0f, 1.0f);
     ChangePedScaling(&scale);
 }
 
