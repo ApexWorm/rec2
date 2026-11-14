@@ -401,6 +401,36 @@ void C2_HOOK_FASTCALL GetThreeInts(FILE* pF, int* pF1, int* pF2, int* pF3) {
     sscanf(str, "%d", pF3);
 }
 
+// FUNCTION: CARMA2_HW 0x0048fed0
+// FUNCTION: CARMA2_SW 0x0048d140
+void C2_HOOK_FASTCALL GetThreeIntsAndAString(FILE* pF, int* pF1, int* pF2, int* pF3, char* pS) {
+    char s[256];
+    char* str;
+
+    GetALineAndDontArgue(pF, s);
+    str = strtok(s, "\t ,/");
+    sscanf(str, "%d", pF1);
+    str = strtok(NULL, "\t ,/");
+    sscanf(str, "%d", pF2);
+    str = strtok(NULL, "\t ,/");
+    sscanf(str, "%d", pF3);
+    str = strtok(NULL, "\t ,/");
+    strcpy(pS, str);
+}
+
+// FUNCTION: CARMA2_HW 0x0048ffa0
+// FUNCTION: CARMA2_SW 0x0048d210
+void C2_HOOK_FASTCALL GetIntAndAString(FILE* pF, int* pF1, char* pS) {
+    char s[256];
+    char* str;
+
+    GetALineAndDontArgue(pF, s);
+    str = strtok(s, "\t ,/");
+    sscanf(str, "%d", pF1);
+    str = strtok(NULL, "\t ,/");
+    strcpy(pS, str);
+}
+
 // FUNCTION: CARMA2_HW 0x00490020
 // FUNCTION: CARMA2_SW 0x0048d290
 void C2_HOOK_FASTCALL GetFourInts(FILE* pF, int* pF1, int* pF2, int* pF3, int* pF4) {
