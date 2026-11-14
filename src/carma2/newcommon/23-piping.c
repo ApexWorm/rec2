@@ -256,7 +256,11 @@ void C2_HOOK_FASTCALL ARAdvanceChunkPtr(tU8** pChunk, int pType) {
 
 // PipingFrameReset
 
-// ARPipeSearchForwards
+// FUNCTION: CARMA2_HW 0x00402540
+// FUNCTION: CARMA2_SW 0x00402540
+int C2_HOOK_FASTCALL ARPipeSearchForwards(void) {
+    return ARReplayForwards();
+}
 
 // FUNCTION: CARMA2_HW 0x004025a0
 // FUNCTION: CARMA2_SW 0x004025a0
