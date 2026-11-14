@@ -726,11 +726,11 @@ void C2_HOOK_FASTCALL FlameAnimate(int pColumn, const br_vector3* pPos, tU32 pTi
             AddFlameToPipingSession(i + 16 * pColumn, col->frame_count[i] + 1, col->scale_x[i], col->scale_y[i], col->offset_x[i], col->offset_z[i]);
             AREndPipingSession();
             col->frame_count[i] = IRandomBetween(-5, -1);
-            scale = SRandomBetween(1.f, 1.5f) * .003f;
+            scale = SRandomBetween(1.0f, 1.5f) * 0.003f;
             col->scale_x[i] = (2 * IRandomBetween(0, 1) - 1) * scale;
-            col->scale_y[i] = SRandomBetween(.5f, 1.f) * .003f;
-            col->offset_x[i] = SRandomPosNeg(.03f);
-            col->offset_z[i] = SRandomBetween(-.03f, 0.f);
+            col->scale_y[i] = SRandomBetween(0.5f, 1.0f) * 0.003f;
+            col->offset_x[i] = SRandomPosNeg(0.03f);
+            col->offset_z[i] = SRandomBetween(-0.03f, 0.f);
             actor->type = BR_ACTOR_NONE;
         }
         if (col->frame_count[i] == 0) {
