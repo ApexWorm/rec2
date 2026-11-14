@@ -496,7 +496,156 @@ void C2_HOOK_FASTCALL ResetCrushSystems(void) {
     gCount_car_damage_crush_list = 0;
 }
 
-// ReadCrushData
+// FUNCTION: CARMA2_HW 0x0042a550
+// FUNCTION: CARMA2_SW 0x0042a5e0
+void C2_HOOK_FASTCALL ReadCrushData(FILE* pF, tCar_crush_buffer_entry* pCar_crush_buffer_entry, tBrender_storage* pBrender_storage) {
+    int i;
+
+    C2_HOOK_BUG_ON(REC2_ASIZE(gSoftness_names) != 6);
+    C2_HOOK_BUG_ON(REC2_ASIZE(gCrush_type_names) != 3);
+    C2_HOOK_BUG_ON(REC2_ASIZE(gEase_of_detachment_names) != 5);
+    C2_HOOK_BUG_ON(REC2_ASIZE(gCar_crush_shape_names) != 2);
+    C2_HOOK_BUG_ON(REC2_ASIZE(gDetach_type_names) != 4);
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tCar_crush_detach_data, shape_points, 16 * sizeof(int));
+
+    GetAString(pF, pCar_crush_buffer_entry->actor_name);
+    if (strlen(pCar_crush_buffer_entry->actor_name) < 4) {
+        PDFatalError("Less than 4 chars in car actor identifier");
+    }
+    DRstrlwr(pCar_crush_buffer_entry->actor_name);
+    switch (GetALineAndInterpretCommand(pF, gSoftness_names, REC2_ASIZE(gSoftness_names))) {
+    case eSoftness_VerySoft:
+        pCar_crush_buffer_entry->softness_factor = 4.0f;
+        break;
+    case eSoftness_Soft:
+        pCar_crush_buffer_entry->softness_factor = 2.0f;
+        break;
+    default:
+        pCar_crush_buffer_entry->softness_factor = 1.0f;
+        break;
+    case eSoftness_Hard:
+        pCar_crush_buffer_entry->softness_factor = 0.5f;
+        break;
+    case eSoftness_VeryHard:
+        pCar_crush_buffer_entry->softness_factor = 0.25f;
+        break;
+    case eSoftness_Uncrushable:
+        pCar_crush_buffer_entry->softness_factor = 0.0f;
+        break;
+    }
+    pCar_crush_buffer_entry->id = gCrush_data_entry_counter;
+    gCrush_data_entry_counter++;
+
+    switch (GetALineAndInterpretCommand(pF, gCrush_type_names, REC2_ASIZE(gCrush_type_names))) {
+    case eCrushType_Flap:
+        C2_HOOK_BUG_ON(sizeof(tCar_crush_flap_data) != 0x2c);
+        pCar_crush_buffer_entry->flap_data = BrMemAllocate(sizeof(tCar_crush_flap_data), kMem_crush_data);
+        pCar_crush_buffer_entry->flap_data->hinge0 = GetAnInt(pF);
+        pCar_crush_buffer_entry->flap_data->hinge1 = GetAnInt(pF);
+        pCar_crush_buffer_entry->flap_data->hinge2 = GetAnInt(pF);
+        pCar_crush_buffer_entry->flap_data->field_0x4 = 0;
+        pCar_crush_buffer_entry->flap_data->field_0x2 = 0;
+        pCar_crush_buffer_entry->flap_data->field_0x6 = BR_ANGLE_DEG(90);
+        pCar_crush_buffer_entry->flap_data->field_0x8 = BR_ANGLE_DEG(90);
+        pCar_crush_buffer_entry->flap_data->kev_o_flap = GetAnInt(pF);
+        pCar_crush_buffer_entry->flap_data->field_0x14 = 1;
+        pCar_crush_buffer_entry->flap_data->field_0x15 = 0;
+        pCar_crush_buffer_entry->flap_data->field_0x18 = 0;
+        if (strstr(pCar_crush_buffer_entry->actor_name, "door") != NULL || strstr(pCar_crush_buffer_entry->actor_name, "dor") != NULL) {
+            pCar_crush_buffer_entry->flap_data->is_door = 1;
+        } else {
+            pCar_crush_buffer_entry->flap_data->is_door = 0;
+        }
+        C2_HOOK_BUG_ON(sizeof(tCar_crush_detach_data) != 0x88);
+        pCar_crush_buffer_entry->detach_data = BrMemAllocate(sizeof(tCar_crush_detach_data), kMem_crush_data);
+        pCar_crush_buffer_entry->detach_data->field_0x0 = 0.f;
+        switch (GetALineAndInterpretCommand(pF, gEase_of_detachment_names, REC2_ASIZE(gEase_of_detachment_names))) {
+        case eEaseOfDetachment_VeryEasy:
+            pCar_crush_buffer_entry->detach_data->force = gNormal_force_to_detach * 0.25f;
+            break;
+        case eEaseOfDetachment_Easy:
+            pCar_crush_buffer_entry->detach_data->force = gNormal_force_to_detach * 0.5f;
+            break;
+        case eEaseOfDetachment_Normal:
+        default:
+            pCar_crush_buffer_entry->detach_data->force = gNormal_force_to_detach;
+            break;
+        case eEaseOfDetachment_Hard:
+            pCar_crush_buffer_entry->detach_data->force = gNormal_force_to_detach * 2.0f;
+            break;
+        case eEaseOfDetachment_VeryHard:
+            pCar_crush_buffer_entry->detach_data->force = gNormal_force_to_detach * 4.0f;
+            break;
+        }
+        if (pCar_crush_buffer_entry->flap_data->kev_o_flap) {
+            pCar_crush_buffer_entry->detach_data->type = eDetachType_kev_o_flap;
+        } else {
+            pCar_crush_buffer_entry->detach_data->type = eDetachType_fully_detachable;
+        }
+        switch (GetALineAndInterpretCommand(pF, gCar_crush_shape_names, REC2_ASIZE(gCar_crush_shape_names))) {
+        case eCarCrushShape_poly:
+            pCar_crush_buffer_entry->detach_data->count_shape_points = GetAnInt(pF);
+            for (i = 0; i < pCar_crush_buffer_entry->detach_data->count_shape_points; i++) {
+                pCar_crush_buffer_entry->detach_data->shape_points[i] = GetAnInt(pF);
+            }
+            break;
+        case eCarCrushShape_box:
+        default:
+            pCar_crush_buffer_entry->detach_data->count_shape_points = 0;
+            break;
+        }
+        pCar_crush_buffer_entry->detach_data->field_0x28 = 0;
+        break;
+    case eCrushType_Detach:
+        C2_HOOK_BUG_ON(sizeof(tCar_crush_detach_data) != 0x88);
+        pCar_crush_buffer_entry->detach_data = BrMemAllocate(sizeof(tCar_crush_detach_data), kMem_crush_data);
+        pCar_crush_buffer_entry->detach_data->field_0x0 = 0.f;
+        switch (GetALineAndInterpretCommand(pF, gEase_of_detachment_names, REC2_ASIZE(gEase_of_detachment_names))) {
+        case eEaseOfDetachment_VeryEasy:
+            pCar_crush_buffer_entry->detach_data->force = gNormal_force_to_detach * 0.25f;
+            break;
+        case eEaseOfDetachment_Easy:
+            pCar_crush_buffer_entry->detach_data->force = gNormal_force_to_detach * 0.5f;
+            break;
+        case eEaseOfDetachment_Normal:
+        default:
+            pCar_crush_buffer_entry->detach_data->force = gNormal_force_to_detach;
+            break;
+        case eEaseOfDetachment_Hard:
+            pCar_crush_buffer_entry->detach_data->force = gNormal_force_to_detach * 2.0f;
+            break;
+        case eEaseOfDetachment_VeryHard:
+            pCar_crush_buffer_entry->detach_data->force = gNormal_force_to_detach * 4.0f;
+            break;
+        }
+        pCar_crush_buffer_entry->detach_data->type = GetALineAndInterpretCommand(pF, gDetach_type_names, REC2_ASIZE(gDetach_type_names));
+        if (pCar_crush_buffer_entry->detach_data->type == eDetachType_joint_index) {
+            pCar_crush_buffer_entry->detach_data->field_0x30 = GetAnInt(pF);
+        }
+        switch (GetALineAndInterpretCommand(pF, gCar_crush_shape_names, REC2_ASIZE(gCar_crush_shape_names))) {
+        case eCarCrushShape_poly:
+            pCar_crush_buffer_entry->detach_data->count_shape_points = GetAnInt(pF);
+            if (pCar_crush_buffer_entry->detach_data->count_shape_points > (int)REC2_ASIZE(pCar_crush_buffer_entry->detach_data->shape_points)) {
+                PDFatalError("Too many sample points in crush data");
+            }
+            for (i = 0; i < pCar_crush_buffer_entry->detach_data->count_shape_points; i++) {
+                pCar_crush_buffer_entry->detach_data->shape_points[i] = GetAnInt(pF);
+            }
+            break;
+        case eCarCrushShape_box:
+        default:
+            pCar_crush_buffer_entry->detach_data->count_shape_points = 0;
+            break;
+        }
+        pCar_crush_buffer_entry->detach_data->field_0x28 = 0;
+        break;
+    }
+    if (gNet_mode != eNet_mode_none && pCar_crush_buffer_entry->detach_data != NULL) {
+        pCar_crush_buffer_entry->detach_data->count_shape_points = 0;
+    }
+    pCar_crush_buffer_entry->field_0x2c = 0;
+    ReadSmashableData(pF, pCar_crush_buffer_entry, pBrender_storage);
+}
 
 // FUNCTION: CARMA2_HW 0x0042a220
 // FUNCTION: CARMA2_SW 0x0042a2b0
@@ -534,157 +683,6 @@ void C2_HOOK_FASTCALL CreateDefaultCrushData(br_actor* pActor, tCar_spec* pCar_s
 // LinkCrushDataToActor
 
 // LinkCrushDataToActors
-
-// FUNCTION: CARMA2_HW 0x0042a550
-// FUNCTION: CARMA2_SW 0x0042a5e0
-void C2_HOOK_FASTCALL LoadCarCrushDataEntry(FILE* pF, tCar_crush_buffer_entry* pCar_crush_buffer_entry, tBrender_storage* pBrender_storage) {
-    int i;
-
-    C2_HOOK_BUG_ON(REC2_ASIZE(gSoftness_names) != 6);
-    C2_HOOK_BUG_ON(REC2_ASIZE(gCrush_type_names) != 3);
-    C2_HOOK_BUG_ON(REC2_ASIZE(gEase_of_detachment_names) != 5);
-    C2_HOOK_BUG_ON(REC2_ASIZE(gCar_crush_shape_names) != 2);
-    C2_HOOK_BUG_ON(REC2_ASIZE(gDetach_type_names) != 4);
-    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tCar_crush_detach_data, shape_points, 16 * sizeof(int));
-
-    GetAString(pF, pCar_crush_buffer_entry->actor_name);
-    if (strlen(pCar_crush_buffer_entry->actor_name) < 4) {
-        PDFatalError("Less than 4 chars in car actor identifier");
-    }
-    DRstrlwr(pCar_crush_buffer_entry->actor_name);
-    switch (GetALineAndInterpretCommand(pF, gSoftness_names, REC2_ASIZE(gSoftness_names))) {
-    case eSoftness_VerySoft:
-        pCar_crush_buffer_entry->softness_factor = 4.f;
-        break;
-    case eSoftness_Soft:
-        pCar_crush_buffer_entry->softness_factor = 2.f;
-        break;
-    default:
-        pCar_crush_buffer_entry->softness_factor = 1.f;
-        break;
-    case eSoftness_Hard:
-        pCar_crush_buffer_entry->softness_factor = 0.5f;
-        break;
-    case eSoftness_VeryHard:
-        pCar_crush_buffer_entry->softness_factor = 0.25f;
-        break;
-    case eSoftness_Uncrushable:
-        pCar_crush_buffer_entry->softness_factor = 0.f;
-        break;
-    }
-    pCar_crush_buffer_entry->id = gCrush_data_entry_counter;
-    gCrush_data_entry_counter++;
-
-    switch (GetALineAndInterpretCommand(pF, gCrush_type_names, REC2_ASIZE(gCrush_type_names))) {
-    case eCrushType_Flap:
-        C2_HOOK_BUG_ON(sizeof(tCar_crush_flap_data) != 0x2c);
-        pCar_crush_buffer_entry->flap_data = BrMemAllocate(sizeof(tCar_crush_flap_data), kMem_crush_data);
-        pCar_crush_buffer_entry->flap_data->hinge0 = GetAnInt(pF);
-        pCar_crush_buffer_entry->flap_data->hinge1 = GetAnInt(pF);
-        pCar_crush_buffer_entry->flap_data->hinge2 = GetAnInt(pF);
-        pCar_crush_buffer_entry->flap_data->field_0x4 = 0;
-        pCar_crush_buffer_entry->flap_data->field_0x2 = 0;
-        pCar_crush_buffer_entry->flap_data->field_0x6 = 0x3ffc;
-        pCar_crush_buffer_entry->flap_data->field_0x8 = 0x3ffc;
-        pCar_crush_buffer_entry->flap_data->kev_o_flap = GetAnInt(pF);
-        pCar_crush_buffer_entry->flap_data->field_0x14 = 1;
-        pCar_crush_buffer_entry->flap_data->field_0x15 = 0;
-        pCar_crush_buffer_entry->flap_data->field_0x18 = 0;
-        if (strstr(pCar_crush_buffer_entry->actor_name, "door") != NULL || strstr(pCar_crush_buffer_entry->actor_name, "dor") != NULL) {
-            pCar_crush_buffer_entry->flap_data->is_door = 1;
-        } else {
-            pCar_crush_buffer_entry->flap_data->is_door = 0;
-        }
-        C2_HOOK_BUG_ON(sizeof(tCar_crush_detach_data) != 0x88);
-        pCar_crush_buffer_entry->detach_data = BrMemAllocate(sizeof(tCar_crush_detach_data), kMem_crush_data);
-        pCar_crush_buffer_entry->detach_data->field_0x0 = 0.f;
-        switch (GetALineAndInterpretCommand(pF, gEase_of_detachment_names, REC2_ASIZE(gEase_of_detachment_names))) {
-        case eEaseOfDetachment_VeryEasy:
-            pCar_crush_buffer_entry->detach_data->force = gNormal_force_to_detach * 0.25f;
-            break;
-        case eEaseOfDetachment_Easy:
-            pCar_crush_buffer_entry->detach_data->force = gNormal_force_to_detach * 0.5f;
-            break;
-        case eEaseOfDetachment_Normal:
-        default:
-            pCar_crush_buffer_entry->detach_data->force = gNormal_force_to_detach;
-            break;
-        case eEaseOfDetachment_Hard:
-            pCar_crush_buffer_entry->detach_data->force = gNormal_force_to_detach * 2.f;
-            break;
-        case eEaseOfDetachment_VeryHard:
-            pCar_crush_buffer_entry->detach_data->force = gNormal_force_to_detach * 4.f;
-            break;
-        }
-        if (pCar_crush_buffer_entry->flap_data->kev_o_flap) {
-            pCar_crush_buffer_entry->detach_data->type = eDetachType_kev_o_flap;
-        } else {
-            pCar_crush_buffer_entry->detach_data->type = eDetachType_fully_detachable;
-        }
-        switch (GetALineAndInterpretCommand(pF, gCar_crush_shape_names, REC2_ASIZE(gCar_crush_shape_names))) {
-        case eCarCrushShape_poly:
-            pCar_crush_buffer_entry->detach_data->count_shape_points = GetAnInt(pF);
-            for (i = 0; i < pCar_crush_buffer_entry->detach_data->count_shape_points; i++) {
-                pCar_crush_buffer_entry->detach_data->shape_points[i] = GetAnInt(pF);
-            }
-            break;
-        case eCarCrushShape_box:
-        default:
-            pCar_crush_buffer_entry->detach_data->count_shape_points = 0;
-            break;
-        }
-        pCar_crush_buffer_entry->detach_data->field_0x28 = 0;
-        break;
-    case eCrushType_Detach:
-        C2_HOOK_BUG_ON(sizeof(tCar_crush_detach_data) != 0x88);
-        pCar_crush_buffer_entry->detach_data = BrMemAllocate(sizeof(tCar_crush_detach_data), kMem_crush_data);
-        pCar_crush_buffer_entry->detach_data->field_0x0 = 0.f;
-        switch (GetALineAndInterpretCommand(pF, gEase_of_detachment_names, REC2_ASIZE(gEase_of_detachment_names))) {
-        case eEaseOfDetachment_VeryEasy:
-            pCar_crush_buffer_entry->detach_data->force = gNormal_force_to_detach * .25f;
-            break;
-        case eEaseOfDetachment_Easy:
-            pCar_crush_buffer_entry->detach_data->force = gNormal_force_to_detach * .5f;
-            break;
-        case eEaseOfDetachment_Normal:
-        default:
-            pCar_crush_buffer_entry->detach_data->force = gNormal_force_to_detach;
-            break;
-        case eEaseOfDetachment_Hard:
-            pCar_crush_buffer_entry->detach_data->force = gNormal_force_to_detach * 2.f;
-            break;
-        case eEaseOfDetachment_VeryHard:
-            pCar_crush_buffer_entry->detach_data->force = gNormal_force_to_detach * 4.f;
-            break;
-        }
-        pCar_crush_buffer_entry->detach_data->type = GetALineAndInterpretCommand(pF, gDetach_type_names, REC2_ASIZE(gDetach_type_names));
-        if (pCar_crush_buffer_entry->detach_data->type == eDetachType_joint_index) {
-            pCar_crush_buffer_entry->detach_data->field_0x30 = GetAnInt(pF);
-        }
-        switch (GetALineAndInterpretCommand(pF, gCar_crush_shape_names, REC2_ASIZE(gCar_crush_shape_names))) {
-        case eCarCrushShape_poly:
-            pCar_crush_buffer_entry->detach_data->count_shape_points = GetAnInt(pF);
-            if (pCar_crush_buffer_entry->detach_data->count_shape_points > (int)REC2_ASIZE(pCar_crush_buffer_entry->detach_data->shape_points)) {
-                PDFatalError("Too many sample points in crush data");
-            }
-            for (i = 0; i < pCar_crush_buffer_entry->detach_data->count_shape_points; i++) {
-                pCar_crush_buffer_entry->detach_data->shape_points[i] = GetAnInt(pF);
-            }
-            break;
-        case eCarCrushShape_box:
-        default:
-            pCar_crush_buffer_entry->detach_data->count_shape_points = 0;
-            break;
-        }
-        pCar_crush_buffer_entry->detach_data->field_0x28 = 0;
-        break;
-    }
-    if (gNet_mode != eNet_mode_none && pCar_crush_buffer_entry->detach_data != NULL) {
-        pCar_crush_buffer_entry->detach_data->count_shape_points = 0;
-    }
-    pCar_crush_buffer_entry->field_0x2c = 0;
-    ReadSmashableData(pF, pCar_crush_buffer_entry, pBrender_storage);
-}
 
 // FUNCTION: CARMA2_HW 0x0042a940
 // FUNCTION: CARMA2_SW 0x0042a9d0

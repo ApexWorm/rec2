@@ -50,7 +50,7 @@ extern void C2_HOOK_FASTCALL InitCrushSystems(void);
 
 extern void C2_HOOK_FASTCALL ResetCrushSystems(void);
 
-// ReadCrushData
+extern void C2_HOOK_FASTCALL ReadCrushData(FILE* pF, tCar_crush_buffer_entry* pCar_crush_buffer_entry, tBrender_storage* pBrender_storage);
 
 extern intptr_t C2_HOOK_CDECL CreateDefaultCrushDataCB(br_actor* pActor, void* pData);
 
@@ -63,8 +63,6 @@ extern void C2_HOOK_FASTCALL CreateDefaultCrushData(br_actor* pActor, tCar_spec*
 // LinkCrushDataToActor
 
 // LinkCrushDataToActors
-
-extern void C2_HOOK_FASTCALL LoadCarCrushDataEntry(FILE* pF, tCar_crush_buffer_entry* pCar_crush_buffer_entry, tBrender_storage* pBrender_storage);
 
 extern void C2_HOOK_FASTCALL LinkCarCrushDatas(br_actor* pActor, tCar_crush_buffer* pBuffer);
 
