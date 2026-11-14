@@ -109,6 +109,17 @@ tU32 gUINT_0074a690;
 // GLOBAL: CARMA2_SW 0x007411d8
 tU32 gUINT_0074a718;
 
+#ifdef REC2_HW
+// GLOBAL: CARMA2_HW 0x0074a71c
+br_actor* gNetscore_box_universe;
+
+// GLOBAL: CARMA2_HW 0x0074a720
+br_material* gNetscore_box_materials[4] = { 0 };
+
+// GLOBAL: CARMA2_HW 0x0074a730
+br_actor* gNetscore_box_camera = NULL;
+#endif
+
 // GLOBAL: CARMA2_HW 0x0074a734
 // GLOBAL: CARMA2_SW 0x007411f4
 int gIt_or_fox;
@@ -116,6 +127,17 @@ int gIt_or_fox;
 // GLOBAL: CARMA2_HW 0x0074a738
 // GLOBAL: CARMA2_SW 0x007411f8
 int gInitialised_grid;
+
+#ifdef REC2_HW
+// GLOBAL: CARMA2_HW 0x0074a73c
+br_model* gNetScore_box_model;
+
+// GLOBAL: CARMA2_HW 0x0074a740
+br_actor* gNetscore_box_actors[12] = { 0 };
+#endif
+
+// GLOBAL: CARMA2_HW 0x0074a770
+int gINT_0074a770 = 0;
 
 // GLOBAL: CARMA2_HW 0x00659d30
 // GLOBAL: CARMA2_SW 0x00654648
@@ -261,7 +283,7 @@ void C2_HOOK_FASTCALL NetSendHeadupToPlayer(char* pMessage, tPlayer_ID pPlayer) 
             }
         } else {
             message = NetBuildGuaranteedMessage(eNet_message_chunk_type_headup, 0);
-            strcpy((char*)message->contents.raw.data, pMessage);
+            strcpy(message->contents.headup.text, pMessage);
             NetGuaranteedSendMessageToPlayer(gCurrent_net_game, message, pPlayer, NULL);
         }
     }
@@ -339,7 +361,11 @@ void C2_HOOK_FASTCALL NetStartProducingJoinList(tAddToJoinListProc* pAdd_proc) {
     PDNetStartProducingJoinList();
 }
 
-// NetEndJoinList
+// STUB: CARMA2_HW 0x0049dc00
+// STUB: CARMA2_SW 0x00499d80
+void C2_HOOK_FASTCALL NetEndJoinList(void) {
+    NOT_IMPLEMENTED();
+}
 
 // FUNCTION: CARMA2_HW 0x0049dc70
 // FUNCTION: CARMA2_SW 0x00499df0
@@ -445,7 +471,31 @@ int C2_HOOK_FASTCALL NetReallySendMessageToPlayer(tNet_game_details* pNet_game, 
     return -3;
 }
 
-// NetSendMessageToPlayer
+// FUNCTION: CARMA2_HW 0x0049ef20
+// FUNCTION: CARMA2_SW 0x0049b0a0
+int C2_HOOK_FASTCALL NetSendMessageToPlayer(tNet_game_details* pDetails, tNet_message* pMessage, tPlayer_ID pPlayer) {
+    int i;
+    int size;
+    void* contents;
+
+    C2_HOOK_BUG_ON(sizeof(tNet_message_header) != 0x18);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tNet_message, contents, 0x18);
+
+    for (i = 0; i < gNumber_of_net_players; i++) {
+        if (gNet_players[i].ID == pPlayer) {
+            size = pMessage->header.field_0x16 - sizeof(tNet_message_header);
+            pMessage->contents.raw.header.size = size;
+            contents = NetGetToPlayerContentsSize(&gNet_players[i], size);
+            if (contents != NULL) {
+                memcpy(contents, &pMessage->contents, size);
+                NetDisposeMessage(pDetails, pMessage);
+                return 0;
+            }
+        }
+    }
+    NetDisposeMessage(pDetails, pMessage);
+    return -3;
+}
 
 // FUNCTION: CARMA2_HW 0x0049f0d0
 int C2_HOOK_FASTCALL NetSendMessageToHost(tNet_game_details* pDetails, tNet_message* pMessage) {
