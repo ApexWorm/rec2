@@ -68,8 +68,6 @@ extern tPed_cache_006944c0 gPed_cache_006944c0[100];
 extern tPed_face_cache_0x34* gPed_face_caches[4];
 extern int gPipe_halted_ped_status;
 extern int gPed_valium_left;
-extern int gPed_severing_chance;
-extern br_material* gPed_slick_material;
 
 extern int C2_HOOK_FASTCALL OrientationChanged(const br_matrix34* pOrientation_1, const br_matrix34* pOrientation_2, float pCos_angle);
 
