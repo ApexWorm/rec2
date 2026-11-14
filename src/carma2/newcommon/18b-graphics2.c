@@ -626,6 +626,7 @@ void DRPixelmapDoubledCopy(br_pixelmap* pDestn, br_pixelmap* pSource, int pSourc
 #endif
 
 // FUNCTION: CARMA2_HW 0x0047c740
+// FUNCTION: CARMA2_SW 0x0047baf0
 void C2_HOOK_FASTCALL PoshDrawLine(br_pixelmap* pDestn, int pX1, float pAngle, int pY1, int pX2, int pY2, int pColour) {
 
     if (pColour >= 0) {
