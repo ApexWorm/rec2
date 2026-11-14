@@ -20,6 +20,13 @@ extern int rr_min;
 extern int rr_mid;
 extern int rr_max;
 extern int gInitialised_grid;
+#ifdef REC2_HW
+extern br_actor* gNetscore_box_universe;
+extern br_material* gNetscore_box_materials[4];
+extern br_actor* gNetscore_box_camera;
+extern br_model* gNetScore_box_model;
+extern br_actor* gNetscore_box_actors[12];
+#endif
 
 extern int C2_HOOK_FASTCALL NetInitialise(void);
 
@@ -51,7 +58,7 @@ extern void C2_HOOK_FASTCALL DoNextJoinPoll(void);
 
 extern void C2_HOOK_FASTCALL NetStartProducingJoinList(tAddToJoinListProc* pAdd_proc);
 
-// NetEndJoinList
+extern void C2_HOOK_FASTCALL NetEndJoinList(void);
 
 extern void C2_HOOK_FASTCALL NetDisposePIDGameInfo(tNet_game_details* pDetails);
 
@@ -93,7 +100,7 @@ extern int C2_HOOK_FASTCALL NetSendMessageToAddress(tNet_game_details* pDetails,
 
 extern int C2_HOOK_FASTCALL NetReallySendMessageToPlayer(tNet_game_details* pNet_game, tNet_message* pMessage, tPlayer_ID pPlayer_id);
 
-// NetSendMessageToPlayer
+extern int C2_HOOK_FASTCALL NetSendMessageToPlayer(tNet_game_details* pDetails, tNet_message* pMessage, tPlayer_ID pPlayer);
 
 extern int C2_HOOK_FASTCALL NetSendMessageToHost(tNet_game_details* pDetails, tNet_message* pMessage);
 
@@ -237,10 +244,12 @@ extern tNet_game_player_info* C2_HOOK_FASTCALL NetPlayerFromCar(tCar_spec* pCar)
 
 extern void C2_HOOK_FASTCALL GetCheckSum(tNet_message* pMessage);
 
-// CheckCheckSum
+extern void C2_HOOK_FASTCALL CheckCheckSum(tNet_message* pMessage);
 
-// StatReceivePacket
+extern void C2_HOOK_FASTCALL StatReceivePacket(void);
 
-// StatSendPacket
+extern void C2_HOOK_FASTCALL StatReceivePacket(void);
+
+extern void C2_HOOK_FASTCALL StatSendPacket(void);
 
 #endif // GUARD_01_NETWORK_H
