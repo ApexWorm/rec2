@@ -47,7 +47,7 @@ extern void C2_HOOK_FASTCALL RemoveDroneFromPHIL(tDrone_spec* pDrone);
 
 // InitDroneCollisionObject
 
-// ReallyAddDroneToPHIL
+extern int C2_HOOK_FASTCALL ReallyAddDroneToPHIL(tDrone_spec* pDrone);
 
 // AddDroneToPHIL
 
