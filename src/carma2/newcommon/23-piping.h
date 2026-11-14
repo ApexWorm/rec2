@@ -32,6 +32,8 @@ extern tU8* gPipe_record_ptr;
 extern tU32 gPipe_sound_start_time;
 extern tU32 gPipe_sound_time_window;
 extern int gDisable_advance;
+extern tPipe_smudge_data* gCrush_space;
+extern tU8* gEnd_of_session;
 
 extern int C2_HOOK_FASTCALL ARReplayForwards(void);
 
@@ -57,7 +59,7 @@ extern int C2_HOOK_FASTCALL LengthOfChunk(tPipe_chunk* pChunk, int pType);
 
 extern tU32 C2_HOOK_FASTCALL LengthOfSession(tPipe_session* pSession);
 
-// ARAdvanceChunkPtr
+extern void C2_HOOK_FASTCALL ARAdvanceChunkPtr(tU8** pChunk, int pType);
 
 // PipingFrameReset
 
@@ -71,7 +73,7 @@ extern int C2_HOOK_FASTCALL ARSomeReplayLeft(void);
 
 // EnablePipedSounds
 
-// StartPipingSession2
+extern void C2_HOOK_FASTCALL StartPipingSession2(tPipe_chunk_type pType, int pMunge_reentrancy);
 
 extern void C2_HOOK_FASTCALL ARStartPipingSession(tPipe_chunk_type pType);
 
@@ -223,7 +225,7 @@ extern void C2_HOOK_FASTCALL PipeSingleSpecial(tSpecial_type pType);
 
 // PipeSingleCarIncident
 
-// PipeSinglePedIncident
+extern void C2_HOOK_FASTCALL PipeSinglePedIncident(tPedestrian* pPed, br_actor* pActor);
 
 extern void C2_HOOK_FASTCALL PipeSingleWallIncident(float pSeverity, br_vector3* pImpact_point);
 
@@ -255,7 +257,7 @@ extern void C2_HOOK_FASTCALL PipeSingleSmashTextureChange(tCar_spec* pCar_spec, 
 
 extern void C2_HOOK_FASTCALL PipeSingleRepulseRay(int pIndex, br_vector3* pOrigin, br_vector3* pVictim, tU32 pTime);
 
-// PipeSinglePedStatus
+extern void C2_HOOK_FASTCALL PipeSinglePedStatus(const tPedestrian* pPed, tS8 pArg2, tS8 pArg3, tS8 pArg4, tS8 pArg5, tS8 pArg6, tU8 pArg7, tS8 pArg8, tU8 pArg9, const br_vector3* pArg10, const br_vector3* pArg11, const br_matrix34* pArg12);
 
 extern void C2_HOOK_FASTCALL PipeSinglePedDir(int pId, const br_vector3* pDir);
 
@@ -265,7 +267,7 @@ extern void C2_HOOK_FASTCALL PipeSinglePedPhysics(int pId, br_matrix34* pMat);
 
 extern void C2_HOOK_FASTCALL PipeSinglePedDismember(tPedestrian* pPed, tU8 pBone_index, tS8 pOld_value, tS8 pNew_value);
 
-// PipeSinglePedFPChange
+extern void C2_HOOK_FASTCALL PipeSinglePedFPChange(tPedestrian* pPed, float pOld_speed, float pNew_speed);
 
 extern void C2_HOOK_FASTCALL PipeSinglePedPos(const tPedestrian* pPed, const br_vector3* pPos, const br_vector3* pVelocity);
 
@@ -315,7 +317,7 @@ extern void C2_HOOK_FASTCALL ApplySmudge(tPipe_chunk** pChunk);
 
 // ApplySpark
 
-// ApplyShrapnel
+extern void C2_HOOK_FASTCALL ApplyShrapnel(tPipe_chunk** pChunk);
 
 extern void C2_HOOK_FASTCALL ApplyScreenWobble(tPipe_chunk** pChunk);
 
@@ -341,7 +343,7 @@ extern void C2_HOOK_FASTCALL ApplyFrameBoundary(tPipe_chunk** pChunk);
 
 // ApplyCar
 
-// ApplyGWS
+extern void C2_HOOK_FASTCALL ApplyGWS(tPipe_chunk** pChunk);
 
 // ApplyDamage
 

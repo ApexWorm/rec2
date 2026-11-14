@@ -147,11 +147,11 @@ extern void C2_HOOK_FASTCALL CheckHorn3D(tCar_spec* pCar);
 
 // SortOutRecover
 
-// SetFlipUpCar
+extern void C2_HOOK_FASTCALL SetFlipUpCar(tCar_spec* pCar);
 
 extern void C2_HOOK_FASTCALL AlignChildren(tPhysics_object* pCollision_info);
 
-// FlipUpCar
+extern void C2_HOOK_FASTCALL FlipUpCar(tCar_spec* pCar_spec);
 
 extern void C2_HOOK_FASTCALL GetPowerup(int pNum);
 
@@ -161,9 +161,9 @@ extern void C2_HOOK_FASTCALL CheckForCheatingGits(void);
 
 // CheckKevKeys
 
-// BrakeInstantly
+extern void C2_HOOK_FASTCALL BrakeInstantly(void);
 
-// PollCarControls
+extern void C2_HOOK_FASTCALL PollCarControls(tU32 pTime_difference);
 
 extern void C2_HOOK_FASTCALL PollCameraControls(tU32 pCamera_period);
 
@@ -201,7 +201,7 @@ extern void C2_HOOK_FASTCALL ToggleAccessoryRendering(void);
 
 extern void C2_HOOK_FASTCALL UserSendMessage(void);
 
-// EnterUserMessage
+extern void C2_HOOK_FASTCALL SteelBollock(void);
 
 extern void C2_HOOK_FASTCALL DisplayUserMessage(void);
 
@@ -213,7 +213,7 @@ extern void C2_HOOK_FASTCALL ChangeCameraTypeInGame(void);
 
 // SteelBollock
 
-// RichardsSphere
+extern void C2_HOOK_FASTCALL RichardsSphere(int pNum);
 
 extern void C2_HOOK_FASTCALL ToggleHeadupLevel(void);
 

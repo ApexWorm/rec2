@@ -23,6 +23,7 @@
 #include "72-interface.h"
 #include "c2_stdio.h"
 #include "globvars.h"
+#include "globvrkm.h"
 #include "globvrpb.h"
 #include "platform.h"
 #include "rec2_macros.h"
@@ -314,7 +315,71 @@ void C2_HOOK_FASTCALL EnableCar(tCar_spec* pCar) {
 
 // ClipName
 
-// CreateBoxes
+#ifdef REC2_HW
+// FUNCTION: CARMA2_HW 0x0049a410
+void C2_HOOK_FASTCALL CreateBoxes(void) {
+    br_camera* camera;
+    br_pixelmap* pixelmap;
+    br_material* material;
+    int i;
+    char name[32];
+
+    C2_HOOK_BUG_ON(REC2_ASIZE(gNetscore_box_materials) != 4);
+    C2_HOOK_BUG_ON(REC2_ASIZE(gNetscore_box_actors) != 12);
+
+    gNetscore_box_universe = BrActorAllocate(BR_ACTOR_NONE, NULL);
+    for (i = 0; i < (int)REC2_ASIZE(gNetscore_box_actors); i++) {
+        gNetscore_box_actors[i] = BrActorAllocate(BR_ACTOR_MODEL, NULL);
+        if (gNetscore_box_actors[i] == NULL) {
+            BrFailure("Out of memory for NetPlay");
+        }
+        gNetscore_box_actors[i]->render_style = BR_RSTYLE_FACES;
+    }
+    gNetScore_box_model = BrModelAllocate("NetScore Model", 4, 2);
+    gNetScore_box_model->faces[0].vertices[0] = 0;
+    gNetScore_box_model->faces[0].vertices[1] = 1;
+    gNetScore_box_model->faces[0].vertices[2] = 2;
+    gNetScore_box_model->faces[1].vertices[0] = 1;
+    gNetScore_box_model->faces[1].vertices[1] = 3;
+    gNetScore_box_model->faces[1].vertices[2] = 2;
+    gNetScore_box_model->faces[0].material = NULL;
+    gNetScore_box_model->faces[1].material = NULL;
+    BrVector3Set(&gNetScore_box_model->vertices[0].p, 0.0f, 0.0f, -2.0f);
+    BrVector3Set(&gNetScore_box_model->vertices[1].p, 100.0f, 0.0f, -2.0f);
+    BrVector3Set(&gNetScore_box_model->vertices[2].p, 0.0f, -38.0f, -2.0f);
+    BrVector3Set(&gNetScore_box_model->vertices[3].p, 100.0f, -38.0f, -2.0f);
+    BrVector2Set(&gNetScore_box_model->vertices[0].map, 0.0f, 0.0f);
+    BrVector2Set(&gNetScore_box_model->vertices[1].map, 1.0f / 1.28f, 0.0f);
+    BrVector2Set(&gNetScore_box_model->vertices[2].map, 0.0f, 0.38f / 1.28f);
+    BrVector2Set(&gNetScore_box_model->vertices[3].map, 1.0f / 1.28f, 0.38f / 1.28f);
+    gNetScore_box_model->flags |= BR_MODF_KEEP_ORIGINAL;
+    BrModelAdd(gNetScore_box_model);
+    for (i = 0; i < (int)REC2_ASIZE(gNetscore_box_materials); i++) {
+        sprintf(name, "NETBOX%i.PIX", i + 1);
+        pixelmap = LoadPixelmap(name);
+        if (pixelmap == NULL) {
+            BrFailure("Cannot find headup graphic %s", name);
+        }
+        BrMapAdd(pixelmap);
+        material = BrMaterialAllocate("NetScore Material");
+        material->colour = 0;
+        material->colour_map = pixelmap;
+        material->flags = BR_MATF_FORCE_FRONT | BR_MATF_ALWAYS_VISIBLE;
+        BrMaterialAdd(material);
+        gNetscore_box_materials[i] = material;
+    }
+    gNetscore_box_camera = BrActorAllocate(BR_ACTOR_CAMERA, NULL);
+    gNetscore_box_camera->identifier = "Net HUD Camera";
+    camera = gNetscore_box_camera->type_data;
+    camera->type = BR_CAMERA_PARALLEL;
+    camera->hither_z = 1.0f;
+    camera->yon_z = 3.0f;
+    camera->width = gScreen->width;
+    camera->height = gScreen->height;
+    BrActorAdd(gNetscore_box_universe, gNetscore_box_camera);
+    gNetscore_box_created = 1;
+}
+#endif
 
 // DrawScoreBoxes
 
@@ -579,7 +644,19 @@ void C2_HOOK_FASTCALL CheckForNeedyEnvironmentRecipients(void) {
 
 // ReceivedGameplay
 
-// SendGameplay
+// FUNCTION: CARMA2_HW 0x0049bc20
+// FUNCTION: CARMA2_SW 0x00497da0
+void C2_HOOK_FASTCALL SendGameplay(tPlayer_ID pPlayer, tNet_gameplay_mess pMess, int pParam_1, int pParam_2, int pParam_3, int pParam_4) {
+    tNet_message* the_message;
+
+    the_message = NetBuildGuaranteedMessage(eNet_message_chunk_type_gameplay, 0);
+    the_message->contents.gameplay.mess = pMess;
+    the_message->contents.gameplay.param_1 = pParam_1;
+    the_message->contents.gameplay.param_2 = pParam_2;
+    the_message->contents.gameplay.param_3 = pParam_3;
+    the_message->contents.gameplay.param_4 = pParam_4;
+    NetGuaranteedSendMessageToPlayer(gCurrent_net_game, the_message, pPlayer, NULL);
+}
 
 // FUNCTION: CARMA2_HW 0x0049bc70
 // FUNCTION: CARMA2_SW 0x00497df0

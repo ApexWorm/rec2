@@ -15,6 +15,7 @@
 
 #include "16-graphics1.h"
 #include "18-graphics2.h"
+#include "23-piping.h"
 #include "32-spark.h"
 #include "39-oil.h"
 #include "41-utility.h"
@@ -41,17 +42,25 @@ int gInventory[20];
 // GLOBAL: CARMA2_SW 0x0069aac4
 int gINT_006a0a6c;
 
-// GLOBAL: CARMA2_HW 0x006a0a5c
-// GLOBAL: CARMA2_SW 0x0069aab4
-int gINT_006a0a5c;
+// GLOBAL: CARMA2_HW 0x006a0960
+// GLOBAL: CARMA2_SW 0x0069a9b8
+tRepulse_link gRepulse_links[6] = { 0 };
+
+// GLOBAL: CARMA2_HW 0x006a0a50
+// GLOBAL: CARMA2_SW 0x0069aaa8
+tU8* gRace_powerup_respawn_bools = NULL;
+
+// GLOBAL: CARMA2_HW 0x006a0a54
+// GLOBAL: CARMA2_SW 0x0069aaac
+tPowerup* gPowerup_array = NULL;
 
 // GLOBAL: CARMA2_HW 0x006a0a58
 // GLOBAL: CARMA2_SW 0x0069aab0
 int gInventory_selected = 0;
 
-// GLOBAL: CARMA2_HW 0x006a0960
-// GLOBAL: CARMA2_SW 0x0069a9b8
-tRepulse_link gRepulse_links[6];
+// GLOBAL: CARMA2_HW 0x006a0a5c
+// GLOBAL: CARMA2_SW 0x0069aab4
+int gINT_006a0a5c = 0;
 
 // GLOBAL: CARMA2_HW 0x006a0ad4
 // GLOBAL: CARMA2_SW 0x0069ab2c
@@ -60,6 +69,10 @@ const char* gPowerup_txt_path;
 // GLOBAL: CARMA2_HW 0x006a0ad8
 // GLOBAL: CARMA2_SW 0x0069ab30
 tU32* gReal_render_palette;
+
+// GLOBAL: CARMA2_HW 0x006a0adc
+// GLOBAL: CARMA2_SW 0x0069ab34
+int gCollision_info_uid_counter;
 
 // GLOBAL: CARMA2_HW 0x006a0ae0
 // GLOBAL: CARMA2_SW 0x0069ab38
@@ -105,6 +118,10 @@ int gPickup_respawn_min_time_ms;
 // GLOBAL: CARMA2_SW 0x0073b2a8
 int gPickup_respawn_max_extra_time_ms;
 
+// GLOBAL: CARMA2_HW 0x007447cc
+// GLOBAL: CARMA2_SW 0x0073b28c
+int gCount_killed_peds;
+
 // GLOBAL: CARMA2_HW 0x007447d0
 int gBlind_pedestrians;
 
@@ -124,9 +141,13 @@ int gPanicking_peds;
 // GLOBAL: CARMA2_SW 0x006fc480
 int gCount_mutant_tail_parts;
 
+// GLOBAL: CARMA2_HW 0x006a0458
+// GLOBAL: CARMA2_SW 0x0069a4b0
+tRespawn_powerup gRespawn_powerups[100] = { 0 };
+
 // GLOBAL: CARMA2_HW 0x006a0908
 // GLOBAL: CARMA2_SW 0x0069a960
-tPhysics_object* gMutant_tail_object;
+tPhysics_object* gMutant_tail_object = NULL;
 
 // GLOBAL: CARMA2_HW 0x006a0acc
 // GLOBAL: CARMA2_SW 0x0069ab24
@@ -167,10 +188,6 @@ tU32 gInventory_timeout;
 // GLOBAL: CARMA2_HW 0x0079ec50
 // GLOBAL: CARMA2_SW 0x007951b0
 int gInstant_handbrake;
-
-// GLOBAL: CARMA2_HW 0x006a0a54
-// GLOBAL: CARMA2_SW 0x0069aaac
-tPowerup* gPowerup_array;
 
 // FUNCTION: CARMA2_HW 0x004d8d10
 // FUNCTION: CARMA2_SW 0x004d5240
@@ -250,7 +267,37 @@ void C2_HOOK_FASTCALL LoadPowerups(void) {
 
 // MungeBoxObject
 
-// MungeShereObject
+// FUNCTION: CARMA2_HW 0x004da400
+// FUNCTION: CARMA2_SW 0x004d68d0
+tPhysics_object* C2_HOOK_FASTCALL MungeShereObject(br_model* pModel, float pWeight) {
+    tPhysics_object* collision_info;
+    tPhysics_shape* shape;
+
+    C2_HOOK_BUG_ON(sizeof(tPhysics_object) != 0x4d8);
+
+    collision_info = BrMemAllocate(sizeof(tPhysics_object), kMem_collision_object);
+    collision_info->shape = (tPhysics_shape*)AllocateShapeSphere(kMem_collision_shape);
+    BrVector3Set(&collision_info->shape->sphere.sphere.center, 0.0f, 0.0f, 0.0f);
+    collision_info->shape->sphere.sphere.radius = (pModel->bounds.max.v[0] - pModel->bounds.min.v[0]
+        + pModel->bounds.max.v[1] - pModel->bounds.min.v[1]
+        + pModel->bounds.max.v[2] - pModel->bounds.min.v[2]) / 6.0f;
+    FillInShape(collision_info->shape);
+    collision_info->uid = (tU8)gCollision_info_uid_counter;
+    gCollision_info_uid_counter++;
+    UpdateCollisionObject(collision_info);
+    shape = collision_info->shape;
+    collision_info->M = pWeight;
+    BrVector3Set(&collision_info->I,
+        REC2_SQR(shape->sphere.sphere.radius) * pWeight / 6.0f,
+        REC2_SQR(shape->sphere.sphere.radius) * pWeight / 6.0f,
+        REC2_SQR(shape->sphere.sphere.radius) * pWeight / 6.0f);
+    BrVector3SetFloat(&collision_info->field_0x54, 0.0f, (br_scalar)(-1.0 / (2.5 * 6.9)), 0.0f);
+    collision_info->actor = BrActorAllocate(BR_ACTOR_MODEL, NULL);
+    BrMatrix34Copy(&collision_info->actor->t.t.mat, &collision_info->transform_matrix);
+    collision_info->actor->model = pModel;
+    collision_info->box_face_ref = (tU16)(gFace_num__car - 2);
+    return collision_info;
+}
 
 // InitTail
 
@@ -621,7 +668,14 @@ void C2_HOOK_FASTCALL ResetPedSpeed(tPowerup* powerup, tCar_spec* car) {
     gPedestrian_speed_factor = 1.f;
 }
 
-// ResetPedSize
+// FUNCTION: CARMA2_HW 0x004dc9d0
+// FUNCTION: CARMA2_SW 0x004d8ed0
+void C2_HOOK_FASTCALL ResetPedSize(tPowerup* pPowerup, tCar_spec* pCar) {
+    br_vector3 scale;
+
+    BrVector3Set(&scale, 1.0f, 1.0f, 1.0f);
+    ChangePedScaling(&scale);
+}
 
 // ResetPedHeadSize
 
@@ -727,7 +781,19 @@ void C2_HOOK_FASTCALL TheEffectsOfDrugs(tPowerup* pPowerup, tU32 pPeriod) {
     ResetPalette();
 }
 
-// SetOpponentsSpeed
+// FUNCTION: CARMA2_HW 0x004dcca0
+// FUNCTION: CARMA2_SW 0x004d91a0
+int C2_HOOK_FASTCALL SetOpponentsSpeed(tPowerup* pPowerup, tCar_spec* pCar) {
+    int i;
+
+    for (i = 0; i < gCurrent_race.number_of_racers && gCurrent_race.opponent_list[i].index != 29; i++) {
+    }
+    if (i < gCurrent_race.number_of_racers) {
+        SetEngineFactor(&gPowerup_array[5], gCurrent_race.opponent_list[i].car_spec);
+    }
+    gOpponent_speed_factor = pPowerup->float_params[0];
+    return pPowerup - gPowerup_array;
+}
 
 // FUNCTION: CARMA2_HW 0x004dcd70
 // FUNCTION: CARMA2_SW 0x004d9270
@@ -1381,7 +1447,50 @@ int C2_HOOK_FASTCALL PedValium(tPowerup* pPowerup, tCar_spec* pCar) {
 
 // PowerupCancel
 
-// GrowATail
+// FUNCTION: CARMA2_HW 0x004e02b0
+// FUNCTION: CARMA2_SW 0x004dc7b0
+int C2_HOOK_FASTCALL GrowATail(tPowerup* pPowerup, tCar_spec* pCar) {
+    tPhysics_object* object;
+    br_matrix34 mat;
+    br_vector3 pos;
+
+    if (gMutant_tail_state == 2) {
+        return -1;
+    }
+    if (gMutant_tail_state == 1) {
+        PHILRemoveObject(gMutant_tail_object);
+        gMutant_tail_object->physics_joint1 = gMutant_tail_first_joint;
+    } else {
+        PipeSingleSpecial(1);
+    }
+    BrVector3SetFloat(&gMutant_tail_object->physics_joint1->field_0x14,
+        0.0f,
+        (pCar->collision_info->bb1.max.v[1] - pCar->collision_info->bb1.min.v[1]) * 0.5f,
+        (br_scalar)(pCar->collision_info->bb1.max.v[2] * 0.95));
+    PhysicsAddObject(pCar->collision_info, gMutant_tail_object);
+    for (object = gMutant_tail_object; object != NULL; object = object->child) {
+        if (object->actor->parent == NULL) {
+            BrActorAdd(gNon_track_actor, object->actor);
+        }
+        object->owner = pCar;
+        BrMatrix34Translate(&object->actor->t.t.mat,
+            -object->physics_joint1->field_0x08.v[0],
+            -object->physics_joint1->field_0x08.v[1],
+            -object->physics_joint1->field_0x08.v[2]);
+        BrMatrix34Copy(&mat, &pCar->collision_info->actor->t.t.mat);
+        BrMatrix34Post(&object->actor->t.t.mat, &mat);
+        BrMatrix34Rotate(&mat, BR_ANGLE_DEG(350), (br_vector3*)object->actor->t.t.mat.m[0]);
+        BrMatrix34Post(&object->actor->t.t.mat, &mat);
+        BrMatrix34ApplyP(&pos, &object->physics_joint1->field_0x14, &object->parent->actor->t.t.mat);
+        BrMatrix34PostTranslate(&object->actor->t.t.mat, pos.v[0], pos.v[1], pos.v[2]);
+        BrMatrix34Copy(&object->transform_matrix, &object->actor->t.t.mat);
+        object->field_0xed = 1;
+    }
+    GotPowerupEarwig(pCar, 95, 0, 1);
+    gMutant_tail_state = 2;
+    DRS3StartSound2(gCar_outlet, eSoundId_GrowATail, 1, 0xff, 0xff, -1, -1);
+    return pPowerup - gPowerup_array;
+}
 
 // CutOffTail
 
@@ -1428,7 +1537,25 @@ void C2_HOOK_FASTCALL UndoInitialTail(void) {
     }
 }
 
-// MayQueuePowerupRespawn
+// FUNCTION: CARMA2_HW 0x004e0750
+// FUNCTION: CARMA2_SW 0x004dcc50
+void C2_HOOK_FASTCALL MayQueuePowerupRespawn(int pPowerup_index, br_actor* pActor) {
+    int i;
+
+    C2_HOOK_BUG_ON(REC2_ASIZE(gRespawn_powerups) != 100);
+    C2_HOOK_BUG_ON(sizeof(tRespawn_powerup) != 0xc);
+
+    if (pActor != NULL && gRace_powerup_respawn_bools[pPowerup_index] && (gNet_mode == eNet_mode_none || gCurrent_net_game->options.powerup_respawn)) {
+        for (i = 0; i < (int)REC2_ASIZE(gRespawn_powerups); i++) {
+            if (gRespawn_powerups[i].actor == NULL) {
+                gRespawn_powerups[i].actor = pActor;
+                gRespawn_powerups[i].index = pPowerup_index;
+                gRespawn_powerups[i].respawn_time = GetTotalTime() + gPickup_respawn_max_extra_time_ms / 2 + gPickup_respawn_min_time_ms;
+                break;
+            }
+        }
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x004e07d0
 // FUNCTION: CARMA2_SW 0x004dccd0
