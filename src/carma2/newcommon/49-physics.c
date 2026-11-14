@@ -46,6 +46,10 @@ void* gPhysics_buffer1_ptr;
 // GLOBAL: CARMA2_SW 0x0073b2d4
 void* gPhysics_buffer2_ptr;
 
+// GLOBAL: CARMA2_HW 0x0074480c
+// GLOBAL: CARMA2_SW 0x0073b2cc
+int gTotal_count_smash_peds;
+
 // GLOBAL: CARMA2_HW 0x00744810
 // GLOBAL: CARMA2_SW 0x0073b2d0
 int gImmortal_peds;
@@ -65,6 +69,10 @@ void* gPhysics_buffer3_ptr;
 // GLOBAL: CARMA2_HW 0x0074a5e4
 // GLOBAL: CARMA2_SW 0x007410a4
 int gPHIL_mechanics_time_sync;
+
+// GLOBAL: CARMA2_HW 0x0074a5e8
+// GLOBAL: CARMA2_SW 0x007410a8
+int gPHIL_munging_objects;
 
 // GLOBAL: CARMA2_HW 0x006940c8
 // GLOBAL: CARMA2_SW 0x0068e120
@@ -1362,7 +1370,11 @@ void C2_HOOK_FASTCALL FillInShape(tPhysics_shape* pShape) {
     }
 }
 
-// UpdateCollisionObject
+// STUB: CARMA2_HW 0x004c60a0
+// STUB: CARMA2_SW 0x004c27d0
+void C2_HOOK_FASTCALL UpdateCollisionObject(tPhysics_object* pCollision_info) {
+    NOT_IMPLEMENTED();
+}
 
 // FUNCTION: CARMA2_HW 0x004c61c0
 // FUNCTION: CARMA2_SW 0x004c28f0

@@ -25,9 +25,28 @@ extern int gCount_track_smashable_environment_specs;
 extern tStored_smash* gNet_host_smashes;
 
 extern tExplosion gExplosions[50];
+extern tRepair_animation gRepair_animations[25];
 extern br_vector3 gZero_vector__smash;
 extern tDecal gDecals[50];
 extern int gCount_queued_smashes;
+
+typedef struct {
+    br_vector3 origin;
+    br_vector2 map_origin;
+    br_vector2 map_other;
+    br_scalar map_from_geometry[2][2];
+    br_face* face;
+} tSmash_triangle_mapping;
+
+typedef struct {
+    int axis_0;
+    int axis_1;
+    int axis_2;
+    br_vector3 normal;
+    br_scalar d;
+    br_vector2 map_edge;
+    tSmash_triangle_mapping triangles[2];
+} tSmash_quad_mapping;
 
 extern void C2_HOOK_FASTCALL InitFogificateMaterials(void);
 
@@ -71,9 +90,9 @@ extern void C2_HOOK_FASTCALL SetShrapnelFragment(tSmash_vertex* pFragment, tMove
 
 // ShatterObject
 
-// MungeInternalCarGlass
+extern void C2_HOOK_FASTCALL MungeInternalCarGlass(tCar_spec* pCar_spec);
 
-// ActuallySmashPart
+extern void C2_HOOK_FASTCALL ActuallySmashPart(tCar_spec* pCar_spec, tCar_crush_smashable_part* pSmash, int pLevel);
 
 // MakeSmashSound
 
@@ -207,7 +226,7 @@ extern void C2_HOOK_FASTCALL InitSmashing(void);
 
 // VerySimpleRotate
 
-// DoFragMovement
+extern void C2_HOOK_FASTCALL DoFragMovement(tSmash_vertex* pFragment, tU32 pTime, float pDelta_time);
 
 extern void C2_HOOK_FASTCALL MungeGlassFragments2(int pEnd_race);
 
@@ -223,7 +242,7 @@ extern void C2_HOOK_FASTCALL DisposeSmashData(tCar_crush_buffer_entry* pCrush_da
 
 // DoBackwardShrapnel
 
-// InitRepairAnimations
+extern void C2_HOOK_FASTCALL InitRepairAnimations(void);
 
 extern void C2_HOOK_FASTCALL SplondificatalizeIdentifier(br_actor* pActor, char **pIdentifier, int pIndex);
 
@@ -251,13 +270,13 @@ extern void C2_HOOK_FASTCALL FreeConnotations(tConnotations* pConnotations, int 
 
 // ExtrapolateGeometryCoordinates2
 
-// ExtrapolateGeometryCoordinates
+extern void C2_HOOK_FASTCALL ExtrapolateGeometryCoordinates(tSmash_quad_mapping* pMapping, br_vector2* pMap, br_vertex* pVertex);
 
 // ExtractDeTiledFaces
 
 // AddDecal
 
-// InsertQuad
+extern int C2_HOOK_FASTCALL InsertQuad(tSmash_quad_mapping* pMapping, br_actor* pActor, br_vertex* pVertices, tU8* pOn_edge, br_vertex** pCorners, br_material* pMaterial, tU16* pFace_points, tU16* pPoint_indices);
 
 // SpawnSmashAndMungeFaces
 
@@ -321,7 +340,7 @@ extern void C2_HOOK_FASTCALL TurnOffSmashModel(br_actor* pActor);
 
 extern void C2_HOOK_FASTCALL SmashRemoveSomeFaces(br_model* pModel, tS16 pCount);
 
-// SmashRestoreSomeFaces
+extern void C2_HOOK_FASTCALL SmashRestoreSomeFaces(br_model* pModel, int pFace_count, const tU16* pFace_data, br_material* pMaterial);
 
 extern void C2_HOOK_FASTCALL TurnOnSmashDecal(int pIndex);
 
