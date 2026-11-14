@@ -8,8 +8,10 @@
 
 #include "60-phil.h"
 
+#include "18-graphics2.h"
 #include "49-physics.h"
 #include "55-volume.h"
+#include "rec2_macros.h"
 
 // GLOBAL: CARMA2_HW 0x0065d004
 // GLOBAL: CARMA2_SW 0x0065793c
@@ -22,6 +24,30 @@ tPhysics_object* gPHIL_list_collision_infos;
 // GLOBAL: CARMA2_HW 0x0074a5ec
 // GLOBAL: CARMA2_SW 0x007410ac
 tU32 gPHIL_last_physics_tick;
+
+// GLOBAL: CARMA2_HW 0x006923e0
+// GLOBAL: CARMA2_SW 0x0068c438
+int gPHIL_count_list_collision_infos;
+
+// GLOBAL: CARMA2_HW 0x006923e4
+// GLOBAL: CARMA2_SW 0x0068c43c
+int gPHIL_object_added;
+
+// GLOBAL: CARMA2_HW 0x006923f0
+// GLOBAL: CARMA2_SW 0x0068c448
+tPHIL_queued_objects gPhil_queued_objects = { 0 };
+
+// GLOBAL: CARMA2_HW 0x00692db8
+// GLOBAL: CARMA2_SW 0x0068ce10
+tWorld_callback_active_passive_cbfn* gPHIL_original_activate_passive = NULL;
+
+// GLOBAL: CARMA2_HW 0x00692dbc
+// GLOBAL: CARMA2_SW 0x0068ce14
+int gPHIL_count_queued_objects_for_removal;
+
+// GLOBAL: CARMA2_HW 0x00692dc0
+// GLOBAL: CARMA2_SW 0x0068ce18
+int gPHIL_count_queued_objects;
 
 // ScalarToFraction
 
@@ -203,7 +229,30 @@ int C2_HOOK_FASTCALL GetNetworkDataSize(tU8* pNet_data) {
 
 // GetSingleMatrixFromNetworkData
 
-// PHILInit
+// FUNCTION: CARMA2_HW 0x004b5cc0
+// FUNCTION: CARMA2_SW 0x004b23e0
+int C2_HOOK_FASTCALL PHILInit(void) {
+    int i;
+
+    C2_HOOK_BUG_ON(REC2_ASIZE(gPhil_queued_objects.headers) != 100);
+    C2_HOOK_BUG_ON(sizeof(gPhil_queued_objects.headers[0]) != 0x18);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPHIL_queued_objects, headers, 0x68);
+
+    for (i = 0; i < (int)REC2_ASIZE(gPhil_queued_objects.headers); i++) {
+        gPhil_queued_objects.headers[i].collision_info = NULL;
+    }
+    gPHIL_count_list_collision_infos = 0;
+    gPHIL_count_queued_objects = 0;
+    gPHIL_count_queued_objects_for_removal = 0;
+    gPHIL_list_collision_infos = NULL;
+    gPHIL_munging_objects = 0;
+    gPHIL_doing_physics = 0;
+    gPHIL_object_added = 0;
+    gPHIL_last_physics_tick = 0;
+    gPHIL_mechanics_time_sync = 1;
+    gPHIL_disabled = 0;
+    return 0;
+}
 
 // FUNCTION: CARMA2_HW 0x004b5d20
 // FUNCTION: CARMA2_SW 0x004b2440
