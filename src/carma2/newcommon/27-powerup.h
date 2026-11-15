@@ -109,7 +109,7 @@ extern void C2_HOOK_FASTCALL EmptyInventory(void);
 
 extern void C2_HOOK_FASTCALL CloseDownPowerUps(void);
 
-// NewRepulseRay
+extern void C2_HOOK_FASTCALL NewRepulseRay(tU32 pTime, tCar_spec* pCar, tCar_spec* pVictim_car, br_vector3* pPos_origin, br_vector3* pPos_victim, float pRadius1, float pRadius2);
 
 // RemoveRepulsiveReferences
 
@@ -349,7 +349,7 @@ extern void C2_HOOK_FASTCALL ResetLowGravityPeds(tPowerup* pPowerup, tCar_spec* 
 
 extern void C2_HOOK_FASTCALL ResetPissedPeds(tPowerup* pPowerup, tCar_spec* pCar);
 
-// ResetGhostPeds
+extern void C2_HOOK_FASTCALL ResetGhostPeds(tPowerup* pPowerup, tCar_spec* pCar);
 
 // DoBouncey
 
