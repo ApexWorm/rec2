@@ -143,6 +143,7 @@ static tU8 gFlame_frame_size[20][2] = {
     { 24, 70 }, { 20, 65 }, { 20, 64 }, { 20, 74 }, { 28, 55 },
     { 24, 62 }, { 28, 47 }, { 20, 51 }, { 20, 45 }, { 20, 45 },
 };
+
 // GLOBAL: CARMA2_HW 0x006aa5a4
 // GLOBAL: CARMA2_SW 0x006a3ff4
 int gNum_splash_types;
@@ -274,10 +275,21 @@ void C2_HOOK_FASTCALL SetLineModelCols(tU8 pCol) {
 
 // AdjustSpark
 
-// STUB: CARMA2_HW 0x004f86f0
-// STUB: CARMA2_SW 0x004f3d70
+// FUNCTION: CARMA2_HW 0x004f86f0
+// FUNCTION: CARMA2_SW 0x004f3d70
 void C2_HOOK_FASTCALL AdjustShrapnel(int pShrapnel_num, br_vector3* pPos, tU16 pAge, br_material* pMaterial) {
-    NOT_IMPLEMENTED();
+    int i;
+
+    i = pShrapnel_num & 0x7fff;
+    if (!(gShrapnel_flags & (1 << i))) {
+        BrActorAdd(gNon_track_actor, gShrapnel[i].actor);
+    }
+    gShrapnel_flags |= 1 << i;
+    BrVector3Copy(&gShrapnel[i].actor->t.t.translate.t, pPos);
+    if (pShrapnel_num & 0x8000) {
+        gShrapnel[i].age = pAge;
+        gShrapnel[i].actor->material = pMaterial;
+    }
 }
 
 // FUNCTION: CARMA2_HW 0x004f87a0
@@ -286,7 +298,21 @@ void C2_HOOK_FASTCALL ResetSparks(void) {
     gSpark_flags = 0;
 }
 
-// ResetShrapnel
+// FUNCTION: CARMA2_HW 0x004f87b0
+// FUNCTION: CARMA2_SW 0x004f3e30
+void C2_HOOK_FASTCALL ResetShrapnel(void) {
+    int i;
+
+    if (gShrapnel_flags == 0) {
+        return;
+    }
+    for (i = 0; i < (int)REC2_ASIZE(gShrapnel); i++) {
+        if ((gShrapnel_flags & (1 << i)) != 0 && gShrapnel[i].actor->parent != NULL) {
+            BrActorRemove(gShrapnel[i].actor);
+        }
+    }
+    gShrapnel_flags = 0;
+}
 
 // CreateShrapnelShower2
 
@@ -761,11 +787,11 @@ void C2_HOOK_FASTCALL FlameAnimate(int pColumn, const br_vector3* pPos, tU32 pTi
             AddFlameToPipingSession(i + 16 * pColumn, col->frame_count[i] + 1, col->scale_x[i], col->scale_y[i], col->offset_x[i], col->offset_z[i]);
             AREndPipingSession();
             col->frame_count[i] = IRandomBetween(-5, -1);
-            scale = SRandomBetween(1.f, 1.5f) * .003f;
+            scale = SRandomBetween(1.0f, 1.5f) * 0.003f;
             col->scale_x[i] = (2 * IRandomBetween(0, 1) - 1) * scale;
-            col->scale_y[i] = SRandomBetween(.5f, 1.f) * .003f;
-            col->offset_x[i] = SRandomPosNeg(.03f);
-            col->offset_z[i] = SRandomBetween(-.03f, 0.f);
+            col->scale_y[i] = SRandomBetween(0.5f, 1.0f) * 0.003f;
+            col->offset_x[i] = SRandomPosNeg(0.03f);
+            col->offset_z[i] = SRandomBetween(-0.03f, 0.f);
             actor->type = BR_ACTOR_NONE;
         }
         if (col->frame_count[i] == 0) {
@@ -1118,11 +1144,76 @@ void C2_HOOK_FASTCALL StopCarBeingIt(tCar_spec* pCar) {
 #pragma auto_inline(on)
 #endif
 
-// ForEveryModelMaterial
+inline void C2_HOOK_FASTCALL ForEveryModelMaterial(br_model* pModel, tMaterialMaybeUpdate_cbfn* pCallback) {
+    int i;
+    int need_update;
 
-// ForEveryActorMaterial
+    need_update = 0;
+    if (pModel == NULL) {
+        return;
+    }
+    for (i = 0; i < pModel->prepared->ngroups; i++) {
+        br_material* material = pModel->faces[pModel->prepared->groups[i].face_user[0]].material;
 
-// ForEveryActorMaterialNoGrooves
+        if (material != NULL) {
+            need_update |= pCallback(material);
+        }
+    }
+    if (need_update) {
+        BrModelUpdate(pModel, BR_MODU_PRIMITIVE_MATERIALS);
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x004fe8a0
+// FUNCTION: CARMA2_SW 0x004fa180
+intptr_t C2_HOOK_CDECL ForEveryActorMaterial(br_actor* pActor, void* pContext) {
+    tUser_crush_data* user_crush_data;
+    tMaterialMaybeUpdate_cbfn* callback;
+
+    callback = pContext;
+    if (pActor->type != BR_ACTOR_MODEL) {
+        return 0;
+    }
+    if (pActor->model == NULL) {
+        return 0;
+    }
+    user_crush_data = pActor->user;
+    if (user_crush_data == NULL) {
+        return 0;
+    }
+    if (pActor->material != NULL) {
+        callback(pActor->material);
+    }
+    ForEveryModelMaterial(pActor->model, callback);
+    return 0;
+}
+
+// FUNCTION: CARMA2_HW 0x004fe930
+// FUNCTION: CARMA2_SW 0x004fa210
+intptr_t C2_HOOK_CDECL ForEveryActorMaterialNoGrooves(br_actor* pActor, void* pContext) {
+    tUser_crush_data* user_crush_data;
+    tMaterialMaybeUpdate_cbfn* callback;
+
+    callback = pContext;
+    if (pActor->type != BR_ACTOR_MODEL) {
+        return 0;
+    }
+    if (pActor->model == NULL) {
+        return 0;
+    }
+    user_crush_data = pActor->user;
+    if (user_crush_data == NULL) {
+        return 0;
+    }
+    if (user_crush_data->groove != NULL) {
+        return 0;
+    }
+    if (pActor->material != NULL) {
+        callback(pActor->material);
+    }
+    ForEveryModelMaterial(pActor->model, callback);
+    return 0;
+}
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)

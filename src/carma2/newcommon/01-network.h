@@ -100,7 +100,7 @@ extern int C2_HOOK_FASTCALL NetSendMessageToAddress(tNet_game_details* pDetails,
 
 extern int C2_HOOK_FASTCALL NetReallySendMessageToPlayer(tNet_game_details* pNet_game, tNet_message* pMessage, tPlayer_ID pPlayer_id);
 
-// NetSendMessageToPlayer
+extern int C2_HOOK_FASTCALL NetSendMessageToPlayer(tNet_game_details* pDetails, tNet_message* pMessage, tPlayer_ID pPlayer);
 
 extern int C2_HOOK_FASTCALL NetSendMessageToHost(tNet_game_details* pDetails, tNet_message* pMessage);
 
@@ -136,7 +136,7 @@ extern int C2_HOOK_FASTCALL NetDisposeMessage(tNet_game_details* pDetails, tNet_
 
 extern void C2_HOOK_FASTCALL NetReallyDisposeMessage(tNet_message* pMessage);
 
-// NetGetNextMessage
+extern tNet_message* C2_HOOK_FASTCALL NetGetNextMessage(tNet_game_details* pDetails, void** pSender_address);
 
 // ReceivedSendMeDetails
 
@@ -150,7 +150,7 @@ extern void C2_HOOK_FASTCALL NetReallyDisposeMessage(tNet_message* pMessage);
 
 // ReceivedLeave
 
-// NetFullScreenMessage
+extern void C2_HOOK_FASTCALL NetFullScreenMessage(int pStr_index, int pLeave_it_up_there);
 
 // HostHasBittenTheDust
 
@@ -202,7 +202,7 @@ extern void C2_HOOK_FASTCALL NetReallyDisposeMessage(tNet_message* pMessage);
 
 // ProcessGuaranteeStuff
 
-// ReceivedMessage
+extern void C2_HOOK_FASTCALL ReceivedMessage(tNet_message* pMessage, void* pSender_address, tU32 pReceive_time);
 
 extern void C2_HOOK_FASTCALL NetReceiveAndProcessMessages(void);
 
@@ -244,10 +244,12 @@ extern tNet_game_player_info* C2_HOOK_FASTCALL NetPlayerFromCar(tCar_spec* pCar)
 
 extern void C2_HOOK_FASTCALL GetCheckSum(tNet_message* pMessage);
 
-// CheckCheckSum
+extern void C2_HOOK_FASTCALL CheckCheckSum(tNet_message* pMessage);
 
-// StatReceivePacket
+extern void C2_HOOK_FASTCALL StatReceivePacket(void);
 
-// StatSendPacket
+extern void C2_HOOK_FASTCALL StatReceivePacket(void);
+
+extern void C2_HOOK_FASTCALL StatSendPacket(void);
 
 #endif // GUARD_01_NETWORK_H

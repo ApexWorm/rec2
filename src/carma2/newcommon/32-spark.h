@@ -79,7 +79,7 @@ extern void C2_HOOK_FASTCALL AdjustShrapnel(int pShrapnel_num, br_vector3* pPos,
 
 extern void C2_HOOK_FASTCALL ResetSparks(void);
 
-// ResetShrapnel
+extern void C2_HOOK_FASTCALL ResetShrapnel(void);
 
 // CreateShrapnelShower2
 
@@ -235,11 +235,11 @@ extern void C2_HOOK_FASTCALL MakeCarIt(tCar_spec* pCar);
 
 extern void C2_HOOK_FASTCALL StopCarBeingIt(tCar_spec* pCar);
 
-// ForEveryModelMaterial
+extern void C2_HOOK_FASTCALL ForEveryModelMaterial(br_model* pModel, tMaterialMaybeUpdate_cbfn* pCallback);
 
-// ForEveryActorMaterial
+extern intptr_t C2_HOOK_CDECL ForEveryActorMaterial(br_actor* pActor, void* pContext);
 
-// ForEveryActorMaterialNoGrooves
+extern intptr_t C2_HOOK_CDECL ForEveryActorMaterialNoGrooves(br_actor* pActor, void* pContext);
 
 extern void C2_HOOK_FASTCALL ForEveryCarMaterial(tCar_spec* pCar_spec, tMaterialMaybeUpdate_cbfn* pCallback, int pGrooves);
 

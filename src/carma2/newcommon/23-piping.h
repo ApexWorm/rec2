@@ -63,7 +63,7 @@ extern void C2_HOOK_FASTCALL ARAdvanceChunkPtr(tU8** pChunk, int pType);
 
 // PipingFrameReset
 
-// ARPipeSearchForwards
+extern int C2_HOOK_FASTCALL ARPipeSearchForwards(void);
 
 extern int C2_HOOK_FASTCALL ARIsActionReplayAvailable(void);
 
@@ -419,7 +419,7 @@ extern void C2_HOOK_FASTCALL ApplyFunkEnable(tPipe_chunk** pChunk);
 
 extern void C2_HOOK_FASTCALL ApplyVanishDismembered(tPipe_chunk** pChunk);
 
-// ApplyDSModel
+extern void C2_HOOK_FASTCALL ApplyDSModel(tPipe_chunk** pChunk);
 
 // ApplyPedDiagnostics
 
