@@ -23,6 +23,7 @@
 #include "43-pratcam.h"
 
 #include "49-physics.h"
+#include "51-smash.h"
 #include "53-controls.h"
 #include "60-phil.h"
 #include "61-pedestrn.h"
@@ -373,11 +374,56 @@ void C2_HOOK_FASTCALL CloseDownPowerUps(void) {
     NOT_IMPLEMENTED();
 }
 
-// NewRepulseRay
+// FUNCTION: CARMA2_HW 0x004da870
+// FUNCTION: CARMA2_SW 0x004d6d40
+void C2_HOOK_FASTCALL NewRepulseRay(tU32 pTime, tCar_spec* pCar, tCar_spec* pVictim_car, br_vector3* pPos_origin, br_vector3* pPos_victim, float pRadius1, float pRadius2) {
+    int i;
+    int link_index;
+    int oldest_link;
+    tU32 oldest_time;
+
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tRepulse_link, field_0x24, 0x24);
+
+    link_index = -1;
+    oldest_time = 0x7fffffff;
+    for (i = 0; i < (int)REC2_ASIZE(gRepulse_links); i++) {
+        if (gRepulse_links[i].time == 0) {
+            link_index = i;
+            break;
+        }
+        if (gRepulse_links[i].time < oldest_time) {
+            oldest_time = gRepulse_links[i].time;
+            oldest_link = i;
+        }
+    }
+    if (link_index < 0) {
+        link_index = oldest_link;
+    }
+    gRepulse_links[link_index].pos_origin = pPos_origin;
+    gRepulse_links[link_index].pos_victim = pPos_victim;
+    gRepulse_links[link_index].time = pTime;
+    gRepulse_links[link_index].field_0x10 = -1;
+    gRepulse_links[link_index].field_0x18 = pRadius1;
+    gRepulse_links[link_index].field_0x1c = pRadius2;
+    gRepulse_links[link_index].car = pCar;
+    gRepulse_links[link_index].field_0x24 = pVictim_car;
+}
 
 // RemoveRepulsiveReferences
 
-// MungeRepulseRays
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_HW 0x004db8e0
+// STUB: CARMA2_SW 0x004d7de0
+void C2_HOOK_FASTCALL MungeRepulseRays(tU32 pTime) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // FUNCTION: CARMA2_HW 0x004da960
 // FUNCTION: CARMA2_SW 0x004d6e30
@@ -431,9 +477,34 @@ void C2_HOOK_FASTCALL ToggleInventory(void) {
 
 // DoPowerupPeriodics
 
-// CheckRespawnQueue
+inline void C2_HOOK_FASTCALL CheckRespawnQueue(tU32 pTime) {
+    int i;
 
-// MungePowerupStuff
+    for (i = 0; i < (int)REC2_ASIZE(gRespawn_powerups); i++) {
+        tRespawn_powerup* respawn_powerup = &gRespawn_powerups[i];
+
+        if (respawn_powerup->actor == NULL || (tS32)pTime < (tS32)respawn_powerup->respawn_time) {
+            continue;
+        }
+        if (respawn_powerup->actor->render_style != BR_RSTYLE_FACES) {
+            respawn_powerup->actor->render_style = BR_RSTYLE_FACES;
+        }
+        PipeSinglePowerupRespawn(respawn_powerup->actor, respawn_powerup->index);
+        DoPowerupRespawnSmash(respawn_powerup->actor);
+        respawn_powerup->actor = NULL;
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x004db880
+// FUNCTION: CARMA2_SW 0x004d7d80
+void C2_HOOK_FASTCALL MungePowerupStuff(tU32 pFrame_period) {
+    tU32 time;
+
+    (void)pFrame_period;
+    time = GetTotalTime();
+    MungeRepulseRays(time);
+    CheckRespawnQueue(time);
+}
 
 void C2_HOOK_FASTCALL GotPowerupN(int pN) {
     int modifiers;
@@ -1218,7 +1289,11 @@ void C2_HOOK_FASTCALL ResetPissedPeds(tPowerup* pPowerup, tCar_spec* pCar) {
     gDrunk_pedestrians = 0;
 }
 
-// ResetGhostPeds
+// FUNCTION: CARMA2_HW 0x004de9a0
+// FUNCTION: CARMA2_SW 0x004daea0
+void C2_HOOK_FASTCALL ResetGhostPeds(tPowerup* pPowerup, tCar_spec* pCar) {
+    TurnOffGhostPeds();
+}
 
 // DoBouncey
 
