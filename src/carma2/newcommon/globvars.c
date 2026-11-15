@@ -188,6 +188,14 @@ int gAuto_load;
 // GLOBAL: CARMA2_SW 0x006a4014
 int gRussels_fannies;
 
+// GLOBAL: CARMA2_HW 0x007051e0
+// GLOBAL: CARMA2_SW 0x006fbca0
+int gAPO_pre_race[3];
+
+// GLOBAL: CARMA2_HW 0x007051f8
+// GLOBAL: CARMA2_SW 0x006fbcb8
+int gMoney_pre_race;
+
 // GLOBAL: CARMA2_HW 0x00705220
 // GLOBAL: CARMA2_SW 0x006fbce0
 char gQuick_time_quality[32];
@@ -359,6 +367,10 @@ tRace_group_spec* gCurrent_race_group;
 // GLOBAL: CARMA2_HW 0x00761a60
 // GLOBAL: CARMA2_SW 0x00757fc0
 int gIs_boundary_race;
+
+// GLOBAL: CARMA2_HW 0x00761a80
+// GLOBAL: CARMA2_SW 0x00757fe0
+char gCurrent_load_name[256];
 
 // GLOBAL: CARMA2_HW 0x0074d1ac
 // GLOBAL: CARMA2_SW 0x0074370c
