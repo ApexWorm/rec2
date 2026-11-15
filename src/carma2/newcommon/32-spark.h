@@ -43,6 +43,11 @@ extern tSpark gSparks[32];
 extern br_matrix4 gCameraToScreen;
 extern br_camera* gSpark_cam;
 extern tCar_spec* gCar_of_material;
+extern int gNum_splash_types;
+extern tSplash gSplash[32];
+extern int gSplash_flags;
+extern br_material* gSplash_material[20];
+extern br_model* gSplash_model;
 extern br_pixelmap* gFog_shade_table;
 extern br_pixelmap* gAcid_shade_table;
 
@@ -94,7 +99,7 @@ extern void C2_HOOK_FASTCALL DisposeShrapnel(void);
 
 // ReplayShrapnel
 
-// ActorFunks
+extern intptr_t C2_HOOK_CDECL ActorFunks(br_actor* pActor, void* pContext);
 
 extern void C2_HOOK_FASTCALL MasterDisableCarFunks(tCar_spec* pCar);
 
@@ -104,7 +109,7 @@ extern int C2_HOOK_FASTCALL SetPixelmap(br_material* pMaterial);
 
 extern void C2_HOOK_FASTCALL DoCamouflageThing(tCar_spec* pCar);
 
-// DoSolidGraniteThing
+extern void C2_HOOK_FASTCALL DoSolidGraniteThing(tCar_spec* pCar);
 
 // DoTrueColModelThing
 
@@ -131,6 +136,8 @@ extern void C2_HOOK_FASTCALL RestoreCarPixelmaps(tCar_spec* pCar);
 extern int C2_HOOK_CDECL CmpSmokeZ(const void* p1, const void* p2);
 
 extern void C2_HOOK_FASTCALL InitSmokeStuff(void);
+
+extern void C2_HOOK_FASTCALL DustRotate(void);
 
 extern void C2_HOOK_FASTCALL RenderRecordedSmokeCircles(void);
 
@@ -174,11 +181,11 @@ extern void C2_HOOK_FASTCALL FlameAnimate(int pColumn, const br_vector3* pPos, t
 
 // MungeSmokeColumn
 
-// DisposeFlame
+extern void C2_HOOK_FASTCALL DisposeFlame(void);
 
 extern void C2_HOOK_FASTCALL InitFlame(void);
 
-// InitSplash
+extern void C2_HOOK_FASTCALL InitSplash(FILE* pF);
 
 // DisposeSplash
 
@@ -222,7 +229,7 @@ extern void C2_HOOK_FASTCALL FreeSmokeShadeTables(void);
 
 // DisposeKevStuff
 
-// DisposeKevStuffCar
+extern void C2_HOOK_FASTCALL DisposeKevStuffCar(tCar_spec* pCar);
 
 extern void C2_HOOK_FASTCALL MakeCarIt(tCar_spec* pCar);
 

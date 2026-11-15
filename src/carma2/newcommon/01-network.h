@@ -44,7 +44,7 @@ extern void C2_HOOK_FASTCALL HaltNetServiceReentrancy(void);
 
 // NetSendHeadupToAllPlayers
 
-// NetSendHeadupToEverybody
+extern void C2_HOOK_FASTCALL NetSendHeadupToEverybody(const char* pMessage);
 
 extern void C2_HOOK_FASTCALL NetSendHeadupToPlayer(char* pMessage, tPlayer_ID pPlayer);
 
@@ -150,7 +150,7 @@ extern tNet_message* C2_HOOK_FASTCALL NetGetNextMessage(tNet_game_details* pDeta
 
 // ReceivedLeave
 
-// NetFullScreenMessage
+extern void C2_HOOK_FASTCALL NetFullScreenMessage(int pStr_index, int pLeave_it_up_there);
 
 // HostHasBittenTheDust
 

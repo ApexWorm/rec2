@@ -37,18 +37,20 @@ extern int gCount_net_crush_semi_detach_bit_list;
 extern int gCount_net_crush_full_detach_bit_list;
 extern int gCount_car_damage_crush_list;
 extern tToggled_door gToggled_doors[16];
+extern tCrush_detach_list_item gCrush_detach_list[16];
+extern tU32 gUINT_0067be84;
 
 extern void C2_HOOK_FASTCALL ReadCrushSettings(FILE* pF);
 
 extern void C2_HOOK_FASTCALL ClearCrushLists(void);
 
-// RemoveCarFromCrushLists
+extern void C2_HOOK_FASTCALL RemoveCarFromCrushLists(tCar_spec* pCar_spec);
 
 extern void C2_HOOK_FASTCALL InitCrushSystems(void);
 
 extern void C2_HOOK_FASTCALL ResetCrushSystems(void);
 
-// ReadCrushData
+extern void C2_HOOK_FASTCALL ReadCrushData(FILE* pF, tCar_crush_buffer_entry* pCar_crush_buffer_entry, tBrender_storage* pBrender_storage);
 
 extern intptr_t C2_HOOK_CDECL CreateDefaultCrushDataCB(br_actor* pActor, void* pData);
 
@@ -196,7 +198,7 @@ extern void C2_HOOK_FASTCALL SetCrush(tCar_crush* pCrush, int pCount_vectors, br
 
 // QueueCarCrush
 
-// SetBitForDetachment
+extern void C2_HOOK_FASTCALL SetBitForDetachment(br_actor* pActor, tCar_spec* pCar, float pArg3, int pArg4);
 
 extern void C2_HOOK_FASTCALL SetFlappage(br_actor* pActor, tCar_spec* pCar, int pFlags, float pScalar);
 
