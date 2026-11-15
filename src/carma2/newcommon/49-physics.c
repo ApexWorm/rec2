@@ -58,6 +58,10 @@ int gImmortal_peds;
 // GLOBAL: CARMA2_SW 0x0073b2c4
 int gBOOL_00744804;
 
+// GLOBAL: CARMA2_HW 0x00744800
+// GLOBAL: CARMA2_SW 0x0073b2c0
+float gPed_head_scale;
+
 // GLOBAL: CARMA2_HW 0x00744808
 // GLOBAL: CARMA2_SW 0x0073b2c8
 tPedestrian* gPedestrian_array;
@@ -81,6 +85,10 @@ int gPhysics_other_buffer_capacity;
 // GLOBAL: CARMA2_HW 0x00694140
 // GLOBAL: CARMA2_SW 0x0068e198
 tProximity_ray gProximity_rays[20];
+
+// GLOBAL: CARMA2_HW 0x00694274
+// GLOBAL: CARMA2_SW 0x0068e2cc
+tPed_giblet_size_spec* gGiblet_sizes;
 
 // GLOBAL: CARMA2_HW 0x00694278
 // GLOBAL: CARMA2_SW 0x0068e2d0
