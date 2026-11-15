@@ -60,6 +60,10 @@ int gNet_storage_space_initialized;
 // GLOBAL: CARMA2_SW 0x00597750
 tNet_mode gFrontend_net_mode = eNet_mode_thinking_about_it;
 
+// GLOBAL: CARMA2_HW 0x00763940
+// GLOBAL: CARMA2_SW 0x00759ea0
+br_actor* gFrontend_billboard_actors[8] = { 0 };
+
 // GLOBAL: CARMA2_HW 0x00763960
 // GLOBAL: CARMA2_SW 0x00759ec0
 tNet_game_options gNet_settings[9] = { 0 };
@@ -69,6 +73,7 @@ tNet_game_options gNet_settings[9] = { 0 };
 // GLOBAL: CARMA2_SW 0x0075a070
 int gINT_00763b10 = 0;
 #endif
+
 
 // GLOBAL: CARMA2_HW 0x00688aa8
 // GLOBAL: CARMA2_SW 0x00683008
@@ -279,10 +284,6 @@ int gCredits_total_height;
 // GLOBAL: CARMA2_HW 0x006886d0
 // GLOBAL: CARMA2_SW 0x00682c30
 double gFrontend_throb_factor;
-
-// GLOBAL: CARMA2_HW 0x00763940
-// GLOBAL: CARMA2_SW 0x00759ea0
-br_actor* gFrontend_billboard_actors[8];
 
 // GLOBAL: CARMA2_HW 0x00688b10
 // GLOBAL: CARMA2_SW 0x00683070
@@ -2464,7 +2465,41 @@ void C2_HOOK_FASTCALL ScrollCredits(void) {
     }
 }
 
-// LoadGameInFunc
+// FUNCTION: CARMA2_HW 0x0046f750
+// FUNCTION: CARMA2_SW 0x0046ee00
+int C2_HOOK_FASTCALL LoadGameInFunc(tFrontend_spec* pFrontend) {
+    br_camera* camera;
+    int i;
+
+    DefaultInfunc(pFrontend);
+    ResetInterfaceTimeout();
+    gFrontend_count_saved_games = StartSavedGamesList();
+    gFrontend_load_game_index_top = 0;
+    gFrontend_scroll_time_left = 0;
+    gFrontend_scroll_time_increment = 25;
+    gFrontend_scroll_last_update = PDGetTotalTime();
+
+    gFrontend_menu_camera = BrActorAllocate(BR_ACTOR_CAMERA, NULL);
+    camera = gFrontend_menu_camera->type_data;
+    camera->type = BR_CAMERA_PARALLEL;
+    camera->field_of_view = BR_ANGLE_DEG(90);
+    camera->hither_z = 1.0f;
+    camera->yon_z = 3.0f;
+    camera->width = 640.0f;
+    camera->height = 480.0f;
+
+    for (i = 0; i < (int)REC2_ASIZE(gFrontend_billboard_actors); i++) {
+        gFrontend_billboard_actors[i] = CreateAPOactor();
+    }
+    gFrontend_APO_Colour_1 = FudgeBRenderIntoTheNinetiesWithSomeProperFuckingColourSupport(
+        gFrontend_billboard_actors[0]->material->colour_map, 0xff, 0x80, 0x00, 0xff);
+    gFrontend_APO_Colour_2 = FudgeBRenderIntoTheNinetiesWithSomeProperFuckingColourSupport(
+        gFrontend_billboard_actors[0]->material->colour_map, 0x00, 0x00, 0x80, 0xff);
+    gFrontend_APO_Colour_3 = FudgeBRenderIntoTheNinetiesWithSomeProperFuckingColourSupport(
+        gFrontend_billboard_actors[0]->material->colour_map, 0x00, 0x00, 0xff, 0xff);
+    DRS3StartSound(gEffects_outlet, eSoundId_Swingin);
+    return 0;
+}
 
 // FUNCTION: CARMA2_HW 0x0046f8a0
 // FUNCTION: CARMA2_SW 0x0046ef50

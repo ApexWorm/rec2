@@ -8,6 +8,7 @@
 
 #include "61-pedestrn.h"
 
+#include "07-structur.h"
 #include "08-loading1.h"
 #include "10-loading2.h"
 #include "15-displays.h"
@@ -17,6 +18,7 @@
 #include "27-powerup.h"
 #include "28-world3.h"
 #include "30-opponent.h"
+#include "32-spark.h"
 
 #include "41-utility.h"
 #include "42-input.h"
@@ -24,6 +26,7 @@
 #include "49-physics.h"
 #include "51-smash.h"
 #include "52-errors.h"
+#include "54-runtime.h"
 #include "62-graphics3.h"
 
 #include "63-loading3.h"
@@ -117,7 +120,38 @@ int gExploding_pedestrians;
 
 // GLOBAL: CARMA2_HW 0x0069b9f0
 // GLOBAL: CARMA2_SW 0x00695a48
-tNapalm_bolt gNapalm_bolts[5];
+tNapalm_bolt gNapalm_bolts[5] = { 0 };
+
+// GLOBAL: CARMA2_HW 0x0069bc0c
+// GLOBAL: CARMA2_SW 0x00695c64
+int gPed_severing_chance = 0;
+
+// GLOBAL: CARMA2_HW 0x0069bc10
+// GLOBAL: CARMA2_SW 0x00695c68
+br_material* gPed_slick_material = NULL;
+
+// GLOBAL: CARMA2_HW 0x0069fd88
+// GLOBAL: CARMA2_SW 0x00699de0
+br_material* gNapalm_bolt_materials[7] = { 0 };
+
+// GLOBAL: CARMA2_HW 0x0069fda4
+int gINT_0069fda4 = 0;
+
+// GLOBAL: CARMA2_HW 0x00694308
+// GLOBAL: CARMA2_SW 0x0068e360
+br_model* gNapalm_bolt_models[7];
+
+// GLOBAL: CARMA2_HW 0x0065e598
+// GLOBAL: CARMA2_SW 0x00658ed0
+const char* gNapalm_bolt_texture_names[7] = {
+    "Ex00006",
+    "Ex00006",
+    "Ex00006",
+    "Ex00006",
+    "Ex00006",
+    "Ex00006",
+    "Ex00006",
+};
 
 // GLOBAL: CARMA2_HW 0x0069412c
 // GLOBAL: CARMA2_SW 0x0068e184
@@ -446,7 +480,63 @@ br_vector3* C2_HOOK_FASTCALL GetPedPos(tPedestrian* pPed) {
 
 // InitOtherPedStuff
 
-// InitNapalmNolts
+// FUNCTION: CARMA2_HW 0x004cb630
+// FUNCTION: CARMA2_SW 0x004c7d30
+void C2_HOOK_FASTCALL InitNapalmNolts(void) {
+    int i;
+    int j;
+
+    C2_HOOK_BUG_ON(REC2_ASIZE(gNapalm_bolt_texture_names) != 7);
+    C2_HOOK_BUG_ON(REC2_ASIZE(gNapalm_bolt_materials) != REC2_ASIZE(gNapalm_bolt_texture_names));
+    C2_HOOK_BUG_ON(REC2_ASIZE(gNapalm_bolt_models) != REC2_ASIZE(gNapalm_bolt_texture_names));
+    C2_HOOK_BUG_ON(REC2_ASIZE(gNapalm_bolts[0].actors) != REC2_ASIZE(gNapalm_bolt_texture_names));
+    C2_HOOK_BUG_ON(REC2_ASIZE(gNapalm_bolts) != 5);
+    C2_HOOK_BUG_ON(sizeof(tNapalm_bolt) != 0x6c);
+
+    for (i = 0; i < (int)REC2_ASIZE(gNapalm_bolt_materials); i++) {
+        gNapalm_bolt_models[i] = BrModelAllocate(NULL, 4, 2);
+        gNapalm_bolt_models[i]->faces[0].vertices[0] = 0;
+        gNapalm_bolt_models[i]->faces[0].vertices[1] = 2;
+        gNapalm_bolt_models[i]->faces[0].vertices[2] = 1;
+        gNapalm_bolt_models[i]->faces[0].material = NULL;
+        gNapalm_bolt_models[i]->faces[0].smoothing = 1;
+        gNapalm_bolt_models[i]->faces[1].vertices[0] = 0;
+        gNapalm_bolt_models[i]->faces[1].vertices[1] = 3;
+        gNapalm_bolt_models[i]->faces[1].vertices[2] = 2;
+        gNapalm_bolt_models[i]->faces[1].material = NULL;
+        gNapalm_bolt_models[i]->faces[1].smoothing = 1;
+        BrVector3Set(&gNapalm_bolt_models[i]->vertices[0].p, -0.5f, -0.5f, 0.0f);
+        BrVector2Set(&gNapalm_bolt_models[i]->vertices[0].map, 0.0f, 1.0f);
+        BrVector3Set(&gNapalm_bolt_models[i]->vertices[1].p, -0.5f, 0.5f, 0.0f);
+        BrVector2Set(&gNapalm_bolt_models[i]->vertices[1].map, 0.0f, 0.0f);
+        BrVector3Set(&gNapalm_bolt_models[i]->vertices[2].p, 0.5f, 0.5f, 0.0f);
+        BrVector2Set(&gNapalm_bolt_models[i]->vertices[2].map, 1.0f, 0.0f);
+        BrVector3Set(&gNapalm_bolt_models[i]->vertices[3].p, 0.5f, -0.5f, 0.0f);
+        BrVector2Set(&gNapalm_bolt_models[i]->vertices[3].map, 1.0f, 1.0f);
+        BrModelAdd(gNapalm_bolt_models[i]);
+        gNapalm_bolt_materials[i] = BrMaterialAllocate("BURN!");
+        gNapalm_bolt_materials[i]->flags &= ~BR_MATF_LIGHT;
+        gNapalm_bolt_materials[i]->flags |= BR_MATF_ALWAYS_VISIBLE;
+        gNapalm_bolt_materials[i]->colour_map = BrMapFind(gNapalm_bolt_texture_names[i]);
+        if (gNapalm_bolt_materials[i]->colour_map == NULL) {
+            FatalError(kFatalError_CantFindPedTexture_S, gNapalm_bolt_texture_names[i]);
+        }
+#ifdef REC2_HW
+        GlorifyMaterial(&gNapalm_bolt_materials[i], 1, kRendererShadingType_Diffuse2);
+#endif
+        BrMaterialAdd(gNapalm_bolt_materials[i]);
+    }
+    for (i = 0; i < (int)REC2_ASIZE(gNapalm_bolts); i++) {
+        gNapalm_bolts[i].ped = NULL;
+        for (j = 0; j < (int)REC2_ASIZE(gNapalm_bolts[i].actors); j++) {
+            gNapalm_bolts[i].actors[j] = BrActorAllocate(BR_ACTOR_MODEL, NULL);
+            gNapalm_bolts[i].actors[j]->material = gNapalm_bolt_materials[j];
+            gNapalm_bolts[i].actors[j]->model = gNapalm_bolt_models[j];
+            gNapalm_bolts[i].actors[j]->render_style = BR_RSTYLE_NONE;
+            BrActorAdd(gNon_track_actor, gNapalm_bolts[i].actors[j]);
+        }
+    }
+}
 
 // STUB: CARMA2_HW 0x004cadc0
 // STUB: CARMA2_SW 0x004c74f0
@@ -753,9 +843,55 @@ void C2_HOOK_FASTCALL PedApplyBloodSpurt(tU32 pId, tU32 pTime, unsigned int pSee
     DoBloodSpurt(pId, pTime, pSeed, pPosition, pImpactee_velocity, pNormal);
 }
 
-// PedUndoBloodSpurt
+// FUNCTION: CARMA2_HW 0x004ccd70
+// FUNCTION: CARMA2_SW 0x004c9470
+void C2_HOOK_FASTCALL PedUndoBloodSpurt(tU32 pCurrent_time, tU32 pId, tU32 pTime, unsigned int pSeed, br_vector3* pPosition, br_vector3* pImpactee_velocity, br_vector3* pNormal) {
+    int i;
+    tSmash_vertex* fragment;
+    float delta_time;
 
-// OneLessPed
+    DoBloodSpurt(pId, pTime, pSeed, pPosition, pImpactee_velocity, pNormal);
+    delta_time = (float)(tS32)(pCurrent_time - pTime);
+    for (i = 0, fragment = gSmash_glass_fragments; i < REC2_ASIZE(gSmash_glass_fragments); i++, fragment++) {
+        if (fragment->end_time != 0 && fragment->field_0x18 == pId) {
+            fragment->field_0x34 = 0;
+            DoFragMovement(fragment, GetTotalTime(), delta_time);
+            fragment->field_0x34 = 1;
+        }
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x004cd160
+// FUNCTION: CARMA2_SW 0x004c9860
+void C2_HOOK_FASTCALL OneLessPed(tPedestrian* pPed) {
+    tS16 flags;
+
+    flags = pPed->flags & 0x100;
+    if (flags == 0) {
+        pPed->flags |= 0x100;
+        if (gCurrent_race.race_spec->race_type == kRaceType_Carma1 && ++gCount_killed_peds >= gPed_count) {
+            NewTextHeadupSlot(4, 0, 5000, -4, GetMiscString(eMiscString_every_pedestrian_killed));
+            RaceCompleted(eRace_over_1);
+            return;
+        }
+        if (gCurrent_race.race_spec->race_type == kRaceType_Peds) {
+            flags = pPed->flags & 0x200;
+            if (flags != 0 && ++gCount_killed_peds >= gTotal_count_smash_peds) {
+                RaceCompleted(eRace_over_1);
+                return;
+            }
+        }
+        if (gCurrent_race.race_spec->race_type == kRaceType_SmashNPed) {
+            flags = pPed->flags & 0x200;
+            if (flags != 0) {
+                AccumulateRuntimeVariable(gCurrent_race.race_spec->options.smash_and_peds.var_smash_number, 1);
+                if (GetRuntimeVariable(gCurrent_race.race_spec->options.smash_and_peds.var_smash_number) >= gCurrent_race.race_spec->options.smash_and_peds.var_smash_target) {
+                    RaceCompleted(eRace_over_3);
+                }
+            }
+        }
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x004cd260
 // FUNCTION: CARMA2_SW 0x004c9960

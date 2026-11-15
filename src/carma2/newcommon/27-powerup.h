@@ -30,6 +30,7 @@ extern int gNet_powerup_time_replacement;
 extern int gPickup_respawn_min_time_ms;
 extern int gPickup_respawn_max_extra_time_ms;
 extern int gBlind_pedestrians;
+extern int gCount_killed_peds;
 extern int gPed_dismemberfest;
 extern int gPanicking_peds;
 extern float gPed_gravity_multiplier;
@@ -108,7 +109,7 @@ extern void C2_HOOK_FASTCALL EmptyInventory(void);
 
 extern void C2_HOOK_FASTCALL CloseDownPowerUps(void);
 
-// NewRepulseRay
+extern void C2_HOOK_FASTCALL NewRepulseRay(tU32 pTime, tCar_spec* pCar, tCar_spec* pVictim_car, br_vector3* pPos_origin, br_vector3* pPos_victim, float pRadius1, float pRadius2);
 
 // RemoveRepulsiveReferences
 
@@ -204,7 +205,7 @@ extern int C2_HOOK_FASTCALL DoInstantRepair(tPowerup* pPowerup, tCar_spec* pCar)
 
 extern void C2_HOOK_FASTCALL ResetPedSpeed(tPowerup* powerup, tCar_spec* car);
 
-// ResetPedSize
+extern void C2_HOOK_FASTCALL ResetPedSize(tPowerup* pPowerup, tCar_spec* pCar);
 
 // ResetPedHeadSize
 

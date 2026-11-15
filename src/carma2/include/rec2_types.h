@@ -34,6 +34,13 @@ typedef int tTWTVFS;
 typedef tU32 tPlayer_ID;
 typedef tU8 tNet_message_type;
 
+#ifdef REC2_HW
+typedef tU16 tPixel;
+#endif
+#ifdef REC2_SW
+typedef tU8 tPixel;
+#endif
+
 // FIXME: incomplete type
 typedef struct tCar_spec tCar_spec;
 typedef struct tCar_crush_spec tCar_crush_spec;
@@ -174,6 +181,8 @@ typedef enum {
 typedef enum {
     eNet_gameplay_checkpoint = 0,
     eNet_gameplay_wrong_checkpoint = 1,
+    eNet_gameplay_suddenly_death = 2,
+    eNet_gameplay_suicide = 3,
     eNet_gameplay_host_paused = 4,
     eNet_gameplay_host_unpaused = 5,
 } tNet_gameplay_mess;
@@ -597,6 +606,14 @@ typedef struct {
 } tPipe_chunk_smoke_column;
 
 typedef struct {
+    tS16 frame_count;
+    br_scalar scale_x;
+    br_scalar scale_y;
+    br_scalar offset_x;
+    br_scalar offset_z;
+} tPipe_chunk_flame;
+
+typedef struct {
     tCar_spec* car;
 } tPipe_chunk_powerup_lose;
 
@@ -693,6 +710,7 @@ typedef enum {
     ePipe_chunk_smoke = 15,
     ePipe_chunk_oil_spill = 16,
     ePipe_chunk_smoke_column = 17,
+    ePipe_chunk_flame = 18,
     ePipe_chunk_smudge = 19,
     ePipe_chunk_splash = 20,
     ePipe_chunk_prox_ray = 21,
@@ -776,6 +794,7 @@ typedef struct tPipe_chunk {
         tPipe_chunk_explosion explosion;
         tPipe_single_groove_on_of groove;
         tPipe_single_vanished_dismembered vanished_dismembered;
+        tPipe_single_ds_model ds_model;
         tPipe_chunk_napalm_bolt napalm_bolt;
         tPipe_ped_dir_data ped_dir;
         tPipe_ped_fp_change_data ped_fp_change;
@@ -4007,8 +4026,8 @@ typedef struct  {
     undefined field_0x1;
     tU16 field_0x2;
     br_angle field_0x4;
-    tU16 field_0x6;
-    tU16 field_0x8;
+    br_angle field_0x6;
+    br_angle field_0x8;
     tU16 hinge0;
     tU16 field_0xc;
     tU16 hinge1;
@@ -4640,7 +4659,7 @@ typedef struct {
     float field_0x18;
     float field_0x1c;
     tCar_spec* car;
-    undefined4 field_0x24;
+    tCar_spec* field_0x24;
 } tRepulse_link;
 
 typedef struct tPed_movement_spec{
@@ -5539,6 +5558,7 @@ enum {
     eMiscString_cp = 21,
     eMiscString_completion_bonus_colon = 22,
     eMiscString_time_bonus_colon = 23,
+    eMiscString_every_pedestrian_killed = 26,
     eMiscString_action_replay_unavailable = 37,
     eMiscString_instant_repair = 41,
     eMiscString_final_lap = 42,
@@ -5628,6 +5648,7 @@ enum {
     eMiscString_race_leader = 218,
     eMiscString_message_sent = 226,
     eMiscString_enter_message = 227,
+    eMiscString_please_wait_host_has_paused = 228,
     eMiscString_too_late_to_cancel = 242,
     eMiscString_could_not_find_carmageddon_cd = 243,
     eMiscString_no_target_to_lock_onto = 250,
