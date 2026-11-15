@@ -17,6 +17,7 @@
 #include "27-powerup.h"
 #include "30-opponent.h"
 #include "32-spark.h"
+#include "37-brucetrk.h"
 #include "41-utility.h"
 #include "46-win95sys.h"
 
@@ -1076,7 +1077,20 @@ void C2_HOOK_FASTCALL PipeSingleFlap(br_actor* pActor, br_angle pAngle) {
         SIZE_OFFSET_PIPING(tPipe_chunk_flap, angle), pAngle);
 }
 
-// PipeSingleRelink
+// FUNCTION: CARMA2_HW 0x004c86b0
+// FUNCTION: CARMA2_SW 0x004c4de0
+void C2_HOOK_FASTCALL PipeSingleRelink(br_actor* pParent, br_actor* pActor) {
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_chunk_relink, actor, 0x4);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk_relink, old_parent, 0x4);
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_chunk_relink, old_parent, 0x4);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk_relink, new_parent, 0x8);
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_chunk_relink, new_parent, 0x4);
+
+    ARDoSingleVariedSession(ePipe_chunk_relink, (uintptr_t)pActor, 3,
+        SIZE_OFFSET_PIPING(tPipe_chunk_relink, actor), pActor,
+        SIZE_OFFSET_PIPING(tPipe_chunk_relink, old_parent), pActor->parent,
+        SIZE_OFFSET_PIPING(tPipe_chunk_relink, new_parent), pParent);
+}
 
 // FUNCTION: CARMA2_HW 0x004c86d0
 // FUNCTION: CARMA2_SW 0x004c4e00
@@ -1880,7 +1894,20 @@ void C2_HOOK_FASTCALL ApplyVanishDismembered(tPipe_chunk** pChunk) {
     PedApplyVanishDismembered((tPedestrian*)(*pChunk)->subject_index, (*pChunk)->data.vanished_dismembered.field_0x4);
 }
 
-// ApplyDSModel
+// FUNCTION: CARMA2_HW 0x004c9c40
+// FUNCTION: CARMA2_SW 0x004c6370
+void C2_HOOK_FASTCALL ApplyDSModel(tPipe_chunk** pChunk) {
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk, data, 0x4);
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_single_ds_model, field_0x0, 0x2);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tCar_spec, car_model_actor, 0xe0c);
+
+    if ((*pChunk)->data.ds_model.field_0x0 != 0) {
+        MakeModelMaterialsDoubleSided((br_model*)(*pChunk)->subject_index);
+    } else {
+        DRActorEnumRecurse(((tCar_spec*)(*pChunk)->subject_index)->car_model_actor,
+            MakeCarModelsMaterialsSingleSided, (tCar_spec*)(*pChunk)->subject_index);
+    }
+}
 
 // ApplyPedDiagnostics
 
@@ -2029,7 +2056,30 @@ void C2_HOOK_FASTCALL UndoModelMash(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chu
     ARUndoModelMash((*pChunk)->data.model_mash.model, (*pChunk)->data.model_mash.vectors);
 }
 
-// UndoRelink
+// FUNCTION: CARMA2_HW 0x004c9f90
+// FUNCTION: CARMA2_SW 0x004c66c0
+void C2_HOOK_FASTCALL UndoRelink(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
+    tPipe_chunk* chunk;
+    br_actor* actor;
+    br_actor* parent;
+
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk, data, 0x4);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk_relink, old_parent, 0x4);
+
+    (void)pPrev_chunk;
+    chunk = *pChunk;
+    actor = chunk->data.relink.actor;
+    parent = chunk->data.relink.old_parent;
+    if (actor->parent != NULL) {
+        if (parent != NULL) {
+            ActorRelink(parent, actor);
+        } else {
+            BrActorRemove(actor);
+        }
+    } else if (parent != NULL) {
+        BrActorAdd(parent, actor);
+    }
+}
 
 // UndoSplitWeld
 
