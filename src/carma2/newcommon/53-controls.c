@@ -105,6 +105,10 @@ int gRecovery_voucher_count;
 // GLOBAL: CARMA2_SW 0x00676be4
 int gAllow_car_flying;
 
+// GLOBAL: CARMA2_HW 0x0067c470
+// GLOBAL: CARMA2_SW 0x00676be8
+int gINT_0067c470;
+
 // GLOBAL: CARMA2_HW 0x0067c474
 // GLOBAL: CARMA2_SW 0x00676bec
 int gEntering_message;
@@ -309,6 +313,13 @@ void C2_HOOK_FASTCALL TDamageTrans(void) {
     DamageTrans(21);
 }
 
+// FUNCTION: CARMA2_HW 0x00442040
+// FUNCTION: CARMA2_SW 0x00442120
+void C2_HOOK_FASTCALL TDamageSteering(void) {
+
+    DamageSteering(21);
+}
+
 // FUNCTION: CARMA2_HW 0x00442050
 // FUNCTION: CARMA2_SW 0x00442130
 void C2_HOOK_FASTCALL TDamageLFWheel(void) {
@@ -479,11 +490,52 @@ void C2_HOOK_FASTCALL CheckHorn3D(tCar_spec* pCar) {
 
 // CheckRecoveryOfCars
 
-// TradeInAPO
+inline int C2_HOOK_FASTCALL TradeInAPO(int pCost) {
+    int type;
+
+    while (pCost > 0
+        && (gProgram_state.current_car.power_up_levels[0] != 0
+            || gProgram_state.current_car.power_up_levels[1] != 0
+            || gProgram_state.current_car.power_up_levels[2] != 0)) {
+        type = IRandomBetween(0, (int)REC2_ASIZE(gProgram_state.current_car.power_up_levels) - 1);
+        if (gProgram_state.current_car.power_up_levels[type] != 0) {
+            gProgram_state.current_car.power_up_levels[type]--;
+            pCost -= gNet_mode != eNet_mode_none ? gTrade_in_value_APO.initial_network[gCurrent_net_game->type] : gTrade_in_value_APO.initial[gProgram_state.skill_level];
+            gProgram_state.credits += gNet_mode != eNet_mode_none ? gTrade_in_value_APO.initial_network[gCurrent_net_game->type] : gTrade_in_value_APO.initial[gProgram_state.skill_level];
+        }
+    }
+    if (pCost < 0) {
+        pCost = 0;
+    }
+    return pCost;
+}
 
 // CheckOtherRacingKeys
 
-// CheckRecoverCost
+// FUNCTION: CARMA2_HW 0x00442750
+// FUNCTION: CARMA2_SW 0x00442830
+int C2_HOOK_FASTCALL CheckRecoverCost(void) {
+
+    if (gNet_mode != eNet_mode_none) {
+        if (gProgram_state.current_car.knackered
+            || gRecovery_voucher_count != 0
+            || (NetPlayerFromCar(&gProgram_state.current_car) != NULL && NetPlayerFromCar(&gProgram_state.current_car)->field_0x80 != 0)) {
+            gINT_0067c470 = 1;
+        } else {
+            gINT_0067c470 = 0;
+            if (gProgram_state.credits < (gNet_mode != eNet_mode_none ? gRecovery_cost.initial_network[gCurrent_net_game->type] : gRecovery_cost.initial[gProgram_state.skill_level])) {
+                TradeInAPO((int)(gNet_mode != eNet_mode_none ? gRecovery_cost.initial_network[gCurrent_net_game->type] : gRecovery_cost.initial[gProgram_state.skill_level]));
+            }
+            if (gProgram_state.credits < (gNet_mode != eNet_mode_none ? gRecovery_cost.initial_network[gCurrent_net_game->type] : gRecovery_cost.initial[gProgram_state.skill_level])) {
+                gToo_poor_for_recovery_timeout = PDGetTotalTime() + 2000;
+                NewTextHeadupSlot(4, 0, 1000, -4, GetMiscString(eMiscString_press_return_to_commit_suicide));
+                return 0;
+            }
+            SpendCredits((int)(gNet_mode != eNet_mode_none ? gRecovery_cost.initial_network[gCurrent_net_game->type] : gRecovery_cost.initial[gProgram_state.skill_level]));
+        }
+    }
+    return 1;
+}
 
 // SortOutRecover
 
@@ -807,12 +859,36 @@ void C2_HOOK_FASTCALL ToggleHeadupMap(int pArg) {
 
 }
 
-// HackyMapFixForMac3dfx
+inline void C2_HOOK_FASTCALL HackyMapFixForMac3dfx(void) {
 
-// STUB: CARMA2_HW 0x00444610
-// STUB: CARMA2_SW 0x004446f0
+    if (gCurrent_race.map_image != NULL) {
+        PixelmapSwapByteOrder(gCurrent_race.map_image);
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x00444610
+// FUNCTION: CARMA2_SW 0x004446f0
 void C2_HOOK_FASTCALL ToggleMap(void) {
-    NOT_IMPLEMENTED();
+    // GLOBAL: CARMA2_HW 0x0067c458
+    // GLOBAL: CARMA2_SW 0x00676bd0
+    static int old_indent;
+
+    if (gMap_view == 2) {
+        gMap_view = 1;
+        gRender_indent = old_indent;
+        HackyMapFixForMac3dfx();
+    } else if (!gAction_replay_mode) {
+        if (gNet_mode != eNet_mode_none && gCurrent_net_game->type == eNet_game_type_foxy && gThis_net_player_index == gIt_or_fox) {
+            NewTextHeadupSlot(4, 0, 1000, -4, GetMiscString(eMiscString_fox_cant_do_that));
+        } else {
+            old_indent = gRender_indent;
+            gRender_indent = 0;
+            gMap_view = 2;
+            gMap_time = PDGetTotalTime();
+            HackyMapFixForMac3dfx();
+        }
+    }
+    AdjustRenderScreenSize();
 }
 
 // FUNCTION: CARMA2_HW 0x004446f0

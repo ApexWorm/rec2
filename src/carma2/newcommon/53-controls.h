@@ -13,6 +13,7 @@
 #include "rec2_types.h"
 
 extern int gAllow_car_flying;
+extern int gINT_0067c470;
 extern int gEntering_message;
 extern int gInvulnerability;
 extern tU32 gToo_poor_for_recovery_timeout;
@@ -95,6 +96,8 @@ extern void C2_HOOK_FASTCALL TDamageDriver(void);
 
 extern void C2_HOOK_FASTCALL TDamageTrans(void);
 
+extern void C2_HOOK_FASTCALL TDamageSteering(void);
+
 extern void C2_HOOK_FASTCALL TDamageLFWheel(void);
 
 extern void C2_HOOK_FASTCALL TDamageLFBrake(void);
@@ -139,11 +142,11 @@ extern void C2_HOOK_FASTCALL CheckHorn3D(tCar_spec* pCar);
 
 // CheckRecoveryOfCars
 
-// TradeInAPO
+extern int C2_HOOK_FASTCALL TradeInAPO(int pCost);
 
 // CheckOtherRacingKeys
 
-// CheckRecoverCost
+extern int C2_HOOK_FASTCALL CheckRecoverCost(void);
 
 // SortOutRecover
 
@@ -181,7 +184,7 @@ extern void C2_HOOK_FASTCALL LoseDosh(void);
 
 extern void C2_HOOK_FASTCALL ToggleHeadupMap(int pArg);
 
-// HackyMapFixForMac3dfx
+extern void C2_HOOK_FASTCALL HackyMapFixForMac3dfx(void);
 
 extern void C2_HOOK_FASTCALL ToggleMap(void);
 
