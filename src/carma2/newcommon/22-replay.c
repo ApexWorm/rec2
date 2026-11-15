@@ -51,14 +51,17 @@ tU32 gUINT_006a237c;
 
 // GLOBAL: CARMA2_HW 0x006a2380
 // GLOBAL: CARMA2_SW 0x0069c3d8
-tU32 gDAT_006a2380;
+tU32 gLast_replay_zappy_screen;
+
 // GLOBAL: CARMA2_HW 0x006a2388
 // GLOBAL: CARMA2_SW 0x0069c3e0
 br_pixelmap* gReplay_pixies[11] = { NULL };
 
+#ifdef REC2_MATCHING
 // GLOBAL: CARMA2_HW 0x006a23b4
 // GLOBAL: CARMA2_SW 0x0069c40c
 int gINT_006a23b4 = 0;
+#endif
 
 // GLOBAL: CARMA2_HW 0x006a23c4
 // GLOBAL: CARMA2_SW 0x0069c41c
@@ -150,9 +153,9 @@ void C2_HOOK_FASTCALL DoZappyActionReplayHeadups(int pSpecial_zappy_bastard) {
     tU32 the_time;
 
     the_time = PDGetTotalTime();
-    if (abs(pSpecial_zappy_bastard) > 10000 && the_time - gDAT_006a2380 > 50) {
+    if (abs(pSpecial_zappy_bastard) > 10000 && the_time - gLast_replay_zappy_screen > 50) {
         ActualActionReplayHeadups(pSpecial_zappy_bastard);
-        gDAT_006a2380 = the_time;
+        gLast_replay_zappy_screen = the_time;
         PDScreenBufferSwap(0);
         RemoveTransientBitmaps(1);
     }
