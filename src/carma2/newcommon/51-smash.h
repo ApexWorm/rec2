@@ -29,6 +29,7 @@ extern tRepair_animation gRepair_animations[25];
 extern br_vector3 gZero_vector__smash;
 extern tDecal gDecals[50];
 extern int gCount_queued_smashes;
+extern tSmash_explosion gSmash_explosions[20];
 
 typedef struct {
     br_vector3 origin;
@@ -64,7 +65,7 @@ extern void C2_HOOK_FASTCALL RemoveMaterialFromFogification(br_material* pMateri
 
 extern void C2_HOOK_FASTCALL InitExplosions(void);
 
-// ResetExplosions
+extern void C2_HOOK_FASTCALL ResetExplosions(void);
 
 extern void C2_HOOK_FASTCALL RemoveAllExplosionettes(void);
 
@@ -134,7 +135,7 @@ extern void C2_HOOK_FASTCALL DoSpillage(tSlick_spec* pSlick, br_actor* pActor);
 
 // DoConnotations
 
-// DoPowerupRespawnSmash
+extern void C2_HOOK_FASTCALL DoPowerupRespawnSmash(br_actor* pActor);
 
 // DoConnotationsMultiLevel
 
@@ -274,7 +275,7 @@ extern void C2_HOOK_FASTCALL ExtrapolateGeometryCoordinates(tSmash_quad_mapping*
 
 // ExtractDeTiledFaces
 
-// AddDecal
+extern br_actor* C2_HOOK_FASTCALL AddDecal(tFace_ref* pFace, br_vertex* pVertices, br_material* pMaterial, tU16* pFace_points, tU16* pPoint_indices);
 
 extern int C2_HOOK_FASTCALL InsertQuad(tSmash_quad_mapping* pMapping, br_actor* pActor, br_vertex* pVertices, tU8* pOn_edge, br_vertex** pCorners, br_material* pMaterial, tU16* pFace_points, tU16* pPoint_indices);
 
