@@ -488,6 +488,7 @@ void C2_HOOK_FASTCALL InitSmokeStuff(void) {
 }
 
 // FUNCTION: CARMA2_HW 0x004fa8d0
+// FUNCTION: CARMA2_SW 0x004f5960
 void C2_HOOK_FASTCALL DustRotate(void) {
 
     gDust_rotate += 1;
