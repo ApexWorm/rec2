@@ -49,60 +49,34 @@ int gPHIL_count_queued_objects_for_removal;
 // GLOBAL: CARMA2_SW 0x0068ce18
 int gPHIL_count_queued_objects;
 
-// ScalarToFraction
+tU16 C2_HOOK_FASTCALL ScalarToFraction(br_scalar pMin, br_scalar pMax, br_scalar pValue) {
+
+    if (pValue > pMax) {
+        pValue = pMax;
+    }
+    if (pValue < pMin) {
+        pValue = pMin;
+    }
+    pValue = (((pValue - pMin) / (pMax - pMin)) * 65534.0f);
+    return (tU16)(pValue + 0.5f);
+}
 
 br_scalar C2_HOOK_FASTCALL FractionToScalar(br_scalar pMin, br_scalar pMax, tU16 pFixed) {
 
-    return ((pMax - pMin) * (((br_scalar)pFixed / 65534.0f)) + pMin;
+    return ((pMax - pMin) * (((br_scalar)pFixed / 65534.0f))) + pMin;
 }
 
 // FUNCTION: CARMA2_HW 0x0049be90
 // FUNCTION: CARMA2_SW 0x00498010
 void C2_HOOK_FASTCALL GetOrientationFromMatrix(tFixed_quat* pOrientation, const br_matrix34* pMatrix) {
     br_quat quaternion;
-    br_scalar value;
 
     BrMatrix34ToQuat(&quaternion, pMatrix);
-    value = quaternion.x;
-    if (value > 1.0f) {
-        value = 1.0f;
-    }
-    if (value < -1.0f) {
-        value = -1.0f;
-    }
-    value = (value + 1.0f) * 0.5f;
-    value *= 65534.f;
-    pOrientation->v[0] = (tU16)(value + 0.5f);
-    value = quaternion.y;
-    if (value > 1.0f) {
-        value = 1.0f;
-    }
-    if (value < -1.0f) {
-        value = -1.0f;
-    }
-    value = (value + 1.0f) * 0.5f;
-    value *= 65534.f;
-    pOrientation->v[1] = (tU16)(value + 0.5f);
-    value = quaternion.z;
-    if (value > 1.0f) {
-        value = 1.0f;
-    }
-    if (value < -1.0f) {
-        value = -1.0f;
-    }
-    value = (value + 1.0f) * 0.5f;
-    value *= 65534.f;
-    pOrientation->v[2] = (tU16)(value + 0.5f);
-    value = quaternion.w;
-    if (value > 1.0f) {
-        value = 1.0f;
-    }
-    if (value < -1.0f) {
-        value = -1.0f;
-    }
-    value = (value + 1.0f) * 0.5f;
-    value *= 65534.f;
-    pOrientation->v[3] = (tU16)(value + 0.5f);
+
+    pOrientation->v[0] = ScalarToFraction(-1.0f, 1.0f, quaternion.x);
+    pOrientation->v[1] = ScalarToFraction(-1.0f, 1.0f, quaternion.y);
+    pOrientation->v[2] = ScalarToFraction(-1.0f, 1.0f, quaternion.z);
+    pOrientation->v[3] = ScalarToFraction(-1.0f, 1.0f, quaternion.w);
 }
 
 // FUNCTION: CARMA2_HW 0x0049c000

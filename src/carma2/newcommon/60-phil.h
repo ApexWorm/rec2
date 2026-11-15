@@ -23,7 +23,7 @@ extern tPHIL_queued_objects gPhil_queued_objects;
 extern int gPHIL_count_queued_objects_for_removal;
 extern int gPHIL_count_queued_objects;
 
-// ScalarToFraction
+extern tU16 C2_HOOK_FASTCALL ScalarToFraction(br_scalar pMin, br_scalar pMax, br_scalar pValue);
 
 extern br_scalar C2_HOOK_FASTCALL FractionToScalar(br_scalar pMin, br_scalar pMax, tU16 pFixed);
 
