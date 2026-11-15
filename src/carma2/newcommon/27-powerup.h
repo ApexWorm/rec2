@@ -49,6 +49,7 @@ extern int gInventory_cycling;
 extern tU32 gInventory_timeout;
 extern tU32* gReal_render_palette;
 extern int gCollision_info_uid_counter;
+extern tShit_mine gShit_mines[20];
 
 extern char* C2_HOOK_FASTCALL GetPowerupMessage(int pPowerup_index);
 
@@ -110,11 +111,11 @@ extern void C2_HOOK_FASTCALL EmptyInventory(void);
 
 extern void C2_HOOK_FASTCALL CloseDownPowerUps(void);
 
-// NewRepulseRay
+extern void C2_HOOK_FASTCALL NewRepulseRay(tU32 pTime, tCar_spec* pCar, tCar_spec* pVictim_car, br_vector3* pPos_origin, br_vector3* pPos_victim, float pRadius1, float pRadius2);
 
 // RemoveRepulsiveReferences
 
-// MungeRepulseRays
+extern void C2_HOOK_FASTCALL MungeRepulseRays(tU32 pTime);
 
 extern void C2_HOOK_FASTCALL AdjustRepulseRay(int pIndex, br_vector3* pOrigin, br_vector3* pVictim, tU32 pTime);
 
@@ -138,9 +139,9 @@ extern void C2_HOOK_FASTCALL ToggleInventory(void);
 
 // DoPowerupPeriodics
 
-// CheckRespawnQueue
+extern void C2_HOOK_FASTCALL CheckRespawnQueue(tU32 pTime);
 
-// MungePowerupStuff
+extern void C2_HOOK_FASTCALL MungePowerupStuff(tU32 pFrame_period);
 
 // GotPowerupN
 
@@ -252,7 +253,7 @@ extern void C2_HOOK_FASTCALL ResetSuicidalPeds(tPowerup* pPowerup, tCar_spec* pC
 
 extern int C2_HOOK_FASTCALL SetDamageMultiplier(tPowerup* pPowerup, tCar_spec* pCar);
 
-// FillInMine
+extern void C2_HOOK_FASTCALL FillInMine(tNet_message_chunk* pChunk, tShit_mine* pMine, int pArg3);
 
 // SendMines
 
@@ -268,7 +269,7 @@ extern void C2_HOOK_FASTCALL MinePreCollisionStuff(void);
 
 // ShitMine
 
-// MineExplode
+extern int C2_HOOK_FASTCALL MineExplode(tShit_mine* pMine);
 
 extern void C2_HOOK_FASTCALL TiggerMineToExplode(tCar_spec* pCar);
 
@@ -350,7 +351,7 @@ extern void C2_HOOK_FASTCALL ResetLowGravityPeds(tPowerup* pPowerup, tCar_spec* 
 
 extern void C2_HOOK_FASTCALL ResetPissedPeds(tPowerup* pPowerup, tCar_spec* pCar);
 
-// ResetGhostPeds
+extern void C2_HOOK_FASTCALL ResetGhostPeds(tPowerup* pPowerup, tCar_spec* pCar);
 
 // DoBouncey
 
