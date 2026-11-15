@@ -14,6 +14,10 @@
 
 extern int gPed_count_limbed_actors;
 extern br_actor* gLimbs_actor;
+extern tSmashable_initial_position_spec gGiblet_initial_position;
+extern tMovement_spec gGiblet_initial_speed;
+extern tShrapnel_time_info gGiblet_min_max_time;
+extern int gGiblet_size_count;
 
 extern tPedForms_vtable* gPed_vtable;
 
@@ -32,6 +36,11 @@ extern int gCount_active_peds;
 extern int gPeds_suicidal;
 extern int gExploding_pedestrians;
 extern tNapalm_bolt gNapalm_bolts[5];
+extern int gPed_severing_chance;
+extern br_material* gPed_slick_material;
+extern br_material* gNapalm_bolt_materials[7];
+extern br_model* gNapalm_bolt_models[7];
+extern const char* gNapalm_bolt_texture_names[7];
 extern int gCount_changed_points;
 extern br_vector3 gChanged_points[10];
 extern int gPed_dismember_spurting_member_count;
@@ -122,7 +131,7 @@ extern br_vector3* C2_HOOK_FASTCALL GetPedPos(tPedestrian* pPed);
 
 // InitOtherPedStuff
 
-// InitNapalmNolts
+extern void C2_HOOK_FASTCALL InitNapalmNolts(void);
 
 extern void C2_HOOK_FASTCALL InitPolyPedSystem(void);
 
@@ -190,7 +199,7 @@ extern void C2_HOOK_FASTCALL CBDisposePersonality(tPed_personality* pPersonality
 
 extern void C2_HOOK_FASTCALL CBFillInObject(tPhysics_object* pObject, undefined4 pType);
 
-// DoGibShower
+extern void C2_HOOK_FASTCALL DoGibShower(tU32 pId, tU32 pTime, unsigned int pSeed, float pForce, int pStart_size, br_vector3* pPosition, br_vector3* pAlternate_position, br_vector3* pImpactee_velocity);
 
 // PedApplyGibShower
 
@@ -380,7 +389,7 @@ extern void C2_HOOK_FASTCALL ModelUpdatePrimitiveMaterials(br_model* pModel);
 
 extern void C2_HOOK_FASTCALL TurnOnGhostPeds(void);
 
-// TurnOffGhostPeds
+extern void C2_HOOK_FASTCALL TurnOffGhostPeds(void);
 
 extern void C2_HOOK_FASTCALL MutatePed(tPed_character_instance* pCharacter, void* pUnused, tU8* pAngle_x, tU8* pAngle_y, tU8* pAngle_z);
 

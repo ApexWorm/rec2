@@ -7,6 +7,7 @@
 #include "41-utility.h"
 #include "63-loading3.h"
 #include "globvars.h"
+#include "globvrbm.h"
 #include "globvrpb.h"
 #include "platform.h"
 
@@ -678,7 +679,28 @@ void DRPixelmapDoubledCopy(br_pixelmap* pDestn, br_pixelmap* pSource, int pSourc
 }
 #endif
 
-// PoshDrawLine
+// FUNCTION: CARMA2_HW 0x0047c740
+// FUNCTION: CARMA2_SW 0x0047baf0
+void C2_HOOK_FASTCALL PoshDrawLine(br_pixelmap* pDestn, int pX1, float pAngle, int pY1, int pX2, int pY2, int pColour) {
+
+    if (pColour >= 0) {
+        DRDrawLine(pDestn, pX1, pY1, pX2, pY2, pColour);
+    } else {
+        if (pAngle >= 0.785 && pAngle <= 5.498 && (pAngle <= 2.356 || pAngle >= 3.926)) {
+            if ((pAngle <= 0.785 || pAngle >= 1.57) && (pAngle <= 3.926 || pAngle >= 4.712)) {
+                DRDrawLine(pDestn, pX1 - 1, pY1, pX2 - 1, pY2, -pColour - 1);
+                DRDrawLine(pDestn, pX1 + 1, pY1, pX2 + 1, pY2, 1 - pColour);
+            } else {
+                DRDrawLine(pDestn, pX1 - 1, pY1, pX2 - 1, pY2, 1 - pColour);
+                DRDrawLine(pDestn, pX1 + 1, pY1, pX2 + 1, pY2, -pColour - 1);
+            }
+        } else {
+            DRDrawLine(pDestn, pX1, pY1 + 1, pX2, pY2 + 1, -pColour - 1);
+            DRDrawLine(pDestn, pX1, pY1 - 1, pX2, pY2 - 1, 1 - pColour);
+        }
+        DRDrawLine(pDestn, pX1, pY1, pX2, pY2, -pColour);
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x0047c9c0
 // FUNCTION: CARMA2_SW 0x0047bca0
@@ -705,17 +727,29 @@ void C2_HOOK_FASTCALL DrawRRectangle(br_pixelmap* pPixelmap, int pLeft, int pTop
     BrPixelmapLine(pPixelmap, pRight, pTop + 1, pRight, pBottom - 1, pColour);
 }
 
-#ifdef REC2_MATCHING
-#pragma auto_inline(off)
-#endif
-
-// STUB: CARMA2_HW 0x0047cad0
+#ifdef REC2_HW
+// FUNCTION: CARMA2_HW 0x0047cad0
 void C2_HOOK_FASTCALL DeviouslyDimRectangle(br_pixelmap* pPixelmap, int pLeft, int pTop, int pRight, int pBottom, int pKnock_out_corners) {
-    NOT_IMPLEMENTED();
-}
 
-#ifdef REC2_MATCHING
-#pragma auto_inline(on)
+    gDim_model->vertices[1].p.v[0] = (float)pLeft;
+    gDim_model->vertices[0].p.v[0] = gDim_model->vertices[1].p.v[0];
+    gDim_model->vertices[3].p.v[0] = (float)pRight;
+    gDim_model->vertices[2].p.v[0] = gDim_model->vertices[3].p.v[0];
+    gDim_model->vertices[3].p.v[1] = -(float)pTop;
+    gDim_model->vertices[0].p.v[1] = gDim_model->vertices[3].p.v[1];
+    gDim_model->vertices[2].p.v[1] = -(float)pBottom;
+    gDim_model->vertices[1].p.v[1] = gDim_model->vertices[2].p.v[1];
+    BrModelUpdate(gDim_model, BR_MODU_VERTEX_POSITIONS);
+    gDim_actor->render_style = BR_RSTYLE_FACES;
+    if (gDim_actor->prev == NULL) {
+        BrActorAdd(g2d_camera, gDim_actor);
+    }
+    BrZbsSceneRender(g2d_camera, g2d_camera, gBack_screen, gDepth_buffer);
+    if (gDim_actor->parent != NULL) {
+        BrActorRemove(gDim_actor);
+    }
+    gDim_actor->render_style = BR_RSTYLE_NONE;
+}
 #endif
 
 // FUNCTION: CARMA2_HW 0x0047cbd0
