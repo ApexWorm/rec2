@@ -1267,7 +1267,7 @@ br_actor* C2_HOOK_FASTCALL AddDecal(tFace_ref* pFace, br_vertex* pVertices, br_m
     BrModelUpdate(model, BR_MODU_ALL);
     BrActorAdd(gOther_selfs[0], decal->actor);
     for (i = 0; i < 2; i++) {
-        if (BrVector3Dot(&pFace->normal, &model->faces[i].n) <= 0.f) {
+        if (BrVector3Dot(&pFace->normal, &model->faces[i].n) <= 0.0f) {
             temp = model->faces[i].vertices[0];
             model->faces[i].vertices[0] = model->faces[i].vertices[1];
             model->faces[i].vertices[1] = temp;
