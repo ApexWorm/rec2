@@ -220,7 +220,7 @@ tFace_ref* C2_HOOK_FASTCALL RayCastThruFaceList2(br_vector3* pPosition, br_vecto
     tFace_ref* best;
     int i;
 
-    *pT = 2.f;
+    *pT = 2.0f;
     for (i = 0; i < pCount; i++, pFaces++) {
         CheckSingleFace(pFaces, pPosition, pDirection, &normal, &t, &collision_position);
         if (t < *pT) {
@@ -230,7 +230,7 @@ tFace_ref* C2_HOOK_FASTCALL RayCastThruFaceList2(br_vector3* pPosition, br_vecto
             BrVector3Copy(pCollision_position, &collision_position);
         }
     }
-    if (*pT < 2.f) {
+    if (*pT < 2.0f) {
         return best;
     } else {
         return NULL;
