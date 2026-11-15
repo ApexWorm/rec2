@@ -12,9 +12,9 @@
 #include "01-network.h"
 #include "13-crush1.h"
 #include "15-displays.h"
-
 #include "16-graphics1.h"
 #include "18-graphics2.h"
+#include "18b-graphics2.h"
 #include "19-font.h"
 #include "23-piping.h"
 #include "25-grafdata.h"
@@ -192,6 +192,10 @@ tCar_spec* gCloaked_cars[12];
 // GLOBAL: CARMA2_HW 0x006a0940
 // GLOBAL: CARMA2_SW 0x0069a998
 int gInventory_cycling;
+
+// GLOBAL: CARMA2_HW 0x006a0950
+// GLOBAL: CARMA2_SW 0x0069a9a8
+int gFizzle_height;
 
 // GLOBAL: CARMA2_HW 0x006a0954
 // GLOBAL: CARMA2_SW 0x0069a9ac
@@ -463,6 +467,7 @@ void C2_HOOK_FASTCALL ResetRepulseRay(void) {
 }
 
 // FUNCTION: CARMA2_HW 0x004daff0
+// FUNCTION: CARMA2_SW 0x004d74c0
 int C2_HOOK_FASTCALL DrawSinglePowerupIcon(int pDraw, int pTime, tPowerup* pPowerup, tHeadup_icon* pIcon, int pX, int pY, int pUpdate_x) {
     br_pixelmap* fizzle_pix;
     char s[8];
@@ -474,7 +479,14 @@ int C2_HOOK_FASTCALL DrawSinglePowerupIcon(int pDraw, int pTime, tPowerup* pPowe
     if (pIcon != NULL && pIcon->fizzle_stage < 4) {
         fizzle_pix = gFizzle_in[pPowerup->fizzle_type];
         if (pDraw) {
+#ifdef REC2_HW
             PrintPowerupIconIn3D(pX, pY, pIcon, pPowerup, 1, pTime);
+#endif
+#ifdef REC2_SW
+            DRPixelmapRectangleMaskedCopy(gBack_screen, pX, pY,
+                fizzle_pix, 0, gFizzle_height * pIcon->fizzle_stage,
+                fizzle_pix->width, gFizzle_height);
+#endif
         }
         if (pUpdate_x) {
             return pX + fizzle_pix->width;
@@ -482,7 +494,14 @@ int C2_HOOK_FASTCALL DrawSinglePowerupIcon(int pDraw, int pTime, tPowerup* pPowe
         return 0;
     }
     if (pDraw) {
+#ifdef REC2_HW
         PrintPowerupIconIn3D(pX, pY, pIcon, pPowerup, 0, pTime);
+#endif
+#ifdef REC2_SW
+        DRPixelmapRectangleMaskedCopy(gBack_screen, pX, pY,
+            pPowerup->icon, 0, 0,
+            pPowerup->icon->width, pPowerup->icon->height);
+#endif
     }
     if (pPowerup->initial_value < 0) {
         sprintf(s, "%d", -pPowerup->value);
