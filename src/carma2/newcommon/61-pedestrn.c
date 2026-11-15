@@ -836,7 +836,7 @@ void C2_HOOK_FASTCALL DoGibShower(tU32 pId, tU32 pTime, unsigned int pSeed, floa
 
     seed = rand();
     srand(pSeed);
-    for (j = pStart_size, size = &gGibletSizes[pStart_size]; j < gGiblet_size_count; j++, size++) {
+    for (j = pStart_size, size = &gGiblet_sizes[pStart_size]; j < gGiblet_size_count; j++, size++) {
         if (pForce >= size->min_force) {
             count = (int)((pForce - size->min_force) / size->instance_force + 1.f);
             if (count > size->max_count) {
