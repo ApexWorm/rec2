@@ -64,45 +64,45 @@ void C2_HOOK_FASTCALL GetOrientationFromMatrix(tFixed_quat* pOrientation, const 
 
     BrMatrix34ToQuat(&quaternion, pMatrix);
     value = quaternion.x;
-    if (value > 1.f) {
-        value = 1.f;
+    if (value > 1.0f) {
+        value = 1.0f;
     }
-    if (value < -1.f) {
-        value = -1.f;
+    if (value < -1.0f) {
+        value = -1.0f;
     }
-    value = (value + 1.f) * .5f;
+    value = (value + 1.0f) * 0.5f;
     value *= 65534.f;
-    pOrientation->v[0] = (tU16)(value + .5f);
+    pOrientation->v[0] = (tU16)(value + 0.5f);
     value = quaternion.y;
-    if (value > 1.f) {
-        value = 1.f;
+    if (value > 1.0f) {
+        value = 1.0f;
     }
-    if (value < -1.f) {
-        value = -1.f;
+    if (value < -1.0f) {
+        value = -1.0f;
     }
-    value = (value + 1.f) * .5f;
+    value = (value + 1.0f) * 0.5f;
     value *= 65534.f;
-    pOrientation->v[1] = (tU16)(value + .5f);
+    pOrientation->v[1] = (tU16)(value + 0.5f);
     value = quaternion.z;
-    if (value > 1.f) {
-        value = 1.f;
+    if (value > 1.0f) {
+        value = 1.0f;
     }
-    if (value < -1.f) {
-        value = -1.f;
+    if (value < -1.0f) {
+        value = -1.0f;
     }
-    value = (value + 1.f) * .5f;
+    value = (value + 1.0f) * 0.5f;
     value *= 65534.f;
-    pOrientation->v[2] = (tU16)(value + .5f);
+    pOrientation->v[2] = (tU16)(value + 0.5f);
     value = quaternion.w;
-    if (value > 1.f) {
-        value = 1.f;
+    if (value > 1.0f) {
+        value = 1.0f;
     }
-    if (value < -1.f) {
-        value = -1.f;
+    if (value < -1.0f) {
+        value = -1.0f;
     }
-    value = (value + 1.f) * .5f;
+    value = (value + 1.0f) * 0.5f;
     value *= 65534.f;
-    pOrientation->v[3] = (tU16)(value + .5f);
+    pOrientation->v[3] = (tU16)(value + 0.5f);
 }
 
 // FUNCTION: CARMA2_HW 0x0049c000
@@ -156,7 +156,7 @@ int C2_HOOK_FASTCALL SizeOfObjectNetworkStuff(tPhysics_joint_type pType) {
     case eJoint_ball_n_socket:
         return 0x10;
     default:
-        PhysicsError(9, "netphys got messed up");
+        PhysicsError(ePhysicsError_error9, "netphys got messed up");
         return 0;
     }
 }
@@ -171,7 +171,7 @@ int C2_HOOK_STDCALL FloatToFixedFraction(float pValue, float pMin, float pMax) {
         pValue = pMin;
     }
     pValue = ((pValue - pMin) / (pMax - pMin)) * 65534.f;
-    return (int)(pValue + .5f);
+    return (int)(pValue + 0.5f);
 }
 
 // WriteObjectNetworkStuff
