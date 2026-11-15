@@ -53,7 +53,7 @@ int gPHIL_count_queued_objects;
 
 br_scalar C2_HOOK_FASTCALL FractionToScalar(br_scalar pMin, br_scalar pMax, tU16 pFixed) {
 
-    return ((pMax - pMin) * ((br_scalar)pFixed / 65534.0f)) + pMin;
+    return ((pMax - pMin) * (((br_scalar)pFixed / 65534.0f)) + pMin;
 }
 
 // FUNCTION: CARMA2_HW 0x0049be90
