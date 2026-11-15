@@ -1414,11 +1414,11 @@ void C2_HOOK_FASTCALL InitPedsForRace(void) {
     gPanicking_peds = 0;
     gDrunk_pedestrians = 0;
     gGhost_pedestrians = 0;
-    gPedestrian_speed_factor = 1.f;
-    BrVector3Set(&gPed_scale, 1.f, 1.f, 1.f);
-    gAverage_ped_scale = 1.f;
-    gPed_head_scale = 1.f;
-    gPed_gravity_multiplier = 1.f;
+    gPedestrian_speed_factor = 1.0f;
+    BrVector3Set(&gPed_scale, 1.0f, 1.0f, 1.0f);
+    gAverage_ped_scale = 1.0f;
+    gPed_head_scale = 1.0f;
+    gPed_gravity_multiplier = 1.0f;
     gBOOL_00744804 = 0;
     gCount_killed_peds = 0;
     gPed_valium_left = 0;
