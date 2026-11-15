@@ -13,6 +13,7 @@
 #include "rec2_types.h"
 
 extern int gAllow_car_flying;
+extern int gINT_0067c470;
 extern int gEntering_message;
 extern int gInvulnerability;
 extern tU32 gToo_poor_for_recovery_timeout;
@@ -95,6 +96,8 @@ extern void C2_HOOK_FASTCALL TDamageDriver(void);
 
 extern void C2_HOOK_FASTCALL TDamageTrans(void);
 
+extern void C2_HOOK_FASTCALL TDamageSteering(void);
+
 extern void C2_HOOK_FASTCALL TDamageLFWheel(void);
 
 extern void C2_HOOK_FASTCALL TDamageLFBrake(void);
@@ -139,19 +142,19 @@ extern void C2_HOOK_FASTCALL CheckHorn3D(tCar_spec* pCar);
 
 // CheckRecoveryOfCars
 
-// TradeInAPO
+extern int C2_HOOK_FASTCALL TradeInAPO(int pCost);
 
 // CheckOtherRacingKeys
 
-// CheckRecoverCost
+extern int C2_HOOK_FASTCALL CheckRecoverCost(void);
 
 // SortOutRecover
 
-// SetFlipUpCar
+extern void C2_HOOK_FASTCALL SetFlipUpCar(tCar_spec* pCar);
 
 extern void C2_HOOK_FASTCALL AlignChildren(tPhysics_object* pCollision_info);
 
-// FlipUpCar
+extern void C2_HOOK_FASTCALL FlipUpCar(tCar_spec* pCar_spec);
 
 extern void C2_HOOK_FASTCALL GetPowerup(int pNum);
 
@@ -161,9 +164,9 @@ extern void C2_HOOK_FASTCALL CheckForCheatingGits(void);
 
 // CheckKevKeys
 
-// BrakeInstantly
+extern void C2_HOOK_FASTCALL BrakeInstantly(void);
 
-// PollCarControls
+extern void C2_HOOK_FASTCALL PollCarControls(tU32 pTime_difference);
 
 extern void C2_HOOK_FASTCALL PollCameraControls(tU32 pCamera_period);
 
@@ -181,7 +184,7 @@ extern void C2_HOOK_FASTCALL LoseDosh(void);
 
 extern void C2_HOOK_FASTCALL ToggleHeadupMap(int pArg);
 
-// HackyMapFixForMac3dfx
+extern void C2_HOOK_FASTCALL HackyMapFixForMac3dfx(void);
 
 extern void C2_HOOK_FASTCALL ToggleMap(void);
 
@@ -201,7 +204,7 @@ extern void C2_HOOK_FASTCALL ToggleAccessoryRendering(void);
 
 extern void C2_HOOK_FASTCALL UserSendMessage(void);
 
-// EnterUserMessage
+extern void C2_HOOK_FASTCALL SteelBollock(void);
 
 extern void C2_HOOK_FASTCALL DisplayUserMessage(void);
 
@@ -213,7 +216,7 @@ extern void C2_HOOK_FASTCALL ChangeCameraTypeInGame(void);
 
 // SteelBollock
 
-// RichardsSphere
+extern void C2_HOOK_FASTCALL RichardsSphere(int pNum);
 
 extern void C2_HOOK_FASTCALL ToggleHeadupLevel(void);
 

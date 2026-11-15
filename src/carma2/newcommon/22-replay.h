@@ -17,7 +17,11 @@ extern tU32 gDAT_006a2364;
 extern int gKey_down;
 extern float gPending_replay_rate;
 extern tU32 gUINT_006a237c;
+extern tU32 gLast_replay_zappy_screen;
+extern br_pixelmap* gReplay_pixies[11];
+extern int gSingle_frame_mode;
 extern tU32 gCam_change_time;
+extern tU32 gLast_synch_time;
 
 extern int gPaused;
 
@@ -33,13 +37,13 @@ extern int gCar_car_collisions;
 extern const float gCar_simplification_factor[2][5];
 extern tPolyhedron_edge_indexes gDefault_box_collision_wireframe_edges[12];
 
-// ActualActionReplayHeadups
+extern void C2_HOOK_FASTCALL ActualActionReplayHeadups(int pSpecial_zappy_bastard);
 
 extern void C2_HOOK_FASTCALL DoActionReplayPostSwap(void);
 
-// DoZappyActionReplayHeadups
+extern void C2_HOOK_FASTCALL DoZappyActionReplayHeadups(int pSpecial_zappy_bastard);
 
-// DoActionReplayHeadups
+extern void C2_HOOK_FASTCALL DoActionReplayHeadups(void);
 
 // PreProcess
 
@@ -57,13 +61,13 @@ extern void C2_HOOK_FASTCALL DoActionReplayPostSwap(void);
 
 // InitializeActionReplayPix
 
-// FreeActionReplayPix
+extern void C2_HOOK_FASTCALL FreeActionReplayPix(void);
 
-// SynchronizeActionReplay
+extern void C2_HOOK_FASTCALL SynchronizeActionReplay(void);
 
 extern void C2_HOOK_FASTCALL TurnOnActionReplay(void);
 
-// TurnOffActionReplay
+extern void C2_HOOK_FASTCALL TurnOffActionReplay(void);
 
 extern void C2_HOOK_FASTCALL AfterActionReplay(void);
 

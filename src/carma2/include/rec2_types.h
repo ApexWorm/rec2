@@ -34,9 +34,17 @@ typedef int tTWTVFS;
 typedef tU32 tPlayer_ID;
 typedef tU8 tNet_message_type;
 
+#ifdef REC2_HW
+typedef tU16 tPixel;
+#endif
+#ifdef REC2_SW
+typedef tU8 tPixel;
+#endif
+
 // FIXME: incomplete type
 typedef struct tCar_spec tCar_spec;
 typedef struct tCar_crush_spec tCar_crush_spec;
+typedef struct tBend_point_context tBend_point_context;
 typedef struct tPhysics_object tPhysics_object;
 typedef struct tFace_ref tFace_ref;
 typedef struct tNon_car_spec tNon_car_spec;
@@ -173,6 +181,8 @@ typedef enum {
 typedef enum {
     eNet_gameplay_checkpoint = 0,
     eNet_gameplay_wrong_checkpoint = 1,
+    eNet_gameplay_suddenly_death = 2,
+    eNet_gameplay_suicide = 3,
     eNet_gameplay_host_paused = 4,
     eNet_gameplay_host_unpaused = 5,
 } tNet_gameplay_mess;
@@ -280,7 +290,7 @@ typedef struct tPed_character_instance {
     tPed_personality* personality;
     tS8 field_0x4;
     undefined field_0x5;
-    undefined field_0x6;
+    tS8 field_0x6;
     tS8 field_0x7;
     tS8 field_0x8;
     tU8 field_0x9;
@@ -596,6 +606,14 @@ typedef struct {
 } tPipe_chunk_smoke_column;
 
 typedef struct {
+    tS16 frame_count;
+    br_scalar scale_x;
+    br_scalar scale_y;
+    br_scalar offset_x;
+    br_scalar offset_z;
+} tPipe_chunk_flame;
+
+typedef struct {
     tCar_spec* car;
 } tPipe_chunk_powerup_lose;
 
@@ -692,12 +710,14 @@ typedef enum {
     ePipe_chunk_smoke = 15,
     ePipe_chunk_oil_spill = 16,
     ePipe_chunk_smoke_column = 17,
+    ePipe_chunk_flame = 18,
     ePipe_chunk_smudge = 19,
     ePipe_chunk_splash = 20,
     ePipe_chunk_prox_ray = 21,
     ePipe_chunk_skid_adjustment = 22,
     ePipe_chunk_flap = 23,
     ePipe_model_mash = 24,
+    ePipe_chunk_relink = 25,
     ePipe_chunk_identity = 26,
     ePipe_chunk_explosion = 31,
     ePipe_chunk_non_car_creation = 32,
@@ -733,6 +753,12 @@ typedef enum {
 } tPipe_chunk_type;
 
 typedef struct {
+    br_actor* actor;
+    br_actor* old_parent;
+    br_actor* new_parent;
+} tPipe_chunk_relink;
+
+typedef struct {
     br_model* old_model;
     br_model* new_model;
 } tPipe_chunk_smash_model_change;
@@ -757,6 +783,7 @@ typedef struct tPipe_chunk {
         tPipe_chunk_shrapnel shrapnel;
         tPipe_chunk_identity identity;
         tPipe_chunk_flap flap;
+        tPipe_chunk_relink relink;
         tPipe_chunk_smash_model_change smash_model_change;
         tPipe_smash_texture_change smash_texture_change;
         tPipe_single_transform_type transform_type;
@@ -775,11 +802,13 @@ typedef struct tPipe_chunk {
         tPipe_chunk_explosion explosion;
         tPipe_single_groove_on_of groove;
         tPipe_single_vanished_dismembered vanished_dismembered;
+        tPipe_single_ds_model ds_model;
         tPipe_chunk_napalm_bolt napalm_bolt;
         tPipe_ped_dir_data ped_dir;
         tPipe_ped_fp_change_data ped_fp_change;
         tPipe_chunk_repulse_ray repulse_ray;
         tPipe_chunk_oil_spill oil_spill;
+        tPipe_single_graphical_wheel_stuff graphical_wheel_stuff;
         char raw_data[0];
     } data;
 } tPipe_chunk;
@@ -3279,7 +3308,7 @@ typedef struct tPowerup{
     int duration;
     tU32 lose_time;
     int group_inclusion;
-    struct br_pixelmap * icon;
+    br_pixelmap * icon;
     int fizzle_type;
     int number_of_float_params;
     int number_of_integer_params;
@@ -4005,8 +4034,8 @@ typedef struct  {
     undefined field_0x1;
     tU16 field_0x2;
     br_angle field_0x4;
-    tU16 field_0x6;
-    tU16 field_0x8;
+    br_angle field_0x6;
+    br_angle field_0x8;
     tU16 hinge0;
     tU16 field_0xc;
     tU16 hinge1;
@@ -4638,7 +4667,7 @@ typedef struct {
     float field_0x18;
     float field_0x1c;
     tCar_spec* car;
-    undefined4 field_0x24;
+    tCar_spec* field_0x24;
 } tRepulse_link;
 
 typedef struct tPed_movement_spec{
@@ -5537,6 +5566,7 @@ enum {
     eMiscString_cp = 21,
     eMiscString_completion_bonus_colon = 22,
     eMiscString_time_bonus_colon = 23,
+    eMiscString_every_pedestrian_killed = 26,
     eMiscString_action_replay_unavailable = 37,
     eMiscString_instant_repair = 41,
     eMiscString_final_lap = 42,
@@ -5626,6 +5656,7 @@ enum {
     eMiscString_race_leader = 218,
     eMiscString_message_sent = 226,
     eMiscString_enter_message = 227,
+    eMiscString_please_wait_host_has_paused = 228,
     eMiscString_too_late_to_cancel = 242,
     eMiscString_could_not_find_carmageddon_cd = 243,
     eMiscString_no_target_to_lock_onto = 250,
@@ -5668,6 +5699,9 @@ enum {
 };
 
 enum {
+    eInterfaceString_car_colon = 14,
+    eInterfaceString_abort_race = 21,
+    eInterfaceString_closed = 179,
     eInterfaceString_target_none = 232,
     eInterfaceString_target_kills = 233,
     eInterfaceString_target_laps = 234,
@@ -5809,6 +5843,7 @@ typedef enum {
     ePhysicsError_PolyhedronHasNoPoints = 3,
     ePhysicsError_UnknownHingeType = 5,
     ePhysicsError_OutOfMemory = 6,
+    ePhysicsError_error9 = 9,
     ePhysicsError_InsufficientSizedBuffer = 12
 } tPhysicsError;
 
@@ -5840,6 +5875,7 @@ enum {
     kFatalError_CannotOpenRacesFile = 0x32,
     kFatalError_CannotOpenOpponentsFile = 0x36,
     kFatalError_OpponentCountMismatchesActualNumberOfOpponents = 0x37,
+    kFatalError_CannotLoadChromeFontFile = 0x3b,
     kFatalError_FunkotronicFile = 0x3e,
     kFatalError_ErrorWithinGroovidelicFile = 0x3f,
     kFatalError_CannotFindMainMaterialInFunkotronicFile_S = 0x40,
@@ -5867,7 +5903,7 @@ enum {
     kFatalError_CannotFindFlicReferencedTranslation_S = 0x65,
     kFatalError_CannotOpenHeadupsFile = 0x66,
     kFatalError_CannotOpenCarResolutionDependentFile = 0x68,
-    kFatalError_CantOpenKeyNamesFile = 0x61,
+    kFatalError_CantOpenKeyNamesFile = 0x6a,
     kFatalError_CantOpen_S = 0x6b,
     kFatalError_CannotLoadAGeneratedShadeTable = 0x6d,
     kFatalError_NetworkCodeSelfCheck = 0x6e,
@@ -5972,6 +6008,7 @@ enum {
     eSoundId_CantAffordPart = 3100,
     eSoundId_NapalmHitCrackls = 3702,
     eSoundId_PedValium = 3801,
+    eSoundId_GrowATail = 3901,
     eSoundId_SmashRepair = 4550,
     eSoundId_Smash1 = 5000,
     eSoundId_Smash2 = 5001,
