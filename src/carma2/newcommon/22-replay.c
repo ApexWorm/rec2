@@ -9,11 +9,13 @@
 #include "22-replay.h"
 
 #include "04-netgame.h"
+#include "08-loading1.h"
 #include "10-loading2.h"
 #include "18-graphics2.h"
 #include "23-piping.h"
 #include "30-opponent.h"
 #include "32-spark.h"
+#include "40-main.h"
 #include "41-utility.h"
 #include "53-controls.h"
 #include "59-camera.h"
@@ -21,6 +23,11 @@
 #include "globvars.h"
 #include "globvrpb.h"
 #include "platform.h"
+
+#include "rec2_macros.h"
+
+#include <math.h>
+#include <stdlib.h>
 
 // GLOBAL: CARMA2_HW 0x006a2360
 // GLOBAL: CARMA2_SW 0x0069c3b8
@@ -42,9 +49,31 @@ float gPending_replay_rate;
 // GLOBAL: CARMA2_SW 0x0069c3d4
 tU32 gUINT_006a237c;
 
+// GLOBAL: CARMA2_HW 0x006a2380
+// GLOBAL: CARMA2_SW 0x0069c3d8
+tU32 gLast_replay_zappy_screen;
+
+// GLOBAL: CARMA2_HW 0x006a2388
+// GLOBAL: CARMA2_SW 0x0069c3e0
+br_pixelmap* gReplay_pixies[11] = { NULL };
+
+#ifdef REC2_MATCHING
+// GLOBAL: CARMA2_HW 0x006a23b4
+// GLOBAL: CARMA2_SW 0x0069c40c
+int gINT_006a23b4 = 0;
+#endif
+
+// GLOBAL: CARMA2_HW 0x006a23c4
+// GLOBAL: CARMA2_SW 0x0069c41c
+int gSingle_frame_mode;
+
 // GLOBAL: CARMA2_HW 0x006a23c8
 // GLOBAL: CARMA2_SW 0x0069c420
 tU32 gCam_change_time;
+
+// GLOBAL: CARMA2_HW 0x006a23d4
+// GLOBAL: CARMA2_SW 0x0069c42c
+tU32 gLast_synch_time;
 
 // GLOBAL: CARMA2_HW 0x006768fc
 // GLOBAL: CARMA2_SW 0x0067106c
@@ -98,7 +127,19 @@ tPolyhedron_edge_indexes gDefault_box_collision_wireframe_edges[12] = {
     { 0, 4 }, { 1, 5 }, { 2, 6 }, { 3, 7 },
 };
 
-// ActualActionReplayHeadups
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_HW 0x004e6280
+// STUB: CARMA2_SW 0x004e22a0
+void C2_HOOK_FASTCALL ActualActionReplayHeadups(int pSpecial_zappy_bastard) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // FUNCTION: CARMA2_HW 0x004e6260
 // FUNCTION: CARMA2_SW 0x004e2280
@@ -106,9 +147,25 @@ void C2_HOOK_FASTCALL DoActionReplayPostSwap(void) {
     RemoveTransientBitmaps(1);
 }
 
-// DoZappyActionReplayHeadups
+// FUNCTION: CARMA2_HW 0x004e6900
+// FUNCTION: CARMA2_SW 0x004e27f0
+void C2_HOOK_FASTCALL DoZappyActionReplayHeadups(int pSpecial_zappy_bastard) {
+    tU32 the_time;
 
-// DoActionReplayHeadups
+    the_time = PDGetTotalTime();
+    if (abs(pSpecial_zappy_bastard) > 10000 && the_time - gLast_replay_zappy_screen > 50) {
+        ActualActionReplayHeadups(pSpecial_zappy_bastard);
+        gLast_replay_zappy_screen = the_time;
+        PDScreenBufferSwap(0);
+        RemoveTransientBitmaps(1);
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x004e6270
+// FUNCTION: CARMA2_SW 0x004e2290
+void C2_HOOK_FASTCALL DoActionReplayHeadups(void) {
+    ActualActionReplayHeadups(0);
+}
 
 // PreProcess
 
@@ -126,9 +183,35 @@ void C2_HOOK_FASTCALL DoActionReplayPostSwap(void) {
 
 // InitializeActionReplayPix
 
-// FreeActionReplayPix
+// FUNCTION: CARMA2_HW 0x004e70d0
+// FUNCTION: CARMA2_SW 0x004e2f10
+void C2_HOOK_FASTCALL FreeActionReplayPix(void) {
+    int i;
 
-// SynchronizeActionReplay
+    C2_HOOK_BUG_ON(REC2_ASIZE(gReplay_pixies) != 11);
+
+    for (i = 0; i < (int)REC2_ASIZE(gReplay_pixies); i++) {
+        if (gReplay_pixies[i] != NULL) {
+            BrMapRemove(gReplay_pixies[i]);
+            BrPixelmapFree(gReplay_pixies[i]);
+            gReplay_pixies[i] = NULL;
+        }
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x004e7110
+// FUNCTION: CARMA2_SW 0x004e2f50
+void C2_HOOK_FASTCALL SynchronizeActionReplay(void) {
+
+    while (ARGetReplayRate() != 0.f && PDGetTotalTime() - gLast_synch_time < gFrame_period / fabs(ARGetReplayRate())) {
+        ServiceGameInRace();
+    }
+    gLast_synch_time = PDGetTotalTime();
+    if (gSingle_frame_mode) {
+        ARSetReplayRate(0.f);
+        gSingle_frame_mode = 0;
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x004e71c0
 // FUNCTION: CARMA2_SW 0x004e3000
@@ -157,7 +240,22 @@ void C2_HOOK_FASTCALL TurnOnActionReplay(void) {
     InitReplaySplashes();
 }
 
-// TurnOffActionReplay
+// FUNCTION: CARMA2_HW 0x004e7270
+// FUNCTION: CARMA2_SW 0x004e30b0
+void C2_HOOK_FASTCALL TurnOffActionReplay(void) {
+    UnlockInterfaceStuff();
+    AssertThisTimeAsCurrentTime();
+    if (gRace_finished == 0) {
+        RestoreCameraPosition(0);
+    }
+    if (gNet_mode == eNet_mode_host) {
+        SendGameplayToAllPlayers(eNet_gameplay_host_unpaused, 0, 0, 0, 0);
+    }
+    gAR_camera_type = gAction_replay_camera_mode;
+    SetCameraType(gCamera_type);
+    ComparePedStuff();
+    EndMouseCursor();
+}
 
 // FUNCTION: CARMA2_HW 0x004e72d0
 // FUNCTION: CARMA2_SW 0x004e3110

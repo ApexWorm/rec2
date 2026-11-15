@@ -46,6 +46,10 @@ void* gPhysics_buffer1_ptr;
 // GLOBAL: CARMA2_SW 0x0073b2d4
 void* gPhysics_buffer2_ptr;
 
+// GLOBAL: CARMA2_HW 0x0074480c
+// GLOBAL: CARMA2_SW 0x0073b2cc
+int gTotal_count_smash_peds;
+
 // GLOBAL: CARMA2_HW 0x00744810
 // GLOBAL: CARMA2_SW 0x0073b2d0
 int gImmortal_peds;
@@ -53,6 +57,10 @@ int gImmortal_peds;
 // GLOBAL: CARMA2_HW 0x00744804
 // GLOBAL: CARMA2_SW 0x0073b2c4
 int gBOOL_00744804;
+
+// GLOBAL: CARMA2_HW 0x00744800
+// GLOBAL: CARMA2_SW 0x0073b2c0
+float gPed_head_scale;
 
 // GLOBAL: CARMA2_HW 0x00744808
 // GLOBAL: CARMA2_SW 0x0073b2c8
@@ -66,6 +74,10 @@ void* gPhysics_buffer3_ptr;
 // GLOBAL: CARMA2_SW 0x007410a4
 int gPHIL_mechanics_time_sync;
 
+// GLOBAL: CARMA2_HW 0x0074a5e8
+// GLOBAL: CARMA2_SW 0x007410a8
+int gPHIL_munging_objects;
+
 // GLOBAL: CARMA2_HW 0x006940c8
 // GLOBAL: CARMA2_SW 0x0068e120
 int gPhysics_other_buffer_capacity;
@@ -73,6 +85,10 @@ int gPhysics_other_buffer_capacity;
 // GLOBAL: CARMA2_HW 0x00694140
 // GLOBAL: CARMA2_SW 0x0068e198
 tProximity_ray gProximity_rays[20];
+
+// GLOBAL: CARMA2_HW 0x00694274
+// GLOBAL: CARMA2_SW 0x0068e2cc
+tPed_giblet_size_spec* gGiblet_sizes;
 
 // GLOBAL: CARMA2_HW 0x00694278
 // GLOBAL: CARMA2_SW 0x0068e2d0
@@ -195,10 +211,30 @@ tFace_ref* C2_HOOK_FASTCALL RayCastThruFaceList(br_vector3* pPosition, br_vector
     }
 }
 
-// STUB: CARMA2_HW 0x004226d0
-// STUB: CARMA2_SW 0x00422750
+// FUNCTION: CARMA2_HW 0x004226d0
+// FUNCTION: CARMA2_SW 0x00422750
 tFace_ref* C2_HOOK_FASTCALL RayCastThruFaceList2(br_vector3* pPosition, br_vector3* pDirection, br_vector3* pNormal, br_scalar* pT, br_vector3* pCollision_position, tFace_ref* pFaces, int pCount) {
-    NOT_IMPLEMENTED();
+    br_vector3 normal;
+    br_vector3 collision_position;
+    br_scalar t;
+    tFace_ref* best;
+    int i;
+
+    *pT = 2.0f;
+    for (i = 0; i < pCount; i++, pFaces++) {
+        CheckSingleFace(pFaces, pPosition, pDirection, &normal, &t, &collision_position);
+        if (t < *pT) {
+            *pT = t;
+            BrVector3Copy(pNormal, &normal);
+            best = pFaces;
+            BrVector3Copy(pCollision_position, &collision_position);
+        }
+    }
+    if (*pT < 2.0f) {
+        return best;
+    } else {
+        return NULL;
+    }
 }
 
 // RayCastInBox

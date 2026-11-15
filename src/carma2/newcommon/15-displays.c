@@ -31,6 +31,8 @@
 #include "c2_string.h"
 #include "17-world2.h"
 
+#include <math.h>
+
 // GLOBAL: CARMA2_HW 0x0067c500
 // GLOBAL: CARMA2_SW 0x00676c70
 tHeadup gHeadups[37];
@@ -760,6 +762,41 @@ void C2_HOOK_FASTCALL DoDamageScreen(tU32 pThe_time) {
 }
 
 // DoInstruments
+
+// FUNCTION: CARMA2_HW 0x0044b050
+// FUNCTION: CARMA2_SW 0x0044b1e0
+void C2_HOOK_FASTCALL DoSteeringWheel(tU32 pThe_time) {
+    br_pixelmap* hands_image;
+    int hands_index;
+
+    (void)pThe_time;
+
+    if (gProgram_state.current_car_index != gProgram_state.current_car.index) {
+        return;
+    }
+    if (gProgram_state.cockpit_on && gProgram_state.cockpit_image_index >= 0 && gProgram_state.which_view == eView_forward) {
+        hands_index = (int)floor(gProgram_state.current_car.number_of_hands_images * (-gProgram_state.current_car.steering_angle / 10.f + 1.f) / 2.0);
+        if (hands_index < 0) {
+            hands_index = 0;
+        } else if (hands_index >= gProgram_state.current_car.number_of_hands_images) {
+            hands_index = gProgram_state.current_car.number_of_hands_images - 1;
+        }
+        hands_image = gProgram_state.current_car.lhands_images[hands_index];
+        if (hands_image != NULL) {
+            DRPixelmapRectangleMaskedCopy(gBack_screen,
+                (br_int_16)(gProgram_state.current_car.lhands_x[hands_index] + gScreen_wobble_x),
+                (br_int_16)(gProgram_state.current_car.lhands_y[hands_index] + gScreen_wobble_y),
+                hands_image, 0, 0, (br_int_16)hands_image->width, (br_int_16)hands_image->height);
+        }
+        hands_image = gProgram_state.current_car.rhands_images[hands_index];
+        if (hands_image != NULL) {
+            DRPixelmapRectangleMaskedCopy(gBack_screen,
+                (br_int_16)(gProgram_state.current_car.rhands_x[hands_index] + gScreen_wobble_x),
+                (br_int_16)(gProgram_state.current_car.rhands_y[hands_index] + gScreen_wobble_y),
+                hands_image, 0, 0, (br_int_16)hands_image->width, (br_int_16)hands_image->height);
+        }
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x0044b170
 // FUNCTION: CARMA2_SW 0x0044b300

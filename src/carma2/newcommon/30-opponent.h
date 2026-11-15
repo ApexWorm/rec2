@@ -70,7 +70,7 @@ extern tS16 C2_HOOK_FASTCALL FindNearestPathSection(const br_vector3* pActor_coo
 
 extern void C2_HOOK_CDECL NewObjective(tOpponent_spec* pOpponent_spec, tOpponent_objective_type pObjective_type, ...);
 
-// CalcRaceRoute
+extern void C2_HOOK_FASTCALL CalcRaceRoute(tOpponent_spec* pOpponent_spec);
 
 extern void C2_HOOK_FASTCALL TopUpRandomRoute(tOpponent_spec* pOpponent_spec, int pSections_to_add);
 
@@ -84,7 +84,7 @@ extern int C2_HOOK_FASTCALL SearchForSection(tRoute_section* pRoute, tRoute_sect
 
 extern int C2_HOOK_FASTCALL ShiftOpponentsProjectedRoute(tOpponent_spec* pOpponent_spec, int pPlaces);
 
-// NewCalcGetNearPlayerRoute
+extern void C2_HOOK_FASTCALL NewCalcGetNearPlayerRoute(tOpponent_spec* pOpponent_spec, tCar_spec* pPursuee, int pForce);
 
 extern void C2_HOOK_FASTCALL CalcReturnToStartPointRoute(tOpponent_spec* pOpponent_spec);
 
@@ -116,7 +116,7 @@ extern void C2_HOOK_FASTCALL ProcessWaitForSomeHaplessSod(tOpponent_spec* pOppon
 
 // ProcessLevitate
 
-// ProcessGetNearPlayer
+extern void C2_HOOK_FASTCALL ProcessGetNearPlayer(tOpponent_spec* pOpponent_spec, tProcess_objective_command pCommand);
 
 // ProcessFrozen
 
@@ -140,7 +140,7 @@ extern void C2_HOOK_FASTCALL ChooseNewObjective(tOpponent_spec* pOpponent_spec, 
 
 // NoteCarsCurrentlyUsed
 
-// AddIfNotInList
+extern void C2_HOOK_FASTCALL AddIfNotInList(tPhysics_object* pObject, tPhysics_object** pList, int pCount);
 
 extern void C2_HOOK_FASTCALL RemoveAnythingStillInList(tPhysics_object** pList, int pCount);
 
@@ -166,9 +166,9 @@ extern void C2_HOOK_FASTCALL CalcDistanceFromHome(tOpponent_spec* pOpponent_spec
 
 // RematerialiseOpponentOnThisSection
 
-// RematerialiseOpponentOnNearestSection
+extern int C2_HOOK_FASTCALL RematerialiseOpponentOnNearestSection(tOpponent_spec* pOpponent_spec, br_scalar pSpeed);
 
-// RematerialiseOpponent
+extern int C2_HOOK_FASTCALL RematerialiseOpponent(tOpponent_spec* pOpponent_spec, br_scalar pSpeed);
 
 // CalcPlayerConspicuousness
 

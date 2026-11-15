@@ -32,10 +32,6 @@
 
 #include <stdio.h>
 
-// GLOBAL: CARMA2_HW 0x006a6d38
-// GLOBAL: CARMA2_SW 0x006a0d98
-int gMaterials_to_adapt_count;
-
 // GLOBAL: CARMA2_HW 0x006a8298
 // GLOBAL: CARMA2_SW 0x006a22f8
 int gAllow_material_adapt;
@@ -89,7 +85,23 @@ tStored_smash* gNet_host_smashes;
 
 // GLOBAL: CARMA2_HW 0x006a55c8
 // GLOBAL: CARMA2_SW 0x0069f628
-tExplosion gExplosions[50];
+tExplosion gExplosions[50] = { 0 };
+
+// GLOBAL: CARMA2_HW 0x006a6d38
+// GLOBAL: CARMA2_SW 0x006a0d98
+int gMaterials_to_adapt_count = 0;
+
+// GLOBAL: CARMA2_HW 0x006a6d3c
+// GLOBAL: CARMA2_SW 0x006a0d9c
+int gCount_host_smashes = 0;
+
+// GLOBAL: CARMA2_HW 0x006a6d40
+// GLOBAL: CARMA2_SW 0x006a0da0
+tSmash_explosion gSmash_explosions[20] = { 0 };
+
+// GLOBAL: CARMA2_HW 0x006a7ce0
+// GLOBAL: CARMA2_SW 0x006a1d40
+tSmashable_item_spec gPowerup_respawn_smashable = { 0 };
 
 // GLOBAL: CARMA2_HW 0x006a7fc8
 // GLOBAL: CARMA2_SW 0x006a2028
@@ -221,7 +233,24 @@ void C2_HOOK_FASTCALL InitExplosions(void) {
     }
 }
 
-// ResetExplosions
+// FUNCTION: CARMA2_HW 0x004eaac0
+// FUNCTION: CARMA2_SW 0x004e6790
+void C2_HOOK_FASTCALL ResetExplosions(void) {
+    int i;
+
+    C2_HOOK_BUG_ON(REC2_ASIZE(gExplosions) != 50);
+    C2_HOOK_BUG_ON(sizeof(gExplosions[0]) != 0x78);
+    C2_HOOK_BUG_ON(REC2_ASIZE(gSmash_explosions) != 20);
+    C2_HOOK_BUG_ON(sizeof(gSmash_explosions[0]) != 0xc8);
+
+    for (i = 0; i < (int)REC2_ASIZE(gExplosions); i++) {
+        gExplosions[i].start = 0;
+        gExplosions[i].finished = 0;
+    }
+    for (i = 0; i < (int)REC2_ASIZE(gSmash_explosions); i++) {
+        gSmash_explosions[i].active = 0;
+    }
+}
 
 void C2_HOOK_FASTCALL RemoveAllExplosionettes(void) {
     int i;
@@ -468,7 +497,11 @@ void C2_HOOK_FASTCALL DoSpillage(tSlick_spec* pSlick, br_actor* pActor) {
 
 // DoConnotations
 
-// DoPowerupRespawnSmash
+// STUB: CARMA2_HW 0x004ecea0
+// STUB: CARMA2_SW 0x004e8b70
+void C2_HOOK_FASTCALL DoPowerupRespawnSmash(br_actor* pActor) {
+    NOT_IMPLEMENTED();
+}
 
 // DoConnotationsMultiLevel
 
@@ -890,7 +923,7 @@ void C2_HOOK_FASTCALL ActuallyRepairSmash(tCar_spec* pCar_spec, tCar_crush_smash
 // RepairSmash
 
 // FUNCTION: CARMA2_HW 0x004ef9c0
-// FUNCTION: CARMA2_SW 0x004eb4a0
+// FUNCTION: CARMA2_SW 0x004eb620
 void C2_HOOK_FASTCALL TotallyRepairSmash(tCar_spec* pCar_Spec, tCar_crush_buffer_entry* pSmash_data) {
     tCar_crush_smashable_part* smashable = pSmash_data->smashables;
     int i;
@@ -971,7 +1004,11 @@ void C2_HOOK_FASTCALL InitSmashing(void) {
 
 // VerySimpleRotate
 
-// DoFragMovement
+// STUB: CARMA2_HW 0x004eff30
+// STUB: CARMA2_SW 0x004ebb90
+void C2_HOOK_FASTCALL DoFragMovement(tSmash_vertex* pFragment, tU32 pTime, float pDelta_time) {
+    NOT_IMPLEMENTED();
+}
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
@@ -1194,7 +1231,65 @@ void C2_HOOK_FASTCALL ExtrapolateGeometryCoordinates(tSmash_quad_mapping* pMappi
 
 // ExtractDeTiledFaces
 
-// AddDecal
+// FUNCTION: CARMA2_HW 0x004f3820
+// FUNCTION: CARMA2_SW 0x004ef480
+br_actor* C2_HOOK_FASTCALL AddDecal(tFace_ref* pFace, br_vertex* pVertices, br_material* pMaterial, tU16* pFace_points, tU16* pPoint_indices) {
+    int i;
+    int temp;
+    int changed;
+    tU32 oldest_time;
+    tDecal* decal;
+    tDecal* oldest_decal;
+    br_model* model;
+
+    changed = 0;
+    oldest_time = GetTotalTime();
+    oldest_decal = gDecals;
+    for (i = 0, decal = gDecals; i < (int)REC2_ASIZE(gDecals); i++, decal++) {
+        if (decal->time == 0) {
+            break;
+        }
+        if (decal->time < oldest_time) {
+            oldest_time = decal->time;
+            oldest_decal = decal;
+        }
+    }
+    if (i >= (int)REC2_ASIZE(gDecals)) {
+        decal = oldest_decal;
+    }
+    model = decal->actor->model;
+    model->faces[0].material = pMaterial;
+    model->faces[1].material = pMaterial;
+    for (i = 0; i < 4; i++) {
+        model->vertices[i] = pVertices[i];
+        model->vertices[i].p.v[1] -= -10.0f;
+    }
+    BrModelUpdate(model, BR_MODU_ALL);
+    BrActorAdd(gOther_selfs[0], decal->actor);
+    for (i = 0; i < 2; i++) {
+        if (BrVector3Dot(&pFace->normal, &model->faces[i].n) <= 0.0f) {
+            temp = model->faces[i].vertices[0];
+            model->faces[i].vertices[0] = model->faces[i].vertices[1];
+            model->faces[i].vertices[1] = temp;
+            changed = 1;
+        }
+    }
+    if (changed) {
+        BrModelUpdate(model, BR_MODU_ALL);
+    }
+    decal->time = GetTotalTime();
+    for (i = 0; i < 4; i++) {
+        pPoint_indices[i] = i;
+    }
+    pFace_points[0] = 0;
+    pFace_points[1] = 1;
+    pFace_points[2] = 3;
+    pFace_points[3] = 0;
+    pFace_points[4] = 2;
+    pFace_points[5] = 3;
+    PipeSingleSmashDecal(2);
+    return decal->actor;
+}
 
 // FUNCTION: CARMA2_HW 0x004f39a0
 // FUNCTION: CARMA2_SW 0x004ef600
