@@ -87,6 +87,7 @@ int gDust_rotate = 0;
 int gN_BR_smoke_structs;
 
 // GLOBAL: CARMA2_HW 0x006a8638
+// GLOBAL: CARMA2_SW 0x006a2698
 br_pixelmap* gFlame_map[20] = { 0 };
 
 #ifdef REC2_MATCHING
@@ -161,10 +162,6 @@ int gNum_splash_types;
 // GLOBAL: CARMA2_HW 0x006a82b8
 // GLOBAL: CARMA2_SW 0x006a2318
 tSplash gSplash[32] = { 0 };
-
-// GLOBAL: CARMA2_HW 0x006a8638
-// GLOBAL: CARMA2_SW 0x006a2698
-br_pixelmap* gFlame_map[20] = { 0 };
 
 // GLOBAL: CARMA2_HW 0x006aa570
 // GLOBAL: CARMA2_SW 0x006a3fbc
