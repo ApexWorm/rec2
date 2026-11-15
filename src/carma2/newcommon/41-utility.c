@@ -357,13 +357,13 @@ int C2_HOOK_FASTCALL DRLoadMultiplePix(char* pName, br_pixelmap** pMaps, int pCa
     PathCat(path3, path3, pName);
 
     PathCat(path2, path1, "TIFFX");
-    PFForEveryFile2(path2, (tEnumPathCallback)GetFileName, &list);
+    PFForEveryFile2(path2, GetFileName, &list);
     PathCat(path4, path1, "PIX8");
-    PFForEveryFile2(path4, (tEnumPathCallback)GetAdditionalFileName, &list);
+    PFForEveryFile2(path4, GetAdditionalFileName, &list);
     PathCat(path2, path1, "TIFFRGB");
-    PFForEveryFile2(path2, (tEnumPathCallback)GetAdditionalFileName, &list);
+    PFForEveryFile2(path2, GetAdditionalFileName, &list);
     PathCat(path4, path1, "PIX16");
-    PFForEveryFile2(path4, (tEnumPathCallback)GetAdditionalFileName, &list);
+    PFForEveryFile2(path4, GetAdditionalFileName, &list);
 
     if (list.size != 0) {
         for (i = 0; i < list.size; i++) {
@@ -373,13 +373,13 @@ int C2_HOOK_FASTCALL DRLoadMultiplePix(char* pName, br_pixelmap** pMaps, int pCa
     }
 
     PathCat(path2, path3, "TIFFX");
-    PFForEveryFile2(path2, (tEnumPathCallback)GetFileName, &list);
+    PFForEveryFile2(path2, GetFileName, &list);
     PathCat(path4, path3, "PIX8");
-    PFForEveryFile2(path4, (tEnumPathCallback)GetAdditionalFileName, &list);
+    PFForEveryFile2(path4, GetAdditionalFileName, &list);
     PathCat(path2, path3, "TIFFRGB");
-    PFForEveryFile2(path2, (tEnumPathCallback)GetAdditionalFileName, &list);
+    PFForEveryFile2(path2, GetAdditionalFileName, &list);
     PathCat(path4, path3, "PIX16");
-    PFForEveryFile2(path4, (tEnumPathCallback)GetAdditionalFileName, &list);
+    PFForEveryFile2(path4, GetAdditionalFileName, &list);
 
     if (list.size != 0) {
         for (i = 0; i < list.size; i++) {
