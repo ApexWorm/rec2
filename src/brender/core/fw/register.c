@@ -55,7 +55,7 @@ int C2_HOOK_STDCALL BrRegistryAddMany(br_registry* reg, void** items, int n) {
     int i;
 
     for(i = 0; i < n; i++) {
-        BrRegistryAdd(reg, items[i]);
+        BrRegistryAdd(reg, *items++);
     }
     return n;
 }
