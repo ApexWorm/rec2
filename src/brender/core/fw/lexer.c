@@ -298,13 +298,7 @@ void C2_HOOK_CDECL BrLexerTokenError(br_lexer* l, br_lexer_token_id t) {
             l->error(l, "expected a real number");
             break;
         default:
-            if (t < 0x80) {
-                if (BrIsPrint(t) != 0) {
-                    BrSprintfN(tmp, sizeof(tmp), "expected '%c'", t);
-                } else {
-                    BrSprintfN(tmp, sizeof(tmp), "expected unknown token %d", t);
-                }
-            } else {
+            if (t >= 0x80) {
                 for (i = 0; i < l->nkeywords; i++) {
                     if (l->keywords[i].id == t) {
                         break;
@@ -314,6 +308,12 @@ void C2_HOOK_CDECL BrLexerTokenError(br_lexer* l, br_lexer_token_id t) {
                     BrSprintfN(tmp, sizeof(tmp), "expected '%s'", l->keywords[i].name);
                 } else {
                     BrSprintfN(tmp, sizeof(tmp), "expected unknown keyword %d", t);
+                }
+            } else {
+                if (BrIsPrint(t) != 0) {
+                    BrSprintfN(tmp, sizeof(tmp), "expected '%c'", t);
+                } else {
+                    BrSprintfN(tmp, sizeof(tmp), "expected unknown token %d", t);
                 }
             }
             l->error(l, tmp);
