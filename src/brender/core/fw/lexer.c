@@ -343,11 +343,12 @@ br_fixed_ls C2_HOOK_CDECL BrParseFixed(br_lexer* l) {
     br_boolean neg;
     br_fixed_ls x;
 
+    neg = 0;
     if (l->current.id == T_PLUS) {
         l->advance(l);
     }
-    neg = l->current.id == T_DASH;
-    if (neg) {
+    if (l->current.id == T_DASH) {
+        neg = 1;
         l->advance(l);
     }
     if (l->current.id == T_REAL) {
@@ -420,7 +421,7 @@ br_int_32 C2_HOOK_CDECL BrParseInteger(br_lexer* l) {
         i = 0;
     }
     if (neg) {
-        i = -i;
+        return -i;
     }
     return i;
 }
