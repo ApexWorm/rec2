@@ -307,10 +307,10 @@ void C2_HOOK_CDECL BrMatrix4ApplyV(br_vector4* A, const br_vector3* B, const br_
 // FUNCTION: CARMA2_SW 0x00532160
 void C2_HOOK_CDECL BrMatrix4TApply(br_vector4* A, const br_vector4* B, const br_matrix4* C) {
 
-    A->v[0] = BR_MAC4(B->v[0], C(0, 0), B->v[1], C(0, 1), B->v[2], C(0, 2), B->v[3], C(0, 3));
-    A->v[1] = BR_MAC4(B->v[0], C(1, 0), B->v[1], C(1, 1), B->v[2], C(1, 2), B->v[3], C(1, 3));
-    A->v[2] = BR_MAC4(B->v[0], C(2, 0), B->v[1], C(2, 1), B->v[2], C(2, 2), B->v[3], C(2, 3));
-    A->v[3] = BR_MAC4(B->v[0], C(3, 0), B->v[1], C(3, 1), B->v[2], C(3, 2), B->v[3], C(3, 3));
+    A->v[0] = BR_MAC4(B->v[3], C(0, 3), B->v[2], C(0, 2), B->v[1], C(0, 1), B->v[0], C(0, 0));
+    A->v[1] = BR_MAC4(B->v[3], C(1, 3), B->v[2], C(1, 2), B->v[1], C(1, 1), B->v[0], C(1, 0));
+    A->v[2] = BR_MAC4(B->v[3], C(2, 3), B->v[2], C(2, 2), B->v[1], C(2, 1), B->v[0], C(2, 0));
+    A->v[3] = BR_MAC4(B->v[3], C(3, 3), B->v[2], C(3, 2), B->v[1], C(3, 1), B->v[0], C(3, 0));
 }
 
 // FUNCTION: CARMA2_HW 0x00536b70
