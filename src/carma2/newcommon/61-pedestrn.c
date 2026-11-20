@@ -1726,6 +1726,7 @@ void C2_HOOK_FASTCALL ShowActivePedCount(void) {
 
 // STUB: CARMA2_HW 0x004d6880
 // STUB: CARMA2_SW 0x004d2e80
+// STUB: CARMA2_CHEAT 0x004dc440
 void C2_HOOK_FASTCALL PedPreCollisionStuff(void) {
     NOT_IMPLEMENTED();
 }
@@ -1734,6 +1735,7 @@ void C2_HOOK_FASTCALL PedPreCollisionStuff(void) {
 
 // STUB: CARMA2_HW 0x004d69b0
 // STUB: CARMA2_SW 0x004d2fb0
+// STUB: CARMA2_CHEAT 0x004dc570
 int C2_HOOK_FASTCALL ChangePedScaling(br_vector3* pScale) {
     NOT_IMPLEMENTED();
 }
@@ -1792,12 +1794,14 @@ void C2_HOOK_FASTCALL TurnOnGhostPeds(void) {
     gGhost_pedestrians = 1;
 }
 
-// STUB: CARMA2_HW 0x004d6bb0
-// STUB: CARMA2_SW 0x004d31b0
-// STUB: CARMA2_CHEAT 0x004dc770
+// FUNCTION: CARMA2_HW 0x004d6bb0
+// FUNCTION: CARMA2_SW 0x004d31b0
+// FUNCTION: CARMA2_CHEAT 0x004dc770
 void C2_HOOK_FASTCALL TurnOffGhostPeds(void) {
-
-    NOT_IMPLEMENTED();
+    MungeAllCharacterMaterials(UnmakeMaterialBlendy);
+    MungeAllCharacterObjects(TurnOnCollisions);
+    MungeAllCharacterModels(UpdateModels);
+    gGhost_pedestrians = 0;
 }
 
 // FUNCTION: CARMA2_HW 0x004d6c10
@@ -1854,6 +1858,7 @@ void C2_HOOK_FASTCALL AdjustPedDiagnostics(tU32 pSubject_index, void* pUnused2, 
 
 // STUB: CARMA2_HW 0x004d6dc0
 // STUB: CARMA2_SW 0x004d33c0
+// STUB: CARMA2_CHEAT 0x004dc980
 int C2_HOOK_FASTCALL CalmDownAllPeds(void) {
     NOT_IMPLEMENTED();
 }
