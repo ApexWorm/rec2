@@ -894,14 +894,20 @@ void C2_HOOK_FASTCALL AddFlameToPipingSession(int pIndex, int pFrame, br_scalar 
         SIZE_OFFSET_PIPING(tPipe_chunk_flame, offset_z), gFloat_pipe_union.u32);
 }
 
-// STUB: CARMA2_HW 0x004c7130
-// STUB: CARMA2_SW 0x004c3860
+// FUNCTION: CARMA2_HW 0x004c7130
+// FUNCTION: CARMA2_SW 0x004c3860
+// FUNCTION: CARMA2_CHEAT 0x004ccc50
 void C2_HOOK_FASTCALL AddSplashToPipingSession(tPhysics_object* pObject) {
-    NOT_IMPLEMENTED();
+
+    gFloat_pipe_union.f = pObject->water_d;
+    ARDoSingleVariedSession(ePipe_chunk_splash, (uintptr_t)pObject, 2,
+        SIZE_OFFSET_PIPING(tPipe_chunk_splash, water_d), gFloat_pipe_union.u32,
+        SIZE_OFFSET_PIPING(tPipe_chunk_splash, normal), &pObject->water_normal);
 }
 
 // STUB: CARMA2_HW 0x004c7160
 // STUB: CARMA2_SW 0x004c3890
+// STUB: CARMA2_CHEAT 0x004ccc80
 void C2_HOOK_FASTCALL AddExtendedSplashToPipingSession(tPhysics_object* pObject, void* pSubject) {
     NOT_IMPLEMENTED();
 }

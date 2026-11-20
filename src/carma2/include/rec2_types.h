@@ -790,6 +790,11 @@ typedef struct {
     br_pixelmap* texture2;
 } tPipe_smash_texture_change;
 
+typedef struct {
+    br_scalar water_d;
+    br_vector3 normal;
+} tPipe_chunk_splash;
+
 typedef struct tPipe_chunk {
     uintptr_t subject_index;
     union {
@@ -803,6 +808,7 @@ typedef struct tPipe_chunk {
         tPipe_chunk_shrapnel shrapnel;
         tPipe_chunk_identity identity;
         tPipe_chunk_flap flap;
+        tPipe_chunk_splash splash;
         tPipe_chunk_relink relink;
         tPipe_chunk_smash_model_change smash_model_change;
         tPipe_smash_texture_change smash_texture_change;
