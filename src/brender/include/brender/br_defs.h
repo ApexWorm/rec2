@@ -62,7 +62,7 @@
 #define BR_SCALAR(x) ((br_scalar)(x))
 
 #define BR_COLOUR_RGBA(r, g, b, a) \
-    ((((unsigned int)(a)) << 24) | (((unsigned int)(r)) << 16) | (((unsigned int)(g)) << 8) | ((unsigned int)(b)))
+    ((((br_colour)(a)) << 24) | (((br_colour)(r)) << 16) | (((br_colour)(g)) << 8) | ((br_colour)(b)))
 
 #define BR_COLOUR_RED(c) ((c >> 16) & 0xff)
 #define BR_COLOUR_GRN(c) ((c >>  8) & 0xff)
