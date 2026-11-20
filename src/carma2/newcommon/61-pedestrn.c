@@ -2659,7 +2659,40 @@ void C2_HOOK_FASTCALL MungeAllCharacterObjects(void (C2_HOOK_FASTCALL *pCallback
 #pragma auto_inline(on)
 #endif
 
-// MungeAllCharacterModels
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// FUNCTION: CARMA2_HW 0x0040c560
+// FUNCTION: CARMA2_SW 0x0040c550
+// FUNCTION: CARMA2_CHEAT 0x0040c600
+void C2_HOOK_FASTCALL MungeAllCharacterModels(void (C2_HOOK_FASTCALL *pCallback)(br_model*)) {
+    tPed_personality** personality;
+    int i;
+    int j;
+    int k;
+    int l;
+
+    for (i = 0, personality = gPed_personalities; i < (int)REC2_ASIZE(gPed_personalities); i++, personality++) {
+        if (*personality != NULL) {
+            for (j = 0; j < (*personality)->form->count_bones; j++) {
+                for (k = 0; k < REC2_ASIZE((*personality)->bones[j].models[l].models); k++) { // 2x
+                    for (l = 0; l < (int)REC2_ASIZE((*personality)->bones[j].models); l++) { // 4x
+                        br_model* model = (*personality)->bones[j].models[l].models[k];
+
+                        if (model != NULL) {
+                            pCallback(model);
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // FUNCTION: CARMA2_HW 0x0040c600
 // FUNCTION: CARMA2_SW 0x0040c5f0
