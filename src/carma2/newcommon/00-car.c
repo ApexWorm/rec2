@@ -953,6 +953,7 @@ void C2_HOOK_FASTCALL MoveAndCollideNonCar(tNon_car_spec* pNon_car, br_scalar pD
 
 // FUNCTION: CARMA2_HW 0x00417180
 // FUNCTION: CARMA2_SW 0x004171b0
+// FUNCTION: CARMA2_CHEAT 0x004173e0
 void C2_HOOK_FASTCALL ControlCar2(tCar_spec* pCar, br_scalar pDt) {
     br_scalar time_steps;
 
@@ -999,6 +1000,7 @@ void C2_HOOK_FASTCALL ControlCar2(tCar_spec* pCar, br_scalar pDt) {
 
 // FUNCTION: CARMA2_HW 0x004173b0
 // FUNCTION: CARMA2_SW 0x004173e0
+// FUNCTION: CARMA2_CHEAT 0x00417610
 void C2_HOOK_FASTCALL ControlCar3(tCar_spec* pCar, br_scalar pDt) {
     br_scalar time_steps;
 
@@ -1092,6 +1094,7 @@ void C2_HOOK_FASTCALL ControlCar4(tCar_spec* pCar, br_scalar pDt) {
 
 // FUNCTION: CARMA2_HW 0x00417a20
 // FUNCTION: CARMA2_SW 0x00417a50
+// FUNCTION: CARMA2_CHEAT 0x00417c80
 void C2_HOOK_FASTCALL ControlCar5(tCar_spec* pCar, br_scalar pDt) {
     br_scalar time_steps;
 
@@ -1150,7 +1153,42 @@ void C2_HOOK_FASTCALL ControlCar5(tCar_spec* pCar, br_scalar pDt) {
     pCar->keys.left = 1;
 }
 
-// ControlCar1
+// FUNCTION: CARMA2_HW 0x00417de0
+// FUNCTION: CARMA2_SW 0x00417e10
+// FUNCTION: CARMA2_CHEAT 0x00418040
+void C2_HOOK_FASTCALL ControlCar1(tCar_spec* pCar, br_scalar pDt) {
+    br_scalar time_steps;
+
+    pCar->acc_force = 0.0f;
+    if (pCar->keys.acc) {
+        pCar->acc_force = 7.0f * pCar->collision_info->M;
+    }
+    if (pCar->keys.dec) {
+        pCar->acc_force = -(7.0f * pCar->collision_info->M);
+    }
+    if (pCar->keys.left) {
+        if (pCar->curvature < 0.0f) {
+            pCar->curvature = (float)(pCar->curvature + pDt * 0.25);
+        } else {
+            time_steps = pDt / 0.04f;
+            pCar->curvature = (float)(pCar->curvature + time_steps * (0.05f / (5.0f + BrVector3Length(&pCar->collision_info->v))));
+        }
+    }
+    if (pCar->keys.right) {
+        if (pCar->curvature > 0.0f) {
+            pCar->curvature = (float)(pCar->curvature - pDt * 0.25);
+        } else {
+            time_steps = pDt / 0.04f;
+            pCar->curvature = (float)(pCar->curvature - time_steps * (0.05f / (5.0f + BrVector3Length(&pCar->collision_info->v))));
+        }
+    }
+    if (pCar->curvature > pCar->maxcurve) {
+        pCar->curvature = pCar->maxcurve;
+    }
+    if (pCar->curvature < -pCar->maxcurve) {
+        pCar->curvature = -pCar->maxcurve;
+    }
+}
 
 // SteeringSelfCentre
 
