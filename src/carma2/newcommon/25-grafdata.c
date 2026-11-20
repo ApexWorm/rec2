@@ -15,6 +15,7 @@
 
 // GLOBAL: CARMA2_HW 0x00655f58
 // GLOBAL: CARMA2_SW 0x00650d68
+// GLOBAL: CARMA2_CHEAT 0x0065c7d8
 tGraf_data gGraf_data[2] = {
     {
         320,
@@ -680,18 +681,22 @@ tGraf_data gGraf_data[2] = {
 
 // GLOBAL: CARMA2_HW 0x0074d630
 // GLOBAL: CARMA2_SW 0x00743b90
+// GLOBAL: CARMA2_CHEAT 0x00754cd0
 int gGraf_data_index;
 
 // GLOBAL: CARMA2_HW 0x0074b770
 // GLOBAL: CARMA2_SW 0x00741e30
+// GLOBAL: CARMA2_CHEAT 0x00752e10
 int gReal_graf_data_index;
 
 // GLOBAL: CARMA2_HW 0x0074b774
 // GLOBAL: CARMA2_SW 0x00741e34
+// GLOBAL: CARMA2_CHEAT 0x00752e14
 tGraf_data* gCurrent_graf_data;
 
 // FUNCTION: CARMA2_HW 0x0047b3e0
 // FUNCTION: CARMA2_SW 0x0047a940
+// FUNCTION: CARMA2_CHEAT 0x0047b760
 void C2_HOOK_FASTCALL CalcGrafDataIndex(void) {
     int i;
 

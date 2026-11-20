@@ -13,6 +13,7 @@
 
 // GLOBAL: CARMA2_HW 0x005f8e68
 // GLOBAL: CARMA2_SW 0x005f3d98
+// GLOBAL: CARMA2_CHEAT 0x005ff6e8
 tFrontend_spec gFrontend_WRECKS = {
 #if 0 // FIXME: enable this
     "Wrecks",

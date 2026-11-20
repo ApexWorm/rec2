@@ -17,6 +17,7 @@ char scratchString[512] = "SCRATCH";
 
 // FUNCTION: CARMA2_HW 0x00529e80
 // FUNCTION: CARMA2_SW 0x005249f0
+// FUNCTION: CARMA2_CHEAT 0x0052fa70
 void* C2_HOOK_CDECL BrScratchAllocate(br_size_t size) {
 
     if (fw.scratch_inuse != 0) {
@@ -38,6 +39,7 @@ void* C2_HOOK_CDECL BrScratchAllocate(br_size_t size) {
 
 // FUNCTION: CARMA2_HW 0x00529ef0
 // FUNCTION: CARMA2_SW 0x00524a60
+// FUNCTION: CARMA2_CHEAT 0x0052fae0
 void C2_HOOK_CDECL BrScratchFree(void* scratch) {
 
     fw.scratch_inuse = 0;
@@ -45,6 +47,7 @@ void C2_HOOK_CDECL BrScratchFree(void* scratch) {
 
 // FUNCTION: CARMA2_HW 0x00529f00
 // FUNCTION: CARMA2_SW 0x00524a70
+// FUNCTION: CARMA2_CHEAT 0x0052faf0
 void C2_HOOK_CDECL BrScratchFlush(void) {
 
     if (fw.scratch_inuse != 0) {
@@ -59,6 +62,7 @@ void C2_HOOK_CDECL BrScratchFlush(void) {
 
 // FUNCTION: CARMA2_HW 0x00529f40
 // FUNCTION: CARMA2_SW 0x00524ab0
+// FUNCTION: CARMA2_CHEAT 0x0052fb30
 br_size_t C2_HOOK_CDECL BrScratchInquire(void) {
 
     return fw.scratch_size;
@@ -66,6 +70,7 @@ br_size_t C2_HOOK_CDECL BrScratchInquire(void) {
 
 // FUNCTION: CARMA2_HW 0x00529f50
 // FUNCTION: CARMA2_SW 0x00524ac0
+// FUNCTION: CARMA2_CHEAT 0x0052fb40
 char* C2_HOOK_CDECL BrScratchString(void) {
 
     return scratchString;
@@ -73,6 +78,7 @@ char* C2_HOOK_CDECL BrScratchString(void) {
 
 // FUNCTION: CARMA2_HW 0x00529f60
 // FUNCTION: CARMA2_SW 0x00524ad0
+// FUNCTION: CARMA2_CHEAT 0x0052fb50
 br_size_t C2_HOOK_CDECL BrScratchStringSize(void) {
 
     return sizeof(scratchString);

@@ -13,18 +13,22 @@
 
 // GLOBAL: CARMA2_HW 0x00655f40
 // GLOBAL: CARMA2_SW 0x00650d50
+// GLOBAL: CARMA2_CHEAT 0x0065c7c0
 br_scalar gCamera_zoom = 0.2f;
 
 // GLOBAL: CARMA2_HW 0x0074c7b0
 // GLOBAL: CARMA2_SW 0x00742e70
+// GLOBAL: CARMA2_CHEAT 0x00753e50
 br_actor* gCamera_list[2];
 
 // GLOBAL: CARMA2_HW 0x0068b910
 // GLOBAL: CARMA2_SW 0x00685e58
+// GLOBAL: CARMA2_CHEAT 0x006931b4
 int gCar_flying;
 
 // GLOBAL: CARMA2_HW 0x00655f54
 // GLOBAL: CARMA2_SW 0x00650d64
+// GLOBAL: CARMA2_CHEAT 0x0065c7d4
 tCar_spec* gCar_to_view = &gProgram_state.current_car;
 
 #ifdef REC2_HW
@@ -34,6 +38,7 @@ int gNetscore_box_created;
 
 // GLOBAL: CARMA2_HW 0x0068d940
 // GLOBAL: CARMA2_SW 0x00687998
+// GLOBAL: CARMA2_CHEAT 0x006951e0
 tU32 gCar_to_view_id;
 
 // GLOBAL: CARMA2_HW 0x0068b914
@@ -46,6 +51,7 @@ int gCamera_sign;
 
 // GLOBAL: CARMA2_HW 0x0068b908
 // GLOBAL: CARMA2_SW 0x00685e50
+// GLOBAL: CARMA2_CHEAT 0x006931ac
 br_angle gCamera_yaw;
 
 // GLOBAL: CARMA2_HW 0x0074c9f0

@@ -15,6 +15,7 @@ br_device* C2_HOOK_CDECL BrDrv1SoftRendBegin(const char* arguments);
 void (C2_HOOK_CDECL * _BrBeginHook_original)(void);
 // FUNCTION: CARMA2_HW 0x0051d610
 // FUNCTION: CARMA2_SW 0x00518e00
+// FUNCTION: CARMA2_CHEAT 0x00523200
 void C2_HOOK_CDECL _BrBeginHook(void) {
 
     BrDevAddStatic(NULL, BrDrv1SoftRendBegin, NULL);
@@ -22,6 +23,7 @@ void C2_HOOK_CDECL _BrBeginHook(void) {
 
 // FUNCTION: CARMA2_HW 0x0051d630
 // FUNCTION: CARMA2_SW 0x00518e20
+// FUNCTION: CARMA2_CHEAT 0x00523220
 void C2_HOOK_CDECL _BrEndHook(void) {
 
 }

@@ -56,6 +56,7 @@ br_error C2_HOOK_CDECL HostIniQuery(char* ini_file, char* section_name, char* en
 
 // FUNCTION: CARMA2_HW 0x0053fc10
 // FUNCTION: CARMA2_SW 0x0053b2b0
+// FUNCTION: CARMA2_CHEAT 0x00545800
 br_error C2_HOOK_CDECL HostRegistryQuery(void* hKey, char* Path, char* entry, char* Buffer, br_uint_16 max, br_uint_16* size) {
 #ifdef _WIN32
     HKEY key, key2;

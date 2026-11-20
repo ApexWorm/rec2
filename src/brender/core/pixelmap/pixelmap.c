@@ -12,6 +12,7 @@
 
 // FUNCTION: CARMA2_HW 0x00538d80
 // FUNCTION: CARMA2_SW 0x00534420
+// FUNCTION: CARMA2_CHEAT 0x0053e970
 br_pixelmap* C2_HOOK_CDECL BrPixelmapAllocate(br_uint_8 type, br_int_32 w, br_int_32 h, void* pixels, int flags) {
 
     return (br_pixelmap*)DevicePixelmapMemAllocate(type, w, h, pixels, flags);

@@ -13,7 +13,15 @@ This will be done in two stages:
 
 ## Status
 
-<a href="https://gist.githubusercontent.com/madebr/92b121cfd427c51b771fb614b4c893f4/raw/CARMA2_HW.html"><img width="50%" src="https://gist.githubusercontent.com/madebr/92b121cfd427c51b771fb614b4c893f4/raw/CARMA2_HW.svg"></a><a href="https://gist.githubusercontent.com/madebr/92b121cfd427c51b771fb614b4c893f4/raw/CARMA2_SW.html"><img width="50%" src="https://gist.githubusercontent.com/madebr/92b121cfd427c51b771fb614b4c893f4/raw/CARMA2_SW.svg"></a>
+<a href="https://gist.githubusercontent.com/madebr/92b121cfd427c51b771fb614b4c893f4/raw/CARMA2_HW.html">
+<img width="33%" src="https://gist.githubusercontent.com/madebr/92b121cfd427c51b771fb614b4c893f4/raw/CARMA2_HW.svg">
+</a>
+<a href="https://gist.githubusercontent.com/madebr/92b121cfd427c51b771fb614b4c893f4/raw/CARMA2_SW.html">
+<img width="33%" src="https://gist.githubusercontent.com/madebr/92b121cfd427c51b771fb614b4c893f4/raw/CARMA2_SW.svg">
+</a>
+<a href="https://gist.githubusercontent.com/madebr/92b121cfd427c51b771fb614b4c893f4/raw/CARMA2_SW.html">
+<img width="33%" src="https://gist.githubusercontent.com/madebr/92b121cfd427c51b771fb614b4c893f4/raw/CARMA2_CHEAT.svg">
+</a>
 
 ## Requirements
 
@@ -38,6 +46,16 @@ This will be done in two stages:
 - Every single commit should compile and work: this enables `git-bisect` to search for regressions
 - Get the game running on most platforms
 
+## Target binaries
+
+| Name         | version | Build timestamp     | size (bytes)    | Where to get?                                                                                                                                            |
+|--------------|---------|---------------------|-----------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|
+| CARMA2_HW    | v1.02a  | 1998-11-30 18:25:11 | 2,680,320 bytes | [gog.com](https://www.gog.com/en/game/carmageddon_2_carpocalypse_now)/[steam](https://store.steampowered.com/app/282030/Carmageddon_2_Carpocalypse_Now/) |
+| CARMA2_SW    | v1.02a  | 1998-11-30 19:02:21 | 2,656,768 bytes | [gog.com](https://www.gog.com/en/game/carmageddon_2_carpocalypse_now)/[steam](https://store.steampowered.com/app/282030/Carmageddon_2_Carpocalypse_Now/) |
+| CARMA2_CHEAT | v1.01a  | 1998-11-07 18:35:26 | 2,714,112 bytes | [Road Reaction 2000](https://rr2000.cwaboard.co.uk/pc-files#c2)                                                                                          |
+
+Checksums can be found in [`reccmp-project.yml`](/reccmp-project.yml)
+
 ## License
 
 rec2 is licensed under the [MPL-2.0 (Mozilla Public License 2.0)](https://www.mozilla.org/en-US/MPL/)
@@ -47,4 +65,4 @@ Contributors are required to complete the steps shown in [CONTRIBUTING.md](/CONT
 ## Credits
 
 - [Stainles Games](https://www.stainlessgames.com/): the creators of the Carmageddon series
-- The [DethRace](https://github.com/dethrace-labs/dethrace/) project: Carmageddon 2 is a continuation of Carmageddon 1.
+- The [Dethrace](https://github.com/dethrace-labs/dethrace/) project: Carmageddon 2 is a continuation of Carmageddon 1.

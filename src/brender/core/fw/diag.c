@@ -20,10 +20,12 @@
 
 // GLOBAL: CARMA2_HW 0x006ad928
 // GLOBAL: CARMA2_SW 0x006a70b0
+// GLOBAL: CARMA2_CHEAT 0x006b4fb8
 char _diag_scratch[128];
 
 // FUNCTION: CARMA2_HW 0x00527c80
 // FUNCTION: CARMA2_SW 0x00523320
+// FUNCTION: CARMA2_CHEAT 0x0052d870
 void C2_HOOK_CDECL BrFailure(const char* s, ...) {
     va_list args;
 
@@ -45,6 +47,7 @@ void C2_HOOK_CDECL BrFailure(const char* s, ...) {
 
 // FUNCTION: CARMA2_HW 0x00527cd0
 // FUNCTION: CARMA2_SW 0x00523370
+// FUNCTION: CARMA2_CHEAT 0x0052d8c0
 void C2_HOOK_CDECL BrWarning(const char* s, ...) {
     va_list args;
 
@@ -62,6 +65,7 @@ void C2_HOOK_CDECL BrWarning(const char* s, ...) {
 
 // FUNCTION: CARMA2_HW 0x00527d20
 // FUNCTION: CARMA2_SW 0x005233c0
+// FUNCTION: CARMA2_CHEAT 0x0052d910
 void C2_HOOK_CDECL BrFatal(const char* name, int line, const char* s, ...) {
     va_list args;
     int n;
@@ -79,6 +83,7 @@ void C2_HOOK_CDECL BrFatal(const char* name, int line, const char* s, ...) {
 
 // FUNCTION: CARMA2_HW 0x00527d80
 // FUNCTION: CARMA2_SW 0x00523420
+// FUNCTION: CARMA2_CHEAT 0x0052d970
 void C2_HOOK_CDECL _BrAssert(const char* condition, const char* file, unsigned int line) {
     if (fw.diag->failure == NULL) {
         BrAbort();
@@ -90,6 +95,7 @@ void C2_HOOK_CDECL _BrAssert(const char* condition, const char* file, unsigned i
 
 // FUNCTION: CARMA2_HW 0x00527dd0
 // FUNCTION: CARMA2_SW 0x00523470
+// FUNCTION: CARMA2_CHEAT 0x0052d9c0
 void C2_HOOK_CDECL _BrUAssert(const char* condition, const char* file, unsigned int line) {
     if (fw.diag->failure == NULL) {
         BrAbort();

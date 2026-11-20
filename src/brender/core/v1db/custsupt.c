@@ -16,6 +16,7 @@
 // Carmageddon 2 adaptation
 
 // GLOBAL: CARMA2_HW 0x0079feb4
+// GLOBAL: CARMA2_CHEAT 0x007a7554
 br_scalar gScreenZOffset;
 
 // GLOBAL: CARMA2_HW 0x00670530
@@ -31,6 +32,7 @@ const float gScreenZOffsetPresetChoices[7] = {
 
 // FUNCTION: CARMA2_HW 0x00540560
 // FUNCTION: CARMA2_SW 0x0053bc00
+// FUNCTION: CARMA2_CHEAT 0x00546150
 void C2_HOOK_CDECL BrSetScreenZOffset(br_uint_32 pOffset) {
 
     C2_HOOK_BUG_ON(BR_ASIZE(gScreenZOffsetPresetChoices) != 7);
@@ -68,6 +70,7 @@ static br_uint_32 calculate_outcode(const br_vector4* v) {
 }
 
 // FUNCTION: CARMA2_HW 0x005269f0
+// FUNCTION: CARMA2_CHEAT 0x0052c5e0
 void C2_HOOK_CDECL BrModelToScreenQuery(br_matrix4* dest) {
     br_uint_32 dummy;
     br_matrix4 v2s;
@@ -79,6 +82,7 @@ void C2_HOOK_CDECL BrModelToScreenQuery(br_matrix4* dest) {
 }
 
 // FUNCTION: CARMA2_HW 0x00526a60
+// FUNCTION: CARMA2_CHEAT 0x0052c650
 void C2_HOOK_CDECL BrModelToViewQuery(br_matrix34* dest) {
     br_uint_32 dummy;
 
@@ -86,6 +90,7 @@ void C2_HOOK_CDECL BrModelToViewQuery(br_matrix34* dest) {
 }
 
 // FUNCTION: CARMA2_HW 0x00526a90
+// FUNCTION: CARMA2_CHEAT 0x0052c680
 br_uint_8 C2_HOOK_CDECL BrOriginToScreenXY(br_vector2* screen) {
 
     if (!v1db.model_to_screen_valid) {
@@ -100,6 +105,7 @@ br_uint_8 C2_HOOK_CDECL BrOriginToScreenXY(br_vector2* screen) {
 }
 
 // FUNCTION: CARMA2_HW 0x00526b70
+// FUNCTION: CARMA2_CHEAT 0x0052c760
 br_uint_32 C2_HOOK_CDECL BrOriginToScreenXYZO(br_vector3* screen) {
     br_uint_32 outcode;
 
@@ -119,6 +125,7 @@ br_uint_32 C2_HOOK_CDECL BrOriginToScreenXYZO(br_vector3* screen) {
 }
 
 // FUNCTION: CARMA2_HW 0x00526cf0
+// FUNCTION: CARMA2_CHEAT 0x0052c8e0
 br_uint_8 C2_HOOK_CDECL BrPointToScreenXY(br_vector2* screen, const br_vector3* point) {
     br_vector4 sp;
 
@@ -134,6 +141,7 @@ br_uint_8 C2_HOOK_CDECL BrPointToScreenXY(br_vector2* screen, const br_vector3* 
 }
 
 // FUNCTION: CARMA2_HW 0x00526df0
+// FUNCTION: CARMA2_CHEAT 0x0052c9e0
 br_uint_32 C2_HOOK_CDECL BrPointToScreenXYZO(br_vector3* screen, const br_vector3* point) {
     br_vector4 sp;
     br_uint_32 outcode;
@@ -154,6 +162,7 @@ br_uint_32 C2_HOOK_CDECL BrPointToScreenXYZO(br_vector3* screen, const br_vector
 }
 
 // FUNCTION: CARMA2_HW 0x00526f80
+// FUNCTION: CARMA2_CHEAT 0x0052cb70
 void C2_HOOK_CDECL BrPointToScreenXYMany(br_vector2* screens, const br_vector3* points, br_uint_32 npoints) {
     br_vector4 sp;
     br_uint_32 i;
@@ -172,6 +181,7 @@ void C2_HOOK_CDECL BrPointToScreenXYMany(br_vector2* screens, const br_vector3* 
 }
 
 // FUNCTION: CARMA2_HW 0x00527070
+// FUNCTION: CARMA2_CHEAT 0x0052cc60
 void C2_HOOK_CDECL BrPointToScreenXYZOMany(br_vector3* screens, br_uint_32* outcodes, br_vector3* points, br_uint_32 npoints) {
     br_uint_32 outcode;
     br_vector4 sp;
@@ -195,12 +205,14 @@ void C2_HOOK_CDECL BrPointToScreenXYZOMany(br_vector3* screens, br_uint_32* outc
 }
 
 // FUNCTION: CARMA2_HW 0x00527240
+// FUNCTION: CARMA2_CHEAT 0x0052ce30
 br_scalar C2_HOOK_CDECL BrZbDepthToScreenZ(br_uint_32 depth_z, br_camera* camera) {
 
     return BrFixedToScalar((br_int_32)BrFixedNeg(depth_z));
 }
 
 // FUNCTION: CARMA2_HW 0x00527260
+// FUNCTION: CARMA2_CHEAT 0x0052ce50
 br_uint_32 C2_HOOK_CDECL BrZbScreenZToDepth(br_scalar sz, br_camera* camera) {
     br_uint_32 depth;
 
@@ -215,6 +227,7 @@ br_uint_32 C2_HOOK_CDECL BrZbScreenZToDepth(br_scalar sz, br_camera* camera) {
 }
 
 // FUNCTION: CARMA2_HW 0x005272b0
+// FUNCTION: CARMA2_CHEAT 0x0052cea0
 br_scalar C2_HOOK_CDECL BrZsDepthToScreenZ(br_scalar depth_z, br_camera* camera) {
     br_scalar hither;
     br_scalar yon;
@@ -232,6 +245,7 @@ br_scalar C2_HOOK_CDECL BrZsDepthToScreenZ(br_scalar depth_z, br_camera* camera)
 }
 
 // FUNCTION: CARMA2_HW 0x00527320
+// FUNCTION: CARMA2_CHEAT 0x0052cf10
 br_scalar C2_HOOK_CDECL BrZsScreenZToDepth(br_scalar sz, br_camera* camera) {
     br_scalar hither;
     br_scalar yon;
@@ -249,6 +263,7 @@ br_scalar C2_HOOK_CDECL BrZsScreenZToDepth(br_scalar sz, br_camera* camera) {
 }
 
 // FUNCTION: CARMA2_HW 0x005273a0
+// FUNCTION: CARMA2_CHEAT 0x0052cf90
 br_scalar C2_HOOK_CDECL BrScreenZToCamera(br_actor* camera, br_scalar sz) {
     br_camera* data;
     br_scalar hither;
@@ -274,6 +289,7 @@ br_scalar C2_HOOK_CDECL BrScreenZToCamera(br_actor* camera, br_scalar sz) {
 }
 
 // FUNCTION: CARMA2_HW 0x00527480
+// FUNCTION: CARMA2_CHEAT 0x0052d070
 void C2_HOOK_CDECL BrScreenXYZToCamera(br_vector3* point, br_actor* camera, br_pixelmap* screen_buffer, br_int_16 x, br_int_16 y, br_scalar sz) {
     br_scalar hx;
     br_scalar hy;

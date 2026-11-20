@@ -15,6 +15,7 @@
 
 // GLOBAL: CARMA2_HW 0x005933a8
 // GLOBAL: CARMA2_SW 0x0058e308
+// GLOBAL: CARMA2_CHEAT 0x00599d00
 br_filesystem gFile_system = {
     "Carmageddon",
     NULL,
@@ -33,10 +34,12 @@ br_filesystem gFile_system = {
 
 // GLOBAL: CARMA2_HW 0x006815c4
 // GLOBAL: CARMA2_SW 0x0067bd04
+// GLOBAL: CARMA2_CHEAT 0x00688e6c
 br_filesystem* gOld_file_system;
 
 // FUNCTION: CARMA2_HW 0x0044c6a0
 // FUNCTION: CARMA2_SW 0x0044c450
+// FUNCTION: CARMA2_CHEAT 0x0044cbf0
 int C2_HOOK_CDECL DRStdioEOF(void* f) {
 
     return PFfeof(f);
@@ -44,6 +47,7 @@ int C2_HOOK_CDECL DRStdioEOF(void* f) {
 
 // FUNCTION: CARMA2_HW 0x0044c6b0
 // FUNCTION: CARMA2_SW 0x0044c460
+// FUNCTION: CARMA2_CHEAT 0x0044cc00
 int C2_HOOK_CDECL DRStdioGetChr(void* f) {
 
     return PFfgetc(f);
@@ -51,6 +55,7 @@ int C2_HOOK_CDECL DRStdioGetChr(void* f) {
 
 // FUNCTION: CARMA2_HW 0x0044c6c0
 // FUNCTION: CARMA2_SW 0x0044c470
+// FUNCTION: CARMA2_CHEAT 0x0044cc10
 br_size_t C2_HOOK_CDECL DRStdioGetLine(char* buf, br_size_t buf_len, void* f) {
 
     PFfgets(buf, buf_len, f);
@@ -59,6 +64,7 @@ br_size_t C2_HOOK_CDECL DRStdioGetLine(char* buf, br_size_t buf_len, void* f) {
 
 // FUNCTION: CARMA2_HW 0x0044c6f0
 // FUNCTION: CARMA2_SW 0x0044c4a0
+// FUNCTION: CARMA2_CHEAT 0x0044cc40
 void C2_HOOK_CDECL DRStdioAdvance(br_size_t count, void *f) {
 
     PFfseek((FILE*)f, count, SEEK_CUR);
@@ -66,6 +72,7 @@ void C2_HOOK_CDECL DRStdioAdvance(br_size_t count, void *f) {
 
 // FUNCTION: CARMA2_HW 0x0044c700
 // FUNCTION: CARMA2_SW 0x0044c4b0
+// FUNCTION: CARMA2_CHEAT 0x0044cc50
 void* C2_HOOK_CDECL DRStdioOpenRead(const char* name, br_size_t n_magics, br_mode_test_cbfn* identify, int* mode_result) {
 
     if (mode_result != NULL) {
@@ -76,6 +83,7 @@ void* C2_HOOK_CDECL DRStdioOpenRead(const char* name, br_size_t n_magics, br_mod
 
 // FUNCTION: CARMA2_HW 0x0044c720
 // FUNCTION: CARMA2_SW 0x0044c4d0
+// FUNCTION: CARMA2_CHEAT 0x0044cc70
 void* C2_HOOK_CDECL DRStdioOpenWrite(const char* name, int mode) {
 
     return gOld_file_system->open_write(name, mode);
@@ -83,6 +91,7 @@ void* C2_HOOK_CDECL DRStdioOpenWrite(const char* name, int mode) {
 
 // FUNCTION: CARMA2_HW 0x0044c740
 // FUNCTION: CARMA2_SW 0x0044c4f0
+// FUNCTION: CARMA2_CHEAT 0x0044cc90
 void C2_HOOK_CDECL DRStdioClose(void* f) {
 
     PFfclose(f);
@@ -90,6 +99,7 @@ void C2_HOOK_CDECL DRStdioClose(void* f) {
 
 // FUNCTION: CARMA2_HW 0x0044c750
 // FUNCTION: CARMA2_SW 0x0044c500
+// FUNCTION: CARMA2_CHEAT 0x0044cca0
 br_size_t C2_HOOK_CDECL DRStdioRead(void* buf, br_size_t size, unsigned int n, void* f) {
 
     return PFfread(buf, size, n, f);
@@ -97,6 +107,7 @@ br_size_t C2_HOOK_CDECL DRStdioRead(void* buf, br_size_t size, unsigned int n, v
 
 // FUNCTION: CARMA2_HW 0x0044c770
 // FUNCTION: CARMA2_SW 0x0044c520
+// FUNCTION: CARMA2_CHEAT 0x0044ccc0
 br_size_t C2_HOOK_CDECL DRStdioWrite(const void* buf, br_size_t size, unsigned int n, void* f) {
 
     return PFfwrite(buf, size, n, f);
@@ -104,6 +115,7 @@ br_size_t C2_HOOK_CDECL DRStdioWrite(const void* buf, br_size_t size, unsigned i
 
 // FUNCTION: CARMA2_HW 0x0044c790
 // FUNCTION: CARMA2_SW 0x0044c540
+// FUNCTION: CARMA2_CHEAT 0x0044cce0
 void C2_HOOK_FASTCALL InstallDRFileCalls(void) {
     br_filesystem* temp_system;
 

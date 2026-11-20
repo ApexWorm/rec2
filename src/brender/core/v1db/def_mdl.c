@@ -40,6 +40,7 @@ br_vertex default_model_vertices[] = {
 
 // GLOBAL: CARMA2_HW 0x006653e8
 // GLOBAL: CARMA2_SW 0x0065fb80
+// GLOBAL: CARMA2_CHEAT 0x0066cca0
 br_model _BrDefaultModel = {
     0,
     "default_model",

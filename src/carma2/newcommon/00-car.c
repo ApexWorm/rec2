@@ -47,42 +47,52 @@
 
 // GLOBAL: CARMA2_HW 0x0079eda0
 // GLOBAL: CARMA2_SW 0x00795340
+// GLOBAL: CARMA2_CHEAT 0x007a6440
 tNon_car_spec* gActive_non_car_list[99];
 
 // GLOBAL: CARMA2_HW 0x0067939c
 // GLOBAL: CARMA2_SW 0x00673b0c
+// GLOBAL: CARMA2_CHEAT 0x00680c4c
 int gTesting_car_for_sensible_place;
 
 // GLOBAL: CARMA2_HW 0x00763500
 // GLOBAL: CARMA2_SW 0x00759a60
+// GLOBAL: CARMA2_CHEAT 0x0076aba0
 int gCunning_stunt_bonus[3];
 
 // GLOBAL: CARMA2_HW 0x0074d1c0
 // GLOBAL: CARMA2_SW 0x00743720
+// GLOBAL: CARMA2_CHEAT 0x00754860
 float gArmour_starting_value[100];
 
 // GLOBAL: CARMA2_HW 0x00761f5c
 // GLOBAL: CARMA2_SW 0x007584bc
+// GLOBAL: CARMA2_CHEAT 0x007695fc
 int gExplosion_sound_id;
 
 // GLOBAL: CARMA2_HW 0x00761f60
 // GLOBAL: CARMA2_SW 0x007584c0
+// GLOBAL: CARMA2_CHEAT 0x00769600
 float gPower_starting_value[100];
 
 // GLOBAL: CARMA2_HW 0x00761d40
 // GLOBAL: CARMA2_SW 0x007582a0
+// GLOBAL: CARMA2_CHEAT 0x007693e0
 float gOffensive_starting_value[100];
 
 // GLOBAL: CARMA2_HW 0x0075ba20
 // GLOBAL: CARMA2_SW 0x00751f80
+// GLOBAL: CARMA2_CHEAT 0x007630c0
 tFloat_bunch_info gCar_softness;
 
 // GLOBAL: CARMA2_HW 0x0074d600
 // GLOBAL: CARMA2_SW 0x00743b60
+// GLOBAL: CARMA2_CHEAT 0x00754ca0
 tFloat_bunch_info gCar_car_damage_multiplier;
 
 // GLOBAL: CARMA2_HW 0x0068b8d0
 // GLOBAL: CARMA2_SW 0x00685e30
+// GLOBAL: CARMA2_CHEAT 0x00693178
 br_vector3 gZero_v__car;  // FIXME: make const?
 
 // GLOBAL: CARMA2_HW 0x006793a0
@@ -91,6 +101,7 @@ int gFreeze_mechanics;
 
 // GLOBAL: CARMA2_HW 0x006793dc
 // GLOBAL: CARMA2_SW 0x00673b4c
+// GLOBAL: CARMA2_CHEAT 0x00680c8c
 int gNum_active_non_cars;
 
 // GLOBAL: CARMA2_HW 0x006793d0
@@ -99,22 +110,27 @@ int gEliminate_faces;
 
 // GLOBAL: CARMA2_HW 0x00679364
 // GLOBAL: CARMA2_SW 0x00673ad4
+// GLOBAL: CARMA2_CHEAT 0x00680c14
 int gIn_the_sea;
 
 // GLOBAL: CARMA2_HW 0x0065d010
 // GLOBAL: CARMA2_SW 0x00657948
+// GLOBAL: CARMA2_CHEAT 0x006646cc
 int gFace_num__car = 1;
 
 // GLOBAL: CARMA2_HW 0x00744820
 // GLOBAL: CARMA2_SW 0x0073b2e0
+// GLOBAL: CARMA2_CHEAT 0x0074bec0
 tFace_ref gFace_list__car[300];
 
 // GLOBAL: CARMA2_HW 0x00679360
 // GLOBAL: CARMA2_SW 0x00673ad0
+// GLOBAL: CARMA2_CHEAT 0x00680c10
 br_scalar gMin_world_y;
 
 // GLOBAL: CARMA2_HW 0x006793e4
 // GLOBAL: CARMA2_SW 0x00673b54
+// GLOBAL: CARMA2_CHEAT 0x00680c94
 tPhysics_object* gUnknown_car_collision_info;
 
 // GLOBAL: CARMA2_HW 0x006793d4
@@ -134,6 +150,7 @@ br_vector3 gCar_to_view_original_v;
 
 // FUNCTION: CARMA2_HW 0x00413cc0
 // FUNCTION: CARMA2_SW 0x00413cf0
+// FUNCTION: CARMA2_CHEAT 0x00413f20
 void C2_HOOK_FASTCALL DamageUnit(tCar_spec* pCar, tDamage_type pUnit_type, int pDamage_amount) {
     tDamage_unit* the_damage;
 
@@ -149,6 +166,7 @@ void C2_HOOK_FASTCALL DamageUnit(tCar_spec* pCar, tDamage_type pUnit_type, int p
 
 // FUNCTION: CARMA2_HW 0x00413d00
 // FUNCTION: CARMA2_SW 0x00413d30
+// FUNCTION: CARMA2_CHEAT 0x00413f60
 void C2_HOOK_FASTCALL DamageEngine(int pDamage_amount) {
     DamageUnit(&gProgram_state.current_car, eDamage_engine, pDamage_amount);
     SortOutSmoke(&gProgram_state.current_car);
@@ -156,6 +174,7 @@ void C2_HOOK_FASTCALL DamageEngine(int pDamage_amount) {
 
 // FUNCTION: CARMA2_HW 0x00413d30
 // FUNCTION: CARMA2_SW 0x00413d60
+// FUNCTION: CARMA2_CHEAT 0x00413f90
 void C2_HOOK_FASTCALL DamageTrans(int pAmount) {
     DamageUnit(&gProgram_state.current_car, eDamage_transmission, pAmount);
     SortOutSmoke(&gProgram_state.current_car);
@@ -169,6 +188,7 @@ void C2_HOOK_FASTCALL DamageSteering(int pDamage_amount) {
 
 // FUNCTION: CARMA2_HW 0x00413d90
 // FUNCTION: CARMA2_SW 0x00413dc0
+// FUNCTION: CARMA2_CHEAT 0x00413ff0
 void C2_HOOK_FASTCALL DamageLFWheel(int pDamage_amount) {
     DamageUnit(&gProgram_state.current_car, eDamage_lf_wheel, pDamage_amount);
     SortOutSmoke(&gProgram_state.current_car);
@@ -176,6 +196,7 @@ void C2_HOOK_FASTCALL DamageLFWheel(int pDamage_amount) {
 
 // FUNCTION: CARMA2_HW 0x00413dc0
 // FUNCTION: CARMA2_SW 0x00413df0
+// FUNCTION: CARMA2_CHEAT 0x00414020
 void C2_HOOK_FASTCALL DamageLFBrake(int pDamage_amount) {
     DamageUnit(&gProgram_state.current_car, eDamage_lf_brake, pDamage_amount);
     SortOutSmoke(&gProgram_state.current_car);
@@ -183,6 +204,7 @@ void C2_HOOK_FASTCALL DamageLFBrake(int pDamage_amount) {
 
 // FUNCTION: CARMA2_HW 0x00413df0
 // FUNCTION: CARMA2_SW 0x00413e20
+// FUNCTION: CARMA2_CHEAT 0x00414050
 void C2_HOOK_FASTCALL DamageLRBrake(int pDamage_amount) {
     DamageUnit(&gProgram_state.current_car, eDamage_lr_brake, pDamage_amount);
     SortOutSmoke(&gProgram_state.current_car);
@@ -190,6 +212,7 @@ void C2_HOOK_FASTCALL DamageLRBrake(int pDamage_amount) {
 
 // FUNCTION: CARMA2_HW 0x00413e20
 // FUNCTION: CARMA2_SW 0x00413e50
+// FUNCTION: CARMA2_CHEAT 0x00414080
 void C2_HOOK_FASTCALL DamageLRWheel(int pDamage_amount) {
     DamageUnit(&gProgram_state.current_car, eDamage_lr_wheel, pDamage_amount);
     SortOutSmoke(&gProgram_state.current_car);
@@ -197,6 +220,7 @@ void C2_HOOK_FASTCALL DamageLRWheel(int pDamage_amount) {
 
 // FUNCTION: CARMA2_HW 0x00413e50
 // FUNCTION: CARMA2_SW 0x00413e80
+// FUNCTION: CARMA2_CHEAT 0x004140b0
 void C2_HOOK_FASTCALL DamageRFWheel(int pDamage_amount) {
     DamageUnit(&gProgram_state.current_car, eDamage_rf_wheel, pDamage_amount);
     SortOutSmoke(&gProgram_state.current_car);
@@ -204,6 +228,7 @@ void C2_HOOK_FASTCALL DamageRFWheel(int pDamage_amount) {
 
 // FUNCTION: CARMA2_HW 0x00413e80
 // FUNCTION: CARMA2_SW 0x00413eb0
+// FUNCTION: CARMA2_CHEAT 0x004140e0
 void C2_HOOK_FASTCALL DamageRFBrake(int pDamage_amount) {
     DamageUnit(&gProgram_state.current_car, eDamage_rf_brake, pDamage_amount);
     SortOutSmoke(&gProgram_state.current_car);
@@ -211,6 +236,7 @@ void C2_HOOK_FASTCALL DamageRFBrake(int pDamage_amount) {
 
 // FUNCTION: CARMA2_HW 0x00413eb0
 // FUNCTION: CARMA2_SW 0x00413ee0
+// FUNCTION: CARMA2_CHEAT 0x00414110
 void C2_HOOK_FASTCALL DamageRRBrake(int pDamage_amount) {
     DamageUnit(&gProgram_state.current_car, eDamage_rr_brake, pDamage_amount);
     SortOutSmoke(&gProgram_state.current_car);
@@ -218,6 +244,7 @@ void C2_HOOK_FASTCALL DamageRRBrake(int pDamage_amount) {
 
 // FUNCTION: CARMA2_HW 0x00413ee0
 // FUNCTION: CARMA2_SW 0x00413f10
+// FUNCTION: CARMA2_CHEAT 0x00414140
 void C2_HOOK_FASTCALL DamageRRWheel(int pDamage_amount) {
     DamageUnit(&gProgram_state.current_car, eDamage_rr_wheel, pDamage_amount);
     SortOutSmoke(&gProgram_state.current_car);
@@ -225,6 +252,7 @@ void C2_HOOK_FASTCALL DamageRRWheel(int pDamage_amount) {
 
 // FUNCTION: CARMA2_HW 0x00413f10
 // FUNCTION: CARMA2_SW 0x00413f40
+// FUNCTION: CARMA2_CHEAT 0x00414170
 intptr_t C2_HOOK_CDECL SwitchCarModel(br_actor* pActor, void* pData) {
 
     if (pActor->user != NULL) {
@@ -244,6 +272,7 @@ intptr_t C2_HOOK_CDECL SwitchCarModel(br_actor* pActor, void* pData) {
 }
 
 // FUNCTION: CARMA2_HW 0x00413f40
+// FUNCTION: CARMA2_CHEAT 0x004141a0
 void C2_HOOK_FASTCALL SwitchCarModels(tCar_spec* pCar, int pIndex) {
     DRActorEnumRecurse(pCar->car_model_actor, SwitchCarModel, &pIndex);
     pCar->field_0xe18 = pIndex;
@@ -251,6 +280,7 @@ void C2_HOOK_FASTCALL SwitchCarModels(tCar_spec* pCar, int pIndex) {
 
 // FUNCTION: CARMA2_HW 0x00413f70
 // FUNCTION: CARMA2_SW 0x00413fa0
+// FUNCTION: CARMA2_CHEAT 0x004141d0
 void C2_HOOK_FASTCALL InitialiseCar2(tCar_spec* pCar, int pClear_disabled_flag) {
     int index;
     int j;
@@ -402,12 +432,14 @@ void C2_HOOK_FASTCALL InitialiseCar2(tCar_spec* pCar, int pClear_disabled_flag) 
 
 // FUNCTION: CARMA2_HW 0x00414400
 // FUNCTION: CARMA2_SW 0x00414430
+// FUNCTION: CARMA2_CHEAT 0x00414660
 void C2_HOOK_FASTCALL InitialiseCar(tCar_spec* pCar) {
     InitialiseCar2(pCar, 1);
 }
 
 // FUNCTION: CARMA2_HW 0x00414410
 // FUNCTION: CARMA2_SW 0x00414440
+// FUNCTION: CARMA2_CHEAT 0x00414670
 void C2_HOOK_FASTCALL InitialiseCarsEtc(tRace_info* pThe_race) {
     int i;
     int cat;
@@ -451,6 +483,7 @@ void C2_HOOK_FASTCALL InitialiseCarsEtc(tRace_info* pThe_race) {
 
 // FUNCTION: CARMA2_HW 0x00414510
 // FUNCTION: CARMA2_SW 0x00414540
+// FUNCTION: CARMA2_CHEAT 0x00414770
 void C2_HOOK_FASTCALL SetInitialPosition(tRace_info* pThe_race, int pCar_index, tU32 pGrid_index) {
     int place_on_grid;
     int i;
@@ -541,6 +574,7 @@ void C2_HOOK_FASTCALL SetInitialPosition(tRace_info* pThe_race, int pCar_index, 
 
 // FUNCTION: CARMA2_HW 0x004148d0
 // FUNCTION: CARMA2_SW 0x00414900
+// FUNCTION: CARMA2_CHEAT 0x00414b30
 void C2_HOOK_FASTCALL SetInitialPositions(tRace_info* pThe_race) {
     int i;
 
@@ -642,6 +676,7 @@ void C2_HOOK_FASTCALL NewFaceListCallBack(tPhysics_object* pObject, tFace_ref* p
 
 // FUNCTION: CARMA2_HW 0x00414ca0
 // FUNCTION: CARMA2_SW 0x00414cd0
+// FUNCTION: CARMA2_CHEAT 0x00414f00
 int C2_HOOK_FASTCALL IsCarInTheSea(void) {
 
     return gIn_the_sea;
@@ -659,6 +694,7 @@ int C2_HOOK_FASTCALL IsCarInTheSea(void) {
 
 // FUNCTION: CARMA2_HW 0x004157e0
 // FUNCTION: CARMA2_SW 0x00415810
+// FUNCTION: CARMA2_CHEAT 0x00415a40
 void C2_HOOK_FASTCALL CalcGraphicalWheelStuff(tCar_spec* pCar) {
 
     pCar->steering_angle = (br_scalar)BrRadianToDegree(atan((pCar->wpos[0].v[2] - pCar->wpos[2].v[2]) * (pCar->field_0x1260 + pCar->curvature)));
@@ -1075,6 +1111,7 @@ void C2_HOOK_FASTCALL ControlCar5(tCar_spec* pCar, br_scalar pDt) {
 
 // FUNCTION: CARMA2_HW 0x00418230
 // FUNCTION: CARMA2_SW 0x00418260
+// FUNCTION: CARMA2_CHEAT 0x00418490
 void C2_HOOK_FASTCALL MakeLiftGoUp(tNon_car_spec* pNon_car) {
 
     C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tNon_car_spec, flags, 0x100);
@@ -1146,6 +1183,7 @@ int C2_HOOK_FASTCALL ProcessJointForcesCallBack(void* pArg1, void* pArg2, void* 
 
 // FUNCTION: CARMA2_HW 0x0041e340
 // FUNCTION: CARMA2_SW 0x0041e370
+// FUNCTION: CARMA2_CHEAT 0x0041e5a0
 void C2_HOOK_FASTCALL FindFace(br_vector3* pPosition, br_vector3* pDir, br_vector3* nor, br_scalar* t, br_material** material) {
 
     ActorFindFace(pPosition, pDir, gTrack_actor, nor, t, material, NULL);
@@ -1188,6 +1226,7 @@ int C2_HOOK_FASTCALL FindFloorInBoxBU(br_vector3* pPosition, br_vector3* pDirect
 
 // FUNCTION: CARMA2_HW 0x0041e580
 // FUNCTION: CARMA2_SW 0x0041e5b0
+// FUNCTION: CARMA2_CHEAT 0x0041e7e0
 void C2_HOOK_FASTCALL CancelPendingCunningStunt(void) {
     gQuite_wild_end = 0;
     gQuite_wild_start = 0;
@@ -1200,16 +1239,17 @@ void C2_HOOK_FASTCALL CancelPendingCunningStunt(void) {
 
 void C2_HOOK_FASTCALL SetTextureBits(tCar_spec* pCar) {
     pCar->field_0x18cc = 0;
-    if (pCar->keys.brake || (pCar->brake_force != 0.f && (float)fabs(pCar->collision_info->velocity_car_space.v[2]) > 1.0 / (1200.0 * WORLD_SCALE_D))) {
+    if (pCar->keys.brake || (pCar->brake_force != 0.f && (float)fabs(pCar->collision_info->velocity_car_space.v[2]) > 1.0 / (2000.0 * WORLD_SCALE_D))) {
         pCar->field_0x18cc |= 0x4;
     }
-    if (pCar->gear < 0 || (!(pCar != NULL && pCar->driver == eDriver_local_human) && pCar->collision_info->velocity_car_space.v[2] > 0.f)) {
+    if (pCar->gear < 0 || (!(pCar != NULL && pCar->driver == eDriver_local_human) && pCar->collision_info->velocity_car_space.v[2] > 0.0f)) {
         pCar->field_0x18cc |= 0x8;
     }
 }
 
 // FUNCTION: CARMA2_HW 0x0041e5a0
 // FUNCTION: CARMA2_SW 0x0041e5d0
+// FUNCTION: CARMA2_CHEAT 0x0041e800
 void C2_HOOK_FASTCALL MungeSomeOtherCarGraphics(void) {
     int i;
     tCar_spec* car;
@@ -1230,6 +1270,7 @@ void C2_HOOK_FASTCALL MungeSomeOtherCarGraphics(void) {
 
 // STUB: CARMA2_HW 0x0041e660
 // STUB: CARMA2_SW 0x0041e690
+// STUB: CARMA2_CHEAT 0x0041e8c0
 void C2_HOOK_FASTCALL MungeCarGraphics(tU32 pFrame_period) {
     NOT_IMPLEMENTED();
 }
@@ -1240,6 +1281,7 @@ void C2_HOOK_FASTCALL MungeCarGraphics(tU32 pFrame_period) {
 
 // FUNCTION: CARMA2_HW 0x0041f110
 // FUNCTION: CARMA2_SW 0x0041f140
+// FUNCTION: CARMA2_CHEAT 0x0041f370
 void C2_HOOK_FASTCALL DoLODCarModels(void) {
     int i;
     int j;
@@ -1287,6 +1329,7 @@ void C2_HOOK_FASTCALL DoLODCarModels(void) {
 
 // FUNCTION: CARMA2_HW 0x0041f280
 // FUNCTION: CARMA2_SW 0x0041f300
+// FUNCTION: CARMA2_CHEAT 0x0041f4e0
 intptr_t C2_HOOK_CDECL TurnOffNonGroovers(br_actor* pActor, void* pData) {
     tUser_crush_data* crush_data = pActor->user;
 
@@ -1299,6 +1342,7 @@ intptr_t C2_HOOK_CDECL TurnOffNonGroovers(br_actor* pActor, void* pData) {
 
 // FUNCTION: CARMA2_HW 0x0041f2a0
 // FUNCTION: CARMA2_SW 0x0041f320
+// FUNCTION: CARMA2_CHEAT 0x0041f500
 void C2_HOOK_FASTCALL DoComplexCarModels(void) {
     int i;
     tCar_spec* car;
@@ -1313,6 +1357,7 @@ void C2_HOOK_FASTCALL DoComplexCarModels(void) {
 
 // FUNCTION: CARMA2_HW 0x0041f300
 // FUNCTION: CARMA2_SW 0x0041f380
+// FUNCTION: CARMA2_CHEAT 0x0041f560
 void C2_HOOK_FASTCALL ResetCarScreens(void) {
     int cat;
     int car_count;
@@ -1394,6 +1439,7 @@ void C2_HOOK_FASTCALL FreezeMechanics(void) {
 
 // STUB: CARMA2_HW 0x0041fc60
 // STUB: CARMA2_SW 0x0041fce0
+// STUB: CARMA2_CHEAT 0x0041fec0
 void C2_HOOK_FASTCALL SetCarSuspGiveAndHeight(tCar_spec* pCar, float pFront_give_factor, float pRear_give_factor, float pDamping_factor, float pExtra_front_height, float pExtra_rear_height) {
     NOT_IMPLEMENTED();
 }
@@ -1404,6 +1450,7 @@ void C2_HOOK_FASTCALL SetCarSuspGiveAndHeight(tCar_spec* pCar, float pFront_give
 
 // FUNCTION: CARMA2_HW 0x0041fe50
 // FUNCTION: CARMA2_SW 0x0041fed0
+// FUNCTION: CARMA2_CHEAT 0x004200b0
 int C2_HOOK_FASTCALL TestForCarInSensiblePlace(tCar_spec* pCar_spec, br_vector3* pVec3) {
     int r;
 
@@ -1452,6 +1499,7 @@ tNon_car_spec* C2_HOOK_FASTCALL DoPullActorFromWorld(br_actor* pActor) {
 
 // FUNCTION: CARMA2_HW 0x004207e0
 // FUNCTION: CARMA2_SW 0x00420860
+// FUNCTION: CARMA2_CHEAT 0x00420a40
 void C2_HOOK_FASTCALL AdjustNonCar(br_actor* pActor, const br_matrix34* pMatrix) {
     tU8 column_x;
     tU8 column_z;
@@ -1471,6 +1519,7 @@ void C2_HOOK_FASTCALL AdjustNonCar(br_actor* pActor, const br_matrix34* pMatrix)
 
 // FUNCTION: CARMA2_HW 0x00420880
 // FUNCTION: CARMA2_SW 0x00420900
+// FUNCTION: CARMA2_CHEAT 0x00420ae0
 int C2_HOOK_FASTCALL GetPrecalculatedFacesUnderCar(tCar_spec* pCar, tFace_ref** pFace_refs) {
 
     if (pCar->collision_info->box_face_ref != gFace_num__car) {
@@ -1484,12 +1533,14 @@ int C2_HOOK_FASTCALL GetPrecalculatedFacesUnderCar(tCar_spec* pCar, tFace_ref** 
 
 // FUNCTION: CARMA2_HW 0x004208f0
 // FUNCTION: CARMA2_SW 0x00420970
+// FUNCTION: CARMA2_CHEAT 0x00420b50
 void C2_HOOK_FASTCALL TurnOnNonCar(int pIndex) {
     gProgram_state.track_spec.non_car_list[pIndex]->render_style = BR_RSTYLE_FACES;
 }
 
 // FUNCTION: CARMA2_HW 0x00420900
 // FUNCTION: CARMA2_SW 0x00420980
+// FUNCTION: CARMA2_CHEAT 0x00420b60
 void C2_HOOK_FASTCALL TurnOffNonCar(int pIndex) {
     gProgram_state.track_spec.non_car_list[pIndex]->render_style = BR_RSTYLE_NONE;
 }

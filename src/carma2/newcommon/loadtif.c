@@ -25,6 +25,7 @@
 #include <sys/stat.h>
 
 // FUNCTION: CARMA2_HW 0x00485590
+// FUNCTION: CARMA2_CHEAT 0x004858b0
 br_pixelmap* C2_HOOK_FASTCALL CreatePalettePixelmapFromRGBChannels(br_uint_16* pRed_channel, br_uint_16* pGrn_channel, br_uint_16* pBlu_channel, int pRGB555) {
     br_pixelmap* pm;
     int i;
@@ -150,6 +151,7 @@ int C2_HOOK_FASTCALL CheckPixOutdated(const char* pDirectory, const char* pStem,
 
 // FUNCTION: CARMA2_HW 0x00485750
 // FUNCTION: CARMA2_SW 0x00482890
+// FUNCTION: CARMA2_CHEAT 0x00485a70
 br_pixelmap* C2_HOOK_FASTCALL LoadTiffTexture_Ex2(const char* pDirectory, const char* pFile_stem, br_pixelmap* pPalette, int pFlags, int* pError_code, int pTiff_palette) {
     tPath_name tif_path;
     tPath_name pix_path;
@@ -242,6 +244,7 @@ br_pixelmap* C2_HOOK_FASTCALL LoadTiffTexture_Ex2(const char* pDirectory, const 
 
 // FUNCTION: CARMA2_HW 0x004856c0
 // FUNCTION: CARMA2_SW 0x00482800
+// FUNCTION: CARMA2_CHEAT 0x004859e0
 br_pixelmap* C2_HOOK_FASTCALL LoadTiffTexture_Ex(const char* pDirectory, const char* pFile_stem, br_pixelmap* pPalette, int pFlags, int* pError_code) {
     br_pixelmap* texture;
 
@@ -262,6 +265,7 @@ br_pixelmap* C2_HOOK_FASTCALL LoadTiffTexture_Ex(const char* pDirectory, const c
 
 // FUNCTION: CARMA2_HW 0x004869e0
 // FUNCTION: CARMA2_SW 0x00483b20
+// FUNCTION: CARMA2_CHEAT 0x00486d00
 int C2_HOOK_FASTCALL ReadFileLink(char* pDest, const char* pPath) {
     FILE* f;
     char s1[256];
@@ -314,6 +318,7 @@ int C2_HOOK_FASTCALL ReadFileLink(char* pDest, const char* pPath) {
 
 // FUNCTION: CARMA2_HW 0x00486b20
 // FUNCTION: CARMA2_SW 0x00483c60
+// FUNCTION: CARMA2_CHEAT 0x00486e40
 int C2_HOOK_FASTCALL WriteFileLink(const char* pLink_dest, const char* pLink_source) {
     char *ptr;
     FILE *f;
@@ -346,6 +351,7 @@ int C2_HOOK_FASTCALL WriteFileLink(const char* pLink_dest, const char* pLink_sou
 
 // FUNCTION: CARMA2_HW 0x00486be0
 // FUNCTION: CARMA2_SW 0x00483d20
+// FUNCTION: CARMA2_CHEAT 0x00486f00
 int C2_HOOK_FASTCALL PDGetLastModificationTime(const char* pPath) {
     struct stat statbuf;
 
@@ -357,6 +363,7 @@ int C2_HOOK_FASTCALL PDGetLastModificationTime(const char* pPath) {
 
 // FUNCTION: CARMA2_HW 0x00486c00
 // FUNCTION: CARMA2_SW 0x00483d40
+// FUNCTION: CARMA2_CHEAT 0x00486f20
 int C2_HOOK_FASTCALL PDFileExists(const char *pPath) {
     struct stat statbuf;
 
@@ -367,6 +374,7 @@ int C2_HOOK_FASTCALL PDFileExists(const char *pPath) {
 
 // FUNCTION: CARMA2_HW 0x00485fe0
 // FUNCTION: CARMA2_SW 0x00483120
+// FUNCTION: CARMA2_CHEAT 0x00486300
 br_pixelmap* C2_HOOK_FASTCALL LoadTiff8bit(const char *pPath, int pFlags, int *pError_code) {
     TIFF* tif;
     br_pixelmap* pm;
@@ -446,6 +454,7 @@ br_pixelmap* C2_HOOK_FASTCALL LoadTiff8bit(const char *pPath, int pFlags, int *p
 
 // FUNCTION: CARMA2_HW 0x004864a0
 // FUNCTION: CARMA2_SW 0x004835e0
+// FUNCTION: CARMA2_CHEAT 0x004867c0
 br_pixelmap* C2_HOOK_FASTCALL LoadTiff16bit(const char *pPath, int pFlags, int *pError_code) {
     TIFF* tif;
     br_pixelmap* pm;
@@ -603,6 +612,7 @@ br_pixelmap* C2_HOOK_FASTCALL LoadTiffUsingPalette(const char* pPath, br_pixelma
 
 // FUNCTION: CARMA2_HW 0x00486240
 // FUNCTION: CARMA2_SW 0x00483380
+// FUNCTION: CARMA2_CHEAT 0x00486560
 int C2_HOOK_FASTCALL DRstrrcasestr(int* pOffset, const char* pHaystack, int pLength_haystack, const char* pNeedle) {
     int len_needle;
     int pos_haystack;
@@ -700,6 +710,7 @@ int C2_HOOK_FASTCALL FindPaletteColourXRGB8888(br_colour pColour, br_pixelmap *p
 
 // FUNCTION: CARMA2_HW 0x004862b0
 // FUNCTION: CARMA2_SW 0x004833f0
+// FUNCTION: CARMA2_CHEAT 0x004865d0
 int C2_HOOK_FASTCALL FindPaletteColour(br_colour pColour, br_pixelmap *pPalette) {
 
     if (pPalette->type == BR_PMT_RGB_565) {

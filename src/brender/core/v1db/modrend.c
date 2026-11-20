@@ -11,6 +11,7 @@
 #include "dbsetup.h"
 
 // GLOBAL: CARMA2_HW 0x00665090
+// GLOBAL: CARMA2_CHEAT 0x0066c948
 render_style_cbfn RenderStyleCalls[] = {
     renderFaces,                /* BR_RSTYLE_DEFAULT			*/
     nullRender,                 /* BR_RSTYLE_NONE				*/
@@ -42,6 +43,7 @@ v11face bounds_faces[] = {
 br_colour bounds_colours[12] = { 0 };
 
 // GLOBAL: CARMA2_HW 0x00664d98
+// GLOBAL: CARMA2_CHEAT 0x0066c650
 fmt_vertex bounds_vertices[] = {
     { { { -1.0f, -1.0f, -1.0f } }, { { 0.0f, 0.0f } }, { { -0.666f, -0.333f, -0.666f } } },
     { { { -1.0f, -1.0f, 1.0f } }, { { 0.0f, 0.0f } }, { { -0.333f, -0.666f, 0.666f } } },
@@ -86,6 +88,7 @@ br_model bounds_model = {
 };
 
 // FUNCTION: CARMA2_HW 0x00525fc0
+// FUNCTION: CARMA2_CHEAT 0x0052bbb0
 void C2_HOOK_STDCALL renderFaces(br_actor* actor, br_model* model, br_material* material, void* render_data, br_uint_8 style, int on_screen) {
     // br_geometry_stored* stored_geometry;
     // br_geometry_v1_model* v1_model;
@@ -108,6 +111,7 @@ void C2_HOOK_STDCALL renderFaces(br_actor* actor, br_model* model, br_material* 
 }
 
 // FUNCTION: CARMA2_HW 0x00526040
+// FUNCTION: CARMA2_CHEAT 0x0052bc30
 void C2_HOOK_STDCALL renderEdges(br_actor* actor, br_model* model, br_material* material, void* render_data, br_uint_8 style, int on_screen) {
 
     if (on_screen == BRT_ACCEPT) {
@@ -118,6 +122,7 @@ void C2_HOOK_STDCALL renderEdges(br_actor* actor, br_model* model, br_material* 
 }
 
 // FUNCTION: CARMA2_HW 0x00526090
+// FUNCTION: CARMA2_CHEAT 0x0052bc80
 void C2_HOOK_STDCALL renderPoints(br_actor* actor, br_model* model, br_material* material, void* render_data, br_uint_8 style, int on_screen) {
     if (on_screen == BRT_ACCEPT) {
         ((br_geometry_v1_model*)v1db.format_model)->dispatch->_renderOnScreenF((br_geometry_v1_model*)v1db.format_model, v1db.renderer, model->prepared, material->stored, BRT_POINT);
@@ -127,11 +132,13 @@ void C2_HOOK_STDCALL renderPoints(br_actor* actor, br_model* model, br_material*
 }
 
 // FUNCTION: CARMA2_HW 0x005260e0
+// FUNCTION: CARMA2_CHEAT 0x0052bcd0
 void C2_HOOK_STDCALL nullRender(br_actor* actor, br_model* model, br_material* material, void* render_data, br_uint_8 style, int on_screen) {
 
 }
 
 // FUNCTION: CARMA2_HW 0x00526150
+// FUNCTION: CARMA2_CHEAT 0x0052bd40
 br_model* C2_HOOK_STDCALL makeMeshFromBounds(br_bounds* b) {
     int i;
 
@@ -183,18 +190,21 @@ br_model* C2_HOOK_STDCALL makeMeshFromBounds(br_bounds* b) {
 }
 
 // FUNCTION: CARMA2_HW 0x005260f0
+// FUNCTION: CARMA2_CHEAT 0x0052bce0
 void C2_HOOK_STDCALL boundingBoxRenderPoints(br_actor* actor, br_model* model, br_material* material, void* render_data, br_uint_8 style, int on_screen) {
 
     renderPoints(actor, makeMeshFromBounds(&model->bounds), material, render_data, style, on_screen);
 }
 
 // FUNCTION: CARMA2_HW 0x00526270
+// FUNCTION: CARMA2_CHEAT 0x0052be60
 void C2_HOOK_STDCALL boundingBoxRenderEdges(br_actor* actor, br_model* model, br_material* material, void* render_data, br_uint_8 style, int on_screen) {
 
     renderEdges(actor, makeMeshFromBounds(&model->bounds), material, render_data, style, on_screen);
 }
 
 // FUNCTION: CARMA2_HW 0x005262d0
+// FUNCTION: CARMA2_CHEAT 0x0052bec0
 void C2_HOOK_STDCALL boundingBoxRenderFaces(br_actor* actor, br_model* model, br_material* material, void* render_data, br_uint_8 style, int on_screen) {
 
     renderFaces(actor, makeMeshFromBounds(&model->bounds), material, render_data, style, on_screen);

@@ -16,16 +16,19 @@
 
 // GLOBAL: CARMA2_HW 0x0065a398
 // GLOBAL: CARMA2_SW 0x00654cb0
+// GLOBAL: CARMA2_CHEAT 0x00660d14
 const char* gOil_pixie_names[1] = {
     "OIL.PIX",
 };
 
 // GLOBAL: CARMA2_HW 0x00690c88
 // GLOBAL: CARMA2_SW 0x0068ace0
+// GLOBAL: CARMA2_CHEAT 0x00698528
 br_pixelmap* gOil_pixies[1];
 
 // GLOBAL: CARMA2_HW 0x00690c90
 // GLOBAL: CARMA2_SW 0x0068ace8
+// GLOBAL: CARMA2_CHEAT 0x00698530
 tOil_spill_info gOily_spills[32] = { 0 };
 
 // GLOBAL: CARMA2_HW 0x00691710
@@ -38,10 +41,12 @@ int gBig_bang = 0;
 
 // GLOBAL: CARMA2_HW 0x0074a68c
 // GLOBAL: CARMA2_SW 0x0074114c
+// GLOBAL: CARMA2_CHEAT 0x00751d2c
 br_material* oily_material;
 
 // FUNCTION: CARMA2_HW 0x004a6a10
 // FUNCTION: CARMA2_SW 0x004a2b90
+// FUNCTION: CARMA2_CHEAT 0x004a7d20
 void C2_HOOK_FASTCALL InitOilSpills(void) {
     int i;
     br_model* the_model;
@@ -117,6 +122,7 @@ void C2_HOOK_FASTCALL ResetOilSpills(void) {
 
 // FUNCTION: CARMA2_HW 0x004a6c80
 // FUNCTION: CARMA2_SW 0x004a2df0
+// FUNCTION: CARMA2_CHEAT 0x004a7f90
 void C2_HOOK_FASTCALL QueueOilSpill2(tCar_spec* pCar, br_actor* pCar_actor, br_model* pCar_model, tU32 pTime_delay, br_scalar pMin_size, br_scalar pMax_size, br_scalar pMin_grow_rate, br_scalar pMax_grow_rate, br_scalar pInitial_size, br_scalar pField_0x48, br_scalar pField_0x4c, br_scalar pField_0x40, br_scalar pField_0x44, br_material* pMaterial, br_material* pField_0x50) {
     int i;
     int oily_index;
@@ -169,6 +175,7 @@ void C2_HOOK_FASTCALL QueueOilSpill2(tCar_spec* pCar, br_actor* pCar_actor, br_m
 
 // FUNCTION: CARMA2_HW 0x004a6dd0
 // FUNCTION: CARMA2_SW 0x004a2f40
+// FUNCTION: CARMA2_CHEAT 0x004a80e0
 void C2_HOOK_FASTCALL QueueOilSpill(tCar_spec* pCar) {
     QueueOilSpill2(pCar, pCar->car_master_actor, pCar->car_actor->model, 500,
         0.35f, 0.6f, 0.00003f, 0.0001f, 0.1f, 1.5f, 2.5f, 0.01f, 0.15f,
@@ -189,6 +196,7 @@ void C2_HOOK_FASTCALL MungeOilsHeightAboveGround(tOil_spill_info* pOil) {
 
 // FUNCTION: CARMA2_HW 0x004a6e20
 // FUNCTION: CARMA2_SW 0x004a2f90
+// FUNCTION: CARMA2_CHEAT 0x004a8130
 void C2_HOOK_FASTCALL MungeIndexedOilsHeightAboveGround(int pIndex) {
 
     C2_HOOK_BUG_ON(sizeof(tOil_spill_info) != 0x54);
@@ -222,6 +230,7 @@ int C2_HOOK_FASTCALL GetOilSpillCount(void) {
 
 // FUNCTION: CARMA2_HW 0x004a74f0
 // FUNCTION: CARMA2_SW 0x004a3660
+// FUNCTION: CARMA2_CHEAT 0x004a8800
 void C2_HOOK_FASTCALL GetOilSpillDetails(int pIndex, br_actor** pActor, br_scalar* pSize) {
     if (gOily_spills[pIndex].car_actor != NULL) {
         *pActor = gOily_spills[pIndex].actor;
@@ -308,6 +317,7 @@ void C2_HOOK_FASTCALL GetOilFrictionFactors(tCar_spec* pCar, br_scalar* pFl_fact
 }
 
 // FUNCTION: CARMA2_HW 0x004a7860
+// FUNCTION: CARMA2_CHEAT 0x004a8b70
 void C2_HOOK_FASTCALL AdjustOilSpill(int pIndex, br_matrix34* pMat, br_scalar pFull_size, br_scalar pGrow_rate, tU32 pSpill_time, tU32 pStop_time, tCar_spec* pCar, br_vector3* pOriginal_pos, br_pixelmap* pPixelmap) {
 
     BrMatrix34Copy(&gOily_spills[pIndex].actor->t.t.mat, pMat);
@@ -322,6 +332,7 @@ void C2_HOOK_FASTCALL AdjustOilSpill(int pIndex, br_matrix34* pMat, br_scalar pF
 
 // FUNCTION: CARMA2_HW 0x004a78e0
 // FUNCTION: CARMA2_SW 0x004a3a50
+// FUNCTION: CARMA2_CHEAT 0x004a8bf0
 void C2_HOOK_FASTCALL ReceivedOilSpill(tNet_message_chunk* pContents) {
     tCar_spec* car;
 
@@ -336,6 +347,7 @@ void C2_HOOK_FASTCALL ReceivedOilSpill(tNet_message_chunk* pContents) {
 
 // FUNCTION: CARMA2_HW 0x004a7940
 // FUNCTION: CARMA2_SW 0x004a3ab0
+// FUNCTION: CARMA2_CHEAT 0x004a8c50
 void C2_HOOK_FASTCALL RemoveCarsOilSlicks(tCar_spec* pCar) {
     int i;
 

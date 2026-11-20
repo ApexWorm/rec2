@@ -56,6 +56,7 @@ br_tv_template_entry deviceTemplateEntries[] = {
 
 // FUNCTION: CARMA2_HW 0x00540880
 // FUNCTION: CARMA2_SW 0x0053bf20
+// FUNCTION: CARMA2_CHEAT 0x00546470
 void C2_HOOK_CDECL _M_br_softrend_device_free(br_soft_device* self) {
 
     BrObjectContainerFree((br_object_container *)self, BR_NULL_TOKEN, NULL, NULL);
@@ -64,6 +65,7 @@ void C2_HOOK_CDECL _M_br_softrend_device_free(br_soft_device* self) {
 
 // FUNCTION: CARMA2_HW 0x005408a0
 // FUNCTION: CARMA2_SW 0x0053bf40
+// FUNCTION: CARMA2_CHEAT 0x00546490
 br_token C2_HOOK_CDECL _M_br_softrend_device_type(br_soft_device* self) {
 
     return BRT_DEVICE;
@@ -71,6 +73,7 @@ br_token C2_HOOK_CDECL _M_br_softrend_device_type(br_soft_device* self) {
 
 // FUNCTION: CARMA2_HW 0x005408b0
 // FUNCTION: CARMA2_SW 0x0053bf50
+// FUNCTION: CARMA2_CHEAT 0x005464a0
 int C2_HOOK_CDECL _M_br_softrend_device_isType(br_soft_device* self, br_token t) {
 
     return t == BRT_DEVICE || t == BRT_OBJECT_CONTAINER || t == BRT_OBJECT;
@@ -78,6 +81,7 @@ int C2_HOOK_CDECL _M_br_softrend_device_isType(br_soft_device* self, br_token t)
 
 // FUNCTION: CARMA2_HW 0x005408d0
 // FUNCTION: CARMA2_SW 0x0053bf70
+// FUNCTION: CARMA2_CHEAT 0x005464c0
 br_size_t C2_HOOK_CDECL _M_br_softrend_device_space(br_soft_device* self) {
 
     C2_HOOK_BUG_ON(sizeof(br_soft_device) != 0x58);
@@ -86,6 +90,7 @@ br_size_t C2_HOOK_CDECL _M_br_softrend_device_space(br_soft_device* self) {
 
 // FUNCTION: CARMA2_HW 0x005408e0
 // FUNCTION: CARMA2_SW 0x0053bf80
+// FUNCTION: CARMA2_CHEAT 0x005464d0
 br_tv_template* C2_HOOK_CDECL _M_br_soft_device_templateQuery(br_soft_device* self) {
 
     if (self->templates.deviceTemplate == NULL) {
@@ -99,6 +104,7 @@ br_tv_template* C2_HOOK_CDECL _M_br_soft_device_templateQuery(br_soft_device* se
 
 // FUNCTION: CARMA2_HW 0x00540910
 // FUNCTION: CARMA2_SW 0x0053bfb0
+// FUNCTION: CARMA2_CHEAT 0x00546500
 void* C2_HOOK_CDECL _M_br_softrend_device_listQuery(br_soft_device* self) {
 
     return self->object_list;
@@ -106,6 +112,7 @@ void* C2_HOOK_CDECL _M_br_softrend_device_listQuery(br_soft_device* self) {
 
 // FUNCTION: CARMA2_HW 0x00540810
 // FUNCTION: CARMA2_SW 0x0053beb0
+// FUNCTION: CARMA2_CHEAT 0x00546400
 br_device* C2_HOOK_STDCALL DeviceSoftAllocate(const char* identifier) {
     br_soft_device *self;
 

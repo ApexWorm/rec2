@@ -26,6 +26,7 @@
 
 // FUNCTION: CARMA2_HW 0x004af8d0
 // FUNCTION: CARMA2_SW 0x004aba40
+// FUNCTION: CARMA2_CHEAT 0x004b51a0
 int C2_HOOK_FASTCALL TimeToStopStruggling(tOpponent_spec* pOpponent_spec) {
 
     if (gTime_stamp_for_this_munging >
@@ -64,6 +65,7 @@ void C2_HOOK_CDECL DoNotDprintf_oppoproc(const char* pMessage, ...) {
 
 // STUB: CARMA2_HW 0x004af960
 // STUB: CARMA2_SW 0x004abad0
+// STUB: CARMA2_CHEAT 0x004b5230
 tFollow_path_result C2_HOOK_FASTCALL ProcessFollowPath(tOpponent_spec* pOpponent_spec, tProcess_objective_command pCommand, int pPursuit_mode, int pIgnore_end, int pNever_struggle) {
     NOT_IMPLEMENTED();
 }

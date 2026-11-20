@@ -15,6 +15,7 @@
 
 // GLOBAL: CARMA2_HW 0x006631c0
 // GLOBAL: CARMA2_SW 0x0065d958
+// GLOBAL: CARMA2_CHEAT 0x0066aa78
 br_filesystem gZlib_filesystem = {
     "Zlib filesystem",
     ZlibFsGetAttributes,
@@ -33,6 +34,7 @@ br_filesystem gZlib_filesystem = {
 
 // FUNCTION: CARMA2_HW 0x0051db90
 // FUNCTION: CARMA2_SW 0x00519230
+// FUNCTION: CARMA2_CHEAT 0x00523780
 br_uint_32 C2_HOOK_CDECL ZlibFsGetAttributes(void) {
 
     return BR_FS_ATTR_READABLE | BR_FS_ATTR_WRITEABLE | BR_FS_ATTR_HAS_BINARY;
@@ -40,6 +42,7 @@ br_uint_32 C2_HOOK_CDECL ZlibFsGetAttributes(void) {
 
 // FUNCTION: CARMA2_HW 0x0051dc10
 // FUNCTION: CARMA2_SW 0x005192b0
+// FUNCTION: CARMA2_CHEAT 0x00523800
 void* C2_HOOK_CDECL ZlibFsOpenRead(const char* buffer, br_size_t capacity, br_mode_test_cbfn* cbfn, int* type) {
 
     return gzopen(buffer, "rb");
@@ -47,6 +50,7 @@ void* C2_HOOK_CDECL ZlibFsOpenRead(const char* buffer, br_size_t capacity, br_mo
 
 // FUNCTION: CARMA2_HW 0x0051dc20
 // FUNCTION: CARMA2_SW 0x005192c0
+// FUNCTION: CARMA2_CHEAT 0x00523810
 void* C2_HOOK_CDECL ZlibFsOpenWrite(const char* path, int type) {
 
     if (type != BR_FS_MODE_BINARY) {
@@ -82,6 +86,7 @@ int C2_HOOK_CDECL ZlibFsGetChr(void* context) {
 
 // FUNCTION: CARMA2_HW 0x0051dc40
 // FUNCTION: CARMA2_SW 0x005192e0
+// FUNCTION: CARMA2_CHEAT 0x00523830
 void C2_HOOK_CDECL ZlibFsPutChr(int chr, void* context) {
     char data[1];
 
@@ -91,6 +96,7 @@ void C2_HOOK_CDECL ZlibFsPutChr(int chr, void* context) {
 
 // FUNCTION: CARMA2_HW 0x0051dca0
 // FUNCTION: CARMA2_SW 0x00519340
+// FUNCTION: CARMA2_CHEAT 0x00523890
 br_size_t C2_HOOK_CDECL ZlibFsRead(void* buffer, br_size_t elem_size, unsigned int count, void* context) {
     int bytes_read;
 
@@ -103,6 +109,7 @@ br_size_t C2_HOOK_CDECL ZlibFsRead(void* buffer, br_size_t elem_size, unsigned i
 
 // FUNCTION: CARMA2_HW 0x0051dcd0
 // FUNCTION: CARMA2_SW 0x00519370
+// FUNCTION: CARMA2_CHEAT 0x005238c0
 br_size_t C2_HOOK_CDECL ZlibFsWrite(const void* buffer, br_size_t elem_size, unsigned int count, void* context) {
     int bytes_written;
 
@@ -136,6 +143,7 @@ br_size_t C2_HOOK_CDECL ZlibFsGetLine(char* buffer, br_size_t capacity, void* co
 
 // FUNCTION: CARMA2_HW 0x0051dc60
 // FUNCTION: CARMA2_SW 0x00519300
+// FUNCTION: CARMA2_CHEAT 0x00523850
 void C2_HOOK_CDECL ZlibFsPutLine(char* line, void* context) {
     char newline_buffer[1];
 

@@ -239,7 +239,9 @@ extern br_pixelmap* gIcons_low_pix;
 extern br_scalar gCamera_yon;
 extern br_actor* gCamera;
 extern br_actor* gOther_selfs[4];
-//extern br_actor* gArrow_actor;
+#ifdef REC2_CHEAT
+extern br_actor* gArrow_actor;
+#endif
 //extern br_pixelmap* gIcons_pix_low_res;
 extern br_pixelmap* gDepth_buffer;
 //extern int gInitial_net_credits[5];

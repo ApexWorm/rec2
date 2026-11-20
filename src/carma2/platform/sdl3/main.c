@@ -35,7 +35,7 @@ int main(int argc, char *argv[]) {
         } else if (SDL_strcmp(argv[i], "-AFE") == 0) {
             gAFE = 1;
 //        } else if (SDL_strcmp(argv[i], "-SCALEMOUSE") == 0) {
-//            gScaleMouse = 1;
+//            gScale_mouse = 1;
         } else {
             dr_dprintf("Unknown argument: \"%s\"", argv[i]);
             return 1;

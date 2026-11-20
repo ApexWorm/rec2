@@ -17,26 +17,32 @@ int gPling_materials = 1;
 
 // GLOBAL: CARMA2_HW 0x00686190
 // GLOBAL: CARMA2_SW 0x006808d0
+// GLOBAL: CARMA2_CHEAT 0x0068da38
 br_scalar gNearest_T;
 
 // GLOBAL: CARMA2_HW 0x006861c8
 // GLOBAL: CARMA2_SW 0x00680908
+// GLOBAL: CARMA2_CHEAT 0x0068da70
 int gTemp_group;
 
 // GLOBAL: CARMA2_HW 0x006861cc
 // GLOBAL: CARMA2_SW 0x0068090c
+// GLOBAL: CARMA2_CHEAT 0x0068da74
 br_actor* gNearest_actor;
 
 // GLOBAL: CARMA2_HW 0x00686188
 // GLOBAL: CARMA2_SW 0x006808c8
+// GLOBAL: CARMA2_CHEAT 0x0068da30
 int gNearest_face;
 
 // GLOBAL: CARMA2_HW 0x00686194
 // GLOBAL: CARMA2_SW 0x006808d4
+// GLOBAL: CARMA2_CHEAT 0x0068da3c
 int gNearest_face_group;
 
 // GLOBAL: CARMA2_HW 0x0068618c
 // GLOBAL: CARMA2_SW 0x006808cc
+// GLOBAL: CARMA2_CHEAT 0x0068da34
 br_model* gNearest_model;
 
 // GLOBAL: CARMA2_HW 0x00686198
@@ -48,6 +54,7 @@ br_matrix34 gPick_model_to_view__finteray;
 
 // FUNCTION: CARMA2_HW 0x0045cd90
 // FUNCTION: CARMA2_SW 0x0045c7d0
+// FUNCTION: CARMA2_CHEAT 0x0045d200
 int C2_HOOK_FASTCALL PickBoundsTestRay_finteray(br_bounds* pBounds, br_vector3* pRay_pos, br_vector3* pRay_dir, br_scalar pT_near, br_scalar pT_far, br_scalar* pNew_t_near, br_scalar* pNew_t_far) {
     int i;
     br_scalar inverse;
@@ -99,6 +106,7 @@ int C2_HOOK_FASTCALL PickBoundsTestRay_finteray(br_bounds* pBounds, br_vector3* 
 
 // FUNCTION: CARMA2_HW 0x0045cb70
 // FUNCTION: CARMA2_SW 0x0045c5b0
+// FUNCTION: CARMA2_CHEAT 0x0045cfe0
 int C2_HOOK_FASTCALL ActorRayPick2D(br_actor* pActor, br_vector3* pPosition, br_vector3* pDir, br_model* pModel, br_material* pMaterial, dr_pick2d_cbfn* pCallback) {
     br_actor* a;
     br_model* this_model;
@@ -198,6 +206,7 @@ int C2_HOOK_FASTCALL DRModelPick2D_finteray(br_model* pModel, br_material* pMate
 
 // FUNCTION: CARMA2_HW 0x0045d570
 // FUNCTION: CARMA2_SW 0x0045cfb0
+// FUNCTION: CARMA2_CHEAT 0x0045d9e0
 int C2_HOOK_CDECL FindHighestPolyCallBack(br_model* pModel, br_actor* pActor, br_material* pMaterial, br_vector3* pRay_pos, br_vector3* pRay_dir, float pT, int pF, int pE, int pV, br_vector3* pPoint, br_vector2* pMap, void* pData) {
 
     if (pT < gNearest_T) {
@@ -212,6 +221,7 @@ int C2_HOOK_CDECL FindHighestPolyCallBack(br_model* pModel, br_actor* pActor, br
 
 // FUNCTION: CARMA2_HW 0x0045cf20
 // FUNCTION: CARMA2_SW 0x0045c960
+// FUNCTION: CARMA2_CHEAT 0x0045d390
 int C2_HOOK_CDECL FindHighestCallBack(br_actor* pActor, br_model* pModel, br_material* pMaterial, br_vector3* pRay_pos, br_vector3* pRay_dir, br_scalar pT_near, br_scalar pT_far, void* pArg) {
 
     DRModelPick2D_finteray(pModel, pMaterial, pActor, pRay_pos, pRay_dir, pT_near, pT_far, FindHighestPolyCallBack, pArg);
@@ -220,6 +230,7 @@ int C2_HOOK_CDECL FindHighestCallBack(br_actor* pActor, br_model* pModel, br_mat
 
 // FUNCTION: CARMA2_HW 0x0045ca60
 // FUNCTION: CARMA2_SW 0x0045c4a0
+// FUNCTION: CARMA2_CHEAT 0x0045ced0
 void C2_HOOK_FASTCALL ActorFindFace(br_vector3* pPosition, br_vector3* pDir, br_actor* pWorld, br_vector3* pNormal, br_scalar* pT, br_material** pMaterial, br_actor** pActor) {
     int group;
 
@@ -239,6 +250,7 @@ void C2_HOOK_FASTCALL ActorFindFace(br_vector3* pPosition, br_vector3* pDir, br_
 
 // FUNCTION: CARMA2_HW 0x0045d5c0
 // FUNCTION: CARMA2_SW 0x0045d000
+// FUNCTION: CARMA2_CHEAT 0x0045da30
 void C2_HOOK_FASTCALL EnablePlingMaterials(void) {
 
     gPling_materials = 1;
@@ -246,6 +258,7 @@ void C2_HOOK_FASTCALL EnablePlingMaterials(void) {
 
 // FUNCTION: CARMA2_HW 0x0045d5d0
 // FUNCTION: CARMA2_SW 0x0045d010
+// FUNCTION: CARMA2_CHEAT 0x0045da40
 void C2_HOOK_FASTCALL DisablePlingMaterials(void) {
 
     gPling_materials = 0;
@@ -284,6 +297,7 @@ void C2_HOOK_FASTCALL StationarySphereSphereCollide(const br_vector3* pPoint, co
 
 // STUB: CARMA2_HW 0x0045ecc0
 // STUB: CARMA2_SW 0x0045e730
+// STUB: CARMA2_CHEAT 0x0045f130
 void C2_HOOK_FASTCALL CheckSingleFace(tFace_ref* pFace, br_vector3* ray_pos, br_vector3* ray_dir, br_vector3* normal, br_scalar* rt, br_vector3* coll_pos) {
     NOT_IMPLEMENTED();
 }
@@ -298,6 +312,7 @@ void C2_HOOK_FASTCALL GetNewBoundingBox(br_bounds* b2, br_bounds* b1, br_matrix3
 
 // FUNCTION: CARMA2_HW 0x0045f690
 // FUNCTION: CARMA2_SW 0x0045f100
+// FUNCTION: CARMA2_CHEAT 0x0045fb00
 void C2_HOOK_FASTCALL FillInBounds(tBounds* pBounds) {
     br_vector3 tv;
     br_vector3 c[3];
@@ -324,6 +339,7 @@ void C2_HOOK_FASTCALL FillInBounds(tBounds* pBounds) {
 }
 
 // STUB: CARMA2_HW 0x0045f8c0
+// STUB: CARMA2_CHEAT 0x0045fd30
 int C2_HOOK_FASTCALL ActorBoxPick(tBounds* bnds, br_actor* ap, br_model* model, br_material* material, tFace_ref* face_list, int max_face, br_matrix34* pMat, tWorld_callbacks* pWorld_callbacks) {
     NOT_IMPLEMENTED();
 }
@@ -344,6 +360,7 @@ int C2_HOOK_FASTCALL ActorBoxPick(tBounds* bnds, br_actor* ap, br_model* model, 
 
 // STUB: CARMA2_HW 0x00460bd0
 // STUB: CARMA2_SW 0x00460640
+// STUB: CARMA2_CHEAT 0x00461040
 int C2_HOOK_FASTCALL LineBoxColl(br_vector3* pStart, br_vector3* pEnd, br_bounds* pBounds, br_vector3* pPoint, br_scalar* pT) {
     NOT_IMPLEMENTED();
 }
@@ -422,6 +439,7 @@ int C2_HOOK_FASTCALL LineSphereCollWithSphere(br_vector3* pStart, br_vector3* pE
 
 // STUB: CARMA2_HW 0x00461310
 // STUB: CARMA2_SW 0x00460db0
+// STUB: CARMA2_CHEAT 0x00461780
 int C2_HOOK_FASTCALL LinePolyColl(br_vector3* pStart, br_vector3* pEnd, tCollision_shape_polyhedron_data* pPoly, br_vector3* pPoint, br_scalar pRadius, br_scalar* pT) {
     NOT_IMPLEMENTED();
 }
@@ -500,6 +518,7 @@ int C2_HOOK_FASTCALL ShapeRayCastWithSphere(br_vector3* pStart, br_vector3* pEnd
 
 // FUNCTION: CARMA2_HW 0x004618e0
 // FUNCTION: CARMA2_SW 0x00461380
+// FUNCTION: CARMA2_CHEAT 0x00461d50
 tFace_ref* C2_HOOK_FASTCALL CastRayDownThruFaces(br_vector3* pPosition, tFace_ref* pFaces, int pCount, br_scalar pOffset, br_vector3* pCollision_position) {
     br_vector3 direction;
     br_vector3 position;

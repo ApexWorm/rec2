@@ -77,6 +77,7 @@ br_geometry_v1_model* C2_HOOK_STDCALL GeometryV1ModelAllocate(br_soft_renderer_f
 
 // FUNCTION: CARMA2_HW 0x00540d50
 // FUNCTION: CARMA2_SW 0x0053c3f0
+// FUNCTION: CARMA2_CHEAT 0x00546940
 void C2_HOOK_CDECL _M_br_geometry_v1_model_soft_free(br_geometry_v1_model_soft* self) {
 
     self->renderer_facility->dispatch->_remove((br_object_container*)self->renderer_facility, (br_object*)self);
@@ -85,6 +86,7 @@ void C2_HOOK_CDECL _M_br_geometry_v1_model_soft_free(br_geometry_v1_model_soft* 
 
 // FUNCTION: CARMA2_HW 0x00540d70
 // FUNCTION: CARMA2_SW 0x0053c410
+// FUNCTION: CARMA2_CHEAT 0x00546960
 br_token C2_HOOK_CDECL _M_br_geometry_v1_model_soft_type(br_geometry_v1_model_soft* self) {
 
     return BRT_GEOMETRY_V1_MODEL;
@@ -92,6 +94,7 @@ br_token C2_HOOK_CDECL _M_br_geometry_v1_model_soft_type(br_geometry_v1_model_so
 
 // FUNCTION: CARMA2_HW 0x00540d80
 // FUNCTION: CARMA2_SW 0x0053c420
+// FUNCTION: CARMA2_CHEAT 0x00546970
 br_boolean C2_HOOK_CDECL _M_br_geometry_v1_model_soft_isType(br_geometry_v1_model_soft* self, br_token t) {
 
     return t == BRT_GEOMETRY_V1_MODEL || t == BRT_GEOMETRY || t == BRT_OBJECT;
@@ -99,6 +102,7 @@ br_boolean C2_HOOK_CDECL _M_br_geometry_v1_model_soft_isType(br_geometry_v1_mode
 
 // FUNCTION: CARMA2_HW 0x00540da0
 // FUNCTION: CARMA2_SW 0x0053c440
+// FUNCTION: CARMA2_CHEAT 0x00546990
 br_int_32 C2_HOOK_CDECL _M_br_geometry_v1_model_soft_space(br_geometry_v1_model_soft* self) {
 
     C2_HOOK_BUG_ON(sizeof(br_geometry_v1_model_soft) != 0x10);
@@ -107,6 +111,7 @@ br_int_32 C2_HOOK_CDECL _M_br_geometry_v1_model_soft_space(br_geometry_v1_model_
 
 // FUNCTION: CARMA2_HW 0x00540db0
 // FUNCTION: CARMA2_SW 0x0053c450
+// FUNCTION: CARMA2_CHEAT 0x005469a0
 br_tv_template* C2_HOOK_CDECL _M_br_geometry_v1_model_soft_templateQuery(br_geometry_v1_model_soft* self) {
 
 #ifndef REC2_MATCHING
@@ -122,30 +127,35 @@ br_tv_template* C2_HOOK_CDECL _M_br_geometry_v1_model_soft_templateQuery(br_geom
 }
 
 // FUNCTION: CARMA2_HW 0x00540e10
+// FUNCTION: CARMA2_CHEAT 0x00546a00
 br_error C2_HOOK_CDECL _M_br_geometry_v1_model_soft_renderFixedToFloat(br_geometry_v1_model_soft* self, br_renderer* renderer, v11model* model, br_token type) {
 
     return 0x1002;
 }
 
 // FUNCTION: CARMA2_HW 0x00540e20
+// FUNCTION: CARMA2_CHEAT 0x00546a10
 br_error C2_HOOK_CDECL _M_br_geometry_v1_model_soft_renderOnScreenFixedToFloat(br_geometry* self, br_renderer* renderer, v11model* model, br_token type) {
 
     return 0x1002;
 }
 
 // FUNCTION: CARMA2_HW 0x00540e00
+// FUNCTION: CARMA2_CHEAT 0x005469f0
 br_error C2_HOOK_CDECL _M_br_geometry_v1_model_soft_storedNew(br_geometry* self, br_renderer* renderer, br_geometry_stored** psg, v11model* model, br_token type, br_token_value* tv) {
 
     return 0x1002;
 }
 
 // FUNCTION: CARMA2_HW 0x00540df0
+// FUNCTION: CARMA2_CHEAT 0x005469e0
 br_error C2_HOOK_CDECL _M_br_geometry_v1_model_soft_storedNewFixedToFloat(br_geometry* self, br_renderer* renderer, br_geometry_stored** psg, v11model* model, br_token type, br_token_value* tv) {
 
     return 0x1002;
 }
 
 // FUNCTION: CARMA2_HW 0x00540de0
+// FUNCTION: CARMA2_CHEAT 0x005469d0
 br_error C2_HOOK_CDECL _M_br_geometry_v1_model_soft_storedAvail(br_geometry* self, br_int_32* psize, br_token_value* tv) {
 
     return 0x1002;

@@ -16,6 +16,7 @@
 
 // FUNCTION: CARMA2_HW 0x0053fb50
 // FUNCTION: CARMA2_SW 0x0053b1f0
+// FUNCTION: CARMA2_CHEAT 0x00545740
 void* C2_HOOK_CDECL HostImageLoad(const char* name) {
 
 #ifdef _WIN32
@@ -28,6 +29,7 @@ void* C2_HOOK_CDECL HostImageLoad(const char* name) {
 
 // FUNCTION: CARMA2_HW 0x0053fb60
 // FUNCTION: CARMA2_SW 0x0053b200
+// FUNCTION: CARMA2_CHEAT 0x00545750
 void C2_HOOK_CDECL HostImageUnload(void* image) {
 
 }

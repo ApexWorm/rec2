@@ -108,6 +108,7 @@ br_tv_template_entry rendererTemplateEntries[] = {
 
 // GLOBAL: CARMA2_HW 0x0058bd20
 // GLOBAL: CARMA2_SW 0x00586ce8
+// GLOBAL: CARMA2_CHEAT 0x00590d88
 const br_token RendererPartsTokens[] = {
     BRT_CULL,
     BRT_SURFACE,
@@ -149,6 +150,7 @@ br_renderer* C2_HOOK_STDCALL RendererSoftAllocate(br_device *dev, br_soft_render
 
 // FUNCTION: CARMA2_HW 0x00540af0
 // FUNCTION: CARMA2_SW 0x0053c190
+// FUNCTION: CARMA2_CHEAT 0x005466e0
 void C2_HOOK_CDECL _M_br_soft_renderer_free(br_soft_renderer* self) {
 
     self->renderer_facility->dispatch->_remove((br_object_container*)self->renderer_facility, (br_object*)self);
@@ -161,6 +163,7 @@ void C2_HOOK_CDECL _M_br_soft_renderer_free(br_soft_renderer* self) {
 
 // FUNCTION: CARMA2_HW 0x00540b40
 // FUNCTION: CARMA2_SW 0x0053c1e0
+// FUNCTION: CARMA2_CHEAT 0x00546730
 br_token C2_HOOK_CDECL _M_br_soft_renderer_type(br_soft_renderer* self) {
 
     return BRT_RENDERER;
@@ -168,6 +171,7 @@ br_token C2_HOOK_CDECL _M_br_soft_renderer_type(br_soft_renderer* self) {
 
 // FUNCTION: CARMA2_HW 0x00540b50
 // FUNCTION: CARMA2_SW 0x0053c1f0
+// FUNCTION: CARMA2_CHEAT 0x00546740
 int C2_HOOK_CDECL _M_br_soft_renderer_isType(br_soft_renderer* self, br_token t) {
 
     return t == BRT_RENDERER || t == BRT_OBJECT;
@@ -175,6 +179,7 @@ int C2_HOOK_CDECL _M_br_soft_renderer_isType(br_soft_renderer* self, br_token t)
 
 // FUNCTION: CARMA2_HW 0x00540b70
 // FUNCTION: CARMA2_SW 0x0053c210
+// FUNCTION: CARMA2_CHEAT 0x00546760
 size_t C2_HOOK_CDECL _M_br_soft_renderer_space(br_soft_renderer* self) {
 
     return sizeof(br_soft_renderer);
@@ -182,6 +187,7 @@ size_t C2_HOOK_CDECL _M_br_soft_renderer_space(br_soft_renderer* self) {
 
 // FUNCTION: CARMA2_HW 0x00540b80
 // FUNCTION: CARMA2_SW 0x0053c220
+// FUNCTION: CARMA2_CHEAT 0x00546770
 br_tv_template* C2_HOOK_CDECL _M_br_soft_renderer_templateQuery(br_soft_renderer* self) {
 
     if (self->device->templates.rendererTemplate == NULL) {
@@ -257,6 +263,7 @@ void* C2_HOOK_CDECL _M_br_soft_renderer_listQuery(br_soft_renderer* self) {
 
 // FUNCTION: CARMA2_HW 0x00540bc0
 // FUNCTION: CARMA2_SW 0x0053c260
+// FUNCTION: CARMA2_CHEAT 0x005467b0
 br_error C2_HOOK_CDECL _M_br_soft_renderer_validDestination(br_soft_renderer* self, br_boolean* bp, br_object* h) {
 
     return 0;
@@ -264,6 +271,7 @@ br_error C2_HOOK_CDECL _M_br_soft_renderer_validDestination(br_soft_renderer* se
 
 // FUNCTION: CARMA2_HW 0x00540bd0
 // FUNCTION: CARMA2_SW 0x0053c270
+// FUNCTION: CARMA2_CHEAT 0x005467c0
 br_error C2_HOOK_CDECL _M_br_soft_renderer_stateStoredNew(br_soft_renderer* self, br_renderer_state_stored_soft** pss, br_uint_32 mask, br_token_value* tv) {
     br_renderer_state_stored_soft *ss;
 
@@ -278,6 +286,7 @@ br_error C2_HOOK_CDECL _M_br_soft_renderer_stateStoredNew(br_soft_renderer* self
 
 // FUNCTION: CARMA2_HW 0x00540c00
 // FUNCTION: CARMA2_SW 0x0053c2a0
+// FUNCTION: CARMA2_CHEAT 0x005467f0
 br_error C2_HOOK_CDECL _M_br_soft_renderer_stateStoredAvail(br_soft_renderer* self, br_int_32* psize, br_uint_32 mask, br_token_value* tv) {
 
     return 0x1002;
@@ -285,6 +294,7 @@ br_error C2_HOOK_CDECL _M_br_soft_renderer_stateStoredAvail(br_soft_renderer* se
 
 // FUNCTION: CARMA2_HW 0x00540c10
 // FUNCTION: CARMA2_SW 0x0053c2b0
+// FUNCTION: CARMA2_CHEAT 0x00546800
 br_error C2_HOOK_CDECL _M_br_soft_renderer_bufferStoredNew(br_soft_renderer* self, br_buffer_stored** psm, br_token use, br_device_pixelmap* pm, br_token_value* tv) {
 
     return self->plib->dispatch->_bufferStoredNew(self->plib, psm, use, pm, tv);
@@ -292,6 +302,7 @@ br_error C2_HOOK_CDECL _M_br_soft_renderer_bufferStoredNew(br_soft_renderer* sel
 
 // FUNCTION: CARMA2_HW 0x00540c40
 // FUNCTION: CARMA2_SW 0x0053c2e0
+// FUNCTION: CARMA2_CHEAT 0x00546830
 br_error C2_HOOK_CDECL _M_br_soft_renderer_bufferStoredAvail(br_soft_renderer* self, br_int_32* space, br_token use, br_token_value* tv) {
 
     return self->plib->dispatch->_bufferStoredAvail(self->plib, space, use, tv);
@@ -299,6 +310,7 @@ br_error C2_HOOK_CDECL _M_br_soft_renderer_bufferStoredAvail(br_soft_renderer* s
 
 // FUNCTION: CARMA2_HW 0x00540cb0
 // FUNCTION: CARMA2_SW 0x0053c350
+// FUNCTION: CARMA2_CHEAT 0x005468a0
 br_error C2_HOOK_CDECL _M_br_soft_renderer_commandModeSet(br_soft_renderer* self, br_token mode) {
 
     return 0x1002;
@@ -306,6 +318,7 @@ br_error C2_HOOK_CDECL _M_br_soft_renderer_commandModeSet(br_soft_renderer* self
 
 // FUNCTION: CARMA2_HW 0x00540cc0
 // FUNCTION: CARMA2_SW 0x0053c360
+// FUNCTION: CARMA2_CHEAT 0x005468b0
 br_error C2_HOOK_CDECL _M_br_soft_renderer_commandModeQuery(br_soft_renderer* self, br_token *mode) {
 
     return 0x1002;
@@ -313,6 +326,7 @@ br_error C2_HOOK_CDECL _M_br_soft_renderer_commandModeQuery(br_soft_renderer* se
 
 // FUNCTION: CARMA2_HW 0x00540cd0
 // FUNCTION: CARMA2_SW 0x0053c370
+// FUNCTION: CARMA2_CHEAT 0x005468c0
 br_error C2_HOOK_CDECL _M_br_soft_renderer_commandModeDefault(br_soft_renderer* self) {
 
     return 0x1002;
@@ -320,6 +334,7 @@ br_error C2_HOOK_CDECL _M_br_soft_renderer_commandModeDefault(br_soft_renderer* 
 
 // FUNCTION: CARMA2_HW 0x00540ce0
 // FUNCTION: CARMA2_SW 0x0053c380
+// FUNCTION: CARMA2_CHEAT 0x005468d0
 br_error C2_HOOK_CDECL _M_br_soft_renderer_commandModePush(br_soft_renderer* self) {
 
     return 0x1002;
@@ -327,6 +342,7 @@ br_error C2_HOOK_CDECL _M_br_soft_renderer_commandModePush(br_soft_renderer* sel
 
 // FUNCTION: CARMA2_HW 0x00540cf0
 // FUNCTION: CARMA2_SW 0x0053c390
+// FUNCTION: CARMA2_CHEAT 0x005468e0
 br_error C2_HOOK_CDECL _M_br_soft_renderer_commandModePop(br_soft_renderer* self) {
 
     return 0x1002;
@@ -334,6 +350,7 @@ br_error C2_HOOK_CDECL _M_br_soft_renderer_commandModePop(br_soft_renderer* self
 
 // FUNCTION: CARMA2_HW 0x00540c70
 // FUNCTION: CARMA2_SW 0x0053c310
+// FUNCTION: CARMA2_CHEAT 0x00546860
 br_error C2_HOOK_CDECL _M_br_soft_renderer_flush(br_soft_renderer* self, br_boolean wait) {
 
     return self->plib->dispatch->_flush(self->plib, wait);
@@ -341,6 +358,7 @@ br_error C2_HOOK_CDECL _M_br_soft_renderer_flush(br_soft_renderer* self, br_bool
 
 // FUNCTION: CARMA2_HW 0x00540c90
 // FUNCTION: CARMA2_SW 0x0053c330
+// FUNCTION: CARMA2_CHEAT 0x00546880
 br_error C2_HOOK_CDECL _M_br_soft_renderer_synchronise(br_soft_renderer* self, br_token sync_type, br_boolean block) {
 
     return self->plib->dispatch->_synchronise(self->plib, sync_type, block);
@@ -348,6 +366,7 @@ br_error C2_HOOK_CDECL _M_br_soft_renderer_synchronise(br_soft_renderer* self, b
 
 // FUNCTION: CARMA2_HW 0x00541d90
 // FUNCTION: CARMA2_SW 0x0053d430
+// FUNCTION: CARMA2_CHEAT 0x00547980
 br_error C2_HOOK_CDECL _M_br_soft_renderer_partQueryCapability(br_soft_renderer* self, br_token part, br_int_32 index, br_token_value* buffer, br_size_t buffer_size) {
 
     return 0x1002;
@@ -355,6 +374,7 @@ br_error C2_HOOK_CDECL _M_br_soft_renderer_partQueryCapability(br_soft_renderer*
 
 // FUNCTION: CARMA2_HW 0x00541e60
 // FUNCTION: CARMA2_SW 0x0053d500
+// FUNCTION: CARMA2_CHEAT 0x00547a50
 br_error C2_HOOK_CDECL _M_br_soft_renderer_stateQueryPerformance(br_soft_renderer* self, br_fixed_lu* speed) {
 
     return 0x1002;

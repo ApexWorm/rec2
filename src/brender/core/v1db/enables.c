@@ -63,6 +63,7 @@ void C2_HOOK_STDCALL actorDisable(br_v1db_enable* e, br_actor* a) {
 
 // FUNCTION: CARMA2_HW 0x00524e30
 // FUNCTION: CARMA2_SW 0x005204d0
+// FUNCTION: CARMA2_CHEAT 0x0052aa20
 void C2_HOOK_CDECL BrLightEnable(br_actor* l) {
 
     actorEnable(&v1db.enabled_lights, l);
@@ -70,6 +71,7 @@ void C2_HOOK_CDECL BrLightEnable(br_actor* l) {
 
 // FUNCTION: CARMA2_HW 0x00524ec0
 // FUNCTION: CARMA2_SW 0x00520560
+// FUNCTION: CARMA2_CHEAT 0x0052aab0
 void C2_HOOK_CDECL BrLightDisable(br_actor* l) {
 
     actorDisable(&v1db.enabled_lights, l);
@@ -77,6 +79,7 @@ void C2_HOOK_CDECL BrLightDisable(br_actor* l) {
 
 // FUNCTION: CARMA2_HW 0x00524f10
 // FUNCTION: CARMA2_SW 0x005205b0
+// FUNCTION: CARMA2_CHEAT 0x0052ab00
 void C2_HOOK_CDECL BrClipPlaneEnable(br_actor* c) {
 
     actorEnable(&v1db.enabled_clip_planes, c);
@@ -84,6 +87,7 @@ void C2_HOOK_CDECL BrClipPlaneEnable(br_actor* c) {
 
 // FUNCTION: CARMA2_HW 0x00524fa0
 // FUNCTION: CARMA2_SW 0x00520640
+// FUNCTION: CARMA2_CHEAT 0x0052ab90
 void C2_HOOK_CDECL BrClipPlaneDisable(br_actor* c) {
 
     actorDisable(&v1db.enabled_clip_planes, c);
@@ -91,6 +95,7 @@ void C2_HOOK_CDECL BrClipPlaneDisable(br_actor* c) {
 
 // FUNCTION: CARMA2_HW 0x00524ff0
 // FUNCTION: CARMA2_SW 0x00520690
+// FUNCTION: CARMA2_CHEAT 0x0052abe0
 void C2_HOOK_CDECL BrHorizonPlaneEnable(br_actor* h) {
 
     actorEnable(&v1db.enabled_horizon_planes, h);
@@ -98,6 +103,7 @@ void C2_HOOK_CDECL BrHorizonPlaneEnable(br_actor* h) {
 
 // FUNCTION: CARMA2_HW 0x00525080
 // FUNCTION: CARMA2_SW 0x00520720
+// FUNCTION: CARMA2_CHEAT 0x0052ac70
 void C2_HOOK_CDECL BrHorizonPlaneDisable(br_actor* h) {
 
     actorDisable(&v1db.enabled_horizon_planes, h);
@@ -105,6 +111,7 @@ void C2_HOOK_CDECL BrHorizonPlaneDisable(br_actor* h) {
 
 // FUNCTION: CARMA2_HW 0x005250d0
 // FUNCTION: CARMA2_SW 0x00520770
+// FUNCTION: CARMA2_CHEAT 0x0052acc0
 br_actor* C2_HOOK_CDECL BrEnvironmentSet(br_actor* a) {
     br_actor* old_a;
 
@@ -131,6 +138,7 @@ br_boolean C2_HOOK_STDCALL setupView(br_matrix34* view_to_this, br_matrix34* thi
 }
 
 // FUNCTION: CARMA2_HW 0x005250e0
+// FUNCTION: CARMA2_CHEAT 0x0052acd0
 void C2_HOOK_STDCALL BrSetupLights(br_actor* world, br_matrix34* world_to_view, br_int_32 w2vt) {
     br_matrix34 this_to_view;
     br_matrix34 view_to_this;
@@ -272,6 +280,7 @@ void C2_HOOK_STDCALL BrSetupLights(br_actor* world, br_matrix34* world_to_view, 
 }
 
 // FUNCTION: CARMA2_HW 0x00525450
+// FUNCTION: CARMA2_CHEAT 0x0052b040
 void C2_HOOK_STDCALL BrSetupClipPlanes(br_actor* world, br_matrix34* world_to_view, br_int_32 w2vt, br_matrix4* view_to_screen) {
     br_matrix34 this_to_view;
     br_matrix34 view_to_this;
@@ -326,6 +335,7 @@ void C2_HOOK_STDCALL BrSetupClipPlanes(br_actor* world, br_matrix34* world_to_vi
 }
 
 // FUNCTION: CARMA2_HW 0x00525630
+// FUNCTION: CARMA2_CHEAT 0x0052b220
 void C2_HOOK_STDCALL BrSetupEnvironment(br_actor* world, br_matrix34* world_to_view, br_int_32 w2vt) {
     br_matrix34 view_to_this;
     br_matrix34 this_to_view;
@@ -353,10 +363,12 @@ void C2_HOOK_STDCALL BrSetupEnvironment(br_actor* world, br_matrix34* world_to_v
 }
 
 // FUNCTION: CARMA2_HW 0x00525750
+// FUNCTION: CARMA2_CHEAT 0x0052b340
 void C2_HOOK_STDCALL BrSetupHorizons(br_actor* world, br_matrix34* world_to_view, br_int_32 w2vt) {
 }
 
 // FUNCTION: CARMA2_HW 0x00525760
+// FUNCTION: CARMA2_CHEAT 0x0052b350
 void C2_HOOK_STDCALL BrActorEnableCheck(br_actor* a) {
 
     if (a == v1db.enabled_environment) {

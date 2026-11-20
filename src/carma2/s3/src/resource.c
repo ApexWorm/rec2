@@ -10,6 +10,7 @@
 
 // FUNCTION: CARMA2_HW 0x00565af7
 // FUNCTION: CARMA2_SW 0x00561197
+// FUNCTION: CARMA2_CHEAT 0x0056b6e7
 void* C2_HOOK_FASTCALL S3MemAllocate(br_size_t size, br_uint_8 type) {
     void *result;
 
@@ -19,17 +20,20 @@ void* C2_HOOK_FASTCALL S3MemAllocate(br_size_t size, br_uint_8 type) {
 
 // FUNCTION: CARMA2_HW 0x00565b1d
 // FUNCTION: CARMA2_SW 0x005611bd
+// FUNCTION: CARMA2_CHEAT 0x0056b70d
 void C2_HOOK_FASTCALL S3MemFree(void* p) {
 
     BrMemFree(p);
 }
 
 // FUNCTION: CARMA2_HW 0x005186f0
+// FUNCTION: CARMA2_CHEAT 0x0051e120
 FILE* C2_HOOK_FASTCALL S3_low_memory_fopen(const char* pPath, const char* pMode) {
     return NULL;
 }
 
 // FUNCTION: CARMA2_HW 0x00568bdc
+// FUNCTION: CARMA2_CHEAT 0x0056e7cc
 int C2_HOOK_FASTCALL S3GetFileSize(FILE *pF) {
     struct {
         int current;

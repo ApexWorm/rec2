@@ -28,14 +28,17 @@
 
 // GLOBAL: CARMA2_HW 0x006aa9e0
 // GLOBAL: CARMA2_SW 0x006a4430
+// GLOBAL: CARMA2_CHEAT 0x006b2558
 int gWindowed;
 
 // GLOBAL: CARMA2_SW 0x006a4458
 // GLOBAL: CARMA2_HW 0x006aaa08
+// GLOBAL: CARMA2_CHEAT 0x006b2580
 HWND gHWnd_SSDX;
 
 // GLOBAL: CARMA2_HW 0x006aa9d8
 // GLOBAL: CARMA2_SW 0x006a4428
+// GLOBAL: CARMA2_CHEAT 0x006b2550
 int gEnumerate_DirectX_surfaces;
 
 // GLOBAL: CARMA2_HW 0x006aa5c8
@@ -84,6 +87,7 @@ RECT gSSDXWindowPos;
 
 // GLOBAL: CARMA2_HW 0x007a0540
 // GLOBAL: CARMA2_SW 0x00796ae0
+// GLOBAL: CARMA2_CHEAT 0x007a7be0
 MCI_OPEN_PARMS mci_open_params;
 
 // GLOBAL: CARMA2_HW 0x007a0530
@@ -193,6 +197,7 @@ void C2_HOOK_FASTCALL LocalWindowedDDSetup(int pWidth, int pHeight, int* pPitch)
 
 // FUNCTION: CARMA2_HW 0x005002d0
 // FUNCTION: CARMA2_SW 0x004fbbb0
+// FUNCTION: CARMA2_CHEAT 0x00505f80
 void C2_HOOK_FASTCALL SSDXLogDirectDrawError(HRESULT hRes) {
 
 #define LOG_CASE_DDERR(V) case V: dr_dprintf("%s (%x)", #V, hRes); return
@@ -221,6 +226,7 @@ void C2_HOOK_FASTCALL SSDXLogDirectDrawError(HRESULT hRes) {
 
 // FUNCTION: CARMA2_HW 0x00500500
 // FUNCTION: CARMA2_SW 0x004fbde0
+// FUNCTION: CARMA2_CHEAT 0x005061b0
 int C2_HOOK_FASTCALL SSDXStart(void *p_hWnd, int p_windowed, int p_EnumerateDDX, int p_flags) {
     HRESULT hRes;
 
@@ -271,6 +277,7 @@ int C2_HOOK_FASTCALL SSDXStart(void *p_hWnd, int p_windowed, int p_EnumerateDDX,
 
 // FUNCTION: CARMA2_HW 0x00500590
 // FUNCTION: CARMA2_SW 0x004fbef0
+// FUNCTION: CARMA2_CHEAT 0x00506240
 void C2_HOOK_FASTCALL SSDXStop(void) {
 
     SSDXUnlockAttachedSurface();
@@ -316,6 +323,7 @@ void C2_HOOK_FASTCALL SSDXStop(void) {
 
 // FUNCTION: CARMA2_HW 0x005006d0
 // FUNCTION: CARMA2_SW 0x004fc030
+// FUNCTION: CARMA2_CHEAT 0x00506380
 void C2_HOOK_FASTCALL SSDXRelease(void) {
 
     if (gDirectDraw2 != NULL) {

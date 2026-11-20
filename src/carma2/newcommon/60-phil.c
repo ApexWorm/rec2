@@ -15,14 +15,17 @@
 
 // GLOBAL: CARMA2_HW 0x0065d004
 // GLOBAL: CARMA2_SW 0x0065793c
+// GLOBAL: CARMA2_CHEAT 0x006645fc
 int gPHIL_disabled = 1;
 
 // GLOBAL: CARMA2_HW 0x0074a5f0
 // GLOBAL: CARMA2_SW 0x007410b0
+// GLOBAL: CARMA2_CHEAT 0x00751c90
 tPhysics_object* gPHIL_list_collision_infos;
 
 // GLOBAL: CARMA2_HW 0x0074a5ec
 // GLOBAL: CARMA2_SW 0x007410ac
+// GLOBAL: CARMA2_CHEAT 0x00751c8c
 tU32 gPHIL_last_physics_tick;
 
 // GLOBAL: CARMA2_HW 0x006923e0
@@ -106,6 +109,7 @@ void C2_HOOK_FASTCALL GetMatrixFromOrientation(br_matrix34* pMatrix, const tFixe
 
 // STUB: CARMA2_HW 0x0049c0d0
 // STUB: CARMA2_SW 0x00498250
+// STUB: CARMA2_CHEAT 0x0049c480
 int C2_HOOK_FASTCALL GetObjectNetworkStuff(tPhysics_object* pObject, tU8* pBuffer, tU32 pSize) {
 
     NOT_IMPLEMENTED();
@@ -152,6 +156,7 @@ int C2_HOOK_STDCALL FloatToFixedFraction(float pValue, float pMin, float pMax) {
 
 // FUNCTION: CARMA2_HW 0x0049cd00
 // FUNCTION: CARMA2_SW 0x00498e80
+// FUNCTION: CARMA2_CHEAT 0x0049d0b0
 int C2_HOOK_FASTCALL GetHierarchyNetworkStuff(tPhysics_object* pObject, tU8* pBuffer, int pSize) {
     int size;
     int child_size;
@@ -187,6 +192,7 @@ int C2_HOOK_FASTCALL GetHierarchyNetworkStuff(tPhysics_object* pObject, tU8* pBu
 
 // FUNCTION: CARMA2_HW 0x0049ce60
 // FUNCTION: CARMA2_SW 0x00498fe0
+// FUNCTION: CARMA2_CHEAT 0x0049d210
 int C2_HOOK_FASTCALL GetHierarchyNetworkSize(tPhysics_object* pObject) {
     int size;
     tPhysics_object* child;
@@ -200,6 +206,7 @@ int C2_HOOK_FASTCALL GetHierarchyNetworkSize(tPhysics_object* pObject) {
 
 // FUNCTION: CARMA2_HW 0x0049cee0
 // FUNCTION: CARMA2_SW 0x00499060
+// FUNCTION: CARMA2_CHEAT 0x0049d290
 int C2_HOOK_FASTCALL GetNetworkDataSize(tU8* pNet_data) {
     int size;
     tU8* next;
@@ -244,6 +251,7 @@ int C2_HOOK_FASTCALL PHILInit(void) {
 
 // FUNCTION: CARMA2_HW 0x004b5d20
 // FUNCTION: CARMA2_SW 0x004b2440
+// FUNCTION: CARMA2_CHEAT 0x004bb5f0
 void C2_HOOK_FASTCALL PHILDisable(void) {
     gPHIL_disabled = 1;
 }
@@ -254,16 +262,36 @@ void C2_HOOK_FASTCALL PHILDisable(void) {
 
 // STUB: CARMA2_HW 0x004b5d40
 // STUB: CARMA2_SW 0x004b2460
+// STUB: CARMA2_CHEAT 0x004bb610
 int C2_HOOK_FASTCALL PHILAddObject(tPhysics_object* pObject) {
+    NOT_IMPLEMENTED();
+}
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
+
+#ifdef REC2_CHEAT
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_CHEAT 0x004bb790
+void C2_HOOK_FASTCALL PHILVerify(void) {
     NOT_IMPLEMENTED();
 }
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(on)
 #endif
+#endif
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
 
 // STUB: CARMA2_HW 0x004b5ea0
 // STUB: CARMA2_SW 0x004b25c0
+// STUB: CARMA2_CHEAT 0x004bb890
 int C2_HOOK_FASTCALL PHILRemoveObject(tPhysics_object* pObject) {
 
     NOT_IMPLEMENTED();
@@ -272,6 +300,7 @@ int C2_HOOK_FASTCALL PHILRemoveObject(tPhysics_object* pObject) {
 
 // FUNCTION: CARMA2_HW 0x004b5fd0
 // FUNCTION: CARMA2_SW 0x004b26f0
+// FUNCTION: CARMA2_CHEAT 0x004bb9f0
 tPhysics_object* C2_HOOK_FASTCALL PHILGetFirstObject(void) {
     if (gPHIL_disabled) {
         return NULL;
@@ -282,6 +311,7 @@ tPhysics_object* C2_HOOK_FASTCALL PHILGetFirstObject(void) {
 
 // FUNCTION: CARMA2_HW 0x004b5ff0
 // FUNCTION: CARMA2_SW 0x004b2710
+// FUNCTION: CARMA2_CHEAT 0x004bba10
 tPhysics_object* C2_HOOK_FASTCALL PHILGetNextObject(tPhysics_object* pObject) {
     if (gPHIL_disabled) {
         return NULL;
@@ -339,12 +369,14 @@ int C2_HOOK_FASTCALL PHILMakeObjectPassive(tPhysics_object* pObject) {
 
 // FUNCTION: CARMA2_HW 0x004b6090
 // FUNCTION: CARMA2_SW 0x004b27b0
+// FUNCTION: CARMA2_CHEAT 0x004bbad0
 int C2_HOOK_FASTCALL PHILMakeObjectActive(tPhysics_object* pObject, const br_vector3* pVelocity, const br_vector3* pOmega, int pFlag) {
     tPHIL_queued_object_info* info;
 
     if (gPHIL_disabled) {
         return 0;
     }
+    PHILVerify();
     if (pObject->field_0x239 == 2) {
         info = pObject->field_0x240;
         info->field_0x8 = 2;
@@ -361,6 +393,7 @@ int C2_HOOK_FASTCALL PHILMakeObjectActive(tPhysics_object* pObject, const br_vec
         } else {
             info->field_0x4 &= ~0x2;
         }
+        PHILVerify();
         return 0;
     }
     info = pObject->field_0x240;
@@ -379,14 +412,17 @@ int C2_HOOK_FASTCALL PHILMakeObjectActive(tPhysics_object* pObject, const br_vec
             pObject->omega = *pOmega;
         }
         ResetCarSpecialVolume(pObject);
+        PHILVerify();
         return 0;
     } else {
+        PHILVerify();
         return 3;
     }
 }
 
 // FUNCTION: CARMA2_HW 0x004b61a0
 // FUNCTION: CARMA2_SW 0x004b28c0
+// FUNCTION: CARMA2_cHEAT 0x004bbc00
 int C2_HOOK_FASTCALL PHILSetPassiveObjectsMatrix(tPhysics_object* pObject, const br_matrix34* pMatrix) {
     tPHIL_queued_object_info* queued;
     tPHIL_queued_header* info;
@@ -394,26 +430,32 @@ int C2_HOOK_FASTCALL PHILSetPassiveObjectsMatrix(tPhysics_object* pObject, const
     if (gPHIL_disabled) {
         return 0;
     }
+    PHILVerify();
     if (pObject->field_0x239 == 2) {
         queued = pObject->field_0x240;
         queued->field_0x30 = *pMatrix;
         queued->flags |= 0x4;
+        PHILVerify();
         return 0;
     }
     info = pObject->field_0x240;
     if (info != NULL) {
         if (info->field_0x8 != 1) {
+            PHILVerify();
             return 4;
         }
         info->collision_info->actor->t.t.mat = *pMatrix;
+        PHILVerify();
         return 0;
     } else {
+        PHILVerify();
         return 3;
     }
 }
 
 // FUNCTION: CARMA2_HW 0x004b6210
 // FUNCTION: CARMA2_SW 0x004b2930
+// FUNCTION: CARMA2_CHEAT 0x004bbc90
 int C2_HOOK_FASTCALL PHILAddActiveObject(tPhysics_object* pInfo, const br_matrix34* pArg2, const br_vector3* pArg3, const br_vector3* pArg4) {
     int result;
 
@@ -431,12 +473,14 @@ int C2_HOOK_FASTCALL PHILAddActiveObject(tPhysics_object* pInfo, const br_matrix
 
 // STUB: CARMA2_HW 0x004b62e0
 // STUB: CARMA2_SW 0x004b2a00
+// STUB: CARMA2_CHEAT 0x004bbd70
 int C2_HOOK_FASTCALL PHILAddActiveObjectImmediately(tPhysics_object* pObject, const br_matrix34* pMatrix, const br_vector3* pVelocity, const br_vector3* pOmega) {
     NOT_IMPLEMENTED();
 }
 
 // STUB: CARMA2_HW 0x004b63b0
 // STUB: CARMA2_SW 0x004b2ad0
+// STUB: CARMA2_CHEAT 0x004bbe50
 int C2_HOOK_CDECL PHILSetObjectProperty(tPhysics_object* pCollision_info, int pParam, ...) {
     NOT_IMPLEMENTED();
 }
@@ -483,6 +527,7 @@ void C2_HOOK_FASTCALL MarkObjectAndChildrenAsPassive(tPhysics_object* pObject) {
 
 // FUNCTION: CARMA2_HW 0x004b7220
 // FUNCTION: CARMA2_SW 0x004b3940
+// FUNCTION: CARMA2_CHEAT 0x004bcd50
 void C2_HOOK_FASTCALL PHILApplyPHILObject(tPhysics_object* pObject, const br_matrix34* pMatrix) {
 
     C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPhysics_object, actor, 0x0);

@@ -13,10 +13,12 @@
 
 // GLOBAL: CARMA2_HW 0x006ba640
 // GLOBAL: CARMA2_SW 0x006b1320
+// GLOBAL: CARMA2_CHEAT 0x006c1ce0
 tS8 gRace_memory[1000];
 
 // FUNCTION: CARMA2_HW 0x004e7440
 // FUNCTION: CARMA2_SW 0x004e3260
+// FUNCTION: CARMA2_CHEAT 0x004ed0e0
 int C2_HOOK_FASTCALL GetRuntimeVariable(int pAddress) {
 
     if (pAddress >= 0 && pAddress < (int)REC2_ASIZE(gRace_memory)) {
@@ -29,6 +31,7 @@ int C2_HOOK_FASTCALL GetRuntimeVariable(int pAddress) {
 
 // FUNCTION: CARMA2_HW 0x004e7460
 // FUNCTION: CARMA2_SW 0x004e3280
+// FUNCTION: CARMA2_CHEAT 0x004ed100
 int C2_HOOK_FASTCALL AccumulateRuntimeVariable(int pAddress, int pDelta) {
 
     if (pAddress >= 0 && pAddress < (int)REC2_ASIZE(gRace_memory)) {
@@ -42,6 +45,7 @@ int C2_HOOK_FASTCALL AccumulateRuntimeVariable(int pAddress, int pDelta) {
 
 // FUNCTION: CARMA2_HW 0x004e7480
 // FUNCTION: CARMA2_SW 0x004e32a0
+// FUNCTION: CARMA2_CHEAT 0x004ed120
 int C2_HOOK_FASTCALL ToggleRuntimeVariable(int pAddress) {
 
     if (pAddress >= 0 && pAddress < (int)REC2_ASIZE(gRace_memory)) {
@@ -60,6 +64,7 @@ int C2_HOOK_FASTCALL ToggleRuntimeVariable(int pAddress) {
 
 // FUNCTION: CARMA2_HW 0x004e74b0
 // FUNCTION: CARMA2_SW 0x004e32d0
+// FUNCTION: CARMA2_CHEAT 0x004ed150
 void C2_HOOK_FASTCALL ClearAllRuntimeVariables(void) {
     memset(gRace_memory, 0, sizeof(gRace_memory));
 }

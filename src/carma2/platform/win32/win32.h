@@ -34,7 +34,10 @@ extern int gMouseCaptured;
 extern POINT gCursorPos_LastClick;
 extern POINT gPD_mouse_position;
 extern int gCursorPos_LastClick_Valid;
-extern int gScaleMouse;
+extern int gScale_mouse;
+#ifdef REC2_V101A
+extern int gOld_mouse;
+#endif
 extern int gScreenWidth;
 extern int gScreenHeight;
 extern FILE *gAction_replay_buffer_file;
@@ -105,7 +108,10 @@ extern void C2_HOOK_FASTCALL PDPixelmapToScreenRectangleCopy(br_pixelmap* dst, b
 extern void C2_HOOK_FASTCALL PDPixelmapLine(br_pixelmap* pDst, int pX1, int pY1, int pX2, int pY2, br_colour pColour);
 
 extern void C2_HOOK_FASTCALL PDPixelmapLine2(br_pixelmap* pDst, int pX1, int pY1, int pX2, int pY2, br_colour pColour);
+#endif
 
+#ifdef REC2_HW
+extern void C2_HOOK_FASTCALL CheckIfRunningOnServer(void);
 #endif
 
 #endif // C2_WIN32_WIN32_H

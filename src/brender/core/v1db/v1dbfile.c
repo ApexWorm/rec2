@@ -39,6 +39,7 @@ br_file_struct_member br_vertex_FM[] = {
 
 // GLOBAL: CARMA2_HW 0x006634c0
 // GLOBAL: CARMA2_SW 0x0065dc58
+// GLOBAL: CARMA2_CHEAT 0x0066ad78
 br_file_struct br_vertex_F = { "br_vertex", BR_ASIZE(br_vertex_FM), br_vertex_FM, sizeof(br_vertex) };
 
 // GLOBAL: CARMA2_HW 0x006634d0
@@ -50,6 +51,7 @@ br_file_struct_member br_vertex_uv_FM[] = {
 
 // GLOBAL: CARMA2_HW 0x006634f0
 // GLOBAL: CARMA2_SW 0x0065dc88
+// GLOBAL: CARMA2_CHEAT 0x0066ada8
 br_file_struct br_vertex_uv_F = { "br_vertex_uv", BR_ASIZE(br_vertex_uv_FM), br_vertex_uv_FM, sizeof(br_vertex) };
 
 // GLOBAL: CARMA2_HW 0x00663500
@@ -78,6 +80,7 @@ br_file_struct_member br_face_FM[] = {
 
 // GLOBAL: CARMA2_HW 0x006635b0
 // GLOBAL: CARMA2_SW 0x0065dd48
+// GLOBAL: CARMA2_CHEAT 0x0066ae68
 br_file_struct br_face_F = { "br_face", BR_ASIZE(br_face_FM), br_face_FM, sizeof(br_face) };
 
 // GLOBAL: CARMA2_HW 0x006635c0
@@ -92,6 +95,7 @@ br_file_struct_member br_old_face_1_FM[] = {
 
 // GLOBAL: CARMA2_HW 0x00663610
 // GLOBAL: CARMA2_SW 0x0065dda8
+// GLOBAL: CARMA2_CHEAT 0x0066aec8
 br_file_struct br_old_face_1_F = { "br_old_face_1", BR_ASIZE(br_old_face_1_FM), br_old_face_1_FM, sizeof(br_face) };
 
 // GLOBAL: CARMA2_HW 0x00663620
@@ -106,6 +110,7 @@ br_file_struct_member br_old_face_FM[] = {
 
 // GLOBAL: CARMA2_HW 0x00663670
 // GLOBAL: CARMA2_SW 0x0065de08
+// GLOBAL: CARMA2_CHEAT 0x0066af28
 br_file_struct br_old_face_F ={ "br_old_face", BR_ASIZE(br_old_face_FM), br_old_face_FM, sizeof(br_face) };
 
 // GLOBAL: CARMA2_HW 0x00663680
@@ -117,6 +122,7 @@ br_file_struct_member br_model_FM[] = {
 
 // GLOBAL: CARMA2_HW 0x006636a0
 // GLOBAL: CARMA2_SW 0x0065de38
+// GLOBAL: CARMA2_CHEAT 0x0066af58
 br_file_struct br_model_F ={ "br_model", BR_ASIZE(br_model_FM), br_model_FM, sizeof(br_model) };
 
 
@@ -128,6 +134,7 @@ br_file_struct_member br_old_model_1_FM[] = {
 
 // GLOBAL: CARMA2_HW 0x006636c0
 // GLOBAL: CARMA2_SW 0x0065de58
+// GLOBAL: CARMA2_CHEAT 0x0066af78
 br_file_struct br_old_model_1_F = { "br_old_model_1", 1, br_old_model_1_FM, sizeof(br_model) };
 
 // GLOBAL: CARMA2_HW 0x006636d0
@@ -140,6 +147,7 @@ br_file_struct_member br_pivot_FM[] = {
 
 // GLOBAL: CARMA2_HW 0x00663700
 // GLOBAL: CARMA2_SW 0x0065de98
+// GLOBAL: CARMA2_CHEAT 0x0066afb8
 br_file_struct br_pivot_F = { "br_pivot", 3, br_pivot_FM, sizeof(br_model) };
 
 // GLOBAL: CARMA2_HW 0x00663710
@@ -162,6 +170,7 @@ br_file_struct_member br_material_old_FM[] = {
 
 // GLOBAL: CARMA2_HW 0x006637e0
 // GLOBAL: CARMA2_SW 0x0065df78
+// GLOBAL: CARMA2_CHEAT 0x0066b098
 br_file_struct br_material_old_F = { "br_material_old", BR_ASIZE(br_material_old_FM), br_material_old_FM, sizeof(br_material) };
 
 // GLOBAL: CARMA2_HW 0x006637f0
@@ -188,9 +197,11 @@ br_file_struct_member br_material_FM[] = {
 
 // GLOBAL: CARMA2_HW 0x00663900
 // GLOBAL: CARMA2_SW 0x0065e098
+// GLOBAL: CARMA2_CHEAT 0x0066b1b8
 br_file_struct br_material_F = { "br_material", BR_ASIZE(br_material_FM), br_material_FM, sizeof(br_material) };
 
 // GLOBAL: CARMA2_HW 0x00663910
+// GLOBAL: CARMA2_CHEAT 0x0066b1c8
 br_df_material_map_item MaterialMaps[] = {
     { CHUNKID_MATERIAL_COLOUR_MAP, offsetof(br_material, colour_map), 0 },
     { CHUNKID_MATERIAL_INDEX_BLEND, offsetof(br_material, index_blend), 1 },
@@ -243,6 +254,7 @@ br_file_struct_member br_actor_FM[] = {
 
 // GLOBAL: CARMA2_HW 0x00663a10
 // GLOBAL: CARMA2_SW 0x0065e1a8
+// GLOBAL: CARMA2_CHEAT 0x0066b2c8
 br_file_struct br_actor_F = { "br_actor", BR_ASIZE(br_actor_FM), br_actor_FM, sizeof(br_actor) };
 
 // GLOBAL: CARMA2_HW 0x00663a20
@@ -343,6 +355,7 @@ br_file_struct br_transform_translation_F = { "br_transform_translation", BR_ASI
 
 // GLOBAL: CARMA2_HW 0x00663c58
 // GLOBAL: CARMA2_SW 0x0065e3f0
+// GLOBAL: CARMA2_CHEAT 0x0066b510
 transform_type TransformTypes[] = {
     { CHUNKID_TRANSFORM_MAT34, &br_transform_matrix34_F },
     { CHUNKID_TRANSFORM_MAT34_LP, &br_transform_matrix34_F },
@@ -362,6 +375,7 @@ br_file_struct_member br_bounds3_FM[] = {
 
 // GLOBAL: CARMA2_HW 0x00663cb0
 // GLOBAL: CARMA2_SW 0x0065e448
+// GLOBAL: CARMA2_CHEAT 0x0066b568
 br_file_struct br_bounds3_F = { "br_bounds3", BR_ASIZE(br_bounds3_FM), br_bounds3_FM, sizeof(br_bounds3) };
 
 // GLOBAL: CARMA2_HW 0x00663cc0
@@ -372,6 +386,7 @@ br_file_struct_member br_plane_FM[] ={
 
 // GLOBAL: CARMA2_HW 0x00663cd0
 // GLOBAL: CARMA2_SW 0x0065e468
+// GLOBAL: CARMA2_CHEAT 0x0066b588
 br_file_struct br_plane_F = { "br_plane", BR_ASIZE(br_plane_FM), br_plane_FM, sizeof(br_vector4) };
 
 // GLOBAL: CARMA2_HW 0x00663ce0
@@ -408,6 +423,7 @@ br_file_struct_member br_light_FM[] = {
 
 // GLOBAL: CARMA2_HW 0x00663db8
 // GLOBAL: CARMA2_SW 0x0065e550
+// GLOBAL: CARMA2_CHEAT 0x0066b670
 br_file_struct br_light_F = { "br_light", BR_ASIZE(br_light_FM), br_light_FM, sizeof(br_light) };
 
 // GLOBAL: CARMA2_HW 0x00663dc8
@@ -434,10 +450,12 @@ br_file_struct_member br_camera_FM[] = {
 
 // GLOBAL: CARMA2_HW 0x00663e40
 // GLOBAL: CARMA2_SW 0x0065e5d8
+// GLOBAL: CARMA2_CHEAT 0x0066b6f8
 br_file_struct br_camera_F = { "br_camera", BR_ASIZE(br_camera_FM), br_camera_FM, sizeof(br_camera) };
 
 // GLOBAL: CARMA2_HW 0x00663e50
 // GLOBAL: CARMA2_SW 0x0065e5e8
+// GLOBAL: CARMA2_CHEAT 0x0066b708
 br_chunks_table_entry ModelLoadEntries[] = {
     { CHUNKID_END, 0u, FopRead_END },
     { CHUNKID_OLD_MATERIAL_INDEX, 0u, FopRead_OLD_MATERIAL_INDEX },
@@ -458,6 +476,7 @@ br_chunks_table_entry ModelLoadEntries[] = {
 
 // GLOBAL: CARMA2_HW 0x00663f08
 // GLOBAL: CARMA2_SW 0x0065e6a0
+// GLOBAL: CARMA2_CHEAT 0x0066b7c0
 br_chunks_table ModelLoadTable = { BR_ASIZE(ModelLoadEntries), ModelLoadEntries };
 
 // GLOBAL: CARMA2_HW 0x00663f10
@@ -492,6 +511,7 @@ br_chunks_table ActorLoadTable = { BR_ASIZE(ActorLoadEntries), ActorLoadEntries 
 
 // GLOBAL: CARMA2_HW 0x00664018
 // GLOBAL: CARMA2_SW 0x0065e7b0
+// GLOBAL: CARMA2_CHEAT 0x0066b8d0
 br_chunks_table_entry MaterialLoadEntries[] = {
     { CHUNKID_END, 0u, FopRead_END },
     { CHUNKID_MATERIAL_OLD, 0u, FopRead_MATERIAL_OLD },
@@ -505,6 +525,7 @@ br_chunks_table_entry MaterialLoadEntries[] = {
 
 // GLOBAL: CARMA2_HW 0x00664078
 // GLOBAL: CARMA2_SW 0x0065e810
+// GLOBAL: CARMA2_CHEAT 0x0066b930
 br_chunks_table MaterialLoadTable = { BR_ASIZE(MaterialLoadEntries), MaterialLoadEntries };
 
 int C2_HOOK_STDCALL FopWrite_VERTICES(br_datafile* df, br_vertex* vertices, int nvertices) {
@@ -517,6 +538,7 @@ int C2_HOOK_STDCALL FopWrite_VERTICES(br_datafile* df, br_vertex* vertices, int 
 
 // FUNCTION: CARMA2_HW 0x005232a0
 // FUNCTION: CARMA2_SW 0x0051e940
+// FUNCTION: CARMA2_CHEAT 0x00528e90
 int C2_HOOK_STDCALL FopRead_VERTICES(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     br_model* mp;
 
@@ -529,6 +551,7 @@ int C2_HOOK_STDCALL FopRead_VERTICES(br_datafile* df, br_uint_32 id, br_uint_32 
 
 // FUNCTION: CARMA2_HW 0x005232f0
 // FUNCTION: CARMA2_SW 0x0051e990
+// FUNCTION: CARMA2_CHEAT 0x00528ee0
 int C2_HOOK_STDCALL FopRead_OLD_VERTICES(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     void *ptr;
 
@@ -549,6 +572,7 @@ int C2_HOOK_STDCALL FopWrite_VERTEX_UV(br_datafile* df, br_vertex* vertices, int
 
 // FUNCTION: CARMA2_HW 0x00523350
 // FUNCTION: CARMA2_SW 0x0051e9f0
+// FUNCTION: CARMA2_CHEAT 0x00528f40
 int C2_HOOK_STDCALL FopRead_VERTEX_UV(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     br_model* mp;
 
@@ -562,6 +586,7 @@ int C2_HOOK_STDCALL FopRead_VERTEX_UV(br_datafile* df, br_uint_32 id, br_uint_32
 
 // FUNCTION: CARMA2_HW 0x005233a0
 // FUNCTION: CARMA2_SW 0x0051ea40
+// FUNCTION: CARMA2_CHEAT 0x00528f90
 int C2_HOOK_STDCALL FopRead_OLD_VERTICES_UV(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     void* ptr;
 
@@ -574,6 +599,7 @@ int C2_HOOK_STDCALL FopRead_OLD_VERTICES_UV(br_datafile* df, br_uint_32 id, br_u
 
 // FUNCTION: CARMA2_HW 0x00523400
 // FUNCTION: CARMA2_SW 0x0051eaa0
+// FUNCTION: CARMA2_CHEAT 0x00528ff0
 int C2_HOOK_STDCALL FopRead_MATERIAL_INDEX(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     char name[256];
     br_material** mip;
@@ -606,6 +632,7 @@ int C2_HOOK_STDCALL FopWrite_MATERIAL_INDEX(br_datafile* df, br_material** mater
 
 // FUNCTION: CARMA2_HW 0x00523490
 // FUNCTION: CARMA2_SW 0x0051eb30
+// FUNCTION: CARMA2_CHEAT 0x00529080
 int C2_HOOK_STDCALL FopRead_OLD_MATERIAL_INDEX(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     char* mblock;
     char* cp;
@@ -636,6 +663,7 @@ int C2_HOOK_STDCALL FopRead_OLD_MATERIAL_INDEX(br_datafile* df, br_uint_32 id, b
 
 // FUNCTION: CARMA2_HW 0x00523550
 // FUNCTION: CARMA2_SW 0x0051ebf0
+// FUNCTION: CARMA2_CHEAT 0x00529140
 int C2_HOOK_STDCALL FopRead_FACES(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     br_model* mp;
     int i;
@@ -666,6 +694,7 @@ int C2_HOOK_STDCALL FopWrite_FACES(br_datafile* df, br_face* faces, int nfaces) 
 
 // FUNCTION: CARMA2_HW 0x005235d0
 // FUNCTION: CARMA2_SW 0x0051ec70
+// FUNCTION: CARMA2_CHEAT 0x005291c0
 int C2_HOOK_STDCALL FopRead_OLD_FACES_1(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     br_model* mp;
     int i;
@@ -686,6 +715,7 @@ int C2_HOOK_STDCALL FopRead_OLD_FACES_1(br_datafile* df, br_uint_32 id, br_uint_
 
 // FUNCTION: CARMA2_HW 0x00523670
 // FUNCTION: CARMA2_SW 0x0051ed10
+// FUNCTION: CARMA2_CHEAT 0x00529260
 int C2_HOOK_STDCALL FopRead_OLD_FACES(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     br_face* fp;
     br_material** mip;
@@ -741,6 +771,7 @@ int C2_HOOK_STDCALL FopWrite_FACE_MATERIAL(br_datafile* df, br_face* faces, int 
 
 // FUNCTION: CARMA2_HW 0x00523750
 // FUNCTION: CARMA2_SW 0x0051edf0
+// FUNCTION: CARMA2_CHEAT 0x00529340
 int C2_HOOK_STDCALL FopRead_FACE_MATERIAL(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     br_material** mindex;
     int nmaterials;
@@ -775,6 +806,7 @@ int C2_HOOK_STDCALL FopRead_FACE_MATERIAL(br_datafile* df, br_uint_32 id, br_uin
 
 // FUNCTION: CARMA2_HW 0x00523810
 // FUNCTION: CARMA2_SW 0x0051eeb0
+// FUNCTION: CARMA2_CHEAT 0x00529400
 int C2_HOOK_STDCALL FopRead_MODEL(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     br_model* mp;
 
@@ -798,6 +830,7 @@ int C2_HOOK_STDCALL FopWrite_MODEL(br_datafile* df, br_model* mp) {
 
 // FUNCTION: CARMA2_HW 0x00523860
 // FUNCTION: CARMA2_SW 0x0051ef00
+// FUNCTION: CARMA2_CHEAT 0x00529450
 int C2_HOOK_STDCALL FopRead_OLD_MODEL_1(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     br_model* mp;
 
@@ -811,6 +844,7 @@ int C2_HOOK_STDCALL FopRead_OLD_MODEL_1(br_datafile* df, br_uint_32 id, br_uint_
 
 // FUNCTION: CARMA2_HW 0x005238a0
 // FUNCTION: CARMA2_SW 0x0051ef40
+// FUNCTION: CARMA2_CHEAT 0x00529490
 int C2_HOOK_STDCALL FopRead_OLD_MODEL(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     br_model* mp;
     int i;
@@ -832,6 +866,7 @@ int C2_HOOK_STDCALL FopRead_OLD_MODEL(br_datafile* df, br_uint_32 id, br_uint_32
 
 // FUNCTION: CARMA2_HW 0x00523930
 // FUNCTION: CARMA2_SW 0x0051efd0
+// FUNCTION: CARMA2_CHEAT 0x00529520
 int C2_HOOK_STDCALL FopRead_PIVOT(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     br_model* mp;
 
@@ -845,6 +880,7 @@ int C2_HOOK_STDCALL FopRead_PIVOT(br_datafile* df, br_uint_32 id, br_uint_32 len
 
 // FUNCTION: CARMA2_HW 0x00523970
 // FUNCTION: CARMA2_SW 0x0051f010
+// FUNCTION: CARMA2_CHEAT 0x00529560
 int C2_HOOK_STDCALL FopRead_MATERIAL_OLD(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     br_material* mp;
     mp = BrMaterialAllocate(NULL);
@@ -857,6 +893,7 @@ int C2_HOOK_STDCALL FopRead_MATERIAL_OLD(br_datafile* df, br_uint_32 id, br_uint
 
 // FUNCTION: CARMA2_HW 0x005239b0
 // FUNCTION: CARMA2_SW 0x0051f050
+// FUNCTION: CARMA2_CHEAT 0x005295a0
 int C2_HOOK_STDCALL FopRead_MATERIAL(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     br_material* mp;
 
@@ -877,6 +914,7 @@ int C2_HOOK_STDCALL FopWrite_MATERIAL(br_datafile* df, br_material* mp) {
 
 // FUNCTION: CARMA2_HW 0x005239f0
 // FUNCTION: CARMA2_SW 0x0051f090
+// FUNCTION: CARMA2_CHEAT 0x005295e0
 int C2_HOOK_STDCALL FopRead_PIXELMAP_REF(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     br_pixelmap* pm;
     char name[256];
@@ -921,6 +959,7 @@ int C2_HOOK_STDCALL FopWrite_ACTOR(br_datafile* df, br_actor* ap) {
 
 // FUNCTION: CARMA2_HW 0x00523a70
 // FUNCTION: CARMA2_SW 0x0051f110
+// FUNCTION: CARMA2_CHEAT 0x00529660
 int C2_HOOK_STDCALL FopRead_ACTOR(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     br_actor* ap;
 
@@ -942,6 +981,7 @@ int C2_HOOK_STDCALL FopWrite_ACTOR_MODEL(br_datafile* df, br_model* model) {
 
 // FUNCTION: CARMA2_HW 0x00523ac0
 // FUNCTION: CARMA2_SW 0x0051f160
+// FUNCTION: CARMA2_CHEAT 0x005296b0
 int C2_HOOK_STDCALL FopRead_ACTOR_MODEL(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     char name[256];
     br_actor* a;
@@ -960,6 +1000,7 @@ int C2_HOOK_STDCALL FopWrite_ACTOR_MATERIAL(br_datafile* df, br_material* materi
 
 // FUNCTION: CARMA2_HW 0x00523b00
 // FUNCTION: CARMA2_SW 0x0051f1a0
+// FUNCTION: CARMA2_CHEAT 0x005296f0
 int C2_HOOK_STDCALL FopRead_ACTOR_MATERIAL(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     char name[256];
     br_actor* a;
@@ -977,6 +1018,7 @@ int C2_HOOK_STDCALL FopWrite_ACTOR_TRANSFORM(br_datafile* df) {
 
 // FUNCTION: CARMA2_HW 0x00523b40
 // FUNCTION: CARMA2_SW 0x0051f1e0
+// FUNCTION: CARMA2_CHEAT 0x00529730
 int C2_HOOK_STDCALL FopRead_ACTOR_TRANSFORM(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     br_actor* a;
     br_transform* tp;
@@ -996,6 +1038,7 @@ int C2_HOOK_STDCALL FopWrite_ACTOR_LIGHT(br_datafile* df) {
 
 // FUNCTION: CARMA2_HW 0x00523b80
 // FUNCTION: CARMA2_SW 0x0051f220
+// FUNCTION: CARMA2_CHEAT 0x00529770
 int C2_HOOK_STDCALL FopRead_ACTOR_LIGHT(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     br_actor* a;
     br_light* lp;
@@ -1014,6 +1057,7 @@ int C2_HOOK_STDCALL FopWrite_ACTOR_CAMERA(br_datafile* df) {
 
 // FUNCTION: CARMA2_HW 0x00523ba0
 // FUNCTION: CARMA2_SW 0x0051f240
+// FUNCTION: CARMA2_CHEAT 0x00529790
 int C2_HOOK_STDCALL FopRead_ACTOR_CAMERA(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     br_actor* a;
     br_light* cp;
@@ -1032,6 +1076,7 @@ int C2_HOOK_STDCALL FopWrite_ACTOR_BOUNDS(br_datafile* df) {
 
 // FUNCTION: CARMA2_HW 0x00523bc0
 // FUNCTION: CARMA2_SW 0x0051f260
+// FUNCTION: CARMA2_CHEAT 0x005297b0
 int C2_HOOK_STDCALL FopRead_ACTOR_BOUNDS(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     br_actor* a;
     br_bounds* bp;
@@ -1050,6 +1095,7 @@ int C2_HOOK_STDCALL FopWrite_ACTOR_CLIP_PLANE(br_datafile* df) {
 
 // FUNCTION: CARMA2_HW 0x00523be0
 // FUNCTION: CARMA2_SW 0x0051f280
+// FUNCTION: CARMA2_CHEAT 0x005297d0
 int C2_HOOK_STDCALL FopRead_ACTOR_CLIP_PLANE(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     br_actor* a;
     br_vector4* vp;
@@ -1068,6 +1114,7 @@ int C2_HOOK_STDCALL FopWrite_ACTOR_ADD_CHILD(br_datafile* df) {
 
 // FUNCTION: CARMA2_HW 0x00523c00
 // FUNCTION: CARMA2_SW 0x0051f2a0
+// FUNCTION: CARMA2_CHEAT 0x005297f0
 int C2_HOOK_STDCALL FopRead_ACTOR_ADD_CHILD(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     br_actor* a;
     br_actor* p;
@@ -1095,6 +1142,7 @@ int C2_HOOK_STDCALL FopWrite_TRANSFORM(br_datafile* df, br_transform* t) {
 
 // FUNCTION: CARMA2_HW 0x00523c30
 // FUNCTION: CARMA2_SW 0x0051f2d0
+// FUNCTION: CARMA2_CHEAT 0x00529820
 int C2_HOOK_STDCALL FopRead_TRANSFORM(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     int t;
     br_transform* tp;
@@ -1129,6 +1177,7 @@ int C2_HOOK_STDCALL FopWrite_BOUNDS(br_datafile* df, br_bounds* bp) {
 
 // FUNCTION: CARMA2_HW 0x00523ca0
 // FUNCTION: CARMA2_SW 0x0051f340
+// FUNCTION: CARMA2_CHEAT 0x00529890
 int C2_HOOK_STDCALL FopRead_BOUNDS(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     br_bounds3* bp;
 
@@ -1149,6 +1198,7 @@ int C2_HOOK_STDCALL FopWrite_PLANE(br_datafile* df, br_vector4* pp) {
 
 // FUNCTION: CARMA2_HW 0x00523cf0
 // FUNCTION: CARMA2_SW 0x0051f390
+// FUNCTION: CARMA2_CHEAT 0x005298e0
 int C2_HOOK_STDCALL FopRead_PLANE(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     br_vector4* pp;
 
@@ -1169,6 +1219,7 @@ int C2_HOOK_STDCALL FopWrite_LIGHT(br_datafile* df, br_light* lp) {
 
 // FUNCTION: CARMA2_HW 0x00523d40
 // FUNCTION: CARMA2_SW 0x0051f3e0
+// FUNCTION: CARMA2_CHEAT 0x00529930
 int C2_HOOK_STDCALL FopRead_LIGHT(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     br_light* lp;
 
@@ -1189,6 +1240,7 @@ int C2_HOOK_STDCALL FopWrite_CAMERA(br_datafile* df, br_camera* cp) {
 
 // FUNCTION: CARMA2_HW 0x00523d90
 // FUNCTION: CARMA2_SW 0x0051f430
+// FUNCTION: CARMA2_CHEAT 0x00529980
 int C2_HOOK_STDCALL FopRead_CAMERA(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     br_camera* cp;
 
@@ -1202,6 +1254,7 @@ int C2_HOOK_STDCALL FopRead_CAMERA(br_datafile* df, br_uint_32 id, br_uint_32 le
 
 // FUNCTION: CARMA2_HW 0x00523de0
 // FUNCTION: CARMA2_SW 0x0051f480
+// FUNCTION: CARMA2_CHEAT 0x005299d0
 br_uint_32 C2_HOOK_CDECL BrModelLoadMany(char* filename, br_model** models, br_uint_16 num) {
     int count;
     int r;
@@ -1228,6 +1281,7 @@ br_uint_32 C2_HOOK_CDECL BrModelLoadMany(char* filename, br_model** models, br_u
 
 // FUNCTION: CARMA2_HW 0x00524310
 // FUNCTION: CARMA2_SW 0x0051f9b0
+// FUNCTION: CARMA2_CHEAT 0x00529f00
 int C2_HOOK_CDECL PtrCompare(void* a, void* b) {
 
     if (*(uintptr_t*)a > *(uintptr_t*)b) {
@@ -1238,6 +1292,7 @@ int C2_HOOK_CDECL PtrCompare(void* a, void* b) {
 
 // FUNCTION: CARMA2_HW 0x00523ee0
 // FUNCTION: CARMA2_SW 0x0051f580
+// FUNCTION: CARMA2_CHEAT 0x00529ad0
 br_uint_32 C2_HOOK_CDECL WriteModel(br_model* mp, br_datafile* df) {
     br_material** mindex;
     int nmaterials;
@@ -1297,6 +1352,7 @@ br_uint_32 C2_HOOK_CDECL WriteModel(br_model* mp, br_datafile* df) {
 
 // FUNCTION: CARMA2_HW 0x00523e50
 // FUNCTION: CARMA2_SW 0x00520000
+// FUNCTION: CARMA2_CHEAT 0x00529a40
 br_uint_32 C2_HOOK_CDECL BrModelSaveMany(char* filename, br_model** models, br_uint_16 num) {
     br_datafile* df;
     int i;
@@ -1307,14 +1363,14 @@ br_uint_32 C2_HOOK_CDECL BrModelSaveMany(char* filename, br_model** models, br_u
         return 0;
     }
     FopWrite_FILE_INFO(df, FILE_TYPE_MODEL);
-    if (models == NULL) {
-        BrModelEnum(NULL, (br_model_enum_cbfn*)&WriteModel, df);
-        m = BrModelCount(NULL);
-    } else {
+    if (models != NULL) {
         for (i = 0; i < num; i++) {
             WriteModel(models[i], df);
         }
         m = num;
+    } else {
+        BrModelEnum(NULL, (br_model_enum_cbfn*)&WriteModel, df);
+        m = BrModelCount(NULL);
     }
     DfClose(df);
     return m;
@@ -1322,6 +1378,7 @@ br_uint_32 C2_HOOK_CDECL BrModelSaveMany(char* filename, br_model** models, br_u
 
 // FUNCTION: CARMA2_HW 0x00524330
 // FUNCTION: CARMA2_SW 0x0051f9d0
+// FUNCTION: CARMA2_CHEAT 0x00529f20
 br_uint_32 C2_HOOK_CDECL BrActorLoadMany(char* filename, br_actor** actors, br_uint_16 num) {
     br_datafile* df;
     int count;
@@ -1349,6 +1406,7 @@ br_uint_32 C2_HOOK_CDECL BrActorLoadMany(char* filename, br_actor** actors, br_u
 
 // FUNCTION: CARMA2_HW 0x00524400
 // FUNCTION: CARMA2_SW 0x0051faa0
+// FUNCTION: CARMA2_CHEAT 0x00529ff0
 int C2_HOOK_STDCALL WriteActor(br_actor* a, br_datafile* df) {
     br_actor* ap;
     br_actor* last_ap;
@@ -1404,6 +1462,7 @@ int C2_HOOK_STDCALL WriteActor(br_actor* a, br_datafile* df) {
 
 // FUNCTION: CARMA2_HW 0x005243a0
 // FUNCTION: CARMA2_SW 0x0051fa40
+// FUNCTION: CARMA2_CHEAT 0x00529f90
 br_uint_32 C2_HOOK_CDECL BrActorSaveMany(char* filename, br_actor** actors, br_uint_16 num) {
     br_datafile* df;
     int i;
@@ -1423,6 +1482,7 @@ br_uint_32 C2_HOOK_CDECL BrActorSaveMany(char* filename, br_actor** actors, br_u
 
 // FUNCTION: CARMA2_HW 0x00524600
 // FUNCTION: CARMA2_SW 0x0051fca0
+// FUNCTION: CARMA2_CHEAT 0x0052a1f0
 br_uint_32 C2_HOOK_CDECL BrMaterialLoadMany(char* filename, br_material** materials, br_uint_16 num) {
     br_datafile* df;
     int count;
@@ -1449,6 +1509,7 @@ br_uint_32 C2_HOOK_CDECL BrMaterialLoadMany(char* filename, br_material** materi
 
 // FUNCTION: CARMA2_HW 0x005247f0
 // FUNCTION: CARMA2_SW 0x0051fe90
+// FUNCTION: CARMA2_CHEAT 0x0052a3e0
 br_uint_32 C2_HOOK_CDECL WriteMaterial(br_material* mp, void* df) {
 
     FopWrite_MATERIAL(df, mp);
@@ -1473,6 +1534,7 @@ br_uint_32 C2_HOOK_CDECL WriteMaterial(br_material* mp, void* df) {
 
 // FUNCTION: CARMA2_HW 0x00524670
 // FUNCTION: CARMA2_SW 0x0051fd10
+// FUNCTION: CARMA2_CHEAT 0x0052a260
 br_uint_32 C2_HOOK_CDECL BrMaterialSaveMany(char* filename, br_material** materials, br_uint_16 num) {
     br_datafile* df;
     int i;
@@ -1502,6 +1564,7 @@ br_uint_32 C2_HOOK_CDECL BrMaterialSaveMany(char* filename, br_material** materi
 
 // FUNCTION: CARMA2_HW 0x005248e0
 // FUNCTION: CARMA2_SW 0x0051ff80
+// FUNCTION: CARMA2_CHEAT 0x0052a4d0
 br_model* C2_HOOK_CDECL BrModelLoad(char* filename) {
     br_model* ptr;
 
@@ -1513,6 +1576,7 @@ br_model* C2_HOOK_CDECL BrModelLoad(char* filename) {
 
 // FUNCTION: CARMA2_HW 0x00524960
 // FUNCTION: CARMA2_SW 0x0051f4f0
+// FUNCTION: CARMA2_CHEAT 0x0052a550
 br_uint_32 C2_HOOK_CDECL BrModelSave(char* filename, br_model* ptr) {
 
     return BrModelSaveMany(filename, &ptr, 1);
@@ -1520,6 +1584,7 @@ br_uint_32 C2_HOOK_CDECL BrModelSave(char* filename, br_model* ptr) {
 
 // FUNCTION: CARMA2_HW 0x005249e0
 // FUNCTION: CARMA2_SW 0x00520080
+// FUNCTION: CARMA2_CHEAT 0x0052a5d0
 br_material* C2_HOOK_CDECL BrMaterialLoad(char* filename) {
     br_material* ptr;
 
@@ -1531,6 +1596,7 @@ br_material* C2_HOOK_CDECL BrMaterialLoad(char* filename) {
 
 // FUNCTION: CARMA2_HW 0x00524a60
 // FUNCTION: CARMA2_SW 0x00520100
+// FUNCTION: CARMA2_CHEAT 0x0052a650
 br_uint_32 C2_HOOK_CDECL BrMaterialSave(char* filename, br_material* ptr) {
 
     return BrMaterialSaveMany(filename, &ptr, 1);
@@ -1538,6 +1604,7 @@ br_uint_32 C2_HOOK_CDECL BrMaterialSave(char* filename, br_material* ptr) {
 
 // FUNCTION: CARMA2_HW 0x00524be0
 // FUNCTION: CARMA2_SW 0x00520280
+// FUNCTION: CARMA2_CHEAT 0x0052a7d0
 br_actor* C2_HOOK_CDECL BrActorLoad(char* filename) {
     br_actor* ptr;
 
@@ -1550,6 +1617,7 @@ br_actor* C2_HOOK_CDECL BrActorLoad(char* filename) {
 
 // FUNCTION: CARMA2_HW 0x00524c60
 // FUNCTION: CARMA2_SW 0x00520300
+// FUNCTION: CARMA2_CHEAT 0x0052a850
 br_uint_32 C2_HOOK_CDECL BrActorSave(char* filename, br_actor* ptr) {
 
     return BrActorSaveMany(filename, &ptr, 1);
@@ -1557,6 +1625,7 @@ br_uint_32 C2_HOOK_CDECL BrActorSave(char* filename, br_actor* ptr) {
 
 // FUNCTION: CARMA2_HW 0x00524cb0
 // FUNCTION: CARMA2_SW 0x00520350
+// FUNCTION: CARMA2_CHEAT 0x0052a8a0
 br_error C2_HOOK_CDECL BrModelFileCount(char* filename, br_uint_16* num) {
     br_datafile* df;
 
@@ -1585,6 +1654,7 @@ br_error C2_HOOK_CDECL BrModelFileCount(char* filename, br_uint_16* num) {
 
 // FUNCTION: CARMA2_HW 0x00524d30
 // FUNCTION: CARMA2_SW 0x005203d0
+// FUNCTION: CARMA2_CHEAT 0x0052a920
 br_error C2_HOOK_CDECL BrActorFileCount(char* filename, br_uint_16* num) {
     br_datafile* df;
 
@@ -1613,6 +1683,7 @@ br_error C2_HOOK_CDECL BrActorFileCount(char* filename, br_uint_16* num) {
 
 // FUNCTION: CARMA2_HW 0x00524db0
 // FUNCTION: CARMA2_SW 0x00520450
+// FUNCTION: CARMA2_CHEAT 0x0052a9a0
 br_error C2_HOOK_CDECL BrMaterialFileCount(char* filename, br_uint_16* num) {
     br_datafile* df;
 

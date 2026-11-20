@@ -17,6 +17,7 @@
 // Global variables
 
 // GLOBAL: CARMA2_HW 0x0066fdc0
+// GLOBAL: CARMA2_CHEAT 0x00677670
 br_filesystem BrStdioFilesystem = {
     "Standard IO",
     BrStdioAttributes,
@@ -35,15 +36,18 @@ br_filesystem BrStdioFilesystem = {
 
 // GLOBAL: CARMA2_HW 0x0066fdf4
 // GLOBAL: CARMA2_SW 0x0066a584
+// GLOBAL: CARMA2_CHEAT 0x006776a4
 br_filesystem* _BrDefaultFilesystem = &BrStdioFilesystem;
 
 // FUNCTION: CARMA2_HW 0x0053f660
+// FUNCTION: CARMA2_CHEAT 0x00545250
 br_uint_32 C2_HOOK_CDECL BrStdioAttributes(void) {
     return BR_FS_ATTR_READABLE | BR_FS_ATTR_WRITEABLE | BR_FS_ATTR_HAS_TEXT | BR_FS_ATTR_HAS_BINARY | BR_FS_ATTR_HAS_ADVANCE;
 }
 
 // FUNCTION: CARMA2_HW 0x0053f670
 // FUNCTION: CARMA2_SW 0x0053ad10
+// FUNCTION: CARMA2_CHEAT 0x00545260
 void* C2_HOOK_CDECL BrStdioOpenRead(const char* name, br_size_t n_magics, br_mode_test_cbfn* identify, int* mode_result) {
     FILE* fh;
     br_uint_8 magics[16];
@@ -119,6 +123,7 @@ void* C2_HOOK_CDECL BrStdioOpenRead(const char* name, br_size_t n_magics, br_mod
 
 // FUNCTION: CARMA2_HW 0x0053f8a0
 // FUNCTION: CARMA2_SW 0x0053af40
+// FUNCTION: CARMA2_CHEAT 0x00545490
 void* C2_HOOK_CDECL BrStdioOpenWrite(const char* name, int mode) {
     FILE* fh;
 
@@ -128,28 +133,33 @@ void* C2_HOOK_CDECL BrStdioOpenWrite(const char* name, int mode) {
 }
 
 // FUNCTION: CARMA2_HW 0x0053f8d0
+// FUNCTION: CARMA2_CHEAT 0x005454c0
 void C2_HOOK_CDECL BrStdioClose(void* f) {
 
     fclose(f);
 }
 
 // FUNCTION: CARMA2_HW 0x0053f8e0
+// FUNCTION: CARMA2_CHEAT 0x005454d0
 int C2_HOOK_CDECL BrStdioEof(void* f) {
     return feof((FILE*)f);
 }
 
 // FUNCTION: CARMA2_HW 0x0053f8f0
+// FUNCTION: CARMA2_CHEAT 0x005454e0
 int C2_HOOK_CDECL BrStdioGetChar(void* f) {
 
     return getc((FILE *)f);
 }
 
 // FUNCTION: CARMA2_HW 0x0053f920
+// FUNCTION: CARMA2_CHEAT 0x00545510
 void C2_HOOK_CDECL BrStdioPutChar(int c, void* f) {
     fputc(c, f);
 }
 
 // FUNCTION: CARMA2_HW 0x0053f940
+// FUNCTION: CARMA2_CHEAT 0x00545530
 br_size_t C2_HOOK_CDECL BrStdioRead(void* buf, br_size_t size, unsigned int n, void* f) {
     int i;
 
@@ -159,6 +169,7 @@ br_size_t C2_HOOK_CDECL BrStdioRead(void* buf, br_size_t size, unsigned int n, v
 
 // FUNCTION: CARMA2_HW 0x0053f960
 // FUNCTION: CARMA2_SW 0x0053b000
+// FUNCTION: CARMA2_CHEAT 0x00545550
 br_size_t C2_HOOK_CDECL BrStdioWrite(const void* buf, br_size_t size, unsigned int n, void* f) {
 
     return fwrite(buf, size, n, f);
@@ -166,6 +177,7 @@ br_size_t C2_HOOK_CDECL BrStdioWrite(const void* buf, br_size_t size, unsigned i
 
 // FUNCTION: CARMA2_HW 0x0053f980
 // FUNCTION: CARMA2_SW 0x0053b020
+// FUNCTION: CARMA2_CHEAT 0x00545570
 br_size_t C2_HOOK_CDECL BrStdioGetLine(char* buf, br_size_t buf_len, void* f) {
     br_size_t l;
 
@@ -184,6 +196,7 @@ br_size_t C2_HOOK_CDECL BrStdioGetLine(char* buf, br_size_t buf_len, void* f) {
 
 // FUNCTION: CARMA2_HW 0x0053f9c0
 // FUNCTION: CARMA2_SW 0x0053b060
+// FUNCTION: CARMA2_CHEAT 0x005455b0
 void C2_HOOK_CDECL BrStdioPutLine(char* buf, void* f) {
 
     fputs(buf, f);
@@ -192,6 +205,7 @@ void C2_HOOK_CDECL BrStdioPutLine(char* buf, void* f) {
 
 // FUNCTION: CARMA2_HW 0x0053f9e0
 // FUNCTION: CARMA2_SW 0x0053b080
+// FUNCTION: CARMA2_CHEAT 0x005455d0
 void C2_HOOK_CDECL BrStdioAdvance(br_size_t count, void* f) {
     fseek(f, count, SEEK_CUR);
 }

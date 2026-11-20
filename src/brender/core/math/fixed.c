@@ -244,6 +244,7 @@ br_fixed_ls C2_HOOK_CDECL BrFixedAbs(br_fixed_ls a) {
 }
 
 // FUNCTION: CARMA2_HW 0x00537120
+// FUNCTION: CARMA2_CHEAT 0x0053cd10
 br_fixed_ls C2_HOOK_FASTCALL BrFixedMul(br_fixed_ls a, br_fixed_ls b) {
 
     return ((br_int_64)a * (br_int_64)b) >> 16;

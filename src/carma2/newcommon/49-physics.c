@@ -32,42 +32,52 @@
 
 // GLOBAL: CARMA2_HW 0x00692dc8
 // GLOBAL: CARMA2_SW 0x0068ce20
+// GLOBAL: CARMA2_CHEAT 0x0069a940
 int gINT_00692dc8;
 
 // GLOBAL: CARMA2_HW 0x006940c0
 // GLOBAL: CARMA2_SW 0x0068e118
+// GLOBAL: CARMA2_CHEAT 0x0069bc38
 tPhysicsError_cbfn* gPhysics_error_cb;
 
 // GLOBAL: CARMA2_HW 0x00744818
 // GLOBAL: CARMA2_SW 0x0073b2d8
+// GLOBAL: CARMA2_CHEAT 0x0074beb8
 void* gPhysics_buffer1_ptr;
 
 // GLOBAL: CARMA2_HW 0x00744814
 // GLOBAL: CARMA2_SW 0x0073b2d4
+// GLOBAL: CARMA2_CHEAT 0x0074beb4
 void* gPhysics_buffer2_ptr;
 
 // GLOBAL: CARMA2_HW 0x0074480c
 // GLOBAL: CARMA2_SW 0x0073b2cc
+// GLOBAL: CARMA2_CHEAT 0x0074beac
 int gTotal_count_smash_peds;
 
 // GLOBAL: CARMA2_HW 0x00744810
 // GLOBAL: CARMA2_SW 0x0073b2d0
+// GLOBAL: CARMA2_CHEAT 0x0074beb0
 int gImmortal_peds;
 
 // GLOBAL: CARMA2_HW 0x00744804
 // GLOBAL: CARMA2_SW 0x0073b2c4
+// GLOBAL: CARMA2_CHEAT 0x0074bea4
 int gBOOL_00744804;
 
 // GLOBAL: CARMA2_HW 0x00744800
 // GLOBAL: CARMA2_SW 0x0073b2c0
+// GLOBAL: CARMA2_CHEAT 0x0074bea0
 float gPed_head_scale;
 
 // GLOBAL: CARMA2_HW 0x00744808
 // GLOBAL: CARMA2_SW 0x0073b2c8
+// GLOBAL: CARMA2_CHEAT 0x0074bea8
 tPedestrian* gPedestrian_array;
 
 // GLOBAL: CARMA2_HW 0x0074a5e0
 // GLOBAL: CARMA2_SW 0x007410a0
+// GLOBAL: CARMA2_CHEAT 0x00751c80
 void* gPhysics_buffer3_ptr;
 
 // GLOBAL: CARMA2_HW 0x0074a5e4
@@ -80,38 +90,47 @@ int gPHIL_munging_objects;
 
 // GLOBAL: CARMA2_HW 0x006940c8
 // GLOBAL: CARMA2_SW 0x0068e120
+// GLOBAL: CARMA2_CHEAT 0x0069bc40
 int gPhysics_other_buffer_capacity;
 
 // GLOBAL: CARMA2_HW 0x00694140
 // GLOBAL: CARMA2_SW 0x0068e198
+// GLOBAL: CARMA2_CHEAT 0x0069bcb8
 tProximity_ray gProximity_rays[20];
 
 // GLOBAL: CARMA2_HW 0x00694274
 // GLOBAL: CARMA2_SW 0x0068e2cc
+// GLOBAL: CARMA2_CHEAT 0x0069bdec
 tPed_giblet_size_spec* gGiblet_sizes;
 
 // GLOBAL: CARMA2_HW 0x00694278
 // GLOBAL: CARMA2_SW 0x0068e2d0
+// GLOBAL: CARMA2_CHEAT 0x0069bdf0
 br_model* gPed_spurt_model;
 
 // GLOBAL: CARMA2_HW 0x0069427c
 // GLOBAL: CARMA2_SW 0x0068e2d4
+// GLOBAL: CARMA2_CHEAT 0x0069bdf4
 int gPed_spurty_lumps_count;
 
 // GLOBAL: CARMA2_HW 0x00694268
 // GLOBAL: CARMA2_SW 0x0068e2c0
+// GLOBAL: CARMA2_CHEAT 0x0069bde0
 int gPed_times[3];
 
 // GLOBAL: CARMA2_HW 0x00694280
 // GLOBAL: CARMA2_SW 0x0068e2d8
+// GLOBAL: CARMA2_CHEAT 0x0069bdf8
 br_actor* gPed_limbed_actors[30];
 
 // GLOBAL: CARMA2_HW 0x006942f8
 // GLOBAL: CARMA2_SW 0x0068e350
+// GLOBAL: CARMA2_CHEAT 0x0069be70
 tShrapnel_time_info gPed_spurt_min_max_time;
 
 // GLOBAL: CARMA2_HW 0x006940c4
 // GLOBAL: CARMA2_SW 0x0068e11c
+// GLOBAL: CARMA2_CHEAT 0x0069bc3c
 void* gPhysics_other_buffer;
 
 // GLOBAL: CARMA2_HW 0x006940bc
@@ -120,10 +139,12 @@ void* gPhysics_scratch_ptr;
 
 // GLOBAL: CARMA2_HW 0x006940b0
 // GLOBAL: CARMA2_SW 0x0068e108
+// GLOBAL: CARMA2_CHEAT 0x0069bc28
 int gFace_count;
 
 // GLOBAL: CARMA2_HW 0x0065cf78
 // GLOBAL: CARMA2_SW 0x006578b0
+// GLOBAL: CARMA2_CHEAT 0x00664570
 tWorld_callbacks gWorld_callbacks = {
     ProcessForcesCallback,
     ProcessJointForcesCallBack,
@@ -139,6 +160,7 @@ tWorld_callbacks gWorld_callbacks = {
 
 // FUNCTION: CARMA2_HW 0x004225b0
 // FUNCTION: CARMA2_SW 0x00422630
+// FUNCTION: CARMA2_CHEAT 0x00422800
 void C2_HOOK_FASTCALL DrMatrix34ApplyLPInverse(br_vector3* dest, const br_vector3* source, const br_matrix34* matrix) {
     br_vector3 relative;
 
@@ -213,6 +235,7 @@ tFace_ref* C2_HOOK_FASTCALL RayCastThruFaceList(br_vector3* pPosition, br_vector
 
 // FUNCTION: CARMA2_HW 0x004226d0
 // FUNCTION: CARMA2_SW 0x00422750
+// FUNCTION: CARMA2_CHEAT 0x00422920
 tFace_ref* C2_HOOK_FASTCALL RayCastThruFaceList2(br_vector3* pPosition, br_vector3* pDirection, br_vector3* pNormal, br_scalar* pT, br_vector3* pCollision_position, tFace_ref* pFaces, int pCount) {
     br_vector3 normal;
     br_vector3 collision_position;
@@ -367,6 +390,7 @@ int C2_HOOK_FASTCALL TestObjectOverlap(tPhysics_object* pCollision_1, tPhysics_o
 
 // FUNCTION: CARMA2_HW 0x00428dc0
 // FUNCTION: CARMA2_SW 0x00428e50
+// FUNCTION: CARMA2_CHEAT 0x00428f50
 int C2_HOOK_FASTCALL TestShapeEdgeIntersection(tPhysics_object* pCollision_info_1, tPhysics_object* pCollision_info_2, tPhysics_shape* pCollision_shape_1, tPhysics_shape* pCollision_shape_2) {
     br_vector3 points[64];
     br_vector3 transformed;
@@ -441,6 +465,7 @@ int C2_HOOK_FASTCALL TestShapeEdgeIntersection(tPhysics_object* pCollision_info_
 
 // STUB: CARMA2_HW 0x00429070
 // STUB: CARMA2_SW 0x00429100
+// STUB: CARMA2_CHEAT 0x00429200
 int C2_HOOK_FASTCALL TestForObjectInSensiblePlace(tPhysics_object* pCollision_info_1, tPhysics_object* pCollision_info_2, br_vector3* pVec3, tWorld_callbacks* pCar_callbacks) {
     NOT_IMPLEMENTED();
 }
@@ -572,6 +597,7 @@ void C2_HOOK_FASTCALL PositionWorldJointedObject(tPhysics_object* pObject, br_sc
 
 // STUB: CARMA2_HW 0x004b9750
 // STUB: CARMA2_SW 0x004b5e70
+// STUB: CARMA2_CHEAT 0x004bf280
 void C2_HOOK_FASTCALL TellPhysicsJointsHaveChanged(tPhysics_object* pCollision_info) {
     NOT_IMPLEMENTED();
 }
@@ -623,6 +649,7 @@ void C2_HOOK_FASTCALL WriteNewPositions(tPhysics_object* pObject) {
 
 // FUNCTION: CARMA2_HW 0x004b9eb0
 // FUNCTION: CARMA2_SW 0x004b65d0
+// FUNCTION: CARMA2_CHEAT 0x004bf9e0
 void C2_HOOK_FASTCALL SetListDoingNothingFlag(tPhysics_object* pObject, int pFlag) {
     while (pObject != NULL) {
         pObject->disable_move_rotate = pFlag;
@@ -638,6 +665,7 @@ void C2_HOOK_FASTCALL SetListDoingNothingFlag(tPhysics_object* pObject, int pFla
 
 // FUNCTION: CARMA2_HW 0x004b9ef0
 // FUNCTION: CARMA2_SW 0x004b6610
+// FUNCTION: CARMA2_CHEAT 0x004bfa20
 void C2_HOOK_FASTCALL SetHierarchyDoingNothingFlag(tPhysics_object* pObject, int pFlag) {
     pObject->disable_move_rotate = pFlag;
     pObject->field_0x1df = 0;
@@ -714,6 +742,7 @@ void C2_HOOK_FASTCALL SetObjectTrialPositionType(tPhysics_object* pObject, int p
 
 // FUNCTION: CARMA2_HW 0x004ba4f0
 // FUNCTION: CARMA2_SW 0x004b6c10
+// FUNCTION: CARMA2_CHEAT 0x004c0020
 int C2_HOOK_FASTCALL FlagsAreGo(tPhysics_object* pCollision_1, tPhysics_object* pCollision_2) {
     int blocked;
 
@@ -742,6 +771,7 @@ int C2_HOOK_FASTCALL FlagsAreGo(tPhysics_object* pCollision_1, tPhysics_object* 
 
 // FUNCTION: CARMA2_HW 0x004ba550
 // FUNCTION: CARMA2_SW 0x004b6c70
+// FUNCTION: CARMA2_CHEAT 0x004c0080
 int C2_HOOK_FASTCALL ReduceEffectOfForces(tPhysics_joint_force* pForces, br_scalar* pImpulses, int pCount, const int* pIndices, int pIndex_count, br_scalar pThreshold) {
     int i;
     br_scalar total;
@@ -965,6 +995,7 @@ void C2_HOOK_FASTCALL SetGravityDeltaV(tPhysics_object* pObject, br_vector3* pIm
 
 // FUNCTION: CARMA2_HW 0x004c2b20
 // FUNCTION: CARMA2_SW 0x004bf250
+// FUNCTION: CARMA2_CHEAT 0x004c8640
 void C2_HOOK_FASTCALL InternalPositionChildren(tPhysics_object* pParent, tPhysics_object* pRoot) {
     tPhysics_object* child;
     br_vector3 parent_point;
@@ -991,6 +1022,7 @@ void C2_HOOK_FASTCALL InternalPositionChildren(tPhysics_object* pParent, tPhysic
 
 // FUNCTION: CARMA2_HW 0x004c2b10
 // FUNCTION: CARMA2_SW 0x004bf240
+// FUNCTION: CARMA2_CHEAT 0x004c8630
 void C2_HOOK_FASTCALL PositionChildren(tPhysics_object* pCollision_info) {
 
     InternalPositionChildren(pCollision_info, pCollision_info);
@@ -1227,6 +1259,7 @@ void C2_HOOK_FASTCALL ClearPhysicsScratchSpace(void) {
 
 // FUNCTION: CARMA2_HW 0x004c5d10
 // FUNCTION: CARMA2_SW 0x004c2440
+// FUNCTION: CARMA2_CHEAT 0x004cb830
 tCollision_shape_sphere* C2_HOOK_FASTCALL AllocateShapeSphere(int pType) {
     tCollision_shape_sphere* result;
 
@@ -1237,6 +1270,7 @@ tCollision_shape_sphere* C2_HOOK_FASTCALL AllocateShapeSphere(int pType) {
 
 // FUNCTION: CARMA2_HW 0x004c5d70
 // FUNCTION: CARMA2_SW 0x004c24a0
+// FUNCTION: CARMA2_CHEAT 0x004cb890
 tCollision_shape_polyhedron* C2_HOOK_FASTCALL AllocateShapePolyhedron(int pCount_points, int pType) {
     tCollision_shape_polyhedron* result;
     tU8* raw_memory;
@@ -1276,6 +1310,7 @@ tCollision_shape_wireframe* C2_HOOK_FASTCALL AllocateShapeWireFrame(int pCount_p
 }
 
 // FUNCTION: CARMA2_HW 0x004c5e00
+// FUNCTION: CARMA2_CHEAT 0x004cb920
 tCollision_shape_box* C2_HOOK_FASTCALL AllocateShapeBox(int pType) {
     tCollision_shape_box* result;
 
@@ -1288,6 +1323,7 @@ tCollision_shape_box* C2_HOOK_FASTCALL AllocateShapeBox(int pType) {
 
 // FUNCTION: CARMA2_HW 0x004c5e20
 // FUNCTION: CARMA2_SW 0x004c2550
+// FUNCTION: CARMA2_CHEAT 0x004cb940
 tPhysics_joint* C2_HOOK_FASTCALL AllocatePhysicsJoint(int pCount_limits, int pType) {
     return BrMemAllocate(offsetof(tPhysics_joint, limits) + pCount_limits * sizeof(tPhysics_joint_limit), (br_uint_8)pType);
 }
@@ -1305,12 +1341,14 @@ tPhysics_joint* C2_HOOK_FASTCALL ClonePhysicsJoint(const tPhysics_joint* pJoint,
 
 // FUNCTION: CARMA2_HW 0x004c5e70
 // FUNCTION: CARMA2_SW 0x004c25a0
+// FUNCTION: CARMA2_CHEAT 0x004cb990
 void C2_HOOK_FASTCALL FreeShape(void* pData) {
     BrMemFree(pData);
 }
 
 // FUNCTION: CARMA2_HW 0x004c5e80
 // FUNCTION: CARMA2_SW 0x004c25b0
+// FUNCTION: CARMA2_CHEAT 0x004cb9a0
 void C2_HOOK_FASTCALL FreeShapeList(tPhysics_shape *pShape) {
 
     if (pShape->common.next != NULL) {
@@ -1321,6 +1359,7 @@ void C2_HOOK_FASTCALL FreeShapeList(tPhysics_shape *pShape) {
 
 // FUNCTION: CARMA2_HW 0x004c5ea0
 // FUNCTION: CARMA2_SW 0x004c25d0
+// FUNCTION: CARMA2_CHEAT 0x004cb9c0
 void C2_HOOK_FASTCALL FreePhysicsJoint(tPhysics_joint* pJoint) {
 
     BrMemFree(pJoint);
@@ -1328,6 +1367,7 @@ void C2_HOOK_FASTCALL FreePhysicsJoint(tPhysics_joint* pJoint) {
 
 // FUNCTION: CARMA2_HW 0x004c5eb0
 // FUNCTION: CARMA2_SW 0x004c25e0
+// FUNCTION: CARMA2_CHEAT 0x004cb9d0
 void C2_HOOK_FASTCALL GetBoundsFromPointList(const br_vector3* pVertices, int pCount_vertices, br_bounds3* pBounds) {
     int i;
 
@@ -1348,6 +1388,7 @@ void C2_HOOK_FASTCALL GetBoundsFromPointList(const br_vector3* pVertices, int pC
 
 // FUNCTION: CARMA2_HW 0x004c5f20
 // FUNCTION: CARMA2_SW 0x004c2650
+// FUNCTION: CARMA2_CHEAT 0x004cba40
 void C2_HOOK_FASTCALL FillInShape(tPhysics_shape* pShape) {
     int i;
     tPhysicsError error;
@@ -1404,12 +1445,14 @@ void C2_HOOK_FASTCALL FillInShape(tPhysics_shape* pShape) {
 
 // STUB: CARMA2_HW 0x004c60a0
 // STUB: CARMA2_SW 0x004c27d0
+// STUB: CARMA2_CHEAT 0x004cbbc0
 void C2_HOOK_FASTCALL UpdateCollisionObject(tPhysics_object* pCollision_info) {
     NOT_IMPLEMENTED();
 }
 
 // FUNCTION: CARMA2_HW 0x004c61c0
 // FUNCTION: CARMA2_SW 0x004c28f0
+// FUNCTION: CARMA2_CHEAT 0x004cbce0
 void C2_NORETURN C2_HOOK_FASTCALL PhysicsError(tPhysicsError pError, const char* pMessage) {
 
     if (gPhysics_error_cb != NULL) {
@@ -1420,12 +1463,14 @@ void C2_NORETURN C2_HOOK_FASTCALL PhysicsError(tPhysicsError pError, const char*
 
 // FUNCTION: CARMA2_HW 0x004c61e0
 // FUNCTION: CARMA2_SW 0x004c2910
+// FUNCTION: CARMA2_CHEAT 0x004cbd00
 void C2_HOOK_FASTCALL PhysicsWarning(const char* pMessage) {
     (void)pMessage;
 }
 
 // FUNCTION: CARMA2_HW 0x004c61f0
 // FUNCTION: CARMA2_SW 0x004c2920
+// FUNCTION: CARMA2_CHEAT 0x004cbd10
 void C2_HOOK_FASTCALL PhysicsSetErrorHandler(tPhysicsError_cbfn* pError_cbfn) {
 
     gPhysics_error_cb = pError_cbfn;
@@ -1433,6 +1478,7 @@ void C2_HOOK_FASTCALL PhysicsSetErrorHandler(tPhysicsError_cbfn* pError_cbfn) {
 
 // FUNCTION: CARMA2_HW 0x004c62e0
 // FUNCTION: CARMA2_SW 0x004c2a10
+// FUNCTION: CARMA2_CHEAT 0x004cbe00
 void C2_HOOK_FASTCALL RepositionAndOrientateChildren(tPhysics_object* pObject, br_matrix34* pParent_matrix) {
     br_matrix34 inverse;
     br_matrix34 parent_matrix;
@@ -1460,6 +1506,7 @@ void C2_HOOK_FASTCALL RepositionAndOrientateChildren(tPhysics_object* pObject, b
 
 // FUNCTION: CARMA2_HW 0x004c63b0
 // FUNCTION: CARMA2_SW 0x004c2ae0
+// FUNCTION: CARMA2_CHEAT 0x004cbed0
 void C2_HOOK_FASTCALL PhysicsAddObject(tPhysics_object* pParent, tPhysics_object* pChild) {
 
     C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPhysics_object, next, 0x220);
@@ -1473,6 +1520,7 @@ void C2_HOOK_FASTCALL PhysicsAddObject(tPhysics_object* pParent, tPhysics_object
 
 // FUNCTION: CARMA2_HW 0x004c63d0
 // FUNCTION: CARMA2_SW 0x004c2b00
+// FUNCTION: CARMA2_CHEAT 0x004cbef0
 void C2_HOOK_FASTCALL PhysicsAddObjectList(tPhysics_object* pParent, tPhysics_object* pChild) {
     tPhysics_object* last;
 
@@ -1492,6 +1540,7 @@ void C2_HOOK_FASTCALL PhysicsAddObjectList(tPhysics_object* pParent, tPhysics_ob
 
 // FUNCTION: CARMA2_HW 0x004c6410
 // FUNCTION: CARMA2_SW 0x004c2b40
+// FUNCTION: CARMA2_CHEAT 0x004cbf30
 void C2_HOOK_FASTCALL PhysicsRemoveObject(tPhysics_object* pObject) {
     tPhysics_object* parent;
     tPhysics_object* sibling;
@@ -1512,6 +1561,7 @@ void C2_HOOK_FASTCALL PhysicsRemoveObject(tPhysics_object* pObject) {
 
 // FUNCTION: CARMA2_HW 0x004c6470
 // FUNCTION: CARMA2_SW 0x004c2ba0
+// FUNCTION: CARMA2_CHEAT 0x004cbf90
 int C2_HOOK_FASTCALL PhysicsObjectRecurse(tPhysics_object* pObject, tEnumCollision_cbfn* pCallback, void* pContext) {
     int result;
     tPhysics_object* child;
@@ -1546,6 +1596,7 @@ int C2_HOOK_FASTCALL PhysicsObjectRecurseChildren(tPhysics_object* pObject, tEnu
 
 // FUNCTION: CARMA2_HW 0x004c6510
 // FUNCTION: CARMA2_SW 0x004c2c40
+// FUNCTION: CARMA2_CHEAT 0x004cc030
 void C2_HOOK_FASTCALL InitPhysicsWorkspace(tU8* pBuffer, int pSize) {
 
     gPhysics_buffer1_ptr = pBuffer;
@@ -1561,6 +1612,7 @@ void C2_HOOK_FASTCALL InitPhysicsWorkspace(tU8* pBuffer, int pSize) {
 }
 
 // FUNCTION: CARMA2_HW 0x004b57d0
+// FUNCTION: CARMA2_CHEAT 0x004bb0a0
 int C2_HOOK_FASTCALL FindFacesInBox(tBounds* pBounds, tFace_ref* pFace_list, int pMax_face, tWorld_callbacks* pWorld_callbacks) {
     tU8 cx_min;
     tU8 cz_min;
@@ -1619,6 +1671,7 @@ float C2_HOOK_FASTCALL GetFrictionFromFace(const tFace_ref* pFace) {
 
 // FUNCTION: CARMA2_HW 0x004b5990
 // FUNCTION: CARMA2_SW 0x004b20b0
+// FUNCTION: CARMA2_CHEAT 0x004bb260
 void C2_HOOK_FASTCALL DoPhysicsError(tPhysicsError pError, const char* pMessage) {
     char s[256];
 
@@ -1664,6 +1717,7 @@ void C2_HOOK_FASTCALL SetUpTestObjects(void) {
 
 // FUNCTION: CARMA2_HW 0x004b5ca0
 // FUNCTION: CARMA2_SW 0x004b23c0
+// FUNCTION: CARMA2_CHEAT 0x004bb570
 void C2_HOOK_FASTCALL InitPhysics(void) {
 
     PhysicsSetErrorHandler(DoPhysicsError);

@@ -53,19 +53,23 @@
 
 // GLOBAL: CARMA2_HW 0x0068c6ec
 // GLOBAL: CARMA2_SW 0x0068673c
+// GLOBAL: CARMA2_CHEAT 0x00693f8c
 FILE* gTempFile;
 
 // GLOBAL: CARMA2_HW 0x0068c718
 // GLOBAL: CARMA2_SW 0x00686768
+// GLOBAL: CARMA2_CHEAT 0x00693fb8
 const char* gPedTextTxtPath;
 
 // GLOBAL: CARMA2_HW 0x0068b88c
 // GLOBAL: CARMA2_SW 0x00685dec
+// GLOBAL: CARMA2_CHEAT 0x00693134
 int gKey_map_index;
 
 #define DECODE_OFFSET 50
 // GLOBAL: CARMA2_HW 0x00655e38
 // GLOBAL: CARMA2_SW 0x00650d20
+// GLOBAL: CARMA2_CHEAT 0x0065c6c0
 char gDecode_string[14] = {
     (char)('i' + DECODE_OFFSET),
     (char)(' ' + DECODE_OFFSET),
@@ -85,46 +89,57 @@ char gDecode_string[14] = {
 
 // GLOBAL: CARMA2_HW 0x0068c6f8
 // GLOBAL: CARMA2_SW 0x00686748
+// GLOBAL: CARMA2_CHEAT 0x00693f98
 char gUnderwater_screen_name[32];
 
 // GLOBAL: CARMA2_HW 0x00764ea0
 // GLOBAL: CARMA2_SW 0x0075b400
+// GLOBAL: CARMA2_CHEAT 0x0076c540
 char gDefault_car[32];
 
 // GLOBAL: CARMA2_HW 0x00764ec0
 // GLOBAL: CARMA2_SW 0x0075b420
+// GLOBAL: CARMA2_CHEAT 0x0076c560
 char gBasic_car_name[32];
 
 // GLOBAL: CARMA2_HW 0x007638c0
 // GLOBAL: CARMA2_SW 0x00759e20
+// GLOBAL: CARMA2_CHEAT 0x0076af60
 int gNet_score_targets[8];
 
 // GLOBAL: CARMA2_HW 0x0074b58c
 // GLOBAL: CARMA2_SW 0x00741c4c
+// GLOBAL: CARMA2_CHEAT 0x00752c2c
 int gDemo_race_rank_equivalent;
 
 // GLOBAL: CARMA2_HW 0x0074b4fc
 // GLOBAL: CARMA2_SW 0x00741bbc
+// GLOBAL: CARMA2_CHEAT 0x00752b9c
 int gCount_demo_opponents;
 
 // GLOBAL: CARMA2_HW 0x0074b4c0
 // GLOBAL: CARMA2_SW 0x00741b80
+// GLOBAL: CARMA2_CHEAT 0x00752b60
 int gDemo_opponents[15];
 
 // GLOBAL: CARMA2_HW 0x00679308
 // GLOBAL: CARMA2_SW 0x00673a78
+// GLOBAL: CARMA2_CHEAT 0x00680bb8
 int gCamera_type;
 
 // GLOBAL: CARMA2_HW 0x00679324
 // GLOBAL: CARMA2_SW 0x00673a94
+// GLOBAL: CARMA2_CHEAT 0x00680bd4
 tActionReplayCameraMode gAction_replay_camera_mode_00679324;
 
 // GLOBAL: CARMA2_HW 0x0074b4a8
 // GLOBAL: CARMA2_SW 0x00741b68
+// GLOBAL: CARMA2_CHEAT 0x00752b48
 int gGroove_funk_offset;
 
 // GLOBAL: CARMA2_HW 0x00657558
 // GLOBAL: CARMA2_SW 0x00651f08
+// GLOBAL: CARMA2_CHEAT 0x0065dde8
 const char* gNet_avail_names[4] = {
     "never",
     "eagle",
@@ -134,10 +149,12 @@ const char* gNet_avail_names[4] = {
 
 // GLOBAL: CARMA2_HW 0x0074b500
 // GLOBAL: CARMA2_SW 0x00741bc0
+// GLOBAL: CARMA2_CHEAT 0x00752ba0
 br_material* gSimple_materials[32];
 
 // GLOBAL: CARMA2_HW 0x006572f0
 // GLOBAL: CARMA2_SW 0x00651ca0
+// GLOBAL: CARMA2_CHEAT 0x0065db80
 tU32 gSimple_material_colours[12] = {
     /* Material number is in MSB */
     (0x00 << 24) | 0x5d0303,
@@ -156,6 +173,7 @@ tU32 gSimple_material_colours[12] = {
 
 // GLOBAL: CARMA2_HW 0x00657320
 // GLOBAL: CARMA2_SW 0x00651cd0
+// GLOBAL: CARMA2_CHEAT 0x0065dbb0
 tHeadup_info gHeadup_image_info[45] = {
     { "", eNot_ever_ever_ever },
     { "", eNot_ever_ever_ever },
@@ -221,10 +239,12 @@ const char* gDev_car_names[6] = {
 
 // GLOBAL: CARMA2_HW 0x0079eb60
 // GLOBAL: CARMA2_SW 0x007950c0
+// GLOBAL: CARMA2_CHEAT 0x007a6200
 br_pixelmap* gHeadup_images[45];
 
 // GLOBAL: CARMA2_HW 0x006574d0
 // GLOBAL: CARMA2_SW 0x00651e80
+// GLOBAL: CARMA2_CHEAT 0x0065dd60
 const char* gDamage_names[12] = {
     "engine",
     "transmission",
@@ -283,9 +303,13 @@ void C2_HOOK_FASTCALL LoadInRegisteeDir(const char *pRoot, const char *pSubDir, 
 
 // FUNCTION: CARMA2_HW 0x00486e10
 // FUNCTION: CARMA2_SW 0x00483f40
+// FUNCTION: CARMA2_CHEAT 0x00487130
 void C2_HOOK_FASTCALL LoadInRegistees(void) {
 
     LoadInRegisteeDir(gApplication_path, "REG", 1);
+#ifdef REC2_CHEAT
+    LoadInRegisteeDir(gApplication_path, "DEVREG", 0);
+#endif
 }
 
 void C2_HOOK_FASTCALL LoadBunchOParameters(tSlot_info* pSlot_info) {
@@ -342,6 +366,7 @@ void C2_HOOK_FASTCALL GetHithers(void) {
 
 // FUNCTION: CARMA2_HW 0x00486ef0
 // FUNCTION: CARMA2_SW 0x00484020
+// FUNCTION: CARMA2_CHEAT 0x004872d0
 void C2_HOOK_FASTCALL LoadGeneralParameters(void) {
     tPath_name the_path;
     int i;
@@ -608,6 +633,7 @@ void C2_HOOK_FASTCALL LoadGeneralParameters(void) {
 
 // FUNCTION: CARMA2_HW 0x00487dc0
 // FUNCTION: CARMA2_SW 0x00484ef0
+// FUNCTION: CARMA2_CHEAT 0x004881a0
 void C2_HOOK_FASTCALL FinishLoadingGeneral(void) {
     gDefault_default_water_spec_vol.screen_pixelmap = BrMapFind(gUnderwater_screen_name);
     LoadWastedExplosion(gTempFile, &gWasted_explosion_chance, &gExplosion_sound_id, &gExplosion_pix_animation_groups);
@@ -619,6 +645,7 @@ void C2_HOOK_FASTCALL FinishLoadingGeneral(void) {
 
 // FUNCTION: CARMA2_HW 0x00487ea0
 // FUNCTION: CARMA2_SW 0x00484fd0
+// FUNCTION: CARMA2_CHEAT 0x00488280
 void C2_HOOK_FASTCALL LoadInterfaceStuff(int pWithin_race) {
 #ifdef REC2_SW
     tPath_name path;
@@ -646,6 +673,7 @@ void C2_HOOK_FASTCALL LoadInterfaceStuff(int pWithin_race) {
 
 // FUNCTION: CARMA2_HW 0x00487eb0
 // FUNCTION: CARMA2_SW 0x004850e0
+// FUNCTION: CARMA2_CHEAT 0x00488290
 void C2_HOOK_FASTCALL InitInterfaceLoadState(void) {
 #ifdef REC2_SW
     int i;
@@ -661,6 +689,7 @@ void C2_HOOK_FASTCALL InitInterfaceLoadState(void) {
 
 // FUNCTION: CARMA2_HW 0x0048b560
 // FUNCTION: CARMA2_SW 0x004887a0
+// FUNCTION: CARMA2_CHEAT 0x0048b940
 void C2_HOOK_FASTCALL LoadSpeedo(FILE* pF, int pIndex, tCar_spec* pCar_spec) {
     char s[256];
     char* str;
@@ -711,6 +740,7 @@ void C2_HOOK_FASTCALL LoadSpeedo(FILE* pF, int pIndex, tCar_spec* pCar_spec) {
 
 // FUNCTION: CARMA2_HW 0x0048b810
 // FUNCTION: CARMA2_SW 0x00488a50
+// FUNCTION: CARMA2_CHEAT 0x0048bbf0
 void C2_HOOK_FASTCALL LoadTacho(FILE* pF, int pIndex, tCar_spec* pCar_spec) {
     char s[256];
     char* str;
@@ -754,6 +784,7 @@ void C2_HOOK_FASTCALL LoadTacho(FILE* pF, int pIndex, tCar_spec* pCar_spec) {
 
 // FUNCTION: CARMA2_HW 0x0048ba60
 // FUNCTION: CARMA2_SW 0x00488ca0
+// FUNCTION: CARMA2_CHEAT 0x0048be40
 void C2_HOOK_FASTCALL LoadHeadups(FILE* pF, int pIndex, tCar_spec* pCar_spec) {
     char s[256];
     char* str;
@@ -821,6 +852,7 @@ void C2_HOOK_FASTCALL LoadHeadups(FILE* pF, int pIndex, tCar_spec* pCar_spec) {
 
 // FUNCTION: CARMA2_HW 0x0048bca0
 // FUNCTION: CARMA2_SW 0x00488ee0
+// FUNCTION: CARMA2_CHEAT 0x0048c080
 void C2_HOOK_FASTCALL GetDamageProgram(FILE* pF, tCar_spec* pCar_spec, tImpact_location pImpact_location) {
     tDamage_clause* the_clause;
     int i;
@@ -891,6 +923,7 @@ void C2_HOOK_FASTCALL GetDamageProgram(FILE* pF, tCar_spec* pCar_spec, tImpact_l
 
 // FUNCTION: CARMA2_HW 0x0048bf20
 // FUNCTION: CARMA2_SW 0x00489160
+// FUNCTION: CARMA2_CHEAT 0x0048c300
 intptr_t C2_HOOK_CDECL AllocateCarActorData(br_actor* pActor, void* pData) {
 
     C2_HOOK_BUG_ON(sizeof(tUser_crush_data) != 0x10);
@@ -903,6 +936,7 @@ intptr_t C2_HOOK_CDECL AllocateCarActorData(br_actor* pActor, void* pData) {
 
 // FUNCTION: CARMA2_HW 0x0048bf50
 // FUNCTION: CARMA2_SW 0x00489190
+// FUNCTION: CARMA2_CHEAT 0x0048c330
 intptr_t C2_HOOK_CDECL AllocateCarModelData(br_actor* pActor, void* pData) {
     tUser_crush_data* user_crush;
     tCar_spec* car_spec;
@@ -932,6 +966,7 @@ intptr_t C2_HOOK_CDECL AllocateCarModelData(br_actor* pActor, void* pData) {
 
 // FUNCTION: CARMA2_HW 0x00488dd0
 // FUNCTION: CARMA2_SW 0x00486010
+// FUNCTION: CARMA2_CHEAT 0x004891b0
 br_material* C2_HOOK_FASTCALL GetSimpleMaterial(char* pName, tRendererShadingType pShading_type) {
     int i;
     int material_number;
@@ -982,6 +1017,7 @@ br_material* C2_HOOK_FASTCALL GetSimpleMaterial(char* pName, tRendererShadingTyp
 
 // FUNCTION: CARMA2_HW 0x0048c130
 // FUNCTION: CARMA2_SW 0x00489370
+// FUNCTION: CARMA2_CHEAT 0x0048c510
 intptr_t C2_HOOK_CDECL LinkCarActorsToGroovidelicsCB(br_actor* pActor, void* pData) {
     tUser_crush_data* user_crush;
 
@@ -1020,6 +1056,7 @@ void C2_HOOK_FASTCALL LoadCar(const char* pCar_name, tDriver pDriver, tCar_spec*
 
 // FUNCTION: CARMA2_HW 0x0048c150
 // FUNCTION: CARMA2_SW 0x00489390
+// FUNCTION: CARMA2_CHEAT 0x0048c530
 void C2_HOOK_FASTCALL LoadHeadupImages(void) {
     int i;
 
@@ -1040,12 +1077,14 @@ void C2_HOOK_FASTCALL LoadHeadupImages(void) {
 
 // STUB: CARMA2_HW 0x0048c1c0
 // STUB: CARMA2_SW 0x00489400
+// STUB: CARMA2_CHEAT 0x0048c5a0
 void C2_HOOK_FASTCALL LoadRaces(tRace_list_spec* pRace_list, int* pCount, int pRace_type_index) {
     NOT_IMPLEMENTED();
 }
 
 // FUNCTION: CARMA2_HW 0x0048c860
 // FUNCTION: CARMA2_SW 0x00489aa0
+// FUNCTION: CARMA2_CHEAT 0x0048cc40
 void C2_HOOK_FASTCALL LoadRaceInfo(int pRace_index, tRace_info* pRace_info) {
     int i;
 
@@ -1073,6 +1112,7 @@ void C2_HOOK_FASTCALL FUN_0048c920(void) {
 
 // FUNCTION: CARMA2_HW 0x0048c930
 // FUNCTION: CARMA2_SW 0x00489b70
+// FUNCTION: CARMA2_CHEAT 0x0048cd10
 void C2_HOOK_FASTCALL LoadOpponents(void) {
     FILE* f;
     tPath_name the_path;
@@ -1156,6 +1196,7 @@ void C2_HOOK_FASTCALL LoadOpponents(void) {
 
 // FUNCTION: CARMA2_HW 0x0048cd80
 // FUNCTION: CARMA2_SW 0x00489fc0
+// FUNCTION: CARMA2_CHEAT 0x0048d160
 void C2_HOOK_FASTCALL AboutToLoadFirstCar(void) {
 
     InitFunkGrooveFlags();
@@ -1220,6 +1261,7 @@ void C2_HOOK_FASTCALL LoadOpponentsCars(tRace_info* pRace_info) {
 
 // FUNCTION: CARMA2_HW 0x0048cfc0
 // FUNCTION: CARMA2_SW 0x0048a200
+// FUNCTION: CARMA2_CHEAT 0x0048d3a0
 void C2_HOOK_FASTCALL LoadMiscStrings(void) {
     int i;
     FILE *f;
@@ -1256,6 +1298,7 @@ void C2_HOOK_FASTCALL LoadMiscStrings(void) {
 
 // FUNCTION: CARMA2_HW 0x0048d0e0
 // FUNCTION: CARMA2_SW 0x0048a320
+// FUNCTION: CARMA2_CHEAT 0x0048d4c0
 void C2_HOOK_FASTCALL FillInRaceInfo(tRace_info* pThe_race) {
 
     C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tProgram_state, track_file_name, 0x1a1e);
@@ -1267,6 +1310,7 @@ void C2_HOOK_FASTCALL FillInRaceInfo(tRace_info* pThe_race) {
 
 // FUNCTION: CARMA2_HW 0x0048d110
 // FUNCTION: CARMA2_SW 0x0048a350
+// FUNCTION: CARMA2_CHEAT 0x0048d4f0
 void C2_HOOK_FASTCALL ReadNetworkSettings(FILE* pF, tNet_game_options* pOptions) {
 
     pOptions->enable_text_messages = GetAnInt(pF);
@@ -1285,6 +1329,7 @@ void C2_HOOK_FASTCALL ReadNetworkSettings(FILE* pF, tNet_game_options* pOptions)
 
 // FUNCTION: CARMA2_HW 0x0048d7d0
 // FUNCTION: CARMA2_SW 0x0048aa10
+// FUNCTION: CARMA2_CHEAT 0x0048dbb0
 int C2_HOOK_FASTCALL PrintNetOptions(FILE* pF, int pIndex) {
 
     fprintf(pF, "NETSETTINGS %d\n\n", pIndex);
@@ -1305,12 +1350,14 @@ int C2_HOOK_FASTCALL PrintNetOptions(FILE* pF, int pIndex) {
 
 // STUB: CARMA2_HW 0x0048d190
 // STUB: CARMA2_SW 0x0048a3d0
+// STUB: CARMA2_CHEAT 0x0048d570
 int C2_HOOK_FASTCALL SaveOptions(void) {
     NOT_IMPLEMENTED();
 }
 
 // FUNCTION: CARMA2_HW 0x0048d8f0
 // FUNCTION: CARMA2_SW 0x0048ab30
+// FUNCTION: CARMA2_CHEAT 0x0048dcd0
 int C2_HOOK_FASTCALL RestoreOptions(void) {
     tPath_name the_path;
     FILE* f;
@@ -1497,24 +1544,28 @@ void C2_HOOK_FASTCALL InitFunkGrooveFlags(void) {
 
 // FUNCTION: CARMA2_HW 0x0048ea00
 // FUNCTION: CARMA2_SW 0x0048bca0
+// FUNCTION: CARMA2_CHEAT 0x0048ede0
 void C2_HOOK_FASTCALL SetDefaultTextFileName(void) {
     gPedTextTxtPath = "TEXT.TXT";
 }
 
 // FUNCTION: CARMA2_HW 0x0048ea10
 // FUNCTION: CARMA2_SW 0x0048bcb0
+// FUNCTION: CARMA2_CHEAT 0x0048edf0
 void C2_HOOK_FASTCALL ConfigureBloodPedTextTxtPath(void) {
     gPedTextTxtPath = "TEXT.TXT";
 }
 
 // FUNCTION: CARMA2_HW 0x0048ea20
 // FUNCTION: CARMA2_SW 0x0048bcc0
+// FUNCTION: CARMA2_CHEAT 0x0048ee00
 void C2_HOOK_FASTCALL ConfigureZombiePedTextTxtPath(void) {
     gPedTextTxtPath = "ZOMTEXT.TXT";
 }
 
 // FUNCTION: CARMA2_HW 0x0048ea30
 // FUNCTION: CARMA2_SW 0x0048bcd0
+// FUNCTION: CARMA2_CHEAT 0x0048ee10
 void C2_HOOK_FASTCALL ConfigureAlienPedTextTxtPath(void) {
     gPedTextTxtPath = "ALTEXT.TXT";
 }

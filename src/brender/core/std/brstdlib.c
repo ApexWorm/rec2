@@ -19,6 +19,7 @@
 
 // FUNCTION: CARMA2_HW 0x0053f030
 // FUNCTION: CARMA2_SW 0x0053a6d0
+// FUNCTION: CARMA2_CHEAT 0x00544c20
 int C2_HOOK_CDECL BrMemCmp(const void* s1, const void* s2, size_t n) {
 
     return memcmp(s1, s2, n);
@@ -26,6 +27,7 @@ int C2_HOOK_CDECL BrMemCmp(const void* s1, const void* s2, size_t n) {
 
 // FUNCTION: CARMA2_HW 0x0053f050
 // FUNCTION: CARMA2_SW 0x0053a6f0
+// FUNCTION: CARMA2_CHEAT 0x00544c40
 void* C2_HOOK_CDECL BrMemCpy(void* s1, const void* s2, size_t n) {
 
     return memcpy(s1, s2, n);
@@ -33,6 +35,7 @@ void* C2_HOOK_CDECL BrMemCpy(void* s1, const void* s2, size_t n) {
 
 // FUNCTION: CARMA2_HW 0x0053f080
 // FUNCTION: CARMA2_SW 0x0053a720
+// FUNCTION: CARMA2_CHEAT 0x00544c70
 void* C2_HOOK_CDECL BrMemSet(void* s, int c, size_t n) {
 
 #ifdef BRENDER_FIX_BUGS
@@ -46,6 +49,7 @@ void* C2_HOOK_CDECL BrMemSet(void* s, int c, size_t n) {
 
 // FUNCTION: CARMA2_HW 0x0053f0c0
 // FUNCTION: CARMA2_SW 0x0053a760
+// FUNCTION: CARMA2_CHEAT 0x00544cb0
 char* C2_HOOK_CDECL BrStrCat(char* s1, const char* s2) {
 
     return strcat(s1, s2);
@@ -53,6 +57,7 @@ char* C2_HOOK_CDECL BrStrCat(char* s1, const char* s2) {
 
 // FUNCTION: CARMA2_HW 0x0053f100
 // FUNCTION: CARMA2_SW 0x0053a7a0
+// FUNCTION: CARMA2_CHEAT 0x00544cf0
 int C2_HOOK_CDECL BrStrCmp(const char* s1, const char* s2) {
 
     return strcmp(s1, s2);
@@ -60,6 +65,7 @@ int C2_HOOK_CDECL BrStrCmp(const char* s1, const char* s2) {
 
 // FUNCTION: CARMA2_HW 0x0053f140
 // FUNCTION: CARMA2_SW 0x0053a7e0
+// FUNCTION: CARMA2_CHEAT 0x00544d30
 int C2_HOOK_CDECL BrStrICmp(const char* s1, const char* s2) {
 
     return strcasecmp(s1, s2);
@@ -67,6 +73,7 @@ int C2_HOOK_CDECL BrStrICmp(const char* s1, const char* s2) {
 
 // FUNCTION: CARMA2_HW 0x0053f160
 // FUNCTION: CARMA2_SW 0x0053a800
+// FUNCTION: CARMA2_CHEAT 0x00544d50
 char* C2_HOOK_CDECL BrStrCpy(char* s1, const char* s2) {
 
     return strcpy(s1, s2);
@@ -74,6 +81,7 @@ char* C2_HOOK_CDECL BrStrCpy(char* s1, const char* s2) {
 
 // FUNCTION: CARMA2_HW 0x0053f190
 // FUNCTION: CARMA2_SW 0x0053a830
+// FUNCTION: CARMA2_CHEAT 0x00544d80
 br_size_t C2_HOOK_CDECL BrStrLen(const char* s) {
 
     return strlen(s);
@@ -81,6 +89,7 @@ br_size_t C2_HOOK_CDECL BrStrLen(const char* s) {
 
 // FUNCTION: CARMA2_HW 0x0053f1b0
 // FUNCTION: CARMA2_SW 0x0053a850
+// FUNCTION: CARMA2_CHEAT 0x00544da0
 int C2_HOOK_CDECL BrStrNCmp(const char* s1, const char* s2, size_t n) {
 
     return strncmp(s1, s2, n);
@@ -88,6 +97,7 @@ int C2_HOOK_CDECL BrStrNCmp(const char* s1, const char* s2, size_t n) {
 
 // FUNCTION: CARMA2_HW 0x0053f1d0
 // FUNCTION: CARMA2_SW 0x0053a870
+// FUNCTION: CARMA2_CHEAT 0x00544dc0
 int C2_HOOK_CDECL BrStrNICmp(const char* s1, const char* s2, size_t n) {
 
     return strncasecmp(s1, s2, n);
@@ -95,6 +105,7 @@ int C2_HOOK_CDECL BrStrNICmp(const char* s1, const char* s2, size_t n) {
 
 // FUNCTION: CARMA2_HW 0x0053f1f0
 // FUNCTION: CARMA2_SW 0x0053a890
+// FUNCTION: CARMA2_CHEAT 0x00544de0
 char* C2_HOOK_CDECL BrStrNCpy(char* s1, const char* s2, size_t n) {
 
     return strncpy(s1, s2, n);
@@ -102,6 +113,7 @@ char* C2_HOOK_CDECL BrStrNCpy(char* s1, const char* s2, size_t n) {
 
 // FUNCTION: CARMA2_HW 0x0053f210
 // FUNCTION: CARMA2_SW 0x0053a8b0
+// FUNCTION: CARMA2_CHEAT 0x00544e00
 char* C2_HOOK_CDECL BrStrRChr(const char* s1, char c) {
 
     return (char*)strrchr(s1, c);
@@ -109,6 +121,7 @@ char* C2_HOOK_CDECL BrStrRChr(const char* s1, char c) {
 
 // FUNCTION: CARMA2_HW 0x0053f230
 // FUNCTION: CARMA2_SW 0x0053a8d0
+// FUNCTION: CARMA2_CHEAT 0x00544e20
 void C2_HOOK_CDECL BrAbort(void) {
 
     abort();
@@ -116,6 +129,7 @@ void C2_HOOK_CDECL BrAbort(void) {
 
 // FUNCTION: CARMA2_HW 0x0053f240
 // FUNCTION: CARMA2_SW 0x0053a8e0
+// FUNCTION: CARMA2_CHEAT 0x00544e30
 char* C2_HOOK_CDECL BrGetEnv(const char* name) {
 
     return getenv(name);
@@ -123,6 +137,7 @@ char* C2_HOOK_CDECL BrGetEnv(const char* name) {
 
 // FUNCTION: CARMA2_HW 0x0053f250
 // FUNCTION: CARMA2_SW 0x0053a8f0
+// FUNCTION: CARMA2_CHEAT 0x00544e40
 float C2_HOOK_CDECL BrStrToF(const char* nptr, char** endptr) {
 
     return c2_strtof(nptr, endptr);
@@ -130,6 +145,7 @@ float C2_HOOK_CDECL BrStrToF(const char* nptr, char** endptr) {
 
 // FUNCTION: CARMA2_HW 0x0053f270
 // FUNCTION: CARMA2_SW 0x0053a910
+// FUNCTION: CARMA2_CHEAT 0x00544e60
 double C2_HOOK_CDECL BrStrToD(const char* nptr, char** endptr) {
 
     return strtod(nptr, endptr);
@@ -137,6 +153,7 @@ double C2_HOOK_CDECL BrStrToD(const char* nptr, char** endptr) {
 
 // FUNCTION: CARMA2_HW 0x0053f290
 // FUNCTION: CARMA2_SW 0x0053a930
+// FUNCTION: CARMA2_CHEAT 0x00544e80
 long C2_HOOK_CDECL BrStrToL(const char* nptr, char** endptr, int base) {
 
     return strtol(nptr, endptr, base);
@@ -144,6 +161,7 @@ long C2_HOOK_CDECL BrStrToL(const char* nptr, char** endptr, int base) {
 
 // FUNCTION: CARMA2_HW 0x0053f2b0
 // FUNCTION: CARMA2_SW 0x0053a950
+// FUNCTION: CARMA2_CHEAT 0x00544ea0
 unsigned long C2_HOOK_CDECL BrStrToUL(const char* nptr, char** endptr, int base) {
 
     return strtoul(nptr, endptr, base);
@@ -151,6 +169,7 @@ unsigned long C2_HOOK_CDECL BrStrToUL(const char* nptr, char** endptr, int base)
 
 // FUNCTION: CARMA2_HW 0x0053f2d0
 // FUNCTION: CARMA2_SW 0x0053a970
+// FUNCTION: CARMA2_CHEAT 0x00544ec0
 br_boolean C2_HOOK_CDECL BrIsAlpha(int c) {
 
     return isalpha(c);
@@ -158,6 +177,7 @@ br_boolean C2_HOOK_CDECL BrIsAlpha(int c) {
 
 // FUNCTION: CARMA2_HW 0x0053f300
 // FUNCTION: CARMA2_SW 0x0053a9a0
+// FUNCTION: CARMA2_CHEAT 0x00544ef0
 br_boolean C2_HOOK_CDECL BrIsDigit(int c) {
 
     return isdigit(c);
@@ -165,6 +185,7 @@ br_boolean C2_HOOK_CDECL BrIsDigit(int c) {
 
 // FUNCTION: CARMA2_HW 0x0053f330
 // FUNCTION: CARMA2_SW 0x0053a9d0
+// FUNCTION: CARMA2_CHEAT 0x00544f20
 br_boolean C2_HOOK_CDECL BrIsSpace(int c) {
 
     return isspace(c);
@@ -172,6 +193,7 @@ br_boolean C2_HOOK_CDECL BrIsSpace(int c) {
 
 // FUNCTION: CARMA2_HW 0x0053f360
 // FUNCTION: CARMA2_SW 0x0053aa00
+// FUNCTION: CARMA2_CHEAT 0x00544f50
 br_boolean C2_HOOK_CDECL BrIsPrint(int c) {
 
     return isprint(c);
@@ -179,12 +201,14 @@ br_boolean C2_HOOK_CDECL BrIsPrint(int c) {
 
 // FUNCTION: CARMA2_HW 0x0053f390
 // FUNCTION: CARMA2_SW 0x0053aa30
+// FUNCTION: CARMA2_CHEAT 0x00544f80
 int C2_HOOK_CDECL BrVSprintf(char* buf, const char* fmt, va_list args) {
     return vsprintf(buf, fmt, args);
 }
 
 // FUNCTION: CARMA2_HW 0x0053f3b0
 // FUNCTION: CARMA2_SW 0x0053aa50
+// FUNCTION: CARMA2_CHEAT 0x00544fa0
 br_int_32 C2_HOOK_CDECL BrVSprintfN(char* buf, br_size_t buf_size, const char* fmt, va_list args) {
     unsigned int n;
     char tmp[512];
@@ -202,6 +226,7 @@ br_int_32 C2_HOOK_CDECL BrVSprintfN(char* buf, br_size_t buf_size, const char* f
 
 // FUNCTION: CARMA2_HW 0x0053f410
 // FUNCTION: CARMA2_SW 0x0053aab0
+// FUNCTION: CARMA2_CHEAT 0x00545000
 br_int_32 C2_HOOK_CDECL BrVSScanf(char* buf, const char* fmt, va_list args) {
 
 #ifdef REC2_MATCHING

@@ -27,27 +27,33 @@
 
 // GLOBAL: CARMA2_HW 0x006acea4
 // GLOBAL: CARMA2_SW 0x006a6644
+// GLOBAL: CARMA2_CHEAT 0x006b4534
 HINSTANCE gHInstance;
 
 // GLOBAL: CARMA2_HW 0x006ace9c
 // GLOBAL: CARMA2_SW 0x006a663c
+// GLOBAL: CARMA2_CHEAT 0x006b452c
 int gNShowCmd;
 
 // GLOBAL: CARMA2_HW 0x006ad484
 // GLOBAL: CARMA2_SW 0x006a6c14
+// GLOBAL: CARMA2_CHEAT 0x006b4b10
 int gProgram_result;
 
 
 // GLOBAL: CARMA2_HW 0x006621d0
 // GLOBAL: CARMA2_SW 0x0065cac0
+// GLOBAL: CARMA2_CHEAT 0x00669a38
 const char* gCarma2WndClassName = "Carma2MainWndClass";
 
 // GLOBAL: CARMA2_HW 0x00662270
 // GLOBAL: CARMA2_SW 0x0065cb58
+// GLOBAL: CARMA2_CHEAT 0x00669ad8
 const char* gRegionDescriminator = "AUDIQUATTRO";
 
 // FUNCTION: CARMA2_HW 0x0051aaa0
 // FUNCTION: CARMA2_SW 0x00514580
+// FUNCTION: CARMA2_CHEAT 0x00520210
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd) {
     char* currentArgument;
     WNDCLASSA wndCls;
@@ -59,6 +65,9 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 #endif
 
     args[0] = "Carmageddon";
+#ifdef REC2_CHEAT
+    CheckIfRunningOnServer();
+#endif
 #ifdef REC2_HW
     gAFE = 0;
     SetDefaultPedFolderNames();
@@ -81,8 +90,14 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                     SetAlienPedFolderNames();
                 } else if (strcmp(currentArgument, "-AFE") == 0) {
                     gAFE = 1;
+#ifdef REC2_V101A
+                } else if (strcmp(currentArgument, "-OLDMOUSE") == 0) {
+                    gOld_mouse = 0;
+#endif
+#ifdef REC2_V102A
                 } else if (strcmp(currentArgument, "-SCALEMOUSE") == 0) {
-                    gScaleMouse = 1;
+                    gScale_mouse = 1;
+#endif
                 }
 #ifdef REC2_FIX_BUGS
                 else {

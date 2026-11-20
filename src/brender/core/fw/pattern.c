@@ -12,6 +12,7 @@
 
 // FUNCTION: CARMA2_HW 0x00529860
 // FUNCTION: CARMA2_SW 0x005243d0
+// FUNCTION: CARMA2_CHEAT 0x0052f450
 br_boolean C2_HOOK_CDECL BrNamePatternMatch(const char* p, const char* s) {
     const char* cp;
 

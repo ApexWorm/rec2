@@ -23,6 +23,7 @@ int gINT_00595f84 = 7500;
 
 // GLOBAL: CARMA2_HW 0x00595f88
 // GLOBAL: CARMA2_SW 0x00590ee8
+// GLOBAL: CARMA2_CHEAT 0x0059c808
 int gJoystick_index = -1;
 
 // GLOBAL: CARMA2_HW 0x00595f90
@@ -35,6 +36,7 @@ float gJoystick_y_throttle = 1.f;
 
 // GLOBAL: CARMA2_HW 0x00596310
 // GLOBAL: CARMA2_SW 0x00591270
+// GLOBAL: CARMA2_CHEAT 0x0059cb90
 int gINT_00596310 = 50;
 
 // GLOBAL: CARMA2_HW 0x00686184
@@ -52,6 +54,7 @@ typedef struct tJoystick_preference_node {
 
 // FUNCTION: CARMA2_HW 0x0045a0f0
 // FUNCTION: CARMA2_SW 0x00459e80
+// FUNCTION: CARMA2_CHEAT 0x0045a570
 int C2_HOOK_FASTCALL HasCurrentJoystick(void) {
     return gJoystick_index != -1;
 }
@@ -213,6 +216,7 @@ int C2_HOOK_FASTCALL CountJoystickPreferences(FILE* pF) {
 
 // FUNCTION: CARMA2_HW 0x0045bd90
 // FUNCTION: CARMA2_SW 0x0045b810
+// FUNCTION: CARMA2_CHEAT 0x0045c210
 int C2_HOOK_FASTCALL SaveJoystickPreferences(void) {
     tPath_name path;
     char error[256];
@@ -332,6 +336,7 @@ int C2_HOOK_FASTCALL SaveJoystickPreferences(void) {
 
 // FUNCTION: CARMA2_HW 0x0045bd50
 // FUNCTION: CARMA2_SW 0x0045b7d0
+// FUNCTION: CARMA2_CHEAT 0x0045c1d0
 void C2_HOOK_FASTCALL EnableJoysticks(void) {
     tButtonJoystickInfo* info;
 
@@ -344,6 +349,7 @@ void C2_HOOK_FASTCALL EnableJoysticks(void) {
 
 // FUNCTION: CARMA2_HW 0x0045bd70
 // FUNCTION: CARMA2_SW 0x0045b7f0
+// FUNCTION: CARMA2_CHEAT 0x0045c1f0
 void C2_HOOK_FASTCALL DisableJoysticks(void) {
     tButtonJoystickInfo* info;
 
@@ -356,6 +362,7 @@ void C2_HOOK_FASTCALL DisableJoysticks(void) {
 
 // FUNCTION: CARMA2_HW 0x0045c0b0
 // FUNCTION: CARMA2_SW 0x0045bb30
+// FUNCTION: CARMA2_CHEAT 0x0045c530
 int C2_HOOK_FASTCALL LoadJoystickPreferences(void) {
     tPath_name path;
     tButtonJoystickInfo* info;
@@ -420,6 +427,7 @@ void C2_HOOK_FASTCALL RestoreJoystickPreferences(void) {
 }
 
 // FUNCTION: CARMA2_HW 0x0045c460
+// FUNCTION: CARMA2_CHEAT 0x0045c8e0
 int C2_HOOK_FASTCALL ToggleJoystickThrottle(void) {
     tButtonJoystickInfo* info;
 
@@ -434,6 +442,7 @@ int C2_HOOK_FASTCALL ToggleJoystickThrottle(void) {
 
 // FUNCTION: CARMA2_HW 0x0045c490
 // FUNCTION: CARMA2_SW 0x0045bed0
+// FUNCTION: CARMA2_CHEAT 0x0045c910
 void C2_HOOK_FASTCALL SetJoystickXAxis(float pValue) {
 
     tButtonJoystickInfo* joystick;
@@ -453,6 +462,7 @@ void C2_HOOK_FASTCALL SetJoystickXAxis(float pValue) {
 
 // FUNCTION: CARMA2_HW 0x0045c4f0
 // FUNCTION: CARMA2_SW 0x0045bf30
+// FUNCTION: CARMA2_CHEAT 0x0045c970
 void C2_HOOK_FASTCALL SetJoystickYAxis(float pValue) {
 
     tButtonJoystickInfo* joystick;
@@ -472,6 +482,7 @@ void C2_HOOK_FASTCALL SetJoystickYAxis(float pValue) {
 
 // FUNCTION: CARMA2_HW 0x0045c570
 // FUNCTION: CARMA2_SW 0x0045bfb0
+// FUNCTION: CARMA2_CHEAT 0x0045c9f0
 void C2_HOOK_FASTCALL SetJoystickDPadEnabled(int pEnabled) {
     tButtonJoystickInfo* info;
 
@@ -483,12 +494,14 @@ void C2_HOOK_FASTCALL SetJoystickDPadEnabled(int pEnabled) {
 
 // STUB: CARMA2_HW 0x0045c6b0
 // STUB: CARMA2_SW 0x0045c0f0
+// STUB: CARMA2_CHEAT 0x0045cb30
 int C2_HOOK_FASTCALL PlayExclusiveFFBEffect(const char* pEffect_name, int pArg2) {
     NOT_IMPLEMENTED();
 }
 
 // FUNCTION: CARMA2_HW 0x0045c780
 // FUNCTION: CARMA2_SW 0x0045c1c0
+// FUNCTION: CARMA2_CHEAT 0x0045cc00
 int C2_HOOK_FASTCALL CycleJoystickFFBGain(void) {
 
     gINT_00596310 += 25;
@@ -501,6 +514,7 @@ int C2_HOOK_FASTCALL CycleJoystickFFBGain(void) {
 
 // FUNCTION: CARMA2_HW 0x0045c7b0
 // FUNCTION: CARMA2_SW 0x0045c1f0
+// FUNCTION: CARMA2_CHEAT 0x0045cc30
 void C2_HOOK_FASTCALL SetJoystickFFBGain(int pValue) {
     tButtonJoystickInfo* info;
 
@@ -520,6 +534,7 @@ void C2_HOOK_FASTCALL SetJoystickFFBGain(int pValue) {
 
 // FUNCTION: CARMA2_HW 0x0045c7f0
 // FUNCTION: CARMA2_SW 0x0045c230
+// FUNCTION: CARMA2_CHEAT 0x0045cc70
 int C2_HOOK_FASTCALL GetJoystickFBBGain(void) {
     tButtonJoystickInfo* info;
 
@@ -532,6 +547,7 @@ int C2_HOOK_FASTCALL GetJoystickFBBGain(void) {
 
 // FUNCTION: CARMA2_HW 0x0045c810
 // FUNCTION: CARMA2_SW 0x0045c250
+// FUNCTION: CARMA2_CHEAT 0x0045cc90
 void C2_HOOK_FASTCALL SetJoystickX(float pValue) {
     tButtonJoystickInfo* info;
 
@@ -550,6 +566,7 @@ void C2_HOOK_FASTCALL SetJoystickX(float pValue) {
 
 // FUNCTION: CARMA2_HW 0x0045c870
 // FUNCTION: CARMA2_SW 0x0045c2b0
+// FUNCTION: CARMA2_CHEAT 0x0045ccf0
 void C2_HOOK_FASTCALL SetJoystickY(float pValue) {
     tButtonJoystickInfo* info;
 
@@ -568,6 +585,7 @@ void C2_HOOK_FASTCALL SetJoystickY(float pValue) {
 
 // FUNCTION: CARMA2_HW 0x0045c8d0
 // FUNCTION: CARMA2_SW 0x0045c310
+// FUNCTION: CARMA2_CHEAT 0x0045cd50
 float C2_HOOK_FASTCALL GetJoystickX(void) {
     tButtonJoystickInfo* info;
 
@@ -580,6 +598,7 @@ float C2_HOOK_FASTCALL GetJoystickX(void) {
 
 // FUNCTION: CARMA2_HW 0x0045c8f0
 // FUNCTION: CARMA2_SW 0x0045c330
+// FUNCTION: CARMA2_CHEAT 0x0045cd70
 float C2_HOOK_FASTCALL GetJoystickY(void) {
     tButtonJoystickInfo* info;
 

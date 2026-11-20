@@ -45,14 +45,17 @@
 
 // GLOBAL: CARMA2_HW 0x00655e30
 // GLOBAL: CARMA2_SW 0x00650d18
+// GLOBAL: CARMA2_CHEAT 0x0065c6b8
 int gDecode_thing = '@';
 
 // GLOBAL: CARMA2_HW 0x0079efb8
 // GLOBAL: CARMA2_SW 0x00795558
+// GLOBAL: CARMA2_CHEAT 0x007a6658
 tU32 gTime_stamp_for_this_munging;
 
 // GLOBAL: CARMA2_HW 0x00658610
 // GLOBAL: CARMA2_SW 0x00652ff0
+// GLOBAL: CARMA2_CHEAT 0x0065eea0
 int gAllow_open_to_fail = 1;
 
 // GLOBAL: CARMA2_HW 0x00658614
@@ -60,6 +63,7 @@ int g_source_exists = 1;
 
 // GLOBAL: CARMA2_HW 0x006585f0
 // GLOBAL: CARMA2_SW 0x00652fd0
+// GLOBAL: CARMA2_CHEAT 0x0065ee80
 const tU8 gLong_key[16] = {
     0x6c, 0x1b, 0x99, 0x5f, 0xb9, 0xcd, 0x5f, 0x13,
     0xcb, 0x04, 0x20, 0x0e, 0x5e, 0x1c, 0xa1, 0x0e,
@@ -67,6 +71,7 @@ const tU8 gLong_key[16] = {
 
 // GLOBAL: CARMA2_HW 0x00658600
 // GLOBAL: CARMA2_SW 0x00652fe0
+// GLOBAL: CARMA2_CHEAT 0x0065ee90
 const tU8 gOther_long_key[16] = {
     0x67, 0xa8, 0xd6, 0x26, 0xb6, 0xdd, 0x45, 0x1b,
     0x32, 0x7e, 0x22, 0x13, 0x15, 0xc2, 0x94, 0x37,
@@ -74,6 +79,7 @@ const tU8 gOther_long_key[16] = {
 
 // GLOBAL: CARMA2_HW 0x00763540
 // GLOBAL: CARMA2_SW 0x00759aa0
+// GLOBAL: CARMA2_CHEAT 0x0076abe0
 int gFunk_groove_flags[30];
 
 #ifdef REC2_SW
@@ -83,6 +89,7 @@ br_pixelmap* gCursors[8];
 
 // FUNCTION: CARMA2_HW 0x0048f830
 // FUNCTION: CARMA2_SW 0x0048caa0
+// FUNCTION: CARMA2_CHEAT 0x0048f8e0
 tU32 C2_HOOK_FASTCALL ReadU32(FILE* pF) {
     tU32 raw_long;
 
@@ -93,6 +100,7 @@ tU32 C2_HOOK_FASTCALL ReadU32(FILE* pF) {
 
 // FUNCTION: CARMA2_HW 0x0048f850
 // FUNCTION: CARMA2_SW 0x0048cac0
+// FUNCTION: CARMA2_CHEAT 0x0048f900
 tU16 C2_HOOK_FASTCALL ReadU16(FILE* pF) {
     tU16 raw_short;
 
@@ -103,6 +111,7 @@ tU16 C2_HOOK_FASTCALL ReadU16(FILE* pF) {
 
 // FUNCTION: CARMA2_HW 0x0048f870
 // FUNCTION: CARMA2_SW 0x0048cae0
+// FUNCTION: CARMA2_CHEAT 0x0048f920
 tU8 C2_HOOK_FASTCALL ReadU8(FILE* pF) {
     tU8 raw_byte;
 
@@ -149,6 +158,7 @@ tS8 C2_HOOK_FASTCALL ReadS8(FILE* pF) {
 
 // FUNCTION: CARMA2_HW 0x0048f910
 // FUNCTION: CARMA2_SW 0x0048cb80
+// FUNCTION: CARMA2_CHEAT 0x0048f9c0
 void C2_HOOK_FASTCALL WriteU32L(FILE* pF, tU32 pNumber) {
     tU32 raw_long;
 
@@ -159,6 +169,7 @@ void C2_HOOK_FASTCALL WriteU32L(FILE* pF, tU32 pNumber) {
 
 // FUNCTION: CARMA2_HW 0x0048f930
 // FUNCTION: CARMA2_SW 0x0048cba0
+// FUNCTION: CARMA2_CHEAT 0x0048f9e0
 void C2_HOOK_FASTCALL WriteU16L(FILE* pF, tU16 pNumber) {
     tU16 raw_short;
 
@@ -169,6 +180,7 @@ void C2_HOOK_FASTCALL WriteU16L(FILE* pF, tU16 pNumber) {
 
 // FUNCTION: CARMA2_HW 0x0048f960
 // FUNCTION: CARMA2_SW 0x0048cbd0
+// FUNCTION: CARMA2_CHEAT 0x0048fa10
 void C2_HOOK_FASTCALL WriteU8L(FILE* pF, tU8 pNumber) {
     tU8 raw_byte;
 
@@ -284,6 +296,7 @@ void C2_HOOK_FASTCALL MemSkipBytes(char** pPtr, int pBytes_to_skip) {
 
 // FUNCTION: CARMA2_HW 0x0048fa70
 // FUNCTION: CARMA2_SW 0x0048cce0
+// FUNCTION: CARMA2_CHEAT 0x0048fb20
 int C2_HOOK_FASTCALL GetALineAndInterpretCommand(FILE* pF, const char** pString_list, int pCount) {
     int i;
     char s[256];
@@ -301,6 +314,7 @@ int C2_HOOK_FASTCALL GetALineAndInterpretCommand(FILE* pF, const char** pString_
 
 // FUNCTION: CARMA2_HW 0x0048fb00
 // FUNCTION: CARMA2_SW 0x0048cd70
+// FUNCTION: CARMA2_CHEAT 0x0048fbb0
 int C2_HOOK_FASTCALL GetAnInt(FILE* pF) {
     char s[256];
     int value;
@@ -314,6 +328,7 @@ int C2_HOOK_FASTCALL GetAnInt(FILE* pF) {
 
 // FUNCTION: CARMA2_HW 0x0048fb50
 // FUNCTION: CARMA2_SW 0x0048cdc0
+// FUNCTION: CARMA2_CHEAT 0x0048fc00
 unsigned int C2_HOOK_FASTCALL BinIntegerToInteger(unsigned int pValue) {
     unsigned int result;
 
@@ -326,6 +341,7 @@ unsigned int C2_HOOK_FASTCALL BinIntegerToInteger(unsigned int pValue) {
 
 // FUNCTION: CARMA2_HW 0x004900e0
 // FUNCTION: CARMA2_SW 0x0048d350
+// FUNCTION: CARMA2_CHEAT 0x00490190
 float C2_HOOK_FASTCALL GetAFloat(FILE* pF) {
     char s[256];
     char *str;
@@ -340,6 +356,7 @@ float C2_HOOK_FASTCALL GetAFloat(FILE* pF) {
 
 // FUNCTION: CARMA2_HW 0x0048fc20
 // FUNCTION: CARMA2_SW 0x0048ce90
+// FUNCTION: CARMA2_CHEAT 0x0048fcd0
 void C2_HOOK_FASTCALL GetPairOfFloats(FILE* pF, float* pF1, float* pF2) {
     char s[256];
     char* str;
@@ -353,6 +370,7 @@ void C2_HOOK_FASTCALL GetPairOfFloats(FILE* pF, float* pF1, float* pF2) {
 
 // FUNCTION: CARMA2_HW 0x0048fc90
 // FUNCTION: CARMA2_SW 0x0048cf00
+// FUNCTION: CARMA2_CHEAT 0x0048fd40
 void C2_HOOK_FASTCALL GetThreeFloats(FILE * pF, float* pF1, float* pF2, float* pF3) {
     char s[256];
     char* str;
@@ -368,6 +386,7 @@ void C2_HOOK_FASTCALL GetThreeFloats(FILE * pF, float* pF1, float* pF2, float* p
 
 // FUNCTION: CARMA2_HW 0x0048fd30
 // FUNCTION: CARMA2_SW 0x0048cfa0
+// FUNCTION: CARMA2_CHEAT 0x0048fde0
 void C2_HOOK_FASTCALL GetAVector3(FILE* pF, br_vector3* pV) {
 
     GetThreeFloats(pF, &pV->v[0], &pV->v[1], &pV->v[2]);
@@ -375,6 +394,7 @@ void C2_HOOK_FASTCALL GetAVector3(FILE* pF, br_vector3* pV) {
 
 // FUNCTION: CARMA2_HW 0x0048fdc0
 // FUNCTION: CARMA2_SW 0x0048d030
+// FUNCTION: CARMA2_CHEAT 0x0048fe70
 void C2_HOOK_FASTCALL GetPairOfInts(FILE* pF, int* pF1, int* pF2) {
     char s[256];
     char* str;
@@ -388,6 +408,7 @@ void C2_HOOK_FASTCALL GetPairOfInts(FILE* pF, int* pF1, int* pF2) {
 
 // FUNCTION: CARMA2_HW 0x0048fe30
 // FUNCTION: CARMA2_SW 0x0048d0a0
+// FUNCTION: CARMA2_CHEAT 0x0048fee0
 void C2_HOOK_FASTCALL GetThreeInts(FILE* pF, int* pF1, int* pF2, int* pF3) {
     char s[256];
     char* str;
@@ -433,6 +454,7 @@ void C2_HOOK_FASTCALL GetIntAndAString(FILE* pF, int* pF1, char* pS) {
 
 // FUNCTION: CARMA2_HW 0x00490020
 // FUNCTION: CARMA2_SW 0x0048d290
+// FUNCTION: CARMA2_CHEAT 0x004900d0
 void C2_HOOK_FASTCALL GetFourInts(FILE* pF, int* pF1, int* pF2, int* pF3, int* pF4) {
     char s[256];
     char* str;
@@ -450,6 +472,7 @@ void C2_HOOK_FASTCALL GetFourInts(FILE* pF, int* pF1, int* pF2, int* pF3, int* p
 
 // FUNCTION: CARMA2_HW 0x0048fb80
 // FUNCTION: CARMA2_SW 0x0048cdf0
+// FUNCTION: CARMA2_CHEAT 0x0048fc30
 br_scalar C2_HOOK_FASTCALL GetAScalar(FILE* pF) {
 
     return GetAFloat(pF);
@@ -457,6 +480,7 @@ br_scalar C2_HOOK_FASTCALL GetAScalar(FILE* pF) {
 
 // FUNCTION: CARMA2_HW 0x00490130
 // FUNCTION: CARMA2_SW 0x0048d3a0
+// FUNCTION: CARMA2_CHEAT 0x004901e0
 void GetPairOfScalars(FILE* pF, br_scalar* pS1, br_scalar* pS2) {
     float f1;
     float f2;
@@ -468,6 +492,7 @@ void GetPairOfScalars(FILE* pF, br_scalar* pS1, br_scalar* pS2) {
 
 // FUNCTION: CARMA2_HW 0x004901c0
 // FUNCTION: CARMA2_SW 0x0048d430
+// FUNCTION: CARMA2_CHEAT 0x00490270
 void C2_HOOK_FASTCALL GetThreeScalars(FILE* pF, br_scalar* pS1, br_scalar* pS2, br_scalar* pS3) {
     float f1;
     float f2;
@@ -481,6 +506,7 @@ void C2_HOOK_FASTCALL GetThreeScalars(FILE* pF, br_scalar* pS1, br_scalar* pS2, 
 
 // FUNCTION: CARMA2_HW 0x00490270
 // FUNCTION: CARMA2_SW 0x0048d4e0
+// FUNCTION: CARMA2_CHEAT 0x00490320
 void C2_HOOK_FASTCALL GetFourScalars(FILE* pF, br_scalar* pS1, br_scalar* pS2, br_scalar* pS3, br_scalar* pS4) {
     char s[256];
     char* str;
@@ -506,6 +532,7 @@ void C2_HOOK_FASTCALL GetFourScalars(FILE* pF, br_scalar* pS1, br_scalar* pS2, b
 
 // FUNCTION: CARMA2_HW 0x00490350
 // FUNCTION: CARMA2_SW 0x0048d5c0
+// FUNCTION: CARMA2_CHEAT 0x00490400
 void C2_HOOK_FASTCALL GetFiveScalars(FILE* pF, br_scalar* pS1, br_scalar* pS2, br_scalar* pS3, br_scalar* pS4, br_scalar* pS5) {
     char s[256];
     char* str;
@@ -534,6 +561,7 @@ void C2_HOOK_FASTCALL GetFiveScalars(FILE* pF, br_scalar* pS1, br_scalar* pS2, b
 }
 
 // FUNCTION: CARMA2_HW 0x00490460
+// FUNCTION: CARMA2_CHEAT 0x00490510
 void C2_HOOK_FASTCALL GetNScalars(FILE* pF, int n, br_scalar* pS) {
     char s[256];
     char* str;
@@ -550,6 +578,7 @@ void C2_HOOK_FASTCALL GetNScalars(FILE* pF, int n, br_scalar* pS) {
 }
 
 // FUNCTION: CARMA2_HW 0x004904e0
+// FUNCTION: CARMA2_CHEAT 0x00490590
 void C2_HOOK_FASTCALL GetPairOfFloatPercents(FILE* pF, float* pF1, float* pF2) {
     char s[256];
     char* str;
@@ -564,6 +593,7 @@ void C2_HOOK_FASTCALL GetPairOfFloatPercents(FILE* pF, float* pF1, float* pF2) {
 }
 
 // FUNCTION: CARMA2_HW 0x00490570
+// FUNCTION: CARMA2_CHEAT 0x00490620
 void C2_HOOK_FASTCALL GetThreeFloatPercents(FILE* pF, float* pF1, float* pF2, float* pF3) {
     char s[256];
     char* str;
@@ -582,6 +612,7 @@ void C2_HOOK_FASTCALL GetThreeFloatPercents(FILE* pF, float* pF1, float* pF2, fl
 
 // FUNCTION: CARMA2_HW 0x00490630
 // FUNCTION: CARMA2_SW 0x0048d8a0
+// FUNCTION: CARMA2_CHEAT 0x004906e0
 void C2_HOOK_FASTCALL GetAString(FILE* pF, char* pString) {
     char s[256];
     char* str;
@@ -594,6 +625,7 @@ void C2_HOOK_FASTCALL GetAString(FILE* pF, char* pString) {
 
 // FUNCTION: CARMA2_HW 0x00490690
 // FUNCTION: CARMA2_SW 0x0048d900
+// FUNCTION: CARMA2_CHEAT 0x00490740
 void C2_HOOK_FASTCALL StripCRNL(char* line) {
     char* loc;
 
@@ -610,6 +642,7 @@ void C2_HOOK_FASTCALL StripCRNL(char* line) {
 
 // FUNCTION: CARMA2_HW 0x004906c0
 // FUNCTION: CARMA2_SW 0x0048d930
+// FUNCTION: CARMA2_CHEAT 0x00490770
 void C2_HOOK_CDECL SubsStringJob(char *pFormat, ...) {
     char *str;
     char temp[256];
@@ -721,6 +754,7 @@ static void C2_HOOK_FASTCALL EncodeLine2(char* pS) {
 
 // FUNCTION: CARMA2_HW 0x004907b0
 // FUNCTION: CARMA2_SW 0x0048da20
+// FUNCTION: CARMA2_CHEAT 0x00490860
 void C2_HOOK_FASTCALL EncodeLine_DEMO(char* pS) {
     int len;
     int seed;
@@ -749,6 +783,7 @@ void C2_HOOK_FASTCALL EncodeLine_DEMO(char* pS) {
 
 // FUNCTION: CARMA2_HW 0x00490840
 // FUNCTION: CARMA2_SW 0x0048dab0
+// FUNCTION: CARMA2_CHEAT 0x004908f0
 void C2_HOOK_FASTCALL EncodeFile(char* pThe_path) {
     FILE* f;
     FILE* d;
@@ -834,6 +869,7 @@ void C2_HOOK_FASTCALL EncodeFile(char* pThe_path) {
 
 // FUNCTION: CARMA2_HW 0x00490bc0
 // FUNCTION: CARMA2_SW 0x0048de30
+// FUNCTION: CARMA2_CHEAT 0x00490c70
 void C2_HOOK_FASTCALL EncodeFileWrapper(char* pThe_path) {
     int len;
 
@@ -857,6 +893,7 @@ void C2_HOOK_FASTCALL EncodeFileWrapper(char* pThe_path) {
 
 // FUNCTION: CARMA2_HW 0x00490ec0
 // FUNCTION: CARMA2_SW 0x0048e130
+// FUNCTION: CARMA2_CHEAT 0x00490f70
 void C2_HOOK_FASTCALL SkipNLines(FILE* pF) {
     int i;
     int count;
@@ -870,6 +907,7 @@ void C2_HOOK_FASTCALL SkipNLines(FILE* pF) {
 
 // FUNCTION: CARMA2_HW 0x00490f30
 // FUNCTION: CARMA2_SW 0x0048e1a0
+// FUNCTION: CARMA2_CHEAT 0x00490fe0
 char * C2_HOOK_FASTCALL GetALineWithNoPossibleService(FILE* pF, char* pS) {
     char* result;
     size_t len;
@@ -934,6 +972,7 @@ char * C2_HOOK_FASTCALL GetALineWithNoPossibleService(FILE* pF, char* pS) {
 
 // FUNCTION: CARMA2_HW 0x00491090
 // FUNCTION: CARMA2_SW 0x0048e300
+// FUNCTION: CARMA2_CHEAT 0x00491140
 char * C2_HOOK_FASTCALL GetALineAndDontArgue(FILE* pF, char* pS) {
 
     PossibleService();
@@ -1043,6 +1082,7 @@ FILE* OldDRfopen(const char* pFilename, const char* pMode) {
 
 // FUNCTION: CARMA2_HW 0x004910b0
 // FUNCTION: CARMA2_SW 0x0048e320
+// FUNCTION: CARMA2_CHEAT 0x00491160
 void C2_HOOK_FASTCALL AllowOpenToFail(void) {
 
     gAllow_open_to_fail = 1;
@@ -1050,6 +1090,7 @@ void C2_HOOK_FASTCALL AllowOpenToFail(void) {
 
 // FUNCTION: CARMA2_HW 0x004910c0
 // FUNCTION: CARMA2_SW 0x0048e330
+// FUNCTION: CARMA2_CHEAT 0x00491170
 void C2_HOOK_FASTCALL DoNotAllowOpenToFail(void) {
 
 }
@@ -1058,6 +1099,7 @@ void C2_HOOK_FASTCALL DoNotAllowOpenToFail(void) {
 
 // FUNCTION: CARMA2_HW 0x00491170
 // FUNCTION: CARMA2_SW 0x0048e3e0
+// FUNCTION: CARMA2_CHEAT 0x00491220
 FILE* C2_HOOK_FASTCALL DRfopen(const char* pFilename, const char* pMode) {
     FILE *result;
 
@@ -1082,6 +1124,7 @@ FILE* C2_HOOK_FASTCALL DRfopen(const char* pFilename, const char* pMode) {
 
 // FUNCTION: CARMA2_HW 0x0044bb80
 // FUNCTION: CARMA2_SW 0x0044b8e0
+// FUNCTION: CARMA2_CHEAT 0x0044c0d0
 void C2_HOOK_FASTCALL UnlockInterfaceStuff(void) {
 #ifdef REC2_SW
   int i;
@@ -1103,6 +1146,7 @@ void C2_HOOK_FASTCALL UnlockInterfaceStuff(void) {
 
 // FUNCTION: CARMA2_HW 0x0044bb90
 // FUNCTION: CARMA2_SW 0x0044b940
+// FUNCTION: CARMA2_CHEAT 0x0044c0e0
 void C2_HOOK_FASTCALL DisposePhysicsObject(tPhysics_object* pObject) {
 
     if (pObject != NULL) {
@@ -1122,6 +1166,7 @@ void C2_HOOK_FASTCALL DisposePhysicsObject(tPhysics_object* pObject) {
 
 // FUNCTION: CARMA2_HW 0x0044be80
 // FUNCTION: CARMA2_SW 0x0044bc30
+// FUNCTION: CARMA2_CHEAT 0x0044c3d0
 intptr_t C2_HOOK_CDECL DisposeCarActModDataCB(br_actor* pActor, void* pContext) {
     tUser_crush_data* crush_data = pActor->user;
     tCar_spec* car = pContext;
@@ -1155,6 +1200,7 @@ intptr_t C2_HOOK_CDECL DisposeCarActModDataCB(br_actor* pActor, void* pContext) 
 
 // FUNCTION: CARMA2_HW 0x0044bbe0
 // FUNCTION: CARMA2_SW 0x0044b990
+// FUNCTION: CARMA2_CHEAT 0x0044c130
 void C2_HOOK_FASTCALL DisposeCar(tCar_spec* pCar_spec, int pOwner) {
     int i;
     tCar_crush_spec* car_crush_spec;
@@ -1246,6 +1292,7 @@ void C2_HOOK_FASTCALL DisposeCar(tCar_spec* pCar_spec, int pOwner) {
 
 // FUNCTION: CARMA2_HW 0x0044bf70
 // FUNCTION: CARMA2_SW 0x0044bd20
+// FUNCTION: CARMA2_CHEAT 0x0044c4c0
 void C2_HOOK_FASTCALL DisposeRaceInfo(tRace_info* pRace_info) {
 
     // empty
@@ -1268,6 +1315,7 @@ void C2_HOOK_FASTCALL FUN_0044bf90(br_pixelmap* pMap) {
 
 // FUNCTION: CARMA2_HW 0x0044bfa0
 // FUNCTION: CARMA2_SW 0x0044bd50
+// FUNCTION: CARMA2_CHEAT 0x0044c4f0
 void C2_HOOK_FASTCALL DisposeOpponentsCars(tRace_info* pRace_info) {
     int i;
 
@@ -1295,6 +1343,7 @@ void C2_HOOK_FASTCALL DisposeOpponentsCars(tRace_info* pRace_info) {
 
 // FUNCTION: CARMA2_HW 0x0044c070
 // FUNCTION: CARMA2_SW 0x0044be20
+// FUNCTION: CARMA2_CHEAT 0x0044c5c0
 void C2_HOOK_FASTCALL DisposeRace(void) {
 
     RemoveTail();
@@ -1331,6 +1380,7 @@ void C2_HOOK_FASTCALL DisposeRace(void) {
 
 // FUNCTION: CARMA2_HW 0x0044c130
 // FUNCTION: CARMA2_SW 0x0044bee0
+// FUNCTION: CARMA2_CHEAT 0x0044c680
 void C2_HOOK_FASTCALL DisposeGameIfNecessary(void) {
     int i;
 
@@ -1361,6 +1411,7 @@ void C2_HOOK_FASTCALL DisposeGameIfNecessary(void) {
 
 // FUNCTION: CARMA2_HW 0x0044c220
 // FUNCTION: CARMA2_SW 0x0044bfd0
+// FUNCTION: CARMA2_CHEAT 0x0044c770
 void C2_HOOK_FASTCALL DisposeTrack(void) {
 
     FreeTrack(&gProgram_state.track_spec);
@@ -1368,6 +1419,7 @@ void C2_HOOK_FASTCALL DisposeTrack(void) {
 
 // FUNCTION: CARMA2_HW 0x004910d0
 // FUNCTION: CARMA2_SW 0x0048e340
+// FUNCTION: CARMA2_CHEAT 0x00491180
 int GetRegisterSourceLocation(char* pSource_location) {
 #ifdef REC2_MATCHING
     HKEY hKey;

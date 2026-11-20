@@ -33,6 +33,7 @@
 
 // GLOBAL: CARMA2_HW 0x006593a0
 // GLOBAL: CARMA2_SW 0x00653d88
+// GLOBAL: CARMA2_CHEAT 0x0065fcb8
 const int gArrows[2][4][60] = {
     {
         // inner arrow (=fill)
@@ -56,165 +57,207 @@ const int gArrows[2][4][60] = {
 
 // GLOBAL: CARMA2_HW 0x00655df0
 // GLOBAL: CARMA2_SW 0x00650cd8
-br_vector3 y_unit_vector = { { 0.f, 1.f, 0.f } };
+// GLOBAL: CARMA2_CHEAT 0x0065c670
+br_vector3 y_unit_vector = { { 0.0f, 1.0f, 0.0f } };
 
 // GLOBAL: CARMA2_HW 0x00655dfc
 // GLOBAL: CARMA2_SW 0x00650ce4
+// GLOBAL: CARMA2_CHEAT 0x0065c67c
 int gMini_map_visible = 2;
 
 // GLOBAL: CARMA2_HW 0x0074a780
+// GLOBAL: CARMA2_CHEAT 0x00751e20
 tCar_icon gCar_icons[128];
 
 // GLOBAL: CARMA2_HW 0x0074ab84
+// GLOBAL: CARMA2_CHEAT 0x00752224
 br_actor* gCar_icons_model_actor;
 
 // GLOBAL: CARMA2_HW 0x0068d8c4
 // GLOBAL: CARMA2_SW 0x0068791c
+// GLOBAL: CARMA2_CHEAT 0x00695164
 tCar_spec* gTarget_lock_car_1;
 
 // GLOBAL: CARMA2_HW 0x0068d6f0
 // GLOBAL: CARMA2_SW 0x00687748
+// GLOBAL: CARMA2_CHEAT 0x00694f90
 tCar_spec* gTarget_lock_car_2;
 
 // GLOBAL: CARMA2_HW 0x0068d8c8
 // GLOBAL: CARMA2_SW 0x00687920
+// GLOBAL: CARMA2_CHEAT 0x00695168
 int gTarget_lock_enabled;
 
 // GLOBAL: CARMA2_HW 0x0068d8cc
 // GLOBAL: CARMA2_SW 0x00687924
+// GLOBAL: CARMA2_CHEAT 0x0069516c
 int gInitMap_done;
 
 // GLOBAL: CARMA2_HW 0x0074abdc
 // GLOBAL: CARMA2_SW 0x00741288
+// GLOBAL: CARMA2_CHEAT 0x0075227c
 float gHeadup_map_x_float;
 
 // GLOBAL: CARMA2_HW 0x0074abd8
 // GLOBAL: CARMA2_SW 0x00741284
+// GLOBAL: CARMA2_CHEAT 0x00752278
 float gHeadup_map_y_float;
 
 // GLOBAL: CARMA2_HW 0x0074abcc
 // GLOBAL: CARMA2_SW 0x00741278
+// GLOBAL: CARMA2_CHEAT 0x0075226c
 float gHeadup_map_w_float;
 
 // GLOBAL: CARMA2_HW 0x0074ab80
 // GLOBAL: CARMA2_SW 0x00741230
+// GLOBAL: CARMA2_CHEAT 0x00752220
 float gHeadup_map_h_float;
 
 // GLOBAL: CARMA2_HW 0x0074ab88
 // GLOBAL: CARMA2_SW 0x00741234
+// GLOBAL: CARMA2_CHEAT 0x00752228
 int gINT_0074ab88;
 
 // GLOBAL: CARMA2_HW 0x0074ab8c
 // GLOBAL: CARMA2_SW 0x00741238
+// GLOBAL: CARMA2_CHEAT 0x0075222c
 int gINT_0074ab8c;
 
 // GLOBAL: CARMA2_HW 0x0074ab94
 // GLOBAL: CARMA2_SW 0x00741240
+// GLOBAL: CARMA2_CHEAT 0x00752234
 int gINT_0074ab94;
 
 // GLOBAL: CARMA2_HW 0x0074ab98
 // GLOBAL: CARMA2_SW 0x00741244
+// GLOBAL: CARMA2_CHEAT 0x00752238
 int gHeadup_map_half_height;
 
 // GLOBAL: CARMA2_HW 0x0074abe4
 // GLOBAL: CARMA2_SW 0x00741290
+// GLOBAL: CARMA2_CHEAT 0x00752284
 int gHeadup_map_half_width;
 
 // GLOBAL: CARMA2_HW 0x0074abec
 // GLOBAL: CARMA2_SW 0x00741298
+// GLOBAL: CARMA2_CHEAT 0x0075228c
 int gINT_0074abec;
 
 // GLOBAL: CARMA2_HW 0x0068d8d8
+// GLOBAL: CARMA2_CHEAT 0x00695178
 br_pixelmap* gMap_overlay;
 
 // GLOBAL: CARMA2_HW 0x0074aba0
 // GLOBAL: CARMA2_SW 0x0074124c
+// GLOBAL: CARMA2_CHEAT 0x00752240
 int gMini_map_x;
 
 // GLOBAL: CARMA2_HW 0x0074aba4
 // GLOBAL: CARMA2_SW 0x00741250
+// GLOBAL: CARMA2_CHEAT 0x00752244
 int gMini_map_y;
 
 // GLOBAL: CARMA2_HW 0x0074abd4
 // GLOBAL: CARMA2_SW 0x00741280
+// GLOBAL: CARMA2_CHEAT 0x00752274
 int gINT_0074abd4;
 
 // GLOBAL: CARMA2_HW 0x0074abd0
 // GLOBAL: CARMA2_SW 0x0074127c
+// GLOBAL: CARMA2_CHEAT 0x00752270
 int gINT_0074abd0;
 
 // GLOBAL: CARMA2_HW 0x0068d8dc
 // GLOBAL: CARMA2_SW 0x00687934
+// GLOBAL: CARMA2_CHEAT 0x0069517c
 br_pixelmap* gMini_map;
 
 // GLOBAL: CARMA2_HW 0x00655f04
-int gINT_00655f04;
+// GLOBAL: CARMA2_CHEAT 0x0065c784
+int gINT_00655f04 = 520;
 
 // GLOBAL: CARMA2_HW 0x00655f08
-int gINT_00655f08;
+// GLOBAL: CARMA2_CHEAT 0x0065c788
+int gINT_00655f08 = 380;
 
 // GLOBAL: CARMA2_HW 0x0068d8a0
 // GLOBAL: CARMA2_SW 0x006878f8
+// GLOBAL: CARMA2_CHEAT 0x00695140
 float gFLOAT_0068d8a0;
 
 // GLOBAL: CARMA2_HW 0x0068d8a4
 // GLOBAL: CARMA2_SW 0x006878fc
+// GLOBAL: CARMA2_CHEAT 0x00695144
 float gFLOAT_0068d8a4;
 
 // GLOBAL: CARMA2_HW 0x0068d8a8
 // GLOBAL: CARMA2_SW 0x00687900
+// GLOBAL: CARMA2_CHEAT 0x00695148
 float gMini_map_arrow_z;
 
 // GLOBAL: CARMA2_HW 0x0074ab9c
 // GLOBAL: CARMA2_SW 0x00741248
+// GLOBAL: CARMA2_CHEAT 0x0075223c
 float gFLOAT_0074ab9c;
 
 // GLOBAL: CARMA2_HW 0x0074abb8
 // GLOBAL: CARMA2_SW 0x00741264
+// GLOBAL: CARMA2_CHEAT 0x00752258
 float gFLOAT_0074abb8;
 
 // GLOBAL: CARMA2_HW 0x0074abbc
 // GLOBAL: CARMA2_SW 0x00741268
+// GLOBAL: CARMA2_CHEAT 0x0075225c
 int gMap_render_y_i;
 
 // GLOBAL: CARMA2_HW 0x0074abc0
 // GLOBAL: CARMA2_SW 0x0074126c
+// GLOBAL: CARMA2_CHEAT 0x00752260
 int gMap_render_x_i;
 
 // GLOBAL: CARMA2_HW 0x0074abc8
 // GLOBAL: CARMA2_SW 0x00741274
+// GLOBAL: CARMA2_CHEAT 0x00752268
 int gMap_render_height_i;
 
 // GLOBAL: CARMA2_HW 0x0074abe8
 // GLOBAL: CARMA2_SW 0x00741294
+// GLOBAL: CARMA2_CHEAT 0x00752288
 int gMap_render_width_i;
 
 // GLOBAL: CARMA2_HW 0x0068d6e4
 // GLOBAL: CARMA2_SW 0x0068773c
+// GLOBAL: CARMA2_CHEAT 0x00694f84
 br_pixelmap* gCheckpoint_numbers;
 
 // GLOBAL: CARMA2_HW 0x0068d884
 // GLOBAL: CARMA2_SW 0x006878dc
+// GLOBAL: CARMA2_CHEAT 0x00695124
 br_pixelmap* gSmashy_dot;
 
 // GLOBAL: CARMA2_HW 0x0068d88c
 // GLOBAL: CARMA2_SW 0x006878e4
+// GLOBAL: CARMA2_CHEAT 0x0069512c
 int gBack_original_base_x;
 
 // GLOBAL: CARMA2_HW 0x0068d888
 // GLOBAL: CARMA2_SW 0x006878e0
+// GLOBAL: CARMA2_CHEAT 0x00695128
 int gBack_original_base_y;
 
 // GLOBAL: CARMA2_HW 0x0068d6ec
 // GLOBAL: CARMA2_SW 0x00687744
+// GLOBAL: CARMA2_CHEAT 0x00694f8c
 int gBack_original_origin_x;
 
 // GLOBAL: CARMA2_HW 0x0068d6e8
 // GLOBAL: CARMA2_SW 0x00687740
+// GLOBAL: CARMA2_CHEAT 0x00694f88
 int gBack_original_origin_y;
 
 // GLOBAL: CARMA2_HW 0x0068c87c
 // GLOBAL: CARMA2_SW 0x006868d4
+// GLOBAL: CARMA2_CHEAT 0x0069411c
 br_pixelmap* gAlt_meter;
 
 // GLOBAL: CARMA2_HW 0x0068c880
@@ -223,22 +266,27 @@ br_matrix23 gMatrix23_0068c880;
 
 // GLOBAL: CARMA2_HW 0x0068c868
 // GLOBAL: CARMA2_SW 0x006868c0
+// GLOBAL: CARMA2_CHEAT 0x00694108
 br_vector3 gOrigin_map;
 
 // GLOBAL: CARMA2_HW 0x0068d898
 // GLOBAL: CARMA2_SW 0x006878f0
+// GLOBAL: CARMA2_CHEAT 0x00695138
 br_vector2 gOrigin_headup_map;
 
 // GLOBAL: CARMA2_HW 0x0068c860
 // GLOBAL: CARMA2_SW 0x006868b8
+// GLOBAL: CARMA2_CHEAT 0x00694100
 int gCheckpoint_digit_height;
 
 // GLOBAL: CARMA2_HW 0x0068d8bc
 // GLOBAL: CARMA2_SW 0x00687914
+// GLOBAL: CARMA2_CHEAT 0x0069515c
 int gCheckpoint_digit_center_x;
 
 // GLOBAL: CARMA2_HW 0x0068c85c
 // GLOBAL: CARMA2_SW 0x006868b4
+// GLOBAL: CARMA2_CHEAT 0x006940fc
 tU32 gCheckpoint_digit_center_y;
 
 // GLOBAL: CARMA2_HW 0x0068d8f0
@@ -251,14 +299,17 @@ int flash_state;
 
 // GLOBAL: CARMA2_HW 0x0068d6f8
 // GLOBAL: CARMA2_SW 0x00687750
+// GLOBAL: CARMA2_CHEAT 0x00694f98
 tOppo_status_messages gOppo_status_messages[9];
 
 // GLOBAL: CARMA2_HW 0x0074abe0
 // GLOBAL: CARMA2_SW 0x0074128c
+// GLOBAL: CARMA2_CHEAT 0x00752280
 int gCount_smashable_race_targets;
 
 // GLOBAL: CARMA2_HW 0x0068c898
 // GLOBAL: CARMA2_SW 0x006868f0
+// GLOBAL: CARMA2_CHEAT 0x00694138
 tSmashable_race_target gSmashable_race_targets[300];
 
 #ifdef REC2_HW
@@ -270,6 +321,7 @@ br_actor* gLit_op_stat_actor;
 
 // FUNCTION: CARMA2_HW 0x004945f0
 // FUNCTION: CARMA2_SW 0x004918f0
+// FUNCTION: CARMA2_CHEAT 0x00494820
 void C2_HOOK_FASTCALL ToggleTargetLock(void) {
     char name[256];
     char s[256];
@@ -302,6 +354,7 @@ void C2_HOOK_FASTCALL ToggleTargetLock(void) {
 
 // FUNCTION: CARMA2_HW 0x00494700
 // FUNCTION: CARMA2_SW 0x00491a00
+// FUNCTION: CARMA2_CHEAT 0x00494930
 void C2_HOOK_FASTCALL CycleTargetLock(void) {
     tVehicle_type category;
     int i;
@@ -369,6 +422,7 @@ void C2_HOOK_FASTCALL CycleMapOptions(void) {
 
 // FUNCTION: CARMA2_HW 0x00494880
 // FUNCTION: CARMA2_SW 0x00491b80
+// FUNCTION: CARMA2_CHEAT 0x00494ab0
 void C2_HOOK_FASTCALL ToggleMapTransparency(void) {
 
     gMap_trans = !gMap_trans;
@@ -382,6 +436,7 @@ void C2_HOOK_FASTCALL InitTargetLock(void) {
 }
 
 // FUNCTION: CARMA2_HW 0x004948b0
+// FUNCTION: CARMA2_CHEAT 0x00494ae0
 void C2_HOOK_FASTCALL SetIntegerMapRenders(void) {
 
     gMap_render_width = 128.f;
@@ -395,6 +450,7 @@ void C2_HOOK_FASTCALL SetIntegerMapRenders(void) {
 // OppositeColour
 
 // FUNCTION: CARMA2_HW 0x00495a00
+// FUNCTION: CARMA2_CHEAT 0x00495c70
 // STUB: CARMA2_SW 0x00492400
 void C2_HOOK_FASTCALL DrawArrow(br_pixelmap* pScreen, br_uint_32 pArrow_index, const br_vector3* pPos, br_uint_32 pColour) {
     int colours[2];
@@ -469,6 +525,7 @@ void C2_HOOK_FASTCALL DrawArrow(br_pixelmap* pScreen, br_uint_32 pArrow_index, c
 // DrawCarArrow
 
 // FUNCTION: CARMA2_HW 0x00495ba0
+// FUNCTION: CARMA2_CHEAT 0x00495e10
 void C2_HOOK_FASTCALL DoSomeThingsToCheckpoints(br_pixelmap* pMap, tU32 pTime, tDoSomethingsToCheckpoints_cbfn* pCallback, int pDraw_prev) {
     int i;
     int checkpoint;
@@ -576,6 +633,7 @@ void C2_HOOK_FASTCALL DrawOffsetCheckpoint(br_pixelmap* pMap, int pCheckpoint, t
 
 // STUB: CARMA2_HW 0x00495e10
 // STUB: CARMA2_SW 0x004927b0
+// STUB: CARMA2_CHEAT 0x00496080
 void C2_HOOK_FASTCALL DoMapOverlays(br_pixelmap* pScreen) {
     NOT_IMPLEMENTED();
 }
@@ -675,6 +733,7 @@ void C2_HOOK_FASTCALL AllocateOppoBarActor(int pX, int pY) {
 
 // STUB: CARMA2_HW 0x004950b0
 // STUB: CARMA2_SW 0x00491c00
+// STUB: CARMA2_CHEAT 0x004952e0
 void C2_HOOK_FASTCALL MapOverlay(void) {
     NOT_IMPLEMENTED();
 }
@@ -689,6 +748,7 @@ void C2_HOOK_FASTCALL MapOverlay(void) {
 
 // FUNCTION: CARMA2_HW 0x00496d80
 // FUNCTION: CARMA2_SW 0x00493bf0
+// FUNCTION: CARMA2_CHEAT 0x00497130
 void C2_HOOK_FASTCALL MapStuffAfterRender(void) {
     if (gCurrent_race.map_image == NULL) {
         return;
@@ -737,6 +797,7 @@ static void C2_HOOK_FASTCALL ReadMoodMessages(void) {
 
 // FUNCTION: CARMA2_HW 0x00496e30
 // FUNCTION: CARMA2_SW 0x00493ca0
+// FUNCTION: CARMA2_CHEAT 0x004971e0
 void C2_HOOK_FASTCALL InitMap(void) {
 
     if (!gInitMap_done) {
@@ -924,6 +985,7 @@ void C2_HOOK_FASTCALL ConvertCarIcons(br_pixelmap* pMap) {
 
 // FUNCTION: CARMA2_HW 0x00497610
 // FUNCTION: CARMA2_SW 0x00494240
+// FUNCTION: CARMA2_CHEAT 0x004979c0
 void C2_HOOK_FASTCALL MapChanged(void) {
 
     InitMap();
@@ -932,6 +994,7 @@ void C2_HOOK_FASTCALL MapChanged(void) {
 
 // FUNCTION: CARMA2_HW 0x00497620
 // FUNCTION: CARMA2_SW 0x00494250
+// FUNCTION: CARMA2_CHEAT 0x004979d0
 void C2_HOOK_FASTCALL CheckMapMoveKeys(int pKey0, int pKey1) {
 
     if (KeyIsDown(31) && pKey0) {
@@ -969,6 +1032,7 @@ void C2_HOOK_FASTCALL InitSmashTargets(void) {
 
 // FUNCTION: CARMA2_HW 0x004977f0
 // FUNCTION: CARMA2_SW 0x00494420
+// FUNCTION: CARMA2_CHEAT 0x00497ba0
 void C2_HOOK_FASTCALL AddSmashTarget(br_model* pModel, br_actor* pActor, int pUnknown) {
     int index;
 

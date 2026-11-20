@@ -23,42 +23,52 @@
 
 // GLOBAL: CARMA2_HW 0x0068c1f0
 // GLOBAL: CARMA2_SW 0x00686238
+// GLOBAL: CARMA2_CHEAT 0x00693a90
 int gAlways_typing;
 
 // GLOBAL: CARMA2_HW 0x0068c1ec
 // GLOBAL: CARMA2_SW 0x00686234
+// GLOBAL: CARMA2_CHEAT 0x00693a8c
 int gDisabled_count;
 
 // GLOBAL: CARMA2_HW 0x0068c1f8
 // GLOBAL: CARMA2_SW 0x00686240
+// GLOBAL: CARMA2_CHEAT 0x00693a98
 int gDisabled_choices[10];
 
 // GLOBAL: CARMA2_HW 0x0075b8fc
 // GLOBAL: CARMA2_SW 0x00751e5c
+// GLOBAL: CARMA2_CHEAT 0x00762f9c
 int gTyping_slot;
 
 // GLOBAL: CARMA2_HW 0x0068c1e8
 // GLOBAL: CARMA2_SW 0x00686230
+// GLOBAL: CARMA2_CHEAT 0x00693a88
 const tInterface_spec* gSpec;
 
 // GLOBAL: CARMA2_HW 0x0068c220
 // GLOBAL: CARMA2_SW 0x00686268
+// GLOBAL: CARMA2_CHEAT 0x00693ac0
 int gCurrent_mode;
 
 // GLOBAL: CARMA2_HW 0x0068c224
 // GLOBAL: CARMA2_SW 0x0068626c
+// GLOBAL: CARMA2_CHEAT 0x00693ac4
 int gCurrent_choice;
 
 // GLOBAL: CARMA2_HW 0x0068c228
 // GLOBAL: CARMA2_SW 0x00686270
+// GLOBAL: CARMA2_CHEAT 0x00693ac8
 tU32 gStart_time;
 
 // GLOBAL: CARMA2_HW 0x0079ecb8
 // GLOBAL: CARMA2_SW 0x00795244
+// GLOBAL: CARMA2_CHEAT 0x007a6358
 int gMouse_in_use;
 
 // FUNCTION: CARMA2_HW 0x00484620
 // FUNCTION: CARMA2_SW 0x00481760
+// FUNCTION: CARMA2_CHEAT 0x00484940
 void C2_HOOK_FASTCALL SetAlwaysTyping(void) {
 
     gAlways_typing = 1;
@@ -66,6 +76,7 @@ void C2_HOOK_FASTCALL SetAlwaysTyping(void) {
 
 // FUNCTION: CARMA2_HW 0x00484630
 // FUNCTION: CARMA2_SW 0x00481770
+// FUNCTION: CARMA2_CHEAT 0x00484950
 void C2_HOOK_FASTCALL ClearAlwaysTyping(void) {
 
     gAlways_typing = 0;
@@ -84,6 +95,7 @@ int C2_HOOK_FASTCALL ChoiceDisabled(int pChoice) {
 
 // FUNCTION: CARMA2_HW 0x00484640
 // FUNCTION: CARMA2_SW 0x00481780
+// FUNCTION: CARMA2_CHEAT 0x00484960
 void C2_HOOK_FASTCALL ResetInterfaceTimeout__intrface(void) {
 
     gStart_time = PDGetTotalTime();
@@ -91,6 +103,7 @@ void C2_HOOK_FASTCALL ResetInterfaceTimeout__intrface(void) {
 
 // FUNCTION: CARMA2_HW 0x00484650
 // FUNCTION: CARMA2_SW 0x00481790
+// FUNCTION: CARMA2_CHEAT 0x00484970
 void C2_HOOK_FASTCALL DisableChoice(int pChoice) {
     int i;
 
@@ -105,6 +118,7 @@ void C2_HOOK_FASTCALL DisableChoice(int pChoice) {
 
 // FUNCTION: CARMA2_HW 0x00484680
 // FUNCTION: CARMA2_SW 0x004817c0
+// FUNCTION: CARMA2_CHEAT 0x004849a0
 void C2_HOOK_FASTCALL EnableChoice(int pChoice) {
     int i;
 
@@ -119,6 +133,7 @@ void C2_HOOK_FASTCALL EnableChoice(int pChoice) {
 
 // FUNCTION: CARMA2_HW 0x00484dd0
 // FUNCTION: CARMA2_SW 0x00481f10
+// FUNCTION: CARMA2_CHEAT 0x004850f0
 void C2_HOOK_FASTCALL ChangeSelection(const tInterface_spec* pSpec, int* pOld_selection, int* pNew_selection, int pMode, int pSkip_disabled) {
 
     if (ChoiceDisabled(*pNew_selection)) {
@@ -161,6 +176,7 @@ void C2_HOOK_FASTCALL RecopyAreas(const tInterface_spec* pSpec) {
 
 // FUNCTION: CARMA2_HW 0x004846e0
 // FUNCTION: CARMA2_SW 0x00481820
+// FUNCTION: CARMA2_CHEAT 0x00484a00
 int C2_HOOK_FASTCALL DoInterfaceScreen(const tInterface_spec* pSpec, int pOptions, int pCurrent_choice) {
     tProg_status entry_status;
     int i;
@@ -379,6 +395,7 @@ int C2_HOOK_FASTCALL DoInterfaceScreen(const tInterface_spec* pSpec, int pOption
 
 // FUNCTION: CARMA2_HW 0x00484f10
 // FUNCTION: CARMA2_SW 0x00482050
+// FUNCTION: CARMA2_CHEAT 0x00485230
 void C2_HOOK_FASTCALL ChangeSelectionTo(int pNew_choice, int pNew_mode) {
     int last_choice;
 
@@ -390,6 +407,7 @@ void C2_HOOK_FASTCALL ChangeSelectionTo(int pNew_choice, int pNew_mode) {
 
 // FUNCTION: CARMA2_HW 0x00484f40
 // FUNCTION: CARMA2_SW 0x00482080
+// FUNCTION: CARMA2_CHEAT 0x00485260
 int C2_HOOK_FASTCALL WhichItemIsSelectedIn(tFrontend_spec* pFrontend, int pGroup) {
     int i;
 
@@ -405,6 +423,7 @@ int C2_HOOK_FASTCALL WhichItemIsSelectedIn(tFrontend_spec* pFrontend, int pGroup
 
 // FUNCTION: CARMA2_HW 0x00484f70
 // FUNCTION: CARMA2_SW 0x004820b0
+// FUNCTION: CARMA2_CHEAT 0x00485290
 void C2_HOOK_FASTCALL SelectThisItemIn(tFrontend_spec* pFrontend, int pGroup, int pValue) {
     int i;
 

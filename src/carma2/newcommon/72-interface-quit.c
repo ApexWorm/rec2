@@ -11,6 +11,7 @@
 #include "72-interface.h"
 
 // GLOBAL: CARMA2_HW 0x00649df0
+// GLOBAL: CARMA2_CHEAT 0x00650670
 tFrontend_spec gFrontend_QUIT = {
 #if 0 // FIXME: enable this
     "Quit",

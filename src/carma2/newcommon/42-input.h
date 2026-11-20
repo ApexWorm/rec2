@@ -60,7 +60,7 @@ extern tKey_down_result C2_HOOK_FASTCALL EdgeTriggeryKey(int pKey_index, int pRe
 
 extern int C2_HOOK_FASTCALL PDKeyDown(int pKey_index);
 
-// PDKeyDown3
+extern int C2_HOOK_FASTCALL PDKeyDown3(int pIndex);
 
 extern int C2_HOOK_FASTCALL PDAnyKeyDown(void);
 

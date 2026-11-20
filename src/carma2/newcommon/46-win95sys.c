@@ -154,6 +154,7 @@ void C2_HOOK_FASTCALL DoRunLengthX(tFlic_descriptor* pFlic_info, tU32 pChunk_len
 // PDEnterDebugger
 
 // FUNCTION: CARMA2_HW 0x0051b9a0
+// FUNCTION: CARMA2_CHEAT 0x00521250
 void C2_HOOK_FASTCALL PDAllocateActionReplayBuffer(tU8** pBuffer, tU32* pSize) {
 
     PDReallyAllocateActionReplayBuffer();
@@ -167,6 +168,7 @@ void C2_HOOK_FASTCALL PDAllocateActionReplayBuffer(tU8** pBuffer, tU32* pSize) {
 
 // FUNCTION: CARMA2_HW 0x0051b9d0
 // FUNCTION: CARMA2_SW 0x005157a0
+// FUNCTION: CARMA2_CHEAT 0x00521280
 void C2_HOOK_FASTCALL PDDisposeActionReplayBuffer(void* pBuffer) {
     (void)pBuffer;
 }

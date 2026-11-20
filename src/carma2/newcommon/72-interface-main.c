@@ -13,6 +13,7 @@
 
 // GLOBAL: CARMA2_HW 0x005a80f0
 // GLOBAL: CARMA2_SW 0x005a3020
+// GLOBAL: CARMA2_CHEAT 0x005ae970
 tFrontend_spec gFrontend_MAIN = {
 #if 0 // FIXME: enable this
     "Main",

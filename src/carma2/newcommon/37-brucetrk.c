@@ -18,22 +18,27 @@
 
 // GLOBAL: CARMA2_HW 0x0058f490
 // GLOBAL: CARMA2_SW 0x0058a490
+// GLOBAL: CARMA2_CHEAT 0x005944ec
 int gRender_alternative_track_actors = 1;
 
 // GLOBAL: CARMA2_HW 0x00655e60
 // GLOBAL: CARMA2_SW 0x00650d48
+// GLOBAL: CARMA2_CHEAT 0x0065c6e0
 br_scalar gYon_factor = 0.25f;
 
 // GLOBAL: CARMA2_HW 0x0074b74c
 // GLOBAL: CARMA2_SW 0x00741e0c
+// GLOBAL: CARMA2_CHEAT 0x00752dec
 br_material* gDefault_track_material;
 
 // GLOBAL: CARMA2_HW 0x00679260
 // GLOBAL: CARMA2_SW 0x006739d0
+// GLOBAL: CARMA2_CHEAT 0x00680b10
 int gCount_track_non_cars;
 
 // GLOBAL: CARMA2_HW 0x00679268
 // GLOBAL: CARMA2_SW 0x006739d8
+// GLOBAL: CARMA2_CHEAT 0x00680b18
 br_vector3 gAverage_grid_position;
 
 // AssertNoncars
@@ -46,6 +51,7 @@ br_vector3 gAverage_grid_position;
 
 // FUNCTION: CARMA2_HW 0x0040c660
 // FUNCTION: CARMA2_SW 0x0040c650
+// FUNCTION: CARMA2_CHEAT 0x0040c700
 br_uint_8 C2_HOOK_CDECL ActorToActorMatrix34(br_matrix34* m, br_actor* a, br_actor* b) {
     br_uint_8 transform_type_combine[7][7] = {
         { 0, 0, 0, 0, 0, 0, 0 },
@@ -132,6 +138,7 @@ br_uint_8 C2_HOOK_CDECL ActorToActorMatrix34(br_matrix34* m, br_actor* a, br_act
 
 // FUNCTION: CARMA2_HW 0x0040ca40
 // FUNCTION: CARMA2_SW 0x0040ca30
+// FUNCTION: CARMA2_CHEAT 0x0040cae0
 void C2_HOOK_CDECL ActorRelink(br_actor* parent, br_actor* a) {
     br_matrix34 mat34;
 
@@ -144,6 +151,7 @@ void C2_HOOK_CDECL ActorRelink(br_actor* parent, br_actor* a) {
 
 // FUNCTION: CARMA2_HW 0x0040ca90
 // FUNCTION: CARMA2_SW 0x0040ca80
+// FUNCTION: CARMA2_CHEAT 0x0040cb30
 void C2_HOOK_FASTCALL DisposeColumns(tTrack_spec* pTrack_spec) {
     int z;
     int x;
@@ -181,6 +189,7 @@ void C2_HOOK_FASTCALL DisposeColumns(tTrack_spec* pTrack_spec) {
 
 // FUNCTION: CARMA2_HW 0x0040cb90
 // FUNCTION: CARMA2_SW 0x0040cb80
+// FUNCTION: CARMA2_CHEAT 0x0040cc30
 void C2_HOOK_FASTCALL XZToColumnXZ(tU8* pColumn_x, tU8* pColumn_z, br_scalar pX, br_scalar pZ, tTrack_spec* pTrack_spec) {
     br_scalar x;
     br_scalar z;
@@ -217,6 +226,7 @@ void C2_HOOK_FASTCALL XZToColumnXZ(tU8* pColumn_x, tU8* pColumn_z, br_scalar pX,
 
 // FUNCTION: CARMA2_HW 0x0040d7c0
 // FUNCTION: CARMA2_SW 0x0040d7b0
+// FUNCTION: CARMA2_CHEAT 0x0040d880
 void C2_HOOK_FASTCALL RenderTrack(br_actor* pWorld, tTrack_spec* pTrack_spec, br_actor* pCamera, br_matrix34* pCamera_to_world) {
     tU8 column_x;
     tU8 column_z;
@@ -352,6 +362,7 @@ void C2_HOOK_FASTCALL RenderTrack(br_actor* pWorld, tTrack_spec* pTrack_spec, br
 
 // FUNCTION: CARMA2_HW 0x0040dfe0
 // FUNCTION: CARMA2_SW 0x0040dfc0
+// FUNCTION: CARMA2_CHEAT 0x0040e0a0
 br_scalar C2_HOOK_STDCALL GetYonFactor(void) {
 
     return gYon_factor;
@@ -359,6 +370,7 @@ br_scalar C2_HOOK_STDCALL GetYonFactor(void) {
 
 // FUNCTION: CARMA2_HW 0x0040dff0
 // FUNCTION: CARMA2_SW 0x0040dfd0
+// FUNCTION: CARMA2_CHEAT 0x0040e0b0
 void C2_HOOK_STDCALL SetYonFactor(br_scalar pNew) {
 
     gYon_factor = pNew;
@@ -366,6 +378,7 @@ void C2_HOOK_STDCALL SetYonFactor(br_scalar pNew) {
 
 // FUNCTION: CARMA2_HW 0x0040e290
 // FUNCTION: CARMA2_SW 0x0040e270
+// FUNCTION: CARMA2_CHEAT 0x0040e350
 intptr_t C2_HOOK_CDECL FoundAnActor(br_actor* pActor, void* pContext) {
     tFoundAnActor_context* context = pContext;
     char* identifier;
@@ -418,6 +431,7 @@ intptr_t C2_HOOK_CDECL FoundAnActor(br_actor* pActor, void* pContext) {
 
 // FUNCTION: CARMA2_HW 0x0040e000
 // FUNCTION: CARMA2_SW 0x0040dfe0
+// FUNCTION: CARMA2_CHEAT 0x0040e0c0
 int C2_HOOK_FASTCALL ProcessNearbyActors(tTrack_spec* pTrack, br_vector3* pPos, float pMax_dist, int pMatch_type, char pIdentifier_value, tS8 pIdentifier_index, tU16 pMatch_flags, tNearbyActors_cbfn* pCallback, void* pContext) {
 
     tFoundAnActor_context found_an_actor_context;

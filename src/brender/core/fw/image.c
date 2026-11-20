@@ -22,6 +22,7 @@
 
 // FUNCTION: CARMA2_HW 0x0052fed0
 // FUNCTION: CARMA2_SW 0x0052b570
+// FUNCTION: CARMA2_CHEAT 0x00535ac0
 br_boolean C2_HOOK_CDECL BrImageAdd(br_image* img) {
     BrAddHead(&fw.images, &img->node);
     return 1;
@@ -29,12 +30,14 @@ br_boolean C2_HOOK_CDECL BrImageAdd(br_image* img) {
 
 // FUNCTION: CARMA2_HW 0x0052fef0
 // FUNCTION: CARMA2_SW 0x0052b590
+// FUNCTION: CARMA2_CHEAT 0x00535ae0
 br_boolean C2_HOOK_CDECL BrImageRemove(br_image* img) {
     BrRemove(&img->node);
     return 1;
 }
 
 // FUNCTION: CARMA2_HW 0x0052ff10
+// FUNCTION: CARMA2_CHEAT 0x00535b00
 br_image* C2_HOOK_CDECL BrImageFind(const char* pattern) {
     char* c;
     br_image* img;
@@ -69,6 +72,7 @@ br_image* C2_HOOK_STDCALL imageLoadHost(const char* name) {
 
 // FUNCTION: CARMA2_HW 0x0052ffa0
 // FUNCTION: CARMA2_SW 0x0052b640
+// FUNCTION: CARMA2_CHEAT 0x00535b90
 br_image* C2_HOOK_CDECL BrImageReference(const char* name) {
     const char* suffix;
     char* suffix2;
@@ -152,6 +156,7 @@ void* C2_HOOK_STDCALL imageLookupName(br_image* img, const char* name, br_uint_3
 
 // FUNCTION: CARMA2_HW 0x005301e0
 // FUNCTION: CARMA2_SW 0x0052b880
+// FUNCTION: CARMA2_CHEAT 0x00535dd0
 void* C2_HOOK_CDECL BrImageLookupName(br_image* img, const char* name, br_uint_32 hint) {
     char* scratch;
     void* p;
@@ -177,6 +182,7 @@ void* C2_HOOK_CDECL BrImageLookupName(br_image* img, const char* name, br_uint_3
 
 // FUNCTION: CARMA2_HW 0x00530320
 // FUNCTION: CARMA2_SW 0x0052b9c0
+// FUNCTION: CARMA2_CHEAT 0x00535f10
 void* C2_HOOK_CDECL BrImageLookupOrdinal(br_image* img, br_uint_32 ordinal) {
 
     if (img->type == 3) {
@@ -190,6 +196,7 @@ void* C2_HOOK_CDECL BrImageLookupOrdinal(br_image* img, br_uint_32 ordinal) {
 
 // FUNCTION: CARMA2_HW 0x00530360
 // FUNCTION: CARMA2_SW 0x0052ba00
+// FUNCTION: CARMA2_CHEAT 0x00535f50
 void C2_HOOK_CDECL BrImageDereference(br_image* image) {
     int i;
     image->ref_count--;

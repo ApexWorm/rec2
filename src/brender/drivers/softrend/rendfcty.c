@@ -43,6 +43,7 @@ br_tv_template_entry rendererNewTemplateEntries[] = {
 
 // FUNCTION: CARMA2_HW 0x005405e0
 // FUNCTION: CARMA2_SW 0x0053bc80
+// FUNCTION: CARMA2_CHEAT 0x005461d0
 br_renderer_facility* C2_HOOK_STDCALL RendererFacilitySoftAllocate(br_device* dev, const char* identifier) {
     br_soft_renderer_facility* self;
 
@@ -70,6 +71,7 @@ br_renderer_facility* C2_HOOK_STDCALL RendererFacilitySoftAllocate(br_device* de
 
 // FUNCTION: CARMA2_HW 0x00540670
 // FUNCTION: CARMA2_SW 0x0053bd10
+// FUNCTION: CARMA2_CHEAT 0x00546260
 void C2_HOOK_CDECL _M_br_renderer_facility_soft_free(br_soft_renderer_facility* self) {
 
 
@@ -82,6 +84,7 @@ void C2_HOOK_CDECL _M_br_renderer_facility_soft_free(br_soft_renderer_facility* 
 
 // FUNCTION: CARMA2_HW 0x005406b0
 // FUNCTION: CARMA2_SW 0x0053bd50
+// FUNCTION: CARMA2_CHEAT 0x005462a0
 br_token C2_HOOK_CDECL _M_br_renderer_facility_soft_type(br_soft_renderer_facility* self) {
 
     return BRT_RENDERER_FACILITY;
@@ -89,6 +92,7 @@ br_token C2_HOOK_CDECL _M_br_renderer_facility_soft_type(br_soft_renderer_facili
 
 // FUNCTION: CARMA2_HW 0x005406c0
 // FUNCTION: CARMA2_SW 0x0053bd60
+// FUNCTION: CARMA2_CHEAT 0x005462b0
 int C2_HOOK_CDECL _M_br_renderer_facility_soft_isType(br_soft_renderer_facility* self, br_token t) {
 
     return t == BRT_RENDERER_FACILITY || t == BRT_OBJECT_CONTAINER || t == BRT_OBJECT;
@@ -96,6 +100,7 @@ int C2_HOOK_CDECL _M_br_renderer_facility_soft_isType(br_soft_renderer_facility*
 
 // FUNCTION: CARMA2_HW 0x005406e0
 // FUNCTION: CARMA2_SW 0x0053bd80
+// FUNCTION: CARMA2_CHEAT 0x005462d0
 br_int_32 C2_HOOK_CDECL _M_br_renderer_facility_soft_space(br_soft_renderer_facility* self) {
 
     C2_HOOK_BUG_ON(sizeof(br_soft_renderer_facility) != 0x79c);
@@ -105,6 +110,7 @@ br_int_32 C2_HOOK_CDECL _M_br_renderer_facility_soft_space(br_soft_renderer_faci
 
 // FUNCTION: CARMA2_HW 0x005406f0
 // FUNCTION: CARMA2_SW 0x0053bd90
+// FUNCTION: CARMA2_CHEAT 0x005462e0
 br_tv_template* C2_HOOK_CDECL _M_br_renderer_facility_soft_templateQuery(br_soft_renderer_facility* self) {
 
     if (self->device->templates.rendererFacilityTemplate == NULL) {
@@ -119,6 +125,7 @@ br_tv_template* C2_HOOK_CDECL _M_br_renderer_facility_soft_templateQuery(br_soft
 
 // FUNCTION: CARMA2_HW 0x00540800
 // FUNCTION: CARMA2_SW 0x0053bea0
+// FUNCTION: CARMA2_CHEAT 0x005463f0
 void* C2_HOOK_CDECL _M_br_renderer_facility_soft_listQuery(br_soft_renderer_facility* self) {
 
     C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(br_soft_renderer_facility, object_list, 0xc);
@@ -128,6 +135,7 @@ void* C2_HOOK_CDECL _M_br_renderer_facility_soft_listQuery(br_soft_renderer_faci
 
 // FUNCTION: CARMA2_HW 0x00540720
 // FUNCTION: CARMA2_SW 0x0053bdc0
+// FUNCTION: CARMA2_CHEAT 0x00546310
 int C2_HOOK_CDECL _M_br_renderer_facility_soft_validDestination(br_soft_renderer_facility* self, br_boolean* bp, br_object* h) {
 
     return 0;
@@ -135,6 +143,7 @@ int C2_HOOK_CDECL _M_br_renderer_facility_soft_validDestination(br_soft_renderer
 
 // FUNCTION: CARMA2_HW 0x00540730
 // FUNCTION: CARMA2_SW 0x0053bdd0
+// FUNCTION: CARMA2_CHEAT 0x00546320
 int C2_HOOK_CDECL _M_br_renderer_facility_soft_rendererNew(br_soft_renderer_facility* self, br_renderer** prenderer, br_token_value* tv) {
     newRendererTokens rt = { NULL, NULL };
     br_error r;

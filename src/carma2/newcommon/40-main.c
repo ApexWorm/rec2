@@ -31,6 +31,7 @@
 
 // FUNCTION: CARMA2_HW 0x00491f70
 // FUNCTION: CARMA2_SW 0x0048f1e0
+// FUNCTION: CARMA2_CHEAT 0x00492020
 C2_NORETURN void C2_HOOK_FASTCALL QuitGame(void) {
     SaveOptions();
     if (gSave_game_out_of_sync) {
@@ -38,12 +39,14 @@ C2_NORETURN void C2_HOOK_FASTCALL QuitGame(void) {
     }
     MovieStopRecordingIfNecessary();
     PHILDisable();
+#ifdef REC2_V102A
     dr_dprintf("QuitGame() - Point 1");
     if (gProgram_state.racing && gAdditional_actors != NULL && gAdditional_actors->children != NULL) {
         dr_dprintf("QuitGame() - Point 2");
         AutoSaveAdditionalStuff();
         dr_dprintf("QuitGame() - Point 3");
     }
+#endif
     gProgram_state.racing = 0;
     SaveOptions();
     if (gNet_mode != eNet_mode_none) {
@@ -71,18 +74,21 @@ C2_NORETURN void C2_HOOK_FASTCALL QuitGame(void) {
 // ServiceTheGame
 
 // STUB: CARMA2_HW 0x00492180
+// STUB: CARMA2_CHEAT 0x004921a0
 void C2_HOOK_FASTCALL ServiceGame(void) {
     NOT_IMPLEMENTED();
 }
 
 // STUB: CARMA2_HW 0x004922a0
 // STUB: CARMA2_SW 0x0048f4e0
+// STUB: CARMA2_CHEAT 0x00492270
 void C2_HOOK_FASTCALL ServiceGameInRace(void) {
     NOT_IMPLEMENTED();
 }
 
 // FUNCTION: CARMA2_HW 0x004924a0
 // FUNCTION: CARMA2_SW 0x0048f6d0
+// FUNCTION: CARMA2_CHEAT 0x00492430
 void C2_HOOK_FASTCALL GameMain(int pArgc, const char** pArgv) {
     tPath_name location;
 

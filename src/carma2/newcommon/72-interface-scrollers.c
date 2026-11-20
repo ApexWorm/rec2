@@ -14,6 +14,7 @@
 
 // FUNCTION: CARMA2_HW 0x004677d0
 // FUNCTION: CARMA2_SW 0x00467550
+// FUNCTION: CARMA2_CHEAT 0x00467c20
 int C2_HOOK_FASTCALL GetItemAtMousePos(tFrontend_spec *pFrontend, int pX, int pY) {
     int i;
 
@@ -46,6 +47,7 @@ void C2_HOOK_FASTCALL RefreshNetRacesScroller(tFrontend_spec* pFrontend) {
 
 // FUNCTION: CARMA2_HW 0x00467a70
 // FUNCTION: CARMA2_SW 0x004677f0
+// FUNCTION: CARMA2_CHEAT 0x00467ec0
 void C2_HOOK_FASTCALL UpdateScrollPositions(tFrontend_spec* pFrontend) {
 
     if (gCurrent_frontend_spec == &gFrontend_MAIN) {

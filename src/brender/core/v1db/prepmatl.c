@@ -17,6 +17,7 @@
 
 // FUNCTION: CARMA2_HW 0x00520e70
 // FUNCTION: CARMA2_SW 0x0051c510
+// FUNCTION: CARMA2_CHEAT 0x00526a60
 void C2_HOOK_CDECL BrMaterialUpdate(br_material* mat, br_uint_16 flags) {
     br_token_value tva[32];
     br_token_value* tvp;
@@ -294,6 +295,7 @@ void C2_HOOK_CDECL BrMaterialUpdate(br_material* mat, br_uint_16 flags) {
 
 // FUNCTION: CARMA2_HW 0x00521460
 // FUNCTION: CARMA2_SW 0x0051cb00
+// FUNCTION: CARMA2_CHEAT 0x00527050
 void C2_HOOK_STDCALL BrMaterialClear(br_material* mat) {
     br_object* stored = (br_object*)mat->stored;
 

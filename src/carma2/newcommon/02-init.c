@@ -61,26 +61,32 @@
 
 // GLOBAL: CARMA2_HW 0x0068be2c
 // GLOBAL: CARMA2_SW 0x00685e70
+// GLOBAL: CARMA2_CHEAT 0x006936cc
 int gBr_initialized;
 
 // GLOBAL: CARMA2_HW 0x0068be34
 // GLOBAL: CARMA2_SW 0x00685e78
+// GLOBAL: CARMA2_CHEAT 0x006936d4
 int gInitialisation_finished;
 
 // GLOBAL: CARMA2_HW 0x0068be24
 // GLOBAL: CARMA2_SW 0x00685e68
+// GLOBAL: CARMA2_CHEAT 0x006936c4
 tU32 gAustere_time;
 
 // GLOBAL: CARMA2_HW 0x0074b760
 // GLOBAL: CARMA2_SW 0x00741e20
+// GLOBAL: CARMA2_CHEAT 0x00752e00
 int gCredits_per_rank[3];
 
 // GLOBAL: CARMA2_HW 0x0074b76c
 // GLOBAL: CARMA2_SW 0x00741e2c
+// GLOBAL: CARMA2_CHEAT 0x00752e0c
 int gInitial_rank;
 
 // GLOBAL: CARMA2_HW 0x00762110
 // GLOBAL: CARMA2_SW 0x00758670
+// GLOBAL: CARMA2_CHEAT 0x007697b0
 int gStarting_money[3];
 
 // GLOBAL: CARMA2_HW 0x00762160
@@ -89,23 +95,28 @@ int gNet_starting_money[8];
 
 // GLOBAL: CARMA2_HW 0x0074d4c0
 // GLOBAL: CARMA2_SW 0x00743a20
+// GLOBAL: CARMA2_CHEAT 0x00754b60
 tSlot_info gInitial_APO[3];
 
 // GLOBAL: CARMA2_HW 0x007622a0
 // GLOBAL: CARMA2_SW 0x00758800
+// GLOBAL: CARMA2_CHEAT 0x00769940
 tSlot_info gInitial_APO_potential[3];
 
 // GLOBAL: CARMA2_HW 0x0074cfa0
 // GLOBAL: CARMA2_SW 0x00743500
+// GLOBAL: CARMA2_CHEAT 0x00754640
 tSlot_info gMax_APO[3];
 
 // GLOBAL: CARMA2_HW 0x0068d8e0
 // GLOBAL: CARMA2_SW 0x00687938
+// GLOBAL: CARMA2_CHEAT 0x00695180
 br_pixelmap* gLit_op_stat_bloc;
 
 
 // FUNCTION: CARMA2_HW 0x0047d880
 // FUNCTION: CARMA2_SW 0x0047da40
+// FUNCTION: CARMA2_CHEAT 0x0047dc00
 void C2_HOOK_FASTCALL Modify2DCopyPixelmaps(void) {
     int i;
     int pixel_type;
@@ -134,6 +145,7 @@ void C2_HOOK_FASTCALL Modify2DCopyPixelmaps(void) {
 
 // FUNCTION: CARMA2_HW 0x0047d8d0
 // FUNCTION: CARMA2_SW 0x0047dab0
+// FUNCTION: CARMA2_CHEAT 0x0047dc50
 void C2_HOOK_FASTCALL ReinitialiseForwardCamera(void) {
     br_camera* camera_ptr;
     float the_angle;
@@ -182,6 +194,7 @@ void C2_HOOK_FASTCALL ReinitialiseForwardCamera(void) {
 
 // FUNCTION: CARMA2_HW 0x0047dab0
 // FUNCTION: CARMA2_SW 0x0047dc90
+// FUNCTION: CARMA2_CHEAT 0x0047de30
 void C2_HOOK_FASTCALL AllocateRearviewPixelmap(void) {
     if (gRearview_screen != NULL) {
 #ifdef REC2_SW
@@ -228,6 +241,7 @@ void C2_HOOK_FASTCALL AllocateRearviewPixelmap(void) {
 
 // FUNCTION: CARMA2_HW 0x0047db30
 // FUNCTION: CARMA2_SW 0x0047ddb0
+// FUNCTION: CARMA2_CHEAT 0x0047deb0
 void C2_HOOK_FASTCALL ReinitialiseRearviewCamera(void) {
     br_camera* camera_ptr;
     float width;
@@ -248,6 +262,7 @@ void C2_HOOK_FASTCALL ReinitialiseRearviewCamera(void) {
 
 // FUNCTION: CARMA2_HW 0x0047dc30
 // FUNCTION: CARMA2_SW 0x0047de40
+// FUNCTION: CARMA2_CHEAT 0x0047dfb0
 void C2_HOOK_FASTCALL ReinitialiseRenderStuff(void) {
     int index;
     int x_diff;
@@ -325,6 +340,7 @@ void C2_HOOK_FASTCALL InstallFindFailedHooks(void) {
 
 #ifdef REC2_HW
 // FUNCTION: CARMA2_HW 0x0047e610
+// FUNCTION: CARMA2_CHEAT 0x0047e9a0
 void C2_HOOK_FASTCALL InitLineStuff(void) {
 
     gLine_model = BrModelAllocate("gLine_model", 2, 1);
@@ -379,6 +395,7 @@ void C2_HOOK_FASTCALL InitLineStuff(void) {
     } while (0)
 
 // FUNCTION: CARMA2_HW 0x0047e720
+// FUNCTION: CARMA2_CHEAT 0x0047eab0
 void C2_HOOK_FASTCALL Init2DStuff(void) {
     // GLOBAL: CARMA2_HW 0x006569c8
     static br_token_value fadealpha_opacity0x80[3] = {
@@ -813,6 +830,7 @@ void C2_HOOK_FASTCALL Init2DStuff(void) {
 #define InitialiseApplication(pArgc, pArgv) \
     do { \
         tTWTVFS twt; \
+        REC2_CHEAT_RUN(br_model* arrow_model;) \
         \
         gProgram_state.sausage_eater_mode = gSausage_override; \
         InitQuickTimeStuff(); \
@@ -849,6 +867,10 @@ void C2_HOOK_FASTCALL Init2DStuff(void) {
         PDSaveOriginalPalette(); \
         PDInitScreen(); \
         InitializeBRenderEnvironment(); \
+        REC2_CHEAT_RUN(arrow_model = LoadModel("CPOINT.DAT");) \
+        REC2_CHEAT_RUN(BrModelAdd(arrow_model);) \
+        REC2_CHEAT_RUN(gArrow_actor = LoadActor("CPOINT.ACT");) \
+        REC2_CHEAT_RUN(gArrow_actor->model = arrow_model;) \
         PrintMemoryDump(0, "AFTER INITIALISING BRENDER"); \
         CheckTimedDemo(); \
         InitDRFonts(); \
@@ -860,7 +882,11 @@ void C2_HOOK_FASTCALL Init2DStuff(void) {
         PrintMemoryDump(0, "AFTER INITIALISING EXPLOSIONS"); \
         LoadMiscStrings(); \
         PrintMemoryDump(0, "AFTER LOADING MISC STRING"); \
-        InitialiseStorageSpace(0, &gMisc_storage_space, 1000, 5, 1000, 1000, 10); \
+        \
+        REC2_V101A_RUN(InitialiseStorageSpace(0, &gMisc_storage_space, 500, 5, 500, 500, 10);) \
+        \
+        REC2_V102A_RUN(InitialiseStorageSpace(0, &gMisc_storage_space, 1000, 5, 1000, 1000, 10);) \
+        \
         LoadInRegistees(); \
         InitMap(); \
         PrintMemoryDump(0, "AFTER INITIALISING GENERAL STORAGE AND LOADING IN REG"); \
@@ -882,7 +908,7 @@ void C2_HOOK_FASTCALL Init2DStuff(void) {
         PrintMemoryDump(0, "AFTER INITING PHYSICS"); \
         InitCrushSystems(); \
         PrintMemoryDump(0, "AFTER INITING CRUSH SYSTEMS"); \
-        InitTreeSurgery(); \
+        REC2_V102A_RUN(InitTreeSurgery();) \
         FlicPaletteAllocate(); \
         InitInterfaceLoadState(); \
         InitTransientBitmaps(); \
@@ -917,11 +943,18 @@ void C2_HOOK_FASTCALL Init2DStuff(void) {
         PrintMemoryDump(0, "AFTER INITING DEPTH EFFECTS"); \
         InitSmashing(); \
         PrintMemoryDump(0, "AFTER INITING SMASHING"); \
-        InitialiseStorageSpace(0, &gOur_car_storage_space, 200, 2, 200, 200, 10); \
-        InitialiseStorageSpace(0, &gTheir_cars_storage_space, 1500, 50, 1500, 1500, 50); \
-        InitialiseStorageSpace(0, &gDroneStorage, 500, 50, 500, 228, 10); \
-        InitialiseStorageSpace(0, &gPedStorage, 200, 10, 100, 500, 200); \
-        InitialiseStorageSpace(0, &gTrack_storage_space, 1000, 50, 1000, 1000, 50); \
+        \
+        REC2_V101A_RUN(InitialiseStorageSpace(0, &gOur_car_storage_space, 100, 2, 100, 100, 10);) \
+        REC2_V101A_RUN(InitialiseStorageSpace(0, &gTheir_cars_storage_space, 1100, 50, 1000, 1000, 50);) \
+        REC2_V101A_RUN(InitialiseStorageSpace(0, &gDroneStorage, 1000, 50, 1000, 1000, 10);) \
+        REC2_V101A_RUN(InitialiseStorageSpace(0, &gPedStorage, 100, 10, 50, 300, 100);) \
+        REC2_V101A_RUN(InitialiseStorageSpace(0, &gTrack_storage_space, 500, 50, 500, 500, 50);) \
+        \
+        REC2_V102A_RUN(InitialiseStorageSpace(0, &gOur_car_storage_space, 200, 2, 200, 200, 10);) \
+        REC2_V102A_RUN(InitialiseStorageSpace(0, &gTheir_cars_storage_space, 1500, 50, 1500, 1500, 50);) \
+        REC2_V102A_RUN(InitialiseStorageSpace(0, &gDroneStorage, 500, 50, 500, 228, 10);) \
+        REC2_V102A_RUN(InitialiseStorageSpace(0, &gPedStorage, 200, 10, 100, 500, 200);) \
+        REC2_V102A_RUN(InitialiseStorageSpace(0, &gTrack_storage_space, 1000, 50, 1000, 1000, 50);) \
         FinishLoadingGeneral(); \
         PrintMemoryDump(0, "AFTER FINISHING LOADING GENERAL"); \
         InitOilSpills(); \
@@ -956,6 +989,7 @@ void C2_HOOK_FASTCALL DoDevelopmentThings(void) {
 
 // FUNCTION: CARMA2_HW 0x0047dd20
 // FUNCTION: CARMA2_SW 0x0047df00
+// FUNCTION: CARMA2_CHEAT 0x0047e0a0
 void C2_HOOK_FASTCALL InitialiseDeathRace(int pArgc, const char** pArgv) {
 
     PDInitialiseSystem();
@@ -966,6 +1000,7 @@ void C2_HOOK_FASTCALL InitialiseDeathRace(int pArgc, const char** pArgv) {
 
 // FUNCTION: CARMA2_HW 0x00481620
 // FUNCTION: CARMA2_SW 0x0047e7a0
+// FUNCTION: CARMA2_CHEAT 0x004819b0
 void C2_HOOK_FASTCALL InitGameAccordingToSkillLevel(void) {
     int i;
 
@@ -980,6 +1015,7 @@ void C2_HOOK_FASTCALL InitGameAccordingToSkillLevel(void) {
 
 // FUNCTION: CARMA2_HW 0x004816b0
 // FUNCTION: CARMA2_SW 0x0047e830
+// FUNCTION: CARMA2_CHEAT 0x00481a40
 void C2_HOOK_FASTCALL InitGame(int pStart_race) {
     int i;
 
@@ -1019,6 +1055,7 @@ void C2_HOOK_FASTCALL InitGame(int pStart_race) {
 
 // FUNCTION: CARMA2_HW 0x00481e90
 // FUNCTION: CARMA2_SW 0x0047efd0
+// FUNCTION: CARMA2_CHEAT 0x004821b0
 int C2_HOOK_FASTCALL GetScreenSize(void) {
 
     return gRender_indent;
@@ -1026,6 +1063,7 @@ int C2_HOOK_FASTCALL GetScreenSize(void) {
 
 // FUNCTION: CARMA2_HW 0x00481ea0
 // FUNCTION: CARMA2_SW 0x0047efe0
+// FUNCTION: CARMA2_CHEAT 0x004821c0
 void C2_HOOK_FASTCALL SetScreenSize(int pNew_size) {
 
     gRender_indent = pNew_size;

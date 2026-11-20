@@ -28,6 +28,7 @@
 
 // FUNCTION: CARMA2_HW 0x004b4090
 // FUNCTION: CARMA2_SW 0x004b0200
+// FUNCTION: CARMA2_CHEAT 0x004b9960
 void C2_HOOK_FASTCALL GetGraphicsSettingsData(tFrontend_spec* pFrontend) {
     float yon_factor;
     float yon;
@@ -160,6 +161,7 @@ void C2_HOOK_FASTCALL GetGraphicsSettingsData(tFrontend_spec* pFrontend) {
 
 // FUNCTION: CARMA2_HW 0x004b42c0
 // FUNCTION: CARMA2_SW 0x004b0430
+// FUNCTION: CARMA2_CHEAT 0x004b9b90
 void C2_HOOK_FASTCALL SetGraphicsSettingsData(tFrontend_spec* pFrontend) {
 
     switch (WhichItemIsSelectedIn(pFrontend, 1)) {

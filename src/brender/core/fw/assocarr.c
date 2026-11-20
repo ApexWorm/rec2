@@ -19,6 +19,7 @@
 
 // FUNCTION: CARMA2_HW 0x00531500
 // FUNCTION: CARMA2_SW 0x0052cba0
+// FUNCTION: CARMA2_CHEAT 0x005370f0
 br_associative_array* C2_HOOK_CDECL BrAssociativeArrayAllocate(void) {
     br_associative_array* pArray;
 
@@ -54,6 +55,7 @@ br_error C2_HOOK_CDECL Set_Associative_Array_Value(br_associative_array* pArray,
 
 // FUNCTION: CARMA2_HW 0x00531540
 // FUNCTION: CARMA2_SW 0x0052cbe0
+// FUNCTION: CARMA2_CHEAT 0x00537130
 br_error C2_HOOK_STDCALL BrAssociativeArraySetEntry(br_associative_array* pArray, br_token t, br_value v) {
     br_uint_16 i;
     br_token_value* temp;

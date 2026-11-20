@@ -14,15 +14,18 @@ tCollision_shape_polyhedron_data* gPolyhedron_to_sort;
 
 // GLOBAL: CARMA2_HW 0x00679420
 // GLOBAL: CARMA2_SW 0x00673b90
+// GLOBAL: CARMA2_CHEAT 0x00680cd0
 br_vector3 gPhysics_reference_normal_comparison;
 
 // STUB: CARMA2_HW 0x00420910
 // STUB: CARMA2_SW 0x00420990
+// STUB: CARMA2_CHEAT 0x00420b70
 tPhysicsError C2_HOOK_FASTCALL ConvexHull2D(tCollision_shape_polyhedron_data* pPolyhedron) {
     NOT_IMPLEMENTED();
 }
 
 // FUNCTION: CARMA2_HW 0x00420d60
+// FUNCTION: CARMA2_CHEAT 0x00420fc0
 br_scalar C2_HOOK_FASTCALL SignedTwiceAreaOf3DTriangle(const br_vector3* pV1, const br_vector3* pV2) {
     br_scalar x;
     br_scalar y;
@@ -40,6 +43,7 @@ br_scalar C2_HOOK_FASTCALL SignedTwiceAreaOf3DTriangle(const br_vector3* pV1, co
 
 // FUNCTION: CARMA2_HW 0x00420dc0
 // FUNCTION: CARMA2_SW 0x00420e40
+// FUNCTION: CARMA2_CHEAT 0x00421010
 int C2_HOOK_CDECL CompareAngle(const void *pLhs, const void *pRhs) {
     tCollision_shape_polyhedron_data* polyhedron;
     br_scalar s1, s2;
@@ -74,6 +78,7 @@ int C2_HOOK_CDECL CompareAngle(const void *pLhs, const void *pRhs) {
 
 // FUNCTION: CARMA2_HW 0x00420ef0
 // FUNCTION: CARMA2_SW 0x00420f70
+// FUNCTION: CARMA2_CHEAT 0x00421140
 int C2_HOOK_FASTCALL Collinear(const br_vector3* pV1, const br_vector3* pV2, const br_vector3* pV3) {
 
     return (float)fabs((pV3->v[2] - pV1->v[2]) * (pV2->v[1] - pV1->v[1]) - (pV3->v[1] - pV1->v[1]) * (pV2->v[2] - pV1->v[2])) < 1e-6f
@@ -112,6 +117,7 @@ undefined4* C2_HOOK_FASTCALL FUN_00421fd0(int pCount_points) {
 
 // STUB: CARMA2_HW 0x00420fb0
 // STUB: CARMA2_SW 0x00421030
+// STUB: CARMA2_CHEAT 0x00421200
 tPhysicsError C2_HOOK_FASTCALL ConvexHull3D(tCollision_shape_polyhedron_data* pPolyhedron) {
     NOT_IMPLEMENTED();
 }

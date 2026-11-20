@@ -24,39 +24,48 @@
 
 // GLOBAL: CARMA2_HW 0x00655e48
 // GLOBAL: CARMA2_SW 0x00650d30
+// GLOBAL: CARMA2_CHEAT 0x0065c6d0
 int gHud_tinted1 = -1;
 
 // GLOBAL: CARMA2_HW 0x00655e4c
 // GLOBAL: CARMA2_SW 0x00650d34
+// GLOBAL: CARMA2_CHEAT 0x0065c6d4
 int gHud_tinted2 = -1;
 
 #ifdef REC2_HW
 // GLOBAL: CARMA2_HW 0x00655e50
+// GLOBAL: CARMA2_CHEAT 0x0065c6d8
 int gHud_tinted3 = -1;
 #endif
 
 // GLOBAL: CARMA2_HW 0x00762140
 // GLOBAL: CARMA2_SW 0x007586a0
+// GLOBAL: CARMA2_CHEAT 0x007697e0
 int gCredits_checkpoint[3];
 
 // GLOBAL: CARMA2_HW 0x006aaa34
 // GLOBAL: CARMA2_SW 0x006a4484
+// GLOBAL: CARMA2_CHEAT 0x006b25ac
 tU32 gLast_checkpoint_time;
 
 // GLOBAL: CARMA2_HW 0x006aaa38
 // GLOBAL: CARMA2_SW 0x006a4488
+// GLOBAL: CARMA2_CHEAT 0x006b25b0
 int gHud_tinted1_visible;
 
 // GLOBAL: CARMA2_HW 0x006aaa3c
 // GLOBAL: CARMA2_SW 0x006a448c
+// GLOBAL: CARMA2_CHEAT 0x006b25b4
 int gHud_tinted2_visible;
 
 // GLOBAL: CARMA2_HW 0x00660cdc
 // GLOBAL: CARMA2_SW 0x0065b650
+// GLOBAL: CARMA2_CHEAT 0x00668524
 int gLast_wrong_checkpoint = -1;
 
 // FUNCTION: CARMA2_HW 0x00503050
 // FUNCTION: CARMA2_SW 0x004fe9a0
+// FUNCTION: CARMA2_CHEAT 0x00508cf0
 int C2_HOOK_FASTCALL NumberOfOpponentsLeft(void) {
     int result;
     int count;
@@ -81,6 +90,7 @@ int C2_HOOK_FASTCALL NumberOfOpponentsLeft(void) {
 
 // STUB: CARMA2_HW 0x005030b0
 // STUB: CARMA2_SW 0x004fea00
+// STUB: CARMA2_CHEAT 0x00508d50
 void C2_HOOK_FASTCALL RaceCompleted(tRace_over_reason pReason) {
     NOT_IMPLEMENTED();
 }
@@ -91,6 +101,7 @@ void C2_HOOK_FASTCALL RaceCompleted(tRace_over_reason pReason) {
 
 // FUNCTION: CARMA2_HW 0x00503270
 // FUNCTION: CARMA2_SW 0x004febc0
+// FUNCTION: CARMA2_CHEAT 0x00508f10
 void C2_HOOK_FASTCALL Checkpoint(int pCheckpoint_index, int pDo_sound) {
     (void)pCheckpoint_index;
 
@@ -103,6 +114,7 @@ void C2_HOOK_FASTCALL Checkpoint(int pCheckpoint_index, int pDo_sound) {
 
 // FUNCTION: CARMA2_HW 0x005032a0
 // FUNCTION: CARMA2_SW 0x004febf0
+// FUNCTION: CARMA2_CHEAT 0x00508f40
 void C2_HOOK_FASTCALL IncrementCheckpoint(void) {
     int done_voice;
 
@@ -144,6 +156,7 @@ void C2_HOOK_FASTCALL IncrementCheckpoint(void) {
 
 // FUNCTION: CARMA2_HW 0x005033b0
 // FUNCTION: CARMA2_SW 0x004fed00
+// FUNCTION: CARMA2_CHEAT 0x00509050
 void C2_HOOK_FASTCALL IncrementLap(void) {
     int i;
 
@@ -156,6 +169,7 @@ void C2_HOOK_FASTCALL IncrementLap(void) {
 
 // FUNCTION: CARMA2_HW 0x005033e0
 // FUNCTION: CARMA2_SW 0x004fed30
+// FUNCTION: CARMA2_CHEAT 0x00509080
 void C2_HOOK_FASTCALL WrongCheckpoint(int pCheckpoint_index) {
     int next_checkpoint;
 
@@ -206,6 +220,7 @@ void C2_HOOK_FASTCALL TotalRepair(void) {
 
 // FUNCTION: CARMA2_HW 0x00503b00
 // FUNCTION: CARMA2_SW 0x004ff450
+// FUNCTION: CARMA2_CHEAT 0x005097a0
 int C2_HOOK_FASTCALL ChooseOpponent(int pNastiness) {
     int i;
     int count;
@@ -238,6 +253,7 @@ int C2_HOOK_FASTCALL ChooseOpponent(int pNastiness) {
 
 // FUNCTION: CARMA2_HW 0x005039e0
 // FUNCTION: CARMA2_SW 0x004ff330
+// FUNCTION: CARMA2_CHEAT 0x00509680
 void C2_HOOK_FASTCALL SelectOpponents(tRace_info* pRace_info) {
     int i;
 
@@ -264,6 +280,7 @@ void C2_HOOK_FASTCALL SelectOpponents(tRace_info* pRace_info) {
 
 // FUNCTION: CARMA2_HW 0x00503ba0
 // FUNCTION: CARMA2_SW 0x004ff4f0
+// FUNCTION: CARMA2_CHEAT 0x00509840
 int C2_HOOK_FASTCALL PickNetRace(int pCurrent_race, tNet_sequence_type pNet_race_sequence) {
     int i;
     int new_index;
@@ -307,12 +324,14 @@ int C2_HOOK_FASTCALL PickNetRace(int pCurrent_race, tNet_sequence_type pNet_race
 
 // STUB: CARMA2_HW 0x00503c50
 // STUB: CARMA2_SW 0x004ff5a0
+// STUB: CARMA2_CHEAT 0x005098f0
 void C2_HOOK_FASTCALL DoProgram(void) {
     NOT_IMPLEMENTED();
 }
 
 // FUNCTION: CARMA2_HW 0x00504170
 // FUNCTION: CARMA2_SW 0x004ffac0
+// FUNCTION: CARMA2_CHEAT 0x00509e10
 void C2_HOOK_FASTCALL JumpTheStart(void) {
     char s[256];
 
@@ -330,6 +349,7 @@ void C2_HOOK_FASTCALL JumpTheStart(void) {
 
 // FUNCTION: CARMA2_HW 0x00504230
 // FUNCTION: CARMA2_SW 0x004ffb80
+// FUNCTION: CARMA2_CHEAT 0x00509ed0
 void C2_HOOK_FASTCALL GoingToInterfaceFromRace(void) {
 
     gInterface_within_race_mode = 1;
@@ -345,6 +365,7 @@ void C2_HOOK_FASTCALL GoingToInterfaceFromRace(void) {
 
 // FUNCTION: CARMA2_HW 0x005042a0
 // FUNCTION: CARMA2_SW 0x004ffbf0
+// FUNCTION: CARMA2_CHEAT 0x00509f40
 void C2_HOOK_FASTCALL GoingBackToRaceFromInterface(void) {
 
     gInterface_within_race_mode = 0;

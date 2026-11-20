@@ -21,22 +21,36 @@ extern br_uint_32 C2_HOOK_FASTCALL DeleteBastards(br_actor* pActor, br_matrix34*
 
 extern br_uint_32 C2_HOOK_FASTCALL ApplyTransToModels(br_actor* pActor, br_matrix34* pMatrix, void* pArg);
 
-// FindSpecVolIndex
+extern int C2_HOOK_FASTCALL FindSpecVolIndex(br_actor* pActor);
 
 extern void C2_HOOK_FASTCALL MungeMaterialSV(br_matrix34* pMat, br_material* pMat_1, br_material* pMat_2, int pAxis_0, int pAxis_1);
 
-// SetSpecVolMatSize
+extern void C2_HOOK_FASTCALL SetSpecVolMatSize(br_actor* pActor);
 
-// UpdateSpecVol
+extern void C2_HOOK_FASTCALL UpdateSpecVol(void);
 
 // PutAdditionalNonCarsOnToAdditionalActors
 
 // PutAdditionalNonCarsOnToNonTrackActor
 
-// SaveAdditionalActors
+extern void C2_HOOK_FASTCALL SaveAdditionalActors(void);
 
-// DoSaveAdditionalStuff
+extern void C2_HOOK_FASTCALL DoSaveAdditionalStuff(void);
 
 extern void C2_HOOK_FASTCALL AutoSaveAdditionalStuff(void);
+
+extern br_material* C2_HOOK_FASTCALL GetInternalMat(void);
+
+extern br_material* C2_HOOK_FASTCALL GetExternalMat(void);
+
+extern void C2_HOOK_FASTCALL BuildSpecVolModel(tSpecial_volume* pSpec, int pIndex, br_material* pInt_mat, br_material* pExt_mat);
+
+extern void BuildSpecVolModel(tSpecial_volume* pSpec, int pIndex, br_material* pInt_mat, br_material* pExt_mat);
+
+extern void C2_HOOK_FASTCALL DelSpecVolumeGraph(int pIndex);
+
+extern void C2_HOOK_FASTCALL ShowSpecialVolumes(void);
+
+extern void C2_HOOK_FASTCALL HideSpecialVolumes(void);
 
 #endif // GUARD_11_WORLD1_H

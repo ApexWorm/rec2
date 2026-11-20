@@ -67,6 +67,12 @@ extern void C2_HOOK_FASTCALL PHILDisable(void);
 
 extern int C2_HOOK_FASTCALL PHILAddObject(tPhysics_object* pObject);
 
+#ifdef REC2_CHEAT
+extern void C2_HOOK_FASTCALL PHILVerify(void);
+#else
+#define PHILVerify() do {} while(0)
+#endif
+
 extern int C2_HOOK_FASTCALL PHILRemoveObject(tPhysics_object* pObject);
 
 extern tPhysics_object* C2_HOOK_FASTCALL PHILGetFirstObject(void);

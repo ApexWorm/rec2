@@ -31,30 +31,37 @@
 
 // GLOBAL: CARMA2_HW 0x006a2360
 // GLOBAL: CARMA2_SW 0x0069c3b8
+// GLOBAL: CARMA2_CHEAT 0x006a9ed8
 tU32 gDAT_006a2360;
 
 // GLOBAL: CARMA2_HW 0x006a2364
 // GLOBAL: CARMA2_SW 0x0069c3bc
+// GLOBAL: CARMA2_CHEAT 0x006a9edc
 tU32 gDAT_006a2364;
 
 // GLOBAL: CARMA2_HW 0x006a2374
 // GLOBAL: CARMA2_SW 0x0069c3cc
+// GLOBAL: CARMA2_CHEAT 0x006a9eec
 int gKey_down;
 
 // GLOBAL: CARMA2_HW 0x006a2378
 // GLOBAL: CARMA2_SW 0x0069c3d0
+// GLOBAL: CARMA2_CHEAT 0x006a9ef0
 float gPending_replay_rate;
 
 // GLOBAL: CARMA2_HW 0x006a237c
 // GLOBAL: CARMA2_SW 0x0069c3d4
+// GLOBAL: CARMA2_CHEAT 0x006a9ef4
 tU32 gUINT_006a237c;
 
 // GLOBAL: CARMA2_HW 0x006a2380
 // GLOBAL: CARMA2_SW 0x0069c3d8
+// GLOBAL: CARMA2_CHEAT 0x006a9ef8
 tU32 gLast_replay_zappy_screen;
 
 // GLOBAL: CARMA2_HW 0x006a2388
 // GLOBAL: CARMA2_SW 0x0069c3e0
+// GLOBAL: CARMA2_CHEAT 0x006a9f00
 br_pixelmap* gReplay_pixies[11] = { NULL };
 
 #ifdef REC2_MATCHING
@@ -65,22 +72,27 @@ int gINT_006a23b4 = 0;
 
 // GLOBAL: CARMA2_HW 0x006a23c4
 // GLOBAL: CARMA2_SW 0x0069c41c
+// GLOBAL: CARMA2_CHEAT 0x006a9f3c
 int gSingle_frame_mode;
 
 // GLOBAL: CARMA2_HW 0x006a23c8
 // GLOBAL: CARMA2_SW 0x0069c420
+// GLOBAL: CARMA2_CHEAT 0x006a9f40
 tU32 gCam_change_time;
 
 // GLOBAL: CARMA2_HW 0x006a23d4
 // GLOBAL: CARMA2_SW 0x0069c42c
+// GLOBAL: CARMA2_CHEAT 0x006a9f4c
 tU32 gLast_synch_time;
 
 // GLOBAL: CARMA2_HW 0x006768fc
 // GLOBAL: CARMA2_SW 0x0067106c
+// GLOBAL: CARMA2_CHEAT 0x0067e1ac
 int gPaused;
 
 // GLOBAL: CARMA2_HW 0x0058f2d8
 // GLOBAL: CARMA2_SW 0x0058a2d8
+// GLOBAL: CARMA2_CHEAT 0x005942d8
 const int gPow2_array[32] = {
     0x1, 0x2, 0x4, 0x8,
     0x10, 0x20, 0x40, 0x80,
@@ -94,18 +106,29 @@ const int gPow2_array[32] = {
 
 // GLOBAL: CARMA2_HW 0x0058f600
 // GLOBAL: CARMA2_SW 0x0058a600
+// GLOBAL: CARMA2_CHEAT 0x00594690
 tU8 gCamera_type_allowed_replay[9] = {
+#ifdef REC2_V101A
     1, 1, 1, 1, 1, 0, 0, 1, 1,
+#else
+    1, 1, 1, 1, 1, 1, 1, 1, 1,
+#endif
 };
 
 // GLOBAL: CARMA2_HW 0x0058f610
 // GLOBAL: CARMA2_SW 0x0058a610
+// GLOBAL: CARMA2_CHEAT 0x005946a0
 tU8 gCamera_type_allowed_gameplay[9] = {
+#ifdef REC2_101A
+    1, 0, 0, 0, 1, 1, 1, 1, 1,
+#else
     1, 0, 0, 0, 1, 0, 0, 1, 1,
+#endif
 };
 
 // GLOBAL: CARMA2_HW 0x0058f620
 // GLOBAL: CARMA2_SW 0x0058a620
+// GLOBAL: CARMA2_CHEAT 0x005946b0
 int gAR_camera_type = 2;
 
 // GLOBAL: CARMA2_HW 0x0058f6a4
@@ -114,6 +137,7 @@ int gCar_car_collisions = 1;
 
 // GLOBAL: CARMA2_HW 0x0058f6b0
 // GLOBAL: CARMA2_SW 0x0058a6b0
+// GLOBAL: CARMA2_CHEAT 0x00594740
 const float gCar_simplification_factor[2][5] = {
     { 50.0f, 3.0f, 1.5f, 0.75f, 0.0f },
     { 50.0f, 5.0f, 2.5f, 1.5f, 0.0f }
@@ -121,6 +145,7 @@ const float gCar_simplification_factor[2][5] = {
 
 // GLOBAL: CARMA2_HW 0x0058f7f0
 // GLOBAL: CARMA2_SW 0x0058a7f0
+// GLOBAL: CARMA2_CHEAT 0x00594880
 tPolyhedron_edge_indexes gDefault_box_collision_wireframe_edges[12] = {
     { 0, 1 }, { 2, 3 }, { 4, 5 }, { 6, 7 },
     { 0, 2 }, { 1, 3 }, { 4, 6 }, { 5, 7 },
@@ -133,6 +158,7 @@ tPolyhedron_edge_indexes gDefault_box_collision_wireframe_edges[12] = {
 
 // STUB: CARMA2_HW 0x004e6280
 // STUB: CARMA2_SW 0x004e22a0
+// STUB: CARMA2_CHEAT 0x004ebf90
 void C2_HOOK_FASTCALL ActualActionReplayHeadups(int pSpecial_zappy_bastard) {
     NOT_IMPLEMENTED();
 }
@@ -143,12 +169,14 @@ void C2_HOOK_FASTCALL ActualActionReplayHeadups(int pSpecial_zappy_bastard) {
 
 // FUNCTION: CARMA2_HW 0x004e6260
 // FUNCTION: CARMA2_SW 0x004e2280
+// FUNCTION: CARMA2_CHEAT 0x004ebf70
 void C2_HOOK_FASTCALL DoActionReplayPostSwap(void) {
     RemoveTransientBitmaps(1);
 }
 
 // FUNCTION: CARMA2_HW 0x004e6900
 // FUNCTION: CARMA2_SW 0x004e27f0
+// FUNCTION: CARMA2_CHEAT 0x004ec5f0
 void C2_HOOK_FASTCALL DoZappyActionReplayHeadups(int pSpecial_zappy_bastard) {
     tU32 the_time;
 
@@ -163,6 +191,7 @@ void C2_HOOK_FASTCALL DoZappyActionReplayHeadups(int pSpecial_zappy_bastard) {
 
 // FUNCTION: CARMA2_HW 0x004e6270
 // FUNCTION: CARMA2_SW 0x004e2290
+// FUNCTION: CARMA2_CHEAT 0x004ebf80
 void C2_HOOK_FASTCALL DoActionReplayHeadups(void) {
     ActualActionReplayHeadups(0);
 }
@@ -201,6 +230,7 @@ void C2_HOOK_FASTCALL FreeActionReplayPix(void) {
 
 // FUNCTION: CARMA2_HW 0x004e7110
 // FUNCTION: CARMA2_SW 0x004e2f50
+// FUNCTION: CARMA2_CHEAT 0x004ecdb0
 void C2_HOOK_FASTCALL SynchronizeActionReplay(void) {
 
     while (ARGetReplayRate() != 0.f && PDGetTotalTime() - gLast_synch_time < gFrame_period / fabs(ARGetReplayRate())) {
@@ -215,6 +245,7 @@ void C2_HOOK_FASTCALL SynchronizeActionReplay(void) {
 
 // FUNCTION: CARMA2_HW 0x004e71c0
 // FUNCTION: CARMA2_SW 0x004e3000
+// FUNCTION: CARMA2_CHEAT 0x004ece60
 void C2_HOOK_FASTCALL TurnOnActionReplay(void) {
 
     SavePedStuff();
@@ -242,6 +273,7 @@ void C2_HOOK_FASTCALL TurnOnActionReplay(void) {
 
 // FUNCTION: CARMA2_HW 0x004e7270
 // FUNCTION: CARMA2_SW 0x004e30b0
+// FUNCTION: CARMA2_CHEAT 0x004ecf10
 void C2_HOOK_FASTCALL TurnOffActionReplay(void) {
     UnlockInterfaceStuff();
     AssertThisTimeAsCurrentTime();
@@ -259,6 +291,7 @@ void C2_HOOK_FASTCALL TurnOffActionReplay(void) {
 
 // FUNCTION: CARMA2_HW 0x004e72d0
 // FUNCTION: CARMA2_SW 0x004e3110
+// FUNCTION: CARMA2_CHEAT 0x004ecf70
 void C2_HOOK_FASTCALL AfterActionReplay(void) {
     ForceRebuildActiveCarList();
 }
@@ -269,12 +302,14 @@ void C2_HOOK_FASTCALL AfterActionReplay(void) {
 
 // FUNCTION: CARMA2_HW 0x004022e0
 // FUNCTION: CARMA2_SW 0x004022e0
+// FUNCTION: CARMA2_CHEAT 0x004022e0
 void C2_HOOK_FASTCALL ApplyTime(tU32 pTime) {
     gLast_replay_frame_time = pTime;
 }
 
 // FUNCTION: CARMA2_HW 0x004022f0
 // FUNCTION: CARMA2_SW 0x004022f0
+// FUNCTION: CARMA2_CHEAT 0x004022f0
 void C2_HOOK_FASTCALL ARSetPause(int pPause) {
     gPaused = pPause;
 }

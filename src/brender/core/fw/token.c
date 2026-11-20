@@ -525,6 +525,7 @@ token_type tokenTypes[37] = {
 
 // FUNCTION: CARMA2_HW 0x0052f030
 // FUNCTION: CARMA2_SW 0x0052a6d0
+// FUNCTION: CARMA2_CHEAT 0x00534c20
 void C2_HOOK_CDECL BrTokenBegin(void) {
     int i;
 
@@ -537,6 +538,7 @@ void C2_HOOK_CDECL BrTokenBegin(void) {
 
 // FUNCTION: CARMA2_HW 0x0052f070
 // FUNCTION: CARMA2_SW 0x0052a710
+// FUNCTION: CARMA2_CHEAT 0x00534c60
 br_token C2_HOOK_CDECL BrTokenCreate(const char* identifier, br_token type) {
     br_token_entry* te;
     int i;
@@ -587,6 +589,7 @@ br_token C2_HOOK_CDECL BrTokenCreate(const char* identifier, br_token type) {
 
 // FUNCTION: CARMA2_HW 0x0052f1c0
 // FUNCTION: CARMA2_SW 0x0052a860
+// FUNCTION: CARMA2_CHEAT 0x00534db0
 char* C2_HOOK_CDECL BrTokenIdentifier(br_token t) {
     br_token_entry* te;
 
@@ -602,6 +605,7 @@ char* C2_HOOK_CDECL BrTokenIdentifier(br_token t) {
 
 // FUNCTION: CARMA2_HW 0x0052f1f0
 // FUNCTION: CARMA2_SW 0x0052a890
+// FUNCTION: CARMA2_CHEAT 0x00534de0
 br_token C2_HOOK_CDECL BrTokenType(br_token t) {
     br_token_entry* te;
 
@@ -617,6 +621,7 @@ br_token C2_HOOK_CDECL BrTokenType(br_token t) {
 
 // FUNCTION: CARMA2_HW 0x0052f220
 // FUNCTION: CARMA2_SW 0x0052a8c0
+// FUNCTION: CARMA2_CHEAT 0x00534e10
 br_int_32 C2_HOOK_CDECL BrTokenCount(const char* pattern) {
     br_token_entry* te;
     int n;
@@ -642,6 +647,7 @@ br_int_32 C2_HOOK_CDECL BrTokenCount(const char* pattern) {
 
 // FUNCTION: CARMA2_HW 0x0052f270
 // FUNCTION: CARMA2_SW 0x0052a910
+// FUNCTION: CARMA2_CHEAT 0x00534e60
 br_token C2_HOOK_CDECL BrTokenFind(const char* pattern) {
     br_token_entry* te;
 
@@ -657,6 +663,7 @@ br_token C2_HOOK_CDECL BrTokenFind(const char* pattern) {
 
 // FUNCTION: CARMA2_HW 0x0052f2b0
 // FUNCTION: CARMA2_SW 0x0052a950
+// FUNCTION: CARMA2_CHEAT 0x00534ea0
 br_int_32 C2_HOOK_CDECL BrTokenFindMany(const char* pattern, br_token* tokens, br_int_32 max_tokens) {
     br_token_entry* te;
     int n;

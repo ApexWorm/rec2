@@ -11,6 +11,7 @@
 // this function was only called in Carmageddon I DOS build
 // FUNCTION: CARMA2_HW 0x0056990f
 // FUNCTION: CARMA2_SW 0x00564faf
+// FUNCTION: CARMA2_CHEAT 0x0056f500
 int C2_HOOK_FASTCALL S3CreateTypeStructs(tS3_channel* chan) {
 
     return 1;

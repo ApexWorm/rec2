@@ -19,6 +19,7 @@
 #define BR_MAC2(A, B, C, D) ((A) * (B) + (C) * (D))
 
 // FUNCTION: CARMA2_HW 0x00521490
+// FUNCTION: CARMA2_CHEAT 0x00527080
 void C2_HOOK_CDECL BrModelApplyMap(br_model* model, int map_type, br_matrix34* xform) {
     int v;
     br_vertex* vp;
@@ -60,6 +61,7 @@ void C2_HOOK_CDECL BrModelApplyMap(br_model* model, int map_type, br_matrix34* x
 }
 
 // FUNCTION: CARMA2_HW 0x00521660
+// FUNCTION: CARMA2_CHEAT 0x00527250
 br_matrix34* C2_HOOK_CDECL BrModelFitMap(br_model* model, int axis_0, int axis_1, br_matrix34* transform) {
     br_vector3 axis_3;
     br_vector3 tr;
@@ -101,6 +103,7 @@ br_matrix34* C2_HOOK_CDECL BrModelFitMap(br_model* model, int axis_0, int axis_1
 
 // FUNCTION: CARMA2_HW 0x005217e0
 // FUNCTION: CARMA2_SW 0x0051ce80
+// FUNCTION: CARMA2_CHEAT 0x005273d0
 void C2_HOOK_CDECL BrModelFree(br_model* m) {
 
     BrResFree(m);
@@ -108,6 +111,7 @@ void C2_HOOK_CDECL BrModelFree(br_model* m) {
 
 // FUNCTION: CARMA2_HW 0x005217f0
 // FUNCTION: CARMA2_SW 0x0051ce90
+// FUNCTION: CARMA2_CHEAT 0x005273e0
 br_model* C2_HOOK_CDECL BrModelAllocate(const char* name, int nvertices, int nfaces) {
     br_model* m;
 
@@ -131,12 +135,14 @@ br_model* C2_HOOK_CDECL BrModelAllocate(const char* name, int nvertices, int nfa
 }
 
 // FUNCTION: CARMA2_HW 0x00521870
+// FUNCTION: CARMA2_CHEAT 0x00527460
 br_primitive_list* C2_HOOK_CDECL BrPrimitiveListAllocate(br_uint_32 prim_type, br_uint_16 num_prims) {
 
     return NULL;
 }
 
 // FUNCTION: CARMA2_HW 0x00521880
+// FUNCTION: CARMA2_CHEAT 0x00527470
 br_uint_32 C2_HOOK_CDECL BrModelAddPrimitiveList(br_model* model, br_primitive_list* primitive_list) {
 
     return 0;

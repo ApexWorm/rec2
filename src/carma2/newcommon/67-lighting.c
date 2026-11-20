@@ -21,12 +21,14 @@
 
 // FUNCTION: CARMA2_HW 0x004f6520
 // FUNCTION: CARMA2_SW 0x004f2180
+// FUNCTION: CARMA2_CHEAT 0x004fc1c0
 void C2_HOOK_FASTCALL LoadTrackModels(tBrender_storage* pStorage, const char* pPath) {
     gStorage_for_callbacks = pStorage;
     PFForEveryFile(pPath, SmoothlyLoadIfItsAModel);
 }
 
 // FUNCTION: CARMA2_HW 0x004f6540
+// FUNCTION: CARMA2_CHEAT 0x004fc1e0
 void C2_HOOK_FASTCALL SmoothlyLoadIfItsAModel(const char* pPath) {
     char s[256];
 
@@ -37,6 +39,7 @@ void C2_HOOK_FASTCALL SmoothlyLoadIfItsAModel(const char* pPath) {
 }
 
 // FUNCTION: CARMA2_HW 0x004f6580
+// FUNCTION: CARMA2_CHEAT 0x004fc220
 int C2_HOOK_FASTCALL AddSmoothModels(tBrender_storage* pStorage, const char* pPath) {
     br_model* temp_array[2000];
     int count;
@@ -73,6 +76,7 @@ int C2_HOOK_FASTCALL AddSmoothModels(tBrender_storage* pStorage, const char* pPa
 
 // FUNCTION: CARMA2_HW 0x004f6640
 // FUNCTION: CARMA2_SW 0x004f2290
+// FUNCTION: CARMA2_CHEAT 0x004fc2e0
 void C2_HOOK_FASTCALL LoadTrackMaterials(tBrender_storage* pStorage, const char* pPath) {
 
     gMaterial_shading_for_callback = kRendererShadingType_Default;
@@ -84,6 +88,7 @@ void C2_HOOK_FASTCALL LoadTrackMaterials(tBrender_storage* pStorage, const char*
 
 // FUNCTION: CARMA2_HW 0x004f6740
 // FUNCTION: CARMA2_SW 0x004f22d0
+// FUNCTION: CARMA2_CHEAT 0x004fc3e0
 void C2_HOOK_FASTCALL LoadCarMaterials(tBrender_storage* pStorage, const char* pPath, tCar_spec* pCar_spec) {
 
     gMaterial_shading_for_callback = kRendererShadingType_Specular;
@@ -101,6 +106,7 @@ void C2_HOOK_FASTCALL LoadCarMaterials(tBrender_storage* pStorage, const char* p
 
 // FUNCTION: CARMA2_HW 0x004f67a0
 // FUNCTION: CARMA2_SW 0x004f2330
+// FUNCTION: CARMA2_CHEAT 0x004fc440
 void C2_HOOK_FASTCALL SmoothlySetCarMaterialFlags(tBrender_storage* pStorage, tCar_spec* pCar_spec) {
     int i;
     br_material* material;
@@ -141,6 +147,7 @@ void C2_HOOK_FASTCALL SmoothlySetCarMaterialFlags(tBrender_storage* pStorage, tC
 #endif
 
 // FUNCTION: CARMA2_HW 0x004f6820
+// FUNCTION: CARMA2_CHEAT 0x004fc4c0
 // STUB: CARMA2_SW 0x004f23d0
 void C2_HOOK_FASTCALL SmoothlySetWorldMaterialFlags(tBrender_storage* pStorage) {
 #ifdef REC2_HW
@@ -157,6 +164,7 @@ void C2_HOOK_FASTCALL SmoothlySetWorldMaterialFlags(tBrender_storage* pStorage) 
 }
 
 // FUNCTION: CARMA2_HW 0x004f6900
+// FUNCTION: CARMA2_CHEAT 0x004fc5a0
 void C2_HOOK_FASTCALL SmoothificatePowerups(br_actor* pActor) {
     br_model* model;
     int i;
@@ -179,6 +187,7 @@ void C2_HOOK_FASTCALL SmoothificatePowerups(br_actor* pActor) {
 }
 
 // FUNCTION: CARMA2_HW 0x004f6a20
+// FUNCTION: CARMA2_CHEAT 0x004fc6c0
 void C2_HOOK_FASTCALL SmoothificatePowerupMaterial(br_material* pMaterial) {
     int need_update;
 
@@ -207,6 +216,7 @@ void C2_HOOK_FASTCALL SmoothificatePowerupMaterial(br_material* pMaterial) {
 }
 
 // FUNCTION: CARMA2_HW 0x004f6a90
+// FUNCTION: CARMA2_CHEAT 0x004fc730
 void C2_HOOK_FASTCALL SmoothificateWorldMaterial(br_material* pMaterial) {
 #ifdef REC2_HW
     if (gNbPixelBits != 16) {
@@ -230,6 +240,7 @@ void C2_HOOK_FASTCALL SmoothificateWorldMaterial(br_material* pMaterial) {
 }
 
 // FUNCTION: CARMA2_HW 0x004f6b50
+// FUNCTION: CARMA2_CHEAT 0x004fc7f0
 void C2_HOOK_FASTCALL SmoothificateCarMaterial(br_material* pMaterial) {
 
   if (gNbPixelBits == 16) {
@@ -243,6 +254,7 @@ void C2_HOOK_FASTCALL SmoothificateCarMaterial(br_material* pMaterial) {
 
 // FUNCTION: CARMA2_HW 0x00486d60
 // FUNCTION: CARMA2_SW 0x00483e90
+// FUNCTION: CARMA2_CHEAT 0x00487080
 void C2_HOOK_FASTCALL MungeLightingEffects(void) {
 
     // empty
@@ -250,12 +262,14 @@ void C2_HOOK_FASTCALL MungeLightingEffects(void) {
 
 // FUNCTION: CARMA2_HW 0x00486d70
 // FUNCTION: CARMA2_SW 0x00483ea0
+// FUNCTION: CARMA2_CHEAT 0x00487090
 void C2_HOOK_FASTCALL KillLightingEffects(void) {
 
     // empty
 }
 
 // FUNCTION: CARMA2_HW 0x00486d80
+// FUNCTION: CARMA2_CHEAT 0x004870a0
 void C2_HOOK_FASTCALL InitLightingEffects(void) {
 
     // empty

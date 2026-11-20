@@ -272,6 +272,7 @@ void C2_HOOK_CDECL pm_mem_copy_colour_rowbyrow(br_uint_8* dest, br_uint_32 dest_
 }
 
 // FUNCTION: CARMA2_HW 0x0053e5c9
+// FUNCTION: CARMA2_CHEAT 0x005441b9
 void C2_HOOK_CDECL pm_mem_set_colour(br_uint_8* dest, br_uint_32 dest_qual, br_uint_32 bpp, br_uint_32 colour) {
 
 

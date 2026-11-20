@@ -29,6 +29,7 @@
 
 // FUNCTION: CARMA2_HW 0x0051a070
 // FUNCTION: CARMA2_SW 0x00513b50
+// FUNCTION: CARMA2_CHEAT 0x0051f790
 void C2_HOOK_FASTCALL PDNetDisposeGameDetails(void) {
 
     dr_dprintf("PDNetDisposeGameDetails()");
@@ -36,6 +37,7 @@ void C2_HOOK_FASTCALL PDNetDisposeGameDetails(void) {
 
 // FUNCTION: CARMA2_HW 0x0051a080
 // FUNCTION: CARMA2_SW 0x00513b60
+// FUNCTION: CARMA2_CHEAT 0x0051f7a0
 int C2_HOOK_FASTCALL PDNetHostGame(tNet_game_details* pDetails, char* pHost_name, void** pHost_address) {
     dr_dprintf("PDNetHostGame()");
     *pHost_address = &gLocal_address;
@@ -50,6 +52,7 @@ int C2_HOOK_FASTCALL PDNetHostGame(tNet_game_details* pDetails, char* pHost_name
 
 // FUNCTION: CARMA2_HW 0x0051a0d0
 // FUNCTION: CARMA2_SW 0x00513bb0
+// FUNCTION: CARMA2_CHEAT 0x0051f7f0
 tU32 C2_HOOK_FASTCALL PDNetExtractGameID(const tNet_game_details* pDetails) {
     tU8 *addr = (tU8*)pDetails->pd_net_info.addr;
 
@@ -71,6 +74,7 @@ tU32 C2_HOOK_FASTCALL PDNetExtractGameID(const tNet_game_details* pDetails) {
 
 // FUNCTION: CARMA2_HW 0x0051a5f0
 // FUNCTION: CARMA2_SW 0x005140d0
+// FUNCTION: CARMA2_CHEAT 0x0051fd10
 void C2_HOOK_FASTCALL PDNetSetPlayerSystemInfo(tNet_game_player_info* pPlayer, void* pSender_address) {
     C2_HOOK_BUG_ON(sizeof(SOCKADDR_IPX) != 14);
 

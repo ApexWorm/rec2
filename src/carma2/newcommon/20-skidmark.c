@@ -18,22 +18,27 @@
 
 // GLOBAL: CARMA2_HW 0x0065fe08
 // GLOBAL: CARMA2_SW 0x0065a748
+// GLOBAL: CARMA2_CHEAT 0x00667650
 char* gBoring_material_names[2] = { "OILSMEAR.MAT", "ROBSMEAR.MAT" };
 
 // GLOBAL: CARMA2_HW 0x0065fe10
 // GLOBAL: CARMA2_SW 0x0065a750
+// GLOBAL: CARMA2_CHEAT 0x00667658
 char* gMaterial_names[2] = { "OILSMEAR.MAT", "GIBSMEAR.MAT" };
 
 // GLOBAL: CARMA2_HW 0x0065fec0
 // GLOBAL: CARMA2_SW 0x0065a800
+// GLOBAL: CARMA2_CHEAT 0x00667708
 const char* gShrapnel_type_names[4] = { "abstract", "shards", "ghostparts", "noncars" };
 
 // GLOBAL: CARMA2_HW 0x0065fed0
 // GLOBAL: CARMA2_SW 0x0065a810
+// GLOBAL: CARMA2_CHEAT 0x00667718
 const char* gInitial_position_type_names[3] = { "sphereclumped", "boxclumped", "actorbased" };
 
 // GLOBAL: CARMA2_HW 0x0065fee0
 // GLOBAL: CARMA2_SW 0x0065a820
+// GLOBAL: CARMA2_CHEAT 0x00667728
 const char* gInitial_position_sphere_where[2] = { "impact", "model" };
 
 // GLOBAL: CARMA2_HW 0x0065fee8
@@ -45,6 +50,7 @@ const char* gExplosion_rotate_names[2] = {
 
 // GLOBAL: CARMA2_HW 0x006a27f0
 // GLOBAL: CARMA2_SW 0x0069c848
+// GLOBAL: CARMA2_CHEAT 0x006aa368
 tSkid gSkids[100] = { 0 };
 
 // GLOBAL: CARMA2_HW 0x006a32e0
@@ -57,6 +63,7 @@ int gCurrent_skid;
 
 // FUNCTION: CARMA2_HW 0x004ea2c0
 // FUNCTION: CARMA2_SW 0x004e6060
+// FUNCTION: CARMA2_CHEAT 0x004eff60
 void C2_HOOK_FASTCALL StretchMark(tSkid* pMark, br_vector3* pFrom, br_vector3* pTo, br_scalar pTexture_start, br_scalar pTexture_step) {
     br_vector3 temp;
     br_vector3* rows;
@@ -92,6 +99,7 @@ void C2_HOOK_FASTCALL StretchMark(tSkid* pMark, br_vector3* pFrom, br_vector3* p
 
 // FUNCTION: CARMA2_HW 0x004e9be0
 // FUNCTION: CARMA2_SW 0x004e59a0
+// FUNCTION: CARMA2_CHEAT 0x004ef880
 void C2_HOOK_FASTCALL AdjustSkid(int pSkid_num, br_matrix34* pMatrix, br_material* pMaterial) {
     gSkids[pSkid_num].actor->t.t.mat = *pMatrix;
     gSkids[pSkid_num].pos = *(br_vector3*)pMatrix->m[3];
@@ -105,6 +113,7 @@ void C2_HOOK_FASTCALL AdjustSkid(int pSkid_num, br_matrix34* pMatrix, br_materia
 
 // FUNCTION: CARMA2_HW 0x004e9c40
 // FUNCTION: CARMA2_SW 0x004e5a00
+// FUNCTION: CARMA2_CHEAT 0x004ef8e0
 void C2_HOOK_FASTCALL InitSkids(void) {
     int skid;
     int mat;
@@ -178,6 +187,7 @@ void C2_HOOK_FASTCALL InitSkids(void) {
 
 // FUNCTION: CARMA2_HW 0x004e9ee0
 // FUNCTION: CARMA2_SW 0x004e5c80
+// FUNCTION: CARMA2_CHEAT 0x004efb80
 void C2_HOOK_FASTCALL HideSkid(int pSkid_num) {
 
     gSkids[pSkid_num].actor->render_style = BR_RSTYLE_NONE;
@@ -185,6 +195,7 @@ void C2_HOOK_FASTCALL HideSkid(int pSkid_num) {
 
 // FUNCTION: CARMA2_HW 0x004e9f00
 // FUNCTION: CARMA2_SW 0x004e5ca0
+// FUNCTION: CARMA2_CHEAT 0x004efba0
 void C2_HOOK_FASTCALL HideSkids(void) {
     int skid;
 
@@ -216,6 +227,7 @@ int C2_HOOK_FASTCALL SkidSection(tS16* pSkid_id, br_vector3* pSkid_start, br_vec
 
 // FUNCTION: CARMA2_HW 0x004ea490
 // FUNCTION: CARMA2_SW 0x004e6230
+// FUNCTION: CARMA2_CHEAT 0x004f0130
 void C2_HOOK_FASTCALL SkidMark(tCar_spec* pCar_spec, int pWheel_num) {
     br_material* material;
     int skid_mask;
@@ -279,6 +291,7 @@ void C2_HOOK_FASTCALL SkidMark(tCar_spec* pCar_spec, int pWheel_num) {
 
 // FUNCTION: CARMA2_HW 0x004ea700
 // FUNCTION: CARMA2_SW 0x004e64a0
+// FUNCTION: CARMA2_CHEAT 0x004f03a0
 void C2_HOOK_FASTCALL InitCarSkidStuff(tCar_spec* pCar) {
     int wheel;
 
@@ -290,6 +303,7 @@ void C2_HOOK_FASTCALL InitCarSkidStuff(tCar_spec* pCar) {
 
 // FUNCTION: CARMA2_HW 0x004ea720
 // FUNCTION: CARMA2_SW 0x004e64c0
+// FUNCTION: CARMA2_CHEAT 0x004f03c0
 void C2_HOOK_FASTCALL SkidsPerFrame(void) {
     int skid;
 

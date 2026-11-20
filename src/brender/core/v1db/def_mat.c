@@ -14,6 +14,7 @@
 
 // FUNCTION: CARMA2_HW 0x00526940
 // FUNCTION: CARMA2_SW 0x00521fe0
+// FUNCTION: CARMA2_CHEAT 0x0052c530
 br_material* C2_HOOK_CDECL SetupDefaultMaterial(void) {
     // GLOBAL: CARMA2_HW 0x006ad520
     static br_material* default_mat;

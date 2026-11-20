@@ -92,6 +92,7 @@ void C2_HOOK_FASTCALL S3StopSoundSource(tS3_sound_source* src) {
 
 // FUNCTION: CARMA2_HW 0x00567875
 // FUNCTION: CARMA2_SW 0x00562f15
+// FUNCTION: CARMA2_CHEAT 0x0056d46c
 void C2_HOOK_FASTCALL S3UpdateSoundSource(tS3_outlet* outlet, tS3_sound_tag tag, tS3_sound_source* src, float pMax_distance_squared, int pPeriod, tS3_repeats pAmbient_repeats, tS3_volume pVolume, int pPitch, tS3_speed pSpeed) {
     tS3_channel* channel;
     int is_sample;
@@ -216,6 +217,7 @@ void C2_HOOK_FASTCALL S3SetVector3(tS3_vector3* pVec, float pX, float pY, float 
 
 // FUNCTION: CARMA2_HW 0x00565d70
 // FUNCTION: CARMA2_SW 0x00561410
+// FUNCTION: CARMA2_CHEAT 0x0056b960
 int C2_HOOK_STDCALL S3Set3DSoundEnvironment(float a1, float a2, float a3) {
 
     S3_FUN_00565e39_MACRO(a1, a2, a3);
@@ -476,6 +478,7 @@ void C2_HOOK_FASTCALL S3CopyVector3(void* pDest, void* pSrc, int pIs_BRender) {
 
 // FUNCTION: CARMA2_HW 0x005675ce
 // FUNCTION: CARMA2_SW 0x00562c6e
+// FUNCTION: CARMA2_CHEAT 0x0056d1c5
 void C2_HOOK_FASTCALL S3UpdateListenerVectors(void) {
 
     if (gS3_listener_pos_ptr != NULL) {
@@ -597,6 +600,7 @@ int C2_HOOK_FASTCALL S3UpdateSourcePosition(tS3_sound_source *pSource) {
 
 // FUNCTION: CARMA2_HW 0x00567ea5
 // FUNCTION: CARMA2_SW 0x00563545
+// FUNCTION: CARMA2_CHEAT 0x0056da9c
 int C2_HOOK_FASTCALL S3UpdateSourceVectors(void) {
     tS3_sound_source* source;
 
@@ -715,6 +719,7 @@ int C2_HOOK_FASTCALL S3Calculate3D(tS3_channel* pChannel, int pAmbient) {
 
 // FUNCTION: CARMA2_HW 0x00567575
 // FUNCTION: CARMA2_SW 0x00562c15
+// FUNCTION: CARMA2_CHEAT 0x0056d165
 int C2_HOOK_FASTCALL S3Service3D(tS3_channel* pChannel) {
     int updated;
 

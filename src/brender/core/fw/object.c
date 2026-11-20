@@ -12,6 +12,7 @@
 
 // FUNCTION: CARMA2_HW 0x0052d060
 // FUNCTION: CARMA2_SW 0x00528700
+// FUNCTION: CARMA2_CHEAT 0x00532c50
 br_error C2_HOOK_CDECL _M_br_object_query(br_object* self, br_uint_32* pvalue, br_token t) {
 
     return BrTokenValueQuery(pvalue, NULL, 0, t, self, self->dispatch->_templateQuery(self));
@@ -19,6 +20,7 @@ br_error C2_HOOK_CDECL _M_br_object_query(br_object* self, br_uint_32* pvalue, b
 
 // FUNCTION: CARMA2_HW 0x0052d090
 // FUNCTION: CARMA2_SW 0x00528730
+// FUNCTION: CARMA2_CHEAT 0x00532c80
 br_error C2_HOOK_CDECL _M_br_object_queryBuffer(br_object* self, br_uint_32* pvalue, br_uint_32* buffer, br_size_t buffer_size, br_token t) {
 
     return BrTokenValueQuery(pvalue, buffer, buffer_size, t, self, self->dispatch->_templateQuery(self));
@@ -26,6 +28,7 @@ br_error C2_HOOK_CDECL _M_br_object_queryBuffer(br_object* self, br_uint_32* pva
 
 // FUNCTION: CARMA2_HW 0x0052d0c0
 // FUNCTION: CARMA2_SW 0x00528760
+// FUNCTION: CARMA2_CHEAT 0x00532cb0
 br_error C2_HOOK_CDECL _M_br_object_queryMany(br_object* self, br_token_value* tv, void* extra, br_size_t extra_size, br_int_32* pcount) {
 
     return BrTokenValueQueryMany(tv, extra, extra_size, pcount, self, self->dispatch->_templateQuery(self));
@@ -33,6 +36,7 @@ br_error C2_HOOK_CDECL _M_br_object_queryMany(br_object* self, br_token_value* t
 
 // FUNCTION: CARMA2_HW 0x0052d0f0
 // FUNCTION: CARMA2_SW 0x00528790
+// FUNCTION: CARMA2_CHEAT 0x00532ce0
 br_error C2_HOOK_CDECL _M_br_object_queryManySize(br_object* self, br_size_t* pextra_size, br_token_value* tv) {
 
     return BrTokenValueQueryManySize(pextra_size, tv, self, self->dispatch->_templateQuery(self));
@@ -40,6 +44,7 @@ br_error C2_HOOK_CDECL _M_br_object_queryManySize(br_object* self, br_size_t* pe
 
 // FUNCTION: CARMA2_HW 0x0052d120
 // FUNCTION: CARMA2_SW 0x005287c0
+// FUNCTION: CARMA2_CHEAT 0x00532d10
 br_error C2_HOOK_CDECL _M_br_object_queryAll(br_object* self, br_token_value* buffer, br_size_t buffer_size) {
 
     return BrTokenValueQueryAll(buffer, buffer_size, self, self->dispatch->_templateQuery(self));
@@ -47,6 +52,7 @@ br_error C2_HOOK_CDECL _M_br_object_queryAll(br_object* self, br_token_value* bu
 
 // FUNCTION: CARMA2_HW 0x0052d150
 // FUNCTION: CARMA2_SW 0x005287f0
+// FUNCTION: CARMA2_CHEAT 0x00532d40
 br_error C2_HOOK_CDECL _M_br_object_queryAllSize(br_object* self, br_size_t* psize) {
 
     return BrTokenValueQueryAllSize(psize, self, self->dispatch->_templateQuery(self));
@@ -54,6 +60,7 @@ br_error C2_HOOK_CDECL _M_br_object_queryAllSize(br_object* self, br_size_t* psi
 
 // FUNCTION: CARMA2_HW 0x0052d170
 // FUNCTION: CARMA2_SW 0x00528810
+// FUNCTION: CARMA2_CHEAT 0x00532d60
 void C2_HOOK_CDECL _BrObjectFree(void* res, br_uint_8 res_class, br_size_t size) {
 
     br_object* o;

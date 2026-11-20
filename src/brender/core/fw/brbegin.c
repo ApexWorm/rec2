@@ -23,6 +23,7 @@ br_boolean active;
 
 // FUNCTION: CARMA2_HW 0x0052cf20
 // FUNCTION: CARMA2_SW 0x005285c0
+// FUNCTION: CARMA2_CHEAT 0x00532b10
 br_error C2_HOOK_CDECL BrBegin(void) {
     if (active) {
         return 4103;
@@ -39,6 +40,7 @@ br_error C2_HOOK_CDECL BrBegin(void) {
 
 // FUNCTION: CARMA2_HW 0x0052cf50
 // FUNCTION: CARMA2_SW 0x005285f0
+// FUNCTION: CARMA2_CHEAT 0x00532b40
 br_error C2_HOOK_CDECL BrEnd(void) {
     br_device* dev;
 

@@ -14,6 +14,7 @@
 #include <string.h>
 
 // FUNCTION: CARMA2_HW 0x0047b450
+// FUNCTION: CARMA2_CHEAT 0x0047b7d0
 void C2_HOOK_FASTCALL DRDrawLine(br_pixelmap* pDestn, int pX1, int pY1, int pX2, int pY2, int pColour) {
 
 #ifdef REC2_HW
@@ -26,6 +27,7 @@ void C2_HOOK_FASTCALL DRDrawLine(br_pixelmap* pDestn, int pX1, int pY1, int pX2,
 
 // FUNCTION: CARMA2_HW 0x0047b880
 // FUNCTION: CARMA2_SW 0x0047aba0
+// FUNCTION: CARMA2_CHEAT 0x0047bc00
 void C2_HOOK_FASTCALL ClearEntireScreen(void) {
 
     if (gScreen != NULL) {
@@ -43,6 +45,7 @@ void C2_HOOK_FASTCALL ClearEntireScreen(void) {
 
 // FUNCTION: CARMA2_HW 0x0047b960
 // FUNCTION: CARMA2_SW 0x0047ac50
+// FUNCTION: CARMA2_CHEAT 0x0047bce0
 void C2_HOOK_FASTCALL KillSplashScreen(void) {
 
     if (gCurrent_splash != NULL) {
@@ -54,6 +57,7 @@ void C2_HOOK_FASTCALL KillSplashScreen(void) {
 
 // FUNCTION: CARMA2_HW 0x0047b990
 // FUNCTION: CARMA2_SW 0x0047ac80
+// FUNCTION: CARMA2_CHEAT 0x0047bd10
 void C2_HOOK_FASTCALL SplashScreenWith(const char* pPixmap_name) {
     br_pixelmap* map;
     tPixelFlags flags;
@@ -105,6 +109,7 @@ void C2_HOOK_FASTCALL SplashScreenWith(const char* pPixmap_name) {
 
 // FUNCTION: CARMA2_HW 0x0047ba80
 // FUNCTION: CARMA2_SW 0x0047ae00
+// FUNCTION: CARMA2_CHEAT 0x0047be00
 void C2_HOOK_FASTCALL DRPixelmapRectangleMaskedCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_int_16 pDest_y, const br_pixelmap* pSource, br_int_16 pSource_x, br_int_16 pSource_y, br_int_16 pWidth, br_int_16 pHeight) {
 #ifdef REC2_SW
     int y_count;
@@ -235,6 +240,7 @@ void C2_HOOK_FASTCALL DRPixelmapRectangleMaskedCopy(br_pixelmap* pDest, br_int_1
 
 // FUNCTION: CARMA2_HW 0x0047bc40
 // FUNCTION: CARMA2_SW 0x0047af60
+// FUNCTION: CARMA2_CHEAT 0x0047bfc0
 void C2_HOOK_FASTCALL DRMaskedStamp(br_int_16 pDest_x, br_int_16 pDest_y, br_pixelmap* pSource) {
 
     DRPixelmapRectangleMaskedCopy(gBack_screen, pDest_x, pDest_y, pSource, 0, 0, pSource->width, pSource->height);
@@ -242,6 +248,7 @@ void C2_HOOK_FASTCALL DRMaskedStamp(br_int_16 pDest_x, br_int_16 pDest_y, br_pix
 
 // FUNCTION: CARMA2_HW 0x0047bc80
 // FUNCTION: CARMA2_SW 0x0047afa0
+// FUNCTION: CARMA2_CHEAT 0x0047c000
 void C2_HOOK_FASTCALL DRPixelmapRectangleOnscreenCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_int_16 pDest_y, const br_pixelmap* pSource, br_int_16 pSource_x, br_int_16 pSource_y, br_int_16 pWidth, br_int_16 pHeight) {
     int y_count;
     int x_count;
@@ -272,6 +279,7 @@ void C2_HOOK_FASTCALL DRPixelmapRectangleOnscreenCopy(br_pixelmap* pDest, br_int
 
 // FUNCTION: CARMA2_HW 0x0047bd20
 // FUNCTION: CARMA2_SW 0x0047b020
+// FUNCTION: CARMA2_CHEAT 0x0047c0a0
 void C2_HOOK_FASTCALL DRPixelmapRectangleShearedCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_int_16 pDest_y, const br_pixelmap* pSource, br_int_16 pSource_x, br_int_16 pSource_y, br_int_16 pWidth, br_int_16 pHeight, int pShear) {
     int y_count;
     int x_count;
@@ -365,6 +373,7 @@ void C2_HOOK_FASTCALL DRPixelmapRectangleShearedCopy(br_pixelmap* pDest, br_int_
 
 // FUNCTION: CARMA2_HW 0x0047bf90
 // FUNCTION: CARMA2_SW 0x0047b250
+// FUNCTION: CARMA2_CHEAT 0x0047c310
 void C2_HOOK_FASTCALL DRPixelmapRectangleVScaledCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_int_16 pDest_y, br_pixelmap* pSource, br_int_16 pSource_x, br_int_16 pSource_y, br_int_16 pWidth, br_int_16 pHeight) {
     int y_count;
     int x_count;
@@ -408,6 +417,7 @@ void C2_HOOK_FASTCALL DRPixelmapRectangleVScaledCopy(br_pixelmap* pDest, br_int_
 
 // FUNCTION: CARMA2_HW 0x0047c090
 // FUNCTION: CARMA2_SW 0x0047b310
+// FUNCTION: CARMA2_CHEAT 0x0047c410
 void C2_HOOK_FASTCALL DropInImageFromTop(br_pixelmap* pImage, int pLeft, int pTop, int pTop_clip, int pBottom_clip) {
     tS32 start_time;
     tS32 the_time;
@@ -461,6 +471,7 @@ void C2_HOOK_FASTCALL DropInImageFromTop(br_pixelmap* pImage, int pLeft, int pTo
 
 // FUNCTION: CARMA2_HW 0x0047c220
 // FUNCTION: CARMA2_SW 0x0047b4a0
+// FUNCTION: CARMA2_CHEAT 0x0047c5a0
 void C2_HOOK_FASTCALL DropOutImageThruBottom(br_pixelmap* pImage, int pLeft, int pTop, int pTop_clip, int pBottom_clip) {
     tS32 start_time;
     tS32 the_time;
@@ -499,6 +510,7 @@ void C2_HOOK_FASTCALL DropOutImageThruBottom(br_pixelmap* pImage, int pLeft, int
 
 // FUNCTION: CARMA2_HW 0x0047c360
 // FUNCTION: CARMA2_SW 0x0047b5e0
+// FUNCTION: CARMA2_CHEAT 0x0047c6e0
 void C2_HOOK_FASTCALL DropInImageFromBottom(br_pixelmap* pImage, int pLeft, int pTop, int pTop_clip, int pBottom_clip) {
     tS32 start_time;
     tS32 the_time;
@@ -552,6 +564,7 @@ void C2_HOOK_FASTCALL DropInImageFromBottom(br_pixelmap* pImage, int pLeft, int 
 
 // FUNCTION: CARMA2_HW 0x0047c4f0
 // FUNCTION: CARMA2_SW 0x0047b770
+// FUNCTION: CARMA2_CHEAT 0x0047c870
 void C2_HOOK_FASTCALL DropOutImageThruTop(br_pixelmap* pImage, int pLeft, int pTop, int pTop_clip, int pBottom_clip) {
     tS32 start_time;
     tS32 the_time;
@@ -590,6 +603,7 @@ void C2_HOOK_FASTCALL DropOutImageThruTop(br_pixelmap* pImage, int pLeft, int pT
 
 // FUNCTION: CARMA2_HW 0x0047c650
 // FUNCTION: CARMA2_SW 0x0047b8d0
+// FUNCTION: CARMA2_CHEAT 0x0047c9d0
 int C2_HOOK_FASTCALL SwitchToHiresMode(void) {
 #ifdef REC2_SW
     if (gGraf_spec_index == 0) {
@@ -614,6 +628,7 @@ int C2_HOOK_FASTCALL SwitchToHiresMode(void) {
 
 // FUNCTION: CARMA2_HW 0x0047c660
 // FUNCTION: CARMA2_SW 0x0047b980
+// FUNCTION: CARMA2_CHEAT 0x0047c9e0
 int C2_HOOK_FASTCALL SwitchToLoresMode(void) {
 #ifdef REC2_SW
     if (gGraf_spec_index == 1) {
@@ -681,6 +696,7 @@ void DRPixelmapDoubledCopy(br_pixelmap* pDestn, br_pixelmap* pSource, int pSourc
 
 // FUNCTION: CARMA2_HW 0x0047c740
 // FUNCTION: CARMA2_SW 0x0047baf0
+// FUNCTION: CARMA2_CHEAT 0x0047cac0
 void C2_HOOK_FASTCALL PoshDrawLine(br_pixelmap* pDestn, int pX1, float pAngle, int pY1, int pX2, int pY2, int pColour) {
 
     if (pColour >= 0) {
@@ -704,6 +720,7 @@ void C2_HOOK_FASTCALL PoshDrawLine(br_pixelmap* pDestn, int pX1, float pAngle, i
 
 // FUNCTION: CARMA2_HW 0x0047c9c0
 // FUNCTION: CARMA2_SW 0x0047bca0
+// FUNCTION: CARMA2_CHEAT 0x0047cd40
 void C2_HOOK_FASTCALL DrawRectangle(br_pixelmap* pMap, int pLeft, int pTop, int pRight, int pBottom, br_uint_32 pColour) {
 
 #ifdef REC2_HW
@@ -719,6 +736,7 @@ void C2_HOOK_FASTCALL DrawRectangle(br_pixelmap* pMap, int pLeft, int pTop, int 
 
 // FUNCTION: CARMA2_HW 0x0047ca50
 // FUNCTION: CARMA2_SW 0x0047bd10
+// FUNCTION: CARMA2_CHEAT 0x0047cdd0
 void C2_HOOK_FASTCALL DrawRRectangle(br_pixelmap* pPixelmap, int pLeft, int pTop, int pRight, int pBottom, br_uint_32 pColour) {
 
     BrPixelmapLine(pPixelmap, pLeft + 1, pTop, pRight - 1, pTop, pColour);
@@ -729,6 +747,7 @@ void C2_HOOK_FASTCALL DrawRRectangle(br_pixelmap* pPixelmap, int pLeft, int pTop
 
 #ifdef REC2_HW
 // FUNCTION: CARMA2_HW 0x0047cad0
+// FUNCTION: CARMA2_CHEAT 0x0047ce50
 void C2_HOOK_FASTCALL DeviouslyDimRectangle(br_pixelmap* pPixelmap, int pLeft, int pTop, int pRight, int pBottom, int pKnock_out_corners) {
 
     gDim_model->vertices[1].p.v[0] = (float)pLeft;
@@ -754,6 +773,7 @@ void C2_HOOK_FASTCALL DeviouslyDimRectangle(br_pixelmap* pPixelmap, int pLeft, i
 
 // FUNCTION: CARMA2_HW 0x0047cbd0
 // FUNCTION: CARMA2_SW 0x0047bd90
+// FUNCTION: CARMA2_CHEAT 0x0047cf50
 void C2_HOOK_CDECL DimRectangle(br_pixelmap* pPixelmap, int pLeft, int pTop, int pRight, int pBottom, int pKnock_out_corners) {
     tU8* ptr;
     tU8* depth_table_ptr;
@@ -799,6 +819,7 @@ void C2_HOOK_CDECL DimRectangle(br_pixelmap* pPixelmap, int pLeft, int pTop, int
 
 // FUNCTION: CARMA2_HW 0x0047cce0
 // FUNCTION: CARMA2_SW 0x0047be70
+// FUNCTION: CARMA2_CHEAT 0x0047d060
 void C2_HOOK_FASTCALL DimRectangleClipped(br_pixelmap* pPixelmap, int pLeft, int pTop, int pRight, int pBottom, int pKnock_out_corners) {
 
     if (pLeft < 0) {
@@ -841,6 +862,7 @@ void C2_HOOK_FASTCALL DR8BitPixelmapBlendedLine(br_pixelmap* pDest, int pX1, int
 
 // FUNCTION: CARMA2_HW 0x0047d260
 // FUNCTION: CARMA2_SW 0x0047c3e0
+// FUNCTION: CARMA2_CHEAT 0x0047d5e0
 void C2_HOOK_FASTCALL DRPixelmapBlendedLine(br_pixelmap* pDest, int pX1, int pY1, int pX2, int pY2, br_uint_32 pColour, br_pixelmap* pPalette) {
 #ifdef REC2_HW
     (void)pPalette;
@@ -872,6 +894,7 @@ void C2_HOOK_FASTCALL FancyDrawLine(br_pixelmap* pMpDestap, int pX1, int pY1, in
 // DRPixelmapCopyMapBlack
 
 // FUNCTION: CARMA2_HW 0x0047d6a0
+// FUNCTION: CARMA2_CHEAT 0x0047da20
 void C2_HOOK_FASTCALL DisableLights(void) {
     int i;
 
@@ -881,6 +904,7 @@ void C2_HOOK_FASTCALL DisableLights(void) {
 }
 
 // FUNCTION: CARMA2_HW 0x0047d6d0
+// FUNCTION: CARMA2_CHEAT 0x0047da50
 void C2_HOOK_FASTCALL EnableLights(void) {
     int i;
 
@@ -890,6 +914,7 @@ void C2_HOOK_FASTCALL EnableLights(void) {
 }
 
 // FUNCTION: CARMA2_HW 0x0047d700
+// FUNCTION: CARMA2_CHEAT 0x0047da80
 void C2_HOOK_FASTCALL DRPixelmap16Copy(br_pixelmap* pDest, br_pixelmap* pSource, br_uint_16 pDest_x, br_uint_16 pDest_y, br_uint_16 pWidth, br_uint_16 pHeight) {
     int x;
     int y;
@@ -910,6 +935,7 @@ void C2_HOOK_FASTCALL DRPixelmap16Copy(br_pixelmap* pDest, br_pixelmap* pSource,
 
 // FUNCTION: CARMA2_HW 0x0047d7b0
 // FUNCTION: CARMA2_SW 0x0047d970
+// FUNCTION: CARMA2_CHEAT 0x0047db30
 void C2_HOOK_FASTCALL DRPixelmapBlendyCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_int_16 pDest_y, br_pixelmap* pSource) {
     int x;
     int y;

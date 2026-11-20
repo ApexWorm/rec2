@@ -20,6 +20,7 @@
 
 // GLOBAL: CARMA2_HW 0x0074b5e0
 // GLOBAL: CARMA2_SW 0x00741ca0
+// GLOBAL: CARMA2_CHEAT 0x00752c80
 int gKey_mapping[77] = { 0 };
 
 // GLOBAL: CARMA2_HW 0x0074b714
@@ -28,6 +29,7 @@ int gINT_0074b714 = 0;
 
 // GLOBAL: CARMA2_HW 0x0068c1c4
 // GLOBAL: CARMA2_SW 0x0068620c
+// GLOBAL: CARMA2_CHEAT 0x00693a64
 int gEdge_trigger_mode;
 
 // GLOBAL: CARMA2_HW 0x00657200
@@ -36,42 +38,52 @@ int gGo_ahead_keys[3] = { 51, 52, 106 };
 
 // GLOBAL: CARMA2_HW 0x0074b5c0
 // GLOBAL: CARMA2_SW 0x00741c80
+// GLOBAL: CARMA2_CHEAT 0x00752c60
 tJoy_array gJoy_array;
 
 // GLOBAL: CARMA2_HW 0x0068bee0
 // GLOBAL: CARMA2_SW 0x00685f28
+// GLOBAL: CARMA2_CHEAT 0x00693780
 tKey_array gKey_array;
 
 // GLOBAL: CARMA2_HW 0x0068bed4
 // GLOBAL: CARMA2_SW 0x00685f1c
+// GLOBAL: CARMA2_CHEAT 0x00693774
 int gKey_poll_counter;
 
 // GLOBAL: CARMA2_HW 0x006571f8
 // GLOBAL: CARMA2_SW 0x00651bb0
+// GLOBAL: CARMA2_CHEAT 0x0065da88
 tMouse_coord gCurrent_mouse_position = {-1, -1};
 
 // GLOBAL: CARMA2_HW 0x0068c144
 // GLOBAL: CARMA2_SW 0x0068618c
+// GLOBAL: CARMA2_CHEAT 0x006939e4
 tU32 gLast_roll;
 
 // GLOBAL: CARMA2_HW 0x0068c140
 // GLOBAL: CARMA2_SW 0x00686188
+// GLOBAL: CARMA2_CHEAT 0x006939e0
 int gCurrent_cursor;
 
 // GLOBAL: CARMA2_HW 0x0068be88
 // GLOBAL: CARMA2_SW 0x00685ed0
+// GLOBAL: CARMA2_CHEAT 0x00693728
 tRolling_letter* gRolling_letters;
 
 // GLOBAL: CARMA2_HW 0x0068be90
 // GLOBAL: CARMA2_SW 0x00685ed8
+// GLOBAL: CARMA2_CHEAT 0x00693730
 int gLetter_x_coords[15];
 
 // GLOBAL: CARMA2_HW 0x0068bed0
 // GLOBAL: CARMA2_SW 0x00685f18
+// GLOBAL: CARMA2_CHEAT 0x00693770
 int gVisible_length;
 
 // GLOBAL: CARMA2_HW 0x0068be48
 // GLOBAL: CARMA2_SW 0x00685e90
+// GLOBAL: CARMA2_cHEAT 0x006936e8
 int gLetter_y_coords[15];
 
 // GLOBAL: CARMA2_HW 0x0068be84
@@ -88,12 +100,15 @@ int gCurrent_position;
 
 // GLOBAL: CARMA2_HW 0x0068c1c8
 // GLOBAL: CARMA2_SW 0x00686210
+// GLOBAL: CARMA2_CHEAT 0x00693a68
 tU32 gLast_poll_keys;
 
 // GLOBAL: CARMA2_HW 0x006621e4
+// GLOBAL: CARMA2_CHEAT 0x00669a50
 int gINT_006621e4 = 1;
 
 // GLOBAL: CARMA2_HW 0x006621e8
+// GLOBAL: CARMA2_CHEAT 0x00669a54
 int gINT_006621e8 = 1;
 
 // GLOBAL: CARMA2_HW 0x006621ec
@@ -126,6 +141,7 @@ int gModifiers_down;
 
 // FUNCTION: CARMA2_HW 0x00482770
 // FUNCTION: CARMA2_SW 0x0047f8b0
+// FUNCTION: CARMA2_CHEAT 0x00482a90
 void C2_HOOK_FASTCALL SetJoystickArrays(int* pKeys, int pMark) {
     int i;
 
@@ -242,6 +258,7 @@ void C2_HOOK_FASTCALL SetJoystickArrays(int* pKeys, int pMark) {
 
 // FUNCTION: CARMA2_HW 0x00481eb0
 // FUNCTION: CARMA2_SW 0x0047eff0
+// FUNCTION: CARMA2_CHEAT 0x004821d0
 void C2_HOOK_FASTCALL PollKeys(void) {
 
     gKey_poll_counter += 1;
@@ -253,6 +270,7 @@ void C2_HOOK_FASTCALL PollKeys(void) {
 
 // FUNCTION: CARMA2_HW 0x00482160
 // FUNCTION: CARMA2_SW 0x0047f2a0
+// FUNCTION: CARMA2_CHEAT 0x00482480
 void C2_HOOK_FASTCALL CyclePollKeys(void) {
     int i;
 
@@ -284,6 +302,7 @@ void C2_HOOK_FASTCALL ResetPollKeys(void) {
 
 // FUNCTION: CARMA2_HW 0x004821c0
 // FUNCTION: CARMA2_SW 0x0047f300
+// FUNCTION: CARMA2_CHEAT 0x004824e0
 void C2_HOOK_FASTCALL CheckKeysForMouldiness(void) {
 
     if (PDGetTotalTime() - gLast_poll_keys > 500) {
@@ -295,6 +314,7 @@ void C2_HOOK_FASTCALL CheckKeysForMouldiness(void) {
 
 // FUNCTION: CARMA2_HW 0x004824c0
 // FUNCTION: CARMA2_SW 0x0047f600
+// FUNCTION: CARMA2_CHEAT 0x004827e0
 int C2_HOOK_FASTCALL EitherMouseButtonDown(void) {
     tMouse_coord pos;
     tMouse_coord prev_pos = gCurrent_mouse_position;
@@ -330,6 +350,7 @@ static int C2_HOOK_FASTCALL AnyModifiersDown(void) {
 
 // FUNCTION: CARMA2_HW 0x00482590
 // FUNCTION: CARMA2_SW 0x0047f6d0
+// FUNCTION: CARMA2_CHEAT 0x004828b0
 tKey_down_result C2_HOOK_FASTCALL EdgeTriggeryKey(int pKey_index, int pReset) {
     tU32 now;
 
@@ -380,6 +401,7 @@ tKey_down_result C2_HOOK_FASTCALL EdgeTriggeryKey(int pKey_index, int pReset) {
 
 // FUNCTION: CARMA2_HW 0x00482550
 // FUNCTION: CARMA2_SW 0x0047f690
+// FUNCTION: CARMA2_CHEAT 0x00482870
 int C2_HOOK_FASTCALL PDKeyDown(int pKey_index) {
     tKey_down_result result;
 
@@ -390,10 +412,16 @@ int C2_HOOK_FASTCALL PDKeyDown(int pKey_index) {
     return result == tKey_down_yes || result == tKey_down_repeat;
 }
 
-// PDKeyDown3
+// FUNCTION: CARMA2_HW 0x004829f0
+// FUNCTION: CARMA2_CHEAT 0x00482d10
+int C2_HOOK_FASTCALL PDKeyDown3(int pIndex) {
+
+    return gKey_array[pIndex];
+}
 
 // FUNCTION: CARMA2_HW 0x00482a00
 // FUNCTION: CARMA2_SW 0x0047fb40
+// FUNCTION: CARMA2_CHEAT 0x00482d20
 int C2_HOOK_FASTCALL PDAnyKeyDown(void) {
     int i;
 
@@ -421,6 +449,7 @@ int C2_HOOK_FASTCALL PDAnyKeyDown(void) {
 
 // FUNCTION: CARMA2_HW 0x00482d70
 // FUNCTION: CARMA2_SW 0x0047feb0
+// FUNCTION: CARMA2_CHEAT 0x00483090
 int C2_HOOK_FASTCALL AnyKeyDown(void) {
     int the_key;
 
@@ -430,12 +459,14 @@ int C2_HOOK_FASTCALL AnyKeyDown(void) {
 
 // STUB: CARMA2_HW 0x00482f10
 // STUB: CARMA2_SW 0x00480050
+// STUB: CARMA2_CHEAT 0x00483230
 tU32* C2_HOOK_FASTCALL KevKeyService(void) {
     NOT_IMPLEMENTED();
 }
 
 // FUNCTION: CARMA2_HW 0x00483040
 // FUNCTION: CARMA2_SW 0x00480180
+// FUNCTION: CARMA2_CHEAT 0x00483360
 int C2_HOOK_FASTCALL KeyIsDown(int pKey_index) {
     int i;
 
@@ -457,6 +488,7 @@ int C2_HOOK_FASTCALL KeyIsDown(int pKey_index) {
 
 // FUNCTION: CARMA2_HW 0x004833a0
 // FUNCTION: CARMA2_SW 0x004804e0
+// FUNCTION: CARMA2_CHEAT 0x004836c0
 int C2_HOOK_FASTCALL KeyIsDownNoMouldiness(int pKey_index) {
 
     return gKey_array[gKey_mapping[pKey_index]];
@@ -464,6 +496,7 @@ int C2_HOOK_FASTCALL KeyIsDownNoMouldiness(int pKey_index) {
 
 // FUNCTION: CARMA2_HW 0x004833b0
 // FUNCTION: CARMA2_SW 0x004804f0
+// FUNCTION: CARMA2_CHEAT 0x004836d0
 void C2_HOOK_FASTCALL WaitForNoKeys(void) {
 
     do {
@@ -478,6 +511,7 @@ void C2_HOOK_FASTCALL WaitForNoKeys(void) {
 
 // FUNCTION: CARMA2_HW 0x00483c10
 // FUNCTION: CARMA2_SW 0x00480d50
+// FUNCTION: CARMA2_CHEAT 0x00483f30
 void C2_HOOK_FASTCALL GetMousePosition(int *pX, int *pY) {
 
     PDGetMousePosition(pX, pY);
@@ -501,6 +535,7 @@ void C2_HOOK_FASTCALL GetMousePosition(int *pX, int *pY) {
 
 // FUNCTION: CARMA2_HW 0x00483c90
 // FUNCTION: CARMA2_SW 0x00480dd0
+// FUNCTION: CARMA2_CHEAT 0x00483fb0
 void C2_HOOK_FASTCALL InitRollingLetters(void) {
     int i;
 
@@ -518,6 +553,7 @@ void C2_HOOK_FASTCALL InitRollingLetters(void) {
 
 // FUNCTION: CARMA2_HW 0x00483ce0
 // FUNCTION: CARMA2_SW 0x00480e20
+// FUNCTION: CARMA2_CHEAT 0x00484000
 void C2_HOOK_FASTCALL EndRollingLetters(void) {
 
     BrMemFree(gRolling_letters);
@@ -525,6 +561,7 @@ void C2_HOOK_FASTCALL EndRollingLetters(void) {
 
 // FUNCTION: CARMA2_HW 0x00483cf0
 // FUNCTION: CARMA2_SW 0x00480e30
+// FUNCTION: CARMA2_CHEAT 0x00484010
 int C2_HOOK_FASTCALL AddRollingLetter(char pChar, int pX, int pY, tRolling_type rolling_type) {
     tRolling_letter* let;
     int i;
@@ -560,6 +597,7 @@ int C2_HOOK_FASTCALL AddRollingLetter(char pChar, int pX, int pY, tRolling_type 
 
 // FUNCTION: CARMA2_HW 0x00483dd0
 // FUNCTION: CARMA2_SW 0x00480f10
+// FUNCTION: CARMA2_CHEAT 0x004840f0
 void C2_HOOK_FASTCALL AddRollingString(char* pStr, int pX, int pY, tRolling_type pRolling_type) {
     int i;
 
@@ -587,6 +625,7 @@ void C2_HOOK_FASTCALL BlankSlot(int pIndex, int pName_length, int pVisible_lengt
 
 // FUNCTION: CARMA2_HW 0x00484000
 // FUNCTION: CARMA2_SW 0x00481140
+// FUNCTION: CARMA2_CHEAT 0x00484320
 int C2_HOOK_FASTCALL ChangeCharTo(int pSlot_index, int pChar_index, char pNew_char) {
     int x_coord;
     int y_coord;
@@ -637,6 +676,7 @@ void C2_HOOK_FASTCALL StopTyping(int pSlot_index) {
 
 // FUNCTION: CARMA2_HW 0x00484120
 // FUNCTION: CARMA2_SW 0x00481260
+// FUNCTION: CARMA2_CHEAT 0x00484440
 void C2_HOOK_FASTCALL RevertTyping(int pSlot_index, char* pRevert_str) {
     int i;
 
@@ -696,6 +736,7 @@ void C2_HOOK_FASTCALL KillCursor(int pSlot_index) {
 
 // FUNCTION: CARMA2_HW 0x00484600
 // FUNCTION: CARMA2_SW 0x00481740
+// FUNCTION: CARMA2_CHEAT 0x00484920
 void C2_HOOK_FASTCALL EdgeTriggerModeOn(void) {
 
     gEdge_trigger_mode = 1;
@@ -704,6 +745,7 @@ void C2_HOOK_FASTCALL EdgeTriggerModeOn(void) {
 
 // FUNCTION: CARMA2_HW 0x00484610
 // FUNCTION: CARMA2_SW 0x00481750
+// FUNCTION: CARMA2_CHEAT 0x00484930
 void C2_HOOK_FASTCALL EdgeTriggerModeOff(void) {
 
     gEdge_trigger_mode = 0;

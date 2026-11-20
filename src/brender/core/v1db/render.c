@@ -21,6 +21,7 @@
 #include "core/fw/diag.h"
 
 // FUNCTION: CARMA2_HW 0x00521890
+// FUNCTION: CARMA2_CHEAT 0x00527480
 void C2_HOOK_CDECL BrDbModelRender(br_actor* actor, br_model* model, br_material* material, void* render_data, br_uint_8 style, int on_screen, int use_custom) {
     br_token_value tv[5] = {
         { BRT_V1INSERT_FUNCTION_P },
@@ -116,6 +117,7 @@ void C2_HOOK_CDECL BrDbModelRender(br_actor* actor, br_model* model, br_material
 
 // FUNCTION: CARMA2_HW 0x00521bf0
 // FUNCTION: CARMA2_SW 0x0051d290
+// FUNCTION: CARMA2_CHEAT 0x005277e0
 br_uint_32 C2_HOOK_CDECL BrOnScreenCheck(br_bounds3* bounds) {
     br_token r;
 
@@ -136,6 +138,7 @@ br_uint_16 C2_HOOK_STDCALL prependActorTransform(br_actor* ap, br_uint_16 t) {
 }
 
 // FUNCTION: CARMA2_HW 0x005221e0
+// FUNCTION: CARMA2_CHEAT 0x00527dd0
 void C2_HOOK_STDCALL actorRender(br_actor* ap, br_model* model, br_material* material, void* render_data, br_uint_8 style, br_uint_16 t) {
     br_material* this_material;
     br_model* this_model;
@@ -226,6 +229,7 @@ void C2_HOOK_STDCALL actorRender(br_actor* ap, br_model* model, br_material* mat
 }
 
 // FUNCTION: CARMA2_HW 0x00522510
+// FUNCTION: CARMA2_CHEAT 0x00528100
 void C2_HOOK_STDCALL actorRenderOnScreen(br_actor* ap, br_model* model, br_material* material, void* render_data, br_uint_8 style, br_uint_16 t) {
     br_material* this_material;
     br_model* this_model;
@@ -278,6 +282,7 @@ void C2_HOOK_STDCALL sceneRenderWorld(br_actor* world) {
 }
 
 // FUNCTION: CARMA2_HW 0x00521fe0
+// FUNCTION: CARMA2_CHEAT 0x00527bd0
 void C2_HOOK_STDCALL sceneRenderAdd(br_actor* tree) {
     br_material* material;
     br_model* model;
@@ -340,6 +345,7 @@ void C2_HOOK_STDCALL sceneRenderAdd(br_actor* tree) {
 }
 
 // FUNCTION: CARMA2_HW 0x00521c10
+// FUNCTION: CARMA2_CHEAT 0x00527800
 void C2_HOOK_CDECL BrDbSceneRenderBegin(br_actor* world, br_actor* camera) {
     br_matrix34 tfm;
     br_matrix4 vtos;
@@ -378,6 +384,7 @@ void C2_HOOK_CDECL BrDbSceneRenderBegin(br_actor* world, br_actor* camera) {
 }
 
 // FUNCTION: CARMA2_HW 0x00521e10
+// FUNCTION: CARMA2_CHEAT 0x00527a00
 br_renderbounds_cbfn* C2_HOOK_CDECL BrDbSetRenderBoundsCallback(br_renderbounds_cbfn* new_cbfn) {
     br_renderbounds_cbfn* old_cbfn;
 
@@ -404,6 +411,7 @@ void C2_HOOK_STDCALL SetViewport(br_pixelmap* buffer) {
 }
 
 // FUNCTION: CARMA2_HW 0x00521e50
+// FUNCTION: CARMA2_CHEAT 0x00527a40
 void C2_HOOK_CDECL BrZbSceneRenderBegin(br_actor* world, br_actor* camera, br_pixelmap* colour_buffer, br_pixelmap* depth_buffer) {
 
     v1db.rendering = BR_ZB_RENDERING;
@@ -419,12 +427,14 @@ void C2_HOOK_CDECL BrZbSceneRenderBegin(br_actor* world, br_actor* camera, br_pi
 }
 
 // FUNCTION: CARMA2_HW 0x00521fd0
+// FUNCTION: CARMA2_CHEAT 0x00527bc0
 void C2_HOOK_CDECL BrZbSceneRenderAdd(br_actor* tree) {
 
     sceneRenderAdd(tree);
 }
 
 // FUNCTION: CARMA2_HW 0x005226a0
+// FUNCTION: CARMA2_CHEAT 0x00528290
 void C2_HOOK_CDECL BrZbSceneRenderEnd(void) {
 
     v1db.renderer->dispatch->_flush(v1db.renderer, 0);
@@ -434,6 +444,7 @@ void C2_HOOK_CDECL BrZbSceneRenderEnd(void) {
 
 // FUNCTION: CARMA2_HW 0x005226d0
 // FUNCTION: CARMA2_SW 0x0051dd70
+// FUNCTION: CARMA2_CHEAT 0x005282c0
 void C2_HOOK_CDECL BrZbSceneRender(br_actor* world, br_actor* camera, br_pixelmap* colour_buffer, br_pixelmap* depth_buffer) {
 
     if (v1db.renderer != NULL) {
@@ -444,6 +455,7 @@ void C2_HOOK_CDECL BrZbSceneRender(br_actor* world, br_actor* camera, br_pixelma
 }
 
 // FUNCTION: CARMA2_HW 0x005228e0
+// FUNCTION: CARMA2_CHEAT 0x005284d0
 void C2_HOOK_CDECL BrZsSceneRenderBegin(br_actor* world, br_actor* camera, br_pixelmap* colour_buffer) {
     br_camera* camera_data;
 
@@ -470,12 +482,14 @@ void C2_HOOK_CDECL BrZsSceneRenderBegin(br_actor* world, br_actor* camera, br_pi
 }
 
 // FUNCTION: CARMA2_HW 0x00522ae0
+// FUNCTION: CARMA2_CHEAT 0x005286d0
 void C2_HOOK_CDECL BrZsSceneRenderAdd(br_actor* tree) {
 
     sceneRenderAdd(tree);
 }
 
 // FUNCTION: CARMA2_HW 0x00522af0
+// FUNCTION: CARMA2_CHEAT 0x005286e0
 void C2_HOOK_CDECL BrZsSceneRenderEnd(void) {
 
     v1db.renderer->dispatch->_partSet(v1db.renderer, BRT_OUTPUT, 0, BRT_COLOUR_BUFFER_O, (uintptr_t)v1db.colour_buffer);
@@ -493,6 +507,7 @@ void C2_HOOK_CDECL BrZsSceneRenderEnd(void) {
 }
 
 // FUNCTION: CARMA2_HW 0x00522b70
+// FUNCTION: CARMA2_CHEAT 0x00528760
 void C2_HOOK_CDECL BrZsSceneRender(br_actor* world, br_actor* camera, br_pixelmap* colour_buffer) {
 
     if (v1db.renderer == NULL) {
@@ -504,6 +519,7 @@ void C2_HOOK_CDECL BrZsSceneRender(br_actor* world, br_actor* camera, br_pixelma
 }
 
 // FUNCTION: CARMA2_HW 0x00522c70
+// FUNCTION: CARMA2_CHEAT 0x00528860
 br_primitive_cbfn* C2_HOOK_CDECL BrZsPrimitiveCallbackSet(br_primitive_cbfn* new_cbfn) {
     br_primitive_cbfn* old_cbfn;
 
@@ -514,6 +530,7 @@ br_primitive_cbfn* C2_HOOK_CDECL BrZsPrimitiveCallbackSet(br_primitive_cbfn* new
 
 // FUNCTION: CARMA2_HW 0x00522c80
 // FUNCTION: CARMA2_SW 0x0051e320
+// FUNCTION: CARMA2_CHEAT 0x00528870
 void C2_HOOK_CDECL BrZbsSceneRenderBegin(br_actor* world, br_actor* camera, br_pixelmap* colour_buffer, br_pixelmap* depth_buffer) {
     br_camera* camera_data;
 
@@ -541,6 +558,7 @@ void C2_HOOK_CDECL BrZbsSceneRenderBegin(br_actor* world, br_actor* camera, br_p
 
 // FUNCTION: CARMA2_HW 0x00522ea0
 // FUNCTION: CARMA2_SW 0x0051e540
+// FUNCTION: CARMA2_CHEAT 0x00528a90
 void C2_HOOK_CDECL BrZbsSceneRenderAdd(br_actor* tree) {
 
     sceneRenderAdd(tree);
@@ -548,6 +566,7 @@ void C2_HOOK_CDECL BrZbsSceneRenderAdd(br_actor* tree) {
 
 // FUNCTION: CARMA2_HW 0x00522eb0
 // FUNCTION: CARMA2_SW 0x0051e550
+// FUNCTION: CARMA2_CHEAT 0x00528aa0
 void C2_HOOK_CDECL BrZbsSceneRenderEnd(void) {
 
     v1db.renderer->dispatch->_partSet(v1db.renderer, BRT_OUTPUT, 0, BRT_COLOUR_BUFFER_O, (uintptr_t)v1db.colour_buffer);
@@ -566,6 +585,7 @@ void C2_HOOK_CDECL BrZbsSceneRenderEnd(void) {
 
 // FUNCTION: CARMA2_HW 0x00522f30
 // FUNCTION: CARMA2_SW 0x0051e5d0
+// FUNCTION: CARMA2_CHEAT 0x00528b20
 void C2_HOOK_CDECL BrZbsSceneRender(br_actor* world, br_actor* camera, br_pixelmap* colour_buffer, br_pixelmap* depth_buffer) {
 
     if (v1db.renderer == NULL) {
@@ -577,6 +597,7 @@ void C2_HOOK_CDECL BrZbsSceneRender(br_actor* world, br_actor* camera, br_pixelm
 }
 
 // FUNCTION: CARMA2_HW 0x00523040
+// FUNCTION: CARMA2_CHEAT 0x00528c30
 void C2_HOOK_CDECL BrZbModelRender(br_actor* actor, br_model* model, br_material* material, br_uint_8 style, int on_screen, int use_custom) {
 
     BrDbModelRender(actor, model, material, NULL, style, on_screen, use_custom);
@@ -584,12 +605,14 @@ void C2_HOOK_CDECL BrZbModelRender(br_actor* actor, br_model* model, br_material
 
 // FUNCTION: CARMA2_HW 0x00523070
 // FUNCTION: CARMA2_SW 0x0051e710
+// FUNCTION: CARMA2_CHEAT 0x00528c60
 void C2_HOOK_CDECL BrZsModelRender(br_actor* actor, br_model* model, br_material* material, br_order_table* order_table, br_uint_8 style, int on_screen, int use_custom) {
 
     BrDbModelRender(actor, model, material, order_table, style, on_screen, use_custom);
 }
 
 // FUNCTION: CARMA2_HW 0x005230a0
+// FUNCTION: CARMA2_CHEAT 0x00528c90
 br_renderbounds_cbfn* C2_HOOK_CDECL BrZbRenderBoundsCallbackSet(br_renderbounds_cbfn* new_cbfn) {
 
     if (!(v1db.zx_active & BR_ZX_ZB_ACTIVE_MASK)) {
@@ -600,6 +623,7 @@ br_renderbounds_cbfn* C2_HOOK_CDECL BrZbRenderBoundsCallbackSet(br_renderbounds_
 }
 
 // FUNCTION: CARMA2_HW 0x00523100
+// FUNCTION: CARMA2_CHEAT 0x00528cf0
 br_renderbounds_cbfn* C2_HOOK_CDECL BrZsRenderBoundsCallbackSet(br_renderbounds_cbfn* new_cbfn) {
 
     if ((v1db.zx_active & BR_ZX_ZS_ACTIVE_MASK) == 0) {

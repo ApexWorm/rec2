@@ -26,7 +26,7 @@ typedef struct {
 extern Uint64 g_PerformanceFrequency;
 extern SDL_Window *g_SDL_Window;
 extern char gPathNetworkIni[256];
-extern int gScaleMouse;
+extern int gScale_mouse;
 extern tJoystick_info g_Joystick_infos[16];
 extern int g_Count_Joystick_infos;
 

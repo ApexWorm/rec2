@@ -43,16 +43,19 @@ br_file_struct_member file_info_FM[] = {
 
 // GLOBAL: CARMA2_HW 0x00667168
 // GLOBAL: CARMA2_SW 0x00661748
+// GLOBAL: CARMA2_CHEAT 0x0066ea20
 br_file_struct file_info_F = { "file_info", BR_ASIZE(file_info_FM), file_info_FM, sizeof(file_info) };
 
 // FUNCTION: CARMA2_HW 0x00529f70
 // FUNCTION: CARMA2_SW 0x00524b00
+// FUNCTION: CARMA2_CHEAT 0x0052fb60
 int C2_HOOK_STDCALL FopRead_END(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     return 1;
 }
 
 // FUNCTION: CARMA2_HW 0x00529f80
 // FUNCTION: CARMA2_SW 0x00524b10
+// FUNCTION: CARMA2_CHEAT 0x0052fb70
 int C2_HOOK_STDCALL FopWrite_END(br_datafile* df) {
 
     df->prims->chunk_write(df, CHUNKID_END, 0);
@@ -61,6 +64,7 @@ int C2_HOOK_STDCALL FopWrite_END(br_datafile* df) {
 
 // FUNCTION: CARMA2_HW 0x00529fa0
 // FUNCTION: CARMA2_SW 0x00524b30
+// FUNCTION: CARMA2_CHEAT 0x0052fb90
 int C2_HOOK_STDCALL FopWrite_FILE_INFO(br_datafile* df, br_uint_32 type) {
     file_info fi;
 

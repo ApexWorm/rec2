@@ -12,6 +12,7 @@
 
 // GLOBAL: CARMA2_HW 0x00627398
 // GLOBAL: CARMA2_SW 0x006222c8
+// GLOBAL: CARMA2_CHEAT 0x0062dc18
 tFrontend_spec gFrontend_NETWORK_SUMMARY = {
 #if 0 // FIXME: enable this
     "NetworkSummary",

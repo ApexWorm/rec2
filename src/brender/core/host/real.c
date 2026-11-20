@@ -13,6 +13,7 @@
 
 // GLOBAL: CARMA2_HW 0x0067052a
 // GLOBAL: CARMA2_SW 0x0066acba
+// GLOBAL: CARMA2_CHEAT 0x00677dda
 br_uint_16 _RealSelector;
 
 #ifdef REC2_MATCHING
@@ -231,6 +232,7 @@ C2_MATCHING_NAKED br_error C2_HOOK_CDECL HostRealInterruptCall(br_uint_32 vector
 
 // FUNCTION: CARMA2_HW 0x00540062
 // FUNCTION: CARMA2_SW 0x0053b702
+// FUNCTION: CARMA2_CHEAT 0x00545c52
 C2_MATCHING_NAKED br_error C2_HOOK_CDECL RealSelectorBegin(void) {
 
 #ifdef REC2_MATCHING
@@ -257,6 +259,7 @@ C2_MATCHING_NAKED br_error C2_HOOK_CDECL RealSelectorBegin(void) {
 }
 
 // FUNCTION: CARMA2_HW 0x00540085
+// FUNCTION: CARMA2_CHEAT 0x00545c75
 void C2_HOOK_CDECL RealSelectorEnd(void) {
 
     // empty

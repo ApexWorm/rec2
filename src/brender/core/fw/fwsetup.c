@@ -74,6 +74,7 @@ br_resource_class fw_resourceClasses[25] = {
 
 // GLOBAL: CARMA2_HW 0x00665b70
 // GLOBAL: CARMA2_SW 0x00660308
+// GLOBAL: CARMA2_CHEAT 0x0066d428
 void* functionPointers_BRCORE1[185] = {
     BrAbort,
     BrAddHead,
@@ -264,6 +265,7 @@ void* functionPointers_BRCORE1[185] = {
 
 // GLOBAL: CARMA2_HW 0x00665710
 // GLOBAL: CARMA2_SW 0x0065fea8
+// GLOBAL: CARMA2_CHEAT 0x0066cfc8
 const char* namePointers_BRCORE1[185] = {
     "_BrAbort",
     "_BrAddHead",
@@ -667,6 +669,7 @@ br_image Image_BRCORE1 = {
 
 // FUNCTION: CARMA2_HW 0x00527e20
 // FUNCTION: CARMA2_SW 0x005234c0
+// FUNCTION: CARMA2_CHEAT 0x0052da10
 br_error C2_HOOK_CDECL BrFwBegin(void) {
     int i;
 
@@ -706,6 +709,7 @@ br_error C2_HOOK_CDECL BrFwBegin(void) {
 
 // FUNCTION: CARMA2_HW 0x00527f20
 // FUNCTION: CARMA2_SW 0x005235c0
+// FUNCTION: CARMA2_CHEAT 0x0052db10
 br_error C2_HOOK_CDECL BrFwEnd(void) {
 
     if (!fw.active) {
@@ -719,6 +723,7 @@ br_error C2_HOOK_CDECL BrFwEnd(void) {
 
 // FUNCTION: CARMA2_HW 0x00527f70
 // FUNCTION: CARMA2_SW 0x00523610
+// FUNCTION: CARMA2_CHEAT 0x0052db60
 br_diaghandler* C2_HOOK_CDECL BrDiagHandlerSet(br_diaghandler* newdh) {
     br_diaghandler* old;
 
@@ -732,6 +737,7 @@ br_diaghandler* C2_HOOK_CDECL BrDiagHandlerSet(br_diaghandler* newdh) {
 
 // FUNCTION: CARMA2_HW 0x00527f90
 // FUNCTION: CARMA2_SW 0x00523630
+// FUNCTION: CARMA2_CHEAT 0x0052db80
 br_filesystem* C2_HOOK_CDECL BrFilesystemSet(br_filesystem* newfs) {
     br_filesystem* old;
 
@@ -745,6 +751,7 @@ br_filesystem* C2_HOOK_CDECL BrFilesystemSet(br_filesystem* newfs) {
 
 // FUNCTION: CARMA2_HW 0x00527fb0
 // FUNCTION: CARMA2_SW 0x00523650
+// FUNCTION: CARMA2_CHEAT 0x0052dba0
 br_allocator* C2_HOOK_CDECL BrAllocatorSet(br_allocator* newal) {
     br_allocator* old;
 

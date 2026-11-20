@@ -25,14 +25,17 @@
 
 // GLOBAL: CARMA2_HW 0x0058f5fc
 // GLOBAL: CARMA2_SW 0x0058a5fc
+// GLOBAL: CARMA2_CHEAT 0x0059468c
 int gNet_player_to_view_index = -1;
 
 // GLOBAL: CARMA2_HW 0x00679278
 // GLOBAL: CARMA2_SW 0x006739e8
+// GLOBAL: CARMA2_CHEAT 0x00680b28
 int gAction_replay_manual_camera_target_type;
 
 // GLOBAL: CARMA2_HW 0x006792b4
 // GLOBAL: CARMA2_SW 0x00673a24
+// GLOBAL: CARMA2_CHEAT 0x00680b64
 br_actor* gPed_actor;
 
 // GLOBAL: CARMA2_HW 0x006792b8
@@ -41,10 +44,12 @@ int gCamera_frozen;
 
 // GLOBAL: CARMA2_HW 0x006792bc
 // GLOBAL: CARMA2_SW 0x00673a2c
+// GLOBAL: CARMA2_CHEAT 0x00680b6c
 int gOpponent_viewing_mode;
 
 // GLOBAL: CARMA2_HW 0x006792c8
 // GLOBAL: CARMA2_SW 0x00673a38
+// GLOBAL: CARMA2_CHEAT 0x00680b78
 tSave_camera gSave_camera[2];
 
 // GLOBAL: CARMA2_HW 0x007634ac
@@ -53,6 +58,7 @@ float gCamera_cockpit_hither;
 
 // GLOBAL: CARMA2_HW 0x0079efa8
 // GLOBAL: CARMA2_SW 0x00795548
+// GLOBAL: CARMA2_CHEAT 0x007a6648
 tActionReplayCameraMode gAction_replay_camera_mode;
 
 // DoCameraControls
@@ -87,6 +93,7 @@ tCar_spec* C2_HOOK_FASTCALL GetRaceLeader(void) {
 
 // FUNCTION: CARMA2_HW 0x0040e430
 // FUNCTION: CARMA2_SW 0x0040e410
+// FUNCTION: CARMA2_CHEAT 0x0040e4f0
 void C2_HOOK_FASTCALL ViewNetPlayer(void) {
     tCar_spec* car;
     tNet_game_player_info* net_player;
@@ -230,6 +237,7 @@ int C2_HOOK_FASTCALL IsCameraTypeAllowed(int pCamera_mode) {
 
 // FUNCTION: CARMA2_HW 0x0040e700
 // FUNCTION: CARMA2_SW 0x0040e6e0
+// FUNCTION: CARMA2_CHEAT 0x0040e7c0
 void C2_HOOK_FASTCALL MungeCarMaterials(tCar_spec* pCar, int pInternal_cam) {
     int i;
 
@@ -281,6 +289,7 @@ void C2_HOOK_FASTCALL SetCameraType(tActionReplayCameraMode pCamPos) {
 
 // FUNCTION: CARMA2_HW 0x0040e7f0
 // FUNCTION: CARMA2_SW 0x0040e7d0
+// FUNCTION: CARMA2_CHEAT 0x0040e8b0
 void C2_HOOK_FASTCALL ChangeCameraType(void) {
     tActionReplayCameraMode mode;
 
@@ -310,6 +319,7 @@ void C2_HOOK_FASTCALL ChangeCameraType(void) {
 
 // FUNCTION: CARMA2_HW 0x0040e900
 // FUNCTION: CARMA2_SW 0x0040e8e0
+// FUNCTION: CARMA2_CHEAT 0x0040e9c0
 void C2_HOOK_FASTCALL ToggleCockpit(void) {
     C2_HOOK_BUG_ON(REC2_ASIZE(gCamera_type_allowed_replay) != 9);
     C2_HOOK_BUG_ON(REC2_ASIZE(gCamera_type_allowed_gameplay) != 9);
@@ -343,6 +353,7 @@ void C2_HOOK_FASTCALL ToggleCockpit(void) {
 
 // STUB: CARMA2_HW 0x0040ea30
 // STUB: CARMA2_SW 0x0040ea10
+// STUB: CARMA2_CHEAT 0x0040eaf0
 void C2_HOOK_FASTCALL PositionExternalCamera(tCar_spec* pCar_spec, tU32 pTime) {
     NOT_IMPLEMENTED();
 }
@@ -353,6 +364,7 @@ void C2_HOOK_FASTCALL PositionExternalCamera(tCar_spec* pCar_spec, tU32 pTime) {
 
 // FUNCTION: CARMA2_HW 0x0040f760
 // FUNCTION: CARMA2_SW 0x0040f740
+// FUNCTION: CARMA2_CHEAT 0x0040f9b0
 void C2_HOOK_FASTCALL CameraBugFix(tCar_spec* pCar, tU32 pTime) {
 
     if (gAction_replay_mode
@@ -373,6 +385,7 @@ void C2_HOOK_FASTCALL CameraBugFix(tCar_spec* pCar, tU32 pTime) {
 
 // STUB: CARMA2_HW 0x0040f790
 // STUB: CARMA2_SW 0x0040f770
+// STUB: CARMA2_CHEAT 0x0040f9e0
 int C2_HOOK_FASTCALL IncidentCam(tCar_spec* pCar, tU32 pTime) {
 
     NOT_IMPLEMENTED();
@@ -392,6 +405,7 @@ int C2_HOOK_FASTCALL IncidentCam(tCar_spec* pCar, tU32 pTime) {
 
 // FUNCTION: CARMA2_HW 0x00410be0
 // FUNCTION: CARMA2_SW 0x00410bc0
+// FUNCTION: CARMA2_CHEAT 0x00410e30
 void C2_HOOK_FASTCALL SaveCameraPosition(int pIndex) {
 
     if (gSave_camera[pIndex].saved == 1) {
@@ -404,6 +418,7 @@ void C2_HOOK_FASTCALL SaveCameraPosition(int pIndex) {
 
 // FUNCTION: CARMA2_HW 0x00410c20
 // FUNCTION: CARMA2_SW 0x00410c00
+// FUNCTION: CARMA2_CHEAT 0x00410e70
 void C2_HOOK_FASTCALL RestoreCameraPosition(int pIndex) {
 
     if (gSave_camera[pIndex].saved == 0) {
@@ -472,6 +487,7 @@ int C2_HOOK_FASTCALL CollideCameraWithOtherCars(br_vector3* pPos, br_vector3* pC
 
 // STUB: CARMA2_HW 0x00413580
 // STUB: CARMA2_SW 0x004135b0
+// STUB: CARMA2_CHEAT 0x004137e0
 void C2_HOOK_FASTCALL InitialiseExternalCamera(void) {
     NOT_IMPLEMENTED();
 }
@@ -489,6 +505,7 @@ void C2_HOOK_FASTCALL FreezeCamera(void) {
 
 // FUNCTION: CARMA2_HW 0x00413780
 // FUNCTION: CARMA2_SW 0x004137b0
+// FUNCTION: CARMA2_CHEAT 0x004139e0
 void C2_HOOK_FASTCALL GetAverageGridPosition(tRace_info* pThe_race) {
     int i;
     br_scalar total_cars;

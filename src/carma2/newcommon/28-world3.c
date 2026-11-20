@@ -24,14 +24,17 @@
 
 // GLOBAL: CARMA2_HW 0x006b75c0
 // GLOBAL: CARMA2_SW 0x006ae2a0
+// GLOBAL: CARMA2_CHEAT 0x006bec60
 br_actor* gAdditional_actors;
 
 // GLOBAL: CARMA2_HW 0x006b7820
 // GLOBAL: CARMA2_SW 0x006ae500
+// GLOBAL: CARMA2_CHEAT 0x006beec0
 tBrender_storage* gStorage_for_callbacks;
 
 // GLOBAL: CARMA2_HW 0x006aaa2c
 // GLOBAL: CARMA2_SW 0x006a447c
+// GLOBAL: CARMA2_CHEAT 0x006b25a4
 int gDisallow_duplicates;
 
 // GLOBAL: CARMA2_HW 0x006aaa20
@@ -43,10 +46,12 @@ br_pixelmap* gDuplicate_pixelmap;
 br_material* gDuplicate_material;
 
 // GLOBAL: CARMA2_HW 0x006aaa24
+// GLOBAL: CARMA2_CHEAT 0x006b259c
 br_model* gDuplicate_model;
 
 // GLOBAL: CARMA2_HW 0x00660cb8
 // GLOBAL: CARMA2_SW 0x0065b62c
+// GLOBAL: CARMA2_CHEAT 0x00668500
 tRendererShadingType gMaterial_shading_for_callback = kRendererShadingType_Undefined;
 
 // FUNCTION: CARMA2_HW 0x00504b30
@@ -99,6 +104,7 @@ void C2_HOOK_FASTCALL InitTreeSurgery(void) {
 
 // FUNCTION: CARMA2_HW 0x00506e20
 // FUNCTION: CARMA2_SW 0x00502270
+// FUNCTION: CARMA2_CHEAT 0x0050c810
 intptr_t C2_HOOK_CDECL RemoveBounds(br_actor* pActor, void* pArg) {
 
     C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(br_actor, type, 0x12);
@@ -116,12 +122,14 @@ intptr_t C2_HOOK_CDECL RemoveBounds(br_actor* pActor, void* pArg) {
 
 // STUB: CARMA2_HW 0x00506c20
 // STUB: CARMA2_SW 0x00502070
+// STUB: CARMA2_CHEAT 0x0050c610
 void C2_HOOK_FASTCALL FreeTrack(tTrack_spec* pTrack_spec) {
     NOT_IMPLEMENTED();
 }
 
 // FUNCTION: CARMA2_HW 0x00506e50
 // FUNCTION: CARMA2_SW 0x005022a0
+// FUNCTION: CARMA2_CHEAT 0x0050c840
 void C2_HOOK_FASTCALL ProcessTrack(br_actor* pWorld, tTrack_spec* pTrack_spec, br_actor* pCamera, br_matrix34* pCamera_to_world) {
 
     RenderTrack(pWorld, pTrack_spec, pCamera, pCamera_to_world);
@@ -138,6 +146,7 @@ void C2_HOOK_FASTCALL ProcessTrack(br_actor* pWorld, tTrack_spec* pTrack_spec, b
 
 // FUNCTION: CARMA2_HW 0x00500d50
 // FUNCTION: CARMA2_SW 0x004fc6b0
+// FUNCTION: CARMA2_CHEAT 0x00506a00
 void C2_HOOK_FASTCALL InitialiseStorageSpace(int pUnknown, tBrender_storage* pStorage_space, int pMax_pixelmaps, int pMax_shade_tables, int pMax_materials, int pMax_models, int pMax_sounds) {
 
     pStorage_space->pixelmaps_count = 0;
@@ -161,6 +170,7 @@ void C2_HOOK_FASTCALL InitialiseStorageSpace(int pUnknown, tBrender_storage* pSt
 
 // FUNCTION: CARMA2_HW 0x00500e10
 // FUNCTION: CARMA2_SW 0x004fc770
+// FUNCTION: CARMA2_CHEAT 0x00506ac0
 void C2_HOOK_FASTCALL DisposeStorageSpace(tBrender_storage* pStorage) {
 
     BrMemFree(pStorage->pixelmaps);
@@ -173,6 +183,7 @@ void C2_HOOK_FASTCALL DisposeStorageSpace(tBrender_storage* pStorage) {
 
 // FUNCTION: CARMA2_HW 0x00500e60
 // FUNCTION: CARMA2_SW 0x004fc7c0
+// FUNCTION: CARMA2_CHEAT 0x00506b10
 void C2_HOOK_FASTCALL ClearMatertrialSetFromStorageSpace(tBrender_storage* pStorage_space, int pStart, int pEnd) {
     int i;
     int move_to;
@@ -199,6 +210,7 @@ void C2_HOOK_FASTCALL ClearMatertrialSetFromStorageSpace(tBrender_storage* pStor
 
 // FUNCTION: CARMA2_HW 0x00500f30
 // FUNCTION: CARMA2_SW 0x004fc890
+// FUNCTION: CARMA2_CHEAT 0x00506be0
 void C2_HOOK_FASTCALL ClearOutStorageSpace(tBrender_storage* pStorage_space) {
     int i;
 
@@ -279,6 +291,7 @@ tAdd_to_storage_result C2_HOOK_FASTCALL AddShadeTableToStorage(tBrender_storage*
 
 // FUNCTION: CARMA2_HW 0x00501190
 // FUNCTION: CARMA2_SW 0x004fcaf0
+// FUNCTION: CARMA2_CHEAT 0x00506e40
 tAdd_to_storage_result C2_HOOK_FASTCALL AddMaterialToStorage(tBrender_storage* pStorage_space, br_material* pThe_mat) {
     int i;
 
@@ -303,6 +316,7 @@ tAdd_to_storage_result C2_HOOK_FASTCALL AddMaterialToStorage(tBrender_storage* p
 
 // FUNCTION: CARMA2_HW 0x00501260
 // FUNCTION: CARMA2_SW 0x004fcbc0
+// FUNCTION: CARMA2_CHEAT 0x00506f10
 tAdd_to_storage_result C2_HOOK_FASTCALL AddModelToStorage(tBrender_storage* pStorage_space, br_model* pThe_mod) {
     int i;
 
@@ -348,6 +362,7 @@ tAdd_to_storage_result C2_HOOK_FASTCALL AddSoundToStorage(tBrender_storage* pSto
 
 // FUNCTION: CARMA2_HW 0x005024f0
 // FUNCTION: CARMA2_SW 0x004fde40
+// FUNCTION: CARMA2_CHEAT 0x005081a0
 int C2_HOOK_FASTCALL AddPixelmaps(tBrender_storage* pStorage_space, const char* path) {
     int i;
     int new_ones;
@@ -422,6 +437,7 @@ br_pixelmap* C2_HOOK_FASTCALL LoadSinglePixelmap(tBrender_storage* pStorage, con
 
 // FUNCTION: CARMA2_HW 0x005016a0
 // FUNCTION: CARMA2_SW 0x004fd000
+// FUNCTION: CARMA2_CHEAT 0x00507350
 br_pixelmap* C2_HOOK_FASTCALL LoadSingleShadeTable(tBrender_storage* pStorage_space, const char* pName) {
     br_pixelmap* temp;
 
@@ -481,6 +497,7 @@ br_material* C2_HOOK_FASTCALL LoadSingleMaterial(tBrender_storage* pStorage_spac
 
 // FUNCTION: CARMA2_HW 0x00501930
 // FUNCTION: CARMA2_SW 0x004fd290
+// FUNCTION: CARMA2_CHEAT 0x005075e0
 tAdd_to_storage_result C2_HOOK_FASTCALL LoadSingleSound(tBrender_storage* pStorage_space, int pSound_id) {
 
     if (S3GetBufferDescription(pSound_id) != NULL) {
@@ -605,6 +622,7 @@ void C2_HOOK_FASTCALL LoadSomeMaterials(tBrender_storage* pStorage, FILE* pFile,
 
 // FUNCTION: CARMA2_HW 0x00502060
 // FUNCTION: CARMA2_SW 0x004fd9b0
+// FUNCTION: CARMA2_CHEAT 0x00507d10
 int C2_HOOK_FASTCALL AddMaterials(tBrender_storage* pStorage_space, const char* pPath, tRendererShadingType pShading) {
     int i;
     int new_ones;
@@ -673,6 +691,7 @@ void C2_HOOK_FASTCALL LoadAllPixelmapsInDirectory(tBrender_storage* pStorage, co
 
 // FUNCTION: CARMA2_HW 0x005026b0
 // FUNCTION: CARMA2_SW 0x004fe000
+// FUNCTION: CARMA2_CHEAT 0x00508360
 int C2_HOOK_FASTCALL GetFileName(const char *pPath, void* pContext) {
     tPath_name path;
     tPath_name pathUpper;
@@ -697,6 +716,7 @@ int C2_HOOK_FASTCALL GetFileName(const char *pPath, void* pContext) {
 
 // FUNCTION: CARMA2_HW 0x00502780
 // FUNCTION: CARMA2_SW 0x004fe0d0
+// FUNCTION: CARMA2_CHEAT 0x00508430
 int C2_HOOK_FASTCALL GetAdditionalFileName(const char* pPath, void* pContext) {
     tPath_name path;
     tPath_name upperPath;
@@ -735,6 +755,7 @@ int C2_HOOK_FASTCALL GetAdditionalFileName(const char* pPath, void* pContext) {
 
 // FUNCTION: CARMA2_HW 0x005028f0
 // FUNCTION: CARMA2_SW 0x004fe240
+// FUNCTION: CARMA2_CHEAT 0x00508590
 void C2_HOOK_FASTCALL LoadAllImagesInDirectory(tBrender_storage* pStorage_space, const char* path) {
     tPath_name pathCopy;
     tPath_name pixPath;
@@ -771,6 +792,7 @@ void C2_HOOK_FASTCALL LoadAllImagesInDirectory(tBrender_storage* pStorage_space,
 
 // FUNCTION: CARMA2_HW 0x00502a70
 // FUNCTION: CARMA2_SW 0x004fe3c0
+// FUNCTION: CARMA2_CHEAT 0x00508710
 void C2_HOOK_FASTCALL LoadIfItsAMaterial(const char* pPath) {
     char path[256];
     tRendererShadingType shading;
@@ -809,6 +831,7 @@ void C2_HOOK_FASTCALL LoadIfItsAModel(const char* pPath) {
 
 // FUNCTION: CARMA2_HW 0x00502b00
 // FUNCTION: CARMA2_SW 0x004fe450
+// FUNCTION: CARMA2_CHEAT 0x005087a0
 void C2_HOOK_FASTCALL LoadAllModelsInDirectory(tBrender_storage *pStorage, const char* pPath) {
 
     gStorage_for_callbacks = pStorage;
@@ -828,6 +851,7 @@ void C2_HOOK_FASTCALL LoadIfItsAShadeTable(const char* pPath) {
 
 // FUNCTION: CARMA2_HW 0x00502b60
 // FUNCTION: CARMA2_SW 0x004fe4b0
+// FUNCTION: CARMA2_CHEAT 0x00508800
 void C2_HOOK_FASTCALL LoadAllShadeTablesInDirectory(tBrender_storage* pStorage, const char* pPath) {
 
     gStorage_for_callbacks = pStorage;
@@ -836,6 +860,7 @@ void C2_HOOK_FASTCALL LoadAllShadeTablesInDirectory(tBrender_storage* pStorage, 
 
 // FUNCTION: CARMA2_HW 0x00502cf0
 // FUNCTION: CARMA2_SW 0x004fe640
+// FUNCTION: CARMA2_CHEAT 0x00508990
 void C2_HOOK_FASTCALL LoadAllStuffInDirectory(tBrender_storage* pStorage, const char* pPath, tRendererShadingType pShading) {
 
     LoadAllShadeTablesInDirectory(pStorage, pPath);
@@ -847,6 +872,7 @@ void C2_HOOK_FASTCALL LoadAllStuffInDirectory(tBrender_storage* pStorage, const 
 
 // FUNCTION: CARMA2_HW 0x00502d60
 // FUNCTION: CARMA2_SW 0x004fe6b0
+// FUNCTION: CARMA2_CHEAT 0x00508a00
 void C2_HOOK_FASTCALL DisallowDuplicates(void) {
 
     // empty
@@ -854,6 +880,7 @@ void C2_HOOK_FASTCALL DisallowDuplicates(void) {
 
 // FUNCTION: CARMA2_HW 0x00502d70
 // FUNCTION: CARMA2_SW 0x004fe6c0
+// FUNCTION: CARMA2_CHEAT 0x00508a10
 void C2_HOOK_FASTCALL AllowDuplicates(void) {
 
     gDisallow_duplicates = 0;

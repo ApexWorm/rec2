@@ -22,6 +22,7 @@
 
 // FUNCTION: CARMA2_HW 0x004e33d0
 // FUNCTION: CARMA2_SW 0x004df760
+// FUNCTION: CARMA2_CHEAT 0x004e8f50
 int C2_HOOK_FASTCALL AnyBuyableCars(void) {
     int count;
     int i;
@@ -37,6 +38,7 @@ int C2_HOOK_FASTCALL AnyBuyableCars(void) {
 
 // FUNCTION: CARMA2_HW 0x004e3410
 // FUNCTION: CARMA2_SW 0x004df7a0
+// FUNCTION: CARMA2_CHEAT 0x004e8f90
 void C2_HOOK_FASTCALL RecordAPOAndCredits(void) {
 
     C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tCar_spec, power_up_levels, 0x18a8);

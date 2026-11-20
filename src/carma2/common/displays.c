@@ -874,7 +874,7 @@ void C2_HOOK_FASTCALL DRPixelmapCleverText(br_pixelmap* pPixelmap, int pX, int p
 }
 
 // FUNCTION: CARMA2_HW 0x0045aa60
-void C2_HOOK_STDCALL CreateAccentPolyActor(float pX, float pY, float pWidth, float pHeight) {
+void C2_HOOK_FASTCALL CreateAccentPolyActor(float pX, float pY, float pWidth, float pHeight) {
 
     if (gAcc_poly_material == NULL) {
         gAcc_poly_material = BrMaterialAllocate("Acc Poly Mat");

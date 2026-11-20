@@ -17,6 +17,7 @@
 #include "c2_stdlib.h"
 
 // FUNCTION: CARMA2_HW 0x00526300
+// FUNCTION: CARMA2_CHEAT 0x0052bef0
 br_order_table* C2_HOOK_CDECL BrZsOrderTableAllocate(br_uint_16 size, br_uint_32 flags, br_uint_16 type) {
     br_order_table* order_table;
 
@@ -37,12 +38,14 @@ br_order_table* C2_HOOK_CDECL BrZsOrderTableAllocate(br_uint_16 size, br_uint_32
 }
 
 // FUNCTION: CARMA2_HW 0x00526370
+// FUNCTION: CARMA2_CHEAT 0x0052bf60
 void C2_HOOK_CDECL BrZsOrderTableFree(br_order_table* order_table) {
 
     BrResFree(order_table);
 }
 
 // FUNCTION: CARMA2_HW 0x00526380
+// FUNCTION: CARMA2_CHEAT 0x0052bf70
 br_order_table* C2_HOOK_CDECL BrZsActorOrderTableSet(br_actor* actor, br_order_table* order_table) {
 
     actor->render_data = order_table;
@@ -50,12 +53,14 @@ br_order_table* C2_HOOK_CDECL BrZsActorOrderTableSet(br_actor* actor, br_order_t
 }
 
 // FUNCTION: CARMA2_HW 0x00526390
+// FUNCTION: CARMA2_CHEAT 0x0052bf80
 br_order_table* C2_HOOK_CDECL BrZsActorOrderTableGet(br_actor* actor) {
 
     return actor->render_data;
 }
 
 // FUNCTION: CARMA2_HW 0x005263a0
+// FUNCTION: CARMA2_CHEAT 0x0052bf90
 br_order_table* C2_HOOK_CDECL BrZsOrderTableClear(br_order_table* order_table) {
 
     BrMemSet(order_table->table, 0, order_table->size * sizeof(br_primitive*));
@@ -63,6 +68,7 @@ br_order_table* C2_HOOK_CDECL BrZsOrderTableClear(br_order_table* order_table) {
 }
 
 // FUNCTION: CARMA2_HW 0x005263c0
+// FUNCTION: CARMA2_CHEAT 0x0052bfb0
 void C2_HOOK_CDECL BrZsOrderTablePrimitiveInsert(br_order_table* order_table, br_primitive* primitive, br_uint_16 bucket) {
 
     primitive->next = order_table->table[bucket];
@@ -70,6 +76,7 @@ void C2_HOOK_CDECL BrZsOrderTablePrimitiveInsert(br_order_table* order_table, br
 }
 
 // FUNCTION: CARMA2_HW 0x005263f0
+// FUNCTION: CARMA2_CHEAT 0x0052bfe0
 br_uint_16 C2_HOOK_CDECL BrZsPrimitiveBucketSelect(br_scalar* z, br_uint_16 type, br_scalar min_z, br_scalar max_z, br_uint_16 size, br_uint_16 sort_type) {
     br_uint_16 bucket;
     br_scalar zprim;
@@ -151,6 +158,7 @@ br_uint_16 C2_HOOK_CDECL BrZsPrimitiveBucketSelect(br_scalar* z, br_uint_16 type
 }
 
 // FUNCTION: CARMA2_HW 0x00526560
+// FUNCTION: CARMA2_CHEAT 0x0052c150
 void C2_HOOK_CDECL BrZsOrderTablePrimaryEnable(br_order_table* order_table) {
 
     if (order_table == NULL) {
@@ -160,12 +168,14 @@ void C2_HOOK_CDECL BrZsOrderTablePrimaryEnable(br_order_table* order_table) {
 }
 
 // FUNCTION: CARMA2_HW 0x00526580
+// FUNCTION: CARMA2_CHEAT 0x0052c170
 void C2_HOOK_CDECL BrZsOrderTablePrimaryDisable(void) {
 
     v1db.primary_order_table = NULL;
 }
 
 // FUNCTION: CARMA2_HW 0x00526590
+// FUNCTION: CARMA2_CHEAT 0x0052c180
 void C2_HOOK_STDCALL InsertOrderTableList(br_order_table* order_table) {
     br_order_table* previous_table;
     br_order_table* current_table;
@@ -195,6 +205,7 @@ void C2_HOOK_STDCALL InsertOrderTableList(br_order_table* order_table) {
 }
 
 // FUNCTION: CARMA2_HW 0x00526600
+// FUNCTION: CARMA2_CHEAT 0x0052c1f0
 void C2_HOOK_STDCALL SetOrderTableBounds(br_bounds* bounds, br_order_table* order_table) {
     br_uint_32 i;
     br_scalar element;
@@ -227,6 +238,7 @@ void C2_HOOK_STDCALL SetOrderTableBounds(br_bounds* bounds, br_order_table* orde
 }
 
 // FUNCTION: CARMA2_HW 0x005266f0
+// FUNCTION: CARMA2_CHEAT 0x0052c2e0
 void C2_HOOK_STDCALL SetOrderTableRange(br_order_table* order_table) {
     br_scalar range;
 
@@ -252,6 +264,7 @@ void C2_HOOK_STDCALL SetOrderTableRange(br_order_table* order_table) {
 }
 
 // FUNCTION: CARMA2_HW 0x00526770
+// FUNCTION: CARMA2_CHEAT 0x0052c360
 void C2_HOOK_STDCALL RenderOrderTableList(void) {
     br_order_table* order_table;
 
@@ -264,6 +277,7 @@ void C2_HOOK_STDCALL RenderOrderTableList(void) {
 }
 
 // FUNCTION: CARMA2_HW 0x005267b0
+// FUNCTION: CARMA2_CHEAT 0x0052c3a0
 void C2_HOOK_STDCALL RenderPrimaryOrderTable(void) {
     br_uint_16 m;
     br_uint_16 size;

@@ -29,6 +29,7 @@ void C2_HOOK_FASTCALL MakeFaceAndTextureIt(br_model* pModel, int pFace_num, br_u
 
 // FUNCTION: CARMA2_HW 0x00401000
 // FUNCTION: CARMA2_SW 0x00401000
+// FUNCTION: CARMA2_CHEAT 0x00401000
 void C2_HOOK_FASTCALL InitPanGameAIWorld(void) {
 
     PrintMemoryDump(0, "BEFORE LoadOpponents()");
@@ -65,6 +66,7 @@ void C2_HOOK_FASTCALL LoadAIWorldForRace(tRace_info* pRace_info) {
 
 // FUNCTION: CARMA2_HW 0x00401160
 // FUNCTION: CARMA2_SW 0x00401160
+// FUNCTION: CARMA2_CHEAT 0x00401160
 void C2_HOOK_FASTCALL DisposeAIWorldRaceStuff(void) {
 
     DisposeOpponents();
@@ -75,6 +77,7 @@ void C2_HOOK_FASTCALL DisposeAIWorldRaceStuff(void) {
 
 // FUNCTION: CARMA2_HW 0x004013d0
 // FUNCTION: CARMA2_SW 0x004013d0
+// FUNCTION: CARMA2_CHEAT 0x004013d0
 void C2_HOOK_FASTCALL PointActorAlongThisBloodyVector(br_actor* pThe_actor, br_vector3* pThe_vector) {
     br_transform trans;
 
@@ -87,6 +90,7 @@ void C2_HOOK_FASTCALL PointActorAlongThisBloodyVector(br_actor* pThe_actor, br_v
 
 // FUNCTION: CARMA2_HW 0x00401430
 // FUNCTION: CARMA2_SW 0x00401430
+// FUNCTION: CARMA2_CHEAT 0x00401430
 void C2_HOOK_FASTCALL PointActorAlongVectorWithUp(br_actor* pThe_actor, br_vector3* pLook, br_vector3* pUp) {
     br_transform trans;
 
@@ -99,6 +103,7 @@ void C2_HOOK_FASTCALL PointActorAlongVectorWithUp(br_actor* pThe_actor, br_vecto
 
 // FUNCTION: CARMA2_HW 0x00401760
 // FUNCTION: CARMA2_SW 0x00401760
+// FUNCTION: CARMA2_CHEAT 0x00401760
 br_material* C2_HOOK_FASTCALL CreateSimpleMaterial(int pIndex) {
     br_material* material;
 

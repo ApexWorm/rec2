@@ -48,10 +48,12 @@ br_resource_class v1db_resourceClasses[] = {
 
 // GLOBAL: CARMA2_HW 0x0079efe0
 // GLOBAL: CARMA2_SW 0x00795580
+// GLOBAL: CARMA2_CHEAT 0x007a6680
 br_v1db_state v1db;
 
 // FUNCTION: CARMA2_HW 0x00525860
 // FUNCTION: CARMA2_SW 0x00520f00
+// FUNCTION: CARMA2_CHEAT 0x0052b450
 br_error C2_HOOK_CDECL BrV1dbBegin(void) {
     int i;
 
@@ -98,6 +100,7 @@ br_error C2_HOOK_CDECL BrV1dbBegin(void) {
 
 // FUNCTION: CARMA2_HW 0x00525970
 // FUNCTION: CARMA2_SW 0x00521010
+// FUNCTION: CARMA2_CHEAT 0x0052b560
 br_error C2_HOOK_CDECL BrV1dbEnd(void) {
 
     if (v1db.active == 0) {
@@ -111,6 +114,7 @@ br_error C2_HOOK_CDECL BrV1dbEnd(void) {
 
 // FUNCTION: CARMA2_HW 0x00525b20
 // FUNCTION: CARMA2_SW 0x005211c0
+// FUNCTION: CARMA2_CHEAT 0x0052b710
 br_uint_32 C2_HOOK_CDECL updateTable(br_pixelmap* item, void* arg) {
 
     BrTableUpdate(item, BR_TABU_ALL);
@@ -119,6 +123,7 @@ br_uint_32 C2_HOOK_CDECL updateTable(br_pixelmap* item, void* arg) {
 
 // FUNCTION: CARMA2_HW 0x00525b40
 // FUNCTION: CARMA2_SW 0x005211e0
+// FUNCTION: CARMA2_CHEAT 0x0052b730
 br_uint_32 C2_HOOK_CDECL updateMap(br_pixelmap* item, void* arg) {
 
     BrMapUpdate(item, BR_MAPU_ALL);
@@ -127,6 +132,7 @@ br_uint_32 C2_HOOK_CDECL updateMap(br_pixelmap* item, void* arg) {
 
 // FUNCTION: CARMA2_HW 0x00525b60
 // FUNCTION: CARMA2_SW 0x00521200
+// FUNCTION: CARMA2_CHEAT 0x0052b750
 br_uint_32 C2_HOOK_CDECL updateMaterial(br_material* item, void* arg) {
 
     BrMaterialUpdate(item, BR_MATU_ALL);
@@ -135,6 +141,7 @@ br_uint_32 C2_HOOK_CDECL updateMaterial(br_material* item, void* arg) {
 
 // FUNCTION: CARMA2_HW 0x00525b80
 // FUNCTION: CARMA2_SW 0x00521220
+// FUNCTION: CARMA2_CHEAT 0x0052b770
 br_uint_32 C2_HOOK_CDECL updateModel(br_model* item, void* arg) {
 
     BrModelUpdate(item, BR_MODU_ALL);
@@ -143,6 +150,7 @@ br_uint_32 C2_HOOK_CDECL updateModel(br_model* item, void* arg) {
 
 // FUNCTION: CARMA2_HW 0x00525c50
 // FUNCTION: CARMA2_SW 0x005212f0
+// FUNCTION: CARMA2_CHEAT 0x0052b840
 br_uint_32 C2_HOOK_CDECL clearTable(br_pixelmap* item, void* arg) {
     BrBufferClear(item);
     return 0;
@@ -150,6 +158,7 @@ br_uint_32 C2_HOOK_CDECL clearTable(br_pixelmap* item, void* arg) {
 
 // FUNCTION: CARMA2_HW 0x00525c60
 // FUNCTION: CARMA2_SW 0x00521300
+// FUNCTION: CARMA2_CHEAT 0x0052b850
 br_uint_32 C2_HOOK_CDECL clearMap(br_pixelmap* item, void* arg) {
 
     BrBufferClear(item);
@@ -158,6 +167,7 @@ br_uint_32 C2_HOOK_CDECL clearMap(br_pixelmap* item, void* arg) {
 
 // FUNCTION: CARMA2_HW 0x00525c70
 // FUNCTION: CARMA2_SW 0x00521310
+// FUNCTION: CARMA2_CHEAT 0x0052b860
 br_uint_32 C2_HOOK_CDECL clearMaterial(br_material* item, void* arg) {
 
     BrMaterialClear(item);
@@ -166,6 +176,7 @@ br_uint_32 C2_HOOK_CDECL clearMaterial(br_material* item, void* arg) {
 
 // FUNCTION: CARMA2_HW 0x00525c80
 // FUNCTION: CARMA2_SW 0x00521320
+// FUNCTION: CARMA2_CHEAT 0x0052b870
 br_uint_32 C2_HOOK_CDECL clearModel(br_model* item, void* arg) {
 
     BrModelClear(item);
@@ -174,6 +185,7 @@ br_uint_32 C2_HOOK_CDECL clearModel(br_model* item, void* arg) {
 
 // FUNCTION: CARMA2_HW 0x005259b0
 // FUNCTION: CARMA2_SW 0x00521050
+// FUNCTION: CARMA2_CHEAT 0x0052b5a0
 br_error C2_HOOK_CDECL BrV1dbRendererBegin(br_device_pixelmap* destination, br_renderer* renderer) {
     br_renderer_facility* renderer_facility = NULL;
     br_error r;
@@ -223,6 +235,7 @@ br_error C2_HOOK_CDECL BrV1dbRendererBegin(br_device_pixelmap* destination, br_r
 
 // FUNCTION: CARMA2_HW 0x00525ba0
 // FUNCTION: CARMA2_SW 0x00521240
+// FUNCTION: CARMA2_CHEAT 0x0052b790
 br_renderer* C2_HOOK_CDECL BrV1dbRendererQuery(void) {
 
     return v1db.renderer;
@@ -230,6 +243,7 @@ br_renderer* C2_HOOK_CDECL BrV1dbRendererQuery(void) {
 
 // FUNCTION: CARMA2_HW 0x00525bb0
 // FUNCTION: CARMA2_SW 0x00521250
+// FUNCTION: CARMA2_CHEAT 0x0052b7a0
 br_error C2_HOOK_CDECL BrV1dbRendererEnd(void) {
 
     if (v1db.renderer == NULL) {
@@ -252,6 +266,7 @@ br_error C2_HOOK_CDECL BrV1dbRendererEnd(void) {
 
 // FUNCTION: CARMA2_HW 0x00525c90
 // FUNCTION: CARMA2_SW 0x00521330
+// FUNCTION: CARMA2_CHEAT 0x0052b880
 void C2_HOOK_CDECL BrZbBegin(br_uint_8 colour_type, br_uint_8 depth_type) {
 
     if (v1db.zx_active == 0) {
@@ -264,6 +279,7 @@ void C2_HOOK_CDECL BrZbBegin(br_uint_8 colour_type, br_uint_8 depth_type) {
 
 // FUNCTION: CARMA2_HW 0x00525cd0
 // FUNCTION: CARMA2_SW 0x00521370
+// FUNCTION: CARMA2_CHEAT 0x0052b8c0
 void C2_HOOK_CDECL BrZsBegin(br_uint_8 colour_type, void* primitive, br_uint_32 size) {
 
     if (v1db.zx_active == 0) {
@@ -278,6 +294,7 @@ void C2_HOOK_CDECL BrZsBegin(br_uint_8 colour_type, void* primitive, br_uint_32 
 
 // FUNCTION: CARMA2_HW 0x00525d20
 // FUNCTION: CARMA2_SW 0x005213c0
+// FUNCTION: CARMA2_CHEAT 0x0052b910
 void C2_HOOK_CDECL BrZbsBegin(br_uint_8 colour_type, br_uint_8 depth_type, void* primitive, br_uint_32 size) {
     if (v1db.zx_active == 0) {
         if (BrV1dbRendererBegin((br_device_pixelmap*)BrDevLastBeginQuery(), NULL) != 0) {
@@ -300,6 +317,7 @@ void C2_HOOK_CDECL BrZbEnd(void) {
 
 // FUNCTION: CARMA2_HW 0x00525e10
 // FUNCTION: CARMA2_SW 0x005214b0
+// FUNCTION: CARMA2_CHEAT 0x0052ba00
 void C2_HOOK_CDECL BrZsEnd(void) {
 
     v1db.zx_active &= ~BR_ZX_ZS_ACTIVE_MASK;
@@ -309,6 +327,7 @@ void C2_HOOK_CDECL BrZsEnd(void) {
 }
 
 // FUNCTION: CARMA2_HW 0x00525eb0
+// FUNCTION: CARMA2_CHEAT 0x0052baa0
 void C2_HOOK_CDECL BrZbsEnd(void) {
 
     v1db.zx_active &= ~BR_ZX_ZBS_ACTIVE_MASK;
@@ -319,6 +338,7 @@ void C2_HOOK_CDECL BrZbsEnd(void) {
 
 // FUNCTION: CARMA2_HW 0x00525f50
 // FUNCTION: CARMA2_SW 0x005215f0
+// FUNCTION: CARMA2_CHEAT 0x0052bb40
 void C2_HOOK_CDECL BrV1dbBeginWrapper_Float(void) {
     BrBegin();
     BrV1dbBegin();
@@ -326,6 +346,7 @@ void C2_HOOK_CDECL BrV1dbBeginWrapper_Float(void) {
 
 // FUNCTION: CARMA2_HW 0x00525f60
 // FUNCTION: CARMA2_SW 0x00521600
+// FUNCTION: CARMA2_CHEAT 0x0052bb50
 void C2_HOOK_CDECL BrV1dbEndWrapper_Float(void) {
     BrV1dbEnd();
     BrEnd();

@@ -32,6 +32,7 @@ br_error C2_HOOK_CDECL AddRequestedDrivers(void) {
 
 // FUNCTION: CARMA2_HW 0x00528490
 // FUNCTION: CARMA2_SW 0x00523b10
+// FUNCTION: CARMA2_CHEAT 0x0052e080
 br_error C2_HOOK_STDCALL devAdd(br_device** pdev, br_device_begin_fn* dev_begin, const char* args, br_image* image) {
     int i;
     br_device* dev;
@@ -73,6 +74,7 @@ br_error C2_HOOK_STDCALL devAdd(br_device** pdev, br_device_begin_fn* dev_begin,
 
 // FUNCTION: CARMA2_HW 0x00528430
 // FUNCTION: CARMA2_SW 0x00523ab0
+// FUNCTION: CARMA2_CHEAT 0x0052e020
 br_error C2_HOOK_CDECL BrDevAdd(br_device** pdev, const char* image, const char* args) {
     br_image* dev_image;
     br_device_begin_fn* dev_begin;
@@ -91,6 +93,7 @@ br_error C2_HOOK_CDECL BrDevAdd(br_device** pdev, const char* image, const char*
 
 // FUNCTION: CARMA2_HW 0x005285a0
 // FUNCTION: CARMA2_SW 0x00523c20
+// FUNCTION: CARMA2_CHEAT 0x0052e190
 br_error C2_HOOK_CDECL BrDevAddStatic(br_device** pdev, br_device_begin_fn* dev_begin, const char* args) {
     return devAdd(pdev, dev_begin, args, NULL);
 }
@@ -106,6 +109,7 @@ br_error C2_HOOK_CDECL BrDevCheckAdd(br_device** pdev, const char* name, const c
 }
 
 // FUNCTION: CARMA2_HW 0x005286d0
+// FUNCTION: CARMA2_CHEAT 0x0052e2c0
 br_error C2_HOOK_CDECL BrDevAddConfig(const char* config) {
     const char* end;
     char* dev;
@@ -149,6 +153,7 @@ br_error C2_HOOK_CDECL BrDevAddConfig(const char* config) {
 
 // FUNCTION: CARMA2_HW 0x00528800
 // FUNCTION: CARMA2_SW 0x00523e80
+// FUNCTION: CARMA2_CHEAT 0x0052e3f0
 br_error C2_HOOK_CDECL BrDevRemove(br_device* dev) {
     int i;
 
@@ -167,6 +172,7 @@ br_error C2_HOOK_CDECL BrDevRemove(br_device* dev) {
 
 // FUNCTION: CARMA2_HW 0x00528860
 // FUNCTION: CARMA2_SW 0x00523ee0
+// FUNCTION: CARMA2_CHEAT 0x0052e450
 br_error C2_HOOK_CDECL BrDevFind(br_device** pdev, const char* pattern) {
     int i;
 
@@ -186,6 +192,7 @@ br_error C2_HOOK_CDECL BrDevFind(br_device** pdev, const char* pattern) {
 }
 
 // FUNCTION: CARMA2_HW 0x00528930
+// FUNCTION: CARMA2_CHEAT 0x0052e520
 br_error C2_HOOK_CDECL BrDevFindMany(br_device** devices, br_int_32* ndevices, br_int_32 max_devices, const char* pattern) {
     int i;
     int c;
@@ -212,6 +219,7 @@ br_error C2_HOOK_CDECL BrDevFindMany(br_device** devices, br_int_32* ndevices, b
 }
 
 // FUNCTION: CARMA2_HW 0x00528a10
+// FUNCTION: CARMA2_CHEAT 0x0052e600
 br_error C2_HOOK_CDECL BrDevCount(br_int_32* ndevices, const char* pattern) {
     int i;
     int c;
@@ -234,6 +242,7 @@ br_error C2_HOOK_CDECL BrDevCount(br_int_32* ndevices, const char* pattern) {
 
 // FUNCTION: CARMA2_HW 0x00528ac0
 // FUNCTION: CARMA2_SW 0x00524140
+// FUNCTION: CARMA2_CHEAT 0x0052e6b0
 br_error C2_HOOK_CDECL BrDevContainedFind(br_object** ph, br_token type, const char* pattern, br_token_value* tv) {
     int i;
 
@@ -250,6 +259,7 @@ br_error C2_HOOK_CDECL BrDevContainedFind(br_object** ph, br_token type, const c
 }
 
 // FUNCTION: CARMA2_HW 0x00528b90
+// FUNCTION: CARMA2_CHEAT 0x0052e780
 br_error C2_HOOK_CDECL BrDevContainedFindMany(br_object** objects, br_int_32 max_objects, br_int_32* pnum_objects, br_token type, const char* pattern, br_token_value* tv) {
     int i;
     br_int_32 n;
@@ -278,6 +288,7 @@ br_error C2_HOOK_CDECL BrDevContainedFindMany(br_object** objects, br_int_32 max
 }
 
 // FUNCTION: CARMA2_HW 0x00528c80
+// FUNCTION: CARMA2_CHEAT 0x0052e870
 br_error C2_HOOK_CDECL BrDevContainedCount(br_int_32* pcount, br_token type, const char* pattern, br_token_value* tv) {
     int i;
     br_uint_32 n;

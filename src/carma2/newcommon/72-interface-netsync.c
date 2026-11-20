@@ -13,6 +13,7 @@
 
 // GLOBAL: CARMA2_HW 0x0061bad0
 // GLOBAL: CARMA2_SW 0x00616a00
+// GLOBAL: CARMA2_CHEAT 0x00622350
 tFrontend_spec gFrontend_NETSYNC = {
 #if 0 // FIXME: enable this
     "NetSync",

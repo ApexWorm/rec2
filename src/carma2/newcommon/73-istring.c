@@ -20,14 +20,17 @@
 
 // GLOBAL: CARMA2_HW 0x0068c6e0
 // GLOBAL: CARMA2_SW 0x00686728
+// GLOBAL: CARMA2_CHEAT 0x00693f80
 int gCount_interface_strings;
 
 // GLOBAL: CARMA2_HW 0x0068c230
 // GLOBAL: CARMA2_SW 0x00686278
+// GLOBAL: CARMA2_CHEAT 0x00693ad0
 char* gInterface_strings[300];
 
 // FUNCTION: CARMA2_HW 0x00484fd0
 // FUNCTION: CARMA2_SW 0x00482110
+// FUNCTION: CARMA2_CHEAT 0x004852f0
 void C2_HOOK_FASTCALL IString_Load(void) {
     tPath_name the_path;
     FILE* f;
@@ -57,6 +60,7 @@ void C2_HOOK_FASTCALL IString_Load(void) {
 }
 
 // FUNCTION: CARMA2_HW 0x004850d0
+// FUNCTION: CARMA2_CHEAT 0x004853f0
 void C2_HOOK_FASTCALL IString_Free(void) {
     int i;
 
@@ -68,6 +72,7 @@ void C2_HOOK_FASTCALL IString_Free(void) {
 
 // FUNCTION: CARMA2_HW 0x00485110
 // FUNCTION: CARMA2_SW 0x00482250
+// FUNCTION: CARMA2_CHEAT 0x00485430
 const char* C2_HOOK_FASTCALL IString_Get(int pIndex) {
 
     if (pIndex > gCount_interface_strings) {

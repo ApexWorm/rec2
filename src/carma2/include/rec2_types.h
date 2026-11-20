@@ -129,6 +129,26 @@ typedef union {
 } tFloat_u32_union;
 
 typedef enum {
+    eEdit_mode_options = 0,
+    eEdit_mode_cheat = 1,
+    eEdit_mode_acc = 2,
+    eEdit_mode_powerups = 3,
+    eEdit_mode_spec_vol = 4,
+    eEdit_mode_ped = 5,
+    eEdit_mode_drones = 6,
+    eEdit_mode_opp = 7,
+    eEdit_mode_pratcam = 8,
+    eEdit_mode_depth = 9,
+    eEdit_mode_damage = 10,
+    eEdit_mode_crush = 11,
+#ifdef REC2_CHEAT
+    eEdit_mode_count = 12,
+#else
+    eEdit_mode_count = 2,
+#endif
+} tEdit_mode;
+
+typedef enum {
     eFPR_OK = 0,
     eFPR_end_of_path = 1,
     eFPR_given_up = 2,
@@ -4564,6 +4584,7 @@ typedef struct {
 } tPHIL_queued_header;
 
 typedef struct {
+    /* FIXME: CARMA2_CHEAT has extra 32-bit member */
     tPhysics_object* collision_info;
     undefined2 field_0x4;
     undefined field_0x6[0x2];
@@ -5466,7 +5487,12 @@ typedef struct tSave_game {
 } tSave_game;
 
 typedef struct tMin_message {
+#ifdef REC2_V101A
+    tU8 buffer[96];
+#endif
+#ifdef REC2_V102A
     tU8 buffer[92];
+#endif
 } tMin_message;
 
 typedef struct tMid_message {
@@ -5525,6 +5551,9 @@ typedef struct {
     undefined4 field_0x8;
     undefined4 field_0xc;
     undefined4 field_0x10;
+#ifdef REC2_V101A
+    undefined4 field_extra_v101a; /* FIXME: unknown location (<0x14) */
+#endif
     undefined2 field_0x14;
     undefined2 field_0x16;
 } tNet_message_header;

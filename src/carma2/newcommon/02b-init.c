@@ -22,13 +22,16 @@
 
 // GLOBAL: CARMA2_HW 0x00762284
 // GLOBAL: CARMA2_SW 0x007587e4
+// GLOBAL: CARMA2_CHEAT 0x00769924
 int gDemo;
 
 // GLOBAL: CARMA2_HW 0x0074d354
 // GLOBAL: CARMA2_SW 0x007438b4
+// GLOBAL: CARMA2_CHEAT 0x007549f4
 float gCamera_angle;
 
 // FUNCTION: CARMA2_HW 0x004815d0
+// FUNCTION: CARMA2_CHEAT 0x00481960
 void C2_HOOK_FASTCALL CheckTimedDemo(void) {
     FILE* f;
     tPath_name path;
@@ -43,6 +46,7 @@ void C2_HOOK_FASTCALL CheckTimedDemo(void) {
 
 // FUNCTION: CARMA2_HW 0x0047e560
 // FUNCTION: CARMA2_SW 0x0047e6f0
+// FUNCTION: CARMA2_CHEAT 0x0047e8f0
 void C2_HOOK_FASTCALL Init2DStuffForPolyFonts(void) {
     br_camera* camera_data;
 
@@ -63,6 +67,7 @@ void C2_HOOK_FASTCALL Init2DStuffForPolyFonts(void) {
 
 // FUNCTION: CARMA2_HW 0x0047e500
 // FUNCTION: CARMA2_SW 0x0047e690
+// FUNCTION: CARMA2_CHEAT 0x0047e890
 void C2_HOOK_FASTCALL AllocateStandardLamp(void) {
     int i;
 
@@ -81,6 +86,7 @@ void C2_HOOK_FASTCALL AllocateStandardLamp(void) {
 
 // FUNCTION: CARMA2_HW 0x0047e320
 // FUNCTION: CARMA2_SW 0x0047e4b0
+// FUNCTION: CARMA2_CHEAT 0x0047e6b0
 void C2_HOOK_FASTCALL AllocateActors(void) {
     int i;
 
@@ -105,6 +111,7 @@ void C2_HOOK_FASTCALL AllocateActors(void) {
 
 // FUNCTION: CARMA2_HW 0x0047e3b0
 // FUNCTION: CARMA2_SW 0x0047e540
+// FUNCTION: CARMA2_CHEAT 0x0047e740
 void C2_HOOK_FASTCALL AllocateCamera(void) {
     br_camera* camera_ptr;
     int i;

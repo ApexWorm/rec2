@@ -17,24 +17,29 @@
 
 // GLOBAL: CARMA2_HW 0x0068b8e8
 // GLOBAL: CARMA2_SW 0x00685e48
+// GLOBAL: CARMA2_CHEAT 0x0069318c
 int gINT_0068b8e8;
 
 // GLOBAL: CARMA2_HW 0x0068b8ec
 // GLOBAL: CARMA2_SW 0x00685e4c
+// GLOBAL: CARMA2_CHEAT 0x00693190
 int gSave_game_out_of_sync;
 
 // GLOBAL: CARMA2_HW 0x0068c72c
 // GLOBAL: CARMA2_SW 0x0068677c
+// GLOBAL: CARMA2_CHEAT 0x00693fcc
 tSave_game* gSaved_games;
 
 // GLOBAL: CARMA2_HW 0x0068c728
 // GLOBAL: CARMA2_SW 0x00686778
+// GLOBAL: CARMA2_CHEAT 0x00693fc8
 int gCount_saved_games;
 
 // Encryptificate
 
 // FUNCTION: CARMA2_HW 0x004919a0
 // FUNCTION: CARMA2_SW 0x0048ec10
+// FUNCTION: CARMA2_CHEAT 0x00491a50
 void C2_HOOK_FASTCALL MakeSavedGame(tSave_game* pSave_game) {
     int i;
 
@@ -65,18 +70,21 @@ void C2_HOOK_FASTCALL MakeSavedGame(tSave_game* pSave_game) {
 
 // STUB: CARMA2_HW 0x00491ac0
 // STUB: CARMA2_SW 0x0048ed30
+// STUB: CARMA2_CHEAT 0x00491b70
 void C2_HOOK_FASTCALL DoSaveGame(void) {
     NOT_IMPLEMENTED();
 }
 
 // STUB: CARMA2_HW 0x00491bb0
 // STUB: CARMA2_SW 0x0048ee20
+// STUB: CARMA2_CHEAT 0x00491c60
 int C2_HOOK_FASTCALL StartSavedGamesList(void) {
     NOT_IMPLEMENTED();
 }
 
 // FUNCTION: CARMA2_HW 0x00491c90
 // FUNCTION: CARMA2_SW 0x0048ef00
+// FUNCTION: CARMA2_CHEAT 0x00491d40
 void C2_HOOK_FASTCALL EndSavedGamesList(void) {
 
     if (gSaved_games != NULL) {
@@ -87,6 +95,7 @@ void C2_HOOK_FASTCALL EndSavedGamesList(void) {
 
 // FUNCTION: CARMA2_HW 0x00491cb0
 // FUNCTION: CARMA2_SW 0x0048ef20
+// FUNCTION: CARMA2_CHEAT 0x00491d60
 tSave_game* C2_HOOK_FASTCALL GetNthSavedGame(int pN) {
 
     if (gSaved_games != NULL && pN < gCount_saved_games) {
@@ -97,6 +106,7 @@ tSave_game* C2_HOOK_FASTCALL GetNthSavedGame(int pN) {
 
 // FUNCTION: CARMA2_HW 0x00491ce0
 // FUNCTION: CARMA2_SW 0x0048ef50
+// FUNCTION: CARMA2_CHEAT 0x00491d90
 int C2_HOOK_FASTCALL DoLoadGame2(tSave_game* pSave_game) {
     int i;
 
@@ -130,6 +140,7 @@ int C2_HOOK_FASTCALL DoLoadGame2(tSave_game* pSave_game) {
 
 // FUNCTION: CARMA2_HW 0x00491e20
 // FUNCTION: CARMA2_SW 0x0048f090
+// FUNCTION: CARMA2_CHEAT 0x00491ed0
 int C2_HOOK_FASTCALL DoLoadGame(int pIndex) {
 
     if (gSaved_games != NULL && pIndex >= 0 && pIndex < gCount_saved_games) {

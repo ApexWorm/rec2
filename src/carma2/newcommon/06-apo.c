@@ -44,6 +44,7 @@ void C2_HOOK_FASTCALL ImprovePSPowerup(tCar_spec* pCar, int pIndex) {
 
 // FUNCTION: CARMA2_HW 0x00502e50
 // FUNCTION: CARMA2_SW 0x004fe7a0
+// FUNCTION: CARMA2_CHEAT 0x00508af0
 void C2_HOOK_FASTCALL BuyArmour(void) {
 
     if (gINT_0068b8e4 == 0 && gINT_0068b8e8 == 0) {
@@ -53,6 +54,7 @@ void C2_HOOK_FASTCALL BuyArmour(void) {
 
 // FUNCTION: CARMA2_HW 0x00502e70
 // FUNCTION: CARMA2_SW 0x004fe7c0
+// FUNCTION: CARMA2_CHEAT 0x00508b10
 void C2_HOOK_FASTCALL BuyPSPowerup(int pIndex) {
     char message[256];
     char cost[256];
@@ -78,6 +80,7 @@ void C2_HOOK_FASTCALL BuyPSPowerup(int pIndex) {
 
 // FUNCTION: CARMA2_HW 0x00502fd0
 // FUNCTION: CARMA2_SW 0x004fe920
+// FUNCTION: CARMA2_CHEAT 0x00508c70
 void C2_HOOK_FASTCALL BuyPower(void) {
 
     if (gINT_0068b8e4 == 0 && gINT_0068b8e8 == 0) {
@@ -91,6 +94,7 @@ void C2_HOOK_FASTCALL BuyPower(void) {
 
 // FUNCTION: CARMA2_HW 0x00503030
 // FUNCTION: CARMA2_SW 0x004fe980
+// FUNCTION: CARMA2_CHEAT 0x00508cd0
 void C2_HOOK_FASTCALL BuyOffense(void) {
 
     if (gINT_0068b8e4 == 0 && gINT_0068b8e8 == 0) {

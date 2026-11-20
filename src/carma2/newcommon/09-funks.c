@@ -19,29 +19,36 @@
 
 // GLOBAL: CARMA2_HW 0x0068b840
 // GLOBAL: CARMA2_SW 0x00685da0
+// GLOBAL: CARMA2_CHEAT 0x006930e8
 br_scalar gSight_distance_squared;
 
 // GLOBAL: CARMA2_HW 0x0068b84c
 // GLOBAL: CARMA2_SW 0x00685dac
+// GLOBAL: CARMA2_CHEAT 0x006930f4
 tFunkotronic_spec* gFunkotronics_array;
 
 // GLOBAL: CARMA2_HW 0x0068b850
 // GLOBAL: CARMA2_SW 0x00685db0
+// GLOBAL: CARMA2_CHEAT 0x006930f8
 tGroovidelic_spec* gGroovidelics_array;
 
 // GLOBAL: CARMA2_HW 0x0068b848
 // GLOBAL: CARMA2_SW 0x00685da8
+// GLOBAL: CARMA2_CHEAT 0x006930f0
 int gGroovidelics_array_size;
 
 // GLOBAL: CARMA2_HW 0x0068b838
 // GLOBAL: CARMA2_SW 0x00685d98
+// GLOBAL: CARMA2_CHEAT 0x006930e0
 tU32 gPrevious_groove_times[2];
 
 // GLOBAL: CARMA2_HW 0x00688b30
+// GLOBAL: CARMA2_CHEAT 0x006903d8
 tGroove_funk_binding gGroove_funk_bindings[1440];
 
 // GLOBAL: CARMA2_HW 0x0068b844
 // GLOBAL: CARMA2_SW 0x00685da4
+// GLOBAL: CARMA2_CHEAT 0x006930ec
 int gFunkotronics_array_size;
 
 inline int C2_HOOK_FASTCALL CalculateTextureBitsValue(tFunk_texturebits* pTexturebits) {
@@ -68,6 +75,7 @@ inline float C2_HOOK_FASTCALL MapSawToTriangle(float pNumber) {
 
 // FUNCTION: CARMA2_HW 0x00474880
 // FUNCTION: CARMA2_SW 0x00473de0
+// FUNCTION: CARMA2_CHEAT 0x00474c00
 void C2_HOOK_STDCALL SetSightDistance(br_scalar pYon) {
 
     gSight_distance_squared = (br_scalar)REC2_SQR(pYon * 1.02);
@@ -76,6 +84,7 @@ void C2_HOOK_STDCALL SetSightDistance(br_scalar pYon) {
 // AddFunkGrooveBinding
 
 // FUNCTION: CARMA2_HW 0x004748a0
+// FUNCTION: CARMA2_CHEAT 0x00474c20
 void C2_HOOK_FASTCALL ControlBoundFunkGroove(int pSlot_number, float pValue) {
 
     C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tGroove_funk_binding, field_0x4, 0x4);
@@ -102,12 +111,14 @@ void C2_HOOK_FASTCALL ControlBoundFunkGroove(int pSlot_number, float pValue) {
 
 // STUB: CARMA2_HW 0x00474950
 // STUB: CARMA2_SW 0x00473eb0
+// STUB: CARMA2_CHEAT 0x00474cd0
 void C2_HOOK_FASTCALL DisposeFunkotronics(int pOwner) {
     NOT_IMPLEMENTED();
 }
 
 // FUNCTION: CARMA2_HW 0x004761e0
 // FUNCTION: CARMA2_SW 0x00475740
+// FUNCTION: CARMA2_CHEAT 0x00476560
 br_uint_32 C2_HOOK_FASTCALL CalcProximities(br_actor* pActor, br_material* pMat, void* pData) {
     tFunkotronic_spec* the_funk;
     br_face* the_face;
@@ -139,6 +150,7 @@ br_uint_32 C2_HOOK_FASTCALL CalcProximities(br_actor* pActor, br_material* pMat,
 
 // FUNCTION: CARMA2_HW 0x00476430
 // FUNCTION: CARMA2_SW 0x00475990
+// FUNCTION: CARMA2_CHEAT 0x004767b0
 void C2_HOOK_FASTCALL DisposeGroovidelics(int pOwner) {
     tGroovidelic_spec* the_groove;
     int i;
@@ -159,6 +171,7 @@ void C2_HOOK_FASTCALL DisposeGroovidelics(int pOwner) {
 
 // FUNCTION: CARMA2_HW 0x00477160
 // FUNCTION: CARMA2_SW 0x004766c0
+// FUNCTION: CARMA2_CHEAT 0x004774e0
 void C2_HOOK_FASTCALL KillGroovadelic(int pOwner) {
     int i;
     tGroovidelic_spec* the_groove;
@@ -178,6 +191,7 @@ void C2_HOOK_FASTCALL KillGroovadelic(int pOwner) {
 
 // FUNCTION: CARMA2_HW 0x004771c0
 // FUNCTION: CARMA2_SW 0x00476720
+// FUNCTION: CARMA2_CHEAT 0x00477540
 void C2_HOOK_FASTCALL KillFunkotronic(int pOwner) {
     int i;
     tFunkotronic_spec* the_funk;
@@ -235,6 +249,7 @@ void C2_HOOK_FASTCALL KillFunkotronic(int pOwner) {
 
 // FUNCTION: CARMA2_HW 0x00478e30
 // FUNCTION: CARMA2_SW 0x00478390
+// FUNCTION: CARMA2_CHEAT 0x004791b0
 void C2_HOOK_FASTCALL PathGrooveBastard(tGroovidelic_spec* pGroove, tU32 pTime, br_matrix34* pMat, int pInterrupt_it) {
     br_scalar pos;
 
@@ -407,6 +422,7 @@ void C2_HOOK_FASTCALL PathGrooveBastard(tGroovidelic_spec* pGroove, tU32 pTime, 
 
 // FUNCTION: CARMA2_HW 0x00479890
 // FUNCTION: CARMA2_SW 0x00478df0
+// FUNCTION: CARMA2_CHEAT 0x00479c10
 void C2_HOOK_FASTCALL ObjectGrooveBastard(tGroovidelic_spec* pGroove, tU32 pTime, br_matrix34* pMat, int pInterrupt_it) {
     int rock_it;
     br_scalar x_size;
@@ -520,6 +536,7 @@ void C2_HOOK_FASTCALL ObjectGrooveBastard(tGroovidelic_spec* pGroove, tU32 pTime
 
 // FUNCTION: CARMA2_HW 0x00478c80
 // FUNCTION: CARMA2_SW 0x004781e0
+// FUNCTION: CARMA2_CHEAT 0x00479000
 void C2_HOOK_FASTCALL GrooveThisDelic(tGroovidelic_spec* pGroove, tU32 pTime, int pInterrupt_it) {
     br_actor* the_actor;
     br_vector3 actor_pos;
@@ -579,6 +596,7 @@ void C2_HOOK_FASTCALL GrooveThisDelic(tGroovidelic_spec* pGroove, tU32 pTime, in
 
 // FUNCTION: CARMA2_HW 0x00478c00
 // FUNCTION: CARMA2_SW 0x00478160
+// FUNCTION: CARMA2_CHEAT 0x00478f80
 void C2_HOOK_FASTCALL GrooveThoseDelics(void) {
     tGroovidelic_spec* the_groove;
     float f_the_time;
@@ -598,6 +616,7 @@ void C2_HOOK_FASTCALL GrooveThoseDelics(void) {
 
 // FUNCTION: CARMA2_HW 0x0047b0e0
 // FUNCTION: CARMA2_SW 0x0047a640
+// FUNCTION: CARMA2_CHEAT 0x0047b460
 void C2_HOOK_FASTCALL StopGroovidelic(br_actor* pActor) {
     tGroovidelic_spec* the_groove;
     int i;
@@ -615,6 +634,7 @@ void C2_HOOK_FASTCALL StopGroovidelic(br_actor* pActor) {
 
 // FUNCTION: CARMA2_HW 0x0047b130
 // FUNCTION: CARMA2_SW 0x0047a690
+// FUNCTION: CARMA2_CHEAT 0x0047b4b0
 void C2_HOOK_FASTCALL DisableGroovidelic(br_actor* pActor, tU32 pBlock_flags) {
     tGroovidelic_spec* the_groove;
     int i;
@@ -630,6 +650,7 @@ void C2_HOOK_FASTCALL DisableGroovidelic(br_actor* pActor, tU32 pBlock_flags) {
 
 // FUNCTION: CARMA2_HW 0x0047b160
 // FUNCTION: CARMA2_SW 0x0047a6c0
+// FUNCTION: CARMA2_CHEAT 0x0047b4e0
 void C2_HOOK_FASTCALL EnableGroovidelic(br_actor* pActor, tU32 pBlock_flags) {
     tGroovidelic_spec* the_groove;
     int i;
@@ -645,6 +666,7 @@ void C2_HOOK_FASTCALL EnableGroovidelic(br_actor* pActor, tU32 pBlock_flags) {
 
 // FUNCTION: CARMA2_HW 0x0047b1a0
 // FUNCTION: CARMA2_SW 0x0047a700
+// FUNCTION: CARMA2_CHEAT 0x0047b520
 void C2_HOOK_FASTCALL SetGrooveInterrupt(int pIndex, const br_matrix34* pMatrix, tInterrupt_status pPath_interrupt_status, tInterrupt_status pObject_interrupt_status, float pPath_resumption_value, float pObject_resumption_value) {
     tGroovidelic_spec* the_groove;
 
@@ -658,6 +680,7 @@ void C2_HOOK_FASTCALL SetGrooveInterrupt(int pIndex, const br_matrix34* pMatrix,
 
 // FUNCTION: CARMA2_HW 0x0047b1e0
 // FUNCTION: CARMA2_SW 0x0047a740
+// FUNCTION: CARMA2_CHEAT 0x0047b560
 void C2_HOOK_FASTCALL ResetGrooveFlags(void) {
     int i;
     tGroovidelic_spec* the_groove;
@@ -675,6 +698,7 @@ void C2_HOOK_FASTCALL ResetGrooveFlags(void) {
 
 // FUNCTION: CARMA2_HW 0x0047b210
 // FUNCTION: CARMA2_SW 0x0047a770
+// FUNCTION: CARMA2_CHEAT 0x0047b590
 intptr_t C2_HOOK_CDECL DelGrooveRef(br_actor* pActor, void* pArg) {
     tGroovidelic_spec* the_groove;
     int i;
@@ -689,6 +713,7 @@ intptr_t C2_HOOK_CDECL DelGrooveRef(br_actor* pActor, void* pArg) {
 
 // FUNCTION: CARMA2_HW 0x0047b250
 // FUNCTION: CARMA2_SW 0x0047a7b0
+// FUNCTION: CARMA2_CHEAT 0x0047b5d0
 void C2_HOOK_FASTCALL DisableFunkotronic(int pIndex) {
     gFunkotronics_array[pIndex].flags |= 0x1;
     PipeSingleFunkEnable(pIndex, 0);
@@ -696,6 +721,7 @@ void C2_HOOK_FASTCALL DisableFunkotronic(int pIndex) {
 
 // FUNCTION: CARMA2_HW 0x0047b280
 // FUNCTION: CARMA2_SW 0x0047a7e0
+// FUNCTION: CARMA2_CHEAT 0x0047b600
 void C2_HOOK_FASTCALL EnableFunkotronic(int pIndex) {
     gFunkotronics_array[pIndex].flags &= ~0x1;
     PipeSingleFunkEnable(pIndex, 1);
@@ -703,18 +729,21 @@ void C2_HOOK_FASTCALL EnableFunkotronic(int pIndex) {
 
 // FUNCTION: CARMA2_HW 0x0047b2b0
 // FUNCTION: CARMA2_SW 0x0047a810
+// FUNCTION: CARMA2_CHEAT 0x0047b630
 void C2_HOOK_FASTCALL MasterDisableFunkotronic(int pIndex) {
     gFunkotronics_array[pIndex].flags |= 0x2;
 }
 
 // FUNCTION: CARMA2_HW 0x0047b2e0
 // FUNCTION: CARMA2_SW 0x0047a840
+// FUNCTION: CARMA2_CHEAT 0x0047b660
 void C2_HOOK_FASTCALL MasterEnableFunkotronic(int pIndex) {
     gFunkotronics_array[pIndex].flags &= ~0x2;
 }
 
 // FUNCTION: CARMA2_HW 0x0047b310
 // FUNCTION: CARMA2_SW 0x0047a870
+// FUNCTION: CARMA2_CHEAT 0x0047b690
 void C2_HOOK_FASTCALL AdjustFunkEnable(int pIndex, tS16 pFlags) {
     if (pFlags != 0) {
         EnableFunkotronic(pIndex);
@@ -725,6 +754,7 @@ void C2_HOOK_FASTCALL AdjustFunkEnable(int pIndex, tS16 pFlags) {
 
 // FUNCTION: CARMA2_HW 0x0047b360
 // FUNCTION: CARMA2_SW 0x0047a8c0
+// FUNCTION: CARMA2_CHEAT 0x0047b6e0
 tGroovidelic_spec* C2_HOOK_FASTCALL ActorsGroove(br_actor* pActor) {
     tGroovidelic_spec* groove;
     int count;

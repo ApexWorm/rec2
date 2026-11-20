@@ -14,6 +14,7 @@
 
 // STUB: CARMA2_HW 0x00575950
 // STUB: CARMA2_SW 0x00570ff0
+// STUB: CARMA2_CHEAT 0x0057b540
 OSErr C2_HOOK_CDECL InitializeQTML(long flag) {
     (void)flag;
     return (OSErr)0xf7d3;
@@ -34,6 +35,7 @@ void DisposeHandle(Handle h) {
 
 // STUB: CARMA2_HW 0x0056a8e0
 // STUB: CARMA2_SW 0x00565f80
+// STUB: CARMA2_CHEAT 0x005704d0
 OSErr EnterMovies(void) {
     return 0x1;
 }

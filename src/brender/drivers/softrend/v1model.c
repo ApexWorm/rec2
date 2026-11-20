@@ -702,6 +702,7 @@ br_error C2_HOOK_STDCALL V1Model_Render(br_geometry_v1_model_soft* self, br_soft
 
 // FUNCTION: CARMA2_HW 0x00542930
 // FUNCTION: CARMA2_SW 0x0053dfd0
+// FUNCTION: CARMA2_CHEAT 0x00548520
 br_error C2_HOOK_CDECL _M_br_geometry_v1_model_soft_render(br_geometry_v1_model_soft* self, br_renderer* renderer, v11model* model, br_renderer_state_stored* default_state, br_token type) {
     br_error r;
 
@@ -712,6 +713,7 @@ br_error C2_HOOK_CDECL _M_br_geometry_v1_model_soft_render(br_geometry_v1_model_
 
 // FUNCTION: CARMA2_HW 0x00543a10
 // FUNCTION: CARMA2_SW 0x0053f0b0
+// FUNCTION: CARMA2_CHEAT 0x00549600
 br_error C2_HOOK_CDECL _M_br_geometry_v1_model_soft_renderOnScreen(br_geometry_v1_model_soft* self, br_renderer* renderer, v11model* model, br_renderer_state_stored* default_state, br_token type) {
     br_error r;
 

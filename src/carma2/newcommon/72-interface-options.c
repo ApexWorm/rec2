@@ -12,6 +12,7 @@
 
 // GLOBAL: CARMA2_HW 0x00632c60
 // GLOBAL: CARMA2_SW 0x0062db90
+// GLOBAL: CARMA2_CHEAT 0x006394e0
 tFrontend_spec gFrontend_OPTIONS = {
 #if 0 // FIXME: enable this
     "Options",

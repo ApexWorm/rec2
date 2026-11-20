@@ -37,6 +37,21 @@ targets:
       sha256: ef260578158ed2d82ac1428f84b94c37d246d06e0863ab53c748965696b53d3f
     report:
       icon: reccmp/icons/app.png
+  CARMA2_CHEAT:
+    filename: Carma 2 (HW Cheat 024).exe
+    source_root:
+      - src/brender
+      - src/carma2/hooks
+      - src/carma2/newcommon
+      - src/carma2/platform
+      - src/carma2/s3
+      - external/dummyqt
+    data-sources:
+      - reccmp/carma2_cheat-mslibc.csv
+    hash:
+      sha256: 9981b70bb222b2ecd5d1d74f186f120b01fdeef1d2dad9d10682416c4b1a92c8
+    report:
+      icon: reccmp/icons/app.png
   D3D:
     filename: d3d.bdd
     source_root: src/brender/drivers/d3d

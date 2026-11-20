@@ -15,12 +15,14 @@
 
 
 // GLOBAL: CARMA2_HW 0x006b0a50
+// GLOBAL: CARMA2_CHEAT 0x006b80e0
 void* exceptionValue;
 
 // GLOBAL: CARMA2_HW 0x006b0a54
 br_exception_handler* _BrExceptionHandler;
 
 // FUNCTION: CARMA2_HW 0x0053f510
+// FUNCTION: CARMA2_CHEAT 0x00545100
 br_exception_handler* C2_HOOK_CDECL _BrExceptionBegin(void) {
     br_exception_handler* h;
 
@@ -31,6 +33,7 @@ br_exception_handler* C2_HOOK_CDECL _BrExceptionBegin(void) {
 }
 
 // FUNCTION: CARMA2_HW 0x0053f530
+// FUNCTION: CARMA2_CHEAT 0x00545120
 void C2_HOOK_CDECL _BrExceptionEnd(void) {
     br_exception_handler* old;
 
@@ -43,6 +46,7 @@ void C2_HOOK_CDECL _BrExceptionEnd(void) {
 }
 
 // FUNCTION: CARMA2_HW 0x0053f560
+// FUNCTION: CARMA2_CHEAT 0x00545150
 void C2_HOOK_CDECL _BrExceptionThrow(br_int_32 type, void* value) {
     br_exception_handler h;
     br_exception_handler* old;
@@ -59,6 +63,7 @@ void C2_HOOK_CDECL _BrExceptionThrow(br_int_32 type, void* value) {
 }
 
 // FUNCTION: CARMA2_HW 0x0053f5c0
+// FUNCTION: CARMA2_CHEAT 0x005451b0
 br_exception C2_HOOK_CDECL _BrExceptionValueFetch(br_exception type, void** evp) {
 
     if (type != 0 && evp != NULL) {
@@ -68,6 +73,7 @@ br_exception C2_HOOK_CDECL _BrExceptionValueFetch(br_exception type, void** evp)
 }
 
 // FUNCTION: CARMA2_HW 0x0053f5e0
+// FUNCTION: CARMA2_CHEAT 0x005451d0
 void* C2_HOOK_CDECL _BrExceptionResource(void) {
 
     return _BrExceptionHandler;

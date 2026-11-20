@@ -23,16 +23,19 @@
 
 // GLOBAL: CARMA2_HW 0x0065e560
 // GLOBAL: CARMA2_SW 0x00658e98
+// GLOBAL: CARMA2_CHEAT 0x00665c18
 const char* gForm_non_humanoid_names[1] = {
     "NONHUMANOID",
 };
 
 // GLOBAL: CARMA2_HW 0x00705c80
 // GLOBAL: CARMA2_SW 0x006fc740
+// GLOBAL: CARMA2_CHEAT 0x0070d320
 tTintedPoly gTintedPolys[10] = {0};
 
 // GLOBAL: CARMA2_HW 0x007447a0
 // GLOBAL: CARMA2_SW 0x0073b260
+// GLOBAL: CARMA2_CHEAT 0x0074be40
 int gGhost_pedestrians = 0;
 
 // GLOBAL: CARMA2_HW 0x006a0430
@@ -87,14 +90,17 @@ int gFire_poly_short_iteration;
 
 // GLOBAL: CARMA2_HW 0x006a0444
 // GLOBAL: CARMA2_SW 0x0069a49c
+// GLOBAL: CARMA2_CHEAT 0x006a7fbc
 int gFire_poly_iteration;
 
 // GLOBAL: CARMA2_HW 0x006a0448
 // GLOBAL: CARMA2_SW 0x0069a4a0
+// GLOBAL: CARMA2_CHEAT 0x006a7fc0
 int gFire_poly_enabled_006a0448;
 
 // GLOBAL: CARMA2_HW 0x006a044c
 // GLOBAL: CARMA2_SW 0x0069a4a4
+// GLOBAL: CARMA2_CHEAT 0x006a7fc4
 int gFire_poly_delayed_iteration;
 
 // GLOBAL: CARMA2_HW 0x0065e874
@@ -109,6 +115,7 @@ br_colour* gTinted_original_palette_colours;
 
 // FUNCTION: CARMA2_HW 0x004d7040
 // FUNCTION: CARMA2_SW 0x004d3640
+// FUNCTION: CARMA2_CHEAT 0x004dcc00
 void C2_HOOK_FASTCALL InitTintedPolyStuff(void) {
     br_camera *camera;
 
@@ -169,6 +176,7 @@ static void C2_HOOK_FASTCALL GetRangeOfValuesFromPixelmap(br_pixelmap* pMap, int
 
 // FUNCTION: CARMA2_HW 0x004d70c0
 // FUNCTION: CARMA2_SW 0x004d36c0
+// FUNCTION: CARMA2_CHEAT 0x004dcc80
 int C2_HOOK_FASTCALL CreateTintedPoly(int x0, int y0, int width, int height, int class, int arg1, int arg2, int arg3) {
     tPath_name the_path;
     int i;
@@ -345,6 +353,7 @@ int C2_HOOK_FASTCALL CreateTintedPoly(int x0, int y0, int width, int height, int
 
 // FUNCTION: CARMA2_HW 0x004d7ad0
 // FUNCTION: CARMA2_SW 0x004d3fe0
+// FUNCTION: CARMA2_CHEAT 0x004dd690
 br_model* C2_HOOK_FASTCALL BuildTintedPolyModel(int x0, int y0, int width, int height, int nbX, int nbY) {
     br_model* model;
     int dx;
@@ -400,6 +409,7 @@ br_model* C2_HOOK_FASTCALL BuildTintedPolyModel(int x0, int y0, int width, int h
 
 // FUNCTION: CARMA2_HW 0x004d7c80
 // FUNCTION: CARMA2_SW 0x004d4190
+// FUNCTION: CARMA2_CHEAT 0x004dd840
 inline void C2_HOOK_FASTCALL FreeTintedPolyActor(int pTintedIndex) {
     if (!gTintedPolys[pTintedIndex].used) {
         return;
@@ -423,6 +433,7 @@ inline void C2_HOOK_FASTCALL FreeTintedPolyActor(int pTintedIndex) {
 
 // FUNCTION: CARMA2_HW 0x004d7d10
 // FUNCTION: CARMA2_SW 0x004d4220
+// FUNCTION: CARMA2_CHEAT 0x004dd8d0
 void C2_HOOK_FASTCALL FreeAllTintedPolyActor(void) {
     int i;
 
@@ -433,6 +444,7 @@ void C2_HOOK_FASTCALL FreeAllTintedPolyActor(void) {
 
 // FUNCTION: CARMA2_HW 0x004d7d80
 // FUNCTION: CARMA2_SW 0x004d4290
+// FUNCTION: CARMA2_CHEAT 0x004dd940
 void C2_HOOK_FASTCALL UpdateTintedPolyByMaterial(int pIndex) {
     br_uint_32 new_grn, new_blu, new_red;
     tU32 time;
@@ -558,6 +570,7 @@ void C2_HOOK_FASTCALL UpdateTintedPalette(int pIndex) {
 
 // FUNCTION: CARMA2_HW 0x004d8220
 // FUNCTION: CARMA2_SW 0x004d46f0
+// FUNCTION: CARMA2_CHEAT 0x004ddde0
 void C2_HOOK_FASTCALL TurnTintedPolyOn(int pTintedIndex) {
 #ifdef REC2_HW
     if (gTintedPolys[pTintedIndex].used) {
@@ -581,6 +594,7 @@ void C2_HOOK_FASTCALL TurnTintedPolyOn(int pTintedIndex) {
 
 // FUNCTION: CARMA2_HW 0x004d8250
 // FUNCTION: CARMA2_SW 0x004d4770
+// FUNCTION: CARMA2_CHEAT 0x004dde10
 void C2_HOOK_FASTCALL TurnTintedPolyOff(int pTintedIndex) {
 #ifdef REC2_HW
     if (gTintedPolys[pTintedIndex].used) {
@@ -606,6 +620,7 @@ void C2_HOOK_FASTCALL TurnTintedPolyOff(int pTintedIndex) {
 
 // FUNCTION: CARMA2_HW 0x004d8290
 // FUNCTION: CARMA2_SW 0x004d47d0
+// FUNCTION: CARMA2_CHEAT 0x004dde50
 void C2_HOOK_FASTCALL RenderTintedPolys(void) {
 #ifdef REC2_HW
     BrZbsSceneRender(gTintedPolyCamera, gTintedPolyCamera, gBack_screen, gDepth_buffer);
@@ -614,6 +629,7 @@ void C2_HOOK_FASTCALL RenderTintedPolys(void) {
 
 // FUNCTION: CARMA2_HW 0x004d8350
 // FUNCTION: CARMA2_SW 0x004d4880
+// FUNCTION: CARMA2_CHEAT 0x004ddf10
 void C2_HOOK_FASTCALL SetTintedPolyRefMaterial(int pTintedIndex, br_vector3* pPosition) {
     tSpecial_volume* volume;
     br_vector3 dir;
@@ -648,6 +664,7 @@ void C2_HOOK_FASTCALL SetTintedPolyRefMaterial(int pTintedIndex, br_vector3* pPo
 
 // FUNCTION: CARMA2_HW 0x004d82b0
 // FUNCTION: CARMA2_SW 0x004d47e0
+// FUNCTION: CARMA2_CHEAT 0x004dde70
 void C2_HOOK_FASTCALL SetTintedPolyColour(int pTintedIndex, int pRed, int pGreen, int pBlue) {
     int changed;
 
@@ -672,6 +689,7 @@ void C2_HOOK_FASTCALL SetTintedPolyColour(int pTintedIndex, int pRed, int pGreen
 
 // FUNCTION: CARMA2_HW 0x004d8470
 // FUNCTION: CARMA2_SW 0x004d49a0
+// FUNCTION: CARMA2_CHEAT 0x004de030
 br_material* C2_HOOK_FASTCALL InWater(int pTintedIndex) {
 
     if (gTintedPolys[pTintedIndex].field_0x28 == '#') {
@@ -713,6 +731,7 @@ static void C2_HOOK_FASTCALL UpdatePulsePoly(int pIndex) {
 
 // FUNCTION: CARMA2_HW 0x004d84a0
 // FUNCTION: CARMA2_SW 0x004d49d0
+// FUNCTION: CARMA2_CHEAT 0x004de060
 void C2_HOOK_FASTCALL ProcessTintedPoly(int pIndex) {
 
     if (gTintedPolys[pIndex].used) {
@@ -751,6 +770,7 @@ void C2_HOOK_FASTCALL ProcessTintedPoly(int pIndex) {
 
 // FUNCTION: CARMA2_HW 0x004d8630
 // FUNCTION: CARMA2_SW 0x004d4b60
+// FUNCTION: CARMA2_CHEAT 0x004de1f0
 void C2_HOOK_FASTCALL UpdatePolyVertexColours(int pIndex) {
     int i;
     int new_color;
@@ -800,6 +820,7 @@ void C2_HOOK_FASTCALL GetUniqueFileName(const char *pDirectory, const char *pExt
 
 // FUNCTION: CARMA2_HW 0x004d86e0
 // FUNCTION: CARMA2_SW 0x004d4c10
+// FUNCTION: CARMA2_CHEAT 0x004de2a0
 void C2_HOOK_FASTCALL UpdateFirePoly(int pIndex) {
     int i;
     int j;
@@ -873,6 +894,7 @@ void C2_HOOK_FASTCALL UpdateFirePoly(int pIndex) {
 
 // FUNCTION: CARMA2_HW 0x004d8a20
 // FUNCTION: CARMA2_SW 0x004d4f50
+// FUNCTION: CARMA2_CHEAT 0x004de5e0
 void C2_HOOK_FASTCALL UpdateTintedPolys(void) {
     int i;
 
@@ -883,6 +905,7 @@ void C2_HOOK_FASTCALL UpdateTintedPolys(void) {
 
 // FUNCTION: CARMA2_HW 0x004d8bb0
 // FUNCTION: CARMA2_SW 0x004d50e0
+// FUNCTION: CARMA2_CHEAT 0x004de770
 void C2_HOOK_FASTCALL SetTintedPolySize(int pTintedIndex, int x0, int y0, int width, int height) {
     tTintedPoly* tinted;
     int nb_x;
@@ -925,6 +948,7 @@ void C2_HOOK_FASTCALL SetTintedPolySize(int pTintedIndex, int x0, int y0, int wi
 
 // FUNCTION: CARMA2_HW 0x004d8cf0
 // FUNCTION: CARMA2_SW 0x004d5220
+// FUNCTION: CARMA2_CHEAT 0x004de8b0
 int C2_HOOK_FASTCALL TintedPolyIsOn(int pIndex) {
 
   return gTintedPolys[pIndex].visible;

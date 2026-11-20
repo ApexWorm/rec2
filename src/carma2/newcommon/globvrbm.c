@@ -13,12 +13,14 @@
 br_actor* gPrat_actor;
 
 // GLOBAL: CARMA2_HW 0x0074cac4
+// GLOBAL: CARMA2_CHEAT 0x00754164
 br_actor* g2d_camera;
 
 // GLOBAL: CARMA2_HW 0x0074cf34
 br_actor* gPowerupHUD_actor;
 
 // GLOBAL: CARMA2_HW 0x0074ca7c
+// GLOBAL: CARMA2_CHEAT 0x0075411c
 br_actor* gStatbarHUD1_actor;
 
 // GLOBAL: CARMA2_HW 0x0074cab0
@@ -31,39 +33,49 @@ br_actor* gHUDsquare_actor;
 br_actor* gMapHUD_actor;
 
 // GLOBAL: CARMA2_HW 0x0074ca24
+// GLOBAL: CARMA2_CHEAT 0x007540c4
 br_actor* gTimerRightHUD_actor;
 
 // GLOBAL: CARMA2_HW 0x0074ca84
+// GLOBAL: CARMA2_CHEAT 0x00754124
 br_actor* gOffense_actor;
 
 // GLOBAL: CARMA2_HW 0x0074ca40
+// GLOBAL: CARMA2_CHEAT 0x007540e0
 br_actor* gTimerLeftHUD_actor;
 
 // GLOBAL: CARMA2_HW 0x0074ca98
+// GLOBAL: CARMA2_CHEAT 0x00754138
 br_actor* gPower_actor;
 
 // GLOBAL: CARMA2_HW 0x0074ca68
 br_actor* gHUDcurve_actor;
 
 // GLOBAL: CARMA2_HW 0x0074ca58
+// GLOBAL: CARMA2_CHEAT 0x007540f8
 br_actor* gStatbarRightHUD_actor;
 
 // GLOBAL: CARMA2_HW 0x0074cef4
+// GLOBAL: CARMA2_CHEAT 0x00754594
 br_actor* gHeadup_actor;
 
 // GLOBAL: CARMA2_HW 0x0074cf18
+// GLOBAL: CARMA2_CHEAT 0x007545b8
 br_actor* gStatbarHUD5_actor;
 
 // GLOBAL: CARMA2_HW 0x0074cf24
+// GLOBAL: CARMA2_CHEAT 0x007545c4
 br_actor* gDim_actor;
 
 // GLOBAL: CARMA2_HW 0x0074cf80
+// GLOBAL: CARMA2_CHEAT 0x00754620
 br_actor* gArmour_actor;
 
 // GLOBAL: CARMA2_HW 0x0074c9f8
 br_actor* gHUD_root_actor;
 
 // GLOBAL: CARMA2_HW 0x0074ca14
+// GLOBAL: CARMA2_CHEAT 0x007540b4
 br_actor* gStatbarHUD3_actor;
 
 // GLOBAL: CARMA2_HW 0x0074cabc
@@ -89,12 +101,14 @@ br_model* gHeadup_model;
 br_model* gHUDsquare_model;
 
 // GLOBAL: CARMA2_HW 0x0074cad8
+// GLOBAL: CARMA2_CHEAT 0x00754178
 br_model* gTimerRightHUD_model;
 
 // GLOBAL: CARMA2_HW 0x0074ca64
 br_model* gOffence_model;
 
 // GLOBAL: CARMA2_HW 0x0074cf88
+// GLOBAL: CARMA2_CHEAT 0x00754628
 br_model* gTimerLeftHUD_model;
 
 // GLOBAL: CARMA2_HW 0x0074cee0
@@ -116,6 +130,7 @@ br_model* gPowerupHUD_model;
 br_model* gHeadup2_model;
 
 // GLOBAL: CARMA2_HW 0x0074ca70
+// GLOBAL: CARMA2_CHEAT 0x00754110
 br_model* gDim_model;
 
 // GLOBAL: CARMA2_HW 0x0074cef8
@@ -132,12 +147,15 @@ br_material* gPowerupHUD_material;
 br_material* gTestFont_material;
 
 // GLOBAL: CARMA2_HW 0x0074ca38
+// GLOBAL: CARMA2_CHEAT 0x007540d8
 br_material* gArmour_material;
 
 // GLOBAL: CARMA2_HW 0x0074cf14
+// GLOBAL: CARMA2_CHEAT 0x007545b4
 br_material* gStatbarHUD1_material;
 
 // GLOBAL: CARMA2_HW 0x0074c9fc
+// GLOBAL: CARMA2_CHEAT 0x0075409c
 br_material* gStatbarHUD5_material;
 
 // GLOBAL: CARMA2_HW 0x0074cf50
@@ -147,9 +165,11 @@ br_material* gHeadup_material;
 br_material* gStatbarHUD3_material;
 
 // GLOBAL: CARMA2_HW 0x0074ca9c
+// GLOBAL: CARMA2_CHEAT 0x0075413c
 br_material* gOffence_material;
 
 // GLOBAL: CARMA2_HW 0x0074cf58
+// GLOBAL: CARMA2_CHEAT 0x007545f8
 br_material* gPower_material;
 
 // GLOBAL: CARMA2_HW 0x0074ca8c
@@ -168,6 +188,7 @@ br_material* gMapHUD_material;
 br_material* gHeadup2_material;
 
 // GLOBAL: CARMA2_HW 0x0074cac0
+// GLOBAL: CARMA2_CHEAT 0x00754160
 br_material* gTimerRightHUD_material;
 
 // GLOBAL: CARMA2_HW 0x0074cad4
@@ -177,6 +198,7 @@ br_material* gDim_material;
 br_material* gHUDsquare_material;
 
 // GLOBAL: CARMA2_HW 0x0074cf64
+// GLOBAL: CARMA2_CHEAT 0x00754604
 br_material* gTimerLeftHUD_material;
 
 
@@ -288,25 +310,31 @@ int gStatbarRightHUD_dim_y = 0xa;
 int gTimerLeftHUD_dim_w = 0x40;
 
 // GLOBAL: CARMA2_HW 0x00655ed8
+// GLOBAL: CARMA2_CHEAT 0x0065c758
 int gTimerLeftHUD_dim_h = 0x40;
 
 // GLOBAL: CARMA2_HW 0x00655edc
+// GLOBAL: CARMA2_CHEAT 0x0065c75c
 int gTimerLeftHUD_dim_x = 0x10e;
 
 // GLOBAL: CARMA2_HW 0x0068b900
+// GLOBAL: CARMA2_CHEAT 0x006931a4
 int gTimerLeftHUD_dim_y;
 
-
 // GLOBAL: CARMA2_HW 0x00655ee0
+// GLOBAL: CARMA2_CHEAT 0x0065c760
 int gTimerRightHUD_dim_w = 0x40;
 
 // GLOBAL: CARMA2_HW 0x00655ee4
+// GLOBAL: CARMA2_CHEAT 0x0065c764
 int gTimerRightHUD_dim_h = 0x40;
 
 // GLOBAL: CARMA2_HW 0x00655ee8
+// GLOBAL: CARMA2_CHEAT 0x0065c768
 int gTimerRightHUD_dim_x = 0x14e;
 
 // GLOBAL: CARMA2_HW 0x0068b904
+// GLOBAL: CARMA2_CHEAT 0x006931a8
 int gTimerRightHUD_dim_y;
 
 

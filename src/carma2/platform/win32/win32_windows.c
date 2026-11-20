@@ -86,6 +86,7 @@ void C2_HOOK_CDECL Win32ServiceMessages(void) {
 
 // FUNCTION: CARMA2_HW 0x0044c830
 // FUNCTION: CARMA2_SW 0x0044c5e0
+// FUNCTION: CARMA2_CHEAT 0x0044cd80
 void C2_HOOK_FASTCALL PDCloseReplayFile(void) {
     if (gAction_replay_buffer_file != NULL) {
         PFfclose(gAction_replay_buffer_file);

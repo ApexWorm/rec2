@@ -31,6 +31,7 @@
 
 // GLOBAL: CARMA2_HW 0x0058f808
 // GLOBAL: CARMA2_SW 0x0058a808
+// GLOBAL: CARMA2_CHEAT 0x00594898
 const char* gSoftness_names[6] = {
     "very_soft",
     "soft",
@@ -42,6 +43,7 @@ const char* gSoftness_names[6] = {
 
 // GLOBAL: CARMA2_HW 0x0058f848
 // GLOBAL: CARMA2_SW 0x0058a848
+// GLOBAL: CARMA2_CHEAT 0x005948d8
 const char* gCrush_type_names[3] = {
     "boring",
     "flap",
@@ -50,6 +52,7 @@ const char* gCrush_type_names[3] = {
 
 // GLOBAL: CARMA2_HW 0x0058f820
 // GLOBAL: CARMA2_SW 0x0058a820
+// GLOBAL: CARMA2_CHEAT 0x005948b0
 const char* gEase_of_detachment_names[5] = {
     "very_easy",
     "easy",
@@ -60,6 +63,7 @@ const char* gEase_of_detachment_names[5] = {
 
 // GLOBAL: CARMA2_HW 0x0058f858
 // GLOBAL: CARMA2_SW 0x0058a858
+// GLOBAL: CARMA2_CHEAT 0x005948e8
 const char* gCar_crush_shape_names[2] = {
     "box",
     "poly",
@@ -67,6 +71,7 @@ const char* gCar_crush_shape_names[2] = {
 
 // GLOBAL: CARMA2_HW 0x0058f838
 // GLOBAL: CARMA2_SW 0x0058a838
+// GLOBAL: CARMA2_CHEAT 0x005948c8
 const char* gDetach_type_names[] = {
     "normal",
     "stubborn",
@@ -75,46 +80,57 @@ const char* gDetach_type_names[] = {
 };
 // GLOBAL: CARMA2_HW 0x0067a290
 // GLOBAL: CARMA2_SW 0x00674a00
+// GLOBAL: CARMA2_CHEAT 0x00681b40
 tCrush_net_detach_list_item gNet_crush_detach_list[8];
 
 // GLOBAL: CARMA2_HW 0x0067b840
 // GLOBAL: CARMA2_SW 0x00675fb0
+// GLOBAL: CARMA2_CHEAT 0x006830f0
 tCrush_net_semi_detach_bit_list_item gNet_crush_semi_detach_bit_list[8];
 
 // GLOBAL: CARMA2_HW 0x0067b7d8
 // GLOBAL: CARMA2_SW 0x00675f48
+// GLOBAL: CARMA2_CHEAT 0x00683088
 tCrush_net_full_detach_bit_list_item gNet_crush_full_detach_bit_list[8];
 
 // GLOBAL: CARMA2_HW 0x00679558
 // GLOBAL: CARMA2_SW 0x00673cc8
+// GLOBAL: CARMA2_CHEAT 0x00680e08
 tCrush_detach_list_item gCrush_detach_list[16];
 
 // GLOBAL: CARMA2_HW 0x0067bd18
 // GLOBAL: CARMA2_SW 0x00676488
+// GLOBAL: CARMA2_CHEAT 0x006835c8
 tCar_damge_crush_list_item gCar_damage_crush_list[8];
 
 // GLOBAL: CARMA2_HW 0x00679698
 // GLOBAL: CARMA2_SW 0x00673e08
+// GLOBAL: CARMA2_CHEAT 0x00680f48
 br_scalar gDistortion_factor;
 
 // GLOBAL: CARMA2_HW 0x006796b0
 // GLOBAL: CARMA2_SW 0x00673e20
+// GLOBAL: CARMA2_CHEAT 0x00680f60
 br_scalar gForce_to_movement_factor;
 
 // GLOBAL: CARMA2_HW 0x00679550
 // GLOBAL: CARMA2_SW 0x00673cc0
+// GLOBAL: CARMA2_CHEAT 0x00680e00
 br_scalar gMax_detach_time_ms;
 
 // GLOBAL: CARMA2_HW 0x006796c8
 // GLOBAL: CARMA2_SW 0x00673e38
+// GLOBAL: CARMA2_CHEAT 0x00680f78
 tCrush_list_item gCrush_lists[8];
 
 // GLOBAL: CARMA2_HW 0x006796bc
 // GLOBAL: CARMA2_SW 0x00673e2c
+// GLOBAL: CARMA2_CHEAT 0x00680f6c
 int gCount_queued_drone_crushes;
 
 // GLOBAL: CARMA2_HW 0x0067bad0
 // GLOBAL: CARMA2_SW 0x00676240
+// GLOBAL: CARMA2_CHEAT 0x00683380
 int gCount_crush_detach_list;
 
 // GLOBAL: CARMA2_HW 0x0067bdfc
@@ -123,154 +139,192 @@ int gINT_0067bdfc;
 
 // GLOBAL: CARMA2_HW 0x0067be08
 // GLOBAL: CARMA2_SW 0x00676578
+// GLOBAL: CARMA2_CHEAT 0x006836b8
 tU8 gCrush_data_entry_counter;
 
 // GLOBAL: CARMA2_HW 0x0067bdf0
 // GLOBAL: CARMA2_SW 0x00676560
+// GLOBAL: CARMA2_CHEAT 0x006836a0
 int gCount_net_crush_detach_list;
 
 // GLOBAL: CARMA2_HW 0x0067b838
 // GLOBAL: CARMA2_SW 0x00675fa8
+// GLOBAL: CARMA2_CHEAT 0x006830e8
 int gCount_net_crush_semi_detach_bit_list;
 
 // GLOBAL: CARMA2_HW 0x0067bd60
 // GLOBAL: CARMA2_SW 0x006764d0
+// GLOBAL: CARMA2_CHEAT 0x00683610
 int gCount_net_crush_full_detach_bit_list;
 
 // GLOBAL: CARMA2_HW 0x0067b7cc
 // GLOBAL: CARMA2_SW 0x00675f3c
+// GLOBAL: CARMA2_CHEAT 0x0068307c
 int gCount_car_damage_crush_list;
 
 // GLOBAL: CARMA2_HW 0x006796b8
 // GLOBAL: CARMA2_SW 0x00673e28
+// GLOBAL: CARMA2_CHEAT 0x00680f68
 br_scalar gMin_crush_force;
 
 // GLOBAL: CARMA2_HW 0x0067944c
 // GLOBAL: CARMA2_SW 0x00673bbc
+// GLOBAL: CARMA2_CHEAT 0x00680cfc
 br_scalar gNormal_force_to_detach;
 
 // GLOBAL: CARMA2_HW 0x0067a18c
 // GLOBAL: CARMA2_SW 0x006748fc
+// GLOBAL: CARMA2_CHEAT 0x00681a3c
 br_scalar gMin_bend_angle;
 
 // GLOBAL: CARMA2_HW 0x0067b7b0
 // GLOBAL: CARMA2_SW 0x00675f20
+// GLOBAL: CARMA2_CHEAT 0x00683060
 int gMin_bend_damage;
 
 // GLOBAL: CARMA2_HW 0x0067b7b4
 // GLOBAL: CARMA2_SW 0x00675f24
+// GLOBAL: CARMA2_CHEAT 0x00683064
 br_scalar gFlap_inertia_fudge_biscuit;
 
 // GLOBAL: CARMA2_HW 0x0067b7d0
 // GLOBAL: CARMA2_SW 0x00675f40
+// GLOBAL: CARMA2_CHEAT 0x00683080
 int gMax_split_damage;
 
 // GLOBAL: CARMA2_HW 0x0067bac8
 // GLOBAL: CARMA2_SW 0x00676238
+// GLOBAL: CARMA2_CHEAT 0x00683378
 br_scalar gMin_force_to_split_XZ_per_tonne;
 
 // GLOBAL: CARMA2_HW 0x0067bacc
 // GLOBAL: CARMA2_SW 0x0067623c
+// GLOBAL: CARMA2_CHEAT 0x0068337c
 br_scalar gMax_crush_dist_sq;
 
 // GLOBAL: CARMA2_HW 0x0067be84
 // GLOBAL: CARMA2_SW 0x006765f4
+// GLOBAL: CARMA2_CHEAT 0x00683734
 tU32 gUINT_0067be84;
 
 // GLOBAL: CARMA2_HW 0x0067bd5c
 // GLOBAL: CARMA2_SW 0x006764cc
+// GLOBAL: CARMA2_CHEAT 0x0068360c
 br_scalar gMin_force_to_split_Y_per_tonne;
 
 // GLOBAL: CARMA2_HW 0x0067bd64
 // GLOBAL: CARMA2_SW 0x006764d4
+// GLOBAL: CARMA2_CHEAT 0x00683614
 int gMin_split_damage;
 
 // GLOBAL: CARMA2_HW 0x0067bdec
 // GLOBAL: CARMA2_SW 0x0067655c
+// GLOBAL: CARMA2_CHEAT 0x0068369c
 br_scalar gMax_crush_force;
 
 // GLOBAL: CARMA2_HW 0x0067bdf4
 // GLOBAL: CARMA2_SW 0x00676564
+// GLOBAL: CARMA2_CHEAT 0x006836a4
 int gMax_bend_damage;
 
 // GLOBAL: CARMA2_HW 0x0067bdf8
 // GLOBAL: CARMA2_SW 0x00676568
+// GLOBAL: CARMA2_CHEAT 0x006836a8
 br_scalar gTorque_to_snap_per_tonne;
 
 // GLOBAL: CARMA2_HW 0x0067be00
 // GLOBAL: CARMA2_SW 0x00676570
+// GLOBAL: CARMA2_CHEAT 0x006836b0
 br_scalar gChance_of_bending;
 
 // GLOBAL: CARMA2_HW 0x0067be04
 // GLOBAL: CARMA2_SW 0x00676574
+// GLOBAL: CARMA2_CHEAT 0x006836b4
 br_scalar gChance_of_inverse_buckle;
 
 // GLOBAL: CARMA2_HW 0x0067be78
 // GLOBAL: CARMA2_SW 0x006765e8
+// GLOBAL: CARMA2_CHEAT 0x00683728
 br_vector3 gBatty_gravity;
 
 // GLOBAL: CARMA2_HW 0x0067a190
 // GLOBAL: CARMA2_SW 0x00674900
+// GLOBAL: CARMA2_CHEAT 0x00681a40
 undefined4 gCrush_array_0067a190[10];
 
 // GLOBAL: CARMA2_HW 0x0067b7c8
 // GLOBAL: CARMA2_SW 0x00675f38
+// GLOBAL: CARMA2_CHEAT 0x00683078
 int gCount_net_crush_reattach_bit_list;
 
 // GLOBAL: CARMA2_HW 0x0067be10
 // GLOBAL: CARMA2_SW 0x00676580
+// GLOBAL: CARMA2_CHEAT 0x006836c0
 tCrush_net_reattach_bit_list_item gNet_crush_reattach_bit_list[8];
 
 // GLOBAL: CARMA2_HW 0x00679440
 // GLOBAL: CARMA2_SW 0x00673bb0
+// GLOBAL: CARMA2_CHEAT 0x00680cf0
 undefined4 gDAT_00679440;
 
 // GLOBAL: CARMA2_HW 0x006796a0
 // GLOBAL: CARMA2_SW 0x00673e10
+// GLOBAL: CARMA2_CHEAT 0x00680f50
 tCrush_info_buffer gDetached_bit_crush_info_buffer;
 
 // GLOBAL: CARMA2_HW 0x00679448
 // GLOBAL: CARMA2_SW 0x00673bb8
+// GLOBAL: CARMA2_CHEAT 0x00680cf8
 tPhysics_object* gDetached_bit_collision_infos;
 
 // GLOBAL: CARMA2_HW 0x006796ac
 // GLOBAL: CARMA2_SW 0x00673e1c
+// GLOBAL: CARMA2_CHEAT 0x00680f5c
 tDriver gDetached_bit_driver;
 
 // GLOBAL: CARMA2_HW 0x0067bd68
 // GLOBAL: CARMA2_SW 0x006764d8
+// GLOBAL: CARMA2_CHEAT 0x00683618
 tPhysics_joint* gTrack_crush_joints[32] = { 0 };
 
 // GLOBAL: CARMA2_HW 0x0067bde8
 // GLOBAL: CARMA2_SW 0x00676558
+// GLOBAL: CARMA2_CHEAT 0x00683698
 br_scalar gMin_bend_force = 0.f;
 
 // GLOBAL: CARMA2_HW 0x0067b7b8
 // GLOBAL: CARMA2_SW 0x00675f28
+// GLOBAL: CARMA2_CHEAT 0x00683068
 tCrush_info_buffer gSplit_car_crush_info_buffer;
 
 // GLOBAL: CARMA2_HW 0x0067a188
 // GLOBAL: CARMA2_SW 0x006748f8
+// GLOBAL: CARMA2_CHEAT 0x00681a38
 tPhysics_object* gSplit_car_collision_infos;
 
 // GLOBAL: CARMA2_HW 0x0067b7c4
 // GLOBAL: CARMA2_SW 0x00675f34
+// GLOBAL: CARMA2_CHEAT 0x00683074
 tDriver gSplit_car_driver;
 
 // GLOBAL: CARMA2_HW 0x006796b4
 // GLOBAL: CARMA2_SW 0x00673e24
+// GLOBAL: CARMA2_CHEAT 0x00680f64
 tPhysics_shape* gGonad_sphere_collision_shape;
 
 // GLOBAL: CARMA2_HW 0x0067bd58
 // GLOBAL: CARMA2_SW 0x006764c8
+// GLOBAL: CARMA2_CHEAT 0x00683608
 int gCount_toggled_doors;
 
 // GLOBAL: CARMA2_HW 0x00679450
 // GLOBAL: CARMA2_SW 0x00673bc0
+// GLOBAL: CARMA2_CHEAT 0x00680d00
 tToggled_door gToggled_doors[16];
 
 // FUNCTION: CARMA2_HW 0x00429bb0
 // FUNCTION: CARMA2_SW 0x00429c40
+// FUNCTION: CARMA2_CHEAT 0x00429d40
 void C2_HOOK_FASTCALL ReadCrushSettings(FILE* pF) {
     char s[256];
     char *result;
@@ -345,6 +399,7 @@ void C2_HOOK_FASTCALL ClearCrushLists(void) {
 
 // FUNCTION: CARMA2_HW 0x00429d90
 // FUNCTION: CARMA2_SW 0x00429e20
+// FUNCTION: CARMA2_CHEAT 0x00429f20
 void C2_HOOK_FASTCALL RemoveCarFromCrushLists(tCar_spec* pCar_spec) {
     int i;
     int new_count;
@@ -430,6 +485,7 @@ void C2_HOOK_FASTCALL RemoveCarFromCrushLists(tCar_spec* pCar_spec) {
 
 // FUNCTION: CARMA2_HW 0x00429fa0
 // FUNCTION: CARMA2_SW 0x0042a030
+// FUNCTION: CARMA2_CHEAT 0x0042a130
 void C2_HOOK_FASTCALL InitCrushSystems(void) {
     int i;
 
@@ -500,6 +556,7 @@ void C2_HOOK_FASTCALL ResetCrushSystems(void) {
 
 // FUNCTION: CARMA2_HW 0x0042a550
 // FUNCTION: CARMA2_SW 0x0042a5e0
+// FUNCTION: CARMA2_CHEAT 0x0042a6e0
 void C2_HOOK_FASTCALL ReadCrushData(FILE* pF, tCar_crush_buffer_entry* pCar_crush_buffer_entry, tBrender_storage* pBrender_storage) {
     int i;
 
@@ -651,6 +708,7 @@ void C2_HOOK_FASTCALL ReadCrushData(FILE* pF, tCar_crush_buffer_entry* pCar_crus
 
 // FUNCTION: CARMA2_HW 0x0042a220
 // FUNCTION: CARMA2_SW 0x0042a2b0
+// FUNCTION: CARMA2_CHEAT 0x0042a3b0
 intptr_t C2_HOOK_CDECL CreateDefaultCrushDataCB(br_actor* pActor, void* pData) {
     tUser_crush_data* user_crush;
 
@@ -674,6 +732,7 @@ intptr_t C2_HOOK_CDECL CreateDefaultCrushDataCB(br_actor* pActor, void* pData) {
 
 // FUNCTION: CARMA2_HW 0x0042a210
 // FUNCTION: CARMA2_SW 0x0042a2a0
+// FUNCTION: CARMA2_CHEAT 0x0042a3a0
 void C2_HOOK_FASTCALL CreateDefaultCrushData(br_actor* pActor, tCar_spec* pCar_spec) {
     DRActorEnumRecurse(pActor, CreateDefaultCrushDataCB, pCar_spec);
 }
@@ -688,12 +747,14 @@ void C2_HOOK_FASTCALL CreateDefaultCrushData(br_actor* pActor, tCar_spec* pCar_s
 
 // FUNCTION: CARMA2_HW 0x0042a940
 // FUNCTION: CARMA2_SW 0x0042a9d0
+// FUNCTION: CARMA2_CHEAT 0x0042aad0
 void C2_HOOK_FASTCALL LinkCarCrushDatas(br_actor* pActor, tCar_crush_buffer* pBuffer) {
     DRActorEnumRecurse(pActor, LinkCarCrushData, pBuffer);
 }
 
 // FUNCTION: CARMA2_HW 0x0042a950
 // FUNCTION: CARMA2_SW 0x0042a9e0
+// FUNCTION: CARMA2_CHEAT 0x0042aae0
 intptr_t C2_HOOK_CDECL LinkCarCrushData(br_actor* pActor, void* pData) {
     int i;
     tUser_crush_data* user_crush;
@@ -716,6 +777,7 @@ intptr_t C2_HOOK_CDECL LinkCarCrushData(br_actor* pActor, void* pData) {
 
 // FUNCTION: CARMA2_HW 0x0042ac70
 // FUNCTION: CARMA2_SW 0x0042ad00
+// FUNCTION: CARMA2_CHEAT 0x0042ae00
 intptr_t C2_HOOK_CDECL z(br_actor* pActor, void* pData) {
     tAccumulateSquashVertices_UserData* context = pData;
     tUser_crush_data* crush_data = pActor->user;
@@ -736,6 +798,7 @@ intptr_t C2_HOOK_CDECL z(br_actor* pActor, void* pData) {
 
 // FUNCTION: CARMA2_HW 0x0042a9b0
 // FUNCTION: CARMA2_SW 0x0042aa40
+// FUNCTION: CARMA2_CHEAT 0x0042ab40
 void C2_HOOK_FASTCALL InitNetworkShapesStuff(tCar_crush_spec* pCar_crush) {
     int i;
 
@@ -754,6 +817,7 @@ void C2_HOOK_FASTCALL InitNetworkShapesStuff(tCar_crush_spec* pCar_crush) {
 
 // FUNCTION: CARMA2_HW 0x0042acb0
 // FUNCTION: CARMA2_SW 0x0042ad40
+// FUNCTION: CARMA2_CHEAT 0x0042ae40
 int C2_HOOK_CDECL IncreasingCompare(const void* pValue1, const void* pValue2) {
     if (*(const float*)pValue1 < *(const float*)pValue2) {
         return -1;
@@ -766,6 +830,7 @@ int C2_HOOK_CDECL IncreasingCompare(const void* pValue1, const void* pValue2) {
 
 // FUNCTION: CARMA2_HW 0x0042ace0
 // FUNCTION: CARMA2_SW 0x0042ad70
+// FUNCTION: CARMA2_CHEAT 0x0042ae70
 int C2_HOOK_CDECL DecreasingCompare(const void* pValue1, const void* pValue2) {
     if (*(const float*)pValue1 > *(const float*)pValue2) {
         return -1;
@@ -778,6 +843,7 @@ int C2_HOOK_CDECL DecreasingCompare(const void* pValue1, const void* pValue2) {
 
 // FUNCTION: CARMA2_HW 0x0042b4c0
 // FUNCTION: CARMA2_SW 0x0042b550
+// FUNCTION: CARMA2_CHEAT 0x0042b650
 tU16 C2_HOOK_FASTCALL CrushLimitNumber(const br_vector3* pPoint, const tCar_crush_limits* pLimits, const tCar_crush_count_limits* pCount_limits, int* pInvalid) {
     int number;
     int i;
@@ -809,6 +875,7 @@ tU16 C2_HOOK_FASTCALL CrushLimitNumber(const br_vector3* pPoint, const tCar_crus
 
 // FUNCTION: CARMA2_HW 0x0042b760
 // FUNCTION: CARMA2_SW 0x0042b7f0
+// FUNCTION: CARMA2_CHEAT 0x0042b8f0
 intptr_t C2_HOOK_FASTCALL DRActorEnumRecurseWithTranslation(br_actor* pActor, br_vector3* pDelta, tDRActorEnumRecurseWithTranslation_cbfn* pCallback, void* pContext) {
     br_vector3 delta;
     intptr_t result;
@@ -860,6 +927,7 @@ intptr_t C2_HOOK_FASTCALL DRActorEnumRecurseWithTranslation(br_actor* pActor, br
 
 // FUNCTION: CARMA2_HW 0x0042be20
 // FUNCTION: CARMA2_SW 0x0042beb0
+// FUNCTION: CARMA2_CHEAT 0x0042bfc0
 intptr_t C2_HOOK_CDECL InitModelCrushDataCB(br_actor* pActor, void* pData) {
     tUser_crush_data* user_crush_data;
     tCar_crush_detach_data* detach_data;
@@ -912,6 +980,7 @@ intptr_t C2_HOOK_CDECL InitModelCrushDataCB(br_actor* pActor, void* pData) {
 
 // STUB: CARMA2_HW 0x0042c0e0
 // STUB: CARMA2_SW 0x0042c170
+// STUB: CARMA2_CHEAT 0x0042c280
 void C2_HOOK_FASTCALL SetFlapCheckVertices(tCar_crush_flap_data* pFlap_data, const br_model* pModel, tModel_detail_vertex_data* pVertex_data) {
     NOT_IMPLEMENTED();
 }
@@ -937,6 +1006,7 @@ void C2_HOOK_FASTCALL InitModelVertexData(tModel_detail_vertex_data* pVertex_dat
 
 // FUNCTION: CARMA2_HW 0x0042bf80
 // FUNCTION: CARMA2_SW 0x0042c010
+// FUNCTION: CARMA2_CHEAT 0x0042c120
 intptr_t C2_HOOK_CDECL InitVertexDataCB(br_actor* pActor, void* pData) {
     tUser_crush_data* user_crush_data;
     tCar_crush_buffer_entry* crush_data;
@@ -974,6 +1044,7 @@ intptr_t C2_HOOK_CDECL InitVertexDataCB(br_actor* pActor, void* pData) {
 
 // FUNCTION: CARMA2_HW 0x0042c420
 // FUNCTION: CARMA2_SW 0x0042c4b0
+// FUNCTION: CARMA2_CHEAT 0x0042c5c0
 void C2_HOOK_FASTCALL DisposeMasterCrushData(tCar_crush_spec* pCar_crush, tCar_spec* pCar) {
     int i;
 
@@ -1001,6 +1072,7 @@ void C2_HOOK_FASTCALL DisposeMasterCrushData(tCar_crush_spec* pCar_crush, tCar_s
 
 // FUNCTION: CARMA2_HW 0x0042c4f0
 // FUNCTION: CARMA2_SW 0x0042c580
+// FUNCTION: CARMA2_CHEAT 0x0042c690
 void C2_HOOK_FASTCALL DisposeCrushData(tCar_crush_buffer_entry* pCrush_data) {
 
     if (pCrush_data != NULL) {
@@ -1017,6 +1089,7 @@ void C2_HOOK_FASTCALL DisposeCrushData(tCar_crush_buffer_entry* pCrush_data) {
 
 // FUNCTION: CARMA2_HW 0x0042c530
 // FUNCTION: CARMA2_SW 0x0042c5c0
+// FUNCTION: CARMA2_CHEAT 0x0042c6d0
 void C2_HOOK_FASTCALL DisposeVertexData(tModel_detail_vertex_data* pVertex_data) {
 
     if (pVertex_data != NULL) {
@@ -1039,6 +1112,7 @@ void C2_HOOK_FASTCALL DisposeVertexData(tModel_detail_vertex_data* pVertex_data)
 #endif
 
 // STUB: CARMA2_HW 0x0042c8b0
+// STUB: CARMA2_CHEAT 0x0042ca50
 float C2_HOOK_FASTCALL DistSq(const br_vector3* pP, int pCount, const br_vector3* pVertices) {
     NOT_IMPLEMENTED();
 }
@@ -1051,6 +1125,7 @@ float C2_HOOK_FASTCALL DistSq(const br_vector3* pP, int pCount, const br_vector3
 
 // FUNCTION: CARMA2_HW 0x00436850
 // FUNCTION: CARMA2_SW 0x00436880
+// FUNCTION: CARMA2_CHEAT 0x00436a50
 float C2_HOOK_FASTCALL GetImpactScale(const br_vector3* pP, int pCount, const br_vector3* pVertices, float pMax_dist_sq) {
     float dist_sq;
 
@@ -1064,6 +1139,7 @@ float C2_HOOK_FASTCALL GetImpactScale(const br_vector3* pP, int pCount, const br
 
 // FUNCTION: CARMA2_HW 0x0042d0e0
 // FUNCTION: CARMA2_SW 0x0042d150
+// FUNCTION: CARMA2_CHEAT 0x0042d280
 int C2_HOOK_FASTCALL TooFarToCrush(const br_model* pModel, int pCount, const br_vector3* pVertices, float pMax_dist_sq) {
     br_vector3 diagonal;
     float threshold;
@@ -1080,6 +1156,7 @@ int C2_HOOK_FASTCALL TooFarToCrush(const br_model* pModel, int pCount, const br_
 
 // FUNCTION: CARMA2_HW 0x00436890
 // FUNCTION: CARMA2_SW 0x004368c0
+// FUNCTION: CARMA2_CHEAT 0x00436a90
 int C2_HOOK_FASTCALL NearestAxis(const br_vector3* pVector) {
 
     if ((float)fabs(pVector->v[0]) > 0.707107f) {
@@ -1101,6 +1178,7 @@ int C2_HOOK_FASTCALL NearestAxis(const br_vector3* pVector) {
 
 // FUNCTION: CARMA2_HW 0x004368d0
 // FUNCTION: CARMA2_SW 0x00436900
+// FUNCTION: CARMA2_CHEAT 0x00436ad0
 void C2_HOOK_FASTCALL ClipPointToLimits(br_vector3* pPoint, tU16 pLimit_bits, const tCar_crush_limits* pLimits) {
     int i;
 
@@ -1130,6 +1208,7 @@ void C2_HOOK_FASTCALL ClipPointToLimits(br_vector3* pPoint, tU16 pLimit_bits, co
 
 // FUNCTION: CARMA2_HW 0x00436940
 // FUNCTION: CARMA2_SW 0x00436970
+// FUNCTION: CARMA2_CHEAT 0x00436b40
 void C2_HOOK_FASTCALL CompressCrush(tCompressed_car_crush* pDest, const tCar_crush* pSrc) {
     int i;
 
@@ -1156,6 +1235,7 @@ void C2_HOOK_FASTCALL CompressCrush(tCompressed_car_crush* pDest, const tCar_cru
 
 // FUNCTION: CARMA2_HW 0x0042d390
 // FUNCTION: CARMA2_SW 0x0042d400
+// FUNCTION: CARMA2_CHEAT 0x0042d530
 void C2_HOOK_FASTCALL AddDroneCrush(tQueued_drone_crush_item* pCrush, const br_vector3* pVector, float pScale, int pCount, const br_vector3* pPoints) {
     int i;
 
@@ -1181,6 +1261,7 @@ void C2_HOOK_FASTCALL AddDroneCrush(tQueued_drone_crush_item* pCrush, const br_v
 
 // FUNCTION: CARMA2_HW 0x0042d770
 // FUNCTION: CARMA2_SW 0x0042d7e0
+// FUNCTION: CARMA2_CHEAT 0x0042d910
 void C2_HOOK_FASTCALL SetCrush(tCar_crush* pCrush, int pCount_vectors, br_vector3* pVectors, br_vector3* pVector1, br_vector3* pVector2, float pScalar, tU32 pValue) {
     int i;
 
@@ -1198,6 +1279,7 @@ void C2_HOOK_FASTCALL SetCrush(tCar_crush* pCrush, int pCount_vectors, br_vector
 
 // FUNCTION: CARMA2_HW 0x0042d7e0
 // FUNCTION: CARMA2_SW 0x0042d850
+// FUNCTION: CARMA2_CHEAT 0x0042d980
 void C2_HOOK_FASTCALL SetBitForDetachment(br_actor* pActor, tCar_spec* pCar, float pArg3, int pArg4) {
     tUser_crush_data* user_crush;
     tCar_crush_detach_data* detach_data;
@@ -1244,6 +1326,7 @@ void C2_HOOK_FASTCALL SetBitForDetachment(br_actor* pActor, tCar_spec* pCar, flo
 
 // FUNCTION: CARMA2_HW 0x0042d8f0
 // FUNCTION: CARMA2_SW 0x0042d960
+// FUNCTION: CARMA2_CHEAT 0x0042da90
 void C2_HOOK_FASTCALL SetFlappage(br_actor* pActor, tCar_spec* pCar, int pFlags, float pScalar) {
     int i;
 
@@ -1289,6 +1372,7 @@ void C2_HOOK_FASTCALL SetFlappage(br_actor* pActor, tCar_spec* pCar, int pFlags,
 
 // FUNCTION: CARMA2_HW 0x0042d950
 // FUNCTION: CARMA2_SW 0x0042d9c0
+// FUNCTION: CARMA2_CHEAT 0x0042daf0
 void C2_HOOK_FASTCALL MakeModelMaterialsDoubleSided(br_model* pModel) {
     int g;
 
@@ -1309,6 +1393,7 @@ void C2_HOOK_FASTCALL MakeModelMaterialsDoubleSided(br_model* pModel) {
 
 // FUNCTION: CARMA2_HW 0x0042d9b0
 // FUNCTION: CARMA2_SW 0x0042da20
+// FUNCTION: CARMA2_CHEAT 0x0042db50
 void C2_HOOK_FASTCALL MakeModelMaterialsSingleSided(br_model* pModel) {
     int g;
 
@@ -1333,6 +1418,7 @@ void C2_HOOK_FASTCALL MakeModelMaterialsSingleSided(br_model* pModel) {
 
 // FUNCTION: CARMA2_HW 0x0042dbd0
 // FUNCTION: CARMA2_SW 0x0042dc40
+// FUNCTION: CARMA2_CHEAT 0x0042dd70
 int C2_HOOK_FASTCALL GetSDBJointPosAndBounds(br_vector3* pP1, br_vector3* pP2, br_vector3* pP3, br_bounds3* pBounds, br_actor* pActor) {
     tUser_crush_data* user_crush;
     br_model* model;
@@ -1372,6 +1458,7 @@ int C2_HOOK_FASTCALL GetSDBJointPosAndBounds(br_vector3* pP1, br_vector3* pP2, b
 
 // FUNCTION: CARMA2_HW 0x0042dab0
 // FUNCTION: CARMA2_SW 0x0042db20
+// FUNCTION: CARMA2_CHEAT 0x0042dc50
 void C2_HOOK_FASTCALL SendSemiDetachBit(tCar_spec* pCar, br_actor* pActor, float pArg3, tNet_game_player_info* pPlayer) {
     tNet_message* message;
     tUser_crush_data* user_crush;
@@ -1415,6 +1502,7 @@ void C2_HOOK_FASTCALL SendSemiDetachBit(tCar_spec* pCar, br_actor* pActor, float
 
 // FUNCTION: CARMA2_HW 0x0042da20
 // FUNCTION: CARMA2_SW 0x0042da90
+// FUNCTION: CARMA2_CHEAT 0x0042dbc0
 void C2_HOOK_FASTCALL SendAllSemiDetachedBits(tNet_game_player_info* pPlayer) {
     int i;
     int j;
@@ -1439,7 +1527,14 @@ void C2_HOOK_FASTCALL AddNonCar(tNon_car_spec* pNon_car, const tDriver* pDriver)
     C2_HOOK_BUG_ON(REC2_ASIZE(gActive_non_car_list) != 99);
     // FIXME: pDriver should be passed by argument, not pointer
 
-    if (gNum_active_non_cars != REC2_ASIZE(gActive_non_car_list)) {
+    if (gNum_active_non_cars == REC2_ASIZE(gActive_non_car_list)) {
+#ifdef REC2_CHEAT
+        PDEnterDebugger("gActive_non_car_list full up");
+    }
+    {
+#else
+    } else {
+#endif
         pNon_car->driver = *pDriver;
         gActive_non_car_list[gNum_active_non_cars++] = pNon_car;
         PHILAddActiveObjectImmediately(pNon_car->collision_info, NULL, NULL, NULL);
@@ -1460,6 +1555,7 @@ void C2_HOOK_FASTCALL AddNonCar(tNon_car_spec* pNon_car, const tDriver* pDriver)
 
 // FUNCTION: CARMA2_HW 0x0043b250
 // FUNCTION: CARMA2_SW 0x0043b2a0
+// FUNCTION: CARMA2_CHEAT 0x0043b480
 void C2_HOOK_FASTCALL SendReAttachBit(tCar_spec* pCar, tPhysics_object* pObject) {
     tNet_message* message;
 
@@ -1481,6 +1577,7 @@ void C2_HOOK_FASTCALL SendReAttachBit(tCar_spec* pCar, tPhysics_object* pObject)
 
 // STUB: CARMA2_HW 0x004387d0
 // STUB: CARMA2_SW 0x00438800
+// STUB: CARMA2_CHEAT 0x004389e0
 void C2_HOOK_FASTCALL StopFlapping(br_actor* pActor, tCar_spec* pCar_spec) {
     NOT_IMPLEMENTED();
 }
@@ -1493,6 +1590,7 @@ void C2_HOOK_FASTCALL StopFlapping(br_actor* pActor, tCar_spec* pCar_spec) {
 
 // FUNCTION: CARMA2_HW 0x0042ddc0
 // FUNCTION: CARMA2_SW 0x0042de30
+// FUNCTION: CARMA2_CHEAT 0x0042df60
 intptr_t C2_HOOK_CDECL ToggleFlapsCB2(br_actor* pActor, void* pCar) {
     tUser_crush_data* user_crush;
     tCar_crush_buffer_entry* crush_data;
@@ -1517,6 +1615,7 @@ intptr_t C2_HOOK_CDECL ToggleFlapsCB2(br_actor* pActor, void* pCar) {
 
 // FUNCTION: CARMA2_HW 0x0042ddb0
 // FUNCTION: CARMA2_SW 0x0042de20
+// FUNCTION: CARMA2_CHEAT 0x0042df50
 int C2_HOOK_FASTCALL ToggleFlapsCB(tPhysics_object* pCollision_info, void* pCar) {
     DRActorEnumRecurse(pCollision_info->actor, ToggleFlapsCB2, pCar);
     return 0;
@@ -1535,6 +1634,7 @@ void C2_HOOK_FASTCALL SendToggleFlaps(tCar_spec* pCar) {
 
 // FUNCTION: CARMA2_HW 0x0042dd50
 // FUNCTION: CARMA2_SW 0x0042ddc0
+// FUNCTION: CARMA2_CHEAT 0x0042def0
 void C2_HOOK_FASTCALL ToggleFlaps(void) {
 
     if (gCountdown || gToo_poor_for_recovery_timeout) {
@@ -1549,6 +1649,7 @@ void C2_HOOK_FASTCALL ToggleFlaps(void) {
 
 // FUNCTION: CARMA2_HW 0x00434910
 // FUNCTION: CARMA2_SW 0x00434940
+// FUNCTION: CARMA2_CHEAT 0x00434b00
 int C2_HOOK_FASTCALL BitObjectIsSufficientlyOutsideCarObjectToDetach(tPhysics_object* pObject) {
     br_vector3 world_direction;
     br_vector3 parent_direction;
@@ -1570,6 +1671,7 @@ int C2_HOOK_FASTCALL BitObjectIsSufficientlyOutsideCarObjectToDetach(tPhysics_ob
 
 // FUNCTION: CARMA2_HW 0x0042f4e0
 // FUNCTION: CARMA2_SW 0x0042f530
+// FUNCTION: CARMA2_CHEAT 0x0042f6a0
 void C2_HOOK_FASTCALL FullyDetachBit(tCar_spec* pCar, tPhysics_object* pObject) {
     br_actor* actor;
     tUser_crush_data* user_crush;
@@ -1627,6 +1729,7 @@ void C2_HOOK_FASTCALL FullyDetachBit(tCar_spec* pCar, tPhysics_object* pObject) 
 
 // FUNCTION: CARMA2_HW 0x00430730
 // FUNCTION: CARMA2_SW 0x00430760
+// FUNCTION: CARMA2_CHEAT 0x00430900
 intptr_t C2_HOOK_CDECL MakeCarModelsMaterialsDoubleSided(br_actor* pActor, void* pArg) {
     tUser_crush_data* user_crush = pActor->user;
     tCar_spec* car_spec = pArg;
@@ -1648,6 +1751,7 @@ intptr_t C2_HOOK_CDECL MakeCarModelsMaterialsDoubleSided(br_actor* pActor, void*
 
 // FUNCTION: CARMA2_HW 0x0042deb0
 // FUNCTION: CARMA2_SW 0x0042df20
+// FUNCTION: CARMA2_CHEAT 0x0042e050
 intptr_t C2_HOOK_CDECL MakeCarModelsMaterialsSingleSided(br_actor* pActor, void* pArg) {
     tUser_crush_data* user_crush = pActor->user;
     tCar_spec* car_spec = pArg;
@@ -1703,6 +1807,7 @@ intptr_t C2_HOOK_CDECL MakeCarModelsMaterialsSingleSided(br_actor* pActor, void*
 
 // STUB: CARMA2_HW 0x00434f60
 // STUB: CARMA2_SW 0x00434f90
+// STUB: CARMA2_CHEAT 0x00435150
 void C2_HOOK_FASTCALL BendPoint(br_vector3* pPoint, const tBend_point_context* pContext) {
     NOT_IMPLEMENTED();
 }
@@ -1741,6 +1846,7 @@ void C2_HOOK_FASTCALL BendPoint(br_vector3* pPoint, const tBend_point_context* p
 
 // FUNCTION: CARMA2_HW 0x00431590
 // FUNCTION: CARMA2_SW 0x004315c0
+// FUNCTION: CARMA2_CHEAT 0x00431760
 void C2_HOOK_CDECL JitModelUpdate(br_actor* pActor, br_model* pModel, br_material* pMaterial, void* pOrder_table, br_uint_8 pStyle, int pOn_screen) {
 
     (void)pOn_screen;
@@ -1751,6 +1857,7 @@ void C2_HOOK_CDECL JitModelUpdate(br_actor* pActor, br_model* pModel, br_materia
 
 // FUNCTION: CARMA2_HW 0x004315e0
 // FUNCTION: CARMA2_SW 0x00431610
+// FUNCTION: CARMA2_CHEAT 0x004317b0
 void C2_HOOK_FASTCALL SetModelForUpdate(br_model* pModel) {
     tUser_detail_level_model* user_detail_model;
 
@@ -1775,6 +1882,7 @@ void C2_HOOK_FASTCALL TotallySpamTheCar(tCar_spec* pCar, br_scalar pDamage) {
 
 // FUNCTION: CARMA2_HW 0x00435dd0
 // FUNCTION: CARMA2_SW 0x00435e00
+// FUNCTION: CARMA2_CHEAT 0x00435fc0
 intptr_t C2_HOOK_FASTCALL DRActorEnumRecurseUltraPlus(br_actor* pActor, br_actor_enum_cbfn* pCallback, void* pArg) {
     intptr_t result;
     br_actor* actor;
@@ -1805,12 +1913,14 @@ intptr_t C2_HOOK_FASTCALL DRActorEnumRecurseUltraPlus(br_actor* pActor, br_actor
 
 // STUB: CARMA2_HW 0x004391d0
 // STUB: CARMA2_SW 0x00439210
+// STUB: CARMA2_CHEAT 0x004393e0
 void C2_HOOK_FASTCALL SphericizeCar(tCar_spec* pCar) {
     NOT_IMPLEMENTED();
 }
 
 // FUNCTION: CARMA2_HW 0x004398d0
 // FUNCTION: CARMA2_SW 0x00439910
+// FUNCTION: CARMA2_CHEAT 0x00439af0
 intptr_t C2_HOOK_CDECL BattenDownTheHatches(br_actor* pActor, void* pUser) {
     tUser_crush_data* user_crush_data = pActor->user;
     tCar_crush_buffer_entry* crush_data;
@@ -1834,6 +1944,7 @@ intptr_t C2_HOOK_CDECL BattenDownTheHatches(br_actor* pActor, void* pUser) {
 
 // FUNCTION: CARMA2_HW 0x004398c0
 // FUNCTION: CARMA2_SW 0x00439900
+// FUNCTION: CARMA2_CHEAT 0x00439ae0
 int C2_HOOK_FASTCALL BattenDownTheObjects(tPhysics_object* pCollision_info, void* pUser_data) {
     DRActorEnumRecurse(pCollision_info->actor, BattenDownTheHatches, pUser_data);
     return 0;
@@ -1841,6 +1952,7 @@ int C2_HOOK_FASTCALL BattenDownTheObjects(tPhysics_object* pCollision_info, void
 
 // FUNCTION: CARMA2_HW 0x00439fd0
 // FUNCTION: CARMA2_SW 0x0043a010
+// FUNCTION: CARMA2_CHEAT 0x0043a1f0
 void C2_HOOK_FASTCALL CompletelyUnBendCollisionShape(tCar_crush_shape_info* pShape) {
     int i;
 
@@ -1858,6 +1970,7 @@ void C2_HOOK_FASTCALL CompletelyUnBendCollisionShape(tCar_crush_shape_info* pSha
 
 // FUNCTION: CARMA2_HW 0x00439910
 // FUNCTION: CARMA2_SW 0x00439950
+// FUNCTION: CARMA2_CHEAT 0x00439b30
 intptr_t C2_HOOK_CDECL EnableGroovers(br_actor* pActor, void* pData) {
     tUser_crush_data* user_crush;
 
@@ -1875,6 +1988,7 @@ intptr_t C2_HOOK_CDECL EnableGroovers(br_actor* pActor, void* pData) {
 
 // FUNCTION: CARMA2_HW 0x00439960
 // FUNCTION: CARMA2_SW 0x004399a0
+// FUNCTION: CARMA2_CHEAT 0x00439b80
 void C2_HOOK_FASTCALL TotallyRepairCarCollisionShapes(tCar_spec* pCar_spec) {
     int i;
 
@@ -1896,12 +2010,14 @@ void C2_HOOK_FASTCALL TotallyRepairCarCollisionShapes(tCar_spec* pCar_spec) {
 
 // STUB: CARMA2_HW 0x00439a20
 // STUB: CARMA2_SW 0x00439a60
+// STUB: CARMA2_CHEAT 0x00439c40
 intptr_t C2_HOOK_CDECL TotallyRepairModels(br_actor* pActor, void* pUser) {
     NOT_IMPLEMENTED();
 }
 
 // FUNCTION: CARMA2_HW 0x00439a10
 // FUNCTION: CARMA2_SW 0x00439a50
+// FUNCTION: CARMA2_CHEAT 0x00439c30
 int C2_HOOK_FASTCALL TotallyRepairObject(tPhysics_object* pCollision_info, void* pUser_data) {
     DRActorEnumRecurse(pCollision_info->actor, TotallyRepairModels, pUser_data);
     return 0;
@@ -1909,6 +2025,7 @@ int C2_HOOK_FASTCALL TotallyRepairObject(tPhysics_object* pCollision_info, void*
 
 // FUNCTION: CARMA2_HW 0x0043b2a0
 // FUNCTION: CARMA2_SW 0x0043b2f0
+// FUNCTION: CARMA2_CHEAT 0x0043b4d0
 void C2_HOOK_FASTCALL SendReAttachAllBits(tCar_spec* pCar) {
     tNet_message* message;
 
@@ -1928,6 +2045,7 @@ void C2_HOOK_FASTCALL SendReAttachAllBits(tCar_spec* pCar) {
 
 // STUB: CARMA2_HW 0x00439510
 // STUB: CARMA2_SW 0x00439550
+// STUB: CARMA2_CHEAT 0x00439720
 void C2_HOOK_FASTCALL TotallyRepairACar(tCar_spec* pCar_spec) {
     NOT_IMPLEMENTED();
 }
@@ -1938,6 +2056,7 @@ void C2_HOOK_FASTCALL TotallyRepairACar(tCar_spec* pCar_spec) {
 
 // FUNCTION: CARMA2_HW 0x00439bf0
 // FUNCTION: CARMA2_SW 0x00439c30
+// FUNCTION: CARMA2_CHEAT 0x00439e10
 void C2_HOOK_FASTCALL TotallyRepairCar(void) {
 
     if (!gArrow_mode) {
@@ -1961,6 +2080,7 @@ void C2_HOOK_FASTCALL TotallyRepairCar(void) {
 
 // FUNCTION: CARMA2_HW 0x0043aa20
 // FUNCTION: CARMA2_SW 0x0043aa70
+// FUNCTION: CARMA2_CHEAT 0x0043ac40
 void C2_HOOK_FASTCALL UnBendCollisionShape(tCar_crush_shape_info* pShape, const tBend_point_context* pContext) {
     int i;
 
@@ -1978,6 +2098,7 @@ void C2_HOOK_FASTCALL UnBendCollisionShape(tCar_crush_shape_info* pShape, const 
 
 // FUNCTION: CARMA2_HW 0x0043ac90
 // FUNCTION: CARMA2_SW 0x0043ace0
+// FUNCTION: CARMA2_CHEAT 0x0043aeb0
 br_scalar C2_HOOK_FASTCALL NormalizedAngle(br_angle pAngle) {
     if (pAngle < BR_ANGLE_DEG(180)) {
         return (br_scalar)(pAngle / (double)BR_ONE_LS);
@@ -1994,6 +2115,7 @@ br_scalar C2_HOOK_FASTCALL NormalizedAngle(br_angle pAngle) {
 
 // STUB: CARMA2_HW 0x00439c30
 // STUB: CARMA2_SW 0x00439c70
+// STUB: CARMA2_CHEAT 0x00439e50
 br_scalar C2_HOOK_FASTCALL UnBendCar(tCar_spec* pCar_spec, tU32 pDelta_time, br_scalar* pOriginal_amount) {
     NOT_IMPLEMENTED();
 }
@@ -2004,6 +2126,7 @@ br_scalar C2_HOOK_FASTCALL UnBendCar(tCar_spec* pCar_spec, tU32 pDelta_time, br_
 
 // FUNCTION: CARMA2_HW 0x00439c10
 // FUNCTION: CARMA2_SW 0x00439c50
+// FUNCTION: CARMA2_CHEAT 0x00439e30
 void C2_HOOK_FASTCALL CompletelyUnBendCar(tCar_spec* pCar_spec) {
     br_scalar original_amount;
 
@@ -2032,6 +2155,7 @@ void C2_HOOK_FASTCALL CompletelyUnBendCar(tCar_spec* pCar_spec) {
 
 // FUNCTION: CARMA2_HW 0x0043bf30
 // FUNCTION: CARMA2_SW 0x0043bf80
+// FUNCTION: CARMA2_CHEAT 0x0043c180
 void C2_HOOK_FASTCALL ARCompressModelMash(tCompressed_vector3* pDest, br_model* pModel, br_vector3* pSrc) {
     tU16 i;
 
@@ -2042,6 +2166,7 @@ void C2_HOOK_FASTCALL ARCompressModelMash(tCompressed_vector3* pDest, br_model* 
 
 // FUNCTION: CARMA2_HW 0x0043bf80
 // FUNCTION: CARMA2_SW 0x0043bfd0
+// FUNCTION: CARMA2_CHEAT 0x0043c1d0
 void C2_HOOK_FASTCALL ARApplyModelMash(br_model* pModel, tCompressed_vector3* pSrc) {
     tU16 i;
     br_vector3 delta;
@@ -2055,6 +2180,7 @@ void C2_HOOK_FASTCALL ARApplyModelMash(br_model* pModel, tCompressed_vector3* pS
 
 // FUNCTION: CARMA2_HW 0x0043c030
 // FUNCTION: CARMA2_SW 0x0043c080
+// FUNCTION: CARMA2_CHEAT 0x0043c280
 void C2_HOOK_FASTCALL ARUndoModelMash(br_model* pModel, tCompressed_vector3* pSrc) {
     tU16 i;
     br_vector3 delta;
@@ -2068,6 +2194,7 @@ void C2_HOOK_FASTCALL ARUndoModelMash(br_model* pModel, tCompressed_vector3* pSr
 
 // FUNCTION: CARMA2_HW 0x0043c0e0
 // FUNCTION: CARMA2_SW 0x0043c130
+// FUNCTION: CARMA2_CHEAT 0x0043c330
 void C2_HOOK_FASTCALL ARApplyFlap(br_actor* pActor, br_angle pAngle) {
     tUser_crush_data* user;
     tUser_crush_data* parent_user;
@@ -2127,6 +2254,7 @@ void C2_HOOK_FASTCALL ARApplyFlap(br_actor* pActor, br_angle pAngle) {
 
 // FUNCTION: CARMA2_HW 0x0043ce60
 // FUNCTION: CARMA2_SW 0x0043ceb0
+// FUNCTION: CARMA2_CHEAT 0x0043d0c0
 void C2_HOOK_FASTCALL ReceivedReAttachAllBits(tNet_message_chunk* pContents) {
     tCar_spec* car;
 
@@ -2157,6 +2285,7 @@ void C2_HOOK_FASTCALL ReceivedReAttachAllBits(tNet_message_chunk* pContents) {
 
 // FUNCTION: CARMA2_HW 0x0043d670
 // FUNCTION: CARMA2_SW 0x0043d6c0
+// FUNCTION: CARMA2_CHEAT 0x0043d8f0
 void C2_HOOK_FASTCALL ReceivedToggleFlaps(tNet_message_chunk* pContents) {
     tCar_spec* car;
 
@@ -2176,6 +2305,7 @@ void C2_HOOK_FASTCALL ReceivedToggleFlaps(tNet_message_chunk* pContents) {
 
 // FUNCTION: CARMA2_HW 0x0043d900
 // FUNCTION: CARMA2_SW 0x0043d950
+// FUNCTION: CARMA2_CHEAT 0x0043dbb0
 int C2_HOOK_FASTCALL GetNetShapeDataLengthFromShape(tCar_spec* pCar) {
     int i;
     int count;
@@ -2205,6 +2335,7 @@ int C2_HOOK_FASTCALL GetNetShapeDataLengthFromShape(tCar_spec* pCar) {
 
 // FUNCTION: CARMA2_HW 0x0043d9c0
 // FUNCTION: CARMA2_SW 0x0043da10
+// FUNCTION: CARMA2_CHEAT 0x0043dc70
 void C2_HOOK_FASTCALL EncodeNetShapeData(tU8* pData, tCar_spec* pCar) {
     int i;
     int j;
@@ -2259,6 +2390,7 @@ void C2_HOOK_FASTCALL EncodeNetShapeData(tU8* pData, tCar_spec* pCar) {
 
 // FUNCTION: CARMA2_HW 0x0043deb0
 // FUNCTION: CARMA2_SW 0x0043df00
+// FUNCTION: CARMA2_CHEAT 0x0043e160
 void C2_HOOK_FASTCALL CompressPlane(tCompressed_vector4* pDest, const br_vector4* pSrc) {
 
     CompressVector3((tCompressed_vector3*)pDest, (const br_vector3*)pSrc, -1.0f, 1.0f);
@@ -2267,6 +2399,7 @@ void C2_HOOK_FASTCALL CompressPlane(tCompressed_vector4* pDest, const br_vector4
 
 // FUNCTION: CARMA2_HW 0x0043dee0
 // FUNCTION: CARMA2_SW 0x0043df30
+// FUNCTION: CARMA2_CHEAT 0x0043e190
 void C2_HOOK_FASTCALL ExpandPlane(br_vector4* pDest, const tCompressed_vector4* pSrc) {
 
     ExpandVector3((br_vector3*)pDest, (const tCompressed_vector3*)pSrc, -1.0f, 1.0f);
@@ -2277,6 +2410,7 @@ void C2_HOOK_FASTCALL ExpandPlane(br_vector4* pDest, const tCompressed_vector4* 
 
 // FUNCTION: CARMA2_HW 0x0043dfd0
 // FUNCTION: CARMA2_SW 0x0043e020
+// FUNCTION: CARMA2_CHEAT 0x0043e280
 void C2_HOOK_FASTCALL SetAllShapeStatusFlags(tCar_crush_network_shapes* pShapes) {
     int i;
 

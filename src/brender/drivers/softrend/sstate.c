@@ -79,6 +79,7 @@ br_renderer_state_stored_soft* C2_HOOK_STDCALL RendererStateStoredSoftAllocate(b
 
 // FUNCTION: CARMA2_HW 0x00542520
 // FUNCTION: CARMA2_SW 0x0053dbc0
+// FUNCTION: CARMA2_CHEAT 0x00548110
 br_error C2_HOOK_STDCALL StateCopyToStored(br_renderer_state_stored_soft* dest, soft_state_all* src, br_uint_32 copy_mask, void* res) {
 
     C2_HOOK_BUG_ON(MASK_STATE_SURFACE != 0x1);

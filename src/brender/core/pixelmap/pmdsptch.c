@@ -20,6 +20,7 @@
 
 // FUNCTION: CARMA2_HW 0x00537d60
 // FUNCTION: CARMA2_SW 0x00533400
+// FUNCTION: CARMA2_CHEAT 0x0053d950
 br_pixelmap* C2_HOOK_CDECL BrPixelmapAllocateSub(br_pixelmap* src, br_int_32 x, br_int_32 y, br_int_32 w, br_int_32 h) {
     br_pixelmap* new;
     br_rectangle r;
@@ -37,6 +38,7 @@ br_pixelmap* C2_HOOK_CDECL BrPixelmapAllocateSub(br_pixelmap* src, br_int_32 x, 
 
 // FUNCTION: CARMA2_HW 0x00537dc0
 // FUNCTION: CARMA2_SW 0x00533460
+// FUNCTION: CARMA2_CHEAT 0x0053d9b0
 void C2_HOOK_CDECL BrPixelmapFree(br_pixelmap* src) {
 
     CheckDispatch((br_device_pixelmap*)src);
@@ -59,6 +61,7 @@ br_pixelmap* C2_HOOK_CDECL BrPixelmapResize(br_pixelmap* src, br_int_32 width, b
 
 // FUNCTION: CARMA2_HW 0x00537e20
 // FUNCTION: CARMA2_SW 0x005334c0
+// FUNCTION: CARMA2_CHEAT 0x0053da10
 br_pixelmap* C2_HOOK_CDECL BrPixelmapMatch(br_pixelmap* src, br_uint_8 match_type) {
     br_pixelmap *new;
 
@@ -317,6 +320,7 @@ br_pixelmap* C2_HOOK_CDECL BrPixelmapClone(br_pixelmap* src) {
 
 // FUNCTION: CARMA2_HW 0x005382f0
 // FUNCTION: CARMA2_SW 0x00533990
+// FUNCTION: CARMA2_CHEAT 0x0053dee0
 void C2_HOOK_CDECL BrPixelmapFill(br_pixelmap* dst, br_uint_32 colour) {
 
     CheckDispatch((br_device_pixelmap*)dst);
@@ -397,6 +401,7 @@ br_error C2_HOOK_STDCALL DispatchRectangleCopy(br_device_pixelmap* self, br_poin
 
 // FUNCTION: CARMA2_HW 0x005384e0
 // FUNCTION: CARMA2_SW 0x00533b80
+// FUNCTION: CARMA2_CHEAT 0x0053e0d0
 br_error C2_HOOK_STDCALL DispatchRectangleStretchCopy(br_device_pixelmap* self, br_rectangle* r, br_device_pixelmap* src, br_rectangle* s) {
 
     CheckDispatch((br_device_pixelmap*)self);
@@ -420,6 +425,7 @@ br_error C2_HOOK_STDCALL DispatchRectangleStretchCopy(br_device_pixelmap* self, 
 
 // FUNCTION: CARMA2_HW 0x00538590
 // FUNCTION: CARMA2_SW 0x00533c30
+// FUNCTION: CARMA2_CHEAT 0x0053e180
 void C2_HOOK_CDECL BrPixelmapRectangleCopy(br_pixelmap* dst, br_int_32 dx, br_int_32 dy, br_pixelmap* src, br_int_32 sx, br_int_32 sy, br_int_32 w, br_int_32 h) {
     br_rectangle r;
     br_point p;
@@ -454,6 +460,7 @@ void C2_HOOK_CDECL BrPixelmapRectangleStretchCopy(br_pixelmap* dst, br_int_32 dx
 
 // FUNCTION: CARMA2_HW 0x00538640
 // FUNCTION: CARMA2_SW 0x00533ce0
+// FUNCTION: CARMA2_CHEAT 0x0053e230
 void C2_HOOK_CDECL BrPixelmapRectangleFill(br_pixelmap* dst, br_int_32 x, br_int_32 y, br_int_32 w, br_int_32 h, br_uint_32 colour) {
     br_rectangle r;
 
@@ -524,6 +531,7 @@ void C2_HOOK_CDECL BrPixelmapDirtyRectangleDoubleBuffer(br_pixelmap* dst, br_pix
 
 // FUNCTION: CARMA2_HW 0x00538800
 // FUNCTION: CARMA2_SW 0x00533ea0
+// FUNCTION: CARMA2_CHEAT 0x0053e3f0
 void C2_HOOK_CDECL BrPixelmapPixelSet(br_pixelmap* dst, br_int_32 x, br_int_32 y, br_uint_32 colour) {
     br_point p;
 
@@ -535,6 +543,7 @@ void C2_HOOK_CDECL BrPixelmapPixelSet(br_pixelmap* dst, br_int_32 x, br_int_32 y
 
 // FUNCTION: CARMA2_HW 0x00538840
 // FUNCTION: CARMA2_SW 0x00533ee0
+// FUNCTION: CARMA2_CHEAT 0x0053e430
 br_uint_32 C2_HOOK_CDECL BrPixelmapPixelGet(br_pixelmap* dst, br_int_32 x, br_int_32 y) {
     br_point p;
     br_uint_32 colour;
@@ -549,6 +558,7 @@ br_uint_32 C2_HOOK_CDECL BrPixelmapPixelGet(br_pixelmap* dst, br_int_32 x, br_in
 
 // FUNCTION: CARMA2_HW 0x00538880
 // FUNCTION: CARMA2_SW 0x00533f20
+// FUNCTION: CARMA2_CHEAT 0x0053e470
 void C2_HOOK_CDECL BrPixelmapCopy(br_pixelmap* dst, br_pixelmap* src) {
 
     br_rectangle s;
@@ -578,6 +588,7 @@ void C2_HOOK_CDECL BrPixelmapCopy(br_pixelmap* dst, br_pixelmap* src) {
 
 // FUNCTION: CARMA2_HW 0x00538990
 // FUNCTION: CARMA2_SW 0x00534030
+// FUNCTION: CARMA2_CHEAT 0x0053e580
 void C2_HOOK_CDECL BrPixelmapLine(br_pixelmap* dst, br_int_32 x1, br_int_32 y1, br_int_32 x2, br_int_32 y2, br_uint_32 colour) {
     br_point s;
     br_point e;
@@ -592,6 +603,7 @@ void C2_HOOK_CDECL BrPixelmapLine(br_pixelmap* dst, br_int_32 x1, br_int_32 y1, 
 
 // FUNCTION: CARMA2_HW 0x005389e0
 // FUNCTION: CARMA2_SW 0x00534080
+// FUNCTION: CARMA2_CHEAT 0x0053e5d0
 void C2_HOOK_CDECL BrPixelmapDoubleBuffer(br_pixelmap* dst, br_pixelmap* src) {
 
     CheckDispatch((br_device_pixelmap*)dst);
@@ -604,6 +616,7 @@ void C2_HOOK_CDECL BrPixelmapDoubleBuffer(br_pixelmap* dst, br_pixelmap* src) {
 
 // FUNCTION: CARMA2_HW 0x00538a10
 // FUNCTION: CARMA2_SW 0x005340b0
+// FUNCTION: CARMA2_CHEAT 0x0053e600
 void C2_HOOK_CDECL BrPixelmapText(br_pixelmap* dst, br_int_32 x, br_int_32 y, br_uint_32 colour, br_font* font, char* text) {
     br_point p;
 
@@ -638,6 +651,7 @@ void C2_HOOK_CDECL BrPixelmapTextF(br_pixelmap* dst, br_int_32 x, br_int_32 y, b
 
 // FUNCTION: CARMA2_HW 0x00538ad0
 // FUNCTION: CARMA2_SW 0x00534170
+// FUNCTION: CARMA2_CHEAT 0x0053e6c0
 br_uint_16 C2_HOOK_CDECL BrPixelmapTextWidth(br_pixelmap* dst, br_font* font, char* text) {
     int i;
     int j;
@@ -708,6 +722,7 @@ br_uint_16 C2_HOOK_CDECL BrPixelmapChannels(br_pixelmap* pm) {
 
 // FUNCTION: CARMA2_HW 0x00538c40
 // FUNCTION: CARMA2_SW 0x005342e0
+// FUNCTION: CARMA2_CHEAT 0x0053e830
 void C2_HOOK_CDECL BrPixelmapPaletteSet(br_pixelmap* pm, br_pixelmap* pal) {
 
     CheckDispatch((br_device_pixelmap*)pm);
@@ -717,6 +732,7 @@ void C2_HOOK_CDECL BrPixelmapPaletteSet(br_pixelmap* pm, br_pixelmap* pal) {
 
 // FUNCTION: CARMA2_HW 0x00538c90
 // FUNCTION: CARMA2_SW 0x00534330
+// FUNCTION: CARMA2_CHEAT 0x0053e880
 void C2_HOOK_CDECL BrPixelmapPaletteEntrySet(br_pixelmap* pm, br_int_32 index, br_colour colour) {
     br_device_clut* clut;
 
@@ -747,6 +763,7 @@ void C2_HOOK_CDECL BrPixelmapPaletteEntrySetMany(br_pixelmap* pm, br_int_32 inde
 
 // FUNCTION: CARMA2_HW 0x00538d20
 // FUNCTION: CARMA2_SW 0x005343c0
+// FUNCTION: CARMA2_CHEAT 0x0053e910
 br_pixelmap* C2_HOOK_CDECL BrPixelmapDirectLock(br_pixelmap* src, br_boolean block) {
 
     CheckDispatch((br_device_pixelmap*)src);
@@ -759,6 +776,7 @@ br_pixelmap* C2_HOOK_CDECL BrPixelmapDirectLock(br_pixelmap* src, br_boolean blo
 
 // FUNCTION: CARMA2_HW 0x00538d50
 // FUNCTION: CARMA2_SW 0x005343f0
+// FUNCTION: CARMA2_CHEAT 0x0053e940
 br_pixelmap* C2_HOOK_CDECL BrPixelmapDirectUnlock(br_pixelmap* src) {
 
     CheckDispatch((br_device_pixelmap*)src);

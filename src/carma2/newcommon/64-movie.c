@@ -21,42 +21,52 @@
 
 // GLOBAL: CARMA2_HW 0x006a0c24
 // GLOBAL: CARMA2_SW 0x0069ac7c
+// GLOBAL: CARMA2_CHEAT 0x006a879c
 int gQuickTime_initialized;
 
 // GLOBAL: CARMA2_HW 0x006a0c50
 // GLOBAL: CARMA2_SW 0x0069aca8
+// GLOBAL: CARMA2_CHEAT 0x006a87c8
 int gNext_replay_record_state;
 
 // GLOBAL: CARMA2_HW 0x006a23b8
 // GLOBAL: CARMA2_SW 0x0069c410
+// GLOBAL: CARMA2_CHEAT 0x006a9f30
 int gShow_status_message;
 
 // GLOBAL: CARMA2_HW 0x006a23bc
 // GLOBAL: CARMA2_SW 0x0069c414
+// GLOBAL: CARMA2_CHEAT 0x006a9f34
 int gStatus_message_1;
 
 // GLOBAL: CARMA2_HW 0x006a23c0
 // GLOBAL: CARMA2_SW 0x0069c418
+// GLOBAL: CARMA2_CHEAT 0x006a9f38
 int gStatus_message_2;
 
 // GLOBAL: CARMA2_HW 0x00705440
 // GLOBAL: CARMA2_SW 0x006fbf00
+// GLOBAL: CARMA2_CHEAT 0x0070cae0
 char gQuick_time_temp_path[256];
 
 // GLOBAL: CARMA2_HW 0x00705240
 // GLOBAL: CARMA2_SW 0x006fbd00
+// GLOBAL: CARMA2_CHEAT 0x0070c8e0
 char gQuick_time_movie_path_stub[256];
 
 // GLOBAL: CARMA2_HW 0x00705340
 // GLOBAL: CARMA2_SW 0x006fbe00
+// GLOBAL: CARMA2_CHEAT 0x0070c9e0
 char gQuick_time_banner_texture_name[256];
 
 // GLOBAL: CARMA2_HW 0x0065ee50
-char gDefault_quick_time_quality[] = "normal";
+// GLOBAL: CARMA2_CHEAT 0x00666628
+char gDefault_quick_time_quality[32] = "normal";
 
 // GLOBAL: CARMA2_HW 0x0065ed30
 // GLOBAL: CARMA2_SW 0x00659690
-char gDefault_quick_time_compressor[] = "animation";
+// GLOBAL: CARMA2_CHEAT 0x00666508
+char gDefault_quick_time_compressor[32] = "animation";
 
 // Create555BELookupTable
 
@@ -84,6 +94,7 @@ char gDefault_quick_time_compressor[] = "animation";
 
 // FUNCTION: CARMA2_HW 0x004e1700
 // FUNCTION: CARMA2_SW 0x004dda00
+// FUNCTION: CARMA2_CHEAT 0x004e72a0
 void C2_HOOK_CDECL InitQuickTimeStuff(void) {
     OSErr err;
 
@@ -102,6 +113,7 @@ void C2_HOOK_CDECL InitQuickTimeStuff(void) {
 
 // FUNCTION: CARMA2_HW 0x004e1740
 // FUNCTION: CARMA2_SW 0x004dda40
+// FUNCTION: CARMA2_CHEAT 0x004e72e0
 void C2_HOOK_FASTCALL SetQuickTimeDefaults(void) {
 
     if (gQuick_time_quality[0] == '\0') {
@@ -125,6 +137,7 @@ void C2_HOOK_FASTCALL SetQuickTimeDefaults(void) {
 
 // STUB: CARMA2_HW 0x004e1a20
 // STUB: CARMA2_SW 0x004ddd20
+// STUB: CARMA2_CHEAT 0x004e75b0
 void C2_HOOK_FASTCALL MovieStopRecordingIfNecessary(void) {
     NOT_IMPLEMENTED();
 }
@@ -159,12 +172,14 @@ void C2_HOOK_FASTCALL FUN_004e1c60(undefined4 pArg1, undefined4 pArg2, undefined
 
 // FUNCTION: CARMA2_HW 0x004e2100
 // FUNCTION: CARMA2_SW 0x004de480
+// FUNCTION: CARMA2_CHEAT 0x004e7c90
 int C2_HOOK_FASTCALL MovieRecording(void) {
     return gNext_replay_record_state;
 }
 
 // FUNCTION: CARMA2_HW 0x004e2110
 // FUNCTION: CARMA2_SW 0x004de490
+// FUNCTION: CARMA2_CHEAT 0x004e7ca0
 void C2_HOOK_FASTCALL KillStatusMessage(void) {
 
     gShow_status_message = 0;
@@ -172,6 +187,7 @@ void C2_HOOK_FASTCALL KillStatusMessage(void) {
 
 // FUNCTION: CARMA2_HW 0x004e2120
 // FUNCTION: CARMA2_SW 0x004de4a0
+// FUNCTION: CARMA2_CHEAT 0x004e7cb0
 void C2_HOOK_FASTCALL ShowStatusMessage(int pMessage1, int pMessage2) {
 
     gShow_status_message = 1;
@@ -181,6 +197,7 @@ void C2_HOOK_FASTCALL ShowStatusMessage(int pMessage1, int pMessage2) {
 
 // FUNCTION: CARMA2_HW 0x004e2140
 // FUNCTION: CARMA2_SW 0x004de4c0
+// FUNCTION: CARMA2_CHEAT 0x004e7cd0
 int C2_HOOK_FASTCALL GetMovieWidth(void) {
 
     if (gNbPixelBits == 16) {
@@ -192,6 +209,7 @@ int C2_HOOK_FASTCALL GetMovieWidth(void) {
 
 // FUNCTION: CARMA2_HW 0x004e2160
 // FUNCTION: CARMA2_SW 0x004de4e0
+// FUNCTION: CARMA2_CHEAT 0x004e7cf0
 int C2_HOOK_FASTCALL GetMovieHeight(void) {
 
     if (gNbPixelBits == 16) {
@@ -203,6 +221,7 @@ int C2_HOOK_FASTCALL GetMovieHeight(void) {
 
 // FUNCTION: CARMA2_HW 0x004e2190
 // FUNCTION: CARMA2_SW 0x004de510
+// FUNCTION: CARMA2_CHEAT 0x004e7d20
 void C2_HOOK_FASTCALL TidyMovieARDisplay(void) {
     int old_state;
 

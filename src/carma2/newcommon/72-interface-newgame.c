@@ -14,6 +14,7 @@
 
 // GLOBAL: CARMA2_HW 0x005bf280
 // GLOBAL: CARMA2_SW 0x005ba1b0
+// GLOBAL: CARMA2_CHEAT 0x005c5b00
 tFrontend_spec gFrontend_NEWGAME = {
 #if 0 // FIXME: enable this
     "newgame",
@@ -44,6 +45,7 @@ tFrontend_spec gFrontend_NEWGAME = {
 
 // GLOBAL: CARMA2_HW 0x005cab48
 // GLOBAL: CARMA2_SW 0x005c5a78
+// GLOBAL: CARMA2_CHEAT 0x005d13c8
 tFrontend_spec gFrontend_CREDITS = {
     "Credits",
     0,

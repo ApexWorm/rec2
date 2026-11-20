@@ -21,6 +21,7 @@ FILE* gDiagnostic_file;
 
 // GLOBAL: CARMA2_HW 0x00591708
 // GLOBAL: CARMA2_SW 0x0058c668
+// GLOBAL: CARMA2_CHEAT 0x00598060
 const char* gError_messages[184] = {
     "Unable to support this screen depth setting",
     "Couldn't allocate off-screen buffer",
@@ -210,6 +211,7 @@ const char* gError_messages[184] = {
 
 // FUNCTION: CARMA2_HW 0x0044c230
 // FUNCTION: CARMA2_SW 0x0044bfe0
+// FUNCTION: CARMA2_CHEAT 0x0044c780
 void C2_NORETURN C2_HOOK_CDECL FatalError(int pStr_index, ...) {
     char the_str[1024];
     char* sub_str;
@@ -255,6 +257,7 @@ void C2_NORETURN C2_HOOK_CDECL FatalError(int pStr_index, ...) {
 
 // FUNCTION: CARMA2_HW 0x0044c460
 // FUNCTION: CARMA2_SW 0x0044c210
+// FUNCTION: CARMA2_CHEAT 0x0044c9b0
 void C2_HOOK_CDECL NonFatalError(int pStr_index, ...) {
     char the_str[256];
     char* sub_str;
@@ -277,12 +280,14 @@ void C2_HOOK_CDECL NonFatalError(int pStr_index, ...) {
 
 // FUNCTION: CARMA2_HW 0x0044c570
 // FUNCTION: CARMA2_SW 0x0044c320
+// FUNCTION: CARMA2_CHEAT 0x0044cac0
 void C2_HOOK_FASTCALL CloseDiagnostics(void) {
 
 }
 
 // FUNCTION: CARMA2_HW 0x0044c580
 // FUNCTION: CARMA2_SW 0x0044c330
+// FUNCTION: CARMA2_CHEAT 0x0044cad0
 void C2_HOOK_FASTCALL OpenDiagnostics(void) {
 #ifndef REC2_MATCHING
     // FIXME: use c2_stdio functions
@@ -301,6 +306,7 @@ void C2_HOOK_FASTCALL OpenDiagnostics(void) {
 // This function is stripped from the retail binary, we've guessed at the implementation
 // FUNCTION: CARMA2_HW 0x0044c590
 // FUNCTION: CARMA2_SW 0x0044c340
+// FUNCTION: CARMA2_CHEAT 0x0044cae0
 void C2_HOOK_CDECL dr_dprintf(const char* fmt_string, ...) {
     va_list args;
     tU32 the_time;
