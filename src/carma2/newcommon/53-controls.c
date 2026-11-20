@@ -155,13 +155,10 @@ tU32 gPalette_fade_time;
 // GLOBAL: CARMA2_CHEAT 0x00595798
 tEdit_func* gEdit_funcs[eEdit_mode_count][18][8] = { 0 };
 
-#ifdef REC2_CHEAT
 // GLOBAL: CARMA2_HW 0x0067c468
-tEdit_mode gWhich_edit_mode;
-#else
+// GLOBAL: CARMA2_SW 0x00676be0
 // GLOBAL: CARMA2_CHEAT 0x00595760
-tEdit_mode gWhich_edit_mode = eEdit_mode_options;
-#endif
+tEdit_mode gWhich_edit_mode = eEdit_mode_default;
 
 void C2_HOOK_FASTCALL CompleteRace(void) {
     gRace_over_reason = eRace_over_0;

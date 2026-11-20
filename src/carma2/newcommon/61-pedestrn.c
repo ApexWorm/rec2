@@ -1742,6 +1742,7 @@ int C2_HOOK_FASTCALL ChangePedScaling(br_vector3* pScale) {
 
 // FUNCTION: CARMA2_HW 0x004d6b70
 // FUNCTION: CARMA2_SW 0x004d3170
+// FUNCTION: CARMA2_CHEAT 0x004dc730
 void C2_HOOK_FASTCALL MakeMaterialBlendy(br_material* pMaterial) {
     BlendifyMaterial(pMaterial, 25);
     BrMaterialUpdate(pMaterial, BR_MATU_ALL);
@@ -1758,6 +1759,7 @@ void C2_HOOK_FASTCALL UnmakeMaterialBlendy(br_material* pMaterial) {
 
 // FUNCTION: CARMA2_HW 0x004d6b90
 // FUNCTION: CARMA2_SW 0x004d3190
+// FUNCTION: CARMA2_CHEAT 0x004dc750
 void C2_HOOK_FASTCALL TurnOffCollisions(tPhysics_object* pObject) {
 
     pObject->flags |= 0x4;
@@ -1774,24 +1776,27 @@ void C2_HOOK_FASTCALL TurnOnCollisions(tPhysics_object* pObject) {
 // FUNCTION: CARMA2_HW 0x004d6ba0
 // FUNCTION: CARMA2_SW 0x004d31a0
 // FUNCTION: CARMA2_CHEAT 0x004dc760
-void C2_HOOK_FASTCALL ModelUpdatePrimitiveMaterials(br_model* pModel) {
+void C2_HOOK_FASTCALL UpdateModels(br_model* pModel) {
 
     BrModelUpdate(pModel, BR_MODU_PRIMITIVE_MATERIALS);
 }
 
-// UpdateModels
-
-// STUB: CARMA2_HW 0x004d6b40
-// STUB: CARMA2_SW 0x004d3140
-// STUB: CARMA2_CHEAT 0x004dc700
+// FUNCTION: CARMA2_HW 0x004d6b40
+// FUNCTION: CARMA2_SW 0x004d3140
+// FUNCTION: CARMA2_CHEAT 0x004dc700
 void C2_HOOK_FASTCALL TurnOnGhostPeds(void) {
-    NOT_IMPLEMENTED();
+
+    MungeAllCharacterMaterials(MakeMaterialBlendy);
+    MungeAllCharacterObjects(TurnOffCollisions);
+    MungeAllCharacterModels(UpdateModels);
+    gGhost_pedestrians = 1;
 }
 
 // STUB: CARMA2_HW 0x004d6bb0
 // STUB: CARMA2_SW 0x004d31b0
 // STUB: CARMA2_CHEAT 0x004dc770
 void C2_HOOK_FASTCALL TurnOffGhostPeds(void) {
+
     NOT_IMPLEMENTED();
 }
 
@@ -2607,6 +2612,10 @@ float C2_HOOK_FASTCALL GetClearanceFromCharacterInstance(tPed_character_instance
 
 // ScaleBone
 
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
 // FUNCTION: CARMA2_HW 0x0040c490
 // FUNCTION: CARMA2_SW 0x0040c480
 // FUNCTION: CARMA2_CHEAT 0x0040c530
@@ -2626,6 +2635,10 @@ void C2_HOOK_FASTCALL MungeAllCharacterMaterials(material_cbfn* pCallback) {
         pCallback(gPedestrian_character_cloned_materials[i]);
     }
 }
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)

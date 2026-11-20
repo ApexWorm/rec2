@@ -389,9 +389,7 @@ extern void C2_HOOK_FASTCALL TurnOffCollisions(tPhysics_object* pObject);
 
 extern void C2_HOOK_FASTCALL TurnOnCollisions(tPhysics_object* pObject);
 
-extern void C2_HOOK_FASTCALL ModelUpdatePrimitiveMaterials(br_model* pModel);
-
-// UpdateModels
+extern void C2_HOOK_FASTCALL UpdateModels(br_model* pModel);
 
 extern void C2_HOOK_FASTCALL TurnOnGhostPeds(void);
 

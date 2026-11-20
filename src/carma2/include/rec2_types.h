@@ -143,8 +143,10 @@ typedef enum {
     eEdit_mode_crush = 11,
 #ifdef REC2_CHEAT
     eEdit_mode_count = 12,
+    eEdit_mode_default = eEdit_mode_cheat,
 #else
     eEdit_mode_count = 2,
+    eEdit_mode_default = eEdit_mode_options,
 #endif
 } tEdit_mode;
 
