@@ -335,6 +335,7 @@ void C2_HOOK_STDCALL BrSetupClipPlanes(br_actor* world, br_matrix34* world_to_vi
 }
 
 // FUNCTION: CARMA2_HW 0x00525630
+// FUNCTION: CARMA2_SW 0x00520cd0
 // FUNCTION: CARMA2_CHEAT 0x0052b220
 void C2_HOOK_STDCALL BrSetupEnvironment(br_actor* world, br_matrix34* world_to_view, br_int_32 w2vt) {
     br_matrix34 view_to_this;
@@ -363,11 +364,13 @@ void C2_HOOK_STDCALL BrSetupEnvironment(br_actor* world, br_matrix34* world_to_v
 }
 
 // FUNCTION: CARMA2_HW 0x00525750
+// FUNCTION: CARMA2_SW 0x00520df0
 // FUNCTION: CARMA2_CHEAT 0x0052b340
 void C2_HOOK_STDCALL BrSetupHorizons(br_actor* world, br_matrix34* world_to_view, br_int_32 w2vt) {
 }
 
 // FUNCTION: CARMA2_HW 0x00525760
+// FUNCTION: CARMA2_SW 0x00520e00
 // FUNCTION: CARMA2_CHEAT 0x0052b350
 void C2_HOOK_STDCALL BrActorEnableCheck(br_actor* a) {
 

@@ -13,7 +13,7 @@
 
 #include "brender/br_types.h"
 
-extern br_uint_8 _CombineTransforms[7][7];
+extern const br_uint_8 _CombineTransforms[7][7];
 #define BrTransformCombineTypes(a, b) (_CombineTransforms[(a)][(b)])
 #define BrTransformTypeIsLP(a) ((a) != BR_TRANSFORM_MATRIX34)
 #define BrTransformTypeIsMatrix34(a) ((a) <= BR_TRANSFORM_MATRIX34_LP)

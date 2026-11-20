@@ -44,6 +44,7 @@ br_uint_32 C2_HOOK_CDECL BrActorEnum(br_actor* parent, br_actor_enum_cbfn* callb
 }
 
 // FUNCTION: CARMA2_HW 0x0051df00
+// FUNCTION: CARMA2_SW 0x005195a0
 // FUNCTION: CARMA2_CHEAT 0x00523af0
 br_uint_32 C2_HOOK_CDECL BrActorSearchMany(br_actor* root, char* pattern, br_actor** actors, int max) {
     br_actor* a;
@@ -84,6 +85,7 @@ br_uint_32 C2_HOOK_CDECL BrActorSearchMany(br_actor* root, char* pattern, br_act
 }
 
 // FUNCTION: CARMA2_HW 0x0051dfb0
+// FUNCTION: CARMA2_SW 0x00519650
 // FUNCTION: CARMA2_CHEAT 0x00523ba0
 br_actor* C2_HOOK_CDECL BrActorSearch(br_actor* root, char* pattern) {
     br_actor* a;
@@ -95,6 +97,7 @@ br_actor* C2_HOOK_CDECL BrActorSearch(br_actor* root, char* pattern) {
 }
 
 // FUNCTION: CARMA2_HW 0x0051e040
+// FUNCTION: CARMA2_SW 0x005196e0
 // FUNCTION: CARMA2_CHEAT 0x00523c30
 void C2_HOOK_STDCALL RenumberActor(br_actor* a, int d) {
     br_actor* ac;
@@ -140,6 +143,7 @@ br_actor* C2_HOOK_CDECL BrActorRemove(br_actor* a) {
 }
 
 // FUNCTION: CARMA2_HW 0x0051e0d0
+// FUNCTION: CARMA2_SW 0x00519770
 // FUNCTION: CARMA2_CHEAT 0x00523cc0
 void C2_HOOK_CDECL BrActorRelink(br_actor* parent, br_actor* a) {
     br_matrix34 mat;
@@ -215,6 +219,7 @@ br_actor* C2_HOOK_CDECL BrActorAllocate(br_uint_8 type, void* type_data) {
 }
 
 // FUNCTION: CARMA2_HW 0x0051e300
+// FUNCTION: CARMA2_SW 0x005199a0
 // FUNCTION: CARMA2_CHEAT 0x00523ef0
 void C2_HOOK_STDCALL InternalActorFree(br_actor* a) {
 
@@ -234,6 +239,7 @@ void C2_HOOK_CDECL BrActorFree(br_actor* a) {
 }
 
 // FUNCTION: CARMA2_HW 0x0051e340
+// FUNCTION: CARMA2_SW 0x005199e0
 // FUNCTION: CARMA2_CHEAT 0x00523f30
 br_boolean C2_HOOK_STDCALL ActorToRoot(br_actor* a, br_actor* world, br_matrix34* m) {
     if (a == world) {
@@ -251,6 +257,7 @@ br_boolean C2_HOOK_STDCALL ActorToRoot(br_actor* a, br_actor* world, br_matrix34
 }
 
 // FUNCTION: CARMA2_HW 0x0051e3b0
+// FUNCTION: CARMA2_SW 0x00519a50
 // FUNCTION: CARMA2_CHEAT 0x00523fa0
 br_boolean C2_HOOK_STDCALL ActorToRootTyped(br_actor* a, br_actor* world, br_matrix34* m, br_int_32* type) {
     br_int_32 t;
@@ -273,6 +280,7 @@ br_boolean C2_HOOK_STDCALL ActorToRootTyped(br_actor* a, br_actor* world, br_mat
 }
 
 // FUNCTION: CARMA2_HW 0x0051e450
+// FUNCTION: CARMA2_SW 0x00519af0
 // FUNCTION: CARMA2_CHEAT 0x00524040
 void C2_HOOK_STDCALL Matrix4PerspectiveNew(br_matrix4* mat, br_angle field_of_view, br_scalar aspect, br_scalar hither, br_scalar yon, br_scalar origin_x, br_scalar origin_y) {
     br_scalar scale;
@@ -280,24 +288,25 @@ void C2_HOOK_STDCALL Matrix4PerspectiveNew(br_matrix4* mat, br_angle field_of_vi
     scale = BR_COS(field_of_view / 2) / BR_SIN(field_of_view / 2);
 
     mat->m[0][0] = scale / aspect;
-    mat->m[0][1] = 0.f;
-    mat->m[0][2] = 0.f;
-    mat->m[0][3] = 0.f;
-    mat->m[1][0] = 0.f;
     mat->m[1][1] = scale;
-    mat->m[1][2] = 0.f;
-    mat->m[1][3] = 0.f;
+    mat->m[2][2] = (yon + hither) / (yon - hither);
+    mat->m[3][2] = -2.0f * ((yon * hither) / (yon - hither));
+    mat->m[0][1] = 0.0f;
+    mat->m[0][2] = 0.0f;
+    mat->m[0][3] = 0.0f;
+    mat->m[1][0] = 0.0f;
+    mat->m[1][2] = 0.0f;
+    mat->m[1][3] = 0.0f;
     mat->m[2][0] = -origin_x;
     mat->m[2][1] = -origin_y;
-    mat->m[2][2] = (yon + hither) / (yon - hither);
-    mat->m[2][3] = -1.f;
-    mat->m[3][0] = 0.f;
-    mat->m[3][1] = 0.f;
-    mat->m[3][2] = -2.f * (yon * hither) / (yon - hither);
-    mat->m[3][3] = 0.f;
+    mat->m[2][3] = -1.0f;
+    mat->m[3][0] = 0.0f;
+    mat->m[3][1] = 0.0f;
+    mat->m[3][3] = 0.0f;
 }
 
 // FUNCTION: CARMA2_HW 0x0051e520
+// FUNCTION: CARMA2_SW 0x00519bc0
 // FUNCTION: CARMA2_CHEAT 0x00524110
 br_token C2_HOOK_STDCALL CameraToScreenMatrix4(br_matrix4* mat, br_actor* camera) {
     br_camera* camera_type;
@@ -305,11 +314,29 @@ br_token C2_HOOK_STDCALL CameraToScreenMatrix4(br_matrix4* mat, br_actor* camera
 
     camera_type = camera->type_data;
 	switch (camera_type->type) {
+    case BR_CAMERA_PERSPECTIVE_FOV:
+        Matrix4PerspectiveNew(mat,
+            camera_type->field_of_view,
+            camera_type->aspect,
+            -camera_type->hither_z,
+            -camera_type->yon_z,
+            v1db.origin.v[0],
+            v1db.origin.v[1]);
+        return BRT_PERSPECTIVE;
+    case BR_CAMERA_PERSPECTIVE_FOV_OLD:
+        BrMatrix4Perspective(mat,
+            camera_type->field_of_view,
+            camera_type->aspect,
+            -camera_type->hither_z,
+            -camera_type->yon_z);
+        return BRT_PERSPECTIVE;
+    case BR_CAMERA_PERSPECTIVE_WHD:
+        return BRT_PERSPECTIVE;
 	case BR_CAMERA_PARALLEL:
-		if (camera_type->width == 0.f) {
+		if (camera_type->width == 0.0f) {
 			BrFailure("Parallel camera has zero width");
         }
-		if (camera_type->height == 0.f) {
+		if (camera_type->height == 0.0f) {
 			BrFailure("Parallel camera has zero height");
         }
 		if (camera_type->yon_z <= camera_type->hither_z) {
@@ -317,55 +344,45 @@ br_token C2_HOOK_STDCALL CameraToScreenMatrix4(br_matrix4* mat, br_actor* camera
         }
 
 		BrMatrix34Scale(&mat34,
-            2.f / (camera_type->width * camera_type->aspect),
-            2.f / camera_type->height,
-            2.f / (camera_type->yon_z - camera_type->hither_z));
+            (br_scalar)((1.0 / (camera_type->width * camera_type->aspect)) * 2.0),
+            (br_scalar)((1.0 / camera_type->height) * 2.0),
+            (br_scalar)((1.0 / (camera_type->yon_z - camera_type->hither_z)) * 2.0));
 		BrMatrix34PreTranslate(&mat34,
-            0.f,
-            0.f,
-            (camera_type->hither_z + camera_type->yon_z) / 2.f);
+            0.0f,
+            0.0f,
+            (camera_type->hither_z + camera_type->yon_z) / 2.0f);
 		BrMatrix34PostTranslate(&mat34,
             v1db.origin.v[0],
             v1db.origin.v[1],
-            0.f);
+            0.0f);
 		BrMatrix4Copy34(mat, &mat34);
 		return BRT_PARALLEL;
-	case BR_CAMERA_PERSPECTIVE_FOV:
-		Matrix4PerspectiveNew(mat,
-			camera_type->field_of_view,
-            camera_type->aspect,
-			-camera_type->hither_z,
-            -camera_type->yon_z,
-			v1db.origin.v[0],
-            v1db.origin.v[1]);
-		return BRT_PERSPECTIVE;
-    case BR_CAMERA_PERSPECTIVE_WHD:
-        return BRT_PERSPECTIVE;
 	case BR_CAMERA_PARALLEL_OLD:
-		if (camera_type->width == 0.f) {
+		if (camera_type->width == 0.0f) {
             BrFailure("Parallel camera has zero width");
         }
-        if (camera_type->height == 0.f) {
+        if (camera_type->height == 0.0f) {
             BrFailure("Parallel camera has zero height");
         }
 		if (camera_type->yon_z <= camera_type->hither_z) {
             BrFailure("Parallel camera has invalid yon and hither");
         }
 		BrMatrix34Scale(&mat34,
-			1.f / camera_type->width,
-			1.f / camera_type->height,
-			1.f / (camera_type->yon_z - camera_type->hither_z));
+			(br_scalar)(1.0 / camera_type->width),
+			(br_scalar)(1.0 / camera_type->height),
+			(br_scalar)(1.0 / (camera_type->yon_z - camera_type->hither_z)));
 		BrMatrix34PreTranslate(&mat34,
-            0.f,
-            0.f,
+            0.0f,
+            0.0f,
             camera_type->hither_z);
-		BrMatrix4Copy34(mat,&mat34);
+		BrMatrix4Copy34(mat, &mat34);
 		return BRT_PARALLEL;
 	}
 	return BR_NULL_TOKEN;
 }
 
 // FUNCTION: CARMA2_HW 0x0051e7d0
+// FUNCTION: CARMA2_SW 0x00519e70
 // FUNCTION: CARMA2_CHEAT 0x005243c0
 br_uint_16 C2_HOOK_CDECL BrActorToActorMatrix34(br_matrix34* m, br_actor* a, br_actor* b) {
     br_matrix34 mata;
@@ -459,6 +476,7 @@ br_uint_16 C2_HOOK_CDECL BrActorToActorMatrix34(br_matrix34* m, br_actor* a, br_
 }
 
 // FUNCTION: CARMA2_HW 0x0051eae0
+// FUNCTION: CARMA2_SW 0x0051a180
 // FUNCTION: CARMA2_CHEAT 0x005246d0
 void C2_HOOK_CDECL BrActorToScreenMatrix4(br_matrix4* m, br_actor* a, br_actor* camera) {
     br_matrix34 a2c;
@@ -496,6 +514,7 @@ void C2_HOOK_CDECL BrMatrix34ApplyBounds(br_bounds* A, br_bounds* B, br_matrix34
 }
 
 // FUNCTION: CARMA2_HW 0x0051ebc0
+// FUNCTION: CARMA2_SW 0x0051a260
 // FUNCTION: CARMA2_CHEAT 0x005247b0
 void C2_HOOK_STDCALL ActorToBounds(br_bounds* dest, br_actor* ap, br_model* model) {
     br_actor* a;

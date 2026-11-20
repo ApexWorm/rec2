@@ -182,12 +182,12 @@ void C2_HOOK_CDECL BrMatrix23LPInverse(br_matrix23* B, const br_matrix23* A) {
 void C2_HOOK_CDECL BrMatrix23LPNormalise(br_matrix23* A, const br_matrix23* B) {
 
     br_scalar norm = (br_scalar)sqrt(BR_MAC2(B(1, 0), B(1, 0), B(1, 1), B(1,1)));
-    if (norm < 2.384186e-07f) {
+    if (norm > (1.f / 2048.f / 2048.f)) {
+        A(1, 0) = B(1, 0) * BR_SCALAR(1.0 / norm);
+        A(1, 1) = B(1, 1) * BR_SCALAR(1.0 / norm);
+    } else {
         A(1, 0) = BR_SCALAR(1.f);
         A(1, 1) = BR_SCALAR(0.f);
-    } else {
-        A(1, 0) = B(1, 0) / norm;
-        A(1, 1) = B(1, 1) / norm;
     }
     A(0, 0) = A(1, 1);
     A(0, 1) = -A(1, 0);

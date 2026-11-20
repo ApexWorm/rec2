@@ -15,40 +15,32 @@
 
 #include "c2_string.h"
 
-// GLOBAL: CARMA2_HW 0x006b7818
-// GLOBAL: CARMA2_SW 0x006ae4f8
-// GLOBAL: CARMA2_CHEAT 0x006beeb8
-int gTimers_stack_size;
-
-// GLOBAL: CARMA2_HW 0x006b7600
-// GLOBAL: CARMA2_CHEAT 0x006beca0
-tTimer gTimers[19];
-
-// GLOBAL: CARMA2_HW 0x006b7814
-// GLOBAL: CARMA2_SW 0x006ae4f4
-// GLOBAL: CARMA2_CHEAT 0x006beeb4
-int gTimers_max_index;
-
 // GLOBAL: CARMA2_HW 0x006aaa40
+// GLOBAL: CARMA2_SW 0x006a4490
 // GLOBAL: CARMA2_CHEAT 0x006b25b8
 int gTimers_draw_x;
 
 // GLOBAL: CARMA2_HW 0x006aaa44
+// GLOBAL: CARMA2_SW 0x006a4494
 // GLOBAL: CARMA2_CHEAT 0x006b25bc
 int gTimers_draw_y_stride;
 
 // GLOBAL: CARMA2_HW 0x006aaa48
+// GLOBAL: CARMA2_SW 0x006a4498
 // GLOBAL: CARMA2_CHEAT 0x006b25c0
 int gTimers_enough_samples;
 
 // GLOBAL: CARMA2_HW 0x006aaa4c
+// GLOBAL: CARMA2_SW 0x006a449c
 // GLOBAL: CARMA2_CHEAT 0x006b25c4
 int gTimers_frame_count;
 
 // GLOBAL: CARMA2_HW 0x006aaa50
+// GLOBAL: CARMA2_SW 0x006a44a0
 tU32 gTimers_frame_end_time;
 
 // GLOBAL: CARMA2_HW 0x006aaa54
+// GLOBAL: CARMA2_SW 0x006a44a4
 // GLOBAL: CARMA2_CHEAT 0x006b25cc
 int gTimers_draw_y;
 
@@ -57,7 +49,23 @@ int gTimers_draw_y;
 tU32 gTimers_frame_start_time;
 
 // GLOBAL: CARMA2_HW 0x006aaa5c
+// GLOBAL: CARMA2_SW 0x006a44ac
 tU32 gTimers_tolerance;
+
+// GLOBAL: CARMA2_HW 0x006b7600
+// GLOBAL: CARMA2_SW 0x006ae2e0
+// GLOBAL: CARMA2_CHEAT 0x006beca0
+tTimer gTimers[19];
+
+// GLOBAL: CARMA2_HW 0x006b7814
+// GLOBAL: CARMA2_SW 0x006ae4f4
+// GLOBAL: CARMA2_CHEAT 0x006beeb4
+int gTimers_max_index;
+
+// GLOBAL: CARMA2_HW 0x006b7818
+// GLOBAL: CARMA2_SW 0x006ae4f8
+// GLOBAL: CARMA2_CHEAT 0x006beeb8
+int gTimers_stack_size;
 
 // FUNCTION: CARMA2_HW 0x00504300
 // FUNCTION: CARMA2_SW 0x004ffc50
@@ -194,18 +202,21 @@ void C2_HOOK_FASTCALL Timers_Draw(br_pixelmap* pScreen) {
             i * gTimers_draw_y_stride + gTimers_draw_y + 0,
             (int)(gTimers[i].total_duration * draw_factor + (float)gTimers_draw_x),
             i * gTimers_draw_y_stride + gTimers_draw_y + 0,
+            // LINE: CARMA2_HW 0x00504897
             gTimers[i].colour);
         BrPixelmapLine(pScreen,
             gTimers_draw_x,
             i * gTimers_draw_y_stride + gTimers_draw_y + 1,
             (int)(gTimers[i].total_duration * draw_factor + (float)gTimers_draw_x),
             i * gTimers_draw_y_stride + gTimers_draw_y + 1,
+            // LINE: CARMA2_HW 0x005048de
             gTimers[i].colour);
         BrPixelmapLine(pScreen,
             gTimers_draw_x,
             i * gTimers_draw_y_stride + gTimers_draw_y + 2,
             (int)(gTimers[i].total_duration * draw_factor + (float)gTimers_draw_x),
             i * gTimers_draw_y_stride + gTimers_draw_y + 2,
+            // LINE: CARMA2_HW 0x00504929
             gTimers[i].colour);
 
         sprintf(duration_str, "%i", gTimers[i].total_duration);
@@ -224,19 +235,19 @@ void C2_HOOK_FASTCALL Timers_Draw(br_pixelmap* pScreen) {
         BrPixelmapRectangle(pScreen,
             gTimers_draw_x - 2,
             gTimers_draw_y + longest_duration_timer * gTimers_draw_y_stride - 2,
-            (int)(gTimers[longest_duration_timer].total_duration * draw_factor - 5.0f),
+            (int)(gTimers[longest_duration_timer].total_duration * draw_factor + 5.0f),
             6,
             RGB565_TO_BACKSCREEN_COLOUR(0x1f, 0x3e, 0x1f));
     }
     BrPixelmapLine(pScreen,
-        (int)(gTimers_draw_x + draw_factor * 10000.0),
+        (int)(gTimers_draw_x + (draw_factor * 10000.0)),
         gTimers_draw_y - 1,
-        (int)(gTimers_draw_x + draw_factor * 10000.0),
+        (int)(gTimers_draw_x + (draw_factor * 10000.0)),
         gTimers_draw_y + (REC2_ASIZE(gTimers) - 1) * gTimers_draw_y_stride + 3,
         RGB565_TO_BACKSCREEN_COLOUR(0x1f, 0x00, 0x00));
     sprintf(tolerance_str, "8.38ms, tollerance = %i", gTimers_tolerance);
     DRPixelmapText(pScreen,
-        (int)(((double)gTimers_draw_x + draw_factor * 10000.0) - 13.0),
+        (int)(((double)gTimers_draw_x + (draw_factor * 10000.0)) - 13.0),
         gTimers_draw_y + 7 + gTimers_draw_y_stride * (REC2_ASIZE(gTimers) - 1),
         &gFonts[1],
         tolerance_str,

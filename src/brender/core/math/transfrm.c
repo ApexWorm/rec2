@@ -26,8 +26,9 @@
 #define IDT BR_TRANSFORM_IDENTITY
 
 // GLOBAL: CARMA2_HW 0x0066cb68
+// GLOBAL: CARMA2_SW 0x006672f8
 // GLOBAL: CARMA2_CHEAT 0x00674418
-br_uint_8 _CombineTransforms[7][7] = {
+const br_uint_8 _CombineTransforms[7][7] = {
 
     /* M34 */ {
         M34,

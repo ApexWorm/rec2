@@ -967,7 +967,7 @@ void C2_HOOK_FASTCALL ControlCar2(tCar_spec* pCar, br_scalar pDt) {
             pCar->turn_speed = 0.0f;
         }
         if (pCar->curvature < 0.0f) {
-            pCar->turn_speed = (float)(pCar->turn_speed + 0.01 * pDt / 0.04f / 2.0);
+            pCar->turn_speed = (float)(pCar->turn_speed + 0.01 * pDt / 0.04 / 2.0);
         } else {
             time_steps = pDt / 0.04f;
             pCar->turn_speed += time_steps * (0.05f / (5.0f + BrVector3Length(&pCar->collision_info->v))) / 2.0f;
@@ -978,7 +978,7 @@ void C2_HOOK_FASTCALL ControlCar2(tCar_spec* pCar, br_scalar pDt) {
             pCar->turn_speed = 0.0f;
         }
         if (pCar->curvature > 0.0f) {
-            pCar->turn_speed = (float)(pCar->turn_speed - 0.01 * pDt / 0.04f / 2.0);
+            pCar->turn_speed = (float)(pCar->turn_speed - 0.01 * pDt / 0.04 / 2.0);
         } else {
             time_steps = pDt / 0.04f;
             pCar->turn_speed -= time_steps * (0.05f / (5.0f + BrVector3Length(&pCar->collision_info->v))) / 2.0f;
@@ -1006,7 +1006,7 @@ void C2_HOOK_FASTCALL ControlCar3(tCar_spec* pCar, br_scalar pDt) {
             pCar->turn_speed = 0.0f;
         }
         if (pCar->curvature < 0.0f || pCar->collision_info->omega.v[1] < 0.0f) {
-            pCar->turn_speed = (float)(pCar->turn_speed + 0.01 * pDt / 0.04f / 2.0 * 3.0);
+            pCar->turn_speed = (float)(pCar->turn_speed + 0.01 * pDt / 0.04 / 2.0 * 3.0);
         } else {
             time_steps = pDt / 0.04f;
             pCar->turn_speed = (float)(pCar->turn_speed + time_steps * (0.05f / (5.0f + BrVector3Length(&pCar->collision_info->v))) / 2.0f * 0.75);
@@ -1017,7 +1017,7 @@ void C2_HOOK_FASTCALL ControlCar3(tCar_spec* pCar, br_scalar pDt) {
             pCar->turn_speed = 0.0f;
         }
         if (pCar->curvature > 0.0f || pCar->collision_info->omega.v[1] > 0.0f) {
-            pCar->turn_speed = (float)(pCar->turn_speed - 0.01 * pDt / 0.04f / 2.0 * 3.0);
+            pCar->turn_speed = (float)(pCar->turn_speed - 0.01 * pDt / 0.04 / 2.0 * 3.0);
         } else {
             time_steps = pDt / 0.04f;
             pCar->turn_speed = (float)(pCar->turn_speed - time_steps * (0.05f / (5.0f + BrVector3Length(&pCar->collision_info->v))) / 2.0f * 0.75);
@@ -1054,7 +1054,7 @@ void C2_HOOK_FASTCALL ControlCar5(tCar_spec* pCar, br_scalar pDt) {
             pCar->turn_speed = 0.0f;
         }
         if (pCar->curvature < 0.0f) {
-            pCar->turn_speed = (float)(pCar->turn_speed + 0.01 * pDt / 0.04f / 2.0 * 0.5);
+            pCar->turn_speed = (float)(pCar->turn_speed + 0.01 * pDt / 0.04 / 2.0 * 0.5);
         } else {
             time_steps = pDt / 0.04f;
             pCar->turn_speed = (float)(pCar->turn_speed + time_steps * (0.05f / (5.0f + BrVector3Length(&pCar->collision_info->v))) / 2.0f * 0.5);
@@ -1065,7 +1065,7 @@ void C2_HOOK_FASTCALL ControlCar5(tCar_spec* pCar, br_scalar pDt) {
             pCar->turn_speed = 0.0f;
         }
         if (pCar->curvature > 0.0f) {
-            pCar->turn_speed = (float)(pCar->turn_speed - 0.01 * pDt / 0.04f / 2.0 * 0.5);
+            pCar->turn_speed = (float)(pCar->turn_speed - 0.01 * pDt / 0.04 / 2.0 * 0.5);
         } else {
             time_steps = pDt / 0.04f;
             pCar->turn_speed = (float)(pCar->turn_speed - time_steps * (0.05f / (5.0f + BrVector3Length(&pCar->collision_info->v))) / 2.0f * 0.5);

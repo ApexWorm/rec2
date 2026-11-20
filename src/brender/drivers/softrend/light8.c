@@ -234,7 +234,7 @@ void C2_HOOK_STDCALL lightingIndexSpotAttn(br_soft_renderer* self, br_vector3* p
 
     BrVector3Sub(&dirn, &alp->position, p);
     dist = BrVector3Length(&dirn);
-    if (dist <= BR_SCALAR_EPSILON) {
+    if (dist <= (1.f / 2048.f / 2048.f)) {
         return;
     }
     BrVector3InvScale(&dirn_norm, &dirn, dist);
