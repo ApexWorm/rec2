@@ -42,7 +42,7 @@ extern int C2_HOOK_FASTCALL PermitNetServiceReentrancy(void);
 
 extern void C2_HOOK_FASTCALL HaltNetServiceReentrancy(void);
 
-// NetSendHeadupToAllPlayers
+extern void C2_HOOK_FASTCALL NetSendHeadupToAllPlayers(char* pMessage);
 
 extern void C2_HOOK_FASTCALL NetSendHeadupToEverybody(const char* pMessage);
 
