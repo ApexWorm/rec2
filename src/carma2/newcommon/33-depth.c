@@ -307,6 +307,7 @@ void C2_HOOK_FASTCALL RenderLollipops(br_pixelmap* pRender_buffer, br_pixelmap* 
 
 // STUB: CARMA2_HW 0x00446680
 // STUB: CARMA2_SW 0x00446700
+// STUB: CARMA2_CHEAT 0x00446ba0
 void C2_HOOK_FASTCALL DoWobbleCamera(br_actor* pCamera) {
     NOT_IMPLEMENTED();
 }
@@ -399,6 +400,7 @@ inline int C2_HOOK_FASTCALL DoSubaquaCam(void) {
 
 // FUNCTION: CARMA2_HW 0x00446340
 // FUNCTION: CARMA2_SW 0x004463c0
+// FUNCTION: CARMA2_CHEAT 0x00446860
 void C2_HOOK_FASTCALL DoSpecialCameraEffect(br_actor* pCamera, br_matrix34* pCamera_to_world) {
 
     UpdateTintedPolys();
