@@ -187,6 +187,11 @@ void C2_HOOK_FASTCALL AutoSaveAdditionalStuff(void) {
     FlushAllPedCaches();
 }
 
+// FUNCTION: CARMA2_HW 0x0050c980
+// FUNCTION: CARMA2_SW 0x00507dd0
+void C2_HOOK_FASTCALL DropSpecVol0(void) {
+}
+
 br_material* C2_HOOK_FASTCALL GetInternalMat(void) {
 
     return BrMaterialFind("SPECVOL.MAT");
