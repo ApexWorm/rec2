@@ -279,6 +279,7 @@ void C2_HOOK_FASTCALL BuildSpecVolModel(tSpecial_volume* pSpec, int pIndex, br_m
 
 // FUNCTION: CARMA2_HW 0x0050d270
 // FUNCTION: CARMA2_SW 0x005086c0
+// FUNCTION: CARMA2_CHEAT 0x00512c60
 void C2_HOOK_FASTCALL IdentifySpecVol(void) {
     int i;
     int min_index;
