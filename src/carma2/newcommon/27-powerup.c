@@ -329,6 +329,7 @@ void C2_HOOK_FASTCALL LoadPowerups(void) {
 
 // FUNCTION: CARMA2_HW 0x004da290
 // FUNCTION: CARMA2_SW 0x004d6760
+// FUNCTION: CARMA2_CHEAT 0x004dfe50
 tPhysics_object* C2_HOOK_FASTCALL MungeBoxObject(br_model* pModel, float pMass) {
     tPhysics_object* box;
 
