@@ -63,6 +63,8 @@ tU32 C2_HOOK_FASTCALL PDNetExtractGameID(const tNet_game_details* pDetails) {
 }
 
 // STUB: CARMA2_HW 0x0051a130
+// STUB: CARMA2_SW 0x00513c10
+// STUB: CARMA2_CHEAT 0x0051f850
 tU32 C2_HOOK_FASTCALL PDNetExtractPlayerID(void) {
     NOT_IMPLEMENTED();
 }

@@ -466,6 +466,7 @@ void C2_HOOK_FASTCALL NetLeaveGame(tNet_game_details* pNet_game) {
 
 // FUNCTION: CARMA2_HW 0x0049e3a0
 // FUNCTION: CARMA2_SW 0x0049a520
+// FUNCTION: CARMA2_CHEAT 0x0049e8e0
 void C2_HOOK_FASTCALL FillInThisPlayer(tNet_game_details* pGame, tNet_game_player_info* pPlayer, int pCar_index, int pHost) {
     C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tNet_game_player_info, field_0x58, 0x58);
     C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tNet_game_player_info, field_0x58, 4);
