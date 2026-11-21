@@ -1481,6 +1481,7 @@ void C2_HOOK_FASTCALL PipeSingleGrooveOnOff(int pOn, br_actor* pActor, int pBloc
 
 // FUNCTION: CARMA2_HW 0x004c8da0
 // FUNCTION: CARMA2_SW 0x004c54d0
+// FUNCTION: CARMA2_CHEAT 0x004ce8c0
 void C2_HOOK_FASTCALL PipeSinglePowerupGot(tPowerup* pPowerup, tCar_spec* pCar_spec) {
     C2_HOOK_BUG_ON(sizeof(pCar_spec) != 0x4);
 
