@@ -279,6 +279,10 @@ extern void C2_HOOK_FASTCALL TiggerMineToExplode(tCar_spec* pCar);
 
 // MungeShatMines
 
+extern int C2_HOOK_FASTCALL CarVulnerableByMine(tCar_spec* pCar);
+
+extern void C2_HOOK_FASTCALL ProcessShitMines(tU32 pTime);
+
 extern void C2_HOOK_FASTCALL ARDoShitMine(br_actor* pActor, br_matrix34* pMatrix);
 
 extern void C2_HOOK_FASTCALL ARUndoShitMine(br_actor* pActor, br_matrix34* pMatrix);

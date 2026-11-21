@@ -27,12 +27,14 @@
 #include "49-physics.h"
 #include "51-smash.h"
 #include "53-controls.h"
+#include "58-crush2.h"
 #include "60-phil.h"
 #include "61-pedestrn.h"
 #include "69-sound.h"
 #include "globvars.h"
 #include "globvrpb.h"
 #include "joystick.h"
+#include "platform.h"
 #include "rec2_macros.h"
 
 #include "c2_stdio.h"
@@ -1275,6 +1277,75 @@ void C2_HOOK_FASTCALL TiggerMineToExplode(tCar_spec* pCar) {
 // ClearMineReferencesToCar
 
 // MungeShatMines
+
+inline int C2_HOOK_FASTCALL CarVulnerableByMine(tCar_spec* pCar) {
+
+    if (pCar->field_0x4c8 > 1.0
+            || (gNet_mode != eNet_mode_none && NetPlayerFromCar(pCar) != NULL && NetPlayerFromCar(pCar)->field_0x80 != 0)
+            || pCar->invulnerable_no_crushage != 0) {
+        return 0;
+    } else {
+        return 1;
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x004dde20
+// FUNCTION: CARMA2_SW 0x004da320
+void C2_HOOK_FASTCALL ProcessShitMines(tU32 pTime) {
+    int i;
+    int car_vulnerable;
+    tShit_mine* mine;
+    tCar_spec* car;
+    tPhysics_object* object;
+
+    C2_HOOK_BUG_ON(REC2_ASIZE(gShit_mines) != 20);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPhysics_object, field_0x49c, 0x49c);
+
+    for (i = 0; i < (int)REC2_ASIZE(gShit_mines); i++) {
+        mine = &gShit_mines[i];
+        if (!(mine->flags & 0x1)) {
+            continue;
+        }
+        if ((mine->flags & 0x80) && mine->car != NULL) {
+            car = mine->car;
+            mine->flags &= ~0x80;
+            car_vulnerable = CarVulnerableByMine(car);
+            if (car_vulnerable) {
+                TotallySpamTheCar(car, mine->max_damage * 0.1f);
+            }
+            if (car_vulnerable && (gNet_mode == eNet_mode_none || gNet_mode == eNet_mode_host)) {
+                object = car->collision_info;
+                object->v.v[1] = (br_scalar)(FRandomBetween(mine->field3_0xc, mine->initial_y_speed_factor) / (object->M * WORLD_SCALE_D) + object->v.v[1]);
+                object = car->collision_info;
+                object->omega.v[2] = (br_scalar)((FRandomPosNeg(mine->initial_z_omega_factor) * TAU) / object->M + object->omega.v[2]);
+                object = car->collision_info;
+                object->omega.v[0] = (br_scalar)((FRandomPosNeg(mine->initial_x_omega_factor) * TAU) / object->M + object->omega.v[0]);
+                car->collision_info->disable_move_rotate = 0;
+                car->collision_info->field_0x49c = gPHIL_last_physics_tick + 40;
+                if (!car->invulnerable_no_damage) {
+                    for (i = 0; i < eDamage_count; i++) {
+                        DamageUnit2(car, (tDamage_type)i, IRandomBetween(0, (int)(mine->max_damage * 25.0f)));
+                    }
+                    if (car != mine->field_0x30) {
+                        car->last_hit_by = mine->field_0x30;
+                        car->time_last_hit = PDGetTotalTime();
+                        CrashEarnings(car, NULL);
+                    }
+                }
+            }
+        }
+        if (mine->flags & 0x20) {
+            mine->flags &= ~0x20;
+            MineExplode(mine);
+        } else if (mine->flags & 0x2) {
+            if (mine->next_think_time < pTime) {
+                mine->flags &= ~0x3;
+            }
+        } else if ((mine->flags & 0x4) && mine->next_think_time < pTime) {
+            MineExplode(mine);
+        }
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x004de000
 // FUNCTION: CARMA2_SW 0x004da500
