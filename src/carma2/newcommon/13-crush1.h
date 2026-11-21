@@ -422,7 +422,7 @@ extern intptr_t C2_HOOK_CDECL EnableGroovers(br_actor* pActor, void* pData);
 
 extern void C2_HOOK_FASTCALL TotallyRepairCarCollisionShapes(tCar_spec* pCar_spec);
 
-// TotallyRepairModel
+extern void C2_HOOK_FASTCALL TotallyRepairModel(br_model* pModel);
 
 extern intptr_t C2_HOOK_CDECL TotallyRepairModels(br_actor* pActor, void* pUser);
 

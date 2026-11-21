@@ -2006,13 +2006,69 @@ void C2_HOOK_FASTCALL TotallyRepairCarCollisionShapes(tCar_spec* pCar_spec) {
     pCar_spec->car_crush_spec->expand_bounding_box = 3;
 }
 
-// TotallyRepairModel
+inline void C2_HOOK_FASTCALL TotallyRepairModel(br_model* pModel) {
+    tUser_detail_level_model* user_detail_model;
+    tModel_detail_vertex_data* vertex_detail_data;
+    tU16 i;
+    br_vector3 vector_mash[1024];
 
-// STUB: CARMA2_HW 0x00439a20
-// STUB: CARMA2_SW 0x00439a60
-// STUB: CARMA2_CHEAT 0x00439c40
+    if (pModel == NULL) {
+        return;
+    }
+    user_detail_model = pModel->user;
+    if (user_detail_model == NULL) {
+        return;
+    }
+    vertex_detail_data = user_detail_model->field_0x4;
+    if (vertex_detail_data == NULL) {
+        return;
+    }
+    if (pModel->nvertices > REC2_ASIZE(vector_mash)) {
+        PDFatalError("Holy polygons Batman! There's a lot of vertices on that model.");
+    }
+    for (i = 0; i < pModel->nvertices; i++) {
+        br_vector3 pos;
+
+        ExpandVector3(&pos, &vertex_detail_data[i].p, -10.f, 10.f);
+        BrVector3Sub(&vector_mash[i], &pos, &pModel->vertices[i].p);
+        BrVector3Copy(&pModel->vertices[i].p, &pos);
+        vertex_detail_data[i].flags &= ~0x4;
+    }
+    AddModelMashToPipingSession(pModel, vector_mash);
+    SetModelForUpdate(pModel);
+}
+
+// FUNCTION: CARMA2_HW 0x00439a20
+// FUNCTION: CARMA2_SW 0x00439a60
+// FUNCTION: CARMA2_CHEAT 0x00439c40
 intptr_t C2_HOOK_CDECL TotallyRepairModels(br_actor* pActor, void* pUser) {
-    NOT_IMPLEMENTED();
+    tCar_spec* car_spec;
+    tUser_crush_data* user_crush;
+    tCar_crush_buffer_entry* crush_data;
+    int i;
+
+    car_spec = pUser;
+    user_crush = pActor->user;
+    if (user_crush == NULL) {
+        return 0;
+    }
+    for (i = 0; i < car_spec->count_detail_levels; i++) {
+        TotallyRepairModel(user_crush->models[i]);
+    }
+    crush_data = user_crush->crush_data;
+    if (crush_data != NULL) {
+        TotallyRepairSmash(car_spec, crush_data);
+        crush_data->field_0x2c = 0;
+        if (crush_data->flap_data != NULL && !crush_data->flap_data->kev_o_flap) {
+            crush_data->flap_data->field_0x15 = 0;
+            crush_data->flap_data->field_0x14 = 1;
+            crush_data->flap_data->field_0x18 = 0.f;
+        }
+        if (crush_data->detach_data != NULL) {
+            crush_data->detach_data->field_0x0 = 0.f;
+        }
+    }
+    return 0;
 }
 
 // FUNCTION: CARMA2_HW 0x00439a10
