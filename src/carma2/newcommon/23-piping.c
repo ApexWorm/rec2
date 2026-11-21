@@ -947,6 +947,7 @@ void C2_HOOK_FASTCALL AddFlapToPipingSession(br_actor* pActor, br_angle pAngle) 
 
 // STUB: CARMA2_HW 0x004c7550
 // STUB: CARMA2_SW 0x004c3c80
+// STUB: CARMA2_CHEAT 0x004cd070
 void C2_HOOK_FASTCALL AddModelMashToPipingSession(br_model* pModel, br_vector3* pMash) {
     NOT_IMPLEMENTED();
 }
