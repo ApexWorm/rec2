@@ -199,6 +199,7 @@ br_material* C2_HOOK_FASTCALL GetExternalMat(void) {
 
 // FUNCTION: CARMA2_HW 0x0050c990
 // FUNCTION: CARMA2_SW 0x00507de0
+// FUNCTION: CARMA2_CHEAT 0x00512380
 void C2_HOOK_FASTCALL DropSpecVol1(void) {
 
     DropSpecVol(1);
@@ -210,6 +211,7 @@ void C2_HOOK_FASTCALL DropSpecVol1(void) {
 
 // STUB: CARMA2_HW 0x0050c9a0
 // STUB: CARMA2_SW 0x00507df0
+// STUB: CARMA2_CHEAT 0x00512390
 void C2_HOOK_FASTCALL DropSpecVol(int pIndex) {
     NOT_IMPLEMENTED();
 }
