@@ -16,6 +16,7 @@
 extern tU8* gLocal_buffer;
 extern tU8* gPipe_buffer_working_end;
 extern int gReentrancy_count;
+extern tU32 gPipe_buffer_size;
 extern tU8* gPipe_buffer_phys_end;
 extern tU32 gLocal_buffer_size;
 extern tU8* gMr_chunky;
@@ -32,6 +33,7 @@ extern tU8* gPipe_record_ptr;
 extern tU32 gPipe_sound_start_time;
 extern tU32 gPipe_sound_time_window;
 extern int gDisable_advance;
+extern int gPipe_count_callbacks;
 extern tPipe_smudge_data* gCrush_space;
 extern tU8* gEnd_of_session;
 
@@ -51,7 +53,7 @@ extern void C2_HOOK_FASTCALL ARSetReplayDirection(float pDirection);
 
 extern void C2_HOOK_FASTCALL ARResetPiping(void);
 
-// ARInitialise
+extern void C2_HOOK_FASTCALL ARInitialise(int pEnable, int pCount_callbacks, const tReplay_callback* pCallbacks);
 
 extern void C2_HOOK_FASTCALL ARDispose(void);
 
