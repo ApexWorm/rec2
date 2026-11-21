@@ -637,6 +637,10 @@ typedef struct {
 
 typedef struct {
     tCar_spec* car;
+} tPipe_chunk_powerup_got;
+
+typedef struct {
+    tCar_spec* car;
 } tPipe_chunk_powerup_lose;
 
 typedef struct {
@@ -757,6 +761,7 @@ typedef enum {
     ePipe_chunk_single_ped_model_change = 47,
     ePipe_chunk_phil_object = 48,
     ePipe_single_groove_on_off = 51,
+    ePipe_chunk_powerup_got = 52,
     ePipe_chunk_powerup_lose = 53,
     ePipe_funk_enable = 54,
     ePipe_chunk_vanished_dismembered = 55,
@@ -816,6 +821,7 @@ typedef struct tPipe_chunk {
         tPipe_smash_texture_change smash_texture_change;
         tPipe_single_transform_type transform_type;
         tPipe_single_vector vector;
+        tPipe_chunk_powerup_got powerup_got;
         tPipe_chunk_powerup_lose powerup_lose;
         tPipe_chunk_powerup_respawn powerup_respawn;
         tPipe_chunk_shit_mine shit_mine;
@@ -4456,6 +4462,10 @@ typedef struct {
 } tCollision_info_owner;
 
 typedef struct {
+    tU16 v[3];
+} tFixed_vec3;
+
+typedef struct {
     tU16 v[4];
 } tFixed_quat;
 
@@ -4939,6 +4949,31 @@ typedef struct {
     int smoke_type; /* room for expansion */
     br_material* skid_mark_material;
 } tMaterial_modifiers;
+
+typedef struct {
+    union {
+        struct {
+            tU8 type;
+            tU8 uid;
+            tU16 rotation;
+            tFixed_quat orientation;
+        } hinge;
+        struct {
+            tU8 type;
+            tU8 uid;
+            tFixed_vec3 omega;
+            tFixed_quat orientation;
+        } universal;
+        struct {
+            tU8 type;
+            tU8 uid;
+            tFixed_vec3 omega;
+            br_vector3 v;
+            tFixed_quat orientation;
+            br_vector3 pos;
+        } none;
+    };
+} tObject_network_stuff;
 
 typedef struct {
     br_vector3 pos;

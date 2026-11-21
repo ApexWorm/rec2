@@ -19,6 +19,7 @@
 
 // FUNCTION: CARMA2_HW 0x005355e0
 // FUNCTION: CARMA2_SW 0x00530c80
+// FUNCTION: CARMA2_CHEAT 0x0053b1d0
 br_quat* C2_HOOK_CDECL BrQuatMul(br_quat* q, const br_quat* l, const br_quat* r) {
     br_scalar x1;
     br_scalar x2;
@@ -40,6 +41,7 @@ br_quat* C2_HOOK_CDECL BrQuatMul(br_quat* q, const br_quat* l, const br_quat* r)
 
 // FUNCTION: CARMA2_HW 0x00535710
 // FUNCTION: CARMA2_SW 0x00530db0
+// FUNCTION: CARMA2_CHEAT 0x0053b300
 br_quat* C2_HOOK_CDECL BrQuatNormalise(br_quat* q, const br_quat* qq) {
     br_scalar s;
 
@@ -53,6 +55,7 @@ br_quat* C2_HOOK_CDECL BrQuatNormalise(br_quat* q, const br_quat* qq) {
 
 // FUNCTION: CARMA2_HW 0x00535790
 // FUNCTION: CARMA2_SW 0x00530e30
+// FUNCTION: CARMA2_CHEAT 0x0053b380
 br_quat* C2_HOOK_CDECL BrQuatInvert(br_quat* q, const br_quat* qq) {
 
     q->x = -qq->x;
@@ -64,6 +67,7 @@ br_quat* C2_HOOK_CDECL BrQuatInvert(br_quat* q, const br_quat* qq) {
 
 // FUNCTION: CARMA2_HW 0x005357c0
 // FUNCTION: CARMA2_SW 0x00530e60
+// FUNCTION: CARMA2_CHEAT 0x0053b3b0
 br_quat* C2_HOOK_CDECL BrQuatSlerp(br_quat* q, const br_quat* l, const br_quat* r, br_scalar a, br_int_16 spins) {
     int omega;
     int omega_spin;
@@ -75,7 +79,7 @@ br_quat* C2_HOOK_CDECL BrQuatSlerp(br_quat* q, const br_quat* l, const br_quat* 
 
     // Animating rotation with quaternion curves, Ken Shoemake,SIGGRAPH Computer Graphics, 19(3):245–254, 1985. doi:10.1145/325165.325242.
     c_omega = l->x * r->x + l->y * r->y + l->z * r->z + l->w * r->w;
-    if (c_omega >= 0.f) {
+    if (c_omega >= 0.0f) {
         t.x = r->x;
         t.y = r->y;
         t.z = r->z;
@@ -88,8 +92,8 @@ br_quat* C2_HOOK_CDECL BrQuatSlerp(br_quat* q, const br_quat* l, const br_quat* 
         c_omega = -c_omega;
     }
 
-    if ((1.f - c_omega) <= BR_SCALAR_EPSILON) {
-        scale_l = 1.f - a;
+    if ((1.0f - c_omega) <= BR_SCALAR_EPSILON) {
+        scale_l = 1.0f - a;
         scale_r = a;
     } else {
         omega = BrRadianToAngle(acosf(c_omega));
@@ -107,6 +111,7 @@ br_quat* C2_HOOK_CDECL BrQuatSlerp(br_quat* q, const br_quat* l, const br_quat* 
 
 // FUNCTION: CARMA2_HW 0x005359a0
 // FUNCTION: CARMA2_SW 0x00531040
+// FUNCTION: CARMA2_CHEAT 0x0053b590
 br_matrix34* C2_HOOK_CDECL BrQuatToMatrix34(br_matrix34* mat, const br_quat* q) {
     br_scalar xs;
     br_scalar ys;
@@ -134,24 +139,25 @@ br_matrix34* C2_HOOK_CDECL BrQuatToMatrix34(br_matrix34* mat, const br_quat* q) 
     xs = q->x * xx;
     yz = q->y * zz;
 
-    M(0, 0) = 1.f - (ys + zs);
+    M(0, 0) = 1.0f - (ys + zs);
     M(1, 0) = xy - wz;
     M(2, 0) = xz + wy;
     M(0, 1) = xy + wz;
-    M(1, 1) = 1.f - (zs + xs);
+    M(1, 1) = 1.0f - (zs + xs);
     M(2, 1) = yz - wx;
     M(0, 2) = xz - wy;
     M(1, 2) = yz + wx;
-    M(2, 2) = 1.f - (xs + ys);
-    M(3, 0) = 0.f;
-    M(3, 1) = 0.f;
-    M(3, 2) = 0.f;
+    M(2, 2) = 1.0f - (xs + ys);
+    M(3, 0) = 0.0f;
+    M(3, 1) = 0.0f;
+    M(3, 2) = 0.0f;
 
     return mat;
 }
 
 // FUNCTION: CARMA2_HW 0x00535ae0
 // FUNCTION: CARMA2_SW 0x00531180
+// FUNCTION: CARMA2_cHEAT 0x0053b6d0
 br_quat* C2_HOOK_CDECL BrMatrix34ToQuat(br_quat* q, const br_matrix34* mat) {
     br_scalar tr;
     br_scalar s;
@@ -173,7 +179,7 @@ br_quat* C2_HOOK_CDECL BrMatrix34ToQuat(br_quat* q, const br_matrix34* mat) {
     i = M_DIAG(2) >= M_DIAG(i) ? 2 : i;
     j = (i + 1) % 3;
     k = (j + 1) % 3;
-    tr = (br_scalar)sqrt(M_DIAG(i) - (M_DIAG(j) + M_DIAG(k)) + 1.f);
+    tr = (br_scalar)sqrt(M_DIAG(i) - (M_DIAG(j) + M_DIAG(k)) + 1.0f);
     s = 0.5f / tr;
     Q_EL(i) = 0.5f * tr;
     Q_EL(j) = (M(i, j) + M(j, i)) * s;
@@ -184,6 +190,7 @@ br_quat* C2_HOOK_CDECL BrMatrix34ToQuat(br_quat* q, const br_matrix34* mat) {
 
 // FUNCTION: CARMA2_HW 0x00535c70
 // FUNCTION: CARMA2_SW 0x00531310
+// FUNCTION: CARMA2_CHEAT 0x0053b860
 br_matrix4* C2_HOOK_CDECL BrQuatToMatrix4(br_matrix4* mat, const br_quat* q) {
     br_matrix34 tmp;
 
@@ -194,6 +201,7 @@ br_matrix4* C2_HOOK_CDECL BrQuatToMatrix4(br_matrix4* mat, const br_quat* q) {
 
 // FUNCTION: CARMA2_HW 0x00535ca0
 // FUNCTION: CARMA2_SW 0x00531340
+// FUNCTION: CARMA2_CHEAT 0x0053b890
 br_quat* C2_HOOK_CDECL BrMatrix4ToQuat(br_quat* q, const br_matrix4* mat) {
     br_matrix34 tmp;
 
