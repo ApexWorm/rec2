@@ -1587,6 +1587,7 @@ void C2_HOOK_FASTCALL ResetGhostPeds(tPowerup* pPowerup, tCar_spec* pCar) {
 
 // FUNCTION: CARMA2_HW 0x004de9b0
 // FUNCTION: CARMA2_SW 0x004daeb0
+// FUNCTION: CARMA2_CHEAT 0x004e4570
 void C2_HOOK_FASTCALL DoBouncey(tPowerup* pPowerup, tU32 pPeriod) {
 
     if (gProgram_state.current_car.bounce_rate <= GetTotalTime() - gProgram_state.current_car.last_bounce
