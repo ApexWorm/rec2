@@ -637,6 +637,10 @@ typedef struct {
 
 typedef struct {
     tCar_spec* car;
+} tPipe_chunk_powerup_got;
+
+typedef struct {
+    tCar_spec* car;
 } tPipe_chunk_powerup_lose;
 
 typedef struct {
@@ -757,6 +761,7 @@ typedef enum {
     ePipe_chunk_single_ped_model_change = 47,
     ePipe_chunk_phil_object = 48,
     ePipe_single_groove_on_off = 51,
+    ePipe_chunk_powerup_got = 52,
     ePipe_chunk_powerup_lose = 53,
     ePipe_funk_enable = 54,
     ePipe_chunk_vanished_dismembered = 55,
@@ -816,6 +821,7 @@ typedef struct tPipe_chunk {
         tPipe_smash_texture_change smash_texture_change;
         tPipe_single_transform_type transform_type;
         tPipe_single_vector vector;
+        tPipe_chunk_powerup_got powerup_got;
         tPipe_chunk_powerup_lose powerup_lose;
         tPipe_chunk_powerup_respawn powerup_respawn;
         tPipe_chunk_shit_mine shit_mine;
@@ -1128,7 +1134,9 @@ typedef struct {
     float initial_y_speed_factor;
     float initial_z_omega_factor;
     float initial_x_omega_factor;
-    undefined field_0x1c[12];
+    float field_0x1c;
+    float field_0x20;
+    float field_0x24;
     tCar_spec* car;
     float max_damage;
     tCar_spec* field_0x30;
@@ -4456,6 +4464,10 @@ typedef struct {
 } tCollision_info_owner;
 
 typedef struct {
+    tU16 v[3];
+} tFixed_vec3;
+
+typedef struct {
     tU16 v[4];
 } tFixed_quat;
 
@@ -4941,6 +4953,31 @@ typedef struct {
 } tMaterial_modifiers;
 
 typedef struct {
+    union {
+        struct {
+            tU8 type;
+            tU8 uid;
+            tU16 rotation;
+            tFixed_quat orientation;
+        } hinge;
+        struct {
+            tU8 type;
+            tU8 uid;
+            tFixed_vec3 omega;
+            tFixed_quat orientation;
+        } universal;
+        struct {
+            tU8 type;
+            tU8 uid;
+            tFixed_vec3 omega;
+            br_vector3 v;
+            tFixed_quat orientation;
+            br_vector3 pos;
+        } none;
+    };
+} tObject_network_stuff;
+
+typedef struct {
     br_vector3 pos;
     float yaw;
 } tNet_starts;
@@ -5093,18 +5130,18 @@ typedef struct {
     int car_index;
     int grid_index;
     int grid_position_set;
-    undefined field_0x58[4];
+    int field_0x58;
     int opponent_list_index;
     int awaiting_confirmation;
     int score2;
     int credits;
     int wasted;
     int wasteage_attributed;
-    undefined field_0x74[4];
+    int field_0x74;
     undefined field_0x78[4];
     int field_0x7c;
     int field_0x80;
-    undefined field_0x84[4];
+    int field_0x84;
     int field_0x88;
     int next_car_index;
     int score;
@@ -5112,7 +5149,7 @@ typedef struct {
     struct br_matrix34 initial_position;
     struct tCar_spec * car;
     tNet_message* field_0xcc;
-    undefined field_0xd0[4];
+    tPlayer_ID field_0xd0;
 } tNet_game_player_info;
 
 typedef enum {

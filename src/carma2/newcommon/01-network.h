@@ -72,7 +72,7 @@ extern void C2_HOOK_FASTCALL NetLeaveGame(tNet_game_details* pNet_game);
 
 // NetSetPlayerSystemInfo
 
-// FillInThisPlayer
+extern void C2_HOOK_FASTCALL FillInThisPlayer(tNet_game_details* pGame, tNet_game_player_info* pPlayer, int pCar_index, int pHost);
 
 // LoadCarN
 
@@ -94,7 +94,7 @@ extern void C2_HOOK_FASTCALL NetObtainSystemUserName(char* pName, int pMax_lengt
 
 // NetExtractGameID
 
-// NetExtractPlayerID
+extern tPlayer_ID C2_HOOK_FASTCALL NetExtractPlayerID(tNet_game_details* pDetails);
 
 extern int C2_HOOK_FASTCALL NetSendMessageToAddress(tNet_game_details* pDetails, tNet_message* pMessage, void* pAddress);
 
