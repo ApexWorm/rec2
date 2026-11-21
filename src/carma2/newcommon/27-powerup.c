@@ -1291,6 +1291,7 @@ inline int C2_HOOK_FASTCALL CarVulnerableByMine(tCar_spec* pCar) {
 
 // FUNCTION: CARMA2_HW 0x004dde20
 // FUNCTION: CARMA2_SW 0x004da320
+// FUNCTION: CARMA2_CHEAT 0x004e39e0
 void C2_HOOK_FASTCALL ProcessShitMines(tU32 pTime) {
     int i;
     int car_vulnerable;
