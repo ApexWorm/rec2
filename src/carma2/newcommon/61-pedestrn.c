@@ -409,7 +409,33 @@ void C2_HOOK_FASTCALL PedApplyPedDir(tU32 pId, const br_vector3* pDir) {
     }
 }
 
-// SetCharacterMoveAR
+// FUNCTION: CARMA2_HW 0x004d1c60
+// FUNCTION: CARMA2_SW 0x004ce360
+void C2_HOOK_FASTCALL SetCharacterMoveAR(tPed_character_instance* pCharacter, int pMove_action, float pSpeed, int pArg4, int pArg5, tU32 pTime) {
+    br_matrix34* mat;
+    br_vector3 old_pos;
+    int old_move;
+    int old_frame;
+    float old_speed;
+
+    if (gAction_replay_mode && !gBOOL_00744804) {
+        return;
+    }
+    if (pSpeed == 0.f) {
+        pSpeed = 0.f;
+    }
+    mat = GetCharacterMatrixPtr(pCharacter);
+    BrVector3Copy(&old_pos, (br_vector3*)mat->m[3]);
+    old_move = pCharacter->personality->form->moves[pCharacter->field_0x7].id;
+    old_frame = pCharacter->field_0x1c;
+    old_speed = (float)(tS16)pCharacter->field_0x1e;
+    SetCharacterMove(pCharacter, pMove_action, pSpeed, pArg4, pArg5, pTime);
+    if (pMove_action == -1) {
+        PipeSinglePedFPChange(pCharacter->ped, (float)(tS16)pCharacter->field_0x1e, pSpeed);
+    } else {
+        PipeSinglePedMove(pCharacter->ped, (tS16)old_frame, (tS16)old_move, (tS16)pMove_action, old_speed, pSpeed, pArg5, pArg4, &old_pos, (br_vector3*)mat->m[3], -1, -1, &pCharacter->field_0x8c);
+    }
+}
 
 // SetPedStartRun
 
