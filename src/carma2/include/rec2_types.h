@@ -798,6 +798,13 @@ typedef struct {
 } tPipe_smash_texture_change;
 
 typedef struct {
+    tU8 field_0x0;
+    br_scalar water_d;
+    br_vector3 normal;
+    br_bounds3 bb;
+} tPipe_chunk_extended_splash;
+
+typedef struct {
     br_scalar water_d;
     br_vector3 normal;
 } tPipe_chunk_splash;

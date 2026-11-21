@@ -905,11 +905,33 @@ void C2_HOOK_FASTCALL AddSplashToPipingSession(tPhysics_object* pObject) {
         SIZE_OFFSET_PIPING(tPipe_chunk_splash, normal), &pObject->water_normal);
 }
 
-// STUB: CARMA2_HW 0x004c7160
-// STUB: CARMA2_SW 0x004c3890
-// STUB: CARMA2_CHEAT 0x004ccc80
+// FUNCTION: CARMA2_HW 0x004c7160
+// FUNCTION: CARMA2_SW 0x004c3890
+// FUNCTION: CARMA2_CHEAT 0x004ccc80
 void C2_HOOK_FASTCALL AddExtendedSplashToPipingSession(tPhysics_object* pObject, void* pSubject) {
-    NOT_IMPLEMENTED();
+    tU8 value;
+    br_scalar water_d;
+
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_chunk_extended_splash, field_0x0, 0x1);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk_extended_splash, water_d, 0x4);
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_chunk_extended_splash, water_d, 0x4);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk_extended_splash, normal, 0x8);
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_chunk_extended_splash, normal, 0xc);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk_extended_splash, bb, 0x14);
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_chunk_extended_splash, bb, 0x18);
+
+    if (PHILGetObjectProperty(pObject, 6) != 0.0f) {
+        value = 0xff;
+    } else {
+        value = pObject->flags_0x238;
+    }
+    water_d = pObject->water_d;
+    gFloat_pipe_union.f = water_d;
+    ARAddVariedDataToSession(ePipe_extended_splash, (uintptr_t)pSubject, 4,
+        SIZE_OFFSET_PIPING(tPipe_chunk_extended_splash, field_0x0), value,
+        SIZE_OFFSET_PIPING(tPipe_chunk_extended_splash, water_d), gFloat_pipe_union.u32,
+        SIZE_OFFSET_PIPING(tPipe_chunk_extended_splash, normal), &pObject->water_normal,
+        SIZE_OFFSET_PIPING(tPipe_chunk_extended_splash, bb), &pObject->bb2);
 }
 
 // AddCarToPipingSession
