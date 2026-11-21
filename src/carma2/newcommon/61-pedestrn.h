@@ -19,6 +19,8 @@ extern tMovement_spec gGiblet_initial_speed;
 extern tShrapnel_time_info gGiblet_min_max_time;
 extern int gGiblet_size_count;
 
+extern int gPed_move_fsm[118][7];
+
 extern tPedForms_vtable* gPed_vtable;
 
 extern int gPed_retain_root_mode;
