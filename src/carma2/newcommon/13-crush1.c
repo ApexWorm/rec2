@@ -1417,6 +1417,7 @@ void C2_HOOK_FASTCALL MakeModelMaterialsSingleSided(br_model* pModel) {
 
 // STUB: CARMA2_HW 0x00434010
 // STUB: CARMA2_SW 0x00434040
+// STUB: CARMA2_CHEAT 0x004341f0
 void C2_HOOK_FASTCALL ReAttachBit(tCar_spec* pCar_spec, br_actor* pActor_arg2, br_actor* pActor_arg3, tPhysics_object* pObject) {
     NOT_IMPLEMENTED();
 }
@@ -1570,6 +1571,7 @@ void C2_HOOK_FASTCALL AddNonCar(tNon_car_spec* pNon_car, const tDriver* pDriver)
 
 // STUB: CARMA2_HW 0x0042f3d0
 // STUB: CARMA2_SW 0x0042f420
+// STUB: CARMA2_CHEAT 0x0042f590
 void C2_HOOK_FASTCALL MungeDetachLists(tCar_crush_spec* pCar_crush) {
     NOT_IMPLEMENTED();
 }
