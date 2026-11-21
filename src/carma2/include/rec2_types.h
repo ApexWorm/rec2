@@ -1141,7 +1141,9 @@ typedef struct {
     float initial_y_speed_factor;
     float initial_z_omega_factor;
     float initial_x_omega_factor;
-    undefined field_0x1c[12];
+    float field_0x1c;
+    float field_0x20;
+    float field_0x24;
     tCar_spec* car;
     float max_damage;
     tCar_spec* field_0x30;
@@ -5135,18 +5137,18 @@ typedef struct {
     int car_index;
     int grid_index;
     int grid_position_set;
-    undefined field_0x58[4];
+    int field_0x58;
     int opponent_list_index;
     int awaiting_confirmation;
     int score2;
     int credits;
     int wasted;
     int wasteage_attributed;
-    undefined field_0x74[4];
+    int field_0x74;
     undefined field_0x78[4];
     int field_0x7c;
     int field_0x80;
-    undefined field_0x84[4];
+    int field_0x84;
     int field_0x88;
     int next_car_index;
     int score;
@@ -5154,7 +5156,7 @@ typedef struct {
     struct br_matrix34 initial_position;
     struct tCar_spec * car;
     tNet_message* field_0xcc;
-    undefined field_0xd0[4];
+    tPlayer_ID field_0xd0;
 } tNet_game_player_info;
 
 typedef enum {
