@@ -1223,6 +1223,7 @@ void C2_HOOK_FASTCALL MinePreCollisionStuff(void) {
 
 // FUNCTION: CARMA2_HW 0x004dd3f0
 // FUNCTION: CARMA2_SW 0x004d98f0
+// FUNCTION: CARMA2_CHEAT 0x004e2fb0
 void C2_HOOK_FASTCALL ActivateMine(tShit_mine* pMine, tPowerup* pPowerup, tCar_spec* pCar) {
 
     C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tShit_mine, field_0x1c, 0x1c);
