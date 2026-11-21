@@ -2214,6 +2214,7 @@ tPed_personality* C2_HOOK_FASTCALL FindOrOpenPersonality(const char* pName) {
 
 // FUNCTION: CARMA2_HW 0x004079a0
 // FUNCTION: CARMA2_SW 0x00407990
+// FUNCTION: CARMA2_CHEAT 0x00407990
 tPed_character_instance* C2_HOOK_FASTCALL BuildCharacterInstance(const char* pGroup_name, br_matrix34* pMat34) {
     tPed_character_instance* instance;
 
