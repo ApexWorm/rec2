@@ -16,7 +16,7 @@
 extern int gHas_sky_texture;
 extern br_pixelmap* gDepth_shade_table;
 
-// Log2
+extern int C2_HOOK_CDECL Log2(int pNumber);
 
 // CalculateWrappingMultiplier
 
@@ -40,7 +40,7 @@ extern void C2_HOOK_FASTCALL MungeSkyModel(br_actor* pCamera, br_model* pModel);
 
 // CreateHorizonModel
 
-// LoadDepthTable
+extern void C2_HOOK_FASTCALL LoadDepthTable(char* pName, br_pixelmap** pTable, int* pPower);
 
 extern void C2_HOOK_FASTCALL InitDepthEffects(void);
 
