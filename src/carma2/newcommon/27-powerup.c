@@ -1231,19 +1231,36 @@ void C2_HOOK_FASTCALL ActivateMine(tShit_mine* pMine, tPowerup* pPowerup, tCar_s
     C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tShit_mine, field_0x24, 0x24);
 
     pMine->flags = 0x5;
+    /* Integer parameter #0: direction of fire (0 - shit out, 1 - mortar fire) */
     if (pPowerup->integer_params[0] != 0) {
         pMine->flags = 0x45;
     } else {
         pMine->flags = 0x5;
     }
+    /* Floating point param #0: Explosion delay */
     pMine->next_think_time = GetTotalTime() - (int)(pPowerup->float_params[0] * -1000.0);
+
+    /* Floating point param #1: min y strength */
     pMine->field3_0xc = pPowerup->float_params[1];
+
+    /* Floating point param #2: max y strength*/
     pMine->initial_y_speed_factor = pPowerup->float_params[2];
+
+    /* Floating point param #3: max roll rate */
     pMine->initial_z_omega_factor = pPowerup->float_params[3];
+
+    /* Floating point param #4: max pitch rate */
     pMine->initial_x_omega_factor = pPowerup->float_params[4];
+
+    /* Floating point param #5: force needed to trigger world exlposion */
     pMine->field_0x1c = pPowerup->float_params[5];
+
+    /* Floating point param #6: firing up vector */
     pMine->field_0x20 = pPowerup->float_params[6];
+
+    /* Floating point param #6: firing out vector */
     pMine->field_0x24 = pPowerup->float_params[7];
+
     pMine->collision_info->field_0xed = 1;
     pMine->collision_info->disable_move_rotate = 0;
     pMine->collision_info->flags &= ~0x40;
