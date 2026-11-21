@@ -294,6 +294,7 @@ void C2_HOOK_FASTCALL InstantDepthChange(tDepth_effect_type pType, br_pixelmap* 
 // CreateHorizonModel
 
 // FUNCTION: CARMA2_HW 0x00445860
+// FUNCTION: CARMA2_SW 0x004455f0
 // FUNCTION: CARMA2_CHEAT 0x00445d80
 void C2_HOOK_FASTCALL LoadDepthTable(char* pName, br_pixelmap** pTable, int* pPower) {
     tPath_name the_path;
