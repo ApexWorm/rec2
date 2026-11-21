@@ -1602,6 +1602,7 @@ void* C2_HOOK_FASTCALL GetSplashIndex(tPhysics_object* pObject) {
 
 // FUNCTION: CARMA2_HW 0x004fef40
 // FUNCTION: CARMA2_SW 0x004fa820
+// FUNCTION: CARMA2_CHEAT 0x00504be0
 void C2_HOOK_FASTCALL AdjustSplashReplay(void* pObject, int pType, float pWater_density, br_vector3* pNormal, br_bounds3* pBounds) {
     int i;
     int free_index;
