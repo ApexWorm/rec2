@@ -640,6 +640,7 @@ br_actor* C2_HOOK_FASTCALL LoadActorFromRace(const char *pName) {
 
 // STUB: CARMA2_HW 0x004ee5e0
 // STUB: CARMA2_SW 0x004ea2b0
+// STUB: CARMA2_CHEAT 0x004f4280
 void C2_HOOK_FASTCALL ReadSpillData(FILE* pF, tSlick_spec* pSlick_spec) {
     NOT_IMPLEMENTED();
 }

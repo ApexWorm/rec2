@@ -652,6 +652,7 @@ inline void C2_HOOK_FASTCALL SetUpGibSlicks(void) {
 
 // FUNCTION: CARMA2_HW 0x004cb1e0
 // FUNCTION: CARMA2_SW 0x004c7910
+// FUNCTION: CARMA2_CHEAT 0x004d0d20
 void C2_HOOK_FASTCALL ReadInGiblets(FILE* pFile) {
     tPath_name the_path;
     char model_name[256];
@@ -2120,6 +2121,7 @@ void C2_HOOK_FASTCALL SetGoreLevel(int pNewLevel) {
 
 // STUB: CARMA2_HW 0x004042f0
 // STUB: CARMA2_SW 0x004042f0
+// STUB: CARMA2_CHEAT 0x004042f0
 void C2_HOOK_FASTCALL ScaleModel(br_model* pModel, float pScale) {
     NOT_IMPLEMENTED();
 }
