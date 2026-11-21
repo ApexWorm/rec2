@@ -365,7 +365,27 @@ int C2_HOOK_FASTCALL OrientationChanged(const br_matrix34* pOrientation_1, const
     }
 }
 
-// AssertRootObjectsMatrix
+// FUNCTION: CARMA2_HW 0x004d57c0
+// FUNCTION: CARMA2_SW 0x004d1eb0
+// FUNCTION: CARMA2_CHEAT 0x004db380
+void C2_HOOK_FASTCALL AssertRootObjectsMatrix(tPed_character_instance* pPed) {
+    tPhysics_object* collision_info;
+    int i;
+
+    if (pPed->field_0x14 & 0x1) {
+        collision_info = pPed->personality->form->simple_physicing[(tS8)pPed->field_0x5].collision_info;
+    } else {
+        collision_info = GetRootObject(pPed);
+    }
+    for (i = 0; i < 3; i++) {
+        int j;
+
+        for (j = 0; j < 3; j++) {
+            collision_info->transform_matrix.m[i][j] = collision_info->actor->t.t.mat.m[i][j];
+        }
+    }
+    collision_info->flags |= 0x100;
+}
 
 // InitFaceCaches
 
@@ -2342,6 +2362,10 @@ int C2_HOOK_FASTCALL MakeCharacterCollideworthy(tPed_character_instance* pCharac
     return MakeCharacterCollideworthy2(pCharacter, pArg2, pArg3, -1);
 }
 
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
 // FUNCTION: CARMA2_HW 0x00409040
 // FUNCTION: CARMA2_SW 0x00409040
 // FUNCTION: CARMA2_CHEAT 0x00409070
@@ -2359,6 +2383,10 @@ tPhysics_object* C2_HOOK_FASTCALL GetRootObject(tPed_character_instance* pPed) {
     }
     return NULL;
 }
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // CharacterNoLongerCollideworthy
 
