@@ -410,6 +410,7 @@ int C2_HOOK_FASTCALL IncidentCam(tCar_spec* pCar, tU32 pTime) {
 
 // FUNCTION: CARMA2_HW 0x004104b0
 // FUNCTION: CARMA2_SW 0x00410490
+// FUNCTION: CARMA2_CHEAT 0x00410700
 void C2_HOOK_FASTCALL PanningExternalCamera(tCar_spec* pCar, tU32 pTime) {
     br_matrix34* m2;
     br_vector3 tv;
@@ -445,6 +446,7 @@ inline int C2_HOOK_FASTCALL CheckForWall(br_vector3* pStart, br_vector3* pEnd) {
 
 // STUB: CARMA2_HW 0x004105f0
 // STUB: CARMA2_SW 0x004105d0
+// STUB: CARMA2_CHEAT 0x00410840
 void C2_HOOK_FASTCALL SetUpPanningCamera(tCar_spec* c) {
     NOT_IMPLEMENTED();
 }
@@ -499,6 +501,7 @@ void C2_HOOK_FASTCALL RestoreCameraPosition(int pIndex) {
 
 // STUB: CARMA2_HW 0x00411fc0
 // STUB: CARMA2_SW 0x00411fa0
+// STUB: CARMA2_CHEAT 0x00412210
 void C2_HOOK_FASTCALL PointCameraAtCar(br_vector3* pPos, br_matrix34* pMat, float pFov_factor) {
     NOT_IMPLEMENTED();
 }
