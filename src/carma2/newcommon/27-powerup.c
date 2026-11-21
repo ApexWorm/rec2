@@ -770,6 +770,7 @@ int C2_HOOK_FASTCALL GotCredits(tPowerup* pPowerup, tCar_spec* pCar) {
 
 // FUNCTION: CARMA2_HW 0x004dc3e0
 // FUNCTION: CARMA2_SW 0x004d88e0
+// FUNCTION: CARMA2_CHEAT 0x004e1fa0
 int C2_HOOK_FASTCALL GainAPO2(tCar_spec* pCar, int pIndex, int pAmount) {
     int old;
 
@@ -794,6 +795,7 @@ int C2_HOOK_FASTCALL GainAPO2(tCar_spec* pCar, int pIndex, int pAmount) {
 
 // FUNCTION: CARMA2_HW 0x004dc240
 // FUNCTION: CARMA2_SW 0x004d8740
+// FUNCTION: CARMA2_CHEAT 0x004e1e00
 int C2_HOOK_FASTCALL GainAPO(tPowerup* pPowerup, tCar_spec* pCar) {
     int powerup_index;
     int old_armour;
