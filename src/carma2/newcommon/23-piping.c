@@ -920,7 +920,7 @@ void C2_HOOK_FASTCALL AddExtendedSplashToPipingSession(tPhysics_object* pObject,
     C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk_extended_splash, bb, 0x14);
     C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_chunk_extended_splash, bb, 0x18);
 
-    if (PHILGetObjectProperty(pObject, 6) != 0.f) {
+    if (PHILGetObjectProperty(pObject, 6) != 0.0f) {
         value = 0xff;
     } else {
         value = pObject->flags_0x238;
