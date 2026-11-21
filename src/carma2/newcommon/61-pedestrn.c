@@ -411,6 +411,7 @@ void C2_HOOK_FASTCALL PedApplyPedDir(tU32 pId, const br_vector3* pDir) {
 
 // FUNCTION: CARMA2_HW 0x004d1c60
 // FUNCTION: CARMA2_SW 0x004ce360
+// FUNCTION: CARMA2_CHEAT 0x004d7800
 void C2_HOOK_FASTCALL SetCharacterMoveAR(tPed_character_instance* pCharacter, int pMove_action, float pSpeed, int pArg4, int pArg5, tU32 pTime) {
     br_matrix34* mat;
     br_vector3 old_pos;
