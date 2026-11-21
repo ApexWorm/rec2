@@ -1134,7 +1134,9 @@ typedef struct {
     float initial_y_speed_factor;
     float initial_z_omega_factor;
     float initial_x_omega_factor;
-    undefined field_0x1c[12];
+    float field_0x1c;
+    float field_0x20;
+    float field_0x24;
     tCar_spec* car;
     float max_damage;
     tCar_spec* field_0x30;

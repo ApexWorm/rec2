@@ -1221,7 +1221,46 @@ void C2_HOOK_FASTCALL MinePreCollisionStuff(void) {
     NOT_IMPLEMENTED();
 }
 
-// ActivateMine
+// FUNCTION: CARMA2_HW 0x004dd3f0
+// FUNCTION: CARMA2_SW 0x004d98f0
+void C2_HOOK_FASTCALL ActivateMine(tShit_mine* pMine, tPowerup* pPowerup, tCar_spec* pCar) {
+
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tShit_mine, field_0x1c, 0x1c);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tShit_mine, field_0x20, 0x20);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tShit_mine, field_0x24, 0x24);
+
+    pMine->flags = 0x5;
+    if (pPowerup->integer_params[0] != 0) {
+        pMine->flags = 0x45;
+    } else {
+        pMine->flags = 0x5;
+    }
+    pMine->next_think_time = GetTotalTime() - (int)(pPowerup->float_params[0] * -1000.0);
+    pMine->field3_0xc = pPowerup->float_params[1];
+    pMine->initial_y_speed_factor = pPowerup->float_params[2];
+    pMine->initial_z_omega_factor = pPowerup->float_params[3];
+    pMine->initial_x_omega_factor = pPowerup->float_params[4];
+    pMine->field_0x1c = pPowerup->float_params[5];
+    pMine->field_0x20 = pPowerup->float_params[6];
+    pMine->field_0x24 = pPowerup->float_params[7];
+    pMine->collision_info->field_0xed = 1;
+    pMine->collision_info->disable_move_rotate = 0;
+    pMine->collision_info->flags &= ~0x40;
+    if (pMine->collision_info->actor->parent == NULL) {
+        BrActorAdd(gNon_track_actor, pMine->collision_info->actor);
+    }
+    pMine->collision_info->actor->render_style = BR_RSTYLE_FACES;
+    pMine->field_0x34 = (tU8)(pPowerup - gPowerup_array);
+    PHILAddActiveObject(pMine->collision_info, NULL, NULL, NULL);
+    PHILSetObjectProperty(pMine->collision_info, 0, 1.0);
+    PHILSetObjectProperty(pMine->collision_info, 7, 1);
+    PHILSetObjectProperty(pMine->collision_info, 6, 1);
+    pMine->field_0x30 = pCar;
+    pMine->collision_info->last_special_volume = pCar->collision_info->last_special_volume;
+    pMine->collision_info->auto_special_volume = pCar->collision_info->auto_special_volume;
+    pMine->collision_info->water_d = pCar->collision_info->water_d;
+    BrVector3Copy(&pMine->collision_info->water_normal, &pCar->collision_info->water_normal);
+}
 
 // PositionMine
 
