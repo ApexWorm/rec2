@@ -4456,6 +4456,10 @@ typedef struct {
 } tCollision_info_owner;
 
 typedef struct {
+    tU16 v[3];
+} tFixed_vec3;
+
+typedef struct {
     tU16 v[4];
 } tFixed_quat;
 
@@ -4939,6 +4943,31 @@ typedef struct {
     int smoke_type; /* room for expansion */
     br_material* skid_mark_material;
 } tMaterial_modifiers;
+
+typedef struct {
+    union {
+        struct {
+            tU8 type;
+            tU8 uid;
+            tU16 rotation;
+            tFixed_quat orientation;
+        } hinge;
+        struct {
+            tU8 type;
+            tU8 uid;
+            tFixed_vec3 omega;
+            tFixed_quat orientation;
+        } universal;
+        struct {
+            tU8 type;
+            tU8 uid;
+            tFixed_vec3 omega;
+            br_vector3 v;
+            tFixed_quat orientation;
+            br_vector3 pos;
+        } none;
+    };
+} tObject_network_stuff;
 
 typedef struct {
     br_vector3 pos;
