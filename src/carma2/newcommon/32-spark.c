@@ -88,18 +88,20 @@ tBRender_smoke* gBR_smoke_pointers[35];
 
 // GLOBAL: CARMA2_HW 0x006aa388
 // GLOBAL: CARMA2_SW 0x006a3dd8
+// GLOBAL: CARMA2_CHEAT 0x006b1f00
 tReplay_splash gReplay_splashes[10] = { 0 };
 
 // GLOBAL: CARMA2_HW 0x006aa568
 // GLOBAL: CARMA2_SW 0x006a3fb8
 int gDust_rotate = 0;
 
-// GLOBAL: CARMA2_HW 0x006aa574
-// GLOBAL: CARMA2_SW 0x006a3fc0
-int gReplay_splash_flags;
-
 // GLOBAL: CARMA2_HW 0x006aa56c
 int gN_BR_smoke_structs;
+
+// GLOBAL: CARMA2_HW 0x006aa574
+// GLOBAL: CARMA2_SW 0x006a3fc0
+// GLOBAL: CARMA2_CHEAT 0x006b20ec
+int gReplay_splash_flags;
 
 // GLOBAL: CARMA2_HW 0x006a8638
 // GLOBAL: CARMA2_SW 0x006a2698
