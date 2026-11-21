@@ -1200,6 +1200,7 @@ void C2_HOOK_FASTCALL PipeSingleIdentity(br_actor* pActor) {
 
 // FUNCTION: CARMA2_HW 0x004c86f0
 // FUNCTION: CARMA2_SW 0x004c4e20
+// FUNCTION: CARMA2_CHEAT 0x004ce210
 void C2_HOOK_FASTCALL PipeSingleSplitWeld(uintptr_t pId, const br_vector4* pPlane, int pSplit) {
     C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_chunk_split_weld, plane, 0x10);
     C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk_split_weld, split, 0x10);
@@ -1855,6 +1856,7 @@ void C2_HOOK_FASTCALL ApplyIdentity(tPipe_chunk** pChunk) {
 
 // FUNCTION: CARMA2_HW 0x004c98b0
 // FUNCTION: CARMA2_SW 0x004c5fe0
+// FUNCTION: CARMA2_CHEAT 0x004cf3e0
 void C2_HOOK_FASTCALL ApplySplitWeld(tPipe_chunk** pChunk) {
     tCar_spec* car;
 

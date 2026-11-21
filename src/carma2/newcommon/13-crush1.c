@@ -2230,12 +2230,14 @@ void C2_HOOK_FASTCALL ARApplyFlap(br_actor* pActor, br_angle pAngle) {
 
 // STUB: CARMA2_HW 0x0043c240
 // STUB: CARMA2_SW 0x0043c290
+// STUB: CARMA2_CHEAT 0x0043c490
 void C2_HOOK_FASTCALL ARApplySplitWeld(tCar_spec* pCar, const br_vector4* pPlane) {
     NOT_IMPLEMENTED();
 }
 
 // STUB: CARMA2_HW 0x0043c3d0
 // STUB: CARMA2_SW 0x0043c420
+// STUB: CARMA2_CHEAT 0x0043c620
 void C2_HOOK_FASTCALL ARUndoSplitWeld(tCar_spec* pCar) {
     NOT_IMPLEMENTED();
 }
