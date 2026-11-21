@@ -223,6 +223,7 @@ void C2_HOOK_FASTCALL ARResetPiping(void) {
 
 // FUNCTION: CARMA2_HW 0x00402410
 // FUNCTION: CARMA2_SW 0x00402410
+// FUNCTION: CARMA2_CHEAT 0x00402410
 void C2_HOOK_FASTCALL ARInitialise(int pEnable, int pCount_callbacks, const tReplay_callback* pCallbacks) {
 
     if (!pEnable) {
