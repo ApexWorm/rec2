@@ -1117,6 +1117,7 @@ void C2_HOOK_FASTCALL NetService(int pIn_race) {
 
 // FUNCTION: CARMA2_HW 0x004a5710
 // FUNCTION: CARMA2_SW 0x004a1890
+// FUNCTION: CARMA2_CHEAT 0x004a6610
 void C2_HOOK_FASTCALL NetFinishRace(tNet_game_details* pDetails, tRace_over_reason pReason) {
     tNet_message* the_message;
 
