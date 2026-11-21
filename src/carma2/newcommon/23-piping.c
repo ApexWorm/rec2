@@ -1198,7 +1198,17 @@ void C2_HOOK_FASTCALL PipeSingleIdentity(br_actor* pActor) {
         SIZE_OFFSET_PIPING(tPipe_chunk_identity, actor), pActor);
 }
 
-// PipeSingleSplitWeld
+// FUNCTION: CARMA2_HW 0x004c86f0
+// FUNCTION: CARMA2_SW 0x004c4e20
+void C2_HOOK_FASTCALL PipeSingleSplitWeld(uintptr_t pId, const br_vector4* pPlane, int pSplit) {
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_chunk_split_weld, plane, 0x10);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk_split_weld, split, 0x10);
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_chunk_split_weld, split, 0x4);
+
+    ARDoSingleVariedSession(ePipe_chunk_split_weld, pId, 2,
+        SIZE_OFFSET_PIPING(tPipe_chunk_split_weld, plane), pPlane,
+        SIZE_OFFSET_PIPING(tPipe_chunk_split_weld, split), pSplit);
+}
 
 // PipeSingleShrapnelShower
 
@@ -1843,7 +1853,30 @@ void C2_HOOK_FASTCALL ApplyIdentity(tPipe_chunk** pChunk) {
     BrMatrix34Identity(&chunk->data.identity.actor->t.t.mat);
 }
 
-// ApplySplitWeld
+// FUNCTION: CARMA2_HW 0x004c98b0
+// FUNCTION: CARMA2_SW 0x004c5fe0
+void C2_HOOK_FASTCALL ApplySplitWeld(tPipe_chunk** pChunk) {
+    tCar_spec* car;
+
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk, data, 0x4);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk_split_weld, split, 0x10);
+
+    if ((*pChunk)->data.split_weld.split) {
+        if (((*pChunk)->subject_index >> 8) == eVehicle_self) {
+            car = &gProgram_state.current_car;
+        } else {
+            car = GetCarSpec((*pChunk)->subject_index >> 8, (*pChunk)->subject_index & 0xff);
+        }
+        ARApplySplitWeld(car, &(*pChunk)->data.split_weld.plane);
+    } else {
+        if (((*pChunk)->subject_index >> 8) == eVehicle_self) {
+            car = &gProgram_state.current_car;
+        } else {
+            car = GetCarSpec((*pChunk)->subject_index >> 8, (*pChunk)->subject_index & 0xff);
+        }
+        ARUndoSplitWeld(car);
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x004c9930
 // FUNCTION: CARMA2_SW 0x004c6060

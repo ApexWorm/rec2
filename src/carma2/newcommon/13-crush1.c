@@ -2228,9 +2228,17 @@ void C2_HOOK_FASTCALL ARApplyFlap(br_actor* pActor, br_angle pAngle) {
         parent_model->vertices[flap->field_0xc].p.v[2]);
 }
 
-// ARApplySplitWeld
+// STUB: CARMA2_HW 0x0043c240
+// STUB: CARMA2_SW 0x0043c290
+void C2_HOOK_FASTCALL ARApplySplitWeld(tCar_spec* pCar, const br_vector4* pPlane) {
+    NOT_IMPLEMENTED();
+}
 
-// ARUndoSplitWeld
+// STUB: CARMA2_HW 0x0043c3d0
+// STUB: CARMA2_SW 0x0043c420
+void C2_HOOK_FASTCALL ARUndoSplitWeld(tCar_spec* pCar) {
+    NOT_IMPLEMENTED();
+}
 
 // ReceivedCrush
 
