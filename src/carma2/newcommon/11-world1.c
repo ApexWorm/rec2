@@ -8,11 +8,14 @@
 
 #include "11-world1.h"
 
-#include "globvars.h"
+#include "15-displays.h"
 #include "28-world3.h"
 #include "41-utility.h"
 #include "55-volume.h"
 #include "61-pedestrn.h"
+#include "globvars.h"
+
+#include "c2_stdio.h"
 
 #include <string.h>
 
@@ -272,6 +275,37 @@ void C2_HOOK_FASTCALL BuildSpecVolModel(tSpecial_volume* pSpec, int pIndex, br_m
     BrActorAdd(gNon_track_actor, actor);
     gSpec_vol_actors[pIndex] = actor;
     SetSpecVolMatSize(actor);
+}
+
+// FUNCTION: CARMA2_HW 0x0050d270
+// FUNCTION: CARMA2_SW 0x005086c0
+void C2_HOOK_FASTCALL IdentifySpecVol(void) {
+    int i;
+    int min_index;
+    tSpecial_volume* v;
+    br_scalar min_d;
+    br_scalar d;
+    br_vector3* p;
+    char s[256];
+
+    min_d = BR_SCALAR_MAX;
+    p = &gProgram_state.current_car.pos;
+    min_index = -1;
+    for (i = 0, v = gProgram_state.special_volumes; i < gProgram_state.special_volume_count; i++, v++) {
+        d = Vector3DistanceSquared((br_vector3*)v->boundary.box.mat.m[3], p);
+        if (d < min_d) {
+            min_d = d;
+            min_index = i;
+        }
+    }
+    if (min_index >= 0) {
+        sprintf(s, "Locked onto Special Volume #%d", min_index);
+        NewTextHeadupSlot(4, 0, 2000, -2, s);
+        gLast_actor = gSpec_vol_actors[min_index];
+    } else {
+        gLast_actor = NULL;
+        NewTextHeadupSlot(4, 0, 2000, -2, "No special volumes to lock onto");
+    }
 }
 
 // FUNCTION: CARMA2_HW 0x0050d470
