@@ -973,6 +973,7 @@ intptr_t C2_HOOK_CDECL InitModelCrushDataCB(br_actor* pActor, void* pData) {
 // InitModelCrushData
 
 // FUNCTION: CARMA2_HW 0x0042c300
+// FUNCTION: CARMA2_SW 0x0042c390
 // FUNCTION: CARMA2_CHEAT 0x0042c4a0
 float C2_HOOK_FASTCALL PointEdgeDistSq(const br_vector3* pP, const br_vector3* pA, const br_vector3* pB) {
     br_vector3 pAB;
@@ -1120,6 +1121,7 @@ void C2_HOOK_FASTCALL DisposeVertexData(tModel_detail_vertex_data* pVertex_data)
 // BuckleTheBugger
 
 // FUNCTION: CARMA2_HW 0x0042cc40
+// FUNCTION: CARMA2_SW 0x0042ccc0
 // FUNCTION: CARMA2_CHEAT 0x0042cde0
 int C2_HOOK_FASTCALL OutsideEdgeLine(const br_vector3* pPoint, const br_vector3* pA, const br_vector3* pDirection, const br_vector3* pInside) {
     br_vector3 direction;
@@ -1138,6 +1140,7 @@ int C2_HOOK_FASTCALL OutsideEdgeLine(const br_vector3* pPoint, const br_vector3*
 }
 
 // FUNCTION: CARMA2_HW 0x0042ca30
+// FUNCTION: CARMA2_SW 0x0042cab0
 // FUNCTION: CARMA2_CHEAT 0x0042cbd0
 float C2_HOOK_FASTCALL PointTriangleDistSq(const br_vector3* pP, const br_vector3* pA, const br_vector3* pB, const br_vector3* pC) {
     br_vector3 ab;
@@ -1170,6 +1173,7 @@ float C2_HOOK_FASTCALL PointTriangleDistSq(const br_vector3* pP, const br_vector
 }
 
 // FUNCTION: CARMA2_HW 0x0042ce00
+// FUNCTION: CARMA2_SW 0x0042ce70
 // FUNCTION: CARMA2_CHEAT 0x0042cfa0
 float C2_HOOK_FASTCALL PointRectDistSq(const br_vector3* pP, const br_vector3* pA, const br_vector3* pB, const br_vector3* pC) {
     const br_vector3* origin;
@@ -1216,6 +1220,7 @@ float C2_HOOK_FASTCALL PointRectDistSq(const br_vector3* pP, const br_vector3* p
 // PointSimplexDistSq
 
 // FUNCTION: CARMA2_HW 0x0042c8b0
+// FUNCTION: CARMA2_SW 0x0042c930
 // FUNCTION: CARMA2_CHEAT 0x0042ca50
 float C2_HOOK_FASTCALL DistSq(const br_vector3* pP, int pCount, const br_vector3* pVertices) {
     br_vector3 offset;
@@ -1861,6 +1866,7 @@ void C2_HOOK_FASTCALL FullyDetachBit(tCar_spec* pCar, tPhysics_object* pObject) 
 // SplitCarCollisionShapes
 
 // FUNCTION: CARMA2_HW 0x00430d80
+// FUNCTION: CARMA2_SW 0x00430db0
 // FUNCTION: CARMA2_CHEAT 0x00430f50
 int C2_HOOK_FASTCALL QuantizeWithinBounds(br_scalar pQuant, br_scalar pMin, br_scalar pMax, br_scalar* pValue) {
     br_scalar range;
