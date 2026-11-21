@@ -729,6 +729,7 @@ void C2_HOOK_FASTCALL ToggleInventory(void) {
 
 // FUNCTION: CARMA2_HW 0x004dad00
 // FUNCTION: CARMA2_SW 0x004d71d0
+// FUNCTION: CARMA2_CHEAT 0x004e08c0
 void C2_HOOK_FASTCALL DrawPowerups(tU32 pTime) {
 
     DrawPowerupIcons2(pTime, gPickedup_powerups, &gNumber_of_icons, 5,
