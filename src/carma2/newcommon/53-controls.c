@@ -105,10 +105,12 @@ int gInvulnerability;
 
 // GLOBAL: CARMA2_HW 0x0067c3b8
 // GLOBAL: CARMA2_SW 0x00676b30
+// GLOBAL: CARMA2_CHEAT 0x00683c68
 int gToo_late;
 
 // GLOBAL: CARMA2_HW 0x0067c3bc
 // GLOBAL: CARMA2_SW 0x00676b34
+// GLOBAL: CARMA2_CHEAT 0x00683c6c
 int gRecover_timer;
 
 // GLOBAL: CARMA2_HW 0x0067c3c8
@@ -127,6 +129,7 @@ int gRecovery_voucher_count;
 
 // GLOBAL: CARMA2_HW 0x0067c460
 // GLOBAL: CARMA2_SW 0x00676bd8
+// GLOBAL: CARMA2_CHEAT 0x00683d10
 int gHad_auto_recover;
 
 // GLOBAL: CARMA2_HW 0x0067c46c
@@ -171,6 +174,7 @@ tEdit_func* gEdit_funcs[eEdit_mode_count][18][8] = { 0 };
 
 // GLOBAL: CARMA2_HW 0x00590f60
 // GLOBAL: CARMA2_SW 0x0058bf58
+// GLOBAL: CARMA2_CHEAT 0x0059788c
 int gCancel_recover = 1;
 
 // GLOBAL: CARMA2_HW 0x0067c468
