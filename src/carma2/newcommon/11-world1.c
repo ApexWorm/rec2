@@ -49,6 +49,7 @@ char gAdditional_model_path[256];
 char gAdditional_actor_path[256];
 
 // GLOBAL: CARMA2_HW 0x006b6600
+// GLOBAL: CARMA2_SW 0x006ad2e0
 // GLOBAL: CARMA2_CHEAT 0x006bdca0
 br_actor* gLast_actor;
 
