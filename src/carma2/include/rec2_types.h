@@ -659,6 +659,14 @@ typedef struct {
 } tPipe_chunk_screen_wobble;
 
 typedef struct {
+    int path_interrupt;
+    int object_interrupt;
+    float path_resumption;
+    float object_resumption;
+    br_matrix34 matrix;
+} tPipe_chunk_groove_stop;
+
+typedef struct {
     tU32 time;
 } tPipe_chunk_frame_boundary;
 
@@ -732,6 +740,7 @@ typedef enum {
     ePipe_chunk_spark = 10,
     ePipe_chunk_shrapnel = 11,
     ePipe_chunk_screen_wobble = 12,
+    ePipe_chunk_groove_stop = 13,
     ePipe_chunk_non_car = 14,
     ePipe_chunk_smoke = 15,
     ePipe_chunk_oil_spill = 16,
