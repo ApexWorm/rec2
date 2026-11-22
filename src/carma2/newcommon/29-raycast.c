@@ -98,7 +98,7 @@ int C2_HOOK_FASTCALL PickBoundsTestRay__raycast(br_bounds* b, br_vector3* rp, br
     for (i = 0; i < (int)REC2_ASIZE(rd->v); i++) {
         if (rd->v[i] > 2 * BR_SCALAR_EPSILON) {
             inverse = rd->v[i];
-            inverse = 1.f / inverse;
+            inverse = 1.0f / inverse;
             t = (rp->v[i] - b->max.v[i]) * inverse;
             if (t > BR_SCALAR_MAX) {
                 t_near = BR_SCALAR_MAX;
@@ -113,7 +113,7 @@ int C2_HOOK_FASTCALL PickBoundsTestRay__raycast(br_bounds* b, br_vector3* rp, br
             }
         } else if (rd->v[i] < -2 * BR_SCALAR_EPSILON) {
             inverse = rd->v[i];
-            inverse = 1.f / inverse;
+            inverse = 1.0f / inverse;
             t = (rp->v[i] - b->max.v[i]) * inverse;
             if (t < BR_SCALAR_MIN) {
                 t_far = BR_SCALAR_MIN;
