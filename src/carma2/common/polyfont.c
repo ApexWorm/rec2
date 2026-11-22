@@ -855,7 +855,7 @@ void C2_HOOK_FASTCALL TransparentPolyFontText(const char* pText, int pX, int pY,
     tvs[0].t = BRT_BLEND_B;
     tvs[0].v.b = 1;
     tvs[1].t = BRT_OPACITY_X;
-    tvs[1].v.x = BR_FIXED_INT(pOpacity_factor * 255.);
+    tvs[1].v.x = BR_FIXED_INT(pOpacity_factor * 255.0);
     tvs[2].t = BR_NULL_TOKEN;
     tvs[2].v.u32 = 0;
 

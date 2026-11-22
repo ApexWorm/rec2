@@ -4097,7 +4097,8 @@ typedef struct  {
     float field_0x18;
     float field_0x1c;
     tU8 kev_o_flap;
-    undefined field_0x21[7];
+    undefined field_0x21[3];
+    tPhysics_object* field_0x24;
     tU8 is_door;
     undefined field_0x29[3];
 } tCar_crush_flap_data;
@@ -6112,6 +6113,7 @@ enum {
     eSoundId_BendCar = 5099,
     eSoundId_DamageRepair = 5200,
     eSoundId_Horn = 5209,
+    eSoundId_DoorSlam = 5250,
     eSoundId_Cop_Siren = 5350,
     eSoundId_Explosion = 5400,
     eSoundId_FlaskGone = 5401,

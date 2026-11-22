@@ -646,7 +646,7 @@ void C2_HOOK_FASTCALL InitSoundSources(void) {
             if (env_src->source == NULL) {
                 env_src->source = S3CreateSoundSourceBR(&env_src->position, &gZero_v__car, gXXX_outlet);
                 if (env_src->source != NULL) {
-                    S3BindAmbientSoundToOutlet(gXXX_outlet, eSoundId_Cop_Siren, env_src->source, 100.f, 0, 0, 0, BR_FIXED_INT(1), BR_FIXED_INT(1));
+                    S3BindAmbientSoundToOutlet(gXXX_outlet, eSoundId_Cop_Siren, env_src->source, 100.f, 0, 0, 0, S3_FIXED_INT(1), S3_FIXED_INT(1));
                 }
             }
         }
@@ -785,7 +785,7 @@ void C2_HOOK_FASTCALL MungeEngineNoise(void) {
                 BrVector3Copy(&the_car->vel, &the_car->collision_info->v);
                 if (cat == eVehicle_rozzer) {
                     vol = 255.0f;
-                    pitch = (float)BR_FIXED_INT(1);
+                    pitch = (float)S3_FIXED_INT(1);
                 } else {
                     if (the_car->collision_info->last_special_volume != NULL) {
                         type_of_engine_noise = the_car->collision_info->last_special_volume->engine_noise_index;
@@ -822,7 +822,7 @@ void C2_HOOK_FASTCALL MungeEngineNoise(void) {
                 if (the_car->field_0x4d4 > 1.0) {
                     vol = (float)(vol * (1.0 + (the_car->field_0x4d4 - 1.0f) / 12.0f));
                 }
-                S3UpdateSoundSource(gEngine_outlet, -1, the_car->sound_source, (float)(gAction_replay_mode ? 300 : 250), 0, 0, (int)vol, (int)pitch, BR_FIXED_INT(1));
+                S3UpdateSoundSource(gEngine_outlet, -1, the_car->sound_source, (float)(gAction_replay_mode ? 300 : 250), 0, 0, (int)vol, (int)pitch, S3_FIXED_INT(1));
             }
         }
     }
