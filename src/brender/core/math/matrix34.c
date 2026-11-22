@@ -344,13 +344,13 @@ br_scalar C2_HOOK_CDECL BrMatrix34Inverse(br_matrix34* B, const br_matrix34* A) 
     det = pos + neg;
 
     if (ABS(det) <= PRECISION_LIMIT)
-        return 0.f;
+        return 0.0f;
 
     if ((ABS(det / (pos - neg)) < PRECISION_LIMIT)) {
-        return 0.f;
+        return 0.0f;
     }
 
-    idet = 1.f / det;
+    idet = 1.0f / det;
 
     BF(0, 0) = (AF(1, 1) * AF(2, 2) - AF(1, 2) * AF(2, 1)) * idet;
     BF(1, 0) = -(AF(1, 0) * AF(2, 2) - AF(1, 2) * AF(2, 0)) * idet;
@@ -414,6 +414,7 @@ void C2_HOOK_CDECL BrMatrix34LPNormalise(br_matrix34* A, const br_matrix34* B) {
 
 // FUNCTION: CARMA2_HW 0x00533100
 // FUNCTION: CARMA2_SW 0x0052e7a0
+// FUNCTION: CARMA2_CHEAT 0x00538cf0
 void C2_HOOK_CDECL BrMatrix34RollingBall(br_matrix34* mat, int dx, int dy, int radius) {
     br_scalar nx;
     br_scalar ny;
@@ -449,13 +450,14 @@ void C2_HOOK_CDECL BrMatrix34RollingBall(br_matrix34* mat, int dx, int dy, int r
     M(2, 0) = -M(0, 2);
     M(2, 1) = -M(1, 2);
 
-    M(3, 0) = BR_SCALAR(0.f);
-    M(3, 1) = BR_SCALAR(0.f);
-    M(3, 2) = BR_SCALAR(0.f);
+    M(3, 0) = BR_SCALAR(0.0f);
+    M(3, 1) = BR_SCALAR(0.0f);
+    M(3, 2) = BR_SCALAR(0.0f);
 }
 
 // FUNCTION: CARMA2_HW 0x00533290
 // FUNCTION: CARMA2_SW 0x0052e930
+// FUNCTION: CARMA2_CHEAT 0x00538e80
 br_matrix34* C2_HOOK_CDECL BrBoundsToMatrix34(br_matrix34* mat, const br_bounds* bounds) {
     int i;
     br_vector3 tr;
@@ -471,13 +473,13 @@ br_matrix34* C2_HOOK_CDECL BrBoundsToMatrix34(br_matrix34* mat, const br_bounds*
     }
 
     M(0, 0) = sc.v[0];
-    M(0, 1) = 0.f;
-    M(0, 2) = 0.f;
-    M(1, 0) = 0.f;
+    M(0, 1) = 0.0f;
+    M(0, 2) = 0.0f;
+    M(1, 0) = 0.0f;
     M(1, 1) = sc.v[1];
-    M(1, 2) = 0.f;
-    M(2, 0) = 0.f;
-    M(2, 1) = 0.f;
+    M(1, 2) = 0.0f;
+    M(2, 0) = 0.0f;
+    M(2, 1) = 0.0f;
     M(2, 2) = sc.v[2];
     M(3, 0) = tr.v[0];
     M(3, 1) = tr.v[1];
@@ -487,6 +489,7 @@ br_matrix34* C2_HOOK_CDECL BrBoundsToMatrix34(br_matrix34* mat, const br_bounds*
 
 // FUNCTION: CARMA2_HW 0x00533350
 // FUNCTION: CARMA2_SW 0x0052e9f0
+// FUNCTION: CARMA2_CHEAT 0x00538f40
 void C2_HOOK_CDECL BrMatrix34Copy4(br_matrix34* A, const br_matrix4* B) {
 
     A(0, 0) = B(0, 0);

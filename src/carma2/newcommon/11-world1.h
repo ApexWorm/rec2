@@ -39,9 +39,15 @@ extern void C2_HOOK_FASTCALL DoSaveAdditionalStuff(void);
 
 extern void C2_HOOK_FASTCALL AutoSaveAdditionalStuff(void);
 
+extern void C2_HOOK_FASTCALL DropSpecVol0(void);
+
 extern br_material* C2_HOOK_FASTCALL GetInternalMat(void);
 
 extern br_material* C2_HOOK_FASTCALL GetExternalMat(void);
+
+extern void C2_HOOK_FASTCALL DropSpecVol1(void);
+
+extern void C2_HOOK_FASTCALL DropSpecVol(int pIndex);
 
 extern void C2_HOOK_FASTCALL BuildSpecVolModel(tSpecial_volume* pSpec, int pIndex, br_material* pInt_mat, br_material* pExt_mat);
 

@@ -32,6 +32,7 @@ int gDelete_count;
 br_actor* gDelete_list[500];
 
 // GLOBAL: CARMA2_HW 0x006ab7b0
+// GLOBAL: CARMA2_SW 0x006a5200
 // GLOBAL: CARMA2_CHEAT 0x006b2e40
 br_actor* gSpec_vol_actors[100];
 
@@ -190,6 +191,12 @@ void C2_HOOK_FASTCALL AutoSaveAdditionalStuff(void) {
     FlushAllPedCaches();
 }
 
+// FUNCTION: CARMA2_HW 0x0050c980
+// FUNCTION: CARMA2_SW 0x00507dd0
+// FUNCTION: CARMA2_CHEAT 0x00512370
+void C2_HOOK_FASTCALL DropSpecVol0(void) {
+}
+
 br_material* C2_HOOK_FASTCALL GetInternalMat(void) {
 
     return BrMaterialFind("SPECVOL.MAT");
@@ -200,6 +207,29 @@ br_material* C2_HOOK_FASTCALL GetExternalMat(void) {
     return BrMaterialFind("SPECVOL2.MAT");
 }
 
+// FUNCTION: CARMA2_HW 0x0050c990
+// FUNCTION: CARMA2_SW 0x00507de0
+// FUNCTION: CARMA2_CHEAT 0x00512380
+void C2_HOOK_FASTCALL DropSpecVol1(void) {
+
+    DropSpecVol(1);
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_HW 0x0050c9a0
+// STUB: CARMA2_SW 0x00507df0
+// STUB: CARMA2_CHEAT 0x00512390
+void C2_HOOK_FASTCALL DropSpecVol(int pIndex) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
+
 #define DrVertexSet(V, X, Y, Z) \
     do {                        \
         (V)[0] = (X);           \
@@ -208,6 +238,7 @@ br_material* C2_HOOK_FASTCALL GetExternalMat(void) {
     } while (0)
 
 // FUNCTION: CARMA2_HW 0x0050cbf0
+// FUNCTION: CARMA2_SW 0x00508040
 // FUNCTION: CARMA2_CHEAT 0x005125e0
 void C2_HOOK_FASTCALL BuildSpecVolModel(tSpecial_volume* pSpec, int pIndex, br_material* pInt_mat, br_material* pExt_mat) {
     int i;
