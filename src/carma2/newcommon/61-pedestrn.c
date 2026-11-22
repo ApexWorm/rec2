@@ -2181,6 +2181,7 @@ tPed_form* C2_HOOK_FASTCALL FindOrOpenForm(const char* pName) {
 
 // STUB: CARMA2_HW 0x00406ab0
 // STUB: CARMA2_SW 0x00406ab0
+// STUB: CARMA2_CHEAT 0x00406ab0
 tPed_personality* C2_HOOK_FASTCALL ReadPersonality(const char* pName) {
     NOT_IMPLEMENTED();
 }
@@ -2195,6 +2196,7 @@ tPed_personality* C2_HOOK_FASTCALL ReadPersonality(const char* pName) {
 
 // FUNCTION: CARMA2_HW 0x00407930
 // FUNCTION: CARMA2_SW 0x00407920
+// FUNCTION: CARMA2_CHEAT 0x00407920
 tPed_personality* C2_HOOK_FASTCALL FindOrOpenPersonality(const char* pName) {
     int i;
 
