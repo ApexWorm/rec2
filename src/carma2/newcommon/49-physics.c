@@ -1339,6 +1339,7 @@ tCollision_shape_wireframe* C2_HOOK_FASTCALL AllocateShapeWireFrame(int pCount_p
 }
 
 // FUNCTION: CARMA2_HW 0x004c5e00
+// FUNCTION: CARMA2_SW 0x004c2530
 // FUNCTION: CARMA2_CHEAT 0x004cb920
 tCollision_shape_box* C2_HOOK_FASTCALL AllocateShapeBox(int pType) {
     tCollision_shape_box* result;

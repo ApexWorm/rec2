@@ -334,7 +334,33 @@ void C2_HOOK_FASTCALL LoadPowerups(void) {
 
 // InitRepulseEffects
 
-// MungeBoxObject
+// FUNCTION: CARMA2_HW 0x004da290
+// FUNCTION: CARMA2_SW 0x004d6760
+// FUNCTION: CARMA2_CHEAT 0x004dfe50
+tPhysics_object* C2_HOOK_FASTCALL MungeBoxObject(br_model* pModel, float pMass) {
+    tPhysics_object* box;
+
+    C2_HOOK_BUG_ON(sizeof(tPhysics_object) != 0x4d8);
+
+    box = BrMemAllocate(sizeof(tPhysics_object), kMem_collision_object);
+    box->shape = (tPhysics_shape*)AllocateShapeBox(kMem_collision_shape);
+    box->shape->common.bb = pModel->bounds;
+    FillInShape(box->shape);
+    box->uid = (tU8)gCollision_info_uid_counter;
+    gCollision_info_uid_counter++;
+    UpdateCollisionObject(box);
+    box->M = pMass;
+    BrVector3Set(&box->I,
+        (REC2_SQR((pModel->bounds.max.v[1] - pModel->bounds.min.v[1]) * 0.5f) + REC2_SQR((pModel->bounds.max.v[2] - pModel->bounds.min.v[2]) * 0.5f)) * pMass / 12.0f,
+        (REC2_SQR((pModel->bounds.max.v[0] - pModel->bounds.min.v[0]) * 0.5f) + REC2_SQR((pModel->bounds.max.v[2] - pModel->bounds.min.v[2]) * 0.5f)) * pMass / 12.0f,
+        (REC2_SQR((pModel->bounds.max.v[0] - pModel->bounds.min.v[0]) * 0.5f) + REC2_SQR((pModel->bounds.max.v[1] - pModel->bounds.min.v[1]) * 0.5f)) * pMass / 12.0f);
+    BrVector3SetFloat(&box->field_0x54, 0.0f, (br_scalar)(-1.0 / (2.5 * 6.9)), 0.0f);
+    box->actor = BrActorAllocate(BR_ACTOR_MODEL, NULL);
+    BrMatrix34Copy(&box->actor->t.t.mat, &box->transform_matrix);
+    box->actor->model = pModel;
+    box->box_face_ref = (tU16)(gFace_num__car - 2);
+    return box;
+}
 
 // FUNCTION: CARMA2_HW 0x004da400
 // FUNCTION: CARMA2_SW 0x004d68d0
