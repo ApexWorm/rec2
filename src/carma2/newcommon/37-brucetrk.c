@@ -248,7 +248,7 @@ intptr_t C2_HOOK_CDECL FindNonCarsCB(br_actor* pActor, void* pData) {
         n2 = BrVector3LengthSquared((br_vector3*)pActor->t.t.mat.m[2]);
         if (n0 < 0.999 || n1 < 0.999 || n2 < 0.999) {
             dr_dprintf("non car was scaled down %s", pActor->identifier);
-            pActor->t.t.translate.t.v[0] += 2000.f;
+            pActor->t.t.translate.t.v[0] += 2000.0f;
         }
         if (n0 > 1.001 || n1 > 1.001 || n2 > 1.001) {
             BrVector3InvScale((br_vector3*)pActor->t.t.mat.m[0], (br_vector3*)pActor->t.t.mat.m[0], (float)sqrt((double)n0));
