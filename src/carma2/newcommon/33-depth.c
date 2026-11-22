@@ -15,6 +15,7 @@
 #include "36-trig.h"
 #include "37-brucetrk.h"
 #include "41-utility.h"
+#include "52-errors.h"
 #include "55-volume.h"
 #include "66-tintedpoly.h"
 #include "globvars.h"
@@ -96,7 +97,33 @@ tSpecial_volume* gLast_camera_special_volume;
 
 static void C2_HOOK_FASTCALL FrobFog(void);
 
-// Log2
+int C2_HOOK_CDECL Log2(int pNumber) {
+    int i;
+    int bits[16] = {
+        0x1,
+        0x2,
+        0x4,
+        0x8,
+        0x10,
+        0x20,
+        0x40,
+        0x80,
+        0x100,
+        0x200,
+        0x400,
+        0x800,
+        0x1000,
+        0x2000,
+        0x4000,
+        0x8000,
+    };
+    for (i = REC2_ASIZE(bits) - 1; i >= 0; --i) {
+        if (bits[i] & pNumber) {
+            return i;
+        }
+    }
+    return 0;
+}
 
 // CalculateWrappingMultiplier
 
@@ -278,7 +305,34 @@ void C2_HOOK_FASTCALL InstantDepthChange(tDepth_effect_type pType, br_pixelmap* 
 
 // CreateHorizonModel
 
-// LoadDepthTable
+// FUNCTION: CARMA2_HW 0x00445860
+// FUNCTION: CARMA2_SW 0x004455f0
+// FUNCTION: CARMA2_CHEAT 0x00445d80
+void C2_HOOK_FASTCALL LoadDepthTable(char* pName, br_pixelmap** pTable, int* pPower) {
+    tPath_name the_path;
+    int i;
+    int j;
+    tU8 temp;
+
+#define PTABLE_PIXEL_AT(X, Y) ((tU8*)((*pTable)->pixels))[(X) + (Y) * (*pTable)->row_bytes]
+
+    PathCat(the_path, gApplication_path, "SHADETAB");
+    PathCat(the_path, the_path, pName);
+    *pTable = DRPixelmapLoad(the_path);
+    if (*pTable == NULL) {
+        FatalError(kFatalError_CannotLoadDepthCueShadeTable);
+    }
+    *pPower = Log2((*pTable)->height);
+    for (i = 0; i < (*pTable)->width; i++) {
+        for (j = 0; j < (*pTable)->height / 2; j++) {
+            temp = PTABLE_PIXEL_AT(i, j);
+            PTABLE_PIXEL_AT(i, j) = PTABLE_PIXEL_AT(i, ((*pTable)->height - j - 1));
+            PTABLE_PIXEL_AT(i, ((*pTable)->height - j - 1)) = temp;
+        }
+    }
+
+#undef PTABLE_PIXEL_AT
+}
 
 // STUB: CARMA2_HW 0x00445620
 // STUB: CARMA2_SW 0x00445450

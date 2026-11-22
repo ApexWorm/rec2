@@ -306,6 +306,7 @@ br_pixelmap* C2_HOOK_FASTCALL DRImageLoad(const char* pPath) {
 
 // FUNCTION: CARMA2_HW 0x00513970
 // FUNCTION: CARMA2_SW 0x0050edb0
+// FUNCTION: CARMA2_CHEAT 0x00519360
 br_pixelmap* C2_HOOK_FASTCALL DRPixelmapLoad(char* pFile_name) {
     br_pixelmap* the_map;
 
