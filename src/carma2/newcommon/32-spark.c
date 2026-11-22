@@ -86,12 +86,22 @@ tSmoke gSmoke[25];
 // GLOBAL: CARMA2_HW 0x006a8760
 tBRender_smoke* gBR_smoke_pointers[35];
 
+// GLOBAL: CARMA2_HW 0x006aa388
+// GLOBAL: CARMA2_SW 0x006a3dd8
+// GLOBAL: CARMA2_CHEAT 0x006b1f00
+tReplay_splash gReplay_splashes[10] = { 0 };
+
 // GLOBAL: CARMA2_HW 0x006aa568
 // GLOBAL: CARMA2_SW 0x006a3fb8
 int gDust_rotate = 0;
 
 // GLOBAL: CARMA2_HW 0x006aa56c
 int gN_BR_smoke_structs;
+
+// GLOBAL: CARMA2_HW 0x006aa574
+// GLOBAL: CARMA2_SW 0x006a3fc0
+// GLOBAL: CARMA2_CHEAT 0x006b20ec
+int gReplay_splash_flags;
 
 // GLOBAL: CARMA2_HW 0x006a8638
 // GLOBAL: CARMA2_SW 0x006a2698
@@ -1592,7 +1602,47 @@ void* C2_HOOK_FASTCALL GetSplashIndex(tPhysics_object* pObject) {
 
 // ClearSplashes
 
-// AdjustSplashReplay
+// FUNCTION: CARMA2_HW 0x004fef40
+// FUNCTION: CARMA2_SW 0x004fa820
+// FUNCTION: CARMA2_CHEAT 0x00504be0
+void C2_HOOK_FASTCALL AdjustSplashReplay(void* pObject, int pType, float pWater_density, br_vector3* pNormal, br_bounds3* pBounds) {
+    int i;
+    int free_index;
+
+    C2_HOOK_BUG_ON(sizeof(tReplay_splash) != 0x30);
+    C2_HOOK_BUG_ON(REC2_ASIZE(gReplay_splashes) != 10);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tReplay_splash, type, 0x4);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tReplay_splash, water_density, 0x8);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tReplay_splash, normal, 0xc);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tReplay_splash, bb, 0x18);
+
+    free_index = -1;
+    for (i = 0; i < (int)REC2_ASIZE(gReplay_splashes); i++) {
+        if (!(gReplay_splash_flags & (1 << i))) {
+            if (free_index < 0) {
+                free_index = i;
+            }
+        } else if (gReplay_splashes[i].object.ptr == pObject) {
+            gReplay_splashes[i].water_density = pWater_density;
+            BrVector3Copy(&gReplay_splashes[i].normal, pNormal);
+            BrVector3Copy(&gReplay_splashes[i].bb.min, &pBounds->min);
+            BrVector3Copy(&gReplay_splashes[i].bb.max, &pBounds->max);
+            return;
+        }
+    }
+    if (free_index < 0) {
+        i = IRandomBetween(0, REC2_ASIZE(gReplay_splashes));
+    } else {
+        i = free_index;
+    }
+    gReplay_splash_flags |= 1 << i;
+    gReplay_splashes[i].object.ptr = pObject;
+    gReplay_splashes[i].type = pType;
+    gReplay_splashes[i].water_density = pWater_density;
+    BrVector3Copy(&gReplay_splashes[i].normal, pNormal);
+    BrVector3Copy(&gReplay_splashes[i].bb.min, &pBounds->min);
+    BrVector3Copy(&gReplay_splashes[i].bb.max, &pBounds->max);
+}
 
 // STUB: CARMA2_HW 0x004ff030
 // STUB: CARMA2_SW 0x004fa910
