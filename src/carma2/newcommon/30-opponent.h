@@ -60,11 +60,11 @@ extern tS16 C2_HOOK_FASTCALL FindNearestGeneralSection(tCar_spec* pCar, const br
 
 extern tS16 C2_HOOK_FASTCALL FindNearestPathSection(const br_vector3* pActor_coords, br_vector3* pPath_direction, br_vector3* pIntersect, br_scalar* pDistance);
 
-// DeadStopCar
+extern void C2_HOOK_FASTCALL DeadStopCar(tCar_spec* pCar_spec);
 
 // TurnOpponentPhysicsOn
 
-// TurnOpponentPhysicsOff
+extern void C2_HOOK_FASTCALL TurnOpponentPhysicsOff(tOpponent_spec* pOpponent_spec);
 
 // ApplyOppoRenderage2
 
