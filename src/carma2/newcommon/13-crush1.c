@@ -2063,10 +2063,10 @@ intptr_t C2_HOOK_CDECL TotallyRepairModels(br_actor* pActor, void* pUser) {
         if (crush_data->flap_data != NULL && !crush_data->flap_data->kev_o_flap) {
             crush_data->flap_data->field_0x15 = 0;
             crush_data->flap_data->field_0x14 = 1;
-            crush_data->flap_data->field_0x18 = 0.f;
+            crush_data->flap_data->field_0x18 = 0.0f;
         }
         if (crush_data->detach_data != NULL) {
-            crush_data->detach_data->field_0x0 = 0.f;
+            crush_data->detach_data->field_0x0 = 0.0f;
         }
     }
     return 0;
