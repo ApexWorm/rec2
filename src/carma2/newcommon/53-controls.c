@@ -1230,12 +1230,15 @@ void C2_HOOK_FASTCALL UserSendMessage(void) {
 void C2_HOOK_FASTCALL EnterUserMessage(void) {
     // GLOBAL: CARMA2_HW 0x00590f64
     // GLOBAL: CARMA2_SW 0x0058bf5c
+    // GLOBAL: CARMA2_CHEAT 0x00597890
     static int last_key = -1;
     // GLOBAL: CARMA2_HW 0x0067c49c
     // GLOBAL: CARMA2_SW 0x00676c14
+    // GLOBAL: CARMA2_CHEAT 0x00683d44
     static int about_to_die;
     // GLOBAL: CARMA2_HW 0x0067c454
     // GLOBAL: CARMA2_SW 0x00676bcc
+    // GLOBAL: CARMA2_CHEAT 0x00683d04
     static tU32 next_time;
     char* the_message;
     char* p;
