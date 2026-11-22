@@ -1479,7 +1479,7 @@ void C2_HOOK_FASTCALL DRPlaneEquation(br_vector4* pDst, const br_vector3* pN, co
 // FUNCTION: CARMA2_SW 0x005117c0
 // FUNCTION: CARMA2_CHEAT 0x0051bd70
 int C2_HOOK_FASTCALL DRVector3NonZero(const br_vector3* pV) {
-    if (pV->v[0] == 0.f && pV->v[1] == 0.f && pV->v[2] == 0.f) {
+    if (pV->v[0] == 0.0f && pV->v[1] == 0.0f && pV->v[2] == 0.0f) {
         return 0;
     } else {
         return 1;
