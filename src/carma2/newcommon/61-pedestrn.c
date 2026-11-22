@@ -134,6 +134,8 @@ int gFlameThrowerOn = 1;
 int gExplosives_on = 1;
 
 // GLOBAL: CARMA2_HW 0x0065d7f0
+// GLOBAL: CARMA2_SW 0x00658128
+// GLOBAL: CARMA2_CHEAT 0x00664ea8
 int gPed_move_fsm[118][7] = {
     {   0,  -2,   5,   6, 111,  31, 112 },
     {   0,   0,   5,   6, 111,  31, 112 },
@@ -1145,6 +1147,11 @@ void C2_HOOK_FASTCALL SetPedMove(tPedestrian* pPed, int pMove_action, int pWalk_
     PipeSinglePedMove(pPed, (tS16)original_field_0x1c, (tS16)original_move_id,
         (tS16)pMove_action, (float)original_field_0x1e, (float)pWalk_speed_factor, pArg5, pArg4,
         &original_pos, (br_vector3*)character_matrix->m[3], original_action, pPed->action, &pPed->character->field_0x8c);
+#ifdef REC2_CHEAT
+    if (pPed->action == ePed_action_impacting && pPed->character->personality->form->moves[pPed->character->field_0x7].id == 0x29) {
+        PDFatalError("Earwig alert! (My uncle has some spam.)");
+    }
+#endif
 }
 
 // FUNCTION: CARMA2_HW 0x004cc660
