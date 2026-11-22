@@ -233,6 +233,11 @@ tCar_spec* gCloaked_cars[12];
 // GLOBAL: CARMA2_CHEAT 0x006a84b8
 int gInventory_cycling;
 
+// GLOBAL: CARMA2_HW 0x006a0944
+// GLOBAL: CARMA2_SW 0x0069a99c
+// GLOBAL: CARMA2_CHEAT 0x006a84bc
+int gNumber_of_icons;
+
 // GLOBAL: CARMA2_HW 0x006a0950
 // GLOBAL: CARMA2_SW 0x0069a9a8
 int gFizzle_height;
@@ -617,9 +622,104 @@ int C2_HOOK_FASTCALL DrawSinglePowerupIcon(int pDraw, int pTime, tPowerup* pPowe
     return 0;
 }
 
-// DrawPowerupIcons2
+inline void C2_HOOK_FASTCALL DrawPowerupIcons2(tU32 pTime, tHeadup_icon* pHeadup_icons, int* pCount_icons, int pMax_count_icons, int pX, int pY) {
+    int i;
+    int y;
+    tPowerup* the_powerup;
+    tHeadup_icon* the_icon;
 
-// DrawKeyPowerups
+    C2_HOOK_BUG_ON(sizeof(tHeadup_icon) != 0x14);
+
+    y = pY;
+    for (i = 0, the_icon = pHeadup_icons; i < *pCount_icons; i++, the_icon++) {
+        if (i >= pMax_count_icons) {
+            break;
+        }
+        the_powerup = the_icon->powerup;
+        if (the_powerup->icon == NULL) {
+            continue;
+        }
+        y += gCurrent_graf_data->power_up_icon_y_pitch;
+        if (the_icon->fizzle_stage < 4) {
+            if (the_icon->fizzle_direction < 0) {
+                the_icon->fizzle_stage = 3 - (pTime - the_icon->fizzle_start) / 150;
+            } else {
+                the_icon->fizzle_stage = (pTime - the_icon->fizzle_start) / 150;
+            }
+            if (the_icon->fizzle_stage > 4) {
+                the_icon->fizzle_stage = 4;
+            } else if (the_icon->fizzle_stage < 0) {
+                memcpy(the_icon, the_icon + 1, sizeof(tHeadup_icon) * (*pCount_icons - i - 1));
+                (*pCount_icons)--;
+                continue;
+            }
+        }
+        DrawSinglePowerupIcon(1, pTime, the_icon->powerup, the_icon, pX, y, 0);
+    }
+}
+
+inline void C2_HOOK_FASTCALL DrawKeyPowerups(tU32 pTime) {
+    int x;
+    int i;
+
+    if (gInventory_cycling) {
+        if (gInventory_selected >= 0) {
+            if (GetTotalTime() >= gInventory_timeout) {
+                gInventory_timeout = 0;
+                gInventory_cycling = 0;
+            }
+            x = gCurrent_graf_data->keyboard_powerup_x;
+            i = gInventory_selected;
+            do {
+                if (gInventory[i] >= 0) {
+                    x = DrawSinglePowerupIcon(0, pTime, &gPowerup_array[gInventory[i]], NULL,
+                        x, gCurrent_graf_data->keyboard_powerup_y, 1) + gCurrent_graf_data->keyboard_powerup_spacing_x;
+                }
+                i++;
+                if (i >= (int)REC2_ASIZE(gInventory)) {
+                    i = 0;
+                }
+            } while (i != gInventory_selected);
+            if (x >= 0) {
+                DimRectangle(gBack_screen, gCurrent_graf_data->keyboard_powerup_bg_x, gCurrent_graf_data->keyboard_powerup_bg_y,
+                    x, gCurrent_graf_data->keyboard_powerup_bg_bottom, 1);
+                i = gInventory_selected;
+                x = gCurrent_graf_data->keyboard_powerup_x;
+#ifdef REC2_HW
+                DRPixelmapText(gBack_screen,
+                    gCurrent_graf_data->keyboard_powerup_bg_x + 1, gCurrent_graf_data->keyboard_powerup_bg_bottom - 9,
+                    &gFonts[2], gPowerup_array[gInventory[gInventory_selected]].message,
+                    gCurrent_graf_data->keyboard_powerup_bg_x + 100);
+#endif
+#ifdef REC2_SW
+                DRPixelmapText(gBack_screen,
+                    gCurrent_graf_data->keyboard_powerup_bg_x + 4, gCurrent_graf_data->keyboard_powerup_bg_bottom - 8,
+                    &gFonts[2], gPowerup_array[gInventory[gInventory_selected]].message,
+                    gCurrent_graf_data->keyboard_powerup_bg_x + 100);
+#endif
+                do {
+                    if (gInventory[i] >= 0) {
+                        tPowerup* the_powerup = &gPowerup_array[gInventory[i]];
+
+                        if (gInventory_cycling) {
+                            x = DrawSinglePowerupIcon(1, pTime, the_powerup, NULL,
+                                x, gCurrent_graf_data->keyboard_powerup_y, 1) + gCurrent_graf_data->keyboard_powerup_spacing_x;
+                        }
+                    }
+                    i++;
+                    if (i >= (int)REC2_ASIZE(gInventory)) {
+                        i = 0;
+                    }
+                } while (i != gInventory_selected);
+            }
+        }
+    } else {
+        if (gInventory_selected >= 0) {
+            DrawSinglePowerupIcon(1, pTime, &gPowerup_array[gInventory[gInventory_selected]], NULL,
+                gCurrent_graf_data->keyboard_powerup_x, gCurrent_graf_data->keyboard_powerup_y, 0);
+        }
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x004da9d0
 // FUNCTION: CARMA2_SW 0x004d6ea0
@@ -636,7 +736,15 @@ void C2_HOOK_FASTCALL ToggleInventory(void) {
 
 // LeftInventory
 
-// DrawPowerups
+// FUNCTION: CARMA2_HW 0x004dad00
+// FUNCTION: CARMA2_SW 0x004d71d0
+// FUNCTION: CARMA2_CHEAT 0x004e08c0
+void C2_HOOK_FASTCALL DrawPowerups(tU32 pTime) {
+
+    DrawPowerupIcons2(pTime, gPickedup_powerups, &gNumber_of_icons, 5,
+        gCurrent_graf_data->power_up_icon_x, gCurrent_graf_data->power_up_icon_y);
+    DrawKeyPowerups(pTime);
+}
 
 // MungeKeyboardPowerup
 
@@ -1221,7 +1329,64 @@ void C2_HOOK_FASTCALL MinePreCollisionStuff(void) {
     NOT_IMPLEMENTED();
 }
 
-// ActivateMine
+// FUNCTION: CARMA2_HW 0x004dd3f0
+// FUNCTION: CARMA2_SW 0x004d98f0
+// FUNCTION: CARMA2_CHEAT 0x004e2fb0
+void C2_HOOK_FASTCALL ActivateMine(tShit_mine* pMine, tPowerup* pPowerup, tCar_spec* pCar) {
+
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tShit_mine, field_0x1c, 0x1c);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tShit_mine, field_0x20, 0x20);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tShit_mine, field_0x24, 0x24);
+
+    pMine->flags = 0x5;
+    /* Integer parameter #0: direction of fire (0 - shit out, 1 - mortar fire) */
+    if (pPowerup->integer_params[0] != 0) {
+        pMine->flags = 0x45;
+    } else {
+        pMine->flags = 0x5;
+    }
+    /* Floating point param #0: Explosion delay */
+    pMine->next_think_time = GetTotalTime() - (int)(pPowerup->float_params[0] * -1000.0);
+
+    /* Floating point param #1: min y strength */
+    pMine->field3_0xc = pPowerup->float_params[1];
+
+    /* Floating point param #2: max y strength*/
+    pMine->initial_y_speed_factor = pPowerup->float_params[2];
+
+    /* Floating point param #3: max roll rate */
+    pMine->initial_z_omega_factor = pPowerup->float_params[3];
+
+    /* Floating point param #4: max pitch rate */
+    pMine->initial_x_omega_factor = pPowerup->float_params[4];
+
+    /* Floating point param #5: force needed to trigger world exlposion */
+    pMine->field_0x1c = pPowerup->float_params[5];
+
+    /* Floating point param #6: firing up vector */
+    pMine->field_0x20 = pPowerup->float_params[6];
+
+    /* Floating point param #6: firing out vector */
+    pMine->field_0x24 = pPowerup->float_params[7];
+
+    pMine->collision_info->field_0xed = 1;
+    pMine->collision_info->disable_move_rotate = 0;
+    pMine->collision_info->flags &= ~0x40;
+    if (pMine->collision_info->actor->parent == NULL) {
+        BrActorAdd(gNon_track_actor, pMine->collision_info->actor);
+    }
+    pMine->collision_info->actor->render_style = BR_RSTYLE_FACES;
+    pMine->field_0x34 = (tU8)(pPowerup - gPowerup_array);
+    PHILAddActiveObject(pMine->collision_info, NULL, NULL, NULL);
+    PHILSetObjectProperty(pMine->collision_info, 0, 1.0);
+    PHILSetObjectProperty(pMine->collision_info, 7, 1);
+    PHILSetObjectProperty(pMine->collision_info, 6, 1);
+    pMine->field_0x30 = pCar;
+    pMine->collision_info->last_special_volume = pCar->collision_info->last_special_volume;
+    pMine->collision_info->auto_special_volume = pCar->collision_info->auto_special_volume;
+    pMine->collision_info->water_d = pCar->collision_info->water_d;
+    BrVector3Copy(&pMine->collision_info->water_normal, &pCar->collision_info->water_normal);
+}
 
 // PositionMine
 
@@ -1585,7 +1750,20 @@ void C2_HOOK_FASTCALL ResetGhostPeds(tPowerup* pPowerup, tCar_spec* pCar) {
     TurnOffGhostPeds();
 }
 
-// DoBouncey
+// FUNCTION: CARMA2_HW 0x004de9b0
+// FUNCTION: CARMA2_SW 0x004daeb0
+// FUNCTION: CARMA2_CHEAT 0x004e4570
+void C2_HOOK_FASTCALL DoBouncey(tPowerup* pPowerup, tU32 pPeriod) {
+
+    if (gProgram_state.current_car.bounce_rate <= GetTotalTime() - gProgram_state.current_car.last_bounce
+        && gProgram_state.current_car.number_of_wheels_on_ground > 2) {
+        PratcamEvent(42);
+        gProgram_state.current_car.last_bounce = GetTotalTime();
+        gProgram_state.current_car.collision_info->v.v[1] = (br_scalar)((gProgram_state.current_car.bounce_amount * (1.0 / WORLD_SCALE_D)) + gProgram_state.current_car.collision_info->v.v[1]);
+        DRS3StartSound(gCar_outlet, eSoundId_Boing);
+        gProgram_state.current_car.collision_info->disable_move_rotate = 0;
+    }
+}
 
 // HitMine
 

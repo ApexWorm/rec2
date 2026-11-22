@@ -46,6 +46,7 @@ extern float gMass_mutant_tail_ball;
 extern float gMass_mine;
 extern int gInstant_handbrake;
 extern int gInventory_cycling;
+extern int gNumber_of_icons;
 extern tU32 gInventory_timeout;
 extern tU32* gReal_render_palette;
 extern int gCollision_info_uid_counter;
@@ -123,9 +124,9 @@ extern void C2_HOOK_FASTCALL ResetRepulseRay(void);
 
 extern int C2_HOOK_FASTCALL DrawSinglePowerupIcon(int pDraw, int pTime, tPowerup* pPowerup, tHeadup_icon* pIcon, int pX, int pY, int pUpdate_x);
 
-// DrawPowerupIcons2
+extern void C2_HOOK_FASTCALL DrawPowerupIcons2(tU32 pTime, tHeadup_icon* pHeadup_icons, int* pCount_icons, int pMax_count_icons, int pX, int pY);
 
-// DrawKeyPowerups
+extern void C2_HOOK_FASTCALL DrawKeyPowerups(tU32 pTime);
 
 extern void C2_HOOK_FASTCALL ToggleInventory(void);
 
@@ -133,7 +134,7 @@ extern void C2_HOOK_FASTCALL ToggleInventory(void);
 
 // LeftInventory
 
-// DrawPowerups
+extern void C2_HOOK_FASTCALL DrawPowerups(tU32 pTime);
 
 // MungeKeyboardPowerup
 
@@ -259,7 +260,7 @@ extern void C2_HOOK_FASTCALL FillInMine(tNet_message_chunk* pChunk, tShit_mine* 
 
 extern void C2_HOOK_FASTCALL MinePreCollisionStuff(void);
 
-// ActivateMine
+extern void C2_HOOK_FASTCALL ActivateMine(tShit_mine* pMine, tPowerup* pPowerup, tCar_spec* pCar);
 
 // PositionMine
 
@@ -353,7 +354,7 @@ extern void C2_HOOK_FASTCALL ResetPissedPeds(tPowerup* pPowerup, tCar_spec* pCar
 
 extern void C2_HOOK_FASTCALL ResetGhostPeds(tPowerup* pPowerup, tCar_spec* pCar);
 
-// DoBouncey
+extern void C2_HOOK_FASTCALL DoBouncey(tPowerup* pPowerup, tU32 pPeriod);
 
 // HitMine
 

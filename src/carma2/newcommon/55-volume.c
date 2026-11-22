@@ -58,6 +58,7 @@ tSpecial_volume* C2_HOOK_FASTCALL GetDefaultSpecialVolumeForWater(void) {
 
 // STUB: CARMA2_HW 0x004ff120
 // STUB: CARMA2_SW 0x004faa00
+// STUB: CARMA2_CHEAT 0x00504dc0
 tSpecial_volume* C2_HOOK_FASTCALL FindSpecialVolume(br_vector3* pP, tSpecial_volume* pLast_vol, int pArg3) {
     NOT_IMPLEMENTED();
 }
