@@ -529,11 +529,45 @@ int C2_HOOK_CDECL PHILSetObjectProperty(tPhysics_object* pCollision_info, int pP
     NOT_IMPLEMENTED();
 }
 
-// STUB: CARMA2_HW 0x004b6530
-// STUB: CARMA2_SW 0x004b2c50
-// STUB: CARMA2_CHEAT 0x004bc010
+// FUNCTION: CARMA2_HW 0x004b6530
+// FUNCTION: CARMA2_SW 0x004b2c50
+// FUNCTION: CARMA2_CHEAT 0x004bc010
 float C2_HOOK_FASTCALL PHILGetObjectProperty(tPhysics_object* pObject, int pProperty) {
-    NOT_IMPLEMENTED();
+    tCollision_info_owner* owner;
+
+    if (!gPHIL_disabled) {
+        if (pObject->field_0x239 == 2) {
+            owner = pObject->field_0x240;
+        } else {
+            owner = pObject->field_0x240;
+        }
+        if (owner != NULL) {
+            if (pProperty < 0 || pProperty >= 9) {
+                return 5.f;
+            }
+            switch (pProperty) {
+            case 0:
+                return owner->field_0x10;
+            case 1:
+                return (float)(owner->field_0x04 & 0x1);
+            case 2:
+                return owner->field_0x0c;
+            case 3:
+                return (float)(int)(((tU32)pObject->flags >> 6) & 0x1);
+            case 4:
+                return (float)(int)(((tU32)pObject->flags >> 3) & 0x1);
+            case 5:
+                return (float)(int)(((tU32)pObject->flags >> 4) & 0x1);
+            case 6:
+                return (float)((owner->field_0x04 >> 2) & 0x1);
+            case 7:
+                return (float)((owner->field_0x04 >> 3) & 0x1);
+            case 8:
+                return owner->field_0x14;
+            }
+        }
+    }
+    return 0.f;
 }
 
 // FlushQueuedAddsAndRemoves
