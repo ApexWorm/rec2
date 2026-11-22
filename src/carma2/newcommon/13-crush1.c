@@ -1876,6 +1876,7 @@ void C2_HOOK_FASTCALL SetModelForUpdate(br_model* pModel) {
 
 // STUB: CARMA2_HW 0x00431610
 // STUB: CARMA2_SW 0x00431640
+// STUB: CARMA2_CHEAT 0x004317e0
 void C2_HOOK_FASTCALL TotallySpamTheCar(tCar_spec* pCar, br_scalar pDamage) {
     NOT_IMPLEMENTED();
 }
