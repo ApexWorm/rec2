@@ -492,7 +492,7 @@ int C2_HOOK_FASTCALL PDNetJoinGame(tNet_game_details* pGame_details, const char*
 // FUNCTION: CARMA2_HW 0x0051a0c0
 // FUNCTION: CARMA2_SW 0x00513ba0
 // FUNCTION: CARMA2_CHEAT 0x0051f7e0
-void C2_HOOK_FASTCALL PDNetHostFinishGame(void) {
+void C2_HOOK_FASTCALL PDNetHostFinishGame(tNet_game_details* pDetails) {
 
     dr_dprintf("PDNetHostFinishGame()");
 }
