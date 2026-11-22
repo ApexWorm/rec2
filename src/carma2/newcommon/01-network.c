@@ -962,8 +962,6 @@ void C2_HOOK_FASTCALL NetFullScreenMessage(int pStr_index, int pLeave_it_up_ther
     char* pixels_copy;
     char* palette_copy;
 
-    C2_HOOK_BUG_ON(sizeof(br_colour) != 4);
-
     if (!(pLeave_it_up_there || (gProgram_state.racing && !gInterface_within_race_mode))) {
         pixel_buffer_size = gBack_screen->height * gBack_screen->row_bytes;
         pixels_copy = BrMemAllocate(pixel_buffer_size, kMem_quit_vfy_pixels);
@@ -989,6 +987,7 @@ void C2_HOOK_FASTCALL NetFullScreenMessage(int pStr_index, int pLeave_it_up_ther
     if (!pLeave_it_up_there) {
         start_time = PDGetTotalTime();
         while (PDGetTotalTime() - start_time < 3000) {
+            /* FIXME: add sleep */
         }
         FadePaletteDown();
         if (restore_screen) {
