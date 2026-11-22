@@ -46,6 +46,8 @@ int gNearest_face_group;
 br_model* gNearest_model;
 
 // GLOBAL: CARMA2_HW 0x00686198
+// GLOBAL: CARMA2_SW 0x006808d8
+// GLOBAL: CARMA2_CHEAT 0x0068da40
 br_matrix34 gPick_model_to_view__finteray;
 
 // BadDiv

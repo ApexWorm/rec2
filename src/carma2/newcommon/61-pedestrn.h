@@ -495,7 +495,7 @@ extern tPed_personality* C2_HOOK_FASTCALL ReadPersonality(const char* pName);
 
 extern tPed_personality* C2_HOOK_FASTCALL FindOrOpenPersonality(const char* pName);
 
-// BuildCharacterInstance
+extern tPed_character_instance* C2_HOOK_FASTCALL BuildCharacterInstance(const char* pGroup_name, br_matrix34* pMat34);
 
 extern br_matrix34* C2_HOOK_FASTCALL GetCharacterMatrixPtr(tPed_character_instance* pCharacter);
 
