@@ -29,6 +29,7 @@ int gDelete_count;
 br_actor* gDelete_list[500];
 
 // GLOBAL: CARMA2_HW 0x006ab7b0
+// GLOBAL: CARMA2_SW 0x006a5200
 // GLOBAL: CARMA2_CHEAT 0x006b2e40
 br_actor* gSpec_vol_actors[100];
 
@@ -211,6 +212,7 @@ br_material* C2_HOOK_FASTCALL GetExternalMat(void) {
     } while (0)
 
 // FUNCTION: CARMA2_HW 0x0050cbf0
+// FUNCTION: CARMA2_SW 0x00508040
 // FUNCTION: CARMA2_CHEAT 0x005125e0
 void C2_HOOK_FASTCALL BuildSpecVolModel(tSpecial_volume* pSpec, int pIndex, br_material* pInt_mat, br_material* pExt_mat) {
     int i;
