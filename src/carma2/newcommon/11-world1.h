@@ -53,6 +53,8 @@ extern void C2_HOOK_FASTCALL BuildSpecVolModel(tSpecial_volume* pSpec, int pInde
 
 extern void BuildSpecVolModel(tSpecial_volume* pSpec, int pIndex, br_material* pInt_mat, br_material* pExt_mat);
 
+extern void C2_HOOK_FASTCALL IdentifySpecVol(void);
+
 extern void C2_HOOK_FASTCALL DelSpecVolumeGraph(int pIndex);
 
 extern void C2_HOOK_FASTCALL ShowSpecialVolumes(void);
