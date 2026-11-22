@@ -5259,11 +5259,11 @@ typedef struct {
         br_actor* actor;
         tPedestrian* ped;
         tPhysics_object* phil_object;
+        void* ptr;
     } object;
     undefined4 type;
     float water_density;
     br_vector3 normal;
-    float field_0x18;
     br_bounds3 bb;
 } tReplay_splash;
 
