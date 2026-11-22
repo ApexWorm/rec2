@@ -259,7 +259,7 @@ extern void C2_HOOK_FASTCALL FillInMine(tNet_message_chunk* pChunk, tShit_mine* 
 
 extern void C2_HOOK_FASTCALL MinePreCollisionStuff(void);
 
-// ActivateMine
+extern void C2_HOOK_FASTCALL ActivateMine(tShit_mine* pMine, tPowerup* pPowerup, tCar_spec* pCar);
 
 // PositionMine
 
