@@ -1441,23 +1441,10 @@ void C2_HOOK_FASTCALL TiggerMineToExplode(tCar_spec* pCar) {
 
 // ClearMineReferencesToCar
 
-// MungeShatMines
-
-inline int C2_HOOK_FASTCALL CarVulnerableByMine(tCar_spec* pCar) {
-
-    if (pCar->field_0x4c8 > 1.0
-            || (gNet_mode != eNet_mode_none && NetPlayerFromCar(pCar) != NULL && NetPlayerFromCar(pCar)->field_0x80 != 0)
-            || pCar->invulnerable_no_crushage != 0) {
-        return 0;
-    } else {
-        return 1;
-    }
-}
-
 // FUNCTION: CARMA2_HW 0x004dde20
 // FUNCTION: CARMA2_SW 0x004da320
 // FUNCTION: CARMA2_CHEAT 0x004e39e0
-void C2_HOOK_FASTCALL ProcessShitMines(tU32 pTime) {
+void C2_HOOK_FASTCALL MungeShatMines(tU32 pTime) {
     int i;
     int car_vulnerable;
     tShit_mine* mine;
@@ -1475,7 +1462,9 @@ void C2_HOOK_FASTCALL ProcessShitMines(tU32 pTime) {
         if ((mine->flags & 0x80) && mine->car != NULL) {
             car = mine->car;
             mine->flags &= ~0x80;
-            car_vulnerable = CarVulnerableByMine(car);
+            car_vulnerable = car->field_0x4c8 <= 1.0
+                    && !(gNet_mode != eNet_mode_none && NetPlayerFromCar(car) != NULL && NetPlayerFromCar(car)->field_0x80 != 0)
+                    && !car->invulnerable_no_crushage;
             if (car_vulnerable) {
                 TotallySpamTheCar(car, mine->max_damage * 0.1f);
             }
