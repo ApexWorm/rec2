@@ -1638,9 +1638,9 @@ void C2_HOOK_FASTCALL StopFlapping(br_actor* pActor, tCar_spec* pCar_spec) {
                     flap_data->field_0x8 = BR_ANGLE_DEG(90);
                     flap_data->field_0x0 = 0;
                 }
-                DRS3StartSound3D(gCar_outlet, 5250,
-                    (br_vector3*)pCar_spec->car_master_actor->t.t.mat.m[3], &gZero_v__car,
-                    1, 255, IRandomBetween(0xe000, 0x12000), BR_FIXED_INT(1));
+                DRS3StartSound3D(gCar_outlet, eSoundId_DoorSlam,
+                    &pCar_spec->car_master_actor->t.t.translate.t, &gZero_v__car,
+                    1, 255, IRandomBetween(BR_FIXED_INT(0.875f), BR_FIXED_INT(1.125f)), BR_FIXED_INT(1));
             }
         }
     }

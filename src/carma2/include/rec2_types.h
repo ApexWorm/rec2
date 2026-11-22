@@ -6113,6 +6113,7 @@ enum {
     eSoundId_BendCar = 5099,
     eSoundId_DamageRepair = 5200,
     eSoundId_Horn = 5209,
+    eSoundId_DoorSlam = 5250,
     eSoundId_Cop_Siren = 5350,
     eSoundId_Explosion = 5400,
     eSoundId_FlaskGone = 5401,
