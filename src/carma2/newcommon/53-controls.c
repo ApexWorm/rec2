@@ -27,6 +27,7 @@
 #include "41-utility.h"
 #include "42-input.h"
 #include "43-pratcam.h"
+#include "52-errors.h"
 #include "59-camera.h"
 #include "62-graphics3.h"
 #include "69-sound.h"
@@ -1288,7 +1289,136 @@ void C2_HOOK_FASTCALL UserSendMessage(void) {
     }
 }
 
-// EnterUserMessage
+// FUNCTION: CARMA2_HW 0x00444910
+// FUNCTION: CARMA2_SW 0x004449f0
+// FUNCTION: CARMA2_CHEAT 0x00444aa0
+void C2_HOOK_FASTCALL EnterUserMessage(void) {
+    // GLOBAL: CARMA2_HW 0x00590f64
+    // GLOBAL: CARMA2_SW 0x0058bf5c
+    // GLOBAL: CARMA2_CHEAT 0x00597890
+    static int last_key = -1;
+    // GLOBAL: CARMA2_HW 0x0067c49c
+    // GLOBAL: CARMA2_SW 0x00676c14
+    // GLOBAL: CARMA2_CHEAT 0x00683d44
+    static int about_to_die;
+    // GLOBAL: CARMA2_HW 0x0067c454
+    // GLOBAL: CARMA2_SW 0x00676bcc
+    // GLOBAL: CARMA2_CHEAT 0x00683d04
+    static tU32 next_time;
+    char* the_message;
+    char* p;
+    int len;
+    int the_key;
+    int abuse_num;
+
+    C2_HOOK_BUG_ON(REC2_ASIZE(gString) != 84);
+
+    the_message = &gString[20];
+    if (!gEntering_message || gNet_mode == eNet_mode_none || !gCurrent_net_game->options.enable_text_messages) {
+        return;
+    }
+    the_key = PDAnyKeyDown();
+    if (gEntering_message == 1) {
+        if (the_key == -1) {
+            gEntering_message = 2;
+            PDClearKeyboardBuffer();
+        } else {
+            return;
+        }
+    }
+    if (about_to_die) {
+        if (the_key == -1) {
+            about_to_die = 0;
+            gEntering_message = 0;
+        }
+        return;
+    }
+    if (the_key == last_key) {
+        if (next_time < PDGetTotalTime()) {
+            next_time += 100;
+        } else {
+            the_key = -1000;
+        }
+    } else {
+        last_key = the_key;
+        next_time = PDGetTotalTime() + 500;
+    }
+    switch (the_key) {
+    case -1:
+    case 0:
+        break;
+    case 51:
+    case 52:
+        len = strlen(gNet_players[gThis_net_player_index].player_name);
+        if (len > 18) {
+            break;
+        }
+        p = the_message - len - 2;
+        strcpy(p, gNet_players[gThis_net_player_index].player_name);
+        p[len + 0] = ':';
+        p[len + 1] = ' ';
+        gString[REC2_ASIZE(gString) - 1] = '\0';
+        NetSendHeadupToAllPlayers(p);
+        the_message[0] = '\0';
+        NewTextHeadupSlot(4, 0, 1000, -4, GetMiscString(eMiscString_message_sent));
+        about_to_die = 1;
+        break;
+    case 2:
+    case 3:
+    case 53:
+    case 63:
+        about_to_die = 1;
+        break;
+    case 50:
+    case 65:
+    case 70:
+        len = strlen(the_message);
+        if (len > 0) {
+            the_message[len - 1] = '\0';
+        }
+        break;
+    default:
+        if (gKey_mapping[71] == the_key) {
+            about_to_die = 1;
+            break;
+        }
+        if (the_key >= 75 && the_key <= 105) {
+            if (the_key >= 81 && the_key <= 90) {
+                if (the_key == 81) {
+                    abuse_num = 9;
+                } else {
+                    abuse_num = the_key - 82;
+                }
+                if (gAbuse_text[abuse_num] != NULL) {
+                    strcpy(the_message, gAbuse_text[abuse_num]);
+                }
+                break;
+            } else {
+                gEntering_message = 0;
+                break;
+            }
+        }
+        for (;;) {
+            int raw_ch = PDGetKeyboardCharacter();
+            int ch;
+
+            if (raw_ch == '\0') {
+                break;
+            }
+            ch = (tU8)PDConvertToASCIILessThan128((char)raw_ch);
+            len = strlen(the_message);
+            if (len < (int)REC2_ASIZE(gString) - 20 - 1) {
+                the_message[len] = (char)ch;
+                if ((tU8)the_message[len] < gFonts[4].offset || (tU8)the_message[len] >= gFonts[4].offset + gFonts[4].num_entries) {
+                    the_message[len] = '\0';
+                }
+                the_message[len + 1] = '\0';
+                dr_dprintf("NETMESSAGE: '%s'", the_message);
+            }
+        }
+        break;
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x00444c00
 // FUNCTION: CARMA2_SW 0x00444ce0

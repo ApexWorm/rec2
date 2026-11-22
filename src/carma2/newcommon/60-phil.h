@@ -23,19 +23,19 @@ extern tPHIL_queued_objects gPhil_queued_objects;
 extern int gPHIL_count_queued_objects_for_removal;
 extern int gPHIL_count_queued_objects;
 
-extern tU16 C2_HOOK_FASTCALL ScalarToFraction(br_scalar pMin, br_scalar pMax, br_scalar pValue);
+extern tU16 C2_HOOK_FASTCALL ScalarToFraction(br_scalar pValue, br_scalar pMin, br_scalar pMax);
 
-extern br_scalar C2_HOOK_FASTCALL FractionToScalar(br_scalar pMin, br_scalar pMax, tU16 pFixed);
+extern br_scalar C2_HOOK_FASTCALL FractionToScalar(tU16 pFixed, br_scalar pMin, br_scalar pMax);
 
 extern void C2_HOOK_FASTCALL GetOrientationFromMatrix(tFixed_quat* pOrientation, const br_matrix34* pMatrix);
 
 extern void C2_HOOK_FASTCALL GetMatrixFromOrientation(br_matrix34* pMatrix, const tFixed_quat* pOrientation);
 
-// OmegaCompScalarTo16
+extern tU16 C2_HOOK_FASTCALL OmegaCompScalarTo16(br_scalar pOmega);
 
 // OmegaComp16ToScalar
 
-// GetOmega16FromOmega
+extern void C2_HOOK_FASTCALL GetOmega16FromOmega(tFixed_vec3* pOmega16, const br_vector3* pOmega);
 
 // GetOmegaFromOmega16
 
@@ -44,8 +44,6 @@ extern int C2_HOOK_FASTCALL GetObjectNetworkStuff(tPhysics_object* pObject, tU8*
 // GetVelocityAndPosition
 
 extern int C2_HOOK_FASTCALL SizeOfObjectNetworkStuff(tPhysics_joint_type pType);
-
-extern int C2_HOOK_STDCALL FloatToFixedFraction(float pValue, float pMin, float pMax);
 
 // WriteObjectNetworkStuff
 

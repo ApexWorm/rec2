@@ -211,6 +211,8 @@ extern void C2_HOOK_FASTCALL UserSendMessage(void);
 
 extern void C2_HOOK_FASTCALL SteelBollock(void);
 
+extern void C2_HOOK_FASTCALL EnterUserMessage(void);
+
 extern void C2_HOOK_FASTCALL DisplayUserMessage(void);
 
 extern void C2_HOOK_FASTCALL InitAbuseomatic(void);
