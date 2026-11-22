@@ -1640,7 +1640,7 @@ void C2_HOOK_FASTCALL StopFlapping(br_actor* pActor, tCar_spec* pCar_spec) {
                 }
                 DRS3StartSound3D(gCar_outlet, eSoundId_DoorSlam,
                     &pCar_spec->car_master_actor->t.t.translate.t, &gZero_v__car,
-                    1, 255, IRandomBetween(BR_FIXED_INT(0.875f), BR_FIXED_INT(1.125f)), BR_FIXED_INT(1));
+                    1, 255, IRandomBetween(S3_FIXED_INT(0.875f), S3_FIXED_INT(1.125f)), S3_FIXED_INT(1));
             }
         }
     }

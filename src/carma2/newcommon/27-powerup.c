@@ -1530,7 +1530,7 @@ int C2_HOOK_FASTCALL MineExplode(tShit_mine* pMine) {
     pMine->next_think_time = GetTotalTime() + 1600;
     BrVector3Negate(&offset, &gExplosion_pix_animation_groups.groups[0].offset);
     Explode(&gExplosion_pix_animation_groups, pMine->collision_info->actor, &pMine->collision_info->actor->model->bounds, &offset);
-    DRS3StartSound3D(gCar_outlet, eSoundId_Explosion, &pMine->collision_info->actor->t.t.translate.t, &gZero_v__car, 1, 255, BR_FIXED_INT(1), BR_FIXED_INT(1));
+    DRS3StartSound3D(gCar_outlet, eSoundId_Explosion, &pMine->collision_info->actor->t.t.translate.t, &gZero_v__car, 1, 255, S3_FIXED_INT(1), S3_FIXED_INT(1));
     PipeSingleEndShitMine(pMine->collision_info->actor);
     if (pMine->collision_info->actor->parent != NULL) {
         BrActorRemove(pMine->collision_info->actor);
