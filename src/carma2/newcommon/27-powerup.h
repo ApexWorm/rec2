@@ -353,7 +353,7 @@ extern void C2_HOOK_FASTCALL ResetPissedPeds(tPowerup* pPowerup, tCar_spec* pCar
 
 extern void C2_HOOK_FASTCALL ResetGhostPeds(tPowerup* pPowerup, tCar_spec* pCar);
 
-// DoBouncey
+extern void C2_HOOK_FASTCALL DoBouncey(tPowerup* pPowerup, tU32 pPeriod);
 
 // HitMine
 

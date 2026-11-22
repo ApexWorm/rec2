@@ -1642,7 +1642,20 @@ void C2_HOOK_FASTCALL ResetGhostPeds(tPowerup* pPowerup, tCar_spec* pCar) {
     TurnOffGhostPeds();
 }
 
-// DoBouncey
+// FUNCTION: CARMA2_HW 0x004de9b0
+// FUNCTION: CARMA2_SW 0x004daeb0
+// FUNCTION: CARMA2_CHEAT 0x004e4570
+void C2_HOOK_FASTCALL DoBouncey(tPowerup* pPowerup, tU32 pPeriod) {
+
+    if (gProgram_state.current_car.bounce_rate <= GetTotalTime() - gProgram_state.current_car.last_bounce
+        && gProgram_state.current_car.number_of_wheels_on_ground > 2) {
+        PratcamEvent(42);
+        gProgram_state.current_car.last_bounce = GetTotalTime();
+        gProgram_state.current_car.collision_info->v.v[1] = (br_scalar)((gProgram_state.current_car.bounce_amount * (1.0 / WORLD_SCALE_D)) + gProgram_state.current_car.collision_info->v.v[1]);
+        DRS3StartSound(gCar_outlet, eSoundId_Boing);
+        gProgram_state.current_car.collision_info->disable_move_rotate = 0;
+    }
+}
 
 // HitMine
 
