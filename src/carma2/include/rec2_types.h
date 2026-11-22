@@ -5373,6 +5373,7 @@ typedef struct {
 typedef enum {
     eNet_message_chunk_type_5 = 0x5,
     eNet_message_chunk_poll_car_details = 0x6,
+    eNet_message_chunk_type_race_over = 0xa,
     eNet_message_chunk_type_start_race = 0xc,
     eNet_message_chunk_type_headup = 0xd,
     eNet_message_chunk_type_netsynch = 0xe,
@@ -5393,6 +5394,11 @@ typedef struct {
     tU8 size;
     tU8 type;
 } tNet_message_chunk_header;
+
+typedef struct {
+    tNet_message_chunk_header header;
+    tRace_over_reason reason;
+} tNet_message_chunk_race_over;
 
 typedef struct {
     tU8 index;
@@ -5589,6 +5595,7 @@ typedef struct {
 
 typedef union {
     tNet_message_chunk_raw raw;
+    tNet_message_chunk_race_over race_over; /* type = 0xa */
     tNet_message_chunk_start_race start_race; /* type = 0xc */
     tNet_message_headup headup; /* type = 0xd */
     tNet_message_chunk_scores scores; /* type = 0x18 */
