@@ -70,6 +70,7 @@ int gReentrancy_count;
 
 // GLOBAL: CARMA2_HW 0x006768ec
 // GLOBAL: CARMA2_SW 0x0067105c
+// GLOBAL: CARMA2_CHEAT 0x0067e19c
 tU32 gPipe_buffer_size;
 
 // GLOBAL: CARMA2_HW 0x006768f0
@@ -137,6 +138,7 @@ int gDisable_advance;
 
 // GLOBAL: CARMA2_HW 0x00676910
 // GLOBAL: CARMA2_SW 0x00671080
+// GLOBAL: CARMA2_CHEAT 0x0067e1c0
 int gPipe_count_callbacks;
 
 // GLOBAL: CARMA2_HW 0x00694104
