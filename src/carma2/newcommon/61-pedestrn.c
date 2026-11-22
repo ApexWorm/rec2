@@ -67,30 +67,37 @@ tSmashable_initial_position_spec gGiblet_initial_position;
 
 // GLOBAL: CARMA2_HW 0x0069411c
 // GLOBAL: CARMA2_SW 0x0068e174
+// GLOBAL: CARMA2_CHEAT 0x0069bc94
 float gGiblet_scrape_start;
 
 // GLOBAL: CARMA2_HW 0x00694238
 // GLOBAL: CARMA2_SW 0x0068e290
+// GLOBAL: CARMA2_CHEAT 0x0069bdb0
 tSlick_spec gPed_slick;
 
 // GLOBAL: CARMA2_HW 0x0069445c
 // GLOBAL: CARMA2_SW 0x0068e4b4
+// GLOBAL: CARMA2_CHEAT 0x0069bfd4
 int gPed_spurting_period;
 
 // GLOBAL: CARMA2_HW 0x00694460
 // GLOBAL: CARMA2_SW 0x0068e4b8
+// GLOBAL: CARMA2_CHEAT 0x0069bfd8
 br_material* gPed_smear_material;
 
 // GLOBAL: CARMA2_HW 0x00694478
 // GLOBAL: CARMA2_SW 0x0068e4d0
+// GLOBAL: CARMA2_CHEAT 0x0069bff0
 tExplosion_animation gPed_explosion_small_blood_cloud;
 
 // GLOBAL: CARMA2_HW 0x00694480
 // GLOBAL: CARMA2_SW 0x0068e4d8
+// GLOBAL: CARMA2_CHEAT 0x0069bff8
 tExplosion_animation gPed_medium_blood_cloud;
 
 // GLOBAL: CARMA2_HW 0x00694488
 // GLOBAL: CARMA2_SW 0x0068e4e0
+// GLOBAL: CARMA2_CHEAT 0x0069c000
 tExplosion_animation gPed_large_blood_cloud;
 
 // GLOBAL: CARMA2_HW 0x0069bc38
@@ -269,6 +276,7 @@ br_vector3 gChanged_points[10];
 
 // GLOBAL: CARMA2_HW 0x00694454
 // GLOBAL: CARMA2_SW 0x0068e4ac
+// GLOBAL: CARMA2_CHEAT 0x0069bfcc
 int gPed_dismember_spurting_member_count;
 
 // GLOBAL: CARMA2_HW 0x00694490
@@ -638,15 +646,17 @@ inline void C2_HOOK_FASTCALL SetUpGibSlicks(void) {
     gPed_slick_material->flags |= BR_MATF_PERSPECTIVE;
     gPed_slick_material->flags |= BR_MATF_SMOOTH;
     gPed_slick_material->ka = 0.99f;
-    gPed_slick_material->kd = 0.f;
-    gPed_slick_material->ks = 0.f;
-    gPed_slick_material->power = 0.f;
+    gPed_slick_material->kd = 0.0f;
+    gPed_slick_material->ks = 0.0f;
+    gPed_slick_material->power = 0.0f;
     gPed_slick_material->index_base = 0;
     gPed_slick_material->index_range = 0;
     BrMatrix23Identity(&gPed_slick_material->map_transform);
     gPed_slick_material->index_shade = BrTableFind("IDENTITY.TAB");
     gPed_slick_material->colour_map = BrMapFind("GIBSLICK");
+#ifdef REC2_HW
     GlorifyMaterial(&gPed_slick_material, 1, kRendererShadingType_Diffuse2);
+#endif
     BrMaterialUpdate(gPed_slick_material, BR_MATU_ALL);
 }
 
@@ -694,9 +704,11 @@ void C2_HOOK_FASTCALL ReadInGiblets(FILE* pFile) {
             if (size[i].models[j] == NULL) {
                 FatalError(kFatalError_CannotFindGibletModel_S, model_name);
             }
+#ifdef REC2_HW
             if (i == gGiblet_size_count - 1) {
-                scaling_factor = (scaling_factor * 3.f) / 4.f;
+                scaling_factor = (scaling_factor * 3.0f) / 4.0f;
             }
+#endif
             ScaleModel(size[i].models[j], scaling_factor);
             size[i].models[j]->faces[0].material->index_base = (tU8)index;
             size[i].models[j]->faces[0].material->index_range = 1;

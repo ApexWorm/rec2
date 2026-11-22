@@ -582,6 +582,7 @@ void C2_HOOK_FASTCALL ReadShrapnelMovementSpec(FILE* pFile, tMovement_spec* pIni
 }
 
 // FUNCTION: CARMA2_HW 0x004ee550
+// FUNCTION: CARMA2_SW 0x004ea220
 // FUNCTION: CARMA2_CHEAT 0x004f41f0
 void C2_HOOK_FASTCALL ReadShrapnelInitialPosition(FILE* pF, tSmashable_initial_position_spec* pInitial_pos) {
     pInitial_pos->type = GetALineAndInterpretCommand(pF, gInitial_position_type_names, REC2_ASIZE(gInitial_position_type_names));
