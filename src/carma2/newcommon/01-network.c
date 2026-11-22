@@ -301,7 +301,10 @@ void C2_HOOK_FASTCALL HaltNetServiceReentrancy(void) {
 
 // STUB: CARMA2_HW 0x0049d430
 // STUB: CARMA2_SW 0x004995b0
-// NetSendHeadupToAllPlayers
+// STUB: CARMA2_CHEAT 0x0049d7e0
+void C2_HOOK_FASTCALL NetSendHeadupToAllPlayers(char* pMessage) {
+    NOT_IMPLEMENTED();
+}
 
 // FUNCTION: CARMA2_HW 0x0049d780
 // FUNCTION: CARMA2_SW 0x00499900
