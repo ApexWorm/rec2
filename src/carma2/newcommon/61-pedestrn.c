@@ -65,6 +65,41 @@ br_actor* gLimbs_actor;
 // GLOBAL: CARMA2_CHEAT 0x0069bfe0
 tSmashable_initial_position_spec gGiblet_initial_position;
 
+// GLOBAL: CARMA2_HW 0x0069411c
+// GLOBAL: CARMA2_SW 0x0068e174
+// GLOBAL: CARMA2_CHEAT 0x0069bc94
+float gGiblet_scrape_start;
+
+// GLOBAL: CARMA2_HW 0x00694238
+// GLOBAL: CARMA2_SW 0x0068e290
+// GLOBAL: CARMA2_CHEAT 0x0069bdb0
+tSlick_spec gPed_slick;
+
+// GLOBAL: CARMA2_HW 0x0069445c
+// GLOBAL: CARMA2_SW 0x0068e4b4
+// GLOBAL: CARMA2_CHEAT 0x0069bfd4
+int gPed_spurting_period;
+
+// GLOBAL: CARMA2_HW 0x00694460
+// GLOBAL: CARMA2_SW 0x0068e4b8
+// GLOBAL: CARMA2_CHEAT 0x0069bfd8
+br_material* gPed_smear_material;
+
+// GLOBAL: CARMA2_HW 0x00694478
+// GLOBAL: CARMA2_SW 0x0068e4d0
+// GLOBAL: CARMA2_CHEAT 0x0069bff0
+tExplosion_animation gPed_explosion_small_blood_cloud;
+
+// GLOBAL: CARMA2_HW 0x00694480
+// GLOBAL: CARMA2_SW 0x0068e4d8
+// GLOBAL: CARMA2_CHEAT 0x0069bff8
+tExplosion_animation gPed_medium_blood_cloud;
+
+// GLOBAL: CARMA2_HW 0x00694488
+// GLOBAL: CARMA2_SW 0x0068e4e0
+// GLOBAL: CARMA2_CHEAT 0x0069c000
+tExplosion_animation gPed_large_blood_cloud;
+
 // GLOBAL: CARMA2_HW 0x0069bc38
 // GLOBAL: CARMA2_SW 0x00695c90
 // GLOBAL: CARMA2_CHEAT 0x006a37b0
@@ -97,6 +132,130 @@ int gFlameThrowerOn = 1;
 // GLOBAL: CARMA2_HW 0x0065d7d0
 // GLOBAL: CARMA2_CHEAT 0x00664e88
 int gExplosives_on = 1;
+
+// GLOBAL: CARMA2_HW 0x0065d7f0
+// GLOBAL: CARMA2_SW 0x00658128
+// GLOBAL: CARMA2_CHEAT 0x00664ea8
+int gPed_move_fsm[118][7] = {
+    {   0,  -2,   5,   6, 111,  31, 112 },
+    {   0,   0,   5,   6, 111,  31, 112 },
+    {   0,   1,   5,   6, 111,  31, 112 },
+    {   0,   2,   5,   6, 111,  31, 112 },
+    {   0,   2,   5,   6, 111,  31, 112 },
+    {   0,   2,   2,   6, 111,  31, 112 },
+    {   0,   2,   2,   6, 111,  31, 112 },
+    {   0,  -3,  -3,  -3,  -3,  -3,  -3 },
+    {   0,  -3,  -3,  -3,  -3,  -3,  -3 },
+    {   0,  -3,  -3,  -3,  -3,  -3,  -3 },
+    {   0,   2,   5,   6, 111,  31, 112 },
+    {   0,  10,   5,   6, 111,  31, 112 },
+    {   0,   2,   5,   6, 111,  31, 112 },
+    {   0,  10,   5,   6, 111,  31, 112 },
+    {   0,   1,   5,   6, 111,  31, 112 },
+    {   0,  -3,  -3,  -3,  -3,  -3,  -3 },
+    {   0,  -3,  -3,  -3,  -3,  -3,  -3 },
+    {   0,  -3,  -3,  -3,  -3,  -3,  -3 },
+    {   0,  -3,  -3,  -3,  -3,  -3,  -3 },
+    {   0,  -3,  -3,  -3,  -3,  -3,  -3 },
+    {   1,  -1,  -1,  -1,  -1,  -1,  -1 },
+    {   1,  -1,  -1,  -1,  -1,  -1,  -1 },
+    {   1,  -1,  -1,  -1,  -1,  -1,  -1 },
+    {   0,  -3,  -3,  -3,  -3,  -3,  -3 },
+    {   0,  -3,  -3,  -3,  -3,  -3,  -3 },
+    {   0,  -3,  -3,  -3,  -3,  -3,  -3 },
+    {   0,  -3,  -3,  -3,  -3,  -3,  -3 },
+    {   0,  -3,  -3,  -3,  -3,  -3,  -3 },
+    {   0,  -3,  -3,  -3,  -3,  -3,  -3 },
+    {   0,  -3,  -3,  -3,  -3,  -3,  -3 },
+    {   1,  -2,  50,  51, 111,  31, 112 },
+    {   1,  30,  31,  31, 111,  31, 112 },
+    {   0,  -3,  -3,  -3,  -3,  -3,  -3 },
+    {   0,  -3,  -3,  -3,  -3,  -3,  -3 },
+    {   0,  -3,  -3,  -3,  -3,  -3,  -3 },
+    {   0,  -3,  -3,  -3,  -3,  -3,  -3 },
+    {   0,  -3,  -3,  -3,  -3,  -3,  -3 },
+    {   0,  -3,  -3,  -3,  -3,  -3,  -3 },
+    {   0,  -3,  -3,  -3,  -3,  -3,  -3 },
+    {   0,  -3,  -3,  -3,  -3,  -3,  -3 },
+    {   1,  -2,  50,  51, 111,  31, 112 },
+    {   1,  40,  50,  51, 111,  31, 112 },
+    {   1,  40,  50,  51, 111,  31, 112 },
+    {   0,  -3,  -3,  -3,  -3,  -3,  -3 },
+    {   0,  -3,  -3,  -3,  -3,  -3,  -3 },
+    {   0,  -3,  -3,  -3,  -3,  -3,  -3 },
+    {   0,  -3,  -3,  -3,  -3,  -3,  -3 },
+    {   0,  -3,  -3,  -3,  -3,  -3,  -3 },
+    {   0,  -3,  -3,  -3,  -3,  -3,  -3 },
+    {   0,  -3,  -3,  -3,  -3,  -3,  -3 },
+    {   1,  52,  50,  51, 111,  31, 112 },
+    {   1,  52,  50,  51, 111,  31, 112 },
+    {   1,  40,  50,  51, 111,  31, 112 },
+    {   0,  -3,  -3,  -3,  -3,  -3,  -3 },
+    {   0,  -3,  -3,  -3,  -3,  -3,  -3 },
+    {   0,  -3,  -3,  -3,  -3,  -3,  -3 },
+    {   0,  -3,  -3,  -3,  -3,  -3,  -3 },
+    {   0,  -3,  -3,  -3,  -3,  -3,  -3 },
+    {   0,  -3,  -3,  -3,  -3,  -3,  -3 },
+    {   0,  -3,  -3,  -3,  -3,  -3,  -3 },
+    {   1,  -1,  -1,  -1,  -1,  -1,  -1 },
+    {   1,  -1,  -1,  -1,  -1,  -1,  -1 },
+    {   1,  -1,  -1,  -1,  -1,  -1,  -1 },
+    {   1,  -1,  -1,  -1,  -1,  -1,  -1 },
+    {   1,  -1,  -1,  -1,  -1,  -1,  -1 },
+    {   0,  -3,  -3,  -3,  -3,  -3,  -3 },
+    {   0,  -3,  -3,  -3,  -3,  -3,  -3 },
+    {   0,  -3,  -3,  -3,  -3,  -3,  -3 },
+    {   0,  -3,  -3,  -3,  -3,  -3,  -3 },
+    {   0,  -3,  -3,  -3,  -3,  -3,  -3 },
+    {   1,  -1,  -1,  -1,  -1,  -1,  -1 },
+    {   1,  72,  71,  71,  71,  71,  71 },
+    {   1,  -2,  72,  72,  72,  72,  72 },
+    {   1,  -1,  -1,  -1,  -1,  -1,  -1 },
+    {   1,  -2,  74,  74,  74,  74,  74 },
+    {   0,  -3,  -3,  -3,  -3,  -3,  -3 },
+    {   0,  -3,  -3,  -3,  -3,  -3,  -3 },
+    {   0,  -3,  -3,  -3,  -3,  -3,  -3 },
+    {   0,  -3,  -3,  -3,  -3,  -3,  -3 },
+    {   0,  -3,  -3,  -3,  -3,  -3,  -3 },
+    {   0,  -2,  82,  83,  80,  80,  80 },
+    {   0,  -2,  84,  85,  81,  81,  81 },
+    {   0,  80,  82,  83,  80,  80,  80 },
+    {   0,  80,  82,  83,  80,  80,  80 },
+    {   0,  81,  84,  85,  81,  81,  81 },
+    {   0,  81,  84,  85,  81,  81,  81 },
+    {   0,  -3,  -3,  -3,  -3,  -3,  -3 },
+    {   0,  -3,  -3,  -3,  -3,  -3,  -3 },
+    {   0,  -3,  -3,  -3,  -3,  -3,  -3 },
+    {   0,  -3,  -3,  -3,  -3,  -3,  -3 },
+    {   0,  91,  90,  90,  90,  90,  90 },
+    {   0,  -2,  91,  91,  91,  91,  91 },
+    {   0,  91,  92,  92,  92,  92,  92 },
+    {   0,  94,  93,  93,  93,  93,  93 },
+    {   0,  -2,  94,  94,  94,  94,  94 },
+    {   0,  -2,  95,  95,  95,  95,  95 },
+    {   0,  91,  96,  96,  96,  96,  96 },
+    {   0,  72,  97,  97,  97,  97,  97 },
+    {   0,  -3,  -3,  -3,  -3,  -3,  -3 },
+    {   0,  -3,  -3,  -3,  -3,  -3,  -3 },
+    {   0,  -3,  -3,  -3,  -3,  -3,  -3 },
+    {   0,  -3,  -3,  -3,  -3,  -3,  -3 },
+    {   0,  -3,  -3,  -3,  -3,  -3,  -3 },
+    {   0,  -3,  -3,  -3,  -3,  -3,  -3 },
+    {   0,  -3,  -3,  -3,  -3,  -3,  -3 },
+    {   0,  -3,  -3,  -3,  -3,  -3,  -3 },
+    {   0,  -3,  -3,  -3,  -3,  -3,  -3 },
+    {   0,  -3,  -3,  -3,  -3,  -3,  -3 },
+    {   0,  -3,  -3,  -3,  -3,  -3,  -3 },
+    {   0,  -3,  -3,  -3,  -3,  -3,  -3 },
+    {   1,  72, 110, 110, 110, 110, 110 },
+    {   1,  -2, 111, 111, 111,  31, 112 },
+    {   1,  -2, 112, 112, 111,  31, 112 },
+    {   0,  91, 113, 113, 113, 113, 113 },
+    {   2,   2,   2,   2,   2,   2,   3 },
+    {   4,   2,   2,   2,  10,  11,  13 },
+    { -41, -41, -41,   0,   2,   2,   2 },
+    {   2,   2,   3,   4,   4,  10,  11 },
+};
 
 // GLOBAL: CARMA2_HW 0x0067697c
 // GLOBAL: CARMA2_SW 0x006710ec
@@ -241,6 +400,7 @@ br_vector3 gChanged_points[10];
 
 // GLOBAL: CARMA2_HW 0x00694454
 // GLOBAL: CARMA2_SW 0x0068e4ac
+// GLOBAL: CARMA2_CHEAT 0x0069bfcc
 int gPed_dismember_spurting_member_count;
 
 // GLOBAL: CARMA2_HW 0x00694490
@@ -409,7 +569,34 @@ void C2_HOOK_FASTCALL PedApplyPedDir(tU32 pId, const br_vector3* pDir) {
     }
 }
 
-// SetCharacterMoveAR
+// FUNCTION: CARMA2_HW 0x004d1c60
+// FUNCTION: CARMA2_SW 0x004ce360
+// FUNCTION: CARMA2_CHEAT 0x004d7800
+void C2_HOOK_FASTCALL SetCharacterMoveAR(tPed_character_instance* pCharacter, int pMove_action, float pSpeed, int pArg4, int pArg5, tU32 pTime) {
+    br_matrix34* mat;
+    br_vector3 old_pos;
+    int old_move;
+    int old_frame;
+    float old_speed;
+
+    if (gAction_replay_mode && !gBOOL_00744804) {
+        return;
+    }
+    if (pSpeed == 0.0f) {
+        pSpeed = 0.0f;
+    }
+    mat = GetCharacterMatrixPtr(pCharacter);
+    BrVector3Copy(&old_pos, (br_vector3*)mat->m[3]);
+    old_move = pCharacter->personality->form->moves[pCharacter->field_0x7].id;
+    old_frame = pCharacter->field_0x1c;
+    old_speed = (float)(tS16)pCharacter->field_0x1e;
+    SetCharacterMove(pCharacter, pMove_action, pSpeed, pArg4, pArg5, pTime);
+    if (pMove_action == -1) {
+        PipeSinglePedFPChange(pCharacter->ped, (float)(tS16)pCharacter->field_0x1e, pSpeed);
+    } else {
+        PipeSinglePedMove(pCharacter->ped, (tS16)old_frame, (tS16)old_move, (tS16)pMove_action, old_speed, pSpeed, pArg5, pArg4, &old_pos, (br_vector3*)mat->m[3], -1, -1, &pCharacter->field_0x8c);
+    }
+}
 
 // SetPedStartRun
 
@@ -602,9 +789,110 @@ br_vector3* C2_HOOK_FASTCALL GetPedPos(tPedestrian* pPed) {
     return (br_vector3*)GetCharacterMatrixPtr(pPed->character)->m[3];
 }
 
-// SetUpGibSlicks
+inline void C2_HOOK_FASTCALL SetUpGibSlicks(void) {
 
-// ReadInGiblets
+    gPed_slick_material = BrMaterialAllocate("GIBSLICK");
+    BrMaterialAdd(gPed_slick_material);
+    gPed_slick_material->flags |= BR_MATF_LIGHT;
+    gPed_slick_material->flags |= BR_MATF_PERSPECTIVE;
+    gPed_slick_material->flags |= BR_MATF_SMOOTH;
+    gPed_slick_material->ka = 0.99f;
+    gPed_slick_material->kd = 0.0f;
+    gPed_slick_material->ks = 0.0f;
+    gPed_slick_material->power = 0.0f;
+    gPed_slick_material->index_base = 0;
+    gPed_slick_material->index_range = 0;
+    BrMatrix23Identity(&gPed_slick_material->map_transform);
+    gPed_slick_material->index_shade = BrTableFind("IDENTITY.TAB");
+    gPed_slick_material->colour_map = BrMapFind("GIBSLICK");
+#ifdef REC2_HW
+    GlorifyMaterial(&gPed_slick_material, 1, kRendererShadingType_Diffuse2);
+#endif
+    BrMaterialUpdate(gPed_slick_material, BR_MATU_ALL);
+}
+
+// FUNCTION: CARMA2_HW 0x004cb1e0
+// FUNCTION: CARMA2_SW 0x004c7910
+// FUNCTION: CARMA2_CHEAT 0x004d0d20
+void C2_HOOK_FASTCALL ReadInGiblets(FILE* pFile) {
+    tPath_name the_path;
+    char model_name[256];
+    float scaling_factor;
+    int i;
+    int j;
+    int r;
+    int g;
+    int b;
+    int index;
+    tPed_giblet_size_spec* size;
+    tU8* model_count;
+
+    C2_HOOK_BUG_ON(sizeof(tPed_giblet_size_spec) != 0x18);
+
+    PathCat(the_path, gApplication_path, gPedsFolder);
+    PathCat(the_path, the_path, "GIBLETS");
+    LoadAllStuffInDirectory(&gMisc_storage_space, the_path, kRendererShadingType_Diffuse1);
+    gGiblet_scrape_start = (float)GetAnInt(pFile);
+    ReadShrapnelInitialPosition(pFile, &gGiblet_initial_position);
+    ReadShrapnelMovementSpec(pFile, &gGiblet_initial_speed);
+    ReadShrapnelTimeInfo(pFile, &gGiblet_min_max_time);
+    gGiblet_size_count = GetAnInt(pFile);
+    gGiblet_sizes = BrMemAllocate(gGiblet_size_count * sizeof(tPed_giblet_size_spec), kMem_misc_poly_ped);
+    size = gGiblet_sizes;
+    for (i = 0; i < gGiblet_size_count; i++) {
+        model_count = &size[i].model_count;
+        size[i].flags = (tU8)GetAnInt(pFile);
+        size[i].min_force = GetAScalar(pFile);
+        size[i].instance_force = GetAScalar(pFile);
+        size[i].max_count = (tU8)GetAnInt(pFile);
+        *model_count = (tU8)GetAnInt(pFile);
+        for (j = 0; j < *model_count; j++) {
+            scaling_factor = GetAScalar(pFile);
+            index = GetAnInt(pFile);
+            GetThreeInts(pFile, &r, &g, &b);
+            GetAString(pFile, model_name);
+            size[i].models[j] = BrModelFind(model_name);
+            if (size[i].models[j] == NULL) {
+                FatalError(kFatalError_CannotFindGibletModel_S, model_name);
+            }
+#ifdef REC2_HW
+            if (i == gGiblet_size_count - 1) {
+                scaling_factor = (scaling_factor * 3.0f) / 4.0f;
+            }
+#endif
+            ScaleModel(size[i].models[j], scaling_factor);
+            size[i].models[j]->faces[0].material->index_base = (tU8)index;
+            size[i].models[j]->faces[0].material->index_range = 1;
+            size[i].models[j]->faces[0].material->colour = BR_COLOUR_RGB(r, g, b);
+            BrMaterialUpdate(size[i].models[j]->faces[0].material, BR_MATU_ALL);
+        }
+    }
+    ReadExplosion(pFile, &gPed_explosion_small_blood_cloud);
+    ReadExplosion(pFile, &gPed_medium_blood_cloud);
+    ReadExplosion(pFile, &gPed_large_blood_cloud);
+    SetUpGibSlicks();
+    gPed_smear_material = BrMaterialFind("PEDSMEAR");
+    ReadSpillData(pFile, &gPed_slick);
+    gPed_spurty_lumps_count = GetAnInt(pFile);
+    gPed_spurting_period = GetAnInt(pFile);
+    gPed_dismember_spurting_member_count = GetAnInt(pFile);
+    ReadShrapnelInitialPosition(pFile, &gPed_spurt_initial_position);
+    ReadShrapnelMovementSpec(pFile, &gPed_spurt_initial_speed);
+    ReadShrapnelTimeInfo(pFile, &gPed_spurt_min_max_time);
+    scaling_factor = GetAScalar(pFile);
+    index = GetAnInt(pFile);
+    GetThreeInts(pFile, &r, &g, &b);
+    GetAString(pFile, model_name);
+    gPed_spurt_model = BrModelFind(model_name);
+    if (gPed_spurt_model == NULL) {
+        FatalError(kFatalError_CannotFindGibletModel_S, model_name);
+    }
+    ScaleModel(gPed_spurt_model, scaling_factor);
+    gPed_spurt_model->faces[0].material->index_base = (tU8)index;
+    gPed_spurt_model->faces[0].material->index_range = 1;
+    gPed_spurt_model->faces[0].material->colour = BR_COLOUR_RGB(r, g, b);
+    BrMaterialUpdate(gPed_spurt_model->faces[0].material, BR_MATU_ALL);
+}
 
 // ReadSettingsFile
 
@@ -805,20 +1093,93 @@ int C2_HOOK_FASTCALL IsActorRenderworthy(br_actor* pActor) {
 
 // MakePedNoise
 
-#ifdef REC2_MATCHING
-#pragma auto_inline(off)
-#endif
-
-// STUB: CARMA2_HW 0x004cbcd0
-// STUB: CARMA2_SW 0x004c83d0
-// STUB: CARMA2_CHEAT 0x004d1810
+// FUNCTION: CARMA2_HW 0x004cbcd0
+// FUNCTION: CARMA2_SW 0x004c83d0
+// FUNCTION: CARMA2_CHEAT 0x004d1810
 void C2_HOOK_FASTCALL SetPedMove(tPedestrian* pPed, int pMove_action, int pWalk_speed_factor, int pArg4, int pArg5, tU32 pTime, tPed_action pAction) {
-    NOT_IMPLEMENTED();
-}
+    tPed_action original_action;
+    int original_move_id;
+    int original_field_0x1e;
+    int original_field_0x1c;
+    br_vector3 original_pos;
+    br_matrix34* character_matrix;
+    int new_move_lut_id;
+    int i = 0;
 
-#ifdef REC2_MATCHING
-#pragma auto_inline(on)
+    C2_HOOK_BUG_ON(REC2_ASIZE(gPed_move_fsm) != 118);
+    C2_HOOK_BUG_ON(REC2_ASIZE(gPed_move_fsm[0]) != 7);
+
+    original_action = pPed->action;
+    original_move_id = pPed->character->personality->form->moves[pPed->character->field_0x7].id;
+    original_field_0x1e = (tS16)pPed->character->field_0x1e;
+    original_field_0x1c = pPed->character->field_0x1c;
+    character_matrix = GetCharacterMatrixPtr(pPed->character);
+    BrVector3Copy(&original_pos, (br_vector3*)character_matrix->m[3]);
+    if ((int)pAction >= 0 && pMove_action >= 0 && pPed->action != ePed_action_dead) {
+        pPed->action = pAction;
+    }
+    if (gDrunk_pedestrians) {
+        new_move_lut_id = 4;
+    } else if (gDancing_peds) {
+        new_move_lut_id = 3;
+    } else if (gPanicking_peds) {
+        new_move_lut_id = 5;
+    } else if (pPed->character->field_0xc & gPow2_array[3]) {
+        new_move_lut_id = 1;
+    } else if (pPed->character->field_0xc & gPow2_array[5]) {
+        new_move_lut_id = 2;
+    } else {
+        new_move_lut_id = 0;
+    }
+    if (new_move_lut_id != 0) {
+        pMove_action = gPed_move_fsm[pMove_action][new_move_lut_id + 1];
+    }
+    if (pMove_action == 112 || pMove_action == 31 || pMove_action == 111) {
+        pPed->action = ePed_action_running;
+    }
+    if (pPed->field_0x0c != NULL && pMove_action != 112 && pMove_action != 31
+            && pMove_action != 40 && pMove_action != 41 && pMove_action != 42) {
+        pPed->field_0x0c->field_0x80 = 0;
+    }
+    for (; i < 10; i++) {
+        int move_result;
+        float speed;
+
+        if (gPedestrian_speed_factor != 0.f) {
+            speed = (float)pWalk_speed_factor / gPedestrian_speed_factor;
+        } else {
+            speed = (float)pWalk_speed_factor;
+        }
+        move_result = SetCharacterMove(pPed->character, pMove_action, speed, pArg4, pArg5, pTime);
+        if (move_result == 2) {
+            pMove_action = gPed_move_fsm[pMove_action][1];
+            if (pMove_action <= -2) {
+                char buffer[256];
+
+                sprintf(buffer, "%d", pMove_action);
+                FatalError(pMove_action == -2 ? kFatalError_CoreMoveMissingFor_SS : kFatalError_BadMoveAttemptedFor_SS,
+                    buffer, pPed->character->personality->name);
+            }
+        }
+        if (pMove_action == -1 || move_result != 2) {
+            break;
+        }
+    }
+    if (i >= 10) {
+        char buffer[256];
+
+        sprintf(buffer, "%d", pMove_action);
+        FatalError(kFatalError_CyclicMoveDefinitionFor_SS, buffer, pPed->character->personality->name);
+    }
+    PipeSinglePedMove(pPed, (tS16)original_field_0x1c, (tS16)original_move_id,
+        (tS16)pMove_action, (float)original_field_0x1e, (float)pWalk_speed_factor, pArg5, pArg4,
+        &original_pos, (br_vector3*)character_matrix->m[3], original_action, pPed->action, &pPed->character->field_0x8c);
+#ifdef REC2_CHEAT
+    if (pPed->action == ePed_action_impacting && pPed->character->personality->form->moves[pPed->character->field_0x7].id == 0x29) {
+        PDFatalError("Earwig alert! (My uncle has some spam.)");
+    }
 #endif
+}
 
 // FUNCTION: CARMA2_HW 0x004cc660
 // FUNCTION: CARMA2_SW 0x004c8d60
@@ -1990,7 +2351,20 @@ void C2_HOOK_FASTCALL SetGoreLevel(int pNewLevel) {
 
 // ScaleModelXYZ
 
-// ScaleModel
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_HW 0x004042f0
+// STUB: CARMA2_SW 0x004042f0
+// STUB: CARMA2_CHEAT 0x004042f0
+void C2_HOOK_FASTCALL ScaleModel(br_model* pModel, float pScale) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // DisposeMove
 
@@ -2181,6 +2555,7 @@ tPed_form* C2_HOOK_FASTCALL FindOrOpenForm(const char* pName) {
 
 // STUB: CARMA2_HW 0x00406ab0
 // STUB: CARMA2_SW 0x00406ab0
+// STUB: CARMA2_CHEAT 0x00406ab0
 tPed_personality* C2_HOOK_FASTCALL ReadPersonality(const char* pName) {
     NOT_IMPLEMENTED();
 }
@@ -2195,6 +2570,7 @@ tPed_personality* C2_HOOK_FASTCALL ReadPersonality(const char* pName) {
 
 // FUNCTION: CARMA2_HW 0x00407930
 // FUNCTION: CARMA2_SW 0x00407920
+// FUNCTION: CARMA2_CHEAT 0x00407920
 tPed_personality* C2_HOOK_FASTCALL FindOrOpenPersonality(const char* pName) {
     int i;
 
@@ -2212,7 +2588,45 @@ tPed_personality* C2_HOOK_FASTCALL FindOrOpenPersonality(const char* pName) {
     return ReadPersonality(pName);
 }
 
-// BuildCharacterInstance
+// FUNCTION: CARMA2_HW 0x004079a0
+// FUNCTION: CARMA2_SW 0x00407990
+// FUNCTION: CARMA2_CHEAT 0x00407990
+tPed_character_instance* C2_HOOK_FASTCALL BuildCharacterInstance(const char* pGroup_name, br_matrix34* pMat34) {
+    tPed_character_instance* instance;
+
+    C2_HOOK_BUG_ON(sizeof(tPed_character_instance) != 0xec);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPed_character_instance, field_0x4, 0x4);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPed_character_instance, field_0x6, 0x6);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPed_character_instance, field_0x7, 0x7);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPed_character_instance, field_0x8, 0x8);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPed_character_instance, field_0x9, 0x9);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPed_character_instance, field_0xa, 0xa);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPed_character_instance, field_0xc, 0xc);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPed_character_instance, field_0x14, 0x14);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPed_character_instance, field_0x28, 0x28);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPed_character_instance, field_0x2c, 0x2c);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPed_character_instance, field_0x5c, 0x5c);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPed_character_instance, field_0x8c, 0x8c);
+
+    instance = BrMemAllocate(sizeof(tPed_character_instance), kBoner_mem_type_char_instance);
+    if (instance == NULL) {
+        FatalError(kFatalError_BonerError_UnableToAllocateMemory, 0);
+    }
+    instance->personality = FindOrOpenPersonality(pGroup_name);
+    instance->field_0x4 = -1;
+    instance->field_0x7 = -1;
+    instance->field_0x6 = -1;
+    instance->field_0x28 = 0;
+    instance->field_0x2c = *pMat34;
+    instance->field_0x8 = -1;
+    instance->field_0x9 = 0;
+    instance->field_0xa = 0;
+    instance->field_0x14 = 0;
+    instance->field_0xc = 0;
+    BrMatrix34Identity(&instance->field_0x5c);
+    BrMatrix34Identity(&instance->field_0x8c);
+    return instance;
+}
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)

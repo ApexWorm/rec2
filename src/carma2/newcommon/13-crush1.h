@@ -492,9 +492,9 @@ extern void C2_HOOK_FASTCALL ARUndoModelMash(br_model* pModel, tCompressed_vecto
 
 extern void C2_HOOK_FASTCALL ARApplyFlap(br_actor* pActor, br_angle pAngle);
 
-// ARApplySplitWeld
+extern void C2_HOOK_FASTCALL ARApplySplitWeld(tCar_spec* pCar, const br_vector4* pPlane);
 
-// ARUndoSplitWeld
+extern void C2_HOOK_FASTCALL ARUndoSplitWeld(tCar_spec* pCar);
 
 // ReceivedCrush
 
