@@ -10,6 +10,7 @@
 
 #include "16-graphics1.h"
 #include "globvars.h"
+#include "rec2_macros.h"
 
 // GLOBAL: CARMA2_HW 0x006a20d0
 // GLOBAL: CARMA2_SW 0x0069c128
@@ -86,20 +87,57 @@ void C2_HOOK_FASTCALL InitRayCasting(void) {
 
 // DRVector2AccumulateScale
 
-#ifdef REC2_MATCHING
-#pragma auto_inline(off)
-#endif
-
-// STUB: CARMA2_HW 0x004e3a30
-// STUB: CARMA2_SW 0x004dfdc0
-// STUB: CARMA2_CHEAT 0x004e95b0
+// FUNCTION: CARMA2_HW 0x004e3a30
+// FUNCTION: CARMA2_SW 0x004dfdc0
+// FUNCTION: CARMA2_CHEAT 0x004e95b0
 int C2_HOOK_FASTCALL PickBoundsTestRay__raycast(br_bounds* b, br_vector3* rp, br_vector3* rd, br_scalar t_near, br_scalar t_far, br_scalar* new_t_near, br_scalar* new_t_far) {
-    NOT_IMPLEMENTED();
-}
+    int i;
+    br_scalar inverse;
+    br_scalar t;
 
-#ifdef REC2_MATCHING
-#pragma auto_inline(on)
-#endif
+    for (i = 0; i < (int)REC2_ASIZE(rd->v); i++) {
+        if (rd->v[i] > 2 * BR_SCALAR_EPSILON) {
+            inverse = rd->v[i];
+            inverse = 1.0f / inverse;
+            t = (rp->v[i] - b->max.v[i]) * inverse;
+            if (t > BR_SCALAR_MAX) {
+                t_near = BR_SCALAR_MAX;
+            } else if (t > t_near) {
+                t_near = t;
+            }
+            t = (rp->v[i] - b->min.v[i]) * inverse;
+            if (t < BR_SCALAR_MIN) {
+                t_far = BR_SCALAR_MIN;
+            } else if (t < t_far) {
+                t_far = t;
+            }
+        } else if (rd->v[i] < -2 * BR_SCALAR_EPSILON) {
+            inverse = rd->v[i];
+            inverse = 1.0f / inverse;
+            t = (rp->v[i] - b->max.v[i]) * inverse;
+            if (t < BR_SCALAR_MIN) {
+                t_far = BR_SCALAR_MIN;
+            } else if (t < t_far) {
+                t_far = t;
+            }
+            t = (rp->v[i] - b->min.v[i]) * inverse;
+            if (t > BR_SCALAR_MAX) {
+                t_near = BR_SCALAR_MAX;
+            } else if (t > t_near) {
+                t_near = t;
+            }
+        } else if (rp->v[i] > b->max.v[i] || rp->v[i] < b->min.v[i]) {
+            return 0;
+        }
+    }
+    if (t_near <= t_far) {
+        *new_t_near = t_near;
+        *new_t_far = t_far;
+        return 1;
+    } else {
+        return 0;
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x004e3840
 // FUNCTION: CARMA2_SW 0x004dfbd0

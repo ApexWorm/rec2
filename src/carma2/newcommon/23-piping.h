@@ -16,6 +16,7 @@
 extern tU8* gLocal_buffer;
 extern tU8* gPipe_buffer_working_end;
 extern int gReentrancy_count;
+extern tU32 gPipe_buffer_size;
 extern tU8* gPipe_buffer_phys_end;
 extern tU32 gLocal_buffer_size;
 extern tU8* gMr_chunky;
@@ -32,6 +33,7 @@ extern tU8* gPipe_record_ptr;
 extern tU32 gPipe_sound_start_time;
 extern tU32 gPipe_sound_time_window;
 extern int gDisable_advance;
+extern int gPipe_count_callbacks;
 extern tPipe_smudge_data* gCrush_space;
 extern tU8* gEnd_of_session;
 
@@ -51,7 +53,7 @@ extern void C2_HOOK_FASTCALL ARSetReplayDirection(float pDirection);
 
 extern void C2_HOOK_FASTCALL ARResetPiping(void);
 
-// ARInitialise
+extern void C2_HOOK_FASTCALL ARInitialise(int pEnable, int pCount_callbacks, const tReplay_callback* pCallbacks);
 
 extern void C2_HOOK_FASTCALL ARDispose(void);
 
@@ -239,7 +241,7 @@ extern void C2_HOOK_FASTCALL PipeSingleRelink(br_actor* pParent, br_actor* pActo
 
 extern void C2_HOOK_FASTCALL PipeSingleIdentity(br_actor* pActor);
 
-// PipeSingleSplitWeld
+extern void C2_HOOK_FASTCALL PipeSingleSplitWeld(uintptr_t pId, const br_vector4* pPlane, int pSplit);
 
 // PipeSingleShrapnelShower
 
@@ -361,7 +363,7 @@ extern void C2_HOOK_FASTCALL ApplyModelMash(tPipe_chunk** pChunk);
 
 extern void C2_HOOK_FASTCALL ApplyIdentity(tPipe_chunk** pChunk);
 
-// ApplySplitWeld
+extern void C2_HOOK_FASTCALL ApplySplitWeld(tPipe_chunk** pChunk);
 
 extern void C2_HOOK_FASTCALL ApplyBend(tPipe_chunk** pChunk);
 
