@@ -91,6 +91,7 @@ br_pixelmap* gDepth_shade_table;
 
 // GLOBAL: CARMA2_HW 0x0079ec44
 // GLOBAL: CARMA2_SW 0x007951a4
+// GLOBAL: CARMA2_CHEAT 0x007a62e4
 tSpecial_volume* gLast_camera_special_volume;
 
 static void C2_HOOK_FASTCALL FrobFog(void);
@@ -320,57 +321,75 @@ inline void C2_HOOK_FASTCALL DoDrugWobbleCamera(br_actor* pCamera) {
     float f_time;
     // GLOBAL: CARMA2_HW 0x005911d0
     // GLOBAL: CARMA2_SW 0x0058c1c8
+    // GLOBAL: CARMA2_CHEAT 0x00597b28
     static float mag00 = 0.03f;
     // GLOBAL: CARMA2_HW 0x005911d4
     // GLOBAL: CARMA2_SW 0x0058c1cc
+    // GLOBAL: CARMA2_CHEAT 0x00597b2c
     static float mag01 = 0.03f;
     // GLOBAL: CARMA2_HW 0x005911d8
     // GLOBAL: CARMA2_SW 0x0058c1d0
+    // GLOBAL: CARMA2_CHEAT 0x00597b30
     static float mag02 = 0.03f;
     // GLOBAL: CARMA2_HW 0x005911dc
     // GLOBAL: CARMA2_SW 0x0058c1d4
+    // GLOBAL: CARMA2_CHEAT 0x00597b34
     static float mag10 = 0.2f;
     // GLOBAL: CARMA2_HW 0x005911e0
     // GLOBAL: CARMA2_SW 0x0058c1d8
+    // GLOBAL: CARMA2_CHEAT 0x00597b38
     static float mag11 = 0.07f;
     // GLOBAL: CARMA2_HW 0x005911e4
     // GLOBAL: CARMA2_SW 0x0058c1dc
+    // GLOBAL: CARMA2_CHEAT 0x00597b3c
     static float mag12 = 0.03f;
     // GLOBAL: CARMA2_HW 0x005911e8
     // GLOBAL: CARMA2_SW 0x0058c1e0
+    // GLOBAL: CARMA2_CHEAT 0x00597b40
     static float mag20 = 0.02f;
     // GLOBAL: CARMA2_HW 0x005911ec
     // GLOBAL: CARMA2_SW 0x0058c1e4
+    // GLOBAL: CARMA2_CHEAT 0x00597b44
     static float mag21 = 0.03f;
     // GLOBAL: CARMA2_HW 0x005911f0
     // GLOBAL: CARMA2_SW 0x0058c1e8
+    // GLOBAL: CARMA2_CHEAT 0x00597b48
     static float mag22 = 0.01f;
     // GLOBAL: CARMA2_HW 0x005911f4
     // GLOBAL: CARMA2_SW 0x0058c1ec
+    // GLOBAL: CARMA2_CHEAT 0x00597b4c
     static float period00 = 550.f;
     // GLOBAL: CARMA2_HW 0x005911f8
     // GLOBAL: CARMA2_SW 0x0058c1f0
+    // GLOBAL: CARMA2_CHEAT 0x00597b50
     static float period01 = 700.f;
     // GLOBAL: CARMA2_HW 0x005911fc
     // GLOBAL: CARMA2_SW 0x0058c1f4
+    // GLOBAL: CARMA2_CHEAT 0x00597b54
     static float period02 = 200.f;
     // GLOBAL: CARMA2_HW 0x00591200
     // GLOBAL: CARMA2_SW 0x0058c1f8
+    // GLOBAL: CARMA2_CHEAT 0x00597b58
     static float period10 = 100.f;
     // GLOBAL: CARMA2_HW 0x00591204
     // GLOBAL: CARMA2_SW 0x0058c1fc
+    // GLOBAL: CARMA2_CHEAT 0x00597b5c
     static float period11 = 1300.f;
     // GLOBAL: CARMA2_HW 0x00591208
     // GLOBAL: CARMA2_SW 0x0058c200
+    // GLOBAL: CARMA2_CHEAT 0x00597b60
     static float period12 = 500.f;
     // GLOBAL: CARMA2_HW 0x0059120c
     // GLOBAL: CARMA2_SW 0x0058c204
+    // GLOBAL: CARMA2_CHEAT 0x00597b64
     static float period20 = 800.f;
     // GLOBAL: CARMA2_HW 0x00591210
     // GLOBAL: CARMA2_SW 0x0058c208
+    // GLOBAL: CARMA2_CHEAT 0x00597b68
     static float period21 = 1500.f;
     // GLOBAL: CARMA2_HW 0x00591214
     // GLOBAL: CARMA2_SW 0x0058c20c
+    // GLOBAL: CARMA2_CHEAT 0x00597b6c
     static float period22 = 300.f;
 
     f_time = (float)(tS32)PDGetTotalTime();
