@@ -52,7 +52,10 @@ int gPHIL_count_queued_objects_for_removal;
 // GLOBAL: CARMA2_SW 0x0068ce18
 int gPHIL_count_queued_objects;
 
-tU16 C2_HOOK_FASTCALL ScalarToFraction(br_scalar pMin, br_scalar pMax, br_scalar pValue) {
+// FUNCTION: CARMA2_HW 0x0049c5e0
+// FUNCTION: CARMA2_SW 0x00498760
+// FUNCTION: CARMA2_CHEAT 0x0049c990
+tU16 C2_HOOK_FASTCALL ScalarToFraction(br_scalar pValue, br_scalar pMin, br_scalar pMax) {
 
     if (pValue > pMax) {
         pValue = pMax;
@@ -60,46 +63,57 @@ tU16 C2_HOOK_FASTCALL ScalarToFraction(br_scalar pMin, br_scalar pMax, br_scalar
     if (pValue < pMin) {
         pValue = pMin;
     }
-    pValue = (((pValue - pMin) / (pMax - pMin)) * 65534.0f);
+    pValue = ((pValue - pMin) / (pMax - pMin)) * 65534.0f;
     return (tU16)(pValue + 0.5f);
 }
 
-br_scalar C2_HOOK_FASTCALL FractionToScalar(br_scalar pMin, br_scalar pMax, tU16 pFixed) {
+br_scalar C2_HOOK_FASTCALL FractionToScalar(tU16 pFixed, br_scalar pMin, br_scalar pMax) {
 
     return ((pMax - pMin) * (((br_scalar)pFixed / 65534.0f))) + pMin;
 }
 
 // FUNCTION: CARMA2_HW 0x0049be90
 // FUNCTION: CARMA2_SW 0x00498010
+// FUNCTION: CARMA2_CHEAT 0x0049c240
 void C2_HOOK_FASTCALL GetOrientationFromMatrix(tFixed_quat* pOrientation, const br_matrix34* pMatrix) {
     br_quat quaternion;
 
     BrMatrix34ToQuat(&quaternion, pMatrix);
 
-    pOrientation->v[0] = ScalarToFraction(-1.0f, 1.0f, quaternion.x);
-    pOrientation->v[1] = ScalarToFraction(-1.0f, 1.0f, quaternion.y);
-    pOrientation->v[2] = ScalarToFraction(-1.0f, 1.0f, quaternion.z);
-    pOrientation->v[3] = ScalarToFraction(-1.0f, 1.0f, quaternion.w);
+    pOrientation->v[0] = ScalarToFraction(quaternion.x, -1.0f, 1.0f);
+    pOrientation->v[1] = ScalarToFraction(quaternion.y, -1.0f, 1.0f);
+    pOrientation->v[2] = ScalarToFraction(quaternion.z, -1.0f, 1.0f);
+    pOrientation->v[3] = ScalarToFraction(quaternion.w, -1.0f, 1.0f);
 }
 
 // FUNCTION: CARMA2_HW 0x0049c000
 // FUNCTION: CARMA2_SW 0x00498180
+// FUNCTION: CARMA2_CHEAT 0x0049c3b0
 void C2_HOOK_FASTCALL GetMatrixFromOrientation(br_matrix34* pMatrix, const tFixed_quat* pOrientation) {
     br_quat quaternion;
 
-    quaternion.x = FractionToScalar(-1.0f, 1.0f, pOrientation->v[0]);
-    quaternion.y = FractionToScalar(-1.0f, 1.0f, pOrientation->v[1]);
-    quaternion.z = FractionToScalar(-1.0f, 1.0f, pOrientation->v[2]);
-    quaternion.w = FractionToScalar(-1.0f, 1.0f, pOrientation->v[3]);
+    quaternion.x = FractionToScalar(pOrientation->v[0], -1.0f, 1.0f);
+    quaternion.y = FractionToScalar(pOrientation->v[1], -1.0f, 1.0f);
+    quaternion.z = FractionToScalar(pOrientation->v[2], -1.0f, 1.0f);
+    quaternion.w = FractionToScalar(pOrientation->v[3], -1.0f, 1.0f);
     BrQuatNormalise(&quaternion, &quaternion);
     BrQuatToMatrix34(pMatrix, &quaternion);
 }
 
-// OmegaCompScalarTo16
+tU16 C2_HOOK_FASTCALL OmegaCompScalarTo16(br_scalar pOmega) {
+    /* Range is [-12.5 * PI, 12.5 * PI] */
+    return ScalarToFraction(pOmega, -39.269908f, 39.269908f);
+}
 
 // OmegaComp16ToScalar
 
-// GetOmega16FromOmega
+void C2_HOOK_FASTCALL GetOmega16FromOmega(tFixed_vec3* pOmega16, const br_vector3* pOmega) {
+    int i;
+
+    for (i = 0; i < 3; i++) {
+        pOmega16->v[i] = OmegaCompScalarTo16(pOmega->v[i]);
+    }
+}
 
 // GetOmegaFromOmega16
 
@@ -107,12 +121,55 @@ void C2_HOOK_FASTCALL GetMatrixFromOrientation(br_matrix34* pMatrix, const tFixe
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x0049c0d0
-// STUB: CARMA2_SW 0x00498250
-// STUB: CARMA2_CHEAT 0x0049c480
+// FUNCTION: CARMA2_HW 0x0049c0d0
+// FUNCTION: CARMA2_SW 0x00498250
+// FUNCTION: CARMA2_CHEAT 0x0049c480
 int C2_HOOK_FASTCALL GetObjectNetworkStuff(tPhysics_object* pObject, tU8* pBuffer, tU32 pSize) {
+    tObject_network_stuff* stuff = (tObject_network_stuff*)pBuffer;
 
-    NOT_IMPLEMENTED();
+    C2_HOOK_BUG_ON(sizeof(stuff->hinge) != 0xc);
+    C2_HOOK_BUG_ON(sizeof(stuff->universal) != 0x10);
+    C2_HOOK_BUG_ON(sizeof(stuff->none) != 0x28);
+
+    if (pObject->physics_joint1 != NULL) {
+        switch (pObject->physics_joint1->type) {
+        case eJoint_hinge:
+        case eJoint_quick_hinge:
+            if (pSize < sizeof(stuff->hinge)) {
+                return -1;
+            }
+            stuff->hinge.type = (tU8)pObject->physics_joint1->type;
+            stuff->hinge.uid = pObject->uid;
+            stuff->hinge.rotation = OmegaCompScalarTo16(BrVector3Dot(&pObject->omega, &pObject->physics_joint1->hinge_axis));
+            GetOrientationFromMatrix(&stuff->hinge.orientation, &pObject->transform_matrix);
+            return sizeof(stuff->hinge);
+        case eJoint_universal:
+        case eJoint_ball_n_socket:
+            if (pSize < sizeof(stuff->universal)) {
+                return -1;
+            }
+            stuff->universal.type = (tU8)pObject->physics_joint1->type;
+            stuff->universal.uid = pObject->uid;
+            GetOmega16FromOmega(&stuff->universal.omega, &pObject->omega);
+            GetOrientationFromMatrix(&stuff->universal.orientation, &pObject->transform_matrix);
+            return sizeof(stuff->universal);
+        case eJoint_none:
+            break;
+        default:
+            PhysicsError(ePhysicsError_error9, "netphys got messed up");
+            break;
+        }
+    }
+    if (pSize < sizeof(stuff->none)) {
+        return -1;
+    }
+    stuff->none.type = eJoint_none;
+    stuff->none.uid = pObject->uid;
+    GetOmega16FromOmega(&stuff->none.omega, &pObject->omega);
+    BrVector3Copy(&stuff->none.v, &pObject->v);
+    BrVector3Copy(&stuff->none.pos, (br_vector3*)pObject->transform_matrix.m[3]);
+    GetOrientationFromMatrix(&stuff->none.orientation, &pObject->transform_matrix);
+    return sizeof(stuff->none);
 }
 
 #ifdef REC2_MATCHING
@@ -137,19 +194,6 @@ int C2_HOOK_FASTCALL SizeOfObjectNetworkStuff(tPhysics_joint_type pType) {
         PhysicsError(ePhysicsError_error9, "netphys got messed up");
         return 0;
     }
-}
-
-// FUNCTION: CARMA2_HW 0x0049c5e0
-// FUNCTION: CARMA2_SW 0x00498760
-int C2_HOOK_STDCALL FloatToFixedFraction(float pValue, float pMin, float pMax) {
-    if (pValue > pMax) {
-        pValue = pMax;
-    }
-    if (pValue < pMin) {
-        pValue = pMin;
-    }
-    pValue = ((pValue - pMin) / (pMax - pMin)) * 65534.f;
-    return (int)(pValue + 0.5f);
 }
 
 // WriteObjectNetworkStuff
@@ -487,6 +531,7 @@ int C2_HOOK_CDECL PHILSetObjectProperty(tPhysics_object* pCollision_info, int pP
 
 // STUB: CARMA2_HW 0x004b6530
 // STUB: CARMA2_SW 0x004b2c50
+// STUB: CARMA2_CHEAT 0x004bc010
 float C2_HOOK_FASTCALL PHILGetObjectProperty(tPhysics_object* pObject, int pProperty) {
     NOT_IMPLEMENTED();
 }
