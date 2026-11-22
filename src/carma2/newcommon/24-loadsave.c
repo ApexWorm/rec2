@@ -8,7 +8,13 @@
 
 #include "24-loadsave.h"
 
+#include "08-loading1.h"
+#include "41-utility.h"
+#include "69-sound.h"
+#include "70-packfile.h"
+
 #include "globvars.h"
+#include "globvrpb.h"
 #include "platform.h"
 #include "rec2_macros.h"
 #include "rec2_types.h"
@@ -68,11 +74,32 @@ void C2_HOOK_FASTCALL MakeSavedGame(tSave_game* pSave_game) {
     }
 }
 
-// STUB: CARMA2_HW 0x00491ac0
-// STUB: CARMA2_SW 0x0048ed30
-// STUB: CARMA2_CHEAT 0x00491b70
+// FUNCTION: CARMA2_HW 0x00491ac0
+// FUNCTION: CARMA2_SW 0x0048ed30
+// FUNCTION: CARMA2_CHEAT 0x00491b70
 void C2_HOOK_FASTCALL DoSaveGame(void) {
-    NOT_IMPLEMENTED();
+    char the_path[256];
+    tSave_game saved_game;
+    FILE* f;
+    int i;
+
+    if (gNet_mode == eNet_mode_none) {
+        PathCat(the_path, gApplication_path, "SAVEDGAMES.ARS");
+        PDFileUnlock(the_path);
+        f = DRfopen(the_path, "ab+");
+        if (f != NULL) {
+            PFfseek(f, 0, SEEK_END);
+            for (i = 0; i < (int)REC2_ASIZE(gCurrent_APO_levels); i++) {
+                gCurrent_APO_levels[i] = gProgram_state.current_car.power_up_levels[i];
+                gCurrent_APO_potential_levels[i] = gProgram_state.current_car.power_up_slots[i];
+            }
+            MakeSavedGame(&saved_game);
+            SplungeSomeData(&saved_game, sizeof(tSave_game));
+            PFfwrite(&saved_game, 1, sizeof(tSave_game), f);
+            PFfclose(f);
+            gSave_game_out_of_sync = 0;
+        }
+    }
 }
 
 // STUB: CARMA2_HW 0x00491bb0
