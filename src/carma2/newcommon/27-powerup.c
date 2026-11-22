@@ -235,6 +235,7 @@ int gInventory_cycling;
 
 // GLOBAL: CARMA2_HW 0x006a0944
 // GLOBAL: CARMA2_SW 0x0069a99c
+// GLOBAL: CARMA2_CHEAT 0x006a84bc
 int gNumber_of_icons;
 
 // GLOBAL: CARMA2_HW 0x006a0950
@@ -684,10 +685,18 @@ inline void C2_HOOK_FASTCALL DrawKeyPowerups(tU32 pTime) {
                     x, gCurrent_graf_data->keyboard_powerup_bg_bottom, 1);
                 i = gInventory_selected;
                 x = gCurrent_graf_data->keyboard_powerup_x;
+#ifdef REC2_HW
                 DRPixelmapText(gBack_screen,
                     gCurrent_graf_data->keyboard_powerup_bg_x + 1, gCurrent_graf_data->keyboard_powerup_bg_bottom - 9,
                     &gFonts[2], gPowerup_array[gInventory[gInventory_selected]].message,
                     gCurrent_graf_data->keyboard_powerup_bg_x + 100);
+#endif
+#ifdef REC2_SW
+                DRPixelmapText(gBack_screen,
+                    gCurrent_graf_data->keyboard_powerup_bg_x + 4, gCurrent_graf_data->keyboard_powerup_bg_bottom - 8,
+                    &gFonts[2], gPowerup_array[gInventory[gInventory_selected]].message,
+                    gCurrent_graf_data->keyboard_powerup_bg_x + 100);
+#endif
                 do {
                     if (gInventory[i] >= 0) {
                         tPowerup* the_powerup = &gPowerup_array[gInventory[i]];
