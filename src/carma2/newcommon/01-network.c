@@ -12,6 +12,7 @@
 #include "15-displays.h"
 #include "32-spark.h"
 #include "41-utility.h"
+#include "47-win95net.h"
 #include "53-controls.h"
 #include "platform.h"
 #include "globvars.h"
@@ -300,7 +301,10 @@ void C2_HOOK_FASTCALL HaltNetServiceReentrancy(void) {
 
 // STUB: CARMA2_HW 0x0049d430
 // STUB: CARMA2_SW 0x004995b0
-// NetSendHeadupToAllPlayers
+// STUB: CARMA2_CHEAT 0x0049d7e0
+void C2_HOOK_FASTCALL NetSendHeadupToAllPlayers(char* pMessage) {
+    NOT_IMPLEMENTED();
+}
 
 // FUNCTION: CARMA2_HW 0x0049d780
 // FUNCTION: CARMA2_SW 0x00499900
@@ -463,7 +467,41 @@ void C2_HOOK_FASTCALL NetLeaveGame(tNet_game_details* pNet_game) {
 
 // NetSetPlayerSystemInfo
 
-// FillInThisPlayer
+// FUNCTION: CARMA2_HW 0x0049e3a0
+// FUNCTION: CARMA2_SW 0x0049a520
+// FUNCTION: CARMA2_CHEAT 0x0049e8e0
+void C2_HOOK_FASTCALL FillInThisPlayer(tNet_game_details* pGame, tNet_game_player_info* pPlayer, int pCar_index, int pHost) {
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tNet_game_player_info, field_0x58, 0x58);
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tNet_game_player_info, field_0x58, 4);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tNet_game_player_info, field_0x74, 0x74);
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tNet_game_player_info, field_0x74, 4);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tNet_game_player_info, field_0x84, 0x84);
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tNet_game_player_info, field_0x84, 4);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tNet_game_player_info, field_0xd0, 0xd0);
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tNet_game_player_info, field_0xd0, 4);
+
+    pPlayer->host = pHost;
+    pPlayer->ID = NetExtractPlayerID(pGame);
+    strcpy(pPlayer->player_name, gProgram_state.player_name);
+    pPlayer->this_players_time_stamp = PDGetTotalTime();
+    pPlayer->car_index = pCar_index;
+    pPlayer->reposition_time = 0;
+    pPlayer->last_waste_message = 0;
+    pPlayer->wasteage_attributed = 0;
+    pPlayer->field_0x58 = 0;
+    pPlayer->field_0x74 = 1;
+    pPlayer->field_0x7c = 0;
+    pPlayer->field_0x88 = 0;
+    pPlayer->score = 0;
+    pPlayer->field_0x80 = 0;
+    pPlayer->field_0x84 = 0;
+    pPlayer->field_0xcc = NULL;
+    pPlayer->field_0xd0 = 0;
+    if (pGame->options.car_choice == eNet_car_all || pGame->options.car_choice == eNet_car_novelty) {
+        pPlayer->next_car_index = -1;
+    }
+    InitialisePlayerScore(pPlayer);
+}
 
 // LoadCarN
 
@@ -495,7 +533,10 @@ void C2_HOOK_FASTCALL NetObtainSystemUserName(char* pName, int pMax_length) {
 
 // NetExtractGameID
 
-// NetExtractPlayerID
+inline tPlayer_ID C2_HOOK_FASTCALL NetExtractPlayerID(tNet_game_details* pDetails) {
+
+    return PDNetExtractPlayerID();
+}
 
 // FUNCTION: CARMA2_HW 0x0049ee50
 // FUNCTION: CARMA2_CHEAT 0x0049f3f0
@@ -1077,7 +1118,19 @@ void C2_HOOK_FASTCALL NetService(int pIn_race) {
     gIn_net_service = 0;
 }
 
-// NetFinishRace
+// FUNCTION: CARMA2_HW 0x004a5710
+// FUNCTION: CARMA2_SW 0x004a1890
+// FUNCTION: CARMA2_CHEAT 0x004a6610
+void C2_HOOK_FASTCALL NetFinishRace(tNet_game_details* pDetails, tRace_over_reason pReason) {
+    tNet_message* the_message;
+
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tNet_message_chunk_race_over, reason, 0x4);
+
+    gSynch_race_start = 0;
+    the_message = NetBuildGuaranteedMessage(eNet_message_chunk_type_race_over, 0);
+    the_message->contents.race_over.reason = pReason;
+    NetGuaranteedSendMessageToAllPlayers(gCurrent_net_game, the_message, NULL);
+}
 
 // STUB: CARMA2_HW 0x004a57e0
 // STUB: CARMA2_SW 0x004a1960
