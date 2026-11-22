@@ -984,16 +984,42 @@ void C2_HOOK_FASTCALL InitPolyPedSystem(void) {
     NOT_IMPLEMENTED();
 }
 
-// DisposePedSpawnSpec
+inline void C2_HOOK_FASTCALL DisposePedSpawnSpec(void) {
+    int i;
 
-// DisposeCharacterInstances
+    for (i = 0; i < gCount_race_pedestrian_specs; i++) {
+        if (gRace_pedestrian_specs[i].exclusion.exclusion_materials != NULL) {
+            BrMemFree(gRace_pedestrian_specs[i].exclusion.exclusion_materials);
+        }
+        if (gRace_pedestrian_specs[i].exclusion.exception_materials != NULL) {
+            BrMemFree(gRace_pedestrian_specs[i].exclusion.exception_materials);
+        }
+    }
+    if (gRace_pedestrian_specs != NULL) {
+        BrMemFree(gRace_pedestrian_specs);
+    }
+}
 
-// STUB: CARMA2_HW 0x004cb8d0
-// STUB: CARMA2_SW 0x004c7fd0
-// STUB: CARMA2_CHEAT 0x004d1410
+inline void C2_HOOK_FASTCALL DisposeCharacterInstances(void) {
+    int i;
+
+    for (i = 0; i < gPed_count; i++) {
+        DisposeCharacterInstance(gPedestrian_array[i].character);
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x004cb8d0
+// FUNCTION: CARMA2_SW 0x004c7fd0
+// FUNCTION: CARMA2_CHEAT 0x004d1410
 void C2_HOOK_FASTCALL DisposePedStuff(void) {
 
-    NOT_IMPLEMENTED();
+    DisposeAllBonerData();
+    DisposeCharacterInstances();
+    ClearOutStorageSpace(&gPedStorage);
+    if (gPedestrian_array != NULL) {
+        BrMemFree(gPedestrian_array);
+    }
+    DisposePedSpawnSpec();
 }
 
 // FUNCTION: CARMA2_HW 0x004cb980
@@ -2535,6 +2561,10 @@ void C2_HOOK_FASTCALL DisposeCharacterForm(tPed_form* pForm) {
 
 // DisposeAllLoadedForms
 
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
 // FUNCTION: CARMA2_HW 0x00406a30
 // FUNCTION: CARMA2_SW 0x00406a30
 // FUNCTION: CARMA2_CHEAT 0x00406a30
@@ -2544,6 +2574,10 @@ void C2_HOOK_FASTCALL DisposeCharacterInstance(tPed_character_instance* pCharact
         BrMemFree(pCharacter);
     }
 }
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // FUNCTION: CARMA2_HW 0x00406a40
 // FUNCTION: CARMA2_SW 0x00406a40
@@ -2930,7 +2964,20 @@ void C2_HOOK_FASTCALL SetCharacterDirection(tPed_character_instance* pPed, const
 
 // DisposeClonedMaterials
 
-// DisposeAllBonerData
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_HW 0x0040b2e0
+// STUB: CARMA2_SW 0x0040b2d0
+// STUB: CARMA2_CHEAT 0x0040b350
+void C2_HOOK_FASTCALL DisposeAllBonerData(void) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // FUNCTION: CARMA2_HW 0x0040b420
 // FUNCTION: CARMA2_SW 0x0040b410
