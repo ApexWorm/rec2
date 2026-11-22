@@ -98,7 +98,7 @@ extern void C2_HOOK_FASTCALL ResetPedFaceCache(void);
 
 extern void C2_HOOK_FASTCALL PedApplyPedDir(tU32 pId, const br_vector3* pDir);
 
-// SetCharacterMoveAR
+extern void C2_HOOK_FASTCALL SetCharacterMoveAR(tPed_character_instance* pCharacter, int pMove_action, float pSpeed, int pArg4, int pArg5, tU32 pTime);
 
 // SetPedStartRun
 
