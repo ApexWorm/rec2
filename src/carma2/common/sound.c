@@ -682,7 +682,7 @@ void C2_HOOK_FASTCALL InitSoundSources(void) {
 
                     car->sound_source = S3CreateSoundSourceBR(&car->pos, &car->vel, gEngine_outlet);
                     if (car->sound_source != NULL) {
-                        S3BindAmbientSoundToOutlet(gEngine_outlet, category == eVehicle_rozzer ? eSoundId_Cop_Siren : car->engine_noises[0], car->sound_source, 250.f, 0, 0, 0, BR_FIXED_INT(1), BR_FIXED_INT(1));
+                        S3BindAmbientSoundToOutlet(gEngine_outlet, category == eVehicle_rozzer ? eSoundId_Cop_Siren : car->engine_noises[0], car->sound_source, 250.0f, 0, 0, 0, BR_FIXED_INT(1), BR_FIXED_INT(1));
                     }
                 }
             }
@@ -702,7 +702,7 @@ void C2_HOOK_FASTCALL InitSoundSources(void) {
             if (env_src->source == NULL) {
                 env_src->source = S3CreateSoundSourceBR(&env_src->position, &gZero_v__car, gXXX_outlet);
                 if (env_src->source != NULL) {
-                    S3BindAmbientSoundToOutlet(gXXX_outlet, eSoundId_Cop_Siren, env_src->source, 100.f, 0, 0, 0, BR_FIXED_INT(1), BR_FIXED_INT(1));
+                    S3BindAmbientSoundToOutlet(gXXX_outlet, eSoundId_Cop_Siren, env_src->source, 100.f, 0, 0, 0, S3_FIXED_INT(1), S3_FIXED_INT(1));
                 }
             }
         }

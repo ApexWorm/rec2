@@ -582,6 +582,7 @@ void C2_HOOK_FASTCALL ReadShrapnelMovementSpec(FILE* pFile, tMovement_spec* pIni
 }
 
 // FUNCTION: CARMA2_HW 0x004ee550
+// FUNCTION: CARMA2_SW 0x004ea220
 // FUNCTION: CARMA2_CHEAT 0x004f41f0
 void C2_HOOK_FASTCALL ReadShrapnelInitialPosition(FILE* pF, tSmashable_initial_position_spec* pInitial_pos) {
     pInitial_pos->type = GetALineAndInterpretCommand(pF, gInitial_position_type_names, REC2_ASIZE(gInitial_position_type_names));
@@ -638,7 +639,12 @@ br_actor* C2_HOOK_FASTCALL LoadActorFromRace(const char *pName) {
     return BrActorLoad(path);
 }
 
-// ReadSpillData
+// STUB: CARMA2_HW 0x004ee5e0
+// STUB: CARMA2_SW 0x004ea2b0
+// STUB: CARMA2_CHEAT 0x004f4280
+void C2_HOOK_FASTCALL ReadSpillData(FILE* pF, tSlick_spec* pSlick_spec) {
+    NOT_IMPLEMENTED();
+}
 
 // FUNCTION: CARMA2_HW 0x004ee780
 // FUNCTION: CARMA2_SW 0x004ea420

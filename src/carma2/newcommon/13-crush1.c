@@ -20,6 +20,7 @@
 #include "51-smash.h"
 #include "53-controls.h"
 #include "60-phil.h"
+#include "69-sound.h"
 #include "globvars.h"
 #include "globvrpb.h"
 
@@ -778,7 +779,7 @@ intptr_t C2_HOOK_CDECL LinkCarCrushData(br_actor* pActor, void* pData) {
 // FUNCTION: CARMA2_HW 0x0042ac70
 // FUNCTION: CARMA2_SW 0x0042ad00
 // FUNCTION: CARMA2_CHEAT 0x0042ae00
-intptr_t C2_HOOK_CDECL z(br_actor* pActor, void* pData) {
+intptr_t C2_HOOK_CDECL AccumulateSquashVertices(br_actor* pActor, void* pData) {
     tAccumulateSquashVertices_UserData* context = pData;
     tUser_crush_data* crush_data = pActor->user;
 
@@ -1552,7 +1553,20 @@ void C2_HOOK_FASTCALL MakeModelMaterialsSingleSided(br_model* pModel) {
     }
 }
 
-// ReAttachBit
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_HW 0x00434010
+// STUB: CARMA2_SW 0x00434040
+// STUB: CARMA2_CHEAT 0x004341f0
+void C2_HOOK_FASTCALL ReAttachBit(tCar_spec* pCar_spec, br_actor* pActor_arg2, br_actor* pActor_arg3, tPhysics_object* pObject) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // CentreModelOnPoint
 
@@ -1693,7 +1707,20 @@ void C2_HOOK_FASTCALL AddNonCar(tNon_car_spec* pNon_car, const tDriver* pDriver)
 
 // StartFlapping
 
-// MungeDetachLists
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_HW 0x0042f3d0
+// STUB: CARMA2_SW 0x0042f420
+// STUB: CARMA2_CHEAT 0x0042f590
+void C2_HOOK_FASTCALL MungeDetachLists(tCar_crush_spec* pCar_crush) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // FUNCTION: CARMA2_HW 0x0043b250
 // FUNCTION: CARMA2_SW 0x0043b2a0
@@ -1713,20 +1740,53 @@ void C2_HOOK_FASTCALL SendReAttachBit(tCar_spec* pCar, tPhysics_object* pObject)
     NetGuaranteedSendMessageToEverybody(gCurrent_net_game, message, NULL);
 }
 
-#ifdef REC2_MATCHING
-#pragma auto_inline(off)
-#endif
-
-// STUB: CARMA2_HW 0x004387d0
-// STUB: CARMA2_SW 0x00438800
-// STUB: CARMA2_CHEAT 0x004389e0
+// FUNCTION: CARMA2_HW 0x004387d0
+// FUNCTION: CARMA2_SW 0x00438800
+// FUNCTION: CARMA2_CHEAT 0x004389e0
 void C2_HOOK_FASTCALL StopFlapping(br_actor* pActor, tCar_spec* pCar_spec) {
-    NOT_IMPLEMENTED();
-}
+    tUser_crush_data* user_crush;
+    tCar_crush_buffer_entry* crush_data;
+    tCar_crush_flap_data* flap_data;
 
-#ifdef REC2_MATCHING
-#pragma auto_inline(on)
-#endif
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tCar_crush_flap_data, field_0x2, 0x2);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tCar_crush_flap_data, field_0x4, 0x4);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tCar_crush_flap_data, field_0x6, 0x6);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tCar_crush_flap_data, field_0x8, 0x8);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tCar_crush_flap_data, kev_o_flap, 0x20);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tCar_crush_flap_data, field_0x24, 0x24);
+
+    user_crush = pActor->user;
+    if (user_crush != NULL) {
+        crush_data = user_crush->crush_data;
+        if (crush_data != NULL) {
+            flap_data = crush_data->flap_data;
+            if (flap_data != NULL) {
+                if (flap_data->kev_o_flap) {
+                    if (gNet_mode != eNet_mode_none) {
+                        if (gNet_mode == eNet_mode_host) {
+                            SendReAttachBit(pCar_spec, flap_data->field_0x24);
+                        }
+                    } else {
+                        ReAttachBit(pCar_spec, pCar_spec->car_model_actor, pActor, flap_data->field_0x24);
+                        MungeDetachLists(pCar_spec->car_crush_spec);
+                    }
+                } else {
+                    pCar_spec->car_crush_spec->field_0x134--;
+                    BrMatrix34Identity(&pActor->t.t.mat);
+                    PipeSingleFlap(pActor, -flap_data->field_0x4);
+                    flap_data->field_0x4 = 0;
+                    flap_data->field_0x2 = 0;
+                    flap_data->field_0x6 = BR_ANGLE_DEG(90);
+                    flap_data->field_0x8 = BR_ANGLE_DEG(90);
+                    flap_data->field_0x0 = 0;
+                }
+                DRS3StartSound3D(gCar_outlet, eSoundId_DoorSlam,
+                    &pCar_spec->car_master_actor->t.t.translate.t, &gZero_v__car,
+                    1, 255, IRandomBetween(S3_FIXED_INT(0.875f), S3_FIXED_INT(1.125f)), S3_FIXED_INT(1));
+            }
+        }
+    }
+}
 
 // DoFlapping
 
@@ -2051,6 +2111,7 @@ void C2_HOOK_FASTCALL SetModelForUpdate(br_model* pModel) {
 
 // STUB: CARMA2_HW 0x00431610
 // STUB: CARMA2_SW 0x00431640
+// STUB: CARMA2_CHEAT 0x004317e0
 void C2_HOOK_FASTCALL TotallySpamTheCar(tCar_spec* pCar, br_scalar pDamage) {
     NOT_IMPLEMENTED();
 }
@@ -2403,9 +2464,19 @@ void C2_HOOK_FASTCALL ARApplyFlap(br_actor* pActor, br_angle pAngle) {
         parent_model->vertices[flap->field_0xc].p.v[2]);
 }
 
-// ARApplySplitWeld
+// STUB: CARMA2_HW 0x0043c240
+// STUB: CARMA2_SW 0x0043c290
+// STUB: CARMA2_CHEAT 0x0043c490
+void C2_HOOK_FASTCALL ARApplySplitWeld(tCar_spec* pCar, const br_vector4* pPlane) {
+    NOT_IMPLEMENTED();
+}
 
-// ARUndoSplitWeld
+// STUB: CARMA2_HW 0x0043c3d0
+// STUB: CARMA2_SW 0x0043c420
+// STUB: CARMA2_CHEAT 0x0043c620
+void C2_HOOK_FASTCALL ARUndoSplitWeld(tCar_spec* pCar) {
+    NOT_IMPLEMENTED();
+}
 
 // ReceivedCrush
 

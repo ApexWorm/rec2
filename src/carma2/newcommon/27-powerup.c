@@ -27,12 +27,14 @@
 #include "49-physics.h"
 #include "51-smash.h"
 #include "53-controls.h"
+#include "58-crush2.h"
 #include "60-phil.h"
 #include "61-pedestrn.h"
 #include "69-sound.h"
 #include "globvars.h"
 #include "globvrpb.h"
 #include "joystick.h"
+#include "platform.h"
 #include "rec2_macros.h"
 
 #include "c2_stdio.h"
@@ -233,6 +235,11 @@ tCar_spec* gCloaked_cars[12];
 // GLOBAL: CARMA2_CHEAT 0x006a84b8
 int gInventory_cycling;
 
+// GLOBAL: CARMA2_HW 0x006a0944
+// GLOBAL: CARMA2_SW 0x0069a99c
+// GLOBAL: CARMA2_CHEAT 0x006a84bc
+int gNumber_of_icons;
+
 // GLOBAL: CARMA2_HW 0x006a0950
 // GLOBAL: CARMA2_SW 0x0069a9a8
 int gFizzle_height;
@@ -327,7 +334,33 @@ void C2_HOOK_FASTCALL LoadPowerups(void) {
 
 // InitRepulseEffects
 
-// MungeBoxObject
+// FUNCTION: CARMA2_HW 0x004da290
+// FUNCTION: CARMA2_SW 0x004d6760
+// FUNCTION: CARMA2_CHEAT 0x004dfe50
+tPhysics_object* C2_HOOK_FASTCALL MungeBoxObject(br_model* pModel, float pMass) {
+    tPhysics_object* box;
+
+    C2_HOOK_BUG_ON(sizeof(tPhysics_object) != 0x4d8);
+
+    box = BrMemAllocate(sizeof(tPhysics_object), kMem_collision_object);
+    box->shape = (tPhysics_shape*)AllocateShapeBox(kMem_collision_shape);
+    box->shape->common.bb = pModel->bounds;
+    FillInShape(box->shape);
+    box->uid = (tU8)gCollision_info_uid_counter;
+    gCollision_info_uid_counter++;
+    UpdateCollisionObject(box);
+    box->M = pMass;
+    BrVector3Set(&box->I,
+        (REC2_SQR((pModel->bounds.max.v[1] - pModel->bounds.min.v[1]) * 0.5f) + REC2_SQR((pModel->bounds.max.v[2] - pModel->bounds.min.v[2]) * 0.5f)) * pMass / 12.0f,
+        (REC2_SQR((pModel->bounds.max.v[0] - pModel->bounds.min.v[0]) * 0.5f) + REC2_SQR((pModel->bounds.max.v[2] - pModel->bounds.min.v[2]) * 0.5f)) * pMass / 12.0f,
+        (REC2_SQR((pModel->bounds.max.v[0] - pModel->bounds.min.v[0]) * 0.5f) + REC2_SQR((pModel->bounds.max.v[1] - pModel->bounds.min.v[1]) * 0.5f)) * pMass / 12.0f);
+    BrVector3SetFloat(&box->field_0x54, 0.0f, (br_scalar)(-1.0 / (2.5 * 6.9)), 0.0f);
+    box->actor = BrActorAllocate(BR_ACTOR_MODEL, NULL);
+    BrMatrix34Copy(&box->actor->t.t.mat, &box->transform_matrix);
+    box->actor->model = pModel;
+    box->box_face_ref = (tU16)(gFace_num__car - 2);
+    return box;
+}
 
 // FUNCTION: CARMA2_HW 0x004da400
 // FUNCTION: CARMA2_SW 0x004d68d0
@@ -617,9 +650,104 @@ int C2_HOOK_FASTCALL DrawSinglePowerupIcon(int pDraw, int pTime, tPowerup* pPowe
     return 0;
 }
 
-// DrawPowerupIcons2
+inline void C2_HOOK_FASTCALL DrawPowerupIcons2(tU32 pTime, tHeadup_icon* pHeadup_icons, int* pCount_icons, int pMax_count_icons, int pX, int pY) {
+    int i;
+    int y;
+    tPowerup* the_powerup;
+    tHeadup_icon* the_icon;
 
-// DrawKeyPowerups
+    C2_HOOK_BUG_ON(sizeof(tHeadup_icon) != 0x14);
+
+    y = pY;
+    for (i = 0, the_icon = pHeadup_icons; i < *pCount_icons; i++, the_icon++) {
+        if (i >= pMax_count_icons) {
+            break;
+        }
+        the_powerup = the_icon->powerup;
+        if (the_powerup->icon == NULL) {
+            continue;
+        }
+        y += gCurrent_graf_data->power_up_icon_y_pitch;
+        if (the_icon->fizzle_stage < 4) {
+            if (the_icon->fizzle_direction < 0) {
+                the_icon->fizzle_stage = 3 - (pTime - the_icon->fizzle_start) / 150;
+            } else {
+                the_icon->fizzle_stage = (pTime - the_icon->fizzle_start) / 150;
+            }
+            if (the_icon->fizzle_stage > 4) {
+                the_icon->fizzle_stage = 4;
+            } else if (the_icon->fizzle_stage < 0) {
+                memcpy(the_icon, the_icon + 1, sizeof(tHeadup_icon) * (*pCount_icons - i - 1));
+                (*pCount_icons)--;
+                continue;
+            }
+        }
+        DrawSinglePowerupIcon(1, pTime, the_icon->powerup, the_icon, pX, y, 0);
+    }
+}
+
+inline void C2_HOOK_FASTCALL DrawKeyPowerups(tU32 pTime) {
+    int x;
+    int i;
+
+    if (gInventory_cycling) {
+        if (gInventory_selected >= 0) {
+            if (GetTotalTime() >= gInventory_timeout) {
+                gInventory_timeout = 0;
+                gInventory_cycling = 0;
+            }
+            x = gCurrent_graf_data->keyboard_powerup_x;
+            i = gInventory_selected;
+            do {
+                if (gInventory[i] >= 0) {
+                    x = DrawSinglePowerupIcon(0, pTime, &gPowerup_array[gInventory[i]], NULL,
+                        x, gCurrent_graf_data->keyboard_powerup_y, 1) + gCurrent_graf_data->keyboard_powerup_spacing_x;
+                }
+                i++;
+                if (i >= (int)REC2_ASIZE(gInventory)) {
+                    i = 0;
+                }
+            } while (i != gInventory_selected);
+            if (x >= 0) {
+                DimRectangle(gBack_screen, gCurrent_graf_data->keyboard_powerup_bg_x, gCurrent_graf_data->keyboard_powerup_bg_y,
+                    x, gCurrent_graf_data->keyboard_powerup_bg_bottom, 1);
+                i = gInventory_selected;
+                x = gCurrent_graf_data->keyboard_powerup_x;
+#ifdef REC2_HW
+                DRPixelmapText(gBack_screen,
+                    gCurrent_graf_data->keyboard_powerup_bg_x + 1, gCurrent_graf_data->keyboard_powerup_bg_bottom - 9,
+                    &gFonts[2], gPowerup_array[gInventory[gInventory_selected]].message,
+                    gCurrent_graf_data->keyboard_powerup_bg_x + 100);
+#endif
+#ifdef REC2_SW
+                DRPixelmapText(gBack_screen,
+                    gCurrent_graf_data->keyboard_powerup_bg_x + 4, gCurrent_graf_data->keyboard_powerup_bg_bottom - 8,
+                    &gFonts[2], gPowerup_array[gInventory[gInventory_selected]].message,
+                    gCurrent_graf_data->keyboard_powerup_bg_x + 100);
+#endif
+                do {
+                    if (gInventory[i] >= 0) {
+                        tPowerup* the_powerup = &gPowerup_array[gInventory[i]];
+
+                        if (gInventory_cycling) {
+                            x = DrawSinglePowerupIcon(1, pTime, the_powerup, NULL,
+                                x, gCurrent_graf_data->keyboard_powerup_y, 1) + gCurrent_graf_data->keyboard_powerup_spacing_x;
+                        }
+                    }
+                    i++;
+                    if (i >= (int)REC2_ASIZE(gInventory)) {
+                        i = 0;
+                    }
+                } while (i != gInventory_selected);
+            }
+        }
+    } else {
+        if (gInventory_selected >= 0) {
+            DrawSinglePowerupIcon(1, pTime, &gPowerup_array[gInventory[gInventory_selected]], NULL,
+                gCurrent_graf_data->keyboard_powerup_x, gCurrent_graf_data->keyboard_powerup_y, 0);
+        }
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x004da9d0
 // FUNCTION: CARMA2_SW 0x004d6ea0
@@ -636,7 +764,15 @@ void C2_HOOK_FASTCALL ToggleInventory(void) {
 
 // LeftInventory
 
-// DrawPowerups
+// FUNCTION: CARMA2_HW 0x004dad00
+// FUNCTION: CARMA2_SW 0x004d71d0
+// FUNCTION: CARMA2_CHEAT 0x004e08c0
+void C2_HOOK_FASTCALL DrawPowerups(tU32 pTime) {
+
+    DrawPowerupIcons2(pTime, gPickedup_powerups, &gNumber_of_icons, 5,
+        gCurrent_graf_data->power_up_icon_x, gCurrent_graf_data->power_up_icon_y);
+    DrawKeyPowerups(pTime);
+}
 
 // MungeKeyboardPowerup
 
@@ -768,11 +904,95 @@ int C2_HOOK_FASTCALL GotCredits(tPowerup* pPowerup, tCar_spec* pCar) {
     return pPowerup - gPowerup_array;
 }
 
-// GainAPO2
+// FUNCTION: CARMA2_HW 0x004dc3e0
+// FUNCTION: CARMA2_SW 0x004d88e0
+// FUNCTION: CARMA2_CHEAT 0x004e1fa0
+int C2_HOOK_FASTCALL GainAPO2(tCar_spec* pCar, int pIndex, int pAmount) {
+    int old;
+
+    if (pAmount < 0) {
+        if (pCar->power_up_levels[pIndex] >= pCar->power_up_slots[pIndex]) {
+            return 0;
+        } else {
+            return GainAPO2(pCar, pIndex, pCar->power_up_slots[pIndex] - pCar->power_up_levels[pIndex]);
+        }
+    }
+    if (pIndex == 1 && gNet_mode != eNet_mode_none && gCurrent_net_game->type == eNet_game_type_foxy && gThis_net_player_index == gIt_or_fox) {
+        return 0;
+    }
+    old = pCar->power_up_levels[pIndex];
+    pCar->power_up_levels[pIndex] = old + pAmount;
+    if (pCar->power_up_levels[pIndex] > pCar->power_up_slots[pIndex]) {
+        pCar->power_up_levels[pIndex] = pCar->power_up_slots[pIndex];
+    }
+    return pCar->power_up_levels[pIndex] - old;
+}
 
 // GainAPOPot2
 
-// GainAPO
+// FUNCTION: CARMA2_HW 0x004dc240
+// FUNCTION: CARMA2_SW 0x004d8740
+// FUNCTION: CARMA2_CHEAT 0x004e1e00
+int C2_HOOK_FASTCALL GainAPO(tPowerup* pPowerup, tCar_spec* pCar) {
+    int powerup_index;
+    int old_armour;
+    int old_power;
+    int old_offensive;
+    int index;
+    int amount;
+    int original_index;
+    int direction;
+
+    powerup_index = pPowerup - gPowerup_array;
+    old_armour = pCar->power_up_levels[0];
+    old_power = pCar->power_up_levels[1];
+    old_offensive = pCar->power_up_levels[2];
+    if (pPowerup->integer_params[0] != 0 && pPowerup->integer_params[1] != 0 && pPowerup->integer_params[2] != 0) {
+        GainAPO2(pCar, 0, pPowerup->integer_params[0]);
+        GainAPO2(pCar, 1, pPowerup->integer_params[1]);
+        GainAPO2(pCar, 2, pPowerup->integer_params[2]);
+    } else {
+        if (pPowerup->integer_params[0] != 0) {
+            index = 0;
+            amount = pPowerup->integer_params[0];
+        } else if (pPowerup->integer_params[1] != 0) {
+            index = 1;
+            amount = pPowerup->integer_params[1];
+        } else {
+            index = 2;
+            amount = pPowerup->integer_params[2];
+        }
+        if (GainAPO2(pCar, index, amount) == 0) {
+            original_index = index;
+            direction = PercentageChance(50) ? 1 : -1;
+            index += direction;
+            if (index < 0) {
+                index = 2;
+            } else if (index > 2) {
+                index = 0;
+            }
+            if (GainAPO2(pCar, index, amount) == 0) {
+                index += direction;
+                if (index < 0) {
+                    index = 2;
+                } else if (index > 2) {
+                    index = 0;
+                }
+                GainAPO2(pCar, index, amount);
+            }
+            powerup_index += index - original_index;
+        }
+    }
+    if (old_armour == pCar->power_up_levels[0] && old_power == pCar->power_up_levels[1] && old_offensive == pCar->power_up_levels[2]) {
+        if (gNet_mode != eNet_mode_none) {
+            EarnCredits(gSubstitution_value_APO.initial_network[gCurrent_net_game->type]);
+        } else {
+            EarnCredits(gSubstitution_value_APO.initial[gProgram_state.skill_level]);
+        }
+        return -1;
+    }
+    return powerup_index;
+}
 
 // FUNCTION: CARMA2_HW 0x004dc470
 // FUNCTION: CARMA2_SW 0x004d8970
@@ -1221,7 +1441,64 @@ void C2_HOOK_FASTCALL MinePreCollisionStuff(void) {
     NOT_IMPLEMENTED();
 }
 
-// ActivateMine
+// FUNCTION: CARMA2_HW 0x004dd3f0
+// FUNCTION: CARMA2_SW 0x004d98f0
+// FUNCTION: CARMA2_CHEAT 0x004e2fb0
+void C2_HOOK_FASTCALL ActivateMine(tShit_mine* pMine, tPowerup* pPowerup, tCar_spec* pCar) {
+
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tShit_mine, field_0x1c, 0x1c);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tShit_mine, field_0x20, 0x20);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tShit_mine, field_0x24, 0x24);
+
+    pMine->flags = 0x5;
+    /* Integer parameter #0: direction of fire (0 - shit out, 1 - mortar fire) */
+    if (pPowerup->integer_params[0] != 0) {
+        pMine->flags = 0x45;
+    } else {
+        pMine->flags = 0x5;
+    }
+    /* Floating point param #0: Explosion delay */
+    pMine->next_think_time = GetTotalTime() - (int)(pPowerup->float_params[0] * -1000.0);
+
+    /* Floating point param #1: min y strength */
+    pMine->field3_0xc = pPowerup->float_params[1];
+
+    /* Floating point param #2: max y strength*/
+    pMine->initial_y_speed_factor = pPowerup->float_params[2];
+
+    /* Floating point param #3: max roll rate */
+    pMine->initial_z_omega_factor = pPowerup->float_params[3];
+
+    /* Floating point param #4: max pitch rate */
+    pMine->initial_x_omega_factor = pPowerup->float_params[4];
+
+    /* Floating point param #5: force needed to trigger world exlposion */
+    pMine->field_0x1c = pPowerup->float_params[5];
+
+    /* Floating point param #6: firing up vector */
+    pMine->field_0x20 = pPowerup->float_params[6];
+
+    /* Floating point param #6: firing out vector */
+    pMine->field_0x24 = pPowerup->float_params[7];
+
+    pMine->collision_info->field_0xed = 1;
+    pMine->collision_info->disable_move_rotate = 0;
+    pMine->collision_info->flags &= ~0x40;
+    if (pMine->collision_info->actor->parent == NULL) {
+        BrActorAdd(gNon_track_actor, pMine->collision_info->actor);
+    }
+    pMine->collision_info->actor->render_style = BR_RSTYLE_FACES;
+    pMine->field_0x34 = (tU8)(pPowerup - gPowerup_array);
+    PHILAddActiveObject(pMine->collision_info, NULL, NULL, NULL);
+    PHILSetObjectProperty(pMine->collision_info, 0, 1.0);
+    PHILSetObjectProperty(pMine->collision_info, 7, 1);
+    PHILSetObjectProperty(pMine->collision_info, 6, 1);
+    pMine->field_0x30 = pCar;
+    pMine->collision_info->last_special_volume = pCar->collision_info->last_special_volume;
+    pMine->collision_info->auto_special_volume = pCar->collision_info->auto_special_volume;
+    pMine->collision_info->water_d = pCar->collision_info->water_d;
+    BrVector3Copy(&pMine->collision_info->water_normal, &pCar->collision_info->water_normal);
+}
 
 // PositionMine
 
@@ -1253,7 +1530,7 @@ int C2_HOOK_FASTCALL MineExplode(tShit_mine* pMine) {
     pMine->next_think_time = GetTotalTime() + 1600;
     BrVector3Negate(&offset, &gExplosion_pix_animation_groups.groups[0].offset);
     Explode(&gExplosion_pix_animation_groups, pMine->collision_info->actor, &pMine->collision_info->actor->model->bounds, &offset);
-    DRS3StartSound3D(gCar_outlet, eSoundId_Explosion, &pMine->collision_info->actor->t.t.translate.t, &gZero_v__car, 1, 255, BR_FIXED_INT(1), BR_FIXED_INT(1));
+    DRS3StartSound3D(gCar_outlet, eSoundId_Explosion, &pMine->collision_info->actor->t.t.translate.t, &gZero_v__car, 1, 255, S3_FIXED_INT(1), S3_FIXED_INT(1));
     PipeSingleEndShitMine(pMine->collision_info->actor);
     if (pMine->collision_info->actor->parent != NULL) {
         BrActorRemove(pMine->collision_info->actor);
@@ -1274,7 +1551,66 @@ void C2_HOOK_FASTCALL TiggerMineToExplode(tCar_spec* pCar) {
 
 // ClearMineReferencesToCar
 
-// MungeShatMines
+// FUNCTION: CARMA2_HW 0x004dde20
+// FUNCTION: CARMA2_SW 0x004da320
+// FUNCTION: CARMA2_CHEAT 0x004e39e0
+void C2_HOOK_FASTCALL MungeShatMines(tU32 pTime) {
+    int i;
+    int car_vulnerable;
+    tShit_mine* mine;
+    tCar_spec* car;
+    tPhysics_object* object;
+
+    C2_HOOK_BUG_ON(REC2_ASIZE(gShit_mines) != 20);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPhysics_object, field_0x49c, 0x49c);
+
+    for (i = 0; i < (int)REC2_ASIZE(gShit_mines); i++) {
+        mine = &gShit_mines[i];
+        if (!(mine->flags & 0x1)) {
+            continue;
+        }
+        if ((mine->flags & 0x80) && mine->car != NULL) {
+            car = mine->car;
+            mine->flags &= ~0x80;
+            car_vulnerable = car->field_0x4c8 <= 1.0
+                    && !(gNet_mode != eNet_mode_none && NetPlayerFromCar(car) != NULL && NetPlayerFromCar(car)->field_0x80 != 0)
+                    && !car->invulnerable_no_crushage;
+            if (car_vulnerable) {
+                TotallySpamTheCar(car, mine->max_damage * 0.1f);
+            }
+            if (car_vulnerable && (gNet_mode == eNet_mode_none || gNet_mode == eNet_mode_host)) {
+                object = car->collision_info;
+                object->v.v[1] = (br_scalar)(FRandomBetween(mine->field3_0xc, mine->initial_y_speed_factor) / (object->M * WORLD_SCALE_D) + object->v.v[1]);
+                object = car->collision_info;
+                object->omega.v[2] = (br_scalar)((FRandomPosNeg(mine->initial_z_omega_factor) * TAU) / object->M + object->omega.v[2]);
+                object = car->collision_info;
+                object->omega.v[0] = (br_scalar)((FRandomPosNeg(mine->initial_x_omega_factor) * TAU) / object->M + object->omega.v[0]);
+                car->collision_info->disable_move_rotate = 0;
+                car->collision_info->field_0x49c = gPHIL_last_physics_tick + 40;
+                if (!car->invulnerable_no_damage) {
+                    for (i = 0; i < eDamage_count; i++) {
+                        DamageUnit2(car, (tDamage_type)i, IRandomBetween(0, (int)(mine->max_damage * 25.0f)));
+                    }
+                    if (car != mine->field_0x30) {
+                        car->last_hit_by = mine->field_0x30;
+                        car->time_last_hit = PDGetTotalTime();
+                        CrashEarnings(car, NULL);
+                    }
+                }
+            }
+        }
+        if (mine->flags & 0x20) {
+            mine->flags &= ~0x20;
+            MineExplode(mine);
+        } else if (mine->flags & 0x2) {
+            if (mine->next_think_time < pTime) {
+                mine->flags &= ~0x3;
+            }
+        } else if ((mine->flags & 0x4) && mine->next_think_time < pTime) {
+            MineExplode(mine);
+        }
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x004de000
 // FUNCTION: CARMA2_SW 0x004da500
@@ -1585,7 +1921,20 @@ void C2_HOOK_FASTCALL ResetGhostPeds(tPowerup* pPowerup, tCar_spec* pCar) {
     TurnOffGhostPeds();
 }
 
-// DoBouncey
+// FUNCTION: CARMA2_HW 0x004de9b0
+// FUNCTION: CARMA2_SW 0x004daeb0
+// FUNCTION: CARMA2_CHEAT 0x004e4570
+void C2_HOOK_FASTCALL DoBouncey(tPowerup* pPowerup, tU32 pPeriod) {
+
+    if (gProgram_state.current_car.bounce_rate <= GetTotalTime() - gProgram_state.current_car.last_bounce
+        && gProgram_state.current_car.number_of_wheels_on_ground > 2) {
+        PratcamEvent(42);
+        gProgram_state.current_car.last_bounce = GetTotalTime();
+        gProgram_state.current_car.collision_info->v.v[1] = (br_scalar)((gProgram_state.current_car.bounce_amount * (1.0 / WORLD_SCALE_D)) + gProgram_state.current_car.collision_info->v.v[1]);
+        DRS3StartSound(gCar_outlet, eSoundId_Boing);
+        gProgram_state.current_car.collision_info->disable_move_rotate = 0;
+    }
+}
 
 // HitMine
 
