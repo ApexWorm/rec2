@@ -154,6 +154,7 @@ void C2_HOOK_FASTCALL DoRunLengthX(tFlic_descriptor* pFlic_info, tU32 pChunk_len
 // PDEnterDebugger
 
 // FUNCTION: CARMA2_HW 0x0051b9a0
+// FUNCTION: CARMA2_SW 0x00515770
 // FUNCTION: CARMA2_CHEAT 0x00521250
 void C2_HOOK_FASTCALL PDAllocateActionReplayBuffer(tU8** pBuffer, tU32* pSize) {
 
