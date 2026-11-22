@@ -28,6 +28,7 @@
 
 // GLOBAL: CARMA2_HW 0x0058f5e8
 // GLOBAL: CARMA2_SW 0x0058a5e8
+// GLOBAL: CARMA2_CHEAT 0x00594678
 int gInside_camera_zone = 1;
 
 // GLOBAL: CARMA2_HW 0x0058f5fc
@@ -56,6 +57,7 @@ int gOpponent_viewing_mode;
 
 // GLOBAL: CARMA2_HW 0x006792c0
 // GLOBAL: CARMA2_SW 0x00673a30
+// GLOBAL: CARMA2_CHEAT 0x00680b70
 tU32 gSwitch_time;
 
 // GLOBAL: CARMA2_HW 0x006792c8
@@ -416,17 +418,22 @@ void C2_HOOK_FASTCALL PanningExternalCamera(tCar_spec* pCar, tU32 pTime) {
     br_vector3 tv;
     br_scalar ts;
 
+    /*
+     * 102.91955471539592: REC2_SQR(70.0 / WORLD_SCALE_D)
+     * 205.8391094307918: 9800.0 / REC2_SQR(WORLD_SCALE_D))
+     */
+
     m2 = &gCamera->t.t.mat;
     BrVector3Sub(&tv, (br_vector3*)m2->m[3], &pCar->pos);
     ts = BrVector3LengthSquared(&tv);
     if (ts > 102.91955471539592 || (gSwitch_time != 0 && (ARPipeSearchForwards() ? (gSwitch_time <= GetTotalTime()) : (gSwitch_time >= GetTotalTime())))) {
-        if ((gInside_camera_zone || ts > 205.83910943079184) && (ts > 25.f || CheckForWall(&pCar->pos, &gCamera->t.t.translate.t))) {
+        if ((gInside_camera_zone || ts > 205.83910943079184) && (ts > 25.0f || CheckForWall(&pCar->pos, &gCamera->t.t.translate.t))) {
             SetUpPanningCamera(pCar);
         }
     } else {
         gInside_camera_zone = 1;
     }
-    PointCameraAtCar(&pCar->pos, &gCamera->t.t.mat, 1.f);
+    PointCameraAtCar(&pCar->pos, &gCamera->t.t.mat, 1.0f);
 }
 
 inline int C2_HOOK_FASTCALL CheckForWall(br_vector3* pStart, br_vector3* pEnd) {
