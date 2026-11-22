@@ -778,7 +778,7 @@ intptr_t C2_HOOK_CDECL LinkCarCrushData(br_actor* pActor, void* pData) {
 // FUNCTION: CARMA2_HW 0x0042ac70
 // FUNCTION: CARMA2_SW 0x0042ad00
 // FUNCTION: CARMA2_CHEAT 0x0042ae00
-intptr_t C2_HOOK_CDECL z(br_actor* pActor, void* pData) {
+intptr_t C2_HOOK_CDECL AccumulateSquashVertices(br_actor* pActor, void* pData) {
     tAccumulateSquashVertices_UserData* context = pData;
     tUser_crush_data* crush_data = pActor->user;
 
