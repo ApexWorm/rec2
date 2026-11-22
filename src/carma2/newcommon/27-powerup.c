@@ -884,11 +884,12 @@ int C2_HOOK_FASTCALL GotCredits(tPowerup* pPowerup, tCar_spec* pCar) {
 int C2_HOOK_FASTCALL GainAPO2(tCar_spec* pCar, int pIndex, int pAmount) {
     int old;
 
-    while (pAmount < 0) {
+    if (pAmount < 0) {
         if (pCar->power_up_levels[pIndex] >= pCar->power_up_slots[pIndex]) {
             return 0;
+        } else {
+            return GainAPO2(pCar, pIndex, pCar->power_up_slots[pIndex] - pCar->power_up_levels[pIndex]);
         }
-        pAmount = pCar->power_up_slots[pIndex] - pCar->power_up_levels[pIndex];
     }
     if (pIndex == 1 && gNet_mode != eNet_mode_none && gCurrent_net_game->type == eNet_game_type_foxy && gThis_net_player_index == gIt_or_fox) {
         return 0;
