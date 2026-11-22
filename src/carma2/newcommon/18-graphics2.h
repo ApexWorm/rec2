@@ -34,6 +34,7 @@ extern int gDim_amount;
 extern int gPalette_changed;
 #endif
 extern br_pixelmap* gCurrent_palette;
+extern char* gCurrent_palette_pixels;
 extern br_pixelmap* gCurrent_splash;
 
 extern void C2_HOOK_FASTCALL DRPixelmapShadedHRectFill(br_pixelmap* pMap, int pX, int pY, int pWidth, int pHeight, br_uint_32 pColour);

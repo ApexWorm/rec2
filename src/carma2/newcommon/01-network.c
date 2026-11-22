@@ -10,6 +10,9 @@
 
 #include "04-netgame.h"
 #include "15-displays.h"
+#include "18-graphics2.h"
+#include "18b-graphics2.h"
+#include "19-font.h"
 #include "32-spark.h"
 #include "41-utility.h"
 #include "47-win95net.h"
@@ -948,11 +951,60 @@ tNet_message* C2_HOOK_FASTCALL NetGetNextMessage(tNet_game_details* pDetails, vo
 
 // ReceivedLeave
 
-// STUB: CARMA2_HW 0x004a0080
-// STUB: CARMA2_SW 0x0049c200
-// STUB: CARMA2_CHEAT 0x004a0bb0
+// FUNCTION: CARMA2_HW 0x004a0080
+// FUNCTION: CARMA2_SW 0x0049c200
+// FUNCTION: CARMA2_CHEAT 0x004a0bb0
 void C2_HOOK_FASTCALL NetFullScreenMessage(int pStr_index, int pLeave_it_up_there) {
-    NOT_IMPLEMENTED();
+    tU32 start_time;
+    const char* s;
+    int restore_screen;
+    int pixel_buffer_size;
+    char* pixels_copy;
+    char* palette_copy;
+
+    if (!(pLeave_it_up_there || (gProgram_state.racing && !gInterface_within_race_mode))) {
+        pixel_buffer_size = gBack_screen->height * gBack_screen->row_bytes;
+        pixels_copy = BrMemAllocate(pixel_buffer_size, kMem_quit_vfy_pixels);
+        palette_copy = BrMemAllocate(256 * sizeof(br_colour), kMem_quit_vfy_pal);
+        memcpy(pixels_copy, gBack_screen->pixels, pixel_buffer_size);
+        memcpy(palette_copy, gCurrent_palette_pixels, 256 * sizeof(br_colour));
+        restore_screen = 1;
+    } else {
+        restore_screen = 0;
+    }
+    FadePaletteDown();
+    LoadFont(4);
+    ClearEntireScreen();
+    s = GetMiscString(pStr_index);
+    OoerrIveGotTextInMeBoxMissus(4, s, gBack_screen,
+        gGraf_specs[gGraf_spec_index].total_width / 10,
+        gGraf_specs[gGraf_spec_index].total_height / 2 - gFonts[4].height,
+        gGraf_specs[gGraf_spec_index].total_width * 9 / 10,
+        gGraf_specs[gGraf_spec_index].total_height - 64, 1);
+    PDScreenBufferSwap(0);
+    EnsureRenderPalette();
+    EnsurePaletteUp();
+    if (!pLeave_it_up_there) {
+        start_time = PDGetTotalTime();
+        while (PDGetTotalTime() - start_time < 3000) {
+            /* FIXME: add sleep */
+        }
+        FadePaletteDown();
+        if (restore_screen) {
+            memcpy(gBack_screen->pixels, pixels_copy, pixel_buffer_size);
+            memcpy(gCurrent_palette_pixels, palette_copy, 256 * sizeof(br_colour));
+            if (pixels_copy != NULL) {
+                BrMemFree(pixels_copy);
+            }
+            if (palette_copy != NULL) {
+                BrMemFree(palette_copy);
+            }
+            PDScreenBufferSwap(0);
+            FadePaletteUp();
+        } else {
+            ClearEntireScreen();
+        }
+    }
 }
 
 // HostHasBittenTheDust
