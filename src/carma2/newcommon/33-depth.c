@@ -99,24 +99,24 @@ static void C2_HOOK_FASTCALL FrobFog(void);
 
 int C2_HOOK_CDECL Log2(int pNumber) {
     int i;
-    int bits[16];
-
-    bits[0] = 1;
-    bits[1] = 2;
-    bits[2] = 4;
-    bits[3] = 8;
-    bits[4] = 16;
-    bits[5] = 32;
-    bits[6] = 64;
-    bits[7] = 128;
-    bits[8] = 256;
-    bits[9] = 512;
-    bits[10] = 1024;
-    bits[11] = 2048;
-    bits[12] = 4096;
-    bits[13] = 0x2000;
-    bits[14] = 0x4000;
-    bits[15] = 0x8000;
+    int bits[16] = {
+        0x1,
+        0x2,
+        0x4,
+        0x8,
+        0x10,
+        0x20,
+        0x40,
+        0x80,
+        0x100,
+        0x200,
+        0x400,
+        0x800,
+        0x1000,
+        0x2000,
+        0x4000,
+        0x8000,
+    };
     for (i = REC2_ASIZE(bits) - 1; i >= 0; --i) {
         if (bits[i] & pNumber) {
             return i;
