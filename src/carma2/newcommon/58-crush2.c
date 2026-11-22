@@ -128,7 +128,7 @@ void C2_HOOK_FASTCALL ExplodeMeCarUpMeOldMatey(tCar_spec* pCar) {
     if ((pCar != NULL && pCar->driver ==  eDriver_local_human)) {
         DRS3StartSound(gCar_outlet, gExplosion_sound_id);
     } else {
-        DRS3StartSound3D(gCar_outlet, gExplosion_sound_id, &pCar->pos, &gZero_v__car, 1, 255, BR_FIXED_INT(1), BR_FIXED_INT(1));
+        DRS3StartSound3D(gCar_outlet, gExplosion_sound_id, &pCar->pos, &gZero_v__car, 1, 255, S3_FIXED_INT(1), S3_FIXED_INT(1));
     }
 }
 

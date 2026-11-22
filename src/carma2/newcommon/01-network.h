@@ -42,7 +42,7 @@ extern int C2_HOOK_FASTCALL PermitNetServiceReentrancy(void);
 
 extern void C2_HOOK_FASTCALL HaltNetServiceReentrancy(void);
 
-// NetSendHeadupToAllPlayers
+extern void C2_HOOK_FASTCALL NetSendHeadupToAllPlayers(char* pMessage);
 
 extern void C2_HOOK_FASTCALL NetSendHeadupToEverybody(const char* pMessage);
 
@@ -214,7 +214,7 @@ extern void C2_HOOK_FASTCALL CheckForPendingStartRace(void);
 
 extern void C2_HOOK_FASTCALL NetService(int pIn_race);
 
-// NetFinishRace
+extern void C2_HOOK_FASTCALL NetFinishRace(tNet_game_details* pDetails, tRace_over_reason pReason);
 
 extern void C2_HOOK_FASTCALL NetPlayerStatusChanged(tPlayer_status pNew_status);
 

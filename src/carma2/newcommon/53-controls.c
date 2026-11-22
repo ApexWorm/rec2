@@ -19,6 +19,7 @@
 #include "17-world2.h"
 #include "18b-graphics2.h"
 #include "19-font.h"
+#include "24-loadsave.h"
 #include "25-grafdata.h"
 #include "27-powerup.h"
 #include "29-raycast.h"
@@ -26,6 +27,7 @@
 #include "41-utility.h"
 #include "42-input.h"
 #include "43-pratcam.h"
+#include "52-errors.h"
 #include "59-camera.h"
 #include "62-graphics3.h"
 #include "69-sound.h"
@@ -101,6 +103,16 @@ char gString[84];
 // GLOBAL: CARMA2_CHEAT 0x00683d40
 int gInvulnerability;
 
+// GLOBAL: CARMA2_HW 0x0067c3b8
+// GLOBAL: CARMA2_SW 0x00676b30
+// GLOBAL: CARMA2_CHEAT 0x00683c68
+int gToo_late;
+
+// GLOBAL: CARMA2_HW 0x0067c3bc
+// GLOBAL: CARMA2_SW 0x00676b34
+// GLOBAL: CARMA2_CHEAT 0x00683c6c
+int gRecover_timer;
+
 // GLOBAL: CARMA2_HW 0x0067c3c8
 // GLOBAL: CARMA2_SW 0x00676b40
 // GLOBAL: CARMA2_CHEAT 0x00683c78
@@ -114,6 +126,11 @@ int gINT_0067c3f0 = 0;
 // GLOBAL: CARMA2_SW 0x00676b70
 // GLOBAL: CARMA2_CHEAT 0x00683ca8
 int gRecovery_voucher_count;
+
+// GLOBAL: CARMA2_HW 0x0067c460
+// GLOBAL: CARMA2_SW 0x00676bd8
+// GLOBAL: CARMA2_CHEAT 0x00683d10
+int gHad_auto_recover;
 
 // GLOBAL: CARMA2_HW 0x0067c46c
 // GLOBAL: CARMA2_SW 0x00676be4
@@ -154,6 +171,11 @@ tU32 gPalette_fade_time;
 // GLOBAL: CARMA2_SW 0x0058b4e8
 // GLOBAL: CARMA2_CHEAT 0x00595798
 tEdit_func* gEdit_funcs[eEdit_mode_count][18][8] = { 0 };
+
+// GLOBAL: CARMA2_HW 0x00590f60
+// GLOBAL: CARMA2_SW 0x0058bf58
+// GLOBAL: CARMA2_CHEAT 0x0059788c
+int gCancel_recover = 1;
 
 // GLOBAL: CARMA2_HW 0x0067c468
 // GLOBAL: CARMA2_SW 0x00676be0
@@ -671,7 +693,55 @@ void C2_HOOK_FASTCALL CheckHorn3D(tCar_spec* pCar) {
 
 // SetQuickRecovery
 
-// SetRecovery
+// FUNCTION: CARMA2_HW 0x00442300
+// FUNCTION: CARMA2_SW 0x004423e0
+// FUNCTION: CARMA2_CHEAT 0x00442420
+void C2_HOOK_FASTCALL SetRecovery(void) {
+
+    if (!gINT_0068b8e4
+        && !gINT_0068b8e8
+        && !gRace_finished
+        && !gProgram_state.current_car.knackered
+        && !gWait_for_it
+        && !gHad_auto_recover
+        && !gPalette_fade_time) {
+        if (gNet_mode != eNet_mode_none) {
+            if (gProgram_state.current_car.time_to_recover) {
+                if (gCancel_recover) {
+                    if (GetRaceTime() + 600 < gProgram_state.current_car.time_to_recover) {
+                        gProgram_state.current_car.time_to_recover = 0;
+                        if (!gINT_0067c470) {
+                            EarnCredits((int)(gNet_mode != eNet_mode_none ? gRecovery_cost.initial_network[gCurrent_net_game->type] : gRecovery_cost.initial[gProgram_state.skill_level]));
+                        }
+                        NewTextHeadupSlot2(4, 0, 2000, -4, GetMiscString(eMiscString_recovery_cancelled), 0);
+                    } else {
+                        NewTextHeadupSlot2(4, 0, 2000, -4, GetMiscString(eMiscString_too_late_to_cancel), 1);
+                        gToo_late = 1;
+                    }
+                }
+            } else {
+                gCancel_recover = 1;
+                if (CheckRecoverCost()) {
+                    if (gCurrent_net_game->type == eNet_game_type_foxy) {
+                        if (gThis_net_player_index == gIt_or_fox) {
+                            gProgram_state.current_car.time_to_recover = GetRaceTime() + 5000;
+                        } else {
+                            gProgram_state.current_car.time_to_recover = GetRaceTime() + 1000;
+                        }
+                    } else if (gCurrent_net_game->type == eNet_game_type_6 && gNet_players[gThis_net_player_index].field_0x80 != 0) {
+                        gProgram_state.current_car.time_to_recover = GetRaceTime() + 500;
+                    } else {
+                        gProgram_state.current_car.time_to_recover = GetRaceTime() + 3000;
+                    }
+                    gToo_late = 0;
+                }
+            }
+        } else {
+            gRecover_car = 1;
+            gRecover_timer = 0;
+        }
+    }
+}
 
 // RecoverCar
 
@@ -1223,7 +1293,136 @@ void C2_HOOK_FASTCALL UserSendMessage(void) {
     }
 }
 
-// EnterUserMessage
+// FUNCTION: CARMA2_HW 0x00444910
+// FUNCTION: CARMA2_SW 0x004449f0
+// FUNCTION: CARMA2_CHEAT 0x00444aa0
+void C2_HOOK_FASTCALL EnterUserMessage(void) {
+    // GLOBAL: CARMA2_HW 0x00590f64
+    // GLOBAL: CARMA2_SW 0x0058bf5c
+    // GLOBAL: CARMA2_CHEAT 0x00597890
+    static int last_key = -1;
+    // GLOBAL: CARMA2_HW 0x0067c49c
+    // GLOBAL: CARMA2_SW 0x00676c14
+    // GLOBAL: CARMA2_CHEAT 0x00683d44
+    static int about_to_die;
+    // GLOBAL: CARMA2_HW 0x0067c454
+    // GLOBAL: CARMA2_SW 0x00676bcc
+    // GLOBAL: CARMA2_CHEAT 0x00683d04
+    static tU32 next_time;
+    char* the_message;
+    char* p;
+    int len;
+    int the_key;
+    int abuse_num;
+
+    C2_HOOK_BUG_ON(REC2_ASIZE(gString) != 84);
+
+    the_message = &gString[20];
+    if (!gEntering_message || gNet_mode == eNet_mode_none || !gCurrent_net_game->options.enable_text_messages) {
+        return;
+    }
+    the_key = PDAnyKeyDown();
+    if (gEntering_message == 1) {
+        if (the_key == -1) {
+            gEntering_message = 2;
+            PDClearKeyboardBuffer();
+        } else {
+            return;
+        }
+    }
+    if (about_to_die) {
+        if (the_key == -1) {
+            about_to_die = 0;
+            gEntering_message = 0;
+        }
+        return;
+    }
+    if (the_key == last_key) {
+        if (next_time < PDGetTotalTime()) {
+            next_time += 100;
+        } else {
+            the_key = -1000;
+        }
+    } else {
+        last_key = the_key;
+        next_time = PDGetTotalTime() + 500;
+    }
+    switch (the_key) {
+    case -1:
+    case 0:
+        break;
+    case 51:
+    case 52:
+        len = strlen(gNet_players[gThis_net_player_index].player_name);
+        if (len > 18) {
+            break;
+        }
+        p = the_message - len - 2;
+        strcpy(p, gNet_players[gThis_net_player_index].player_name);
+        p[len + 0] = ':';
+        p[len + 1] = ' ';
+        gString[REC2_ASIZE(gString) - 1] = '\0';
+        NetSendHeadupToAllPlayers(p);
+        the_message[0] = '\0';
+        NewTextHeadupSlot(4, 0, 1000, -4, GetMiscString(eMiscString_message_sent));
+        about_to_die = 1;
+        break;
+    case 2:
+    case 3:
+    case 53:
+    case 63:
+        about_to_die = 1;
+        break;
+    case 50:
+    case 65:
+    case 70:
+        len = strlen(the_message);
+        if (len > 0) {
+            the_message[len - 1] = '\0';
+        }
+        break;
+    default:
+        if (gKey_mapping[71] == the_key) {
+            about_to_die = 1;
+            break;
+        }
+        if (the_key >= 75 && the_key <= 105) {
+            if (the_key >= 81 && the_key <= 90) {
+                if (the_key == 81) {
+                    abuse_num = 9;
+                } else {
+                    abuse_num = the_key - 82;
+                }
+                if (gAbuse_text[abuse_num] != NULL) {
+                    strcpy(the_message, gAbuse_text[abuse_num]);
+                }
+                break;
+            } else {
+                gEntering_message = 0;
+                break;
+            }
+        }
+        for (;;) {
+            int raw_ch = PDGetKeyboardCharacter();
+            int ch;
+
+            if (raw_ch == '\0') {
+                break;
+            }
+            ch = (tU8)PDConvertToASCIILessThan128((char)raw_ch);
+            len = strlen(the_message);
+            if (len < (int)REC2_ASIZE(gString) - 20 - 1) {
+                the_message[len] = (char)ch;
+                if ((tU8)the_message[len] < gFonts[4].offset || (tU8)the_message[len] >= gFonts[4].offset + gFonts[4].num_entries) {
+                    the_message[len] = '\0';
+                }
+                the_message[len + 1] = '\0';
+                dr_dprintf("NETMESSAGE: '%s'", the_message);
+            }
+        }
+        break;
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x00444c00
 // FUNCTION: CARMA2_SW 0x00444ce0

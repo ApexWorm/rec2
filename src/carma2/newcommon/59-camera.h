@@ -66,11 +66,11 @@ extern int C2_HOOK_FASTCALL IncidentCam(tCar_spec* pCar, tU32 pTime);
 
 // MoveCamToIncident
 
-// PanningExternalCamera
+extern void C2_HOOK_FASTCALL PanningExternalCamera(tCar_spec* pCar, tU32 pTime);
 
-// CheckForWall
+extern int C2_HOOK_FASTCALL CheckForWall(br_vector3* pStart, br_vector3* pEnd);
 
-// SetUpPanningCamera
+extern void C2_HOOK_FASTCALL SetUpPanningCamera(tCar_spec* c);
 
 extern void C2_HOOK_FASTCALL SaveCameraPosition(int pIndex);
 
@@ -90,7 +90,7 @@ extern void C2_HOOK_FASTCALL RestoreCameraPosition(int pIndex);
 
 // SwingCamera
 
-// PointCameraAtCar
+extern void C2_HOOK_FASTCALL PointCameraAtCar(br_vector3* pPos, br_matrix34* pMat, float pFov_factor);
 
 extern void C2_HOOK_FASTCALL PointCamera(const br_vector3* pPos, br_matrix34* pMat);
 
