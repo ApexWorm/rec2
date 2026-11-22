@@ -745,6 +745,7 @@ typedef enum {
     ePipe_model_mash = 24,
     ePipe_chunk_relink = 25,
     ePipe_chunk_identity = 26,
+    ePipe_chunk_split_weld = 27,
     ePipe_chunk_explosion = 31,
     ePipe_chunk_non_car_creation = 32,
     ePipe_chunk_smash_model_change = 33,
@@ -791,11 +792,23 @@ typedef struct {
 } tPipe_chunk_smash_model_change;
 
 typedef struct {
+    br_vector4 plane;
+    int split;
+} tPipe_chunk_split_weld;
+
+typedef struct {
     tCar_spec* car_spec;
     undefined4 field_0x4;
     br_pixelmap* texture1;
     br_pixelmap* texture2;
 } tPipe_smash_texture_change;
+
+typedef struct {
+    tU8 field_0x0;
+    br_scalar water_d;
+    br_vector3 normal;
+    br_bounds3 bb;
+} tPipe_chunk_extended_splash;
 
 typedef struct {
     br_scalar water_d;
@@ -814,6 +827,7 @@ typedef struct tPipe_chunk {
         tPipe_funk_enable funk_enable;
         tPipe_chunk_shrapnel shrapnel;
         tPipe_chunk_identity identity;
+        tPipe_chunk_split_weld split_weld;
         tPipe_chunk_flap flap;
         tPipe_chunk_splash splash;
         tPipe_chunk_relink relink;
@@ -1134,7 +1148,9 @@ typedef struct {
     float initial_y_speed_factor;
     float initial_z_omega_factor;
     float initial_x_omega_factor;
-    undefined field_0x1c[12];
+    float field_0x1c;
+    float field_0x20;
+    float field_0x24;
     tCar_spec* car;
     float max_damage;
     tCar_spec* field_0x30;
@@ -5250,11 +5266,11 @@ typedef struct {
         br_actor* actor;
         tPedestrian* ped;
         tPhysics_object* phil_object;
+        void* ptr;
     } object;
     undefined4 type;
     float water_density;
     br_vector3 normal;
-    float field_0x18;
     br_bounds3 bb;
 } tReplay_splash;
 
@@ -5357,6 +5373,7 @@ typedef struct {
 typedef enum {
     eNet_message_chunk_type_5 = 0x5,
     eNet_message_chunk_poll_car_details = 0x6,
+    eNet_message_chunk_type_race_over = 0xa,
     eNet_message_chunk_type_start_race = 0xc,
     eNet_message_chunk_type_headup = 0xd,
     eNet_message_chunk_type_netsynch = 0xe,
@@ -5377,6 +5394,11 @@ typedef struct {
     tU8 size;
     tU8 type;
 } tNet_message_chunk_header;
+
+typedef struct {
+    tNet_message_chunk_header header;
+    tRace_over_reason reason;
+} tNet_message_chunk_race_over;
 
 typedef struct {
     tU8 index;
@@ -5573,6 +5595,7 @@ typedef struct {
 
 typedef union {
     tNet_message_chunk_raw raw;
+    tNet_message_chunk_race_over race_over; /* type = 0xa */
     tNet_message_chunk_start_race start_race; /* type = 0xc */
     tNet_message_headup headup; /* type = 0xd */
     tNet_message_chunk_scores scores; /* type = 0x18 */

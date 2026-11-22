@@ -15,6 +15,13 @@
 extern int gPed_count_limbed_actors;
 extern br_actor* gLimbs_actor;
 extern tSmashable_initial_position_spec gGiblet_initial_position;
+extern float gGiblet_scrape_start;
+extern tSlick_spec gPed_slick;
+extern int gPed_spurting_period;
+extern br_material* gPed_smear_material;
+extern tExplosion_animation gPed_explosion_small_blood_cloud;
+extern tExplosion_animation gPed_medium_blood_cloud;
+extern tExplosion_animation gPed_large_blood_cloud;
 extern tMovement_spec gGiblet_initial_speed;
 extern tShrapnel_time_info gGiblet_min_max_time;
 extern int gGiblet_size_count;
@@ -131,9 +138,9 @@ extern void C2_HOOK_FASTCALL ReadPedSpecs(FILE* pF);
 
 extern br_vector3* C2_HOOK_FASTCALL GetPedPos(tPedestrian* pPed);
 
-// SetUpGibSlicks
+extern void C2_HOOK_FASTCALL SetUpGibSlicks(void);
 
-// ReadInGiblets
+extern void C2_HOOK_FASTCALL ReadInGiblets(FILE* pFile);
 
 // ReadSettingsFile
 
@@ -445,7 +452,7 @@ extern void C2_HOOK_FASTCALL SetGoreLevel(int pNewLevel);
 
 // ScaleModelXYZ
 
-// DRScaleModel
+extern void C2_HOOK_FASTCALL ScaleModel(br_model* pModel, float pScale);
 
 // DisposeMove
 
@@ -497,7 +504,7 @@ extern tPed_personality* C2_HOOK_FASTCALL ReadPersonality(const char* pName);
 
 extern tPed_personality* C2_HOOK_FASTCALL FindOrOpenPersonality(const char* pName);
 
-// BuildCharacterInstance
+extern tPed_character_instance* C2_HOOK_FASTCALL BuildCharacterInstance(const char* pGroup_name, br_matrix34* pMat34);
 
 extern br_matrix34* C2_HOOK_FASTCALL GetCharacterMatrixPtr(tPed_character_instance* pCharacter);
 
