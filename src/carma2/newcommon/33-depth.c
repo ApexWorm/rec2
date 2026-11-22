@@ -9,16 +9,23 @@
 #include "33-depth.h"
 
 #include "00-car.h"
+#include "07-structur.h"
 #include "15-displays.h"
 #include "17-world2.h"
+#include "36-trig.h"
 #include "37-brucetrk.h"
 #include "41-utility.h"
 #include "52-errors.h"
+#include "55-volume.h"
+#include "66-tintedpoly.h"
 #include "globvars.h"
 #include "globvrkm.h"
+#include "platform.h"
 #include "rec2_macros.h"
 
 #include "c2_stdio.h"
+
+#include <math.h>
 
 // GLOBAL: CARMA2_HW 0x00591188
 // GLOBAL: CARMA2_SW 0x0058c180
@@ -82,6 +89,11 @@ int gHas_sky_texture;
 // GLOBAL: CARMA2_SW 0x00795180
 // GLOBAL: CARMA2_CHEAT 0x007a62c0
 br_pixelmap* gDepth_shade_table;
+
+// GLOBAL: CARMA2_HW 0x0079ec44
+// GLOBAL: CARMA2_SW 0x007951a4
+// GLOBAL: CARMA2_CHEAT 0x007a62e4
+tSpecial_volume* gLast_camera_special_volume;
 
 static void C2_HOOK_FASTCALL FrobFog(void);
 
@@ -344,13 +356,152 @@ void C2_HOOK_FASTCALL RenderLollipops(br_pixelmap* pRender_buffer, br_pixelmap* 
 
 // DepthEffectSky
 
-// DoWobbleCamera
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
 
-// DoDrugWobbleCamera
+// STUB: CARMA2_HW 0x00446680
+// STUB: CARMA2_SW 0x00446700
+// STUB: CARMA2_CHEAT 0x00446ba0
+void C2_HOOK_FASTCALL DoWobbleCamera(br_actor* pCamera) {
+    NOT_IMPLEMENTED();
+}
 
-// DoSubaquaCam
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
-// DoSpecialCameraEffect
+inline void C2_HOOK_FASTCALL DoDrugWobbleCamera(br_actor* pCamera) {
+    float f_time;
+    // GLOBAL: CARMA2_HW 0x005911d0
+    // GLOBAL: CARMA2_SW 0x0058c1c8
+    // GLOBAL: CARMA2_CHEAT 0x00597b28
+    static float mag00 = 0.03f;
+    // GLOBAL: CARMA2_HW 0x005911d4
+    // GLOBAL: CARMA2_SW 0x0058c1cc
+    // GLOBAL: CARMA2_CHEAT 0x00597b2c
+    static float mag01 = 0.03f;
+    // GLOBAL: CARMA2_HW 0x005911d8
+    // GLOBAL: CARMA2_SW 0x0058c1d0
+    // GLOBAL: CARMA2_CHEAT 0x00597b30
+    static float mag02 = 0.03f;
+    // GLOBAL: CARMA2_HW 0x005911dc
+    // GLOBAL: CARMA2_SW 0x0058c1d4
+    // GLOBAL: CARMA2_CHEAT 0x00597b34
+    static float mag10 = 0.2f;
+    // GLOBAL: CARMA2_HW 0x005911e0
+    // GLOBAL: CARMA2_SW 0x0058c1d8
+    // GLOBAL: CARMA2_CHEAT 0x00597b38
+    static float mag11 = 0.07f;
+    // GLOBAL: CARMA2_HW 0x005911e4
+    // GLOBAL: CARMA2_SW 0x0058c1dc
+    // GLOBAL: CARMA2_CHEAT 0x00597b3c
+    static float mag12 = 0.03f;
+    // GLOBAL: CARMA2_HW 0x005911e8
+    // GLOBAL: CARMA2_SW 0x0058c1e0
+    // GLOBAL: CARMA2_CHEAT 0x00597b40
+    static float mag20 = 0.02f;
+    // GLOBAL: CARMA2_HW 0x005911ec
+    // GLOBAL: CARMA2_SW 0x0058c1e4
+    // GLOBAL: CARMA2_CHEAT 0x00597b44
+    static float mag21 = 0.03f;
+    // GLOBAL: CARMA2_HW 0x005911f0
+    // GLOBAL: CARMA2_SW 0x0058c1e8
+    // GLOBAL: CARMA2_CHEAT 0x00597b48
+    static float mag22 = 0.01f;
+    // GLOBAL: CARMA2_HW 0x005911f4
+    // GLOBAL: CARMA2_SW 0x0058c1ec
+    // GLOBAL: CARMA2_CHEAT 0x00597b4c
+    static float period00 = 550.f;
+    // GLOBAL: CARMA2_HW 0x005911f8
+    // GLOBAL: CARMA2_SW 0x0058c1f0
+    // GLOBAL: CARMA2_CHEAT 0x00597b50
+    static float period01 = 700.f;
+    // GLOBAL: CARMA2_HW 0x005911fc
+    // GLOBAL: CARMA2_SW 0x0058c1f4
+    // GLOBAL: CARMA2_CHEAT 0x00597b54
+    static float period02 = 200.f;
+    // GLOBAL: CARMA2_HW 0x00591200
+    // GLOBAL: CARMA2_SW 0x0058c1f8
+    // GLOBAL: CARMA2_CHEAT 0x00597b58
+    static float period10 = 100.f;
+    // GLOBAL: CARMA2_HW 0x00591204
+    // GLOBAL: CARMA2_SW 0x0058c1fc
+    // GLOBAL: CARMA2_CHEAT 0x00597b5c
+    static float period11 = 1300.f;
+    // GLOBAL: CARMA2_HW 0x00591208
+    // GLOBAL: CARMA2_SW 0x0058c200
+    // GLOBAL: CARMA2_CHEAT 0x00597b60
+    static float period12 = 500.f;
+    // GLOBAL: CARMA2_HW 0x0059120c
+    // GLOBAL: CARMA2_SW 0x0058c204
+    // GLOBAL: CARMA2_CHEAT 0x00597b64
+    static float period20 = 800.f;
+    // GLOBAL: CARMA2_HW 0x00591210
+    // GLOBAL: CARMA2_SW 0x0058c208
+    // GLOBAL: CARMA2_CHEAT 0x00597b68
+    static float period21 = 1500.f;
+    // GLOBAL: CARMA2_HW 0x00591214
+    // GLOBAL: CARMA2_SW 0x0058c20c
+    // GLOBAL: CARMA2_CHEAT 0x00597b6c
+    static float period22 = 300.f;
+
+    f_time = (float)(tS32)PDGetTotalTime();
+    pCamera->t.t.mat.m[0][0] += FastScalarSin((int)fmod(f_time / period00 * 360.f, 360.f)) * mag00;
+    pCamera->t.t.mat.m[0][1] += FastScalarSin((int)fmod(f_time / period01 * 360.f, 360.f)) * mag01;
+    pCamera->t.t.mat.m[0][2] += FastScalarSin((int)fmod(f_time / period02 * 360.f, 360.f)) * mag02;
+    pCamera->t.t.mat.m[1][0] += FastScalarSin((int)fmod(f_time / period10 * 360.f, 360.f)) * mag10;
+    pCamera->t.t.mat.m[1][1] += FastScalarSin((int)fmod(f_time / period11 * 360.f, 360.f)) * mag11;
+    pCamera->t.t.mat.m[1][2] += FastScalarSin((int)fmod(f_time / period12 * 360.f, 360.f)) * mag12;
+    pCamera->t.t.mat.m[2][0] += FastScalarSin((int)fmod(f_time / period20 * 360.f, 360.f)) * mag20;
+    pCamera->t.t.mat.m[2][1] += FastScalarSin((int)fmod(f_time / period21 * 360.f, 360.f)) * mag21;
+    pCamera->t.t.mat.m[2][2] += FastScalarSin((int)fmod(f_time / period22 * 360.f, 360.f)) * mag22;
+}
+
+inline int C2_HOOK_FASTCALL DoSubaquaCam(void) {
+    int submerged;
+
+    submerged = 0;
+    if (InWater(gHud_tinted1) != NULL) {
+        TurnTintedPolyOn(gHud_tinted1);
+        submerged = 1;
+    } else {
+        TurnTintedPolyOff(gHud_tinted1);
+    }
+    return submerged;
+}
+
+// FUNCTION: CARMA2_HW 0x00446340
+// FUNCTION: CARMA2_SW 0x004463c0
+// FUNCTION: CARMA2_CHEAT 0x00446860
+void C2_HOOK_FASTCALL DoSpecialCameraEffect(br_actor* pCamera, br_matrix34* pCamera_to_world) {
+
+    UpdateTintedPolys();
+    if (gOn_drugs && !gAction_replay_mode) {
+        TurnTintedPolyOn(gHud_tinted2);
+        DoDrugWobbleCamera(pCamera);
+    } else {
+        TurnTintedPolyOff(gHud_tinted2);
+        gLast_camera_special_volume = FindSpecialVolume((br_vector3*)pCamera_to_world->m[3], gLast_camera_special_volume, 0);
+        if (gLast_camera_special_volume != NULL) {
+            switch (gLast_camera_special_volume->camera_special_effect_index) {
+            case 0:
+                DoWobbleCamera(pCamera);
+            default:
+                break;
+            }
+        }
+        if (gHas_sky_texture && gSky_on) {
+            if ((gProgram_state.current_depth_effect.sky_texture != NULL) == (gLast_camera_special_volume != NULL && gLast_camera_special_volume->sky_col == -2)) {
+                ToggleSkyQuietly();
+            }
+        }
+    }
+    SetTintedPolyRefMaterial(gHud_tinted1, (br_vector3*)pCamera_to_world->m[3]);
+    if (DoSubaquaCam()) {
+        DoWobbleCamera(pCamera);
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x00446890
 // FUNCTION: CARMA2_SW 0x00446910

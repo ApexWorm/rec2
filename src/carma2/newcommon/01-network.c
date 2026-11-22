@@ -301,7 +301,10 @@ void C2_HOOK_FASTCALL HaltNetServiceReentrancy(void) {
 
 // STUB: CARMA2_HW 0x0049d430
 // STUB: CARMA2_SW 0x004995b0
-// NetSendHeadupToAllPlayers
+// STUB: CARMA2_CHEAT 0x0049d7e0
+void C2_HOOK_FASTCALL NetSendHeadupToAllPlayers(char* pMessage) {
+    NOT_IMPLEMENTED();
+}
 
 // FUNCTION: CARMA2_HW 0x0049d780
 // FUNCTION: CARMA2_SW 0x00499900
@@ -1115,7 +1118,19 @@ void C2_HOOK_FASTCALL NetService(int pIn_race) {
     gIn_net_service = 0;
 }
 
-// NetFinishRace
+// FUNCTION: CARMA2_HW 0x004a5710
+// FUNCTION: CARMA2_SW 0x004a1890
+// FUNCTION: CARMA2_CHEAT 0x004a6610
+void C2_HOOK_FASTCALL NetFinishRace(tNet_game_details* pDetails, tRace_over_reason pReason) {
+    tNet_message* the_message;
+
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tNet_message_chunk_race_over, reason, 0x4);
+
+    gSynch_race_start = 0;
+    the_message = NetBuildGuaranteedMessage(eNet_message_chunk_type_race_over, 0);
+    the_message->contents.race_over.reason = pReason;
+    NetGuaranteedSendMessageToAllPlayers(gCurrent_net_game, the_message, NULL);
+}
 
 // STUB: CARMA2_HW 0x004a57e0
 // STUB: CARMA2_SW 0x004a1960
