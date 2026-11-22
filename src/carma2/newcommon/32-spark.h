@@ -268,7 +268,7 @@ extern void* C2_HOOK_FASTCALL GetSplashIndex(tPhysics_object* pObject);
 
 // ClearSplashes
 
-// AdjustSplashReplay
+extern void C2_HOOK_FASTCALL AdjustSplashReplay(void* pObject, int pType, float pWater_density, br_vector3* pNormal, br_bounds3* pBounds);
 
 extern void C2_HOOK_FASTCALL InitReplaySplashes(void);
 
