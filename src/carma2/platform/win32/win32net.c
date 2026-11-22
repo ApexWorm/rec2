@@ -47,6 +47,7 @@ struct sockaddr gLocal_address;
 struct sockaddr gLocal_address_2;
 
 // GLOBAL: CARMA2_HW 0x006ac358
+// GLOBAL: CARMA2_SW 0x006a58a8
 // GLOBAL: CARMA2_CHEAT 0x006b39e8
 struct sockaddr* gPtr_local_address; /* FIXME: rename to gLocal_addr_ipx? */
 
