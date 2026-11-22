@@ -84,7 +84,7 @@ extern int gPed_valium_left;
 
 extern int C2_HOOK_FASTCALL OrientationChanged(const br_matrix34* pOrientation_1, const br_matrix34* pOrientation_2, float pCos_angle);
 
-// AssertRootObjectsMatrix
+extern void C2_HOOK_FASTCALL AssertRootObjectsMatrix(tPed_character_instance* pPed);
 
 // InitFaceCaches
 
