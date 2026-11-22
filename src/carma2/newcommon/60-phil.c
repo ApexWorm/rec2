@@ -531,6 +531,7 @@ int C2_HOOK_CDECL PHILSetObjectProperty(tPhysics_object* pCollision_info, int pP
 
 // STUB: CARMA2_HW 0x004b6530
 // STUB: CARMA2_SW 0x004b2c50
+// STUB: CARMA2_CHEAT 0x004bc010
 float C2_HOOK_FASTCALL PHILGetObjectProperty(tPhysics_object* pObject, int pProperty) {
     NOT_IMPLEMENTED();
 }

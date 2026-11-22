@@ -306,6 +306,7 @@ br_pixelmap* C2_HOOK_FASTCALL DRImageLoad(const char* pPath) {
 
 // FUNCTION: CARMA2_HW 0x00513970
 // FUNCTION: CARMA2_SW 0x0050edb0
+// FUNCTION: CARMA2_CHEAT 0x00519360
 br_pixelmap* C2_HOOK_FASTCALL DRPixelmapLoad(char* pFile_name) {
     br_pixelmap* the_map;
 
@@ -1061,6 +1062,7 @@ int C2_HOOK_FASTCALL NormalSideOfPlane(br_vector3* pPoint, br_vector3* pNormal, 
 }
 
 // FUNCTION: CARMA2_HW 0x00515780
+// FUNCTION: CARMA2_SW 0x00510bf0
 // FUNCTION: CARMA2_CHEAT 0x0051b170
 br_material* C2_HOOK_FASTCALL DRMaterialClone(br_material* pMaterial, int pSet_identifier) {
     br_material* the_material;
@@ -1068,6 +1070,8 @@ br_material* C2_HOOK_FASTCALL DRMaterialClone(br_material* pMaterial, int pSet_i
     int version;
 
     // GLOBAL: CARMA2_HW 0x006abefc
+    // GLOBAL: CARMA2_SW 0x006a544c
+    // GLOBAL: CARMA2_CHEAT 0x006b358c
     static int gVersion_suffix;
 
     the_material = BrMaterialAllocate(NULL);
@@ -1479,7 +1483,7 @@ void C2_HOOK_FASTCALL DRPlaneEquation(br_vector4* pDst, const br_vector3* pN, co
 // FUNCTION: CARMA2_SW 0x005117c0
 // FUNCTION: CARMA2_CHEAT 0x0051bd70
 int C2_HOOK_FASTCALL DRVector3NonZero(const br_vector3* pV) {
-    if (pV->v[0] == 0.f && pV->v[1] == 0.f && pV->v[2] == 0.f) {
+    if (pV->v[0] == 0.0f && pV->v[1] == 0.0f && pV->v[2] == 0.0f) {
         return 0;
     } else {
         return 1;
