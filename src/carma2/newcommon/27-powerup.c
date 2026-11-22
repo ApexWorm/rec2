@@ -2306,7 +2306,7 @@ void C2_HOOK_FASTCALL SetChangingPowerup(br_actor* pActor) {
         }
         PFfclose(f);
     }
-    BrMatrix34PreTranslate(&pActor->t.t.mat, .0f, .1f, .0f);
+    BrMatrix34PreTranslate(&pActor->t.t.mat, 0.0f, 0.1f, 0.0f);
     pActor->model = gModel_powerup_armor;
     pActor->model->flags |= BR_MODF_CUSTOM;
     pActor->model->custom = RenderChangingPowerup;
