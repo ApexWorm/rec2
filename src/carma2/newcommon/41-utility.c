@@ -1061,6 +1061,7 @@ int C2_HOOK_FASTCALL NormalSideOfPlane(br_vector3* pPoint, br_vector3* pNormal, 
 }
 
 // FUNCTION: CARMA2_HW 0x00515780
+// FUNCTION: CARMA2_SW 0x00510bf0
 // FUNCTION: CARMA2_CHEAT 0x0051b170
 br_material* C2_HOOK_FASTCALL DRMaterialClone(br_material* pMaterial, int pSet_identifier) {
     br_material* the_material;
@@ -1068,6 +1069,8 @@ br_material* C2_HOOK_FASTCALL DRMaterialClone(br_material* pMaterial, int pSet_i
     int version;
 
     // GLOBAL: CARMA2_HW 0x006abefc
+    // GLOBAL: CARMA2_SW 0x006a544c
+    // GLOBAL: CARMA2_CHEAT 0x006b358c
     static int gVersion_suffix;
 
     the_material = BrMaterialAllocate(NULL);
