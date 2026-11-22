@@ -778,7 +778,7 @@ intptr_t C2_HOOK_CDECL LinkCarCrushData(br_actor* pActor, void* pData) {
 // FUNCTION: CARMA2_HW 0x0042ac70
 // FUNCTION: CARMA2_SW 0x0042ad00
 // FUNCTION: CARMA2_CHEAT 0x0042ae00
-intptr_t C2_HOOK_CDECL z(br_actor* pActor, void* pData) {
+intptr_t C2_HOOK_CDECL AccumulateSquashVertices(br_actor* pActor, void* pData) {
     tAccumulateSquashVertices_UserData* context = pData;
     tUser_crush_data* crush_data = pActor->user;
 
@@ -2228,9 +2228,19 @@ void C2_HOOK_FASTCALL ARApplyFlap(br_actor* pActor, br_angle pAngle) {
         parent_model->vertices[flap->field_0xc].p.v[2]);
 }
 
-// ARApplySplitWeld
+// STUB: CARMA2_HW 0x0043c240
+// STUB: CARMA2_SW 0x0043c290
+// STUB: CARMA2_CHEAT 0x0043c490
+void C2_HOOK_FASTCALL ARApplySplitWeld(tCar_spec* pCar, const br_vector4* pPlane) {
+    NOT_IMPLEMENTED();
+}
 
-// ARUndoSplitWeld
+// STUB: CARMA2_HW 0x0043c3d0
+// STUB: CARMA2_SW 0x0043c420
+// STUB: CARMA2_CHEAT 0x0043c620
+void C2_HOOK_FASTCALL ARUndoSplitWeld(tCar_spec* pCar) {
+    NOT_IMPLEMENTED();
+}
 
 // ReceivedCrush
 

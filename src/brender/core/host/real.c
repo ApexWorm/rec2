@@ -253,7 +253,6 @@ C2_MATCHING_NAKED br_error C2_HOOK_CDECL RealSelectorBegin(void) {
         ret
     }
 #else
-    NOT_IMPLEMENTED();
     return 0x1002;
 #endif
 }
