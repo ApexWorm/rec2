@@ -422,8 +422,8 @@ void C2_HOOK_FASTCALL SetCharacterMoveAR(tPed_character_instance* pCharacter, in
     if (gAction_replay_mode && !gBOOL_00744804) {
         return;
     }
-    if (pSpeed == 0.f) {
-        pSpeed = 0.f;
+    if (pSpeed == 0.0f) {
+        pSpeed = 0.0f;
     }
     mat = GetCharacterMatrixPtr(pCharacter);
     BrVector3Copy(&old_pos, (br_vector3*)mat->m[3]);
