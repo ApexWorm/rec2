@@ -103,11 +103,29 @@ int C2_HOOK_FASTCALL Collinear(const br_vector3* pV1, const br_vector3* pV2, con
 // AddPointToPolyhedron
 
 #ifdef REC2_MATCHING
-// STUB: CARMA2_HW 0x00421fd0
-// STUB: CARMA2_SW 0x00422050
+// FUNCTION: CARMA2_HW 0x00421fd0
+// FUNCTION: CARMA2_SW 0x00422050
+// FUNCTION: CARMA2_CHEAT 0x00422220
 undefined4* C2_HOOK_FASTCALL FUN_00421fd0(int pCount_points) {
-    NOT_IMPLEMENTED();
     /* Unused */
+    undefined4* result;
+    int count_faces;
+    int count_indices;
+
+    count_faces = pCount_points - 2;
+    count_indices = count_faces * 3;
+
+    result = BrMemAllocate((count_indices + count_faces * 16 + (pCount_points + 2) * 6) * 2, BR_MEMORY_APPLICATION);
+    if (result == NULL) {
+        return NULL;
+    }
+    result[3] = (undefined4)(result + 6);
+    result[4] = (undefined4)((br_vector3*)result[3] + pCount_points);
+    result[5] = (undefined4)((tU16*)result[4] + count_indices);
+    result[0] = 0;
+    result[1] = 0;
+    result[2] = 0;
+    return result;
 }
 #endif
 
