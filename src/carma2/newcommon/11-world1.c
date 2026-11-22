@@ -8,11 +8,15 @@
 
 #include "11-world1.h"
 
+#include "00-car.h"
+#include "08-loading1.h"
+
 #include "15-displays.h"
 #include "28-world3.h"
 #include "41-utility.h"
 #include "55-volume.h"
 #include "61-pedestrn.h"
+#include "70-packfile.h"
 #include "globvars.h"
 
 #include "c2_stdio.h"
@@ -41,10 +45,12 @@ br_actor* gSpec_vol_actors[100];
 int gSpec_vol_mode;
 
 // GLOBAL: CARMA2_HW 0x006b6400
+// GLOBAL: CARMA2_SW 0x006ad0e0
 // GLOBAL: CARMA2_CHEAT 0x006bdaa0
 char gAdditional_model_path[256];
 
 // GLOBAL: CARMA2_HW 0x006b6500
+// GLOBAL: CARMA2_SW 0x006ad1e0
 // GLOBAL: CARMA2_CHEAT 0x006bdba0
 char gAdditional_actor_path[256];
 
@@ -52,6 +58,16 @@ char gAdditional_actor_path[256];
 // GLOBAL: CARMA2_SW 0x006ad2e0
 // GLOBAL: CARMA2_CHEAT 0x006bdca0
 br_actor* gLast_actor;
+
+// GLOBAL: CARMA2_HW 0x006b6620
+// GLOBAL: CARMA2_SW 0x006ad300
+// GLOBAL: CARMA2_CHEAT 0x006bdcc0
+br_model* gAdditional_models[1000];
+
+// GLOBAL: CARMA2_HW 0x006ab948
+// GLOBAL: CARMA2_SW 0x006a5398
+// GLOBAL: CARMA2_CHEAT 0x006b2fd8
+int gNumber_of_additional_models;
 
 // FUNCTION: CARMA2_HW 0x00507210
 // FUNCTION: CARMA2_SW 0x00502660
@@ -79,7 +95,15 @@ br_uint_32 C2_HOOK_FASTCALL DeleteBastards(br_actor* pActor, br_matrix34* pMatri
     return 0;
 }
 
-// DeleteAnyZeroBastards
+inline void C2_HOOK_FASTCALL DeleteAnyZeroBastards(void) {
+    int i;
+
+    gDelete_count = 0;
+    DRActorEnumRecurseWithTrans(gAdditional_actors, NULL, DeleteBastards, NULL);
+    for (i = gDelete_count - 1; i >= 0; i--) {
+        BrActorRemove(gDelete_list[i]);
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x005072b0
 // FUNCTION: CARMA2_SW 0x00502700
@@ -147,18 +171,87 @@ void C2_HOOK_FASTCALL UpdateSpecVol(void) {
     }
 }
 
-// PutAdditionalNonCarsOnToAdditionalActors
+inline void C2_HOOK_FASTCALL PutAdditionalNonCarsOnToAdditionalActors(void) {
+    int i;
+    tNon_car_spec* non_car;
 
-// PutAdditionalNonCarsOnToNonTrackActor
+    for (i = 0; i < gNum_active_non_cars; i++) {
+        non_car = gActive_non_car_list[i];
+        if ((tU16)non_car->car_ID == 0xffff && non_car->car_master_actor->parent == gNon_track_actor) {
+            BrActorRemove(non_car->car_master_actor);
+            BrActorAdd(gAdditional_actors, non_car->car_master_actor);
+        }
+    }
+}
+
+inline void C2_HOOK_FASTCALL PutAdditionalNonCarsOnToNonTrackActor(void) {
+    int i;
+    tNon_car_spec* non_car;
+
+    for (i = 0; i < gNum_active_non_cars; i++) {
+        non_car = gActive_non_car_list[i];
+        if ((tU16)non_car->car_ID == 0xffff && non_car->car_master_actor->parent == gAdditional_actors) {
+            BrActorRemove(non_car->car_master_actor);
+            BrActorAdd(gNon_track_actor, non_car->car_master_actor);
+        }
+    }
+}
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x00506f40
-// STUB: CARMA2_CHEAT 0x0050c930
+// FUNCTION: CARMA2_HW 0x00506f40
+// FUNCTION: CARMA2_SW 0x00502390
+// FUNCTION: CARMA2_CHEAT 0x0050c930
 void C2_HOOK_FASTCALL SaveAdditionalActors(void) {
-    NOT_IMPLEMENTED();
+    int index;
+    int found_free_name;
+    tPath_name base_name;
+    tPath_name file_name;
+    char* dot;
+    FILE* f;
+
+    index = 0;
+    found_free_name = 0;
+    PutAdditionalNonCarsOnToAdditionalActors();
+    DeleteAnyZeroBastards();
+    if (gLast_actor != NULL) {
+        DRActorEnumRecurseWithTrans(gLast_actor, NULL, ApplyTransToModels, NULL);
+    }
+    if (strstr(gAdditional_actor_path, "autosave") != NULL) {
+        BrActorSave(gAdditional_actor_path, gAdditional_actors);
+        BrModelSaveMany(gAdditional_model_path, gAdditional_models, gNumber_of_additional_models);
+    } else {
+        sprintf(base_name, "%s", gAdditional_actor_path);
+        dot = strstr(base_name, ".");
+        if (dot != NULL) {
+            *dot = '\0';
+        }
+        while (!found_free_name) {
+            sprintf(file_name, "%s%04d.ACT", base_name, index);
+            f = DRfopen(file_name, "rb");
+            if (f != NULL) {
+                PFfclose(f);
+                index++;
+            } else {
+                found_free_name = 1;
+            }
+        }
+        strcpy(file_name, base_name);
+        sprintf(base_name, "%s%04d.ACT", file_name, index);
+        BrActorSave(base_name, gAdditional_actors);
+        BrActorSave(gAdditional_actor_path, gAdditional_actors);
+        sprintf(file_name, "%s", gAdditional_model_path);
+        dot = strstr(file_name, ".");
+        if (dot != NULL) {
+            *dot = '\0';
+        }
+        sprintf(base_name, "%s%04d.DAT", file_name, index);
+        BrModelSaveMany(base_name, gAdditional_models, gNumber_of_additional_models);
+        BrModelSaveMany(gAdditional_model_path, gAdditional_models, gNumber_of_additional_models);
+    }
+    PutAdditionalNonCarsOnToNonTrackActor();
 }
 
 #ifdef REC2_MATCHING
