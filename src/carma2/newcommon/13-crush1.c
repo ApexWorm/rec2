@@ -1131,10 +1131,8 @@ int C2_HOOK_FASTCALL OutsideEdgeLine(const br_vector3* pPoint, const br_vector3*
 
     BrVector3Normalise(&direction, pDirection);
     BrVector3Sub(&offset, pPoint, pA);
-    /* The original recomputes the dot product after each component changes. */
-    direction.v[0] *= BrVector3Dot(&offset, &direction);
-    direction.v[1] *= BrVector3Dot(&offset, &direction);
-    direction.v[2] *= BrVector3Dot(&offset, &direction);
+    /* FIXME: The original recomputes the dot product after each component changes, using a modified direction. */
+    BrVector3Scale(&direction, &direction, BrVector3Dot(&offset, &direction));
     BrVector3Sub(&offset, &offset, &direction);
     BrVector3Sub(&inside_offset, pInside, pA);
     return !(BrVector3Dot(&offset, &inside_offset) >= 0.0f);
@@ -1154,6 +1152,7 @@ float C2_HOOK_FASTCALL PointTriangleDistSq(const br_vector3* pP, const br_vector
 
     BrVector3Sub(&ab, pB, pA);
     BrVector3Sub(&bc, pC, pB);
+    BrVector3Sub(&ca, pA, pC);
     BrVector3Cross(&normal, &ab, &bc);
     BrVector3Normalise(&normal, &normal);
     BrVector3Sub(&offset, pP, pA);
@@ -1166,11 +1165,10 @@ float C2_HOOK_FASTCALL PointTriangleDistSq(const br_vector3* pP, const br_vector
     if (OutsideEdgeLine(&projected, pB, &bc, pA)) {
         return PointEdgeDistSq(pP, pB, pC);
     }
-    BrVector3Sub(&ca, pA, pC);
     if (OutsideEdgeLine(&projected, pA, &ca, pB)) {
         return PointEdgeDistSq(pP, pA, pC);
     }
-    return distance * distance;
+    return REC2_SQR(distance);
 }
 
 // FUNCTION: CARMA2_HW 0x0042ce00
