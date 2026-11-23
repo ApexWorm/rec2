@@ -5411,6 +5411,7 @@ typedef enum {
     eNet_message_chunk_type_start_race = 0xc,
     eNet_message_chunk_type_headup = 0xd,
     eNet_message_chunk_type_netsynch = 0xe,
+    eNet_message_chunk_type_powerup = 0x16,
     eNet_message_chunk_type_player_scores = 0x18,
     eNet_message_chunk_type_gameplay = 0x1b,
     eNet_message_chunk_type_oil_spill = 0x1f,
@@ -5627,11 +5628,21 @@ typedef struct {
     tU8 object_hierarchy[];
 } tNet_message_chunk_mine_explode;
 
+typedef struct {
+    tNet_message_chunk_header header;
+    undefined field_0x2[0x4-0x2];
+    tPlayer_ID player;
+    int powerup_index;
+    tU32 time_left;
+    int event;
+} tNet_message_chunk_powerup;
+
 typedef union {
     tNet_message_chunk_raw raw;
     tNet_message_chunk_race_over race_over; /* type = 0xa */
     tNet_message_chunk_start_race start_race; /* type = 0xc */
     tNet_message_headup headup; /* type = 0xd */
+    tNet_message_chunk_powerup powerup; /* type = 0x16 */
     tNet_message_chunk_scores scores; /* type = 0x18 */
     tNet_message_chunk_gameplay gameplay; /* type = 0x1b */
     tNet_message_chunk_oil_spill oil_spill; /* type = 0x1f*/
