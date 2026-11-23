@@ -353,7 +353,7 @@ extern void C2_HOOK_FASTCALL ApplyGWS(tPipe_chunk** pChunk);
 
 extern void C2_HOOK_FASTCALL ApplyProxRay(tPipe_chunk** pChunk);
 
-// ApplySkidAdjustment
+extern void C2_HOOK_FASTCALL ApplySkidAdjustment(tPipe_chunk** pChunk);
 
 extern void C2_HOOK_FASTCALL ApplyFlap(tPipe_chunk** pChunk);
 

@@ -1913,7 +1913,15 @@ void C2_HOOK_FASTCALL ApplyProxRay(tPipe_chunk** pChunk) {
         (*pChunk)->data.prox_ray.time);
 }
 
-// ApplySkidAdjustment
+// FUNCTION: CARMA2_HW 0x004c9810
+// FUNCTION: CARMA2_SW 0x004c5f40
+// FUNCTION: CARMA2_CHEAT 0x004cf330
+void C2_HOOK_FASTCALL ApplySkidAdjustment(tPipe_chunk** pChunk) {
+
+    AdjustSkid((*pChunk)->subject_index,
+        &(*pChunk)->data.skid_adjustment.matrix,
+        (*pChunk)->data.skid_adjustment.material);
+}
 
 // FUNCTION: CARMA2_HW 0x004c9830
 // FUNCTION: CARMA2_SW 0x004c5f60
