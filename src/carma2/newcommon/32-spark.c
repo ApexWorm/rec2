@@ -533,9 +533,21 @@ void C2_HOOK_FASTCALL DoSolidGraniteThing(tCar_spec* pCar) {
     NOT_IMPLEMENTED();
 }
 
-// DoTrueColModelThing
+#ifdef REC2_HW
+// STUB: CARMA2_HW 0x004f9180
+// STUB: CARMA2_CHEAT 0x004fee20
+void C2_HOOK_CDECL DoTrueColModelThing(br_actor* pActor, br_model* pModel, br_material* pMaterial, void* pArg4, br_uint_8 pArg5, int pArg6) {
+    NOT_IMPLEMENTED();
+}
 
-// SetFoxModelCallback
+// FUNCTION: CARMA2_HW 0x004f95e0
+// FUNCTION: CARMA2_CHEAT 0x004ff280
+int C2_HOOK_FASTCALL SetFoxModelCallback(br_model* pModel) {
+
+    pModel->flags |= BR_MODF_CUSTOM;
+    pModel->custom = DoTrueColModelThing;
+    return 1;
+}
 
 // FUNCTION: CARMA2_HW 0x004f9390
 // FUNCTION: CARMA2_CHEAT 0x004ff030
@@ -563,9 +575,11 @@ int C2_HOOK_FASTCALL ResetFoxLighting(br_material* pMaterial) {
 // SetFoxLighting
 
 // SetupAlternateFoxEffect
+#endif
 
 // FUNCTION: CARMA2_HW 0x004f9760
 // FUNCTION: CARMA2_SW 0x004f4de0
+// FUNCTION: CARMA2_CHEAT 0x004ff400
 int C2_HOOK_FASTCALL RestorePixelmap(br_material* pMaterial) {
 
     if (pMaterial->colour_map != pMaterial->user) {
