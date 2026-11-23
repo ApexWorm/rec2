@@ -125,7 +125,7 @@ extern void C2_HOOK_FASTCALL CancelAlternateFoxEffect(tCar_spec* pCar_spec);
 
 extern int C2_HOOK_FASTCALL SetFoxLighting(br_material* pMaterial);
 
-// SetupAlternateFoxEffect
+extern void C2_HOOK_FASTCALL SetupAlternateFoxEffect(tCar_spec* pCar_spec);
 #endif
 
 extern int C2_HOOK_FASTCALL RestorePixelmap(br_material* pMaterial);
