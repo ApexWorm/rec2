@@ -1830,7 +1830,19 @@ void C2_HOOK_FASTCALL ApplyFlame(tPipe_chunk** pChunk) {
         (*pChunk)->data.flame.offset_x);
 }
 
-// ApplySplash
+// FUNCTION: CARMA2_HW 0x004c92d0
+// FUNCTION: CARMA2_SW 0x004c5a00
+// FUNCTION: CARMA2_CHEAT 0x004cedf0
+void C2_HOOK_FASTCALL ApplySplash(tPipe_chunk** pChunk) {
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk, data, 0x4);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPhysics_object, water_normal, 0x244);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPhysics_object, water_d, 0x250);
+
+    ((tPhysics_object*)(*pChunk)->subject_index)->water_d = (*pChunk)->data.splash.water_d;
+    ((tPhysics_object*)(*pChunk)->subject_index)->water_normal.v[0] = (*pChunk)->data.splash.normal.v[0];
+    ((tPhysics_object*)(*pChunk)->subject_index)->water_normal.v[1] = (*pChunk)->data.splash.normal.v[1];
+    ((tPhysics_object*)(*pChunk)->subject_index)->water_normal.v[2] = (*pChunk)->data.splash.normal.v[2];
+}
 
 // ApplyExtendedSplash
 
