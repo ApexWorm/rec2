@@ -379,7 +379,7 @@ extern void C2_HOOK_FASTCALL ApplyNonCarCreation(tPipe_chunk** pChunk);
 
 extern void C2_HOOK_FASTCALL ApplySmashModelChange(tPipe_chunk** pChunk);
 
-// ApplySmashRemoveFaces
+extern void C2_HOOK_FASTCALL ApplySmashRemoveFaces(tPipe_chunk** pChunk);
 
 extern void C2_HOOK_FASTCALL ApplySmashDecal(tPipe_chunk** pChunk);
 

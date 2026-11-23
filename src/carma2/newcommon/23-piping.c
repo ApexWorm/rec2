@@ -2044,7 +2044,14 @@ void C2_HOOK_FASTCALL ApplySmashModelChange(tPipe_chunk** pChunk) {
     }
 }
 
-// ApplySmashRemoveFaces
+// FUNCTION: CARMA2_HW 0x004c9a10
+// FUNCTION: CARMA2_SW 0x004c6140
+// FUNCTION: CARMA2_CHEAT 0x004cf540
+void C2_HOOK_FASTCALL ApplySmashRemoveFaces(tPipe_chunk** pChunk) {
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk, data, 0x4);
+
+    SmashRemoveSomeFaces((br_model*)(*pChunk)->subject_index, (*pChunk)->data.remove_faces.count);
+}
 
 // FUNCTION: CARMA2_HW 0x004c9a20
 // FUNCTION: CARMA2_SW 0x004c6150
