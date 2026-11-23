@@ -2019,17 +2019,17 @@ void C2_HOOK_FASTCALL SmashRemoveSomeFaces(br_model* pModel, int pCount) {
 // FUNCTION: CARMA2_HW 0x004f5fa0
 // FUNCTION: CARMA2_SW 0x004f1c00
 // FUNCTION: CARMA2_CHEAT 0x004fbc40
-void C2_HOOK_FASTCALL SmashRestoreSomeFaces(br_model* pModel, int pFace_count, const tU16* pFace_data, br_material* pMaterial) {
+void C2_HOOK_FASTCALL SmashRestoreSomeFaces(br_model* pModel, int pFace_count, const tPipe_remove_face* pFace_data, br_material* pMaterial) {
     br_face* face;
     int i;
 
     face = &pModel->faces[pModel->nfaces];
     for (i = 0; i < pFace_count; i++) {
         face->material = pMaterial;
-        face->vertices[0] = pFace_data[4 * i + 0];
-        face->vertices[1] = pFace_data[4 * i + 1];
-        face->vertices[2] = pFace_data[4 * i + 2];
-        face->smoothing = pFace_data[4 * i + 3];
+        face->vertices[0] = pFace_data[i].vertices[0];
+        face->vertices[1] = pFace_data[i].vertices[1];
+        face->vertices[2] = pFace_data[i].vertices[2];
+        face->smoothing = pFace_data[i].smoothing;
         face->flags = 0;
         face++;
     }
