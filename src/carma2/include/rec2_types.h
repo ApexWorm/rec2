@@ -827,6 +827,7 @@ typedef struct tPipe_chunk {
         tPipe_funk_enable funk_enable;
         tPipe_chunk_shrapnel shrapnel;
         tPipe_chunk_identity identity;
+        tPipe_chunk_flame flame;
         tPipe_chunk_split_weld split_weld;
         tPipe_chunk_flap flap;
         tPipe_chunk_splash splash;

@@ -331,7 +331,7 @@ extern void C2_HOOK_FASTCALL ApplyNonCar(tPipe_chunk** pChunk);
 
 extern void C2_HOOK_FASTCALL ApplySmokeColumn(tPipe_chunk** pChunk);
 
-// ApplyFlame
+extern void C2_HOOK_FASTCALL ApplyFlame(tPipe_chunk** pChunk);
 
 // ApplySplash
 
