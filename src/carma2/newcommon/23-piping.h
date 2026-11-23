@@ -431,7 +431,7 @@ extern void C2_HOOK_FASTCALL ApplyVector3(tPipe_chunk** pChunk);
 
 extern void C2_HOOK_FASTCALL ApplyDroneCornerPos(tPipe_chunk** pChunk);
 
-// ApplyDroneStraightPos
+extern void C2_HOOK_FASTCALL ApplyDroneStraightPos(tPipe_chunk** pChunk);
 
 extern void C2_HOOK_FASTCALL ApplyDroneUnused(tPipe_chunk** pChunk);
 

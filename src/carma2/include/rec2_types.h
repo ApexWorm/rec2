@@ -876,6 +876,7 @@ typedef struct tPipe_chunk {
         tPipe_chunk_napalm_bolt napalm_bolt;
         tPipe_ped_dir_data ped_dir;
         tPipe_ped_fp_change_data ped_fp_change;
+        tPipe_single_drone_straight_pos drone_straight_pos;
         tPipe_chunk_repulse_ray repulse_ray;
         tPipe_chunk_oil_spill oil_spill;
         tPipe_chunk_extended_splash extended_splash;

@@ -2266,7 +2266,16 @@ void C2_HOOK_FASTCALL ApplyDroneCornerPos(tPipe_chunk** pChunk) {
         &(*pChunk)->data.drone_corner_pos.matrix);
 }
 
-// ApplyDroneStraightPos
+// FUNCTION: CARMA2_HW 0x004c9cf0
+// FUNCTION: CARMA2_SW 0x004c6420
+// FUNCTION: CARMA2_CHEAT 0x004cf820
+void C2_HOOK_FASTCALL ApplyDroneStraightPos(tPipe_chunk** pChunk) {
+
+    ApplyDroneStraightPos2((*pChunk)->subject_index,
+        (*pChunk)->data.drone_straight_pos.section,
+        (*pChunk)->data.drone_straight_pos.speed,
+        (*pChunk)->data.drone_straight_pos.distance);
+}
 
 // FUNCTION: CARMA2_HW 0x004c9d10
 // FUNCTION: CARMA2_SW 0x004c6440
