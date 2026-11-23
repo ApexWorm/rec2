@@ -655,10 +655,21 @@ void C2_HOOK_CDECL SetCharacterPhysicsLevelAR(tPed_character_instance* pCharacte
 
 // PedApplyPedPhysics
 
-// STUB: CARMA2_HW 0x004ca830
-// STUB: CARMA2_SW 0x004c6f60
+// FUNCTION: CARMA2_HW 0x004ca830
+// FUNCTION: CARMA2_SW 0x004c6f60
+// FUNCTION: CARMA2_CHEAT 0x004d0370
 void C2_HOOK_FASTCALL PedApplyPedPos(tPedestrian* pPedestrian, br_vector3* pPos) {
-    NOT_IMPLEMENTED();
+
+    if (!gBOOL_00744804) {
+        if (pPos->v[0] == 0.f && pPos->v[1] == 0.f && pPos->v[2] == 0.f) {
+            pPedestrian->flags |= 0x80;
+        } else {
+            SetCharacterPosition(pPedestrian->character, pPos, -1);
+            if (pPedestrian->flags & 0x80) {
+                pPedestrian->flags &= ~0x80;
+            }
+        }
+    }
 }
 
 // FUNCTION: CARMA2_HW 0x004ca890
@@ -2926,7 +2937,20 @@ void C2_HOOK_FASTCALL SetCharacterDirection(tPed_character_instance* pPed, const
 #pragma auto_inline(on)
 #endif
 
-// SetCharacterPosition
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_HW 0x0040b0a0
+// STUB: CARMA2_SW 0x0040b090
+// STUB: CARMA2_CHEAT 0x0040b110
+void C2_HOOK_FASTCALL SetCharacterPosition(tPed_character_instance* pCharacter, br_vector3* pPos, int pArg3) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // DisposeClonedMaterials
 
