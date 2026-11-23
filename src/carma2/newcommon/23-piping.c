@@ -1756,7 +1756,14 @@ void C2_HOOK_FASTCALL DoSmudge(tPipe_chunk** pChunk, int pDir) {
     }
 }
 
-// ApplySpark
+// FUNCTION: CARMA2_HW 0x004c9140
+// FUNCTION: CARMA2_SW 0x004c5870
+// FUNCTION: CARMA2_CHEAT 0x004cec60
+void C2_HOOK_FASTCALL ApplySpark(tPipe_chunk** pChunk) {
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk, data, 0x4);
+
+    AdjustSpark((*pChunk)->subject_index, &(*pChunk)->data.spark.p, &(*pChunk)->data.spark.v);
+}
 
 // FUNCTION: CARMA2_HW 0x004c9160
 // FUNCTION: CARMA2_SW 0x004c5890

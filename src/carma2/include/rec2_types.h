@@ -831,6 +831,7 @@ typedef struct tPipe_chunk {
         tPipe_chunk_flap flap;
         tPipe_chunk_splash splash;
         tPipe_chunk_relink relink;
+        tPipe_chunk_spark spark;
         tPipe_chunk_smash_model_change smash_model_change;
         tPipe_smash_texture_change smash_texture_change;
         tPipe_single_transform_type transform_type;
