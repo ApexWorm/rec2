@@ -2225,7 +2225,19 @@ void C2_HOOK_FASTCALL ApplyDSModel(tPipe_chunk** pChunk) {
     }
 }
 
-// ApplyPedDiagnostics
+// FUNCTION: CARMA2_HW 0x004c9c70
+// FUNCTION: CARMA2_SW 0x004c63a0
+// FUNCTION: CARMA2_CHEAT 0x004cf7a0
+void C2_HOOK_FASTCALL ApplyPedDiagnostics(tPipe_chunk** pChunk) {
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk, data, 0x4);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_ped_diagnostic, instance, 0x54);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_ped_diagnostic, cache, 0x140);
+
+    AdjustPedDiagnostics((*pChunk)->subject_index,
+        &(*pChunk)->data.ped_diagnostic.ped,
+        &(*pChunk)->data.ped_diagnostic.instance,
+        &(*pChunk)->data.ped_diagnostic.cache);
+}
 
 // FUNCTION: CARMA2_HW 0x004c9c90
 // FUNCTION: CARMA2_SW 0x004c63c0

@@ -838,6 +838,7 @@ typedef struct tPipe_chunk {
         tPipe_chunk_non_car non_car;
         tPipe_ped_physics_data ped_physics;
         tPipe_single_ped_pos ped_pos;
+        tPipe_ped_diagnostic ped_diagnostic;
         tPipe_single_ped_dismember ped_dismember;
         tPipe_phil_object phil_object;
         tPipe_funk_enable funk_enable;
