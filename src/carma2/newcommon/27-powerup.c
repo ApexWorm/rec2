@@ -101,7 +101,22 @@ int gCollision_info_uid_counter;
 // GLOBAL: CARMA2_HW 0x00705560
 // GLOBAL: CARMA2_SW 0x006fc020
 // GLOBAL: CARMA2_CHEAT 0x0070cc00
-tShit_mine gShit_mines[20];
+tShit_mine gShit_mines[20] = { 0 };
+
+// GLOBAL: CARMA2_HW 0x007059c0
+// GLOBAL: CARMA2_SW 0x006fc480
+// GLOBAL: CARMA2_CHEAT 0x0070d060
+int gCount_mutant_tail_parts = 0;
+
+// GLOBAL: CARMA2_HW 0x007059c4
+// GLOBAL: CARMA2_SW 0x006fc484
+// GLOBAL: CARMA2_CHEAT 0x0070d064
+int gINT_007059c4 = 0;
+
+// GLOBAL: CARMA2_HW 0x007059c8
+// GLOBAL: CARMA2_SW 0x006fc488
+// GLOBAL: CARMA2_CHEAT 0x0070d068
+int gINT_007059c8 = 0;
 
 // GLOBAL: CARMA2_HW 0x006a0ae0
 // GLOBAL: CARMA2_SW 0x0069ab38
@@ -182,11 +197,6 @@ int gPed_dismemberfest;
 // GLOBAL: CARMA2_SW 0x0073b2b8
 // GLOBAL: CARMA2_CHEAT 0x0074be98
 int gPanicking_peds;
-
-// GLOBAL: CARMA2_HW 0x007059c0
-// GLOBAL: CARMA2_SW 0x006fc480
-// GLOBAL: CARMA2_CHEAT 0x0070d060
-int gCount_mutant_tail_parts;
 
 // GLOBAL: CARMA2_HW 0x006a0458
 // GLOBAL: CARMA2_SW 0x0069a4b0
@@ -1438,10 +1448,23 @@ inline void C2_HOOK_FASTCALL FillInMine(tNet_message_chunk* pChunk, tShit_mine* 
 
 // SendMines
 
-// STUB: CARMA2_HW 0x004dd1b0
-// STUB: CARMA2_SW 0x004d96b0
+// FUNCTION: CARMA2_HW 0x004dd1b0
+// FUNCTION: CARMA2_SW 0x004d96b0
+// FUNCTION: CARMA2_CHEAT 0x004e2d70
 void C2_HOOK_FASTCALL MinePreCollisionStuff(void) {
-    NOT_IMPLEMENTED();
+    int i;
+    tPhysics_object* object;
+
+    for (i = 0; i < (int)REC2_ASIZE(gShit_mines); i++) {
+        if (gShit_mines[i].flags & 0x1) {
+            object = gShit_mines[i].collision_info;
+            if (object->field_0x261 == 0x31 && object->message_time == gPHIL_last_physics_tick) {
+                object->field_0xf0 = 1;
+                WriteHierarchyNetworkStuff(object->field_0x294, object, 2);
+                object->field_0x261 = 0;
+            }
+        }
+    }
 }
 
 // FUNCTION: CARMA2_HW 0x004dd3f0
