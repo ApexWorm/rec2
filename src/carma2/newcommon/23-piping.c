@@ -2528,7 +2528,16 @@ void C2_HOOK_FASTCALL UndoSmashTextureChange(tPipe_chunk** pChunk, tPipe_chunk* 
         chunk->data.smash_texture_change.texture1);
 }
 
-// UndoActorTrans
+// FUNCTION: CARMA2_HW 0x004ca180
+// FUNCTION: CARMA2_SW 0x004c68b0
+// FUNCTION: CARMA2_CHEAT 0x004cfcc0
+void C2_HOOK_FASTCALL UndoActorTrans(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
+
+    (void)pPrev_chunk;
+    (*pChunk)->data.actor_trans.actor->t.t.translate.t.v[0] -= (*pChunk)->data.actor_trans.delta.v[0];
+    (*pChunk)->data.actor_trans.actor->t.t.translate.t.v[1] -= (*pChunk)->data.actor_trans.delta.v[1];
+    (*pChunk)->data.actor_trans.actor->t.t.translate.t.v[2] -= (*pChunk)->data.actor_trans.delta.v[2];
+}
 
 // UndoPedStatus
 
