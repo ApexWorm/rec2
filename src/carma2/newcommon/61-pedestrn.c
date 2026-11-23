@@ -1370,7 +1370,13 @@ void C2_HOOK_FASTCALL DoGibShower(tU32 pId, tU32 pTime, unsigned int pSeed, floa
     srand(seed);
 }
 
-// PedApplyGibShower
+// FUNCTION: CARMA2_HW 0x004ccae0
+// FUNCTION: CARMA2_SW 0x004c91e0
+// FUNCTION: CARMA2_CHEAT 0x004d2650
+void C2_HOOK_FASTCALL PedApplyGibShower(tU32 pId, tU32 pTime, unsigned int pSeed, float pForce, int pStart_size, br_vector3* pPosition, br_vector3* pAlternate_position, br_vector3* pImpactee_velocity) {
+
+    DoGibShower(pId, pTime, pSeed, pForce, pStart_size, pPosition, pAlternate_position, pImpactee_velocity);
+}
 
 // PedUndoGibShower
 
