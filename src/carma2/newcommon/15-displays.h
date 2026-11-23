@@ -76,7 +76,7 @@ extern void C2_HOOK_FASTCALL DoPSPowerupHeadups(void);
 
 extern int C2_HOOK_FASTCALL FindAHeadupHoleWoofBarkSoundsABitRude(int pSlot_index);
 
-// IsHeadupTextClever
+extern int C2_HOOK_FASTCALL IsHeadupTextClever(char* pText);
 
 extern int C2_HOOK_FASTCALL MungeHeadupWidth(tHeadup* pHeadup);
 
