@@ -14,6 +14,7 @@ address,type,name
 0x0057c3c0,library,_strstr
 0x0057c450,library,_tolower
 0x0057c550,library,_srand
+0x0057c560,library,_rand
 0x0057c7ba,library,__CIfmod
 0x0057c7f0,library,_div
 0x0057c8f0,library,_fprintf

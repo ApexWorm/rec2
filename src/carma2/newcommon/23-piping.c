@@ -2149,7 +2149,19 @@ void C2_HOOK_FASTCALL ApplyPHILObject(tPipe_chunk** pChunk) {
 
 // ApplyGibShower
 
-// ApplyBloodSpurt
+// FUNCTION: CARMA2_HW 0x004c9bc0
+// FUNCTION: CARMA2_SW 0x004c62f0
+// FUNCTION: CARMA2_CHEAT 0x004cf6f0
+void C2_HOOK_FASTCALL ApplyBloodSpurt(tPipe_chunk** pChunk) {
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk, data, 0x4);
+
+    PedApplyBloodSpurt((*pChunk)->subject_index,
+        (*pChunk)->data.blood_spurt.time,
+        (*pChunk)->data.blood_spurt.seed,
+        &(*pChunk)->data.blood_spurt.position,
+        &(*pChunk)->data.blood_spurt.impactee_velocity,
+        &(*pChunk)->data.blood_spurt.normal);
+}
 
 // FUNCTION: CARMA2_HW 0x004c9be0
 // FUNCTION: CARMA2_SW 0x004c6310

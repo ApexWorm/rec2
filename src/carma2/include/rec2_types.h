@@ -797,6 +797,14 @@ typedef struct {
 } tPipe_chunk_smash_model_change;
 
 typedef struct {
+    unsigned int seed;
+    tU32 time;
+    br_vector3 position;
+    br_vector3 impactee_velocity;
+    br_vector3 normal;
+} tPipe_chunk_blood_spurt;
+
+typedef struct {
     br_vector4 plane;
     int split;
 } tPipe_chunk_split_weld;
@@ -869,6 +877,7 @@ typedef struct tPipe_chunk {
         tPipe_chunk_actor_trans actor_trans;
         tPipe_chunk_smoke_column smoke_column;
         tPipe_chunk_explosion explosion;
+        tPipe_chunk_blood_spurt blood_spurt;
         tPipe_single_groove_on_of groove;
         tPipe_single_vanished_dismembered vanished_dismembered;
         tPipe_single_ds_model ds_model;
