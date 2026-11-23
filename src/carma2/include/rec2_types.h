@@ -635,6 +635,16 @@ typedef struct {
 } tPipe_chunk_shrapnel;
 
 typedef struct {
+    undefined4 field_0x0;
+    tU32 uid;
+    tU32 time;
+    float force;
+    br_vector3 p1;
+    br_vector3 p2;
+    br_vector3 v;
+} tPipe_chunk_gib_shower;
+
+typedef struct {
     tSmoke_column_core core;
     tU16 vertex;
 } tPipe_chunk_smoke_column;
@@ -773,6 +783,7 @@ typedef enum {
     ePipe_chunk_single_ped_pos = 46,
     ePipe_chunk_single_ped_model_change = 47,
     ePipe_chunk_phil_object = 48,
+    ePipe_chunk_gib_shower = 49,
     ePipe_single_groove_on_off = 51,
     ePipe_chunk_powerup_got = 52,
     ePipe_chunk_powerup_lose = 53,
@@ -877,6 +888,7 @@ typedef struct tPipe_chunk {
         tPipe_chunk_shit_mine shit_mine;
         tPipe_chunk_end_shit_mine end_shit_mine;
         tPipe_chunk_prox_ray prox_ray;
+        tPipe_chunk_gib_shower gib_shower;
         tPipe_smudge_data smudge;
         tPipe_model_mash model_mash;
         tPipe_chunk_bend bend;
