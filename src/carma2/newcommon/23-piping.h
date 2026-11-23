@@ -335,7 +335,7 @@ extern void C2_HOOK_FASTCALL ApplyFlame(tPipe_chunk** pChunk);
 
 extern void C2_HOOK_FASTCALL ApplySplash(tPipe_chunk** pChunk);
 
-// ApplyExtendedSplash
+extern void C2_HOOK_FASTCALL ApplyExtendedSplash(tPipe_chunk** pChunk);
 
 // ApplyOilSpill
 
