@@ -1276,15 +1276,34 @@ void C2_HOOK_FASTCALL FreeConnotations(tConnotations* pConnotations, int pKeep_a
 
 // ExtrapolateTextureCoordinates
 
-// ExtrapolateGeometryCoordinates2
-
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x004f36c0
-// STUB: CARMA2_SW 0x004ef320
+// FUNCTION: CARMA2_HW 0x004f36c0
+// FUNCTION: CARMA2_SW 0x004ef320
+// FUNCTION: CARMA2_CHEAT 0x004f9360
 void C2_HOOK_FASTCALL ExtrapolateGeometryCoordinates(tSmash_quad_mapping* pMapping, br_vector2* pMap, br_vertex* pVertex) {
+    br_scalar dx0;
+    br_scalar dy0;
+    br_scalar dx1;
+    br_scalar dy1;
+
+    dx0 = pMapping->triangles[0].map_other.v[0] - pMap->v[0];
+    dy0 = pMapping->triangles[0].map_other.v[1] - pMap->v[1];
+    dx1 = pMapping->triangles[1].map_other.v[0] - pMap->v[0];
+    dy1 = pMapping->triangles[1].map_other.v[1] - pMap->v[1];
+    if (dx0 * dx0 + dy0 * dy0 > dx1 * dx1 + dy1 * dy1) {
+        ExtrapolateGeometryCoordinates2(pMapping, &pMapping->triangles[1], pMap, pVertex);
+    } else {
+        ExtrapolateGeometryCoordinates2(pMapping, &pMapping->triangles[0], pMap, pVertex);
+    }
+}
+
+// STUB: CARMA2_HW 0x004f3740
+// STUB: CARMA2_SW 0x004ef3a0
+// STUB: CARMA2_CHEAT 0x004f93e0
+void C2_HOOK_FASTCALL ExtrapolateGeometryCoordinates2(tSmash_quad_mapping* pMapping, tSmash_triangle_mapping* pTriangle, br_vector2* pMap, br_vertex* pVertex) {
     NOT_IMPLEMENTED();
 }
 
