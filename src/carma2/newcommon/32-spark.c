@@ -214,10 +214,14 @@ br_material* gSplash_material[20];
 // GLOBAL: CARMA2_CHEAT 0x006b02d0
 br_model* gSplash_model;
 
+// GLOBAL: CARMA2_HW 0x0079ec38
 // GLOBAL: CARMA2_SW 0x00795198
+// GLOBAL: CARMA2_CHEAT 0x007a62d8
 br_pixelmap* gFog_shade_table;
 
+// GLOBAL: CARMA2_HW 0x0079ec24
 // GLOBAL: CARMA2_SW 0x00795184
+// GLOBAL: CARMA2_CHEAT 0x007a62c4
 br_pixelmap* gAcid_shade_table;
 
 // DrawDot

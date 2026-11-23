@@ -8,6 +8,8 @@
 
 #include "33-depth.h"
 
+#include "32-spark.h"
+
 #include "00-car.h"
 #include "07-structur.h"
 #include "15-displays.h"
@@ -89,6 +91,36 @@ int gHas_sky_texture;
 // GLOBAL: CARMA2_SW 0x00795180
 // GLOBAL: CARMA2_CHEAT 0x007a62c0
 br_pixelmap* gDepth_shade_table;
+
+// GLOBAL: CARMA2_HW 0x0067c4bc
+// GLOBAL: CARMA2_SW 0x00676c34
+// GLOBAL: CARMA2_CHEAT 0x00683d64
+int gDepth_shade_table_power;
+
+// GLOBAL: CARMA2_HW 0x0067c4a4
+// GLOBAL: CARMA2_SW 0x00676c1c
+// GLOBAL: CARMA2_CHEAT 0x00683d4c
+int gFog_shade_table_power;
+
+// GLOBAL: CARMA2_HW 0x0067c4dc
+// GLOBAL: CARMA2_SW 0x00676c54
+// GLOBAL: CARMA2_CHEAT 0x00683d84
+int gAcid_shade_table_power;
+
+// GLOBAL: CARMA2_HW 0x0079ec28
+// GLOBAL: CARMA2_SW 0x00795188
+// GLOBAL: CARMA2_CHEAT 0x007a62c8
+br_pixelmap* gWater_shade_table;
+
+// GLOBAL: CARMA2_HW 0x0067c4cc
+// GLOBAL: CARMA2_SW 0x00676c44
+// GLOBAL: CARMA2_CHEAT 0x00683d74
+int gWater_shade_table_power;
+
+// GLOBAL: CARMA2_HW 0x0067c4d8
+// GLOBAL: CARMA2_SW 0x00676c50
+// GLOBAL: CARMA2_CHEAT 0x00683d80
+br_actor* gForward_sky_actor;
 
 // GLOBAL: CARMA2_HW 0x0079ec44
 // GLOBAL: CARMA2_SW 0x007951a4
@@ -303,7 +335,33 @@ void C2_HOOK_FASTCALL InstantDepthChange(tDepth_effect_type pType, br_pixelmap* 
 
 // EdgeU
 
-// CreateHorizonModel
+inline br_model* C2_HOOK_FASTCALL CreateHorizonModel(br_actor* pCamera) {
+    tU8 nbands;
+    tU8 band;
+    int vertex;
+    tU8 stripe;
+    br_model* model;
+
+    nbands = 21;
+    model = BrModelAllocate(NULL, 88, 6 * nbands);
+    model->flags |= BR_MODF_KEEP_ORIGINAL;
+    for (band = 0; band < nbands; band++) {
+        for (stripe = 0; stripe < 3; stripe++) {
+            vertex = 6 * band + 2 * stripe;
+            model->faces[vertex + 0].vertices[0] = stripe + 4 * band + 0;
+            model->faces[vertex + 0].vertices[1] = stripe + 4 * band + 1;
+            model->faces[vertex + 0].vertices[2] = stripe + 4 * band + 5;
+            model->faces[vertex + 1].vertices[0] = stripe + 4 * band + 0;
+            model->faces[vertex + 1].vertices[1] = stripe + 4 * band + 5;
+            model->faces[vertex + 1].vertices[2] = stripe + 4 * band + 4;
+            model->faces[vertex + 0].smoothing = 1;
+            model->faces[vertex + 1].smoothing = 1;
+            model->faces[vertex + 0].material = NULL;
+            model->faces[vertex + 1].material = NULL;
+        }
+    }
+    return model;
+}
 
 // FUNCTION: CARMA2_HW 0x00445860
 // FUNCTION: CARMA2_SW 0x004455f0
@@ -334,11 +392,43 @@ void C2_HOOK_FASTCALL LoadDepthTable(char* pName, br_pixelmap** pTable, int* pPo
 #undef PTABLE_PIXEL_AT
 }
 
-// STUB: CARMA2_HW 0x00445620
-// STUB: CARMA2_SW 0x00445450
-// STUB: CARMA2_CHEAT 0x00445b40
+// FUNCTION: CARMA2_HW 0x00445620
+// FUNCTION: CARMA2_SW 0x00445450
+// FUNCTION: CARMA2_CHEAT 0x00445b40
 void C2_HOOK_FASTCALL InitDepthEffects(void) {
-    NOT_IMPLEMENTED();
+
+    LoadDepthTable("DEPTHCUE.TAB", &gDepth_shade_table, &gDepth_shade_table_power);
+    LoadDepthTable("FOG.TAB", &gFog_shade_table, &gFog_shade_table_power);
+    LoadDepthTable("ACIDFOG.TAB", &gAcid_shade_table, &gAcid_shade_table_power);
+    LoadDepthTable("BLUEGIT.TAB", &gWater_shade_table, &gWater_shade_table_power);
+    GenerateSmokeShades();
+    gHorizon_material = BrMaterialFind("HORIZON.MAT");
+    if (gHorizon_material == NULL) {
+        FatalError(kFatalError_CannotFindSkyMaterial_S);
+    }
+#ifndef REC2_SW
+    if (gScreen->type == BR_PMT_INDEX_8 && !gNo_fog) {
+        int i;
+        int j;
+
+        gHorizon_material->index_blend = BrPixelmapAllocate(BR_PMT_INDEX_8, 256, 256, NULL, 0);
+        BrTableAdd(gHorizon_material->index_blend);
+        for (i = 0; i < 256; i++) {
+            for (j = 0; j < 256; j++) {
+                ((tU8*)gHorizon_material->index_blend->pixels)[256 * i + j] = j;
+            }
+        }
+        gHorizon_material->flags |= BR_MATF_PERSPECTIVE;
+    }
+    gHorizon_material->flags |= BR_MATF_MAP_INTERPOLATION;
+#endif
+    gForward_sky_model = CreateHorizonModel(gCamera);
+    BrModelAdd(gForward_sky_model);
+    gForward_sky_actor = BrActorAllocate(BR_ACTOR_MODEL, NULL);
+    gForward_sky_actor->model = gForward_sky_model;
+    gForward_sky_actor->material = gHorizon_material;
+    gForward_sky_actor->render_style = BR_RSTYLE_NONE;
+    BrActorAdd(gUniverse_actor, gForward_sky_actor);
 }
 
 // DoHorizon
