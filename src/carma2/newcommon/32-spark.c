@@ -553,11 +553,19 @@ void C2_HOOK_FASTCALL DoCamouflageThing(tCar_spec* pCar) {
     }
 }
 
-// STUB: CARMA2_HW 0x004f9020
-// STUB: CARMA2_SW 0x004f46a0
-// STUB: CARMA2_CHEAT 0x004fecc0
+// FUNCTION: CARMA2_HW 0x004f9020
+// FUNCTION: CARMA2_SW 0x004f46a0
+// FUNCTION: CARMA2_CHEAT 0x004fecc0
 void C2_HOOK_FASTCALL DoSolidGraniteThing(tCar_spec* pCar) {
-    NOT_IMPLEMENTED();
+    br_material* material;
+
+    MasterDisableCarFunks(pCar);
+    material = BrMaterialFind("solidgrn");
+    if (material != NULL && material->colour_map != NULL) {
+        gCar_of_material = pCar;
+        pCar->field_0x1960 = material->colour_map;
+        ForEveryCarMaterial(pCar, SetPixelmap, 1);
+    }
 }
 
 // DoTrueColModelThing
