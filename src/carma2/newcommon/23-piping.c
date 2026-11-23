@@ -1161,7 +1161,17 @@ void C2_HOOK_FASTCALL PipeSingleSpecial(tSpecial_type pType) {
     ARDoSingleVariedSession(ePipe_chunk_special, pType, 0);
 }
 
-// PipeSingleCarIncident
+// FUNCTION: CARMA2_HW 0x004c8540
+// FUNCTION: CARMA2_SW 0x004c4c70
+// FUNCTION: CARMA2_CHEAT 0x004ce060
+void C2_HOOK_FASTCALL PipeSingleCarIncident(tCar_spec* pCar, br_vector3* pPosition, float pForce) {
+
+    gFloat_pipe_union.f = pForce;
+    ARDoSingleVariedSession(ePipe_chunk_ped_incident, 1, 3,
+        SIZE_OFFSET_PIPING(tPipe_chunk_car_incident, force), gFloat_pipe_union.u32,
+        SIZE_OFFSET_PIPING(tPipe_chunk_car_incident, car_ID), (tU16)pCar->car_ID,
+        SIZE_OFFSET_PIPING(tPipe_chunk_car_incident, position), pPosition);
+}
 
 // FUNCTION: CARMA2_HW 0x004c8580
 // FUNCTION: CARMA2_SW 0x004c4cb0

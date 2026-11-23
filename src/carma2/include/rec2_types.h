@@ -599,6 +599,13 @@ typedef struct {
 } tPipe_ped_incident;
 
 typedef struct {
+    float force;
+    tU16 car_ID;
+    tU16 padding_0x6;
+    br_vector3 position;
+} tPipe_chunk_car_incident;
+
+typedef struct {
     tPedestrian* ped;
     br_vector3 positions[7];
 } tPipe_chunk_napalm_bolt;
@@ -842,6 +849,7 @@ typedef struct {
 typedef struct tPipe_chunk {
     uintptr_t subject_index;
     union {
+        tPipe_chunk_car_incident car_incident;
         tPipe_chunk_frame_boundary frame_boundary;
         tPipe_chunk_non_car non_car;
         tPipe_ped_physics_data ped_physics;
