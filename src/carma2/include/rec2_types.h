@@ -784,6 +784,7 @@ typedef enum {
     ePipe_chunk_single_ped_model_change = 47,
     ePipe_chunk_phil_object = 48,
     ePipe_chunk_gib_shower = 49,
+    ePipe_blood_spurt = 50,
     ePipe_single_groove_on_off = 51,
     ePipe_chunk_powerup_got = 52,
     ePipe_chunk_powerup_lose = 53,
@@ -815,7 +816,7 @@ typedef struct {
 } tPipe_chunk_smash_model_change;
 
 typedef struct {
-    unsigned int seed;
+    tU32 seed;
     tU32 time;
     br_vector3 position;
     br_vector3 impactee_velocity;

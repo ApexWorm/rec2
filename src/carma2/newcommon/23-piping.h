@@ -279,7 +279,7 @@ extern void C2_HOOK_FASTCALL PipeSinglePHILObject(tPhysics_object* pObject);
 
 extern void C2_HOOK_FASTCALL PipeSingleGibShower(uintptr_t pId, tU32 pTime, tU32 pUid, float pForce, undefined4 pArg5, const br_vector3* pP1, const br_vector3* pP2, const br_vector3* pV);
 
-// PipeSingleBloodSpurt
+extern void C2_HOOK_FASTCALL PipeSingleBloodSpurt(uintptr_t pId, tU32 pTime, tU32 pSeed, const br_vector3* pPosition, const br_vector3* pImpactee_velocity, const br_vector3* pNormal);
 
 extern void C2_HOOK_FASTCALL PipeSingleGrooveOnOff(int pOn, br_actor* pActor, int pBlock_flags);
 

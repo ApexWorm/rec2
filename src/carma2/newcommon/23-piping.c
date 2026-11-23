@@ -1562,7 +1562,18 @@ void C2_HOOK_FASTCALL PipeSingleGibShower(uintptr_t pId, tU32 pTime, tU32 pUid, 
         SIZE_OFFSET_PIPING(tPipe_chunk_gib_shower, v), pV);
 }
 
-// PipeSingleBloodSpurt
+// FUNCTION: CARMA2_HW 0x004c8d40
+// FUNCTION: CARMA2_SW 0x004c5470
+// FUNCTION: CARMA2_CHEAT 0x004ce860
+void C2_HOOK_FASTCALL PipeSingleBloodSpurt(uintptr_t pId, tU32 pTime, tU32 pSeed, const br_vector3* pPosition, const br_vector3* pImpactee_velocity, const br_vector3* pNormal) {
+
+    ARDoSingleVariedSession(ePipe_blood_spurt, pId, 5,
+        SIZE_OFFSET_PIPING(tPipe_chunk_blood_spurt, time), pTime,
+        SIZE_OFFSET_PIPING(tPipe_chunk_blood_spurt, seed), pSeed,
+        SIZE_OFFSET_PIPING(tPipe_chunk_blood_spurt, position), pPosition,
+        SIZE_OFFSET_PIPING(tPipe_chunk_blood_spurt, impactee_velocity), pImpactee_velocity,
+        SIZE_OFFSET_PIPING(tPipe_chunk_blood_spurt, normal), pNormal);
+}
 
 // FUNCTION: CARMA2_HW 0x004c8d80
 // FUNCTION: CARMA2_SW 0x004c54b0
