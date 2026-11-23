@@ -450,7 +450,7 @@ extern void C2_HOOK_FASTCALL SetGoreLevel(int pNewLevel);
 
 // DRVector3SafeCrossXZ
 
-// ScaleModelXYZ
+extern void C2_HOOK_FASTCALL ScaleModelXYZ(br_model* pModel, br_scalar pScale_x, br_scalar pScale_y, br_scalar pScale_z);
 
 extern void C2_HOOK_FASTCALL ScaleModel(br_model* pModel, float pScale);
 
