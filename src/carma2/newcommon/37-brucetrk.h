@@ -34,7 +34,7 @@ extern void C2_HOOK_FASTCALL DisposeColumns(tTrack_spec* pTrack_spec);
 
 extern void C2_HOOK_FASTCALL XZToColumnXZ(tU8* pColumn_x, tU8* pColumn_z, br_scalar pX, br_scalar pZ, tTrack_spec* pTrack_spec);
 
-// FindNonCarsCB
+extern intptr_t C2_HOOK_CDECL FindNonCarsCB(br_actor* pActor, void* pData);
 
 // MungeFaces
 

@@ -8,10 +8,17 @@
 
 #include "37-brucetrk.h"
 
+#include "27-powerup.h"
 #include "41-utility.h"
+#include "51-smash.h"
+#include "52-errors.h"
+#include "67-lighting.h"
 
 #include "globvars.h"
+#include "platform.h"
 #include "rec2_macros.h"
+
+#include "c2_stdio.h"
 
 #include <math.h>
 #include <string.h>
@@ -214,7 +221,59 @@ void C2_HOOK_FASTCALL XZToColumnXZ(tU8* pColumn_x, tU8* pColumn_z, br_scalar pX,
     *pColumn_z = (tU8)z;
 }
 
-// FindNonCarsCB
+// FUNCTION: CARMA2_HW 0x0040d1f0
+// FUNCTION: CARMA2_SW 0x0040d1e0
+// FUNCTION: CARMA2_CHEAT 0x0040d290
+intptr_t C2_HOOK_CDECL FindNonCarsCB(br_actor* pActor, void* pData) {
+    char s[256];
+    tTrack_spec* pTrack_spec = pData;
+
+    SetSmashableModel(pActor);
+    if (pActor->identifier[0] == '&' && pActor->model == NULL) {
+        sprintf(s, "Accessory %s has no model. Well how does it pose? Awful!", pActor->identifier);
+        PDFatalError(s);
+    }
+    if (pActor->identifier[0] == '&' && '0' <= pActor->identifier[1] && pActor->identifier[1] <= '9') {
+        int id;
+        br_scalar n0;
+        br_scalar n1;
+        br_scalar n2;
+
+        id = TEXT_TO_NUMBER_4(&pActor->identifier[4]);
+        if (id < 0 || id >= pTrack_spec->count_non_cars) {
+            return 1;
+        }
+        n0 = BrVector3LengthSquared((br_vector3*)pActor->t.t.mat.m[0]);
+        n1 = BrVector3LengthSquared((br_vector3*)pActor->t.t.mat.m[1]);
+        n2 = BrVector3LengthSquared((br_vector3*)pActor->t.t.mat.m[2]);
+        if (n0 < 0.999 || n1 < 0.999 || n2 < 0.999) {
+            dr_dprintf("non car was scaled down %s", pActor->identifier);
+            pActor->t.t.translate.t.v[0] += 2000.0f;
+        }
+        if (n0 > 1.001 || n1 > 1.001 || n2 > 1.001) {
+            BrVector3InvScale((br_vector3*)pActor->t.t.mat.m[0], (br_vector3*)pActor->t.t.mat.m[0], (float)sqrt((double)n0));
+            BrVector3InvScale((br_vector3*)pActor->t.t.mat.m[1], (br_vector3*)pActor->t.t.mat.m[1], (float)sqrt((double)n1));
+            BrVector3InvScale((br_vector3*)pActor->t.t.mat.m[2], (br_vector3*)pActor->t.t.mat.m[2], (float)sqrt((double)n2));
+            dr_dprintf("non car was scaled up %s", pActor->identifier);
+        }
+        pTrack_spec->non_car_list[id] = pActor;
+        pActor->type_data = NULL;
+        return 0;
+    }
+    if (pActor != NULL && pActor->identifier != NULL && pActor->identifier[1] == '\xa3') {
+        int id;
+
+        SmoothificatePowerups(pActor);
+        id = TEXT_TO_NUMBER_2(&pActor->identifier[2]);
+        if (id >= 66 && id <= 85) {
+            SetSpinningPowerup(pActor, 0);
+        }
+        if (id >= 86 && id <= 87) {
+            SetChangingPowerup(pActor);
+        }
+    }
+    return BrActorEnum(pActor, FindNonCarsCB, pTrack_spec);
+}
 
 // MungeFaces
 
