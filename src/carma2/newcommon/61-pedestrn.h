@@ -112,7 +112,7 @@ extern void C2_HOOK_FASTCALL PedApplyPedFPChange(tPedestrian* pPed, float pSpeed
 
 // PedUndoStatus
 
-extern void C2_HOOK_CDECL SetCharacterPhysicsLevelAR(tPed_character_instance* pCharacter, tU32 pLevel);
+extern void C2_HOOK_CDECL SetCharacterPhysicsLevelAR(tPed_character_instance* pCharacter, tU32 pLevel, ...);
 
 // PedApplyPedPhysics
 
@@ -552,7 +552,7 @@ extern int C2_HOOK_FASTCALL BonerActiveHalted2(tPed_character_instance* pCharact
 
 extern int C2_HOOK_FASTCALL CharacterNoLongerPhysicworthy(tPed_character_instance* pCharacter);
 
-// SetCharacterPhysicsLevel
+extern void C2_HOOK_CDECL SetCharacterPhysicsLevel(tPed_character_instance* pCharacter, tU32 pLevel, ...);
 
 extern void C2_HOOK_FASTCALL StopCharacterMorphing(tPed_character_instance* pCharacter);
 
