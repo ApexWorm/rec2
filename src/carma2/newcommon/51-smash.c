@@ -59,6 +59,11 @@ br_vector3 gVector3_006b78a0[4] = { { { 0.f } } };
 // GLOBAL: CARMA2_SW 0x006ae5b0
 int gINT_006b78d0 = 0;
 
+// GLOBAL: CARMA2_HW 0x006ba4a0
+// GLOBAL: CARMA2_SW 0x006b1180
+// GLOBAL: CARMA2_CHEAT 0x006c1b40
+tSmashable_item_spec* gSmashable_track_indexable_triggers[100];
+
 // GLOBAL: CARMA2_HW 0x006a3338
 // GLOBAL: CARMA2_SW 0x0069d398
 // GLOBAL: CARMA2_CHEAT 0x006aaeb0
@@ -1684,9 +1689,23 @@ int C2_HOOK_FASTCALL InsertQuad(tSmash_quad_mapping* pMapping, br_actor* pActor,
 
 // ProcessModel
 
-// BashModel
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
 
-// SendNetSmash
+// STUB: CARMA2_HW 0x004f4e20
+// STUB: CARMA2_SW 0x004f0a80
+// STUB: CARMA2_CHEAT 0x004faac0
+float C2_HOOK_FASTCALL BashModel(tSmashable_item_spec* pSpec, tPhysics_object* pObject, br_actor* pActor, float pMagnitude, br_vector3* pPosition, br_vector3* pNormal, br_vector3* pForce, int* pSmashed, int pNetwork) {
+    NOT_IMPLEMENTED();
+}
+
+// STUB: CARMA2_HW 0x004f5110
+// STUB: CARMA2_SW 0x004f0d70
+// STUB: CARMA2_CHEAT 0x004fadb0
+void C2_HOOK_FASTCALL SendNetSmash(tPhysics_object* pObject, undefined4 pArg2, float pMagnitude, br_vector3* pPosition, br_vector3* pNormal, br_vector3* pForce, int pArg7) {
+    NOT_IMPLEMENTED();
+}
 
 // SendAllSmashes
 
@@ -1694,14 +1713,31 @@ int C2_HOOK_FASTCALL InsertQuad(tSmash_quad_mapping* pMapping, br_actor* pActor,
 
 // SmashEnvironment
 
-#ifdef REC2_MATCHING
-#pragma auto_inline(off)
-#endif
-
-// STUB: CARMA2_HW 0x004f52f0
-// STUB: CARMA2_SW 0x004f0f50
+// FUNCTION: CARMA2_HW 0x004f52f0
+// FUNCTION: CARMA2_SW 0x004f0f50
+// FUNCTION: CARMA2_CHEAT 0x004faf90
 float C2_HOOK_FASTCALL BashObject(tPhysics_object* pObject, br_actor* pActor, float pMagnitude, br_vector3* pPosition, br_vector3* pNormal, br_vector3* pForce, int pSnap, int pNetwork) {
-    NOT_IMPLEMENTED();
+    tSmashable_item_spec* spec;
+    float result;
+    int smashed;
+
+    result = -1.f;
+    smashed = 0;
+    if (pActor != NULL && pActor->identifier != NULL && pActor->identifier[0] == '&') {
+        spec = gSmashable_track_indexable_triggers[(pActor->identifier[1] - '0') * 10 + (pActor->identifier[2] - '0')];
+        if (spec != NULL) {
+            if ((!pSnap && (spec->trigger_object.number.field_0x1 & 0x1) && pActor->identifier[3] != '!')
+                    || (!pSnap && (spec->trigger_object.number.field_0x1 & 0x4) && pActor->identifier[3] == '!')
+                    || (pSnap && (spec->trigger_object.number.field_0x1 & 0x2))) {
+                gINT_006a3334 = 0;
+                result = BashModel(spec, pObject, pActor, pMagnitude, pPosition, pNormal, pForce, &smashed, pNetwork);
+                if (smashed && !pNetwork) {
+                    SendNetSmash(pObject, 0, pMagnitude, pPosition, pNormal, pForce, 1);
+                }
+            }
+        }
+    }
+    return result;
 }
 
 #ifdef REC2_MATCHING
