@@ -604,11 +604,14 @@ int C2_HOOK_FASTCALL RestorePixelmap(br_material* pMaterial) {
     }
 }
 
-// STUB: CARMA2_HW 0x004f9620
-// STUB: CARMA2_SW 0x004f4ca0
-// STUB: CARMA2_CHEAT 0x004ff2c0
+// FUNCTION: CARMA2_HW 0x004f9620
+// FUNCTION: CARMA2_SW 0x004f4ca0
+// FUNCTION: CARMA2_CHEAT 0x004ff2c0
 void C2_HOOK_FASTCALL RestoreCarPixelmaps(tCar_spec* pCar_spec) {
-    NOT_IMPLEMENTED();
+
+    MasterEnableCarFunks(pCar_spec);
+    ForEveryCarMaterial(pCar_spec, RestorePixelmap, 1);
+    pCar_spec->field_0x1960 = NULL;
 }
 
 // MungeShrapnel
