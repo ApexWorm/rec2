@@ -8,6 +8,8 @@
 
 #include "42-input.h"
 
+#include "globvars.h"
+
 #include "41-utility.h"
 #include "25-grafdata.h"
 #include "platform.h"
@@ -457,11 +459,76 @@ int C2_HOOK_FASTCALL AnyKeyDown(void) {
     return (the_key != -1 && the_key != 4) || EitherMouseButtonDown();
 }
 
-// STUB: CARMA2_HW 0x00482f10
-// STUB: CARMA2_SW 0x00480050
-// STUB: CARMA2_CHEAT 0x00483230
+// FUNCTION: CARMA2_HW 0x00482f10
+// FUNCTION: CARMA2_SW 0x00480050
+// FUNCTION: CARMA2_CHEAT 0x00483230
 tU32* C2_HOOK_FASTCALL KevKeyService(void) {
-    NOT_IMPLEMENTED();
+    // GLOBAL: CARMA2_HW 0x0068c1d4
+    // GLOBAL: CARMA2_SW 0x0068621c
+    // GLOBAL: CARMA2_CHEAT 0x00693a74
+    static tU32 sum;
+    // GLOBAL: CARMA2_HW 0x0068c1d8
+    // GLOBAL: CARMA2_SW 0x00686220
+    // GLOBAL: CARMA2_CHEAT 0x00693a78
+    static tU32 code;
+    // GLOBAL: CARMA2_HW 0x0068c1dc
+    // GLOBAL: CARMA2_SW 0x00686224
+    // GLOBAL: CARMA2_CHEAT 0x00693a7c
+    static tU32 code2;
+    // GLOBAL: CARMA2_HW 0x00657210
+    // GLOBAL: CARMA2_SW 0x00651bc8
+    // GLOBAL: CARMA2_CHEAT 0x0065daa0
+    static tU32 last_key = -1;
+    // GLOBAL: CARMA2_HW 0x00657214
+    // GLOBAL: CARMA2_SW 0x00651bcc
+    // GLOBAL: CARMA2_CHEAT 0x0065daa4
+    static tU32 last_single_key = -1;
+    // GLOBAL: CARMA2_HW 0x0068be8c
+    // GLOBAL: CARMA2_SW 0x00685ed4
+    // GLOBAL: CARMA2_CHEAT 0x0069372c
+    static tU32 last_time;
+    // GLOBAL: CARMA2_HW 0x0068c1e0
+    // GLOBAL: CARMA2_SW 0x00686228
+    // GLOBAL: CARMA2_CHEAT 0x00693a80
+    static tU32 return_val[2];
+    tU32 keys;
+
+    return_val[0] = 0;
+    return_val[1] = 0;
+    keys = gKeys_pressed;
+    if (keys >= 0x6b) {
+        if (keys > 0x6b00 || (last_single_key != (keys & 0xff) && last_single_key != keys >> 8)) {
+            sum = 0;
+            code = 0;
+            return return_val;
+        }
+        if (last_single_key == (keys & 0xff)) {
+            keys = keys >> 8;
+        } else if (last_single_key == keys >> 8) {
+            keys = keys & 0xff;
+        } else {
+            sum = 0;
+            code = 0;
+            return return_val;
+        }
+    } else {
+        last_single_key = keys;
+    }
+    if (keys != last_key && keys > 0) {
+        sum += keys;
+        code += keys << 11;
+        code = (code >> 17) + (code << 4);
+        code2 = keys * keys + (code2 << 3) + (code2 >> 29);
+        last_time = PDGetTotalTime();
+    } else if (PDGetTotalTime() > last_time + 1000) {
+        return_val[0] = (sum << 21) + (code >> 11);
+        return_val[1] = code2;
+        code = 0;
+        code2 = 0;
+        sum = 0;
+    }
+    last_key = keys;
+    return return_val;
 }
 
 // FUNCTION: CARMA2_HW 0x00483040
