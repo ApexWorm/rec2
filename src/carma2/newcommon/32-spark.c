@@ -597,9 +597,24 @@ int C2_HOOK_FASTCALL ResetFoxLighting(br_material* pMaterial) {
     }
 }
 
-// CancelAlternateFoxEffect
+inline void C2_HOOK_FASTCALL CancelAlternateFoxEffect(tCar_spec* pCar_spec) {
 
-// SetFoxLighting
+    ForEveryCarModel(pCar_spec, ResetFoxModelCallback);
+    ForEveryCarMaterial(pCar_spec, ResetFoxLighting, 1);
+}
+
+// FUNCTION: CARMA2_HW 0x004f9600
+// FUNCTION: CARMA2_CHEAT 0x004ff2a0
+int C2_HOOK_FASTCALL SetFoxLighting(br_material* pMaterial) {
+
+    if (!(pMaterial->flags & BR_MATF_PRELIT)) {
+        pMaterial->flags |= BR_MATF_PRELIT;
+        BrMaterialUpdate(pMaterial, BR_MATU_LIGHTING | BR_MATU_RENDERING);
+        return 1;
+    } else {
+        return 0;
+    }
+}
 
 // SetupAlternateFoxEffect
 #endif
@@ -1457,11 +1472,18 @@ void C2_HOOK_FASTCALL MakeCarIt(tCar_spec* pCar) {
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x004fe570
+// FUNCTION: CARMA2_HW 0x004fe570
 // STUB: CARMA2_SW 0x004f9d90
-// STUB: CARMA2_CHEAT 0x00504210
+// FUNCTION: CARMA2_CHEAT 0x00504210
 void C2_HOOK_FASTCALL StopCarBeingIt(tCar_spec* pCar) {
+#ifdef REC2_HW
+
+    if (gAFE) {
+        CancelAlternateFoxEffect(pCar);
+    }
+#else
     NOT_IMPLEMENTED();
+#endif
 }
 
 #ifdef REC2_MATCHING
@@ -1569,7 +1591,23 @@ intptr_t C2_HOOK_CDECL ForEveryCarModelCB(br_actor* pActor, void* pContext) {
     return 0;
 }
 
-// ForEveryCarModel
+inline void C2_HOOK_FASTCALL ForEveryCarModel(tCar_spec* pCar_spec, int (C2_HOOK_FASTCALL* pCallback)(br_model*)) {
+    tCar_crush_spec* crush_spec;
+    int i;
+
+    crush_spec = pCar_spec->car_crush_spec;
+    pCallback(pCar_spec->shell_model);
+    if (((tUser_crush_data*)pCar_spec->car_model_actor->user)->models[1] != NULL) {
+        pCallback(((tUser_crush_data*)pCar_spec->car_model_actor->user)->models[1]);
+    }
+    DRActorEnumRecurse(pCar_spec->car_model_actor, ForEveryCarModelCB, (void*)pCallback);
+    for (i = 0; i < crush_spec->field_0x270; i++) {
+        pCallback(crush_spec->field_0x274[i].field_0x0->model);
+    }
+    for (i = 0; i < crush_spec->field_0x2b0; i++) {
+        pCallback(crush_spec->field_0x2b4[i].field_0x0->model);
+    }
+}
 
 int C2_HOOK_FASTCALL MightBlendifyMaterial(br_material* pMaterial, int pBlend_factor) {
 
