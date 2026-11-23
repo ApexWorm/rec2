@@ -9,6 +9,7 @@
 #include "32-spark.h"
 
 #include "00-car.h"
+#include "09-funks.h"
 #include "08-loading1.h"
 #include "10-loading2.h"
 #include "15-displays.h"
@@ -475,17 +476,43 @@ intptr_t C2_HOOK_CDECL ActorFunks(br_actor* pActor, void* pContext) {
     return 0;
 }
 
-// STUB: CARMA2_HW 0x004f8ca0
-// STUB: CARMA2_CHEAT 0x004fe940
+// FUNCTION: CARMA2_HW 0x004f8ca0
+// FUNCTION: CARMA2_CHEAT 0x004fe940
 void C2_HOOK_FASTCALL MasterDisableCarFunks(tCar_spec* pCar) {
-    NOT_IMPLEMENTED();
+    tCar_crush_spec* crush_spec;
+    int i;
+    tCar_bit_spec* bit;
+
+    crush_spec = pCar->car_crush_spec;
+    DRActorEnumRecurse(pCar->car_model_actor, ActorFunks, (void*)MasterDisableFunkotronic);
+    bit = crush_spec->field_0x274;
+    for (i = 0; i < crush_spec->field_0x270; i++, bit++) {
+        ActorFunks(bit->field_0x0, (void*)MasterDisableFunkotronic);
+    }
+    bit = crush_spec->field_0x2b4;
+    for (i = 0; i < crush_spec->field_0x2b0; i++, bit++) {
+        ActorFunks(bit->field_0x0, (void*)MasterDisableFunkotronic);
+    }
 }
 
-// STUB: CARMA2_HW 0x004f8e10
-// STUB: CARMA2_SW 0x004f4490
-// STUB: CARMA2_CHEAT 0x004feab0
+// FUNCTION: CARMA2_HW 0x004f8e10
+// FUNCTION: CARMA2_SW 0x004f4490
+// FUNCTION: CARMA2_CHEAT 0x004feab0
 void C2_HOOK_FASTCALL MasterEnableCarFunks(tCar_spec* pCar) {
-    NOT_IMPLEMENTED();
+    tCar_crush_spec* crush_spec;
+    int i;
+    tCar_bit_spec* bit;
+
+    crush_spec = pCar->car_crush_spec;
+    DRActorEnumRecurse(pCar->car_model_actor, ActorFunks, (void*)MasterEnableFunkotronic);
+    bit = crush_spec->field_0x274;
+    for (i = 0; i < crush_spec->field_0x270; i++, bit++) {
+        ActorFunks(bit->field_0x0, (void*)MasterEnableFunkotronic);
+    }
+    bit = crush_spec->field_0x2b4;
+    for (i = 0; i < crush_spec->field_0x2b0; i++, bit++) {
+        ActorFunks(bit->field_0x0, (void*)MasterEnableFunkotronic);
+    }
 }
 
 // FUNCTION: CARMA2_HW 0x004f8ff0
