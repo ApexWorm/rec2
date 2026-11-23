@@ -387,7 +387,7 @@ extern void C2_HOOK_FASTCALL ApplySmashTextureChange(tPipe_chunk** pChunk);
 
 extern void C2_HOOK_FASTCALL ApplyRepulseRay(tPipe_chunk** pChunk);
 
-// ApplyActorTrans
+extern void C2_HOOK_FASTCALL ApplyActorTrans(tPipe_chunk** pChunk);
 
 // ApplyPedStatus
 

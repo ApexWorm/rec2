@@ -2090,7 +2090,13 @@ void C2_HOOK_FASTCALL ApplyRepulseRay(tPipe_chunk** pChunk) {
     AdjustRepulseRay((*pChunk)->subject_index, (*pChunk)->data.repulse_ray.origin, (*pChunk)->data.repulse_ray.victim, (*pChunk)->data.repulse_ray.time);
 }
 
-// ApplyActorTrans
+// FUNCTION: CARMA2_HW 0x004c9a70
+// FUNCTION: CARMA2_SW 0x004c61a0
+// FUNCTION: CARMA2_CHEAT 0x004cf5a0
+void C2_HOOK_FASTCALL ApplyActorTrans(tPipe_chunk** pChunk) {
+
+    BrVector3Accumulate(&(*pChunk)->data.actor_trans.actor->t.t.translate.t, &(*pChunk)->data.actor_trans.delta);
+}
 
 // ApplyPedStatus
 
