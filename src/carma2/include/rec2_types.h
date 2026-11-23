@@ -1174,8 +1174,9 @@ typedef enum {
 } tPed_form_bone_hinge_type;
 
 typedef enum tSpecial_type {
-    ePipe_special_fade = 0,
-} tSpecial_type;
+    ePipe_special_action_recovery = 0,
+    ePipe_special_action_tail_growth = 1,
+} tPipe_special_action;
 
 typedef struct {
     tCar_detail_ownership ownership;

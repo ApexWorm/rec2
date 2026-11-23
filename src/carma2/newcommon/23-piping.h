@@ -223,7 +223,7 @@ extern void C2_HOOK_FASTCALL PipeSingleGraphicalWheelStuff(tCar_spec* pCar);
 
 extern void C2_HOOK_FASTCALL PipeSingleSound(tS3_outlet* pOutlet, int pSound, tS3_volume pL_volume, tS3_volume pR_volume, int pPitch, const br_vector3* pPosition);
 
-extern void C2_HOOK_FASTCALL PipeSingleSpecial(tSpecial_type pType);
+extern void C2_HOOK_FASTCALL PipeSingleSpecial(tPipe_special_action pType);
 
 extern void C2_HOOK_FASTCALL PipeSingleCarIncident(tCar_spec* pCar, br_vector3* pPosition, float pForce);
 
@@ -349,7 +349,7 @@ extern void C2_HOOK_FASTCALL ApplyGWS(tPipe_chunk** pChunk);
 
 // ApplyDamage
 
-// ApplySpecial
+extern void C2_HOOK_FASTCALL ApplySpecial(tPipe_chunk** pChunk);
 
 extern void C2_HOOK_FASTCALL ApplyProxRay(tPipe_chunk** pChunk);
 
