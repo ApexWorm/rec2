@@ -618,10 +618,101 @@ int C2_HOOK_CDECL CmpSmokeZ(const void* p1, const void* p2) {
     }
 }
 
-// STUB: CARMA2_HW 0x004f9fc0
-// STUB: CARMA2_CHEAT 0x004ffc60
+// FUNCTION: CARMA2_HW 0x004f9fc0
+// FUNCTION: CARMA2_CHEAT 0x004ffc60
 void C2_HOOK_FASTCALL InitSmokeStuff(void) {
-    NOT_IMPLEMENTED();
+
+    int i;
+    br_pixelmap* smoke_pm;
+    char s[256];
+    // GLOBAL: CARMA2_HW 0x00660148
+    // GLOBAL: CARMA2_CHEAT 0x00667990
+    static br_token_value fadealpha[3] = {
+        { BRT_BLEND_B, { 1 } },
+        { BRT_OPACITY_X, { 0x4b0000 } }, /* ~ 29.296875% = 75 / 256 */
+        { 0 },
+    };
+
+    gBlend_model = BrModelAllocate("gBlend_model", 4, 2);
+    gBlend_model2 = BrModelAllocate("gBlend_model2", 6, 4);
+    gBlend_actor = BrActorAllocate(BR_ACTOR_MODEL, NULL);
+    for (i = 0; i < (int)REC2_ASIZE(gBR_smoke_structs); i++) {
+        gBR_smoke_structs[i].material = BrMaterialAllocate("some smoke");
+        if (gBR_smoke_structs[i].material == NULL) {
+            break;
+        }
+    }
+    if (gBlend_model == NULL || i != (int)REC2_ASIZE(gBR_smoke_structs) || gBlend_actor == NULL) {
+        FatalError(kFatalError_OOM_S);
+    }
+    gBlend_actor->identifier = "gBlend_actor";
+    gBlend_actor->model = gBlend_model;
+
+    gBlend_model->faces[0].vertices[0] = 0;
+    gBlend_model->faces[0].vertices[1] = 1;
+    gBlend_model->faces[0].vertices[2] = 2;
+    gBlend_model->faces[1].vertices[0] = 2;
+    gBlend_model->faces[1].vertices[1] = 3;
+    gBlend_model->faces[1].vertices[2] = 0;
+
+    gBlend_model2->faces[0].vertices[0] = 0;
+    gBlend_model2->faces[0].vertices[1] = 1;
+    gBlend_model2->faces[0].vertices[2] = 2;
+    gBlend_model2->faces[1].vertices[0] = 2;
+    gBlend_model2->faces[1].vertices[1] = 3;
+    gBlend_model2->faces[1].vertices[2] = 0;
+    gBlend_model2->faces[2].vertices[0] = 1;
+    gBlend_model2->faces[2].vertices[1] = 5;
+    gBlend_model2->faces[2].vertices[2] = 2;
+    gBlend_model2->faces[3].vertices[0] = 1;
+    gBlend_model2->faces[3].vertices[1] = 4;
+    gBlend_model2->faces[3].vertices[2] = 5;
+
+    BrVector3Set(&gBlend_model->vertices[0].p, -1.f,  1.f, 0.f);
+    BrVector3Set(&gBlend_model->vertices[1].p, -1.f, -1.f, 0.f);
+    BrVector3Set(&gBlend_model->vertices[2].p,  1.f, -1.f, 0.f);
+    BrVector3Set(&gBlend_model->vertices[3].p,  1.f,  1.f, 0.f);
+
+    BrVector3Set(&gBlend_model2->vertices[0].p, -1.f, 1.f, 0.f);
+    BrVector3Set(&gBlend_model2->vertices[1].p, -1.f, 0.f, 0.f);
+    BrVector3Set(&gBlend_model2->vertices[2].p,  1.f, 0.f, 0.f);
+    BrVector3Set(&gBlend_model2->vertices[3].p,  1.f, 1.f, 0.f);
+    BrVector3Set(&gBlend_model2->vertices[4].p, -1.f, -.25f, 0.f);
+    BrVector3Set(&gBlend_model2->vertices[5].p,  1.f, -.25f, 0.f);
+    gBlend_model->flags |= BR_MODF_KEEP_ORIGINAL;
+    gBlend_model2->flags |= BR_MODF_KEEP_ORIGINAL;
+
+    strcpy(s, "SMOKE.PIX");
+    smoke_pm = LoadPixelmap(s);
+    if (smoke_pm == NULL) {
+        FatalError(kFatalError_CantLoadPixelmapFile_S, s);
+    }
+    smoke_pm->map = gRender_palette;
+    BrMapAdd(smoke_pm);
+
+    for (i = 0; i < (int)REC2_ASIZE(gBR_smoke_structs); i++) {
+        gBR_smoke_structs[i].material->flags = BR_MATF_LIGHT | BR_MATF_PRELIT | BR_MATF_SMOOTH | BR_MATF_PERSPECTIVE;
+        gBR_smoke_structs[i].material->extra_prim = fadealpha;
+        gBR_smoke_structs[i].material->colour_map = smoke_pm;
+        BrMaterialAdd(gBR_smoke_structs[i].material);
+    }
+
+    BrVector2Set(&gBlend_model->vertices[0].map, 0.f, 1.f - 1.f / (float)smoke_pm->height);
+    BrVector2Set(&gBlend_model->vertices[1].map, 0.f, 0.f);
+    BrVector2Set(&gBlend_model->vertices[2].map, 1.f - 1.f / (float)smoke_pm->width, 0.f);
+    BrVector2Set(&gBlend_model->vertices[3].map, 1.f - 1.f / (float)smoke_pm->width, 1.f - 1.f / (float)smoke_pm->height);
+
+    BrVector2Set(&gBlend_model2->vertices[0].map, 0.f, 1.f - 1.f / (float)smoke_pm->height);
+    BrVector2Set(&gBlend_model2->vertices[1].map, 0.f, 0.5f);
+    BrVector2Set(&gBlend_model2->vertices[2].map, 1.f - 1.f / (float)smoke_pm->width, .5f);
+    BrVector2Set(&gBlend_model2->vertices[3].map, 1.f - 1.f / (float)smoke_pm->width, 1.f - 1.f / (float)smoke_pm->height);
+    BrVector2Set(&gBlend_model2->vertices[4].map, 0.f, 0.f);
+    BrVector2Set(&gBlend_model2->vertices[5].map, 1.f - 1.f / (float)smoke_pm->width, 0.f);
+
+    BrModelAdd(gBlend_model);
+    BrModelAdd(gBlend_model2);
+
+    BrActorAdd(gDont_render_actor, gBlend_actor);
 }
 
 // FUNCTION: CARMA2_HW 0x004fa8d0
