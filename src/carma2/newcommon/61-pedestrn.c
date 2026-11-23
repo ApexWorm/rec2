@@ -24,6 +24,7 @@
 #include "42-input.h"
 #include "43-pratcam.h"
 #include "49-physics.h"
+#include "60-phil.h"
 #include "51-smash.h"
 #include "52-errors.h"
 #include "54-runtime.h"
@@ -2112,11 +2113,21 @@ void C2_HOOK_FASTCALL ShowActivePedCount(void) {
     NewTextHeadupSlot2(4, 0, 1000, -4, text, 0);
 }
 
-// STUB: CARMA2_HW 0x004d6880
-// STUB: CARMA2_SW 0x004d2e80
-// STUB: CARMA2_CHEAT 0x004dc440
+// FUNCTION: CARMA2_HW 0x004d6880
+// FUNCTION: CARMA2_SW 0x004d2e80
+// FUNCTION: CARMA2_CHEAT 0x004dc440
 void C2_HOOK_FASTCALL PedPreCollisionStuff(void) {
-    NOT_IMPLEMENTED();
+    tPhysics_object* object;
+    br_vector3 torque;
+
+    for (object = PHILGetFirstObject(); object != NULL; object = PHILGetNextObject(object)) {
+        if (object->owner != NULL && object->flags_0x238 == 5) {
+            torque.v[0] = object->omega.v[0] * (0.002 * 0.002 * BrVector3Length(&object->omega));
+            torque.v[1] = object->omega.v[1] * (0.002 * 0.002 * BrVector3Length(&object->omega));
+            torque.v[2] = object->omega.v[2] * (0.002 * 0.002 * BrVector3Length(&object->omega));
+            ApplyDiminishingTorque(object, &torque);
+        }
+    }
 }
 
 // UpdateIfBackwardsAR
