@@ -401,8 +401,8 @@ void C2_NORETURN C2_HOOK_FASTCALL PDFatalError(const char *pThe_str) {
 #endif
 
     dr_dprintf("FATAL ERROR: %s", pThe_str);
-    str1 = pThe_str;
     str2 = "";
+    str1 = pThe_str;
     if (str1 == NULL) {
         str1 = "NULL str1";
     }
