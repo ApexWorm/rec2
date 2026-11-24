@@ -456,7 +456,7 @@ void *PDS3CreateSoundBuffer(tS3_wav_info *pWav_info, void *pWav_buffer) {
     return NULL;
 }
 
-int PDS3PlaySample(tS3_channel *pChannel) {
+int S3PlaySample(tS3_channel *pChannel, tS3_descriptor *pDesc) {
     return 0;
 }
 

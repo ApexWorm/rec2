@@ -79,8 +79,6 @@ extern int C2_HOOK_FASTCALL PDS3IsCDAPlaying(void);
 
 extern int C2_HOOK_FASTCALL PDS3UpdateChannelFrequency(tS3_channel* pChannel);
 
-extern int C2_HOOK_FASTCALL PDS3PlaySample(tS3_channel* pChannel);
-
 extern tS3_error_codes C2_HOOK_FASTCALL PDS3StartMidiChannel(tS3_channel* pChannel);
 
 extern tS3_error_codes C2_HOOK_FASTCALL PDS3PlayCDAChannel(tS3_channel* pChannel);

@@ -11,6 +11,7 @@
 #include "platform.h"
 #include "s3/internal/audio.h"
 #include "s3/internal/resource.h"
+#include "s3/internal/sample.h"
 #include "rec2_macros.h"
 
 // GLOBAL: CARMA2_HW 0x006aaa1c
@@ -492,20 +493,36 @@ int C2_HOOK_FASTCALL PDS3UpdateChannelFrequency(tS3_channel* pChannel) {
     return 1;
 }
 
-int C2_HOOK_FASTCALL PDS3PlaySample(tS3_channel* pChannel) {
+// FUNCTION: CARMA2_HW 0x00569865
+// FUNCTION: CARMA2_SW 0x00564f05
+// FUNCTION: CARMA2_CHEAT 0x0056f43b
+int C2_HOOK_FASTCALL S3PlaySample(tS3_channel* pChannel, tS3_descriptor* pDesc) {
+    LPDIRECTSOUNDBUFFER snd_buffer;
+    HRESULT hr;
+    DWORD mode;
 
+    hr = 0;
+    mode = 0;
     if (pChannel->descriptor != NULL && pChannel->descriptor->type == pChannel->type) {
-        IDirectSoundBuffer *sound_buffer = pChannel->descriptor->pd_handle;
-        if (sound_buffer != NULL) {
-            int looping = pChannel->repetitions == 0;
-            IDirectSoundBuffer_Play(sound_buffer, 0, 0, looping ? DSBPLAY_LOOPING : 0);
-            if (!looping) {
-                IDirectSoundBuffer_SetCurrentPosition(sound_buffer, 0);
+        snd_buffer = pChannel->descriptor->pd_handle;
+        if (snd_buffer != NULL) {
+            if (pChannel->repetitions == 0) {
+                mode = DSBPLAY_LOOPING;
+            }
+#ifdef REC2_CHEAT
+            if (gS3_callbacks.field_0x0 != NULL && pChannel->repetitions) {
+                gS3_callbacks.field_0x0(pChannel);
+            }
+#endif
+            IDirectSoundBuffer_Play(snd_buffer, 0, 0, mode);
+            if (mode == 0) {
+                IDirectSoundBuffer_SetCurrentPosition(snd_buffer, 0);
             }
         }
-        PDS3UpdateChannelVolume(pChannel);
-        PDS3UpdateChannelFrequency(pChannel);
     }
+    PDS3UpdateChannelVolume(pChannel);
+    PDS3UpdateChannelFrequency(pChannel);
+    (void)hr;
     return 1;
 }
 

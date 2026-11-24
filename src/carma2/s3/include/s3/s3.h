@@ -216,7 +216,7 @@ typedef struct tS3_outlet {
 } tS3_outlet;
 
 typedef struct {
-    undefined4 field_0x0;
+    void (C2_HOOK_FASTCALL * field_0x0)(tS3_channel* pChannel);
     void (C2_HOOK_FASTCALL * on_sample_channel_stop)(tS3_channel* pChannel);
     int (C2_HOOK_FASTCALL * on_sample_channel_set_volume)(tS3_channel* pChannel, int pVolume);
     int (C2_HOOK_FASTCALL * on_sample_channel_set_pan)(tS3_channel* pChannel, float pPan);
