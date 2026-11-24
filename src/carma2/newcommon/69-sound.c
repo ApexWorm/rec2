@@ -748,18 +748,23 @@ void C2_HOOK_FASTCALL MungeEngineNoise(void) {
     float vol;
     int type_of_engine_noise;
     int i;
+    tPhysics_object* collision_info;
+    float dx;
+    float dy;
+    float dz;
 
     if (!gSound_available || !gProgram_state.racing) {
         return;
     }
-    gCamera_left.v[0] = (br_scalar)(gCamera_to_world.m[0][0] * -1.0f);
-    gCamera_left.v[1] = (br_scalar)(gCamera_to_world.m[0][1] * -1.0f);
-    gCamera_left.v[2] = (br_scalar)(gCamera_to_world.m[0][2] * -1.0f);
     BrVector3Copy(&gCamera_position, (br_vector3*)gCamera_to_world.m[3]);
+    BrVector3Scale(&gCamera_left, (br_vector3*)gCamera_to_world.m[0], -1.0f);
+    dx = gCamera_to_world.m[3][0] - gOld_camera_position.v[0];
+    dy = gCamera_to_world.m[3][1] - gOld_camera_position.v[1];
+    dz = gCamera_to_world.m[3][2] - gOld_camera_position.v[2];
     if (gFrame_period != 0) {
-        gCamera_velocity.v[0] = (br_scalar)((double)(gCamera_position.v[0] - gOld_camera_position.v[0]) / ((double)gFrame_period / 1000.0));
-        gCamera_velocity.v[1] = (br_scalar)((double)(gCamera_position.v[1] - gOld_camera_position.v[1]) / ((double)gFrame_period / 1000.0));
-        gCamera_velocity.v[2] = (br_scalar)((double)(gCamera_position.v[2] - gOld_camera_position.v[2]) / ((double)gFrame_period / 1000.0));
+        gCamera_velocity.v[0] = (br_scalar)((double)dx / ((double)gFrame_period / 1000.0));
+        gCamera_velocity.v[1] = (br_scalar)((double)dy / ((double)gFrame_period / 1000.0));
+        gCamera_velocity.v[2] = (br_scalar)((double)dz / ((double)gFrame_period / 1000.0));
     } else {
         BrVector3Set(&gCamera_velocity, 0.0f, 0.0f, 0.0f);
     }
@@ -784,13 +789,14 @@ void C2_HOOK_FASTCALL MungeEngineNoise(void) {
             if ((the_car != NULL && the_car->driver == eDriver_local_human)
                     || gSound_detail_level >= 3 || cat == eVehicle_rozzer) {
 
-                BrVector3Copy(&the_car->vel, &the_car->collision_info->v);
+                collision_info = the_car->collision_info;
+                BrVector3Copy(&the_car->vel, &collision_info->v);
                 if (cat == eVehicle_rozzer) {
                     vol = 255.0f;
                     pitch = (float)S3_FIXED_INT(1);
                 } else {
-                    if (the_car->collision_info->last_special_volume != NULL) {
-                        type_of_engine_noise = the_car->collision_info->last_special_volume->engine_noise_index;
+                    if (collision_info->last_special_volume != NULL) {
+                        type_of_engine_noise = collision_info->last_special_volume->engine_noise_index;
                     } else {
                         type_of_engine_noise = 0;
                     }
