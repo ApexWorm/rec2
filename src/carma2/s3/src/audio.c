@@ -965,12 +965,12 @@ tS3_descriptor* C2_HOOK_FASTCALL S3CreateDescriptor(void) {
 
 // FUNCTION: CARMA2_HW 0x00568704
 int C2_HOOK_FASTCALL S3SoundBankReaderReadFilename(char** pPath, tS3_soundbank_read_ctx* pContext, const char* pDir_name) {
-    unsigned int dir_name_len;
+    unsigned int dir_len;
     char* data_start;
-    unsigned int bytes_read;
+    unsigned int read;
 
     data_start = pContext->data;
-    dir_name_len = strlen(pDir_name);
+    dir_len = strlen(pDir_name);
     while (pContext->data_len != 0) {
         if (!isspace(*pContext->data)) {
             S3SoundBankReaderAdvance(pContext, 1);
@@ -978,17 +978,17 @@ int C2_HOOK_FASTCALL S3SoundBankReaderReadFilename(char** pPath, tS3_soundbank_r
         }
         break;
     }
-    bytes_read = pContext->data - data_start;
-    if (bytes_read == 0) {
+    read = pContext->data - data_start;
+    if (read == 0) {
         return 0;
     }
-    *pPath = S3MemAllocate(bytes_read + dir_name_len + 1, kMem_S3_scan_name);
+    *pPath = S3MemAllocate(dir_len + read + 1, kMem_S3_scan_name);
     if (*pPath == NULL) {
         return 0;
     }
     strcpy(*pPath, pDir_name);
-    memmove(&(*pPath)[dir_name_len], data_start, bytes_read);
-    (*pPath)[bytes_read + dir_name_len] = '\0';
+    memmove(&(*pPath)[dir_len], data_start, read);
+    (*pPath)[dir_len + read] = '\0';
     return 1;
 }
 
