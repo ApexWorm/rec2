@@ -77,7 +77,12 @@ int gINT_00681fb0;
 // GLOBAL: CARMA2_CHEAT 0x0068bdbc
 int gFrame;
 
-// DoNotDprintf
+// FUNCTION: CARMA2_HW 0x0044cfc0
+// FUNCTION: CARMA2_SW 0x0044cd70
+// FUNCTION: CARMA2_CHEAT 0x0044d510
+void C2_HOOK_CDECL DoNotDprintf_drone(const char* pMessage, ...) {
+
+}
 
 // CrappyLittleVector3DPrintf
 

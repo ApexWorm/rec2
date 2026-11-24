@@ -177,6 +177,11 @@ int gLast_credit_headup__displays = -1;
 // GLOBAL: CARMA2_CHEAT 0x0068711c
 tU32 gLast_earn_time;
 
+// GLOBAL: CARMA2_HW 0x0067f878
+// GLOBAL: CARMA2_SW 0x00679fe8
+// GLOBAL: CARMA2_CHEAT 0x00687120
+int gLast_credit_amount;
+
 // GLOBAL: CARMA2_HW 0x005913dc
 // GLOBAL: CARMA2_SW 0x0058c3bc
 // GLOBAL: CARMA2_CHEAT 0x00597d34
@@ -204,6 +209,11 @@ char gHeadup_oppo_ped_text[64];
 // GLOBAL: CARMA2_SW 0x00679ff4
 // GLOBAL: CARMA2_CHEAT 0x00687130
 int gQueued_headup_count;
+
+// GLOBAL: CARMA2_HW 0x0067f890
+// GLOBAL: CARMA2_SW 0x00679ff8
+// GLOBAL: CARMA2_CHEAT 0x00687138
+tQueued_headup gQueued_headups[4];
 
 
 static void C2_HOOK_FASTCALL LoadHeadupMessageFile(void) {
@@ -450,7 +460,11 @@ void C2_HOOK_FASTCALL DimAFewBits(void) {
 #undef DIM_INDEX
 }
 
-// KillOldestQueuedHeadup
+inline void C2_HOOK_FASTCALL KillOldestQueuedHeadup(void) {
+
+    gQueued_headup_count -= 1;
+    memcpy(&gQueued_headups[0], &gQueued_headups[1], gQueued_headup_count * sizeof(tQueued_headup));
+}
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
@@ -577,11 +591,73 @@ int C2_HOOK_FASTCALL MungeHeadupWidth(tHeadup* pHeadup) {
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x00449fd0
-// STUB: CARMA2_SW 0x0044a160
-// STUB: CARMA2_CHEAT 0x0044a4f0
+// FUNCTION: CARMA2_HW 0x00449fd0
+// FUNCTION: CARMA2_SW 0x0044a160
+// FUNCTION: CARMA2_CHEAT 0x0044a4f0
 int C2_HOOK_FASTCALL NewTextHeadupSlot2(int pSlot_index, int pFlash_rate, int pLifetime, int pFont_index, const char* pText, int pQueue_it) {
-    NOT_IMPLEMENTED();
+    int index;
+    tHeadup* the_headup;
+    tHeadup_slot* headup_slot;
+    tU32 time;
+
+    time = PDGetTotalTime();
+    if (pQueue_it && pSlot_index == 4 && time - gLast_centre_headup < 1000) {
+        if (gQueued_headup_count == 4) {
+            KillOldestQueuedHeadup();
+        }
+        gQueued_headups[gQueued_headup_count].flash_rate = pFlash_rate;
+        gQueued_headups[gQueued_headup_count].lifetime = pLifetime;
+        gQueued_headups[gQueued_headup_count].font_index = pFont_index;
+        strcpy(gQueued_headups[gQueued_headup_count].text, pText);
+        gQueued_headup_count++;
+        index = -1;
+    } else {
+        index = FindAHeadupHoleWoofBarkSoundsABitRude(pSlot_index);
+        if (index >= 0) {
+            if (pSlot_index == 4) {
+                gLast_centre_headup = time;
+            }
+            headup_slot = &gProgram_state.current_car.headup_slots[gProgram_state.cockpit_on][pSlot_index];
+            the_headup = &gHeadups[index];
+            the_headup->data.coloured_text_info.coloured_font = &gFonts[-pFont_index];
+            if (pSlot_index == 4) {
+                the_headup->type = eHeadup_box_text;
+            } else {
+                the_headup->type = eHeadup_coloured_text;
+            }
+            strcpy(the_headup->data.coloured_text_info.text, pText);
+
+            the_headup->slot_index = pSlot_index;
+            the_headup->justification = headup_slot->justification;
+            if (pSlot_index >= 0) {
+                the_headup->cockpit_anchored = headup_slot->cockpit_anchored;
+            } else {
+                the_headup->cockpit_anchored = 0;
+            }
+            the_headup->field_0x3c = headup_slot->field_0x28;
+            the_headup->dimmed_background = headup_slot->dimmed_background;
+            the_headup->dim_left = headup_slot->dim_left;
+            the_headup->dim_top = headup_slot->dim_top;
+            the_headup->dim_right = headup_slot->dim_right;
+            the_headup->dim_bottom = headup_slot->dim_bottom;
+            the_headup->original_x = headup_slot->x;
+            the_headup->right_edge = MungeHeadupWidth(the_headup) + the_headup->x;
+            the_headup->y = headup_slot->y;
+            if (pFlash_rate) {
+                the_headup->flash_period = 1000 / pFlash_rate;
+            } else {
+                the_headup->flash_period = 0;
+            }
+            the_headup->last_flash = 0;
+            the_headup->flash_state = 0;
+            if (pLifetime) {
+                the_headup->end_time = GetTotalTime() + pLifetime;
+            } else {
+                the_headup->end_time = 0;
+            }
+        }
+    }
+    return index;
 }
 
 #ifdef REC2_MATCHING
@@ -976,10 +1052,41 @@ void C2_HOOK_FASTCALL ChangingView(void) {
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x0044b300
-// STUB: CARMA2_SW 0x0044b490
+// FUNCTION: CARMA2_HW 0x0044b300
+// FUNCTION: CARMA2_SW 0x0044b490
+// FUNCTION: CARMA2_CHEAT 0x0044b850
 void C2_HOOK_FASTCALL EarnCredits2(int pAmount, const char* pPrefix_text) {
-    NOT_IMPLEMENTED();
+    char s[256];
+    int original_amount;
+    tU32 the_time;
+
+    if (gRace_finished) {
+        return;
+    }
+    the_time = GetTotalTime();
+    if (pAmount == 0) {
+        return;
+    }
+    if (gCredit_multiplier != 0) {
+        pAmount *= gCredit_multiplier;
+    }
+    original_amount = pAmount;
+    if (gLast_credit_headup__displays >= 0 && the_time - gLast_earn_time < 2000) {
+        pAmount += gLast_credit_amount;
+    }
+    gLast_credit_amount = pAmount;
+    if (pAmount > 1) {
+        sprintf(s, "%s%d %s", pPrefix_text, pAmount, GetMiscString(eMiscString_credits));
+    } else if (pAmount > 0) {
+        sprintf(s, "%s1 %s", pPrefix_text, GetMiscString(eMiscString_credit));
+    } else if (pAmount < -1) {
+        sprintf(s, "%s%s %d %s", GetMiscString(eMiscString_lost_credits_prefix), pPrefix_text, -pAmount, GetMiscString(eMiscString_credits));
+    } else {
+        sprintf(s, "%s%s 1 %s", pPrefix_text, GetMiscString(eMiscString_lost_credits_prefix), GetMiscString(eMiscString_credit));
+    }
+    gProgram_state.credits += original_amount;
+    gLast_credit_headup__displays = NewTextHeadupSlot2(4, 0, 2000, -4, s, 1);
+    gLast_earn_time = the_time;
 }
 
 #ifdef REC2_MATCHING
