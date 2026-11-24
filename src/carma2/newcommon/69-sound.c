@@ -596,21 +596,19 @@ void C2_HOOK_FASTCALL InitSoundSources(void) {
     int cat;
     int car_count;
     tCar_spec* car;
-    tEnvironment_sound_source* env_src;
     int i;
 
+    toggle = 0;
     if (!gSound_available) {
         return;
     }
 
     if (!gSound_enabled) {
-        toggle = 1;
         ToggleSoundEnable();
-    } else {
-        toggle = 0;
+        toggle = 1;
     }
-    BrVector3Scale(&gCamera_left, (br_vector3*)gCamera_to_world.m[0], -1.0f);
     BrVector3Copy(&gCamera_position, (br_vector3*)gCamera_to_world.m[3]);
+    BrVector3Scale(&gCamera_left, (br_vector3*)gCamera_to_world.m[0], -1.0f);
     S3BindListenerPositionBRender(&gCamera_position);
     S3BindListenerVelocityBRender(&gCamera_velocity);
     S3BindListenerLeftBRender(&gCamera_left);
@@ -636,7 +634,7 @@ void C2_HOOK_FASTCALL InitSoundSources(void) {
 
                     car->sound_source = S3CreateSoundSourceBR(&car->pos, &car->vel, gEngine_outlet);
                     if (car->sound_source != NULL) {
-                        S3BindAmbientSoundToOutlet(gEngine_outlet, cat == eVehicle_rozzer ? eSoundId_Cop_Siren : car->engine_noises[0], car->sound_source, 250.0f, 0, 0, 0, BR_FIXED_INT(1), BR_FIXED_INT(1));
+                        S3BindAmbientSoundToOutlet(gEngine_outlet, cat != eVehicle_rozzer ? car->engine_noises[0] : eSoundId_Cop_Siren, car->sound_source, 250.0f, 0, 0, 0, BR_FIXED_INT(1), BR_FIXED_INT(1));
                     }
                 }
             }
@@ -644,12 +642,11 @@ void C2_HOOK_FASTCALL InitSoundSources(void) {
 
         for (i = 0; i < (int)REC2_ASIZE(gEnvironment_sound_sources); i++) {
 
-            env_src = &gEnvironment_sound_sources[i];
-            env_src->field_0x10 = NULL;
-            if (env_src->source == NULL) {
-                env_src->source = S3CreateSoundSourceBR(&env_src->position, &gZero_v__car, gXXX_outlet);
-                if (env_src->source != NULL) {
-                    S3BindAmbientSoundToOutlet(gXXX_outlet, eSoundId_Cop_Siren, env_src->source, 100.f, 0, 0, 0, S3_FIXED_INT(1), S3_FIXED_INT(1));
+            gEnvironment_sound_sources[i].field_0x10 = NULL;
+            if (gEnvironment_sound_sources[i].source == NULL) {
+                gEnvironment_sound_sources[i].source = S3CreateSoundSourceBR(&gEnvironment_sound_sources[i].position, &gZero_v__car, gXXX_outlet);
+                if (gEnvironment_sound_sources[i].source != NULL) {
+                    S3BindAmbientSoundToOutlet(gXXX_outlet, eSoundId_Cop_Siren, gEnvironment_sound_sources[i].source, 100.f, 0, 0, 0, S3_FIXED_INT(1), S3_FIXED_INT(1));
                 }
             }
         }
