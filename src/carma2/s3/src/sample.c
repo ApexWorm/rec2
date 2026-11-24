@@ -133,9 +133,14 @@ void C2_HOOK_CDECL s3_dprintf(const char* pFormat, ...) {
 }
 
 // FUNCTION: CARMA2_HW 0x00568ee0
+// FUNCTION: CARMA2_SW 0x00564580
+// FUNCTION: CARMA2_CHEAT 0x0056ead0
 int C2_HOOK_FASTCALL S3CheckWavHeader(tS3_wav_file* pWav_buffer, tS3_wav_chunk_info_header** pWav_format_info_header, void** pSamples, int* pSample_size) {
-    void* chunk_start;
-    void* file_end;
+    tU32* pdw;
+    tU32* pdwEnd;
+    tU32 dwRiff;
+    tU32 dwType;
+    tU32 dwLength;
 
     if (pWav_format_info_header != NULL) {
         *pWav_format_info_header = NULL;
@@ -146,43 +151,51 @@ int C2_HOOK_FASTCALL S3CheckWavHeader(tS3_wav_file* pWav_buffer, tS3_wav_chunk_i
     if (pSample_size != NULL) {
         *pSample_size = 0;
     }
-    if (strncmp(pWav_buffer->riff_header.magic, "RIFF", 4) != 0 || strncmp(pWav_buffer->wave_magic, "WAVE", 4) != 0) {
+    pdw = (tU32*)pWav_buffer;
+    dwRiff = *pdw++;
+    dwLength = *pdw++;
+    dwType = *pdw++;
+    if (dwRiff != 0x46464952) {
         return 0;
     }
-    file_end = (br_uint_8*)pWav_buffer->wave_magic + pWav_buffer->riff_header.chunk_size;
-    chunk_start = &pWav_buffer->fmt_chunk;
-    while (chunk_start < file_end) {
-        tS3_riff_chunk_header* chunk_header = chunk_start;
-        if (strncmp(chunk_header->magic, "fmt ", 4) == 0) {
-            tS3_riff_fmt_chunk* fmt_chunk = chunk_start;
+    if (dwType != 0x45564157) {
+        return 0;
+    }
+    pdwEnd = (tU32*)((tU8*)pdw + dwLength - 4);
+    while (pdw < pdwEnd) {
+        dwType = *pdw++;
+        dwLength = *pdw++;
+        switch (dwType) {
+        case 0x20746d66:
             if (pWav_format_info_header != NULL && *pWav_format_info_header == NULL) {
-                C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tS3_wav_chunk_info_header, bits_per_sample, 0xe);
-                if (chunk_header->chunk_size < offsetof(tS3_wav_chunk_info_header, bits_per_sample)) {
+                if (dwLength < 14) {
                     return 0;
                 }
-                *pWav_format_info_header = &fmt_chunk->wav_info_header;
+                *pWav_format_info_header = (tS3_wav_chunk_info_header*)pdw;
                 if ((pSamples == NULL || *pSamples != NULL) && (pSample_size == NULL || *pSample_size != 0)) {
                     return 1;
                 }
             }
-        } else if (strncmp(chunk_header->magic, "data", 4) == 0) {
-            tS3_riff_data_chunk* data_chunk = chunk_start;
+            break;
+        case 0x61746164:
             if ((pSamples != NULL && *pSamples == NULL) || (pSample_size != NULL && *pSample_size == 0)) {
                 if (pSamples != NULL) {
-                    *pSamples = data_chunk->data;
+                    *pSamples = pdw;
                 }
                 if (pSample_size != NULL) {
-                    *pSample_size = data_chunk->header.chunk_size;
+                    *pSample_size = dwLength;
                 }
                 if (pWav_format_info_header == NULL || *pWav_format_info_header != NULL) {
                     return 1;
                 }
             }
+            break;
         }
-        chunk_start = (br_uint_8*)&chunk_header[1] + chunk_header->chunk_size;
+        pdw = (tU32*)((tU8*)pdw + ((dwLength + 1) & ~1));
     }
     return 0;
 }
+
 
 // FUNCTION: CARMA2_HW 0x0056907c
 // FUNCTION: CARMA2_SW 0x0056471c
