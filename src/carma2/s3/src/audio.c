@@ -1103,29 +1103,29 @@ int C2_HOOK_FASTCALL S3NotifyUnbindChannel(tS3_channel* pChannel) {
 // FUNCTION: CARMA2_HW 0x00565607
 // FUNCTION: CARMA2_SW 0x00560ca7
 int C2_HOOK_FASTCALL S3UnbindChannels(tS3_outlet* pOutlet) {
-    tS3_channel* next;
-    tS3_channel* c;
+    tS3_channel* next_channel;
+    tS3_channel* channel;
 
-    c = pOutlet->channel_list;
-    for (; c != NULL;) {
-        if (c->active) {
-            c->termination_reason = 1;
-            S3StopChannel(c);
-            c->needs_service = 1;
+    channel = pOutlet->channel_list;
+    for (; channel != NULL;) {
+        if (channel->active) {
+            channel->termination_reason = 1;
+            S3StopChannel(channel);
+            channel->needs_service = 1;
         }
-        next = c->next;
-        S3NotifyUnbindChannel(c);
+        next_channel = channel->next;
+        S3NotifyUnbindChannel(channel);
         if (gS3_unbound_channels == NULL) {
-            gS3_unbound_channels = c;
-            gS3_last_unbound_channel = c;
+            gS3_unbound_channels = channel;
+            gS3_last_unbound_channel = channel;
         } else {
-            gS3_last_unbound_channel->next = c;
-            gS3_last_unbound_channel = c;
+            gS3_last_unbound_channel->next = channel;
+            gS3_last_unbound_channel = channel;
         }
 
-        C2_HOOK_BUG_ON(sizeof(*c) != 0x78);
-        memset(c, 0, sizeof(*c));
-        c = next;
+        C2_HOOK_BUG_ON(sizeof(*channel) != 0x78);
+        memset(channel, 0, sizeof(*channel));
+        channel = next_channel;
     }
     pOutlet->channel_list = NULL;
     return 1;
