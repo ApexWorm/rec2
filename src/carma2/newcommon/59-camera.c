@@ -632,7 +632,7 @@ void C2_HOOK_FASTCALL InitialiseExternalCamera(void) {
     gView_direction.v[2] = c->direction.v[2];
     gFLOAT_006792fc = 1.0f;
     BrVector3Normalise(&gView_direction, &gView_direction);
-    ts = -(gView_direction.v[2] * c->car_master_actor->t.t.mat.m[2][2] + gView_direction.v[0] * c->car_master_actor->t.t.mat.m[2][0] + gView_direction.v[1] * c->car_master_actor->t.t.mat.m[2][1]);
+    ts = -((gView_direction.v[2] * c->car_master_actor->t.t.mat.m[2][2]) + gView_direction.v[0] * c->car_master_actor->t.t.mat.m[2][0] + gView_direction.v[1] * c->car_master_actor->t.t.mat.m[2][1]);
     gCamera_sign = ts < 0;
     if (gCamera_sign) {
         yaw = -gCamera_yaw;
