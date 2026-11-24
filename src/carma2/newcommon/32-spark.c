@@ -78,13 +78,16 @@ int gSmoke_flags;
 // GLOBAL: CARMA2_SW 0x006a3fe4
 int gSmoke_num;
 
+// GLOBAL: CARMA2_HW 0x006a8760
+tBRender_smoke* gBR_smoke_pointers[35];
+
+// GLOBAL: CARMA2_HW 0x006a87f0
+tBRender_smoke gBR_smoke_structs[35] = { 0 };
+
 // GLOBAL: CARMA2_HW 0x006a8ce0
 // GLOBAL: CARMA2_SW 0x006a2730
 // GLOBAL: CARMA2_CHEAT 0x006b0858
-tSmoke gSmoke[25];
-
-// GLOBAL: CARMA2_HW 0x006a8760
-tBRender_smoke* gBR_smoke_pointers[35];
+tSmoke gSmoke[25] = { 0 };
 
 // GLOBAL: CARMA2_HW 0x006aa388
 // GLOBAL: CARMA2_SW 0x006a3dd8

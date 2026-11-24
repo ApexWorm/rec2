@@ -398,9 +398,6 @@ br_model* gBlend_model2;
 // GLOBAL: CARMA2_HW 0x0074caac
 br_actor* gBlend_actor;
 
-// GLOBAL: CARMA2_HW 0x006a87f0
-tBRender_smoke gBR_smoke_structs[35];
-
 
 // GLOBAL: CARMA2_HW 0x00655dc0
 // GLOBAL: CARMA2_SW 0x00650ca8
