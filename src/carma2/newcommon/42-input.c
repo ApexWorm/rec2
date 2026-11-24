@@ -144,7 +144,7 @@ int gModifiers_down;
 // FUNCTION: CARMA2_HW 0x00482770
 // FUNCTION: CARMA2_SW 0x0047f8b0
 // FUNCTION: CARMA2_CHEAT 0x00482a90
-void C2_HOOK_FASTCALL SetJoystickArrays(int* pKeys, int pMark) {
+inline void C2_HOOK_FASTCALL SetJoystickArrays(int* pKeys, int pMark) {
     int i;
 
     for (i = 0; i < 44; i++) {
