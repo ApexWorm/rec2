@@ -138,19 +138,21 @@ FILE* C2_HOOK_FASTCALL PFfopen(const char* pPath, const char* mode) {
     int twt;
     int i;
     int file_index;
-    size_t twt_path_len;
+    tTwatVfsMountPoint* mount;
+    const char* name;
 
     for (twt = 0; twt < (int)REC2_ASIZE(gTwatVfsMountPoints); twt++) {
-        if (gTwatVfsMountPoints[twt].header != NULL && strstr(pPath, gTwatVfsMountPoints[twt].path) == pPath) {
-            twt_path_len = strlen(gTwatVfsMountPoints[twt].path);
-            for (i = 0; i < ((tTwatHeader*)gTwatVfsMountPoints[twt].data)->nbFiles; i++) {
-                if (DRStricmp(((tTwatHeader*)gTwatVfsMountPoints[twt].data)->fileHeaders[i].filename, &pPath[twt_path_len + 1]) == 0) {
+        mount = &gTwatVfsMountPoints[twt];
+        if (mount->header != NULL && strstr(pPath, mount->path) == pPath) {
+            name = &pPath[strlen(mount->path) + 1];
+            for (i = 0; i < ((tTwatHeader*)mount->data)->nbFiles; i++) {
+                if (DRStricmp(((tTwatHeader*)mount->data)->fileHeaders[i].filename, name) == 0) {
                     for (file_index = 0; file_index < (int)REC2_ASIZE(gTwatVfsFiles) - 1; file_index++) {
                         if (gTwatVfsFiles[file_index + 1].start != NULL) {
                             continue;
                         }
-                        gTwatVfsFiles[file_index + 1].pos = gTwatVfsFiles[file_index + 1].start = ((tTwatHeader*)gTwatVfsMountPoints[twt].data)->fileHeaders[i].data;
-                        gTwatVfsFiles[file_index + 1].end = gTwatVfsFiles[file_index + 1].start + ((tTwatHeader*)gTwatVfsMountPoints[twt].data)->fileHeaders[i].fileSize;
+                        gTwatVfsFiles[file_index + 1].pos = gTwatVfsFiles[file_index + 1].start = ((tTwatHeader*)mount->data)->fileHeaders[i].data;
+                        gTwatVfsFiles[file_index + 1].end = gTwatVfsFiles[file_index + 1].start + ((tTwatHeader*)mount->data)->fileHeaders[i].fileSize;
                         gTwatVfsFiles[file_index + 1].error = 0;
                         return (FILE*)(file_index + 1);
                     }
