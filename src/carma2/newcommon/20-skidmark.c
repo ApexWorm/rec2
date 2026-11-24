@@ -19,12 +19,12 @@
 // GLOBAL: CARMA2_HW 0x0065fe08
 // GLOBAL: CARMA2_SW 0x0065a748
 // GLOBAL: CARMA2_CHEAT 0x00667650
-char* gBoring_material_names[2] = { "OILSMEAR.MAT", "ROBSMEAR.MAT" };
+const char* gBoring_material_names[2] = { "OILSMEAR.MAT", "ROBSMEAR.MAT" };
 
 // GLOBAL: CARMA2_HW 0x0065fe10
 // GLOBAL: CARMA2_SW 0x0065a750
 // GLOBAL: CARMA2_CHEAT 0x00667658
-char* gMaterial_names[2] = { "OILSMEAR.MAT", "GIBSMEAR.MAT" };
+const char* gMaterial_names[2] = { "OILSMEAR.MAT", "GIBSMEAR.MAT" };
 
 // GLOBAL: CARMA2_HW 0x0065fec0
 // GLOBAL: CARMA2_SW 0x0065a800
@@ -124,16 +124,16 @@ void C2_HOOK_FASTCALL InitSkids(void) {
 
     for (mat = 0; mat < (int)REC2_ASIZE(gMaterial_names); mat++) {
         if (gProgram_state.sausage_eater_mode) {
-            str = gBoring_material_names[mat];
+            str = (char*)gBoring_material_names[mat];
         } else {
-            str = gMaterial_names[mat];
+            str = (char*)gMaterial_names[mat];
         }
         gMaterial[mat] = BrMaterialFind(str);
         if (gMaterial[mat] == NULL) {
             if (gProgram_state.sausage_eater_mode) {
-                str = gBoring_material_names[mat];
+                str = (char*)gBoring_material_names[mat];
             } else {
-                str = gMaterial_names[mat];
+                str = (char*)gMaterial_names[mat];
             }
 
             str = strtok(str, ".");
@@ -150,9 +150,16 @@ void C2_HOOK_FASTCALL InitSkids(void) {
             if (gMaterial[mat] == NULL) {
                 BrFatal("C:\\Carma2\\Source\\Common\\Skidmark.c", 215, "Couldn't find %s", gMaterial_names[mat]);
             } else {
+#ifdef REC2_HW
                 GlorifyMaterial(&gMaterial[mat], 1, kRendererShadingType_AmbientOnly);
+#endif
+#ifdef REC2_SW
+                BrMaterialAdd(gMaterial[mat]);
+#endif
             }
+#ifdef REC2_HW
             BrMaterialAdd(gMaterial[mat]);
+#endif
         }
     }
 
