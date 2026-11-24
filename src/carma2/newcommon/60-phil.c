@@ -468,7 +468,7 @@ int C2_HOOK_FASTCALL PHILMakeObjectActive(tPhysics_object* pObject, const br_vec
 // FUNCTION: CARMA2_HW 0x004b61a0
 // FUNCTION: CARMA2_SW 0x004b28c0
 // FUNCTION: CARMA2_cHEAT 0x004bbc00
-int C2_HOOK_FASTCALL PHILSetPassiveObjectsMatrix(tPhysics_object* pObject, const br_matrix34* pMatrix) {
+inline int C2_HOOK_FASTCALL PHILSetPassiveObjectsMatrix(tPhysics_object* pObject, const br_matrix34* pMatrix) {
     tPHIL_queued_object_info* queued;
     tPHIL_queued_header* info;
 
@@ -531,11 +531,24 @@ int C2_HOOK_FASTCALL PHILAddObjectImmediately(tPhysics_object* pObject) {
     return result;
 }
 
-// STUB: CARMA2_HW 0x004b62e0
-// STUB: CARMA2_SW 0x004b2a00
-// STUB: CARMA2_CHEAT 0x004bbd70
+// FUNCTION: CARMA2_HW 0x004b62e0
+// FUNCTION: CARMA2_SW 0x004b2a00
+// FUNCTION: CARMA2_CHEAT 0x004bbd70
 int C2_HOOK_FASTCALL PHILAddActiveObjectImmediately(tPhysics_object* pObject, const br_matrix34* pMatrix, const br_vector3* pVelocity, const br_vector3* pOmega) {
-    NOT_IMPLEMENTED();
+    int result;
+
+    if (gPHIL_disabled) {
+        return 0;
+    }
+    if (gPHIL_munging_objects) {
+        gPHIL_object_added = 1;
+    }
+    result = PHILAddObject(pObject);
+    if (result == 0 && (pMatrix == NULL || (result = PHILSetPassiveObjectsMatrix(pObject, pMatrix)) == 0)) {
+        result = PHILMakeObjectActive(pObject, pVelocity, pOmega, 0);
+    }
+    gPHIL_object_added = 0;
+    return result;
 }
 
 // STUB: CARMA2_HW 0x004b63b0
