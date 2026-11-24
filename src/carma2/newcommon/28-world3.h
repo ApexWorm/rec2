@@ -18,6 +18,10 @@ extern tBrender_storage* gStorage_for_callbacks;
 
 extern tRendererShadingType gMaterial_shading_for_callback;
 
+extern tU8* gTrack_flic_buffer;
+
+extern tFlic_descriptor gTrack_flic_descriptor;
+
 extern void C2_HOOK_FASTCALL InitTreeSurgery(void);
 
 // ModelIsATree
@@ -42,7 +46,7 @@ extern void C2_HOOK_FASTCALL InitTreeSurgery(void);
 
 extern intptr_t C2_HOOK_CDECL RemoveBounds(br_actor* pActor, void* pArg);
 
-// RemoveBoundsStructures
+extern void C2_HOOK_FASTCALL RemoveBoundsStructures(br_actor* pActor);
 
 extern void C2_HOOK_FASTCALL FreeTrack(tTrack_spec* pTrack_spec);
 

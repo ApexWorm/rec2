@@ -9,7 +9,12 @@
 #include "28-world3.h"
 
 #include "08-loading1.h"
+#include "09-funks.h"
+#include "17-world2.h"
+#include "30-opponent.h"
+#include "32-spark.h"
 #include "37-brucetrk.h"
+#include "38-flicplay.h"
 #include "41-utility.h"
 #include "51-smash.h"
 #include "52-errors.h"
@@ -53,6 +58,16 @@ br_model* gDuplicate_model;
 // GLOBAL: CARMA2_SW 0x0065b62c
 // GLOBAL: CARMA2_CHEAT 0x00668500
 tRendererShadingType gMaterial_shading_for_callback = kRendererShadingType_Undefined;
+
+// GLOBAL: CARMA2_HW 0x006aaf40
+// GLOBAL: CARMA2_SW 0x006a4990
+// GLOBAL: CARMA2_CHEAT 0x006b25d8
+tU8* gTrack_flic_buffer;
+
+// GLOBAL: CARMA2_HW 0x006aaf50
+// GLOBAL: CARMA2_SW 0x006a49a0
+// GLOBAL: CARMA2_CHEAT 0x006b25e0
+tFlic_descriptor gTrack_flic_descriptor;
 
 // FUNCTION: CARMA2_HW 0x00504b30
 // FUNCTION: CARMA2_SW 0x005002f0
@@ -118,13 +133,84 @@ intptr_t C2_HOOK_CDECL RemoveBounds(br_actor* pActor, void* pArg) {
     return 0;
 }
 
-// RemoveBoundsStructures
+inline void C2_HOOK_FASTCALL RemoveBoundsStructures(br_actor* pActor) {
 
-// STUB: CARMA2_HW 0x00506c20
-// STUB: CARMA2_SW 0x00502070
-// STUB: CARMA2_CHEAT 0x0050c610
+    DRActorEnumRecurse(pActor, RemoveBounds, NULL);
+}
+
+// FUNCTION: CARMA2_HW 0x00506c20
+// FUNCTION: CARMA2_SW 0x00502070
+// FUNCTION: CARMA2_CHEAT 0x0050c610
 void C2_HOOK_FASTCALL FreeTrack(tTrack_spec* pTrack_spec) {
-    NOT_IMPLEMENTED();
+    int i;
+    tNon_car_spec* non_car;
+
+    DisposeSmashableEnvironment();
+    if (gAdditional_actors != NULL) {
+        BrActorRemove(gAdditional_actors);
+        BrActorFree(gAdditional_actors);
+    }
+    PossibleService();
+    DisposeTexturingMaterials();
+    PossibleService();
+    RemoveBoundsStructures(pTrack_spec->the_actor);
+    PossibleService();
+    DisposeColumns(pTrack_spec);
+    PossibleService();
+    DisposeFunkotronics(-2);
+    PossibleService();
+    ClearOutStorageSpace(&gTrack_storage_space);
+#ifndef REC2_CHEAT
+    gProgram_state.current_depth_effect.sky_texture = NULL;
+#endif
+    PossibleService();
+    DisposeGroovidelics(-2);
+    PossibleService();
+    DisposeOpponentPaths();
+    PossibleService();
+    DisposeKevStuff();
+    PossibleService();
+    BrActorRemove(pTrack_spec->the_actor);
+    BrActorFree(pTrack_spec->the_actor);
+    pTrack_spec->the_actor = NULL;
+    gTrack_actor = NULL;
+    if (gProgram_state.special_volume_count != 0) {
+        BrMemFree(gProgram_state.special_volumes);
+    }
+    if (gProgram_state.special_screens_count != 0) {
+        BrMemFree(gProgram_state.special_screens);
+    }
+    PossibleService();
+    non_car = gProgram_state.non_cars;
+    for (i = 0; i < 40; i++, non_car++) {
+        non_car->collision_info->shape = NULL;
+        non_car->collision_info->physics_joint1 = NULL;
+        non_car->collision_info->physics_joint2 = NULL;
+    }
+    non_car = gProgram_state.non_cars;
+    for (i = 0; i < gProgram_state.num_non_car_spaces; i++, non_car++) {
+        PossibleService();
+        if (non_car->driver == eDriver_4 && non_car->car_master_actor != NULL) {
+            if (non_car->car_master_actor->parent != NULL) {
+                BrActorRemove(non_car->car_master_actor);
+            }
+            BrActorFree(non_car->car_master_actor);
+        }
+        DisposePhysicsObject(non_car->collision_info);
+    }
+    if (gProgram_state.non_cars != NULL) {
+        BrMemFree(gProgram_state.non_cars);
+    }
+    FreeSmokeShadeTables();
+    if (gTrack_flic_buffer != NULL) {
+        BrMapRemove(gProgram_state.default_depth_effect.sky_texture);
+        BrMemFree(gTrack_flic_buffer);
+        EndFlic(&gTrack_flic_descriptor);
+        BrMemFree(gProgram_state.default_depth_effect.sky_texture->pixels);
+        gProgram_state.default_depth_effect.sky_texture->pixels = NULL;
+        BrPixelmapFree(gProgram_state.default_depth_effect.sky_texture);
+        gTrack_flic_buffer = NULL;
+    }
 }
 
 // FUNCTION: CARMA2_HW 0x00506e50

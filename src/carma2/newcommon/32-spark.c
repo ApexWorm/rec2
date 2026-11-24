@@ -1706,7 +1706,12 @@ void C2_HOOK_FASTCALL LoadInKevStuff(FILE* pF) {
     PackFileRerevertTiffLoading();
 }
 
-// DisposeKevStuff
+// STUB: CARMA2_HW 0x004fe180
+// STUB: CARMA2_SW 0x004f9720
+// STUB: CARMA2_CHEAT 0x00503e20
+void C2_HOOK_FASTCALL DisposeKevStuff(void) {
+    NOT_IMPLEMENTED();
+}
 
 // FUNCTION: CARMA2_HW 0x004fe2c0
 // FUNCTION: CARMA2_SW 0x004f9860

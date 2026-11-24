@@ -237,7 +237,7 @@ extern void C2_HOOK_FASTCALL FreeSmokeShadeTables(void);
 
 extern void C2_HOOK_FASTCALL LoadInKevStuff(FILE* pF);
 
-// DisposeKevStuff
+extern void C2_HOOK_FASTCALL DisposeKevStuff(void);
 
 extern void C2_HOOK_FASTCALL DisposeKevStuffCar(tCar_spec* pCar);
 

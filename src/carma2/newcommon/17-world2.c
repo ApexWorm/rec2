@@ -552,7 +552,12 @@ br_material* C2_HOOK_FASTCALL DisposeSuffixedMaterials(br_model* pModel, tU16 pF
     return NULL;
 }
 
-// DisposeTexturingMaterials
+// STUB: CARMA2_HW 0x004489d0
+// STUB: CARMA2_SW 0x00448df0
+// STUB: CARMA2_CHEAT 0x00448ee0
+void C2_HOOK_FASTCALL DisposeTexturingMaterials(void) {
+    NOT_IMPLEMENTED();
+}
 
 // FUNCTION: CARMA2_HW 0x00448ea0
 // FUNCTION: CARMA2_SW 0x004492c0
