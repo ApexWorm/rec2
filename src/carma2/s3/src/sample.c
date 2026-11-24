@@ -48,39 +48,43 @@ tS3_buffer_desc* C2_HOOK_FASTCALL S3GetBufferDescription(int pSample_id) {
 // FUNCTION: CARMA2_SW 0x00563ed0
 // FUNCTION: CARMA2_CHEAT 0x0056e420
 tS3_error_codes C2_HOOK_FASTCALL S3LoadSample(int pSample_id) {
-    tS3_descriptor* descriptor;
-    char path[512];
-    tS3_buffer_desc* buffer_description;
+    tS3_descriptor* sd;
+    char name[512];
+    tS3_buffer_desc* bd;
+    int n;
+    int res;
 
     if (gS3_enabled) {
-        descriptor = S3GetDescriptorByID(pSample_id);
-        if (descriptor == NULL) {
+        sd = S3GetDescriptorByID(pSample_id);
+        if (sd == NULL) {
             return eS3_error_bad_id;
         }
-        if (descriptor->type == 0) {
-            if (descriptor->buffer_description != NULL) {
+        if (sd->type == 0) {
+            if (sd->buffer_description != NULL) {
                 return eS3_error_none;
             }
-            path[0] = '\0';
-            strcpy(path, descriptor->path);
+            name[0] = '\0';
+            strcpy(name, sd->path);
 
             C2_HOOK_BUG_ON(sizeof(tS3_buffer_desc) != 0x18);
 
-            buffer_description = S3MemAllocate(sizeof(tS3_buffer_desc), kMem_S3_sound_header);
-            if (buffer_description == NULL) {
+            bd = S3MemAllocate(sizeof(tS3_buffer_desc), kMem_S3_sound_header);
+            if (bd == NULL) {
                 return eS3_error_memory;
             }
-            memset(buffer_description, 0, sizeof(*buffer_description));
-            descriptor->pd_handle = S3BufferWav(path, buffer_description);
-            if (descriptor->pd_handle == NULL) {
-                BrFailure("Cound not load sample:%s", path);
-                S3MemFree(buffer_description);
+            memset(bd, 0, sizeof(*bd));
+            sd->pd_handle = S3BufferWav(name, bd);
+            if (sd->pd_handle == NULL) {
+                BrFailure("Could not load sample:%s", name);
+                S3MemFree(bd);
                 return gS3_last_error;
             }
-            descriptor->effects_enabled = 0;
-            descriptor->buffer_description = buffer_description;
+            sd->effects_enabled = 0;
+            sd->buffer_description = bd;
         }
     }
+    (void)n;
+    (void)res;
     return eS3_error_none;
 }
 
