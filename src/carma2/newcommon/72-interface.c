@@ -1323,14 +1323,15 @@ void C2_HOOK_FASTCALL RefreshRacesScroller(tFrontend_spec* pFrontend) {
     char group_text[12];
     int group;
     int i;
+    int race_i;
 
-    group = (gCurrent_race_group - gRace_groups) % 10;
-    sprintf(group_text, "%s %d", IString_Get(78), group + 1);
+    group = (gCurrent_race_group - gRace_groups) % 10 + 1;
+    sprintf(group_text, "%s %d", IString_Get(78), group);
     strcpy(pFrontend->items[2].text, group_text);
 
-    for (i = pFrontend->scrollers[0].indexFirstScrollableItem; i <= pFrontend->scrollers[0].indexLastScrollableItem; i++) {
+    race_i = 4 * (group - 1);
+    for (i = pFrontend->scrollers[0].indexFirstScrollableItem; i <= pFrontend->scrollers[0].indexLastScrollableItem; i++, race_i++) {
         tFrontend_item_spec* item = &pFrontend->items[i];
-        int race_i = 4 * group + i;
 
         strcpy(item->text, gRace_list[race_i].name);
         if (race_i == gProgram_state.current_race_index) {
