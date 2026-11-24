@@ -1086,11 +1086,24 @@ void C2_HOOK_FASTCALL PipeSingleScreenWobble(int pWobble_x, int pWobble_y) {
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x004c80b0
-// STUB: CARMA2_SW 0x004c47e0
-// STUB: CARMA2_CHEAT 0x004cdbd0
+// FUNCTION: CARMA2_HW 0x004c80b0
+// FUNCTION: CARMA2_SW 0x004c47e0
+// FUNCTION: CARMA2_CHEAT 0x004cdbd0
 void C2_HOOK_FASTCALL PipeSingleGrooveStop(int pGroove_index, br_matrix34* pMatrix, int pPath_interrupt, int pObject_interrupt, float pPath_resumption, float pObject_resumption) {
-    NOT_IMPLEMENTED();
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk_groove_stop, path_interrupt, 0x0);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk_groove_stop, object_interrupt, 0x4);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk_groove_stop, path_resumption, 0x8);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk_groove_stop, object_resumption, 0xc);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk_groove_stop, matrix, 0x10);
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_chunk_groove_stop, matrix, 0x30);
+
+    gFloat_pipe_union.f = pPath_resumption;
+    ARDoSingleVariedSession(ePipe_chunk_groove_stop, pGroove_index, 5,
+        SIZE_OFFSET_PIPING(tPipe_chunk_groove_stop, path_interrupt), pObject_interrupt,
+        SIZE_OFFSET_PIPING(tPipe_chunk_groove_stop, object_interrupt), pObject_interrupt,
+        SIZE_OFFSET_PIPING(tPipe_chunk_groove_stop, path_resumption), gFloat_pipe_union.u32,
+        SIZE_OFFSET_PIPING(tPipe_chunk_groove_stop, object_resumption), gFloat_pipe_union.u32,
+        SIZE_OFFSET_PIPING(tPipe_chunk_groove_stop, matrix), pMatrix);
 }
 
 #ifdef REC2_MATCHING
