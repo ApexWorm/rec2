@@ -21,6 +21,7 @@
 #include "52-errors.h"
 #include "59-camera.h"
 #include "62-graphics3.h"
+#include "69-sound.h"
 
 #include "globvars.h"
 #include "globvrpb.h"
@@ -957,10 +958,27 @@ void C2_HOOK_FASTCALL ReadSmashableData(FILE* pF, tCar_crush_buffer_entry* pCar_
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x004ef840
-// STUB: CARMA2_SW 0x004eb4a0
+// FUNCTION: CARMA2_HW 0x004ef840
+// FUNCTION: CARMA2_SW 0x004eb4a0
+// FUNCTION: CARMA2_CHEAT 0x004f54e0
 void C2_HOOK_FASTCALL ActuallyRepairSmash(tCar_spec* pCar_spec, tCar_crush_smashable_part* pSmashable, int pLevel) {
-    NOT_IMPLEMENTED();
+    br_pixelmap* texture;
+
+    pSmashable->field_0x4c = pLevel;
+    texture = pSmashable->levels[pLevel].pixelmaps[IRandomBetween(0, pSmashable->levels[pLevel].count_pixelmaps - 1)];
+    PipeSingleSmashTextureChange(pCar_spec, pSmashable->funk_material, texture);
+    pSmashable->funk_material->user = texture;
+    if (pCar_spec->field_0x1960 == NULL) {
+        pSmashable->funk_material->colour_map = texture;
+    }
+    BrMaterialUpdate(pSmashable->funk_material, BR_MATU_COLOURMAP);
+    MungeInternalCarGlass(pCar_spec);
+    if (pLevel == 0 && pSmashable->funk >= 0) {
+        EnableFunkotronic(pSmashable->funk);
+    }
+    if (pCar_spec != NULL && pCar_spec->driver == eDriver_local_human && gProgram_state.racing) {
+        DRS3StartSound(gCar_outlet, eSoundId_SmashRepair);
+    }
 }
 
 #ifdef REC2_MATCHING
