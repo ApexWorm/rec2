@@ -346,7 +346,7 @@ int C2_HOOK_FASTCALL PFfseek(FILE* pF, int offset, int whence) {
     twtFile = &gTwatVfsFiles[(uintptr_t)pF];
     switch (whence) {
     case SEEK_SET:
-        newpos = twtFile->start + offset;
+        newpos = gTwatVfsFiles[(uintptr_t)pF].start + offset;
         break;
     case SEEK_END:
         newpos = twtFile->end + offset;
