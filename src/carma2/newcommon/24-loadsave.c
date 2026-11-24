@@ -41,7 +41,10 @@ tSave_game* gSaved_games;
 // GLOBAL: CARMA2_CHEAT 0x00693fc8
 int gCount_saved_games;
 
-// Encryptificate
+void C2_HOOK_FASTCALL Encryptificate(tSave_game* pSave_games, int pCount) {
+
+    SplungeSomeData(pSave_games, pCount * sizeof(*pSave_games));
+}
 
 // FUNCTION: CARMA2_HW 0x004919a0
 // FUNCTION: CARMA2_SW 0x0048ec10
@@ -94,7 +97,7 @@ void C2_HOOK_FASTCALL DoSaveGame(void) {
                 gCurrent_APO_potential_levels[i] = gProgram_state.current_car.power_up_slots[i];
             }
             MakeSavedGame(&saved_game);
-            SplungeSomeData(&saved_game, sizeof(tSave_game));
+            Encryptificate(&saved_game, 1);
             PFfwrite(&saved_game, 1, sizeof(tSave_game), f);
             PFfclose(f);
             gSave_game_out_of_sync = 0;
