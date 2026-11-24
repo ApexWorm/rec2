@@ -2620,7 +2620,29 @@ void C2_HOOK_FASTCALL UndoRelink(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk)
     }
 }
 
-// UndoSplitWeld
+// FUNCTION: CARMA2_HW 0x004c9fd0
+// FUNCTION: CARMA2_SW 0x004c6700
+// FUNCTION: CARMA2_CHEAT 0x004cfb10
+void C2_HOOK_FASTCALL UndoSplitWeld(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
+    tCar_spec* car;
+
+    (void)pPrev_chunk;
+    if ((*pChunk)->data.split_weld.split) {
+        if (((*pChunk)->subject_index >> 8) == eVehicle_self) {
+            car = &gProgram_state.current_car;
+        } else {
+            car = GetCarSpec((*pChunk)->subject_index >> 8, (*pChunk)->subject_index & 0xff);
+        }
+        ARUndoSplitWeld(car);
+    } else {
+        if (((*pChunk)->subject_index >> 8) == eVehicle_self) {
+            car = &gProgram_state.current_car;
+        } else {
+            car = GetCarSpec((*pChunk)->subject_index >> 8, (*pChunk)->subject_index & 0xff);
+        }
+        ARApplySplitWeld(car, &(*pChunk)->data.split_weld.plane);
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x004ca050
 // FUNCTION: CARMA2_SW 0x004c6780
