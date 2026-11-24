@@ -564,6 +564,9 @@ int C2_HOOK_CDECL PHILSetObjectProperty(tPhysics_object* pCollision_info, int pP
     if (gPHIL_disabled) {
         return 0;
     }
+#ifdef REC2_CHEAT
+    PHILVerify();
+#endif
     if (pCollision_info->field_0x239 == 2) {
         owner = pCollision_info->field_0x240;
     } else {
@@ -626,6 +629,9 @@ int C2_HOOK_CDECL PHILSetObjectProperty(tPhysics_object* pCollision_info, int pP
         va_end(ap);
         return 0;
     }
+#ifdef REC2_CHEAT
+    PHILVerify();
+#endif
     return 3;
 }
 
