@@ -572,7 +572,7 @@ float C2_HOOK_FASTCALL PHILGetObjectProperty(tPhysics_object* pObject, int pProp
         }
         if (owner != NULL) {
             if (pProperty < 0 || pProperty >= 9) {
-                return 5.f;
+                return 5.0f;
             }
             switch (pProperty) {
             case 0:
@@ -596,7 +596,7 @@ float C2_HOOK_FASTCALL PHILGetObjectProperty(tPhysics_object* pObject, int pProp
             }
         }
     }
-    return 0.f;
+    return 0.0f;
 }
 
 // FlushQueuedAddsAndRemoves
