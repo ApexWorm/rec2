@@ -635,6 +635,7 @@ int C2_HOOK_FASTCALL S3CreateOutletChannels(tS3_outlet* outlet, int pChannel_cou
 }
 
 // FUNCTION: CARMA2_HW 0x00568c2c
+// FUNCTION: CARMA2_SW 0x005642cc
 // FUNCTION: CARMA2_CHEAT 0x0056e81c
 void* C2_HOOK_FASTCALL S3LoadSoundBankFile(const char* pPath) {
     char file_name[512];
