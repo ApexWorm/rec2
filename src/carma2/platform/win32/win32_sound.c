@@ -243,7 +243,7 @@ int C2_HOOK_FASTCALL PDReverseAudio(tS3_channel* pChannel) {
         if (tmp_buffer == NULL) {
             return 1;
         }
-        memmove(tmp_buffer, data, nbytes);
+        memcpy(tmp_buffer, data, nbytes);
         for (cnt = 0; cnt < (int)nbytes; cnt++) {
 #ifdef REC2_CHEAT
             data[cnt] = tmp_buffer[size - cnt];
