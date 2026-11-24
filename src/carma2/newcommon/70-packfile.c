@@ -416,6 +416,7 @@ void C2_HOOK_FASTCALL PFForEveryFile(const char* pThe_path, tPDForEveryFileRecur
     int twt;
     int i;
     char buffer[256];
+    tTwatVfsMountPoint* mp;
 
     for (twt = 0; twt < (int)REC2_ASIZE(gTwatVfsMountPoints); twt++) {
         if (gTwatVfsMountPoints[twt].header == NULL) {
@@ -424,8 +425,9 @@ void C2_HOOK_FASTCALL PFForEveryFile(const char* pThe_path, tPDForEveryFileRecur
         if (DRStricmp(pThe_path, gTwatVfsMountPoints[twt].path) != 0) {
             continue;
         }
-        for (i = 0; i < gTwatVfsMountPoints[twt].header->nbFiles; i++) {
-            PathCat(buffer, pThe_path, gTwatVfsMountPoints[twt].header->fileHeaders[i].filename);
+        mp = &gTwatVfsMountPoints[twt];
+        for (i = 0; i < ((tTwatHeader*)mp->data)->nbFiles; i++) {
+            PathCat(buffer, pThe_path, ((tTwatHeader*)mp->data)->fileHeaders[i].filename);
             pAction_routine(buffer);
         }
         return;
