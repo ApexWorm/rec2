@@ -1764,9 +1764,35 @@ void C2_HOOK_FASTCALL AdjustSplashReplay(void* pObject, int pType, float pWater_
     BrVector3Copy(&gReplay_splashes[i].bb.max, &pBounds->max);
 }
 
-// STUB: CARMA2_HW 0x004ff030
-// STUB: CARMA2_SW 0x004fa910
-// STUB: CARMA2_CHEAT 0x00504cd0
+// FUNCTION: CARMA2_HW 0x004ff030
+// FUNCTION: CARMA2_SW 0x004fa910
+// FUNCTION: CARMA2_CHEAT 0x00504cd0
 void C2_HOOK_FASTCALL InitReplaySplashes(void) {
-    NOT_IMPLEMENTED();
+    tPhysics_object* object;
+    void* owner;
+    tU8 type;
+    tCar_spec* car;
+
+    gReplay_splash_flags = 0;
+    for (object = gPHIL_list_collision_infos; object != NULL; object = object->next) {
+        if (object->water_d != 10000.0f) {
+            owner = NULL;
+            if (PHILGetObjectProperty(object, 6) != 0.0f) {
+                owner = object;
+                type = 0xff;
+            } else if (object != NULL && object->owner != NULL && object->flags_0x238 == 1) {
+                car = (tCar_spec*)object->owner;
+                if (car == NULL || car->driver <= eDriver_5) {
+                    owner = object->actor;
+                    type = 1;
+                }
+            } else if (object != NULL && object->owner != NULL && object->flags_0x238 >= 2 && object->flags_0x238 <= 4) {
+                owner = object->owner;
+                type = object->flags_0x238;
+            }
+            if (owner != NULL) {
+                AdjustSplashReplay(owner, type, object->water_d, &object->water_normal, &object->bb1);
+            }
+        }
+    }
 }
