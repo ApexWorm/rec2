@@ -305,7 +305,7 @@ extern void C2_HOOK_FASTCALL PipeSingleDroneStraightPos(tDrone_spec* pDrone, tDr
 
 extern void C2_HOOK_FASTCALL PipeSinglePowerupRespawn(br_actor* pActor, int pPowerup_id);
 
-// PipeSingleShitMine
+extern void C2_HOOK_FASTCALL PipeSingleShitMine(br_actor* pActor);
 
 extern void C2_HOOK_FASTCALL PipeSingleEndShitMine(br_actor* pActor);
 

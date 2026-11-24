@@ -1753,7 +1753,15 @@ void C2_HOOK_FASTCALL PipeSinglePowerupRespawn(br_actor* pActor, int pPowerup_id
         SIZE_OFFSET_PIPING(tPipe_chunk_powerup_respawn, index), pPowerup_id);
 }
 
-// PipeSingleShitMine
+// FUNCTION: CARMA2_HW 0x004c8fb0
+// FUNCTION: CARMA2_SW 0x004c56e0
+// FUNCTION: CARMA2_CHEAT 0x004cead0
+void C2_HOOK_FASTCALL PipeSingleShitMine(br_actor* pActor) {
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_chunk_shit_mine, m, 0x30);
+
+    ARDoSingleVariedSession(ePipe_chunk_shit_mine, (uintptr_t)pActor, 1,
+        SIZE_OFFSET_PIPING(tPipe_chunk_shit_mine, m), &pActor->t.t.mat);
+}
 
 // FUNCTION: CARMA2_HW 0x004c8fd0
 // FUNCTION: CARMA2_SW 0x004c5700
