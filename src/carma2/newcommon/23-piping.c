@@ -32,6 +32,7 @@
 #include "globvars.h"
 #include "platform.h"
 
+#include "rec2_macros.h"
 #include <s3/internal/audio.h>
 
 #include <limits.h>
@@ -734,7 +735,31 @@ inline void C2_HOOK_FASTCALL SaveReducedPos(tReduced_pos* pReduced_pos, br_vecto
         (tS16)(tv.v[2] * 800.0f));
 }
 
-// InitLastDamageArrayEtc
+// FUNCTION: CARMA2_HW 0x004c6580
+// FUNCTION: CARMA2_SW 0x004c2cb0
+// FUNCTION: CARMA2_CHEAT 0x004cc0a0
+void C2_HOOK_FASTCALL InitLastDamageArrayEtc(void) {
+    int cat;
+    int car_count;
+    int i;
+    int j;
+
+    for (cat = eVehicle_self; cat <= eVehicle_not_really; cat++) {
+        car_count = cat == eVehicle_self ? 1 : GetCarCount(cat);
+        for (i = 0; i < car_count; i++) {
+            tCar_spec* car;
+
+            car = cat == eVehicle_self ? &gProgram_state.current_car : GetCarSpec(cat, i);
+            if (cat != eVehicle_not_really) {
+
+                for (j = 0; j < (int)REC2_ASIZE(car->frame_start_damage); j++) {
+                    car->frame_start_damage[j] = 0;
+                }
+            }
+            car->car_ID = (tU16)((cat << 8) + i);
+        }
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x004c65f0
 // FUNCTION: CARMA2_SW 0x004c2d20
