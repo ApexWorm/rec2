@@ -45,6 +45,8 @@
 #include "c2_stdlib.h"
 #include "c2_string.h"
 
+#include <stdarg.h>
+
 // GLOBAL: CARMA2_HW 0x006a0414
 // GLOBAL: CARMA2_SW 0x0069a46c
 // GLOBAL: CARMA2_CHEAT 0x006a7f8c
@@ -642,11 +644,32 @@ void C2_HOOK_FASTCALL PedApplyPedFPChange(tPedestrian* pPed, float pSpeed) {
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x004cc860
-// STUB: CARMA2_SW 0x004c8f60
-// STUB: CARMA2_CHEAT 0x004d23d0
-void C2_HOOK_CDECL SetCharacterPhysicsLevelAR(tPed_character_instance* pCharacter, tU32 pLevel) {
-    NOT_IMPLEMENTED();
+// FUNCTION: CARMA2_HW 0x004cc860
+// FUNCTION: CARMA2_SW 0x004c8f60
+// FUNCTION: CARMA2_CHEAT 0x004d23d0
+void C2_HOOK_CDECL SetCharacterPhysicsLevelAR(tPed_character_instance* pCharacter, tU32 pLevel, ...) {
+    tU32 old_level;
+    tU32 old_bit;
+    tS8 old_field_0x4;
+    undefined old_field_0x5;
+    va_list ap;
+
+    old_level = pCharacter->field_0x14;
+    old_bit = (old_level >> 2) & 0x1;
+    old_field_0x4 = pCharacter->field_0x4;
+    old_field_0x5 = pCharacter->field_0x5;
+    if (pLevel == 1) {
+        va_start(ap, pLevel);
+        SetCharacterPhysicsLevel(pCharacter, 1, va_arg(ap, int));
+        va_end(ap);
+    } else {
+        SetCharacterPhysicsLevel(pCharacter, pLevel);
+    }
+    if (((pLevel >> 2) & 0x1) ^ old_bit) {
+        PipeSinglePedStatus(pCharacter->ped, -1, -1, old_level, pLevel, old_field_0x4, pCharacter->field_0x4, old_field_0x5, pCharacter->field_0x5,
+            &pCharacter->field_0xc0, &pCharacter->field_0xcc, &pCharacter->field_0x8c);
+        pCharacter->ped->field_0x06++;
+    }
 }
 
 #ifdef REC2_MATCHING
@@ -2959,7 +2982,20 @@ int C2_HOOK_FASTCALL CharacterNoLongerPhysicworthy(tPed_character_instance* pCha
     return 0;
 }
 
-// SetCharacterPhysicsLevel
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_HW 0x00409570
+// STUB: CARMA2_SW 0x00409570
+// STUB: CARMA2_CHEAT 0x004095c0
+void C2_HOOK_CDECL SetCharacterPhysicsLevel(tPed_character_instance* pCharacter, tU32 pLevel, ...) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // FUNCTION: CARMA2_HW 0x004096f0
 // FUNCTION: CARMA2_SW 0x004096f0
