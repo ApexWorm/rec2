@@ -183,7 +183,7 @@ address,type,name
 0x005847c0,library,__set_osfhnd
 0x00584870,library,__free_osfhnd
 0x00584910,library,__get_osfhandle
-0x00584a00,library,_open
+0x00584a00,library,__open
 0x00584a20,library,__sopen
 0x00584de0,library,__lseeki64
 0x00584ed0,library,___strgtold12

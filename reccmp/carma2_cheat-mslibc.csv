@@ -151,7 +151,7 @@ address,type,name
 0x0058a3b0,library,__set_osfhnd
 0x0058a460,library,__free_osfhnd
 0x0058a500,library,__get_osfhandle
-0x0058a5f0,library,_open
+0x0058a5f0,library,__open
 0x0058a610,library,__sopen
 0x0058a9d0,library,__lseeki64
 0x0058b2a0,library,___tzset
