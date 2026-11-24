@@ -127,8 +127,8 @@ br_uint_32 gS3_last_service_time_spatial;
 // FUNCTION: CARMA2_SW 0x00560870
 // FUNCTION: CARMA2_CHEAT 0x0056adc0
 int C2_HOOK_FASTCALL S3Init(const char* pPath, int pLow_memory_mode, const char* pSound_dirname) {
-    tS3_descriptor* descriptor;
-    char dirpath[256];
+    tS3_descriptor* the_descriptor;
+    char dir_name[256];
 
     s3_debug_init();
 
@@ -151,19 +151,19 @@ int C2_HOOK_FASTCALL S3Init(const char* pPath, int pLow_memory_mode, const char*
 
     C2_HOOK_BUG_ON(sizeof(tS3_descriptor) != 0x4c);
 
-    descriptor = S3MemAllocate(sizeof(tS3_descriptor), kMem_S3_sentinel);
-    if (descriptor == NULL) {
+    the_descriptor = S3MemAllocate(sizeof(tS3_descriptor), kMem_S3_sentinel);
+    if (the_descriptor == NULL) {
         return eS3_error_memory;
     }
-    memset(descriptor, 0, sizeof(tS3_descriptor));
-    descriptor->sample_id = 0x261269;
-    gS3_state.root_descriptor = descriptor;
+    memset(the_descriptor, 0, sizeof(tS3_descriptor));
+    the_descriptor->sample_id = 0x261269;
+    gS3_state.root_descriptor = the_descriptor;
     gS3_state.descriptors = gS3_state.root_descriptor;
     gS3_sound_dirname[0] = '\0';
     if (pSound_dirname != NULL) {
 
-        PDExtractDirectory(dirpath, pPath);
-        sprintf(gS3_sound_dirname, "%s%s", dirpath, pSound_dirname);
+        PDExtractDirectory(dir_name, pPath);
+        sprintf(gS3_sound_dirname, "%s%s", dir_name, pSound_dirname);
     }
     if (S3LoadSoundbank(pPath, pLow_memory_mode)) {
         return eS3_error_soundbank;
