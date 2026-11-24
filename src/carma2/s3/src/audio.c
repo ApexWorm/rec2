@@ -493,8 +493,8 @@ tS3_error_codes C2_HOOK_FASTCALL S3StopSound(int pTag) {
 void C2_HOOK_FASTCALL S3Service(int pInside_cockpit, int pThings_moved) {
     tU32 now;
     int spatial_serviced = 0;
-    tS3_outlet* o;
-    tS3_channel* c;
+    tS3_outlet* outlet;
+    tS3_channel* channel;
 
     gS3_inside_cockpit = pInside_cockpit;
     if (gS3_enabled) {
@@ -506,39 +506,39 @@ void C2_HOOK_FASTCALL S3Service(int pInside_cockpit, int pThings_moved) {
             S3UpdateListenerVectors();
             S3UpdateSourceVectors();
         }
-        for (o = gS3_state.outlets; o != NULL; o = o->next) {
-            for (c = o->channel_list; c != NULL; c = c->next) {
-                if (c->needs_service) {
-                    c->needs_service = 0;
-                    if (c->descriptor != NULL && c->descriptor->flags == 2) {
-                        S3ReleaseSound(c->descriptor->sample_id);
+        for (outlet = gS3_state.outlets; outlet != NULL; outlet = outlet->next) {
+            for (channel = outlet->channel_list; channel != NULL; channel = channel->next) {
+                if (channel->needs_service) {
+                    channel->needs_service = 0;
+                    if (channel->descriptor != NULL && channel->descriptor->flags == 2) {
+                        S3ReleaseSound(channel->descriptor->sample_id);
                     }
-                    c->active = 0;
-                    if (c->type != 1) {
-                        c->tag = 0;
+                    channel->active = 0;
+                    if (channel->type != 1) {
+                        channel->tag = 0;
                     }
                 } else {
-                    if (c->spatial_sound && c->active) {
-                        if (S3Service3D(c) == 0) {
-                            if (c->sound_source_ptr != NULL) {
-                                if (c->sound_source_ptr->ambient) {
-                                    S3UpdateSoundSource(NULL, -1, c->sound_source_ptr, -1.f, -1, -1, 0, -1, -1);
+                    if (channel->spatial_sound && channel->active) {
+                        if (S3Service3D(channel) == 0) {
+                            if (channel->sound_source_ptr != NULL) {
+                                if (channel->sound_source_ptr->ambient) {
+                                    S3UpdateSoundSource(NULL, -1, channel->sound_source_ptr, -1.f, -1, -1, 0, -1, -1);
                                 }
                             } else {
-                                S3StopChannel(c);
+                                S3StopChannel(channel);
                             }
                         }
-                        else if (c->sound_source_ptr != NULL && c->sound_source_ptr->ambient && !S3SoundStillPlaying(c->tag)) {
-                            S3UpdateSoundSource(NULL, -1, c->sound_source_ptr, -1.f, -1, -1, 0, -1, -1);
+                        else if (channel->sound_source_ptr != NULL && channel->sound_source_ptr->ambient && !S3SoundStillPlaying(channel->tag)) {
+                            S3UpdateSoundSource(NULL, -1, channel->sound_source_ptr, -1.f, -1, -1, 0, -1, -1);
                         }
-                    } else if (c->type == 1 && c->active) {
-                        S3ServiceMIDIChannel(c);
+                    } else if (channel->type == 1 && channel->active) {
+                        S3ServiceMIDIChannel(channel);
                     }
                 }
                 if (pThings_moved < 2 && gS3_last_service_time_spatial < gS3_last_service_time)  {
                     spatial_serviced = 1;
-                    if (!c->active && c->spatial_sound == 2) {
-                        S3ServiceSpatialSound(c);
+                    if (!channel->active && channel->spatial_sound == 2) {
+                        S3ServiceSpatialSound(channel);
                     }
                 }
             }
