@@ -8,10 +8,13 @@
 
 #include "60-phil.h"
 
+#include "00-car.h"
 #include "18-graphics2.h"
 #include "49-physics.h"
 #include "55-volume.h"
 #include "rec2_macros.h"
+
+#include <stdarg.h>
 
 // GLOBAL: CARMA2_HW 0x0065d004
 // GLOBAL: CARMA2_SW 0x0065793c
@@ -551,11 +554,85 @@ int C2_HOOK_FASTCALL PHILAddActiveObjectImmediately(tPhysics_object* pObject, co
     return result;
 }
 
-// STUB: CARMA2_HW 0x004b63b0
-// STUB: CARMA2_SW 0x004b2ad0
-// STUB: CARMA2_CHEAT 0x004bbe50
+// FUNCTION: CARMA2_HW 0x004b63b0
+// FUNCTION: CARMA2_SW 0x004b2ad0
+// FUNCTION: CARMA2_CHEAT 0x004bbe50
 int C2_HOOK_CDECL PHILSetObjectProperty(tPhysics_object* pCollision_info, int pParam, ...) {
-    NOT_IMPLEMENTED();
+    tCollision_info_owner* owner;
+    va_list ap;
+
+    if (gPHIL_disabled) {
+        return 0;
+    }
+#ifdef REC2_CHEAT
+    PHILVerify();
+#endif
+    if (pCollision_info->field_0x239 == 2) {
+        owner = pCollision_info->field_0x240;
+    } else {
+        owner = pCollision_info->field_0x240;
+    }
+    if (owner != NULL) {
+        if (pParam < 0 || pParam >= 9) {
+            return 5;
+        }
+        va_start(ap, pParam);
+        switch (pParam) {
+        case 0:
+            owner->field_0x10 = (float)va_arg(ap, double);
+            break;
+        case 1:
+            if (va_arg(ap, int)) {
+                owner->field_0x04 |= 0x1;
+                PositionChildren(pCollision_info);
+            } else {
+                owner->field_0x04 &= 0x1;
+            }
+            break;
+        case 2:
+            owner->field_0x0c = (float)va_arg(ap, double);
+            break;
+        case 3:
+            pCollision_info->flags = (pCollision_info->flags & ~(1 << 6)) | (((va_arg(ap, int) != 0) & 0x1) << 6);
+            if (!(pCollision_info->flags & 0x40)) {
+                pCollision_info->box_face_ref = gFace_num__car - 2;
+            }
+            break;
+        case 4:
+            pCollision_info->flags = (pCollision_info->flags & ~(1 << 3)) | (((va_arg(ap, int) != 0) & 0x1) << 3);
+            break;
+        case 5:
+            pCollision_info->flags = (pCollision_info->flags & ~(1 << 4)) | (((va_arg(ap, int) != 0) & 0x1) << 4);
+            break;
+        case 6:
+            if (va_arg(ap, int)) {
+                owner->field_0x04 |= 0x4;
+            } else {
+                owner->field_0x04 &= 0x4;
+            }
+            break;
+        case 7:
+            if (va_arg(ap, int)) {
+                owner->field_0x04 |= 0x8;
+                pCollision_info->water_d = 10000.f;
+            } else {
+                owner->field_0x04 &= 0x8;
+            }
+            break;
+        case 8:
+            owner->field_0x14 = (float)va_arg(ap, double);
+            break;
+        }
+#ifdef REC2_CHEAT
+        PHILVerify();
+#endif
+        va_end(ap);
+        return 0;
+    }
+#ifdef REC2_CHEAT
+    PHILVerify();
+#endif
+    return 3;
 }
 
 // FUNCTION: CARMA2_HW 0x004b6530
