@@ -57,7 +57,7 @@ extern void C2_HOOK_FASTCALL PDS3ReleaseSound(tS3_descriptor* pSound_descriptor)
 
 extern int C2_HOOK_FASTCALL PDReverseAudio(tS3_channel* pChannel);
 
-extern const char* C2_HOOK_FASTCALL PDS3GetWorkingDirectory(void);
+extern const char* C2_HOOK_FASTCALL PDS3GetWorkingDirectory(int pArg1);
 
 extern int C2_HOOK_FASTCALL PDS3StopMidiChannel(tS3_channel* pChannel);
 

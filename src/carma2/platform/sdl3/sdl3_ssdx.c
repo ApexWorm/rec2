@@ -25,7 +25,7 @@ int SSDXStart(void *p_hWnd, int p_DirectDraw, int p_EnumerateDDX, int p_flags) {
 void SSDXStop(void) {
 }
 
-const char *C2_HOOK_FASTCALL PDS3GetWorkingDirectory(void) {
+const char *C2_HOOK_FASTCALL PDS3GetWorkingDirectory(int pArg1) {
     return ".";
 }
 

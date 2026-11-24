@@ -232,18 +232,13 @@ int C2_HOOK_FASTCALL PDReverseAudio(tS3_channel* pChannel) {
 }
 
 // FUNCTION: CARMA2_HW 0x00569b30
-const char* C2_HOOK_FASTCALL PDS3GetWorkingDirectory(void) {
+const char* C2_HOOK_FASTCALL PDS3GetWorkingDirectory(int pArg1) {
 
     if (!gS3_working_directory_initialized) {
-        DWORD len_res;
-        size_t len;
-
         C2_HOOK_BUG_ON(sizeof(gS3_working_directory) != 0x104);
 
         gS3_working_directory[0] = '\0';
-        len_res = GetCurrentDirectoryA(sizeof(gS3_working_directory), gS3_working_directory);
-        len = strlen(gS3_working_directory);
-        if (len_res != len) {
+        if (GetCurrentDirectoryA(sizeof(gS3_working_directory), gS3_working_directory) != strlen(gS3_working_directory)) {
             gS3_working_directory[0] = '\0';
         }
         gS3_working_directory_initialized = 1;

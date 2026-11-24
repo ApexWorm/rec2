@@ -188,7 +188,7 @@ extern int C2_HOOK_FASTCALL PDS3PlaySample(tS3_channel* pChannel);
 
 extern tS3_error_codes C2_HOOK_FASTCALL PDS3StartMidiChannel(tS3_channel* pChannel);
 
-extern const char* C2_HOOK_FASTCALL PDS3GetWorkingDirectory(void);
+extern const char* C2_HOOK_FASTCALL PDS3GetWorkingDirectory(int pArg1);
 
 extern int C2_HOOK_FASTCALL PDS3StopMidiChannel(tS3_channel* pChannel);
 

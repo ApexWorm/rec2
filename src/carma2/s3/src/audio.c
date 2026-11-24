@@ -726,7 +726,7 @@ int C2_HOOK_FASTCALL S3LoadSoundbank(const char* pPath, int pLow_memory_mode) {
     } else {
         dir_name[0] = '\0';
         soundbank_filename[0] = '\0';
-        cur_dir = PDS3GetWorkingDirectory();
+        cur_dir = PDS3GetWorkingDirectory(0);
         strcpy(dir_name, cur_dir);
         strcat(dir_name, gS3_path_separator);
         strcat(dir_name, "DATA");
