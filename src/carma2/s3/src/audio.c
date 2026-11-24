@@ -775,131 +775,130 @@ void C2_HOOK_FASTCALL S3SoundBankReaderSkipWhitespace(tS3_soundbank_read_ctx* pC
 }
 
 // FUNCTION: CARMA2_HW 0x0056828c
-int C2_HOOK_FASTCALL S3SoundBankReadEntry(tS3_soundbank_read_ctx *pContext, const char* pDir_name, int pLow_memory_mode) {
-    tS3_descriptor* descriptor;
-    int i;
-    int n;
-    const char* dir_name;
-    double f1, f2;
-    int count;
+int C2_HOOK_FASTCALL S3SoundBankReadEntry(tS3_soundbank_read_ctx *pContext, char* pDir_name, int pLow_memory_mode) {
+    tS3_descriptor* sd;
+    unsigned int k;
+    int used;
+    double lo;
+    double fmax;
+    int howmany;
     int alternative;
 
     // GLOBAL: CARMA2_HW 0x006b2c8c
     static char cda_dir_name[4];
 
-    descriptor = S3CreateDescriptor();
-    if (descriptor == NULL) {
+    sd = S3CreateDescriptor();
+    if (sd == NULL) {
         return gS3_last_error;
     }
 
     /* Sound ID */
-    if (sscanf(pContext->data, "%i%n", &descriptor->sample_id, &n) != 1) {
+    if (sscanf(pContext->data, "%i%n", &sd->sample_id, &used) != 1) {
         return 0;
     }
-    S3SoundBankReaderAdvance(pContext, n);
+    S3SoundBankReaderAdvance(pContext, used);
     S3SoundBankReaderNextLine(pContext);
 
     /* Type, Flags */
-    if (sscanf(pContext->data, "%i,%i%n", &descriptor->type, &descriptor->flags, &n) != 2) {
+    if (sscanf(pContext->data, "%i,%i%n", &sd->type, &sd->flags, &used) != 2) {
         return 0;
     }
-    S3SoundBankReaderAdvance(pContext, n);
+    S3SoundBankReaderAdvance(pContext, used);
     S3SoundBankReaderNextLine(pContext);
 
     /* File name */
-    dir_name = pDir_name;
-    if (descriptor->type == 2) {
-        dir_name = cda_dir_name;
-        cda_dir_name[0] = '\0';
+    if (sd->type == 2) {
+        pDir_name = cda_dir_name;
+        pDir_name[0] = '\0';
     }
-    if (S3SoundBankReaderReadFilename(&descriptor->path, pContext, dir_name) == 0) {
+    if (S3SoundBankReaderReadFilename(&sd->path, pContext, pDir_name) == 0) {
         return 0;
     }
     S3SoundBankReaderNextLine(pContext);
 
     /* Priority */
-    if (sscanf(pContext->data, "%i%n", &descriptor->priority, &n) != 1) {
+    if (sscanf(pContext->data, "%i%n", &sd->priority, &used) != 1) {
         return 0;
     }
-    S3SoundBankReaderAdvance(pContext, n);
+    S3SoundBankReaderAdvance(pContext, used);
     S3SoundBankReaderNextLine(pContext);
 
     /* Repeat rate */
-    if (sscanf(pContext->data, "%i%n", &descriptor->repeat_rate, &n) != 1) {
+    if (sscanf(pContext->data, "%i%n", &sd->repeat_rate, &used) != 1) {
         return 0;
     }
-    S3SoundBankReaderAdvance(pContext, n);
+    S3SoundBankReaderAdvance(pContext, used);
     S3SoundBankReaderNextLine(pContext);
 
     /* MinVol, MaxVol */
-    if (sscanf(pContext->data, "%i,%i%n", &descriptor->min_volume, &descriptor->max_volume, &n) != 2) {
+    if (sscanf(pContext->data, "%i,%i%n", &sd->min_volume, &sd->max_volume, &used) != 2) {
         return 0;
     }
-    S3SoundBankReaderAdvance(pContext, n);
+    S3SoundBankReaderAdvance(pContext, used);
     S3SoundBankReaderNextLine(pContext);
 
     /* MinPitch, MaxPitch */
-    if (sscanf(pContext->data, "%lf,%lf%n", &f1, &f2, &n) != 2) {
+    if (sscanf(pContext->data, "%lf,%lf%n", &lo, &fmax, &used) != 2) {
         return 0;
     }
-    S3SoundBankReaderAdvance(pContext, n);
+    S3SoundBankReaderAdvance(pContext, used);
     S3SoundBankReaderNextLine(pContext);
-    if (f1 == 0.0) {
-        f1 = 1.875;
+    if (lo == 0.0) {
+        lo = 1.0;
     }
-    if (f2 == 0.0) {
-        f2 = 1.875;
+    if (fmax == 0.0) {
+        fmax = 1.0;
     }
-    descriptor->min_pitch = (int)ldexp(f1, 16);
-    descriptor->max_pitch = (int)ldexp(f2, 16);
+    sd->min_pitch = (int)ldexp(lo, 16);
+    sd->max_pitch = (int)ldexp(fmax, 16);
 
     /* MinSpeed, MaxSpeed */
-    if (sscanf(pContext->data, "%lf,%lf%n", &f1, &f2, &n) != 2) {
+    if (sscanf(pContext->data, "%lf,%lf%n", &lo, &fmax, &used) != 2) {
         return 0;
     }
-    S3SoundBankReaderAdvance(pContext, n);
+    S3SoundBankReaderAdvance(pContext, used);
     S3SoundBankReaderNextLine(pContext);
-    if (f1 == 0.0) {
-        f1 = 1.875;
+    if (lo == 0.0) {
+        lo = 1.0;
     }
-    if (f2 == 0.0) {
-        f2 = 1.875;
+    if (fmax == 0.0) {
+        fmax = 1.0;
     }
-    descriptor->min_speed = (int)ldexp(f1, 16);
-    descriptor->max_speed = (int)ldexp(f2, 16);
+    sd->min_speed = (int)ldexp(lo, 16);
+    sd->max_speed = (int)ldexp(fmax, 16);
 
     /* Special FX index */
-    if (sscanf(pContext->data, "%i%n", &descriptor->effects_enabled, &n) != 1) {
+    if (sscanf(pContext->data, "%i%n", &sd->effects_enabled, &used) != 1) {
         return 0;
     }
-    S3SoundBankReaderAdvance(pContext, n);
+    S3SoundBankReaderAdvance(pContext, used);
     S3SoundBankReaderNextLine(pContext);
 
     /* Number of low memory alternatives */
-    if (sscanf(pContext->data, "%d%n", &count, &n) != 1) {
+    if (sscanf(pContext->data, "%d%n", &howmany, &used) != 1) {
         return 0;
     }
-    S3SoundBankReaderAdvance(pContext, n);
+    S3SoundBankReaderAdvance(pContext, used);
     S3SoundBankReaderNextLine(pContext);
-    descriptor->low_memory_alternative = -1;
-    for (i = 0; i < count; i++) {
+    sd->low_memory_alternative = -1;
+    for (k = 0; k < howmany; k++) {
 
-        if (sscanf(pContext->data, "%d%n", &alternative, &n) != 1) {
+        if (sscanf(pContext->data, "%d%n", &alternative, &used) != 1) {
             return 0;
         }
-        if (i + 1 == pLow_memory_mode) {
-            descriptor->low_memory_alternative = alternative;
+        if (k + 1 == pLow_memory_mode) {
+            sd->low_memory_alternative = alternative;
         }
-        S3SoundBankReaderAdvance(pContext, n);
+        S3SoundBankReaderAdvance(pContext, used);
         S3SoundBankReaderNextLine(pContext);
     }
 
-    if ((descriptor->flags & 0x1) && descriptor->low_memory_alternative == -1) {
-        if (descriptor->type == 1) {
-            descriptor->buffer_description = NULL;
+    if ((sd->flags & 0x1) && sd->low_memory_alternative == -1) {
+        if (sd->type == 1) {
+            sd->buffer_description = NULL;
         } else {
-            if (S3LoadSample(descriptor->sample_id) != eS3_error_none) {
-                printf("\nSound bank file: couldn't load '%s'\n", descriptor->path);
+            if (S3LoadSample(sd->sample_id) != eS3_error_none) {
+                printf("\nSound bank file: couldn't load '%s'\n", sd->path);
                 pContext->data_len = 1;
                 return 0;
             }

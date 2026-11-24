@@ -74,7 +74,7 @@ extern int C2_HOOK_FASTCALL S3CreateOutletChannels(tS3_outlet* outlet, int pChan
 
 extern void C2_HOOK_FASTCALL S3SoundBankReaderSkipWhitespace(tS3_soundbank_read_ctx* pContext);
 
-extern int C2_HOOK_FASTCALL S3SoundBankReadEntry(tS3_soundbank_read_ctx *pContext, const char* pDir_name, int pLow_memory_mode);
+extern int C2_HOOK_FASTCALL S3SoundBankReadEntry(tS3_soundbank_read_ctx *pContext, char* pDir_name, int pLow_memory_mode);
 
 extern void C2_HOOK_FASTCALL S3SoundBankReaderNextLine(tS3_soundbank_read_ctx* pContext);
 
