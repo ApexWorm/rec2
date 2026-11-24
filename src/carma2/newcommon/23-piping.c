@@ -2266,7 +2266,15 @@ void C2_HOOK_FASTCALL ApplyPedFPChange(tPipe_chunk** pChunk) {
     PedApplyPedFPChange((tPedestrian*)(*pChunk)->subject_index, (*pChunk)->data.ped_fp_change.new_speed);
 }
 
-// ApplyPedPos
+// FUNCTION: CARMA2_HW 0x004c9b50
+// FUNCTION: CARMA2_SW 0x004c6280
+// FUNCTION: CARMA2_CHEAT 0x004cf680
+void C2_HOOK_FASTCALL ApplyPedPos(tPipe_chunk** pChunk) {
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk, data, 0x4);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_single_ped_pos, v, 0xc);
+
+    PedApplyPedPos((tPedestrian*)(*pChunk)->subject_index, &(*pChunk)->data.ped_pos.v);
+}
 
 // ApplyPedModelChange
 
