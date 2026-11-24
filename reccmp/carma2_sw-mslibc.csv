@@ -70,6 +70,7 @@ address,type,name
 0x00574560,library,_vsprintf
 0x005745d0,library,_longjmp
 0x00574650,library,__filbuf
+0x00574740,library,_memcpy
 0x00574a80,library,_memset
 0x00575030,library,_strlen
 0x005751a0,library,_calloc

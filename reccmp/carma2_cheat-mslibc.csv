@@ -63,6 +63,7 @@ address,type,name
 0x0057e630,library,__amsg_exit
 0x0057e6b0,library,_getenv
 0x0057ebc0,library,__filbuf
+0x0057ecb0,library,_memcpy
 0x0057eff0,library,_memset
 0x0057f620,library,_strcpy
 0x0057f710,library,_calloc

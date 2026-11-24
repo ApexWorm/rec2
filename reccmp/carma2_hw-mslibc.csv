@@ -78,7 +78,7 @@ address,type,name
 0x00578ee0,library,_vsprintf
 0x00578f50,library,_longjmp
 0x00578fd0,library,__filbuf
-0x005790c0,library,_memmove
+0x005790c0,library,_memcpy
 0x00579400,library,_memset
 0x005799b0,library,_strlen
 0x00579a30,library,_strcpy
