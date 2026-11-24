@@ -1136,21 +1136,21 @@ int C2_HOOK_FASTCALL S3UnbindChannels(tS3_outlet* pOutlet) {
 // FUNCTION: CARMA2_CHEAT 0x0056b478
 tS3_channel* C2_HOOK_FASTCALL S3GetChannelForTag(int pTag) {
     tS3_channel* channel;
-    tS3_outlet* outlet;
-    int tag_id;
+    tS3_outlet* out;
+    int tag;
 
     if (pTag == 0) {
         return NULL;
     }
-    tag_id = pTag & 0xff;
-    outlet = gS3_state.outlets;
-    for (; outlet != NULL && outlet->id != tag_id; ) {
-        outlet = outlet->next;
+    tag = pTag & 0xff;
+    out = gS3_state.outlets;
+    for (; out != NULL && out->id != tag; ) {
+        out = out->next;
     }
-    if (outlet == NULL) {
+    if (out == NULL) {
         return NULL;
     }
-    channel = outlet->channel_list;
+    channel = out->channel_list;
     for (; channel != NULL; ) {
         if (channel->tag == pTag) {
             return channel;
