@@ -1229,6 +1229,8 @@ double C2_HOOK_STDCALL S3FRandomBetween(double pMin, double pMax) {
 }
 
 // FUNCTION: CARMA2_HW 0x00564278
+// FUNCTION: CARMA2_SW 0x0055f918
+// FUNCTION: CARMA2_CHEAT 0x00569e68
 int C2_HOOK_FASTCALL S3IRandomBetween(int pMin, int pMax, int pDefault) {
 
     if (pMin == -1) {
@@ -1238,6 +1240,20 @@ int C2_HOOK_FASTCALL S3IRandomBetween(int pMin, int pMax, int pDefault) {
         return pMin + rand() % (pMax - pMin);
     } else {
         return pMin;
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x005642b5
+// FUNCTION: CARMA2_SW 0x0055f955
+// FUNCTION: CARMA2_CHEAT 0x00569ea5
+int C2_HOOK_FASTCALL S3IRandomBetweenLog__dup(int pMin, int pMax, int pDefault) {
+    double dbl;
+
+    if (pMin == -1 || pMin >= pMax) {
+        return pDefault;
+    } else {
+        dbl = exp(S3FRandomBetween2(log(pMin), log(pMax)));
+        return (int)(ldexp(dbl, -16) * pDefault);
     }
 }
 
@@ -1499,8 +1515,9 @@ void C2_HOOK_FASTCALL S3CalculateRandomizedFields(tS3_channel* chan, tS3_descrip
     vol = S3IRandomBetween(desc->min_volume, desc->max_volume, 128);
     chan->source_volume = vol;
     chan->volume_multiplier = vol;
+    chan->field_0x28 = 0.f;
     if (desc->type == 0 && desc->buffer_description != NULL) {
-        chan->rate = S3IRandomBetweenLog(desc->min_pitch, desc->max_pitch, desc->buffer_description->sample_rate);
+        chan->rate = S3IRandomBetweenLog__dup(desc->min_pitch, desc->max_pitch, desc->buffer_description->sample_rate);
     }
 }
 
