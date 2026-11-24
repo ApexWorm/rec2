@@ -64,6 +64,7 @@ address,type,name
 0x0057e6b0,library,_getenv
 0x0057ebc0,library,__filbuf
 0x0057eff0,library,_memset
+0x0057f630,library,_strcat
 0x0057f710,library,_calloc
 0x005804a0,library,__input
 0x005812c0,library,__flsbuf

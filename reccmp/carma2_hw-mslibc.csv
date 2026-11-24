@@ -82,6 +82,7 @@ address,type,name
 0x00579400,library,_memset
 0x005799b0,library,_strlen
 0x00579a30,library,_strcpy
+0x00579a40,library,_strcat
 0x00579b20,library,_calloc
 0x00579bc0,library,_ldexp
 0x00579e20,library,_exp
