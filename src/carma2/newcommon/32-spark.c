@@ -499,17 +499,15 @@ void C2_HOOK_FASTCALL DisposeShrapnel(void) {
 // FUNCTION: CARMA2_CHEAT 0x004fea60
 intptr_t C2_HOOK_CDECL ActorFunks(br_actor* pActor, void* pContext) {
     tFunk_index_cbfn* funk_index_callback = pContext;
-    tUser_crush_data* user_crush_data = pActor->user;
     tCar_crush_buffer_entry* crush_data;
     int i;
 
-    if (user_crush_data != NULL) {
-        crush_data = user_crush_data->crush_data;
+    if (pActor->user != NULL) {
+        crush_data = ((tUser_crush_data*)pActor->user)->crush_data;
         if (crush_data != NULL && crush_data->smashables != NULL) {
             for (i = 0; i < crush_data->count_smashables; i++) {
-                int funk_index = crush_data->smashables[i].funk;
-                if (funk_index >= 0) {
-                    funk_index_callback(funk_index);
+                if (crush_data->smashables[i].funk >= 0) {
+                    funk_index_callback(crush_data->smashables[i].funk);
                 }
             }
         }
@@ -523,17 +521,14 @@ intptr_t C2_HOOK_CDECL ActorFunks(br_actor* pActor, void* pContext) {
 void C2_HOOK_FASTCALL MasterDisableCarFunks(tCar_spec* pCar) {
     tCar_crush_spec* crush_spec;
     int i;
-    tCar_bit_spec* bit;
 
     crush_spec = pCar->car_crush_spec;
     DRActorEnumRecurse(pCar->car_model_actor, ActorFunks, (void*)MasterDisableFunkotronic);
-    bit = crush_spec->field_0x274;
-    for (i = 0; i < crush_spec->field_0x270; i++, bit++) {
-        ActorFunks(bit->field_0x0, (void*)MasterDisableFunkotronic);
+    for (i = 0; i < crush_spec->field_0x270; i++) {
+        ActorFunks(crush_spec->field_0x274[i].field_0x0, (void*)MasterDisableFunkotronic);
     }
-    bit = crush_spec->field_0x2b4;
-    for (i = 0; i < crush_spec->field_0x2b0; i++, bit++) {
-        ActorFunks(bit->field_0x0, (void*)MasterDisableFunkotronic);
+    for (i = 0; i < crush_spec->field_0x2b0; i++) {
+        ActorFunks(crush_spec->field_0x2b4[i].field_0x0, (void*)MasterDisableFunkotronic);
     }
 }
 
@@ -543,17 +538,14 @@ void C2_HOOK_FASTCALL MasterDisableCarFunks(tCar_spec* pCar) {
 void C2_HOOK_FASTCALL MasterEnableCarFunks(tCar_spec* pCar) {
     tCar_crush_spec* crush_spec;
     int i;
-    tCar_bit_spec* bit;
 
     crush_spec = pCar->car_crush_spec;
     DRActorEnumRecurse(pCar->car_model_actor, ActorFunks, (void*)MasterEnableFunkotronic);
-    bit = crush_spec->field_0x274;
-    for (i = 0; i < crush_spec->field_0x270; i++, bit++) {
-        ActorFunks(bit->field_0x0, (void*)MasterEnableFunkotronic);
+    for (i = 0; i < crush_spec->field_0x270; i++) {
+        ActorFunks(crush_spec->field_0x274[i].field_0x0, (void*)MasterEnableFunkotronic);
     }
-    bit = crush_spec->field_0x2b4;
-    for (i = 0; i < crush_spec->field_0x2b0; i++, bit++) {
-        ActorFunks(bit->field_0x0, (void*)MasterEnableFunkotronic);
+    for (i = 0; i < crush_spec->field_0x2b0; i++) {
+        ActorFunks(crush_spec->field_0x2b4[i].field_0x0, (void*)MasterEnableFunkotronic);
     }
 }
 
