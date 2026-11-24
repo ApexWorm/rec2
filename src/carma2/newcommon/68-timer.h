@@ -32,6 +32,11 @@
 #define TIMER_SER 17
 #define TIMER_OQQ 18
 
+extern int gTimers_stack_size;
+extern tTimer gTimers[19];
+extern int gTimers_stack[8];
+extern int gTimers_max_index;
+
 extern void C2_HOOK_FASTCALL Timers_Init(void);
 
 extern void C2_HOOK_FASTCALL Timers_StartFrame(void);

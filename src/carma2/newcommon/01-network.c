@@ -20,6 +20,7 @@
 #include "platform.h"
 #include "globvars.h"
 #include "globvrpb.h"
+#include "68-timer.h"
 
 #include "rec2_macros.h"
 
@@ -941,10 +942,31 @@ void C2_HOOK_FASTCALL NetReallyDisposeMessage(tNet_message* pMessage) {
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x0049ff70
-// STUB: CARMA2_SW 0x0049c0f0
+// FUNCTION: CARMA2_HW 0x0049ff70
+// FUNCTION: CARMA2_SW 0x0049c0f0
+// FUNCTION: CARMA2_CHEAT 0x004a0aa0
 tNet_message* C2_HOOK_FASTCALL NetGetNextMessage(tNet_game_details* pDetails, void** pSender_address) {
-    NOT_IMPLEMENTED();
+    tNet_message* message;
+
+    gTimers_stack[gTimers_stack_size] = TIMER_LLR;
+    if (gTimers_stack_size != 0) {
+        gTimers[gTimers_stack[gTimers_stack_size - 1]].durations[gTimers[gTimers_stack[gTimers_stack_size - 1]].index] += PDGetMicroseconds() - gTimers[gTimers_stack[gTimers_stack_size - 1]].start_time;
+    } else {
+        gTimers[gTimers_max_index].durations[gTimers[gTimers_max_index].index] += PDGetMicroseconds() - gTimers[gTimers_max_index].start_time;
+    }
+    gTimers[TIMER_LLR].start_time = PDGetMicroseconds();
+    gTimers_stack_size++;
+
+    message = PDNetGetNextMessage(pDetails, pSender_address);
+
+    gTimers[TIMER_LLR].durations[gTimers[TIMER_LLR].index] += PDGetMicroseconds() - gTimers[TIMER_LLR].start_time;
+    if (gTimers_stack_size > 1) {
+        gTimers[gTimers_stack[gTimers_stack_size - 1]].start_time = PDGetMicroseconds();
+    } else {
+        gTimers[gTimers_max_index].start_time = PDGetMicroseconds();
+    }
+    gTimers_stack_size--;
+    return message;
 }
 
 #ifdef REC2_MATCHING
