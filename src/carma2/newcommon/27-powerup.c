@@ -10,6 +10,7 @@
 
 #include "00-car.h"
 #include "01-network.h"
+#include "08-loading1.h"
 #include "13-crush1.h"
 #include "15-displays.h"
 #include "16-graphics1.h"
@@ -30,7 +31,9 @@
 #include "58-crush2.h"
 #include "60-phil.h"
 #include "61-pedestrn.h"
+#include "63-loading3.h"
 #include "69-sound.h"
+#include "70-packfile.h"
 #include "globvars.h"
 #include "globvrpb.h"
 #include "joystick.h"
@@ -268,7 +271,21 @@ char* C2_HOOK_FASTCALL GetPowerupMessage(int pPowerup_index) {
 
 // QueueIconGoing
 
-// QueueIconComing
+// FUNCTION: CARMA2_HW 0x004d9670
+// FUNCTION: CARMA2_SW 0x004d5b40
+// FUNCTION: CARMA2_CHEAT 0x004df230
+void C2_HOOK_FASTCALL QueueIconComing(tPowerup* pPowerup, tHeadup_icon* pHeadup_icons, int* pCount_icons) {
+    int i;
+
+    for (i = 0; i < *pCount_icons; i++) {
+        if (pPowerup == pHeadup_icons[i].powerup) {
+            pHeadup_icons[i].fizzle_stage = 3;
+            pHeadup_icons[i].fizzle_direction = -1;
+            pHeadup_icons[i].fizzle_start = GetTotalTime();
+            break;
+        }
+    }
+}
 
 // LosePowerupX
 
@@ -1530,7 +1547,7 @@ int C2_HOOK_FASTCALL MineExplode(tShit_mine* pMine) {
     pMine->next_think_time = GetTotalTime() + 1600;
     BrVector3Negate(&offset, &gExplosion_pix_animation_groups.groups[0].offset);
     Explode(&gExplosion_pix_animation_groups, pMine->collision_info->actor, &pMine->collision_info->actor->model->bounds, &offset);
-    DRS3StartSound3D(gCar_outlet, eSoundId_Explosion, &pMine->collision_info->actor->t.t.translate.t, &gZero_v__car, 1, 255, BR_FIXED_INT(1), BR_FIXED_INT(1));
+    DRS3StartSound3D(gCar_outlet, eSoundId_Explosion, &pMine->collision_info->actor->t.t.translate.t, &gZero_v__car, 1, 255, S3_FIXED_INT(1), S3_FIXED_INT(1));
     PipeSingleEndShitMine(pMine->collision_info->actor);
     if (pMine->collision_info->actor->parent != NULL) {
         BrActorRemove(pMine->collision_info->actor);
@@ -2077,7 +2094,20 @@ void C2_HOOK_FASTCALL ARPowerupLose(tPowerup* pPowerup, tCar_spec* pCar) {
 
 // SetPissed
 
-// ResetPissed
+// FUNCTION: CARMA2_HW 0x004df300
+// FUNCTION: CARMA2_SW 0x004db800
+// FUNCTION: CARMA2_CHEAT 0x004e4ec0
+void C2_HOOK_FASTCALL ResetPissed(tPowerup* pPowerup, tCar_spec* pCar) {
+    br_vector3 p;
+
+    gCredit_multiplier = 0;
+    BrVector3Copy(&p, &gCamera->t.t.translate.t);
+    BrMatrix34Identity(&gCamera->t.t.mat);
+    BrVector3Copy(&gCamera->t.t.translate.t, &p);
+    BrVector3Copy(&p, &gRearview_camera->t.t.translate.t);
+    BrMatrix34Identity(&gRearview_camera->t.t.mat);
+    BrVector3Copy(&gRearview_camera->t.t.translate.t, &p);
+}
 
 // PissedEffect
 
@@ -2171,9 +2201,143 @@ void C2_HOOK_FASTCALL SetSpinningPowerup(br_actor* pActor, int pOpacity) {
     }
 }
 
-// DuplicateModel
+inline br_model* C2_HOOK_FASTCALL DuplicateModel(br_model* pModel, const char* pName) {
+    br_model* copy;
 
-// SetChangingPowerup
+    copy = BrModelAllocate(pName, pModel->nvertices, pModel->nfaces);
+    if (copy == NULL) {
+        return copy;
+    }
+    copy->pivot = pModel->pivot;
+    copy->flags = pModel->flags;
+    copy->user = pModel->user;
+    copy->crease_angle = pModel->crease_angle;
+    copy->radius = pModel->radius;
+    copy->bounds = pModel->bounds;
+    memcpy(copy->vertices, pModel->vertices, pModel->nvertices * sizeof(br_vertex));
+    memcpy(copy->faces, pModel->faces, pModel->nfaces * sizeof(br_face));
+    return copy;
+}
+
+// FUNCTION: CARMA2_HW 0x004df6c0
+// FUNCTION: CARMA2_SW 0x004dbbc0
+// FUNCTION: CARMA2_CHEAT 0x004e5280
+void C2_HOOK_FASTCALL SetChangingPowerup(br_actor* pActor) {
+    br_model* model;
+    tPath_name the_path;
+    char s[256];
+    char s2[256];
+    FILE* f;
+    int i;
+    br_actor* actor;
+
+    if (pActor == NULL) {
+        return;
+    }
+    if (gModel_powerup_armor == NULL || gModel_powerup_power == NULL || gModel_powerup_offence == NULL) {
+
+        model = BrModelFind("&68powerup1.ACT");
+#ifdef REC2_CHEAT
+        if (model == NULL) {
+            PDFatalError("ARMOUR missing from REG directory");
+        }
+#endif
+        gModel_powerup_armor = DuplicateModel(model, "PowArm");
+        gModel_powerup_armor->flags |= BR_MODF_CUSTOM;
+        gModel_powerup_armor->custom = RenderChangingPowerup;
+        BrModelAdd(gModel_powerup_armor);
+
+        model = BrModelFind("&70powerup1.ACT");
+#ifdef REC2_CHEAT
+        if (model == NULL) {
+            PDFatalError("POWER missing from REG directory");
+        }
+#endif
+        gModel_powerup_power = DuplicateModel(model, "PowPow");
+        gModel_powerup_power->flags |= BR_MODF_CUSTOM;
+        gModel_powerup_power->custom = RenderChangingPowerup;
+        BrModelAdd(gModel_powerup_power);
+
+        model = BrModelFind("&69powerup1.ACT");
+#ifdef REC2_CHEAT
+        if (model == NULL) {
+            PDFatalError("OFFENSIVE missing from REG directory");
+        }
+#endif
+        gModel_powerup_offence = DuplicateModel(model, "PowOff");
+        gModel_powerup_offence->flags |= BR_MODF_CUSTOM;
+        gModel_powerup_offence->custom = RenderChangingPowerup;
+        BrModelAdd(gModel_powerup_offence);
+    }
+
+    if (gModel_powerup_armor == NULL) {
+        BrModelFind("&77powerup.ACT");
+        PathCat(the_path, gApplication_path, "POWRSHIT.TXT");
+        f = DRfopen(the_path, "rt");
+        if (f == NULL) {
+            sprintf(s, "Cant open %s", "POWRSHIT.TXT");
+            PDFatalError(s);
+        }
+        for (i = 0; i < 67; i++) {
+            GetAString(f, s2);
+        }
+        actor = LoadActor(s2);
+        if (actor != NULL && actor->model != NULL) {
+            gModel_powerup_armor = DuplicateModel(actor->model, "PowArm");
+            gModel_powerup_armor->flags |= BR_MODF_CUSTOM;
+            gModel_powerup_armor->custom = RenderChangingPowerup;
+            BrModelAdd(gModel_powerup_armor);
+            BrActorFree(actor);
+        }
+        PFfclose(f);
+    }
+
+    if (gModel_powerup_power == NULL) {
+        PathCat(the_path, gApplication_path, "POWRSHIT.TXT");
+        f = DRfopen(the_path, "rt");
+        if (f == NULL) {
+            sprintf(s, "Cant open %s", "POWRSHIT.TXT");
+            PDFatalError(s);
+        }
+        for (i = 0; i < 68; i++) {
+            GetAString(f, s2);
+        }
+        actor = LoadActor(s2);
+        if (actor != NULL && actor->model != NULL) {
+            gModel_powerup_power = DuplicateModel(actor->model, "PowPow");
+            gModel_powerup_power->flags |= BR_MODF_CUSTOM;
+            gModel_powerup_power->custom = RenderChangingPowerup;
+            BrModelAdd(gModel_powerup_power);
+            BrActorFree(actor);
+        }
+        PFfclose(f);
+    }
+
+    if (gModel_powerup_offence == NULL) {
+        PathCat(the_path, gApplication_path, "POWRSHIT.TXT");
+        f = DRfopen(the_path, "rt");
+        if (f == NULL) {
+            sprintf(s, "Cant open %s", "POWRSHIT.TXT");
+            PDFatalError(s);
+        }
+        for (i = 0; i < 69; i++) {
+            GetAString(f, s2);
+        }
+        actor = LoadActor(s2);
+        if (actor != NULL && actor->model != NULL) {
+            gModel_powerup_offence = DuplicateModel(actor->model, "PowOff");
+            gModel_powerup_offence->flags |= BR_MODF_CUSTOM;
+            gModel_powerup_offence->custom = RenderChangingPowerup;
+            BrModelAdd(gModel_powerup_offence);
+            BrActorFree(actor);
+        }
+        PFfclose(f);
+    }
+    BrMatrix34PreTranslate(&pActor->t.t.mat, 0.0f, 0.1f, 0.0f);
+    pActor->model = gModel_powerup_armor;
+    pActor->model->flags |= BR_MODF_CUSTOM;
+    pActor->model->custom = RenderChangingPowerup;
+}
 
 // FUNCTION: CARMA2_HW 0x004dfec0
 // FUNCTION: CARMA2_SW 0x004dc3c0

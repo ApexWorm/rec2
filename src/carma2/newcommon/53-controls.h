@@ -29,6 +29,10 @@ extern int gHeadup_map_y;
 extern int gHeadup_map_w;
 extern int gHeadup_map_h;
 extern int gRecovery_voucher_count;
+extern int gToo_late;
+extern int gRecover_timer;
+extern int gHad_auto_recover;
+extern int gCancel_recover;
 extern tRace_over_reason gRace_over_reason;
 extern tU32 gPalette_fade_time;
 extern tEdit_func* gEdit_funcs[eEdit_mode_count][18][8];
@@ -133,7 +137,7 @@ extern void C2_HOOK_FASTCALL CheckHorn3D(tCar_spec* pCar);
 
 // SetQuickRecovery
 
-// SetRecovery
+extern void C2_HOOK_FASTCALL SetRecovery(void);
 
 // RecoverCar
 
@@ -159,7 +163,7 @@ extern void C2_HOOK_FASTCALL FlipUpCar(tCar_spec* pCar_spec);
 
 extern void C2_HOOK_FASTCALL GetPowerup(int pNum);
 
-// CheckSystemKeys
+extern void C2_HOOK_FASTCALL CheckSystemKeys(int pRacing);
 
 extern void C2_HOOK_FASTCALL CheckForCheatingGits(void);
 

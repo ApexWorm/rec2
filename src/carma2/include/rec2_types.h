@@ -438,6 +438,11 @@ typedef struct {
 } tPipe_chunk_skid_adjustment;
 
 typedef struct {
+    br_actor* actor;
+    br_vector3 delta;
+} tPipe_chunk_actor_trans;
+
+typedef struct {
     br_vector3 direction;
 } tPipe_ped_dir_data;
 
@@ -594,6 +599,13 @@ typedef struct {
 } tPipe_ped_incident;
 
 typedef struct {
+    float force;
+    tU16 car_ID;
+    tU16 padding_0x6;
+    br_vector3 position;
+} tPipe_chunk_car_incident;
+
+typedef struct {
     tPedestrian* ped;
     br_vector3 positions[7];
 } tPipe_chunk_napalm_bolt;
@@ -621,6 +633,16 @@ typedef struct {
     tU16 age;
     br_material* material;
 } tPipe_chunk_shrapnel;
+
+typedef struct {
+    undefined4 field_0x0;
+    tU32 uid;
+    tU32 time;
+    float force;
+    br_vector3 p1;
+    br_vector3 p2;
+    br_vector3 v;
+} tPipe_chunk_gib_shower;
 
 typedef struct {
     tSmoke_column_core core;
@@ -726,7 +748,7 @@ typedef enum {
     ePipe_chunk_ped_incident = 1,
     ePipe_chunk_single_sound = 2,
     ePipe_chunk_car = 5,
-    ePipe_chunk_single_graphical_wheel_stuff = 6,
+    ePipe_chunk_graphical_wheel_stuff = 6,
     ePipe_chunk_damage = 7,
     ePipe_chunk_special = 8,
     ePipe_chunk_spark = 10,
@@ -742,7 +764,7 @@ typedef enum {
     ePipe_chunk_prox_ray = 21,
     ePipe_chunk_skid_adjustment = 22,
     ePipe_chunk_flap = 23,
-    ePipe_model_mash = 24,
+    ePipe_chunk_model_mash = 24,
     ePipe_chunk_relink = 25,
     ePipe_chunk_identity = 26,
     ePipe_chunk_split_weld = 27,
@@ -761,23 +783,26 @@ typedef enum {
     ePipe_chunk_single_ped_pos = 46,
     ePipe_chunk_single_ped_model_change = 47,
     ePipe_chunk_phil_object = 48,
-    ePipe_single_groove_on_off = 51,
+    ePipe_chunk_gib_shower = 49,
+    ePipe_chunk_blood_spurt = 50,
+    ePipe_chunk_groove_on_off = 51,
     ePipe_chunk_powerup_got = 52,
     ePipe_chunk_powerup_lose = 53,
-    ePipe_funk_enable = 54,
+    ePipe_chunk_funk_enable = 54,
     ePipe_chunk_vanished_dismembered = 55,
     ePipe_chunk_ds_model = 56,
-    ePipe_ped_diagnostic = 57,
+    ePipe_chunk_ped_diagnostic = 57,
     ePipe_chunk_vector3 = 58,
-    ePipe_extended_splash = 59,
+    ePipe_chunk_extended_splash = 59,
     ePipe_chunk_drone_render = 60,
     ePipe_chunk_drone_corner_pos = 61,
-    ePipe_chunk_single_drone_straight_pos = 62,
+    ePipe_chunk_drone_straight_pos = 62,
     ePipe_chunk_burning_ped = 64,
     ePipe_chunk_powerup_respawn = 65,
+    ePipe_chunk_shit_mine = 66,
     ePipe_chunk_end_shit_mine = 67,
     ePipe_chunk_transform_type = 68,
-    ePipe_chunk_single_oppo_renderage = 69,
+    ePipe_chunk_oppo_renderage = 69,
 } tPipe_chunk_type;
 
 typedef struct {
@@ -792,9 +817,28 @@ typedef struct {
 } tPipe_chunk_smash_model_change;
 
 typedef struct {
+    tU32 seed;
+    tU32 time;
+    br_vector3 position;
+    br_vector3 impactee_velocity;
+    br_vector3 normal;
+} tPipe_chunk_blood_spurt;
+
+typedef struct {
     br_vector4 plane;
     int split;
 } tPipe_chunk_split_weld;
+
+typedef struct {
+    br_uint_16 vertices[3];
+    br_uint_16 smoothing;
+} tPipe_remove_face;
+
+typedef struct {
+    br_material* material;
+    tS32 count;
+    tPipe_remove_face faces[];
+} tPipe_chunk_remove_faces;
 
 typedef struct {
     tCar_spec* car_spec;
@@ -818,19 +862,24 @@ typedef struct {
 typedef struct tPipe_chunk {
     uintptr_t subject_index;
     union {
+        tPipe_chunk_car_incident car_incident;
         tPipe_chunk_frame_boundary frame_boundary;
         tPipe_chunk_non_car non_car;
         tPipe_ped_physics_data ped_physics;
         tPipe_single_ped_pos ped_pos;
+        tPipe_ped_diagnostic ped_diagnostic;
         tPipe_single_ped_dismember ped_dismember;
         tPipe_phil_object phil_object;
         tPipe_funk_enable funk_enable;
         tPipe_chunk_shrapnel shrapnel;
+        tPipe_chunk_remove_faces remove_faces;
         tPipe_chunk_identity identity;
+        tPipe_chunk_flame flame;
         tPipe_chunk_split_weld split_weld;
         tPipe_chunk_flap flap;
         tPipe_chunk_splash splash;
         tPipe_chunk_relink relink;
+        tPipe_chunk_spark spark;
         tPipe_chunk_smash_model_change smash_model_change;
         tPipe_smash_texture_change smash_texture_change;
         tPipe_single_transform_type transform_type;
@@ -841,21 +890,29 @@ typedef struct tPipe_chunk {
         tPipe_chunk_shit_mine shit_mine;
         tPipe_chunk_end_shit_mine end_shit_mine;
         tPipe_chunk_prox_ray prox_ray;
+        tPipe_chunk_gib_shower gib_shower;
         tPipe_smudge_data smudge;
         tPipe_model_mash model_mash;
         tPipe_chunk_bend bend;
         tPipe_chunk_screen_wobble wobble;
         tPipe_chunk_skid_adjustment skid_adjustment;
+        tPipe_chunk_actor_trans actor_trans;
+        tPipe_chunk_smoke smoke;
         tPipe_chunk_smoke_column smoke_column;
         tPipe_chunk_explosion explosion;
+        tPipe_single_oppo_renderage oppo_renderage;
+        tPipe_chunk_blood_spurt blood_spurt;
         tPipe_single_groove_on_of groove;
         tPipe_single_vanished_dismembered vanished_dismembered;
         tPipe_single_ds_model ds_model;
+        tPipe_drone_corner_pos drone_corner_pos;
         tPipe_chunk_napalm_bolt napalm_bolt;
         tPipe_ped_dir_data ped_dir;
         tPipe_ped_fp_change_data ped_fp_change;
+        tPipe_single_drone_straight_pos drone_straight_pos;
         tPipe_chunk_repulse_ray repulse_ray;
         tPipe_chunk_oil_spill oil_spill;
+        tPipe_chunk_extended_splash extended_splash;
         tPipe_single_graphical_wheel_stuff graphical_wheel_stuff;
         char raw_data[0];
     } data;
@@ -1121,8 +1178,9 @@ typedef enum {
 } tPed_form_bone_hinge_type;
 
 typedef enum tSpecial_type {
-    ePipe_special_fade = 0,
-} tSpecial_type;
+    ePipe_special_action_recovery = 0,
+    ePipe_special_action_tail_growth = 1,
+} tPipe_special_action;
 
 typedef struct {
     tCar_detail_ownership ownership;
@@ -4097,7 +4155,8 @@ typedef struct  {
     float field_0x18;
     float field_0x1c;
     tU8 kev_o_flap;
-    undefined field_0x21[7];
+    undefined field_0x21[3];
+    tPhysics_object* field_0x24;
     tU8 is_door;
     undefined field_0x29[3];
 } tCar_crush_flap_data;
@@ -5593,6 +5652,13 @@ typedef struct {
     tU8 object_hierarchy[];
 } tNet_message_chunk_mine_explode;
 
+typedef struct {
+    tNet_message_chunk_header header;
+    undefined field_0x2[2];
+    tPlayer_ID player;
+    tU32 time;
+} tNet_message_chunk_recover;
+
 typedef union {
     tNet_message_chunk_raw raw;
     tNet_message_chunk_race_over race_over; /* type = 0xa */
@@ -5608,6 +5674,7 @@ typedef union {
     tNet_message_chunk_toggle_doors toggle_doors; /* type = 0x2c */
     tNet_message_chunk_view_car view_car; /* type = 0x2f */
     tNet_message_chunk_mine_explode mine_explode; /* type = 0x31 */
+    tNet_message_chunk_recover recover;
     tNet_message_chunk_detach_bit detach_bit; /* type = 0x33 */
 } tNet_message_chunk;
 
@@ -6012,6 +6079,7 @@ enum {
     kFatalError_TooManyCrushLimits = 0x7a,
     kFatalError_TooManyCrushDatas = 0x7c,
     kFatalError_ChunkIsTooLargeToPipe = 0x7d,
+    kFatalError_RelinActorNullToNullInActionReplay = 0x7e,
     kFatalError_CannotFindSmashActorModel_S = 0x81,
     kFatalError_ProblemWithSpecialVolumeNumber_I = 0x82,
     kFatalError_TooManyEnvironmentalSoundAlternatives = 0x83,
@@ -6112,6 +6180,7 @@ enum {
     eSoundId_BendCar = 5099,
     eSoundId_DamageRepair = 5200,
     eSoundId_Horn = 5209,
+    eSoundId_DoorSlam = 5250,
     eSoundId_Cop_Siren = 5350,
     eSoundId_Explosion = 5400,
     eSoundId_FlaskGone = 5401,
