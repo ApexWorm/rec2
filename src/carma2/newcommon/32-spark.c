@@ -39,6 +39,7 @@ int gSmoke_on = 1;
 int gShade_list[16];
 
 // GLOBAL: CARMA2_HW 0x00660140
+// GLOBAL: CARMA2_CHEAT 0x00667988
 int* gShade_table = &gShade_list[8];
 #endif
 #ifdef REC2_SW
@@ -57,6 +58,7 @@ tSmash_vertex gSmash_glass_fragments[200];
 
 // GLOBAL: CARMA2_HW 0x006a82b4
 // GLOBAL: CARMA2_SW 0x006a2314
+// GLOBAL: CARMA2_CHEAT 0x006afe2c
 int gNum_dust_tables;
 
 // GLOBAL: CARMA2_HW 0x006aa57c
@@ -93,6 +95,7 @@ tReplay_splash gReplay_splashes[10] = { 0 };
 
 // GLOBAL: CARMA2_HW 0x006aa568
 // GLOBAL: CARMA2_SW 0x006a3fb8
+// GLOBAL: CARMA2_CHEAT 0x006b20e0
 int gDust_rotate = 0;
 
 // GLOBAL: CARMA2_HW 0x006aa56c
@@ -626,6 +629,7 @@ void C2_HOOK_FASTCALL InitSmokeStuff(void) {
 
 // FUNCTION: CARMA2_HW 0x004fa8d0
 // FUNCTION: CARMA2_SW 0x004f5960
+// FUNCTION: CARMA2_CHEAET 0x00500570
 void C2_HOOK_FASTCALL DustRotate(void) {
 
     gDust_rotate += 1;
@@ -1251,6 +1255,7 @@ void C2_HOOK_FASTCALL SetSmokeOn(int pSmoke_on) {
 
 // FUNCTION: CARMA2_HW 0x004fc9e0
 // FUNCTION: CARMA2_SW 0x004f7f40
+// FUNCTION: CARMA2_CHEAT 0x00502680
 void C2_HOOK_FASTCALL ReallySetSmokeOn(int pSmoke_on) {
 
     C2_HOOK_BUG_ON(REC2_ASIZE(gSmoke_column) != 10);
@@ -1343,6 +1348,7 @@ void C2_HOOK_FASTCALL CreateSplash(tPhysics_object* pObject, tU32 pTime) {
 
 // FUNCTION: CARMA2_HW 0x004fdb70
 // FUNCTION: CARMA2_SW 0x004f90d0
+// FUNCTION: CARMA2_CHEAT 0x00503810
 void C2_HOOK_FASTCALL GetSmokeShadeTables(FILE* pF) {
     int i;
     int red;
@@ -1463,6 +1469,7 @@ inline void C2_HOOK_FASTCALL ForEveryModelMaterial(br_model* pModel, tMaterialMa
 
 // FUNCTION: CARMA2_HW 0x004fe8a0
 // FUNCTION: CARMA2_SW 0x004fa180
+// FUNCTION: CARMA2_CHEAT 0x00504540
 intptr_t C2_HOOK_CDECL ForEveryActorMaterial(br_actor* pActor, void* pContext) {
     tUser_crush_data* user_crush_data;
     tMaterialMaybeUpdate_cbfn* callback;
@@ -1487,6 +1494,7 @@ intptr_t C2_HOOK_CDECL ForEveryActorMaterial(br_actor* pActor, void* pContext) {
 
 // FUNCTION: CARMA2_HW 0x004fe930
 // FUNCTION: CARMA2_SW 0x004fa210
+// FUNCTION: CARMA2_CHEAT 0x005045d0
 intptr_t C2_HOOK_CDECL ForEveryActorMaterialNoGrooves(br_actor* pActor, void* pContext) {
     tUser_crush_data* user_crush_data;
     tMaterialMaybeUpdate_cbfn* callback;
@@ -1529,6 +1537,7 @@ void C2_HOOK_FASTCALL ForEveryCarMaterial(tCar_spec* pCar_spec, tMaterialMaybeUp
 
 // FUNCTION: CARMA2_HW 0x004fec30
 // FUNCTION: CARMA2_SW 0x004fa510
+// FUNCTION: CARMA2_CHEAT 0x005048d0
 intptr_t C2_HOOK_CDECL ForEveryCarModelCB(br_actor* pActor, void* pContext) {
     tUser_crush_data* user_crush;
     int (C2_HOOK_FASTCALL* model_callback)(br_model*) = pContext;
@@ -1596,10 +1605,25 @@ int C2_HOOK_FASTCALL IsCarSmoking(tCar_spec* pCar) {
     return 0;
 }
 
-// ClearSplashReplay
+// FUNCTION: CARMA2_HW 0x004fedd0
+// FUNCTION: CARMA2_SW 0x004fa6b0
+// FUNCTION: CARMA2_CHEAT 0x00504a70
+void C2_HOOK_FASTCALL ClearSplashReplay(uintptr_t pObject) {
+    int flags;
+    int i;
+
+    flags = gReplay_splash_flags;
+    for (i = 0; i < (int)REC2_ASIZE(gReplay_splashes); i++) {
+        if (pObject == (uintptr_t)gReplay_splashes[i].object.ptr) {
+            flags &= ~(1 << i);
+        }
+    }
+    gReplay_splash_flags = flags;
+}
 
 // FUNCTION: CARMA2_HW 0x004fee10
 // FUNCTION: CARMA2_SW 0x004fa6f0
+// FUNCTION: CARMA2_CHEAT 0x00504ab0
 void* C2_HOOK_FASTCALL GetSplashIndex(tPhysics_object* pObject) {
 
     if (PHILGetObjectProperty(pObject, 6) != 0.f) {
@@ -1660,6 +1684,7 @@ void C2_HOOK_FASTCALL AdjustSplashReplay(void* pObject, int pType, float pWater_
 
 // STUB: CARMA2_HW 0x004ff030
 // STUB: CARMA2_SW 0x004fa910
+// STUB: CARMA2_CHEAT 0x00504cd0
 void C2_HOOK_FASTCALL InitReplaySplashes(void) {
     NOT_IMPLEMENTED();
 }
