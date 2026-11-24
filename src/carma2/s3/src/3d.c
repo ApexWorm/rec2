@@ -95,91 +95,95 @@ void C2_HOOK_FASTCALL S3StopSoundSource(tS3_sound_source* src) {
 // FUNCTION: CARMA2_CHEAT 0x0056d46c
 void C2_HOOK_FASTCALL S3UpdateSoundSource(tS3_outlet* outlet, tS3_sound_tag tag, tS3_sound_source* src, float pMax_distance_squared, int pPeriod, tS3_repeats pAmbient_repeats, tS3_volume pVolume, int pPitch, tS3_speed pSpeed) {
     tS3_channel* channel;
-    int is_sample;
+    int sample;
+    tS3_descriptor* desc;
 
-    is_sample = 0;
-    if (!gS3_enabled) {
-        return;
-    }
-    if (src == NULL) {
-        return;
-    }
-    channel = src->channel;
-    if (tag != -1 && src->sound_id != tag) {
-        tS3_descriptor* desc = S3GetDescriptorByID(tag);
-        if (desc == NULL) {
+    sample = 0;
+    if (gS3_enabled) {
+        if (src == NULL) {
             return;
         }
-        if (desc->type == 0) {
-            src->sound_id = tag;
-            if (desc->buffer_description == NULL || (desc->flags & 0x2)) {
-                if (S3LoadSample(tag) == eS3_error_none) {
-                    return;
-                }
+        channel = src->channel;
+        if (tag != -1 && src->sound_id != tag) {
+            desc = S3GetDescriptorByID(tag);
+            if (desc == NULL) {
+                return;
             }
-            is_sample = 1;
+            if (desc->type == 0) {
+                src->sound_id = tag;
+                if (desc->buffer_description == NULL || (desc->flags & 0x2)) {
+                    if (S3LoadSample(tag) == eS3_error_none) {
+                        return;
+                    }
+                }
+                sample = 1;
+            }
         }
-    }
-    if (pSpeed != -1) {
-        if (pSpeed <= 0) {
-            pSpeed = 0x10000;
+        if (pSpeed != -1) {
+            if (pSpeed < 1) {
+                pSpeed = 0x10000;
+            }
+            src->speed = pSpeed;
         }
-        src->speed = pSpeed;
-    }
-    if (pPitch != -1) {
-        if (pPitch <= 0) {
-            pPitch = 0x10000;
-        }
-        src->pitch = pPitch;
-        if (channel != NULL && channel->descriptor != NULL && channel->descriptor->type == 0) {
-            C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tS3_channel, source_rate, 0x54);
+        if (pPitch != -1) {
+            if (pPitch < 1) {
+                pPitch = 0x10000;
+            }
+            src->pitch = pPitch;
+            if (channel != NULL && channel->descriptor != NULL && channel->descriptor->type == 0) {
+                C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tS3_channel, source_rate, 0x54);
 
-            channel->source_rate = S3IRandomBetweenLog(channel->descriptor->min_pitch, channel->descriptor->max_pitch, channel->descriptor->buffer_description->sample_rate);
-            channel->source_rate = (int)((float)channel->source_rate * ldexpf((float)src->pitch, -16));
+                channel->source_rate = S3IRandomBetweenLog(channel->descriptor->min_pitch, channel->descriptor->max_pitch, channel->descriptor->buffer_description->sample_rate);
+                channel->source_rate = (int)(channel->source_rate * ldexp(src->pitch, -16));
+            }
         }
-    }
-    if (pAmbient_repeats != -1) {
-        src->ambient_repeats = MAX(0, pAmbient_repeats);
-        if (channel != NULL) {
-            channel->repetitions = src->ambient_repeats;
+        if (pAmbient_repeats != -1) {
+            src->ambient_repeats = pAmbient_repeats <= 0 ? 0 : pAmbient_repeats;
+            if (channel != NULL) {
+                channel->repetitions = src->ambient_repeats;
+            }
         }
-    }
 
-    if (pMax_distance_squared != -1.0f) {
-        src->max_distance_sq = pMax_distance_squared;
-        if (channel != NULL) {
-            C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tS3_channel, max_distance_squared, 0x58);
+        if (pMax_distance_squared != -1.0f) {
+            src->max_distance_sq = pMax_distance_squared;
+            if (channel != NULL) {
+                C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tS3_channel, max_distance_squared, 0x58);
 
-            channel->max_distance_squared = pMax_distance_squared;
+                channel->max_distance_squared = pMax_distance_squared;
+            }
         }
-    }
-    if (pPeriod != -1) {
-        src->period = pPeriod;
-    }
-    if (pVolume != -1) {
-        if (pVolume > 255) {
-            pVolume = 255;
+        if (pPeriod != -1) {
+            src->period = pPeriod;
         }
-        if (pVolume < 0) {
-            pVolume = 0;
-        }
-        if (src->volume != pVolume) {
-            src->volume = pVolume;
+        if (pVolume != -1) {
+            if (pVolume > 255) {
+                pVolume = 255;
+            }
+            if (pVolume < 0) {
+                pVolume = 0;
+            }
+            if (src->volume != pVolume) {
+                src->volume = pVolume;
+            }
+            if (channel != NULL) {
+#ifdef REC2_CHEAT
+                channel->source_volume = pVolume;
+#else
+                channel->volume_multiplier = pVolume;
+#endif
+            }
         }
         if (channel != NULL) {
-            channel->volume_multiplier = pVolume;
-        }
-    }
-    if (channel != NULL) {
-        if (channel->sound_source_ptr != src) {
-            S3StopChannel(channel);
-        }
-        if (pVolume == 0 || is_sample) {
-            channel->spatial_sound = 0;
-            channel->needs_service = 1;
-            S3StopChannel(channel);
-            src->channel = NULL;
-            src->tag = 0;
+            if (channel->sound_source_ptr != src) {
+                S3StopChannel(channel);
+            }
+            if (pVolume == 0 || sample) {
+                channel->spatial_sound = 0;
+                channel->needs_service = 1;
+                S3StopChannel(channel);
+                src->channel = NULL;
+                src->tag = 0;
+            }
         }
     }
 }
