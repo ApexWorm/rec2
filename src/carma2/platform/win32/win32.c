@@ -1060,7 +1060,7 @@ void C2_HOOK_FASTCALL PDForEveryFile(const char *pThe_path, tPDForEveryFile_cbfn
     char found_path[256];
     WIN32_FIND_DATAA find_data;
     HANDLE hFindFile;
-    char file_filter[6];
+    char file_filter[256];
     char current_dir[260];
 
     GetCurrentDirectoryA(sizeof(current_dir), current_dir);
@@ -1068,10 +1068,13 @@ void C2_HOOK_FASTCALL PDForEveryFile(const char *pThe_path, tPDForEveryFile_cbfn
         strcpy(file_filter, "*.???");
         hFindFile = FindFirstFileA(file_filter, &find_data);
         if (hFindFile != INVALID_HANDLE_VALUE) {
-            do {
+            for (;;) {
                 PathCat(found_path, pThe_path, find_data.cFileName);
                 pAction_routine(found_path);
-            } while (FindNextFileA(hFindFile, &find_data) != 0);
+                if (FindNextFileA(hFindFile, &find_data) == 0) {
+                    break;
+                }
+            }
             FindClose(hFindFile);
         }
         SetCurrentDirectoryA(current_dir);
