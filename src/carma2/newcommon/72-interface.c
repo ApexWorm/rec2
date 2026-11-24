@@ -2100,13 +2100,14 @@ void C2_HOOK_FASTCALL FRONTEND_CreateMenuButton(tFrontend_brender_item* pFronten
         pFrontend_brender_item->field_0xc = BrPixelmapAllocate(BR_PMT_RGBA_4444, 8, 8, NULL, 0);
         BrPixelmapCopy(pFrontend_brender_item->field_0xc, pFrontend_brender_item->field_0x10);
         pFrontend_brender_item->field_0xc->identifier = BrResStrDup(pFrontend_brender_item->field_0xc, pText);
+        BrMapAdd(pFrontend_brender_item->field_0xc);
     } else {
         pFrontend_brender_item->field_0x10 = BrPixelmapAllocate(BR_PMT_RGBA_4444, pMap->width, pMap->height, NULL, 0);
         BrPixelmapCopy(pFrontend_brender_item->field_0x10, pMap);
         pFrontend_brender_item->field_0xc = BrPixelmapAllocate(BR_PMT_RGBA_4444, pMap->width, pMap->height, NULL, 0);
         BrPixelmapCopy(pFrontend_brender_item->field_0xc, pFrontend_brender_item->field_0x10);
+        BrMapAdd(pFrontend_brender_item->field_0xc);
     }
-    BrMapAdd(pFrontend_brender_item->field_0xc);
     pFrontend_brender_item->prims[0].t = BRT_BLEND_B;
     pFrontend_brender_item->prims[0].v.b = 1;
     pFrontend_brender_item->prims[1].t = BRT_OPACITY_X;
