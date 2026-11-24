@@ -858,7 +858,20 @@ void C2_HOOK_FASTCALL GetPowerup(int pNum) {
     GotPowerup(&gProgram_state.current_car, pNum);
 }
 
-// CheckSystemKeys
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_HW 0x00442e90
+// STUB: CARMA2_SW 0x00442f70
+// STUB: CARMA2_CHEAT 0x00442fb0
+void C2_HOOK_FASTCALL CheckSystemKeys(int pRacing) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // FUNCTION: CARMA2_HW 0x00443c50
 // FUNCTION: CARMA2_SW 0x00443d30
