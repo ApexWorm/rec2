@@ -62,7 +62,7 @@ extern tS16 C2_HOOK_FASTCALL FindNearestPathSection(const br_vector3* pActor_coo
 
 // DeadStopCar
 
-// TurnOpponentPhysicsOn
+extern void C2_HOOK_FASTCALL TurnOpponentPhysicsOn(tOpponent_spec* pOpponent_spec);
 
 // TurnOpponentPhysicsOff
 
