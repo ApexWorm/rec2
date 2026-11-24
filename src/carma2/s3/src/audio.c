@@ -1185,38 +1185,38 @@ tS3_error_codes C2_HOOK_FASTCALL S3ClearBufferOfMidiChannel(int pTag) {
 // FUNCTION: CARMA2_CHEAT 0x0056e519
 int C2_HOOK_FASTCALL S3ReleaseSound(int pSound_id) {
     tS3_buffer_desc *description;
-    tS3_outlet *outlet;
+    tS3_outlet *the_outlet;
     tS3_channel *channel;
-    tS3_descriptor* descriptor;
+    tS3_descriptor* sound_descriptor;
 
     if (gS3_enabled) {
-        descriptor = S3GetDescriptorByID(pSound_id);
-        if (descriptor == NULL) {
+        sound_descriptor = S3GetDescriptorByID(pSound_id);
+        if (sound_descriptor == NULL) {
             return eS3_error_bad_id;
         }
-        if (descriptor->type == 1) {
+        if (sound_descriptor->type == 1) {
 
-            for (outlet = gS3_state.outlets; outlet != NULL; outlet = outlet->next) {
+            for (the_outlet = gS3_state.outlets; the_outlet != NULL; the_outlet = the_outlet->next) {
 
-                for (channel = outlet->channel_list; channel != NULL; channel = channel->next) {
+                for (channel = the_outlet->channel_list; channel != NULL; channel = channel->next) {
                     if (channel->descriptor != NULL && channel->descriptor->sample_id == pSound_id) {
                         S3ClearBufferOfMidiChannel(channel->tag);
                     }
                 }
             }
-        } else if (descriptor->type == 0) {
+        } else if (sound_descriptor->type == 0) {
 
 
-            if (descriptor->buffer_description == NULL) {
+            if (sound_descriptor->buffer_description == NULL) {
                 return 0;
             }
-            description = descriptor->buffer_description;
-            PDS3ReleaseSound(descriptor);
+            description = sound_descriptor->buffer_description;
+            PDS3ReleaseSound(sound_descriptor);
             if (description->field_0x14 != NULL) {
                 S3MemFree(description->field_0x14);
             }
             S3MemFree(description);
-            descriptor->buffer_description = NULL;
+            sound_descriptor->buffer_description = NULL;
         }
     }
     return eS3_error_none;
