@@ -234,7 +234,12 @@ tS16 C2_HOOK_FASTCALL FindNearestPathSection(const br_vector3* pActor_coords, br
 
 // TurnOpponentPhysicsOff
 
-// ApplyOppoRenderage2
+// STUB: CARMA2_HW 0x004a7a20
+// STUB: CARMA2_SW 0x004a3b90
+// STUB: CARMA2_CHEAT 0x004a8d30
+void C2_HOOK_FASTCALL ApplyOppoRenderage2(tOpponent_spec* pOpponent_spec, int pRender) {
+    NOT_IMPLEMENTED();
+}
 
 // FUNCTION: CARMA2_HW 0x004aad70
 // FUNCTION: CARMA2_SW 0x004a6ee0

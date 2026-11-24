@@ -445,7 +445,7 @@ extern void C2_HOOK_FASTCALL ApplyEndShitMine(tPipe_chunk** pChunk);
 
 extern void C2_HOOK_FASTCALL ApplyTransformType(tPipe_chunk** pChunk);
 
-// ApplyOppoRenderage
+extern void C2_HOOK_FASTCALL ApplyOppoRenderage(tPipe_chunk** pChunk);
 
 // UndoCrush
 
