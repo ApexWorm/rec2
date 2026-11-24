@@ -716,7 +716,13 @@ void C2_HOOK_FASTCALL ARMainLoopStart(void) {
 
 // ARToggleReplay
 
-// GetReducedPos
+void C2_HOOK_FASTCALL GetReducedPos(br_vector3* pPos, const tReduced_pos* pReduced_pos) {
+
+    pPos->v[0] = (br_scalar)(pReduced_pos->v[0] / 800.0);
+    pPos->v[1] = (br_scalar)(pReduced_pos->v[1] / 800.0);
+    pPos->v[2] = (br_scalar)(pReduced_pos->v[2] / 800.0);
+    BrVector3Accumulate(pPos, &gProgram_state.current_car.car_master_actor->t.t.translate.t);
+}
 
 inline void C2_HOOK_FASTCALL SaveReducedPos(tReduced_pos* pReduced_pos, br_vector3* pPos) {
     br_vector3 tv;
@@ -1843,7 +1849,21 @@ void C2_HOOK_FASTCALL ApplyNonCar(tPipe_chunk** pChunk) {
     AdjustNonCar((*pChunk)->data.non_car.actor, &(*pChunk)->data.non_car.matrix);
 }
 
-// ApplySmoke
+// FUNCTION: CARMA2_HW 0x004c91c0
+// FUNCTION: CARMA2_SW 0x004c58f0
+// FUNCTION: CARMA2_CHEAT 0x004cece0
+void C2_HOOK_FASTCALL ApplySmoke(tPipe_chunk** pChunk) {
+    tPipe_chunk_smoke* chunk;
+    br_vector3 pos;
+    br_scalar radius;
+    br_scalar strength;
+
+    chunk = &(*pChunk)->data.smoke;
+    GetReducedPos(&pos, &chunk->pos);
+    radius = chunk->radius / 1024.0f;
+    strength = chunk->strength / 256.0f;
+    AdjustSmoke((*pChunk)->subject_index, chunk->type, &pos, radius, strength);
+}
 
 // FUNCTION: CARMA2_HW 0x004c9280
 // FUNCTION: CARMA2_SW 0x004c59b0

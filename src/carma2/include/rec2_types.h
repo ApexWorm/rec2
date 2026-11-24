@@ -896,6 +896,7 @@ typedef struct tPipe_chunk {
         tPipe_chunk_screen_wobble wobble;
         tPipe_chunk_skid_adjustment skid_adjustment;
         tPipe_chunk_actor_trans actor_trans;
+        tPipe_chunk_smoke smoke;
         tPipe_chunk_smoke_column smoke_column;
         tPipe_chunk_explosion explosion;
         tPipe_chunk_blood_spurt blood_spurt;
