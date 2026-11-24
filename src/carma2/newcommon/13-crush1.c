@@ -973,7 +973,28 @@ intptr_t C2_HOOK_CDECL InitModelCrushDataCB(br_actor* pActor, void* pData) {
 
 // InitModelCrushData
 
-// PointEdgeDistSq
+// FUNCTION: CARMA2_HW 0x0042c300
+// FUNCTION: CARMA2_SW 0x0042c390
+// FUNCTION: CARMA2_CHEAT 0x0042c4a0
+float C2_HOOK_FASTCALL PointEdgeDistSq(const br_vector3* pP, const br_vector3* pA, const br_vector3* pB) {
+    br_vector3 pAB;
+    br_vector3 pAP;
+    br_vector3 pProj;
+    float proj;
+
+    BrVector3Sub(&pAB, pB, pA);
+    BrVector3Sub(&pAP, pP, pA);
+    proj = BrVector3Dot(&pAP, &pAB) / BrVector3Dot(&pAB, &pAB);
+    if (!(proj >= 0.0f)) {
+        proj = 0.0f;
+    } else if (proj > 1.0f) {
+        proj = 1.0f;
+    }
+    BrVector3Scale(&pProj, &pAB, proj);
+    BrVector3Add(&pProj, &pProj, pA);
+    BrVector3Sub(&pProj, pP, &pProj);
+    return BrVector3LengthSquared(&pProj);
+}
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
@@ -1100,27 +1121,146 @@ void C2_HOOK_FASTCALL DisposeVertexData(tModel_detail_vertex_data* pVertex_data)
 
 // BuckleTheBugger
 
-// OutsideEdgeLine
+// FUNCTION: CARMA2_HW 0x0042cc40
+// FUNCTION: CARMA2_SW 0x0042ccc0
+// FUNCTION: CARMA2_CHEAT 0x0042cde0
+int C2_HOOK_FASTCALL OutsideEdgeLine(const br_vector3* pPoint, const br_vector3* pA, const br_vector3* pDirection, const br_vector3* pInside) {
+    br_vector3 direction;
+    br_vector3 offset;
+    br_vector3 inside_offset;
 
-// PointTriangleDistSq
+    BrVector3Normalise(&direction, pDirection);
+    BrVector3Sub(&offset, pPoint, pA);
+    /* FIXME: The original recomputes the dot product after each component changes, using a modified direction. */
+    BrVector3Scale(&direction, &direction, BrVector3Dot(&offset, &direction));
+    BrVector3Sub(&offset, &offset, &direction);
+    BrVector3Sub(&inside_offset, pInside, pA);
+    return !(BrVector3Dot(&offset, &inside_offset) >= 0.0f);
+}
 
-// PointRectDistSq
+// FUNCTION: CARMA2_HW 0x0042ca30
+// FUNCTION: CARMA2_SW 0x0042cab0
+// FUNCTION: CARMA2_CHEAT 0x0042cbd0
+float C2_HOOK_FASTCALL PointTriangleDistSq(const br_vector3* pP, const br_vector3* pA, const br_vector3* pB, const br_vector3* pC) {
+    br_vector3 ab;
+    br_vector3 bc;
+    br_vector3 ca;
+    br_vector3 normal;
+    br_vector3 offset;
+    br_vector3 projected;
+    float distance;
+
+    BrVector3Sub(&ab, pB, pA);
+    BrVector3Sub(&bc, pC, pB);
+    BrVector3Sub(&ca, pA, pC);
+    BrVector3Cross(&normal, &ab, &bc);
+    BrVector3Normalise(&normal, &normal);
+    BrVector3Sub(&offset, pP, pA);
+    distance = BrVector3Dot(&offset, &normal);
+    BrVector3Scale(&projected, &normal, distance);
+    BrVector3Sub(&projected, pP, &projected);
+    if (OutsideEdgeLine(&projected, pA, &ab, pC)) {
+        return PointEdgeDistSq(pP, pA, pB);
+    }
+    if (OutsideEdgeLine(&projected, pB, &bc, pA)) {
+        return PointEdgeDistSq(pP, pB, pC);
+    }
+    if (OutsideEdgeLine(&projected, pA, &ca, pB)) {
+        return PointEdgeDistSq(pP, pA, pC);
+    }
+    return REC2_SQR(distance);
+}
+
+// FUNCTION: CARMA2_HW 0x0042ce00
+// FUNCTION: CARMA2_SW 0x0042ce70
+// FUNCTION: CARMA2_CHEAT 0x0042cfa0
+float C2_HOOK_FASTCALL PointRectDistSq(const br_vector3* pP, const br_vector3* pA, const br_vector3* pB, const br_vector3* pC) {
+    const br_vector3* origin;
+    br_vector3 u;
+    br_vector3 v;
+    br_vector3 offset;
+    br_vector3 closest;
+    float u_scale;
+    float v_scale;
+
+    origin = pA;
+    BrVector3Sub(&u, pC, pA);
+    BrVector3Sub(&v, pB, pA);
+    if (fabs(BrVector3Dot(&u, &v)) > 0.001f) {
+        origin = pB;
+        BrVector3Sub(&u, pC, pB);
+        BrVector3Sub(&v, pA, pB);
+        if (fabs(BrVector3Dot(&u, &v)) > 0.001f) {
+            origin = pC;
+            BrVector3Sub(&u, pB, pC);
+            BrVector3Sub(&v, pA, pC);
+        }
+    }
+    BrVector3Sub(&offset, pP, origin);
+    v_scale = BrVector3Dot(&offset, &v) / BrVector3LengthSquared(&v);
+    u_scale = BrVector3Dot(&offset, &u) / BrVector3LengthSquared(&u);
+    if (!(v_scale >= 0.0f)) {
+        v_scale = 0.0f;
+    } else if (v_scale > 1.0f) {
+        v_scale = 1.0f;
+    }
+    if (!(u_scale >= 0.0f)) {
+        u_scale = 0.0f;
+    } else if (u_scale > 1.0f) {
+        u_scale = 1.0f;
+    }
+    closest.v[0] = u_scale * u.v[0] + v_scale * v.v[0] + origin->v[0];
+    closest.v[1] = u_scale * u.v[1] + v_scale * v.v[1] + origin->v[1];
+    closest.v[2] = u_scale * u.v[2] + v_scale * v.v[2] + origin->v[2];
+    BrVector3Sub(&offset, &closest, pP);
+    return BrVector3LengthSquared(&offset);
+}
 
 // PointSimplexDistSq
 
-#ifdef REC2_MATCHING
-#pragma auto_inline(off)
-#endif
-
-// STUB: CARMA2_HW 0x0042c8b0
-// STUB: CARMA2_CHEAT 0x0042ca50
+// FUNCTION: CARMA2_HW 0x0042c8b0
+// FUNCTION: CARMA2_SW 0x0042c930
+// FUNCTION: CARMA2_CHEAT 0x0042ca50
 float C2_HOOK_FASTCALL DistSq(const br_vector3* pP, int pCount, const br_vector3* pVertices) {
-    NOT_IMPLEMENTED();
-}
+    br_vector3 offset;
+    float closest_distance;
+    int i;
 
-#ifdef REC2_MATCHING
-#pragma auto_inline(on)
-#endif
+    switch (pCount) {
+    case 0:
+        return 0.0f;
+    case 1:
+        BrVector3Sub(&offset, pP, &pVertices[0]);
+        return BrVector3LengthSquared(&offset);
+    case 2:
+        return PointEdgeDistSq(pP, &pVertices[0], &pVertices[1]);
+    case 3:
+        return PointTriangleDistSq(pP, &pVertices[0], &pVertices[1], &pVertices[2]);
+    case 4:
+        return PointRectDistSq(pP, &pVertices[0], &pVertices[1], &pVertices[2]);
+    default:
+        break;
+    }
+
+    closest_distance = BR_SCALAR_MAX;
+    for (i = 0; i < pCount; i++) {
+        int j;
+
+        for (j = i + 1; j < pCount; j++) {
+            int k;
+
+            for (k = j + 1; k < pCount; k++) {
+                float distance;
+
+                distance = PointTriangleDistSq(pP, &pVertices[i], &pVertices[j], &pVertices[k]);
+                if (!(distance >= closest_distance)) {
+                    closest_distance = distance;
+                }
+            }
+        }
+    }
+    return closest_distance;
+}
 
 // LimitImpactScale
 
@@ -1783,7 +1923,40 @@ void C2_HOOK_FASTCALL FullyDetachBit(tCar_spec* pCar, tPhysics_object* pObject) 
 
 // SplitCarCollisionShapes
 
-// QuantizeWithinBounds
+// FUNCTION: CARMA2_HW 0x00430d80
+// FUNCTION: CARMA2_SW 0x00430db0
+// FUNCTION: CARMA2_CHEAT 0x00430f50
+int C2_HOOK_FASTCALL QuantizeWithinBounds(br_scalar pQuant, br_scalar pMin, br_scalar pMax, br_scalar* pValue) {
+    br_scalar range;
+    br_scalar rounded;
+    tS32 count;
+    tS32 index;
+
+    range = pMax - pMin;
+    rounded = range / pQuant;
+    if (rounded > 0.0f) {
+        rounded += 0.5f;
+    } else {
+        rounded -= 0.5f;
+    }
+    count = (tS32)rounded;
+    if (count == 0) {
+        count = 1;
+    }
+    pQuant = range / (br_scalar)count;
+    rounded = (*pValue - pMin) / pQuant;
+    if (rounded > 0.0f) {
+        rounded += 0.5f;
+    } else {
+        rounded -= 0.5f;
+    }
+    index = (tS32)rounded;
+    if (index < 0 || index > count) {
+        return 0;
+    }
+    *pValue = (br_scalar)index * pQuant + pMin;
+    return 1;
+}
 
 // SaveVitalBitsOfObject
 
@@ -2067,13 +2240,69 @@ void C2_HOOK_FASTCALL TotallyRepairCarCollisionShapes(tCar_spec* pCar_spec) {
     pCar_spec->car_crush_spec->expand_bounding_box = 3;
 }
 
-// TotallyRepairModel
+inline void C2_HOOK_FASTCALL TotallyRepairModel(br_model* pModel) {
+    tUser_detail_level_model* user_detail_model;
+    tModel_detail_vertex_data* vertex_detail_data;
+    tU16 i;
+    br_vector3 vector_mash[1024];
 
-// STUB: CARMA2_HW 0x00439a20
-// STUB: CARMA2_SW 0x00439a60
-// STUB: CARMA2_CHEAT 0x00439c40
+    if (pModel == NULL) {
+        return;
+    }
+    user_detail_model = pModel->user;
+    if (user_detail_model == NULL) {
+        return;
+    }
+    vertex_detail_data = user_detail_model->field_0x4;
+    if (vertex_detail_data == NULL) {
+        return;
+    }
+    if (pModel->nvertices > REC2_ASIZE(vector_mash)) {
+        PDFatalError("Holy polygons Batman! There's a lot of vertices on that model.");
+    }
+    for (i = 0; i < pModel->nvertices; i++) {
+        br_vector3 pos;
+
+        ExpandVector3(&pos, &vertex_detail_data[i].p, -10.f, 10.f);
+        BrVector3Sub(&vector_mash[i], &pos, &pModel->vertices[i].p);
+        BrVector3Copy(&pModel->vertices[i].p, &pos);
+        vertex_detail_data[i].flags &= ~0x4;
+    }
+    AddModelMashToPipingSession(pModel, vector_mash);
+    SetModelForUpdate(pModel);
+}
+
+// FUNCTION: CARMA2_HW 0x00439a20
+// FUNCTION: CARMA2_SW 0x00439a60
+// FUNCTION: CARMA2_CHEAT 0x00439c40
 intptr_t C2_HOOK_CDECL TotallyRepairModels(br_actor* pActor, void* pUser) {
-    NOT_IMPLEMENTED();
+    tCar_spec* car_spec;
+    tUser_crush_data* user_crush;
+    tCar_crush_buffer_entry* crush_data;
+    int i;
+
+    car_spec = pUser;
+    user_crush = pActor->user;
+    if (user_crush == NULL) {
+        return 0;
+    }
+    for (i = 0; i < car_spec->count_detail_levels; i++) {
+        TotallyRepairModel(user_crush->models[i]);
+    }
+    crush_data = user_crush->crush_data;
+    if (crush_data != NULL) {
+        TotallyRepairSmash(car_spec, crush_data);
+        crush_data->field_0x2c = 0;
+        if (crush_data->flap_data != NULL && !crush_data->flap_data->kev_o_flap) {
+            crush_data->flap_data->field_0x15 = 0;
+            crush_data->flap_data->field_0x14 = 1;
+            crush_data->flap_data->field_0x18 = 0.0f;
+        }
+        if (crush_data->detach_data != NULL) {
+            crush_data->detach_data->field_0x0 = 0.0f;
+        }
+    }
+    return 0;
 }
 
 // FUNCTION: CARMA2_HW 0x00439a10
@@ -2402,7 +2631,29 @@ int C2_HOOK_FASTCALL GetNetShapeDataLengthFromShape(tCar_spec* pCar) {
     }
 }
 
-// GetNetShapeDataLengthFromData
+// FUNCTION: CARMA2_HW 0x0043d960
+// FUNCTION: CARMA2_SW 0x0043d9b0
+// FUNCTION: CARMA2_CHEAT 0x0043dc10
+int C2_HOOK_FASTCALL GetNetShapeDataLengthFromData(tU8* pData) {
+    tU8 count_points;
+    int count_packets;
+    int total_size;
+    int i;
+
+    count_points = *pData++;
+    if (count_points <= 4) {
+        count_packets = count_points;
+        total_size = 1;
+        for (i = 0; i < count_packets; i++) {
+            count_points = *pData;
+            total_size += 1 + count_points * sizeof(tCompressed_vector3);
+            pData += 1 + count_points * sizeof(tCompressed_vector3);
+        }
+        return total_size;
+    } else {
+        return count_points * 6 + 1;
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x0043d9c0
 // FUNCTION: CARMA2_SW 0x0043da10

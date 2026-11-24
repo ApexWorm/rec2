@@ -41,6 +41,7 @@ br_actor* gDelete_list[500];
 br_actor* gSpec_vol_actors[100];
 
 // GLOBAL: CARMA2_HW 0x006ab940
+// GLOBAL: CARMA2_SW 0x006a5390
 // GLOBAL: CARMA2_CHEAT 0x006b2fd0
 int gSpec_vol_mode;
 
@@ -435,7 +436,8 @@ void C2_HOOK_FASTCALL IdentifySpecVol(void) {
 }
 
 // FUNCTION: CARMA2_HW 0x0050d470
-// FUNCTION: CARMA2_cHEAT 0x00512e60
+// FUNCTION: CARMA2_SW 0x005088c0
+// FUNCTION: CARMA2_CHEAT 0x00512e60
 void C2_HOOK_FASTCALL DelSpecVolumeGraph(int pIndex) {
     br_actor* actor;
     br_model* model;
@@ -482,8 +484,9 @@ void C2_HOOK_FASTCALL ShowSpecialVolumes(void) {
     }
 }
 
-// STUB: CARMA2_HW 0x005111c0
-// STUB: CARMA2_CHEAT 0x00516bb0
+// FUNCTION: CARMA2_HW 0x005111c0
+// FUNCTION: CARMA2_SW 0x0050c610
+// FUNCTION: CARMA2_CHEAT 0x00516bb0
 void C2_HOOK_FASTCALL HideSpecialVolumes(void) {
     int i;
     tSpecial_volume* v;

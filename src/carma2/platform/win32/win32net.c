@@ -71,6 +71,7 @@ struct sockaddr* gPtr_broadcast_address;
 WSADATA gWSA_data;
 
 // GLOBAL: CARMA2_HW 0x006619b0
+// GLOBAL: CARMA2_SW 0x0065c2a0
 // GLOBAL: CARMA2_CHEAT 0x00669214
 SOCKET gSocket = SOCKET_ERROR;
 
