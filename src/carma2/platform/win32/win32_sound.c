@@ -569,24 +569,24 @@ tS3_error_codes C2_HOOK_FASTCALL PDS3PlayCDAChannel(tS3_channel* pChannel) {
 // FUNCTION: CARMA2_SW 0x0056592d
 // FUNCTION: CARMA2_CHEAT 0x0056fe75
 void C2_HOOK_FASTCALL PDS3ServiceCDA(tS32 pDelta_time) {
-    tU32 now;
-    tS3_outlet* o;
-    tS3_channel* c;
+    tU32 the_time;
+    tS3_outlet* outlet;
+    tS3_channel* channel;
 
-    o = gS3_state.outlets;
-    for (; o != NULL; o = o->next) {
-        c = o->channel_list;
-        for (; c != NULL; c = c->next) {
-            S3ServiceChannel(c);
+    outlet = gS3_state.outlets;
+    for (; outlet != NULL; outlet = outlet->next) {
+        channel = outlet->channel_list;
+        for (; channel != NULL; channel = channel->next) {
+            S3ServiceChannel(channel);
             ;
         }
 
     }
 
     if (gPDS3_cda_initialized) {
-        now = PDGetTotalTime();
-        if (now > gPDS3_last_cda_status_update + 3000) {
-            gPDS3_last_cda_status_update = now;
+        the_time = PDGetTotalTime();
+        if (the_time > gPDS3_last_cda_status_update + 3000) {
+            gPDS3_last_cda_status_update = the_time;
             gPDS3_cda_status_parms.dwCallback = (DWORD_PTR)gHWnd;
             gPDS3_cda_status_parms.dwItem = MCI_STATUS_MODE;
             mciSendCommandA(gPDS3_mci_open_parms.wDeviceID, MCI_STATUS, MCI_STATUS_ITEM | MCI_NOTIFY, (DWORD_PTR)&gPDS3_cda_status_parms);
