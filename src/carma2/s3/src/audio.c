@@ -312,18 +312,24 @@ tS3_outlet* C2_HOOK_FASTCALL S3CreateOutlet(int pCount_channels_1, int pCount_ch
 // FUNCTION: CARMA2_SW 0x00560b82
 // FUNCTION: CARMA2_CHEAT 0x0056b0d2
 tS3_error_codes C2_HOOK_FASTCALL S3ReleaseOutlet(tS3_outlet* pOutlet) {
+    tS3_outlet* prev_outlet;
+    tS3_outlet* next_outlet;
+    int outlet;
+    int o;
 
     if (pOutlet == NULL) {
         return eS3_error_bad_id;
     }
     S3UnbindChannels(pOutlet);
-    if (pOutlet->prev != NULL) {
-        pOutlet->prev->next = pOutlet->next;
+    prev_outlet = pOutlet->prev;
+    next_outlet = pOutlet->next;
+    if (prev_outlet != NULL) {
+        prev_outlet->next = next_outlet;
     } else {
-        gS3_state.outlets = pOutlet->next;
+        gS3_state.outlets = next_outlet;
     }
-    if (pOutlet->next != NULL) {
-        pOutlet->next->prev = pOutlet->prev;
+    if (next_outlet != NULL) {
+        next_outlet->prev = prev_outlet;
     }
     if (gS3_state.count_outlets != 0) {
         gS3_state.count_outlets -= 1;
@@ -332,8 +338,11 @@ tS3_error_codes C2_HOOK_FASTCALL S3ReleaseOutlet(tS3_outlet* pOutlet) {
         }
     }
     S3MemFree(pOutlet);
+    (void)outlet;
+    (void)o;
     return eS3_error_none;
 }
+
 
 // FUNCTION: CARMA2_HW 0x0056494f
 // FUNCTION: CARMA2_SW 0x0055ffef
