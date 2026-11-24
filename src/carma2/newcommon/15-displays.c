@@ -514,7 +514,7 @@ int C2_HOOK_FASTCALL FindAHeadupHoleWoofBarkSoundsABitRude(int pSlot_index) {
 
 inline int C2_HOOK_FASTCALL IsHeadupTextClever(char* pText) {
 
-    while (*pText) {
+    while (*pText != '\0') {
         if (*(signed char*)pText++ < 0) {
             return 1;
         }
@@ -581,7 +581,6 @@ int C2_HOOK_FASTCALL MungeHeadupWidth(tHeadup* pHeadup) {
     }
     return width;
 }
-
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(on)
