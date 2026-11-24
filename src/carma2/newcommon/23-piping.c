@@ -2443,7 +2443,19 @@ void C2_HOOK_FASTCALL UndoScreenWobble(tPipe_chunk** pChunk, tPipe_chunk* pPrev_
     AREnableAdvance();
 }
 
-// UndoSplash
+// FUNCTION: CARMA2_HW 0x004c9e80
+// FUNCTION: CARMA2_SW 0x004c65b0
+// FUNCTION: CARMA2_CHEAT 0x004cf9b0
+void C2_HOOK_FASTCALL UndoSplash(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
+
+    ARDisableAdvance();
+    if (pPrev_chunk != NULL) {
+        ApplySplash(&pPrev_chunk);
+    } else {
+        ((tPhysics_object*)(*pChunk)->subject_index)->water_d = 10000.0f;
+    }
+    AREnableAdvance();
+}
 
 // UndoExtendedSplash
 
