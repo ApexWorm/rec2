@@ -374,7 +374,7 @@ extern void C2_HOOK_FASTCALL NextPedCam(void);
 
 extern void C2_HOOK_FASTCALL PrevPedCam(void);
 
-// FindNearestPed
+extern void C2_HOOK_FASTCALL FindNearestPed(void);
 
 extern void C2_HOOK_FASTCALL ResetPedNearness(void);
 
