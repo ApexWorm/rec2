@@ -20,6 +20,7 @@ extern int rr_min;
 extern int rr_mid;
 extern int rr_max;
 extern int gInitialised_grid;
+extern int gINT_0074a694;
 #ifdef REC2_HW
 extern br_actor* gNetscore_box_universe;
 extern br_material* gNetscore_box_materials[4];

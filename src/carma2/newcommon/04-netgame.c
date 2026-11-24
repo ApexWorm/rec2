@@ -55,6 +55,16 @@ tNet_game_player_info* gLast_lepper;
 // GLOBAL: CARMA2_SW 0x00687980
 int gLast_it_change;
 
+// GLOBAL: CARMA2_HW 0x0068d938
+// GLOBAL: CARMA2_SW 0x00687990
+// GLOBAL: CARMA2_CHEAT 0x006951d8
+int gWinner_declared;
+
+// GLOBAL: CARMA2_HW 0x00659c00
+// GLOBAL: CARMA2_SW 0x00654598
+// GLOBAL: CARMA2_CHEAT 0x00660520
+int gGame_scores[12] = { 1, 2, 3, 4, 5, 6, 7, 8, 10, 12, 15, 20 };
+
 // GLOBAL: CARMA2_HW 0x0068d92c
 // GLOBAL: CARMA2_SW 0x00687984
 // GLOBAL: CARMA2_cHEAT 0x006951cc
@@ -462,11 +472,55 @@ void C2_HOOK_FASTCALL DisposeNetHeadups(void) {
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x0049a760
-// STUB: CARMA2_SW 0x004968e0
-// STUB: CARMA2_CHEAT 0x0049ab10
+// FUNCTION: CARMA2_HW 0x0049a760
+// FUNCTION: CARMA2_SW 0x004968e0
+// FUNCTION: CARMA2_CHEAT 0x0049ab10
 void C2_HOOK_FASTCALL DeclareWinner(int pWinner_index) {
-    NOT_IMPLEMENTED();
+    tNet_message* the_message;
+    int i;
+    int j;
+    int best_score_index;
+    char s[256];
+
+    if (gWinner_declared) {
+        return;
+    }
+    gWinner_declared = 1;
+    DoNetScores2(1);
+    the_message = NetBuildGuaranteedMessage(eNet_message_chunk_type_race_over, 0);
+    the_message->contents.race_over.reason = eRace_over_8;
+    NetGuaranteedSendMessageToPlayer(gCurrent_net_game, the_message, gNet_players[pWinner_index].ID, NULL);
+    gNet_players[pWinner_index].field_0x88++;
+    if (gCurrent_net_game->type == eNet_game_type_4 || gCurrent_net_game->type == eNet_game_type_fight_to_death) {
+        gNet_players[pWinner_index].score += gGame_scores[11];
+    }
+    sprintf(s, "%s %s", gNet_players[pWinner_index].player_name, GetMiscString(189));
+    for (i = 0; i < gNumber_of_net_players; i++) {
+        if (gCurrent_net_game->type != eNet_game_type_4 && gCurrent_net_game->type != eNet_game_type_fight_to_death) {
+            best_score_index = gNet_players[i].last_score_index;
+            for (j = 0; j < gNumber_of_net_players; j++) {
+                if (gNet_players[j].score2 == gNet_players[i].score2 && gNet_players[j].last_score_index < best_score_index) {
+                    best_score_index = gNet_players[j].last_score_index;
+                }
+            }
+            gNet_players[i].score += gGame_scores[11 - best_score_index];
+        }
+        gNet_players[i].field_0x7c++;
+        if (i != pWinner_index) {
+            the_message = NetBuildGuaranteedMessage(eNet_message_chunk_type_race_over, 0);
+            the_message->contents.race_over.reason = eRace_over_9;
+            NetGuaranteedSendMessageToPlayer(gCurrent_net_game, the_message, gNet_players[i].ID, NULL);
+            NetSendHeadupToPlayer(s, gNet_players[i].ID);
+        }
+    }
+    gINT_0074a694 = 1;
+    the_message = NetBuildGuaranteedMessage(eNet_message_chunk_type_game_scores, 0);
+    for (i = 0; i < gNumber_of_net_players; i++) {
+        the_message->contents.game_scores.players[i].field_0x0 = gNet_players[i].field_0x7c;
+        the_message->contents.game_scores.players[i].field_0x4 = gNet_players[i].field_0x88;
+        the_message->contents.game_scores.players[i].field_0x8 = gNet_players[i].score;
+    }
+    NetGuaranteedSendMessageToAllPlayers(gCurrent_net_game, the_message, NULL);
 }
 
 #ifdef REC2_MATCHING
