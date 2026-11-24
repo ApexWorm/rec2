@@ -60,13 +60,13 @@ extern tS16 C2_HOOK_FASTCALL FindNearestGeneralSection(tCar_spec* pCar, const br
 
 extern tS16 C2_HOOK_FASTCALL FindNearestPathSection(const br_vector3* pActor_coords, br_vector3* pPath_direction, br_vector3* pIntersect, br_scalar* pDistance);
 
-// DeadStopCar
+extern void C2_HOOK_FASTCALL DeadStopCar(tCar_spec* pCar_spec);
 
-// TurnOpponentPhysicsOn
+extern void C2_HOOK_FASTCALL TurnOpponentPhysicsOn(tOpponent_spec* pOpponent_spec);
 
-// TurnOpponentPhysicsOff
+extern void C2_HOOK_FASTCALL TurnOpponentPhysicsOff(tOpponent_spec* pOpponent_spec);
 
-// ApplyOppoRenderage2
+extern void C2_HOOK_FASTCALL ApplyOppoRenderage2(tOpponent_spec* pOpponent_spec, int pRender);
 
 extern void C2_HOOK_CDECL NewObjective(tOpponent_spec* pOpponent_spec, tOpponent_objective_type pObjective_type, ...);
 
@@ -214,7 +214,7 @@ extern int C2_HOOK_FASTCALL GetOpponentsNextSection(const tOpponent_spec* pOppon
 
 // GetOpponentsSectionFinishNodePoint
 
-// GetOpponentsSectionWidth
+extern float C2_HOOK_FASTCALL GetOpponentsSectionWidth(const tOpponent_spec* pOpponent_spec, tS16 pSection);
 
 extern int C2_HOOK_FASTCALL GetOpponentsSectionMinSpeed(tOpponent_spec* pOpponent_spec, tS16 pSection, int pTowards_finish);
 
