@@ -122,10 +122,12 @@ tU8 C2_HOOK_FASTCALL ReadU8(FILE* pF) {
 // FUNCTION: CARMA2_HW 0x0048f890
 // FUNCTION: CARMA2_SW 0x0048cb00
 float C2_HOOK_FASTCALL ReadF32(FILE* pF) {
+    tU32 raw_long;
     float f;
 
-    PFfread(&f, sizeof(f), 1, pF);
+    PFfread(&raw_long, sizeof(raw_long), 1, pF);
     // FIXME: byteswap for BE
+    *(tU32*)&f = raw_long;
     return f;
 }
 
