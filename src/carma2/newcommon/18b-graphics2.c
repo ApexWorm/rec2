@@ -943,9 +943,8 @@ void C2_HOOK_FASTCALL DRPixelmapBlendyCopy(br_pixelmap* pDest, br_int_16 pDest_x
 
     for (y = 0; y < pSource->height; y++) {
         dest_ptr = (tU8*)pDest->pixels + (pDest_y + y) * pDest->row_bytes + pDest_x;
-        for (x = 0; x < pSource->width; x++) {
+        for (x = 0; x < pSource->width; x++, dest_ptr++) {
             *dest_ptr = ((tU8*)gBlend75_table->pixels)[*dest_ptr + 256 * ((tU8*)pSource->pixels)[y * pSource->row_bytes + x]];
-            dest_ptr++;
         }
     }
 }
