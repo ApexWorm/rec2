@@ -1279,15 +1279,14 @@ int C2_HOOK_FASTCALL S3IRandomBetweenLog(int pMin, int pMax, int pDefault) {
 // FUNCTION: CARMA2_SW 0x00560d57
 // FUNCTION: CARMA2_CHEAT 0x0056b2a7
 int C2_HOOK_FASTCALL S3FreeUnboundChannels(void) {
-    tS3_channel *channel;
+    tS3_channel* channel;
+    tS3_channel* next_channel;
 
     channel = gS3_unbound_channels;
     while (channel != NULL) {
-        tS3_channel* next;
-
-        next = channel->next;
+        next_channel = channel->next;
         S3MemFree(channel);
-        channel = next;
+        channel = next_channel;
     }
     return 0;
 }
