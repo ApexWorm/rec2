@@ -1,5 +1,5 @@
 address,type,name
-00057dae0,library,_fputs
+0x00523a84,library,_closesocket@4
 0x0057b770,library,__ftol
 0x0057b7a0,library,__chkstk
 0x0057b7e0,library,_strchr
@@ -14,6 +14,7 @@ address,type,name
 0x0057c3c0,library,_strstr
 0x0057c450,library,_tolower
 0x0057c550,library,_srand
+0x0057c560,library,_rand
 0x0057c7ba,library,__CIfmod
 0x0057c7f0,library,_div
 0x0057c8f0,library,_fprintf
@@ -49,6 +50,7 @@ address,type,name
 0x0057d880,library,__strcmpi
 0x0057d910,library,__memicmp
 0x0057d9b0,library,_time
+0x0057dae0,library,_fputs
 0x0057db30,library,___dtoxmode
 0x0057dc00,library,_stat
 0x0057dff0,library,__mkdir
@@ -155,6 +157,7 @@ address,type,name
 0x0058d310,library,__mbschr
 0x0058d410,library,__setmode
 0x0058d600,library,__strnicmp
+0x0058e254,global,_closesocket
 0x005927a0,global,___lookuptable
 0x00594000,global,___xc_a
 0x00594004,global,___xc_z
