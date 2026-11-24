@@ -327,6 +327,31 @@ int C2_HOOK_FASTCALL PDS3StopCDAChannel(tS3_channel* pChannel) {
     return 0;
 }
 
+// FUNCTION: CARMA2_HW 0x00569752
+// FUNCTION: CARMA2_SW 0x00564df2
+int C2_HOOK_FASTCALL S3ServiceChannel(tS3_channel* pChannel) {
+    LPDIRECTSOUNDBUFFER buffer;
+    DWORD status;
+
+    if (pChannel->type == 0) {
+        if (pChannel->descriptor != NULL && pChannel->descriptor->type == pChannel->type) {
+            buffer = pChannel->descriptor->pd_handle;
+            if (buffer != NULL) {
+                if (!FAILED(IDirectSoundBuffer_GetStatus(buffer, &status)) && (status & DSBSTATUS_PLAYING)) {
+                    return 1;
+                }
+            }
+        }
+        PDS3StopSampleChannel(pChannel);
+        return 0;
+    } else if (pChannel->type == 1) {
+        return !PDS3IsMIDIStopped(pChannel);
+    } else if (pChannel->type == 2) {
+        return PDS3IsCDAPlaying();
+    }
+    return 0;
+}
+
 // FUNCTION: CARMA2_HW 0x005697ef
 // FUNCTION: CARMA2_SW 0x00564e8f
 // FUNCTION: CARMA2_CHEAT 0x0056f3c5
@@ -450,25 +475,6 @@ int C2_HOOK_FASTCALL PDS3IsCDAPlaying(void) {
     if (gS3_CDA_enabled && gPDS3_cda_media_present) {
         return gPDS3_cda_is_playing;
     }
-    return 0;
-}
-
-int C2_HOOK_FASTCALL PDS3IsSamplePlaying(tS3_channel* pChannel) {
-    DWORD status;
-
-    if (pChannel->descriptor != NULL && pChannel->descriptor->type == pChannel->type) {
-        LPDIRECTSOUNDBUFFER buffer;
-
-        buffer = pChannel->descriptor->pd_handle;
-        if (buffer != NULL) {
-            if (!FAILED(IDirectSoundBuffer_GetStatus(buffer, &status))) {
-                if (status & DSBSTATUS_PLAYING) {
-                    return 1;
-                }
-            }
-        }
-    }
-    PDS3StopSampleChannel(pChannel);
     return 0;
 }
 

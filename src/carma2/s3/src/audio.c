@@ -1383,20 +1383,6 @@ tS3_error_codes C2_HOOK_FASTCALL S3UpdateFrequencySampleChannel(tS3_sound_tag pC
     return eS3_error_none;
 }
 
-// FUNCTION: CARMA2_HW 0x00569752
-// FUNCTION: CARMA2_SW 0x00564df2
-int C2_HOOK_FASTCALL S3ServiceChannel(tS3_channel* pChannel) {
-
-    if (pChannel->type == 0) {
-        return PDS3IsSamplePlaying(pChannel);
-    } else if (pChannel->type == 1) {
-        return !PDS3IsMIDIStopped(pChannel);
-    } else if (pChannel->type == 2) {
-        return PDS3IsCDAPlaying();
-    }
-    return 0;
-}
-
 // FUNCTION: CARMA2_HW 0x0056a280
 // FUNCTION: CARMA2_SW 0x00565920
 // FUNCTION: CARMA2_CHEAT 0x0056fe68

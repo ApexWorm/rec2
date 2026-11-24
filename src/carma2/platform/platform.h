@@ -210,8 +210,6 @@ extern void C2_HOOK_FASTCALL PDS3UpdateCDAVolume(tS3_channel* pChannel, int pVol
 
 extern void C2_HOOK_FASTCALL PDS3ServiceCDA(tS32 pDelta_time);
 
-extern int C2_HOOK_FASTCALL PDS3IsSamplePlaying(tS3_channel* pChannel);
-
 extern void C2_HOOK_FASTCALL PDPageInProcessMemory(void);
 
 extern int C2_HOOK_FASTCALL PDIsJoystickDPadEnabled(void);

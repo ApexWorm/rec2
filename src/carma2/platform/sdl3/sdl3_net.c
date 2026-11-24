@@ -13,6 +13,7 @@
 #include "52-errors.h"
 #include "globvrpb.h"
 #include "01-network.h"
+#include "platform.h"
 
 #include <SDL3/SDL.h>
 
@@ -459,7 +460,12 @@ int PDS3PlaySample(tS3_channel *pChannel) {
     return 0;
 }
 
-int PDS3IsSamplePlaying(tS3_channel *pChannel) {
+int S3ServiceChannel(tS3_channel *pChannel) {
+    if (pChannel->type == 1) {
+        return !PDS3IsMIDIStopped(pChannel);
+    } else if (pChannel->type == 2) {
+        return PDS3IsCDAPlaying();
+    }
     return 0;
 }
 

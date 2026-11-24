@@ -77,8 +77,6 @@ extern int C2_HOOK_FASTCALL PDS3IsMIDIStopped(tS3_channel *pChannel);
 
 extern int C2_HOOK_FASTCALL PDS3IsCDAPlaying(void);
 
-extern int C2_HOOK_FASTCALL PDS3IsSamplePlaying(tS3_channel* pChannel);
-
 extern int C2_HOOK_FASTCALL PDS3UpdateChannelFrequency(tS3_channel* pChannel);
 
 extern int C2_HOOK_FASTCALL PDS3PlaySample(tS3_channel* pChannel);
