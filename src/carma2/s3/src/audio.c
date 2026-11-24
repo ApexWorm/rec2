@@ -987,7 +987,7 @@ int C2_HOOK_FASTCALL S3SoundBankReaderReadFilename(char** pPath, tS3_soundbank_r
         return 0;
     }
     strcpy(*pPath, pDir_name);
-    memmove(&(*pPath)[dir_len], data_start, read);
+    memcpy(&(*pPath)[dir_len], data_start, read);
     (*pPath)[dir_len + read] = '\0';
     return 1;
 }
