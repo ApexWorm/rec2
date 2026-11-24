@@ -1613,7 +1613,11 @@ void C2_HOOK_FASTCALL CheckIfRunningOnServer(void) {
     };
     int i;
     char working_directory[256 + 1];
+#ifdef REC2_FIX_BUGS
     char computer_name[16];
+#else
+    char computer_name[24];
+#endif
     DWORD computer_name_size;
     FILE *f;
     time_t now;
@@ -1624,13 +1628,17 @@ void C2_HOOK_FASTCALL CheckIfRunningOnServer(void) {
     for (i = 0; network_paths[i] != NULL; i++) {
         if (strncasecmp(working_directory, network_paths[i], strlen(network_paths[i])) == 0) {
             if (GetComputerName(computer_name, &computer_name_size) == 0 || computer_name_size == 0) {
+#ifndef REC2_FIX_BUGS
 #ifdef __GNUC__
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wstringop-overflow"
 #endif
-                strcpy(computer_name, "UNKNOWN - lucky cunts");
+#endif
+strcpy(computer_name, "UNKNOWN - lucky cunts");
+#ifndef REC2_FIX_BUGS
 #ifdef __GNUC__
 #pragma GCC diagnostic pop
+#endif
 #endif
             }
             f = fopen("\\\\Beelzebub\\Hades\\Carma2\\List_O_Cunts.TXT", "at");
