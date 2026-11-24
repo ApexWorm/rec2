@@ -34,6 +34,7 @@ int gPHIL_count_list_collision_infos;
 
 // GLOBAL: CARMA2_HW 0x006923e4
 // GLOBAL: CARMA2_SW 0x0068c43c
+// GLOBAL: CARMA2_CHEAT 0x00699dcc
 int gPHIL_object_added;
 
 // GLOBAL: CARMA2_HW 0x006923f0
@@ -467,7 +468,7 @@ int C2_HOOK_FASTCALL PHILMakeObjectActive(tPhysics_object* pObject, const br_vec
 // FUNCTION: CARMA2_HW 0x004b61a0
 // FUNCTION: CARMA2_SW 0x004b28c0
 // FUNCTION: CARMA2_cHEAT 0x004bbc00
-int C2_HOOK_FASTCALL PHILSetPassiveObjectsMatrix(tPhysics_object* pObject, const br_matrix34* pMatrix) {
+inline int C2_HOOK_FASTCALL PHILSetPassiveObjectsMatrix(tPhysics_object* pObject, const br_matrix34* pMatrix) {
     tPHIL_queued_object_info* queued;
     tPHIL_queued_header* info;
 
@@ -513,13 +514,41 @@ int C2_HOOK_FASTCALL PHILAddActiveObject(tPhysics_object* pInfo, const br_matrix
     return result;
 }
 
-// PHILAddObjectImmediately
+// FUNCTION: CARMA2_HW 0x004b62b0
+// FUNCTION: CARMA2_SW 0x004b29d0
+// FUNCTION: CARMA2_CHEAT 0x004bbd40
+int C2_HOOK_FASTCALL PHILAddObjectImmediately(tPhysics_object* pObject) {
+    int result;
 
-// STUB: CARMA2_HW 0x004b62e0
-// STUB: CARMA2_SW 0x004b2a00
-// STUB: CARMA2_CHEAT 0x004bbd70
+    if (gPHIL_disabled) {
+        return 0;
+    }
+    if (gPHIL_munging_objects) {
+        gPHIL_object_added = 1;
+    }
+    result = PHILAddObject(pObject);
+    gPHIL_object_added = 0;
+    return result;
+}
+
+// FUNCTION: CARMA2_HW 0x004b62e0
+// FUNCTION: CARMA2_SW 0x004b2a00
+// FUNCTION: CARMA2_CHEAT 0x004bbd70
 int C2_HOOK_FASTCALL PHILAddActiveObjectImmediately(tPhysics_object* pObject, const br_matrix34* pMatrix, const br_vector3* pVelocity, const br_vector3* pOmega) {
-    NOT_IMPLEMENTED();
+    int result;
+
+    if (gPHIL_disabled) {
+        return 0;
+    }
+    if (gPHIL_munging_objects) {
+        gPHIL_object_added = 1;
+    }
+    result = PHILAddObject(pObject);
+    if (result == 0 && (pMatrix == NULL || (result = PHILSetPassiveObjectsMatrix(pObject, pMatrix)) == 0)) {
+        result = PHILMakeObjectActive(pObject, pVelocity, pOmega, 0);
+    }
+    gPHIL_object_added = 0;
+    return result;
 }
 
 // STUB: CARMA2_HW 0x004b63b0
@@ -529,11 +558,45 @@ int C2_HOOK_CDECL PHILSetObjectProperty(tPhysics_object* pCollision_info, int pP
     NOT_IMPLEMENTED();
 }
 
-// STUB: CARMA2_HW 0x004b6530
-// STUB: CARMA2_SW 0x004b2c50
-// STUB: CARMA2_CHEAT 0x004bc010
+// FUNCTION: CARMA2_HW 0x004b6530
+// FUNCTION: CARMA2_SW 0x004b2c50
+// FUNCTION: CARMA2_CHEAT 0x004bc010
 float C2_HOOK_FASTCALL PHILGetObjectProperty(tPhysics_object* pObject, int pProperty) {
-    NOT_IMPLEMENTED();
+    tCollision_info_owner* owner;
+
+    if (!gPHIL_disabled) {
+        if (pObject->field_0x239 == 2) {
+            owner = pObject->field_0x240;
+        } else {
+            owner = pObject->field_0x240;
+        }
+        if (owner != NULL) {
+            if (pProperty < 0 || pProperty >= 9) {
+                return 5.0f;
+            }
+            switch (pProperty) {
+            case 0:
+                return owner->field_0x10;
+            case 1:
+                return (float)(owner->field_0x04 & 0x1);
+            case 2:
+                return owner->field_0x0c;
+            case 3:
+                return (float)(int)(((tU32)pObject->flags >> 6) & 0x1);
+            case 4:
+                return (float)(int)(((tU32)pObject->flags >> 3) & 0x1);
+            case 5:
+                return (float)(int)(((tU32)pObject->flags >> 4) & 0x1);
+            case 6:
+                return (float)((owner->field_0x04 >> 2) & 0x1);
+            case 7:
+                return (float)((owner->field_0x04 >> 3) & 0x1);
+            case 8:
+                return owner->field_0x14;
+            }
+        }
+    }
+    return 0.0f;
 }
 
 // FlushQueuedAddsAndRemoves

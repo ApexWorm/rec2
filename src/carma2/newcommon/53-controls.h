@@ -163,7 +163,7 @@ extern void C2_HOOK_FASTCALL FlipUpCar(tCar_spec* pCar_spec);
 
 extern void C2_HOOK_FASTCALL GetPowerup(int pNum);
 
-// CheckSystemKeys
+extern void C2_HOOK_FASTCALL CheckSystemKeys(int pRacing);
 
 extern void C2_HOOK_FASTCALL CheckForCheatingGits(void);
 
