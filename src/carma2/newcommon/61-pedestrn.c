@@ -267,15 +267,25 @@ tPedForms_vtable* gPed_vtable = NULL;
 // GLOBAL: CARMA2_CHEAT 0x0067eae4
 int gPed_retain_root_mode = 0;
 
+// GLOBAL: CARMA2_HW 0x00676980
+// GLOBAL: CARMA2_SW 0x006710f0
+// GLOBAL: CARMA2_CHEAT 0x0067e230
+tPed_move* gPed_moves[250] = { 0 };
+
 // GLOBAL: CARMA2_HW 0x00676d68
 // GLOBAL: CARMA2_SW 0x006714d8
 // GLOBAL: CARMA2_CHEAT 0x0067e618
-br_material* gPedestrian_character_cloned_materials[50];
+br_material* gPedestrian_character_cloned_materials[50] = { 0 };
 
 // GLOBAL: CARMA2_HW 0x0067772c
 // GLOBAL: CARMA2_SW 0x00671e9c
 // GLOBAL: CARMA2_CHEAT 0x0067efdc
 int gCount_pedestrian_personality_cloned_materials;
+
+// GLOBAL: CARMA2_HW 0x00677730
+// GLOBAL: CARMA2_SW 0x00671ea0
+// GLOBAL: CARMA2_CHEAT 0x0067efe0
+tPed_morph gPed_morphs[20];
 
 // GLOBAL: CARMA2_HW 0x00677238
 // GLOBAL: CARMA2_SW 0x006719a8
@@ -2481,7 +2491,13 @@ void C2_HOOK_FASTCALL SetGoreLevel(int pNewLevel) {
     gGoreLevel = 2 - pNewLevel;
 }
 
-// ClearOutMorphs
+inline void C2_HOOK_FASTCALL ClearOutMorphs(void) {
+    int i;
+
+    for (i = 0; i < (int)REC2_ASIZE(gPed_morphs); i++) {
+        gPed_morphs[i].field_0x4 = 0.f;
+    }
+}
 
 // InitBoner
 
@@ -2513,9 +2529,32 @@ void C2_HOOK_FASTCALL ScaleModel(br_model* pModel, float pScale) {
     ScaleModelXYZ(pModel, pScale, pScale, pScale);
 }
 
-// DisposeMove
+inline void C2_HOOK_FASTCALL DisposeMove(tPed_move* pMove) {
+    int i;
 
-// DisposeAllLoadedMoves
+    for (i = 0; i < pMove->count_frames; i++) {
+        if (pMove->frames[i].axis != NULL) {
+            BrMemFree(pMove->frames[i].axis);
+        }
+    }
+    if (pMove->frames != NULL) {
+        BrMemFree(pMove->frames);
+    }
+    if (pMove != NULL) {
+        BrMemFree(pMove);
+    }
+}
+
+inline void C2_HOOK_FASTCALL DisposeAllLoadedMoves(void) {
+    int i;
+
+    for (i = 0; i < (int)REC2_ASIZE(gPed_moves); i++) {
+        if (gPed_moves[i] != NULL) {
+            DisposeMove(gPed_moves[i]);
+            gPed_moves[i] = NULL;
+        }
+    }
+}
 
 // ReadRemap
 
@@ -2660,7 +2699,16 @@ void C2_HOOK_FASTCALL DisposeCharacterForm(tPed_form* pForm) {
 #pragma inline_depth()
 #endif
 
-// DisposeAllLoadedForms
+inline void C2_HOOK_FASTCALL DisposeAllLoadedForms(void) {
+    int i;
+
+    for (i = 0; i < (int)REC2_ASIZE(gPed_forms); i++) {
+        if (gPed_forms[i] != NULL) {
+            DisposeCharacterForm(gPed_forms[i]);
+            gPed_forms[i] = NULL;
+        }
+    }
+}
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
@@ -2719,9 +2767,31 @@ tPed_personality* C2_HOOK_FASTCALL ReadPersonality(const char* pName) {
 #pragma auto_inline(on)
 #endif
 
-// DisposePersonality
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
 
-// DisposeAllLoadedPersonalities
+// STUB: CARMA2_HW 0x004077f0
+// STUB: CARMA2_SW 0x004077f0
+// STUB: CARMA2_CHEAT 0x004077f0
+void C2_HOOK_FASTCALL DisposePersonality(tPed_personality* pPersonality) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
+
+inline void C2_HOOK_FASTCALL DisposeAllLoadedPersonalities(void) {
+    int i;
+
+    for (i = 0; i < (int)REC2_ASIZE(gPed_personalities); i++) {
+        if (gPed_personalities[i] != NULL) {
+            DisposePersonality(gPed_personalities[i]);
+            gPed_personalities[i] = NULL;
+        }
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x00407930
 // FUNCTION: CARMA2_SW 0x00407920
@@ -3063,17 +3133,32 @@ void C2_HOOK_FASTCALL SetCharacterDirection(tPed_character_instance* pPed, const
 
 // SetCharacterPosition
 
-// DisposeClonedMaterials
+inline void C2_HOOK_FASTCALL DisposeClonedMaterials(void) {
+    int i;
+
+    for (i = 0; i < gCount_pedestrian_personality_cloned_materials; i++) {
+        BrMaterialRemove(gPedestrian_character_cloned_materials[i]);
+        BrMaterialFree(gPedestrian_character_cloned_materials[i]);
+    }
+    gCount_pedestrian_personality_cloned_materials = 0;
+}
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x0040b2e0
-// STUB: CARMA2_SW 0x0040b2d0
-// STUB: CARMA2_CHEAT 0x0040b350
+// FUNCTION: CARMA2_HW 0x0040b2e0
+// FUNCTION: CARMA2_SW 0x0040b2d0
+// FUNCTION: CARMA2_CHEAT 0x0040b350
 void C2_HOOK_FASTCALL DisposeAllBonerData(void) {
-    NOT_IMPLEMENTED();
+
+    DisposeAllLoadedRemaps();
+    DisposeAllLoadedPersonalities();
+    DisposeAllLoadedMoves();
+    DisposeAllLoadedForms();
+    ClearOutMorphs();
+    DisposeClonedMaterials();
+    gPed_overall_movement_disabled = 0;
 }
 
 // FUNCTION: CARMA2_HW 0x0040b420

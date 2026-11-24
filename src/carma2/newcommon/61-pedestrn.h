@@ -32,7 +32,9 @@ extern tPedForms_vtable* gPed_vtable;
 
 extern int gPed_retain_root_mode;
 
+extern tPed_move* gPed_moves[250];
 extern br_material* gPedestrian_character_cloned_materials[50];
+extern tPed_morph gPed_morphs[20];
 extern int gCount_pedestrian_personality_cloned_materials;
 
 extern tPed_remap* gPed_remaps[10];
@@ -442,7 +444,7 @@ extern void C2_HOOK_FASTCALL SetExplosivesOn(int pExplosives_on);
 
 extern void C2_HOOK_FASTCALL SetGoreLevel(int pNewLevel);
 
-// ClearOutMorphs
+extern void C2_HOOK_FASTCALL ClearOutMorphs(void);
 
 // InitBoner
 
@@ -454,9 +456,9 @@ extern void C2_HOOK_FASTCALL ScaleModelXYZ(br_model* pModel, br_scalar pScale_x,
 
 extern void C2_HOOK_FASTCALL ScaleModel(br_model* pModel, float pScale);
 
-// DisposeMove
+extern void C2_HOOK_FASTCALL DisposeMove(tPed_move* pMove);
 
-// DisposeAllLoadedMoves
+extern void C2_HOOK_FASTCALL DisposeAllLoadedMoves(void);
 
 // ReadRemap
 
@@ -482,7 +484,7 @@ extern tPed_form* C2_HOOK_FASTCALL SetUpCharacterForm(const char* pName);
 
 extern void C2_HOOK_FASTCALL DisposeCharacterForm(tPed_form* pForm);
 
-// DisposeAllLoadedForms
+extern void C2_HOOK_FASTCALL DisposeAllLoadedForms(void);
 
 extern void C2_HOOK_FASTCALL DisposeCharacterInstance(tPed_character_instance* pCharacter);
 
@@ -498,9 +500,9 @@ extern tPed_form* C2_HOOK_FASTCALL FindOrOpenForm(const char* pName);
 
 extern tPed_personality* C2_HOOK_FASTCALL ReadPersonality(const char* pName);
 
-// DisposePersonality
+extern void C2_HOOK_FASTCALL DisposePersonality(tPed_personality* pPersonality);
 
-// DisposeAllLoadedPersonalities
+extern void C2_HOOK_FASTCALL DisposeAllLoadedPersonalities(void);
 
 extern tPed_personality* C2_HOOK_FASTCALL FindOrOpenPersonality(const char* pName);
 
@@ -576,7 +578,7 @@ extern void C2_HOOK_FASTCALL SetCharacterDirection(tPed_character_instance* pPed
 
 // SetCharacterPosition
 
-// DisposeClonedMaterials
+extern void C2_HOOK_FASTCALL DisposeClonedMaterials(void);
 
 extern void C2_HOOK_FASTCALL DisposeAllBonerData(void);
 
