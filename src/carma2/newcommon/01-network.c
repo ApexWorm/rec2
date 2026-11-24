@@ -8,7 +8,6 @@
 
 #include "01-network.h"
 
-#include "04-netgame.h"
 #include "15-displays.h"
 #include "18-graphics2.h"
 #include "18b-graphics2.h"
@@ -21,6 +20,7 @@
 #include "platform.h"
 #include "globvars.h"
 #include "globvrpb.h"
+#include "04-netgame.h"
 
 #include "rec2_macros.h"
 
@@ -128,6 +128,11 @@ int gDont_allow_joiners;
 // GLOBAL: CARMA2_SW 0x00741150
 // GLOBAL: CARMA2_CHEAT 0x00751d30
 tU32 gUINT_0074a690;
+
+// GLOBAL: CARMA2_HW 0x0074a694
+// GLOBAL: CARMA2_SW 0x00741154
+// GLOBAL: CARMA2_CHEAT 0x00751d34
+int gINT_0074a694;
 
 // GLOBAL: CARMA2_HW 0x0074a718
 // GLOBAL: CARMA2_SW 0x007411d8
