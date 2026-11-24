@@ -29,7 +29,7 @@ int C2_HOOK_FASTCALL PDNetGetHeaderSize(void);
 
 int C2_HOOK_FASTCALL PDNetJoinGame(tNet_game_details* pGame_details, const char* pName);
 
-void C2_HOOK_FASTCALL PDNetHostFinishGame(void);
+void C2_HOOK_FASTCALL PDNetHostFinishGame(tNet_game_details* pDetails);
 
 void C2_HOOK_FASTCALL PDNetLeaveGame(void);
 
