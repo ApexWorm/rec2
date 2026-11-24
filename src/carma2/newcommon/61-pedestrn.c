@@ -511,6 +511,10 @@ void C2_HOOK_FASTCALL ScaleModelXYZ(br_model* pModel, br_scalar pScale_x, br_sca
     BrModelUpdate(pModel, BR_MODU_VERTEX_POSITIONS);
 }
 
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
 // FUNCTION: CARMA2_HW 0x004042f0
 // FUNCTION: CARMA2_SW 0x004042f0
 // FUNCTION: CARMA2_CHEAT 0x004042f0
@@ -518,6 +522,10 @@ void C2_HOOK_FASTCALL ScaleModel(br_model* pModel, float pScale) {
 
     ScaleModelXYZ(pModel, pScale, pScale, pScale);
 }
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // DisposeMove
 
