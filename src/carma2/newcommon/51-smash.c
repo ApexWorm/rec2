@@ -59,10 +59,15 @@ br_vector3 gVector3_006b78a0[4] = { { { 0.f } } };
 // GLOBAL: CARMA2_SW 0x006ae5b0
 int gINT_006b78d0 = 0;
 
+// GLOBAL: CARMA2_HW 0x006b78e0
+// GLOBAL: CARMA2_SW 0x006ae5c0
+// GLOBAL: CARMA2_CHEAT 0x006bef80
+tSmash_vertex gSmash_glass_fragments[200] = { { 0 } };
+
 // GLOBAL: CARMA2_HW 0x006ba4a0
 // GLOBAL: CARMA2_SW 0x006b1180
 // GLOBAL: CARMA2_CHEAT 0x006c1b40
-tSmashable_item_spec* gSmashable_track_indexable_triggers[100];
+tSmashable_item_spec* gSmashable_track_indexable_triggers[100] = { 0 };
 
 // GLOBAL: CARMA2_HW 0x006a3338
 // GLOBAL: CARMA2_SW 0x0069d398
