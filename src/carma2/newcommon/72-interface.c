@@ -2845,7 +2845,7 @@ void C2_HOOK_FASTCALL ScrollCredits(void) {
     int y;
     int i;
 
-    y = (int)(430.0 - (float)(PDGetTotalTime() - gCredits_scroll_start) * 0.03);
+    y = (int)(430.0 - (float)(int)(PDGetTotalTime() - gCredits_scroll_start) * 0.03);
     for (i = 0; i < gCredits_line_count; i++) {
         y += gCredits_heights[i];
         if (y < 430 && y > 30) {
@@ -2863,7 +2863,7 @@ void C2_HOOK_FASTCALL ScrollCredits(void) {
             }
         }
     }
-    if ((float)(PDGetTotalTime() - gCredits_scroll_start) * 0.03 > (float)gCredits_total_height) {
+    if ((float)(int)(PDGetTotalTime() - gCredits_scroll_start) * 0.03 > (float)gCredits_total_height) {
         gCredits_scroll_start = PDGetTotalTime();
     }
 }
