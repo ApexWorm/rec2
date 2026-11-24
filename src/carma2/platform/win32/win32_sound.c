@@ -563,27 +563,27 @@ tS3_error_codes C2_HOOK_FASTCALL PDS3PlayCDAChannel(tS3_channel* pChannel) {
     char* endptr;
 
     PDS3CheckCDAMedia();
-    if (!gPDS3_cda_media_present) {
-        return eS3_error_start_cda;
+    if (gPDS3_cda_media_present) {
+        gPDS3_cda_paused = 0;
+        gPDS3_cda_track = strtoul(pChannel->descriptor->path, &endptr, 10);
+        gPDS3_cda_status_parms.dwItem = MCI_STATUS_MODE;
+        mciSendCommandA(gPDS3_mci_open_parms.wDeviceID, MCI_STATUS, MCI_WAIT | MCI_STATUS_ITEM, (DWORD_PTR)&gPDS3_cda_status_parms);
+        if (gPDS3_cda_status_parms.dwReturn != MCI_MODE_NOT_READY
+                && gPDS3_cda_status_parms.dwReturn != MCI_MODE_OPEN) {
+            gPDS3_cda_play_parms.dwFrom = (BYTE)gPDS3_cda_track;
+            if (gPDS3_cda_track + 1 < gPDS3_Number_of_tracks) {
+                gPDS3_cda_play_parms.dwTo = (BYTE)(gPDS3_cda_track + 1);
+                mciSendCommandA(gPDS3_mci_open_parms.wDeviceID, MCI_PLAY, MCI_FROM | MCI_TO, (DWORD_PTR)&gPDS3_cda_play_parms);
+            } else {
+                mciSendCommandA(gPDS3_mci_open_parms.wDeviceID, MCI_PLAY, MCI_FROM, (DWORD_PTR)&gPDS3_cda_play_parms);
+            }
+            gPDS3_cda_is_playing = 1;
+            return eS3_error_none;
+        }
     }
-    gPDS3_cda_paused = 0;
-    gPDS3_cda_track = strtoul(pChannel->descriptor->path, &endptr, 10);
-    gPDS3_cda_status_parms.dwItem = MCI_STATUS_MODE;
-    mciSendCommandA(gPDS3_mci_open_parms.wDeviceID, MCI_STATUS, MCI_WAIT | MCI_STATUS_ITEM, (DWORD_PTR)&gPDS3_cda_status_parms);
-    if (gPDS3_cda_status_parms.dwReturn == MCI_MODE_NOT_READY
-            || gPDS3_cda_status_parms.dwReturn == MCI_MODE_OPEN) {
-        return eS3_error_start_cda;
-    }
-    gPDS3_cda_play_parms.dwFrom = gPDS3_cda_track % 256;
-    if (gPDS3_cda_track + 1 < gPDS3_Number_of_tracks) {
-        gPDS3_cda_play_parms.dwTo = (gPDS3_cda_track + 1) % 256;
-        mciSendCommandA(gPDS3_mci_open_parms.wDeviceID, MCI_PLAY, MCI_FROM | MCI_TO, (DWORD_PTR)&gPDS3_cda_play_parms);
-    } else {
-        mciSendCommandA(gPDS3_mci_open_parms.wDeviceID, MCI_PLAY, MCI_FROM, (DWORD_PTR)&gPDS3_cda_play_parms);
-    }
-    gPDS3_cda_is_playing = 1;
-    return eS3_error_none;
+    return eS3_error_start_cda;
 }
+
 
 // FUNCTION: CARMA2_HW 0x0056a28d
 // FUNCTION: CARMA2_SW 0x0056592d
