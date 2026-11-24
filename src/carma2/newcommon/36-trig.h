@@ -58,6 +58,6 @@ extern void C2_HOOK_FASTCALL DRMatrix34PostRotateZ(br_matrix34* mat, br_angle rz
 
 extern void C2_HOOK_FASTCALL DRMatrix23Rotate(br_matrix23* mat, br_angle rz);
 
-// DRMatrix23PostRotate
+extern void C2_HOOK_FASTCALL DRMatrix23PostRotate(br_matrix23* mat, br_angle rz);
 
 #endif // GUARD_36_TRIG_H

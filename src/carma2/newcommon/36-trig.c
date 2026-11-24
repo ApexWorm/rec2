@@ -108,6 +108,16 @@ float gFloat_sine_table[91] = {
     1.0f,
 };
 
+// GLOBAL: CARMA2_HW 0x006ab950
+// GLOBAL: CARMA2_SW 0x006a53a0
+// GLOBAL: CARMA2_CHEAT 0x006b2fe0
+br_matrix23 mat23tmp1__trig;
+
+// GLOBAL: CARMA2_HW 0x006ab968
+// GLOBAL: CARMA2_SW 0x006a53b8
+// GLOBAL: CARMA2_CHEAT 0x006b2ff8
+br_matrix23 mat23tmp2__trig;
+
 // GLOBAL: CARMA2_HW 0x006ab980
 // GLOBAL: CARMA2_SW 0x006a53d0
 // GLOBAL: CARMA2_CHEAT 0x006b3010
@@ -461,5 +471,13 @@ void C2_HOOK_FASTCALL DRMatrix23Rotate(br_matrix23* mat, br_angle rz) {
     mat->m[2][1] = 0.0f;
 }
 
-// DRMatrix23PostRotate
+// FUNCTION: CARMA2_HW 0x005132a0
+// FUNCTION: CARMA2_SW 0x0050e6e0
+// FUNCTION: CARMA2_CHEAT 0x00518c90
+void C2_HOOK_FASTCALL DRMatrix23PostRotate(br_matrix23* mat, br_angle rz) {
+
+    DRMatrix23Rotate(&mat23tmp2__trig, rz);
+    BrMatrix23Mul(&mat23tmp1__trig, mat, &mat23tmp2__trig);
+    BrMatrix23Copy(mat, &mat23tmp1__trig);
+}
 
