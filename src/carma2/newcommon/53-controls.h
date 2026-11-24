@@ -121,7 +121,7 @@ extern void C2_HOOK_FASTCALL TDamageRRWheel(void);
 
 extern void C2_HOOK_FASTCALL ToggleMiniMap(void);
 
-// CheckToggles
+extern void C2_HOOK_FASTCALL CheckToggles(int pRacing);
 
 extern int C2_HOOK_FASTCALL CarWorldOffFallenCheckThingy(tCar_spec* pCar, int pCheck_around);
 
@@ -149,7 +149,7 @@ extern void C2_HOOK_FASTCALL SetRecovery(void);
 
 extern int C2_HOOK_FASTCALL TradeInAPO(int pCost);
 
-// CheckOtherRacingKeys
+extern void C2_HOOK_FASTCALL CheckOtherRacingKeys(void);
 
 extern int C2_HOOK_FASTCALL CheckRecoverCost(void);
 

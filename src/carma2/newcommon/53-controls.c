@@ -11,6 +11,7 @@
 #include "00-car.h"
 #include "01-network.h"
 #include "04-netgame.h"
+#include "06-apo.h"
 #include "07-structur.h"
 #include "11-world1.h"
 #include "13-crush1.h"
@@ -166,6 +167,73 @@ tRace_over_reason gRace_over_reason;
 // GLOBAL: CARMA2_SW 0x00676bf0
 // GLOBAL: CARMA2_CHEAT 0x00683d20
 tU32 gPalette_fade_time;
+
+// GLOBAL: CARMA2_HW 0x005900a0
+// GLOBAL: CARMA2_SW 0x0058b098
+tToggle_element gToggle_array[44] = {
+    { 35, -2, 1, 1, 0, ToggleMiniMap },
+    { 74, -2, 1, 1, 0, ToggleFlaps },
+    { 57, -2, 1, 1, 0, ToggleMap },
+    { 57, 8, 1, 1, 0, (void (C2_HOOK_FASTCALL*)(void))ToggleHeadupMap },
+    { 57, 7, 1, 1, 0, CycleMapOptions },
+    { 57, 9, 1, 1, 0, ToggleMapTransparency },
+    { 60, -2, 1, 1, 0, SetRecovery },
+    { 4, 7, 1, 0, 0, (void (C2_HOOK_FASTCALL*)(void))AbortRace },
+    { 37, -2, 0, 1, 0, ToggleSoundEnable },
+    { 5, 8, 0, 1, 0, PrintScreen },
+    { 76, -2, 1, 0, 0, ToggleHeadupLevel },
+    { 18, -2, 0, 0, 0, F4Key },
+    { 19, -2, 1, 0, 0, F5Key },
+    { 20, -2, 1, 0, 0, F6Key },
+    { 21, -2, 1, 0, 0, F7Key },
+    { 22, -2, 1, 0, 0, F8Key },
+    { 23, -2, 1, 0, 0, F10Key },
+    { 24, -2, 1, 0, 0, F11Key },
+    { 25, -2, 1, 0, 0, F12Key },
+    { 15, -2, 1, 0, 0, NumberKey0 },
+    { 38, -2, 1, 0, 0, NumberKey1 },
+    { 39, -2, 1, 0, 0, NumberKey2 },
+    { 40, -2, 1, 0, 0, NumberKey3 },
+    { 41, -2, 1, 0, 0, NumberKey4 },
+    { 42, -2, 1, 0, 0, NumberKey5 },
+    { 43, -2, 1, 0, 0, NumberKey6 },
+    { 44, -2, 1, 0, 0, NumberKey7 },
+    { 16, -2, 1, 0, 0, NumberKey8 },
+    { 17, -2, 1, 0, 0, NumberKey9 },
+    { 11, 7, 1, 1, 0, ToggleFlying },
+    { 65, -2, 1, 0, 0, ScreenSmaller },
+    { 66, -2, 1, 0, 0, ScreenLarger },
+    { 67, -2, 1, 0, 0, BuyArmour },
+    { 68, -2, 1, 0, 0, BuyPower },
+    { 69, -2, 1, 0, 0, BuyOffense },
+    { 70, -2, 1, 0, 0, ViewNetPlayer },
+    { 71, -2, 1, 0, 0, UserSendMessage },
+    { 72, -2, 1, 0, 0, ToggleTargetLock },
+    { 73, -2, 1, 0, 0, CycleTargetLock },
+    { 62, -2, 1, 0, 0, ToggleInventory },
+    { 63, -2, 1, 0, 0, LeftInventory },
+    { 64, -2, 1, 0, 0, RightInventory },
+    { 75, -2, 1, 0, 0, ChangeCameraTypeInGame },
+    { 46, -2, 1, 0, 0, ToggleCockpit },
+};
+
+// GLOBAL: CARMA2_HW 0x005904c0
+// GLOBAL: CARMA2_SW 0x0058b4b8
+// GLOBAL: CARMA2_CHEAT 0x00595768
+char* gEdit_mode_names[12] = {
+    "Options",
+    "Cheat",
+    "Accessories",
+    "Powerups",
+    "Special Volumes",
+    "Pedestrians",
+    "Drones",
+    "Opponents",
+    "Prat-cam",
+    "Depth effects",
+    "Damage",
+    "Crush Test",
+};
 
 // GLOBAL: CARMA2_HW 0x005904f0
 // GLOBAL: CARMA2_SW 0x0058b4e8
@@ -601,7 +669,28 @@ void C2_HOOK_FASTCALL ToggleMiniMap(void) {
     }
 }
 
-// CheckToggles
+inline void C2_HOOK_FASTCALL CheckToggles(int pRacing) {
+    int i;
+    int new_state;
+
+    CheckKeysForMouldiness();
+    for (i = 0; i < REC2_ASIZE(gToggle_array); i++) {
+        if (gToggle_array[i].in_game_only && !pRacing) {
+            continue;
+        }
+        if ((gTyping || gEntering_message) && gToggle_array[i].key2 == -2) {
+            continue;
+        }
+        new_state = (gToggle_array[i].key1 == -2 || KeyIsDownNoMouldiness(gToggle_array[i].key1))
+            && ((gToggle_array[i].key2 == -2 && gToggle_array[i].exact_modifiers) ? (!PDKeyDown(0) && !PDKeyDown(1) && !PDKeyDown(2) && !PDKeyDown(3)) : KeyIsDown(gToggle_array[i].key2));
+        if (gToggle_array[i].on_last_time != new_state) {
+            gToggle_array[i].on_last_time = new_state;
+            if (new_state) {
+                gToggle_array[i].action_proc();
+            }
+        }
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x00442140
 // FUNCTION: CARMA2_SW 0x00442220
@@ -771,7 +860,20 @@ inline int C2_HOOK_FASTCALL TradeInAPO(int pCost) {
     return pCost;
 }
 
-// CheckOtherRacingKeys
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_HW 0x00442f90
+// STUB: CARMA2_SW 0x00443070
+// STUB: CARMA2_CHEAT 0x004430b0
+void C2_HOOK_FASTCALL CheckOtherRacingKeys(void) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // FUNCTION: CARMA2_HW 0x00442750
 // FUNCTION: CARMA2_SW 0x00442830
@@ -862,11 +964,19 @@ void C2_HOOK_FASTCALL GetPowerup(int pNum) {
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x00442e90
-// STUB: CARMA2_SW 0x00442f70
-// STUB: CARMA2_CHEAT 0x00442fb0
+// FUNCTION: CARMA2_HW 0x00442e90
+// FUNCTION: CARMA2_SW 0x00442f70
+// FUNCTION: CARMA2_CHEAT 0x00442fb0
 void C2_HOOK_FASTCALL CheckSystemKeys(int pRacing) {
-    NOT_IMPLEMENTED();
+    tU32 start_menu_time;
+
+    start_menu_time = PDGetTotalTime();
+    CheckQuit();
+    AddLostTime(PDGetTotalTime() - start_menu_time);
+    CheckToggles(pRacing);
+    if (pRacing && !gAction_replay_mode) {
+        CheckOtherRacingKeys();
+    }
 }
 
 #ifdef REC2_MATCHING

@@ -777,9 +777,19 @@ void C2_HOOK_FASTCALL ToggleInventory(void) {
     }
 }
 
-// RightInventory
+// STUB: CARMA2_HW 0x004daa00
+// STUB: CARMA2_SW 0x004d6ed0
+// STUB: CARMA2_CHEAT 0x004e05c0
+void C2_HOOK_FASTCALL RightInventory(void) {
+    NOT_IMPLEMENTED();
+}
 
-// LeftInventory
+// STUB: CARMA2_HW 0x004dab80
+// STUB: CARMA2_SW 0x004d7050
+// STUB: CARMA2_CHEAT 0x004e0740
+void C2_HOOK_FASTCALL LeftInventory(void) {
+    NOT_IMPLEMENTED();
+}
 
 // FUNCTION: CARMA2_HW 0x004dad00
 // FUNCTION: CARMA2_SW 0x004d71d0
