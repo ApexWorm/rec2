@@ -1,4 +1,5 @@
 address,type,name
+0x0051de9a,library,_closesocket@4
 0x00575b80,library,__ftol
 0x00575bb0,library,__chkstk
 0x00575bf0,library,_strchr
@@ -208,7 +209,7 @@ address,type,name
 0x00587a10,library,__strnicmp
 0x00587ac0,library,__strupr
 0x00587d00,library,__fstat
-0x00589250,library,_closesocket
+0x00589250,global,_closesocket
 0x0058d878,global,__DEFAULT_CW_in_mem
 0x0058dc10,global,___dnames
 0x0058dc28,global,___mnames

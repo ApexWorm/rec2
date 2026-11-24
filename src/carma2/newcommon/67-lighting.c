@@ -164,8 +164,10 @@ void C2_HOOK_FASTCALL SmoothlySetWorldMaterialFlags(tBrender_storage* pStorage) 
 }
 
 // FUNCTION: CARMA2_HW 0x004f6900
+// FUNCTION: CARMA2_SW 0x004f2470
 // FUNCTION: CARMA2_CHEAT 0x004fc5a0
 void C2_HOOK_FASTCALL SmoothificatePowerups(br_actor* pActor) {
+#ifdef REC2_HW
     br_model* model;
     int i;
 
@@ -184,11 +186,14 @@ void C2_HOOK_FASTCALL SmoothificatePowerups(br_actor* pActor) {
             SmoothificatePowerupMaterial(model->faces[i].material);
         }
     }
+#endif
 }
 
 // FUNCTION: CARMA2_HW 0x004f6a20
+// FUNCTION: CARMA2_SW 0x004f2480
 // FUNCTION: CARMA2_CHEAT 0x004fc6c0
 void C2_HOOK_FASTCALL SmoothificatePowerupMaterial(br_material* pMaterial) {
+#ifdef REC2_HW
     int need_update;
 
     need_update = 0;
@@ -213,9 +218,11 @@ void C2_HOOK_FASTCALL SmoothificatePowerupMaterial(br_material* pMaterial) {
     if (need_update) {
         BrMaterialUpdate(pMaterial, BR_MATU_LIGHTING | BR_MATU_RENDERING);
     }
+#endif
 }
 
 // FUNCTION: CARMA2_HW 0x004f6a90
+// FUNCTION: CARMA2_SW 0x004f2490
 // FUNCTION: CARMA2_CHEAT 0x004fc730
 void C2_HOOK_FASTCALL SmoothificateWorldMaterial(br_material* pMaterial) {
 #ifdef REC2_HW
@@ -234,15 +241,13 @@ void C2_HOOK_FASTCALL SmoothificateWorldMaterial(br_material* pMaterial) {
         BrMaterialUpdate(pMaterial, BR_MATU_LIGHTING | BR_MATU_RENDERING);
     }
 #endif
-#ifdef REC2_SW
-    NOT_IMPLEMENTED();
-#endif
 }
 
 // FUNCTION: CARMA2_HW 0x004f6b50
+// FUNCTION: CARMA2_SW 0x004f24a0
 // FUNCTION: CARMA2_CHEAT 0x004fc7f0
 void C2_HOOK_FASTCALL SmoothificateCarMaterial(br_material* pMaterial) {
-
+#ifdef REC2_HW
   if (gNbPixelBits == 16) {
       pMaterial->ka = 0.6f;
       pMaterial->flags &= ~BR_MATF_PRELIT;
@@ -250,6 +255,7 @@ void C2_HOOK_FASTCALL SmoothificateCarMaterial(br_material* pMaterial) {
       pMaterial->kd = 0.2f;
       BrMaterialUpdate(pMaterial,BR_MATU_ALL);
   }
+#endif
 }
 
 // FUNCTION: CARMA2_HW 0x00486d60

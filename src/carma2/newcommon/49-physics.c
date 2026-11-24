@@ -86,6 +86,7 @@ int gPHIL_mechanics_time_sync;
 
 // GLOBAL: CARMA2_HW 0x0074a5e8
 // GLOBAL: CARMA2_SW 0x007410a8
+// GLOBAL: CARMA2_CHEAT 0x00751c88
 int gPHIL_munging_objects;
 
 // GLOBAL: CARMA2_HW 0x006940c8
@@ -622,13 +623,29 @@ void C2_HOOK_FASTCALL PositionWorldJointedObject(tPhysics_object* pObject, br_sc
 
 // CountJointForces
 
-// MoveJointedObject
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
 
-// STUB: CARMA2_HW 0x004b9750
-// STUB: CARMA2_SW 0x004b5e70
-// STUB: CARMA2_CHEAT 0x004bf280
-void C2_HOOK_FASTCALL TellPhysicsJointsHaveChanged(tPhysics_object* pCollision_info) {
+// STUB: CARMA2_HW 0x004b7510
+// STUB: CARMA2_SW 0x004b3c30
+// STUB: CARMA2_CHEAT 0x004bd040
+void C2_HOOK_FASTCALL MoveJointedObject(tPhysics_object* pObject, float pDelta_time) {
     NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
+
+// FUNCTION: CARMA2_HW 0x004b9750
+// FUNCTION: CARMA2_SW 0x004b5e70
+// FUNCTION: CARMA2_CHEAT 0x004bf280
+void C2_HOOK_FASTCALL TellPhysicsJointsHaveChanged(tPhysics_object* pCollision_info) {
+
+    pCollision_info->field_0x218 = 0;
+    MoveJointedObject(pCollision_info, 0.0f);
+    gINT_00692dc8 = 1;
 }
 
 // CombineBounds
@@ -1784,7 +1801,7 @@ void C2_HOOK_FASTCALL InitPhysics(void) {
 #pragma inline_depth()
 #endif
 
-// PointOutOfSightNotAR
+// PointOutOfSightNotAR (moved to 51-smash for inlining purposes)
 
 // CalcCollObjIDFromCarSpec
 

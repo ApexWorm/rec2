@@ -36,7 +36,7 @@ extern int C2_HOOK_FASTCALL TimeToSendData(void);
 
 // SendCarData
 
-// ReceivedRecover
+extern void C2_HOOK_FASTCALL ReceivedRecover(tNet_message_chunk_recover* pContents);
 
 // CopyMechanics
 
