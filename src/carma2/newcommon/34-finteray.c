@@ -309,7 +309,7 @@ void C2_HOOK_FASTCALL CheckSingleFace(tFace_ref* pFace, br_vector3* ray_pos, br_
 // FUNCTION: CARMA2_HW 0x0045f5b0
 // FUNCTION: CARMA2_SW 0x0045f020
 // FUNCTION: CARMA2_CHEAT 0x0045fa20
-void C2_HOOK_FASTCALL GetNewBoundingBox(br_bounds* b2, br_bounds* b1, br_matrix34* m) {
+void C2_HOOK_FASTCALL GetNewBoundingBox(br_bounds* b2, const br_bounds* b1, const br_matrix34* m) {
     br_vector3 a;
     br_vector3 c[3];
     int j;
@@ -323,7 +323,7 @@ void C2_HOOK_FASTCALL GetNewBoundingBox(br_bounds* b2, br_bounds* b1, br_matrix3
     }
     for (j = 0; j < 3; j++) {
         for (i = 0; i < 3; i++) {
-            if (c[i].v[j] < 0.f) {
+            if (c[i].v[j] < 0.0f) {
                 b2->min.v[j] += c[i].v[j];
             } else {
                 b2->max.v[j] += c[i].v[j];
