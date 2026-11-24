@@ -105,6 +105,7 @@ int gInterface_polyfont_texture_pages;
 tNet_game_options gFrontend_backup_net_options;
 
 // GLOBAL: CARMA2_HW 0x00686340
+// GLOBAL: CARMA2_SW 0x00680a80
 br_material* gPoly_font_materials[80];
 
 // GLOBAL: CARMA2_HW 0x0074cf10
@@ -919,10 +920,12 @@ br_material* C2_HOOK_FASTCALL GetPolyFontMaterial(int pFont_index, char pChar) {
     float f_size;
     tU32 packed_font_character;
 
-    // GLOBAL: CARMA2 0x00686480
+    // GLOBAL: CARMA2_HW 0x00686480
+    // GLOBAL: CARMA2_SW 0x00680bc0
     static int poly_font_material_index;
 
-    // GLOBAL: CARMA2 0x00686498
+    // GLOBAL: CARMA2_HW 0x00686498
+    // GLOBAL: CARMA2_SW 0x00680bd8
     static tU16 poly_font_material_generation;
 
     C2_HOOK_BUG_ON(sizeof(tPolyFont) != 0x1c68);
@@ -942,7 +945,7 @@ br_material* C2_HOOK_FASTCALL GetPolyFontMaterial(int pFont_index, char pChar) {
         if (poly_font_material_index >= (int)REC2_ASIZE(gPoly_font_materials)) {
             poly_font_material_index = 0;
         }
-    } while ((poly_font_material_generation - POLYFONT_MATERIAL_GET_GENERATION(gPoly_font_materials[poly_font_material_index])) < (int)REC2_ASIZE(gPoly_font_materials));
+    } while ((tU16)(poly_font_material_generation - POLYFONT_MATERIAL_GET_GENERATION(gPoly_font_materials[poly_font_material_index])) < REC2_ASIZE(gPoly_font_materials));
     material = gPoly_font_materials[poly_font_material_index];
     gPoly_fonts[pFont_index].glyphs[uchar].material = material;
     material->colour_map = gTexture_maps[gPoly_fonts[pFont_index].glyphs[uchar].index];
