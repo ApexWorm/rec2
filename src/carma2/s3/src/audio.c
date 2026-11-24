@@ -707,6 +707,8 @@ void* C2_HOOK_FASTCALL S3LoadSoundBankFile(const char* pPath) {
 }
 
 // FUNCTION: CARMA2_HW 0x00567fe0
+// FUNCTION: CARMA2_SW 0x00563680
+// FUNCTION: CARMA2_CHEAT 0x0056dbd0
 int C2_HOOK_FASTCALL S3LoadSoundbank(const char* pPath, int pLow_memory_mode) {
     tS3_soundbank_read_ctx read_context;
     char sb_filename[512];
