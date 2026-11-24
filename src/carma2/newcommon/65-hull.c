@@ -8,6 +8,8 @@
 
 #include "65-hull.h"
 
+#include <string.h>
+
 // GLOBAL: CARMA2_HW 0x0067942c
 // GLOBAL: CARMA2_SW 0x00673b9c
 tCollision_shape_polyhedron_data* gPolyhedron_to_sort;
@@ -17,12 +19,20 @@ tCollision_shape_polyhedron_data* gPolyhedron_to_sort;
 // GLOBAL: CARMA2_CHEAT 0x00680cd0
 br_vector3 gPhysics_reference_normal_comparison;
 
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
 // STUB: CARMA2_HW 0x00420910
 // STUB: CARMA2_SW 0x00420990
 // STUB: CARMA2_CHEAT 0x00420b70
 tPhysicsError C2_HOOK_FASTCALL ConvexHull2D(tCollision_shape_polyhedron_data* pPolyhedron) {
     NOT_IMPLEMENTED();
 }
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // FUNCTION: CARMA2_HW 0x00420d60
 // FUNCTION: CARMA2_CHEAT 0x00420fc0
@@ -90,7 +100,20 @@ int C2_HOOK_FASTCALL Collinear(const br_vector3* pV1, const br_vector3* pV2, con
 
 // DRVector4Negate
 
-// ConstructTetrahedron
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_HW 0x004211f0
+// STUB: CARMA2_SW 0x00421270
+// STUB: CARMA2_CHEAT 0x00421440
+tPhysicsError C2_HOOK_FASTCALL ConstructTetrahedron(tCollision_shape_polyhedron_data* pPolyhedron, tPolyhedron_edge_indexes* pEdge_planes) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // CheckSignOfNormal
 
@@ -100,7 +123,20 @@ int C2_HOOK_FASTCALL Collinear(const br_vector3* pV1, const br_vector3* pV2, con
 
 // AdjustEdgePlanes
 
-// AddPointToPolyhedron
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_HW 0x00421790
+// STUB: CARMA2_SW 0x00421810
+// STUB: CARMA2_CHEAT 0x004219e0
+int C2_HOOK_FASTCALL AddPointToPolyhedron(tCollision_shape_polyhedron_data* pPolyhedron, br_vector3* pPoint, tU8 pPoint_index, tPolyhedron_edge_indexes* pEdge_planes) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 #ifdef REC2_MATCHING
 
@@ -131,15 +167,83 @@ tFUN_00421fd0* C2_HOOK_FASTCALL FUN_00421fd0(int pCount_points) {
 }
 #endif
 
-// AdjustEdges
+static void C2_HOOK_FASTCALL AdjustEdges(tCollision_shape_polyhedron_data* pPolyhedron, tU8 pOld_index, tU8 pNew_index) {
+    int i;
 
-// PointOnShape
+    for (i = 0; i < pPolyhedron->count_edges; i++) {
+        if (pPolyhedron->edges[i].index1 == pOld_index) {
+            pPolyhedron->edges[i].index1 = pNew_index;
+        } else if (pPolyhedron->edges[i].index2 == pOld_index) {
+            pPolyhedron->edges[i].index2 = pNew_index;
+        }
+    }
+}
 
-// STUB: CARMA2_HW 0x00420fb0
-// STUB: CARMA2_SW 0x00421030
-// STUB: CARMA2_CHEAT 0x00421200
+static int C2_HOOK_FASTCALL PointOnShape(tCollision_shape_polyhedron_data* pPolyhedron, tU8 pIndex) {
+    int i;
+
+    for (i = 0; i < pPolyhedron->count_edges; i++) {
+        if (pPolyhedron->edges[i].index1 == pIndex) {
+            return 1;
+        }
+        if (pPolyhedron->edges[i].index2 == pIndex) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+// FUNCTION: CARMA2_HW 0x00420fb0
+// FUNCTION: CARMA2_SW 0x00421030
+// FUNCTION: CARMA2_CHEAT 0x00421200
 tPhysicsError C2_HOOK_FASTCALL ConvexHull3D(tCollision_shape_polyhedron_data* pPolyhedron) {
-    NOT_IMPLEMENTED();
+    tU8 count;
+    tU8 i;
+    int original_count_points;
+    tPolyhedron_edge_indexes edge_planes[894];
+    br_vector3 original_points[300];
+    tPhysicsError error;
+
+    if (pPolyhedron->count_points > 300) {
+        pPolyhedron->count_points = 300;
+    }
+    memcpy(original_points, pPolyhedron->points, pPolyhedron->count_points * sizeof(br_vector3));
+    original_count_points = pPolyhedron->count_points;
+    error = ConstructTetrahedron(pPolyhedron, edge_planes);
+    if (error != ePhysicsError_Ok) {
+        if (error == ePhysicsError_UnknownShapeType) {
+            return ePhysicsError_UnknownShapeType;
+        }
+        pPolyhedron->count_points = original_count_points;
+        memcpy(pPolyhedron->points, original_points, pPolyhedron->count_points * sizeof(br_vector3));
+        error = ConvexHull2D(pPolyhedron);
+        if (error == ePhysicsError_Ok) {
+            return ePhysicsError_WireFrameHasNoPoints;
+        }
+        return error;
+    }
+    count = 4;
+    for (i = 0; i < original_count_points; i++) {
+        if (AddPointToPolyhedron(pPolyhedron, &original_points[i], count, edge_planes)) {
+            if (count != i) {
+                BrVector3Copy(&pPolyhedron->points[count], &original_points[i]);
+            }
+            count++;
+        }
+    }
+    pPolyhedron->count_points = count;
+    count = 0;
+    for (i = 0; i < pPolyhedron->count_points; i++) {
+        if (PointOnShape(pPolyhedron, i)) {
+            if (count != i) {
+                BrVector3Copy(&pPolyhedron->points[count], &pPolyhedron->points[i]);
+                AdjustEdges(pPolyhedron, i, count);
+            }
+            count++;
+        }
+    }
+    pPolyhedron->count_points = count;
+    return ePhysicsError_Ok;
 }
 
 // GetPointSample
