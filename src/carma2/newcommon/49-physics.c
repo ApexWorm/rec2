@@ -1515,11 +1515,11 @@ void C2_HOOK_FASTCALL UpdateCollisionObject(tPhysics_object* pCollision_info) {
     }
     pCollision_info->bb2 = pCollision_info->bb1;
 
-    pCollision_info->radius_squared = 0.f
+    pCollision_info->radius_squared = 0.0f
             + MAX(REC2_SQR(pCollision_info->bb2.min.v[0]), REC2_SQR(pCollision_info->bb2.max.v[0]))
             + MAX(REC2_SQR(pCollision_info->bb2.min.v[1]), REC2_SQR(pCollision_info->bb2.max.v[1]))
             + MAX(REC2_SQR(pCollision_info->bb2.min.v[2]), REC2_SQR(pCollision_info->bb2.max.v[2]));
-    radius = sqrt(pCollision_info->radius_squared);
+    radius = (br_scalar)sqrt(pCollision_info->radius_squared);
     pCollision_info->radius = radius;
 }
 
