@@ -538,17 +538,16 @@ int C2_HOOK_FASTCALL KeyIsDown(int pKey_index) {
     int i;
 
     CheckKeysForMouldiness();
-    switch (pKey_index) {
-    case -2:
+    if (pKey_index == -2) {
         return 1;
-    case -1:
+    } else if (pKey_index == -1) {
         for (i = 0; i < REC2_ASIZE(gGo_ahead_keys); i++) {
             if (gKey_array[gGo_ahead_keys[i]]) {
                 return 1;
             }
         }
         return 0;
-    default:
+    } else {
         return gKey_array[gKey_mapping[pKey_index]];
     }
 }
