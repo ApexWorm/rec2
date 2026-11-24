@@ -116,7 +116,8 @@ tFUN_00421fd0* C2_HOOK_FASTCALL FUN_00421fd0(int pCount_points) {
     count_faces = pCount_points - 2;
     count_indices = count_faces * 3;
 
-    result = BrMemAllocate((count_indices + count_faces * 16 + (pCount_points + 2) * 6) * 2, BR_MEMORY_APPLICATION);
+    /* FIXME: replace "32" with sizeof(some_struct) */
+    result = BrMemAllocate(sizeof(tU16) * count_indices + 32 * count_faces + sizeof(br_vector3) * pCount_points + sizeof(tFUN_00421fd0), BR_MEMORY_APPLICATION);
     if (result == NULL) {
         return NULL;
     }
