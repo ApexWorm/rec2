@@ -1568,16 +1568,16 @@ void C2_HOOK_FASTCALL SetCarSuspGiveAndHeight(tCar_spec* pCar, float pFront_give
     pRear_give_factor = pCar->steerable_suspension_give * pRear_give_factor * WORLD_SCALE;
     damping = pCar->damping * pDamping_factor;
     ratio = fabs((pCar->wpos[0].v[2] - pCar->centre_of_mass_world_scale.v[2]) / (pCar->wpos[2].v[2] - pCar->centre_of_mass_world_scale.v[2]));
-    temp = ratio + 1.0f;
+    temp = ratio + 1.0;
     pCar->sk[0] = (pCar->collision_info->M / temp) * 5.0f / pRear_give_factor;
     pCar->sb[0] = (pCar->collision_info->M / temp) * (br_scalar)sqrt(5.0) / (br_scalar)sqrt(pRear_give_factor);
-    temp = 1.0 / ratio + 1.0f;
+    temp = 1.0 + 1.0 / ratio;
     pCar->sk[1] = (pCar->collision_info->M / temp) * 5.0f / pFront_give_factor;
     pCar->sb[1] = (pCar->collision_info->M / temp) * (br_scalar)sqrt(5.0) / (br_scalar)sqrt(pFront_give_factor);
     pCar->sb[0] *= damping;
     pCar->sb[1] *= damping;
-    pCar->susp_height[0] = pCar->ride_height + pRear_give_factor + pExtra_rear_height;
-    pCar->susp_height[1] = pCar->ride_height + pFront_give_factor + pExtra_front_height;
+    pCar->susp_height[0] = pExtra_rear_height + (pCar->ride_height + pRear_give_factor);
+    pCar->susp_height[1] = pExtra_front_height + (pCar->ride_height + pFront_give_factor);
     pCar->collision_info->bb2.min.v[1] = GetCarOverallBoundsMinY(pCar);
 }
 
