@@ -1006,24 +1006,17 @@ float C2_HOOK_FASTCALL PointEdgeDistSq(const br_vector3* pP, const br_vector3* p
 void C2_HOOK_FASTCALL SetFlapCheckVertices(tCar_crush_flap_data* pFlap_data, const br_model* pModel, tModel_detail_vertex_data* pVertex_data) {
     br_vector3 hinge_normal;
     float dist;
-    const br_vector3* p0;
     tU16 i;
     br_vector3 hinge01;
     float d;
-    const br_vector3* p2;
-    const br_vector3* p1;
     float side;
     br_vector3 hinge02;
 
-    p0 = &pModel->vertices[pFlap_data->hinge0].p;
-    p1 = &pModel->vertices[pFlap_data->hinge1].p;
-    p2 = &pModel->vertices[pFlap_data->hinge2].p;
-
-    BrVector3Sub(&hinge02, p2, p0);
-    BrVector3Sub(&hinge01, p1, p0);
+    BrVector3Sub(&hinge01, &pModel->vertices[pFlap_data->hinge1].p, &pModel->vertices[pFlap_data->hinge0].p);
+    BrVector3Sub(&hinge02, &pModel->vertices[pFlap_data->hinge2].p, &pModel->vertices[pFlap_data->hinge0].p);
     BrVector3Cross(&hinge_normal, &hinge01, &hinge02);
     BrVector3Normalise(&hinge_normal, &hinge_normal);
-    d = BrVector3Dot(&hinge_normal, p0);
+    d = BrVector3Dot(&hinge_normal, &pModel->vertices[pFlap_data->hinge0].p);
     for (i = 0; i < pModel->nvertices; i++) {
         dist = PointEdgeDistSq(&pModel->vertices[i].p, &pModel->vertices[pFlap_data->hinge0].p, &pModel->vertices[pFlap_data->hinge1].p);
         side = BrVector3Dot(&hinge_normal, &pModel->vertices[i].p) - d;
