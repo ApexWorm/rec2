@@ -574,7 +574,7 @@ extern int C2_HOOK_FASTCALL SetCharacterMove(tPed_character_instance* pPed, int 
 
 extern void C2_HOOK_FASTCALL SetCharacterDirection(tPed_character_instance* pPed, const br_vector3* pDir, const br_vector3* pUp);
 
-// SetCharacterPosition
+extern void C2_HOOK_FASTCALL SetCharacterPosition(tPed_character_instance* pCharacter, br_vector3* pPos, int pArg3);
 
 // DisposeClonedMaterials
 
