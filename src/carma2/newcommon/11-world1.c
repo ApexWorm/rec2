@@ -41,10 +41,12 @@ br_actor* gSpec_vol_actors[100];
 int gSpec_vol_mode;
 
 // GLOBAL: CARMA2_HW 0x006b6400
+// GLOBAL: CARMA2_SW 0x006ad0e0
 // GLOBAL: CARMA2_CHEAT 0x006bdaa0
 char gAdditional_model_path[256];
 
 // GLOBAL: CARMA2_HW 0x006b6500
+// GLOBAL: CARMA2_SW 0x006ad1e0
 // GLOBAL: CARMA2_CHEAT 0x006bdba0
 char gAdditional_actor_path[256];
 
@@ -183,7 +185,7 @@ void C2_HOOK_FASTCALL AutoSaveAdditionalStuff(void) {
     size_t len_model_path;
 
     len_actor_path = strlen(gAdditional_actor_path);
-    len_model_path = strlen(gAdditional_model_path);
+    len_model_path = strlen(gAdditional_actor_path);
     strcat(gAdditional_actor_path, " autosave");
     strcat(gAdditional_model_path, " autosave");
     DoSaveAdditionalStuff();
