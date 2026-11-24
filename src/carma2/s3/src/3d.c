@@ -605,41 +605,42 @@ int C2_HOOK_FASTCALL S3UpdateSourcePosition(tS3_sound_source *pSource) {
 int C2_HOOK_FASTCALL S3UpdateSourceVectors(void) {
     tS3_sound_source* source;
 
-    for (source = gS3_state.sources; source != NULL; source = source->next) {
-        if (!source->ambient) {
-            continue;
-        }
-        if (source->period > 0) {
-            source->time_since_last_played += gS3_delta_time;
-        }
-        if (source->channel != NULL && source->tag != source->channel->tag) {
-            S3StopChannel(source->channel);
-            source->channel = NULL;
-            source->tag = 0;
-        }
-        if (source->channel == NULL) {
-            if (source->period < source->time_since_last_played && source->period != 0 && source->tag == 0) {
-                if (source->volume > 0) {
-                    if (S3UpdateSourcePosition(source) == 0) {
-                        source->channel = NULL;
-                        source->tag = 0;
-                    }
-                }
-                source->time_since_last_played = 0;
+    source = gS3_state.sources;
+    while (source != NULL) {
+        if (source->ambient) {
+            if (source->period > 0) {
+                source->time_since_last_played += gS3_delta_time;
             }
-            else if ((!source->ambient_repeats || source->period == 0) && source->tag == 0) {
-                if (source->volume > 0) {
-                    if (S3UpdateSourcePosition(source) == 0) {
-                        source->channel = NULL;
-                        source->tag = 0;
+            if (source->channel != NULL && source->tag != source->channel->tag) {
+                S3StopChannel(source->channel);
+                source->channel = NULL;
+                source->tag = 0;
+            }
+            if (source->channel == NULL) {
+                if (source->time_since_last_played > source->period && source->period != 0 && source->tag == 0) {
+                    if (source->volume > 0) {
+                        if (S3UpdateSourcePosition(source) == 0) {
+                            source->channel = NULL;
+                            source->tag = 0;
+                        }
                     }
+                    source->time_since_last_played = 0;
+                } else if ((!source->ambient_repeats || source->period == 0) && source->tag == 0) {
+                    if (source->volume > 0) {
+                        if (S3UpdateSourcePosition(source) == 0) {
+                            source->channel = NULL;
+                            source->tag = 0;
+                        }
+                    }
+                    source->time_since_last_played = 0;
                 }
-                source->time_since_last_played = 0;
             }
         }
+        source = source->next;
     }
     return 0;
 }
+
 
 // FUNCTION: CARMA2_HW 0x0056711c
 // FUNCTION: CARMA2_SW 0x005627bc
