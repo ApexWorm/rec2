@@ -1824,15 +1824,15 @@ tS3_error_codes C2_HOOK_FASTCALL S3SetChannelPitch(tS3_sound_tag pChannel_tag, i
 
 // FUNCTION: CARMA2_HW 0x00564e9b
 // FUNCTION: CARMA2_SW 0x0056053b
-int C2_HOOK_FASTCALL S3StartSound2(tS3_outlet* pOutlet, tS3_sound_id pSound, unsigned int pRepeats, int pLeft_volume, int pRight_volume,  tS32 pLeft_pitch, tS32 pRight_pitch) {
-    tS3_descriptor* descriptor;
-    tS3_channel *chan;
+int C2_HOOK_FASTCALL S3StartSound2(tS3_outlet* pOutlet, tS3_sound_id pSound, int pRepeats, int pLeft_volume, int pRight_volume,  tS32 pLeft_pitch, tS32 pRight_pitch) {
+    tS3_descriptor* desc;
+    tS3_channel *channel;
     float normalized_delta_volume;
-    int priority;
+    int prio;
 
     if (gS3_enabled) {
-        descriptor = S3GetDescriptorByID(pSound);
-        if (descriptor == NULL) {
+        desc = S3GetDescriptorByID(pSound);
+        if (desc == NULL) {
             gS3_last_error = eS3_error_bad_id;
             return 0;
         }
@@ -1850,70 +1850,71 @@ int C2_HOOK_FASTCALL S3StartSound2(tS3_outlet* pOutlet, tS3_sound_id pSound, uns
         }
         normalized_delta_volume = (float)(pRight_volume - pLeft_volume) / 255.0f;
 
-        priority = S3CalculatePriority((pLeft_volume + pRight_volume) / 2, descriptor->priority);
-        chan = S3AllocateChannel(pOutlet, priority);
-        if (chan == NULL) {
+        prio = S3CalculatePriority((pLeft_volume + pRight_volume) / 2, desc->priority);
+        channel = S3AllocateChannel(pOutlet, prio);
+        if (channel == NULL) {
             gS3_last_error = eS3_error_channel_alloc;
             return 0;
         }
-        if (descriptor->type != 2) {
-            if (descriptor->type == 0) {
-                if (descriptor->buffer_description == NULL) {
-                    if (!S3LoadSample(pSound) || (descriptor->flags & 0x2)) {
-                        chan->needs_service = 1;
+        if (desc->type == 2) {
+        } else {
+            if (desc->type == 0) {
+                if (desc->buffer_description == NULL) {
+                    if (!S3LoadSample(pSound) || (desc->flags & 0x2)) {
+                        channel->needs_service = 1;
                         gS3_last_error = eS3_error_load_sound;
                         return 0;
                     }
                 }
             }
         }
-        if (chan->descriptor != NULL && chan->descriptor->type == 1 && chan->descriptor->sample_id != pSound) {
-            S3ClearBufferOfMidiChannel(chan->tag);
+        if (channel->descriptor != NULL && channel->descriptor->type == 1 && channel->descriptor->sample_id != pSound) {
+            S3ClearBufferOfMidiChannel(channel->tag);
         }
-        chan->spatial_sound = 0;
-        chan->descriptor = descriptor;
-        chan->needs_service = 0;
-        chan->termination_reason = 0;
-        chan->type = descriptor->type;
-        chan->sound_source_ptr = NULL;
-        chan->repetitions = pRepeats <= 0 ? 0 : pRepeats;
-        S3CalculateRandomizedFields(chan, descriptor);
-        chan->volume_multiplier = (pLeft_volume + pRight_volume) / 2;
-        chan->field_0x28 = normalized_delta_volume;
-        chan->tag = S3GenerateTag(pOutlet);
+        channel->spatial_sound = 0;
+        channel->descriptor = desc;
+        channel->needs_service = 0;
+        channel->termination_reason = 0;
+        channel->type = desc->type;
+        channel->sound_source_ptr = NULL;
+        channel->repetitions = pRepeats <= 0 ? 0 : pRepeats;
+        S3CalculateRandomizedFields(channel, desc);
+        channel->volume_multiplier = (pLeft_volume + pRight_volume) / 2;
+        channel->field_0x28 = normalized_delta_volume;
+        channel->tag = S3GenerateTag(pOutlet);
         if (pLeft_pitch == -1) {
             pLeft_pitch = 0x10000;
         }
         if (pRight_pitch == -1) {
             pRight_pitch = 0x10000;
         }
-        chan->rate = (int)((double)chan->rate * ldexp((double)pLeft_pitch, -16));
+        channel->rate = (int)((double)channel->rate * ldexp((double)pLeft_pitch, -16));
         if (!pOutlet->independent_pitch) {
-            chan->rate = (int)((double)chan->rate * ldexp((double)pRight_pitch, -16));
+            channel->rate = (int)((double)channel->rate * ldexp((double)pRight_pitch, -16));
         }
-        if (descriptor->type == 1 && descriptor->buffer_description == NULL && S3MIDILoadSong(chan) != eS3_error_none) {
-            chan->needs_service = 1;
+        if (desc->type == 1 && desc->buffer_description == NULL && S3MIDILoadSong(channel) != eS3_error_none) {
+            channel->needs_service = 1;
             return 0;
-        } else if (chan->type == 0) {
-            S3ExecuteSampleFilterFuncs(chan);
-            if (!S3PlaySample(chan, descriptor)) {
-                chan->needs_service = 1;
+        } else if (channel->type == 0) {
+            S3ExecuteSampleFilterFuncs(channel);
+            if (!S3PlaySample(channel, desc)) {
+                channel->needs_service = 1;
                 gS3_last_error = eS3_error_start_sound;
                 return 0;
             }
-        } else if (chan->type == 1) {
-            if (S3PlayMIDI(chan)) {
-                chan->needs_service = 1;
+        } else if (channel->type == 1) {
+            if (S3PlayMIDI(channel)) {
+                channel->needs_service = 1;
                 gS3_last_error = eS3_error_start_song;
                 return 0;
             }
-            S3SetMIDIVolume(chan, chan->volume_multiplier);
-        } else if (chan->type == 2 && S3PlayCDA(chan)) {
-            chan->needs_service = 1;
+            S3SetMIDIVolume(channel, channel->volume_multiplier);
+        } else if (channel->type == 2 && S3PlayCDA(channel)) {
+            channel->needs_service = 1;
             gS3_last_error = eS3_error_start_cda;
             return 0;
         }
-        return chan->tag;
+        return channel->tag;
     } else {
         return 0;
     }

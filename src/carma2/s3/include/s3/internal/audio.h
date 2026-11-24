@@ -180,7 +180,7 @@ extern int C2_HOOK_FASTCALL S3SetChannelVolume(int pChannel_tag, int pVolume);
 
 extern tS3_error_codes C2_HOOK_FASTCALL S3SetChannelPitch(tS3_sound_tag pChannel_tag, int pPitch);
 
-extern int C2_HOOK_FASTCALL S3StartSound2(tS3_outlet* pOutlet, tS3_sound_id pSound, unsigned int pRepeats, int pLeft_volume, int pRight_volume, int pLeft_pitch, int pRight_pitch);
+extern int C2_HOOK_FASTCALL S3StartSound2(tS3_outlet* pOutlet, tS3_sound_id pSound, int pRepeats, int pLeft_volume, int pRight_volume, int pLeft_pitch, int pRight_pitch);
 
 extern tS3_error_codes C2_HOOK_FASTCALL S3MIDITagHasStoppedPlaying(int pTag);
 
