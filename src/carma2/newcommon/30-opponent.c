@@ -266,11 +266,15 @@ inline void C2_HOOK_FASTCALL TurnOpponentPhysicsOff(tOpponent_spec* pOpponent_sp
     }
 }
 
-// STUB: CARMA2_HW 0x004a7a20
-// STUB: CARMA2_SW 0x004a3b90
-// STUB: CARMA2_CHEAT 0x004a8d30
+// FUNCTION: CARMA2_HW 0x004a7a20
+// FUNCTION: CARMA2_SW 0x004a3b90
+// FUNCTION: CARMA2_CHEAT 0x004a8d30
 void C2_HOOK_FASTCALL ApplyOppoRenderage2(tOpponent_spec* pOpponent_spec, int pRender) {
-    NOT_IMPLEMENTED();
+
+    if (gAction_replay_mode && ARGetReplayRate() < 0.f) {
+        pRender = !pRender;
+    }
+    pOpponent_spec->car_spec->car_master_actor->render_style = !pRender;
 }
 
 // FUNCTION: CARMA2_HW 0x004aad70
