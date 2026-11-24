@@ -2771,11 +2771,40 @@ tPed_personality* C2_HOOK_FASTCALL ReadPersonality(const char* pName) {
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x004077f0
-// STUB: CARMA2_SW 0x004077f0
-// STUB: CARMA2_CHEAT 0x004077f0
+// FUNCTION: CARMA2_HW 0x004077f0
+// FUNCTION: CARMA2_SW 0x004077f0
+// FUNCTION: CARMA2_CHEAT 0x004077f0
 void C2_HOOK_FASTCALL DisposePersonality(tPed_personality* pPersonality) {
-    NOT_IMPLEMENTED();
+    int i;
+    int j;
+    int k;
+
+    if (gPed_vtable->dispose_personality != NULL) {
+        gPed_vtable->dispose_personality(pPersonality);
+    }
+    if (pPersonality->moves != NULL) {
+        BrMemFree(pPersonality->moves);
+    }
+    for (i = 0; i < pPersonality->form->count_bones; i++) {
+        for (j = 0; j < 4; j++) {
+            if (pPersonality->bones[i].models[j].models[0] == NULL) {
+                break;
+            }
+            for (k = 1; k < 2; k++) {
+                BrModelRemove(pPersonality->bones[i].models[j].models[k]);
+                BrModelFree(pPersonality->bones[i].models[j].models[k]);
+            }
+        }
+        if (pPersonality->bones[i].hinge != NULL) {
+            FreePhysicsJoint(pPersonality->bones[i].hinge);
+        }
+    }
+    if (pPersonality->bones != NULL) {
+        BrMemFree(pPersonality->bones);
+    }
+    if (pPersonality != NULL) {
+        BrMemFree(pPersonality);
+    }
 }
 
 #ifdef REC2_MATCHING

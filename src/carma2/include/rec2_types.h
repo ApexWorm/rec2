@@ -4034,7 +4034,7 @@ typedef struct {
     void (C2_HOOK_FASTCALL * load_form)(tPed_form* pPed_form, FILE* pF);
     void (C2_HOOK_FASTCALL * dispose_form)(tPed_form*);
     void (C2_HOOK_FASTCALL * load_personality)(tPed_personality*, FILE*);
-    void (C2_HOOK_FASTCALL * dispose_personality)(undefined4*);
+    void (C2_HOOK_FASTCALL * dispose_personality)(tPed_personality*);
 } tPedForms_vtable;
 
 typedef enum {
