@@ -673,8 +673,8 @@ int C2_HOOK_FASTCALL FindPaletteColourRGB565(br_colour pColour, br_pixelmap *pPa
 
         error = RGB565Error(pColour, pixel[i]);
         if (error < best_error) {
-            best_index = i;
             best_error = error;
+            best_index = i;
         }
     }
     return best_index;
@@ -701,8 +701,8 @@ int C2_HOOK_FASTCALL FindPaletteColourXRGB8888(br_colour pColour, br_pixelmap *p
 
         error = XRGB8888Error(pColour, pixel[i]);
         if (error < best_error) {
-            best_index = i;
             best_error = error;
+            best_index = i;
         }
     }
     return best_index;
