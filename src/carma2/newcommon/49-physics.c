@@ -86,6 +86,7 @@ int gPHIL_mechanics_time_sync;
 
 // GLOBAL: CARMA2_HW 0x0074a5e8
 // GLOBAL: CARMA2_SW 0x007410a8
+// GLOBAL: CARMA2_CHEAT 0x00751c88
 int gPHIL_munging_objects;
 
 // GLOBAL: CARMA2_HW 0x006940c8
