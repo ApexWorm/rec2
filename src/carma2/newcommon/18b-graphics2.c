@@ -881,12 +881,44 @@ void C2_HOOK_FASTCALL DRPixelmapBlendedLine(br_pixelmap* pDest, int pX1, int pY1
 #endif
 }
 
-// DR8BitFancyDrawLine
+extern int gFancy_line_center_palette_indexes[5];
+extern int gFancy_line_side_palette_indexes[5];
+extern br_pixelmap* gBlend_palettes[4];
 
-// STUB: CARMA2_HW 0x0047d2b0
-// STUB: CARMA2_SW 0x0047d2b0
+static void C2_HOOK_FASTCALL DR8BitFancyDrawLine(br_pixelmap* pMap, int pX1, int pY1, int pX2, int pY2, br_uint_32 pColour, tU32 pTime_period) {
+    int anim_index;
+    int dy;
+    int dx;
+    float adx;
+    float ady;
+
+    dx = pX2 - pX1;
+    dy = pY2 - pY1;
+    anim_index = (PDGetTotalTime() / pTime_period) % BR_ASIZE(gFancy_line_side_palette_indexes);
+    DRPixelmapBlendedLine(pMap, pX1, pY1, pX2, pY2, pColour, gBlend_palettes[gFancy_line_center_palette_indexes[anim_index]]);
+    adx = (float)fabs(dx);
+    ady = (float)fabs(dy);
+    if (adx > ady) {
+        DRPixelmapBlendedLine(pMap, pX1, pY1 - 1, pX2, pY2 - 1, pColour, gBlend_palettes[gFancy_line_side_palette_indexes[anim_index]]);
+        DRPixelmapBlendedLine(pMap, pX1, pY1 + 1, pX2, pY2 + 1, pColour, gBlend_palettes[gFancy_line_side_palette_indexes[anim_index]]);
+    } else {
+        DRPixelmapBlendedLine(pMap, pX1 - 1, pY1, pX2 - 1, pY2, pColour, gBlend_palettes[gFancy_line_side_palette_indexes[anim_index]]);
+        DRPixelmapBlendedLine(pMap, pX1 + 1, pY1, pX2 + 1, pY2, pColour, gBlend_palettes[gFancy_line_side_palette_indexes[anim_index]]);
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x0047d2b0
+// FUNCTION: CARMA2_SW 0x0047d550
+// FUNCTION: CARMA2_CHEAT 0x0047d630
 void C2_HOOK_FASTCALL FancyDrawLine(br_pixelmap* pMpDestap, int pX1, int pY1, int pX2, int pY2, br_uint_32 pColour, tU32 pTime_period) {
-    NOT_IMPLEMENTED();
+
+    if (pMpDestap->type == BR_PMT_INDEX_8) {
+        DR8BitFancyDrawLine(pMpDestap, pX1, pY1, pX2, pY2, pColour, pTime_period);
+#ifdef REC2_HW
+    } else {
+        BrPixelmapLine(pMpDestap, pX1, pY1, pX2, pY2, PaletteEntry16Bit(gRender_palette, pColour));
+#endif
+    }
 }
 
 // DRPixelmapCopyMapBlack8Bit
