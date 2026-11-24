@@ -2125,7 +2125,7 @@ void C2_HOOK_FASTCALL FRONTEND_CreateMenuButton(tFrontend_brender_item* pFronten
     pFrontend_brender_item->model->flags |= BR_MODF_KEEP_ORIGINAL;
 
     pFrontend_brender_item->model->vertices[0].p.v[0] = pFrontend_brender_item->model->vertices[1].p.v[0] = (float)pX;
-    pFrontend_brender_item->model->vertices[0].p.v[1] = pFrontend_brender_item->model->vertices[3].p.v[1] = -(float)pY;
+    pFrontend_brender_item->model->vertices[0].p.v[1] = pFrontend_brender_item->model->vertices[3].p.v[1] = -((float)pY);
     pFrontend_brender_item->model->vertices[2].p.v[0] = pFrontend_brender_item->model->vertices[3].p.v[0] = pFrontend_brender_item->model->vertices[1].p.v[0] + (float)pWidth;
     pFrontend_brender_item->model->vertices[1].p.v[1] = pFrontend_brender_item->model->vertices[2].p.v[1] = pFrontend_brender_item->model->vertices[3].p.v[1] - (float)pHeight;
     pFrontend_brender_item->model->vertices[0].p.v[2] = -1.1f;
@@ -2141,10 +2141,10 @@ void C2_HOOK_FASTCALL FRONTEND_CreateMenuButton(tFrontend_brender_item* pFronten
     BrModelAdd(pFrontend_brender_item->model);
     if (pMap != NULL) {
         map_x = (float)pWidth / (float)HighResHeadupWidth(pMap->width);
-        map_y = (float)pWidth / (float)HighResHeadupWidth(pMap->height);
+        map_y = (float)pHeight / (float)HighResHeadupWidth(pMap->height);
     } else {
         map_x = (float)pWidth / (float)HighResHeadupWidth(8);
-        map_y = (float)pWidth / (float)HighResHeadupWidth(8);
+        map_y = (float)pHeight / (float)HighResHeadupWidth(8);
     }
     BrVector2Set(&pFrontend_brender_item->model->vertices[0].map, 0.0f, 0.0f);
     BrVector2Set(&pFrontend_brender_item->model->vertices[1].map, 0.0f, map_y);
