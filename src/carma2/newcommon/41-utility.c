@@ -1643,9 +1643,6 @@ int C2_HOOK_FASTCALL PossibleUnlock(int pValue) {
 // FUNCTION: CARMA2_CHEAT 0x0051ca00
 tU16 C2_HOOK_FASTCALL PaletteEntry16Bit(br_pixelmap* pPal, int pEntry) {
     tU32* src_entry;
-    int green;
-    int blue;
-    int red;
 
     src_entry = pPal->pixels;
     switch (gBack_screen->type) {
@@ -1653,15 +1650,9 @@ tU16 C2_HOOK_FASTCALL PaletteEntry16Bit(br_pixelmap* pPal, int pEntry) {
         BrFailure("Unsupported back buffer type.");
         return 0;
     case BR_PMT_RGB_565:
-        red = (src_entry[pEntry] >> 8) & 0xf800;
-        green = (src_entry[pEntry] >> 5) & 0x07e0;
-        blue = (src_entry[pEntry] >> 3) & 0x001f;
-        return red | green | blue;
+        return ((src_entry[pEntry] >> 8) & 0xf800) | ((src_entry[pEntry] >> 5) & 0x7e0) | ((src_entry[pEntry] >> 3) & 0x1f);
     case BR_PMT_RGB_555:
-        red = (src_entry[pEntry] >> 9) & 0x7c00;
-        green = (src_entry[pEntry] >> 6) & 0x03e0;
-        blue = (src_entry[pEntry] >> 3) & 0x001f;
-        return red | green | blue;
+        return ((src_entry[pEntry] >> 9) & 0x7c00) | ((src_entry[pEntry] >> 6) & 0x3e0) | ((src_entry[pEntry] >> 3) & 0x1f);
     }
 }
 
