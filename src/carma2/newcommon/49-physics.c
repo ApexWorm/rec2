@@ -1479,6 +1479,7 @@ void C2_HOOK_FASTCALL FillInShape(tPhysics_shape* pShape) {
 void C2_HOOK_FASTCALL UpdateCollisionObject(tPhysics_object* pCollision_info) {
     tPhysics_shape* shape;
     tPhysics_shape* current;
+    br_scalar radius;
 
     shape = pCollision_info->shape;
     if (shape == NULL) {
@@ -1501,7 +1502,8 @@ void C2_HOOK_FASTCALL UpdateCollisionObject(tPhysics_object* pCollision_info) {
             + MAX(REC2_SQR(pCollision_info->bb2.min.v[0]), REC2_SQR(pCollision_info->bb2.max.v[0]))
             + MAX(REC2_SQR(pCollision_info->bb2.min.v[1]), REC2_SQR(pCollision_info->bb2.max.v[1]))
             + MAX(REC2_SQR(pCollision_info->bb2.min.v[2]), REC2_SQR(pCollision_info->bb2.max.v[2]));
-    pCollision_info->radius = sqrt(pCollision_info->radius_squared);
+    radius = sqrt(pCollision_info->radius_squared);
+    pCollision_info->radius = radius;
 }
 
 // FUNCTION: CARMA2_HW 0x004c61c0

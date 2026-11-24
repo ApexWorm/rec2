@@ -4551,8 +4551,8 @@ typedef struct tPhysics_object {
     br_bounds3 field_0xf4;
     br_bounds3 field_0x10c;
     br_bounds3 field_0x124;
-    float radius_squared;
     float radius;
+    float radius_squared;
     br_matrix34 field_0x144;
     tU16 box_face_start;
     tU16 box_face_end;
