@@ -21,6 +21,7 @@
 #include "59-camera.h"
 #include "60-phil.h"
 #include "63-loading3.h"
+#include "70-packfile.h"
 
 #include "globvars.h"
 #include "globvrkm.h"
@@ -201,6 +202,7 @@ int gNum_splash_types;
 
 // GLOBAL: CARMA2_HW 0x006a82b8
 // GLOBAL: CARMA2_SW 0x006a2318
+// GLOBAL: CARMA2_CHEAT 0x006afe30
 tSplash gSplash[32] = { 0 };
 
 // GLOBAL: CARMA2_HW 0x006aa570
@@ -210,6 +212,7 @@ int gSplash_flags;
 
 // GLOBAL: CARMA2_HW 0x006a9130
 // GLOBAL: CARMA2_SW 0x006a2b80
+// GLOBAL: CARMA2_CHEAT 0x006b0ca8
 br_material* gSplash_material[20];
 
 // GLOBAL: CARMA2_HW 0x006a8758
@@ -412,12 +415,43 @@ void C2_HOOK_FASTCALL CreateShrapnelShowerWorld(const br_vector3* pPosition, con
 
 // random
 
-// InitShrapnel
+inline void C2_HOOK_FASTCALL InitShrapnel(void) {
+    int i;
+    br_scalar scale;
+    double dscale;
+
+    for (i = 0; i < (int)REC2_ASIZE(gShrapnel); i++) {
+        gShrapnel[i].actor = BrActorAllocate(BR_ACTOR_MODEL, NULL);
+        gShrapnel[i].actor->parent = NULL;
+        gShrapnel[i].actor->model = gShrapnel_model[i & 1];
+        gShrapnel[i].actor->render_style = BR_RSTYLE_DEFAULT;
+        gShrapnel[i].actor->t.type = BR_TRANSFORM_MATRIX34;
+        gShrapnel[i].actor->material = BrMaterialFind("DEBRIS.MAT");
+        gShrapnel[i].age = 0;
+        gShrapnel[i].shear1 = FRandomBetween(-2.0f, 2.0f);
+        gShrapnel[i].shear2 = FRandomBetween(-2.0f, 2.0f);
+        BrVector3SetFloat(&gShrapnel[i].axis,
+            FRandomBetween(-1.f, 1.f),
+            FRandomBetween(-1.f, 1.f),
+            FRandomBetween(-1.f, 1.f));
+        scale = BR_LENGTH3(gShrapnel[i].axis.v[0], gShrapnel[i].axis.v[1], gShrapnel[i].axis.v[2]);
+        if (scale > BR_SCALAR_EPSILON * 2) {
+            dscale = 1.0 / scale;
+            gShrapnel[i].axis.v[0] = (br_scalar)(gShrapnel[i].axis.v[0] * dscale);
+            gShrapnel[i].axis.v[1] = (br_scalar)(gShrapnel[i].axis.v[1] * dscale);
+            gShrapnel[i].axis.v[2] = (br_scalar)(gShrapnel[i].axis.v[2] * dscale);
+        } else {
+            gShrapnel[i].axis.v[0] = 1.0f;
+            gShrapnel[i].axis.v[1] = 0.0f;
+            gShrapnel[i].axis.v[2] = 0.0f;
+        }
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x004f8b90
 // FUNCTION: CARMA2_SW 0x004f4210
 // FUNCTION: CARMA2_CHEAT 0x004fe830
-void C2_HOOK_FASTCALL LoadInShrapnel(void) {
+inline void C2_HOOK_FASTCALL LoadInShrapnel(void) {
     gShrapnel_model[0] = LoadModel("FRAG4.DAT");
     DRScaleModel(gShrapnel_model[0], 0.5f);
     gShrapnel_model[1] = LoadModel("FRAG5.DAT");
@@ -1122,14 +1156,14 @@ void C2_HOOK_FASTCALL InitFlame(void) {
         }
     }
     gLollipop_model->nvertices = 4;
-    BrVector3SetFloat(&gLollipop_model->vertices[0].p, -.5f, 0.f, 0.f);
-    BrVector3SetFloat(&gLollipop_model->vertices[1].p, .5f, 0.f, 0.f);
-    BrVector3SetFloat(&gLollipop_model->vertices[2].p, .5f, 1.f, 0.f);
-    BrVector3SetFloat(&gLollipop_model->vertices[3].p, -.5f, 1.f, 0.f);
-    BrVector2Set(&gLollipop_model->vertices[0].map, 0.f, 1.f);
-    BrVector2Set(&gLollipop_model->vertices[1].map, 1.f, 1.f);
-    BrVector2Set(&gLollipop_model->vertices[2].map, 1.f, 0.f);
-    BrVector2Set(&gLollipop_model->vertices[3].map, 0.f, 0.f);
+    BrVector3SetFloat(&gLollipop_model->vertices[0].p, -0.5f, 0.0f, 0.0f);
+    BrVector3SetFloat(&gLollipop_model->vertices[1].p, 0.5f, 0.0f, 0.0f);
+    BrVector3SetFloat(&gLollipop_model->vertices[2].p, 0.5f, 1.0f, 0.0f);
+    BrVector3SetFloat(&gLollipop_model->vertices[3].p, -0.5f, 1.0f, 0.0f);
+    BrVector2Set(&gLollipop_model->vertices[0].map, 0.0f, 1.0f);
+    BrVector2Set(&gLollipop_model->vertices[1].map, 1.0f, 1.0f);
+    BrVector2Set(&gLollipop_model->vertices[2].map, 1.0f, 0.0f);
+    BrVector2Set(&gLollipop_model->vertices[3].map, 0.0f, 0.0f);
     gLollipop_model->nfaces = 2;
     gLollipop_model->faces[0].vertices[0] = 0;
     gLollipop_model->faces[0].vertices[1] = 1;
@@ -1144,6 +1178,7 @@ void C2_HOOK_FASTCALL InitFlame(void) {
 
 // FUNCTION: CARMA2_HW 0x004fdde0
 // FUNCTION: CARMA2_SW 0x004f9380
+// FUNCTION: CARMA2_CHEAT 0x00503a80
 void C2_HOOK_FASTCALL InitSplash(FILE* pF) {
     int i;
     int num_files;
@@ -1390,7 +1425,22 @@ void C2_HOOK_FASTCALL FreeSmokeShadeTables(void) {
 #endif
 }
 
-// LoadInKevStuff
+// FUNCTION: CARMA2_HW 0x004fdc10
+// FUNCTION: CARMA2_SW 0x004f91b0
+// FUNCTION: CARMA2_CHEAT 0x005038b0
+void C2_HOOK_FASTCALL LoadInKevStuff(FILE* pF) {
+
+    PackFileRevertTiffLoading();
+    PossibleService();
+    LoadInShrapnel();
+    PossibleService();
+    InitShrapnel();
+    PossibleService();
+    InitFlame();
+    PossibleService();
+    InitSplash(pF);
+    PackFileRerevertTiffLoading();
+}
 
 // DisposeKevStuff
 
