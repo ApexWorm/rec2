@@ -1775,7 +1775,7 @@ void C2_HOOK_FASTCALL InitPhysics(void) {
 #pragma inline_depth()
 #endif
 
-// PointOutOfSightNotAR
+// PointOutOfSightNotAR (moved to 51-smash for inlining purposes)
 
 // CalcCollObjIDFromCarSpec
 
