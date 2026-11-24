@@ -637,85 +637,81 @@ int C2_HOOK_FASTCALL S3CreateOutletChannels(tS3_outlet* outlet, int pChannel_cou
 // FUNCTION: CARMA2_HW 0x00568c2c
 // FUNCTION: CARMA2_CHEAT 0x0056e81c
 void* C2_HOOK_FASTCALL S3LoadSoundBankFile(const char* pPath) {
-    char path[512];
-    char lowmem_path[512];
+    char file_name[512];
+    char full_path[512];
     char line[512];
-    int bytes_read;
-    char* buffer;
-    int file_size;
-    FILE* f;
-    struct_c2_stat32 stat;
+    char* data;
+    int sz;
+    FILE* file;
+    struct_c2_stat32 stat_buf;
+    int file_handle;
 
     if (gS3_low_memory_mode) {
 
         gS3_last_error = eS3_error_readfile;
-        sprintf(lowmem_path, "DATA%sSOUNDS%s%s", gS3_path_separator, gS3_path_separator, pPath);
-        f = S3_low_memory_fopen(lowmem_path, "rb");
-        if (f == NULL) {
+        sprintf(line, "DATA%sSOUNDS%s%s", gS3_path_separator, gS3_path_separator, pPath);
+        file = S3_low_memory_fopen(line, "rb");
+        if (file == NULL) {
             return NULL;
         }
-        file_size = S3GetFileSize(f);
-        buffer = S3MemAllocate(file_size + 1, kMem_S3_sample);
-        if (buffer == NULL) {
-            fclose(f);
+        sz = S3GetFileSize(file);
+        data = S3MemAllocate(sz + 1, kMem_S3_sample);
+        if (data == NULL) {
+            fclose(file);
             gS3_last_error = eS3_error_memory;
             return NULL;
         }
-        buffer[file_size] = '\0';
-        bytes_read = fread(buffer, 1, file_size, f);
-        if (bytes_read != file_size) {
+        data[sz] = '\0';
+        if (fread(data, 1, sz, file) != sz) {
 #ifdef REC2_FIX_BUGS
-            fclose(f);
+            fclose(file);
 #endif
             gS3_last_error = eS3_error_readfile;
             return NULL;
         }
-        gS3_soundbank_buffer = buffer;
-        gS3_soundbank_buffer_len = file_size;
-        fclose(f);
+        gS3_soundbank_buffer = data;
+        gS3_soundbank_buffer_len = sz;
+        fclose(file);
     } else {
-        int fd;
-
         C2_HOOK_BUG_ON(_O_BINARY != 0x8000);
         if (gS3_sound_dirname[0] != '\0') {
 
-            PDExtractFilename(path, pPath);
-            sprintf(line, "%s%s%s", gS3_sound_dirname, gS3_path_separator, path);
-            fd = c2_open(line, _O_BINARY);
+            PDExtractFilename(file_name, pPath);
+            sprintf(full_path, "%s%s%s", gS3_sound_dirname, gS3_path_separator, file_name);
+            file_handle = c2_open(full_path, _O_BINARY);
         } else {
-            fd = c2_open(pPath, _O_BINARY);
+            file_handle = c2_open(pPath, _O_BINARY);
         }
-        if (fd == -1) {
+        if (file_handle == -1) {
             gS3_last_error = eS3_error_readfile;
             return NULL;
         }
-        if (c2_fstat32(fd, &stat) != 0) {
+        if (c2_fstat32(file_handle, &stat_buf) != 0) {
 #ifdef REC2_FIX_BUGS
-            c2_close(fd);
+            c2_close(file_handle);
 #endif
             gS3_last_error = eS3_error_readfile;
             return NULL;
         }
-        buffer = S3MemAllocate(stat.st_size + 1, kMem_S3_sample);
-        if (buffer == NULL) {
-            c2_close(fd);
+        data = S3MemAllocate(stat_buf.st_size + 1, kMem_S3_sample);
+        if (data == NULL) {
+            c2_close(file_handle);
             gS3_last_error = eS3_error_memory;
             return NULL;
         }
-        buffer[stat.st_size] = '\0';
-        bytes_read = c2_read(fd, buffer, stat.st_size);
-        if (bytes_read != stat.st_size) {
+        data[stat_buf.st_size] = '\0';
+        if (c2_read(file_handle, data, stat_buf.st_size) != stat_buf.st_size) {
 #ifdef REC2_FIX_BUGS
-            c2_close(fd);
+            c2_close(file_handle);
 #endif
             gS3_last_error = eS3_error_readfile;
             return NULL;
         }
-        gS3_soundbank_buffer = buffer;
-        gS3_soundbank_buffer_len = stat.st_size;
-        c2_close(fd);
+        gS3_soundbank_buffer = data;
+        gS3_soundbank_buffer_len = stat_buf.st_size;
+        c2_close(file_handle);
     }
-    return buffer;
+    return data;
 }
 
 // FUNCTION: CARMA2_HW 0x00567fe0
