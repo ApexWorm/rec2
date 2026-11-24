@@ -325,20 +325,20 @@ void C2_HOOK_FASTCALL S3BindListenerLeftBRender(br_vector3* left) {
 // FUNCTION: CARMA2_HW 0x00566048
 // FUNCTION: CARMA2_SW 0x005616e8
 int C2_HOOK_FASTCALL S3StartSound3D(tS3_outlet *pOutlet, int pSound, const br_vector3* pInitial_position, const br_vector3* pInitial_velocity, int pRepeats, int pVolume, int pPitch, int pSpeed) {
-    tS3_descriptor* descriptor;
+    tS3_descriptor* desc;
     tS3_channel* channel;
-    float rate;
+    int prio;
 
     if (gS3_enabled) {
-        descriptor = S3GetDescriptorByID(pSound);
-        if (descriptor == NULL) {
+        desc = S3GetDescriptorByID(pSound);
+        if (desc == NULL) {
             gS3_last_error = eS3_error_bad_id;
             return 0;
         }
-        if (descriptor->type != 0) {
+        if (desc->type != 0) {
             return 0;
         }
-        if (descriptor->buffer_description == NULL || (descriptor->flags & 0x2)) {
+        if (desc->buffer_description == NULL || (desc->flags & 0x2)) {
             if (!S3LoadSample(pSound)) {
                 gS3_last_error = eS3_error_load_sound;
                 return 0;
@@ -348,25 +348,24 @@ int C2_HOOK_FASTCALL S3StartSound3D(tS3_outlet *pOutlet, int pSound, const br_ve
             pVolume = 255;
         }
         if (pVolume < 0) {
-            pVolume = S3IRandomBetween__dup(descriptor->min_volume, descriptor->max_volume, 128);
+            pVolume = S3IRandomBetween__dup(desc->min_volume, desc->max_volume, 128);
         }
         memset(&gS3_channel_template, 0, sizeof(gS3_channel_template));
         gS3_channel_template.sound_source_ptr = NULL;
         gS3_channel_template.max_distance_squared = 150.0f;
         gS3_channel_template.volume_multiplier = pVolume;
         gS3_channel_template.source_volume = pVolume;
-        gS3_channel_template.rate = S3IRandomBetweenLog(descriptor->min_pitch,descriptor->max_pitch,
-        descriptor->buffer_description->sample_rate);
+        gS3_channel_template.rate = S3IRandomBetweenLog(desc->min_pitch,desc->max_pitch,
+        desc->buffer_description->sample_rate);
         if (pPitch == -1) {
             pPitch = BR_FIXED_INT(1);
         }
         if (pSpeed == -1) {
             pSpeed = BR_FIXED_INT(1);
         }
-        rate = (float)(gS3_channel_template.rate * ldexp((double)pPitch, -16));
-        gS3_channel_template.rate = (int)rate;
+        gS3_channel_template.rate = (int)((float)gS3_channel_template.rate * (float)ldexp((double)pPitch, -16));
         if (!pOutlet->independent_pitch) {
-            gS3_channel_template.rate = (int)((float)ldexp((double)pSpeed, -16) * rate);
+            gS3_channel_template.rate = (int)((float)gS3_channel_template.rate * (float)ldexp((double)pSpeed, -16));
         }
         gS3_channel_template.field_0x28 = 0.0f;
         gS3_channel_template.source_rate = gS3_channel_template.rate;
@@ -377,7 +376,8 @@ int C2_HOOK_FASTCALL S3StartSound3D(tS3_outlet *pOutlet, int pSound, const br_ve
         gS3_channel_template.velocity.y = pInitial_velocity->v[1];
         gS3_channel_template.velocity.z = pInitial_velocity->v[2];
         if (S3Calculate3D(&gS3_channel_template, 0)) {
-            channel = S3AllocateChannel(pOutlet, S3CalculatePriority(gS3_channel_template.volume_multiplier, descriptor->priority));
+            prio = S3CalculatePriority(gS3_channel_template.volume_multiplier, desc->priority);
+            channel = S3AllocateChannel(pOutlet, prio);
             if (channel == NULL) {
                 gS3_last_error = eS3_error_channel_alloc;
                 return 0;
@@ -387,25 +387,19 @@ int C2_HOOK_FASTCALL S3StartSound3D(tS3_outlet *pOutlet, int pSound, const br_ve
             channel->rate = gS3_channel_template.rate;
             channel->spatial_sound = 1;
             channel->sound_source_ptr = NULL;
-            channel->descriptor = descriptor;
+            channel->descriptor = desc;
             channel->needs_service = 0;
             channel->termination_reason = 0;
-            channel->position.x = gS3_channel_template.position.x;
-            channel->position.y = gS3_channel_template.position.y;
-            channel->position.z = gS3_channel_template.position.z;
-            channel->prev_position.x = gS3_channel_template.prev_position.x;
-            channel->prev_position.y = gS3_channel_template.prev_position.y;
-            channel->prev_position.z = gS3_channel_template.prev_position.z;
-            channel->velocity.x = gS3_channel_template.velocity.x;
-            channel->velocity.y = gS3_channel_template.velocity.y;
-            channel->velocity.z = gS3_channel_template.velocity.z;
+            channel->position = gS3_channel_template.position;
+            channel->prev_position = gS3_channel_template.prev_position;
+            channel->velocity = gS3_channel_template.velocity;
             channel->repetitions = (pRepeats <= 0) ? 0 : pRepeats;
             channel->tag = S3GenerateTag(pOutlet);
             channel->source_volume = gS3_channel_template.source_volume;
             channel->source_rate = gS3_channel_template.source_rate;
             channel->max_distance_squared = gS3_channel_template.max_distance_squared;
             S3ExecuteSampleFilterFuncs(channel);
-            if (!S3PlaySample(channel, descriptor)) {
+            if (!S3PlaySample(channel, desc)) {
                 channel->needs_service = 1;
                 gS3_last_error = eS3_error_start_sound;
                 return 0;
