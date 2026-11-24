@@ -255,43 +255,43 @@ int C2_HOOK_FASTCALL S3GetCountChannels(int pCount_channels_1, int pCount_channe
 // FUNCTION: CARMA2_SW 0x00560a67
 // FUNCTION: CARMA2_CHEAT 0x0056afb7
 tS3_outlet* C2_HOOK_FASTCALL S3CreateOutlet(int pCount_channels_1, int pCount_channels_2) {
-    tS3_outlet* o;
+    tS3_outlet* prev;
     tS3_outlet* next_outlet;
-    int nchannels;
-    tS3_outlet* outlet;
-    int channels_remaining;
+    int count;
+    tS3_outlet* new_outlet;
+    int created;
 
     (void) next_outlet;
-    nchannels = S3GetCountChannels(pCount_channels_1, pCount_channels_2);
+    count = S3GetCountChannels(pCount_channels_1, pCount_channels_2);
 
-    if (nchannels == 0) {
+    if (count == 0) {
         gS3_last_error = eS3_error_channel_alloc;
         return NULL;
     }
 
     C2_HOOK_BUG_ON(sizeof(tS3_outlet) != 0x20);
 
-    outlet = S3MemAllocate(sizeof(tS3_outlet), kMem_S3_outlet);
-    if (outlet == NULL) {
+    new_outlet = S3MemAllocate(sizeof(tS3_outlet), kMem_S3_outlet);
+    if (new_outlet == NULL) {
         gS3_last_error = eS3_error_memory;
         return NULL;
     }
-    memset(outlet, 0, sizeof(tS3_outlet));
-    channels_remaining = S3CreateOutletChannels(outlet, nchannels);
-    if (channels_remaining == nchannels) {
-        S3MemFree(outlet);
+    memset(new_outlet, 0, sizeof(tS3_outlet));
+    created = S3CreateOutletChannels(new_outlet, count);
+    if (created == count) {
+        S3MemFree(new_outlet);
         return NULL;
     }
 
-    if (gS3_state.outlets == NULL) {
-        gS3_state.outlets = outlet;
+    prev = gS3_state.outlets;
+    if (prev == NULL) {
+        gS3_state.outlets = new_outlet;
     } else {
-        o = gS3_state.outlets;
-        for (; o->next != NULL;) {
-            o = o->next;
+        for (; prev->next != NULL;) {
+            prev = prev->next;
         }
-        o->next = outlet;
-        outlet->prev = o;
+        prev->next = new_outlet;
+        new_outlet->prev = prev;
     }
 
     C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tS3_outlet, volume, 0x8);
@@ -299,13 +299,13 @@ tS3_outlet* C2_HOOK_FASTCALL S3CreateOutlet(int pCount_channels_1, int pCount_ch
     C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tS3_outlet, id, 0x0);
     C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tS3_outlet, independent_pitch, 0xc);
 
-    outlet->volume = 0xff;
-    outlet->max_channels = nchannels - channels_remaining;
-    outlet->id = gS3_state.next_outlet_id;
+    new_outlet->volume = 0xff;
+    new_outlet->max_channels = count - created;
+    new_outlet->id = gS3_state.next_outlet_id;
     gS3_state.next_outlet_id += 1;
-    outlet->independent_pitch = gPD_S3_config.independent_pitch;
+    new_outlet->independent_pitch = gPD_S3_config.independent_pitch;
     gS3_state.count_outlets += 1;
-    return outlet;
+    return new_outlet;
 }
 
 // FUNCTION: CARMA2_HW 0x005654e2
