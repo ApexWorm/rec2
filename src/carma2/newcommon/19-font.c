@@ -502,12 +502,13 @@ void C2_HOOK_FASTCALL CreatePolyFont(int pFont, const char* pName, float pFactor
 
     LoadPolyFont(pName, pSize, pFont);
 
-    if (pFont == kPolyfont_ingame_big_timer) {
-        for (i = 0; i < (int)REC2_ASIZE(gPoly_fonts[kPolyfont_ingame_big_timer].glyphs); i++) {
-            gPoly_fonts[kPolyfont_ingame_big_timer].glyphs[i].glyph_width = 27;
-        }
-        gPoly_fonts[kPolyfont_ingame_big_timer].glyphs[58].glyph_width = 11; /* FIXME: What is gyph 58? */
+    if (pFont != kPolyfont_ingame_big_timer) {
+        return;
     }
+    for (i = 0; i < (int)REC2_ASIZE(gPoly_fonts[kPolyfont_ingame_big_timer].glyphs); i++) {
+        gPoly_fonts[kPolyfont_ingame_big_timer].glyphs[i].glyph_width = 27;
+    }
+    gPoly_fonts[kPolyfont_ingame_big_timer].glyphs[58].glyph_width = 11; /* FIXME: What is gyph 58? */
 }
 
 br_model* C2_HOOK_FASTCALL CreateFontCharacterModel(int pIndex, int pAscii, int pWidth, int pHeight, const char* pName) {
