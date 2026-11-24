@@ -837,13 +837,17 @@ void C2_HOOK_FASTCALL UpdateFirePoly(int pIndex) {
             /* Average heat left-right-up-below */
             int avg =
                 ((gTintedPolys[pIndex].tints2[j + 1][i + 0]       /* up */
+                + gTintedPolys[pIndex].tints2[j + 0][i - 1]       /* left */
                 + gTintedPolys[pIndex].tints2[j - 1][i + 0]       /* below */
-                + gTintedPolys[pIndex].tints2[j + 0][i + 1]       /* right */
-                + gTintedPolys[pIndex].tints2[j + 0][i - 1]) / 4  /* left */
+                + gTintedPolys[pIndex].tints2[j + 0][i + 1]) / 4  /* right */
                 + gTintedPolys[pIndex].tints2[j][i]) / 2          /* pixel itself */
             - gTintedPolys[pIndex].tints1[j][i]
             - gFire_poly_delayed_iteration;
-            gTintedPolys[pIndex].tints3[j][i + 1] = MAX(0, avg);
+            if (avg > 0) {
+                gTintedPolys[pIndex].tints3[j][i - 1] = avg;
+            } else {
+                gTintedPolys[pIndex].tints3[j][i - 1] = 0;
+            }
         }
     }
 
