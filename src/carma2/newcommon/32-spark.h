@@ -90,7 +90,7 @@ extern void C2_HOOK_FASTCALL CreateShrapnelShowerWorld(const br_vector3* pPositi
 
 // random
 
-// InitShrapnel
+extern void C2_HOOK_FASTCALL InitShrapnel(void);
 
 extern void C2_HOOK_FASTCALL LoadInShrapnel(void);
 
@@ -228,7 +228,7 @@ extern void C2_HOOK_FASTCALL GetSmokeShadeTables(FILE* pF);
 
 extern void C2_HOOK_FASTCALL FreeSmokeShadeTables(void);
 
-// LoadInKevStuff
+extern void C2_HOOK_FASTCALL LoadInKevStuff(FILE* pF);
 
 // DisposeKevStuff
 
@@ -264,7 +264,7 @@ extern void C2_HOOK_FASTCALL UnBlendifyCar(tCar_spec* pCar);
 
 extern int C2_HOOK_FASTCALL IsCarSmoking(tCar_spec* pCar);
 
-// ClearSplashReplay
+extern void C2_HOOK_FASTCALL ClearSplashReplay(uintptr_t pObject);
 
 extern void* C2_HOOK_FASTCALL GetSplashIndex(tPhysics_object* pObject);
 

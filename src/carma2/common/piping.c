@@ -827,7 +827,7 @@ void C2_HOOK_FASTCALL PipeSingleVector3(br_vector3* pDest, br_vector3* pValue) {
 // FUNCTION: CARMA2_HW 0x004c8d80
 void C2_HOOK_FASTCALL PipeSingleGrooveOnOff(int pOn, br_actor *pActor, int pBlock_flags) {
 
-    ARDoSingleVariedSession(ePipe_single_groove_on_off, (uintptr_t)pActor, 2,
+    ARDoSingleVariedSession(ePipe_chunk_groove_on_off, (uintptr_t)pActor, 2,
         SIZE_OFFSET_PIPING(tPipe_single_groove_on_of, enable), pOn,
         SIZE_OFFSET_PIPING(tPipe_single_groove_on_of, block_flags), pBlock_flags);
 }
@@ -864,7 +864,7 @@ void C2_HOOK_FASTCALL AddModelMashToPipingSession(br_model* pModel, br_vector3* 
     }
     pipe_model_mash->model = pModel;
     ARCompressModelMash(pipe_model_mash->vectors, pModel, pMash);
-    ARAddDataToSession(ePipe_model_mash, -1, pipe_model_mash, size);
+    ARAddDataToSession(ePipe_chunk_model_mash, -1, pipe_model_mash, size);
 }
 
 // FUNCTION: CARMA2_HW 0x004c8a10
@@ -879,7 +879,7 @@ void C2_HOOK_FASTCALL PipeSingleSmashTextureChange(tCar_spec* pCar_spec, br_mate
 // FUNCTION: CARMA2_HW 0x004c8de0
 void C2_HOOK_FASTCALL PipeSingleFunkEnable(int pIndex, int pFlags) {
 
-    ARDoSingleVariedSession(ePipe_funk_enable, (uintptr_t)pIndex, 1,
+    ARDoSingleVariedSession(ePipe_chunk_funk_enable, (uintptr_t)pIndex, 1,
         SIZE_OFFSET_PIPING(tPipe_funk_enable, flags), pFlags);
 }
 
@@ -893,7 +893,7 @@ void C2_HOOK_FASTCALL PipeSingleSpecial(tSpecial_type pType) {
 void C2_HOOK_FASTCALL PipeSingleDroneStraightPos(tDrone_spec* pDrone, undefined4 pParam1, tU16 pParam2, tU16 pParam3) {
 
     // FIXME: is this a bug, or is pParam2 intentionally ignored?
-    ARDoSingleVariedSession(ePipe_chunk_single_drone_straight_pos, pDrone->id, 3,
+    ARDoSingleVariedSession(ePipe_chunk_drone_straight_pos, pDrone->id, 3,
         SIZE_OFFSET_PIPING(tPipe_single_drone_straight_pos, field_0x0), pParam1,
         SIZE_OFFSET_PIPING(tPipe_single_drone_straight_pos, field_0x4), pParam3,
         SIZE_OFFSET_PIPING(tPipe_single_drone_straight_pos, field_0x6), pParam3);
@@ -902,7 +902,7 @@ void C2_HOOK_FASTCALL PipeSingleDroneStraightPos(tDrone_spec* pDrone, undefined4
 // FUNCTION: CARMA2_HW 0x004c9020
 void C2_HOOK_FASTCALL PipeSingleOppoRenderage(tOpponent_spec *pOpponent_spec, int pEnable) {
 
-    ARDoSingleVariedSession(ePipe_chunk_single_oppo_renderage, (uintptr_t)pOpponent_spec, 1,
+    ARDoSingleVariedSession(ePipe_chunk_oppo_renderage, (uintptr_t)pOpponent_spec, 1,
         SIZE_OFFSET_PIPING(tPipe_single_oppo_renderage, enable), pEnable);
 }
 
@@ -953,7 +953,7 @@ void C2_HOOK_FASTCALL PipeSinglePedModelChange(tPedestrian* pPed, undefined4 pAr
 // FUNCTION: CARMA2_HW 0x004c83f0
 void C2_HOOK_FASTCALL PipeSingleGraphicalWheelStuff(tCar_spec* pCar) {
 
-    ARDoSingleVariedSession(ePipe_chunk_single_graphical_wheel_stuff, (uintptr_t)pCar, 5,
+    ARDoSingleVariedSession(ePipe_chunk_graphical_wheel_stuff, (uintptr_t)pCar, 5,
         SIZE_OFFSET_PIPING(tPipe_single_graphical_wheel_stuff, steering_angle), (tU16)(pCar->steering_angle * (32767.f / 60.f)),
         SIZE_OFFSET_PIPING(tPipe_single_graphical_wheel_stuff, lf_sus_position), pCar->lf_sus_position * 127.f * (20.f / 3.f),
         SIZE_OFFSET_PIPING(tPipe_single_graphical_wheel_stuff, rf_sus_position), pCar->rf_sus_position * 127.f * (20.f / 3.f),

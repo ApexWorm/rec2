@@ -143,11 +143,11 @@ extern void C2_HOOK_FASTCALL ARMainLoopStart(void);
 
 // ARToggleReplay
 
-// GetReducedPos
+extern void C2_HOOK_FASTCALL GetReducedPos(br_vector3* pPos, const tReduced_pos* pReduced_pos);
 
 extern void C2_HOOK_FASTCALL SaveReducedPos(tReduced_pos* pReduced_pos, br_vector3* pPos);
 
-// InitLastDamageArrayEtc
+extern void C2_HOOK_FASTCALL InitLastDamageArrayEtc(void);
 
 extern void C2_HOOK_FASTCALL ResetCars(void);
 
@@ -223,9 +223,9 @@ extern void C2_HOOK_FASTCALL PipeSingleGraphicalWheelStuff(tCar_spec* pCar);
 
 extern void C2_HOOK_FASTCALL PipeSingleSound(tS3_outlet* pOutlet, int pSound, tS3_volume pL_volume, tS3_volume pR_volume, int pPitch, const br_vector3* pPosition);
 
-extern void C2_HOOK_FASTCALL PipeSingleSpecial(tSpecial_type pType);
+extern void C2_HOOK_FASTCALL PipeSingleSpecial(tPipe_special_action pType);
 
-// PipeSingleCarIncident
+extern void C2_HOOK_FASTCALL PipeSingleCarIncident(tCar_spec* pCar, br_vector3* pPosition, float pForce);
 
 extern void C2_HOOK_FASTCALL PipeSinglePedIncident(tPedestrian* pPed, br_actor* pActor);
 
@@ -277,9 +277,9 @@ extern void C2_HOOK_FASTCALL PipeSinglePedModelChange(tPedestrian* pPed, int pBo
 
 extern void C2_HOOK_FASTCALL PipeSinglePHILObject(tPhysics_object* pObject);
 
-// PipeSingleGibShower
+extern void C2_HOOK_FASTCALL PipeSingleGibShower(uintptr_t pId, tU32 pTime, tU32 pUid, float pForce, undefined4 pArg5, const br_vector3* pP1, const br_vector3* pP2, const br_vector3* pV);
 
-// PipeSingleBloodSpurt
+extern void C2_HOOK_FASTCALL PipeSingleBloodSpurt(uintptr_t pId, tU32 pTime, tU32 pSeed, const br_vector3* pPosition, const br_vector3* pImpactee_velocity, const br_vector3* pNormal);
 
 extern void C2_HOOK_FASTCALL PipeSingleGrooveOnOff(int pOn, br_actor* pActor, int pBlock_flags);
 
@@ -305,7 +305,7 @@ extern void C2_HOOK_FASTCALL PipeSingleDroneStraightPos(tDrone_spec* pDrone, tDr
 
 extern void C2_HOOK_FASTCALL PipeSinglePowerupRespawn(br_actor* pActor, int pPowerup_id);
 
-// PipeSingleShitMine
+extern void C2_HOOK_FASTCALL PipeSingleShitMine(br_actor* pActor);
 
 extern void C2_HOOK_FASTCALL PipeSingleEndShitMine(br_actor* pActor);
 
@@ -327,7 +327,7 @@ extern void C2_HOOK_FASTCALL ApplyScreenWobble(tPipe_chunk** pChunk);
 
 extern void C2_HOOK_FASTCALL ApplyNonCar(tPipe_chunk** pChunk);
 
-// ApplySmoke
+extern void C2_HOOK_FASTCALL ApplySmoke(tPipe_chunk** pChunk);
 
 extern void C2_HOOK_FASTCALL ApplySmokeColumn(tPipe_chunk** pChunk);
 
@@ -349,7 +349,7 @@ extern void C2_HOOK_FASTCALL ApplyGWS(tPipe_chunk** pChunk);
 
 // ApplyDamage
 
-// ApplySpecial
+extern void C2_HOOK_FASTCALL ApplySpecial(tPipe_chunk** pChunk);
 
 extern void C2_HOOK_FASTCALL ApplyProxRay(tPipe_chunk** pChunk);
 
@@ -359,7 +359,7 @@ extern void C2_HOOK_FASTCALL ApplyFlap(tPipe_chunk** pChunk);
 
 extern void C2_HOOK_FASTCALL ApplyModelMash(tPipe_chunk** pChunk);
 
-// ApplyRelink
+extern void C2_HOOK_FASTCALL ApplyRelink(tPipe_chunk** pChunk);
 
 extern void C2_HOOK_FASTCALL ApplyIdentity(tPipe_chunk** pChunk);
 
@@ -401,7 +401,7 @@ extern void C2_HOOK_FASTCALL ApplyPedDir(tPipe_chunk** pChunk);
 
 extern void C2_HOOK_FASTCALL ApplyPedFPChange(tPipe_chunk** pChunk);
 
-// ApplyPedPos
+extern void C2_HOOK_FASTCALL ApplyPedPos(tPipe_chunk** pChunk);
 
 // ApplyPedModelChange
 
@@ -445,7 +445,7 @@ extern void C2_HOOK_FASTCALL ApplyEndShitMine(tPipe_chunk** pChunk);
 
 extern void C2_HOOK_FASTCALL ApplyTransformType(tPipe_chunk** pChunk);
 
-// ApplyOppoRenderage
+extern void C2_HOOK_FASTCALL ApplyOppoRenderage(tPipe_chunk** pChunk);
 
 // UndoCrush
 
@@ -457,7 +457,7 @@ extern void C2_HOOK_FASTCALL UndoSmudge(tPipe_chunk** pChunk, tPipe_chunk* pPrev
 
 extern void C2_HOOK_FASTCALL UndoScreenWobble(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk);
 
-// UndoSplash
+extern void C2_HOOK_FASTCALL UndoSplash(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk);
 
 // UndoExtendedSplash
 
@@ -469,7 +469,7 @@ extern void C2_HOOK_FASTCALL UndoModelMash(tPipe_chunk** pChunk, tPipe_chunk* pP
 
 extern void C2_HOOK_FASTCALL UndoRelink(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk);
 
-// UndoSplitWeld
+extern void C2_HOOK_FASTCALL UndoSplitWeld(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk);
 
 extern void C2_HOOK_FASTCALL UndoBend(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk);
 
