@@ -42,6 +42,7 @@ int gNon_fatal_allocation_errors;
 
 // GLOBAL: CARMA2_HW 0x005933e8
 // GLOBAL: CARMA2_SW 0x0058e348
+// GLOBAL: CARMA2_CHEAT 0x00599d40
 const char* gMem_names[256] = {
     "",
     "BR_MEMORY_SCRATCH",
@@ -378,17 +379,7 @@ void* C2_HOOK_CDECL DRStdlibAllocate(br_size_t size, br_uint_8 type) {
     if (size != 0) {
         p = HeapAlloc(GetProcessHeap(), 0, size);
         if (p != NULL) {
-            br_size_t o;
-            if (gPage_size == 0) {
-                GetSystemInfo(&gSystem_info);
-                gPage_size = gSystem_info.dwPageSize;
-            }
-            for (o = gPage_size * 16; o < size; o += gPage_size) {
-                volatile br_uint_8 *ptr1 = (br_uint_8*)p + (o - 16 * gPage_size);
-                volatile br_uint_8 *ptr2 = (br_uint_8*)p + o;
-                *ptr1 = *ptr1;
-                *ptr2 = *ptr2;
-            }
+            TouchMemoryPages(p, size);
             return p;
         }
         if (!gNon_fatal_allocation_errors) {
