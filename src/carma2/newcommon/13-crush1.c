@@ -2092,11 +2092,38 @@ intptr_t C2_HOOK_CDECL MakeCarModelsMaterialsSingleSided(br_actor* pActor, void*
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x00434f60
-// STUB: CARMA2_SW 0x00434f90
-// STUB: CARMA2_CHEAT 0x00435150
+// FUNCTION: CARMA2_HW 0x00434f60
+// FUNCTION: CARMA2_SW 0x00434f90
+// FUNCTION: CARMA2_CHEAT 0x00435150
 void C2_HOOK_FASTCALL BendPoint(br_vector3* pPoint, const tBend_point_context* pContext) {
-    NOT_IMPLEMENTED();
+    br_vector3 tv;
+    br_scalar x;
+    br_scalar y;
+    br_scalar z;
+    br_scalar xy;
+    tBend_point_spec* spec;
+    int flag;
+
+    spec = pContext->field_0x34;
+    flag = spec->field_0x74;
+    z = pPoint->v[2] - spec->field_0x20;
+    if ((flag && z <= 0.f) || (!flag && z >= 0.f)) {
+        BrMatrix34ApplyP(&tv, pPoint, &pContext->field_0x4);
+        BrVector3Copy(pPoint, &tv);
+        return;
+    }
+    BrVector3Sub(&tv, pPoint, &spec->field_0x24);
+    if ((flag && tv.v[2] <= 0.f) || (!flag && tv.v[2] >= 0.f)) {
+        x = tv.v[0] / spec->field_0x30.v[0];
+        y = tv.v[1] / spec->field_0x30.v[1];
+        z = tv.v[2] / spec->field_0x30.v[2];
+        xy = y * x;
+        tv.v[0] = (spec->field_0x44.v[0] * xy + spec->field_0x50.v[0] * x + spec->field_0x5c.v[0] * y + spec->field_0x68.v[0]);
+        tv.v[1] = (spec->field_0x44.v[1] * xy + spec->field_0x50.v[1] * x + spec->field_0x5c.v[1] * y + spec->field_0x68.v[1]);
+        tv.v[2] = (spec->field_0x44.v[2] * xy + spec->field_0x50.v[2] * x + spec->field_0x5c.v[2] * y + spec->field_0x68.v[2]);
+        BrVector3Scale(&tv, &tv, z);
+        BrVector3Accumulate(pPoint, &tv);
+    }
 }
 
 #ifdef REC2_MATCHING
