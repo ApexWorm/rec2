@@ -727,8 +727,8 @@ void C2_HOOK_FASTCALL SetGroup(tPhysics_object* pObject, int pGroup) {
 void C2_HOOK_FASTCALL MakeObjectListDoSomething(tPhysics_object* pObject) {
     while (pObject != NULL) {
         if (pObject->disable_move_rotate) {
-            pObject->disable_move_rotate = 0;
             pObject->box_face_ref = gFace_num__car - 2;
+            pObject->disable_move_rotate = 0;
         }
         if (pObject->child != NULL) {
             MakeObjectListDoSomething(pObject->child);
