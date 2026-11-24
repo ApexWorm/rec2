@@ -216,36 +216,48 @@ void C2_HOOK_FASTCALL PDS3ReleaseSound(tS3_descriptor* pSound_descriptor) {
 // FUNCTION: CARMA2_SW 0x00564aa1
 // FUNCTION: CARMA2_CHEAT 0x0056efec
 int C2_HOOK_FASTCALL PDReverseAudio(tS3_channel* pChannel) {
-    tU8* buffer_data;
-    DWORD buffer_data_size;
-    DWORD i;
+    tU8* data;
+    DWORD nbytes;
+    int cnt;
     tU8* tmp_buffer;
-    DWORD sample_size;
+    DWORD size;
+    LPDIRECTSOUNDBUFFER dsb;
+    tS3_buffer_desc* desc;
+    undefined4 dword;
 
-    LPDIRECTSOUNDBUFFER buffer = pChannel->descriptor->pd_handle;
-    if (buffer == NULL) {
+    data = NULL;
+    dsb = pChannel->descriptor->pd_handle;
+    if (dsb == NULL) {
         return 1;
     }
-    sample_size = pChannel->descriptor->buffer_description->sample_size;
-    if (sample_size > 2000000) {
-        return 0;
+    desc = pChannel->descriptor->buffer_description;
+    dword = desc->field_0x10;
+    size = desc->sample_size;
+    if (IDirectSoundBuffer_Lock(dsb, 0, size, (void**)&data, &nbytes, NULL, NULL, 0) == DS_OK) {
+#ifndef REC2_CHEAT
+        if (size > 2000000) {
+            return 0;
+        }
+#endif
+        tmp_buffer = S3MemAllocate(size, kMem_S3_Windows_95_create_temp_buffer_space_to_reverse_sample);
+        if (tmp_buffer == NULL) {
+            return 1;
+        }
+        memmove(tmp_buffer, data, nbytes);
+        for (cnt = 0; cnt < (int)nbytes; cnt++) {
+#ifdef REC2_CHEAT
+            data[cnt] = tmp_buffer[size - cnt];
+#else
+            data[cnt] = tmp_buffer[size - cnt - 1];
+#endif
+        }
+        S3MemFree(tmp_buffer);
+        IDirectSoundBuffer_Unlock(dsb, data, nbytes, NULL, 0);
     }
-    if (FAILED(IDirectSoundBuffer_Lock(buffer, 0, sample_size, (void**)&buffer_data, &buffer_data_size, NULL, NULL, 0))) {
-        return 0;
-    }
-    tmp_buffer = S3MemAllocate(sample_size, kMem_S3_Windows_95_create_temp_buffer_space_to_reverse_sample);
-    if (tmp_buffer == NULL) {
-        IDirectSoundBuffer_Unlock(buffer, buffer_data, buffer_data_size, NULL, 0);
-        return 1;
-    }
-    memmove(tmp_buffer, buffer_data, buffer_data_size);
-    for (i = 0; i < buffer_data_size; i++) {
-        buffer_data[i] = tmp_buffer[sample_size - 1 - i];
-    }
-    S3MemFree(tmp_buffer);
-    IDirectSoundBuffer_Unlock(buffer, buffer_data, buffer_data_size, NULL, 0);
+    (void)dword;
     return 0;
 }
+
 
 // FUNCTION: CARMA2_HW 0x00569b30
 const char* C2_HOOK_FASTCALL PDS3GetWorkingDirectory(void) {
