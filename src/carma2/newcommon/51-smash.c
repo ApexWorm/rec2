@@ -145,7 +145,7 @@ int gCount_queued_smashes;
 // GLOBAL: CARMA2_CHEAT 0x006b3578
 br_vector3 gZero_vector__smash;
 
-int C2_HOOK_FASTCALL PointOutOfSightNotAR(br_vector3* pPos, br_scalar pMax_distance) {
+int C2_HOOK_FASTCALL PointOutOfSightNotAR(const br_vector3* pPos, br_scalar pMax_distance) {
 
     return !gAction_replay_mode && PointOutOfSight(pPos, pMax_distance);
 }

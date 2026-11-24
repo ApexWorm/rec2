@@ -49,7 +49,7 @@ typedef struct {
     tSmash_triangle_mapping triangles[2];
 } tSmash_quad_mapping;
 
-extern int C2_HOOK_FASTCALL PointOutOfSightNotAR(br_vector3* pPos, br_scalar pMax_distance);
+extern int C2_HOOK_FASTCALL PointOutOfSightNotAR(const br_vector3* pPos, br_scalar pMax_distance);
 
 extern void C2_HOOK_FASTCALL InitFogificateMaterials(void);
 
