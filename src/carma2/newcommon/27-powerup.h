@@ -60,7 +60,7 @@ extern char* C2_HOOK_FASTCALL GetPowerupMessage(int pPowerup_index);
 
 // QueueIconGoing
 
-// QueueIconComing
+extern void C2_HOOK_FASTCALL QueueIconComing(tPowerup* pPowerup, tHeadup_icon* pHeadup_icons, int* pCount_icons);
 
 // LosePowerupX
 
@@ -392,7 +392,7 @@ extern void C2_HOOK_FASTCALL ARPowerupLose(tPowerup* pPowerup, tCar_spec* pCar);
 
 // SetPissed
 
-// ResetPissed
+extern void C2_HOOK_FASTCALL ResetPissed(tPowerup* pPowerup, tCar_spec* pCar);
 
 // PissedEffect
 
@@ -402,9 +402,9 @@ extern void C2_HOOK_CDECL RenderChangingPowerup(br_actor* pActor, br_model* pMod
 
 extern void C2_HOOK_FASTCALL SetSpinningPowerup(br_actor* pActor, int pOpacity);
 
-// DuplicateModel
+extern br_model* C2_HOOK_FASTCALL DuplicateModel(br_model* pModel, const char* pName);
 
-// SetChangingPowerup
+extern void C2_HOOK_FASTCALL SetChangingPowerup(br_actor* pActor);
 
 extern int C2_HOOK_FASTCALL PedValium(tPowerup* pPowerup, tCar_spec* pCar);
 

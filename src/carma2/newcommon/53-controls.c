@@ -708,7 +708,7 @@ void C2_HOOK_FASTCALL SetRecovery(void) {
         if (gNet_mode != eNet_mode_none) {
             if (gProgram_state.current_car.time_to_recover) {
                 if (gCancel_recover) {
-                    if (GetRaceTime() + 600 < gProgram_state.current_car.time_to_recover) {
+                    if (gProgram_state.current_car.time_to_recover > GetRaceTime() + 600) {
                         gProgram_state.current_car.time_to_recover = 0;
                         if (!gINT_0067c470) {
                             EarnCredits((int)(gNet_mode != eNet_mode_none ? gRecovery_cost.initial_network[gCurrent_net_game->type] : gRecovery_cost.initial[gProgram_state.skill_level]));
@@ -858,7 +858,20 @@ void C2_HOOK_FASTCALL GetPowerup(int pNum) {
     GotPowerup(&gProgram_state.current_car, pNum);
 }
 
-// CheckSystemKeys
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_HW 0x00442e90
+// STUB: CARMA2_SW 0x00442f70
+// STUB: CARMA2_CHEAT 0x00442fb0
+void C2_HOOK_FASTCALL CheckSystemKeys(int pRacing) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // FUNCTION: CARMA2_HW 0x00443c50
 // FUNCTION: CARMA2_SW 0x00443d30
