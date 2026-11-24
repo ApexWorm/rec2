@@ -527,32 +527,36 @@ int C2_HOOK_FASTCALL PDS3PlaySample(tS3_channel* pChannel) {
 // FUNCTION: CARMA2_SW 0x00565233
 // FUNCTION: CARMA2_CHEAT 0x0056f784
 tS3_error_codes C2_HOOK_FASTCALL PDS3StartMidiChannel(tS3_channel* pChannel) {
-    char path[256];
-    MCIERROR err;
-    MCIDEVICEID device;
+    char* name;
+    char path[80];
+    char* element_name;
+    MCIERROR error;
+    MCIDEVICEID midi_device;
 
+    name = pChannel->descriptor->path;
     path[0] = '\0';
-    strcpy(path, pChannel->descriptor->path);
+    strcpy(path, name);
     strcat(path, ".MID");
-    mci_open_params.lpstrElementName = path;
+    element_name = path;
     mci_open_params.lpstrDeviceType = "sequencer";
-    err = mciSendCommandA(0, MCI_OPEN, MCI_OPEN_TYPE | MCI_OPEN_ELEMENT, (DWORD_PTR)&mci_open_params);
-    device = mci_open_params.wDeviceID;
-    if (err != 0) {
+    mci_open_params.lpstrElementName = element_name;
+    error = mciSendCommandA(0, MCI_OPEN, MCI_OPEN_TYPE | MCI_OPEN_ELEMENT, (DWORD_PTR)&mci_open_params);
+    if (error != 0) {
         return eS3_error_start_song;
     }
+    midi_device = mci_open_params.wDeviceID;
     gPDS3_mci_midi_status_parms.dwItem = MCI_VD_STATUS_FORWARD;
-    err = mciSendCommandA(device, MCI_STATUS, MCI_STATUS_ITEM, (DWORD_PTR)&gPDS3_mci_midi_status_parms);
-    if (err != 0) {
-        mciSendCommandA(device, MCI_CLOSE, 0, 0);
+    error = mciSendCommandA(midi_device, MCI_STATUS, MCI_STATUS_ITEM, (DWORD_PTR)&gPDS3_mci_midi_status_parms);
+    if (error != 0) {
+        mciSendCommandA(midi_device, MCI_CLOSE, 0, 0);
         return eS3_error_start_song;
     }
-    err = mciSendCommandA(device, MCI_PLAY, 0, (DWORD_PTR)&mci_play_parms);
-    if (err != 0) {
-        mciSendCommandA(device, MCI_CLOSE, 0, 0);
+    error = mciSendCommandA(midi_device, MCI_PLAY, 0, (DWORD_PTR)&mci_play_parms);
+    if (error != 0) {
+        mciSendCommandA(midi_device, MCI_CLOSE, 0, 0);
         return eS3_error_start_song;
     }
-    pChannel->mciDevice = device;
+    pChannel->mciDevice = midi_device;
     gPDS3_midi_playing = 1;
     return eS3_error_none;
 }
