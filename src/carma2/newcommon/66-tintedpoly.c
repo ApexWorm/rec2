@@ -74,6 +74,7 @@ br_uint_32 gTintedColourMap_blu;
 
 // GLOBAL: CARMA2_HW 0x006a0440
 // GLOBAL: CARMA2_SW 0x0069a498
+// GLOBAL: CARMA2_CHEAT 0x006a7fb8
 int gFire_poly_short_iteration;
 
 // GLOBAL: CARMA2_HW 0x006a0444
@@ -841,8 +842,7 @@ void C2_HOOK_FASTCALL UpdateFirePoly(int pIndex) {
                 + gTintedPolys[pIndex].tints2[j - 1][i + 0]       /* below */
                 + gTintedPolys[pIndex].tints2[j + 0][i + 1]) / 4  /* right */
                 + gTintedPolys[pIndex].tints2[j][i]) / 2          /* pixel itself */
-            - gTintedPolys[pIndex].tints1[j][i]
-            - gFire_poly_delayed_iteration;
+            - (gFire_poly_delayed_iteration + gTintedPolys[pIndex].tints1[j][i]);
             if (avg > 0) {
                 gTintedPolys[pIndex].tints3[j][i - 1] = avg;
             } else {
@@ -866,7 +866,7 @@ void C2_HOOK_FASTCALL UpdateFirePoly(int pIndex) {
     for (i = 0; i < FIRE_WIDTH; i++) {
         for (j = 0; j < FIRE_HEIGHT; j++) {
             int idx = gTintedPolys[pIndex].tints3[j][i];
-            BrPixelmapPixelSet(gTintedPolys[pIndex].pixelmap, i, j, gTintedPolys[pIndex].colours[idx]);
+            BrPixelmapPixelSet(gTintedPolys[pIndex].pixelmap, j, i, gTintedPolys[pIndex].colours[idx]);
         }
     }
     BrMapUpdate(gTintedPolys[pIndex].pixelmap, BR_MAPU_ALL);
