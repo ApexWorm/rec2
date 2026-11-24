@@ -467,13 +467,11 @@ char C2_HOOK_FASTCALL PDConvertToASCIILessThan128(char pChar) {
     tU8 b = pChar;
 
     if (b >= 128) {
-        b = gExtendedAsciiToNormalAscii[b - 128];
-        dr_dprintf("PDConvertToASCIILessThan128() Returning %d", b);
-        return b;
-    } else {
-        dr_dprintf("PDConvertToASCIILessThan128() Returning %d", b);
-        return b;
+        dr_dprintf("PDConvertToASCIILessThan128() Returning %d", (tU8)gExtendedAsciiToNormalAscii[b - 128]);
+        return gExtendedAsciiToNormalAscii[b - 128];
     }
+    dr_dprintf("PDConvertToASCIILessThan128() Returning %d", b);
+    return b;
 }
 
 // FUNCTION: CARMA2_HW 0x0051b040
