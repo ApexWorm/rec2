@@ -60,7 +60,7 @@ extern char* C2_HOOK_FASTCALL GetPowerupMessage(int pPowerup_index);
 
 // QueueIconGoing
 
-// QueueIconComing
+extern void C2_HOOK_FASTCALL QueueIconComing(tPowerup* pPowerup, tHeadup_icon* pHeadup_icons, int* pCount_icons);
 
 // LosePowerupX
 
