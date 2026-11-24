@@ -775,6 +775,8 @@ void C2_HOOK_FASTCALL S3SoundBankReaderSkipWhitespace(tS3_soundbank_read_ctx* pC
 }
 
 // FUNCTION: CARMA2_HW 0x0056828c
+// FUNCTION: CARMA2_SW 0x0056392c
+// FUNCTION: CARMA2_CHEAT 0x0056de7c
 int C2_HOOK_FASTCALL S3SoundBankReadEntry(tS3_soundbank_read_ctx *pContext, char* pDir_name, int pLow_memory_mode) {
     tS3_descriptor* sd;
     unsigned int k;
@@ -785,6 +787,8 @@ int C2_HOOK_FASTCALL S3SoundBankReadEntry(tS3_soundbank_read_ctx *pContext, char
     int alternative;
 
     // GLOBAL: CARMA2_HW 0x006b2c8c
+    // GLOBAL: CARMA2_SW 0x006ac414
+    // GLOBAL: CARMA2_CHEAT 0x006ba31c
     static char cda_dir_name[4];
 
     sd = S3CreateDescriptor();
