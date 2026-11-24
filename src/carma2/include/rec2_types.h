@@ -4685,6 +4685,9 @@ typedef struct {
     float field_0xc;
     float field_0x10;
     float field_0x14;
+#ifdef REC2_CHEAT
+    undefined4 cheat_variable; /* FIXME: unknown offset (before 0x18) */
+#endif
     br_vector3 field_0x18;
     br_vector3 field_0x24;
     br_matrix34 field_0x30;
