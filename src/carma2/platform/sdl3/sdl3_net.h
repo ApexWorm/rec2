@@ -21,7 +21,7 @@ extern int PDNetJoinGame(tNet_game_details* pGame_details, const char *pName);
 
 extern void PDNetHostFinishGame(tNet_game_details* pDetails);
 
-extern void PDNetLeaveGame(void);
+extern void PDNetLeaveGame(tNet_game_details* pDetails);
 
 extern void MakeMessageToSend(int pMessage_type);
 

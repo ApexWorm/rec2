@@ -464,7 +464,7 @@ void C2_HOOK_FASTCALL NetLeaveGameLowLevel(void) {
     if (gNet_mode == eNet_mode_host) {
         PDNetHostFinishGame(gCurrent_net_game);
     } else {
-        PDNetLeaveGame();
+        PDNetLeaveGame(gCurrent_join_poll_game);
     }
 }
 
