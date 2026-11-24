@@ -482,7 +482,11 @@ void C2_HOOK_FASTCALL SSDXBlitOrFlip(void) {
 // FUNCTION: CARMA2_HW 0x00500bd0
 void C2_HOOK_FASTCALL SSDXBlit(void) {
 
-    IDirectDrawSurface_Blt(gPrimary_surface, &gSSDXWindowPos, gAttached_surface, &gSSDXRect, DDBLT_WAIT, NULL);
+    if (gWindowed) {
+        IDirectDrawSurface_Blt(gPrimary_surface, &gSSDXWindowPos, gAttached_surface, &gSSDXRect, DDBLT_WAIT, NULL);
+    } else {
+        IDirectDrawSurface_Blt(gPrimary_surface, &gSSDXWindowPos, gAttached_surface, &gSSDXRect, DDBLT_WAIT, NULL);
+    }
 }
 
 // FUNCTION: CARMA2_HW 0x00500c00
