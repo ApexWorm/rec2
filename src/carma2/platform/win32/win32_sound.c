@@ -163,28 +163,85 @@ int C2_HOOK_FASTCALL PDS3InitCDA(void) {
     return 1;
 }
 
-void* C2_HOOK_FASTCALL PDS3CreateSoundBuffer(tS3_wav_info* pWav_info, void* pWav_buffer) {
-    LPDIRECTSOUNDBUFFER buffer;
-    DSBUFFERDESC buffer_desc;
-    void* buffer_data;
-    DWORD buffer_data_size;
+// FUNCTION: CARMA2_HW 0x0056907c
+// FUNCTION: CARMA2_SW 0x0056471c
+void* C2_HOOK_FASTCALL S3BufferWav(const char* pPath, tS3_buffer_desc* pBuffer_desc) {
+    FILE* fp;
+    int status;
+    int num;
+    char leaf[512];
+    DWORD locked_size;
+    tS3_wav_file* file_data;
+    LPDIRECTSOUNDBUFFER sound_buffer;
+    DSBUFFERDESC dsbdesc;
+    tS3_wav_info wav_info;
+    void* data_ptr;
+    char path[512];
+
+    data_ptr = NULL;
+    status = 0;
+    locked_size = 0;
+    if (gS3_low_memory_mode) {
+        sprintf(path, "DATA%sSOUNDS%s%s", gS3_path_separator, gS3_path_separator, pPath);
+        fp = S3_low_memory_fopen(path, "rb");
+    } else if (gS3_sound_dirname[0]) {
+        PDExtractFilename(leaf, pPath);
+        sprintf(path, "%s\\%s", gS3_sound_dirname, leaf);
+        fp = fopen(path, "rb");
+    } else {
+        fp = fopen(pPath, "rb");
+    }
+    if (fp == NULL) {
+        gS3_last_error = eS3_error_readfile;
+        return NULL;
+    }
+    num = S3GetFileSize(fp);
+    if (num == 0) {
+        fclose(fp);
+        gS3_last_error = eS3_error_readfile;
+        return NULL;
+    }
+    file_data = S3MemAllocate(num, kMem_S3_Windows_95_load_WAV_file);
+    if (file_data == NULL) {
+        fclose(fp);
+        gS3_last_error = eS3_error_memory;
+        return NULL;
+    }
+    fread(file_data, 1, num, fp);
+    fclose(fp);
+
+    C2_HOOK_BUG_ON(sizeof(tS3_wav_info) != 0xc);
+
+    memset(&wav_info, 0, sizeof(tS3_wav_info));
+    if (!S3CheckWavHeader(file_data, &wav_info.wav_info_header, &wav_info.samples, &wav_info.sample_size)) {
+        gS3_last_error = eS3_error_readfile;
+        s3_dprintf("ERROR: .WAV file '%s' is crap", path);
+        return NULL;
+    }
+    pBuffer_desc->field_0x14 = 0;
+    pBuffer_desc->field_0x10 = 0;
+    pBuffer_desc->sample_size = wav_info.sample_size;
+    pBuffer_desc->sample_rate = wav_info.wav_info_header->sample_rate;
+    pBuffer_desc->bytes_per_second = wav_info.wav_info_header->avg_bytes_per_second;
+    pBuffer_desc->count_channels = wav_info.wav_info_header->number_of_channels;
 
     C2_HOOK_BUG_ON(sizeof(DSBUFFERDESC) != 0x14);
-    memset(&buffer_desc, 0, sizeof(buffer_desc));
-    buffer_desc.dwSize = sizeof(DSBUFFERDESC);
-    buffer_desc.dwFlags = DSBCAPS_GETCURRENTPOSITION2 | DSBCAPS_CTRLVOLUME | DSBCAPS_CTRLPAN | DSBCAPS_CTRLFREQUENCY | DSBCAPS_STATIC;
-    buffer_desc.dwBufferBytes = pWav_info->sample_size;
-    buffer_desc.lpwfxFormat = (LPWAVEFORMATEX)pWav_info->wav_info_header;
-    if (FAILED(IDirectSound_CreateSoundBuffer(gPD_S3_direct_sound, &buffer_desc, &buffer, NULL))) {
+    memset(&dsbdesc, 0, sizeof(dsbdesc));
+    dsbdesc.dwSize = sizeof(DSBUFFERDESC);
+    dsbdesc.dwFlags = DSBCAPS_GETCURRENTPOSITION2 | DSBCAPS_CTRLVOLUME | DSBCAPS_CTRLPAN | DSBCAPS_CTRLFREQUENCY | DSBCAPS_STATIC;
+    dsbdesc.dwBufferBytes = wav_info.sample_size;
+    dsbdesc.lpwfxFormat = (LPWAVEFORMATEX)wav_info.wav_info_header;
+    if (FAILED(IDirectSound_CreateSoundBuffer(gPD_S3_direct_sound, &dsbdesc, &sound_buffer, NULL))) {
         return NULL;
     }
-    if (FAILED(IDirectSoundBuffer_Lock(buffer, 0, pWav_info->sample_size, &buffer_data, &buffer_data_size, NULL, NULL, 0))) {
-        IDirectSoundBuffer_Release(buffer);
+    if (FAILED(IDirectSoundBuffer_Lock(sound_buffer, 0, wav_info.sample_size, &data_ptr, &locked_size, NULL, NULL, 0))) {
         return NULL;
     }
-    memmove(buffer_data, pWav_info->samples, buffer_data_size);
-    IDirectSoundBuffer_Unlock(buffer, buffer_data, buffer_data_size, NULL, 0);
-    return buffer;
+    memcpy(data_ptr, wav_info.samples, locked_size);
+    S3MemFree(file_data);
+    IDirectSoundBuffer_Unlock(sound_buffer, data_ptr, locked_size, NULL, 0);
+    (void)status;
+    return sound_buffer;
 }
 
 // FUNCTION: CARMA2_HW 0x005693d9

@@ -51,8 +51,6 @@ extern int C2_HOOK_FASTCALL PDS3DDXInit(void);
 
 extern int C2_HOOK_FASTCALL PDS3InitCDA(void);
 
-extern void* C2_HOOK_FASTCALL PDS3CreateSoundBuffer(tS3_wav_info* pWav_info, void* pWav_buffer);
-
 extern void C2_HOOK_FASTCALL PDS3ReleaseSound(tS3_descriptor* pSound_descriptor);
 
 extern int C2_HOOK_FASTCALL PDReverseAudio(tS3_channel* pChannel);
