@@ -29,7 +29,7 @@ extern int gCount_drones;
 
 extern int gCurrent_selected_drone;
 
-// DoNotDprintf
+extern void C2_HOOK_CDECL DoNotDprintf_drone(const char* pMessage, ...);
 
 // CrappyLittleVector3DPrintf
 

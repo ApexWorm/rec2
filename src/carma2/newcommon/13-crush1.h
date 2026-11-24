@@ -542,7 +542,7 @@ extern void C2_HOOK_FASTCALL ReceivedToggleFlaps(tNet_message_chunk* pContents);
 
 extern int C2_HOOK_FASTCALL GetNetShapeDataLengthFromShape(tCar_spec* pCar);
 
-// GetNetShapeDataLengthFromData
+extern int C2_HOOK_FASTCALL GetNetShapeDataLengthFromData(tU8* pData);
 
 extern void C2_HOOK_FASTCALL EncodeNetShapeData(tU8* pData, tCar_spec* pCar);
 

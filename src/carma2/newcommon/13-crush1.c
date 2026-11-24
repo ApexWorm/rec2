@@ -2631,7 +2631,29 @@ int C2_HOOK_FASTCALL GetNetShapeDataLengthFromShape(tCar_spec* pCar) {
     }
 }
 
-// GetNetShapeDataLengthFromData
+// FUNCTION: CARMA2_HW 0x0043d960
+// FUNCTION: CARMA2_SW 0x0043d9b0
+// FUNCTION: CARMA2_CHEAT 0x0043dc10
+int C2_HOOK_FASTCALL GetNetShapeDataLengthFromData(tU8* pData) {
+    tU8 count_points;
+    int count_packets;
+    int total_size;
+    int i;
+
+    count_points = *pData++;
+    if (count_points <= 4) {
+        count_packets = count_points;
+        total_size = 1;
+        for (i = 0; i < count_packets; i++) {
+            count_points = *pData;
+            total_size += 1 + count_points * sizeof(tCompressed_vector3);
+            pData += 1 + count_points * sizeof(tCompressed_vector3);
+        }
+        return total_size;
+    } else {
+        return count_points * 6 + 1;
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x0043d9c0
 // FUNCTION: CARMA2_SW 0x0043da10
