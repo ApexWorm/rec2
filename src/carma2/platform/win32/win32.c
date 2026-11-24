@@ -860,11 +860,14 @@ tU32 C2_HOOK_FASTCALL PDGetTotalTime(void) {
 #ifdef REC2_HW
     LARGE_INTEGER perfCountValue;
     LARGE_INTEGER delta;
+    DWORDLONG now;
 
     if (gPerformanceCounterInitialized) {
         QueryPerformanceCounter(&perfCountValue);
-        delta.QuadPart = perfCountValue.QuadPart - gPerformanceCounterStart.QuadPart;
-        return (tU32) (delta.QuadPart / gPerformanceCounterFrequency_ms.QuadPart);
+        now = Int64ShllMod32(Int64ShllMod32(perfCountValue.HighPart, 16), 16);
+        now += perfCountValue.LowPart;
+        delta.QuadPart = (now - gPerformanceCounterStart.QuadPart) / gPerformanceCounterFrequency_ms.QuadPart;
+        return delta.LowPart;
     }
     return 0;
 #endif
