@@ -370,29 +370,42 @@ int C2_HOOK_FASTCALL PDS3StopSampleChannel(tS3_channel* pChannel) {
 // FUNCTION: CARMA2_SW 0x00564ba7
 // FUNCTION: CARMA2_CHEAT 0x0056f0dd
 int C2_HOOK_FASTCALL PDS3UpdateChannelVolume(tS3_channel* pChannel) {
+    LPDIRECTSOUNDBUFFER buf;
+    float channel_volume;
+    float outlet_volume;
+    int dsvol;
+    int pan;
 
     if (pChannel->type == 0) {
+        channel_volume = (float)pChannel->volume_multiplier;
+        outlet_volume = (float)pChannel->owner_outlet->volume;
         if (pChannel->descriptor != NULL && pChannel->descriptor->type == pChannel->type) {
-            LPDIRECTSOUNDBUFFER buffer = pChannel->descriptor->pd_handle;
-
-            if (buffer != NULL) {
-                int volume = (int)(pChannel->owner_outlet->volume / 255.f * pChannel->volume_multiplier * 11.76470588235294f);
-                int ds_volume = volume - 3000;
-                ds_volume = MAX(ds_volume, -9999);
-                ds_volume = MIN(ds_volume, 0);
-
-                if (SUCCEEDED(IDirectSoundBuffer_SetVolume(buffer, ds_volume))) {
+            buf = pChannel->descriptor->pd_handle;
+            if (buf != NULL) {
+                dsvol = (int)(channel_volume * (outlet_volume / 255.0) * 11.764705882352942);
+                dsvol = dsvol - 3000;
+                if (dsvol < -9999) {
+                    dsvol = -9999;
+                }
+                if (dsvol > 0) {
+                    dsvol = 0;
+                }
+                if (SUCCEEDED(IDirectSoundBuffer_SetVolume(buf, dsvol))) {
                     if (gS3_callbacks.on_sample_channel_set_volume != NULL) {
-                        gS3_callbacks.on_sample_channel_set_volume(pChannel, volume);
+                        gS3_callbacks.on_sample_channel_set_volume(pChannel, (int)channel_volume);
                     }
-                    if (ds_volume != 0 && pChannel->spatial_sound) {
-                        int pan = (int)(pChannel->field_0x28 * 9999.f);
-                        pan = MAX(pan, -9999);
-                        pan = MIN(pan,  9999);
+                    if (dsvol != 0 && pChannel->spatial_sound) {
+                        pan = (int)(pChannel->field_0x28 * 9999.0);
+                        if (pan < -9999) {
+                            pan = -9999;
+                        }
+                        if (pan > 9999) {
+                            pan = 9999;
+                        }
                         if (gS3_callbacks.on_sample_channel_set_pan != NULL) {
                             gS3_callbacks.on_sample_channel_set_pan(pChannel, pChannel->field_0x28);
                         }
-                        IDirectSoundBuffer_SetPan(buffer, pan);
+                        IDirectSoundBuffer_SetPan(buf, pan);
                     }
                 }
             }
@@ -404,6 +417,7 @@ int C2_HOOK_FASTCALL PDS3UpdateChannelVolume(tS3_channel* pChannel) {
     }
     return 1;
 }
+
 
 // FUNCTION: CARMA2_HW 0x00568ed0
 // FUNCTION: CARMA2_SW 0x00564570
