@@ -1524,53 +1524,47 @@ int C2_HOOK_FASTCALL S3GenerateTag(tS3_outlet* outlet) {
 // FUNCTION: CARMA2_SW 0x00560fa4
 // FUNCTION: CARMA2_CHEAT 0x0056b4f4
 tS3_channel* C2_HOOK_FASTCALL S3AllocateChannel(tS3_outlet* pOutlet, int pPriority) {
-    tS3_channel* c;
+    tS3_channel* channel;
     int lowest_priority;
-    int this_priority;
+    int prio;
     tS3_channel* lowest_priority_chan;
 
-    lowest_priority_chan = pOutlet->channel_list;
-    c = pOutlet->channel_list;
-    if (lowest_priority_chan == NULL) {
-        return NULL;
-    }
-    while (c != NULL) {
-        if (!c->active || c->needs_service) {
-            if (!c->needs_service) {
-                c->active = 1;
-                return c;
+    channel = pOutlet->channel_list;
+    lowest_priority_chan = channel;
+    if (channel != NULL) {
+        while (channel != NULL) {
+            if (channel->active && !channel->needs_service) {
+                if (lowest_priority_chan->descriptor != NULL) {
+                    lowest_priority = S3CalculatePriority(lowest_priority_chan->descriptor->priority, lowest_priority_chan->volume_multiplier);
+                } else {
+                    lowest_priority = 0;
+                }
+                if (channel->descriptor != NULL) {
+                    prio = S3CalculatePriority(channel->descriptor->priority, channel->volume_multiplier);
+                } else {
+                    prio = 0;
+                }
+                lowest_priority_chan = lowest_priority < prio ? lowest_priority_chan : channel;
+            } else if (!channel->needs_service) {
+                channel->active = 1;
+                return channel;
             }
-        } else {
-            if (lowest_priority_chan->descriptor != NULL) {
-                lowest_priority = S3CalculatePriority(lowest_priority_chan->descriptor->priority,
-                                                      lowest_priority_chan->volume_multiplier);
-            } else {
-                lowest_priority = 0;
-            }
-            if (c->descriptor != NULL) {
-                this_priority = S3CalculatePriority(c->descriptor->priority, c->volume_multiplier);;
-            } else {
-                this_priority = 0;
-            }
-            if (this_priority <= lowest_priority) {
-                lowest_priority_chan = c;
-            }
+            channel = channel->next;
         }
-        c = c->next;
-    }
-    if (lowest_priority_chan->descriptor == NULL || lowest_priority_chan->needs_service) {
-        lowest_priority = 0;
-    } else {
-        lowest_priority = S3CalculatePriority(lowest_priority_chan->descriptor->priority,
-                                              lowest_priority_chan->volume_multiplier);
-    }
-    if (pPriority > lowest_priority && !lowest_priority_chan->needs_service) {
-        lowest_priority_chan->termination_reason = 2;
-        S3StopChannel(lowest_priority_chan);
-        lowest_priority_chan->active = 1;
+        if (lowest_priority_chan->descriptor != NULL && !lowest_priority_chan->needs_service) {
+            lowest_priority = S3CalculatePriority(lowest_priority_chan->descriptor->priority, lowest_priority_chan->volume_multiplier);
+        } else {
+            lowest_priority = 0;
+        }
+        if (pPriority > lowest_priority && !lowest_priority_chan->needs_service) {
+            lowest_priority_chan->termination_reason = 2;
+            S3StopChannel(lowest_priority_chan);
+            lowest_priority_chan->active = 1;
+        }
     }
     return NULL;
 }
+
 
 // FUNCTION: CARMA2_HW 0x00569b86
 // FUNCTION: CARMA2_SW 0x00565226
