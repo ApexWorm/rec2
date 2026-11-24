@@ -887,7 +887,7 @@ void C2_HOOK_FASTCALL CreateSmokeColumn(tCar_spec *pCar, br_colour pColour, int 
     if (pCar->collision_info->last_special_volume == NULL || pCar->collision_info->last_special_volume->gravity_multiplier >= 1.f) {
         SmudgeCar(pCar, pVertex_index);
         if (pCar->knackered) {
-            SmudgeCar(pCar, pCar->fire_vertex[IRandomBetween(0, 11)]);
+            SmudgeCar(pCar, pCar->fire_vertex[IRandomBetween(0, (int)REC2_ASIZE(pCar->fire_vertex) - 1)]);
         }
         CreateSmokeColumn2(1, pCar->car_master_actor, pCar, NULL, pColour, pVertex_index, pLifetime);
     }
