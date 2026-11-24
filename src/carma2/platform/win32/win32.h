@@ -25,6 +25,7 @@ extern int gWindowActiveState;  // FIXME: enum (0,1) => background(d3d or glide)
 
 extern int gWindowMovingResizing;
 extern LPDIRECTINPUTDEVICEA gDirectInputDevice;
+extern LPDIRECTINPUTA gDirectInput;
 #ifdef REC2_HW
 extern char* gRenderer;
 #endif

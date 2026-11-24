@@ -212,19 +212,6 @@ static int C2_HOOK_FASTCALL InitDirectInput(void) {
     return 0;
 }
 
-void C2_HOOK_FASTCALL CloseDirectInput(void) {
-
-    if (gDirectInputDevice != NULL) {
-        IDirectInputDevice_Unacquire(gDirectInputDevice);
-        IDirectInputDevice_Release(gDirectInputDevice);
-        gDirectInputDevice = NULL;
-    }
-    if (gDirectInput != NULL) {
-        IDirectInput_Release(gDirectInput);
-        gDirectInput = NULL;
-    }
-}
-
 static int C2_HOOK_FASTCALL AcquireDInputJoystickDevice(int pIndex) {
     IDirectInputDevice2A *device;
     HRESULT result;

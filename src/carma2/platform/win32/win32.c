@@ -504,6 +504,19 @@ void C2_HOOK_FASTCALL PDClearKeyboardBuffer(void) {
     gKeyboardBufferLength = 0;
 }
 
+void C2_HOOK_FASTCALL CloseDirectInput(void) {
+
+    if (gDirectInputDevice != NULL) {
+        IDirectInputDevice_Unacquire(gDirectInputDevice);
+        IDirectInputDevice_Release(gDirectInputDevice);
+        gDirectInputDevice = NULL;
+    }
+    if (gDirectInput != NULL) {
+        IDirectInput_Release(gDirectInput);
+        gDirectInput = NULL;
+    }
+}
+
 // FUNCTION: CARMA2_HW 0x0051c110
 // FUNCTION: CARMA2_SW 0x00515ee0
 // FUNCTION: CARMA2_CHEAT 0x005219c0
@@ -514,12 +527,7 @@ C2_NORETURN void C2_HOOK_FASTCALL PDShutdownSystem(void) {
 #ifdef REC2_HW
     gBack_screen = NULL;
 #endif
-    if (been_here) {
-#ifdef REC2_HW
-        PDCloseReplayFile();
-#endif
-        ExitProcess(702);
-    } else {
+    if (!been_here) {
         been_here = 1;
         dr_dprintf("PDShutdownSystem()...");
         SSDXStop();
@@ -536,18 +544,22 @@ C2_NORETURN void C2_HOOK_FASTCALL PDShutdownSystem(void) {
         SendMessageA(HWND_BROADCAST, WM_SHOWWINDOW, TRUE, 0);
         if (gIsFatalError) {
             dr_dprintf("Displaying fatal error...");
-            MessageBoxA(NULL, gFatalErrorMessage, "Carmageddon Fatal error", MB_ICONERROR);
+            MessageBoxA(NULL, gFatalErrorMessage, "Carmageddon Fatal Error", MB_ICONERROR);
         }
         if (gHWnd != NULL) {
             dr_dprintf("Destroying window...");
             DestroyWindow(gHWnd);
             gHWnd = NULL;
         }
-        dr_dprintf("End of PDShutdownSystem()");
+        dr_dprintf("End of PDShutdownSystem().");
         CloseDiagnostics();
         PDCloseReplayFile();
         ExitProcess(gExit_code);
     }
+#ifdef REC2_HW
+    PDCloseReplayFile();
+#endif
+    ExitProcess(702);
 }
 
 // FUNCTION: CARMA2_HW 0x0051c2e0
