@@ -514,6 +514,7 @@ intptr_t C2_HOOK_CDECL ActorFunks(br_actor* pActor, void* pContext) {
 }
 
 // FUNCTION: CARMA2_HW 0x004f8ca0
+// FUNCTION: CARMA2_SW 0x004f4320
 // FUNCTION: CARMA2_CHEAT 0x004fe940
 void C2_HOOK_FASTCALL MasterDisableCarFunks(tCar_spec* pCar) {
     tCar_crush_spec* crush_spec;
