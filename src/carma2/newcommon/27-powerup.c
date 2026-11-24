@@ -2094,7 +2094,20 @@ void C2_HOOK_FASTCALL ARPowerupLose(tPowerup* pPowerup, tCar_spec* pCar) {
 
 // SetPissed
 
-// ResetPissed
+// FUNCTION: CARMA2_HW 0x004df300
+// FUNCTION: CARMA2_SW 0x004db800
+// FUNCTION: CARMA2_CHEAT 0x004e4ec0
+void C2_HOOK_FASTCALL ResetPissed(tPowerup* pPowerup, tCar_spec* pCar) {
+    br_vector3 p;
+
+    gCredit_multiplier = 0;
+    BrVector3Copy(&p, &gCamera->t.t.translate.t);
+    BrMatrix34Identity(&gCamera->t.t.mat);
+    BrVector3Copy(&gCamera->t.t.translate.t, &p);
+    BrVector3Copy(&p, &gRearview_camera->t.t.translate.t);
+    BrMatrix34Identity(&gRearview_camera->t.t.mat);
+    BrVector3Copy(&gRearview_camera->t.t.translate.t, &p);
+}
 
 // PissedEffect
 
