@@ -652,7 +652,7 @@ void C2_HOOK_FASTCALL NewFaceListCallBack(tPhysics_object* pObject, tFace_ref* p
     }
     if (fabs(old_d - pObject->water_d) > 1e-05) {
         if (PHILGetObjectProperty(pObject, 6) != 0.f) {
-            ARStartPipingSession(ePipe_extended_splash);
+            ARStartPipingSession(ePipe_chunk_extended_splash);
             AddExtendedSplashToPipingSession(pObject, pObject);
             AREndPipingSession();
         }
@@ -664,13 +664,13 @@ void C2_HOOK_FASTCALL NewFaceListCallBack(tPhysics_object* pObject, tFace_ref* p
                 AREndPipingSession();
                 return;
             }
-            ARStartPipingSession(ePipe_extended_splash);
+            ARStartPipingSession(ePipe_chunk_extended_splash);
             AddExtendedSplashToPipingSession(pObject, pObject->actor);
             AREndPipingSession();
             return;
         }
         if (pObject != NULL && pObject->owner != NULL && pObject->flags_0x238 >= 2 && pObject->flags_0x238 <= 4) {
-            ARStartPipingSession(ePipe_extended_splash);
+            ARStartPipingSession(ePipe_chunk_extended_splash);
             AddExtendedSplashToPipingSession(pObject, pObject->owner);
             AREndPipingSession();
         }
@@ -1524,7 +1524,33 @@ void C2_HOOK_FASTCALL FreezeMechanics(void) {
 
 // FlyCar
 
-// GetCarOverallBoundsMinY
+// FUNCTION: CARMA2_HW 0x0041fbe0
+// FUNCTION: CARMA2_SW 0x0041fc60
+// FUNCTION: CARMA2_CHEAT 0x0041fe40
+float C2_HOOK_FASTCALL GetCarOverallBoundsMinY(const tCar_spec* pCar_spec) {
+    float rear;
+    float rear_susp;
+    float rear_min;
+    float front_min;
+    float min_value;
+
+    rear = pCar_spec->wpos[0].v[1];
+    rear_susp = pCar_spec->susp_height[0];
+    rear_min = rear - rear_susp;
+    front_min = pCar_spec->wpos[2].v[1] - pCar_spec->susp_height[1];
+
+    rear_min = rear_min / WORLD_SCALE;
+    front_min = front_min / WORLD_SCALE;
+    min_value = pCar_spec->collision_info->bb1.min.v[1];
+
+    if (rear_min < front_min && rear_min < min_value) {
+        return rear_min;
+    }
+    if (front_min < min_value) {
+        return front_min;
+    }
+    return min_value;
+}
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)

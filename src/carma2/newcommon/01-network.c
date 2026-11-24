@@ -534,7 +534,13 @@ void C2_HOOK_FASTCALL NetObtainSystemUserName(char* pName, int pMax_length) {
     pName[9] = '\0';
 }
 
-// NetExtractGameID
+// FUNCTION: CARMA2_HW 0x0049ee30
+// FUNCTION: CARMA2_SW 0x0049afb0
+// FUNCTION: CARMA2_CHEAT 0x0049f3d0
+tU32 C2_HOOK_FASTCALL NetExtractGameID(tNet_game_details* pDetails) {
+
+    return PDNetExtractGameID(pDetails);
+}
 
 inline tPlayer_ID C2_HOOK_FASTCALL NetExtractPlayerID(tNet_game_details* pDetails) {
 
