@@ -748,7 +748,7 @@ typedef enum {
     ePipe_chunk_ped_incident = 1,
     ePipe_chunk_single_sound = 2,
     ePipe_chunk_car = 5,
-    ePipe_chunk_single_graphical_wheel_stuff = 6,
+    ePipe_chunk_graphical_wheel_stuff = 6,
     ePipe_chunk_damage = 7,
     ePipe_chunk_special = 8,
     ePipe_chunk_spark = 10,
@@ -764,7 +764,7 @@ typedef enum {
     ePipe_chunk_prox_ray = 21,
     ePipe_chunk_skid_adjustment = 22,
     ePipe_chunk_flap = 23,
-    ePipe_model_mash = 24,
+    ePipe_chunk_model_mash = 24,
     ePipe_chunk_relink = 25,
     ePipe_chunk_identity = 26,
     ePipe_chunk_split_weld = 27,
@@ -784,24 +784,24 @@ typedef enum {
     ePipe_chunk_single_ped_model_change = 47,
     ePipe_chunk_phil_object = 48,
     ePipe_chunk_gib_shower = 49,
-    ePipe_blood_spurt = 50,
-    ePipe_single_groove_on_off = 51,
+    ePipe_chunk_blood_spurt = 50,
+    ePipe_chunk_groove_on_off = 51,
     ePipe_chunk_powerup_got = 52,
     ePipe_chunk_powerup_lose = 53,
-    ePipe_funk_enable = 54,
+    ePipe_chunk_funk_enable = 54,
     ePipe_chunk_vanished_dismembered = 55,
     ePipe_chunk_ds_model = 56,
-    ePipe_ped_diagnostic = 57,
+    ePipe_chunk_ped_diagnostic = 57,
     ePipe_chunk_vector3 = 58,
-    ePipe_extended_splash = 59,
+    ePipe_chunk_extended_splash = 59,
     ePipe_chunk_drone_render = 60,
     ePipe_chunk_drone_corner_pos = 61,
-    ePipe_chunk_single_drone_straight_pos = 62,
+    ePipe_chunk_drone_straight_pos = 62,
     ePipe_chunk_burning_ped = 64,
     ePipe_chunk_powerup_respawn = 65,
     ePipe_chunk_end_shit_mine = 67,
     ePipe_chunk_transform_type = 68,
-    ePipe_chunk_single_oppo_renderage = 69,
+    ePipe_chunk_oppo_renderage = 69,
 } tPipe_chunk_type;
 
 typedef struct {
@@ -899,6 +899,7 @@ typedef struct tPipe_chunk {
         tPipe_chunk_smoke smoke;
         tPipe_chunk_smoke_column smoke_column;
         tPipe_chunk_explosion explosion;
+        tPipe_single_oppo_renderage oppo_renderage;
         tPipe_chunk_blood_spurt blood_spurt;
         tPipe_single_groove_on_of groove;
         tPipe_single_vanished_dismembered vanished_dismembered;
@@ -6077,6 +6078,7 @@ enum {
     kFatalError_TooManyCrushLimits = 0x7a,
     kFatalError_TooManyCrushDatas = 0x7c,
     kFatalError_ChunkIsTooLargeToPipe = 0x7d,
+    kFatalError_RelinActorNullToNullInActionReplay = 0x7e,
     kFatalError_CannotFindSmashActorModel_S = 0x81,
     kFatalError_ProblemWithSpecialVolumeNumber_I = 0x82,
     kFatalError_TooManyEnvironmentalSoundAlternatives = 0x83,

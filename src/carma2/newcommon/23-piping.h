@@ -147,7 +147,7 @@ extern void C2_HOOK_FASTCALL GetReducedPos(br_vector3* pPos, const tReduced_pos*
 
 extern void C2_HOOK_FASTCALL SaveReducedPos(tReduced_pos* pReduced_pos, br_vector3* pPos);
 
-// InitLastDamageArrayEtc
+extern void C2_HOOK_FASTCALL InitLastDamageArrayEtc(void);
 
 extern void C2_HOOK_FASTCALL ResetCars(void);
 
@@ -359,7 +359,7 @@ extern void C2_HOOK_FASTCALL ApplyFlap(tPipe_chunk** pChunk);
 
 extern void C2_HOOK_FASTCALL ApplyModelMash(tPipe_chunk** pChunk);
 
-// ApplyRelink
+extern void C2_HOOK_FASTCALL ApplyRelink(tPipe_chunk** pChunk);
 
 extern void C2_HOOK_FASTCALL ApplyIdentity(tPipe_chunk** pChunk);
 
@@ -445,7 +445,7 @@ extern void C2_HOOK_FASTCALL ApplyEndShitMine(tPipe_chunk** pChunk);
 
 extern void C2_HOOK_FASTCALL ApplyTransformType(tPipe_chunk** pChunk);
 
-// ApplyOppoRenderage
+extern void C2_HOOK_FASTCALL ApplyOppoRenderage(tPipe_chunk** pChunk);
 
 // UndoCrush
 

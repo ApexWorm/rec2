@@ -32,6 +32,7 @@
 #include "globvars.h"
 #include "platform.h"
 
+#include "rec2_macros.h"
 #include <s3/internal/audio.h>
 
 #include <limits.h>
@@ -734,7 +735,31 @@ inline void C2_HOOK_FASTCALL SaveReducedPos(tReduced_pos* pReduced_pos, br_vecto
         (tS16)(tv.v[2] * 800.0f));
 }
 
-// InitLastDamageArrayEtc
+// FUNCTION: CARMA2_HW 0x004c6580
+// FUNCTION: CARMA2_SW 0x004c2cb0
+// FUNCTION: CARMA2_CHEAT 0x004cc0a0
+void C2_HOOK_FASTCALL InitLastDamageArrayEtc(void) {
+    int cat;
+    int car_count;
+    int i;
+    int j;
+
+    for (cat = eVehicle_self; cat <= eVehicle_not_really; cat++) {
+        car_count = cat == eVehicle_self ? 1 : GetCarCount(cat);
+        for (i = 0; i < car_count; i++) {
+            tCar_spec* car;
+
+            car = cat == eVehicle_self ? &gProgram_state.current_car : GetCarSpec(cat, i);
+            if (cat != eVehicle_not_really) {
+
+                for (j = 0; j < (int)REC2_ASIZE(car->frame_start_damage); j++) {
+                    car->frame_start_damage[j] = 0;
+                }
+            }
+            car->car_ID = (tU16)((cat << 8) + i);
+        }
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x004c65f0
 // FUNCTION: CARMA2_SW 0x004c2d20
@@ -969,7 +994,7 @@ void C2_HOOK_FASTCALL AddExtendedSplashToPipingSession(tPhysics_object* pObject,
     }
     water_d = pObject->water_d;
     gFloat_pipe_union.f = water_d;
-    ARAddVariedDataToSession(ePipe_extended_splash, (uintptr_t)pSubject, 4,
+    ARAddVariedDataToSession(ePipe_chunk_extended_splash, (uintptr_t)pSubject, 4,
         SIZE_OFFSET_PIPING(tPipe_chunk_extended_splash, field_0x0), value,
         SIZE_OFFSET_PIPING(tPipe_chunk_extended_splash, water_d), gFloat_pipe_union.u32,
         SIZE_OFFSET_PIPING(tPipe_chunk_extended_splash, normal), &pObject->water_normal,
@@ -1135,7 +1160,7 @@ void C2_HOOK_FASTCALL PipeSingleFrameFinish(void) {
 // FUNCTION: CARMA2_CHEAT 0x004cdf10
 void C2_HOOK_FASTCALL PipeSingleGraphicalWheelStuff(tCar_spec* pCar) {
 
-    ARDoSingleVariedSession(ePipe_chunk_single_graphical_wheel_stuff, (tU16)pCar->car_ID, 5,
+    ARDoSingleVariedSession(ePipe_chunk_graphical_wheel_stuff, (tU16)pCar->car_ID, 5,
         SIZE_OFFSET_PIPING(tPipe_single_graphical_wheel_stuff, steering_angle), (int)(pCar->steering_angle * (32767.0 / 60.0)),
         SIZE_OFFSET_PIPING(tPipe_single_graphical_wheel_stuff, lf_sus_position), (int)(pCar->lf_sus_position * 127.f * (20.0 / 3.0)),
         SIZE_OFFSET_PIPING(tPipe_single_graphical_wheel_stuff, rf_sus_position), (int)(pCar->rf_sus_position * 127.f * (20.0 / 3.0)),
@@ -1573,7 +1598,7 @@ void C2_HOOK_FASTCALL PipeSingleGibShower(uintptr_t pId, tU32 pTime, tU32 pUid, 
 // FUNCTION: CARMA2_CHEAT 0x004ce860
 void C2_HOOK_FASTCALL PipeSingleBloodSpurt(uintptr_t pId, tU32 pTime, tU32 pSeed, const br_vector3* pPosition, const br_vector3* pImpactee_velocity, const br_vector3* pNormal) {
 
-    ARDoSingleVariedSession(ePipe_blood_spurt, pId, 5,
+    ARDoSingleVariedSession(ePipe_chunk_blood_spurt, pId, 5,
         SIZE_OFFSET_PIPING(tPipe_chunk_blood_spurt, time), pTime,
         SIZE_OFFSET_PIPING(tPipe_chunk_blood_spurt, seed), pSeed,
         SIZE_OFFSET_PIPING(tPipe_chunk_blood_spurt, position), pPosition,
@@ -1589,7 +1614,7 @@ void C2_HOOK_FASTCALL PipeSingleGrooveOnOff(int pOn, br_actor* pActor, int pBloc
     C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_single_groove_on_of, block_flags, 0x4);
     C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_single_groove_on_of, block_flags, 0x4);
 
-    ARDoSingleVariedSession(ePipe_single_groove_on_off, (uintptr_t)pActor, 2,
+    ARDoSingleVariedSession(ePipe_chunk_groove_on_off, (uintptr_t)pActor, 2,
         SIZE_OFFSET_PIPING(tPipe_single_groove_on_of, enable), pOn,
         SIZE_OFFSET_PIPING(tPipe_single_groove_on_of, block_flags), pBlock_flags);
 }
@@ -1620,7 +1645,7 @@ void C2_HOOK_FASTCALL PipeSinglePowerupLose(tPowerup* pPowerup, tCar_spec* pCar_
 void C2_HOOK_FASTCALL PipeSingleFunkEnable(int pIndex, tU16 pFlags) {
     C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_funk_enable, flags, 0x2);
 
-    ARDoSingleVariedSession(ePipe_funk_enable, (uintptr_t)pIndex, 1,
+    ARDoSingleVariedSession(ePipe_chunk_funk_enable, (uintptr_t)pIndex, 1,
         SIZE_OFFSET_PIPING(tPipe_funk_enable, flags), pFlags);
 }
 
@@ -1651,7 +1676,7 @@ void C2_HOOK_FASTCALL PipeSingleDSModel(int pDouble_sided, void* pThing) {
 // FUNCTION: CARMA2_SW 0x004c5580
 void C2_HOOK_FASTCALL PipeSinglePedDiagnostic(tPedestrian* pPed) {
 
-    ARDoSingleVariedSession(ePipe_ped_diagnostic, (uintptr_t)pPed, 3,
+    ARDoSingleVariedSession(ePipe_chunk_ped_diagnostic, (uintptr_t)pPed, 3,
         SIZE_OFFSET_PIPING(tPipe_ped_diagnostic, ped), pPed,
         SIZE_OFFSET_PIPING(tPipe_ped_diagnostic, instance), pPed->character,
         SIZE_OFFSET_PIPING(tPipe_ped_diagnostic, cache), pPed->field_0x0c);
@@ -1711,7 +1736,7 @@ void C2_HOOK_FASTCALL PipeSingleDroneStraightPos(tDrone_spec* pDrone, tDrone_pat
     C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_single_drone_straight_pos, distance, 0x6);
     C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_single_drone_straight_pos, distance, 0x2);
 
-    ARDoSingleVariedSession(ePipe_chunk_single_drone_straight_pos, pDrone->id, 3,
+    ARDoSingleVariedSession(ePipe_chunk_drone_straight_pos, pDrone->id, 3,
         SIZE_OFFSET_PIPING(tPipe_single_drone_straight_pos, section), pSection,
         SIZE_OFFSET_PIPING(tPipe_single_drone_straight_pos, speed), pDistance,
         SIZE_OFFSET_PIPING(tPipe_single_drone_straight_pos, distance), pDistance);
@@ -1761,7 +1786,7 @@ void C2_HOOK_FASTCALL PipeSingleTransformType(br_actor* pActor, tS16 pTransform_
 void C2_HOOK_FASTCALL PipeSingleOppoRenderage(tOpponent_spec* pOpponent_spec, int pEnable) {
     C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_single_oppo_renderage, enable, 0x2);
 
-    ARDoSingleVariedSession(ePipe_chunk_single_oppo_renderage, (uintptr_t)pOpponent_spec, 1,
+    ARDoSingleVariedSession(ePipe_chunk_oppo_renderage, (uintptr_t)pOpponent_spec, 1,
         SIZE_OFFSET_PIPING(tPipe_single_oppo_renderage, enable), pEnable);
 }
 
@@ -2026,7 +2051,33 @@ void C2_HOOK_FASTCALL ApplyModelMash(tPipe_chunk** pChunk) {
     ARApplyModelMash((*pChunk)->data.model_mash.model, (*pChunk)->data.model_mash.vectors);
 }
 
-// ApplyRelink
+// FUNCTION: CARMA2_HW 0x004c9850
+// FUNCTION: CARMA2_SW 0x004c5f80
+// FUNCTION: CARMA2_CHEAT 0x004cf370
+void C2_HOOK_FASTCALL ApplyRelink(tPipe_chunk** pChunk) {
+    br_actor* actor;
+    br_actor* parent;
+
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk, data, 0x4);
+
+    actor = (*pChunk)->data.relink.actor;
+    parent = (*pChunk)->data.relink.new_parent;
+    if (actor->parent != NULL) {
+        if (parent != NULL) {
+            ActorRelink(parent, actor);
+        } else {
+            BrActorRemove(actor);
+        }
+    } else {
+        if (parent != NULL) {
+            BrActorAdd(parent, actor);
+        } else {
+#ifdef REC2_CHEAT
+            NonFatalError(kFatalError_RelinActorNullToNullInActionReplay);
+#endif
+        }
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x004c9890
 // FUNCTION: CARMA2_SW 0x004c5fc0
@@ -2433,7 +2484,14 @@ void C2_HOOK_FASTCALL ApplyTransformType(tPipe_chunk** pChunk) {
     ((br_actor*)chunk->subject_index)->t.type = chunk->data.transform_type.type_to;
 }
 
-// ApplyOppoRenderage
+// FUNCTION: CARMA2_HW 0x004c9d80
+// FUNCTION: CARMA2_SW 0x004c64b0
+// FUNCTION: CARMA2_CHEAT 0x004cf8b0
+void C2_HOOK_FASTCALL ApplyOppoRenderage(tPipe_chunk** pChunk) {
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk, data, 0x4);
+
+    ApplyOppoRenderage2((tOpponent_spec*)(*pChunk)->subject_index, (*pChunk)->data.oppo_renderage.enable);
+}
 
 // UndoCrush
 
