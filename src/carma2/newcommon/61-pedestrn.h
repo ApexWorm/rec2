@@ -216,7 +216,7 @@ extern void C2_HOOK_FASTCALL CBFillInObject(tPhysics_object* pObject, undefined4
 
 extern void C2_HOOK_FASTCALL DoGibShower(tU32 pId, tU32 pTime, unsigned int pSeed, float pForce, int pStart_size, br_vector3* pPosition, br_vector3* pAlternate_position, br_vector3* pImpactee_velocity);
 
-// PedApplyGibShower
+extern void C2_HOOK_FASTCALL PedApplyGibShower(tU32 pId, tU32 pTime, unsigned int pSeed, float pForce, int pStart_size, br_vector3* pPosition, br_vector3* pAlternate_position, br_vector3* pImpactee_velocity);
 
 // PedUndoGibShower
 
@@ -356,7 +356,7 @@ extern void C2_HOOK_FASTCALL ResetPedSystem(void);
 
 extern void C2_HOOK_FASTCALL ResetNapalmBolts(void);
 
-// ARResetNapalmBolts
+extern void C2_HOOK_FASTCALL ARResetNapalmBolts(void);
 
 extern void C2_HOOK_FASTCALL AdjustNapalmBolt(int pIndex, tPedestrian* pPed, br_vector3* pPositions);
 
@@ -374,7 +374,7 @@ extern void C2_HOOK_FASTCALL NextPedCam(void);
 
 extern void C2_HOOK_FASTCALL PrevPedCam(void);
 
-// FindNearestPed
+extern void C2_HOOK_FASTCALL FindNearestPed(void);
 
 extern void C2_HOOK_FASTCALL ResetPedNearness(void);
 
@@ -450,7 +450,7 @@ extern void C2_HOOK_FASTCALL SetGoreLevel(int pNewLevel);
 
 // DRVector3SafeCrossXZ
 
-// ScaleModelXYZ
+extern void C2_HOOK_FASTCALL ScaleModelXYZ(br_model* pModel, br_scalar pScale_x, br_scalar pScale_y, br_scalar pScale_z);
 
 extern void C2_HOOK_FASTCALL ScaleModel(br_model* pModel, float pScale);
 
