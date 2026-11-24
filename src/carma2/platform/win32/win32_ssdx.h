@@ -19,7 +19,7 @@ extern PALETTEENTRY gPD_palette_entries[256];
 
 extern HRESULT CALLBACK LocalEnumAttachedSurfacesCallback(LPDIRECTDRAWSURFACE lpSurface, LPDDSURFACEDESC lpSurfaceDesc, LPVOID lpContext);
 
-extern void C2_HOOK_FASTCALL LocalWindowedDDSetup(int pWidth, int pHeight, int* pPitch);
+extern HRESULT C2_HOOK_FASTCALL LocalWindowedDDSetup(int pWidth, int pHeight, int* pPitch);
 
 extern void C2_HOOK_FASTCALL SSDXLogDirectDrawError(HRESULT hRes);
 
