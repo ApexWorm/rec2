@@ -419,11 +419,17 @@ void C2_HOOK_FASTCALL NetStartProducingJoinList(tAddToJoinListProc* pAdd_proc) {
     PDNetStartProducingJoinList();
 }
 
-// STUB: CARMA2_HW 0x0049dc00
-// STUB: CARMA2_SW 0x00499d80
-// STUB: CARMA2_CHEAT 0x0049e140
+// FUNCTION: CARMA2_HW 0x0049dc00
+// FUNCTION: CARMA2_SW 0x00499d80
+// FUNCTION: CARMA2_CHEAT 0x0049e140
 void C2_HOOK_FASTCALL NetEndJoinList(void) {
-    NOT_IMPLEMENTED();
+
+    if (gJoin_list_mode) {
+        gJoin_list_mode = 0;
+        DisposeCurrentJoinPollGame();
+        LeaveTempGame();
+        PDNetEndJoinList();
+    }
 }
 
 // FUNCTION: CARMA2_HW 0x0049dc70
@@ -455,7 +461,7 @@ tNet_game_details* C2_HOOK_FASTCALL NetAllocatePIDGameDetails(void) {
 void C2_HOOK_FASTCALL NetLeaveGameLowLevel(void) {
 
     if (gNet_mode == eNet_mode_host) {
-        PDNetHostFinishGame();
+        PDNetHostFinishGame(gCurrent_net_game);
     } else {
         PDNetLeaveGame();
     }
@@ -534,7 +540,13 @@ void C2_HOOK_FASTCALL NetObtainSystemUserName(char* pName, int pMax_length) {
     pName[9] = '\0';
 }
 
-// NetExtractGameID
+// FUNCTION: CARMA2_HW 0x0049ee30
+// FUNCTION: CARMA2_SW 0x0049afb0
+// FUNCTION: CARMA2_CHEAT 0x0049f3d0
+tU32 C2_HOOK_FASTCALL NetExtractGameID(tNet_game_details* pDetails) {
+
+    return PDNetExtractGameID(pDetails);
+}
 
 inline tPlayer_ID C2_HOOK_FASTCALL NetExtractPlayerID(tNet_game_details* pDetails) {
 
