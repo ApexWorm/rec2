@@ -1366,11 +1366,26 @@ void C2_HOOK_FASTCALL StopObjectSmokingInstantly(tPhysics_object* pObject) {
     }
 }
 
-// STUB: CARMA2_HW 0x004fcab0
-// STUB: CARMA2_SW 0x004f8010
-// STUB: CARMA2_CHEAT 0x00502750
+// FUNCTION: CARMA2_HW 0x004fcab0
+// FUNCTION: CARMA2_SW 0x004f8010
+// FUNCTION: CARMA2_CHEAT 0x00502750
 void C2_HOOK_FASTCALL ConditionalSmokeColumn(tCar_spec* pCar, int pFire_point, int pColour) {
-    NOT_IMPLEMENTED();
+    int i;
+
+    if (pColour == 0 && (pCar == NULL || pCar->driver < eDriver_net_human)) {
+        pColour = 1;
+    }
+    if (IsCarSmoking(pCar) > 0) {
+        for (i = 0; i < (int)REC2_ASIZE(gSmoke_column); i++) {
+            if (gSmoke_column[i].core.car == pCar) {
+                if ((gColumn_flags & (1 << i)) && gSmoke_column[i].colour <= pColour && gSmoke_column[i].lifetime != 0) {
+                    return;
+                }
+                gSmoke_column[i].lifetime = 2000;
+            }
+        }
+    }
+    CreateSmokeColumn(pCar, pColour, pCar->fire_vertex[pFire_point], 10000000);
 }
 
 // SingleSplash
