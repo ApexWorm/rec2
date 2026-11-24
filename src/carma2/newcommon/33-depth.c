@@ -403,7 +403,7 @@ void C2_HOOK_FASTCALL InitDepthEffects(void) {
     if (gHorizon_material == NULL) {
         FatalError(kFatalError_CannotFindSkyMaterial_S);
     }
-#ifndef REC2_SW
+#ifdef REC2_HW
     if (gScreen->type == BR_PMT_INDEX_8 && !gNo_fog) {
         int i;
         int j;
