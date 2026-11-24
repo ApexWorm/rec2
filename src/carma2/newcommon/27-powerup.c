@@ -2689,10 +2689,6 @@ br_actor* C2_HOOK_FASTCALL CreateBillBoard(br_pixelmap* pTexture) {
     br_model* model;
     int width;
     int height;
-    br_scalar left;
-    br_scalar right;
-    br_scalar top;
-    br_scalar bottom;
 
     width = pTexture->width;
     height = pTexture->height;
@@ -2711,14 +2707,10 @@ br_actor* C2_HOOK_FASTCALL CreateBillBoard(br_pixelmap* pTexture) {
     model->faces[1].vertices[2] = 0;
     model->faces[0].material = NULL;
     model->faces[1].material = NULL;
-    left = (float)-(width / 2);
-    top = (float)+(height / 2);
-    BrVector3Set(&model->vertices[0].p, left,  top, -2.0f);
-    bottom = (float)-(height / 2);
-    BrVector3Set(&model->vertices[1].p, left, bottom, -2.0f);
-    right = (float)+(width / 2);
-    BrVector3Set(&model->vertices[2].p, right, bottom, -2.0f);
-    BrVector3Set(&model->vertices[3].p, right,  top, -2.0f);
+    BrVector3Set(&model->vertices[0].p, -(width / 2), height / 2, -2.0f);
+    BrVector3Set(&model->vertices[1].p, -(width / 2), -(height / 2), -2.0f);
+    BrVector3Set(&model->vertices[2].p, width / 2, -(height / 2), -2.0f);
+    BrVector3Set(&model->vertices[3].p, width / 2, height / 2, -2.0f);
     BrVector2Set(&model->vertices[0].map, 0.0f, 0.0f);
     BrVector2Set(&model->vertices[1].map, 0.0f, 1.0f);
     BrVector2Set(&model->vertices[2].map, 1.0f, 1.0f);
