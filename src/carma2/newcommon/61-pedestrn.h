@@ -356,7 +356,7 @@ extern void C2_HOOK_FASTCALL ResetPedSystem(void);
 
 extern void C2_HOOK_FASTCALL ResetNapalmBolts(void);
 
-// ARResetNapalmBolts
+extern void C2_HOOK_FASTCALL ARResetNapalmBolts(void);
 
 extern void C2_HOOK_FASTCALL AdjustNapalmBolt(int pIndex, tPedestrian* pPed, br_vector3* pPositions);
 

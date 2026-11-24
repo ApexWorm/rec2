@@ -1866,7 +1866,20 @@ inline void C2_HOOK_FASTCALL ResetNapalmBolts(void) {
     }
 }
 
-// ARResetNapalmBolts
+// FUNCTION: CARMA2_HW 0x004d5b10
+// FUNCTION: CARMA2_SW 0x004d2200
+// FUNCTION: CARMA2_CHEAT 0x004db6d0
+void C2_HOOK_FASTCALL ARResetNapalmBolts(void) {
+    int i;
+    int j;
+
+    for (i = 0; i < (int)REC2_ASIZE(gNapalm_bolts); i++) {
+        gNapalm_bolts[i].ped = NULL;
+        for (j = 0; j < (int)REC2_ASIZE(gNapalm_bolts[i].actors); j++) {
+            gNapalm_bolts[i].actors[j]->render_style = BR_RSTYLE_NONE;
+        }
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x004d5b40
 // FUNCTION: CARMA2_SW 0x004d2230
