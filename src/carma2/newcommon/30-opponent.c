@@ -231,13 +231,13 @@ tS16 C2_HOOK_FASTCALL FindNearestPathSection(const br_vector3* pActor_coords, br
 
 inline void C2_HOOK_FASTCALL DeadStopCar(tCar_spec* pCar_spec) {
 
-    pCar_spec->acc_force = 0.f;
-    pCar_spec->brake_force = 0.f;
-    pCar_spec->curvature = 0.f;
+    pCar_spec->acc_force = 0.0f;
+    pCar_spec->brake_force = 0.0f;
+    pCar_spec->curvature = 0.0f;
     pCar_spec->gear = 0;
-    pCar_spec->revs = 0.f;
-    BrVector3Set(&pCar_spec->collision_info->omega, 0.f, 0.f, 0.f);
-    BrVector3Set(&pCar_spec->collision_info->v, 0.f, 0.f, 0.f);
+    pCar_spec->revs = 0.0f;
+    BrVector3Set(&pCar_spec->collision_info->omega, 0.0f, 0.0f, 0.0f);
+    BrVector3Set(&pCar_spec->collision_info->v, 0.0f, 0.0f, 0.0f);
 }
 
 // FUNCTION: CARMA2_HW 0x004a7960
