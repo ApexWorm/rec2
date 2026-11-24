@@ -1660,7 +1660,7 @@ void C2_HOOK_FASTCALL AdjustSplashReplay(void* pObject, int pType, float pWater_
             if (free_index < 0) {
                 free_index = i;
             }
-        } else if (gReplay_splashes[i].object.ptr == pObject) {
+        } else if (pObject == gReplay_splashes[i].object.ptr) {
             gReplay_splashes[i].water_density = pWater_density;
             BrVector3Copy(&gReplay_splashes[i].normal, pNormal);
             BrVector3Copy(&gReplay_splashes[i].bb.min, &pBounds->min);
