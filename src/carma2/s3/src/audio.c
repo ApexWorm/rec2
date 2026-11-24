@@ -1432,6 +1432,7 @@ void C2_HOOK_FASTCALL S3EnableMidi(void) {
 // FUNCTION: CARMA2_SW 0x00561c74
 tS3_sound_source* C2_HOOK_FASTCALL S3CreateSoundSource(void* pPosition, void* pVelocity, tS3_outlet* pBound_outlet) {
     tS3_sound_source* src;
+    tS3_sound_source* tail;
 
     C2_HOOK_BUG_ON(sizeof(tS3_sound_source) != 0x44);
     C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tS3_sound_source, next, 0x18);
@@ -1449,16 +1450,15 @@ tS3_sound_source* C2_HOOK_FASTCALL S3CreateSoundSource(void* pPosition, void* pV
     src->bound_outlet = pBound_outlet;
     src->position_ptr = pPosition;
     src->velocity_ptr = pVelocity;
-    if (gS3_state.sources != NULL) {
-        tS3_sound_source* s;
-        s = gS3_state.sources;
-        while (s->next != NULL) {
-            s = s->next;
-        }
-        s->next = src;
-        src->prev = s;
-    } else {
+    tail = gS3_state.sources;
+    if (tail == NULL) {
         gS3_state.sources = src;
+    } else {
+        while (tail->next != NULL) {
+            tail = tail->next;
+        }
+        tail->next = src;
+        src->prev = tail;
     }
     gS3_state.count_sources += 1;
     return src;
