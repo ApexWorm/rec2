@@ -505,14 +505,18 @@ void C2_HOOK_FASTCALL S3UpdateListenerVectors(void) {
 }
 
 // FUNCTION: CARMA2_HW 0x00567b2d
+// FUNCTION: CARMA2_SW 0x005631cd
+// FUNCTION: CARMA2_CHEAT 0x0056d724
 int C2_HOOK_FASTCALL S3UpdateSourcePosition(tS3_sound_source *pSource) {
+    tS3_outlet* outlet;
+    tS3_descriptor* descriptor;
+    tS3_channel* channel;
+    int prio;
+
     if (pSource == NULL) {
         return 0;
     }
     if (gS3_enabled && pSource->ambient) {
-        tS3_outlet* outlet;
-        tS3_descriptor* descriptor;
-
         outlet = pSource->bound_outlet;
         descriptor = S3GetDescriptorByID(pSource->sound_id);
         if (descriptor == NULL) {
@@ -536,9 +540,9 @@ int C2_HOOK_FASTCALL S3UpdateSourcePosition(tS3_sound_source *pSource) {
         if (pSource->speed < 0) {
             pSource->speed = BR_FIXED_INT(1);
         }
-        gS3_channel_template.rate = (int)(ldexpf((float)pSource->pitch, -16) * (float)gS3_channel_template.rate);
+        gS3_channel_template.rate = (int)(gS3_channel_template.rate * ldexp(pSource->pitch, -16));
         if (!outlet->independent_pitch) {
-            gS3_channel_template.rate = (int)(ldexpf((float)pSource->speed, -16) * (float)gS3_channel_template.rate);
+            gS3_channel_template.rate = (int)(gS3_channel_template.rate * ldexp(pSource->speed, -16));
         }
         gS3_channel_template.source_rate = gS3_channel_template.rate;
         gS3_channel_template.sound_source_ptr = pSource;
@@ -547,9 +551,8 @@ int C2_HOOK_FASTCALL S3UpdateSourcePosition(tS3_sound_source *pSource) {
         }
         gS3_channel_template.max_distance_squared = pSource->max_distance_sq;
         if (S3Calculate3D(&gS3_channel_template, 1) != 0) {
-            tS3_channel* channel;
-
-            channel = S3AllocateChannel(outlet, S3CalculatePriority(gS3_channel_template.volume_multiplier, descriptor->priority));
+            prio = S3CalculatePriority(gS3_channel_template.volume_multiplier, descriptor->priority);
+            channel = S3AllocateChannel(outlet, prio);
             if (channel == NULL) {
                 gS3_last_error = eS3_error_channel_alloc;
                 pSource->tag = 0;
@@ -564,15 +567,9 @@ int C2_HOOK_FASTCALL S3UpdateSourcePosition(tS3_sound_source *pSource) {
             channel->volume_multiplier = gS3_channel_template.volume_multiplier;
             channel->field_0x28 = gS3_channel_template.field_0x28;
             channel->rate = gS3_channel_template.rate;
-            channel->position.x = gS3_channel_template.position.x;
-            channel->position.y = gS3_channel_template.position.y;
-            channel->position.z = gS3_channel_template.position.z;
-            channel->velocity.x = gS3_channel_template.velocity.x;
-            channel->velocity.y = gS3_channel_template.velocity.y;
-            channel->velocity.z = gS3_channel_template.velocity.z;
-            channel->prev_position.x = gS3_channel_template.prev_position.x;
-            channel->prev_position.y = gS3_channel_template.prev_position.y;
-            channel->prev_position.z = gS3_channel_template.prev_position.z;
+            channel->position = gS3_channel_template.position;
+            channel->velocity = gS3_channel_template.velocity;
+            channel->prev_position = gS3_channel_template.prev_position;
             channel->source_volume = gS3_channel_template.source_volume;
             channel->source_rate = gS3_channel_template.source_rate;
             channel->max_distance_squared = gS3_channel_template.max_distance_squared;

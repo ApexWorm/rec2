@@ -106,6 +106,7 @@ tS3_sample_filter gS3_sample_filter_disable_func;
 
 // GLOBAL: CARMA2_HW 0x007a06e0
 // GLOBAL: CARMA2_SW 0x00796c80
+// GLOBAL: CARMA2_CHEAT 0x007a7d80
 tS3_channel gS3_channel_template;
 
 // GLOBAL: CARMA2_HW 0x007a075c
