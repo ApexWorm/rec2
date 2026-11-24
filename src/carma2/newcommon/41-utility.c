@@ -1643,9 +1643,9 @@ int C2_HOOK_FASTCALL PossibleUnlock(int pValue) {
 // FUNCTION: CARMA2_CHEAT 0x0051ca00
 tU16 C2_HOOK_FASTCALL PaletteEntry16Bit(br_pixelmap* pPal, int pEntry) {
     tU32* src_entry;
-    int red;
     int green;
     int blue;
+    int red;
 
     src_entry = pPal->pixels;
     switch (gBack_screen->type) {
@@ -1696,7 +1696,7 @@ br_pixelmap* C2_HOOK_FASTCALL PaletteOf16Bits(br_pixelmap* pSrc) {
     if (!gPalette_changed || gPalette_source != pSrc) {
         dst_entry = g16bit_palette->pixels;
         for (i = 0; i < 256; i++) {
-            *dst_entry++ = PaletteEntry16Bit(pSrc, i);
+            dst_entry[i] = PaletteEntry16Bit(pSrc, i);
         }
         gPalette_changed = 1;
         gPalette_source = pSrc;
