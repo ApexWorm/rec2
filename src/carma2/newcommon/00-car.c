@@ -1556,11 +1556,29 @@ float C2_HOOK_FASTCALL GetCarOverallBoundsMinY(const tCar_spec* pCar_spec) {
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x0041fc60
-// STUB: CARMA2_SW 0x0041fce0
-// STUB: CARMA2_CHEAT 0x0041fec0
+// FUNCTION: CARMA2_HW 0x0041fc60
+// FUNCTION: CARMA2_SW 0x0041fce0
+// FUNCTION: CARMA2_CHEAT 0x0041fec0
 void C2_HOOK_FASTCALL SetCarSuspGiveAndHeight(tCar_spec* pCar, float pFront_give_factor, float pRear_give_factor, float pDamping_factor, float pExtra_front_height, float pExtra_rear_height) {
-    NOT_IMPLEMENTED();
+    float ratio;
+    float front_give;
+    float rear_give;
+    float damping;
+
+    front_give = pCar->susp_give * pFront_give_factor * WORLD_SCALE;
+    rear_give = pCar->steerable_suspension_give * pRear_give_factor * WORLD_SCALE;
+    damping = pCar->damping * pDamping_factor;
+    ratio = fabs((pCar->wpos[0].v[2] - pCar->centre_of_mass_world_scale.v[2]) / (pCar->wpos[2].v[2] - pCar->centre_of_mass_world_scale.v[2]));
+    pCar->sk[0] = (pCar->collision_info->M / (ratio + 1.0f)) * 5.0f / rear_give;
+    pCar->sb[0] = (pCar->collision_info->M / (ratio + 1.0f)) * (br_scalar)sqrt(5.0) / (br_scalar)sqrt(rear_give);
+    ratio = 1.0 / ratio;
+    pCar->sk[1] = (pCar->collision_info->M / (ratio + 1.0f)) * 5.0f / front_give;
+    pCar->sb[1] = (pCar->collision_info->M / (ratio + 1.0f)) * (br_scalar)sqrt(5.0) / (br_scalar)sqrt(front_give);
+    pCar->sb[0] *= damping;
+    pCar->sb[1] *= damping;
+    pCar->susp_height[0] = pCar->ride_height + rear_give + pExtra_rear_height;
+    pCar->susp_height[1] = pCar->ride_height + front_give + pExtra_front_height;
+    pCar->collision_info->bb2.min.v[1] = GetCarOverallBoundsMinY(pCar);
 }
 
 #ifdef REC2_MATCHING
