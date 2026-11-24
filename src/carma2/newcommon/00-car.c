@@ -1561,23 +1561,23 @@ float C2_HOOK_FASTCALL GetCarOverallBoundsMinY(const tCar_spec* pCar_spec) {
 // FUNCTION: CARMA2_CHEAT 0x0041fec0
 void C2_HOOK_FASTCALL SetCarSuspGiveAndHeight(tCar_spec* pCar, float pFront_give_factor, float pRear_give_factor, float pDamping_factor, float pExtra_front_height, float pExtra_rear_height) {
     float ratio;
-    float front_give;
-    float rear_give;
+    float temp;
     float damping;
 
-    front_give = pCar->susp_give * pFront_give_factor * WORLD_SCALE;
-    rear_give = pCar->steerable_suspension_give * pRear_give_factor * WORLD_SCALE;
+    pFront_give_factor = pCar->susp_give * pFront_give_factor * WORLD_SCALE;
+    pRear_give_factor = pCar->steerable_suspension_give * pRear_give_factor * WORLD_SCALE;
     damping = pCar->damping * pDamping_factor;
     ratio = fabs((pCar->wpos[0].v[2] - pCar->centre_of_mass_world_scale.v[2]) / (pCar->wpos[2].v[2] - pCar->centre_of_mass_world_scale.v[2]));
-    pCar->sk[0] = (pCar->collision_info->M / (ratio + 1.0f)) * 5.0f / rear_give;
-    pCar->sb[0] = (pCar->collision_info->M / (ratio + 1.0f)) * (br_scalar)sqrt(5.0) / (br_scalar)sqrt(rear_give);
-    ratio = 1.0 / ratio;
-    pCar->sk[1] = (pCar->collision_info->M / (ratio + 1.0f)) * 5.0f / front_give;
-    pCar->sb[1] = (pCar->collision_info->M / (ratio + 1.0f)) * (br_scalar)sqrt(5.0) / (br_scalar)sqrt(front_give);
+    temp = ratio + 1.0f;
+    pCar->sk[0] = (pCar->collision_info->M / temp) * 5.0f / pRear_give_factor;
+    pCar->sb[0] = (pCar->collision_info->M / temp) * (br_scalar)sqrt(5.0) / (br_scalar)sqrt(pRear_give_factor);
+    temp = 1.0 / ratio + 1.0f;
+    pCar->sk[1] = (pCar->collision_info->M / temp) * 5.0f / pFront_give_factor;
+    pCar->sb[1] = (pCar->collision_info->M / temp) * (br_scalar)sqrt(5.0) / (br_scalar)sqrt(pFront_give_factor);
     pCar->sb[0] *= damping;
     pCar->sb[1] *= damping;
-    pCar->susp_height[0] = pCar->ride_height + rear_give + pExtra_rear_height;
-    pCar->susp_height[1] = pCar->ride_height + front_give + pExtra_front_height;
+    pCar->susp_height[0] = pCar->ride_height + pRear_give_factor + pExtra_rear_height;
+    pCar->susp_height[1] = pCar->ride_height + pFront_give_factor + pExtra_front_height;
     pCar->collision_info->bb2.min.v[1] = GetCarOverallBoundsMinY(pCar);
 }
 
