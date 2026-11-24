@@ -28,7 +28,7 @@ extern char gQuick_time_banner_texture_name[256];
 
 // SwapPixelmapBytePairs
 
-// WriteBannerFrame
+extern void C2_HOOK_FASTCALL WriteBannerFrame(void);
 
 // Allocate555BackScreen
 
@@ -42,9 +42,9 @@ extern char gQuick_time_banner_texture_name[256];
 
 // MovieStartNewMovie
 
-// MovieStopRecordingAndSave
+extern int C2_HOOK_FASTCALL MovieStopRecordingAndSave(void);
 
-// FreeOffQTshite
+extern void C2_HOOK_FASTCALL FreeOffQTshite(void);
 
 extern void C2_HOOK_CDECL InitQuickTimeStuff(void);
 

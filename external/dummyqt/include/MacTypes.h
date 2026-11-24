@@ -9,6 +9,8 @@
 #ifndef __MACTYPES__
 #define __MACTYPES__
 
+#include "c2_hooks.h"
+
 #include <stdint.h>
 
 typedef long                      Fixed;

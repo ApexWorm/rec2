@@ -13,6 +13,6 @@
 
 typedef long                            ImageSequence;
 
-extern OSErr CDSequenceEnd(ImageSequence seqID);
+extern OSErr C2_HOOK_CDECL CDSequenceEnd(ImageSequence seqID);
 
 #endif /* __IMAGECOOMPRESSION__ */

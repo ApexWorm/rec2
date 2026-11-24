@@ -22,61 +22,69 @@ OSErr C2_HOOK_CDECL InitializeQTML(long flag) {
 
 // STUB: CARMA2_SW 0x005709e0
 // STUB: CARMA2_HW 0x00575340
-StringPtr c2pstr(char *aStr) {
+// STUB: CARMA2_CHEAT 0x0057af30
+StringPtr C2_HOOK_CDECL c2pstr(char *aStr) {
     (void)aStr;
     return NULL;
 }
 
-// STUB: CARMA2_SW 0x00570ac0
+// STUB: CARMA2_HW 0x00570ac0
 // STUB: CARMA2_SW 0x0056c160
-void DisposeHandle(Handle h) {
+// STUB: CARMA2_CHEAT 0x005766b0
+void C2_HOOK_CDECL DisposeHandle(Handle h) {
     (void)h;
 }
 
 // STUB: CARMA2_HW 0x0056a8e0
 // STUB: CARMA2_SW 0x00565f80
 // STUB: CARMA2_CHEAT 0x005704d0
-OSErr EnterMovies(void) {
+OSErr C2_HOOK_CDECL EnterMovies(void) {
     return 0x1;
 }
 
 // STUB: CARMA2_HW 0x0056baa0
 // STUB: CARMA2_SW 0x00567140
-OSErr CloseMovieFile(short resRefNum) {
+// STUB: CARMA2_CHEAT 0x00571690
+OSErr C2_HOOK_CDECL CloseMovieFile(short resRefNum) {
     (void)resRefNum;
     return 0x1;
 }
 
 // STUB: CARMA2_HW 0x0056abe0
 // STUB: CARMA2_SW 0x00566280
-void DisposeMovie(Movie theMovie) {
+// STUB: CARMA2_CHEAT 0x005707d0
+void C2_HOOK_CDECL DisposeMovie(Movie theMovie) {
     (void)theMovie;
 }
 
 // STUB: CARMA2_HW 0x0056b360
 // STUB: CARMA2_SW 0x00566a00
-OSErr EndMediaEdits(Media theMedia) {
+// STUB: CARMA2_CHEAT 0x00570f50
+OSErr C2_HOOK_CDECL EndMediaEdits(Media theMedia) {
     (void)theMedia;
     return 1;
 }
 
 // STUB: CARMA2_HW 0x0056b240
 // STUB: CARMA2_SW 0x005668e0
-TimeValue GetMediaDuration(Media theMedia) {
+// STUB: CARMA2_CHEAT 0x00570e30
+TimeValue C2_HOOK_CDECL GetMediaDuration(Media theMedia) {
     (void)theMedia;
     return 0;
 }
 
-// lIBRARY: CARMA2_HW 0x0056dac0
-// lIBRARY: CARMA2_SW 0x00569160
-OSErr CDSequenceEnd(ImageSequence seqID) {
+// STUB: CARMA2_HW 0x0056dac0
+// STUB: CARMA2_SW 0x00569160
+// STUB: CARMA2_CHEAT 0x005736b0
+OSErr C2_HOOK_CDECL CDSequenceEnd(ImageSequence seqID) {
     (void)seqID;
     return 1;
 }
 
 // STUB: CARMA2_HW 0x0056c600
 // STUB: CARMA2_SW 0x00567ca0
-OSErr InsertMediaIntoTrack(Track theTrack, TimeValue trackStart, TimeValue mediaTime, TimeValue mediaDuration, Fixed mediaRate) {
+// STUB: CARMA2_CHEAT 0x005721f0
+OSErr C2_HOOK_CDECL InsertMediaIntoTrack(Track theTrack, TimeValue trackStart, TimeValue mediaTime, TimeValue mediaDuration, Fixed mediaRate) {
     (void)theTrack;
     (void)trackStart;
     (void)mediaTime;
@@ -87,7 +95,8 @@ OSErr InsertMediaIntoTrack(Track theTrack, TimeValue trackStart, TimeValue media
 
 // STUB: CARMA2_HW 0x0056c800
 // STUB: CARMA2_SW 0x00567ea0
-Movie FlattenMovieData(Movie theMovie, long movieFlattenFlags, const FSSpec *theFile, OSType creator, ScriptCode scriptTag, long createMovieFileFlags) {
+// STUB: CARMA2_CHEAT 0x005723f0
+Movie C2_HOOK_CDECL FlattenMovieData(Movie theMovie, long movieFlattenFlags, const FSSpec *theFile, OSType creator, ScriptCode scriptTag, long createMovieFileFlags) {
     (void)theMovie;
     (void)movieFlattenFlags;
     (void)theFile;
@@ -99,6 +108,6 @@ Movie FlattenMovieData(Movie theMovie, long movieFlattenFlags, const FSSpec *the
 
 // STUB: CARMA2_HW 0x0056c720
 // STUB: CARMA2_SW 0x00567dc0
-OSErr CreateMovieFile(const FSSpec* fileSpec, OSType creator, ScriptCode scriptTag, long createMovieFileFlags, short* resRefNum, Movie* newmovie) {
+OSErr C2_HOOK_CDECL CreateMovieFile(const FSSpec* fileSpec, OSType creator, ScriptCode scriptTag, long createMovieFileFlags, short* resRefNum, Movie* newmovie) {
     return 1;
 }
