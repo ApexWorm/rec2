@@ -4227,7 +4227,14 @@ int C2_HOOK_FASTCALL NetSummary_MenuHandler(tFrontend_spec* pFrontend) {
 
 void C2_HOOK_FASTCALL DisplayVolumeSettings(tFrontend_spec* pFrontend) {
 
+#if defined(_MSC_VER) && _MSC_VER >= 1400
+#pragma warning(push)
+#pragma warning(disable : 4244) // '=' : conversion from 'double ' to 'float ', possible loss of data
+#endif
     gOptions_sound_slider.value = gProgram_state.effects_volume / 255.0;
+#if defined(_MSC_VER) && _MSC_VER >= 1400
+#pragma warning(pop)
+#endif
     if (gProgram_state.music_volume >= 128) {
         SelectThisItemIn(pFrontend, 1, 14);
     } else {
