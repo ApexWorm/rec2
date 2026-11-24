@@ -16,6 +16,8 @@
 
 #include <stdlib.h> /* uintptr_t */
 
+#define S3_FIXED_INT(F)  ((int)((F) * 65536.0f))
+
 // External typedefs
 
 typedef float tF32;

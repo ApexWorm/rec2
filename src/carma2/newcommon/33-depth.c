@@ -12,6 +12,7 @@
 #include "07-structur.h"
 #include "15-displays.h"
 #include "17-world2.h"
+#include "20-skidmark.h"
 #include "36-trig.h"
 #include "37-brucetrk.h"
 #include "41-utility.h"
@@ -46,10 +47,6 @@ br_material* gHorizon_material;
 // GLOBAL: CARMA2_SW 0x00676c18
 // GLOBAL: CARMA2_CHEAT 0x00683d48
 br_model* gForward_sky_model;
-
-// GLOBAL: CARMA2_HW 0x0074cee8
-// GLOBAL: CARMA2_CHEAT 0x00754588
-br_material* gMaterial[2];
 
 // GLOBAL: CARMA2_HW 0x0059118c
 // GLOBAL: CARMA2_SW 0x0058c184

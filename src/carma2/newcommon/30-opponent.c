@@ -12,6 +12,7 @@
 #include "00-car.h"
 #include "08-loading1.h"
 #include "13-crush1.h"
+#include "23-piping.h"
 #include "26-oppoproc.h"
 #include "41-utility.h"
 #include "53-controls.h"
@@ -230,11 +231,26 @@ tS16 C2_HOOK_FASTCALL FindNearestPathSection(const br_vector3* pActor_coords, br
 
 // DeadStopCar
 
-// TurnOpponentPhysicsOn
+// FUNCTION: CARMA2_HW 0x004a7960
+// FUNCTION: CARMA2_SW 0x004a3ad0
+// FUNCTION: CARMA2_CHEAT 0x004a8c70
+void C2_HOOK_FASTCALL TurnOpponentPhysicsOn(tOpponent_spec* pOpponent_spec) {
+    pOpponent_spec->car_spec->car_master_actor->render_style = BR_RSTYLE_DEFAULT;
+    PipeSingleOppoRenderage(pOpponent_spec, 1);
+    if (!pOpponent_spec->physics_me) {
+        pOpponent_spec->physics_me = 1;
+        gActive_car_list_rebuild_required = 1;
+    }
+}
 
 // TurnOpponentPhysicsOff
 
-// ApplyOppoRenderage2
+// STUB: CARMA2_HW 0x004a7a20
+// STUB: CARMA2_SW 0x004a3b90
+// STUB: CARMA2_CHEAT 0x004a8d30
+void C2_HOOK_FASTCALL ApplyOppoRenderage2(tOpponent_spec* pOpponent_spec, int pRender) {
+    NOT_IMPLEMENTED();
+}
 
 // FUNCTION: CARMA2_HW 0x004aad70
 // FUNCTION: CARMA2_SW 0x004a6ee0
@@ -1357,7 +1373,26 @@ int C2_HOOK_FASTCALL GetOpponentsNextSection(const tOpponent_spec* pOpponent_spe
 
 // GetOpponentsSectionFinishNodePoint
 
-// GetOpponentsSectionWidth
+// FUNCTION: CARMA2_HW 0x004aece0
+// FUNCTION: CARMA2_SW 0x004aae50
+// FUNCTION: CARMA2_CHEAT 0x004b01f0
+float C2_HOOK_FASTCALL GetOpponentsSectionWidth(const tOpponent_spec* pOpponent_spec, tS16 pSection) {
+    if (pSection >= 20000) {
+        int sections = pOpponent_spec->nnext_sections;
+        int s = pSection - 20000;
+        if (sections > s) {
+            tS16 idx = pOpponent_spec->next_sections[pSection - 20000].section_no;
+            return gProgram_state.AI_vehicles.path_sections[idx].width;
+        }
+    }
+    if (pSection >= 15000) {
+        return 0.5f;
+    }
+    if (pSection == 10000) {
+        return pOpponent_spec->pursue_car_data.direct_line_section.width;
+    }
+    return gProgram_state.AI_vehicles.path_sections[(tS32)pSection].width;
+}
 
 // FUNCTION: CARMA2_HW 0x004aed50
 // FUNCTION: CARMA2_SW 0x004aaec0
