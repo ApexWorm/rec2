@@ -1760,9 +1760,9 @@ void C2_HOOK_FASTCALL InitReplaySplashes(void) {
 
     gReplay_splash_flags = 0;
     for (object = gPHIL_list_collision_infos; object != NULL; object = object->next) {
-        if (object->water_d != 10000.f) {
+        if (object->water_d != 10000.0f) {
             owner = NULL;
-            if (PHILGetObjectProperty(object, 6) != 0.f) {
+            if (PHILGetObjectProperty(object, 6) != 0.0f) {
                 owner = object;
                 type = 0xff;
             } else if (object != NULL && object->owner != NULL && object->flags_0x238 == 1) {
