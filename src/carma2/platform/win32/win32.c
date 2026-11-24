@@ -1614,9 +1614,9 @@ void C2_HOOK_FASTCALL CheckIfRunningOnServer(void) {
     int i;
     char working_directory[256 + 1];
 #ifdef REC2_FIX_BUGS
-    char computer_name[16];
-#else
     char computer_name[24];
+#else
+    char computer_name[16];
 #endif
     DWORD computer_name_size;
     FILE *f;
@@ -1634,7 +1634,7 @@ void C2_HOOK_FASTCALL CheckIfRunningOnServer(void) {
 #pragma GCC diagnostic ignored "-Wstringop-overflow"
 #endif
 #endif
-strcpy(computer_name, "UNKNOWN - lucky cunts");
+                strcpy(computer_name, "UNKNOWN - lucky cunts");
 #ifndef REC2_FIX_BUGS
 #ifdef __GNUC__
 #pragma GCC diagnostic pop
