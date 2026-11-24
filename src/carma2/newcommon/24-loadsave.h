@@ -16,7 +16,7 @@ extern int gINT_0068b8e8;
 extern int gSave_game_out_of_sync;
 extern int gCount_saved_games;
 
-// Encryptificate
+extern void C2_HOOK_FASTCALL Encryptificate(tSave_game* pSave_games, int pCount);
 
 extern void C2_HOOK_FASTCALL MakeSavedGame(tSave_game* pSave_game);
 

@@ -47,6 +47,7 @@ struct sockaddr gLocal_address;
 struct sockaddr gLocal_address_2;
 
 // GLOBAL: CARMA2_HW 0x006ac358
+// GLOBAL: CARMA2_SW 0x006a58a8
 // GLOBAL: CARMA2_CHEAT 0x006b39e8
 struct sockaddr* gPtr_local_address; /* FIXME: rename to gLocal_addr_ipx? */
 
@@ -71,6 +72,7 @@ struct sockaddr* gPtr_broadcast_address;
 WSADATA gWSA_data;
 
 // GLOBAL: CARMA2_HW 0x006619b0
+// GLOBAL: CARMA2_SW 0x0065c2a0
 // GLOBAL: CARMA2_CHEAT 0x00669214
 SOCKET gSocket = SOCKET_ERROR;
 
@@ -492,7 +494,7 @@ int C2_HOOK_FASTCALL PDNetJoinGame(tNet_game_details* pGame_details, const char*
 // FUNCTION: CARMA2_HW 0x0051a0c0
 // FUNCTION: CARMA2_SW 0x00513ba0
 // FUNCTION: CARMA2_CHEAT 0x0051f7e0
-void C2_HOOK_FASTCALL PDNetHostFinishGame(void) {
+void C2_HOOK_FASTCALL PDNetHostFinishGame(tNet_game_details* pDetails) {
 
     dr_dprintf("PDNetHostFinishGame()");
 }
