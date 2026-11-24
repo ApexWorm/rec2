@@ -4227,7 +4227,7 @@ int C2_HOOK_FASTCALL NetSummary_MenuHandler(tFrontend_spec* pFrontend) {
 
 void C2_HOOK_FASTCALL DisplayVolumeSettings(tFrontend_spec* pFrontend) {
 
-    gOptions_sound_slider.value = (float)(gProgram_state.effects_volume / 255.0);
+    gOptions_sound_slider.value = gProgram_state.effects_volume / 255.0;
     if (gProgram_state.music_volume >= 128) {
         SelectThisItemIn(pFrontend, 1, 14);
     } else {
