@@ -391,35 +391,30 @@ int C2_HOOK_FASTCALL S3StopOutletSound(tS3_outlet* pOutlet) {
 // FUNCTION: CARMA2_CHEAT 0x0056c30e
 int C2_HOOK_FASTCALL S3ReleaseSoundSource(tS3_sound_source* src) {
     tS3_sound_source* prev;
-    tS3_sound_source* next;
+    tS3_sound_source* next_src;
 
     C2_HOOK_BUG_ON(sizeof(tS3_sound_source) != 68);
 
-    if (!gS3_enabled) {
-        return 0;
-    }
-
-    if (src == NULL) {
-        return 0;
-    }
-    prev = src->prev;
-    next = src->next;
-    if (prev != NULL) {
-        prev->next = next;
-    } else {
-        gS3_state.sources = src->next;
-    }
-    if (next != NULL) {
-        next->prev = prev;
-    }
-    if (gS3_state.count_sources != 0) {
-        gS3_state.count_sources--;
-        if (gS3_state.count_sources == 0) {
-            gS3_state.sources = NULL;
+    if (gS3_enabled && src != NULL) {
+        prev = src->prev;
+        next_src = src->next;
+        if (prev != NULL) {
+            prev->next = next_src;
+        } else {
+            gS3_state.sources = next_src;
         }
+        if (next_src != NULL) {
+            next_src->prev = prev;
+        }
+        if (gS3_state.count_sources != 0) {
+            gS3_state.count_sources--;
+            if (gS3_state.count_sources == 0) {
+                gS3_state.sources = NULL;
+            }
+        }
+        S3StopSoundSource(src);
+        S3MemFree(src);
     }
-    S3StopSoundSource(src);
-    S3MemFree(src);
     return 0;
 }
 
