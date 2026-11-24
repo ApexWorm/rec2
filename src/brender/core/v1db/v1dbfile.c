@@ -1351,7 +1351,7 @@ br_uint_32 C2_HOOK_CDECL WriteModel(br_model* mp, br_datafile* df) {
 }
 
 // FUNCTION: CARMA2_HW 0x00523e50
-// FUNCTION: CARMA2_SW 0x00520000
+// FUNCTION: CARMA2_SW 0x0051f4f0
 // FUNCTION: CARMA2_CHEAT 0x00529a40
 br_uint_32 C2_HOOK_CDECL BrModelSaveMany(char* filename, br_model** models, br_uint_16 num) {
     br_datafile* df;
@@ -1575,7 +1575,7 @@ br_model* C2_HOOK_CDECL BrModelLoad(char* filename) {
 }
 
 // FUNCTION: CARMA2_HW 0x00524960
-// FUNCTION: CARMA2_SW 0x0051f4f0
+// FUNCTION: CARMA2_SW 0x00520000
 // FUNCTION: CARMA2_CHEAT 0x0052a550
 br_uint_32 C2_HOOK_CDECL BrModelSave(char* filename, br_model* ptr) {
 
