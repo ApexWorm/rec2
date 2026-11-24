@@ -17,7 +17,7 @@ extern br_actor* gDelete_list[500];
 
 extern br_uint_32 C2_HOOK_FASTCALL DeleteBastards(br_actor* pActor, br_matrix34* pMatrix, void* pArg);
 
-// DeleteAnyZeroBastards
+extern void C2_HOOK_FASTCALL DeleteAnyZeroBastards(void);
 
 extern br_uint_32 C2_HOOK_FASTCALL ApplyTransToModels(br_actor* pActor, br_matrix34* pMatrix, void* pArg);
 
@@ -29,9 +29,9 @@ extern void C2_HOOK_FASTCALL SetSpecVolMatSize(br_actor* pActor);
 
 extern void C2_HOOK_FASTCALL UpdateSpecVol(void);
 
-// PutAdditionalNonCarsOnToAdditionalActors
+extern void C2_HOOK_FASTCALL PutAdditionalNonCarsOnToAdditionalActors(void);
 
-// PutAdditionalNonCarsOnToNonTrackActor
+extern void C2_HOOK_FASTCALL PutAdditionalNonCarsOnToNonTrackActor(void);
 
 extern void C2_HOOK_FASTCALL SaveAdditionalActors(void);
 

@@ -26,6 +26,9 @@
 #include "28-world3.h"
 #include "11-world1.h"
 #include "18b-graphics2.h"
+#include "05-drmem.h"
+#include "42-input.h"
+#include "53-controls.h"
 
 #include <string.h>
 
@@ -71,12 +74,32 @@ C2_NORETURN void C2_HOOK_FASTCALL QuitGame(void) {
     exit(0);
 }
 
-// ServiceTheGame
+inline void C2_HOOK_FASTCALL ServiceTheGame(int pRacing) {
 
-// STUB: CARMA2_HW 0x00492180
-// STUB: CARMA2_CHEAT 0x004921a0
+    CheckMemory();
+    if (!pRacing) {
+        CyclePollKeys();
+    }
+    PollKeys();
+    rand();
+    if (PDServiceSystem(gFrame_period)) {
+        QuitGame();
+    }
+    if (!pRacing) {
+        CheckSystemKeys(0);
+        if (gSound_enabled) {
+            SoundService();
+        }
+    }
+    NetService(pRacing);
+}
+
+// FUNCTION: CARMA2_HW 0x00492180
+// FUNCTION: CARMA2_SW 0x0048f3d0
+// FUNCTION: CARMA2_CHEAT 0x004921a0
 void C2_HOOK_FASTCALL ServiceGame(void) {
-    NOT_IMPLEMENTED();
+
+    ServiceTheGame(0);
 }
 
 // STUB: CARMA2_HW 0x004922a0
