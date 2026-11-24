@@ -9,6 +9,8 @@
 #include "29-raycast.h"
 
 #include "16-graphics1.h"
+#include "32-spark.h"
+#include "37-brucetrk.h"
 #include "globvars.h"
 #include "rec2_macros.h"
 
@@ -57,7 +59,21 @@ br_matrix34 gPick_model_to_view__raycast;
 // GLOBAL: CARMA2_CHEAT 0x006a9c98
 float gHighest_y_below;
 
-// DRActorToRoot
+inline int C2_HOOK_FASTCALL DRActorToRoot(br_actor* a, br_actor* world, br_matrix34* m) {
+
+    if (a == world) {
+        BrMatrix34Identity(m);
+        return 1;
+    } else {
+        BrTransformToMatrix34(m, &a->t);
+        for (a = a->parent; a != NULL && a != world; a = a->parent) {
+            if (a->t.type != BR_TRANSFORM_IDENTITY) {
+                BrMatrix34PostTransform(m, &a->t);
+            }
+        }
+        return a == world;
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x004e3660
 // FUNCTION: CARMA2_SW 0x004df9f0
@@ -211,7 +227,20 @@ int C2_HOOK_FASTCALL ActorPick2D(br_actor* pActor, br_model* pModel, br_material
 
 // DRScenePick2DXY
 
-// DRScenePick2D
+inline int C2_HOOK_FASTCALL DRScenePick2D(br_actor* world, br_actor* camera, dr_pick2d_cbfn* callback, void* arg) {
+    br_matrix34 camera_tfm;
+    br_scalar scale;
+    br_scalar aspect;
+    br_camera* camera_data;
+
+    camera_data = (br_camera*)camera->type_data;
+    DRActorToRoot(camera, world, &camera_tfm);
+    BrMatrix34Inverse(&gPick_model_to_view__raycast, &camera_tfm);
+    aspect = camera_data->aspect;
+    scale = BR_COS(camera_data->field_of_view / 2) / BR_SIN(camera_data->field_of_view / 2);
+    BrMatrix34PostScale(&gPick_model_to_view__raycast, scale / aspect, scale, 1.0f);
+    return ActorPick2D(world, NULL, gBlack_material, callback, arg);
+}
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
@@ -303,11 +332,28 @@ int C2_HOOK_CDECL FindYVerticallyBelowCallBack(br_actor* pActor, br_model* pMode
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x004e4370
-// STUB: CARMA2_SW 0x004e0700
-// STUB: CARMA2_CHEAT 0x004e9ef0
+// FUNCTION: CARMA2_HW 0x004e4370
+// FUNCTION: CARMA2_SW 0x004e0700
+// FUNCTION: CARMA2_CHEAT 0x004e9ef0
 br_scalar C2_HOOK_FASTCALL FindYVerticallyBelow(br_vector3* pPosition) {
-    NOT_IMPLEMENTED();
+    tTrack_spec* track_spec;
+    tU8 z;
+    tU8 x;
+    tU8 cz;
+    tU8 cx;
+
+    track_spec = &gProgram_state.track_spec;
+    XZToColumnXZ(&cx, &cz, pPosition->v[0], pPosition->v[2], track_spec);
+    gHighest_y_below = BR_SCALAR_MIN;
+    gY_picking_camera->t.t.translate.t = *pPosition;
+    for (x = MAX(0, cx - 1); x < MIN(track_spec->ncolumns_x, cx + 2); x++) {
+        for (z = MAX(0, cz - 1); z < MIN(track_spec->ncolumns_z, cz + 2); z++) {
+            if (track_spec->columns[z][x].actor_0x0 != NULL) {
+                DRScenePick2D(track_spec->columns[z][x].actor_0x0, gY_picking_camera, FindYVerticallyBelowCallBack, NULL);
+            }
+        }
+    }
+    return gHighest_y_below;
 }
 
 #ifdef REC2_MATCHING
