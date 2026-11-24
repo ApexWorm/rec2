@@ -1055,7 +1055,7 @@ void C2_HOOK_FASTCALL BuggerModelName(tTrack_spec* pTrack_spec, const char* pNam
     char identifier[4];
 
     sprintf(identifier, "%c%02d", ')', pIndex);
-    model = BrModelFind(identifier);
+    model = BrModelFind(pName);
     if (model == NULL || model->identifier == NULL) {
 #ifdef REC2_FIX_BUGS
         FatalError(kFatalError_CannotFindModelReferencedInSoundGeneratorList_S, identifier);
@@ -1070,9 +1070,6 @@ void C2_HOOK_FASTCALL BuggerModelName(tTrack_spec* pTrack_spec, const char* pNam
 // FUNCTION: CARMA2_HW 0x004572f0
 // FUNCTION: CARMA2_SW 0x00457080
 void C2_HOOK_FASTCALL ReadSoundGenerators(tTrack_spec* pTrack_spec, FILE* pF) {
-    float x;
-    float y;
-    float z;
     char name[32];
     tTrackSoundGenerator* generator;
     int i;
@@ -1085,10 +1082,15 @@ void C2_HOOK_FASTCALL ReadSoundGenerators(tTrack_spec* pTrack_spec, FILE* pF) {
 
             generator->type = GetALineAndInterpretCommand(pF, gSound_generator_type_names, REC2_ASIZE(gSound_generator_type_names));
             switch (generator->type) {
-            case kSoundGeneratorType_point:
+            case kSoundGeneratorType_point: {
+                float x;
+                float y;
+                float z;
+
                 GetThreeFloats(pF, &x, &y, &z);
                 BrVector3Set(&generator->point, x, y, z);
                 break;
+            }
             case kSoundGeneratorType_actor:
                 GetAString(pF, name);
                 BuggerModelName(pTrack_spec, name, i);
