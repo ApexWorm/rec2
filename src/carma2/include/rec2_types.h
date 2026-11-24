@@ -6077,6 +6077,7 @@ enum {
     kFatalError_TooManyCrushLimits = 0x7a,
     kFatalError_TooManyCrushDatas = 0x7c,
     kFatalError_ChunkIsTooLargeToPipe = 0x7d,
+    kFatalError_RelinActorNullToNullInActionReplay = 0x7e,
     kFatalError_CannotFindSmashActorModel_S = 0x81,
     kFatalError_ProblemWithSpecialVolumeNumber_I = 0x82,
     kFatalError_TooManyEnvironmentalSoundAlternatives = 0x83,
