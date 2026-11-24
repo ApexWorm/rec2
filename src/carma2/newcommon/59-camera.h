@@ -17,6 +17,8 @@ extern int gOpponent_viewing_mode;
 extern int gAction_replay_manual_camera_target_type;
 extern int gCamera_frozen;
 extern tSave_camera gSave_camera[2];
+extern int gCamera_mode;
+extern float gFLOAT_006792fc;
 extern br_actor* gPed_actor;
 
 extern float gCamera_cockpit_hither;
@@ -76,7 +78,7 @@ extern void C2_HOOK_FASTCALL SaveCameraPosition(int pIndex);
 
 extern void C2_HOOK_FASTCALL RestoreCameraPosition(int pIndex);
 
-// DrVector3RotateY
+extern void C2_HOOK_FASTCALL DrVector3RotateY(br_vector3* v, br_angle t);
 
 // GeneralisedPositionExternalCamera
 

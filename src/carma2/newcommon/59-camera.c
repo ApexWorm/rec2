@@ -41,6 +41,11 @@ int gNet_player_to_view_index = -1;
 // GLOBAL: CARMA2_CHEAT 0x00680b28
 int gAction_replay_manual_camera_target_type;
 
+// GLOBAL: CARMA2_HW 0x00679294
+// GLOBAL: CARMA2_SW 0x00673a04
+// GLOBAL: CARMA2_CHEAT 0x00680b44
+int gCamera_mode;
+
 // GLOBAL: CARMA2_HW 0x006792b4
 // GLOBAL: CARMA2_SW 0x00673a24
 // GLOBAL: CARMA2_CHEAT 0x00680b64
@@ -64,6 +69,11 @@ tU32 gSwitch_time;
 // GLOBAL: CARMA2_SW 0x00673a38
 // GLOBAL: CARMA2_CHEAT 0x00680b78
 tSave_camera gSave_camera[2];
+
+// GLOBAL: CARMA2_HW 0x006792fc
+// GLOBAL: CARMA2_SW 0x00673a6c
+// GLOBAL: CARMA2_CHEAT 0x00680bac
+float gFLOAT_006792fc;
 
 // GLOBAL: CARMA2_HW 0x007634ac
 // GLOBAL: CARMA2_SW 0x00759a0c
@@ -488,7 +498,17 @@ void C2_HOOK_FASTCALL RestoreCameraPosition(int pIndex) {
     gSave_camera[pIndex].saved = 0;
 }
 
-// DrVector3RotateY
+inline void C2_HOOK_FASTCALL DrVector3RotateY(br_vector3* v, br_angle t) {
+    br_scalar c;
+    br_scalar s;
+    br_scalar ts;
+
+    c = BR_COS(t);
+    s = BR_SIN(t);
+    ts = v->v[0] * c + v->v[2] * s;
+    v->v[2] = v->v[2] * c - v->v[0] * s;
+    v->v[0] = ts;
+}
 
 // GeneralisedPositionExternalCamera
 
@@ -594,11 +614,38 @@ int C2_HOOK_FASTCALL CollideCameraWithOtherCars(br_vector3* pPos, br_vector3* pC
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x00413580
-// STUB: CARMA2_SW 0x004135b0
-// STUB: CARMA2_CHEAT 0x004137e0
+// FUNCTION: CARMA2_HW 0x00413580
+// FUNCTION: CARMA2_SW 0x004135b0
+// FUNCTION: CARMA2_CHEAT 0x004137e0
 void C2_HOOK_FASTCALL InitialiseExternalCamera(void) {
-    NOT_IMPLEMENTED();
+    br_scalar ts;
+    tCar_spec* c;
+    br_angle yaw;
+
+    c = gCar_to_view;
+    if (!gProgram_state.racing) {
+        c = &gProgram_state.current_car;
+    }
+    gCamera_height = c->pos.v[1];
+    gView_direction.v[0] = c->direction.v[0];
+    gView_direction.v[1] = 0.0f;
+    gView_direction.v[2] = c->direction.v[2];
+    gFLOAT_006792fc = 1.0f;
+    BrVector3Normalise(&gView_direction, &gView_direction);
+    ts = -(gView_direction.v[2] * c->car_master_actor->t.t.mat.m[2][2] + gView_direction.v[0] * c->car_master_actor->t.t.mat.m[2][0] + gView_direction.v[1] * c->car_master_actor->t.t.mat.m[2][1]);
+    gCamera_sign = ts < 0;
+    if (gCamera_sign) {
+        yaw = -gCamera_yaw;
+    } else {
+        yaw = gCamera_yaw;
+    }
+    DrVector3RotateY(&gView_direction, yaw);
+    gCamera_frozen = 0;
+    gCamera_mode = -2;
+    gMin_camera_car_distance = 0.6f;
+    if (gCountdown && (gNet_mode == eNet_mode_none || gCurrent_net_game->options.grid_start) && gCountdown > 4) {
+        gCamera_height += 10.f;
+    }
 }
 
 #ifdef REC2_MATCHING
