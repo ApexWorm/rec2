@@ -1,4 +1,5 @@
 address,type,name
+0x0051952e,library,_closesocket@4
 0x00571220,library,__ftol
 0x00571250,library,__chkstk
 0x00571290,library,_strchr
@@ -194,6 +195,7 @@ address,type,name
 0x00582a20,library,__setmode
 0x00582c10,library,__strupr
 0x00582cd0,library,__strnicmp
+0x0058425c,global,_closesocket
 0x00588700,global,___lookuptable
 0x0058a000,global,___xc_a
 0x0058a004,global,___xc_z

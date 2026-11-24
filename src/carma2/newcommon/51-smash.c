@@ -21,6 +21,7 @@
 #include "52-errors.h"
 #include "59-camera.h"
 #include "62-graphics3.h"
+#include "69-sound.h"
 
 #include "globvars.h"
 #include "globvrpb.h"
@@ -957,10 +958,27 @@ void C2_HOOK_FASTCALL ReadSmashableData(FILE* pF, tCar_crush_buffer_entry* pCar_
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x004ef840
-// STUB: CARMA2_SW 0x004eb4a0
+// FUNCTION: CARMA2_HW 0x004ef840
+// FUNCTION: CARMA2_SW 0x004eb4a0
+// FUNCTION: CARMA2_CHEAT 0x004f54e0
 void C2_HOOK_FASTCALL ActuallyRepairSmash(tCar_spec* pCar_spec, tCar_crush_smashable_part* pSmashable, int pLevel) {
-    NOT_IMPLEMENTED();
+    br_pixelmap* texture;
+
+    pSmashable->field_0x4c = pLevel;
+    texture = pSmashable->levels[pLevel].pixelmaps[IRandomBetween(0, pSmashable->levels[pLevel].count_pixelmaps - 1)];
+    PipeSingleSmashTextureChange(pCar_spec, pSmashable->funk_material, texture);
+    pSmashable->funk_material->user = texture;
+    if (pCar_spec->field_0x1960 == NULL) {
+        pSmashable->funk_material->colour_map = texture;
+    }
+    BrMaterialUpdate(pSmashable->funk_material, BR_MATU_COLOURMAP);
+    MungeInternalCarGlass(pCar_spec);
+    if (pLevel == 0 && pSmashable->funk >= 0) {
+        EnableFunkotronic(pSmashable->funk);
+    }
+    if (pCar_spec != NULL && pCar_spec->driver == eDriver_local_human && gProgram_state.racing) {
+        DRS3StartSound(gCar_outlet, eSoundId_SmashRepair);
+    }
 }
 
 #ifdef REC2_MATCHING
@@ -2030,7 +2048,7 @@ void C2_HOOK_FASTCALL TurnOffSmashModel(br_actor* pActor) {
 // FUNCTION: CARMA2_HW 0x004f5f90
 // FUNCTION: CARMA2_SW 0x004f1bf0
 // FUNCTION: CARMA2_CHEAT 0x004fbc30
-void C2_HOOK_FASTCALL SmashRemoveSomeFaces(br_model* pModel, tS16 pCount) {
+void C2_HOOK_FASTCALL SmashRemoveSomeFaces(br_model* pModel, int pCount) {
     pModel->nfaces -= pCount;
     DRModelUpdateAndKevificateMaterials(pModel, BR_MODU_ALL);
 }
@@ -2038,17 +2056,17 @@ void C2_HOOK_FASTCALL SmashRemoveSomeFaces(br_model* pModel, tS16 pCount) {
 // FUNCTION: CARMA2_HW 0x004f5fa0
 // FUNCTION: CARMA2_SW 0x004f1c00
 // FUNCTION: CARMA2_CHEAT 0x004fbc40
-void C2_HOOK_FASTCALL SmashRestoreSomeFaces(br_model* pModel, int pFace_count, const tU16* pFace_data, br_material* pMaterial) {
+void C2_HOOK_FASTCALL SmashRestoreSomeFaces(br_model* pModel, int pFace_count, const tPipe_remove_face* pFace_data, br_material* pMaterial) {
     br_face* face;
     int i;
 
     face = &pModel->faces[pModel->nfaces];
     for (i = 0; i < pFace_count; i++) {
         face->material = pMaterial;
-        face->vertices[0] = pFace_data[4 * i + 0];
-        face->vertices[1] = pFace_data[4 * i + 1];
-        face->vertices[2] = pFace_data[4 * i + 2];
-        face->smoothing = pFace_data[4 * i + 3];
+        face->vertices[0] = pFace_data[i].vertices[0];
+        face->vertices[1] = pFace_data[i].vertices[1];
+        face->vertices[2] = pFace_data[i].vertices[2];
+        face->smoothing = pFace_data[i].smoothing;
         face->flags = 0;
         face++;
     }
