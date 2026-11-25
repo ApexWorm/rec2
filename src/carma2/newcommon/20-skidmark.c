@@ -26,6 +26,11 @@ const char* gBoring_material_names[2] = { "OILSMEAR.MAT", "ROBSMEAR.MAT" };
 // GLOBAL: CARMA2_CHEAT 0x00667658
 const char* gMaterial_names[2] = { "OILSMEAR.MAT", "GIBSMEAR.MAT" };
 
+// GLOBAL: CARMA2_HW 0x0065feb0
+// GLOBAL: CARMA2_SW 0x0065a7f0
+// GLOBAL: CARMA2_CHEAT 0x006676f8
+const char* gRepeatability_names[4] = { "none", "singleshot", "repeated", "doitregardless" };
+
 // GLOBAL: CARMA2_HW 0x0065fec0
 // GLOBAL: CARMA2_SW 0x0065a800
 // GLOBAL: CARMA2_CHEAT 0x00667708

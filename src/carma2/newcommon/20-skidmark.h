@@ -14,6 +14,7 @@
 
 extern const char* gBoring_material_names[2];
 extern const char* gMaterial_names[2];
+extern const char* gRepeatability_names[4];
 extern const char* gShrapnel_type_names[4];
 extern const char* gInitial_position_type_names[3];
 extern const char* gInitial_position_sphere_where[2];
