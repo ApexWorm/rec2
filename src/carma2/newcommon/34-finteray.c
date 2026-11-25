@@ -380,11 +380,65 @@ int C2_HOOK_FASTCALL ActorBoxPick(tBounds* bnds, br_actor* ap, br_model* model, 
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x00460bd0
-// STUB: CARMA2_SW 0x00460640
-// STUB: CARMA2_CHEAT 0x00461040
+// FUNCTION: CARMA2_HW 0x00460bd0
+// FUNCTION: CARMA2_SW 0x00460640
+// FUNCTION: CARMA2_CHEAT 0x00461040
 int C2_HOOK_FASTCALL LineBoxColl(br_vector3* pStart, br_vector3* pEnd, br_bounds* pBounds, br_vector3* pPoint, br_scalar* pT) {
-    NOT_IMPLEMENTED();
+    br_vector3 dir;
+    int inside;
+    int quad[3];
+    int i;
+    int which_plane;
+    br_scalar max_t[3];
+    br_scalar cp[3];
+
+    inside = 1;
+    BrVector3Sub(&dir, pEnd, pStart);
+    for (i = 0; i < 3; i++) {
+        if (pStart->v[i] < pBounds->min.v[i]) {
+            quad[i] = 1;
+            cp[i] = pBounds->min.v[i];
+            inside = 0;
+        } else if (pStart->v[i] > pBounds->max.v[i]) {
+            quad[i] = 0;
+            cp[i] = pBounds->max.v[i];
+            inside = 0;
+        } else {
+            quad[i] = 2;
+        }
+    }
+    if (inside) {
+        BrVector3Copy(pPoint, pStart);
+        return -1;
+    }
+    for (i = 0; i < 3; i++) {
+        if (quad[i] != 2 && dir.v[i] != 0.0f) {
+            max_t[i] = (cp[i] - pStart->v[i]) / dir.v[i];
+        } else {
+            max_t[i] = -1.0f;
+        }
+    }
+    which_plane = 0;
+    for (i = 1; i < 3; i++) {
+        if (max_t[i] > max_t[which_plane]) {
+            which_plane = i;
+        }
+    }
+    if (max_t[which_plane] < 0.0f || max_t[which_plane] > 1.0f) {
+        return 0;
+    }
+    for (i = 0; i < 3; i++) {
+        if (which_plane != i) {
+            pPoint->v[i] = dir.v[i] * max_t[which_plane] + pStart->v[i];
+            if (pPoint->v[i] < pBounds->min.v[i] || pPoint->v[i] > pBounds->max.v[i]) {
+                return 0;
+            }
+        } else {
+            pPoint->v[i] = cp[i];
+        }
+    }
+    *pT = max_t[which_plane];
+    return which_plane + 4 * quad[which_plane] + 1;
 }
 
 #ifdef REC2_MATCHING
@@ -417,10 +471,43 @@ int C2_HOOK_FASTCALL SphereBoxIntersection(const br_bounds* pBounds, const br_ve
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x00460e10
-// STUB: CARMA2_SW 0x00460880
+// FUNCTION: CARMA2_HW 0x00460e10
+// FUNCTION: CARMA2_SW 0x00460880
+// FUNCTION: CARMA2_CHEAT 0x00461280
 int C2_HOOK_FASTCALL LineBoxCollWithSphere(br_vector3* pStart, br_vector3* pEnd, br_bounds* pBounds, br_vector3* pPoint, br_vector3* pNormal, br_scalar* pT) {
-    NOT_IMPLEMENTED();
+    int result;
+    int axis;
+    int i;
+    br_scalar len;
+    double scale;
+
+    result = LineBoxColl(pStart, pEnd, pBounds, pPoint, pT);
+    if (result != 0) {
+        BrVector3Set(pNormal, 0.f, 0.f, 0.f);
+        axis = (result - 1) & 0x3;
+        pNormal->v[axis] = (result & 0x4) ? 1.0f : -1.0f;
+        return result;
+    }
+    if (SphereBoxIntersection(pBounds, pEnd, 2.5e-5f, pPoint)) {
+        *pT = 1.0f;
+        BrVector3Set(pNormal, 0.f, 0.f, 0.f);
+        for (i = 0; i < 3; i++) {
+            if (pPoint->v[i] == pBounds->max.v[i]) {
+                pNormal->v[i] = -1.0f;
+            } else if (pPoint->v[i] == pBounds->min.v[i]) {
+                pNormal->v[i] = 1.0f;
+            }
+        }
+        len = BrVector3Length(pNormal);
+        if (len > 2 * BR_SCALAR_EPSILON) {
+            scale = 1.0 / len;
+            BrVector3Scale(pNormal, pNormal, scale);
+        } else {
+            BrVector3Set(pNormal, 1.0f, 0.0f, 0.0f);
+        }
+        return 0x40;
+    }
+    return 0;
 }
 
 #ifdef REC2_MATCHING
