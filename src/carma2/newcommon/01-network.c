@@ -302,11 +302,19 @@ void C2_HOOK_FASTCALL HaltNetServiceReentrancy(void) {
     gIn_net_service = 1;
 }
 
-// STUB: CARMA2_HW 0x0049d430
-// STUB: CARMA2_SW 0x004995b0
-// STUB: CARMA2_CHEAT 0x0049d7e0
+// FUNCTION: CARMA2_HW 0x0049d430
+// FUNCTION: CARMA2_SW 0x004995b0
+// FUNCTION: CARMA2_CHEAT 0x0049d7e0
 void C2_HOOK_FASTCALL NetSendHeadupToAllPlayers(char* pMessage) {
-    NOT_IMPLEMENTED();
+    tNet_message_chunk* the_contents;
+
+    if (gNet_mode != eNet_mode_none) {
+        the_contents = NetStartBroadcastContents(eNet_message_chunk_type_headup, 0);
+        if (the_contents != NULL) {
+            strcpy(the_contents->headup.text, pMessage);
+            NetBroadcastContents(the_contents);
+        }
+    }
 }
 
 // FUNCTION: CARMA2_HW 0x0049d780
