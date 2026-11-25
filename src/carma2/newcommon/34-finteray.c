@@ -431,10 +431,52 @@ int C2_HOOK_FASTCALL LineBoxCollWithSphere(br_vector3* pStart, br_vector3* pEnd,
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x00460f60
-// STUB: CARMA2_SW 0x004609e0
+// FUNCTION: CARMA2_HW 0x00460f60
+// FUNCTION: CARMA2_SW 0x004609e0
+// FUNCTION: CARMA2_CHEAT 0x004613d0
 int C2_HOOK_FASTCALL LineSphereColl(br_vector3* pStart, br_vector3* pEnd, tCollision_shape_sphere_data* pSphere, br_vector3* pPoint, br_vector3* pNormal, br_scalar* pT) {
-    NOT_IMPLEMENTED();
+    br_scalar dist_squared;
+    br_vector3 dir;
+    br_vector3 to_center;
+    double s;
+    br_scalar dir_length_squared;
+    br_scalar t;
+    br_scalar d;
+    br_scalar len;
+
+    BrVector3Sub(&to_center, &pSphere->center, pStart);
+    dist_squared = BrVector3Dot(&to_center, &to_center);
+    if (dist_squared < pSphere->radius_squared) {
+        return -1;
+    }
+    BrVector3Sub(&dir, pEnd, pStart);
+    dir_length_squared = BrVector3Dot(&dir, &dir);
+    if (dir_length_squared < 1e-6) {
+        return 0;
+    }
+    t = BrVector3Dot(&to_center, &dir) / dir_length_squared;
+    d = dist_squared - t * t * dir_length_squared;
+    if (d > pSphere->radius_squared) {
+        return 0;
+    }
+    d = sqrt((pSphere->radius_squared - d) / dir_length_squared);
+    *pT = t - d;
+    if (*pT < 0.0f || *pT > 1.0f) {
+        return 0;
+    }
+    BrVector3Scale(&dir, &dir, *pT);
+    BrVector3Add(pPoint, pStart, &dir);
+    if (pNormal != NULL) {
+        BrVector3Sub(pNormal, &pSphere->center, pPoint);
+        len = BrVector3Length(pNormal);
+        if (len > 2 * BR_SCALAR_EPSILON) {
+            s = 1.0 / len;
+            BrVector3Scale(pNormal, pNormal, s);
+        } else {
+            BrVector3Set(pNormal, 1.0f, 0.0f, 0.0f);
+        }
+    }
+    return 1;
 }
 
 #ifdef REC2_MATCHING
@@ -445,10 +487,38 @@ int C2_HOOK_FASTCALL LineSphereColl(br_vector3* pStart, br_vector3* pEnd, tColli
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x004611b0
-// STUB: CARMA2_SW 0x00460c40
+// FUNCTION: CARMA2_HW 0x004611b0
+// FUNCTION: CARMA2_SW 0x00460c40
+// FUNCTION: CARMA2_CHEAT 0x00461620
 int C2_HOOK_FASTCALL LineSphereCollWithSphere(br_vector3* pStart, br_vector3* pEnd, tCollision_shape_sphere_data* pSphere, br_vector3* pPoint, br_vector3* pNormal, br_scalar* pT) {
-    NOT_IMPLEMENTED();
+    int result;
+    br_scalar dist_squared;
+    br_scalar len;
+    double s;
+
+    result = LineSphereColl(pStart, pEnd, pSphere, pPoint, pNormal, pT);
+    if (result != 0) {
+        return result;
+    }
+    BrVector3Sub(pNormal, &pSphere->center, pEnd);
+    dist_squared = BrVector3LengthSquared(pNormal);
+    if (dist_squared > 2.0f * (0.002f * pSphere->radius_squared) + pSphere->radius_squared) {
+        return 0;
+    }
+    if (dist_squared < pSphere->radius_squared) {
+        return 0;
+    }
+    len = sqrt(dist_squared);
+    if (len > 2 * BR_SCALAR_EPSILON) {
+        s = 1.0 / len;
+        BrVector3Scale(pNormal, pNormal, s);
+    } else {
+        BrVector3Set(pNormal, 1.0f, 0.0f, 0.0f);
+    }
+    BrVector3Scale(pPoint, pNormal, pSphere->radius);
+    BrVector3Accumulate(pPoint, &pSphere->center);
+    *pT = 1.0f;
+    return 2;
 }
 
 #ifdef REC2_MATCHING
