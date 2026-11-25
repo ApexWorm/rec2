@@ -1329,7 +1329,7 @@ int C2_HOOK_FASTCALL DRTextCleverWidth(const tDR_font* pFont, const char* pText)
 
     for (i = 0, c = (signed char*)pText; i < len; i++, c++) {
         if (*c < 0) {
-            pFont = &gFonts - *c;
+            pFont = gFonts - *c;
         } else {
             result += pFont->width_table[*c - pFont->offset] + (i < (len - 1) ? pFont->spacing : 0);
         }
