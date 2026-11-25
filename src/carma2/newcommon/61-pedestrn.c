@@ -2715,7 +2715,20 @@ tPed_form* C2_HOOK_FASTCALL FindOrOpenForm(const char* pName) {
 
 // MakeRotationMatrix
 
-// SetBoner
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_HW 0x00407e70
+// STUB: CARMA2_SW 0x00407e60
+// STUB: CARMA2_CHEAT 0x00407e60
+void C2_HOOK_FASTCALL SetBoner(tPed_character_instance* pPed, br_matrix34* pMat, br_matrix34* pParent_mat, br_matrix34* pArg4, tU8 pAngle_x, tU8 pAngle_y, tU8 pAngle_z, br_vector3* pArg8, br_vector3* pArg9) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // CalcBoundsRadius
 
@@ -2842,11 +2855,79 @@ br_actor* C2_HOOK_FASTCALL GetCharacterActorPtr(const tPed_character_instance* p
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x00407b30
-// STUB: CARMA2_SW 0x00407b20
-// STUB: CARMA2_CHEAT 0x00407b20
+// FUNCTION: CARMA2_HW 0x00407b30
+// FUNCTION: CARMA2_SW 0x00407b20
+// FUNCTION: CARMA2_CHEAT 0x00407b20
 void C2_HOOK_FASTCALL SetCharacterBonePositions(tPed_character_instance* pPed, int pArg2, int pArg3) {
-    NOT_IMPLEMENTED();
+    tPed_personality* personality;
+    tPed_form* form;
+    tPed_form_actor_set* actor_set;
+    tPed_move_frame* frame;
+    int i;
+    int parent_index;
+    br_matrix34* mat;
+    br_matrix34* parent_mat;
+    br_vector3 original_pos;
+    br_vector3 move;
+    br_vector3 delta;
+
+    if (pPed->field_0x7 < 0) {
+        return;
+    }
+    if ((pPed->field_0x14 & 0x4) && (pPed->field_0x14 & 0x2) && pPed->field_0xe8 == NULL) {
+        return;
+    }
+    pPed->field_0x9 &= ~0x1;
+    if (pPed->field_0xbc != NULL) {
+        MorphCharacterBonePositions(pPed, 0);
+        return;
+    }
+    personality = pPed->personality;
+    form = personality->form;
+    if (pPed->field_0x4 >= 0) {
+        actor_set = &form->actor_sets[pPed->field_0x4];
+    } else {
+        actor_set = NULL;
+    }
+    frame = &form->moves[pPed->field_0x7].move->frames[pPed->field_0x1c];
+    for (i = 0; i < form->count_bones; i++) {
+        parent_index = form->bones[i].indices[0];
+        if (parent_index >= 0) {
+            if (!(gPow2_array[i] & pPed->field_0xc) && !(gPow2_array[parent_index] & pPed->field_0xc)
+                && pArg2 != 1 && pArg2 != 2 && actor_set != NULL) {
+                if (pPed->field_0xe8 != NULL) {
+                    parent_mat = &pPed->field_0xe8[parent_index];
+                } else {
+                    parent_mat = &actor_set->actors[parent_index]->t.t.mat;
+                }
+                if (pPed->field_0xe8 != NULL) {
+                    mat = &pPed->field_0xe8[i];
+                } else {
+                    mat = &actor_set->actors[i]->t.t.mat;
+                }
+                SetBoner(pPed, mat, parent_mat, &pPed->field_0x8c,
+                    frame->axis[i].euler1, frame->axis[i].euler2, frame->axis[i].euler3,
+                    &personality->bones[i].field_0x20, &personality->bones[i].field_0x2c);
+            }
+        } else if (pArg2 != 3 && !(pPed->field_0x14 & 0x4)) {
+            mat = GetCharacterMatrixPtr(pPed);
+            BrVector3Copy(&original_pos, (br_vector3*)mat->m[3]);
+            if (pArg2 != 2) {
+                BrMatrix34Mul(mat, &frame->mat, &pPed->field_0x8c);
+            }
+            if (pArg3 != 0 && !gPed_overall_movement_disabled) {
+                BrVector3Scale(&move, (br_vector3*)frame->mat.m[3], personality->moves[pPed->field_0x7].scale_factor);
+                BrMatrix34ApplyV(&delta, &move, &pPed->field_0x5c);
+                if (gAction_replay_mode && ARGetReplayRate() < 0.f) {
+                    BrVector3Sub((br_vector3*)mat->m[3], &original_pos, &delta);
+                } else {
+                    BrVector3Add((br_vector3*)mat->m[3], &delta, &original_pos);
+                }
+            } else {
+                BrVector3Copy((br_vector3*)mat->m[3], &original_pos);
+            }
+        }
+    }
 }
 
 #ifdef REC2_MATCHING
@@ -3047,7 +3128,20 @@ void C2_HOOK_FASTCALL StopCharacterMorphing(tPed_character_instance* pCharacter)
     }
 }
 
-// MorphCharacterBonePositions
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_HW 0x004097b0
+// STUB: CARMA2_SW 0x004097b0
+// STUB: CARMA2_CHEAT 0x00409820
+int C2_HOOK_FASTCALL MorphCharacterBonePositions(tPed_character_instance* pPed, tU32 pArg2) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // StopCharacterMove
 
