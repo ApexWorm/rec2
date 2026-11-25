@@ -561,8 +561,10 @@ int C2_HOOK_FASTCALL MungeHeadupWidth(tHeadup* pHeadup) {
             }
             break;
         }
+#ifdef REC2_HW
     } else if (pHeadup->type == eHeadup_fancy) {
         return 0;
+#endif
     } else {
         pHeadup->clever = 0;
         switch (pHeadup->justification) {

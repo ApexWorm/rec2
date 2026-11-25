@@ -1266,12 +1266,30 @@ int C2_HOOK_FASTCALL PolyFontTextWidth(int pFont, const char* pText) {
 // FUNCTION: CARMA2_CHEAT 0x004661d0
 int C2_HOOK_FASTCALL DRTextWidth(const tDR_font* pFont, const char* pText) {
 
+#ifdef REC2_HW
     return PolyFontTextWidth(GetPolyFontIndexToReplaceDRfontWith(pFont), pText);
+#endif
+#ifdef REC2_SW
+    int i;
+    int len;
+    int result;
+    const char* c;
+
+    result = 0;
+    len = strlen(pText);
+
+    for (i = 0, c = pText; i < len; i++, c++) {
+        result += pFont->width_table[*c - pFont->offset];
+    }
+    return result + pFont->spacing * (len - 1);
+#endif
 }
 
 // FUNCTION: CARMA2_HW 0x00465e10
+// FUNCTION: CARMA2_SW 0x00465a80
 // FUNCTION: CARMA2_CHEAT 0x00466290
 int C2_HOOK_FASTCALL DRTextCleverWidth(const tDR_font* pFont, const char* pText) {
+#ifdef REC2_HW
     int polyfont_index;
     int i;
     int len;
@@ -1299,6 +1317,25 @@ int C2_HOOK_FASTCALL DRTextCleverWidth(const tDR_font* pFont, const char* pText)
         }
     }
     return result;
+#endif
+#ifdef REC2_SW
+    int i;
+    int len;
+    int result;
+    const signed char* c;
+
+    result = 0;
+    len = strlen(pText);
+
+    for (i = 0, c = (signed char*)pText; i < len; i++, c++) {
+        if (*c < 0) {
+            pFont = &gFonts - *c;
+        } else {
+            result += pFont->width_table[*c - pFont->offset] + (i < (len - 1) ? pFont->spacing : 0);
+        }
+    }
+    return result;
+#endif
 }
 
 // FUNCTION: CARMA2_HW 0x00465f10
