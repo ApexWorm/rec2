@@ -459,27 +459,116 @@ int C2_HOOK_FASTCALL LineSphereCollWithSphere(br_vector3* pStart, br_vector3* pE
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x00461310
-// STUB: CARMA2_SW 0x00460db0
-// STUB: CARMA2_CHEAT 0x00461780
+// FUNCTION: CARMA2_HW 0x00461310
+// FUNCTION: CARMA2_SW 0x00460db0
+// FUNCTION: CARMA2_CHEAT 0x00461780
 int C2_HOOK_FASTCALL LinePolyColl(br_vector3* pStart, br_vector3* pEnd, tCollision_shape_polyhedron_data* pPoly, br_vector3* pPoint, br_scalar pRadius, br_scalar* pT) {
-    NOT_IMPLEMENTED();
+    br_vector3 dir;
+    int inside;
+    int i;
+    int which_plane;
+    br_scalar max_t;
+    br_scalar n;
+    br_scalar t[64];
+    br_scalar d[64];
+
+    inside = 1;
+    which_plane = -1;
+    max_t = 0.0f;
+    *pT = 2.0f;
+    BrVector3Sub(&dir, pEnd, pStart);
+    for (i = 0; i < pPoly->count_planes; i++) {
+        d[i] = BrVector3Dot(&pPoly->planes[i], &dir);
+        n = pPoly->planes[i].v[3] + (BrVector3Dot(&pPoly->planes[i], pStart) + pRadius);
+        if (n < 0.0f) {
+            inside = 0;
+        }
+        if (d[i] != 0.0f) {
+            t[i] = -(n / d[i]);
+        } else if (n < 0.0f) {
+            return 0;
+        }
+        if (d[i] > 0.0f && t[i] >= max_t) {
+            if (t[i] > 1.0f) {
+                return 0;
+            }
+            max_t = t[i];
+            which_plane = i;
+        }
+    }
+    if (inside) {
+        return -1;
+    }
+    if (which_plane < 0) {
+        return 0;
+    }
+    for (i = 0; i < pPoly->count_planes; i++) {
+        if (d[i] < 0.0f && t[i] < max_t) {
+            return 0;
+        }
+    }
+    BrVector3Scale(pPoint, &dir, max_t);
+    BrVector3Accumulate(pPoint, pStart);
+    *pT = max_t;
+    return which_plane + 1;
 }
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(on)
 #endif
 
-// SpherePolyIntersection
+inline int C2_HOOK_FASTCALL SpherePolyIntersection(tCollision_shape_polyhedron_data* pPoly, br_vector3* pCenter, br_scalar pRadius, br_vector3* pPoint, br_vector3* pNormal) {
+    int i;
+    int count;
+    br_scalar d[64];
+
+    for (i = 0; i < pPoly->count_planes; i++) {
+        d[i] = BrVector3Dot(&pPoly->planes[i], pCenter) + pPoly->planes[i].v[3];
+        if (d[i] < -pRadius) {
+            return 0;
+        }
+    }
+    count = 0;
+    BrVector3Set(pNormal, 0.f, 0.f, 0.f);
+    for (i = 0; i < pPoly->count_planes; i++) {
+        if (d[i] < 0.f) {
+            count++;
+            BrVector3Accumulate(pNormal, &pPoly->planes[i]);
+        }
+    }
+    if (count > 1) {
+        BrVector3Normalise(pNormal, pNormal);
+    }
+    BrVector3Copy(pPoint, pCenter);
+    return 0x40;
+}
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x00461520
-// STUB: CARMA2_SW 0x00460fc0
+// FUNCTION: CARMA2_HW 0x00461520
+// FUNCTION: CARMA2_SW 0x00460fc0
+// FUNCTION: CARMA2_CHEAT 0x00461990
 int C2_HOOK_FASTCALL LinePolyCollWithSphere(br_vector3* pStart, br_vector3* pEnd, tCollision_shape_polyhedron* pShape, br_vector3* pPoint, br_vector3* pNormal, br_scalar* pT) {
-    NOT_IMPLEMENTED();
+    int result;
+    int plane_index;
+
+    result = LinePolyColl(pStart, pEnd, &pShape->polyhedron, pPoint, 0.0f, pT);
+    if (result != 0) {
+        if (result < 0) {
+            BrVector3SetFloat(pNormal, 1.0f, 0.0f, 0.0f);
+        } else {
+            plane_index = (result & 0x3f) - 1;
+            BrVector3Copy(pNormal, &pShape->polyhedron.planes[plane_index]);
+        }
+        return result;
+    }
+    result = SpherePolyIntersection(&pShape->polyhedron, pEnd, 0.005f, pPoint, pNormal);
+    if (result != 0) {
+        *pT = 1.0f;
+    }
+    return result;
 }
 
 #ifdef REC2_MATCHING

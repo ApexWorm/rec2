@@ -94,7 +94,7 @@ extern int C2_HOOK_FASTCALL LineSphereCollWithSphere(br_vector3* pStart, br_vect
 
 extern int C2_HOOK_FASTCALL LinePolyColl(br_vector3* pStart, br_vector3* pEnd, tCollision_shape_polyhedron_data* pPoly, br_vector3* pPoint, br_scalar pRadius, br_scalar* pT);
 
-// SpherePolyIntersection
+extern int C2_HOOK_FASTCALL SpherePolyIntersection(tCollision_shape_polyhedron_data* pPoly, br_vector3* pCenter, br_scalar pRadius, br_vector3* pPoint, br_vector3* pNormal);
 
 extern int C2_HOOK_FASTCALL LinePolyCollWithSphere(br_vector3* pStart, br_vector3* pEnd, tCollision_shape_polyhedron* pShape, br_vector3* pPoint, br_vector3* pNormal, br_scalar* pT);
 
