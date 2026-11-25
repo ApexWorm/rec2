@@ -98,11 +98,6 @@ tU32* gReal_render_palette;
 // GLOBAL: CARMA2_CHEAT 0x006a8654
 int gCollision_info_uid_counter;
 
-// GLOBAL: CARMA2_HW 0x00705560
-// GLOBAL: CARMA2_SW 0x006fc020
-// GLOBAL: CARMA2_CHEAT 0x0070cc00
-tShit_mine gShit_mines[20];
-
 // GLOBAL: CARMA2_HW 0x006a0ae0
 // GLOBAL: CARMA2_SW 0x0069ab38
 // GLOBAL: CARMA2_CHEAT 0x006a8658
@@ -117,11 +112,6 @@ br_model* gModel_powerup_power;
 // GLOBAL: CARMA2_SW 0x0069ab40
 // GLOBAL: CARMA2_CHEAT 0x006a8660
 br_model* gModel_powerup_offence;
-
-// GLOBAL: CARMA2_HW 0x007059e0
-// GLOBAL: CARMA2_SW 0x006fc4a0
-// GLOBAL: CARMA2_CHEAT 0x0070d080
-tHeadup_icon gPickedup_powerups[20];
 
 // GLOBAL: CARMA2_HW 0x00763480
 // GLOBAL: CARMA2_SW 0x007599e0
@@ -183,10 +173,42 @@ int gPed_dismemberfest;
 // GLOBAL: CARMA2_CHEAT 0x0074be98
 int gPanicking_peds;
 
+// GLOBAL: CARMA2_HW 0x00705560
+// GLOBAL: CARMA2_SW 0x006fc020
+// GLOBAL: CARMA2_CHEAT 0x0070cc00
+tShit_mine gShit_mines[20] = { 0 };
+
 // GLOBAL: CARMA2_HW 0x007059c0
 // GLOBAL: CARMA2_SW 0x006fc480
 // GLOBAL: CARMA2_CHEAT 0x0070d060
-int gCount_mutant_tail_parts;
+int gCount_mutant_tail_parts = 0;
+
+#ifdef REC2_MATCHING
+// GLOBAL: CARMA2_HW 0x007059c4
+// GLOBAL: CARMA2_SW 0x006fc484
+// GLOBAL: CARMA2_CHEAT 0x0070d064
+undefined4 gDAT_007059c4 = 0;
+
+// GLOBAL: CARMA2_HW 0x007059c8
+// GLOBAL: CARMA2_SW 0x006fc488
+// GLOBAL: CARMA2_CHEAT 0x0070d068
+undefined4 gDAT_007059c8[6] = { 0 };
+#endif
+
+// GLOBAL: CARMA2_HW 0x007059e0
+// GLOBAL: CARMA2_SW 0x006fc4a0
+// GLOBAL: CARMA2_CHEAT 0x0070d080
+tHeadup_icon gPickedup_powerups[20] = { 0 };
+
+// GLOBAL: CARMA2_HW 0x00705540
+// GLOBAL: CARMA2_SW 0x006fc000
+// GLOBAL: CARMA2_CHEAT 0x0070cbe0
+int gMutant_tail_state;
+
+// GLOBAL: CARMA2_HW 0x00705b78
+// GLOBAL: CARMA2_SW 0x006fc638
+// GLOBAL: CARMA2_CHEAT 0x0070d218
+float gMass_mutant_tail_link;
 
 // GLOBAL: CARMA2_HW 0x006a0458
 // GLOBAL: CARMA2_SW 0x0069a4b0
@@ -202,16 +224,6 @@ tPhysics_object* gMutant_tail_object = NULL;
 // GLOBAL: CARMA2_SW 0x0069ab24
 // GLOBAL: CARMA2_CHEAT 0x006a8644
 tPhysics_joint* gMutant_tail_first_joint;
-
-// GLOBAL: CARMA2_HW 0x00705540
-// GLOBAL: CARMA2_SW 0x006fc000
-// GLOBAL: CARMA2_CHEAT 0x0070cbe0
-int gMutant_tail_state;
-
-// GLOBAL: CARMA2_HW 0x00705b78
-// GLOBAL: CARMA2_SW 0x006fc638
-// GLOBAL: CARMA2_CHEAT 0x0070d218
-float gMass_mutant_tail_link;
 
 // GLOBAL: CARMA2_HW 0x00705b74
 // GLOBAL: CARMA2_SW 0x006fc634
@@ -1566,7 +1578,26 @@ void C2_HOOK_FASTCALL TiggerMineToExplode(tCar_spec* pCar) {
 
 // HitAShatOutMine
 
-// ClearMineReferencesToCar
+// FUNCTION: CARMA2_HW 0x004ddde0
+// FUNCTION: CARMA2_SW 0x004da2e0
+// FUNCTION: CARMA2_CHEAT 0x004e39a0
+void C2_HOOK_FASTCALL ClearMineReferencesToCar(tCar_spec* pCar) {
+    int i;
+    tShit_mine* mine;
+
+    for (i = 0; i < 20; i++) {
+        mine = &gShit_mines[i];
+        if (mine->flags & 1) {
+            if (mine->car == pCar) {
+                mine->car = NULL;
+            }
+            if (mine->field_0x30 == pCar) {
+                mine->field_0x30 = NULL;
+                MineExplode(mine);
+            }
+        }
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x004dde20
 // FUNCTION: CARMA2_SW 0x004da320

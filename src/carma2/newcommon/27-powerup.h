@@ -276,7 +276,7 @@ extern void C2_HOOK_FASTCALL TiggerMineToExplode(tCar_spec* pCar);
 
 // HitAShatOutMine
 
-// ClearMineReferencesToCar
+extern void C2_HOOK_FASTCALL ClearMineReferencesToCar(tCar_spec* pCar);
 
 extern void C2_HOOK_FASTCALL MungeShatMines(tU32 pTime);
 
