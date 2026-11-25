@@ -468,7 +468,7 @@ extern void C2_HOOK_FASTCALL CompletelyUnBendCar(tCar_spec* pCar_spec);
 
 // RepairObject
 
-// RepairCarCollisionShapes
+extern void C2_HOOK_FASTCALL RepairCarCollisionShapes(tCar_spec* pCar, float pStep);
 
 // RepairCar2
 
