@@ -93,7 +93,7 @@ extern void C2_HOOK_FASTCALL DisposeJoinableGame(int pIndex);
 
 extern void C2_HOOK_FASTCALL DisposeJoinList(int pException);
 
-// AddToJoinList
+extern void C2_HOOK_FASTCALL AddToJoinList(tNet_game_details* pGame);
 
 // FillInRaceDescription
 
