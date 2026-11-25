@@ -4060,7 +4060,76 @@ int C2_HOOK_FASTCALL NetOptions_CreditsRoller(tFrontend_spec* pFrontend) {
     return 0;
 }
 
-// NetOptions_TargetRoller
+// FUNCTION: CARMA2_HW 0x004732b0
+// FUNCTION: CARMA2_SW 0x00472820
+// FUNCTION: CARMA2_CHEAT 0x00473650
+int C2_HOOK_FASTCALL NetOptions_TargetRoller(tFrontend_spec* pFrontend) {
+    int increment;
+    int minimum;
+    int maximum;
+
+    gFrontend_net_current_roll = PDGetTotalTime();
+    if ((int)(gFrontend_net_current_roll - gFrontend_net_last_roll) >= 300) {
+        gFrontend_net_last_roll = gFrontend_net_current_roll;
+        switch (gFrontend_game_type) {
+        case eNet_game_type_1:
+            increment = 1;
+            minimum = 1;
+            maximum = 64;
+            break;
+        case eNet_game_type_5:
+            increment = 1;
+            minimum = 1;
+            maximum = 100;
+            break;
+        case eNet_game_type_foxy:
+            increment = 30 * 1000;
+            minimum = 30 * 1000;
+            maximum = 2 * 60 * 60 * 1000;
+            break;
+        default:
+            return 0;
+        }
+        if (gFrontend_selected_item_index == 30) {
+            gFrontend_net_options.starting_target += increment;
+        } else if (gFrontend_selected_item_index == 29) {
+            gFrontend_net_options.starting_target -= increment;
+        }
+        if (gFrontend_net_options.starting_target < minimum) {
+            gFrontend_net_options.starting_target = minimum;
+        } else if (gFrontend_net_options.starting_target > maximum) {
+            gFrontend_net_options.starting_target = maximum;
+        }
+        switch (gFrontend_game_type) {
+        case eNet_game_type_1:
+        case eNet_game_type_5:
+            sprintf(pFrontend->items[26].text, "%i", gFrontend_net_options.starting_target);
+            break;
+        case eNet_game_type_foxy:
+            {
+                int seconds = gFrontend_net_options.starting_target / 1000;
+                int hours = seconds / 3600;
+                int minutes = (seconds / 60) % 60;
+                int secs = seconds % 60;
+                if (hours != 0) {
+                    sprintf(pFrontend->items[26].text, "%02i:%02i:%02i", hours, minutes, secs);
+                } else {
+                    sprintf(pFrontend->items[26].text, "%02i:%02i", minutes, secs);
+                }
+            }
+            break;
+        case eNet_game_type_fight_to_death:
+        case eNet_game_type_2:
+        case eNet_game_type_checkpoint:
+        case eNet_game_type_4:
+        case eNet_game_type_6:
+            strcpy(pFrontend->items[26].text, "----");
+            break;
+        }
+        FuckWithWidths(pFrontend);
+    }
+    return 0;
+}
 
 // NetOptions_Ok
 
