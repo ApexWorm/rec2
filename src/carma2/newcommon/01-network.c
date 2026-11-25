@@ -13,13 +13,13 @@
 #include "18b-graphics2.h"
 #include "19-font.h"
 #include "32-spark.h"
-#include "41-utility.h"
 #include "47-win95net.h"
 #include "53-controls.h"
 #include "platform.h"
 #include "globvars.h"
 #include "globvrpb.h"
 #include "04-netgame.h"
+#include "41-utility.h"
 
 #include "rec2_macros.h"
 
@@ -1118,9 +1118,33 @@ void C2_HOOK_FASTCALL NetReceiveAndProcessMessages(void) {
     }
 }
 
-// STUB: CARMA2_HW 0x004a4ac0
+// FUNCTION: CARMA2_HW 0x004a4ac0
+// FUNCTION: CARMA2_SW 0x004a0c40
+// FUNCTION: CARMA2_CHEAT 0x004a5890
 void C2_HOOK_FASTCALL BroadcastStatus(void) {
-    NOT_IMPLEMENTED();
+    tNet_message* message;
+    int i;
+
+    switch (gNet_mode) {
+    case eNet_mode_client:
+        message = NetBuildMessage(eNet_message_chunk_type_status_report, 0);
+        message->contents.status_report.status = gNet_players[gThis_net_player_index].player_status;
+        NetSendMessageToHost(gCurrent_net_game, message);
+        break;
+    case eNet_mode_host:
+        message = NetBuildMessage(eNet_message_chunk_type_group_status, gNumber_of_net_players);
+        message->contents.group_status.player_id_sum = 0;
+        message->contents.group_status.number_of_players = gNumber_of_net_players;
+        for (i = 0; i < gNumber_of_net_players; i++) {
+            message->contents.group_status.player_id_sum += gNet_players[i].ID;
+            message->contents.group_status.player_status[i] = gNet_players[i].player_status;
+        }
+        NetSendMessageToAllPlayers(gCurrent_net_game, message);
+        break;
+    default:
+        break;
+    }
+    NetSendMessageStacks();
 }
 
 // STUB: CARMA2_HW 0x004a4da0
@@ -1201,11 +1225,20 @@ void C2_HOOK_FASTCALL NetFinishRace(tNet_game_details* pDetails, tRace_over_reas
     NetGuaranteedSendMessageToAllPlayers(gCurrent_net_game, the_message, NULL);
 }
 
-// STUB: CARMA2_HW 0x004a57e0
-// STUB: CARMA2_SW 0x004a1960
-// STUB: CARMA2_CHEAT 0x004a66e0
+// FUNCTION: CARMA2_HW 0x004a57e0
+// FUNCTION: CARMA2_SW 0x004a1960
+// FUNCTION: CARMA2_CHEAT 0x004a66e0
 void C2_HOOK_FASTCALL NetPlayerStatusChanged(tPlayer_status pNew_status) {
-    NOT_IMPLEMENTED();
+
+    if (gNet_mode != eNet_mode_none && gNet_players[gThis_net_player_index].player_status != pNew_status) {
+        gNet_players[gThis_net_player_index].player_status = pNew_status;
+        BroadcastStatus();
+        if (gProgram_state.current_car.disabled && pNew_status >= ePlayer_status_racing && pNew_status != ePlayer_status_recovering) {
+            EnableCar(&gProgram_state.current_car);
+        } else if (!gProgram_state.current_car.disabled && pNew_status < ePlayer_status_racing) {
+            DisableCar(&gProgram_state.current_car);
+        }
+    }
 }
 
 // FUNCTION: CARMA2_HW 0x004a5b30

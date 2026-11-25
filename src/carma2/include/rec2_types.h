@@ -5445,6 +5445,7 @@ typedef enum {
     eNet_message_chunk_type_5 = 0x5,
     eNet_message_chunk_poll_car_details = 0x6,
     eNet_message_chunk_type_race_over = 0xa,
+    eNet_message_chunk_type_status_report = 0xb,
     eNet_message_chunk_type_start_race = 0xc,
     eNet_message_chunk_type_headup = 0xd,
     eNet_message_chunk_type_netsynch = 0xe,
@@ -5457,6 +5458,7 @@ typedef enum {
     eNet_message_chunk_type_reattach_bit = 0x26,
     eNet_message_chunk_type_reattach_all_bits = 0x2b,
     eNet_message_chunk_type_toggle_doors = 0x2c,
+    eNet_message_chunk_type_group_status = 0x2e,
     eNet_message_chunk_type_view_car = 0x2f,
     eNet_message_chunk_type_mine_explosion = 0x31,
     eNet_message_chunk_type_detach_bit = 0x33,
@@ -5471,6 +5473,19 @@ typedef struct {
     tNet_message_chunk_header header;
     tRace_over_reason reason;
 } tNet_message_chunk_race_over;
+
+typedef struct {
+    tNet_message_chunk_header header;
+    tU16 status;
+} tNet_message_chunk_status_report;
+
+typedef struct {
+    tNet_message_chunk_header header;
+    undefined field_0x2[2];
+    tU32 player_id_sum;
+    tU8 number_of_players;
+    tU8 player_status[];
+} tNet_message_chunk_group_status;
 
 typedef struct {
     tU8 index;
@@ -5686,6 +5701,7 @@ typedef struct {
 typedef union {
     tNet_message_chunk_raw raw;
     tNet_message_chunk_race_over race_over; /* type = 0xa */
+    tNet_message_chunk_status_report status_report; /* type = 0xb */
     tNet_message_chunk_start_race start_race; /* type = 0xc */
     tNet_message_headup headup; /* type = 0xd */
     tNet_message_chunk_scores scores; /* type = 0x18 */
@@ -5697,6 +5713,7 @@ typedef union {
     tNet_message_chunk_reattach_bit reattach_bit; /* type = 0x26 */
     tNet_message_chunk_reattach_all_bits reattach_all_bits; /* type = 0x2b */
     tNet_message_chunk_toggle_doors toggle_doors; /* type = 0x2c */
+    tNet_message_chunk_group_status group_status; /* type = 0x2e */
     tNet_message_chunk_view_car view_car; /* type = 0x2f */
     tNet_message_chunk_mine_explode mine_explode; /* type = 0x31 */
     tNet_message_chunk_recover recover;
