@@ -187,6 +187,21 @@ int gLast_credit_amount;
 // GLOBAL: CARMA2_CHEAT 0x00597d34
 int gLast_time_credit_headup = -1;
 
+// GLOBAL: CARMA2_HW 0x005913e0
+// GLOBAL: CARMA2_SW 0x0058c3c0
+// GLOBAL: CARMA2_CHEAT 0x00597d38
+int gPS_apo_level_changed[3] = { 1, 1, 1 };
+
+// GLOBAL: CARMA2_HW 0x005913ec
+// GLOBAL: CARMA2_SW 0x0058c3cc
+// GLOBAL: CARMA2_CHEAT 0x00597d44
+int gPrev_ps_apo_levels[3] = { -1, -1, -1 };
+
+// GLOBAL: CARMA2_HW 0x005913f8
+// GLOBAL: CARMA2_SW 0x0058c3d8
+// GLOBAL: CARMA2_CHEAT 0x00597d50
+int gPrev_ps_drawn_levels[3] = { -1, -1, -1 };
+
 // GLOBAL: CARMA2_HW 0x0067fcc4
 // GLOBAL: CARMA2_SW 0x0067a42c
 // GLOBAL: CARMA2_CHEAT 0x0068756c
@@ -470,11 +485,185 @@ inline void C2_HOOK_FASTCALL KillOldestQueuedHeadup(void) {
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x00449830
-// STUB: CARMA2_SW 0x00449980
-// STUB: CARMA2_CHEAT 0x00449d40
+// FUNCTION: CARMA2_HW 0x00449830
+// FUNCTION: CARMA2_SW 0x00449980
+// FUNCTION: CARMA2_CHEAT 0x00449d40
 void C2_HOOK_FASTCALL DoTestPowerHeadup(int pLevel, const char* pAPO_str) {
-    NOT_IMPLEMENTED();
+#if defined(REC2_SW)
+    br_pixelmap* icon;
+    int count_slots;
+    int x;
+    int y;
+    int i;
+    int j;
+    int level;
+
+    if (gHeadup_detail_level != 2 && gHeadup_detail_level != 5) {
+        return;
+    }
+    switch (pAPO_str[0]) {
+    case 'A':
+        icon = gIcon_armour;
+        if (gNet_mode != eNet_mode_none) {
+            y = 1;
+            x = 85;
+            count_slots = gProgram_state.current_car.power_up_slots[0];
+        } else {
+            y = 25;
+            x = 65;
+            count_slots = gProgram_state.current_car.power_up_slots[0];
+        }
+        break;
+    case 'P':
+        icon = gIcon_power;
+        if (gNet_mode != eNet_mode_none) {
+            y = 14;
+            x = 85;
+            count_slots = gProgram_state.current_car.power_up_slots[1];
+        } else {
+            y = 25;
+            x = 140;
+            count_slots = gProgram_state.current_car.power_up_slots[1];
+        }
+        break;
+    case 'O':
+        icon = gIcon_offense;
+        if (gNet_mode != eNet_mode_none) {
+            y = 27;
+            x = 85;
+            count_slots = gProgram_state.current_car.power_up_slots[2];
+        } else {
+            y = 25;
+            x = 215;
+            count_slots = gProgram_state.current_car.power_up_slots[2];
+        }
+        break;
+    }
+    DRPixelmapRectangleMaskedCopy(gBack_screen, x, y, icon, 0, 0, icon->width, icon->height);
+    count_slots -= pLevel;
+    level = pLevel;
+    for (i = 0; i < 3; i++) {
+        for (j = 0; j < 10; j++) {
+            if (level > 0) {
+                DRPixelmapRectangleMaskedCopy(gBack_screen,
+                    j * gIcon_litBloc1->width + icon->width + x + 2, y,
+                    gIcon_litBloc1, 0, 0, gIcon_litBloc1->width, gIcon_litBloc1->height);
+                level--;
+            } else if (count_slots > 0) {
+                DRPixelmapRectangleMaskedCopy(gBack_screen,
+                    j * gIcon_grnBlock1->width + icon->width + x + 2, y,
+                    gIcon_grnBlock1, 0, 0, gIcon_grnBlock1->width, gIcon_grnBlock1->height);
+                count_slots--;
+            } else {
+                DRPixelmapRectangleMaskedCopy(gBack_screen,
+                    j * gIcon_greyBloc1->width + icon->width + x + 2, y,
+                    gIcon_greyBloc1, 0, 0, gIcon_greyBloc1->width, gIcon_greyBloc1->height);
+            }
+        }
+        x--;
+        y += 3;
+    }
+#else
+    int changed;
+    br_pixelmap* dest_pm;
+    br_pixelmap* icon;
+    int count_slots;
+    int x;
+    int y;
+    int j;
+    int level;
+
+    switch (pAPO_str[0]) {
+    case 'A':
+        dest_pm = gArmour_colour_map;
+        icon = gIcon_armour;
+        x = 2;
+        count_slots = gProgram_state.current_car.power_up_slots[0];
+        if (pLevel == gPrev_ps_apo_levels[0] && count_slots == gPrev_ps_drawn_levels[0]) {
+            changed = 0;
+        } else {
+            changed = 1;
+        }
+        gPS_apo_level_changed[0] = changed;
+        gPrev_ps_apo_levels[0] = pLevel;
+        gPrev_ps_drawn_levels[0] = count_slots;
+        break;
+    case 'P':
+        dest_pm = gPower_colour_map;
+        icon = gIcon_power;
+        x = 2;
+        count_slots = gProgram_state.current_car.power_up_slots[1];
+        if (pLevel == gPrev_ps_apo_levels[1] && count_slots == gPrev_ps_drawn_levels[1]) {
+            changed = 0;
+        } else {
+            changed = 1;
+        }
+        gPS_apo_level_changed[1] = changed;
+        gPrev_ps_apo_levels[1] = pLevel;
+        gPrev_ps_drawn_levels[1] = count_slots;
+        break;
+    case 'O':
+        icon = gIcon_offense;
+        x = 2;
+        count_slots = gProgram_state.current_car.power_up_slots[2];
+        dest_pm = gOffensive_colour_map;
+        if (pLevel == gPrev_ps_apo_levels[2] && count_slots == gPrev_ps_drawn_levels[1]) {
+            changed = 0;
+        } else {
+            changed = 1;
+        }
+        gPS_apo_level_changed[2] = changed;
+        gPrev_ps_drawn_levels[2] = count_slots;
+        gPrev_ps_apo_levels[2] = pLevel;
+        break;
+    }
+    if (changed) {
+        DRPixelmapCopy(dest_pm, gPowerbar);
+        DRPixelmapRectangleMaskedCopy(dest_pm, x, 0, icon, 0, 0, icon->width, icon->height);
+        count_slots -= pLevel;
+        level = pLevel;
+        for (y = 0; y < 15; y += 5) {
+            for (j = 0; j < 10; j++) {
+                if (level > 0) {
+                    DRPixelmapRectangleMaskedCopy(dest_pm,
+                        j * gIcon_litBloc1->width + x + icon->width + 2, y,
+                        gIcon_litBloc1, 0, 0, gIcon_litBloc1->width, gIcon_litBloc1->height);
+                    level--;
+                } else if (count_slots > 0) {
+                    DRPixelmapRectangleMaskedCopy(dest_pm,
+                        j * gIcon_grnBlock1->width + x + icon->width + 2, y,
+                        gIcon_grnBlock1, 0, 0, gIcon_grnBlock1->width, gIcon_grnBlock1->height);
+                    count_slots--;
+                } else {
+                    DRPixelmapRectangleMaskedCopy(dest_pm,
+                        j * gIcon_greyBloc1->width + x + icon->width + 2, y,
+                        gIcon_greyBloc1, 0, 0, gIcon_greyBloc1->width, gIcon_greyBloc1->height);
+                }
+            }
+            x -= 2;
+        }
+        switch (pAPO_str[0]) {
+        case 'A':
+            BrMapUpdate(gArmour_colour_map, BR_MAPU_ALL);
+            gArmour_material->colour_map = gArmour_colour_map;
+            BrMaterialUpdate(gArmour_material, BR_MATU_COLOURMAP);
+            break;
+        case 'P':
+            BrMapUpdate(gPower_colour_map, BR_MAPU_ALL);
+            gPower_material->colour_map = gPower_colour_map;
+            BrMaterialUpdate(gPower_material, BR_MATU_COLOURMAP);
+            break;
+        case 'O':
+            BrMapUpdate(gOffensive_colour_map, BR_MAPU_ALL);
+            gOffence_material->colour_map = gOffensive_colour_map;
+            BrMaterialUpdate(gOffence_material, BR_MATU_COLOURMAP);
+            break;
+        }
+    }
+    gArmour_actor->render_style = BR_RSTYLE_FACES;
+    gPower_actor->render_style = BR_RSTYLE_FACES;
+    gOffense_actor->render_style = BR_RSTYLE_FACES;
+#endif
 }
 
 #ifdef REC2_MATCHING
