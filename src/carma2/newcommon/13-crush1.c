@@ -1362,7 +1362,24 @@ void C2_HOOK_FASTCALL CompressCrush(tCompressed_car_crush* pDest, const tCar_cru
     pDest->field_0x24 = pSrc->field_0x50;
 }
 
-// ExpandCrush
+// FUNCTION: CARMA2_HW 0x004369c0
+// FUNCTION: CARMA2_SW 0x004369f0
+// FUNCTION: CARMA2_CHEAT 0x00436bc0
+void C2_HOOK_FASTCALL ExpandCrush(tCar_crush* pDest, const tCompressed_car_crush* pSrc) {
+    tU8 i;
+
+    pDest->count = pSrc->count;
+    ExpandVector3(&pDest->vectors[0], &pSrc->vectors[0], -2.5f, 2.5f);
+    BrVector3Copy(&pDest->field_0x34, &pDest->vectors[0]);
+    for (i = 1; i < pSrc->count; i++) {
+        ExpandVector3(&pDest->vectors[i], &pSrc->vectors[i], -2.5f, 2.5f);
+        BrVector3Accumulate(&pDest->field_0x34, &pDest->vectors[i]);
+    }
+    BrVector3Set(&pDest->field_0x34, pDest->field_0x34.v[0] / pDest->count, pDest->field_0x34.v[1] / pDest->count, pDest->field_0x34.v[2] / pDest->count);
+    pDest->field_0x40 = DRU16ToScalar(pSrc->field_0x1a, 0.0f, 10.0f);
+    ExpandVector3(&pDest->field_0x44, &pSrc->field_0x1c, -1.0f, 1.0f);
+    pDest->field_0x50 = pSrc->field_0x24;
+}
 
 // RemoveDuplicatePoints
 
