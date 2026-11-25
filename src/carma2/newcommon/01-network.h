@@ -67,7 +67,7 @@ extern void C2_HOOK_FASTCALL NetDisposeGameDetails(tNet_game_details* pDetails);
 
 extern tNet_game_details* C2_HOOK_FASTCALL NetAllocatePIDGameDetails(void);
 
-extern void C2_HOOK_FASTCALL NetLeaveGameLowLevel(void);
+extern void C2_HOOK_FASTCALL NetLeaveGameLowLevel(tNet_game_details* pDetails);
 
 extern void C2_HOOK_FASTCALL NetLeaveGame(tNet_game_details* pNet_game);
 

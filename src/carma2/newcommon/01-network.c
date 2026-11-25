@@ -355,7 +355,7 @@ void C2_HOOK_FASTCALL NetSendHeadupToPlayer(char* pMessage, tPlayer_ID pPlayer) 
 void C2_HOOK_FASTCALL LeaveTempGame(void) {
 
     if (gCurrent_join_poll_game != NULL) {
-        NetLeaveGameLowLevel();
+        NetLeaveGameLowLevel(gCurrent_join_poll_game);
     }
     gTime_for_next_one = 1;
     gCurrent_join_poll_game = NULL;
@@ -463,12 +463,12 @@ tNet_game_details* C2_HOOK_FASTCALL NetAllocatePIDGameDetails(void) {
     return BrMemAllocate(sizeof(tNet_game_details), kMem_net_pid_details);
 }
 
-void C2_HOOK_FASTCALL NetLeaveGameLowLevel(void) {
+void C2_HOOK_FASTCALL NetLeaveGameLowLevel(tNet_game_details* pDetails) {
 
     if (gNet_mode == eNet_mode_host) {
         PDNetHostFinishGame(gCurrent_net_game);
     } else {
-        PDNetLeaveGame();
+        PDNetLeaveGame(pDetails);
     }
 }
 
@@ -1147,10 +1147,18 @@ void C2_HOOK_FASTCALL BroadcastStatus(void) {
     NetSendMessageStacks();
 }
 
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
 // STUB: CARMA2_HW 0x004a4da0
 void C2_HOOK_FASTCALL CheckForDisappearees(void) {
     NOT_IMPLEMENTED();
 }
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // FUNCTION: CARMA2_HW 0x004a5240
 // FUNCTION: CARMA2_SW 0x004a13c0
@@ -1170,9 +1178,9 @@ void C2_HOOK_FASTCALL CheckForPendingStartRace(void) {
     }
 }
 
-// STUB: CARMA2_HW 0x004a5280
-// STUB: CARMA2_SW 0x004a1400
-// STUB: CARMA2_CHEAT 0x004a6150
+// FUNCTION: CARMA2_HW 0x004a5280
+// FUNCTION: CARMA2_SW 0x004a1400
+// FUNCTION: CARMA2_CHEAT 0x004a6150
 void C2_HOOK_FASTCALL NetService(int pIn_race) {
     tU32 time;
 
@@ -1392,10 +1400,18 @@ int C2_HOOK_FASTCALL NetGuaranteedSendMessageToAddress(tNet_game_details* pDetai
     }
 }
 
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
 // STUB: CARMA2_HW 0x004a6080
 void C2_HOOK_FASTCALL ResendGuaranteedMessages(void) {
     NOT_IMPLEMENTED();
 }
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // NetWaitForGuaranteeReplies
 

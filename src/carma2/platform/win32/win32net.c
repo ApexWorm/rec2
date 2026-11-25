@@ -502,7 +502,7 @@ void C2_HOOK_FASTCALL PDNetHostFinishGame(tNet_game_details* pDetails) {
 // FUNCTION: CARMA2_HW 0x0051a0b0
 // FUNCTION: CARMA2_SW 0x00513b90
 // FUNCTION: CARMA2_CHEAT 0x0051f7d0
-void C2_HOOK_FASTCALL PDNetLeaveGame(void) {
+void C2_HOOK_FASTCALL PDNetLeaveGame(tNet_game_details* pDetails) {
 
     dr_dprintf("PDNetLeaveGame()");
 }

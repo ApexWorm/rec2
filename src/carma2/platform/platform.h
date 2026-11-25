@@ -109,7 +109,7 @@ extern int C2_HOOK_FASTCALL PDNetJoinGame(tNet_game_details* pGame_details, cons
 
 extern void C2_HOOK_FASTCALL PDNetHostFinishGame(tNet_game_details* pDetails);
 
-extern void C2_HOOK_FASTCALL PDNetLeaveGame(void);
+extern void C2_HOOK_FASTCALL PDNetLeaveGame(tNet_game_details* pDetails);
 
 extern tNet_message* C2_HOOK_FASTCALL PDNetGetNextMessage(tNet_game_details* pDetails, void** gRemote_addr);
 
