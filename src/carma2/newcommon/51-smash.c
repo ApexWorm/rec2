@@ -505,13 +505,83 @@ inline void C2_HOOK_FASTCALL MakeSmashSound(tConnotations* pConnotations, br_vec
 
 // MungeSmokeFire
 
-// Random34Matrix
+// FUNCTION: CARMA2_HW 0x004eb6a0
+// FUNCTION: CARMA2_SW 0x004e7370
+// FUNCTION: CARMA2_CHEAT 0x004f1340
+void C2_HOOK_FASTCALL Random34Matrix(br_matrix34* pMatrix) {
+    br_vector3 tv;
 
-// STUB: CARMA2_HW 0x004eb4a0
-// STUB: CARMA2_SW 0x004e7170
-// STUB: CARMA2_CHEAT 0x004f1140
+    BrVector3Set((br_vector3*)pMatrix->m[3], 0.f, 0.f, 0.f);
+    pMatrix->m[1][0] = FRandomPosNeg(1.f);
+    pMatrix->m[1][1] = FRandomPosNeg(1.f);
+    pMatrix->m[1][2] = FRandomPosNeg(1.f);
+    pMatrix->m[2][0] = FRandomPosNeg(1.f);
+    pMatrix->m[2][1] = FRandomPosNeg(1.f);
+    pMatrix->m[2][2] = FRandomPosNeg(1.f);
+    BrVector3Normalise((br_vector3*)pMatrix->m[2], (br_vector3*)pMatrix->m[2]);
+    BrVector3Cross(&tv, (br_vector3*)pMatrix->m[1], (br_vector3*)pMatrix->m[2]);
+    BrVector3Copy((br_vector3*)pMatrix->m[0], &tv);
+    BrVector3Normalise((br_vector3*)pMatrix->m[0], (br_vector3*)pMatrix->m[0]);
+    BrVector3Cross((br_vector3*)pMatrix->m[1], (br_vector3*)pMatrix->m[2], (br_vector3*)pMatrix->m[0]);
+    if (BrVector3LengthSquared((br_vector3*)pMatrix->m[1]) < 0.9) {
+        BrMatrix34Identity(pMatrix);
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x004eb4a0
+// FUNCTION: CARMA2_SW 0x004e7170
+// FUNCTION: CARMA2_CHEAT 0x004f1140
 br_scalar C2_HOOK_FASTCALL SetInitPosition(br_actor* pActor, tSmashable_initial_position_spec* pInitial_position, br_actor* pSource_actor, br_vector3* pPosition, br_vector3* pAlternate_position, br_actor* pReference_actor, br_bounds3* pBounds, br_matrix34* pMatrix) {
-    NOT_IMPLEMENTED();
+    int i;
+    br_scalar scale;
+    br_scalar distance;
+    br_vector3 tv;
+    br_vector3 tv2;
+    br_vector3* pos;
+    br_scalar x;
+    br_scalar y;
+    br_scalar z;
+    br_scalar len;
+
+    scale = 1.f;
+    switch (pInitial_position->type) {
+    case kInitialSmashablePosition_ActorBased:
+        if (pMatrix != NULL) {
+            pActor->t.t.mat = pSource_actor->t.t.mat;
+            BrMatrix34Post(&pActor->t.t.mat, pMatrix);
+        } else {
+            pActor->t.t.mat = pSource_actor->t.t.mat;
+            BrMatrix34Post(&pActor->t.t.mat, &pReference_actor->t.t.mat);
+        }
+        break;
+    case kInitialSmashablePosition_BoxClumped:
+        Random34Matrix(&pActor->t.t.mat);
+        for (i = 0; i < 3; i++) {
+            tv.v[i] = pInitial_position->position.box.v[i] * (pBounds != NULL ? FRandomBetween(pBounds->min.v[i], pBounds->max.v[i]) : 0.f);
+        }
+        BrMatrix34ApplyV(&tv2, &tv, &pReference_actor->t.t.mat);
+        BrVector3Add(&pActor->t.t.translate.t, pPosition, &tv2);
+        break;
+    case kInitialSmashablePosition_SphereClumped:
+        Random34Matrix(&pActor->t.t.mat);
+        if (!pInitial_position->position.sphere.where) {
+            pos = pAlternate_position;
+        } else {
+            pos = pPosition;
+        }
+        pActor->t.t.translate.t = *pos;
+        x = FRandomPosNeg(1.f);
+        y = FRandomPosNeg(1.f);
+        z = FRandomPosNeg(1.f);
+        distance = FRandomBetween(0.f, pInitial_position->position.sphere.radius);
+        scale = distance / pInitial_position->position.sphere.radius;
+        len = distance / BR_LENGTH3(x, y, z);
+        pActor->t.t.translate.t.v[0] = x * len + pos->v[0];
+        pActor->t.t.translate.t.v[1] = y * len + pos->v[1];
+        pActor->t.t.translate.t.v[2] = z * len + pos->v[2];
+        break;
+    }
+    return scale;
 }
 
 // DoGhostPartShrapnel
