@@ -1341,11 +1341,18 @@ void C2_HOOK_FASTCALL ExtrapolateGeometryCoordinates(tSmash_quad_mapping* pMappi
     }
 }
 
-// STUB: CARMA2_HW 0x004f3740
-// STUB: CARMA2_SW 0x004ef3a0
-// STUB: CARMA2_CHEAT 0x004f93e0
+// FUNCTION: CARMA2_HW 0x004f3740
+// FUNCTION: CARMA2_SW 0x004ef3a0
+// FUNCTION: CARMA2_CHEAT 0x004f93e0
 void C2_HOOK_FASTCALL ExtrapolateGeometryCoordinates2(tSmash_quad_mapping* pMapping, tSmash_triangle_mapping* pTriangle, br_vector2* pMap, br_vertex* pVertex) {
-    NOT_IMPLEMENTED();
+
+    pVertex->p.v[pMapping->axis_0] = (pTriangle->map_from_geometry[1][1] * ((pTriangle->map_from_geometry[0][0] * pTriangle->origin.v[pMapping->axis_0]) + (pMap->v[0] - pTriangle->map_origin.v[0]))
+        - pTriangle->map_from_geometry[0][1] * ((pMap->v[1] - pTriangle->map_origin.v[1]) + (pTriangle->map_from_geometry[1][0] * pTriangle->origin.v[pMapping->axis_0])))
+        / (pTriangle->map_from_geometry[1][1] * pTriangle->map_from_geometry[0][0] - pTriangle->map_from_geometry[0][1] * pTriangle->map_from_geometry[1][0]);
+    pVertex->p.v[pMapping->axis_1] = (((pMap->v[0] - pTriangle->map_origin.v[0]) + (pTriangle->map_from_geometry[0][1] * pTriangle->origin.v[pMapping->axis_1])) * pTriangle->map_from_geometry[1][0]
+        - pTriangle->map_from_geometry[0][0] * ((pMap->v[1] - pTriangle->map_origin.v[1]) + (pTriangle->origin.v[pMapping->axis_1] * pTriangle->map_from_geometry[1][1])))
+        / (pTriangle->map_from_geometry[0][1] * pTriangle->map_from_geometry[1][0] - pTriangle->map_from_geometry[1][1] * pTriangle->map_from_geometry[0][0]);
+    pVertex->p.v[pMapping->axis_2] = (pMapping->d - (pMapping->normal.v[pMapping->axis_0] * pVertex->p.v[pMapping->axis_0]) - pVertex->p.v[pMapping->axis_1] * pMapping->normal.v[pMapping->axis_1]) / pMapping->normal.v[pMapping->axis_2];
 }
 
 #ifdef REC2_MATCHING
