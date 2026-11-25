@@ -1197,8 +1197,57 @@ void C2_HOOK_FASTCALL InitDRFonts(void) {
 // FUNCTION: CARMA2_SW 0x00465610
 // FUNCTION: CARMA2_CHEAT 0x00465ef0
 void C2_HOOK_FASTCALL DRPixelmapText(br_pixelmap* pPixelmap, int pX, int pY, const tDR_font* pFont, const char* pText, int pRight_edge) {
-
+#ifdef REC2_HW
     PolyFontText(pText, pX, pY, GetPolyFontIndexToReplaceDRfontWith(pFont), eJust_left, gRender_poly_text);
+#endif
+#ifdef REC2_SW
+
+    int i;
+    int x;
+    int len;
+    int chr;
+    int ch_width;
+    unsigned char* ch;
+
+    x = pX;
+    len = strlen(pText);
+    if (pRight_edge == 0) {
+        pRight_edge = pX + DRTextWidth(pFont, pText);
+    }
+    if (pX < 0 || pPixelmap->width < pRight_edge || pY < 0 || (pY + pFont->height) > pPixelmap->height) {
+        for (i = 0, ch = (unsigned char*)pText; i < len; i++, ch++) {
+            chr = *ch - pFont->offset;
+            ch_width = pFont->width_table[chr];
+            DRPixelmapRectangleMaskedCopy(
+                gBack_screen,
+                x,
+                pY,
+                pFont->images,
+                0,
+                pFont->height * chr,
+                ch_width,
+                pFont->height);
+
+            x += ch_width + pFont->spacing;
+        }
+    } else {
+        for (i = 0, ch = (unsigned char*)pText; i < len; i++, ch++) {
+            chr = *ch - pFont->offset;
+            ch_width = pFont->width_table[chr];
+            DRPixelmapRectangleOnscreenCopy(
+                gBack_screen,
+                x,
+                pY,
+                pFont->images,
+                0,
+                pFont->height * chr,
+                ch_width,
+                pFont->height);
+
+            x += ch_width + pFont->spacing;
+        }
+    }
+#endif
 }
 
 // FUNCTION: CARMA2_HW 0x00465aa0
