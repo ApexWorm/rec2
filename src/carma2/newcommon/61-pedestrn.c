@@ -27,6 +27,7 @@
 #include "51-smash.h"
 #include "52-errors.h"
 #include "54-runtime.h"
+#include "60-phil.h"
 #include "62-graphics3.h"
 
 #include "63-loading3.h"
@@ -527,6 +528,10 @@ int C2_HOOK_FASTCALL OrientationChanged(const br_matrix34* pOrientation_1, const
     }
 }
 
+#if defined(REC2_MATCHING) && defined(_MSC_VER)
+#pragma inline_depth(0)
+#endif
+
 // FUNCTION: CARMA2_HW 0x004d57c0
 // FUNCTION: CARMA2_SW 0x004d1eb0
 // FUNCTION: CARMA2_CHEAT 0x004db380
@@ -548,6 +553,10 @@ void C2_HOOK_FASTCALL AssertRootObjectsMatrix(tPed_character_instance* pPed) {
     }
     collision_info->flags |= 0x100;
 }
+
+#if defined(REC2_MATCHING) && defined(_MSC_VER)
+#pragma inline_depth()
+#endif
 
 // InitFaceCaches
 
@@ -591,6 +600,10 @@ void C2_HOOK_FASTCALL PedApplyPedDir(tU32 pId, const br_vector3* pDir) {
     }
 }
 
+#if defined(REC2_MATCHING) && defined(_MSC_VER)
+#pragma inline_depth(0)
+#endif
+
 // FUNCTION: CARMA2_HW 0x004d1c60
 // FUNCTION: CARMA2_SW 0x004ce360
 // FUNCTION: CARMA2_CHEAT 0x004d7800
@@ -619,6 +632,10 @@ void C2_HOOK_FASTCALL SetCharacterMoveAR(tPed_character_instance* pCharacter, in
         PipeSinglePedMove(pCharacter->ped, (tS16)old_frame, (tS16)old_move, (tS16)pMove_action, old_speed, pSpeed, pArg5, pArg4, &old_pos, (br_vector3*)mat->m[3], -1, -1, &pCharacter->field_0x8c);
     }
 }
+
+#if defined(REC2_MATCHING) && defined(_MSC_VER)
+#pragma inline_depth()
+#endif
 
 // SetPedStartRun
 
@@ -835,6 +852,10 @@ void C2_HOOK_FASTCALL ReadPedSpecs(FILE* pF) {
     gPedestrian_array = BrMemAllocate(PEDESTRIAN_MAX_COUNT * sizeof(tPedestrian), kMem_ped_array);
 }
 
+#if defined(REC2_MATCHING) && defined(_MSC_VER)
+#pragma inline_depth(0)
+#endif
+
 // FUNCTION: CARMA2_HW 0x004cadb0
 // FUNCTION: CARMA2_SW 0x004c74e0
 // FUNCTION: CARMA2_CHEAT 0x004d08f0
@@ -842,6 +863,10 @@ br_vector3* C2_HOOK_FASTCALL GetPedPos(tPedestrian* pPed) {
 
     return (br_vector3*)GetCharacterMatrixPtr(pPed->character)->m[3];
 }
+
+#if defined(REC2_MATCHING) && defined(_MSC_VER)
+#pragma inline_depth()
+#endif
 
 inline void C2_HOOK_FASTCALL SetUpGibSlicks(void) {
 
@@ -1173,6 +1198,10 @@ int C2_HOOK_FASTCALL IsActorRenderworthy(br_actor* pActor) {
 
 // MakePedNoise
 
+#if defined(REC2_MATCHING) && defined(_MSC_VER)
+#pragma inline_depth(0)
+#endif
+
 // FUNCTION: CARMA2_HW 0x004cbcd0
 // FUNCTION: CARMA2_SW 0x004c83d0
 // FUNCTION: CARMA2_CHEAT 0x004d1810
@@ -1260,6 +1289,10 @@ void C2_HOOK_FASTCALL SetPedMove(tPedestrian* pPed, int pMove_action, int pWalk_
     }
 #endif
 }
+
+#if defined(REC2_MATCHING) && defined(_MSC_VER)
+#pragma inline_depth()
+#endif
 
 // FUNCTION: CARMA2_HW 0x004cc660
 // FUNCTION: CARMA2_SW 0x004c8d60
@@ -2767,10 +2800,6 @@ tPed_character_instance* C2_HOOK_FASTCALL BuildCharacterInstance(const char* pGr
     return instance;
 }
 
-#ifdef REC2_MATCHING
-#pragma auto_inline(off)
-#endif
-
 // FUNCTION: CARMA2_HW 0x00407aa0
 // FUNCTION: CARMA2_SW 0x00407a90
 // FUNCTION: CARMA2_CHEAT 0x00407a90
@@ -2784,10 +2813,6 @@ br_matrix34* C2_HOOK_FASTCALL GetCharacterMatrixPtr(tPed_character_instance* pCh
     }
     return &pCharacter->personality->form->actor_sets[pCharacter->field_0x4].actors[0]->t.t.mat;
 }
-
-#ifdef REC2_MATCHING
-#pragma auto_inline(on)
-#endif
 
 // FUNCTION: CARMA2_HW 0x00407ad0
 // FUNCTION: CARMA2_SW 0x00407ac0
@@ -2895,10 +2920,6 @@ int C2_HOOK_FASTCALL MakeCharacterCollideworthy(tPed_character_instance* pCharac
     return MakeCharacterCollideworthy2(pCharacter, pArg2, pArg3, -1);
 }
 
-#ifdef REC2_MATCHING
-#pragma auto_inline(off)
-#endif
-
 // FUNCTION: CARMA2_HW 0x00409040
 // FUNCTION: CARMA2_SW 0x00409040
 // FUNCTION: CARMA2_CHEAT 0x00409070
@@ -2916,10 +2937,6 @@ tPhysics_object* C2_HOOK_FASTCALL GetRootObject(tPed_character_instance* pPed) {
     }
     return NULL;
 }
-
-#ifdef REC2_MATCHING
-#pragma auto_inline(on)
-#endif
 
 // CharacterNoLongerCollideworthy
 
@@ -2961,10 +2978,26 @@ void C2_HOOK_FASTCALL RecalculateOrientationOfRoot(tPed_character_instance* pCha
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x00409400
-// STUB: CARMA2_SW 0x00409400
+// FUNCTION: CARMA2_HW 0x00409400
+// FUNCTION: CARMA2_SW 0x00409400
+// FUNCTION: CARMA2_CHEAT 0x00409450
 int C2_HOOK_FASTCALL BonerActiveHalted2(tPed_character_instance* pCharacter, undefined4 pArg2) {
-    NOT_IMPLEMENTED();
+    tPhysics_object* object;
+
+    object = (pCharacter->field_0x14 & 0x1) ? pCharacter->personality->form->simple_physicing[(tS8)pCharacter->field_0x5].collision_info : GetRootObject(pCharacter);
+    RecalculateOrientationOfRoot(pCharacter);
+    SetCharacterBonePositions(pCharacter, 3, 0);
+    pCharacter->field_0x14 &= ~0x4;
+    if (gPed_vtable->active_halted != NULL && !gPed_vtable->active_halted(pCharacter, object)) {
+        pCharacter->field_0x14 |= 0x4;
+        return 0;
+    }
+    object->disable_move_rotate = 1;
+    BrVector3Copy(&pCharacter->field_0xd8, &object->v);
+    PHILSetObjectProperty(object, 3, 1);
+    PHILSetObjectProperty(object, 4, 1);
+    PHILSetObjectProperty(object, 5, 1);
+    return 1;
 }
 
 #ifdef REC2_MATCHING
