@@ -5436,9 +5436,9 @@ typedef struct tDrone_spec {
 } tDrone_spec;
 
 typedef struct {
-    void *field_0x0;
+    void* field_0x0;
     tU32 field_0x4;
-    undefined4 field_0x8;
+    void* field_0x8;
 } tRepair_animation;
 
 typedef enum {

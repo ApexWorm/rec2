@@ -126,9 +126,12 @@ tSmashable_item_spec gPowerup_respawn_smashable = { 0 };
 // GLOBAL: CARMA2_CHEAT 0x006afb40
 tRepair_animation gRepair_animations[25] = { 0 };
 
+#ifdef REC2_MATCHING
 // GLOBAL: CARMA2_HW 0x006a80f4
 // GLOBAL: CARMA2_SW 0x006a2154
+// GLOBAL: CARMA2_CHEAT 0x006afc6c
 int gINT_006a80f4 = 0;
+#endif
 
 // GLOBAL: CARMA2_HW 0x006a80f8
 // GLOBAL: CARMA2_SW 0x006a2158
@@ -1018,9 +1021,47 @@ void C2_HOOK_FASTCALL ActuallyRepairSmash(tCar_spec* pCar_spec, tCar_crush_smash
 
 // KillFragment
 
-// AddRepairAnimationToQueue
+void C2_HOOK_FASTCALL AddRepairAnimationToQueue(tCar_spec* pCar_spec, tCar_crush_smashable_part* pSmashable) {
+    int free_index;
+    int i;
 
-// RepairSmash
+    free_index = -1;
+    for (i = 0; i < (int)REC2_ASIZE(gRepair_animations); i++) {
+        if (gRepair_animations[i].field_0x0 == (void*)pSmashable) {
+            free_index = i;
+            break;
+        }
+    }
+    if (free_index < 0) {
+        for (i = 0; i < (int)REC2_ASIZE(gRepair_animations); i++) {
+            if (gRepair_animations[i].field_0x0 == NULL) {
+                free_index = i;
+                break;
+            }
+        }
+    }
+    if (free_index >= 0) {
+        gRepair_animations[i].field_0x0 = pSmashable;
+        gRepair_animations[i].field_0x4 = GetTotalTime();
+        gRepair_animations[i].field_0x8 = pCar_spec;
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x004ef910
+// FUNCTION: CARMA2_SW 0x004eb570
+// FUNCTION: CARMA2_CHEAT 0x004f55b0
+void C2_HOOK_FASTCALL RepairSmash(tCar_spec* pCar_spec, tCar_crush_buffer_entry* pSmash_data) {
+    tCar_crush_smashable_part* smashable;
+    int i;
+
+    smashable = pSmash_data->smashables;
+    for (i = 0; i < pSmash_data->count_smashables; i++, smashable++) {
+        if (smashable->field_0x4c != 0) {
+            ActuallyRepairSmash(pCar_spec, smashable, smashable->field_0x4c - 1);
+            AddRepairAnimationToQueue(pCar_spec, smashable);
+        }
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x004ef9c0
 // FUNCTION: CARMA2_SW 0x004eb620
