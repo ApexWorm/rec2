@@ -1279,9 +1279,10 @@ int C2_HOOK_FASTCALL DRTextWidth(const tDR_font* pFont, const char* pText) {
     len = strlen(pText);
 
     for (i = 0, c = pText; i < len; i++, c++) {
-        result += pFont->width_table[*c - pFont->offset];
+        result += pFont->width_table[(tU8)*c - pFont->offset];
     }
-    return result + pFont->spacing * (len - 1);
+    result += pFont->spacing * (len - 1);
+    return result;
 #endif
 }
 
