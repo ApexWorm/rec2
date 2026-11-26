@@ -1101,7 +1101,12 @@ void C2_HOOK_FASTCALL CalcDistanceFromHome(tOpponent_spec* pOpponent_spec) {
 
 // MassageOpponentPosition
 
-// RematerialiseOpponentOnThisSection
+// STUB: CARMA2_HW 0x004a7f20
+// STUB: CARMA2_SW 0x004a4090
+// STUB: CARMA2_CHEAT 0x004a9230
+int C2_HOOK_FASTCALL RematerialiseOpponentOnThisSection(tOpponent_spec* pOpponent_spec, tS16 pSection_no, br_scalar pSpeed) {
+    NOT_IMPLEMENTED();
+}
 
 // FUNCTION: CARMA2_HW 0x004a8170
 // FUNCTION: CARMA2_SW 0x004a42e0
@@ -1423,9 +1428,45 @@ int C2_HOOK_FASTCALL GetOpponentsNextSection(const tOpponent_spec* pOpponent_spe
     return -1;
 }
 
-// GetOpponentsSectionStartNodePoint
+// FUNCTION: CARMA2_HW 0x004aeb90
+// FUNCTION: CARMA2_SW 0x004aad00
+// FUNCTION: CARMA2_CHEAT 0x004b00a0
+const br_vector3* C2_HOOK_FASTCALL GetOpponentsSectionStartNodePoint(const tOpponent_spec* pOpponent_spec, tS16 pSection) {
 
-// GetOpponentsSectionFinishNodePoint
+    if (pSection >= 20000 && pOpponent_spec->nnext_sections > pSection - 20000) {
+        const tRoute_section* route = &pOpponent_spec->next_sections[pSection - 20000];
+        return &gProgram_state.AI_vehicles.path_nodes[(tS16)gProgram_state.AI_vehicles.path_sections[route->section_no].node_indices[route->direction == 0]].pos;
+    }
+    if (pSection >= 15000) {
+        return &pOpponent_spec->pursue_car_data.pursuee->my_trail.trail_nodes[pSection - 15000];
+    }
+    if (pSection == 10000) {
+        return &pOpponent_spec->pursue_car_data.direct_line_nodes[0].pos;
+    }
+    DoNotDprintf("BIG ERROR - GetOpponentsSectionStartNodePoint() - section not found in next_section array for opponent %s", pOpponent_spec->car_spec->driver_name);
+    PDEnterDebugger("BIG ERROR - GetOpponentsSectionStartNodePoint()");
+    return NULL;
+}
+
+// FUNCTION: CARMA2_HW 0x004aec40
+// FUNCTION: CARMA2_SW 0x004aadb0
+// FUNCTION: CARMA2_CHEAT 0x004b0150
+const br_vector3* C2_HOOK_FASTCALL GetOpponentsSectionFinishNodePoint(const tOpponent_spec* pOpponent_spec, tS16 pSection) {
+
+    if (pSection >= 20000 && pOpponent_spec->nnext_sections > pSection - 20000) {
+        const tRoute_section* route = &pOpponent_spec->next_sections[pSection - 20000];
+        return &gProgram_state.AI_vehicles.path_nodes[(tS16)gProgram_state.AI_vehicles.path_sections[route->section_no].node_indices[route->direction]].pos;
+    }
+    if (pSection >= 15000) {
+        return &pOpponent_spec->pursue_car_data.pursuee->my_trail.trail_nodes[pSection + 1 - 15000];
+    }
+    if (pSection == 10000) {
+        return &pOpponent_spec->pursue_car_data.direct_line_nodes[1].pos;
+    }
+    DoNotDprintf("BIG ERROR - GetOpponentsSectionFinishNodePoint() - section not found in next_section array for opponent %s", pOpponent_spec->car_spec->driver_name);
+    PDEnterDebugger("BIG ERROR - GetOpponentsSectionFinishNodePoint()");
+    return NULL;
+}
 
 // FUNCTION: CARMA2_HW 0x004aece0
 // FUNCTION: CARMA2_SW 0x004aae50

@@ -164,7 +164,7 @@ extern void C2_HOOK_FASTCALL CalcDistanceFromHome(tOpponent_spec* pOpponent_spec
 
 // MassageOpponentPosition
 
-// RematerialiseOpponentOnThisSection
+extern int C2_HOOK_FASTCALL RematerialiseOpponentOnThisSection(tOpponent_spec* pOpponent_spec, tS16 pSection_no, br_scalar pSpeed);
 
 extern int C2_HOOK_FASTCALL RematerialiseOpponentOnNearestSection(tOpponent_spec* pOpponent_spec, br_scalar pSpeed);
 
@@ -210,9 +210,9 @@ extern int C2_HOOK_FASTCALL GetOpponentsFirstSection(const tOpponent_spec* pOppo
 
 extern int C2_HOOK_FASTCALL GetOpponentsNextSection(const tOpponent_spec* pOpponent_spec, tS16 pCurrent_section);
 
-// GetOpponentsSectionStartNodePoint
+extern const br_vector3* C2_HOOK_FASTCALL GetOpponentsSectionStartNodePoint(const tOpponent_spec* pOpponent_spec, tS16 pSection);
 
-// GetOpponentsSectionFinishNodePoint
+extern const br_vector3* C2_HOOK_FASTCALL GetOpponentsSectionFinishNodePoint(const tOpponent_spec* pOpponent_spec, tS16 pSection);
 
 extern float C2_HOOK_FASTCALL GetOpponentsSectionWidth(const tOpponent_spec* pOpponent_spec, tS16 pSection);
 

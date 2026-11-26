@@ -17,38 +17,38 @@
 
 // CornerFudge
 
-// MaxCurvatureForCarSpeed
+extern float C2_HOOK_FASTCALL MaxCurvatureForCarSpeed(tCar_spec* pCar, float pSpeed);
 
-// Vector2Cross
+extern br_scalar C2_HOOK_FASTCALL Vector2Cross(const br_vector2* pV1, const br_vector2* pV2);
 
 // RoughlyColinear
 
-// GetStraight
+extern int C2_HOOK_FASTCALL GetStraight(br_vector2* pStart, br_vector2* pFinish, float* pWidth, int pSection_no, tOpponent_spec* pOpponent_spec);
 
 extern int C2_HOOK_FASTCALL TimeToStopStruggling(tOpponent_spec* pOpponent_spec);
 
-// TimeToBeBrakingWhenStruggling
+extern int C2_HOOK_FASTCALL TimeToBeBrakingWhenStruggling(tOpponent_spec* pOpponent_spec);
 
 extern void C2_HOOK_CDECL DoNotDprintf_oppoproc(const char* pMessage, ...);
 
-// CalcCorners
+extern int C2_HOOK_FASTCALL CalcCorners(tCorner* pCorners, int pSection_no, float pWidth, br_vector2* pStart, tOpponent_spec* pOpponent_spec);
 
-// Distance2D
+extern br_scalar C2_HOOK_FASTCALL Distance2D(const br_vector3* pV1, const br_vector3* pV2);
 
-// SectionLength2D
+extern br_scalar C2_HOOK_FASTCALL SectionLength2D(const tOpponent_spec* pOpponent_spec, tS16 pSection_no);
 
-// NearestSectionInStraight
+extern int C2_HOOK_FASTCALL NearestSectionInStraight(const br_vector2* pPos2d, const br_vector2* pStart2d, const br_vector2* pFinish2d, tS16 pSection_no, tS16 pEnd_section, const tOpponent_spec* pOpponent_spec);
 
-// SetMaxSpeedFromSOCs
+extern void C2_HOOK_FASTCALL SetMaxSpeedFromSOCs(tSOC* pSocs, int pCount_socs, float* pDesired_speed, float pSpeed, br_vector2* pPos2d, tCorner* pCorners, tOpponent_spec* pOpponent_spec);
 
-// CalcSOCs
+extern int C2_HOOK_FASTCALL CalcSOCs(int pSection_no, int pCount_corners, tCorner* pCorners, tOpponent_spec* pOpponent_spec, tSOC* pSocs, tCar_spec* pCar_spec);
 
-// StuffDataFromCorner
+extern void C2_HOOK_FASTCALL StuffDataFromCorner(tFollow_path_data* pFollow_path, tCorner* pCorner);
 
-// SetCurvature
+extern void C2_HOOK_FASTCALL SetCurvature(tCar_spec* pCar_spec, float pCurvature);
 
 extern tFollow_path_result C2_HOOK_FASTCALL ProcessFollowPath(tOpponent_spec* pOpponent_spec, tProcess_objective_command pCommand, int pPursuit_mode, int pIgnore_end, int pNever_struggle);
 
-// FollowCheatyPath
+extern tFollow_path_result C2_HOOK_FASTCALL FollowCheatyPath(tOpponent_spec* pOpponent_spec);
 
 #endif // GUARD_26_OPPOPROC_H

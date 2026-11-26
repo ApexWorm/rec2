@@ -53,6 +53,11 @@ int gDecode_thing = '@';
 // GLOBAL: CARMA2_CHEAT 0x007a6658
 tU32 gTime_stamp_for_this_munging;
 
+// GLOBAL: CARMA2_HW 0x0079efc4
+// GLOBAL: CARMA2_SW 0x00795564
+// GLOBAL: CARMA2_CHEAT 0x007a6664
+tU32 gFrame_period_for_this_munging;
+
 // GLOBAL: CARMA2_HW 0x00658610
 // GLOBAL: CARMA2_SW 0x00652ff0
 // GLOBAL: CARMA2_CHEAT 0x0065eea0
