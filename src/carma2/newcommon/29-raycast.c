@@ -9,6 +9,7 @@
 #include "29-raycast.h"
 
 #include "16-graphics1.h"
+#include "32-spark.h"
 #include "globvars.h"
 #include "rec2_macros.h"
 
@@ -57,7 +58,21 @@ br_matrix34 gPick_model_to_view__raycast;
 // GLOBAL: CARMA2_CHEAT 0x006a9c98
 float gHighest_y_below;
 
-// DRActorToRoot
+inline int C2_HOOK_FASTCALL DRActorToRoot(br_actor* a, br_actor* world, br_matrix34* m) {
+
+    if (a == world) {
+        BrMatrix34Identity(m);
+        return 1;
+    } else {
+        BrTransformToMatrix34(m, &a->t);
+        for (a = a->parent; a != NULL && a != world; a = a->parent) {
+            if (a->t.type != BR_TRANSFORM_IDENTITY) {
+                BrMatrix34PostTransform(m, &a->t);
+            }
+        }
+        return a == world;
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x004e3660
 // FUNCTION: CARMA2_SW 0x004df9f0
@@ -211,7 +226,20 @@ int C2_HOOK_FASTCALL ActorPick2D(br_actor* pActor, br_model* pModel, br_material
 
 // DRScenePick2DXY
 
-// DRScenePick2D
+inline int C2_HOOK_FASTCALL DRScenePick2D(br_actor* world, br_actor* camera, dr_pick2d_cbfn* callback, void* arg) {
+    br_matrix34 camera_tfm;
+    br_scalar cos_angle;
+    br_scalar sin_angle;
+    br_camera* camera_data;
+
+    camera_data = camera->type_data;
+    DRActorToRoot(camera, world, &camera_tfm);
+    BrMatrix34Inverse(&gPick_model_to_view__raycast, &camera_tfm);
+    cos_angle = BR_COS(camera_data->field_of_view / 2);
+    sin_angle = BR_SIN(camera_data->field_of_view / 2);
+    BrMatrix34PostScale(&gPick_model_to_view__raycast, cos_angle / sin_angle / camera_data->aspect, cos_angle / sin_angle, 1.0f);
+    return ActorPick2D(world, NULL, gBlack_material, callback, arg);
+}
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
@@ -263,11 +291,23 @@ int C2_HOOK_CDECL FindHighestCallBack__raycast(br_actor* pActor, br_model* pMode
     return 0;
 }
 
-// STUB: CARMA2_HW 0x004e3bc0
-// STUB: CARMA2_SW 0x004dff50
-// STUB: CARMA2_CHEAT 0x004e9740
+// FUNCTION: CARMA2_HW 0x004e3bc0
+// FUNCTION: CARMA2_SW 0x004dff50
+// FUNCTION: CARMA2_CHEAT 0x004e9740
 void C2_HOOK_FASTCALL FindBestY(br_vector3* pPosition, br_actor* pWorld, br_scalar pStarting_height, br_scalar* pNearest_y_above, br_scalar* pNearest_y_below, br_model** pNearest_above_model, br_model** pNearest_below_model, int* pNearest_above_face_index, int* pNearest_below_face_index) {
-    NOT_IMPLEMENTED();
+
+    gLowest_y_above = 30000.0f;
+    gHighest_y_below = -30000.0f;
+    gCurrent_y = pPosition->v[1] + 1.192093e-5f;
+    gY_picking_camera->t.t.translate.t = *pPosition;
+    gY_picking_camera->t.t.translate.t.v[1] += pStarting_height;
+    DRScenePick2D(pWorld, gY_picking_camera, FindHighestCallBack__raycast, NULL);
+    *pNearest_y_above = gLowest_y_above;
+    *pNearest_y_below = gHighest_y_below;
+    *pNearest_above_model = gAbove_model;
+    *pNearest_below_model = gBelow_model;
+    *pNearest_above_face_index = gAbove_face_index;
+    *pNearest_below_face_index = gBelow_face_index;
 }
 
 // FUNCTION: CARMA2_HW 0x004e45b0
