@@ -2341,7 +2341,20 @@ void C2_HOOK_FASTCALL FRONTEND_PingPongFlash(void) {
     }
 }
 
-// FRONTEND_DrawMenu
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_HW 0x0046e020
+// STUB: CARMA2_SW 0x0046d6c0
+// STUB: CARMA2_CHEAT 0x0046e390
+void C2_HOOK_FASTCALL FRONTEND_DrawMenu(tFrontend_spec* pFrontend) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // FUNCTION: CARMA2_HW 0x0046cf10
 // FUNCTION: CARMA2_SW 0x0046cbd0
@@ -2478,7 +2491,33 @@ void C2_HOOK_FASTCALL FRONTEND_Setup(tFrontendMenuType pType) {
     PrintMemoryDump(0, "END OF FRONTEND_Setup");
 }
 
-// FRONTEND_Redraw
+inline int C2_HOOK_FASTCALL FRONTEND_Redraw(void) {
+    int i;
+
+    gBack_screen->origin_x = 0;
+    gBack_screen->origin_y = 0;
+    if (gFrontend_backdrop != NULL) {
+        DrPixelmapRectangleCopyPossibleLock(gBack_screen, 0, 0, gFrontend_backdrop, 0, 0, gFrontend_backdrop->width, gFrontend_backdrop->height);
+    }
+    BrPixelmapFill(gDepth_buffer, -1);
+    for (i = 0; i < gFrontend_count_brender_items; i++) {
+        if (gCurrent_frontend_spec->items[i].visible) {
+            gFrontend_brender_items[i].actor->render_style = BR_RSTYLE_FACES;
+        } else {
+            gFrontend_brender_items[i].actor->render_style = BR_RSTYLE_NONE;
+        }
+    }
+#ifdef REC2_CHEAT
+    if (!PDKeyDown(36))
+#endif
+    {
+        BrZbsSceneRender(gFrontend_actor, gFrontend_camera, gBack_screen, gDepth_buffer);
+        FRONTEND_DrawMenu(gCurrent_frontend_spec);
+    }
+    MaybeDoMouseCursor();
+    PDScreenBufferSwap(0);
+    return 0;
+}
 
 // FUNCTION: CARMA2_HW 0x0046d8b0
 // FUNCTION: CARMA2_SW 0x0046cfb0
@@ -3742,7 +3781,15 @@ void C2_HOOK_FASTCALL RefreshScrollSet(tFrontend_spec* pFrontend) {
     FuckWithWidths(pFrontend);
 }
 
-// DetermineKeyArrayIndex
+inline int C2_HOOK_FASTCALL DetermineKeyArrayIndex(void) {
+    int index;
+
+    index = gFrontend_selected_item_index;
+    if (gFrontend_selected_item_index >= 53) {
+        index = gFrontend_selected_item_index - 10;
+    }
+    return index - 43 + gControls_scroller.field_0x8;
+}
 
 inline void C2_HOOK_FASTCALL Joystick_BackupSettings(void) {
 
@@ -3929,11 +3976,64 @@ int C2_HOOK_FASTCALL Controls_Outfunc(tFrontend_spec* pFrontend) {
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x00472b00
-// STUB: CARMA2_SW 0x00472090
-// STUB: CARMA2_CHEAT 0x00472e90
+// FUNCTION: CARMA2_HW 0x00472b00
+// FUNCTION: CARMA2_SW 0x00472090
+// FUNCTION: CARMA2_CHEAT 0x00472e90
 int C2_HOOK_FASTCALL Controls_SlotActivated(tFrontend_spec* pFrontend) {
-    NOT_IMPLEMENTED();
+    int key_array_index;
+    float dy;
+    br_model* model;
+    int match;
+    int key;
+    int i;
+    int j;
+
+    key_array_index = DetermineKeyArrayIndex();
+    CyclePollKeys();
+    PollKeys();
+    WaitForNoKeys();
+    pFrontend->items[0].visible = 1;
+    dy = (float)(17 * (key_array_index - gControls_scroller.field_0x8));
+    model = gFrontend_brender_items[0].model;
+    model->vertices[0].p.v[1] = model->vertices[3].p.v[1] = -(pFrontend->items[0].y + dy);
+    model->vertices[1].p.v[1] = model->vertices[2].p.v[1] = -(pFrontend->items[0].y + dy + 20.f);
+    BrModelUpdate(model, BR_MODU_VERTEX_POSITIONS);
+    match = -1;
+    for (;;) {
+        FRONTEND_Redraw();
+        key = PDAnyKeyDown();
+        if (key != -1 && key != 63) {
+            for (i = 28; i <= 76; i++) {
+                if (gKey_mapping[i] == key && i != gControls_frontend_to_key_mapping_lut[key_array_index]) {
+                    for (j = 0; j < gFrontend_controls_count_keys; j++) {
+                        if (gControls_frontend_to_key_mapping_lut[j] == i) {
+                            gKey_mapping[i] = -2;
+                            match = j;
+                            break;
+                        }
+                    }
+                    if (match < 0) {
+                        DRS3StartSound(gEffects_outlet, eSoundId_CantAffordPart);
+                        key = -1;
+                        break;
+                    }
+                }
+            }
+        }
+        CyclePollKeys();
+        PollKeys();
+        ServiceGame();
+        if (key != -1 || EitherMouseButtonDown()) {
+            pFrontend->items[0].visible = 0;
+            DRS3StartSound(gEffects_outlet, eSoundId_Done);
+            WaitForNoKeys();
+            if (key != 63 && key != -1) {
+                gKey_mapping[gControls_frontend_to_key_mapping_lut[key_array_index]] = key;
+            }
+            RefreshScrollSet(pFrontend);
+            return 0;
+        }
+    }
 }
 
 #ifdef REC2_MATCHING
