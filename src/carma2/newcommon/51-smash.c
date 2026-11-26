@@ -302,7 +302,68 @@ void C2_HOOK_FASTCALL RemoveAllExplosionettes(void) {
     }
 }
 
-// MungeExplosions
+// FUNCTION: CARMA2_HW 0x004eaaf0
+// FUNCTION: CARMA2_SW 0x004e67c0
+// FUNCTION: CARMA2_CHEAT 0x004f0790
+void C2_HOOK_FASTCALL MungeExplosions(void) {
+    int i;
+    int frame;
+    int now;
+    br_vector3 tv;
+    tExplosion* explosion;
+    int prev_frame;
+
+    now = GetTotalTime();
+    for (i = 0, explosion = gExplosions; i < (int)REC2_ASIZE(gExplosions); i++, explosion++) {
+        if (explosion->start == 0) {
+            continue;
+        }
+        frame = (now - (int)explosion->start) / (int)explosion->period;
+        prev_frame = explosion->field_0x8;
+        if (now < (int)explosion->start) {
+            if (explosion->actor->parent != NULL) {
+                BrActorRemove(explosion->actor);
+            }
+        } else if (frame >= explosion->count_frames) {
+            if (explosion->actor->parent != NULL) {
+                BrActorRemove(explosion->actor);
+            }
+            explosion->finished = 1;
+        } else {
+            if (!PointOutOfSightNotAR(&explosion->collision_actor->t.t.translate.t, 0.0f)) {
+                explosion->field_0x8 = frame;
+                if (explosion->actor->parent == NULL) {
+                    BrActorAdd(gNon_track_actor, explosion->actor);
+                }
+                if (frame != prev_frame) {
+                    explosion->actor->material->colour_map = explosion->frames[frame].map;
+#ifdef REC2_SW
+                    BlendifyMaterial(explosion->actor->material, (int)explosion->frames[frame].opacity);
+#endif
+                    BrMaterialUpdate(explosion->actor->material, BR_MATU_ALL);
+                }
+                if (explosion->actor->material->colour_map == NULL) {
+                    if (explosion->actor->parent != NULL) {
+                        BrActorRemove(explosion->actor);
+                    }
+                } else {
+                    explosion->actor->t.t.mat = gCamera->t.t.mat;
+                    BrMatrix34ApplyV(&tv, &explosion->field_0x1c, &explosion->collision_actor->t.t.mat);
+                    BrVector3Add(&explosion->actor->t.t.translate.t, &explosion->collision_actor->t.t.translate.t, &tv);
+                    BrMatrix34PreScale(&explosion->actor->t.t.mat,
+                        (float)explosion->actor->material->colour_map->width * explosion->field_0x14 / 128.0f,
+                        (float)explosion->actor->material->colour_map->height * explosion->field_0x14 / 128.0f,
+                        1.0f);
+                    BrMatrix34PreRotateZ(&explosion->actor->t.t.mat, explosion->angle);
+                }
+            } else {
+                if (explosion->actor->parent != NULL) {
+                    BrActorRemove(explosion->actor);
+                }
+            }
+        }
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x004eace0
 // FUNCTION: CARMA2_SW 0x004e69c0

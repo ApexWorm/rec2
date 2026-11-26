@@ -71,7 +71,7 @@ extern void C2_HOOK_FASTCALL ResetExplosions(void);
 
 extern void C2_HOOK_FASTCALL RemoveAllExplosionettes(void);
 
-// MungeExplosions
+extern void C2_HOOK_FASTCALL MungeExplosions(void);
 
 extern void C2_HOOK_FASTCALL CopyExplosionData(int pIndex, tExplosion* pExplosion);
 

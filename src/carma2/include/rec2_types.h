@@ -264,8 +264,8 @@ typedef struct {
 typedef struct {
     tU32 start;
     tU32 period;
-    undefined field_0x8;
-    tU8 count_frames;
+    tS8 field_0x8;
+    tS8 count_frames;
     tU8 finished;
     undefined field_0xb;
     br_actor* collision_actor;
