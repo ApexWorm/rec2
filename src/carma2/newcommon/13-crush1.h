@@ -210,7 +210,7 @@ extern void C2_HOOK_FASTCALL SetFlappage(br_actor* pActor, tCar_spec* pCar, int 
 
 // RemoveNonCarChildren
 
-// RemoveNonCar
+extern void C2_HOOK_FASTCALL RemoveNonCar(tNon_car_spec* pNon_car);
 
 // GetNonCar
 
@@ -228,7 +228,7 @@ extern void C2_HOOK_FASTCALL SetFlappage(br_actor* pActor, tCar_spec* pCar, int 
 
 extern void C2_HOOK_FASTCALL MakeModelMaterialsDoubleSided(br_model* pModel);
 
-// CheckFlapAngles
+extern intptr_t C2_HOOK_CDECL CheckFlapAngles(br_actor* pActor, void* pData);
 
 extern void C2_HOOK_FASTCALL MakeModelMaterialsSingleSided(br_model* pModel);
 

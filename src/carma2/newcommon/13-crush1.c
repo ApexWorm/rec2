@@ -15,6 +15,7 @@
 #include "18-graphics2.h"
 #include "23-piping.h"
 #include "30-opponent.h"
+#include "37-brucetrk.h"
 #include "41-utility.h"
 #include "49-physics.h"
 #include "51-smash.h"
@@ -1512,7 +1513,28 @@ void C2_HOOK_FASTCALL SetFlappage(br_actor* pActor, tCar_spec* pCar, int pFlags,
 
 // RemoveNonCarChildren
 
-// RemoveNonCar
+inline void C2_HOOK_FASTCALL RemoveNonCar(tNon_car_spec* pNon_car) {
+    int i;
+
+    for (i = 0; i < gNum_active_non_cars; i++) {
+        if (gActive_non_car_list[i] == pNon_car) {
+            break;
+        }
+    }
+    if (i == gNum_active_non_cars) {
+#ifdef REC2_CHEAT
+        PDEnterDebugger("Trying to remove non_car which isn't on any list known to man");
+#endif
+    } else {
+        gNum_active_non_cars--;
+        for (; i < gNum_active_non_cars; i++) {
+            gActive_non_car_list[i] = gActive_non_car_list[i + 1];
+        }
+    }
+    pNon_car->driver = eDriver_non_car_unused_slot;
+    pNon_car->car_master_actor->type_data = NULL;
+    PHILRemoveObject(pNon_car->collision_info);
+}
 
 // GetNonCar
 
@@ -1547,7 +1569,20 @@ void C2_HOOK_FASTCALL MakeModelMaterialsDoubleSided(br_model* pModel) {
     }
 }
 
-// CheckFlapAngles
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_HW 0x00434320
+// STUB: CARMA2_SW 0x00434350
+// STUB: CARMA2_CHEAT 0x00434510
+intptr_t C2_HOOK_CDECL CheckFlapAngles(br_actor* pActor, void* pData) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // FUNCTION: CARMA2_HW 0x0042d9b0
 // FUNCTION: CARMA2_SW 0x0042da20
@@ -1572,11 +1607,95 @@ void C2_HOOK_FASTCALL MakeModelMaterialsSingleSided(br_model* pModel) {
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x00434010
-// STUB: CARMA2_SW 0x00434040
-// STUB: CARMA2_CHEAT 0x004341f0
+// FUNCTION: CARMA2_HW 0x00434010
+// FUNCTION: CARMA2_SW 0x00434040
+// FUNCTION: CARMA2_CHEAT 0x004341f0
 void C2_HOOK_FASTCALL ReAttachBit(tCar_spec* pCar_spec, br_actor* pActor_arg2, br_actor* pActor_arg3, tPhysics_object* pObject) {
-    NOT_IMPLEMENTED();
+    tUser_crush_data* user_crush;
+    tCar_crush_buffer_entry* crush_data;
+    tCar_crush_detach_data* detach_data;
+    tCar_crush_flap_data* flap_data;
+    tCar_crush_spec* car_crush;
+    tNon_car_spec* non_car;
+    tPhysics_shape* shape;
+    br_model* model;
+    br_vector3 neg;
+
+    user_crush = pActor_arg3->user;
+    if (user_crush == NULL) {
+        return;
+    }
+    crush_data = user_crush->crush_data;
+    if (crush_data == NULL) {
+        return;
+    }
+    detach_data = crush_data->detach_data;
+    if (detach_data == NULL) {
+        return;
+    }
+    if (detach_data->field_0x28 == 0) {
+        return;
+    }
+    car_crush = pCar_spec->car_crush_spec;
+    non_car = pActor_arg3->type_data;
+    if (non_car != NULL) {
+        pActor_arg3->type_data = NULL;
+        non_car->driver = eDriver_non_car_unused_slot;
+        if (pObject != NULL) {
+            PhysicsRemoveObject(pObject);
+            if (pObject->physics_joint1 != NULL) {
+                pObject->physics_joint1->type = eJoint_none;
+                pObject->physics_joint1 = NULL;
+            }
+            if (detach_data->type == 4) {
+                shape = pObject->shape;
+                pObject->shape = (tPhysics_shape*)car_crush->field_0x4[detach_data->field_0x78].field_0x0;
+                car_crush->field_0x4[detach_data->field_0x78].field_0x0 = &shape->polyhedron;
+                car_crush->field_0x4[detach_data->field_0x78].field_0x8 = 0;
+                car_crush->expand_bounding_box |= 0x1;
+            }
+        } else {
+            PipeSingleNonCar((tU16)non_car->car_ID, pActor_arg3);
+            RemoveNonCar(non_car);
+        }
+    }
+    PipeSingleRelink(pActor_arg2, pActor_arg3);
+    if (pActor_arg3->parent != NULL) {
+        ActorRelink(pActor_arg2, pActor_arg3);
+    } else {
+        BrActorAdd(pActor_arg2, pActor_arg3);
+    }
+    flap_data = crush_data->flap_data;
+    if (flap_data != NULL && !flap_data->kev_o_flap) {
+        BrVector3Negate(&neg, &((tUser_crush_data*)pActor_arg3->user)->models[0]->vertices[flap_data->hinge0].p);
+        BrMatrix34Translate(&pActor_arg3->t.t.mat, neg.v[0], neg.v[1], neg.v[2]);
+        model = ((tUser_crush_data*)pActor_arg2->user)->models[0];
+        BrMatrix34PostTranslate(&pActor_arg3->t.t.mat, model->vertices[flap_data->field_0xc].p.v[0], model->vertices[flap_data->field_0xc].p.v[1], model->vertices[flap_data->field_0xc].p.v[2]);
+        PipeSingleFlap(pActor_arg3, -flap_data->field_0x4);
+        flap_data->field_0x4 = 0;
+        SetFlappage(pActor_arg3, pCar_spec, 0x1, 0.f);
+        CheckFlapAngles(pActor_arg3, NULL);
+    } else {
+        BrMatrix34Identity(&pActor_arg3->t.t.mat);
+        PipeSingleIdentity(pActor_arg3);
+        if (flap_data != NULL) {
+            flap_data->field_0x0 = 0;
+        }
+    }
+    PipeSingleDSModel(1, user_crush->models[0]);
+    pActor_arg3->model = user_crush->models[0];
+    if (gProgram_state.racing && pObject == NULL) {
+        DRS3StartSound3D(gCar_outlet, 5251,
+            &pCar_spec->collision_info->actor->t.t.translate.t, &gZero_v__car,
+            1, 255, IRandomBetween(S3_FIXED_INT(0.875f), S3_FIXED_INT(1.125f)), S3_FIXED_INT(1));
+    }
+    if (user_crush->groove != NULL) {
+        PipeSingleGrooveOnOff(1, pActor_arg3, 3);
+        EnableGroovidelic(pActor_arg3, 3);
+        PipeSingleTransformType(pActor_arg3, BR_TRANSFORM_MATRIX34_LP);
+        pActor_arg3->t.type = BR_TRANSFORM_MATRIX34_LP;
+    }
+    detach_data->field_0x28 = 0;
 }
 
 #ifdef REC2_MATCHING
