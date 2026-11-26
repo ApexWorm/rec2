@@ -62,9 +62,9 @@ extern char* C2_HOOK_FASTCALL GetPowerupMessage(int pPowerup_index);
 
 extern void C2_HOOK_FASTCALL QueueIconComing(tPowerup* pPowerup, tHeadup_icon* pHeadup_icons, int* pCount_icons);
 
-// LosePowerupX
+extern void C2_HOOK_FASTCALL LosePowerupX(tPowerup* pPowerup, int pTell_net_players);
 
-// LosePowerup
+extern void C2_HOOK_FASTCALL LosePowerup(tPowerup* pPowerup);
 
 // LoseKeyboardPowerupN
 
