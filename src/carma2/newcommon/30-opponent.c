@@ -381,12 +381,57 @@ void C2_HOOK_FASTCALL CalcRaceRoute(tOpponent_spec* pOpponent_spec) {
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x004a93c0
-// STUB: CARMA2_SW 0x004a5530
-// STUB: CARMA2_CHEAT 0x004aa6e0
+// FUNCTION: CARMA2_HW 0x004a93c0
+// FUNCTION: CARMA2_SW 0x004a5530
+// FUNCTION: CARMA2_CHEAT 0x004aa6e0
 void C2_HOOK_FASTCALL TopUpRandomRoute(tOpponent_spec* pOpponent_spec, int pSections_to_add) {
-    NOT_IMPLEMENTED();
+    tS16 section_no;
+    tS16 node_no;
+    tS16 temp_section_array[8];
+    int i;
+    int target;
+    int num_of_temp_sections;
+    int direction;
+
+    if (!pSections_to_add) {
+        PDEnterDebugger("TopUpRandomRoute() called with no seed (woof, bark, etc.)");
+    }
+    if (pSections_to_add < 0) {
+        target = REC2_ASIZE(pOpponent_spec->next_sections);
+    } else {
+        target = MIN(pSections_to_add + pOpponent_spec->nnext_sections, (int)REC2_ASIZE(pOpponent_spec->next_sections));
+    }
+    while (pOpponent_spec->nnext_sections < target) {
+        node_no = (tS16)gProgram_state.AI_vehicles.path_sections[pOpponent_spec->next_sections[pOpponent_spec->nnext_sections - 1].section_no].node_indices[pOpponent_spec->next_sections[pOpponent_spec->nnext_sections - 1].direction];
+        if (gProgram_state.AI_vehicles.path_nodes[node_no].number_of_sections > 1) {
+            num_of_temp_sections = 0;
+            for (i = 0; i < gProgram_state.AI_vehicles.path_nodes[node_no].number_of_sections; i++) {
+                section_no = (tS16)gProgram_state.AI_vehicles.path_nodes[node_no].sections[i];
+                if (section_no != pOpponent_spec->next_sections[pOpponent_spec->nnext_sections - 1].section_no
+                    && (!gProgram_state.AI_vehicles.path_sections[section_no].one_way || node_no != (tS16)gProgram_state.AI_vehicles.path_sections[section_no].node_indices[1])
+                    && (pOpponent_spec->cheating || gProgram_state.AI_vehicles.path_sections[section_no].type != 2)) {
+                    temp_section_array[num_of_temp_sections] = section_no;
+                    num_of_temp_sections++;
+                }
+            }
+            if (num_of_temp_sections > 1) {
+                section_no = temp_section_array[IRandomBetween(0, num_of_temp_sections - 1)];
+                direction = node_no != (tS16)gProgram_state.AI_vehicles.path_sections[section_no].node_indices[1];
+            } else if (num_of_temp_sections == 1) {
+                section_no = temp_section_array[0];
+                direction = node_no != (tS16)gProgram_state.AI_vehicles.path_sections[section_no].node_indices[1];
+            } else {
+                section_no = pOpponent_spec->next_sections[pOpponent_spec->nnext_sections - 1].section_no;
+                direction = pOpponent_spec->next_sections[pOpponent_spec->nnext_sections - 1].direction == 0;
+            }
+        } else {
+            section_no = pOpponent_spec->next_sections[pOpponent_spec->nnext_sections - 1].section_no;
+            direction = pOpponent_spec->next_sections[pOpponent_spec->nnext_sections - 1].direction == 0;
+        }
+        AddToOpponentsProjectedRoute(pOpponent_spec, section_no, direction);
+    }
 }
+
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(on)
