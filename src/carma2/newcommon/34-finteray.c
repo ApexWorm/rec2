@@ -50,7 +50,10 @@ br_model* gNearest_model;
 // GLOBAL: CARMA2_CHEAT 0x0068da40
 br_matrix34 gPick_model_to_view__finteray;
 
-// BadDiv
+inline int C2_HOOK_FASTCALL BadDiv__finteray(br_scalar a, br_scalar b) {
+
+    return (float)fabs(b) < 1.0f && (float)fabs(a) > (float)fabs(b) * BR_SCALAR_MAX;
+}
 
 // DRVector2AccumulateScale
 
@@ -297,11 +300,115 @@ void C2_HOOK_FASTCALL StationarySphereSphereCollide(const br_vector3* pPoint, co
 
 // SphereFaceCollide
 
-// STUB: CARMA2_HW 0x0045ecc0
-// STUB: CARMA2_SW 0x0045e730
-// STUB: CARMA2_CHEAT 0x0045f130
+// FUNCTION: CARMA2_HW 0x0045ecc0
+// FUNCTION: CARMA2_SW 0x0045e730
+// FUNCTION: CARMA2_CHEAT 0x0045f130
 void C2_HOOK_FASTCALL CheckSingleFace(tFace_ref* pFace, br_vector3* ray_pos, br_vector3* ray_dir, br_vector3* normal, br_scalar* rt, br_vector3* coll_pos) {
-    NOT_IMPLEMENTED();
+    float u0;
+    br_scalar t;
+    br_scalar numerator;
+    br_scalar d;
+    int axis_m;
+    int axis_0;
+    int axis_1;
+    float u1;
+    float u2;
+    float v0;
+    float v1;
+    float v2;
+    br_scalar v0i1;
+    br_scalar v0i2;
+    br_vector3 p;
+    float alpha;
+    float f_d;
+    float f_n;
+    br_material* this_material;
+
+    this_material = pFace->material;
+    *rt = 100.f;
+    d = BrVector3Dot(&pFace->normal, ray_dir);
+    if (this_material != NULL && (this_material->flags & (BR_MATF_TWO_SIDED | BR_MATF_ALWAYS_VISIBLE)) == 0 && d > 0.f) {
+        return;
+    }
+    if (this_material != NULL && this_material->identifier != NULL
+            && (this_material->identifier[0] == '!' || this_material->identifier[0] == '>' || this_material->identifier[0] == '?')
+            && gPling_materials) {
+        return;
+    }
+    if ((float)fabs(d) < 2.3841858e-7f) {
+        return;
+    }
+    BrVector3Sub(&p, ray_pos, &pFace->v[0]);
+    numerator = BrVector3Dot(&pFace->normal, &p);
+    if (BadDiv__finteray(numerator, d)) {
+        return;
+    }
+    if (d <= 0.f) {
+        if (numerator < 0.f || numerator > 0.003 - d) {
+            return;
+        }
+    } else {
+        if (-numerator < 0.f || -numerator > d + 0.003) {
+            return;
+        }
+    }
+    t = -(numerator / d);
+    if (t > 1.f) {
+        t = 1.f;
+    }
+    BrVector3Scale(coll_pos, ray_dir, t);
+    BrVector3Accumulate(coll_pos, ray_pos);
+    axis_m = 0;
+    if ((float)fabs(pFace->normal.v[1]) > (float)fabs(pFace->normal.v[0])) {
+        axis_m = 1;
+    }
+    if ((float)fabs(pFace->normal.v[2]) > (float)fabs(pFace->normal.v[axis_m])) {
+        axis_m = 2;
+    }
+    switch (axis_m) {
+    case 0:
+        axis_0 = 1;
+        axis_1 = 2;
+        break;
+    case 1:
+        axis_0 = 0;
+        axis_1 = 2;
+        break;
+    case 2:
+        axis_0 = 0;
+        axis_1 = 1;
+        break;
+    }
+    v0i2 = pFace->v[0].v[axis_1];
+    v0i1 = pFace->v[0].v[axis_0];
+    u1 = pFace->v[1].v[axis_0] - v0i1;
+    v1 = pFace->v[1].v[axis_1] - v0i2;
+    u2 = pFace->v[2].v[axis_0] - v0i1;
+    v2 = pFace->v[2].v[axis_1] - v0i2;
+    u0 = coll_pos->v[axis_0] - v0i1;
+    v0 = coll_pos->v[axis_1] - v0i2;
+    f_d = v0 * u1 - v1 * u0;
+    f_n = (v2 * u1) - u2 * v1;
+    if (fabs(f_d) > fabs(f_n) * 1.0001 || f_n == 0.f) {
+        return;
+    }
+    alpha = f_d / f_n;
+    if (alpha < -0.0001) {
+        return;
+    }
+    f_n = (v1 * u2) - u1 * v2;
+    u1 = (v0 * u2) - v2 * u0;
+    if (fabs(u1) > 1.0001 * fabs(f_n) || f_n == 0.f) {
+        return;
+    }
+    if (u1 / f_n < -0.0001 || alpha + u1 / f_n > 1.0001) {
+        return;
+    }
+    *rt = t;
+    BrVector3Copy(normal, &pFace->normal);
+    if (d > 0.0f) {
+        BrVector3Negate(normal, normal);
+    }
 }
 
 // MultiRayCheckSingleFace
