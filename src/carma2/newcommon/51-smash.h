@@ -71,7 +71,7 @@ extern void C2_HOOK_FASTCALL ResetExplosions(void);
 
 extern void C2_HOOK_FASTCALL RemoveAllExplosionettes(void);
 
-// MungeExplosions
+extern void C2_HOOK_FASTCALL MungeExplosions(void);
 
 extern void C2_HOOK_FASTCALL CopyExplosionData(int pIndex, tExplosion* pExplosion);
 
@@ -211,9 +211,9 @@ extern void C2_HOOK_FASTCALL ActuallyRepairSmash(tCar_spec* pCar_spec, tCar_crus
 
 // KillFragment
 
-// AddRepairAnimationToQueue
+extern void C2_HOOK_FASTCALL AddRepairAnimationToQueue(tCar_spec* pCar_spec, tCar_crush_smashable_part* pSmashable);
 
-// RepairSmash
+extern void C2_HOOK_FASTCALL RepairSmash(tCar_spec* pCar_spec, tCar_crush_buffer_entry* pSmash_data);
 
 extern void C2_HOOK_FASTCALL TotallyRepairSmash(tCar_spec* pCar_Spec, tCar_crush_buffer_entry* pSmash_data);
 
@@ -233,7 +233,7 @@ extern void C2_HOOK_FASTCALL DoFragMovement(tSmash_vertex* pFragment, tU32 pTime
 
 extern void C2_HOOK_FASTCALL MungeGlassFragments2(int pEnd_race);
 
-// MungeAnimationRepairs
+extern void C2_HOOK_FASTCALL MungeAnimationRepairs(void);
 
 // MungeGlassFragments
 

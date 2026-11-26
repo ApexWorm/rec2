@@ -12,6 +12,7 @@
 #include "09-funks.h"
 #include "08-loading1.h"
 #include "10-loading2.h"
+#include "13-crush1.h"
 #include "15-displays.h"
 #include "18-graphics2.h"
 #include "23-piping.h"
@@ -587,11 +588,19 @@ void C2_HOOK_FASTCALL DoCamouflageThing(tCar_spec* pCar) {
     }
 }
 
-// STUB: CARMA2_HW 0x004f9020
-// STUB: CARMA2_SW 0x004f46a0
-// STUB: CARMA2_CHEAT 0x004fecc0
+// FUNCTION: CARMA2_HW 0x004f9020
+// FUNCTION: CARMA2_SW 0x004f46a0
+// FUNCTION: CARMA2_CHEAT 0x004fecc0
 void C2_HOOK_FASTCALL DoSolidGraniteThing(tCar_spec* pCar) {
-    NOT_IMPLEMENTED();
+    br_material* material;
+
+    MasterDisableCarFunks(pCar);
+    material = BrMaterialFind("solidgrn");
+    if (material != NULL && material->colour_map != NULL) {
+        gCar_of_material = pCar;
+        pCar->field_0x1960 = material->colour_map;
+        ForEveryCarMaterial(pCar, SetPixelmap, 1);
+    }
 }
 
 #ifdef REC2_HW
@@ -633,7 +642,7 @@ int C2_HOOK_FASTCALL ResetFoxLighting(br_material* pMaterial) {
 
 inline void C2_HOOK_FASTCALL CancelAlternateFoxEffect(tCar_spec* pCar_spec) {
 
-    ForEveryCarModel(pCar_spec, ResetFoxModelCallback);
+    ForEveryCarModel(pCar_spec, ResetFoxModelCallback, 1);
     ForEveryCarMaterial(pCar_spec, ResetFoxLighting, 1);
 }
 
@@ -659,7 +668,7 @@ inline void C2_HOOK_FASTCALL SetupAlternateFoxEffect(tCar_spec* pCar_spec) {
         gCar_of_material = pCar_spec;
         pCar_spec->field_0x1960 = material->colour_map;
         ForEveryCarMaterial(pCar_spec, SetFoxLighting, 1);
-        ForEveryCarModel(pCar_spec, SetFoxModelCallback);
+        ForEveryCarModel(pCar_spec, SetFoxModelCallback, 1);
     }
 }
 #endif
@@ -678,11 +687,14 @@ int C2_HOOK_FASTCALL RestorePixelmap(br_material* pMaterial) {
     }
 }
 
-// STUB: CARMA2_HW 0x004f9620
-// STUB: CARMA2_SW 0x004f4ca0
-// STUB: CARMA2_CHEAT 0x004ff2c0
+// FUNCTION: CARMA2_HW 0x004f9620
+// FUNCTION: CARMA2_SW 0x004f4ca0
+// FUNCTION: CARMA2_CHEAT 0x004ff2c0
 void C2_HOOK_FASTCALL RestoreCarPixelmaps(tCar_spec* pCar_spec) {
-    NOT_IMPLEMENTED();
+
+    MasterEnableCarFunks(pCar_spec);
+    ForEveryCarMaterial(pCar_spec, RestorePixelmap, 1);
+    pCar_spec->field_0x1960 = NULL;
 }
 
 // MungeShrapnel
@@ -1459,7 +1471,29 @@ void C2_HOOK_FASTCALL CreateSplash(tPhysics_object* pObject, tU32 pTime) {
         pObject->water_d, &pObject->bb1, &pObject->actor->t.t.mat, pTime);
 }
 
-// GetVelocitiesFromMatrices
+// FUNCTION: CARMA2_HW 0x004fda70
+// FUNCTION: CARMA2_SW 0x004f8fd0
+// FUNCTION: CARMA2_CHEAT 0x00503710
+void C2_HOOK_FASTCALL GetVelocitiesFromMatrices(br_vector3* pVel, br_vector3* pRot, br_matrix34* pMat_now, br_matrix34* pMat_prev, tU32 pTime) {
+    br_quat quat_now;
+    br_quat quat_prev;
+    br_quat quat_speed;
+    br_scalar ts;
+
+    ts = (br_scalar)(pTime / 1000.0);
+    BrVector3Sub(pVel, (br_vector3*)pMat_prev->m[3], (br_vector3*)pMat_now->m[3]);
+    pVel->v[0] /= ts;
+    pVel->v[1] /= ts;
+    pVel->v[2] /= ts;
+
+    BrMatrix34ToQuat(&quat_now, pMat_now);
+    BrMatrix34ToQuat(&quat_prev, pMat_now);
+    BrQuatInvert(&quat_now, &quat_now);
+    BrQuatMul(&quat_speed, &quat_now, &quat_prev);
+    pRot->v[0] = 2 * quat_speed.x / ts;
+    pRot->v[1] = 2 * quat_speed.y / ts;
+    pRot->v[2] = 2 * quat_speed.z / ts;
+}
 
 // MungeSplash
 
@@ -1576,16 +1610,28 @@ void C2_HOOK_FASTCALL MakeCarIt(tCar_spec* pCar) {
 #endif
 
 // FUNCTION: CARMA2_HW 0x004fe570
-// STUB: CARMA2_SW 0x004f9d90
+// FUNCTION: CARMA2_SW 0x004f9d90
 // FUNCTION: CARMA2_CHEAT 0x00504210
 void C2_HOOK_FASTCALL StopCarBeingIt(tCar_spec* pCar) {
-#ifdef REC2_HW
 
+#ifdef REC2_HW
     if (gAFE) {
         CancelAlternateFoxEffect(pCar);
     }
-#else
-    NOT_IMPLEMENTED();
+#endif
+#ifdef REC2_SW
+    int i;
+    tCar_crush_spec* car_crush;;
+
+    car_crush = pCar->car_crush_spec;
+    UnFoxifyModel(pCar->shell_model);
+    DRActorEnumRecurse(pCar->car_model_actor, UnFoxifyModelCB, pCar);
+    for (i = 0; i < car_crush->field_0x270; i++) {
+        UnFoxifyModel(car_crush->field_0x274[i].field_0x0->model);
+    }
+    for (i = 0; i < car_crush->field_0x2b0; i++) {
+        UnFoxifyModel(car_crush->field_0x2b4[i].field_0x0->model);
+    }
 #endif
 }
 
@@ -1666,6 +1712,51 @@ intptr_t C2_HOOK_CDECL ForEveryActorMaterialNoGrooves(br_actor* pActor, void* pC
     return 0;
 }
 
+#ifdef REC2_SW
+// FUNCTION: CARMA2_SW 0x004f9e10
+void C2_HOOK_FASTCALL UnFoxifyModel(br_model *pModel) {
+    br_pixelmap* shade0;
+    br_material* mat;
+    int i;
+    int j;
+
+    if (pModel != NULL) {
+        pModel->flags &= ~BR_MODF_CUSTOM;
+        pModel->custom = NULL;
+        shade0 = gShade_list[0];
+        for (i = 0; i < pModel->nfaces; i++) {
+            mat = pModel->faces[i].material;
+
+            if (mat != NULL && mat->index_shade != shade0) {
+
+                mat->index_shade = shade0;
+                mat->flags &= ~(BR_MATF_LIGHT | BR_MATF_PRELIT | BR_MATF_SMOOTH);
+                BrMaterialUpdate(mat, BR_MATU_ALL);
+            }
+        }
+        for (i = 0; i < pModel->prepared->ngroups; i++) {
+            for (j = 0; j < pModel->prepared->groups[i].nvertices; j++) {
+                pModel->prepared->groups[i].vertex_colours[j] = 0;
+                if (pModel->flags & BR_MATF_I_FROM_U) {
+                    pModel->vertices[pModel->prepared->groups[i].vertex_user[j]].index = 0;
+                }
+            }
+        }
+        SetModelForUpdate(pModel);
+    }
+}
+
+// FUNCTION: CARMA2_SW 0x004f9ef0
+intptr_t C2_HOOK_CDECL UnFoxifyModelCB(br_actor* pActor, void* pContext) {
+
+    if (pActor->type == BR_ACTOR_MODEL && pActor->model != NULL
+            && pActor->user != NULL && ((tUser_crush_data*)pActor->user)->groove == NULL) {
+        UnFoxifyModel(pActor->model);
+            }
+    return 0;
+}
+#endif
+
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
 #endif
@@ -1716,7 +1807,10 @@ intptr_t C2_HOOK_CDECL ForEveryCarModelCB(br_actor* pActor, void* pContext) {
     return 0;
 }
 
-inline void C2_HOOK_FASTCALL ForEveryCarModel(tCar_spec* pCar_spec, int (C2_HOOK_FASTCALL* pCallback)(br_model*)) {
+// FUNCTION: CARMA2_HW 0x004fec60
+// FUNCTION: CARMA2_SW 0x004fa540
+// FUNCTION: CARMA2_CHEAT 0x00504900
+inline void C2_HOOK_FASTCALL ForEveryCarModel(tCar_spec* pCar_spec, intptr_t (C2_HOOK_FASTCALL* pCallback)(br_model*), int pGrooves) {
     tCar_crush_spec* crush_spec;
     int i;
 
