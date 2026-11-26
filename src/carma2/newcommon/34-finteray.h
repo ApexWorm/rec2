@@ -22,7 +22,7 @@ extern int gNearest_face_group;
 extern br_model* gNearest_model;
 extern br_matrix34 gPick_model_to_view__finteray;
 
-// BadDiv
+extern int C2_HOOK_FASTCALL BadDiv__finteray(br_scalar a, br_scalar b);
 
 // DRVector2AccumulateScale
 
