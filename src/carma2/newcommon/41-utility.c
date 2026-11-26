@@ -452,15 +452,15 @@ void C2_HOOK_FASTCALL WaitFor(tU32 pDelay) {
 // FUNCTION: CARMA2_HW 0x005146f0
 // FUNCTION: CARMA2_SW 0x0050fb30
 // FUNCTION: CARMA2_CHEAT 0x0051a0e0
-intptr_t C2_HOOK_FASTCALL DRActorEnumRecurse(br_actor* pActor, br_actor_enum_cbfn* callback, void* arg) {
+intptr_t C2_HOOK_FASTCALL DRActorEnumRecurse(br_actor* pActor, br_actor_enum_cbfn* callback, void* pContext) {
     intptr_t result;
 
-    result = callback(pActor, arg);
+    result = callback(pActor, pContext);
     if (result != 0) {
         return result;
     }
     for (pActor = pActor->children; pActor != NULL; pActor = pActor->next) {
-        result = DRActorEnumRecurse(pActor, callback, arg);
+        result = DRActorEnumRecurse(pActor, callback, pContext);
         if (result != 0) {
             return result;
         }
