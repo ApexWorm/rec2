@@ -85,6 +85,7 @@ int gDirectInputJoystickEnumerated;
 
 // GLOBAL: CARMA2_HW 0x0079d9c0
 // GLOBAL: CARMA2_SW 0x00793f20
+// GLOBAL: CARMA2_CHEAT 0x007a5060
 tDirectInputJoystickInfo gDirectInputJoystickInfos[MAX_COUNT_JOYSTICKS];
 
 // GLOBAL: CARMA2_HW 0x00684628
@@ -470,15 +471,25 @@ size_t C2_HOOK_FASTCALL GetCurrentJoystickCountButtons(void) {
     return gDirectInputJoystickInfos[gJoystick_index].count_buttons;
 }
 
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
 // FUNCTION: CARMA2_HW 0x00459f80
 // FUNCTION: CARMA2_SW 0x00459d10
 // FUNCTION: CARMA2_CHEAT 0x0045a400
 tButtonJoystickInfo* C2_HOOK_FASTCALL PDGetCurrentJoystickData(void) {
-    if (gJoystick_index == -1) {
-        return NULL;
+    if (gJoystick_index != -1) {
+        if (gDirectInputJoystickInfos[gJoystick_index].data != NULL) {
+            return gDirectInputJoystickInfos[gJoystick_index].data;
+        }
     }
-    return gDirectInputJoystickInfos[gJoystick_index].data;
+    return NULL;
 }
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // FUNCTION: CARMA2_HW 0x00459fd0
 // FUNCTION: CARMA2_SW 0x00459d60
@@ -1155,6 +1166,8 @@ void C2_HOOK_FASTCALL Win32InitInputDevice(void) {
 }
 
 // FUNCTION: CARMA2_HW 0x00459690
+// FUNCTION: CARMA2_SW 0x00459420
+// FUNCTION: CARMA2_CHEAT 0x00459b10
 tU32 C2_HOOK_FASTCALL PDGetJoystickButtonStates(void) {
     IDirectInputDevice2 *device;
     HRESULT res;
@@ -1208,7 +1221,7 @@ tU32 C2_HOOK_FASTCALL PDGetJoystickButtonStates(void) {
 // FUNCTION: CARMA2_SW 0x0045ade0
 // FUNCTION: CARMA2_CHEAT 0x0045b7e0
 void C2_HOOK_FASTCALL PDSetKeysFromJoystick(int *keys) {
-    if (gJoystick_index != 1) {
+    if (gJoystick_index != -1) {
         tU32 button_mask;
 
         button_mask = PDGetJoystickButtonStates();
@@ -1216,7 +1229,11 @@ void C2_HOOK_FASTCALL PDSetKeysFromJoystick(int *keys) {
             int i;
 
             for (i = 0; i < 32; i++) {
-                keys[107 + i] = !!(button_mask & (i << i));
+                if (button_mask & (1 << i)) {
+                    keys[107 + i] = 1;
+                } else {
+                    keys[107 + i] = 0;
+                }
             }
         }
     }
@@ -1672,8 +1689,8 @@ int C2_HOOK_FASTCALL PDIsJoystickDPadEnabled(void) {
     tButtonJoystickInfo* joystick_info;
 
     joystick_info = PDGetCurrentJoystickData();
-    if (joystick_info == NULL) {
-        return 0;
+    if (joystick_info != NULL) {
+        return joystick_info->field_0xe0;
     }
-    return joystick_info->field_0xe0;
+    return 0;
 }
