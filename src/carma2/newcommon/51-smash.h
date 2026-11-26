@@ -227,7 +227,7 @@ extern void C2_HOOK_FASTCALL ReadPowerupSmash(FILE* pF);
 
 extern void C2_HOOK_FASTCALL InitSmashing(void);
 
-// VerySimpleRotate
+extern void C2_HOOK_FASTCALL VerySimpleRotate(br_scalar pDt, br_matrix34* pMatrix, br_vector3* pOmega);
 
 extern void C2_HOOK_FASTCALL DoFragMovement(tSmash_vertex* pFragment, tU32 pTime, float pDelta_time);
 
