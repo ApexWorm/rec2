@@ -655,9 +655,22 @@ void C2_HOOK_FASTCALL InitSmashQueue(void) {
 
 // QueueSmashIfNecessary2
 
-// AllocateSmashLevels
+inline void C2_HOOK_FASTCALL AllocateSmashLevels(tSmashable_level** pSmashable_levels, int pCount_smashable_levels) {
+    C2_HOOK_BUG_ON(sizeof(tSmashable_level) != 0x2c4);
 
-// ReadSmashSounds
+    *pSmashable_levels = BrMemAllocate(pCount_smashable_levels * sizeof(tSmashable_level), kMem_smash_levels);
+}
+
+inline void C2_HOOK_FASTCALL ReadSmashSounds(FILE* pF, tConnotations* pConnotations, tBrender_storage* pStorage) {
+    int i;
+    int sound;
+
+    pConnotations->count_sounds = GetAnInt(pF);
+    for (i = 0; i < pConnotations->count_sounds; i++) {
+        sound = GetAnInt(pF);
+        pConnotations->sounds[i] = LoadSingleSound(pStorage, sound);
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x004ee500
 // FUNCTION: CARMA2_SW 0x004ea1d0
@@ -736,12 +749,20 @@ br_actor* C2_HOOK_FASTCALL LoadActorFromRace(const char *pName) {
     return BrActorLoad(path);
 }
 
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
 // STUB: CARMA2_HW 0x004ee5e0
 // STUB: CARMA2_SW 0x004ea2b0
 // STUB: CARMA2_CHEAT 0x004f4280
 void C2_HOOK_FASTCALL ReadSpillData(FILE* pF, tSlick_spec* pSlick_spec) {
     NOT_IMPLEMENTED();
 }
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // FUNCTION: CARMA2_HW 0x004ee780
 // FUNCTION: CARMA2_SW 0x004ea420
@@ -1001,37 +1022,145 @@ void C2_HOOK_FASTCALL FUN_004ef830(tCar_spec* pCar_spec, tCar_crush_smashable_pa
 
 // FreeExplosion
 
-// ReadSpecialEffectsSpec
+inline void C2_HOOK_FASTCALL ReadSpecialEffectsSpec(FILE* pF, tSpecial_effects_spec* pSpecial_effects) {
+    ReadExplosion(pF, &pSpecial_effects->explosion_animation);
+    ReadSpillData(pF, &pSpecial_effects->slick);
+}
 
 // ReadBounds
 
-// ReadNoncarSideEffects
+// FUNCTION: CARMA2_HW 0x004efce0
+// FUNCTION: CARMA2_SW 0x004eb940
+// FUNCTION: CARMA2_CHEAT 0x004f5980
+inline void C2_HOOK_FASTCALL ReadNoncarSideEffects(FILE* pF, tNon_car_cuboid_activations* pNon_car_cuboid_activations) {
+    int i;
+    int time1;
+    int time2;
 
-// ReadSmashSideEffects
+    C2_HOOK_BUG_ON(sizeof(tNon_car_cuboid_activation) != 0x40);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tNon_car_cuboid_activation, field_0x2, 0x2);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tNon_car_cuboid_activation, field_0x4, 0x4);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tNon_car_cuboid_activation, field_0x8, 0x8);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tNon_car_cuboid_activation, bounds, 0xc);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tNon_car_cuboid_activation, speed_info, 0x24);
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tNon_car_cuboid_activation, speed_info, 0x1c);
+    C2_HOOK_BUG_ON(REC2_ASIZE(gPosition_type_names) != 2);
 
-// ReadSideEffects
-
-// ReadLightingInformation
-
-// ReadAward
-
-// ReadVariableChanges
-
-// ReadConnotations
+    pNon_car_cuboid_activations->count_activations = GetAnInt(pF);
+    if (pNon_car_cuboid_activations->count_activations != 0) {
+        pNon_car_cuboid_activations->activations = BrMemAllocate(pNon_car_cuboid_activations->count_activations * sizeof(tNon_car_cuboid_activation), kMem_smash_side_effects);
+        for (i = 0; i < pNon_car_cuboid_activations->count_activations; i++) {
+            GetPairOfInts(pF, &time1, &time2);
+            pNon_car_cuboid_activations->activations[i].field_0x0 = (tS16)(1000 * time1);
+            pNon_car_cuboid_activations->activations[i].field_0x2 = (tS16)(1000 * time2);
+            pNon_car_cuboid_activations->activations[i].field_0x4 = GetALineAndInterpretCommand(pF, gPosition_type_names, REC2_ASIZE(gPosition_type_names));
+            pNon_car_cuboid_activations->activations[i].field_0x8 = (tS8)GetAnInt(pF);
+            LoadMinMax(pF, &pNon_car_cuboid_activations->activations[i].bounds);
+            ReadShrapnelMovementSpec(pF, &pNon_car_cuboid_activations->activations[i].speed_info);
+        }
+    }
+}
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x004eea20
-// STUB: CARMA2_SW 0x004ea6c0
-void C2_HOOK_FASTCALL ReadSmashLevels(FILE* pF, tSmashable_level** pSmashable_levels, int* pCount_smashable_levels, int pIs_texture_change, tBrender_storage* pBrender_storage) {
+// STUB: CARMA2_HW 0x004ef550
+// STUB: CARMA2_SW 0x004eb1b0
+// STUB: CARMA2_CHEAT 0x004f51f0
+void C2_HOOK_FASTCALL ReadSmashSideEffects(FILE* pF, tShrapnel_side_effects* pShrapnel_side_effects) {
     NOT_IMPLEMENTED();
 }
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(on)
 #endif
+
+inline void C2_HOOK_FASTCALL ReadSideEffects(FILE* pF, tSide_effects* pSide_effects) {
+    ReadNoncarSideEffects(pF, &pSide_effects->activations);
+    ReadSmashSideEffects(pF, &pSide_effects->side_effects);
+    pSide_effects->extension_flags = GetAnInt(pF);
+    if (pSide_effects->extension_flags & 0x1) {
+        ReadLightingInformation(pF, &pSide_effects->extension_arg);
+    }
+    pSide_effects->room_turn_on_code = GetAnInt(pF);
+}
+
+inline void C2_HOOK_FASTCALL ReadLightingInformation(FILE* pF, int* pLighting_information) {
+    *pLighting_information = GetAnInt(pF);
+}
+
+inline void C2_HOOK_FASTCALL ReadAward(FILE* pF, tAward_info* pAward_info) {
+    C2_HOOK_BUG_ON(REC2_ASIZE(gRepeatability_names) != 4);
+
+    pAward_info->frequency = GetALineAndInterpretCommand(pF, gRepeatability_names, REC2_ASIZE(gRepeatability_names));
+    if (pAward_info->frequency != kRepeatability_None) {
+        pAward_info->field_0x4 = GetAScalar(pF);
+        pAward_info->field_0x8 = GetAScalar(pF);
+        pAward_info->field_0xc = GetAnInt(pF);
+        pAward_info->field_0x10 = GetAnInt(pF);
+    }
+}
+
+inline void C2_HOOK_FASTCALL ReadVariableChanges(FILE* pF, tVariable_changes* pVariable_changes) {
+    int i;
+    int v1;
+    int v2;
+
+    pVariable_changes->count = (tU8)GetAnInt(pF);
+    for (i = 0; i < pVariable_changes->count; i++) {
+        GetPairOfInts(pF, &v1, &v2);
+        pVariable_changes->runtime_changes[i].field_0x2 = (tS16)v1;
+        pVariable_changes->runtime_changes[i].field_0x0 = (tS16)v2;
+    }
+}
+
+inline void C2_HOOK_FASTCALL ReadConnotations(FILE* pF, tConnotations* pConnotations, tBrender_storage* pStorage) {
+    ReadSmashSounds(pF, pConnotations, pStorage);
+    ReadShrapnelSpec(pF, pConnotations->shrapnel, &pConnotations->count_shrapnel);
+    ReadSpecialEffectsSpec(pF, &pConnotations->special_effects);
+    ReadSideEffects(pF, &pConnotations->side_effects);
+    ReadAward(pF, &pConnotations->award);
+    ReadVariableChanges(pF, &pConnotations->variable_changes);
+}
+
+// FUNCTION: CARMA2_HW 0x004eea20
+// FUNCTION: CARMA2_SW 0x004ea6c0
+// FUNCTION: CARMA2_CHEAT 0x004f46c0
+void C2_HOOK_FASTCALL ReadSmashLevels(FILE* pF, tSmashable_level** pSmashable_levels, int* pCount_smashable_levels, int pIs_texture_change, tBrender_storage* pBrender_storage) {
+    char s[256];
+    int i;
+    int j;
+    tSmashable_level* level;
+
+    C2_HOOK_BUG_ON(REC2_ASIZE(gSmashable_collision_type_names) != 3);
+
+    GetAString(pF, s);
+    *pCount_smashable_levels = GetAnInt(pF) + 1;
+    AllocateSmashLevels(pSmashable_levels, *pCount_smashable_levels);
+    (*pSmashable_levels)[0].pixelmaps[0] = BrMapFind(s);
+    if ((*pSmashable_levels)[0].pixelmaps[0] == NULL) {
+        FatalError(kFatalError_CantLoadSmashPix_S, s);
+    }
+    (*pSmashable_levels)[0].connotations.count_shrapnel = 0;
+    (*pSmashable_levels)[0].trigger_threshold = 0.f;
+    for (i = 0, level = *pSmashable_levels + 1; i < *pCount_smashable_levels - 1; i++, level++) {
+        level->trigger_threshold = GetAScalar(pF);
+        level->flags = GetAnInt(pF);
+        if (pIs_texture_change) {
+            level->collision_type = GetALineAndInterpretCommand(pF, gSmashable_collision_type_names, REC2_ASIZE(gSmashable_collision_type_names));
+        }
+        ReadConnotations(pF, &level->connotations, pBrender_storage);
+        level->count_pixelmaps = GetAnInt(pF);
+        for (j = 0; j < level->count_pixelmaps; j++) {
+            GetAString(pF, s);
+            level->pixelmaps[j] = BrMapFind(s);
+            if (level->pixelmaps[j] == NULL) {
+                FatalError(kFatalError_CantLoadSmashPix_S, s);
+            }
+        }
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x004ee990
 // FUNCTION: CARMA2_SW 0x004ea630

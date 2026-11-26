@@ -153,9 +153,9 @@ extern void C2_HOOK_FASTCALL InitSmashQueue(void);
 
 // QueueSmashIfNecessary2
 
-// AllocateSmashLevels
+extern void C2_HOOK_FASTCALL AllocateSmashLevels(tSmashable_level** pSmashable_levels, int pCount_smashable_levels);
 
-// ReadSmashSounds
+extern void C2_HOOK_FASTCALL ReadSmashSounds(FILE* pF, tConnotations* pConnotations, tBrender_storage* pStorage);
 
 extern void C2_HOOK_FASTCALL ReadShrapnelMovementSpec(FILE* pFile, tMovement_spec* pInitial_speed);
 
@@ -185,23 +185,23 @@ extern void C2_HOOK_FASTCALL FUN_004ef830(tCar_spec* pCar_spec, tCar_crush_smash
 
 // FreeExplosion
 
-// ReadSpecialEffectsSpec
+extern void C2_HOOK_FASTCALL ReadSpecialEffectsSpec(FILE* pF, tSpecial_effects_spec* pSpecial_effects);
 
 // ReadBounds
 
-// ReadNoncarSideEffects
+extern void C2_HOOK_FASTCALL ReadNoncarSideEffects(FILE* pF, tNon_car_cuboid_activations* pNon_car_cuboid_activations);
 
-// ReadSmashSideEffects
+extern void C2_HOOK_FASTCALL ReadSmashSideEffects(FILE* pF, tShrapnel_side_effects* pShrapnel_side_effects);
 
-// ReadSideEffects
+extern void C2_HOOK_FASTCALL ReadSideEffects(FILE* pF, tSide_effects* pSide_effects);
 
-// ReadLightingInformation
+extern void C2_HOOK_FASTCALL ReadLightingInformation(FILE* pF, int* pLighting_information);
 
-// ReadAward
+extern void C2_HOOK_FASTCALL ReadAward(FILE* pF, tAward_info* pAward_info);
 
-// ReadVariableChanges
+extern void C2_HOOK_FASTCALL ReadVariableChanges(FILE* pF, tVariable_changes* pVariable_changes);
 
-// ReadConnotations
+extern void C2_HOOK_FASTCALL ReadConnotations(FILE* pF, tConnotations* pConnotations, tBrender_storage* pStorage);
 
 extern void C2_HOOK_FASTCALL ReadSmashLevels(FILE* pF, tSmashable_level** pSmashable_levels, int* pCount_smashable_levels, int pIs_texture_change, tBrender_storage* pBrender_storage);
 
