@@ -71,6 +71,11 @@ tSmashable_initial_position_spec gGiblet_initial_position;
 // GLOBAL: CARMA2_CHEAT 0x0069bc94
 float gGiblet_scrape_start;
 
+// GLOBAL: CARMA2_HW 0x00694234
+// GLOBAL: CARMA2_SW 0x0068e28c
+// GLOBAL: CARMA2_CHEAT 0x0069bdac
+int gPed_severing_damage;
+
 // GLOBAL: CARMA2_HW 0x00694238
 // GLOBAL: CARMA2_SW 0x0068e290
 // GLOBAL: CARMA2_CHEAT 0x0069bdb0
@@ -1174,7 +1179,20 @@ int C2_HOOK_FASTCALL IsActorRenderworthy(br_actor* pActor) {
 
 // StopPedNoise
 
-// MakePedNoise
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_HW 0x004cd880
+// STUB: CARMA2_SW 0x004c9f80
+// STUB: CARMA2_CHEAT 0x004d3410
+void C2_HOOK_FASTCALL MakePedNoise(tPedestrian* pPed, int pArg2, int pArg3, tPhysics_object* pCollision_info) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // FUNCTION: CARMA2_HW 0x004cbcd0
 // FUNCTION: CARMA2_SW 0x004c83d0
@@ -1678,7 +1696,20 @@ void C2_HOOK_FASTCALL ScoreForKilledPedestrian(tPedestrian* pPed, float pHeight)
     AwardTime(gPed_times[gProgram_state.skill_level]);
 }
 
-// KillPedestrian
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_HW 0x004cce70
+// STUB: CARMA2_SW 0x004c9570
+// STUB: CARMA2_CHEAT 0x004d29e0
+void C2_HOOK_FASTCALL KillPedestrian(tPedestrian* pPed, tPhysics_object* pCollision_info) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // FUNCTION: CARMA2_HW 0x004cd9e0
 // FUNCTION: CARMA2_SW 0x004ca0e0
@@ -1717,10 +1748,77 @@ int C2_HOOK_FASTCALL DismemberPed(tPedestrian* pPed, int pBone_index) {
     }
 }
 
-// STUB: CARMA2_HW 0x004cd640
-// STUB: CARMA2_SW 0x004c9d40
-void C2_HOOK_FASTCALL DamagePedestrian(tPedestrian* pPed, int pDamage, int pArg3, int pArg4, tPhysics_object* pObject) {
-    NOT_IMPLEMENTED();
+// FUNCTION: CARMA2_HW 0x004cd640
+// FUNCTION: CARMA2_SW 0x004c9d40
+// FUNCTION: CARMA2_CHEAT 0x004d31d0
+int C2_HOOK_FASTCALL DamagePedestrian(tPedestrian* pPed, int pDamage, int pArg3, int pArg4, tPhysics_object* pObject) {
+    tPed_form* form;
+    br_scalar mass_factor;
+    br_scalar damage_left;
+    int count;
+    int severing_damage;
+
+    count = 0;
+    form = pPed->character->personality->form;
+    mass_factor = 0.068 / form->simple_physicing[(tS8)pPed->character->field_0x5].collision_info->M;
+    pDamage = (int)(mass_factor * mass_factor * pDamage);
+    if (form->non_humanoid && (gPed_dismemberfest || gExploding_pedestrians) && pDamage < 100) {
+        pDamage = 100;
+    }
+    damage_left = (br_scalar)pDamage;
+    if (pObject != NULL && !gImmortal_peds && gGoreLevel >= 2) {
+        while (1) {
+            if (gPed_dismemberfest) {
+                severing_damage = 5;
+            } else {
+                severing_damage = gPed_severing_damage;
+            }
+            damage_left -= severing_damage;
+            if (damage_left < 0.f || count >= 5) {
+                break;
+            }
+            if (gExploding_pedestrians || gPed_dismemberfest || PercentageChance(gPed_severing_chance)) {
+                count += DismemberPed(pPed, IRandomBetween(1, pPed->character->personality->form->count_bones - 1));
+            }
+        }
+    }
+    if (count > 4) {
+        pPed->field_0x0c->field_0x2e |= 0x2;
+    }
+    if (pPed->hit_points <= 0) {
+        if (pDamage > 2) {
+            MakePedNoise(pPed, 5, 0, pObject);
+        }
+        return 1;
+    }
+    if (pPed->character->personality->form->non_humanoid && pPed->character->field_0xc) {
+        pPed->hit_points = 0;
+        pDamage = 0;
+    }
+    if (pPed->character->field_0xc & gPow2_array[pPed->character->personality->form->index_head_bone]) {
+        pPed->hit_points = 0;
+    } else if (pDamage >= 100) {
+        pPed->hit_points = 0;
+    } else {
+        pPed->hit_points -= pDamage;
+    }
+    if (gImmortal_peds && pPed->hit_points <= 0) {
+        pPed->hit_points = 1;
+    }
+    if (pPed->hit_points > 0) {
+        if (pArg3 >= 0) {
+            SetPedMove(pPed, pArg3, -1, 0, 1, GetTotalTime(), ePed_action_impacting);
+        }
+        MakePedNoise(pPed, 4, 0, pObject);
+        return 0;
+    } else {
+        if (pArg4 >= 0) {
+            SetPedMove(pPed, pArg4, -1, 0, 1, GetTotalTime(), ePed_action_impacting);
+        }
+        MakePedNoise(pPed, 1, 0, pObject);
+        KillPedestrian(pPed, pObject);
+        return 1;
+    }
 }
 
 // SetLastHitter

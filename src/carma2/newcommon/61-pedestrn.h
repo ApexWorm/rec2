@@ -46,6 +46,8 @@ extern int gPeds_suicidal;
 extern int gExploding_pedestrians;
 extern tNapalm_bolt gNapalm_bolts[5];
 extern int gPed_severing_chance;
+
+extern int gPed_severing_damage;
 extern br_material* gPed_slick_material;
 extern br_material* gNapalm_bolt_materials[7];
 extern br_model* gNapalm_bolt_models[7];
@@ -234,11 +236,11 @@ extern void C2_HOOK_FASTCALL OneLessPed(tPedestrian* pPed);
 
 extern void C2_HOOK_FASTCALL ScoreForKilledPedestrian(tPedestrian* pPed, float pHeight);
 
-// KillPedestrian
+extern void C2_HOOK_FASTCALL KillPedestrian(tPedestrian* pPed, tPhysics_object* pCollision_info);
 
 extern int C2_HOOK_FASTCALL DismemberPed(tPedestrian* pPed, int pBone_index);
 
-extern void C2_HOOK_FASTCALL DamagePedestrian(tPedestrian* pPed, int pDamage, int pArg3, int pArg4, tPhysics_object* pObject);
+extern int C2_HOOK_FASTCALL DamagePedestrian(tPedestrian* pPed, int pDamage, int pArg3, int pArg4, tPhysics_object* pObject);
 
 // SetLastHitter
 
