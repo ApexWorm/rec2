@@ -11,9 +11,12 @@
 
 #include "c2_hooks.h"
 
-// QuitVerifyStart
+extern int gMouse_was_started;
+extern int gReplace_background;
 
-// QuitVerifyDone
+extern void C2_HOOK_FASTCALL QuitVerifyStart(void);
+
+extern int C2_HOOK_FASTCALL QuitVerifyDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out);
 
 extern int C2_HOOK_FASTCALL DoVerifyQuit(int pReplace_background);
 
