@@ -412,7 +412,7 @@ extern void C2_HOOK_FASTCALL CompletelyUnBendCollisionShape(tCar_crush_shape_inf
 
 // CompletelyUnBendCollisionShapes
 
-// CompletelyUnBendWheels
+extern void C2_HOOK_FASTCALL CompletelyUnBendWheels(tCar_spec* pCar_spec);
 
 // CompletelyUnBendOtherThings
 
