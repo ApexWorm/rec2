@@ -476,7 +476,7 @@ extern float C2_HOOK_FASTCALL RepairCar2(tCar_spec* pCar, tU32 pFrame_period, br
 
 // RestoreVitalBitsOfObject
 
-extern void C2_HOOK_FASTCALL WeldCar(tCar_spec* pCar);
+extern void C2_HOOK_FASTCALL WeldCar(tCar_spec* pCar_spec);
 
 // ARCompressCrush
 

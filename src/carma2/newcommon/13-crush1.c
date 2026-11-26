@@ -2567,12 +2567,20 @@ float C2_HOOK_FASTCALL RepairCar2(tCar_spec* pCar, tU32 pFrame_period, br_scalar
 
 // RestoreVitalBitsOfObject
 
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
 // STUB: CARMA2_HW 0x0043b8a0
 // STUB: CARMA2_SW 0x0043b8f0
 // STUB: CARMA2_CHEAT 0x0043bad0
-void C2_HOOK_FASTCALL WeldCar(tCar_spec* pCar) {
+void C2_HOOK_FASTCALL WeldCar(tCar_spec* pCar_spec) {
     NOT_IMPLEMENTED();
 }
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // ARCompressCrush
 
