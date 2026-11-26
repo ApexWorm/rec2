@@ -125,7 +125,13 @@ extern void C2_HOOK_FASTCALL CancelAlternateFoxEffect(tCar_spec* pCar_spec);
 
 extern int C2_HOOK_FASTCALL SetFoxLighting(br_material* pMaterial);
 
-// SetupAlternateFoxEffect
+extern void C2_HOOK_FASTCALL SetupAlternateFoxEffect(tCar_spec* pCar_spec);
+#endif
+
+#ifdef REC2_SW
+extern void C2_HOOK_CDECL DoModelThing(br_actor* pActor, br_model* pModel, br_material* pMaterial, void* pArg4, br_uint_8 pArg5, int pArg6);
+
+extern void C2_HOOK_FASTCALL SetModelShade(br_model* pModel, br_pixelmap* pIndex_shade, int pArg3);
 #endif
 
 extern int C2_HOOK_FASTCALL RestorePixelmap(br_material* pMaterial);
@@ -235,6 +241,12 @@ extern void C2_HOOK_FASTCALL LoadInKevStuff(FILE* pF);
 extern void C2_HOOK_FASTCALL DisposeKevStuffCar(tCar_spec* pCar);
 
 extern void C2_HOOK_FASTCALL MakeCarIt(tCar_spec* pCar);
+
+#ifdef REC2_SW
+extern void C2_HOOK_FASTCALL FoxifyModel(br_model *pModel);
+
+extern intptr_t C2_HOOK_CDECL FoxifyModelCB(br_actor* pActor, void* pContext);
+#endif
 
 extern void C2_HOOK_FASTCALL StopCarBeingIt(tCar_spec* pCar);
 
