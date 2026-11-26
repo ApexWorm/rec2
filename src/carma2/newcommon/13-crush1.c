@@ -1726,11 +1726,48 @@ void C2_HOOK_FASTCALL AddNonCar(tNon_car_spec* pNon_car, const tDriver* pDriver)
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x0042f3d0
-// STUB: CARMA2_SW 0x0042f420
-// STUB: CARMA2_CHEAT 0x0042f590
+// FUNCTION: CARMA2_HW 0x0042f3d0
+// FUNCTION: CARMA2_SW 0x0042f420
+// FUNCTION: CARMA2_CHEAT 0x0042f590
 void C2_HOOK_FASTCALL MungeDetachLists(tCar_crush_spec* pCar_crush) {
-    NOT_IMPLEMENTED();
+    int i;
+    int new_count;
+    tCar_bit_spec* bit;
+
+    new_count = 0;
+    for (i = 0; i < pCar_crush->field_0x270; i++) {
+        bit = &pCar_crush->field_0x274[i];
+        switch (bit->field_0xc[10]) {
+        case 1:
+            if (new_count != i) {
+                pCar_crush->field_0x274[new_count] = *bit;
+            }
+            new_count++;
+            break;
+        case 2:
+            pCar_crush->field_0x2b4[pCar_crush->field_0x2b0] = *bit;
+            pCar_crush->field_0x2b0++;
+            break;
+        }
+    }
+    pCar_crush->field_0x270 = new_count;
+
+    new_count = 0;
+    for (i = 0; i < pCar_crush->field_0x2b0; i++) {
+        switch (pCar_crush->field_0x2b4[i].field_0xc[10]) {
+        case 1:
+            pCar_crush->field_0x274[pCar_crush->field_0x270] = pCar_crush->field_0x2b4[i];
+            pCar_crush->field_0x270++;
+            break;
+        case 2:
+            if (new_count != i) {
+                pCar_crush->field_0x2b4[new_count] = pCar_crush->field_0x2b4[i];
+            }
+            new_count++;
+            break;
+        }
+    }
+    pCar_crush->field_0x2b0 = new_count;
 }
 
 #ifdef REC2_MATCHING
