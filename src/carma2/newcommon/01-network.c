@@ -12,8 +12,10 @@
 #include "18-graphics2.h"
 #include "18b-graphics2.h"
 #include "19-font.h"
+#include "28-world3.h"
 #include "32-spark.h"
 #include "47-win95net.h"
+#include "52-errors.h"
 #include "53-controls.h"
 #include "platform.h"
 #include "globvars.h"
@@ -122,6 +124,11 @@ int gNet_initialised;
 // GLOBAL: CARMA2_SW 0x006879b8
 // GLOBAL: CARMA2_CHEAT 0x00695200
 int gDont_allow_joiners;
+
+// GLOBAL: CARMA2_HW 0x0068d968
+// GLOBAL: CARMA2_SW 0x006879c0
+// GLOBAL: CARMA2_CHEAT 0x00695208
+int gHost_died;
 
 // GLOBAL: CARMA2_HW 0x0074a690
 // GLOBAL: CARMA2_SW 0x00741150
@@ -307,11 +314,19 @@ void C2_HOOK_FASTCALL HaltNetServiceReentrancy(void) {
     gIn_net_service = 1;
 }
 
-// STUB: CARMA2_HW 0x0049d430
-// STUB: CARMA2_SW 0x004995b0
-// STUB: CARMA2_CHEAT 0x0049d7e0
+// FUNCTION: CARMA2_HW 0x0049d430
+// FUNCTION: CARMA2_SW 0x004995b0
+// FUNCTION: CARMA2_CHEAT 0x0049d7e0
 void C2_HOOK_FASTCALL NetSendHeadupToAllPlayers(char* pMessage) {
-    NOT_IMPLEMENTED();
+    tNet_message_chunk* the_contents;
+
+    if (gNet_mode != eNet_mode_none) {
+        the_contents = NetStartBroadcastContents(eNet_message_chunk_type_headup, 0);
+        if (the_contents != NULL) {
+            strcpy(the_contents->headup.text, pMessage);
+            NetBroadcastContents(the_contents);
+        }
+    }
 }
 
 // FUNCTION: CARMA2_HW 0x0049d780
@@ -472,11 +487,69 @@ void C2_HOOK_FASTCALL NetLeaveGameLowLevel(tNet_game_details* pDetails) {
     }
 }
 
-// STUB: CARMA2_HW 0x0049dc90
-// STUB: CARMA2_SW 0x00499e10
-// STUB: CARMA2_CHEAT 0x0049e1d0
+extern void C2_HOOK_FASTCALL DisposeCarN(int pIndex);
+extern void C2_HOOK_FASTCALL NetWaitForGuaranteeReplies(void);
+
+// FUNCTION: CARMA2_HW 0x0049dc90
+// FUNCTION: CARMA2_SW 0x00499e10
+// FUNCTION: CARMA2_CHEAT 0x0049e1d0
 void C2_HOOK_FASTCALL NetLeaveGame(tNet_game_details* pNet_game) {
-    NOT_IMPLEMENTED();
+    tNet_message* the_message;
+    char s[256];
+    const char* s2;
+    int i;
+    int must_revert_reentrancy;
+
+    dr_dprintf("NetLeaveGame() START");
+    if (gNet_mode != eNet_mode_none) {
+        gOnly_receive_guarantee_replies = 1;
+        if (gNet_mode == eNet_mode_host) {
+            dr_dprintf("NetLeaveGame() Point 1");
+            gDont_allow_joiners = 1;
+            NetSendMessageStacks();
+            dr_dprintf("NetLeaveGame() Point 2");
+            the_message = NetBuildGuaranteedMessage(9, 0);
+            dr_dprintf("NetLeaveGame() Point 3");
+            must_revert_reentrancy = PermitNetServiceReentrancy();
+            dr_dprintf("NetLeaveGame() Point 4");
+            NetGuaranteedSendMessageToAllPlayers(pNet_game, the_message, NULL);
+            dr_dprintf("NetLeaveGame() Point 5");
+            if (must_revert_reentrancy) {
+                HaltNetServiceReentrancy();
+            }
+            dr_dprintf("NetLeaveGame() Point 6");
+        } else if (!gHost_died) {
+            the_message = NetBuildGuaranteedMessage(8, 0);
+            NetGuaranteedSendMessageToHost(pNet_game, the_message, NULL);
+            strcpy(s, gProgram_state.player_name);
+            s2 = GetMiscString(74);
+            strcat(s, " ");
+            strcat(s, s2);
+            NetSendHeadupToAllPlayers(s);
+        }
+        dr_dprintf("NetLeaveGame() Point 7");
+        for (i = 0; i < gNumber_of_net_players; i++) {
+            DisposeCarN(i);
+        }
+        dr_dprintf("NetLeaveGame() Point 8");
+        ClearOutStorageSpace(&gOur_car_storage_space);
+        dr_dprintf("NetLeaveGame() Point 9");
+        ClearOutStorageSpace(&gNet_cars_storage_space);
+        dr_dprintf("NetLeaveGame() Point 10");
+        must_revert_reentrancy = PermitNetServiceReentrancy();
+        NetSendMessageStacks();
+        NetWaitForGuaranteeReplies();
+        NetLeaveGameLowLevel(gCurrent_net_game);
+        if (must_revert_reentrancy) {
+            HaltNetServiceReentrancy();
+        }
+        gCurrent_net_game = NULL;
+        gNet_mode = eNet_mode_none;
+        gNumber_of_net_players = 0;
+        gProgram_state.prog_status = eProg_idling;
+        gOnly_receive_guarantee_replies = 0;
+        dr_dprintf("NetLeaveGame() Point 11");
+    }
 }
 
 // NetSetPlayerSystemInfo
@@ -519,7 +592,20 @@ void C2_HOOK_FASTCALL FillInThisPlayer(tNet_game_details* pGame, tNet_game_playe
 
 // LoadCarN
 
-// DisposeCarN
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_HW 0x0049e100
+// STUB: CARMA2_SW 0x0049a280
+// STUB: CARMA2_CHEAT 0x0049e640
+void C2_HOOK_FASTCALL DisposeCarN(int pIndex) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // PlayerHasLeft
 
@@ -1413,7 +1499,17 @@ void C2_HOOK_FASTCALL ResendGuaranteedMessages(void) {
 #pragma auto_inline(on)
 #endif
 
-// NetWaitForGuaranteeReplies
+// FUNCTION: CARMA2_HW 0x004a64c0
+// FUNCTION: CARMA2_SW 0x004a2640
+// FUNCTION: CARMA2_CHEAT 0x004a7690
+void C2_HOOK_FASTCALL NetWaitForGuaranteeReplies(void) {
+    tU32 start_time;
+
+    start_time = PDGetTotalTime();
+    while (gNext_guarantee != 0 && PDGetTotalTime() - start_time < 5000) {
+        NetService(0);
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x004a6920
 // FUNCTION: CARMA2_SW 0x004a2aa0
