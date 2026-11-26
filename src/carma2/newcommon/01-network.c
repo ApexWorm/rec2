@@ -312,6 +312,7 @@ void C2_HOOK_FASTCALL NetSendHeadupToAllPlayers(char* pMessage) {
 
 // FUNCTION: CARMA2_HW 0x0049d780
 // FUNCTION: CARMA2_SW 0x00499900
+// FUNCTION: CARMA2_CHEAT 0x0049dbf0
 void C2_HOOK_FASTCALL NetSendHeadupToEverybody(const char* pMessage) {
     tNet_message_chunk* the_contents;
 

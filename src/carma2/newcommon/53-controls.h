@@ -167,7 +167,7 @@ extern void C2_HOOK_FASTCALL CheckSystemKeys(int pRacing);
 
 extern void C2_HOOK_FASTCALL CheckForCheatingGits(void);
 
-// CheckKevKeys
+extern void C2_HOOK_FASTCALL CheckKevKeys(void);
 
 extern void C2_HOOK_FASTCALL BrakeInstantly(void);
 
