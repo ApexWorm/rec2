@@ -35,6 +35,8 @@ extern int gPed_retain_root_mode;
 extern br_material* gPedestrian_character_cloned_materials[50];
 extern int gCount_pedestrian_personality_cloned_materials;
 
+extern const char* gPed_personality_grounding_type_names[1];
+
 extern tPed_remap* gPed_remaps[10];
 
 extern tPed_personality* gPed_personalities[50];
@@ -472,11 +474,11 @@ extern void C2_HOOK_FASTCALL DisposeAllLoadedRemaps(void);
 
 // FindOrOpenMove
 
-// RemapVector
+extern void C2_HOOK_FASTCALL RemapVector(br_vector3* pV, const tPed_remap_bone* pRemap);
 
 // RemapPowerupVector
 
-// RemapModelAxis
+extern void C2_HOOK_FASTCALL RemapModelAxis(br_model* pModel, const tPed_remap_bone* pRemap);
 
 extern tPed_form* C2_HOOK_FASTCALL SetUpCharacterForm(const char* pName);
 
@@ -492,9 +494,9 @@ extern tPed_form* C2_HOOK_FASTCALL FindOrOpenForm(const char* pName);
 
 // SetBoner
 
-// CalcBoundsRadius
+extern float C2_HOOK_FASTCALL CalcBoundsRadius(const br_bounds3* pBounds);
 
-// BonerCloneModel
+extern br_model* C2_HOOK_FASTCALL BonerCloneModel(br_model* pModel, int pIndex, int pUpdateable);
 
 extern tPed_personality* C2_HOOK_FASTCALL ReadPersonality(const char* pName);
 
