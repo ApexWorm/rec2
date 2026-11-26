@@ -5375,7 +5375,7 @@ typedef enum {
 } tFunk_groove_speed_control;
 
 typedef struct {
-    tS8 type; /* tFunk_groove_type */
+    tU8 type; /* tFunk_groove_type */
     br_actor* actor;
     union {
         struct {
