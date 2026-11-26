@@ -1702,7 +1702,61 @@ void C2_HOOK_FASTCALL MenuSetDriverImage(int pOpponent_index, int pFrontend_inde
     BrModelUpdate(gFrontend_brender_items[pFrontend_index].model, BR_MODU_VERTEX_POSITIONS);
 }
 
-// MainMenuInfunc
+// FUNCTION: CARMA2_HW 0x00469a40
+// FUNCTION: CARMA2_SW 0x004697a0
+// FUNCTION: CARMA2_CHEAT 0x00469e60
+int C2_HOOK_FASTCALL MainMenuInfunc(tFrontend_spec* pFrontend) {
+    char group_name[12];
+    br_camera* camera;
+    tFrontend_item_spec* item;
+    int group;
+    int race_index;
+    int i;
+
+    DefaultInfunc(pFrontend);
+    ResetInterfaceTimeout();
+    group = (gCurrent_race_group - gRace_groups) % 10 + 1;
+    sprintf(group_name, "%s %d", IString_Get(eInterfaceString_mission), group);
+    strcpy(pFrontend->items[2].text, group_name);
+    for (race_index = 4 * (group - 1), i = pFrontend->scrollers[0].indexFirstScrollableItem; i <= pFrontend->scrollers[0].indexLastScrollableItem; race_index++, i++) {
+        item = &pFrontend->items[i];
+        strcpy(item->text, gRace_list[race_index].name);
+        if (race_index == gProgram_state.current_race_index) {
+            item->radioButton_selected = 1;
+        } else {
+            item->radioButton_selected = 0;
+        }
+        if (gRace_list[race_index].is_boundary) {
+            item->unlitFont = 2;
+            item->highFont = 3;
+        } else {
+            item->unlitFont = 0;
+            item->highFont = 1;
+        }
+    }
+    FuckingMakeTheFuckingRaceAndGroupsDisplayHaveTheRightCuntingStuffInIt(pFrontend);
+    FillInRaceDescription(pFrontend->items[22].text, gProgram_state.current_race_index);
+    strcpy(pFrontend->items[18].text, gProgram_state.player_name);
+    strcpy(pFrontend->items[20].text, gOpponents[gProgram_state.current_car_index].car_name);
+    strcpy(pFrontend->items[23].text, MungeCommas(gProgram_state.credits));
+    gFrontend_car_image_outdated = 1;
+    pFrontend->isPreviousSomeOtherMenu = 1;
+    gMouse_in_use = 0;
+    gFrontend_menu_camera = BrActorAllocate(BR_ACTOR_CAMERA, NULL);
+    camera = gFrontend_menu_camera->type_data;
+    camera->type = BR_CAMERA_PARALLEL;
+    camera->field_of_view = BR_ANGLE_DEG(90);
+    camera->hither_z = 1.0f;
+    camera->yon_z = 3.0f;
+    camera->width = 640.0f;
+    camera->height = 480.0f;
+    gFrontend_billboard_actors[0] = CreateAPOactor();
+    gFrontend_APO_Colour_1 = FudgeBRenderIntoTheNinetiesWithSomeProperFuckingColourSupport(gFrontend_billboard_actors[0]->material->colour_map, 0xff, 0x80, 0x00, 0xff);
+    gFrontend_APO_Colour_2 = FudgeBRenderIntoTheNinetiesWithSomeProperFuckingColourSupport(gFrontend_billboard_actors[0]->material->colour_map, 0x00, 0x00, 0x80, 0xff);
+    gFrontend_APO_Colour_3 = FudgeBRenderIntoTheNinetiesWithSomeProperFuckingColourSupport(gFrontend_billboard_actors[0]->material->colour_map, 0x00, 0x00, 0xff, 0xff);
+    FuckWithWidths(pFrontend);
+    return 1;
+}
 
 // FUNCTION: CARMA2_HW 0x00469df0
 // FUNCTION: CARMA2_SW 0x00469b50
