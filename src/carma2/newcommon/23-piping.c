@@ -973,9 +973,11 @@ void C2_HOOK_FASTCALL AddFlameToPipingSession(int pIndex, int pFrame, br_scalar 
 // FUNCTION: CARMA2_SW 0x004c3860
 // FUNCTION: CARMA2_CHEAT 0x004ccc50
 void C2_HOOK_FASTCALL AddSplashToPipingSession(tPhysics_object* pObject) {
+    br_scalar water_d;
 
-    gFloat_pipe_union.f = pObject->water_d;
-    ARDoSingleVariedSession(ePipe_chunk_splash, (uintptr_t)pObject, 2,
+    water_d = pObject->water_d;
+    gFloat_pipe_union.f = water_d;
+    ARAddVariedDataToSession(ePipe_chunk_splash, (uintptr_t)pObject, 2,
         SIZE_OFFSET_PIPING(tPipe_chunk_splash, water_d), gFloat_pipe_union.u32,
         SIZE_OFFSET_PIPING(tPipe_chunk_splash, normal), &pObject->water_normal);
 }
