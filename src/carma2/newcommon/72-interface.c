@@ -803,7 +803,16 @@ void C2_HOOK_FASTCALL AddToJoinList(tNet_game_details* pGame) {
     }
 }
 
-// FillInRaceDescription
+void C2_HOOK_FASTCALL FillInRaceDescription(char* pText, int pRace_index) {
+    const tRace_list_spec* race;
+
+    race = &gRace_list[pRace_index];
+
+    strcpy(pText, gRace_list[pRace_index].description);
+    MungeMetaCharactersChar(pText, 'R', '\r');
+    MungeMetaCharactersNum(pText, 'O', race->count_explicit_opponents);
+    MungeMetaCharactersNum(pText, 'L', race->count_laps);
+}
 
 // FUNCTION: CARMA2_HW 0x00466450
 // FUNCTION: CARMA2_SW 0x004661e0
@@ -1266,7 +1275,18 @@ int C2_HOOK_FASTCALL FindPrevActiveItem(tFrontend_spec* pFrontend, int pStart_in
     return FindPrevActiveItem(pFrontend, pFrontend->count_items);
 }
 
-// RaceIndex
+int C2_HOOK_FASTCALL RaceIndex(const char* pName) {
+    int i;
+
+    for (i = 0; i < gNumber_of_races; i++) {
+        if (DRStricmp(pName, gRace_list[i].name) == 0) {
+            return i;
+        }
+    }
+#ifndef REC2_MATCHING
+    return 0;
+#endif
+}
 
 // FUNCTION: CARMA2_HW 0x00466bb0
 // FUNCTION: CARMA2_SW 0x00466940
@@ -1696,7 +1716,26 @@ int C2_HOOK_FASTCALL MainMenuOutfunc(tFrontend_spec* pFrontend) {
     return 1;
 }
 
-// MainMenuSelectRace
+// FUNCTION: CARMA2_HW 0x00469ea0
+// FUNCTION: CARMA2_SW 0x00469c00
+// FUNCTION: CARMA2_CHEAT 0x0046a2a0
+int C2_HOOK_FASTCALL MainMenuSelectRace(tFrontend_spec* pFrontend) {
+    char group_name[12];
+    int race_index;
+
+    race_index = RaceIndex(pFrontend->items[gFrontend_selected_item_index].text);
+    gProgram_state.current_race_index = race_index;;
+    pFrontend->items[22].highFont = 11;
+    pFrontend->items[22].unlitFont = 11;
+    if (!gMouse_in_use) {
+        FillInRaceDescription(pFrontend->items[22].text, race_index);
+    }
+    gCurrent_race_group = gRace_list[gProgram_state.current_race_index].group;
+    sprintf(group_name, "%s %d", IString_Get(eInterfaceString_mission), (gCurrent_race_group - gRace_groups) % 10 + 1);
+    strcpy(pFrontend->items[2].text, group_name);
+    FuckWithWidths(pFrontend);
+    return 0;
+}
 
 // FUNCTION: CARMA2_HW 0x0046a010
 // FUNCTION: CARMA2_SW 0x00469d70
