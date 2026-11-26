@@ -2121,11 +2121,29 @@ const char* C2_HOOK_FASTCALL GetActorRenderStyleString(br_actor* pActor) {
     }
 }
 
-// STUB: CARMA2_HW 0x00518d60
-// STUB: CARMA2_SW 0x00512820
-// STUB: CARMA2_CHEAT 0x0051e750
+// FUNCTION: CARMA2_HW 0x00518d60
+// FUNCTION: CARMA2_SW 0x00512820
+// FUNCTION: CARMA2_CHEAT 0x0051e750
 tU32 C2_HOOK_FASTCALL FudgeBRenderIntoTheNinetiesWithSomeProperFuckingColourSupport(br_pixelmap* pm, tU32 red, tU32 grn, tU32 blu, tU32 alp) {
-    NOT_IMPLEMENTED();
+
+    switch (pm->type) {
+    case BR_PMT_RGB_555:
+        return (((red >> 3) & 0x1f) << 10) | (((grn >> 3) & 0x1f) << 5) | ((blu >> 3) & 0x1f);
+    case BR_PMT_RGB_565:
+        return (((red >> 3) & 0x1f) << 11) | (((grn >> 2) & 0x3f) << 5) | ((blu >> 3) & 0x1f);
+    case BR_PMT_RGB_888:
+        return (red << 16) | (grn << 8) | blu;
+    case BR_PMT_RGBX_888:
+        return (red << 16) | (grn << 8) | blu;
+    case BR_PMT_RGBA_8888:
+        return (alp << 24) | (red << 16) | (grn << 8) | blu;
+    case BR_PMT_RGBA_4444:
+        return ((alp >> 4) << 12) | ((red >> 4) << 8) | ((grn >> 4) << 4) | (blu >> 4);
+    case BR_PMT_ARGB_1555:
+        return ((alp >> 7) << 15) | (((red >> 3) & 0x1f) << 10) | (((grn >> 3) & 0x1f) << 5) | ((blu >> 3) & 0x1f);
+    default:
+        return (red << 16) | (grn << 8) | blu;
+    }
 }
 
 // GetBlenficatiousnessOfMaterialTablishly
