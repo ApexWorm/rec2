@@ -1462,7 +1462,57 @@ inline void C2_HOOK_FASTCALL FillInMine(tNet_message_chunk* pChunk, tShit_mine* 
     GetHierarchyNetworkStuff(pMine->collision_info, pChunk->mine_explode.object_hierarchy, NET_OBJECT_HIERARCHY_DEFAULT_SIZE);
 }
 
-// SendMines
+// FUNCTION: CARMA2_HW 0x004dcfb0
+// FUNCTION: CARMA2_SW 0x004d94b0
+// FUNCTION: CARMA2_CHEAT 0x004e2b70
+void C2_HOOK_FASTCALL SendMines(tU32 pNext_frame_time) {
+    int i;
+    int j;
+    int size;
+    int index;
+    tShit_mine* mine;
+    union {
+        tNet_message_chunk chunk;
+        tU8 raw[0x23c]; /* FIXME: should raw buffer be added to tNet_message_chunk or is sizeof(tNet_message_chunk) == 0x235? */
+    } message;
+    tNet_message_chunk* contents;
+    br_vector3 tv;
+
+    if (gNet_mode != eNet_mode_host) {
+        return;
+    }
+    if (gNumber_of_net_players == 1) {
+        return;
+    }
+    for (i = 0; i < (int)REC2_ASIZE(gShit_mines); i++) {
+        mine = &gShit_mines[i];
+        if (!(mine->flags & 0x1)) {
+            continue;
+        }
+        FillInMine(&message.chunk, mine, pNext_frame_time);
+        size = (int)(GetHierarchyNetworkSize(gShit_mines[i].collision_info) + 12.0f);
+        message.chunk.mine_explode.header.size = size;
+        message.chunk.mine_explode.header.type = eNet_message_chunk_type_mine_explosion;
+        for (j = 1; j < gNumber_of_net_players; j++) {
+            if (gNet_players[j].field_0xd0 != 0) {
+                for (index = 0; index < gNumber_of_net_players - 1; index++) {
+                    if (gNet_players[index].ID == gNet_players[j].field_0xd0) {
+                        break;
+                    }
+                }
+            } else {
+                index = j;
+            }
+            BrVector3Sub(&tv, (br_vector3*)mine->collision_info->transform_matrix.m[3], (br_vector3*)gNet_players[index].car->collision_info->transform_matrix.m[3]);
+            if (BrVector3LengthSquared(&tv) < REC2_SQR(20.0f)) {
+                contents = NetGetToPlayerContents(eNet_message_chunk_type_mine_explosion, size, gNet_players[j].ID);
+                if (contents != NULL) {
+                    memcpy(contents, &message.chunk, size);
+                }
+            }
+        }
+    }
+}
 
 // STUB: CARMA2_HW 0x004dd1b0
 // STUB: CARMA2_SW 0x004d96b0

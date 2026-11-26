@@ -256,7 +256,7 @@ extern int C2_HOOK_FASTCALL SetDamageMultiplier(tPowerup* pPowerup, tCar_spec* p
 
 extern void C2_HOOK_FASTCALL FillInMine(tNet_message_chunk* pChunk, tShit_mine* pMine, int pArg3);
 
-// SendMines
+extern void C2_HOOK_FASTCALL SendMines(tU32 pNext_frame_time);
 
 extern void C2_HOOK_FASTCALL MinePreCollisionStuff(void);
 
