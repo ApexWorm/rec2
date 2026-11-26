@@ -25,7 +25,7 @@ extern tSpecial_volume* gLast_camera_special_volume;
 
 extern int C2_HOOK_CDECL Log2(int pNumber);
 
-// CalculateWrappingMultiplier
+extern br_scalar C2_HOOK_FASTCALL CalculateWrappingMultiplier(br_scalar pValue, br_scalar pYon);
 
 extern br_scalar C2_HOOK_FASTCALL DepthCueingShiftToDistance(int pDistance);
 
@@ -39,9 +39,9 @@ extern void C2_HOOK_FASTCALL MungeSkyVs(br_model* pModel, br_material* pMaterial
 
 extern void C2_HOOK_FASTCALL InstantDepthChange(tDepth_effect_type pType, br_pixelmap* pSky_texture, int pStart, int pEnd, int pRed, int pGreen, int pBlue, int pParam_8);
 
-// Tan
+extern br_scalar C2_HOOK_FASTCALL Tan(br_scalar pAngle);
 
-// EdgeU
+extern br_scalar C2_HOOK_FASTCALL EdgeU(br_angle pSky, br_angle pView, br_angle pPerfect);
 
 extern void C2_HOOK_FASTCALL MungeSkyModel(br_actor* pCamera, br_model* pModel);
 
