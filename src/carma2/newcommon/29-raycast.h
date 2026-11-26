@@ -29,9 +29,9 @@ extern float gHighest_y_below;
 
 extern void C2_HOOK_FASTCALL InitRayCasting(void);
 
-// BadDiv
+extern int C2_HOOK_FASTCALL BadDiv__raycast(br_scalar a, br_scalar b);
 
-// DRVector2AccumulateScale
+extern void C2_HOOK_FASTCALL DRVector2AccumulateScale__raycast(br_vector2* a, br_vector2* b, br_scalar s);
 
 extern int C2_HOOK_FASTCALL PickBoundsTestRay__raycast(br_bounds* b, br_vector3* rp, br_vector3* rd, br_scalar t_near, br_scalar t_far, br_scalar* new_t_near, br_scalar* new_t_far);
 
