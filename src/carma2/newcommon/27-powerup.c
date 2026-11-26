@@ -1134,6 +1134,7 @@ int C2_HOOK_FASTCALL SetStupidPedestrians(tPowerup* pPowerup, tCar_spec* pCar) {
 }
 
 // FUNCTION: CARMA2_HW 0x004dc920
+// FUNCTION: CARMA2_SW 0x004d8e20
 // FUNCTION: CARMA2_CHEAT 0x004e24e0
 void C2_HOOK_FASTCALL ResetStupidPedestrians(tPowerup* pPowerup, tCar_spec* pCar) {
 
@@ -1201,6 +1202,7 @@ void C2_HOOK_FASTCALL ResetPedExplode(tPowerup* powerup, tCar_spec* car) {
 }
 
 // FUNCTION: CARMA2_HW 0x004dca20
+// FUNCTION: CARMA2_SW 0x004d8f20
 // FUNCTION: CARMA2_CHEAT 0x004e25e0
 void C2_HOOK_FASTCALL ResetPedBrittle(tPowerup* pPowerup, tCar_spec* pCar) {
 
@@ -1849,6 +1851,7 @@ void C2_HOOK_FASTCALL ResetWallclimb(tPowerup* pPowerup, tCar_spec* pCar) {
 }
 
 // FUNCTION: CARMA2_HW 0x004de750
+// FUNCTION: CARMA2_SW 0x004dac50
 // FUNCTION: CARMA2_CHEAT 0x004e4310
 void C2_HOOK_FASTCALL ResetBouncey(tPowerup* pPowerup, tCar_spec* pCar) {
 
@@ -1984,6 +1987,7 @@ int C2_HOOK_FASTCALL SetGhostPeds(tPowerup* pPowerup, tCar_spec* pCar) {
 }
 
 // FUNCTION: CARMA2_HW 0x004de960
+// FUNCTION: CARMA2_SW 0x004dae60
 // FUNCTION: CARMA2_CHEAT 0x004e4520
 void C2_HOOK_FASTCALL ResetDancingPeds(tPowerup* pPowerup, tCar_spec* pCar) {
 
@@ -1991,6 +1995,7 @@ void C2_HOOK_FASTCALL ResetDancingPeds(tPowerup* pPowerup, tCar_spec* pCar) {
 }
 
 // FUNCTION: CARMA2_HW 0x004de970
+// FUNCTION: CARMA2_SW 0x004dae70
 // FUNCTION: CARMA2_CHEAT 0x004e4530
 void C2_HOOK_FASTCALL ResetPanickingPeds(tPowerup* pPowerup, tCar_spec* pCar) {
 
@@ -1998,6 +2003,7 @@ void C2_HOOK_FASTCALL ResetPanickingPeds(tPowerup* pPowerup, tCar_spec* pCar) {
 }
 
 // FUNCTION: CARMA2_HW 0x004de980
+// FUNCTION: CARMA2_SW 0x004dae80
 // FUNCTION: CARMA2_CHEAT 0x004e4540
 void C2_HOOK_FASTCALL ResetLowGravityPeds(tPowerup* pPowerup, tCar_spec* pCar) {
 
@@ -2064,6 +2070,7 @@ void C2_HOOK_FASTCALL ResetMassMultiplier(tPowerup* pPowerup, tCar_spec* pCar) {
 }
 
 // FUNCTION: CARMA2_HW 0x004dec10
+// FUNCTION: CARMA2_SW 0x004db110
 // FUNCTION: CARMA2_CHEAT 0x004e47d0
 int C2_HOOK_FASTCALL ShowPedestrians(tPowerup* pPowerup, tCar_spec* pCar) {
 
@@ -2084,6 +2091,7 @@ void C2_HOOK_FASTCALL HidePedestrians(tPowerup* pPowerup, tCar_spec* pCar) {
 }
 
 // FUNCTION: CARMA2_HW 0x004dec60
+// FUNCTION: CARMA2_SW 0x004db160
 // FUNCTION: CARMA2_CHEAT 0x004e4820
 int C2_HOOK_FASTCALL SetElectroBastard(tPowerup* pPowerup, tCar_spec* pCar) {
 

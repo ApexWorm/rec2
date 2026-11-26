@@ -815,8 +815,8 @@ int C2_HOOK_FASTCALL GetDepthCueingOn(void) {
 }
 
 // FUNCTION: CARMA2_HW 0x00446fa0
-// FUNCTION: CARMA2_CHEAT 0x004474c0
 // STUB: CARMA2_SW 0x004471e0
+// FUNCTION: CARMA2_CHEAT 0x004474c0
 void C2_HOOK_FASTCALL SetDepthCueingOn(int pOn) {
 #ifdef REC2_HW
     if (gDepth_cueing_on != pOn && gHorizon_material != NULL) {
@@ -825,13 +825,16 @@ void C2_HOOK_FASTCALL SetDepthCueingOn(int pOn) {
     gDepth_cueing_on = pOn;
 #endif
 #ifdef REC2_SW
-    NOT_IMPLEMENTED();
+    if (gDepth_cueing_on != pOn && gHorizon_material != NULL) {
+        ToggleDepthCueingQuietly();
+    }
+    gDepth_cueing_on = pOn;
 #endif
 }
 
 // FUNCTION: CARMA2_HW 0x00447070
-// FUNCTION: CARMA2_CHEAT 0x00447590
 // STUB: CARMA2_SW 0x00447350
+// FUNCTION: CARMA2_CHEAT 0x00447590
 void C2_HOOK_FASTCALL ToggleDepthCueingQuietly(void) {
 #ifdef REC2_HW
     int temp_red;
@@ -869,6 +872,7 @@ void C2_HOOK_FASTCALL ToggleDepthCueingQuietly(void) {
 }
 
 // FUNCTION: CARMA2_HW 0x00447110
+// FUNCTION: CARMA2_SW 0x00447490
 // FUNCTION: CARMA2_CHEAT 0x00447630
 // STUB: CARMA2_SW 0x00447490
 void C2_HOOK_FASTCALL ToggleDepthCueing(void) {
@@ -932,6 +936,7 @@ void C2_HOOK_FASTCALL SkyTextureChanged(void) {
 }
 
 // FUNCTION: CARMA2_HW 0x004472b0
+// FUNCTION: CARMA2_SW 0x004476d0
 // FUNCTION: CARMA2_CHEAT 0x004477d0
 void C2_HOOK_FASTCALL SetSkyColour(br_colour c) {
 

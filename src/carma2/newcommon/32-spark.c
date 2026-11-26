@@ -45,8 +45,8 @@ int gShade_list[16];
 // GLOBAL: CARMA2_CHEAT 0x00667988
 int* gShade_table = &gShade_list[8];
 #endif
-#ifdef REC2_SW
 
+#ifdef REC2_SW
 // GLOBAL: CARMA2_SW 0x006ae520
 br_pixelmap* gShade_list[16];
 
@@ -180,6 +180,7 @@ int gCount_smashable_noncars;
 br_matrix4 gCameraToScreen;
 
 // GLOBAL: CARMA2_HW 0x006a82b0
+// GLOBAL: CARMA2_SW 0x006a2310
 // GLOBAL: CARMA2_CHEAT 0x006afe28
 br_camera* gSpark_cam;
 
@@ -239,6 +240,7 @@ br_pixelmap* gAcid_shade_table;
 // DrawLine3DThroughBRender
 
 // FUNCTION: CARMA2_HW 0x004f6b80
+// FUNCTION: CARMA2_SW 0x004f24b0
 // FUNCTION: CARMA2_CHEAT 0x004fc820
 int C2_HOOK_FASTCALL DrawLine3D(const br_vector3* pStart, const br_vector3* pEnd, br_pixelmap* pScreen, br_pixelmap* pDepth, br_pixelmap* pShade) {
     br_vector3 start;
@@ -1490,6 +1492,7 @@ void C2_HOOK_FASTCALL GeneralCreateSplash(tPhysics_object* pObject, const br_vec
 #endif
 
 // FUNCTION: CARMA2_HW 0x004fda40
+// FUNCTION: CARMA2_SW 0x004f8fa0
 void C2_HOOK_FASTCALL CreateSplash(tPhysics_object* pObject, tU32 pTime) {
     GeneralCreateSplash(pObject, &pObject->v, &pObject->omega, &pObject->water_normal,
         pObject->water_d, &pObject->bb1, &pObject->actor->t.t.mat, pTime);

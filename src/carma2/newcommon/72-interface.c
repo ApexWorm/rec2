@@ -500,6 +500,7 @@ tWreck_gallery_sell_info gWreck_gallery_sell_infos[32];
 br_actor* gFrontend_actor;
 
 // GLOBAL: CARMA2_HW 0x00686f10
+// GLOBAL: CARMA2_SW 0x00681650
 // GLOBAL: CARMA2_CHEAT 0x0068e7b8
 br_material* gFrontend_backdrop_materials[3];
 
@@ -1895,6 +1896,7 @@ int C2_HOOK_FASTCALL ChangeCarMenuInfunc(tFrontend_spec* pFrontend) {
 }
 
 // FUNCTION: CARMA2_HW 0x0046b610
+// FUNCTION: CARMA2_SW 0x0046b330
 // FUNCTION: CARMA2_CHEAT 0x0046b9b0
 int C2_HOOK_FASTCALL ChangeCarCancel(tFrontend_spec* pFrontend) {
 
@@ -2479,6 +2481,7 @@ void C2_HOOK_FASTCALL FRONTEND_Setup(tFrontendMenuType pType) {
 // FRONTEND_Redraw
 
 // FUNCTION: CARMA2_HW 0x0046d8b0
+// FUNCTION: CARMA2_SW 0x0046cfb0
 // FUNCTION: CARMA2_CHEAT 0x0046dc20
 void C2_HOOK_FASTCALL MaybeDoMouseCursor(void) {
 

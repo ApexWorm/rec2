@@ -139,6 +139,7 @@ void C2_HOOK_FASTCALL Timers_StartFrame(void) {
 }
 
 // FUNCTION: CARMA2_HW 0x00504740
+// FUNCTION: CARMA2_SW 0x004fff30
 // FUNCTION: CARMA2_CHEAT 0x0050a3e0
 void C2_HOOK_FASTCALL Timers_EndFrame(void) {
     int i;
@@ -171,6 +172,7 @@ void C2_HOOK_FASTCALL Timers_EndFrame(void) {
 }
 
 // FUNCTION: CARMA2_HW 0x00504810
+// FUNCTION: CARMA2_SW 0x00500000
 void C2_HOOK_FASTCALL Timers_Draw(br_pixelmap* pScreen) {
     tU32 longest_duration;
     int longest_duration_timer;

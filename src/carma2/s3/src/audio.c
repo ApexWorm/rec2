@@ -1769,6 +1769,7 @@ int C2_HOOK_FASTCALL S3StartSound(tS3_outlet* pOutlet, tS3_sound_id pSound) {
 }
 
 // FUNCTION: CARMA2_HW 0x00564807
+// FUNCTION: CARMA2_SW 0x0055fea7
 int C2_HOOK_FASTCALL S3SetChannelVolume(int pChannel_tag, int pVolume) {
     tS3_channel* channel;
     if (gS3_enabled) {
@@ -1956,6 +1957,7 @@ int C2_HOOK_FASTCALL S3IsCDAPlaying(void) {
 }
 
 // FUNCTION: CARMA2_HW 0x00565d24
+// FUNCTION: CARMA2_SW 0x005613c4
 int C2_HOOK_FASTCALL S3UpdateCDAVolume(tS3_channel* pChannel, int pVolume) {
 
     if (pVolume < 0) {

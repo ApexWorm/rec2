@@ -35,26 +35,32 @@ int gFancy_line_center_palette_indexes[5] = { 1, 2, 3, 2, 1 };
 int gFancy_line_side_palette_indexes[5] = { 1, 2, 3, 2, 1 };
 
 // GLOBAL: CARMA2_HW 0x0058fdc8
+// GLOBAL: CARMA2_SW 0x0058adc8
 // GLOBAL: CARMA2_CHEAT 0x00594f4c
 int gCursor_tinted_top = -1;
 
 // GLOBAL: CARMA2_HW 0x0058fdd0
+// GLOBAL: CARMA2_SW 0x0058add0
 // GLOBAL: CARMA2_CHEAT 0x00594f54
 int gCursor_tinted_left = -1;
 
 // GLOBAL: CARMA2_HW 0x0058fdcc
+// GLOBAL: CARMA2_SW 0x0058adcc
 // GLOBAL: CARMA2_CHEAT 0x00594f50
 int gCursor_tinted_bottom = -1;
 
 // GLOBAL: CARMA2_HW 0x0058fdd4
+// GLOBAL: CARMA2_SW 0x0058add4
 // GLOBAL: CARMA2_CHEAT 0x00594f58
 int gCursor_tinted_right = -1;
 
 // GLOBAL: CARMA2_HW 0x0058fdd8
+// GLOBAL: CARMA2_SW 0x0058add8
 // GLOBAL: CARMA2_CHEAT 0x00594f5c
 int gCursor_tinted_center = -1;
 
 // GLOBAL: CARMA2_HW 0x0058fde0
+// GLOBAL: CARMA2_SW 0x0058addc
 // GLOBAL: CARMA2_CHEAT 0x00594f64
 int gCursor_line_width = 5;
 
@@ -665,6 +671,7 @@ int C2_HOOK_FASTCALL AllocateCursorTransient(void) {
 }
 
 // FUNCTION: CARMA2_HW 0x0043e3f0
+// FUNCTION: CARMA2_SW 0x0043e480
 // FUNCTION: CARMA2_CHEAT 0x0043e6a0
 void C2_HOOK_FASTCALL InitMouseTargetLines(void) {
     br_pixelmap* cross;

@@ -1298,6 +1298,7 @@ void C2_HOOK_FASTCALL IncreasePhysicsScratchPointer(int pSize) {
 }
 
 // FUNCTION: CARMA2_HW 0x004c5d00
+// FUNCTION: CARMA2_SW 0x004c2430
 void C2_HOOK_FASTCALL ClearPhysicsScratchSpace(void) {
 
     gPhysics_scratch_ptr = gPhysics_other_buffer;
@@ -1685,6 +1686,7 @@ void C2_HOOK_FASTCALL InitPhysicsWorkspace(tU8* pBuffer, int pSize) {
 }
 
 // FUNCTION: CARMA2_HW 0x004b57d0
+// FUNCTION: CARMA2_SW 0x004b1ef0
 // FUNCTION: CARMA2_CHEAT 0x004bb0a0
 int C2_HOOK_FASTCALL FindFacesInBox(tBounds* pBounds, tFace_ref* pFace_list, int pMax_face, tWorld_callbacks* pWorld_callbacks) {
     tU8 cx_min;

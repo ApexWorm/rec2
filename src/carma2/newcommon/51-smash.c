@@ -213,6 +213,7 @@ void C2_HOOK_FASTCALL DisableAutoFogification(void) {
 }
 
 // FUNCTION: CARMA2_HW 0x004ea860
+// FUNCTION: CARMA2_SW 0x004e6560
 // FUNCTION: CARMA2_CHEAT 0x004f0500
 void C2_HOOK_FASTCALL RemoveMaterialFromFogification(br_material* pMaterial) {
     int count = gMaterials_to_adapt_count;
@@ -1416,6 +1417,7 @@ void C2_HOOK_FASTCALL FreeEnvSmash(tSmashable_item_spec* pSmash) {
 }
 
 // FUNCTION: CARMA2_HW 0x004f0a80
+// FUNCTION: CARMA2_SW 0x004ec6e0
 // FUNCTION: CARMA2_CHEAT 0x004f6720
 void C2_HOOK_FASTCALL FreeConnotations(tConnotations* pConnotations, int pKeep_actors) {
     int i;
@@ -2235,13 +2237,14 @@ void C2_HOOK_FASTCALL TurnOnSmashDecal(int pIndex) {
 }
 
 // FUNCTION: CARMA2_HW 0x004f6040
+// FUNCTION: CARMA2_SW 0x004f1ca0
 // FUNCTION: CARMA2_CHEAT 0x004fbce0
 void C2_HOOK_FASTCALL TurnOffSmashDecal(int pIndex) {
     BrActorRemove(gDecals[pIndex].actor);
 }
 
 // STUB: CARMA2_HW 0x004f6060
-// STUB: CARMA2_SW 0x004f1ca0
+// STUB: CARMA2_SW 0x004f1cc0
 void C2_HOOK_FASTCALL ChangeSmashTexture(br_material* pMaterial, tCar_spec* pCar_spec, br_pixelmap* pOld_texture, br_pixelmap* pNew_texture) {
     NOT_IMPLEMENTED();
 }

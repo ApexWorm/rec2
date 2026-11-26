@@ -1387,6 +1387,7 @@ br_scalar C2_HOOK_FASTCALL DistanceFromFace(const br_vector3* pPoint, const tFac
 }
 
 // FUNCTION: CARMA2_HW 0x005160c0
+// FUNCTION: CARMA2_SW 0x00511530
 // FUNCTION: CARMA2_CHEAT 0x0051bae0
 void C2_HOOK_FASTCALL DRBoundsCopy(br_bounds3* pDest, const br_bounds3* pSrc) {
 

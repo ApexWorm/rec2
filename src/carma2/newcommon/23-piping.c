@@ -1081,6 +1081,7 @@ void C2_HOOK_FASTCALL AddNapalmBoltToPipingSession(int pIndex, tPedestrian* pPed
 // PipeSingleCrush
 
 // FUNCTION: CARMA2_HW 0x004c8090
+// FUNCTION: CARMA2_SW 0x004c47c0
 // FUNCTION: CARMA2_CHEAT 0x004cdbb0
 void C2_HOOK_FASTCALL PipeSingleScreenWobble(int pWobble_x, int pWobble_y) {
     C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_chunk_screen_wobble, wobble_x, 0x1);
@@ -2263,6 +2264,7 @@ void C2_HOOK_FASTCALL ApplySmashDecal(tPipe_chunk** pChunk) {
 }
 
 // FUNCTION: CARMA2_HW 0x004c9a30
+// FUNCTION: CARMA2_SW 0x004c6160
 // FUNCTION: CARMA2_CHEAT 0x004cf560
 void C2_HOOK_FASTCALL ApplySmashTextureChange(tPipe_chunk** pChunk) {
     tPipe_chunk* chunk;
