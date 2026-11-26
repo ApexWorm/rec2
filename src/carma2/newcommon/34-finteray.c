@@ -306,10 +306,30 @@ void C2_HOOK_FASTCALL CheckSingleFace(tFace_ref* pFace, br_vector3* ray_pos, br_
 
 // MultiRayCheckSingleFace
 
-// STUB: CARMA2_HW 0x0045f5b0
-// STUB: CARMA2_SW 0x0045f020
-void C2_HOOK_FASTCALL GetNewBoundingBox(br_bounds* b2, br_bounds* b1, br_matrix34* m) {
-    NOT_IMPLEMENTED();
+// FUNCTION: CARMA2_HW 0x0045f5b0
+// FUNCTION: CARMA2_SW 0x0045f020
+// FUNCTION: CARMA2_CHEAT 0x0045fa20
+void C2_HOOK_FASTCALL GetNewBoundingBox(br_bounds* b2, const br_bounds* b1, const br_matrix34* m) {
+    br_vector3 a;
+    br_vector3 c[3];
+    int j;
+    int i;
+
+    BrMatrix34ApplyP(&b2->min, &b1->min, m);
+    BrVector3Copy(&b2->max, &b2->min);
+    BrVector3Sub(&a, &b1->max, &b1->min);
+    for (j = 0; j < 3; j++) {
+        BrVector3Scale(&c[j], (br_vector3*)m->m[j], a.v[j]);
+    }
+    for (j = 0; j < 3; j++) {
+        for (i = 0; i < 3; i++) {
+            if (c[i].v[j] < 0.0f) {
+                b2->min.v[j] += c[i].v[j];
+            } else {
+                b2->max.v[j] += c[i].v[j];
+            }
+        }
+    }
 }
 
 // FUNCTION: CARMA2_HW 0x0045f690

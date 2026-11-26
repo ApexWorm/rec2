@@ -1,5 +1,5 @@
 address,type,name
-00057dae0,library,_fputs
+0x00523a84,library,_closesocket@4
 0x0057b770,library,__ftol
 0x0057b7a0,library,__chkstk
 0x0057b7e0,library,_strchr
@@ -50,6 +50,7 @@ address,type,name
 0x0057d880,library,__strcmpi
 0x0057d910,library,__memicmp
 0x0057d9b0,library,_time
+0x0057dae0,library,_fputs
 0x0057db30,library,___dtoxmode
 0x0057dc00,library,_stat
 0x0057dff0,library,__mkdir
@@ -63,7 +64,9 @@ address,type,name
 0x0057e6b0,library,_getenv
 0x0057ebc0,library,__filbuf
 0x0057eff0,library,_memset
+0x0057f620,library,_strcpy
 0x0057f710,library,_calloc
+0x0057fc84,library,_log10
 0x005804a0,library,__input
 0x005812c0,library,__flsbuf
 0x005813f0,library,__output
@@ -77,6 +80,10 @@ address,type,name
 0x005828d0,library,__errcode
 0x005829e0,library,__sptype
 0x00582b80,library,__ctrlfp
+0x00582df7,library,__startOneArgErrorHandling
+0x00582e6c,library,__convertTOStoQNaN
+0x00582e85,library,__fload_withFB
+0x00582eeb,library,__math_exit
 0x00583220,library,___crtLCMapStringA
 0x00583950,library,__cintrindisp2
 0x005843a6,library,__fprem_common
@@ -137,6 +144,7 @@ address,type,name
 0x0058a0c0,library,_wctomb
 0x0058a140,library,__aullrem
 0x0058a1c0,library,__matherr
+0x0058a1d0,library,__87except
 0x0058a2f0,library,__alloc_osfhnd
 0x0058a3b0,library,__set_osfhnd
 0x0058a460,library,__free_osfhnd
@@ -156,7 +164,9 @@ address,type,name
 0x0058d310,library,__mbschr
 0x0058d410,library,__setmode
 0x0058d600,library,__strnicmp
+0x0058e254,global,_closesocket
 0x005927a0,global,___lookuptable
+0x005928e8,global,__DEFAULT_CW_in_mem
 0x00594000,global,___xc_a
 0x00594004,global,___xc_z
 0x00594008,global,___xi_a
@@ -170,6 +180,8 @@ address,type,name
 0x0067b534,global,___app_type
 0x0067b5cc,global,___nullstring
 0x0067b5d0,global,___wnullstring
+0x0067b700,global,__indefinite
+0x0067b73a,global,__minfinity
 0x0067b908,global,___small_block_heap
 0x0067d92c,global,___sbh_threshold
 0x0067d930,global,___badioinfo
@@ -183,6 +195,7 @@ address,type,name
 0x0067dda8,global,__tzname
 0x0067ddd0,global,__lpdays
 0x0067de08,global,__days
+0x006ba468,global,___fastflag
 0x006ba46c,global,__adjust_fdiv
 0x006ba474,global,__cflush
 0x006ba490,global,errno

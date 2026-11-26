@@ -535,9 +535,31 @@ br_uint_32 C2_HOOK_FASTCALL DRActorEnumRecurseWithTrans(br_actor* pActor, br_mat
     return 0;
 }
 
-// STUB: CARMA2_HW 0x005148c0
-// STUB: CARMA2_SW 0x0050fd00
-// DRActorEnumRecurseWithSnart
+// FUNCTION: CARMA2_HW 0x005148c0
+// FUNCTION: CARMA2_SW 0x0050fd00
+// FUNCTION: CARMA2_CHEAT 0x0051a2b0
+intptr_t C2_HOOK_FASTCALL DRActorEnumRecurseWithSnart(br_actor* pActor, br_matrix34* pMat, tDRActorEnumRecurseWithSnart_cbfn* pCallback, void* pContext) {
+    br_actor* child;
+    br_matrix34 mat;
+    intptr_t result;
+
+    if (pMat != NULL) {
+        BrMatrix34Mul(&mat, &pActor->t.t.mat, pMat);
+    } else {
+        BrMatrix34Identity(&mat);
+    }
+    result = pCallback(pActor, &mat, pContext);
+    if (result != 0) {
+        return result;
+    }
+    for (child = pActor->children; child != NULL; child = child->next) {
+        result = DRActorEnumRecurseWithSnart(child, &mat, pCallback, pContext);
+        if (result != 0) {
+            return result;
+        }
+    }
+    return 0;
+}
 
 // FUNCTION: CARMA2_HW 0x00514930
 // FUNCTION: CARMA2_SW 0x0050fd70
@@ -2100,6 +2122,7 @@ const char* C2_HOOK_FASTCALL GetActorRenderStyleString(br_actor* pActor) {
 
 // STUB: CARMA2_HW 0x00518d60
 // STUB: CARMA2_SW 0x00512820
+// STUB: CARMA2_CHEAT 0x0051e750
 tU32 C2_HOOK_FASTCALL FudgeBRenderIntoTheNinetiesWithSomeProperFuckingColourSupport(br_pixelmap* pm, tU32 red, tU32 grn, tU32 blu, tU32 alp) {
     NOT_IMPLEMENTED();
 }

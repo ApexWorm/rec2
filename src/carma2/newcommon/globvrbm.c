@@ -26,8 +26,15 @@ br_actor* gStatbarHUD1_actor;
 // GLOBAL: CARMA2_HW 0x0074cab0
 br_actor* gHeadup2_actor;
 
+#endif
+
+// GLOBAL: CARMA2_HW 0x0074cee8
+// GLOBAL: CARMA2_CHEAT 0x00754588
+br_material* gMaterial[2] = { NULL };
+
+#ifdef REC2_HW
 // GLOBAL: CARMA2_HW 0x0074cef0
-br_actor* gHUDsquare_actor;
+br_actor* gHUDsquare_actor = NULL;
 
 // GLOBAL: CARMA2_HW 0x0074cf0c
 br_actor* gMapHUD_actor;

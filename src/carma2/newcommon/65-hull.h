@@ -37,7 +37,16 @@ extern int C2_HOOK_FASTCALL Collinear(const br_vector3* pV1, const br_vector3* p
 // AddPointToPolyhedron
 
 #ifdef REC2_MATCHING
-extern undefined4* C2_HOOK_FASTCALL FUN_00421fd0(int pCount_points);
+typedef struct {
+    undefined4 field_0x00;
+    undefined4 field_0x04;
+    undefined4 field_0x08;
+    br_vector3* field_0x0c;
+    tU16* field_0x10;
+    undefined* field_0x14;
+} tFUN_00421fd0;
+
+extern tFUN_00421fd0* C2_HOOK_FASTCALL FUN_00421fd0(int pCount_points);
 #endif
 
 // AdjustEdges
