@@ -35,6 +35,8 @@ extern int gPed_retain_root_mode;
 extern br_material* gPedestrian_character_cloned_materials[50];
 extern int gCount_pedestrian_personality_cloned_materials;
 
+extern tPed_morph gPed_morphs[20];
+
 extern tPed_remap* gPed_remaps[10];
 
 extern tPed_personality* gPed_personalities[50];
@@ -564,7 +566,7 @@ extern void C2_HOOK_FASTCALL StopCharacterMorphing(tPed_character_instance* pCha
 
 extern void C2_HOOK_FASTCALL SetOnGroundVector(tPed_character_instance* pCharacter, br_vector3* pPos, br_vector3* pNew_pos);
 
-// ResetAnimation
+extern void C2_HOOK_FASTCALL ResetAnimation(tPed_character_instance* pCharacter);
 
 extern int C2_HOOK_FASTCALL SetCharacterMove(tPed_character_instance* pPed, int pMove_action, float pSpeed, int pArg4, int pArg5, tU32 pTime);
 

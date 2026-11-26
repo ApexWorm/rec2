@@ -4021,7 +4021,7 @@ typedef struct tPed_morph {
     br_vector3 field_0x14;
     br_vector3 field_0x20;
     undefined field_0x2c;
-    undefined field_0x2d[0x10][6];
+    tS8 field_0x2d[0x10][6];
     undefined field_0x8d[0xcf];
 } tPed_morph;
 
