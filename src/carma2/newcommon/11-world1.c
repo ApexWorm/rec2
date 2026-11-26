@@ -28,17 +28,22 @@
 // GLOBAL: CARMA2_HW 0x006ab7a8
 // GLOBAL: CARMA2_SW 0x006a51f8
 // GLOBAL: CARMA2_CHEAT 0x006b2e38
-int gDelete_count;
+int gDelete_count = 0;
 
 // GLOBAL: CARMA2_HW 0x006aafc8
 // GLOBAL: CARMA2_SW 0x006a4a18
 // GLOBAL: CARMA2_CHEAT 0x006b2658
 br_actor* gDelete_list[500];
 
+// GLOBAL: CARMA2_HW 0x006ab7ac
+// GLOBAL: CARMA2_SW 0x006a51fc
+// GLOBAL: CARMA2_CHEAT 0x006b2e3c
+int gINT_006ab7ac = 0;
+
 // GLOBAL: CARMA2_HW 0x006ab7b0
 // GLOBAL: CARMA2_SW 0x006a5200
 // GLOBAL: CARMA2_CHEAT 0x006b2e40
-br_actor* gSpec_vol_actors[100];
+br_actor* gSpec_vol_actors[100] = { 0 };
 
 // GLOBAL: CARMA2_HW 0x006ab940
 // GLOBAL: CARMA2_SW 0x006a5390
@@ -314,11 +319,43 @@ void C2_HOOK_FASTCALL DropSpecVol1(void) {
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x0050c9a0
-// STUB: CARMA2_SW 0x00507df0
-// STUB: CARMA2_CHEAT 0x00512390
+// FUNCTION: CARMA2_HW 0x0050c9a0
+// FUNCTION: CARMA2_SW 0x00507df0
+// FUNCTION: CARMA2_CHEAT 0x00512390
 void C2_HOOK_FASTCALL DropSpecVol(int pIndex) {
-    NOT_IMPLEMENTED();
+    FILE* f;
+    tPath_name the_path;
+    int i;
+    int spec_count;
+    tSpecial_volume spec;
+    tSpecial_volume* new_specs;
+    char s[256];
+
+    PathCat(the_path, gApplication_path, "SPECVOL.TXT");
+    f = DRfopen(the_path, "rt");
+    if (f != NULL) {
+        spec_count = GetAnInt(f);
+        if (spec_count >= pIndex) {
+            for (i = 0; i < pIndex; i++) {
+                ParseSpecialVolume(f, &spec, NULL, 1);
+            }
+            spec.boundary_type = eFx_boundary_box;
+            BrMatrix34Copy(&spec.boundary.box.mat, &gProgram_state.current_car.car_master_actor->t.t.mat);
+            new_specs = BrMemAllocate((gProgram_state.special_volume_count + 1) * sizeof(tSpecial_volume), kMem_new_special_vol);
+            memcpy(new_specs, gProgram_state.special_volumes, gProgram_state.special_volume_count * sizeof(tSpecial_volume));
+            memcpy(&new_specs[gProgram_state.special_volume_count], &spec, sizeof(tSpecial_volume));
+            gProgram_state.special_volume_count++;
+            BrMemFree(gProgram_state.special_volumes);
+            gProgram_state.special_volumes = new_specs;
+            BuildSpecVolModel(&spec, gProgram_state.special_volume_count - 1, GetInternalMat(), GetExternalMat());
+            gLast_actor = gSpec_vol_actors[gProgram_state.special_volume_count - 1];
+            UpdateSpecVol();
+            sprintf(s, "Shat out special volume #%d (type %d)", gProgram_state.special_volume_count - 1, pIndex);
+            NewTextHeadupSlot(4, 0, 2000, -2, s);
+            SaveSpecialVolumes();
+        }
+        PFfclose(f);
+    }
 }
 
 #ifdef REC2_MATCHING

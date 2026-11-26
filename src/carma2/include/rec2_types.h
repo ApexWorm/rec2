@@ -5968,6 +5968,7 @@ enum {
     kMem_stored_smash = 0xd1,
     kMem_special_volume = 0xd2,
     kMem_special_screen = 0xd3,
+    kMem_new_special_vol = 0xd4,
     kMem_saved_gam = 0xd5,
     kMem_new_save_game = 0xd6,
     kMem_stor_space_table = 0xd7,
