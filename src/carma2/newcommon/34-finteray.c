@@ -55,7 +55,11 @@ inline int C2_HOOK_FASTCALL BadDiv__finteray(br_scalar a, br_scalar b) {
     return (float)fabs(b) < 1.0f && (float)fabs(a) > (float)fabs(b) * BR_SCALAR_MAX;
 }
 
-// DRVector2AccumulateScale
+inline void C2_HOOK_FASTCALL DRVector2AccumulateScale__finteray(br_vector2* a, br_vector2* b, br_scalar s) {
+
+    a->v[0] += b->v[0] * s;
+    a->v[1] += b->v[1] * s;
+}
 
 // FUNCTION: CARMA2_HW 0x0045cd90
 // FUNCTION: CARMA2_SW 0x0045c7d0
@@ -199,10 +203,146 @@ int C2_HOOK_FASTCALL ActorRayPick2D(br_actor* pActor, br_vector3* pPosition, br_
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x0045cf60
-// STUB: CARMA2_SW 0x0045c9a0
+// FUNCTION: CARMA2_HW 0x0045cf60
+// FUNCTION: CARMA2_SW 0x0045c9a0
+// FUNCTION: CARMA2_CHEAT 0x0045d3d0
 int C2_HOOK_FASTCALL DRModelPick2D_finteray(br_model* pModel, br_material* pMaterial, br_actor* pActor, br_vector3* pRay_pos, br_vector3* pRay_dir, br_scalar pT_near, br_scalar pT_far, dr_modelpick2d_cbfn* pCallback, void* pArg) {
-    NOT_IMPLEMENTED();
+    int f;
+    int axis_m;
+    int axis_0;
+    int axis_1;
+    int group;
+    br_scalar t;
+    br_scalar d;
+    br_vector3 p;
+    float u0;
+    float u1;
+    float u2;
+    float v0;
+    float v1;
+    float v2;
+    float v0i1;
+    float v0i2;
+    float alpha;
+    float beta;
+    float f_d;
+    float f_n;
+    br_vector2 map;
+    int v;
+    int e;
+    int r;
+    br_material* this_material;
+    br_scalar numerator;
+    v11face* fp;
+
+    pT_near -= 0.00001f;
+    pT_far += 0.00001f;
+    for (group = 0; group < V11MODEL(pModel)->ngroups; group++) {
+        fp = V11MODEL(pModel)->groups[group].faces;
+        for (f = 0; f < V11MODEL(pModel)->groups[group].nfaces; f++, fp++) {
+            if (V11MODEL(pModel)->groups[group].face_colours.materials[0] != NULL) {
+                this_material = V11MODEL(pModel)->groups[group].face_colours.materials[0];
+            } else {
+                this_material = pMaterial;
+            }
+            d = BrVector3Dot(&fp->eqn, pRay_dir);
+            if ((float)fabs(d) < 2.3841858e-7f) {
+                continue;
+            }
+            if (this_material != NULL && this_material->identifier != NULL
+                    && (this_material->identifier[0] == '!' || this_material->identifier[0] == '>' || this_material->identifier[0] == '?')
+                    && gPling_materials) {
+                continue;
+            }
+            if ((this_material == NULL || (this_material->flags & (BR_MATF_TWO_SIDED | BR_MATF_ALWAYS_VISIBLE)) == 0) && d > 0.0f) {
+                continue;
+            }
+            numerator = BrVector3Dot(&fp->eqn, pRay_pos) - fp->eqn.v[3];
+            if (BadDiv__finteray(numerator, d)) {
+                continue;
+            }
+            t = -(numerator / d);
+            if (t < pT_near || t > pT_far) {
+                continue;
+            }
+            BrVector3Scale(&p, pRay_dir, t);
+            BrVector3Accumulate(&p, pRay_pos);
+            axis_m = 0;
+            if ((float)fabs(fp->eqn.v[1]) > (float)fabs(fp->eqn.v[0])) {
+                axis_m = 1;
+            }
+            if ((float)fabs(fp->eqn.v[2]) > (float)fabs(fp->eqn.v[axis_m])) {
+                axis_m = 2;
+            }
+            switch (axis_m) {
+            case 0:
+                axis_0 = 1;
+                axis_1 = 2;
+                break;
+            case 1:
+                axis_0 = 0;
+                axis_1 = 2;
+                break;
+            case 2:
+                axis_0 = 0;
+                axis_1 = 1;
+                break;
+            }
+            v0i1 = V11MODEL(pModel)->groups[group].vertices[fp->vertices[0]].p.v[axis_0];
+            v0i2 = V11MODEL(pModel)->groups[group].vertices[fp->vertices[0]].p.v[axis_1];
+            u1 = V11MODEL(pModel)->groups[group].vertices[fp->vertices[1]].p.v[axis_0] - v0i1;
+            v1 = V11MODEL(pModel)->groups[group].vertices[fp->vertices[1]].p.v[axis_1] - v0i2;
+            u2 = V11MODEL(pModel)->groups[group].vertices[fp->vertices[2]].p.v[axis_0] - v0i1;
+            v2 = V11MODEL(pModel)->groups[group].vertices[fp->vertices[2]].p.v[axis_1] - v0i2;
+            u0 = p.v[axis_0] - v0i1;
+            v0 = p.v[axis_1] - v0i2;
+            f_n = v2 * u1 - v1 * u2;
+            f_d = v0 * u1 - v1 * u0;
+            if ((float)fabs(f_d) > (float)fabs(f_n) || f_n == 0.f) {
+                continue;
+            }
+            beta = f_d / f_n;
+            if (beta < 0.f) {
+                continue;
+            }
+            f_n = v1 * u2 - v2 * u1;
+            f_d = v0 * u2 - v2 * u0;
+            if ((float)fabs(f_d) > (float)fabs(f_n) || f_n == 0.f) {
+                continue;
+            }
+            alpha = f_d / f_n;
+            if (alpha < 0.f || beta + alpha > 1.f) {
+                continue;
+            }
+            BrVector2Scale(&map, &V11MODEL(pModel)->groups[group].vertices[fp->vertices[1]].map, alpha);
+            DRVector2AccumulateScale__finteray(&map, &V11MODEL(pModel)->groups[group].vertices[fp->vertices[2]].map, beta);
+            DRVector2AccumulateScale__finteray(&map, &V11MODEL(pModel)->groups[group].vertices[fp->vertices[0]].map, 1.f - (beta + alpha));
+            v = 0;
+            e = 1;
+            if (alpha > beta) {
+                if (1.0 - beta * 2.0 > alpha) {
+                    e = 2;
+                }
+                if (0.5 - beta / 2.0 < alpha) {
+                    v = 2;
+                }
+            } else {
+                if (0.5 - beta / 2.0 > alpha) {
+                    e = 0;
+                }
+                if (1.0 - beta * 2.0 < alpha) {
+                    v = 1;
+                }
+
+            }
+            gTemp_group = group;
+            r = pCallback(pModel, pActor, this_material, pRay_pos, pRay_dir, t, f, e, v, &p, &map, pArg);
+            if (r != 0) {
+                return r;
+            }
+        }
+    }
+    return 0;
 }
 
 #ifdef REC2_MATCHING

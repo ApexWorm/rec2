@@ -24,7 +24,7 @@ extern br_matrix34 gPick_model_to_view__finteray;
 
 extern int C2_HOOK_FASTCALL BadDiv__finteray(br_scalar a, br_scalar b);
 
-// DRVector2AccumulateScale
+extern void C2_HOOK_FASTCALL DRVector2AccumulateScale__finteray(br_vector2* a, br_vector2* b, br_scalar s);
 
 extern int C2_HOOK_FASTCALL PickBoundsTestRay_finteray(br_bounds* pBounds, br_vector3* pRay_pos, br_vector3* pRay_dir, br_scalar pT_near, br_scalar pT_far, br_scalar* pNew_t_near, br_scalar* pNew_t_far);
 
