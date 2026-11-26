@@ -1880,7 +1880,12 @@ int C2_HOOK_FASTCALL InsertQuad(tSmash_quad_mapping* pMapping, br_actor* pActor,
 
 // SendNetSmash
 
-// SendAllSmashes
+// STUB: CARMA2_HW 0x004f0f80
+// STUB: CARMA2_SW 0x004ecbe0
+// STUB: CARMA2_CHEAT 0x004f6c20
+void C2_HOOK_FASTCALL SendAllSmashes(tNet_game_player_info* pPlayer) {
+    NOT_IMPLEMENTED();
+}
 
 // HitPowerup
 

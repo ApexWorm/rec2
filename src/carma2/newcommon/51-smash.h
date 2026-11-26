@@ -299,7 +299,7 @@ extern int C2_HOOK_FASTCALL InsertQuad(tSmash_quad_mapping* pMapping, br_actor* 
 
 // SendNetSmash
 
-// SendAllSmashes
+extern void C2_HOOK_FASTCALL SendAllSmashes(tNet_game_player_info* pPlayer);
 
 // HitPowerup
 

@@ -50,7 +50,7 @@ extern void C2_HOOK_FASTCALL ReceivedRecover(tNet_message_chunk_recover* pConten
 
 extern void C2_HOOK_FASTCALL ReceivedCopInfo(void);
 
-// SendAllNonCarPositions
+extern void C2_HOOK_FASTCALL SendAllNonCarPositions(tNet_game_player_info* pPlayer);
 
 // ReceivedNonCarPosition
 
@@ -120,7 +120,7 @@ extern void C2_HOOK_FASTCALL InitialisePlayerScore(tNet_game_player_info* pPlaye
 
 extern void C2_HOOK_FASTCALL UseGeneralScore(int pScore);
 
-// NetSendEnvironmentChanges
+extern void C2_HOOK_FASTCALL NetSendEnvironmentChanges(tNet_game_player_info* pPlayer);
 
 extern void C2_HOOK_FASTCALL CheckForNeedyEnvironmentRecipients(void);
 

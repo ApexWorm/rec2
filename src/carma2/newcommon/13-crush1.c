@@ -2705,7 +2705,12 @@ void C2_HOOK_FASTCALL ReceivedReAttachAllBits(tNet_message_chunk* pContents) {
 
 // ReceivedDBNonCar
 
-// SendAllDBNonCars
+// STUB: CARMA2_HW 0x0043d5b0
+// STUB: CARMA2_SW 0x0043d600
+// STUB: CARMA2_CHEAT 0x0043d830
+void C2_HOOK_FASTCALL SendAllDBNonCars(tNet_game_player_info* pPlayer) {
+    NOT_IMPLEMENTED();
+}
 
 // ReceivedDBNonCarPosition
 
@@ -2725,7 +2730,12 @@ void C2_HOOK_FASTCALL ReceivedToggleFlaps(tNet_message_chunk* pContents) {
 
 // SendSHNonCar
 
-// SendAllSHNonCars
+// STUB: CARMA2_HW 0x0043d7d0
+// STUB: CARMA2_SW 0x0043d820
+// STUB: CARMA2_CHEAT 0x0043da80
+void C2_HOOK_FASTCALL SendAllSHNonCars(tNet_game_player_info* pPlayer) {
+    NOT_IMPLEMENTED();
+}
 
 // ReceivedSHNonCar
 
