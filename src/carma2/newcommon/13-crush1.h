@@ -470,13 +470,13 @@ extern void C2_HOOK_FASTCALL CompletelyUnBendCar(tCar_spec* pCar_spec);
 
 extern void C2_HOOK_FASTCALL RepairCarCollisionShapes(tCar_spec* pCar, float pStep);
 
-// RepairCar2
+extern float C2_HOOK_FASTCALL RepairCar2(tCar_spec* pCar, tU32 pFrame_period, br_scalar* pTotal_deflection);
 
 // RepairCar
 
 // RestoreVitalBitsOfObject
 
-// WeldCar
+extern void C2_HOOK_FASTCALL WeldCar(tCar_spec* pCar);
 
 // ARCompressCrush
 
@@ -546,9 +546,9 @@ extern int C2_HOOK_FASTCALL GetNetShapeDataLengthFromData(tU8* pData);
 
 extern void C2_HOOK_FASTCALL EncodeNetShapeData(tU8* pData, tCar_spec* pCar);
 
-// DecodeNetShapeData
+extern void C2_HOOK_FASTCALL DecodeNetShapeData(tCar_spec* pCar, tU8* pData);
 
-// CopyBendInMessage
+extern void C2_HOOK_FASTCALL CopyBendInMessage(tCar_spec* pCar);
 
 // Vector4Equal
 
@@ -556,7 +556,7 @@ extern void C2_HOOK_FASTCALL CompressPlane(tCompressed_vector4* pDest, const br_
 
 extern void C2_HOOK_FASTCALL ExpandPlane(br_vector4* pDest, const tCompressed_vector4* pSrc);
 
-// CopySplitInMessage
+extern void C2_HOOK_FASTCALL CopySplitInMessage(tCar_spec* pCar);
 
 extern void C2_HOOK_FASTCALL SetAllShapeStatusFlags(tCar_crush_network_shapes* pShapes);
 

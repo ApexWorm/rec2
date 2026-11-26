@@ -4667,9 +4667,20 @@ typedef struct tPhysics_object {
     undefined field_0x261;
     undefined field_0x262[6];
     tU32 message_time; // 0x268
-    undefined field_0x26c[0x278 - 0x26c];
+    tU8 field_0x26c[4];
+    undefined field_0x270[4];
+    tU32 field_0x274;
     tS16 field_0x278;
-    undefined field_0x27a[0x49c - 0x27a];
+    tU16 field_0x27a;
+    tU32 field_0x27c;
+    tU8 field_0x280[12];
+    undefined field_0x28c[4];
+    tU16 field_0x290;
+    tU8 field_0x292;
+    undefined field_0x293;
+    tU8 field_0x294[0x2fc - 0x294];
+    tU8 field_0x2fc[0x48c - 0x2fc];
+    float field_0x48c[4];
     undefined4 field_0x49c; /* tU32 last_car_car_collision: */
     undefined field_0x4a0[52];
     tU8 drivable_on;

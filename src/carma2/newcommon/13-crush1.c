@@ -2555,13 +2555,24 @@ void C2_HOOK_FASTCALL RepairCarCollisionShapes(tCar_spec* pCar, float pStep) {
     pCar->car_crush_spec->expand_bounding_box = 3;
 }
 
-// RepairCar2
+// STUB: CARMA2_HW 0x0043ace0
+// STUB: CARMA2_SW 0x0043ad30
+// STUB: CARMA2_CHEAT 0x0043af00
+float C2_HOOK_FASTCALL RepairCar2(tCar_spec* pCar, tU32 pFrame_period, br_scalar* pTotal_deflection) {
+    NOT_IMPLEMENTED();
+    return 0.f;
+}
 
 // RepairCar
 
 // RestoreVitalBitsOfObject
 
-// WeldCar
+// STUB: CARMA2_HW 0x0043b8a0
+// STUB: CARMA2_SW 0x0043b8f0
+// STUB: CARMA2_CHEAT 0x0043bad0
+void C2_HOOK_FASTCALL WeldCar(tCar_spec* pCar) {
+    NOT_IMPLEMENTED();
+}
 
 // ARCompressCrush
 
@@ -2830,9 +2841,19 @@ void C2_HOOK_FASTCALL EncodeNetShapeData(tU8* pData, tCar_spec* pCar) {
     }
 }
 
-// DecodeNetShapeData
+// STUB: CARMA2_HW 0x0043db00
+// STUB: CARMA2_SW 0x0043db50
+// STUB: CARMA2_CHEAT 0x0043ddb0
+void C2_HOOK_FASTCALL DecodeNetShapeData(tCar_spec* pCar, tU8* pData) {
+    NOT_IMPLEMENTED();
+}
 
-// CopyBendInMessage
+// STUB: CARMA2_HW 0x0043dce0
+// STUB: CARMA2_SW 0x0043dd30
+// STUB: CARMA2_CHEAT 0x0043df90
+void C2_HOOK_FASTCALL CopyBendInMessage(tCar_spec* pCar) {
+    NOT_IMPLEMENTED();
+}
 
 // Vector4Equal
 
@@ -2854,7 +2875,12 @@ void C2_HOOK_FASTCALL ExpandPlane(br_vector4* pDest, const tCompressed_vector4* 
     pDest->v[3] = DRU16ToScalar(pSrc->v[3], -2.5f, 2.5f);
 }
 
-// CopySplitInMessage
+// STUB: CARMA2_HW 0x0043df10
+// STUB: CARMA2_SW 0x0043df60
+// STUB: CARMA2_CHEAT 0x0043e1c0
+void C2_HOOK_FASTCALL CopySplitInMessage(tCar_spec* pCar) {
+    NOT_IMPLEMENTED();
+}
 
 // FUNCTION: CARMA2_HW 0x0043dfd0
 // FUNCTION: CARMA2_SW 0x0043e020
