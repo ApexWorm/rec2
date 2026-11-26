@@ -963,10 +963,112 @@ void C2_HOOK_FASTCALL TranslateObject(tPhysics_object* pObject, br_scalar pDelta
     BrVector3Accumulate(&pObject->actor->t.t.translate.t, &tv);
 }
 
-// STUB: CARMA2_HW 0x004c2060
-// STUB: CARMA2_SW 0x004be790
+// FUNCTION: CARMA2_HW 0x004c2060
+// FUNCTION: CARMA2_SW 0x004be790
+// FUNCTION: CARMA2_CHEAT 0x004c7b80
 void C2_HOOK_FASTCALL GetFacesNearObject(tPhysics_object *pObject, tWorld_callbacks *pCallbacks) {
-    NOT_IMPLEMENTED();
+    br_bounds3 bb;
+    tBounds bnds;
+    br_bounds3 bb2;
+    br_matrix34 mat;
+    br_matrix34 mat2;
+    br_matrix34 inv_mat;
+    br_matrix34 mat3;
+    br_vector3 tv;
+    br_matrix34* actor_mat;
+    int i;
+
+    if (pObject->flags & 0x40) {
+        pObject->box_face_start = pObject->box_face_end;
+        return;
+    }
+    if ((pObject->flags & 0x2) && pObject->parent != NULL) {
+        pObject->box_face_start = pObject->parent->box_face_start;
+        pObject->box_face_end = pObject->parent->box_face_end;
+        pObject->box_face_ref = pObject->parent->box_face_ref;
+        return;
+    }
+    if (pObject->flags & 0x1) {
+        if ((pObject->box_face_ref == gFace_num__car || (pObject->box_face_ref == gFace_num__car - 1 && pObject->box_face_start > gFace_count))
+                && pObject->field_0x10c.min.v[0] > pObject->field_0x124.min.v[0]
+                && pObject->field_0x10c.min.v[1] > pObject->field_0x124.min.v[1]
+                && pObject->field_0x10c.min.v[2] > pObject->field_0x124.min.v[2]
+                && pObject->field_0x10c.max.v[0] < pObject->field_0x124.max.v[0]
+                && pObject->field_0x10c.max.v[1] < pObject->field_0x124.max.v[1]
+                && pObject->field_0x10c.max.v[2] < pObject->field_0x124.max.v[2]) {
+            return;
+        }
+        BrVector3Scale(&tv, &pObject->v, 0.12f);
+        for (i = 0; i < 3; i++) {
+            bnds.original_bounds.min.v[i] = pObject->field_0x10c.min.v[i] - 0.15;
+            bnds.original_bounds.max.v[i] = pObject->field_0x10c.max.v[i] + 0.15;
+            if (tv.v[i] < 0.0f) {
+                bnds.original_bounds.min.v[i] += tv.v[i];
+            } else {
+                bnds.original_bounds.max.v[i] += tv.v[i];
+            }
+            pObject->field_0x124.min.v[i] = bnds.original_bounds.min.v[i] + 0.005;
+            pObject->field_0x124.max.v[i] = bnds.original_bounds.max.v[i] - 0.005;
+        }
+        bnds.mat = &inv_mat;
+        BrMatrix34Identity(&inv_mat);
+    } else {
+        actor_mat = &pObject->actor->t.t.mat;
+        if (pObject->box_face_ref == gFace_num__car || (pObject->box_face_ref == gFace_num__car - 1 && pObject->box_face_start > gFace_count)) {
+            BrMatrix34Mul(&mat2, actor_mat, &pObject->field_0x144);
+            GetNewBoundingBox(&bb, &pObject->bb2, &mat2);
+            if (bb.max.v[0] < pObject->field_0x124.max.v[0]
+                    && bb.max.v[1] < pObject->field_0x124.max.v[1]
+                    && bb.max.v[2] < pObject->field_0x124.max.v[2]
+                    && bb.min.v[0] > pObject->field_0x124.min.v[0]
+                    && bb.min.v[1] > pObject->field_0x124.min.v[1]
+                    && bb.min.v[2] > pObject->field_0x124.min.v[2]) {
+                return;
+            }
+        }
+        BrMatrix34LPInverse(&inv_mat, actor_mat);
+        BrMatrix34Mul(&mat, &pObject->transform_matrix, &inv_mat);
+        GetNewBoundingBox(&bnds.original_bounds, &pObject->bb2, &mat);
+        for (i = 0; i < 3; i++) {
+            bnds.original_bounds.min.v[i] = MIN(bnds.original_bounds.min.v[i], pObject->bb2.min.v[i]);
+            bnds.original_bounds.max.v[i] = MAX(bnds.original_bounds.max.v[i], pObject->bb2.max.v[i]);
+            bnds.original_bounds.min.v[i] -= 0.0025f;
+            bnds.original_bounds.max.v[i] += 0.0025f;
+        }
+        BrMatrix34Mul(&mat2, &mat, &mat);
+        BrMatrix34Mul(&mat3, &mat2, &mat);
+        BrMatrix34LPInverse(&mat2, &mat3);
+        GetNewBoundingBox(&bb2, &pObject->bb2, &mat2);
+        for (i = 0; i < 3; i++) {
+            bnds.original_bounds.min.v[i] = MIN(bnds.original_bounds.min.v[i], bb2.min.v[i]);
+            bnds.original_bounds.max.v[i] = MAX(bnds.original_bounds.max.v[i], bb2.max.v[i]);
+            bnds.original_bounds.min.v[i] -= 0.02f;
+            bnds.original_bounds.max.v[i] += 0.02f;
+        }
+        pObject->field_0x124 = bnds.original_bounds;
+        BrMatrix34Copy(&pObject->field_0x144, &inv_mat);
+        bnds.mat = actor_mat;
+    }
+    pObject->box_face_start = gFace_count;
+    gPling_face = NULL;
+    gActorBoxPick_StopGroovidelics = (pObject->flags & 0x80) == 0;
+    if (pCallbacks != NULL && pCallbacks->find_faces_in_box != NULL) {
+        gFace_count += pCallbacks->find_faces_in_box(&bnds, &gFace_list__car[gFace_count], REC2_ASIZE(gFace_list__car) - gFace_count, pCallbacks);
+        if (gFace_count >= REC2_ASIZE(gFace_list__car)) {
+            pObject->box_face_start = 0;
+            gFace_count = pCallbacks->find_faces_in_box(&bnds, gFace_list__car, REC2_ASIZE(gFace_list__car), pCallbacks);
+            gFace_num__car++;
+        }
+    }
+    pObject->box_face_end = gFace_count;
+    pObject->box_face_ref = gFace_num__car;
+    gActorBoxPick_StopGroovidelics = 1;
+    if (pCallbacks != NULL && pCallbacks->new_face_list != NULL) {
+        pCallbacks->new_face_list(pObject, gPling_face);
+    }
+    if (pObject->flags & 0x80) {
+        pObject->box_face_end = pObject->box_face_start;
+    }
 }
 
 // FUNCTION: CARMA2_HW 0x004c25a0
