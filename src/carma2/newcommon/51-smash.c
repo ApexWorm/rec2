@@ -40,6 +40,11 @@
 // GLOBAL: CARMA2_CHEAT 0x006afe10
 int gAllow_material_adapt;
 
+// GLOBAL: CARMA2_HW 0x006a82a0
+// GLOBAL: CARMA2_SW 0x006a2300
+// GLOBAL: CARMA2_CHEAT 0x006afe18
+int gLast_explosion;
+
 // GLOBAL: CARMA2_HW 0x006a3340
 // GLOBAL: CARMA2_CHEAT 0x006aaeb8
 br_material* gMaterials_to_adapt[200];
@@ -375,17 +380,103 @@ void C2_HOOK_FASTCALL CopyExplosionData(int pIndex, tExplosion* pExplosion) {
     gExplosions[pIndex] = *pExplosion;
 }
 
-// DoExplosionette
+inline int C2_HOOK_FASTCALL DoExplosionette(float pScale, br_actor* pActor, tU32 pStart, tU32 pPeriod, int pCount_frames, tExplosion_animation_frame* pFrames, br_vector3* pPos, br_angle pAngle) {
+    int i;
+    int found;
+    tExplosion* explosion;
+
+    found = 0;
+    for (i = 0, explosion = gExplosions; i < (int)REC2_ASIZE(gExplosions); i++, explosion++) {
+        if (explosion->start == 0) {
+            found = 1;
+            break;
+        }
+    }
+    if (i == (int)REC2_ASIZE(gExplosions)) {
+        i = gLast_explosion;
+        explosion = &gExplosions[gLast_explosion];
+        do {
+            i++;
+            if (i >= (int)REC2_ASIZE(gExplosions)) {
+                i = 0;
+                explosion = gExplosions;
+            } else {
+                explosion++;
+            }
+            if (explosion->finished) {
+                gLast_explosion = i;
+                found = 1;
+                break;
+            }
+        } while (i != gLast_explosion);
+    }
+    if (!found) {
+        return 0;
+    }
+    explosion->finished = 0;
+    explosion->collision_actor = pActor;
+    explosion->start = pStart;
+    explosion->period = pPeriod;
+    explosion->field_0x8 = 0xff;
+    explosion->count_frames = pCount_frames;
+    explosion->field_0x14 = pScale / 6.9;
+    memcpy(explosion->frames, pFrames, pCount_frames * sizeof(tExplosion_animation_frame));
+    explosion->field_0x1c = *pPos;
+    explosion->angle = pAngle;
+    PipeSingleExplosion(i, explosion);
+    return 1;
+}
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x004ead00
-// STUB: CARMA2_SW 0x004e69e0
-// STUB: CARMA2_CHEAT 0x004f09a0
+// FUNCTION: CARMA2_HW 0x004ead00
+// FUNCTION: CARMA2_SW 0x004e69e0
+// FUNCTION: CARMA2_CHEAT 0x004f09a0
 void C2_HOOK_FASTCALL Explode(tExplosion_animation *pExplosion_animation,br_actor *pActor, const br_bounds3* pBounds, const br_vector3* pPos) {
-    NOT_IMPLEMENTED();
+    tU32 the_time;
+    int i;
+    int j;
+    int count;
+    tExplosion_animation_group* group;
+    br_vector3 min;
+    br_vector3 max;
+    br_vector3 pos;
+    br_angle angle;
+    float scale;
+
+    the_time = GetTotalTime();
+    if (pActor == NULL) {
+        return;
+    }
+    for (i = 0, group = pExplosion_animation->groups; i < pExplosion_animation->count_groups; i++, group++) {
+        count = IRandomBetween((tS16)group->min_count, (tS16)group->max_count);
+        min.v[0] = group->min_xyz_factor.v[0] * pBounds->max.v[0];
+        max.v[0] = group->max_xyz_factor.v[0] * pBounds->max.v[0];
+        min.v[1] = group->min_xyz_factor.v[1] * pBounds->max.v[1];
+        max.v[1] = group->max_xyz_factor.v[1] * pBounds->max.v[1];
+        min.v[2] = group->min_xyz_factor.v[2] * pBounds->max.v[2];
+        max.v[2] = group->max_xyz_factor.v[2] * pBounds->max.v[2];
+        for (j = 0; j < count; j++) {
+            pos.v[0] = FRandomBetween(min.v[0], max.v[0]) * (PercentageChance(50) ? 1 : -1);
+            pos.v[1] = FRandomBetween(min.v[1], max.v[1]) * (PercentageChance(50) ? 1 : -1);
+            pos.v[2] = FRandomBetween(min.v[2], max.v[2]) * (PercentageChance(50) ? 1 : -1);
+            if (pPos != NULL) {
+                BrVector3Accumulate(&pos, pPos);
+            }
+            BrVector3Accumulate(&pos, &group->offset);
+            if (group->rotate_modus != kExplosionRotateModus_NoRotate) {
+                angle = IRandomBetween(0, 0xffff);
+            } else {
+                angle = 0;
+            }
+            scale = FRandomBetween(group->min_scaling_factor, group->max_scaling_factor);
+            if (!DoExplosionette(scale, pActor, the_time + IRandomBetween((tS16)group->min_start_delay_ms, (tS16)group->max_start_delay_ms), IRandomBetween((tS16)group->min_frametime_ms, (tS16)group->max_frametime_ms), group->count_frames, group->frames, &pos, angle)) {
+                return;
+            }
+        }
+    }
 }
 
 #ifdef REC2_MATCHING

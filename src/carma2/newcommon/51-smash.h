@@ -13,6 +13,7 @@
 #include "rec2_types.h"
 
 extern int gAllow_material_adapt;
+extern int gLast_explosion;
 extern br_material* gMaterials_to_adapt[200];
 extern int gMaterials_to_adapt_count;
 extern int gShrapnel_child_count;
@@ -75,7 +76,7 @@ extern void C2_HOOK_FASTCALL MungeExplosions(void);
 
 extern void C2_HOOK_FASTCALL CopyExplosionData(int pIndex, tExplosion* pExplosion);
 
-// DoExplosionette
+extern int C2_HOOK_FASTCALL DoExplosionette(float pScale, br_actor* pActor, tU32 pStart, tU32 pPeriod, int pCount_frames, tExplosion_animation_frame* pFrames, br_vector3* pPos, br_angle pAngle);
 
 extern void C2_HOOK_FASTCALL Explode(tExplosion_animation *pExplosion_animation,br_actor *pActor, const br_bounds3* pBounds, const br_vector3* pPos);
 
