@@ -15,9 +15,11 @@
 #include "18-graphics2.h"
 #include "23-piping.h"
 #include "30-opponent.h"
+#include "32-spark.h"
 #include "41-utility.h"
 #include "49-physics.h"
 #include "51-smash.h"
+#include "52-errors.h"
 #include "53-controls.h"
 #include "60-phil.h"
 #include "69-sound.h"
@@ -2084,7 +2086,20 @@ intptr_t C2_HOOK_CDECL MakeCarModelsMaterialsSingleSided(br_actor* pActor, void*
 
 // MoveCarToSensiblePlace
 
-// SwapShapesIfPossible
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_HW 0x004349c0
+// STUB: CARMA2_SW 0x004349f0
+// STUB: CARMA2_CHEAT 0x00434bb0
+int C2_HOOK_FASTCALL SwapShapesIfPossible(tCar_spec* pCar_spec) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // DoShapeSwapping
 
@@ -2250,12 +2265,19 @@ void C2_HOOK_FASTCALL CompletelyUnBendCollisionShape(tCar_crush_shape_info* pSha
     }
 }
 
-// CompletelyUnBendCollisionShapes
+inline void C2_HOOK_FASTCALL CompletelyUnBendCollisionShapes(tCar_spec* pCar_spec) {
+    int i;
+
+    for (i = 0; i < pCar_spec->car_crush_spec->count_shapes; i++) {
+        CompletelyUnBendCollisionShape(&pCar_spec->car_crush_spec->field_0x4[i]);
+    }
+    pCar_spec->car_crush_spec->expand_bounding_box = 3;
+}
 
 // FUNCTION: CARMA2_HW 0x0043a010
 // FUNCTION: CARMA2_SW 0x0043a050
 // FUNCTION: CARMA2_CHEAT 0x0043a230
-void C2_HOOK_FASTCALL CompletelyUnBendWheels(tCar_spec* pCar_spec) {
+inline void C2_HOOK_FASTCALL CompletelyUnBendWheels(tCar_spec* pCar_spec) {
     br_actor* actor;
     tGroovidelic_spec* groove;
     br_vector3 delta;
@@ -2288,7 +2310,12 @@ void C2_HOOK_FASTCALL CompletelyUnBendWheels(tCar_spec* pCar_spec) {
     pCar_spec->field_0x1260 = 0.0f;
 }
 
-// CompletelyUnBendOtherThings
+inline void C2_HOOK_FASTCALL CompletelyUnBendOtherThings(tCar_spec* pCar_spec) {
+
+    CompletelyUnBendCollisionShapes(pCar_spec);
+    CompletelyUnBendWheels(pCar_spec);
+    BrVector3Copy(&pCar_spec->collision_info->cmpos, &pCar_spec->car_crush_spec->field_0x264);
+}
 
 // FUNCTION: CARMA2_HW 0x00439910
 // FUNCTION: CARMA2_SW 0x00439950
@@ -2306,7 +2333,12 @@ intptr_t C2_HOOK_CDECL EnableGroovers(br_actor* pActor, void* pData) {
     return 0;
 }
 
-// DoCompletelyUnBentThings
+inline void C2_HOOK_FASTCALL DoCompletelyUnBentThings(tCar_spec* pCar_spec) {
+
+    pCar_spec->car_crush_spec->field_0x144 = 0;
+    CompletelyUnBendOtherThings(pCar_spec);
+    DRActorEnumRecurse(pCar_spec->car_model_actor, EnableGroovers, NULL);
+}
 
 // FUNCTION: CARMA2_HW 0x00439960
 // FUNCTION: CARMA2_SW 0x004399a0
@@ -2421,11 +2453,67 @@ void C2_HOOK_FASTCALL SendReAttachAllBits(tCar_spec* pCar) {
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x00439510
-// STUB: CARMA2_SW 0x00439550
-// STUB: CARMA2_CHEAT 0x00439720
+// FUNCTION: CARMA2_HW 0x00439510
+// FUNCTION: CARMA2_SW 0x00439550
+// FUNCTION: CARMA2_CHEAT 0x00439720
 void C2_HOOK_FASTCALL TotallyRepairACar(tCar_spec* pCar_spec) {
-    NOT_IMPLEMENTED();
+    int i;
+    tCar_crush_spec* car_crush;
+
+#ifdef REC2_CHEAT
+    if (gArrow_mode) {
+        return;
+    }
+#endif
+    StopCarSmokingInstantly(pCar_spec);
+    if (ARIsActionReplayAvailable()) {
+        PipeInstantUnSmudge(pCar_spec);
+    }
+    pCar_spec->repair_time += 100000;
+    for (i = 0; i < (int)REC2_ASIZE(pCar_spec->damage_units); i++) {
+        pCar_spec->damage_units[i].damage_level = 0;
+        pCar_spec->damage_units[i].last_level = 0;
+        pCar_spec->damage_units[i].smoke_last_level = 0;
+    }
+    if (pCar_spec->use_shell_model) {
+        return;
+    }
+    car_crush = pCar_spec->car_crush_spec;
+    if (car_crush == NULL) {
+        return;
+    }
+    if (car_crush->field_0x4b8) {
+        WeldCar(pCar_spec);
+    }
+    for (i = 0; i < car_crush->field_0x2b0; i++) {
+        ReAttachBit(pCar_spec, car_crush->field_0x2b4[i].field_0x4, car_crush->field_0x2b4[i].field_0x0, NULL);
+    }
+    car_crush->field_0x2b0 = 0;
+    for (i = 0; i < car_crush->field_0x270; i++) {
+        ReAttachBit(pCar_spec, car_crush->field_0x274[i].field_0x4, car_crush->field_0x274[i].field_0x0, car_crush->field_0x274[i].field_0x8);
+    }
+    car_crush->field_0x270 = 0;
+    DRActorEnumRecurse(pCar_spec->car_model_actor, MakeCarModelsMaterialsSingleSided, pCar_spec);
+    PipeSingleDSModel(0, pCar_spec);
+    if (car_crush->field_0x144) {
+        DoCompletelyUnBentThings(pCar_spec);
+    }
+    ARStartPipingSession(ePipe_chunk_model_mash);
+    PhysicsObjectRecurse(pCar_spec->collision_info, TotallyRepairObject, pCar_spec);
+    AREndPipingSession();
+    dr_dprintf("TotallyRepairACar() - Point 7");
+    TotallyRepairCarCollisionShapes(pCar_spec);
+    dr_dprintf("TotallyRepairACar() - Point 8");
+    PhysicsObjectRecurse(pCar_spec->collision_info, BattenDownTheObjects, pCar_spec);
+    dr_dprintf("TotallyRepairACar() - Point 9");
+    if (gProgram_state.prog_status != eProg_idling) {
+        dr_dprintf("TotallyRepairACar() - Point 10");
+        SwapShapesIfPossible(pCar_spec);
+    }
+    dr_dprintf("TotallyRepairACar() - Point 11");
+    pCar_spec->use_shell_model = 1;
+    RemoveCarFromCrushLists(pCar_spec);
+    dr_dprintf("TotallyRepairACar() - Point 12");
 }
 
 #ifdef REC2_MATCHING
@@ -2561,7 +2649,20 @@ void C2_HOOK_FASTCALL RepairCarCollisionShapes(tCar_spec* pCar, float pStep) {
 
 // RestoreVitalBitsOfObject
 
-// WeldCar
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_HW 0x0043b8a0
+// STUB: CARMA2_SW 0x0043b8f0
+// STUB: CARMA2_CHEAT 0x0043bad0
+void C2_HOOK_FASTCALL WeldCar(tCar_spec* pCar_spec) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // ARCompressCrush
 

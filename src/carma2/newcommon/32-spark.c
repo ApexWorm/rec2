@@ -1356,11 +1356,16 @@ void C2_HOOK_FASTCALL InitSplash(FILE* pF) {
 
 // DrawTheGlow
 
-// PipeInstantUnSmudge
-
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
 #endif
+
+// STUB: CARMA2_HW 0x004fc740
+// STUB: CARMA2_SW 0x004f7ca0
+// STUB: CARMA2_CHEAT 0x005023e0
+void C2_HOOK_FASTCALL PipeInstantUnSmudge(tCar_spec* pCar_spec) {
+    NOT_IMPLEMENTED();
+}
 
 // FUNCTION: CARMA2_HW 0x004fc9c0
 // FUNCTION: CARMA2_SW 0x004f7f20
