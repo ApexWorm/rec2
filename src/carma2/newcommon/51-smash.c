@@ -415,10 +415,49 @@ void C2_HOOK_FASTCALL RemoveExplosions(tCar_spec* pCar_spec) {
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x004eb180
-// STUB: CARMA2_SW 0x004e6e60
+// FUNCTION: CARMA2_HW 0x004eb180
+// FUNCTION: CARMA2_SW 0x004e6e60
+// FUNCTION: CARMA2_CHEAT 0x004f0e20
 void C2_HOOK_FASTCALL ApplyInitialMovement(tMovement_spec* pSpeed_info, br_vector3* pImpactee_velocity, br_vector3* pVelocity, br_vector3* pOmega, float pScale, br_vector3* pNormal, br_vector3* pSource_position, br_vector3* pPosition) {
-    NOT_IMPLEMENTED();
+    int i;
+    float distance;
+    br_vector3 tv;
+
+    pVelocity->v[0] = pImpactee_velocity->v[0] * (pSpeed_info->impactee_velocity_factor);
+    pVelocity->v[1] = pImpactee_velocity->v[1] * pSpeed_info->impactee_velocity_factor;
+    pVelocity->v[2] = pImpactee_velocity->v[2] * pSpeed_info->impactee_velocity_factor;
+    if (pSource_position != NULL && pPosition != NULL && pSpeed_info->min_speed != 0.f && pSpeed_info->max_speed != 0.f) {
+        BrVector3Sub(&tv, pSource_position, pPosition);
+        distance = BrVector3Length(&tv);
+        tv.v[0] *= FRandomBetween(pSpeed_info->min_speed, pSpeed_info->max_speed) / distance;
+        tv.v[1] *= FRandomBetween(pSpeed_info->min_speed, pSpeed_info->max_speed) / distance;
+        tv.v[2] *= FRandomBetween(pSpeed_info->min_speed, pSpeed_info->max_speed) / distance;
+        BrVector3Accumulate(pVelocity, &tv);
+    }
+    for (i = 0; i < 3; i++) {
+        pVelocity->v[i] = (pVelocity->v[i] + FRandomPosNeg(pSpeed_info->random_velocity_max)) * pScale;
+        pOmega->v[i] = FRandomBetween(0.f, 1.f);
+    }
+    pVelocity->v[1] += FRandomBetween(0.f, pSpeed_info->random_up_velocity_max);
+    distance = BrVector3Length(pNormal);
+    if (distance > BR_SCALAR_EPSILON * 2) {
+        BrVector3Scale(&tv, pNormal, 1.0 / distance);
+    } else {
+        BrVector3Set(&tv, 1.f, 0.f, 0.f);
+    }
+    tv.v[0] *= FRandomBetween(0.f, pSpeed_info->random_normal_velocity_max);
+    tv.v[1] *= FRandomBetween(0.f, pSpeed_info->random_normal_velocity_max);
+    tv.v[2] *= FRandomBetween(0.f, pSpeed_info->random_normal_velocity_max);
+    BrVector3Accumulate(pVelocity, &tv);
+    distance = BrVector3Length(pOmega);
+    if (distance > BR_SCALAR_EPSILON * 2) {
+        BrVector3Scale(pOmega, pOmega, 1.0 / distance);
+    } else {
+        BrVector3Set(pOmega, 1.f, 0.f, 0.f);
+    }
+    pOmega->v[0] *= FRandomPosNeg(pScale * pSpeed_info->random_spin_rate_max);
+    pOmega->v[1] *= FRandomPosNeg(pScale * pSpeed_info->random_spin_rate_max);
+    pOmega->v[2] *= FRandomPosNeg(pScale * pSpeed_info->random_spin_rate_max);
 }
 
 #ifdef REC2_MATCHING
