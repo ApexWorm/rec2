@@ -220,7 +220,7 @@ extern void C2_HOOK_FASTCALL GeneralCreateSplash(tPhysics_object* pObject, const
 
 extern void C2_HOOK_FASTCALL CreateSplash(tPhysics_object* pObject, tU32 pTime);
 
-// GetVelocitiesFromMatrices
+extern void C2_HOOK_FASTCALL GetVelocitiesFromMatrices(br_vector3* pVel, br_vector3* pRot, br_matrix34* pMat_now, br_matrix34* pMat_prev, tU32 pTime);
 
 // MungeSplash
 
