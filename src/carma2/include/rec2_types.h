@@ -590,7 +590,7 @@ typedef struct {
         };
     };
     int field_0x40;
-} tPipe_car_chunk;
+} tPipe_chunk_car;
 
 typedef struct {
     undefined4 field_0x0;
@@ -754,7 +754,7 @@ typedef struct {
 typedef enum {
     ePipe_chunk_frame_finish = 0,
     ePipe_chunk_ped_incident = 1,
-    ePipe_chunk_single_sound = 2,
+    ePipe_chunk_sound = 2,
     ePipe_chunk_car = 5,
     ePipe_chunk_graphical_wheel_stuff = 6,
     ePipe_chunk_damage = 7,
@@ -873,6 +873,7 @@ typedef struct tPipe_chunk {
     union {
         tPipe_chunk_car_incident car_incident;
         tPipe_chunk_frame_boundary frame_boundary;
+        tPipe_chunk_car car;
         tPipe_chunk_non_car non_car;
         tPipe_ped_physics_data ped_physics;
         tPipe_single_ped_pos ped_pos;

@@ -1205,7 +1205,7 @@ void C2_HOOK_FASTCALL PipeSingleSound(tS3_outlet* pOutlet, int pSound, tS3_volum
         if (pPosition == NULL) {
             pPosition = &gZero_vector__smash;
         }
-        ARDoSingleVariedSession(ePipe_chunk_single_sound, pSound, 4,
+        ARDoSingleVariedSession(ePipe_chunk_sound, pSound, 4,
             SIZE_OFFSET_PIPING(tPipe_shunk_single_sound, pitch), pPitch,
             SIZE_OFFSET_PIPING(tPipe_shunk_single_sound, position), pPosition,
             SIZE_OFFSET_PIPING(tPipe_shunk_single_sound, outlet), GetIndexFromOutlet(pOutlet),
@@ -1989,7 +1989,44 @@ void C2_HOOK_FASTCALL ApplyFrameBoundary(tPipe_chunk** pChunk) {
 
 // ApplySound
 
-// ApplyCar
+// FUNCTION: CARMA2_HW 0x004c9490
+// FUNCTION: CARMA2_SW 0x004c5bc0
+// FUNCTION: CARMA2_CHEAT 0x004cefb0
+void C2_HOOK_FASTCALL ApplyCar(tPipe_chunk** pChunk) {
+    tCar_spec* car;
+    br_vector3 com_offset_c;
+    br_vector3 com_offset_w;
+    tPhysics_object* collision_info;
+
+    if (((*pChunk)->subject_index & 0xffffff00) == (eVehicle_self << 8)) {
+        car = &gProgram_state.current_car;
+    } else {
+        car = GetCarSpec((*pChunk)->subject_index >> 8, (*pChunk)->subject_index & 0xff);
+    }
+
+    car->car_master_actor->t.t.mat = (*pChunk)->data.car.mat;
+    car->collision_info->v = (*pChunk)->data.car.v;
+    BrMatrix34TApplyV(&car->collision_info->velocity_car_space, &car->collision_info->v, &car->car_master_actor->t.t.mat);
+
+    collision_info = car->collision_info;
+
+    if (BrVector3LengthSquared(&collision_info->velocity_car_space) < 0.01) {
+        BrVector3Negate(&car->direction, (br_vector3*)car->car_master_actor->t.t.mat.m[2]);
+    } else {
+        BrVector3Normalise(&car->direction, &collision_info->v);
+    }
+
+    car->pos = car->car_master_actor->t.t.translate.t;
+    BrVector3InvScale(&com_offset_c, &car->centre_of_mass_world_scale, WORLD_SCALE);
+    BrMatrix34ApplyV(&com_offset_w, &com_offset_c, &car->car_master_actor->t.t.mat);
+    BrVector3Accumulate(&car->pos, &com_offset_w);
+
+    car->speedo_speed = (float)((double)(*pChunk)->data.car.speedo_speed / 468100.0);
+    car->revs = (float)((*pChunk)->data.car.revs * 10);
+    car->gear = (*pChunk)->data.car.gear - 1;
+    car->frame_collision_flag = (*pChunk)->data.car.frame_collision_flag;
+    car->field_0x18cc = (*pChunk)->data.car.field_0x40;
+}
 
 // FUNCTION: CARMA2_HW 0x004c96c0
 // FUNCTION: CARMA2_SW 0x004c5df0
