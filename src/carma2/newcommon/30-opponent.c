@@ -986,7 +986,7 @@ void C2_HOOK_FASTCALL ChooseNewObjective(tOpponent_spec* pOpponent_spec, int pMu
 
 // ProcessThisOpponent
 
-inline int C2_HOOK_FASTCALL IsNetCarActive(br_vector3* pPoint) {
+static inline int C2_HOOK_FASTCALL IsNetCarActive(br_vector3* pPoint) {
     br_vector3 tv;
 
     BrVector3Sub(&tv, &gProgram_state.current_car.car_master_actor->t.t.translate.t, pPoint);
@@ -1001,7 +1001,7 @@ inline int C2_HOOK_FASTCALL IsNetCarActive(br_vector3* pPoint) {
     return 0;
 }
 
-inline void C2_HOOK_FASTCALL NoteCarsCurrentlyUsed(tPhysics_object** pCollision_infos, int* pCount) {
+static inline void C2_HOOK_FASTCALL NoteCarsCurrentlyUsed(tPhysics_object** pCollision_infos, int* pCount) {
     tPhysics_object* current;
     tPhysics_object* next;
 
