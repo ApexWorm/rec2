@@ -2502,9 +2502,35 @@ void C2_HOOK_FASTCALL SetGoreLevel(int pNewLevel) {
 
 // InitBoner
 
-// DRVector3SafeCross
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
 
-// DRVector3SafeCrossXZ
+// STUB: CARMA2_HW 0x00403f90
+// STUB: CARMA2_SW 0x00403f90
+// STUB: CARMA2_CHEAT 0x00403f90
+void C2_HOOK_FASTCALL DRVector3SafeCross(br_vector3* pDest, const br_vector3* pA, const br_vector3* pB) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_HW 0x00404150
+// STUB: CARMA2_SW 0x00404150
+// STUB: CARMA2_CHEAT 0x00404150
+void C2_HOOK_FASTCALL DRVector3SafeCrossXZ(br_vector3* pDest, const br_vector3* pA, const br_vector3* pB) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // FUNCTION: CARMA2_HW 0x00404290
 // FUNCTION: CARMA2_SW 0x00404290
@@ -3143,19 +3169,117 @@ int C2_HOOK_FASTCALL SetCharacterMove(tPed_character_instance* pPed, int pMove_a
 #pragma auto_inline(on)
 #endif
 
-// DRMatrix34RotateCos
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
 
-// DropPointOntoPlane
+// STUB: CARMA2_HW 0x0040aed0
+// STUB: CARMA2_SW 0x0040aec0
+// STUB: CARMA2_CHEAT 0x0040af40
+void C2_HOOK_FASTCALL DRMatrix34RotateCos(br_matrix34* pDest, const br_vector3* pAxis, br_scalar pCos_a) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x0040a730
-// STUB: CARMA2_SW 0x0040a730
-// STUB: CARMA2_CHEAT 0x0040a7a0
-void C2_HOOK_FASTCALL SetCharacterDirection(tPed_character_instance* pPed, const br_vector3* pDir, const br_vector3* pUp) {
+// STUB: CARMA2_HW 0x0040b030
+// STUB: CARMA2_SW 0x0040b020
+// STUB: CARMA2_CHEAT 0x0040b0a0
+void C2_HOOK_FASTCALL DropPointOntoPlane(const br_vector3* pPoint, const br_vector3* pPlane, br_vector3* pDest) {
     NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// FUNCTION: CARMA2_HW 0x0040a730
+// FUNCTION: CARMA2_SW 0x0040a730
+// FUNCTION: CARMA2_CHEAT 0x0040a7a0
+void C2_HOOK_FASTCALL SetCharacterDirection(tPed_character_instance* pPed, const br_vector3* pDir, const br_vector3* pUp) {
+    br_vector3 dropped_move_dir;
+    br_vector3 dropped_dir;
+    br_matrix34 mat;
+    br_vector3 move_dir;
+    int keep_direction;
+    br_vector3 axis;
+    tPed_move* move;
+    br_matrix34 rot_up;
+    br_matrix34* character_matrix;
+    br_vector3 cross;
+    br_vector3 norm_dir;
+    br_matrix34 inverse;
+    br_vector3 norm_up;
+    br_vector3 norm_dropped_dir;
+    br_scalar cos_a;
+    br_vector3 original_pos;
+    br_matrix34 rot_dir;
+
+    if (pPed->field_0x7 < 0) {
+        return;
+    }
+    if ((pPed->field_0x14 & 0x4) && !gAction_replay_mode) {
+        return;
+    }
+    if (pDir == NULL) {
+        pDir = &pPed->field_0xc0;
+        pUp = &pPed->field_0xcc;
+        keep_direction = 1;
+    } else {
+        BrVector3Normalise(&pPed->field_0xc0, pDir);
+        pPed->field_0xcc = *pUp;
+        keep_direction = 0;
+    }
+    move = pPed->personality->form->moves[pPed->field_0x7].move;
+    character_matrix = GetCharacterMatrixPtr(pPed);
+    BrMatrix34Inverse(&inverse, &pPed->field_0x8c);
+    BrVector3Copy(&original_pos, (br_vector3*)character_matrix->m[3]);
+    BrVector3Set((br_vector3*)character_matrix->m[3], 0.f, 0.f, 0.f);
+    BrMatrix34Mul(&mat, character_matrix, &inverse);
+    if (pUp != NULL) {
+        BrVector3Normalise(&norm_up, pUp);
+    } else {
+        BrVector3Set(&norm_up, 0.f, 1.f, 0.f);
+    }
+    BrVector3Normalise(&norm_dir, pDir);
+    BrVector3Copy(&move_dir, &move->field_0x40);
+    if (pPed->field_0xbc != NULL) {
+        Vector3Lerp(&move_dir, &move_dir, &pPed->field_0xbc->field_0x20, pPed->field_0xbc->field_0x0);
+        BrVector3Normalise(&move_dir, &move_dir);
+    }
+    DropPointOntoPlane(&norm_dir, &norm_up, &dropped_dir);
+    DropPointOntoPlane(&move_dir, &norm_up, &dropped_move_dir);
+    BrVector3Normalise(&norm_dropped_dir, &dropped_dir);
+    BrVector3Normalise(&dropped_move_dir, &dropped_move_dir);
+    cos_a = BrVector3Dot(&norm_dropped_dir, &dropped_move_dir);
+    DRVector3SafeCrossXZ(&cross, &dropped_move_dir, &norm_dropped_dir);
+    BrVector3Normalise(&axis, &cross);
+    DRMatrix34RotateCos(&pPed->field_0x8c, &axis, cos_a);
+    BrVector3Set(&cross, norm_up.v[2], 0.f, -norm_up.v[0]);
+    BrVector3Normalise(&axis, &cross);
+    DRMatrix34RotateCos(&rot_up, &axis, norm_up.v[1]);
+    BrMatrix34Pre(&pPed->field_0x8c, &rot_up);
+    cos_a = BrVector3Dot(&norm_dropped_dir, &norm_dir);
+    DRVector3SafeCross(&cross, &norm_dropped_dir, &norm_dir);
+    BrVector3Normalise(&axis, &cross);
+    DRMatrix34RotateCos(&rot_dir, &axis, cos_a);
+    BrMatrix34Mul(&pPed->field_0x5c, &pPed->field_0x8c, &rot_dir);
+    BrMatrix34Post(&mat, &pPed->field_0x8c);
+    BrVector3Add((br_vector3*)mat.m[3], &original_pos, (br_vector3*)mat.m[3]);
+    BrMatrix34LPNormalise(character_matrix, &mat);
+    if (!keep_direction) {
+        SetCharacterBonePositions(pPed, 3, 0);
+    }
 }
 
 #ifdef REC2_MATCHING
