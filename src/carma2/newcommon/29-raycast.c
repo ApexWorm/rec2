@@ -336,19 +336,19 @@ int C2_HOOK_FASTCALL DRModelPick2D_raycast(br_model* pModel, br_material* pMater
             DRVector2AccumulateScale__raycast(&map, &V11MODEL(pModel)->groups[group].vertices[fp->vertices[0]].map, 1.0f - (s_alpha + s_beta));
             v = 0;
             e = 1;
-            if (s_alpha <= s_beta) {
-                if (0.5 - s_beta / 2.0 > s_alpha) {
-                    e = 0;
-                }
-                if (1.0 - s_beta * 2.0 < s_alpha) {
-                    v = 1;
-                }
-            } else {
+            if (s_alpha > s_beta) {
                 if (1.0 - s_beta * 2.0 > s_alpha) {
                     e = 2;
                 }
                 if (0.5 - s_beta / 2.0 < s_alpha) {
                     v = 2;
+                }
+            } else {
+                if (0.5 - s_beta / 2.0 > s_alpha) {
+                    e = 0;
+                }
+                if (1.0 - s_beta * 2.0 < s_alpha) {
+                    v = 1;
                 }
             }
             r = pCallback(pModel, this_material, pRay_pos, pRay_dir, t, f, e, v, &p, &map, pArg);
