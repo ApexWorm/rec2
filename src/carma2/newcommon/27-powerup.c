@@ -525,11 +525,17 @@ void C2_HOOK_FASTCALL EmptyInventory(void) {
 
 // ResetPowerups
 
-// STUB: CARMA2_HW 0x004da730
-// STUB: CARMA2_SW 0x004d6c00
-// STUB: CARMA2_CHEAT 0x004e02f0
+// FUNCTION: CARMA2_HW 0x004da730
+// FUNCTION: CARMA2_SW 0x004d6c00
+// FUNCTION: CARMA2_CHEAT 0x004e02f0
 void C2_HOOK_FASTCALL CloseDownPowerUps(void) {
-    NOT_IMPLEMENTED();
+    int i;
+
+    for (i = 0; i < gNumber_of_powerups; i++) {
+        if (gPowerup_array[i].got_time != 0) {
+            LosePowerup(&gPowerup_array[i]);
+        }
+    }
 }
 
 // FUNCTION: CARMA2_HW 0x004da870
