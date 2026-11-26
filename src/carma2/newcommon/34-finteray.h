@@ -13,6 +13,8 @@
 #include "rec2_types.h"
 
 extern int gPling_materials;
+extern int gActorBoxPick_StopGroovidelics;
+extern tFace_ref* gPling_face;
 extern br_scalar gNearest_T;
 extern int gTemp_group;
 
@@ -72,15 +74,15 @@ extern void C2_HOOK_FASTCALL FillInBounds(tBounds* pBounds);
 
 extern int C2_HOOK_FASTCALL ActorBoxPick(tBounds* bnds, br_actor* ap, br_model* model, br_material* material, tFace_ref* face_list, int max_face, br_matrix34* pMat, tWorld_callbacks* pWorld_callbacks);
 
-// ModelPickBox
+extern int C2_HOOK_FASTCALL ModelPickBox(br_actor* actor, tBounds* bnds, br_model* model, br_material* model_material, tFace_ref* face_list, int max_face, br_matrix34* pMat);
 
-// ClipToPlaneGE
+extern void C2_HOOK_FASTCALL ClipToPlaneGE(br_scalar limit, br_vector3* p, int* nv, int i);
 
-// ClipToPlaneLE
+extern void C2_HOOK_FASTCALL ClipToPlaneLE(br_scalar limit, br_vector3* p, int* nv, int i);
 
 // BoundsOverlapTest
 
-// BoundsTransformTest
+extern int C2_HOOK_FASTCALL BoundsTransformTest(br_bounds* b1, br_bounds* b2, br_matrix34* M);
 
 extern int C2_HOOK_FASTCALL LineBoxColl(br_vector3* pStart, br_vector3* pEnd, br_bounds* pBounds, br_vector3* pPoint, br_scalar* pT);
 
