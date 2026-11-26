@@ -562,7 +562,7 @@ extern void C2_HOOK_FASTCALL StopCharacterMorphing(tPed_character_instance* pCha
 
 // MungeCharacterAnimation
 
-// SetOnGroundVector
+extern void C2_HOOK_FASTCALL SetOnGroundVector(tPed_character_instance* pCharacter, br_vector3* pPos, br_vector3* pNew_pos);
 
 // ResetAnimation
 

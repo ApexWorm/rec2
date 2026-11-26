@@ -17,6 +17,7 @@
 #include "23-piping.h"
 #include "27-powerup.h"
 #include "28-world3.h"
+#include "29-raycast.h"
 #include "30-opponent.h"
 #include "32-spark.h"
 
@@ -3124,7 +3125,12 @@ void C2_HOOK_FASTCALL StopCharacterMorphing(tPed_character_instance* pCharacter)
 
 // MungeCharacterAnimation
 
-// SetOnGroundVector
+inline void C2_HOOK_FASTCALL SetOnGroundVector(tPed_character_instance* pCharacter, br_vector3* pPos, br_vector3* pNew_pos) {
+    br_scalar y;
+
+    y = FindYVerticallyBelow2(pPos);
+    BrVector3Set(pNew_pos, pPos->v[0], y + pCharacter->personality->moves[pCharacter->field_0x7].grounding_offset, pPos->v[2]);
+}
 
 // ResetAnimation
 
@@ -3166,11 +3172,68 @@ void C2_HOOK_FASTCALL SetCharacterDirection(tPed_character_instance* pPed, const
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x0040b0a0
-// STUB: CARMA2_SW 0x0040b090
-// STUB: CARMA2_CHEAT 0x0040b110
+// FUNCTION: CARMA2_HW 0x0040b0a0
+// FUNCTION: CARMA2_SW 0x0040b090
+// FUNCTION: CARMA2_CHEAT 0x0040b110
 void C2_HOOK_FASTCALL SetCharacterPosition(tPed_character_instance* pCharacter, br_vector3* pPos, int pArg3) {
-    NOT_IMPLEMENTED();
+    tPed_personality* personality;
+    tPed_move* move;
+    br_matrix34* mat;
+    br_vector3 new_pos;
+    br_vector3 delta;
+    int i;
+    int mode;
+
+    if ((pCharacter->field_0x14 & 0x4) && !gAction_replay_mode) {
+        return;
+    }
+    personality = pCharacter->personality;
+    if (pCharacter->field_0x7 >= 0) {
+        move = pCharacter->personality->form->moves[pCharacter->field_0x7].move;
+    } else {
+        move = NULL;
+    }
+    if (pCharacter->field_0x1c >= 0) {
+        mode = pArg3;
+    } else {
+        mode = -1;
+    }
+    switch (mode) {
+    case -1:
+        new_pos = *pPos;
+        break;
+    case 0:
+        SetOnGroundVector(pCharacter, pPos, &new_pos);
+        break;
+    case 1:
+        BrVector3Set(&new_pos, pPos->v[0], pPos->v[1] + pCharacter->personality->moves[pCharacter->field_0x7].grounding_offset, pPos->v[2]);
+        break;
+    }
+    mat = GetCharacterMatrixPtr(pCharacter);
+    BrVector3Set(&delta, 0.f, 0.f, 0.f);
+    if (move != NULL && move->field_0x2a == 0) {
+        for (i = pCharacter->field_0x1c; i > 0; i--) {
+            BrVector3Accumulate(&delta, (br_vector3*)move->frames[i].mat.m[3]);
+        }
+        if (!(move->looping_reset_flags & 0x1)) {
+            delta.v[0] = 0.f;
+        }
+        if (!(move->looping_reset_flags & 0x2)) {
+            delta.v[1] = 0.f;
+        }
+        if (!(move->looping_reset_flags & 0x4)) {
+            delta.v[2] = 0.f;
+        }
+    }
+    BrVector3Copy((br_vector3*)mat->m[3], &new_pos);
+    if (!gAction_replay_mode) {
+        BrVector3Scale(&delta, &delta, personality->moves[pCharacter->field_0x7].scale_factor);
+        BrVector3Accumulate((br_vector3*)mat->m[3], &delta);
+    }
+    if ((pCharacter->field_0x14 & 0x1) && !gAction_replay_mode) {
+        BrMatrix34Copy(&pCharacter->personality->form->simple_physicing[(tS8)pCharacter->field_0x5].collision_info->transform_matrix, mat);
+    }
+    SetCharacterBonePositions(pCharacter, 0, 0);
 }
 
 #ifdef REC2_MATCHING
