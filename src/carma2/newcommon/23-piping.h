@@ -163,7 +163,7 @@ extern void C2_HOOK_FASTCALL DoSmudge(tPipe_chunk** pChunk, int pDir);
 
 // CarTimeout
 
-// ScanCarsPositions
+extern void C2_HOOK_FASTCALL ScanCarsPositions(tCar_spec* pCar, br_vector3* pSource_pos, br_scalar pMax_distance_sqr, tU32 pOffset_time, tU32 pTime_period, br_vector3* pCar_pos, tU32* pTime_returned);
 
 // InitialiseActionReplay
 
