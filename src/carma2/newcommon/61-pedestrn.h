@@ -522,9 +522,9 @@ extern int C2_HOOK_FASTCALL MakeCharacterRenderable(tPed_character_instance* pCh
 
 // CalcCollisionObjectThings
 
-// SetCollisionObject
+extern int C2_HOOK_FASTCALL SetCollisionObject(tPed_character_instance* pCharacter, tPhysics_object* pObject, br_actor* pActor, br_bounds3* pBounds, int pArg5, int pArg6, int pArg7, int pArg8, int pArg9, int pArg10, int pArg11);
 
-// FindAndSetSeveredPhysicsSet
+extern int C2_HOOK_FASTCALL FindAndSetSeveredPhysicsSet(tPed_character_instance* pCharacter);
 
 // SetSeveredLimbObject
 
@@ -538,9 +538,9 @@ extern int C2_HOOK_FASTCALL CharacterNoLongerCollideworthy(tPed_character_instan
 
 extern void C2_HOOK_FASTCALL SetObjectV(tPhysics_object* pObject, const br_vector3* pV);
 
-// SetObjectOmega
+extern void C2_HOOK_FASTCALL SetObjectOmega(tPhysics_object* pObject, const br_vector3* pOmega);
 
-extern void C2_HOOK_FASTCALL MakePartPhysicallyActive(tPhysics_object* pObject, const br_vector3* pV);
+extern void C2_HOOK_FASTCALL MakePartPhysicallyActive(tPhysics_object* pObject, const br_vector3* pV, const br_vector3* pOmega, int pArg4);
 
 extern void C2_HOOK_FASTCALL TurnPhysicsOn(tPed_character_instance* pCharacter);
 

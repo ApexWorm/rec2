@@ -2893,11 +2893,59 @@ int C2_HOOK_FASTCALL MakeCharacterRenderable(tPed_character_instance* pCharacter
 
 // CalcCollisionObjectThings
 
-// SetCollisionObject
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
 
-// FindAndSetSeveredPhysicsSet
+// STUB: CARMA2_HW 0x004085f0
+// STUB: CARMA2_SW 0x004085f0
+// STUB: CARMA2_CHEAT 0x004085f0
+int C2_HOOK_FASTCALL SetCollisionObject(tPed_character_instance* pCharacter, tPhysics_object* pObject, br_actor* pActor, br_bounds3* pBounds, int pArg5, int pArg6, int pArg7, int pArg8, int pArg9, int pArg10, int pArg11) {
+    NOT_IMPLEMENTED();
+}
 
-// SetSeveredLimbObject
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
+
+inline int C2_HOOK_FASTCALL FindAndSetSeveredPhysicsSet(tPed_character_instance* pCharacter) {
+    tPed_form* form;
+    tPed_form_boned_phys* boned;
+    int i;
+
+#ifdef REC2_CHEAT
+    if (gAction_replay_mode) {
+        PDFatalError("Spam spam spam spam!");
+    }
+#endif
+    if (pCharacter->field_0x6 < 0) {
+        form = pCharacter->personality->form;
+        for (i = 0, boned = form->boned_physicing; i < form->max_boned_physicing_at_once; i++, boned++) {
+            if (!boned->field_0x0) {
+                break;
+            }
+        }
+        if (i == form->max_boned_physicing_at_once) {
+            return 0;
+        }
+        pCharacter->field_0x6 = i;
+        boned->field_0x0 = 1;
+    }
+    return 1;
+}
+
+tPhysics_object* C2_HOOK_FASTCALL SetSeveredLimbObject(tPed_character_instance* pCharacter, int pBone_index, int pArg3, int pArg4) {
+    tPed_form_boned_phys* boned;
+    br_actor* actor;
+
+    boned = &pCharacter->personality->form->boned_physicing[pCharacter->field_0x6];
+    actor = pCharacter->personality->form->actor_sets[pCharacter->field_0x4].actors[pBone_index];
+    if (SetCollisionObject(pCharacter, boned->collision_infos[pBone_index], actor, &actor->model->bounds, 0, 3, pArg3, pArg4, 0, 0, 0)) {
+        return boned->collision_infos[pBone_index];
+    } else {
+        return NULL;
+    }
+}
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
@@ -2956,18 +3004,31 @@ int C2_HOOK_FASTCALL CharacterNoLongerCollideworthy(tPed_character_instance* pCh
 
 // FUNCTION: CARMA2_HW 0x00409300
 // FUNCTION: CARMA2_SW 0x00409300
+// FUNCTION: CARMA2_CHEAT 0x00409350
 void C2_HOOK_FASTCALL SetObjectV(tPhysics_object* pObject, const br_vector3* pV) {
     tPhysics_object* child;
 
+    child = pObject->child;
     BrVector3Copy(&pObject->v, pV);
-    for (child = pObject->child; child != NULL; child = child->next) {
+    for (; child != NULL; child = child->next) {
         SetObjectV(child, pV);
     }
 }
 
-// SetObjectOmega
+// FUNCTION: CARMA2_HW 0x0040ba80
+// FUNCTION: CARMA2_SW 0x0040ba70
+// FUNCTION: CARMA2_CHEAT 0x0040bb20
+inline void C2_HOOK_FASTCALL SetObjectOmega(tPhysics_object* pObject, const br_vector3* pOmega) {
+    tPhysics_object* child;
 
-inline void C2_HOOK_FASTCALL MakePartPhysicallyActive(tPhysics_object* pObject, const br_vector3* pV) {
+    child = pObject->child;
+    BrVector3Copy(&pObject->omega, pOmega);
+    for (; child != NULL; child = child->next) {
+        SetObjectOmega(child, pOmega);
+    }
+}
+
+inline void C2_HOOK_FASTCALL MakePartPhysicallyActive(tPhysics_object* pObject, const br_vector3* pV, const br_vector3* pOmega, int pArg4) {
 
 #ifdef REC2_CHEAT
     if (gAction_replay_mode) {
@@ -2978,7 +3039,10 @@ inline void C2_HOOK_FASTCALL MakePartPhysicallyActive(tPhysics_object* pObject, 
     if (pV != NULL) {
         SetObjectV(pObject, pV);
     }
-    PHILMakeObjectActive(pObject, NULL, NULL, 1);
+    if (pOmega != NULL) {
+        SetObjectOmega(pObject, pOmega);
+    }
+    PHILMakeObjectActive(pObject, NULL, NULL, pArg4);
     pObject->field_0xed = 1;
     PHILSetObjectProperty(pObject, 0, 1.0);
     PHILSetObjectProperty(pObject, 3, 0);
@@ -2990,7 +3054,7 @@ inline void C2_HOOK_FASTCALL TurnPhysicsOn(tPed_character_instance* pCharacter) 
     tPhysics_object* object;
 
     object = (pCharacter->field_0x14 & 0x1) ? pCharacter->personality->form->simple_physicing[(tS8)pCharacter->field_0x5].collision_info : GetRootObject(pCharacter);
-    MakePartPhysicallyActive(object, &pCharacter->field_0xd8);
+    MakePartPhysicallyActive(object, &pCharacter->field_0xd8, NULL, 1);
     pCharacter->field_0x14 |= 0x4;
 }
 
@@ -3289,11 +3353,38 @@ int C2_HOOK_FASTCALL BonerActiveHalted(tPed_character_instance* pCharacter) {
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x0040b860
-// STUB: CARMA2_SW 0x0040b850
-// STUB: CARMA2_CHEAT 0x0040b8e0
+// FUNCTION: CARMA2_HW 0x0040b860
+// FUNCTION: CARMA2_SW 0x0040b850
+// FUNCTION: CARMA2_CHEAT 0x0040b8e0
 int C2_HOOK_FASTCALL DismemberCharacter(tPed_character_instance* pCharacter, int pBone_index, br_vector3* pVelocity, br_vector3* pAngular_velocity) {
-    NOT_IMPLEMENTED();
+    br_vector3 omega;
+    tPhysics_object* object;
+
+    if (!(pCharacter->field_0xc & gPow2_array[pBone_index]) && FindAndSetSeveredPhysicsSet(pCharacter)) {
+        if (pAngular_velocity == NULL) {
+            BrVector3Set(&omega, SRandomPosNeg(1.f), SRandomPosNeg(1.f), SRandomPosNeg(1.f));
+        } else {
+            BrVector3Copy(&omega, pAngular_velocity);
+        }
+        object = SetSeveredLimbObject(pCharacter, pBone_index, 1, 1);
+        if (object != NULL) {
+            pCharacter->field_0xc |= gPow2_array[pBone_index];
+            if (object->parent != NULL) {
+                object->parent->child = NULL;
+                object->parent = NULL;
+            }
+            object->child = NULL;
+            object->physics_joint1 = NULL;
+            if (pCharacter->field_0x14 & 0x4) {
+                if (pVelocity == NULL) {
+                    pVelocity = &pCharacter->field_0xd8;
+                }
+                MakePartPhysicallyActive(object, pVelocity, &omega, 0);
+            }
+            return 1;
+        }
+    }
+    return 0;
 }
 
 #ifdef REC2_MATCHING
