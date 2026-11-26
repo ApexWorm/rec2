@@ -1041,7 +1041,12 @@ void C2_HOOK_FASTCALL ReadSoundSpec(FILE* pF, tSpecial_volume_soundfx_data* pSpe
 
 // DoAnEnvironmentalSound
 
-// DoEnvSound
+// STUB: CARMA2_HW 0x00456af0
+// STUB: CARMA2_SW 0x00456880
+// STUB: CARMA2_CHEAT 0x00456f70
+void C2_HOOK_FASTCALL DoEnvSound(tSpecial_volume* pVolume, br_vector3* pP, tSpecial_volume_soundfx_type pType, tSpecial_volume_soundfx_data* pSound_data, float pSound_dist, br_vector3* pSound_dir) {
+    NOT_IMPLEMENTED();
+}
 
 // FoundSoundSource
 

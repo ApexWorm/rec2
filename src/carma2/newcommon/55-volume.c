@@ -56,11 +56,97 @@ tSpecial_volume* C2_HOOK_FASTCALL GetDefaultSpecialVolumeForWater(void) {
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x004ff120
-// STUB: CARMA2_SW 0x004faa00
-// STUB: CARMA2_CHEAT 0x00504dc0
+// FUNCTION: CARMA2_HW 0x004ff120
+// FUNCTION: CARMA2_SW 0x004faa00
+// FUNCTION: CARMA2_CHEAT 0x00504dc0
 tSpecial_volume* C2_HOOK_FASTCALL FindSpecialVolume(br_vector3* pP, tSpecial_volume* pLast_vol, int pArg3) {
-    NOT_IMPLEMENTED();
+    int i;
+    int j;
+    tSpecial_volume* v;
+    tSpecial_volume* result;
+    tSpecial_volume* sound_volume;
+    tSpecial_volume* containing_volume;
+    float sound_dist;
+    float dist;
+    float fartest_dist;
+    int bnds_axis;
+    int fartest_bnds_axis;
+    int axis;
+    br_vector3 sound_dir;
+    br_vector3 pnt_norm;
+
+    result = NULL;
+    for (i = 0, v = gProgram_state.special_volumes; i < gProgram_state.special_volume_count && (result == NULL || pArg3); i++, v++) {
+        containing_volume = NULL;
+        sound_volume = NULL;
+        sound_dist = 1e7f;
+        switch (v->boundary_type) {
+        case eFx_boundary_box:
+            if (pP->v[0] > v->boundary.box.bounds.min.v[0]
+                    && pP->v[0] < v->boundary.box.bounds.max.v[0]
+                    && pP->v[2] > v->boundary.box.bounds.min.v[2]
+                    && pP->v[2] < v->boundary.box.bounds.max.v[2]
+                    && pP->v[1] > v->boundary.box.bounds.min.v[1]
+                    && pP->v[1] < v->boundary.box.bounds.max.v[1]) {
+                BrMatrix34ApplyP(&pnt_norm, pP, &v->boundary.box.inv_mat);
+                fartest_dist = 0.f;
+                for (j = 0; j < 3; j++) {
+                    if (pnt_norm.v[j] < -1.f) {
+                        dist = -1.f - pnt_norm.v[j];
+                        bnds_axis = j + 3;
+                    } else if (pnt_norm.v[j] > 1.f) {
+                        dist = pnt_norm.v[j] - 1.f;
+                        bnds_axis = j;
+                    } else {
+                        dist = 0.f;
+                    }
+                    if (dist > fartest_dist) {
+                        fartest_dist = dist;
+                        fartest_bnds_axis = bnds_axis;
+                    }
+                }
+                if (fartest_dist == 0.f || v->soundfx_type == kSoundFx_None) {
+                    if (fartest_dist == 0.f) {
+                        containing_volume = v;
+                    }
+                } else {
+                    axis = fartest_bnds_axis % 3;
+                    fartest_dist /= v->boundary.box.axis_length.v[axis];
+                    if (1e7f > fartest_dist) {
+                        sound_dir.v[0] = v->boundary.box.mat.m[axis][0] * (float)(fartest_bnds_axis >= 3 ? -1 : 1);
+                        sound_volume = v;
+                        sound_dir.v[1] = v->boundary.box.mat.m[axis][1] * (float)(fartest_bnds_axis >= 3 ? -1 : 1);
+                        sound_dist = fartest_dist;
+                        sound_dir.v[2] = v->boundary.box.mat.m[axis][2] * (float)(fartest_bnds_axis >= 3 ? -1 : 1);
+                    }
+                }
+            }
+            break;
+        case eFx_boundary_plane:
+            dist = DistanceFromFaceND(pP, (br_vector3*)v->boundary.plane.v, v->boundary.plane.v[3]);
+            if (dist < 0.f) {
+                containing_volume = v;
+            } else if (dist < 1e7f && v->soundfx_type != kSoundFx_None) {
+                sound_dist = dist;
+                BrVector3Copy(&sound_dir, (br_vector3*)v->boundary.plane.v);
+                sound_volume = v;
+            }
+            break;
+        default:
+            break;
+        }
+        if (containing_volume != NULL) {
+            sound_dist = 0.f;
+            sound_volume = containing_volume;
+            if (result == NULL) {
+                result = containing_volume;
+            }
+        }
+        if (pArg3 && sound_volume != NULL && sound_dist < 10.f) {
+            DoEnvSound(sound_volume, pP, sound_volume->soundfx_type, &sound_volume->soundfx_data, sound_dist, &sound_dir);
+        }
+    }
+    return result;
 }
 
 #ifdef REC2_MATCHING
