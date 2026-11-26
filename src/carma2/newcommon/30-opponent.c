@@ -480,9 +480,34 @@ int C2_HOOK_FASTCALL SearchForSection(tRoute_section* pRoute, tRoute_section* pB
     return 0;
 }
 
-// UpdatePlayersSection
+static inline void C2_HOOK_FASTCALL UpdatePlayersSection(tCar_spec* pPursuee, int pForce) {
+    br_vector3 section_v;
+    br_vector3 intersect;
+    br_scalar distance;
 
-// AllowForDecel
+    if (pForce || pPursuee->field_0x155c < 0 || gTime_stamp_for_this_munging > pPursuee->field_0x1540) {
+        pPursuee->field_0x1540 = gTime_stamp_for_this_munging + IRandomBetween(-100, 100) + 1000;
+        pPursuee->field_0x155c = FindNearestPathSection(&pPursuee->car_master_actor->t.t.translate.t, &section_v, &intersect, &distance);
+    }
+}
+
+static inline int C2_HOOK_FASTCALL AllowForDecel(tOpponent_spec* pOpponent_spec, int pSection_index, br_vector3* pPos) {
+    br_scalar decel_distance;
+    br_scalar distance;
+    br_vector3 tv;
+
+    decel_distance = (100.f - BrVector3LengthSquared(&pOpponent_spec->car_spec->collision_info->v)) / -16.f / WORLD_SCALE_D;
+    if (decel_distance > 0.f) {
+        BrVector3Sub(&tv, &gProgram_state.AI_vehicles.path_nodes[(tS16)gProgram_state.AI_vehicles.path_sections[pSection_index].node_indices[pOpponent_spec->next_sections[pSection_index].direction]].pos, pPos);
+        distance = BrVector3Length(&tv);
+        while (pSection_index < pOpponent_spec->nnext_sections - 1 && distance < decel_distance) {
+            decel_distance -= distance;
+            pSection_index++;
+            distance = gProgram_state.AI_vehicles.path_sections[pOpponent_spec->next_sections[pSection_index].section_no].length;
+        }
+    }
+    return pSection_index;
+}
 
 // FUNCTION: CARMA2_HW 0x004ab100
 // FUNCTION: CARMA2_SW 0x004a7270
@@ -508,11 +533,89 @@ int C2_HOOK_FASTCALL ShiftOpponentsProjectedRoute(tOpponent_spec* pOpponent_spec
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x004ac9e0
-// STUB: CARMA2_SW 0x004a8b50
-// STUB: CARMA2_CHEAT 0x004aded0
+// FUNCTION: CARMA2_HW 0x004ac9e0
+// FUNCTION: CARMA2_SW 0x004a8b50
+// FUNCTION: CARMA2_CHEAT 0x004aded0
 void C2_HOOK_FASTCALL NewCalcGetNearPlayerRoute(tOpponent_spec* pOpponent_spec, tCar_spec* pPursuee, int pForce) {
-    NOT_IMPLEMENTED();
+    int fuck_it;
+    br_vector3 intersect;
+    tRoute_section temp_store[10];
+    int i;
+    br_vector3 section_v;
+    tRoute_section perm_store[10];
+    int sections_to_copy;
+    tS16 section_no;
+    int section_index;
+    br_vector3 tv;
+    br_scalar distance;
+    int num_of_perm_store_sections;
+
+    fuck_it = 0;
+    if (pOpponent_spec->nnext_sections >= (int)REC2_ASIZE(pOpponent_spec->next_sections)) {
+        return;
+    }
+    UpdatePlayersSection(pPursuee, 0);
+    if (pPursuee->field_0x155c < 0) {
+        PDEnterDebugger("No path section near player. THIS CAN'T HAPPEN!");
+        return;
+    }
+    if (pOpponent_spec->nnext_sections == 0) {
+        pForce = 1;
+    }
+    if (pForce || pPursuee->field_0x155c != pOpponent_spec->players_section_when_last_calced_full_path) {
+        section_no = FindNearestPathSection(&pOpponent_spec->car_spec->car_master_actor->t.t.translate.t, &section_v, &intersect, &distance);
+        if (section_no < 0) {
+            PDEnterDebugger("No path section near us. THIS CAN'T HAPPEN!");
+            return;
+        }
+        section_index = -1;
+        for (i = 0; i < pOpponent_spec->nnext_sections; i++) {
+            if ((pOpponent_spec->next_sections[i].section_no = section_no) != 0) {
+                section_index = i;
+                break;
+            }
+        }
+        if (section_index >= 0) {
+            ShiftOpponentsProjectedRoute(pOpponent_spec, AllowForDecel(pOpponent_spec, section_index, &intersect));
+        } else {
+            ClearOpponentsProjectedRoute(pOpponent_spec);
+            BrVector3Sub(&tv, &intersect, &pOpponent_spec->car_spec->car_master_actor->t.t.translate.t);
+            AddToOpponentsProjectedRoute(pOpponent_spec, section_no, BrVector3Dot(&tv, (br_vector3*)pOpponent_spec->car_spec->car_master_actor->t.t.mat.m[2]) >= 0.f);
+        }
+    }
+    while (pOpponent_spec->nnext_sections < (int)REC2_ASIZE(pOpponent_spec->next_sections) && !fuck_it) {
+        temp_store[0].section_no = pOpponent_spec->next_sections[pOpponent_spec->nnext_sections - 1].section_no;
+        temp_store[0].direction = pOpponent_spec->next_sections[pOpponent_spec->nnext_sections - 1].direction;
+        gRoute_search_calls = 0;
+        gRoute_search_attempts++;
+        SearchForSection(temp_store, perm_store, &num_of_perm_store_sections, pPursuee->field_0x155c, 1, 0.f, pOpponent_spec);
+        gRoute_search_total_calls += gRoute_search_calls;
+        if (gRoute_search_calls > gRoute_search_max_calls) {
+            gRoute_search_max_calls = gRoute_search_calls;
+        }
+        if (num_of_perm_store_sections > 1) {
+            sections_to_copy = MIN(num_of_perm_store_sections - 1, (int)REC2_ASIZE(pOpponent_spec->next_sections) - pOpponent_spec->nnext_sections);
+            memcpy(&pOpponent_spec->next_sections[pOpponent_spec->nnext_sections], &perm_store[1], sections_to_copy * sizeof(tRoute_section));
+            pOpponent_spec->nnext_sections += sections_to_copy;
+            if (pOpponent_spec->next_sections[pOpponent_spec->nnext_sections].section_no == pPursuee->field_0x155c) {
+                if (gOpponents[pOpponent_spec->index].strength_rating < 5) {
+                    TopUpRandomRoute(pOpponent_spec, IRandomBetween(1, 2));
+                } else {
+                    TopUpRandomRoute(pOpponent_spec, 1);
+                }
+            }
+        } else {
+            fuck_it = 1;
+            if (pOpponent_spec->nnext_sections < (int)REC2_ASIZE(pOpponent_spec->next_sections)) {
+                if (gOpponents[pOpponent_spec->index].strength_rating < 5) {
+                    TopUpRandomRoute(pOpponent_spec, 4);
+                } else {
+                    TopUpRandomRoute(pOpponent_spec, 2);
+                }
+            }
+        }
+    }
+    pOpponent_spec->players_section_when_last_calced_full_path = pPursuee->field_0x155c;
 }
 
 #ifdef REC2_MATCHING
