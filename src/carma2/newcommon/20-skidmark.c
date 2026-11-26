@@ -8,6 +8,7 @@
 
 #include "20-skidmark.h"
 
+#include "23-piping.h"
 #include "41-utility.h"
 #include "52-errors.h"
 #include "63-loading3.h"
@@ -59,7 +60,7 @@ int gINT_006a32e0 = 0;
 
 // GLOBAL: CARMA2_HW 0x006a27e8
 // GLOBAL: CARMA2_SW 0x0069c840
-int gCurrent_skid;
+tU16 gCurrent_skid = 0;
 
 // FUNCTION: CARMA2_HW 0x004ea2c0
 // FUNCTION: CARMA2_SW 0x004e6060
@@ -221,11 +222,47 @@ void C2_HOOK_FASTCALL HideSkids(void) {
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x004e9f20
-// STUB: CARMA2_SW 0x004e5cc0
-int C2_HOOK_FASTCALL SkidSection(tS16* pSkid_id, br_vector3* pSkid_start, br_vector3* pSkid_end, br_material* pMaterial, br_vector3* pPos, br_vector3* pNorm, br_vector3* pPrev_pos, br_vector3* pPrev_norm, br_scalar pTexture_start, br_scalar pTexture_step) {
+// FUNCTION: CARMA2_HW 0x004e9f20
+// FUNCTION: CARMA2_SW 0x004e5cc0
+// FUNCTION: CARMA2_CHEAT 0x004efbc0
+int C2_HOOK_FASTCALL SkidSection(tU16* pSkid_id, br_vector3* pSkid_start, br_vector3* pSkid_end, br_material* pMaterial, br_vector3* pPos, br_vector3* pNorm, br_vector3* pPrev_pos, br_vector3* pPrev_norm, br_scalar pTexture_start, br_scalar pTexture_step) {
+    br_scalar tmp;
+    br_scalar t1x;
+    br_scalar t1z;
+    br_scalar t2x;
+    br_scalar t2z;
 
-    NOT_IMPLEMENTED();
+    if (BrVector3Dot(pNorm, pPrev_norm) < 0.997f || fabs(BrVector3Dot(pNorm, pPos) - BrVector3Dot(pPrev_pos, pNorm)) > 0.01f) {
+        *pSkid_id = -1;
+        return 1;
+    }
+    if (*pSkid_id < REC2_ASIZE(gSkids) && gSkids[*pSkid_id].actor->material == pMaterial) {
+        tmp = BrVector3LengthSquared((br_vector3*)gSkids[*pSkid_id].actor->t.t.mat.m[2]);
+        if (tmp < 2.f * (pTexture_step * pTexture_step) && pTexture_step * pTexture_step <= 2.f * tmp) {
+            if (BrVector3Length((br_vector3*)gSkids[*pSkid_id].actor->t.t.mat.m[0]) <= 0.5f) {
+                t1x = pSkid_end->v[0] - pSkid_start->v[0];
+                t1z = pSkid_end->v[2] - pSkid_start->v[2];
+                t2x = pPos->v[0] - pSkid_end->v[0];
+                t2z = pPos->v[2] - pSkid_end->v[2];
+                if (fabs(t1z * t2x - t1x * t2z) <= 0.05f * sqrt(t1x * t1x + t1z * t1z)
+                    && (pPos->v[0] - pPrev_pos->v[0]) * (pPrev_pos->v[0] - pSkid_start->v[0]) + (pPos->v[2] - pPrev_pos->v[2]) * (pPrev_pos->v[2] - pSkid_start->v[2]) >= 0.f) {
+                    StretchMark(&gSkids[*pSkid_id], pSkid_start, pPos, pTexture_start, pTexture_step);
+                    PipeSingleSkidAdjustment(*pSkid_id, &gSkids[*pSkid_id].actor->t.t.mat, pMaterial);
+                    return 0;
+                }
+            }
+        }
+    }
+    BrVector3Copy(pSkid_start, pPrev_pos);
+    BrVector3Copy(pSkid_end, pPos);
+    gSkids[gCurrent_skid].actor->render_style = BR_RSTYLE_DEFAULT;
+    gSkids[gCurrent_skid].actor->material = pMaterial;
+    BrVector3Copy(&gSkids[gCurrent_skid].normal, pNorm);
+    StretchMark(&gSkids[gCurrent_skid], pPrev_pos, pPos, pTexture_start, pTexture_step);
+    PipeSingleSkidAdjustment(gCurrent_skid, &gSkids[gCurrent_skid].actor->t.t.mat, pMaterial);
+    *pSkid_id = gCurrent_skid;
+    gCurrent_skid = (gCurrent_skid + 1) % 100;
+    return 0;
 }
 
 #ifdef REC2_MATCHING

@@ -3023,7 +3023,7 @@ typedef struct tCar_spec {
     tU32 last_bounce;
     int new_skidding;
     int old_skidding;
-    tS16 old_skid[4];
+    tU16 old_skid[4];
     br_vector3 special_start[4];
     br_vector3 prev_skid_pos[4];
     br_vector3 field_0x160c[4];
