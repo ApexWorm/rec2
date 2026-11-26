@@ -121,9 +121,9 @@ extern int C2_HOOK_FASTCALL ResetFoxModelCallback(br_model* pModel);
 
 extern int C2_HOOK_FASTCALL ResetFoxLighting(br_material* pMaterial);
 
-// CancelAlternateFoxEffect
+extern void C2_HOOK_FASTCALL CancelAlternateFoxEffect(tCar_spec* pCar_spec);
 
-// SetFoxLighting
+extern int C2_HOOK_FASTCALL SetFoxLighting(br_material* pMaterial);
 
 // SetupAlternateFoxEffect
 #endif
@@ -244,13 +244,19 @@ extern intptr_t C2_HOOK_CDECL ForEveryActorMaterial(br_actor* pActor, void* pCon
 
 extern intptr_t C2_HOOK_CDECL ForEveryActorMaterialNoGrooves(br_actor* pActor, void* pContext);
 
+#ifdef REC2_SW
+extern void C2_HOOK_FASTCALL UnFoxifyModel(br_model *pModel);
+
+extern intptr_t C2_HOOK_CDECL UnFoxifyModelCB(br_actor* pActor, void* pContext);
+#endif
+
 extern void C2_HOOK_FASTCALL ForEveryCarMaterial(tCar_spec* pCar_spec, tMaterialMaybeUpdate_cbfn* pCallback, int pGrooves);
 
 // ForEveryCarModelCB
 
 extern intptr_t C2_HOOK_CDECL ForEveryCarModelCB(br_actor* pActor, void *pContext);
 
-// ForEveryCarModel
+extern void C2_HOOK_FASTCALL ForEveryCarModel(tCar_spec* pCar_spec, int (C2_HOOK_FASTCALL* pCallback)(br_model*), int pGrooves);
 
 extern int C2_HOOK_FASTCALL MightBlendifyMaterial(br_material* pMaterial, int pBlend_factor);
 
