@@ -114,6 +114,7 @@ int gCount_host_smashes = 0;
 
 // GLOBAL: CARMA2_HW 0x006a6d40
 // GLOBAL: CARMA2_SW 0x006a0da0
+// GLOBAL: CARMA2_CHEAT 0x006ae8b8
 tSmash_explosion gSmash_explosions[20] = { 0 };
 
 // GLOBAL: CARMA2_HW 0x006a7ce0
@@ -417,6 +418,7 @@ void C2_HOOK_FASTCALL RemoveExplosions(tCar_spec* pCar_spec) {
 
 // STUB: CARMA2_HW 0x004eb180
 // STUB: CARMA2_SW 0x004e6e60
+// STUB: CARMA2_CHEAT 0x004f0e20
 void C2_HOOK_FASTCALL ApplyInitialMovement(tMovement_spec* pSpeed_info, br_vector3* pImpactee_velocity, br_vector3* pVelocity, br_vector3* pOmega, float pScale, br_vector3* pNormal, br_vector3* pSource_position, br_vector3* pPosition) {
     NOT_IMPLEMENTED();
 }
@@ -1981,6 +1983,7 @@ float C2_HOOK_FASTCALL SmashEnvironment(tPhysics_object* pObject, undefined4* pA
 
 // STUB: CARMA2_HW 0x004f52f0
 // STUB: CARMA2_SW 0x004f0f50
+// STUB: CARMA2_CHEAT 0x004faf90
 float C2_HOOK_FASTCALL BashObject(tPhysics_object* pObject, br_actor* pActor, float pMagnitude, br_vector3* pPosition, br_vector3* pNormal, br_vector3* pForce, int pSnap, int pNetwork) {
     NOT_IMPLEMENTED();
 }
