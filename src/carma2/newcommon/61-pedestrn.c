@@ -2067,11 +2067,79 @@ void C2_HOOK_FASTCALL StopCharacterMorphing(tPed_character_instance* pCharacter)
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x004097b0
-// STUB: CARMA2_SW 0x004097b0
-// STUB: CARMA2_CHEAT 0x00409820
+// FUNCTION: CARMA2_HW 0x004097b0
+// FUNCTION: CARMA2_SW 0x004097b0
+// FUNCTION: CARMA2_CHEAT 0x00409820
 int C2_HOOK_FASTCALL MorphCharacterBonePositions(tPed_character_instance* pPed, tU32 pArg2) {
-    NOT_IMPLEMENTED();
+    tPed_personality* personality;
+    tPed_form* form;
+    tPed_form_actor_set* actor_set;
+    tPed_morph* morph;
+    br_matrix34* mat;
+    br_matrix34* parent_mat;
+    br_matrix34 rotation;
+    br_vector3 old_pos;
+    br_vector3 move;
+    br_vector3 delta;
+    int i;
+    int parent_index;
+
+    pPed->field_0xbc->field_0x0 += pPed->field_0xbc->field_0x4 * (float)pArg2;
+    if (pPed->field_0xbc->field_0x0 >= 1.0f) {
+        StopCharacterMorphing(pPed);
+        return 0;
+    }
+    personality = pPed->personality;
+    form = personality->form;
+    if (pPed->field_0x4 >= 0) {
+        actor_set = &form->actor_sets[pPed->field_0x4];
+    } else {
+        actor_set = NULL;
+    }
+    for (i = 0; i < form->count_bones; i++) {
+        parent_index = form->bones[i].indices[0];
+        if (parent_index >= 0) {
+            if (!(pPed->field_0xc & gPow2_array[i]) && !(pPed->field_0xc & gPow2_array[parent_index]) && actor_set != NULL) {
+                if (pPed->field_0xe8 != NULL) {
+#ifdef REC2_FIX_BUGS
+                    parent_mat = &pPed->field_0xe8[parent_index];
+#else
+                    parent_mat = &pPed->field_0xe8[i];
+#endif
+                } else {
+                    parent_mat = &actor_set->actors[parent_index]->t.t.mat;
+                }
+                if (pPed->field_0xe8 != NULL) {
+                    mat = &pPed->field_0xe8[i];
+                } else {
+                    mat = &actor_set->actors[i]->t.t.mat;
+                }
+                morph = pPed->field_0xbc;
+                SetBoner(pPed, mat, parent_mat, &pPed->field_0x8c,
+                    (tU8)(morph->field_0x2d[i][3] * morph->field_0x0 + morph->field_0x2d[i][0]),
+                    (tU8)(morph->field_0x2d[i][4] * morph->field_0x0 + morph->field_0x2d[i][1]),
+                    (tU8)(morph->field_0x2d[i][5] * morph->field_0x0 + morph->field_0x2d[i][2]),
+                    &personality->bones[i].field_0x20, &personality->bones[i].field_0x2c);
+            }
+        } else if (!(pPed->field_0x14 & 0x4) && !pPed->field_0xbc->field_0x2c) {
+            mat = GetCharacterMatrixPtr(pPed);
+            BrVector3Copy(&old_pos, (br_vector3*)mat->m[3]);
+            morph = pPed->field_0xbc;
+            MakeRotationMatrix(&rotation,
+                (tU8)(morph->field_0x2d[i][3] * morph->field_0x0 + morph->field_0x2d[i][0]),
+                (tU8)(morph->field_0x2d[i][4] * morph->field_0x0 + morph->field_0x2d[i][1]),
+                (tU8)(morph->field_0x2d[i][5] * morph->field_0x0 + morph->field_0x2d[i][2]));
+            BrMatrix34Mul(mat, &rotation, &pPed->field_0x8c);
+            morph = pPed->field_0xbc;
+            // FIXME: Vector3Lerp(&move, &morph->field_0x14, &morph->field_0x8, morph->field_0x0) + BrVector3Scale(&move, &move, (float)pArg2)
+            move.v[0] = (morph->field_0x8.v[0] * (1.0f - morph->field_0x0) + morph->field_0x14.v[0] * morph->field_0x0) * (float)pArg2;
+            move.v[1] = (morph->field_0x8.v[1] * (1.0f - morph->field_0x0) + morph->field_0x14.v[1] * morph->field_0x0) * (float)pArg2;
+            move.v[2] = (morph->field_0x8.v[2] * (1.0f - morph->field_0x0) + morph->field_0x14.v[2] * morph->field_0x0) * (float)pArg2;
+            BrMatrix34ApplyV(&delta, &move, &pPed->field_0x5c);
+            BrVector3Add((br_vector3*)mat->m[3], &delta, &old_pos);
+        }
+    }
+    return 1;
 }
 
 #ifdef REC2_MATCHING
