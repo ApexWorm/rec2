@@ -56,6 +56,7 @@ br_model* gForward_sky_model;
 int gDepth_cueing_on = 1;
 
 // GLOBAL: CARMA2_HW 0x00591190
+// GLOBAL: CARMA2_SW 0x0058c188
 // GLOBAL: CARMA2_CHEAT 0x00597ae8
 tDepth_effect_type gSwap_depth_effect_type = eDepth_effect_none;
 

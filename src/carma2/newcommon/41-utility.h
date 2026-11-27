@@ -15,6 +15,7 @@
 
 extern char* gMisc_strings[300];
 extern char gCurrent_load_directory[256];
+extern tMaterial_exception* gMaterial_exceptions;
 
 extern br_error C2_HOOK_FASTCALL DRBrEnd(void);
 

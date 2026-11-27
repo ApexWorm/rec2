@@ -12,6 +12,17 @@
 #include "brender/brender.h"
 #include "rec2_types.h"
 
+extern const char* gDepth_effect_names[3];
+extern tU8* gTrack_flic_buffer;
+extern tU32 gTrack_flic_buffer_size;
+extern tFlic_descriptor gTrack_flic_descriptor;
+extern br_angle gSky_image_width;
+extern br_angle gSky_image_height;
+extern br_angle gSky_image_underground;
+extern int gTrack_depth_colour_red;
+extern int gTrack_depth_colour_green;
+extern int gTrack_depth_colour_blue;
+extern tU8 gNon_car_spec_indices[100];
 extern br_actor* gAdditional_actors;
 
 extern tBrender_storage* gStorage_for_callbacks;
@@ -20,23 +31,23 @@ extern tRendererShadingType gMaterial_shading_for_callback;
 
 extern void C2_HOOK_FASTCALL InitTreeSurgery(void);
 
-// ModelIsATree
+extern int C2_HOOK_FASTCALL ModelIsATree(br_model* pModel, char* pName_replacement);
 
-// PerformTreeSurgery
+extern void C2_HOOK_FASTCALL PerformTreeSurgery(tBrender_storage* pStorage, br_model* pModel, const char* pName_replacement);
 
-// PossibleTreeSurgery
+extern void C2_HOOK_FASTCALL PossibleTreeSurgery(br_model* pModel);
 
-// AddExceptionToList
+extern void C2_HOOK_FASTCALL AddExceptionToList(tMaterial_exception** pList, tMaterial_exception* pItem);
 
-// LoadExceptionsFile
+extern void C2_HOOK_FASTCALL LoadExceptionsFile(const char* pPath);
 
-// LoadExceptionsFileForTrack
+extern void C2_HOOK_FASTCALL LoadExceptionsFileForTrack(const char* pTrack_name);
 
-// FreeExceptions
+extern void C2_HOOK_FASTCALL FreeExceptions(void);
 
-// GetFaceFlag
+extern int C2_HOOK_FASTCALL GetFaceFlag(int pIndex);
 
-// MungeTrackModel
+extern void C2_HOOK_FASTCALL MungeTrackModel(br_model* pModel);
 
 extern void C2_HOOK_FASTCALL LoadTrack(const char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_info);
 
@@ -52,7 +63,7 @@ extern void C2_HOOK_FASTCALL ProcessTrack(br_actor* pWorld, tTrack_spec* pTrack_
 
 // CombineBounds
 
-// CheckNonCarModelBounds
+extern void C2_HOOK_FASTCALL CheckNonCarModelBounds(void);
 
 extern void C2_HOOK_FASTCALL InitialiseStorageSpace(int pUnknown, tBrender_storage* pStorage_space, int pMax_pixelmaps, int pMax_shade_tables, int pMax_materials, int pMax_models, int pMax_sounds);
 

@@ -12,6 +12,11 @@
 #include "c2_hooks.h"
 #include "rec2_types.h"
 
+extern char gAdditional_model_path[256];
+extern char gAdditional_actor_path[256];
+extern br_actor* gLast_actor;
+extern br_model* gAdditional_models[1000];
+extern int gNumber_of_additional_models;
 extern int gDelete_count;
 extern br_actor* gDelete_list[500];
 
