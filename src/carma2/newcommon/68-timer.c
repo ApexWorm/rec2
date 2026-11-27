@@ -190,6 +190,7 @@ void C2_HOOK_FASTCALL Timers_EndFrame(void) {
 
 // FUNCTION: CARMA2_HW 0x00504810
 // FUNCTION: CARMA2_SW 0x00500000
+// FUNCTION: CARMA2_CHEAT 0x0050a4b0
 void C2_HOOK_FASTCALL Timers_Draw(br_pixelmap* pScreen) {
     tU32 longest_duration;
     int longest_duration_timer;
