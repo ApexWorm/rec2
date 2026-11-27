@@ -464,6 +464,7 @@ void C2_HOOK_FASTCALL DelSpecVolumeGraph(int pIndex) {
 }
 
 // FUNCTION: CARMA2_HW 0x00511140
+// FUNCTION: CARMA2_SW 0x0050c590
 // FUNCTION: CARMA2_CHEAT 0x00516b30
 void C2_HOOK_FASTCALL ShowSpecialVolumes(void) {
     int i;
