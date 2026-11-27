@@ -196,7 +196,7 @@ extern void C2_HOOK_FASTCALL WriteNewPositions(tPhysics_object* pObject);
 
 extern void C2_HOOK_FASTCALL SetListDoingNothingFlag(tPhysics_object* pObject, int pFlag);
 
-// SetGroupDoingNothingFlag
+extern void C2_HOOK_FASTCALL SetGroupDoingNothingFlag(tPhysics_object* pObject, int pFlag);
 
 extern void C2_HOOK_FASTCALL SetHierarchyDoingNothingFlag(tPhysics_object* pObject, int pFlag);
 

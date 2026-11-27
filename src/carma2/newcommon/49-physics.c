@@ -707,7 +707,19 @@ void C2_HOOK_FASTCALL SetListDoingNothingFlag(tPhysics_object* pObject, int pFla
     }
 }
 
-// SetGroupDoingNothingFlag
+// FUNCTION: CARMA2_HW 0x004b9e40
+// FUNCTION: CARMA2_SW 0x004b6560
+// FUNCTION: CARMA2_CHEAT 0x004bf970
+void C2_HOOK_FASTCALL SetGroupDoingNothingFlag(tPhysics_object* pObject, int pFlag) {
+    tPhysics_object* object;
+
+    pObject->disable_move_rotate = pFlag;
+    object = pObject;
+    do {
+        SetHierarchyDoingNothingFlag(object, pFlag);
+        object = object->field183_0x1d8;
+    } while (object != NULL && object != pObject);
+}
 
 // FUNCTION: CARMA2_HW 0x004b9ef0
 // FUNCTION: CARMA2_SW 0x004b6610
