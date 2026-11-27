@@ -504,7 +504,7 @@ extern br_actor* C2_HOOK_FASTCALL AttachedBitFromID(tCar_spec* pCar, tU8 pID);
 
 extern void C2_HOOK_FASTCALL ReceivedSemiDetachBit(tNet_message_chunk* pContents);
 
-// ReceivedDetachBit
+extern void C2_HOOK_FASTCALL ReceivedDetachBit(tNet_message_chunk* pContents);
 
 // SemiDetachedBitObjectFromID
 
