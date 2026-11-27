@@ -215,9 +215,9 @@ extern tNon_car_spec* C2_HOOK_FASTCALL GetNonCar(tCrush_info_buffer* pBuffer, br
 
 // GetNonCarObject
 
-// SetRelationsDoingNothingFlags
+extern void C2_HOOK_FASTCALL SetRelationsDoingNothingFlags(tPhysics_object* pObject, int pFlag);
 
-// SetUpDetachedBitObject
+extern void C2_HOOK_FASTCALL SetUpDetachedBitObject(tPhysics_object* pObject, br_actor* pActor, br_model* pModel, tCar_crush_detach_data* pDetach_data, tCar_crush_spec* pCar_crush, br_bounds3* pBounds, tPhysics_object* pCar_object);
 
 // SetUpSemiDetachedBitJoint
 
@@ -233,7 +233,7 @@ extern void C2_HOOK_FASTCALL MakeModelMaterialsSingleSided(br_model* pModel);
 
 extern void C2_HOOK_FASTCALL ReAttachBit(tCar_spec* pCar_spec, br_actor* pActor_arg2, br_actor* pActor_arg3, tPhysics_object* pObject);
 
-// CentreModelOnPoint
+extern void C2_HOOK_FASTCALL CentreModelOnPoint(br_model* pModel, const br_vector3* pPoint);
 
 extern tPhysics_object* C2_HOOK_FASTCALL SemiDetachBit(tCar_spec* pCar, br_actor* pActor, float pArg3, int* pArg4, br_vector3* pP1, br_bounds3* pBounds, br_vector3* pP2, br_vector3* pP3);
 

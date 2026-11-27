@@ -21,6 +21,7 @@
 #include "51-smash.h"
 #include "53-controls.h"
 #include "60-phil.h"
+#include "65-hull.h"
 #include "69-sound.h"
 #include "globvars.h"
 #include "globvrpb.h"
@@ -1622,9 +1623,115 @@ tNon_car_spec* C2_HOOK_FASTCALL GetNonCar(tCrush_info_buffer* pBuffer, br_actor*
 
 // GetNonCarObject
 
-// SetRelationsDoingNothingFlags
+inline void C2_HOOK_FASTCALL SetRelationsDoingNothingFlags(tPhysics_object* pObject, int pFlag) {
 
-// SetUpDetachedBitObject
+    while (pObject->parent != NULL) {
+        pObject = pObject->parent;
+    }
+    SetHierarchyDoingNothingFlag(pObject, pFlag);
+}
+
+// FUNCTION: CARMA2_HW 0x004336f0
+// FUNCTION: CARMA2_SW 0x00433720
+// FUNCTION: CARMA2_CHEAT 0x004338d0
+void C2_HOOK_FASTCALL SetUpDetachedBitObject(tPhysics_object* pObject, br_actor* pActor, br_model* pModel, tCar_crush_detach_data* pDetach_data, tCar_crush_spec* pCar_crush, br_bounds3* pBounds, tPhysics_object* pCar_object) {
+    tPhysics_shape* shape;
+    tUser_crush_data* user_crush;
+    br_vector3* car_bounds[2];
+    br_vector3 bb_min;
+    br_vector3 bb_max;
+    br_vector3 pos;
+    br_vector3 tv;
+    br_scalar dist;
+    br_scalar min_dist;
+    br_scalar dx2;
+    br_scalar dy2;
+    br_scalar dz2;
+    int i;
+    int nearest;
+
+    pObject->actor = pActor;
+    if (pBounds != NULL) {
+        pObject->shape->common.type = kCollisionShapeType_Box;
+        DRBoundsCopy(&pObject->shape->common.bb, pBounds);
+    } else if (pDetach_data->type == 4) {
+        shape = pObject->shape;
+        pObject->shape = (tPhysics_shape*)pCar_crush->field_0x4[pDetach_data->field_0x78].field_0x0;
+        pCar_crush->field_0x4[pDetach_data->field_0x78].field_0x0 = &shape->polyhedron;
+        pCar_crush->field_0x4[pDetach_data->field_0x78].field_0x8 = 1;
+        pCar_crush->expand_bounding_box |= 0x1;
+    } else if (pDetach_data->count_shape_points > 0) {
+        switch (NPointConvexHullUsingSample(&pObject->shape->polyhedron.polyhedron, pModel, 8, pDetach_data->count_shape_points, pDetach_data->shape_points)) {
+        case 0:
+            pObject->shape->common.type = kCollisionShapeType_Polyhedron;
+            GetBoundsFromPointList(pObject->shape->polyhedron.polyhedron.points, pObject->shape->polyhedron.polyhedron.count_points, &pObject->shape->common.bb);
+            break;
+        case 2:
+            pObject->shape->common.type = kCollisionShapeType_Wireframe_Polyhedron;
+            GetBoundsFromPointList(pObject->shape->polyhedron.polyhedron.points, pObject->shape->polyhedron.polyhedron.count_points, &pObject->shape->common.bb);
+            break;
+        default:
+            pObject->shape->common.type = kCollisionShapeType_Box;
+            DRBoundsCopy(&pObject->shape->common.bb, &pModel->bounds);
+            break;
+        }
+    } else {
+        pObject->shape->common.type = kCollisionShapeType_Box;
+        DRBoundsCopy(&pObject->shape->common.bb, &pModel->bounds);
+    }
+    DRBoundsCopy(&pObject->bb1, &pObject->shape->common.bb);
+    DRBoundsCopy(&pObject->bb2, &pObject->shape->common.bb);
+    car_bounds[0] = &pCar_object->bb1.min;
+    car_bounds[1] = &pCar_object->bb1.max;
+    user_crush = pActor->user;
+    pObject->M = user_crush->crush_data->field_0x24;
+    BrVector3Scale(&bb_min, &pObject->bb1.min, 0.5f);
+    BrVector3Scale(&bb_max, &pObject->bb1.max, 0.5f);
+    BrVector3Add(&pObject->cmpos, &bb_min, &bb_max);
+    BrMatrix34ApplyP(&pos, &pObject->cmpos, &pObject->actor->t.t.mat);
+    DrMatrix34ApplyLPInverse(&tv, &pos, &pCar_object->actor->t.t.mat);
+    nearest = 0;
+    min_dist = BR_SCALAR_MAX;
+    for (i = 0; i < 6; i++) {
+        if (i != 2) {
+            dist = (br_scalar)fabs(tv.v[i >> 1] - car_bounds[i & 1]->v[i >> 1]);
+            if (dist < min_dist) {
+                min_dist = dist;
+                nearest = i;
+            }
+        }
+    }
+    if (nearest & 1) {
+        pObject->cmpos.v[nearest >> 1] = (pObject->cmpos.v[nearest >> 1] + pObject->bb1.max.v[nearest >> 1]) * 0.5f;
+    } else {
+        pObject->cmpos.v[nearest >> 1] = (pObject->cmpos.v[nearest >> 1] + pObject->bb1.min.v[nearest >> 1]) * 0.5f;
+    }
+    dx2 = REC2_SQR(pObject->bb1.max.v[0] - pObject->bb1.min.v[0]);
+    dy2 = REC2_SQR(pObject->bb1.max.v[1] - pObject->bb1.min.v[1]);
+    dz2 = REC2_SQR(pObject->bb1.max.v[2] - pObject->bb1.min.v[2]);
+    pObject->I.v[2] = pObject->M * (dx2 + dy2) / 12.0f;
+    pObject->I.v[1] = pObject->M * (dz2 + dx2) / 12.0f;
+    pObject->I.v[0] = pObject->M * (dy2 + dz2) / 12.0f;
+    BrMatrix34ApplyV(&pos, &pCar_object->omega, &pCar_object->actor->t.t.mat);
+    BrMatrix34TApplyV(&pObject->omega, &pos, &pObject->actor->t.t.mat);
+    BrMatrix34ApplyP(&pos, &pCar_object->cmpos, &pCar_object->actor->t.t.mat);
+    DrMatrix34ApplyLPInverse(&tv, &pos, &pObject->actor->t.t.mat);
+    BrVector3Sub(&pos, &pObject->cmpos, &tv);
+    BrVector3Cross(&pObject->v, &pObject->omega, &pos);
+    BrMatrix34ApplyV(&pos, &pObject->v, &pObject->actor->t.t.mat);
+    BrVector3Add(&pObject->v, &pos, &pCar_object->v);
+    BrVector3SetFloat(&pObject->field_0x54, 0.0f, -0.4f / WORLD_SCALE, 0.0f);
+    pObject->box_face_ref = gFace_num__car - 2;
+    SetRelationsDoingNothingFlags(pObject, 0);
+    pObject->flags |= 0x100;
+    pObject->field_0x261 = 0;
+    pObject->message_time = 0;
+    pObject->field_0x49c = 1;
+    pObject->uid = user_crush->crush_data->id;
+    pObject->auto_special_volume = pCar_object->auto_special_volume;
+    pObject->last_special_volume = pCar_object->last_special_volume;
+    pObject->water_d = pCar_object->water_d;
+}
 
 // SetUpSemiDetachedBitJoint
 
@@ -1784,7 +1891,22 @@ void C2_HOOK_FASTCALL ReAttachBit(tCar_spec* pCar_spec, br_actor* pActor_arg2, b
 #pragma auto_inline(on)
 #endif
 
-// CentreModelOnPoint
+// FUNCTION: CARMA2_HW 0x00433b90
+// FUNCTION: CARMA2_SW 0x00433bc0
+// FUNCTION: CARMA2_CHEAT 0x00433d70
+void C2_HOOK_FASTCALL CentreModelOnPoint(br_model* pModel, const br_vector3* pPoint) {
+    br_vector3 centre;
+    br_vector3 offset;
+    tU16 i;
+
+    BrVector3Add(&centre, &pModel->bounds.max, &pModel->bounds.min);
+    BrVector3Scale(&centre, &centre, 0.5f);
+    BrVector3Sub(&offset, pPoint, &centre);
+    for (i = 0; i < pModel->nvertices; i++) {
+        BrVector3Accumulate(&pModel->vertices[i].p, &offset);
+    }
+    SetModelForUpdate(pModel);
+}
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
@@ -1930,11 +2052,74 @@ void C2_HOOK_FASTCALL AddNonCar(tNon_car_spec* pNon_car, const tDriver* pDriver)
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x00433350
-// STUB: CARMA2_SW 0x00433380
-// STUB: CARMA2_CHEAT 0x00433520
+// FUNCTION: CARMA2_HW 0x00433350
+// FUNCTION: CARMA2_SW 0x00433380
+// FUNCTION: CARMA2_CHEAT 0x00433530
 tPhysics_object* C2_HOOK_FASTCALL DetachBit(tCar_spec* pCar, br_actor* pActor, br_bounds3* pBounds) {
-    NOT_IMPLEMENTED();
+    tUser_crush_data* user_crush;
+    tUser_crush_data* parent_user_crush;
+    tCar_crush_detach_data* detach_data;
+    tNon_car_spec* non_car;
+    tPhysics_object* object;
+    tCar_bit_spec* bit;
+    br_vector3 centre;
+    int model_index;
+
+    if (pCar->invulnerable_no_crushage || pCar->car_crush_spec == NULL || pCar->car_crush_spec->field_0x4b8) {
+        return NULL;
+    }
+    user_crush = pActor->user;
+    if (user_crush == NULL || user_crush->crush_data == NULL) {
+        return NULL;
+    }
+    detach_data = user_crush->crush_data->detach_data;
+    if (detach_data == NULL || detach_data->field_0x28 != 0 || pCar->car_crush_spec->field_0x2b0 == REC2_ASIZE(pCar->car_crush_spec->field_0x2b4)) {
+        return NULL;
+    }
+    non_car = GetNonCar(&gDetached_bit_crush_info_buffer, pActor, pCar);
+    if (non_car == NULL) {
+        return NULL;
+    }
+    object = non_car->collision_info;
+    parent_user_crush = pActor->parent->user;
+    BrVector3Copy(&detach_data->field_0xc, &parent_user_crush->models[0]->vertices[detach_data->min_vertex].p);
+    BrVector3Copy(&detach_data->field_0x18, &parent_user_crush->models[0]->vertices[detach_data->max_vertex].p);
+    detach_data->field_0x28 = 2;
+    bit = &pCar->car_crush_spec->field_0x2b4[pCar->car_crush_spec->field_0x2b0];
+    bit->field_0x0 = pActor;
+    bit->field_0x4 = pActor->parent;
+    bit->field_0x8 = object;
+    bit->field_0xc = (undefined4*)detach_data; /* FIXME: field_0xc is a tCar_crush_detach_data* */
+    bit->field_0x10 = PDGetTotalTime();
+    pCar->car_crush_spec->field_0x2b0 += 1;
+    PipeSingleIdentity(pActor);
+    PipeSingleRelink(gNon_track_actor, pActor);
+    ActorRelink(gNon_track_actor, pActor);
+    BrMatrix34Copy(&object->transform_matrix, &pActor->t.t.mat);
+    PipeSingleNonCar((tU16)non_car->car_ID, pActor);
+    pActor->identifier[3] = '!';
+    SetUpDetachedBitObject(object, pActor, user_crush->models[0], detach_data, pCar->car_crush_spec, pBounds, pCar->collision_info);
+    object->flags |= 0x100;
+    AddNonCar(non_car, &gDetached_bit_crush_info_buffer.driver);
+    if (user_crush->groove == NULL) {
+        MakeModelMaterialsDoubleSided(user_crush->models[0]);
+        PipeSingleDSModel(1, user_crush->models[0]);
+    }
+    model_index = 0;
+    SwitchCarModel(pActor, &model_index);
+    if (pBounds != NULL) {
+        BrVector3Add(&centre, &pBounds->max, &pBounds->min);
+        BrVector3Scale(&centre, &centre, 0.5f);
+        CentreModelOnPoint(user_crush->models[0], &centre);
+    }
+    pCar->use_shell_model = 0;
+    if (user_crush->groove != NULL) {
+        DisableGroovidelic(pActor, 3);
+        PipeSingleGrooveOnOff(0, pActor, 3);
+    }
+    CompressVector3(&detach_data->field_0x7c, &object->bb1.min, -10.0f, 10.0f);
+    CompressVector3(&detach_data->field_0x82, &object->bb1.max, -10.0f, 10.0f);
+    return object;
 }
 
 #ifdef REC2_MATCHING

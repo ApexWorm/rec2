@@ -4213,7 +4213,8 @@ typedef struct  {
     float force;
     tU16 min_vertex;
     tU16 max_vertex;
-    undefined field_0xc[24];
+    br_vector3 field_0xc;
+    br_vector3 field_0x18;
     tDetach_type type;
     undefined4 field_0x28;
     tCar_spec* field_0x2c;
@@ -4223,7 +4224,8 @@ typedef struct  {
     int count_shape_points; /* >0 if shape is poly, ==0 if box */
     int shape_points[16];
     int field_0x78;
-    undefined field_0x7c[12];
+    tCompressed_vector3 field_0x7c;
+    tCompressed_vector3 field_0x82;
 } tCar_crush_detach_data;
 
 typedef struct {
@@ -4324,8 +4326,7 @@ typedef struct tCar_crush_spec {
     int field_0x270;
     tCar_bit_spec field_0x274[3];
     int field_0x2b0;
-    tCar_bit_spec field_0x2b4[3];
-    undefined field_0x2f0[0x494 - 0x2f0];
+    tCar_bit_spec field_0x2b4[24];
     int field_0x494;
     br_actor* field_0x498[8];
     tU8 field_0x4b8;
