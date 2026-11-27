@@ -18,13 +18,12 @@ extern undefined4 gCrush_array_0067a190[10];
 extern int gCount_net_crush_reattach_bit_list;
 extern tCrush_net_reattach_bit_list_item gNet_crush_reattach_bit_list[8];
 extern undefined4 gDAT_00679440;
+extern tU16 gUnique_id;
 extern tCrush_info_buffer gDetached_bit_crush_info_buffer;
 extern tPhysics_object* gDetached_bit_collision_infos;
-extern tDriver gDetached_bit_driver;
 extern tPhysics_joint* gTrack_crush_joints[32];
 extern tCrush_info_buffer gSplit_car_crush_info_buffer;
 extern tPhysics_object* gSplit_car_collision_infos;
-extern tDriver gSplit_car_driver;
 extern tPhysics_shape* gGonad_sphere_collision_shape;
 extern int gCount_toggled_doors;
 extern tCrush_list_item gCrush_lists[8];
@@ -202,17 +201,17 @@ extern void C2_HOOK_FASTCALL SetBitForDetachment(br_actor* pActor, tCar_spec* pC
 
 extern void C2_HOOK_FASTCALL SetFlappage(br_actor* pActor, tCar_spec* pCar, int pFlags, float pScalar);
 
-// GetUniqueID
+extern tU16 C2_HOOK_FASTCALL GetUniqueID(void);
 
-// InitializeCollisionInfo
+extern void C2_HOOK_FASTCALL InitializeCollisionInfo(tNon_car_spec* pNon_car, br_actor* pActor, tCar_spec* pCar);
 
-// RemoveBit
+extern void C2_HOOK_FASTCALL RemoveBit(br_actor* pActor, tCar_spec* pCar);
 
-// RemoveNonCarChildren
+extern void C2_HOOK_FASTCALL RemoveNonCarChildren(tNon_car_spec* pNon_car);
 
-// RemoveNonCar
+extern void C2_HOOK_FASTCALL RemoveNonCar(tNon_car_spec* pNon_car);
 
-// GetNonCar
+extern tNon_car_spec* C2_HOOK_FASTCALL GetNonCar(tCrush_info_buffer* pBuffer, br_actor* pActor, tCar_spec* pCar);
 
 // GetNonCarObject
 
@@ -228,7 +227,7 @@ extern void C2_HOOK_FASTCALL SetFlappage(br_actor* pActor, tCar_spec* pCar, int 
 
 extern void C2_HOOK_FASTCALL MakeModelMaterialsDoubleSided(br_model* pModel);
 
-// CheckFlapAngles
+extern intptr_t C2_HOOK_CDECL CheckFlapAngles(br_actor* pActor, void* pData);
 
 extern void C2_HOOK_FASTCALL MakeModelMaterialsSingleSided(br_model* pModel);
 

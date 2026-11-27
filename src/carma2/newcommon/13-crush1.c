@@ -15,6 +15,7 @@
 #include "18-graphics2.h"
 #include "23-piping.h"
 #include "30-opponent.h"
+#include "37-brucetrk.h"
 #include "41-utility.h"
 #include "49-physics.h"
 #include "51-smash.h"
@@ -79,6 +80,11 @@ const char* gDetach_type_names[] = {
     "fully_detach",
     "joint_index",
 };
+
+// GLOBAL: CARMA2_HW 0x0058f860
+// GLOBAL: CARMA2_SW 0x0058a860
+// GLOBAL: CARMA2_CHEAT 0x005948f0
+tU16 gUnique_id = 10000;
 // GLOBAL: CARMA2_HW 0x0067a290
 // GLOBAL: CARMA2_SW 0x00674a00
 // GLOBAL: CARMA2_CHEAT 0x00681b40
@@ -278,11 +284,6 @@ tCrush_info_buffer gDetached_bit_crush_info_buffer;
 // GLOBAL: CARMA2_CHEAT 0x00680cf8
 tPhysics_object* gDetached_bit_collision_infos;
 
-// GLOBAL: CARMA2_HW 0x006796ac
-// GLOBAL: CARMA2_SW 0x00673e1c
-// GLOBAL: CARMA2_CHEAT 0x00680f5c
-tDriver gDetached_bit_driver;
-
 // GLOBAL: CARMA2_HW 0x0067bd68
 // GLOBAL: CARMA2_SW 0x006764d8
 // GLOBAL: CARMA2_CHEAT 0x00683618
@@ -302,11 +303,6 @@ tCrush_info_buffer gSplit_car_crush_info_buffer;
 // GLOBAL: CARMA2_SW 0x006748f8
 // GLOBAL: CARMA2_CHEAT 0x00681a38
 tPhysics_object* gSplit_car_collision_infos;
-
-// GLOBAL: CARMA2_HW 0x0067b7c4
-// GLOBAL: CARMA2_SW 0x00675f34
-// GLOBAL: CARMA2_CHEAT 0x00683074
-tDriver gSplit_car_driver;
 
 // GLOBAL: CARMA2_HW 0x006796b4
 // GLOBAL: CARMA2_SW 0x00673e24
@@ -493,27 +489,27 @@ void C2_HOOK_FASTCALL InitCrushSystems(void) {
     memset(gCrush_array_0067a190, 0, sizeof(gCrush_array_0067a190));
     gDAT_00679440 = 0;
     gDetached_bit_crush_info_buffer.capacity = 16;
-    gDetached_bit_crush_info_buffer.crush_infos = BrMemAllocate(gDetached_bit_crush_info_buffer.capacity * sizeof(tCrush_info), kMem_crush_data);
+    gDetached_bit_crush_info_buffer.crush_infos = BrMemAllocate(gDetached_bit_crush_info_buffer.capacity * sizeof(tNon_car_spec), kMem_crush_data);
     gDetached_bit_collision_infos = BrMemAllocate(gDetached_bit_crush_info_buffer.capacity * sizeof(tPhysics_object), kMem_crush_data);
     for (i = 0; i < gDetached_bit_crush_info_buffer.capacity; i++) {
-        gDetached_bit_crush_info_buffer.crush_infos[i].field_0xdc = 1.f;
-        gDetached_bit_crush_info_buffer.crush_infos[i].field_0xe0 = 0.28985506f;
-        gDetached_bit_crush_info_buffer.crush_infos[i].collision_object = &gDetached_bit_collision_infos[i];
+        gDetached_bit_crush_info_buffer.crush_infos[i].tumble_factor = 1.0f;
+        gDetached_bit_crush_info_buffer.crush_infos[i].tumble_threshold = 0.28985506f;
+        gDetached_bit_crush_info_buffer.crush_infos[i].collision_info = &gDetached_bit_collision_infos[i];
         gDetached_bit_collision_infos[i].shape = (tPhysics_shape*)AllocateShapePolyhedron(16, kMem_crush_data);
     }
-    gDetached_bit_driver = eDriver_detached_bit;
+    gDetached_bit_crush_info_buffer.driver = eDriver_detached_bit;
     for (i = 0; i < (int)REC2_ASIZE(gTrack_crush_joints); i++) {
         gTrack_crush_joints[i] = AllocatePhysicsJoint(3, kMem_crush_data);
     }
     gSplit_car_crush_info_buffer.capacity = 3;
-    gSplit_car_crush_info_buffer.crush_infos = BrMemAllocate(gSplit_car_crush_info_buffer.capacity * sizeof(tCrush_info), kMem_crush_data);
+    gSplit_car_crush_info_buffer.crush_infos = BrMemAllocate(gSplit_car_crush_info_buffer.capacity * sizeof(tNon_car_spec), kMem_crush_data);
     gSplit_car_collision_infos = BrMemAllocate(gSplit_car_crush_info_buffer.capacity * sizeof(tPhysics_object), kMem_crush_data);
     for (i = 0; i < gSplit_car_crush_info_buffer.capacity; i++) {
         int j;
         tPhysics_shape* shape = NULL;
 
-        gSplit_car_crush_info_buffer.crush_infos[i].field_0xdc = 0.f;
-        gSplit_car_crush_info_buffer.crush_infos[i].collision_object = &gSplit_car_collision_infos[i];
+        gSplit_car_crush_info_buffer.crush_infos[i].tumble_factor = 0.0f;
+        gSplit_car_crush_info_buffer.crush_infos[i].collision_info = &gSplit_car_collision_infos[i];
         for (j = 0; j < 4; j++) {
             tPhysics_shape* polyhedron = (tPhysics_shape*)AllocateShapePolyhedron(16, kMem_crush_data);
 
@@ -528,7 +524,7 @@ void C2_HOOK_FASTCALL InitCrushSystems(void) {
             shape->common.next = NULL;
         }
     }
-    gSplit_car_driver = eDriver_split_car;
+    gSplit_car_crush_info_buffer.driver = eDriver_split_car;
     gGonad_sphere_collision_shape = (tPhysics_shape*)AllocateShapeSphere(kMem_crush_data);
 }
 
@@ -1504,17 +1500,125 @@ void C2_HOOK_FASTCALL SetFlappage(br_actor* pActor, tCar_spec* pCar, int pFlags,
     }
 }
 
-// GetUniqueID
+inline tU16 C2_HOOK_FASTCALL GetUniqueID(void) {
 
-// InitializeCollisionInfo
+    if (gUnique_id == 20000) {
+        gUnique_id = 10000;
+    }
+    return gUnique_id++;
+}
 
-// RemoveBit
+inline void C2_HOOK_FASTCALL InitializeCollisionInfo(tNon_car_spec* pNon_car, br_actor* pActor, tCar_spec* pCar) {
 
-// RemoveNonCarChildren
+    pNon_car->collision_info->actor = pActor;
+    pNon_car->car_master_actor = pActor;
+    pNon_car->field_0x4 = 0;
+    pNon_car->field_0xc4 = -1.0f;
+    if (gNet_mode != eNet_mode_none) {
+        pNon_car->car_ID = pCar->car_ID;
+    } else {
+        pNon_car->car_ID = GetUniqueID();
+    }
+    pNon_car->field_0xc8 = pCar;
+}
 
-// RemoveNonCar
+inline void C2_HOOK_FASTCALL RemoveBit(br_actor* pActor, tCar_spec* pCar) {
 
-// GetNonCar
+    if (pCar->car_crush_spec->field_0x494 != REC2_ASIZE(pCar->car_crush_spec->field_0x498)) {
+        PipeSingleRelink(NULL, pActor);
+        BrActorRemove(pActor);
+        pCar->car_crush_spec->field_0x498[pCar->car_crush_spec->field_0x494] = pActor;
+        pCar->car_crush_spec->field_0x494++;
+    }
+}
+
+inline void C2_HOOK_FASTCALL RemoveNonCarChildren(tNon_car_spec* pNon_car) {
+    tPhysics_object* child;
+    tPhysics_object* next;
+    tNon_car_spec* non_car;
+    tUser_crush_data* user_crush;
+
+    for (child = pNon_car->collision_info->child; child != NULL; child = next) {
+        next = child->next;
+        non_car = child->actor->type_data;
+        child->actor->type_data = NULL;
+        user_crush = child->actor->user;
+        RemoveBit(child->actor, user_crush->crush_data->detach_data->field_0x2c);
+        non_car->driver = eDriver_non_car_unused_slot;
+        PhysicsRemoveObject(child);
+    }
+}
+
+inline void C2_HOOK_FASTCALL RemoveNonCar(tNon_car_spec* pNon_car) {
+    int i;
+
+    for (i = 0; i < gNum_active_non_cars; i++) {
+        if (gActive_non_car_list[i] == pNon_car) {
+            break;
+        }
+    }
+    if (i == gNum_active_non_cars) {
+#ifdef REC2_CHEAT
+        PDEnterDebugger("Trying to remove non_car which isn't on any list known to man");
+#endif
+    } else {
+        gNum_active_non_cars--;
+        for (; i < gNum_active_non_cars; i++) {
+            gActive_non_car_list[i] = gActive_non_car_list[i + 1];
+        }
+    }
+    pNon_car->driver = eDriver_non_car_unused_slot;
+    pNon_car->car_master_actor->type_data = NULL;
+    PHILRemoveObject(pNon_car->collision_info);
+}
+
+// FUNCTION: CARMA2_HW 0x0042f170
+// FUNCTION: CARMA2_SW 0x0042f1c0
+// FUNCTION: CARMA2_CHEAT 0x0042f320
+tNon_car_spec* C2_HOOK_FASTCALL GetNonCar(tCrush_info_buffer* pBuffer, br_actor* pActor, tCar_spec* pCar) {
+    int i;
+    int index;
+    tNon_car_spec* non_car;
+
+    for (i = 0; i < pBuffer->capacity; i++) {
+        if (pBuffer->crush_infos[i].driver == eDriver_non_car_unused_slot) {
+            break;
+        }
+    }
+    if (i == pBuffer->capacity) {
+        if (gPHIL_doing_physics) {
+            return NULL;
+        }
+        index = pBuffer->field_0x8;
+        for (i = 0; i < pBuffer->capacity; i++) {
+            if (pBuffer->crush_infos[index].driver != eDriver_non_car) {
+                break;
+            }
+            index = (index + 1) % pBuffer->capacity;
+        }
+        if (i == pBuffer->capacity) {
+            return NULL;
+        }
+        non_car = &pBuffer->crush_infos[index];
+        pBuffer->field_0x8 = (pBuffer->field_0x8 + 1) % pBuffer->capacity;
+        non_car->car_master_actor->type_data = NULL;
+        PipeSingleNonCar((tU16)non_car->car_ID, non_car->car_master_actor);
+        PipeSingleRelink(NULL, non_car->car_master_actor);
+        BrActorRemove(non_car->car_master_actor);
+        RemoveNonCarChildren(non_car);
+        RemoveNonCar(non_car);
+    } else {
+        non_car = &pBuffer->crush_infos[i];
+    }
+    pActor->type_data = non_car;
+    non_car->driver = pBuffer->driver;
+    InitializeCollisionInfo(non_car, pActor, pCar);
+    non_car->collision_info->owner = non_car;
+    non_car->collision_info->flags_0x238 = 1;
+    non_car->collision_info->field_0x1a0 = 0xffff;
+    non_car->collision_info->field_0x1a4 = 0;
+    return non_car;
+}
 
 // GetNonCarObject
 
@@ -1547,7 +1651,20 @@ void C2_HOOK_FASTCALL MakeModelMaterialsDoubleSided(br_model* pModel) {
     }
 }
 
-// CheckFlapAngles
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_HW 0x00434320
+// STUB: CARMA2_SW 0x00434350
+// STUB: CARMA2_CHEAT 0x00434510
+intptr_t C2_HOOK_CDECL CheckFlapAngles(br_actor* pActor, void* pData) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // FUNCTION: CARMA2_HW 0x0042d9b0
 // FUNCTION: CARMA2_SW 0x0042da20
@@ -1572,11 +1689,95 @@ void C2_HOOK_FASTCALL MakeModelMaterialsSingleSided(br_model* pModel) {
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x00434010
-// STUB: CARMA2_SW 0x00434040
-// STUB: CARMA2_CHEAT 0x004341f0
+// FUNCTION: CARMA2_HW 0x00434010
+// FUNCTION: CARMA2_SW 0x00434040
+// FUNCTION: CARMA2_CHEAT 0x004341f0
 void C2_HOOK_FASTCALL ReAttachBit(tCar_spec* pCar_spec, br_actor* pActor_arg2, br_actor* pActor_arg3, tPhysics_object* pObject) {
-    NOT_IMPLEMENTED();
+    tUser_crush_data* user_crush;
+    tCar_crush_buffer_entry* crush_data;
+    tCar_crush_detach_data* detach_data;
+    tCar_crush_flap_data* flap_data;
+    tCar_crush_spec* car_crush;
+    tNon_car_spec* non_car;
+    tPhysics_shape* shape;
+    br_model* model;
+    br_vector3 neg;
+
+    user_crush = pActor_arg3->user;
+    if (user_crush == NULL) {
+        return;
+    }
+    crush_data = user_crush->crush_data;
+    if (crush_data == NULL) {
+        return;
+    }
+    detach_data = crush_data->detach_data;
+    if (detach_data == NULL) {
+        return;
+    }
+    if (detach_data->field_0x28 == 0) {
+        return;
+    }
+    car_crush = pCar_spec->car_crush_spec;
+    non_car = pActor_arg3->type_data;
+    if (non_car != NULL) {
+        pActor_arg3->type_data = NULL;
+        non_car->driver = eDriver_non_car_unused_slot;
+        if (pObject != NULL) {
+            PhysicsRemoveObject(pObject);
+            if (pObject->physics_joint1 != NULL) {
+                pObject->physics_joint1->type = eJoint_none;
+                pObject->physics_joint1 = NULL;
+            }
+            if (detach_data->type == 4) {
+                shape = pObject->shape;
+                pObject->shape = (tPhysics_shape*)car_crush->field_0x4[detach_data->field_0x78].field_0x0;
+                car_crush->field_0x4[detach_data->field_0x78].field_0x0 = &shape->polyhedron;
+                car_crush->field_0x4[detach_data->field_0x78].field_0x8 = 0;
+                car_crush->expand_bounding_box |= 0x1;
+            }
+        } else {
+            PipeSingleNonCar((tU16)non_car->car_ID, pActor_arg3);
+            RemoveNonCar(non_car);
+        }
+    }
+    PipeSingleRelink(pActor_arg2, pActor_arg3);
+    if (pActor_arg3->parent != NULL) {
+        ActorRelink(pActor_arg2, pActor_arg3);
+    } else {
+        BrActorAdd(pActor_arg2, pActor_arg3);
+    }
+    flap_data = crush_data->flap_data;
+    if (flap_data != NULL && !flap_data->kev_o_flap) {
+        BrVector3Negate(&neg, &((tUser_crush_data*)pActor_arg3->user)->models[0]->vertices[flap_data->hinge0].p);
+        BrMatrix34Translate(&pActor_arg3->t.t.mat, neg.v[0], neg.v[1], neg.v[2]);
+        model = ((tUser_crush_data*)pActor_arg2->user)->models[0];
+        BrMatrix34PostTranslate(&pActor_arg3->t.t.mat, model->vertices[flap_data->field_0xc].p.v[0], model->vertices[flap_data->field_0xc].p.v[1], model->vertices[flap_data->field_0xc].p.v[2]);
+        PipeSingleFlap(pActor_arg3, -flap_data->field_0x4);
+        flap_data->field_0x4 = 0;
+        SetFlappage(pActor_arg3, pCar_spec, 0x1, 0.0f);
+        CheckFlapAngles(pActor_arg3, NULL);
+    } else {
+        BrMatrix34Identity(&pActor_arg3->t.t.mat);
+        PipeSingleIdentity(pActor_arg3);
+        if (flap_data != NULL) {
+            flap_data->field_0x0 = 0;
+        }
+    }
+    PipeSingleDSModel(1, user_crush->models[0]);
+    pActor_arg3->model = user_crush->models[0];
+    if (gProgram_state.racing && pObject == NULL) {
+        DRS3StartSound3D(gCar_outlet, 5251,
+            &pCar_spec->collision_info->actor->t.t.translate.t, &gZero_v__car,
+            1, 255, IRandomBetween(S3_FIXED_INT(0.875f), S3_FIXED_INT(1.125f)), S3_FIXED_INT(1));
+    }
+    if (user_crush->groove != NULL) {
+        PipeSingleGrooveOnOff(1, pActor_arg3, 3);
+        EnableGroovidelic(pActor_arg3, 3);
+        PipeSingleTransformType(pActor_arg3, BR_TRANSFORM_MATRIX34_LP);
+        pActor_arg3->t.type = BR_TRANSFORM_MATRIX34_LP;
+    }
+    detach_data->field_0x28 = 0;
 }
 
 #ifdef REC2_MATCHING
@@ -1975,7 +2176,7 @@ void C2_HOOK_FASTCALL FullyDetachBit(tCar_spec* pCar, tPhysics_object* pObject) 
         }
         pObject->flags |= 0x100;
         non_car = actor->type_data;
-        AddNonCar(non_car, &gDetached_bit_driver);
+        AddNonCar(non_car, &gDetached_bit_crush_info_buffer.driver);
         PipeSingleNonCar((tU16)non_car->car_ID, actor);
         actor->identifier[3] = '!';
         detach_data->field_0x28 = 2;
