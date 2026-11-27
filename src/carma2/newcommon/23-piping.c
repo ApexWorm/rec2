@@ -959,8 +959,6 @@ int C2_HOOK_FASTCALL CarTimeout(tU32 pTime) {
     return 1;
 }
 
-extern void C2_HOOK_FASTCALL ARScanBuffer(tU8** pPtr, tPipe_chunk_type pType, tU32 pDefault_time, tARScanBuffer_callback* pCallback, tARScanBuffer_time_check* pTime_check);
-
 // FUNCTION: CARMA2_HW 0x004c6920
 // FUNCTION: CARMA2_SW 0x004c3050
 // FUNCTION: CARMA2_CHEAT 0x004cc440
