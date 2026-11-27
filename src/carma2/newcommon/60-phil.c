@@ -40,12 +40,18 @@ int gPHIL_count_list_collision_infos;
 // GLOBAL: CARMA2_CHEAT 0x00699dcc
 int gPHIL_object_added;
 
+// GLOBAL: CARMA2_HW 0x006923e8
+// GLOBAL: CARMA2_SW 0x0068c440
+// GLOBAL: CARMA2_CHEAT 0x00699dd0
+tPhysics_callbacks* gPHIL_callbacks;
+
 // GLOBAL: CARMA2_HW 0x006923f0
 // GLOBAL: CARMA2_SW 0x0068c448
 tPHIL_queued_objects gPhil_queued_objects = { 0 };
 
 // GLOBAL: CARMA2_HW 0x00692db8
 // GLOBAL: CARMA2_SW 0x0068ce10
+// GLOBAL: CARMA2_CHEAT 0x0069a930
 tWorld_callback_active_passive_cbfn* gPHIL_original_activate_passive = NULL;
 
 // GLOBAL: CARMA2_HW 0x00692dbc
@@ -704,7 +710,28 @@ void C2_HOOK_FASTCALL MarkObjectAndChildrenAsPassive(tPhysics_object* pObject) {
 
 // PHILMungeObjects
 
-// PHILActivatePassive
+// FUNCTION: CARMA2_HW 0x004b71b0
+// FUNCTION: CARMA2_SW 0x004b38d0
+// FUNCTION: CARMA2_CHEAT 0x004bcce0
+void C2_HOOK_FASTCALL PHILActivatePassive(tPhysics_object* pObject, void* pContext) {
+    tPHIL_queued_header* info;
+
+    info = pObject->field_0x240;
+    if (info != NULL && info->field_0x8 == 1) {
+        if (gPHIL_original_activate_passive != NULL) {
+            gPHIL_original_activate_passive(pObject, pContext);
+        }
+        if (gPHIL_callbacks->passive_activated != NULL) {
+            if (gPHIL_callbacks->passive_activated(pObject, pContext)) {
+                PHILMakeObjectActive(pObject, NULL, NULL, 1);
+            }
+        } else {
+            PHILMakeObjectActive(pObject, NULL, NULL, 1);
+        }
+    } else {
+        pObject->flags |= 0x1000;
+    }
+}
 
 // PHILInterpolateObjects
 
