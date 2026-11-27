@@ -78,9 +78,9 @@ extern void C2_HOOK_FASTCALL CalcOpponentConspicuousnessWithAViewToCheatingLikeF
 
 extern int C2_HOOK_FASTCALL SearchForSection(tRoute_section* pRoute, tRoute_section* pBest_route, int* pBest_count, tS16 pTarget, int pDepth, br_scalar pLength, tOpponent_spec* pOpponent_spec);
 
-// UpdatePlayersSection
+extern void C2_HOOK_FASTCALL UpdatePlayersSection(tCar_spec* pPursuee, int pForce);
 
-// AllowForDecel
+extern int C2_HOOK_FASTCALL AllowForDecel(tOpponent_spec* pOpponent_spec, int pSection_index, br_vector3* pPos);
 
 extern int C2_HOOK_FASTCALL ShiftOpponentsProjectedRoute(tOpponent_spec* pOpponent_spec, int pPlaces);
 

@@ -480,7 +480,7 @@ int C2_HOOK_FASTCALL SearchForSection(tRoute_section* pRoute, tRoute_section* pB
     return 0;
 }
 
-static inline void C2_HOOK_FASTCALL UpdatePlayersSection(tCar_spec* pPursuee, int pForce) {
+inline void C2_HOOK_FASTCALL UpdatePlayersSection(tCar_spec* pPursuee, int pForce) {
     br_vector3 section_v;
     br_vector3 intersect;
     br_scalar distance;
@@ -491,7 +491,7 @@ static inline void C2_HOOK_FASTCALL UpdatePlayersSection(tCar_spec* pPursuee, in
     }
 }
 
-static inline int C2_HOOK_FASTCALL AllowForDecel(tOpponent_spec* pOpponent_spec, int pSection_index, br_vector3* pPos) {
+inline int C2_HOOK_FASTCALL AllowForDecel(tOpponent_spec* pOpponent_spec, int pSection_index, br_vector3* pPos) {
     br_scalar decel_distance;
     br_scalar distance;
     br_vector3 tv;
