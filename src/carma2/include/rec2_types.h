@@ -5436,6 +5436,12 @@ typedef struct tDrone_spec {
     undefined4 field_0x5d4;
 } tDrone_spec;
 
+typedef struct { /* FIXME: name is a guess, returned to PHIL by GetDroneCrushData */
+    br_model* model;
+    float crushability;
+    br_bounds3 bounds;
+} tDrone_crush_data;
+
 typedef struct {
     void* field_0x0;
     tU32 field_0x4;
