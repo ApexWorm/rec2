@@ -2925,7 +2925,36 @@ void C2_HOOK_FASTCALL SendAllSHNonCars(tNet_game_player_info* pPlayer) {
     }
 }
 
-// ReceivedSHNonCar
+// FUNCTION: CARMA2_HW 0x0043d810
+// FUNCTION: CARMA2_SW 0x0043d860
+// FUNCTION: CARMA2_CHEAT 0x0043dac0
+void C2_HOOK_FASTCALL ReceivedSHNonCar(tNet_message_chunk* pContents) {
+    tCar_spec* car;
+    tNon_car_spec* non_car;
+    br_vector4 plane;
+
+    car = NetCarFromPlayerID(pContents->sh_non_car.player);
+    if (car == NULL) {
+        return;
+    }
+    if (!car->car_crush_spec->field_0x4b8) {
+        ExpandPlane(&plane, &pContents->sh_non_car.plane);
+        SplitCar(car, &plane, 0);
+    }
+    non_car = car->car_crush_spec->actor->type_data;
+    if (non_car == NULL) {
+        return;
+    }
+    if (!(pContents->sh_non_car.flags & 0x2) && pContents->sh_non_car.time != (tU32)-1) {
+        memcpy(non_car->collision_info->field_0x294, pContents->sh_non_car.object_hierarchy, GetNetworkDataSize(pContents->sh_non_car.object_hierarchy));
+        non_car->collision_info->message_time = pContents->sh_non_car.time;
+        non_car->collision_info->field_0x261 = eNet_message_chunk_type_sh_non_car;
+        non_car->collision_info->disable_move_rotate = 0;
+    } else {
+        WriteHierarchyNetworkStuff(pContents->sh_non_car.object_hierarchy, non_car->collision_info, 2);
+        non_car->collision_info->disable_move_rotate = 1;
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x0043d900
 // FUNCTION: CARMA2_SW 0x0043d950

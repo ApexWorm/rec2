@@ -538,7 +538,7 @@ extern void C2_HOOK_FASTCALL ReceivedToggleFlaps(tNet_message_chunk* pContents);
 
 extern void C2_HOOK_FASTCALL SendAllSHNonCars(tNet_game_player_info* pPlayer);
 
-// ReceivedSHNonCar
+extern void C2_HOOK_FASTCALL ReceivedSHNonCar(tNet_message_chunk* pContents);
 
 extern int C2_HOOK_FASTCALL GetNetShapeDataLengthFromShape(tCar_spec* pCar);
 
