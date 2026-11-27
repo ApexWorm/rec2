@@ -226,6 +226,11 @@ br_scalar gMax_crush_dist_sq;
 // GLOBAL: CARMA2_CHEAT 0x00683734
 tU32 gUINT_0067be84;
 
+// GLOBAL: CARMA2_HW 0x0067be88
+// GLOBAL: CARMA2_SW 0x006765f8
+// GLOBAL: CARMA2_CHEAT 0x00683738
+tU32 gLast_flap_bits;
+
 // GLOBAL: CARMA2_HW 0x0067bd5c
 // GLOBAL: CARMA2_SW 0x006764cc
 // GLOBAL: CARMA2_CHEAT 0x0068360c
@@ -2113,11 +2118,112 @@ void C2_HOOK_FASTCALL DoDetaching(void) {
     gCount_crush_detach_list = new_count;
 }
 
-// FlapBit
+// FUNCTION: CARMA2_HW 0x004384c0
+// FUNCTION: CARMA2_SW 0x004384f0
+// FUNCTION: CARMA2_CHEAT 0x004386d0
+intptr_t C2_HOOK_FASTCALL FlapBit(br_actor* pActor, br_matrix34* pMat, void* pContext) {
+    tCar_crush_buffer_entry* crush_data;
+    tFlapBit_arg* arg;
+    tCar_crush_flap_data* flap_data;
+    br_vector3* hinge;
+    br_vector3* pivot;
+    br_angle old_angle;
+    br_vector3 arm;
+    br_vector3 arm_world;
+    tUser_crush_data* user_crush;
+    br_angle angle;
+    br_vector3 axis;
 
-// FlapBits
+    arg = pContext;
+    user_crush = pActor->user;
+    if (user_crush != NULL) {
+        crush_data = user_crush->crush_data;
+        if (crush_data != NULL) {
+            flap_data = crush_data->flap_data;
+            if (flap_data != NULL && !flap_data->kev_o_flap && flap_data->field_0x0) {
+                hinge = &user_crush->models[0]->vertices[flap_data->hinge0].p;
+                BrVector3Sub(&axis, &user_crush->models[0]->vertices[flap_data->hinge1].p, hinge);
+                BrVector3Normalise(&axis, &axis);
+                BrVector3Sub(&arm, &user_crush->models[0]->vertices[flap_data->hinge2].p, hinge);
+                BrVector3Normalise(&arm, &arm);
+                BrMatrix34ApplyV(&arm_world, &arm, pMat);
+                angle = BrRadianToAngle(atan2((arg->force.v[0] * (axis.v[2] * arm_world.v[1] - arm_world.v[2] * axis.v[1])
+                        + ((arm_world.v[2] * axis.v[0]) - arm_world.v[0] * axis.v[2]) * arg->force.v[1]
+                        + ((axis.v[1] * arm_world.v[0]) - arm_world.v[1] * axis.v[0]) * arg->force.v[2])
+                    * gFlap_inertia_fudge_biscuit,
+                    crush_data->field_0x24));
+                if (angle != 0) {
+                    old_angle = flap_data->field_0x4;
+                    flap_data->field_0x4 += angle;
+                    if ((br_angle)(flap_data->field_0x4 - flap_data->field_0x2) > flap_data->field_0x8) {
+                        if ((br_angle)(flap_data->field_0x4 - flap_data->field_0x6) < 0x3ffc) {
+                            flap_data->field_0x4 = flap_data->field_0x6;
+                        } else {
+                            flap_data->field_0x4 = flap_data->field_0x2;
+                        }
+                    }
+                    BrMatrix34Translate(&pActor->t.t.mat, -hinge->v[0], -hinge->v[1], -hinge->v[2]);
+                    BrMatrix34PostRotate(&pActor->t.t.mat, flap_data->field_0x4, &axis);
+                    pivot = &((tUser_crush_data*)pActor->parent->user)->models[0]->vertices[flap_data->field_0xc].p;
+                    BrMatrix34PostTranslate(&pActor->t.t.mat, pivot->v[0], pivot->v[1], pivot->v[2]);
+                    if (old_angle != flap_data->field_0x4) {
+                        AddFlapToPipingSession(pActor, flap_data->field_0x4 - old_angle);
+                    }
+                }
+            }
+        }
+    }
+    return 0;
+}
 
-// StartFlapping
+extern void C2_HOOK_FASTCALL FlapBits(tCar_spec* pCar);
+
+inline void C2_HOOK_FASTCALL FlapBits(tCar_spec* pCar) {
+    tCar_crush_spec* car_crush_spec;
+    br_scalar dt;
+    br_vector3 force;
+    tFlapBit_arg flapbit_arg;
+
+    car_crush_spec = pCar->car_crush_spec;
+    if (car_crush_spec != NULL) {
+        if (car_crush_spec->field_0x134) {
+            dt = (gPHIL_last_physics_tick - gLast_flap_bits) * 0.001f;
+            BrVector3Sub(&force, &pCar->collision_info->v, &car_crush_spec->field_0x138);
+            force.v[0] /= dt;
+            force.v[1] /= dt;
+            force.v[2] /= dt;
+            BrVector3Add(&force, &gBatty_gravity, &force);
+            BrMatrix34TApplyV(&flapbit_arg.force, &force, &pCar->car_master_actor->t.t.mat);
+            flapbit_arg.car = pCar;
+            ARStartPipingSession(ePipe_chunk_flap);
+            DRActorEnumRecurseWithSnart(pCar->car_model_actor, NULL, FlapBit, &flapbit_arg);
+            AREndPipingSession();
+        }
+        BrVector3Copy(&car_crush_spec->field_0x138, &pCar->collision_info->v);
+        gLast_flap_bits = gPHIL_last_physics_tick;
+    }
+}
+
+extern void C2_HOOK_FASTCALL StartFlapping(br_actor* pActor, tCar_spec* pCar, tU8 pBits, float pForce);
+
+inline void C2_HOOK_FASTCALL StartFlapping(br_actor* pActor, tCar_spec* pCar, tU8 pBits, float pForce) {
+    tUser_crush_data* user_crush;
+    tCar_crush_flap_data* flap_data;
+
+    user_crush = pActor->user;
+    if (user_crush != NULL && user_crush->crush_data != NULL && user_crush->crush_data->flap_data != NULL) {
+        flap_data = user_crush->crush_data->flap_data;
+        if (flap_data->kev_o_flap) {
+            SetBitForDetachment(pActor, pCar, pForce, 1);
+        } else {
+            MakeModelMaterialsDoubleSided(user_crush->models[0]);
+            PipeSingleDSModel(1, user_crush->models[0]);
+            pCar->car_crush_spec->field_0x134 += 1;
+            flap_data->field_0x0 = 1;
+        }
+        pCar->use_shell_model = 0;
+    }
+}
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
@@ -2237,7 +2343,38 @@ void C2_HOOK_FASTCALL StopFlapping(br_actor* pActor, tCar_spec* pCar_spec) {
     }
 }
 
-// DoFlapping
+// FUNCTION: CARMA2_HW 0x004381b0
+// FUNCTION: CARMA2_SW 0x004381e0
+// FUNCTION: CARMA2_CHEAT 0x004383c0
+void C2_HOOK_FASTCALL DoFlapping(void) {
+    int i;
+    tToggled_door* door;
+    tUser_crush_data* user_crush;
+    tCar_spec* car;
+    br_actor* actor;
+
+    for (i = 0; i < gCount_toggled_doors; i++) {
+        door = &gToggled_doors[i];
+        actor = door->actor;
+        if (actor != NULL) {
+            user_crush = actor->user;
+            if (user_crush != NULL && user_crush->crush_data != NULL && user_crush->crush_data->flap_data != NULL) {
+                if (!user_crush->crush_data->flap_data->field_0x0 && (door->field_0x8 & 0x1)) {
+                    StartFlapping(actor, door->car, 0, door->field_0xc);
+                } else if (user_crush->crush_data->flap_data->field_0x0 && !(door->field_0x8 & 0x1)) {
+                    StopFlapping(actor, door->car);
+                }
+            }
+        }
+    }
+    gCount_toggled_doors = 0;
+    for (i = 0; i < gNum_active_cars; i++) {
+        car = gActive_car_list[i];
+        if (car != NULL && car->driver > eDriver_5) {
+            FlapBits(car);
+        }
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x0042ddc0
 // FUNCTION: CARMA2_SW 0x0042de30
