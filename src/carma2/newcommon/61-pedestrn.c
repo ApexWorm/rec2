@@ -1778,7 +1778,50 @@ int C2_HOOK_FASTCALL DamagePedestrian(tPedestrian* pPed, int pDamage, int pArg3,
     }
 }
 
-// SetLastHitter
+// FUNCTION: CARMA2_HW 0x004cdeb0
+// FUNCTION: CARMA2_SW 0x004ca5b0
+// FUNCTION: CARMA2_CHEAT 0x004d3a40
+void C2_HOOK_FASTCALL SetLastHitter(tPedestrian* pPed, tPhysics_object* pObject) {
+    tCar_spec* car;
+
+    if (pObject == NULL || pPed->field_0x0c == NULL) {
+        return;
+    }
+    if (pObject->owner != NULL && pObject->flags_0x238 >= 2 && pObject->flags_0x238 <= 4 && pPed->field_0x0c->field_0xc0 == NULL
+            && ((tPed_character_instance*)pObject->owner)->ped != NULL && ((tPed_character_instance*)pObject->owner)->ped->field_0x0c != NULL) {
+        pPed->field_0x0c->field_0xc0 = ((tPed_character_instance*)pObject->owner)->ped->field_0x0c->field_0xc0;
+    }
+    if ((pObject->owner != NULL && pObject->flags_0x238 == 1)
+            || (pObject->flags_0x238 == 0x20 && (gMutant_tail_state == 2 || GetTotalTime() - gDAT_00705b70 < 7500))
+            || pObject->flags_0x238 == 0x40
+            || pObject->flags_0x238 == 0x10) {
+        if (pObject->flags_0x238 == 0x40) {
+            car = ((tNon_car_spec*)pObject->owner)->field_0x30;
+        } else if (pObject->flags_0x238 == 0x10) {
+            car = ((tDrone_spec*)pObject->owner)->field_0x5d4;
+        } else {
+            car = pObject->owner;
+        }
+        if ((car != NULL && car->driver > 5) || pObject->parent != NULL) {
+            pPed->field_0x0c->field_0xc0 = car;
+            if (pObject->owner != NULL && pObject->flags_0x238 == 0x20) {
+                pPed->field_0x0c->field_0x2e |= 0x8;
+            }
+            if (pObject->owner != NULL && pObject->flags_0x238 == 0x20 && gMutant_tail_state == 1) {
+                pPed->field_0x0c->field_0x2e |= 0x10;
+            }
+            if (pObject->flags_0x238 == 0x40) {
+                pPed->field_0x0c->field_0x2e = 0x40;
+            }
+            if (pObject->flags_0x238 == 0x10) {
+                pPed->field_0x0c->field_0x2e = 0x1;
+            }
+        } else if (car != NULL && pPed->field_0x0c->field_0xc0 == NULL) {
+            pPed->field_0x0c->field_0xc0 = car->field_0xc8;
+            pPed->field_0x0c->field_0x2e |= 0x1;
+        }
+    }
+}
 
 // MakePedVanish
 
