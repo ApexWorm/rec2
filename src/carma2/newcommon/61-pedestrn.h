@@ -48,6 +48,7 @@ extern tNapalm_bolt gNapalm_bolts[5];
 extern int gPed_severing_chance;
 
 extern int gPed_severing_damage;
+extern float gPed_max_survivable_impact;
 extern br_material* gPed_slick_material;
 extern br_material* gNapalm_bolt_materials[7];
 extern br_model* gNapalm_bolt_models[7];
