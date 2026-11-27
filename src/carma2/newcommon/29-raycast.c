@@ -244,7 +244,7 @@ int C2_HOOK_FASTCALL DRScenePick2DXY(br_actor* pWorld, br_actor* pCamera, br_pix
     cos_angle = BR_COS(view_over_2);
     sin_angle = BR_SIN(view_over_2);
     scale = cos_angle / sin_angle;
-    BrMatrix34PostScale(&gPick_model_to_view__raycast, scale / camera_data->aspect, scale, 1.f);
+    BrMatrix34PostScale(&gPick_model_to_view__raycast, scale / camera_data->aspect, scale, 1.0f);
     BrMatrix34PostShearZ(&gPick_model_to_view__raycast,
         (float)(2 * pPick_x) / (float)pViewport->width,
         (float)(-2 * pPick_y) / (float)pViewport->height);
