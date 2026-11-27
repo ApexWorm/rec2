@@ -60,6 +60,7 @@ address,type,name
 0x00573960,library,_exit
 0x00573980,library,__exit
 0x00573cb0,library,_fgets
+0x00573d30,library,_clearerr
 0x00573e70,library,_strpbrk
 0x00573eb0,library,__aulldiv
 0x005740c0,library,__amsg_exit

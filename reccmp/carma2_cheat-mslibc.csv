@@ -58,6 +58,7 @@ address,type,name
 0x0057e0d0,library,_exit
 0x0057e0f0,library,__exit
 0x0057e1e0,library,__initterm
+0x0057e280,library,_clearerr
 0x0057e400,library,_ctime
 0x0057e420,library,__aulldiv
 0x0057e630,library,__amsg_exit

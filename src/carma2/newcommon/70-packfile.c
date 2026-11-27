@@ -406,6 +406,18 @@ int C2_HOOK_FASTCALL DRferror(FILE* pFile) {
     }
 }
 
+// FUNCTION: CARMA2_HW 0x004b4c60
+// FUNCTION: CARMA2_SW 0x004b0dd0
+// FUNCTION: CARMA2_CHEAT 0x004ba530
+void C2_HOOK_FASTCALL DRclearerr(FILE* pFile) {
+
+    if ((uintptr_t)pFile >= REC2_ASIZE(gTwatVfsFiles)) {
+        clearerr(pFile);
+    } else {
+        gTwatVfsFiles[(uintptr_t)pFile].error = 0;
+    }
+}
+
 // FUNCTION: CARMA2_HW 0x004b4c80
 // FUNCTION: CARMA2_SW 0x004b0df0
 // FUNCTION: CARMA2_CHEAT 0x004ba550

@@ -64,7 +64,7 @@ address,type,name
 0x00578500,library,__exit
 0x005785f0,library,__initterm
 0x00578610,library,_fgets
-0x00578690,library,clearerr
+0x00578690,library,_clearerr
 0x005786d0,library,_ceil
 0x005787d0,library,_strpbrk
 0x00578810,library,_ctime
