@@ -3176,7 +3176,7 @@ int C2_HOOK_FASTCALL SetCharacterMove(tPed_character_instance* pPed, int pMove_a
     personality = pPed->personality;
     form = personality->form;
     if (pPed->field_0x7 >= 0) {
-        original_ped_move = personality->form->moves[pPed->field_0x7].move;
+        original_ped_move = pPed->personality->form->moves[pPed->field_0x7].move;
     } else {
         original_ped_move = NULL;
     }
