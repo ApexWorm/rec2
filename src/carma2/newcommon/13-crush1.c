@@ -2560,7 +2560,7 @@ void C2_HOOK_FASTCALL RepairCarCollisionShapes(tCar_spec* pCar, float pStep) {
 // STUB: CARMA2_CHEAT 0x0043af00
 float C2_HOOK_FASTCALL RepairCar2(tCar_spec* pCar, tU32 pFrame_period, br_scalar* pTotal_deflection) {
     NOT_IMPLEMENTED();
-    return 0.f;
+    return 0.0f;
 }
 
 // RepairCar

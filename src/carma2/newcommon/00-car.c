@@ -726,7 +726,7 @@ void C2_HOOK_FASTCALL GetNetPos(tCar_spec* pCar) {
 
     if (gNet_mode == eNet_mode_host && pCar->collision_info->field_0x49c > pCar->collision_info->field_0x274) {
         pCar->collision_info->field_0x261 = 0;
-        pCar->dt = -1.f;
+        pCar->dt = -1.0f;
         return;
     }
     switch (pCar->collision_info->field_0xf0) {
@@ -742,7 +742,7 @@ void C2_HOOK_FASTCALL GetNetPos(tCar_spec* pCar) {
     }
     if (pCar != NULL && pCar->driver > eDriver_5) {
         for (i = 0; i < 4; i++) {
-            pCar->oldd[i] = (float)pCar->collision_info->field_0x26c[i] * pCar->susp_height[i >> 1] / 255.f;
+            pCar->oldd[i] = (float)pCar->collision_info->field_0x26c[i] * pCar->susp_height[i >> 1] / 255.0f;
         }
         if (pCar != NULL && pCar->driver == eDriver_net_human) {
             pCar->revs = (float)pCar->collision_info->field_0x27a;
@@ -765,7 +765,7 @@ void C2_HOOK_FASTCALL GetNetPos(tCar_spec* pCar) {
             }
             SortOutSmoke(pCar);
         }
-        if (pCar->collision_info->disable_move_rotate && BrVector3LengthSquared(&pCar->collision_info->v) != 0.f) {
+        if (pCar->collision_info->disable_move_rotate && BrVector3LengthSquared(&pCar->collision_info->v) != 0.0f) {
             pCar->collision_info->disable_move_rotate = 0;
         }
         if (pCar != NULL && pCar->driver >= eDriver_net_human
