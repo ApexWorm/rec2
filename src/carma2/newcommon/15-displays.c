@@ -203,6 +203,7 @@ tU32 gLast_time_credit_amount;
 int gOld_times[10];
 
 // GLOBAL: CARMA2_HW 0x0079eb00
+// GLOBAL: CARMA2_CHEAT 0x007a61a0
 char gHeadup_oppo_ped_text[64];
 
 // GLOBAL: CARMA2_HW 0x0067f888
