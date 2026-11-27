@@ -1990,7 +1990,76 @@ void C2_HOOK_FASTCALL CreateSplitPoints(br_vector3* pDest1, br_vector3* pDest2, 
 
 }
 
-// SplitCollisionShape
+// FUNCTION: CARMA2_HW 0x004303c0
+// FUNCTION: CARMA2_SW 0x004303f0
+// FUNCTION: CARMA2_CHEAT 0x00430590
+void C2_HOOK_FASTCALL SplitCollisionShape(tPhysics_shape* pShape, tCollision_shape_polyhedron* pPositive, tCollision_shape_polyhedron* pNegative, const br_vector4* pPlane) {
+    br_vector3* positive;
+    br_vector3* negative;
+    int count_positive;
+    int count_negative;
+    int i;
+    int a;
+    int b;
+    float distances[16];
+    int sides[16];
+
+    if (pShape->common.type != kCollisionShapeType_Polyhedron) {
+        PDFatalError("Oooh no. I can't split that sort of shape, Mrs Jabberwok.");
+    }
+    positive = pPositive->polyhedron.points;
+    negative = pNegative->polyhedron.points;
+    count_positive = 0;
+    count_negative = 0;
+    for (i = 0; i < pShape->polyhedron.polyhedron.count_points && i < (int)REC2_ASIZE(distances); i++) {
+        distances[i] = BrVector3Dot(&pShape->polyhedron.polyhedron.points[i], pPlane) - pPlane->v[3];
+        if (distances[i] <= 0.0f) {
+            BrVector3Copy(negative, &pShape->polyhedron.polyhedron.points[i]);
+            negative++;
+            count_negative++;
+            sides[i] = 2;
+        } else {
+            BrVector3Copy(positive, &pShape->polyhedron.polyhedron.points[i]);
+            count_positive++;
+            sides[i] = 1;
+            positive++;
+        }
+    }
+    for (i = 0; i < pShape->polyhedron.polyhedron.count_edges; i++) {
+        if (count_positive > 15 || count_negative > 15) {
+            break;
+        }
+        a = pShape->polyhedron.polyhedron.edges[i].index1;
+        b = pShape->polyhedron.polyhedron.edges[i].index2;
+        if (sides[a] != sides[b]) {
+            if (sides[a] == 1) {
+                CreateSplitPoints(positive, negative, &pShape->polyhedron.polyhedron.points[a], &pShape->polyhedron.polyhedron.points[b], distances[a], distances[b]);
+            } else {
+                CreateSplitPoints(positive, negative, &pShape->polyhedron.polyhedron.points[b], &pShape->polyhedron.polyhedron.points[a], distances[b], distances[a]);
+            }
+            positive++;
+            negative++;
+            count_positive++;
+            count_negative++;
+        }
+    }
+    pPositive->polyhedron.count_points = count_positive;
+    pNegative->polyhedron.count_points = count_negative;
+    if (count_positive < 4) {
+        pPositive->polyhedron.count_points = 0;
+        pPositive->polyhedron.count_edges = 0;
+        pPositive->polyhedron.count_planes = 0;
+    } else {
+        FillInShape((tPhysics_shape*)pPositive);
+    }
+    if (count_negative < 4) {
+        pNegative->polyhedron.count_points = 0;
+        pNegative->polyhedron.count_edges = 0;
+        pNegative->polyhedron.count_planes = 0;
+    } else {
+        FillInShape((tPhysics_shape*)pNegative);
+    }
+}
 
 // SplitCarCollisionShapes
 

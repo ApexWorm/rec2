@@ -298,7 +298,7 @@ extern void C2_HOOK_FASTCALL FullyDetachBit(tCar_spec* pCar, tPhysics_object* pO
 
 extern void C2_HOOK_FASTCALL CreateSplitPoints(br_vector3* pDest1, br_vector3* pDest2, const br_vector3* pV1, const br_vector3* pV2, float pMin, float pMax);
 
-// SplitCollisionShape
+extern void C2_HOOK_FASTCALL SplitCollisionShape(tPhysics_shape* pShape, tCollision_shape_polyhedron* pPositive, tCollision_shape_polyhedron* pNegative, const br_vector4* pPlane);
 
 // SplitCarCollisionShapes
 
