@@ -18,6 +18,7 @@ extern int gBIG_APC_index;
 extern float gOpponent_nastyness_frigger;
 extern int gMinTimeOpponentRepair;
 extern int gMaxTimeOpponentRepair;
+extern tU32 gAcme_frame_count;
 extern int gActive_car_list_rebuild_required;
 extern int gNumber_of_cops_before_faffage;
 extern int gNum_of_opponents_completing_race;
@@ -226,7 +227,7 @@ extern void C2_HOOK_FASTCALL InitOpponentPsyche(int pOpponent_index);
 
 extern void C2_HOOK_FASTCALL TwoCarsHitEachOther(tCar_spec* pA_car, tCar_spec* pAnother_car);
 
-// RecordOpponentTwattageOccurrence
+extern void C2_HOOK_FASTCALL RecordOpponentTwattageOccurrence(tCar_spec* pTwatter, tCar_spec* pTwattee);
 
 // GetOpponentMood
 
