@@ -14,19 +14,23 @@
 #include "13-crush1.h"
 #include "23-piping.h"
 #include "26-oppoproc.h"
+#include "39-oil.h"
 #include "41-utility.h"
 #include "53-controls.h"
 #include "56-aiworld.h"
 #include "60-phil.h"
 #include "globvars.h"
+#include "globvrme.h"
 #include "globvrpb.h"
 #include "c2_stdio.h"
 #include "platform.h"
 #include "rec2_macros.h"
+#include <math.h>
 #include <stdarg.h>
 #include <string.h>
 
 #define CAR_SPEC_IS_ROZZER(CAR_SPEC) (VEHICLE_TYPE_FROM_ID((tU16)(CAR_SPEC)->car_ID) == eVehicle_rozzer)
+#define CAR_SPEC_IS_OPPONENT(CAR_SPEC) (VEHICLE_TYPE_FROM_ID((tU16)(CAR_SPEC)->car_ID) == eVehicle_opponent)
 #define GET_CAR_SPEED_FACTOR(CAR) (CAR_SPEC_IS_ROZZER(CAR) ? gCop_speed_factor : gOpponent_speed_factor)
 
 // GLOBAL: CARMA2_HW 0x0065a3bc
@@ -42,6 +46,11 @@ const char* gDrone_name = "Innocent Civilian";
 // GLOBAL: CARMA2_CHEAT 0x00660d50
 int gBIG_APC_index = -1;
 
+// GLOBAL: CARMA2_HW 0x0065a3c8
+// GLOBAL: CARMA2_SW 0x00654ce0
+// GLOBAL: CARMA2_CHEAT 0x00660d54
+int gChallenger_index__opponent = -1;
+
 // GLOBAL: CARMA2_HW 0x0065a3cc
 // GLOBAL: CARMA2_SW 0x00654ce4
 // GLOBAL: CARMA2_CHEAT 0x00660d58
@@ -56,6 +65,26 @@ int gMinTimeOpponentRepair;
 // GLOBAL: CARMA2_SW 0x00741148
 // GLOBAL: CARMA2_CHEAT 0x00751d28
 int gMaxTimeOpponentRepair;
+
+// GLOBAL: CARMA2_HW 0x00691754
+// GLOBAL: CARMA2_SW 0x0068b7ac
+// GLOBAL: CARMA2_CHEAT 0x00699104
+tU32 gNext_grudge_reduction;
+
+// GLOBAL: CARMA2_HW 0x00691724
+// GLOBAL: CARMA2_SW 0x0068b77c
+// GLOBAL: CARMA2_CHEAT 0x006990d0
+int gGrudge_reduction_per_period;
+
+// GLOBAL: CARMA2_HW 0x00691760
+// GLOBAL: CARMA2_SW 0x0068b7b8
+// GLOBAL: CARMA2_CHEAT 0x00699110
+br_scalar gMinimum_yness_before_knackerisation;
+
+// GLOBAL: CARMA2_HW 0x00691728
+// GLOBAL: CARMA2_SW 0x0068b780
+// GLOBAL: CARMA2_CHEAT 0x006990d4
+tU32 gAcme_frame_count;
 
 // GLOBAL: CARMA2_HW 0x0069173c
 // GLOBAL: CARMA2_SW 0x0068b794
@@ -1159,7 +1188,62 @@ int C2_HOOK_FASTCALL RematerialiseOpponent(tOpponent_spec* pOpponent_spec, br_sc
 
 // NumberOfOpponentsStillRunning
 
-// ResetPredominantJobbies
+inline void C2_HOOK_FASTCALL ResetPredominantJobbies(void) {
+    int i;
+    int j;
+    int start;
+    int count;
+    int number_of_racers;
+    int number_of_pursuers;
+
+    count = 0;
+    for (i = 0; i < gProgram_state.AI_vehicles.number_of_opponents; i++) {
+        if (!gProgram_state.AI_vehicles.opponents[i].car_spec->knackered) {
+            count++;
+        }
+    }
+    if (count != 0) {
+        if (gCurrent_race.race_spec->opponent_nastiness_level >= 10.0f) {
+            for (i = 0; i < gProgram_state.AI_vehicles.number_of_opponents; i++) {
+                gProgram_state.AI_vehicles.opponents[i].field_0xb4 = 3;
+            }
+        } else {
+            for (i = 0; i < gProgram_state.AI_vehicles.number_of_opponents; i++) {
+                gProgram_state.AI_vehicles.opponents[i].field_0xb4 = 0;
+            }
+            number_of_pursuers = (int)(count * 0.6);
+            number_of_racers = (int)(count * 0.2);
+            for (i = 0; i < number_of_pursuers; i++) {
+                start = IRandomBetween(0, count - i - 1);
+                j = start;
+                do {
+                    if (gProgram_state.AI_vehicles.opponents[j].field_0xb4 == 0) {
+                        gProgram_state.AI_vehicles.opponents[j].field_0xb4 = 2;
+                        break;
+                    }
+                    j++;
+                    if (j >= count) {
+                        j = 0;
+                    }
+                } while (j != start);
+            }
+            for (i = 0; i < number_of_racers; i++) {
+                start = IRandomBetween(0, count - number_of_pursuers - i - 1);
+                j = start;
+                do {
+                    if (gProgram_state.AI_vehicles.opponents[j].field_0xb4 == 0) {
+                        gProgram_state.AI_vehicles.opponents[j].field_0xb4 = 1;
+                        break;
+                    }
+                    j++;
+                    if (j >= count) {
+                        j = 0;
+                    }
+                } while (j != start);
+            }
+        }
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x004a9600
 // FUNCTION: CARMA2_SW 0x004a5770
@@ -1198,9 +1282,117 @@ void C2_HOOK_FASTCALL DisposeOpponentPaths(void) {
     gBit_per_node = NULL;
 }
 
-// MungeOpponents
+// STUB: CARMA2_HW 0x004a9e10
+// STUB: CARMA2_SW 0x004a5f80
+// STUB: CARMA2_CHEAT 0x004ab2f0
+void C2_HOOK_FASTCALL MungeOpponents(tU32 pFrame_period) {
+    /* FIXME: MungeAIWorld passes pFrame_period in ecx; the Mac version has no parameter */
+    NOT_IMPLEMENTED();
+}
 
-// InitOpponents
+// FUNCTION: CARMA2_HW 0x004add50
+// FUNCTION: CARMA2_SW 0x004a9ec0
+// FUNCTION: CARMA2_CHEAT 0x004af260
+void C2_HOOK_FASTCALL InitOpponents(tRace_info* pRace_info) {
+    int i;
+    int opponent_number;
+    int rank_dependent_difficulty;
+    int skill_dependent_difficulty;
+    br_bounds bounds;
+    tCar_spec* car_spec;
+    tOpponent_spec* opponent_spec;
+
+    gNext_grudge_reduction = gTime_stamp_for_this_munging + 10000;
+    gGrudge_reduction_per_period = 3 - gProgram_state.skill_level;
+    gFirst_frame = 1;
+    gAcknowledged_start = 0;
+    gStart_jumped = 0;
+    gNum_viewable_cars = 0;
+    gViewable_car_list[gNum_viewable_cars] = &gProgram_state.current_car;
+    gNum_viewable_cars++;
+    BrActorToBounds(&bounds, gProgram_state.track_spec.the_actor);
+    gMinimum_yness_before_knackerisation = bounds.min.v[1] - 2.0f;
+    gHead_on_cos_value = (float)cos(0.5235668420791626);
+    gAcme_frame_count = 0;
+    gProgram_state.current_car.no_of_processes_recording_my_trail = 0;
+    gProgram_state.current_car.field_0x1540 = 0;
+    gProgram_state.current_car.field_0x155c = -1;
+    rank_dependent_difficulty = (int)((101.0 - (1.0 - (double)gCurrent_race.index / gNumber_of_races) * 99.0) * -0.1);
+    skill_dependent_difficulty = gProgram_state.skill_level * 5;
+    gBig_bang = (int)(70.0f - (2 * skill_dependent_difficulty - 3 * rank_dependent_difficulty) * gOpponent_nastyness_frigger);
+    gIn_view_distance = MAX(45.0f, gCamera_yon - 10.0f);
+    if (gNet_mode != eNet_mode_none) {
+        gProgram_state.AI_vehicles.number_of_opponents = 0;
+    } else {
+        gProgram_state.AI_vehicles.number_of_opponents = pRace_info->number_of_racers - 1;
+    }
+    for (i = 0, opponent_number = 0; i < gProgram_state.AI_vehicles.number_of_opponents; i++, opponent_number++) {
+        PossibleService();
+        if (pRace_info->opponent_list[opponent_number].index < 0) {
+            opponent_number++;
+        }
+        gProgram_state.AI_vehicles.opponents[i].car_spec = pRace_info->opponent_list[opponent_number].car_spec;
+        gProgram_state.AI_vehicles.opponents[i].car_spec->car_ID = i + 0x200;
+        DoNotDprintf("Car '%s', car_ID %x",
+            gProgram_state.AI_vehicles.opponents[i].car_spec->driver_name,
+            (tU16)gProgram_state.AI_vehicles.opponents[i].car_spec->car_ID);
+        gProgram_state.AI_vehicles.opponents[i].index = pRace_info->opponent_list[opponent_number].index;
+        gProgram_state.AI_vehicles.opponents[i].time_last_processed = gTime_stamp_for_this_munging;
+        gProgram_state.AI_vehicles.opponents[i].next_repair_check = 0;
+        gProgram_state.AI_vehicles.opponents[i].repair_interval = IRandomBetween(gMinTimeOpponentRepair, gMaxTimeOpponentRepair) * 60000;
+        gProgram_state.AI_vehicles.opponents[i].last_repair_time = gTime_stamp_for_this_munging;
+        DoNotDprintf("*** Opponent %s, repair_interval is %d",
+            gProgram_state.AI_vehicles.opponents[i].car_spec->driver_name,
+            gProgram_state.AI_vehicles.opponents[i].repair_interval);
+        gProgram_state.AI_vehicles.opponents[i].time_this_objective_started = gTime_stamp_for_this_munging;
+        gProgram_state.AI_vehicles.opponents[i].last_moved_ok = gTime_stamp_for_this_munging;
+        gProgram_state.AI_vehicles.opponents[i].last_in_view = 0;
+        gProgram_state.AI_vehicles.opponents[i].stun_time_ends = 0;
+        gProgram_state.AI_vehicles.opponents[i].next_player_visibility_check = gTime_stamp_for_this_munging + IRandomBetween(0, 900) + 2000;
+        gProgram_state.AI_vehicles.opponents[i].next_out_of_world_check = gTime_stamp_for_this_munging + 500;
+        gProgram_state.AI_vehicles.opponents[i].finished_for_this_race = 0;
+        gProgram_state.AI_vehicles.opponents[i].physics_me = 1;
+        gProgram_state.AI_vehicles.opponents[i].pursue_from_start = 0;
+        gProgram_state.AI_vehicles.opponents[i].cheating = 0;
+        gProgram_state.AI_vehicles.opponents[i].knackeredness_detected = 0;
+        gProgram_state.AI_vehicles.opponents[i].players_section_when_last_calced_full_path = -1;
+        gProgram_state.AI_vehicles.opponents[i].car_spec->last_person_to_hit_us = NULL;
+        gProgram_state.AI_vehicles.opponents[i].car_spec->last_person_we_hit = NULL;
+        gProgram_state.AI_vehicles.opponents[i].car_spec->last_collision_time = 0;
+        gProgram_state.AI_vehicles.opponents[i].car_spec->last_time_we_touched_a_player = gTime_stamp_for_this_munging;
+        gProgram_state.AI_vehicles.opponents[i].car_spec->grudge_raised_recently = 1;
+        gProgram_state.AI_vehicles.opponents[i].car_spec->no_of_processes_recording_my_trail = 0;
+        gProgram_state.AI_vehicles.opponents[i].nnext_sections = 0;
+        gProgram_state.AI_vehicles.opponents[i].new_objective_required = 1;
+        gProgram_state.AI_vehicles.opponents[i].current_objective = eOOT_none;
+        gProgram_state.AI_vehicles.opponents[i].has_moved_at_some_point = 0;
+        gProgram_state.AI_vehicles.opponents[i].player_in_view_now = 0;
+        gProgram_state.AI_vehicles.opponents[i].acknowledged_piv = 0;
+        gProgram_state.AI_vehicles.opponents[i].field_0xb4 = 0;
+        gProgram_state.AI_vehicles.opponents[i].nastiness = (float)(((gOpponents[gProgram_state.AI_vehicles.opponents[i].index].strength_rating - 1) * 0.25
+                                                                        + gProgram_state.skill_level * 0.5
+                                                                        + gCurrent_race.race_spec->opponent_nastiness_level)
+            / 3.0 * gOpponent_nastyness_frigger);
+        BrVector3Set(&gProgram_state.AI_vehicles.opponents[i].pos_last_frame, 0.0f, 0.0f, 0.0f);
+        gOpponents[gProgram_state.AI_vehicles.opponents[i].index].psyche.grudge_against_player = 10;
+        gViewable_car_list[gNum_viewable_cars] = gProgram_state.AI_vehicles.opponents[i].car_spec;
+        gNum_viewable_cars++;
+        StunTheBugger(&gProgram_state.AI_vehicles.opponents[i], 0xfffffff);
+    }
+    if (gChallenger_index__opponent >= 0) {
+        car_spec = GetCarSpecFromGlobalOppoIndex(gChallenger_index__opponent);
+        opponent_spec = GetOpponentSpecFromCarSpec(car_spec);
+        if (opponent_spec != NULL) {
+            opponent_spec->pursue_from_start = 1;
+        } else {
+            DoNotDprintf("ERROR - can't record dare - no opponent_spec for car_spec");
+        }
+        gChallenger_index__opponent = -1;
+    }
+    ResetPredominantJobbies();
+    gActive_car_list_rebuild_required = 1;
+    RebuildActiveCarList();
+}
 
 // FUNCTION: CARMA2_HW 0x004ae5d0
 // FUNCTION: CARMA2_SW 0x004aa740
@@ -1502,6 +1694,88 @@ void C2_HOOK_FASTCALL TwoCarsHitEachOther(tCar_spec* pA_car, tCar_spec* pAnother
     }
 }
 
-// RecordOpponentTwattageOccurrence
+// FUNCTION: CARMA2_HW 0x004aeef0
+// FUNCTION: CARMA2_SW 0x004ab060
+// FUNCTION: CARMA2_CHEAT 0x004b0450
+void C2_HOOK_FASTCALL RecordOpponentTwattageOccurrence(tCar_spec* pTwatter, tCar_spec* pTwattee) {
+    int bangness;
+    int twatter_index;
+    int twattee_index;
+    int grudginess_caused_by_damage;
+    int new_grudge_value;
+    float damage;
+    tOpponent_spec* twattee_opponent_spec;
+    tOpponent_spec* twatter_opponent_spec;
+
+    if ((pTwatter == NULL || pTwatter->driver != eDriver_oppo) && (pTwattee == NULL || pTwattee->driver != eDriver_oppo)) {
+        return;
+    }
+    damage = pTwattee->damage_magnitude_accumulator;
+    bangness = (int)MIN(100.0, sqrt(damage * 300000.0));
+    grudginess_caused_by_damage = bangness / 10 + 50 * CAR_SPEC_IS_ROZZER(pTwattee);
+    DoNotDprintf("Frame %0.6d: %s hit %s, damage %f, bangness %d, gBig_bang %d, grudginess %d",
+        gAcme_frame_count,
+        pTwatter->driver_name,
+        pTwattee->driver_name,
+        damage,
+        bangness,
+        gBig_bang,
+        grudginess_caused_by_damage);
+    if (bangness < 5) {
+        return;
+    }
+    pTwatter->last_collision_time = gTime_stamp_for_this_munging;
+    pTwatter->last_person_we_hit = pTwattee;
+    pTwattee->last_collision_time = gTime_stamp_for_this_munging;
+    pTwattee->last_person_to_hit_us = pTwatter;
+    pTwattee->grudge_raised_recently = 1;
+    if (bangness >= gBig_bang || CAR_SPEC_IS_ROZZER(pTwattee)) {
+        pTwattee->big_bang = 1;
+    }
+    if (bangness >= 80) {
+        pTwattee->scary_bang = 1;
+    }
+    if (pTwatter != NULL && pTwatter->driver == eDriver_local_human) {
+        twattee_opponent_spec = GetOpponentSpecFromCarSpec(pTwattee);
+        if (pTwattee->scary_bang && gOpponents[twattee_opponent_spec->index].strength_rating < 5) {
+            StunTheBugger(twattee_opponent_spec, 30 * MIN(100, bangness) + 1000);
+        }
+        twattee_index = twattee_opponent_spec->index;
+        new_grudge_value = grudginess_caused_by_damage + gOpponents[twattee_index].psyche.grudge_against_player;
+        if (new_grudge_value > 100) {
+            new_grudge_value = 100;
+        }
+        gOpponents[twattee_index].psyche.grudge_against_player = new_grudge_value;
+    } else if (pTwattee != NULL && pTwattee->driver == eDriver_local_human) {
+        twatter_opponent_spec = GetOpponentSpecFromCarSpec(pTwatter);
+        if (twatter_opponent_spec->current_objective == eOOT_pursue_and_twat && twatter_opponent_spec->pursue_car_data.pursuee == pTwattee) {
+            twatter_opponent_spec->pursue_car_data.time_last_twatted_em = gTime_stamp_for_this_munging;
+        }
+        twatter_index = twatter_opponent_spec->index;
+        new_grudge_value = gOpponents[twatter_index].psyche.grudge_against_player - (twatter_opponent_spec->current_objective == eOOT_pursue_and_twat ? 0 : 2 * grudginess_caused_by_damage);
+        if (new_grudge_value < 0) {
+            new_grudge_value = 0;
+        }
+        gOpponents[twatter_index].psyche.grudge_against_player = new_grudge_value;
+    } else {
+        twatter_opponent_spec = GetOpponentSpecFromCarSpec(pTwatter);
+        twattee_opponent_spec = GetOpponentSpecFromCarSpec(pTwattee);
+        if (pTwattee->scary_bang && gOpponents[twattee_opponent_spec->index].strength_rating < 5) {
+            StunTheBugger(twattee_opponent_spec, 30 * bangness + 1000);
+        }
+        twatter_index = twatter_opponent_spec->index;
+        twattee_index = twattee_opponent_spec->index;
+        if (twatter_opponent_spec->current_objective == eOOT_pursue_and_twat && twatter_opponent_spec->pursue_car_data.pursuee == pTwattee) {
+            twatter_opponent_spec->pursue_car_data.time_last_twatted_em = gTime_stamp_for_this_munging;
+        }
+        if (CAR_SPEC_IS_OPPONENT(pTwatter) && CAR_SPEC_IS_ROZZER(pTwattee)) {
+            new_grudge_value = grudginess_caused_by_damage + gOpponents[twattee_index].psyche.grudge_against_player;
+            if (new_grudge_value > 100) {
+                new_grudge_value = 100;
+            }
+            gOpponents[twattee_index].psyche.grudge_against_player = new_grudge_value;
+        }
+    }
+}
 
 // GetOpponentMood
