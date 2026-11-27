@@ -446,7 +446,7 @@ extern void C2_HOOK_FASTCALL SetGoreLevel(int pNewLevel);
 
 // InitBoner
 
-// DRVector3SafeCross
+extern void C2_HOOK_FASTCALL DRVector3SafeCross(br_vector3* pDest, const br_vector3* pA, const br_vector3* pB);
 
 // DRVector3SafeCrossXZ
 

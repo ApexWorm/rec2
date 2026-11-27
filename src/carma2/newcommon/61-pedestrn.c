@@ -1188,7 +1188,52 @@ int C2_HOOK_FASTCALL IsActorRenderworthy(br_actor* pActor) {
     }
 }
 
-// SetPedXZDirection
+// FUNCTION: CARMA2_HW 0x004cc2c0
+// FUNCTION: CARMA2_SW 0x004c89c0
+// FUNCTION: CARMA2_CHEAT 0x004d1e30
+void C2_HOOK_FASTCALL SetPedXZDirection(tPedestrian* pPed, br_vector3* pDir, float pSpeed, tU32 pTime) {
+    tPed_face_cache_0x34* face_cache;
+    br_vector3 side;
+    br_vector3 dir;
+    br_scalar length;
+    br_scalar turn_time;
+
+    face_cache = pPed->field_0x0c->field_0xb0;
+    if (face_cache == NULL || face_cache->field_0x30 == NULL) {
+        return;
+    }
+    DRVector3SafeCross(&side, &y_unit_vector, pDir);
+    DRVector3SafeCross(&dir, &side, &face_cache->field_0x30->normal);
+    length = BrVector3Length(&dir);
+    if (length > 2.3841858e-07f) {
+        length = 1.0 / length;
+        BrVector3Scale(&dir, &dir, length);
+    } else {
+        BrVector3Set(&dir, 1.f, 0.f, 0.f);
+    }
+    if (pPed->field_0x0c->field_0x6c == 0 || BrVector3Dot(&pPed->field_0x0c->field_0x48, &dir) <= .95) {
+        pPed->field_0x0c->field_0x48.v[0] = dir.v[0];
+        pPed->field_0x0c->field_0x48.v[1] = dir.v[1];
+        pPed->field_0x0c->field_0x48.v[2] = dir.v[2];
+        if (pSpeed != 0.f) {
+            pPed->field_0x0c->field_0x54.v[0] = pPed->field_0x0c->field_0x48.v[0];
+            pPed->field_0x0c->field_0x54.v[1] = pPed->field_0x0c->field_0x48.v[1];
+            pPed->field_0x0c->field_0x54.v[2] = pPed->field_0x0c->field_0x48.v[2];
+            turn_time = (tS16)pPed->character->field_0x1e * (pSpeed / BrVector3Length(&pPed->character->field_0xd8)) / 30.f;
+            if (turn_time > .5) {
+                turn_time = .5f;
+            }
+            pPed->field_0x0c->field_0x6c = pTime;
+            pPed->field_0x0c->field_0x70 = pTime - turn_time * -1000.f;
+            pPed->field_0x0c->field_0x60.v[0] = pPed->character->field_0xc0.v[0];
+            pPed->field_0x0c->field_0x60.v[1] = pPed->character->field_0xc0.v[1];
+            pPed->field_0x0c->field_0x60.v[2] = pPed->character->field_0xc0.v[2];
+        } else {
+            pPed->field_0x0c->field_0x6c = 0;
+            SetCharacterDirectionAR(pPed->character, &pPed->field_0x0c->field_0x48, &pPed->character->field_0xcc);
+        }
+    }
+}
 
 // StopPedNoise
 
@@ -2490,9 +2535,35 @@ void C2_HOOK_FASTCALL SetGoreLevel(int pNewLevel) {
 
 // InitBoner
 
-// DRVector3SafeCross
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
 
-// DRVector3SafeCrossXZ
+// STUB: CARMA2_HW 0x00403f90
+// STUB: CARMA2_SW 0x00403f90
+// STUB: CARMA2_CHEAT 0x00403f90
+void C2_HOOK_FASTCALL DRVector3SafeCross(br_vector3* pDest, const br_vector3* pA, const br_vector3* pB) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_HW 0x00404150
+// STUB: CARMA2_SW 0x00404150
+// STUB: CARMA2_CHEAT 0x00404150
+void C2_HOOK_FASTCALL DRVector3SafeCrossXZ(br_vector3* pDest, const br_vector3* pA, const br_vector3* pB) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // FUNCTION: CARMA2_HW 0x00404290
 // FUNCTION: CARMA2_SW 0x00404290
