@@ -2054,7 +2054,19 @@ intptr_t C2_HOOK_CDECL MakeCarModelsMaterialsSingleSided(br_actor* pActor, void*
     return 0;
 }
 
-// IsOnNonCarHalf
+// FUNCTION: CARMA2_HW 0x0042df70
+// FUNCTION: CARMA2_SW 0x0042dfe0
+// FUNCTION: CARMA2_CHEAT 0x0042e110
+int C2_HOOK_FASTCALL IsOnNonCarHalf(tCar_spec* pCar, const br_vector3* pPos) {
+    tCar_crush_spec* crush;
+
+    crush = pCar->car_crush_spec;
+    if (crush != NULL && crush->field_0x4b8 != 0 && BrVector3Dot(&crush->field_0x548, pPos) - crush->field_0x554 < 0.0f) {
+        return 1;
+    } else {
+        return 0;
+    }
+}
 
 // SplitCar
 
