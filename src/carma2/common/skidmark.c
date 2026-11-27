@@ -23,13 +23,13 @@
 
 
 // GLOBAL: CARMA2_HW 0x0065fe08
-char* gBoring_material_names[2] = {
+const char* gBoring_material_names[2] = {
     "OILSMEAR.MAT",
     "ROBSMEAR.MAT",
 };
 
 // GLOBAL: CARMA2_HW 0x0065fe10
-char* gMaterial_names[2] = {
+const char* gMaterial_names[2] = {
     "OILSMEAR.MAT",
     "GIBSMEAR.MAT",
 };

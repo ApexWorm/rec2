@@ -172,7 +172,7 @@ extern void C2_HOOK_FASTCALL PositionWorldJointedObject(tPhysics_object* pObject
 
 // CountJointForces
 
-// MoveJointedObject
+extern void C2_HOOK_FASTCALL MoveJointedObject(tPhysics_object* pObject, float pDelta_time);
 
 extern void C2_HOOK_FASTCALL TellPhysicsJointsHaveChanged(tPhysics_object* pCollision_info);
 
@@ -430,7 +430,7 @@ extern void C2_HOOK_FASTCALL SetUpTestObjects(void);
 
 extern void C2_HOOK_FASTCALL InitPhysics(void);
 
-// PointOutOfSightNotAR
+// PointOutOfSightNotAR (moved to 51-smash for inlining purposes)
 
 // CalcCollObjIDFromCarSpec
 

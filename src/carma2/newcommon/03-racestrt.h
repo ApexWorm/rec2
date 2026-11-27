@@ -12,11 +12,12 @@
 #include "c2_hooks.h"
 #include "rec2_types.h"
 
+extern int gOur_starting_position;
 extern tU32 gLast_host_query;
 
 extern int C2_HOOK_CDECL SortGridFunction(const void* pFirst_one, const void* pSecond_one);
 
-// SortOpponents
+extern int C2_HOOK_FASTCALL SortOpponents(void);
 
 // DoGridPosition
 

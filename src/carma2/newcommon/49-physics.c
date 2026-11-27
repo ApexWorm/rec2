@@ -82,10 +82,12 @@ void* gPhysics_buffer3_ptr;
 
 // GLOBAL: CARMA2_HW 0x0074a5e4
 // GLOBAL: CARMA2_SW 0x007410a4
+// GLOBAL: CARMA2_CHEAT 0x00751c84
 int gPHIL_mechanics_time_sync;
 
 // GLOBAL: CARMA2_HW 0x0074a5e8
 // GLOBAL: CARMA2_SW 0x007410a8
+// GLOBAL: CARMA2_CHEAT 0x00751c88
 int gPHIL_munging_objects;
 
 // GLOBAL: CARMA2_HW 0x006940c8
@@ -622,13 +624,29 @@ void C2_HOOK_FASTCALL PositionWorldJointedObject(tPhysics_object* pObject, br_sc
 
 // CountJointForces
 
-// MoveJointedObject
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
 
-// STUB: CARMA2_HW 0x004b9750
-// STUB: CARMA2_SW 0x004b5e70
-// STUB: CARMA2_CHEAT 0x004bf280
-void C2_HOOK_FASTCALL TellPhysicsJointsHaveChanged(tPhysics_object* pCollision_info) {
+// STUB: CARMA2_HW 0x004b7510
+// STUB: CARMA2_SW 0x004b3c30
+// STUB: CARMA2_CHEAT 0x004bd040
+void C2_HOOK_FASTCALL MoveJointedObject(tPhysics_object* pObject, float pDelta_time) {
     NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
+
+// FUNCTION: CARMA2_HW 0x004b9750
+// FUNCTION: CARMA2_SW 0x004b5e70
+// FUNCTION: CARMA2_CHEAT 0x004bf280
+void C2_HOOK_FASTCALL TellPhysicsJointsHaveChanged(tPhysics_object* pCollision_info) {
+
+    pCollision_info->field_0x218 = 0;
+    MoveJointedObject(pCollision_info, 0.0f);
+    gINT_00692dc8 = 1;
 }
 
 // CombineBounds
@@ -1282,6 +1300,7 @@ void C2_HOOK_FASTCALL IncreasePhysicsScratchPointer(int pSize) {
 }
 
 // FUNCTION: CARMA2_HW 0x004c5d00
+// FUNCTION: CARMA2_SW 0x004c2430
 void C2_HOOK_FASTCALL ClearPhysicsScratchSpace(void) {
 
     gPhysics_scratch_ptr = gPhysics_other_buffer;
@@ -1474,11 +1493,37 @@ void C2_HOOK_FASTCALL FillInShape(tPhysics_shape* pShape) {
     }
 }
 
-// STUB: CARMA2_HW 0x004c60a0
-// STUB: CARMA2_SW 0x004c27d0
-// STUB: CARMA2_CHEAT 0x004cbbc0
+// FUNCTION: CARMA2_HW 0x004c60a0
+// FUNCTION: CARMA2_SW 0x004c27d0
+// FUNCTION: CARMA2_CHEAT 0x004cbbc0
 void C2_HOOK_FASTCALL UpdateCollisionObject(tPhysics_object* pCollision_info) {
-    NOT_IMPLEMENTED();
+    tPhysics_shape* shape;
+    tPhysics_shape* current;
+    br_scalar radius;
+
+    shape = pCollision_info->shape;
+    if (shape == NULL) {
+        return;
+    }
+    pCollision_info->bb1 = shape->common.bb;
+
+    for (current = shape->common.next; current != NULL; current = current->common.next) {
+        int i;
+
+        for (i = 0; i < 3; i++) {
+
+            pCollision_info->bb1.min.v[i] = pCollision_info->bb1.min.v[i] < current->common.bb.min.v[i] ? pCollision_info->bb1.min.v[i] : current->common.bb.min.v[i];
+            pCollision_info->bb1.max.v[i] = pCollision_info->bb1.max.v[i] > current->common.bb.max.v[i] ? pCollision_info->bb1.max.v[i] : current->common.bb.max.v[i];
+        }
+    }
+    pCollision_info->bb2 = pCollision_info->bb1;
+
+    pCollision_info->radius_squared = 0.0f
+            + MAX(REC2_SQR(pCollision_info->bb2.min.v[0]), REC2_SQR(pCollision_info->bb2.max.v[0]))
+            + MAX(REC2_SQR(pCollision_info->bb2.min.v[1]), REC2_SQR(pCollision_info->bb2.max.v[1]))
+            + MAX(REC2_SQR(pCollision_info->bb2.min.v[2]), REC2_SQR(pCollision_info->bb2.max.v[2]));
+    radius = (br_scalar)sqrt(pCollision_info->radius_squared);
+    pCollision_info->radius = radius;
 }
 
 // FUNCTION: CARMA2_HW 0x004c61c0
@@ -1643,6 +1688,7 @@ void C2_HOOK_FASTCALL InitPhysicsWorkspace(tU8* pBuffer, int pSize) {
 }
 
 // FUNCTION: CARMA2_HW 0x004b57d0
+// FUNCTION: CARMA2_SW 0x004b1ef0
 // FUNCTION: CARMA2_CHEAT 0x004bb0a0
 int C2_HOOK_FASTCALL FindFacesInBox(tBounds* pBounds, tFace_ref* pFace_list, int pMax_face, tWorld_callbacks* pWorld_callbacks) {
     tU8 cx_min;
@@ -1734,6 +1780,7 @@ void C2_HOOK_FASTCALL DoPhysicsError(tPhysicsError pError, const char* pMessage)
 // ResetMan2
 
 // FUNCTION: CARMA2_HW 0x004b5aa0
+// FUNCTION: CARMA2_CHEAT 0x004bb370
 void C2_HOOK_FASTCALL SetUpTestObjects(void) {
 
 }
@@ -1759,7 +1806,7 @@ void C2_HOOK_FASTCALL InitPhysics(void) {
 #pragma inline_depth()
 #endif
 
-// PointOutOfSightNotAR
+// PointOutOfSightNotAR (moved to 51-smash for inlining purposes)
 
 // CalcCollObjIDFromCarSpec
 
