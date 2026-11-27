@@ -20,21 +20,22 @@
 // GLOBAL: CARMA2_HW 0x00691b40
 // GLOBAL: CARMA2_SW 0x0068bb98
 // GLOBAL: CARMA2_CHEAT 0x00699528
-tTwatVfsMountPoint gTwatVfsMountPoints[5];
+tTwatVfsMountPoint gTwatVfsMountPoints[5] = { 0 };
+
+// GLOBAL: CARMA2_HW 0x00692068
+// GLOBAL: CARMA2_SW 0x0068c0c0
+// GLOBAL: CARMA2_CHEAT 0x00699a50
+int gDisableTiffConversionStack[2] = { 0 };
 
 // GLOBAL: CARMA2_HW 0x00692070
 // GLOBAL: CARMA2_SW 0x0068c0c8
 // GLOBAL: CARMA2_CHEAT 0x00699a58
-tTwatVfsFile gTwatVfsFiles[51];
+tTwatVfsFile gTwatVfsFiles[51] = { 0 };
 
 // GLOBAL: CARMA2_HW 0x006923a0
 // GLOBAL: CARMA2_SW 0x0068c3f8
 // GLOBAL: CARMA2_CHEAT 0x00699d88
-int gDisableTiffConversionStackPos;
-
-// GLOBAL: CARMA2_HW 0x00692068
-// GLOBAL: CARMA2_SW 0x0068c0c0
-int gDisableTiffConversionStack[2];
+int gDisableTiffConversionStackPos = 0;
 
 // GLOBAL: CARMA2_HW 0x0068c724
 // GLOBAL: CARMA2_SW 0x00686774
