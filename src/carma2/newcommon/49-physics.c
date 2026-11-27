@@ -931,8 +931,8 @@ void C2_HOOK_FASTCALL DoJointFriction(tPhysics_object* pObject) {
     tPhysics_object* child;
     br_vector3 rel[3];
 
-    if (pObject->physics_joint1 != NULL && pObject->physics_joint1->friction != 0.f && pObject->field_0x230 != NULL) {
-        total_sq = 0.f;
+    if (pObject->physics_joint1 != NULL && pObject->physics_joint1->friction != 0.0f && pObject->field_0x230 != NULL) {
+        total_sq = 0.0f;
         max_impulse_sq = pObject->physics_joint1->friction * 0.04f;
         max_impulse_sq = max_impulse_sq * max_impulse_sq;
         for (i = 0; i < 3; i++) {
@@ -941,7 +941,7 @@ void C2_HOOK_FASTCALL DoJointFriction(tPhysics_object* pObject) {
             for (j = 0; j < 3; j++) {
                 rel[i].v[j] = tv.v[j] / pObject->field_0x230->I.v[j];
             }
-            impulse.v[i] /= 1.0 / pObject->I.v[i] + BrVector3Dot(&rel[i], &tv);
+            impulse.v[i] /= (br_scalar)(1.0 / pObject->I.v[i] + BrVector3Dot(&rel[i], &tv));
             total_sq += impulse.v[i] * impulse.v[i];
         }
         if (total_sq > max_impulse_sq) {
@@ -954,9 +954,9 @@ void C2_HOOK_FASTCALL DoJointFriction(tPhysics_object* pObject) {
             BrVector3Accumulate(&pObject->field_0x230->omega, &rel[i]);
         }
     }
-    if (pObject->physics_joint2 != NULL && pObject->physics_joint2->friction != 0.f) {
+    if (pObject->physics_joint2 != NULL && pObject->physics_joint2->friction != 0.0f) {
         max_impulse_sq = pObject->physics_joint2->friction * 0.04f;
-        total_sq = 0.f;
+        total_sq = 0.0f;
         max_impulse_sq = max_impulse_sq * max_impulse_sq;
         for (i = 0; i < 3; i++) {
             impulse.v[i] = pObject->omega.v[i] * pObject->I.v[i];
