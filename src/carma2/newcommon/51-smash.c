@@ -1221,9 +1221,9 @@ inline void C2_HOOK_FASTCALL VerySimpleRotate(br_scalar pDt, br_matrix34* pMatri
         pos.v[0] = pMatrix->m[3][0];
         pos.v[1] = pMatrix->m[3][1];
         pos.v[2] = pMatrix->m[3][2];
-        pMatrix->m[3][0] = 0.f;
-        pMatrix->m[3][1] = 0.f;
-        pMatrix->m[3][2] = 0.f;
+        pMatrix->m[3][0] = 0.0f;
+        pMatrix->m[3][1] = 0.0f;
+        pMatrix->m[3][2] = 0.0f;
         BrMatrix34PostRotate(pMatrix, BrRadianToAngle(omega * pDt), &axis);
         pMatrix->m[3][0] = pos.v[0];
         pMatrix->m[3][1] = pos.v[1];
@@ -1238,8 +1238,8 @@ void C2_HOOK_FASTCALL DoFragMovement(tSmash_vertex* pFragment, tU32 pTime, float
     float f_dt;
     br_vector3 move;
 
-    f_dt = pDelta_time / 1000.f;
-    if (f_dt != 0.f && pFragment->field_0x34 == 0) {
+    f_dt = pDelta_time / 1000.0f;
+    if (f_dt != 0.0f && pFragment->field_0x34 == 0) {
         move.v[0] = pFragment->v.v[0] * f_dt;
         move.v[1] = pFragment->v.v[1] * f_dt - 4.9 * gGravity_multiplier * f_dt * f_dt;
         move.v[2] = pFragment->v.v[2] * f_dt;
