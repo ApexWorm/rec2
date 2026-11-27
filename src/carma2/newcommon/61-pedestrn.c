@@ -2619,6 +2619,7 @@ tPed_form* C2_HOOK_FASTCALL SetUpCharacterForm(const char* pName) {
 
 // FUNCTION: CARMA2_HW 0x004067e0
 // FUNCTION: CARMA2_SW 0x004067e0
+// FUNCTION: CARMA2_CHEAT 0x004067e0
 void C2_HOOK_FASTCALL DisposeCharacterForm(tPed_form* pForm) {
     int i;
     int j;
