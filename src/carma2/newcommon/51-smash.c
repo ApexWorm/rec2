@@ -495,7 +495,18 @@ void C2_HOOK_FASTCALL RemoveExplosions(tCar_spec* pCar_spec) {
     }
 }
 
-// CalcRandomPointBetween
+inline void C2_HOOK_FASTCALL CalcRandomPointBetween(br_vertex* pDest, const br_vertex* pA, const br_vertex* pB) {
+    int i;
+    br_scalar t;
+
+    t = FRandomBetween(0.2f, 0.8f);
+    for (i = 0; i < 3; i++) {
+        pDest->p.v[i] = (pB->p.v[i] - pA->p.v[i]) * t + pA->p.v[i];
+    }
+    for (i = 0; i < 2; i++) {
+        pDest->map.v[i] = (pB->map.v[i] - pA->map.v[i]) * t + pA->map.v[i];
+    }
+}
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
@@ -570,7 +581,160 @@ void C2_HOOK_FASTCALL SetShrapnelFragment(tSmash_vertex* pFragment, tMovement_sp
     pFragment->field_0x10 = pTime + IRandomBetween(pTime_spec->min_time, pTime_spec->max_time);
 }
 
-// ShatterObject
+// FUNCTION: CARMA2_HW 0x004ec370
+// FUNCTION: CARMA2_SW 0x004e8040
+// FUNCTION: CARMA2_CHEAT 0x004f2010
+void C2_HOOK_FASTCALL ShatterObject(int pSeed, br_vector3* pImpactee_velocity, br_actor* pActor, tU32 pTime, int pCount_faces, tCar_crush_vertex_data* pFaces, int pCount_vertices, tU16* pVertex_indices, br_material* pMaterial, tU32 pFlags, float pMin_size_squared, tMovement_spec* pSpeed_info, tShrapnel_time_info* pTime_spec, tU32 pId, br_matrix34* pMatrix) {
+    int i;
+    int j;
+    int old_seed;
+    int count_faces;
+    int count_vertices;
+    const int* split;
+    int k;
+    br_vertex* v[5];
+    br_vertex vertices[200];
+    br_face faces[200];
+    br_face* face;
+    br_scalar d01;
+    br_scalar d02;
+    br_scalar d12;
+    br_scalar size;
+    br_scalar scale;
+    br_vector3 tv;
+    br_vector3 centre;
+    br_vector3 fragment_centre;
+    tSmash_vertex* fragment;
+    br_model* model;
+    // GLOBAL: CARMA2_HW 0x0065ff08
+    // GLOBAL: CARMA2_SW 0x0065a848
+    // GLOBAL: CARMA2_CHEAT 0x00667750
+    static int split_orders[3][2][3] = {
+        { { 0, 1, 2 }, { 0, 2, 1 } },
+        { { 1, 0, 2 }, { 1, 2, 0 } },
+        { { 2, 0, 1 }, { 2, 1, 0 } },
+    };
+
+    if (pCount_faces == 0 || pFaces == NULL || pCount_vertices == 0 || pVertex_indices == NULL) {
+        return;
+    }
+    old_seed = rand();
+    srand(pSeed);
+    memset(vertices, 0, sizeof(vertices));
+    for (i = 0; i < pCount_vertices; i++) {
+        vertices[i] = pActor->model->vertices[pVertex_indices[i]];
+    }
+    memset(faces, 0, sizeof(faces));
+    for (i = 0; i < pCount_faces; i++) {
+        memcpy(faces[i].vertices, pFaces[i].field_0x0, sizeof(faces[i].vertices));
+        faces[i].material = pMaterial;
+        faces[i].flags = 0;
+    }
+    count_faces = pCount_faces;
+    count_vertices = pCount_vertices;
+    for (i = 0; i < count_faces && count_faces < 199 && count_vertices < 199; i++) {
+        face = &faces[i];
+        for (j = 0; j < 4 && count_faces < 199 && count_vertices < 199; j++) {
+            for (k = 0; k < 3; k++) {
+                v[k] = &vertices[face->vertices[k]];
+            }
+            /* FIXME: Vector3DistanceSquared */
+            d01 = (v[0]->p.v[0] - v[1]->p.v[0]) * (v[0]->p.v[0] - v[1]->p.v[0]) + (v[0]->p.v[1] - v[1]->p.v[1]) * (v[0]->p.v[1] - v[1]->p.v[1]) + (v[0]->p.v[2] - v[1]->p.v[2]) * (v[0]->p.v[2] - v[1]->p.v[2]);
+            d02 = (v[0]->p.v[0] - v[2]->p.v[0]) * (v[0]->p.v[0] - v[2]->p.v[0]) + (v[0]->p.v[1] - v[2]->p.v[1]) * (v[0]->p.v[1] - v[2]->p.v[1]) + (v[0]->p.v[2] - v[2]->p.v[2]) * (v[0]->p.v[2] - v[2]->p.v[2]);
+            d12 = (v[2]->p.v[0] - v[1]->p.v[0]) * (v[2]->p.v[0] - v[1]->p.v[0]) + (v[2]->p.v[1] - v[1]->p.v[1]) * (v[2]->p.v[1] - v[1]->p.v[1]) + (v[2]->p.v[2] - v[1]->p.v[2]) * (v[2]->p.v[2] - v[1]->p.v[2]);
+            if (d01 < pMin_size_squared && d02 < pMin_size_squared && d12 < pMin_size_squared && !PercentageChance(0)) {
+                break;
+            }
+            if (d01 < d02 && d01 < d12) {
+                split = split_orders[2][IRandomBetween(0, 1)];
+            } else if (d12 < d02 && d12 < d01) {
+                split = split_orders[0][IRandomBetween(0, 1)];
+            } else {
+                split = split_orders[1][IRandomBetween(0, 1)];
+            }
+            v[3] = &vertices[count_vertices];
+            v[4] = &vertices[count_vertices + 1];
+            CalcRandomPointBetween(v[3], v[split[0]], v[split[1]]);
+            CalcRandomPointBetween(v[4], v[split[0]], v[split[2]]);
+            faces[count_faces].material = pMaterial;
+            faces[count_faces].flags = 0;
+            faces[count_faces].vertices[0] = face->vertices[split[1]];
+            faces[count_faces].vertices[1] = count_vertices;
+            faces[count_faces].vertices[2] = count_vertices + 1;
+            faces[count_faces + 1].material = pMaterial;
+            faces[count_faces + 1].flags = 0;
+            faces[count_faces + 1].vertices[0] = face->vertices[split[1]];
+            faces[count_faces + 1].vertices[1] = face->vertices[split[2]];
+            faces[count_faces + 1].vertices[2] = count_vertices + 1;
+            face->vertices[split[1]] = count_vertices;
+            face->vertices[split[2]] = count_vertices + 1;
+            count_faces += 2;
+            count_vertices += 2;
+        }
+    }
+    BrVector3Set(&centre, 0.0f, 0.0f, 0.0f);
+    for (i = 0; i < count_vertices; i++) {
+        BrMatrix34ApplyP(&tv, &vertices[i].p, pMatrix);
+        BrVector3Copy(&vertices[i].p, &tv);
+        if (pFlags & 0x1) {
+            BrVector3Accumulate(&centre, &tv);
+        }
+    }
+    centre.v[0] /= count_vertices;
+    centre.v[1] /= count_vertices;
+    centre.v[2] /= count_vertices;
+    for (i = 0; i < count_faces; i++) {
+        fragment = FindShrapnelFragment(NULL, pId, 3);
+        if (fragment == NULL) {
+            break;
+        }
+        face = &faces[i];
+        BrVector3Set(&fragment_centre, 0.0f, 0.0f, 0.0f);
+        BrVector3Copy(&fragment->actor->model->vertices[0].p, &vertices[face->vertices[0]].p);
+        BrVector3Accumulate(&fragment_centre, &fragment->actor->model->vertices[0].p);
+        fragment->actor->model->vertices[0].map.v[0] = vertices[face->vertices[0]].map.v[0];
+        fragment->actor->model->vertices[0].map.v[1] = vertices[face->vertices[0]].map.v[1];
+        fragment->actor->model->faces[0].material = face->material;
+        BrVector3Copy(&fragment->actor->model->vertices[1].p, &vertices[face->vertices[1]].p);
+        BrVector3Accumulate(&fragment_centre, &fragment->actor->model->vertices[1].p);
+        fragment->actor->model->vertices[1].map.v[0] = vertices[face->vertices[1]].map.v[0];
+        fragment->actor->model->vertices[1].map.v[1] = vertices[face->vertices[1]].map.v[1];
+        BrVector3Copy(&fragment->actor->model->vertices[2].p, &vertices[face->vertices[2]].p);
+        BrVector3Accumulate(&fragment_centre, &fragment->actor->model->vertices[2].p);
+        fragment->actor->model->vertices[2].map.v[0] = vertices[face->vertices[2]].map.v[0];
+        fragment->actor->model->vertices[2].map.v[1] = vertices[face->vertices[2]].map.v[1];
+        fragment_centre.v[0] /= fragment->actor->model->nvertices;
+        fragment_centre.v[1] /= fragment->actor->model->nvertices;
+        fragment_centre.v[2] /= fragment->actor->model->nvertices;
+        for (j = 0; j < fragment->actor->model->nvertices; j++) {
+            fragment->actor->model->vertices[j].p.v[0] -= fragment_centre.v[0];
+            fragment->actor->model->vertices[j].p.v[1] -= fragment_centre.v[1];
+            fragment->actor->model->vertices[j].p.v[2] -= fragment_centre.v[2];
+        }
+        BrMatrix34Identity(&fragment->actor->t.t.mat);
+        for (j = 0; j < 3; j++) {
+            if (pFlags & 0x1) {
+                fragment->actor->t.t.translate.t.v[j] = FRandomPosNeg(0.04f) + centre.v[j];
+            } else {
+                fragment->actor->t.t.translate.t.v[j] = FRandomPosNeg(0.015f) + fragment_centre.v[j];
+            }
+        }
+        BrModelUpdate(fragment->actor->model, BR_MODU_VERTEX_POSITIONS | BR_MODU_VERTEX_MAPPING | BR_MODU_PRIMITIVE_MATERIALS);
+        model = fragment->actor->model;
+        size = 0.0f;
+        for (j = 0; j < 3; j++) {
+            size += model->bounds.max.v[j] - model->bounds.min.v[j];
+        }
+        if (size < 0.1) {
+            scale = (br_scalar)((0.2 - size) / 0.2);
+        } else {
+            scale = 0.5f;
+        }
+        SetShrapnelFragment(fragment, pSpeed_info, pImpactee_velocity, scale, pTime_spec, pTime,
+            (br_vector3*)&model->prepared->groups->faces->eqn, NULL, NULL);
+    }
+    srand(old_seed);
+}
 
 void C2_HOOK_FASTCALL MungeInternalCarGlass(tCar_spec* pCar_spec) {
 

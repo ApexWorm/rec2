@@ -93,7 +93,7 @@ extern void C2_HOOK_FASTCALL Explode(tExplosion_animation *pExplosion_animation,
 
 extern void C2_HOOK_FASTCALL RemoveExplosions(tCar_spec* pCar_spec);
 
-// CalcRandomPointBetween
+extern void C2_HOOK_FASTCALL CalcRandomPointBetween(br_vertex* pDest, const br_vertex* pA, const br_vertex* pB);
 
 extern void C2_HOOK_FASTCALL ApplyInitialMovement(tMovement_spec* pSpeed_info, br_vector3* pImpactee_velocity, br_vector3* pVelocity, br_vector3* pOmega, float pScale, br_vector3* pNormal, br_vector3* pSource_position, br_vector3* pPosition);
 
@@ -103,7 +103,7 @@ extern tSmash_vertex* C2_HOOK_FASTCALL FindShrapnelFragment(br_model* pModel, tU
 
 extern void C2_HOOK_FASTCALL SetShrapnelFragment(tSmash_vertex* pFragment, tMovement_spec* pSpeed_info, br_vector3* pImpactee_velocity, float pScale, tShrapnel_time_info* pTime_spec, tU32 pTime, br_vector3* pNormal, br_vector3* pSource_position, br_vector3* pPosition);
 
-// ShatterObject
+extern void C2_HOOK_FASTCALL ShatterObject(int pSeed, br_vector3* pImpactee_velocity, br_actor* pActor, tU32 pTime, int pCount_faces, tCar_crush_vertex_data* pFaces, int pCount_vertices, tU16* pVertex_indices, br_material* pMaterial, tU32 pFlags, float pMin_size_squared, tMovement_spec* pSpeed_info, tShrapnel_time_info* pTime_spec, tU32 pId, br_matrix34* pMatrix);
 
 extern void C2_HOOK_FASTCALL MungeInternalCarGlass(tCar_spec* pCar_spec);
 
