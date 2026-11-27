@@ -329,6 +329,7 @@ void C2_HOOK_CDECL BrPixelmapFill(br_pixelmap* dst, br_uint_32 colour) {
 
 // FUNCTION: CARMA2_HW 0x00538310
 // FUNCTION: CARMA2_SW 0x005339b0
+// FUNCTION: CARMA2_CHEAT 0x0053df00
 void C2_HOOK_CDECL BrPixelmapRectangle(br_pixelmap* dst, br_int_32 x, br_int_32 y, br_int_32 w, br_int_32 h, br_uint_32 colour) {
     br_rectangle r;
 
