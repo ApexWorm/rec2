@@ -147,6 +147,7 @@ void C2_HOOK_FASTCALL SmoothlySetCarMaterialFlags(tBrender_storage* pStorage, tC
 #endif
 
 // FUNCTION: CARMA2_HW 0x004f6820
+// FUNCTION: CARMA2_SW 0x004f23d0
 // FUNCTION: CARMA2_CHEAT 0x004fc4c0
 // STUB: CARMA2_SW 0x004f23d0
 void C2_HOOK_FASTCALL SmoothlySetWorldMaterialFlags(tBrender_storage* pStorage) {

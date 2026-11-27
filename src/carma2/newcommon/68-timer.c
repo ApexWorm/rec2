@@ -52,6 +52,23 @@ tU32 gTimers_frame_start_time;
 // GLOBAL: CARMA2_SW 0x006a44ac
 tU32 gTimers_tolerance;
 
+#ifdef REC2_MATCHING
+// GLOBAL: CARMA2_HW 0x006b75d8
+// GLOBAL: CARMA2_SW 0x006ae2b8
+// GLOBAL: CARMA2_CHEAT 0x006bec78
+int gINT_006b75d8 = 0;
+
+// GLOBAL: CARMA2_HW 0x006b75dc
+// GLOBAL: CARMA2_SW 0x006ae2bc
+// GLOBAL: CARMA2_CHEAT 0x006bec7c
+int gINT_006b75dc = 0;
+#endif
+
+// GLOBAL: CARMA2_HW 0x006b75e0
+// GLOBAL: CARMA2_SW 0x006ae2c0
+// GLOBAL: CARMA2_CHEAT 0x006bec80
+int gTimers_stack[8] = { 0 };
+
 // GLOBAL: CARMA2_HW 0x006b7600
 // GLOBAL: CARMA2_SW 0x006ae2e0
 // GLOBAL: CARMA2_CHEAT 0x006beca0
@@ -139,6 +156,7 @@ void C2_HOOK_FASTCALL Timers_StartFrame(void) {
 }
 
 // FUNCTION: CARMA2_HW 0x00504740
+// FUNCTION: CARMA2_SW 0x004fff30
 // FUNCTION: CARMA2_CHEAT 0x0050a3e0
 void C2_HOOK_FASTCALL Timers_EndFrame(void) {
     int i;
@@ -171,6 +189,7 @@ void C2_HOOK_FASTCALL Timers_EndFrame(void) {
 }
 
 // FUNCTION: CARMA2_HW 0x00504810
+// FUNCTION: CARMA2_SW 0x00500000
 void C2_HOOK_FASTCALL Timers_Draw(br_pixelmap* pScreen) {
     tU32 longest_duration;
     int longest_duration_timer;
