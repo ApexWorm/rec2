@@ -19,6 +19,7 @@
 #include "28-world3.h"
 #include "30-opponent.h"
 #include "32-spark.h"
+#include "34-finteray.h"
 #include "41-utility.h"
 #include "42-input.h"
 #include "43-pratcam.h"
@@ -100,7 +101,7 @@ int gGhost_pedestrians = 0;
 // FUNCTION: CARMA2_HW 0x004d5730
 // FUNCTION: CARMA2_SW 0x004d1e20
 // FUNCTION: CARMA2_CHEAT 0x004db2f0
-int C2_HOOK_FASTCALL OrientationChanged(const br_matrix34* pOrientation_1, const br_matrix34* pOrientation_2, float pCos_angle) {
+inline int C2_HOOK_FASTCALL OrientationChanged(const br_matrix34* pOrientation_1, const br_matrix34* pOrientation_2, float pCos_angle) {
     if (BrVector3Dot((br_vector3*)pOrientation_1->m[0], (br_vector3*)pOrientation_2->m[0]) < pCos_angle
         || BrVector3Dot((br_vector3*)pOrientation_1->m[1], (br_vector3*)pOrientation_2->m[1]) < pCos_angle
         || BrVector3Dot((br_vector3*)pOrientation_1->m[2], (br_vector3*)pOrientation_2->m[2]) < pCos_angle) {
@@ -159,11 +160,53 @@ inline void C2_HOOK_FASTCALL ResetPedFaceCache(void) {
     }
 }
 
-// SetPedCurrentFace
+inline void C2_HOOK_FASTCALL SetPedCurrentFace(tPedestrian* pPed, br_vector3* pPos) {
+    tPed_face_cache_0x34* face_cache;
 
-// RecachePedestrian
+    if (pPed->field_0x0c != NULL) {
+        face_cache = pPed->field_0x0c->field_0xb0;
+        face_cache->field_0x30 = CastRayDownThruFaces((br_vector3*)GetCharacterMatrixPtr(pPed->character)->m[3], face_cache->field_0x0, face_cache->field_0x4,
+            GetClearanceFromCharacterInstance(pPed->character, 0), pPos);
+    }
+}
 
-// SetCharacterDirectionAR
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_HW 0x004d2060
+// STUB: CARMA2_SW 0x004ce760
+// STUB: CARMA2_CHEAT 0x004d7c00
+void C2_HOOK_FASTCALL RecachePedestrian(tPedestrian* pPed, br_vector3* pPos, tU32 pTime) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
+
+// FUNCTION: CARMA2_HW 0x004d3360
+// FUNCTION: CARMA2_SW 0x004cfa50
+// FUNCTION: CARMA2_CHEAT 0x004d8f20
+void C2_HOOK_FASTCALL SetCharacterDirectionAR(tPed_character_instance* pPed, const br_vector3* pDir, const br_vector3* pUp) {
+    tPhysics_object* object;
+
+    if (pPed->field_0x14 & 0x1) {
+        object = pPed->personality->form->simple_physicing[(tS8)pPed->field_0x5].collision_info;
+    } else {
+        object = GetRootObject(pPed);
+    }
+    if (gAction_replay_mode && !gBOOL_00744804) {
+        return;
+    }
+    if (!(pPed->field_0x14 & 0x4) && gProgram_state.racing) {
+        PipeSinglePedDir(((tS16)pPed->ped->field_0x06 << 16) | (pPed->ped - gPedestrian_array), pDir);
+    }
+    SetCharacterDirection(pPed, pDir, pUp);
+    if (gProgram_state.racing && OrientationChanged(&object->transform_matrix, &object->actor->t.t.mat, .7f)) {
+        AssertRootObjectsMatrix(pPed);
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x004ca4d0
 // FUNCTION: CARMA2_SW 0x004c6c00
@@ -1548,11 +1591,79 @@ int C2_HOOK_FASTCALL DamagePedestrian(tPedestrian* pPed, int pDamage, int pArg3,
 
 // PedHeadingTowardsCollisionObject
 
-// OutsideFaceXZ
+inline int C2_HOOK_FASTCALL OutsideFaceXZ(const br_vector3* pPos, const tFace_ref* pFace) {
+    int result;
+    br_scalar dx1;
+    br_scalar dz1;
+    br_scalar dx2;
+    br_scalar dz2;
+    br_scalar px;
+    br_scalar pz;
+
+#ifdef REC2_FIX_BUGS
+    result = 0;
+#endif
+    if (pFace != NULL) {
+        dx1 = pFace->v[1].v[0] - pFace->v[0].v[0];
+        dz1 = pFace->v[1].v[2] - pFace->v[0].v[2];
+        dx2 = pFace->v[2].v[0] - pFace->v[0].v[0];
+        dz2 = pFace->v[2].v[2] - pFace->v[0].v[2];
+        px = pPos->v[0] - pFace->v[0].v[0];
+        pz = pPos->v[2] - pFace->v[0].v[2];
+        if ((dx1 * pz - dz1 * px) * (dx1 * dz2 - dz1 * dx2) >= 0.0f && (dx2 * pz - dz2 * px) * (dx2 * dz1 - dz2 * dx1) >= 0.0f) {
+            dx1 = pFace->v[2].v[0] - pFace->v[1].v[0];
+            dz1 = pFace->v[2].v[2] - pFace->v[1].v[2];
+            if ((dx1 * (pPos->v[2] - pFace->v[1].v[2]) - dz1 * (pPos->v[0] - pFace->v[1].v[0])) * (dx1 * (pFace->v[0].v[2] - pFace->v[1].v[2]) - dz1 * (pFace->v[0].v[0] - pFace->v[1].v[0])) < 0.0f) {
+                result = 1;
+            } else {
+                result = 0;
+            }
+        }
+    }
+    return result;
+}
 
 // RescanPedProximity
 
-// RecacheAndSetFace
+// FUNCTION: CARMA2_HW 0x004d1d70
+// FUNCTION: CARMA2_SW 0x004ce470
+// FUNCTION: CARMA2_CHEAT 0x004d7910
+tPed_face_cache_0x34* C2_HOOK_FASTCALL RecacheAndSetFace(tPedestrian* pPed, int* pOn_face, int* pFace_changed, br_vector3* pPos, int pForce, tU32 pTime) {
+    br_vector3* pos;
+    tPed_face_cache_0x34* face_cache;
+    tFace_ref* old_face;
+
+    *pOn_face = 0;
+    *pFace_changed = 0;
+    pos = GetPedPos(pPed);
+    face_cache = pPed->field_0x0c->field_0xb0;
+    if (!pForce && face_cache != NULL
+            && pos->v[0] - face_cache->field_0x18.max.v[0] <= -.21739130434782608
+            && pos->v[1] - face_cache->field_0x18.max.v[1] <= -.21739130434782608
+            && pos->v[2] - face_cache->field_0x18.max.v[2] <= -.21739130434782608
+            && face_cache->field_0x18.min.v[0] - pos->v[0] <= -.21739130434782608
+            && face_cache->field_0x18.min.v[1] - pos->v[1] <= -.21739130434782608
+            && face_cache->field_0x18.min.v[2] - pos->v[2] <= -.21739130434782608) {
+        if (OutsideFaceXZ(pos, face_cache->field_0x30)) {
+            old_face = face_cache->field_0x30;
+            SetPedCurrentFace(pPed, pPos);
+            *pOn_face = 1;
+            if (old_face == NULL || face_cache->field_0x30 == NULL || BrVector3Dot(&old_face->normal, &pPed->field_0x0c->field_0x00) < .99) {
+                *pFace_changed = 1;
+            }
+        }
+        return face_cache;
+    }
+    RecachePedestrian(pPed, pPos, pTime);
+    face_cache = pPed->field_0x0c->field_0xb0;
+    if (face_cache != NULL) {
+        *pOn_face = 1;
+    } else {
+        *pOn_face = 0;
+    }
+    *pFace_changed = 1;
+    return face_cache;
+}
 
 // PedScanForObjects
 

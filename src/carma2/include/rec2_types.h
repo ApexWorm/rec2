@@ -4816,8 +4816,8 @@ typedef struct {
 } tPed_face_cache_0x50;
 
 typedef struct tPed_face_cache_0x34 {
-    tPed_face_cache_0x50* field_0x0;
-    undefined field_0x4;
+    tFace_ref* field_0x0;
+    tU8 field_0x4;
     tU8 count;
     undefined field_0x6;
     undefined field_0x7;
@@ -4825,8 +4825,7 @@ typedef struct tPed_face_cache_0x34 {
     struct tPed_face_cache_0x34* next;
     struct tPed_face_cache_0x34* prev;
     tPedestrian* field_0x14;
-    br_bounds3* field_0x18;
-    undefined field_0x1c[0x14];
+    br_bounds3 field_0x18;
     tFace_ref* field_0x30;
 } tPed_face_cache_0x34;
 
