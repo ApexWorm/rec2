@@ -511,13 +511,13 @@ inline void C2_HOOK_FASTCALL MakeSmashSound(tConnotations* pConnotations, br_vec
 void C2_HOOK_FASTCALL Random34Matrix(br_matrix34* pMatrix) {
     br_vector3 tv;
 
-    BrVector3Set((br_vector3*)pMatrix->m[3], 0.f, 0.f, 0.f);
-    pMatrix->m[1][0] = FRandomPosNeg(1.f);
-    pMatrix->m[1][1] = FRandomPosNeg(1.f);
-    pMatrix->m[1][2] = FRandomPosNeg(1.f);
-    pMatrix->m[2][0] = FRandomPosNeg(1.f);
-    pMatrix->m[2][1] = FRandomPosNeg(1.f);
-    pMatrix->m[2][2] = FRandomPosNeg(1.f);
+    BrVector3Set((br_vector3*)pMatrix->m[3], 0.0f, 0.0f, 0.0f);
+    pMatrix->m[1][0] = FRandomPosNeg(1.0f);
+    pMatrix->m[1][1] = FRandomPosNeg(1.0f);
+    pMatrix->m[1][2] = FRandomPosNeg(1.0f);
+    pMatrix->m[2][0] = FRandomPosNeg(1.0f);
+    pMatrix->m[2][1] = FRandomPosNeg(1.0f);
+    pMatrix->m[2][2] = FRandomPosNeg(1.0f);
     BrVector3Normalise((br_vector3*)pMatrix->m[2], (br_vector3*)pMatrix->m[2]);
     BrVector3Cross(&tv, (br_vector3*)pMatrix->m[1], (br_vector3*)pMatrix->m[2]);
     BrVector3Copy((br_vector3*)pMatrix->m[0], &tv);
@@ -543,7 +543,7 @@ br_scalar C2_HOOK_FASTCALL SetInitPosition(br_actor* pActor, tSmashable_initial_
     br_scalar z;
     br_scalar len;
 
-    scale = 1.f;
+    scale = 1.0f;
     switch (pInitial_position->type) {
     case kInitialSmashablePosition_ActorBased:
         if (pMatrix != NULL) {
@@ -557,7 +557,7 @@ br_scalar C2_HOOK_FASTCALL SetInitPosition(br_actor* pActor, tSmashable_initial_
     case kInitialSmashablePosition_BoxClumped:
         Random34Matrix(&pActor->t.t.mat);
         for (i = 0; i < 3; i++) {
-            tv.v[i] = pInitial_position->position.box.v[i] * (pBounds != NULL ? FRandomBetween(pBounds->min.v[i], pBounds->max.v[i]) : 0.f);
+            tv.v[i] = pInitial_position->position.box.v[i] * (pBounds != NULL ? FRandomBetween(pBounds->min.v[i], pBounds->max.v[i]) : 0.0f);
         }
         BrMatrix34ApplyV(&tv2, &tv, &pReference_actor->t.t.mat);
         BrVector3Add(&pActor->t.t.translate.t, pPosition, &tv2);
@@ -570,10 +570,10 @@ br_scalar C2_HOOK_FASTCALL SetInitPosition(br_actor* pActor, tSmashable_initial_
             pos = pPosition;
         }
         pActor->t.t.translate.t = *pos;
-        x = FRandomPosNeg(1.f);
-        y = FRandomPosNeg(1.f);
-        z = FRandomPosNeg(1.f);
-        distance = FRandomBetween(0.f, pInitial_position->position.sphere.radius);
+        x = FRandomPosNeg(1.0f);
+        y = FRandomPosNeg(1.0f);
+        z = FRandomPosNeg(1.0f);
+        distance = FRandomBetween(0.0f, pInitial_position->position.sphere.radius);
         scale = distance / pInitial_position->position.sphere.radius;
         len = distance / BR_LENGTH3(x, y, z);
         pActor->t.t.translate.t.v[0] = x * len + pos->v[0];
