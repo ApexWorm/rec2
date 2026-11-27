@@ -33,19 +33,19 @@ extern void C2_HOOK_FASTCALL GetMatrixFromOrientation(br_matrix34* pMatrix, cons
 
 extern tU16 C2_HOOK_FASTCALL OmegaCompScalarTo16(br_scalar pOmega);
 
-// OmegaComp16ToScalar
+extern br_scalar C2_HOOK_FASTCALL OmegaComp16ToScalar(tU16 pOmega16);
 
 extern void C2_HOOK_FASTCALL GetOmega16FromOmega(tFixed_vec3* pOmega16, const br_vector3* pOmega);
 
-// GetOmegaFromOmega16
+extern void C2_HOOK_FASTCALL GetOmegaFromOmega16(br_vector3* pOmega, const tFixed_vec3* pOmega16);
 
 extern int C2_HOOK_FASTCALL GetObjectNetworkStuff(tPhysics_object* pObject, tU8* pBuffer, tU32 pSize);
 
-// GetVelocityAndPosition
+extern void C2_HOOK_FASTCALL GetVelocityAndPosition(tPhysics_object* pObject, br_matrix34* pMatrix, br_matrix34* pParent_matrix);
 
 extern int C2_HOOK_FASTCALL SizeOfObjectNetworkStuff(tPhysics_joint_type pType);
 
-// WriteObjectNetworkStuff
+extern int C2_HOOK_FASTCALL WriteObjectNetworkStuff(const tU8* pBuffer, tPhysics_object* pObject, int pMode);
 
 extern int C2_HOOK_FASTCALL GetHierarchyNetworkStuff(tPhysics_object* pObject, tU8* pBuffer, int pSize);
 
