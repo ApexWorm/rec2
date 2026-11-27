@@ -26,6 +26,12 @@ extern void C2_HOOK_FASTCALL Win32InitInputDevice(void);
 
 extern void C2_HOOK_FASTCALL CloseDirectInput(void);
 
+extern void C2_HOOK_FASTCALL SetMappedKey(int* pKeys, int pKey_index);
+
+extern void C2_HOOK_FASTCALL AcquireKeyboard(void);
+
+extern void C2_HOOK_FASTCALL UnacquireKeyboard(void);
+
 extern int C2_HOOK_FASTCALL InitForceFeedback(void);
 
 extern void C2_HOOK_FASTCALL KeyBegin(void);

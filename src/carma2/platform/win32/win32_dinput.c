@@ -212,6 +212,9 @@ static int C2_HOOK_FASTCALL InitDirectInput(void) {
     return 0;
 }
 
+// FUNCTION: CARMA2_HW 0x0051d170
+// FUNCTION: CARMA2_SW 0x00518a80
+// FUNCTION: CARMA2_CHEAT 0x00522d60
 void C2_HOOK_FASTCALL CloseDirectInput(void) {
 
     if (gDirectInputDevice != NULL) {
@@ -1259,6 +1262,14 @@ tU32 C2_HOOK_FASTCALL PDGetJoystickButtonStates(void) {
     return 0;
 }
 
+// FUNCTION: CARMA2_HW 0x0045b350
+// FUNCTION: CARMA2_SW 0x0045add0
+// FUNCTION: CARMA2_CHEAT 0x0045b7d0
+void C2_HOOK_FASTCALL SetMappedKey(int* pKeys, int pKey_index) {
+
+    pKeys[gKey_mapping[pKey_index]] = 1;
+}
+
 // FUNCTION: CARMA2_HW 0x0045b360
 // FUNCTION: CARMA2_SW 0x0045ade0
 // FUNCTION: CARMA2_CHEAT 0x0045b7e0
@@ -1360,6 +1371,26 @@ void C2_HOOK_FASTCALL PDSetKeyArray(int* pKeys, int pMark) {
                 pKeys[i] = 0;
             }
         }
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x0051d1b0
+// FUNCTION: CARMA2_SW 0x00518ac0
+// FUNCTION: CARMA2_CHEAT 0x00522da0
+void C2_HOOK_FASTCALL AcquireKeyboard(void) {
+
+    if (gDirectInputDevice != NULL) {
+        IDirectInputDevice_Acquire(gDirectInputDevice);
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x0051d1c0
+// FUNCTION: CARMA2_SW 0x00518ad0
+// FUNCTION: CARMA2_CHEAT 0x00522db0
+void C2_HOOK_FASTCALL UnacquireKeyboard(void) {
+
+    if (gDirectInputDevice != NULL) {
+        IDirectInputDevice_Unacquire(gDirectInputDevice);
     }
 }
 
