@@ -559,7 +559,7 @@ void C2_HOOK_FASTCALL LoadPerRaceDroneStuff(void) {
     for (i = 0; i < gCount_drone_forms; i++) {
         form = &gDrone_forms[i];
         if (form->field_0x6c != 0) {
-            if (form->crushability != 0.f) {
+            if (form->crushability != 0.0f) {
                 if ((int)form->field_0x6c > 10) {
                     count = 10;
                 } else {
