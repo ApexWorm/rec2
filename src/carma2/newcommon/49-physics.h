@@ -142,7 +142,7 @@ extern void C2_HOOK_FASTCALL CreateJointTorque(tPhysics_object* pObject, tPhysic
 
 extern tPhysics_workspace* C2_HOOK_FASTCALL AllocateObjectWorkspace(int pCount);
 
-// RedoQuickHingeVelocities
+extern void C2_HOOK_FASTCALL RedoQuickHingeVelocities(tPhysics_object* pObject);
 
 extern int C2_HOOK_FASTCALL GetJointForces(tPhysics_object* pObject, tPhysics_joint_force* pForces);
 
@@ -248,13 +248,13 @@ extern int C2_HOOK_FASTCALL ReduceEffectOfForces(tPhysics_joint_force* pForces, 
 
 extern void C2_HOOK_FASTCALL AddDoubleTorqueToMatrix(br_scalar* pMatrix, int pRows, int pIndex, tPhysics_joint_force** pForces, int pColumns);
 
-// DRMatrix33Inverse
+extern void C2_HOOK_FASTCALL DRMatrix33Inverse(br_scalar* pResult, const br_scalar* pInput);
 
-// SetUpQuickHingeData
+extern void C2_HOOK_FASTCALL SetUpQuickHingeData(tPhysics_object* pObject, tPhysics_object* pPartner, br_vector3* pAxis);
 
-// InitQuickHinge
+extern void C2_HOOK_FASTCALL InitQuickHinge(tPhysics_object* pObject);
 
-// CalcQuickHingeData
+extern void C2_HOOK_FASTCALL CalcQuickHingeData(tPhysics_object* pObject);
 
 extern void C2_HOOK_FASTCALL SetUpForce(br_vector3* pAngular, br_vector3* pLinear, const br_vector3* pPoint, const br_vector3* pDirection, tPhysics_object* pObject);
 
