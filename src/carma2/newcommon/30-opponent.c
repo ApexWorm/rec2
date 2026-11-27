@@ -496,8 +496,8 @@ static inline int C2_HOOK_FASTCALL AllowForDecel(tOpponent_spec* pOpponent_spec,
     br_scalar distance;
     br_vector3 tv;
 
-    decel_distance = (100.f - BrVector3LengthSquared(&pOpponent_spec->car_spec->collision_info->v)) / -16.f / WORLD_SCALE_D;
-    if (decel_distance > 0.f) {
+    decel_distance = (100.0f - BrVector3LengthSquared(&pOpponent_spec->car_spec->collision_info->v)) / -16.0f / WORLD_SCALE_D;
+    if (decel_distance > 0.0f) {
         BrVector3Sub(&tv, &gProgram_state.AI_vehicles.path_nodes[(tS16)gProgram_state.AI_vehicles.path_sections[pSection_index].node_indices[pOpponent_spec->next_sections[pSection_index].direction]].pos, pPos);
         distance = BrVector3Length(&tv);
         while (pSection_index < pOpponent_spec->nnext_sections - 1 && distance < decel_distance) {
@@ -580,7 +580,7 @@ void C2_HOOK_FASTCALL NewCalcGetNearPlayerRoute(tOpponent_spec* pOpponent_spec, 
         } else {
             ClearOpponentsProjectedRoute(pOpponent_spec);
             BrVector3Sub(&tv, &intersect, &pOpponent_spec->car_spec->car_master_actor->t.t.translate.t);
-            AddToOpponentsProjectedRoute(pOpponent_spec, section_no, BrVector3Dot(&tv, (br_vector3*)pOpponent_spec->car_spec->car_master_actor->t.t.mat.m[2]) >= 0.f);
+            AddToOpponentsProjectedRoute(pOpponent_spec, section_no, BrVector3Dot(&tv, (br_vector3*)pOpponent_spec->car_spec->car_master_actor->t.t.mat.m[2]) >= 0.0f);
         }
     }
     while (pOpponent_spec->nnext_sections < (int)REC2_ASIZE(pOpponent_spec->next_sections) && !fuck_it) {
@@ -588,7 +588,7 @@ void C2_HOOK_FASTCALL NewCalcGetNearPlayerRoute(tOpponent_spec* pOpponent_spec, 
         temp_store[0].direction = pOpponent_spec->next_sections[pOpponent_spec->nnext_sections - 1].direction;
         gRoute_search_calls = 0;
         gRoute_search_attempts++;
-        SearchForSection(temp_store, perm_store, &num_of_perm_store_sections, pPursuee->field_0x155c, 1, 0.f, pOpponent_spec);
+        SearchForSection(temp_store, perm_store, &num_of_perm_store_sections, pPursuee->field_0x155c, 1, 0.0f, pOpponent_spec);
         gRoute_search_total_calls += gRoute_search_calls;
         if (gRoute_search_calls > gRoute_search_max_calls) {
             gRoute_search_max_calls = gRoute_search_calls;
