@@ -324,6 +324,7 @@ void C2_HOOK_FASTCALL S3BindListenerLeftBRender(br_vector3* left) {
 
 // FUNCTION: CARMA2_HW 0x00566048
 // FUNCTION: CARMA2_SW 0x005616e8
+// FUNCTION: CARMA2_CHEAT 0x0056bc38
 int C2_HOOK_FASTCALL S3StartSound3D(tS3_outlet *pOutlet, int pSound, const br_vector3* pInitial_position, const br_vector3* pInitial_velocity, int pRepeats, int pVolume, int pPitch, int pSpeed) {
     tS3_descriptor* descriptor;
     tS3_channel* channel;

@@ -3123,8 +3123,8 @@ typedef struct {
 typedef struct {
     tS3_sound_source *source;
     br_vector3 position;
-    void* field_0x10;
-    undefined field_0x14[0x18 - 0x14];
+    int field_0x10;
+    void* field_0x14;
     undefined4 field_0x18;
 } tEnvironment_sound_source;
 
