@@ -932,13 +932,13 @@ int C2_HOOK_FASTCALL APTCActiveHalted(tPhysics_object* pObject) {
 // FUNCTION: CARMA2_HW 0x004162b0
 // FUNCTION: CARMA2_SW 0x004162e0
 // FUNCTION: CARMA2_CHEAT 0x00416510
-int C2_HOOK_FASTCALL APTCPassiveActivated(tPhysics_object* pObject, undefined4 pArg2) {
+int C2_HOOK_FASTCALL APTCPassiveActivated(tPhysics_object* pObject, tPhysics_object* pOther) {
 
     if (pObject != NULL && pObject->owner != NULL && pObject->flags_0x238 >= 2 && pObject->flags_0x238 <= 4) {
-        return BonerPassiveCollision(pObject->owner, pArg2);
+        return BonerPassiveCollision(pObject->owner, pOther);
     }
     if (pObject != NULL && pObject->flags_0x238 == 0x10) {
-        return MyDroneHathCollideth(pObject, pArg2);
+        return MyDroneHathCollideth(pObject, pOther);
     }
     return 1;
 }

@@ -3319,7 +3319,7 @@ int C2_HOOK_FASTCALL GetCharacterModelSet(tPed_character_instance* pCharacter) {
 // STUB: CARMA2_HW 0x0040b620
 // STUB: CARMA2_SW 0x0040b610
 // STUB: CARMA2_CHEAT 0x0040b690
-int C2_HOOK_FASTCALL BonerPassiveCollision(tPed_character_instance* pCharacter, undefined4 pArg2) {
+int C2_HOOK_FASTCALL BonerPassiveCollision(tPed_character_instance* pCharacter, tPhysics_object* pOther) {
     NOT_IMPLEMENTED();
 }
 
