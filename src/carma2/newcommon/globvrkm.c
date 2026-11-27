@@ -33,6 +33,7 @@ tCar_spec* gCar_to_view = &gProgram_state.current_car;
 
 #ifdef REC2_HW
 // GLOBAL: CARMA2_HW 0x0068d93c
+// GLOBAL: CARMA2_CHEAT 0x006951dc
 int gNetscore_box_created;
 #endif
 

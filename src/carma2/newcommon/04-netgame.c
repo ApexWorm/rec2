@@ -64,6 +64,7 @@ tU32 gTime_for_punishment;
 
 // FUNCTION: CARMA2_HW 0x00497ef0
 // FUNCTION: CARMA2_SW 0x00494b20
+// FUNCTION: CARMA2_CHEAT 0x004982a0
 void C2_HOOK_FASTCALL ClearShapeStatusFlag(tCar_crush_network_shapes* pShapes, int pPlayer_id) {
     int i;
 
@@ -88,6 +89,7 @@ void C2_HOOK_FASTCALL ClearShapeStatusFlag(tCar_crush_network_shapes* pShapes, i
 
 // FUNCTION: CARMA2_HW 0x00498370
 // FUNCTION: CARMA2_SW 0x00494fa0
+// FUNCTION: CARMA2_CHEAT 0x00498720
 int C2_HOOK_FASTCALL CarShapeNeedsSendingToPlayer(tCar_crush_network_shapes* pShapes, int pPlayer_id) {
     int i;
 
@@ -103,9 +105,11 @@ int C2_HOOK_FASTCALL CarShapeNeedsSendingToPlayer(tCar_crush_network_shapes* pSh
 
 // FUNCTION: CARMA2_HW 0x004978d0
 // FUNCTION: CARMA2_SW 0x00494500
+// FUNCTION: CARMA2_CHEAT 0x00497c80
 int C2_HOOK_FASTCALL TimeToSendData(void) {
     // GLOBAL: CARMA2_HW 0x00659c30
     // GLOBAL: CARMA2_SW 0x006545c8
+    // GLOBAL: CARMA2_CHEAT 0x00660550
     static tU32 last_physics_send_time = (tU32)-1;
 
     if (gPHIL_last_physics_tick > last_physics_send_time && gPHIL_last_physics_tick < last_physics_send_time + 80) {
@@ -345,6 +349,7 @@ void C2_HOOK_FASTCALL EnableCar(tCar_spec* pCar) {
 
 #ifdef REC2_HW
 // FUNCTION: CARMA2_HW 0x0049a410
+// FUNCTION: CARMA2_CHEAT 0x0049a7c0
 void C2_HOOK_FASTCALL CreateBoxes(void) {
     br_camera* camera;
     br_pixelmap* pixelmap;
@@ -475,6 +480,7 @@ void C2_HOOK_FASTCALL DeclareWinner(int pWinner_index) {
 
 // FUNCTION: CARMA2_HW 0x0049a940
 // FUNCTION: CARMA2_SW 0x00496ac0
+// FUNCTION: CARMA2_CHEAT 0x0049acf0
 void C2_HOOK_FASTCALL CheckForVampireWinner(void) {
     int i;
     int players_left;
@@ -532,6 +538,7 @@ void C2_HOOK_FASTCALL PlayerIsInfected(tNet_game_player_info* pPlayer) {
 
 // FUNCTION: CARMA2_HW 0x0049a990
 // FUNCTION: CARMA2_SW 0x00496b10
+// FUNCTION: CARMA2_CHEAT 0x0049ad40
 void C2_HOOK_FASTCALL CarInContactWithFox(tNet_game_player_info* pPlayer) {
 
     if ((int)(PDGetTotalTime() - gLast_it_change) > 500) {
@@ -547,6 +554,7 @@ void C2_HOOK_FASTCALL CarInContactWithFox(tNet_game_player_info* pPlayer) {
 
 // FUNCTION: CARMA2_HW 0x0049a9e0
 // FUNCTION: CARMA2_SW 0x00496b60
+// FUNCTION: CARMA2_CHEAT 0x0049ad90
 void C2_HOOK_FASTCALL PlayerIsIt(tNet_game_player_info* pPlayer) {
     int i;
     char s[256];
@@ -779,6 +787,7 @@ void C2_HOOK_FASTCALL ReceivedGameplay(tNet_message_chunk* pContents, tNet_messa
 
 // FUNCTION: CARMA2_HW 0x0049bc20
 // FUNCTION: CARMA2_SW 0x00497da0
+// FUNCTION: CARMA2_CHEAT 0x0049bfd0
 void C2_HOOK_FASTCALL SendGameplay(tPlayer_ID pPlayer, tNet_gameplay_mess pMess, int pParam_1, int pParam_2, int pParam_3, int pParam_4) {
     tNet_message* the_message;
 
