@@ -590,11 +590,11 @@ extern br_model* C2_HOOK_FASTCALL GetCharacterBoneModel(tPed_character_instance*
 
 extern int C2_HOOK_FASTCALL GetCharacterModelSet(tPed_character_instance* pCharacter);
 
-// BonerPassiveCollision
+extern int C2_HOOK_FASTCALL BonerPassiveCollision(tPed_character_instance* pCharacter, undefined4 pArg2);
 
 extern int C2_HOOK_FASTCALL BonerActiveHalted(tPed_character_instance* pCharacter);
 
-// BonerPedMovedByPhysics
+extern void C2_HOOK_FASTCALL BonerPedMovedByPhysics(tPed_character_instance* pCharacter, undefined4 pArg2);
 
 extern int C2_HOOK_FASTCALL DismemberCharacter(tPed_character_instance* pCharacter, int pBone_index, br_vector3* pVelocity, br_vector3* pAngular_velocity);
 
