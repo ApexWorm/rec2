@@ -259,6 +259,18 @@ int gPed_move_fsm[118][7] = {
     {   2,   2,   3,   4,   4,  10,  11 },
 };
 
+// GLOBAL: CARMA2_HW 0x0058f290
+// GLOBAL: CARMA2_SW 0x0058a290
+// GLOBAL: CARMA2_CHEAT 0x00594290
+const char* gPed_remap_axis_choices[6] = {
+    "+X",
+    "+Y",
+    "+Z",
+    "-X",
+    "-Y",
+    "-Z",
+};
+
 // GLOBAL: CARMA2_HW 0x0067697c
 // GLOBAL: CARMA2_SW 0x006710ec
 // GLOBAL: CARMA2_CHEAT 0x0067e22c
@@ -1109,6 +1121,10 @@ FILE* C2_HOOK_FASTCALL BonerOpenMoves(const char* pName) {
     return DRfopen(path, "rb");
 }
 
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
 // FUNCTION: CARMA2_HW 0x004cbbb0
 // FUNCTION: CARMA2_SW 0x004c82b0
 // FUNCTION: CARMA2_CHEAT 0x004d16f0
@@ -1120,6 +1136,10 @@ FILE* C2_HOOK_FASTCALL BonerOpenRemaps(const char* pFile_name) {
     PathCat(path, path, pFile_name);
     return DRfopen(path, "rb");
 }
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // FUNCTION: CARMA2_HW 0x004cbc10
 // FUNCTION: CARMA2_SW 0x004c8310
@@ -2501,7 +2521,60 @@ void C2_HOOK_FASTCALL ScaleModel(br_model* pModel, float pScale) {
 
 // DisposeAllLoadedMoves
 
-// ReadRemap
+// FUNCTION: CARMA2_HW 0x00404410
+// FUNCTION: CARMA2_SW 0x00404410
+// FUNCTION: CARMA2_CHEAT 0x00404410
+tPed_remap* C2_HOOK_FASTCALL ReadRemap(const char* pFile_name) {
+    FILE* f;
+    int i;
+    char s[256];
+    tPed_remap* remap;
+    int j;
+
+    if (strcmp(pFile_name, "NONE") == 0) {
+        return NULL;
+    }
+    f = BonerOpenRemaps(pFile_name);
+    if (f == NULL) {
+        FatalError(kFatalError_BonerError_UnableToOpenFile_S, pFile_name);
+    }
+    remap = BrMemAllocate(sizeof(tPed_remap), kBoner_mem_type_remap);
+    if (remap == NULL) {
+        FatalError(kFatalError_BonerError_UnableToAllocateMemory, 0);
+    }
+    remap->count_bones = 0;
+    GetALineAndDontArgue(f, s);
+    if (strcmp("START OF BONES", s) != 0) {
+        FatalError(kFatalError_BonerError_SyntaxErrorInFormFileExpected_S, "START OF BONES");
+    }
+    while (!PFfeof(f)) {
+        GetALineAndDontArgue(f, s);
+        if ((remap->count_bones == 0 && strcmp("END OF BONES", s) != 0) || strcmp("NEXT BONE", s) == 0) {
+            remap->count_bones++;
+        }
+    }
+    remap->bones = BrMemAllocate(remap->count_bones * sizeof(tPed_remap_bone), kBoner_mem_type_remap);
+    PFrewind(f);
+    GetALineAndDontArgue(f, s);
+    for (i = 0; i < remap->count_bones; i++) {
+        GetALineAndDontArgue(f, remap->bones[i].name);
+        for (j = 0; j < 3; j++) {
+            remap->bones[i].general_remap[j] = GetALineAndInterpretCommand(f, gPed_remap_axis_choices, REC2_ASIZE(gPed_remap_axis_choices));
+        }
+        for (j = 0; j < 3; j++) {
+            remap->bones[i].powerup_axis[j] = GetALineAndInterpretCommand(f, gPed_remap_axis_choices, REC2_ASIZE(gPed_remap_axis_choices));
+        }
+        GetALineAndDontArgue(f, s);
+    }
+    strcpy(remap->name, pFile_name);
+    for (i = 0; i < (int)REC2_ASIZE(gPed_remaps); i++) {
+        if (gPed_remaps[i] == NULL) {
+            gPed_remaps[i] = remap;
+            return remap;
+        }
+    }
+    FatalError(kFatalError_BonerError_TooManyRemapsLoaded, 0);
+}
 
 // FUNCTION: CARMA2_HW 0x004046d0
 // FUNCTION: CARMA2_SW 0x004046d0
