@@ -158,7 +158,7 @@ extern int C2_HOOK_FASTCALL MakeCharacterRenderable2(tPed_character_instance* pC
 
 extern int C2_HOOK_FASTCALL MakeCharacterRenderable(tPed_character_instance* pCharacter);
 
-// CharacterNoLongerRenderable
+extern int C2_HOOK_FASTCALL CharacterNoLongerRenderable(tPed_character_instance* pCharacter);
 
 extern void C2_HOOK_FASTCALL CalcCollisionObjectThings(tPhysics_object* pObject, br_bounds3* pFrame, int pNull, br_vector3* pBoneVec, br_vector3* pBonePtr);
 
