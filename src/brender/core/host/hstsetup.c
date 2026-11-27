@@ -193,6 +193,7 @@ br_uint_16 nameOrdinals_BRHOST1[50] = {
 };
 
 // GLOBAL: CARMA2_HW 0x00670068
+// GLOBAL: CARMA2_CHEAT 0x00677918
 br_image Image_BRHOST1 = {
     { 0 },
     "BRHOST1",
