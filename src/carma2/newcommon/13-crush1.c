@@ -2212,8 +2212,8 @@ inline br_scalar C2_HOOK_FASTCALL BrAngleToSignedDegree(br_angle pAngle) {
     br_scalar degrees;
 
     degrees = (br_scalar)(pAngle * (360.0 / 65536.0));
-    if (degrees >= 180.f) {
-        degrees -= 360.f;
+    if (degrees >= 180.0f) {
+        degrees -= 360.0f;
     }
     return degrees;
 }
@@ -2258,7 +2258,7 @@ void C2_HOOK_FASTCALL BendWheels(tCar_spec* pCar, const tBend_point_context* pCo
         pCar->wpos[i].v[1] = (br_scalar)(p.v[1] * WORLD_SCALE_D);
         pCar->wpos[i].v[2] = (br_scalar)(p.v[2] * WORLD_SCALE_D);
     }
-    SetCarSuspGiveAndHeight(pCar, 1.f, 1.f, 1.f, 0.f, 0.f);
+    SetCarSuspGiveAndHeight(pCar, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f);
     if (pContext->field_0x34->field_0x20 == pCar->car_crush_spec->bend_z_min) {
         pCar->field_0x1260 = BrAngleToSignedDegree(pContext->field_0x34->field_0x3e) * 0.03f;
     }
@@ -2657,7 +2657,7 @@ void C2_HOOK_FASTCALL UnBendWheels(tCar_spec* pCar, const tBend_point_context* p
         pCar->wpos[i].v[1] = (br_scalar)(p.v[1] * WORLD_SCALE_D);
         pCar->wpos[i].v[2] = (br_scalar)(p.v[2] * WORLD_SCALE_D);
     }
-    SetCarSuspGiveAndHeight(pCar, 1.f, 1.f, 1.f, 0.f, 0.f);
+    SetCarSuspGiveAndHeight(pCar, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f);
     if (pContext->field_0x34->field_0x20 == pCar->car_crush_spec->bend_z_min) {
         pCar->field_0x1260 = BrAngleToSignedDegree(pContext->field_0x34->field_0x3e) * 0.03f;
     }
