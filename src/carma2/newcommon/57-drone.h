@@ -103,7 +103,7 @@ extern int C2_HOOK_FASTCALL DroneTrainWithinRenderingDistance(const br_vector3* 
 
 // ChooseNextNode
 
-// DroneOrientationChanged
+extern int C2_HOOK_FASTCALL DroneOrientationChanged(tDrone_spec* pDrone, float pDot);
 
 // DroneyObjectInSensiblePlace
 
@@ -129,9 +129,9 @@ extern int C2_HOOK_FASTCALL DroneTrainWithinProcessingDistance(const br_vector3*
 
 // DoDroneFunkyGroovyThings
 
-// ProcessThisDrone
+extern void C2_HOOK_FASTCALL ProcessThisDrone(int pIndex);
 
-// DroneStateFuncReset
+extern void C2_HOOK_FASTCALL DroneStateFuncReset(tDrone_spec* pDrone, tDroneStateFuncState pState);
 
 // InitDroneDrivingInfo
 
@@ -143,13 +143,13 @@ extern void C2_HOOK_FASTCALL PipeDroneMatrix(tDrone_spec* pDrone);
 
 // PossiblyPipeDroneMovement
 
-// DroneStateFuncControlledMovement
+extern void C2_HOOK_FASTCALL DroneStateFuncControlledMovement(tDrone_spec* pDrone, tDroneStateFuncState pState);
 
 // DoDroneHaltingStuff
 
-// DroneStateFuncPhysicsActive
+extern void C2_HOOK_FASTCALL DroneStateFuncPhysicsActive(tDrone_spec* pDrone, tDroneStateFuncState pState);
 
-// DroneStateFuncStationaryPassive
+extern void C2_HOOK_FASTCALL DroneStateFuncStationaryPassive(tDrone_spec* pDrone, tDroneStateFuncState pState);
 
 // GetNewCrushyModelForDrone
 
