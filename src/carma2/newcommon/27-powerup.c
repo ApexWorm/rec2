@@ -2056,7 +2056,7 @@ int C2_HOOK_FASTCALL HitMine(tPowerup* pPowerup, tCar_spec* pCar) {
                 softness = pCar->softness_factor / 0.7;
                 if (!pCar->invulnerable_no_damage) {
                     for (i = 0; i < 12; i++) {
-                        DamageUnit(pCar, i, IRandomBetween(0, (int)(25.f * softness)));
+                        DamageUnit(pCar, i, IRandomBetween(0, (int)(25.0f * softness)));
                     }
                 }
                 if (!pCar->invulnerable_no_crushage) {
