@@ -1331,10 +1331,12 @@ tCollision_shape_polyhedron* C2_HOOK_FASTCALL AllocateShapePolyhedron(int pCount
     tCollision_shape_polyhedron* result;
     tU8* raw_memory;
     int count_edges;
+    int count_planes;
 
+    count_planes = (pCount_points - 2) * 2;
     count_edges = (pCount_points - 2) * 3;
     result = BrMemAllocate(sizeof(tCollision_shape_polyhedron) + pCount_points * sizeof(br_vector3)
-        + count_edges * sizeof(tPolyhedron_edge_indexes) + (pCount_points - 2) * 2 * sizeof(br_vector4), (br_uint_8)pType);
+        + count_edges * sizeof(tPolyhedron_edge_indexes) + count_planes * sizeof(br_vector4), (br_uint_8)pType);
     raw_memory = (tU8*)result + sizeof(tCollision_shape_polyhedron);
     result->polyhedron.points = (br_vector3*)raw_memory;
     raw_memory += pCount_points * sizeof(br_vector3);
