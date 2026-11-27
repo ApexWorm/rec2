@@ -1125,11 +1125,161 @@ void C2_HOOK_FASTCALL ApplyDiminishingTorque(tPhysics_object* pObject, const br_
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x004c4850
-// STUB: CARMA2_SW 0x004c0f80
-// STUB: CARMA2_CHEAT 0x004ca370
+// FUNCTION: CARMA2_HW 0x004c4850
+// FUNCTION: CARMA2_SW 0x004c0f80
+// FUNCTION: CARMA2_CHEAT 0x004ca370
 void C2_HOOK_FASTCALL RQExpand(br_scalar* pMatrix, const br_scalar* pOriginal, int pOld_size, int pSize, br_scalar* pOrthogonal, const tU8* pIndices) {
-    NOT_IMPLEMENTED();
+    br_scalar row[100];
+    br_scalar value;
+    br_scalar maximum;
+    br_scalar scale;
+    br_scalar diagonal;
+    br_scalar sum;
+    br_scalar length;
+    br_scalar head;
+    br_scalar denominator;
+    br_scalar coefficient;
+    const br_scalar* selected;
+    int i;
+    int j;
+    int k;
+
+    for (j = pOld_size; j < pSize; j++) {
+        selected = &pOriginal[100 * pIndices[j]];
+        for (i = 0; i < pOld_size; i++) {
+            row[i] = selected[pIndices[i]];
+            pMatrix[i * 100 + j] = row[i];
+        }
+        for (i = 0; i < pOld_size; i++) {
+            sum = 0.0f;
+            for (k = 0; k < pOld_size; k++) {
+                sum += row[k] * pOrthogonal[i * 100 + k];
+            }
+            pMatrix[j * 100 + i] = sum;
+        }
+    }
+
+    for (i = pOld_size; i < pSize; i++) {
+        selected = &pOriginal[100 * pIndices[i]];
+        for (j = pOld_size; j < pSize; j++) {
+            pMatrix[i * 100 + j] = selected[pIndices[j]];
+            pOrthogonal[i * 100 + j] = 0.0f;
+        }
+        for (j = 0; j < pOld_size; j++) {
+            pOrthogonal[i * 100 + j] = 0.0f;
+            pOrthogonal[j * 100 + i] = 0.0f;
+        }
+        pOrthogonal[i * 101] = 1.0f;
+    }
+
+    for (i = 0; i < pOld_size; i++) {
+        diagonal = pMatrix[i * 101];
+        maximum = 0.0f;
+        for (k = pOld_size; k < pSize; k++) {
+            value = (br_scalar)fabs(pMatrix[i * 100 + k]);
+            if (maximum <= value) {
+                maximum = value;
+            }
+        }
+        if (maximum == 0.0f) {
+            continue;
+        }
+        scale = (br_scalar)fabs(diagonal);
+        if (maximum > scale) {
+            scale = maximum;
+        }
+        for (k = pOld_size; k < pSize; k++) {
+            pMatrix[i * 100 + k] /= scale;
+        }
+        diagonal /= scale;
+        sum = 0.0f;
+        for (k = pOld_size; k < pSize; k++) {
+            sum += pMatrix[i * 100 + k] * pMatrix[i * 100 + k];
+        }
+        length = (br_scalar)fabs(sqrt(diagonal * diagonal + sum));
+        if (diagonal <= 0.0f) {
+            length = -length;
+        }
+        head = diagonal + length;
+        denominator = head * length;
+        for (j = 0; j < pSize; j++) {
+            sum = head * pOrthogonal[i * 100 + j];
+            for (k = pOld_size; k < pSize; k++) {
+                sum += pOrthogonal[k * 100 + j] * pMatrix[i * 100 + k];
+            }
+            coefficient = sum / denominator;
+            for (k = pOld_size; k < pSize; k++) {
+                pOrthogonal[k * 100 + j] -= coefficient * pMatrix[i * 100 + k];
+            }
+            pOrthogonal[i * 100 + j] -= head * coefficient;
+        }
+        for (j = i + 1; j < pSize; j++) {
+            sum = head * pMatrix[j * 100 + i];
+            for (k = pOld_size; k < pSize; k++) {
+                sum += pMatrix[j * 100 + k] * pMatrix[i * 100 + k];
+            }
+            coefficient = sum / denominator;
+            for (k = pOld_size; k < pSize; k++) {
+                pMatrix[j * 100 + k] -= coefficient * pMatrix[i * 100 + k];
+            }
+            pMatrix[j * 100 + i] -= head * coefficient;
+        }
+        pMatrix[i * 101] = -(length * scale);
+        for (k = pOld_size; k < pSize; k++) {
+            pMatrix[i * 100 + k] = 0.0f;
+        }
+    }
+
+    for (i = pOld_size; i < pSize; i++) {
+        maximum = 0.0f;
+        for (k = i; k < pSize; k++) {
+            value = (br_scalar)fabs(pMatrix[i * 100 + k]);
+            if (maximum <= value) {
+                maximum = value;
+            }
+        }
+        if (maximum == 0.0f) {
+            continue;
+        }
+        for (k = i; k < pSize; k++) {
+            pMatrix[i * 100 + k] /= maximum;
+        }
+        sum = 0.0f;
+        for (k = i; k < pSize; k++) {
+            sum += pMatrix[i * 100 + k] * pMatrix[i * 100 + k];
+        }
+        length = (br_scalar)fabs(sqrt(sum));
+        if (pMatrix[i * 101] <= 0.0f) {
+            length = -length;
+        }
+        head = length + pMatrix[i * 101];
+        denominator = length * head;
+        pMatrix[i * 101] = head;
+        for (j = 0; j < pSize; j++) {
+            sum = 0.0f;
+            for (k = i; k < pSize; k++) {
+                sum += pMatrix[i * 100 + k] * pOrthogonal[k * 100 + j];
+            }
+            coefficient = sum / denominator;
+            for (k = i; k < pSize; k++) {
+                pOrthogonal[k * 100 + j] -= coefficient * pMatrix[i * 100 + k];
+            }
+        }
+        for (j = i + 1; j < pSize; j++) {
+            sum = 0.0f;
+            for (k = i; k < pSize; k++) {
+                sum += pMatrix[j * 100 + k] * pMatrix[i * 100 + k];
+            }
+            coefficient = sum / denominator;
+            for (k = i; k < pSize; k++) {
+                pMatrix[j * 100 + k] -= coefficient * pMatrix[i * 100 + k];
+            }
+        }
+        pMatrix[i * 101] = -(length * maximum);
+        for (k = i + 1; k < pSize; k++) {
+            pMatrix[i * 100 + k] = 0.0f;
+        }
+    }
 }
 
 // STUB: CARMA2_HW 0x004c4f40
