@@ -6099,6 +6099,7 @@ enum {
     kFatalError_CantOpen_S = 0x6b,
     kFatalError_CannotLoadAGeneratedShadeTable = 0x6d,
     kFatalError_NetworkCodeSelfCheck = 0x6e,
+    kFatalError_NetworkMessageCorrupt = 0x6f,
     kFatalError_RanOutOfFunkGrooveSlotBunches = 0x71,
     kFatalError_FileIsCorrupted_S = 0x73,
     kFatalError_CantFindFile_S = 0x75,

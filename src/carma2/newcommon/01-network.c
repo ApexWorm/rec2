@@ -1461,7 +1461,7 @@ void C2_HOOK_FASTCALL CheckCheckSum(tNet_message* pMessage) {
     checksum = pMessage->header.checksum;
     pMessage->header.checksum = 0;
     if (checksum != CalculateCheckSum(pMessage)) {
-        FatalError(0x6f);
+        FatalError(kFatalError_NetworkMessageCorrupt);
     }
 #else
     (void)pMessage;
