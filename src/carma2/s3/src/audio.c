@@ -388,6 +388,7 @@ int C2_HOOK_FASTCALL S3StopOutletSound(tS3_outlet* pOutlet) {
 
 // FUNCTION: CARMA2_HW 0x0056671e
 // FUNCTION: CARMA2_SW 0x00561dbe
+// FUNCTION: CARMA2_CHEAT 0x0056c30e
 int C2_HOOK_FASTCALL S3ReleaseSoundSource(tS3_sound_source* src) {
     tS3_sound_source* prev;
     tS3_sound_source* next;
