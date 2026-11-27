@@ -4227,7 +4227,43 @@ int C2_HOOK_FASTCALL NetOptions_TargetRoller(tFrontend_spec* pFrontend) {
     return 0;
 }
 
-// NetOptions_Ok
+// FUNCTION: CARMA2_HW 0x00473470
+// FUNCTION: CARMA2_SW 0x004729e0
+// FUNCTION: CARMA2_CHEAT 0x00473810
+int C2_HOOK_FASTCALL NetOptions_Ok(tFrontend_spec* pFrontend) {
+
+    if (WhichItemIsSelectedIn(pFrontend, 1) - 2 == 0) {
+        gFrontend_net_options.show_players_on_map = 1;
+    } else {
+        gFrontend_net_options.show_players_on_map = 0;
+    }
+    if (WhichItemIsSelectedIn(pFrontend, 2) - 5 == 0) {
+        gFrontend_net_options.powerup_respawn = 1;
+    } else {
+        gFrontend_net_options.powerup_respawn = 0;
+    }
+    if (WhichItemIsSelectedIn(pFrontend, 3) - 8 == 0) {
+        gFrontend_net_options.open_game = 1;
+    } else {
+        gFrontend_net_options.open_game = 0;
+    }
+    if (WhichItemIsSelectedIn(pFrontend, 4) - 11 == 0) {
+        gFrontend_net_options.grid_start = 1;
+    } else {
+        gFrontend_net_options.grid_start = 0;
+    }
+    if (WhichItemIsSelectedIn(pFrontend, 6) - 17 == 0) {
+        gFrontend_net_options.random_car_choice = 1;
+    } else {
+        gFrontend_net_options.random_car_choice = 0;
+    }
+    gFrontend_net_options.race_sequence_type = WhichItemIsSelectedIn(pFrontend, 5) - 14;
+    gFrontend_net_options.car_choice = WhichItemIsSelectedIn(pFrontend, 7) - 20;
+    gNet_settings[0] = gFrontend_net_options;
+    gNet_settings[gNet_last_game_type + 1] = gFrontend_net_options;
+    SaveOptions();
+    return 0;
+}
 
 // FUNCTION: CARMA2_HW 0x00473550
 // FUNCTION: CARMA2_SW 0x00472ac0
