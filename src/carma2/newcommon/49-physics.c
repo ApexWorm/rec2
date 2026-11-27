@@ -1007,6 +1007,7 @@ void C2_HOOK_FASTCALL ResetObjectList(tPhysics_object* pObjects) {
 
 // FUNCTION: CARMA2_HW 0x004c2910
 // FUNCTION: CARMA2_SW 0x004bf040
+// FUNCTION: CARMA2_CHEAT 0x004c8430
 void C2_HOOK_FASTCALL ApplyGravitySingleObject(tPhysics_object* pObject) {
 
     if (!pObject->disable_move_rotate) {
@@ -1028,6 +1029,7 @@ void C2_HOOK_FASTCALL ApplyGravity(tPhysics_object* pObject) {
 
 // FUNCTION: CARMA2_HW 0x004c29d0
 // FUNCTION: CARMA2_SW 0x004bf100
+// FUNCTION: CARMA2_CHEAT 0x004c84f0
 void C2_HOOK_FASTCALL SetGravityDeltaV(tPhysics_object* pObject, br_vector3* pImpulse) {
     tPhysics_object* pChild;
 
