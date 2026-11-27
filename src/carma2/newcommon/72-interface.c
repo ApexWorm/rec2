@@ -1394,7 +1394,44 @@ void C2_HOOK_FASTCALL MaybeRestoreSavedGame(void) {
     }
 }
 
-// NetworkJoinUpdateScroller
+inline void C2_HOOK_FASTCALL NetworkJoinUpdateScroller(tFrontend_spec* pFrontend) {
+    int have_game;
+    int i;
+    int game_index;
+
+    have_game = 0;
+    PossibleService();
+    for (i = 0; i < REC2_ASIZE(gGames_to_join); i++) {
+        if (gGames_to_join[i].game != NULL) {
+            have_game = 1;
+        }
+    }
+    if (have_game) {
+        for (i = pFrontend->scrollers[2].indexFirstScrollableItem; i <= pFrontend->scrollers[2].indexLastScrollableItem; i++) {
+            game_index = i - pFrontend->scrollers[2].indexFirstScrollableItem;
+            if (gGames_to_join[game_index].time != 0 && gGames_to_join[game_index].game != NULL) {
+                /* FIXME: the game name is not part of tPD_net_player_info */
+                sprintf(pFrontend->items[i].text, "%s", &gGames_to_join[game_index].game->pd_net_info.addr[14]);
+                pFrontend->items[i].enabled = kFrontendItemEnabled_enabled;
+            } else {
+                sprintf(pFrontend->items[i].text, "%s", " ");
+                pFrontend->items[i].enabled = kFrontendItemEnabled_disabled;
+            }
+        }
+        pFrontend->items[29].enabled = kFrontendItemEnabled_enabled;
+    } else {
+        sprintf(pFrontend->items[20].text, "%s", IString_Get(253));
+        strcpy(pFrontend->items[21].text, " ");
+        strcpy(pFrontend->items[22].text, " ");
+        strcpy(pFrontend->items[23].text, " ");
+        pFrontend->items[29].enabled = kFrontendItemEnabled_disabled;
+        pFrontend->items[20].enabled = kFrontendItemEnabled_disabled;
+        pFrontend->items[21].enabled = kFrontendItemEnabled_disabled;
+        pFrontend->items[22].enabled = kFrontendItemEnabled_disabled;
+        pFrontend->items[23].enabled = kFrontendItemEnabled_disabled;
+    }
+    FuckWithWidths(pFrontend);
+}
 
 // void C2_HOOK_FASTCALL UpdateScrollPositions(tFrontend_spec* pFrontend); // Moved for inlining purposes
 
@@ -1763,7 +1800,147 @@ int C2_HOOK_FASTCALL NetCancel(tFrontend_spec* pFrontend) {
     return 0;
 }
 
-// FRONTEND_NetworkJoinMenuHandler
+// FUNCTION: CARMA2_HW 0x00469320
+// FUNCTION: CARMA2_SW 0x004690a0
+// FUNCTION: CARMA2_CHEAT 0x00469740
+int C2_HOOK_FASTCALL FRONTEND_NetworkJoinMenuHandler(tFrontend_spec* pFrontend) {
+    int original_selected_index;
+    int the_key;
+    int mouse_button;
+    int item_under_mouse;
+    int mouse_x;
+    int mouse_y;
+    int result;
+    int i;
+
+    original_selected_index = gFrontend_selected_item_index;
+    gTyping_slot = -1;
+    EdgeTriggerModeOn();
+    KillSplashScreen();
+    if (gTyping) {
+        the_key = ProcessInputString();
+        FuckWithWidths(pFrontend);
+        if (the_key < 0) {
+            NetGameToggleTyping(pFrontend);
+        }
+    } else {
+        PollKeys();
+        EdgeTriggerModeOff();
+        the_key = PDAnyKeyDown();
+        if (the_key != -1 && the_key != 4) {
+            gMouse_in_use = 0;
+            ResetInterfaceTimeout();
+        }
+        EdgeTriggerModeOn();
+        mouse_button = 0;
+        if (gMouse_in_use) {
+            ResetInterfaceTimeout();
+            GetMousePosition(&mouse_x, &mouse_y);
+            mouse_button = EitherMouseButtonDown();
+            item_under_mouse = GetItemAtMousePos(gCurrent_frontend_spec, mouse_x, mouse_y);
+            if (item_under_mouse != -1) {
+                gFrontend_selected_item_index = item_under_mouse;
+            } else {
+                gFrontend_selected_item_index = 21;
+            }
+        }
+        if (PDKeyDown(72) || PDKeyDown(89)) {
+            gFrontend_selected_item_index = FindPrevActiveItem(gCurrent_frontend_spec, gFrontend_selected_item_index);
+            if (!gMouse_in_use
+                    && gFrontend_selected_item_index >= gCurrent_frontend_spec->scrollers[0].indexFirstScrollableItem
+                    && gFrontend_selected_item_index <= gCurrent_frontend_spec->scrollers[0].indexLastScrollableItem) {
+                ToggleSelection(pFrontend);
+                if (pFrontend->items[gFrontend_selected_item_index].action != NULL) {
+                    pFrontend->items[gFrontend_selected_item_index].action(pFrontend);
+                }
+            }
+        }
+        if (PDKeyDown(73) || PDKeyDown(83)) {
+            if (gFrontend_selected_item_index < pFrontend->count_items - 1) {
+                gFrontend_selected_item_index = FindNextActiveItem(gCurrent_frontend_spec, gFrontend_selected_item_index);
+            } else {
+                gFrontend_selected_item_index = -1;
+                gFrontend_selected_item_index = FindNextActiveItem(gCurrent_frontend_spec, gFrontend_selected_item_index);
+            }
+            if (!gMouse_in_use
+                    && gFrontend_selected_item_index >= gCurrent_frontend_spec->scrollers[0].indexFirstScrollableItem
+                    && gFrontend_selected_item_index <= gCurrent_frontend_spec->scrollers[0].indexLastScrollableItem) {
+                ToggleSelection(pFrontend);
+                if (pFrontend->items[gFrontend_selected_item_index].action != NULL) {
+                    pFrontend->items[gFrontend_selected_item_index].action(pFrontend);
+                }
+            }
+        }
+        if (PDKeyDown(63)) {
+            ShutdownNetIfRequired();
+            MaybeRestoreSavedGame();
+            gCurrent_frontend_spec->default_item = gFrontend_selected_item_index;
+            FRONTEND_DestroyMenu(pFrontend);
+            gCurrent_frontend_spec = pFrontend->previous;
+            FRONTEND_CreateMenu(gCurrent_frontend_spec);
+#ifdef REC2_HW
+            Morph_Initialise(pFrontend, gCurrent_frontend_spec);
+#endif
+            gFrontend_selected_item_index = gCurrent_frontend_spec->default_item;
+            for (i = 0; i < gCurrent_frontend_spec->count_scrollers; i++) {
+                gCurrent_frontend_spec->scrollers[i].indexTopItem = gCurrent_frontend_spec->scrollers[i].indexOfItemAtTop;
+            }
+            UpdateScrollPositions(gCurrent_frontend_spec);
+            return 0;
+        }
+        if (PDKeyDown(51) || PDKeyDown(52) || (mouse_button == 1 && item_under_mouse != -1)) {
+            ToggleSelection(pFrontend);
+            if (!gMouse_in_use
+                    && gFrontend_selected_item_index >= gCurrent_frontend_spec->scrollers[0].indexFirstScrollableItem
+                    && gFrontend_selected_item_index <= gCurrent_frontend_spec->scrollers[0].indexLastScrollableItem) {
+                gFrontend_selected_item_index = 21;
+            }
+            if (pFrontend->items[gFrontend_selected_item_index].field_0xc == 2) {
+                return 2;
+            }
+            if (pFrontend->items[gFrontend_selected_item_index].field_0xc == 1) {
+                gFrontend_leave_current_menu = 1;
+            }
+            if (pFrontend->items[gFrontend_selected_item_index].action != NULL) {
+                result = pFrontend->items[gFrontend_selected_item_index].action(pFrontend);
+            } else {
+                result = pFrontend->items[original_selected_index].field_0xc;
+            }
+            if (pFrontend->items[gFrontend_selected_item_index].menuInfo != NULL) {
+                gCurrent_frontend_spec->default_item = gFrontend_selected_item_index;
+                for (i = 0; i < gCurrent_frontend_spec->count_scrollers; i++) {
+                    gCurrent_frontend_spec->scrollers[i].indexOfItemAtTop = gCurrent_frontend_spec->scrollers[i].indexTopItem;
+                }
+                FRONTEND_DestroyMenu(pFrontend);
+                gCurrent_frontend_spec = pFrontend->items[gFrontend_selected_item_index].menuInfo;
+                FRONTEND_CreateMenu(gCurrent_frontend_spec);
+                if (gCurrent_frontend_spec != pFrontend->previous) {
+                    gCurrent_frontend_spec->previous = pFrontend;
+                }
+#ifdef REC2_HW
+                Morph_Initialise(pFrontend, gCurrent_frontend_spec);
+#endif
+                if (gCurrent_frontend_spec == &gFrontend_QUIT) {
+                    gFrontend_selected_item_index = 0;
+                } else {
+                    gFrontend_selected_item_index = gCurrent_frontend_spec->default_item;
+                }
+                for (i = 0; i < gCurrent_frontend_spec->count_scrollers; i++) {
+                    gCurrent_frontend_spec->scrollers[i].indexTopItem = gCurrent_frontend_spec->scrollers[i].indexOfItemAtTop;
+                }
+                UpdateScrollPositions(gCurrent_frontend_spec);
+            }
+            return result;
+        }
+    }
+    ServiceGame();
+    NetworkJoinUpdateScroller(pFrontend);
+    if (gFrontend_leave_current_menu) {
+        return 1;
+    } else {
+        return 0;
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x00469a30
 // FUNCTION: CARMA2_SW 0x00469790

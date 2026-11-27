@@ -151,7 +151,7 @@ extern void C2_HOOK_FASTCALL RestoreSinglePlayerState(void);
 
 extern void C2_HOOK_FASTCALL MaybeRestoreSavedGame(void);
 
-// NetworkJoinUpdateScroller
+extern void C2_HOOK_FASTCALL NetworkJoinUpdateScroller(tFrontend_spec* pFrontend);
 
 extern void C2_HOOK_FASTCALL UpdateScrollPositions(tFrontend_spec* pFrontend);
 
@@ -211,7 +211,7 @@ extern void C2_HOOK_FASTCALL InitNetStorageSpace(void);
 
 extern int C2_HOOK_FASTCALL NetCancel(tFrontend_spec* pFrontend);
 
-// FRONTEND_NetworkJoinMenuHandler
+extern int C2_HOOK_FASTCALL FRONTEND_NetworkJoinMenuHandler(tFrontend_spec* pFrontend);
 
 extern int C2_HOOK_FASTCALL OnePlayerSetup(tFrontend_spec* pFrontend);
 
