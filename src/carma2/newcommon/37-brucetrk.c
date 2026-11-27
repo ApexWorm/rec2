@@ -12,6 +12,7 @@
 #include "41-utility.h"
 #include "51-smash.h"
 #include "52-errors.h"
+#include "61-pedestrn-phys.h"
 #include "67-lighting.h"
 
 #include "globvars.h"
@@ -42,6 +43,11 @@ br_material* gDefault_track_material;
 // GLOBAL: CARMA2_SW 0x006739d0
 // GLOBAL: CARMA2_CHEAT 0x00680b10
 int gCount_track_non_cars;
+
+// GLOBAL: CARMA2_HW 0x00679264
+// GLOBAL: CARMA2_SW 0x006739d4
+// GLOBAL: CARMA2_CHEAT 0x00680b14
+br_actor* gMr_blendy;
 
 // GLOBAL: CARMA2_HW 0x00679268
 // GLOBAL: CARMA2_SW 0x006739d8
@@ -275,7 +281,72 @@ intptr_t C2_HOOK_CDECL FindNonCarsCB(br_actor* pActor, void* pData) {
     return BrActorEnum(pActor, FindNonCarsCB, pTrack_spec);
 }
 
-// MungeFaces
+// FUNCTION: CARMA2_HW 0x0040d530
+// FUNCTION: CARMA2_SW 0x0040d520
+// FUNCTION: CARMA2_CHEAT 0x0040d5d0
+void C2_HOOK_FASTCALL MungeFaces(br_actor* pActor, br_model* pModel) {
+    int i;
+    int j;
+    int k;
+    br_face* face;
+    br_face* blendy_face;
+    br_vertex* vertex;
+    br_vertex* blendy_vertex;
+    int changed_one;
+
+    changed_one = 0;
+    face = pModel->faces;
+    for (i = 0; i < pModel->nfaces; i++, face++) {
+
+        SpawnPedsOnFace(face, pModel);
+        if (SmashFaceMustBeUpdateable(face->material, pModel)) {
+            if (gMr_blendy == NULL) {
+                gMr_blendy = BrActorAllocate(BR_ACTOR_MODEL, NULL);
+                gMr_blendy->render_style = BR_RSTYLE_FACES;
+                gMr_blendy->model = BrModelAllocate(NULL, 2000, 2000);
+                gMr_blendy->model->nfaces = 0;
+                gMr_blendy->model->nvertices = 0;
+                gMr_blendy->model->flags |= BR_MODF_UPDATEABLE;
+            }
+            blendy_face = &gMr_blendy->model->faces[gMr_blendy->model->nfaces];
+            gMr_blendy->model->nfaces++;
+            *blendy_face = *face;
+            for (j = 0; j < 3; j++) {
+                vertex = &pModel->vertices[face->vertices[j]];
+                blendy_vertex = gMr_blendy->model->vertices;
+                for (k = 0; k < gMr_blendy->model->nvertices; k++, blendy_vertex++) {
+                    if (Vector3Equals(&blendy_vertex->p, &vertex->p)
+                            && Vector2Equals(&blendy_vertex->map, &vertex->map)) {
+                        blendy_face->vertices[j] = k;
+                        vertex = NULL;
+                        break;
+                    }
+                }
+                if (vertex != NULL) {
+                    blendy_face->vertices[j] = gMr_blendy->model->nvertices;
+                    gMr_blendy->model->vertices[gMr_blendy->model->nvertices] = *vertex;
+                    gMr_blendy->model->nvertices++;
+                }
+            }
+            if (i < pModel->nfaces - 1) {
+                memmove(&pModel->faces[i], &pModel->faces[i + 1], (pModel->nfaces - i - 1) * sizeof(br_face));
+            }
+            pModel->nfaces--;
+            i--;
+            changed_one = 1;
+            face = &pModel->faces[i];
+
+        }
+    }
+    if (changed_one) {
+        if (pModel->nfaces != 0) {
+            BrModelUpdate(pModel, BR_MODU_ALL);
+        } else {
+            pActor->model = NULL;
+            pActor->render_style = BR_RSTYLE_NONE;
+        }
+    }
+}
 
 // ProcessModelsCB
 
