@@ -145,7 +145,7 @@ int gPipe_count_callbacks;
 // GLOBAL: CARMA2_HW 0x00694104
 // GLOBAL: CARMA2_SW 0x0068e15c
 // GLOBAL: CARMA2_CHEAT 0x0069bc7c
-tPipe_smudge_data* gCrush_space;
+void* gCrush_space;
 
 // GLOBAL: CARMA2_HW 0x0069410c
 // GLOBAL: CARMA2_SW 0x0068e164
@@ -432,6 +432,7 @@ void C2_HOOK_FASTCALL AREndPipingSession(void) {
 
 // FUNCTION: CARMA2_HW 0x004028a0
 // FUNCTION: CARMA2_SW 0x004028a0
+// FUNCTION: CARMA2_CHEAT 0x004028a0
 void C2_HOOK_FASTCALL ARAddDataToSession(int pType, uintptr_t pOwner, void* pData, tU32 pSize) {
     tU32 new_size;
 
@@ -892,7 +893,33 @@ void C2_HOOK_FASTCALL DisposeActionReplay(void) {
 
 // GetNextIncident
 
-// AddCrushToPipingSession
+#if defined(REC2_MATCHING) && defined(_MSC_VER)
+#pragma inline_depth(0)
+#endif
+
+// FUNCTION: CARMA2_HW 0x004c6e40
+// FUNCTION: CARMA2_SW 0x004c3570
+// FUNCTION: CARMA2_CHEAT 0x004cc960
+void C2_HOOK_FASTCALL AddCrushToPipingSession(br_model* pModel, const br_vector3* pVector, const float* pValues) {
+    tPipe_chunk_crush* crush;
+    tU32 size;
+
+    crush = gCrush_space;
+    if (gCrush_space == NULL) {
+        return;
+    }
+    size = offsetof(tPipe_chunk_crush, values) + pModel->nvertices * sizeof(tU16);
+    if (size > 0x4000) {
+        FatalError(kFatalError_ChunkIsTooLargeToPipe);
+    }
+    crush->model = pModel;
+    ARCompressCrush(&crush->direction, crush->values, pModel, pVector, pValues);
+    ARAddDataToSession(ePipe_chunk_crush, -1, crush, size);
+}
+
+#if defined(REC2_MATCHING) && defined(_MSC_VER)
+#pragma inline_depth()
+#endif
 
 // AddSmudgeToPipingSession
 
@@ -1113,7 +1140,25 @@ void C2_HOOK_FASTCALL AddNapalmBoltToPipingSession(int pIndex, tPedestrian* pPed
         SIZE_OFFSET_PIPING(tPipe_chunk_napalm_bolt, positions), pPositions);
 }
 
-// PipeSingleCrush
+// FUNCTION: CARMA2_HW 0x004c7f40
+// FUNCTION: CARMA2_SW 0x004c4670
+// FUNCTION: CARMA2_CHEAT 0x004cda60
+void C2_HOOK_FASTCALL PipeSingleCrush(br_model* pModel, const br_vector3* pVector, const float* pValues) {
+    tPipe_chunk_crush* crush;
+    tU32 size;
+
+    crush = gCrush_space;
+    if (gCrush_space == NULL) {
+        return;
+    }
+    size = offsetof(tPipe_chunk_crush, values) + pModel->nvertices * sizeof(tU16);
+    if (size > 0x4000) {
+        FatalError(kFatalError_ChunkIsTooLargeToPipe);
+    }
+    crush->model = pModel;
+    ARCompressCrush(&crush->direction, crush->values, pModel, pVector, pValues);
+    ARDoSingleSession(ePipe_chunk_crush, -1, crush, size);
+}
 
 // FUNCTION: CARMA2_HW 0x004c8090
 // FUNCTION: CARMA2_SW 0x004c47c0
@@ -1857,7 +1902,13 @@ void C2_HOOK_FASTCALL PipeSingleOppoRenderage(tOpponent_spec* pOpponent_spec, in
         SIZE_OFFSET_PIPING(tPipe_single_oppo_renderage, enable), pEnable);
 }
 
-// ApplyCrush
+// FUNCTION: CARMA2_HW 0x004c9040
+// FUNCTION: CARMA2_SW 0x004c5770
+// FUNCTION: CARMA2_CHEAT 0x004ceb60
+void C2_HOOK_FASTCALL ApplyCrush(tPipe_chunk** pChunk) {
+
+    ARApplyCrush((*pChunk)->data.crush.model, &(*pChunk)->data.crush.direction, (*pChunk)->data.crush.values);
+}
 
 // FUNCTION: CARMA2_HW 0x004c9060
 // FUNCTION: CARMA2_SW 0x004c5790
@@ -2606,7 +2657,13 @@ void C2_HOOK_FASTCALL ApplyOppoRenderage(tPipe_chunk** pChunk) {
     ApplyOppoRenderage2((tOpponent_spec*)(*pChunk)->subject_index, (*pChunk)->data.oppo_renderage.enable);
 }
 
-// UndoCrush
+// FUNCTION: CARMA2_HW 0x004c9d90
+// FUNCTION: CARMA2_SW 0x004c64c0
+// FUNCTION: CARMA2_CHEAT 0x004cf8c0
+void C2_HOOK_FASTCALL UndoCrush(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
+
+    ARUndoCrush((*pChunk)->data.crush.model, &(*pChunk)->data.crush.direction, (*pChunk)->data.crush.values);
+}
 
 // FUNCTION: CARMA2_HW 0x004c9db0
 // FUNCTION: CARMA2_SW 0x004c64e0
@@ -3024,7 +3081,15 @@ void C2_HOOK_FASTCALL UndoTransformType(tPipe_chunk** pChunk, tPipe_chunk* pPrev
     ((br_actor*)chunk->subject_index)->t.type = chunk->data.transform_type.type_from;
 }
 
-// CalcCrushLength
+// FUNCTION: CARMA2_HW 0x004ca3f0
+int C2_HOOK_FASTCALL CalcCrushLength(tPipe_chunk* pChunk) {
+    br_model* model;
+
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk, data, 0x4);
+
+    model = *(br_model**)&pChunk->data;
+    return 0xa + 2 * model->nvertices;
+}
 
 // FUNCTION: CARMA2_HW 0x004ca400
 // FUNCTION: CARMA2_CHEAT 0x004cff40
