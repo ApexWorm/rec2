@@ -218,7 +218,7 @@ void C2_HOOK_FASTCALL ProcessCurrentObjective(tOpponent_spec* pOpponent_spec, tP
 // FUNCTION: CARMA2_HW 0x004aa400
 // FUNCTION: CARMA2_SW 0x004a6570
 // FUNCTION: CARMA2_CHEAT 0x004ab8f0
-int C2_HOOK_FASTCALL PointVisibleFromHere(br_vector3* pFrom, br_vector3* pTo) {
+inline int C2_HOOK_FASTCALL PointVisibleFromHere(br_vector3* pFrom, br_vector3* pTo) {
     br_vector3 from;
     br_vector3 dir;
     br_vector3 norm;
@@ -1289,7 +1289,36 @@ int C2_HOOK_FASTCALL RematerialiseOpponent(tOpponent_spec* pOpponent_spec, br_sc
 #pragma auto_inline(on)
 #endif
 
-// CalcPlayerConspicuousness
+// FUNCTION: CARMA2_HW 0x004adae0
+// FUNCTION: CARMA2_SW 0x004a9c50
+// FUNCTION: CARMA2_CHEAT 0x004aeff0
+void C2_HOOK_FASTCALL CalcPlayerConspicuousness(tOpponent_spec* pOpponent_spec) {
+    br_vector3 pos_in_cop_space;
+    br_matrix34 inverse_transform;
+
+    if (gTime_stamp_for_this_munging <= pOpponent_spec->next_player_visibility_check) {
+        return;
+    }
+    pOpponent_spec->player_in_view_now = 0;
+    if (CAR_SPEC_IS_ROZZER(pOpponent_spec->car_spec)) {
+        pOpponent_spec->next_player_visibility_check = gTime_stamp_for_this_munging + IRandomBetween(0, 900) + 100;
+        if (pOpponent_spec->player_to_oppo_d < 20.0f) {
+            BrMatrix34LPInverse(&inverse_transform, &pOpponent_spec->car_spec->car_master_actor->t.t.mat);
+            BrMatrix34ApplyP(&pos_in_cop_space, &gProgram_state.current_car.car_master_actor->t.t.translate.t, &inverse_transform);
+            if (pos_in_cop_space.v[2] < 0.0f && PointVisibleFromHere(&gProgram_state.current_car.car_master_actor->t.t.translate.t, &pOpponent_spec->car_spec->car_master_actor->t.t.translate.t)) {
+                pOpponent_spec->player_in_view_now = 1;
+                pOpponent_spec->acknowledged_piv = 0;
+            }
+        }
+    } else {
+        pOpponent_spec->next_player_visibility_check = gTime_stamp_for_this_munging + IRandomBetween(0, 900) + 4000;
+        DoNotDprintf("%s: Time now: %9.2f; next vis check at %9.2f", pOpponent_spec->car_spec->driver_name, gTime_stamp_for_this_munging / 1000.0, pOpponent_spec->next_player_visibility_check / 1000.0);
+        if (pOpponent_spec->player_to_oppo_d < 50.0f && PointVisibleFromHere(&gProgram_state.current_car.car_master_actor->t.t.translate.t, &pOpponent_spec->car_spec->car_master_actor->t.t.translate.t)) {
+            pOpponent_spec->player_in_view_now = 1;
+            pOpponent_spec->acknowledged_piv = 0;
+        }
+    }
+}
 
 // CalcOpponentConspicuousnessWithAViewToCheatingLikeFuck
 
