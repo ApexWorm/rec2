@@ -82,6 +82,7 @@ void* gPhysics_buffer3_ptr;
 
 // GLOBAL: CARMA2_HW 0x0074a5e4
 // GLOBAL: CARMA2_SW 0x007410a4
+// GLOBAL: CARMA2_CHEAT 0x00751c84
 int gPHIL_mechanics_time_sync;
 
 // GLOBAL: CARMA2_HW 0x0074a5e8
@@ -142,6 +143,16 @@ void* gPhysics_scratch_ptr;
 // GLOBAL: CARMA2_SW 0x0068e108
 // GLOBAL: CARMA2_CHEAT 0x0069bc28
 int gFace_count;
+
+// GLOBAL: CARMA2_HW 0x00679438
+// GLOBAL: CARMA2_SW 0x00673ba8
+// GLOBAL: CARMA2_CHEAT 0x00680ce8
+int gINT_00679438;
+
+// GLOBAL: CARMA2_HW 0x0079ecbc
+// GLOBAL: CARMA2_SW 0x00795248
+// GLOBAL: CARMA2_CHEAT 0x007a635c
+tPhysics_object* gObject_blocking_sensible_place;
 
 // GLOBAL: CARMA2_HW 0x0065cf78
 // GLOBAL: CARMA2_SW 0x006578b0
@@ -297,7 +308,20 @@ tFace_ref* C2_HOOK_FASTCALL RayCastThruFaceList2(br_vector3* pPosition, br_vecto
 
 // SetUpWorkspace
 
-// GetObjectWallForceInfo
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_HW 0x004228b0
+// STUB: CARMA2_SW 0x00422930
+// STUB: CARMA2_CHEAT 0x00422a30
+int C2_HOOK_FASTCALL GetObjectWallForceInfo(tPhysics_object* pObject, tPhysics_joint_force* pForces, int pCount) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // GetObjectCornerToObjectFacePoints
 
@@ -489,15 +513,73 @@ int C2_HOOK_FASTCALL TestShapeEdgeIntersection(tPhysics_object* pCollision_info_
     return 0;
 }
 
-// TestObjectOverlapIgnoreCloseRelatives
+inline int C2_HOOK_FASTCALL TestObjectOverlapIgnoreCloseRelatives(tPhysics_object* pCollision_1, tPhysics_object* pCollision_2) {
 
-// TestObjectOverlapRecurse
+    if (pCollision_2 == pCollision_1 || pCollision_1->parent == pCollision_2 || pCollision_2->parent == pCollision_1) {
+        return 0;
+    }
+    return TestObjectOverlap(pCollision_1, pCollision_2);
+}
 
-// STUB: CARMA2_HW 0x00429070
-// STUB: CARMA2_SW 0x00429100
-// STUB: CARMA2_CHEAT 0x00429200
+// FUNCTION: CARMA2_HW 0x004293c0
+// FUNCTION: CARMA2_SW 0x00429450
+// FUNCTION: CARMA2_CHEAT 0x00429550
+int C2_HOOK_FASTCALL TestObjectOverlapRecurse(tPhysics_object* pCollision_1, tPhysics_object* pCollision_2) {
+    tPhysics_object* child;
+
+    if (TestObjectOverlapIgnoreCloseRelatives(pCollision_1, pCollision_2)) {
+        return 1;
+    }
+    for (child = pCollision_2->child; child != NULL; child = child->next) {
+        if (TestObjectOverlapRecurse(pCollision_1, child)) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+// FUNCTION: CARMA2_HW 0x00429070
+// FUNCTION: CARMA2_SW 0x00429100
+// FUNCTION: CARMA2_CHEAT 0x00429200
 int C2_HOOK_FASTCALL TestForObjectInSensiblePlace(tPhysics_object* pCollision_info_1, tPhysics_object* pCollision_info_2, br_vector3* pVec3, tWorld_callbacks* pCar_callbacks) {
-    NOT_IMPLEMENTED();
+    tPhysics_joint_force forces[8];
+    br_vector3 normal;
+    int count;
+    int i;
+    tPhysics_object* object;
+
+    gObject_blocking_sensible_place = NULL;
+    GetNewBoundingBox(&pCollision_info_1->field_0xf4, &pCollision_info_1->bb1, &pCollision_info_1->transform_matrix);
+    GetFacesNearObject(pCollision_info_1, pCar_callbacks);
+    gINT_00679438 = 1;
+    count = GetObjectWallForceInfo(pCollision_info_1, forces, 0);
+    gINT_00679438 = 0;
+    if (count != 0) {
+        BrVector3Copy(&normal, &forces[0].direction_a);
+        if (count > 1) {
+            for (i = 1; i < count; i++) {
+                BrVector3Accumulate(&normal, &forces[i].direction_a);
+            }
+            BrVector3Normalise(&normal, &normal);
+        }
+        BrMatrix34ApplyV(pVec3, &normal, &pCollision_info_1->transform_matrix);
+        return 0;
+    }
+    object = pCollision_info_2;
+    while (1) {
+        if (object == NULL) {
+            return -1;
+        }
+        if (TestObjectOverlapRecurse(pCollision_info_1, object)) {
+            BrVector3Add(pVec3, &pCollision_info_1->field_0x10c.min, &pCollision_info_1->field_0x10c.max);
+            BrVector3Sub(pVec3, pVec3, &object->field_0x10c.min);
+            BrVector3Sub(pVec3, pVec3, &object->field_0x10c.max);
+            BrVector3Normalise(pVec3, pVec3);
+            gObject_blocking_sensible_place = object;
+            return 0;
+        }
+        object = object->next;
+    }
 }
 
 // HierarchyCalcEnergy
@@ -741,11 +823,13 @@ void C2_HOOK_FASTCALL SetGroup(tPhysics_object* pObject, int pGroup) {
 // GetPreCalculatedJointForces
 
 // FUNCTION: CARMA2_HW 0x004b9f40
+// FUNCTION: CARMA2_SW 0x004b6660
+// FUNCTION: CARMA2_CHEAT 0x004bfa70
 void C2_HOOK_FASTCALL MakeObjectListDoSomething(tPhysics_object* pObject) {
     while (pObject != NULL) {
         if (pObject->disable_move_rotate) {
-            pObject->disable_move_rotate = 0;
             pObject->box_face_ref = gFace_num__car - 2;
+            pObject->disable_move_rotate = 0;
         }
         if (pObject->child != NULL) {
             MakeObjectListDoSomething(pObject->child);
@@ -963,11 +1047,20 @@ void C2_HOOK_FASTCALL TranslateObject(tPhysics_object* pObject, br_scalar pDelta
     BrVector3Accumulate(&pObject->actor->t.t.translate.t, &tv);
 }
 
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
 // STUB: CARMA2_HW 0x004c2060
 // STUB: CARMA2_SW 0x004be790
+// STUB: CARMA2_CHEAT 0x004c7b80
 void C2_HOOK_FASTCALL GetFacesNearObject(tPhysics_object *pObject, tWorld_callbacks *pCallbacks) {
     NOT_IMPLEMENTED();
 }
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // FUNCTION: CARMA2_HW 0x004c25a0
 // FUNCTION: CARMA2_SW 0x004becd0
@@ -1089,6 +1182,7 @@ void C2_HOOK_FASTCALL ApplyTorque(tPhysics_object* pObject, const br_vector3* pT
 
 // FUNCTION: CARMA2_HW 0x004c2c90
 // FUNCTION: CARMA2_SW 0x004bf3c0
+// FUNCTION: CARMA2_CHEAT 0x004c87b0
 void C2_HOOK_FASTCALL ApplyDiminishingTorque(tPhysics_object* pObject, const br_vector3* pV) {
     br_vector3 original_omega;
     br_vector3 tv;
@@ -1322,10 +1416,12 @@ tCollision_shape_polyhedron* C2_HOOK_FASTCALL AllocateShapePolyhedron(int pCount
     tCollision_shape_polyhedron* result;
     tU8* raw_memory;
     int count_edges;
+    int count_planes;
 
+    count_planes = (pCount_points - 2) * 2;
     count_edges = (pCount_points - 2) * 3;
     result = BrMemAllocate(sizeof(tCollision_shape_polyhedron) + pCount_points * sizeof(br_vector3)
-        + count_edges * sizeof(tPolyhedron_edge_indexes) + (pCount_points - 2) * 2 * sizeof(br_vector4), (br_uint_8)pType);
+        + count_edges * sizeof(tPolyhedron_edge_indexes) + count_planes * sizeof(br_vector4), (br_uint_8)pType);
     raw_memory = (tU8*)result + sizeof(tCollision_shape_polyhedron);
     result->polyhedron.points = (br_vector3*)raw_memory;
     raw_memory += pCount_points * sizeof(br_vector3);
@@ -1778,6 +1874,7 @@ void C2_HOOK_FASTCALL DoPhysicsError(tPhysicsError pError, const char* pMessage)
 // ResetMan2
 
 // FUNCTION: CARMA2_HW 0x004b5aa0
+// FUNCTION: CARMA2_CHEAT 0x004bb370
 void C2_HOOK_FASTCALL SetUpTestObjects(void) {
 
 }

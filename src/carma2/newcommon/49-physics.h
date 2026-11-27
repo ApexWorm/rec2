@@ -36,6 +36,8 @@ extern tShrapnel_time_info gPed_spurt_min_max_time;
 extern void* gPhysics_other_buffer;
 extern void* gPhysics_scratch_ptr;
 extern int gFace_count;
+extern int gINT_00679438;
+extern tPhysics_object* gObject_blocking_sensible_place;
 extern tWorld_callbacks gWorld_callbacks;
 
 // count
@@ -86,7 +88,7 @@ extern tFace_ref* C2_HOOK_FASTCALL RayCastThruFaceList2(br_vector3* pPosition, b
 
 // SetUpWorkspace
 
-// GetObjectWallForceInfo
+extern int C2_HOOK_FASTCALL GetObjectWallForceInfo(tPhysics_object* pObject, tPhysics_joint_force* pForces, int pCount);
 
 // GetObjectCornerToObjectFacePoints
 
@@ -114,9 +116,9 @@ extern int C2_HOOK_FASTCALL TestObjectOverlap(tPhysics_object* pCollision_1, tPh
 
 extern int C2_HOOK_FASTCALL TestShapeEdgeIntersection(tPhysics_object* pCollision_info_1, tPhysics_object* pCollision_info_2, tPhysics_shape* pCollision_shape_1, tPhysics_shape* pCollision_shape_2);
 
-// TestObjectOverlapIgnoreCloseRelatives
+extern int C2_HOOK_FASTCALL TestObjectOverlapIgnoreCloseRelatives(tPhysics_object* pCollision_1, tPhysics_object* pCollision_2);
 
-// TestObjectOverlapRecurse
+extern int C2_HOOK_FASTCALL TestObjectOverlapRecurse(tPhysics_object* pCollision_1, tPhysics_object* pCollision_2);
 
 extern int C2_HOOK_FASTCALL TestForObjectInSensiblePlace(tPhysics_object* pCollision_info_1, tPhysics_object* pCollision_info_2, br_vector3* pVec3, tWorld_callbacks* pCar_callbacks);
 
