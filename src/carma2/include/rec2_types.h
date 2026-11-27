@@ -755,6 +755,7 @@ typedef enum {
     ePipe_chunk_frame_finish = 0,
     ePipe_chunk_ped_incident = 1,
     ePipe_chunk_sound = 2,
+    ePipe_chunk_crush = 3,
     ePipe_chunk_car = 5,
     ePipe_chunk_graphical_wheel_stuff = 6,
     ePipe_chunk_damage = 7,
@@ -4754,6 +4755,12 @@ typedef struct {
     br_vector3 field_0x44;
     undefined4 field_0x50;
 } tCar_crush;
+
+typedef struct {
+    tCar_spec* car;
+    tCar_crush* crush;
+    float scale;
+} tSpam_userdata; /* FIXME: name from Ghidra */
 
 typedef struct {
     tU8 count;

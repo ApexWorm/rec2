@@ -158,19 +158,19 @@ extern int C2_HOOK_FASTCALL NearestAxis(const br_vector3* pVector);
 
 // PossibleShockSmash
 
-// CrushModels
+extern intptr_t C2_HOOK_FASTCALL CrushModels(br_actor* pActor, br_matrix34* pMat, void* pContext);
 
-// CrushPoint
+extern void C2_HOOK_FASTCALL CrushPoint(br_vector3* pPoint, int pCount, const br_vector3* pVertices, const br_vector3* pDirection, br_scalar pForce, tU16 pLimit_number, const tCar_crush_limits* pLimits, int pMax_index);
 
 extern void C2_HOOK_FASTCALL ClipPointToLimits(br_vector3* pPoint, tU16 pLimit_bits, const tCar_crush_limits* pLimits);
 
-// CrushCollisionShapes
+extern void C2_HOOK_FASTCALL CrushCollisionShapes(tCar_spec* pCar, tSpam_userdata* pContext);
 
 extern intptr_t C2_HOOK_FASTCALL SimpleCrushCarModelsCB(br_actor* pActor, br_matrix34* pMat, void* pContext);
 
-// SimpleCrushCar
+extern void C2_HOOK_FASTCALL SimpleCrushCar(tCar_spec* pCar, tSpam_userdata* pContext);
 
-// CrushCar
+extern void C2_HOOK_FASTCALL CrushCar(tCar_spec* pCar, br_actor* pActor, tCar_crush* pCrush);
 
 // SendCrush
 
@@ -496,7 +496,7 @@ extern void C2_HOOK_FASTCALL ARApplySplitWeld(tCar_spec* pCar, const br_vector4*
 
 extern void C2_HOOK_FASTCALL ARUndoSplitWeld(tCar_spec* pCar);
 
-// ReceivedCrush
+extern void C2_HOOK_FASTCALL ReceivedCrush(tNet_message_chunk* pContents);
 
 // FindBitWithID
 
