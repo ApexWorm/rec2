@@ -103,6 +103,14 @@ extern int gINT_1001dc54;
 extern int gINT_1001dc30;
 extern br_colour gCOLOUR_100156e8;
 extern int gLock_count;
+extern void* gDevice_pixels;
+extern int gINT_1001bb98;
+extern int gDirty_min_x;
+extern int gDirty_min_y;
+extern int gDirty_max_x;
+extern int gDirty_max_y;
+extern int gAttached_surface_pixelformat;
+extern LPDIRECT3DDEVICE2 gD3DDevice2;
 extern int gINT_1001bb94;
 
 
@@ -113,6 +121,8 @@ int C2_HOOK_CDECL DetectD3DDevices(void);
 int C2_HOOK_CDECL InitD3D(void);
 
 void C2_HOOK_CDECL CloseD3D(void);
+
+void C2_HOOK_CDECL ApplyD3DRenderStateQueue(void);
 
 void C2_HOOK_CDECL DoD3DOperation(int operation);
 

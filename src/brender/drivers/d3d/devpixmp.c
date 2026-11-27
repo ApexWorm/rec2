@@ -79,6 +79,8 @@ br_tv_template devicePixelmapD3DAllocateTemplate = {
     devicePixelmapD3DAllocateTemplateEntries
 };
 
+// GLOBAL: D3D 0x1001afd0
+D3DTLVERTEX gPixel_vertex;
 
 // GLOBAL: D3D 0x100cea84
 br_boolean passthru_vga;
@@ -490,11 +492,60 @@ br_error C2_HOOK_CDECL _M_br_device_pixelmap_d3d_rectangleFill(br_device_pixelma
     return 0;
 }
 
-// STUB: D3D 0x10001910
+// FUNCTION: D3D 0x10001910
 br_error C2_HOOK_CDECL _M_br_device_pixelmap_d3d_pixelSet(br_device_pixelmap_d3d* self, br_point* p, br_uint_32 colour) {
-    NOT_IMPLEMENTED();
-    return 0xa005;
+    br_point ap;
+    int x;
+    int y;
+
+    if (self->buffer_type == BT_BACKSCREEN && PixelmapPointClip(&ap, p, (br_pixelmap*)self) != BR_CLIP_REJECT) {
+        x = ap.x + self->pm_base_x;
+        y = ap.y + self->pm_base_y;
+        if (x >= 0 && y >= 0 && x <= 639 && y <= 479) {
+            if (gLock_count > 0) {
+                if (self->pm_pixels != NULL) {
+                    ((br_uint_16*)self->pm_pixels)[(self->pm_row_bytes >> 1) * y + x] = colour;
+                    if (x < gDirty_min_x) {
+                        gDirty_min_x = x;
+                    }
+                    if (x > gDirty_max_x) {
+                        gDirty_max_x = x;
+                    }
+                    if (y < gDirty_min_y) {
+                        gDirty_min_y = y;
+                    }
+                    if (y > gDirty_max_y) {
+                        gDirty_max_y = y;
+                    }
+                }
+            } else {
+                gQueued_render_states[0].type = D3DRENDERSTATE_TEXTUREHANDLE;
+                gQueued_render_states[0].value = 0;
+                gQueued_render_states[1].type = D3DRENDERSTATE_SHADEMODE;
+                gQueued_render_states[1].value = D3DSHADE_GOURAUD;
+                gQueued_render_states[2].type = D3DRENDERSTATE_ALPHABLENDENABLE;
+                gQueued_render_states[2].value = FALSE;
+                gQueued_render_states[3].type = D3DRENDERSTATE_ZFUNC;
+                gQueued_render_states[3].value = D3DCMP_ALWAYS;
+                gQueued_render_states[4].type = D3DRENDERSTATE_ZWRITEENABLE;
+                gQueued_render_states[4].value = FALSE;
+                gCount_queued_render_states = 5;
+                ApplyD3DRenderStateQueue();
+                gPixel_vertex.sx = (D3DVALUE)(ap.x + self->pm_base_x);
+                gPixel_vertex.sy = (D3DVALUE)(ap.y + self->pm_base_y);
+                gPixel_vertex.sz = 1e-5f;
+                if (gAttached_surface_pixelformat == 4) {
+                    gPixel_vertex.color = ((((((colour & 0xf800) << 3) | (colour & 0x7e0)) << 2) | (colour & 0x1f)) << 3);
+                } else {
+                    gPixel_vertex.color = ((((((colour & 0x7c00) << 3) | (colour & 0x3e0)) << 3) | (colour & 0x1f)) << 3);
+                }
+                IDirect3DDevice2_DrawPrimitive(gD3DDevice2, D3DPT_POINTLIST, D3DVT_TLVERTEX, &gPixel_vertex, 1, 0);
+            }
+        }
+    }
+    return 0;
 }
+
 
 br_error C2_HOOK_CDECL _M_br_device_pixelmap_d3d_flush(br_device_pixelmap_d3d* self) {
     return 0;
@@ -504,14 +555,54 @@ br_error C2_HOOK_CDECL _M_br_device_pixelmap_d3d_synchronise(br_device_pixelmap_
     return 0;
 }
 
-// STUB: D3D 0x10001d70
+// FUNCTION: D3D 0x10001d70
 br_error C2_HOOK_CDECL _M_br_device_pixelmap_d3d_directLock(br_device_pixelmap_d3d* self, br_boolean block) {
-    NOT_IMPLEMENTED();
-    return 0xa005;
+    DDSURFACEDESC surface_desc;
+
+    gLock_count += 1;
+    if (gLock_count != 1) {
+        return 0;
+    }
+    if (self->buffer_type == BT_FRONTSCREEN || self->buffer_type == BT_BACKSCREEN || self->buffer_type == BT_DEPTH) {
+        if (gNo_2d_during_3d_scene == 1) {
+            self->pm_pixels = gDevice_pixels;
+            self->pm_row_bytes = 640 * 2;
+            gINT_1001bb98 += 1;
+            return 0;
+        }
+        DoD3DOperation(3);
+        memset(&surface_desc, 0, sizeof(surface_desc));
+        surface_desc.dwSize = sizeof(surface_desc);
+        OutputDebugStringA("D3D.BDD: Actual Lock");
+        if (IDirectDrawSurface_Lock(gAttached_surface, NULL, &surface_desc, DDLOCK_WAIT, NULL) == DD_OK) {
+            self->pm_pixels = surface_desc.lpSurface;
+            self->pm_row_bytes = (br_int_16)surface_desc.lPitch;
+            return 0;
+        }
+    }
+    return 0xa001;
 }
 
-// STUB: D3D 0x10001e40
+// FUNCTION: D3D 0x10001e40
 br_error C2_HOOK_CDECL _M_br_device_pixelmap_d3d_directUnlock(br_device_pixelmap_d3d* self) {
-    NOT_IMPLEMENTED();
-    return 0xa005;
+
+    gLock_count -= 1;
+    if (gLock_count != 0) {
+        if (gLock_count < 0) {
+            gLock_count = 0;
+        }
+        return 0;
+    }
+    if (self->buffer_type == BT_FRONTSCREEN || self->buffer_type == BT_BACKSCREEN || self->buffer_type == BT_DEPTH) {
+        if (gNo_2d_during_3d_scene != 1) {
+            if (IDirectDrawSurface_Unlock(gAttached_surface, NULL) != DD_OK) {
+                return 0xa001;
+            }
+            DoD3DOperation(2);
+        }
+        self->pm_pixels = NULL;
+        self->pm_row_bytes = 0;
+        return 0;
+    }
+    return 0xa001;
 }
