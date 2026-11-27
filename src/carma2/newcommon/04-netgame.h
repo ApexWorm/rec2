@@ -72,9 +72,9 @@ extern void C2_HOOK_FASTCALL EnableCar(tCar_spec* pCar);
 
 // DoNetworkHeadups
 
-// SortNetHeadAscending
+extern int C2_HOOK_CDECL SortNetHeadAscending(const void* pFirst_one, const void* pSecond_one);
 
-// SortNetHeadDescending
+extern int C2_HOOK_CDECL SortNetHeadDescending(const void* pFirst_one, const void* pSecond_one);
 
 // ClipName
 
@@ -82,7 +82,9 @@ extern void C2_HOOK_FASTCALL EnableCar(tCar_spec* pCar);
 extern void C2_HOOK_FASTCALL CreateBoxes(void);
 #endif
 
-// DrawScoreBoxes
+#ifdef REC2_HW
+extern void C2_HOOK_FASTCALL DrawScoreBoxes(int pX, int pY, int pBox_index, int pMaterial_index);
+#endif
 
 extern void C2_HOOK_FASTCALL DoNetScores2(int pOnly_sort_scores);
 
