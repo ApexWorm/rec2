@@ -603,5 +603,10 @@ void C2_HOOK_FASTCALL GetAverageGridPosition(tRace_info* pThe_race) {
 
 // FindAPed
 
-// MouseClickInActionReplay
+// STUB: CARMA2_HW 0x00413860
+// STUB: CARMA2_SW 0x00413890
+// STUB: CARMA2_CHEAT 0x00413ac0
+void C2_HOOK_FASTCALL MouseClickInActionReplay(int pX_coord, int pY_coord, int pUnknown) {
+    NOT_IMPLEMENTED();
+}
 

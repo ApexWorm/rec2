@@ -51,11 +51,11 @@ extern void C2_HOOK_FASTCALL DoActionReplayHeadups(void);
 
 // DoActionReplay
 
-// MoveToEndOfReplay
+extern void C2_HOOK_FASTCALL MoveToEndOfReplay(void);
 
-// MoveToStartOfReplay
+extern void C2_HOOK_FASTCALL MoveToStartOfReplay(void);
 
-// PollActionReplayControls
+extern void C2_HOOK_FASTCALL PollActionReplayControls(tU32 *pFrame_period, tU32* pAverage_frame_period);
 
 // CheckReplayTurnOn
 

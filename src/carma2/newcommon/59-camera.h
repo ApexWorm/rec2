@@ -108,6 +108,6 @@ extern void C2_HOOK_FASTCALL GetAverageGridPosition(tRace_info* pThe_race);
 
 // FindAPed
 
-// MouseClickInActionReplay
+extern void C2_HOOK_FASTCALL MouseClickInActionReplay(int pX_coord, int pY_coord, int pUnknown);
 
 #endif // GUARD_59_CAMERA_H

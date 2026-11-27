@@ -194,6 +194,7 @@ int C2_HOOK_FASTCALL ARReplayIsReallyPaused(void) {
 
 // FUNCTION: CARMA2_HW 0x00402380
 // FUNCTION: CARMA2_SW 0x00402380
+// FUNCTION: CARMA2_CHEAT 0x00402380
 int C2_HOOK_FASTCALL ARReplayPauseState(void) {
 
     return gPaused;
