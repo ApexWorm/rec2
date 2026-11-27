@@ -2442,9 +2442,60 @@ void C2_HOOK_FASTCALL TotallyRepairCar(void) {
     }
 }
 
-// AddTotalDeflectionOfModel
+typedef struct {
+    tCar_spec* car;
+    float repair_step;
+    float* total_deflection;
+    float repaired_amount;
+} tRepair_context;
 
-// AddTotalDeflection
+inline void C2_HOOK_FASTCALL AddTotalDeflectionOfModel(br_model* pModel, float* pDeflection) {
+    tUser_detail_level_model* user_detail_model;
+    tModel_detail_vertex_data* vertex_data;
+    float deflection;
+    br_vector3 pos;
+    int i;
+    int j;
+
+    if (pModel == NULL) {
+        return;
+    }
+    user_detail_model = pModel->user;
+    if (user_detail_model == NULL) {
+        return;
+    }
+    vertex_data = user_detail_model->field_0x4;
+    if (vertex_data == NULL) {
+        return;
+    }
+    deflection = 0.0f;
+    for (i = 0; i < pModel->nvertices; i++) {
+        ExpandVector3(&pos, &vertex_data[i].p, -10.0f, 10.0f);
+        for (j = 0; j < 3; j++) {
+            deflection += (float)fabs(pos.v[j] - pModel->vertices[i].p.v[j]);
+        }
+    }
+    *pDeflection += deflection;
+}
+
+// FUNCTION: CARMA2_HW 0x0043b2e0
+// FUNCTION: CARMA2_SW 0x0043b330
+// FUNCTION: CARMA2_CHEAT 0x0043b510
+intptr_t C2_HOOK_CDECL AddTotalDeflection(br_actor* pActor, void* pContext) {
+    tUser_crush_data* user_crush;
+    tRepair_context* context;
+    int i;
+
+    user_crush = pActor->user;
+    if (user_crush == NULL || user_crush->crush_data == NULL || !user_crush->crush_data->field_0x2c) {
+        return 0;
+    }
+    context = pContext;
+    for (i = 0; i < context->car->count_detail_levels; i++) {
+        AddTotalDeflectionOfModel(user_crush->models[i], context->total_deflection);
+    }
+    return 0;
+}
 
 // RepairModel
 

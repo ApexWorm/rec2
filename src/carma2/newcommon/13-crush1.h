@@ -434,9 +434,9 @@ extern void C2_HOOK_FASTCALL TotallyRepairACar(tCar_spec* pCar_spec);
 
 extern void C2_HOOK_FASTCALL TotallyRepairCar(void);
 
-// AddTotalDeflectionOfModel
+extern void C2_HOOK_FASTCALL AddTotalDeflectionOfModel(br_model* pModel, float* pDeflection);
 
-// AddTotalDeflection
+extern intptr_t C2_HOOK_CDECL AddTotalDeflection(br_actor* pActor, void* pContext);
 
 // RepairModel
 
