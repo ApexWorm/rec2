@@ -20,6 +20,7 @@
 #include "platform.h"
 #include "globvars.h"
 #include "globvrpb.h"
+#include "52-errors.h"
 
 #include "rec2_macros.h"
 
@@ -30,6 +31,12 @@
 #include <string.h>
 #include <winsock.h>
 #include <wsipx.h>
+
+#ifdef REC2_V101A
+#define NET_MESSAGE_MAGIC 0x763a505a
+#else
+#define NET_MESSAGE_MAGIC 0x763a5059
+#endif
 
 // GLOBAL: CARMA2_HW 0x0068d95c
 // GLOBAL: CARMA2_SW 0x006879b4
@@ -894,7 +901,7 @@ tNet_message* C2_HOOK_FASTCALL NetAllocateMessage(int pSize) {
     if (pointer != NULL) {
         message = (tNet_message*)((tU8*)pointer + gMessage_header_size);
         message->header.field_0xc = 1;
-        message->header.field_0x4 = 0x763a5059;
+        message->header.field_0x4 = NET_MESSAGE_MAGIC;
         return message;
     } else {
         return NULL;
@@ -943,6 +950,7 @@ void C2_HOOK_FASTCALL NetReallyDisposeMessage(tNet_message* pMessage) {
 
 // STUB: CARMA2_HW 0x0049ff70
 // STUB: CARMA2_SW 0x0049c0f0
+// STUB: CARMA2_CHEAT 0x004a0aa0
 tNet_message* C2_HOOK_FASTCALL NetGetNextMessage(tNet_game_details* pDetails, void** pSender_address) {
     NOT_IMPLEMENTED();
 }
@@ -1100,7 +1108,7 @@ void C2_HOOK_FASTCALL NetReceiveAndProcessMessages(void) {
             if (message != NULL) {
                 if (message->header.field_0x14 != 0) {
                     receive_time = GetRaceTime();
-                    if (message->header.field_0x4 == 0x763a5059) {
+                    if (message->header.field_0x4 == NET_MESSAGE_MAGIC) {
                         CheckCheckSum(message);
                         StatReceivePacket();
                         ReceivedMessage(message, sender_address, receive_time);
@@ -1254,6 +1262,7 @@ void C2_HOOK_FASTCALL NetGuaranteedSendMessageToHost(tNet_game_details* pDetails
 
 // FUNCTION: CARMA2_HW 0x004a5ca0
 // FUNCTION: CARMA2_SW 0x004a1e20
+// FUNCTION: CARMA2_CHEAT 0x004a6c10
 void C2_HOOK_FASTCALL AddToGuaranteeList(tNet_message* pMessage, void* pAddress, tPlayer_ID pPlayer, void* pNotifyFail) {
     int i;
 
@@ -1341,6 +1350,7 @@ int C2_HOOK_FASTCALL NetGuaranteedSendMessageToPlayer(tNet_game_details* pDetail
 
 // FUNCTION: CARMA2_HW 0x004a6020
 // FUNCTION: CARMA2_SW 0x004a21a0
+// FUNCTION: CARMA2_CHEAT 0x004a70a0
 int C2_HOOK_FASTCALL NetGuaranteedSendMessageToAddress(tNet_game_details* pDetails, tNet_message* pMessage, void* pAddress, void* pNotifyFail) {
 
     if (gNet_mode != eNet_mode_none || gJoin_list_mode) {
@@ -1402,17 +1412,54 @@ tNet_game_player_info* C2_HOOK_FASTCALL NetPlayerFromCar(tCar_spec* pCar) {
     return NULL;
 }
 
+#ifdef REC2_V101A
+// FUNCTION: CARMA2_CHEAT 0x004a7be0
+tU32 C2_HOOK_FASTCALL CalculateCheckSum(tNet_message* pMessage) {
+    tU32 sum;
+    int i;
+    tU32* p;
+    tU8* pb;
+
+    sum = 0;
+    p = (tU32*)pMessage;
+    for (i = 0; i < pMessage->header.field_0x16 >> 2; i++) {
+        sum += *p;
+        p++;
+    }
+    pb = (tU8*)p;
+    for (i *= 4; i < pMessage->header.field_0x16; i++) {
+        sum += *pb;
+        pb++;
+    }
+    return sum;
+}
+#endif
+
 // FUNCTION: CARMA2_HW 0x004a69f0
 // FUNCTION: CARMA2_SW 0x004a2b70
-// FUNCTION: CARMA2_CHEAT 0x004a7be0
 void C2_HOOK_FASTCALL GetCheckSum(tNet_message* pMessage) {
+#ifdef REC2_V101A
+    pMessage->header.checksum = 0;
+    pMessage->header.checksum = CalculateCheckSum(pMessage);
+#else
     (void)pMessage;
+#endif
 }
 
 // FUNCTION: CARMA2_HW 0x004a6a00
 // FUNCTION: CARMA2_SW 0x004a2b80
 void C2_HOOK_FASTCALL CheckCheckSum(tNet_message* pMessage) {
+#ifdef REC2_V101A
+    tU32 checksum;
+
+    checksum = pMessage->header.checksum;
+    pMessage->header.checksum = 0;
+    if (checksum != CalculateCheckSum(pMessage)) {
+        FatalError(0x6f);
+    }
+#else
     (void)pMessage;
+#endif
 }
 
 void C2_HOOK_FASTCALL StatReceivePacket(void) {
