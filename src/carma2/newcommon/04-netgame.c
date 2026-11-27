@@ -28,6 +28,7 @@
 #include "63-loading3.h"
 #include "72-interface.h"
 #include "c2_stdio.h"
+#include "c2_string.h"
 #include "globvars.h"
 #include "globvrkm.h"
 #include "globvrpb.h"
@@ -132,13 +133,97 @@ void C2_HOOK_FASTCALL ReceivedRecover(tNet_message_chunk_recover* pContents) {
     }
 }
 
-// CopyMechanics
+// FUNCTION: CARMA2_HW 0x00498ab0
+// FUNCTION: CARMA2_SW 0x004956e0
+// FUNCTION: CARMA2_CHEAT 0x00498e60
+void C2_HOOK_FASTCALL CopyMechanics(tCar_spec* pCar, tU8* pSrc) {
+    int size;
+    int i;
+    tU8* pData;
+    tPhysics_object* object;
+
+    memcpy(&pCar->collision_info->field_0x260, pSrc, 0x34); /* FIXME: 0x34 is the block from field_0x260 up to field_0x294 */
+    pData = pSrc + 0x34;
+    size = GetNetworkDataSize(pData);
+    memcpy(pCar->collision_info->field_0x294, pData, size);
+    pData += size;
+    if (pCar->collision_info->field_0x292 & 0x8) {
+        for (i = 0; i < (int)REC2_ASIZE(pCar->collision_info->field_0x48c); i++) {
+            pCar->collision_info->field_0x48c[i] = *(undefined4*)pData;
+            pData += sizeof(undefined4);
+        }
+    } else {
+        for (i = 0; i < (int)REC2_ASIZE(pCar->collision_info->field_0x48c); i++) {
+            pCar->collision_info->field_0x48c[i] = 0;
+        }
+    }
+    if (pCar->collision_info->field_0x292 & 0x1) {
+        size = GetNetShapeDataLengthFromData(pData);
+        memcpy(pCar->collision_info->shape_data, pData, size);
+        pData += size;
+    }
+    if (pCar->collision_info->field_0x292 & 0x2) {
+        pCar->collision_info->field_0x481 = *pData;
+        pData += sizeof(tU8);
+        pCar->collision_info->field_0x482 = *(tU16*)pData;
+        pData += sizeof(tU16);
+    }
+    object = pCar->collision_info;
+    if (object->field_0x292 & 0x4) {
+        object->field_0x484 = ((undefined4*)pData)[0];
+        object->field_0x488 = ((undefined4*)pData)[1];
+    }
+}
 
 // ReceivedShapeNumbers
 
-// FillInSimpleCarPos
+// FUNCTION: CARMA2_HW 0x00498460
+// FUNCTION: CARMA2_SW 0x00495090
+// FUNCTION: CARMA2_CHEAT 0x00498810
+void C2_HOOK_FASTCALL FillInSimpleCarPos(tNet_message_chunk* pContents, int pPlayer_index) {
+    tCar_spec* car;
 
-// ReceivedSimpleCarPos
+    car = gNet_players[pPlayer_index].car;
+    CompressVector3(&pContents->simple_car_pos.pos, &car->car_master_actor->t.t.translate.t, -500.0f, 500.0f);
+    pContents->simple_car_pos.yaw = BrRadianToAngle(atan2(car->car_master_actor->t.t.mat.m[2][0], car->car_master_actor->t.t.mat.m[2][2]));
+    pContents->simple_car_pos.player = gNet_players[pPlayer_index].ID;
+    pContents->simple_car_pos.repair_time = car->repair_time;
+}
+
+// FUNCTION: CARMA2_HW 0x004984c0
+// FUNCTION: CARMA2_SW 0x004950f0
+// FUNCTION: CARMA2_CHEAT 0x00498870
+void C2_HOOK_FASTCALL ReceivedSimpleCarPos(tNet_message_chunk* pContents) {
+    int i;
+    tCar_spec* car;
+    br_matrix34* mat;
+    br_scalar total_deflection;
+
+    car = NULL;
+    for (i = 0; i < gNumber_of_net_players; i++) {
+        if (gNet_players[i].ID == pContents->simple_car_pos.player) {
+            car = gNet_players[i].car;
+            break;
+        }
+    }
+    if (car != NULL) {
+        car->active = 0;
+        mat = &car->car_master_actor->t.t.mat;
+        BrMatrix34RotateY(mat, pContents->simple_car_pos.yaw);
+        ExpandVector3((br_vector3*)mat->m[3], &pContents->simple_car_pos.pos, -500.0f, 500.0f);
+        BrMatrix34Copy(&car->collision_info->transform_matrix, mat);
+        BrVector3Copy(&car->pos, (br_vector3*)car->collision_info->transform_matrix.m[3]);
+        BrVector3Copy(&car->collision_info->pos, (br_vector3*)car->collision_info->transform_matrix.m[3]);
+        if (car != NULL && car->driver >= eDriver_net_human && pContents->simple_car_pos.repair_time > car->repair_time) {
+            if (pContents->simple_car_pos.repair_time - car->repair_time >= 100000) {
+                TotallyRepairACar(car);
+                car->repair_time = car->collision_info->field_0x27c;
+            } else {
+                RepairCar2(car, pContents->simple_car_pos.repair_time - car->repair_time, &total_deflection);
+            }
+        }
+    }
+}
 
 // ReceivedMechanics
 
