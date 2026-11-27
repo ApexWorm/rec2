@@ -43,6 +43,7 @@ int gGroovidelics_array_size;
 tU32 gPrevious_groove_times[2];
 
 // GLOBAL: CARMA2_HW 0x00688b30
+// GLOBAL: CARMA2_SW 0x00683090
 // GLOBAL: CARMA2_CHEAT 0x006903d8
 tGroove_funk_binding gGroove_funk_bindings[1440];
 
