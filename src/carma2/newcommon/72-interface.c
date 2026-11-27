@@ -135,9 +135,13 @@ int gFrontend_suppress_mouse;
 tConnected_items* gConnected_items;
 
 // GLOBAL: CARMA2_HW 0x00686f08
+// GLOBAL: CARMA2_SW 0x00681648
+// GLOBAL: CARMA2_CHEAT 0x0068e7b0
 int gCount_connected_items_indices;
 
 // GLOBAL: CARMA2_HW 0x00687018
+// GLOBAL: CARMA2_SW 0x00681758
+// GLOBAL: CARMA2_CHEAT 0x0068e8c0
 int gConnected_items_indices[6];
 
 // GLOBAL: CARMA2_HW 0x00686508
@@ -3198,12 +3202,20 @@ void C2_HOOK_FASTCALL ResetInterfaceTimeout(void) {
 // FUNCTION: CARMA2_CHEAT 0x0046dc50
 int C2_HOOK_FASTCALL FRONTEND_Main(tFrontendMenuType pFrontend_type) {
     // GLOBAL: CARMA2_HW 0x0076370c
+    // GLOBAL: CARMA2_SW 0x00759c6c
+    // GLOBAL: CARMA2_CHEAT 0x0076adac
     static int back_screen_base_x;
     // GLOBAL: CARMA2_HW 0x00763710
+    // GLOBAL: CARMA2_SW 0x00759c70
+    // GLOBAL: CARMA2_CHEAT 0x0076adb0
     static int back_screen_base_y;
     // GLOBAL: CARMA2_HW 0x00763704
+    // GLOBAL: CARMA2_SW 0x00759c64
+    // GLOBAL: CARMA2_CHEAT 0x0076ada4
     static int back_screen_origin_x;
     // GLOBAL: CARMA2_HW 0x00763708
+    // GLOBAL: CARMA2_SW 0x00759c68
+    // GLOBAL: CARMA2_CHEAT 0x0076ada8
     static int back_screen_origin_y;
     int step;
 
