@@ -397,7 +397,7 @@ extern void C2_HOOK_FASTCALL ApplyPedDir(tPipe_chunk** pChunk);
 
 // ApplyPedPhysics
 
-// ApplyPedDismember
+extern void C2_HOOK_FASTCALL ApplyPedDismember(tPipe_chunk** pChunk);
 
 extern void C2_HOOK_FASTCALL ApplyPedFPChange(tPipe_chunk** pChunk);
 

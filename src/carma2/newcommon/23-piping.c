@@ -2351,7 +2351,13 @@ void C2_HOOK_FASTCALL ApplyPedDir(tPipe_chunk** pChunk) {
 
 // ApplyPedPhysics
 
-// ApplyPedDismember
+// FUNCTION: CARMA2_HW 0x004c9b20
+// FUNCTION: CARMA2_SW 0x004c6250
+// FUNCTION: CARMA2_CHEAT 0x004cf650
+void C2_HOOK_FASTCALL ApplyPedDismember(tPipe_chunk** pChunk) {
+
+    PedApplyDismember((tPedestrian*)(*pChunk)->subject_index, (*pChunk)->data.ped_dismember.bone_index, (*pChunk)->data.ped_dismember.new_value);
+}
 
 // FUNCTION: CARMA2_HW 0x004c9b40
 // FUNCTION: CARMA2_SW 0x004c6270

@@ -287,7 +287,18 @@ inline int C2_HOOK_FASTCALL DismemberCharacterAR(tPed_character_instance* pChara
     return result;
 }
 
-// PedApplyDismember
+// FUNCTION: CARMA2_HW 0x004ca900
+// FUNCTION: CARMA2_SW 0x004c7030
+// FUNCTION: CARMA2_CHEAT 0x004d0440
+void C2_HOOK_FASTCALL PedApplyDismember(tPedestrian* pPed, int pBone_index, int pNew_value) {
+    tPed_form_actor_set* actor_set;
+
+    pPed->character->field_0xc |= gPow2_array[pBone_index];
+    pPed->character->field_0x6 = pNew_value;
+    SetSeveredLimbObject(pPed->character, pBone_index, 1, 0);
+    actor_set = &pPed->character->personality->form->actor_sets[pPed->character->field_0x4];
+    MakeActorRenderable(actor_set->actors[pBone_index], pBone_index, pPed->character);
+}
 
 // FUNCTION: CARMA2_HW 0x004ca980
 // FUNCTION: CARMA2_SW 0x004c70b0

@@ -1077,6 +1077,9 @@ inline int C2_HOOK_FASTCALL FindAndSetSeveredPhysicsSet(tPed_character_instance*
     return 1;
 }
 
+// FUNCTION: CARMA2_HW 0x00408580
+// FUNCTION: CARMA2_SW 0x00408580
+// FUNCTION: CARMA2_CHEAT 0x00408580
 tPhysics_object* C2_HOOK_FASTCALL SetSeveredLimbObject(tPed_character_instance* pCharacter, int pBone_index, int pArg3, int pArg4) {
     tPed_form_boned_phys* boned;
     br_actor* actor;
