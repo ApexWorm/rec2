@@ -693,11 +693,10 @@ LRESULT CALLBACK D3DWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 
 // FUNCTION: D3D 0x10005e20
 void C2_HOOK_CDECL d3d_debug_printf(const char* format, ...) {
-    va_list ap;
-    va_start(ap, format);
-    vfprintf(stderr, format, ap);
-    va_end(ap);
-    fputc('\n', stderr);
+}
+
+/* FIXME: empty in the original, where the linker folded it with d3d_debug_printf; the name is a guess */
+void C2_HOOK_CDECL d3d_check_result(int failed, const char* message) {
 }
 
 // FUNCTION: D3D 0x10002130
@@ -1134,6 +1133,7 @@ HRESULT CALLBACK D3DEnumTextureFormats(LPDDSURFACEDESC lpDdsd, LPVOID lpContext)
 // FUNCTION: D3D 0x10002ac0
 int C2_HOOK_CDECL SetD3DViewport(void) {
     D3DVIEWPORT2 viewport2;
+    int failed;
 
     if (gD3D_Viewport == NULL) {
         return 0;
@@ -1147,19 +1147,23 @@ int C2_HOOK_CDECL SetD3DViewport(void) {
     viewport2.dwY = 0;
     viewport2.dwWidth = gDisplay_width_10015888;
     viewport2.dwHeight = gDisplay_height_1001588c;
-    viewport2.dvClipX = 0.f;
-    viewport2.dvClipY = 0.f;
+    viewport2.dvClipX = 0.0f;
+    viewport2.dvClipY = 0.0f;
     viewport2.dvClipWidth = (float)gDisplay_width_10015888;
     viewport2.dvClipHeight = (float)gDisplay_height_1001588c;
-    viewport2.dvMinZ = 0.f;
-    viewport2.dvMaxZ = 1.f;
-    if (IDirect3DViewport2_SetViewport2(gD3D_Viewport, &viewport2) != D3D_OK) {
-        d3d_debug_printf("Set viewport2");
+    viewport2.dvMinZ = 0.0f;
+    viewport2.dvMaxZ = 1.0f;
+    failed = IDirect3DViewport2_SetViewport2(gD3D_Viewport, &viewport2) != D3D_OK;
+    if (failed) {
+        d3d_check_result(failed, "Set viewport2");
         gError_code = 1;
         return 1;
     }
     return 0;
 }
+
+
+
 
 // FUNCTION: D3D 0x10004030
 void C2_HOOK_CDECL D3DSetupTextureCacheColorKeyAlpha(void) {
@@ -1646,27 +1650,27 @@ int C2_HOOK_CDECL InitD3D(void) {
 // FUNCTION: D3D 0x10005a50
 void C2_HOOK_CDECL CloseD3D(void) {
 
-    if (gD3DDevice2 != NULL) {
+    if (gD3DDevice2 != NULL && gD3DDevice2->lpVtbl != NULL) {
         IDirect3DDevice2_Release(gD3DDevice2);
         gD3DDevice2 = NULL;
     }
-    if (gPrimary_surface != NULL) {
+    if (gPrimary_surface != NULL && gPrimary_surface->lpVtbl != NULL) {
         IDirectDrawSurface_Release(gPrimary_surface);
         gPrimary_surface = NULL;
     }
-    if (gDirect3D2 != NULL) {
+    if (gDirect3D2 != NULL && gDirect3D2->lpVtbl != NULL) {
         IDirect3D2_Release(gDirect3D2);
         gDirect3D2 = NULL;
     }
-    if (gDirectDraw2 != NULL) {
+    if (gDirectDraw2 != NULL && gDirectDraw2->lpVtbl != NULL) {
         IDirectDraw2_Release(gDirectDraw2);
         gDirectDraw2 = NULL;
     }
-    if (gDirect3D != NULL) {
+    if (gDirect3D != NULL && gDirect3D->lpVtbl != NULL) {
         IDirect3D_Release(gDirect3D);
         gDirect3D = NULL;
     }
-    if (gDirectDraw != NULL) {
+    if (gDirectDraw != NULL && gDirectDraw->lpVtbl != NULL) {
         IDirectDraw_Release(gDirectDraw);
         gDirectDraw = NULL;
     }
@@ -1695,6 +1699,7 @@ void C2_HOOK_CDECL ApplyD3DRenderStateQueue(void) {
 
 // FUNCTION: D3D 0x10005b10
 void C2_HOOK_CDECL DoD3DOperation(int operation) {
+    int failed;
 
     switch(operation) {
     case 2:
@@ -1702,8 +1707,9 @@ void C2_HOOK_CDECL DoD3DOperation(int operation) {
             return;
         }
         gIn_d3d_scene = 1;
-        if (IDirect3DDevice2_BeginScene(gD3DDevice2) != D3D_OK) {
-            d3d_debug_printf("SRS Begin scene");
+        failed = IDirect3DDevice2_BeginScene(gD3DDevice2) != D3D_OK;
+        if (failed) {
+            d3d_check_result(failed, "SRS Begin scene");
             gError_code = 1;
             return;
         }
@@ -1713,7 +1719,7 @@ void C2_HOOK_CDECL DoD3DOperation(int operation) {
         QUEUE_RENDER_STATE(D3DRENDERSTATE_ZENABLE, 1);
         QUEUE_RENDER_STATE(D3DRENDERSTATE_ZWRITEENABLE, 1);
         QUEUE_RENDER_STATE(D3DRENDERSTATE_ZFUNC, D3DCMP_LESSEQUAL);
-        QUEUE_RENDER_STATE(D3DCMP_LESSEQUAL, (gRegister_flags & 0x8) != 0);
+        QUEUE_RENDER_STATE(D3DRENDERSTATE_TEXTUREPERSPECTIVE, (gRegister_flags & 0x8) != 0);
         QUEUE_RENDER_STATE(D3DRENDERSTATE_TEXTUREHANDLE, 0);
         QUEUE_RENDER_STATE(D3DRENDERSTATE_DITHERENABLE, (gRegister_flags & 0x10) != 0);
         ApplyD3DRenderStateQueue();
@@ -1723,8 +1729,9 @@ void C2_HOOK_CDECL DoD3DOperation(int operation) {
             return;
         }
         gIn_d3d_scene = 0;
-        if (IDirect3DDevice2_EndScene(gD3DDevice2) != D3D_OK) {
-            d3d_debug_printf("SRS End scene");
+        failed = IDirect3DDevice2_EndScene(gD3DDevice2) != D3D_OK;
+        if (failed) {
+            d3d_check_result(failed, "SRS End scene");
             gError_code = 1;
             return;
         }
@@ -1738,35 +1745,90 @@ void C2_HOOK_CDECL DoD3DOperation(int operation) {
             memset(&surface_desc, 0, sizeof(surface_desc));
             surface_desc.dwSize = sizeof(surface_desc);
             if (IDirectDrawSurface_Lock(gAttached_surface, NULL, &surface_desc, DDLOCK_WAIT, NULL) == DD_OK) {
-                int y;
-                br_uint_16* src = gDevice_pixels;
-                br_uint_16* dst = surface_desc.lpSurface;
+                void* dst;
+                LONG pitch;
 
-                for (y = 0; y < 480; y++) {
-                    int x;
-                    br_uint_32 sum = 0;
-                    br_uint_32 *src4 = (br_uint_32*)src;
-
-                    for (x = 0; x < 640 / (4 * 2); x++) {
-                        sum += src4[0] + src4[1] + src4[2] + src4[3];
-                    }
-                    if (sum != 0) {
-                        for (x = 0; x < 640; x++) {
-                            if (src[x] != 0) {
-                                dst[x] = src[x];
-                            }
-                        }
-                    }
-                    memset(src, 0, 2 * 640);
-
-                    src += 640;
-                    dst = (br_uint_16*)((br_uint_8*)dst + surface_desc.lPitch);
+                dst = surface_desc.lpSurface;
+                pitch = surface_desc.lPitch;
+#ifdef REC2_MATCHING
+                __asm {
+                    mov     esi, gDevice_pixels
+                    mov     edi, dst
+                    mov     ecx, 480
+                row_loop:
+                    push    ecx
+                    push    edi
+                    push    esi
+                    push    esi
+                    mov     ecx, 640 / 8
+                    xor     eax, eax
+                sum_loop:
+                    add     eax, [esi]
+                    add     eax, [esi + 4]
+                    add     eax, [esi + 8]
+                    add     eax, [esi + 12]
+                    add     esi, 16
+                    loop    sum_loop
+                    pop     esi
+                    cmp     eax, 0
+                    je      next_row
+                    push    esi
+                    mov     ecx, 640
+                copy_loop:
+                    lodsw
+                    cmp     ax, 0
+                    je      skip_pixel
+                    mov     [edi], ax
+                skip_pixel:
+                    add     edi, 2
+                    loop    copy_loop
+                    pop     esi
+                    mov     edi, esi
+                    mov     ecx, 640 / 2
+                    xor     eax, eax
+                    rep stosd
+                next_row:
+                    pop     esi
+                    add     esi, 640 * 2
+                    pop     edi
+                    add     edi, pitch
+                    pop     ecx
+                    loop    row_loop
                 }
+#else
+                {
+                    int x;
+                    int y;
+                    br_uint_16* src;
+                    br_uint_16* dst_row;
+                    br_uint_32 sum;
+
+                    src = gDevice_pixels;
+                    dst_row = dst;
+                    for (y = 0; y < 480; y++) {
+                        sum = 0;
+                        for (x = 0; x < 640 / 2; x++) {
+                            sum += ((br_uint_32*)src)[x];
+                        }
+                        if (sum != 0) {
+                            for (x = 0; x < 640; x++) {
+                                if (src[x] != 0) {
+                                    dst_row[x] = src[x];
+                                }
+                            }
+                            memset(src, 0, 640 * sizeof(br_uint_16));
+                        }
+                        src += 640;
+                        dst_row = (br_uint_16*)((br_uint_8*)dst_row + pitch);
+                    }
+                }
+#endif
                 IDirectDrawSurface_Unlock(gAttached_surface, NULL);
             }
         }
-        if (IDirectDrawSurface_Flip(gPrimary_surface, NULL, DDFLIP_WAIT) != DD_OK) {
-            d3d_debug_printf("Flip");
+        failed = IDirectDrawSurface_Flip(gPrimary_surface, NULL, DDFLIP_WAIT) != DD_OK;
+        if (failed) {
+            d3d_check_result(failed, "Flip");
             gError_code = 1;
             return;
         }
@@ -1775,8 +1837,8 @@ void C2_HOOK_CDECL DoD3DOperation(int operation) {
         DoD3DOperation(5);
         DoD3DOperation(2);
         gINT_1001bbe0 = 0;
-        gINT_1001bb94 = 0;
         gINT_1001bb98 = 0;
+        gINT_1001bb94 = 0;
         gDirty_min_x = 639;
         gDirty_min_y = 479;
         gDirty_max_x = 1;
@@ -1785,13 +1847,14 @@ void C2_HOOK_CDECL DoD3DOperation(int operation) {
     case 5:
         {
             D3DRECT rects[1];
-            rects[0].x1 = 0;
             rects[0].y1 = 0;
+            rects[0].x1 = 0;
             rects[0].x2 = gDisplay_width_10015888;
             rects[0].y2 = gDisplay_height_1001588c;
             gINT_1001bc70 = 1;
-            if (IDirect3DViewport2_Clear(gD3D_Viewport, BR_ASIZE(rects), rects, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER) != D3D_OK) {
-                d3d_debug_printf("Clear viewport");
+            failed = IDirect3DViewport2_Clear(gD3D_Viewport, BR_ASIZE(rects), rects, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER) != D3D_OK;
+            if (failed) {
+                d3d_check_result(failed, "Clear viewport");
                 gError_code = 1;
                 return;
             }
@@ -1801,6 +1864,8 @@ void C2_HOOK_CDECL DoD3DOperation(int operation) {
         return;
     }
 }
+
+
 
 // STUB: D3D 0x10008570
 void C2_HOOK_CDECL FUN_10008570(void* dst, br_uint_32 dst_width, br_uint_32 dst_height, br_uint_32 dst_stride, void* src, br_uint_32 src_width, br_uint_32 src_height, br_uint_32 src_stride) {
