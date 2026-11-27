@@ -744,11 +744,51 @@ br_actor* C2_HOOK_FASTCALL LoadActorFromRace(const char *pName) {
     return BrActorLoad(path);
 }
 
-// STUB: CARMA2_HW 0x004ee5e0
-// STUB: CARMA2_SW 0x004ea2b0
-// STUB: CARMA2_CHEAT 0x004f4280
+// FUNCTION: CARMA2_HW 0x004ee5e0
+// FUNCTION: CARMA2_SW 0x004ea2b0
+// FUNCTION: CARMA2_CHEAT 0x004f4280
 void C2_HOOK_FASTCALL ReadSpillData(FILE* pF, tSlick_spec* pSlick_spec) {
-    NOT_IMPLEMENTED();
+    char s[256];
+    float f1;
+    float f2;
+    float f3;
+
+    GetAString(pF, s);
+    if (strcmp(s, "none") != 0) {
+        pSlick_spec->material = BrMaterialFind(s);
+        if (pSlick_spec->material == NULL) {
+            FatalError(kFatalError_CannotFindSmashMaterial_S, s);
+        }
+#ifdef REC2_HW
+        AddFogificateMaterial(pSlick_spec->material);
+#endif
+        GetThreeFloats(pF, &f2, &f3, &f1);
+        pSlick_spec->field_0x0 = (int)f2;
+        pSlick_spec->field_0xc = f3;
+        pSlick_spec->field_0x10 = f1;
+        GetThreeFloats(pF, &f1, &f3, &f2);
+        pSlick_spec->field_0x14 = f1;
+        pSlick_spec->field_0x4 = f3;
+        pSlick_spec->field_0x8 = f2;
+        GetPairOfFloats(pF, &f1, &f2);
+        pSlick_spec->field_0x20 = f1;
+        pSlick_spec->field_0x24 = f2;
+        if (f2 != 0.0f) {
+            GetPairOfFloats(pF, &f1, &f3);
+            pSlick_spec->field_0x18 = f1;
+            pSlick_spec->field_0x1c = f3;
+            GetAString(pF, s);
+            pSlick_spec->material2 = BrMaterialFind(s);
+            if (pSlick_spec->material2 == NULL) {
+                FatalError(kFatalError_CannotFindSmashMaterial_S, s);
+            }
+#ifdef REC2_HW
+            AddFogificateMaterial(pSlick_spec->material2);
+#endif
+        }
+    } else {
+        pSlick_spec->material = NULL;
+    }
 }
 
 // FUNCTION: CARMA2_HW 0x004ee780
