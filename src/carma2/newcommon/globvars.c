@@ -396,6 +396,7 @@ br_model* gBlend_model;
 br_model* gBlend_model2;
 
 // GLOBAL: CARMA2_HW 0x0074caac
+// GLOBAL: CARMA2_CHEAT 0x0075414c
 br_actor* gBlend_actor;
 
 // GLOBAL: CARMA2_HW 0x006a87f0
