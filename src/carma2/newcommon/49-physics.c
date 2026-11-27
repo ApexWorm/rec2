@@ -581,14 +581,14 @@ void C2_HOOK_FASTCALL GetUniversalRotationAngle(br_matrix34* pMat_1, br_matrix34
     if (length > 2.3841858e-7f) {
         BrVector3Scale(pAxis, pAxis, 1.0 / length);
     } else {
-        BrVector3Set(pAxis, 1.f, 0.f, 0.f);
+        BrVector3Set(pAxis, 1.0f, 0.0f, 0.0f);
     }
     BrMatrix34ApplyV(&tv, pV3, pMat_1);
     BrMatrix34TApplyV(pOut, &tv, pMat_2);
-    dot = 2.f * BrVector3Dot(pOut, pAxis);
+    dot = 2.0f * BrVector3Dot(pOut, pAxis);
     BrVector3Scale(&tv, pAxis, dot);
     BrVector3Sub(pOut, pOut, &tv);
-    dot = 2.f * BrVector3Dot(pOut, pV2);
+    dot = 2.0f * BrVector3Dot(pOut, pV2);
     BrVector3Scale(&tv, pV2, dot);
     BrVector3Sub(pOut, pOut, &tv);
 }
