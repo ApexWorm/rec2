@@ -153,6 +153,11 @@ int gCount_net_crush_detach_list;
 // GLOBAL: CARMA2_CHEAT 0x006830e8
 int gCount_net_crush_semi_detach_bit_list;
 
+// GLOBAL: CARMA2_HW 0x0067b83c
+// GLOBAL: CARMA2_SW 0x00675fac
+// GLOBAL: CARMA2_CHEAT 0x006830ec
+tU16 gBend_counter; /* FIXME: unknown name and purpose, BendActor resets it before bending the models */
+
 // GLOBAL: CARMA2_HW 0x0067bd60
 // GLOBAL: CARMA2_SW 0x006764d0
 // GLOBAL: CARMA2_CHEAT 0x00683610
@@ -2148,7 +2153,64 @@ intptr_t C2_HOOK_FASTCALL BendModels(br_actor* pActor, br_vector3* pTranslation,
 
 // BendWheels
 
-// BendActor
+// FUNCTION: CARMA2_HW 0x00435550
+// FUNCTION: CARMA2_SW 0x00435580
+// FUNCTION: CARMA2_CHEAT 0x00435740
+void C2_HOOK_FASTCALL BendActor(tCar_spec* pCar, br_actor* pActor, br_angle pAngle_x, br_angle pAngle_y, br_angle pAngle_z, const br_vector3* pPivot, br_scalar pZ, tBend_point_spec* pSpec) {
+    tBend_point_context context;
+    br_vector3 tv;
+    int flag;
+
+    context.field_0x34 = pSpec;
+    BrMatrix34Translate(&context.field_0x4, -pPivot->v[0], -pPivot->v[1], -pPivot->v[2]);
+    if (pAngle_y != 0) {
+        BrMatrix34PostRotateY(&context.field_0x4, pAngle_y);
+    }
+    if (pAngle_x != 0) {
+        BrMatrix34PostRotateX(&context.field_0x4, pAngle_x);
+    }
+    if (pAngle_z != 0) {
+        BrMatrix34PostRotateZ(&context.field_0x4, pAngle_z);
+    }
+    BrMatrix34PostTranslate(&context.field_0x4, pPivot->v[0], pPivot->v[1], pPivot->v[2]);
+    BrActorToBounds(&pSpec->bounds, pActor);
+    BrVector3Set(&pSpec->field_0x44, pSpec->bounds.max.v[0], pSpec->bounds.max.v[1], pPivot->v[2]);
+    BrVector3Set(&pSpec->field_0x50, pSpec->bounds.max.v[0], pSpec->bounds.min.v[1], pPivot->v[2]);
+    BrVector3Set(&pSpec->field_0x5c, pSpec->bounds.min.v[0], pSpec->bounds.max.v[1], pPivot->v[2]);
+    BrVector3Set(&pSpec->field_0x68, pSpec->bounds.min.v[0], pSpec->bounds.min.v[1], pPivot->v[2]);
+    BrVector3Set(&pSpec->field_0x24, pSpec->bounds.min.v[0], pSpec->bounds.min.v[1], pZ);
+    BrVector3Sub(&pSpec->field_0x30, &pSpec->field_0x44, &pSpec->field_0x24);
+    BrMatrix34ApplyP(&tv, &pSpec->field_0x44, &context.field_0x4);
+    BrVector3Sub(&pSpec->field_0x44, &tv, &pSpec->field_0x44);
+    BrMatrix34ApplyP(&tv, &pSpec->field_0x50, &context.field_0x4);
+    BrVector3Sub(&pSpec->field_0x50, &tv, &pSpec->field_0x50);
+    BrMatrix34ApplyP(&tv, &pSpec->field_0x5c, &context.field_0x4);
+    BrVector3Sub(&pSpec->field_0x5c, &tv, &pSpec->field_0x5c);
+    BrMatrix34ApplyP(&tv, &pSpec->field_0x68, &context.field_0x4);
+    BrVector3Sub(&pSpec->field_0x68, &tv, &pSpec->field_0x68);
+    BrVector3Sub(&pSpec->field_0x44, &pSpec->field_0x44, &pSpec->field_0x50);
+    BrVector3Sub(&pSpec->field_0x44, &pSpec->field_0x44, &pSpec->field_0x5c);
+    BrVector3Accumulate(&pSpec->field_0x44, &pSpec->field_0x68);
+    BrVector3Sub(&pSpec->field_0x50, &pSpec->field_0x50, &pSpec->field_0x68);
+    BrVector3Sub(&pSpec->field_0x5c, &pSpec->field_0x5c, &pSpec->field_0x68);
+    if (pPivot->v[2] < pZ) {
+        flag = 1;
+    } else {
+        flag = 0;
+    }
+    pSpec->field_0x74 = flag;
+    pSpec->field_0x18 = pPivot->v[0];
+    pSpec->field_0x1c = pPivot->v[1];
+    pSpec->field_0x20 = pPivot->v[2];
+    context.car = pCar;
+    gBend_counter = 0;
+    ARStartPipingSession(ePipe_chunk_model_mash);
+    DRActorEnumRecurseWithTranslation(pActor, NULL, BendModels, &context);
+    AREndPipingSession();
+    pSpec->field_0x3c[0] = pAngle_x;
+    pSpec->field_0x3c[1] = pAngle_y;
+    pSpec->field_0x3c[2] = pAngle_z;
+}
 
 // BendOtherThings
 
