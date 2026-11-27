@@ -10,6 +10,7 @@
 
 #include "60-phil.h"
 #include "00-car.h"
+#include "01-network.h"
 #include "08-loading1.h"
 #include "09-funks.h"
 #include "16-graphics1.h"
@@ -619,7 +620,24 @@ inline void C2_HOOK_FASTCALL MakeSmashSound(tConnotations* pConnotations, br_vec
     }
 }
 
-// MungeSmokeFire
+inline void C2_HOOK_FASTCALL MungeSmokeFire(br_actor* pActor, tNon_car_spec* pNon_car, tSmoke_fire_chance* pSmoke_fire_chance) {
+    int i;
+    int type;
+
+    if (PercentageChance(pSmoke_fire_chance->probability_fire)) {
+        for (i = 0; i < pSmoke_fire_chance->count_fire_columns; i++) {
+            if (pNon_car != NULL) {
+                type = 2;
+            } else {
+                type = 0;
+            }
+            /* FIXME: CreateSmokeColumn2 takes the tNon_car_spec in its pCar argument for type 2 */
+            CreateSmokeColumn2(type, pActor, (tCar_spec*)pNon_car, NULL,
+                IRandomBetween(pSmoke_fire_chance->min_smokiness, pSmoke_fire_chance->max_smokiness),
+                IRandomBetween(0, pActor->model->prepared->groups->nvertices), 10000000);
+        }
+    }
+}
 
 // Random34Matrix
 
@@ -2118,7 +2136,56 @@ int C2_HOOK_FASTCALL InsertQuad(tSmash_quad_mapping* pMapping, br_actor* pActor,
 
 // PointInFace
 
-// FindFaceWithPoint
+// FUNCTION: CARMA2_HW 0x004f4c70
+// FUNCTION: CARMA2_SW 0x004f08d0
+// FUNCTION: CARMA2_CHEAT 0x004fa910
+int C2_HOOK_FASTCALL FindFaceWithPoint(tFace_ref* pFace, br_vector3* pPoint, tFace_ref* pNew_face, int pInclude_same_face) {
+    br_model* model;
+    br_vertex* vertices;
+    br_face* face;
+    v11group* group;
+    fmt_vertex* group_vertices;
+    v11face* group_face;
+    int nfaces;
+    int i;
+
+    *pNew_face = *pFace;
+    model = pFace->a->model;
+    if (pFace->g < 0) {
+        vertices = model->vertices;
+        face = model->faces;
+        nfaces = model->nfaces;
+        for (i = 0; i < nfaces; i++, face++) {
+            if (pInclude_same_face || i != (tU16)pFace->f) {
+                /* FIXME: br_face::n is a br_fvector3 */
+                if (PointInFace(pPoint, (br_vector3*)&face->n, face->d, &vertices[face->vertices[0]].p, &vertices[face->vertices[1]].p, &vertices[face->vertices[2]].p)) {
+                    pNew_face->f = i;
+                    memcpy(&pNew_face->normal, &face->n, sizeof(br_vector3));
+                    pNew_face->d = face->d;
+                    pNew_face->material = face->material;
+                    return 1;
+                }
+            }
+        }
+    } else {
+        group = &model->prepared->groups[pFace->g];
+        group_vertices = group->vertices;
+        group_face = group->faces;
+        nfaces = group->nfaces;
+        for (i = 0; i < nfaces; i++, group_face++) {
+            if (i != (tU16)pFace->f) {
+                /* FIXME: the face plane is a br_vector4, its first three components are the normal */
+                if (PointInFace(pPoint, (br_vector3*)&group_face->eqn, group_face->eqn.v[3], &group_vertices[group_face->vertices[0]].p, &group_vertices[group_face->vertices[1]].p, &group_vertices[group_face->vertices[2]].p)) {
+                    pNew_face->f = i;
+                    memcpy(&pNew_face->normal, &group_face->eqn, sizeof(br_vector3));
+                    pNew_face->d = group_face->eqn.v[3];
+                    return 1;
+                }
+            }
+        }
+    }
+    return 0;
+}
 
 // ProcessTexture
 
@@ -2137,14 +2204,96 @@ float C2_HOOK_FASTCALL BashModel(tSmashable_item_spec* pSpec, tPhysics_object* p
     NOT_IMPLEMENTED();
 }
 
-// STUB: CARMA2_HW 0x004f5110
-// STUB: CARMA2_SW 0x004f0d70
-// STUB: CARMA2_CHEAT 0x004fadb0
-void C2_HOOK_FASTCALL SendNetSmash(tPhysics_object* pObject, undefined4 pArg2, float pMagnitude, br_vector3* pPosition, br_vector3* pNormal, br_vector3* pForce, int pArg7) {
-    NOT_IMPLEMENTED();
+extern int C2_HOOK_FASTCALL CalcCollObjIDFromCarSpec(tCar_spec* pCar);
+
+extern int C2_HOOK_FASTCALL CalcCollObjID(tPhysics_object* pObject);
+
+inline int C2_HOOK_FASTCALL CalcCollObjIDFromCarSpec(tCar_spec* pCar) {
+
+    if (pCar == NULL || pCar->driver <= eDriver_5) {
+        return -1;
+    } else if (gNet_mode != eNet_mode_none) {
+        return NetPlayerFromCar(pCar) - gNet_players;
+    } else {
+        return (tU16)pCar->car_ID;
+    }
 }
 
-// SendAllSmashes
+inline int C2_HOOK_FASTCALL CalcCollObjID(tPhysics_object* pObject) {
+
+    if (pObject == NULL || pObject->owner == NULL || pObject->flags_0x238 != 1) {
+        return -1;
+    } else {
+        return CalcCollObjIDFromCarSpec((tCar_spec*)pObject->owner);
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x004f5110
+// FUNCTION: CARMA2_SW 0x004f0d70
+// FUNCTION: CARMA2_CHEAT 0x004fadb0
+void C2_HOOK_FASTCALL SendNetSmash(tPhysics_object* pObject, tFace_ref* pFace, float pMagnitude, br_vector3* pPosition, br_vector3* pNormal, br_vector3* pForce, int pSnap) {
+    br_vector3 pos;
+    br_scalar dist;
+    tNet_message* message;
+    tQueued_net_smash* smash;
+
+    if (gNet_mode == eNet_mode_none) {
+        return;
+    }
+#define OBJECT_CAR(O) (((O) != NULL && (O)->owner != NULL) ? (tCar_spec*)(O)->owner : NULL)
+    if (pObject != NULL && pObject->owner != NULL && pObject->flags_0x238 == 1
+            && OBJECT_CAR(pObject) != NULL && OBJECT_CAR(pObject)->driver > eDriver_5
+            && (OBJECT_CAR(pObject) == NULL || OBJECT_CAR(pObject)->driver != eDriver_local_human)) {
+        return;
+    }
+#undef OBJECT_CAR
+    if (pFace != NULL) {
+        dist = DistanceFromFace(pPosition, pFace);
+        BrVector3Scale(&pos, &pFace->normal, -dist);
+        BrVector3Accumulate(&pos, pPosition);
+    } else {
+        BrVector3Copy(&pos, pPosition);
+    }
+    message = NetBuildGuaranteedMessage(eNet_message_chunk_type_smash, 0);
+    smash = &message->contents.smash;
+    smash->field_0x4 = gPHIL_last_physics_tick + 40;
+    smash->coll_obj_id = CalcCollObjID(pObject);
+    smash->magnitude = pMagnitude;
+    BrVector3Copy(&smash->position, &pos);
+    smash->normal = *pNormal;
+    smash->force = *pForce;
+    if (pSnap) {
+        smash->flags = 0x2;
+    } else {
+        smash->flags = 0x0;
+    }
+    NetGuaranteedSendMessageToAllPlayers(gCurrent_net_game, message, NULL);
+    if (gNet_mode == eNet_mode_host && gCount_host_smashes < 1000) {
+        memcpy(&gNet_host_smashes[gCount_host_smashes++].smash, smash, sizeof(tQueued_net_smash));
+    }
+}
+
+
+// FUNCTION: CARMA2_HW 0x004f0f80
+// FUNCTION: CARMA2_SW 0x004ecbe0
+// FUNCTION: CARMA2_CHEAT 0x004f6c20
+void C2_HOOK_FASTCALL SendAllSmashes(tNet_game_player_info* pPlayer) {
+    tNet_message* message;
+    int i;
+    tU8 size;
+    tU8 type;
+
+    message = NetBuildMessage(eNet_message_chunk_type_smash, 0);
+    size = message->contents.raw.header.size;
+    type = message->contents.raw.header.type;
+    for (i = 0; i < gCount_host_smashes; i++) {
+        message->contents.smash = gNet_host_smashes[i].smash;
+        message->contents.raw.header.size = size;
+        message->contents.raw.header.type = type;
+        message->contents.smash.flags |= 0x1;
+        NetSendMessageToPlayer(gCurrent_net_game, message, pPlayer->ID);
+    }
+}
 
 // HitPowerup
 
@@ -2186,7 +2335,7 @@ float C2_HOOK_FASTCALL BashObject(tPhysics_object* pObject, br_actor* pActor, fl
                 gINT_006a3334 = 0;
                 result = BashModel(spec, pObject, pActor, pMagnitude, pPosition, pNormal, pForce, &smashed, pNetwork);
                 if (smashed && !pNetwork) {
-                    SendNetSmash(pObject, 0, pMagnitude, pPosition, pNormal, pForce, 1);
+                    SendNetSmash(pObject, NULL, pMagnitude, pPosition, pNormal, pForce, 1);
                 }
             }
         }
@@ -2733,9 +2882,47 @@ void C2_HOOK_FASTCALL DoQueuedNetSmashes(void) {
     }
 }
 
-// FindTheBastard
+inline br_actor* C2_HOOK_FASTCALL FindTheBastard(const char* pShrapnel_id) {
+    int i;
 
-// ReceivedSmashShraps
+    for (i = 0; i < gCount_smashable_noncar_shrapnel_actors; i++) {
+        if (gSmashable_noncar_shrapnel_actors[i]->identifier[1] == pShrapnel_id[0]
+                && gSmashable_noncar_shrapnel_actors[i]->identifier[2] == pShrapnel_id[1]) {
+            return gSmashable_noncar_shrapnel_actors[i];
+        }
+    }
+    return NULL;
+}
+
+// FUNCTION: CARMA2_HW 0x004f6320
+// FUNCTION: CARMA2_SW 0x004f1f80
+// FUNCTION: CARMA2_CHEAT 0x004fbfc0
+void C2_HOOK_FASTCALL ReceivedSmashShraps(tNet_message_chunk_smash_shraps* pContents) {
+    br_actor* actor;
+    tNon_car_spec* non_car;
+
+    actor = FindTheBastard(pContents->shrapnel_id);
+    if (actor != NULL && gProgram_state.track_spec.non_car_list[pContents->index] == NULL) {
+        actor = CloneActor(actor);
+        sprintf(actor->identifier + 4, "%04d.ACT", pContents->index);
+        gProgram_state.track_spec.non_car_list[pContents->index] = actor;
+        BrActorAdd(gDont_render_actor, actor);
+        BrMatrix34Copy(&actor->t.t.mat, &pContents->mat);
+        if (actor->type_data == NULL && (non_car = DoPullActorFromWorld(actor)) != NULL) {
+            BrVector3Copy(&non_car->collision_info->v, &pContents->v);
+            BrVector3Copy(&non_car->collision_info->omega, &pContents->omega);
+            srand(pContents->seed);
+            MungeSmokeFire(actor, non_car, &pContents->smoke_fire_chance);
+            if (gProgram_state.track_spec.count_non_cars < pContents->index + 1) {
+                gProgram_state.track_spec.count_non_cars = pContents->index + 1;
+            }
+        } else {
+            BrActorRemove(actor);
+            BrActorFree(actor);
+            gProgram_state.track_spec.non_car_list[pContents->index] = NULL;
+        }
+    }
+}
 
 // MungeSmashEdgeTriggers
 
