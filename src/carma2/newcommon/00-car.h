@@ -23,6 +23,7 @@ extern br_vector3 gZero_v__car;
 extern int gFreeze_mechanics;
 extern int gNum_active_non_cars;
 extern tNon_car_spec* gActive_non_car_list[99];
+extern tS8 gNon_car_spec_indices[100];
 extern int gEliminate_faces;
 extern int gIn_the_sea;
 extern int gFace_num__car;
@@ -67,7 +68,7 @@ extern void C2_HOOK_FASTCALL SetInitialPosition(tRace_info* pThe_race, int pCar_
 
 extern void C2_HOOK_FASTCALL SetInitialPositions(tRace_info* pThe_race);
 
-// InitialiseNonCar
+extern void C2_HOOK_FASTCALL InitialiseNonCar(tNon_car_spec* pNon_car);
 
 extern void C2_HOOK_FASTCALL NewFaceListCallBack(tPhysics_object* pObject, tFace_ref* pFace);
 

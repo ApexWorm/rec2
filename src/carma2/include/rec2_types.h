@@ -4631,8 +4631,8 @@ typedef struct tPhysics_object {
     tPhysics_joint* physics_joint2;
     tU8 uid;
     undefined field_0x191[3];
-    undefined4 field_0x194;
-    undefined4 field_0x198;
+    int (C2_HOOK_FASTCALL * field_0x194)(tPhysics_object*);
+    int (C2_HOOK_FASTCALL * field_0x198)(tPhysics_object*);
     int flags;
     int field_0x1a0;
     undefined4 field_0x1a4;
@@ -4955,16 +4955,17 @@ typedef struct {
 
 typedef struct tNon_car_spec {
     int index;
-    undefined field_0x4[4];
+    int disabled;
     tPhysics_object* collision_info;
     tDriver driver;
     br_actor* car_master_actor;
-    undefined field_0x14[4];
+    br_scalar field_0x14;
     br_scalar break_off_radians_squared;
     undefined field_0x1c[0x4c - 0x1c];
     br_vector3 pos;
     br_vector3 centre_of_mass_world_scale;
-    undefined field_0x64[0x6c - 0x64];
+    undefined field_0x64[4];
+    int field_0x68;
     int count_shrapnel_materials;
     undefined field_0x70[16];
     tS16 car_ID;
@@ -4972,7 +4973,7 @@ typedef struct tNon_car_spec {
     br_material* shrapnel_materials[3];
     undefined field_0x90[0xc4 - 0x90];
     float field_0xc4;
-    undefined field_0xc8[0xcc - 0xc8];
+    undefined* field_0xc8;
     float free_mass;
     float attached_mass;
     float min_torque_squared;

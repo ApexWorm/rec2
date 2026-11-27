@@ -20,6 +20,7 @@
 #include "22-replay.h"
 #include "23-piping.h"
 #include "27-powerup.h"
+#include "28-world3.h"
 #include "29-raycast.h"
 #include "30-opponent.h"
 #include "32-spark.h"
@@ -56,6 +57,11 @@ int gNum_cars_and_non_cars;
 // GLOBAL: CARMA2_SW 0x00795340
 // GLOBAL: CARMA2_CHEAT 0x007a6440
 tNon_car_spec* gActive_non_car_list[99];
+
+// GLOBAL: CARMA2_HW 0x0079ef40
+// GLOBAL: CARMA2_SW 0x007954e0
+// GLOBAL: CARMA2_CHEAT 0x007a65e0
+tS8 gNon_car_spec_indices[100];
 
 // GLOBAL: CARMA2_HW 0x0067939c
 // GLOBAL: CARMA2_SW 0x00673b0c
@@ -597,7 +603,50 @@ void C2_HOOK_FASTCALL SetInitialPositions(tRace_info* pThe_race) {
     }
 }
 
-// InitialiseNonCar
+inline void C2_HOOK_FASTCALL InitialiseNonCar(tNon_car_spec* pNon_car) {
+
+    BrMatrix34Copy(&pNon_car->collision_info->transform_matrix, &pNon_car->car_master_actor->t.t.mat);
+    pNon_car->collision_info->box_face_ref = gFace_num__car - 2;
+    pNon_car->collision_info->disable_move_rotate = 1;
+    pNon_car->collision_info->actor = pNon_car->car_master_actor;
+    pNon_car->disabled = 0;
+    BrVector3SetFloat(&pNon_car->collision_info->v, 0.0f, 0.0f, 0.0f);
+    BrVector3SetFloat(&pNon_car->collision_info->omega, 0.0f, 0.0f, 0.0f);
+    BrVector3SetFloat(&pNon_car->collision_info->rotate_omega, 0.0f, 0.0f, 0.0f);
+    pNon_car->field_0x68 = 0;
+    pNon_car->field_0xc8 = NULL;
+    if (pNon_car->car_master_actor->identifier[3] != '!' && pNon_car->snap_off_cosine < 1.0f) {
+        pNon_car->collision_info->M = pNon_car->attached_mass;
+        pNon_car->field_0x14 = pNon_car->min_torque_squared;
+        pNon_car->collision_info->field_0xed = 0;
+        pNon_car->collision_info->physics_joint2 = pNon_car->field_0xf0;
+        pNon_car->collision_info->field_0x194 = TestNonCarSnapOff;
+        pNon_car->collision_info->field_0x198 = NonCarSnapOff;
+        BrMatrix34ApplyP(&pNon_car->collision_info->field_0x17c, &pNon_car->collision_info->physics_joint2->field_0x08, &pNon_car->collision_info->transform_matrix);
+    } else {
+        pNon_car->car_master_actor->identifier[3] = '!';
+        pNon_car->collision_info->field_0xed = 1;
+        pNon_car->collision_info->M = pNon_car->free_mass;
+        pNon_car->field_0x14 = 0.0f;
+        if (pNon_car->snap_off_cosine < 1.0f) {
+            pNon_car->collision_info->physics_joint2 = NULL;
+        }
+        pNon_car->collision_info->field_0x194 = NULL;
+        pNon_car->collision_info->field_0x198 = NULL;
+        if (pNon_car->collision_info->physics_joint2 != NULL) {
+            BrMatrix34ApplyP(&pNon_car->collision_info->field_0x17c, &pNon_car->collision_info->physics_joint2->field_0x08, &pNon_car->collision_info->transform_matrix);
+        }
+    }
+    BrVector3Scale(&pNon_car->collision_info->I, &pNon_car->I_over_M, pNon_car->collision_info->M);
+    pNon_car->collision_info->water_d = 10000.0f;
+    pNon_car->collision_info->field_0x261 = 0;
+    pNon_car->collision_info->message_time = 0;
+    pNon_car->field_0xc4 = -1.0f;
+    pNon_car->collision_info->field_0x49c = 1;
+    pNon_car->flags &= 0xffef0000;
+    pNon_car->field_0xf8 = 0;
+    BrVector3SetFloat(&pNon_car->collision_info->field_0x54, 0.0f, (br_scalar)(-1.0 / (2.5 * 6.9)), 0.0f);
+}
 
 // FUNCTION: CARMA2_HW 0x00414910
 // FUNCTION: CARMA2_SW 0x00414940
@@ -1685,11 +1734,70 @@ tNon_car_spec* C2_HOOK_FASTCALL PullActorFromWorld(br_actor* pActor) {
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x0041ff20
-// STUB: CARMA2_SW 0x0041ffa0
+// FUNCTION: CARMA2_HW 0x0041ff20
+// FUNCTION: CARMA2_SW 0x0041ffa0
+// FUNCTION: CARMA2_CHEAT 0x00420180
 tNon_car_spec* C2_HOOK_FASTCALL DoPullActorFromWorld(br_actor* pActor) {
-    NOT_IMPLEMENTED();
-    return NULL;
+    int num;
+    int i;
+    tNon_car_spec* non_car;
+    tPhysics_object* collision_info;
+
+    non_car = NULL;
+    if (pActor->type_data != NULL) {
+        return NULL;
+    }
+    num = 10 * (pActor->identifier[1] - '0') + (pActor->identifier[2] - '0');
+    if (gNon_car_spec_indices[num] != 0) {
+        non_car = &gProgram_state.non_cars[gNon_car_spec_indices[num] + 39];
+    }
+    if (non_car != NULL && non_car->driver == eDriver_4) {
+        for (i = 0; i < 40; i++) {
+            non_car = &gProgram_state.non_cars[i];
+            if (non_car->driver == eDriver_non_car_unused_slot) {
+                break;
+            }
+        }
+        if (i == 40) {
+            non_car = NULL;
+        } else {
+            collision_info = non_car->collision_info;
+            *collision_info = *gProgram_state.non_cars[gNon_car_spec_indices[num] + 39].collision_info;
+            *non_car = gProgram_state.non_cars[gNon_car_spec_indices[num] + 39];
+            non_car->collision_info = collision_info;
+        }
+    }
+    if (non_car == NULL) {
+        pActor->identifier[1] = 'x';
+        return NULL;
+    }
+    pActor->type_data = non_car;
+    non_car->driver = eDriver_4;
+    non_car->collision_info->disable_move_rotate = 1;
+    if (pActor->parent == gAdditional_actors) {
+        non_car->car_ID = -1;
+    } else {
+        non_car->car_ID = 100 * (pActor->identifier[5] - '0') + 10 * (pActor->identifier[6] - '0') + (pActor->identifier[7] - '0');
+    }
+    BrActorRemove(pActor);
+    BrActorAdd(gNon_track_actor, pActor);
+    non_car->car_master_actor = pActor;
+    gActive_non_car_list[gNum_active_non_cars] = non_car;
+    gNum_active_non_cars++;
+    gActive_car_list[gNum_cars_and_non_cars] = (tCar_spec*)non_car;
+    gNum_cars_and_non_cars++;
+    if (gTesting_car_for_sensible_place) {
+        GetNewBoundingBox(&non_car->collision_info->field_0xf4, &non_car->collision_info->bb2, &pActor->t.t.mat);
+        non_car->collision_info->field_0x10c = non_car->collision_info->field_0xf4;
+    }
+    InitialiseNonCar(non_car);
+    ResetCarSpecialVolume(non_car->collision_info);
+    BrMatrix34Copy(&non_car->collision_info->transform_matrix, &pActor->t.t.mat);
+    if (non_car->car_ID != -1) {
+        PipeSingleNonCar((tU16)non_car->car_ID, non_car->car_master_actor);
+    }
+    PHILAddActiveObjectImmediately(non_car->collision_info, NULL, NULL, NULL);
+    return non_car;
 }
 
 #ifdef REC2_MATCHING
