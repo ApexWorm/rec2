@@ -37,6 +37,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+// GLOBAL: CARMA2_HW 0x00659c2c
+// GLOBAL: CARMA2_SW 0x006545c4
+// GLOBAL: CARMA2_CHEAT 0x0066054c
+int gScore_winner = 20;
+
 // GLOBAL: CARMA2_HW 0x0075b8f8
 // GLOBAL: CARMA2_SW 0x00751e58
 // GLOBAL: CARMA2_cHEAT 0x00762f98

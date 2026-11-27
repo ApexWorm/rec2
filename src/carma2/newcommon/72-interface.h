@@ -487,9 +487,9 @@ extern int C2_HOOK_FASTCALL NetSync_Infunc(tFrontend_spec* pFrontend);
 
 // SortGameScores
 
-// NetworkSummarySetup
+extern void C2_HOOK_FASTCALL NetworkSummarySetup(tFrontend_spec* pFrontend);
 
-// NetSummary_Infunc
+extern int C2_HOOK_FASTCALL NetSummary_Infunc(tFrontend_spec* pFrontend);
 
 extern int C2_HOOK_FASTCALL NetSummary_MenuHandler(tFrontend_spec* pFrontend);
 

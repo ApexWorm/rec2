@@ -4473,13 +4473,94 @@ static void C2_HOOK_FASTCALL NetSummary_Draw(tFrontend_spec* pFrontend) {
     }
 }
 
-// SortScores
+// FUNCTION: CARMA2_HW 0x004743c0
+// FUNCTION: CARMA2_SW 0x00473920
+// FUNCTION: CARMA2_CHEAT 0x00474750
+static int C2_HOOK_CDECL SortScores(const void* pFirst_one, const void* pSecond_one) {
 
-// SortGameScores
+    return gNet_players[*(const int*)pSecond_one].score - gNet_players[*(const int*)pFirst_one].score;
+}
 
-// NetworkSummarySetup
+static void C2_HOOK_FASTCALL SortGameScores(void) {
 
-// NetSummary_Infunc
+    qsort(gPlayer_lookup_netsummary, gNumber_of_net_players, sizeof(int), SortScores);
+}
+
+inline void C2_HOOK_FASTCALL NetworkSummarySetup(tFrontend_spec* pFrontend) {
+    int i;
+    tNet_game_player_info* player;
+
+    strcpy(pFrontend->items[60].text, GetMiscString(eMiscString_player));
+    strcpy(pFrontend->items[61].text, GetMiscString(eMiscString_played));
+    strcpy(pFrontend->items[62].text, GetMiscString(eMiscString_won));
+    strcpy(pFrontend->items[63].text, GetMiscString(eMiscString_score));
+    strcpy(pFrontend->items[64].text, IString_Get(182));
+    for (i = 0; i < gNumber_of_net_players; i++) {
+        gPlayer_lookup_netsummary[i] = i;
+    }
+    SortGameScores();
+    for (i = 0; i < gNumber_of_net_players; i++) {
+        player = &gNet_players[gPlayer_lookup_netsummary[i]];
+        pFrontend->items[i].visible = 1;
+        pFrontend->items[12 + i].visible = 1;
+        pFrontend->items[24 + i].visible = 1;
+        pFrontend->items[36 + i].visible = 1;
+        pFrontend->items[48 + i].visible = 1;
+        pFrontend->items[65 + i].visible = 1;
+        strcpy(pFrontend->items[i].text, player->player_name);
+        if (player->host) {
+            strcat(pFrontend->items[i].text, " (");
+            strcat(pFrontend->items[i].text, GetMiscString(eMiscString_host));
+            strcat(pFrontend->items[i].text, ")");
+        }
+        sprintf(pFrontend->items[12 + i].text, "%d", player->field_0x7c);
+        sprintf(pFrontend->items[24 + i].text, "%d", player->field_0x88);
+        sprintf(pFrontend->items[36 + i].text, "%d", player->score);
+        sprintf(pFrontend->items[48 + i].text, "%d%%",
+            (int)((float)player->score / (float)player->field_0x7c / gScore_winner * 100.0));
+    }
+    for (i = gNumber_of_net_players; i < kMax_netplayers; i++) {
+        pFrontend->items[i].text[0] = '\0';
+        pFrontend->items[12 + i].text[0] = '\0';
+        pFrontend->items[24 + i].text[0] = '\0';
+        pFrontend->items[36 + i].text[0] = '\0';
+        pFrontend->items[48 + i].text[0] = '\0';
+        pFrontend->items[i].visible = 0;
+        pFrontend->items[12 + i].visible = 0;
+        pFrontend->items[24 + i].visible = 0;
+        pFrontend->items[36 + i].visible = 0;
+        pFrontend->items[48 + i].visible = 0;
+        pFrontend->items[65 + i].visible = 0;
+    }
+    if (gCurrent_net_game->options.open_game) {
+        sprintf(pFrontend->items[78].text, "%s: %s (%s)",
+            GetMiscString(eMiscString_game_type),
+            GetMiscString(eMiscString_network_type_start + gCurrent_net_game->type),
+            GetMiscString(eMiscString_open));
+    } else {
+        sprintf(pFrontend->items[78].text, "%s: %s (%s)",
+            GetMiscString(eMiscString_game_type),
+            GetMiscString(eMiscString_network_type_start + gCurrent_net_game->type),
+            GetMiscString(eMiscString_closed));
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x00473f40
+// FUNCTION: CARMA2_SW 0x004734a0
+// FUNCTION: CARMA2_CHEAT 0x004742d0
+int C2_HOOK_FASTCALL NetSummary_Infunc(tFrontend_spec* pFrontend) {
+    int i;
+
+    Generic_Infunc(pFrontend);
+    NetworkSummarySetup(pFrontend);
+    for (i = 0; i < pFrontend->count_items; i++) {
+        pFrontend->items[i].visible = 1;
+    }
+    FuckWithWidths(pFrontend);
+    gMouse_in_use = 0;
+    gFrontend_netsummary_first_iteration = 1;
+    return 1;
+}
 
 // FUNCTION: CARMA2_HW 0x00474400
 // FUNCTION: CARMA2_SW 0x00473960
