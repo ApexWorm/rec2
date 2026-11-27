@@ -1154,8 +1154,13 @@ void C2_HOOK_FASTCALL FlameAnimate(int pColumn, const br_vector3* pPos, tU32 pTi
             AddFlameToPipingSession(i + 16 * pColumn, col->frame_count[i] + 1, col->scale_x[i], col->scale_y[i], col->offset_x[i], col->offset_z[i]);
             AREndPipingSession();
             col->frame_count[i] = IRandomBetween(-5, -1);
+#ifdef REC2_SW
+            scale = (float)(2 * IRandomBetween(0, 1) - 1);
+            col->scale_x[i] = scale * (SRandomBetween(1.0f, 1.5f) * 0.003f);
+#else
             scale = SRandomBetween(1.0f, 1.5f) * 0.003f;
             col->scale_x[i] = (2 * IRandomBetween(0, 1) - 1) * scale;
+#endif
             col->scale_y[i] = SRandomBetween(0.5f, 1.0f) * 0.003f;
             col->offset_x[i] = SRandomPosNeg(0.03f);
             col->offset_z[i] = SRandomBetween(-0.03f, 0.0f);
