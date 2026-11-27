@@ -1043,7 +1043,28 @@ void C2_HOOK_FASTCALL ReadSoundSpec(FILE* pF, tSpecial_volume_soundfx_data* pSpe
 
 // DoEnvSound
 
-// FoundSoundSource
+// FUNCTION: CARMA2_HW 0x00457260
+// FUNCTION: CARMA2_SW 0x00456ff0
+// FUNCTION: CARMA2_CHEAT 0x004576e0
+intptr_t C2_HOOK_FASTCALL FoundSoundSource(br_actor* pActor, void* pContext) {
+    tEnvironment_sound_generator_vector* vector;
+    tEnvironment_sound_generator_info* info;
+
+    vector = pContext;
+    if (vector->count < 20) {
+        info = &vector->sources[vector->count];
+        vector->count++;
+        info->actor = pActor;
+        info->generator = &gProgram_state.track_sound_generators[10 * (pActor->model->identifier[1] - '0') + pActor->model->identifier[2] - '0'];
+        if (info->generator->type == kSoundGeneratorType_noncar && pActor->identifier[3] == '!') {
+            info->soundfx = info->generator->fx2_noncar;
+        } else {
+            info->soundfx = info->generator->fx;
+        }
+        BrVector3Copy(&info->pos, &pActor->t.t.translate.t);
+    }
+    return 0;
+}
 
 // MungeSoundGenerators
 
