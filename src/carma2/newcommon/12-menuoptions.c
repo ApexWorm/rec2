@@ -320,3 +320,19 @@ void C2_HOOK_FASTCALL SetGraphicsSettingsData(tFrontend_spec* pFrontend) {
     SaveOptions();
 }
 
+#ifdef REC2_MATCHING
+// FUNCTION: CARMA2_HW 0x004b4550
+// FUNCTION: CARMA2_SW 0x004b06c0
+// FUNCTION: CARMA2_CHEAT 0x004b9e20
+void C2_HOOK_FASTCALL FUN_004b4550(void) {
+    /* Unused */
+}
+
+// FUNCTION: CARMA2_HW 0x004b4560
+// FUNCTION: CARMA2_SW 0x004b06d0
+// FUNCTION: CARMA2_CHEAT 0x004b9e30
+void C2_HOOK_FASTCALL FUN_004b4560(void) {
+    /* Unused */
+}
+#endif
+
