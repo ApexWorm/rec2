@@ -33,6 +33,7 @@
 #include "59-camera.h"
 #include "60-phil.h"
 #include "61-pedestrn-phys.h"
+#include "61-pedestrn.h"
 #include "brender/brender.h"
 #include "globvars.h"
 #include "globvrkm.h"
