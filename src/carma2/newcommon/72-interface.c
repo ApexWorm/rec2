@@ -22,6 +22,7 @@
 #include "19-font.h"
 #include "24-loadsave.h"
 #include "28-world3.h"
+#include "29-raycast.h"
 #include "30-opponent.h"
 
 #include "35-intrface.h"
@@ -2765,11 +2766,267 @@ int C2_HOOK_FASTCALL WrecksOutFunc(tFrontend_spec* pFrontend) {
     return 1;
 }
 
-// WrecksUpdateFunc
+// FUNCTION: CARMA2_HW 0x0046eb80
+// FUNCTION: CARMA2_SW 0x0046e240
+// FUNCTION: CARMA2_CHEAT 0x0046ef10
+int C2_HOOK_FASTCALL WrecksUpdateFunc(tFrontend_spec* pFrontend) {
+    int item_at_mouse;
+    int i;
+    int mouse_x;
+    int mouse_y;
+    tU32 now;
+    int count_visible_cars;
+    float rotate_angle;
+    int index_first_car;
 
-// GotItAlready
+    item_at_mouse = -1;
+    gFrontend_mouse_down = 0;
+    if (gMouse_in_use) {
+        gFrontend_selected_item_index = 0;
+        ResetInterfaceTimeout();
+        GetMousePosition(&mouse_x, &mouse_y);
+        item_at_mouse = GetItemAtMousePos(pFrontend, mouse_x, mouse_y);
+        if (item_at_mouse != -1) {
+            gFrontend_selected_item_index = item_at_mouse;
+        }
+        gPrev_frontend_mouse_down = gFrontend_mouse_down;
+        gFrontend_mouse_down = EitherMouseButtonDown();
+    }
+    if (gFrontend_selected_item_index == 0) {
+        gFrontend_selected_item_index = 10;
+    }
 
-// GetCarSelectedByMouse
+    now = PDGetTotalTime();
+    if (gFrontend_wreck_bought_car_dz != 0.0f) {
+        int dt;
+
+        dt = now - gFrontend_wrecks_previous_update;
+        gFrontend_wreck_bought_car_dz += 0.0025 * dt;
+        if (gFrontend_wreck_bought_car_dz > 2.5) {
+            gFrontend_wreck_bought_car_dz = 0.0f;
+            gWreck_gallery_sell_infos[gFrontend_wrecks_current].sold = 1;
+        }
+    }
+
+    if (gFrontend_wrecks_pending_hscroll > 0) {
+        gFrontend_wrecks_pending_hscroll -= 5;
+        gFrontend_wrecks_hscroll -= 5;
+        if (gFrontend_wrecks_pending_hscroll < 0) {
+            gFrontend_wrecks_pending_hscroll = 0;
+        }
+    }
+    if (gFrontend_wrecks_pending_hscroll < 0) {
+        gFrontend_wrecks_pending_hscroll += 5;
+        gFrontend_wrecks_hscroll += 5;
+        if (gFrontend_wrecks_pending_hscroll > 0) {
+            gFrontend_wrecks_pending_hscroll = 0;
+        }
+    }
+
+    gFrontend_wrecks_previous_update = now;
+
+    strcpy(pFrontend->items[6].text, MungeCommas(gProgram_state.credits));
+
+    if (gFrontend_wrecks_hscroll % 30 == 0 && gFrontend_wreck_bought_car_dz == 0.0f) {
+        tCar_spec* car;
+        tOpponent_spec* opponent;
+
+        pFrontend->items[2].enabled = kFrontendItemEnabled_enabled;
+        pFrontend->items[3].enabled = kFrontendItemEnabled_enabled;
+        pFrontend->items[4].enabled = kFrontendItemEnabled_enabled;
+
+        gFrontend_wrecks_current = KeepInRange((gFrontend_wrecks_hscroll / 30) % gFrontend_wrecks_car_count, gFrontend_wrecks_car_count);
+
+        car = GetCarSpec(eVehicle_opponent, gFrontend_wrecks_current);
+        opponent = GetOpponentSpecFromCarSpec(car);
+        if (!gWreck_gallery_sell_infos[gFrontend_wrecks_current].sold) {
+            int got_it_already;
+
+            sprintf(pFrontend->items[2].text, "%s @R%s",
+                gOpponents[opponent->index].car_name,
+                gOpponents[opponent->index].line4_description);
+            MungeMetaCharactersChar(pFrontend->items[2].text, 'R', '\r');
+            got_it_already = GotItAlready(car);
+            pFrontend->items[9].enabled = kFrontendItemEnabled_disabled;
+            pFrontend->items[2].visible = 1;
+            if (!car->knackered) {
+                sprintf(pFrontend->items[8].text, "%s", GetMiscString(eMiscString_not_wasted));
+            } else {
+                int price = gOpponents[opponent->index].price;
+
+                if (price > gProgram_state.credits) {
+                    sprintf(pFrontend->items[8].text, "%s - %s",
+                        MungeCommas(price),
+                        GetMiscString(eMiscString_dream_on));
+                } else if (got_it_already) {
+                    sprintf(pFrontend->items[8].text, "%s",
+                        GetMiscString(eMiscString_already_have_it));
+                } else {
+                    strcpy(pFrontend->items[8].text, MungeCommas(price));
+                    pFrontend->items[9].enabled = kFrontendItemEnabled_enabled;
+                }
+            }
+            if (gFrontend_opponent_profile_pic_needs_update) {
+                MenuSetDriverImage(opponent->index, 11);
+                gFrontend_opponent_profile_pic_needs_update = 0;
+            }
+            FuckWithWidths(pFrontend);
+        } else {
+            pFrontend->items[2].visible = 0;
+        }
+
+        if (gFrontend_mouse_down && gFrontend_wrecks_pending_hscroll == 0) {
+            int selected_car;
+
+            if (gFrontend_wrecks_rotate_prev_x != -1 && gFrontend_wrecks_rotate_prev_y != -1) {
+                BrMatrix34RollingBall(&gWreck_gallery_car_infos[gFrontend_wrecks_current].field_0x14,
+                    mouse_x - gFrontend_wrecks_rotate_prev_x,
+                    mouse_y - gFrontend_wrecks_rotate_prev_y,
+                    50);
+            }
+            selected_car = GetCarSelectedByMouse(mouse_x, mouse_y);
+            if (selected_car != -1) {
+                if (selected_car == gFrontend_wrecks_current) {
+                    if (gFrontend_wrecks_rotate_prev_x == -1) {
+                        gFrontend_wrecks_rotate_prev_x = mouse_x;
+                        gFrontend_wrecks_rotate_prev_y = mouse_y;
+                    }
+                } else if (!gPrev_frontend_mouse_down) {
+                    DRS3StartSound(gEffects_outlet, eSoundId_LeftButton);
+
+                    if (gFrontend_wrecks_current == KeepInRange(selected_car + 2, gFrontend_wrecks_car_count) && gFrontend_wrecks_car_count >= 2) {
+                        gFrontend_wrecks_pending_hscroll += 60;
+                    } else if (gFrontend_wrecks_current == KeepInRange(selected_car + 1, gFrontend_wrecks_car_count)) {
+                        gFrontend_wrecks_pending_hscroll += 30;
+                    } else if (gFrontend_wrecks_current == KeepInRange(selected_car - 2, gFrontend_wrecks_car_count) && gFrontend_wrecks_car_count >= 2) {
+                        gFrontend_wrecks_pending_hscroll -= 60;
+                    } else if (gFrontend_wrecks_current == KeepInRange(selected_car - 1, gFrontend_wrecks_car_count)) {
+                        gFrontend_wrecks_pending_hscroll -= 30;
+                    }
+                }
+            }
+        }
+        if (!gFrontend_mouse_down) {
+            gFrontend_wrecks_rotate_prev_x = -1;
+            gFrontend_wrecks_rotate_prev_y = -1;
+        }
+    } else {
+        pFrontend->items[2].visible = 0;
+        pFrontend->items[2].enabled = kFrontendItemEnabled_disabled;
+        pFrontend->items[3].enabled = kFrontendItemEnabled_disabled;
+        pFrontend->items[4].enabled = kFrontendItemEnabled_disabled;
+        pFrontend->items[9].enabled = kFrontendItemEnabled_disabled;
+    }
+
+    count_visible_cars = MIN(5, gFrontend_wrecks_car_count);
+    rotate_angle = (float)(count_visible_cars / 2 * -30 - gFrontend_wrecks_hscroll % 30);
+
+    if (gFrontend_wrecks_car_count == 1) {
+        pFrontend->items[3].enabled = kFrontendItemEnabled_disabled;
+        pFrontend->items[4].enabled = kFrontendItemEnabled_disabled;
+    } else {
+        pFrontend->items[3].enabled = kFrontendItemEnabled_enabled;
+        pFrontend->items[4].enabled = kFrontendItemEnabled_enabled;
+    }
+
+    index_first_car = KeepInRange((gFrontend_wrecks_hscroll / 30) % gFrontend_wrecks_car_count - count_visible_cars / 2, gFrontend_wrecks_car_count);
+
+    for (i = 0; i < gFrontend_wrecks_car_count; i++) {
+        gWreck_gallery_car_infos[i].actor->render_style = BR_RSTYLE_NONE;
+    }
+
+    for (i = 0; i < count_visible_cars; i++) {
+        int car_index;
+        br_matrix34 *mat;
+        br_vector3 pos;
+
+        car_index = KeepInRange(index_first_car + i, gFrontend_wrecks_car_count);
+        mat = &gWreck_gallery_car_infos[car_index].actor->t.t.mat;
+        BrMatrix34RotateY(mat, BrDegreeToAngle(rotate_angle));
+        BrMatrix34PostRotateX(mat, BrDegreeToAngle(340));
+        if (car_index == gFrontend_wrecks_current) {
+            BrMatrix34PreTranslate(mat, 0.0f, 0.0f, (br_scalar)-(gFrontend_wreck_bought_car_dz + 1.5));
+        } else {
+            BrMatrix34PreTranslate(mat, 0.0f, 0.0f, -1.5f);
+        }
+        BrMatrix34Post(&gWreck_gallery_car_infos[car_index].field_0x74,
+            &gWreck_gallery_car_infos[car_index].field_0x14);
+
+        BrVector3Copy(&pos, &gWreck_gallery_car_infos[car_index].actor->t.t.translate.t);
+        BrVector3Set(&gWreck_gallery_car_infos[car_index].actor->t.t.translate.t, 0.0f, 0.0f, 0.0f);
+        BrMatrix34Pre(mat, &gWreck_gallery_car_infos[car_index].field_0x74);
+        BrVector3Copy(&gWreck_gallery_car_infos[car_index].actor->t.t.translate.t, &pos);
+        gWreck_gallery_car_infos[car_index].actor->render_style = BR_RSTYLE_FACES;
+        if (gWreck_gallery_sell_infos[car_index].sold) {
+            gWreck_gallery_car_infos[car_index].actor->render_style = BR_RSTYLE_NONE;
+        }
+        rotate_angle += 30.0f;
+    }
+
+    FuckWithWidths(pFrontend);
+    if (PDKeyDown(51) || PDKeyDown(52) || (gFrontend_mouse_down && item_at_mouse != -1)) {
+        ToggleSelection(pFrontend);
+        if (pFrontend->items[gFrontend_selected_item_index].action != NULL) {
+            pFrontend->items[gFrontend_selected_item_index].action(pFrontend);
+        }
+        if (pFrontend->items[gFrontend_selected_item_index].field_0xc == 1) {
+            gFrontend_leave_current_menu = 1;
+        }
+        if (pFrontend->items[gFrontend_selected_item_index].menuInfo != NULL) {
+            gCurrent_frontend_spec->default_item = gFrontend_selected_item_index;
+            for (i = 0; i < gCurrent_frontend_spec->count_scrollers; i++) {
+                gCurrent_frontend_spec->scrollers[i].indexOfItemAtTop = gCurrent_frontend_spec->scrollers[i].indexTopItem;
+            }
+            FRONTEND_DestroyMenu(pFrontend);
+            gCurrent_frontend_spec = pFrontend->items[gFrontend_selected_item_index].menuInfo;
+            FRONTEND_CreateMenu(gCurrent_frontend_spec);
+            if (gCurrent_frontend_spec != pFrontend->previous) {
+                gCurrent_frontend_spec->previous = pFrontend;
+            }
+#ifdef REC2_HW
+            Morph_Initialise(pFrontend, gCurrent_frontend_spec);
+#endif
+            if (gCurrent_frontend_spec == &gFrontend_QUIT) {
+                gFrontend_selected_item_index = 0;
+            } else {
+                gFrontend_selected_item_index = gCurrent_frontend_spec->default_item;
+            }
+            for (i = 0; i < gCurrent_frontend_spec->count_scrollers; i++) {
+                gCurrent_frontend_spec->scrollers[i].indexTopItem = gCurrent_frontend_spec->scrollers[i].indexOfItemAtTop;
+            }
+            UpdateScrollPositions(gCurrent_frontend_spec);
+        }
+    }
+    if (gFrontend_leave_current_menu != 0) {
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
+inline int C2_HOOK_FASTCALL GotItAlready(tCar_spec* pCar) {
+    int i;
+
+    for (i = 0; i < gProgram_state.number_of_cars; i++) {
+        if (gProgram_state.cars_available[i] == pCar->index) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+inline int C2_HOOK_FASTCALL GetCarSelectedByMouse(int pX, int pY) {
+
+    gPicked_wreck = -1;
+    DRScenePick2DXY(gFrontend_wrecks_actor,
+        gFrontend_wrecks_camera,
+        gFrontend_wrecks_pixelmap,
+        pX - gFrontend_wrecks_pixelmap->origin_x - 65,
+        pY - gFrontend_wrecks_pixelmap->origin_y - 55,
+        WreckPick,
+        NULL);
+    return gPicked_wreck;
+}
 
 // FUNCTION: CARMA2_HW 0x0046f4f0
 // FUNCTION: CARMA2_SW 0x0046eba0

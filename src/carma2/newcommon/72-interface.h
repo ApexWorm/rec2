@@ -299,11 +299,11 @@ extern int C2_HOOK_FASTCALL KeepInRange(int pIndex, int pRange);
 
 extern int C2_HOOK_FASTCALL WrecksOutFunc(tFrontend_spec* pFrontend);
 
-// WrecksUpdateFunc
+extern int C2_HOOK_FASTCALL WrecksUpdateFunc(tFrontend_spec* pFrontend);
 
-// GotItAlready
+extern int C2_HOOK_FASTCALL GotItAlready(tCar_spec* pCar);
 
-// GetCarSelectedByMouse
+extern int C2_HOOK_FASTCALL GetCarSelectedByMouse(int pX, int pY);
 
 extern int C2_HOOK_CDECL WreckPick(br_actor* pActor, br_model* pModel, br_material* pMaterial, br_vector3* pRay_pos, br_vector3* pRay_dir, br_scalar pT_near, br_scalar pT_far, void* pArg);
 
