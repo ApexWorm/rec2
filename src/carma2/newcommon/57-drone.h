@@ -177,7 +177,7 @@ extern void C2_HOOK_FASTCALL LoadInDronePaths(FILE* pF);
 
 extern void C2_HOOK_FASTCALL DronePreCollisionStuff(void);
 
-// DoDronePerGameFrameStuff
+extern void C2_HOOK_FASTCALL DoDronePerGameFrameStuff(void);
 
 extern void C2_HOOK_FASTCALL DoDroneFunkyGroovyThings(tDrone_spec* pDrone);
 
