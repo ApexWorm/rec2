@@ -104,5 +104,10 @@ void C2_HOOK_FASTCALL RecordAPOAndCredits(void) {
 
 // PickRaceWhenGameCompleted
 
-// MungeRaceProgression
+// STUB: CARMA2_HW 0x004e3440
+// STUB: CARMA2_SW 0x004df7d0
+// STUB: CARMA2_CHEAT 0x004e8fc0
+int C2_HOOK_FASTCALL MungeRaceProgression(tRace_result pRace_result) {
+    NOT_IMPLEMENTED();
+}
 

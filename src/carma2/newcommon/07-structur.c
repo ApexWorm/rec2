@@ -8,19 +8,37 @@
 
 #include "07-structur.h"
 
+#include "00-car.h"
 #include "01-network.h"
+#include "02-init.h"
+#include "03-racestrt.h"
 #include "04-netgame.h"
+#include "05-drmem.h"
+#include "08-loading1.h"
+#include "10-loading2.h"
 #include "13-crush1.h"
 #include "15-displays.h"
 #include "18b-graphics2.h"
+#include "21-mainloop.h"
+#include "23-piping.h"
+#include "24-loadsave.h"
+#include "28-world3.h"
 #include "30-opponent.h"
+#include "31-racesumm.h"
 #include "38-flicplay.h"
 #include "41-utility.h"
 #include "43-pratcam.h"
+#include "44-mainmenu.h"
+#include "45-cutscene.h"
+#include "51-smash.h"
+#include "52-errors.h"
 #include "53-controls.h"
+#include "56-aiworld.h"
 #include "66-tintedpoly.h"
 #include "69-sound.h"
+#include "72-interface.h"
 #include "globvars.h"
+#include "globvrkm.h"
 #include "globvrpb.h"
 #include "c2_stdio.h"
 
@@ -64,6 +82,16 @@ int gHud_tinted2_visible;
 // GLOBAL: CARMA2_SW 0x0065b650
 // GLOBAL: CARMA2_CHEAT 0x00668524
 int gLast_wrong_checkpoint = -1;
+
+// GLOBAL: CARMA2_HW 0x00660ce0
+// GLOBAL: CARMA2_SW 0x0065b654
+// GLOBAL: CARMA2_CHEAT 0x00668528
+int gMirror_on__structur = 1;
+
+// GLOBAL: CARMA2_HW 0x00660ce8
+// GLOBAL: CARMA2_SW 0x0065b65c
+// GLOBAL: CARMA2_CHEAT 0x00668530
+int gLoad_last_save_game = 1;
 
 // FUNCTION: CARMA2_HW 0x00503050
 // FUNCTION: CARMA2_SW 0x004fe9a0
@@ -284,11 +312,27 @@ void C2_HOOK_FASTCALL TotalRepair(void) {
     NewTextHeadupSlot(4, 0, 1000, -4, GetMiscString(eMiscString_instant_repair));
 }
 
-// DoLogos
+inline void C2_HOOK_FASTCALL DoLogos(void) {
 
-// DoProgOpeningAnimation
+    ClearEntireScreen();
+    DoSCILogo();
+    DoOpeningAnimation();
+    DoStainlessLogo();
+    gProgram_state.prog_status = eProg_opening;
+}
 
-// DoProgramDemo
+inline void C2_HOOK_FASTCALL DoProgOpeningAnimation(void) {
+
+    gProgram_state.prog_status = eProg_idling;
+    DRS3StopOutletSound(gEffects_outlet);
+}
+
+inline void C2_HOOK_FASTCALL DoProgramDemo(void) {
+
+    DoLogos();
+    gProgram_state.prog_status = eProg_idling;
+    DRS3StopOutletSound(gEffects_outlet);
+}
 
 // FUNCTION: CARMA2_HW 0x00503b00
 // FUNCTION: CARMA2_SW 0x004ff450
@@ -386,19 +430,209 @@ int C2_HOOK_FASTCALL PickNetRace(int pCurrent_race, tNet_sequence_type pNet_race
     }
 }
 
-// SwapNetCarsLoad
+inline void C2_HOOK_FASTCALL SwapNetCarsLoad(void) {
+    int i;
 
-// SwapNetCarsDispose
+    DisableNetService();
+    AboutToLoadFirstCar();
+    for (i = 0; i < gNumber_of_net_players; i++) {
+        if (gNet_players[i].next_car_index >= 0) {
+            gNet_players[i].car_index = gNet_players[i].next_car_index;
+        }
+        gNet_players[i].next_car_index = -1;
+        LoadCar(gOpponents[gNet_players[i].car_index].car_file_name,
+            (i == gThis_net_player_index) ? eDriver_local_human : eDriver_net_human,
+            gNet_players[i].car, gNet_players[i].car_index, gNet_players[i].player_name,
+            &gNet_cars_storage_space);
+    }
+    ReenableNetService();
+}
 
-// DoGame
+inline void C2_HOOK_FASTCALL SwapNetCarsDispose(void) {
+    int i;
 
-// InitialiseProgramState
+    DisableNetService();
+    for (i = 0; i < gNumber_of_net_players; i++) {
+        DisposeCar(gNet_players[i].car, gNet_players[i].car_index);
+        if (gNet_players[i].car_index >= 0) {
+            gCar_details[gNet_players[i].car_index].ownership = eCar_owner_none;
+        }
+    }
+    ClearOutStorageSpace(&gOur_car_storage_space);
+    ClearOutStorageSpace(&gNet_cars_storage_space);
+    ReenableNetService();
+}
 
-// STUB: CARMA2_HW 0x00503c50
-// STUB: CARMA2_SW 0x004ff5a0
-// STUB: CARMA2_CHEAT 0x005098f0
+inline void C2_HOOK_FASTCALL DoGame(void) {
+    tRace_result race_result;
+    int game_completed;
+    int i;
+
+    PrintMemoryDump(0, "START OF DoGame()");
+    gAbandon_game = 0;
+    gDisallow_abandon_race = 0;
+    gCar_to_view = &gProgram_state.current_car;
+    StartLoadingScreen();
+    gProgram_state.prog_status = eProg_game_ongoing;
+    if (gNet_mode_of_last_game != gNet_mode) {
+        gProgram_state.prog_status = eProg_idling;
+    } else {
+        PrintMemoryDump(0, "BEFORE START RACE SCREEN");
+        LoadRaceInfo(gProgram_state.current_race_index, &gCurrent_race);
+        SelectOpponents(&gCurrent_race);
+        if (gNet_mode != eNet_mode_none) {
+            FillInRaceInfo(&gCurrent_race);
+            DisposeRaceInfo(&gCurrent_race);
+        } else {
+            SelectOpponents(&gCurrent_race);
+            LoadRaceInfo(gProgram_state.current_race_index, &gCurrent_race);
+            FillInRaceInfo(&gCurrent_race);
+        }
+        PrintMemoryDump(0, "AFTER START RACE SCREEN");
+        if (gNet_mode != eNet_mode_none
+            && (gCurrent_net_game->options.car_choice == eNet_car_all || gCurrent_net_game->options.car_choice == eNet_car_novelty)
+            && !gNo_races_yet) {
+            SwapNetCarsLoad();
+        }
+        PrintMemoryDump(0, "AFTER LOADING OPPONENTS IN");
+        InitRace();
+        if (gNet_mode_of_last_game != gNet_mode) {
+            gProgram_state.prog_status = eProg_idling;
+        } else {
+            if (gNet_mode != eNet_mode_none) {
+                FRONTEND_Main(kFrontend_menu_netsync);
+                dr_dprintf("Returned from NetSync screen");
+                SwitchToLoresMode();
+            } else {
+                SortOpponents();
+                SetInitialPositions(&gCurrent_race);
+            }
+            if (gProgram_state.prog_status == eProg_idling) {
+                dr_dprintf("Calling DisposeRace()");
+                DisposeRace();
+                dr_dprintf("Calling DisposeTrack()");
+                DisposeTrack();
+                dr_dprintf("Returning from DoGame()");
+            } else {
+                InitialiseAIWorldForRace(&gCurrent_race);
+                InitialiseCarsEtc(&gCurrent_race);
+                InitSoundSources();
+                InitLastDamageArrayEtc();
+                FogificateMaterials(kRendererShadingType_Default);
+                EnableAutoFogification();
+                RecordAPOAndCredits();
+                race_result = DoRace();
+                DisableAutoFogification();
+                DisposeRace();
+                PrintMemoryDump(0, "AFTER DISPOSING RACE");
+                if (gNet_mode != eNet_mode_none) {
+                    gProgram_state.current_race_index = gPending_race;
+                    gCurrent_net_game->start_race = gProgram_state.current_race_index;
+                    gPending_race = -1;
+                    if (race_result != eRace_game_abandonned && race_result != eRace_aborted) {
+                        DoEndRaceSummary(race_result, 0);
+                    }
+                } else {
+                    game_completed = MungeRaceProgression(race_result);
+                    if (race_result == eRace_completed) {
+                        gSave_game_out_of_sync = 1;
+                        DoEndRaceAnimation();
+                        DoEndRaceSummary(race_result, game_completed);
+                        DoSaveGame();
+                    }
+                }
+                if (gNet_mode != eNet_mode_none) {
+                    for (i = 0; i < gNumber_of_net_players; i++) {
+                        TotallyRepairACar(gNet_players[i].car);
+                    }
+                } else {
+                    TotallyRepairCar();
+                }
+                if (gNet_mode == eNet_mode_none) {
+                    DisposeOpponentsCars(&gCurrent_race);
+                } else if ((gCurrent_net_game->options.car_choice == eNet_car_all || gCurrent_net_game->options.car_choice == eNet_car_novelty)
+                           && !gNo_races_yet) {
+                    SwapNetCarsDispose();
+                }
+                PrintMemoryDump(0, "AFTER DISPOSING CARS");
+                DisposeTrack();
+                PrintMemoryDump(0, "AFTER DISPOSING TRACK");
+                if (gProgram_state.prog_status == eProg_game_ongoing) {
+                    if (gNet_mode == eNet_mode_none) {
+                        gProgram_state.prog_status = eProg_idling;
+                    } else {
+                        gProgram_state.prog_status = eProg_game_starting;
+                    }
+                }
+            }
+        }
+    }
+}
+
+inline void C2_HOOK_FASTCALL InitialiseProgramState(void) {
+
+    gProgram_state.prog_status = eProg_intro;
+    gProgram_state.last_slot = 0;
+    gProgram_state.view_type = eVT_Scene;
+    gProgram_state.frank_or_anniness = eFrankie;
+    gProgram_state.racing = 0;
+    gProgram_state.cut_scene = 0;
+    gProgram_state.saving = 0;
+    gProgram_state.loading = 0;
+    gProgram_state.dont_save_or_load = 0;
+    gProgram_state.dont_load = 0;
+    gProgram_state.mirror_on = gMirror_on__structur;
+    gProgram_state.field_0x2c = 0;
+    if (gAusterity_mode) {
+        gPratcam_on = 0;
+        gProgram_state.prat_cam_on = 0;
+    } else {
+        gProgram_state.prat_cam_on = gPratcam_on;
+    }
+    gProgram_state.cockpit_on = gCockpit_on;
+    gProgram_state.car_name[0] = '\0';
+    SetSoundVolumes(0);
+}
+
+// FUNCTION: CARMA2_HW 0x00503c50
+// FUNCTION: CARMA2_SW 0x004ff5a0
+// FUNCTION: CARMA2_CHEAT 0x005098f0
 void C2_HOOK_FASTCALL DoProgram(void) {
-    NOT_IMPLEMENTED();
+
+    InitialiseProgramState();
+    do {
+        switch (gProgram_state.prog_status) {
+        case eProg_intro:
+            DisposeGameIfNecessary();
+            DoLogos();
+            break;
+        case eProg_opening:
+            DisposeGameIfNecessary();
+            DoProgOpeningAnimation();
+            break;
+        case eProg_idling:
+            DisposeGameIfNecessary();
+            if (gNo_current_game) {
+                LoadRaces(gRace_list, &gNumber_of_races, -1);
+                InitGame(gDev_initial_race);
+                MaybeRestoreSavedGame();
+            }
+            if (gAuto_load && gLoad_last_save_game) {
+                DoLoadMostRecentGame();
+                gLoad_last_save_game = 0;
+            }
+            DoMainScreen();
+            break;
+        case eProg_demo:
+            DoProgramDemo();
+            break;
+        case eProg_game_starting:
+            DoGame();
+            break;
+        default:
+            break;
+        }
+    } while (gProgram_state.prog_status != eProg_quit);
 }
 
 // FUNCTION: CARMA2_HW 0x00504170

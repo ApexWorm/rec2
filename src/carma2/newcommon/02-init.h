@@ -72,7 +72,7 @@ extern void C2_HOOK_FASTCALL InitGame(int pStart_race);
 
 // LoadInTrack
 
-// InitRace
+extern void C2_HOOK_FASTCALL InitRace(void);
 
 extern int C2_HOOK_FASTCALL GetScreenSize(void);
 

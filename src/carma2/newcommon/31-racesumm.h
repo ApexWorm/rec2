@@ -26,6 +26,6 @@ extern void C2_HOOK_FASTCALL RecordAPOAndCredits(void);
 
 // PickRaceWhenGameCompleted
 
-// MungeRaceProgression
+extern int C2_HOOK_FASTCALL MungeRaceProgression(tRace_result pRace_result);
 
 #endif // GUARD_31_RACESUMM_H

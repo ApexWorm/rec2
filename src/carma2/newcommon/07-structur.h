@@ -22,6 +22,8 @@ extern tU32 gLast_checkpoint_time;
 extern int gHud_tinted1_visible;
 extern int gHud_tinted2_visible;
 extern int gLast_wrong_checkpoint;
+extern int gMirror_on__structur;
+extern int gLoad_last_save_game;
 
 extern int C2_HOOK_FASTCALL NumberOfOpponentsLeft(void);
 
@@ -41,11 +43,11 @@ extern void C2_HOOK_FASTCALL WrongCheckpoint(int pCheckpoint_index);
 
 extern void C2_HOOK_FASTCALL TotalRepair(void);
 
-// DoLogos
+extern void C2_HOOK_FASTCALL DoLogos(void);
 
-// DoProgOpeningAnimation
+extern void C2_HOOK_FASTCALL DoProgOpeningAnimation(void);
 
-// DoProgramDemo
+extern void C2_HOOK_FASTCALL DoProgramDemo(void);
 
 extern int C2_HOOK_FASTCALL ChooseOpponent(int pNastiness);
 
@@ -53,13 +55,13 @@ extern void C2_HOOK_FASTCALL SelectOpponents(tRace_info* pRace_info);
 
 extern int C2_HOOK_FASTCALL PickNetRace(int pCurrent_race, tNet_sequence_type pNet_race_sequence);
 
-// SwapNetCarsLoad
+extern void C2_HOOK_FASTCALL SwapNetCarsLoad(void);
 
-// SwapNetCarsDispose
+extern void C2_HOOK_FASTCALL SwapNetCarsDispose(void);
 
-// DoGame
+extern void C2_HOOK_FASTCALL DoGame(void);
 
-// InitialiseProgramState
+extern void C2_HOOK_FASTCALL InitialiseProgramState(void);
 
 extern void C2_HOOK_FASTCALL DoProgram(void);
 
