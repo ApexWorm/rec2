@@ -29,6 +29,7 @@
 #include "05-drmem.h"
 #include "42-input.h"
 #include "53-controls.h"
+#include "68-timer.h"
 
 #include <string.h>
 
@@ -102,11 +103,15 @@ void C2_HOOK_FASTCALL ServiceGame(void) {
     ServiceTheGame(0);
 }
 
-// STUB: CARMA2_HW 0x004922a0
-// STUB: CARMA2_SW 0x0048f4e0
-// STUB: CARMA2_CHEAT 0x00492270
+// FUNCTION: CARMA2_HW 0x004922a0
+// FUNCTION: CARMA2_SW 0x0048f4e0
+// FUNCTION: CARMA2_CHEAT 0x00492270
 void C2_HOOK_FASTCALL ServiceGameInRace(void) {
-    NOT_IMPLEMENTED();
+
+    Timers_Push(TIMER_SER);
+    ServiceTheGame(1);
+    CheckKevKeys();
+    Timers_Pop(TIMER_SER);
 }
 
 // FUNCTION: CARMA2_HW 0x004924a0
