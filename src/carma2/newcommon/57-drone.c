@@ -11,6 +11,7 @@
 #include "08-loading1.h"
 #include "15-displays.h"
 #include "23-piping.h"
+#include "27-powerup.h"
 #include "28-world3.h"
 #include "41-utility.h"
 #include "49-physics.h"
@@ -579,7 +580,29 @@ void C2_HOOK_FASTCALL DoDroneFunkyGroovyThings(tDrone_spec* pDrone) {
 #pragma auto_inline(on)
 #endif
 
-// MyDroneHathCollideth
+// FUNCTION: CARMA2_HW 0x00452230
+// FUNCTION: CARMA2_SW 0x00451fc0
+// FUNCTION: CARMA2_CHEAT 0x00452780
+int C2_HOOK_FASTCALL MyDroneHathCollideth(tPhysics_object* pObject, tPhysics_object* pOther) {
+    tDrone_spec* drone;
+
+    DoNotDprintf_drone("MyDroneHathCollideth(): PHIL called a bloody callback. Rejoice!");
+    drone = pObject->owner;
+    pObject->disable_move_rotate = 0;
+    pObject->field_0xed = 1;
+    pObject->field_0x1a0 = 0x200000;
+    BrVector3Copy(&pObject->v, &drone->field_0x18);
+    PHILMakeObjectActive(pObject, NULL, NULL, 1);
+    PHILSetObjectProperty(pObject, 3, 0);
+    if ((pOther != NULL && pOther->owner != NULL && pOther->flags_0x238 == 1)
+            || (pOther->flags_0x238 == 0x20 && (gMutant_tail_state == 2 || GetTotalTime() - gDAT_00705b70 < 7500))) {
+        ((tDrone_spec*)pObject->owner)->field_0x5d4 = pOther->owner;
+    } else if (pOther != NULL && pOther->flags_0x238 == 0x40) {
+        ((tDrone_spec*)pObject->owner)->field_0x5d4 = ((tNon_car_spec*)pOther->owner)->field_0x30;
+    }
+    NewDroneState(pObject->owner, 3);
+    return 0;
+}
 
 // FUNCTION: CARMA2_HW 0x00452360
 // FUNCTION: CARMA2_SW 0x004520f0
