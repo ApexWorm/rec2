@@ -338,9 +338,20 @@ br_error C2_HOOK_CDECL _M_br_primitive_state_d3d_rangesQueryF(br_primitive_state
     return 0;
 }
 
-// STUB: D3D 0x10006660
+// FUNCTION: D3D 0x10006660
 br_error C2_HOOK_CDECL _M_br_primitive_state_d3d_rangesQueryX(br_primitive_state_d3d* self, br_fixed_ls* offset, br_fixed_ls* scale, br_int_32 max_comp) {
-    NOT_IMPLEMENTED();
+    int i;
+
+    if (self->cache.timestamp_prim != self->prim.timestamp_major ||
+            self->cache.timestamp_out != self->out.timestamp_major) {
+        return 0xa001;
+    }
+    for (i = 0; i < max_comp; i++) {
+        offset[i] = self->cache.comp_offsets[i];
+        scale[i] = self->cache.comp_scales[i];
+    }
+
+    return 0;
 }
 
 
