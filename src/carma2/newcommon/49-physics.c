@@ -1026,8 +1026,6 @@ void C2_HOOK_FASTCALL SimpleRotate(tPhysics_object* pObject, br_scalar pDt) {
     }
 }
 
-void C2_HOOK_FASTCALL InterpolateObjects(tPhysics_object* pList, br_scalar pDt);
-
 // FUNCTION: CARMA2_HW 0x004c2830
 // FUNCTION: CARMA2_SW 0x004bef60
 // FUNCTION: CARMA2_CHEAT 0x004c8350
