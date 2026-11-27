@@ -382,7 +382,7 @@ extern void C2_HOOK_CDECL JitModelUpdate(br_actor* pActor, br_model* pModel, br_
 
 extern void C2_HOOK_FASTCALL SetModelForUpdate(br_model* pModel);
 
-// RandomlyXZSplitCar
+extern void C2_HOOK_FASTCALL RandomlyXZSplitCar(tCar_spec* pCar);
 
 // RandomlyBendCar
 
