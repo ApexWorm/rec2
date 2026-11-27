@@ -2143,7 +2143,11 @@ void C2_HOOK_FASTCALL ActuallyRepairSmash(tCar_spec* pCar_spec, tCar_crush_smash
 #pragma auto_inline(on)
 #endif
 
-// KillFragment
+inline void C2_HOOK_FASTCALL KillFragment(tSmash_vertex* pFragment) {
+
+    BrActorRemove(pFragment->actor);
+    pFragment->end_time = 0;
+}
 
 void C2_HOOK_FASTCALL AddRepairAnimationToQueue(tCar_spec* pCar_spec, tCar_crush_smashable_part* pSmashable) {
     int free_index;
@@ -2335,11 +2339,55 @@ void C2_HOOK_FASTCALL DoFragMovement(tSmash_vertex* pFragment, tU32 pTime, float
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x004f0150
-// STUB: CARMA2_SW 0x004ebdb0
-// STUB: CARMA2_CHEAT 0x004f5df0
+// FUNCTION: CARMA2_HW 0x004f0150
+// FUNCTION: CARMA2_SW 0x004ebdb0
+// FUNCTION: CARMA2_CHEAT 0x004f5df0
 void C2_HOOK_FASTCALL MungeGlassFragments2(int pEnd_race) {
-    NOT_IMPLEMENTED();
+    // GLOBAL: CARMA2_HW 0x006a7fc0
+    // GLOBAL: CARMA2_SW 0x006a2020
+    // GLOBAL: CARMA2_CHEAT 0x006afb38
+    static int prev_glass_munge;
+    int i;
+    int j;
+    tU32 the_time;
+    float delta;
+    tU32 id;
+    tSmash_vertex* fragment;
+    tSmash_vertex* other;
+
+    the_time = GetTotalTime();
+    if (prev_glass_munge != 0) {
+        delta = (float)the_time - (float)prev_glass_munge;
+        for (i = 0, fragment = gSmash_glass_fragments; i < (int)REC2_ASIZE(gSmash_glass_fragments); i++, fragment++) {
+            if (fragment->end_time == 0) {
+                continue;
+            }
+            if (!pEnd_race && (the_time < fragment->end_time || (gAction_replay_mode && ARGetReplayRate() <= 0.0f)) && the_time >= fragment->field_0xc) {
+                DoFragMovement(fragment, the_time, delta);
+                if (fragment->field_0x34) {
+                    fragment->field_0x34 = 0;
+                }
+                fragment->time_last_move = the_time;
+            } else {
+                id = fragment->field_0x18;
+                if (the_time >= fragment->end_time) {
+                    if ((int)id >= 0) {
+                        PipeSingleShrapnelShower(id, fragment->time_last_move, 0, 0, NULL, NULL, 0.0f, NULL, NULL, 0, NULL, 0, NULL, NULL, NULL);
+                    } else if (id & 0x40000000) {
+                        PipeSingleGibShower(id, fragment->time_last_move, 0, 0.0f, 0, NULL, NULL, NULL);
+                    } else {
+                        PipeSingleBloodSpurt(id, fragment->time_last_move, 0, NULL, NULL, NULL);
+                    }
+                }
+                for (j = 0, other = gSmash_glass_fragments; j < (int)REC2_ASIZE(gSmash_glass_fragments); j++, other++) {
+                    if (other->end_time != 0 && other->field_0x18 == id) {
+                        KillFragment(other);
+                    }
+                }
+            }
+        }
+    }
+    prev_glass_munge = the_time;
 }
 
 #ifdef REC2_MATCHING
