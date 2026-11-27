@@ -156,7 +156,7 @@ extern void C2_HOOK_FASTCALL NetFullScreenMessage(int pStr_index, int pLeave_it_
 
 // ReceivedHosticide
 
-// ReceivedNewPlayerList
+extern void C2_HOOK_FASTCALL ReceivedNewPlayerList(tNet_message_chunk* pContents, tNet_message* pM);
 
 // ReceivedRaceOver
 
