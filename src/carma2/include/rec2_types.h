@@ -80,6 +80,7 @@ typedef struct tCar_crush_vertex_data tCar_crush_vertex_data;
 typedef struct tPed_face_cache_0x34 tPed_face_cache_0x34;
 typedef struct tPed_anim_seq tPed_anim_seq;
 typedef struct tPed_morph tPed_morph;
+typedef struct tPed_form_dismembered_character tPed_form_dismembered_character;
 
 typedef char tPed_animal_name[50]; /* FIXME: should not really exist */
 
@@ -327,7 +328,7 @@ typedef struct tPed_character_instance {
     undefined2 field_0x20;
     undefined field_0x22[0x2];
     undefined4 field_0x24;
-    undefined4 field_0x28;
+    tPed_form_dismembered_character* field_0x28;
     br_matrix34 field_0x2c;
     br_matrix34 field_0x5c;
     br_matrix34 field_0x8c;
@@ -3988,8 +3989,8 @@ typedef struct {
     tPed_move* move;
 } tPed_form_move;
 
-typedef struct {
-    undefined field_0x0[0x30];
+typedef struct tPed_form_dismembered_character {
+    br_matrix34 bone_matrices[1]; /* FIXME: one per bone of the form */
 } tPed_form_dismembered_character;
 
 typedef struct {

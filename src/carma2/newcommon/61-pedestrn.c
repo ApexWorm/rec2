@@ -2889,7 +2889,50 @@ int C2_HOOK_FASTCALL MakeCharacterRenderable(tPed_character_instance* pCharacter
     return MakeCharacterRenderable2(pCharacter, i);
 }
 
-// CharacterNoLongerRenderable
+// FUNCTION: CARMA2_HW 0x00408400
+// FUNCTION: CARMA2_SW 0x00408400
+// FUNCTION: CARMA2_CHEAT 0x00408400
+int C2_HOOK_FASTCALL CharacterNoLongerRenderable(tPed_character_instance* pCharacter) {
+    int i;
+    tPed_form* form;
+    tPed_form_actor_set* actor_set;
+
+    if (pCharacter->field_0x4 < 0) {
+        return 0xb;
+    }
+    if (!gAction_replay_mode) {
+        CharacterNoLongerCollideworthy(pCharacter);
+    }
+    form = pCharacter->personality->form;
+    actor_set = &form->actor_sets[pCharacter->field_0x4];
+    if (!gAction_replay_mode) {
+        actor_set->field_0x0 = 0;
+    }
+    BrMatrix34Copy(&pCharacter->field_0x2c, GetCharacterMatrixPtr(pCharacter));
+    if (pCharacter->field_0xc != 0) {
+        for (i = 0; i < form->max_stored_dismembered_characters; i++) {
+            if (form->stored_dismembered_characters[i]->bone_matrices[0].m[0][0] == 0.f) {
+                break;
+            }
+        }
+        if (i == form->max_stored_dismembered_characters) {
+            pCharacter->field_0x28 = NULL;
+        } else {
+            form->stored_dismembered_characters[i]->bone_matrices[0].m[0][0] = 1.f;
+            pCharacter->field_0x28 = form->stored_dismembered_characters[i];
+            for (i = 1; i < form->count_bones; i++) {
+                if (pCharacter->field_0xc & gPow2_array[i]) {
+                    BrMatrix34Copy(&pCharacter->field_0x28->bone_matrices[i], GetBoneMatrixPtr(pCharacter, i));
+                }
+            }
+        }
+    }
+    for (i = 0; i < form->count_bones; i++) {
+        StopActorBeingRenderable(actor_set->actors[i]);
+    }
+    pCharacter->field_0x4 = -1;
+    return 0;
+}
 
 // CalcCollisionObjectThings
 
