@@ -576,6 +576,10 @@ void C2_HOOK_FASTCALL CreateJointTorque(tPhysics_object* pObject, tPhysics_objec
 
 // LimitOmega
 
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
 // FUNCTION: CARMA2_HW 0x004c1840
 // FUNCTION: CARMA2_SW 0x004bdf70
 void C2_HOOK_FASTCALL CapOmega(tPhysics_object* pObject) {
@@ -587,6 +591,10 @@ void C2_HOOK_FASTCALL CapOmega(tPhysics_object* pObject) {
         pObject->omega.v[2] = pObject->omega.v[2] / (2.f * ts);
     }
 }
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // ListLimitOmega
 
@@ -913,9 +921,173 @@ void C2_HOOK_FASTCALL RestoreListOmega(tPhysics_object* pObject) {
 
 // MakeVelocitiesVector
 
-// NewAddFrictionObjectObject
+inline void C2_HOOK_FASTCALL NewAddFrictionObjectObject(tPhysics_joint_force* pForce) {
+    tPhysics_object* object_a;
+    tPhysics_object* object_b;
+    br_vector3 velocity;
+    br_vector3 velocity_b;
+    br_vector3 normal;
+    br_vector3 direction_a;
+    br_vector3 direction_b;
+    br_vector3 angular_a;
+    br_vector3 angular_b;
+    br_vector3 tv;
+    br_vector3 tv2;
+    br_scalar friction;
+    br_scalar max_impulse;
+    br_scalar speed;
+    br_scalar d;
+    br_scalar impulse;
 
-// NewAddFriction
+    object_a = pForce->object_a;
+    friction = pForce->field_0x0;
+    object_b = pForce->object_b;
+    object_a->collision_flag |= 0x2;
+    object_b->collision_flag |= 0x2;
+    BrVector3Cross(&tv, &object_b->omega, &pForce->point_b);
+    BrVector3Add(&velocity_b, &tv, &object_b->velocity_car_space);
+    BrMatrix34ApplyV(&tv, &velocity_b, &object_b->actor->t.t.mat);
+    BrMatrix34TApplyV(&velocity_b, &tv, &object_a->actor->t.t.mat);
+    BrVector3Cross(&tv, &object_a->omega, &pForce->point_a);
+    BrVector3Accumulate(&tv, &object_a->velocity_car_space);
+    BrVector3Sub(&velocity, &tv, &velocity_b);
+    BrMatrix34ApplyV(&tv, &pForce->direction_a, &object_a->transform_matrix);
+    BrMatrix34TApplyV(&normal, &tv, &object_a->actor->t.t.mat);
+    d = BrVector3Dot(&velocity, &normal);
+    BrVector3Scale(&tv, &normal, d);
+    BrVector3Sub(&velocity, &velocity, &tv);
+    max_impulse = 0.35f * friction * object_a->object_friction + 0.35f * friction;
+    max_impulse = max_impulse * object_b->object_friction + max_impulse;
+    speed = BrVector3Length(&velocity);
+    if (speed < 0.001f) {
+        return;
+    }
+    BrVector3Scale(&direction_a, &velocity, 1.0f / -speed);
+    BrMatrix34ApplyV(&tv, &direction_a, &object_a->actor->t.t.mat);
+    BrMatrix34TApplyV(&direction_b, &tv, &object_b->actor->t.t.mat);
+    if (!(object_a->flags & 0x800)) {
+        BrVector3Cross(&tv, &pForce->point_a, &direction_a);
+        Vector3Div(&angular_a, &tv, &object_a->I);
+    } else {
+        BrVector3Set(&angular_a, 0.0f, 0.0f, 0.0f);
+    }
+    if (!(object_b->flags & 0x800)) {
+        BrVector3Cross(&tv, &pForce->point_b, &direction_b);
+        Vector3Div(&angular_b, &tv, &object_b->I);
+    } else {
+        BrVector3Set(&angular_b, 0.0f, 0.0f, 0.0f);
+    }
+    BrVector3Cross(&tv, &angular_b, &pForce->point_b);
+    BrVector3Cross(&tv2, &angular_a, &pForce->point_a);
+    d = 1.0f / object_a->M + 1.0f / object_b->M + BrVector3Dot(&tv2, &direction_a) + BrVector3Dot(&tv, &direction_b);
+    if (fabs(d) <= 0.0001f) {
+        return;
+    }
+    impulse = speed / d;
+    if (impulse > max_impulse) {
+        impulse = max_impulse;
+    }
+    BrVector3Scale(&direction_a, &direction_a, impulse / object_a->M);
+    BrVector3Scale(&direction_b, &direction_b, -(impulse / object_b->M));
+    BrVector3Scale(&pForce->field_0x44, &direction_a, object_a->M);
+    BrVector3Scale(&pForce->field_0x50, &direction_b, object_b->M);
+    pForce->type |= 0x100;
+    BrVector3Scale(&angular_a, &angular_a, impulse);
+    BrVector3Accumulate(&object_a->omega, &angular_a);
+    BrVector3Scale(&angular_b, &angular_b, -impulse);
+    BrVector3Accumulate(&object_b->omega, &angular_b);
+    BrMatrix34ApplyV(&tv, &direction_a, &object_a->actor->t.t.mat);
+    BrVector3Accumulate(&object_a->v, &tv);
+    BrVector3Accumulate(&object_a->velocity_car_space, &direction_a);
+    BrMatrix34ApplyV(&tv, &direction_b, &object_b->actor->t.t.mat);
+    BrVector3Accumulate(&object_b->v, &tv);
+    BrVector3Accumulate(&object_b->velocity_car_space, &direction_b);
+}
+
+// FUNCTION: CARMA2_HW 0x004c0ac0
+// FUNCTION: CARMA2_SW 0x004bd1f0
+// FUNCTION: CARMA2_CHEAT 0x004c65e0
+void C2_HOOK_FASTCALL NewAddFriction(tPhysics_joint_force* pForce, tWorld_callbacks* pCallbacks) {
+    tPhysics_object* object;
+    br_vector3 point;
+    br_vector3 velocity;
+    br_vector3 normal;
+    br_vector3 direction;
+    br_vector3 angular;
+    br_vector3 tv;
+    br_scalar friction;
+    br_scalar max_impulse;
+    br_scalar speed;
+    br_scalar d;
+    br_scalar impulse;
+
+    object = pForce->object_a;
+    if (pForce->object_b != NULL && pForce->type != 14) {
+        NewAddFrictionObjectObject(pForce);
+        CapOmega(pForce->object_a);
+        CapOmega(pForce->object_b);
+        return;
+    }
+    friction = pForce->field_0x0;
+    object->collision_flag |= 0x1;
+    if (pForce->type == 1) {
+        BrVector3Scale(&point, &pForce->point_a, -0.005f);
+        BrVector3Accumulate(&point, &pForce->point_a);
+        BrVector3Cross(&velocity, &object->omega, &point);
+    } else {
+        BrVector3Cross(&velocity, &object->omega, &pForce->point_a);
+    }
+    BrVector3Accumulate(&velocity, &object->velocity_car_space);
+    BrMatrix34ApplyV(&tv, &pForce->direction_a, &object->transform_matrix);
+    BrMatrix34TApplyV(&normal, &tv, &object->actor->t.t.mat);
+    d = BrVector3Dot(&velocity, &normal);
+    BrVector3Scale(&tv, &normal, d);
+    BrVector3Sub(&velocity, &velocity, &tv);
+    if (pCallbacks != NULL && pCallbacks->get_friction_from_face != NULL && pForce->field_0xc != NULL) {
+        friction = pCallbacks->get_friction_from_face(pForce->field_0xc) * friction;
+    }
+    max_impulse = 0.35f * friction * object->world_friction + 0.35f * friction;
+    speed = BrVector3Length(&velocity);
+    if (speed < 0.001f) {
+        return;
+    }
+    BrVector3Scale(&direction, &velocity, 1.0f / -speed);
+    if (!(object->flags & 0x800)) {
+        BrVector3Cross(&tv, &pForce->point_a, &direction);
+        Vector3Div(&angular, &tv, &object->I);
+    } else {
+        BrVector3Set(&angular, 0.0f, 0.0f, 0.0f);
+    }
+    d = BrVector3Dot(&object->omega, &pForce->direction_a);
+    if (fabs(d) < 0.1f && BrVector3Dot(&angular, &object->omega) < 0.0f && BrVector3LengthSquared(&object->v) < 0.001) {
+        BrVector3Scale(&tv, &pForce->direction_a, d);
+        BrVector3Sub(&object->omega, &object->omega, &tv);
+        BrVector3SetFloat(&angular, 0.0f, 0.0f, 0.0f);
+        speed = BrVector3Length(&object->velocity_car_space);
+        if (speed < 0.001f) {
+            return;
+        }
+        BrVector3InvScale(&direction, &object->velocity_car_space, -speed);
+    }
+    BrVector3Cross(&tv, &angular, &pForce->point_a);
+    d = 1.0f / object->M + BrVector3Dot(&tv, &direction);
+    if (fabs(d) <= 0.0001f) {
+        return;
+    }
+    impulse = speed / d;
+    if (impulse > max_impulse) {
+        impulse = max_impulse;
+    }
+    BrVector3Scale(&angular, &angular, impulse);
+    BrVector3Scale(&direction, &direction, impulse / object->M);
+    BrVector3Scale(&pForce->field_0x44, &direction, object->M);
+    pForce->type |= 0x100;
+    BrVector3Accumulate(&object->omega, &angular);
+    BrMatrix34ApplyV(&tv, &direction, &object->actor->t.t.mat);
+    BrVector3Accumulate(&object->v, &tv);
+    BrVector3Accumulate(&object->velocity_car_space, &direction);
+    CapOmega(object);
+}
 
 // ApplyForces
 
