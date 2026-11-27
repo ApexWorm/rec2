@@ -1239,15 +1239,6 @@ int C2_HOOK_FASTCALL RQDcmpV(br_scalar* pMatrix, int pDim, br_scalar* pQ) {
 
 // SparseRQDcmpV
 
-/* FIXME: name and layout are guesses; only count, orthogonal and matrix are read here. */
-typedef struct tForce_group {
-    int count;
-    tPhysics_joint_force* forces;
-    undefined field_0x8[12];
-    br_scalar* orthogonal;
-    br_scalar* matrix;
-} tForce_group;
-
 // FUNCTION: CARMA2_HW 0x004c5220
 // FUNCTION: CARMA2_SW 0x004c1950
 // FUNCTION: CARMA2_CHEAT 0x004cad40
