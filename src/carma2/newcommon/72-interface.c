@@ -201,6 +201,13 @@ int gOriginal_joystick_fbb;
 // GLOBAL: CARMA2_CHEAT 0x0068ffb8
 int gOriginal_joystick_dpad;
 
+// GLOBAL: CARMA2_HW 0x00604900
+// GLOBAL: CARMA2_SW 0x005ff830
+// GLOBAL: CARMA2_CHEAT 0x0060b180
+int gFrontend_controls_indices[15] = {
+    12, 13, 17, 18, 22, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35
+};
+
 // GLOBAL: CARMA2_HW 0x00686f68
 // GLOBAL: CARMA2_SW 0x006816a8
 // GLOBAL: CARMA2_CHEAT 0x0068e810
@@ -3937,11 +3944,82 @@ void C2_HOOK_FASTCALL Slider_ForceProc(tFrontend_slider* pSlider) {
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x00472210
-// STUB: CARMA2_SW 0x004717a0
-// STUB: CARMA2_CHEAT 0x004725a0
-void C2_HOOK_FASTCALL DisplayJoystickSettings(tFrontend_spec* pFrontend) {
-    NOT_IMPLEMENTED();
+// FUNCTION: CARMA2_HW 0x00472210
+// FUNCTION: CARMA2_SW 0x004717a0
+// FUNCTION: CARMA2_CHEAT 0x004725a0
+void C2_HOOK_FASTCALL DisplayJoystickSettings(tFrontend_spec *pFrontend) {
+    float x;
+
+    C2_HOOK_BUG_ON(REC2_ASIZE(gFrontend_controls_indices) != 15);
+
+    if (gJoystick_index == -1) {
+        int i;
+
+        pFrontend->items[10].unlitFont = 0;
+        pFrontend->items[10].highFont = 0;
+        pFrontend->items[11].unlitFont = 1;
+        pFrontend->items[11].highFont = 1;
+        gControls_slider_1.flags = 1;
+        gControls_slider_2.flags = 1;
+        gControls_slider_3.flags = 1;
+
+        for (i = 0; i < 3; i++) {
+            pFrontend->items[ 1 + i].enabled = kFrontendItemEnabled_disabled;
+            pFrontend->items[ 4 + i].enabled = kFrontendItemEnabled_disabled;
+            pFrontend->items[ 7 + i].enabled = kFrontendItemEnabled_disabled;
+            pFrontend->items[14 + i].enabled = kFrontendItemEnabled_disabled;
+            pFrontend->items[19 + i].enabled = kFrontendItemEnabled_disabled;
+            pFrontend->items[23 + i].enabled = kFrontendItemEnabled_disabled;
+        }
+        for (i = 0; i < (int)REC2_ASIZE(gFrontend_controls_indices); i++) {
+
+            pFrontend->items[gFrontend_controls_indices[i]].enabled = kFrontendItemEnabled_disabled;
+        }
+        pFrontend->items[36].enabled = kFrontendItemEnabled_disabled;
+        pFrontend->items[37].enabled = kFrontendItemEnabled_disabled;
+    } else {
+        int i;
+
+        pFrontend->items[10].unlitFont = 1;
+        pFrontend->items[10].highFont = 1;
+        pFrontend->items[11].unlitFont = 0;
+        pFrontend->items[11].highFont = 0;
+        gControls_slider_1.flags = 0;
+        gControls_slider_2.flags = 0;
+        gControls_slider_3.flags = 0;
+
+        for (i = 0; i < 3; i++) {
+            pFrontend->items[ 1 + i].enabled = kFrontendItemEnabled_enabled;
+            pFrontend->items[ 4 + i].enabled = kFrontendItemEnabled_enabled;
+            pFrontend->items[ 7 + i].enabled = kFrontendItemEnabled_enabled;
+            pFrontend->items[14 + i].enabled = kFrontendItemEnabled_enabled;
+            pFrontend->items[19 + i].enabled = kFrontendItemEnabled_enabled;
+            pFrontend->items[23 + i].enabled = kFrontendItemEnabled_enabled;
+        }
+        for (i = 0; i < (int)REC2_ASIZE(gFrontend_controls_indices); i++) {
+
+            pFrontend->items[gFrontend_controls_indices[i]].enabled = kFrontendItemEnabled_enabled;
+        }
+        pFrontend->items[36].enabled = kFrontendItemEnabled_enabled;
+        pFrontend->items[37].enabled = kFrontendItemEnabled_enabled;
+    }
+
+    x = GetJoystickX();
+    gControls_slider_1.value = x / (gControls_slider_1.field_0x18 - gControls_slider_1.field_0x14) + gControls_slider_1.field_0x14;
+    x = GetJoystickY();
+    gControls_slider_2.value = x / (gControls_slider_2.field_0x18 - gControls_slider_2.field_0x14) + gControls_slider_2.field_0x14;
+    gControls_slider_3.value = (float)(GetJoystickFBBGain() / 100.0);
+    if (PDIsJoystickDPadEnabled()) {
+        pFrontend->items[36].unlitFont = 1;
+        pFrontend->items[36].highFont = 1;
+        pFrontend->items[37].unlitFont = 0;
+        pFrontend->items[37].highFont = 0;
+    } else {
+        pFrontend->items[36].unlitFont = 0;
+        pFrontend->items[36].highFont = 0;
+        pFrontend->items[37].unlitFont = 1;
+        pFrontend->items[37].highFont = 1;
+    }
 }
 
 #ifdef REC2_MATCHING
