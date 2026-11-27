@@ -115,6 +115,8 @@ extern tNet_message* C2_HOOK_FASTCALL PDNetGetNextMessage(tNet_game_details* pDe
 
 extern int C2_HOOK_FASTCALL PDNetSendMessageToAddress(tNet_game_details* pDetails, tNet_message* pMessage, void* pAddress);
 
+extern void C2_HOOK_FASTCALL PDNetDisposePlayer(tNet_game_player_info* pPlayer);
+
 extern int C2_HOOK_FASTCALL PDFileUnlock(const char* pThe_path);
 
 extern void C2_HOOK_FASTCALL PDAllocateScreenAndBack(void);

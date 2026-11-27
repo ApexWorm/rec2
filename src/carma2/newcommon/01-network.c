@@ -475,7 +475,21 @@ void C2_HOOK_FASTCALL NetLeaveGame(tNet_game_details* pNet_game) {
     NOT_IMPLEMENTED();
 }
 
-// NetSetPlayerSystemInfo
+// FUNCTION: CARMA2_HW 0x0049e0e0
+// FUNCTION: CARMA2_SW 0x0049a260
+// FUNCTION: CARMA2_CHEAT 0x0049e620
+void C2_HOOK_FASTCALL NetSetPlayerSystemInfo(tNet_game_player_info* pPlayer, void* pSender_address) {
+
+    PDNetSetPlayerSystemInfo(pPlayer, pSender_address);
+}
+
+// FUNCTION: CARMA2_HW 0x0049e0f0
+// FUNCTION: CARMA2_SW 0x0049a270
+// FUNCTION: CARMA2_CHEAT 0x0049e630
+void C2_HOOK_FASTCALL NetDisposePlayer(tNet_game_player_info* pPlayer) {
+
+    PDNetDisposePlayer(pPlayer);
+}
 
 // FUNCTION: CARMA2_HW 0x0049e3a0
 // FUNCTION: CARMA2_SW 0x0049a520
@@ -1364,6 +1378,18 @@ int C2_HOOK_FASTCALL NetGuaranteedSendMessageToAddress(tNet_game_details* pDetai
 // STUB: CARMA2_HW 0x004a6080
 void C2_HOOK_FASTCALL ResendGuaranteedMessages(void) {
     NOT_IMPLEMENTED();
+}
+
+// FUNCTION: CARMA2_HW 0x004a64b0
+// FUNCTION: CARMA2_SW 0x004a2630
+// FUNCTION: CARMA2_CHEAT 0x004a7680
+int C2_HOOK_FASTCALL SampleFailNotifier(tU32 pAge, tNet_message* pMessage) {
+
+    if (pAge >= 10000) {
+        return 1;
+    } else {
+        return 0;
+    }
 }
 
 // NetWaitForGuaranteeReplies
