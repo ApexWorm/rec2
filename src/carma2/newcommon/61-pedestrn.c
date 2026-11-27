@@ -122,6 +122,11 @@ int gGiblet_size_count;
 // GLOBAL: CARMA2_CHEAT 0x00664e54
 int gNext_gib_shower_id = -1;
 
+// GLOBAL: CARMA2_HW 0x0065d7a0
+// GLOBAL: CARMA2_SW 0x006580d8
+// GLOBAL: CARMA2_CHEAT 0x00664e58
+int gNext_blood_spurt_id = 0xbfffffff;
+
 // GLOBAL: CARMA2_HW 0x0065d7d4
 // GLOBAL: CARMA2_SW 0x0065810c
 // GLOBAL: CARMA2_CHEAT 0x00664e8c
@@ -1503,7 +1508,25 @@ void C2_HOOK_FASTCALL DoBloodSpurt(tU32 pId, tU32 pTime, unsigned int pSeed, br_
     srand(seed);
 }
 
-// DoSpurt
+// FUNCTION: CARMA2_HW 0x004d5820
+// FUNCTION: CARMA2_SW 0x004d1f10
+// FUNCTION: CARMA2_CHEAT 0x004db3e0
+void C2_HOOK_FASTCALL DoSpurt(br_matrix34* pMat, br_vector3* pPos, br_vector3* pNormal, br_vector3* pVelocity) {
+    tU32 time;
+    unsigned int seed;
+    br_vector3 pos;
+    br_vector3 normal;
+    br_vector3 velocity;
+
+    time = GetTotalTime();
+    BrMatrix34ApplyP(&pos, pPos, pMat);
+    BrMatrix34ApplyV(&normal, pNormal, pMat);
+    BrVector3Scale(&velocity, pVelocity, 6.9);
+    seed = (int)pos.v[0] ^ (int)pos.v[1] ^ (int)pos.v[2] ^ time;
+    DoBloodSpurt(gNext_blood_spurt_id, time, seed, &pos, &velocity, &normal);
+    PipeSingleBloodSpurt(gNext_blood_spurt_id, time, seed, &pos, &velocity, &normal);
+    gNext_blood_spurt_id--;
+}
 
 // FUNCTION: CARMA2_HW 0x004cccc0
 // FUNCTION: CARMA2_SW 0x004c93c0
