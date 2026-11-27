@@ -51,7 +51,7 @@ extern int C2_HOOK_FASTCALL ReallyAddDroneToPHIL(tDrone_spec* pDrone);
 
 // AddDroneToPHIL
 
-// PreprocessDronePaths
+extern void C2_HOOK_FASTCALL PreprocessDronePaths(void);
 
 extern int C2_HOOK_CDECL LinkyCallback(br_actor* pActor, void* pData);
 

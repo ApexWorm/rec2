@@ -10,12 +10,13 @@
 
 #include "08-loading1.h"
 #include "41-utility.h"
+#include "46-win95sys.h"
 #include "69-sound.h"
 #include "70-packfile.h"
-
 #include "globvars.h"
 #include "globvrpb.h"
 #include "platform.h"
+
 #include "rec2_macros.h"
 #include "rec2_types.h"
 
@@ -105,11 +106,34 @@ void C2_HOOK_FASTCALL DoSaveGame(void) {
     }
 }
 
-// STUB: CARMA2_HW 0x00491bb0
-// STUB: CARMA2_SW 0x0048ee20
-// STUB: CARMA2_CHEAT 0x00491c60
+// FUNCTION: CARMA2_HW 0x00491bb0
+// FUNCTION: CARMA2_SW 0x0048ee20
+// FUNCTION: CARMA2_CHEAT 0x00491c60
 int C2_HOOK_FASTCALL StartSavedGamesList(void) {
-    NOT_IMPLEMENTED();
+    tPath_name the_path;
+    FILE* f;
+    int size;
+
+    C2_HOOK_BUG_ON(sizeof(tSave_game) != 0x328);
+
+    if (gSaved_games != NULL) {
+        PDFatalError("Saved games list already started");
+    }
+    PathCat(the_path, gApplication_path, "SAVEDGAMES.ARS");
+    f = DRfopen(the_path, "rb");
+    if (f != NULL) {
+        PFfseek(f, 0, SEEK_END);
+        size = PFftell(f);
+        PFrewind(f);
+        gCount_saved_games = size / sizeof(tSave_game);
+        gSaved_games = BrMemAllocate(size, kMem_misc);
+        PFfread(gSaved_games, 1, size, f);
+        Encryptificate(gSaved_games, gCount_saved_games);
+        PFfclose(f);
+        return gCount_saved_games;
+    } else {
+        return 0;
+    }
 }
 
 // FUNCTION: CARMA2_HW 0x00491c90

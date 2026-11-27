@@ -427,6 +427,7 @@ void C2_HOOK_FASTCALL RestoreJoystickPreferences(void) {
 }
 
 // FUNCTION: CARMA2_HW 0x0045c460
+// FUNCTION: CARMA2_SW 0x0045bea0
 // FUNCTION: CARMA2_CHEAT 0x0045c8e0
 int C2_HOOK_FASTCALL ToggleJoystickThrottle(void) {
     tButtonJoystickInfo* info;
@@ -490,13 +491,6 @@ void C2_HOOK_FASTCALL SetJoystickDPadEnabled(int pEnabled) {
     if (info != NULL) {
         info->field_0xe0 = pEnabled;
     }
-}
-
-// STUB: CARMA2_HW 0x0045c6b0
-// STUB: CARMA2_SW 0x0045c0f0
-// STUB: CARMA2_CHEAT 0x0045cb30
-int C2_HOOK_FASTCALL PlayExclusiveFFBEffect(const char* pEffect_name, int pArg2) {
-    NOT_IMPLEMENTED();
 }
 
 // FUNCTION: CARMA2_HW 0x0045c780
