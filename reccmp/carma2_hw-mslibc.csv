@@ -9,6 +9,7 @@ address,type,name
 0x00575de0,library,_sprintf
 0x00575e50,library,_floor
 0x00576080,library,_memmove
+0x005763c0,library,__CIasin
 0x00576490,library,_qsort
 0x005766d0,library,_strncpy
 0x005767d0,library,_strstr

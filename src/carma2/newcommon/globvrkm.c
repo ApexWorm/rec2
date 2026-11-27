@@ -52,6 +52,7 @@ int gCamera_reset;
 
 // GLOBAL: CARMA2_HW 0x0068b90c
 // GLOBAL: CARMA2_SW 0x00685e54
+// GLOBAL: CARMA2_CHEAT 0x006931b0
 int gCamera_sign;
 
 // GLOBAL: CARMA2_HW 0x0068b908
@@ -61,8 +62,10 @@ br_angle gCamera_yaw;
 
 // GLOBAL: CARMA2_HW 0x0074c9f0
 // GLOBAL: CARMA2_SW 0x007430b0
+// GLOBAL: CARMA2_CHEAT 0x00754090
 br_scalar gCamera_height;
 
 // GLOBAL: CARMA2_HW 0x00655f48
 // GLOBAL: CARMA2_SW 0x00650d58
+// GLOBAL: CARMA2_CHEAT 0x0065c7c8
 br_vector3 gView_direction = { { 0.f, 0.f, -1.f }};
