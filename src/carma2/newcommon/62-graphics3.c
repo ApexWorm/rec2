@@ -757,9 +757,11 @@ inline void C2_HOOK_FASTCALL DrawSmashBlip(br_pixelmap* pScreen, tU32 pTime, con
         gNearest_smash_blip_index = pIndex;
     }
     if (gNet_mode == eNet_mode_none && (pTime & 0x100)) {
+#ifdef REC2_HW
         if (gMap_view == 2) {
             PossibleLock(1);
         }
+#endif
         DRPixelmapRectangleMaskedCopy(pScreen,
             (br_int_16)(int)(map_pos.v[0] - gSmashy_dot->width / 2),
             (br_int_16)(int)(map_pos.v[1] - gSmashy_dot->height / 2),
@@ -768,9 +770,11 @@ inline void C2_HOOK_FASTCALL DrawSmashBlip(br_pixelmap* pScreen, tU32 pTime, con
             0,
             gSmashy_dot->width,
             gSmashy_dot->height);
+#ifdef REC2_HW
         if (gMap_view == 2) {
             PossibleUnlock(1);
         }
+#endif
     }
 }
 
