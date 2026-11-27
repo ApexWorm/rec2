@@ -171,6 +171,7 @@ tS3_outlet* gIndexed_outlets[7] = { 0 };
 
 // GLOBAL: CARMA2_HW 0x0079e17c
 // GLOBAL: CARMA2_SW 0x007946dc
+// GLOBAL: CARMA2_CHEAT 0x007a581c
 int gEnvironmental_sound_sources_buffer_index = 0;
 
 // GLOBAL: CARMA2_HW 0x00595c38
