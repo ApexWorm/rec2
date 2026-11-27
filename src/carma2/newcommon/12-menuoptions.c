@@ -16,7 +16,7 @@
 #include "35-intrface.h"
 #include "37-brucetrk.h"
 #include "57-drone.h"
-#include "61-pedestrn.h"
+#include "61-pedestrn-phys.h"
 #include "69-sound.h"
 #include "globvars.h"
 
