@@ -1421,7 +1421,7 @@ void C2_HOOK_FASTCALL PipeSingleSmashModelChange(br_actor* pActor, br_model* pOl
 // FUNCTION: CARMA2_HW 0x004c8980
 // FUNCTION: CARMA2_SW 0x004c50b0
 // FUNCTION: CARMA2_CHEAT 0x004ce4a0
-void C2_HOOK_FASTCALL PipeSingleSmashRemoveFaces(br_model* pModel, int pCount, tPipe_remove_face* pFaces, br_material* pMaterial) {
+void C2_HOOK_FASTCALL PipeSingleSmashRemoveFaces(br_model* pModel, int pCount, const tPipe_remove_face* pFaces, br_material* pMaterial) {
     tPipe_chunk_remove_faces* remove_faces;
     tU32 size;
 
