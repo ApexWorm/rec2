@@ -434,6 +434,7 @@ void C2_HOOK_FASTCALL NetEndJoinList(void) {
 
 // FUNCTION: CARMA2_HW 0x0049dc70
 // FUNCTION: CARMA2_SW 0x00499df0
+// FUNCTION: CARMA2_CHEAT 0x0049e1b0
 void C2_HOOK_FASTCALL NetDisposePIDGameInfo(tNet_game_details* pDetails) {
 
     if (pDetails != NULL) {
@@ -1363,6 +1364,7 @@ void C2_HOOK_FASTCALL ResendGuaranteedMessages(void) {
 
 // FUNCTION: CARMA2_HW 0x004a6920
 // FUNCTION: CARMA2_SW 0x004a2aa0
+// FUNCTION: CARMA2_CHEAT 0x004a7b10
 tNet_game_player_info* C2_HOOK_FASTCALL NetPlayerFromID(tPlayer_ID pPlayer) {
     int i;
 
