@@ -671,8 +671,6 @@ int C2_HOOK_FASTCALL QueueSmashIfNecessary3(tCar_spec* pCar, tPhysics_object* pO
 #pragma auto_inline(on)
 #endif
 
-extern void C2_HOOK_FASTCALL QueueSmashIfNecessary2(tCar_spec* pCar, tPhysics_object* pObject, br_vector3* pPosition, br_vector3* pNormal, br_actor* pActor, int pArg6, tCar_crush_smashable_part* pSmashable, float pMagnitude, int pArg9, int pArg10);
-
 inline void C2_HOOK_FASTCALL QueueSmashIfNecessary2(tCar_spec* pCar, tPhysics_object* pObject, br_vector3* pPosition, br_vector3* pNormal, br_actor* pActor, int pArg6, tCar_crush_smashable_part* pSmashable, float pMagnitude, int pArg9, int pArg10) {
     gINT_006a3334 = 0;
     QueueSmashIfNecessary3(pCar, pObject, pPosition, pNormal, pActor, pArg6, pSmashable, pMagnitude, pArg9, pArg10);
