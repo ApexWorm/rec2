@@ -147,7 +147,7 @@ extern void C2_HOOK_FASTCALL DisposeVertexData(tModel_detail_vertex_data* pVerte
 
 extern float C2_HOOK_FASTCALL DistSq(const br_vector3* pP, int pCount, const br_vector3* pVertices);
 
-// LimitImpactScale
+extern void C2_HOOK_FASTCALL LimitImpactScale(float* pScale, int pAxis, float pPos, float pDirection, tU16 pLimit_number, const tCar_crush_limits* pLimits, int pMax_index);
 
 extern float C2_HOOK_FASTCALL GetImpactScale(const br_vector3* pP, int pCount, const br_vector3* pVertices, float pMax_dist_sq);
 
@@ -159,19 +159,19 @@ extern int C2_HOOK_FASTCALL NearestAxis(const br_vector3* pVector);
 
 // PossibleShockSmash
 
-// CrushModels
+extern intptr_t C2_HOOK_FASTCALL CrushModels(br_actor* pActor, br_matrix34* pMat, void* pContext);
 
-// CrushPoint
+extern void C2_HOOK_FASTCALL CrushPoint(br_vector3* pPoint, int pCount, const br_vector3* pVertices, const br_vector3* pDirection, br_scalar pForce, tU16 pLimit_number, const tCar_crush_limits* pLimits, int pMax_index);
 
 extern void C2_HOOK_FASTCALL ClipPointToLimits(br_vector3* pPoint, tU16 pLimit_bits, const tCar_crush_limits* pLimits);
 
-// CrushCollisionShapes
+extern void C2_HOOK_FASTCALL CrushCollisionShapes(tCar_spec* pCar, tSpam_userdata* pContext);
 
-// SimpleCrushCarModelsCB
+extern intptr_t C2_HOOK_FASTCALL SimpleCrushCarModelsCB(br_actor* pActor, br_matrix34* pMat, void* pContext);
 
-// SimpleCrushCar
+extern void C2_HOOK_FASTCALL SimpleCrushCar(tCar_spec* pCar, tSpam_userdata* pContext);
 
-// CrushCar
+extern void C2_HOOK_FASTCALL CrushCar(tCar_spec* pCar, br_actor* pActor, tCar_crush* pCrush);
 
 // SendCrush
 
@@ -181,11 +181,11 @@ extern void C2_HOOK_FASTCALL ExpandCrush(tCar_crush* pDest, const tCompressed_ca
 
 // RemoveDuplicatePoints
 
-// SimpleCrushModel
+extern void C2_HOOK_FASTCALL SimpleCrushModel(br_model* pModel, int pCount, const br_vector3* pPoints, const br_vector3* pForce, const br_bounds3* pBounds);
 
-// CrushDrone
+extern void C2_HOOK_FASTCALL CrushDrone(tDrone_crush_data* pCrush_data, int pCount, const br_vector3* pPoints, const br_vector3* pForce);
 
-// CrushDroneObject
+extern void C2_HOOK_FASTCALL CrushDroneObject(tPhysics_object* pObject, int pCount, const br_vector3* pPoints, const br_vector3* pForce);
 
 // DoDroneCrushing
 
@@ -497,7 +497,7 @@ extern void C2_HOOK_FASTCALL ARApplySplitWeld(tCar_spec* pCar, const br_vector4*
 
 extern void C2_HOOK_FASTCALL ARUndoSplitWeld(tCar_spec* pCar);
 
-// ReceivedCrush
+extern void C2_HOOK_FASTCALL ReceivedCrush(tNet_message_chunk* pContents);
 
 extern intptr_t C2_HOOK_CDECL FindBitWithID(br_actor* pActor, void* pContext);
 
