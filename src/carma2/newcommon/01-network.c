@@ -707,6 +707,7 @@ int C2_HOOK_FASTCALL NetSendMessageToPlayer(tNet_game_details* pDetails, tNet_me
 }
 
 // FUNCTION: CARMA2_HW 0x0049f0d0
+// FUNCTION: CARMA2_SW 0x0049b250
 // FUNCTION: CARMA2_CHEAT 0x0049f7d0
 int C2_HOOK_FASTCALL NetSendMessageToHost(tNet_game_details* pDetails, tNet_message* pMessage) {
 
