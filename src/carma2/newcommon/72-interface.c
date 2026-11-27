@@ -3994,7 +3994,7 @@ int C2_HOOK_FASTCALL Controls_SlotActivated(tFrontend_spec* pFrontend) {
     pFrontend->items[0].visible = 1;
     dy = (float)(17 * (key_array_index - gControls_scroller.field_0x8));
     gFrontend_brender_items[0].model->vertices[0].p.v[1] = gFrontend_brender_items[0].model->vertices[3].p.v[1] = -(pFrontend->items[0].y + dy);
-    gFrontend_brender_items[0].model->vertices[1].p.v[1] = gFrontend_brender_items[0].model->vertices[2].p.v[1] = -(pFrontend->items[0].y + dy + 20.f);
+    gFrontend_brender_items[0].model->vertices[1].p.v[1] = gFrontend_brender_items[0].model->vertices[2].p.v[1] = -(pFrontend->items[0].y + dy + 20.0f);
     BrModelUpdate(gFrontend_brender_items[0].model, BR_MODU_VERTEX_POSITIONS);
     match = -1;
     for (;;) {
