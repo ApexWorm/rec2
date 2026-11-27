@@ -1348,7 +1348,6 @@ void C2_HOOK_FASTCALL BlendifyMaterial(br_material* pMaterial, int pPercent) {
 // FUNCTION: CARMA2_CHEAT 0x0051b9c0
 void C2_HOOK_FASTCALL DRModelUpdateAndKevificateMaterials(br_model* pModel, br_uint_16 pFlags) {
     int i;
-    v11group* v11g;
 
     C2_HOOK_BUG_ON(sizeof(v11group) != 0x24);
 
@@ -1357,13 +1356,13 @@ void C2_HOOK_FASTCALL DRModelUpdateAndKevificateMaterials(br_model* pModel, br_u
         BrModelUpdate(pModel, pFlags);
         for (i = 0; i < V11MODEL(pModel)->ngroups; i++) {
 
-            v11g = &V11MODEL(pModel)->groups[i];
-            *v11g->face_colours.materials = pModel->faces[*v11g->face_user].material;
+            V11MODEL(pModel)->groups[i].face_colours.materials[0] = pModel->faces[V11MODEL(pModel)->groups[i].face_user[0]].material;
         }
     }
 }
 
 // FUNCTION: CARMA2_HW 0x00516010
+// FUNCTION: CARMA2_SW 0x00511480
 // FUNCTION: CARMA2_CHEAT 0x0051ba30
 int C2_HOOK_FASTCALL DRModelUpdateDeluxTurbo(br_actor* pActor, br_model* pModel, br_uint_16 pFlags) {
 
