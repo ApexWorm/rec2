@@ -358,6 +358,26 @@ br_pixelmap* gFrontend_wrecks_pixelmap;
 // GLOBAL: CARMA2_CHEAT 0x0076ac8c
 tU32 gFrontend_wrecks_previous_update;
 
+// GLOBAL: CARMA2_HW 0x00763600
+// GLOBAL: CARMA2_SW 0x00759b60
+// GLOBAL: CARMA2_CHEAT 0x0076aca0
+char gFrontend_host_join_buffer[256];
+
+// GLOBAL: CARMA2_HW 0x00763714
+// GLOBAL: CARMA2_SW 0x00759c74
+// GLOBAL: CARMA2_CHEAT 0x0076adb4
+tNet_game_details* gGame_to_join;
+
+// GLOBAL: CARMA2_HW 0x007638a8
+// GLOBAL: CARMA2_SW 0x00759e08
+// GLOBAL: CARMA2_CHEAT 0x0076af48
+const char* gFrontend_has_joined_text;
+
+// GLOBAL: CARMA2_HW 0x007638e0
+// GLOBAL: CARMA2_SW 0x00759e40
+// GLOBAL: CARMA2_CHEAT 0x0076af80
+int gFrontend_net_car_index;
+
 // GLOBAL: CARMA2_HW 0x00763844
 // GLOBAL: CARMA2_SW 0x00759da4
 // GLOBAL: CARMA2_CHEAT 0x0076aee4
@@ -1684,14 +1704,88 @@ void C2_HOOK_FASTCALL InitNetStorageSpace(void) {
     InitialiseStorageSpace(0, &gNet_cars_storage_space, 2000, 50, 2000, 2000, 50);
 }
 
-// DisposeNetStorageSpace
+inline void C2_HOOK_FASTCALL DisposeNetStorageSpace(void) {
 
-// SetUpOtherNetThings
+    if (gNet_storage_space_initialized) {
+        DisposeStorageSpace(&gNet_cars_storage_space);
+    }
+    gNet_storage_space_initialized = 0;
+}
+inline void C2_HOOK_FASTCALL SetUpOtherNetThings(tNet_game_details* pNet_game) {
 
-// DoMultiplayerStartStuff
+    gProgram_state.skill_level = 1;
+    InitGame(pNet_game->start_race);
+}
+inline int C2_HOOK_FASTCALL DoMultiplayerStartStuff(tNet_mode pNet_mode) {
 
-// NetworkJoinGoAhead
+    if (pNet_mode == eNet_mode_thinking_about_it) {
+        if (gGame_to_join == NULL) {
+            return 0;
+        }
+        SolidPolyFontText("Joining a game", 200, 100, 1, eJust_left, 1);
+        gFrontend_net_car_index = -1;
+        do {
+            gNet_join_host_result = 0;
+            if (ChooseNetCar(gGame_to_join, &gGame_to_join->options, &gFrontend_net_car_index, 0)) {
+                InitNetStorageSpace();
+                gNet_join_host_result = NetJoinGame(gGame_to_join, gProgram_state.player_name, gFrontend_net_car_index);
+                if (gNet_join_host_result == 0) {
+                    LoadRaces(gRace_list, &gNumber_of_races, gCurrent_net_game->options.race_sequence_type);
+                    SetUpOtherNetThings(gGame_to_join);
+                    ReenableNetService();
+                    gFrontend_has_joined_text = GetMiscString(eMiscString_has_joined_the_game);
+                    strcpy(gFrontend_host_join_buffer, gProgram_state.player_name);
+                    strcat(gFrontend_host_join_buffer, " ");
+                    strcat(gFrontend_host_join_buffer, gFrontend_has_joined_text);
+                    NetSendHeadupToAllPlayers(gFrontend_host_join_buffer);
+                    gNet_join_host_result = 1;
+                } else {
+                    DisposeNetStorageSpace();
+                }
+            }
+        } while (gNet_join_host_result == -4);
+        if (gNet_join_host_result > 0) {
+            return 1;
+        }
+        NetDisposeGameDetails(gGame_to_join);
+        return 0;
+    } else {
+        gFrontend_net_car_index = -1;
+        gRace_index = gProgram_state.current_race_index;
+        if (ChooseNetCar(gCurrent_net_game, &gFrontend_net_options, &gFrontend_net_car_index, 1)) {
+            InitNetStorageSpace();
+            if (NetHostGame(gFrontend_game_type, &gFrontend_net_options, gRace_index, gProgram_state.player_name, gFrontend_net_car_index) != NULL) {
+                SetUpOtherNetThings(gCurrent_net_game);
+                ReenableNetService();
+                return 1;
+            }
+            DisposeNetStorageSpace();
+            ReenableNetService();
+            NetLeaveGame(gCurrent_net_game);
+        }
+        return 0;
+    }
+}
+// FUNCTION: CARMA2_HW 0x00468460
+// FUNCTION: CARMA2_SW 0x004681e0
+// FUNCTION: CARMA2_CHEAT 0x00468880
+int C2_HOOK_FASTCALL NetworkJoinGoAhead(tFrontend_spec* pFrontend) {
 
+    ClearAlwaysTyping();
+    if (gLast_graph_sel < 0) {
+        return 0;
+    }
+    StopAllThatJoinyStuffThisInstant();
+    SaveOptions();
+    gGame_to_join = gGames_to_join[gLast_graph_sel].game;
+    if (DoMultiplayerStartStuff(gFrontend_net_mode)) {
+        return 1;
+    }
+    InitGamesToJoin();
+    gLast_graph_sel = -1;
+    NetStartProducingJoinList(AddToJoinList);
+    return 0;
+}
 // FUNCTION: CARMA2_HW 0x00468790
 // FUNCTION: CARMA2_SW 0x00468510
 // FUNCTION: CARMA2_CHEAT 0x00468bb0
@@ -1731,9 +1825,23 @@ int C2_HOOK_FASTCALL NetSetRaceType(tFrontend_spec* pFrontend) {
     return 0;
 }
 
-// NetworkStartJoin
+// FUNCTION: CARMA2_HW 0x00468a50
+// FUNCTION: CARMA2_SW 0x004687d0
+// FUNCTION: CARMA2_CHEAT 0x00468e70
+int C2_HOOK_FASTCALL NetworkStartJoin(tFrontend_spec* pFrontend) {
 
-// NetworkStartHost
+    gFrontend_net_mode = eNet_mode_thinking_about_it;
+    return NetworkJoinGoAhead(pFrontend);
+}
+
+// FUNCTION: CARMA2_HW 0x00468e80
+// FUNCTION: CARMA2_SW 0x00468c00
+// FUNCTION: CARMA2_CHEAT 0x004692a0
+int C2_HOOK_FASTCALL NetworkStartHost(tFrontend_spec* pFrontend) {
+
+    gFrontend_net_mode = eNet_mode_host;
+    return NetworkJoinGoAhead(pFrontend);
+}
 
 // NetHostChooseThisRace
 

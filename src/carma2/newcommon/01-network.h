@@ -85,7 +85,7 @@ extern void C2_HOOK_FASTCALL DisposeCarN(int pIndex);
 
 extern void C2_HOOK_FASTCALL NetPlayersChanged(int pNew_count, tNet_game_player_info* pNew_players);
 
-// NetHostGame
+extern tNet_game_details* C2_HOOK_FASTCALL NetHostGame(tNet_game_type pGame_type, tNet_game_options* pOptions, int pStart_race, char* pHost_name, int pCar_index);
 
 extern int C2_HOOK_FASTCALL NetJoinGameLowLevel(tNet_game_details* pGame_details, const char* pName);
 

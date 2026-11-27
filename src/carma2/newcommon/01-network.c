@@ -669,7 +669,12 @@ void C2_HOOK_FASTCALL NetPlayersChanged(int pNew_count, tNet_game_player_info* p
 #pragma auto_inline(on)
 #endif
 
-// NetHostGame
+// STUB: CARMA2_HW 0x0049e210
+// STUB: CARMA2_SW 0x0049a390
+// STUB: CARMA2_CHEAT 0x0049e750
+tNet_game_details* C2_HOOK_FASTCALL NetHostGame(tNet_game_type pGame_type, tNet_game_options* pOptions, int pStart_race, char* pHost_name, int pCar_index) {
+    NOT_IMPLEMENTED();
+}
 
 int C2_HOOK_FASTCALL NetJoinGameLowLevel(tNet_game_details* pGame_details, const char* pName) {
 

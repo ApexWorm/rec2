@@ -35,6 +35,10 @@ extern int gPicked_wreck;
 extern tWreck_gallery_car_info gWreck_gallery_car_infos[30];
 extern tNet_game_type gFrontend_game_type;
 extern int gRace_index;
+extern char gFrontend_host_join_buffer[256];
+extern tNet_game_details* gGame_to_join;
+extern const char* gFrontend_has_joined_text;
+extern int gFrontend_net_car_index;
 extern tStruct_00686508 gUNK_006883b0;
 extern tStruct_00686508 gUNK_006886e8;
 extern br_actor* gFrontend_wrecks_actor;
@@ -194,19 +198,19 @@ extern int C2_HOOK_FASTCALL ChooseNetCar(tNet_game_details* pNet_game, tNet_game
 
 extern void C2_HOOK_FASTCALL InitNetStorageSpace(void);
 
-// DisposeNetStorageSpace
+extern void C2_HOOK_FASTCALL DisposeNetStorageSpace(void);
 
-// SetUpOtherNetThings
+extern void C2_HOOK_FASTCALL SetUpOtherNetThings(tNet_game_details* pNet_game);
 
-// DoMultiplayerStartStuff
+extern int C2_HOOK_FASTCALL DoMultiplayerStartStuff(tNet_mode pNet_mode);
 
-// NetworkJoinGoAhead
+extern int C2_HOOK_FASTCALL NetworkJoinGoAhead(tFrontend_spec* pFrontend);
 
 extern int C2_HOOK_FASTCALL NetSetRaceType(tFrontend_spec* pFrontend);
 
-// NetworkStartJoin
+extern int C2_HOOK_FASTCALL NetworkStartJoin(tFrontend_spec* pFrontend);
 
-// NetworkStartHost
+extern int C2_HOOK_FASTCALL NetworkStartHost(tFrontend_spec* pFrontend);
 
 // NetHostChooseThisRace
 
