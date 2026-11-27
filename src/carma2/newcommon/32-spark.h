@@ -34,6 +34,7 @@ extern tBRender_smoke* gBR_smoke_pointers[35];
 extern int gN_BR_smoke_structs;
 extern int gColumn_flags;
 extern int gNext_column;
+extern int gNext_shrapnel;
 extern int gShrapnel_flags;
 extern br_model* gShrapnel_model[2];
 extern br_pixelmap* gFlame_map[20];

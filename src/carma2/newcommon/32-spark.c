@@ -151,6 +151,11 @@ int gColumn_flags;
 // GLOBAL: CARMA2_CHEAT 0x006b2118
 int gNext_column;
 
+// GLOBAL: CARMA2_HW 0x006aa580
+// GLOBAL: CARMA2_SW 0x006a3fcc
+// GLOBAL: CARMA2_CHEAT 0x006b20f8
+int gNext_shrapnel;
+
 // GLOBAL: CARMA2_HW 0x006aa584
 // GLOBAL: CARMA2_SW 0x006a3fd0
 // GLOBAL: CARMA2_CHEAT 0x006b20fc
@@ -402,10 +407,75 @@ void C2_HOOK_FASTCALL ResetShrapnel(void) {
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x004f8800
-// STUB: CARMA2_SW 0x004f3e80
+// FUNCTION: CARMA2_HW 0x004f8800
+// FUNCTION: CARMA2_SW 0x004f3e80
+// FUNCTION: CARMA2_CHEAT 0x004fe4a0
 void C2_HOOK_FASTCALL CreateShrapnelShower2(const br_vector3* pPosition, const br_vector3* pVelocity, const br_vector3* pDirection, br_scalar pStrength, tCar_spec* pCar1, tCar_spec* pCar2, int pMaterialCount, br_material** pMaterials) {
-    NOT_IMPLEMENTED();
+    br_scalar ts;
+    br_scalar ts2;
+    br_scalar rnd;
+    int num;
+    int i;
+    tCar_spec* c;
+    br_vector3 tv;
+    br_vector3 tv2;
+    br_vector3 vel;
+
+    if (pStrength < 10.f) {
+        return;
+    }
+    if (pMaterials != NULL) {
+        ts = .7f;
+    } else {
+        ts = .3f;
+    }
+    if (pVelocity->v[1] < 0.f) {
+        ts -= pVelocity->v[1];
+    }
+    ts2 = pDirection->v[1] * ts;
+    tv2.v[0] = pDirection->v[0] * ts2;
+    tv2.v[1] = pDirection->v[1] * ts2;
+    tv2.v[2] = pDirection->v[2] * ts2;
+    vel.v[0] = pVelocity->v[0] - tv2.v[0];
+    vel.v[1] = pVelocity->v[1] + ts - tv2.v[1];
+    vel.v[2] = pVelocity->v[2] - tv2.v[2];
+    num = (int)(pStrength / 10.f) * 12;
+    if (num > 20) {
+        num = 20;
+    }
+    rnd = (pStrength + 20.f) * 3.f / 200.f;
+    for (i = 0; i < num; i++) {
+        if (!(gShrapnel_flags & (1 << gNext_shrapnel))) {
+            BrActorAdd(gNon_track_actor, gShrapnel[gNext_shrapnel].actor);
+        }
+        gShrapnel_flags |= 1 << gNext_shrapnel;
+        BrVector3Copy(&gShrapnel[gNext_shrapnel].actor->t.t.translate.t, pPosition);
+        BrVector3SetFloat(&tv, FRandomBetween(-rnd, rnd), FRandomBetween(-vel.v[1] + 0.3, rnd), FRandomBetween(-rnd, rnd));
+        ts2 = BrVector3Dot(pDirection, &tv);
+        tv2.v[0] = pDirection->v[0] * ts2;
+        tv2.v[1] = pDirection->v[1] * ts2;
+        tv2.v[2] = pDirection->v[2] * ts2;
+        BrVector3Sub(&gShrapnel[gNext_shrapnel].v, &tv, &tv2);
+        BrVector3Accumulate(&gShrapnel[gNext_shrapnel].v, &vel);
+        gShrapnel[gNext_shrapnel].time_sync = gPHIL_mechanics_time_sync;
+        gShrapnel[gNext_shrapnel].age = 0;
+        if (pMaterials != NULL) {
+            gShrapnel[gNext_shrapnel].actor->material = pMaterials[IRandomBetween(0, pMaterialCount - 1)];
+        } else if (IRandomBetween(0, 2) == 0) {
+            gShrapnel[gNext_shrapnel].actor->material = gBlack_material;
+        } else {
+            if (IRandomBetween(0, 1) != 0) {
+                c = pCar1;
+            } else {
+                c = pCar2;
+            }
+            gShrapnel[gNext_shrapnel].actor->material = c->shrapnel_materials[IRandomBetween(0, c->count_shrapnel_materials - 1)];
+        }
+        gNext_shrapnel++;
+        if (gNext_shrapnel >= (int)REC2_ASIZE(gShrapnel)) {
+            gNext_shrapnel = 0;
+        }
+    }
 }
 
 #ifdef REC2_MATCHING
