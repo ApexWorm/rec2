@@ -17,10 +17,12 @@
 #include "13-crush1.h"
 #include "15-displays.h"
 #include "16-graphics1.h"
+#include "18b-graphics2.h"
 #include "17-world2.h"
 #include "18-graphics2.h"
 #include "21-mainloop.h"
 #include "22-replay.h"
+#include "25-grafdata.h"
 #include "27-powerup.h"
 #include "28-world3.h"
 #include "30-opponent.h"
@@ -41,6 +43,7 @@
 #include "61-pedestrn-phys.h"
 #include "62-graphics3.h"
 #include "63-loading3.h"
+#include "67-lighting.h"
 #include "64-movie.h"
 #include "69-sound.h"
 #include "70-packfile.h"
@@ -107,6 +110,11 @@ char gBasic_car_name[32];
 // GLOBAL: CARMA2_SW 0x00759e20
 // GLOBAL: CARMA2_CHEAT 0x0076af60
 int gNet_score_targets[8];
+
+// GLOBAL: CARMA2_HW 0x0074b584
+// GLOBAL: CARMA2_SW 0x00741c44
+// GLOBAL: CARMA2_CHEAT 0x00752c24
+tCar_spec* gCurrent_car_spec;
 
 // GLOBAL: CARMA2_HW 0x0074b58c
 // GLOBAL: CARMA2_SW 0x00741c4c
@@ -263,6 +271,7 @@ const char* gDamage_names[12] = {
 
 // GLOBAL: CARMA2_HW 0x00657500
 // GLOBAL: CARMA2_SW 0x00651eb0
+// GLOBAL: CARMA2_CHEAT 0x0065dd90
 const char* gWheel_actor_names[6] = {
     "FLWHEEL.ACT",
     "FRWHEEL.ACT",
@@ -270,6 +279,18 @@ const char* gWheel_actor_names[6] = {
     "RRWHEEL.ACT",
     "IRLWHEEL.ACT",
     "IRRWHEEL.ACT",
+};
+
+// GLOBAL: CARMA2_HW 0x00657518
+// GLOBAL: CARMA2_SW 0x00651ec8
+// GLOBAL: CARMA2_CHEAT 0x0065dda8
+const char* gPivot_actor_names[6] = {
+    "FLPIVOT.ACT",
+    "FRPIVOT.ACT",
+    "RLPIVOT.ACT",
+    "RRPIVOT.ACT",
+    "IRLPIVOT.ACT",
+    "IRRPIVOT.ACT",
 };
 
 void C2_HOOK_FASTCALL LoadInRegisteeDir(const char *pRoot, const char *pSubDir, int pInitialize_palettes) {
@@ -686,7 +707,38 @@ void C2_HOOK_FASTCALL InitInterfaceLoadState(void) {
 #endif
 }
 
-// AdjustCarCoordinates
+inline void C2_HOOK_FASTCALL AdjustCarCoordinates(tCar_spec* pCar) {
+    int i;
+
+    for (i = 0; i < (int)REC2_ASIZE(pCar->render_left); i++) {
+        pCar->render_left[i] -= gCurrent_graf_data->cock_margin_x;
+        pCar->render_top[i] -= gCurrent_graf_data->cock_margin_y;
+        pCar->render_right[i] -= gCurrent_graf_data->cock_margin_x;
+        pCar->render_bottom[i] -= gCurrent_graf_data->cock_margin_y;
+    }
+    pCar->mirror_left -= gCurrent_graf_data->cock_margin_x;
+    pCar->mirror_top -= gCurrent_graf_data->cock_margin_y;
+    pCar->mirror_right -= gCurrent_graf_data->cock_margin_x;
+    pCar->mirror_bottom -= gCurrent_graf_data->cock_margin_y;
+    pCar->speedo_centre_x[1] -= gCurrent_graf_data->cock_margin_x;
+    pCar->speedo_centre_y[1] -= gCurrent_graf_data->cock_margin_y;
+    pCar->tacho_centre_x[1] -= gCurrent_graf_data->cock_margin_x;
+    pCar->tacho_centre_y[1] -= gCurrent_graf_data->cock_margin_y;
+    pCar->speedo_x[1] -= gCurrent_graf_data->cock_margin_x;
+    pCar->speedo_y[1] -= gCurrent_graf_data->cock_margin_y;
+    pCar->tacho_x[1] -= gCurrent_graf_data->cock_margin_x;
+    pCar->tacho_y[1] -= gCurrent_graf_data->cock_margin_y;
+    for (i = 0; i < (int)REC2_ASIZE(pCar->lhands_x); i++) {
+        pCar->lhands_x[i] -= gCurrent_graf_data->cock_margin_x;
+        pCar->lhands_y[i] -= gCurrent_graf_data->cock_margin_y;
+        pCar->rhands_x[i] -= gCurrent_graf_data->cock_margin_x;
+        pCar->rhands_y[i] -= gCurrent_graf_data->cock_margin_y;
+    }
+    for (i = 0; i < (int)REC2_ASIZE(pCar->damage_units); i++) {
+        pCar->damage_units[i].x_coord -= gCurrent_graf_data->cock_margin_x;
+        pCar->damage_units[i].y_coord -= gCurrent_graf_data->cock_margin_y;
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x0048b560
 // FUNCTION: CARMA2_SW 0x004887a0
@@ -841,7 +893,37 @@ void C2_HOOK_FASTCALL LoadHeadups(FILE* pF, int pIndex, tCar_spec* pCar_spec) {
 
 // ReadNonCarMechanicsData
 
-// ReadPartHeader
+inline void C2_HOOK_FASTCALL ReadPartHeader(tPhysics_object* pObject, FILE* pF) {
+    tCar_spec* car;
+    char s[256];
+    br_vector3 cmpos;
+    float ixp;
+    float iyp;
+    float izp;
+
+    car = pObject->owner;
+    /* Type */
+    GetAString(pF, s);
+    /* Identifier */
+    GetAString(pF, s);
+    /* Actor */
+    GetAString(pF, s);
+    pObject->actor = car->car_master_actor;
+    /* Joint data type */
+    GetAString(pF, s);
+    /* Centre of mass */
+    GetThreeFloats(pF, &cmpos.v[0], &cmpos.v[1], &cmpos.v[2]);
+    BrVector3Copy(&pObject->cmpos, &cmpos);
+    /* Mass */
+    pObject->M = GetAScalar(pF);
+    /* Angular momentum proportions */
+    GetThreeFloats(pF, &ixp, &iyp, &izp);
+    pObject->I.v[0] = (izp * izp + iyp * iyp) * pObject->M / 12.0f;
+    pObject->I.v[1] = (ixp * ixp + izp * izp) * pObject->M / 12.0f;
+    pObject->I.v[2] = (iyp * iyp + ixp * ixp) * pObject->M / 12.0f;
+    /* Downforce-to-weight balance speed */
+    car->downforce_to_weight = GetAScalar(pF);
+}
 
 // FUNCTION: CARMA2_HW 0x00488b00
 // FUNCTION: CARMA2_SW 0x00485d40
@@ -932,11 +1014,171 @@ void C2_HOOK_FASTCALL ReadMechanicsShapes(tPhysics_shape** pShapes, FILE* pF) {
     }
 }
 
-// NewReadMechanicsData
+inline void C2_HOOK_FASTCALL NewReadMechanicsData(FILE* pF, tCar_spec* c, char* pLine) {
+    int i;
+    int j;
+    int count_wheels;
+    char* str;
+    char s[256];
+    br_scalar red_gear_speed;
+    br_scalar acceleration_highest_gear;
+    br_vector3 wpos;
+    br_actor* parent;
+    int steer_flags;
+    int wpos_i;
+    br_scalar susp_give;
+    br_scalar damping;
+    br_scalar friction_slipping_reduction;
+    br_scalar friction_angle_1;
+    br_scalar friction_angle_2;
+    br_scalar traction_multiplier;
+    br_scalar rolling_resistance;
+    br_scalar friction_steer;
+    br_scalar friction_non_steer_1;
+    br_scalar friction_non_steer_2;
+    br_scalar mass_factor;
 
-// LoadGear
+#ifdef REC2_FIX_BUGS
+    friction_steer = 0.0f;
+    friction_non_steer_1 = 0.0f;
+    friction_non_steer_2 = 0.0f;
+#endif
 
-// AddRefOffset
+    for (str = pLine + strlen(pLine) - 1; *str == ' '; str--) {
+    }
+    /* Minimum turning circle */
+    c->maxcurve = (br_scalar)(1.0 / GetAScalar(pF));
+    /* Brake multiplier */
+    c->initial_brake = GetAScalar(pF);
+    /* Braking strength multiplier */
+    c->brake_increase = GetAScalar(pF);
+    /* Number of gears */
+    c->max_gear = GetAnInt(pF);
+    /* Speed at red line in highest gear */
+    red_gear_speed = GetAScalar(pF);
+    /* Acceleration in highest gear (m/s^2) i.e. engine strength */
+    acceleration_highest_gear = GetAScalar(pF);
+
+    c->collision_info = BrMemAllocate(sizeof(tPhysics_object), kMem_collision_object);
+    c->collision_info->owner = c;
+    c->collision_info->flags_0x238 = 1;
+    c->collision_info->field_0x1a0 = 0xffff;
+    c->collision_info->field_0x1a4 = 0;
+    ReadPartHeader(c->collision_info, pF);
+
+    /* Number of 'Wheels' entries */
+    count_wheels = GetAnInt(pF);
+    if (count_wheels != 4) {
+        FatalError(kFatalError_InvalidScreenDepthSetting);
+    }
+    for (i = 0; i < count_wheels; i++) {
+        /* Type */
+        GetAnInt(pF);
+        /* Identifier */
+        GetAString(pF, s);
+        /* Actor */
+        GetAString(pF, s);
+        /* Position */
+        GetThreeFloats(pF, &wpos.v[0], &wpos.v[1], &wpos.v[2]);
+        if (Vector3IsZero(&wpos)) {
+            for (j = 0; j < 4; j++) {
+                if (c->wheel_actors[j] != NULL && DRStricmp(s, c->wheel_actors[j]->identifier) == 0) {
+                    BrVector3Copy(&wpos, &c->wheel_actors[j]->t.t.translate.t);
+                    for (parent = c->wheel_actors[j]->parent; parent != NULL && parent != c->car_master_actor; parent = parent->parent) {
+                        BrVector3Accumulate(&wpos, &parent->t.t.translate.t);
+                    }
+                    break;
+                }
+            }
+        }
+        /* Steerable flags */
+        steer_flags = GetAnInt(pF);
+        /* Driven flags */
+        GetAnInt(pF);
+        /* Suspension give */
+        susp_give = GetAScalar(pF);
+        /* Damping factor */
+        damping = GetAScalar(pF);
+        /* Fractional reduction in friction when slipping */
+        friction_slipping_reduction = GetAScalar(pF);
+        /* Friction angles */
+        GetPairOfFloats(pF, &friction_angle_1, &friction_angle_2);
+        /* Traction fractional multiplier */
+        traction_multiplier = GetAScalar(pF);
+        /* Rolling resistance */
+        rolling_resistance = GetAScalar(pF);
+        if (steer_flags) {
+            c->steerable_suspension_give = susp_give;
+            c->steerable_rolling_resistance = rolling_resistance;
+            friction_steer = friction_angle_1;
+            wpos_i = 2;
+        } else {
+            c->susp_give = susp_give;
+            c->traction_multiplier = traction_multiplier;
+            c->rolling_resistance = rolling_resistance;
+            friction_non_steer_1 = friction_angle_1;
+            friction_non_steer_2 = friction_angle_2;
+            wpos_i = 0;
+        }
+        if (wpos.v[0] > 0.0f) {
+            wpos_i++;
+        }
+        BrVector3Copy(&c->wpos[wpos_i], &wpos);
+        c->damping = damping;
+        c->friction_slipping_reduction = friction_slipping_reduction;
+    }
+    c->collision_info->object_friction = 0.4f;
+    ReadMechanicsShapes(&c->collision_info->shape, pF);
+    UpdateCollisionObject(c->collision_info);
+
+    c->maxcurve = (br_scalar)(c->maxcurve / WORLD_SCALE_D);
+    c->ride_height = (br_scalar)(c->collision_info->bb1.min.v[1] + 0.01);
+    c->ride_height = (br_scalar)(c->ride_height * WORLD_SCALE_D);
+    c->initial_brake = 12.0f * c->collision_info->M * c->initial_brake;
+    c->brake_increase = 12.0f * c->collision_info->M * c->brake_increase;
+    BrVector3Scale(&c->centre_of_mass_world_scale, &c->collision_info->cmpos, WORLD_SCALE);
+    c->speed_revs_ratio = red_gear_speed * 4.0f / 9.0f / c->max_gear / 6000.0f;
+    c->force_torque_ratio = c->collision_info->M * (c->max_gear * acceleration_highest_gear);
+    /* FIXME: 3.14 / 180.0 is what the original uses, not DEG_TO_RAD */
+    c->mu.v[1] = (br_scalar)(tan(friction_steer * (3.14 / 180.0)) * 0.25);
+    c->mu.v[0] = (br_scalar)(tan(friction_non_steer_1 * (3.14 / 180.0)) * 0.25);
+    c->mu.v[2] = (br_scalar)(tan(friction_non_steer_2 * (3.14 / 180.0)) * 0.25);
+    mass_factor = 5.0f * c->collision_info->M;
+    c->mu.v[0] *= (br_scalar)sqrt(mass_factor * ((c->wpos[2].v[2] - c->collision_info->cmpos.v[2]) / (c->wpos[2].v[2] - c->wpos[0].v[2])));
+    c->mu.v[1] *= (br_scalar)sqrt(mass_factor * ((c->wpos[0].v[2] - c->collision_info->cmpos.v[2]) / (c->wpos[0].v[2] - c->wpos[2].v[2])));
+    c->mu.v[2] *= (br_scalar)sqrt(mass_factor * ((c->wpos[2].v[2] - c->collision_info->cmpos.v[2]) / (c->wpos[2].v[2] - c->wpos[0].v[2])));
+    for (i = 0; i < (int)REC2_ASIZE(c->wpos); i++) {
+        BrVector3Scale(&c->wpos[i], &c->wpos[i], WORLD_SCALE_D);
+        c->wpos[i].v[1] = c->ride_height;
+    }
+    /* Number of sub-parts */
+    GetAnInt(pF);
+    c->collision_info->bb2 = c->collision_info->bb1;
+    /* END OF MECHANICS STUFF */
+    GetAString(pF, s);
+}
+
+inline void C2_HOOK_FASTCALL LoadGear(FILE* pF, int pIndex, tCar_spec* pCar_spec) {
+    char* str;
+    char s[256];
+
+    GetALineAndDontArgue(pF, s);
+    str = strtok(s, "\t ,/");
+    sscanf(str, "%d", &pCar_spec->gear_x[pIndex]);
+    str = strtok(NULL, "\t ,/");
+    sscanf(str, "%d", &pCar_spec->gear_y[pIndex]);
+    str = strtok(NULL, "\t ,/");
+    if (pIndex == 0) {
+        pCar_spec->gears_image = LoadPixelmap(str);
+    }
+}
+
+inline void C2_HOOK_FASTCALL AddRefOffset(int* pRef_holder) {
+
+    if (*pRef_holder >= 0) {
+        *pRef_holder += gGroove_funk_offset;
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x0048bca0
 // FUNCTION: CARMA2_SW 0x00488ee0
@@ -1048,9 +1290,21 @@ intptr_t C2_HOOK_CDECL AllocateCarModelData(br_actor* pActor, void* pData) {
 
 // AddCarModelToList
 
-// LinkCarModel
+// STUB: CARMA2_HW 0x0048bfa0
+// STUB: CARMA2_SW 0x004891e0
+// STUB: CARMA2_CHEAT 0x0048c380
+intptr_t C2_HOOK_CDECL LinkCarModel(br_actor* pActor, void* pContext) {
+    NOT_IMPLEMENTED();
+}
 
-// LinkCarModelsToActor
+inline void C2_HOOK_FASTCALL LinkCarModelsToActor(br_actor* pActor, br_model** pModels, int pModel_count, int pCount_detail_levels) {
+    tCrush_model_pool model_pool;
+
+    model_pool.models = pModels;
+    model_pool.model_count = pModel_count;
+    model_pool.count_detail_levels = pCount_detail_levels;
+    DRActorEnumRecurse(pActor, LinkCarModel, &model_pool);
+}
 
 // FUNCTION: CARMA2_HW 0x00488dd0
 // FUNCTION: CARMA2_SW 0x00486010
@@ -1099,9 +1353,29 @@ br_material* C2_HOOK_FASTCALL GetSimpleMaterial(char* pName, tRendererShadingTyp
 
 // ReadShrapnelMaterials
 
-// SetModelFlags
+inline void C2_HOOK_FASTCALL SetModelFlags(br_model* pModel, int pOwner) {
 
-// FindCarShellModel
+    if (pModel != NULL && pModel->nfaces != 0) {
+        if (pOwner != 98 && !gAusterity_mode) {
+            pModel->flags |= BR_MODF_UPDATEABLE | BR_MODF_KEEP_ORIGINAL | BR_MODF_DONT_WELD;
+            BrModelUpdate(pModel, BR_MODU_ALL);
+        } else if (pModel->flags & BR_MODF_UPDATEABLE) {
+            pModel->flags &= ~(BR_MODF_UPDATEABLE | BR_MODF_KEEP_ORIGINAL);
+            BrModelUpdate(pModel, BR_MODU_ALL);
+        }
+    }
+}
+
+inline br_model* C2_HOOK_FASTCALL FindCarShellModel(br_model** pModels, int pCount) {
+    int i;
+
+    for (i = 0; i < pCount; i++) {
+        if (strcmp(pModels[i]->identifier, "SHELL") == 0) {
+            return pModels[i];
+        }
+    }
+    return NULL;
+}
 
 // FUNCTION: CARMA2_HW 0x0048c130
 // FUNCTION: CARMA2_SW 0x00489370
@@ -1116,26 +1390,108 @@ intptr_t C2_HOOK_CDECL LinkCarActorsToGroovidelicsCB(br_actor* pActor, void* pDa
     return 0;
 }
 
-// LinkCarActorsToGroovidelics
+inline void C2_HOOK_FASTCALL LinkCarActorsToGroovidelics(br_actor* pActor) {
 
-// ReadCarKeywordData
+    DRActorEnumRecurse(pActor, LinkCarActorsToGroovidelicsCB, NULL);
+}
 
-// TrashModelMaterialIdentifiers
+inline void C2_HOOK_FASTCALL ReadCarKeywordData(tCar_spec* pCar_spec, FILE* pF) {
+    int i;
+    int j;
+    char s[256];
 
-// CentreModel
+    while (!PFfeof(pF)) {
+        GetAString(pF, s);
+        if (DRStricmp(s, "END") == 0) {
+            break;
+        }
+        if (DRStricmp(s, "CAMERA_POSITIONS") == 0) {
+            /* bumper position */
+            GetAVector3(pF, &pCar_spec->camera_bumper_position);
+            /* cockpit position */
+            GetAVector3(pF, &pCar_spec->camera_cockpit_position);
+        } else if (DRStricmp(s, "CAMERA_TURN_OFF_MATERIALS") == 0) {
+            pCar_spec->count_window_materials = GetAnInt(pF);
+            for (i = 0; i < pCar_spec->count_window_materials; i++) {
+                GetAString(pF, s);
+                pCar_spec->window_materials[i].material = BrMaterialFind(s);
+                pCar_spec->window_materials[i].count_maps = GetAnInt(pF);
+                for (j = 0; j < pCar_spec->window_materials[i].count_maps; j++) {
+                    GetAString(pF, s);
+                    pCar_spec->window_materials[i].maps[j] = BrMapFind(s);
+                }
+            }
+        }
+    }
+}
 
-// PivotizeWheel
+inline void C2_HOOK_FASTCALL TrashModelMaterialIdentifiers(tCar_spec* pCar_spec, tBrender_storage* pStorage) {
+    int i;
+    br_material* material;
 
-// SetUpGraphicalWheelStuff
+    for (i = pCar_spec->old_material_count; i < pCar_spec->new_material_count && i < pStorage->materials_count; i++) {
+        material = pStorage->materials[i];
+        if (material->identifier != NULL && material->identifier[0] != '\0') {
+            if (material->flags & BR_MATF_TWO_SIDED) {
+                material->identifier[0] = 'D';
+            } else {
+                material->identifier[0] = 'S';
+            }
+            BrMaterialUpdate(material, BR_MATU_ALL);
+        }
+    }
+}
 
-#ifdef REC2_MATCHING
-#pragma auto_inline(off)
-#endif
+inline void C2_HOOK_FASTCALL CentreModel(br_actor* pActor) {
+    br_model* model;
+    br_vector3 centre;
+    int i;
+
+    model = pActor->model;
+    if (model == NULL) {
+        return;
+    }
+    BrVector3Add(&centre, &model->bounds.min, &model->bounds.max);
+    BrVector3Scale(&centre, &centre, 0.5f);
+    if (Vector3IsZero(&centre)) {
+        return;
+    }
+    BrVector3Accumulate(&pActor->t.t.translate.t, &centre);
+    BrVector3Negate(&centre, &centre);
+    for (i = 0; i < model->nvertices; i++) {
+        BrVector3Accumulate(&model->vertices[i].p, &centre);
+    }
+    BrModelUpdate(model, BR_MODU_VERTEX_POSITIONS);
+}
+
+inline void C2_HOOK_FASTCALL PivotizeWheel(br_actor* pActor) {
+
+    if (pActor->children == NULL) {
+        return;
+    }
+    BrVector3Accumulate(&pActor->t.t.translate.t, &pActor->children->t.t.translate.t);
+    BrVector3Set(&pActor->children->t.t.translate.t, 0.0f, 0.0f, 0.0f);
+}
+
+inline void C2_HOOK_FASTCALL SetUpGraphicalWheelStuff(tCar_spec* pCar_spec) {
+    int i;
+
+    for (i = 0; i < (int)REC2_ASIZE(pCar_spec->wheel_actors); i++) {
+        if (pCar_spec->wheel_actors[i] != NULL) {
+            CentreModel(pCar_spec->wheel_actors[i]);
+        }
+    }
+    for (i = 0; i < (int)REC2_ASIZE(pCar_spec->pivot_actors); i++) {
+        if (pCar_spec->pivot_actors[i] != NULL) {
+            PivotizeWheel(pCar_spec->pivot_actors[i]);
+        }
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x00488f00
 // FUNCTION: CARMA2_SW 0x00486120
 // FUNCTION: CARMA2_CHEAT 0x004892e0
-void C2_HOOK_FASTCALL LoadCarShrapnelMaterials(FILE* pF, tCar_spec* pCar_spec) {
+inline void C2_HOOK_FASTCALL LoadCarShrapnelMaterials(FILE* pF, tCar_spec* pCar_spec) {
     int i;
     char s[256];
 
@@ -1150,10 +1506,597 @@ void C2_HOOK_FASTCALL LoadCarShrapnelMaterials(FILE* pF, tCar_spec* pCar_spec) {
     }
 }
 
-// STUB: CARMA2_HW 0x00488f70
-// STUB: CARMA2_SW 0x00486190
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// FUNCTION: CARMA2_HW 0x00488f70
+// FUNCTION: CARMA2_SW 0x00486190
+// FUNCTION: CARMA2_CHEAT 0x00489350
 void C2_HOOK_FASTCALL LoadCar(const char* pCar_name, tDriver pDriver, tCar_spec* pCar_spec, int pOwner, const char* pDriver_name, tBrender_storage* pStorage_space) {
-    NOT_IMPLEMENTED();
+    tBrender_storage* old_storage;
+    FILE* f;
+    FILE* g;
+    FILE* h;
+    tPath_name the_path;
+    char s[256];
+    char car_path[256];
+    char load_name[256];
+    char load_directory[256];
+    char actor_path[256];
+    char* str;
+    int i;
+    int j;
+    int k;
+    int version;
+    int old_model_count;
+    int count_vertices;
+    int vertex_index;
+    int all_fire_zero;
+    float temp_float;
+    tTWTVFS twt;
+    tCar_crush_buffer car_crush_buffer;
+    br_model* model;
+    br_material* car_material;
+    v11group* group;
+#ifdef REC2_SW
+    int old_graf_spec_index;
+
+    old_graf_spec_index = gGraf_spec_index;
+    SwitchToLoresMode();
+#endif
+
+    memset(pCar_spec, 0, sizeof(tCar_spec));
+    old_storage = gStorage_for_callbacks;
+    gCurrent_car_spec = pCar_spec;
+    if (pDriver == eDriver_local_human) {
+        strcpy(gProgram_state.car_name, pCar_name);
+    }
+    strcpy(gCurrent_load_directory, "CARS");
+    strcpy(gCurrent_load_name, pCar_name);
+    gCurrent_load_name[strlen(gCurrent_load_name) - 4] = '\0';
+    strcpy(load_directory, gCurrent_load_directory);
+    strcpy(load_name, gCurrent_load_name);
+    PathCat(car_path, gApplication_path, load_directory);
+    PathCat(car_path, car_path, load_name);
+    twt = OpenPackFileAndSetTiffLoading(car_path);
+    pCar_spec->is_girl = 0;
+    pCar_spec->driver = pDriver;
+    pCar_spec->index = pOwner;
+    if (pDriver == eDriver_local_human) {
+        gFunk_groove_flags[0] = 1;
+        gGroove_funk_offset = 0;
+    } else {
+        gGroove_funk_offset = -1;
+        for (i = 1; i < (int)REC2_ASIZE(gFunk_groove_flags); i++) {
+            if (!gFunk_groove_flags[i]) {
+                pCar_spec->fg_index = i;
+                gFunk_groove_flags[i] = 1;
+                gGroove_funk_offset = GROOVE_FUNK_MAX_PER_CAR * i;
+                break;
+            }
+        }
+    }
+    if (gGroove_funk_offset < 0) {
+        FatalError(kFatalError_RanOutOfFunkGrooveSlotBunches);
+    }
+    if (strcmp(pCar_name, "STELLA.TXT") == 0) {
+        pCar_spec->proxy_ray_distance = 6.0f;
+    } else {
+        pCar_spec->proxy_ray_distance = 0.0f;
+    }
+
+    PathCat(the_path, car_path, pCar_name);
+    f = DRfopen(the_path, "rt");
+    if (f == NULL) {
+        FatalError(kFatalError_CannotLoadCarResolutionIndependentFile);
+    }
+    strcpy(the_path, car_path);
+    PathCat(the_path, the_path, gGraf_specs[gGraf_spec_index].data_dir_name);
+    PathCat(the_path, the_path, pCar_name);
+    AllowOpenToFail();
+    g = DRfopen(the_path, "rt");
+    DoNotAllowOpenToFail();
+    if (g == NULL) {
+        PathCat(the_path, gApplication_path, "CARS");
+        PathCat(the_path, the_path, gGraf_specs[gGraf_spec_index].data_dir_name);
+        PathCat(the_path, the_path, gBasic_car_name);
+        g = DRfopen(the_path, "rt");
+        if (g == NULL) {
+            FatalError(kFatalError_CannotOpenCarResolutionDependentFile);
+        }
+    }
+
+    /* VERSION */
+    GetALineAndDontArgue(f, s);
+    str = strtok(s, "\t ,/");
+    if (strcmp(str, "VERSION") == 0) {
+        str = strtok(NULL, "\t ,/");
+        sscanf(str, "%d", &version);
+        GetAString(f, s);
+    } else {
+        version = 0;
+    }
+    if (strcmp(s, "BOY") == 0) {
+        pCar_spec->is_girl = 0;
+        GetAString(f, s);
+    } else if (strcmp(s, "GIRL") == 0) {
+        pCar_spec->is_girl = 1;
+        GetAString(f, s);
+    }
+    /* Name of car */
+    strcpy(pCar_spec->name, s);
+    if (DRStricmp(s, pCar_name) != 0) {
+        FatalError(kFatalError_FileIsCorrupted_S, pCar_name);
+    }
+    if (pDriver_name[0] != '\0') {
+        memcpy(pCar_spec->driver_name, pDriver_name, sizeof(pCar_spec->driver_name));
+        pCar_spec->driver_name[sizeof(pCar_spec->driver_name) - 1] = '\0';
+    } else {
+        strcpy(pCar_spec->driver_name, "X");
+    }
+    pCar_spec->can_be_stolen = 0;
+    pCar_spec->has_been_stolen = 0;
+    pCar_spec->knackered = 0;
+    pCar_spec->time_last_hit = 0;
+    pCar_spec->time_last_victim = 0;
+    pCar_spec->disabled = 0;
+    pCar_spec->active = 1;
+    for (i = 0; i < (int)REC2_ASIZE(pCar_spec->power_up_levels); i++) {
+        pCar_spec->power_up_levels[i] = gCurrent_APO_levels[i];
+        pCar_spec->power_up_slots[i] = gCurrent_APO_potential_levels[i];
+    }
+    /* Softness factor */
+    pCar_spec->softness_factor = GetAFloat(f);
+    /* START OF DRIVABLE STUFF */
+    GetALineAndDontArgue(f, s);
+    if (pDriver == eDriver_local_human) {
+        if (twt >= 0) {
+            PackFileRevertTiffLoading();
+        }
+        for (i = 0; i < (int)REC2_ASIZE(pCar_spec->cockpit_images); i++) {
+            /* Cockpit forward/left/right image file names */
+            GetALineAndDontArgue(g, s);
+            strtok(s, "\t ,/");
+            pCar_spec->cockpit_images[i] = NULL;
+            /* Left, top, right, bottom rendering coordinates */
+            GetALineAndDontArgue(g, s);
+            str = strtok(s, "\t ,/");
+            sscanf(str, "%d", &pCar_spec->render_left[i]);
+            str = strtok(NULL, "\t ,/");
+            sscanf(str, "%d", &pCar_spec->render_top[i]);
+            str = strtok(NULL, "\t ,/");
+            sscanf(str, "%d", &pCar_spec->render_right[i]);
+            str = strtok(NULL, "\t ,/");
+            sscanf(str, "%d", &pCar_spec->render_bottom[i]);
+            PossibleService();
+        }
+        /* Speedo (external) */
+        LoadSpeedo(g, 0, pCar_spec);
+        /* Speedo (internal) */
+        GetALineAndDontArgue(g, s);
+        PossibleService();
+        /* Tacho (external) */
+        LoadTacho(g, 0, pCar_spec);
+        /* Tacho (internal) */
+        GetALineAndDontArgue(g, s);
+        PossibleService();
+        /* Gear display (external) */
+        LoadGear(g, 0, pCar_spec);
+        /* Gear display (internal) */
+        GetALineAndDontArgue(g, s);
+        PossibleService();
+        /* Number of hands frames */
+        GetALineAndDontArgue(g, s);
+        str = strtok(s, "\t ,/");
+        sscanf(str, "%d", &pCar_spec->number_of_hands_images);
+        for (i = 0; i < pCar_spec->number_of_hands_images; i++) {
+            GetALineAndDontArgue(g, s);
+            str = strtok(s, "\t ,/");
+            sscanf(str, "%d", &pCar_spec->lhands_x[i]);
+            str = strtok(NULL, "\t ,/");
+            sscanf(str, "%d", &pCar_spec->lhands_y[i]);
+            str = strtok(NULL, "\t ,/");
+            pCar_spec->lhands_images[i] = LoadPixelmap(str);
+            str = strtok(NULL, "\t ,/");
+            sscanf(str, "%d", &pCar_spec->rhands_x[i]);
+            str = strtok(NULL, "\t ,/");
+            sscanf(str, "%d", &pCar_spec->rhands_y[i]);
+            strtok(NULL, "\t ,/");
+            PossibleService();
+        }
+        pCar_spec->red_line = 8000;
+        /* Offset of the driver's head in 3D space */
+        GetALineAndDontArgue(f, s);
+        str = strtok(s, "\t ,/");
+        sscanf(str, "%f", &pCar_spec->driver_x_offset);
+        str = strtok(NULL, "\t ,/");
+        sscanf(str, "%f", &pCar_spec->driver_y_offset);
+        str = strtok(NULL, "\t ,/");
+        sscanf(str, "%f", &pCar_spec->driver_z_offset);
+        /* Angles to turn to make head go left and right */
+        GetALineAndDontArgue(f, s);
+        str = strtok(s, "\t ,/");
+        sscanf(str, "%f", &pCar_spec->head_left_angle);
+        str = strtok(NULL, "\t ,/");
+        sscanf(str, "%f", &pCar_spec->head_right_angle);
+        /* Offset of the mirror camera in 3D space, viewing angle of mirror */
+        GetALineAndDontArgue(f, s);
+        str = strtok(s, "\t ,/");
+        sscanf(str, "%f", &pCar_spec->mirror_x_offset);
+        str = strtok(NULL, "\t ,/");
+        sscanf(str, "%f", &pCar_spec->mirror_y_offset);
+        str = strtok(NULL, "\t ,/");
+        sscanf(str, "%f", &pCar_spec->mirror_z_offset);
+        str = strtok(NULL, "\t ,/");
+        sscanf(str, "%f", &pCar_spec->rearview_camera_angle);
+        /* Left, top, right, bottom of mirror */
+        GetALineAndDontArgue(g, s);
+        str = strtok(s, "\t ,/");
+        sscanf(str, "%d", &pCar_spec->mirror_left);
+        str = strtok(NULL, "\t ,/");
+        sscanf(str, "%d", &pCar_spec->mirror_top);
+        str = strtok(NULL, "\t ,/");
+        sscanf(str, "%d", &pCar_spec->mirror_right);
+        str = strtok(NULL, "\t ,/");
+        sscanf(str, "%d", &pCar_spec->mirror_bottom);
+        /* Left, top, right, bottom of pratcam */
+        GetALineAndDontArgue(g, s);
+        str = strtok(s, "\t ,/");
+        sscanf(str, "%d", &pCar_spec->prat_left);
+        str = strtok(NULL, "\t ,/");
+        sscanf(str, "%d", &pCar_spec->prat_top);
+        str = strtok(NULL, "\t ,/");
+        sscanf(str, "%d", &pCar_spec->prat_right);
+        str = strtok(NULL, "\t ,/");
+        sscanf(str, "%d", &pCar_spec->prat_bottom);
+        /* Pratcam border names (left, top, right, bottom) */
+        GetALineAndDontArgue(f, s);
+        PossibleService();
+        str = strtok(s, "\t ,/");
+        pCar_spec->prat_cam_left = LoadPixelmap(str);
+        str = strtok(NULL, "\t ,/");
+        pCar_spec->prat_cam_top = LoadPixelmap(str);
+        str = strtok(NULL, "\t ,/");
+        pCar_spec->prat_cam_right = LoadPixelmap(str);
+        str = strtok(NULL, "\t ,/");
+        pCar_spec->prat_cam_bottom = LoadPixelmap(str);
+        PossibleService();
+        for (i = 0; i < (int)REC2_ASIZE(pCar_spec->damage_units); i++) {
+            if (i == eDamage_driver) {
+                pCar_spec->damage_units[i].images = NULL;
+            } else {
+                /* Damage unit x, y, flash periods, image */
+                GetALineAndDontArgue(g, s);
+                str = strtok(s, "\t ,/");
+                sscanf(str, "%d", &pCar_spec->damage_units[i].x_coord);
+                str = strtok(NULL, "\t ,/");
+                sscanf(str, "%d", &pCar_spec->damage_units[i].y_coord);
+                for (k = 0; k < (int)REC2_ASIZE(pCar_spec->damage_units[i].periods); k++) {
+                    str = strtok(NULL, "\t ,/");
+                    sscanf(str, "%f", &temp_float);
+                    pCar_spec->damage_units[i].periods[k] = (int)(1000.0 / temp_float * 0.5);
+                }
+                str = strtok(NULL, "\t ,/");
+                pCar_spec->damage_units[i].images = LoadPixelmap(str);
+                if (pCar_spec->damage_units[i].images == NULL) {
+                    FatalError(kFatalError_CannotLoadDamageImage);
+                }
+            }
+            pCar_spec->damage_units[i].damage_level = 0;
+            PossibleService();
+        }
+        /* Damage display offsets and background */
+        GetALineAndDontArgue(g, s);
+        str = strtok(s, "\t ,/");
+        sscanf(str, "%d", &pCar_spec->damage_x_offset);
+        str = strtok(NULL, "\t ,/");
+        sscanf(str, "%d", &pCar_spec->damage_y_offset);
+        str = strtok(NULL, "\t ,/");
+        sscanf(str, "%d", &pCar_spec->damage_background_x);
+        str = strtok(NULL, "\t ,/");
+        sscanf(str, "%d", &pCar_spec->damage_background_y);
+        str = strtok(NULL, "\t ,/");
+        pCar_spec->damage_background = LoadPixelmap(str);
+        /* Number of dimmed areas */
+        pCar_spec->dim_count[0] = GetAnInt(g);
+        for (i = 0; i < (int)REC2_ASIZE(pCar_spec->dim_count); i++) {
+            for (j = 0; j < pCar_spec->dim_count[i]; j++) {
+                GetFourInts(g,
+                    &pCar_spec->dim_left[i][j],
+                    &pCar_spec->dim_top[i][j],
+                    &pCar_spec->dim_right[i][j],
+                    &pCar_spec->dim_bottom[i][j]);
+            }
+        }
+        PathCat(the_path, gApplication_path, gGraf_specs[gGraf_spec_index].data_dir_name);
+        PathCat(the_path, the_path, "HEADUP.TXT");
+        h = DRfopen(the_path, "rt");
+        if (h == NULL) {
+            FatalError(kFatalError_CannotOpenHeadupsFile);
+        }
+        PossibleService();
+        LoadHeadups(h, 0, pCar_spec);
+        LoadHeadups(h, 1, pCar_spec);
+        PossibleService();
+        PFfclose(h);
+        AdjustCarCoordinates(&gProgram_state.current_car);
+        AdjustRenderScreenSize();
+        PossibleService();
+        ReinitialiseRearviewCamera();
+        /* END OF DRIVABLE STUFF */
+        GetALineAndDontArgue(f, s);
+        if (twt >= 0) {
+            PackFileRerevertTiffLoading();
+        }
+    } else {
+        do {
+            GetALineAndDontArgue(f, s);
+        } while (!PFfeof(f) && strcmp(s, "END OF DRIVABLE STUFF") != 0);
+        pCar_spec->red_line = 8000;
+    }
+    PossibleService();
+    /* Engine noise (normal, enclosed space, underwater) */
+    GetThreeInts(f, &pCar_spec->engine_noises[0], &pCar_spec->engine_noises[1], &pCar_spec->engine_noises[2]);
+    /* Can be stolen */
+    GetAString(f, s);
+    if (strcmp(s, "stealworthy") == 0) {
+        pCar_spec->can_be_stolen = 1;
+    } else {
+        pCar_spec->can_be_stolen = 0;
+    }
+    /* Damage info for top, bottom, left, right, front and rear impacts */
+    GetDamageProgram(f, pCar_spec, eImpact_top);
+    GetDamageProgram(f, pCar_spec, eImpact_bottom);
+    GetDamageProgram(f, pCar_spec, eImpact_left);
+    GetDamageProgram(f, pCar_spec, eImpact_right);
+    GetDamageProgram(f, pCar_spec, eImpact_front);
+    GetDamageProgram(f, pCar_spec, eImpact_back);
+    /* Grid image (opponent, frank, annie) */
+    GetALineAndDontArgue(f, s);
+    str = strtok(s, "\t ,/");
+    strcpy(pCar_spec->grid_icon_names[0], str);
+    str = strtok(NULL, "\t ,/");
+    strcpy(pCar_spec->grid_icon_names[1], str);
+    str = strtok(NULL, "\t ,/");
+    strcpy(pCar_spec->grid_icon_names[2], str);
+    pCar_spec->grid_icon_image = NULL;
+    LoadAllImagesInDirectory(pStorage_space, car_path);
+    LoadAllShadeTablesInDirectory(pStorage_space, car_path);
+    LoadCarMaterials(pStorage_space, car_path, pCar_spec);
+    old_model_count = pStorage_space->models_count;
+    /* Number of extra levels of detail */
+    GetALineAndDontArgue(f, s);
+    str = strtok(s, "\t ,/");
+    sscanf(str, "%d", &pCar_spec->count_detail_levels);
+    pCar_spec->count_detail_levels++;
+    if (pCar_spec->count_detail_levels > (int)REC2_ASIZE(pCar_spec->detail_levels)) {
+        PDFatalError("Too many levels of detail");
+    }
+    pCar_spec->detail_levels[0] = 0.0f;
+    for (i = 1; i < pCar_spec->count_detail_levels; i++) {
+        /* min_dist_squared */
+        pCar_spec->detail_levels[i] = GetAScalar(f);
+    }
+    LoadAllModelsInDirectory(pStorage_space, car_path);
+    if (version > 0) {
+        PossibleService();
+        /* Crush data file (.WAM) */
+        GetALineAndDontArgue(f, s);
+        str = strtok(s, "\t ,/");
+        PathCat(the_path, car_path, str);
+        if (LoadCrushDataFile(&car_crush_buffer, the_path, pStorage_space, &pCar_spec->car_crush_spec)) {
+            PathCat(the_path, car_path, pCar_name);
+            strcpy(&the_path[strlen(the_path) - 3], "WAM");
+            LoadCrushDataFile(&car_crush_buffer, the_path, pStorage_space, &pCar_spec->car_crush_spec);
+        }
+    }
+    pCar_spec->car_master_actor = BrActorAllocate(BR_ACTOR_NONE, NULL);
+    BrActorAdd(gNon_track_actor, pCar_spec->car_master_actor);
+    if (pDriver == eDriver_local_human) {
+        gPlayer_car_master_actor = pCar_spec->car_master_actor;
+    }
+    PathCat(actor_path, car_path, load_name);
+    strcat(actor_path, ".ACT");
+    pCar_spec->car_model_actor = BrActorLoad(actor_path);
+    if (pCar_spec->car_model_actor == NULL) {
+        FatalError(kFatalError_CannotLoadCarActor);
+    }
+    BrActorAdd(pCar_spec->car_master_actor, pCar_spec->car_model_actor);
+    DRActorEnumRecurse(pCar_spec->car_model_actor, AllocateCarActorData, NULL);
+    LinkCarModelsToActor(pCar_spec->car_model_actor,
+        &pStorage_space->models[old_model_count],
+        pStorage_space->models_count - old_model_count,
+        pCar_spec->count_detail_levels);
+    pCar_spec->shell_model = FindCarShellModel(&pStorage_space->models[old_model_count], pStorage_space->models_count - old_model_count);
+    pCar_spec->car_actor = BrActorAllocate(BR_ACTOR_MODEL, NULL);
+    if (pCar_spec->car_model_actor->user == NULL || ((tUser_crush_data*)pCar_spec->car_model_actor->user)->models[0] == NULL) {
+        PDFatalError("Can't find main car model");
+    }
+    pCar_spec->car_actor->model = ((tUser_crush_data*)pCar_spec->car_model_actor->user)->models[0];
+    BrMatrix34Copy(&pCar_spec->car_actor->t.t.mat, &pCar_spec->car_model_actor->t.t.mat);
+    if (version > 0) {
+        LinkCarCrushDatas(pCar_spec->car_model_actor, &car_crush_buffer);
+    }
+    DRActorEnumRecurse(pCar_spec->car_model_actor, AllocateCarModelData, pCar_spec);
+    PossibleService();
+    for (i = old_model_count; i < pStorage_space->models_count; i++) {
+        SetModelFlags(pStorage_space->models[i], pOwner);
+    }
+    /* Name of reflective screen material (or none if non-reflective) */
+    GetAString(f, s);
+    if (version > 1) {
+        /* Percentage transparency of windscreen */
+        GetAnInt(f);
+    }
+    /* Number of steerable wheels */
+    GetALineAndDontArgue(f, s);
+    str = strtok(s, "\t ,/");
+    sscanf(str, "%d", &pCar_spec->number_of_steerable_wheels);
+    for (i = 0; i < pCar_spec->number_of_steerable_wheels; i++) {
+        /* GroovyFunkRef of steerable wheel */
+        GetALineAndDontArgue(f, s);
+        str = strtok(s, "\t ,/");
+        sscanf(str, "%d", &pCar_spec->steering_ref[i]);
+        AddRefOffset(&pCar_spec->steering_ref[i]);
+    }
+    /* Left-front suspension parts GroovyFunkRef */
+    GetALineAndDontArgue(f, s);
+    str = strtok(s, "\t ,/");
+    for (i = 0; i < (int)REC2_ASIZE(pCar_spec->lf_sus_ref); i++) {
+        sscanf(str, "%d", &pCar_spec->lf_sus_ref[i]);
+        AddRefOffset(&pCar_spec->lf_sus_ref[i]);
+        str = strtok(NULL, "\t ,/");
+    }
+    PossibleService();
+    /* Right-front suspension parts GroovyFunkRef */
+    GetALineAndDontArgue(f, s);
+    str = strtok(s, "\t ,/");
+    for (i = 0; i < (int)REC2_ASIZE(pCar_spec->rf_sus_ref); i++) {
+        sscanf(str, "%d", &pCar_spec->rf_sus_ref[i]);
+        AddRefOffset(&pCar_spec->rf_sus_ref[i]);
+        str = strtok(NULL, "\t ,/");
+    }
+    /* Left-rear suspension parts GroovyFunkRef */
+    GetALineAndDontArgue(f, s);
+    str = strtok(s, "\t ,/");
+    for (i = 0; i < (int)REC2_ASIZE(pCar_spec->lr_sus_ref); i++) {
+        sscanf(str, "%d", &pCar_spec->lr_sus_ref[i]);
+        AddRefOffset(&pCar_spec->lr_sus_ref[i]);
+        str = strtok(NULL, "\t ,/");
+    }
+    /* Right-rear suspension parts GroovyFunkRef */
+    GetALineAndDontArgue(f, s);
+    str = strtok(s, "\t ,/");
+    for (i = 0; i < (int)REC2_ASIZE(pCar_spec->rr_sus_ref); i++) {
+        sscanf(str, "%d", &pCar_spec->rr_sus_ref[i]);
+        AddRefOffset(&pCar_spec->rr_sus_ref[i]);
+        str = strtok(NULL, "\t ,/");
+    }
+    /* Driven wheels GroovyFunkRefs (for spinning) */
+    GetFourInts(f,
+        &pCar_spec->driven_wheels_spin_ref_1,
+        &pCar_spec->driven_wheels_spin_ref_2,
+        &pCar_spec->driven_wheels_spin_ref_3,
+        &pCar_spec->driven_wheels_spin_ref_4);
+    AddRefOffset(&pCar_spec->driven_wheels_spin_ref_1);
+    AddRefOffset(&pCar_spec->driven_wheels_spin_ref_2);
+    AddRefOffset(&pCar_spec->driven_wheels_spin_ref_3);
+    AddRefOffset(&pCar_spec->driven_wheels_spin_ref_4);
+    PossibleService();
+    /* Non-driven wheels GroovyFunkRefs (for spinning) */
+    GetFourInts(f,
+        &pCar_spec->non_driven_wheels_spin_ref_1,
+        &pCar_spec->non_driven_wheels_spin_ref_2,
+        &pCar_spec->non_driven_wheels_spin_ref_3,
+        &pCar_spec->non_driven_wheels_spin_ref_4);
+    AddRefOffset(&pCar_spec->non_driven_wheels_spin_ref_1);
+    AddRefOffset(&pCar_spec->non_driven_wheels_spin_ref_2);
+    AddRefOffset(&pCar_spec->non_driven_wheels_spin_ref_3);
+    AddRefOffset(&pCar_spec->non_driven_wheels_spin_ref_4);
+    /* Driven wheels diameter */
+    GetALineAndDontArgue(f, s);
+    str = strtok(s, "\t ,/");
+    sscanf(str, "%f", &temp_float);
+    pCar_spec->driven_wheels_circum = (float)(temp_float * 2.0f * REC2_PI);
+    /* Non-driven wheels diameter */
+    GetALineAndDontArgue(f, s);
+    str = strtok(s, "\t ,/");
+    sscanf(str, "%f", &temp_float);
+    pCar_spec->non_driven_wheels_circum = (float)(temp_float * 2.0f * REC2_PI);
+    if (pDriver != eDriver_local_human) {
+        pCar_spec->car_model_variable = 1;
+    } else {
+        pCar_spec->car_model_variable = 0;
+    }
+    PossibleService();
+    /* START OF FUNK */
+    GetALineAndDontArgue(f, s);
+    AddFunkotronics(f, pOwner, gGroove_funk_offset, &car_crush_buffer);
+    PossibleService();
+    for (i = 0; i < (int)REC2_ASIZE(gWheel_actor_names); i++) {
+        pCar_spec->wheel_actors[i] = DRActorFindRecurse(pCar_spec->car_master_actor, gWheel_actor_names[i]);
+    }
+    for (i = 0; i < (int)REC2_ASIZE(gPivot_actor_names); i++) {
+        pCar_spec->pivot_actors[i] = DRActorFindRecurse(pCar_spec->car_master_actor, gPivot_actor_names[i]);
+    }
+    SetUpGraphicalWheelStuff(pCar_spec);
+    /* START OF GROOVE */
+    GetALineAndDontArgue(f, s);
+    AddGroovidelics(f, pOwner, pCar_spec->car_master_actor, gGroove_funk_offset, 1);
+    if (version == 0) {
+        do {
+            str = GetALineAndDontArgue(f, s);
+        } while (str != NULL && strcmp("START OF MECHANICS STUFF", s) != 0);
+        if (str == NULL) {
+            PDFatalError("Can't find old end of crush data comment");
+        }
+    } else {
+        /* START OF MECHANICS STUFF version 1 */
+        GetALineAndDontArgue(f, s);
+    }
+    PossibleService();
+    NewReadMechanicsData(f, pCar_spec, s);
+    PossibleService();
+    /* Materials for shrapnel */
+    LoadCarShrapnelMaterials(f, pCar_spec);
+
+    model = pCar_spec->car_actor->model;
+    count_vertices = 0;
+    for (i = 0; i < ((v11model*)model->prepared)->ngroups; i++) {
+        count_vertices += ((v11model*)model->prepared)->groups[i].nvertices;
+    }
+    all_fire_zero = 1;
+    /* Damage vertices fire points */
+    for (i = 0; i < (int)REC2_ASIZE(pCar_spec->fire_vertex); i++) {
+        pCar_spec->fire_vertex[i] = GetAnInt(f);
+        if (pCar_spec->fire_vertex[i] >= count_vertices) {
+            pCar_spec->fire_vertex[i] = 0;
+        }
+        if (pCar_spec->fire_vertex[i] != 0) {
+            all_fire_zero = 0;
+        }
+        vertex_index = 0;
+        for (j = 0; j < ((v11model*)model->prepared)->ngroups; j++) {
+            group = &((v11model*)model->prepared)->groups[j];
+            for (k = 0; k < group->nvertices; k++) {
+                if (group->vertex_user[k] == pCar_spec->fire_vertex[i]) {
+                    pCar_spec->fire_vertex[i] = vertex_index;
+                    j = ((v11model*)model->prepared)->ngroups;
+                    break;
+                }
+                vertex_index++;
+            }
+        }
+    }
+    if (all_fire_zero) {
+        for (i = 0; i < (int)REC2_ASIZE(pCar_spec->fire_vertex); i++) {
+            pCar_spec->fire_vertex[i] = IRandomBetween(0, count_vertices - 1);
+        }
+    }
+    ReadCarKeywordData(pCar_spec, f);
+    PFfclose(f);
+    PFfclose(g);
+    gCurrent_car_spec = NULL;
+    pCar_spec->field_0x18c8 = 0;
+    LinkCarActorsToGroovidelics(pCar_spec->car_model_actor);
+    CreateDefaultCrushData(pCar_spec->car_model_actor, pCar_spec);
+    InitPhysModCrushData(pCar_spec);
+    ClosePackFileAndSetTiffLoading(twt);
+    car_material = BrMaterialAllocate("PorterIsAWxnkxr");
+    if (AddMaterialToStorage(pStorage_space, car_material) == eStorage_not_enough_room) {
+        FatalError(kFatalError_InsufficientMaterialSlots);
+    }
+    BrMaterialAdd(car_material);
+    pCar_spec->car_master_actor->material = car_material;
+    AutoFogificateMaterials(kRendererShadingType_Specular);
+    TrashModelMaterialIdentifiers(pCar_spec, pStorage_space);
+    gStorage_for_callbacks = old_storage;
+#ifdef REC2_SW
+    if (old_graf_spec_index != 0) {
+        SwitchToHiresMode();
+    }
+#endif
 }
 
 #ifdef REC2_MATCHING

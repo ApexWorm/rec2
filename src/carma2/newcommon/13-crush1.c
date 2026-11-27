@@ -740,7 +740,12 @@ void C2_HOOK_FASTCALL CreateDefaultCrushData(br_actor* pActor, tCar_spec* pCar_s
 
 // ReadMasterCrushData
 
-// LoadCrushDataFile
+// STUB: CARMA2_HW 0x0042a280
+// STUB: CARMA2_SW 0x0042a310
+// STUB: CARMA2_CHEAT 0x0042a410
+int C2_HOOK_FASTCALL LoadCrushDataFile(tCar_crush_buffer* pCar_crush_buffer, const char* pPath, tBrender_storage* pBrender_storage, tCar_crush_spec** pCar_crush_spec) {
+    NOT_IMPLEMENTED();
+}
 
 // LinkCrushDataToActor
 
@@ -1062,7 +1067,12 @@ intptr_t C2_HOOK_CDECL InitVertexDataCB(br_actor* pActor, void* pData) {
 
 // CheckWheelPositions
 
-// InitPhysModCrushData
+// STUB: CARMA2_HW 0x0042aa20
+// STUB: CARMA2_SW 0x0042aab0
+// STUB: CARMA2_CHEAT 0x0042abb0
+void C2_HOOK_FASTCALL InitPhysModCrushData(tCar_spec* pCar_spec) {
+    NOT_IMPLEMENTED();
+}
 
 // FUNCTION: CARMA2_HW 0x0042c420
 // FUNCTION: CARMA2_SW 0x0042c4b0

@@ -58,7 +58,7 @@ extern void C2_HOOK_FASTCALL CreateDefaultCrushData(br_actor* pActor, tCar_spec*
 
 // ReadMasterCrushData
 
-// LoadCrushDataFile
+extern int C2_HOOK_FASTCALL LoadCrushDataFile(tCar_crush_buffer* pCar_crush_buffer, const char* pPath, tBrender_storage* pBrender_storage, tCar_crush_spec** pCar_crush_spec);
 
 // LinkCrushDataToActor
 
@@ -126,7 +126,7 @@ extern intptr_t C2_HOOK_CDECL InitVertexDataCB(br_actor* pActor, void* pData);
 
 // CheckWheelPositions
 
-// InitPhysModCrushData
+extern void C2_HOOK_FASTCALL InitPhysModCrushData(tCar_spec* pCar_spec);
 
 extern void C2_HOOK_FASTCALL DisposeMasterCrushData(tCar_crush_spec* pCar_crush, tCar_spec* pCar);
 

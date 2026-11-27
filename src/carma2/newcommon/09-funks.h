@@ -47,13 +47,13 @@ extern br_uint_32 C2_HOOK_FASTCALL CalcProximities(br_actor* pActor, br_material
 
 // FindSmashableMaterial
 
-// AddFunkotronics
+extern void C2_HOOK_FASTCALL AddFunkotronics(FILE* pF, int pOwner, int pRef_offset, tCar_crush_buffer* pCar_crush_buffer);
 
 extern void C2_HOOK_FASTCALL DisposeGroovidelics(int pOwner);
 
 // AddNewGroovidelic
 
-// AddGroovidelics
+extern void C2_HOOK_FASTCALL AddGroovidelics(FILE* pF, int pOwner, br_actor* pParent_actor, int pRef_offset, int pAllowed_to_be_absent);
 
 extern void C2_HOOK_FASTCALL KillGroovadelic(int pOwner);
 

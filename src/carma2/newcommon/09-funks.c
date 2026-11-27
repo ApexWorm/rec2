@@ -146,7 +146,12 @@ br_uint_32 C2_HOOK_FASTCALL CalcProximities(br_actor* pActor, br_material* pMat,
 
 // FindSmashableMaterial
 
-// AddFunkotronics
+// STUB: CARMA2_HW 0x00474ac0
+// STUB: CARMA2_SW 0x00474020
+// STUB: CARMA2_CHEAT 0x00474e40
+void C2_HOOK_FASTCALL AddFunkotronics(FILE* pF, int pOwner, int pRef_offset, tCar_crush_buffer* pCar_crush_buffer) {
+    NOT_IMPLEMENTED();
+}
 
 // FUNCTION: CARMA2_HW 0x00476430
 // FUNCTION: CARMA2_SW 0x00475990
@@ -167,7 +172,12 @@ void C2_HOOK_FASTCALL DisposeGroovidelics(int pOwner) {
 
 // AddNewGroovidelic
 
-// AddGroovidelics
+// STUB: CARMA2_HW 0x00476470
+// STUB: CARMA2_SW 0x004759d0
+// STUB: CARMA2_CHEAT 0x004767f0
+void C2_HOOK_FASTCALL AddGroovidelics(FILE* pF, int pOwner, br_actor* pParent_actor, int pRef_offset, int pAllowed_to_be_absent) {
+    NOT_IMPLEMENTED();
+}
 
 // FUNCTION: CARMA2_HW 0x00477160
 // FUNCTION: CARMA2_SW 0x004766c0
