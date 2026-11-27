@@ -35,6 +35,16 @@
 // GLOBAL: CARMA2_CHEAT 0x0069a940
 int gINT_00692dc8;
 
+// GLOBAL: CARMA2_HW 0x00692dd0
+// GLOBAL: CARMA2_SW 0x0068ce28
+// GLOBAL: CARMA2_CHEAT 0x0069a948
+br_scalar gPhysics_bounds_max_x;
+
+// GLOBAL: CARMA2_HW 0x00692dd4
+// GLOBAL: CARMA2_SW 0x0068ce2c
+// GLOBAL: CARMA2_CHEAT 0x0069a94c
+br_scalar gPhysics_bounds_min_x;
+
 // GLOBAL: CARMA2_HW 0x006940c0
 // GLOBAL: CARMA2_SW 0x0068e118
 // GLOBAL: CARMA2_CHEAT 0x0069bc38
@@ -652,7 +662,51 @@ void C2_HOOK_FASTCALL TellPhysicsJointsHaveChanged(tPhysics_object* pCollision_i
 
 // GetWorldBoundingBoxForObjects
 
-// GetWorldBoundingBoxForObject
+// FUNCTION: CARMA2_HW 0x004b9ce0
+// FUNCTION: CARMA2_SW 0x004b6400
+// FUNCTION: CARMA2_CHEAT 0x004bf810
+void C2_HOOK_FASTCALL GetWorldBoundingBoxForObject(tPhysics_object* pObject, br_bounds* pBounds) {
+    br_bounds bounds;
+    tPhysics_object* child;
+    br_scalar extent;
+    int i;
+
+    GetNewBoundingBox(&pObject->field_0xf4, &pObject->bb1, &pObject->transform_matrix);
+    GetNewBoundingBox(&bounds, &pObject->bb1, &pObject->actor->t.t.mat);
+    for (i = 0; i < 3; i++) {
+        if (pObject->field_0xf4.min.v[i] > bounds.min.v[i]) {
+            pObject->field_0xf4.min.v[i] = bounds.min.v[i];
+        }
+        if (pObject->field_0xf4.max.v[i] < bounds.max.v[i]) {
+            pObject->field_0xf4.max.v[i] = bounds.max.v[i];
+        }
+        pObject->field_0xf4.min.v[i] -= 0.0025;
+        pObject->field_0xf4.max.v[i] -= -0.0025;
+    }
+    pObject->field_0x10c = pObject->field_0xf4;
+    for (child = pObject->child; child != NULL; child = child->next) {
+        GetWorldBoundingBoxForObject(child, &pObject->field_0x10c);
+    }
+    if (pBounds != NULL) {
+        for (i = 0; i < 3; i++) {
+            if (pObject->field_0x10c.min.v[i] < pBounds->min.v[i]) {
+                pBounds->min.v[i] = pObject->field_0x10c.min.v[i];
+            }
+            if (pObject->field_0x10c.max.v[i] > pBounds->max.v[i]) {
+                pBounds->max.v[i] = pObject->field_0x10c.max.v[i];
+            }
+        }
+    } else {
+        extent = pObject->field_0x10c.max.v[0] - pObject->transform_matrix.m[3][0];
+        if (gPhysics_bounds_max_x <= extent) {
+            gPhysics_bounds_max_x = extent;
+        }
+        extent = pObject->field_0x10c.min.v[0] - pObject->transform_matrix.m[3][0];
+        if (gPhysics_bounds_min_x >= extent) {
+            gPhysics_bounds_min_x = extent;
+        }
+    }
+}
 
 // MatricesAreIdentical
 
