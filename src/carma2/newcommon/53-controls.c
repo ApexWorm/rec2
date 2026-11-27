@@ -857,6 +857,7 @@ void C2_HOOK_FASTCALL FlipUpCar(tCar_spec* pCar_spec) {
     br_vector3 p;
     br_material* mat;
 
+    i = 0;
     if (pCar_spec != NULL && pCar_spec->driver == eDriver_local_human && gNet_mode == eNet_mode_none) {
         FadePaletteDown();
         while (KeyIsDown(0x3c)) {
@@ -868,12 +869,11 @@ void C2_HOOK_FASTCALL FlipUpCar(tCar_spec* pCar_spec) {
     SetHierarchyDoingNothingFlag(pCar_spec->collision_info, 0);
     EnableCar(pCar_spec);
     new_pos = 1;
-    for (i = 0; i < 4; i++) {
-        if (pCar_spec->oldd[i] >= pCar_spec->susp_height[i / 2]) {
+    for (k = 0; k < 4; k++) {
+        if (pCar_spec->oldd[k] >= pCar_spec->susp_height[k >> 1]) {
             new_pos = 0;
         }
     }
-    i = 0;
     do {
         BrVector3Sub(&nor, &pCar_spec->car_master_actor->t.t.translate.t, (br_vector3*)pCar_spec->last_safe_positions[0].m[3]);
         if (BrVector3LengthSquared(&nor) > 8.3015966f) {
