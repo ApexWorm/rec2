@@ -133,7 +133,7 @@ extern void C2_HOOK_FASTCALL DisposeCharacterInstance(tPed_character_instance* p
 
 extern tPed_form* C2_HOOK_FASTCALL FindOrOpenForm(const char* pName);
 
-// MakeRotationMatrix
+extern void C2_HOOK_FASTCALL MakeRotationMatrix(br_matrix34* pMat, tU8 pAngle_x, tU8 pAngle_y, tU8 pAngle_z);
 
 extern void C2_HOOK_FASTCALL SetBoner(tPed_character_instance* pPed, br_matrix34* pMat, br_matrix34* pParent_mat, br_matrix34* pArg4, tU8 pAngle_x, tU8 pAngle_y, tU8 pAngle_z, br_vector3* pArg8, br_vector3* pArg9);
 

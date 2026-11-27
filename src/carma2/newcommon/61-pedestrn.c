@@ -759,17 +759,77 @@ tPed_form* C2_HOOK_FASTCALL FindOrOpenForm(const char* pName) {
     return SetUpCharacterForm(pName);
 }
 
-// MakeRotationMatrix
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// FUNCTION: CARMA2_HW 0x004080d0
+// FUNCTION: CARMA2_SW 0x004080d0
+// FUNCTION: CARMA2_CHEAT 0x004080d0
+void C2_HOOK_FASTCALL MakeRotationMatrix(br_matrix34* pMat, tU8 pAngle_x, tU8 pAngle_y, tU8 pAngle_z) {
+    br_scalar sin_x;
+    br_scalar cos_x;
+    br_scalar sin_y;
+    br_scalar cos_y;
+    br_scalar sin_z;
+    br_scalar cos_z;
+
+    cos_x = gPed_cos_table[pAngle_x];
+    cos_y = gPed_cos_table[pAngle_y];
+    sin_z = gPed_sin_table[pAngle_z];
+    cos_z = gPed_cos_table[pAngle_z];
+    sin_x = gPed_sin_table[pAngle_x];
+    sin_y = gPed_sin_table[pAngle_y];
+    pMat->m[3][2] = pMat->m[3][1] = pMat->m[3][0] = 0.0f;
+    pMat->m[0][0] = cos_y * cos_z;
+    pMat->m[1][0] = sin_y * sin_x * cos_z - cos_x * sin_z;
+    pMat->m[2][0] = sin_y * cos_x * cos_z + sin_x * sin_z;
+    pMat->m[0][1] = cos_y * sin_z;
+    pMat->m[1][1] = sin_y * sin_x * sin_z + cos_x * cos_z;
+    pMat->m[2][1] = sin_y * cos_x * sin_z - sin_x * cos_z;
+    pMat->m[0][2] = -sin_y;
+    pMat->m[1][2] = cos_y * sin_x;
+    pMat->m[2][2] = cos_y * cos_x;
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x00407e70
-// STUB: CARMA2_SW 0x00407e60
-// STUB: CARMA2_CHEAT 0x00407e60
+// FUNCTION: CARMA2_HW 0x00407e70
+// FUNCTION: CARMA2_SW 0x00407e60
+// FUNCTION: CARMA2_CHEAT 0x00407e60
 void C2_HOOK_FASTCALL SetBoner(tPed_character_instance* pPed, br_matrix34* pMat, br_matrix34* pParent_mat, br_matrix34* pArg4, tU8 pAngle_x, tU8 pAngle_y, tU8 pAngle_z, br_vector3* pArg8, br_vector3* pArg9) {
-    NOT_IMPLEMENTED();
+    if (gMutant_speed != 0.0f) {
+        MutatePed(pPed, pMat, &pAngle_x, &pAngle_y, &pAngle_z);
+    }
+    MakeRotationMatrix(pMat, pAngle_x, pAngle_y, pAngle_z);
+    if (pArg4 != NULL) {
+        pMat->m[3][0] = -pArg8->v[0] * pMat->m[0][0] + -pArg8->v[1] * pMat->m[1][0] + -pArg8->v[2] * pMat->m[2][0];
+        pMat->m[3][1] = -pArg8->v[0] * pMat->m[0][1] + -pArg8->v[1] * pMat->m[1][1] + -pArg8->v[2] * pMat->m[2][1];
+        pMat->m[3][2] = -pArg8->v[0] * pMat->m[0][2] + -pArg8->v[1] * pMat->m[1][2] + -pArg8->v[2] * pMat->m[2][2];
+        BrMatrix34Post(pMat, pArg4);
+        pMat->m[3][0] += pParent_mat->m[3][0]
+            + pArg9->v[0] * pParent_mat->m[0][0] + pArg9->v[1] * pParent_mat->m[1][0] + pArg9->v[2] * pParent_mat->m[2][0];
+        pMat->m[3][1] += pParent_mat->m[3][1]
+            + pArg9->v[0] * pParent_mat->m[0][1] + pArg9->v[1] * pParent_mat->m[1][1] + pArg9->v[2] * pParent_mat->m[2][1];
+        pMat->m[3][2] += pParent_mat->m[3][2]
+            + pArg9->v[0] * pParent_mat->m[0][2] + pArg9->v[1] * pParent_mat->m[1][2] + pArg9->v[2] * pParent_mat->m[2][2];
+    } else {
+        pMat->m[3][0] = pParent_mat->m[3][0]
+            + -pArg8->v[0] * pMat->m[0][0] + -pArg8->v[1] * pMat->m[1][0] + -pArg8->v[2] * pMat->m[2][0]
+            + pArg9->v[0] * pParent_mat->m[0][0] + pArg9->v[1] * pParent_mat->m[1][0] + pArg9->v[2] * pParent_mat->m[2][0];
+        pMat->m[3][1] = pParent_mat->m[3][1]
+            + -pArg8->v[0] * pMat->m[0][1] + -pArg8->v[1] * pMat->m[1][1] + -pArg8->v[2] * pMat->m[2][1]
+            + pArg9->v[0] * pParent_mat->m[0][1] + pArg9->v[1] * pParent_mat->m[1][1] + pArg9->v[2] * pParent_mat->m[2][1];
+        pMat->m[3][2] = pParent_mat->m[3][2]
+            + -pArg8->v[0] * pMat->m[0][2] + -pArg8->v[1] * pMat->m[1][2] + -pArg8->v[2] * pMat->m[2][2]
+            + pArg9->v[0] * pParent_mat->m[0][2] + pArg9->v[1] * pParent_mat->m[1][2] + pArg9->v[2] * pParent_mat->m[2][2];
+    }
 }
 
 #ifdef REC2_MATCHING
