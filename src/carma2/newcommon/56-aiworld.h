@@ -38,9 +38,9 @@ extern void C2_HOOK_FASTCALL PointActorAlongVectorWithUp(br_actor* pThe_actor, b
 
 extern br_material* C2_HOOK_FASTCALL CreateSimpleMaterial(int pIndex);
 
-// MakeAIEditCubeHere
+extern void C2_HOOK_FASTCALL MakeAIEditCubeHere(br_model* pModel, int pVertex_index, int pFace_index, const br_vector3* pPos, br_material* pMaterial_1, br_material* pMaterial_2, br_material* pMaterial_3);
 
-// CalcNegativeXVector
+extern void C2_HOOK_FASTCALL CalcNegativeXVector(br_vector3* pNegative_x_vector, const br_vector3* pStart, const br_vector3* pFinish, br_scalar pLength);
 
 extern void C2_HOOK_FASTCALL MakeAISimpleEditSectionHere(br_model* pModel, int pVertex_index, int pFace_index, const br_vector3* pStart, const br_vector3* pFinish, br_material* pMaterial_1, br_material* pMaterial_2);
 

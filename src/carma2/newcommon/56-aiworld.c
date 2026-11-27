@@ -124,9 +124,58 @@ br_material* C2_HOOK_FASTCALL CreateSimpleMaterial(int pIndex) {
     return material;
 }
 
-// MakeAIEditCubeHere
+// FUNCTION: CARMA2_HW 0x00401aa0
+// FUNCTION: CARMA2_SW 0x00401aa0
+// FUNCTION: CARMA2_CHEAT 0x00401aa0
+void C2_HOOK_FASTCALL MakeAIEditCubeHere(br_model* pModel, int pVertex_index, int pFace_index, const br_vector3* pPos, br_material* pMaterial_1, br_material* pMaterial_2, br_material* pMaterial_3) {
+    br_vector3 pos;
+    br_vector3 offsets[8];
 
-// CalcNegativeXVector
+    BrVector3Set(&offsets[0], 0.1f, 0.1f, 0.1f);
+    BrVector3Set(&offsets[1], 0.1f, -0.1f, 0.1f);
+    BrVector3Set(&offsets[2], -0.1f, -0.1f, 0.1f);
+    BrVector3Set(&offsets[3], -0.1f, 0.1f, 0.1f);
+    BrVector3Set(&offsets[4], 0.1f, 0.1f, -0.1f);
+    BrVector3Set(&offsets[5], 0.1f, -0.1f, -0.1f);
+    BrVector3Set(&offsets[6], -0.1f, -0.1f, -0.1f);
+    BrVector3Set(&offsets[7], -0.1f, 0.1f, -0.1f);
+    BrVector3Copy(&pos, pPos);
+    pos.v[1] += 0.15f;
+    MakeVertexAndOffsetIt(pos.v[0], pos.v[1], pos.v[2], pModel, pVertex_index, &offsets[0]);
+    MakeVertexAndOffsetIt(pos.v[0], pos.v[1], pos.v[2], pModel, pVertex_index + 1, &offsets[1]);
+    MakeVertexAndOffsetIt(pos.v[0], pos.v[1], pos.v[2], pModel, pVertex_index + 2, &offsets[2]);
+    MakeVertexAndOffsetIt(pos.v[0], pos.v[1], pos.v[2], pModel, pVertex_index + 3, &offsets[3]);
+    MakeVertexAndOffsetIt(pos.v[0], pos.v[1], pos.v[2], pModel, pVertex_index + 4, &offsets[4]);
+    MakeVertexAndOffsetIt(pos.v[0], pos.v[1], pos.v[2], pModel, pVertex_index + 5, &offsets[5]);
+    MakeVertexAndOffsetIt(pos.v[0], pos.v[1], pos.v[2], pModel, pVertex_index + 6, &offsets[6]);
+    MakeVertexAndOffsetIt(pos.v[0], pos.v[1], pos.v[2], pModel, pVertex_index + 7, &offsets[7]);
+    MakeFaceAndTextureIt(pModel, pFace_index, pVertex_index + 3, pVertex_index + 2, pVertex_index + 1, pMaterial_1);
+    MakeFaceAndTextureIt(pModel, pFace_index + 1, pVertex_index, pVertex_index + 3, pVertex_index + 1, pMaterial_1);
+    MakeFaceAndTextureIt(pModel, pFace_index + 2, pVertex_index + 1, pVertex_index + 5, pVertex_index + 4, pMaterial_2);
+    MakeFaceAndTextureIt(pModel, pFace_index + 3, pVertex_index + 1, pVertex_index + 4, pVertex_index, pMaterial_2);
+    MakeFaceAndTextureIt(pModel, pFace_index + 4, pVertex_index, pVertex_index + 4, pVertex_index + 3, pMaterial_3);
+    MakeFaceAndTextureIt(pModel, pFace_index + 5, pVertex_index + 3, pVertex_index + 4, pVertex_index + 7, pMaterial_3);
+    MakeFaceAndTextureIt(pModel, pFace_index + 6, pVertex_index + 4, pVertex_index + 5, pVertex_index + 7, pMaterial_1);
+    MakeFaceAndTextureIt(pModel, pFace_index + 7, pVertex_index + 5, pVertex_index + 6, pVertex_index + 7, pMaterial_1);
+    MakeFaceAndTextureIt(pModel, pFace_index + 8, pVertex_index + 2, pVertex_index + 7, pVertex_index + 6, pMaterial_2);
+    MakeFaceAndTextureIt(pModel, pFace_index + 9, pVertex_index + 2, pVertex_index + 3, pVertex_index + 7, pMaterial_2);
+    MakeFaceAndTextureIt(pModel, pFace_index + 10, pVertex_index + 1, pVertex_index + 2, pVertex_index + 6, pMaterial_3);
+    MakeFaceAndTextureIt(pModel, pFace_index + 11, pVertex_index + 1, pVertex_index + 6, pVertex_index + 5, pMaterial_3);
+}
+
+// FUNCTION: CARMA2_HW 0x00401fe0
+// FUNCTION: CARMA2_SW 0x00401fe0
+// FUNCTION: CARMA2_CHEAT 0x00401fe0
+void C2_HOOK_FASTCALL CalcNegativeXVector(br_vector3* pNegative_x_vector, const br_vector3* pStart, const br_vector3* pFinish, br_scalar pLength) {
+    br_vector3 positive_y_vector;
+    br_vector3 path_vector;
+
+    BrVector3Sub(&path_vector, pFinish, pStart);
+    BrVector3Set(&positive_y_vector, 0.0f, 1.0f, 0.0f);
+    BrVector3Cross(pNegative_x_vector, &path_vector, &positive_y_vector);
+    BrVector3Normalise(pNegative_x_vector, pNegative_x_vector);
+    BrVector3Scale(pNegative_x_vector, pNegative_x_vector, pLength);
+}
 
 // FUNCTION: CARMA2_HW 0x004020e0
 // FUNCTION: CARMA2_SW 0x004020e0
