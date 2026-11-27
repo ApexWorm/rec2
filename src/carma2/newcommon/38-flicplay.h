@@ -135,6 +135,10 @@ extern void C2_HOOK_FASTCALL ProcessFlicQueue(tU32 pInterval);
 
 extern void C2_HOOK_FASTCALL FlushFlicQueue(void);
 
+extern void C2_HOOK_FASTCALL AddToFlicQueue(int pIndex, int pX, int pY, int pMust_finish);
+
+extern void C2_HOOK_FASTCALL InitialiseFlicPanel(int pIndex, int pLeft, int pTop, int pWidth, int pHeight);
+
 extern void C2_HOOK_FASTCALL DisposeFlicPanel(int pIndex);
 
 extern br_pixelmap* C2_HOOK_FASTCALL GetPanelPixelmap(int pPanel_index);
