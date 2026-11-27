@@ -214,8 +214,8 @@ tPhysicsError C2_HOOK_FASTCALL GetPointSample(br_model* pModel, int pCount, int*
                 }
             }
         }
-        sum_i = 0.f;
-        sum_j = 0.f;
+        sum_i = 0.0f;
+        sum_j = 0.0f;
         for (k = 0; k < count; k++) {
             if (!removed[k] && k != best_i && k != best_j) {
                 if (k < best_i) {
