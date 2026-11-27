@@ -1130,12 +1130,16 @@ inline void C2_HOOK_FASTCALL MakePartPhysicallyActive(tPhysics_object* pObject, 
     PHILSetObjectProperty(pObject, 5, 0);
 }
 
-inline void C2_HOOK_FASTCALL TurnPhysicsOn(tPed_character_instance* pCharacter) {
+inline tPhysics_object* C2_HOOK_FASTCALL TurnPhysicsOn(tPed_character_instance* pCharacter) {
     tPhysics_object* object;
 
+    if (pCharacter->field_0x14 & 0x4) {
+        return NULL;
+    }
     object = (pCharacter->field_0x14 & 0x1) ? pCharacter->personality->form->simple_physicing[(tS8)pCharacter->field_0x5].collision_info : GetRootObject(pCharacter);
     MakePartPhysicallyActive(object, &pCharacter->field_0xd8);
     pCharacter->field_0x14 |= 0x4;
+    return object;
 }
 
 inline int C2_HOOK_FASTCALL MakeCharacterPhysicworthy(tPed_character_instance* pCharacter) {
@@ -1427,11 +1431,21 @@ int C2_HOOK_FASTCALL GetCharacterModelSet(tPed_character_instance* pCharacter) {
     return pCharacter->field_0xa;
 }
 
-// STUB: CARMA2_HW 0x0040b620
-// STUB: CARMA2_SW 0x0040b610
-// STUB: CARMA2_CHEAT 0x0040b690
+// FUNCTION: CARMA2_HW 0x0040b620
+// FUNCTION: CARMA2_SW 0x0040b610
+// FUNCTION: CARMA2_CHEAT 0x0040b690
 int C2_HOOK_FASTCALL BonerPassiveCollision(tPed_character_instance* pCharacter, tPhysics_object* pOther) {
-    NOT_IMPLEMENTED();
+    tPhysics_object* object;
+
+    if (pCharacter->field_0x14 == 0) {
+        return 1;
+    }
+    object = TurnPhysicsOn(pCharacter);
+    pCharacter->field_0x14 |= 0x4;
+    if (gPed_vtable->passive_collision != NULL) {
+        gPed_vtable->passive_collision(pCharacter, object, pOther);
+    }
+    return 0;
 }
 
 // FUNCTION: CARMA2_HW 0x0040b760
@@ -1442,11 +1456,21 @@ int C2_HOOK_FASTCALL BonerActiveHalted(tPed_character_instance* pCharacter) {
     return BonerActiveHalted2(pCharacter, 0);
 }
 
-// STUB: CARMA2_HW 0x0040b770
-// STUB: CARMA2_SW 0x0040b760
-// STUB: CARMA2_CHEAT 0x0040b7f0
+// FUNCTION: CARMA2_HW 0x0040b770
+// FUNCTION: CARMA2_SW 0x0040b760
+// FUNCTION: CARMA2_CHEAT 0x0040b7f0
 void C2_HOOK_FASTCALL BonerPedMovedByPhysics(tPed_character_instance* pCharacter, undefined4 pArg2) {
-    NOT_IMPLEMENTED();
+    tPhysics_object* object;
+
+    if (pCharacter->field_0x14 & 0x1) {
+        RecalculateOrientationOfRoot(pCharacter);
+        SetCharacterBonePositions(pCharacter, 3, 0);
+        object = pCharacter->personality->form->simple_physicing[(tS8)pCharacter->field_0x5].collision_info;
+        BrVector3Copy(&pCharacter->field_0xd8, &object->v);
+        if (gPed_vtable->moved_by_physics != NULL) {
+            gPed_vtable->moved_by_physics(pCharacter, object, pArg2);
+        }
+    }
 }
 
 #ifdef REC2_MATCHING
