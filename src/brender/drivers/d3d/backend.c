@@ -1061,6 +1061,7 @@ HRESULT CALLBACK D3DEnumTextureFormats(LPDDSURFACEDESC lpDdsd, LPVOID lpContext)
 #else
 #ifdef __GNUC__
 #pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wparentheses"
 #pragma GCC diagnostic ignored "-Wlogical-not-parentheses"
 #endif
     if (!lpDdsd->ddpfPixelFormat.dwFlags & DDPF_RGB) {
@@ -1104,6 +1105,8 @@ HRESULT CALLBACK D3DEnumTextureFormats(LPDDSURFACEDESC lpDdsd, LPVOID lpContext)
         }
         alp_bits >>= 1;
     }
+    /* The original builds format_str, but the message that printed it is gone */
+    (void)format_str;
     if (bit_count == 16 && alp_bit_mask == 0 && red_bit_mask == 0x7c00 && grn_bit_mask == 0x03e0 && blu_bit_mask == 0x001f) {
         gAvailable_pixel_formats |= 0x2;
         memcpy(&gAvailable_RGB555_texture_format_description, lpDdsd, sizeof(*lpDdsd));
