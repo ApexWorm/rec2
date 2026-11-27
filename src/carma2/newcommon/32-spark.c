@@ -1984,8 +1984,8 @@ void C2_HOOK_FASTCALL ClearSplashes(tPhysics_object* pObject) {
     void* subject;
     int i;
 
-    if (pObject->water_d != 10000.f) {
-        pObject->water_d = 10000.f;
+    if (pObject->water_d != 10000.0f) {
+        pObject->water_d = 10000.0f;
         subject = GetSplashIndex(pObject);
         if (subject != NULL) {
             for (i = 0; i < (int)REC2_ASIZE(gReplay_splashes); i++) {
