@@ -452,9 +452,9 @@ void C2_HOOK_FASTCALL DRMatrix34Rotate(br_matrix34* mat, br_angle r, br_vector3*
     mat->m[1][2] = sx + tyz;
     mat->m[2][0] = sy + txz;
     mat->m[2][1] = tyz - sx;
-    mat->m[3][2] = 0.f;
-    mat->m[3][1] = 0.f;
-    mat->m[3][0] = 0.f;
+    mat->m[3][2] = 0.0f;
+    mat->m[3][1] = 0.0f;
+    mat->m[3][0] = 0.0f;
     mat->m[2][2] = c + t * (a->v[2] * a->v[2]);
 }
 
