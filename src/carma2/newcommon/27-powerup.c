@@ -338,7 +338,15 @@ inline void C2_HOOK_FASTCALL LosePowerup(tPowerup* pPowerup) {
     LosePowerupX(pPowerup, 1);
 }
 
-// LoseKeyboardPowerupN
+inline void C2_HOOK_FASTCALL LoseKeyboardPowerupN(int pPowerup_index) {
+    int i;
+
+    for (i = 0; i < (int)REC2_ASIZE(gInventory); i++) {
+        if (gInventory[i] == pPowerup_index) {
+            gInventory[i] = -1;
+        }
+    }
+}
 
 // KeyboardPowerupFinished
 
@@ -2537,7 +2545,36 @@ int C2_HOOK_FASTCALL PedValium(tPowerup* pPowerup, tCar_spec* pCar) {
     }
 }
 
-// PowerupCancel
+// FUNCTION: CARMA2_HW 0x004dff30
+// FUNCTION: CARMA2_SW 0x004dc430
+// FUNCTION: CARMA2_CHEAT 0x004e5b10
+int C2_HOOK_FASTCALL PowerupCancel(tPowerup* pPowerup, tCar_spec* pCar) {
+    int i;
+    int cancelled;
+    tPowerup* the_powerup;
+
+    cancelled = 0;
+    if (pCar == NULL || pCar->driver != eDriver_local_human) {
+        return -1;
+    }
+    for (i = 0, the_powerup = gPowerup_array; i < gNumber_of_powerups; i++, the_powerup++) {
+        if (the_powerup->got_time != 0) {
+            LosePowerup(the_powerup);
+            cancelled = 1;
+        }
+    }
+    if (gMutant_tail_state == 2) {
+        LoseKeyboardPowerupN(95);
+        CutOffTail(&gPowerup_array[94], pCar);
+        cancelled = 1;
+    }
+    if (!cancelled) {
+        return -1;
+    }
+    NewTextHeadupSlot(4, 0, 3000, -4, GetMiscString(0x113));
+    DRS3StartSound2(gCar_outlet, 3802, 1, 255, 255, -1, -1);
+    return pPowerup - gPowerup_array;
+}
 
 // FUNCTION: CARMA2_HW 0x004e02b0
 // FUNCTION: CARMA2_SW 0x004dc7b0

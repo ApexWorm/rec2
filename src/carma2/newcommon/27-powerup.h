@@ -66,7 +66,7 @@ extern void C2_HOOK_FASTCALL LosePowerupX(tPowerup* pPowerup, int pTell_net_play
 
 extern void C2_HOOK_FASTCALL LosePowerup(tPowerup* pPowerup);
 
-// LoseKeyboardPowerupN
+extern void C2_HOOK_FASTCALL LoseKeyboardPowerupN(int pPowerup_index);
 
 // KeyboardPowerupFinished
 
@@ -408,11 +408,11 @@ extern void C2_HOOK_FASTCALL SetChangingPowerup(br_actor* pActor);
 
 extern int C2_HOOK_FASTCALL PedValium(tPowerup* pPowerup, tCar_spec* pCar);
 
-// PowerupCancel
+extern int C2_HOOK_FASTCALL PowerupCancel(tPowerup* pPowerup, tCar_spec* pCar);
 
 extern int C2_HOOK_FASTCALL GrowATail(tPowerup* pPowerup, tCar_spec* pCar);
 
-// CutOffTail
+extern int C2_HOOK_FASTCALL CutOffTail(tPowerup* pPowerup, tCar_spec* pCar);
 
 extern void C2_HOOK_FASTCALL RemoveTail(void);
 
