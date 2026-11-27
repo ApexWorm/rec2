@@ -1550,14 +1550,14 @@ br_uint_32 C2_HOOK_CDECL BrMaterialSaveMany(char* filename, br_material** materi
 #else
     FopWrite_FILE_INFO(df, FILE_TYPE_MATERIAL_OLD);
 #endif
-    if (materials == NULL) {
-        BrMaterialEnum(NULL, WriteMaterial, df);
-        count = BrMaterialCount(NULL);
-    } else {
+    if (materials != NULL) {
         for (i = 0; i < num; i++) {
             WriteMaterial(materials[i], df);
         }
         count = num;
+    } else {
+        BrMaterialEnum(NULL, WriteMaterial, df);
+        count = BrMaterialCount(NULL);
     }
     DfClose(df);
     return count;
