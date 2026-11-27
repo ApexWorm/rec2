@@ -31,7 +31,7 @@ extern void C2_HOOK_FASTCALL ResetPedFaceCache(void);
 
 // RecachePedestrian
 
-// SetCharacterDirectionAR
+extern void C2_HOOK_FASTCALL SetCharacterDirectionAR(tPed_character_instance* pPed, const br_vector3* pDir, const br_vector3* pUp);
 
 extern void C2_HOOK_FASTCALL PedApplyPedDir(tU32 pId, const br_vector3* pDir);
 
