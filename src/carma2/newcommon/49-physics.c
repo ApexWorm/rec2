@@ -1026,6 +1026,18 @@ void C2_HOOK_FASTCALL SimpleRotate(tPhysics_object* pObject, br_scalar pDt) {
     }
 }
 
+// FUNCTION: CARMA2_HW 0x004c27c0
+// FUNCTION: CARMA2_SW 0x004beef0
+// FUNCTION: CARMA2_CHEAT 0x004c82e0
+void C2_HOOK_FASTCALL FUN_004c27c0(tPhysics_object* pObject, br_scalar pDt) {
+    br_vector3 omega;
+
+    BrVector3Copy(&pObject->rotate_omega, &pObject->omega);
+    BrMatrix34ApplyV(&omega, &pObject->omega, &pObject->actor->t.t.mat);
+    SimpleRotate(pObject, pDt);
+    BrMatrix34TApplyV(&pObject->omega, &omega, &pObject->actor->t.t.mat);
+}
+
 // FUNCTION: CARMA2_HW 0x004c2830
 // FUNCTION: CARMA2_SW 0x004bef60
 // FUNCTION: CARMA2_CHEAT 0x004c8350
@@ -1038,6 +1050,9 @@ void C2_HOOK_FASTCALL InterpolateSingleObject(tPhysics_object* pObject, br_scala
     }
 }
 
+// FUNCTION: CARMA2_HW 0x004c28a0
+// FUNCTION: CARMA2_SW 0x004befd0
+// FUNCTION: CARMA2_CHEAT 0x004c83c0
 inline void C2_HOOK_FASTCALL InterpolateObjects(tPhysics_object* pList, br_scalar pDt) {
 
     for (; pList != NULL; pList = pList->next) {
