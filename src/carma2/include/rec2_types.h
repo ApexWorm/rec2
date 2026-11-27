@@ -2287,6 +2287,16 @@ typedef struct {
 } tQueued_headup;
 
 typedef struct {
+    float min_speed;
+    float max_speed;
+    float impactee_velocity_factor;
+    float random_velocity_max;
+    float random_up_velocity_max;
+    float random_normal_velocity_max;
+    float random_spin_rate_max;
+} tMovement_spec;
+
+typedef struct {
     br_actor* actor;
     tU32 time;
 } tDelayed_non_car_actor_item;
@@ -2294,7 +2304,7 @@ typedef struct {
 typedef struct {
     br_vector3 field_0x0;
     br_vector3 field_0xc;
-    undefined4* field_0x18;
+    tMovement_spec* field_0x18;
     int count_actions;
     tDelayed_non_car_actor_item actor_time_actions[20];
 } tDelayed_non_car;
@@ -3549,16 +3559,6 @@ typedef struct {
         br_vector3 box;
     } position;
 } tSmashable_initial_position_spec;
-
-typedef struct {
-    float min_speed;
-    float max_speed;
-    float impactee_velocity_factor;
-    float random_velocity_max;
-    float random_up_velocity_max;
-    float random_normal_velocity_max;
-    float random_spin_rate_max;
-} tMovement_spec;
 
 typedef struct tSmoke_fire_chance {
     int probability_fire;
