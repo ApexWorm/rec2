@@ -57,7 +57,7 @@ extern void C2_HOOK_FASTCALL DoActionReplay(tU32 pFrame_period);
 
 // PollActionReplayControls
 
-// CheckReplayTurnOn
+extern void C2_HOOK_FASTCALL CheckReplayTurnOn(void);
 
 extern void C2_HOOK_FASTCALL InitializeActionReplayPix(void);
 
@@ -71,7 +71,7 @@ extern void C2_HOOK_FASTCALL TurnOffActionReplay(void);
 
 extern void C2_HOOK_FASTCALL AfterActionReplay(void);
 
-// ToggleReplay
+extern void C2_HOOK_FASTCALL ToggleReplay(tU32* pFrame_period, tU32* pFrame_period_2);
 
 // DisplayMovieStatusPanel
 

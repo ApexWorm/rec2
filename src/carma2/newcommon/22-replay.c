@@ -258,8 +258,6 @@ void C2_HOOK_FASTCALL DoActionReplay(tU32 pFrame_period) {
 
 // PollActionReplayControls
 
-extern int C2_HOOK_FASTCALL ARToggleReplay(tTurn_on_AR_callback* pTurn_on_AR_cb, tTurn_off_AR_callback* pTurn_off_AR_cb, tAfter_AR_callback* pAfter_AR_cb, tReplay_session_callback* pZappy_AR_cb, tPreprocess_AR_callback* pPreprocess_cb, tPostProcess_AR_callback* pPostProcess_cb, tU32* pFrame_period, tU32* pFrame_period_2);
-
 // FUNCTION: CARMA2_HW 0x004e72e0
 // FUNCTION: CARMA2_CHEAT 0x004ecf80
 void C2_HOOK_FASTCALL ToggleReplay(tU32* pFrame_period, tU32* pFrame_period_2) {
