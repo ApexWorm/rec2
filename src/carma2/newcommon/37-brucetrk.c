@@ -502,7 +502,7 @@ void C2_HOOK_FASTCALL ExtractColumns(tTrack_spec* pTrack_spec) {
         single_column = 1;
         x = 1;
         z = 1;
-        extra_room = 0.f;
+        extra_room = 0.0f;
         pTrack_spec->count_non_cars = 0;
         break;
     }
@@ -510,8 +510,8 @@ void C2_HOOK_FASTCALL ExtractColumns(tTrack_spec* pTrack_spec) {
     pTrack_spec->ncolumns_z = z;
     room = extra_room;
     BrActorToBounds(&bounds, pTrack_spec->the_actor);
-    pTrack_spec->column_size_x = (bounds.max.v[0] - bounds.min.v[0] + 2.f * room) / pTrack_spec->ncolumns_x;
-    pTrack_spec->column_size_z = (bounds.max.v[2] - bounds.min.v[2] + 2.f * room) / pTrack_spec->ncolumns_z;
+    pTrack_spec->column_size_x = (bounds.max.v[0] - bounds.min.v[0] + 2.0f * room) / pTrack_spec->ncolumns_x;
+    pTrack_spec->column_size_z = (bounds.max.v[2] - bounds.min.v[2] + 2.0f * room) / pTrack_spec->ncolumns_z;
     pTrack_spec->origin_x = bounds.min.v[0] - room;
     pTrack_spec->origin_z = bounds.min.v[2] - room;
     AllocateActorMatrix(pTrack_spec, &pTrack_spec->columns);
