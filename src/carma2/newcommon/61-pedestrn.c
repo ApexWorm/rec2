@@ -492,11 +492,84 @@ int gPed_movements_count;
 tPed_movement_spec* gPed_movements;
 
 
+// GLOBAL: CARMA2_HW 0x007447b4
+// GLOBAL: CARMA2_SW 0x0073b274
+// GLOBAL: CARMA2_CHEAT 0x0074be54
+tPedestrian* gPedestrians_in_sight;
+
+// GLOBAL: CARMA2_HW 0x00694130
+// GLOBAL: CARMA2_SW 0x0068e188
+// GLOBAL: CARMA2_CHEAT 0x0069bca8
+tU32 gPed_last_munging;
+
+// GLOBAL: CARMA2_HW 0x006a042c
+// GLOBAL: CARMA2_SW 0x0069a484
+// GLOBAL: CARMA2_CHEAT 0x006a7fa4
+tU32 gLast_scare_time;
+
+// GLOBAL: CARMA2_HW 0x006a0428
+// GLOBAL: CARMA2_SW 0x0069a480
+// GLOBAL: CARMA2_CHEAT 0x006a7fa0
+tU32 gLast_bleed_giblet_time;
+
+// GLOBAL: CARMA2_HW 0x00694118
+// GLOBAL: CARMA2_SW 0x0068e170
+// GLOBAL: CARMA2_CHEAT 0x0069bc90
+float gPed_process_distance;
+
+// GLOBAL: CARMA2_HW 0x0069bc1c
+// GLOBAL: CARMA2_SW 0x00695c74
+// GLOBAL: CARMA2_CHEAT 0x006a3794
+float gPed_process_distance_inner;
+
+// GLOBAL: CARMA2_HW 0x006944bc
+// GLOBAL: CARMA2_SW 0x0068e514
+// GLOBAL: CARMA2_CHEAT 0x0069c034
+float gPed_popup_distance;
+
+// GLOBAL: CARMA2_HW 0x00694128
+// GLOBAL: CARMA2_SW 0x0068e180
+// GLOBAL: CARMA2_CHEAT 0x0069bca0
+float gPed_popup_distance_inner;
+
+// GLOBAL: CARMA2_HW 0x00694464
+// GLOBAL: CARMA2_SW 0x0068e4bc
+// GLOBAL: CARMA2_CHEAT 0x0069bfdc
+float gPed_cos_max_slope;
+
+// GLOBAL: CARMA2_HW 0x00694300
+// GLOBAL: CARMA2_SW 0x0068e358
+// GLOBAL: CARMA2_CHEAT 0x0069be78
+float gPed_min_dist_avoid_collisions_squared;
+
+// GLOBAL: CARMA2_HW 0x0069413c
+// GLOBAL: CARMA2_SW 0x0068e194
+// GLOBAL: CARMA2_CHEAT 0x0069bcb4
+float gPed_reach_squared;
+
+// GLOBAL: CARMA2_HW 0x00694328
+// GLOBAL: CARMA2_SW 0x0068e380
+// GLOBAL: CARMA2_CHEAT 0x0069bea0
+tPed_cache_006944c0 gPed_cache_00694328;
+
 // ClearOutMorphs
 
 // InitBoner
 
-// DRVector3SafeCross
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_HW 0x00403f90
+// STUB: CARMA2_SW 0x00403f90
+// STUB: CARMA2_CHEAT 0x00403f90
+void C2_HOOK_FASTCALL DRVector3SafeCross(br_vector3* pDest, const br_vector3* pA, const br_vector3* pB) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // DRVector3SafeCrossXZ
 
@@ -942,7 +1015,12 @@ int C2_HOOK_FASTCALL MakeCharacterRenderable(tPed_character_instance* pCharacter
     return MakeCharacterRenderable2(pCharacter, i);
 }
 
-// CharacterNoLongerRenderable
+// STUB: CARMA2_HW 0x00408400
+// STUB: CARMA2_SW 0x00408400
+// STUB: CARMA2_CHEAT 0x00408400
+int C2_HOOK_FASTCALL CharacterNoLongerRenderable(tPed_character_instance* pCharacter) {
+    NOT_IMPLEMENTED();
+}
 
 // FUNCTION: CARMA2_HW 0x004087b0
 // FUNCTION: CARMA2_SW 0x004087b0
@@ -1189,7 +1267,12 @@ void C2_HOOK_FASTCALL StopCharacterMorphing(tPed_character_instance* pCharacter)
 
 // StopCharacterMove
 
-// MungeCharacterAnimation
+// STUB: CARMA2_HW 0x00409ca0
+// STUB: CARMA2_SW 0x00409ca0
+// STUB: CARMA2_CHEAT 0x00409d10
+void C2_HOOK_FASTCALL MungeCharacterAnimation(tPed_character_instance* pCharacter, tU32 pTime, int pArg3) {
+    NOT_IMPLEMENTED();
+}
 
 // SetOnGroundVector
 

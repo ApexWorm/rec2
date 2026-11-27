@@ -84,11 +84,24 @@ extern tPed_face_cache_0x34* gPed_face_caches[4];
 extern int gPipe_halted_ped_status;
 extern int gPed_valium_left;
 
+extern tPedestrian* gPedestrians_in_sight;
+extern tU32 gPed_last_munging;
+extern tU32 gLast_scare_time;
+extern tU32 gLast_bleed_giblet_time;
+extern float gPed_process_distance;
+extern float gPed_process_distance_inner;
+extern float gPed_popup_distance;
+extern float gPed_popup_distance_inner;
+extern float gPed_cos_max_slope;
+extern float gPed_min_dist_avoid_collisions_squared;
+extern float gPed_reach_squared;
+extern tPed_cache_006944c0 gPed_cache_00694328;
+
 // ClearOutMorphs
 
 // InitBoner
 
-// DRVector3SafeCross
+extern void C2_HOOK_FASTCALL DRVector3SafeCross(br_vector3* pDest, const br_vector3* pA, const br_vector3* pB);
 
 // DRVector3SafeCrossXZ
 
@@ -160,7 +173,7 @@ extern int C2_HOOK_FASTCALL MakeCharacterRenderable2(tPed_character_instance* pC
 
 extern int C2_HOOK_FASTCALL MakeCharacterRenderable(tPed_character_instance* pCharacter);
 
-// CharacterNoLongerRenderable
+extern int C2_HOOK_FASTCALL CharacterNoLongerRenderable(tPed_character_instance* pCharacter);
 
 extern void C2_HOOK_FASTCALL CalcCollisionObjectThings(tPhysics_object* pObject, br_bounds3* pFrame, int pNull, br_vector3* pBoneVec, br_vector3* pBonePtr);
 
@@ -202,7 +215,7 @@ extern void C2_HOOK_FASTCALL StopCharacterMorphing(tPed_character_instance* pCha
 
 // StopCharacterMove
 
-// MungeCharacterAnimation
+extern void C2_HOOK_FASTCALL MungeCharacterAnimation(tPed_character_instance* pCharacter, tU32 pTime, int pArg3);
 
 // SetOnGroundVector
 
