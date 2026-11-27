@@ -423,7 +423,12 @@ void C2_HOOK_FASTCALL CreateShrapnelShowerWorld(const br_vector3* pPosition, con
     CreateShrapnelShower2(pPosition, pVelocity, pDirection, pStrength, NULL, NULL, pMaterialCount, pMaterials);
 }
 
-// CreateShrapnelShower
+// FUNCTION: CARMA2_HW 0x004f8b70
+// FUNCTION: CARMA2_SW 0x004f41f0
+// FUNCTION: CARMA2_CHEAT 0x004fe810
+void C2_HOOK_FASTCALL CreateShrapnelShower(const br_vector3* pPosition, const br_vector3* pVelocity, const br_vector3* pDirection, br_scalar pStrength, tCar_spec* pCar1, tCar_spec* pCar2) {
+    CreateShrapnelShower2(pPosition, pVelocity, pDirection, pStrength, pCar1, pCar2, 0, NULL);
+}
 
 // random
 

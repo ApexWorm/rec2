@@ -87,7 +87,7 @@ extern void C2_HOOK_FASTCALL CreateShrapnelShower2(const br_vector3* pPosition, 
 
 extern void C2_HOOK_FASTCALL CreateShrapnelShowerWorld(const br_vector3* pPosition, const br_vector3* pVelocity, const br_vector3* pDirection, br_scalar pStrength, int pMaterialCount, br_material** pMaterials);
 
-// CreateShrapnelShower
+extern void C2_HOOK_FASTCALL CreateShrapnelShower(const br_vector3* pPosition, const br_vector3* pVelocity, const br_vector3* pDirection, br_scalar pStrength, tCar_spec* pCar1, tCar_spec* pCar2);
 
 // random
 
