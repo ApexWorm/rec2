@@ -333,17 +333,48 @@ int C2_HOOK_FASTCALL GetHierarchyNetworkStuff(tPhysics_object* pObject, tU8* pBu
     return size;
 }
 
-// FindObject
+inline tPhysics_object* C2_HOOK_FASTCALL FindObject(tPhysics_object* pParent, tU8 pUid) {
+    tPhysics_object* child;
+
+    if (pParent == NULL) {
+        return NULL;
+    }
+    for (child = pParent->child; child != NULL; child = child->next) {
+        if (child->uid == pUid) {
+            return child;
+        }
+    }
+    return NULL;
+}
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x0049cd90
-// STUB: CARMA2_SW 0x00498f10
-// STUB: CARMA2_CHEAT 0x0049d140
-int C2_HOOK_FASTCALL WriteHierarchyNetworkStuff(tU8* pBuffer, tPhysics_object* pObject, int pArg3) {
-    NOT_IMPLEMENTED();
+// FUNCTION: CARMA2_HW 0x0049cd90
+// FUNCTION: CARMA2_SW 0x00498f10
+// FUNCTION: CARMA2_CHEAT 0x0049d140
+int C2_HOOK_FASTCALL WriteHierarchyNetworkStuff(tU8* pBuffer, tPhysics_object* pObject, int pMode) {
+    int size;
+    tU8* child_buffer;
+    tPhysics_object* child;
+    tU8 more;
+
+    if (pObject != NULL && pBuffer[1] != pObject->uid) {
+        PhysicsError(ePhysicsError_error9, "netphys got messed up");
+    }
+    size = WriteObjectNetworkStuff(pBuffer, pObject, pMode);
+    more = *pBuffer & 0x80;
+    while (more != 0) {
+        child_buffer = pBuffer + size;
+        child = FindObject(pObject, child_buffer[1]);
+        size += WriteHierarchyNetworkStuff(child_buffer, FindObject(pObject, child_buffer[1]), pMode);
+        if (child != NULL) {
+            child->field_0xf0 = pObject->field_0xf0;
+        }
+        more = *child_buffer & 0x40;
+    }
+    return size;
 }
 
 #ifdef REC2_MATCHING

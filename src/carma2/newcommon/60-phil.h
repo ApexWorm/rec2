@@ -49,9 +49,9 @@ extern int C2_HOOK_FASTCALL WriteObjectNetworkStuff(const tU8* pBuffer, tPhysics
 
 extern int C2_HOOK_FASTCALL GetHierarchyNetworkStuff(tPhysics_object* pObject, tU8* pBuffer, int pSize);
 
-// FindObject
+extern tPhysics_object* C2_HOOK_FASTCALL FindObject(tPhysics_object* pParent, tU8 pUid);
 
-extern int C2_HOOK_FASTCALL WriteHierarchyNetworkStuff(tU8* pBuffer, tPhysics_object* pObject, int pArg3);
+extern int C2_HOOK_FASTCALL WriteHierarchyNetworkStuff(tU8* pBuffer, tPhysics_object* pObject, int pMode);
 
 extern int C2_HOOK_FASTCALL GetHierarchyNetworkSize(tPhysics_object* pObject);
 
