@@ -1901,7 +1901,13 @@ void C2_HOOK_FASTCALL RenderLimbs(void) {
     gPed_count_limbed_actors = 0;
 }
 
-// MungePedestrians
+// STUB: CARMA2_HW 0x004d3740
+// STUB: CARMA2_SW 0x004cfe30
+// STUB: CARMA2_CHEAT 0x004d9300
+void C2_HOOK_FASTCALL MungePedestrians(tU32 pFrame_period) {
+
+    NOT_IMPLEMENTED();
+}
 
 // FUN_1011cb0c
 
