@@ -4596,6 +4596,13 @@ typedef struct {
     int type;
 } tPhysics_joint_force;
 
+typedef struct tPhysics_quick_hinge {
+    tU32 field_0x0;
+    tPhysics_object* partner;
+    br_matrix34 field_0x8;
+    br_matrix34 field_0x38;
+} tPhysics_quick_hinge;
+
 typedef struct tPhysics_workspace {
     int count;
     tPhysics_joint_force* forces;
@@ -4653,7 +4660,7 @@ typedef struct tPhysics_object {
     undefined field_0x1df;
     tU8 field_0x1e0;
     undefined field_0x1e1[3];
-    undefined4 field_0x1e4;
+    tPhysics_quick_hinge* field_0x1e4;
     br_matrix34 field_0x1e8;
     struct tPhysics_workspace* field_0x218;
     float field_0x21c;

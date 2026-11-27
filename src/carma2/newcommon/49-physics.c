@@ -776,7 +776,7 @@ int C2_HOOK_FASTCALL CountJointForces(tPhysics_object* pObject, tPhysics_object*
 
     joint = pObject->physics_joint1;
     pObject->field_0x230 = pParent;
-    pObject->field_0x1e4 = 0;
+    pObject->field_0x1e4 = NULL;
     if (joint != NULL && !(pObject->flags & 0x400)) {
         switch (joint->type) {
         case eJoint_none:
@@ -789,10 +789,10 @@ int C2_HOOK_FASTCALL CountJointForces(tPhysics_object* pObject, tPhysics_object*
             count = 3;
             break;
         case eJoint_quick_hinge:
-            if (pParent->field_0x1e4 == 0) {
+            if (pParent->field_0x1e4 == NULL) {
                 count = 2;
-                pObject->field_0x1e4 = -1;
-                pParent->field_0x1e4 = -1;
+                pObject->field_0x1e4 = (tPhysics_quick_hinge*)-1;
+                pParent->field_0x1e4 = (tPhysics_quick_hinge*)-1;
                 break;
             }
             joint->type = eJoint_hinge;
@@ -1127,9 +1127,188 @@ void C2_HOOK_FASTCALL SetUpForce(br_vector3* pAngular, br_vector3* pLinear, cons
     BrVector3Scale(pLinear, pDirection, inverse_mass);
 }
 
-// SetUpTorqueHingePartners
+// FUNCTION: CARMA2_HW 0x004be550
+// FUNCTION: CARMA2_SW 0x004bac70
+// FUNCTION: CARMA2_CHEAT 0x004c4080
+tPhysics_object* C2_HOOK_FASTCALL SetUpTorqueHingePartners(br_vector3* pAngular, br_vector3* pLinear, br_vector3* pPartner_angular, br_vector3* pPartner_linear, const br_vector3* pTorque, tPhysics_object* pObject) {
+    tPhysics_object* partner;
+    tPhysics_joint* joint;
+    br_vector3 lever;
+    br_vector3 cross;
+    br_vector3 rhs;
+    br_vector3 response;
+    br_vector3 rotated;
+    br_vector3 force;
+    br_vector3 temp;
+    br_scalar factor;
+    int i;
 
-// SetUpHingePartners
+    if (!(pObject->flags & 0x800)) {
+        for (i = 0; i < 3; i++) {
+            pAngular->v[i] = pTorque->v[i] / pObject->I.v[i];
+        }
+    } else {
+        BrVector3Set(pAngular, 0.0f, 0.0f, 0.0f);
+    }
+    if (pObject->field_0x1e4 == NULL) {
+        BrVector3SetFloat(pLinear, 0.0f, 0.0f, 0.0f);
+        return NULL;
+    }
+    partner = pObject->field_0x1e4->partner;
+    if (partner == pObject->field_0x230) {
+        joint = pObject->physics_joint1;
+        BrVector3Sub(&lever, &joint->field_0x08, &pObject->cmpos);
+        BrVector3Cross(&cross, pAngular, &lever);
+        rhs.v[0] = -BrVector3Dot(&cross, &joint->hinge_axis);
+        rhs.v[1] = -BrVector3Dot(&joint->hinge_axis2, pAngular);
+        rhs.v[2] = -BrVector3Dot(&joint->hinge_axis3, pAngular);
+        BrMatrix34ApplyV(&response, &rhs, &pObject->field_0x1e4->field_0x8);
+        factor = response.v[0] / pObject->M;
+        BrVector3Scale(pLinear, &joint->hinge_axis, factor);
+        factor = -(response.v[0] / partner->M);
+        BrVector3Scale(pPartner_linear, &joint->parent_bone_axis, factor);
+        for (i = 0; i < 3; i++) {
+            rotated.v[i] = joint->hinge_axis2.v[i] * response.v[1] + joint->hinge_axis3.v[i] * response.v[2];
+        }
+        BrVector3Scale(&force, &joint->hinge_axis, response.v[0]);
+        BrVector3Cross(&temp, &lever, &force);
+        BrVector3Accumulate(&temp, &rotated);
+        for (i = 0; i < 3; i++) {
+            pAngular->v[i] += temp.v[i] / pObject->I.v[i];
+        }
+        BrMatrix34ApplyV(&temp, &rotated, &pObject->transform_matrix);
+        BrMatrix34TApplyV(pPartner_angular, &temp, &partner->transform_matrix);
+        BrVector3Scale(&force, &joint->parent_bone_axis, response.v[0]);
+        BrVector3Sub(&lever, &joint->field_0x14, &partner->cmpos);
+        BrVector3Cross(&temp, &lever, &force);
+        BrVector3Accumulate(pPartner_angular, &temp);
+        for (i = 0; i < 3; i++) {
+            pPartner_angular->v[i] = -(pPartner_angular->v[i] / partner->I.v[i]);
+        }
+        return partner;
+    }
+    joint = partner->physics_joint1;
+    BrVector3Sub(&lever, &joint->field_0x14, &pObject->cmpos);
+    BrVector3Cross(&cross, pAngular, &lever);
+    rhs.v[0] = BrVector3Dot(&cross, &joint->parent_bone_axis);
+    BrMatrix34ApplyV(&rotated, pAngular, &pObject->transform_matrix);
+    BrMatrix34TApplyV(&temp, &rotated, &partner->transform_matrix);
+    rhs.v[1] = BrVector3Dot(&joint->hinge_axis2, &temp);
+    rhs.v[2] = BrVector3Dot(&joint->hinge_axis3, &temp);
+    BrMatrix34ApplyV(&response, &rhs, &partner->field_0x1e4->field_0x8);
+    factor = response.v[0] / partner->M;
+    BrVector3Scale(pPartner_linear, &joint->hinge_axis, factor);
+    factor = -(response.v[0] / pObject->M);
+    BrVector3Scale(pLinear, &joint->parent_bone_axis, factor);
+    for (i = 0; i < 3; i++) {
+        pPartner_angular->v[i] = joint->hinge_axis2.v[i] * response.v[1] + joint->hinge_axis3.v[i] * response.v[2];
+    }
+    BrMatrix34ApplyV(&temp, pPartner_angular, &partner->transform_matrix);
+    BrMatrix34TApplyV(&rotated, &temp, &pObject->transform_matrix);
+    BrVector3Scale(&force, &joint->parent_bone_axis, response.v[0]);
+    BrVector3Cross(&temp, &lever, &force);
+    BrVector3Accumulate(&rotated, &temp);
+    BrVector3Scale(&force, &joint->hinge_axis, response.v[0]);
+    BrVector3Sub(&lever, &joint->field_0x08, &partner->cmpos);
+    BrVector3Cross(&temp, &lever, &force);
+    BrVector3Accumulate(pPartner_angular, &temp);
+    for (i = 0; i < 3; i++) {
+        pAngular->v[i] -= rotated.v[i] / pObject->I.v[i];
+    }
+    for (i = 0; i < 3; i++) {
+        pPartner_angular->v[i] /= partner->I.v[i];
+    }
+    return partner;
+}
+
+// FUNCTION: CARMA2_HW 0x004becf0
+// FUNCTION: CARMA2_SW 0x004bb400
+// FUNCTION: CARMA2_CHEAT 0x004c4820
+tPhysics_object* C2_HOOK_FASTCALL SetUpHingePartners(br_vector3* pAngular, br_vector3* pLinear, br_vector3* pPartner_angular, br_vector3* pPartner_linear, tPhysics_object* pObject) {
+    tPhysics_object* partner;
+    tPhysics_joint* joint;
+    br_vector3 lever;
+    br_vector3 velocity;
+    br_vector3 rhs;
+    br_vector3 response;
+    br_vector3 rotated;
+    br_vector3 force;
+    br_vector3 temp;
+    br_scalar factor;
+    int i;
+
+    partner = pObject->field_0x1e4->partner;
+    if (partner == pObject->field_0x230) {
+        joint = pObject->physics_joint1;
+        BrVector3Sub(&lever, &joint->field_0x08, &pObject->cmpos);
+        BrVector3Cross(&velocity, pAngular, &lever);
+        BrVector3Accumulate(&velocity, pLinear);
+        rhs.v[0] = -BrVector3Dot(&joint->hinge_axis, &velocity);
+        rhs.v[1] = -BrVector3Dot(&joint->hinge_axis2, pAngular);
+        rhs.v[2] = -BrVector3Dot(&joint->hinge_axis3, pAngular);
+        BrMatrix34ApplyV(&response, &rhs, &pObject->field_0x1e4->field_0x8);
+        factor = response.v[0] / pObject->M;
+        for (i = 0; i < 3; i++) {
+            pLinear->v[i] += joint->hinge_axis.v[i] * factor;
+        }
+        factor = -(response.v[0] / partner->M);
+        BrVector3Scale(pPartner_linear, &joint->parent_bone_axis, factor);
+        for (i = 0; i < 3; i++) {
+            rotated.v[i] = joint->hinge_axis2.v[i] * response.v[1] + joint->hinge_axis3.v[i] * response.v[2];
+        }
+        BrVector3Scale(&force, &joint->hinge_axis, response.v[0]);
+        BrVector3Cross(&temp, &lever, &force);
+        BrVector3Accumulate(&temp, &rotated);
+        for (i = 0; i < 3; i++) {
+            pAngular->v[i] += temp.v[i] / pObject->I.v[i];
+        }
+        BrMatrix34ApplyV(&temp, &rotated, &pObject->transform_matrix);
+        BrMatrix34TApplyV(pPartner_angular, &temp, &partner->transform_matrix);
+        BrVector3Scale(&force, &joint->parent_bone_axis, response.v[0]);
+        BrVector3Sub(&lever, &joint->field_0x14, &partner->cmpos);
+        BrVector3Cross(&temp, &lever, &force);
+        BrVector3Accumulate(pPartner_angular, &temp);
+        for (i = 0; i < 3; i++) {
+            pPartner_angular->v[i] = -(pPartner_angular->v[i] / partner->I.v[i]);
+        }
+        return partner;
+    }
+    joint = partner->physics_joint1;
+    BrVector3Sub(&lever, &joint->field_0x14, &pObject->cmpos);
+    BrVector3Cross(&velocity, pAngular, &lever);
+    BrVector3Accumulate(&velocity, pLinear);
+    rhs.v[0] = BrVector3Dot(&joint->parent_bone_axis, &velocity);
+    BrMatrix34ApplyV(&rotated, pAngular, &pObject->transform_matrix);
+    BrMatrix34TApplyV(&temp, &rotated, &partner->transform_matrix);
+    rhs.v[1] = BrVector3Dot(&joint->hinge_axis2, &temp);
+    rhs.v[2] = BrVector3Dot(&joint->hinge_axis3, &temp);
+    BrMatrix34ApplyV(&response, &rhs, &partner->field_0x1e4->field_0x8);
+    factor = response.v[0] / partner->M;
+    BrVector3Scale(pPartner_linear, &joint->hinge_axis, factor);
+    factor = -(response.v[0] / pObject->M);
+    for (i = 0; i < 3; i++) {
+        pLinear->v[i] += joint->parent_bone_axis.v[i] * factor;
+    }
+    for (i = 0; i < 3; i++) {
+        pPartner_angular->v[i] = joint->hinge_axis2.v[i] * response.v[1] + joint->hinge_axis3.v[i] * response.v[2];
+    }
+    BrMatrix34ApplyV(&temp, pPartner_angular, &partner->transform_matrix);
+    BrMatrix34TApplyV(&rotated, &temp, &pObject->transform_matrix);
+    BrVector3Scale(&force, &joint->parent_bone_axis, response.v[0]);
+    BrVector3Cross(&temp, &lever, &force);
+    BrVector3Accumulate(&rotated, &temp);
+    BrVector3Scale(&force, &joint->hinge_axis, response.v[0]);
+    BrVector3Sub(&lever, &joint->field_0x08, &partner->cmpos);
+    BrVector3Cross(&temp, &lever, &force);
+    BrVector3Accumulate(pPartner_angular, &temp);
+    for (i = 0; i < 3; i++) {
+        pAngular->v[i] -= rotated.v[i] / pObject->I.v[i];
+    }
+    for (i = 0; i < 3; i++) {
+        pPartner_angular->v[i] /= partner->I.v[i];
+    }
+    return partner;
+}
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
