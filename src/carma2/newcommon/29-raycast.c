@@ -268,7 +268,7 @@ int C2_HOOK_FASTCALL DRModelPick2D_raycast(br_model* pModel, br_material* pMater
             } else {
                 this_material = pMaterial;
             }
-            d = BrVector3Dot(&fp->eqn, pRay_dir);
+            d = fp->eqn.v[0] * pRay_dir->v[0] + fp->eqn.v[1] * pRay_dir->v[1] + fp->eqn.v[2] * pRay_dir->v[2];
             if ((float)fabs(d) < 2.3841858e-7f) {
                 continue;
             }
@@ -292,28 +292,24 @@ int C2_HOOK_FASTCALL DRModelPick2D_raycast(br_model* pModel, br_material* pMater
             if ((float)fabs(fp->eqn.v[2]) > (float)fabs(fp->eqn.v[axis_m])) {
                 axis_m = 2;
             }
-            switch (axis_m) {
-            case 0:
+            if (axis_m == 0) {
                 axis_0 = 1;
                 axis_1 = 2;
-                break;
-            case 1:
+            } else if (axis_m == 1) {
                 axis_0 = 0;
                 axis_1 = 2;
-                break;
-            case 2:
+            } else if (axis_m == 2) {
                 axis_0 = 0;
                 axis_1 = 1;
-                break;
             }
             v0 = V11MODEL(pModel)->groups[group].vertices[fp->vertices[0]].p.v[axis_0];
-            u0 = V11MODEL(pModel)->groups[group].vertices[fp->vertices[0]].p.v[axis_1];
             v1 = V11MODEL(pModel)->groups[group].vertices[fp->vertices[1]].p.v[axis_0] - v0;
-            u1 = V11MODEL(pModel)->groups[group].vertices[fp->vertices[1]].p.v[axis_1] - u0;
-            v2 = V11MODEL(pModel)->groups[group].vertices[fp->vertices[2]].p.v[axis_0] - v0;
-            u2 = V11MODEL(pModel)->groups[group].vertices[fp->vertices[2]].p.v[axis_1] - u0;
             v0i1 = p.v[axis_0] - v0;
+            v2 = V11MODEL(pModel)->groups[group].vertices[fp->vertices[2]].p.v[axis_0] - v0;
+            u0 = V11MODEL(pModel)->groups[group].vertices[fp->vertices[0]].p.v[axis_1];
+            u1 = V11MODEL(pModel)->groups[group].vertices[fp->vertices[1]].p.v[axis_1] - u0;
             v0i2 = p.v[axis_1] - u0;
+            u2 = V11MODEL(pModel)->groups[group].vertices[fp->vertices[2]].p.v[axis_1] - u0;
             if (fabs(v1) > 2.3841858e-7f) {
                 f_d = v0i2 * v1 - u1 * v0i1;
                 f_n = u2 * v1 - u1 * v2;
