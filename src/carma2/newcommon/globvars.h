@@ -14,7 +14,13 @@
 //#include "brender/br_types.h"
 #include "rec2_types.h"
 
+#ifdef REC2_CHEAT
+extern int gShow_timers;
+#endif
 extern int gApplicationDataTwtMounted;
+#ifdef REC2_CHEAT
+extern int gDebug_speedo_value;
+#endif
 extern int gWasted_explosion_chance;
 extern tExplosion_animation gExplosion_pix_animation_groups;
 extern tPath_name gApplication_path;

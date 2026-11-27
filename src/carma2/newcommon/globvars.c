@@ -14,10 +14,20 @@
 // GLOBAL: CARMA2_CHEAT 0x0067e1c8
 int gDisable_piped_sounds = 0;
 
+#ifdef REC2_CHEAT
+// GLOBAL: CARMA2_CHEAT 0x00693108
+int gShow_timers; /* FIXME: CHEAT-only, name unknown (toggled by a debug key in DoRace) */
+#endif
+
 // GLOBAL: CARMA2_HW 0x0068b868
 // GLOBAL: CARMA2_SW 0x00685dc8
 // GLOBAL: CARMA2_CHEAT 0x00693110
 int gApplicationDataTwtMounted;
+
+#ifdef REC2_CHEAT
+// GLOBAL: CARMA2_CHEAT 0x00769580
+int gDebug_speedo_value; /* FIXME: CHEAT-only, name unknown (set in DoRace) */
+#endif
 
 // GLOBAL: CARMA2_HW 0x0075ba60
 // GLOBAL: CARMA2_SW 0x00751fc0

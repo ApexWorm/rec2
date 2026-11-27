@@ -17,8 +17,10 @@
 #include "19-font.h"
 #include "25-grafdata.h"
 #include "41-utility.h"
+#include "42-input.h"
 #include "53-controls.h"
 #include "62-graphics3.h"
+#include "68-timer.h"
 #include "63-loading3.h"
 #include "70-packfile.h"
 #include "globvars.h"
@@ -519,8 +521,8 @@ void C2_HOOK_FASTCALL DoPSPowerupHeadups(void) {
     DoTestPowerHeadup(gProgram_state.current_car.power_up_levels[2], "O");
 }
 
+#ifdef REC2_HW
 // FUNCTION: CARMA2_HW 0x00449b10
-// FUNCTION: CARMA2_SW 0x00449b80
 // FUNCTION: CARMA2_CHEAT 0x0044a020
 void C2_HOOK_FASTCALL DoHeadups(tU32 pThe_time) {
     int i;
@@ -559,6 +561,11 @@ void C2_HOOK_FASTCALL DoHeadups(tU32 pThe_time) {
         }
     }
     the_headup = gHeadups;
+#ifdef REC2_CHEAT
+    if (gShow_timers) {
+        Timers_Draw(gBack_screen);
+    }
+#endif
     for (i = 0; i < (int)REC2_ASIZE(gHeadups); i++, the_headup++) {
         the_screen = gRender_screen;
         if (the_headup->type != eHeadup_unused
@@ -677,6 +684,8 @@ void C2_HOOK_FASTCALL DoHeadups(tU32 pThe_time) {
                             y_offset + the_headup->y + 60,
                             1);
                         break;
+                    default:
+                        break;
                     }
                 }
             } else {
@@ -685,6 +694,12 @@ void C2_HOOK_FASTCALL DoHeadups(tU32 pThe_time) {
         }
     }
 }
+#else
+// STUB: CARMA2_SW 0x00449b80
+void C2_HOOK_FASTCALL DoHeadups(tU32 pThe_time) {
+    NOT_IMPLEMENTED();
+}
+#endif
 
 // FUNCTION: CARMA2_HW 0x00449fa0
 // FUNCTION: CARMA2_SW 0x0044a130
@@ -1145,8 +1160,8 @@ void C2_HOOK_FASTCALL DoDamageScreen(tU32 pThe_time) {
     }
 }
 
+#ifdef REC2_HW
 // FUNCTION: CARMA2_HW 0x0044aad0
-// FUNCTION: CARMA2_SW 0x0044acc0
 // FUNCTION: CARMA2_CHEAT 0x0044aff0
 void C2_HOOK_FASTCALL DoInstruments(tU32 pThe_time) {
     char buffer[8];
@@ -1166,6 +1181,11 @@ void C2_HOOK_FASTCALL DoInstruments(tU32 pThe_time) {
         if (speed_mph < 0.0) {
             speed_mph = 0.0;
         }
+#ifdef REC2_CHEAT
+        if (PDKeyDown(0x20)) {
+            speed_mph = gDebug_speedo_value / 10;
+        }
+#endif
         if (gHeadup_detail_level == 0 || gHeadup_detail_level == 3) {
             if (!gAction_replay_mode) {
                 sprintf(buffer, "%03i", (int)speed_mph);
@@ -1283,6 +1303,12 @@ void C2_HOOK_FASTCALL DoInstruments(tU32 pThe_time) {
             gProgram_state.current_car.speedo_needle_colour[gProgram_state.cockpit_on]);
     }
 }
+#else
+// STUB: CARMA2_SW 0x0044acc0
+void C2_HOOK_FASTCALL DoInstruments(tU32 pThe_time) {
+    NOT_IMPLEMENTED();
+}
+#endif
 
 // FUNCTION: CARMA2_HW 0x0044b050
 // FUNCTION: CARMA2_SW 0x0044b1e0
