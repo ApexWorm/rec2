@@ -228,6 +228,7 @@ void C2_HOOK_FASTCALL SkipBytes(FILE* pF, int pBytes_to_skip) {
 
 // FUNCTION: CARMA2_HW 0x0048fa00
 // FUNCTION: CARMA2_SW 0x0048cc70
+// FUNCTION: CARMA2_CHEAT 0x0048fab0
 tU32 C2_HOOK_FASTCALL MemReadU32(char** pPtr) {
     tU32 raw_long;
 
@@ -239,6 +240,7 @@ tU32 C2_HOOK_FASTCALL MemReadU32(char** pPtr) {
 
 // FUNCTION: CARMA2_HW 0x0048fa10
 // FUNCTION: CARMA2_SW 0x0048cc80
+// FUNCTION: CARMA2_CHEAT 0x0048fac0
 tU16 C2_HOOK_FASTCALL MemReadU16(char** pPtr) {
     tU16 raw_short;
 
@@ -292,6 +294,7 @@ tS8 C2_HOOK_FASTCALL MemReadS8(char** pPtr) {
 
 // FUNCTION: CARMA2_HW 0x0048fa60
 // FUNCTION: CARMA2_SW 0x0048ccd0
+// FUNCTION: CARMA2_CHEAT 0x0048fb10
 void C2_HOOK_FASTCALL MemSkipBytes(char** pPtr, int pBytes_to_skip) {
 
     *pPtr += pBytes_to_skip;
