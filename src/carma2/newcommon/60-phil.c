@@ -204,11 +204,31 @@ int C2_HOOK_FASTCALL GetObjectNetworkStuff(tPhysics_object* pObject, tU8* pBuffe
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x0049cb00
-// STUB: CARMA2_SW 0x00498c80
-// STUB: CARMA2_CHEAT 0x0049ceb0
+// FUNCTION: CARMA2_HW 0x0049cb00
+// FUNCTION: CARMA2_SW 0x00498c80
+// FUNCTION: CARMA2_CHEAT 0x0049ceb0
 void C2_HOOK_FASTCALL GetVelocityAndPosition(tPhysics_object* pObject, br_matrix34* pMatrix, br_matrix34* pParent_matrix) {
-    NOT_IMPLEMENTED();
+    br_vector3 offset;
+    br_vector3 tv;
+    br_vector3 tv2;
+    br_vector3 joint_pos;
+
+    BrVector3Sub(&offset, &pObject->physics_joint1->field_0x08, &pObject->cmpos);
+    BrVector3Cross(&tv, &pObject->omega, &offset);
+    BrMatrix34ApplyV(&pObject->v, &tv, pMatrix);
+    if (pParent_matrix != NULL) {
+        BrVector3Sub(&offset, &pObject->physics_joint1->field_0x14, &pObject->parent->cmpos);
+        BrVector3Cross(&tv, &pObject->parent->omega, &offset);
+        BrMatrix34ApplyV(&tv2, &tv, pMatrix);
+        BrVector3Accumulate(&tv2, &pObject->parent->v);
+        BrVector3Accumulate(&pObject->v, &tv2);
+        BrMatrix34ApplyV(&tv, &pObject->physics_joint1->field_0x08, pMatrix);
+        BrMatrix34ApplyP(&joint_pos, &pObject->physics_joint1->field_0x14, pParent_matrix);
+        BrVector3Sub((br_vector3*)pMatrix->m[3], &joint_pos, &tv);
+    } else {
+        BrMatrix34ApplyV(&tv, &pObject->physics_joint1->field_0x08, pMatrix);
+        BrVector3Sub((br_vector3*)pMatrix->m[3], &pObject->field_0x17c, &tv);
+    }
 }
 
 #ifdef REC2_MATCHING
