@@ -29,6 +29,7 @@
 #include "63-loading3.h"
 #include "72-interface.h"
 #include "c2_stdio.h"
+#include "c2_string.h"
 #include "globvars.h"
 #include "globvrkm.h"
 #include "globvrpb.h"
