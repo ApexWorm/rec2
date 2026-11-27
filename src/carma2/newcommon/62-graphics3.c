@@ -687,7 +687,47 @@ void C2_HOOK_FASTCALL CalcMapCheckpoint2(br_pixelmap* pMap, int pCheckpoint, tU3
     checkpoint->map_position.v[1] += (float)gINT_0074abd0;
 }
 
-// DrawCheckpoint
+// FUNCTION: CARMA2_HW 0x004969e0
+// FUNCTION: CARMA2_CHEAT 0x00496d90
+void C2_HOOK_FASTCALL DrawCheckpoint(br_pixelmap* pMap, int pCheckpoint, tU32 pTime, int pTarget) {
+    // GLOBAL: CARMA2_HW 0x0068d8e8
+    // GLOBAL: CARMA2_CHEAT 0x00695188
+    static tU32 last_flash;
+    // GLOBAL: CARMA2_HW 0x0068d8ec
+    // GLOBAL: CARMA2_CHEAT 0x0069518c
+    static int flash_rate;
+    tRace_checkpoint_spec* checkpoint;
+
+    if ((pCheckpoint >= 0 && pCheckpoint < gCurrent_race.check_point_count && gTrack_version > 0 && !pTarget)
+            || Flash(300, &last_flash, &flash_rate)) {
+
+        checkpoint = &gCurrent_race.checkpoints[pCheckpoint];
+        if (checkpoint->map_position.v[0] >= 0.0f
+                && checkpoint->map_position.v[0] < (float)pMap->width
+                && checkpoint->map_position.v[1] >= 0.0f
+                && checkpoint->map_position.v[1] < (float)pMap->height) {
+
+#ifdef REC2_HW
+            if (gMap_view == 2) {
+                PossibleLock(1);
+            }
+#endif
+            DRPixelmapRectangleMaskedCopy(pMap,
+                (int)(checkpoint->map_position.v[0] - (float)gCheckpoint_digit_center_x),
+                (int)(checkpoint->map_position.v[1] - (float)(int)gCheckpoint_digit_center_y),
+                gCheckpoint_numbers,
+                0,
+                pCheckpoint * gCheckpoint_digit_height,
+                gCheckpoint_numbers->width,
+                gCheckpoint_digit_height);
+#ifdef REC2_HW
+            if (gMap_view == 2) {
+                PossibleUnlock(1);
+            }
+#endif
+        }
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x00495d00
 // FUNCTION: CARMA2_SW 0x00493350
