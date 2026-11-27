@@ -1980,7 +1980,16 @@ intptr_t C2_HOOK_CDECL MakeCarModelsMaterialsDoubleSided(br_actor* pActor, void*
 
 // SwapCarShapes
 
-// IsAWheelOrPivotActor
+inline int C2_HOOK_FASTCALL IsAWheelOrPivotActor(br_actor* pActor, tCar_spec* pCar) {
+    int i;
+
+    for (i = 0; i < (int)REC2_ASIZE(pCar->wheel_actors); i++) {
+        if (pActor == pCar->pivot_actors[i] || pActor == pCar->wheel_actors[i]) {
+            return 1;
+        }
+    }
+    return 0;
+}
 
 // FUNCTION: CARMA2_HW 0x0042deb0
 // FUNCTION: CARMA2_SW 0x0042df20
@@ -2089,9 +2098,51 @@ void C2_HOOK_FASTCALL BendPoint(br_vector3* pPoint, const tBend_point_context* p
 
 // BendCollisionShapes
 
-// BendModel
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
 
-// BendModels
+// STUB: CARMA2_HW 0x00435960
+// STUB: CARMA2_SW 0x00435990
+// STUB: CARMA2_CHEAT 0x00435b50
+void C2_HOOK_FASTCALL BendModel(br_model* pModel, br_vector3* pTranslation, tBend_point_context* pContext, br_actor* pActor) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
+
+// FUNCTION: CARMA2_HW 0x004358a0
+// FUNCTION: CARMA2_SW 0x004358d0
+// FUNCTION: CARMA2_CHEAT 0x00435a90
+intptr_t C2_HOOK_FASTCALL BendModels(br_actor* pActor, br_vector3* pTranslation, void* pContext) {
+    tBend_point_context* context;
+    tUser_crush_data* user_crush;
+    int i;
+
+    context = pContext;
+    user_crush = pActor->user;
+    if (user_crush == NULL) {
+        return 0;
+    }
+    if (IsAWheelOrPivotActor(pActor, context->car)) {
+        return 0;
+    }
+    if (user_crush->groove != NULL) {
+        PipeSingleGrooveOnOff(0, pActor, 3);
+        DisableGroovidelic(pActor, 3);
+        PipeSingleTransformType(pActor, BR_TRANSFORM_TRANSLATION);
+        pActor->t.type = BR_TRANSFORM_TRANSLATION;
+    }
+    if (user_crush->crush_data != NULL) {
+        for (i = 0; i < context->car->count_detail_levels; i++) {
+            BendModel(user_crush->models[i], pTranslation, context, pActor);
+        }
+        user_crush->crush_data->field_0x2c = 1;
+    }
+    return 0;
+}
 
 // BrAngleToSignedDegree
 

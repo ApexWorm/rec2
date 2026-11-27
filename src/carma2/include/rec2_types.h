@@ -4298,7 +4298,7 @@ typedef struct {
 } tBend_point_spec;
 
 typedef struct tBend_point_context {
-    undefined4 field_0x0;
+    tCar_spec* car;
     br_matrix34 field_0x4;
     tBend_point_spec* field_0x34;
 } tBend_point_context;

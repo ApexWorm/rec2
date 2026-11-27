@@ -310,7 +310,7 @@ extern intptr_t C2_HOOK_CDECL MakeCarModelsMaterialsDoubleSided(br_actor* pActor
 
 // SwapCarShapes
 
-// IsAWheelOrPivotActor
+extern int C2_HOOK_FASTCALL IsAWheelOrPivotActor(br_actor* pActor, tCar_spec* pCar);
 
 extern intptr_t C2_HOOK_CDECL MakeCarModelsMaterialsSingleSided(br_actor* pActor, void* pArg);
 
@@ -358,7 +358,7 @@ extern void C2_HOOK_FASTCALL BendPoint(br_vector3* pPoint, const tBend_point_con
 
 // BendModel
 
-// BendModels
+extern intptr_t C2_HOOK_FASTCALL BendModels(br_actor* pActor, br_vector3* pTranslation, void* pContext);
 
 // BrAngleToSignedDegree
 
