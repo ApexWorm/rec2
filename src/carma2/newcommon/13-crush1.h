@@ -326,11 +326,11 @@ extern intptr_t C2_HOOK_CDECL MakeCarModelsMaterialsSingleSided(br_actor* pActor
 
 // FindForceEdge
 
-// DoXZSplitting
+extern int C2_HOOK_FASTCALL DoXZSplitting(tPhysics_joint_force* pForces, br_scalar* pImpulses, int pCount);
 
-// DoYSplitting
+extern int C2_HOOK_FASTCALL DoYSplitting(tPhysics_joint_force* pForces, br_scalar* pImpulses, int pCount);
 
-// DoSplitting
+extern int C2_HOOK_FASTCALL DoSplitting(tPhysics_joint_force* pForces, br_scalar* pImpulses, int pCount);
 
 // DoJointSnapping
 
