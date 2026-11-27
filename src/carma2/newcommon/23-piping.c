@@ -19,6 +19,7 @@
 #include "30-opponent.h"
 #include "32-spark.h"
 #include "37-brucetrk.h"
+#include "39-oil.h"
 #include "41-utility.h"
 #include "46-win95sys.h"
 
@@ -823,7 +824,20 @@ int C2_HOOK_FASTCALL PipeObjectPosition(tPhysics_object* pObject, void* pContext
 
 // PipeCarPositions
 
-// DoOilSpillAR
+extern void C2_HOOK_FASTCALL DoOilSpillAR(tPipe_chunk** pChunk, tU32 pStop_time);
+
+inline void C2_HOOK_FASTCALL DoOilSpillAR(tPipe_chunk** pChunk, tU32 pStop_time) {
+
+    AdjustOilSpill((*pChunk)->subject_index,
+        &(*pChunk)->data.oil_spill.mat,
+        (*pChunk)->data.oil_spill.size_min,
+        (*pChunk)->data.oil_spill.size_max,
+        (*pChunk)->data.oil_spill.spill_time,
+        pStop_time,
+        (*pChunk)->data.oil_spill.car,
+        &(*pChunk)->data.oil_spill.original_pos,
+        (*pChunk)->data.oil_spill.pixelmap);
+}
 
 // CheckCar
 
@@ -1977,7 +1991,13 @@ void C2_HOOK_FASTCALL ApplyExtendedSplash(tPipe_chunk** pChunk) {
         &(*pChunk)->data.extended_splash.bb);
 }
 
-// ApplyOilSpill
+// FUNCTION: CARMA2_HW 0x004c9330
+// FUNCTION: CARMA2_SW 0x004c5a60
+// FUNCTION: CARMA2_CHEAT 0x004cee50
+void C2_HOOK_FASTCALL ApplyOilSpill(tPipe_chunk** pChunk) {
+
+    DoOilSpillAR(pChunk, 0);
+}
 
 // FUNCTION: CARMA2_HW 0x004c9360
 // FUNCTION: CARMA2_SW 0x004c5a90
@@ -2355,7 +2375,20 @@ void C2_HOOK_FASTCALL ApplyPHILObject(tPipe_chunk** pChunk) {
     PHILApplyPHILObject((tPhysics_object*)chunk->subject_index, &chunk->data.phil_object.matrix);
 }
 
-// ApplyGibShower
+// FUNCTION: CARMA2_HW 0x004c9b90
+// FUNCTION: CARMA2_SW 0x004c62c0
+// FUNCTION: CARMA2_CHEAT 0x004cf6c0
+void C2_HOOK_FASTCALL ApplyGibShower(tPipe_chunk** pChunk) {
+
+    PedApplyGibShower((*pChunk)->subject_index,
+        (*pChunk)->data.gib_shower.time,
+        (*pChunk)->data.gib_shower.uid,
+        (*pChunk)->data.gib_shower.force,
+        (*pChunk)->data.gib_shower.field_0x0,
+        &(*pChunk)->data.gib_shower.p1,
+        &(*pChunk)->data.gib_shower.p2,
+        &(*pChunk)->data.gib_shower.v);
+}
 
 // FUNCTION: CARMA2_HW 0x004c9bc0
 // FUNCTION: CARMA2_SW 0x004c62f0
