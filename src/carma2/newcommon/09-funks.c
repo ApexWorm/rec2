@@ -103,7 +103,12 @@ void C2_HOOK_FASTCALL ControlBoundFunkGroove(int pSlot_number, float pValue) {
     }
 }
 
-// ControlBoundFunkGroovePlus
+// STUB: CARMA2_HW 0x004748e0
+// STUB: CARMA2_SW 0x00473e40
+// STUB: CARMA2_CHEAT 0x00474c60
+float C2_HOOK_FASTCALL ControlBoundFunkGroovePlus(int pSlot_number, float pValue) {
+    NOT_IMPLEMENTED();
+}
 
 // ShiftBoundGrooveFunks
 

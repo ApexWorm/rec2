@@ -21,6 +21,7 @@ extern tFloat_bunch_info gCar_softness;
 extern tFloat_bunch_info gCar_car_damage_multiplier;
 extern br_vector3 gZero_v__car;
 extern int gFreeze_mechanics;
+extern tU32 gLast_cunning_stunt;
 extern int gNum_active_non_cars;
 extern tNon_car_spec* gActive_non_car_list[99];
 extern int gEliminate_faces;
@@ -193,7 +194,7 @@ extern int C2_HOOK_FASTCALL FindFloorInBoxBU(br_vector3* pPosition, br_vector3* 
 
 extern void C2_HOOK_FASTCALL CancelPendingCunningStunt(void);
 
-// SetAmbientPratCam
+extern void C2_HOOK_FASTCALL SetAmbientPratCam(tCar_spec* pCar);
 
 extern void C2_HOOK_FASTCALL SetTextureBits(tCar_spec* pCar);
 
