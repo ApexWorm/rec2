@@ -397,6 +397,7 @@ int C2_HOOK_FASTCALL AddOldForces(tPhysics_joint_force* pForces, int pCount, con
 
 // FUNCTION: CARMA2_HW 0x00428d40
 // FUNCTION: CARMA2_SW 0x00428dd0
+// FUNCTION: CARMA2_CHEAT 0x00428ed0
 int C2_HOOK_FASTCALL TestObjectOverlap(tPhysics_object* pCollision_1, tPhysics_object* pCollision_2) {
     tPhysics_shape* shape1;
     tPhysics_shape* shape2;

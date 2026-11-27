@@ -13,6 +13,9 @@
 #include "rec2_types.h"
 
 extern br_vector3 gRender_bounds_centre;
+extern int gDrones_unmodified;
+extern int gINT_006820d4;
+extern int gINT_006844fc;
 extern int gINT_00681fb0;
 extern int gFrame;
 extern tDrone_state_function* gDrone_state_functions[6];
@@ -50,7 +53,7 @@ extern void C2_HOOK_FASTCALL InitDroneCollisionObject(tDrone_spec* pDrone);
 
 extern int C2_HOOK_FASTCALL ReallyAddDroneToPHIL(tDrone_spec* pDrone);
 
-// AddDroneToPHIL
+extern int C2_HOOK_FASTCALL AddDroneToPHIL(tDrone_spec* pDrone);
 
 extern void C2_HOOK_FASTCALL PreprocessDronePaths(void);
 
@@ -84,7 +87,7 @@ extern br_actor* C2_HOOK_CDECL MrFindy(br_actor* pActor, const char* pName);
 
 extern void C2_HOOK_FASTCALL PauseDroneState(tDrone_spec* pDrone);
 
-// UnPauseDroneState
+extern void C2_HOOK_FASTCALL UnPauseDroneState(tDrone_spec* pDrone);
 
 extern void C2_HOOK_FASTCALL NewDroneState(tDrone_spec* pDrone, int pNew_state);
 
@@ -106,7 +109,7 @@ extern int C2_HOOK_FASTCALL DroneTrainWithinRenderingDistance(const br_vector3* 
 
 // DroneOrientationChanged
 
-// DroneyObjectInSensiblePlace
+extern int C2_HOOK_FASTCALL DroneyObjectInSensiblePlace(tPhysics_object* pObject, tPhysics_object* pList);
 
 extern void C2_HOOK_FASTCALL StopRenderingThisDrone(tDrone_spec* pDrone);
 
@@ -114,9 +117,9 @@ extern void C2_HOOK_FASTCALL StopProcessingThisDrone(tDrone_spec* pDrone, int pF
 
 extern void C2_HOOK_FASTCALL StartRenderingThisDrone(tDrone_spec* pDrone);
 
-// CheckDroneInSensiblePlaceBeforeStartingToProcessTheCuntingThing
+extern int C2_HOOK_FASTCALL CheckDroneInSensiblePlaceBeforeStartingToProcessTheCuntingThing(tDrone_spec* pDrone);
 
-// StartProcessingThisDrone
+extern void C2_HOOK_FASTCALL StartProcessingThisDrone(tDrone_spec* pDrone);
 
 extern int C2_HOOK_FASTCALL DroneCarWithinProcessingDistance(const br_vector3* pPos);
 
@@ -160,7 +163,7 @@ extern int C2_HOOK_FASTCALL OtherPerambulatoryInstasificationIsEnablificated(voi
 
 extern void C2_HOOK_FASTCALL LoadPanGameDroneInfo(void);
 
-// InitDrones
+extern void C2_HOOK_FASTCALL InitDrones(void);
 
 extern void C2_HOOK_FASTCALL DisposeDronesRaceStuff(void);
 
