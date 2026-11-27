@@ -88,10 +88,12 @@ tDirectInputJoystickInfo gDirectInputJoystickInfos[MAX_COUNT_JOYSTICKS] = { 0 };
 // GLOBAL: CARMA2_CHEAT 0x007a56e0
 IFR_Project * gIfr_project = NULL;
 
+#ifdef REC2_MATCHING
 // GLOBAL: CARMA2_HW 0x0079e044
 // GLOBAL: CARMA2_SW 0x007945a4
 // GLOBAL: CARMA2_CHEAT 0x007a56e4
-int gINT_0079e044 = 0;
+undefined4 gDAT_0079e044 = 0;
+#endif
 
 // GLOBAL: CARMA2_HW 0x0079e060
 // GLOBAL: CARMA2_SW 0x007945c0
@@ -105,6 +107,7 @@ IDirectInputEffect* gDirectInputEffects[MAX_COUNT_EFFECTS] = { 0 };
 
 // GLOBAL: CARMA2_HW 0x00684628
 // GLOBAL: CARMA2_SW 0x0067ed68
+// GLOBAL: CARMA2_CHEAT 0x0068bed0
 tJoystick_force_effect gJoystick_effects[30];
 
 // GLOBAL: CARMA2_HW 0x00686168
@@ -114,21 +117,27 @@ int gForceFeedbackAvailable;
 
 // GLOBAL: CARMA2_HW 0x00595f74
 // GLOBAL: CARMA2_SW 0x00590ed4
+// GLOBAL: CARMA2_CHEAT 0x0059c7f4
 int gBasic_friction_joystick_effect_index = -1;
 
 // GLOBAL: CARMA2_HW 0x00595f78
 // GLOBAL: CARMA2_SW 0x00590ed8
+// GLOBAL: CARMA2_CHEAT 0x0059c7f8
 int gBasic_force_joystick_effect_index = -1;
 
 // GLOBAL: CARMA2_HW 0x00595f80
 // GLOBAL: CARMA2_SW 0x00590ee0
+// GLOBAL: CARMA2_CHEAT 0x0059c800
 int gCollision_force_joystick_effect_index = -1;
 
 // GLOBAL: CARMA2_HW 0x00686164
 // GLOBAL: CARMA2_SW 0x006808a4
+// GLOBAL: CARMA2_CHEAT 0x0068da0c
 int gCount_joystick_effects;
 
 // GLOBAL: CARMA2_HW 0x00589f38
+// GLOBAL: CARMA2_SW 0x00584f20
+// GLOBAL: CARMA2_CHEAT 0x0058ef40
 const GUID* gJoystick_effect_guids[13] = {
     &GUID_ConstantForce,
     &GUID_RampForce,
@@ -181,6 +190,11 @@ tU32 gUINT_006ad094;
 
 // GLOBAL: CARMA2_HW 0x006ad0b8
 int gINT_006ad0b8;
+
+// GLOBAL: CARMA2_HW 0x0059630c
+// GLOBAL: CARMA2_SW 0x0059126c
+// GLOBAL: CARMA2_CHEAT 0x0059cb8c
+int gCurrent_exclusive_ffb_effect = -1;
 
 static int C2_HOOK_FASTCALL InitDirectInput(void) {
     int i;
@@ -598,6 +612,7 @@ void C2_HOOK_FASTCALL PDSetJoystickFFBGain(int pGain) {
 
 // FUNCTION: CARMA2_HW 0x00458020
 // FUNCTION: CARMA2_SW 0x00457db0
+// FUNCTION: CARMA2_CHEAT 0x004584a0
 void C2_HOOK_FASTCALL DownloadDinputFFBEffectAtIndex(int index) {
     IDirectInputEffect* effect = gDirectInputEffects[index];
 
@@ -605,6 +620,25 @@ void C2_HOOK_FASTCALL DownloadDinputFFBEffectAtIndex(int index) {
         IDirectInputEffect_Download(effect);
     }
 }
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// FUNCTION: CARMA2_HW 0x00458430
+// FUNCTION: CARMA2_SW 0x004581c0
+// FUNCTION: CARMA2_CHEAT 0x004588b0
+tJoystick_force_effect* C2_HOOK_FASTCALL GetJoystickEffect(int pIndex) {
+
+    if (pIndex >= 0 && pIndex <= gCount_joystick_effects) {
+        return &gJoystick_effects[pIndex];
+    }
+    return NULL;
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
@@ -626,6 +660,7 @@ void C2_HOOK_FASTCALL UnloadDinputFFBEffectAtIndex(int index) {
 
 // FUNCTION: CARMA2_HW 0x00457c20
 // FUNCTION: CARMA2_SW 0x004579b0
+// FUNCTION: CARMA2_CHEAT 0x004580a0
 int C2_HOOK_FASTCALL CreateDinputEffect(int joystick_index, tJoystick_effect_description* description, const char *name) {
     int effect_id = gCount_joystick_effects;
     IDirectInputDevice2A *device = gDirectInputJoystickDevices[joystick_index];
@@ -766,6 +801,7 @@ int C2_HOOK_FASTCALL ReadIforceEffectsNames(const char *path, char **names, size
 
 // FUNCTION: CARMA2_HW 0x00458060
 // FUNCTION: CARMA2_SW 0x00457df0
+// FUNCTION: CARMA2_CHEAT 0x004584e0
 int C2_HOOK_FASTCALL UnloadDinputFFBEfectwithName(const char *name) {
     int i;
 
@@ -1630,6 +1666,10 @@ void C2_HOOK_FASTCALL StartDinputEffect(int pIndex) {
 #pragma auto_inline(on)
 #endif
 
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
 // FUNCTION: CARMA2_HW 0x00457ed0
 // FUNCTION: CARMA2_SW 0x00457c60
 // FUNCTION: CARMA2_CHEAT 0x00458350
@@ -1641,6 +1681,10 @@ void C2_HOOK_FASTCALL StopDinputEffect(int pIndex) {
         IDirectInputEffect_Stop(effect);
     }
 }
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // FUNCTION: CARMA2_HW 0x0045a070
 // FUNCTION: CARMA2_SW 0x00459e00
@@ -1699,6 +1743,35 @@ void C2_HOOK_FASTCALL PDPlayFFBEffect(const char* effectName) {
     if (gForceFeedbackAvailable) {
         int index = PDFindJoystickEffect(effectName);
         if (index != -1) {
+            StartDinputEffect(index);
+        }
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x0045c6b0
+// FUNCTION: CARMA2_SW 0x0045c0f0
+// FUNCTION: CARMA2_CHEAT 0x0045cb30
+void C2_HOOK_FASTCALL PlayExclusiveFFBEffect(const char* pEffect_name, int pArg2) {
+    int index;
+    tJoystick_force_effect* effect;
+
+    if (gForceFeedbackAvailable) {
+        index = PDFindJoystickEffect(pEffect_name);
+        if (index != -1) {
+            if (gCurrent_exclusive_ffb_effect != -1) {
+                if (gCurrent_exclusive_ffb_effect != index) {
+                    StopDinputEffect(gCurrent_exclusive_ffb_effect);
+                    UnloadDinputFFBEffectAtIndex(gCurrent_exclusive_ffb_effect);
+                    gCurrent_exclusive_ffb_effect = -1;
+                }
+                if (gCurrent_exclusive_ffb_effect != -1) {
+                    effect = GetJoystickEffect(gCurrent_exclusive_ffb_effect);
+                    if (pArg2 == 0 && effect != NULL && effect->di_effect.dwDuration == (DWORD)-1) {
+                        return;
+                    }
+                }
+            }
+            gCurrent_exclusive_ffb_effect = index;
             StartDinputEffect(index);
         }
     }
