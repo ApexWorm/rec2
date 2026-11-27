@@ -1556,7 +1556,12 @@ void C2_HOOK_FASTCALL InitPedsForRace(void) {
     memset(gPed_cache_006944c0, 0, sizeof(gPed_cache_006944c0));
 }
 
-// RenderElectroBastardRays
+// STUB: CARMA2_HW 0x004d5d60
+// STUB: CARMA2_SW 0x004d2450
+// STUB: CARMA2_CHEAT 0x004db920
+void C2_HOOK_FASTCALL RenderElectroBastardRays(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_actor* pCamera, br_matrix34* pCamera_to_world, tU32 pTime) {
+    NOT_IMPLEMENTED();
+}
 
 // FUNCTION: CARMA2_HW 0x004d6180
 // FUNCTION: CARMA2_SW 0x004d2780

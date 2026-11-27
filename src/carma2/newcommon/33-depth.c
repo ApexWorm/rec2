@@ -56,6 +56,7 @@ br_model* gForward_sky_model;
 int gDepth_cueing_on = 1;
 
 // GLOBAL: CARMA2_HW 0x00591190
+// GLOBAL: CARMA2_SW 0x0058c188
 // GLOBAL: CARMA2_CHEAT 0x00597ae8
 tDepth_effect_type gSwap_depth_effect_type = eDepth_effect_none;
 
@@ -441,7 +442,12 @@ void C2_HOOK_FASTCALL InitDepthEffects(void) {
 void C2_HOOK_FASTCALL RenderLollipops(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_actor* pCamera, br_matrix34* pCamera_to_world) {
 }
 
-// DepthEffectSky
+// STUB: CARMA2_HW 0x00445cb0
+// STUB: CARMA2_SW 0x00445d40
+// STUB: CARMA2_CHEAT 0x004461d0
+void C2_HOOK_FASTCALL DepthEffectSky(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_actor* pCamera, br_matrix34* pCamera_to_world) {
+    NOT_IMPLEMENTED();
+}
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)

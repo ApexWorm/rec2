@@ -67,7 +67,7 @@ extern void C2_HOOK_FASTCALL SetLineModelCols(tU8 pCol);
 
 // ReplaySparks
 
-// RenderSparks
+extern void C2_HOOK_FASTCALL RenderSparks(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_actor* pCamera, br_matrix34* pCamera_to_world, tU32 pTime);
 
 // CreateSingleSpark
 
@@ -159,7 +159,7 @@ extern void C2_HOOK_FASTCALL RenderRecordedSmokeCircles(void);
 
 // GenerateContinuousSmoke
 
-// RenderSmoke
+extern void C2_HOOK_FASTCALL RenderSmoke(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_actor* pCamera, br_matrix34* pCamera_to_world, tU32 pTime);
 
 extern void C2_HOOK_FASTCALL CreatePuffOfSmoke(br_vector3* pPos, br_vector3* pV, float pStrength, float pDecay_factor, int pType);
 

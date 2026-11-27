@@ -8,17 +8,22 @@
 
 #include "16-graphics1.h"
 
+#include "01-network.h"
 #include "02-init.h"
 #include "07-structur.h"
 #include "15-displays.h"
 #include "17-world2.h"
+#include "18-graphics2.h"
 #include "18b-graphics2.h"
 #include "19-font.h"
+#include "28-world3.h"
 #include "27-powerup.h"
 #include "30-opponent.h"
+#include "32-spark.h"
 #include "33-depth.h"
 #include "41-utility.h"
 #include "52-errors.h"
+#include "61-pedestrn-phys.h"
 #include "62-graphics3.h"
 #include "63-loading3.h"
 #include "66-tintedpoly.h"
@@ -689,22 +694,205 @@ void C2_HOOK_FASTCALL ResetScreenWobble(void) {
 
 // CalculateWobblitude
 
-// ProcessNonTrackActors
+inline void C2_HOOK_FASTCALL ProcessNonTrackActors(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_actor* pCamera, br_matrix34* pCamera_to_world) {
 
-// ConditionallyFillWithSky
+    BrZbsSceneRenderAdd(gNon_track_actor);
+}
 
-// FoxyStuff
+inline int C2_HOOK_FASTCALL ConditionallyFillWithSky(br_pixelmap* pPixelmap) {
+    int bgnd_col;
+
+    if (gProgram_state.current_depth_effect.sky_texture != NULL && (gLast_camera_special_volume == NULL || gLast_camera_special_volume->sky_col < 0)) {
+        return 0;
+    }
+    if (gProgram_state.current_depth_effect.type == eDepth_effect_fog || gSwap_depth_effect_type == eDepth_effect_fog) {
+        bgnd_col = 0xff;
+    } else if (gProgram_state.current_depth_effect.type == eDepth_effect_darkness || gSwap_depth_effect_type == eDepth_effect_darkness) {
+        bgnd_col = 0x00;
+    } else if (gLast_camera_special_volume != NULL && gLast_camera_special_volume->sky_col >= 0) {
+        bgnd_col = gLast_camera_special_volume->sky_col;
+    } else {
+        bgnd_col = 0x00;
+    }
+    if (gNet_mode != eNet_mode_none && (gCurrent_net_game->type == eNet_game_type_6 || gCurrent_net_game->type == eNet_game_type_foxy)) {
+        SetSkyColour(((br_colour*)gRender_palette->pixels)[bgnd_col]);
+        return 0;
+    } else {
+        if (pPixelmap->type != BR_PMT_INDEX_8) {
+            bgnd_col = PaletteEntry16Bit(gRender_palette, bgnd_col);
+            bgnd_col = (bgnd_col << 16) | bgnd_col;
+        }
+        BrPixelmapFill(pPixelmap, bgnd_col);
+        return 1;
+    }
+}
+
+inline void C2_HOOK_FASTCALL FoxyStuff(br_matrix34* pMat34, br_actor* pCamera, br_pixelmap* pColour, br_pixelmap* pDepth) {
+    int i;
+    int j;
+    int count;
+    tCar_spec* fox_car;
+
+    count = 0;
+    if (gNet_mode != eNet_mode_none && (gCurrent_net_game->type == eNet_game_type_6 || gCurrent_net_game->type == eNet_game_type_foxy)) {
+        BrZbsSceneRenderBegin(gUniverse_actor, pCamera, pColour, pDepth);
+        for (i = 0; i < gNumber_of_net_players; i++) {
+            if ((gNet_players[i].field_0x80 || i == gIt_or_fox) && !IsCarCloaked(gNet_players[i].car)) {
+                fox_car = gNet_players[i].car;
+                if (fox_car->car_master_actor->render_style != BR_RSTYLE_NONE) {
+                    count++;
+                    for (j = 0; j < (int)REC2_ASIZE(fox_car->wheel_actors); j++) {
+                        if (fox_car->wheel_actors[j] != NULL) {
+                            fox_car->wheel_actors[j]->render_style = BR_RSTYLE_NONE;
+                        }
+                    }
+                    BrZbsSceneRenderAdd(fox_car->car_master_actor);
+                }
+            }
+        }
+        BrZbsSceneRenderEnd();
+        if (count != 0) {
+            if (gHud_tinted4 == -1) {
+                gHud_tinted4 = CreateTintedPoly(0, 0, 640, 480, 3, 2, 0, 0);
+            }
+            TurnTintedPolyOn(gHud_tinted4);
+            ProcessTintedPoly(gHud_tinted4);
+            RenderTintedPolys();
+            TurnTintedPolyOff(gHud_tinted4);
+            BrZbsSceneRenderBegin(gUniverse_actor, pCamera, pColour, pDepth);
+            for (i = 0; i < gNumber_of_net_players; i++) {
+                if (gNet_players[i].field_0x80 || i == gIt_or_fox) {
+                    fox_car = gNet_players[i].car;
+                    if (fox_car->car_master_actor->render_style != BR_RSTYLE_NONE) {
+                        for (j = 0; j < (int)REC2_ASIZE(fox_car->wheel_actors); j++) {
+                            if (fox_car->wheel_actors[j] != NULL) {
+                                fox_car->wheel_actors[j]->render_style = BR_RSTYLE_DEFAULT;
+                                BrZbsSceneRenderAdd(fox_car->wheel_actors[j]);
+                            }
+                        }
+                    }
+                }
+            }
+            BrZbsSceneRenderEnd();
+            fox_car->car_master_actor->render_style = BR_RSTYLE_NONE;
+        }
+    }
+}
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x004e5680
+#ifdef REC2_HW
+// FUNCTION: CARMA2_HW 0x004e5680
+// FUNCTION: CARMA2_CHEAT 0x004eb200
+void C2_HOOK_FASTCALL DoARenderPass(br_matrix34* pMat34, br_actor* pCamera, br_pixelmap* pColour, br_pixelmap* pDepth, br_scalar pYon_factor, int pShadows, int pEffects, int pArg8) {
+    int i;
+    br_camera* camera_data;
+    br_scalar original_yon;
+    br_pixelmap* sky_pixelmap;
+
+    camera_data = (br_camera*)pCamera->type_data;
+    original_yon = camera_data->yon_z;
+    camera_data->yon_z *= pYon_factor;
+    BrPixelmapFill(pDepth, 0xffffffff);
+    if (!gAFE) {
+        FoxyStuff(pMat34, pCamera, pColour, pDepth);
+    }
+    sky_pixelmap = pColour;
+    if (pColour->width == gBack_screen->width) {
+        sky_pixelmap = gBack_screen;
+    }
+    if (!ConditionallyFillWithSky(sky_pixelmap)) {
+        BrZbsSceneRenderBegin(gUniverse_actor, pCamera, pColour, pDepth);
+        DepthEffectSky(pColour, pDepth, pCamera, pMat34);
+        BrZbsSceneRenderEnd();
+    }
+    DoSpecialCameraEffect(pCamera, pMat34);
+    if (pShadows) {
+        RenderShadows(gUniverse_actor, &gProgram_state.track_spec, pCamera, pMat34);
+    }
+    BrZbsSceneRenderBegin(gUniverse_actor, pCamera, pColour, pDepth);
+    for (i = REC2_ASIZE(gOther_selfs); i > 0; i--) {
+        if (i != 2) {
+            BrSetScreenZOffset(i);
+            BrZbsSceneRenderAdd(gOther_selfs[i - 1]);
+        }
+    }
+    BrSetScreenZOffset(0);
+    ProcessTrack(gUniverse_actor, &gProgram_state.track_spec, pCamera, pMat34);
+#ifdef REC2_CHEAT
+    if (gNet_mode != eNet_mode_none) {
+        for (i = 0; i < gNumber_of_net_players; i++) {
+            CheckModelSanity(gNet_players[i].car->collision_info->actor->children->model);
+        }
+    }
+#endif
+    ProcessNonTrackActors(pColour, pDepth, pCamera, pMat34);
+    RenderLimbs();
+    RenderLollipops(pColour, pDepth, pCamera, pMat34);
+    if (pEffects) {
+        RenderSparks(pColour, pDepth, pCamera, pMat34, gFrame_period);
+        RenderSmoke(pColour, pDepth, pCamera, pMat34, gFrame_period);
+        RenderElectroBastardRays(pColour, pDepth, pCamera, pMat34, gFrame_period);
+    }
+    BrZbsSceneRenderEnd();
+    camera_data->yon_z = original_yon;
+}
+#else
 // STUB: CARMA2_SW 0x004e1a40
-// STUB: CARMA2_CHEAT 0x004eb200
 void C2_HOOK_FASTCALL DoARenderPass(br_matrix34* pMat34, br_actor* pCamera, br_pixelmap* pColour, br_pixelmap* pDepth, br_scalar pYon_factor, int pShadows, int pEffects, int pArg8) {
     NOT_IMPLEMENTED();
 }
+#endif
+
+#ifdef REC2_CHEAT
+/* FIXME: CHEAT-only function, its name is unknown */
+// FUNCTION: CARMA2_CHEAT 0x004eb630
+void C2_HOOK_FASTCALL CheckModelSanity(br_model* pModel) {
+    int i;
+    br_vertex* vertex;
+    br_face* face;
+    br_material* material;
+
+    if (pModel == NULL) {
+        return;
+    }
+    vertex = pModel->vertices;
+    for (i = 0; i < pModel->nvertices; i++, vertex++) {
+        if (DRVector3TestForNan(&vertex->p)) {
+            FatalError(0x80); /* FIXME: name of fatal error 0x80 */
+        }
+        if (DRVector2TestForNan(&vertex->map)) {
+            FatalError(0x80);
+        }
+    }
+    face = pModel->faces;
+    for (i = 0; i < pModel->nfaces; i++, face++) {
+        if (face->vertices[0] >= pModel->nvertices) {
+            PDFatalError("Vertex 0 is a wombat");
+        }
+        if (face->vertices[1] >= pModel->nvertices) {
+            PDFatalError("Vertex 1 is a wombat");
+        }
+        if (face->vertices[2] >= pModel->nvertices) {
+            PDFatalError("Vertex 2 is a wombat");
+        }
+        material = face->material;
+        if (material != NULL) {
+            if (material->ka < 0.0f && material->ka > 1.0) {
+                PDFatalError("ka is a bucket of puke");
+            }
+            if (material->kd < 0.0f && material->ka > 1.0) {
+                PDFatalError("kd is a bucket of semen");
+            }
+            if (material->ks < 0.0f && material->ka > 1.0) {
+                PDFatalError("ks is a bucket of yaks bile");
+            }
+        }
+    }
+}
+#endif
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(on)

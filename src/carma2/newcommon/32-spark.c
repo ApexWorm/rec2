@@ -331,7 +331,12 @@ void C2_HOOK_FASTCALL SetLineModelCols(tU8 pCol) {
 
 // ReplaySparks
 
-// RenderSparks
+// STUB: CARMA2_HW 0x004f7450
+// STUB: CARMA2_SW 0x004f2d00
+// STUB: CARMA2_CHEAT 0x004fd0f0
+void C2_HOOK_FASTCALL RenderSparks(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_actor* pCamera, br_matrix34* pCamera_to_world, tU32 pTime) {
+    NOT_IMPLEMENTED();
+}
 
 // CreateSingleSpark
 
@@ -927,7 +932,12 @@ void C2_HOOK_FASTCALL RenderRecordedSmokeCircles(void) {
 
 // GenerateContinuousSmoke
 
-// RenderSmoke
+// STUB: CARMA2_HW 0x004fa910
+// STUB: CARMA2_SW 0x004f59a0
+// STUB: CARMA2_CHEAT 0x005005b0
+void C2_HOOK_FASTCALL RenderSmoke(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_actor* pCamera, br_matrix34* pCamera_to_world, tU32 pTime) {
+    NOT_IMPLEMENTED();
+}
 
 // FUNCTION: CARMA2_HW 0x004fb330
 // FUNCTION: CARMA2_SW 0x004f6870
