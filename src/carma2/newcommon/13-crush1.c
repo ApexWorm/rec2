@@ -2660,11 +2660,6 @@ void C2_HOOK_FASTCALL ARUndoSplitWeld(tCar_spec* pCar) {
 
 // ReceivedCrush
 
-typedef struct {
-    tU8 id;
-    br_actor* actor;
-} tFindBitWithID_context;
-
 // FUNCTION: CARMA2_HW 0x0043cac0
 // FUNCTION: CARMA2_SW 0x0043cb10
 // FUNCTION: CARMA2_CHEAT 0x0043cd20
