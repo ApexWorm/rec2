@@ -20,6 +20,7 @@ extern int rr_min;
 extern int rr_mid;
 extern int rr_max;
 extern int gInitialised_grid;
+extern int gINT_0074a694;
 #ifdef REC2_HW
 extern br_actor* gNetscore_box_universe;
 extern br_material* gNetscore_box_materials[4];
@@ -48,7 +49,7 @@ extern void C2_HOOK_FASTCALL NetSendHeadupToEverybody(const char* pMessage);
 
 extern void C2_HOOK_FASTCALL NetSendHeadupToPlayer(char* pMessage, tPlayer_ID pPlayer);
 
-// InitialisePlayerStati
+extern void C2_HOOK_FASTCALL InitialisePlayerStati(void);
 
 extern void C2_HOOK_FASTCALL LeaveTempGame(void);
 
@@ -66,7 +67,7 @@ extern void C2_HOOK_FASTCALL NetDisposeGameDetails(tNet_game_details* pDetails);
 
 extern tNet_game_details* C2_HOOK_FASTCALL NetAllocatePIDGameDetails(void);
 
-extern void C2_HOOK_FASTCALL NetLeaveGameLowLevel(void);
+extern void C2_HOOK_FASTCALL NetLeaveGameLowLevel(tNet_game_details* pDetails);
 
 extern void C2_HOOK_FASTCALL NetLeaveGame(tNet_game_details* pNet_game);
 
@@ -76,19 +77,19 @@ extern void C2_HOOK_FASTCALL FillInThisPlayer(tNet_game_details* pGame, tNet_gam
 
 // LoadCarN
 
-// DisposeCarN
+extern void C2_HOOK_FASTCALL DisposeCarN(int pIndex);
 
 // PlayerHasLeft
 
 // RemoveReferencesToCar
 
-// NetPlayersChanged
+extern void C2_HOOK_FASTCALL NetPlayersChanged(int pNew_count, tNet_game_player_info* pNew_players);
 
 // NetHostGame
 
 extern int C2_HOOK_FASTCALL NetJoinGameLowLevel(tNet_game_details* pGame_details, const char* pName);
 
-// NetJoinGame
+extern int C2_HOOK_FASTCALL NetJoinGame(tNet_game_details* pDetails, char* pPlayer_name, int pCar_index);
 
 extern void C2_HOOK_FASTCALL NetObtainSystemUserName(char* pName, int pMax_length);
 
@@ -142,11 +143,11 @@ extern tNet_message* C2_HOOK_FASTCALL NetGetNextMessage(tNet_game_details* pDeta
 
 // ReceivedDetails
 
-// SendOutPlayerList
+extern void C2_HOOK_FASTCALL SendOutPlayerList(void);
 
 // ReceivedJoin
 
-// KickPlayerOut
+extern void C2_HOOK_FASTCALL KickPlayerOut(tPlayer_ID pID);
 
 // ReceivedLeave
 
@@ -156,7 +157,7 @@ extern void C2_HOOK_FASTCALL NetFullScreenMessage(int pStr_index, int pLeave_it_
 
 // ReceivedHosticide
 
-// ReceivedNewPlayerList
+extern void C2_HOOK_FASTCALL ReceivedNewPlayerList(tNet_message_chunk* pContents, tNet_message* pM);
 
 // ReceivedRaceOver
 
@@ -234,7 +235,7 @@ extern int C2_HOOK_FASTCALL NetGuaranteedSendMessageToAddress(tNet_game_details*
 
 extern void C2_HOOK_FASTCALL ResendGuaranteedMessages(void);
 
-// NetWaitForGuaranteeReplies
+extern void C2_HOOK_FASTCALL NetWaitForGuaranteeReplies(void);
 
 extern tNet_game_player_info* C2_HOOK_FASTCALL NetPlayerFromID(tPlayer_ID pPlayer);
 
