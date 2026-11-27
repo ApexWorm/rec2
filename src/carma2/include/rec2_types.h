@@ -4684,6 +4684,9 @@ typedef struct {
     float field_0xc;
     float field_0x10;
     float field_0x14;
+#ifdef REC2_CHEAT
+    undefined4 cheat_variable;
+#endif
 } tPHIL_queued_header;
 
 typedef struct {
@@ -4708,7 +4711,9 @@ typedef struct {
 typedef union {
     struct {
         tPHIL_queued_object_info _field_0x0;
+#ifndef REC2_CHEAT
         undefined _field_0x64;
+#endif
         tPHIL_queued_header headers[100];
     };
     struct {
