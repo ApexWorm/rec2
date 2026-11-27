@@ -374,7 +374,7 @@ extern int C2_HOOK_FASTCALL SetMutantCorpses(tPowerup* pPowerup, tCar_spec* pCar
 
 extern void C2_HOOK_FASTCALL ResetMutantCorpses(tPowerup* pPowerup, tCar_spec* pCar);
 
-// ReceivedPowerup
+extern void C2_HOOK_FASTCALL ReceivedPowerup(tNet_message_chunk* pContents);
 
 extern void C2_HOOK_FASTCALL SendCurrentPowerups(void);
 
