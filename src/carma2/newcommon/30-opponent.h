@@ -15,9 +15,13 @@ extern const char* gCop_name;
 extern const char* gDrone_name;
 
 extern int gBIG_APC_index;
+extern int gChallenger_index__opponent;
 extern float gOpponent_nastyness_frigger;
 extern int gMinTimeOpponentRepair;
 extern int gMaxTimeOpponentRepair;
+extern tU32 gNext_grudge_reduction;
+extern int gGrudge_reduction_per_period;
+extern br_scalar gMinimum_yness_before_knackerisation;
 extern tU32 gAcme_frame_count;
 extern int gActive_car_list_rebuild_required;
 extern int gNumber_of_cops_before_faffage;
