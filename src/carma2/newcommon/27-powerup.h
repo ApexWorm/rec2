@@ -102,19 +102,19 @@ extern void C2_HOOK_FASTCALL ThisObjectHitAMineSoSpamItUpUsingThisPowerupsSettin
 
 extern void C2_HOOK_FASTCALL InitPowerups(void);
 
-// RemoveRepulseEffect
+extern void C2_HOOK_FASTCALL RemoveRepulseEffect(int pIndex);
 
-// ResetRepulseEffects
+extern void C2_HOOK_FASTCALL ResetRepulseEffects(void);
 
 extern void C2_HOOK_FASTCALL EmptyInventory(void);
 
-// ResetPowerups
+extern void C2_HOOK_FASTCALL ResetPowerups(void);
 
 extern void C2_HOOK_FASTCALL CloseDownPowerUps(void);
 
 extern void C2_HOOK_FASTCALL NewRepulseRay(tU32 pTime, tCar_spec* pCar, tCar_spec* pVictim_car, br_vector3* pPos_origin, br_vector3* pPos_victim, float pRadius1, float pRadius2);
 
-// RemoveRepulsiveReferences
+extern void C2_HOOK_FASTCALL RemoveRepulsiveReferences(tCar_spec* pCar);
 
 extern void C2_HOOK_FASTCALL MungeRepulseRays(tU32 pTime);
 
