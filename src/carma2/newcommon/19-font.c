@@ -101,6 +101,8 @@ int gInterface_polyfont_texture_pages;
 tNet_game_options gFrontend_backup_net_options;
 
 // GLOBAL: CARMA2_HW 0x00686340
+// GLOBAL: CARMA2_CHEAT 0x0068dbe8
+// GLOBAL: CARMA2_SW 0x00680a80
 br_material* gPoly_font_materials[80];
 
 // GLOBAL: CARMA2_HW 0x0074cf10

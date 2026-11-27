@@ -177,6 +177,7 @@ tSmashable_environment_name* gSmashable_noncars;
 int gCount_smashable_noncars;
 
 // GLOBAL: CARMA2_HW 0x006a8718
+// GLOBAL: CARMA2_CHEAT 0x006b0290
 br_matrix4 gCameraToScreen;
 
 // GLOBAL: CARMA2_HW 0x006a82b0

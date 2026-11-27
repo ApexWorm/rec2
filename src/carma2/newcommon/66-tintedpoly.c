@@ -53,6 +53,7 @@ br_actor* gTintedPolyCamera;
 
 // GLOBAL: CARMA2_HW 0x0065e840
 // GLOBAL: CARMA2_SW 0x00659190
+// GLOBAL: CARMA2_CHEAT 0x00665fa8
 br_token_value gTinted_poly_material_tokens[TINTED_COUNT_TOKENS] = {
   { BRT_BLEND_B, { 1 } },
   { BRT_OPACITY_X, { BR_FIXED_INT(0x80) } },
@@ -60,6 +61,7 @@ br_token_value gTinted_poly_material_tokens[TINTED_COUNT_TOKENS] = {
 
 // GLOBAL: CARMA2_HW 0x0065e850
 // GLOBAL: CARMA2_SW 0x006591a0
+// GLOBAL: CARMA2_CHEAT 0x00665fb8
 br_token_value gTinted_poly_zero_opacity_tokens[TINTED_COUNT_TOKENS] = {
   { BRT_BLEND_B, { 1 } },
   { BRT_OPACITY_X, { BR_FIXED_INT(0x80) } },
@@ -67,6 +69,7 @@ br_token_value gTinted_poly_zero_opacity_tokens[TINTED_COUNT_TOKENS] = {
 
 // GLOBAL: CARMA2_HW 0x0065e860
 // GLOBAL: CARMA2_SW 0x006591b0
+// GLOBAL: CARMA2_CHEAT 0x00665fc8
 br_token_value gTinted_poly_custom_opacity_tokens[TINTED_COUNT_TOKENS] = {
   { BRT_BLEND_B, { 1 } },
   { BRT_OPACITY_X, { BR_FIXED_INT(0x80) } },

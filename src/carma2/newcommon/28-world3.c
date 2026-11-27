@@ -672,6 +672,7 @@ void C2_HOOK_FASTCALL DodgyModelUpdate(br_model* pM) {
 
 // FUNCTION: CARMA2_HW 0x005024b0
 // FUNCTION: CARMA2_SW 0x004fde00
+// FUNCTION: CARMA2_CHEAT 0x00508160
 void C2_HOOK_FASTCALL LoadIfItsAPixelmap(const char* pPath) {
     char s[256];
 
