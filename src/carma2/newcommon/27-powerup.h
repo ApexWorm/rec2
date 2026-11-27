@@ -56,7 +56,7 @@ extern char* C2_HOOK_FASTCALL GetPowerupMessage(int pPowerup_index);
 
 // GetNextGoodyTime
 
-// DoPowerupTextHeadup
+extern void C2_HOOK_FASTCALL DoPowerupTextHeadup(tPowerup* pPowerup, int pGot_it);
 
 // QueueIconGoing
 
@@ -68,15 +68,15 @@ extern void C2_HOOK_FASTCALL LosePowerup(tPowerup* pPowerup);
 
 // LoseKeyboardPowerupN
 
-// KeyboardPowerupFinished
+extern void C2_HOOK_FASTCALL KeyboardPowerupFinished(tPowerup* pPowerup, int pSelect_new);
 
 // LoseAllSimilarPowerups
 
-// ExcludedPowerup
+extern int C2_HOOK_FASTCALL ExcludedPowerup(int pIndex, tRace_list_spec* pRace_spec);
 
 extern int C2_HOOK_FASTCALL GotPowerupX(tCar_spec* pCar, int pIndex, int pArg3, int pMessage, tU32 pTime);
 
-// GotPowerupXX
+extern int C2_HOOK_FASTCALL GotPowerupXX(tCar_spec* pCar, int pIndex, int pMessage);
 
 extern void C2_HOOK_FASTCALL GotPowerupEarwig(tCar_spec* pCar, int pIndex, int pMessage, int pSelect_inventory);
 
