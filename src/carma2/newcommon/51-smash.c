@@ -667,7 +667,20 @@ void C2_HOOK_FASTCALL InitSmashQueue(void) {
 
 // FlushPowerupQueue
 
-// FlushSmashQueue
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_HW 0x004ecfb0
+// STUB: CARMA2_SW 0x004e8c80
+// STUB: CARMA2_CHEAT 0x004f2c50
+void C2_HOOK_FASTCALL FlushSmashQueue(int pFlush_powerups) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // QueueSmashIfNecessary3
 
@@ -1956,7 +1969,20 @@ void C2_HOOK_FASTCALL SendNetSmash(tPhysics_object* pObject, undefined4 pArg2, f
 
 // HitPowerup
 
-// SmashEnvironment
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_HW 0x004f1140
+// STUB: CARMA2_SW 0x004ecda0
+// STUB: CARMA2_CHEAT 0x004f6de0
+float C2_HOOK_FASTCALL SmashEnvironment(tPhysics_object* pObject, tFace_ref* pFace, float pMagnitude, br_vector3* pPosition, br_vector3* pNormal, br_vector3* pForce, int pSnap, int pNetwork) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // FUNCTION: CARMA2_HW 0x004f52f0
 // FUNCTION: CARMA2_SW 0x004f0f50

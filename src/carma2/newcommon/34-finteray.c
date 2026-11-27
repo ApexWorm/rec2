@@ -304,7 +304,12 @@ void C2_HOOK_FASTCALL CheckSingleFace(tFace_ref* pFace, br_vector3* ray_pos, br_
     NOT_IMPLEMENTED();
 }
 
-// MultiRayCheckSingleFace
+// STUB: CARMA2_HW 0x0045f0d0
+// STUB: CARMA2_SW 0x0045eb40
+// STUB: CARMA2_CHEAT 0x0045f540
+void C2_HOOK_FASTCALL MultiRayCheckSingleFace(int pNum_rays, tFace_ref* pFace, br_vector3* ray_pos, br_vector3* ray_dir, br_vector3* normal, br_scalar* rt) {
+    NOT_IMPLEMENTED();
+}
 
 // FUNCTION: CARMA2_HW 0x0045f5b0
 // FUNCTION: CARMA2_SW 0x0045f020

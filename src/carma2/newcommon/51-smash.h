@@ -148,7 +148,7 @@ extern void C2_HOOK_FASTCALL InitSmashQueue(void);
 
 // FlushPowerupQueue
 
-// FlushSmashQueue
+extern void C2_HOOK_FASTCALL FlushSmashQueue(int pFlush_powerups);
 
 // QueueSmashIfNecessary3
 
@@ -304,7 +304,7 @@ extern void C2_HOOK_FASTCALL SendNetSmash(tPhysics_object* pObject, undefined4 p
 
 // HitPowerup
 
-// SmashEnvironment
+extern float C2_HOOK_FASTCALL SmashEnvironment(tPhysics_object* pObject, tFace_ref* pFace, float pMagnitude, br_vector3* pPosition, br_vector3* pNormal, br_vector3* pForce, int pSnap, int pNetwork);
 
 extern float C2_HOOK_FASTCALL BashObject(tPhysics_object* pObject, br_actor* pActor, float pMagnitude, br_vector3* pPosition, br_vector3* pNormal, br_vector3* pForce, int pSnap, int pNetwork);
 

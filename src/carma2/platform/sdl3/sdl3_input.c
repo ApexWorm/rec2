@@ -559,6 +559,14 @@ void C2_HOOK_FASTCALL PDInitJoysticks(void) {
 void C2_HOOK_FASTCALL PDPlayFFBEffect(const char* effectName) {
 }
 
+int C2_HOOK_FASTCALL PDSetJoystickFrictionFFB(int pGain) {
+    return 0;
+}
+
+int C2_HOOK_FASTCALL PDSetJoystickForceFFB(int pForce) {
+    return 0;
+}
+
 int C2_HOOK_FASTCALL PDIsJoystickDPadEnabled(void) {
     tButtonJoystickInfo* info = PDGetCurrentJoystickData();
 
