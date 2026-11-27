@@ -150,6 +150,11 @@ int gPipe_count_callbacks;
 // GLOBAL: CARMA2_CHEAT 0x0069bc48
 tU32 gOldest_time;
 
+// GLOBAL: CARMA2_HW 0x006940d4
+// GLOBAL: CARMA2_SW 0x0068e12c
+// GLOBAL: CARMA2_CHEAT 0x0069bc4c
+tPipe_smudge_data* gSmudge_space;
+
 // GLOBAL: CARMA2_HW 0x006940d8
 // GLOBAL: CARMA2_SW 0x0068e130
 // GLOBAL: CARMA2_CHEAT 0x0069bc50
@@ -435,6 +440,7 @@ void C2_HOOK_FASTCALL AREndPipingSession(void) {
 
 // FUNCTION: CARMA2_HW 0x004028a0
 // FUNCTION: CARMA2_SW 0x004028a0
+// FUNCTION: CARMA2_CHEAT 0x004028a0
 void C2_HOOK_FASTCALL ARAddDataToSession(int pType, uintptr_t pOwner, void* pData, tU32 pSize) {
     tU32 new_size;
 
@@ -963,7 +969,31 @@ void C2_HOOK_FASTCALL DisposeActionReplay(void) {
 
 // AddCrushToPipingSession
 
-// AddSmudgeToPipingSession
+#if defined(REC2_MATCHING) && defined(_MSC_VER)
+#pragma inline_depth(0)
+#endif
+
+// FUNCTION: CARMA2_HW 0x004c6ea0
+// FUNCTION: CARMA2_SW 0x004c35d0
+// FUNCTION: CARMA2_CHEAT 0x004cc9c0
+void C2_HOOK_FASTCALL AddSmudgeToPipingSession(tU16 pCar_ID, int pModel_index, int pVertex_count, tSmudged_vertex* pCoordinates) {
+    tU32 data_size;
+
+    if (gSmudge_space != NULL) {
+        if (pVertex_count > 600) {
+            pVertex_count = 600;
+        }
+        data_size = pVertex_count * sizeof(tSmudged_vertex);
+        gSmudge_space->vertex_count = pVertex_count;
+        gSmudge_space->model_index = pModel_index;
+        memcpy(gSmudge_space->vertex_changes, pCoordinates, data_size);
+        ARAddDataToSession(ePipe_chunk_smudge, pCar_ID, gSmudge_space, data_size + offsetof(tPipe_smudge_data, vertex_changes));
+    }
+}
+
+#if defined(REC2_MATCHING) && defined(_MSC_VER)
+#pragma inline_depth()
+#endif
 
 // FUNCTION: CARMA2_HW 0x004c6f20
 // FUNCTION: CARMA2_SW 0x004c3650
