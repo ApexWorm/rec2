@@ -2957,6 +2957,7 @@ int C2_HOOK_FASTCALL CharacterNoLongerCollideworthy(tPed_character_instance* pCh
 
 // FUNCTION: CARMA2_HW 0x00409300
 // FUNCTION: CARMA2_SW 0x00409300
+// FUNCTION: CARMA2_CHEAT 0x00409350
 void C2_HOOK_FASTCALL SetObjectV(tPhysics_object* pObject, const br_vector3* pV) {
     tPhysics_object* child;
 
