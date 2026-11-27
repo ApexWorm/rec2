@@ -293,7 +293,7 @@ typedef struct tPedestrian {
     tS8 hit_points;
     undefined field_0x05;
     undefined2 field_0x06;
-    tU16 flags;
+    tS16 flags;
     undefined field_0x0a;
     undefined field_0x0b;
     tPed_cache_006944c0* field_0x0c;
