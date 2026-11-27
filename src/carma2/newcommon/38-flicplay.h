@@ -79,15 +79,17 @@ extern int C2_HOOK_FASTCALL StartFlic(char* pFile_name, int pIndex, tFlic_descri
 
 extern int C2_HOOK_FASTCALL EndFlic(tFlic_descriptor_ptr pFlic_info);
 
-// DoColourMap
+extern void C2_HOOK_FASTCALL DoColourMap(tFlic_descriptor* pFlic_info, tU32 chunk_length);
 
 extern void C2_HOOK_FASTCALL DoDifferenceX(tFlic_descriptor* pFlic_info, tU32 pChunk_length);
 
 extern void C2_HOOK_FASTCALL DoDifferenceTrans(tFlic_descriptor* pFlic_info, tU32 pChunk_length);
 
-// DoColour256
+extern void C2_HOOK_FASTCALL DoColour256(tFlic_descriptor* pFlic_info, tU32 chunk_length);
 
-// DoDeltaTrans
+extern void C2_HOOK_FASTCALL DoDeltaTrans(tFlic_descriptor* pFlic_info, tU32 chunk_length);
+
+extern void C2_HOOK_FASTCALL DoDeltaX(tFlic_descriptor* pFlic_info, tU32 chunk_length);
 
 extern void C2_HOOK_FASTCALL DoBlack(tFlic_descriptor* pFlic_info, tU32 pChunk_length);
 
@@ -97,9 +99,9 @@ extern void C2_HOOK_FASTCALL DoUncompressed(tFlic_descriptor* pFlic_info, tU32 p
 
 extern void C2_HOOK_FASTCALL DoUncompressedTrans(tFlic_descriptor* pFlic_info, tU32 pChunk_length);
 
-// DoMini
+extern void C2_HOOK_FASTCALL DoMini(tFlic_descriptor* pFlic_info, tU32 chunk_length);
 
-// DrawTranslations
+extern void C2_HOOK_FASTCALL DrawTranslations(tFlic_descriptor* pFlic_info);
 
 extern int C2_HOOK_FASTCALL PlayNextFlicFrame(tFlic_descriptor* pFlic_info);
 
