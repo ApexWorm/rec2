@@ -597,7 +597,7 @@ int C2_HOOK_FASTCALL MyDroneHathHalteth(tPhysics_object* pObject) {
 // FUNCTION: CARMA2_HW 0x00452410
 // FUNCTION: CARMA2_SW 0x004521a0
 // FUNCTION: CARMA2_CHEAT 0x00452960
-void C2_HOOK_FASTCALL MoveMyDroneBaby(tPhysics_object* pObject) {
+void C2_HOOK_FASTCALL MoveMyDroneBaby(tPhysics_object* pObject, undefined4 pArg2) {
     tDrone_spec* drone;
 
     drone = pObject->owner;
