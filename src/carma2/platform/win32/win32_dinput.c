@@ -88,10 +88,12 @@ tDirectInputJoystickInfo gDirectInputJoystickInfos[MAX_COUNT_JOYSTICKS] = { 0 };
 // GLOBAL: CARMA2_CHEAT 0x007a56e0
 IFR_Project * gIfr_project = NULL;
 
+#ifdef REC2_MATCHING
 // GLOBAL: CARMA2_HW 0x0079e044
 // GLOBAL: CARMA2_SW 0x007945a4
 // GLOBAL: CARMA2_CHEAT 0x007a56e4
-int gINT_0079e044 = 0;
+undefined4 gDAT_0079e044 = 0;
+#endif
 
 // GLOBAL: CARMA2_HW 0x0079e060
 // GLOBAL: CARMA2_SW 0x007945c0
