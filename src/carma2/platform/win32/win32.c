@@ -188,21 +188,22 @@ int gPerformanceCounterInitialized;
 // GLOBAL: CARMA2_HW 0x006acc80
 // GLOBAL: CARMA2_SW 0x006a6420
 // GLOBAL: CARMA2_CHEAT 0x006b4310
-LARGE_INTEGER gPerformanceCounterStart;
+ULARGE_INTEGER gPerformanceCounterStart;
 
 // GLOBAL: CARMA2_HW 0x006acc68
 // GLOBAL: CARMA2_SW 0x006a61b0
-LARGE_INTEGER gPerformanceCounterFrequency_s;
+// GLOBAL: CARMA2_CHEAT 0x006b42f8
+ULARGE_INTEGER gPerformanceCounterFrequency_s;
 
 // GLOBAL: CARMA2_HW 0x006ad1f0
 // GLOBAL: CARMA2_SW 0x006a6990
 // GLOBAL: CARMA2_CHEAT 0x006b4880
-LARGE_INTEGER gPerformanceCounterFrequency_ms;
+ULARGE_INTEGER gPerformanceCounterFrequency_ms;
 
 // GLOBAL: CARMA2_HW 0x006ac858
 // GLOBAL: CARMA2_SW 0x006a5da8
 // GLOBAL: CARMA2_CHEAT 0x006b3ee8
-LARGE_INTEGER gPerformanceCounterFrequency_us;
+ULARGE_INTEGER gPerformanceCounterFrequency_us;
 
 
 // GLOBAL: CARMA2_HW 0x006ad49c
@@ -828,18 +829,23 @@ int C2_HOOK_FASTCALL PDServiceSystem(tU32 pTime_since_last_call) {
 
 // FUNCTION: CARMA2_HW 0x0051d7c0
 // FUNCTION: CARMA2_SW 0x00518e30
-// FUNCTION: CARMA2_cHEAT 0x005233b0
+// FUNCTION: CARMA2_CHEAT 0x005233b0
 void C2_HOOK_FASTCALL PDInitTimer(void) {
     LARGE_INTEGER freq;
     LARGE_INTEGER current_count;
 
-
     gPerformanceCounterInitialized = 0;
     if (QueryPerformanceFrequency(&freq) != 0) {
         gPerformanceCounterInitialized = 1;
-        gPerformanceCounterFrequency_s = freq;
+        gPerformanceCounterFrequency_s.QuadPart = freq.HighPart;
+        gPerformanceCounterFrequency_s.QuadPart = Int64ShllMod32(gPerformanceCounterFrequency_s.QuadPart, 16);
+        gPerformanceCounterFrequency_s.QuadPart = Int64ShllMod32(gPerformanceCounterFrequency_s.QuadPart, 16);
+        gPerformanceCounterFrequency_s.QuadPart += freq.LowPart;
         QueryPerformanceCounter(&current_count);
-        gPerformanceCounterStart = current_count;
+        gPerformanceCounterStart.QuadPart = current_count.HighPart;
+        gPerformanceCounterStart.QuadPart = Int64ShllMod32(gPerformanceCounterStart.QuadPart, 16);
+        gPerformanceCounterStart.QuadPart = Int64ShllMod32(gPerformanceCounterStart.QuadPart, 16);
+        gPerformanceCounterStart.QuadPart += current_count.LowPart;
         gPerformanceCounterFrequency_ms.QuadPart = gPerformanceCounterFrequency_s.QuadPart / 1000;
         gPerformanceCounterFrequency_us.QuadPart = gPerformanceCounterFrequency_s.QuadPart / 1000000;
     }

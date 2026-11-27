@@ -46,10 +46,10 @@ extern int gKeyboardBufferLength;
 extern unsigned char gKeyboardBuffer[20];
 
 extern int gPerformanceCounterInitialized;
-extern LARGE_INTEGER gPerformanceCounterStart;
-extern LARGE_INTEGER gPerformanceCounterFrequency_s;
-extern LARGE_INTEGER gPerformanceCounterFrequency_ms;
-extern LARGE_INTEGER gPerformanceCounterFrequency_us;
+extern ULARGE_INTEGER gPerformanceCounterStart;
+extern ULARGE_INTEGER gPerformanceCounterFrequency_s;
+extern ULARGE_INTEGER gPerformanceCounterFrequency_ms;
+extern ULARGE_INTEGER gPerformanceCounterFrequency_us;
 
 extern tU32 gTime_app_activated;
 
