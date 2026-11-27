@@ -381,6 +381,13 @@ int gINT_0069fda4 = 0;
 // GLOBAL: CARMA2_CHEAT 0x0069be80
 br_model* gNapalm_bolt_models[7];
 
+// GLOBAL: CARMA2_HW 0x0065e4d8
+// GLOBAL: CARMA2_SW 0x00658e10
+// GLOBAL: CARMA2_CHEAT 0x00665b90
+const tPed_anim_seq gScare_ped_anim_sequence = {
+    4, { 1, 2, 1, 99 },
+};
+
 // GLOBAL: CARMA2_HW 0x0065e4e0
 // GLOBAL: CARMA2_SW 0x00658e18
 // GLOBAL: CARMA2_CHEAT 0x00665b98
@@ -1175,9 +1182,29 @@ int C2_HOOK_FASTCALL IsActorRenderworthy(br_actor* pActor) {
     }
 }
 
-// SetPedXZDirection
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
 
-// StopPedNoise
+// STUB: CARMA2_HW 0x004cc2c0
+// STUB: CARMA2_SW 0x004c89c0
+// STUB: CARMA2_CHEAT 0x004d1e30
+void C2_HOOK_FASTCALL SetPedXZDirection(tPedestrian* pPed, br_vector3* pDir, float pSpeed, tU32 pTime) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
+
+static inline void C2_HOOK_FASTCALL StopPedNoise(tPedestrian* pPed) {
+
+    if (pPed->field_0x0c != NULL && pPed->field_0x0c->field_0x9c != 0 && pPed->field_0x0c->field_0xa0 >= 0) {
+        if (DRS3SoundStillPlaying(pPed->field_0x0c->field_0x9c)) {
+            DRS3StopSound(pPed->field_0x0c->field_0x9c);
+        }
+    }
+}
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
@@ -1314,7 +1341,19 @@ inline void C2_HOOK_FASTCALL SetPedHeadAnim(tPedestrian* pPed, const tPed_anim_s
 
 // ClearPedHeadAnim
 
-// ScarePedestrian
+static inline void C2_HOOK_FASTCALL ScarePedestrian(tPedestrian* pPed, tU32 pTime, int pPanic, int pForce) {
+
+    if (((pPed->action != ePed_action_running && pPed->action != ePed_action_panicking) || pForce) && pPed->action != ePed_action_getting_up) {
+        if (!pPanic) {
+            StartPedRunning(pPed, pTime, 0);
+        } else {
+            SetPedMove(pPed, gPed_move_fsm[114][IRandomBetween(0, 7)], -1, 0, 1, pTime, ePed_action_panicking);
+            MakePedNoise(pPed, 6, 0, NULL);
+            SetPedHeadAnim(pPed, &gScare_ped_anim_sequence, pTime);
+        }
+    }
+    pPed->field_0x28 = pTime;
+}
 
 // PedAnimCausesMovement
 
@@ -1356,7 +1395,74 @@ void C2_HOOK_FASTCALL DoPostElectricution(tPedestrian* pPed, tU32 pTime, float p
     }
 }
 
-// CBMoveCompleted
+// FUNCTION: CARMA2_HW 0x004cbf20
+// FUNCTION: CARMA2_SW 0x004c8620
+// FUNCTION: CARMA2_CHEAT 0x004d1a90
+int C2_HOOK_FASTCALL CBMoveCompleted(tPed_character_instance* pCharacter) {
+    tU32 time;
+    tPedestrian* ped;
+    int move_id;
+    br_vector3 dir;
+
+    time = GetTotalTime();
+    ped = pCharacter->ped;
+    move_id = pCharacter->personality->form->moves[pCharacter->field_0x7].id;
+    if (pCharacter->field_0x14 & 0x4) {
+        EnableRetainRootMode();
+    }
+    switch (move_id) {
+    case 2:
+    case 3:
+    case 4:
+    case 5:
+    case 6:
+    case 10:
+    case 11:
+        if (ped->field_0x0c != NULL && ped->field_0x0c->field_0x20[0] != 0) {
+            StopPedNoise(ped);
+        }
+        if (!gPeds_suicidal) {
+            BrVector3Scale(&dir, &pCharacter->field_0xc0, -1.f);
+            SetPedXZDirection(ped, &dir, 0.f, time);
+        }
+        StartPedRunning(ped, time, 0);
+        break;
+    case 13:
+        StartPedRunning(ped, time, 1);
+        break;
+    case 80:
+    case 81:
+    case 82:
+    case 83:
+    case 84:
+    case 85:
+        if (!gBlind_pedestrians && !gPed_valium_left) {
+            ped->action = ePed_action_walking;
+            ScarePedestrian(ped, time, 0, 0);
+        } else {
+            SetPedMove(ped, 0x1e, -1, 0, 0, time, ePed_action_walking);
+        }
+        break;
+    case 90:
+    case 91:
+    case 92:
+        SetPedMove(ped, 0x61, -1, 0, 1, time, ePed_action_impacting);
+        break;
+    case 96:
+    case 97:
+        SetKnockedOverMove(ped, time);
+        break;
+    case 113:
+        DoPostElectricution(ped, time, 1.f, 1.f);
+        break;
+    }
+    if (ped->field_0x0c != NULL && ped->field_0x0c->field_0xb0 != NULL) {
+        ped->field_0x0c->field_0xb0->field_0x14 = NULL;
+        ped->field_0x0c->field_0xb0 = NULL;
+    }
+    DisableRetainRootMode();
+    return 1;
+}
 
 // FUNCTION: CARMA2_HW 0x004cc900
 // FUNCTION: CARMA2_SW 0x004c9000
@@ -3454,6 +3560,10 @@ void C2_HOOK_FASTCALL EnableOverallMovement(void) {
     gPed_overall_movement_disabled = 0;
 }
 
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
 // FUNCTION: CARMA2_HW 0x0040c620
 // FUNCTION: CARMA2_SW 0x0040c610
 // FUNCTION: CARMA2_CHEAT 0x0040c6c0
@@ -3467,3 +3577,7 @@ void C2_HOOK_FASTCALL EnableRetainRootMode(void) {
 void C2_HOOK_FASTCALL DisableRetainRootMode(void) {
     gPed_retain_root_mode = 0;
 }
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
