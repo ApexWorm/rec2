@@ -646,7 +646,7 @@ void C2_HOOK_FASTCALL InitSoundSources(void) {
             if (gEnvironment_sound_sources[i].source == NULL) {
                 gEnvironment_sound_sources[i].source = S3CreateSoundSourceBR(&gEnvironment_sound_sources[i].position, &gZero_v__car, gXXX_outlet);
                 if (gEnvironment_sound_sources[i].source != NULL) {
-                    S3BindAmbientSoundToOutlet(gXXX_outlet, eSoundId_Cop_Siren, gEnvironment_sound_sources[i].source, 100.f, 0, 0, 0, S3_FIXED_INT(1), S3_FIXED_INT(1));
+                    S3BindAmbientSoundToOutlet(gXXX_outlet, eSoundId_Cop_Siren, gEnvironment_sound_sources[i].source, 100.0f, 0, 0, 0, S3_FIXED_INT(1), S3_FIXED_INT(1));
                 }
             }
         }
