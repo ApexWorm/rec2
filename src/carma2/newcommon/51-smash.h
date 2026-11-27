@@ -116,9 +116,9 @@ extern br_scalar C2_HOOK_FASTCALL SetInitPosition(br_actor* pActor, tSmashable_i
 
 // DoNonCarShrapnel
 
-extern void C2_HOOK_FASTCALL DoShrapnel(int pArg1, tShrapnel_spec* pShrapnel, int pArg3, br_vector3* pArg4, br_vector3* pArg5, br_vector3* pArg6, undefined4 pArg7, tU32 pTime, uintptr_t pId, br_matrix34* pMat, br_bounds3* pBounds, br_vector3* pArg12, float pArg13, br_vector3* pArg14, int pArg15);
+extern void C2_HOOK_FASTCALL DoShrapnel(tCar_crush_smashable_part* pSmashable, tShrapnel_spec* pShrapnel, int pArg3, br_vector3* pArg4, br_vector3* pArg5, br_vector3* pArg6, br_actor* pActor, tU32 pTime, uintptr_t pId, br_matrix34* pMat, br_bounds3* pBounds, br_vector3* pArg12, float pArg13, br_vector3* pArg14, int pArg15);
 
-// DoAward
+extern void C2_HOOK_FASTCALL DoAward(tPhysics_object* pObject, tAward_info* pAward, float pForce_magnitude);
 
 extern void C2_HOOK_FASTCALL DoSpillage(tSlick_spec* pSlick, br_actor* pActor);
 
@@ -134,13 +134,13 @@ extern void C2_HOOK_FASTCALL DoDelayedSmash(tDelayed_smash* pDelayed_smash);
 
 extern void C2_HOOK_FASTCALL MungeDelayedSideEffects(void);
 
-// ActivateNonCarSideEffects
+extern void C2_HOOK_FASTCALL ActivateNonCarSideEffects(br_actor* pActor, tNon_car_cuboid_activations* pActivations, tPhysics_object* pObject);
 
-// ActivateSmashSideEffects
+extern void C2_HOOK_FASTCALL ActivateSmashSideEffects(int pArg1, tPhysics_object* pObject, tShrapnel_side_effects* pSide_effects, br_vector3* pForce, float pForce_magnitude);
 
-// DoSideEffects
+extern void C2_HOOK_FASTCALL DoSideEffects(br_actor* pActor, int pArg2, tPhysics_object* pObject, tSide_effects* pSide_effects, br_vector3* pPosition, float pForce_magnitude, br_vector3* pForce);
 
-// DoVariableEffects
+extern void C2_HOOK_FASTCALL DoVariableEffects(tVariable_changes* pChanges);
 
 extern void C2_HOOK_FASTCALL DoConnotations(tPhysics_object* pObject, int pArg2, tCar_crush_smashable_part* pSmashable, tConnotations* pConnotations, int pSeed, br_vector3* pVelocity, br_vector3* pPosition, br_vector3* pSound_position, br_actor* pActor, tU32 pTime, uintptr_t pId, br_matrix34* pMat, br_bounds3* pBounds, br_vector3* pArg14, float pForce_magnitude, br_vector3* pForce, int pNo_side_effects);
 
@@ -250,7 +250,7 @@ extern void C2_HOOK_FASTCALL CleanUpSmashStuff(void);
 
 extern void C2_HOOK_FASTCALL DisposeSmashData(tCar_crush_buffer_entry* pCrush_data);
 
-extern void C2_HOOK_FASTCALL DoBackwardShrapnel(tU32 pTime_now, int pArg1, tShrapnel_spec* pShrapnel, int pArg3, br_vector3* pArg4, br_vector3* pArg5, br_vector3* pArg6, undefined4 pArg7, tU32 pTime, uintptr_t pId, br_matrix34* pMat, br_bounds3* pBounds, br_vector3* pArg12, float pArg13, br_vector3* pArg14);
+extern void C2_HOOK_FASTCALL DoBackwardShrapnel(tU32 pTime_now, tCar_crush_smashable_part* pSmashable, tShrapnel_spec* pShrapnel, int pArg3, br_vector3* pArg4, br_vector3* pArg5, br_vector3* pArg6, br_actor* pActor, tU32 pTime, uintptr_t pId, br_matrix34* pMat, br_bounds3* pBounds, br_vector3* pArg12, float pArg13, br_vector3* pArg14);
 
 extern void C2_HOOK_FASTCALL InitRepairAnimations(void);
 
@@ -308,7 +308,7 @@ extern void C2_HOOK_FASTCALL SendNetSmash(tPhysics_object* pObject, undefined4 p
 
 // SendAllSmashes
 
-// HitPowerup
+extern void C2_HOOK_FASTCALL HitPowerup(tPhysics_object* pObject, int pIndex, int pArg3);
 
 extern float C2_HOOK_FASTCALL SmashEnvironment(tPhysics_object* pObject, tFace_ref* pFace, float pMagnitude, br_vector3* pPosition, br_vector3* pNormal, br_vector3* pForce, int pSnap, int pNetwork);
 

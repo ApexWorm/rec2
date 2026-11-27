@@ -3579,7 +3579,7 @@ typedef enum {
 
 typedef struct {
     short field_0x0;
-    short field_0x2;
+    tU16 field_0x2;
 } tSmash_run_time_variable_change;
 
 typedef enum {
@@ -3668,6 +3668,7 @@ typedef struct {
     float field_0x8;
     int field_0xc;
     int field_0x10;
+    int field_0x14;
 } tAward_info;
 
 typedef char tSmashable_environment_name[32];
@@ -3713,7 +3714,6 @@ typedef struct {
     tSpecial_effects_spec special_effects;
     tSide_effects side_effects;
     tAward_info award;
-    undefined field_0x28c[4];
     tVariable_changes variable_changes;
 } tConnotations;
 
