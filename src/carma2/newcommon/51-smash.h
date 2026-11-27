@@ -305,7 +305,7 @@ extern void C2_HOOK_FASTCALL SendNetSmash(tPhysics_object* pObject, undefined4 p
 
 // SendAllSmashes
 
-// HitPowerup
+extern void C2_HOOK_FASTCALL HitPowerup(tPhysics_object* pObject, int pPowerup_index, br_actor* pActor);
 
 // SmashEnvironment
 
