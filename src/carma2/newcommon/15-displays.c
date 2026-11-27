@@ -203,6 +203,8 @@ tU32 gLast_time_credit_amount;
 int gOld_times[10];
 
 // GLOBAL: CARMA2_HW 0x0079eb00
+// GLOBAL: CARMA2_SW 0x00795060
+// GLOBAL: CARMA2_CHEAT 0x007a61a0
 char gHeadup_oppo_ped_text[64];
 
 // GLOBAL: CARMA2_HW 0x0067f888
@@ -801,6 +803,8 @@ void C2_HOOK_FASTCALL DoFancyHeadup(int pIndex) {
 }
 
 // FUNCTION: CARMA2_HW 0x0044a8a0
+// FUNCTION: CARMA2_SW 0x0044aa30
+// FUNCTION: CARMA2_CHEAT 0x0044adc0
 void C2_HOOK_FASTCALL MoveHeadupTo(int pHeadup_index, int pNew_x, int pNew_y) {
     tHeadup* the_headup;
 
@@ -1103,6 +1107,7 @@ void C2_HOOK_FASTCALL EarnCredits(int pAmount) {
 
 // FUNCTION: CARMA2_HW 0x0044b450
 // FUNCTION: CARMA2_SW 0x0044b5e0
+// FUNCTION: CARMA2_CHEAT 0x0044b9a0
 void C2_HOOK_FASTCALL EarnCredits100(int pAmount) {
     EarnCredits(pAmount - (pAmount + 50) % 100 + 50);
 }
@@ -1194,6 +1199,7 @@ void C2_HOOK_FASTCALL AwardTime5(tU32 pTime) {
 
 // FUNCTION: CARMA2_HW 0x0044ba10
 // FUNCTION: CARMA2_SW 0x0044b830
+// FUNCTION: CARMA2_CHEAT 0x0044bf60
 void C2_HOOK_FASTCALL FullScreenTimedMessage(const char* pText) {
     LoadFont(1);
     ClearEntireScreen();
