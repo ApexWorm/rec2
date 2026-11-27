@@ -3724,11 +3724,8 @@ typedef struct {
 } tSmashable_item_spec_shrapnel;
 
 typedef struct {
-    char undefined_0x0[4];
-    int count_sounds;
-    int sounds[3];
-    undefined field_0x18[44];
-    undefined4 field_0x40;
+    char name[64];
+    int field_0x40;
     tSmashable_item_spec_trigger trigger;
     int count_levels;
     undefined4 field_0x4c;
@@ -3746,15 +3743,8 @@ typedef struct {
 } tSmashable_item_spec_texture_change;
 
 typedef struct {
-    int chance_fire;
-    int model_1_int;
-    int model_2_int;
-    int model_3_int;
-} tSmokeFireChance;
-
-typedef struct {
     br_model* model;
-    tSmokeFireChance smoke_fire_chance;
+    tSmoke_fire_chance smoke_fire_chance;
 } tSmashReplace;
 
 typedef struct tSmashable_item_spec {

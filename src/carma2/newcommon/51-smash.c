@@ -68,6 +68,11 @@ tPowerup_queue_item gPowerup_queue[50] = { 0 };
 // GLOBAL: CARMA2_CHEAT 0x006ab1d8
 tSmashable_item_spec gUnknown_smashable_006a3660;
 
+// GLOBAL: CARMA2_HW 0x006a3330
+// GLOBAL: CARMA2_SW 0x0069d390
+// GLOBAL: CARMA2_CHEAT 0x006aaea8
+int gCapacity_track_smashable_environment_specs;
+
 // GLOBAL: CARMA2_HW 0x006a3334
 // GLOBAL: CARMA2_SW 0x0069d394
 // GLOBAL: CARMA2_CHEAT 0x006aaeac
@@ -184,12 +189,10 @@ int gINT_006a80f4 = 0;
 // GLOBAL: CARMA2_CHEAT 0x006afc70
 tDecal gDecals[50] = { 0 };
 
-#ifdef REC2_MATCHING
 // GLOBAL: CARMA2_HW 0x006a8288
 // GLOBAL: CARMA2_SW 0x006a22e8
 // GLOBAL: CARMA2_CHEAT 0x006afe00
 int gINT_006a8288 = 0;
-#endif
 
 // GLOBAL: CARMA2_HW 0x006a828c
 // GLOBAL: CARMA2_SW 0x006a22ec
@@ -2284,11 +2287,111 @@ void C2_HOOK_FASTCALL SplondificatalizeIdentifier(br_actor* pActor, char **pIden
     }
 }
 
-// ReadSmashReplace
+inline void C2_HOOK_FASTCALL ReadSmashReplace(tSmashReplace* pReplace, FILE* pF) {
+    char s[256];
 
-// ReadSmashTexture
+    GetAString(pF, s);
+    pReplace->model = BrModelFind(s);
+    if (pReplace->model == NULL) {
+        FatalError(kFatalError_CannotFindSmashActorModel_S, s);
+    }
+    ReadSmokeFireChance(pF, &pReplace->smoke_fire_chance);
+}
 
-// ReadSmashableEnvironment
+inline void C2_HOOK_FASTCALL ReadSmashTexture(tSmashable_item_spec* pSpec, tSmashable_item_spec_texture_change* pChange, FILE* pF) {
+    char s[256];
+
+    pChange->levels = NULL;
+#ifdef REC2_FIX_BUGS
+    s[0] = '\0';
+#endif
+    strcpy(pChange->name, s);
+    pChange->field_0x40 = -1;
+    pChange->trigger = pSpec->trigger_object;
+    pChange->field_0x4c = 0;
+    pChange->field_0x40 = -1;
+    pChange->field_0x6c = 0;
+    pChange->field_0x70 = NULL;
+    pChange->field_0x74 = 0;
+    pChange->field_0x78 = NULL;
+    pChange->field_0x54 = 0.0f;
+    pChange->field_0x58 = 0.0f;
+    pChange->field_0x5c = 0.0f;
+    pChange->field_0x60 = 1.0f;
+    pChange->field_0x64 = 0.0f;
+    pChange->field_0x68 = 0.0f;
+    ReadSmashLevels(pF, &pChange->levels, &pChange->count_levels, pSpec->mode == kSmashableMode_TextureChange, &gTrack_storage_space);
+}
+
+// FUNCTION: CARMA2_HW 0x004f0450
+// FUNCTION: CARMA2_SW 0x004ec0b0
+// FUNCTION: CARMA2_CHEAT 0x004f60f0
+void C2_HOOK_FASTCALL ReadSmashableEnvironment(FILE* pF, const char* pPath) {
+    int i;
+    tSmashable_item_spec* spec;
+    char s[256];
+
+    gCount_smashable_noncars = 0;
+    gCount_smashable_noncar_shrapnel_actors = 0;
+    gSmashable_noncars = BrMemAllocate(100 * sizeof(tSmashable_environment_name), kMem_smashable_env_info);
+    gCount_track_smashable_environment_specs = GetAnInt(pF);
+    gINT_006a8288 = gCount_track_smashable_environment_specs;
+    gCapacity_track_smashable_environment_specs = 5 * (gCount_track_smashable_environment_specs + 30);
+    gTrack_smashable_environment_specs = BrMemAllocate(gCapacity_track_smashable_environment_specs * sizeof(tSmashable_item_spec), kMem_smashable_env_info);
+    gSmashable_track_environment_path = pPath;
+    memset(gSmashable_track_indexable_triggers, 0, sizeof(gSmashable_track_indexable_triggers));
+    for (i = 0, spec = gTrack_smashable_environment_specs; i < gCount_track_smashable_environment_specs; i++, spec++) {
+        spec->flags = GetAnInt(pF);
+        spec->field_0x10 = 0;
+        GetAString(pF, s);
+        if (s[0] == '&' && s[1] >= '0' && s[1] <= '9' && s[3] == '\0') {
+            spec->trigger_type = kSmashableTrigger_Number;
+        } else if (s[0] == '&' || strstr(s, ".DAT") != NULL || strstr(s, ".dat") != NULL || strstr(s, ".ACT") != NULL || strstr(s, ".act") != NULL) {
+            spec->trigger_type = kSmashableTrigger_Model;
+        } else {
+            spec->trigger_type = kSmashableTrigger_Material;
+        }
+        switch (spec->trigger_type) {
+        case kSmashableTrigger_Material:
+            spec->trigger_object.material = BrMaterialFind(s);
+            if (spec->trigger_object.material == NULL) {
+                FatalError(kFatalError_CannotFindSmashMaterial_S, s);
+            }
+            break;
+        case kSmashableTrigger_Model:
+            spec->trigger_object.model = BrModelFind(s);
+            if (spec->trigger_object.model == NULL) {
+                FatalError(kFatalError_CannotFindSmashModel_S, s);
+            }
+            break;
+        case kSmashableTrigger_Number:
+            spec->trigger_object.number.field_0x0 = (s[1] - '0') * 10 + (s[2] - '0');
+            spec->trigger_object.number.field_0x1 = GetAnInt(pF);
+            gSmashable_track_indexable_triggers[spec->trigger_object.number.field_0x0] = spec;
+            break;
+        }
+        spec->mode = GetALineAndInterpretCommand(pF, gSmashable_item_mode_names, REC2_ASIZE(gSmashable_item_mode_names));
+        if (spec->mode == kSmashableMode_Decal || spec->mode == kSmashableMode_TextureChange) {
+            ReadSmashTexture(spec, &spec->mode_data.texture_change, pF);
+        } else {
+            spec->mode_data.shrapnel.removal_threshold = GetAScalar(pF);
+            ReadConnotations(pF, &spec->mode_data.shrapnel.connotations, &gTrack_storage_space);
+        }
+        if (spec->mode != kSmashableMode_Remove && spec->mode == kSmashableMode_ReplaceModel) {
+            ReadSmashReplace(&spec->replace, pF);
+        }
+        GetAnInt(pF);
+        GetAnInt(pF);
+        GetAnInt(pF);
+        GetAnInt(pF);
+        spec->field_0x2d8 = 0;
+        spec->field_0x2d4 = 0;
+        spec->field_0x2dc = 0;
+    }
+    for (; i < gCapacity_track_smashable_environment_specs; i++, spec++) {
+        spec->trigger_type = -1;
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x004f0940
 // FUNCTION: CARMA2_SW 0x004ec5a0

@@ -25,6 +25,8 @@ extern br_actor* gSmashable_noncar_shrapnel_actors[100];
 extern int gCount_smashable_noncar_shrapnel_actors;
 extern const char* gSmashable_track_environment_path;
 extern int gCount_track_smashable_environment_specs;
+extern int gCapacity_track_smashable_environment_specs;
+extern int gINT_006a8288;
 extern tStored_smash* gNet_host_smashes;
 extern tQueued_net_smash gQueued_net_smashes[50];
 extern int gINT_006a8294;
@@ -258,11 +260,11 @@ extern void C2_HOOK_FASTCALL InitRepairAnimations(void);
 
 extern void C2_HOOK_FASTCALL SplondificatalizeIdentifier(br_actor* pActor, char **pIdentifier, int pIndex);
 
-// ReadSmashReplace
+extern void C2_HOOK_FASTCALL ReadSmashReplace(tSmashReplace* pReplace, FILE* pF);
 
-// ReadSmashTexture
+extern void C2_HOOK_FASTCALL ReadSmashTexture(tSmashable_item_spec* pSpec, tSmashable_item_spec_texture_change* pChange, FILE* pF);
 
-// ReadSmashableEnvironment
+extern void C2_HOOK_FASTCALL ReadSmashableEnvironment(FILE* pF, const char* pPath);
 
 extern void C2_HOOK_FASTCALL DisposeSmashEnvNonCars(void);
 

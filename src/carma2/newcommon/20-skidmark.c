@@ -26,6 +26,11 @@ const char* gBoring_material_names[2] = { "OILSMEAR.MAT", "ROBSMEAR.MAT" };
 // GLOBAL: CARMA2_CHEAT 0x00667658
 const char* gMaterial_names[2] = { "OILSMEAR.MAT", "GIBSMEAR.MAT" };
 
+// GLOBAL: CARMA2_HW 0x0065fe88
+// GLOBAL: CARMA2_SW 0x0065a7c8
+// GLOBAL: CARMA2_CHEAT 0x006676d0
+const char* gSmashable_item_mode_names[6] = { "nochange", "decal", "texturechange", "remove", "replacemodel", "crush" };
+
 // GLOBAL: CARMA2_HW 0x0065fea0
 // GLOBAL: CARMA2_SW 0x0065a7e0
 // GLOBAL: CARMA2_CHEAT 0x006676e8
