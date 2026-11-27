@@ -6,7 +6,9 @@
  * Copyright 2022-2026 rec2 developers
  */
 
+#include "FixMath.h"
 #include "ImageCompression.h"
+#include "MacMemory.h"
 #include "Movies.h"
 #include "QTML.h"
 
@@ -109,5 +111,147 @@ Movie C2_HOOK_CDECL FlattenMovieData(Movie theMovie, long movieFlattenFlags, con
 // STUB: CARMA2_HW 0x0056c720
 // STUB: CARMA2_SW 0x00567dc0
 OSErr C2_HOOK_CDECL CreateMovieFile(const FSSpec* fileSpec, OSType creator, ScriptCode scriptTag, long createMovieFileFlags, short* resRefNum, Movie* newmovie) {
+    return 1;
+}
+
+// STUB: CARMA2_HW 0x0056fde0
+// STUB: CARMA2_SW 0x0056b480
+// STUB: CARMA2_CHEAT 0x005759d0
+Fixed C2_HOOK_CDECL FixRatio(short numer, short denom) {
+    (void)numer;
+    (void)denom;
+    return 0;
+}
+
+// STUB: CARMA2_HW 0x0056c640
+// STUB: CARMA2_SW 0x00567ce0
+// STUB: CARMA2_CHEAT 0x00572230
+Track C2_HOOK_CDECL NewMovieTrack(Movie theMovie, Fixed width, Fixed height, short trackVolume) {
+    (void)theMovie;
+    (void)width;
+    (void)height;
+    (void)trackVolume;
+    return NULL;
+}
+
+// STUB: CARMA2_HW 0x0056a920
+// STUB: CARMA2_SW 0x00565fc0
+// STUB: CARMA2_CHEAT 0x00570510
+OSErr C2_HOOK_CDECL GetMoviesError(void) {
+    return 1;
+}
+
+// STUB: CARMA2_HW 0x0056c6e0
+// STUB: CARMA2_SW 0x00567d80
+// STUB: CARMA2_CHEAT 0x005722d0
+Media C2_HOOK_CDECL NewTrackMedia(Track theTrack, OSType mediaType, TimeScale timeScale, Handle dataRef, OSType dataRefType) {
+    (void)theTrack;
+    (void)mediaType;
+    (void)timeScale;
+    (void)dataRef;
+    (void)dataRefType;
+    return NULL;
+}
+
+// STUB: CARMA2_HW 0x0056b340
+// STUB: CARMA2_SW 0x005669e0
+// STUB: CARMA2_CHEAT 0x00570f30
+OSErr C2_HOOK_CDECL BeginMediaEdits(Media theMedia) {
+    (void)theMedia;
+    return 1;
+}
+
+// STUB: CARMA2_HW 0x00570600
+// STUB: CARMA2_SW 0x0056bca0
+// STUB: CARMA2_CHEAT 0x005761f0
+Handle C2_HOOK_CDECL NewHandle(Size byteCount) {
+    (void)byteCount;
+    return NULL;
+}
+
+// STUB: CARMA2_HW 0x005705c0
+// STUB: CARMA2_SW 0x0056bc60
+// STUB: CARMA2_CHEAT 0x005761b0
+OSErr C2_HOOK_CDECL MemError(void) {
+    return 1;
+}
+
+// STUB: CARMA2_HW 0x0056d7e0
+// STUB: CARMA2_SW 0x00568e80
+// STUB: CARMA2_CHEAT 0x005733d0
+OSErr C2_HOOK_CDECL GetMaxCompressionSize(PixMapHandle src, const Rect* srcRect, short colorDepth, CodecQ quality, CodecType cType, CompressorComponent codec, long* size) {
+    (void)src;
+    (void)srcRect;
+    (void)colorDepth;
+    (void)quality;
+    (void)cType;
+    (void)codec;
+    (void)size;
+    return 1;
+}
+
+// STUB: CARMA2_HW 0x00570a40
+// STUB: CARMA2_SW 0x0056c0e0
+// STUB: CARMA2_CHEAT 0x00576630
+void C2_HOOK_CDECL MoveHHi(Handle h) {
+    (void)h;
+}
+
+// STUB: CARMA2_HW 0x005707e0
+// STUB: CARMA2_SW 0x0056be80
+// STUB: CARMA2_CHEAT 0x005763d0
+void C2_HOOK_CDECL HLock(Handle h) {
+    (void)h;
+}
+
+// STUB: CARMA2_HW 0x0056d8a0
+// STUB: CARMA2_SW 0x00568f40
+// STUB: CARMA2_CHEAT 0x00573490
+OSErr C2_HOOK_CDECL CompressSequenceBegin(ImageSequence* seqID, PixMapHandle src, PixMapHandle prev, const Rect* srcRect, const Rect* prevRect, short colorDepth, CodecType cType, CompressorComponent codec, CodecQ spatialQuality, CodecQ temporalQuality, long keyFrameRate, CTabHandle ctable, CodecFlags flags, ImageDescriptionHandle desc) {
+    (void)seqID;
+    (void)src;
+    (void)prev;
+    (void)srcRect;
+    (void)prevRect;
+    (void)colorDepth;
+    (void)cType;
+    (void)codec;
+    (void)spatialQuality;
+    (void)temporalQuality;
+    (void)keyFrameRate;
+    (void)ctable;
+    (void)flags;
+    (void)desc;
+    return 1;
+}
+
+// STUB: CARMA2_HW 0x0056d8c0
+// STUB: CARMA2_SW 0x00568f60
+// STUB: CARMA2_CHEAT 0x005734b0
+OSErr C2_HOOK_CDECL CompressSequenceFrame(ImageSequence seqID, PixMapHandle src, const Rect* srcRect, CodecFlags flags, Ptr data, long* dataSize, unsigned char* similarity, ICMCompletionProcRecordPtr asyncCompletionProc) {
+    (void)seqID;
+    (void)src;
+    (void)srcRect;
+    (void)flags;
+    (void)data;
+    (void)dataSize;
+    (void)similarity;
+    (void)asyncCompletionProc;
+    return 1;
+}
+
+// STUB: CARMA2_HW 0x0056b440
+// STUB: CARMA2_SW 0x00566ae0
+// STUB: CARMA2_CHEAT 0x00571030
+OSErr C2_HOOK_CDECL AddMediaSample(Media theMedia, Handle dataIn, long inOffset, unsigned long size, TimeValue durationPerSample, SampleDescriptionHandle sampleDescriptionH, long numberOfSamples, short sampleFlags, TimeValue* sampleTime) {
+    (void)theMedia;
+    (void)dataIn;
+    (void)inOffset;
+    (void)size;
+    (void)durationPerSample;
+    (void)sampleDescriptionH;
+    (void)numberOfSamples;
+    (void)sampleFlags;
+    (void)sampleTime;
     return 1;
 }

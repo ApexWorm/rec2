@@ -9,6 +9,7 @@
 #ifndef __MOVIES__
 #define __MOVIES__
 
+#include "ConditionalMacros.h"
 #include "Files.h"
 #include "MacTypes.h"
 
@@ -17,6 +18,15 @@
 typedef struct MediaType**              Media;
 typedef struct MovieType**              Movie;
 typedef struct TrackType**              Track;
+typedef struct SampleDescription**      SampleDescriptionHandle;
+
+enum {
+    VideoMediaType                = FOUR_CHAR_CODE('v', 'i', 'd', 'e'),
+};
+
+enum {
+    kFullVolume                   = 0x0100,
+};
 
 enum {
     flattenAddMovieToDataFork = 1L << 0,
@@ -26,6 +36,25 @@ enum {
 };
 
 extern OSErr C2_HOOK_CDECL EnterMovies(void);
+
+extern OSErr C2_HOOK_CDECL GetMoviesError(void);
+
+extern Track C2_HOOK_CDECL NewMovieTrack(Movie theMovie, Fixed width, Fixed height, short trackVolume);
+
+extern Media C2_HOOK_CDECL NewTrackMedia(Track theTrack, OSType mediaType, TimeScale timeScale, Handle dataRef, OSType dataRefType);
+
+extern OSErr C2_HOOK_CDECL BeginMediaEdits(Media theMedia);
+
+extern OSErr C2_HOOK_CDECL AddMediaSample(
+    Media                   theMedia,
+    Handle                  dataIn,
+    long                    inOffset,
+    unsigned long           size,
+    TimeValue               durationPerSample,
+    SampleDescriptionHandle sampleDescriptionH,
+    long                    numberOfSamples,
+    short                   sampleFlags,
+    TimeValue*              sampleTime);
 
 extern OSErr C2_HOOK_CDECL CloseMovieFile(short resRefNum);
 
