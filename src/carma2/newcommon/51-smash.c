@@ -2616,10 +2616,6 @@ void C2_HOOK_FASTCALL ChangeSmashTexture(br_material* pMaterial, tCar_spec* pCar
     NOT_IMPLEMENTED();
 }
 
-extern tCar_spec* C2_HOOK_FASTCALL GetCarSpecFromCollObjID(int pID);
-
-extern tPhysics_object* C2_HOOK_FASTCALL GetCollObjFromID(int pID);
-
 inline tCar_spec* C2_HOOK_FASTCALL GetCarSpecFromCollObjID(int pID) {
 
     if (gNet_mode != eNet_mode_none) {

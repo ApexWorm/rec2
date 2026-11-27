@@ -25,6 +25,7 @@ extern const char* gSmashable_track_environment_path;
 extern int gCount_track_smashable_environment_specs;
 extern tStored_smash* gNet_host_smashes;
 extern tQueued_net_smash gQueued_net_smashes[50];
+extern int gINT_006a8294;
 extern tPowerup_queue_item gPowerup_queue[50];
 extern int gSize_powerup_queue;
 
@@ -355,7 +356,11 @@ extern void C2_HOOK_FASTCALL TurnOffSmashDecal(int pIndex);
 
 extern void C2_HOOK_FASTCALL ChangeSmashTexture(br_material* pMaterial, tCar_spec* pCar_spec, br_pixelmap* pOld_texture, br_pixelmap* pNew_texture);
 
-// DoNetSmash
+extern tCar_spec* C2_HOOK_FASTCALL GetCarSpecFromCollObjID(int pID);
+
+extern tPhysics_object* C2_HOOK_FASTCALL GetCollObjFromID(int pID);
+
+extern void C2_HOOK_FASTCALL DoNetSmash(tQueued_net_smash* pSmash);
 
 // ReceivedSmashEnvironment
 
