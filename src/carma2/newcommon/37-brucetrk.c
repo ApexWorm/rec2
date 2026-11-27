@@ -43,6 +43,11 @@ br_material* gDefault_track_material;
 // GLOBAL: CARMA2_CHEAT 0x00680b10
 int gCount_track_non_cars;
 
+// GLOBAL: CARMA2_HW 0x0079efac
+// GLOBAL: CARMA2_SW 0x0079554c
+// GLOBAL: CARMA2_CHEAT 0x007a664c
+int gMax_count_non_cars;
+
 // GLOBAL: CARMA2_HW 0x00679268
 // GLOBAL: CARMA2_SW 0x006739d8
 // GLOBAL: CARMA2_CHEAT 0x00680b18

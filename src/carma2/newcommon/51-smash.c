@@ -917,20 +917,196 @@ br_scalar C2_HOOK_FASTCALL SetInitPosition(br_actor* pActor, tSmashable_initial_
     return scale;
 }
 
-// DoGhostPartShrapnel
+inline void C2_HOOK_FASTCALL DoGhostPartShrapnel(tShrapnel_spec* pShrapnel, int pSeed, br_vector3* pVelocity, br_vector3* pPosition, br_vector3* pAlternate_position, br_actor* pActor, tU32 pTime, uintptr_t pId, br_bounds3* pBounds, br_matrix34* pMatrix, br_vector3* pSource_position) {
+    int i;
+    int count;
+    int use_all;
+    int old_seed;
+    br_actor* actor;
+    tSmash_vertex* fragment;
+    br_scalar scale;
+    br_scalar size_x;
+    br_scalar size_y;
+    br_matrix34 scale_mat;
+    br_matrix34 mat;
 
-// DoNonCarShrapnel
+    old_seed = rand();
+    srand(pSeed);
+    use_all = pShrapnel->type_info.ghost.field_0x0 < 0;
+    if (use_all) {
+        count = pShrapnel->type_info.ghost.count_actors;
+    } else {
+        count = IRandomBetween(pShrapnel->type_info.ghost.field_0x0, pShrapnel->type_info.ghost.field_0x4);
+    }
+    if (pMatrix != NULL && pShrapnel->type_info.ghost.bounds_dx != 0.0f && pShrapnel->type_info.ghost.bounds_dy != 0.0f) {
+        size_x = (br_scalar)sqrt(Vector3DistanceSquared(&gVector3_006b78a0[1], &gVector3_006b78a0[0]));
+        size_y = (br_scalar)sqrt(Vector3DistanceSquared(&gVector3_006b78a0[2], &gVector3_006b78a0[0]));
+        if (size_x < 0.001 || size_y < 0.001) {
+            return;
+        }
+        BrMatrix34Scale(&scale_mat, size_x / pShrapnel->type_info.ghost.bounds_dx, size_y / pShrapnel->type_info.ghost.bounds_dy, 1.0f);
+        BrMatrix34Mul(&mat, &scale_mat, pMatrix);
+        pMatrix = &mat;
+    }
+    for (i = 0; i < count; i++) {
+        if (use_all) {
+            actor = pShrapnel->type_info.ghost.actors[i];
+        } else {
+            actor = pShrapnel->type_info.ghost.actors[IRandomBetween(0, pShrapnel->type_info.ghost.count_actors - 1)];
+        }
+        fragment = FindShrapnelFragment(actor->model, pId, 4);
+        if (fragment == NULL) {
+            break;
+        }
+        scale = SetInitPosition(fragment->actor, &pShrapnel->initial_pos, actor, pPosition, pAlternate_position, pActor, pBounds, pMatrix);
+        SetShrapnelFragment(fragment, &pShrapnel->initial_speed, pVelocity, scale, &pShrapnel->time_info, pTime,
+            &gZero_vector__smash, pSource_position, &fragment->actor->t.t.translate.t);
+    }
+    srand(old_seed);
+}
+
+inline void C2_HOOK_FASTCALL DoNonCarShrapnel(tShrapnel_spec* pShrapnel, br_vector3* pVelocity, br_vector3* pPosition, br_vector3* pAlternate_position, br_actor* pActor, br_bounds3* pBounds, br_matrix34* pMatrix, br_vector3* pSource_position) {
+    int i;
+    int count;
+    int use_all;
+    int seed;
+    int old_seed;
+    br_actor* actor;
+    br_actor* clone;
+    tNon_car_spec* non_car;
+    tNet_message* message;
+    br_scalar scale;
+    br_vector3 v;
+    br_vector3 omega;
+
+    message = NULL;
+    if (gNet_mode == eNet_mode_client && !gINT_006a8294) {
+        return;
+    }
+    use_all = pShrapnel->type_info.noncar.amount_min < 0;
+    if (use_all) {
+        count = pShrapnel->type_info.noncar.count_actors;
+    } else {
+        count = IRandomBetween(pShrapnel->type_info.noncar.amount_min, pShrapnel->type_info.noncar.amount_max);
+    }
+    for (i = 0; i < count; i++) {
+        seed = rand();
+        if (gProgram_state.track_spec.count_non_cars >= gMax_count_non_cars) {
+            break;
+        }
+        if (gNet_mode == eNet_mode_host) {
+            message = NetBuildGuaranteedMessage(eNet_message_chunk_type_smash_shraps, 0);
+            message->contents.smash_shraps.seed = seed;
+            message->contents.smash_shraps.index = gProgram_state.track_spec.count_non_cars;
+        }
+        if (use_all) {
+            actor = pShrapnel->type_info.noncar.actors[i];
+        } else {
+            actor = pShrapnel->type_info.noncar.actors[IRandomBetween(0, pShrapnel->type_info.noncar.count_actors - 1)];
+        }
+        if (gNet_mode == eNet_mode_host) {
+            memcpy(message->contents.smash_shraps.shrapnel_id, actor->identifier + 1, sizeof(message->contents.smash_shraps.shrapnel_id));
+        }
+        clone = CloneActor(actor);
+        sprintf(clone->identifier + 4, "%04d.ACT", gProgram_state.track_spec.count_non_cars);
+        gProgram_state.track_spec.non_car_list[gProgram_state.track_spec.count_non_cars] = clone;
+        gProgram_state.track_spec.count_non_cars++;
+        BrActorAdd(gDont_render_actor, clone);
+        scale = SetInitPosition(clone, &pShrapnel->initial_pos, clone, pPosition, pAlternate_position, pActor, pBounds, pMatrix);
+        if (clone->type_data != NULL || (non_car = DoPullActorFromWorld(clone)) == NULL) {
+            BrActorRemove(clone);
+            BrActorFree(clone);
+            gProgram_state.track_spec.count_non_cars--;
+            break;
+        }
+        old_seed = rand();
+        ApplyInitialMovement(&pShrapnel->initial_speed, pVelocity, &v, &omega, scale, &gZero_vector__smash, pSource_position, &clone->t.t.translate.t);
+        BrVector3Scale(&non_car->collision_info->v, &v, 1.0 / WORLD_SCALE_D);
+        BrVector3Scale(&non_car->collision_info->omega, &omega, REC2_TAU);
+        non_car->collision_info->disable_move_rotate = 0;
+        srand(seed);
+        MungeSmokeFire(clone, non_car, &pShrapnel->type_info.noncar.smoke_fire_change);
+        if (gNet_mode == eNet_mode_host) {
+            BrMatrix34Copy(&message->contents.smash_shraps.mat, &clone->t.t.mat);
+            BrVector3Copy(&message->contents.smash_shraps.v, &non_car->collision_info->v);
+            BrVector3Copy(&message->contents.smash_shraps.omega, &non_car->collision_info->omega);
+            message->contents.smash_shraps.smoke_fire_chance = pShrapnel->type_info.noncar.smoke_fire_change;
+        }
+        PipeSingleNonCarCreation(gProgram_state.track_spec.count_non_cars - 1);
+        if (gNet_mode == eNet_mode_host) {
+            NetGuaranteedSendMessageToAllPlayers(gCurrent_net_game, message, NULL);
+        }
+        srand(old_seed);
+    }
+}
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
 #endif
 
-/* FIXME: parameter types and names are guesses (from the Ghidra project and the call sites) */
-// STUB: CARMA2_HW 0x004eb8f0
-// STUB: CARMA2_SW 0x004e75c0
-// STUB: CARMA2_CHEAT 0x004f1590
-void C2_HOOK_FASTCALL DoShrapnel(tCar_crush_smashable_part* pSmashable, tShrapnel_spec* pShrapnel, int pArg3, br_vector3* pArg4, br_vector3* pArg5, br_vector3* pArg6, br_actor* pActor, tU32 pTime, uintptr_t pId, br_matrix34* pMat, br_bounds3* pBounds, br_vector3* pArg12, float pArg13, br_vector3* pArg14, int pArg15) {
-    NOT_IMPLEMENTED();
+// FUNCTION: CARMA2_HW 0x004eb8f0
+// FUNCTION: CARMA2_SW 0x004e75c0
+// FUNCTION: CARMA2_CHEAT 0x004f1590
+void C2_HOOK_FASTCALL DoShrapnel(tCar_crush_smashable_part* pSmashable, tShrapnel_spec* pShrapnel, int pSeed, br_vector3* pVelocity, br_vector3* pPosition, br_vector3* pAlternate_position, br_actor* pActor, tU32 pTime, uintptr_t pId, br_matrix34* pMat, br_bounds3* pBounds, br_vector3* pDirection, float pForce, br_vector3* pSource_position, int pArg15) {
+    br_matrix34 mat;
+    br_vector3 tv;
+
+    if (!gAction_replay_mode) {
+        if ((pShrapnel->type == kShrapnelType_GhostParts || pShrapnel->type == kShrapnelType_NonCars)
+                && pShrapnel->initial_pos.type == kInitialSmashablePosition_ActorBased
+                && gINT_006a3334) {
+            BrVector3Sub(&tv, &gVector3_006b78a0[1], &gVector3_006b78a0[0]);
+            BrVector3Normalise((br_vector3*)mat.m[0], &tv);
+            BrVector3Sub(&tv, &gVector3_006b78a0[2], &gVector3_006b78a0[0]);
+            BrVector3Normalise((br_vector3*)mat.m[1], &tv);
+            BrVector3Normalise((br_vector3*)mat.m[2], &gVector3_006a4688);
+            BrVector3Copy((br_vector3*)mat.m[3], &gVector3_006b78a0[1]);
+        }
+    } else {
+        BrMatrix34Copy(&mat, pMat);
+    }
+    switch (pShrapnel->type) {
+    case kShrapnelType_Abstract:
+        if (!PointOutOfSightNotAR(pAlternate_position, gYon_squared)) {
+            if (pDirection == NULL) {
+                pDirection = &gBR_VECTOR3_00661678;
+            }
+            CreateShrapnelShowerWorld(pAlternate_position, &gZero_vector__smash, pDirection, (br_scalar)sqrt(pForce) * 10.0f,
+                pShrapnel->type_info.abstract.count_materials, pShrapnel->type_info.abstract.materials);
+        }
+        break;
+    case kShrapnelType_Shards:
+        if (!PointOutOfSightNotAR(pAlternate_position, gYon_squared)) {
+            ShatterObject(pSeed, pVelocity, pActor, pTime,
+                pSmashable != NULL ? pSmashable->field_0x74 : 0,
+                pSmashable != NULL ? pSmashable->field_0x78 : NULL,
+                pSmashable != NULL ? pSmashable->field_0x6c : 0,
+                pSmashable != NULL ? pSmashable->field_0x70 : NULL,
+                pShrapnel->type_info.shard.material, pShrapnel->type_info.shard.field_0x8, pShrapnel->type_info.shard.field_0x4,
+                &pShrapnel->initial_speed, &pShrapnel->time_info, pId, pMat);
+        }
+        break;
+    case kShrapnelType_GhostParts:
+        if (!PointOutOfSightNotAR(pAlternate_position, gYon_squared)) {
+            DoGhostPartShrapnel(pShrapnel, pSeed, pVelocity, pPosition, pAlternate_position, pActor, pTime, pId, pBounds,
+                gINT_006a3334 ? &mat : NULL, pSource_position);
+        }
+        break;
+    case kShrapnelType_NonCars:
+        DoNonCarShrapnel(pShrapnel, pVelocity, pPosition, pAlternate_position, pActor, pBounds,
+            gINT_006a3334 ? &mat : NULL, pSource_position);
+        break;
+    }
+    if (pShrapnel->type == kShrapnelType_GhostParts) {
+        /* FIXME: the original passes the matrix in the bounds argument for ghost parts */
+        PipeSingleShrapnelShower(pId, pTime, pSeed, pSmashable, pVelocity, pDirection, pForce, pPosition, pAlternate_position,
+            pShrapnel, (br_bounds3*)pMat, pActor, &mat, pSource_position, gVector3_006b78a0);
+        gINT_006a829c++;
+    } else if (pShrapnel->type == kShrapnelType_Shards) {
+        PipeSingleShrapnelShower(pId, pTime, pSeed, pSmashable, pVelocity, pDirection, pForce, pPosition, pAlternate_position,
+            pShrapnel, pBounds, pActor, pMat, pSource_position, gVector3_006b78a0);
+        gINT_006a829c++;
+    }
 }
 
 #ifdef REC2_MATCHING

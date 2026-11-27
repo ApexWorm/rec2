@@ -117,11 +117,11 @@ extern void C2_HOOK_FASTCALL Random34Matrix(br_matrix34* pMatrix);
 
 extern br_scalar C2_HOOK_FASTCALL SetInitPosition(br_actor* pActor, tSmashable_initial_position_spec* pInitial_position, br_actor* pSource_actor, br_vector3* pPosition, br_vector3* pAlternate_position, br_actor* pReference_actor, br_bounds3* pBounds, br_matrix34* pMatrix);
 
-// DoGhostPartShrapnel
+extern void C2_HOOK_FASTCALL DoGhostPartShrapnel(tShrapnel_spec* pShrapnel, int pSeed, br_vector3* pVelocity, br_vector3* pPosition, br_vector3* pAlternate_position, br_actor* pActor, tU32 pTime, uintptr_t pId, br_bounds3* pBounds, br_matrix34* pMatrix, br_vector3* pSource_position);
 
-// DoNonCarShrapnel
+extern void C2_HOOK_FASTCALL DoNonCarShrapnel(tShrapnel_spec* pShrapnel, br_vector3* pVelocity, br_vector3* pPosition, br_vector3* pAlternate_position, br_actor* pActor, br_bounds3* pBounds, br_matrix34* pMatrix, br_vector3* pSource_position);
 
-extern void C2_HOOK_FASTCALL DoShrapnel(tCar_crush_smashable_part* pSmashable, tShrapnel_spec* pShrapnel, int pArg3, br_vector3* pArg4, br_vector3* pArg5, br_vector3* pArg6, br_actor* pActor, tU32 pTime, uintptr_t pId, br_matrix34* pMat, br_bounds3* pBounds, br_vector3* pArg12, float pArg13, br_vector3* pArg14, int pArg15);
+extern void C2_HOOK_FASTCALL DoShrapnel(tCar_crush_smashable_part* pSmashable, tShrapnel_spec* pShrapnel, int pSeed, br_vector3* pVelocity, br_vector3* pPosition, br_vector3* pAlternate_position, br_actor* pActor, tU32 pTime, uintptr_t pId, br_matrix34* pMat, br_bounds3* pBounds, br_vector3* pDirection, float pForce, br_vector3* pSource_position, int pArg15);
 
 extern void C2_HOOK_FASTCALL DoAward(tPhysics_object* pObject, tAward_info* pAward, float pForce_magnitude);
 
