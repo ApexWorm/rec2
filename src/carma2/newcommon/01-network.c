@@ -44,6 +44,8 @@ int gJoin_poll_index;
 int gBastard_has_answered;
 
 // GLOBAL: CARMA2_HW 0x0068d984
+// GLOBAL: CARMA2_SW 0x006879dc
+// GLOBAL: CARMA2_CHEAT 0x00695224
 tU32 gAsk_time;
 
 // GLOBAL: CARMA2_HW 0x0068d98c
@@ -52,6 +54,7 @@ tU32 gAsk_time;
 int gMessage_header_size;
 
 // GLOBAL: CARMA2_HW 0x00690c80
+// GLOBAL: CARMA2_SW 0x0068acd8
 // GLOBAL: CARMA2_CHEAT 0x00698520
 tU32 gLast_status_broadcast;
 
@@ -645,6 +648,7 @@ inline tPlayer_ID C2_HOOK_FASTCALL NetExtractPlayerID(tNet_game_details* pDetail
 }
 
 // FUNCTION: CARMA2_HW 0x0049ee50
+// FUNCTION: CARMA2_SW 0x0049afd0
 // FUNCTION: CARMA2_CHEAT 0x0049f3f0
 int C2_HOOK_FASTCALL NetSendMessageToAddress(tNet_game_details* pDetails, tNet_message* pMessage, void* pAddress) {
 
@@ -1034,6 +1038,7 @@ void C2_HOOK_FASTCALL NetReallyDisposeMessage(tNet_message* pMessage) {
 
 // STUB: CARMA2_HW 0x0049ff70
 // STUB: CARMA2_SW 0x0049c0f0
+// STUB: CARMA2_CHEAT 0x004a0aa0
 tNet_message* C2_HOOK_FASTCALL NetGetNextMessage(tNet_game_details* pDetails, void** pSender_address) {
     NOT_IMPLEMENTED();
 }
@@ -1166,6 +1171,7 @@ void C2_HOOK_FASTCALL NetFullScreenMessage(int pStr_index, int pLeave_it_up_ther
 
 // STUB: CARMA2_HW 0x004a0260
 // STUB: CARMA2_SW 0x0049c3e0
+// STUB: CARMA2_CHEAT 0x004a0d90
 void C2_HOOK_FASTCALL ReceivedMessage(tNet_message* pMessage, void* pSender_address, tU32 pReceive_time) {
     NOT_IMPLEMENTED();
 }
@@ -1238,6 +1244,8 @@ void C2_HOOK_FASTCALL BroadcastStatus(void) {
 #endif
 
 // STUB: CARMA2_HW 0x004a4da0
+// STUB: CARMA2_SW 0x004a0f20
+// STUB: CARMA2_CHEAT 0x004a5c10
 void C2_HOOK_FASTCALL CheckForDisappearees(void) {
     NOT_IMPLEMENTED();
 }
@@ -1491,6 +1499,8 @@ int C2_HOOK_FASTCALL NetGuaranteedSendMessageToAddress(tNet_game_details* pDetai
 #endif
 
 // STUB: CARMA2_HW 0x004a6080
+// STUB: CARMA2_SW 0x004a2200
+// STUB: CARMA2_CHEAT 0x004a7150
 void C2_HOOK_FASTCALL ResendGuaranteedMessages(void) {
     NOT_IMPLEMENTED();
 }
