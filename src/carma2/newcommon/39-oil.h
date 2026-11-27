@@ -34,7 +34,7 @@ extern void C2_HOOK_FASTCALL MungeIndexedOilsHeightAboveGround(int pIndex);
 
 extern void C2_HOOK_FASTCALL SetInitialOilStuff(tOil_spill_info* pOil, br_model* pModel);
 
-// ProcessOilSpills
+extern void C2_HOOK_FASTCALL ProcessOilSpills(tU32 pFrame_period);
 
 extern int C2_HOOK_FASTCALL GetOilSpillCount(void);
 

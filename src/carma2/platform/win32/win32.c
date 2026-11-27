@@ -394,16 +394,19 @@ void C2_HOOK_FASTCALL PDBuildAppPath(char *pThe_path) {
 // FUNCTION: CARMA2_SW 0x005149a0
 // FUNCTION: CARMA2_CHEAT 0x00520690
 void C2_NORETURN C2_HOOK_FASTCALL PDFatalError(const char *pThe_str) {
+#ifdef REC2_HW
     const char *str1;
     const char *str2;
+#endif
 #ifdef REC2_CHEAT
     time_t now;
     FILE* f;
 #endif
 
     dr_dprintf("FATAL ERROR: %s", pThe_str);
-    str1 = pThe_str;
+#ifdef REC2_HW
     str2 = "";
+    str1 = pThe_str;
     if (str1 == NULL) {
         str1 = "NULL str1";
     }
@@ -412,6 +415,11 @@ void C2_NORETURN C2_HOOK_FASTCALL PDFatalError(const char *pThe_str) {
     }
     gIsFatalError = 1;
     sprintf(gFatalErrorMessage, "%s\n%s", str1, str2);
+#endif
+#ifdef REC2_SW
+    gIsFatalError = 1;
+    sprintf(gFatalErrorMessage,"%s\n%s", pThe_str, "");
+#endif
 #ifdef REC2_CHEAT
     time(&now);
     f = fopen("Last_Error.TXT", "at");
