@@ -646,7 +646,21 @@ br_scalar C2_HOOK_FASTCALL SetInitPosition(br_actor* pActor, tSmashable_initial_
 
 // DoNonCarShrapnel
 
-// DoShrapnel
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+/* FIXME: parameter types and names are guesses (from the Ghidra project and the call sites) */
+// STUB: CARMA2_HW 0x004eb8f0
+// STUB: CARMA2_SW 0x004e75c0
+// STUB: CARMA2_CHEAT 0x004f1590
+void C2_HOOK_FASTCALL DoShrapnel(int pArg1, tShrapnel_spec* pShrapnel, int pArg3, br_vector3* pArg4, br_vector3* pArg5, br_vector3* pArg6, undefined4 pArg7, tU32 pTime, uintptr_t pId, br_matrix34* pMat, br_bounds3* pBounds, br_vector3* pArg12, float pArg13, br_vector3* pArg14, int pArg15) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // DoAward
 
@@ -1567,13 +1581,52 @@ void C2_HOOK_FASTCALL InitSmashing(void) {
     InitDecals();
 }
 
-// VerySimpleRotate
+inline void C2_HOOK_FASTCALL VerySimpleRotate(br_scalar pDt, br_matrix34* pMatrix, br_vector3* pOmega) {
+    br_scalar omega;
+    br_vector3 axis;
+    br_vector3 pos;
 
-// STUB: CARMA2_HW 0x004eff30
-// STUB: CARMA2_SW 0x004ebb90
-// STUB: CARMA2_CHEAT 0x004f5bd0
+    omega = BrVector3Length(pOmega);
+    axis.v[0] = pOmega->v[0] / omega;
+    axis.v[1] = pOmega->v[1] / omega;
+    axis.v[2] = pOmega->v[2] / omega;
+    if (fabs(omega * pDt) >= 0.0001) {
+        pos.v[0] = pMatrix->m[3][0];
+        pos.v[1] = pMatrix->m[3][1];
+        pos.v[2] = pMatrix->m[3][2];
+        pMatrix->m[3][0] = 0.0f;
+        pMatrix->m[3][1] = 0.0f;
+        pMatrix->m[3][2] = 0.0f;
+        BrMatrix34PostRotate(pMatrix, BrRadianToAngle(omega * pDt), &axis);
+        pMatrix->m[3][0] = pos.v[0];
+        pMatrix->m[3][1] = pos.v[1];
+        pMatrix->m[3][2] = pos.v[2];
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x004eff30
+// FUNCTION: CARMA2_SW 0x004ebb90
+// FUNCTION: CARMA2_CHEAT 0x004f5bd0
 void C2_HOOK_FASTCALL DoFragMovement(tSmash_vertex* pFragment, tU32 pTime, float pDelta_time) {
-    NOT_IMPLEMENTED();
+    float f_dt;
+    br_vector3 move;
+
+    f_dt = pDelta_time / 1000.0f;
+    if (f_dt != 0.0f && pFragment->field_0x34 == 0) {
+        move.v[0] = pFragment->v.v[0] * f_dt;
+        move.v[1] = pFragment->v.v[1] * f_dt - 4.9 * gGravity_multiplier * f_dt * f_dt;
+        move.v[2] = pFragment->v.v[2] * f_dt;
+        pFragment->actor->t.t.translate.t.v[0] += move.v[0] / WORLD_SCALE_D;
+        pFragment->actor->t.t.translate.t.v[1] += move.v[1] / WORLD_SCALE_D;
+        pFragment->actor->t.t.translate.t.v[2] += move.v[2] / WORLD_SCALE_D;
+        pFragment->v.v[1] -= f_dt * gGravity_multiplier * 9.8;
+        VerySimpleRotate(f_dt, &pFragment->actor->t.t.mat, &pFragment->omega);
+    }
+    if (pTime >= pFragment->field_0x10) {
+        pFragment->actor->render_style = BR_RSTYLE_NONE;
+    } else {
+        pFragment->actor->render_style = BR_RSTYLE_FACES;
+    }
 }
 
 #ifdef REC2_MATCHING
@@ -1658,7 +1711,25 @@ void C2_HOOK_FASTCALL DisposeSmashData(tCar_crush_buffer_entry* pCrush_data) {
     }
 }
 
-// DoBackwardShrapnel
+/* FIXME: parameter types and names are guesses, see DoShrapnel */
+// FUNCTION: CARMA2_HW 0x004f0380
+// FUNCTION: CARMA2_SW 0x004ebfe0
+// FUNCTION: CARMA2_CHEAT 0x004f6020
+void C2_HOOK_FASTCALL DoBackwardShrapnel(tU32 pTime_now, int pArg1, tShrapnel_spec* pShrapnel, int pArg3, br_vector3* pArg4, br_vector3* pArg5, br_vector3* pArg6, undefined4 pArg7, tU32 pTime, uintptr_t pId, br_matrix34* pMat, br_bounds3* pBounds, br_vector3* pArg12, float pArg13, br_vector3* pArg14) {
+    int i;
+    float dt;
+    tSmash_vertex* fragment;
+
+    DoShrapnel(pArg1, pShrapnel, pArg3, pArg4, pArg5, pArg6, pArg7, pTime, pId, pMat, pBounds, pArg12, pArg13, pArg14, 0);
+    dt = (float)(pTime_now - pTime);
+    for (i = 0, fragment = gSmash_glass_fragments; i < (int)REC2_ASIZE(gSmash_glass_fragments); i++, fragment++) {
+        if (fragment->end_time != 0 && fragment->field_0x18 == pId) {
+            fragment->field_0x34 = 0;
+            DoFragMovement(fragment, GetTotalTime(), dt);
+            fragment->field_0x34 = 1;
+        }
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x004f0430
 // FUNCTION: CARMA2_SW 0x004ec090
