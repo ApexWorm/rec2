@@ -3305,11 +3305,108 @@ void C2_HOOK_FASTCALL TotallyRepairCar(void) {
 
 // RepairModels
 
-// UnBendModel
+typedef struct {
+    br_matrix34 matrix;
+    br_vector3 corners[4];
+    tBend_point_spec* spec;
+    tCar_spec* car;
+} tUnBend_models_context;
 
-// UnBendModels
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
 
-// UnBendActor
+// STUB: CARMA2_HW 0x0043a5b0
+// STUB: CARMA2_SW 0x0043a5f0
+// STUB: CARMA2_CHEAT 0x0043a7d0
+void C2_HOOK_FASTCALL UnBendModel(br_model* pModel, br_vector3* pTranslation, tUnBend_models_context* pContext) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
+
+// FUNCTION: CARMA2_HW 0x0043a560
+// FUNCTION: CARMA2_SW 0x0043a5a0
+// FUNCTION: CARMA2_CHEAT 0x0043a780
+intptr_t C2_HOOK_FASTCALL UnBendModels(br_actor* pActor, br_vector3* pTranslation, void* pContext) {
+    tUnBend_models_context* context;
+    tUser_crush_data* user_crush;
+    int i;
+
+    user_crush = pActor->user;
+    if (user_crush == NULL) {
+        return 0;
+    }
+    if (user_crush->crush_data != NULL) {
+        context = pContext;
+        for (i = 0; i < context->car->count_detail_levels; i++) {
+            UnBendModel(user_crush->models[i], pTranslation, context);
+        }
+    }
+    return 0;
+}
+
+// FUNCTION: CARMA2_HW 0x0043a150
+// FUNCTION: CARMA2_SW 0x0043a190
+// FUNCTION: CARMA2_CHEAT 0x0043a370
+void C2_HOOK_FASTCALL UnBendActor(br_actor* pActor, tBend_point_spec* pSpec, br_angle pAngle_x, br_angle pAngle_y, br_angle pAngle_z, tCar_spec* pCar) {
+    tUnBend_models_context context;
+    br_vector3 tv;
+
+    pSpec->field_0x3c[0] += pAngle_x;
+    pSpec->field_0x3c[1] += pAngle_y;
+    pSpec->field_0x3c[2] += pAngle_z;
+    context.spec = pSpec;
+    context.car = pCar;
+    BrMatrix34Translate(&context.matrix, -pSpec->field_0x18, -pSpec->field_0x1c, -pSpec->field_0x20);
+    if (pSpec->field_0x3c[1] != 0) {
+        BrMatrix34PostRotateY(&context.matrix, pSpec->field_0x3c[1]);
+    }
+    if (pSpec->field_0x3c[0] != 0) {
+        BrMatrix34PostRotateX(&context.matrix, pSpec->field_0x3c[0]);
+    }
+    if (pSpec->field_0x3c[2] != 0) {
+        BrMatrix34PostRotateZ(&context.matrix, pSpec->field_0x3c[2]);
+    }
+    BrMatrix34PostTranslate(&context.matrix, pSpec->field_0x18, pSpec->field_0x1c, pSpec->field_0x20);
+    BrVector3Set(&context.corners[0], pSpec->bounds.max.v[0], pSpec->bounds.max.v[1], pSpec->field_0x20);
+    BrVector3Set(&context.corners[1], pSpec->bounds.max.v[0], pSpec->bounds.min.v[1], pSpec->field_0x20);
+    BrVector3Set(&context.corners[2], pSpec->bounds.min.v[0], pSpec->bounds.max.v[1], pSpec->field_0x20);
+    BrVector3Set(&context.corners[3], pSpec->bounds.min.v[0], pSpec->bounds.min.v[1], pSpec->field_0x20);
+    BrMatrix34ApplyP(&tv, &context.corners[0], &context.matrix);
+    BrVector3Sub(&context.corners[0], &tv, &context.corners[0]);
+    BrMatrix34ApplyP(&tv, &context.corners[1], &context.matrix);
+    BrVector3Sub(&context.corners[1], &tv, &context.corners[1]);
+    BrMatrix34ApplyP(&tv, &context.corners[2], &context.matrix);
+    BrVector3Sub(&context.corners[2], &tv, &context.corners[2]);
+    BrMatrix34ApplyP(&tv, &context.corners[3], &context.matrix);
+    BrVector3Sub(&context.corners[3], &tv, &context.corners[3]);
+    BrVector3Sub(&context.corners[0], &context.corners[0], &context.corners[1]);
+    BrVector3Sub(&context.corners[0], &context.corners[0], &context.corners[2]);
+    BrVector3Accumulate(&context.corners[0], &context.corners[3]);
+    BrVector3Sub(&context.corners[1], &context.corners[1], &context.corners[3]);
+    BrVector3Sub(&context.corners[2], &context.corners[2], &context.corners[3]);
+    BrMatrix34Translate(&context.matrix, -pSpec->field_0x18, -pSpec->field_0x1c, -pSpec->field_0x20);
+    if (pAngle_y != 0) {
+        BrMatrix34PostRotateY(&context.matrix, pAngle_y);
+    }
+    if (pAngle_x != 0) {
+        BrMatrix34PostRotateX(&context.matrix, pAngle_x);
+    }
+    if (pAngle_z != 0) {
+        BrMatrix34PostRotateZ(&context.matrix, pAngle_z);
+    }
+    BrMatrix34PostTranslate(&context.matrix, pSpec->field_0x18, pSpec->field_0x1c, pSpec->field_0x20);
+    ARStartPipingSession(ePipe_chunk_model_mash);
+    DRActorEnumRecurseWithTranslation(pActor, NULL, UnBendModels, &context);
+    AREndPipingSession();
+    BrVector3Copy(&pSpec->field_0x44, &context.corners[0]);
+    BrVector3Copy(&pSpec->field_0x50, &context.corners[1]);
+    BrVector3Copy(&pSpec->field_0x5c, &context.corners[2]);
+    BrVector3Copy(&pSpec->field_0x68, &context.corners[3]);
+}
 
 // FUNCTION: CARMA2_HW 0x0043aa20
 // FUNCTION: CARMA2_SW 0x0043aa70

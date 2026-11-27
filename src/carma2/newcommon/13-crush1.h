@@ -445,9 +445,9 @@ extern void C2_HOOK_FASTCALL TotallyRepairCar(void);
 
 // UnBendModel
 
-// UnBendModels
+extern intptr_t C2_HOOK_FASTCALL UnBendModels(br_actor* pActor, br_vector3* pTranslation, void* pContext);
 
-// UnBendActor
+extern void C2_HOOK_FASTCALL UnBendActor(br_actor* pActor, tBend_point_spec* pSpec, br_angle pAngle_x, br_angle pAngle_y, br_angle pAngle_z, tCar_spec* pCar);
 
 extern void C2_HOOK_FASTCALL UnBendCollisionShape(tCar_crush_shape_info* pShape, const tBend_point_context* pContext);
 
