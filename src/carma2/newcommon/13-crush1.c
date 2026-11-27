@@ -3495,7 +3495,14 @@ void C2_HOOK_FASTCALL UnBendCollisionShape(tCar_crush_shape_info* pShape, const 
     }
 }
 
-// UnBendCollisionShapes
+inline void C2_HOOK_FASTCALL UnBendCollisionShapes(tCar_spec* pCar, const tBend_point_context* pContext) {
+    int i;
+
+    for (i = 0; i < pCar->car_crush_spec->count_shapes; i++) {
+        UnBendCollisionShape(&pCar->car_crush_spec->field_0x4[i], pContext);
+    }
+    pCar->car_crush_spec->expand_bounding_box = 3;
+}
 
 // FUNCTION: CARMA2_HW 0x0043aa80
 // FUNCTION: CARMA2_SW 0x0043aad0
@@ -3542,7 +3549,27 @@ void C2_HOOK_FASTCALL UnBendWheels(tCar_spec* pCar, const tBend_point_context* p
     }
 }
 
-// UnBendOtherThings
+inline void C2_HOOK_FASTCALL UnBendOtherThings(tCar_spec* pCar, tBend_point_spec* pSpec) {
+    tBend_point_context context;
+
+    context.car = pCar;
+    context.field_0x34 = pSpec;
+    BrMatrix34Translate(&context.field_0x4, -pSpec->field_0x18, -pSpec->field_0x1c, -pSpec->field_0x20);
+    if (pSpec->field_0x3c[1] != 0) {
+        BrMatrix34PostRotateY(&context.field_0x4, pSpec->field_0x3c[1]);
+    }
+    if (pSpec->field_0x3c[0] != 0) {
+        BrMatrix34PostRotateX(&context.field_0x4, pSpec->field_0x3c[0]);
+    }
+    if (pSpec->field_0x3c[2] != 0) {
+        BrMatrix34PostRotateZ(&context.field_0x4, pSpec->field_0x3c[2]);
+    }
+    BrMatrix34PostTranslate(&context.field_0x4, pSpec->field_0x18, pSpec->field_0x1c, pSpec->field_0x20);
+    UnBendCollisionShapes(pCar, &context);
+    UnBendWheels(pCar, &context);
+    BrVector3Copy(&pCar->collision_info->cmpos, &pCar->car_crush_spec->field_0x264);
+    BendPoint(&pCar->collision_info->cmpos, &context);
+}
 
 // FUNCTION: CARMA2_HW 0x0043ac90
 // FUNCTION: CARMA2_SW 0x0043ace0
@@ -3555,17 +3582,58 @@ br_scalar C2_HOOK_FASTCALL NormalizedAngle(br_angle pAngle) {
     }
 }
 
-// CalculateAmountRepairedFraction
+inline br_scalar C2_HOOK_FASTCALL CalculateAmountRepairedFraction(br_angle pAngle_x, br_angle pAngle_y, br_angle pAngle_z, br_angle pDelta_x, br_angle pDelta_y, br_angle pDelta_z, br_scalar* pOriginal_amount) {
+    br_scalar original;
+    br_scalar repaired;
+
+    original = NormalizedAngle(pAngle_x) + NormalizedAngle(pAngle_y) + NormalizedAngle(pAngle_z);
+    repaired = NormalizedAngle(pDelta_x) + NormalizedAngle(pDelta_y) + NormalizedAngle(pDelta_z);
+    *pOriginal_amount = 2.0f * original;
+    return repaired;
+}
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x00439c30
-// STUB: CARMA2_SW 0x00439c70
-// STUB: CARMA2_CHEAT 0x00439e50
+// FUNCTION: CARMA2_HW 0x00439c30
+// FUNCTION: CARMA2_SW 0x00439c70
+// FUNCTION: CARMA2_CHEAT 0x00439e50
 br_scalar C2_HOOK_FASTCALL UnBendCar(tCar_spec* pCar_spec, tU32 pDelta_time, br_scalar* pOriginal_amount) {
-    NOT_IMPLEMENTED();
+    tCar_crush_spec* crush_spec;
+    br_angle step;
+    br_angle delta_x;
+    br_angle delta_y;
+    br_angle delta_z;
+    br_scalar amount;
+
+    crush_spec = pCar_spec->car_crush_spec;
+    step = (br_angle)(pDelta_time * 8);
+#define UNBEND_STEP(ANGLE, DELTA)        \
+    if ((ANGLE) < BR_ANGLE_DEG(90)) {    \
+        if ((ANGLE) < step) {            \
+            DELTA = -(ANGLE);            \
+        } else {                         \
+            DELTA = -step;               \
+        }                                \
+    } else {                             \
+        DELTA = -(ANGLE);                \
+        if (DELTA >= step) {             \
+            DELTA = step;                \
+        }                                \
+    }
+    UNBEND_STEP(crush_spec->field_0x154.field_0x3c[0], delta_x)
+    UNBEND_STEP(crush_spec->field_0x154.field_0x3c[1], delta_y)
+    UNBEND_STEP(crush_spec->field_0x154.field_0x3c[2], delta_z)
+#undef UNBEND_STEP
+    amount = CalculateAmountRepairedFraction(crush_spec->field_0x154.field_0x3c[0], crush_spec->field_0x154.field_0x3c[1], crush_spec->field_0x154.field_0x3c[2],
+        delta_x, delta_y, delta_z, pOriginal_amount);
+    UnBendActor(pCar_spec->car_master_actor, &crush_spec->field_0x154, delta_x, delta_y, delta_z, pCar_spec);
+    UnBendOtherThings(pCar_spec, &crush_spec->field_0x154);
+    if (crush_spec->field_0x154.field_0x3c[0] == 0 && crush_spec->field_0x154.field_0x3c[1] == 0 && crush_spec->field_0x154.field_0x3c[2] == 0) {
+        DoCompletelyUnBentThings(pCar_spec);
+    }
+    return amount;
 }
 
 #ifdef REC2_MATCHING

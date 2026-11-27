@@ -451,15 +451,15 @@ extern void C2_HOOK_FASTCALL UnBendActor(br_actor* pActor, tBend_point_spec* pSp
 
 extern void C2_HOOK_FASTCALL UnBendCollisionShape(tCar_crush_shape_info* pShape, const tBend_point_context* pContext);
 
-// UnBendCollisionShapes
+extern void C2_HOOK_FASTCALL UnBendCollisionShapes(tCar_spec* pCar, const tBend_point_context* pContext);
 
 // UnBendWheels
 
-// UnBendOtherThings
+extern void C2_HOOK_FASTCALL UnBendOtherThings(tCar_spec* pCar, tBend_point_spec* pSpec);
 
 extern br_scalar C2_HOOK_FASTCALL NormalizedAngle(br_angle pAngle);
 
-// CalculateAmountRepairedFraction
+extern br_scalar C2_HOOK_FASTCALL CalculateAmountRepairedFraction(br_angle pAngle_x, br_angle pAngle_y, br_angle pAngle_z, br_angle pDelta_x, br_angle pDelta_y, br_angle pDelta_z, br_scalar* pOriginal_amount);
 
 extern br_scalar C2_HOOK_FASTCALL UnBendCar(tCar_spec* pCar_spec, tU32 pDelta_time, br_scalar* pOriginal_amount);
 
