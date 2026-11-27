@@ -79,7 +79,7 @@ extern void C2_HOOK_FASTCALL FancyDrawLine(br_pixelmap* pDest, int pX1, int pY1,
 
 // DRPixelmapCopyMapBlack8Bit
 
-// DRPixelmapCopyMapBlack
+extern void C2_HOOK_FASTCALL DRPixelmapCopyMapBlack(br_pixelmap* pDest, br_pixelmap* pSrc);
 
 extern void C2_HOOK_FASTCALL DisableLights(void);
 

@@ -95,9 +95,9 @@ extern void C2_HOOK_FASTCALL ResetScreenWobble(void);
 
 // FoxyStuff
 
-// DoARenderPass
+extern void C2_HOOK_FASTCALL DoARenderPass(br_matrix34* pMat34, br_actor* pCamera, br_pixelmap* pColour, br_pixelmap* pDepth, br_scalar pYon_factor, int pShadows, int pEffects, int pArg8);
 
-// DoACompleteRenderPass
+extern void C2_HOOK_FASTCALL DoACompleteRenderPass(int pMirror, br_matrix34* pCamera_to_world, br_actor* pCamera, br_pixelmap* pScreen, br_pixelmap* pDepth);
 
 extern void C2_HOOK_FASTCALL RenderAFrame(int pDepth_mask_on);
 
