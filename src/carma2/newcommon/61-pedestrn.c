@@ -117,6 +117,11 @@ tShrapnel_time_info gGiblet_min_max_time;
 // GLOBAL: CARMA2_CHEAT 0x006a3790
 int gGiblet_size_count;
 
+// GLOBAL: CARMA2_HW 0x0065d79c
+// GLOBAL: CARMA2_SW 0x006580d4
+// GLOBAL: CARMA2_CHEAT 0x00664e54
+int gNext_gib_shower_id = -1;
+
 // GLOBAL: CARMA2_HW 0x0065d7d4
 // GLOBAL: CARMA2_SW 0x0065810c
 // GLOBAL: CARMA2_CHEAT 0x00664e8c
@@ -1440,7 +1445,44 @@ void C2_HOOK_FASTCALL PedApplyGibShower(tU32 pId, tU32 pTime, unsigned int pSeed
 
 // PedUndoGibShower
 
-// DoGiblets
+#if defined(REC2_MATCHING) && defined(_MSC_VER)
+#pragma inline_depth(0)
+#endif
+
+// FUNCTION: CARMA2_HW 0x004ccff0
+// FUNCTION: CARMA2_SW 0x004c96f0
+// FUNCTION: CARMA2_CHEAT 0x004d2b60
+void C2_HOOK_FASTCALL DoGiblets(tPedestrian* pPed, tPhysics_object* pObject, tPhysics_object* pOther_object, float pForce, br_vector3* pPos, int pStart_size) {
+    tU32 time;
+    unsigned int seed;
+    tPhysics_object* object;
+    br_vector3 v;
+
+    if (gGoreLevel > 0) {
+        time = GetTotalTime();
+        if (pForce > .5) {
+            Explode(&gPed_large_blood_cloud, GetCharacterActorPtr(pPed->character), &pPed->character->personality->bb, &pObject->cmpos);
+        } else if (pForce > .25) {
+            Explode(&gPed_medium_blood_cloud, GetCharacterActorPtr(pPed->character), &pPed->character->personality->bb, &pObject->cmpos);
+        } else if (pForce > .05) {
+            Explode(&gPed_explosion_small_blood_cloud, GetCharacterActorPtr(pPed->character), &pPed->character->personality->bb, &pObject->cmpos);
+        }
+        seed = (int)pPos->v[2] ^ (int)pPos->v[1] ^ time ^ (uintptr_t)pOther_object ^ (uintptr_t)pPed ^ (int)pPos->v[0];
+        if (pOther_object != NULL) {
+            object = pOther_object;
+        } else {
+            object = pObject;
+        }
+        BrVector3Scale(&v, &object->v, 6.9);
+        DoGibShower(gNext_gib_shower_id, time, seed, pForce, pStart_size, &pPed->pos, pPos, &v);
+        PipeSingleGibShower(gNext_gib_shower_id, time, seed, pForce, pStart_size, &pPed->pos, pPos, &v);
+        gNext_gib_shower_id--;
+    }
+}
+
+#if defined(REC2_MATCHING) && defined(_MSC_VER)
+#pragma inline_depth()
+#endif
 
 void C2_HOOK_FASTCALL DoBloodSpurt(tU32 pId, tU32 pTime, unsigned int pSeed, br_vector3* pPosition, br_vector3* pImpactee_velocity, br_vector3* pNormal) {
     int seed;
