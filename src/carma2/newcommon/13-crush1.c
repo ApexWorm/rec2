@@ -1977,6 +1977,10 @@ void C2_HOOK_FASTCALL FullyDetachBit(tCar_spec* pCar, tPhysics_object* pObject) 
 
 // SplitCarCollisionShapes
 
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
 // FUNCTION: CARMA2_HW 0x00430d80
 // FUNCTION: CARMA2_SW 0x00430db0
 // FUNCTION: CARMA2_CHEAT 0x00430f50
@@ -2011,6 +2015,10 @@ int C2_HOOK_FASTCALL QuantizeWithinBounds(br_scalar pQuant, br_scalar pMin, br_s
     *pValue = (br_scalar)index * pQuant + pMin;
     return 1;
 }
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // SaveVitalBitsOfObject
 
@@ -2076,19 +2084,129 @@ void C2_HOOK_FASTCALL SplitCar(tCar_spec* pCar, tSplit_info* pSplit_info, int pA
 #pragma auto_inline(on)
 #endif
 
-// QuantizePlane
+extern void C2_HOOK_FASTCALL QuantizePlane(tSplit_info* pPlane);
 
-// WithinBounds
+inline void C2_HOOK_FASTCALL QuantizePlane(tSplit_info* pPlane) {
+    tCompressed_vector4 compressed;
+
+    CompressVector3((tCompressed_vector3*)&compressed, &pPlane->normal, -1.0f, 1.0f);
+    compressed.v[3] = DRScalarToU16(pPlane->d, -2.5f, 2.5f);
+    ExpandVector3(&pPlane->normal, (tCompressed_vector3*)&compressed, -1.0f, 1.0f);
+    pPlane->d = DRU16ToScalar(compressed.v[3], -2.5f, 2.5f);
+}
+
+inline int C2_HOOK_FASTCALL WithinBounds(br_scalar pValue, br_scalar pMin, br_scalar pMax) {
+
+    if (pValue < pMin || pValue > pMax) {
+        return 0;
+    } else {
+        return 1;
+    }
+}
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x004307e0
-// STUB: CARMA2_SW 0x00430810
-// STUB: CARMA2_CHEAT 0x004309b0
+// FUNCTION: CARMA2_HW 0x004307e0
+// FUNCTION: CARMA2_SW 0x00430810
+// FUNCTION: CARMA2_CHEAT 0x004309b0
 int C2_HOOK_FASTCALL SplitCheck(tCar_spec* pCar, int pArg2, const br_vector3* pPlane, float pArg4, tSplit_info* pSplit_info) {
-    NOT_IMPLEMENTED();
+    tCar_crush_spec* crush_spec;
+    br_bounds3* bounds;
+    br_bounds3* model_bounds;
+    br_vector3 size;
+    br_vector3 margin;
+    br_vector3 p;
+    br_scalar min_x;
+    br_scalar max_x;
+    br_scalar min_z;
+    br_scalar max_z;
+    br_scalar a;
+    br_scalar b;
+    br_scalar t;
+    int axis;
+    int axis1;
+    int axis2;
+    int found;
+
+    if (pCar->invulnerable_no_crushage && !pCar->knackered) {
+        return 0;
+    }
+    if (pCar->field_0x4c8 != 1.0) {
+        return 0;
+    }
+    crush_spec = pCar->car_crush_spec;
+    if (crush_spec == NULL || crush_spec->field_0x144 || crush_spec->field_0x4b8) {
+        return 0;
+    }
+    bounds = &pCar->collision_info->bb1;
+    BrVector3Sub(&size, &bounds->max, &bounds->min);
+    BrVector3Scale(&margin, &size, 0.25f);
+    min_x = bounds->min.v[0] + margin.v[0];
+    min_z = bounds->min.v[2] + margin.v[2];
+    max_x = bounds->max.v[0] - margin.v[0];
+    max_z = bounds->max.v[2] - margin.v[2];
+    switch (pArg2) {
+    case 0:
+            found = 0;
+            if ((br_scalar)fabs(pPlane->v[0]) > 0.001f) {
+                a = (pPlane->v[2] - bounds->min.v[1] * pPlane->v[1]) / pPlane->v[0];
+                b = (pPlane->v[2] - bounds->max.v[1] * pPlane->v[1]) / pPlane->v[0];
+                if (QuantizeWithinBounds(0.02f, bounds->min.v[0], bounds->max.v[0], &a)
+                    && QuantizeWithinBounds(0.02f, bounds->min.v[0], bounds->max.v[0], &b)
+                    && WithinBounds((a + b) * 0.5f, min_x, max_x)) {
+                    BrVector3Set(&pSplit_info->normal, -size.v[1], 0.0f, b - a);
+                    BrVector3Normalise(&pSplit_info->normal, &pSplit_info->normal);
+                    BrVector3Set(&p, a, 0.0f, bounds->min.v[1]);
+                    pSplit_info->d = BrVector3Dot(&pSplit_info->normal, &p);
+                    found = 1;
+                }
+            }
+            if (!found) {
+                if ((br_scalar)fabs(pPlane->v[1]) <= 0.001f) {
+                    return 0;
+                }
+                a = (pPlane->v[2] - bounds->min.v[0] * pPlane->v[0]) / pPlane->v[1];
+                b = (pPlane->v[2] - bounds->max.v[0] * pPlane->v[0]) / pPlane->v[1];
+                if (!QuantizeWithinBounds(0.02f, bounds->min.v[2], bounds->max.v[2], &a)
+                    || !QuantizeWithinBounds(0.02f, bounds->min.v[2], bounds->max.v[2], &b)
+                    || !WithinBounds((a + b) * 0.5f, min_z, max_z)) {
+                    return 0;
+                }
+                BrVector3Set(&pSplit_info->normal, b - a, 0.0f, -size.v[0]);
+                BrVector3Normalise(&pSplit_info->normal, &pSplit_info->normal);
+                BrVector3Set(&p, bounds->min.v[0], 0.0f, a);
+                pSplit_info->d = BrVector3Dot(&pSplit_info->normal, &p);
+            }
+        break;
+    case 1:
+            BrVector3Set(&pSplit_info->normal, 0.0f, 1.0f, 0.0f);
+            pSplit_info->d = pArg4;
+            if (!QuantizeWithinBounds(0.02f, bounds->min.v[1], bounds->max.v[1], &pSplit_info->d)) {
+                return 0;
+            }
+        break;
+    default:
+        return 0;
+    }
+    model_bounds = &pCar->car_actor->model->bounds;
+    axis = NearestAxis(&pSplit_info->normal);
+    p.v[axis] = 0.0f;
+    axis1 = (axis + 1) % 3;
+    axis2 = (axis + 2) % 3;
+    p.v[axis1] = (model_bounds->min.v[axis1] + model_bounds->max.v[axis1]) * 0.5f;
+    p.v[axis2] = (model_bounds->min.v[axis2] + model_bounds->max.v[axis2]) * 0.5f;
+    t = -((BrVector3Dot(&pSplit_info->normal, &p) - pSplit_info->d) / pSplit_info->normal.v[axis]);
+    if (t < model_bounds->min.v[axis] + 0.4f / WORLD_SCALE || t > model_bounds->max.v[axis] - 0.4f / WORLD_SCALE) {
+        return 0;
+    }
+    if (BrVector3Dot(&crush_spec->driver_position, &pSplit_info->normal) - pSplit_info->d < 0.0f) {
+        BrVector3Negate(&pSplit_info->normal, &pSplit_info->normal);
+        pSplit_info->d = -pSplit_info->d;
+    }
+    QuantizePlane(pSplit_info);
+    return 1;
 }
 
 #ifdef REC2_MATCHING
