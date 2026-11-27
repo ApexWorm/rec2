@@ -1914,6 +1914,10 @@ void C2_HOOK_FASTCALL ToggleFlaps(void) {
     }
 }
 
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
 // FUNCTION: CARMA2_HW 0x00434910
 // FUNCTION: CARMA2_SW 0x00434940
 // FUNCTION: CARMA2_CHEAT 0x00434b00
@@ -1990,7 +1994,75 @@ void C2_HOOK_FASTCALL SendFullyDetachBit(tCar_spec* pCar, tPhysics_object* pObje
     }
 }
 
-// DoFullyDetaching
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
+
+// FUNCTION: CARMA2_HW 0x00438900
+// FUNCTION: CARMA2_SW 0x00438930
+// FUNCTION: CARMA2_CHEAT 0x00438b10
+void C2_HOOK_FASTCALL DoFullyDetaching(void) {
+    int i;
+    int j;
+    int k;
+    int detach;
+    int found;
+    int elapsed;
+    tCar_spec* car;
+    tCar_crush_spec* car_crush;
+    tCar_bit_spec* bit;
+
+    if (gNet_mode != eNet_mode_none && gNet_mode != eNet_mode_host) {
+        return;
+    }
+    for (i = 0; i < gNum_active_cars; i++) {
+        car = gActive_car_list[i];
+        if (car == NULL || car->driver <= eDriver_oppo - 1) {
+            continue;
+        }
+        car_crush = car->car_crush_spec;
+        if (car_crush == NULL) {
+            continue;
+        }
+        for (j = 0; j < car_crush->field_0x270; j++) {
+            bit = &car_crush->field_0x274[j];
+            switch (bit->field_0xc[9]) {
+            case 2:
+            case 4:
+                detach = 1;
+                break;
+            case 0:
+            case 1:
+                detach = BitObjectIsSufficientlyOutsideCarObjectToDetach(bit->field_0x8);
+                elapsed = PDGetTotalTime() - bit->field_0x10;
+                if ((float)elapsed < gMax_detach_time_ms) {
+                    detach &= PercentageChance((int)((float)(elapsed * 100) / gMax_detach_time_ms));
+                }
+                break;
+            default:
+                detach = 0;
+                break;
+            }
+            if (detach) {
+                if (gNet_mode != eNet_mode_none) {
+                    found = 0;
+                    for (k = 0; k < gCount_net_crush_full_detach_bit_list; k++) {
+                        if (gNet_crush_full_detach_bit_list[k].object == bit->field_0x8) {
+                            found = 1;
+                            break;
+                        }
+                    }
+                    if (!found) {
+                        SendFullyDetachBit(gActive_car_list[i], bit->field_0x8);
+                    }
+                } else {
+                    FullyDetachBit(gActive_car_list[i], bit->field_0x8);
+                }
+            }
+        }
+        MungeDetachLists(car_crush);
+    }
+}
 
 // CalculateCollisionObjectStuffForSplitHalves
 
