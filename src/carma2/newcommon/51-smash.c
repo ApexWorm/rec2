@@ -165,6 +165,8 @@ void C2_HOOK_FASTCALL InitFogificateMaterials(void) {
 // FUNCTION: CARMA2_SW 0x004e6510
 // FUNCTION: CARMA2_CHEAT 0x004f0410
 void C2_HOOK_FASTCALL FogificateMaterials(tRendererShadingType pShading_type) {
+
+#ifdef REC2_HW
     int i;
 
     for (i = 0; i < gMaterials_to_adapt_count; i++) {
@@ -174,6 +176,7 @@ void C2_HOOK_FASTCALL FogificateMaterials(tRendererShadingType pShading_type) {
         }
     }
     InitFogificateMaterials();
+#endif
 }
 
 // FUNCTION: CARMA2_HW 0x004ea7c0
@@ -181,21 +184,26 @@ void C2_HOOK_FASTCALL FogificateMaterials(tRendererShadingType pShading_type) {
 // FUNCTION: CARMA2_CHEAT 0x004f0460
 void C2_HOOK_FASTCALL AutoFogificateMaterials(tRendererShadingType pShading_type) {
 
+#ifdef REC2_HW
     if (gAllow_material_adapt) {
         FogificateMaterials(pShading_type);
     }
+#endif
 }
 
 // FUNCTION: CARMA2_HW 0x004ea820
 // FUNCTION: CARMA2_SW 0x004e6530
 // FUNCTION: CARMA2_CHEAT 0x004f04c0
 void C2_HOOK_FASTCALL AddFogificateMaterial(br_material* pMaterial) {
+
+#ifdef REC2_HW
     int count = gMaterials_to_adapt_count;
 
     if (count < (int)REC2_ASIZE(gMaterials_to_adapt)) {
         gMaterials_to_adapt[count] = pMaterial;
         gMaterials_to_adapt_count = count + 1;
     }
+#endif
 }
 
 // FUNCTION: CARMA2_HW 0x004ea840
