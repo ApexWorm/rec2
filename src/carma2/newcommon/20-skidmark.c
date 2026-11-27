@@ -43,6 +43,7 @@ const char* gInitial_position_sphere_where[2] = { "impact", "model" };
 
 // GLOBAL: CARMA2_HW 0x0065fee8
 // GLOBAL: CARMA2_SW 0x0065a828
+// GLOBAL: CARMA2_CHEAT 0x00667730
 const char* gExplosion_rotate_names[2] = {
     "norotate",
     "randomrotate",
