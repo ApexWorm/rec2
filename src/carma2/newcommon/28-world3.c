@@ -820,6 +820,7 @@ void C2_HOOK_FASTCALL LoadAllMaterialsInDirectory(tBrender_storage* pStorage, co
 
 // FUNCTION: CARMA2_HW 0x00502b20
 // FUNCTION: CARMA2_SW 0x004fe470
+// FUNCTION: CARMA2_CHEAT 0x005087c0
 void C2_HOOK_FASTCALL LoadIfItsAModel(const char* pPath) {
     char s[256];
 
@@ -840,6 +841,7 @@ void C2_HOOK_FASTCALL LoadAllModelsInDirectory(tBrender_storage *pStorage, const
 
 // FUNCTION: CARMA2_HW 0x00502b80
 // FUNCTION: CARMA2_SW 0x004fe4d0
+// FUNCTION: CARMA2_CHEAT 0x00508820
 void C2_HOOK_FASTCALL LoadIfItsAShadeTable(const char* pPath) {
     char path[256];
 
