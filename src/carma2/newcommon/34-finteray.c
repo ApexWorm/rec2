@@ -483,14 +483,14 @@ int C2_HOOK_FASTCALL LineBoxCollWithSphere(br_vector3* pStart, br_vector3* pEnd,
 
     result = LineBoxColl(pStart, pEnd, pBounds, pPoint, pT);
     if (result != 0) {
-        BrVector3Set(pNormal, 0.f, 0.f, 0.f);
+        BrVector3Set(pNormal, 0.0f, 0.0f, 0.0f);
         axis = (result - 1) & 0x3;
         pNormal->v[axis] = (result & 0x4) ? 1.0f : -1.0f;
         return result;
     }
     if (SphereBoxIntersection(pBounds, pEnd, 2.5e-5f, pPoint)) {
         *pT = 1.0f;
-        BrVector3Set(pNormal, 0.f, 0.f, 0.f);
+        BrVector3Set(pNormal, 0.0f, 0.0f, 0.0f);
         for (i = 0; i < 3; i++) {
             if (pPoint->v[i] == pBounds->max.v[i]) {
                 pNormal->v[i] = -1.0f;
