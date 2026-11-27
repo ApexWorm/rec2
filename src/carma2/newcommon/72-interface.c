@@ -1589,11 +1589,49 @@ int C2_HOOK_FASTCALL StartFudge(tFrontend_spec* pFrontend) {
 
 // FRONTEND_NewGameMenuHandler
 
-// UpdateNetGameTypeScroller
+inline void C2_HOOK_FASTCALL UpdateNetGameTypeScroller(tFrontend_spec* pFrontend) {
+    int i;
+    int text_index;
+    int string_index;
 
-// NetGameTypeUp
+    text_index = pFrontend->scrollers[0].indexTopItem - pFrontend->scrollers[0].indexFirstScrollableItem;
+    for (i = pFrontend->scrollers[0].indexFirstScrollableItem; i < pFrontend->scrollers[0].indexFirstScrollableItem + pFrontend->scrollers[0].nbDisplayedAtOnce; i++) {
+        if (text_index >= 2) {
+            string_index = text_index + 1;
+        } else {
+            string_index = text_index;
+        }
+        strcpy(pFrontend->items[i].text, GetMiscString(eMiscString_network_type_start + string_index));
+        text_index++;
+    }
+    FuckWithWidths(pFrontend);
+}
 
-// NetGameTypeDn
+// FUNCTION: CARMA2_HW 0x00467ce0
+// FUNCTION: CARMA2_SW 0x00467a60
+// FUNCTION: CARMA2_CHEAT 0x00468110
+int C2_HOOK_FASTCALL NetGameTypeUp(tFrontend_spec* pFrontend) {
+
+    if (PDGetTotalTime() - gFrontend_last_scroll > 400) {
+        gFrontend_last_scroll = PDGetTotalTime();
+        ScrollUp(pFrontend, 0);
+    }
+    UpdateNetGameTypeScroller(pFrontend);
+    return 0;
+}
+
+// FUNCTION: CARMA2_HW 0x00467dc0
+// FUNCTION: CARMA2_SW 0x00467b40
+// FUNCTION: CARMA2_CHEAT 0x004681f0
+int C2_HOOK_FASTCALL NetGameTypeDn(tFrontend_spec* pFrontend) {
+
+    if (PDGetTotalTime() - gFrontend_last_scroll > 400) {
+        gFrontend_last_scroll = PDGetTotalTime();
+        ScrollDn(pFrontend, 0);
+    }
+    UpdateNetGameTypeScroller(pFrontend);
+    return 0;
+}
 
 // FUNCTION: CARMA2_HW 0x00467eb0
 // FUNCTION: CARMA2_SW 0x00467c30
