@@ -188,6 +188,7 @@ int gNext_guarantee;
 
 // GLOBAL: CARMA2_HW 0x0068d990
 // GLOBAL: CARMA2_SW 0x006879e8
+// GLOBAL: CARMA2_CHEAT 0x00695230
 tGuaranteed_message gGuarantee_list[200] = { 0 };
 
 // GLOBAL: CARMA2_HW 0x00690230
@@ -930,10 +931,22 @@ void C2_HOOK_FASTCALL DisposeExcessMemory(void) {
 // FUNCTION: CARMA2_SW 0x0049c0d0
 // FUNCTION: CARMA2_CHEAT 0x004a0a40
 int C2_HOOK_FASTCALL NetDisposeMessage(tNet_game_details* pDetails, tNet_message* pMessage) {
+#ifdef REC2_CHEAT
+    int i;
+#endif
 
     if (pMessage->header.field_0x14 == 0xff) {
         return -1;
     }
+#ifdef REC2_CHEAT
+    if (pMessage->header.field_0x14 != 0) {
+        for (i = 0; i < gNext_guarantee; i++) {
+            if (gGuarantee_list[i].message == pMessage && !gGuarantee_list[i].recieved) {
+                PDFatalError("Temp debug stuff");
+            }
+        }
+    }
+#endif
     pMessage->contents.raw.header.type = eNetMsg_none;
     return 0;
 }
