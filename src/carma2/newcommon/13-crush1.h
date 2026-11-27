@@ -464,7 +464,7 @@ extern br_scalar C2_HOOK_FASTCALL UnBendCar(tCar_spec* pCar_spec, tU32 pDelta_ti
 
 extern void C2_HOOK_FASTCALL CompletelyUnBendCar(tCar_spec* pCar_spec);
 
-// ReAttachBits
+extern void C2_HOOK_FASTCALL ReAttachBits(tCar_spec* pCar);
 
 extern int C2_HOOK_FASTCALL RepairObject(tPhysics_object* pObject, void* pContext);
 

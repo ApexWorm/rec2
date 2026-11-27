@@ -12,6 +12,7 @@
 #include "01-network.h"
 #include "08-loading1.h"
 #include "09-funks.h"
+#include "15-displays.h"
 #include "18-graphics2.h"
 #include "23-piping.h"
 #include "30-opponent.h"
@@ -2840,7 +2841,68 @@ void C2_HOOK_FASTCALL CompletelyUnBendCar(tCar_spec* pCar_spec) {
     UnBendCar(pCar_spec, 2000, &original_amount);
 }
 
-// ReAttachBits
+inline void C2_HOOK_FASTCALL ReAttachBits(tCar_spec* pCar) {
+    tCar_crush_spec* crush;
+    tCar_bit_spec* bit;
+    tCar_crush_detach_data* detach_data; /* FIXME: tCar_bit_spec::field_0xc is a tCar_crush_detach_data* */
+    tUser_crush_data* user_crush;
+    br_vertex* vertices;
+    int i;
+    int j;
+    int found;
+
+    crush = pCar->car_crush_spec;
+    for (i = 0; i < crush->field_0x2b0; i++) {
+        bit = &crush->field_0x2b4[i];
+        detach_data = (tCar_crush_detach_data*)bit->field_0xc;
+        if (detach_data == NULL || bit->field_0x4 == NULL) {
+            continue;
+        }
+        user_crush = bit->field_0x4->user;
+        if (user_crush == NULL || user_crush->models[0] == NULL) {
+            continue;
+        }
+        vertices = user_crush->models[0]->vertices;
+        if (Vector3DistanceSquared(&vertices[detach_data->min_vertex].p, &detach_data->field_0xc) < (0.1f / WORLD_SCALE) * (0.1f / WORLD_SCALE)
+            && Vector3DistanceSquared(&vertices[detach_data->max_vertex].p, &detach_data->field_0x18) < (0.1f / WORLD_SCALE) * (0.1f / WORLD_SCALE)) {
+            if (gNet_mode == eNet_mode_none) {
+                ReAttachBit(pCar, bit->field_0x4, bit->field_0x0, NULL);
+            } else {
+                found = 0;
+                for (j = 0; j < gCount_net_crush_reattach_bit_list; j++) {
+                    if (gNet_crush_reattach_bit_list[j].actor == bit->field_0x0) {
+                        found = 1;
+                        break;
+                    }
+                }
+                if (!found) {
+                    SendReAttachBit(pCar, bit->field_0x8);
+                }
+            }
+        }
+    }
+    for (i = 0; i < crush->field_0x270; i++) {
+        bit = &crush->field_0x274[i];
+        detach_data = (tCar_crush_detach_data*)bit->field_0xc;
+        if (detach_data == NULL || bit->field_0x4 == NULL) {
+            continue;
+        }
+        user_crush = bit->field_0x4->user;
+        if (user_crush == NULL || user_crush->models[0] == NULL) {
+            continue;
+        }
+        vertices = user_crush->models[0]->vertices;
+        if (Vector3DistanceSquared(&vertices[detach_data->min_vertex].p, &detach_data->field_0xc) < (0.1f / WORLD_SCALE) * (0.1f / WORLD_SCALE)
+            && Vector3DistanceSquared(&vertices[detach_data->max_vertex].p, &detach_data->field_0x18) < (0.1f / WORLD_SCALE) * (0.1f / WORLD_SCALE)) {
+            if (gNet_mode == eNet_mode_none) {
+                ReAttachBit(pCar, bit->field_0x4, bit->field_0x0, bit->field_0x8);
+            } else {
+                SendReAttachBit(pCar, bit->field_0x8);
+            }
+        }
+    }
+    MungeDetachLists(pCar->car_crush_spec);
+}
 
 // FUNCTION: CARMA2_HW 0x0043b400
 // FUNCTION: CARMA2_SW 0x0043b450
@@ -2906,11 +2968,74 @@ void C2_HOOK_FASTCALL RepairCarCollisionShapes(tCar_spec* pCar, float pStep) {
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x0043ace0
-// STUB: CARMA2_SW 0x0043ad30
-// STUB: CARMA2_CHEAT 0x0043af00
+// FUNCTION: CARMA2_HW 0x0043ace0
+// FUNCTION: CARMA2_SW 0x0043ad30
+// FUNCTION: CARMA2_CHEAT 0x0043af00
 float C2_HOOK_FASTCALL RepairCar2(tCar_spec* pCar, tU32 pFrame_period, br_scalar* pTotal_deflection) {
-    NOT_IMPLEMENTED();
+    tCar_crush_spec* crush;
+    tRepair_context context;
+    br_scalar amount;
+    int i;
+
+    pCar->repair_time += pFrame_period;
+    if (pCar->use_shell_model || pCar == NULL || pCar->driver < eDriver_net_human) {
+        return 0.0f;
+    }
+    crush = pCar->car_crush_spec;
+    if (crush == NULL || crush->field_0x4b8 || gAusterity_mode) {
+        return 0.0f;
+    }
+    if (crush->field_0x144) {
+        amount = UnBendCar(pCar, pFrame_period, pTotal_deflection);
+    } else {
+        if (gNet_mode == eNet_mode_none || gNet_mode == eNet_mode_host) {
+            ReAttachBits(pCar);
+        }
+        *pTotal_deflection = 0.0f;
+        context.car = pCar;
+        context.repair_step = pFrame_period * 0.00005f;
+        context.total_deflection = pTotal_deflection;
+        context.repaired_amount = 0.0f;
+        PhysicsObjectRecurse(pCar->collision_info, RepairObject, &context);
+        RepairCarCollisionShapes(pCar, context.repair_step);
+        for (i = 0; i < crush->field_0x2b0; i++) {
+            DRActorEnumRecurse(crush->field_0x2b4[i].field_0x0, AddTotalDeflection, &context);
+        }
+        amount = context.repaired_amount;
+        if (context.repaired_amount == 0.0f) {
+            RepairAllSmashes(pCar);
+            TotallyRepairCarCollisionShapes(pCar);
+            if (gNet_mode == eNet_mode_none) {
+                for (i = 0; i < crush->field_0x2b0; i++) {
+                    ReAttachBit(pCar, crush->field_0x2b4[i].field_0x4, crush->field_0x2b4[i].field_0x0, NULL);
+                }
+                crush->field_0x2b0 = 0;
+                for (i = 0; i < crush->field_0x270; i++) {
+                    ReAttachBit(pCar, crush->field_0x274[i].field_0x4, crush->field_0x274[i].field_0x0, crush->field_0x274[i].field_0x8);
+                }
+                crush->field_0x270 = 0;
+            } else if (gNet_mode == eNet_mode_host) {
+                SendReAttachAllBits(pCar);
+            }
+            DRActorEnumRecurse(pCar->car_model_actor, MakeCarModelsMaterialsSingleSided, pCar);
+            PipeSingleDSModel(0, pCar);
+            gCount_toggled_doors = 0;
+            gCount_crush_detach_list = 0;
+            if (*pTotal_deflection == 0.0f && (gNet_mode == eNet_mode_none || (crush->field_0x270 <= 0 && crush->field_0x2b0 <= 0))) {
+                PhysicsObjectRecurse(pCar->collision_info, BattenDownTheObjects, pCar);
+                if (pCar != NULL && pCar->driver == eDriver_local_human) {
+                    pCar->repair_time += 100000;
+                }
+                pCar->use_shell_model = 1;
+            } else {
+                amount = 1.1920929e-07f;
+            }
+        }
+    }
+    if (SwapShapesIfPossible(pCar) && pCar != NULL && pCar->driver == eDriver_local_human) {
+        NewTextHeadupSlot(4, 0, 1000, -4, GetMiscString(6));
+    }
+    return amount;
 }
 
 #ifdef REC2_MATCHING

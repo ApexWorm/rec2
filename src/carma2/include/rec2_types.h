@@ -4212,7 +4212,8 @@ typedef struct  {
     float force;
     tU16 min_vertex;
     tU16 max_vertex;
-    undefined field_0xc[24];
+    br_vector3 field_0xc;
+    br_vector3 field_0x18;
     tDetach_type type;
     undefined4 field_0x28;
     tCar_spec* field_0x2c;
