@@ -142,10 +142,10 @@ void C2_HOOK_FASTCALL CopyMechanics(tCar_spec* pCar, tU8* pSrc) {
     tU8* pData;
     tPhysics_object* object;
 
-    memcpy(&pCar->collision_info->field_0x260, pSrc, 0x34); /* FIXME: 0x34 is the block from field_0x260 up to network_data */
+    memcpy(&pCar->collision_info->field_0x260, pSrc, 0x34); /* FIXME: 0x34 is the block from field_0x260 up to field_0x294 */
     pData = pSrc + 0x34;
     size = GetNetworkDataSize(pData);
-    memcpy(pCar->collision_info->network_data, pData, size);
+    memcpy(pCar->collision_info->field_0x294, pData, size);
     pData += size;
     if (pCar->collision_info->field_0x292 & 0x8) {
         for (i = 0; i < (int)REC2_ASIZE(pCar->collision_info->field_0x48c); i++) {
@@ -184,7 +184,7 @@ void C2_HOOK_FASTCALL FillInSimpleCarPos(tNet_message_chunk* pContents, int pPla
     tCar_spec* car;
 
     car = gNet_players[pPlayer_index].car;
-    CompressVector3(&pContents->simple_car_pos.pos, &car->car_master_actor->t.t.translate.t, -500.f, 500.f);
+    CompressVector3(&pContents->simple_car_pos.pos, &car->car_master_actor->t.t.translate.t, -500.0f, 500.0f);
     pContents->simple_car_pos.yaw = BrRadianToAngle(atan2(car->car_master_actor->t.t.mat.m[2][0], car->car_master_actor->t.t.mat.m[2][2]));
     pContents->simple_car_pos.player = gNet_players[pPlayer_index].ID;
     pContents->simple_car_pos.repair_time = car->repair_time;
@@ -210,7 +210,7 @@ void C2_HOOK_FASTCALL ReceivedSimpleCarPos(tNet_message_chunk* pContents) {
         car->active = 0;
         mat = &car->car_master_actor->t.t.mat;
         BrMatrix34RotateY(mat, pContents->simple_car_pos.yaw);
-        ExpandVector3((br_vector3*)mat->m[3], &pContents->simple_car_pos.pos, -500.f, 500.f);
+        ExpandVector3((br_vector3*)mat->m[3], &pContents->simple_car_pos.pos, -500.0f, 500.0f);
         BrMatrix34Copy(&car->collision_info->transform_matrix, mat);
         BrVector3Copy(&car->pos, (br_vector3*)car->collision_info->transform_matrix.m[3]);
         BrVector3Copy(&car->collision_info->pos, (br_vector3*)car->collision_info->transform_matrix.m[3]);
