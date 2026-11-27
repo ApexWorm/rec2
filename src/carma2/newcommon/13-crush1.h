@@ -355,7 +355,7 @@ extern void C2_HOOK_FASTCALL BendPoint(br_vector3* pPoint, const tBend_point_con
 
 // BendCollisionShape
 
-// BendCollisionShapes
+extern void C2_HOOK_FASTCALL BendCollisionShapes(tCar_spec* pCar, const tBend_point_context* pContext);
 
 // BendModel
 
@@ -367,9 +367,9 @@ extern intptr_t C2_HOOK_FASTCALL BendModels(br_actor* pActor, br_vector3* pTrans
 
 extern void C2_HOOK_FASTCALL BendActor(tCar_spec* pCar, br_actor* pActor, br_angle pAngle_x, br_angle pAngle_y, br_angle pAngle_z, const br_vector3* pPivot, br_scalar pZ, tBend_point_spec* pSpec);
 
-// BendOtherThings
+extern void C2_HOOK_FASTCALL BendOtherThings(tCar_spec* pCar, tBend_point_spec* pSpec);
 
-// ReAttachOrFullyDetachDifficultBits
+extern void C2_HOOK_FASTCALL ReAttachOrFullyDetachDifficultBits(tCar_spec* pCar, br_scalar pBend_z, br_scalar pPivot_z);
 
 extern void C2_HOOK_FASTCALL BendCar(tCar_spec* pCar, br_angle pAngle_x, br_angle pAngle_y, br_angle pAngle_z, const br_vector3* pPivot, br_scalar pZ, int pArg7);
 

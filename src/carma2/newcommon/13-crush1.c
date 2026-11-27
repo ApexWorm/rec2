@@ -14,11 +14,13 @@
 #include "09-funks.h"
 #include "18-graphics2.h"
 #include "23-piping.h"
+#include "27-powerup.h"
 #include "30-opponent.h"
 #include "41-utility.h"
 #include "49-physics.h"
 #include "51-smash.h"
 #include "53-controls.h"
+#include "58-crush2.h"
 #include "60-phil.h"
 #include "69-sound.h"
 #include "globvars.h"
@@ -1810,8 +1812,8 @@ void C2_HOOK_FASTCALL DoDetaching(void) {
             keep = 0;
             if (gCrush_detach_list[i].car->car_crush_spec->field_0x144
                 && BitIsInBentPartOfCar(gCrush_detach_list[i].actor,
-                    gCrush_detach_list[i].car->car_crush_spec->field_0x174,
-                    gCrush_detach_list[i].car->car_crush_spec->field_0x180)) {
+                    gCrush_detach_list[i].car->car_crush_spec->field_0x154.field_0x20,
+                    gCrush_detach_list[i].car->car_crush_spec->field_0x154.field_0x24.v[2])) {
                 continue;
             }
             if (gCrush_detach_list[i].car->car_crush_spec->field_0x4b8) {
@@ -2609,7 +2611,21 @@ void C2_HOOK_FASTCALL BendCollisionShape(tCar_crush_shape_info* pShape, const tB
     }
 }
 
-// BendCollisionShapes
+inline void C2_HOOK_FASTCALL BendCollisionShapes(tCar_spec* pCar, const tBend_point_context* pContext) {
+    int i;
+
+    if (pCar->car_crush_spec->expand_bounding_box) {
+        SwapShapesIfPossible(pCar);
+    }
+    for (i = 0; i < pCar->car_crush_spec->count_shapes; i++) {
+        BendCollisionShape(&pCar->car_crush_spec->field_0x4[i], pContext);
+    }
+    BrVector3Copy(&pCar->car_crush_spec->field_0x264, &pCar->collision_info->cmpos);
+    BrVector3Copy(&pCar->car_crush_spec->field_0x10, &pCar->collision_info->cmpos);
+    BendPoint(&pCar->car_crush_spec->field_0x10, pContext);
+    pCar->car_crush_spec->expand_bounding_box = 0xb;
+    SwapShapesIfPossible(pCar);
+}
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
@@ -2775,19 +2791,74 @@ void C2_HOOK_FASTCALL BendActor(tCar_spec* pCar, br_actor* pActor, br_angle pAng
     pSpec->field_0x3c[2] = pAngle_z;
 }
 
-// BendOtherThings
+inline void C2_HOOK_FASTCALL BendOtherThings(tCar_spec* pCar, tBend_point_spec* pSpec) {
+    tBend_point_context context;
 
-// ReAttachOrFullyDetachDifficultBits
+    context.car = pCar;
+    context.field_0x34 = pSpec;
+    BrMatrix34Translate(&context.field_0x4, -pSpec->field_0x18, -pSpec->field_0x1c, -pSpec->field_0x20);
+    if (pSpec->field_0x3c[1] != 0) {
+        BrMatrix34PostRotateY(&context.field_0x4, pSpec->field_0x3c[1]);
+    }
+    if (pSpec->field_0x3c[0] != 0) {
+        BrMatrix34PostRotateX(&context.field_0x4, pSpec->field_0x3c[0]);
+    }
+    if (pSpec->field_0x3c[2] != 0) {
+        BrMatrix34PostRotateZ(&context.field_0x4, pSpec->field_0x3c[2]);
+    }
+    BrMatrix34PostTranslate(&context.field_0x4, pSpec->field_0x18, pSpec->field_0x1c, pSpec->field_0x20);
+    LoseDodgyPowerups(pCar);
+    BendCollisionShapes(pCar, &context);
+    BendWheels(pCar, &context);
+}
+
+inline void C2_HOOK_FASTCALL ReAttachOrFullyDetachDifficultBits(tCar_spec* pCar, br_scalar pBend_z, br_scalar pPivot_z) {
+    tCar_crush_spec* crush_spec;
+    int i;
+
+    crush_spec = pCar->car_crush_spec;
+    for (i = 0; i < crush_spec->field_0x270; i++) {
+        if (BitIsInBentPartOfCar(crush_spec->field_0x274[i].field_0x0, pBend_z, pPivot_z)) {
+            if (BitObjectIsSufficientlyOutsideCarObjectToDetach(crush_spec->field_0x274[i].field_0x8)) {
+                FullyDetachBit(pCar, crush_spec->field_0x274[i].field_0x8);
+            } else {
+                ReAttachBit(pCar, crush_spec->field_0x274[i].field_0x4, crush_spec->field_0x274[i].field_0x0, crush_spec->field_0x274[i].field_0x8);
+            }
+        }
+    }
+    MungeDetachLists(crush_spec);
+}
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x00433c70
-// STUB: CARMA2_SW 0x00433ca0
-// STUB: CARMA2_CHEAT 0x00433e50
+// FUNCTION: CARMA2_HW 0x00433c70
+// FUNCTION: CARMA2_SW 0x00433ca0
+// FUNCTION: CARMA2_CHEAT 0x00433e50
 void C2_HOOK_FASTCALL BendCar(tCar_spec* pCar, br_angle pAngle_x, br_angle pAngle_y, br_angle pAngle_z, const br_vector3* pPivot, br_scalar pZ, int pArg7) {
-    NOT_IMPLEMENTED();
+    br_bounds3* bounds;
+    br_vector3 margin;
+
+    if (pCar->car_crush_spec == NULL || pCar->invulnerable_no_crushage || pCar->car_crush_spec->field_0x144) {
+        return;
+    }
+    ReAttachOrFullyDetachDifficultBits(pCar, pPivot->v[2], pZ);
+    BendActor(pCar, pCar->car_master_actor, pAngle_x, pAngle_y, pAngle_z, pPivot, pZ, &pCar->car_crush_spec->field_0x154);
+    BendOtherThings(pCar, &pCar->car_crush_spec->field_0x154);
+    SmashEverything(pCar);
+    if (pArg7) {
+        ChristmasLights(pCar, gMin_bend_damage, gMax_bend_damage);
+    }
+    pCar->use_shell_model = 0;
+    bounds = &pCar->collision_info->bb1;
+    BrVector3Sub(&margin, &bounds->max, &bounds->min);
+    BrVector3Scale(&margin, &margin, 0.15f);
+    BrVector3Add(&pCar->car_crush_spec->field_0x11c.min, &bounds->min, &margin);
+    BrVector3Sub(&pCar->car_crush_spec->field_0x11c.max, &bounds->max, &margin);
+    pCar->car_crush_spec->field_0x1d0 = pCar->car_crush_spec->field_0x2b0;
+    pCar->car_crush_spec->field_0x144 = 1;
+    CrashEarnings(pCar, NULL);
 }
 
 #ifdef REC2_MATCHING
