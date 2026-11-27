@@ -21,6 +21,9 @@ extern int gAcid_shade_table_power;
 extern br_pixelmap* gWater_shade_table;
 extern int gWater_shade_table_power;
 extern br_actor* gForward_sky_actor;
+extern int gTrack_depth_colour_red;
+extern int gTrack_depth_colour_green;
+extern int gTrack_depth_colour_blue;
 extern tSpecial_volume* gLast_camera_special_volume;
 
 extern int C2_HOOK_CDECL Log2(int pNumber);
@@ -92,6 +95,8 @@ extern br_scalar C2_HOOK_STDCALL GetYon(void);
 extern void C2_HOOK_STDCALL IncreaseAngle(void);
 
 extern void C2_HOOK_STDCALL DecreaseAngle(void);
+
+extern void C2_HOOK_FASTCALL ToggleDepthMode(void);
 
 extern int C2_HOOK_FASTCALL GetSkyTextureOn(void);
 
