@@ -990,11 +990,11 @@ static inline int C2_HOOK_FASTCALL IsNetCarActive(br_vector3* pPoint) {
     br_vector3 tv;
 
     BrVector3Sub(&tv, &gProgram_state.current_car.car_master_actor->t.t.translate.t, pPoint);
-    if (BrVector3LengthSquared(&tv) < 100.f) {
+    if (BrVector3LengthSquared(&tv) < 100.0f) {
         return 1;
     } else if (gCar_to_view != &gProgram_state.current_car) {
         BrVector3Sub(&tv, &gCar_to_view->car_master_actor->t.t.translate.t, pPoint);
-        if (BrVector3LengthSquared(&tv) < 100.f) {
+        if (BrVector3LengthSquared(&tv) < 100.0f) {
             return 1;
         }
     }
