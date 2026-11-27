@@ -532,6 +532,11 @@ br_actor* gFrontend_camera;
 // GLOBAL: CARMA2_CHEAT 0x0068e8d8
 br_actor* gFrontend_backdrop_actors[3];
 
+// GLOBAL: CARMA2_HW 0x0068703c
+// GLOBAL: CARMA2_SW 0x0068177c
+// GLOBAL: CARMA2_CHEAT 0x0068e8e4
+int gINT_0068703c;
+
 // GLOBAL: CARMA2_HW 0x0068683c
 // GLOBAL: CARMA2_SW 0x00680f7c
 // GLOBAL: CARMA2_CHEAT 0x0068e0e4
@@ -771,7 +776,13 @@ void C2_HOOK_FASTCALL DisposeJoinableGame(int pIndex) {
     gGames_to_join[pIndex].game = NULL;
 }
 
-// InitGamesToJoin
+inline void C2_HOOK_FASTCALL InitGamesToJoin(void) {
+    int i;
+
+    for (i = 0; i < (int)REC2_ASIZE(gGames_to_join); i++) {
+        gGames_to_join[i].game = NULL;
+    }
+}
 
 void C2_HOOK_FASTCALL DisposeJoinList(int pException) {
     int i;
@@ -1376,7 +1387,13 @@ inline void C2_HOOK_FASTCALL UpdateNetTrackScroller(tFrontend_spec* pFrontend) {
 
 // NetRaceDn
 
-// SaveSinglePlayerState
+inline void C2_HOOK_FASTCALL SaveSinglePlayerState(void) {
+
+    if (!gValid_stashed_save_game) {
+        MakeSavedGame(&gStashed_save_game);
+    }
+    gValid_stashed_save_game = 1;
+}
 
 inline void C2_HOOK_FASTCALL RestoreSinglePlayerState(void) {
 
@@ -1573,9 +1590,44 @@ int C2_HOOK_FASTCALL MultiplayerSetup(tFrontend_spec* pFrontend) {
     return 0;
 }
 
-// NetworkJoinSetup
+inline void C2_HOOK_FASTCALL NetworkJoinSetup(void) {
 
-// NetworkJoinMenuInfunc
+    gINT_0068703c = 0;
+    SetAlwaysTyping();
+    InitGamesToJoin();
+    NetStartProducingJoinList(AddToJoinList);
+}
+
+// FUNCTION: CARMA2_HW 0x00467ef0
+// FUNCTION: CARMA2_SW 0x00467c70
+// FUNCTION: CARMA2_CHEAT 0x00468320
+int C2_HOOK_FASTCALL NetworkJoinMenuInfunc(tFrontend_spec* pFrontend) {
+    int i;
+
+    if (!pFrontend->loaded) {
+        LoadMenuSettings(pFrontend);
+    }
+    SaveSinglePlayerState();
+    pFrontend->items[30].text[0] = '\0';
+    ReadNetGameChoices(&gFrontend_game_type, &gFrontend_net_options, &gRace_index);
+    LoadRaces(gRace_list, &gNumber_of_races, gFrontend_game_type);
+    strcpy(pFrontend->items[26].text, gProgram_state.player_name);
+    FuckWithWidths(pFrontend);
+    ResetInterfaceTimeout();
+    for (i = 0; i < pFrontend->count_items; i++) {
+        pFrontend->items[i].visible = 1;
+#ifdef REC2_V102A
+        if (i == 19 || i == 24) {
+            pFrontend->items[i].visible = 0;
+            pFrontend->items[i].enabled = kFrontendItemEnabled_default;
+        }
+#endif
+    }
+    UpdateNetTrackScroller(pFrontend);
+    UpdateNetGameTypeScroller(pFrontend);
+    NetworkJoinSetup();
+    return 0;
+}
 
 void C2_HOOK_FASTCALL StopAllThatJoinyStuffThisInstant(void) {
 

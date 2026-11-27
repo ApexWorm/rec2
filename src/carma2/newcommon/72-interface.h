@@ -90,7 +90,7 @@ extern void C2_HOOK_FASTCALL DefaultNetSettings(void);
 
 extern void C2_HOOK_FASTCALL DisposeJoinableGame(int pIndex);
 
-// InitGamesToJoin
+extern void C2_HOOK_FASTCALL InitGamesToJoin(void);
 
 extern void C2_HOOK_FASTCALL DisposeJoinList(int pException);
 
@@ -146,7 +146,7 @@ extern void C2_HOOK_FASTCALL RefreshNetRacesScroller(tFrontend_spec* pFrontend);
 
 // NetRaceDn
 
-// SaveSinglePlayerState
+extern void C2_HOOK_FASTCALL SaveSinglePlayerState(void);
 
 extern void C2_HOOK_FASTCALL RestoreSinglePlayerState(void);
 
@@ -180,9 +180,9 @@ extern void C2_HOOK_FASTCALL UpdateNetGameTypeScroller(tFrontend_spec* pFrontend
 
 extern int C2_HOOK_FASTCALL MultiplayerSetup(tFrontend_spec* pFrontend);
 
-// NetworkJoinSetup
+extern void C2_HOOK_FASTCALL NetworkJoinSetup(void);
 
-// NetworkJoinMenuInfunc
+extern int C2_HOOK_FASTCALL NetworkJoinMenuInfunc(tFrontend_spec* pFrontend);
 
 extern void C2_HOOK_FASTCALL StopAllThatJoinyStuffThisInstant(void);
 
