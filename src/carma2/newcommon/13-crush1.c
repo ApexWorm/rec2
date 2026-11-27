@@ -2618,6 +2618,7 @@ void C2_HOOK_FASTCALL ARApplyFlap(br_actor* pActor, br_angle pAngle) {
     tCar_crush_flap_data* flap;
     const br_vector3* hinge;
     br_vector3 axis;
+    br_vector3 neg;
 
     user = pActor->user;
     if (user == NULL || user->crush_data == NULL) {
@@ -2631,10 +2632,8 @@ void C2_HOOK_FASTCALL ARApplyFlap(br_actor* pActor, br_angle pAngle) {
     hinge = &user->models[0]->vertices[flap->hinge0].p;
     BrVector3Sub(&axis, &user->models[0]->vertices[flap->hinge1].p, hinge);
     BrVector3Normalise(&axis, &axis);
-    BrMatrix34Translate(&pActor->t.t.mat,
-        -hinge->v[0],
-        -hinge->v[1],
-        -hinge->v[2]);
+    BrVector3Negate(&neg, hinge);
+    BrMatrix34Translate(&pActor->t.t.mat, neg.v[0], neg.v[1], neg.v[2]);
     BrMatrix34PostRotate(&pActor->t.t.mat, flap->field_0x4, &axis);
     parent_user = (tUser_crush_data*)pActor->parent->user;
     parent_model = parent_user->models[0];
