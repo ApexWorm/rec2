@@ -786,7 +786,7 @@ void C2_HOOK_FASTCALL SetPedXZDirection(tPedestrian* pPed, br_vector3* pDir, flo
 #pragma auto_inline(on)
 #endif
 
-static inline void C2_HOOK_FASTCALL StopPedNoise(tPedestrian* pPed) {
+inline void C2_HOOK_FASTCALL StopPedNoise(tPedestrian* pPed) {
 
     if (pPed->field_0x0c != NULL && pPed->field_0x0c->field_0x9c != 0 && pPed->field_0x0c->field_0xa0 >= 0) {
         if (DRS3SoundStillPlaying(pPed->field_0x0c->field_0x9c)) {
@@ -930,7 +930,7 @@ inline void C2_HOOK_FASTCALL SetPedHeadAnim(tPedestrian* pPed, const tPed_anim_s
 
 // ClearPedHeadAnim
 
-static inline void C2_HOOK_FASTCALL ScarePedestrian(tPedestrian* pPed, tU32 pTime, int pPanic, int pForce) {
+inline void C2_HOOK_FASTCALL ScarePedestrian(tPedestrian* pPed, tU32 pTime, int pPanic, int pForce) {
 
     if (((pPed->action != ePed_action_running && pPed->action != ePed_action_panicking) || pForce) && pPed->action != ePed_action_getting_up) {
         if (!pPanic) {
@@ -948,7 +948,7 @@ static inline void C2_HOOK_FASTCALL ScarePedestrian(tPedestrian* pPed, tU32 pTim
 
 // StopSmoothTurning
 
-static inline void C2_HOOK_FASTCALL SetKnockedOverMove(tPedestrian* pPed, tU32 pTime) {
+inline void C2_HOOK_FASTCALL SetKnockedOverMove(tPedestrian* pPed, tU32 pTime) {
 
     if (pPed->hit_points > 0) {
         SetPedMove(pPed, 0x5d, -1, 0, 0, pTime, ePed_action_impacting);
@@ -973,7 +973,7 @@ void C2_HOOK_FASTCALL DoPostElectricution(tPedestrian* pPed, tU32 pTime, float p
     if (object != NULL) {
         pSpeed *= .7;
         object->v.v[0] = SRandomPosNeg(pSpeed);
-        object->v.v[1] = SRandomBetween(0.f, pSpeed);
+        object->v.v[1] = SRandomBetween(0.0f, pSpeed);
         object->v.v[2] = SRandomPosNeg(pSpeed);
         spin = pSpin * 4.0;
         object->omega.v[0] = SRandomPosNeg(spin);
@@ -1011,8 +1011,8 @@ int C2_HOOK_FASTCALL CBMoveCompleted(tPed_character_instance* pCharacter) {
             StopPedNoise(ped);
         }
         if (!gPeds_suicidal) {
-            BrVector3Scale(&dir, &pCharacter->field_0xc0, -1.f);
-            SetPedXZDirection(ped, &dir, 0.f, time);
+            BrVector3Scale(&dir, &pCharacter->field_0xc0, -1.0f);
+            SetPedXZDirection(ped, &dir, 0.0f, time);
         }
         StartPedRunning(ped, time, 0);
         break;
@@ -1042,7 +1042,7 @@ int C2_HOOK_FASTCALL CBMoveCompleted(tPed_character_instance* pCharacter) {
         SetKnockedOverMove(ped, time);
         break;
     case 113:
-        DoPostElectricution(ped, time, 1.f, 1.f);
+        DoPostElectricution(ped, time, 1.0f, 1.0f);
         break;
     }
     if (ped->field_0x0c != NULL && ped->field_0x0c->field_0xb0 != NULL) {
@@ -1469,7 +1469,7 @@ int C2_HOOK_FASTCALL DamagePedestrian(tPedestrian* pPed, int pDamage, int pArg3,
                 severing_damage = gPed_severing_damage;
             }
             damage_left -= severing_damage;
-            if (damage_left < 0.f || count >= 5) {
+            if (damage_left < 0.0f || count >= 5) {
                 break;
             }
             if (gExploding_pedestrians || gPed_dismemberfest || PercentageChance(gPed_severing_chance)) {
