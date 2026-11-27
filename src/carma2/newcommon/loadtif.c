@@ -328,14 +328,15 @@ int C2_HOOK_FASTCALL WriteFileLink(const char* pLink_dest, const char* pLink_sou
 
     i = 0;
     strcpy(s, pLink_dest);
-    for (ptr = strstr(s, "DATA") + 5; *ptr != '\0'; i++, ptr++) {
-
-        if (*ptr == '\\') {
-            rel_dest[i] = *ptr;
-        } else if (*ptr < '\\' && *ptr == ':') {
-            rel_dest[i] = '\\';
-        } else {
-            rel_dest[i] = *ptr;
+    for (ptr = strstr(s, "DATA") + 5; *ptr != '\0'; ptr++) {
+        switch (*ptr) {
+        case ':':
+        case '\\':
+            rel_dest[i++] = '\\';
+            break;
+        default:
+            rel_dest[i++] = *ptr;
+            break;
         }
     }
     rel_dest[i] = '\0';
