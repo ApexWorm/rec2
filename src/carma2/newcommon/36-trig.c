@@ -420,11 +420,13 @@ void C2_HOOK_FASTCALL DRMatrix34RotateZ(br_matrix34* mat, br_angle rz) {
     mat->m[3][2] = 0.0f;
 }
 
-// STUB: CARMA2_HW 0x005127b0
-// STUB: CARMA2_SW 0x0050dbf0
-// STUB: CARMA2_CHEAT 0x005181a0
+// FUNCTION: CARMA2_HW 0x005127b0
+// FUNCTION: CARMA2_SW 0x0050dbf0
+// FUNCTION: CARMA2_CHEAT 0x005181a0
 void C2_HOOK_FASTCALL DRMatrix34PostRotateX(br_matrix34* mat, br_angle rx) {
-    NOT_IMPLEMENTED();
+    DRMatrix34RotateX(&mattmp2__trig, rx);
+    BrMatrix34Mul(&mattmp1__trig, mat, &mattmp2__trig);
+    BrMatrix34Copy(mat, &mattmp1__trig);
 }
 
 // FUNCTION: CARMA2_HW 0x00512ad0
@@ -446,11 +448,13 @@ void C2_HOOK_FASTCALL DRMatrix34PreRotateZ(br_matrix34* mat, br_angle rz) {
     BrMatrix34Copy(mat, &mattmp1__trig);
 }
 
-// STUB: CARMA2_HW 0x00512df0
-// STUB: CARMA2_SW 0x0050e230
-// STUB: CARMA2_CHEAT 0x005187e0
+// FUNCTION: CARMA2_HW 0x00512df0
+// FUNCTION: CARMA2_SW 0x0050e230
+// FUNCTION: CARMA2_CHEAT 0x005187e0
 void C2_HOOK_FASTCALL DRMatrix34PostRotateZ(br_matrix34* mat, br_angle rz) {
-    NOT_IMPLEMENTED();
+    DRMatrix34RotateZ(&mattmp2__trig, rz);
+    BrMatrix34Mul(&mattmp1__trig, mat, &mattmp2__trig);
+    BrMatrix34Copy(mat, &mattmp1__trig);
 }
 
 // FUNCTION: CARMA2_HW 0x00513020
