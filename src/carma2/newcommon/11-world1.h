@@ -67,4 +67,6 @@ extern void C2_HOOK_FASTCALL ToggleJoystickEnable(void);
 
 extern void C2_HOOK_FASTCALL ToggleJoystickDPad(void);
 
+extern void C2_HOOK_FASTCALL IncreaseJoystickFFB(void);
+
 #endif // GUARD_11_WORLD1_H
