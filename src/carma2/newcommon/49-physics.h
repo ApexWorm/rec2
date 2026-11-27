@@ -12,14 +12,6 @@
 #include "c2_hooks.h"
 #include "rec2_types.h"
 
-typedef struct tPhysics_workspace {
-    int count;
-    tPhysics_joint_force* forces;
-    undefined field_0x8[12];
-    br_scalar* field_0x14;
-    br_scalar* field_0x18;
-} tPhysics_workspace;
-
 extern int gINT_00692dc8;
 
 extern tPhysicsError_cbfn* gPhysics_error_cb;
@@ -128,13 +120,13 @@ extern int C2_HOOK_FASTCALL TestShapeEdgeIntersection(tPhysics_object* pCollisio
 
 extern int C2_HOOK_FASTCALL TestForObjectInSensiblePlace(tPhysics_object* pCollision_info_1, tPhysics_object* pCollision_info_2, br_vector3* pVec3, tWorld_callbacks* pCar_callbacks);
 
-// HierarchyCalcEnergy
+extern br_scalar C2_HOOK_FASTCALL HierarchyCalcEnergy(tPhysics_object* pObject);
 
 // CheckCollisionList
 
-// MakeJointVelocitiesVector
+extern void C2_HOOK_FASTCALL MakeJointVelocitiesVector(br_scalar* pVelocities, tPhysics_joint_force** pForces, int pCount);
 
-// ApplySingleForce
+extern void C2_HOOK_FASTCALL ApplySingleForce(tPhysics_joint_force* pForce, br_scalar pAmount);
 
 extern void C2_HOOK_FASTCALL ApplyJointForces(tPhysics_joint_force** pForces, br_scalar* pAmounts, int pCount);
 
@@ -152,7 +144,7 @@ extern tPhysics_workspace* C2_HOOK_FASTCALL AllocateObjectWorkspace(int pCount);
 
 // RedoQuickHingeVelocities
 
-// GetJointForces
+extern int C2_HOOK_FASTCALL GetJointForces(tPhysics_object* pObject, tPhysics_joint_force* pForces);
 
 // GetUniversalRotationAngle
 
@@ -176,9 +168,9 @@ extern void C2_HOOK_FASTCALL PositionWorldJointedObject(tPhysics_object* pObject
 
 // TranslateAndRotatePartialObject
 
-// TranslateAndRotateJointedObject
+extern void C2_HOOK_FASTCALL TranslateAndRotateJointedObject(tPhysics_object* pObject, br_scalar pDelta_time);
 
-// CountJointForces
+extern int C2_HOOK_FASTCALL CountJointForces(tPhysics_object* pObject, tPhysics_object* pParent);
 
 extern void C2_HOOK_FASTCALL MoveJointedObject(tPhysics_object* pObject, float pDelta_time);
 

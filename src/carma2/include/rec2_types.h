@@ -4596,6 +4596,14 @@ typedef struct {
     int type;
 } tPhysics_joint_force;
 
+typedef struct tPhysics_workspace {
+    int count;
+    tPhysics_joint_force* forces;
+    undefined field_0x8[12];
+    br_scalar* field_0x14;
+    br_scalar* field_0x18;
+} tPhysics_workspace;
+
 typedef struct tPhysics_object {
     br_actor* actor;
     float M;
