@@ -419,6 +419,7 @@ int C2_HOOK_FASTCALL DRS3StartSound2(tS3_outlet *pOutlet, tS3_sound_id pSound, i
 }
 
 // FUNCTION: CARMA2_HW 0x004557a0
+// FUNCTION: CARMA2_SW 0x00455530
 int C2_HOOK_FASTCALL DRS3ChangeVolume(int pChannel_id, int pVolume) {
 
     if (gSound_enabled) {
@@ -978,6 +979,7 @@ void C2_HOOK_FASTCALL SetSoundDetailLevel(int pLevel) {
 }
 
 // FUNCTION: CARMA2_HW 0x00456960
+// FUNCTION: CARMA2_SW 0x004566f0
 // FUNCTION: CARMA2_CHEAT 0x00456de0
 void C2_HOOK_FASTCALL ReallySetSoundDetailLevel(int pLevel) {
 

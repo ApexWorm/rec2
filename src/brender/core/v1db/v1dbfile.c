@@ -201,6 +201,7 @@ br_file_struct_member br_material_FM[] = {
 br_file_struct br_material_F = { "br_material", BR_ASIZE(br_material_FM), br_material_FM, sizeof(br_material) };
 
 // GLOBAL: CARMA2_HW 0x00663910
+// GLOBAL: CARMA2_SW 0x0065e0a8
 // GLOBAL: CARMA2_CHEAT 0x0066b1c8
 br_df_material_map_item MaterialMaps[] = {
     { CHUNKID_MATERIAL_COLOUR_MAP, offsetof(br_material, colour_map), 0 },
