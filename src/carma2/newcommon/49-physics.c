@@ -358,11 +358,32 @@ tFace_ref* C2_HOOK_FASTCALL RayCastThruFaceList2(br_vector3* pPosition, br_vecto
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x00423ce0
-// STUB: CARMA2_SW 0x00423d60
-// STUB: CARMA2_CHEAT 0x00423e60
+// FUNCTION: CARMA2_HW 0x00423ce0
+// FUNCTION: CARMA2_SW 0x00423d60
+// FUNCTION: CARMA2_CHEAT 0x00423e60
 int C2_HOOK_FASTCALL CheckSingleEdgeWithSphere(br_vector3* pEdge_start, br_vector3* pEdge_end, tPhysics_object* pObject, tCollision_shape_sphere_data* pSphere, tPhysics_joint_force* pForces, int pCount, br_vector3* pSphere_start, br_vector3* pSphere_end, tFace_ref* pFace) {
-    NOT_IMPLEMENTED();
+    br_vector3 point;
+    br_vector3 normal;
+    br_vector3 trial_normal;
+    br_vector3 old_normal;
+    br_vector3 direction;
+    br_vector3 surface_point;
+    br_scalar t;
+
+    SphereEdgeCollide(pEdge_start, pEdge_end, pSphere_start, pSphere_end, pSphere, &point, &normal, &t, 0, 0);
+    if (t <= 1.0f) {
+        BrMatrix34TApplyV(&trial_normal, &normal, &pObject->transform_matrix);
+        BrMatrix34TApplyV(&old_normal, &normal, &pObject->actor->t.t.mat);
+        BrVector3Scale(&old_normal, &old_normal, t);
+        BrVector3Scale(&direction, &trial_normal, 1.0f - t);
+        BrVector3Accumulate(&direction, &old_normal);
+        BrVector3Normalise(&direction, &direction);
+        BrVector3Scale(&direction, &direction, pSphere->radius);
+        BrVector3Add(&surface_point, &pSphere->center, &direction);
+        BrVector3Negate(&trial_normal, &trial_normal);
+        return AddObjectWallForce(pForces, &surface_point, t, &trial_normal, 0.0f, pCount, pObject, 4, pFace, NULL);
+    }
+    return pCount;
 }
 
 #ifdef REC2_MATCHING
