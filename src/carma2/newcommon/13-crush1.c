@@ -1329,7 +1329,60 @@ int C2_HOOK_FASTCALL NearestAxis(const br_vector3* pVector) {
     }
 }
 
-// CrushModel
+// FUNCTION: CARMA2_HW 0x00432b80
+// FUNCTION: CARMA2_SW 0x00432bb0
+// FUNCTION: CARMA2_CHEAT 0x00432d50
+void C2_HOOK_FASTCALL CrushModel(br_model* pModel, int pCount, const br_vector3* pVertices, br_vector3* pEnergy, br_scalar pForce, const tCar_crush_limits* pLimits, int pAxis, int pMax_level, br_scalar* pMax_scale, br_scalar* pScale, tU16* pIndex) {
+    tU16 j;
+    br_vector3* vertex;
+    float scales[1024];
+    tUser_detail_level_model* user_detail_model;
+    br_vector3 movement;
+    tModel_detail_vertex_data* vertex_data;
+    tU16 i;
+    br_scalar force;
+
+    *pMax_scale = 0.0f;
+    *pScale = 0.0f;
+    *pIndex = 0;
+    if (pModel == NULL) {
+        return;
+    }
+    user_detail_model = pModel->user;
+    if (user_detail_model == NULL) {
+        return;
+    }
+    vertex_data = user_detail_model->field_0x4;
+    if (vertex_data == NULL) {
+        return;
+    }
+    if (pModel->nvertices > REC2_ASIZE(scales)) {
+        PDFatalError("Well stone the crows, there's a lot of vertices on that model.");
+    }
+    for (i = 0; i < pModel->nvertices; i++) {
+        scales[i] = GetImpactScale(&pModel->vertices[i].p, pCount, pVertices, gMax_crush_dist_sq);
+        if (scales[i] > *pMax_scale) {
+            *pMax_scale = scales[i];
+            *pIndex = i;
+        }
+    }
+    if (pForce == 0.0f || *pMax_scale == 0.0f) {
+        return;
+    }
+    force = gForce_to_movement_factor * pForce;
+    for (j = 0; j < pModel->nvertices; j++) {
+        vertex = &pModel->vertices[j].p;
+        if (scales[j] != 0.0f) {
+            scales[j] *= force;
+            LimitImpactScale(&scales[j], pAxis, vertex->v[pAxis], pEnergy->v[pAxis], vertex_data[j].limit_number, pLimits, pMax_level);
+            BrVector3Scale(&movement, pEnergy, scales[j]);
+            BrVector3Accumulate(vertex, &movement);
+        }
+    }
+    *pScale = scales[*pIndex];
+    AddCrushToPipingSession(pModel, pEnergy, scales);
+    SetModelForUpdate(pModel);
+}
 
 // PossibleShockSmash
 

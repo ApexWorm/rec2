@@ -173,7 +173,7 @@ extern void C2_HOOK_FASTCALL DisposeActionReplay(void);
 
 // GetNextIncident
 
-// AddCrushToPipingSession
+extern void C2_HOOK_FASTCALL AddCrushToPipingSession(br_model* pModel, const br_vector3* pVector, const float* pValues);
 
 // AddSmudgeToPipingSession
 

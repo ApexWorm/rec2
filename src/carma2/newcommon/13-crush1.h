@@ -154,7 +154,7 @@ extern int C2_HOOK_FASTCALL TooFarToCrush(const br_model* pModel, int pCount, co
 
 extern int C2_HOOK_FASTCALL NearestAxis(const br_vector3* pVector);
 
-// CrushModel
+extern void C2_HOOK_FASTCALL CrushModel(br_model* pModel, int pCount, const br_vector3* pVertices, br_vector3* pEnergy, br_scalar pForce, const tCar_crush_limits* pLimits, int pAxis, int pMax_level, br_scalar* pMax_scale, br_scalar* pScale, tU16* pIndex);
 
 // PossibleShockSmash
 
