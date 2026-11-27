@@ -696,7 +696,7 @@ void C2_HOOK_FASTCALL ProcessDrag2(tPHIL_queued_header* pObject_info, tPhysics_o
         volume = pVolume;
     }
     if (volume != NULL) {
-        if (pObject_info->field_0x14 == 0.f || volume == NULL || volume->viscosity_multiplier <= 2.0) {
+        if (pObject_info->field_0x14 == 0.0f || volume == NULL || volume->viscosity_multiplier <= 2.0) {
             drag = drag * (volume->viscosity_multiplier * pObject->water_depth_factor);
         } else {
             drag = (br_scalar)(drag * 0.5 * (volume->viscosity_multiplier * pObject->water_depth_factor));
