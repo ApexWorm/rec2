@@ -193,6 +193,7 @@ tCar_spec* gCar_of_material;
 
 // GLOBAL: CARMA2_HW 0x00660118
 // GLOBAL: CARMA2_SW 0x0065aa60
+// GLOBAL: CARMA2_CHEAT 0x00667960
 static tU8 gFlame_frame_size[20][2] = {
     { 20, 25 }, { 24, 32 }, { 24, 34 }, { 28, 44 }, { 28, 49 },
     { 32, 53 }, { 28, 61 }, { 28, 69 }, { 24, 61 }, { 28, 64 },
