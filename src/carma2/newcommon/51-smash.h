@@ -358,7 +358,7 @@ extern void C2_HOOK_FASTCALL ChangeSmashTexture(br_material* pMaterial, tCar_spe
 
 // ReceivedSmashEnvironment
 
-// DoQueuedNetSmashes
+extern void C2_HOOK_FASTCALL DoQueuedNetSmashes(void);
 
 // FindTheBastard
 

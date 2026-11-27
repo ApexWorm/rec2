@@ -8,6 +8,7 @@
 
 #include "51-smash.h"
 
+#include "60-phil.h"
 #include "00-car.h"
 #include "08-loading1.h"
 #include "09-funks.h"
@@ -2301,11 +2302,61 @@ void C2_HOOK_FASTCALL ChangeSmashTexture(br_material* pMaterial, tCar_spec* pCar
     NOT_IMPLEMENTED();
 }
 
-// DoNetSmash
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
 
-// ReceivedSmashEnvironment
+// STUB: CARMA2_HW 0x004f6130
+// STUB: CARMA2_SW 0x004f1d90
+// STUB: CARMA2_CHEAT 0x004fbdd0
+void C2_HOOK_FASTCALL DoNetSmash(tQueued_net_smash* pSmash) {
+    NOT_IMPLEMENTED();
+}
 
-// DoQueuedNetSmashes
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
+
+// FUNCTION: CARMA2_HW 0x004f60b0
+// FUNCTION: CARMA2_SW 0x004f1d10
+// FUNCTION: CARMA2_CHEAT 0x004fbd50
+void C2_HOOK_FASTCALL ReceivedSmashEnvironment(tQueued_net_smash* pSmash) {
+    int i;
+    tQueued_net_smash* queued;
+
+    if (gPHIL_last_physics_tick != 0 && gPHIL_last_physics_tick < pSmash->field_0x4) {
+        for (i = 0, queued = gQueued_net_smashes; i < (int)REC2_ASIZE(gQueued_net_smashes); i++, queued++) {
+            if (queued->field_0x4 == 0) {
+                *queued = *pSmash;
+                if (gNet_mode == eNet_mode_host && gCount_host_smashes < 1000) {
+                    queued = &gNet_host_smashes[gCount_host_smashes].smash;
+                    gCount_host_smashes++;
+                    *queued = *pSmash;
+                }
+                return;
+            }
+        }
+    } else {
+        DoNetSmash(pSmash);
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x004f62e0
+// FUNCTION: CARMA2_SW 0x004f1f40
+// FUNCTION: CARMA2_CHEAT 0x004fbf80
+void C2_HOOK_FASTCALL DoQueuedNetSmashes(void) {
+    int i;
+    tQueued_net_smash* queued;
+
+    if (gNet_mode != eNet_mode_none) {
+        for (i = 0, queued = gQueued_net_smashes; i < (int)REC2_ASIZE(gQueued_net_smashes); i++, queued++) {
+            if (queued->field_0x4 != 0 && gPHIL_last_physics_tick >= queued->field_0x4) {
+                queued->field_0x4 = 0;
+                DoNetSmash(queued);
+            }
+        }
+    }
+}
 
 // FindTheBastard
 
