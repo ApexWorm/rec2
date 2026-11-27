@@ -508,6 +508,7 @@ br_chunks_table_entry ActorLoadEntries[] = {
 
 // GLOBAL: CARMA2_HW 0x00664010
 // GLOBAL: CARMA2_SW 0x0065e7a8
+// GLOBAL: CARMA2_CHEAT 0x0066b8c8
 br_chunks_table ActorLoadTable = { BR_ASIZE(ActorLoadEntries), ActorLoadEntries };
 
 // GLOBAL: CARMA2_HW 0x00664018
