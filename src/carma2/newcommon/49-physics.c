@@ -1053,6 +1053,7 @@ void C2_HOOK_FASTCALL TranslateObject(tPhysics_object* pObject, br_scalar pDelta
 
 // STUB: CARMA2_HW 0x004c2060
 // STUB: CARMA2_SW 0x004be790
+// STUB: CARMA2_CHEAT 0x004c7b80
 void C2_HOOK_FASTCALL GetFacesNearObject(tPhysics_object *pObject, tWorld_callbacks *pCallbacks) {
     NOT_IMPLEMENTED();
 }
