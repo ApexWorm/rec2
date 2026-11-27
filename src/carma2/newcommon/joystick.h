@@ -36,6 +36,10 @@ extern void C2_HOOK_FASTCALL RestoreJoystickPreferences(void);
 
 extern int C2_HOOK_FASTCALL HasCurrentJoystick(void);
 
+#ifdef REC2_HW
+extern void C2_HOOK_FASTCALL CreateAccentPolyActor(float pX, float pY, float pWidth, float pHeight);
+#endif
+
 extern void C2_HOOK_FASTCALL FUN_0045b0a0(tHeadup_text_buffer* pText_buffer);
 
 extern void C2_HOOK_FASTCALL PeekCharacter(FILE* pF);

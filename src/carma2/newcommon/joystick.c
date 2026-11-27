@@ -11,6 +11,7 @@
 #include "08-loading1.h"
 #include "41-utility.h"
 #include "globvars.h"
+#include "globvrbm.h"
 #include "platform.h"
 
 #include "c2_stdio.h"
@@ -38,6 +39,32 @@ float gJoystick_y_throttle = 1.f;
 // GLOBAL: CARMA2_SW 0x00591270
 // GLOBAL: CARMA2_CHEAT 0x0059cb90
 int gINT_00596310 = 50;
+
+#ifdef REC2_HW
+// GLOBAL: CARMA2_HW 0x00686174
+// GLOBAL: CARMA2_CHEAT 0x0068da1c
+br_actor* gAcc_poly_actor;
+
+// GLOBAL: CARMA2_HW 0x00686178
+// GLOBAL: CARMA2_CHEAT 0x0068da20
+br_material* gAcc_poly_material;
+
+// GLOBAL: CARMA2_HW 0x0068617c
+// GLOBAL: CARMA2_CHEAT 0x0068da24
+br_model* gAcc_poly_model;
+
+// GLOBAL: CARMA2_HW 0x00686180
+// GLOBAL: CARMA2_CHEAT 0x0068da28
+int gRender_acc_poly_actor;
+
+// GLOBAL: CARMA2_HW 0x005962f8
+// GLOBAL: CARMA2_CHEAT 0x0059cb78
+br_token_value gAccent_poly_prims[] = {
+    { BRT_BLEND_B, { 1 } },
+    { BRT_OPACITY_X, { 0x4b0000 } },
+    { BR_NULL_TOKEN, { 0 } },
+};
+#endif
 
 // GLOBAL: CARMA2_HW 0x00686184
 // GLOBAL: CARMA2_SW 0x006808c4
@@ -85,6 +112,48 @@ int C2_HOOK_FASTCALL ReadUntilCharacter(FILE* pF, char* pBuffer, int pBuffer_siz
         return 0;
     }
 }
+
+#ifdef REC2_HW
+// FUNCTION: CARMA2_HW 0x0045aa60
+// FUNCTION: CARMA2_CHEAT 0x0045aee0
+void C2_HOOK_FASTCALL CreateAccentPolyActor(float pX, float pY, float pWidth, float pHeight) {
+
+    if (gAcc_poly_material == NULL) {
+        gAcc_poly_material = BrMaterialAllocate("Acc Poly Mat");
+        gAcc_poly_material->colour = 0x80;
+        gAcc_poly_material->flags = BR_MATF_ALWAYS_VISIBLE;
+        BrMaterialAdd(gAcc_poly_material);
+        gAcc_poly_material->extra_prim = gAccent_poly_prims;
+        gAcc_poly_material->extra_prim[1].v.x = 0x800000;
+        BrMaterialUpdate(gAcc_poly_material, BR_MATU_EXTRA_PRIM);
+    }
+    if (gAcc_poly_actor == NULL) {
+        gAcc_poly_model = BrModelAllocate("Tint Poly", 6, 2);
+        BrVector3Set(&gAcc_poly_model->vertices[0].p, pX, -pY, -1.01f);
+        BrVector3Set(&gAcc_poly_model->vertices[1].p, pX + pWidth, -pY, -1.01f);
+        BrVector3Set(&gAcc_poly_model->vertices[2].p, pX, -(pY + pHeight), -1.01f);
+        BrVector3Set(&gAcc_poly_model->vertices[3].p, pX + pWidth, -pY, -1.01f);
+        BrVector3Set(&gAcc_poly_model->vertices[4].p, pX + pWidth, -(pY + pHeight), -1.01f);
+        BrVector3Set(&gAcc_poly_model->vertices[5].p, pX, -(pY + pHeight), -1.01f);
+        gAcc_poly_model->faces[0].vertices[0] = 0;
+        gAcc_poly_model->faces[0].vertices[1] = 1;
+        gAcc_poly_model->faces[0].vertices[2] = 2;
+        gAcc_poly_model->faces[1].vertices[0] = 3;
+        gAcc_poly_model->faces[1].vertices[1] = 4;
+        gAcc_poly_model->faces[1].vertices[2] = 5;
+        gAcc_poly_actor = BrActorAllocate(BR_ACTOR_MODEL, NULL);
+        gAcc_poly_actor->material = gAcc_poly_material;
+        gAcc_poly_model->faces[0].material = gAcc_poly_material;
+        gAcc_poly_model->faces[1].material = gAcc_poly_material;
+        gAcc_poly_actor->model = gAcc_poly_model;
+        BrModelAdd(gAcc_poly_model);
+    }
+    if (!gRender_acc_poly_actor) {
+        gRender_acc_poly_actor = 1;
+        BrActorAdd(g2d_camera, gAcc_poly_actor);
+    }
+}
+#endif
 
 // FUNCTION: CARMA2_HW 0x0045b0a0
 // FUNCTION: CARMA2_SW 0x0045ab20
