@@ -100,7 +100,12 @@ void C2_HOOK_FASTCALL InitTreeSurgery(void) {
 
 // MungeTrackModel
 
-// LoadTrack
+// STUB: CARMA2_HW 0x00504bf0
+// STUB: CARMA2_SW 0x005003b0
+// STUB: CARMA2_CHEAT 0x0050a7d0
+void C2_HOOK_FASTCALL LoadTrack(const char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_info) {
+    NOT_IMPLEMENTED();
+}
 
 // FUNCTION: CARMA2_HW 0x00506e20
 // FUNCTION: CARMA2_SW 0x00502270

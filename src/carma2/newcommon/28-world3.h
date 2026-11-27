@@ -38,7 +38,7 @@ extern void C2_HOOK_FASTCALL InitTreeSurgery(void);
 
 // MungeTrackModel
 
-// LoadTrack
+extern void C2_HOOK_FASTCALL LoadTrack(const char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_info);
 
 extern intptr_t C2_HOOK_CDECL RemoveBounds(br_actor* pActor, void* pArg);
 

@@ -22,6 +22,8 @@ extern br_pixelmap* gWater_shade_table;
 extern int gWater_shade_table_power;
 extern br_actor* gForward_sky_actor;
 extern tSpecial_volume* gLast_camera_special_volume;
+extern br_pixelmap* gSwap_sky_texture;
+extern tDepth_effect_type gSwap_depth_effect_type;
 
 extern int C2_HOOK_CDECL Log2(int pNumber);
 

@@ -24,11 +24,22 @@ extern tSlot_info gInitial_APO[3];
 extern tSlot_info gInitial_APO_potential[3];
 extern tSlot_info gMax_APO[3];
 extern br_pixelmap* gLit_op_stat_bloc;
+extern int gINT_0074c6d0;
+extern int gNet_ped_headup;
+extern int gCredits_won_headup;
+extern int gNet_cash_headup;
+extern int gTimer_headup;
+extern int gLaps_headup;
+extern int gPed_kill_count_headup;
+extern int gCar_kill_count_headup;
+extern int gTime_awarded_headup;
+extern float gForce_feedback_upper_limit;
+extern float gForce_feedback_lower_limit;
 
 
 extern void C2_HOOK_FASTCALL Modify2DCopyPixelmaps(void);
 
-// SetupFFBValues
+extern void C2_HOOK_FASTCALL SetupFFBValues(void);
 
 extern void C2_HOOK_FASTCALL AllocateActors(void);
 
@@ -70,9 +81,9 @@ extern void C2_HOOK_FASTCALL InitGameAccordingToSkillLevel(void);
 
 extern void C2_HOOK_FASTCALL InitGame(int pStart_race);
 
-// LoadInTrack
+extern void C2_HOOK_FASTCALL LoadInTrack(void);
 
-// InitRace
+extern void C2_HOOK_FASTCALL InitRace(void);
 
 extern int C2_HOOK_FASTCALL GetScreenSize(void);
 

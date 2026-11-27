@@ -499,7 +499,12 @@ void C2_HOOK_FASTCALL EmptyInventory(void) {
     gINT_006a0a5c = 0;
 }
 
-// ResetPowerups
+// STUB: CARMA2_HW 0x004da630
+// STUB: CARMA2_SW 0x004d6b00
+// STUB: CARMA2_CHEAT 0x004e01f0
+void C2_HOOK_FASTCALL ResetPowerups(void) {
+    NOT_IMPLEMENTED();
+}
 
 // STUB: CARMA2_HW 0x004da730
 // STUB: CARMA2_SW 0x004d6c00

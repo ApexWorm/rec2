@@ -2094,7 +2094,12 @@ void C2_HOOK_FASTCALL MungeMaterial(br_actor* pActor, int pRecursive, br_materia
     *pCount_vertices = munge_material_cb_ctx.count_vertices;
 }
 
-// ReinitSmashing
+// STUB: CARMA2_HW 0x004f5750
+// STUB: CARMA2_SW 0x004f13b0
+// STUB: CARMA2_CHEAT 0x004fb3f0
+void C2_HOOK_FASTCALL ReinitSmashing(void) {
+    NOT_IMPLEMENTED();
+}
 
 // FUNCTION: CARMA2_HW 0x004f57c0
 // FUNCTION: CARMA2_SW 0x004f1420

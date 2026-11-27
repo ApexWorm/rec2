@@ -15,6 +15,7 @@
 extern int gAllow_car_flying;
 extern int gINT_0067c470;
 extern int gEntering_message;
+extern int gAuto_repair;
 extern int gInvulnerability;
 extern tU32 gToo_poor_for_recovery_timeout;
 extern tCamera_key_flags gCamera_key_flags;

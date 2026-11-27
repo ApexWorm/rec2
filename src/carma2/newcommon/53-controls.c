@@ -157,6 +157,11 @@ tU32 gToo_poor_for_recovery_timeout;
 // GLOBAL: CARMA2_CHEAT 0x007a6644
 tCamera_key_flags gCamera_key_flags;
 
+// GLOBAL: CARMA2_HW 0x0079ec54
+// GLOBAL: CARMA2_SW 0x007951b4
+// GLOBAL: CARMA2_CHEAT 0x007a62f4
+int gAuto_repair;
+
 // GLOBAL: CARMA2_HW 0x006b781c
 // GLOBAL: CARMA2_SW 0x006ae4fc
 // GLOBAL: CARMA2_CHEAT 0x006beebc

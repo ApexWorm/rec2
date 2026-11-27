@@ -668,7 +668,12 @@ void C2_HOOK_FASTCALL InitialisePlayerScore(tNet_game_player_info* pPlayer) {
     pPlayer->reposition_time = 0;
 }
 
-// InitPlayers
+// STUB: CARMA2_HW 0x0049b720
+// STUB: CARMA2_SW 0x004978a0
+// STUB: CARMA2_CHEAT 0x0049bad0
+void C2_HOOK_FASTCALL InitPlayers(void) {
+    NOT_IMPLEMENTED();
+}
 
 // FUNCTION: CARMA2_HW 0x0049b7e0
 // FUNCTION: CARMA2_SW 0x00497960

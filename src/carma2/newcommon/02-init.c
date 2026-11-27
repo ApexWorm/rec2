@@ -8,6 +8,7 @@
 
 #include "02-init.h"
 
+#include "00-car.h"
 #include "01-network.h"
 #include "04-netgame.h"
 #include "05-drmem.h"
@@ -19,6 +20,7 @@
 #include "14-drfile.h"
 #include "15-displays.h"
 #include "16-graphics1.h"
+#include "17-world2.h"
 #include "18-graphics2.h"
 #include "18b-graphics2.h"
 #include "19-font.h"
@@ -34,13 +36,18 @@
 #include "38-flicplay.h"
 #include "39-oil.h"
 #include "41-utility.h"
+#include "43-pratcam.h"
 #include "49-physics.h"
 #include "64-movie.h"
 #include "69-sound.h"
 #include "70-packfile.h"
 #include "51-smash.h"
 #include "52-errors.h"
+#include "53-controls.h"
+#include "54-runtime.h"
 #include "56-aiworld.h"
+#include "59-camera.h"
+#include "60-phil.h"
 #include "61-pedestrn-phys.h"
 #include "62-graphics3.h"
 #include "63-loading3.h"
@@ -113,6 +120,59 @@ tSlot_info gMax_APO[3];
 // GLOBAL: CARMA2_CHEAT 0x00695180
 br_pixelmap* gLit_op_stat_bloc;
 
+// GLOBAL: CARMA2_HW 0x0074c6d0
+// GLOBAL: CARMA2_SW 0x00742d90
+// GLOBAL: CARMA2_CHEAT 0x00753d70
+int gINT_0074c6d0;
+
+// GLOBAL: CARMA2_HW 0x0079eaa4
+// GLOBAL: CARMA2_SW 0x00795004
+// GLOBAL: CARMA2_CHEAT 0x007a6144
+int gNet_ped_headup;
+
+// GLOBAL: CARMA2_HW 0x0079eaa8
+// GLOBAL: CARMA2_SW 0x00795008
+// GLOBAL: CARMA2_CHEAT 0x007a6148
+int gCredits_won_headup;
+
+// GLOBAL: CARMA2_HW 0x0079eae8
+// GLOBAL: CARMA2_SW 0x00795048
+// GLOBAL: CARMA2_CHEAT 0x007a6188
+int gNet_cash_headup;
+
+// GLOBAL: CARMA2_HW 0x0079eaec
+// GLOBAL: CARMA2_SW 0x0079504c
+// GLOBAL: CARMA2_CHEAT 0x007a618c
+int gTimer_headup;
+
+// GLOBAL: CARMA2_HW 0x0079eaf0
+// GLOBAL: CARMA2_SW 0x00795050
+// GLOBAL: CARMA2_CHEAT 0x007a6190
+int gLaps_headup;
+
+// GLOBAL: CARMA2_HW 0x0079eaf4
+// GLOBAL: CARMA2_SW 0x00795054
+// GLOBAL: CARMA2_CHEAT 0x007a6194
+int gPed_kill_count_headup;
+
+// GLOBAL: CARMA2_HW 0x0079eaf8
+// GLOBAL: CARMA2_SW 0x00795058
+// GLOBAL: CARMA2_CHEAT 0x007a6198
+int gCar_kill_count_headup;
+
+// GLOBAL: CARMA2_HW 0x0079eb40
+// GLOBAL: CARMA2_SW 0x007950a0
+// GLOBAL: CARMA2_CHEAT 0x007a61e0
+int gTime_awarded_headup;
+
+// GLOBAL: CARMA2_HW 0x00655e58
+// GLOBAL: CARMA2_SW 0x00650d40
+float gForce_feedback_upper_limit = 2.7f;
+
+// GLOBAL: CARMA2_HW 0x00655e5c
+// GLOBAL: CARMA2_SW 0x00650d44
+float gForce_feedback_lower_limit = 1.5f;
+
 
 // FUNCTION: CARMA2_HW 0x0047d880
 // FUNCTION: CARMA2_SW 0x0047da40
@@ -137,7 +197,19 @@ void C2_HOOK_FASTCALL Modify2DCopyPixelmaps(void) {
     BRPM_convert(gLit_op_stat_bloc, pixel_type);
 }
 
-// SetupFFBValues
+inline void C2_HOOK_FASTCALL SetupFFBValues(void) {
+    tPath_name the_path;
+    FILE* f;
+    char s[256];
+
+    PathCat(the_path, gApplication_path, "FFB.TXT");
+    f = DRfopen(the_path, "rt");
+    GetALineAndDontArgue(f, s);
+    sscanf(strtok(s, "\t ,/"), "%f", &gForce_feedback_upper_limit);
+    GetALineAndDontArgue(f, s);
+    sscanf(strtok(s, "\t ,/"), "%f", &gForce_feedback_lower_limit);
+    PFfclose(f);
+}
 
 // AllocateActors (see 02b-init.c)
 
@@ -1049,9 +1121,170 @@ void C2_HOOK_FASTCALL InitGame(int pStart_race) {
     InitGameAccordingToSkillLevel();
 }
 
-// LoadInTrack
+inline void C2_HOOK_FASTCALL LoadInTrack(void) {
 
-// InitRace
+    LoadTrack(gProgram_state.track_file_name, &gProgram_state.track_spec, &gCurrent_race);
+}
+
+// FUNCTION: CARMA2_HW 0x00481830
+// FUNCTION: CARMA2_SW 0x0047e9b0
+// FUNCTION: CARMA2_CHEAT 0x00481bc0
+void C2_HOOK_FASTCALL InitRace(void) {
+    int i;
+
+    gMap_view = 1;
+    InitFogificateMaterials();
+    InitSmashTargets();
+    ClearAllRuntimeVariables();
+    PHILInit();
+    SetUpTestObjects();
+    InitTargetLock();
+    ReinitSmashing();
+    InitRepairAnimations();
+    ResetExplosions();
+    ClearWobbles();
+    ClearHeadups();
+    ResetOilSpills();
+    HideSkids();
+    ResetPedNearness();
+    PossibleService();
+    InitPedsForRace();
+    BuildColourTable(gRender_palette);
+    PossibleService();
+    gINT_0074c6d0 = 0;
+    gINT_0074b780 = 0;
+    gLast_camera_special_volume = NULL;
+    if (!TranslationMode()) {
+        LoadFont(1);
+        LoadFont(2);
+    }
+    LoadFont(3);
+    LoadFont(4);
+    LoadFont(5);
+    PossibleService();
+    LoadFont(6);
+    LoadFont(7);
+    LoadFont(8);
+    LoadFont(23);
+    PossibleService();
+    ResetRecoveryVouchers();
+    gMap_time = 0;
+    gProgram_state.cockpit_image_index = 0;
+    PossibleService();
+    gProgram_state.which_view = eView_forward;
+    gProgram_state.new_view = eView_undefined;
+    gProgram_state.pratcam_move_start = 0;
+    gAction_replay_mode = 0;
+    InitPratcam();
+    gProgram_state.peds_killed = 0;
+    gProgram_state.revs = 2000;
+    gProgram_state.current_car.speed = 0.0f;
+    gProgram_state.current_car.steering_angle = 0.0f;
+    gProgram_state.current_car.lf_sus_position = 0.0f;
+    gProgram_state.current_car.rf_sus_position = 0.0f;
+    gProgram_state.current_car.lr_sus_position = 0.0f;
+    gProgram_state.current_car.rr_sus_position = 0.0f;
+    PossibleService();
+    gAuto_repair = 0;
+    SetIntegerMapRenders();
+    AdjustRenderScreenSize();
+    PrintMemoryDump(0, "DIRECTLY BEFORE LOADING IN TRACK");
+    LoadInTrack();
+    if (gYon_multiplier != 1.0f) {
+        AdjustRenderScreenSize();
+    }
+    PrintMemoryDump(0, "DIRECTLY AFTER LOADING IN TRACK");
+    ResetCrushSystems();
+    LoadAIWorldForRace(&gCurrent_race);
+    for (i = 0; i < (int)REC2_ASIZE(gRace_head_ups); i++) {
+        gRace_head_ups[i] = NewTextHeadupSlot(16 + i, 0, 0, -1, "");
+    }
+#define APO_LEVEL(APO, I) (gNet_mode != eNet_mode_none ? (APO)[I].initial_network[gCurrent_net_game->type] : (APO)[I].initial[gProgram_state.skill_level])
+    if (gNet_mode != eNet_mode_none) {
+        gNet_cash_headup = NewTextHeadupSlot(13, 0, 0, -6, "");
+        gNet_ped_headup = NewTextHeadupSlot(14, 0, 0, -6, "");
+        for (i = 0; i < (int)REC2_ASIZE(gInitial_powerup_slots); i++) {
+            gInitial_powerup_slots[i] = APO_LEVEL(gMax_APO, i);
+        }
+    } else {
+        gCredits_won_headup = NewTextHeadupSlot(1, 0, 0, -6, "");
+        gPed_kill_count_headup = NewTextHeadupSlot(2, 0, 0, -6, "");
+        gCar_kill_count_headup = NewTextHeadupSlot(12, 0, 0, -6, "");
+        gTimer_headup = NewTextHeadupSlot(7, 0, 0, -5, "");
+        gTime_awarded_headup = NewTextHeadupSlot(11, 0, 0, -2, "");
+        gLaps_headup = NewTextHeadupSlot(8, 0, 0, -6, "");
+        for (i = 0; i < (int)REC2_ASIZE(gInitial_powerup_slots); i++) {
+            gInitial_powerup_slots[i] = (APO_LEVEL(gMax_APO, i) - APO_LEVEL(gInitial_APO_potential, i) - 1) * gCurrent_race.index / (gNumber_of_races - 1)
+                + 1 + APO_LEVEL(gInitial_APO_potential, i);
+        }
+    }
+#undef APO_LEVEL
+    InstantDepthChange(gProgram_state.default_depth_effect.type,
+        gProgram_state.default_depth_effect.sky_texture,
+        gProgram_state.default_depth_effect.start,
+        gProgram_state.default_depth_effect.end,
+        gProgram_state.default_depth_effect.colour.red,
+        gProgram_state.default_depth_effect.colour.green,
+        gProgram_state.default_depth_effect.colour.blue,
+        1);
+    gSwap_sky_texture = NULL;
+    if (!GetSkyTextureOn()) {
+        ToggleSkyQuietly();
+    }
+    gSwap_depth_effect_type = eDepth_effect_none;
+    if (!GetDepthCueingOn()) {
+        ToggleDepthCueingQuietly();
+    }
+    PrintMemoryDump(0, "AFTER LOADING IN AI STUFF");
+    SaveShadeTables();
+    gCountdown = 7;
+    gLap = 1;
+    gTimer = gCurrent_race.initial_timer[gProgram_state.skill_level] * 1000;
+    if (gNet_mode != eNet_mode_none && gCurrent_net_game->type == eNet_game_type_5) {
+        gTotal_laps = gCurrent_net_game->options.starting_target;
+    } else {
+        gTotal_laps = gCurrent_race.total_laps;
+    }
+    gCheckpoint = 1;
+    gCheckpoint_count = gCurrent_race.check_point_count;
+    gFreeze_timer = 0;
+    gFree_repairs = 0;
+    if (gNet_mode != eNet_mode_none) {
+        gShow_opponents = gCurrent_net_game->options.show_players_on_map;
+    } else {
+        gShow_opponents = 1;
+    }
+    gOn_drugs = 0;
+    gRace_finished = 0;
+    gOpponent_speed_factor = 1.0f;
+    gCop_speed_factor = 1.0f;
+    gGravity_multiplier = gDefault_gravity;
+    gPinball_factor = 0.0f;
+    gInstant_handbrake = 0;
+    gShow_peds_on_map = 0;
+    PossibleService();
+    SetCarSuspGiveAndHeight(&gProgram_state.current_car, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f);
+    ResetPowerups();
+    PossibleService();
+    ResetSparks();
+    PossibleService();
+    PossibleService();
+    InitPlayers();
+    if (gNet_mode != eNet_mode_none) {
+        gProgram_state.credits = gCurrent_net_game->options.starting_credits;
+        InitNetGameplayStuff();
+    }
+    gInitialised_grid = 0;
+    SetCameraType(gAction_replay_camera_mode);
+    Modify2DCopyPixelmaps();
+#ifndef REC2_CHEAT
+    SetupFFBValues();
+#endif
+#ifdef REC2_HW
+    PossibleLock(1);
+    PossibleUnlock(1);
+#endif
+}
 
 // FUNCTION: CARMA2_HW 0x00481e90
 // FUNCTION: CARMA2_SW 0x0047efd0

@@ -116,7 +116,7 @@ extern void C2_HOOK_FASTCALL DoNetGameManagement(void);
 
 extern void C2_HOOK_FASTCALL InitialisePlayerScore(tNet_game_player_info* pPlayer);
 
-// InitPlayers
+extern void C2_HOOK_FASTCALL InitPlayers(void);
 
 extern void C2_HOOK_FASTCALL UseGeneralScore(int pScore);
 
