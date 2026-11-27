@@ -154,11 +154,98 @@ tPhysicsError C2_HOOK_FASTCALL ConvexHull3D(tCollision_shape_polyhedron_data* pP
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x00422030
-// STUB: CARMA2_SW 0x004220b0
-// STUB: CARMA2_CHEAT 0x00422280
+// FUNCTION: CARMA2_HW 0x00422030
+// FUNCTION: CARMA2_SW 0x004220b0
+// FUNCTION: CARMA2_CHEAT 0x00422280
 tPhysicsError C2_HOOK_FASTCALL GetPointSample(br_model* pModel, int pCount, int* pIndices) {
-    NOT_IMPLEMENTED();
+    int count;
+    int remaining;
+    int i;
+    int j;
+    int k;
+    int index;
+    int best_i;
+    int best_j;
+    br_scalar best;
+    br_scalar sum_i;
+    br_scalar sum_j;
+    br_scalar* distances;
+    int removed[512];
+
+    count = pModel->nvertices;
+    if (count > 512) {
+        count = 512;
+    }
+    if (pCount >= count) {
+        return ePhysicsError_PolyhedronHasNoPoints;
+    }
+    distances = BrMemAllocate(count * count / 2 * sizeof(br_scalar), BR_MEMORY_APPLICATION);
+    if (distances == NULL) {
+        /* FIXME: tPhysicsError has no name for 4 yet */
+        return 4;
+    }
+    k = 0;
+    for (i = 0; i < count; i++) {
+        for (j = 0; j < i; j++) {
+            distances[k] = BR_SQR3(pModel->vertices[i].p.v[0] - pModel->vertices[j].p.v[0], pModel->vertices[i].p.v[1] - pModel->vertices[j].p.v[1], pModel->vertices[i].p.v[2] - pModel->vertices[j].p.v[2]);
+            k++;
+        }
+    }
+    for (i = 0; i < count; i++) {
+        removed[i] = 0;
+    }
+    for (remaining = count - pCount; remaining != 0; remaining--) {
+        best = BR_SCALAR_MAX;
+        for (i = 0; i < count; i++) {
+            if (!removed[i]) {
+                for (j = 0; j < i; j++) {
+                    if (!removed[j]) {
+                        if (j < i) {
+                            index = ((i - 1) * i >> 1) + j;
+                        } else {
+                            index = ((j - 1) * j >> 1) + i;
+                        }
+                        if (distances[index] < best) {
+                            best = distances[index];
+                            best_i = i;
+                            best_j = j;
+                        }
+                    }
+                }
+            }
+        }
+        sum_i = 0.f;
+        sum_j = 0.f;
+        for (k = 0; k < count; k++) {
+            if (!removed[k] && k != best_i && k != best_j) {
+                if (k < best_i) {
+                    index = ((best_i - 1) * best_i >> 1) + k;
+                } else {
+                    index = ((k - 1) * k >> 1) + best_i;
+                }
+                sum_i += (br_scalar)sqrt(distances[index]);
+                if (k < best_j) {
+                    index = ((best_j - 1) * best_j >> 1) + k;
+                } else {
+                    index = ((k - 1) * k >> 1) + best_j;
+                }
+                sum_j += (br_scalar)sqrt(distances[index]);
+            }
+        }
+        if (sum_j <= sum_i) {
+            removed[best_j] = 1;
+        } else {
+            removed[best_i] = 1;
+        }
+    }
+    for (i = 0; i < count; i++) {
+        if (!removed[i]) {
+            *pIndices = i;
+            pIndices++;
+        }
+    }
+    BrMemFree(distances);
+    return ePhysicsError_Ok;
 }
 
 #ifdef REC2_MATCHING
