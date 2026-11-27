@@ -8,10 +8,13 @@
 
 #include "33-depth.h"
 
+#include "32-spark.h"
+
 #include "00-car.h"
 #include "07-structur.h"
 #include "15-displays.h"
 #include "17-world2.h"
+#include "20-skidmark.h"
 #include "36-trig.h"
 #include "37-brucetrk.h"
 #include "41-utility.h"
@@ -46,10 +49,6 @@ br_material* gHorizon_material;
 // GLOBAL: CARMA2_SW 0x00676c18
 // GLOBAL: CARMA2_CHEAT 0x00683d48
 br_model* gForward_sky_model;
-
-// GLOBAL: CARMA2_HW 0x0074cee8
-// GLOBAL: CARMA2_CHEAT 0x00754588
-br_material* gMaterial[2];
 
 // GLOBAL: CARMA2_HW 0x0059118c
 // GLOBAL: CARMA2_SW 0x0058c184
@@ -89,6 +88,36 @@ int gHas_sky_texture;
 // GLOBAL: CARMA2_SW 0x00795180
 // GLOBAL: CARMA2_CHEAT 0x007a62c0
 br_pixelmap* gDepth_shade_table;
+
+// GLOBAL: CARMA2_HW 0x0067c4bc
+// GLOBAL: CARMA2_SW 0x00676c34
+// GLOBAL: CARMA2_CHEAT 0x00683d64
+int gDepth_shade_table_power;
+
+// GLOBAL: CARMA2_HW 0x0067c4a4
+// GLOBAL: CARMA2_SW 0x00676c1c
+// GLOBAL: CARMA2_CHEAT 0x00683d4c
+int gFog_shade_table_power;
+
+// GLOBAL: CARMA2_HW 0x0067c4dc
+// GLOBAL: CARMA2_SW 0x00676c54
+// GLOBAL: CARMA2_CHEAT 0x00683d84
+int gAcid_shade_table_power;
+
+// GLOBAL: CARMA2_HW 0x0079ec28
+// GLOBAL: CARMA2_SW 0x00795188
+// GLOBAL: CARMA2_CHEAT 0x007a62c8
+br_pixelmap* gWater_shade_table;
+
+// GLOBAL: CARMA2_HW 0x0067c4cc
+// GLOBAL: CARMA2_SW 0x00676c44
+// GLOBAL: CARMA2_CHEAT 0x00683d74
+int gWater_shade_table_power;
+
+// GLOBAL: CARMA2_HW 0x0067c4d8
+// GLOBAL: CARMA2_SW 0x00676c50
+// GLOBAL: CARMA2_CHEAT 0x00683d80
+br_actor* gForward_sky_actor;
 
 // GLOBAL: CARMA2_HW 0x0079ec44
 // GLOBAL: CARMA2_SW 0x007951a4
@@ -303,7 +332,33 @@ void C2_HOOK_FASTCALL InstantDepthChange(tDepth_effect_type pType, br_pixelmap* 
 
 // EdgeU
 
-// CreateHorizonModel
+inline br_model* C2_HOOK_FASTCALL CreateHorizonModel(br_actor* pCamera) {
+    tU8 nbands;
+    tU8 band;
+    int vertex;
+    tU8 stripe;
+    br_model* model;
+
+    nbands = 21;
+    model = BrModelAllocate(NULL, 88, 6 * nbands);
+    model->flags |= BR_MODF_KEEP_ORIGINAL;
+    for (band = 0; band < nbands; band++) {
+        for (stripe = 0; stripe < 3; stripe++) {
+            vertex = 6 * band + 2 * stripe;
+            model->faces[vertex + 0].vertices[0] = stripe + 4 * band + 0;
+            model->faces[vertex + 0].vertices[1] = stripe + 4 * band + 1;
+            model->faces[vertex + 0].vertices[2] = stripe + 4 * band + 5;
+            model->faces[vertex + 1].vertices[0] = stripe + 4 * band + 0;
+            model->faces[vertex + 1].vertices[1] = stripe + 4 * band + 5;
+            model->faces[vertex + 1].vertices[2] = stripe + 4 * band + 4;
+            model->faces[vertex + 0].smoothing = 1;
+            model->faces[vertex + 1].smoothing = 1;
+            model->faces[vertex + 0].material = NULL;
+            model->faces[vertex + 1].material = NULL;
+        }
+    }
+    return model;
+}
 
 // FUNCTION: CARMA2_HW 0x00445860
 // FUNCTION: CARMA2_SW 0x004455f0
@@ -334,11 +389,43 @@ void C2_HOOK_FASTCALL LoadDepthTable(char* pName, br_pixelmap** pTable, int* pPo
 #undef PTABLE_PIXEL_AT
 }
 
-// STUB: CARMA2_HW 0x00445620
-// STUB: CARMA2_SW 0x00445450
-// STUB: CARMA2_CHEAT 0x00445b40
+// FUNCTION: CARMA2_HW 0x00445620
+// FUNCTION: CARMA2_SW 0x00445450
+// FUNCTION: CARMA2_CHEAT 0x00445b40
 void C2_HOOK_FASTCALL InitDepthEffects(void) {
-    NOT_IMPLEMENTED();
+
+    LoadDepthTable("DEPTHCUE.TAB", &gDepth_shade_table, &gDepth_shade_table_power);
+    LoadDepthTable("FOG.TAB", &gFog_shade_table, &gFog_shade_table_power);
+    LoadDepthTable("ACIDFOG.TAB", &gAcid_shade_table, &gAcid_shade_table_power);
+    LoadDepthTable("BLUEGIT.TAB", &gWater_shade_table, &gWater_shade_table_power);
+    GenerateSmokeShades();
+    gHorizon_material = BrMaterialFind("HORIZON.MAT");
+    if (gHorizon_material == NULL) {
+        FatalError(kFatalError_CannotFindSkyMaterial_S);
+    }
+#ifdef REC2_HW
+    if (gScreen->type == BR_PMT_INDEX_8 && !gNo_fog) {
+        int i;
+        int j;
+
+        gHorizon_material->index_blend = BrPixelmapAllocate(BR_PMT_INDEX_8, 256, 256, NULL, 0);
+        BrTableAdd(gHorizon_material->index_blend);
+        for (i = 0; i < 256; i++) {
+            for (j = 0; j < 256; j++) {
+                ((tU8*)gHorizon_material->index_blend->pixels)[256 * i + j] = j;
+            }
+        }
+        gHorizon_material->flags |= BR_MATF_PERSPECTIVE;
+    }
+    gHorizon_material->flags |= BR_MATF_MAP_INTERPOLATION;
+#endif
+    gForward_sky_model = CreateHorizonModel(gCamera);
+    BrModelAdd(gForward_sky_model);
+    gForward_sky_actor = BrActorAllocate(BR_ACTOR_MODEL, NULL);
+    gForward_sky_actor->model = gForward_sky_model;
+    gForward_sky_actor->material = gHorizon_material;
+    gForward_sky_actor->render_style = BR_RSTYLE_NONE;
+    BrActorAdd(gUniverse_actor, gForward_sky_actor);
 }
 
 // DoHorizon
@@ -360,11 +447,94 @@ void C2_HOOK_FASTCALL RenderLollipops(br_pixelmap* pRender_buffer, br_pixelmap* 
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x00446680
-// STUB: CARMA2_SW 0x00446700
-// STUB: CARMA2_CHEAT 0x00446ba0
+// FUNCTION: CARMA2_HW 0x00446680
+// FUNCTION: CARMA2_SW 0x00446700
+// FUNCTION: CARMA2_CHEAT 0x00446ba0
 void C2_HOOK_FASTCALL DoWobbleCamera(br_actor* pCamera) {
-    NOT_IMPLEMENTED();
+    float f_time;
+    // GLOBAL: CARMA2_HW 0x00591194
+    // GLOBAL: CARMA2_SW 0x0058c18c
+    // GLOBAL: CARMA2_CHEAT 0x00597aec
+    static float mag00 = 0.02f;
+    // GLOBAL: CARMA2_HW 0x00591198
+    // GLOBAL: CARMA2_SW 0x0058c190
+    // GLOBAL: CARMA2_CHEAT 0x00597af0
+    static float mag01 = 0.02f;
+    // GLOBAL: CARMA2_HW 0x0059119c
+    // GLOBAL: CARMA2_SW 0x0058c194
+    // GLOBAL: CARMA2_CHEAT 0x00597af4
+    static float mag02 = 0.02f;
+    // GLOBAL: CARMA2_HW 0x005911a0
+    // GLOBAL: CARMA2_SW 0x0058c198
+    // GLOBAL: CARMA2_CHEAT 0x00597af8
+    static float mag10 = 0.15f;
+    // GLOBAL: CARMA2_HW 0x005911a4
+    // GLOBAL: CARMA2_SW 0x0058c19c
+    // GLOBAL: CARMA2_CHEAT 0x00597afc
+    static float mag11 = 0.05f;
+    // GLOBAL: CARMA2_HW 0x005911a8
+    // GLOBAL: CARMA2_SW 0x0058c1a0
+    // GLOBAL: CARMA2_CHEAT 0x00597b00
+    static float mag12 = 0.02f;
+    // GLOBAL: CARMA2_HW 0x0067c4e4
+    // GLOBAL: CARMA2_SW 0x00676c5c
+    // GLOBAL: CARMA2_CHEAT 0x00683d8c
+    static float mag20;
+    // GLOBAL: CARMA2_HW 0x0067c4e8
+    // GLOBAL: CARMA2_SW 0x00676c60
+    // GLOBAL: CARMA2_CHEAT 0x00683d90
+    static float mag21;
+    // GLOBAL: CARMA2_HW 0x0067c4ec
+    // GLOBAL: CARMA2_SW 0x00676c64
+    // GLOBAL: CARMA2_CHEAT 0x00683d94
+    static float mag22;
+    // GLOBAL: CARMA2_HW 0x005911ac
+    // GLOBAL: CARMA2_SW 0x0058c1a4
+    // GLOBAL: CARMA2_CHEAT 0x00597b04
+    static float period00 = 3000.f;
+    // GLOBAL: CARMA2_HW 0x005911b0
+    // GLOBAL: CARMA2_SW 0x0058c1a8
+    // GLOBAL: CARMA2_CHEAT 0x00597b08
+    static float period01 = 3000.f;
+    // GLOBAL: CARMA2_HW 0x005911b4
+    // GLOBAL: CARMA2_SW 0x0058c1ac
+    // GLOBAL: CARMA2_CHEAT 0x00597b0c
+    static float period02 = 4000.f;
+    // GLOBAL: CARMA2_HW 0x005911b8
+    // GLOBAL: CARMA2_SW 0x0058c1b0
+    // GLOBAL: CARMA2_CHEAT 0x00597b10
+    static float period10 = 2200.f;
+    // GLOBAL: CARMA2_HW 0x005911bc
+    // GLOBAL: CARMA2_SW 0x0058c1b4
+    // GLOBAL: CARMA2_CHEAT 0x00597b14
+    static float period11 = 3300.f;
+    // GLOBAL: CARMA2_HW 0x005911c0
+    // GLOBAL: CARMA2_SW 0x0058c1b8
+    // GLOBAL: CARMA2_CHEAT 0x00597b18
+    static float period12 = 3100.f;
+    // GLOBAL: CARMA2_HW 0x005911c4
+    // GLOBAL: CARMA2_SW 0x0058c1bc
+    // GLOBAL: CARMA2_CHEAT 0x00597b1c
+    static float period20 = 2800.f;
+    // GLOBAL: CARMA2_HW 0x005911c8
+    // GLOBAL: CARMA2_SW 0x0058c1c0
+    // GLOBAL: CARMA2_CHEAT 0x00597b20
+    static float period21 = 2500.f;
+    // GLOBAL: CARMA2_HW 0x005911cc
+    // GLOBAL: CARMA2_SW 0x0058c1c4
+    // GLOBAL: CARMA2_CHEAT 0x00597b24
+    static float period22 = 3900.f;
+
+    f_time = (float)GetTotalTime();
+    pCamera->t.t.mat.m[0][0] += FastScalarSin((int)fmod(360.0f * (f_time / period00), 360.0f)) * mag00;
+    pCamera->t.t.mat.m[0][1] += FastScalarSin((int)fmod(360.0f * (f_time / period01), 360.0f)) * mag01;
+    pCamera->t.t.mat.m[0][2] += FastScalarSin((int)fmod(360.0f * (f_time / period02), 360.0f)) * mag02;
+    pCamera->t.t.mat.m[1][0] += FastScalarSin((int)fmod(360.0f * (f_time / period10), 360.0f)) * mag10;
+    pCamera->t.t.mat.m[1][1] += FastScalarSin((int)fmod(360.0f * (f_time / period11), 360.0f)) * mag11;
+    pCamera->t.t.mat.m[1][2] += FastScalarSin((int)fmod(360.0f * (f_time / period12), 360.0f)) * mag12;
+    pCamera->t.t.mat.m[2][0] += FastScalarSin((int)fmod(360.0f * (f_time / period20), 360.0f)) * mag20;
+    pCamera->t.t.mat.m[2][1] += FastScalarSin((int)fmod(360.0f * (f_time / period21), 360.0f)) * mag21;
+    pCamera->t.t.mat.m[2][2] += FastScalarSin((int)fmod(360.0f * (f_time / period22), 360.0f)) * mag22;
 }
 
 #ifdef REC2_MATCHING
@@ -728,8 +898,8 @@ int C2_HOOK_FASTCALL GetDepthCueingOn(void) {
 }
 
 // FUNCTION: CARMA2_HW 0x00446fa0
-// FUNCTION: CARMA2_CHEAT 0x004474c0
 // STUB: CARMA2_SW 0x004471e0
+// FUNCTION: CARMA2_CHEAT 0x004474c0
 void C2_HOOK_FASTCALL SetDepthCueingOn(int pOn) {
 #ifdef REC2_HW
     if (gDepth_cueing_on != pOn && gHorizon_material != NULL) {
@@ -738,13 +908,16 @@ void C2_HOOK_FASTCALL SetDepthCueingOn(int pOn) {
     gDepth_cueing_on = pOn;
 #endif
 #ifdef REC2_SW
-    NOT_IMPLEMENTED();
+    if (gDepth_cueing_on != pOn && gHorizon_material != NULL) {
+        ToggleDepthCueingQuietly();
+    }
+    gDepth_cueing_on = pOn;
 #endif
 }
 
 // FUNCTION: CARMA2_HW 0x00447070
-// FUNCTION: CARMA2_CHEAT 0x00447590
 // STUB: CARMA2_SW 0x00447350
+// FUNCTION: CARMA2_CHEAT 0x00447590
 void C2_HOOK_FASTCALL ToggleDepthCueingQuietly(void) {
 #ifdef REC2_HW
     int temp_red;
@@ -782,6 +955,7 @@ void C2_HOOK_FASTCALL ToggleDepthCueingQuietly(void) {
 }
 
 // FUNCTION: CARMA2_HW 0x00447110
+// FUNCTION: CARMA2_SW 0x00447490
 // FUNCTION: CARMA2_CHEAT 0x00447630
 // STUB: CARMA2_SW 0x00447490
 void C2_HOOK_FASTCALL ToggleDepthCueing(void) {
@@ -845,6 +1019,7 @@ void C2_HOOK_FASTCALL SkyTextureChanged(void) {
 }
 
 // FUNCTION: CARMA2_HW 0x004472b0
+// FUNCTION: CARMA2_SW 0x004476d0
 // FUNCTION: CARMA2_CHEAT 0x004477d0
 void C2_HOOK_FASTCALL SetSkyColour(br_colour c) {
 
