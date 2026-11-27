@@ -203,6 +203,7 @@ br_scalar C2_HOOK_FASTCALL FastScalarCosAngle(br_angle pAngle) {
 
 // FUNCTION: CARMA2_HW 0x005119c0
 // FUNCTION: CARMA2_SW 0x0050ce10
+// FUNCTION: CARMA2_CHEAT 0x005173b0
 float C2_HOOK_STDCALL FastFloatArcSin(float pValue) {
     float low_limit;
     float high_limit;
@@ -232,6 +233,7 @@ float C2_HOOK_STDCALL FastFloatArcSin(float pValue) {
 
 // FUNCTION: CARMA2_HW 0x00511a80
 // FUNCTION: CARMA2_SW 0x0050ced0
+// FUNCTION: CARMA2_CHEAT 0x00517470
 float C2_HOOK_STDCALL FastFloatArcCos(float pValue) {
 
     return 90.f - FastFloatArcSin(pValue);
@@ -239,6 +241,7 @@ float C2_HOOK_STDCALL FastFloatArcCos(float pValue) {
 
 // FUNCTION: CARMA2_HW 0x00511b50
 // FUNCTION: CARMA2_SW 0x0050cfa0
+// FUNCTION: CARMA2_CHEAT 0x00517540
 br_scalar C2_HOOK_STDCALL FastScalarArcSin(br_scalar pValue) {
 
     return FastFloatArcSin(pValue);
@@ -246,6 +249,7 @@ br_scalar C2_HOOK_STDCALL FastScalarArcSin(br_scalar pValue) {
 
 // FUNCTION: CARMA2_HW 0x00511c10
 // FUNCTION: CARMA2_SW 0x0050d060
+// FUNCTION: CARMA2_CHEAT 0x00517600
 br_scalar C2_HOOK_STDCALL FastScalarArcCos(br_scalar pValue) {
 
     return 90.f - FastFloatArcSin(pValue);
