@@ -163,10 +163,6 @@ tWorld_callbacks gWorld_callbacks = {
 
 // count
 
-#ifdef REC2_MATCHING
-#pragma auto_inline(off)
-#endif
-
 // FUNCTION: CARMA2_HW 0x004225b0
 // FUNCTION: CARMA2_SW 0x00422630
 // FUNCTION: CARMA2_CHEAT 0x00422800
@@ -176,10 +172,6 @@ void C2_HOOK_FASTCALL DrMatrix34ApplyLPInverse(br_vector3* dest, const br_vector
     BrVector3Sub(&relative, source, (br_vector3*)matrix->m[3]);
     BrMatrix34TApplyV(dest, &relative, matrix);
 }
-
-#ifdef REC2_MATCHING
-#pragma auto_inline(on)
-#endif
 
 // AddObjectWallForce
 
