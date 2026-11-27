@@ -53,9 +53,9 @@ extern void C2_HOOK_CDECL DoNotDprintf(const char* pMessage, ...);
 
 extern void C2_HOOK_FASTCALL ProcessCurrentObjective(tOpponent_spec* pOpponent_spec, tProcess_objective_command pCommand);
 
-// ReallocExtraPathNodes
+extern tS16 C2_HOOK_FASTCALL ReallocExtraPathNodes(int pHow_many_then);
 
-// ReallocExtraPathSections
+extern tS16 C2_HOOK_FASTCALL ReallocExtraPathSections(int pHow_many_then);
 
 extern int C2_HOOK_FASTCALL PointVisibleFromHere(br_vector3* pFrom, br_vector3* pTo);
 
@@ -182,6 +182,20 @@ extern int C2_HOOK_FASTCALL RematerialiseOpponent(tOpponent_spec* pOpponent_spec
 // NumberOfOpponentsStillRunning
 
 extern void C2_HOOK_FASTCALL ResetPredominantJobbies(void);
+
+#ifdef REC2_CHEAT
+extern char gOppo_path_filename[256];
+
+extern void C2_HOOK_FASTCALL DeleteSection(tS16 pSection_to_delete);
+
+extern void C2_HOOK_FASTCALL DeleteNode(tS16 pNode_to_delete, int pAnd_sections);
+
+extern void C2_HOOK_FASTCALL DeleteOrphanNodes(void);
+
+extern int C2_HOOK_FASTCALL ConsistencyCheck(void);
+
+extern void C2_HOOK_FASTCALL WriteOutOppoPaths(void);
+#endif
 
 extern void C2_HOOK_FASTCALL LoadCopCars(tRace_info* pRace_info);
 
