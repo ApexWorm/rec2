@@ -742,10 +742,10 @@ void C2_HOOK_FASTCALL FinishCars(tU32 pLast_frame_time, tU32 pTime) {
         if (car->speed > 0.0001f) {
             BrVector3Normalise(&car->direction, &car->collision_info->v);
         } else {
-            if (BrVector3Dot(&car->direction, &minus_k) >= 0.f) {
-                BrVector3SetFloat(&minus_k, 0.f, 0.f, -1.f);
+            if (BrVector3Dot(&car->direction, &minus_k) >= 0.0f) {
+                BrVector3SetFloat(&minus_k, 0.0f, 0.0f, -1.0f);
             } else {
-                BrVector3SetFloat(&minus_k, 0.f, 0.f, 1.f);
+                BrVector3SetFloat(&minus_k, 0.0f, 0.0f, 1.0f);
             }
             BrMatrix34ApplyV(&car->direction, &minus_k, &car->car_master_actor->t.t.mat);
         }
@@ -1731,13 +1731,13 @@ void C2_HOOK_FASTCALL CheckForDeAttachmentOfNonCars(tU32 pTime) {
     total_time = 0;
     for (i = 0; i < gNum_active_non_cars; i++) {
         non_car = gActive_non_car_list[i];
-        if (gMin_world_y - 10.f > non_car->car_master_actor->t.t.translate.t.v[1]) {
+        if (gMin_world_y - 10.0f > non_car->car_master_actor->t.t.translate.t.v[1]) {
             non_car->collision_info->disable_move_rotate = 1;
         }
         if (TestForNan(&non_car->car_master_actor->t.t.translate.t.v[1])) {
-            BrVector3Set(&non_car->collision_info->omega, 0.f, 0.f, 0.f);
+            BrVector3Set(&non_car->collision_info->omega, 0.0f, 0.0f, 0.0f);
             BrMatrix34Identity(&non_car->car_master_actor->t.t.mat);
-            BrVector3Set(&non_car->car_master_actor->t.t.translate.t, 2000.f, 0.f, 0.f);
+            BrVector3Set(&non_car->car_master_actor->t.t.translate.t, 2000.0f, 0.0f, 0.0f);
             non_car->collision_info->disable_move_rotate = 1;
         }
         non_car_actor = non_car->car_master_actor;
