@@ -303,6 +303,7 @@ tU32 C2_HOOK_FASTCALL LengthOfSession(tPipe_session* pSession) {
 
 // FUNCTION: CARMA2_HW 0x004024e0
 // FUNCTION: CARMA2_SW 0x004024e0
+// FUNCTION: CARMA2_CHEAT 0x004024e0
 void C2_HOOK_FASTCALL ARAdvanceChunkPtr(tU8** pChunk, int pType) {
     tU8* old_chunk;
 
@@ -397,6 +398,7 @@ void C2_HOOK_FASTCALL AREndPipingSession(void) {
 
 // FUNCTION: CARMA2_HW 0x004028a0
 // FUNCTION: CARMA2_SW 0x004028a0
+// FUNCTION: CARMA2_CHEAT 0x004028a0
 void C2_HOOK_FASTCALL ARAddDataToSession(int pType, uintptr_t pOwner, void* pData, tU32 pSize) {
     tU32 new_size;
 
@@ -551,6 +553,7 @@ void C2_HOOK_FASTCALL ARSetPipePlayPtr(tU8* pPtr) {
 
 // FUNCTION: CARMA2_HW 0x004037c0
 // FUNCTION: CARMA2_SW 0x004037c0
+// FUNCTION: CARMA2_CHEAT 0x004037c0
 int C2_HOOK_FASTCALL MoveSessionPointerBackOne(tU8** pPtr) {
     if (*pPtr == gPipe_buffer_oldest && *pPtr != gPipe_record_ptr) {
         return 1;
@@ -594,6 +597,7 @@ int C2_HOOK_FASTCALL SoundTimeout(tU32 pTime) {
 
 // FUNCTION: CARMA2_HW 0x00403020
 // FUNCTION: CARMA2_SW 0x00403020
+// FUNCTION: CARMA2_CHEAT 0x00403020
 tU32 C2_HOOK_FASTCALL ARGetStartTime(void) {
     tPipe_session* session;
 
@@ -771,6 +775,7 @@ void C2_HOOK_FASTCALL InitLastDamageArrayEtc(void) {
 
 // FUNCTION: CARMA2_HW 0x004c65f0
 // FUNCTION: CARMA2_SW 0x004c2d20
+// FUNCTION: CARMA2_CHEAT 0x004cc110
 void C2_HOOK_FASTCALL ResetCars(void) {
     tCar_spec* car;
     int cat;
@@ -796,6 +801,7 @@ void C2_HOOK_FASTCALL ResetCars(void) {
 
 // FUNCTION: CARMA2_HW 0x004c68a0
 // FUNCTION: CARMA2_SW 0x004c2fd0
+// FUNCTION: CARMA2_CHEAT 0x004cc3c0
 int C2_HOOK_FASTCALL PipeObjectPosition(tPhysics_object* pObject, void* pContext) {
     br_actor* actor;
     tNon_car_spec* non_car;
@@ -2734,6 +2740,7 @@ void C2_HOOK_FASTCALL UndoNonCarCreation(tPipe_chunk** pChunk, tPipe_chunk* pPre
 }
 
 // FUNCTION: CARMA2_HW 0x004ca110
+// FUNCTION: CARMA2_SW 0x004c6840
 // FUNCTION: CARMA2_CHEAT 0x004cfc50
 void C2_HOOK_FASTCALL UndoSmashModelChange(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
     tPipe_chunk* chunk;
