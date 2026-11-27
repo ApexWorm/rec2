@@ -1547,11 +1547,111 @@ void C2_HOOK_FASTCALL MakeModelMaterialsDoubleSided(br_model* pModel) {
     }
 }
 
-// STUB: CARMA2_HW 0x00434320
-// STUB: CARMA2_SW 0x00434350
-// STUB: CARMA2_CHEAT 0x00434510
+// FUNCTION: CARMA2_HW 0x00434320
+// FUNCTION: CARMA2_SW 0x00434350
+// FUNCTION: CARMA2_CHEAT 0x00434510
 intptr_t C2_HOOK_CDECL CheckFlapAngles(br_actor* pActor, void* pContext) {
-    NOT_IMPLEMENTED();
+    tUser_crush_data* user_crush;
+    tUser_crush_data* parent_user_crush;
+    tUser_detail_level_model* detail_model;
+    tModel_detail_vertex_data* vertex_data;
+    tCar_crush_flap_data* flap_data;
+    br_model* model;
+    br_model* parent_model;
+    br_vertex* vertices;
+    br_vector3* hinge;
+    br_vector3 hinge_axis;
+    br_vector3 up;
+    br_vector3 side;
+    br_vector3 tv;
+    br_scalar d;
+    br_scalar x;
+    br_angle angle;
+    br_angle a;
+    br_angle min_angle;
+    br_angle max_angle;
+    tU16 i;
+
+    user_crush = pActor->user;
+    if (user_crush == NULL || user_crush->crush_data == NULL) {
+        return 0;
+    }
+    flap_data = user_crush->crush_data->flap_data;
+    if (flap_data == NULL || flap_data->kev_o_flap || !flap_data->field_0x0 || !flap_data->field_0x15) {
+        return 0;
+    }
+    model = user_crush->models[0];
+    if (model == NULL) {
+        return 0;
+    }
+    detail_model = model->user;
+    if (detail_model == NULL) {
+        return 0;
+    }
+    vertex_data = detail_model->field_0x4;
+    if (vertex_data == NULL) {
+        return 0;
+    }
+    vertices = model->vertices;
+    hinge = &vertices[flap_data->hinge0].p;
+    BrVector3Sub(&hinge_axis, &vertices[flap_data->hinge1].p, hinge);
+    BrVector3Normalise(&hinge_axis, &hinge_axis);
+    BrVector3Sub(&side, &vertices[flap_data->hinge2].p, hinge);
+    BrVector3Normalise(&side, &side);
+    BrVector3Cross(&up, &hinge_axis, &side);
+    BrVector3Normalise(&up, &up);
+    d = BrVector3Dot(&side, &hinge_axis);
+    BrVector3Scale(&tv, &hinge_axis, d);
+    BrVector3Sub(&side, &side, &tv);
+    BrVector3Normalise(&side, &side);
+    parent_user_crush = pActor->parent->user;
+    parent_model = parent_user_crush->models[0];
+    DrMatrix34ApplyLPInverse(&tv, &parent_model->vertices[flap_data->field_0x12].p, &pActor->t.t.mat);
+    BrVector3Sub(&tv, &tv, hinge);
+    x = BrVector3Dot(&tv, &side);
+    if (x == 0.0f) {
+        angle = 0;
+    } else {
+        angle = BrRadianToAngle(atan2(BrVector3Dot(&tv, &up), x));
+    }
+    min_angle = 0xc004;
+    max_angle = 0x3ffc;
+    for (i = 0; i < model->nvertices; i++) {
+        if (vertex_data[i].flags & 0x2) {
+            BrVector3Sub(&tv, &vertices[i].p, hinge);
+            x = BrVector3Dot(&tv, &side);
+            if (x != 0.0f) {
+                a = BrRadianToAngle(atan2(BrVector3Dot(&tv, &up), x));
+                if ((br_angle)(a - min_angle) < 0x7ff8) {
+                    min_angle = a;
+                }
+                if ((br_angle)(max_angle - a) < 0x7ff8) {
+                    max_angle = a;
+                }
+            }
+        }
+    }
+    flap_data->field_0x2 = flap_data->field_0x4 + angle - max_angle;
+    flap_data->field_0x6 = flap_data->field_0x4 + angle + 0x3ffc - min_angle;
+    flap_data->field_0x8 = flap_data->field_0x6 - flap_data->field_0x2;
+    if ((br_angle)(flap_data->field_0x4 - flap_data->field_0x2) > flap_data->field_0x8) {
+        if ((br_angle)(flap_data->field_0x4 - flap_data->field_0x6) < 0x7ff8) {
+            PipeSingleFlap(pActor, flap_data->field_0x6 - flap_data->field_0x4);
+            flap_data->field_0x4 = flap_data->field_0x6;
+        } else {
+            PipeSingleFlap(pActor, flap_data->field_0x2 - flap_data->field_0x4);
+            flap_data->field_0x4 = flap_data->field_0x2;
+        }
+    }
+    BrMatrix34Translate(&pActor->t.t.mat, -hinge->v[0], -hinge->v[1], -hinge->v[2]);
+    BrMatrix34PostRotate(&pActor->t.t.mat, flap_data->field_0x4, &hinge_axis);
+    parent_user_crush = pActor->parent->user;
+    parent_model = parent_user_crush->models[0];
+    BrMatrix34PostTranslate(&pActor->t.t.mat,
+        parent_model->vertices[flap_data->field_0xc].p.v[0],
+        parent_model->vertices[flap_data->field_0xc].p.v[1],
+        parent_model->vertices[flap_data->field_0xc].p.v[2]);
+    return 0;
 }
 
 // FUNCTION: CARMA2_HW 0x0042d9b0
