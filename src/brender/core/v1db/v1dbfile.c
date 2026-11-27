@@ -201,6 +201,7 @@ br_file_struct_member br_material_FM[] = {
 br_file_struct br_material_F = { "br_material", BR_ASIZE(br_material_FM), br_material_FM, sizeof(br_material) };
 
 // GLOBAL: CARMA2_HW 0x00663910
+// GLOBAL: CARMA2_SW 0x0065e0a8
 // GLOBAL: CARMA2_CHEAT 0x0066b1c8
 br_df_material_map_item MaterialMaps[] = {
     { CHUNKID_MATERIAL_COLOUR_MAP, offsetof(br_material, colour_map), 0 },
@@ -927,19 +928,20 @@ int C2_HOOK_STDCALL FopRead_PIXELMAP_REF(br_datafile* df, br_uint_32 id, br_uint
         }
     }
 
+#ifdef BRENDER_FIX_BUGS
     if (i >= BR_ASIZE(MaterialMaps)) {
         // FIXME: error message
         abort();
     }
+#endif
 
     mp = DfTop(DF_MATERIAL, NULL);
-    df->prims->name_read(df, name);
     if (MaterialMaps[i].table != 0) {
-        pm = BrTableFind(name);
+        pm = BrTableFind(df->prims->name_read(df, name));
     } else {
-        pm = BrMapFind(name);
+        pm = BrMapFind(df->prims->name_read(df, name));
     }
-    *(intptr_t*)(mp + MaterialMaps[i].offset) = (intptr_t)pm;
+    *(br_pixelmap**)(mp + MaterialMaps[i].offset) = pm;
     return 0;
 }
 

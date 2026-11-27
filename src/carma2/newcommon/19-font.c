@@ -76,6 +76,7 @@ size_t gPixelmap_buffer_size;
 tPolyFont gPoly_fonts[27];
 
 // GLOBAL: CARMA2_HW 0x0068648c
+// GLOBAL: CARMA2_SW 0x00680bcc
 // GLOBAL: CARMA2_CHEAT 0x0068dd34
 int gSize_font_texture_pages;
 
@@ -84,14 +85,17 @@ int gSize_font_texture_pages;
 tPolyFontBorderColours gPoly_font_border_colours[27];
 
 // GLOBAL: CARMA2_HW 0x00686488
+// GLOBAL: CARMA2_SW 0x00680bc8
 // GLOBAL: CARMA2_CHEAT 0x0068dd30
 int gInterface_fonts_loaded;
 
 // GLOBAL: CARMA2_HW 0x00765ea0
+// GLOBAL: CARMA2_SW 0x0075c400
 // GLOBAL: CARMA2_CHEAT 0x0076d540
 int gInitial_count_font_texture_pages;
 
 // GLOBAL: CARMA2_HW 0x00686494
+// GLOBAL: CARMA2_SW 0x00680bd4
 // GLOBAL: CARMA2_CHEAT 0x0068dd3c
 int gInterface_polyfont_texture_pages;
 
@@ -502,12 +506,13 @@ void C2_HOOK_FASTCALL CreatePolyFont(int pFont, const char* pName, float pFactor
 
     LoadPolyFont(pName, pSize, pFont);
 
-    if (pFont == kPolyfont_ingame_big_timer) {
-        for (i = 0; i < (int)REC2_ASIZE(gPoly_fonts[kPolyfont_ingame_big_timer].glyphs); i++) {
-            gPoly_fonts[kPolyfont_ingame_big_timer].glyphs[i].glyph_width = 27;
-        }
-        gPoly_fonts[kPolyfont_ingame_big_timer].glyphs[58].glyph_width = 11; /* FIXME: What is gyph 58? */
+    if (pFont != kPolyfont_ingame_big_timer) {
+        return;
     }
+    for (i = 0; i < (int)REC2_ASIZE(gPoly_fonts[kPolyfont_ingame_big_timer].glyphs); i++) {
+        gPoly_fonts[kPolyfont_ingame_big_timer].glyphs[i].glyph_width = 27;
+    }
+    gPoly_fonts[kPolyfont_ingame_big_timer].glyphs[58].glyph_width = 11; /* FIXME: What is gyph 58? */
 }
 
 br_model* C2_HOOK_FASTCALL CreateFontCharacterModel(int pIndex, int pAscii, int pWidth, int pHeight, const char* pName) {
@@ -660,6 +665,7 @@ void C2_HOOK_FASTCALL LoadInterfaceFonts(void) {
 
     if (!gInterface_fonts_loaded) {
         gSize_font_texture_pages = gInitial_count_font_texture_pages;
+#ifdef REC2_HW
         CreatePolyFont(kPolyfont_hand_green_15pt_unlit, "HAND15U", 1.0f, 16);
         CreatePolyFont(kPolyfont_hand_green_15pt_lit, "HAND15", 1.0f, 16);
         CreatePolyFont(kPolyfont_hand_red_15pt_unlit, "HAND15U", 1.0f, 16);
@@ -673,6 +679,22 @@ void C2_HOOK_FASTCALL LoadInterfaceFonts(void) {
         CreatePolyFont(kPolyfont_serp_green_38pt_unlit, "SERP38U", 1.0f, 64);
         CreatePolyFont(kPolyfont_serp_green_38pt_lit, "SERP38", 1.0f, 64);
         CreatePolyFont(kPolyfont_highlighter, "HAND15lo", 1.0f, 16);
+#endif
+#ifdef REC2_SW
+        CreatePolyFont(kPolyfont_hand_green_15pt_unlit, "HAND15lo", 1.0f, 16);
+        CreatePolyFont(kPolyfont_hand_green_15pt_lit, "HAND15lo", 1.0f, 16);
+        CreatePolyFont(kPolyfont_hand_red_15pt_unlit, "HAND15lo", 1.0f, 16);
+        CreatePolyFont(kPolyfont_hand_red_15pt_lit, "HAND15lo", 1.0f, 16);
+        CreatePolyFont(kPolyfont_hand_green_10pt_unlit, "HAND10lo", 1.0f, 16);
+        CreatePolyFont(kPolyfont_hand_green_10pt_lit, "HAND10lo", 1.0f, 16);
+        CreatePolyFont(kPolyfont_serp_red_15pt_lit, "SERP15lo", 1.0f, 16);
+        CreatePolyFont(kPolyfont_serp_red_30pt_lit, "SERP30lo", 1.0f, 32);
+        CreatePolyFont(kPolyfont_serp_green_30pt_unlit, "SERP30lo", 1.0f, 32);
+        CreatePolyFont(kPolyfont_serp_green_30pt_lit, "SERP30lo", 1.0f, 32);
+        CreatePolyFont(kPolyfont_serp_green_38pt_unlit, "SERP38lo", 1.0f, 64);
+        CreatePolyFont(kPolyfont_serp_green_38pt_lit, "SERP38lo", 1.0f, 64);
+        CreatePolyFont(kPolyfont_highlighter, "HAND15lo", 1.0f, 16);
+#endif
         gInterface_polyfont_texture_pages = gSize_font_texture_pages - gInitial_count_font_texture_pages;
         gInterface_fonts_loaded = 1;
     }
@@ -1197,8 +1219,57 @@ void C2_HOOK_FASTCALL InitDRFonts(void) {
 // FUNCTION: CARMA2_SW 0x00465610
 // FUNCTION: CARMA2_CHEAT 0x00465ef0
 void C2_HOOK_FASTCALL DRPixelmapText(br_pixelmap* pPixelmap, int pX, int pY, const tDR_font* pFont, const char* pText, int pRight_edge) {
-
+#ifdef REC2_HW
     PolyFontText(pText, pX, pY, GetPolyFontIndexToReplaceDRfontWith(pFont), eJust_left, gRender_poly_text);
+#endif
+#ifdef REC2_SW
+
+    int i;
+    int x;
+    int len;
+    int chr;
+    int ch_width;
+    unsigned char* ch;
+
+    x = pX;
+    len = strlen(pText);
+    if (pRight_edge == 0) {
+        pRight_edge = pX + DRTextWidth(pFont, pText);
+    }
+    if (pX < 0 || pPixelmap->width < pRight_edge || pY < 0 || (pY + pFont->height) > pPixelmap->height) {
+        for (i = 0, ch = (unsigned char*)pText; i < len; i++, ch++) {
+            chr = *ch - pFont->offset;
+            ch_width = pFont->width_table[chr];
+            DRPixelmapRectangleMaskedCopy(
+                gBack_screen,
+                x,
+                pY,
+                pFont->images,
+                0,
+                pFont->height * chr,
+                ch_width,
+                pFont->height);
+
+            x += ch_width + pFont->spacing;
+        }
+    } else {
+        for (i = 0, ch = (unsigned char*)pText; i < len; i++, ch++) {
+            chr = *ch - pFont->offset;
+            ch_width = pFont->width_table[chr];
+            DRPixelmapRectangleOnscreenCopy(
+                gBack_screen,
+                x,
+                pY,
+                pFont->images,
+                0,
+                pFont->height * chr,
+                ch_width,
+                pFont->height);
+
+            x += ch_width + pFont->spacing;
+        }
+    }
+#endif
 }
 
 // FUNCTION: CARMA2_HW 0x00465aa0
@@ -1266,12 +1337,31 @@ int C2_HOOK_FASTCALL PolyFontTextWidth(int pFont, const char* pText) {
 // FUNCTION: CARMA2_CHEAT 0x004661d0
 int C2_HOOK_FASTCALL DRTextWidth(const tDR_font* pFont, const char* pText) {
 
+#ifdef REC2_HW
     return PolyFontTextWidth(GetPolyFontIndexToReplaceDRfontWith(pFont), pText);
+#endif
+#ifdef REC2_SW
+    int i;
+    int len;
+    int result;
+    const char* c;
+
+    result = 0;
+    len = strlen(pText);
+
+    for (i = 0, c = pText; i < len; i++, c++) {
+        result += pFont->width_table[(tU8)*c - pFont->offset];
+    }
+    result += pFont->spacing * (len - 1);
+    return result;
+#endif
 }
 
 // FUNCTION: CARMA2_HW 0x00465e10
+// FUNCTION: CARMA2_SW 0x00465a80
 // FUNCTION: CARMA2_CHEAT 0x00466290
 int C2_HOOK_FASTCALL DRTextCleverWidth(const tDR_font* pFont, const char* pText) {
+#ifdef REC2_HW
     int polyfont_index;
     int i;
     int len;
@@ -1299,6 +1389,25 @@ int C2_HOOK_FASTCALL DRTextCleverWidth(const tDR_font* pFont, const char* pText)
         }
     }
     return result;
+#endif
+#ifdef REC2_SW
+    int i;
+    int len;
+    int result;
+    const signed char* c;
+
+    result = 0;
+    len = strlen(pText);
+
+    for (i = 0, c = (signed char*)pText; i < len; i++, c++) {
+        if (*c < 0) {
+            pFont = gFonts - *c;
+        } else {
+            result += pFont->width_table[*c - pFont->offset] + (i < (len - 1) ? pFont->spacing : 0);
+        }
+    }
+    return result;
+#endif
 }
 
 // FUNCTION: CARMA2_HW 0x00465f10

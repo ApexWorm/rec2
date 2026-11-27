@@ -1125,6 +1125,7 @@ void C2_HOOK_FASTCALL CycleInvulnerability(void) {
 }
 
 // FUNCTION: CARMA2_HW 0x00444590
+// FUNCTION: CARMA2_SW 0x00444670
 // FUNCTION: CARMA2_CHEAT 0x004446b0
 void C2_HOOK_FASTCALL ToggleTimerFreeze(void) {
 
@@ -1152,6 +1153,7 @@ void C2_HOOK_FASTCALL LoseDosh(void) {
 }
 
 // FUNCTION: CARMA2_HW 0x00444600
+// FUNCTION: CARMA2_SW 0x004446e0
 // FUNCTION: CARMA2_CHEAT 0x00444720
 void C2_HOOK_FASTCALL ToggleHeadupMap(int pArg) {
 
@@ -1351,7 +1353,7 @@ void C2_HOOK_FASTCALL EnterUserMessage(void) {
         return;
     }
     if (the_key == last_key) {
-        if (next_time < PDGetTotalTime()) {
+        if (PDGetTotalTime() > next_time) {
             next_time += 100;
         } else {
             the_key = -1000;
@@ -1395,7 +1397,7 @@ void C2_HOOK_FASTCALL EnterUserMessage(void) {
         }
         break;
     default:
-        if (gKey_mapping[71] == the_key) {
+        if (the_key == gKey_mapping[71]) {
             about_to_die = 1;
             break;
         }
