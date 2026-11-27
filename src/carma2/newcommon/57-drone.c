@@ -137,7 +137,21 @@ int C2_HOOK_FASTCALL ReallyAddDroneToPHIL(tDrone_spec* pDrone) {
 
 // AddDroneToPHIL
 
-// PreprocessDronePaths
+// FUNCTION: CARMA2_HW 0x00451070
+// FUNCTION: CARMA2_SW 0x00450e00
+// FUNCTION: CARMA2_CHEAT 0x004515c0
+void C2_HOOK_FASTCALL PreprocessDronePaths(void) {
+    int i;
+    int j;
+
+    for (i = 0; i < gCount_drone_path_nodes; i++) {
+        for (j = 0; j < gDrone_path_nodes[i].count_sections; j++) {
+            BrVector3Sub(&gDrone_path_nodes[i].sections[j].field_0x04, &gDrone_path_nodes[gDrone_path_nodes[i].sections[j].node1].position, &gDrone_path_nodes[i].position);
+            gDrone_path_nodes[i].sections[j].field_0x1c = BrVector3Length(&gDrone_path_nodes[i].sections[j].field_0x04);
+            BrVector3Normalise(&gDrone_path_nodes[i].sections[j].field_0x10, &gDrone_path_nodes[i].sections[j].field_0x04);
+        }
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x00450600
 // FUNCTION: CARMA2_SW 0x00450390
