@@ -370,13 +370,13 @@ extern void C2_HOOK_FASTCALL BendPoint(br_vector3* pPoint, const tBend_point_con
 
 // ReAttachOrFullyDetachDifficultBits
 
-// BendCar
+extern void C2_HOOK_FASTCALL BendCar(tCar_spec* pCar, br_angle pAngle_x, br_angle pAngle_y, br_angle pAngle_z, const br_vector3* pPivot, br_scalar pZ, int pArg7);
 
-// QuantizeAngle
+extern br_angle C2_HOOK_FASTCALL QuantizeAngle(br_angle pAngle, br_angle pMin, br_angle pMax, br_angle pStep);
 
-// BendCarOneForce
+extern int C2_HOOK_FASTCALL BendCarOneForce(tCar_spec* pCar, tCar_crush* pCar_crush);
 
-// DoBending
+extern void C2_HOOK_FASTCALL DoBending(void);
 
 extern void C2_HOOK_CDECL JitModelUpdate(br_actor* pActor, br_model* pModel, br_material* pMaterial, void* pOrder_table, br_uint_8 pStyle, int pOn_screen);
 

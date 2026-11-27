@@ -2123,13 +2123,141 @@ void C2_HOOK_FASTCALL BendPoint(br_vector3* pPoint, const tBend_point_context* p
 
 // ReAttachOrFullyDetachDifficultBits
 
-// BendCar
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
 
-// QuantizeAngle
+// STUB: CARMA2_HW 0x00433c70
+// STUB: CARMA2_SW 0x00433ca0
+// STUB: CARMA2_CHEAT 0x00433e50
+void C2_HOOK_FASTCALL BendCar(tCar_spec* pCar, br_angle pAngle_x, br_angle pAngle_y, br_angle pAngle_z, const br_vector3* pPivot, br_scalar pZ, int pArg7) {
+    NOT_IMPLEMENTED();
+}
 
-// BendCarOneForce
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
-// DoBending
+inline br_angle C2_HOOK_FASTCALL QuantizeAngle(br_angle pAngle, br_angle pMin, br_angle pMax, br_angle pStep) {
+
+    if (pAngle < 0x7ff8 && pAngle > pMax) {
+        return pMax;
+    }
+    if (pAngle > 0x7ff8 && pAngle < pMin) {
+        return pMin;
+    }
+    return pAngle / pStep * pStep;
+}
+
+inline int C2_HOOK_FASTCALL BendCarOneForce(tCar_spec* pCar, tCar_crush* pCar_crush) {
+    tPhysics_object* object;
+    br_vector3 bend_v;
+    br_scalar z;
+    br_scalar force;
+    br_angle angle_x;
+    br_angle angle_y;
+    br_angle quantized_x;
+    br_angle quantized_y;
+    int bend_max;
+
+    object = pCar->collision_info;
+    BrVector3Set(&bend_v, 0.0f, 0.0f, 0.0f);
+    if (pCar_crush->field_0x34.v[2] > pCar->car_crush_spec->bend_z_max) {
+        bend_max = 1;
+        z = object->bb1.min.v[2];
+        bend_v.v[2] = pCar->car_crush_spec->bend_z_max;
+    } else if (pCar_crush->field_0x34.v[2] < pCar->car_crush_spec->bend_z_min) {
+        bend_max = 0;
+        z = object->bb1.max.v[2];
+        bend_v.v[2] = pCar->car_crush_spec->bend_z_min;
+    } else {
+        return 0;
+    }
+    angle_x = 0;
+    angle_y = 0;
+    if ((br_scalar)fabs(pCar_crush->field_0x44.v[2]) > 0.707107f) {
+        force = pCar_crush->field_0x40 * (br_scalar)fabs(pCar_crush->field_0x44.v[2]);
+        srand(pCar_crush->field_0x50);
+        if (PercentageChance(50)) {
+            bend_v.v[1] = object->bb1.max.v[1];
+            if (bend_max) {
+                angle_x = BrRadianToAngle(atan2(force, gMin_bend_force));
+            } else {
+                angle_x = BrRadianToAngle(atan2(-force, gMin_bend_force));
+            }
+        } else {
+            bend_v.v[1] = object->bb1.min.v[1];
+            if (bend_max) {
+                angle_x = BrRadianToAngle(atan2(-force, gMin_bend_force));
+            } else {
+                angle_x = BrRadianToAngle(atan2(force, gMin_bend_force));
+            }
+        }
+    } else if ((br_scalar)fabs(pCar_crush->field_0x44.v[0]) > 0.707107f) {
+        force = (br_scalar)fabs(pCar_crush->field_0x44.v[0]) * pCar_crush->field_0x40;
+        if (pCar_crush->field_0x44.v[0] < 0.0f) {
+            bend_v.v[0] = object->bb1.max.v[0];
+            if (bend_max) {
+                angle_y = BrRadianToAngle(atan2(-force, gMin_bend_force));
+            } else {
+                angle_y = BrRadianToAngle(atan2(force, gMin_bend_force));
+            }
+        } else {
+            bend_v.v[0] = object->bb1.min.v[0];
+            if (bend_max) {
+                angle_y = BrRadianToAngle(atan2(force, gMin_bend_force));
+            } else {
+                angle_y = BrRadianToAngle(atan2(-force, gMin_bend_force));
+            }
+        }
+    } else {
+        force = (br_scalar)fabs(pCar_crush->field_0x44.v[1]) * pCar_crush->field_0x40;
+        if (pCar_crush->field_0x44.v[1] < 0.0f) {
+            bend_v.v[1] = object->bb1.max.v[1];
+            if (bend_max) {
+                angle_x = BrRadianToAngle(atan2(force, gMin_bend_force));
+            } else {
+                angle_x = BrRadianToAngle(atan2(-force, gMin_bend_force));
+            }
+        } else {
+            bend_v.v[1] = object->bb1.min.v[1];
+            if (bend_max) {
+                angle_x = BrRadianToAngle(atan2(-force, gMin_bend_force));
+            } else {
+                angle_x = BrRadianToAngle(atan2(force, gMin_bend_force));
+            }
+        }
+    }
+    quantized_x = QuantizeAngle(angle_x, 0xce3c, 0x31c4, 0xe38);
+    quantized_y = QuantizeAngle(angle_y, 0xdc74, 0x238c, 0xe38);
+    BendCar(pCar, quantized_x, quantized_y, 0, &bend_v, z, 1);
+    DRS3StartSound3D(gCar_outlet, eSoundId_BendCar,
+        &pCar->collision_info->actor->t.t.translate.t, &gZero_v__car,
+        1, 255, IRandomBetween(S3_FIXED_INT(0.875f), S3_FIXED_INT(1.125f)), S3_FIXED_INT(1));
+    return 1;
+}
+
+// FUNCTION: CARMA2_HW 0x00438a90
+// FUNCTION: CARMA2_SW 0x00438ac0
+// FUNCTION: CARMA2_CHEAT 0x00438ca0
+void C2_HOOK_FASTCALL DoBending(void) {
+    int i;
+    int j;
+
+    for (i = 0; gCrush_lists[i].car_spec != NULL; i++) {
+        if (!gCrush_lists[i].car_spec->car_crush_spec->field_0x4b8 && !gCrush_lists[i].car_spec->car_crush_spec->field_0x144) {
+            for (j = 0; j < gCrush_lists[i].count; j++) {
+                if (gCrush_lists[i].items[j].field_0x40 < 0.0f) {
+                    gCrush_lists[i].items[j].field_0x40 = -gCrush_lists[i].items[j].field_0x40;
+                    if (BendCarOneForce(gCrush_lists[i].car_spec, &gCrush_lists[i].items[j])) {
+                        break;
+                    }
+                }
+            }
+        }
+        gCrush_lists[i].car_spec = NULL;
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x00431590
 // FUNCTION: CARMA2_SW 0x004315c0
