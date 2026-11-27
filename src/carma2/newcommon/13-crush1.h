@@ -94,13 +94,13 @@ extern void C2_HOOK_FASTCALL InitShapeStuff(tCar_crush_spec* pCar_crush, tPhysic
 
 // InitPhysMasterCrushData
 
-// CheckHingePointOrder
+extern void C2_HOOK_FASTCALL CheckHingePointOrder(tCar_crush_flap_data* pFlap_data, const br_model* pModel, const br_vector3* pCentre);
 
 extern tU16 C2_HOOK_FASTCALL FindNearestVertex(const br_vector3* pPoint, const br_model* pModel);
 
 extern float C2_HOOK_FASTCALL DistanceToBounds(const br_vector3* pPoint, const br_bounds3* pBounds);
 
-// FindNearestParentVertex
+extern tU16 C2_HOOK_FASTCALL FindNearestParentVertex(br_actor* pActor, const br_vector3* pPoint);
 
 extern void C2_HOOK_FASTCALL SetUpSemiDetachJointStuff(tCar_crush_detach_data* pDetach_data, const br_model* pModel, const br_bounds3* pBounds);
 
