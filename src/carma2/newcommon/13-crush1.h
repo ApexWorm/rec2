@@ -213,17 +213,17 @@ extern void C2_HOOK_FASTCALL RemoveNonCar(tNon_car_spec* pNon_car);
 
 extern tNon_car_spec* C2_HOOK_FASTCALL GetNonCar(tCrush_info_buffer* pBuffer, br_actor* pActor, tCar_spec* pCar);
 
-// GetNonCarObject
+extern tPhysics_object* C2_HOOK_FASTCALL GetNonCarObject(tCrush_info_buffer* pBuffer, br_actor* pActor, tCar_spec* pCar);
 
 extern void C2_HOOK_FASTCALL SetRelationsDoingNothingFlags(tPhysics_object* pObject, int pFlag);
 
 extern void C2_HOOK_FASTCALL SetUpDetachedBitObject(tPhysics_object* pObject, br_actor* pActor, br_model* pModel, tCar_crush_detach_data* pDetach_data, tCar_crush_spec* pCar_crush, br_bounds3* pBounds, tPhysics_object* pCar_object);
 
-// SetUpSemiDetachedBitJoint
+extern void C2_HOOK_FASTCALL SetUpSemiDetachedBitJoint(tPhysics_joint* pJoint, tCar_crush_detach_data* pDetach_data, tCar_crush_flap_data* pFlap_data, br_model* pModel, tPhysics_object* pObject, const br_vector3* pPoint);
 
 // BitIsInBentPartOfCar
 
-// SetUpFlapJoint
+extern void C2_HOOK_FASTCALL SetUpFlapJoint(tPhysics_joint* pJoint, tCar_crush_flap_data* pFlap_data, br_model* pModel, tPhysics_object* pObject, const br_vector3* pP1, const br_vector3* pP2, const br_vector3* pP3);
 
 extern void C2_HOOK_FASTCALL MakeModelMaterialsDoubleSided(br_model* pModel);
 
