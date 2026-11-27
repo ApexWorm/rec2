@@ -2166,14 +2166,14 @@ int C2_HOOK_FASTCALL FRONTEND_CreateMenu(tFrontend_spec* pFrontend_spec) {
     int count_items;
     int i;
 
-    name = pFrontend_spec->backdrop_name;
-    sprintf(s, "START OF FRONTEND_CreateMenu for menu \'%s\'", name);
+    sprintf(s, "START OF FRONTEND_CreateMenu for menu \'%s\'", pFrontend_spec->name);
     PrintMemoryDump(0, s);
     if (pFrontend_spec->create != NULL) {
         pFrontend_spec->create(pFrontend_spec);
     }
     gFrontend_count_brender_items = 0;
     count_items = pFrontend_spec->count_items;
+    name = pFrontend_spec->backdrop_name;
     if (name != NULL && strlen(name) != 0) {
         if (!gFrontend_remove_current_backdrop) {
 
