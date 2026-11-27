@@ -963,17 +963,95 @@ intptr_t C2_HOOK_FASTCALL DRActorEnumRecurseWithTranslation(br_actor* pActor, br
     return 0;
 }
 
-// SoftnessOfNearestPoint
+inline float C2_HOOK_FASTCALL SoftnessOfNearestPoint(tCar_spec* pCar_spec, br_vector3* pPoint) {
+    tSoftnessOfNearestPointCB_Context context;
+
+    context.point = pPoint;
+    context.distance = BR_SCALAR_MAX;
+    context.softness_factor = 1.0f;
+    DRActorEnumRecurseWithTranslation(pCar_spec->car_model_actor, NULL, SoftnessOfNearestPointCB, &context);
+    return context.softness_factor;
+}
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x0042b0e0
-// STUB: CARMA2_SW 0x0042b170
-// STUB: CARMA2_CHEAT 0x0042b270
+// FUNCTION: CARMA2_HW 0x0042b0e0
+// FUNCTION: CARMA2_SW 0x0042b170
+// FUNCTION: CARMA2_CHEAT 0x0042b270
 void C2_HOOK_FASTCALL SetUpShapeLimitingStuff(tCar_crush_spec* pCar_crush, tCar_spec* pCar_spec) {
-    NOT_IMPLEMENTED();
+    br_bounds3 wheel_bounds;
+    br_bounds3 bounds;
+    br_matrix34 wheel_to_car;
+    br_actor* wheel_actor;
+    tUser_crush_data* user_crush;
+    br_model* wheel_model;
+    tCar_crush_shape_info* shape_info;
+    int failed;
+    int i;
+    int j;
+
+    BrVector3Copy(&wheel_bounds.min, &pCar_spec->wpos[0]);
+    BrVector3Copy(&wheel_bounds.max, &wheel_bounds.min);
+    for (i = 1; i < 4; i++) {
+        for (j = 0; j < 3; j++) {
+            if (pCar_spec->wpos[i].v[j] < wheel_bounds.min.v[j]) {
+                wheel_bounds.min.v[j] = pCar_spec->wpos[i].v[j];
+            } else if (pCar_spec->wpos[i].v[j] > wheel_bounds.max.v[j]) {
+                wheel_bounds.max.v[j] = pCar_spec->wpos[i].v[j];
+            }
+        }
+    }
+    for (i = 0; i < 3; i++) {
+        wheel_bounds.min.v[i] = wheel_bounds.min.v[i] / WORLD_SCALE_D;
+        wheel_bounds.max.v[i] = wheel_bounds.max.v[i] / WORLD_SCALE_D;
+    }
+    for (i = 0; i < (int)REC2_ASIZE(pCar_spec->wheel_actors); i++) {
+        wheel_actor = pCar_spec->wheel_actors[i];
+        if (wheel_actor == NULL || (user_crush = wheel_actor->user) == NULL || (wheel_model = user_crush->models[0]) == NULL) {
+            continue;
+        }
+        BrActorToActorMatrix34(&wheel_to_car, wheel_actor, pCar_spec->car_model_actor);
+        for (j = 0; j < 3; j++) {
+            bounds.min.v[j] = wheel_model->bounds.min.v[j] + wheel_to_car.m[3][j];
+            bounds.max.v[j] = wheel_model->bounds.max.v[j] + wheel_to_car.m[3][j];
+        }
+        for (j = 0; j < 3; j++) {
+            if (bounds.min.v[j] < wheel_bounds.min.v[j]) {
+                wheel_bounds.min.v[j] = bounds.min.v[j];
+            } else if (bounds.max.v[j] > wheel_bounds.max.v[j]) {
+                wheel_bounds.max.v[j] = bounds.max.v[j];
+            }
+        }
+    }
+    for (i = 0; i < 3; i++) {
+        for (j = 0; j < pCar_crush->count_limits.counts[i][0]; j++) {
+            pCar_crush->field_0xbc.limits[i][0].values[j] = pCar_crush->limits.limits[i][0].values[j];
+        }
+        pCar_crush->field_0xbc.limits[i][0].values[j] = wheel_bounds.max.v[i];
+        pCar_crush->field_0xa4.counts[i][0] = j + 1;
+        for (j = 0; j < pCar_crush->count_limits.counts[i][1]; j++) {
+            pCar_crush->field_0xbc.limits[i][1].values[j] = pCar_crush->limits.limits[i][1].values[j];
+        }
+        pCar_crush->field_0xbc.limits[i][1].values[j] = wheel_bounds.min.v[i];
+        pCar_crush->field_0xa4.counts[i][1] = j + 1;
+    }
+    for (i = 0; i < 3; i++) {
+        qsort(pCar_crush->field_0xbc.limits[i][0].values, pCar_crush->field_0xa4.counts[i][0], sizeof(float), DecreasingCompare);
+        qsort(pCar_crush->field_0xbc.limits[i][1].values, pCar_crush->field_0xa4.counts[i][1], sizeof(float), IncreasingCompare);
+    }
+    for (i = 0; i < pCar_crush->count_shapes; i++) {
+        shape_info = &pCar_crush->field_0x4[i];
+        for (j = 0; j < shape_info->count_points; j++) {
+            shape_info->field_0x18[j].field_0x28 = CrushLimitNumber(&shape_info->field_0x18[j].field_0x0, &pCar_crush->field_0xbc, &pCar_crush->field_0xa4, &failed);
+            if (failed == 0) {
+                shape_info->field_0x18[j].field_0x24 = SoftnessOfNearestPoint(pCar_spec, &shape_info->field_0x18[j].field_0x0);
+            } else {
+                shape_info->field_0x18[j].field_0x24 = 0.0f;
+            }
+        }
+    }
 }
 
 #ifdef REC2_MATCHING
