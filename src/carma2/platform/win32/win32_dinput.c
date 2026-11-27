@@ -114,6 +114,7 @@ IFR_Project * gIfr_project;
 
 // GLOBAL: CARMA2_HW 0x00686164
 // GLOBAL: CARMA2_SW 0x006808a4
+// GLOBAL: CARMA2_CHEAT 0x0068da0c
 int gCount_joystick_effects;
 
 // GLOBAL: CARMA2_HW 0x00589f38

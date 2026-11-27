@@ -53,6 +53,7 @@ char gS3_working_directory[260];
 
 // GLOBAL: CARMA2_HW 0x006b2da4
 // GLOBAL: CARMA2_SW 0x006ac52c
+// GLOBAL: CARMA2_CHEAT 0x006ba434
 int gPDS3_midi_playing;
 
 // GLOBAL: CARMA2_HW 0x006b2dac

@@ -80,6 +80,7 @@ SOCKET gSocket = SOCKET_ERROR;
 char gLocal_address_text[32];
 
 // GLOBAL: CARMA2_HW 0x006ac128
+// GLOBAL: CARMA2_SW 0x006a5678
 // GLOBAL: CARMA2_CHEAT 0x006b37b8
 int gNumber_of_networks;
 
@@ -88,6 +89,7 @@ int gNumber_of_networks;
 int gMsg_header_strlen;
 
 // GLOBAL: CARMA2_HW 0x006ac578
+// GLOBAL: CARMA2_SW 0x006a5ac8
 // GLOBAL: CARMA2_CHEAT 0x006b3c08
 int gSpecial_server;
 

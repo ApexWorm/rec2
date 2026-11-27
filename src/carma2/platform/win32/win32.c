@@ -138,6 +138,7 @@ int gMouseLButtonDown;
 int gMouseRButtonDown;
 
 // GLOBAL: CARMA2_HW 0x006ad490
+// GLOBAL: CARMA2_SW 0x006a6c20
 int gMouseCaptured;
 
 // GLOBAL: CARMA2_HW 0x006621d4
@@ -206,6 +207,7 @@ LARGE_INTEGER gPerformanceCounterFrequency_us;
 
 
 // GLOBAL: CARMA2_HW 0x006ad49c
+// GLOBAL: CARMA2_SW 0x006a6c2c
 // GLOBAL: CARMA2_CHEAT 0x006b4b28
 tU32 gTime_app_activated;
 
