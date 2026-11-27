@@ -3632,13 +3632,7 @@ typedef struct {
     tS8 field_0x8;
     undefined field_0x9[3];
     br_bounds3 bounds;
-    float field_0x24;
-    float field_0x28;
-    float field_0x2c;
-    float field_0x30;
-    float field_0x34;
-    float field_0x38;
-    float field_0x3c;
+    tMovement_spec speed_info;
 } tNon_car_cuboid_activation;
 
 typedef struct {
