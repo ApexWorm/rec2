@@ -34,14 +34,17 @@ float gFLOAT_006b2c68;
 
 // GLOBAL: CARMA2_HW 0x006b2c20
 // GLOBAL: CARMA2_SW 0x006ac3a8
+// GLOBAL: CARMA2_CHEAT 0x006ba2b0
 br_vector3 gS3_listener_position_now;
 
 // GLOBAL: CARMA2_HW 0x006b2c58
 // GLOBAL: CARMA2_SW 0x006ac3e0
+// GLOBAL: CARMA2_CHEAT 0x006ba2e8
 br_vector3 gS3_listener_vel_now;
 
 // GLOBAL: CARMA2_HW 0x006b2c30
 // GLOBAL: CARMA2_SW 0x006ac3b8
+// GLOBAL: CARMA2_CHEAT 0x006ba2c0
 br_vector3 gS3_listener_left_now;
 
 // GLOBAL: CARMA2_HW 0x006b2c50

@@ -28,6 +28,8 @@ int gS3_low_memory_mode;
 tS3_error_codes gS3_last_error;
 
 // GLOBAL: CARMA2_HW 0x007a05c0
+// GLOBAL: CARMA2_CHEAT 0x007a7c60
+// GLOBAL: CARMA2_SW 0x00796b60
 char gS3_sound_dirname[256];
 
 // FUNCTION: CARMA2_HW 0x005687ff
