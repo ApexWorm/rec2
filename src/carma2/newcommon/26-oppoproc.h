@@ -13,15 +13,15 @@
 
 // DoNotDprintf
 
-// StraightestArcForCorner2D
+extern int C2_HOOK_FASTCALL StraightestArcForCorner2D(br_vector2* pCent, br_scalar* pRadius, br_scalar* pEntry_length, int* pLeft_not_right, const br_vector2* p1, const br_vector2* p2, const br_vector2* p3, br_scalar pWidth12, br_scalar pWidth23);
 
-// CornerFudge
+extern float C2_HOOK_FASTCALL CornerFudge(tCar_spec* pCar_spec);
 
 extern float C2_HOOK_FASTCALL MaxCurvatureForCarSpeed(tCar_spec* pCar, float pSpeed);
 
 extern br_scalar C2_HOOK_FASTCALL Vector2Cross(const br_vector2* pV1, const br_vector2* pV2);
 
-// RoughlyColinear
+extern int C2_HOOK_FASTCALL RoughlyColinear(const br_vector2* p1, const br_vector2* p2, const br_vector2* p3);
 
 extern int C2_HOOK_FASTCALL GetStraight(br_vector2* pStart, br_vector2* pFinish, float* pWidth, int pSection_no, tOpponent_spec* pOpponent_spec);
 

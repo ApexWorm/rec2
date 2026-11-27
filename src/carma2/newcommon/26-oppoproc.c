@@ -10,6 +10,7 @@
 
 #include "08-loading1.h"
 #include "30-opponent.h"
+#include "41-utility.h"
 #include "56-aiworld.h"
 #include "c2_math.h"
 #include "globvars.h"
@@ -18,9 +19,65 @@
 
 // DoNotDprintf
 
-// StraightestArcForCorner2D
+inline int C2_HOOK_FASTCALL StraightestArcForCorner2D(br_vector2* pCent, br_scalar* pRadius, br_scalar* pEntry_length, int* pLeft_not_right, const br_vector2* p1, const br_vector2* p2, const br_vector2* p3, br_scalar pWidth12, br_scalar pWidth23) {
+    br_vector2 rel1;
+    br_vector2 rel3;
+    br_vector2 rot1;
+    br_vector2 rot1u;
+    br_scalar len12_squared;
+    br_scalar len23_squared;
+    br_scalar c;
+    br_scalar numerator;
+    br_scalar x;
 
-// CornerFudge
+    BrVector2Sub(&rel1, p1, p2);
+    BrVector2Sub(&rel3, p3, p2);
+    len12_squared = BrVector2LengthSquared(&rel1);
+    len23_squared = BrVector2LengthSquared(&rel3);
+    if (len12_squared == 0.0f || len23_squared == 0.0f) {
+        return 0;
+    }
+    rot1.v[0] = rel1.v[0] * rel3.v[0] + rel1.v[1] * rel3.v[1];
+    rot1.v[1] = rel1.v[0] * -rel3.v[1] + rel1.v[1] * rel3.v[0];
+    BrVector2Normalise(&rot1u, &rot1);
+    if (rot1u.v[1] > 0.0f) {
+        *pLeft_not_right = 1;
+    } else {
+        rot1u.v[1] = -rot1u.v[1];
+        *pLeft_not_right = 0;
+    }
+    if (rot1u.v[1] < 0.001f) {
+        return 0;
+    }
+    numerator = (rot1u.v[0] * pWidth23 + pWidth12) / rot1u.v[1];
+    x = rot1u.v[1] / (rot1u.v[0] + 1.0f);
+    *pEntry_length = x * pWidth23 + numerator + (br_scalar)sqrt((x * x * pWidth23 + 2.0f * x * numerator - pWidth23) * pWidth23);
+    if (len12_squared < 9.0f * *pEntry_length * *pEntry_length) {
+        *pEntry_length = (br_scalar)sqrt(len12_squared) / 3.0f;
+    }
+    if (len23_squared < 9.0f * *pEntry_length * *pEntry_length) {
+        *pEntry_length = (br_scalar)sqrt(len23_squared) / 3.0f;
+    }
+    *pRadius = *pEntry_length * x;
+    if (*pLeft_not_right) {
+        pCent->v[0] = *pEntry_length * rel3.v[0] + *pRadius * -rel3.v[1];
+        pCent->v[1] = *pEntry_length * rel3.v[1] + *pRadius * rel3.v[0];
+    } else {
+        pCent->v[0] = *pEntry_length * rel3.v[0] + *pRadius * rel3.v[1];
+        pCent->v[1] = *pEntry_length * rel3.v[1] + -*pRadius * rel3.v[0];
+    }
+    c = (br_scalar)sqrt(len23_squared);
+    pCent->v[0] /= c;
+    pCent->v[1] /= c;
+    pCent->v[0] += p2->v[0];
+    pCent->v[1] += p2->v[1];
+    return 1;
+}
+
+inline float C2_HOOK_FASTCALL CornerFudge(tCar_spec* pCar_spec) {
+
+    return 1.4f;
+}
 
 inline float C2_HOOK_FASTCALL MaxCurvatureForCarSpeed(tCar_spec* pCar, float pSpeed) {
     float max_curve;
@@ -37,17 +94,57 @@ inline br_scalar C2_HOOK_FASTCALL Vector2Cross(const br_vector2* pV1, const br_v
     return pV1->v[0] * pV2->v[1] - pV1->v[1] * pV2->v[0];
 }
 
-// RoughlyColinear
+inline int C2_HOOK_FASTCALL RoughlyColinear(const br_vector2* p1, const br_vector2* p2, const br_vector2* p3) {
+    br_vector2 rel1;
+    br_vector2 rel2;
+    br_vector2 sum;
+    int result;
+
+    BrVector2Sub(&rel1, p2, p1);
+    BrVector2Sub(&rel2, p3, p2);
+    BrVector2Add(&sum, &rel1, &rel2);
+    if (BrVector2Dot(&rel1, &sum) >= 0.0f) {
+        if (fabs(Vector2Cross(&rel1, &sum) / BrVector2Length(&sum)) < 0.1f) {
+            result = 1;
+        } else {
+            result = 0;
+        }
+    } else {
+        result = 0;
+    }
+    return result;
+}
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x004b13d0
-// STUB: CARMA2_SW 0x004ad540
-// STUB: CARMA2_CHEAT 0x004b6ca0
+// FUNCTION: CARMA2_HW 0x004b13d0
+// FUNCTION: CARMA2_SW 0x004ad540
+// FUNCTION: CARMA2_CHEAT 0x004b6ca0
 int C2_HOOK_FASTCALL GetStraight(br_vector2* pStart, br_vector2* pFinish, float* pWidth, int pSection_no, tOpponent_spec* pOpponent_spec) {
-    NOT_IMPLEMENTED();
+    int section;
+    br_vector2 next;
+    float next_width;
+
+    pStart->v[0] = GetOpponentsSectionStartNodePoint(pOpponent_spec, pSection_no)->v[2];
+    pStart->v[1] = GetOpponentsSectionStartNodePoint(pOpponent_spec, pSection_no)->v[0];
+    pFinish->v[0] = GetOpponentsSectionFinishNodePoint(pOpponent_spec, pSection_no)->v[2];
+    pFinish->v[1] = GetOpponentsSectionFinishNodePoint(pOpponent_spec, pSection_no)->v[0];
+    *pWidth = GetOpponentsSectionWidth(pOpponent_spec, pSection_no);
+    for (section = GetOpponentsNextSection(pOpponent_spec, pSection_no); section != -1; section = GetOpponentsNextSection(pOpponent_spec, section)) {
+        next.v[0] = GetOpponentsSectionFinishNodePoint(pOpponent_spec, section)->v[2];
+        next.v[1] = GetOpponentsSectionFinishNodePoint(pOpponent_spec, section)->v[0];
+        if (!RoughlyColinear(pStart, pFinish, &next)) {
+            break;
+        }
+        BrVector2Copy(pFinish, &next);
+        next_width = GetOpponentsSectionWidth(pOpponent_spec, section);
+        if (*pWidth > next_width) {
+            *pWidth = next_width;
+        }
+    }
+    return section;
 }
 
 #ifdef REC2_MATCHING
@@ -92,11 +189,34 @@ void C2_HOOK_CDECL DoNotDprintf_oppoproc(const char* pMessage, ...) {
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x004b1560
-// STUB: CARMA2_SW 0x004ad6d0
-// STUB: CARMA2_CHEAT 0x004b6e30
+// FUNCTION: CARMA2_HW 0x004b1560
+// FUNCTION: CARMA2_SW 0x004ad6d0
+// FUNCTION: CARMA2_CHEAT 0x004b6e30
 int C2_HOOK_FASTCALL CalcCorners(tCorner* pCorners, int pSection_no, float pWidth, br_vector2* pStart, tOpponent_spec* pOpponent_spec) {
-    NOT_IMPLEMENTED();
+    int i;
+    br_vector2 prev;
+    br_vector2 start;
+    br_vector2 finish;
+    float width;
+
+    BrVector2Copy(&prev, pStart);
+    for (i = 0; pSection_no != -1 && i < 4; i++) {
+        pCorners[i].section = pSection_no;
+        pSection_no = GetStraight(&start, &finish, &width, pSection_no, pOpponent_spec);
+        if (!StraightestArcForCorner2D(&pCorners[i].field_0x00, &pCorners[i].field_0x08, &pCorners[i].field_0x0c, &pCorners[i].left_not_right, &prev, &start, &finish, pWidth, width)) {
+            BrVector2Copy(&pCorners[i].field_0x00, &start);
+            if (width <= pWidth) {
+                pCorners[i].field_0x08 = width;
+            } else {
+                pCorners[i].field_0x08 = pWidth;
+            }
+            pCorners[i].field_0x0c = pCorners[i].field_0x08 * 0.7f;
+            pCorners[i].left_not_right = IRandomBetween(0, 1);
+        }
+        BrVector2Copy(&prev, &start);
+        pWidth = width;
+    }
+    return i;
 }
 
 #ifdef REC2_MATCHING
@@ -149,11 +269,52 @@ inline int C2_HOOK_FASTCALL NearestSectionInStraight(const br_vector2* pPos2d, c
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x004b18b0
-// STUB: CARMA2_SW 0x004ada20
-// STUB: CARMA2_CHEAT 0x004b7180
+// FUNCTION: CARMA2_HW 0x004b18b0
+// FUNCTION: CARMA2_SW 0x004ada20
+// FUNCTION: CARMA2_CHEAT 0x004b7180
 void C2_HOOK_FASTCALL SetMaxSpeedFromSOCs(tSOC* pSocs, int pCount_socs, float* pDesired_speed, float pSpeed, br_vector2* pPos2d, tCorner* pCorners, tOpponent_spec* pOpponent_spec) {
-    NOT_IMPLEMENTED();
+    int i;
+    int was_corner;
+    const br_vector3* p;
+    br_vector2 last;
+    br_vector2 next;
+    float dist;
+    float corner_length;
+    float max_speed;
+    float speed_squared;
+    float stopping_distance;
+
+    was_corner = 0;
+    speed_squared = pSpeed * pSpeed;
+    dist = 0.0f;
+    BrVector2Copy(&last, pPos2d);
+    stopping_distance = (speed_squared / 16.0f + gFrame_period_for_this_munging * pSpeed / 1000.0f) / WORLD_SCALE;
+    for (i = 0; i < pCount_socs && dist < stopping_distance; i++) {
+        if (was_corner) {
+            dist -= corner_length;
+        }
+        if (pSocs[i].field_0x0) {
+            was_corner = 0;
+            p = GetOpponentsSectionFinishNodePoint(pOpponent_spec, pSocs[i].field_0x4);
+            max_speed = (float)GetOpponentsSectionMaxSpeed(pOpponent_spec, pSocs[i].field_0x4, 1);
+        } else {
+            was_corner = 1;
+            p = GetOpponentsSectionStartNodePoint(pOpponent_spec, pCorners[pSocs[i].field_0x4].section);
+            max_speed = (float)pCorners[pSocs[i].field_0x4].field_0x18;
+            corner_length = pCorners[pSocs[i].field_0x4].field_0x0c;
+            dist -= corner_length;
+        }
+        next.v[0] = p->v[2];
+        next.v[1] = p->v[0];
+        dist += (br_scalar)sqrt((last.v[0] - next.v[0]) * (last.v[0] - next.v[0]) + (last.v[1] - next.v[1]) * (last.v[1] - next.v[1]));
+        if (dist < 0.0f) {
+            dist = 0.0f;
+        }
+        if (WORLD_SCALE * dist < (speed_squared - max_speed * max_speed) / 16.0f + gFrame_period_for_this_munging * pSpeed / 1000.0f && max_speed < *pDesired_speed) {
+            *pDesired_speed = max_speed;
+        }
+        BrVector2Copy(&last, &next);
+    }
 }
 
 #ifdef REC2_MATCHING
@@ -164,11 +325,44 @@ void C2_HOOK_FASTCALL SetMaxSpeedFromSOCs(tSOC* pSocs, int pCount_socs, float* p
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x004b1ab0
-// STUB: CARMA2_SW 0x004adc20
-// STUB: CARMA2_CHEAT 0x004b7380
+// FUNCTION: CARMA2_HW 0x004b1ab0
+// FUNCTION: CARMA2_SW 0x004adc20
+// FUNCTION: CARMA2_CHEAT 0x004b7380
 int C2_HOOK_FASTCALL CalcSOCs(int pSection_no, int pCount_corners, tCorner* pCorners, tOpponent_spec* pOpponent_spec, tSOC* pSocs, tCar_spec* pCar_spec) {
-    NOT_IMPLEMENTED();
+    int i;
+    int count_socs;
+
+    count_socs = 0;
+    for (i = 0; i < pCount_corners; i++) {
+        for (; pSection_no != -1 && count_socs < 10 && pSection_no != pCorners[i].section; pSection_no = GetOpponentsNextSection(pOpponent_spec, pSection_no)) {
+            if (Distance2D(GetOpponentsSectionFinishNodePoint(pOpponent_spec, pSection_no), GetOpponentsSectionStartNodePoint(pOpponent_spec, pCorners[i].section)) <= pCorners[i].field_0x0c) {
+                break;
+            }
+            pSocs[count_socs].field_0x0 = 1;
+            pSocs[count_socs].field_0x4 = pSection_no;
+            count_socs++;
+        }
+        if (count_socs < 10) {
+            pSocs[count_socs].field_0x0 = 0;
+            pSocs[count_socs].field_0x4 = i;
+            pCorners[i].field_0x18 = (int)sqrt((pCorners[i].field_0x08 * WORLD_SCALE * 7.5f) * (CornerFudge(pCar_spec) * CornerFudge(pCar_spec)));
+            for (; pSection_no != pCorners[i].section; pSection_no = GetOpponentsNextSection(pOpponent_spec, pSection_no)) {
+                if (pCorners[i].field_0x18 > GetOpponentsSectionMaxSpeed(pOpponent_spec, pSection_no, 1)) {
+                    pCorners[i].field_0x18 = GetOpponentsSectionMaxSpeed(pOpponent_spec, pSection_no, 1);
+                }
+            }
+            for (; pSection_no != -1; pSection_no = GetOpponentsNextSection(pOpponent_spec, pSection_no)) {
+                if (Distance2D(GetOpponentsSectionFinishNodePoint(pOpponent_spec, pSection_no), GetOpponentsSectionStartNodePoint(pOpponent_spec, pCorners[i].section)) >= pCorners[i].field_0x0c) {
+                    break;
+                }
+                if (pCorners[i].field_0x18 > GetOpponentsSectionMaxSpeed(pOpponent_spec, pSection_no, 1)) {
+                    pCorners[i].field_0x18 = GetOpponentsSectionMaxSpeed(pOpponent_spec, pSection_no, 1);
+                }
+            }
+            count_socs++;
+        }
+    }
+    return count_socs;
 }
 
 #ifdef REC2_MATCHING

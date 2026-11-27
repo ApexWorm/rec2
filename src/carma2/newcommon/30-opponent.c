@@ -1407,6 +1407,7 @@ int C2_HOOK_FASTCALL GetOpponentsFirstSection(const tOpponent_spec* pOpponent_sp
 
 // FUNCTION: CARMA2_HW 0x004aea30
 // FUNCTION: CARMA2_SW 0x004aaba0
+// FUNCTION: CARMA2_CHEAT 0x004aff40
 int C2_HOOK_FASTCALL GetOpponentsNextSection(const tOpponent_spec* pOpponent_spec, tS16 pCurrent_section) {
     if (pCurrent_section >= 20000) {
         if (pOpponent_spec->nnext_sections > pCurrent_section - 19999
@@ -1507,6 +1508,7 @@ int C2_HOOK_FASTCALL GetOpponentsSectionMinSpeed(tOpponent_spec* pOpponent_spec,
 
 // FUNCTION: CARMA2_HW 0x004aedf0
 // FUNCTION: CARMA2_SW 0x004aaf60
+// FUNCTION: CARMA2_CHEAT 0x004b0300
 int C2_HOOK_FASTCALL GetOpponentsSectionMaxSpeed(tOpponent_spec* pOpponent_spec, tS16 pSection, int pTowards_finish) {
     if (pSection >= 20000 && pOpponent_spec->nnext_sections > pSection - 20000) {
         const tRoute_section* route = &pOpponent_spec->next_sections[pSection - 20000];

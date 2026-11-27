@@ -3167,9 +3167,9 @@ typedef struct {
     br_vector2 field_0x00;
     float field_0x08;
     float field_0x0c;
-    undefined4 left_not_right;
-    undefined4 section;
-    undefined4 field_0x18;
+    int left_not_right;
+    int section;
+    int field_0x18;
 } tCorner;
 
 typedef struct {
