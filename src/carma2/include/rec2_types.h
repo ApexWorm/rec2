@@ -352,7 +352,7 @@ typedef struct tPed_cache_006944c0 {
     undefined field_0x22[1];
     undefined field_0x23[10];
     undefined field_0x2d[1];
-    undefined2 field_0x2e;
+    tU16 field_0x2e;
     br_vector3 field_0x30;
     br_vector3 field_0x3c;
     br_vector3 field_0x48;
@@ -2800,7 +2800,7 @@ typedef struct tCar_spec {
     undefined field_0x90[28];
     tU16 fire_vertex[12];
     float dt;
-    undefined* field_0xc8;
+    tCar_spec* field_0xc8;
     char name[32];
     char driver_name[32];
     char grid_icon_names[3][14];
@@ -4959,7 +4959,9 @@ typedef struct tNon_car_spec {
     br_actor* car_master_actor;
     undefined field_0x14[4];
     br_scalar break_off_radians_squared;
-    undefined field_0x1c[0x4c - 0x1c];
+    undefined field_0x1c[0x30 - 0x1c];
+    tCar_spec* field_0x30;
+    undefined field_0x34[0x4c - 0x34];
     br_vector3 pos;
     br_vector3 centre_of_mass_world_scale;
     undefined field_0x64[0x6c - 0x64];
@@ -5438,7 +5440,7 @@ typedef struct tDrone_spec {
     int field_0xf4;
     tPhysics_object collision_info;
     tFunk_grooves* funk_grooves;
-    undefined4 field_0x5d4;
+    tCar_spec* field_0x5d4;
 } tDrone_spec;
 
 typedef struct {
@@ -5604,7 +5606,7 @@ typedef struct {
     void (C2_HOOK_FASTCALL *post_collision)(void);
     void (C2_HOOK_FASTCALL *changed_objects)(tPhysics_object*, undefined4);
     int (C2_HOOK_FASTCALL *active_halted)(tPhysics_object*);
-    int (C2_HOOK_FASTCALL *passive_activated)(tPhysics_object*);
+    int (C2_HOOK_FASTCALL *passive_activated)(tPhysics_object*, tPhysics_object*);
     void* callback_0x18;
 } tPhysics_callbacks;
 

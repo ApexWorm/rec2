@@ -33,6 +33,7 @@
 #include "59-camera.h"
 #include "60-phil.h"
 #include "61-pedestrn-phys.h"
+#include "61-pedestrn.h"
 #include "brender/brender.h"
 #include "globvars.h"
 #include "globvrkm.h"
@@ -915,11 +916,46 @@ void C2_HOOK_FASTCALL SetCollisionFlagsAndStuff(tPhysics_object* pObject) {
 
 // APTCPostCollision
 
-// APTCActiveHalted
+// FUNCTION: CARMA2_HW 0x00416270
+// FUNCTION: CARMA2_SW 0x004162a0
+// FUNCTION: CARMA2_CHEAT 0x004164d0
+int C2_HOOK_FASTCALL APTCActiveHalted(tPhysics_object* pObject) {
 
-// APTCPassiveActivated
+    if (pObject != NULL && pObject->owner != NULL && pObject->flags_0x238 >= 2 && pObject->flags_0x238 <= 4) {
+        return BonerActiveHalted(pObject->owner);
+    }
+    if (pObject != NULL && pObject->flags_0x238 == 0x10) {
+        return MyDroneHathHalteth(pObject);
+    }
+    return 1;
+}
 
-// APTCChangedObjects
+// FUNCTION: CARMA2_HW 0x004162b0
+// FUNCTION: CARMA2_SW 0x004162e0
+// FUNCTION: CARMA2_CHEAT 0x00416510
+int C2_HOOK_FASTCALL APTCPassiveActivated(tPhysics_object* pObject, tPhysics_object* pOther) {
+
+    if (pObject != NULL && pObject->owner != NULL && pObject->flags_0x238 >= 2 && pObject->flags_0x238 <= 4) {
+        return BonerPassiveCollision(pObject->owner, pOther);
+    }
+    if (pObject != NULL && pObject->flags_0x238 == 0x10) {
+        return MyDroneHathCollideth(pObject, pOther);
+    }
+    return 1;
+}
+
+// FUNCTION: CARMA2_HW 0x00416300
+// FUNCTION: CARMA2_SW 0x00416330
+// FUNCTION: CARMA2_CHEAT 0x00416560
+void C2_HOOK_FASTCALL APTCChangedObjects(tPhysics_object* pObject, undefined4 pArg2) {
+
+    if (pObject != NULL && pObject->owner != NULL && pObject->flags_0x238 == 2) {
+        BonerPedMovedByPhysics(pObject->owner, pArg2);
+    }
+    if (pObject != NULL && pObject->flags_0x238 == 0x10) {
+        MoveMyDroneBaby(pObject, pArg2);
+    }
+}
 
 // ApplyPhysicsToCars
 
