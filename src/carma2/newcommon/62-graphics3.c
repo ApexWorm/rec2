@@ -315,6 +315,7 @@ tSmashable_race_target gSmashable_race_targets[300];
 
 #ifdef REC2_HW
 // GLOBAL: CARMA2_HW 0x0068d8c0
+// GLOBAL: CARMA2_CHEAT 0x00695160
 br_actor* gLit_op_stat_actor;
 #endif
 
@@ -415,6 +416,7 @@ void C2_HOOK_FASTCALL CycleTargetLock(void) {
 
 // FUNCTION: CARMA2_HW 0x00494840
 // FUNCTION: CARMA2_SW 0x00491b40
+// FUNCTION: CARMA2_CHEAT 0x00494a70
 void C2_HOOK_FASTCALL CycleMapOptions(void) {
 
     gCheckpoint_finder_enabled = !gCheckpoint_finder_enabled;
@@ -586,6 +588,7 @@ void C2_HOOK_FASTCALL DoSomeThingsToCheckpoints(br_pixelmap* pMap, tU32 pTime, t
 
 // FUNCTION: CARMA2_HW 0x004968f0
 // FUNCTION: CARMA2_SW 0x00493260
+// FUNCTION: CARMA2_CHEAT 0x00496ca0
 void C2_HOOK_FASTCALL CalcMapCheckpoint(br_pixelmap* pMap, int pCheckpoint, tU32 pTime, int pTarget) {
     br_vector3 p;
     tRace_checkpoint_spec* checkpoint;
@@ -596,6 +599,8 @@ void C2_HOOK_FASTCALL CalcMapCheckpoint(br_pixelmap* pMap, int pCheckpoint, tU32
 }
 
 // FUNCTION: CARMA2_HW 0x00496940
+// FUNCTION: CARMA2_SW 0x004932b0
+// FUNCTION: CARMA2_CHEAT 0x00496cf0
 void C2_HOOK_FASTCALL CalcMapCheckpoint2(br_pixelmap* pMap, int pCheckpoint, tU32 pTime, int pTarget) {
     br_vector3 pos_mapspace;
     br_vector2 p;
@@ -613,6 +618,7 @@ void C2_HOOK_FASTCALL CalcMapCheckpoint2(br_pixelmap* pMap, int pCheckpoint, tU3
 
 // FUNCTION: CARMA2_HW 0x00495d00
 // FUNCTION: CARMA2_SW 0x00493350
+// FUNCTION: CARMA2_CHEAT 0x00495f70
 void C2_HOOK_FASTCALL DrawOffsetCheckpoint(br_pixelmap* pMap, int pCheckpoint, tU32 pTime, int pTarget) {
     tRace_checkpoint_spec* checkpoint;
 
@@ -667,6 +673,7 @@ void C2_HOOK_FASTCALL FinishMap(void) {
 
 // FUNCTION: CARMA2_HW 0x00496b10
 // FUNCTION: CARMA2_SW 0x00493450
+// FUNCTION: CARMA2_CHEAT 0x00496ec0
 void C2_HOOK_FASTCALL CheckpointLine(br_pixelmap* pMap, int pCheckpoint, tU32 pTime, int pTarget) {
     int p2_x;
     int p2_y;
@@ -695,6 +702,7 @@ void C2_HOOK_FASTCALL CheckpointLine(br_pixelmap* pMap, int pCheckpoint, tU32 pT
 
 #ifdef REC2_HW
 // FUNCTION: CARMA2_HW 0x00494f40
+// FUNCTION: CARMA2_CHEAT 0x00495170
 void C2_HOOK_FASTCALL AllocateOppoBarActor(int pX, int pY) {
     br_material* material;
     br_model* model;
@@ -924,6 +932,7 @@ void C2_HOOK_FASTCALL InitMap(void) {
 
 #ifdef REC2_HW
 // FUNCTION: CARMA2_HW 0x004973b0
+// FUNCTION: CARMA2_CHEAT 0x00497760
 void C2_HOOK_FASTCALL ConvertCarIcons(br_pixelmap* pMap) {
     int i;
     int j;
@@ -1062,6 +1071,7 @@ void C2_HOOK_FASTCALL AddSmashTarget(br_model* pModel, br_actor* pActor, int pUn
 
 // FUNCTION: CARMA2_HW 0x00497830
 // FUNCTION: CARMA2_SW 0x00494460
+// FUNCTION: CARMA2_CHEAT 0x00497be0
 int C2_HOOK_FASTCALL NearestPowerOfTwo(int pValue) {
     int power;
 
