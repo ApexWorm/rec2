@@ -248,7 +248,7 @@ extern void C2_HOOK_FASTCALL SendAllSemiDetachedBits(tNet_game_player_info* pPla
 
 extern void C2_HOOK_FASTCALL AddNonCar(tNon_car_spec* pNon_car, const tDriver* pDriver);
 
-// DetachBit
+extern tPhysics_object* C2_HOOK_FASTCALL DetachBit(tCar_spec* pCar, br_actor* pActor, br_bounds3* pBounds);
 
 // DoDetaching
 
@@ -518,7 +518,7 @@ extern void C2_HOOK_FASTCALL ReceivedReAttachBit(tNet_message_chunk* pContents);
 
 extern void C2_HOOK_FASTCALL ReceivedReAttachAllBits(tNet_message_chunk* pContents);
 
-// DoQueuedNetDetaching
+extern void C2_HOOK_FASTCALL DoQueuedNetDetaching(void);
 
 // DBNonCarOwner
 

@@ -4344,8 +4344,7 @@ typedef struct tCrush_net_detach_list_item {
     br_actor* actor;
     tCar_spec* car;
     tU32 time;
-    br_vector3 bounds_min;
-    br_vector3 bounds_max;
+    br_bounds3 bounds;
 } tCrush_net_detach_list_item;
 
 typedef struct tCrush_net_semi_detach_bit_list_item {
@@ -4355,8 +4354,7 @@ typedef struct tCrush_net_semi_detach_bit_list_item {
     br_vector3 point_1;
     br_vector3 point_2;
     br_vector3 point_3;
-    br_vector3 bounds_min;
-    br_vector3 bounds_max;
+    br_bounds3 bounds;
     float value;
 } tCrush_net_semi_detach_bit_list_item;
 
