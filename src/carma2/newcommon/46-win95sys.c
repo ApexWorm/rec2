@@ -21,6 +21,7 @@
 
 // FUNCTION: CARMA2_HW 0x004625d0
 // FUNCTION: CARMA2_SW 0x00462060
+// FUNCTION: CARMA2_CHEAT 0x00462a40
 void C2_HOOK_FASTCALL DoRunLengthX(tFlic_descriptor* pFlic_info, tU32 pChunk_length) {
     int i;
     int j;
