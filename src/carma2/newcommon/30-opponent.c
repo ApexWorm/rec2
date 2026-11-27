@@ -1373,6 +1373,18 @@ tCar_spec* C2_HOOK_FASTCALL GetCarSpecFromGlobalOppoIndex(int pIndex) {
     return NULL;
 }
 
+// FUNCTION: CARMA2_HW 0x004ae9b0
+// FUNCTION: CARMA2_SW 0x004aab20
+// FUNCTION: CARMA2_CHEAT 0x004afec0
+int C2_HOOK_FASTCALL FUN_004ae9b0(const tOpponent_spec* pOpponent_spec) {
+
+    if (pOpponent_spec->follow_path_data.section_no >= 20000) {
+        return pOpponent_spec->next_sections[pOpponent_spec->follow_path_data.section_no - 20000].direction;
+    } else {
+        return 1;
+    }
+}
+
 // FUNCTION: CARMA2_HW 0x004ae9e0
 // FUNCTION: CARMA2_SW 0x004aab50
 // FUNCTION: CARMA2_CHEAT 0x004afef0
@@ -1420,6 +1432,41 @@ int C2_HOOK_FASTCALL GetOpponentsNextSection(const tOpponent_spec* pOpponent_spe
         }
         return (tS16)trail_section;
     }
+    return -1;
+}
+
+// FUNCTION: CARMA2_HW 0x004aeab0
+// FUNCTION: CARMA2_SW 0x004aac20
+// FUNCTION: CARMA2_CHEAT 0x004affc0
+tS16 C2_HOOK_FASTCALL GetOpponentsSectionStartNode(const tOpponent_spec* pOpponent_spec, tS16 pSection) {
+    tS16 section_no;
+    int node_index_index;
+
+    if (pSection >= 20000 && pOpponent_spec->nnext_sections > pSection - 20000) {
+        section_no = pOpponent_spec->next_sections[pSection - 20000].section_no;
+        if (pOpponent_spec->next_sections[pSection - 20000].direction) {
+            node_index_index = 0;
+        } else {
+            node_index_index = 1;
+        }
+        return gProgram_state.AI_vehicles.path_sections[section_no].node_indices[node_index_index];
+    }
+    DoNotDprintf("BIG ERROR - GetOpponentsSectionStartNode() - section not found in next_section array for opponent %s", pOpponent_spec->car_spec->driver_name);
+    PDEnterDebugger("BIG ERROR - GetOpponentsSectionStartNode()");
+    return -1;
+}
+
+// FUNCTION: CARMA2_HW 0x004aeb20
+// FUNCTION: CARMA2_SW 0x004aac90
+// FUNCTION: CARMA2_CHEAT 0x004b0030
+tS16 C2_HOOK_FASTCALL GetOpponentsSectionFinishNode(const tOpponent_spec* pOpponent_spec, tS16 pSection) {
+
+    if (pSection >= 20000 && pOpponent_spec->nnext_sections > pSection - 20000) {
+        const tRoute_section* route = &pOpponent_spec->next_sections[pSection - 20000];
+        return gProgram_state.AI_vehicles.path_sections[route->section_no].node_indices[route->direction];
+    }
+    DoNotDprintf("BIG ERROR - GetOpponentsSectionFinishNode() - section not found in next_section array for opponent %s", pOpponent_spec->car_spec->driver_name);
+    PDEnterDebugger("BIG ERROR - GetOpponentsSectionFinishNode()");
     return -1;
 }
 

@@ -204,11 +204,17 @@ extern tOpponent_spec* C2_HOOK_FASTCALL GetOpponentSpecFromCarSpec(tCar_spec* pC
 
 extern tCar_spec* C2_HOOK_FASTCALL GetCarSpecFromGlobalOppoIndex(int pIndex);
 
+extern int C2_HOOK_FASTCALL FUN_004ae9b0(const tOpponent_spec* pOpponent_spec);
+
 extern int C2_HOOK_FASTCALL GetOpponentsRealSection(tOpponent_spec* pOpponent_spec, int pSection_no);
 
 extern int C2_HOOK_FASTCALL GetOpponentsFirstSection(const tOpponent_spec* pOpponent_spec);
 
 extern int C2_HOOK_FASTCALL GetOpponentsNextSection(const tOpponent_spec* pOpponent_spec, tS16 pCurrent_section);
+
+extern tS16 C2_HOOK_FASTCALL GetOpponentsSectionStartNode(const tOpponent_spec* pOpponent_spec, tS16 pSection);
+
+extern tS16 C2_HOOK_FASTCALL GetOpponentsSectionFinishNode(const tOpponent_spec* pOpponent_spec, tS16 pSection);
 
 // GetOpponentsSectionStartNodePoint
 
