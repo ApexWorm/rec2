@@ -9,6 +9,7 @@
 #include "38-flicplay.h"
 
 #include "08-loading1.h"
+#include "18-graphics2.h"
 #include "19-font.h"
 #include "41-utility.h"
 #include "52-errors.h"
@@ -1176,6 +1177,8 @@ void C2_HOOK_FASTCALL InitFlicQueue(void) {
 }
 
 // FUNCTION: CARMA2_HW 0x00462cd0
+// FUNCTION: CARMA2_SW 0x00462760
+// FUNCTION: CARMA2_CHEAT 0x00463140
 int C2_HOOK_FASTCALL FlicQueueFinished(void) {
     tFlic_descriptor* the_flic;
 
@@ -1190,7 +1193,9 @@ int C2_HOOK_FASTCALL FlicQueueFinished(void) {
 }
 
 // FUNCTION: CARMA2_HW 0x00462d00
-void C2_HOOK_FASTCALL ProcessFlicQueue(tU32 pInterval) {
+// FUNCTION: CARMA2_SW 0x00462790
+// FUNCTION: CARMA2_CHEAT 0x00463170
+inline void C2_HOOK_FASTCALL ProcessFlicQueue(tU32 pInterval) {
     tFlic_descriptor* the_flic;
     tFlic_descriptor* last_flic;
     tFlic_descriptor* doomed_flic;
@@ -1229,11 +1234,27 @@ void C2_HOOK_FASTCALL ProcessFlicQueue(tU32 pInterval) {
     LetFlicFuckWithPalettes();
 }
 
-// STUB: CARMA2_HW 0x00462dc0
-// STUB: CARMA2_SW 0x00462850
-// STUB: CARMA2_CHEAT 0x00463230
+// FUNCTION: CARMA2_HW 0x00462dc0
+// FUNCTION: CARMA2_SW 0x00462850
+// FUNCTION: CARMA2_CHEAT 0x00463230
 void C2_HOOK_FASTCALL FlushFlicQueue(void) {
-    NOT_IMPLEMENTED();
+    tFlic_descriptor* the_flic;
+    tFlic_descriptor* old_flic;
+
+    while (!FlicQueueFinished()) {
+        RemoveTransientBitmaps(1);
+        ProcessFlicQueue(gFrame_period);
+        DoMouseCursor();
+        PDScreenBufferSwap(0);
+    }
+    the_flic = gFirst_flic;
+    while (the_flic != NULL) {
+        old_flic = the_flic;
+        EndFlic(the_flic);
+        the_flic = the_flic->next;
+        BrMemFree(old_flic);
+    }
+    gFirst_flic = NULL;
 }
 
 // FUNCTION: CARMA2_HW 0x004630b0
