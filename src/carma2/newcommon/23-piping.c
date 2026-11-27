@@ -147,7 +147,7 @@ int gPipe_count_callbacks;
 // GLOBAL: CARMA2_HW 0x00694104
 // GLOBAL: CARMA2_SW 0x0068e15c
 // GLOBAL: CARMA2_CHEAT 0x0069bc7c
-tPipe_smudge_data* gCrush_space;
+tPipe_model_mash* gCrush_space;
 
 // GLOBAL: CARMA2_HW 0x0069410c
 // GLOBAL: CARMA2_SW 0x0068e164
@@ -397,6 +397,7 @@ void C2_HOOK_FASTCALL AREndPipingSession(void) {
 
 // FUNCTION: CARMA2_HW 0x004028a0
 // FUNCTION: CARMA2_SW 0x004028a0
+// FUNCTION: CARMA2_CHEAT 0x004028a0
 void C2_HOOK_FASTCALL ARAddDataToSession(int pType, uintptr_t pOwner, void* pData, tU32 pSize) {
     tU32 new_size;
 
@@ -1044,12 +1045,33 @@ void C2_HOOK_FASTCALL AddFlapToPipingSession(br_actor* pActor, br_angle pAngle) 
         SIZE_OFFSET_PIPING(tPipe_chunk_flap, angle), pAngle);
 }
 
-// STUB: CARMA2_HW 0x004c7550
-// STUB: CARMA2_SW 0x004c3c80
-// STUB: CARMA2_CHEAT 0x004cd070
+#if defined(REC2_MATCHING) && defined(_MSC_VER)
+#pragma inline_depth(0)
+#endif
+
+// FUNCTION: CARMA2_HW 0x004c7550
+// FUNCTION: CARMA2_SW 0x004c3c80
+// FUNCTION: CARMA2_CHEAT 0x004cd070
 void C2_HOOK_FASTCALL AddModelMashToPipingSession(br_model* pModel, br_vector3* pMash) {
-    NOT_IMPLEMENTED();
+    tPipe_model_mash* model_mash;
+    tU32 size;
+
+    model_mash = gCrush_space;
+    if (gCrush_space == NULL) {
+        return;
+    }
+    size = offsetof(tPipe_model_mash, vectors) + pModel->nvertices * sizeof(tCompressed_vector3);
+    if (size > 0x4000) {
+        FatalError(kFatalError_ChunkIsTooLargeToPipe);
+    }
+    model_mash->model = pModel;
+    ARCompressModelMash(model_mash->vectors, pModel, pMash);
+    ARAddDataToSession(ePipe_chunk_model_mash, -1, model_mash, size);
 }
+
+#if defined(REC2_MATCHING) && defined(_MSC_VER)
+#pragma inline_depth()
+#endif
 
 // FUNCTION: CARMA2_HW 0x004c7940
 // FUNCTION: CARMA2_SW 0x004c4070
