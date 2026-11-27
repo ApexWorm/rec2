@@ -1198,7 +1198,12 @@ void C2_HOOK_FASTCALL ControlCar1(tCar_spec* pCar, br_scalar pDt) {
 
 // TestNonCarSnapOff
 
-// TumbleObjectWithV
+// STUB: CARMA2_HW 0x00417fb0
+// STUB: CARMA2_SW 0x00417fe0
+// STUB: CARMA2_CHEAT 0x00418210
+void C2_HOOK_FASTCALL TumbleObjectWithV(tPhysics_object* pObject, br_vector3* pV, float pArg3, float pArg4) {
+    NOT_IMPLEMENTED();
+}
 
 // TumbleObject
 
