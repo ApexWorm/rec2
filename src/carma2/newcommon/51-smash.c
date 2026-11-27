@@ -611,11 +611,87 @@ inline void C2_HOOK_FASTCALL DoSpecial(tSpecial_effects_spec* pSpecial, br_actor
 
 // QueueDelayedSideEffect
 
-// DoDelayedNonCar
+inline void C2_HOOK_FASTCALL DoDelayedNonCar(tU32 pTime, tDelayed_non_car* pDelayed_non_car) {
+    int i;
+    int number_started;
+    tDelayed_non_car_actor_item* read_action;
+    tDelayed_non_car_actor_item* write_action;
+    tNon_car_spec* non_car;
+    br_vector3 speed;
+    br_vector3 omega;
 
-// DoDelayedSmash
+    number_started = 0;
+    write_action = pDelayed_non_car->actor_time_actions;
+    for (i = 0, read_action = write_action; i < pDelayed_non_car->count_actions; i++, read_action++) {
+        if (pTime >= read_action->time) {
+            if (read_action->actor->type_data == NULL) {
+                non_car = DoPullActorFromWorld(read_action->actor);
+                if (non_car != NULL) {
+                    if (non_car->flags & 0x10000) {
+                        MakeLiftGoUp(non_car);
+                    } else {
+                        ApplyInitialMovement(pDelayed_non_car->field_0x18, &pDelayed_non_car->field_0x0, &speed, &omega, 1.f,
+                            &gZero_vector__smash, &pDelayed_non_car->field_0xc, &read_action->actor->t.t.translate.t);
+                        BrVector3Scale(&non_car->collision_info->v, &speed, 1.0 / WORLD_SCALE_D);
+                        BrVector3Scale(&non_car->collision_info->omega, &omega, REC2_TAU / 65.536);
+                    }
+                    non_car->collision_info->disable_move_rotate = 0;
+                }
+            }
+            number_started++;
+        } else {
+            *write_action = *read_action;
+            write_action++;
+        }
+    }
+    pDelayed_non_car->count_actions -= number_started;
+}
 
-// MungeDelayedSideEffects
+inline void C2_HOOK_FASTCALL DoDelayedSmash(tDelayed_smash* pDelayed_smash) {
+
+    if (pDelayed_smash->field_0x88 == 1
+        && pDelayed_smash->field_0x80->identifier[0] == '&'
+        && pDelayed_smash->field_0x80->identifier[1] >= '0'
+        && pDelayed_smash->field_0x80->identifier[1] <= '9') {
+        DoPullActorFromWorld(pDelayed_smash->field_0x80);
+        pDelayed_smash->field_0x80->identifier[3] = '!';
+        BashObject(pDelayed_smash->field_0x90, pDelayed_smash->field_0x80, pDelayed_smash->field_0x8c,
+            &pDelayed_smash->field_0xc, &pDelayed_smash->field_0x0, &pDelayed_smash->field_0x1c, 1, 0);
+    } else {
+        SmashEnvironment(pDelayed_smash->field_0x90, &pDelayed_smash->field_0x38, pDelayed_smash->field_0x8c,
+            &pDelayed_smash->field_0xc, &pDelayed_smash->field_0x0, &pDelayed_smash->field_0x1c, 1, 0);
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x004ecc80
+// FUNCTION: CARMA2_SW 0x004e8950
+// FUNCTION: CARMA2_CHEAT 0x004f2920
+void C2_HOOK_FASTCALL MungeDelayedSideEffects(void) {
+    int i;
+    tU32 the_time;
+    tSmash_explosion* delayed_effect;
+
+    the_time = GetTotalTime();
+    for (i = 0; i < (int)REC2_ASIZE(gSmash_explosions); i++) {
+        delayed_effect = &gSmash_explosions[i];
+        if (delayed_effect->active) {
+            switch (delayed_effect->type) {
+            case 0:
+                DoDelayedNonCar(the_time, &delayed_effect->what.non_car);
+                if (delayed_effect->what.non_car.count_actions == 0) {
+                    delayed_effect->active = 0;
+                }
+                break;
+            case 1:
+                if (the_time >= delayed_effect->what.smash.field_0x18) {
+                    DoDelayedSmash(&delayed_effect->what.smash);
+                    delayed_effect->active = 0;
+                }
+                break;
+            }
+        }
+    }
+}
 
 // ActivateNonCarSideEffects
 
@@ -1884,7 +1960,20 @@ int C2_HOOK_FASTCALL InsertQuad(tSmash_quad_mapping* pMapping, br_actor* pActor,
 
 // HitPowerup
 
-// SmashEnvironment
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_HW 0x004f1140
+// STUB: CARMA2_SW 0x004ecda0
+// STUB: CARMA2_CHEAT 0x004f6de0
+float C2_HOOK_FASTCALL SmashEnvironment(tPhysics_object* pObject, undefined4* pArg2, float pMagnitude, br_vector3* pPosition, br_vector3* pNormal, br_vector3* pForce, int pSnap, int pNetwork) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
