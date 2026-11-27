@@ -858,7 +858,26 @@ int C2_HOOK_FASTCALL ReduceEffectOfForces(tPhysics_joint_force* pForces, br_scal
 
 // AddDoubleTorqueToMatrix
 
-// DRMatrix33Inverse
+// FUNCTION: CARMA2_HW 0x004be350
+// FUNCTION: CARMA2_SW 0x004baa70
+// FUNCTION: CARMA2_CHEAT 0x004c3e80
+void C2_HOOK_FASTCALL DRMatrix33Inverse(br_scalar* pResult, const br_scalar* pInput) {
+    br_scalar inverse_determinant;
+
+    pResult[0] = pInput[4] * pInput[8] + (-pInput[5]) * pInput[7];
+    pResult[1] = -(pInput[1] * pInput[8] + (-pInput[2]) * pInput[7]);
+    pResult[2] = pInput[1] * pInput[5] + (-pInput[2]) * pInput[4];
+    inverse_determinant = (br_scalar)(1.0 / (pInput[0] * pResult[0] + pInput[1] * pResult[1] + pInput[2] * pResult[2]));
+    pResult[0] = pResult[0] * inverse_determinant;
+    pResult[3] = -(inverse_determinant * (pInput[3] * pInput[8] + (-pInput[5]) * pInput[6]));
+    pResult[6] = inverse_determinant * (pInput[3] * pInput[7] + (-pInput[4]) * pInput[6]);
+    pResult[1] = pResult[1] * inverse_determinant;
+    pResult[4] = inverse_determinant * (pInput[0] * pInput[8] + (-pInput[2]) * pInput[6]);
+    pResult[7] = -(inverse_determinant * (pInput[0] * pInput[7] + (-pInput[1]) * pInput[6]));
+    pResult[2] = pResult[2] * inverse_determinant;
+    pResult[5] = -(inverse_determinant * (pInput[0] * pInput[5] + (-pInput[2]) * pInput[3]));
+    pResult[8] = inverse_determinant * (pInput[0] * pInput[4] + (-pInput[1]) * pInput[3]);
+}
 
 // SetUpQuickHingeData
 
