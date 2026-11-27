@@ -370,9 +370,9 @@ void C2_HOOK_FASTCALL DroneStateFuncReset(tDrone_spec* pDrone, tDroneStateFuncSt
 
 inline void C2_HOOK_FASTCALL InitDroneDrivingInfo(tDrone_spec* pDrone) {
     pDrone->field_0xdc = 0;
-    pDrone->field_0xe4 = 0.f;
-    pDrone->field_0x48 = 0.f;
-    pDrone->field_0x4c = 0.f;
+    pDrone->field_0xe4 = 0.0f;
+    pDrone->field_0x48 = 0.0f;
+    pDrone->field_0x4c = 0.0f;
 }
 
 #ifdef REC2_MATCHING
@@ -430,8 +430,8 @@ void C2_HOOK_FASTCALL PipeDroneMatrix(tDrone_spec* pDrone) {
 inline void C2_HOOK_FASTCALL PossiblyPipeDroneMovement(tDrone_spec* pDrone) {
     if (pDrone->field_0xdc == 1) {
         PipeSingleDroneStraightPos(pDrone, pDrone->field_0x10,
-            DRScalarToU16(pDrone->field_0x48, -500.f, 500.f),
-            DRScalarToU16(pDrone->field_0x4c, 0.f, 255.f));
+            DRScalarToU16(pDrone->field_0x48, -500.0f, 500.0f),
+            DRScalarToU16(pDrone->field_0x4c, 0.0f, 255.0f));
     } else if (pDrone->field_0xdc == 2) {
         PipeDroneMatrix(pDrone);
     } else {
