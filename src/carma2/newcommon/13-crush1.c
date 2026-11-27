@@ -2737,9 +2737,34 @@ void C2_HOOK_FASTCALL RepairCarCollisionShapes(tCar_spec* pCar, float pStep) {
     pCar->car_crush_spec->expand_bounding_box = 3;
 }
 
-// RepairCar2
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
 
-// RepairCar
+// STUB: CARMA2_HW 0x0043ace0
+// STUB: CARMA2_SW 0x0043ad30
+// STUB: CARMA2_CHEAT 0x0043af00
+float C2_HOOK_FASTCALL RepairCar2(tCar_spec* pCar, tU32 pFrame_period, br_scalar* pTotal_deflection) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
+
+// FUNCTION: CARMA2_HW 0x0043b840
+// FUNCTION: CARMA2_SW 0x0043b890
+// FUNCTION: CARMA2_CHEAT 0x0043ba70
+float C2_HOOK_FASTCALL RepairCar(tU16 pCar_ID, tU32 pFrame_period, br_scalar* pTotal_deflection) {
+    tCar_spec* car;
+
+    if (VEHICLE_TYPE_FROM_ID(pCar_ID) == eVehicle_self) {
+        car = &gProgram_state.current_car;
+    } else {
+        car = GetCarSpec(VEHICLE_TYPE_FROM_ID(pCar_ID), pCar_ID & 0xff);
+    }
+    return RepairCar2(car, pFrame_period, pTotal_deflection);
+}
 
 // RestoreVitalBitsOfObject
 
