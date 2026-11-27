@@ -217,7 +217,7 @@ extern void C2_HOOK_FASTCALL AdjustDownForce(void);
 
 extern void C2_HOOK_FASTCALL FreezeMechanics(void);
 
-// FlyCar
+extern void C2_HOOK_FASTCALL FlyCar(tCar_spec* pCar, float pDelta_time);
 
 extern float C2_HOOK_FASTCALL GetCarOverallBoundsMinY(const tCar_spec* pCar_spec);
 

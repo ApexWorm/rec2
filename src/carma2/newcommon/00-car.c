@@ -25,6 +25,7 @@
 #include "34-finteray.h"
 #include "37-brucetrk.h"
 #include "41-utility.h"
+#include "42-input.h"
 #include "49-physics.h"
 #include "53-controls.h"
 #include "55-volume.h"
@@ -1522,7 +1523,154 @@ void C2_HOOK_FASTCALL FreezeMechanics(void) {
     }
 }
 
-// FlyCar
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// FUNCTION: CARMA2_HW 0x0041f4f0
+// FUNCTION: CARMA2_SW 0x0041f570
+// FUNCTION: CARMA2_CHEAT 0x0041f750
+void C2_HOOK_FASTCALL FlyCar(tCar_spec* pCar, float pDelta_time) {
+    int key0_down;
+    int key1_down;
+    int old_axis;
+    int i;
+    br_matrix34* mat;
+    br_vector3 tv;
+    br_vector3 a;
+    br_vector3 b;
+    br_vector3 norm;
+    br_vector3 norm2;
+    br_scalar dist;
+    br_scalar dist2;
+    br_scalar ts;
+    br_material* material;
+    // GLOBAL: CARMA2_HW 0x0058f704
+    // GLOBAL: CARMA2_SW 0x0058a704
+    // GLOBAL: CARMA2_CHEAT 0x00594794
+    static int axis = 2;
+    // GLOBAL: CARMA2_HW 0x00679414
+    // GLOBAL: CARMA2_SW 0x00673b84
+    // GLOBAL: CARMA2_CHEAT 0x00680cc4
+    static br_scalar vel;
+
+    mat = &pCar->collision_info->actor->t.t.mat;
+    key0_down = PDKeyDown(0);
+    if (!key0_down && PDKeyDown(1)) {
+        key1_down = 1;
+    } else {
+        key1_down = 0;
+    }
+    old_axis = axis;
+    if (gProgram_state.current_car.keys.acc || gProgram_state.current_car.joystick.acc > 0) {
+        axis = 2;
+        vel += 10.0f * pDelta_time / WORLD_SCALE_D;
+    } else if (gProgram_state.current_car.keys.dec || gProgram_state.current_car.joystick.dec > 0) {
+        axis = 2;
+        vel -= 10.0f * pDelta_time / WORLD_SCALE_D;
+    } else if (gProgram_state.current_car.keys.up && key0_down) {
+        axis = 1;
+        vel -= 3.0f * pDelta_time / WORLD_SCALE_D;
+    } else if (gProgram_state.current_car.keys.down && key0_down) {
+        axis = 1;
+        vel += 3.0f * pDelta_time / WORLD_SCALE_D;
+    } else if (gProgram_state.current_car.keys.left && key1_down) {
+        axis = 0;
+        vel += 3.0f * pDelta_time / WORLD_SCALE_D;
+    } else if (gProgram_state.current_car.keys.right && key1_down) {
+        axis = 0;
+        vel -= 3.0f * pDelta_time / WORLD_SCALE_D;
+    } else if (vel < 3.0f * pDelta_time && vel > -3.0f * pDelta_time) {
+        vel = 0.0f;
+    } else {
+        vel -= vel / fabs(vel) * pDelta_time * 3.0f;
+    }
+    if (axis != old_axis) {
+        vel = 0.0f;
+    }
+    if (gProgram_state.current_car.keys.brake) {
+        vel = 0.0f;
+    }
+    if (key0_down) {
+        i = 2;
+        pCar->collision_info->omega.v[1] = 0.0f;
+    } else {
+        i = 1;
+        pCar->collision_info->omega.v[2] = 0.0f;
+    }
+    if ((gProgram_state.current_car.keys.left || gProgram_state.current_car.joystick.left > 0) && !key1_down) {
+        pCar->collision_info->omega.v[i] += pDelta_time;
+    } else if ((gProgram_state.current_car.keys.right || gProgram_state.current_car.joystick.right > 0) && !key1_down) {
+        pCar->collision_info->omega.v[i] -= pDelta_time;
+    } else {
+        pCar->collision_info->omega.v[i] = 0.0f;
+    }
+    if (gProgram_state.current_car.keys.up && !key0_down) {
+        pCar->collision_info->omega.v[0] += pDelta_time;
+    } else if (gProgram_state.current_car.keys.down && !key0_down) {
+        pCar->collision_info->omega.v[0] -= pDelta_time;
+    } else {
+        pCar->collision_info->omega.v[0] = 0.0f;
+    }
+    if (pCar->collision_info->omega.v[0] != 0.0f) {
+        BrMatrix34PreRotateX(mat, BrRadianToAngle(pCar->collision_info->omega.v[0] * pDelta_time));
+    }
+    if (pCar->collision_info->omega.v[1] != 0.0f) {
+        BrVector3Copy(&tv, (br_vector3*)mat->m[3]);
+        BrVector3Sub((br_vector3*)mat->m[3], (br_vector3*)mat->m[3], &tv);
+        BrMatrix34PostRotateY(mat, BrRadianToAngle(pCar->collision_info->omega.v[1] * pDelta_time));
+        BrVector3Accumulate((br_vector3*)mat->m[3], &tv);
+    }
+    if (pCar->collision_info->omega.v[2] != 0.0f) {
+        BrMatrix34PreRotateZ(mat, BrRadianToAngle(pCar->collision_info->omega.v[2] * pDelta_time));
+    }
+    BrVector3Scale(&pCar->collision_info->v, (br_vector3*)mat->m[axis], -vel);
+    BrVector3Scale(&tv, &pCar->collision_info->v, pDelta_time);
+    BrVector3Accumulate((br_vector3*)mat->m[3], &tv);
+    if (gProgram_state.current_car.keys.holdw && !key0_down) {
+        BrVector3Copy(&b, (br_vector3*)mat->m[3]);
+        BrMatrix34RotateY(mat, 90 * BrDegreeToAngle(1) - BrRadianToAngle(atan2(mat->m[2][2], mat->m[2][0])));
+        BrVector3Copy((br_vector3*)mat->m[3], &b);
+        BrVector3SetFloat(&b, 0.0f, -10.0f, 0.0f);
+        BrVector3Copy(&a, (br_vector3*)mat->m[3]);
+        FindFace(&a, &b, &norm, &dist, &material);
+        a.v[1] += 10.0f;
+        FindFace(&a, &b, &norm2, &dist2, &material);
+        if (dist2 <= 1.0f) {
+            BrVector3SetFloat(&b, 0.0f, -0.501f, 0.0f);
+            a.v[1] -= 10.0f;
+            for (i = 0; i < 20; i++) {
+                a.v[1] += 0.5f;
+                FindFace(&a, &b, &norm2, &dist2, &material);
+                if (dist2 <= 1.0f) {
+                    break;
+                }
+            }
+            dist2 = -dist2 / 20.0f + (i + 1) * 0.05f;
+        }
+        if (dist2 < dist) {
+            dist = -dist2;
+            BrVector3Copy(&norm, &norm2);
+        }
+        if (fabs(dist) <= 1.0f) {
+            mat->m[3][1] -= dist * 10.0f;
+            ts = norm.v[2] * mat->m[2][2] + norm.v[0] * mat->m[2][0] + norm.v[1] * mat->m[2][1];
+            BrMatrix34PreRotateX(mat, BrRadianToAngle(asin(ts)));
+            ts = norm.v[2] * mat->m[0][2] + norm.v[0] * mat->m[0][0] + norm.v[1] * mat->m[0][1];
+            BrMatrix34PreRotateZ(mat, BrRadianToAngle(-asin(ts)));
+        }
+    } else if (gProgram_state.current_car.keys.holdw) {
+        BrMatrix34PreRotateX(mat, BrRadianToAngle(asin(mat->m[2][1])));
+        BrMatrix34PreRotateZ(mat, BrRadianToAngle(-asin(mat->m[0][1])));
+    }
+    BrVector3Negate(&pCar->direction, (br_vector3*)mat->m[2]);
+    BrMatrix34ApplyP(&pCar->pos, &pCar->collision_info->cmpos, mat);
+    RepositionAndOrientateChildren(pCar->collision_info, NULL);
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // FUNCTION: CARMA2_HW 0x0041fbe0
 // FUNCTION: CARMA2_SW 0x0041fc60
