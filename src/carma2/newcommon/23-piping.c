@@ -579,8 +579,6 @@ void C2_HOOK_CDECL ARDoSingleVariedSession(int pType, uintptr_t pOwner, int pCou
     AREndPipingSession();
 }
 
-extern void C2_HOOK_FASTCALL ARResetPipePlayToEnd(void);
-
 inline void C2_HOOK_FASTCALL ARResetPipePlayToEnd(void) {
 
     gPipe_play_ptr = gPipe_record_ptr;
@@ -773,8 +771,6 @@ void C2_HOOK_FASTCALL ARMainLoopStart(void) {
     gAction_replay_mode = 0;
     gLast_replay_frame_time = PDGetTotalTime();
 }
-
-extern void C2_HOOK_FASTCALL InitializeActionReplayPix(void);
 
 // FUNCTION: CARMA2_HW 0x00403d60
 // FUNCTION: CARMA2_SW 0x00403d60
