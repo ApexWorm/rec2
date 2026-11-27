@@ -107,7 +107,7 @@ extern int C2_HOOK_FASTCALL MoveSessionPointerForwardOne(tU8** pPtr);
 
 // UndoPipedSession
 
-// ARScanBuffer
+extern void C2_HOOK_FASTCALL ARScanBuffer(tU8** pPtr, tPipe_chunk_type pType, tU32 pDefault_time, tARScanBuffer_callback* pCallback, tARScanBuffer_time_check* pTime_check);
 
 // CheckSound
 
