@@ -277,7 +277,7 @@ float gPed_cos_table[256] = { 0 };
 // GLOBAL: CARMA2_HW 0x00677230
 // GLOBAL: CARMA2_SW 0x006719a0
 // GLOBAL: CARMA2_CHEAT 0x0067eae0
-float gFLOAT_00677230 = 0.f;
+float gFLOAT_00677230 = 0.0f;
 
 // GLOBAL: CARMA2_HW 0x00677234
 // GLOBAL: CARMA2_SW 0x006719a4
@@ -2494,7 +2494,7 @@ static inline void C2_HOOK_FASTCALL ClearOutMorphs(void) {
     int i;
 
     for (i = 0; i < (int)REC2_ASIZE(gPed_morphs); i++) {
-        gPed_morphs[i].field_0x4 = 0.f;
+        gPed_morphs[i].field_0x4 = 0.0f;
     }
 }
 
@@ -2518,8 +2518,8 @@ void C2_HOOK_FASTCALL InitBoner(tPedForms_vtable* pTable) {
         gPed_sin_table[i] = s;
         gPed_cos_table[i] = c;
     }
-    gFLOAT_00677728 = 0.f;
-    gFLOAT_00677230 = 1.f;
+    gFLOAT_00677728 = 0.0f;
+    gFLOAT_00677230 = 1.0f;
     gCount_pedestrian_personality_cloned_materials = 0;
     gPed_overall_movement_disabled = 0;
     gPed_retain_root_mode = 0;
