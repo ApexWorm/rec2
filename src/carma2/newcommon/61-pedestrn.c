@@ -1363,19 +1363,19 @@ void C2_HOOK_FASTCALL SetCharacterPosition(tPed_character_instance* pCharacter, 
         break;
     }
     mat = GetCharacterMatrixPtr(pCharacter);
-    BrVector3Set(&delta, 0.f, 0.f, 0.f);
+    BrVector3Set(&delta, 0.0f, 0.0f, 0.0f);
     if (move != NULL && move->field_0x2a == 0) {
         for (i = pCharacter->field_0x1c; i > 0; i--) {
             BrVector3Accumulate(&delta, (br_vector3*)move->frames[i].mat.m[3]);
         }
         if (!(move->looping_reset_flags & 0x1)) {
-            delta.v[0] = 0.f;
+            delta.v[0] = 0.0f;
         }
         if (!(move->looping_reset_flags & 0x2)) {
-            delta.v[1] = 0.f;
+            delta.v[1] = 0.0f;
         }
         if (!(move->looping_reset_flags & 0x4)) {
-            delta.v[2] = 0.f;
+            delta.v[2] = 0.0f;
         }
     }
     BrVector3Copy((br_vector3*)mat->m[3], &new_pos);
