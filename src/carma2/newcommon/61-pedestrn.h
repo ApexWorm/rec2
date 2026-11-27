@@ -520,7 +520,7 @@ extern int C2_HOOK_FASTCALL MakeCharacterRenderable(tPed_character_instance* pCh
 
 // CharacterNoLongerRenderable
 
-// CalcCollisionObjectThings
+extern void C2_HOOK_FASTCALL CalcCollisionObjectThings(tPhysics_object* pObject, br_bounds3* pFrame, int pNull, br_vector3* pBoneVec, br_vector3* pBonePtr);
 
 extern int C2_HOOK_FASTCALL SetCollisionObject(tPed_character_instance* pCharacter, tPhysics_object* pObject, br_actor* pActor, br_bounds3* pBounds, int pArg5, int pArg6, int pArg7, int pArg8, int pArg9, int pArg10, int pArg11);
 
@@ -538,13 +538,13 @@ extern int C2_HOOK_FASTCALL CharacterNoLongerCollideworthy(tPed_character_instan
 
 extern void C2_HOOK_FASTCALL SetObjectV(tPhysics_object* pObject, const br_vector3* pV);
 
-extern void C2_HOOK_FASTCALL SetObjectOmega(tPhysics_object* pObject, const br_vector3* pOmega);
+// SetObjectOmega
 
-extern void C2_HOOK_FASTCALL MakePartPhysicallyActive(tPhysics_object* pObject, const br_vector3* pV, const br_vector3* pOmega, int pArg4);
+// MakePartPhysicallyActive
 
-extern void C2_HOOK_FASTCALL TurnPhysicsOn(tPed_character_instance* pCharacter);
+// TurnPhysicsOn
 
-extern int C2_HOOK_FASTCALL MakeCharacterPhysicworthy(tPed_character_instance* pCharacter);
+// MakeCharacterPhysicworthy
 
 extern void C2_HOOK_FASTCALL RecalculateOrientationOfRoot(tPed_character_instance* pCharacter);
 
@@ -570,7 +570,7 @@ extern int C2_HOOK_FASTCALL SetCharacterMove(tPed_character_instance* pPed, int 
 
 // DRMatrix34RotateCos
 
-// DropPointOntoPlane
+extern void C2_HOOK_FASTCALL DropPointOntoPlane(const br_vector3* pPoint, const br_vector3* pPlane, br_vector3* pDest);
 
 extern void C2_HOOK_FASTCALL SetCharacterDirection(tPed_character_instance* pPed, const br_vector3* pDir, const br_vector3* pUp);
 
