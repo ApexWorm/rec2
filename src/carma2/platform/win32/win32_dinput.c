@@ -412,6 +412,7 @@ BOOL CALLBACK Win32DInputJoystickEnum(const DIDEVICEINSTANCEA* pDeviceInstance, 
 
 // FUNCTION: CARMA2_HW 0x00459ed0
 // FUNCTION: CARMA2_SW 0x00459c60
+// FUNCTION: CARMA2_CHEAT 0x0045a350
 tButtonJoystickInfo* C2_HOOK_FASTCALL AllocateCurrentJoystickData(size_t pSize) {
 
     if (pSize != 0 && gJoystick_index != -1 && gDirectInputJoystickInfos[gJoystick_index].data == NULL) {
@@ -442,6 +443,7 @@ void C2_HOOK_FASTCALL DisposeCurrentJoystickData(void) {
 // FUNCTION: CARMA2_HW 0x00459fe0
 // FUNCTION: CARMA2_SW 0x00459d70
 // FUNCTION: CARMA2_CHEAT 0x0045a460
+// FUNCTION: CARMA2_CHEAT 0x0045a460
 void C2_HOOK_FASTCALL AttachJoystickButtonInfos(size_t pSize, tWin32_void_voidptr_cbfn pCallback) {
     int original_index;
     int i;
@@ -453,12 +455,7 @@ void C2_HOOK_FASTCALL AttachJoystickButtonInfos(size_t pSize, tWin32_void_voidpt
         device = gDirectInputJoystickDevices[i];
         if (device != NULL && gDirectInputJoystickInfos[i].data == NULL) {
             gJoystick_index = i;
-            if (pSize != 0) {
-                gDirectInputJoystickInfos[i].data = malloc(pSize);
-                if (gDirectInputJoystickInfos[i].data != NULL) {
-                    gDirectInputJoystickInfos[i].sizeData = pSize;
-                }
-            }
+            AllocateCurrentJoystickData(pSize);
             if (gDirectInputJoystickInfos[i].data != NULL) {
                 pCallback(gDirectInputJoystickInfos[i].data);
             }
@@ -479,6 +476,7 @@ const char* C2_HOOK_FASTCALL GetCurrentJoystickName(void) {
 }
 
 // FUNCTION: CARMA2_HW 0x00459fb0
+// FUNCTION: CARMA2_SW 0x00459d40
 // FUNCTION: CARMA2_CHEAT 0x0045a430
 size_t C2_HOOK_FASTCALL GetCurrentJoystickCountButtons(void) {
     return gDirectInputJoystickInfos[gJoystick_index].count_buttons;
@@ -510,6 +508,10 @@ int C2_HOOK_FASTCALL PDIsJoystickAvailable(int pIndex) {
     return gDirectInputJoystickDevices[pIndex] != NULL;
 }
 
+#if defined(REC2_MATCHING) && defined(_MSC_VER)
+#pragma inline_depth(0)
+#endif
+
 // FUNCTION: CARMA2_HW 0x0045c370
 // FUNCTION: CARMA2_SW 0x0045bdb0
 // FUNCTION: CARMA2_CHEAT 0x0045c7f0
@@ -527,14 +529,18 @@ void C2_HOOK_FASTCALL CollectJoystickButtonInfo(tButtonJoystickInfo* pInfo) {
         } else {
             pInfo->buttons[i] = -1;
         }
-        pInfo->field_0xd4 = 1;
-        pInfo->field_0xd8 = 1.0f;
-        pInfo->field_0xdc = 1.0f;
-        pInfo->field_0xe0 = 0; /* or 0.f */
-        pInfo->field_0xe4 = 50;
-        pInfo->field_0xe8 = 0; /* or 0.f */
     }
+    pInfo->field_0xd4 = 1;
+    pInfo->field_0xd8 = 1.0f;
+    pInfo->field_0xdc = 1.0f;
+    pInfo->field_0xe0 = 0; /* or 0.f */
+    pInfo->field_0xe4 = 50;
+    pInfo->field_0xe8 = 0; /* or 0.f */
 }
+
+#if defined(REC2_MATCHING) && defined(_MSC_VER)
+#pragma inline_depth()
+#endif
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
