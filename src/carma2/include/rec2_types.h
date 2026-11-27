@@ -5402,7 +5402,7 @@ typedef struct tDrone_spec {
     tU16 field_0xa_pathnode_id;
     tS16 field_0xc;
     tS16 field_0xe;
-    undefined4 field_0x10;
+    tDrone_path_node_section* field_0x10;
     undefined4 field_0x14;
     br_vector3 field_0x18;
     br_vector3 pos;
