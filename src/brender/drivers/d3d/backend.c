@@ -1144,7 +1144,6 @@ HRESULT CALLBACK D3DEnumTextureFormats(LPDDSURFACEDESC lpDdsd, LPVOID lpContext)
     return 1;
 }
 
-
 // FUNCTION: D3D 0x10002ac0
 int C2_HOOK_CDECL SetD3DViewport(void) {
     D3DVIEWPORT2 viewport2;
@@ -1176,7 +1175,6 @@ int C2_HOOK_CDECL SetD3DViewport(void) {
     }
     return 0;
 }
-
 
 
 // FUNCTION: D3D 0x10004030
@@ -1878,7 +1876,6 @@ void C2_HOOK_CDECL DoD3DOperation(int operation) {
         return;
     }
 }
-
 
 // STUB: D3D 0x10008570
 void C2_HOOK_CDECL FUN_10008570(void* dst, br_uint_32 dst_width, br_uint_32 dst_height, br_uint_32 dst_stride, void* src, br_uint_32 src_width, br_uint_32 src_height, br_uint_32 src_stride) {
