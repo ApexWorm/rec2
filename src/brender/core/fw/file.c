@@ -155,6 +155,6 @@ int C2_HOOK_CDECL BrFilePrintf(void* f, char* fmt, ...) {
     va_start(args, fmt);
     n = BrVSprintf(BrScratchString(), fmt, args);
     va_end(args);
-    BrFileWrite(BrScratchString(), 1, n, f);
+    fw.fsys->write(BrScratchString(), 1, n, ((br_file*)f)->raw_file);
     return n;
 }
