@@ -28,7 +28,7 @@
 #include "53-controls.h"
 #include "59-camera.h"
 #include "27-powerup.h"
-#include "61-pedestrn.h"
+#include "61-pedestrn-phys.h"
 #include "63-loading3.h"
 #include "64-movie.h"
 #include "69-sound.h"
