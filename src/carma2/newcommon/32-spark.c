@@ -605,14 +605,15 @@ void C2_HOOK_FASTCALL DoSolidGraniteThing(tCar_spec* pCar) {
     }
 }
 
-#ifdef REC2_HW
 // STUB: CARMA2_HW 0x004f9180
+// STUB: CARMA2_SW 0x004f4800
 // STUB: CARMA2_CHEAT 0x004fee20
 void C2_HOOK_CDECL DoTrueColModelThing(br_actor* pActor, br_model* pModel, br_material* pMaterial, void* pArg4, br_uint_8 pArg5, int pArg6) {
     NOT_IMPLEMENTED();
 }
 
 // FUNCTION: CARMA2_HW 0x004f95e0
+// FUNCTION: CARMA2_SW 0x004f4c60
 // FUNCTION: CARMA2_CHEAT 0x004ff280
 int C2_HOOK_FASTCALL SetFoxModelCallback(br_model* pModel) {
 
@@ -622,6 +623,7 @@ int C2_HOOK_FASTCALL SetFoxModelCallback(br_model* pModel) {
 }
 
 // FUNCTION: CARMA2_HW 0x004f9390
+// FUNCTION: CARMA2_SW 0x004f4a10
 // FUNCTION: CARMA2_CHEAT 0x004ff030
 int C2_HOOK_FASTCALL ResetFoxModelCallback(br_model* pModel) {
     pModel->flags &= ~BR_MODF_CUSTOM;
@@ -630,6 +632,7 @@ int C2_HOOK_FASTCALL ResetFoxModelCallback(br_model* pModel) {
 }
 
 // FUNCTION: CARMA2_HW 0x004f93b0
+// FUNCTION: CARMA2_SW 0x004f4a30
 // FUNCTION: CARMA2_CHEAT 0x004ff050
 int C2_HOOK_FASTCALL ResetFoxLighting(br_material* pMaterial) {
 
@@ -642,13 +645,16 @@ int C2_HOOK_FASTCALL ResetFoxLighting(br_material* pMaterial) {
     }
 }
 
+#ifdef REC2_HW
 inline void C2_HOOK_FASTCALL CancelAlternateFoxEffect(tCar_spec* pCar_spec) {
 
     ForEveryCarModel(pCar_spec, ResetFoxModelCallback, 1);
     ForEveryCarMaterial(pCar_spec, ResetFoxLighting, 1);
 }
+#endif
 
 // FUNCTION: CARMA2_HW 0x004f9600
+// FUNCTION: CARMA2_SW 0x004f4c80
 // FUNCTION: CARMA2_CHEAT 0x004ff2a0
 int C2_HOOK_FASTCALL SetFoxLighting(br_material* pMaterial) {
 
@@ -661,6 +667,7 @@ int C2_HOOK_FASTCALL SetFoxLighting(br_material* pMaterial) {
     }
 }
 
+#ifdef REC2_HW
 inline void C2_HOOK_FASTCALL SetupAlternateFoxEffect(tCar_spec* pCar_spec) {
     br_material* material;
 
