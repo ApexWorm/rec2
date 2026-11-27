@@ -47,6 +47,7 @@ br_pixelmap* gDuplicate_pixelmap;
 br_material* gDuplicate_material;
 
 // GLOBAL: CARMA2_HW 0x006aaa24
+// GLOBAL: CARMA2_SW 0x006a4474
 // GLOBAL: CARMA2_CHEAT 0x006b259c
 br_model* gDuplicate_model;
 
@@ -320,7 +321,7 @@ tAdd_to_storage_result C2_HOOK_FASTCALL AddMaterialToStorage(tBrender_storage* p
 // FUNCTION: CARMA2_HW 0x00501260
 // FUNCTION: CARMA2_SW 0x004fcbc0
 // FUNCTION: CARMA2_CHEAT 0x00506f10
-tAdd_to_storage_result C2_HOOK_FASTCALL AddModelToStorage(tBrender_storage* pStorage_space, br_model* pThe_mod) {
+inline tAdd_to_storage_result C2_HOOK_FASTCALL AddModelToStorage(tBrender_storage* pStorage_space, br_model* pThe_mod) {
     int i;
 
     gDuplicate_model = NULL;
@@ -584,7 +585,9 @@ int C2_HOOK_FASTCALL AddModels(tBrender_storage* pStorage_space, const char* pPa
 
     new_ones = 0;
     total = BrModelLoadMany(pPath, temp_array, REC2_ASIZE(temp_array));
+#ifdef REC2_HW
     WhitenVertexRGB(temp_array, total);
+#endif
     if (total == 0) {
         FatalError(kFatalError_CannotLoadModelFileOrItIsEmpty_S, pPath);
     }
@@ -595,6 +598,7 @@ int C2_HOOK_FASTCALL AddModels(tBrender_storage* pStorage_space, const char* pPa
         switch (AddModelToStorage(pStorage_space, temp_array[i])) {
         case eStorage_allocated:
             temp_array[i]->flags |= BR_MODF_UPDATEABLE;
+            temp_array[i]->flags &= ~BR_MODF_DONT_WELD;
             BrModelAdd(temp_array[i]);
             new_ones++;
             break;
