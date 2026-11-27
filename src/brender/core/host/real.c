@@ -77,7 +77,7 @@ C2_MATCHING_NAKED br_error C2_HOOK_CDECL HostRealAllocate(struct host_real_memor
         ret
     }
 #else
-    NOT_IMPLEMENTED();
+    /* No DOS extender on Win32: there is no real-mode memory to allocate */
     return 0;
 #endif
 }
@@ -97,7 +97,6 @@ C2_MATCHING_NAKED br_error C2_HOOK_CDECL HostRealFree(struct host_real_memory *m
         ret
     }
 #else
-    NOT_IMPLEMENTED();
     return 0;
 #endif
 }
