@@ -12,6 +12,10 @@
 #include "c2_hooks.h"
 #include "rec2_types.h"
 
+extern const char* gGroove_funk_type_names[3];
+extern const char* gAxis_names[3];
+extern const char* gFunk_speed_control_names[2];
+extern const char* gReverseness_type_names[2];
 extern br_vector3 gRender_bounds_centre;
 extern int gINT_00681fb0;
 extern int gFrame;
@@ -55,25 +59,25 @@ extern void C2_HOOK_FASTCALL PreprocessDronePaths(void);
 
 extern int C2_HOOK_CDECL LinkyCallback(br_actor* pActor, void* pData);
 
-// LinkDroneActorsToModelsAndSetRenderStyle
+extern void C2_HOOK_FASTCALL LinkDroneActorsToModelsAndSetRenderStyle(tDrone_spec* pDrone_spec, int pModel_start, int pModel_end);
 
 extern void C2_HOOK_FASTCALL LoadDroneActorsModels(tDrone_spec* pDrone_spec);
 
 extern int C2_HOOK_FASTCALL ReadPastBoundsShapesHeader(FILE* pF);
 
-// ReadPastThisLine
+extern int C2_HOOK_FASTCALL ReadPastThisLine(FILE* pF, const char* pLine);
 
-// MatchFGType
+extern int C2_HOOK_FASTCALL MatchFGType(const char* pName);
 
-// GetAxisFromString
+extern int C2_HOOK_FASTCALL GetAxisFromString(const char* pName);
 
-// GetSpeedControlFromString
+extern int C2_HOOK_FASTCALL GetSpeedControlFromString(const char* pName);
 
 extern br_actor* C2_HOOK_CDECL MrFindy(br_actor* pActor, const char* pName);
 
-// FindDroneChildActor
+extern br_actor* C2_HOOK_FASTCALL FindDroneChildActor(tDrone_spec* pDrone_spec, const char* pName);
 
-// GetReversenessFromString
+extern int C2_HOOK_FASTCALL GetReversenessFromString(const char* pName);
 
 extern void C2_HOOK_FASTCALL LoadFunksAndGrooves(tDrone_spec* pDrone_spec, FILE* pF);
 
