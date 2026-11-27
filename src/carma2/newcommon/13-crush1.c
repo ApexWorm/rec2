@@ -2195,15 +2195,66 @@ intptr_t C2_HOOK_FASTCALL DRActorEnumRecurseUltraPlus(br_actor* pActor, br_actor
 
 // CrushBendFlapRend
 
-// SphericizeModel
+inline void C2_HOOK_FASTCALL SphericizeModel(br_model* pModel, br_vector3* pCenter, br_scalar pRadius) {
+    tU16 i;
+    br_vector3 v;
 
-// SphericizePhysics
+    for (i = 0; i < pModel->nvertices; i++) {
+        BrVector3Sub(&v, &pModel->vertices[i].p, pCenter);
+        BrVector3Normalise(&v, &v);
+        BrVector3Scale(&v, &v, pRadius);
+        BrVector3Add(&pModel->vertices[i].p, &v, pCenter);
+    }
+    BrModelUpdate(pModel, BR_MODU_VERTEX_POSITIONS);
+}
 
-// STUB: CARMA2_HW 0x004391d0
-// STUB: CARMA2_SW 0x00439210
-// STUB: CARMA2_CHEAT 0x004393e0
+inline void C2_HOOK_FASTCALL SphericizePhysics(tCar_spec* pCar, br_vector3* pCenter, br_scalar pRadius) {
+    br_vector3 offset;
+
+    gGonad_sphere_collision_shape->sphere.sphere.radius = pRadius;
+    BrVector3Copy(&gGonad_sphere_collision_shape->sphere.sphere.center, pCenter);
+    gGonad_sphere_collision_shape->common.next = NULL;
+    FillInShape(gGonad_sphere_collision_shape);
+    pCar->collision_info->shape = gGonad_sphere_collision_shape;
+    UpdateCollisionObject(pCar->collision_info);
+    BrVector3Copy(&pCar->collision_info->cmpos, pCenter);
+    pCar->collision_info->M = 50.f;
+    pCar->collision_info->I.v[0] = (pCar->collision_info->shape->sphere.sphere.radius * pCar->collision_info->shape->sphere.sphere.radius) * pCar->collision_info->M / 6.f;
+    pCar->collision_info->I.v[1] = (pCar->collision_info->shape->sphere.sphere.radius * pCar->collision_info->shape->sphere.sphere.radius) * pCar->collision_info->M / 6.f;
+    pCar->collision_info->I.v[2] = (pCar->collision_info->shape->sphere.sphere.radius * pCar->collision_info->shape->sphere.sphere.radius) * pCar->collision_info->M / 6.f;
+    pCar->collision_info->world_friction = 16.f;
+    gGonad_sphere_collision_shape->common.type = kCollisionShapeType_Box;
+    while (!TestForCarInSensiblePlace(pCar, &offset)) {
+        BrVector3Scale(&offset, &offset, 0.5f / WORLD_SCALE);
+        BrVector3Accumulate((br_vector3*)pCar->collision_info->transform_matrix.m[3], &offset);
+    }
+    gGonad_sphere_collision_shape->common.type = kCollisionShapeType_Sphere;
+}
+
+// FUNCTION: CARMA2_HW 0x004391d0
+// FUNCTION: CARMA2_SW 0x00439210
+// FUNCTION: CARMA2_CHEAT 0x004393e0
 void C2_HOOK_FASTCALL SphericizeCar(tCar_spec* pCar) {
-    NOT_IMPLEMENTED();
+    br_model* shell_model;
+    br_scalar radius;
+    br_vector3 center;
+    br_vector3 tmp;
+
+    shell_model = pCar->shell_model;
+    if (shell_model != NULL) {
+        center.v[0] = (0.5f * shell_model->bounds.min.v[0]) + (0.5f * shell_model->bounds.max.v[0]);
+        center.v[1] = (0.5f * shell_model->bounds.min.v[1]) + (0.5f * shell_model->bounds.max.v[1]);
+        center.v[2] = (0.5f * shell_model->bounds.min.v[2]) + (0.5f * shell_model->bounds.max.v[2]);
+        BrVector3Sub(&tmp, &center, &shell_model->bounds.min);
+        radius = BrVector3Length(&tmp);
+        SphericizeModel(shell_model, &center, radius);
+        pCar->car_model_actor->children = NULL;
+        SphericizePhysics(pCar, &center, radius);
+        pCar->invulnerable_no_crushage = 1;
+        pCar->invulnerable_no_damage = 1;
+        pCar->use_shell_model = 1;
+        pCar->field_0x18c8 = 2;
+    }
 }
 
 // FUNCTION: CARMA2_HW 0x004398d0

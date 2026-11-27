@@ -398,9 +398,9 @@ extern intptr_t C2_HOOK_FASTCALL DRActorEnumRecurseUltraPlus(br_actor* pActor, b
 
 // CrushBendFlapRend
 
-// SphericizeModel
+extern void C2_HOOK_FASTCALL SphericizeModel(br_model* pModel, br_vector3* pCenter, br_scalar pRadius);
 
-// SphericizePhysics
+extern void C2_HOOK_FASTCALL SphericizePhysics(tCar_spec* pCar, br_vector3* pCenter, br_scalar pRadius);
 
 extern void C2_HOOK_FASTCALL SphericizeCar(tCar_spec* pCar);
 
