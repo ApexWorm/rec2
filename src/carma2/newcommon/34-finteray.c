@@ -529,9 +529,9 @@ inline int C2_HOOK_FASTCALL SpherePolyIntersection(tCollision_shape_polyhedron_d
         }
     }
     count = 0;
-    BrVector3Set(pNormal, 0.f, 0.f, 0.f);
+    BrVector3Set(pNormal, 0.0f, 0.0f, 0.0f);
     for (i = 0; i < pPoly->count_planes; i++) {
-        if (d[i] < 0.f) {
+        if (d[i] < 0.0f) {
             count++;
             BrVector3Accumulate(pNormal, &pPoly->planes[i]);
         }
