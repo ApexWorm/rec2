@@ -33,11 +33,11 @@ extern void C2_HOOK_FASTCALL IncrementCheckpoint(void);
 
 extern void C2_HOOK_FASTCALL IncrementLap(void);
 
-// RayHitFace
+extern int C2_HOOK_FASTCALL RayHitFace(br_vector3* pV0, br_vector3* pV1, br_vector3* pV2, br_vector3* pNormal, br_vector3* pStart, br_vector3* pDir);
 
 extern void C2_HOOK_FASTCALL WrongCheckpoint(int pCheckpoint_index);
 
-// CheckCheckpoints
+extern void C2_HOOK_FASTCALL CheckCheckpoints(void);
 
 extern void C2_HOOK_FASTCALL TotalRepair(void);
 

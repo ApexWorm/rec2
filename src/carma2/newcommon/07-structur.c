@@ -14,6 +14,7 @@
 #include "15-displays.h"
 #include "18b-graphics2.h"
 #include "30-opponent.h"
+#include "34-finteray.h"
 #include "38-flicplay.h"
 #include "41-utility.h"
 #include "43-pratcam.h"
@@ -237,7 +238,19 @@ void C2_HOOK_FASTCALL IncrementLap(void) {
     }
 }
 
-// RayHitFace
+inline int C2_HOOK_FASTCALL RayHitFace(br_vector3* pV0, br_vector3* pV1, br_vector3* pV2, br_vector3* pNormal, br_vector3* pStart, br_vector3* pDir) {
+    tFace_ref the_face;
+    br_scalar rt;
+    br_vector3 rp;
+
+    the_face.material = NULL;
+    the_face.v[0] = *pV0;
+    the_face.v[1] = *pV1;
+    the_face.v[2] = *pV2;
+    the_face.normal = *pNormal;
+    CheckSingleFace(&the_face, pStart, pDir, &the_face.normal, &rt, &rp);
+    return rt >= 0.0f && rt <= 1.0f;
+}
 
 // FUNCTION: CARMA2_HW 0x005033e0
 // FUNCTION: CARMA2_SW 0x004fed30
@@ -274,7 +287,98 @@ void C2_HOOK_FASTCALL WrongCheckpoint(int pCheckpoint_index) {
     }
 }
 
-// CheckCheckpoints
+// FUNCTION: CARMA2_HW 0x005034b0
+// FUNCTION: CARMA2_SW 0x004fee00
+// FUNCTION: CARMA2_CHEAT 0x00509150
+void C2_HOOK_FASTCALL CheckCheckpoints(void) {
+    tCar_spec* car;
+    br_vector3 orig;
+    br_vector3 dir;
+    int i;
+    int j;
+    int cat;
+    int car_count;
+    int car_index;
+    tNet_game_player_info* net_player;
+
+    if (gNet_mode == eNet_mode_client) {
+        return;
+    }
+    if (gNet_mode == eNet_mode_host
+            && gCurrent_net_game->type != eNet_game_type_5
+            && gCurrent_net_game->type != eNet_game_type_checkpoint
+            && gCurrent_net_game->type != eNet_game_type_4) {
+        return;
+    }
+    for (cat = eVehicle_self; cat <= gNet_mode; cat++) {
+        if (cat == eVehicle_self) {
+            car_count = 1;
+        } else {
+            car_count = GetCarCount(cat);
+        }
+        for (car_index = 0; car_index < car_count; car_index++) {
+            if (cat == eVehicle_self) {
+                car = &gProgram_state.current_car;
+            } else {
+                car = GetCarSpec(cat, car_index);
+            }
+            orig = *(br_vector3*)car->old_frame_mat.m[3];
+            BrVector3Sub(&dir, &car->car_master_actor->t.t.translate.t, &orig);
+            for (i = 0; i < gCurrent_race.check_point_count; i++) {
+                for (j = 0; j < gCurrent_race.checkpoints[i].count_quads; j++) {
+                    if (RayHitFace(&gCurrent_race.checkpoints[i].quads[j].points[0],
+                            &gCurrent_race.checkpoints[i].quads[j].points[1],
+                            &gCurrent_race.checkpoints[i].quads[j].points[2],
+                            &gCurrent_race.checkpoints[i].normals[j],
+                            &orig, &dir)
+                        || RayHitFace(&gCurrent_race.checkpoints[i].quads[j].points[0],
+                            &gCurrent_race.checkpoints[i].quads[j].points[2],
+                            &gCurrent_race.checkpoints[i].quads[j].points[3],
+                            &gCurrent_race.checkpoints[i].normals[j],
+                            &orig, &dir)) {
+                        if (gNet_mode != eNet_mode_none) {
+                            net_player = NetPlayerFromCar(car);
+                            if (gCurrent_net_game->type == eNet_game_type_checkpoint) {
+                                if (net_player->score2 & (1 << i)) {
+                                    net_player->score2 &= ~(1 << i);
+                                    SendGameplay(net_player->ID, eNet_gameplay_checkpoint, i, 0, 0, 0);
+                                } else {
+                                    SendGameplay(net_player->ID, eNet_gameplay_wrong_checkpoint, i, 0, 0, 0);
+                                }
+                            } else if (gCurrent_net_game->type == eNet_game_type_5) {
+                                if (net_player->score2 % gCurrent_race.check_point_count == i) {
+                                    net_player->score2++;
+                                    SendGameplay(net_player->ID, eNet_gameplay_checkpoint, i, 0, 0, 0);
+                                    gLast_checkpoint_time = GetTotalTime();
+                                    if (net_player->score2 >= gCurrent_net_game->options.starting_target * gCurrent_race.check_point_count) {
+                                        DeclareWinner(net_player - gNet_players);
+                                    }
+                                } else {
+                                    SendGameplay(net_player->ID, eNet_gameplay_wrong_checkpoint, i, 0, 0, 0);
+                                }
+                            } else {
+                                if (net_player->score2 % gCurrent_race.check_point_count == i) {
+                                    net_player->score2++;
+                                    SendGameplay(net_player->ID, eNet_gameplay_checkpoint, i, 0, 0, 0);
+                                } else {
+                                    SendGameplay(net_player->ID, eNet_gameplay_wrong_checkpoint, i, 0, 0, 0);
+                                }
+                            }
+                        } else {
+                            if (i + 1 == gCheckpoint) {
+                                IncrementCheckpoint();
+                            } else {
+                                WrongCheckpoint(i);
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
+            car->old_frame_mat = car->car_master_actor->t.t.mat;
+        }
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x005039b0
 // FUNCTION: CARMA2_SW 0x004ff300
