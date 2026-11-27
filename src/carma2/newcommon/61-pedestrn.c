@@ -653,9 +653,69 @@ void C2_HOOK_FASTCALL PedApplyPedFPChange(tPedestrian* pPed, float pSpeed) {
     }
 }
 
-// PedApplyStatus
+#if defined(REC2_MATCHING) && defined(_MSC_VER)
+#pragma inline_depth(0)
+#endif
 
-// PedUndoStatus
+// FUNCTION: CARMA2_HW 0x004ca680
+// FUNCTION: CARMA2_SW 0x004c6db0
+// FUNCTION: CARMA2_CHEAT 0x004d01c0
+void C2_HOOK_FASTCALL PedApplyStatus(tPedestrian* pPed, tS8 pArg2, tS8 pArg3, tS8 pArg4, tS8 pArg5, tS8 pArg6, tS8 pArg7, br_vector3* pArg8, br_vector3* pArg9, br_matrix34* pArg10) {
+
+    if (pArg3 != -1) {
+        if (pArg3 != 0) {
+            pPed->flags |= 0x1;
+            MakeCharacterRenderable2(pPed->character, pArg6);
+        } else {
+            pPed->flags &= ~0x1;
+            CharacterNoLongerRenderable(pPed->character);
+        }
+    }
+    if (pArg5 != -1) {
+        pPed->character->field_0x14 = pArg5;
+        pPed->character->field_0x5 = pArg7;
+        if ((pArg4 & 0x4) && !(pArg5 & 0x4)) {
+            RecalculateOrientationOfRoot(pPed->character);
+        }
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x004ca6e0
+// FUNCTION: CARMA2_SW 0x004c6e10
+// FUNCTION: CARMA2_CHEAT 0x004d0220
+void C2_HOOK_FASTCALL PedUndoStatus(tPedestrian* pPed, tS8 pArg2, tS8 pArg3, tS8 pArg4, tS8 pArg5, tS8 pArg6, tS8 pArg7, br_vector3* pArg8, br_vector3* pArg9, br_matrix34* pArg10) {
+
+    if (pArg2 != -1) {
+        if (pArg2 != 0) {
+            pPed->flags |= 0x1;
+            MakeCharacterRenderable2(pPed->character, pArg6);
+        } else {
+            pPed->flags &= ~0x1;
+            CharacterNoLongerRenderable(pPed->character);
+        }
+    }
+    if (pArg4 != -1) {
+        if (!(pArg4 & 0x4) && (pArg5 & 0x4)) {
+            pPed->character->field_0x14 = pArg4;
+            pPed->character->field_0x5 = pArg7;
+            SetCharacterDirection(pPed->character, pArg8, pArg9);
+            BrMatrix34Copy(&pPed->character->field_0x8c, pArg10);
+            SetCharacterBonePositions(pPed->character, 0, 0);
+        } else if (!(pArg5 & 0x4) && (pArg4 & 0x4)) {
+            BrMatrix34Copy(&pPed->character->field_0x8c, pArg10);
+            SetCharacterBonePositions(pPed->character, 0, 0);
+            pPed->character->field_0x14 = pArg4;
+            pPed->character->field_0x5 = pArg7;
+        } else {
+            pPed->character->field_0x14 = pArg4;
+            pPed->character->field_0x5 = pArg7;
+        }
+    }
+}
+
+#if defined(REC2_MATCHING) && defined(_MSC_VER)
+#pragma inline_depth()
+#endif
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
