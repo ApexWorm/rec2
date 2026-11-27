@@ -76,6 +76,7 @@ size_t gPixelmap_buffer_size;
 tPolyFont gPoly_fonts[27];
 
 // GLOBAL: CARMA2_HW 0x0068648c
+// GLOBAL: CARMA2_SW 0x00680bcc
 // GLOBAL: CARMA2_CHEAT 0x0068dd34
 int gSize_font_texture_pages;
 
@@ -84,14 +85,17 @@ int gSize_font_texture_pages;
 tPolyFontBorderColours gPoly_font_border_colours[27];
 
 // GLOBAL: CARMA2_HW 0x00686488
+// GLOBAL: CARMA2_SW 0x00680bc8
 // GLOBAL: CARMA2_CHEAT 0x0068dd30
 int gInterface_fonts_loaded;
 
 // GLOBAL: CARMA2_HW 0x00765ea0
+// GLOBAL: CARMA2_SW 0x0075c400
 // GLOBAL: CARMA2_CHEAT 0x0076d540
 int gInitial_count_font_texture_pages;
 
 // GLOBAL: CARMA2_HW 0x00686494
+// GLOBAL: CARMA2_SW 0x00680bd4
 // GLOBAL: CARMA2_CHEAT 0x0068dd3c
 int gInterface_polyfont_texture_pages;
 
@@ -661,6 +665,7 @@ void C2_HOOK_FASTCALL LoadInterfaceFonts(void) {
 
     if (!gInterface_fonts_loaded) {
         gSize_font_texture_pages = gInitial_count_font_texture_pages;
+#ifdef REC2_HW
         CreatePolyFont(kPolyfont_hand_green_15pt_unlit, "HAND15U", 1.0f, 16);
         CreatePolyFont(kPolyfont_hand_green_15pt_lit, "HAND15", 1.0f, 16);
         CreatePolyFont(kPolyfont_hand_red_15pt_unlit, "HAND15U", 1.0f, 16);
@@ -674,6 +679,22 @@ void C2_HOOK_FASTCALL LoadInterfaceFonts(void) {
         CreatePolyFont(kPolyfont_serp_green_38pt_unlit, "SERP38U", 1.0f, 64);
         CreatePolyFont(kPolyfont_serp_green_38pt_lit, "SERP38", 1.0f, 64);
         CreatePolyFont(kPolyfont_highlighter, "HAND15lo", 1.0f, 16);
+#endif
+#ifdef REC2_SW
+        CreatePolyFont(kPolyfont_hand_green_15pt_unlit, "HAND15lo", 1.0f, 16);
+        CreatePolyFont(kPolyfont_hand_green_15pt_lit, "HAND15lo", 1.0f, 16);
+        CreatePolyFont(kPolyfont_hand_red_15pt_unlit, "HAND15lo", 1.0f, 16);
+        CreatePolyFont(kPolyfont_hand_red_15pt_lit, "HAND15lo", 1.0f, 16);
+        CreatePolyFont(kPolyfont_hand_green_10pt_unlit, "HAND10lo", 1.0f, 16);
+        CreatePolyFont(kPolyfont_hand_green_10pt_lit, "HAND10lo", 1.0f, 16);
+        CreatePolyFont(kPolyfont_serp_red_15pt_lit, "SERP15lo", 1.0f, 16);
+        CreatePolyFont(kPolyfont_serp_red_30pt_lit, "SERP30lo", 1.0f, 32);
+        CreatePolyFont(kPolyfont_serp_green_30pt_unlit, "SERP30lo", 1.0f, 32);
+        CreatePolyFont(kPolyfont_serp_green_30pt_lit, "SERP30lo", 1.0f, 32);
+        CreatePolyFont(kPolyfont_serp_green_38pt_unlit, "SERP38lo", 1.0f, 64);
+        CreatePolyFont(kPolyfont_serp_green_38pt_lit, "SERP38lo", 1.0f, 64);
+        CreatePolyFont(kPolyfont_highlighter, "HAND15lo", 1.0f, 16);
+#endif
         gInterface_polyfont_texture_pages = gSize_font_texture_pages - gInitial_count_font_texture_pages;
         gInterface_fonts_loaded = 1;
     }
