@@ -421,11 +421,11 @@ void C2_HOOK_FASTCALL RenderSparks(br_pixelmap* pRender_screen, br_pixelmap* pDe
         BrVector3Scale(&tv, &gSparks[i].normal, ts);
         BrVector3Sub(&gSparks[i].v, &gSparks[i].v, &tv);
         if (gSparks[i].time_sync != 0) {
-            BrVector3Scale(&o, &gSparks[i].v, gSparks[i].time_sync / 1000.f);
+            BrVector3Scale(&o, &gSparks[i].v, gSparks[i].time_sync / 1000.0f);
             gSparks[i].count += gSparks[i].time_sync - pTime;
             gSparks[i].time_sync = 0;
         } else {
-            BrVector3Scale(&o, &gSparks[i].v, pTime / 1000.f);
+            BrVector3Scale(&o, &gSparks[i].v, pTime / 1000.0f);
             gSparks[i].count -= pTime;
         }
         BrVector3Accumulate(&gSparks[i].pos, &o);
@@ -433,12 +433,12 @@ void C2_HOOK_FASTCALL RenderSparks(br_pixelmap* pRender_screen, br_pixelmap* pDe
         if (time > 150) {
             time = 150;
         }
-        ts = -time / 1000.f;
+        ts = -time / 1000.0f;
         if (gSparks[i].colour != 0) {
             ts /= 2.0f;
         }
         BrVector3Scale(&gSparks[i].length, &gSparks[i].v, ts);
-        ts = pTime * 10.f / (WORLD_SCALE * 100.f);
+        ts = pTime * 10.0f / (WORLD_SCALE * 100.0f);
         if (gSparks[i].car != NULL) {
             BrMatrix34ApplyV(&tv, &gSparks[i].length, &gSparks[i].car->car_master_actor->t.t.mat);
             BrVector3Copy(&gSparks[i].length, &tv);
