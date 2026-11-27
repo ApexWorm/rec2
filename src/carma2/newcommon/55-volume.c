@@ -89,24 +89,24 @@ tSpecial_volume* C2_HOOK_FASTCALL FindSpecialVolume(br_vector3* pP, tSpecial_vol
                     && pP->v[1] > v->boundary.box.bounds.min.v[1]
                     && pP->v[1] < v->boundary.box.bounds.max.v[1]) {
                 BrMatrix34ApplyP(&pnt_norm, pP, &v->boundary.box.inv_mat);
-                fartest_dist = 0.f;
+                fartest_dist = 0.0f;
                 for (j = 0; j < 3; j++) {
-                    if (pnt_norm.v[j] < -1.f) {
-                        dist = -1.f - pnt_norm.v[j];
+                    if (pnt_norm.v[j] < -1.0f) {
+                        dist = -1.0f - pnt_norm.v[j];
                         bnds_axis = j + 3;
-                    } else if (pnt_norm.v[j] > 1.f) {
-                        dist = pnt_norm.v[j] - 1.f;
+                    } else if (pnt_norm.v[j] > 1.0f) {
+                        dist = pnt_norm.v[j] - 1.0f;
                         bnds_axis = j;
                     } else {
-                        dist = 0.f;
+                        dist = 0.0f;
                     }
                     if (dist > fartest_dist) {
                         fartest_dist = dist;
                         fartest_bnds_axis = bnds_axis;
                     }
                 }
-                if (fartest_dist == 0.f || v->soundfx_type == kSoundFx_None) {
-                    if (fartest_dist == 0.f) {
+                if (fartest_dist == 0.0f || v->soundfx_type == kSoundFx_None) {
+                    if (fartest_dist == 0.0f) {
                         containing_volume = v;
                     }
                 } else {
@@ -123,7 +123,7 @@ tSpecial_volume* C2_HOOK_FASTCALL FindSpecialVolume(br_vector3* pP, tSpecial_vol
             break;
         case eFx_boundary_plane:
             dist = DistanceFromFaceND(pP, (br_vector3*)v->boundary.plane.v, v->boundary.plane.v[3]);
-            if (dist < 0.f) {
+            if (dist < 0.0f) {
                 containing_volume = v;
             } else if (dist < 1e7f && v->soundfx_type != kSoundFx_None) {
                 sound_dist = dist;
@@ -135,13 +135,13 @@ tSpecial_volume* C2_HOOK_FASTCALL FindSpecialVolume(br_vector3* pP, tSpecial_vol
             break;
         }
         if (containing_volume != NULL) {
-            sound_dist = 0.f;
+            sound_dist = 0.0f;
             sound_volume = containing_volume;
             if (result == NULL) {
                 result = containing_volume;
             }
         }
-        if (pArg3 && sound_volume != NULL && sound_dist < 10.f) {
+        if (pArg3 && sound_volume != NULL && sound_dist < 10.0f) {
             DoEnvSound(sound_volume, pP, sound_volume->soundfx_type, &sound_volume->soundfx_data, sound_dist, &sound_dir);
         }
     }
