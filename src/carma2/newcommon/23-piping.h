@@ -393,7 +393,7 @@ extern void C2_HOOK_FASTCALL ApplyActorTrans(tPipe_chunk** pChunk);
 
 extern void C2_HOOK_FASTCALL ApplyPedDir(tPipe_chunk** pChunk);
 
-// ApplyPedMove
+extern void C2_HOOK_FASTCALL ApplyPedMove(tPipe_chunk** pChunk);
 
 // ApplyPedPhysics
 
@@ -491,7 +491,7 @@ extern void C2_HOOK_FASTCALL UndoActorTrans(tPipe_chunk** pChunk, tPipe_chunk* p
 
 // UndoPedStatus
 
-// UndoPedMove
+extern void C2_HOOK_FASTCALL UndoPedMove(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk);
 
 extern void C2_HOOK_FASTCALL UndoPedDismember(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk);
 
