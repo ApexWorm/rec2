@@ -310,6 +310,7 @@ void C2_HOOK_CDECL NewObjective(tOpponent_spec* pOpponent_spec, tOpponent_object
 
 // FUNCTION: CARMA2_HW 0x004aae20
 // FUNCTION: CARMA2_SW 0x004a6f90
+// FUNCTION: CARMA2_CHEAT 0x004ac310
 void C2_HOOK_FASTCALL CalcRaceRoute(tOpponent_spec* pOpponent_spec) {
     tS16 section_no;
     tS16 section_no_index;
@@ -734,6 +735,7 @@ inline int C2_HOOK_FASTCALL LastTwatterAPlayer(tOpponent_spec* pOpponent_spec) {
 
 // FUNCTION: CARMA2_HW 0x004ace20
 // FUNCTION: CARMA2_SW 0x004a8f90
+// FUNCTION: CARMA2_CHEAT 0x004ae310
 void C2_HOOK_FASTCALL ObjectiveComplete(tOpponent_spec* pOpponent_spec) {
     DoNotDprintf("%s: Objective Completed", pOpponent_spec->car_spec->driver_name);
     pOpponent_spec->new_objective_required = 1;
@@ -801,6 +803,7 @@ void C2_HOOK_FASTCALL TeleportOpponentToNearestSafeLocation(tOpponent_spec* pOpp
 
 // FUNCTION: CARMA2_HW 0x004ace70
 // FUNCTION: CARMA2_SW 0x004a8fe0
+// FUNCTION: CARMA2_CHEAT 0x004ae360
 void C2_HOOK_FASTCALL ChooseNewObjective(tOpponent_spec* pOpponent_spec, int pMust_choose_one) {
     char str[256];
 
@@ -991,6 +994,7 @@ void C2_HOOK_FASTCALL ChooseNewObjective(tOpponent_spec* pOpponent_spec, int pMu
 
 // FUNCTION: CARMA2_HW 0x004a7ea0
 // FUNCTION: CARMA2_SW 0x004a4010
+// FUNCTION: CARMA2_CHEAT 0x004a91b0
 void C2_HOOK_FASTCALL AddIfNotInList(tPhysics_object* pObject, tPhysics_object** pList, int pCount) {
     int i;
 
@@ -1005,6 +1009,7 @@ void C2_HOOK_FASTCALL AddIfNotInList(tPhysics_object* pObject, tPhysics_object**
 
 // FUNCTION: CARMA2_HW 0x004a7ef0
 // FUNCTION: CARMA2_SW 0x004a4060
+// FUNCTION: CARMA2_CHEAT 0x004a9200
 void C2_HOOK_FASTCALL RemoveAnythingStillInList(tPhysics_object** pList, int pCount) {
     int i;
 
@@ -1239,6 +1244,7 @@ void C2_HOOK_FASTCALL WakeUpOpponentsToTheFactThatTheStartHasBeenJumped(int pWha
 
 // FUNCTION: CARMA2_HW 0x004ae750
 // FUNCTION: CARMA2_SW 0x004aa8c0
+// FUNCTION: CARMA2_CHEAT 0x004afc60
 void C2_HOOK_FASTCALL ReportMurderToPoliceDepartment(tCar_spec* pCar_spec) {
     int i;
 
@@ -1362,6 +1368,7 @@ tOpponent_spec* C2_HOOK_FASTCALL GetOpponentSpecFromCarSpec(tCar_spec* pCar_spec
 
 // FUNCTION: CARMA2_HW 0x004ae970
 // FUNCTION: CARMA2_SW 0x004aaae0
+// FUNCTION: CARMA2_CHEAT 0x004afe80
 tCar_spec* C2_HOOK_FASTCALL GetCarSpecFromGlobalOppoIndex(int pIndex) {
     int i;
 
@@ -1402,6 +1409,7 @@ int C2_HOOK_FASTCALL GetOpponentsFirstSection(const tOpponent_spec* pOpponent_sp
 
 // FUNCTION: CARMA2_HW 0x004aea30
 // FUNCTION: CARMA2_SW 0x004aaba0
+// FUNCTION: CARMA2_CHEAT 0x004aff40
 int C2_HOOK_FASTCALL GetOpponentsNextSection(const tOpponent_spec* pOpponent_spec, tS16 pCurrent_section) {
     if (pCurrent_section >= 20000) {
         if (pOpponent_spec->nnext_sections > pCurrent_section - 19999
@@ -1450,6 +1458,7 @@ float C2_HOOK_FASTCALL GetOpponentsSectionWidth(const tOpponent_spec* pOpponent_
 
 // FUNCTION: CARMA2_HW 0x004aed50
 // FUNCTION: CARMA2_SW 0x004aaec0
+// FUNCTION: CARMA2_CHEAT 0x004b0260
 int C2_HOOK_FASTCALL GetOpponentsSectionMinSpeed(tOpponent_spec* pOpponent_spec, tS16 pSection, int pTowards_finish) {
     if (pSection >= 20000 && pOpponent_spec->nnext_sections > pSection - 20000) {
         const tRoute_section* route = &pOpponent_spec->next_sections[pSection - 20000];
@@ -1466,6 +1475,7 @@ int C2_HOOK_FASTCALL GetOpponentsSectionMinSpeed(tOpponent_spec* pOpponent_spec,
 
 // FUNCTION: CARMA2_HW 0x004aedf0
 // FUNCTION: CARMA2_SW 0x004aaf60
+// FUNCTION: CARMA2_CHEAT 0x004b0300
 int C2_HOOK_FASTCALL GetOpponentsSectionMaxSpeed(tOpponent_spec* pOpponent_spec, tS16 pSection, int pTowards_finish) {
     if (pSection >= 20000 && pOpponent_spec->nnext_sections > pSection - 20000) {
         const tRoute_section* route = &pOpponent_spec->next_sections[pSection - 20000];
@@ -1492,6 +1502,7 @@ void C2_HOOK_FASTCALL InitOpponentPsyche(int pOpponent_index) {
 
 // FUNCTION: CARMA2_HW 0x004aeeb0
 // FUNCTION: CARMA2_SW 0x004ab020
+// FUNCTION: CARMA2_CHEAT 0x004b0410
 void C2_HOOK_FASTCALL TwoCarsHitEachOther(tCar_spec* pA_car, tCar_spec* pAnother_car) {
 
     if (pA_car != NULL && pA_car->driver == eDriver_local_human) {
