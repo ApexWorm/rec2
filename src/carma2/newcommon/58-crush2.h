@@ -56,7 +56,7 @@ extern void C2_HOOK_FASTCALL DoWheelDamage(tU32 pFrame_period);
 
 extern void C2_HOOK_FASTCALL CrashEarnings(tCar_spec* pCar1, tCar_spec* pCar2);
 
-// PercentageCarHealth
+extern int C2_HOOK_FASTCALL PercentageCarHealth(const tCar_spec* pCar);
 
 extern void C2_HOOK_FASTCALL ChristmasLights(tCar_spec* pCar, int pMin_damage, int pMax_damage);
 
