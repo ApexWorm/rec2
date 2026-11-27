@@ -370,6 +370,7 @@ tPhysics_object* C2_HOOK_FASTCALL PHILGetNextObject(tPhysics_object* pObject) {
 
 // FUNCTION: CARMA2_HW 0x004b6010
 // FUNCTION: CARMA2_SW 0x004b2730
+// FUNCTION: CARMA2_CHEAT 0x004bba30
 tU32 C2_HOOK_FASTCALL PHILReturnObjectStatus(tPhysics_object* pObject) {
     tPHIL_queued_header* info;
 
