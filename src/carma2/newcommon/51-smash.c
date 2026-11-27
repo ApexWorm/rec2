@@ -1201,7 +1201,7 @@ void C2_HOOK_FASTCALL ReadSmashLevels(FILE* pF, tSmashable_level** pSmashable_le
         FatalError(kFatalError_CantLoadSmashPix_S, s);
     }
     (*pSmashable_levels)[0].connotations.count_shrapnel = 0;
-    (*pSmashable_levels)[0].trigger_threshold = 0.f;
+    (*pSmashable_levels)[0].trigger_threshold = 0.0f;
     for (i = 0, level = *pSmashable_levels + 1; i < *pCount_smashable_levels - 1; i++, level++) {
         level->trigger_threshold = GetAScalar(pF);
         level->flags = GetAnInt(pF);
