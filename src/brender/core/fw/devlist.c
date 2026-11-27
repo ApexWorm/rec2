@@ -159,7 +159,7 @@ br_error C2_HOOK_CDECL BrDevRemove(br_device* dev) {
 
     for (i = 0; i < fw.ndev_slots; i++) {
         if (fw.dev_slots[i].dev == dev) {
-            fw.dev_slots[i].dev->dispatch->_free((br_object*)fw.dev_slots[i].dev);
+            dev->dispatch->_free((br_object*)dev);
             if (fw.dev_slots[i].image != NULL) {
                 BrImageDereference(fw.dev_slots[i].image);
             }

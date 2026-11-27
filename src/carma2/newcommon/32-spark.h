@@ -121,11 +121,17 @@ extern int C2_HOOK_FASTCALL ResetFoxModelCallback(br_model* pModel);
 
 extern int C2_HOOK_FASTCALL ResetFoxLighting(br_material* pMaterial);
 
-// CancelAlternateFoxEffect
+extern void C2_HOOK_FASTCALL CancelAlternateFoxEffect(tCar_spec* pCar_spec);
 
-// SetFoxLighting
+extern int C2_HOOK_FASTCALL SetFoxLighting(br_material* pMaterial);
 
-// SetupAlternateFoxEffect
+extern void C2_HOOK_FASTCALL SetupAlternateFoxEffect(tCar_spec* pCar_spec);
+#endif
+
+#ifdef REC2_SW
+extern void C2_HOOK_CDECL DoModelThing(br_actor* pActor, br_model* pModel, br_material* pMaterial, void* pArg4, br_uint_8 pArg5, int pArg6);
+
+extern void C2_HOOK_FASTCALL SetModelShade(br_model* pModel, br_pixelmap* pIndex_shade, int pArg3);
 #endif
 
 extern int C2_HOOK_FASTCALL RestorePixelmap(br_material* pMaterial);
@@ -220,7 +226,7 @@ extern void C2_HOOK_FASTCALL GeneralCreateSplash(tPhysics_object* pObject, const
 
 extern void C2_HOOK_FASTCALL CreateSplash(tPhysics_object* pObject, tU32 pTime);
 
-// GetVelocitiesFromMatrices
+extern void C2_HOOK_FASTCALL GetVelocitiesFromMatrices(br_vector3* pVel, br_vector3* pRot, br_matrix34* pMat_now, br_matrix34* pMat_prev, tU32 pTime);
 
 // MungeSplash
 
@@ -236,6 +242,12 @@ extern void C2_HOOK_FASTCALL DisposeKevStuffCar(tCar_spec* pCar);
 
 extern void C2_HOOK_FASTCALL MakeCarIt(tCar_spec* pCar);
 
+#ifdef REC2_SW
+extern void C2_HOOK_FASTCALL FoxifyModel(br_model *pModel);
+
+extern intptr_t C2_HOOK_CDECL FoxifyModelCB(br_actor* pActor, void* pContext);
+#endif
+
 extern void C2_HOOK_FASTCALL StopCarBeingIt(tCar_spec* pCar);
 
 extern void C2_HOOK_FASTCALL ForEveryModelMaterial(br_model* pModel, tMaterialMaybeUpdate_cbfn* pCallback);
@@ -244,13 +256,19 @@ extern intptr_t C2_HOOK_CDECL ForEveryActorMaterial(br_actor* pActor, void* pCon
 
 extern intptr_t C2_HOOK_CDECL ForEveryActorMaterialNoGrooves(br_actor* pActor, void* pContext);
 
+#ifdef REC2_SW
+extern void C2_HOOK_FASTCALL UnFoxifyModel(br_model *pModel);
+
+extern intptr_t C2_HOOK_CDECL UnFoxifyModelCB(br_actor* pActor, void* pContext);
+#endif
+
 extern void C2_HOOK_FASTCALL ForEveryCarMaterial(tCar_spec* pCar_spec, tMaterialMaybeUpdate_cbfn* pCallback, int pGrooves);
 
 // ForEveryCarModelCB
 
 extern intptr_t C2_HOOK_CDECL ForEveryCarModelCB(br_actor* pActor, void *pContext);
 
-// ForEveryCarModel
+extern void C2_HOOK_FASTCALL ForEveryCarModel(tCar_spec* pCar_spec, int (C2_HOOK_FASTCALL* pCallback)(br_model*), int pGrooves);
 
 extern int C2_HOOK_FASTCALL MightBlendifyMaterial(br_material* pMaterial, int pBlend_factor);
 
