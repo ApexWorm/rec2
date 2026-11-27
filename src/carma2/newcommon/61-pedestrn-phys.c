@@ -921,7 +921,7 @@ void C2_HOOK_FASTCALL DoPostElectricution(tPedestrian* pPed, tU32 pTime, float p
     if (object != NULL) {
         pSpeed *= .7;
         object->v.v[0] = SRandomPosNeg(pSpeed);
-        object->v.v[1] = SRandomBetween(0.f, pSpeed);
+        object->v.v[1] = SRandomBetween(0.0f, pSpeed);
         object->v.v[2] = SRandomPosNeg(pSpeed);
         spin = pSpin * 4.0;
         object->omega.v[0] = SRandomPosNeg(spin);
