@@ -77,7 +77,7 @@ extern void C2_HOOK_FASTCALL FillInThisPlayer(tNet_game_details* pGame, tNet_gam
 
 // LoadCarN
 
-// DisposeCarN
+extern void C2_HOOK_FASTCALL DisposeCarN(int pIndex);
 
 // PlayerHasLeft
 
@@ -235,7 +235,7 @@ extern int C2_HOOK_FASTCALL NetGuaranteedSendMessageToAddress(tNet_game_details*
 
 extern void C2_HOOK_FASTCALL ResendGuaranteedMessages(void);
 
-// NetWaitForGuaranteeReplies
+extern void C2_HOOK_FASTCALL NetWaitForGuaranteeReplies(void);
 
 extern tNet_game_player_info* C2_HOOK_FASTCALL NetPlayerFromID(tPlayer_ID pPlayer);
 

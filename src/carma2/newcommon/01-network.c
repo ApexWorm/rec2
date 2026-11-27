@@ -491,9 +491,6 @@ void C2_HOOK_FASTCALL NetLeaveGameLowLevel(tNet_game_details* pDetails) {
     }
 }
 
-extern void C2_HOOK_FASTCALL DisposeCarN(int pIndex);
-extern void C2_HOOK_FASTCALL NetWaitForGuaranteeReplies(void);
-
 // FUNCTION: CARMA2_HW 0x0049dc90
 // FUNCTION: CARMA2_SW 0x00499e10
 // FUNCTION: CARMA2_CHEAT 0x0049e1d0
