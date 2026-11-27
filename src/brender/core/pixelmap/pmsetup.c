@@ -323,6 +323,7 @@ void C2_HOOK_CDECL BrPixelmapBegin(void) {
 
 // FUNCTION: CARMA2_HW 0x005395f0
 // FUNCTION: CARMA2_SW 0x00534c90
+// FUNCTION: CARMA2_CHEAT 0x0053f1e0
 void C2_HOOK_CDECL BrPixelmapEnd(void) {
 
     BrImageRemove(&Image_BRMAP1);
