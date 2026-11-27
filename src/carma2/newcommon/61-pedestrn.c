@@ -3243,7 +3243,7 @@ void C2_HOOK_FASTCALL SetCharacterDirection(tPed_character_instance* pPed, const
     move = pPed->personality->form->moves[pPed->field_0x7].move;
     character_matrix = GetCharacterMatrixPtr(pPed);
     BrMatrix34Inverse(&inverse, &pPed->field_0x8c);
-    BrVector3Copy(&original_pos, (br_vector3*)character_matrix->m[3]);
+    original_pos = *(br_vector3*)character_matrix->m[3];
     BrVector3Set((br_vector3*)character_matrix->m[3], 0.f, 0.f, 0.f);
     BrMatrix34Mul(&mat, character_matrix, &inverse);
     if (pUp != NULL) {
