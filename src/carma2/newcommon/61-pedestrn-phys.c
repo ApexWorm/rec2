@@ -1793,7 +1793,7 @@ inline void C2_HOOK_FASTCALL UpdateIfBackwardsAR(void) {
     int i;
     tPedestrian* ped;
 
-    if (gAction_replay_mode && ARGetReplayRate() < 0.f) {
+    if (gAction_replay_mode && ARGetReplayRate() < 0.0f) {
         ped = gPedestrian_array;
         for (i = 0; i < gPed_count; i++, ped++) {
             if (ped->flags & 0x1) {
