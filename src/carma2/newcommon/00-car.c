@@ -51,6 +51,9 @@
 // GLOBAL: CARMA2_CHEAT 0x007a6440
 tNon_car_spec* gActive_non_car_list[99];
 
+// GLOBAL: CARMA2_HW 0x00676854
+int gStop_opponents_moving;
+
 // GLOBAL: CARMA2_HW 0x0067939c
 // GLOBAL: CARMA2_SW 0x00673b0c
 // GLOBAL: CARMA2_CHEAT 0x00680c4c
