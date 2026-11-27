@@ -169,7 +169,7 @@ void C2_HOOK_FASTCALL ReceivedSimpleCarPos(tNet_message_chunk* pContents) {
         car->active = 0;
         mat = &car->car_master_actor->t.t.mat;
         BrMatrix34RotateY(mat, pContents->simple_car_pos.yaw);
-        ExpandVector3((br_vector3*)mat->m[3], &pContents->simple_car_pos.pos, -500.f, 500.f);
+        ExpandVector3((br_vector3*)mat->m[3], &pContents->simple_car_pos.pos, -500.0f, 500.0f);
         BrMatrix34Copy(&car->collision_info->transform_matrix, mat);
         BrVector3Copy(&car->pos, (br_vector3*)car->collision_info->transform_matrix.m[3]);
         BrVector3Copy(&car->collision_info->pos, (br_vector3*)car->collision_info->transform_matrix.m[3]);
