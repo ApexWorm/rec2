@@ -1011,27 +1011,27 @@ void C2_HOOK_FASTCALL GenerateSmokeShades(void) {
     static int bl = 0x40;
     // GLOBAL: CARMA2_HW 0x00660178
     // GLOBAL: CARMA2_SW 0x0065aaa4
-    // GLOBAL: CARMA2_CHEAT 0x006679b4
+    // GLOBAL: CARMA2_CHEAT 0x006679c0
     static int rs = 0xc8;
     // GLOBAL: CARMA2_HW 0x0066017c
     // GLOBAL: CARMA2_SW 0x0065aaa8
-    // GLOBAL: CARMA2_CHEAT 0x006679b8
+    // GLOBAL: CARMA2_CHEAT 0x006679c4
     static int gs = 0xc8;
     // GLOBAL: CARMA2_HW 0x00660180
     // GLOBAL: CARMA2_SW 0x0065aaac
-    // GLOBAL: CARMA2_CHEAT 0x006679bc
+    // GLOBAL: CARMA2_CHEAT 0x006679c8
     static int bs = 0xc8;
     // GLOBAL: CARMA2_HW 0x0066016c
     // GLOBAL: CARMA2_SW 0x0065aa98
-    // GLOBAL: CARMA2_CHEAT 0x006679c0
+    // GLOBAL: CARMA2_CHEAT 0x006679b4
     static int rg = 0x80;
     // GLOBAL: CARMA2_HW 0x00660170
     // GLOBAL: CARMA2_SW 0x0065aa9c
-    // GLOBAL: CARMA2_CHEAT 0x006679c4
+    // GLOBAL: CARMA2_CHEAT 0x006679b8
     static int gg = 0x80;
     // GLOBAL: CARMA2_HW 0x00660174
     // GLOBAL: CARMA2_SW 0x0065aaa0
-    // GLOBAL: CARMA2_CHEAT 0x006679c8
+    // GLOBAL: CARMA2_CHEAT 0x006679bc
     static int bg = 0x80;
     // GLOBAL: CARMA2_HW 0x00660184
     // GLOBAL: CARMA2_SW 0x0065aab0
@@ -1059,12 +1059,12 @@ void C2_HOOK_FASTCALL GenerateSmokeShades(void) {
     br_pixelmap* dark_smoke_shade_table;
     br_pixelmap* yellow_shade_table;
 
-    (void)rg; (void)gg; (void)bg;
     (void)rs; (void)gs; (void)bs;
+    (void)ra; (void)ga; (void)ba;
 
     black_smoke_shade_table = GenerateShadeTable(16, gRender_palette, rb, gb, bb, 0.25f, 0.6f, 0.9f);
     dark_smoke_shade_table = GenerateShadeTable(16, gRender_palette, rl, gl, bl, 0.25f, 0.6f, 0.9f);
-    yellow_shade_table = GenerateShadeTable(16, gRender_palette, ra, ga, ba, 0.25f, 0.6f, 0.9f);
+    yellow_shade_table = GenerateShadeTable(16, gRender_palette, rg, gg, bg, 0.25f, 0.6f, 0.9f);
     gShade_list[2] = yellow_shade_table;
     gShade_list[3] = gFog_shade_table;
     gShade_list[4] = gFog_shade_table;
