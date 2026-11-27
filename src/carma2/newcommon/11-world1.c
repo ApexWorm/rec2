@@ -15,7 +15,7 @@
 #include "28-world3.h"
 #include "41-utility.h"
 #include "55-volume.h"
-#include "61-pedestrn.h"
+#include "61-pedestrn-phys.h"
 #include "70-packfile.h"
 #include "globvars.h"
 
@@ -277,7 +277,7 @@ void C2_HOOK_FASTCALL AutoSaveAdditionalStuff(void) {
     size_t len_model_path;
 
     len_actor_path = strlen(gAdditional_actor_path);
-    len_model_path = strlen(gAdditional_model_path);
+    len_model_path = strlen(gAdditional_actor_path);
     strcat(gAdditional_actor_path, " autosave");
     strcat(gAdditional_model_path, " autosave");
     DoSaveAdditionalStuff();
