@@ -2204,7 +2204,34 @@ void C2_HOOK_FASTCALL ApplyUnBend(tPipe_chunk** pChunk) {
 void C2_HOOK_FASTCALL ApplyEndMyBend(tPipe_chunk** pChunk) {
 }
 
-// ApplyShrapnelShower
+extern void C2_HOOK_FASTCALL DoShrapnel(int pArg1, tShrapnel_spec* pShrapnel, int pArg3, br_vector3* pArg4, br_vector3* pArg5, br_vector3* pArg6, undefined4 pArg7, tU32 pTime, uintptr_t pId, br_matrix34* pMat, br_bounds3* pBounds, br_vector3* pArg12, float pArg13, br_vector3* pArg14, int pArg15);
+
+// FUNCTION: CARMA2_HW 0x004c9960
+// FUNCTION: CARMA2_SW 0x004c6090
+// FUNCTION: CARMA2_CHEAT 0x004cf490
+void C2_HOOK_FASTCALL ApplyShrapnelShower(tPipe_chunk** pChunk) {
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk_shrapnel_shower, shrapnel, 0x80);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk_shrapnel_shower, field_0xa0, 0xa0);
+
+    if ((*pChunk)->data.shrapnel_shower.shrapnel != NULL) {
+        memcpy(gVector3_006b78a0, (*pChunk)->data.shrapnel_shower.field_0xa0, sizeof(gVector3_006b78a0));
+        DoShrapnel((*pChunk)->data.shrapnel_shower.field_0x0,
+            (*pChunk)->data.shrapnel_shower.shrapnel,
+            (*pChunk)->data.shrapnel_shower.field_0x40,
+            &(*pChunk)->data.shrapnel_shower.field_0x4,
+            &(*pChunk)->data.shrapnel_shower.field_0x1c,
+            &(*pChunk)->data.shrapnel_shower.field_0x28,
+            (*pChunk)->data.shrapnel_shower.field_0x4c,
+            (*pChunk)->data.shrapnel_shower.time,
+            (*pChunk)->subject_index,
+            &(*pChunk)->data.shrapnel_shower.mat,
+            &(*pChunk)->data.shrapnel_shower.bounds,
+            &(*pChunk)->data.shrapnel_shower.field_0x10,
+            (*pChunk)->data.shrapnel_shower.field_0x9c,
+            &(*pChunk)->data.shrapnel_shower.field_0x34,
+            0);
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x004c99d0
 // FUNCTION: CARMA2_SW 0x004c6100
@@ -2720,7 +2747,35 @@ void C2_HOOK_FASTCALL UndoBend(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
 void C2_HOOK_FASTCALL UndoUnBend(void) {
 }
 
-// UndoShrapnelShower
+extern void C2_HOOK_FASTCALL DoBackwardShrapnel(tU32 pTime_now, int pArg1, tShrapnel_spec* pShrapnel, int pArg3, br_vector3* pArg4, br_vector3* pArg5, br_vector3* pArg6, undefined4 pArg7, tU32 pTime, uintptr_t pId, br_matrix34* pMat, br_bounds3* pBounds, br_vector3* pArg12, float pArg13, br_vector3* pArg14);
+
+// FUNCTION: CARMA2_HW 0x004ca070
+// FUNCTION: CARMA2_SW 0x004c67a0
+// FUNCTION: CARMA2_CHEAT 0x004cfbb0
+void C2_HOOK_FASTCALL UndoShrapnelShower(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
+
+    if ((*pChunk)->data.shrapnel_shower.shrapnel == NULL
+        && pPrev_chunk != NULL
+        && pPrev_chunk->data.shrapnel_shower.field_0x0 != 0
+        && pPrev_chunk->data.shrapnel_shower.shrapnel != NULL) {
+        memcpy(gVector3_006b78a0, pPrev_chunk->data.shrapnel_shower.field_0xa0, sizeof(gVector3_006b78a0));
+        DoBackwardShrapnel((*pChunk)->data.shrapnel_shower.time,
+            pPrev_chunk->data.shrapnel_shower.field_0x0,
+            pPrev_chunk->data.shrapnel_shower.shrapnel,
+            pPrev_chunk->data.shrapnel_shower.field_0x40,
+            &pPrev_chunk->data.shrapnel_shower.field_0x4,
+            &pPrev_chunk->data.shrapnel_shower.field_0x1c,
+            &pPrev_chunk->data.shrapnel_shower.field_0x28,
+            pPrev_chunk->data.shrapnel_shower.field_0x4c,
+            pPrev_chunk->data.shrapnel_shower.time,
+            pPrev_chunk->subject_index,
+            &pPrev_chunk->data.shrapnel_shower.mat,
+            &pPrev_chunk->data.shrapnel_shower.bounds,
+            &pPrev_chunk->data.shrapnel_shower.field_0x10,
+            pPrev_chunk->data.shrapnel_shower.field_0x9c,
+            &pPrev_chunk->data.shrapnel_shower.field_0x34);
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x004ca100
 // FUNCTION: CARMA2_SW 0x004c6830

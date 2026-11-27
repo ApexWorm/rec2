@@ -56,6 +56,7 @@ br_vector3 gVector3_006a4688;
 
 // GLOBAL: CARMA2_HW 0x006b78a0
 // GLOBAL: CARMA2_SW 0x006ae580
+// GLOBAL: CARMA2_CHEAT 0x006bef40
 br_vector3 gVector3_006b78a0[4] = { { { 0.f } } };
 
 // GLOBAL: CARMA2_HW 0x006b78d0

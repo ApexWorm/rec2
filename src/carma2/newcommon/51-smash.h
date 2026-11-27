@@ -16,6 +16,7 @@ extern int gAllow_material_adapt;
 extern br_material* gMaterials_to_adapt[200];
 extern int gMaterials_to_adapt_count;
 extern int gShrapnel_child_count;
+extern br_vector3 gVector3_006b78a0[4];
 
 extern tSmashable_item_spec* gTrack_smashable_environment_specs;
 extern br_actor* gSmashable_noncar_shrapnel_actors[100];

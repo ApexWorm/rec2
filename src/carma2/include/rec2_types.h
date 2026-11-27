@@ -80,6 +80,7 @@ typedef struct tCar_crush_vertex_data tCar_crush_vertex_data;
 typedef struct tPed_face_cache_0x34 tPed_face_cache_0x34;
 typedef struct tPed_anim_seq tPed_anim_seq;
 typedef struct tPed_morph tPed_morph;
+typedef struct tShrapnel_spec tShrapnel_spec;
 
 typedef char tPed_animal_name[50]; /* FIXME: should not really exist */
 
@@ -751,6 +752,24 @@ typedef struct {
     br_pixelmap* pixelmap;
 } tPipe_chunk_oil_spill;
 
+typedef struct {
+    int field_0x0;
+    br_vector3 field_0x4;
+    br_vector3 field_0x10;
+    br_vector3 field_0x1c;
+    br_vector3 field_0x28;
+    br_vector3 field_0x34;
+    int field_0x40;
+    tU32 time;
+    undefined4 field_0x48;
+    undefined4 field_0x4c;
+    br_matrix34 mat;
+    tShrapnel_spec* shrapnel;
+    br_bounds3 bounds;
+    float field_0x9c;
+    br_vector3 field_0xa0[4];
+} tPipe_chunk_shrapnel_shower;
+
 typedef enum {
     ePipe_chunk_frame_finish = 0,
     ePipe_chunk_ped_incident = 1,
@@ -922,6 +941,7 @@ typedef struct tPipe_chunk {
         tPipe_single_drone_straight_pos drone_straight_pos;
         tPipe_chunk_repulse_ray repulse_ray;
         tPipe_chunk_oil_spill oil_spill;
+        tPipe_chunk_shrapnel_shower shrapnel_shower;
         tPipe_chunk_extended_splash extended_splash;
         tPipe_single_graphical_wheel_stuff graphical_wheel_stuff;
         char raw_data[0];
@@ -3567,7 +3587,7 @@ typedef struct tSmoke_fire_chance {
     int max_smokiness;
 } tSmoke_fire_chance;
 
-typedef struct {
+typedef struct tShrapnel_spec {
     tShrapnel_type type;
     tMovement_spec initial_speed;
     tShrapnel_time_info time_info;
