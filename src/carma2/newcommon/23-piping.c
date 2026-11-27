@@ -822,8 +822,6 @@ int C2_HOOK_FASTCALL PipeObjectPosition(tPhysics_object* pObject, void* pContext
     return 0;
 }
 
-extern void C2_HOOK_FASTCALL AddCarToPipingSession(int pCar_ID, br_matrix34* pCar_mat, br_vector3* pCar_velocity, float pSpeedo_speed, float pRevs, int pGear, int pFrame_coll_flag, int pField_0x18cc);
-
 inline void C2_HOOK_FASTCALL AddCarToPipingSession(int pCar_ID, br_matrix34* pCar_mat, br_vector3* pCar_velocity, float pSpeedo_speed, float pRevs, int pGear, int pFrame_coll_flag, int pField_0x18cc) {
 
     ARAddVariedDataToSession(ePipe_chunk_car, pCar_ID, 5,
@@ -833,8 +831,6 @@ inline void C2_HOOK_FASTCALL AddCarToPipingSession(int pCar_ID, br_matrix34* pCa
         SIZE_OFFSET_PIPING(tPipe_chunk_car, flags), (((int)pRevs / 10) & 0x7ff) + ((pGear + 1) << 12) + (pFrame_coll_flag ? 0x800 : 0),
         SIZE_OFFSET_PIPING(tPipe_chunk_car, field_0x40), pField_0x18cc);
 }
-
-extern void C2_HOOK_FASTCALL AddDamageToPipingSession(int pCar_ID, tS8* pDamage_deltas);
 
 inline void C2_HOOK_FASTCALL AddDamageToPipingSession(int pCar_ID, tS8* pDamage_deltas) {
     tS8 damage_deltas[12];

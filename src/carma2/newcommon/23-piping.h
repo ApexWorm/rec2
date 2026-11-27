@@ -153,7 +153,7 @@ extern void C2_HOOK_FASTCALL ResetCars(void);
 
 extern int C2_HOOK_FASTCALL PipeObjectPosition(tPhysics_object* pObject, void* pContext);
 
-// PipeCarPositions
+extern void C2_HOOK_FASTCALL PipeCarPositions(void);
 
 extern void C2_HOOK_FASTCALL DoSmudge(tPipe_chunk** pChunk, int pDir);
 
@@ -193,9 +193,9 @@ extern void C2_HOOK_FASTCALL AddSplashToPipingSession(tPhysics_object* pObject);
 
 extern void C2_HOOK_FASTCALL AddExtendedSplashToPipingSession(tPhysics_object* pObject, void* pSubject);
 
-// AddCarToPipingSession
+extern void C2_HOOK_FASTCALL AddCarToPipingSession(int pCar_ID, br_matrix34* pCar_mat, br_vector3* pCar_velocity, float pSpeedo_speed, float pRevs, int pGear, int pFrame_coll_flag, int pField_0x18cc);
 
-// AddDamageToPipingSession
+extern void C2_HOOK_FASTCALL AddDamageToPipingSession(int pCar_ID, tS8* pDamage_deltas);
 
 extern void C2_HOOK_FASTCALL AddProxRayToPipingSession(int pRay_index, tCar_spec* pCar, tU16 pPed_index, tU32 pTime);
 
