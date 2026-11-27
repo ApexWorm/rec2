@@ -200,7 +200,7 @@ extern int C2_HOOK_FASTCALL MorphCharacterBonePositions(tPed_character_instance*
 
 // StopCharacterMove
 
-// MungeCharacterAnimation
+extern void C2_HOOK_FASTCALL MungeCharacterAnimation(tPed_character_instance* pCharacter, tU32 pTime, int pArg3);
 
 // SetOnGroundVector
 
