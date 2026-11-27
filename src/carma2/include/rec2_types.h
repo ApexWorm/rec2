@@ -5687,15 +5687,6 @@ typedef struct {
     tU32 time;
 } tNet_message_chunk_recover;
 
-typedef struct {
-    tNet_message_chunk_header header;
-    undefined field_0x2[0x4-0x2];
-    tPlayer_ID player;
-    int powerup_index;
-    tU32 time_left;
-    int event;
-} tNet_message_chunk_powerup;
-
 typedef union {
     tNet_message_chunk_raw raw;
     tNet_message_chunk_race_over race_over; /* type = 0xa */
