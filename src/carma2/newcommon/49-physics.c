@@ -517,6 +517,8 @@ int C2_HOOK_FASTCALL TestForObjectInSensiblePlace(tPhysics_object* pCollision_in
 // CheckForTwang
 
 // FUNCTION: CARMA2_HW 0x004b8c20
+// FUNCTION: CARMA2_SW 0x004b5340
+// FUNCTION: CARMA2_CHEAT 0x004be750
 void C2_HOOK_FASTCALL CreateJointForce(tPhysics_object* pObject, tPhysics_object* pPartner, tPhysics_joint_force* pForce, const br_vector3* pDirection) {
     br_vector3 direction;
 
@@ -543,6 +545,8 @@ void C2_HOOK_FASTCALL CreateJointForce(tPhysics_object* pObject, tPhysics_object
 }
 
 // FUNCTION: CARMA2_HW 0x004b8e10
+// FUNCTION: CARMA2_SW 0x004b5530
+// FUNCTION: CARMA2_CHEAT 0x004be940
 void C2_HOOK_FASTCALL CreateJointTorque(tPhysics_object* pObject, tPhysics_object* pPartner, tPhysics_joint_force* pForce, const br_vector3* pDirection) {
     br_vector3 direction;
 
@@ -891,6 +895,8 @@ void C2_HOOK_FASTCALL SetUpForce(br_vector3* pAngular, br_vector3* pLinear, cons
 // MakeMatrix
 
 // FUNCTION: CARMA2_HW 0x004c03f0
+// FUNCTION: CARMA2_SW 0x004bcb20
+// FUNCTION: CARMA2_CHEAT 0x004c5f10
 void C2_HOOK_FASTCALL RestoreListOmega(tPhysics_object* pObject) {
 
     C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPhysics_object, rotate_omega, 0x1c0);
