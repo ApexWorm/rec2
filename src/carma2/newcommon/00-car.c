@@ -857,6 +857,7 @@ void C2_HOOK_FASTCALL GetDrivableOnList(tPhysics_object *pObjects) {
 
 // FUNCTION: CARMA2_HW 0x00415890
 // FUNCTION: CARMA2_SW 0x004158c0
+// FUNCTION: CARMA2_CHEAT 0x00415af0
 void C2_HOOK_FASTCALL APTCPreCollision(void) {
     int i;
 
@@ -873,7 +874,7 @@ void C2_HOOK_FASTCALL APTCPreCollision(void) {
         DoNonCarStuff(gActive_non_car_list[i]);
     }
     for (i = 0; i < gNum_active_cars; i++) {
-        if (gActive_car_list[i]->field_0x4c8 != 1.0f) {
+        if (gActive_car_list[i]->field_0x4c8 != 1.0) {
             MungeCarsMass(gActive_car_list[i], gActive_car_list[i]->field_0x4c8);
         }
     }
