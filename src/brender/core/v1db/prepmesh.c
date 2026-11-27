@@ -695,8 +695,8 @@ void C2_HOOK_STDCALL RegenerateFaceNormals(v11model* v11m) {
     v11face* fp;
 
     for (g = 0; g < v11m->ngroups; g++) {
-        for (f = 0; f < v11m->groups[g].nfaces; f++) {
-            fp = &v11m->groups[g].faces[f];
+        fp = v11m->groups[g].faces;
+        for (f = 0; f < v11m->groups[g].nfaces; f++, fp++) {
             BrPlaneEquation(&fp->eqn,
                 &v11m->groups[g].vertices[fp->vertices[0]].p,
                 &v11m->groups[g].vertices[fp->vertices[1]].p,
