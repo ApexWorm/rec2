@@ -44,7 +44,7 @@ add_library(brender_driver_d3d SHARED
     timestmp.h
     types.h
 )
-target_compile_definitions(brender_driver_d3d PRIVATE DIRECTDRAW_VERSION=0x500)
+target_compile_definitions(brender_driver_d3d PRIVATE DIRECTDRAW_VERSION=0x500 DIRECT3D_VERSION=0x500)
 #target_include_directories(brender_driver_d3d
 #    PRIVATE
 #        "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>"

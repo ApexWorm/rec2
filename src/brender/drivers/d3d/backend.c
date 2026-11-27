@@ -198,6 +198,9 @@ DDSURFACEDESC gAvailable_RGB555_texture_format_description;
 // GLOBAL: D3D 0x100380a0
 DDSURFACEDESC gAvailable_RGB565_texture_format_description;
 
+// GLOBAL: D3D 0x10038560
+DDSURFACEDESC gAvailable_ARGB4444_texture_format_description;
+
 // GLOBAL: D3D 0x1001bc74
 int gIn_d3d_scene;
 
@@ -701,88 +704,88 @@ void C2_HOOK_CDECL d3d_check_result(int failed, const char* message) {
 
 // FUNCTION: D3D 0x10002130
 BOOL CALLBACK DDEnumCallback(GUID* lpDriverGuid, LPSTR lpDriverName, LPSTR lpDriverDescription, LPVOID lpContext) {
-    /* Return 1 to continue execution */
-    int enum_phase = *(int*)lpContext;
+    LPDIRECTDRAW ddraw;
+    DDCAPS_DX5 driverCaps;
+    DDCAPS_DX5 helCaps;
 
     d3d_debug_printf("Callback Generic");
-    if (enum_phase == 0) {
-        LPDIRECTDRAW ddraw;
+    switch (*(int*)lpContext) {
+    case 0:
         d3d_debug_printf("Callback Generic form 0/0, [%s/%s]", lpDriverName, lpDriverDescription);
-        if (SUCCEEDED(gDirectDrawCreate(lpDriverGuid, &ddraw, NULL))) {
-            DDCAPS_DX5 driverCaps, helCaps;
-            memset(&driverCaps, 0, sizeof(driverCaps));
-            driverCaps.dwSize = sizeof(driverCaps);
-            memset(&helCaps, 0, sizeof(helCaps));
-            helCaps.dwSize = sizeof(helCaps);
-            if (FAILED(IDirectDraw_GetCaps(ddraw, &driverCaps, &helCaps))) {
-                IDirectDraw_Release(ddraw);
-                return 1;
-            }
+        if (FAILED(gDirectDrawCreate(lpDriverGuid, &ddraw, NULL))) {
+            return 1;
+        }
+        memset(&driverCaps, 0, sizeof(driverCaps));
+        driverCaps.dwSize = sizeof(driverCaps);
+        memset(&helCaps, 0, sizeof(helCaps));
+        helCaps.dwSize = sizeof(helCaps);
+        if (FAILED(IDirectDraw_GetCaps(ddraw, &driverCaps, &helCaps))) {
             IDirectDraw_Release(ddraw);
-            if (gDDraw_driver_found) {
-                return 1;
-            }
-            gIndex_ddraw_driver = gCount_ddraw_drivers;
+            return 1;
+        }
+        if (gDDraw_driver_found) {
             gCount_ddraw_drivers += 1;
-            if (gRegister_guid_valid) {
-                if (gRegister_driver_guid_binary) {
-                    if (memcmp(&gRegister_driver_guid, lpDriverGuid, sizeof(GUID)) == 0) {
-                        gDDraw_driver_found = 1;
-                    }
-                } else {
-                    if (lpDriverGuid == NULL) {
-                        gDDraw_driver_found = 1;
-                    }
+            IDirectDraw_Release(ddraw);
+            return 1;
+        }
+        IDirectDraw_Release(ddraw);
+        gIndex_ddraw_driver = gCount_ddraw_drivers;
+        gCount_ddraw_drivers += 1;
+        if (gRegister_guid_valid) {
+            if (!gRegister_driver_guid_binary) {
+                if (lpDriverGuid == NULL) {
+                    gDDraw_driver_found = 1;
+                    return 1;
                 }
+            } else if (lpDriverGuid != NULL && memcmp(&gRegister_driver_guid, lpDriverGuid, sizeof(GUID)) == 0) {
+                gDDraw_driver_found = 1;
             }
         }
         return 1;
-    } else if (enum_phase == 1) {
-        LPDIRECTDRAW ddraw;
+    case 1:
         d3d_debug_printf("Callback Generic form 1, [%d/%d]", gCount_ddraw_drivers, gIndex_ddraw_driver);
-        if (SUCCEEDED(gDirectDrawCreate(lpDriverGuid, &ddraw, NULL))) {
-            DDCAPS_DX5 driverCaps, helCaps;
-            memset(&driverCaps, 0, sizeof(driverCaps));
-            driverCaps.dwSize = sizeof(driverCaps);
-            memset(&helCaps, 0, sizeof(helCaps));
-            helCaps.dwSize = sizeof(helCaps);
-            if (FAILED(IDirectDraw_GetCaps(ddraw, &driverCaps, &helCaps))) {
-                IDirectDraw_Release(ddraw);
-                return 1;
-            }
-            if (helCaps.dwCaps2 & DDCAPS2_NO2DDURING3DSCENE) {
-                    gNo_2d_during_3d_scene = 1;
-            }
-            if (gIndex_ddraw_driver == gCount_ddraw_drivers) {
-
-                gDirectDraw = ddraw;
-                d3d_debug_printf("%s %s", lpDriverName, lpDriverDescription);
-                if (IDirectDraw_QueryInterface(gDirectDraw, &IID_IDirect3D, (LPVOID)&gDirect3D) != DD_OK) {
-                    gError_code = 1;
-                }
-                d3d_debug_printf("QI d3d 1[%d]", gError_code);
-                if (IDirectDraw_QueryInterface(gDirectDraw, &IID_IDirectDraw2, (LPVOID)&gDirectDraw2) != DD_OK) {
-                    gError_code = 1;
-                }
-                d3d_debug_printf("QI dd2 1[%d]", gError_code);
-                if (gD3D_windows) {
-                    if (IDirectDraw2_SetCooperativeLevel(gDirectDraw2, gActive_window, DDSCL_NORMAL) != DD_OK) {
-                        gError_code = 1;
-                    }
-                } else {
-                    if (IDirectDraw2_SetCooperativeLevel(gDirectDraw2, gActive_window, DDSCL_EXCLUSIVE | DDSCL_FULLSCREEN) != DD_OK) {
-                        gError_code = 1;
-                    }
-                }
-                d3d_debug_printf("SetCo-op level 1[%d]", gError_code);
-                gCount_ddraw_drivers += 1;
-                return 1;
-            }
-            IDirectDraw_Release(ddraw);
-            gCount_ddraw_drivers += 1;
+        if (FAILED(gDirectDrawCreate(lpDriverGuid, &ddraw, NULL))) {
+            return 1;
         }
+        memset(&driverCaps, 0, sizeof(driverCaps));
+        driverCaps.dwSize = sizeof(driverCaps);
+        memset(&helCaps, 0, sizeof(helCaps));
+        helCaps.dwSize = sizeof(helCaps);
+        if (FAILED(IDirectDraw_GetCaps(ddraw, &driverCaps, &helCaps))) {
+            IDirectDraw_Release(ddraw);
+            return 1;
+        }
+        if (helCaps.dwCaps2 & DDCAPS2_NO2DDURING3DSCENE) {
+            gNo_2d_during_3d_scene = 1;
+        }
+        if (gCount_ddraw_drivers == gIndex_ddraw_driver) {
+            gDirectDraw = ddraw;
+            d3d_debug_printf("%s %s", lpDriverName, lpDriverDescription);
+            if (IDirectDraw_QueryInterface(gDirectDraw, &IID_IDirect3D, (LPVOID)&gDirect3D) != DD_OK) {
+                gError_code = 1;
+            }
+            d3d_debug_printf("QI d3d 1[%d]", gError_code);
+            if (IDirectDraw_QueryInterface(gDirectDraw, &IID_IDirectDraw2, (LPVOID)&gDirectDraw2) != DD_OK) {
+                gError_code = 1;
+            }
+            d3d_debug_printf("QI dd2 1[%d]", gError_code);
+            if (gD3D_windows) {
+                if (IDirectDraw2_SetCooperativeLevel(gDirectDraw2, gActive_window, DDSCL_NORMAL) != DD_OK) {
+                    gError_code = 1;
+                }
+            } else {
+                if (IDirectDraw2_SetCooperativeLevel(gDirectDraw2, gActive_window, DDSCL_EXCLUSIVE | DDSCL_FULLSCREEN) != DD_OK) {
+                    gError_code = 1;
+                }
+            }
+            d3d_debug_printf("SetCo-op level 1[%d]", gError_code);
+            gCount_ddraw_drivers += 1;
+            return 1;
+        }
+        IDirectDraw_Release(ddraw);
+        gCount_ddraw_drivers += 1;
         return 1;
-    } else {
+    default:
         return 0;
     }
 }
@@ -896,7 +899,15 @@ int C2_HOOK_CDECL DetectD3DDevices(void) {
 
 // FUNCTION: D3D 0x10002460
 HRESULT PASCAL DDEnumDisplayModes(LPDDSURFACEDESC lpDDSurfaceDesc, LPVOID lpContext) {
-    int phase = *(int*)lpContext;
+    DWORD bit_count;
+    DWORD r_mask;
+    DWORD g_mask;
+    DWORD b_mask;
+
+    bit_count = lpDDSurfaceDesc->ddpfPixelFormat.dwRGBBitCount;
+    r_mask = lpDDSurfaceDesc->ddpfPixelFormat.dwRBitMask;
+    g_mask = lpDDSurfaceDesc->ddpfPixelFormat.dwGBitMask;
+    b_mask = lpDDSurfaceDesc->ddpfPixelFormat.dwBBitMask;
 
     if (lpDDSurfaceDesc->dwWidth < 320) {
         return 1;
@@ -906,22 +917,19 @@ HRESULT PASCAL DDEnumDisplayModes(LPDDSURFACEDESC lpDDSurfaceDesc, LPVOID lpCont
     }
     d3d_debug_printf("Enum-Modes: %dx%d  bits=%d  rgb=%d,%d,%d",
         lpDDSurfaceDesc->dwWidth, lpDDSurfaceDesc->dwHeight,
-        lpDDSurfaceDesc->ddpfPixelFormat.dwRGBBitCount,
-        lpDDSurfaceDesc->ddpfPixelFormat.dwRBitMask,
-        lpDDSurfaceDesc->ddpfPixelFormat.dwGBitMask,
-        lpDDSurfaceDesc->ddpfPixelFormat.dwBBitMask);
-    if (lpDDSurfaceDesc->ddpfPixelFormat.dwRGBBitCount != 16) {
+        bit_count, r_mask, g_mask, b_mask);
+    if (bit_count != 16) {
         return 1;
     }
-    switch (phase) {
+    switch (*(int*)lpContext) {
     case 0:
         if (lpDDSurfaceDesc->dwWidth == 640 && lpDDSurfaceDesc->dwHeight == 480) {
-            if (!gD3D_windows &&lpDDSurfaceDesc->ddpfPixelFormat.dwRGBBitCount != 16) {
+            if (lpDDSurfaceDesc->ddpfPixelFormat.dwRGBBitCount != 16) {
                 break;
             }
-            if (!(lpDDSurfaceDesc->ddpfPixelFormat.dwRBitMask == 0xf800
-                    && lpDDSurfaceDesc->ddpfPixelFormat.dwGBitMask == 0x07e0
-                    && lpDDSurfaceDesc->ddpfPixelFormat.dwBBitMask == 0x001f
+            if (!(r_mask == 0xf800
+                    && g_mask == 0x07e0
+                    && b_mask == 0x001f
                     && gSelected_display_mode != -1)) {
                 gSelected_display_mode = gCount_display_modes;
             }
@@ -937,12 +945,8 @@ HRESULT PASCAL DDEnumDisplayModes(LPDDSURFACEDESC lpDDSurfaceDesc, LPVOID lpCont
         if (gCount_display_modes != gSelected_display_mode) {
             break;
         }
-        gDisplay_width_10015888 = lpDDSurfaceDesc->dwWidth;
-        gDisplay_height_1001588c = lpDDSurfaceDesc->dwHeight;
-        gDisplay_width_10037cc0 = gDisplay_width_10015888;
-        gDisplay_height_10037cc4 = gDisplay_height_1001588c;
-        gDisplay_width_10038004 = gDisplay_width_10015888;
-        gDisplay_height_10038008 = gDisplay_height_1001588c;
+        gDisplay_width_10015888 = gDisplay_width_10037cc0 = gDisplay_width_10038004 = lpDDSurfaceDesc->dwWidth;
+        gDisplay_height_1001588c = gDisplay_height_10037cc4 = gDisplay_height_10038008 = lpDDSurfaceDesc->dwHeight;
         if (!gD3D_windows) {
             if (IDirectDraw2_SetDisplayMode(gDirectDraw2, gDisplay_width_10015888,
                     gDisplay_height_1001588c,
@@ -954,12 +958,13 @@ HRESULT PASCAL DDEnumDisplayModes(LPDDSURFACEDESC lpDDSurfaceDesc, LPVOID lpCont
             }
         }
 
-        if (gAttached_surface_pixel_format.dwRGBAlphaBitMask
-              || (gAttached_surface_pixel_format.dwRBitMask == 0x7c00
-                  && gAttached_surface_pixel_format.dwGBitMask == 0x03e0
-                  && gAttached_surface_pixel_format.dwBBitMask == 0x001f)) {
+        if (gAttached_surface_pixel_format.dwRGBAlphaBitMask == 0
+                && gAttached_surface_pixel_format.dwRBitMask == 0x7c00
+                && gAttached_surface_pixel_format.dwGBitMask == 0x03e0
+                && gAttached_surface_pixel_format.dwBBitMask == 0x001f) {
             gAttached_surface_pixelformat = 2;
-        } else if (gAttached_surface_pixel_format.dwRBitMask == 0xf800
+        } else if (gAttached_surface_pixel_format.dwRGBAlphaBitMask == 0
+                && gAttached_surface_pixel_format.dwRBitMask == 0xf800
                 && gAttached_surface_pixel_format.dwGBitMask == 0x07e0
                 && gAttached_surface_pixel_format.dwBBitMask == 0x001f) {
             gAttached_surface_pixelformat = 4;
@@ -977,20 +982,19 @@ HRESULT PASCAL DDEnumDisplayModes(LPDDSURFACEDESC lpDDSurfaceDesc, LPVOID lpCont
 
 // FUNCTION: D3D 0x10002630
 HRESULT CALLBACK D3DEnumDevices(GUID FAR *lpGuid, LPSTR lpDeviceDescription, LPSTR lpDeviceName, LPD3DDEVICEDESC lpD3DHWDeviceDesc, LPD3DDEVICEDESC lpD3DHELDeviceDesc, LPVOID lpUserArgs) {
-    int phase = *(int*)lpUserArgs;
-    if (memcmp(lpGuid, &IID_IDirect3DRampDevice, sizeof(GUID)) == 0) {
+    if (memcmp(&IID_IDirect3DRampDevice, lpGuid, sizeof(GUID)) == 0) {
         return 1;
     }
-    if (memcmp(lpGuid, &IID_IDirect3DMMXDevice, sizeof(GUID)) == 0) {
+    if (memcmp(&IID_IDirect3DMMXDevice, lpGuid, sizeof(GUID)) == 0) {
         return 1;
     }
     if (!((lpD3DHELDeviceDesc->dwFlags | lpD3DHWDeviceDesc->dwFlags) & D3DDD_TRICAPS)) {
         return 1;
     }
-    if (lpD3DHELDeviceDesc->dwDeviceZBufferBitDepth == 0 || lpD3DHELDeviceDesc->dwDeviceZBufferBitDepth == 0) {
+    if (lpD3DHWDeviceDesc->dwDeviceZBufferBitDepth == 0 && lpD3DHELDeviceDesc->dwDeviceZBufferBitDepth == 0) {
         return 1;
     }
-    switch (phase) {
+    switch (*(int*)lpUserArgs) {
     case 0:
         if (gRegister_guid_valid) {
             if (memcmp(&gRegister_device_guid, lpGuid, sizeof(GUID)) == 0) {
@@ -1013,11 +1017,16 @@ HRESULT CALLBACK D3DEnumDevices(GUID FAR *lpGuid, LPSTR lpDeviceDescription, LPS
                 lpD3DHWDeviceDesc->dwDeviceZBufferBitDepth,
                 lpD3DHELDeviceDesc->dwDeviceZBufferBitDepth);
         if (gSelected_d3d_device == gCount_d3d_devices) {
-            gDevice_has_color_model = lpD3DHWDeviceDesc->dcmColorModel != 0;
-            memcpy(&gDevice_description, gDevice_has_color_model ? lpD3DHWDeviceDesc : lpD3DHELDeviceDesc, sizeof(D3DDEVICEDESC));
+            if (lpD3DHWDeviceDesc->dcmColorModel != 0) {
+                gDevice_has_color_model = 1;
+                memcpy(&gDevice_description, lpD3DHWDeviceDesc, sizeof(D3DDEVICEDESC));
+            } else {
+                gDevice_has_color_model = 0;
+                memcpy(&gDevice_description, lpD3DHELDeviceDesc, sizeof(D3DDEVICEDESC));
+            }
             d3d_debug_printf("Selected device zbuffer caps %d",
                 gDevice_description.dwDeviceZBufferBitDepth);
-            memcpy(&gDevice_guid, lpGuid, sizeof(GUID));
+            gDevice_guid = *lpGuid;
         }
         gCount_d3d_devices += 1;
         break;
@@ -1030,58 +1039,72 @@ HRESULT CALLBACK D3DEnumDevices(GUID FAR *lpGuid, LPSTR lpDeviceDescription, LPS
 // FUNCTION: D3D 0x100027f0
 HRESULT CALLBACK D3DEnumTextureFormats(LPDDSURFACEDESC lpDdsd, LPVOID lpContext) {
     char format_str[33];
-    DWORD red_bit_mask, grn_bit_mask, blu_bit_mask, alp_bit_mask;
+    DWORD red_bit_mask;
+    DWORD grn_bit_mask;
+    DWORD blu_bit_mask;
+    DWORD alp_bit_mask;
+    int red_bits;
+    int grn_bits;
+    int blu_bits;
+    int alp_bits;
     int i;
     int bit_count;
 
-    int phase = *(int*)lpContext;
-    if (phase != 0) {
+    if (*(int*)lpContext != 0) {
         return 1;
     }
     d3d_debug_printf("Enum Textures bpp=%d", lpDdsd->ddpfPixelFormat.dwRGBBitCount);
+#ifdef REC2_FIX_BUGS
+    if (!(lpDdsd->ddpfPixelFormat.dwFlags & DDPF_RGB)) {
+        return 1;
+    }
+#else
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wlogical-not-parentheses"
+#endif
+    if (!lpDdsd->ddpfPixelFormat.dwFlags & DDPF_RGB) {
+        return 1;
+    }
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif
+#endif
     bit_count = lpDdsd->ddpfPixelFormat.dwRGBBitCount;
-    if (lpDdsd->ddpfPixelFormat.dwRGBBitCount != 16) {
-        if (!(bit_count == 8 && (lpDdsd->ddpfPixelFormat.dwFlags & DDPF_PALETTEINDEXED8))) {
-            return 1;
-        }
+    if (bit_count != 16 && bit_count != 8) {
+        return 1;
+    }
+    if (bit_count == 8 && !(lpDdsd->ddpfPixelFormat.dwFlags & DDPF_PALETTEINDEXED8)) {
+        return 1;
     }
     red_bit_mask = lpDdsd->ddpfPixelFormat.dwRBitMask;
     grn_bit_mask = lpDdsd->ddpfPixelFormat.dwGBitMask;
     blu_bit_mask = lpDdsd->ddpfPixelFormat.dwBBitMask;
     alp_bit_mask = lpDdsd->ddpfPixelFormat.dwRGBAlphaBitMask;
-
-    memset(format_str, 0, sizeof(format_str));
-    for (i = 31; i >= 0; i--) {
-        char c = '.';
-        if (red_bit_mask & 0x1) {
-            c = 'R';
+    red_bits = red_bit_mask;
+    grn_bits = grn_bit_mask;
+    blu_bits = blu_bit_mask;
+    alp_bits = alp_bit_mask;
+    for (i = 15; i >= 0; i--) {
+        format_str[i] = "."[0];
+        if (red_bits & 0x1) {
+            format_str[i] = "R"[0];
         }
-        red_bit_mask >>= 1;
-        if (grn_bit_mask & 0x1) {
-            c = 'G';
+        red_bits >>= 1;
+        if (grn_bits & 0x1) {
+            format_str[i] = "G"[0];
         }
-        grn_bit_mask >>= 1;
-        if (blu_bit_mask & 0x1) {
-            c = 'B';
+        grn_bits >>= 1;
+        if (blu_bits & 0x1) {
+            format_str[i] = "B"[0];
         }
-        blu_bit_mask >>= 1;
-        if (alp_bit_mask & 0x1) {
-            c = 'A';
+        blu_bits >>= 1;
+        if (alp_bits & 0x1) {
+            format_str[i] = "A"[0];
         }
-        alp_bit_mask >>= 1;
-        format_str[i] = c;
+        alp_bits >>= 1;
     }
-    d3d_debug_printf("format=%s r=0x%x g=0x%x b=0x%x a=0x%x",
-        format_str,
-        lpDdsd->ddpfPixelFormat.dwRBitMask,
-        lpDdsd->ddpfPixelFormat.dwGBitMask,
-        lpDdsd->ddpfPixelFormat.dwBBitMask,
-        lpDdsd->ddpfPixelFormat.dwRGBAlphaBitMask);
-    if (bit_count == 16
-            && lpDdsd->ddpfPixelFormat.dwRGBAlphaBitMask == 0
-            && lpDdsd->ddpfPixelFormat.dwRBitMask == 0x7c00
-            && lpDdsd->ddpfPixelFormat.dwGBitMask == 0x03e0
-            && lpDdsd->ddpfPixelFormat.dwBBitMask == 0x001f) {
+    if (bit_count == 16 && alp_bit_mask == 0 && red_bit_mask == 0x7c00 && grn_bit_mask == 0x03e0 && blu_bit_mask == 0x001f) {
         gAvailable_pixel_formats |= 0x2;
         memcpy(&gAvailable_RGB555_texture_format_description, lpDdsd, sizeof(*lpDdsd));
         d3d_debug_printf("TEX.ID: RGB 555");
@@ -1095,11 +1118,7 @@ HRESULT CALLBACK D3DEnumTextureFormats(LPDDSURFACEDESC lpDdsd, LPVOID lpContext)
         }
     }
     if (gPixel_format_is_xrgb1555 != 1 || gDevice_has_color_model) {
-        if (bit_count == 16
-                && lpDdsd->ddpfPixelFormat.dwRGBAlphaBitMask == 0
-                && lpDdsd->ddpfPixelFormat.dwRBitMask == 0xf800
-                && lpDdsd->ddpfPixelFormat.dwGBitMask == 0x07e0
-                && lpDdsd->ddpfPixelFormat.dwBBitMask == 0x001f) {
+        if (bit_count == 16 && alp_bit_mask == 0 && red_bit_mask == 0xf800 && grn_bit_mask == 0x07e0 && blu_bit_mask == 0x001f) {
             gAvailable_pixel_formats |= 0x4;
             memcpy(&gAvailable_RGB565_texture_format_description, lpDdsd, sizeof(*lpDdsd));
             d3d_debug_printf("TEX.ID: RGB 565");
@@ -1112,14 +1131,9 @@ HRESULT CALLBACK D3DEnumTextureFormats(LPDDSURFACEDESC lpDdsd, LPVOID lpContext)
                 memcpy(&gPreferred_opaque_texture_surface_description, lpDdsd, sizeof(*lpDdsd));
             }
         }
-        if ((gRegister_flags & 0x4)
-                && bit_count == 16
-                && lpDdsd->ddpfPixelFormat.dwAlphaBitDepth == 0xf000
-                && lpDdsd->ddpfPixelFormat.dwRBitMask == 0x0f00
-                && lpDdsd->ddpfPixelFormat.dwGBitMask == 0x00f0
-                && lpDdsd->ddpfPixelFormat.dwBBitMask == 0xf) {
+        if ((gRegister_flags & 0x4) && bit_count == 16 && alp_bit_mask == 0xf000 && red_bit_mask == 0x0f00 && grn_bit_mask == 0x00f0 && blu_bit_mask == 0x000f) {
             gAvailable_pixel_formats |= 0x10;
-            memcpy(&gAvailable_RGB565_texture_format_description, lpDdsd, sizeof(*lpDdsd));
+            memcpy(&gAvailable_ARGB4444_texture_format_description, lpDdsd, sizeof(*lpDdsd));
             d3d_debug_printf("TEX.ID: ARGB 4444");
             if (gPreferred_texture_format < 0x10) {
                 gPreferred_texture_format = 0x10;
@@ -1129,6 +1143,7 @@ HRESULT CALLBACK D3DEnumTextureFormats(LPDDSURFACEDESC lpDdsd, LPVOID lpContext)
     }
     return 1;
 }
+
 
 // FUNCTION: D3D 0x10002ac0
 int C2_HOOK_CDECL SetD3DViewport(void) {
