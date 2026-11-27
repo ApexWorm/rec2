@@ -196,7 +196,7 @@ inline void C2_HOOK_FASTCALL LoadDroneTypeInfo(char* pDrone_name) {
     if (strcmp(str, "constant") == 0) {
         form->speed = GetAScalar(f);
     } else if (strcmp(str, "variable") == 0) {
-        form->speed = -1.f;
+        form->speed = -1.0f;
         form->max_acceleration = GetAScalar(f);
         form->max_speed = GetAScalar(f);
         form->min_speed = GetAScalar(f);
@@ -204,7 +204,7 @@ inline void C2_HOOK_FASTCALL LoadDroneTypeInfo(char* pDrone_name) {
         FatalError(kFatalError_UnableToOpenDroneFileOrFileCorrupted_S, pDrone_name);
     }
     form->crushability = GetAScalar(f);
-    if (form->crushability != 0.f) {
+    if (form->crushability != 0.0f) {
         GetPairOfFloats(f, &form->crush_limits_front, &form->crush_limits_back);
         GetPairOfFloats(f, &form->crush_limits_left, &form->crush_limits_right);
         GetPairOfFloats(f, &form->crush_limits_bottom, &form->crush_limits_top);
