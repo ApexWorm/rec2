@@ -129,6 +129,11 @@ tCrush_list_item gCrush_lists[8];
 // GLOBAL: CARMA2_CHEAT 0x00680f6c
 int gCount_queued_drone_crushes;
 
+// GLOBAL: CARMA2_HW 0x0067baa0
+// GLOBAL: CARMA2_SW 0x00676210
+// GLOBAL: CARMA2_CHEAT 0x00683350
+int gINT_0067baa0[10];
+
 // GLOBAL: CARMA2_HW 0x0067bad0
 // GLOBAL: CARMA2_SW 0x00676240
 // GLOBAL: CARMA2_CHEAT 0x00683380
@@ -2307,9 +2312,58 @@ intptr_t C2_HOOK_FASTCALL DRActorEnumRecurseUltraPlus(br_actor* pActor, br_actor
     return pCallback(actor, pArg);
 }
 
-// FireOffBitsCB
+// FUNCTION: CARMA2_HW 0x00435e10
+// FUNCTION: CARMA2_SW 0x00435e40
+// FUNCTION: CARMA2_CHEAT 0x00436000
+inline intptr_t C2_HOOK_CDECL FireOffBitsCB(br_actor* pActor, void* pContext) {
+    tCar_spec* car;
+    tUser_crush_data* user_crush;
+    tPhysics_object* object;
+    br_vector3 car_pos;
+    br_vector3 dir;
+    int found;
+    int i;
 
-// FireSomeBitsOffCar
+    car = pContext;
+    user_crush = pActor->user;
+    if (user_crush == NULL || user_crush->crush_data == NULL || user_crush->crush_data->detach_data == NULL) {
+        return 0;
+    }
+    found = 0;
+    for (i = 0; i < (int)REC2_ASIZE(gINT_0067baa0); i++) {
+        if (gINT_0067baa0[i] == user_crush->crush_data->id) {
+            found = 1;
+            break;
+        }
+    }
+    if (!found) {
+        return 0;
+    }
+    object = DetachBit(car, pActor, NULL);
+    if (object == NULL) {
+        return 0;
+    }
+    BrMatrix34ApplyP(&car_pos, &car->collision_info->cmpos, &car->collision_info->actor->t.t.mat);
+    BrMatrix34ApplyP(&dir, &object->cmpos, &object->actor->t.t.mat);
+    BrVector3Sub(&dir, &dir, &car_pos);
+    BrVector3Normalise(&dir, &dir);
+    BrVector3Scale(&dir, &dir, 8.0f / WORLD_SCALE);
+    BrVector3Accumulate(&object->v, &dir);
+    BrVector3Accumulate(&object->v, &car->collision_info->v);
+    return 0;
+}
+
+// FUNCTION: CARMA2_HW 0x00435fa0
+// FUNCTION: CARMA2_SW 0x00435fd0
+// FUNCTION: CARMA2_CHEAT 0x00436190
+void C2_HOOK_FASTCALL FireSomeBitsOffCar(tCar_spec* pCar) {
+    int i;
+
+    for (i = 0; i < (int)REC2_ASIZE(gINT_0067baa0); i++) {
+        gINT_0067baa0[i] = IRandomBetween(1, pCar->car_crush_spec->nb_entries);
+    }
+    DRActorEnumRecurseUltraPlus(pCar->car_model_actor, FireOffBitsCB, pCar);
+}
 
 // DoSpams
 
