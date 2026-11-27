@@ -72,6 +72,18 @@ int gTraffic_disabled;
 // GLOBAL: CARMA2_SW 0x0067c6f0
 int gINT_00681fb0;
 
+// GLOBAL: CARMA2_HW 0x00594738
+// GLOBAL: CARMA2_SW 0x0058f698
+// GLOBAL: CARMA2_CHEAT 0x0059b090
+tDrone_state_function* gDrone_state_functions[6] = {
+    NULL,
+    DroneStateFuncReset,
+    DroneStateFuncControlledMovement,
+    DroneStateFuncPhysicsActive,
+    DroneStateFuncStationaryPassive,
+    NULL,
+};
+
 // GLOBAL: CARMA2_HW 0x00684514
 // GLOBAL: CARMA2_SW 0x0067ec54
 // GLOBAL: CARMA2_CHEAT 0x0068bdbc
@@ -214,7 +226,24 @@ br_actor* C2_HOOK_CDECL MrFindy(br_actor* pActor, const char* pName) {
 
 // UnPauseDroneState
 
-// NewDroneState
+inline void C2_HOOK_FASTCALL NewDroneState(tDrone_spec* pDrone, int pNew_state) {
+    int old_state;
+
+    DoNotDprintf_drone("NewDroneState() Drone %d, Current state %d, New state %d", pDrone->id, pDrone->current_state, pNew_state);
+    if (pDrone->current_state != pNew_state) {
+        if (gDrone_state_functions[pDrone->current_state] != NULL) {
+            gDrone_state_functions[pDrone->current_state](pDrone, eDrone_state_STOP);
+        }
+        old_state = pDrone->current_state;
+        pDrone->time_last_munge = gTime_stamp_for_this_munging;
+        pDrone->prev_states[1] = pDrone->prev_states[0];
+        pDrone->prev_states[0] = old_state;
+        pDrone->current_state = pNew_state;
+        if (gDrone_state_functions[pNew_state] != NULL) {
+            gDrone_state_functions[pNew_state](pDrone, eDrone_state_START);
+        }
+    }
+}
 
 // ResetDroneCrushyModel
 
@@ -332,13 +361,41 @@ int C2_HOOK_FASTCALL DroneTrainWithinProcessingDistance(const br_vector3* pPos) 
 
 // ProcessThisDrone
 
-// DroneStateFuncReset
+// STUB: CARMA2_HW 0x0044cc70
+// STUB: CARMA2_SW 0x0044ca20
+// STUB: CARMA2_CHEAT 0x0044d1c0
+void C2_HOOK_FASTCALL DroneStateFuncReset(tDrone_spec* pDrone, tDroneStateFuncState pState) {
+    NOT_IMPLEMENTED();
+}
 
-// InitDroneDrivingInfo
+inline void C2_HOOK_FASTCALL InitDroneDrivingInfo(tDrone_spec* pDrone) {
+    pDrone->field_0xdc = 0;
+    pDrone->field_0xe4 = 0.0f;
+    pDrone->field_0x48 = 0.0f;
+    pDrone->field_0x4c = 0.0f;
+}
 
-// MoveThisDronePlane
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
 
-// MoveThisDroneCar
+// STUB: CARMA2_HW 0x0044d2a0
+// STUB: CARMA2_SW 0x0044d050
+// STUB: CARMA2_CHEAT 0x0044d7f0
+void C2_HOOK_FASTCALL MoveThisDronePlane(tDrone_spec* pDrone) {
+    NOT_IMPLEMENTED();
+}
+
+// STUB: CARMA2_HW 0x0044e540
+// STUB: CARMA2_SW 0x0044e2e0
+// STUB: CARMA2_CHEAT 0x0044ea90
+void C2_HOOK_FASTCALL MoveThisDroneCar(tDrone_spec* pDrone) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // FUNCTION: CARMA2_HW 0x0044cfd0
 // FUNCTION: CARMA2_SW 0x0044cd80
@@ -370,15 +427,87 @@ void C2_HOOK_FASTCALL PipeDroneMatrix(tDrone_spec* pDrone) {
     PipeSingleDroneCornerPos(pDrone, DRScalarToU16(speed, -500.f, 500.f), DRScalarToU16(pDrone->field_0x74, 0.f, 1.f), DRScalarToU16(radius, 0.f, 100.f), &compressed_mat);
 }
 
-// PossiblyPipeDroneMovement
+inline void C2_HOOK_FASTCALL PossiblyPipeDroneMovement(tDrone_spec* pDrone) {
+    if (pDrone->field_0xdc == 1) {
+        PipeSingleDroneStraightPos(pDrone, pDrone->field_0x10,
+            DRScalarToU16(pDrone->field_0x48, -500.0f, 500.0f),
+            DRScalarToU16(pDrone->field_0x4c, 0.0f, 255.0f));
+    } else if (pDrone->field_0xdc == 2) {
+        PipeDroneMatrix(pDrone);
+    } else {
+        PDEnterDebugger("Keith");
+    }
+}
 
-// DroneStateFuncControlledMovement
+// FUNCTION: CARMA2_HW 0x0044d1d0
+// FUNCTION: CARMA2_SW 0x0044cf80
+// FUNCTION: CARMA2_CHEAT 0x0044d720
+void C2_HOOK_FASTCALL DroneStateFuncControlledMovement(tDrone_spec* pDrone, tDroneStateFuncState pState) {
+
+    switch (pState) {
+    case eDrone_state_START:
+        DoNotDprintf_drone("DroneStateFuncControlledMovement() START");
+        InitDroneDrivingInfo(pDrone);
+        break;
+    case eDrone_state_RUN:
+        DoNotDprintf_drone("DroneStateFuncControlledMovement() RUN");
+        if (pDrone->field_0x44) {
+            switch (pDrone->form->type) {
+            case kDroneType_plane:
+                MoveThisDronePlane(pDrone);
+                break;
+            default:
+                MoveThisDroneCar(pDrone);
+                break;
+            }
+            PossiblyPipeDroneMovement(pDrone);
+        }
+        break;
+    default:
+        DoNotDprintf_drone("DroneStateFuncControlledMovement() DEFAULT");
+        break;
+    }
+}
 
 // DoDroneHaltingStuff
 
-// DroneStateFuncPhysicsActive
+// FUNCTION: CARMA2_HW 0x0044eb70
+// FUNCTION: CARMA2_SW 0x0044e910
+// FUNCTION: CARMA2_CHEAT 0x0044f0c0
+void C2_HOOK_FASTCALL DroneStateFuncPhysicsActive(tDrone_spec* pDrone, tDroneStateFuncState pState) {
 
-// DroneStateFuncStationaryPassive
+    switch (pState) {
+    case eDrone_state_RUN:
+        DoNotDprintf_drone("DroneStateFuncPhysicsActive() RUN");
+        if ((!pDrone->field_0x44 || ((pDrone->form->flags & 0x4) && !pDrone->field_0x45)) && (pDrone->form->flags & 0x2)) {
+            RemoveDroneFromPHIL(pDrone);
+            pDrone->collision_info.field_0x1a0 = 0x100000;
+            PHILSetObjectProperty(&pDrone->collision_info, 3, 1);
+            pDrone->field_0x5d4 = 0;
+            NewDroneState(pDrone, 1);
+        }
+        break;
+    default:
+        break;
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x0044ec50
+// FUNCTION: CARMA2_SW 0x0044e9f0
+// FUNCTION: CARMA2_CHEAT 0x0044f1a0
+void C2_HOOK_FASTCALL DroneStateFuncStationaryPassive(tDrone_spec* pDrone, tDroneStateFuncState pState) {
+
+    switch (pState) {
+    case eDrone_state_RUN:
+        DoNotDprintf_drone("DroneStateFuncStationaryPassive() RUN");
+        if ((!pDrone->field_0x44 || ((pDrone->form->flags & 0x4) && !pDrone->field_0x45)) && (pDrone->form->flags & 0x2)) {
+            NewDroneState(pDrone, 1);
+        }
+        break;
+    default:
+        break;
+    }
+}
 
 // GetNewCrushyModelForDrone
 
