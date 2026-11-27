@@ -22,6 +22,7 @@
 #include "27-powerup.h"
 #include "29-raycast.h"
 #include "30-opponent.h"
+#include "32-spark.h"
 #include "34-finteray.h"
 #include "37-brucetrk.h"
 #include "41-utility.h"
@@ -51,6 +52,16 @@
 // GLOBAL: CARMA2_SW 0x00795340
 // GLOBAL: CARMA2_CHEAT 0x007a6440
 tNon_car_spec* gActive_non_car_list[99];
+
+// GLOBAL: CARMA2_HW 0x006793c0
+// GLOBAL: CARMA2_SW 0x00673b30
+// GLOBAL: CARMA2_CHEAT 0x00680c70
+int gSkid_tag[2];
+
+// GLOBAL: CARMA2_HW 0x006793c8
+// GLOBAL: CARMA2_SW 0x00673b38
+// GLOBAL: CARMA2_CHEAT 0x00680c78
+tCar_spec* gLast_car_to_skid[2];
 
 // GLOBAL: CARMA2_HW 0x0067935c
 // GLOBAL: CARMA2_SW 0x00673acc
@@ -1254,7 +1265,53 @@ void C2_HOOK_FASTCALL NonCarCalcForce(tNon_car_spec* pNon_car, br_scalar pDt) {
 
 // ScrapeNoise
 
-// SkidNoise
+// FUNCTION: CARMA2_HW 0x0041bed0
+// FUNCTION: CARMA2_SW 0x0041bf00
+// FUNCTION: CARMA2_CHEAT 0x0041c130
+void C2_HOOK_FASTCALL SkidNoise(tCar_spec* pC, int pWheel_num, br_scalar pV, int pMaterial) {
+    br_vector3 pos;
+    br_vector3 world_pos;
+    br_vector3 wv;
+    br_vector3 wvw;
+    br_scalar ts;
+    br_vector3 tv;
+    // GLOBAL: CARMA2_HW 0x00679408
+    // GLOBAL: CARMA2_SW 0x00673b78
+    // GLOBAL: CARMA2_CHEAT 0x00680cb8
+    static int last_skid_vol[2];
+    int i;
+
+    i = IRandomBetween(0, 1);
+    if (pV < 5.f) {
+        return;
+    }
+    if (gCurrent_race.material_modifiers[pMaterial].tyre_noise_index == -1) {
+        return;
+    }
+    if (IRandomBetween(0, 4) != 0) {
+        return;
+    }
+    last_skid_vol[i] = (int)(pV * 10.f);
+    pos.v[0] = pC->wpos[pWheel_num].v[0];
+    pos.v[1] = pC->wpos[pWheel_num].v[1] - pC->oldd[pWheel_num];
+    pos.v[2] = pC->wpos[pWheel_num].v[2];
+    BrMatrix34ApplyP(&world_pos, &pos, &pC->car_master_actor->t.t.mat);
+    BrVector3Scale(&world_pos, &world_pos, 1.f / WORLD_SCALE);
+    if (!DRS3SoundStillPlaying(gSkid_tag[i]) || (pC != NULL && pC->driver == eDriver_local_human && gLast_car_to_skid[i] != pC)) {
+        gSkid_tag[i] = DRS3StartSound3D(gCar_outlet, IRandomBetween(0, 4) + 9000, &world_pos, &pC->vel, 1, last_skid_vol[i], IRandomBetween(0xc000, 0x14000), 0x10000);
+        gLast_car_to_skid[i] = pC;
+    }
+    if (gCurrent_race.material_modifiers[pMaterial].smoke_type == 1) {
+        BrVector3Cross(&wv, &pC->collision_info->omega, &pos);
+        BrVector3Scale(&tv, &pC->collision_info->velocity_car_space, WORLD_SCALE);
+        BrVector3Accumulate(&wv, &tv);
+        ts = -BrVector3Dot(&wv, &pC->road_normal);
+        BrVector3Scale(&wvw, &pC->road_normal, ts);
+        BrVector3Accumulate(&wv, &wvw);
+        BrMatrix34ApplyV(&wvw, &wv, &pC->car_master_actor->t.t.mat);
+        CreatePuffOfSmoke(&world_pos, &wvw, pV * 0.04f, 1.f, 4);
+    }
+}
 
 // StopSkid
 
