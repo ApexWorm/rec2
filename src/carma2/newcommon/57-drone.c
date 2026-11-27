@@ -551,7 +551,17 @@ int C2_HOOK_FASTCALL DroneTrainWithinProcessingDistance(const br_vector3* pPos) 
     }
 }
 
-// CalcRenderBoundsCentre
+// FUNCTION: CARMA2_HW 0x00451bd0
+// FUNCTION: CARMA2_SW 0x00451960
+// FUNCTION: CARMA2_CHEAT 0x00452120
+void C2_HOOK_FASTCALL CalcRenderBoundsCentre(void) {
+    br_vector3 direction;
+
+    BrVector3Negate(&direction, (br_vector3*)gCamera_to_world.m[2]);
+    BrVector3Normalise(&direction, &direction);
+    BrVector3Scale(&direction, &direction, 5.0f);
+    BrVector3Add(&gRender_bounds_centre, &direction, (br_vector3*)gCamera_to_world.m[3]);
+}
 
 // DoDroneDistanceChecks
 
