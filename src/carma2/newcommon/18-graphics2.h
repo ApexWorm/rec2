@@ -41,6 +41,8 @@ extern void C2_HOOK_FASTCALL DRPixelmapShadedHRectFill(br_pixelmap* pMap, int pX
 
 extern void C2_HOOK_FASTCALL DRPixelmapShadedVRectFill(br_pixelmap* pMap, int pX, int pY, int pWidth, int pHeight, br_colour pColour);
 
+extern br_pixelmap* gBlend25_table;
+extern br_pixelmap* gBlend50_table;
 extern br_pixelmap* gBlend75_table;
 extern int gCurrent_cursor_index;
 extern tMouse_coord gMouse_last_pos;
