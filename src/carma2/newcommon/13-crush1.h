@@ -309,7 +309,7 @@ extern void C2_HOOK_FASTCALL DoFullyDetaching(void);
 
 extern intptr_t C2_HOOK_CDECL MakeCarModelsMaterialsDoubleSided(br_actor* pActor, void* pArg);
 
-// SwapCarShapes
+extern void C2_HOOK_FASTCALL SwapCarShapes(tCar_spec* pCar, tPhysics_shape* pShape);
 
 extern int C2_HOOK_FASTCALL IsAWheelOrPivotActor(br_actor* pActor, tCar_spec* pCar);
 
@@ -335,17 +335,17 @@ extern intptr_t C2_HOOK_CDECL MakeCarModelsMaterialsSingleSided(br_actor* pActor
 
 // DoJointSnapping
 
-// PointIsOutsideShape
+extern int C2_HOOK_FASTCALL PointIsOutsideShape(const br_vector3* pPoint, const tCollision_shape_polyhedron_data* pPolyhedron);
 
-// PointIsOutsideLimits
+extern int C2_HOOK_FASTCALL PointIsOutsideLimits(const tCar_crush_shape_info* pShape, int pPoint_index, const tCar_crush_limits* pLimits);
 
-// ClipPointToPolyhedron
+extern void C2_HOOK_FASTCALL ClipPointToPolyhedron(br_vector3* pPoint, const tCollision_shape_polyhedron_data* pPolyhedron);
 
-// QuantizeVector3
+extern void C2_HOOK_FASTCALL QuantizeVector3(br_vector3* pV);
 
-// MoveCarToSensiblePlace
+extern int C2_HOOK_FASTCALL MoveCarToSensiblePlace(tCar_spec* pCar);
 
-// SwapShapesIfPossible
+extern int C2_HOOK_FASTCALL SwapShapesIfPossible(tCar_spec* pCar_spec);
 
 // DoShapeSwapping
 
