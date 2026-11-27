@@ -197,20 +197,20 @@ char* C2_HOOK_FASTCALL PFfgets(char* buffer, br_size_t size, FILE* pFile) {
     if ((intptr_t)pFile >= REC2_ASIZE(gTwatVfsFiles)) {
         return fgets(buffer, size, pFile);
     }
-    twtFile = &gTwatVfsFiles[(uintptr_t)pFile];
     writePtr = buffer;
+    twtFile = &gTwatVfsFiles[(uintptr_t)pFile];
     for (i = 0; i < (int)size - 1; i++) {
-        c = (int)*twtFile->pos++;
+        c = (char)*twtFile->pos++;
         if (c == -1) {
             *writePtr = '\0';
             twtFile->error = -1;
             return NULL;
         }
         *writePtr++ = c;
-        if (c == '\n') {
+        if ((char)c == '\n') {
             break;
         }
-        if (twtFile->pos >= twtFile->end) {
+        if (PFfeof(pFile)) {
             break;
         }
     }
