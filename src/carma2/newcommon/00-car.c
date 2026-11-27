@@ -1204,11 +1204,11 @@ int C2_HOOK_FASTCALL NonCarSnapOff(tPhysics_object* pObject) {
     pObject->field_0xed = 1;
     pObject->field_0x194 = 0;
     pObject->field_0x198 = 0;
-    if (non_car->snap_off_cosine < 1.f) {
+    if (non_car->snap_off_cosine < 1.0f) {
         pObject->physics_joint2 = NULL;
     }
     pObject->field_0x218 = 0;
-    BrVector3Set(&pObject->v, 0.f, 0.f, 0.f);
+    BrVector3Set(&pObject->v, 0.0f, 0.0f, 0.0f);
     return 0;
 }
 
