@@ -91,7 +91,7 @@ extern void C2_HOOK_FASTCALL ARDoSingleSession(int pType, uintptr_t pOwner, void
 
 extern void C2_HOOK_CDECL ARDoSingleVariedSession(int pType, uintptr_t pOwner, int pCount, ...);
 
-// ARResetPipePlayToEnd
+extern void C2_HOOK_FASTCALL ARResetPipePlayToEnd(void);
 
 extern tU8* C2_HOOK_FASTCALL ARGetPipePlayPtr(void);
 
@@ -141,7 +141,7 @@ extern void C2_HOOK_FASTCALL ARService(void);
 
 extern void C2_HOOK_FASTCALL ARMainLoopStart(void);
 
-// ARToggleReplay
+extern int C2_HOOK_FASTCALL ARToggleReplay(tTurn_on_AR_callback* pTurn_on_AR_cb, tTurn_off_AR_callback* pTurn_off_AR_cb, tAfter_AR_callback* pAfter_AR_cb, tReplay_session_callback* pZappy_AR_cb, tPreprocess_AR_callback* pPreprocess_cb, tPostProcess_AR_callback* pPostProcess_cb, tU32* pFrame_period, tU32* pFrame_period_2);
 
 extern void C2_HOOK_FASTCALL GetReducedPos(br_vector3* pPos, const tReduced_pos* pReduced_pos);
 

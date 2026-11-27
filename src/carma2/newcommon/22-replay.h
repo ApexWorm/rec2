@@ -59,7 +59,7 @@ extern void C2_HOOK_FASTCALL DoActionReplay(tU32 pFrame_period);
 
 // CheckReplayTurnOn
 
-// InitializeActionReplayPix
+extern void C2_HOOK_FASTCALL InitializeActionReplayPix(void);
 
 extern void C2_HOOK_FASTCALL FreeActionReplayPix(void);
 
