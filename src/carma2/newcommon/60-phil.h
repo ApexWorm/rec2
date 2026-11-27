@@ -57,7 +57,7 @@ extern int C2_HOOK_FASTCALL GetHierarchyNetworkSize(tPhysics_object* pObject);
 
 extern int C2_HOOK_FASTCALL GetNetworkDataSize(tU8* pNet_data);
 
-// GetSingleMatrixFromNetworkData
+extern int C2_HOOK_FASTCALL GetSingleMatrixFromNetworkData(tU8* pNet_data, br_matrix34* pMatrix);
 
 extern int C2_HOOK_FASTCALL PHILInit(void);
 

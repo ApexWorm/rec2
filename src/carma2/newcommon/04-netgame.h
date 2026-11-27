@@ -54,7 +54,7 @@ extern void C2_HOOK_FASTCALL ReceivedCopInfo(void);
 
 // ReceivedNonCarPosition
 
-// ReceivedNonCar
+extern void C2_HOOK_FASTCALL ReceivedNonCar(tNet_message_chunk_non_car* pContents);
 
 extern void C2_HOOK_FASTCALL SignalToStartRace(void);
 

@@ -51,6 +51,11 @@
 // GLOBAL: CARMA2_CHEAT 0x007a6440
 tNon_car_spec* gActive_non_car_list[99];
 
+// GLOBAL: CARMA2_HW 0x0079ef40
+// GLOBAL: CARMA2_SW 0x007954e0
+// GLOBAL: CARMA2_CHEAT 0x007a65e0
+tS8 gNon_car_spec_indices[100];
+
 // GLOBAL: CARMA2_HW 0x0067939c
 // GLOBAL: CARMA2_SW 0x00673b0c
 // GLOBAL: CARMA2_CHEAT 0x00680c4c
@@ -1601,6 +1606,7 @@ tNon_car_spec* C2_HOOK_FASTCALL PullActorFromWorld(br_actor* pActor) {
 
 // STUB: CARMA2_HW 0x0041ff20
 // STUB: CARMA2_SW 0x0041ffa0
+// STUB: CARMA2_CHEAT 0x00420180
 tNon_car_spec* C2_HOOK_FASTCALL DoPullActorFromWorld(br_actor* pActor) {
     NOT_IMPLEMENTED();
     return NULL;
