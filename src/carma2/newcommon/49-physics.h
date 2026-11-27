@@ -12,8 +12,6 @@
 #include "c2_hooks.h"
 #include "rec2_types.h"
 
-extern tPhysics_object* gTest_object;
-
 extern int gINT_00692dc8;
 
 extern tPhysicsError_cbfn* gPhysics_error_cb;
@@ -428,7 +426,7 @@ extern void C2_HOOK_FASTCALL SetUpTestObjects(void);
 
 extern void C2_HOOK_FASTCALL ResetObjectList_test(tPhysics_object* pObject);
 
-extern void C2_HOOK_FASTCALL ResetMan(void);
+// ResetMan
 
 extern void C2_HOOK_FASTCALL InitPhysics(void);
 
