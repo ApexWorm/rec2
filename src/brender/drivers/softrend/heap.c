@@ -62,6 +62,7 @@ static brp_vertex *heapVertexAdd(br_primitive_heap* heap, brp_vertex* src, br_bo
 }
 
 // FUNCTION: CARMA2_HW 0x00546860
+// FUNCTION: CARMA2_SW 0x00541f00
 void C2_HOOK_CDECL OpHeapAddTriangle(brp_block* block, brp_vertex* v0, brp_vertex* v1, brp_vertex* v2) {
     br_primitive* p;
     br_scalar zprim;
@@ -137,6 +138,7 @@ void C2_HOOK_CDECL OpHeapAddLine(brp_block* block, brp_vertex* v0, brp_vertex* v
 }
 
 // FUNCTION: CARMA2_HW 0x00546e90
+// FUNCTION: CARMA2_SW 0x00542530
 void C2_HOOK_CDECL OpHeapAddPoint(brp_block* block, brp_vertex* v0) {
     br_primitive* p;
     br_scalar zprim;
@@ -171,6 +173,7 @@ void C2_HOOK_CDECL OpHeapAddPoint(brp_block* block, brp_vertex* v0) {
 }
 
 // FUNCTION: CARMA2_HW 0x00547030
+// FUNCTION: CARMA2_SW 0x005426d0
 void C2_HOOK_CDECL OpHeapAddTriangleConvert(brp_block* block, brp_vertex* v0, brp_vertex* v1, brp_vertex* v2) {
     br_primitive* p;
     br_scalar zprim;
@@ -214,6 +217,7 @@ void C2_HOOK_CDECL OpHeapAddTriangleConvert(brp_block* block, brp_vertex* v0, br
 }
 
 // FUNCTION: CARMA2_HW 0x00547310
+// FUNCTION: CARMA2_SW 0x005429b0
 void C2_HOOK_CDECL OpHeapAddLineConvert(brp_block* block, brp_vertex* v0, brp_vertex* v1) {
     br_primitive* p;
     br_scalar zprim;
@@ -254,6 +258,7 @@ void C2_HOOK_CDECL OpHeapAddLineConvert(brp_block* block, brp_vertex* v0, brp_ve
 }
 
 // FUNCTION: CARMA2_HW 0x00547530
+// FUNCTION: CARMA2_SW 0x00542bd0
 void C2_HOOK_CDECL OpHeapAddPointConvert(brp_block* block, brp_vertex* v0) {
     br_primitive* p;
     br_scalar zprim;

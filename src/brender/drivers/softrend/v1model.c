@@ -392,6 +392,7 @@ void C2_HOOK_CDECL V1Face_Render(br_geometry* self, br_soft_renderer* renderer) 
 }
 
 // FUNCTION: CARMA2_HW 0x00542830
+// FUNCTION: CARMA2_SW 0x0053ded0
 void C2_HOOK_CDECL V1Face_OS_Render(br_geometry* self, br_soft_renderer* renderer) {
     int f;
     temp_face_soft* tfp;
@@ -413,6 +414,7 @@ void C2_HOOK_CDECL V1Face_OS_Render(br_geometry* self, br_soft_renderer* rendere
 }
 
 // FUNCTION: CARMA2_HW 0x005428b0
+// FUNCTION: CARMA2_SW 0x0053df50
 void C2_HOOK_CDECL V1Face_OSV_Render(br_geometry* self, br_soft_renderer* renderer) {
     int f;
     temp_face_soft* tfp;

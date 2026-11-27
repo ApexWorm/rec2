@@ -61,6 +61,7 @@ void C2_HOOK_STDCALL ConvertVertex(brp_vertex* dest, brp_vertex* src) {
 }
 
 // FUNCTION: CARMA2_HW 0x005461b0
+// FUNCTION: CARMA2_SW 0x00541850
 void C2_HOOK_CDECL RenderConvert1(brp_block* block, brp_vertex* v0) {
     int c;
     br_uint_32 m;
@@ -106,6 +107,7 @@ void C2_HOOK_CDECL RenderConvert1(brp_block* block, brp_vertex* v0) {
 }
 
 // FUNCTION: CARMA2_HW 0x00546290
+// FUNCTION: CARMA2_SW 0x00541930
 void C2_HOOK_CDECL RenderConvert2(brp_block* block, brp_vertex* v0, brp_vertex* v1) {
     int c;
     br_uint_32 m;
@@ -155,6 +157,7 @@ void C2_HOOK_CDECL RenderConvert2(brp_block* block, brp_vertex* v0, brp_vertex* 
 }
 
 // FUNCTION: CARMA2_HW 0x005463f0
+// FUNCTION: CARMA2_SW 0x00541a90
 void C2_HOOK_CDECL RenderConvert3(brp_block* block, brp_vertex* v0, brp_vertex* v1, brp_vertex* v2) {
     int c;
     br_uint_32 m;

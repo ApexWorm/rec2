@@ -14,6 +14,7 @@
 #include "core/fw/scratch.h"
 
 // FUNCTION: CARMA2_HW 0x00547810
+// FUNCTION: CARMA2_SW 0x00542eb0
 void C2_HOOK_CDECL Vertex_TransformProjectOutcodeBounds(br_geometry* self, br_soft_renderer* renderer) {
     int v;
     brp_vertex* tvp;
@@ -44,6 +45,7 @@ void C2_HOOK_CDECL Vertex_TransformProjectOutcodeBounds(br_geometry* self, br_so
 }
 
 // FUNCTION: CARMA2_HW 0x00547ae0
+// FUNCTION: CARMA2_SW 0x00543180
 void C2_HOOK_CDECL Vertex_TransformProjectOutcode(br_geometry *self, br_soft_renderer* renderer) {
     int v;
     brp_vertex* tvp;
@@ -65,6 +67,7 @@ void C2_HOOK_CDECL Vertex_TransformProjectOutcode(br_geometry *self, br_soft_ren
 }
 
 // FUNCTION: CARMA2_HW 0x00547d40
+// FUNCTION: CARMA2_SW 0x005433e0
 void C2_HOOK_CDECL Vertex_OS_TransformProjectBounds(br_geometry* self, br_soft_renderer* renderer) {
     int v;
     brp_vertex* tvp;
@@ -83,6 +86,7 @@ void C2_HOOK_CDECL Vertex_OS_TransformProjectBounds(br_geometry* self, br_soft_r
 }
 
 // FUNCTION: CARMA2_HW 0x00547f20
+// FUNCTION: CARMA2_SW 0x005435c0
 void C2_HOOK_CDECL Vertex_OS_TransformProject(br_geometry* self, br_soft_renderer* renderer) {
     int v;
     brp_vertex* tvp;
@@ -100,6 +104,7 @@ void C2_HOOK_CDECL Vertex_OS_TransformProject(br_geometry* self, br_soft_rendere
 }
 
 // FUNCTION: CARMA2_HW 0x005480a0
+// FUNCTION: CARMA2_SW 0x00543740
 void C2_HOOK_CDECL Vertex_OS_TransformProjectBoundsSurf(br_geometry* self, br_soft_renderer* renderer) {
     int v;
     int i;
@@ -125,6 +130,7 @@ void C2_HOOK_CDECL Vertex_OS_TransformProjectBoundsSurf(br_geometry* self, br_so
 }
 
 // FUNCTION: CARMA2_HW 0x005482c0
+// FUNCTION: CARMA2_SW 0x00543960
 void C2_HOOK_CDECL Vertex_OS_TransformProjectSurf(br_geometry* self, br_soft_renderer* renderer) {
     int v;
     int i;
@@ -149,6 +155,7 @@ void C2_HOOK_CDECL Vertex_OS_TransformProjectSurf(br_geometry* self, br_soft_ren
 }
 
 // FUNCTION: CARMA2_HW 0x00548470
+// FUNCTION: CARMA2_SW 0x00543b10
 void C2_HOOK_CDECL Vertex_OS_TransformProjectBoundsGeom(br_geometry* self, br_soft_renderer* renderer) {
     int v;
     int i;
@@ -174,6 +181,7 @@ void C2_HOOK_CDECL Vertex_OS_TransformProjectBoundsGeom(br_geometry* self, br_so
 }
 
 // FUNCTION: CARMA2_HW 0x00548690
+// FUNCTION: CARMA2_SW 0x00543d30
 void C2_HOOK_CDECL Vertex_OS_TransformProjectGeom(br_geometry* self, br_soft_renderer* renderer) {
     int v;
     int i;
@@ -198,6 +206,7 @@ void C2_HOOK_CDECL Vertex_OS_TransformProjectGeom(br_geometry* self, br_soft_ren
 }
 
 // FUNCTION: CARMA2_HW 0x00548850
+// FUNCTION: CARMA2_SW 0x00543ef0
 void C2_HOOK_CDECL Vertex_SurfaceComponentsSurf(br_geometry* self, br_soft_renderer* renderer) {
     int v;
     int i;
@@ -219,6 +228,7 @@ void C2_HOOK_CDECL Vertex_SurfaceComponentsSurf(br_geometry* self, br_soft_rende
 }
 
 // FUNCTION: CARMA2_HW 0x005488f0
+// FUNCTION: CARMA2_SW 0x00543f90
 void C2_HOOK_CDECL Vertex_SurfaceComponentsTwoSidedSurf(br_geometry* self, br_soft_renderer* renderer) {
     int v;
     int i;
@@ -251,6 +261,7 @@ void C2_HOOK_CDECL Vertex_SurfaceComponentsTwoSidedSurf(br_geometry* self, br_so
 }
 
 // FUNCTION: CARMA2_HW 0x00548a00
+// FUNCTION: CARMA2_SW 0x005440a0
 void C2_HOOK_CDECL Vertex_SurfaceComponentsGeom(br_geometry* self, br_soft_renderer* renderer) {
     brp_vertex* tvp;
     fmt_vertex* vp;
@@ -272,6 +283,7 @@ void C2_HOOK_CDECL Vertex_SurfaceComponentsGeom(br_geometry* self, br_soft_rende
 }
 
 // FUNCTION: CARMA2_HW 0x00548aa0
+// FUNCTION: CARMA2_SW 0x00544140
 void C2_HOOK_CDECL Vertex_SurfaceComponentsTwoSidedGeom(br_geometry* self, br_soft_renderer* renderer) {
     brp_vertex* tvp;
     fmt_vertex* vp;
@@ -302,6 +314,7 @@ void C2_HOOK_CDECL Vertex_SurfaceComponentsTwoSidedGeom(br_geometry* self, br_so
 }
 
 // FUNCTION: CARMA2_HW 0x00548bd0
+// FUNCTION: CARMA2_SW 0x00544270
 void C2_HOOK_CDECL Vertex_ForceFront(br_geometry* self, br_soft_renderer* renderer) {
     brp_vertex* tvp;
     int v;
@@ -319,6 +332,7 @@ void C2_HOOK_CDECL Vertex_ForceFront(br_geometry* self, br_soft_renderer* render
 }
 
 // FUNCTION: CARMA2_HW 0x005476a0
+// FUNCTION: CARMA2_SW 0x00542d40
 void C2_HOOK_CDECL ScratchFree(br_geometry* self, br_soft_renderer* renderer) {
 
     BrScratchFree(rend.scratch);
@@ -326,6 +340,7 @@ void C2_HOOK_CDECL ScratchFree(br_geometry* self, br_soft_renderer* renderer) {
 }
 
 // FUNCTION: CARMA2_HW 0x005476c0
+// FUNCTION: CARMA2_SW 0x00542d60
 void C2_HOOK_CDECL Vertex_ClearFlags(br_geometry* self, br_soft_renderer* renderer) {
     int v;
 

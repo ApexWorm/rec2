@@ -15,6 +15,7 @@
 #include "c2_string.h"
 
 // FUNCTION: CARMA2_HW 0x00545120
+// FUNCTION: CARMA2_SW 0x005407c0
 void C2_HOOK_CDECL OpTriangleClip(brp_block* block, brp_vertex* v0, brp_vertex* v1, brp_vertex* v2, br_uint_16* fp_vertices, br_uint_16* fp_edges) {
     brp_vertex clip_in[3];
     int nclipped;
@@ -33,6 +34,7 @@ void C2_HOOK_CDECL OpTriangleClip(brp_block* block, brp_vertex* v0, brp_vertex* 
 }
 
 // FUNCTION: CARMA2_HW 0x005451c0
+// FUNCTION: CARMA2_SW 0x00540860
 void C2_HOOK_CDECL OpTriangleClipConstantSurf(brp_block* block, brp_vertex* v0, brp_vertex* v1, brp_vertex* v2, v11face* face, temp_face_soft* tfp) {
     brp_vertex clip_in[3];
     int nclipped,i;
@@ -71,6 +73,7 @@ void C2_HOOK_CDECL OpTriangleClipConstantSurf(brp_block* block, brp_vertex* v0, 
 }
 
 // FUNCTION: CARMA2_HW 0x00545370
+// FUNCTION: CARMA2_SW 0x00540a10
 void C2_HOOK_CDECL OpTriangleConstantSurf(brp_block* block, brp_vertex* v0, brp_vertex* v1, brp_vertex* v2, v11face* face, br_uint_16* fp_vertices) {
     br_colour colour;
     fmt_vertex* vp;
@@ -92,6 +95,7 @@ void C2_HOOK_CDECL OpTriangleConstantSurf(brp_block* block, brp_vertex* v0, brp_
 }
 
 // FUNCTION: CARMA2_HW 0x00545430
+// FUNCTION: CARMA2_SW 0x00540ad0
 void C2_HOOK_CDECL OpTriangleTwoSidedConstantSurf(brp_block* block, brp_vertex* v0, brp_vertex* v1, brp_vertex* v2, v11face* face, temp_face_soft* tfp) {
     fmt_vertex* vp;
     br_colour colour;
@@ -120,6 +124,7 @@ void C2_HOOK_CDECL OpTriangleTwoSidedConstantSurf(brp_block* block, brp_vertex* 
 }
 
 // FUNCTION: CARMA2_HW 0x00545560
+// FUNCTION: CARMA2_SW 0x00540c00
 void C2_HOOK_CDECL OpTriangleMappingWrapFix(brp_block* block, brp_vertex* v0, brp_vertex* v1, brp_vertex* v2, undefined4* param_5, undefined4* param_6) {
     br_scalar scale;
     br_scalar half;
@@ -155,6 +160,7 @@ void C2_HOOK_CDECL OpTriangleMappingWrapFix(brp_block* block, brp_vertex* v0, br
 }
 
 // FUNCTION: CARMA2_HW 0x00545720
+// FUNCTION: CARMA2_SW 0x00540dc0
 void C2_HOOK_CDECL OpTriangleRelightTwoSided(brp_block* block, brp_vertex* v0, brp_vertex* v1, brp_vertex* v2, br_uint_16* fp_vertices, temp_face_soft* tfp) {
     int i, v;
     brp_vertex tv[3];
@@ -189,6 +195,7 @@ void C2_HOOK_CDECL OpTriangleRelightTwoSided(brp_block* block, brp_vertex* v0, b
 }
 
 // FUNCTION: CARMA2_HW 0x005458e0
+// FUNCTION: CARMA2_SW 0x00540f80
 void C2_HOOK_CDECL OpTriangleToLines(brp_block* block, brp_vertex* v0, brp_vertex* v1, brp_vertex* v2, v11face* fp) {
 
     if (!rend.edge_flags[fp->edges[0]]) {
@@ -208,6 +215,7 @@ void C2_HOOK_CDECL OpTriangleToLines(brp_block* block, brp_vertex* v0, brp_verte
 }
 
 // FUNCTION: CARMA2_HW 0x00545990
+// FUNCTION: CARMA2_SW 0x00541030
 void C2_HOOK_CDECL OpTriangleReplicateConstant(brp_block* block, brp_vertex* v0, brp_vertex* v1, brp_vertex* v2, br_uint_16* fp_vertices, br_uint_16* fp_edges) {
     br_uint_32 m;
     int c;
@@ -224,6 +232,7 @@ void C2_HOOK_CDECL OpTriangleReplicateConstant(brp_block* block, brp_vertex* v0,
 }
 
 // FUNCTION: CARMA2_HW 0x005459f0
+// FUNCTION: CARMA2_SW 0x00541090
 void C2_HOOK_CDECL OpTriangleReplicateConstantI(brp_block* block, brp_vertex* v0, brp_vertex* v1, brp_vertex* v2, br_uint_16* fp_vertices, br_uint_16* fp_edges) {
 
     v1->comp[C_I] = v2->comp[C_I] = v0->comp[C_I];
@@ -260,6 +269,7 @@ void C2_HOOK_CDECL OpTriangleToPoints(brp_block* block, brp_vertex* v0, brp_vert
 }
 
 // FUNCTION: CARMA2_HW 0x00545b40
+// FUNCTION: CARMA2_SW 0x005411e0
 void C2_HOOK_CDECL OpTriangleToPoints_OS(brp_block* block, brp_vertex* v0, brp_vertex* v1, brp_vertex* v2, br_uint_16* fp_vertices) {
 
     if (!rend.vertex_flags[fp_vertices[0]]) {
@@ -279,6 +289,7 @@ void C2_HOOK_CDECL OpTriangleToPoints_OS(brp_block* block, brp_vertex* v0, brp_v
 }
 
 // FUNCTION: CARMA2_HW 0x00545be0
+// FUNCTION: CARMA2_SW 0x00541280
 void C2_HOOK_CDECL OpLineClip(brp_block* block, brp_vertex* v0, brp_vertex* v1) {
     brp_vertex clipped[2];
 
@@ -383,6 +394,7 @@ void C2_HOOK_CDECL OpTriangleSubdivide(brp_block* block, brp_vertex* v0, brp_ver
 }
 
 // FUNCTION: CARMA2_HW 0x005460b0
+// FUNCTION: CARMA2_SW 0x00541750
 void C2_HOOK_CDECL OpTriangleSubdivideOnScreen(brp_block* block, brp_vertex* v0, brp_vertex* v1, brp_vertex* v2, br_uint_16* fp_vertices, br_uint_16* fp_edges) {
 
     triangleSubdivideOnScreen(6, block, v0, v1, v2, fp_vertices, fp_edges);
