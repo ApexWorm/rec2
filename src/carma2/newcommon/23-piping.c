@@ -21,12 +21,10 @@
 #include "37-brucetrk.h"
 #include "41-utility.h"
 #include "46-win95sys.h"
-
-#include "13-crush1.h"
 #include "51-smash.h"
 #include "52-errors.h"
 #include "57-drone.h"
-#include "61-pedestrn.h"
+#include "61-pedestrn-phys.h"
 #include "64-movie.h"
 #include "60-phil.h"
 #include "69-sound.h"
