@@ -14,10 +14,13 @@
 
 extern int gAllow_material_adapt;
 extern br_material* gMaterials_to_adapt[200];
+extern tSmashable_item_spec gUnknown_smashable_006a3660;
+extern tSmashable_item_spec gPowerup_pickup_smashable;
 extern int gMaterials_to_adapt_count;
 extern int gShrapnel_child_count;
 
 extern tSmashable_item_spec* gTrack_smashable_environment_specs;
+extern tSmashable_item_spec* gSmashable_track_indexable_triggers[100];
 extern br_actor* gSmashable_noncar_shrapnel_actors[100];
 extern int gCount_smashable_noncar_shrapnel_actors;
 extern const char* gSmashable_track_environment_path;
@@ -153,9 +156,9 @@ extern void C2_HOOK_FASTCALL InitSmashQueue(void);
 
 // QueueSmashIfNecessary2
 
-// AllocateSmashLevels
+extern void C2_HOOK_FASTCALL AllocateSmashLevels(tSmashable_level** pSmashable_levels, int pCount_smashable_levels);
 
-// ReadSmashSounds
+extern void C2_HOOK_FASTCALL ReadSmashSounds(FILE* pF, tConnotations* pConnotations, tBrender_storage* pStorage);
 
 extern void C2_HOOK_FASTCALL ReadShrapnelMovementSpec(FILE* pFile, tMovement_spec* pInitial_speed);
 
@@ -179,31 +182,29 @@ extern void C2_HOOK_FASTCALL ReadShrapnelSpec(FILE* pF, tShrapnel_spec* pShrapne
 
 extern void C2_HOOK_FASTCALL LoadMinMax(FILE* pF, br_bounds3* pBounds);
 
-extern void C2_HOOK_FASTCALL ReadShrapnelSideEffects(FILE* pF, tShrapnel_side_effects* pShrapnel_side_effects);
-
 #ifdef REC2_MATCHING
 extern void C2_HOOK_FASTCALL FUN_004ef830(tCar_spec* pCar_spec, tCar_crush_smashable_part* pSmashable, undefined4 pArg3, int pLevel);
 #endif
 
 // FreeExplosion
 
-// ReadSpecialEffectsSpec
+extern void C2_HOOK_FASTCALL ReadSpecialEffectsSpec(FILE* pF, tSpecial_effects_spec* pSpecial_effects);
 
 // ReadBounds
 
-// ReadNoncarSideEffects
+extern void C2_HOOK_FASTCALL ReadNoncarSideEffects(FILE* pF, tNon_car_cuboid_activations* pNon_car_cuboid_activations);
 
-// ReadSmashSideEffects
+extern void C2_HOOK_FASTCALL ReadSmashSideEffects(FILE* pF, tShrapnel_side_effects* pShrapnel_side_effects);
 
-// ReadSideEffects
+extern void C2_HOOK_FASTCALL ReadSideEffects(FILE* pF, tSide_effects* pSide_effects);
 
-// ReadLightingInformation
+extern void C2_HOOK_FASTCALL ReadLightingInformation(FILE* pF, int* pLighting_information);
 
-// ReadAward
+extern void C2_HOOK_FASTCALL ReadAward(FILE* pF, tAward_info* pAward_info);
 
-// ReadVariableChanges
+extern void C2_HOOK_FASTCALL ReadVariableChanges(FILE* pF, tVariable_changes* pVariable_changes);
 
-// ReadConnotations
+extern void C2_HOOK_FASTCALL ReadConnotations(FILE* pF, tConnotations* pConnotations, tBrender_storage* pStorage);
 
 extern void C2_HOOK_FASTCALL ReadSmashLevels(FILE* pF, tSmashable_level** pSmashable_levels, int* pCount_smashable_levels, int pIs_texture_change, tBrender_storage* pBrender_storage);
 
@@ -226,8 +227,6 @@ extern void C2_HOOK_FASTCALL TotallyRepairSmash(tCar_spec* pCar_Spec, tCar_crush
 extern void C2_HOOK_FASTCALL RemoveAllDecals(void);
 
 extern void C2_HOOK_FASTCALL ReadPowerupSmash(FILE* pF);
-
-extern void C2_HOOK_FASTCALL ReadNonCarCuboidActivation(FILE* pF, tNon_car_cuboid_activations* pNon_car_cuboid_activations);
 
 extern void C2_HOOK_FASTCALL InitSmashing(void);
 
@@ -299,9 +298,9 @@ extern int C2_HOOK_FASTCALL InsertQuad(tSmash_quad_mapping* pMapping, br_actor* 
 
 // ProcessModel
 
-// BashModel
+extern float C2_HOOK_FASTCALL BashModel(tSmashable_item_spec* pSpec, tPhysics_object* pObject, br_actor* pActor, float pMagnitude, br_vector3* pPosition, br_vector3* pNormal, br_vector3* pForce, int* pSmashed, int pNetwork);
 
-// SendNetSmash
+extern void C2_HOOK_FASTCALL SendNetSmash(tPhysics_object* pObject, undefined4 pArg2, float pMagnitude, br_vector3* pPosition, br_vector3* pNormal, br_vector3* pForce, int pArg7);
 
 // SendAllSmashes
 
