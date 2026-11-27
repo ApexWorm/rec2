@@ -238,6 +238,21 @@ int gPed_move_fsm[118][7] = {
 // GLOBAL: CARMA2_CHEAT 0x0067e22c
 tPedForms_vtable* gPed_vtable = NULL;
 
+// GLOBAL: CARMA2_HW 0x00676980
+// GLOBAL: CARMA2_SW 0x006710f0
+// GLOBAL: CARMA2_CHEAT 0x0067e230
+tPed_move* gPed_moves[250] = { 0 };
+
+// GLOBAL: CARMA2_HW 0x00676e30
+// GLOBAL: CARMA2_SW 0x006715a0
+// GLOBAL: CARMA2_CHEAT 0x0067e6e0
+float gPed_cos_table[256] = { 0 };
+
+// GLOBAL: CARMA2_HW 0x00677230
+// GLOBAL: CARMA2_SW 0x006719a0
+// GLOBAL: CARMA2_CHEAT 0x0067eae0
+float gFLOAT_00677230 = 0.0f;
+
 // GLOBAL: CARMA2_HW 0x00677234
 // GLOBAL: CARMA2_SW 0x006719a4
 // GLOBAL: CARMA2_CHEAT 0x0067eae4
@@ -252,6 +267,16 @@ br_material* gPedestrian_character_cloned_materials[50];
 // GLOBAL: CARMA2_SW 0x00671e9c
 // GLOBAL: CARMA2_CHEAT 0x0067efdc
 int gCount_pedestrian_personality_cloned_materials;
+
+// GLOBAL: CARMA2_HW 0x00677728
+// GLOBAL: CARMA2_SW 0x00671e98
+// GLOBAL: CARMA2_CHEAT 0x0067efd8
+float gFLOAT_00677728;
+
+// GLOBAL: CARMA2_HW 0x00677730
+// GLOBAL: CARMA2_SW 0x00671ea0
+// GLOBAL: CARMA2_CHEAT 0x0067efe0
+tPed_morph gPed_morphs[20];
 
 // GLOBAL: CARMA2_HW 0x00677238
 // GLOBAL: CARMA2_SW 0x006719a8
@@ -495,9 +520,40 @@ int gPed_movements_count;
 tPed_movement_spec* gPed_movements;
 
 
-// ClearOutMorphs
+inline void C2_HOOK_FASTCALL ClearOutMorphs(void) {
+    int i;
 
-// InitBoner
+    for (i = 0; i < (int)REC2_ASIZE(gPed_morphs); i++) {
+        gPed_morphs[i].field_0x4 = 0.0f;
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x00403ed0
+// FUNCTION: CARMA2_SW 0x00403ed0
+// FUNCTION: CARMA2_CHEAT 0x00403ed0
+void C2_HOOK_FASTCALL InitBoner(tPedForms_vtable* pTable) {
+    int i;
+    float s;
+    float c;
+
+    gPed_vtable = pTable;
+    memset(gPed_forms, 0, sizeof(gPed_forms));
+    memset(gPed_personalities, 0, sizeof(gPed_personalities));
+    memset(gPed_moves, 0, sizeof(gPed_moves));
+    memset(gPed_remaps, 0, sizeof(gPed_remaps));
+    ClearOutMorphs();
+    for (i = 0; i < 256; i++) {
+        s = sin((i << 8) * (2 * 3.141592653589793 / 65536.0));
+        c = cos((i << 8) * (2 * 3.141592653589793 / 65536.0));
+        gPed_sin_table[i] = s;
+        gPed_cos_table[i] = c;
+    }
+    gFLOAT_00677728 = 0.0f;
+    gFLOAT_00677230 = 1.0f;
+    gCount_pedestrian_personality_cloned_materials = 0;
+    gPed_overall_movement_disabled = 0;
+    gPed_retain_root_mode = 0;
+}
 
 // DRVector3SafeCross
 
@@ -710,9 +766,82 @@ tPed_form* C2_HOOK_FASTCALL FindOrOpenForm(const char* pName) {
     return SetUpCharacterForm(pName);
 }
 
-// MakeRotationMatrix
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
 
-// SetBoner
+// FUNCTION: CARMA2_HW 0x004080d0
+// FUNCTION: CARMA2_SW 0x004080d0
+// FUNCTION: CARMA2_CHEAT 0x004080d0
+void C2_HOOK_FASTCALL MakeRotationMatrix(br_matrix34* pMat, tU8 pAngle_x, tU8 pAngle_y, tU8 pAngle_z) {
+    br_scalar sin_x;
+    br_scalar cos_x;
+    br_scalar sin_y;
+    br_scalar cos_y;
+    br_scalar sin_z;
+    br_scalar cos_z;
+
+    cos_x = gPed_cos_table[pAngle_x];
+    cos_y = gPed_cos_table[pAngle_y];
+    sin_z = gPed_sin_table[pAngle_z];
+    cos_z = gPed_cos_table[pAngle_z];
+    sin_x = gPed_sin_table[pAngle_x];
+    sin_y = gPed_sin_table[pAngle_y];
+    pMat->m[3][2] = pMat->m[3][1] = pMat->m[3][0] = 0.0f;
+    pMat->m[0][0] = cos_y * cos_z;
+    pMat->m[1][0] = sin_y * sin_x * cos_z - cos_x * sin_z;
+    pMat->m[2][0] = sin_y * cos_x * cos_z + sin_x * sin_z;
+    pMat->m[0][1] = cos_y * sin_z;
+    pMat->m[1][1] = sin_y * sin_x * sin_z + cos_x * cos_z;
+    pMat->m[2][1] = sin_y * cos_x * sin_z - sin_x * cos_z;
+    pMat->m[0][2] = -sin_y;
+    pMat->m[1][2] = cos_y * sin_x;
+    pMat->m[2][2] = cos_y * cos_x;
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// FUNCTION: CARMA2_HW 0x00407e70
+// FUNCTION: CARMA2_SW 0x00407e60
+// FUNCTION: CARMA2_CHEAT 0x00407e60
+void C2_HOOK_FASTCALL SetBoner(tPed_character_instance* pPed, br_matrix34* pMat, br_matrix34* pParent_mat, br_matrix34* pArg4, tU8 pAngle_x, tU8 pAngle_y, tU8 pAngle_z, br_vector3* pArg8, br_vector3* pArg9) {
+    if (gMutant_speed != 0.0f) {
+        MutatePed(pPed, pMat, &pAngle_x, &pAngle_y, &pAngle_z);
+    }
+    MakeRotationMatrix(pMat, pAngle_x, pAngle_y, pAngle_z);
+    if (pArg4 != NULL) {
+        pMat->m[3][0] = -pArg8->v[0] * pMat->m[0][0] + -pArg8->v[1] * pMat->m[1][0] + -pArg8->v[2] * pMat->m[2][0];
+        pMat->m[3][1] = -pArg8->v[0] * pMat->m[0][1] + -pArg8->v[1] * pMat->m[1][1] + -pArg8->v[2] * pMat->m[2][1];
+        pMat->m[3][2] = -pArg8->v[0] * pMat->m[0][2] + -pArg8->v[1] * pMat->m[1][2] + -pArg8->v[2] * pMat->m[2][2];
+        BrMatrix34Post(pMat, pArg4);
+        pMat->m[3][0] += pParent_mat->m[3][0]
+            + pArg9->v[0] * pParent_mat->m[0][0] + pArg9->v[1] * pParent_mat->m[1][0] + pArg9->v[2] * pParent_mat->m[2][0];
+        pMat->m[3][1] += pParent_mat->m[3][1]
+            + pArg9->v[0] * pParent_mat->m[0][1] + pArg9->v[1] * pParent_mat->m[1][1] + pArg9->v[2] * pParent_mat->m[2][1];
+        pMat->m[3][2] += pParent_mat->m[3][2]
+            + pArg9->v[0] * pParent_mat->m[0][2] + pArg9->v[1] * pParent_mat->m[1][2] + pArg9->v[2] * pParent_mat->m[2][2];
+    } else {
+        pMat->m[3][0] = pParent_mat->m[3][0]
+            + -pArg8->v[0] * pMat->m[0][0] + -pArg8->v[1] * pMat->m[1][0] + -pArg8->v[2] * pMat->m[2][0]
+            + pArg9->v[0] * pParent_mat->m[0][0] + pArg9->v[1] * pParent_mat->m[1][0] + pArg9->v[2] * pParent_mat->m[2][0];
+        pMat->m[3][1] = pParent_mat->m[3][1]
+            + -pArg8->v[0] * pMat->m[0][1] + -pArg8->v[1] * pMat->m[1][1] + -pArg8->v[2] * pMat->m[2][1]
+            + pArg9->v[0] * pParent_mat->m[0][1] + pArg9->v[1] * pParent_mat->m[1][1] + pArg9->v[2] * pParent_mat->m[2][1];
+        pMat->m[3][2] = pParent_mat->m[3][2]
+            + -pArg8->v[0] * pMat->m[0][2] + -pArg8->v[1] * pMat->m[1][2] + -pArg8->v[2] * pMat->m[2][2]
+            + pArg9->v[0] * pParent_mat->m[0][2] + pArg9->v[1] * pParent_mat->m[1][2] + pArg9->v[2] * pParent_mat->m[2][2];
+    }
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // CalcBoundsRadius
 
@@ -847,11 +976,79 @@ br_actor* C2_HOOK_FASTCALL GetCharacterActorPtr(const tPed_character_instance* p
 // #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x00407b30
-// STUB: CARMA2_SW 0x00407b20
-// STUB: CARMA2_CHEAT 0x00407b20
+// FUNCTION: CARMA2_HW 0x00407b30
+// FUNCTION: CARMA2_SW 0x00407b20
+// FUNCTION: CARMA2_CHEAT 0x00407b20
 void C2_HOOK_FASTCALL SetCharacterBonePositions(tPed_character_instance* pPed, int pArg2, int pArg3) {
-    NOT_IMPLEMENTED();
+    tPed_personality* personality;
+    tPed_form* form;
+    tPed_form_actor_set* actor_set;
+    tPed_move_frame* frame;
+    int i;
+    int parent_index;
+    br_matrix34* mat;
+    br_matrix34* parent_mat;
+    br_vector3 original_pos;
+    br_vector3 move;
+    br_vector3 delta;
+
+    if (pPed->field_0x7 < 0) {
+        return;
+    }
+    if ((pPed->field_0x14 & 0x4) && (pPed->field_0x14 & 0x2) && pPed->field_0xe8 == NULL) {
+        return;
+    }
+    pPed->field_0x9 &= ~0x1;
+    if (pPed->field_0xbc != NULL) {
+        MorphCharacterBonePositions(pPed, 0);
+        return;
+    }
+    personality = pPed->personality;
+    form = personality->form;
+    if (pPed->field_0x4 >= 0) {
+        actor_set = &form->actor_sets[pPed->field_0x4];
+    } else {
+        actor_set = NULL;
+    }
+    frame = &form->moves[pPed->field_0x7].move->frames[pPed->field_0x1c];
+    for (i = 0; i < form->count_bones; i++) {
+        parent_index = form->bones[i].indices[0];
+        if (parent_index >= 0) {
+            if (!(gPow2_array[i] & pPed->field_0xc) && !(gPow2_array[parent_index] & pPed->field_0xc)
+                && pArg2 != 1 && pArg2 != 2 && actor_set != NULL) {
+                if (pPed->field_0xe8 != NULL) {
+                    parent_mat = &pPed->field_0xe8[parent_index];
+                } else {
+                    parent_mat = &actor_set->actors[parent_index]->t.t.mat;
+                }
+                if (pPed->field_0xe8 != NULL) {
+                    mat = &pPed->field_0xe8[i];
+                } else {
+                    mat = &actor_set->actors[i]->t.t.mat;
+                }
+                SetBoner(pPed, mat, parent_mat, &pPed->field_0x8c,
+                    frame->axis[i].euler1, frame->axis[i].euler2, frame->axis[i].euler3,
+                    &personality->bones[i].field_0x20, &personality->bones[i].field_0x2c);
+            }
+        } else if (pArg2 != 3 && !(pPed->field_0x14 & 0x4)) {
+            mat = GetCharacterMatrixPtr(pPed);
+            BrVector3Copy(&original_pos, (br_vector3*)mat->m[3]);
+            if (pArg2 != 2) {
+                BrMatrix34Mul(mat, &frame->mat, &pPed->field_0x8c);
+            }
+            if (pArg3 != 0 && !gPed_overall_movement_disabled) {
+                BrVector3Scale(&move, (br_vector3*)frame->mat.m[3], personality->moves[pPed->field_0x7].scale_factor);
+                BrMatrix34ApplyV(&delta, &move, &pPed->field_0x5c);
+                if (gAction_replay_mode && ARGetReplayRate() < 0.0f) {
+                    BrVector3Sub((br_vector3*)mat->m[3], &original_pos, &delta);
+                } else {
+                    BrVector3Add((br_vector3*)mat->m[3], &delta, &original_pos);
+                }
+            } else {
+                BrVector3Copy((br_vector3*)mat->m[3], &original_pos);
+            }
+        }
+    }
 }
 
 #ifdef REC2_MATCHING
@@ -1372,7 +1569,20 @@ void C2_HOOK_FASTCALL StopCharacterMorphing(tPed_character_instance* pCharacter)
     }
 }
 
-// MorphCharacterBonePositions
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_HW 0x004097b0
+// STUB: CARMA2_SW 0x004097b0
+// STUB: CARMA2_CHEAT 0x00409820
+int C2_HOOK_FASTCALL MorphCharacterBonePositions(tPed_character_instance* pPed, tU32 pArg2) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // StopCharacterMove
 

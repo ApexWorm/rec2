@@ -30,10 +30,15 @@ extern int gPed_move_fsm[118][7];
 
 extern tPedForms_vtable* gPed_vtable;
 
+extern tPed_move* gPed_moves[250];
+extern float gPed_cos_table[256];
+extern float gFLOAT_00677230;
 extern int gPed_retain_root_mode;
 
 extern br_material* gPedestrian_character_cloned_materials[50];
 extern int gCount_pedestrian_personality_cloned_materials;
+extern float gFLOAT_00677728;
+extern tPed_morph gPed_morphs[20];
 
 extern tPed_remap* gPed_remaps[10];
 
@@ -83,9 +88,9 @@ extern tPed_face_cache_0x34* gPed_face_caches[4];
 extern int gPipe_halted_ped_status;
 extern int gPed_valium_left;
 
-// ClearOutMorphs
+extern void C2_HOOK_FASTCALL ClearOutMorphs(void);
 
-// InitBoner
+extern void C2_HOOK_FASTCALL InitBoner(tPedForms_vtable* pTable);
 
 // DRVector3SafeCross
 
@@ -129,9 +134,9 @@ extern void C2_HOOK_FASTCALL DisposeCharacterInstance(tPed_character_instance* p
 
 extern tPed_form* C2_HOOK_FASTCALL FindOrOpenForm(const char* pName);
 
-// MakeRotationMatrix
+extern void C2_HOOK_FASTCALL MakeRotationMatrix(br_matrix34* pMat, tU8 pAngle_x, tU8 pAngle_y, tU8 pAngle_z);
 
-// SetBoner
+extern void C2_HOOK_FASTCALL SetBoner(tPed_character_instance* pPed, br_matrix34* pMat, br_matrix34* pParent_mat, br_matrix34* pArg4, tU8 pAngle_x, tU8 pAngle_y, tU8 pAngle_z, br_vector3* pArg8, br_vector3* pArg9);
 
 // CalcBoundsRadius
 
@@ -197,7 +202,7 @@ extern int C2_HOOK_CDECL SetCharacterPhysicsLevel(tPed_character_instance* pChar
 
 extern void C2_HOOK_FASTCALL StopCharacterMorphing(tPed_character_instance* pCharacter);
 
-// MorphCharacterBonePositions
+extern int C2_HOOK_FASTCALL MorphCharacterBonePositions(tPed_character_instance* pPed, tU32 pArg2);
 
 // StopCharacterMove
 
