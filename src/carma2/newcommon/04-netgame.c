@@ -60,6 +60,21 @@ int gLast_it_change;
 // GLOBAL: CARMA2_cHEAT 0x006951cc
 tU32 gTime_for_punishment;
 
+// GLOBAL: CARMA2_HW 0x0068d934
+// GLOBAL: CARMA2_SW 0x0068798c
+// GLOBAL: CARMA2_CHEAT 0x006951d4
+int gNot_shown_race_type_headup;
+
+// GLOBAL: CARMA2_HW 0x0068d944
+// GLOBAL: CARMA2_SW 0x0068799c
+// GLOBAL: CARMA2_CHEAT 0x006951e4
+tU32 gLast_flash__netgame;
+
+// GLOBAL: CARMA2_HW 0x0068d948
+// GLOBAL: CARMA2_SW 0x006879a0
+// GLOBAL: CARMA2_CHEAT 0x006951e8
+int gFlash_state__netgame;
+
 // SendShapeNumbers
 
 // FUNCTION: CARMA2_HW 0x00497ef0
@@ -335,7 +350,79 @@ void C2_HOOK_FASTCALL EnableCar(tCar_spec* pCar) {
     }
 }
 
-// DoNetworkHeadups
+// FUNCTION: CARMA2_HW 0x00499360
+// FUNCTION: CARMA2_SW 0x00495f90
+// FUNCTION: CARMA2_CHEAT 0x00499710
+void C2_HOOK_FASTCALL DoNetworkHeadups(int pCredits) {
+    char s[256];
+    char s2[256];
+
+    if (gNot_shown_race_type_headup) {
+        gNot_shown_race_type_headup = 0;
+        NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(gCurrent_net_game->type + 59));
+    }
+    if (gTime_for_punishment != 0 && PDGetTotalTime() >= gTime_for_punishment) {
+        gTime_for_punishment = 0;
+        switch (gCurrent_net_game->type) {
+        case eNet_game_type_2:
+            NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(0xdb));
+            break;
+        case eNet_game_type_checkpoint:
+            NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(0xdc));
+            break;
+        case eNet_game_type_4:
+            NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(0xdd));
+            break;
+        case eNet_game_type_foxy:
+            NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(0xde));
+            break;
+        default:
+            break;
+        }
+    }
+    if (gNet_mode != eNet_mode_none && gProgram_state.credits < gRecovery_cost.initial_network[gCurrent_net_game->type] && !Flash(200, &gLast_flash__netgame, &gFlash_state__netgame)) {
+        ChangeHeadupText(gNet_cash_headup, "");
+    } else {
+        sprintf(s, "\xf8%d\xfa %s", pCredits, GetMiscString(0x5e));
+        ChangeHeadupText(gNet_cash_headup, s);
+    }
+    switch (gCurrent_net_game->type) {
+    case eNet_game_type_5:
+        sprintf(s, "\xf8%d\xfa %s", gCurrent_net_game->options.starting_target, GetMiscString(0xf1));
+        break;
+    case eNet_game_type_2:
+        sprintf(s, "%s \xf8%d\xfa", GetMiscString(0xb4), gINT_0068d920);
+        break;
+    case eNet_game_type_1:
+        sprintf(s, "%s \xf8%d\xfa", GetMiscString(0xb5), gCurrent_net_game->options.starting_target);
+        break;
+    case eNet_game_type_foxy:
+        TimerString(gCurrent_net_game->options.starting_target, s2, 1, 1, 0);
+        sprintf(s, "%s \xf8%s\xfa", GetMiscString(0xb6), s2);
+        break;
+    default:
+        s[0] = '\0';
+        break;
+    }
+    ChangeHeadupText(gNet_ped_headup, s);
+    switch (gHeadup_detail_level) {
+    case 0:
+    case 3:
+        MoveHeadupTo(gNet_cash_headup, 80, 25);
+        MoveHeadupTo(gNet_ped_headup, 80, 0);
+        break;
+    case 1:
+    case 4:
+        MoveHeadupTo(gNet_cash_headup, 480, 25);
+        MoveHeadupTo(gNet_ped_headup, 480, 0);
+        break;
+    case 2:
+    case 5:
+        MoveHeadupTo(gNet_cash_headup, 430, 60);
+        MoveHeadupTo(gNet_ped_headup, 430, 20);
+        break;
+    }
+}
 
 // SortNetHeadAscending
 

@@ -47,7 +47,9 @@ extern tU32 gLast_earn_time;
 extern int gLast_time_credit_headup;
 extern tU32 gLast_time_earn_time;
 extern tU32 gLast_time_credit_amount;
+extern int gNet_ped_headup;
 extern int gOld_times[10];
+extern int gNet_cash_headup;
 extern char gHeadup_oppo_ped_text[64];
 extern int gQueued_headup_count;
 extern tQueued_headup gQueued_headups[4];
@@ -90,6 +92,8 @@ extern int C2_HOOK_FASTCALL NewImageHeadupSlot(int pSlot_index, int pFlash_rate,
 extern void C2_HOOK_FASTCALL DoFancyHeadup(int pIndex);
 
 extern void C2_HOOK_FASTCALL MoveHeadupTo(int pHeadup_index, int pNew_x, int pNew_y);
+
+extern void C2_HOOK_FASTCALL MoveAndLeftJustifyHeadup(int pHeadup_index, int pNew_x, int pNew_y);
 
 extern void C2_HOOK_FASTCALL ChangeHeadupText(int pHeadup_index, char* pNew_text);
 
