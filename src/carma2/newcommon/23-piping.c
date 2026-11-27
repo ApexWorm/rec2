@@ -2204,8 +2204,6 @@ void C2_HOOK_FASTCALL ApplyUnBend(tPipe_chunk** pChunk) {
 void C2_HOOK_FASTCALL ApplyEndMyBend(tPipe_chunk** pChunk) {
 }
 
-extern void C2_HOOK_FASTCALL DoShrapnel(int pArg1, tShrapnel_spec* pShrapnel, int pArg3, br_vector3* pArg4, br_vector3* pArg5, br_vector3* pArg6, undefined4 pArg7, tU32 pTime, uintptr_t pId, br_matrix34* pMat, br_bounds3* pBounds, br_vector3* pArg12, float pArg13, br_vector3* pArg14, int pArg15);
-
 // FUNCTION: CARMA2_HW 0x004c9960
 // FUNCTION: CARMA2_SW 0x004c6090
 // FUNCTION: CARMA2_CHEAT 0x004cf490
@@ -2746,8 +2744,6 @@ void C2_HOOK_FASTCALL UndoBend(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
 // FUNCTION: CARMA2_CHEAT 0x004cfba0
 void C2_HOOK_FASTCALL UndoUnBend(void) {
 }
-
-extern void C2_HOOK_FASTCALL DoBackwardShrapnel(tU32 pTime_now, int pArg1, tShrapnel_spec* pShrapnel, int pArg3, br_vector3* pArg4, br_vector3* pArg5, br_vector3* pArg6, undefined4 pArg7, tU32 pTime, uintptr_t pId, br_matrix34* pMat, br_bounds3* pBounds, br_vector3* pArg12, float pArg13, br_vector3* pArg14);
 
 // FUNCTION: CARMA2_HW 0x004ca070
 // FUNCTION: CARMA2_SW 0x004c67a0

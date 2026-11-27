@@ -371,7 +371,7 @@ extern void C2_HOOK_FASTCALL ApplyUnBend(tPipe_chunk** pChunk);
 
 extern void C2_HOOK_FASTCALL ApplyEndMyBend(tPipe_chunk** pChunk);
 
-// ApplyShrapnelShower
+extern void C2_HOOK_FASTCALL ApplyShrapnelShower(tPipe_chunk** pChunk);
 
 extern void C2_HOOK_FASTCALL ApplyExplosion(tPipe_chunk** pChunk);
 
@@ -475,7 +475,7 @@ extern void C2_HOOK_FASTCALL UndoBend(tPipe_chunk** pChunk, tPipe_chunk* pPrev_c
 
 extern void C2_HOOK_FASTCALL UndoUnBend(void);
 
-// UndoShrapnelShower
+extern void C2_HOOK_FASTCALL UndoShrapnelShower(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk);
 
 extern void C2_HOOK_FASTCALL UndoNonCarCreation(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk);
 
