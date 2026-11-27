@@ -279,7 +279,7 @@ static inline void C2_HOOK_FASTCALL WeightedFindNearestNodeAndSection(tCar_spec*
         }
         if ((length_squared_a = BrVector3LengthSquared(&a)) >= 0.0001f) {
             t = BrVector3Dot(&p, &a) / length_squared_a;
-            if (t >= 0.f && t <= 1.f) {
+            if (t >= 0.0f && t <= 1.0f) {
                 BrVector3Scale(&wank, &a, t);
                 BrVector3Sub(&wank, &p, &wank);
                 the_distance_squared = BrVector3LengthSquared(&wank);
@@ -312,7 +312,7 @@ tS16 C2_HOOK_FASTCALL FindNearestGeneralSection(tCar_spec* pCar, const br_vector
     br_vector3 delta;
     br_vector3 tv;
 
-    WeightedFindNearestNodeAndSection(pCar, pActor_coords, &nearest_node_section_no, &nearest_node, &t, 2.f);
+    WeightedFindNearestNodeAndSection(pCar, pActor_coords, &nearest_node_section_no, &nearest_node, &t, 2.0f);
     if (pCar != NULL) {
         BrVector3Sub(&delta, &pCar->my_trail.trail_nodes[nearest_node_section_no + 1], &pCar->my_trail.trail_nodes[nearest_node_section_no]);
     } else {
