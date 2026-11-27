@@ -679,7 +679,7 @@ inline void C2_HOOK_FASTCALL AllocateSmashLevels(tSmashable_level** pSmashable_l
     *pSmashable_levels = BrMemAllocate(pCount_smashable_levels * sizeof(tSmashable_level), kMem_smash_levels);
 }
 
-inline void C2_HOOK_FASTCALL ReadSmashSounds(FILE* pF, tConnotations* pConnotations, tBrender_storage* pStorage) {
+void C2_HOOK_FASTCALL ReadSmashSounds(FILE* pF, tConnotations* pConnotations, tBrender_storage* pStorage) {
     int i;
     int sound;
 

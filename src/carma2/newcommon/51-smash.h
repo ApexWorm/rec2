@@ -156,7 +156,7 @@ extern void C2_HOOK_FASTCALL InitSmashQueue(void);
 
 extern void C2_HOOK_FASTCALL AllocateSmashLevels(tSmashable_level** pSmashable_levels, int pCount_smashable_levels);
 
-extern void C2_HOOK_FASTCALL ReadSmashSounds(FILE* pF, tConnotations* pConnotations, tBrender_storage* pStorage);
+// ReadSmashSounds
 
 extern void C2_HOOK_FASTCALL ReadShrapnelMovementSpec(FILE* pFile, tMovement_spec* pInitial_speed);
 
