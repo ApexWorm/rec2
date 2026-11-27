@@ -431,6 +431,8 @@ void C2_HOOK_FASTCALL ToggleMapTransparency(void) {
 }
 
 // FUNCTION: CARMA2_HW 0x004948a0
+// FUNCTION: CARMA2_SW 0x00491ba0
+// FUNCTION: CARMA2_CHEAT 0x00494ad0
 void C2_HOOK_FASTCALL InitTargetLock(void) {
 
     gTarget_lock_enabled = 0;
@@ -1041,6 +1043,7 @@ void C2_HOOK_FASTCALL CheckMapMoveKeys(int pKey0, int pKey1) {
 
 // FUNCTION: CARMA2_HW 0x004977e0
 // FUNCTION: CARMA2_SW 0x00494410
+// FUNCTION: CARMA2_CHEAT 0x00497b90
 void C2_HOOK_FASTCALL InitSmashTargets(void) {
     gCount_smashable_race_targets = 0;
 }
