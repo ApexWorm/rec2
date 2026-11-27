@@ -37,6 +37,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+typedef struct {
+    int player_index;
+    int score;
+    int field_0x8;
+} tNet_head_sort_entry; /* FIXME: name and fields are guesses */
+
 // GLOBAL: CARMA2_HW 0x0075b8f8
 // GLOBAL: CARMA2_SW 0x00751e58
 // GLOBAL: CARMA2_cHEAT 0x00762f98
@@ -337,9 +343,53 @@ void C2_HOOK_FASTCALL EnableCar(tCar_spec* pCar) {
 
 // DoNetworkHeadups
 
-// SortNetHeadAscending
+// FUNCTION: CARMA2_HW 0x0049a330
+// FUNCTION: CARMA2_SW 0x004967b0
+// FUNCTION: CARMA2_CHEAT 0x0049a6e0
+int C2_HOOK_CDECL SortNetHeadAscending(const void* pFirst_one, const void* pSecond_one) {
+    const tNet_head_sort_entry* first;
+    const tNet_head_sort_entry* second;
 
-// SortNetHeadDescending
+    first = pFirst_one;
+    second = pSecond_one;
+    if (first->field_0x8 != 0) {
+        if (second->field_0x8 == 0) {
+            return 0x7fffffff;
+        }
+        return first->field_0x8 - second->field_0x8;
+    }
+    if (second->field_0x8 != 0) {
+        return -0x7fffffff;
+    }
+    if (first->score != second->score) {
+        return first->score - second->score;
+    }
+    return gNet_players[first->player_index].last_score_index - gNet_players[second->player_index].last_score_index;
+}
+
+// FUNCTION: CARMA2_HW 0x0049a3a0
+// FUNCTION: CARMA2_SW 0x00496820
+// FUNCTION: CARMA2_CHEAT 0x0049a750
+int C2_HOOK_CDECL SortNetHeadDescending(const void* pFirst_one, const void* pSecond_one) {
+    const tNet_head_sort_entry* first;
+    const tNet_head_sort_entry* second;
+
+    first = pFirst_one;
+    second = pSecond_one;
+    if (first->field_0x8 != 0) {
+        if (second->field_0x8 == 0) {
+            return 0x7fffffff;
+        }
+        return first->field_0x8 - second->field_0x8;
+    }
+    if (second->field_0x8 != 0) {
+        return -0x7fffffff;
+    }
+    if (first->score != second->score) {
+        return second->score - first->score;
+    }
+    return gNet_players[first->player_index].last_score_index - gNet_players[second->player_index].last_score_index;
+}
 
 // ClipName
 
