@@ -174,7 +174,7 @@ extern int gINT_0068b8e4;
 //extern br_matrix34 gCamera_to_world;
 //extern tRace_list_spec gRace_list[100];
 extern float gPinball_factor;
-extern int gCredit_multiplier;
+extern tPissed_info gPissed_info;
 extern float gOpponent_speed_factor;
 //extern float gCar_crush_min_fold;
 //extern float gNet_recovery_cost[7];

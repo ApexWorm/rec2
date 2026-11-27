@@ -995,7 +995,7 @@ void C2_HOOK_FASTCALL PollCarControls(tU32 pTime_difference) {
             }
         }
 
-        if (gCredit_multiplier) {
+        if (gPissed_info.credit_multiplier) {
             int temp;
 
             temp = joystick.dec;

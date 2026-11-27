@@ -53,6 +53,11 @@ int gInventory[20];
 // GLOBAL: CARMA2_CHEAT 0x006a85e4
 int gINT_006a0a6c;
 
+// GLOBAL: CARMA2_HW 0x006a0a68
+// GLOBAL: CARMA2_SW 0x0069aac0
+// GLOBAL: CARMA2_CHEAT 0x006a85e0
+tU32 gNext_pissed_sound_time; /* FIXME: name is a guess */
+
 // GLOBAL: CARMA2_HW 0x006a0960
 // GLOBAL: CARMA2_SW 0x0069a9b8
 // GLOBAL: CARMA2_CHEAT 0x006a84d8
@@ -2181,7 +2186,30 @@ void C2_HOOK_FASTCALL ARPowerupLose(tPowerup* pPowerup, tCar_spec* pCar) {
     }
 }
 
-// SetPissed
+// FUNCTION: CARMA2_HW 0x004df220
+// FUNCTION: CARMA2_SW 0x004db720
+// FUNCTION: CARMA2_CHEAT 0x004e4de0
+int C2_HOOK_FASTCALL SetPissed(tPowerup* pPowerup, tCar_spec* pCar) {
+    int i;
+    int j;
+    float period;
+
+    if (pCar != NULL && pCar->driver == eDriver_local_human) {
+        DRS3StartSound2(gCar_outlet, 3601, 1, 255, 255, -1, -1);
+        gNext_pissed_sound_time = IRandomBetween(1500, 3000) + GetTotalTime();
+        gPissed_info.credit_multiplier = pPowerup->integer_params[0];
+        gPissed_info.field_0x94 = pPowerup->float_params[3];
+        for (i = 0; i < 1; i++) {
+            for (j = 0; j < 1; j++) {
+                gPissed_info.amplitude[i][j] = pPowerup->float_params[0];
+                period = FRandomBetween(pPowerup->float_params[1], pPowerup->float_params[2]);
+                gPissed_info.period[i][j] = period;
+                gPissed_info.phase[i][j] = FRandomBetween(0.f, period);
+            }
+        }
+    }
+    return pPowerup - gPowerup_array;
+}
 
 // FUNCTION: CARMA2_HW 0x004df300
 // FUNCTION: CARMA2_SW 0x004db800
@@ -2189,7 +2217,7 @@ void C2_HOOK_FASTCALL ARPowerupLose(tPowerup* pPowerup, tCar_spec* pCar) {
 void C2_HOOK_FASTCALL ResetPissed(tPowerup* pPowerup, tCar_spec* pCar) {
     br_vector3 p;
 
-    gCredit_multiplier = 0;
+    gPissed_info.credit_multiplier = 0;
     BrVector3Copy(&p, &gCamera->t.t.translate.t);
     BrMatrix34Identity(&gCamera->t.t.mat);
     BrVector3Copy(&gCamera->t.t.translate.t, &p);

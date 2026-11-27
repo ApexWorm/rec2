@@ -1068,8 +1068,8 @@ void C2_HOOK_FASTCALL EarnCredits2(int pAmount, const char* pPrefix_text) {
     if (pAmount == 0) {
         return;
     }
-    if (gCredit_multiplier != 0) {
-        pAmount *= gCredit_multiplier;
+    if (gPissed_info.credit_multiplier != 0) {
+        pAmount *= gPissed_info.credit_multiplier;
     }
     original_amount = pAmount;
     if (gLast_credit_headup__displays >= 0 && the_time - gLast_earn_time < 2000) {

@@ -199,7 +199,7 @@ undefined4 gUnknown_00705b80[20];
 // GLOBAL: CARMA2_HW 0x00705be0
 // GLOBAL: CARMA2_SW 0x006fc6a0
 // GLOBAL: CARMA2_CHEAT 0x0070d280
-int gCredit_multiplier;
+tPissed_info gPissed_info;
 
 
 // GLOBAL: CARMA2_HW 0x0074d44c

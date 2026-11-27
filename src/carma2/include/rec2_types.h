@@ -3493,6 +3493,14 @@ typedef struct {
     tU8* bools;
 } tPowerup_respawn_spec;
 
+typedef struct {
+    int credit_multiplier;
+    float amplitude[4][3]; /* FIXME: dimensions are a guess, the code only uses [0][0] */
+    float period[4][3];
+    float phase[4][3];
+    float field_0x94;
+} tPissed_info;
+
 typedef enum {
     kRepeatability_None,
     kRepeatability_SingleShot,
