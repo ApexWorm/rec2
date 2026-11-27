@@ -131,6 +131,7 @@ br_file_primitives _BrFilePrimsWriteText = {
 
 // GLOBAL: CARMA2_HW 0x00667250
 // GLOBAL: CARMA2_SW 0x00661830
+// GLOBAL: CARMA2_CHEAT 0x0066eb08
 const char* member_type_names[32] = {
     "int_8",
     "uint_8",
@@ -169,6 +170,7 @@ const char* member_type_names[32] = {
 
 // GLOBAL: CARMA2_HW 0x006ad9b0
 // GLOBAL: CARMA2_SW 0x006a7138
+// GLOBAL: CARMA2_CHEAT 0x006b5040
 datafile_stack_t DatafileStack[1024];
 
 #if defined(BRENDER_FIX_BUGS)
@@ -189,6 +191,7 @@ datafile_stack_t DatafileStack[1024];
 
 // GLOBAL: CARMA2_HW 0x006672d0
 // GLOBAL: CARMA2_SW 0x006618b0
+// GLOBAL: CARMA2_CHEAT 0x0066eb88
 const char* ChunkNames[CHUNKNAMES_NB] = {
     "END",
     "IMAGE_PLANE",
@@ -1596,12 +1599,15 @@ void C2_HOOK_STDCALL BrNullOther(void) {
 
 // FUNCTION: CARMA2_HW 0x0052cb40
 // FUNCTION: CARMA2_SW 0x005276d0
+// FUNCTION: CARMA2_CHEAT 0x00532730
 int C2_HOOK_CDECL DfFileIdentify(const br_uint_8* magics, br_size_t n_magics) {
     // GLOBAL: CARMA2_HW 0x00667508
     // GLOBAL: CARMA2_SW 0x00661ae8
+    // GLOBAL: CARMA2_CHEAT 0x0066edc0
     static const char text_magics[8] = { '*', 'F', 'I', 'L', 'E', '_', 'I', 'N' };
     // GLOBAL: CARMA2_HW 0x00667510
     // GLOBAL: CARMA2_SW 0x00661af0
+    // GLOBAL: CARMA2_CHEAT 0x0066edc8
     static const char binary_magics[8] = { '\0', '\0', '\0', '\x12', '\0', '\0', '\0', '\b' };
 
     if (BrMemCmp(magics, text_magics, sizeof(text_magics)) == 0) {
