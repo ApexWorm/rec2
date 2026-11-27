@@ -221,16 +221,16 @@ void C2_HOOK_FASTCALL ActualActionReplayHeadups(int pSpecial_zappy_bastard) {
             gReplay_pixies[10]);
     }
     if (pSpecial_zappy_bastard < 0) {
-        DRMaskedStamp(gCurrent_graf_data->field_0x310 + gCurrent_graf_data->field_0x300,
-            gCurrent_graf_data->field_0x314 + gCurrent_graf_data->field_0x304,
+        DRMaskedStamp(gCurrent_graf_data->field_0x300 + gCurrent_graf_data->field_0x310,
+            gCurrent_graf_data->field_0x304 + gCurrent_graf_data->field_0x314,
             gReplay_pixies[2]);
     } else if (pSpecial_zappy_bastard > 0) {
         DRMaskedStamp(gCurrent_graf_data->field_0x300 + gCurrent_graf_data->field_0x340,
             gCurrent_graf_data->field_0x304 + gCurrent_graf_data->field_0x344,
             gReplay_pixies[8]);
     } else if (ARGetReplayRate() < -1.0f) {
-        DRMaskedStamp(gCurrent_graf_data->field_0x318 + gCurrent_graf_data->field_0x300,
-            gCurrent_graf_data->field_0x31c + gCurrent_graf_data->field_0x304,
+        DRMaskedStamp(gCurrent_graf_data->field_0x300 + gCurrent_graf_data->field_0x318,
+            gCurrent_graf_data->field_0x304 + gCurrent_graf_data->field_0x31c,
             gReplay_pixies[3]);
     } else if (ARGetReplayRate() > 1.0f) {
         DRMaskedStamp(gCurrent_graf_data->field_0x300 + gCurrent_graf_data->field_0x338,
