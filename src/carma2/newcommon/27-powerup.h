@@ -56,27 +56,27 @@ extern char* C2_HOOK_FASTCALL GetPowerupMessage(int pPowerup_index);
 
 // GetNextGoodyTime
 
-// DoPowerupTextHeadup
+extern void C2_HOOK_FASTCALL DoPowerupTextHeadup(tPowerup* pPowerup, int pGot_it);
 
 // QueueIconGoing
 
 extern void C2_HOOK_FASTCALL QueueIconComing(tPowerup* pPowerup, tHeadup_icon* pHeadup_icons, int* pCount_icons);
 
-// LosePowerupX
+extern void C2_HOOK_FASTCALL LosePowerupX(tPowerup* pPowerup, int pTell_net_players);
 
-// LosePowerup
+extern void C2_HOOK_FASTCALL LosePowerup(tPowerup* pPowerup);
 
 // LoseKeyboardPowerupN
 
-// KeyboardPowerupFinished
+extern void C2_HOOK_FASTCALL KeyboardPowerupFinished(tPowerup* pPowerup, int pSelect_new);
 
 // LoseAllSimilarPowerups
 
-// ExcludedPowerup
+extern int C2_HOOK_FASTCALL ExcludedPowerup(int pIndex, tRace_list_spec* pRace_spec);
 
 extern int C2_HOOK_FASTCALL GotPowerupX(tCar_spec* pCar, int pIndex, int pArg3, int pMessage, tU32 pTime);
 
-// GotPowerupXX
+extern int C2_HOOK_FASTCALL GotPowerupXX(tCar_spec* pCar, int pIndex, int pMessage);
 
 extern void C2_HOOK_FASTCALL GotPowerupEarwig(tCar_spec* pCar, int pIndex, int pMessage, int pSelect_inventory);
 
@@ -130,9 +130,9 @@ extern void C2_HOOK_FASTCALL DrawKeyPowerups(tU32 pTime);
 
 extern void C2_HOOK_FASTCALL ToggleInventory(void);
 
-// RightInventory
+extern void C2_HOOK_FASTCALL RightInventory(void);
 
-// LeftInventory
+extern void C2_HOOK_FASTCALL LeftInventory(void);
 
 extern void C2_HOOK_FASTCALL DrawPowerups(tU32 pTime);
 
