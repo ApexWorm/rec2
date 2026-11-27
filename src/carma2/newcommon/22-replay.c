@@ -12,6 +12,7 @@
 #include "08-loading1.h"
 #include "10-loading2.h"
 #include "18-graphics2.h"
+#include "21-mainloop.h"
 #include "23-piping.h"
 #include "30-opponent.h"
 #include "32-spark.h"
@@ -19,6 +20,7 @@
 #include "41-utility.h"
 #include "53-controls.h"
 #include "59-camera.h"
+#include "27-powerup.h"
 #include "61-pedestrn.h"
 #include "63-loading3.h"
 #include "globvars.h"
@@ -214,11 +216,40 @@ void C2_HOOK_FASTCALL DoActionReplayHeadups(void) {
     ActualActionReplayHeadups(0);
 }
 
-// PreProcess
+extern void C2_HOOK_FASTCALL MungePedestrians(tU32 pFrame_period);
+extern void C2_HOOK_FASTCALL ProcessOilSpills(tU32 pFrame_period);
 
-// PostProcess
+// FUNCTION: CARMA2_HW 0x004e6950
+// FUNCTION: CARMA2_SW 0x004e2840
+// FUNCTION: CARMA2_CHEAT 0x004ec640
+void C2_HOOK_FASTCALL PreProcess(int pFrame_period) {
 
-// DoActionReplay
+    UpdateFramePeriod(&gCamera_period);
+    if (ARGetReplayRate() < 0.0f) {
+        MungePedestrians(pFrame_period);
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x004e6980
+// FUNCTION: CARMA2_SW 0x004e2870
+// FUNCTION: CARMA2_CHEAT 0x004ec670
+void C2_HOOK_FASTCALL PostProcess(int pFrame_period) {
+
+    ProcessOilSpills(pFrame_period);
+    if (ARGetReplayRate() >= 0.0f) {
+        MungePedestrians(pFrame_period);
+    }
+    MungePowerupStuff(pFrame_period);
+}
+
+// FUNCTION: CARMA2_HW 0x004e68e0
+// FUNCTION: CARMA2_SW 0x004e27d0
+// FUNCTION: CARMA2_CHEAT 0x004ec5d0
+void C2_HOOK_FASTCALL DoActionReplay(tU32 pFrame_period) {
+
+    gLast_replay_zappy_screen = 0;
+    ARDoActionReplay(pFrame_period, DoZappyActionReplayHeadups, PreProcess, PostProcess);
+}
 
 // MoveToEndOfReplay
 
