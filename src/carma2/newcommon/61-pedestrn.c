@@ -915,7 +915,7 @@ void C2_HOOK_FASTCALL SetCharacterBonePositions(tPed_character_instance* pPed, i
             if (pArg3 != 0 && !gPed_overall_movement_disabled) {
                 BrVector3Scale(&move, (br_vector3*)frame->mat.m[3], personality->moves[pPed->field_0x7].scale_factor);
                 BrMatrix34ApplyV(&delta, &move, &pPed->field_0x5c);
-                if (gAction_replay_mode && ARGetReplayRate() < 0.f) {
+                if (gAction_replay_mode && ARGetReplayRate() < 0.0f) {
                     BrVector3Sub((br_vector3*)mat->m[3], &original_pos, &delta);
                 } else {
                     BrVector3Add((br_vector3*)mat->m[3], &delta, &original_pos);
