@@ -226,6 +226,7 @@ void C2_HOOK_FASTCALL SetInitialOilStuff(tOil_spill_info* pOil, br_model* pModel
 
 // FUNCTION: CARMA2_HW 0x004a74e0
 // FUNCTION: CARMA2_SW 0x004a3650
+// FUNCTION: CARMA2_CHEAT 0x004a87f0
 int C2_HOOK_FASTCALL GetOilSpillCount(void) {
     return (int)REC2_ASIZE(gOily_spills);
 }
