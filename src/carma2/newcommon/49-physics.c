@@ -173,6 +173,7 @@ void C2_HOOK_FASTCALL DrMatrix34ApplyLPInverse(br_vector3* dest, const br_vector
 
 // FUNCTION: CARMA2_HW 0x004268a0
 // FUNCTION: CARMA2_SW 0x00426940
+// FUNCTION: CARMA2_CHEAT 0x00426a30
 int C2_HOOK_FASTCALL AddObjectObjectForce(tPhysics_joint_force* pForces, const br_vector3* pPoint_a, br_scalar pT, const br_vector3* pPoint_b, const br_vector3* pNormal, int pCount, tPhysics_object* pObject_a, tPhysics_object* pObject_b, int pType, void* pUnused, br_scalar pValue) {
     int i;
     int j;
@@ -206,6 +207,7 @@ int C2_HOOK_FASTCALL AddObjectObjectForce(tPhysics_joint_force* pForces, const b
 
 // FUNCTION: CARMA2_HW 0x004225f0
 // FUNCTION: CARMA2_SW 0x00422670
+// FUNCTION: CARMA2_CHEAT 0x00422840
 tFace_ref* C2_HOOK_FASTCALL RayCastThruFaceList(br_vector3* pPosition, br_vector3* pDirection, br_vector3* pNormal, br_scalar* pT, br_vector3* pCollision_position, tFace_ref* pFaces, int pCount) {
     br_vector3 normal;
     br_vector3 collision_position;
@@ -360,6 +362,7 @@ int C2_HOOK_FASTCALL BoundsOverlapTest(const br_bounds3* pBounds_1, const br_bou
 
 // FUNCTION: CARMA2_HW 0x00428480
 // FUNCTION: CARMA2_SW 0x00428510
+// FUNCTION: CARMA2_CHEAT 0x00428610
 void C2_HOOK_FASTCALL GetShapePoint(br_vector3* pPoint, tPhysics_shape* pShape, tU32 pIndex) {
     switch (pShape->common.type) {
     case kCollisionShapeType_Box:
@@ -382,6 +385,7 @@ void C2_HOOK_FASTCALL GetShapePoint(br_vector3* pPoint, tPhysics_shape* pShape, 
 
 // FUNCTION: CARMA2_HW 0x00428cf0
 // FUNCTION: CARMA2_SW 0x00428d80
+// FUNCTION: CARMA2_CHEAT 0x00428e80
 int C2_HOOK_FASTCALL AddOldForces(tPhysics_joint_force* pForces, int pCount, const tPhysics_joint_force* pOld_forces, int pOld_count) {
     int i;
 
@@ -396,6 +400,7 @@ int C2_HOOK_FASTCALL AddOldForces(tPhysics_joint_force* pForces, int pCount, con
 
 // FUNCTION: CARMA2_HW 0x00428d40
 // FUNCTION: CARMA2_SW 0x00428dd0
+// FUNCTION: CARMA2_CHEAT 0x00428ed0
 int C2_HOOK_FASTCALL TestObjectOverlap(tPhysics_object* pCollision_1, tPhysics_object* pCollision_2) {
     tPhysics_shape* shape1;
     tPhysics_shape* shape2;
