@@ -510,7 +510,7 @@ void C2_HOOK_FASTCALL DoDroneFunkyGroovyThings(tDrone_spec* pDrone) {
     position = gAction_replay_mode ? pDrone->field_0xe0 : pDrone->field_0x74;
     speed = gAction_replay_mode ? pDrone->field_0xe4 : pDrone->field_0x48;
     if (gAction_replay_mode) {
-        if (speed < 0.f) {
+        if (speed < 0.0f) {
             speed = -speed;
             left_turn = 0;
         } else {
@@ -533,47 +533,47 @@ void C2_HOOK_FASTCALL DoDroneFunkyGroovyThings(tDrone_spec* pDrone) {
             if (groove->spinny.speed_control) {
                 angle = speed * delta_time / groove->spinny.omega;
             } else {
-                angle = 0.f;
+                angle = 0.0f;
             }
             if (!groove->spinny.reverse) {
                 angle = -angle;
             }
             switch (groove->spinny.axis) {
             case tFunk_groove_axis_x:
-                BrMatrix34PreRotateX(&groove->actor->t.t.mat, (br_angle)(angle * 65536.f));
+                BrMatrix34PreRotateX(&groove->actor->t.t.mat, (br_angle)(angle * 65536.0f));
                 break;
             case tFunk_groove_axis_y:
-                BrMatrix34PreRotateY(&groove->actor->t.t.mat, (br_angle)(angle * 65536.f));
+                BrMatrix34PreRotateY(&groove->actor->t.t.mat, (br_angle)(angle * 65536.0f));
                 break;
             case tFunk_groove_axis_z:
-                BrMatrix34PreRotateZ(&groove->actor->t.t.mat, (br_angle)(angle * 65536.f));
+                BrMatrix34PreRotateZ(&groove->actor->t.t.mat, (br_angle)(angle * 65536.0f));
                 break;
             }
             break;
         case eFunk_groove_type_steering_groove:
             if (gAction_replay_mode) {
-                f = (10.f - MIN(10.f, MAX(0.f, pDrone->field_0xe8))) / 70.f;
+                f = (10.0f - MIN(10.0f, MAX(0.0f, pDrone->field_0xe8))) / 70.0f;
             } else if (pDrone->field_0xdc == 2) {
-                f = (10.f - MIN(10.f, MAX(0.f, pDrone->h_radius))) / 70.f;
+                f = (10.0f - MIN(10.0f, MAX(0.0f, pDrone->h_radius))) / 70.0f;
             } else {
-                f = 0.f;
+                f = 0.0f;
             }
             if (position < .5) {
                 angle = position;
             } else {
-                angle = 1.f - position;
+                angle = 1.0f - position;
             }
-            angle = angle * f * 2.f;
+            angle = angle * f * 2.0f;
             if (groove->steering.reverse) {
                 angle = -angle;
             }
             if (left_turn) {
                 angle = -angle;
             }
-            BrVector3Set((br_vector3*)groove->actor->t.t.mat.m[0], 1.f, 0.f, 0.f);
-            BrVector3Set((br_vector3*)groove->actor->t.t.mat.m[1], 0.f, 1.f, 0.f);
-            BrVector3Set((br_vector3*)groove->actor->t.t.mat.m[2], 0.f, 0.f, 1.f);
-            BrMatrix34PreRotateY(&groove->actor->t.t.mat, (br_angle)(angle * 65536.f));
+            BrVector3Set((br_vector3*)groove->actor->t.t.mat.m[0], 1.0f, 0.0f, 0.0f);
+            BrVector3Set((br_vector3*)groove->actor->t.t.mat.m[1], 0.0f, 1.0f, 0.0f);
+            BrVector3Set((br_vector3*)groove->actor->t.t.mat.m[2], 0.0f, 0.0f, 1.0f);
+            BrMatrix34PreRotateY(&groove->actor->t.t.mat, (br_angle)(angle * 65536.0f));
             if (pDrone->field_0xdc == 2) {
                 DoNotDprintf_drone("STEERING GROOVE: rot %f, h_radius %f, reverse %d, left_turn %d",
                     angle, pDrone->h_radius, groove->steering.reverse, pDrone->left_turn);
