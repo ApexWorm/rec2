@@ -130,6 +130,7 @@ br_matrix34 mattmp2__trig;
 
 // FUNCTION: CARMA2_HW 0x005113d0
 // FUNCTION: CARMA2_SW 0x0050c820
+// FUNCTION: CARMA2_CHEAT 0x00516dc0
 float C2_HOOK_FASTCALL FastFloatSin(int pAngle_degrees) {
 
     if (pAngle_degrees < 0) {
@@ -151,6 +152,7 @@ float C2_HOOK_FASTCALL FastFloatSin(int pAngle_degrees) {
 
 // FUNCTION: CARMA2_HW 0x00511440
 // FUNCTION: CARMA2_SW 0x0050c890
+// FUNCTION: CARMA2_CHEAT 0x00516e30
 float C2_HOOK_FASTCALL FastFloatCos(int pAngle_degrees) {
 
     if (pAngle_degrees < 0) {
@@ -189,6 +191,7 @@ br_scalar C2_HOOK_FASTCALL FastScalarCos(int pAngle_degrees) {
 
 // FUNCTION: CARMA2_HW 0x00511780
 // FUNCTION: CARMA2_SW 0x0050cbd0
+// FUNCTION: CARMA2_CHEAT 0x00517170
 br_scalar C2_HOOK_FASTCALL FastScalarSinAngle(br_angle pAngle) {
 
     return FastScalarSin((int)((double)pAngle * (360.0 / 65536.0)));
@@ -196,6 +199,7 @@ br_scalar C2_HOOK_FASTCALL FastScalarSinAngle(br_angle pAngle) {
 
 // FUNCTION: CARMA2_HW 0x00511810
 // FUNCTION: CARMA2_SW 0x0050cc60
+// FUNCTION: CARMA2_CHEAT 0x00517200
 br_scalar C2_HOOK_FASTCALL FastScalarCosAngle(br_angle pAngle) {
 
     return FastScalarCos((int)((double)pAngle * (360.0 / 65536.0)));
