@@ -18,8 +18,6 @@ extern int gMaterials_to_adapt_count;
 extern int gShrapnel_child_count;
 
 extern tSmashable_item_spec* gTrack_smashable_environment_specs;
-extern tSmashable_item_spec gUnknown_smashable_006a3660;
-extern tSmashable_item_spec gPowerup_pickup_smashable;
 extern tSmashable_item_spec* gSmashable_track_indexable_triggers[100];
 extern br_actor* gSmashable_noncar_shrapnel_actors[100];
 extern int gCount_smashable_noncar_shrapnel_actors;
