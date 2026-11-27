@@ -12,12 +12,6 @@
 #include "c2_hooks.h"
 #include "rec2_types.h"
 
-typedef struct { /* FIXME: name is a guess, returned to PHIL by GetDroneCrushData */
-    br_model* model;
-    float crushability;
-    br_bounds3 bounds;
-} tDrone_crush_data;
-
 extern br_vector3 gRender_bounds_centre;
 extern int gINT_00681fb0;
 extern int gFrame;

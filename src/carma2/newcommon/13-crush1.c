@@ -1446,8 +1446,6 @@ void C2_HOOK_FASTCALL SimpleCrushModel(br_model* pModel, int pCount, const br_ve
 #pragma auto_inline(on)
 #endif
 
-extern void C2_HOOK_FASTCALL CrushDrone(tDrone_crush_data* pCrush_data, int pCount, const br_vector3* pPoints, const br_vector3* pForce);
-
 inline void C2_HOOK_FASTCALL CrushDrone(tDrone_crush_data* pCrush_data, int pCount, const br_vector3* pPoints, const br_vector3* pForce) {
     br_vector3 force;
 
