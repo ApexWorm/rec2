@@ -66,6 +66,7 @@ br_file_struct_member br_old_vertex_uv_FM[] = {
 
 // GLOBAL: CARMA2_HW 0x00663550
 // GLOBAL: CARMA2_SW 0x0065dce8
+// GLOBAL: CARMA2_CHEAT 0x0066ae08
 br_file_struct br_old_vertex_uv_F = { "br_old_vertex_uv", BR_ASIZE(br_old_vertex_uv_FM), br_old_vertex_uv_FM, sizeof(br_vertex) };
 
 // GLOBAL: CARMA2_HW 0x00663560
@@ -369,6 +370,7 @@ transform_type TransformTypes[] = {
 
 // GLOBAL: CARMA2_HW 0x00663c90
 // GLOBAL: CARMA2_SW 0x0065e428
+// GLOBAL: CARMA2_CHEAT 0x0066b548
 br_file_struct_member br_bounds3_FM[] = {
     { DF_TYPE_BR_VECTOR3, offsetof(br_bounds3, min), "min", NULL },
     { DF_TYPE_BR_VECTOR3, offsetof(br_bounds3, max), "max", NULL },

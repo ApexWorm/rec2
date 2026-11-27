@@ -14,6 +14,7 @@ br_primitive* _default_table[256];
 
 // GLOBAL: CARMA2_HW 0x00665458
 // GLOBAL: CARMA2_CHEAT 0x0066cd10
+// GLOBAL: CARMA2_SW 0x0065fbf0
 br_order_table _BrDefaultOrderTable = {
     _default_table,
     BR_ASIZE(_default_table),

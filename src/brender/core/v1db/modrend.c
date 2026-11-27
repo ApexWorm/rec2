@@ -68,6 +68,8 @@ v11model bounds_prepared = {
 
 
 // GLOBAL: CARMA2_HW 0x00665030
+// GLOBAL: CARMA2_CHEAT 0x0066c8e8
+// GLOBAL: CARMA2_SW 0x0065f7c8
 br_model bounds_model = {
     0,
     "Bounds",

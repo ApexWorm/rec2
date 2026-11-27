@@ -29,6 +29,8 @@
 #include "c2_string.h"
 
 // GLOBAL: CARMA2_HW 0x00664b68
+// GLOBAL: CARMA2_CHEAT 0x0066c420
+// GLOBAL: CARMA2_SW 0x0065f300
 br_resource_class v1db_resourceClasses[] = {
     { 0u, "VERTICES", BR_MEMORY_VERTICES, NULL, 0u },
     { 0u, "FACES", BR_MEMORY_FACES, NULL, 0u },

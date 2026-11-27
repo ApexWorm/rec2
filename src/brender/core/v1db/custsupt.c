@@ -22,6 +22,7 @@ br_scalar gScreenZOffset;
 
 // GLOBAL: CARMA2_HW 0x00670530
 // GLOBAL: CARMA2_SW 0x0066acc0
+// GLOBAL: CARMA2_CHEAT 0x00677de0
 const float gScreenZOffsetPresetChoices[7] = {
      0.0f,
     -1.5f,
