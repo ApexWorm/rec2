@@ -1282,11 +1282,74 @@ void C2_HOOK_FASTCALL RQExpand(br_scalar* pMatrix, const br_scalar* pOriginal, i
     }
 }
 
-// STUB: CARMA2_HW 0x004c4f40
-// STUB: CARMA2_SW 0x004c1670
-// STUB: CARMA2_CHEAT 0x004caa60
+// FUNCTION: CARMA2_HW 0x004c4f40
+// FUNCTION: CARMA2_SW 0x004c1670
+// FUNCTION: CARMA2_CHEAT 0x004caa60
 void C2_HOOK_FASTCALL RQSingleExpand(br_scalar* pMatrix, const br_scalar* pOriginal, int pSize, br_scalar* pOrthogonal, const tU8* pIndices) {
-    NOT_IMPLEMENTED();
+    int i;
+    int k;
+    br_scalar maximum;
+    br_scalar head;
+    br_scalar denominator;
+    br_scalar length;
+    br_scalar second_coefficient;
+    br_scalar row[100];
+    br_scalar diagonal;
+    br_scalar sum;
+    br_scalar magnitude;
+    int j;
+    br_scalar second;
+    br_scalar first_coefficient;
+
+    for (i = 0; i <= pSize; i++) {
+        row[i] = pOriginal[100 * pIndices[pSize] + pIndices[i]];
+    }
+    for (k = 0; k < pSize; k++) {
+        sum = 0.f;
+        for (j = 0; j < pSize; j++) {
+            sum += pOrthogonal[j + k * 100] * row[j];
+        }
+        pMatrix[100 * pSize + k] = sum;
+    }
+    pOrthogonal[101 * pSize] = 1.f;
+    for (i = 0; i < pSize; i++) {
+        pOrthogonal[i * 100 + pSize] = 0.f;
+        pOrthogonal[100 * pSize + i] = 0.f;
+    }
+    for (i = 0; i < pSize; i++) {
+        magnitude = (br_scalar)fabs(row[i]);
+        pMatrix[i * 100 + pSize] = 0.f;
+        if (magnitude == 0.f) {
+            continue;
+        }
+        maximum = (br_scalar)fabs(pMatrix[i * 101]);
+        if (magnitude > maximum) {
+            maximum = magnitude;
+        }
+        second = row[i] / maximum;
+        diagonal = pMatrix[i * 101] / maximum;
+        length = (br_scalar)fabs(sqrt((diagonal * diagonal) + second * second));
+        row[i] = second;
+        if (diagonal <= 0.f) {
+            length = -length;
+        }
+        head = diagonal + length;
+        denominator = head * length;
+        second_coefficient = second / denominator;
+        first_coefficient = head / denominator;
+        for (j = 0; j <= pSize; j++) {
+            sum = (second * pOrthogonal[pSize * 100 + j]) + (pOrthogonal[i * 100 + j] * head);
+            pOrthogonal[pSize * 100 + j] -= second_coefficient * sum;
+            pOrthogonal[i * 100 + j] -= first_coefficient * sum;
+        }
+        for (j = i + 1; j <= pSize; j++) {
+            sum = (row[j] * second) + (pMatrix[100 * j + i] * head);
+            row[j] -= sum * second_coefficient;
+            pMatrix[i + j * 100] -= sum * first_coefficient;
+        }
+        pMatrix[i * 101] = -(length * maximum);
+    }
+    pMatrix[pSize * 101] = row[pSize];
 }
 
 #ifdef REC2_MATCHING
