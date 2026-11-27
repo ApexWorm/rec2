@@ -264,17 +264,17 @@ extern void C2_HOOK_FASTCALL ActivateMine(tShit_mine* pMine, tPowerup* pPowerup,
 
 extern void C2_HOOK_FASTCALL PositionMine(tShit_mine* pMine, tCar_spec* pCar);
 
-// MineSound
+extern void C2_HOOK_FASTCALL MineSound(tShit_mine* pMine);
 
 // ReceivedMine
 
-// ShitMine
+extern int C2_HOOK_FASTCALL ShitMine(tPowerup* pPowerup, tCar_spec* pCar);
 
 extern int C2_HOOK_FASTCALL MineExplode(tShit_mine* pMine);
 
 extern void C2_HOOK_FASTCALL TiggerMineToExplode(tCar_spec* pCar);
 
-// HitAShatOutMine
+extern void C2_HOOK_FASTCALL HitAShatOutMine(tPhysics_object* pObject1, tPhysics_object* pObject2, br_scalar pImpulse);
 
 extern void C2_HOOK_FASTCALL ClearMineReferencesToCar(tCar_spec* pCar);
 

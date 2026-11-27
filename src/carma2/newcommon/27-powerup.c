@@ -1630,11 +1630,92 @@ void C2_HOOK_FASTCALL PositionMine(tShit_mine* pMine, tCar_spec* pCar) {
     BrVector3Set(&pMine->collision_info->omega, 0.0f, 0.0f, 0.0f);
 }
 
-// MineSound
+inline void C2_HOOK_FASTCALL MineSound(tShit_mine* pMine) {
+
+    if (pMine->flags & 0x40) {
+        DRS3StartSound3D(gCar_outlet, 5405, &pMine->collision_info->actor->t.t.translate.t, &gZero_v__car, 1, 255, 0x10000, 0x10000);
+    } else {
+        DRS3StartSound3D(gCar_outlet, 5404, &pMine->collision_info->actor->t.t.translate.t, &gZero_v__car, 1, 255, 0x10000, 0x10000);
+    }
+    if (pMine->field_0x30 != NULL && pMine->field_0x30->driver == eDriver_local_human) {
+        PlayExclusiveFFBEffect("Mine_Shit", 0);
+    }
+}
 
 // ReceivedMine
 
-// ShitMine
+// FUNCTION: CARMA2_HW 0x004dd700
+// FUNCTION: CARMA2_SW 0x004d9c00
+// FUNCTION: CARMA2_CHEAT 0x004e32c0
+int C2_HOOK_FASTCALL ShitMine(tPowerup* pPowerup, tCar_spec* pCar) {
+    int i;
+    int oldest;
+    tU32 time;
+    tU32 best_time;
+    tShit_mine* mine;
+    br_vector3 car_pos;
+    br_vector3 mine_pos;
+    br_vector3 dir;
+    br_vector3 normal;
+    br_vector3 collision_pos;
+    br_scalar t;
+
+    C2_HOOK_BUG_ON(REC2_ASIZE(gShit_mines) != 20);
+
+    mine = NULL;
+    if (gNet_mode != eNet_mode_client) {
+        for (i = 0; i < (int)REC2_ASIZE(gShit_mines); i++) {
+            if (!(gShit_mines[i].flags & 0x1)) {
+                mine = &gShit_mines[i];
+                break;
+            }
+        }
+        if (mine == NULL) {
+            time = GetTotalTime();
+            best_time = (tU32)(pPowerup->float_params[0] * 1000.0);
+            oldest = -1;
+            for (i = 0; i < (int)REC2_ASIZE(gShit_mines); i++) {
+                if ((gShit_mines[i].flags & 0x4) && !(gShit_mines[i].flags & 0x2) && gShit_mines[i].next_think_time - time < best_time) {
+                    best_time = gShit_mines[i].next_think_time - time;
+                    oldest = i;
+                }
+            }
+            if (oldest == -1) {
+                return pPowerup - gPowerup_array;
+            }
+            mine = &gShit_mines[oldest];
+        }
+        ActivateMine(mine, pPowerup, pCar);
+        mine->field_0x30 = pCar;
+        mine->field_0x35++;
+        PositionMine(mine, pCar);
+        if (gNet_mode == eNet_mode_none) {
+            PipeSingleShitMine(mine->collision_info->actor);
+        }
+        MineSound(mine);
+        BrMatrix34ApplyP(&car_pos, &pCar->collision_info->cmpos, &pCar->collision_info->transform_matrix);
+        BrMatrix34ApplyP(&mine_pos, &mine->collision_info->cmpos, &mine->collision_info->transform_matrix);
+        BrVector3Sub(&dir, &mine_pos, &car_pos);
+        BrVector3Normalise(&normal, &dir);
+        /* FIXME: dir += normal * 0.15 (no BrVector3 macro for it) */
+        dir.v[0] += normal.v[0] * 0.15;
+        dir.v[1] += normal.v[1] * 0.15;
+        dir.v[2] += normal.v[2] * 0.15;
+        if (!TestForObjectInSensiblePlace(mine->collision_info, gPHIL_list_collision_infos, &dir, &gWorld_callbacks)) {
+            HitAShatOutMine(mine->collision_info, gObject_blocking_sensible_place, 1.0f);
+        } else if (RayCastThruFaceList2(&car_pos, &dir, &normal, &t, &collision_pos,
+                       &gFace_list__car[pCar->collision_info->box_face_start],
+                       pCar->collision_info->box_face_end - pCar->collision_info->box_face_start) != NULL
+            || RayCastThruFaceList2(&car_pos, &dir, &normal, &t, &collision_pos,
+                &gFace_list__car[mine->collision_info->box_face_start],
+                mine->collision_info->box_face_end - mine->collision_info->box_face_start) != NULL) {
+            BrVector3Scale(&dir, &dir, -(1.0f - t) - 0.1);
+            BrVector3Accumulate((br_vector3*)mine->collision_info->transform_matrix.m[3], &dir);
+            HitAShatOutMine(pCar->collision_info, mine->collision_info, 1.0f);
+        }
+    }
+    return pPowerup - gPowerup_array;
+}
 
 // FUNCTION: CARMA2_HW 0x004ddab0
 // FUNCTION: CARMA2_SW 0x004d9fb0
@@ -1675,7 +1756,20 @@ void C2_HOOK_FASTCALL TiggerMineToExplode(tCar_spec* pCar) {
     pCar->index |= 0x20;
 }
 
-// HitAShatOutMine
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_HW 0x004ddc20
+// STUB: CARMA2_SW 0x004da120
+// STUB: CARMA2_CHEAT 0x004e37e0
+void C2_HOOK_FASTCALL HitAShatOutMine(tPhysics_object* pObject1, tPhysics_object* pObject2, br_scalar pImpulse) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // FUNCTION: CARMA2_HW 0x004ddde0
 // FUNCTION: CARMA2_SW 0x004da2e0
