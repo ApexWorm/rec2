@@ -501,8 +501,7 @@ int C2_HOOK_FASTCALL LineSphereCollWithSphere(br_vector3* pStart, br_vector3* pE
         return result;
     }
     BrVector3Sub(pNormal, &pSphere->center, pEnd);
-    dist_squared = BrVector3LengthSquared(pNormal);
-    if (dist_squared > 2.0f * (0.002f * pSphere->radius_squared) + pSphere->radius_squared) {
+    if (2.0f * (0.002f * pSphere->radius_squared) + pSphere->radius_squared < (dist_squared = BrVector3LengthSquared(pNormal))) {
         return 0;
     }
     if (dist_squared < pSphere->radius_squared) {
