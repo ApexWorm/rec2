@@ -4342,19 +4342,25 @@ typedef struct tCar_crush_spec {
 typedef struct tCrush_net_detach_list_item {
     br_actor* actor;
     tCar_spec* car;
-    undefined field_0x8[28];
+    tU32 time;
+    br_bounds3 bounds;
 } tCrush_net_detach_list_item;
 
 typedef struct tCrush_net_semi_detach_bit_list_item {
     br_actor* actor;
     tCar_spec* car;
-    undefined field_0x8[68];
+    tU32 time;
+    br_vector3 point_1;
+    br_vector3 point_2;
+    br_vector3 point_3;
+    br_bounds3 bounds;
+    float value;
 } tCrush_net_semi_detach_bit_list_item;
 
 typedef struct tCrush_net_full_detach_bit_list_item {
     tCar_spec* car;
     tPhysics_object* object;
-    undefined field_0x8[0xc - 0x8];
+    tU32 time;
 } tCrush_net_full_detach_bit_list_item;
 
 typedef struct tCrush_net_reattach_bit_list_item {
@@ -5459,6 +5465,7 @@ typedef enum {
     eNet_message_chunk_type_oil_spill = 0x1f,
     eNet_message_chunk_type_car_crush = 0x20,
     eNet_message_chunk_type_semi_detach_bit = 0x24,
+    eNet_message_chunk_type_fully_detach_bit = 0x25,
     eNet_message_chunk_type_reattach_bit = 0x26,
     eNet_message_chunk_type_db_non_car = 0x27,
     eNet_message_chunk_type_sh_non_car = 0x29,
@@ -5531,10 +5538,10 @@ typedef struct {
 } tNet_message_chunk_semi_detach_bit;
 
 typedef struct {
-    int ID;
-    tU8 field_0x4;
-    undefined field_0x5[0x8 - 0x5];
-    tU32 field_0x8;
+    tNet_message_chunk_header header;
+    tPlayer_ID player;
+    tU8 id;
+    tU32 time;
     tCompressed_vector3 bounds_min;
     tCompressed_vector3 bounds_max;
 } tNet_message_chunk_detach_bit;
@@ -5720,6 +5727,7 @@ typedef union {
     tNet_message_chunk_oil_spill oil_spill; /* type = 0x1f*/
     tNet_message_car_crush car_crush; /* type = 0x20 */
     tNet_message_chunk_semi_detach_bit semi_detach_bit; /* type = 0x24 */
+    tNet_message_chunk_semi_detach_bit fully_detach_bit; /* type = 0x25, value unused */
     tNet_message_chunk_reattach_bit reattach_bit; /* type = 0x26 */
     tNet_message_chunk_db_non_car db_non_car; /* type = 0x27 */
     tNet_message_chunk_sh_non_car sh_non_car; /* type = 0x29 */
