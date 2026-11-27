@@ -4343,13 +4343,21 @@ typedef struct tCar_crush_spec {
 typedef struct tCrush_net_detach_list_item {
     br_actor* actor;
     tCar_spec* car;
-    undefined field_0x8[28];
+    tU32 time;
+    br_vector3 bounds_min;
+    br_vector3 bounds_max;
 } tCrush_net_detach_list_item;
 
 typedef struct tCrush_net_semi_detach_bit_list_item {
     br_actor* actor;
     tCar_spec* car;
-    undefined field_0x8[68];
+    tU32 time;
+    br_vector3 point_1;
+    br_vector3 point_2;
+    br_vector3 point_3;
+    br_vector3 bounds_min;
+    br_vector3 bounds_max;
+    float value;
 } tCrush_net_semi_detach_bit_list_item;
 
 typedef struct tCrush_net_full_detach_bit_list_item {
@@ -5524,10 +5532,10 @@ typedef struct {
 } tNet_message_chunk_semi_detach_bit;
 
 typedef struct {
-    int ID;
-    tU8 field_0x4;
-    undefined field_0x5[0x8 - 0x5];
-    tU32 field_0x8;
+    tNet_message_chunk_header header;
+    tPlayer_ID player;
+    tU8 id;
+    tU32 time;
     tCompressed_vector3 bounds_min;
     tCompressed_vector3 bounds_max;
 } tNet_message_chunk_detach_bit;

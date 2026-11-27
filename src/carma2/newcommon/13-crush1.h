@@ -498,11 +498,11 @@ extern void C2_HOOK_FASTCALL ARUndoSplitWeld(tCar_spec* pCar);
 
 // ReceivedCrush
 
-// FindBitWithID
+extern intptr_t C2_HOOK_CDECL FindBitWithID(br_actor* pActor, void* pContext);
 
-// AttachedBitFromID
+extern br_actor* C2_HOOK_FASTCALL AttachedBitFromID(tCar_spec* pCar, tU8 pID);
 
-// ReceivedSemiDetachBit
+extern void C2_HOOK_FASTCALL ReceivedSemiDetachBit(tNet_message_chunk* pContents);
 
 // ReceivedDetachBit
 

@@ -2660,13 +2660,107 @@ void C2_HOOK_FASTCALL ARUndoSplitWeld(tCar_spec* pCar) {
 
 // ReceivedCrush
 
-// FindBitWithID
+typedef struct {
+    tU8 id;
+    br_actor* actor;
+} tFindBitWithID_context;
 
-// AttachedBitFromID
+// FUNCTION: CARMA2_HW 0x0043cac0
+// FUNCTION: CARMA2_SW 0x0043cb10
+// FUNCTION: CARMA2_CHEAT 0x0043cd20
+intptr_t C2_HOOK_CDECL FindBitWithID(br_actor* pActor, void* pContext) {
+    tFindBitWithID_context* context;
+    tUser_crush_data* user_crush;
 
-// ReceivedSemiDetachBit
+    context = pContext;
+    user_crush = pActor->user;
+    if (user_crush != NULL && user_crush->crush_data != NULL && user_crush->crush_data->id == context->id) {
+        context->actor = pActor;
+        return 1;
+    } else {
+        return 0;
+    }
+}
 
-// ReceivedDetachBit
+inline br_actor* C2_HOOK_FASTCALL AttachedBitFromID(tCar_spec* pCar, tU8 pID) {
+    tFindBitWithID_context context;
+
+    context.id = pID;
+    context.actor = NULL;
+    if (DRActorEnumRecurse(pCar->car_model_actor, FindBitWithID, &context) != 0) {
+        return context.actor;
+    } else {
+        return NULL;
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x0043c940
+// FUNCTION: CARMA2_SW 0x0043c990
+// FUNCTION: CARMA2_CHEAT 0x0043cba0
+void C2_HOOK_FASTCALL ReceivedSemiDetachBit(tNet_message_chunk* pContents) {
+    tCar_spec* car;
+    br_actor* actor;
+    int i;
+
+    if (gCount_net_crush_semi_detach_bit_list == REC2_ASIZE(gNet_crush_semi_detach_bit_list)) {
+        return;
+    }
+    car = NetCarFromPlayerID(pContents->semi_detach_bit.player);
+    if (car == NULL) {
+        return;
+    }
+    actor = AttachedBitFromID(car, pContents->semi_detach_bit.id);
+    if (actor == NULL) {
+        return;
+    }
+    for (i = 0; i < gCount_net_crush_semi_detach_bit_list; i++) {
+        if (gNet_crush_semi_detach_bit_list[i].actor == actor) {
+            return;
+        }
+    }
+    gNet_crush_semi_detach_bit_list[gCount_net_crush_semi_detach_bit_list].car = car;
+    gNet_crush_semi_detach_bit_list[gCount_net_crush_semi_detach_bit_list].actor = actor;
+    gNet_crush_semi_detach_bit_list[gCount_net_crush_semi_detach_bit_list].time = pContents->semi_detach_bit.time;
+    ExpandVector3(&gNet_crush_semi_detach_bit_list[gCount_net_crush_semi_detach_bit_list].point_1, &pContents->semi_detach_bit.point_1, -10.0f, 10.0f);
+    ExpandVector3(&gNet_crush_semi_detach_bit_list[gCount_net_crush_semi_detach_bit_list].bounds_min, &pContents->semi_detach_bit.bounds_min, -10.0f, 10.0f);
+    ExpandVector3(&gNet_crush_semi_detach_bit_list[gCount_net_crush_semi_detach_bit_list].bounds_max, &pContents->semi_detach_bit.bounds_max, -10.0f, 10.0f);
+    ExpandVector3(&gNet_crush_semi_detach_bit_list[gCount_net_crush_semi_detach_bit_list].point_2, &pContents->semi_detach_bit.point_2, -10.0f, 10.0f);
+    ExpandVector3(&gNet_crush_semi_detach_bit_list[gCount_net_crush_semi_detach_bit_list].point_3, &pContents->semi_detach_bit.point_3, -10.0f, 10.0f);
+    gNet_crush_semi_detach_bit_list[gCount_net_crush_semi_detach_bit_list].value = DRU16ToScalar(pContents->semi_detach_bit.value, 0.0f, 40.0f);
+    gCount_net_crush_semi_detach_bit_list += 1;
+}
+
+// FUNCTION: CARMA2_HW 0x0043caf0
+// FUNCTION: CARMA2_SW 0x0043cb40
+// FUNCTION: CARMA2_CHEAT 0x0043cd50
+void C2_HOOK_FASTCALL ReceivedDetachBit(tNet_message_chunk* pContents) {
+    tCar_spec* car;
+    br_actor* actor;
+    int i;
+
+    if (gCount_net_crush_detach_list == REC2_ASIZE(gNet_crush_detach_list)) {
+        return;
+    }
+    car = NetCarFromPlayerID(pContents->detach_bit.player);
+    if (car == NULL) {
+        return;
+    }
+    actor = AttachedBitFromID(car, pContents->detach_bit.id);
+    if (actor == NULL) {
+        return;
+    }
+    for (i = 0; i < gCount_net_crush_detach_list; i++) {
+        if (gNet_crush_detach_list[i].actor == actor) {
+            return;
+        }
+    }
+    gNet_crush_detach_list[gCount_net_crush_detach_list].car = car;
+    gNet_crush_detach_list[gCount_net_crush_detach_list].actor = actor;
+    gNet_crush_detach_list[gCount_net_crush_detach_list].time = pContents->detach_bit.time;
+    ExpandVector3(&gNet_crush_detach_list[gCount_net_crush_detach_list].bounds_min, &pContents->detach_bit.bounds_min, -10.0f, 10.0f);
+    ExpandVector3(&gNet_crush_detach_list[gCount_net_crush_detach_list].bounds_max, &pContents->detach_bit.bounds_max, -10.0f, 10.0f);
+    gCount_net_crush_detach_list += 1;
+}
 
 // SemiDetachedBitObjectFromID
 
