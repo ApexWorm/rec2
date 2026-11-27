@@ -82,10 +82,12 @@ int gINT_0067c34c = 0;
 
 // GLOBAL: CARMA2_HW 0x0067c350
 // GLOBAL: CARMA2_SW 0x00676ac0
+// GLOBAL: CARMA2_CHEAT 0x00683c00
 int gINT_0067c350 = 0;
 
 // GLOBAL: CARMA2_HW 0x0067c354
 // GLOBAL: CARMA2_SW 0x00676ac4
+// GLOBAL: CARMA2_CHEAT 0x00683c04
 int gINT_0067c354 = 0;
 
 // GLOBAL: CARMA2_HW 0x0067c358
@@ -257,6 +259,7 @@ void C2_HOOK_FASTCALL DRPixelmapShadedVRectFill(br_pixelmap* pMap, int pX, int p
 
 // FUNCTION: CARMA2_HW 0x004b4fd0
 // FUNCTION: CARMA2_SW 0x004b1140
+// FUNCTION: CARMA2_CHEAT 0x004ba8a0
 void C2_HOOK_FASTCALL DRSetPaletteEntries(br_pixelmap* pThe_palette, int pFirst_colour, int pCount) {
 
     if (!pFirst_colour) {
