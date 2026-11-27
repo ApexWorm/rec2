@@ -22,6 +22,7 @@
 #include "41-utility.h"
 #include "52-errors.h"
 #include "59-camera.h"
+#include "60-phil.h"
 #include "62-graphics3.h"
 #include "69-sound.h"
 
@@ -142,6 +143,11 @@ tDecal gDecals[50] = { 0 };
 // GLOBAL: CARMA2_SW 0x006a22ec
 // GLOBAL: CARMA2_CHEAT 0x006afe04
 int gCount_queued_smashes;
+
+// GLOBAL: CARMA2_HW 0x006a82a4
+// GLOBAL: CARMA2_SW 0x006a2304
+// GLOBAL: CARMA2_CHEAT 0x006afe1c
+tU32 gLast_munge_smash_edge_triggers;
 
 // GLOBAL: CARMA2_HW 0x006abee8
 // GLOBAL: CARMA2_SW 0x006a5438
@@ -2259,5 +2265,21 @@ void C2_HOOK_FASTCALL ChangeSmashTexture(br_material* pMaterial, tCar_spec* pCar
 
 // ReceivedSmashShraps
 
-// MungeSmashEdgeTriggers
+// FUNCTION: CARMA2_HW 0x004f64d0
+// FUNCTION: CARMA2_SW 0x004f2130
+// FUNCTION: CARMA2_CHEAT 0x004fc170
+void C2_HOOK_FASTCALL MungeSmashEdgeTriggers(tU32 pTime) {
+    int i;
+    tSmashable_item_spec* item;
+
+    if (gLast_munge_smash_edge_triggers != gPHIL_last_physics_tick) {
+        item = gTrack_smashable_environment_specs;
+        for (i = 0; i < gCount_track_smashable_environment_specs; i++, item++) {
+            if (item->field_0x10 != 0 && item->field_0x10 != pTime) {
+                item->field_0x10 = 0;
+            }
+        }
+    }
+    gLast_munge_smash_edge_triggers = gPHIL_last_physics_tick;
+}
 

@@ -3796,7 +3796,7 @@ typedef struct {
     tSmashable_item_spec_trigger trigger_object;
     tSmashable_trigger_type trigger_type;
     tSmashable_item_mode mode;
-    undefined4 field_0x10;
+    tU32 field_0x10;
     union {
         tSmashable_item_spec_shrapnel shrapnel;
         tSmashable_item_spec_texture_change texture_change;
