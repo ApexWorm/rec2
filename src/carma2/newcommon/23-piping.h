@@ -121,7 +121,7 @@ extern void C2_HOOK_FASTCALL ARDisableAdvance(void);
 
 extern void C2_HOOK_FASTCALL AREnableAdvance(void);
 
-// FindNextChunk
+extern tPipe_chunk* C2_HOOK_FASTCALL FindNextChunk(tPipe_chunk_type pType, uintptr_t pOwner);
 
 extern void C2_HOOK_FASTCALL MoveReplayBuffer(int pFrames, tReplay_session_callback* pBetween_sessions, tPreprocess_AR_callback* pBefore_frame, tPostProcess_AR_callback* pAfter_frame);
 

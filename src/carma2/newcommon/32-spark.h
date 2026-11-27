@@ -29,6 +29,7 @@ extern int gSmoke_flags;
 extern int gSmoke_num;
 extern tSmoke gSmoke[25];
 extern br_material* gBlack_material;
+extern tU32 gNext_AFE_color_cycle;
 extern tSmashable_environment_name* gSmashable_noncars;
 extern int gCount_smashable_noncars;
 extern tBRender_smoke* gBR_smoke_pointers[35];
@@ -95,11 +96,11 @@ extern void C2_HOOK_FASTCALL InitShrapnel(void);
 
 extern void C2_HOOK_FASTCALL LoadInShrapnel(void);
 
-// KillShrapnel
+extern void C2_HOOK_FASTCALL KillShrapnel(int i);
 
 extern void C2_HOOK_FASTCALL DisposeShrapnel(void);
 
-// ReplayShrapnel
+extern void C2_HOOK_FASTCALL ReplayShrapnel(tU32 pTime);
 
 extern intptr_t C2_HOOK_CDECL ActorFunks(br_actor* pActor, void* pContext);
 
@@ -139,7 +140,7 @@ extern int C2_HOOK_FASTCALL RestorePixelmap(br_material* pMaterial);
 
 extern void C2_HOOK_FASTCALL RestoreCarPixelmaps(tCar_spec* pCar);
 
-// MungeShrapnel
+extern void C2_HOOK_FASTCALL MungeShrapnel(tU32 pTime);
 
 extern void C2_HOOK_FASTCALL DrMatrix34Rotate(br_matrix34* mat, br_angle r, const br_vector3* a);
 
@@ -229,7 +230,7 @@ extern void C2_HOOK_FASTCALL CreateSplash(tPhysics_object* pObject, tU32 pTime);
 
 extern void C2_HOOK_FASTCALL GetVelocitiesFromMatrices(br_vector3* pVel, br_vector3* pRot, br_matrix34* pMat_now, br_matrix34* pMat_prev, tU32 pTime);
 
-// MungeSplash
+extern void C2_HOOK_FASTCALL MungeSplash(tU32 pTime);
 
 extern void C2_HOOK_FASTCALL GetSmokeShadeTables(FILE* pF);
 
