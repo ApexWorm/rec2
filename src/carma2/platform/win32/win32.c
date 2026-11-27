@@ -1316,6 +1316,10 @@ void C2_HOOK_FASTCALL SSDXStartDirectDraw(void) {
     dr_dprintf("Done first surface lock; gOffscreen_pixels 0x%p", gOffscreen_pixels);
 }
 
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
 // FUNCTION: CARMA2_SW 0x00516850
 void C2_HOOK_FASTCALL SSDXResetSurface(void) {
     gNbPixelBits = 8;
@@ -1337,6 +1341,10 @@ void C2_HOOK_FASTCALL SSDXResetSurface(void) {
     SSDXWindowPosOrSizeChanged(gHWnd);
     PDScreenBufferSwap(0);
 }
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // FUNCTION: CARMA2_SW 0x00516c80
 void C2_HOOK_FASTCALL PDSwitchToHiresMode(void) {
