@@ -97,7 +97,7 @@ extern float C2_HOOK_FASTCALL PHILGetObjectProperty(tPhysics_object* pObject, in
 
 // FlushQueuedAddsAndRemoves
 
-// ChangedObjectsCallbacks
+extern void C2_HOOK_FASTCALL ChangedObjectsCallbacks(tPhysics_object* pObjects, tPhysics_callbacks* pCallbacks, tU32 pPeriod);
 
 // ProcessDrag2
 

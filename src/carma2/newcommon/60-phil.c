@@ -10,6 +10,7 @@
 
 #include "00-car.h"
 #include "18-graphics2.h"
+#include "23-piping.h"
 #include "49-physics.h"
 #include "55-volume.h"
 #include "rec2_macros.h"
@@ -346,6 +347,10 @@ int C2_HOOK_FASTCALL PHILRemoveObject(tPhysics_object* pObject) {
     return 0;
 }
 
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
+
 // FUNCTION: CARMA2_HW 0x004b5fd0
 // FUNCTION: CARMA2_SW 0x004b26f0
 // FUNCTION: CARMA2_CHEAT 0x004bb9f0
@@ -370,6 +375,7 @@ tPhysics_object* C2_HOOK_FASTCALL PHILGetNextObject(tPhysics_object* pObject) {
 
 // FUNCTION: CARMA2_HW 0x004b6010
 // FUNCTION: CARMA2_SW 0x004b2730
+// FUNCTION: CARMA2_CHEAT 0x004bba30
 tU32 C2_HOOK_FASTCALL PHILReturnObjectStatus(tPhysics_object* pObject) {
     tPHIL_queued_header* info;
 
@@ -394,23 +400,28 @@ tU32 C2_HOOK_FASTCALL PHILReturnObjectStatus(tPhysics_object* pObject) {
 
 // FUNCTION: CARMA2_HW 0x004b6040
 // FUNCTION: CARMA2_SW 0x004b2760
+// FUNCTION: CARMA2_CHEAT 0x004bba60
 int C2_HOOK_FASTCALL PHILMakeObjectPassive(tPhysics_object* pObject) {
     tPHIL_queued_header* info;
 
     if (gPHIL_disabled) {
         return 0;
     }
+    PHILVerify();
     if (pObject->field_0x239 == 2) {
         info = pObject->field_0x240;
         info->field_0x8 = 1;
+        PHILVerify();
         return 0;
     }
     info = pObject->field_0x240;
     if (info != NULL) {
         info->field_0x8 = 1;
         pObject->flags |= 0x20;
+        PHILVerify();
         return 0;
     } else {
+        PHILVerify();
         return 3;
     }
 }
@@ -678,7 +689,38 @@ float C2_HOOK_FASTCALL PHILGetObjectProperty(tPhysics_object* pObject, int pProp
 
 // FlushQueuedAddsAndRemoves
 
-// ChangedObjectsCallbacks
+// FUNCTION: CARMA2_HW 0x004b6be0
+// FUNCTION: CARMA2_SW 0x004b3300
+// FUNCTION: CARMA2_CHEAT 0x004bc6f0
+void C2_HOOK_FASTCALL ChangedObjectsCallbacks(tPhysics_object* pObjects, tPhysics_callbacks* pCallbacks, tU32 pPeriod) {
+    tPHIL_queued_header* info;
+    tPhysics_object* object;
+
+    while (pObjects != NULL) {
+        if (PHILReturnObjectStatus(pObjects) == 2) {
+            if (pObjects->disable_move_rotate) {
+                info = pObjects->field_0x240;
+                if (info != NULL && (info->field_0x4 & 0x2)) {
+                    if (pCallbacks->active_halted == NULL || pCallbacks->active_halted(pObjects)) {
+                        PHILMakeObjectPassive(pObjects);
+                    }
+                }
+            } else {
+                if (pCallbacks->changed_objects != NULL) {
+                    pCallbacks->changed_objects(pObjects, pPeriod);
+                }
+                info = pObjects->field_0x240;
+                if (info != NULL && (info->field_0x4 & 0x4)) {
+                    /* Only the first-child chain is piped, not the siblings of the children. */
+                    for (object = pObjects; object != NULL; object = object->child) {
+                        PipeSinglePHILObject(object);
+                    }
+                }
+            }
+        }
+        pObjects = pObjects->next;
+    }
+}
 
 // ProcessDrag2
 
