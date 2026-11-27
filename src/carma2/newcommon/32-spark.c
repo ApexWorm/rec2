@@ -1597,15 +1597,167 @@ void C2_HOOK_FASTCALL ConditionalSmokeColumn(tCar_spec* pCar, int pFire_point, i
     CreateSmokeColumn(pCar, pColour, pCar->fire_vertex[pFire_point], 10000000);
 }
 
-// SingleSplash
-
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x004fcbb0
-void C2_HOOK_FASTCALL GeneralCreateSplash(tPhysics_object* pObject, const br_vector3* pVelocity, const br_vector3* pOmega, const br_vector3* pNormal, br_scalar pWater_distance, const br_bounds3* pBounds, const br_matrix34* pMatrix, tU32 pTime) {
+// STUB: CARMA2_HW 0x004fd530
+// STUB: CARMA2_SW 0x004f8a90
+// STUB: CARMA2_CHEAT 0x005031d0
+void C2_HOOK_FASTCALL SingleSplash(tPhysics_object* pObject, const br_matrix34* pMatrix, const br_vector3* pVelocity, const br_vector3* pNormal_velocity, const br_vector3* pOmega, const br_vector3* pPoint, const br_vector3* pNormal, tU32 pTime) {
     NOT_IMPLEMENTED();
+}
+
+// FUNCTION: CARMA2_HW 0x004fcbb0
+// FUNCTION: CARMA2_SW 0x004f8110
+// FUNCTION: CARMA2_CHEAT 0x00502850
+void C2_HOOK_FASTCALL GeneralCreateSplash(tPhysics_object* pObject, const br_vector3* pVelocity, const br_vector3* pOmega, const br_vector3* pNormal, br_scalar pWater_distance, const br_bounds3* pBounds, const br_matrix34* pMatrix, tU32 pTime) {
+    br_vector3 normal;
+    br_vector3 velocity;
+    br_vector3 tv;
+    br_vector3 point;
+    br_vector3 lowest_point;
+    br_vector3 second_point;
+    br_vector3 dir;
+    br_bounds3 bounds;
+    br_scalar lowest;
+    br_scalar second;
+    br_scalar d;
+    br_scalar d_lo;
+    br_scalar d_hi;
+    br_scalar t;
+    br_scalar x;
+    br_scalar y;
+    br_scalar z;
+    br_scalar d1;
+    br_scalar d2;
+    tCar_spec* car;
+    tPhysics_shape* shape;
+    int i;
+    int j;
+    int k;
+    int c;
+    int bits;
+    int random;
+
+    lowest = 0.0f;
+    second = 0.0f;
+    if (BrVector3LengthSquared(pVelocity) * (WORLD_SCALE_D * WORLD_SCALE_D) < 1.0) {
+        return;
+    }
+    BrMatrix34TApplyV(&normal, pNormal, pMatrix);
+    BrMatrix34ApplyP(&tv, &pBounds->min, pMatrix);
+    d_lo = d_hi = BrVector3Dot(&tv, pNormal) - pWater_distance;
+    for (i = 0; i < 3; i++) {
+        if (normal.v[i] > 0.0f) {
+            d_hi += (pBounds->max.v[i] - pBounds->min.v[i]) * normal.v[i];
+        } else {
+            d_lo += (pBounds->max.v[i] - pBounds->min.v[i]) * normal.v[i];
+        }
+    }
+    if (d_lo * d_hi > 0.0f) {
+        return;
+    }
+    bounds.min.v[0] = pBounds->min.v[0];
+    bounds.min.v[2] = pBounds->min.v[2];
+    bounds.max.v[0] = pBounds->max.v[0];
+    bounds.max.v[1] = pBounds->max.v[1];
+    bounds.max.v[2] = pBounds->max.v[2];
+    bounds.min.v[1] = 0.01f;
+    t = BrVector3Dot(pVelocity, pNormal);
+    BrVector3Scale(&tv, &normal, t);
+    BrMatrix34TApplyV(&velocity, pVelocity, pMatrix);
+    d = pWater_distance - BrVector3Dot((br_vector3*)pMatrix->m[3], pNormal);
+    random = IRandomBetween(0, 3);
+    for (i = 0, j = 2; i < 3; j = i, i++) {
+        k = 3 - i - j;
+        for (c = 0; c < 4; c++) {
+            bits = c ^ random;
+            point.v[k] = (bits & 0x1) ? bounds.min.v[k] : bounds.max.v[k];
+            point.v[j] = (bits & 0x2) ? bounds.min.v[j] : bounds.max.v[j];
+            t = (d - normal.v[k] * point.v[k] - normal.v[j] * point.v[j]) / normal.v[i];
+            if (t >= bounds.min.v[i] && t <= bounds.max.v[i]) {
+                point.v[i] = t;
+                t = BrVector3Dot(&point, &velocity);
+                if (t < lowest) {
+                    if (second < 0.0f) {
+                        SingleSplash(pObject, pMatrix, pVelocity, &velocity, pOmega, &second_point, &normal, pTime);
+                    }
+                    second = lowest;
+                    lowest = t;
+                    BrVector3Copy(&second_point, &lowest_point);
+                    BrVector3Copy(&lowest_point, &point);
+                } else if (t < second) {
+                    if (second < 0.0f) {
+                        SingleSplash(pObject, pMatrix, pVelocity, &velocity, pOmega, &second_point, &normal, pTime);
+                    }
+                    second = t;
+                    BrVector3Copy(&second_point, &point);
+                } else {
+                    SingleSplash(pObject, pMatrix, pVelocity, &velocity, pOmega, &point, &normal, pTime);
+                }
+            }
+        }
+    }
+    if (second < 0.0f) {
+        BrVector3Sub(&tv, &second_point, &lowest_point);
+        t = SRandomBetween(0.4f, 0.6f);
+        point.v[0] = tv.v[0] * t + lowest_point.v[0];
+        point.v[1] = tv.v[1] * t + lowest_point.v[1];
+        point.v[2] = tv.v[2] * t + lowest_point.v[2];
+        t = SRandomBetween(0.2f, 0.3f);
+        lowest_point.v[0] += tv.v[0] * t;
+        lowest_point.v[1] += tv.v[1] * t;
+        lowest_point.v[2] += tv.v[2] * t;
+        t = SRandomBetween(0.2f, 0.3f);
+        t = -t;
+        second_point.v[0] += tv.v[0] * t;
+        second_point.v[1] += tv.v[1] * t;
+        second_point.v[2] += tv.v[2] * t;
+        BrVector3Scale(&tv, &normal, -BrVector3Dot(&normal, &velocity));
+        BrVector3Add(&dir, &velocity, &tv);
+        BrVector3Normalise(&tv, &dir);
+        BrVector3Scale(&tv, &tv, -0.2f / WORLD_SCALE);
+        BrVector3Accumulate(&point, &tv);
+        BrVector3Scale(&tv, &tv, 0.5f);
+        BrVector3Accumulate(&lowest_point, &tv);
+        BrVector3Accumulate(&second_point, &tv);
+        SingleSplash(pObject, pMatrix, pVelocity, &velocity, pOmega, &point, &normal, pTime);
+        SingleSplash(pObject, pMatrix, pVelocity, &velocity, pOmega, &lowest_point, &normal, pTime);
+        SingleSplash(pObject, pMatrix, pVelocity, &velocity, pOmega, &second_point, &normal, pTime);
+    } else if (lowest < 0.0f) {
+        SingleSplash(pObject, pMatrix, pVelocity, &velocity, pOmega, &lowest_point, &normal, pTime);
+    }
+    d *= WORLD_SCALE;
+    if (pObject == NULL) {
+        return;
+    }
+    if (pObject->owner != NULL && pObject->flags_0x238 == 1) {
+        car = pObject->owner;
+    } else {
+        car = NULL;
+    }
+    if (car == NULL || car->driver <= eDriver_5) {
+        return;
+    }
+    for (i = 0; i < 4; i++) {
+        shape = pObject->shape;
+        if (i & 0x1) {
+            x = (br_scalar)(shape->common.bb.max.v[0] * WORLD_SCALE_D);
+        } else {
+            x = (br_scalar)(shape->common.bb.min.v[0] * WORLD_SCALE_D);
+        }
+        y = (br_scalar)(shape->common.bb.max.v[1] * WORLD_SCALE_D);
+        z = car->wpos[i].v[2];
+        d1 = d - (x * normal.v[0] + y * normal.v[1] + z * normal.v[2]);
+        d2 = d1 + (shape->common.bb.max.v[1] - 0.01f) * normal.v[1] * WORLD_SCALE;
+        if ((d1 > 0.0f) != (d2 > 0.0f)) {
+            tv.v[0] = x / WORLD_SCALE;
+            tv.v[1] = (br_scalar)((y - (y - 0.01) * (d1 / (d1 - d2))) / WORLD_SCALE);
+            tv.v[2] = z / WORLD_SCALE;
+            SingleSplash(pObject, pMatrix, pVelocity, &velocity, pOmega, &tv, &normal, pTime);
+        }
+    }
 }
 
 #ifdef REC2_MATCHING
