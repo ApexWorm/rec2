@@ -105,7 +105,24 @@ void C2_HOOK_FASTCALL ControlBoundFunkGroove(int pSlot_number, float pValue) {
     }
 }
 
-// ControlBoundFunkGroovePlus
+// FUNCTION: CARMA2_HW 0x004748e0
+// FUNCTION: CARMA2_SW 0x00473e40
+// FUNCTION: CARMA2_CHEAT 0x00474c60
+float C2_HOOK_FASTCALL ControlBoundFunkGroovePlus(int pSlot_number, float pValue) {
+
+    if (pSlot_number < 0) {
+        return 0.0f;
+    }
+    if (pSlot_number >= (int)REC2_ASIZE(gGroove_funk_bindings)) {
+        FatalError(kFatalError_UsedRefNumOfControlledGroovidelicFunkotronicIsOutOfRange);
+    }
+    if (!gGroove_funk_bindings[pSlot_number].field_0x4) {
+        *gGroove_funk_bindings[pSlot_number].v = (float)fmod(pValue + *gGroove_funk_bindings[pSlot_number].v, 1.0);
+        return *gGroove_funk_bindings[pSlot_number].v;
+    } else {
+        return *gGroove_funk_bindings[pSlot_number].v;
+    }
+}
 
 // ShiftBoundGrooveFunks
 
