@@ -19,6 +19,7 @@
 #include "49-physics.h"
 #include "51-smash.h"
 #include "53-controls.h"
+#include "57-drone.h"
 #include "60-phil.h"
 #include "69-sound.h"
 #include "globvars.h"
@@ -1339,7 +1340,54 @@ void C2_HOOK_FASTCALL ClipPointToLimits(br_vector3* pPoint, tU16 pLimit_bits, co
 
 // CrushCollisionShapes
 
-// SimpleCrushCarModelsCB
+typedef struct {
+    int count;
+    br_vector3 points[4];
+    undefined field_0x34[0x44 - 0x34];
+    br_vector3 direction;
+} tSpam_points; /* FIXME: name is a guess */
+
+typedef struct {
+    tCar_spec* car;
+    tSpam_points* points;
+    float scale;
+} tSpam_userdata; /* FIXME: name from Ghidra, field types from the use here */
+
+// FUNCTION: CARMA2_HW 0x00433260
+// FUNCTION: CARMA2_SW 0x00433290
+// FUNCTION: CARMA2_CHEAT 0x00433430
+intptr_t C2_HOOK_FASTCALL SimpleCrushCarModelsCB(br_actor* pActor, br_matrix34* pMat, void* pContext) {
+    tSpam_userdata* context;
+    tUser_crush_data* user_crush;
+    tCar_crush_buffer_entry* crush_data;
+    br_vector3 points[4];
+    br_vector3 direction;
+    float scale;
+    int i;
+
+    context = pContext;
+    if (pActor->type != BR_ACTOR_MODEL) {
+        return 0;
+    }
+    user_crush = pActor->user;
+    if (user_crush == NULL) {
+        return 0;
+    }
+    crush_data = user_crush->crush_data;
+    if (crush_data == NULL) {
+        return 0;
+    }
+    for (i = 0; i < context->points->count; i++) {
+        DrMatrix34ApplyLPInverse(&points[i], &context->points->points[i], pMat);
+    }
+    BrMatrix34TApplyV(&direction, &context->points->direction, pMat);
+    scale = context->scale * crush_data->softness_factor;
+    BrVector3Scale(&direction, &direction, scale);
+    for (i = 0; i < context->car->count_detail_levels; i++) {
+        SimpleCrushModel(user_crush->models[i], context->points->count, points, &direction, &context->car->car_crush_spec->field_0x11c);
+    }
+    return 0;
+}
 
 // SimpleCrushCar
 
@@ -1383,11 +1431,41 @@ void C2_HOOK_FASTCALL ExpandCrush(tCar_crush* pDest, const tCompressed_car_crush
 
 // RemoveDuplicatePoints
 
-// SimpleCrushModel
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
 
-// CrushDrone
+// STUB: CARMA2_HW 0x0042c540
+// STUB: CARMA2_SW 0x0042c5d0
+// STUB: CARMA2_CHEAT 0x0042c6e0
+void C2_HOOK_FASTCALL SimpleCrushModel(br_model* pModel, int pCount, const br_vector3* pPoints, const br_vector3* pForce, const br_bounds3* pBounds) {
+    NOT_IMPLEMENTED();
+}
 
-// CrushDroneObject
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
+
+inline void C2_HOOK_FASTCALL CrushDrone(tDrone_crush_data* pCrush_data, int pCount, const br_vector3* pPoints, const br_vector3* pForce) {
+    br_vector3 force;
+
+    if (pCount >= 1) {
+        BrVector3Scale(&force, pForce, pCrush_data->crushability);
+        SimpleCrushModel(pCrush_data->model, pCount, pPoints, &force, &pCrush_data->bounds);
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x0042d180
+// FUNCTION: CARMA2_SW 0x0042d1f0
+// FUNCTION: CARMA2_CHEAT 0x0042d320
+void C2_HOOK_FASTCALL CrushDroneObject(tPhysics_object* pObject, int pCount, const br_vector3* pPoints, const br_vector3* pForce) {
+    tDrone_crush_data* crush_data;
+
+    crush_data = GetDroneCrushData(pObject);
+    if (crush_data != NULL) {
+        CrushDrone(crush_data, pCount, pPoints, pForce);
+    }
+}
 
 // DoDroneCrushing
 

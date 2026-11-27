@@ -166,7 +166,7 @@ extern void C2_HOOK_FASTCALL ClipPointToLimits(br_vector3* pPoint, tU16 pLimit_b
 
 // CrushCollisionShapes
 
-// SimpleCrushCarModelsCB
+extern intptr_t C2_HOOK_FASTCALL SimpleCrushCarModelsCB(br_actor* pActor, br_matrix34* pMat, void* pContext);
 
 // SimpleCrushCar
 
@@ -180,11 +180,11 @@ extern void C2_HOOK_FASTCALL ExpandCrush(tCar_crush* pDest, const tCompressed_ca
 
 // RemoveDuplicatePoints
 
-// SimpleCrushModel
+extern void C2_HOOK_FASTCALL SimpleCrushModel(br_model* pModel, int pCount, const br_vector3* pPoints, const br_vector3* pForce, const br_bounds3* pBounds);
 
-// CrushDrone
+extern void C2_HOOK_FASTCALL CrushDrone(tDrone_crush_data* pCrush_data, int pCount, const br_vector3* pPoints, const br_vector3* pForce);
 
-// CrushDroneObject
+extern void C2_HOOK_FASTCALL CrushDroneObject(tPhysics_object* pObject, int pCount, const br_vector3* pPoints, const br_vector3* pForce);
 
 // DoDroneCrushing
 
