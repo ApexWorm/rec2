@@ -1174,8 +1174,8 @@ void C2_HOOK_FASTCALL ScoreForKilledPedestrian(tPedestrian* pPed, float pHeight)
     } else {
         gPed_score_multiplier = 1;
     }
-    amount = gPed_points[gProgram_state.skill_level] * gPed_score_multiplier;
     gDAT_006a0418 = the_time;
+    amount = gPed_points[gProgram_state.skill_level] * gPed_score_multiplier;
     ped_object = pPed->character->personality->form->simple_physicing[(tS8)pPed->character->field_0x5].collision_info;
     BrVector3Sub(&offset, &pPed->pos, &car->pos);
     BrMatrix34TApplyV(&local_offset, &offset, &car->collision_info->actor->t.t.mat);
@@ -1239,8 +1239,8 @@ void C2_HOOK_FASTCALL ScoreForKilledPedestrian(tPedestrian* pPed, float pHeight)
         }
     }
     EarnCredits(amount);
-    gPTR_00694120 = pPed;
     gPed_recent_points = amount;
+    gPTR_00694120 = pPed;
     AwardTime(gPed_times[gProgram_state.skill_level]);
 }
 
