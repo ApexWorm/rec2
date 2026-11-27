@@ -1433,7 +1433,87 @@ void C2_HOOK_FASTCALL SetCrush(tCar_crush* pCrush, int pCount_vectors, br_vector
     pCrush->field_0x50 = pValue;
 }
 
-// QueueCarCrush
+// FUNCTION: CARMA2_HW 0x0042d400
+// FUNCTION: CARMA2_SW 0x0042d470
+// FUNCTION: CARMA2_CHEAT 0x0042d5a0
+void C2_HOOK_FASTCALL QueueCarCrush(tCar_spec* pCar_spec, int pCount_points, const br_vector3* pPoints, const br_vector3* pForce, tU32 pValue) {
+    br_vector3 points[4];
+    br_vector3 centre;
+    br_vector3 direction;
+    float force;
+    float magnitude;
+    float smallest_force;
+    int count;
+    int i;
+    int j;
+    int list_index;
+    int smallest_index;
+
+    if (pCar_spec->car_crush_spec == NULL || pCar_spec->invulnerable_no_crushage || pCar_spec->car_crush_spec->field_0x4b8) {
+        return;
+    }
+    magnitude = sqrt(BrVector3LengthSquared(pForce));
+    force = magnitude * pCar_spec->softness_factor;
+    if (force <= gMin_crush_force) {
+        return;
+    }
+    if (force > 10.0f) {
+        force = 10.0f;
+    }
+    magnitude = (br_scalar)(1.0 / magnitude);
+    BrVector3Scale(&direction, pForce, magnitude);
+    BrVector3Copy(&centre, &pPoints[0]);
+    BrVector3Copy(&points[0], &pPoints[0]);
+    count = 1;
+    if (pCount_points > (int)REC2_ASIZE(points)) {
+        pCount_points = REC2_ASIZE(points);
+    }
+    for (i = 1; i < pCount_points; i++) {
+        tU8 unique;
+
+        unique = 1;
+        for (j = 0; j < count; j++) {
+            if (fabs(pPoints[i].v[0] - points[j].v[0]) < 0.005
+                    && fabs(pPoints[i].v[1] - points[j].v[1]) < 0.005
+                    && fabs(pPoints[i].v[2] - points[j].v[2]) < 0.005) {
+                unique = 0;
+                break;
+            }
+        }
+        if (unique) {
+            BrVector3Copy(&points[count], &pPoints[i]);
+            count++;
+            BrVector3Accumulate(&centre, &pPoints[i]);
+        }
+    }
+    BrVector3Set(&centre, centre.v[0] / (float)count, centre.v[1] / (float)count, centre.v[2] / (float)count);
+    for (list_index = 0; gCrush_lists[list_index].car_spec != NULL
+            && gCrush_lists[list_index].car_spec != pCar_spec
+            && list_index < (int)REC2_ASIZE(gCrush_lists); list_index++) {
+    }
+    if (gCrush_lists[list_index].car_spec != NULL) {
+        if (gCrush_lists[list_index].count < (int)REC2_ASIZE(gCrush_lists[list_index].items)) {
+            SetCrush(&gCrush_lists[list_index].items[gCrush_lists[list_index].count], count, points, &centre, &direction, force, pValue);
+            gCrush_lists[list_index].count++;
+        } else {
+            smallest_force = gCrush_lists[list_index].items[0].field_0x40;
+            smallest_index = 0;
+            for (i = 1; i < gCrush_lists[list_index].count; i++) {
+                if (gCrush_lists[list_index].items[i].field_0x40 < smallest_force) {
+                    smallest_force = gCrush_lists[list_index].items[i].field_0x40;
+                    smallest_index = i;
+                }
+            }
+            if (smallest_force < force) {
+                SetCrush(&gCrush_lists[list_index].items[smallest_index], count, points, &centre, &direction, force, pValue);
+            }
+        }
+    } else if (list_index < (int)REC2_ASIZE(gCrush_lists)) {
+        gCrush_lists[list_index].car_spec = pCar_spec;
+        gCrush_lists[list_index].count = 1;
+        SetCrush(&gCrush_lists[list_index].items[0], count, points, &centre, &direction, force, pValue);
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x0042d7e0
 // FUNCTION: CARMA2_SW 0x0042d850
