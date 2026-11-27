@@ -404,7 +404,13 @@ void C2_HOOK_FASTCALL LoadPanGameDroneInfo(void) {
     NOT_IMPLEMENTED();
 }
 
-// InitDrones
+// STUB: CARMA2_HW 0x0044f700
+// STUB: CARMA2_SW 0x0044f4a0
+// STUB: CARMA2_CHEAT 0x0044fc50
+void C2_HOOK_FASTCALL InitDrones(tRace_info* pRace_info) {
+    /* FIXME: InitialiseAIWorldForRace passes pRace_info in ecx; the Mac version has no parameter */
+    NOT_IMPLEMENTED();
+}
 
 // FUNCTION: CARMA2_HW 0x0044fc10
 // FUNCTION: CARMA2_SW 0x0044f9b0
@@ -487,7 +493,12 @@ void C2_HOOK_FASTCALL DronePreCollisionStuff(void) {
     gFrame++;
 }
 
-// DoDronePerGameFrameStuff
+// STUB: CARMA2_HW 0x004512f0
+// STUB: CARMA2_SW 0x00451080
+// STUB: CARMA2_CHEAT 0x00451840
+void C2_HOOK_FASTCALL DoDronePerGameFrameStuff(void) {
+    NOT_IMPLEMENTED();
+}
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)

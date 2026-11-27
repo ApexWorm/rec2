@@ -9,10 +9,16 @@
 #include "56-aiworld.h"
 
 #include "05-drmem.h"
+#include "08-loading1.h"
 #include "10-loading2.h"
 #include "18-graphics2.h"
+#include "27-powerup.h"
 #include "30-opponent.h"
+#include "41-utility.h"
 #include "57-drone.h"
+#include "68-timer.h"
+#include "globvars.h"
+#include "platform.h"
 
 // MakeVertexAndOffsetIt
 
@@ -62,7 +68,31 @@ void C2_HOOK_FASTCALL LoadAIWorldForRace(tRace_info* pRace_info) {
     PrintMemoryDump(0, "AFTER LoadPerRaceDroneStuff()");
 }
 
-// InitialiseAIWorldForRace
+// FUNCTION: CARMA2_HW 0x004010b0
+// FUNCTION: CARMA2_SW 0x004010b0
+// FUNCTION: CARMA2_CHEAT 0x004010b0
+void C2_HOOK_FASTCALL InitialiseAIWorldForRace(tRace_info* pRace_info) {
+    br_bounds3 track_bounds;
+
+    gFirst_drone_processing = 1;
+    gTime_stamp_for_this_munging = GetTotalTime();
+    if (gTime_stamp_for_this_munging == 0) {
+        gTime_stamp_for_this_munging = PDGetTotalTime();
+    }
+    gFrame_period_for_this_munging = 100;
+    gDrone_delta_time = 100.f / 1000.f;
+    BrActorToBounds(&track_bounds, gTrack_actor);
+    if (track_bounds.min.v[1] < track_bounds.max.v[1]) {
+        gTrack_drone_min_y = track_bounds.min.v[1];
+    } else {
+        gTrack_drone_min_y = track_bounds.max.v[1];
+    }
+    PrintMemoryDump(0, "BEFORE InitOpponents()");
+    InitOpponents(pRace_info);
+    PrintMemoryDump(0, "AFTER InitOpponents(), BEFORE InitDrones()");
+    InitDrones(pRace_info);
+    PrintMemoryDump(0, "AFTER InitDrones()");
+}
 
 // FUNCTION: CARMA2_HW 0x00401160
 // FUNCTION: CARMA2_SW 0x00401160
@@ -73,7 +103,26 @@ void C2_HOOK_FASTCALL DisposeAIWorldRaceStuff(void) {
     DisposeDronesRaceStuff();
 }
 
-// MungeAIWorld
+// FUNCTION: CARMA2_HW 0x00401170
+// FUNCTION: CARMA2_SW 0x00401170
+// FUNCTION: CARMA2_CHEAT 0x00401170
+void C2_HOOK_FASTCALL MungeAIWorld(tU32 pFrame_period) {
+
+    gTime_stamp_for_this_munging = GetTotalTime();
+    if (gTime_stamp_for_this_munging == 0) {
+        gTime_stamp_for_this_munging = PDGetTotalTime();
+    }
+    gDrone_delta_time = pFrame_period / 1000.f;
+    gFrame_period_for_this_munging = pFrame_period;
+    Timers_Push(TIMER_DRN);
+    DoDronePerGameFrameStuff();
+    Timers_Pop(TIMER_DRN);
+    Timers_Push(TIMER_OPP);
+    MungeOpponents(pFrame_period);
+    Timers_Pop(TIMER_OPP);
+    gFirst_drone_processing = 0;
+    MungeShatMines(gTime_stamp_for_this_munging);
+}
 
 // FUNCTION: CARMA2_HW 0x004013d0
 // FUNCTION: CARMA2_SW 0x004013d0

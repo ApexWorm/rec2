@@ -15,8 +15,11 @@
 #include <stdio.h>
 
 extern int gDecode_thing;
+extern int gFirst_drone_processing;
 extern tU32 gTime_stamp_for_this_munging;
+extern tU32 gFrame_period_for_this_munging;
 extern float gDrone_delta_time;
+extern float gTrack_drone_min_y;
 extern int gFunk_groove_flags[30];
 extern br_pixelmap* gCursors[8];
 

@@ -159,7 +159,7 @@ extern int C2_HOOK_FASTCALL OtherPerambulatoryInstasificationIsEnablificated(voi
 
 extern void C2_HOOK_FASTCALL LoadPanGameDroneInfo(void);
 
-// InitDrones
+extern void C2_HOOK_FASTCALL InitDrones(tRace_info* pRace_info);
 
 extern void C2_HOOK_FASTCALL DisposeDronesRaceStuff(void);
 
@@ -173,7 +173,7 @@ extern void C2_HOOK_FASTCALL LoadInDronePaths(FILE* pF);
 
 extern void C2_HOOK_FASTCALL DronePreCollisionStuff(void);
 
-// DoDronePerGameFrameStuff
+extern void C2_HOOK_FASTCALL DoDronePerGameFrameStuff(void);
 
 extern void C2_HOOK_FASTCALL DoDroneFunkyGroovyThings(tDrone_spec* pDrone);
 
