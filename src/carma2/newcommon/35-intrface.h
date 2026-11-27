@@ -14,6 +14,8 @@
 
 extern int gMouse_in_use;
 
+extern int gTyping_slot;
+
 extern void C2_HOOK_FASTCALL SetAlwaysTyping(void);
 
 extern void C2_HOOK_FASTCALL ClearAlwaysTyping(void);
