@@ -8,7 +8,6 @@
 
 #include "61-pedestrn.h"
 
-#include "00-car.h"
 #include "07-structur.h"
 #include "08-loading1.h"
 #include "10-loading2.h"
@@ -67,10 +66,12 @@ float gGiblet_scrape_start;
 // GLOBAL: CARMA2_CHEAT 0x0069bcb8
 tProximity_ray gProximity_rays[20] = { 0 };
 
+#ifdef REC2_MATCHING
 // GLOBAL: CARMA2_HW 0x00694230
 // GLOBAL: CARMA2_SW 0x0068e288
 // GLOBAL: CARMA2_CHEAT 0x0069bda8
-int gINT_00694230 = 0;
+undefined4 gDAT_00694230 = 0;
+#endif
 
 // GLOBAL: CARMA2_HW 0x00694234
 // GLOBAL: CARMA2_SW 0x0068e28c
