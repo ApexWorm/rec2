@@ -39,10 +39,12 @@ int gS3_enabled;
 int gS3_CDA_enabled = 1;
 
 // GLOBAL: CARMA2_HW 0x007a0554
+// GLOBAL: CARMA2_SW 0x00796af4
 // GLOBAL: CARMA2_CHEAT 0x007a7bf4
 char gS3_path_separator[2];
 
 // GLOBAL: CARMA2_HW 0x007a0558
+// GLOBAL: CARMA2_SW 0x00796af8
 // GLOBAL: CARMA2_CHEAT 0x007a7bf8
 char gS3_sound_folder_name[6];
 

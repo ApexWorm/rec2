@@ -137,6 +137,9 @@ foreach(edition ${REC2_EDITIONS})
             "${CMAKE_CURRENT_SOURCE_DIR}/win32/win32net.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/win32/winmain.c"
             APPEND PROPERTY COMPILE_OPTIONS "-O2;-Ob2")
+        set_property(SOURCE
+            "${CMAKE_CURRENT_SOURCE_DIR}/win32/win32_sound.c"
+            APPEND PROPERTY COMPILE_OPTIONS "-Gf")
     endif()
 endforeach()
 

@@ -72,6 +72,7 @@ address,type,name
 0x00574650,library,__filbuf
 0x00574a80,library,_memset
 0x00575030,library,_strlen
+0x005750b0,library,_strcpy
 0x005751a0,library,_calloc
 0x00575240,library,_ldexp
 0x005755a4,library,_sqrt
