@@ -31,6 +31,7 @@
 #include "52-errors.h"
 #include "54-runtime.h"
 #include "59-camera.h"
+#include "61-pedestrn-phys.h"
 #include "62-graphics3.h"
 #include "69-sound.h"
 
@@ -924,7 +925,7 @@ void C2_HOOK_FASTCALL ActivateNonCarSideEffects(br_actor* pActor, tNon_car_cuboi
 // FUNCTION: CARMA2_HW 0x004edbe0
 // FUNCTION: CARMA2_SW 0x004e98b0
 // FUNCTION: CARMA2_CHEAT 0x004f3880
-void C2_HOOK_FASTCALL ActivateSmashSideEffects(int pArg1, tPhysics_object* pObject, tShrapnel_side_effects* pSide_effects, br_vector3* pForce, float pForce_magnitude) {
+void C2_HOOK_FASTCALL ActivateSmashSideEffects(tSmashable_item_spec* pSpec, tPhysics_object* pObject, tShrapnel_side_effects* pSide_effects, br_vector3* pForce, float pForce_magnitude) {
     int i;
     int j;
     int k;
@@ -1063,13 +1064,13 @@ void C2_HOOK_FASTCALL ActivateSmashSideEffects(int pArg1, tPhysics_object* pObje
 #pragma auto_inline(on)
 #endif
 
-inline void C2_HOOK_FASTCALL DoSideEffects(br_actor* pActor, int pArg2, tPhysics_object* pObject, tSide_effects* pSide_effects, br_vector3* pPosition, float pForce_magnitude, br_vector3* pForce) {
+inline void C2_HOOK_FASTCALL DoSideEffects(br_actor* pActor, tSmashable_item_spec* pSpec, tPhysics_object* pObject, tSide_effects* pSide_effects, br_vector3* pPosition, float pForce_magnitude, br_vector3* pForce) {
 
     if (pSide_effects->activations.count_activations != 0) {
         ActivateNonCarSideEffects(pActor, &pSide_effects->activations, pObject);
     }
     if (pSide_effects->side_effects.count_side_effects != 0) {
-        ActivateSmashSideEffects(pArg2, pObject, &pSide_effects->side_effects, pForce, pForce_magnitude);
+        ActivateSmashSideEffects(pSpec, pObject, &pSide_effects->side_effects, pForce, pForce_magnitude);
     }
     if (pSide_effects->room_turn_on_code != 0
         && pObject != NULL
@@ -1108,12 +1109,12 @@ inline void C2_HOOK_FASTCALL DoVariableEffects(tVariable_changes* pChanges) {
 // FUNCTION: CARMA2_HW 0x004ed490
 // FUNCTION: CARMA2_SW 0x004e9160
 // FUNCTION: CARMA2_CHEAT 0x004f3130
-void C2_HOOK_FASTCALL DoConnotations(tPhysics_object* pObject, int pArg2, tCar_crush_smashable_part* pSmashable, tConnotations* pConnotations, int pSeed, br_vector3* pVelocity, br_vector3* pPosition, br_vector3* pSound_position, br_actor* pActor, tU32 pTime, uintptr_t pId, br_matrix34* pMat, br_bounds3* pBounds, br_vector3* pArg14, float pForce_magnitude, br_vector3* pForce, int pNo_side_effects) {
+void C2_HOOK_FASTCALL DoConnotations(tPhysics_object* pObject, tSmashable_item_spec* pSpec, tCar_crush_smashable_part* pSmashable, tConnotations* pConnotations, int pSeed, br_vector3* pVelocity, br_vector3* pPosition, br_vector3* pSound_position, br_actor* pActor, tU32 pTime, uintptr_t pId, br_matrix34* pMat, br_bounds3* pBounds, br_vector3* pArg14, float pForce_magnitude, br_vector3* pForce, int pNo_side_effects) {
     int i;
 
     MakeSmashSound(pConnotations, pSound_position);
     if (!pNo_side_effects) {
-        DoSideEffects(pActor, pArg2, pObject, &pConnotations->side_effects, pPosition, pForce_magnitude, pForce);
+        DoSideEffects(pActor, pSpec, pObject, &pConnotations->side_effects, pPosition, pForce_magnitude, pForce);
     }
     for (i = 0; i < pConnotations->count_shrapnel; i++) {
         DoShrapnel(pSmashable, &pConnotations->shrapnel[i], pSeed, pVelocity, pPosition, pSound_position, pActor, pTime, pId, pMat, pBounds,
@@ -1139,18 +1140,18 @@ void C2_HOOK_FASTCALL DoPowerupRespawnSmash(br_actor* pActor) {
     DoSpecial(&gPowerup_respawn_smashable.mode_data.shrapnel.connotations.special_effects, pActor, &pActor->model->bounds);
 }
 
-inline void C2_HOOK_FASTCALL DoConnotationsMultiLevel(tPhysics_object* pObject, int pArg2, tCar_crush_smashable_part* pSmashable, tConnotations* pConnotations, int pSeed, br_vector3* pVelocity, br_vector3* pPosition, br_vector3* pSound_position, br_actor* pActor, tU32 pTime, uintptr_t pId, br_matrix34* pMat, int pFrom_level, int pTo_level, br_vector3* pForce, int pNo_side_effects) {
+inline void C2_HOOK_FASTCALL DoConnotationsMultiLevel(tPhysics_object* pObject, tSmashable_item_spec* pSpec, tCar_crush_smashable_part* pSmashable, tConnotations* pConnotations, int pSeed, br_vector3* pVelocity, br_vector3* pPosition, br_vector3* pSound_position, br_actor* pActor, tU32 pTime, uintptr_t pId, br_matrix34* pMat, int pFrom_level, int pTo_level, br_vector3* pForce, int pNo_side_effects) {
     int i;
     tSmashable_level* level;
 
     for (i = pFrom_level + 1, level = &pSmashable->levels[pFrom_level + 1]; i <= pTo_level; i++, level++) {
         if (!(level->flags & 0x1) || pTo_level - pFrom_level == 1) {
-            DoConnotations(pObject, pArg2, pSmashable, pConnotations, pSeed, pVelocity, pPosition, pSound_position, pActor, pTime, pId, pMat, NULL, NULL, BrVector3Length(pForce), pForce, pNo_side_effects);
+            DoConnotations(pObject, pSpec, pSmashable, pConnotations, pSeed, pVelocity, pPosition, pSound_position, pActor, pTime, pId, pMat, NULL, NULL, BrVector3Length(pForce), pForce, pNo_side_effects);
         }
     }
 }
 
-inline void C2_HOOK_FASTCALL SmashItIntoVerySmallPiecesIndeed(tCar_spec* pCar, tPhysics_object* pObject, br_actor* pActor, int pArg4, tCar_crush_smashable_part* pSmashable, br_vector3* pVelocity, br_vector3* pPosition, int pLevel, br_vector3* pForce, int pNo_side_effects) {
+inline void C2_HOOK_FASTCALL SmashItIntoVerySmallPiecesIndeed(tCar_spec* pCar, tPhysics_object* pObject, br_actor* pActor, tSmashable_item_spec* pSpec, tCar_crush_smashable_part* pSmashable, br_vector3* pVelocity, br_vector3* pPosition, int pLevel, br_vector3* pForce, int pNo_side_effects) {
     tU32 the_time;
     int old_level;
     int seed;
@@ -1165,7 +1166,7 @@ inline void C2_HOOK_FASTCALL SmashItIntoVerySmallPiecesIndeed(tCar_spec* pCar, t
         seed = (uintptr_t)pSmashable ^ the_time;
         BrActorToActorMatrix34(&mat, pActor, gUniverse_actor);
         ActuallySmashPart(pCar, pSmashable, pLevel);
-        DoConnotationsMultiLevel(pObject, pArg4, pSmashable, &pSmashable->levels[pLevel].connotations, seed,
+        DoConnotationsMultiLevel(pObject, pSpec, pSmashable, &pSmashable->levels[pLevel].connotations, seed,
             pVelocity, pPosition, pPosition, pActor, the_time, gINT_006a829c, &mat, old_level, pLevel, pForce, pNo_side_effects);
         if (pSmashable->funk_material != NULL && pSmashable->funk_material->identifier != NULL) {
             switch (pSmashable->levels[pSmashable->field_0x4c].collision_type) {
@@ -1256,7 +1257,7 @@ void C2_HOOK_FASTCALL FlushSmashQueue(int pFlush_powerups) {
 // FUNCTION: CARMA2_HW 0x004ee290
 // FUNCTION: CARMA2_SW 0x004e9f60
 // FUNCTION: CARMA2_CHEAT 0x004f3f30
-tSmashable_level* C2_HOOK_FASTCALL QueueSmashIfNecessary3(tCar_spec* pCar, tPhysics_object* pObject, br_vector3* pPosition, br_vector3* pNormal, br_actor* pActor, int pArg6, tCar_crush_smashable_part* pSmashable, float pMagnitude, int pArg9, int pArg10) {
+tSmashable_level* C2_HOOK_FASTCALL QueueSmashIfNecessary3(tCar_spec* pCar, tPhysics_object* pObject, br_vector3* pPosition, br_vector3* pNormal, br_actor* pActor, tSmashable_item_spec* pSpec, tCar_crush_smashable_part* pSmashable, float pMagnitude, int pArg9, int pArg10) {
     int i;
     int level;
     tSmashable_level* smash_level;
@@ -1283,7 +1284,7 @@ tSmashable_level* C2_HOOK_FASTCALL QueueSmashIfNecessary3(tCar_spec* pCar, tPhys
                     gQueued_smashes[gCount_queued_smashes].object = pObject;
                     gQueued_smashes[gCount_queued_smashes].actor = pActor;
                     gQueued_smashes[gCount_queued_smashes].smashable = pSmashable;
-                    gQueued_smashes[gCount_queued_smashes].field_0x48 = pArg6;
+                    gQueued_smashes[gCount_queued_smashes].field_0x48 = pSpec;
                     gQueued_smashes[gCount_queued_smashes].level = level;
                     gQueued_smashes[gCount_queued_smashes].position = *pPosition;
                     gQueued_smashes[gCount_queued_smashes].field_0x3c = pArg10;
@@ -1319,9 +1320,9 @@ tSmashable_level* C2_HOOK_FASTCALL QueueSmashIfNecessary3(tCar_spec* pCar, tPhys
 #pragma auto_inline(on)
 #endif
 
-inline void C2_HOOK_FASTCALL QueueSmashIfNecessary2(tCar_spec* pCar, tPhysics_object* pObject, br_vector3* pPosition, br_vector3* pNormal, br_actor* pActor, int pArg6, tCar_crush_smashable_part* pSmashable, float pMagnitude, int pArg9, int pArg10) {
+inline void C2_HOOK_FASTCALL QueueSmashIfNecessary2(tCar_spec* pCar, tPhysics_object* pObject, br_vector3* pPosition, br_vector3* pNormal, br_actor* pActor, tSmashable_item_spec* pSpec, tCar_crush_smashable_part* pSmashable, float pMagnitude, int pArg9, int pArg10) {
     gINT_006a3334 = 0;
-    QueueSmashIfNecessary3(pCar, pObject, pPosition, pNormal, pActor, pArg6, pSmashable, pMagnitude, pArg9, pArg10);
+    QueueSmashIfNecessary3(pCar, pObject, pPosition, pNormal, pActor, pSpec, pSmashable, pMagnitude, pArg9, pArg10);
 }
 
 inline void C2_HOOK_FASTCALL AllocateSmashLevels(tSmashable_level** pSmashable_levels, int pCount_smashable_levels) {
@@ -2994,11 +2995,93 @@ int C2_HOOK_FASTCALL InsertQuad(tSmash_quad_mapping* pMapping, br_actor* pActor,
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x004f4e20
-// STUB: CARMA2_SW 0x004f0a80
-// STUB: CARMA2_CHEAT 0x004faac0
+// FUNCTION: CARMA2_HW 0x004f4e20
+// FUNCTION: CARMA2_SW 0x004f0a80
+// FUNCTION: CARMA2_CHEAT 0x004faac0
 float C2_HOOK_FASTCALL BashModel(tSmashable_item_spec* pSpec, tPhysics_object* pObject, br_actor* pActor, float pMagnitude, br_vector3* pPosition, br_vector3* pNormal, br_vector3* pForce, int* pSmashed, int pNetwork) {
-    NOT_IMPLEMENTED();
+    int i;
+    int do_connotations;
+    int seed;
+    float result;
+    tU32 the_time;
+    br_actor* child;
+    br_vector3 velocity;
+    br_bounds3 bounds;
+    br_matrix34 mat;
+
+    result = -1.0f;
+    the_time = GetTotalTime();
+    gINT_006a3334 = 0;
+    *pSmashed = 0;
+    if (pMagnitude < pSpec->mode_data.shrapnel.removal_threshold) {
+        return -1.0f;
+    }
+    BrVector3Scale(&velocity, &pObject->field_0x1b4, WORLD_SCALE_D);
+    seed = (int)pPosition->v[1] ^ (int)pPosition->v[2] ^ (int)pPosition->v[0];
+    bounds = pActor->model->bounds;
+    gINT_006a3334 = 0;
+    do_connotations = 0;
+    switch (pSpec->mode) {
+    case kSmashableMode_NoChange:
+        if (pSpec->field_0x10 == 0) {
+            do_connotations = 1;
+        } else {
+            do_connotations = 0;
+        }
+        pSpec->field_0x10 = GetTotalTime();
+        break;
+    case kSmashableMode_Remove:
+        if (pActor->render_style != BR_RSTYLE_NONE) {
+            do_connotations = 1;
+            pActor->render_style = BR_RSTYLE_NONE;
+            PipeSingleSmashModelChange(pActor, pActor->model, NULL);
+            if (pActor != NULL
+                && pActor->identifier != NULL
+                && pActor->identifier[0] == '&'
+                && gSmashable_track_indexable_triggers[(pActor->identifier[1] - '0') * 10 + (pActor->identifier[2] - '0')] != NULL
+                && pActor == pObject->actor) {
+                pActor->t.t.translate.t.v[1] = -1000.0f;
+                pObject->transform_matrix.m[3][1] = -1000.0f;
+            }
+        }
+        pObject->box_face_end = 0;
+        pObject->box_face_start = 0;
+        pObject->box_face_ref = gFace_num__car - 2;
+        break;
+    case kSmashableMode_ReplaceModel:
+        if (pActor->model != pSpec->replace.model) {
+            do_connotations = 1;
+            PipeSingleSmashModelChange(pActor, pActor->model, pSpec->replace.model);
+            pActor->model = pSpec->replace.model;
+            if (PercentageChance(pSpec->replace.smoke_fire_chance.probability_fire)) {
+                for (i = 0; i < pSpec->replace.smoke_fire_chance.count_fire_columns; i++) {
+                    CreateSmokeColumn2(0, pActor, NULL, NULL,
+                        IRandomBetween(pSpec->replace.smoke_fire_chance.min_smokiness, pSpec->replace.smoke_fire_chance.max_smokiness),
+                        IRandomBetween(0, V11MODEL(pActor->model)->groups->nvertices),
+                        10000000);
+                }
+            }
+            for (child = pActor->children; child != NULL; child = child->next) {
+                PipeSingleSmashModelChange(child, child->model, NULL);
+                child->render_style = BR_RSTYLE_NONE;
+            }
+            AddChangedPoint(&pActor->t.t.translate.t);
+        }
+        pObject->box_face_ref = gFace_num__car - 2;
+        pObject->box_face_end = 0;
+        pObject->box_face_start = 0;
+        break;
+    default:
+        break;
+    }
+    if (do_connotations) {
+        result = pSpec->mode_data.shrapnel.removal_threshold;
+        *pSmashed = 1;
+        BrActorToActorMatrix34(&mat, pActor, gUniverse_actor);
+        DoConnotations(pObject, pSpec, NULL, &pSpec->mode_data.shrapnel.connotations, seed, &velocity, &pActor->t.t.translate.t, pPosition,
+            pActor, the_time, gINT_006a829c, &mat, &bounds, &gZero_vector__smash, pMagnitude, pForce, pNetwork);
+    }
+    return result;
 }
 
 // STUB: CARMA2_HW 0x004f5110

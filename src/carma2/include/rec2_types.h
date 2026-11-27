@@ -4209,7 +4209,7 @@ typedef struct {
     int field_0x3c;
     int field_0x40;
     int field_0x44;
-    int field_0x48;
+    tSmashable_item_spec* field_0x48;
     br_vector3 field_0x4c[4];
     br_vector3 field_0x7c;
 } tQueued_smash;
