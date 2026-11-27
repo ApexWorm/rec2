@@ -436,8 +436,8 @@ extern void C2_HOOK_FASTCALL InitPhysics(void);
 
 // CalcCollObjID
 
-// GetCarSpecFromCollObjID
+// GetCarSpecFromCollObjID (moved to 51-smash for inlining purposes)
 
-// GetCollObjFromID
+// GetCollObjFromID (moved to 51-smash for inlining purposes)
 
 #endif // GUARD_49_PHYSICS_H

@@ -2309,16 +2309,25 @@ typedef struct {
     tDelayed_non_car_actor_item actor_time_actions[20];
 } tDelayed_non_car;
 
+typedef struct tFace_ref {
+    br_material* material;
+    br_vector3 v[3];
+    br_vector2* map[3];
+    br_vector3 normal;
+    int flags;
+    br_scalar d;
+    br_actor* a;
+    tS16 g;
+    tS16 f;
+} tFace_ref;
+
 typedef struct {
     br_vector3 field_0x0;
     br_vector3 field_0xc;
     tU32 field_0x18;
     br_vector3 field_0x1c;
     undefined field_0x28[0x38 - 0x28];
-    undefined4 field_0x38;
-    undefined field_0x3c[0x80 - 0x3c];
-    br_actor *field_0x80;
-    undefined field_0x84[0x88 - 0x84];
+    tFace_ref field_0x38;
     undefined4 field_0x88;
     float field_0x8c;
     tPhysics_object* field_0x90;
@@ -3638,7 +3647,12 @@ typedef struct {
 typedef struct {
     undefined4 field_0x0;
     undefined4 field_0x4;
-    undefined4 field_0x8[12];
+    int coll_obj_id;
+    float magnitude;
+    br_vector3 position;
+    br_vector3 normal;
+    br_vector3 force;
+    tU32 flags;
 } tQueued_net_smash;
 
 typedef struct {
@@ -5293,18 +5307,6 @@ typedef struct tDrone_path_node {
     tS16 type;
     undefined field_0x132[2];
 } tDrone_path_node;
-
-typedef struct tFace_ref {
-    br_material* material;
-    br_vector3 v[3];
-    br_vector2* map[3];
-    br_vector3 normal;
-    int flags;
-    br_scalar d;
-    br_actor* a;
-    tS16 g;
-    tS16 f;
-} tFace_ref;
 
 typedef struct {
     tSmoke_column_core core;

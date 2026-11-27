@@ -17,10 +17,13 @@
 #include "20-skidmark.h"
 #include "23-piping.h"
 #include "28-world3.h"
+#include "30-opponent.h"
 #include "32-spark.h"
 #include "33-depth.h"
+#include "34-finteray.h"
 #include "39-oil.h"
 #include "41-utility.h"
+#include "49-physics.h"
 #include "52-errors.h"
 #include "59-camera.h"
 #include "62-graphics3.h"
@@ -176,6 +179,11 @@ int gINT_006a8288 = 0;
 // GLOBAL: CARMA2_SW 0x006a22ec
 // GLOBAL: CARMA2_CHEAT 0x006afe04
 int gCount_queued_smashes = 0;
+
+// GLOBAL: CARMA2_HW 0x006a8294
+// GLOBAL: CARMA2_SW 0x006a22f4
+// GLOBAL: CARMA2_CHEAT 0x006afe0c
+int gINT_006a8294 = 0;
 
 // GLOBAL: CARMA2_HW 0x006abee8
 // GLOBAL: CARMA2_SW 0x006a5438
@@ -685,12 +693,12 @@ inline void C2_HOOK_FASTCALL DoDelayedNonCar(tU32 pTime, tDelayed_non_car* pDela
 inline void C2_HOOK_FASTCALL DoDelayedSmash(tDelayed_smash* pDelayed_smash) {
 
     if (pDelayed_smash->field_0x88 == 1
-        && pDelayed_smash->field_0x80->identifier[0] == '&'
-        && pDelayed_smash->field_0x80->identifier[1] >= '0'
-        && pDelayed_smash->field_0x80->identifier[1] <= '9') {
-        DoPullActorFromWorld(pDelayed_smash->field_0x80);
-        pDelayed_smash->field_0x80->identifier[3] = '!';
-        BashObject(pDelayed_smash->field_0x90, pDelayed_smash->field_0x80, pDelayed_smash->field_0x8c,
+        && pDelayed_smash->field_0x38.a->identifier[0] == '&'
+        && pDelayed_smash->field_0x38.a->identifier[1] >= '0'
+        && pDelayed_smash->field_0x38.a->identifier[1] <= '9') {
+        DoPullActorFromWorld(pDelayed_smash->field_0x38.a);
+        pDelayed_smash->field_0x38.a->identifier[3] = '!';
+        BashObject(pDelayed_smash->field_0x90, pDelayed_smash->field_0x38.a, pDelayed_smash->field_0x8c,
             &pDelayed_smash->field_0xc, &pDelayed_smash->field_0x0, &pDelayed_smash->field_0x1c, 1, 0);
     } else {
         SmashEnvironment(pDelayed_smash->field_0x90, &pDelayed_smash->field_0x38, pDelayed_smash->field_0x8c,
@@ -760,7 +768,20 @@ void C2_HOOK_FASTCALL InitSmashQueue(void) {
 
 // FlushPowerupQueue
 
-// FlushSmashQueue
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_HW 0x004ecfb0
+// STUB: CARMA2_SW 0x004e8c80
+// STUB: CARMA2_CHEAT 0x004f2c50
+void C2_HOOK_FASTCALL FlushSmashQueue(int pFlush_powerups) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // QueueSmashIfNecessary3
 
@@ -2072,7 +2093,7 @@ int C2_HOOK_FASTCALL InsertQuad(tSmash_quad_mapping* pMapping, br_actor* pActor,
 // STUB: CARMA2_HW 0x004f1140
 // STUB: CARMA2_SW 0x004ecda0
 // STUB: CARMA2_CHEAT 0x004f6de0
-float C2_HOOK_FASTCALL SmashEnvironment(tPhysics_object* pObject, undefined4* pArg2, float pMagnitude, br_vector3* pPosition, br_vector3* pNormal, br_vector3* pForce, int pSnap, int pNetwork) {
+float C2_HOOK_FASTCALL SmashEnvironment(tPhysics_object* pObject, tFace_ref* pFace, float pMagnitude, br_vector3* pPosition, br_vector3* pNormal, br_vector3* pForce, int pSnap, int pNetwork) {
     NOT_IMPLEMENTED();
 }
 
@@ -2464,15 +2485,76 @@ void C2_HOOK_FASTCALL ChangeSmashTexture(br_material* pMaterial, tCar_spec* pCar
     NOT_IMPLEMENTED();
 }
 
+extern tCar_spec* C2_HOOK_FASTCALL GetCarSpecFromCollObjID(int pID);
+
+extern tPhysics_object* C2_HOOK_FASTCALL GetCollObjFromID(int pID);
+
+inline tCar_spec* C2_HOOK_FASTCALL GetCarSpecFromCollObjID(int pID) {
+
+    if (gNet_mode != eNet_mode_none) {
+        if (pID < gNumber_of_net_players) {
+            return gNet_players[pID].car;
+        } else {
+            return NULL;
+        }
+    } else if ((pID >> 8) == eVehicle_self) {
+        return &gProgram_state.current_car;
+    } else {
+        return GetCarSpec(pID >> 8, pID & 0xff);
+    }
+}
+
+inline tPhysics_object* C2_HOOK_FASTCALL GetCollObjFromID(int pID) {
+    tCar_spec* car;
+
+    if (pID != -1) {
+        car = GetCarSpecFromCollObjID(pID);
+        if (car != NULL) {
+            return car->collision_info;
+        } else {
+            return NULL;
+        }
+    } else {
+        return NULL;
+    }
+}
+
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x004f6130
-// STUB: CARMA2_SW 0x004f1d90
-// STUB: CARMA2_CHEAT 0x004fbdd0
+// FUNCTION: CARMA2_HW 0x004f6130
+// FUNCTION: CARMA2_SW 0x004f1d90
+// FUNCTION: CARMA2_CHEAT 0x004fbdd0
 void C2_HOOK_FASTCALL DoNetSmash(tQueued_net_smash* pSmash) {
-    NOT_IMPLEMENTED();
+    tPhysics_object* object;
+    tBounds bounds;
+    br_matrix34 mat;
+    tFace_ref faces[20];
+    tFace_ref* face;
+    int count;
+    int i;
+
+    object = GetCollObjFromID(pSmash->coll_obj_id);
+    if (object == NULL) {
+        return;
+    }
+    bounds.mat = &mat;
+    BrMatrix34Identity(&mat);
+    BrVector3Copy((br_vector3*)mat.m[3], &pSmash->position);
+    BrVector3Set(&bounds.original_bounds.min, -0.05f, -0.05f, -0.05f);
+    BrVector3Set(&bounds.original_bounds.max, 0.05f, 0.05f, 0.05f);
+    FillInBounds(&bounds);
+    count = FindFacesInBox(&bounds, faces, REC2_ASIZE(faces), &gWorld_callbacks);
+    for (i = 0, face = faces; i < count; i++, face++) {
+        if (PointInFace(&pSmash->position, &face->normal, face->d, &face->v[0], &face->v[1], &face->v[2])) {
+            gINT_006a8294 = pSmash->flags & 0x1;
+            SmashEnvironment(object, face, pSmash->magnitude, &pSmash->position, &pSmash->normal, &pSmash->force, (pSmash->flags >> 1) & 0x1, 1);
+            FlushSmashQueue(0);
+            gINT_006a8294 = 0;
+            return;
+        }
+    }
 }
 
 #ifdef REC2_MATCHING
