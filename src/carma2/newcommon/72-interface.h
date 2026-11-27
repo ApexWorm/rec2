@@ -125,7 +125,7 @@ extern void C2_HOOK_FASTCALL DefaultInfunc(tFrontend_spec* pFrontend);
 
 extern int C2_HOOK_FASTCALL GameMenuInfunc(tFrontend_spec* pFrontend);
 
-// FindNextActiveItem
+extern int C2_HOOK_FASTCALL FindNextActiveItem(tFrontend_spec* pFrontend, int pStart_index);
 
 extern int C2_HOOK_FASTCALL FindPrevActiveItem(tFrontend_spec* pFrontend, int pStart_index);
 
@@ -169,7 +169,7 @@ extern int C2_HOOK_FASTCALL NewGameInfunc(tFrontend_spec* pFrontend);
 
 extern int C2_HOOK_FASTCALL StartFudge(tFrontend_spec* pFrontend);
 
-// FRONTEND_NewGameMenuHandler
+extern int C2_HOOK_FASTCALL FRONTEND_NewGameMenuHandler(tFrontend_spec* pFrontend);
 
 // UpdateNetGameTypeScroller
 
@@ -229,7 +229,7 @@ extern int C2_HOOK_FASTCALL testUp(tFrontend_spec* pFrontend);
 
 extern int C2_HOOK_FASTCALL testDn(tFrontend_spec* pFrontend);
 
-// FRONTEND_MainMenuHandler
+extern int C2_HOOK_FASTCALL FRONTEND_MainMenuHandler(tFrontend_spec* pFrontend);
 
 extern void C2_HOOK_FASTCALL UpdateCarInfo(tFrontend_spec* pFrontend);
 
@@ -255,7 +255,7 @@ extern int C2_HOOK_FASTCALL CreditsScreenInfunc(tFrontend_spec* pFrontend);
 
 extern int C2_HOOK_FASTCALL CreditsScreenOutfunc(tFrontend_spec* pFrontend);
 
-// FRONTEND_GenericMenuHandler
+extern int C2_HOOK_FASTCALL FRONTEND_GenericMenuHandler(tFrontend_spec* pFrontend);
 
 extern void C2_HOOK_FASTCALL FRONTEND_CreateMenuButton(tFrontend_brender_item* pFrontend_brender_item, tS16 pX, tS16 pY, tS16 pWidth, tS16 pHeight, br_colour pColour, br_pixelmap* pMap, const char* pText);
 
@@ -467,11 +467,11 @@ extern void C2_HOOK_FASTCALL CheckPlayersAreResponding2(tU32 pDeadline);
 
 extern void C2_HOOK_FASTCALL CheckPlayersAreResponding(void);
 
-// MungePlayers
+extern void C2_HOOK_FASTCALL MungePlayers(tFrontend_spec* pFrontend);
 
 extern int C2_HOOK_FASTCALL NetSynchRaceStart2(tNet_synch_mode pMode);
 
-// NetSync_Draw
+extern void C2_HOOK_FASTCALL NetSync_Draw(tFrontend_spec* pFrontend);
 
 extern int C2_HOOK_FASTCALL NetSync_Start(tFrontend_spec* pFrontend);
 
@@ -479,7 +479,7 @@ extern int C2_HOOK_FASTCALL NetSync_Abort(tFrontend_spec* pFrontend);
 
 extern int C2_HOOK_FASTCALL NetSync_Infunc(tFrontend_spec* pFrontend);
 
-// NetSync_MenuHandler
+extern int C2_HOOK_FASTCALL NetSync_MenuHandler(tFrontend_spec* pFrontend);
 
 // static void C2_HOOK_FASTCALL NetSummary_Draw(tFrontend_spec* pFrontend);
 

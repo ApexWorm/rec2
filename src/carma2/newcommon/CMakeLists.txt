@@ -68,6 +68,7 @@ foreach(edition ${REC2_EDITIONS})
         58-crush2.c
         59-camera.c
         60-phil.c
+        61-pedestrn-phys.c
         61-pedestrn.c
         62-graphics3.c
         63-loading3.c
