@@ -63,8 +63,8 @@ br_error C2_HOOK_STDCALL devAdd(br_device** pdev, br_device_begin_fn* dev_begin,
     }
     BrResFree(fw.dev_slots);
     fw.dev_slots = new_slots;
-    fw.dev_slots[fw.ndev_slots].dev = dev;
-    fw.dev_slots[fw.ndev_slots].image = image;
+    new_slots[fw.ndev_slots].dev = dev;
+    new_slots[fw.ndev_slots].image = image;
     fw.ndev_slots += 16;
     if (pdev != NULL) {
         *pdev = dev;
@@ -192,6 +192,7 @@ br_error C2_HOOK_CDECL BrDevFind(br_device** pdev, const char* pattern) {
 }
 
 // FUNCTION: CARMA2_HW 0x00528930
+// FUNCTION: CARMA2_SW 0x00523fb0
 // FUNCTION: CARMA2_CHEAT 0x0052e520
 br_error C2_HOOK_CDECL BrDevFindMany(br_device** devices, br_int_32* ndevices, br_int_32 max_devices, const char* pattern) {
     int i;
@@ -199,6 +200,7 @@ br_error C2_HOOK_CDECL BrDevFindMany(br_device** devices, br_int_32* ndevices, b
 
     AddRequestedDrivers();
 
+#ifdef BRENDER_FIX_BUGS
     c = 0;
     for (i = 0; i < fw.ndev_slots; i++) {
         if (fw.dev_slots[i].dev != NULL) {
@@ -206,12 +208,21 @@ br_error C2_HOOK_CDECL BrDevFindMany(br_device** devices, br_int_32* ndevices, b
                 if (c >= max_devices) {
                     return 0x1004;
                 }
-                /* Order of operations differs from OG */
                 devices[c] = fw.dev_slots[i].dev;
                 c++;
             }
         }
     }
+#else
+    for (i = 0, c = 0; i < fw.ndev_slots; i++) {
+        if (fw.dev_slots[i].dev != NULL && BrNamePatternMatch(pattern, fw.dev_slots[i].dev->dispatch->_identifier((br_object*)fw.dev_slots[i].dev))) {
+            if (++c >= max_devices) {
+                return 0x1004;
+            }
+            devices[c] = fw.dev_slots[i].dev;
+        }
+    }
+#endif
     if (ndevices != NULL) {
         *ndevices = c;
     }
