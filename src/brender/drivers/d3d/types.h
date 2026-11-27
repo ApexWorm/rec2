@@ -55,9 +55,13 @@ enum {
 
 enum {
     GR_TEXFMT_P_8 = 0x5,
-    GR_TEXFMT_RGB_565 = 0x1,
+    GR_TEXFMT_RGB_565 = 0xa,
     GR_TEXFMT_ARGB_1555 = 0xb,
     GR_TEXFMT_ARGB_4444 = 0xc,
+};
+
+enum {
+    GR_LOD_1 = 0x8,
 };
 
 typedef struct br_object_d3d {

@@ -20,3 +20,7 @@ void C2_HOOK_CDECL TextureCacheD3DClearEntry(int index, int uid) {
         gBuffered_textures[index].field_0x24 = -1;
     }
 }
+
+/* FIXME: empty in the original, where the linker folded it with d3d_debug_printf (0x10005e20); the name is a guess */
+void C2_HOOK_CDECL TextureCacheD3DUpdateEntry(int index, int uid) {
+}

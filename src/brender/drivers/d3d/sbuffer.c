@@ -57,8 +57,8 @@ int gStored_buffer_counter;
 void C2_HOOK_CDECL BufferStoredD3DClearTemplate(void) {
 
     memset(&bufferStoredD3DTemplate, 0, sizeof(bufferStoredD3DTemplate));
-    bufferStoredD3DTemplate.entries = bufferStoredD3DTemplateEntries;
     bufferStoredD3DTemplate.n_entries = BR_ASIZE(bufferStoredD3DTemplateEntries);
+    bufferStoredD3DTemplate.entries = bufferStoredD3DTemplateEntries;
 }
 
 // FUNCTION: D3D 0x10008370
@@ -94,12 +94,12 @@ br_error C2_HOOK_CDECL SetupD3DBuffer(br_buffer_stored_d3d* buffer, br_device_pi
     buffer->buffer.width_p = pm->pm_width;
     buffer->buffer.width_b = pm->pm_width * pixelmapD3DBPP(pm);
     buffer->buffer.height = pm->pm_height;
-    if (pm->pm_mip_offset) {
-        buffer->buffer.info.smallLod = 0;
+    if (pm->pm_mip_offset != 0) {
+        buffer->buffer.info.smallLod = GR_LOD_1;
     } else {
         buffer->buffer.info.smallLod = buffer->buffer.info.largeLod;
     }
-    buffer->pixels_pointer = (br_uint_8*)pm->pm_pixels + pixelmapD3DBPP(pm) * pm->pm_base_x + pm->pm_row_bytes * pm->pm_base_y;
+    buffer->pixels_pointer = (br_uint_8*)pm->pm_pixels + pm->pm_base_y * pm->pm_row_bytes + pm->pm_base_x * pixelmapD3DBPP(pm);
     buffer->buffer.palette_pointer = NULL;
     buffer->buffer.pm_type = pm->pm_type;
 
@@ -115,6 +115,10 @@ br_error C2_HOOK_CDECL SetupD3DBuffer(br_buffer_stored_d3d* buffer, br_device_pi
         buffer->buffer.palette_pointer = map;
         buffer->buffer.blended = 0;
         break;
+    case BR_PMT_ARGB_1555:
+        buffer->buffer.info.format = GR_TEXFMT_ARGB_1555;
+        buffer->buffer.blended = 1;
+        break;
     case BR_PMT_RGB_555:
         buffer->buffer.info.format = GR_TEXFMT_ARGB_1555;
         buffer->buffer.blended = 0;
@@ -127,10 +131,8 @@ br_error C2_HOOK_CDECL SetupD3DBuffer(br_buffer_stored_d3d* buffer, br_device_pi
         buffer->buffer.info.format = GR_TEXFMT_ARGB_4444;
         buffer->buffer.blended = 1;
         break;
-    case BR_PMT_ARGB_1555:
-        buffer->buffer.info.format = GR_TEXFMT_ARGB_1555;
-        buffer->buffer.blended = 1;
-        break;
+    case BR_PMT_RGBX_888:
+        return 0xa005;
     default:
         return 0xa005;
     }
@@ -213,24 +215,24 @@ br_tv_template* C2_HOOK_CDECL _M_br_buffer_stored_d3d_templateQuery(br_buffer_st
 
 // FUNCTION: D3D 0x10008480
 br_error C2_HOOK_CDECL _M_br_buffer_stored_d3d_update(br_buffer_stored_d3d* self, br_device_pixelmap_d3d* pm, br_token_value* tv) {
+    br_device_d3d* dev;
+
     self->buffer.force_reload = 1;
     self->buffer.field_0x58 = 1;
+    TextureCacheD3DUpdateEntry(self->buffer.field_0x4c, self->buffer.uid);
     if (pm->pm_type == BR_PMT_INDEX_8) {
-        br_pixelmap* pal;
-
         self->buffer.info.format = GR_TEXFMT_P_8;
-        pal = pm->pm_map;
-        if (pal != NULL) {
-            self->buffer.palette_pointer = pal->pixels;
+        if (pm->pm_map != NULL) {
+            self->buffer.palette_pointer = pm->pm_map->pixels;
             return 0;
-        } else {
-            NOT_IMPLEMENTED();
-            /* Not implemented */
-#if 0
-            br_device_d3d* dev = (br_device_d3d*)self->buffer.base->dispatch->_device(self->buffer.base);
-            self->buffer.palette_pointer = &dev->clut[8];
-#endif
         }
+#ifdef REC2_FIX_BUGS
+        dev = (br_device_d3d*)self->dispatch->_device((br_object*)self);
+#else
+        /* The original asks the render buffer (not the stored buffer) for its device */
+        dev = (br_device_d3d*)((br_object*)&self->buffer)->dispatch->_device((br_object*)&self->buffer);
+#endif
+        self->buffer.palette_pointer = dev->clut->entries;
     }
     return 0;
 }

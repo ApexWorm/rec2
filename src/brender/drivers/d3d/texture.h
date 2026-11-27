@@ -13,4 +13,6 @@
 
 void C2_HOOK_CDECL TextureCacheD3DClearEntry(int index, int uid);
 
+void C2_HOOK_CDECL TextureCacheD3DUpdateEntry(int index, int uid);
+
 #endif /* D3D_TEXTURE_H */
