@@ -6137,7 +6137,7 @@ enum {
     kFatalError_CannotFindGibletModel_S = 0xa9,
     kFatalError_WrongCrushDataFileVersion_SDD = 0xab,
     kFatalError_ShapeDataIsWrong = 0xad,
-    kFatalError_UnknownNonCarCommand = 0xad,
+    kFatalError_UnknownNonCarCommand = 0xae,
     kFatalError_UnableToOpenDroneFileOrFileCorrupted_S = 0xaf,
     kFatalError_DuplicatePixelmap_S = 0xb5,
     kFatalError_FileMustStartWith_SS = 0xb0,

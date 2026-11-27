@@ -784,6 +784,11 @@ int gJump_start_fine[3];
 //int gTyping_slot;
 //int gCunning_stunt_bonus[3];
 
+// GLOBAL: CARMA2_HW 0x007634ec
+// GLOBAL: CARMA2_SW 0x00759a4c
+// GLOBAL: CARMA2_CHEAT 0x0076ab8c
+int gCountRaceGroups;
+
 // GLOBAL: CARMA2_HW 0x007634f0
 // GLOBAL: CARMA2_SW 0x00759a50
 // GLOBAL: CARMA2_CHEAT 0x0076ab90
