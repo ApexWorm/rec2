@@ -2435,18 +2435,18 @@ void C2_HOOK_CDECL FUN_10007140(void) {
     }
     if (gNo_2d_during_3d_scene == 1) {
         if (gINT_1001bba4 == 9) {
-            gCount_queued_vertices = 0;
             gCount_queued_vertices_indices = 0;
+            gCount_queued_vertices = 0;
             return;
         } else if (gINT_1001bba4 == 2) {
             if (gCount_queued_vertices == 6) {
                 int i;
-                WORD fan[4] = { 0 };
+                WORD fan[5] = { 0, 0, 0, 0, 0 };
 
-                for (i = 0; i < gCount_queued_vertices; i++) {
-                    if (gQueued_vertices[i].tu > 1.5f) {
-                        gCount_queued_vertices = 0;
+                for (i = 0; i < 6; i++) {
+                    if (gQueued_vertices[i].tu > 1.5) {
                         gCount_queued_vertices_indices = 0;
+                        gCount_queued_vertices = 0;
                         return;
                     }
                     if (gQueued_vertices[i].sx <= gQueued_vertices[fan[0]].sx
@@ -2470,19 +2470,25 @@ void C2_HOOK_CDECL FUN_10007140(void) {
                     }
                     gQueued_vertices[i].color = gQueued_vertices[0].color;
                     gQueued_vertices[i].sz = gQueued_vertices[0].sz;
-                    gQueued_vertices[i].specular = gQueued_vertices[0].specular;
+                    gQueued_vertices[i].rhw = gQueued_vertices[0].rhw;
                 }
                 IDirect3DDevice2_DrawIndexedPrimitive(gD3DDevice2,
                     D3DPT_TRIANGLEFAN, D3DVT_TLVERTEX, gQueued_vertices, 6,
-                    fan, BR_ASIZE(fan),
+                    fan, 4,
                     D3DDP_DONOTUPDATEEXTENTS | D3DDP_DONOTCLIP);
                 gCount_queued_vertices_indices = 0;
                 gCount_queued_vertices = 0;
                 return;
             }
         } else if (gINT_1001bba4 == 1 && gCount_queued_vertices == 6 && gDAT_1001dc50 != NULL) {
-            int u, v, du, dv, u_max, v_max;
-            float factor_x, factor_y;
+            int du;
+            int dv;
+            int u_extent;
+            int v_extent;
+            float factor_x;
+            float factor_y;
+            float width;
+            float height;
             br_uint_8* map_ptr;
 
             gQueued_vertices_indices[1] = 0;
@@ -2491,58 +2497,104 @@ void C2_HOOK_CDECL FUN_10007140(void) {
             gQueued_vertices_indices[3] = 2;
             gQueued_vertices_indices[4] = 3;
             gINT_1001dc6c = (int)(gQueued_vertices[3].tu * (float)gINT_1001dc4c);
-            gINT_1001dc5c = (int)(gQueued_vertices[3].tv * (float)gINT_1001dc44);
+            height = (float)gINT_1001dc44;
+            gINT_1001dc5c = (int)(gQueued_vertices[3].tv * height);
             gINT_1001dc68 = (int)(gQueued_vertices[1].tu * (float)gINT_1001dc4c);
-            gINT_1001dc58 = (int)(gQueued_vertices[1].tv * (float)gINT_1001dc44);
+            gINT_1001dc58 = (int)(gQueued_vertices[1].tv * height);
+            map_ptr = (br_uint_8*)gDAT_1001dc50 + gINT_1001dc5c * gINT_1001dc54 + 2 * gINT_1001dc6c;
             du = gINT_1001dc68 - gINT_1001dc6c;
             dv = gINT_1001dc58 - gINT_1001dc5c;
-            map_ptr = (br_uint_8*)gDAT_1001dc50 + gINT_1001dc5c * gINT_1001dc54 + 2 * gINT_1001dc6c;
-            u_max = 0;
-            v_max = 0;
-            for (v = 0; v < dv; v += 1) {
-                br_uint_16* p = (br_uint_16*)map_ptr;
-                for (u = 0; u < du; u += 1) {
-                    if ((p[u] >> 12) > 3) {
-                        if (u >= u_max) {
-                            u_max = u;
+#ifdef REC2_MATCHING
+            __asm {
+                mov     esi, 0
+                mov     edi, 0
+                mov     ebx, map_ptr
+                mov     ecx, 0
+            row_loop:
+                push    ebx
+                mov     edx, 0
+            pixel_loop:
+                xor     eax, eax
+                mov     ax, [ebx]
+                shr     eax, 12
+                cmp     eax, 3
+                jle     next_pixel
+                cmp     esi, edx
+                jg      check_row
+                mov     esi, edx
+            check_row:
+                cmp     edi, ecx
+                jg      next_pixel
+                mov     edi, ecx
+            next_pixel:
+                add     ebx, 2
+                inc     edx
+                cmp     edx, du
+                jl      pixel_loop
+                pop     ebx
+                add     ebx, gINT_1001dc54
+                inc     ecx
+                cmp     ecx, dv
+                jl      row_loop
+                inc     esi
+                inc     edi
+                mov     u_extent, esi
+                mov     v_extent, edi
+            }
+#else
+            {
+                int u;
+                int v;
+
+                u_extent = 0;
+                v_extent = 0;
+                v = 0;
+                do {
+                    br_uint_16* p = (br_uint_16*)map_ptr;
+
+                    u = 0;
+                    do {
+                        if ((p[u] >> 12) > 3) {
+                            if (u_extent <= u) {
+                                u_extent = u;
+                            }
+                            if (v_extent <= v) {
+                                v_extent = v;
+                            }
                         }
-                        if (v >= v_max) {
-                            v_max = v;
-                        }
-                    }
-                }
-                map_ptr += gINT_1001dc54;
+                        u++;
+                    } while (u < du);
+                    map_ptr += gINT_1001dc54;
+                    v++;
+                } while (v < dv);
+                u_extent += 1;
+                v_extent += 1;
             }
-            gINT_1001dc68 = gINT_1001dc6c + u_max + 1;
-            gINT_1001dc58 = gINT_1001dc5c + v_max + 1;
-            if (du == 0 || dv == 0.0) {
-                factor_x = 0.f;
-                factor_y = 0.f;
+#endif
+            gINT_1001dc68 = u_extent + gINT_1001dc6c;
+            gINT_1001dc58 = v_extent + gINT_1001dc5c;
+            if (du != 0 && dv != 0) {
+                factor_x = (float)u_extent / du;
+                factor_y = (float)v_extent / dv;
+            } else {
+                factor_x = 0.0f;
+                factor_y = 0.0f;
             }
-            else {
-                factor_x = (float)(u_max + 1) / (float)du;
-                factor_y = (float)(v_max + 1) / (float)dv;
-            }
-            gQueued_vertices[0].sx = factor_x * (gQueued_vertices[1].sx - gQueued_vertices[3].sx) + gQueued_vertices[3].sx;
-            gQueued_vertices[0].tu = (float)gINT_1001dc68 / (float)gINT_1001dc4c;
-            gQueued_vertices[0].tv = (float)gINT_1001dc5c / (float)gINT_1001dc44;
             gQueued_vertices[0].color = gQueued_vertices[3].color;
-
-            gQueued_vertices[1].sx = gQueued_vertices[0].sx;
-            gQueued_vertices[1].sy = factor_y * (gQueued_vertices[1].sy - gQueued_vertices[3].sy) + gQueued_vertices[3].sy;
-            gQueued_vertices[1].tv = (float)gINT_1001dc58 / (float)gINT_1001dc44;
-            gQueued_vertices[1].tu = gQueued_vertices[0].tu;
             gQueued_vertices[1].color = gQueued_vertices[3].color;
-
-            gQueued_vertices[2].sy = gQueued_vertices[1].sy;
-            gQueued_vertices[2].tu = (float)gINT_1001dc6c / (float)gINT_1001dc4c;
-            gQueued_vertices[2].tv = gQueued_vertices[1].tv;
             gQueued_vertices[2].color = gQueued_vertices[3].color;
-
-            gQueued_vertices[3].tu = gQueued_vertices[2].tu;
-            gQueued_vertices[3].tv = gQueued_vertices[0].tv;
-
             gCount_queued_vertices_indices = 4;
+            gQueued_vertices[1].sx = (gQueued_vertices[1].sx - gQueued_vertices[3].sx) * factor_x + gQueued_vertices[3].sx;
+            gQueued_vertices[0].sx = gQueued_vertices[1].sx;
+            gQueued_vertices[2].sy = gQueued_vertices[1].sy = (gQueued_vertices[1].sy - gQueued_vertices[3].sy) * factor_y + gQueued_vertices[3].sy;
+            width = (float)gINT_1001dc4c;
+            gQueued_vertices[3].tu = gINT_1001dc6c / width;
+            gQueued_vertices[3].tv = gINT_1001dc5c / (float)gINT_1001dc44;
+            gQueued_vertices[0].tu = gINT_1001dc68 / width;
+            gQueued_vertices[0].tv = gQueued_vertices[3].tv;
+            gQueued_vertices[1].tu = gQueued_vertices[0].tu;
+            gQueued_vertices[2].tv = gQueued_vertices[1].tv = gINT_1001dc58 / (float)gINT_1001dc44;
+            gQueued_vertices[2].tu = gQueued_vertices[3].tu;
             IDirect3DDevice2_DrawIndexedPrimitive(gD3DDevice2, D3DPT_TRIANGLEFAN, D3DVT_TLVERTEX,
                 gQueued_vertices, gCount_queued_vertices,
                 gQueued_vertices_indices, 4,
@@ -2551,22 +2603,16 @@ void C2_HOOK_CDECL FUN_10007140(void) {
             gCount_queued_vertices = 0;
             return;
         } else if (gINT_1001bba4 == 3) {
-            QUEUE_RENDER_STATE(D3DRENDERSTATE_TEXTUREHANDLE, (uintptr_t)NULL);
+            QUEUE_RENDER_STATE(D3DRENDERSTATE_TEXTUREHANDLE, 0);
             QUEUE_RENDER_STATE(D3DRENDERSTATE_SHADEMODE, D3DSHADE_FLAT);
             QUEUE_RENDER_STATE(D3DRENDERSTATE_ALPHABLENDENABLE, FALSE);
             if (gCount_queued_render_states != 0) {
                 ApplyD3DRenderStateQueue();
             }
-            gINT_100389ec += gCount_queued_vertices;
-            gINT_100381a4 += gCount_queued_vertices_indices;
-        } else {
-            gINT_100389ec += gCount_queued_vertices;
-            gINT_100381a4 += gCount_queued_vertices_indices;
         }
-    } else {
-        gINT_100389ec += gCount_queued_vertices;
-        gINT_100381a4 += gCount_queued_vertices_indices;
     }
+    gINT_100389ec += gCount_queued_vertices;
+    gINT_100381a4 += gCount_queued_vertices_indices;
     IDirect3DDevice2_DrawIndexedPrimitive(gD3DDevice2, gPrimitive_type, D3DVT_TLVERTEX,
         gQueued_vertices, gCount_queued_vertices,
         gQueued_vertices_indices, gCount_queued_vertices_indices,
