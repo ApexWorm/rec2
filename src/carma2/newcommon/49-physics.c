@@ -527,11 +527,34 @@ br_scalar C2_HOOK_FASTCALL HierarchyCalcEnergy(tPhysics_object* pObject) {
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x004b77b0
-// STUB: CARMA2_SW 0x004b3ed0
-// STUB: CARMA2_CHEAT 0x004bd2e0
+// FUNCTION: CARMA2_HW 0x004b77b0
+// FUNCTION: CARMA2_SW 0x004b3ed0
+// FUNCTION: CARMA2_CHEAT 0x004bd2e0
 void C2_HOOK_FASTCALL MakeJointVelocitiesVector(br_scalar* pVelocities, tPhysics_joint_force** pForces, int pCount) {
-    NOT_IMPLEMENTED();
+    tPhysics_object* object;
+    br_vector3 v;
+    int i;
+
+    for (i = 0; i < pCount; i++) {
+        object = pForces[i]->object_a;
+        if (pForces[i]->type == 11) {
+            pVelocities[i] = -BrVector3Dot(&object->omega, &pForces[i]->direction_a);
+            object = pForces[i]->object_b;
+            if (object != NULL) {
+                pVelocities[i] += BrVector3Dot(&object->omega, &pForces[i]->direction_b);
+            }
+        } else {
+            BrVector3Cross(&v, &object->omega, &pForces[i]->point_a);
+            BrVector3Accumulate(&v, &object->velocity_car_space);
+            pVelocities[i] = -BrVector3Dot(&pForces[i]->direction_a, &v);
+            object = pForces[i]->object_b;
+            if (object != NULL) {
+                BrVector3Cross(&v, &object->omega, &pForces[i]->point_b);
+                BrVector3Accumulate(&v, &object->velocity_car_space);
+                pVelocities[i] += BrVector3Dot(&pForces[i]->direction_b, &v);
+            }
+        }
+    }
 }
 
 #ifdef REC2_MATCHING
@@ -693,25 +716,123 @@ void C2_HOOK_FASTCALL PositionWorldJointedObject(tPhysics_object* pObject, br_sc
     }
 }
 
-// TranslateAndRotatePartialObject
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_HW 0x004b9230
+// STUB: CARMA2_SW 0x004b5950
+// STUB: CARMA2_CHEAT 0x004bed60
+void C2_HOOK_FASTCALL TranslateAndRotatePartialObject(tPhysics_object* pObject, tPhysics_object** pRoot, br_scalar pDelta_time) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x004b8ee0
-// STUB: CARMA2_SW 0x004b5600
-// STUB: CARMA2_CHEAT 0x004bea10
+// FUNCTION: CARMA2_HW 0x004b8ee0
+// FUNCTION: CARMA2_SW 0x004b5600
+// FUNCTION: CARMA2_CHEAT 0x004bea10
 void C2_HOOK_FASTCALL TranslateAndRotateJointedObject(tPhysics_object* pObject, br_scalar pDelta_time) {
-    NOT_IMPLEMENTED();
+    tPhysics_object* root;
+    tPhysics_object* object;
+    tPhysics_object* parent;
+    br_vector3 pos;
+    br_vector3 parent_pos;
+
+    root = NULL;
+    TranslateAndRotatePartialObject(pObject, &root, pDelta_time);
+    if (root != NULL && root->field_0x230 != NULL) {
+        object = root;
+        PositionWorldJointedObject(object, pDelta_time);
+        do {
+            parent = object->field_0x230;
+            BrMatrix34ApplyP(&pos, &object->physics_joint1->field_0x08, &object->actor->t.t.mat);
+            BrMatrix34ApplyP(&parent_pos, &object->physics_joint1->field_0x14, &parent->actor->t.t.mat);
+            BrVector3Sub(&pos, &pos, &parent_pos);
+            BrVector3Accumulate(&object->parent->actor->t.t.translate.t, &pos);
+            object = object->field_0x230;
+        } while (object->field_0x230 != NULL);
+        WriteNewPositions(pObject);
+    }
 }
 
-// STUB: CARMA2_HW 0x004b9650
-// STUB: CARMA2_SW 0x004b5d70
-// STUB: CARMA2_CHEAT 0x004bf180
+#if defined(REC2_MATCHING) && defined(_MSC_VER)
+#pragma inline_depth(0)
+#endif
+
+// FUNCTION: CARMA2_HW 0x004b9650
+// FUNCTION: CARMA2_SW 0x004b5d70
+// FUNCTION: CARMA2_CHEAT 0x004bf180
 int C2_HOOK_FASTCALL CountJointForces(tPhysics_object* pObject, tPhysics_object* pParent) {
-    NOT_IMPLEMENTED();
+    tPhysics_joint* joint;
+    tPhysics_object* child;
+    int count;
+
+    joint = pObject->physics_joint1;
+    pObject->field_0x230 = pParent;
+    pObject->field_0x1e4 = 0;
+    if (joint != NULL && !(pObject->flags & 0x400)) {
+        switch (joint->type) {
+        case eJoint_none:
+            count = 0;
+            break;
+        case eJoint_universal:
+            count = 4;
+            break;
+        case eJoint_ball_n_socket:
+            count = 3;
+            break;
+        case eJoint_quick_hinge:
+            if (pParent->field_0x1e4 == 0) {
+                count = 2;
+                pObject->field_0x1e4 = -1;
+                pParent->field_0x1e4 = -1;
+                break;
+            }
+            joint->type = eJoint_hinge;
+            /* fall through */
+        case eJoint_hinge:
+            count = 5;
+            break;
+        default:
+            PhysicsError(8, "");
+        }
+    } else {
+        count = 0;
+    }
+    if (pObject->physics_joint2 != NULL) {
+        switch (pObject->physics_joint2->type) {
+        case eJoint_universal:
+            count += 4;
+            break;
+        case eJoint_ball_n_socket:
+            count += 3;
+            break;
+        case eJoint_translation:
+            count += 2;
+            break;
+        default:
+            break;
+        }
+    }
+    if (!(pObject->flags & 0x400)) {
+        pParent = pObject;
+    }
+    for (child = pObject->child; child != NULL; child = child->next) {
+        count += CountJointForces(child, pParent);
+    }
+    return count;
 }
+
+#if defined(REC2_MATCHING) && defined(_MSC_VER)
+#pragma inline_depth()
+#endif
 
 // FUNCTION: CARMA2_HW 0x004b7510
 // FUNCTION: CARMA2_SW 0x004b3c30

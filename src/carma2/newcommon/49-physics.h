@@ -166,7 +166,7 @@ extern void C2_HOOK_FASTCALL CapOmega(tPhysics_object* pObject);
 
 extern void C2_HOOK_FASTCALL PositionWorldJointedObject(tPhysics_object* pObject, br_scalar pDelta_time);
 
-// TranslateAndRotatePartialObject
+extern void C2_HOOK_FASTCALL TranslateAndRotatePartialObject(tPhysics_object* pObject, tPhysics_object** pRoot, br_scalar pDelta_time);
 
 extern void C2_HOOK_FASTCALL TranslateAndRotateJointedObject(tPhysics_object* pObject, br_scalar pDelta_time);
 
