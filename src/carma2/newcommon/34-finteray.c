@@ -296,9 +296,9 @@ void C2_HOOK_FASTCALL StationarySphereEdgeCollide(br_vector3* pEdge_start, br_ve
 
     BrVector3Sub(&tv, pSphere_end, pEdge_start);
     ratio = BrVector3Dot(&tv, pEdge_direction) / pEdge_length_squared;
-    if (ratio <= 0.f) {
+    if (ratio <= 0.0f) {
         BrVector3Copy(pPoint, pEdge_start);
-    } else if (ratio >= 1.f) {
+    } else if (ratio >= 1.0f) {
         BrVector3Copy(pPoint, pEdge_end);
     } else {
         BrVector3Scale(pPoint, pEdge_direction, ratio);
@@ -307,7 +307,7 @@ void C2_HOOK_FASTCALL StationarySphereEdgeCollide(br_vector3* pEdge_start, br_ve
     BrVector3Sub(pNormal, pPoint, pSphere_end);
     length_squared = BrVector3LengthSquared(pNormal);
     if (length_squared > pSphere->radius_squared
-            && length_squared < pSphere->radius_squared + (pSphere->radius * 0.002f) * 2.f) {
+            && length_squared < pSphere->radius_squared + (pSphere->radius * 0.002f) * 2.0f) {
         length = (br_scalar)sqrt(length_squared);
         *pT = 1.f;
         pNormal->v[0] /= length;
@@ -336,7 +336,7 @@ void C2_HOOK_FASTCALL PointSphereCollision(br_vector3* pVertex, br_vector3* pSph
         return;
     }
     time = projection - (br_scalar)sqrt((pSphere->radius_squared - distance_squared) / direction_squared);
-    if (time < 0.f || time > 1.f) {
+    if (time < 0.0f || time > 1.0f) {
         return;
     }
     BrVector3Copy(pPoint, pVertex);
