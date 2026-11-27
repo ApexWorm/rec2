@@ -116,7 +116,7 @@ br_pixelmap* gFlame_map[20] = { 0 };
 
 #if defined(REC2_SW)
 // GLOBAL: CARMA2_SW 0x006a26e8
-br_matrix4 gCameraToScreen = { { { 0.f } } };
+br_matrix4 gCameraToScreen = { { { 0.0f } } };
 #elif defined(REC2_MATCHING)
 // GLOBAL: CARMA2_HW 0x006a8688
 // GLOBAL: CARMA2_CHEAT 0x006b0200
