@@ -1339,7 +1339,12 @@ void C2_HOOK_FASTCALL PipeSingleSplitWeld(uintptr_t pId, const br_vector4* pPlan
         SIZE_OFFSET_PIPING(tPipe_chunk_split_weld, split), pSplit);
 }
 
-// PipeSingleShrapnelShower
+// STUB: CARMA2_HW 0x004c8870
+// STUB: CARMA2_SW 0x004c4fa0
+// STUB: CARMA2_CHEAT 0x004ce390
+void C2_HOOK_FASTCALL PipeSingleShrapnelShower(uintptr_t pId, undefined4 pArg2, undefined4 pArg3, undefined4 pArg4, br_vector3* pArg5, br_vector3* pArg6, float pArg7, br_vector3* pArg8, br_vector3* pArg9, undefined4 pArg10, br_bounds3* pArg11, undefined4 pArg12, br_matrix34* pArg13, br_vector3* pArg14, void* pArg15) {
+    NOT_IMPLEMENTED();
+}
 
 // FUNCTION: CARMA2_HW 0x004c8920
 // FUNCTION: CARMA2_SW 0x004c5050
