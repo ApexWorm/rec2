@@ -107,6 +107,7 @@ int gNum_active_non_cars;
 
 // GLOBAL: CARMA2_HW 0x006793d0
 // GLOBAL: CARMA2_SW 0x00673b40
+// GLOBAL: CARMA2_CHEAT 0x00680c80
 int gEliminate_faces;
 
 // GLOBAL: CARMA2_HW 0x00679364
@@ -1286,6 +1287,7 @@ void C2_HOOK_FASTCALL FindFace(br_vector3* pPosition, br_vector3* pDir, br_vecto
 
 // FUNCTION: CARMA2_HW 0x0041e480
 // FUNCTION: CARMA2_SW 0x0041e4b0
+// FUNCTION: CARMA2_CHEAT 0x0041e6e0
 int C2_HOOK_FASTCALL FindFloorInBoxBU(br_vector3* pPosition, br_vector3* pDirection, br_vector3* pNormal, br_scalar* pDistance, tPhysics_object* pObject) {
     br_vector3 nor2;
     br_vector3 collision_position;
