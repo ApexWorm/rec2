@@ -1325,8 +1325,8 @@ void C2_HOOK_FASTCALL LoadInOppoPaths(FILE* pF) {
                     &gProgram_state.AI_vehicles.path_nodes[(tS16)gProgram_state.AI_vehicles.path_sections[section_no].node_indices[1]].pos,
                     &gProgram_state.AI_vehicles.path_nodes[(tS16)gProgram_state.AI_vehicles.path_sections[section_no].node_indices[0]].pos);
                 gProgram_state.AI_vehicles.path_sections[section_no].length = BrVector3Length(&section_v);
-                if (scalars[7] >= 1000.f) {
-                    gProgram_state.AI_vehicles.path_sections[section_no].type = (tU8)(scalars[7] - 1000.f);
+                if (scalars[7] >= 1000.0f) {
+                    gProgram_state.AI_vehicles.path_sections[section_no].type = (tU8)(scalars[7] - 1000.0f);
                     gProgram_state.AI_vehicles.path_sections[section_no].one_way = 1;
                 } else {
                     gProgram_state.AI_vehicles.path_sections[section_no].type = (tU8)scalars[7];
@@ -1350,7 +1350,7 @@ void C2_HOOK_FASTCALL LoadInOppoPaths(FILE* pF) {
                 BrVector3Sub(&section_v,
                     &gProgram_state.AI_vehicles.path_nodes[(tS16)gProgram_state.AI_vehicles.path_sections[section_no].node_indices[1]].pos,
                     &gProgram_state.AI_vehicles.path_nodes[(tS16)gProgram_state.AI_vehicles.path_sections[section_no].node_indices[0]].pos);
-                if (BrVector3LengthSquared(&section_v) == 0.f) {
+                if (BrVector3LengthSquared(&section_v) == 0.0f) {
                     DoNotDprintf("ERROR: Opponent path section #%d has zero length (nodes #%d and #%d are in same position). Section and one node will be deleted.",
                         section_no,
                         (tS16)gProgram_state.AI_vehicles.path_sections[section_no].node_indices[0],
@@ -1392,14 +1392,14 @@ void C2_HOOK_FASTCALL LoadInOppoPaths(FILE* pF) {
                     PossibleService();
                     GetNScalars(pF, 6, scalars);
                     BrVector3Set(&gProgram_state.AI_vehicles.cop_start_points[i], scalars[0], scalars[1], scalars[2]);
-                    if (scalars[3] == 9.f && scalars[4] == 9.f && scalars[5] == 9.f) {
+                    if (scalars[3] == 9.0f && scalars[4] == 9.0f && scalars[5] == 9.0f) {
                         gBIG_APC_index = i;
                     }
                     FindNearestGeneralSection(NULL, &gProgram_state.AI_vehicles.cop_start_points[i], &section_v, &intersect, &distance);
-                    BrVector3Set(&positive_y_vector, 0.f, 1.f, 0.f);
+                    BrVector3Set(&positive_y_vector, 0.0f, 1.0f, 0.0f);
                     BrVector3Cross(&gProgram_state.AI_vehicles.cop_start_vectors[i], &positive_y_vector, &section_v);
                     BrVector3Sub(&cop_to_section, &intersect, &gProgram_state.AI_vehicles.cop_start_points[i]);
-                    if (BrVector3Dot(&gProgram_state.AI_vehicles.cop_start_vectors[i], &cop_to_section) < 0.f) {
+                    if (BrVector3Dot(&gProgram_state.AI_vehicles.cop_start_vectors[i], &cop_to_section) < 0.0f) {
                         BrVector3Negate(&gProgram_state.AI_vehicles.cop_start_vectors[i], &gProgram_state.AI_vehicles.cop_start_vectors[i]);
                     }
                 }
