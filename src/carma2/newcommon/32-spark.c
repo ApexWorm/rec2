@@ -832,8 +832,8 @@ void C2_HOOK_FASTCALL InitSmokeStuff(void) {
     BrVector3Set(&gBlend_model2->vertices[1].p, -1.0f, 0.0f, 0.0f);
     BrVector3Set(&gBlend_model2->vertices[2].p,  1.0f, 0.0f, 0.0f);
     BrVector3Set(&gBlend_model2->vertices[3].p,  1.0f, 1.0f, 0.0f);
-    BrVector3Set(&gBlend_model2->vertices[4].p, -1.00f, -0.25f, 0.0f);
-    BrVector3Set(&gBlend_model2->vertices[5].p,  1.00f, -0.25f, 0.0f);
+    BrVector3Set(&gBlend_model2->vertices[4].p, -1.0f, -0.25f, 0.0f);
+    BrVector3Set(&gBlend_model2->vertices[5].p,  1.0f, -0.25f, 0.0f);
     gBlend_model->flags |= BR_MODF_KEEP_ORIGINAL;
     gBlend_model2->flags |= BR_MODF_KEEP_ORIGINAL;
 
@@ -852,17 +852,17 @@ void C2_HOOK_FASTCALL InitSmokeStuff(void) {
         BrMaterialAdd(gBR_smoke_structs[i].material);
     }
 
-    BrVector2Set(&gBlend_model->vertices[0].map, 0.f, 1.f - 1.f / (float)smoke_pm->height);
-    BrVector2Set(&gBlend_model->vertices[1].map, 0.f, 0.f);
-    BrVector2Set(&gBlend_model->vertices[2].map, 1.f - 1.f / (float)smoke_pm->width, 0.f);
-    BrVector2Set(&gBlend_model->vertices[3].map, 1.f - 1.f / (float)smoke_pm->width, 1.f - 1.f / (float)smoke_pm->height);
+    BrVector2Set(&gBlend_model->vertices[0].map, 0.0f, 1.0f - 1.0f / (float)smoke_pm->height);
+    BrVector2Set(&gBlend_model->vertices[1].map, 0.0f, 0.0f);
+    BrVector2Set(&gBlend_model->vertices[2].map, 1.0f - 1.0f / (float)smoke_pm->width, 0.0f);
+    BrVector2Set(&gBlend_model->vertices[3].map, 1.0f - 1.0f / (float)smoke_pm->width, 1.0f - 1.0f / (float)smoke_pm->height);
 
-    BrVector2Set(&gBlend_model2->vertices[0].map, 0.f, 1.f - 1.f / (float)smoke_pm->height);
-    BrVector2Set(&gBlend_model2->vertices[1].map, 0.f, 0.5f);
-    BrVector2Set(&gBlend_model2->vertices[2].map, 1.f - 1.f / (float)smoke_pm->width, .5f);
-    BrVector2Set(&gBlend_model2->vertices[3].map, 1.f - 1.f / (float)smoke_pm->width, 1.f - 1.f / (float)smoke_pm->height);
-    BrVector2Set(&gBlend_model2->vertices[4].map, 0.f, 0.f);
-    BrVector2Set(&gBlend_model2->vertices[5].map, 1.f - 1.f / (float)smoke_pm->width, 0.f);
+    BrVector2Set(&gBlend_model2->vertices[0].map, 0.0f, 1.0f - 1.0f / (float)smoke_pm->height);
+    BrVector2Set(&gBlend_model2->vertices[1].map, 0.0f, 0.5f);
+    BrVector2Set(&gBlend_model2->vertices[2].map, 1.0f - 1.0f / (float)smoke_pm->width, 0.5f);
+    BrVector2Set(&gBlend_model2->vertices[3].map, 1.0f - 1.0f / (float)smoke_pm->width, 1.0f - 1.0f / (float)smoke_pm->height);
+    BrVector2Set(&gBlend_model2->vertices[4].map, 0.0f, 0.0f);
+    BrVector2Set(&gBlend_model2->vertices[5].map, 1.0f - 1.0f / (float)smoke_pm->width, 0.0f);
 
     BrModelAdd(gBlend_model);
     BrModelAdd(gBlend_model2);
