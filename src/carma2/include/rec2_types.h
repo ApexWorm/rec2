@@ -151,6 +151,19 @@ typedef enum {
 } tEdit_mode;
 
 typedef enum {
+    eRotate_mode_x = 0,
+    eRotate_mode_y = 1,
+    eRotate_mode_z = 2,
+} tRotate_mode;
+
+typedef enum {
+    eScale_mode_all = 0,
+    eScale_mode_x = 1,
+    eScale_mode_y = 2,
+    eScale_mode_z = 3,
+} tScale_mode;
+
+typedef enum {
     eFPR_OK = 0,
     eFPR_end_of_path = 1,
     eFPR_given_up = 2,
