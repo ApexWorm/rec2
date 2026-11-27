@@ -33,6 +33,8 @@ extern int C2_HOOK_FASTCALL InitForceFeedback(void);
 
 extern void C2_HOOK_FASTCALL ResetDInputJoystickFFB(int pIndex);
 
+extern void C2_HOOK_FASTCALL ShowCurrentJoystickName(void);
+
 extern void C2_HOOK_FASTCALL RegisterJoystickFFBForces(void);
 
 extern void C2_HOOK_FASTCALL Win32InitInputDevice(void);
