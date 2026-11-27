@@ -29,6 +29,7 @@ extern int gCapacity_track_smashable_environment_specs;
 extern int gINT_006a8288;
 extern tStored_smash* gNet_host_smashes;
 extern tQueued_net_smash gQueued_net_smashes[50];
+extern int gINT_006a8290;
 extern int gINT_006a8294;
 extern tPowerup_queue_item gPowerup_queue[50];
 extern int gSize_powerup_queue;
@@ -300,9 +301,9 @@ extern int C2_HOOK_FASTCALL InsertQuad(tSmash_quad_mapping* pMapping, br_actor* 
 
 extern int C2_HOOK_FASTCALL FindFaceWithPoint(tFace_ref* pFace, br_vector3* pPoint, tFace_ref* pNew_face, int pInclude_same_face);
 
-// ProcessTexture
+extern float C2_HOOK_FASTCALL ProcessTexture(tPhysics_object* pObject, br_material* pMaterial, br_actor* pActor, tSmashable_item_spec* pSpec, tSmashable_item_spec* pSpec2, tFace_ref* pFace, float pMagnitude, br_vector3* pPosition, br_vector3* pNormal, br_vector3* pForce, int pArg11, int pArg12, int* pSmashed, int pNetwork);
 
-// ProcessMesh
+extern void C2_HOOK_FASTCALL ProcessMesh(tPhysics_object* pObject, br_material* pMaterial, br_actor* pActor, tSmashable_item_spec* pSpec, int* pSmashed);
 
 // ProcessModel
 
@@ -316,7 +317,7 @@ extern void C2_HOOK_FASTCALL SendNetSmash(tPhysics_object* pObject, tFace_ref* p
 
 extern void C2_HOOK_FASTCALL SendAllSmashes(tNet_game_player_info* pPlayer);
 
-extern void C2_HOOK_FASTCALL HitPowerup(tPhysics_object* pObject, int pIndex, int pArg3);
+extern void C2_HOOK_FASTCALL HitPowerup(tPhysics_object* pObject, int pIndex, br_actor* pActor);
 
 extern float C2_HOOK_FASTCALL SmashEnvironment(tPhysics_object* pObject, tFace_ref* pFace, float pMagnitude, br_vector3* pPosition, br_vector3* pNormal, br_vector3* pForce, int pSnap, int pNetwork);
 
