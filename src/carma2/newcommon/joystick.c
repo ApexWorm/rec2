@@ -28,10 +28,12 @@ int gJoystick_index = -1;
 
 // GLOBAL: CARMA2_HW 0x00595f90
 // GLOBAL: CARMA2_SW 0x00590ef0
+// GLOBAL: CARMA2_CHEAT 0x0059c810
 float gJoystick_x_steering = 1.f;
 
 // GLOBAL: CARMA2_HW 0x00595f94
 // GLOBAL: CARMA2_SW 0x00590ef4
+// GLOBAL: CARMA2_CHEAT 0x0059c814
 float gJoystick_y_throttle = 1.f;
 
 // GLOBAL: CARMA2_HW 0x00596310
@@ -423,6 +425,21 @@ void C2_HOOK_FASTCALL RestoreJoystickPreferences(void) {
         if (info != NULL) {
             *info = gJoystick_preferences_backup;
         }
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x0045c420
+// FUNCTION: CARMA2_SW 0x0045be60
+// FUNCTION: CARMA2_CHEAT 0x0045c8a0
+void C2_HOOK_FASTCALL FUN_0045c420(void) {
+    tButtonJoystickInfo* info;
+
+    PDCycleJoystick();
+    info = PDGetCurrentJoystickData();
+    if (info != NULL) {
+        gJoystick_x_steering = info->field_0xd8;
+        gJoystick_y_throttle = info->field_0xdc;
+        gINT_00595f9c = info->field_0xd4;
     }
 }
 

@@ -565,6 +565,21 @@ int C2_HOOK_FASTCALL PDIsJoystickDPadEnabled(void) {
     return info != NULL && info->field_0xe0 != 0;
 }
 
+void C2_HOOK_FASTCALL PDCycleJoystick(void) {
+    int i;
+
+    if (gJoystick_index == -1) {
+        return;
+    }
+    for (i = 1; i <= (int)SDL_arraysize(g_Joystick_infos); i++) {
+        int index = (gJoystick_index + i) % (int)SDL_arraysize(g_Joystick_infos);
+        if (PDIsJoystickAvailable(index)) {
+            gJoystick_index = index;
+            return;
+        }
+    }
+}
+
 tButtonJoystickInfo* C2_HOOK_FASTCALL PDGetCurrentJoystickData(void) {
     if (!PDIsJoystickAvailable(gJoystick_index)) {
         return NULL;

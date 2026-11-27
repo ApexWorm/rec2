@@ -501,6 +501,16 @@ void C2_HOOK_FASTCALL HideSpecialVolumes(void) {
     }
 }
 
+// FUNCTION: CARMA2_HW 0x00511270
+// FUNCTION: CARMA2_SW 0x0050c6c0
+// FUNCTION: CARMA2_CHEAT 0x00516c60
+void C2_HOOK_FASTCALL CycleJoystick(void) {
+
+    SaveJoystickPreferences();
+    FUN_0045c420();
+    LoadJoystickPreferences();
+}
+
 // FUNCTION: CARMA2_HW 0x00511280
 // FUNCTION: CARMA2_SW 0x0050c6d0
 // FUNCTION: CARMA2_CHEAT 0x00516c70

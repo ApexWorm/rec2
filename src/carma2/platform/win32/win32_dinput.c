@@ -14,6 +14,7 @@
 #include "52-errors.h"
 #include "globvars.h"
 #include "02-init.h"
+#include "15-displays.h"
 #include "42-input.h"
 #include "joystick.h"
 #include "41-utility.h"
@@ -307,6 +308,28 @@ tDirectInputJoystickInfo* C2_HOOK_FASTCALL JoystickDInputGetInfo(int pJoystickIn
         }
     }
     return info;
+}
+
+// FUNCTION: CARMA2_HW 0x00459a70
+// FUNCTION: CARMA2_SW 0x00459800
+// FUNCTION: CARMA2_CHEAT 0x00459ef0
+void C2_HOOK_FASTCALL PDCycleJoystick(void) {
+    char s[256];
+
+    if (gJoystick_index != -1 && gDirectInputJoystickDevices[gJoystick_index] != NULL) {
+        if (gJoystickFFB & (1 << gJoystick_index)) {
+            ResetDInputJoystickFFB(gJoystick_index);
+        }
+        gJoystick_index++;
+        if (gJoystick_index > gCountEnumeratedJoystickDinputDevices - 1 || gJoystick_index > 15) {
+            gJoystick_index = 0;
+        }
+        JoystickDInputGetInfo(gJoystick_index, NULL, NULL);
+        if (gJoystick_index != -1 && gDirectInputJoystickDevices[gJoystick_index] != NULL) {
+            sprintf(s, "Joystick %d: %s %d", gJoystick_index, gDirectInputJoystickInfos[gJoystick_index].productName, (gJoystickFFB & (1 << gJoystick_index)) != 0);
+            NewTextHeadupSlot(4, 0, 3000, -1, s);
+        }
+    }
 }
 
 // FUNCTION: CARMA2_HW 0x00459c70

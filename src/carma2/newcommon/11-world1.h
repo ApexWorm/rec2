@@ -61,6 +61,8 @@ extern void C2_HOOK_FASTCALL ShowSpecialVolumes(void);
 
 extern void C2_HOOK_FASTCALL HideSpecialVolumes(void);
 
+extern void C2_HOOK_FASTCALL CycleJoystick(void);
+
 extern void C2_HOOK_FASTCALL ToggleJoystickYAxis(void);
 
 extern void C2_HOOK_FASTCALL ToggleJoystickEnable(void);
