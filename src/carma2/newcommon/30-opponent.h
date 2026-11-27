@@ -48,6 +48,11 @@ extern float gDefinite_no_cop_pursuit_speed;
 extern int gFirst_frame;
 extern float gCop_pursuit_speed_percentage_multiplier;
 extern float gHead_on_cos_value;
+#ifdef REC2_CHEAT
+extern int gProcessing_opponents;
+extern tU32 gNext_elastication;
+extern tU32 gNext_write_during_elastication;
+#endif
 
 extern void C2_HOOK_CDECL DoNotDprintf(const char* pMessage, ...);
 
@@ -105,13 +110,13 @@ extern void C2_HOOK_FASTCALL UnStunTheBugger(tOpponent_spec* pOpponent);
 
 extern void C2_HOOK_FASTCALL StartRecordingTrail(tCar_spec* pPursuee);
 
-// RecordNextTrailNode
+extern void C2_HOOK_FASTCALL RecordNextTrailNode(tCar_spec* pPursuee);
 
-// FindNearestTrailSection
+extern tS16 C2_HOOK_FASTCALL FindNearestTrailSection(tOpponent_spec* pOpponent_spec, tCar_spec* pPursuee, br_vector3* pSection_v, br_vector3* pIntersect, br_scalar* pDistance);
 
 // CalcNextTrailSection
 
-// ProcessPursueAndTwat
+extern void C2_HOOK_FASTCALL ProcessPursueAndTwat(tOpponent_spec* pOpponent_spec, tProcess_objective_command pCommand);
 
 // ProcessRunAway
 
@@ -175,7 +180,7 @@ extern int C2_HOOK_FASTCALL RematerialiseOpponentOnNearestSection(tOpponent_spec
 
 extern int C2_HOOK_FASTCALL RematerialiseOpponent(tOpponent_spec* pOpponent_spec, br_scalar pSpeed);
 
-// CalcPlayerConspicuousness
+extern void C2_HOOK_FASTCALL CalcPlayerConspicuousness(tOpponent_spec* pOpponent_spec);
 
 // CalcOpponentConspicuousnessWithAViewToCheatingLikeFuck
 
@@ -190,11 +195,15 @@ extern void C2_HOOK_FASTCALL DeleteSection(tS16 pSection_to_delete);
 
 extern void C2_HOOK_FASTCALL DeleteNode(tS16 pNode_to_delete, int pAnd_sections);
 
+extern void C2_HOOK_FASTCALL RebuildOppoPathModel(void);
+
 extern void C2_HOOK_FASTCALL DeleteOrphanNodes(void);
 
 extern int C2_HOOK_FASTCALL ConsistencyCheck(void);
 
 extern void C2_HOOK_FASTCALL WriteOutOppoPaths(void);
+
+extern void C2_HOOK_FASTCALL TrackElasticateyPath(void);
 #endif
 
 extern void C2_HOOK_FASTCALL LoadCopCars(tRace_info* pRace_info);
@@ -241,7 +250,7 @@ extern int C2_HOOK_FASTCALL GetOpponentsSectionMaxSpeed(tOpponent_spec* pOpponen
 
 extern void C2_HOOK_FASTCALL InitOpponentPsyche(int pOpponent_index);
 
-// ClearTwattageOccurrenceVariables
+extern void C2_HOOK_FASTCALL ClearTwattageOccurrenceVariables(tOpponent_spec* pOpponent_spec);
 
 extern void C2_HOOK_FASTCALL TwoCarsHitEachOther(tCar_spec* pA_car, tCar_spec* pAnother_car);
 
