@@ -23,6 +23,7 @@
 tTwatVfsMountPoint gTwatVfsMountPoints[5];
 
 // GLOBAL: CARMA2_HW 0x00692070
+// GLOBAL: CARMA2_SW 0x0068c0c8
 // GLOBAL: CARMA2_CHEAT 0x00699a58
 tTwatVfsFile gTwatVfsFiles[51];
 
@@ -375,7 +376,7 @@ void C2_HOOK_FASTCALL PFrewind(FILE* pF) {
         rewind(pF);
     } else {
         twtFile = &gTwatVfsFiles[(uintptr_t)pF];
-        twtFile->pos = twtFile->start;
+        twtFile->pos = gTwatVfsFiles[(uintptr_t)pF].start;
         twtFile->error = 0;
     }
 }

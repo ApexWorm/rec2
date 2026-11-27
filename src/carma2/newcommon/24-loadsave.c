@@ -8,8 +8,15 @@
 
 #include "24-loadsave.h"
 
+#include "08-loading1.h"
+#include "41-utility.h"
+#include "46-win95sys.h"
+#include "69-sound.h"
+#include "70-packfile.h"
 #include "globvars.h"
+#include "globvrpb.h"
 #include "platform.h"
+
 #include "rec2_macros.h"
 #include "rec2_types.h"
 
@@ -35,7 +42,10 @@ tSave_game* gSaved_games;
 // GLOBAL: CARMA2_CHEAT 0x00693fc8
 int gCount_saved_games;
 
-// Encryptificate
+void C2_HOOK_FASTCALL Encryptificate(tSave_game* pSave_games, int pCount) {
+
+    SplungeSomeData(pSave_games, pCount * sizeof(*pSave_games));
+}
 
 // FUNCTION: CARMA2_HW 0x004919a0
 // FUNCTION: CARMA2_SW 0x0048ec10
@@ -68,18 +78,62 @@ void C2_HOOK_FASTCALL MakeSavedGame(tSave_game* pSave_game) {
     }
 }
 
-// STUB: CARMA2_HW 0x00491ac0
-// STUB: CARMA2_SW 0x0048ed30
-// STUB: CARMA2_CHEAT 0x00491b70
+// FUNCTION: CARMA2_HW 0x00491ac0
+// FUNCTION: CARMA2_SW 0x0048ed30
+// FUNCTION: CARMA2_CHEAT 0x00491b70
 void C2_HOOK_FASTCALL DoSaveGame(void) {
-    NOT_IMPLEMENTED();
+    char the_path[256];
+    tSave_game saved_game;
+    FILE* f;
+    int i;
+
+    if (gNet_mode == eNet_mode_none) {
+        PathCat(the_path, gApplication_path, "SAVEDGAMES.ARS");
+        PDFileUnlock(the_path);
+        f = DRfopen(the_path, "ab+");
+        if (f != NULL) {
+            PFfseek(f, 0, SEEK_END);
+            for (i = 0; i < (int)REC2_ASIZE(gCurrent_APO_levels); i++) {
+                gCurrent_APO_levels[i] = gProgram_state.current_car.power_up_levels[i];
+                gCurrent_APO_potential_levels[i] = gProgram_state.current_car.power_up_slots[i];
+            }
+            MakeSavedGame(&saved_game);
+            Encryptificate(&saved_game, 1);
+            PFfwrite(&saved_game, 1, sizeof(tSave_game), f);
+            PFfclose(f);
+            gSave_game_out_of_sync = 0;
+        }
+    }
 }
 
-// STUB: CARMA2_HW 0x00491bb0
-// STUB: CARMA2_SW 0x0048ee20
-// STUB: CARMA2_CHEAT 0x00491c60
+// FUNCTION: CARMA2_HW 0x00491bb0
+// FUNCTION: CARMA2_SW 0x0048ee20
+// FUNCTION: CARMA2_CHEAT 0x00491c60
 int C2_HOOK_FASTCALL StartSavedGamesList(void) {
-    NOT_IMPLEMENTED();
+    tPath_name the_path;
+    FILE* f;
+    int size;
+
+    C2_HOOK_BUG_ON(sizeof(tSave_game) != 0x328);
+
+    if (gSaved_games != NULL) {
+        PDFatalError("Saved games list already started");
+    }
+    PathCat(the_path, gApplication_path, "SAVEDGAMES.ARS");
+    f = DRfopen(the_path, "rb");
+    if (f != NULL) {
+        PFfseek(f, 0, SEEK_END);
+        size = PFftell(f);
+        PFrewind(f);
+        gCount_saved_games = size / sizeof(tSave_game);
+        gSaved_games = BrMemAllocate(size, kMem_misc);
+        PFfread(gSaved_games, 1, size, f);
+        Encryptificate(gSaved_games, gCount_saved_games);
+        PFfclose(f);
+        return gCount_saved_games;
+    } else {
+        return 0;
+    }
 }
 
 // FUNCTION: CARMA2_HW 0x00491c90
