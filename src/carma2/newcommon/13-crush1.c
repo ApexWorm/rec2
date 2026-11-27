@@ -153,6 +153,11 @@ int gCount_net_crush_detach_list;
 // GLOBAL: CARMA2_CHEAT 0x006830e8
 int gCount_net_crush_semi_detach_bit_list;
 
+// GLOBAL: CARMA2_HW 0x0067b83c
+// GLOBAL: CARMA2_SW 0x00675fac
+// GLOBAL: CARMA2_CHEAT 0x006830ec
+tU16 gBend_counter; /* FIXME: unknown name and purpose, BendActor resets it before bending the models */
+
 // GLOBAL: CARMA2_HW 0x0067bd60
 // GLOBAL: CARMA2_SW 0x006764d0
 // GLOBAL: CARMA2_CHEAT 0x00683610
@@ -2034,7 +2039,16 @@ intptr_t C2_HOOK_CDECL MakeCarModelsMaterialsDoubleSided(br_actor* pActor, void*
 
 // SwapCarShapes
 
-// IsAWheelOrPivotActor
+inline int C2_HOOK_FASTCALL IsAWheelOrPivotActor(br_actor* pActor, tCar_spec* pCar) {
+    int i;
+
+    for (i = 0; i < (int)REC2_ASIZE(pCar->wheel_actors); i++) {
+        if (pActor == pCar->pivot_actors[i] || pActor == pCar->wheel_actors[i]) {
+            return 1;
+        }
+    }
+    return 0;
+}
 
 // FUNCTION: CARMA2_HW 0x0042deb0
 // FUNCTION: CARMA2_SW 0x0042df20
@@ -2092,11 +2106,45 @@ intptr_t C2_HOOK_CDECL MakeCarModelsMaterialsSingleSided(br_actor* pActor, void*
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x00434f60
-// STUB: CARMA2_SW 0x00434f90
-// STUB: CARMA2_CHEAT 0x00435150
+// FUNCTION: CARMA2_HW 0x00434f60
+// FUNCTION: CARMA2_SW 0x00434f90
+// FUNCTION: CARMA2_CHEAT 0x00435150
 void C2_HOOK_FASTCALL BendPoint(br_vector3* pPoint, const tBend_point_context* pContext) {
-    NOT_IMPLEMENTED();
+    br_vector3 tv;
+    br_scalar x;
+    br_scalar y;
+    br_scalar z;
+    br_scalar xy;
+    br_scalar sx;
+    br_scalar sy;
+    br_scalar sz;
+    int flag;
+
+    flag = pContext->field_0x34->field_0x74;
+    z = pPoint->v[2] - pContext->field_0x34->field_0x20;
+    if ((flag && z <= 0.f) || (!flag && z >= 0.f)) {
+        BrMatrix34ApplyP(&tv, pPoint, &pContext->field_0x4);
+        BrVector3Copy(pPoint, &tv);
+        return;
+    }
+    BrVector3Sub(&tv, pPoint, &pContext->field_0x34->field_0x24);
+    if ((flag && tv.v[2] <= 0.f) || (!flag && tv.v[2] >= 0.f)) {
+        sx = pContext->field_0x34->field_0x30.v[0];
+        sy = pContext->field_0x34->field_0x30.v[1];
+        sz = pContext->field_0x34->field_0x30.v[2];
+        x = tv.v[0] / sx;
+        y = tv.v[1] / sy;
+        z = tv.v[2] / sz;
+        xy = y * x;
+        tv.v[0] = pContext->field_0x34->field_0x44.v[0] * xy + pContext->field_0x34->field_0x50.v[0] * x + pContext->field_0x34->field_0x5c.v[0] * y;
+        tv.v[1] = pContext->field_0x34->field_0x44.v[1] * xy + pContext->field_0x34->field_0x50.v[1] * x + pContext->field_0x34->field_0x5c.v[1] * y;
+        tv.v[2] = pContext->field_0x34->field_0x44.v[2] * xy + pContext->field_0x34->field_0x50.v[2] * x + pContext->field_0x34->field_0x5c.v[2] * y;
+        BrVector3Accumulate(&tv, &pContext->field_0x34->field_0x68);
+        tv.v[0] = z * tv.v[0];
+        tv.v[1] = z * tv.v[1];
+        tv.v[2] = z * tv.v[2];
+        BrVector3Accumulate(pPoint, &tv);
+    }
 }
 
 #ifdef REC2_MATCHING
@@ -2109,15 +2157,114 @@ void C2_HOOK_FASTCALL BendPoint(br_vector3* pPoint, const tBend_point_context* p
 
 // BendCollisionShapes
 
-// BendModel
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
 
-// BendModels
+// STUB: CARMA2_HW 0x00435960
+// STUB: CARMA2_SW 0x00435990
+// STUB: CARMA2_CHEAT 0x00435b50
+void C2_HOOK_FASTCALL BendModel(br_model* pModel, br_vector3* pTranslation, tBend_point_context* pContext, br_actor* pActor) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
+
+// FUNCTION: CARMA2_HW 0x004358a0
+// FUNCTION: CARMA2_SW 0x004358d0
+// FUNCTION: CARMA2_CHEAT 0x00435a90
+intptr_t C2_HOOK_FASTCALL BendModels(br_actor* pActor, br_vector3* pTranslation, void* pContext) {
+    tBend_point_context* context;
+    tUser_crush_data* user_crush;
+    int i;
+
+    context = pContext;
+    user_crush = pActor->user;
+    if (user_crush == NULL) {
+        return 0;
+    }
+    if (IsAWheelOrPivotActor(pActor, context->car)) {
+        return 0;
+    }
+    if (user_crush->groove != NULL) {
+        PipeSingleGrooveOnOff(0, pActor, 3);
+        DisableGroovidelic(pActor, 3);
+        PipeSingleTransformType(pActor, BR_TRANSFORM_TRANSLATION);
+        pActor->t.type = BR_TRANSFORM_TRANSLATION;
+    }
+    if (user_crush->crush_data != NULL) {
+        for (i = 0; i < context->car->count_detail_levels; i++) {
+            BendModel(user_crush->models[i], pTranslation, context, pActor);
+        }
+        user_crush->crush_data->field_0x2c = 1;
+    }
+    return 0;
+}
 
 // BrAngleToSignedDegree
 
 // BendWheels
 
-// BendActor
+// FUNCTION: CARMA2_HW 0x00435550
+// FUNCTION: CARMA2_SW 0x00435580
+// FUNCTION: CARMA2_CHEAT 0x00435740
+void C2_HOOK_FASTCALL BendActor(tCar_spec* pCar, br_actor* pActor, br_angle pAngle_x, br_angle pAngle_y, br_angle pAngle_z, const br_vector3* pPivot, br_scalar pZ, tBend_point_spec* pSpec) {
+    tBend_point_context context;
+    br_vector3 tv;
+    int flag;
+
+    context.field_0x34 = pSpec;
+    BrMatrix34Translate(&context.field_0x4, -pPivot->v[0], -pPivot->v[1], -pPivot->v[2]);
+    if (pAngle_y != 0) {
+        BrMatrix34PostRotateY(&context.field_0x4, pAngle_y);
+    }
+    if (pAngle_x != 0) {
+        BrMatrix34PostRotateX(&context.field_0x4, pAngle_x);
+    }
+    if (pAngle_z != 0) {
+        BrMatrix34PostRotateZ(&context.field_0x4, pAngle_z);
+    }
+    BrMatrix34PostTranslate(&context.field_0x4, pPivot->v[0], pPivot->v[1], pPivot->v[2]);
+    BrActorToBounds(&pSpec->bounds, pActor);
+    BrVector3Set(&pSpec->field_0x44, pSpec->bounds.max.v[0], pSpec->bounds.max.v[1], pPivot->v[2]);
+    BrVector3Set(&pSpec->field_0x50, pSpec->bounds.max.v[0], pSpec->bounds.min.v[1], pPivot->v[2]);
+    BrVector3Set(&pSpec->field_0x5c, pSpec->bounds.min.v[0], pSpec->bounds.max.v[1], pPivot->v[2]);
+    BrVector3Set(&pSpec->field_0x68, pSpec->bounds.min.v[0], pSpec->bounds.min.v[1], pPivot->v[2]);
+    BrVector3Set(&pSpec->field_0x24, pSpec->bounds.min.v[0], pSpec->bounds.min.v[1], pZ);
+    BrVector3Sub(&pSpec->field_0x30, &pSpec->field_0x44, &pSpec->field_0x24);
+    BrMatrix34ApplyP(&tv, &pSpec->field_0x44, &context.field_0x4);
+    BrVector3Sub(&pSpec->field_0x44, &tv, &pSpec->field_0x44);
+    BrMatrix34ApplyP(&tv, &pSpec->field_0x50, &context.field_0x4);
+    BrVector3Sub(&pSpec->field_0x50, &tv, &pSpec->field_0x50);
+    BrMatrix34ApplyP(&tv, &pSpec->field_0x5c, &context.field_0x4);
+    BrVector3Sub(&pSpec->field_0x5c, &tv, &pSpec->field_0x5c);
+    BrMatrix34ApplyP(&tv, &pSpec->field_0x68, &context.field_0x4);
+    BrVector3Sub(&pSpec->field_0x68, &tv, &pSpec->field_0x68);
+    BrVector3Sub(&pSpec->field_0x44, &pSpec->field_0x44, &pSpec->field_0x50);
+    BrVector3Sub(&pSpec->field_0x44, &pSpec->field_0x44, &pSpec->field_0x5c);
+    BrVector3Accumulate(&pSpec->field_0x44, &pSpec->field_0x68);
+    BrVector3Sub(&pSpec->field_0x50, &pSpec->field_0x50, &pSpec->field_0x68);
+    BrVector3Sub(&pSpec->field_0x5c, &pSpec->field_0x5c, &pSpec->field_0x68);
+    if (pPivot->v[2] < pZ) {
+        flag = 1;
+    } else {
+        flag = 0;
+    }
+    pSpec->field_0x74 = flag;
+    pSpec->field_0x18 = pPivot->v[0];
+    pSpec->field_0x1c = pPivot->v[1];
+    pSpec->field_0x20 = pPivot->v[2];
+    context.car = pCar;
+    gBend_counter = 0;
+    ARStartPipingSession(ePipe_chunk_model_mash);
+    DRActorEnumRecurseWithTranslation(pActor, NULL, BendModels, &context);
+    AREndPipingSession();
+    pSpec->field_0x3c[0] = pAngle_x;
+    pSpec->field_0x3c[1] = pAngle_y;
+    pSpec->field_0x3c[2] = pAngle_z;
+}
 
 // BendOtherThings
 

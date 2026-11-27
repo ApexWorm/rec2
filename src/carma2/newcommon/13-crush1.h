@@ -34,6 +34,7 @@ extern int gINT_0067bdfc;
 extern tU8 gCrush_data_entry_counter;
 extern int gCount_net_crush_detach_list;
 extern int gCount_net_crush_semi_detach_bit_list;
+extern tU16 gBend_counter;
 extern int gCount_net_crush_full_detach_bit_list;
 extern int gCount_car_damage_crush_list;
 extern tToggled_door gToggled_doors[16];
@@ -310,7 +311,7 @@ extern intptr_t C2_HOOK_CDECL MakeCarModelsMaterialsDoubleSided(br_actor* pActor
 
 // SwapCarShapes
 
-// IsAWheelOrPivotActor
+extern int C2_HOOK_FASTCALL IsAWheelOrPivotActor(br_actor* pActor, tCar_spec* pCar);
 
 extern intptr_t C2_HOOK_CDECL MakeCarModelsMaterialsSingleSided(br_actor* pActor, void* pArg);
 
@@ -358,13 +359,13 @@ extern void C2_HOOK_FASTCALL BendPoint(br_vector3* pPoint, const tBend_point_con
 
 // BendModel
 
-// BendModels
+extern intptr_t C2_HOOK_FASTCALL BendModels(br_actor* pActor, br_vector3* pTranslation, void* pContext);
 
 // BrAngleToSignedDegree
 
 // BendWheels
 
-// BendActor
+extern void C2_HOOK_FASTCALL BendActor(tCar_spec* pCar, br_actor* pActor, br_angle pAngle_x, br_angle pAngle_y, br_angle pAngle_z, const br_vector3* pPivot, br_scalar pZ, tBend_point_spec* pSpec);
 
 // BendOtherThings
 

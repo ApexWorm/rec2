@@ -4285,6 +4285,28 @@ typedef struct tCar_bit_spec {
     tU32 field_0x10;
 } tCar_bit_spec;
 
+typedef struct {
+    br_bounds3 bounds;
+    float field_0x18;
+    float field_0x1c;
+    float field_0x20;
+    br_vector3 field_0x24;
+    br_vector3 field_0x30;
+    br_angle field_0x3c[3];
+    undefined field_0x42[2];
+    br_vector3 field_0x44;
+    br_vector3 field_0x50;
+    br_vector3 field_0x5c;
+    br_vector3 field_0x68;
+    int field_0x74;
+} tBend_point_spec;
+
+typedef struct tBend_point_context {
+    tCar_spec* car;
+    br_matrix34 field_0x4;
+    tBend_point_spec* field_0x34;
+} tBend_point_context;
+
 typedef struct tCar_crush_spec {
     int count_shapes;
     tCar_crush_shape_info* field_0x4;
