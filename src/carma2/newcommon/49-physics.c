@@ -30,6 +30,11 @@
 #define PHYSICS_BUFFER_PART_SIZE 40000
 #define PHYSICS_BUFFER_OTHER_SIZE 50000
 
+// GLOBAL: CARMA2_HW 0x00679430
+// GLOBAL: CARMA2_SW 0x00673ba0
+// GLOBAL: CARMA2_CHEAT 0x00680ce0
+tU32 gUINT_00679430;
+
 // GLOBAL: CARMA2_HW 0x00692dc8
 // GLOBAL: CARMA2_SW 0x0068ce20
 // GLOBAL: CARMA2_CHEAT 0x0069a940
@@ -292,9 +297,51 @@ tFace_ref* C2_HOOK_FASTCALL RayCastThruFaceList2(br_vector3* pPosition, br_vecto
 
 // WorldPointCollision
 
-// CheckSingleEdgeWithObjectEdges
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
 
-// GetEdgeToEdgePoints
+// STUB: CARMA2_HW 0x00424270
+// STUB: CARMA2_SW 0x004242f0
+// STUB: CARMA2_CHEAT 0x004243f0
+int C2_HOOK_FASTCALL CheckSingleEdgeWithObjectEdges(br_vector3* pEdge_start, br_vector3* pEdge_end, tPhysics_object* pObject, tPhysics_shape* pShape, tPhysics_joint_force* pForces, int pCount, tFace_ref* pFace, br_matrix34* pMatrix) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
+
+/* FIXME: pMax_count and pUnused are never read; their types are guesses. */
+// FUNCTION: CARMA2_HW 0x00424140
+// FUNCTION: CARMA2_SW 0x004241c0
+// FUNCTION: CARMA2_CHEAT 0x004242c0
+int C2_HOOK_FASTCALL GetEdgeToEdgePoints(tPhysics_object* pObject, tPhysics_shape* pShape, tPhysics_joint_force* pForces, int pCount, int pMax_count, br_matrix34* pMatrix, undefined4 pUnused) {
+    int i;
+    tFace_ref* face;
+    br_vector3 tv;
+
+    gUINT_00679430 = 0;
+    BrMatrix34TApplyV(&tv, &pObject->actor->t.t.translate.t, &pObject->actor->t.t.mat);
+    BrVector3Accumulate(&pShape->common.field_0x1c.min, &tv);
+    BrVector3Accumulate(&pShape->common.field_0x1c.max, &tv);
+    i = pObject->box_face_start;
+    face = &gFace_list__car[i];
+    for (; i < pObject->box_face_end; i++, face++) {
+        if (!(face->flags & 0x80)) {
+            if (!(face->flags & 0x1)) {
+                pCount = CheckSingleEdgeWithObjectEdges(&face->v[0], &face->v[1], pObject, pShape, pForces, pCount, face, pMatrix);
+            }
+            if (!(face->flags & 0x2)) {
+                pCount = CheckSingleEdgeWithObjectEdges(&face->v[1], &face->v[2], pObject, pShape, pForces, pCount, face, pMatrix);
+            }
+            if (!(face->flags & 0x4)) {
+                pCount = CheckSingleEdgeWithObjectEdges(&face->v[2], &face->v[0], pObject, pShape, pForces, pCount, face, pMatrix);
+            }
+        }
+    }
+    return pCount;
+}
 
 // SetUpWorkspace
 
