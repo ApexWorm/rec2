@@ -92,7 +92,7 @@ tCar_spec* gTarget_lock_car_2;
 // GLOBAL: CARMA2_HW 0x0068d6f4
 // GLOBAL: CARMA2_SW 0x0068774c
 // GLOBAL: CARMA2_CHEAT 0x00694f94
-int gINT_0068d6f4;
+int gNearest_smash_blip_index; /* FIXME: name guessed from the old DrawSmashBlip: index of the nearest smash blip, -1 for none */
 
 // GLOBAL: CARMA2_HW 0x0068d8c8
 // GLOBAL: CARMA2_SW 0x00687920
@@ -846,7 +846,7 @@ void C2_HOOK_FASTCALL MapOverlay(void) {
 
 inline void C2_HOOK_FASTCALL InitNearestCar(void) {
 
-    gINT_0068d6f4 = -1;
+    gNearest_smash_blip_index = -1;
     if (gNet_mode != eNet_mode_none && gCurrent_net_game->type == eNet_game_type_foxy) {
         gTarget_lock_car_2 = NULL;
     } else if (gPrevious_opponent_status == eOpponent_status_Wasted && gTarget_lock_car_1 != NULL) {
