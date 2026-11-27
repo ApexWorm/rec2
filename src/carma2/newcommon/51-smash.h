@@ -32,7 +32,6 @@ extern tRepair_animation gRepair_animations[25];
 extern br_vector3 gZero_vector__smash;
 extern tDecal gDecals[50];
 extern int gCount_queued_smashes;
-extern int gINT_006a8294;
 extern tSmash_explosion gSmash_explosions[20];
 
 typedef struct {
