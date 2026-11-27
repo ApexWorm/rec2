@@ -316,7 +316,7 @@ extern intptr_t C2_HOOK_CDECL MakeCarModelsMaterialsSingleSided(br_actor* pActor
 
 // IsOnNonCarHalf
 
-// SplitCar
+extern void C2_HOOK_FASTCALL SplitCar(tCar_spec* pCar, br_vector4* pPlane, int pArg3);
 
 // QuantizePlane
 
@@ -370,7 +370,7 @@ extern void C2_HOOK_FASTCALL BendPoint(br_vector3* pPoint, const tBend_point_con
 
 // ReAttachOrFullyDetachDifficultBits
 
-// BendCar
+extern void C2_HOOK_FASTCALL BendCar(tCar_spec* pCar, br_angle pAngle_x, br_angle pAngle_y, br_angle pAngle_z, const br_vector3* pPivot, br_scalar pZ, int pArg7);
 
 // QuantizeAngle
 
@@ -476,7 +476,7 @@ extern void C2_HOOK_FASTCALL RepairCarCollisionShapes(tCar_spec* pCar, float pSt
 
 // RestoreVitalBitsOfObject
 
-// WeldCar
+extern void C2_HOOK_FASTCALL WeldCar(tCar_spec* pCar_spec);
 
 // ARCompressCrush
 
@@ -546,17 +546,17 @@ extern int C2_HOOK_FASTCALL GetNetShapeDataLengthFromData(tU8* pData);
 
 extern void C2_HOOK_FASTCALL EncodeNetShapeData(tU8* pData, tCar_spec* pCar);
 
-// DecodeNetShapeData
+extern void C2_HOOK_FASTCALL DecodeNetShapeData(tCar_spec* pCar, tU8* pData);
 
-// CopyBendInMessage
+extern void C2_HOOK_FASTCALL CopyBendInMessage(tCar_spec* pCar);
 
-// Vector4Equal
+extern int C2_HOOK_FASTCALL Vector4Equal(const br_vector4* pV1, const br_vector4* pV2);
 
 extern void C2_HOOK_FASTCALL CompressPlane(tCompressed_vector4* pDest, const br_vector4* pSrc);
 
 extern void C2_HOOK_FASTCALL ExpandPlane(br_vector4* pDest, const tCompressed_vector4* pSrc);
 
-// CopySplitInMessage
+extern void C2_HOOK_FASTCALL CopySplitInMessage(tCar_spec* pCar);
 
 extern void C2_HOOK_FASTCALL SetAllShapeStatusFlags(tCar_crush_network_shapes* pShapes);
 
