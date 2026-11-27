@@ -24,13 +24,13 @@ extern tActionReplayCameraMode gAction_replay_camera_mode;
 
 // DoCameraControls
 
-// FrozenCamera
+extern void C2_HOOK_FASTCALL FrozenCamera(tCar_spec* pCar, tU32 pTime);
 
-// CheckCameraHither
+extern void C2_HOOK_FASTCALL CheckCameraHither(void);
 
 extern tCar_spec* C2_HOOK_FASTCALL GetRaceLeader(void);
 
-// AmIGettingBoredWatchingCameraSpin
+extern void C2_HOOK_FASTCALL AmIGettingBoredWatchingCameraSpin(void);
 
 extern void C2_HOOK_FASTCALL ViewNetPlayer(void);
 
@@ -40,7 +40,7 @@ extern void C2_HOOK_FASTCALL ReallyViewOpponent(void);
 
 extern void C2_HOOK_FASTCALL CheckDisablePlingMaterials(tCar_spec* pCar);
 
-// SetPanningFieldOfView
+extern void C2_HOOK_FASTCALL SetPanningFieldOfView(void);
 
 extern int C2_HOOK_FASTCALL IsCameraTypeAllowed(int pCamera_mode);
 
@@ -58,13 +58,13 @@ extern void C2_HOOK_FASTCALL PositionExternalCamera(tCar_spec* pCar_spec, tU32 p
 
 extern void C2_HOOK_FASTCALL CameraBugFix(tCar_spec* pCar, tU32 pTime);
 
-// PossibleRemoveNonCarFromWorld
+extern int C2_HOOK_FASTCALL PossibleRemoveNonCarFromWorld(br_actor* pActor);
 
-// PutNonCarBackInWorld
+extern void C2_HOOK_FASTCALL PutNonCarBackInWorld(br_actor* pActor);
 
 extern int C2_HOOK_FASTCALL IncidentCam(tCar_spec* pCar, tU32 pTime);
 
-// MoveCamToIncident
+extern int C2_HOOK_FASTCALL MoveCamToIncident(tCar_spec* pCar, tIncident_type* pType, float* pSeverity, tIncident_info* pInfo, int* pNext_incident_time);
 
 extern void C2_HOOK_FASTCALL PanningExternalCamera(tCar_spec* pCar, tU32 pTime);
 
@@ -78,13 +78,13 @@ extern void C2_HOOK_FASTCALL RestoreCameraPosition(int pIndex);
 
 // DrVector3RotateY
 
-// GeneralisedPositionExternalCamera
+extern void C2_HOOK_FASTCALL GeneralisedPositionExternalCamera(tCar_spec* pCar, br_matrix34* pMat, br_vector3* pPos, float pSpeed, float pSpeedo_speed, br_vector3* pDirection, br_vector3* pOmega, tU32 pTime);
 
-// NormalPositionExternalCamera
+extern void C2_HOOK_FASTCALL NormalPositionExternalCamera(tCar_spec* pCar, tU32 pTime);
 
-// PositionPedCam
+extern void C2_HOOK_FASTCALL PositionPedCam(tPed_character_instance* pPed, tU32 pTime);
 
-// PositionDroneCam
+extern void C2_HOOK_FASTCALL PositionDroneCam(tU32 pTime);
 
 // MoveWithWheels
 

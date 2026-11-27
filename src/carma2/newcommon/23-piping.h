@@ -171,7 +171,7 @@ extern void C2_HOOK_FASTCALL DisposeActionReplay(void);
 
 // CheckIncident
 
-// GetNextIncident
+extern int C2_HOOK_FASTCALL GetNextIncident(int pOffset_time, tIncident_type* pIncident_type, float* pSeverity, tIncident_info* pInfo, int* pTime_away);
 
 // AddCrushToPipingSession
 

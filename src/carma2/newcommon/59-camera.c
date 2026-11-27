@@ -10,6 +10,7 @@
 
 #include "00-car.h"
 #include "01-network.h"
+#include "02-init.h"
 #include "10-loading2.h"
 #include "15-displays.h"
 #include "21-mainloop.h"
@@ -21,11 +22,15 @@
 #include "42-input.h"
 #include "53-controls.h"
 #include "57-drone.h"
+#include "61-pedestrn-phys.h"
+#include "61-pedestrn.h"
 #include "globvars.h"
 #include "globvrkm.h"
 #include "globvrme.h"
 #include "globvrpb.h"
 #include "rec2_macros.h"
+
+#include <string.h>
 
 // GLOBAL: CARMA2_HW 0x0058f5e8
 // GLOBAL: CARMA2_SW 0x0058a5e8
@@ -77,9 +82,34 @@ tActionReplayCameraMode gAction_replay_camera_mode;
 
 // DoCameraControls
 
-// FrozenCamera
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
 
-// CheckCameraHither
+// STUB: CARMA2_HW 0x0040ef90
+// STUB: CARMA2_SW 0x0040ef70
+// STUB: CARMA2_CHEAT 0x0040f050
+void C2_HOOK_FASTCALL FrozenCamera(tCar_spec* pCar, tU32 pTime) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
+
+inline void C2_HOOK_FASTCALL CheckCameraHither(void) {
+    br_camera* cam;
+    // GLOBAL: CARMA2_HW 0x0067931c
+    // GLOBAL: CARMA2_SW 0x00673a8c
+    // GLOBAL: CARMA2_CHEAT 0x00680bcc
+    static int old_hither;
+
+    cam = gCamera->type_data;
+    if (TestForNan(&cam->hither_z)) {
+        cam->hither_z = (float)old_hither;
+    }
+    old_hither = (int)cam->hither_z;
+}
 
 // FUNCTION: CARMA2_HW 0x0040f4a0
 // FUNCTION: CARMA2_SW 0x0040f480
@@ -103,7 +133,52 @@ tCar_spec* C2_HOOK_FASTCALL GetRaceLeader(void) {
     }
 }
 
-// AmIGettingBoredWatchingCameraSpin
+inline void C2_HOOK_FASTCALL AmIGettingBoredWatchingCameraSpin(void) {
+    // GLOBAL: CARMA2_HW 0x00679298
+    // GLOBAL: CARMA2_SW 0x00673a08
+    // GLOBAL: CARMA2_CHEAT 0x00680b48
+    static tU32 time_of_death;
+    // GLOBAL: CARMA2_HW 0x00679320
+    // GLOBAL: CARMA2_SW 0x00673a90
+    // GLOBAL: CARMA2_CHEAT 0x00680bd0
+    static tU32 headup_timer;
+    char s[256];
+
+    if (gNet_mode != eNet_mode_none
+            && (gCurrent_net_game->type == eNet_game_type_4 || gCurrent_net_game->type == eNet_game_type_fight_to_death)) {
+        if (!gRace_finished) {
+            time_of_death = 0;
+            gOpponent_viewing_mode = 0;
+        } else if (time_of_death == 0) {
+            time_of_death = GetRaceTime();
+        } else if (time_of_death + 10000 <= GetRaceTime()) {
+            if (!gOpponent_viewing_mode) {
+                gOpponent_viewing_mode = 1;
+                gNet_player_to_view_index = -2;
+                ViewNetPlayer();
+            }
+            if (gNet_player_to_view_index >= gNumber_of_net_players) {
+                gNet_player_to_view_index = -2;
+                ViewNetPlayer();
+            }
+            if (gNet_player_to_view_index < 0 && GetRaceLeader() != gCar_to_view) {
+                gNet_player_to_view_index = -2;
+                ViewNetPlayer();
+            }
+            if ((headup_timer + 1000 < GetRaceTime() || GetRaceTime() < headup_timer) && gRace_over_reason == eRace_not_over_yet) {
+                strcpy(s, GetMiscString(eMiscString_watching));
+                strcat(s, " ");
+                if (gNet_player_to_view_index < 0) {
+                    strcat(s, GetMiscString(eMiscString_race_leader));
+                } else {
+                    strcat(s, gNet_players[gNet_player_to_view_index].player_name);
+                }
+                headup_timer = GetRaceTime();
+                NewTextHeadupSlot(6, 0, 500, -4, s);
+            }
+        }
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x0040e430
 // FUNCTION: CARMA2_SW 0x0040e410
@@ -224,7 +299,19 @@ void C2_HOOK_FASTCALL CheckDisablePlingMaterials(tCar_spec* pCar) {
     }
 }
 
-// SetPanningFieldOfView
+inline void C2_HOOK_FASTCALL SetPanningFieldOfView(void) {
+    br_camera* camera_ptr;
+    // GLOBAL: CARMA2_HW 0x00679304
+    // GLOBAL: CARMA2_SW 0x00673a74
+    // GLOBAL: CARMA2_CHEAT 0x00680bb4
+    static br_angle panning_angle;
+
+    camera_ptr = gCamera->type_data;
+    if (panning_angle == 0) {
+        panning_angle = (br_angle)(BrDegreeToAngle(gCamera_angle) * 0.7);
+    }
+    camera_ptr->field_of_view = panning_angle;
+}
 
 int C2_HOOK_FASTCALL IsCameraTypeAllowed(int pCamera_mode) {
     if (gAction_replay_mode && !gCamera_type_allowed_replay[pCamera_mode]) {
@@ -423,11 +510,79 @@ void C2_HOOK_FASTCALL PositionCarMountedCamera(tCar_spec* pCar, tU32 pTime) {
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x0040ea30
-// STUB: CARMA2_SW 0x0040ea10
-// STUB: CARMA2_CHEAT 0x0040eaf0
+// FUNCTION: CARMA2_HW 0x0040ea30
+// FUNCTION: CARMA2_SW 0x0040ea10
+// FUNCTION: CARMA2_CHEAT 0x0040eaf0
 void C2_HOOK_FASTCALL PositionExternalCamera(tCar_spec* pCar_spec, tU32 pTime) {
-    NOT_IMPLEMENTED();
+    br_camera* camera;
+    tCar_spec* c;
+    // GLOBAL: CARMA2_HW 0x0058f62c
+    // GLOBAL: CARMA2_SW 0x0058a62c
+    // GLOBAL: CARMA2_CHEAT 0x005946bc
+    static tActionReplayCameraMode old_camera_mode = kActionReplayCameraMode_Invalid;
+
+    camera = gCamera->type_data;
+    CheckCameraHither();
+    if (!IsCameraTypeAllowed(gAction_replay_camera_mode)) {
+        ChangeCameraType();
+    }
+    AmIGettingBoredWatchingCameraSpin();
+    if (!gProgram_state.cockpit_on) {
+        if (gOpponent_viewing_mode && gAction_replay_mode) {
+            c = &gProgram_state.current_car;
+        } else {
+            c = gCar_to_view;
+        }
+        if (c->car_master_actor->t.t.translate.t.v[0] <= 500.0f) {
+            if (old_camera_mode != gAction_replay_camera_mode) {
+                camera->field_of_view = BrDegreeToAngle(gCamera_angle);
+            }
+            camera->hither_z = gCamera_hither;
+            switch (gAction_replay_camera_mode) {
+            case kActionReplayCameraMode_Standard:
+            case kActionReplayCameraMode_Rigid:
+            case kActionReplayCameraMode_Reversing:
+                NormalPositionExternalCamera(c, pTime);
+                break;
+            case kActionReplayCameraMode_Panning:
+                CheckDisablePlingMaterials(c);
+                SetPanningFieldOfView();
+                if (old_camera_mode != kActionReplayCameraMode_Panning) {
+                    SetUpPanningCamera(c);
+                }
+                PanningExternalCamera(c, pTime);
+                EnablePlingMaterials();
+                break;
+            case kActionReplayCameraMode_ActionTracking:
+                CheckDisablePlingMaterials(c);
+                SetPanningFieldOfView();
+                if (!IncidentCam(c, pTime)) {
+                    if (old_camera_mode != gAction_replay_camera_mode) {
+                        SetUpPanningCamera(c);
+                    }
+                    PanningExternalCamera(c, pTime);
+                    EnablePlingMaterials();
+                }
+                break;
+            case kActionReplayCameraMode_Manual:
+                FrozenCamera(c, pTime);
+                break;
+            case kActionReplayCameraMode_Peds:
+                PositionPedCam(GetTestPed(), pTime);
+                break;
+            case kActionReplayCameraMode_Drone:
+                PositionDroneCam(pTime);
+                break;
+            case kActionReplayCameraMode_Internal:
+                camera->hither_z = gCamera_cockpit_hither;
+                PositionCarMountedCamera(c, pTime);
+                break;
+            default:
+                break;
+            }
+            old_camera_mode = gAction_replay_camera_mode;
+        }
+    }
 }
 
 #ifdef REC2_MATCHING
@@ -447,27 +602,268 @@ void C2_HOOK_FASTCALL CameraBugFix(tCar_spec* pCar, tU32 pTime) {
     }
 }
 
-// PossibleRemoveNonCarFromWorld
+inline int C2_HOOK_FASTCALL PossibleRemoveNonCarFromWorld(br_actor* pActor) {
+    tU8 cx;
+    tU8 cz;
+    tTrack_spec* track_spec;
 
-// PutNonCarBackInWorld
+    track_spec = &gProgram_state.track_spec;
+    XZToColumnXZ(&cx, &cz, pActor->t.t.mat.m[3][0], pActor->t.t.mat.m[3][2], track_spec);
+    if (track_spec->columns[cz][cx].actor_0x0 == pActor->parent) {
+        BrActorRemove(pActor);
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
+inline void C2_HOOK_FASTCALL PutNonCarBackInWorld(br_actor* pActor) {
+    tU8 cx;
+    tU8 cz;
+    tTrack_spec* track_spec;
+
+    track_spec = &gProgram_state.track_spec;
+    XZToColumnXZ(&cx, &cz, pActor->t.t.mat.m[3][0], pActor->t.t.mat.m[3][2], track_spec);
+    BrActorAdd(track_spec->columns[cz][cx].actor_0x0, pActor);
+}
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x0040f790
-// STUB: CARMA2_SW 0x0040f770
-// STUB: CARMA2_CHEAT 0x0040f9e0
+// FUNCTION: CARMA2_HW 0x0040f790
+// FUNCTION: CARMA2_SW 0x0040f770
+// FUNCTION: CARMA2_CHEAT 0x0040f9e0
 int C2_HOOK_FASTCALL IncidentCam(tCar_spec* pCar, tU32 pTime) {
+    br_matrix34* m2;
+    br_vector3 tv;
+    br_vector3 tv2;
+    br_vector3 vertical;
+    br_vector3 pos;
+    br_vector3 murderer_pos;
+    br_vector3 old_cam_pos;
+    br_scalar ts;
+    tCar_spec* car2;
+    int removed;
+    // GLOBAL: CARMA2_HW 0x0067932c
+    // GLOBAL: CARMA2_SW 0x00673a9c
+    // GLOBAL: CARMA2_CHEAT 0x00680bdc
+    static int next_incident_time;
+    // GLOBAL: CARMA2_HW 0x0058f630
+    // GLOBAL: CARMA2_SW 0x0058a630
+    // GLOBAL: CARMA2_CHEAT 0x005946c0
+    static tIncident_type type = eNo_incident;
+    // GLOBAL: CARMA2_HW 0x006792b0
+    // GLOBAL: CARMA2_SW 0x00673a20
+    // GLOBAL: CARMA2_CHEAT 0x00680b60
+    static float severity;
+    // GLOBAL: CARMA2_HW 0x006792a0
+    // GLOBAL: CARMA2_SW 0x00673a10
+    // GLOBAL: CARMA2_CHEAT 0x00680b50
+    static tIncident_info info;
+    // GLOBAL: CARMA2_HW 0x0058f634
+    // GLOBAL: CARMA2_SW 0x0058a634
+    // GLOBAL: CARMA2_CHEAT 0x005946c4
+    static int random = 1;
+    // GLOBAL: CARMA2_HW 0x00679330
+    // GLOBAL: CARMA2_SW 0x00673aa0
+    // GLOBAL: CARMA2_CHEAT 0x00680be0
+    static int count;
 
-    NOT_IMPLEMENTED();
+    m2 = &gCamera->t.t.mat;
+    gPed_actor = NULL;
+    if (type == eNo_incident) {
+        MoveCamToIncident(pCar, &type, &severity, &info, &next_incident_time);
+    } else {
+        gInside_camera_zone = 1;
+    }
+    if (type == eNo_incident) {
+        return 0;
+    }
+    switch (type) {
+    case eIncident_ped:
+        BrVector3Copy(&old_cam_pos, (br_vector3*)m2->m[3]);
+        gPed_actor = info.ped_info.ped_actor;
+        removed = PossibleRemoveNonCarFromWorld(info.ped_info.murderer_actor);
+        BrVector3Copy(&pos, &info.ped_info.ped_actor->t.t.translate.t);
+        info.ped_info.murderer_actor = pCar->car_master_actor;
+        if (info.ped_info.murderer_actor != NULL) {
+            BrVector3Copy(&murderer_pos, &pCar->pos);
+        } else if (info.ped_info.murderer_actor->model != NULL) {
+            BrVector3Sub(&tv, &info.ped_info.murderer_actor->model->bounds.max, &info.ped_info.murderer_actor->model->bounds.min);
+            BrVector3Scale(&tv, &tv, 0.5f);
+            BrMatrix34ApplyP(&murderer_pos, &tv, &info.ped_info.murderer_actor->t.t.mat);
+        } else {
+            BrVector3Copy(&murderer_pos, &info.ped_info.murderer_actor->t.t.translate.t);
+        }
+        if (GetTotalTime() < next_incident_time || ARGetReplayDirection() != 1) {
+            BrVector3Sub(&tv, &pos, &murderer_pos);
+            tv.v[1] = 0.0f;
+            BrVector3Normalise(&tv, &tv);
+            BrVector3Set(&vertical, 0.0f, 0.4f, 0.0f);
+            BrVector3Cross(&tv2, &tv, &vertical);
+            if (random) {
+                BrVector3Negate(&tv2, &tv2);
+            }
+            if (ARPipeSearchForwards()) {
+                BrVector3Accumulate(&tv2, &tv);
+            }
+            BrVector3Add((br_vector3*)m2->m[3], &pos, &tv2);
+            m2->m[3][1] += 0.25f;
+            CollideCamera2(&pos, (br_vector3*)m2->m[3], NULL, 1, NULL);
+        }
+        PointCamera(&pos, m2);
+        BrVector3Sub(&tv, (br_vector3*)m2->m[3], &info.ped_info.murderer_actor->t.t.translate.t);
+        ts = BrVector3LengthSquared(&tv);
+        if (abs(GetTotalTime() - next_incident_time) > 2500) {
+            type = eNo_incident;
+        }
+        if ((ARPipeSearchForwards() ? (next_incident_time + 300 < GetTotalTime()) : (GetTotalTime() < next_incident_time - 600))
+                && (ts > 25.0f || CheckForWall(&info.ped_info.murderer_actor->t.t.translate.t, (br_vector3*)m2->m[3]))) {
+            type = eNo_incident;
+        }
+        if (removed) {
+            PutNonCarBackInWorld(info.ped_info.murderer_actor);
+        }
+        if ((pos.v[0] - m2->m[3][0]) * (pos.v[0] - m2->m[3][0]) + (pos.v[2] - m2->m[3][2]) * (pos.v[2] - m2->m[3][2]) < 0.0225) {
+            BrVector3Copy((br_vector3*)m2->m[3], &old_cam_pos);
+            gPed_actor = NULL;
+            return 0;
+        }
+        break;
+    case eIncident_wall:
+        PointCamera(&pCar->pos, m2);
+        BrVector3Sub(&tv, (br_vector3*)m2->m[3], &pCar->pos);
+        ts = BrVector3LengthSquared(&tv);
+        if ((float)fabs((int)(GetTotalTime() - next_incident_time)) > 2500.0f) {
+            type = eNo_incident;
+        }
+        if ((ARPipeSearchForwards() ? (next_incident_time < GetTotalTime()) : (GetTotalTime() < next_incident_time))
+                && (ts > 25.0f || CheckForWall(&pCar->pos, (br_vector3*)m2->m[3]))) {
+            type = eNo_incident;
+        }
+        break;
+    case eIncident_car:
+        car2 = info.car_info.car;
+        BrVector3Sub(&tv, &car2->pos, &pCar->pos);
+        tv.v[1] = 0.0f;
+        BrVector3Normalise(&tv, &tv);
+        BrVector3Scale(&tv, &tv, 2.0f);
+        BrVector3Add((br_vector3*)m2->m[3], &car2->pos, &tv);
+        m2->m[3][1] += 1.0f;
+        CollideCamera2(&car2->pos, (br_vector3*)m2->m[3], NULL, 1, NULL);
+        PointCamera(&car2->pos, m2);
+        BrVector3Sub(&tv, (br_vector3*)m2->m[3], &pCar->pos);
+        ts = BrVector3LengthSquared(&tv);
+        if ((float)fabs((int)(GetTotalTime() - next_incident_time)) > 2500.0f) {
+            type = eNo_incident;
+        }
+        if ((ARPipeSearchForwards() ? (next_incident_time < GetTotalTime()) : (GetTotalTime() < next_incident_time))
+                && (ts > 25.0f || CheckForWall(&pCar->pos, (br_vector3*)m2->m[3]))) {
+            type = eNo_incident;
+        }
+        break;
+    default:
+        type = eNo_incident;
+        break;
+    }
+    if (type != eNo_incident) {
+        return 1;
+    }
+    if (count > 1) {
+        SetUpPanningCamera(pCar);
+        return 0;
+    }
+    count++;
+    if (IncidentCam(pCar, pTime)) {
+        count--;
+        return 1;
+    } else {
+        count--;
+        return 0;
+    }
 }
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(on)
 #endif
 
-// MoveCamToIncident
+inline int C2_HOOK_FASTCALL MoveCamToIncident(tCar_spec* pCar, tIncident_type* pType, float* pSeverity, tIncident_info* pInfo, int* pNext_incident_time) {
+    int next_incident_time2;
+    int t;
+    tU32 time;
+    tIncident_type type2;
+    float severity2;
+    tIncident_info info2;
+    br_vector3 pos;
+    br_vector3 left;
+    br_vector3 right;
+    br_vector3 vertical;
+    br_vector3 tv;
+    br_vector3 perp;
+    int test;
+
+    test = 0;
+    if (!GetNextIncident(-1, pType, pSeverity, pInfo, pNext_incident_time)) {
+        *pType = eNo_incident;
+    } else if (*pNext_incident_time < 0 && ARGetReplayDirection() >= 0) {
+        *pType = eNo_incident;
+    } else if (abs(*pNext_incident_time) > 2500) {
+        *pType = eNo_incident;
+    } else {
+        t = *pNext_incident_time;
+        while (GetNextIncident(abs(t), &type2, &severity2, &info2, &next_incident_time2) && ++test <= 10 && abs(next_incident_time2) <= 3500) {
+            if (type2 < *pType || (type2 == *pType && *pSeverity <= severity2)) {
+                *pInfo = info2;
+                *pSeverity = severity2;
+                *pType = type2;
+                *pNext_incident_time = next_incident_time2;
+            }
+            t = next_incident_time2;
+        }
+        if (abs(*pNext_incident_time) > 2500) {
+            *pType = eNo_incident;
+        } else {
+            if (*pType == eIncident_wall) {
+                if (*pSeverity < 0.1f) {
+                    *pType = eNo_incident;
+                    return 0;
+                }
+                ScanCarsPositions(pCar, &pCar->pos, 100000.0f, -1, abs(*pNext_incident_time), &pos, &time);
+                if (time == 0) {
+                    *pType = eNo_incident;
+                } else {
+                    BrVector3Sub(&tv, &pos, &pCar->pos);
+                    if (BrVector3LengthSquared(&tv) > 102.91955471539592) {
+                        *pType = eNo_incident;
+                    } else {
+                        BrVector3Sub(&tv, &pos, &pInfo->wall_info.pos);
+                        BrVector3Normalise(&tv, &tv);
+                        BrVector3Scale(&tv, &tv, 2.0f);
+                        BrVector3Set(&vertical, 0.0f, 1.0f, 0.0f);
+                        BrVector3Cross(&perp, &vertical, &tv);
+                        BrVector3Add(&left, &pos, &tv);
+                        BrVector3Add(&left, &left, &perp);
+                        left.v[1] += 2.0f;
+                        BrVector3Add(&right, &pos, &tv);
+                        BrVector3Sub(&right, &right, &perp);
+                        right.v[1] += 2.0f;
+                        CollideCamera2(&pos, &left, NULL, 1, NULL);
+                        CollideCamera2(&pos, &right, NULL, 1, NULL);
+                        if (Vector3DistanceSquared(&left, &pos) <= Vector3DistanceSquared(&right, &pos)) {
+                            BrVector3Copy(&tv, &right);
+                        } else {
+                            BrVector3Copy(&tv, &left);
+                        }
+                        BrVector3Copy(&gCamera->t.t.translate.t, &tv);
+                    }
+                }
+            }
+            *pNext_incident_time += GetTotalTime();
+        }
+    }
+    return 0;
+}
 
 // FUNCTION: CARMA2_HW 0x004104b0
 // FUNCTION: CARMA2_SW 0x00410490
@@ -625,13 +1021,45 @@ void C2_HOOK_FASTCALL RestoreCameraPosition(int pIndex) {
 
 // DrVector3RotateY
 
-// GeneralisedPositionExternalCamera
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
 
-// NormalPositionExternalCamera
+// STUB: CARMA2_HW 0x00410c60
+// STUB: CARMA2_SW 0x00410c40
+// STUB: CARMA2_CHEAT 0x00410eb0
+void C2_HOOK_FASTCALL GeneralisedPositionExternalCamera(tCar_spec* pCar, br_matrix34* pMat, br_vector3* pPos, float pSpeed, float pSpeedo_speed, br_vector3* pDirection, br_vector3* pOmega, tU32 pTime) {
+    NOT_IMPLEMENTED();
+}
 
-// PositionPedCam
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
-// PositionDroneCam
+inline void C2_HOOK_FASTCALL NormalPositionExternalCamera(tCar_spec* pCar, tU32 pTime) {
+
+    GeneralisedPositionExternalCamera(pCar, &pCar->car_master_actor->t.t.mat, &pCar->pos, pCar->speed, pCar->speedo_speed, &pCar->direction, &pCar->collision_info->omega, pTime);
+}
+
+inline void C2_HOOK_FASTCALL PositionPedCam(tPed_character_instance* pPed, tU32 pTime) {
+    br_matrix34* mat;
+
+    if (pPed == NULL) {
+        ChangeCameraType();
+    } else {
+        mat = GetCharacterMatrixPtr(pPed);
+        GeneralisedPositionExternalCamera(NULL, mat, (br_vector3*)mat->m[3], 0.0f, 0.0f, &pPed->field_0xc0, &gZero_v__car, pTime);
+    }
+}
+
+inline void C2_HOOK_FASTCALL PositionDroneCam(tU32 pTime) {
+    br_matrix34* mat;
+
+    if (OKToViewDrones()) {
+        mat = GetCurrentViewDroneMat();
+        GeneralisedPositionExternalCamera(NULL, mat, (br_vector3*)mat->m[3], 0.0f, 0.0f, GetCurrentViewDroneDirection(), &gZero_v__car, pTime);
+    }
+}
 
 // MoveWithWheels
 

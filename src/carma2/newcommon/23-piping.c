@@ -25,6 +25,7 @@
 #include "52-errors.h"
 #include "57-drone.h"
 #include "61-pedestrn-phys.h"
+#include "61-pedestrn.h"
 #include "60-phil.h"
 #include "69-sound.h"
 #include "globvars.h"
@@ -1063,32 +1064,6 @@ int C2_HOOK_FASTCALL CheckIncident(tPipe_chunk* pChunk_ptr, int pChunk_count, tU
     return 1;
 }
 
-typedef enum {
-    eIncident_ped = 0,
-    eIncident_car = 1,
-    eIncident_wall = 2
-} tIncident_type;
-
-typedef struct {
-    br_actor* ped_actor;
-    br_actor* murderer_actor;
-} tPed_incident_info;
-
-typedef struct {
-    tCar_spec* car;
-    br_vector3 impact_point;
-} tCar_incident_info;
-
-typedef struct {
-    br_vector3 pos;
-} tWall_incident_info;
-
-typedef union {
-    tPed_incident_info ped_info;
-    tCar_incident_info car_info;
-    tWall_incident_info wall_info;
-} tIncident_info;
-
 // FUNCTION: CARMA2_HW 0x004c6c90
 // FUNCTION: CARMA2_SW 0x004c33c0
 // FUNCTION: CARMA2_CHEAT 0x004cc7b0
@@ -1128,6 +1103,8 @@ int C2_HOOK_FASTCALL GetNextIncident(int pOffset_time, tIncident_type* pIncident
         case eIncident_wall:
             /* FIXME: a wall incident chunk is a float severity followed by the impact point, the same layout as a splash chunk */
             BrVector3Copy(&pInfo->wall_info.pos, &gIncident_chunk->data.splash.normal);
+            break;
+        default:
             break;
         }
     }
