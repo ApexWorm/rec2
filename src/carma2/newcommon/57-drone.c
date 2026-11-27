@@ -100,7 +100,60 @@ void C2_HOOK_CDECL DoNotDprintf_drone(const char* pMessage, ...) {
 
 // CrappyLittleDrivingStateInfoDprintf
 
-// DroneStraightestArcForCorner2D
+inline int C2_HOOK_FASTCALL DroneStraightestArcForCorner2D(br_vector2* pCent, br_scalar* pRadius, br_scalar* pEntry_length, int* pLeft_not_right, const br_vector2* p1, const br_vector2* p2, const br_vector2* p3, br_scalar pWidth) {
+    br_vector2 rel1;
+    br_vector2 rel3;
+    br_vector2 rot1;
+    br_vector2 rot1u;
+    br_scalar len12_squared;
+    br_scalar len23_squared;
+    br_scalar c;
+    br_scalar numerator;
+    br_scalar x;
+
+    BrVector2Sub(&rel1, p1, p2);
+    BrVector2Sub(&rel3, p3, p2);
+    len12_squared = BrVector2LengthSquared(&rel1);
+    len23_squared = BrVector2LengthSquared(&rel3);
+    if (len12_squared == 0.0f || len23_squared == 0.0f) {
+        return 0;
+    }
+    rot1.v[0] = rel1.v[0] * rel3.v[0] + rel1.v[1] * rel3.v[1];
+    rot1.v[1] = rel1.v[0] * -rel3.v[1] + rel1.v[1] * rel3.v[0];
+    BrVector2Normalise(&rot1u, &rot1);
+    if (rot1u.v[1] > 0.0f) {
+        *pLeft_not_right = 1;
+    } else {
+        rot1u.v[1] = -rot1u.v[1];
+        *pLeft_not_right = 0;
+    }
+    if (rot1u.v[1] < 0.04f) {
+        return 0;
+    }
+    numerator = (rot1u.v[0] * pWidth + pWidth) / rot1u.v[1];
+    x = rot1u.v[1] / (rot1u.v[0] + 1.0f);
+    *pEntry_length = x * pWidth + numerator + (br_scalar)sqrt((x * x * pWidth + 2.0f * x * numerator - pWidth) * pWidth);
+    if (len12_squared < 9.0f * *pEntry_length * *pEntry_length) {
+        *pEntry_length = (br_scalar)sqrt(len12_squared) / 3.0f;
+    }
+    if (len23_squared < 9.0f * *pEntry_length * *pEntry_length) {
+        *pEntry_length = (br_scalar)sqrt(len23_squared) / 3.0f;
+    }
+    *pRadius = *pEntry_length * x;
+    if (*pLeft_not_right) {
+        pCent->v[0] = *pEntry_length * rel3.v[0] + *pRadius * -rel3.v[1];
+        pCent->v[1] = *pEntry_length * rel3.v[1] + *pRadius * rel3.v[0];
+    } else {
+        pCent->v[0] = *pEntry_length * rel3.v[0] + *pRadius * rel3.v[1];
+        pCent->v[1] = *pEntry_length * rel3.v[1] + -*pRadius * rel3.v[0];
+    }
+    c = (br_scalar)sqrt(len23_squared);
+    pCent->v[0] /= c;
+    pCent->v[1] /= c;
+    pCent->v[0] += p2->v[0];
+    pCent->v[1] += p2->v[1];
+    return 1;
+}
 
 // FUNCTION: CARMA2_HW 0x0044f640
 // FUNCTION: CARMA2_SW 0x0044f3e0
@@ -220,7 +273,124 @@ br_actor* C2_HOOK_CDECL MrFindy(br_actor* pActor, const char* pName) {
 
 // LoadDrone
 
-// CalculateDrivingInfo
+// FUNCTION: CARMA2_HW 0x0044dac0
+// FUNCTION: CARMA2_SW 0x0044d870
+// FUNCTION: CARMA2_CHEAT 0x0044e010
+void C2_HOOK_FASTCALL CalculateDrivingInfo(tDrone_spec* pDrone) {
+    br_vector3 v1;
+    br_vector3 v2;
+    br_vector3 up;
+    br_vector3 normal;
+    br_vector3 axis;
+    br_vector3 rotated_v1;
+    br_vector3 rotated_v2;
+    br_vector2 p1;
+    br_vector2 p2;
+    br_vector2 p3;
+    br_vector2 dir;
+    br_vector2 ref;
+    br_angle angle;
+    br_scalar angle_rad;
+    br_scalar slope;
+    br_scalar width;
+    br_scalar min_width;
+    br_scalar cos_angle;
+    int left_not_right;
+
+    if (pDrone->form->type != kDroneType_plane) {
+        min_width = 0.02f;
+        width = 0.5f;
+    } else {
+        min_width = 0.1f;
+        width = 3.0f;
+    }
+    pDrone->field_0xe0 = 0.0f;
+    pDrone->field_0x74 = 0.0f;
+    if (pDrone->field_0x14 != NULL && (pDrone->form->flags & 0x1)) {
+        BrVector3Sub(&v1, &gDrone_path_nodes[pDrone->field_0xa_pathnode_id].position, &gDrone_path_nodes[pDrone->field_0xc].position);
+        BrVector3Sub(&v2, &gDrone_path_nodes[pDrone->field_0xe].position, &gDrone_path_nodes[pDrone->field_0xc].position);
+        BrVector3Cross(&normal, &v2, &v1);
+        if (normal.v[1] < 0.0f) {
+            BrVector3Negate(&normal, &normal);
+        }
+        BrVector3Normalise(&normal, &normal);
+        BrVector3Set(&up, 0.0f, 1.0f, 0.0f);
+        BrVector3Cross(&axis, &normal, &up);
+        BrVector3Normalise(&axis, &axis);
+        angle = BrRadianToAngle(acos(normal.v[1]));
+        angle_rad = BrAngleToRadian(angle);
+        slope = angle_rad;
+        if (slope > PI) {
+            slope = 0.0f;
+        }
+        if (slope > PI / 2.0) {
+            slope = (br_scalar)(PI - slope);
+        }
+        if (pDrone->form->type != kDroneType_plane && pDrone->form->type != kDroneType_chopper) {
+            width = (br_scalar)((1.0 - slope / (PI / 2.0)) * (width - min_width) + min_width);
+        }
+        BrMatrix34Rotate(&pDrone->field_0x78, angle, &axis);
+        BrMatrix34LPInverse(&pDrone->field_0xa8, &pDrone->field_0x78);
+        BrMatrix34ApplyV(&rotated_v1, &v1, &pDrone->field_0x78);
+        BrMatrix34ApplyV(&rotated_v2, &v2, &pDrone->field_0x78);
+        BrVector2Set(&p1, rotated_v1.v[0], rotated_v1.v[2]);
+        BrVector2Set(&p2, 0.0f, 0.0f);
+        BrVector2Set(&p3, rotated_v2.v[0], rotated_v2.v[2]);
+        if (DroneStraightestArcForCorner2D(&pDrone->field_0x54, &pDrone->field_0x68, &pDrone->field_0x6c, &left_not_right, &p1, &p2, &p3, width)) {
+            pDrone->left_turn = left_not_right;
+            pDrone->field_0xe8 = pDrone->h_radius = BrVector2Length(&pDrone->field_0x54) * ((br_scalar)sin(angle_rad) * 7.0f + 1.0f);
+            BrVector2Set(&ref, pDrone->field_0x68, 0.0f);
+            BrVector2Sub(&p1, &p1, &pDrone->field_0x54);
+            BrVector2Sub(&p2, &p2, &pDrone->field_0x54);
+            BrVector2Sub(&p3, &p3, &pDrone->field_0x54);
+
+            BrVector2Sub(&dir, &p1, &p2);
+            BrVector2Normalise(&dir, &dir);
+            BrVector2Scale(&dir, &dir, pDrone->field_0x6c);
+            BrVector2Add(&dir, &dir, &p2);
+            cos_angle = (br_scalar)MIN(1.0, MAX(-1.0, BrVector2Dot(&dir, &ref) / (pDrone->field_0x68 * pDrone->field_0x68)));
+            pDrone->field_0x5c = (br_scalar)acos(cos_angle);
+            if (dir.v[1] < 0.0f) {
+                pDrone->field_0x5c = (br_scalar)(TAU - pDrone->field_0x5c);
+            }
+
+            BrVector2Sub(&dir, &p3, &p2);
+            BrVector2Normalise(&dir, &dir);
+            BrVector2Scale(&dir, &dir, pDrone->field_0x6c);
+            BrVector2Add(&dir, &dir, &p2);
+            cos_angle = (br_scalar)MIN(1.0, MAX(-1.0, BrVector2Dot(&dir, &ref) / (pDrone->field_0x68 * pDrone->field_0x68)));
+            pDrone->field_0x64 = (br_scalar)acos(cos_angle);
+            if (dir.v[1] < 0.0f) {
+                pDrone->field_0x64 = (br_scalar)(TAU - pDrone->field_0x64);
+            }
+
+            if (left_not_right) {
+                while (pDrone->field_0x64 < pDrone->field_0x5c) {
+                    pDrone->field_0x64 = (br_scalar)(pDrone->field_0x64 + TAU);
+                }
+            } else {
+                while (pDrone->field_0x5c < pDrone->field_0x64) {
+                    pDrone->field_0x5c = (br_scalar)(pDrone->field_0x5c + TAU);
+                }
+            }
+            pDrone->field_0x60 = pDrone->field_0x5c;
+            pDrone->field_0xdc = 1;
+        } else {
+            pDrone->field_0x68 = 1000.0f;
+            pDrone->field_0x6c = 0.0f;
+        }
+    } else {
+        pDrone->field_0x68 = 1000.0f;
+        pDrone->field_0x6c = 0.0f;
+    }
+    if (pDrone->form->speed < 0.0f) {
+        pDrone->field_0x50 = pDrone->field_0x68 * 0.5f;
+        pDrone->field_0x50 = MIN(pDrone->form->max_speed, MAX(pDrone->form->min_speed, pDrone->field_0x50));
+    } else {
+        pDrone->field_0x50 = pDrone->form->speed;
+    }
+    DoNotDprintf_drone("CalculateDrivingInfo called - centre node %d, radius %f, section after corner %p", pDrone->field_0xc, pDrone->field_0x68, pDrone->field_0x10);
+}
 
 // PauseDroneState
 
@@ -295,7 +465,12 @@ int C2_HOOK_FASTCALL DroneTrainWithinRenderingDistance(const br_vector3* pPos) {
 
 // InitDroneSpec
 
-// ChooseNextNode
+// STUB: CARMA2_HW 0x0044e410
+// STUB: CARMA2_SW 0x0044e1b0
+// STUB: CARMA2_CHEAT 0x0044e960
+int C2_HOOK_FASTCALL ChooseNextNode(tDrone_spec* pDrone) {
+    NOT_IMPLEMENTED();
+}
 
 // DroneOrientationChanged
 
@@ -379,18 +554,324 @@ inline void C2_HOOK_FASTCALL InitDroneDrivingInfo(tDrone_spec* pDrone) {
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x0044d2a0
-// STUB: CARMA2_SW 0x0044d050
-// STUB: CARMA2_CHEAT 0x0044d7f0
+// FUNCTION: CARMA2_HW 0x0044d2a0
+// FUNCTION: CARMA2_SW 0x0044d050
+// FUNCTION: CARMA2_CHEAT 0x0044d7f0
 void C2_HOOK_FASTCALL MoveThisDronePlane(tDrone_spec* pDrone) {
-    NOT_IMPLEMENTED();
+    br_vector3 offset;
+    br_vector3 direction;
+    br_vector3 tmp;
+    br_scalar time_left;
+    br_scalar time_used;
+    br_scalar angle_step;
+    br_scalar new_angle;
+    br_scalar new_distance;
+    br_scalar end_distance;
+    br_scalar target_speed;
+    br_scalar brake_distance;
+    br_scalar deceleration;
+    br_scalar time_to_target_speed;
+    int finished;
+
+    DoNotDprintf_drone("MoveThisDronePlane()");
+    time_left = gDrone_delta_time;
+    while (time_left > 0.0f) {
+        switch (pDrone->field_0xdc) {
+        case 2:
+            if (pDrone->field_0x68 > 0.0f) {
+                angle_step = time_left * pDrone->field_0x48 / pDrone->field_0x68;
+                finished = 0;
+                if (pDrone->left_turn) {
+                    new_angle = pDrone->field_0x60 + angle_step;
+                    if (new_angle >= pDrone->field_0x64) {
+                        time_used = (pDrone->field_0x64 - pDrone->field_0x60) * pDrone->field_0x68 / pDrone->field_0x48;
+                        finished = 1;
+                        pDrone->field_0x60 = pDrone->field_0x64;
+                    } else {
+                        time_used = gDrone_delta_time;
+                        pDrone->field_0x60 = new_angle;
+                    }
+                } else {
+                    new_angle = pDrone->field_0x60 - angle_step;
+                    if (new_angle <= pDrone->field_0x64) {
+                        time_used = (pDrone->field_0x60 - pDrone->field_0x64) * pDrone->field_0x68 / pDrone->field_0x48;
+                        finished = 1;
+                        pDrone->field_0x60 = pDrone->field_0x64;
+                    } else {
+                        time_used = gDrone_delta_time;
+                        pDrone->field_0x60 = new_angle;
+                    }
+                }
+                offset.v[0] = (br_scalar)(pDrone->field_0x68 * cos(pDrone->field_0x60) + pDrone->field_0x54.v[0]);
+                offset.v[1] = 0.0f;
+                offset.v[2] = (br_scalar)(pDrone->field_0x68 * sin(pDrone->field_0x60) + pDrone->field_0x54.v[1]);
+                BrMatrix34ApplyV(&pDrone->actor->t.t.translate.t, &offset, &pDrone->field_0xa8);
+                BrVector3Accumulate(&pDrone->actor->t.t.translate.t, &gDrone_path_nodes[pDrone->field_0xc].position);
+                pDrone->field_0xe0 = (pDrone->field_0x60 - pDrone->field_0x5c) / (pDrone->field_0x64 - pDrone->field_0x5c);
+                pDrone->field_0x74 = pDrone->field_0xe0;
+                BrVector3Scale(&direction, &pDrone->field_0x14->field_0x10, pDrone->field_0x74);
+                BrVector3Scale(&tmp, &pDrone->field_0x10->field_0x10, 1.0f - pDrone->field_0x74);
+                BrVector3Accumulate(&direction, &tmp);
+                PointActorAlongThisBloodyVector(pDrone->actor, &direction);
+                time_left -= time_used;
+                if (finished) {
+                    pDrone->field_0x4c = pDrone->field_0x6c;
+                    pDrone->field_0xdc = 0;
+                }
+            } else {
+                pDrone->field_0x4c = 0.0f;
+                pDrone->field_0xdc = 0;
+            }
+            pDrone->field_0xe4 = pDrone->field_0x48;
+            break;
+        case 1:
+            new_distance = time_left * pDrone->field_0x48 + pDrone->field_0x4c;
+            switch (pDrone->field_0x10->type) {
+            case 6:
+                target_speed = pDrone->form->min_speed;
+                DoNotDprintf_drone("eDDS_straight_driving: TAXI/LANDING %f %f", target_speed, pDrone->field_0x48);
+                break;
+            case 4:
+            case 5:
+                target_speed = pDrone->form->max_speed * 0.66f;
+                DoNotDprintf_drone("eDDS_straight_driving: APPROACH %f %f", target_speed, pDrone->field_0x48);
+                break;
+            default:
+                target_speed = pDrone->form->max_speed;
+                DoNotDprintf_drone("eDDS_straight_driving: TAKEOFF/INFLIGHT %f %f", target_speed, pDrone->field_0x48);
+                break;
+            }
+            end_distance = pDrone->field_0x10->field_0x1c - pDrone->field_0x6c;
+            if (pDrone->field_0x4c >= end_distance) {
+                time_used = 0.0f;
+                pDrone->field_0xdc = 2;
+            } else if (new_distance > end_distance) {
+                if (pDrone->field_0x48 > target_speed) {
+                    DoNotDprintf_drone("eDDS_straight_driving: CLAUSE 2a %f %f", target_speed, pDrone->field_0x48);
+                    time_used = (pDrone->field_0x48 - target_speed) / pDrone->form->max_acceleration;
+                    pDrone->field_0x48 = target_speed;
+                } else {
+                    DoNotDprintf_drone("eDDS_straight_driving: CLAUSE 2b %f %f", target_speed, pDrone->field_0x48);
+                    time_used = time_left;
+                }
+            } else {
+                brake_distance = end_distance - (pDrone->field_0x48 * pDrone->field_0x48 - target_speed * target_speed) * 0.5f;
+                DoNotDprintf_drone("eDDS_straight_driving: decel_envelope %f %f %f", brake_distance, target_speed, pDrone->field_0x48);
+                if (pDrone->field_0x10->type != 2 && pDrone->field_0x10->type != 3
+                    && pDrone->field_0x48 > target_speed && pDrone->field_0x4c >= brake_distance) {
+                    DoNotDprintf_drone("eDDS_straight_driving: CLAUSE 4 %f %f", target_speed, pDrone->field_0x48);
+                    deceleration = -((pDrone->field_0x48 * pDrone->field_0x48 - target_speed * target_speed)
+                        / (2.0f * (pDrone->field_0x10->field_0x1c - pDrone->field_0x6c - pDrone->field_0x4c)));
+                    time_to_target_speed = (pDrone->field_0x48 - target_speed) / -deceleration;
+                    DoNotDprintf_drone("eDDS_straight_driving: a %f, time_to_hit_max_corner_speed %f %f ", deceleration, time_to_target_speed, target_speed, pDrone->field_0x48);
+                    if (time_to_target_speed <= time_left) {
+                        DoNotDprintf_drone("eDDS_straight_driving: CLAUSE 4a %f %f", target_speed, pDrone->field_0x48);
+                        pDrone->field_0x48 = target_speed;
+                        time_used = time_to_target_speed;
+                    } else {
+                        DoNotDprintf_drone("eDDS_straight_driving: CLAUSE 4b %f %f", target_speed, pDrone->field_0x48);
+                        pDrone->field_0x48 = deceleration * time_left + pDrone->field_0x48;
+                        time_used = time_left;
+                    }
+                } else if (pDrone->field_0x10->type != 2 && pDrone->field_0x10->type != 3
+                    && pDrone->field_0x48 > target_speed && new_distance > brake_distance) {
+                    DoNotDprintf_drone("eDDS_straight_driving: CLAUSE 5 %f %f", target_speed, pDrone->field_0x48);
+                    time_used = time_left;
+                } else if (pDrone->field_0x10->type != 2 && pDrone->field_0x10->type != 3
+                    && pDrone->field_0x48 > target_speed
+                    && pDrone->form->max_acceleration * time_left * time_left * 0.5f + pDrone->field_0x48 * time_left + pDrone->field_0x4c > brake_distance) {
+                    DoNotDprintf_drone("eDDS_straight_driving: CLAUSE 6 %f %f", target_speed, pDrone->field_0x48);
+                    time_used = time_left;
+                } else {
+                    DoNotDprintf_drone("eDDS_straight_driving: CLAUSE 7 %f %f", target_speed, pDrone->field_0x48);
+                    if (pDrone->field_0x48 > target_speed) {
+                        pDrone->field_0x48 = pDrone->field_0x48 - pDrone->form->max_acceleration * time_left;
+                        if (pDrone->field_0x48 < pDrone->form->min_speed) {
+                            pDrone->field_0x48 = pDrone->form->min_speed;
+                        }
+                    } else {
+                        pDrone->field_0x48 = pDrone->form->max_acceleration * time_left + pDrone->field_0x48;
+                        if (pDrone->field_0x48 > pDrone->form->max_speed) {
+                            pDrone->field_0x48 = pDrone->form->max_speed;
+                        }
+                    }
+                    time_used = gDrone_delta_time;
+                }
+            }
+            if (pDrone->field_0xdc == 2) {
+                pDrone->field_0x4c = pDrone->field_0x10->field_0x1c - pDrone->field_0x6c;
+                BrVector3Scale(&pDrone->actor->t.t.translate.t, &pDrone->field_0x10->field_0x10, pDrone->field_0x4c);
+                BrVector3Accumulate(&pDrone->actor->t.t.translate.t, &gDrone_path_nodes[pDrone->field_0xa_pathnode_id].position);
+            } else {
+                pDrone->field_0x4c = pDrone->field_0x48 * time_used + pDrone->field_0x4c;
+                BrVector3Scale(&pDrone->actor->t.t.translate.t, &pDrone->field_0x10->field_0x10, pDrone->field_0x4c);
+                BrVector3Accumulate(&pDrone->actor->t.t.translate.t, &gDrone_path_nodes[pDrone->field_0xa_pathnode_id].position);
+            }
+            time_left -= time_used;
+            pDrone->field_0xe4 = pDrone->field_0x48;
+            break;
+        case 0:
+            DoNotDprintf_drone("eDDS_straight_start");
+            if (!ChooseNextNode(pDrone)) {
+                NewDroneState(pDrone, 4);
+                return;
+            }
+            CalculateDrivingInfo(pDrone);
+            PointActorAlongThisBloodyVector(pDrone->actor, &pDrone->field_0x10->field_0x04);
+            pDrone->field_0xdc = 1;
+            break;
+        }
+    }
 }
 
-// STUB: CARMA2_HW 0x0044e540
-// STUB: CARMA2_SW 0x0044e2e0
-// STUB: CARMA2_CHEAT 0x0044ea90
+// FUNCTION: CARMA2_HW 0x0044e540
+// FUNCTION: CARMA2_SW 0x0044e2e0
+// FUNCTION: CARMA2_CHEAT 0x0044ea90
 void C2_HOOK_FASTCALL MoveThisDroneCar(tDrone_spec* pDrone) {
-    NOT_IMPLEMENTED();
+    br_vector3 offset;
+    br_vector3 direction;
+    br_vector3 tmp;
+    br_scalar time_left;
+    br_scalar time_used;
+    br_scalar angle_step;
+    br_scalar new_angle;
+    br_scalar new_distance;
+    br_scalar end_distance;
+    br_scalar speed_diff_squared;
+    br_scalar brake_distance;
+    br_scalar deceleration;
+    br_scalar time_to_corner_speed;
+    int finished;
+
+    DoNotDprintf_drone("MoveThisDroneCar()");
+    time_left = gDrone_delta_time;
+    while (time_left > 0.0f) {
+        switch (pDrone->field_0xdc) {
+        case 2:
+            if (pDrone->field_0x68 > 0.0f) {
+                angle_step = time_left * pDrone->field_0x48 / pDrone->field_0x68;
+                finished = 0;
+                if (pDrone->left_turn) {
+                    new_angle = pDrone->field_0x60 + angle_step;
+                    if (new_angle >= pDrone->field_0x64) {
+                        time_used = (pDrone->field_0x64 - pDrone->field_0x60) * pDrone->field_0x68 / pDrone->field_0x48;
+                        finished = 1;
+                        pDrone->field_0x60 = pDrone->field_0x64;
+                    } else {
+                        time_used = gDrone_delta_time;
+                        pDrone->field_0x60 = new_angle;
+                    }
+                } else {
+                    new_angle = pDrone->field_0x60 - angle_step;
+                    if (new_angle <= pDrone->field_0x64) {
+                        time_used = (pDrone->field_0x60 - pDrone->field_0x64) * pDrone->field_0x68 / pDrone->field_0x48;
+                        finished = 1;
+                        pDrone->field_0x60 = pDrone->field_0x64;
+                    } else {
+                        time_used = gDrone_delta_time;
+                        pDrone->field_0x60 = new_angle;
+                    }
+                }
+                offset.v[0] = (br_scalar)(pDrone->field_0x68 * cos(pDrone->field_0x60) + pDrone->field_0x54.v[0]);
+                offset.v[1] = 0.0f;
+                offset.v[2] = (br_scalar)(pDrone->field_0x68 * sin(pDrone->field_0x60) + pDrone->field_0x54.v[1]);
+                BrMatrix34ApplyV(&pDrone->actor->t.t.translate.t, &offset, &pDrone->field_0xa8);
+                BrVector3Accumulate(&pDrone->actor->t.t.translate.t, &gDrone_path_nodes[pDrone->field_0xc].position);
+                pDrone->field_0xe0 = (pDrone->field_0x60 - pDrone->field_0x5c) / (pDrone->field_0x64 - pDrone->field_0x5c);
+                pDrone->field_0x74 = pDrone->field_0xe0;
+                BrVector3Scale(&direction, &pDrone->field_0x14->field_0x10, pDrone->field_0x74);
+                BrVector3Scale(&tmp, &pDrone->field_0x10->field_0x10, 1.0f - pDrone->field_0x74);
+                BrVector3Accumulate(&direction, &tmp);
+                if (pDrone->form->flags & 0x10) {
+                    direction.v[1] = 0.0f;
+                }
+                PointActorAlongThisBloodyVector(pDrone->actor, &direction);
+                time_left -= time_used;
+                if (finished) {
+                    pDrone->field_0x4c = pDrone->field_0x6c;
+                    pDrone->field_0xdc = 0;
+                }
+            } else {
+                pDrone->field_0x4c = 0.0f;
+                pDrone->field_0xdc = 0;
+            }
+            pDrone->field_0xe4 = pDrone->field_0x48;
+            break;
+        case 1:
+            if (pDrone->form->speed >= 0.0f) {
+                pDrone->field_0x48 = pDrone->form->speed;
+                pDrone->field_0x50 = pDrone->form->speed;
+            }
+            end_distance = pDrone->field_0x10->field_0x1c - pDrone->field_0x6c;
+            new_distance = time_left * pDrone->field_0x48 + pDrone->field_0x4c;
+            if (pDrone->field_0x4c >= end_distance) {
+                time_used = 0.0f;
+                pDrone->field_0xdc = 2;
+                if (pDrone->field_0x48 > pDrone->field_0x50) {
+                    pDrone->field_0x48 = pDrone->field_0x50;
+                }
+            } else if (new_distance > end_distance) {
+                if (pDrone->field_0x48 > pDrone->field_0x50) {
+                    time_used = pDrone->field_0x48 - pDrone->field_0x50;
+                    pDrone->field_0x48 = pDrone->field_0x50;
+                } else {
+                    time_used = time_left;
+                }
+            } else if (pDrone->form->speed < 0.0f) {
+                speed_diff_squared = pDrone->field_0x48 * pDrone->field_0x48 - pDrone->field_0x50 * pDrone->field_0x50;
+                brake_distance = end_distance - speed_diff_squared * 0.5f;
+                if (pDrone->field_0x48 > pDrone->field_0x50 && pDrone->field_0x4c >= brake_distance) {
+                    deceleration = -(speed_diff_squared / (2.0f * (end_distance - pDrone->field_0x4c)));
+                    time_to_corner_speed = (pDrone->field_0x48 - pDrone->field_0x50) / -deceleration;
+                    if (time_to_corner_speed <= time_left) {
+                        pDrone->field_0x48 = pDrone->field_0x50;
+                        time_used = time_to_corner_speed;
+                    } else {
+                        pDrone->field_0x48 = deceleration * time_left + pDrone->field_0x48;
+                        time_used = time_left;
+                    }
+                } else if ((pDrone->field_0x48 <= pDrone->field_0x50 || new_distance <= brake_distance)
+                    && (pDrone->field_0x48 <= pDrone->field_0x50
+                        || pDrone->form->max_acceleration * time_left * time_left * 0.5f + pDrone->field_0x48 * time_left + pDrone->field_0x4c <= brake_distance)) {
+                    pDrone->field_0x48 = pDrone->form->max_acceleration * time_left + pDrone->field_0x48;
+                    if (pDrone->field_0x48 > pDrone->form->max_speed) {
+                        pDrone->field_0x48 = pDrone->form->max_speed;
+                    }
+                    time_used = gDrone_delta_time;
+                } else {
+                    time_used = time_left;
+                }
+            } else {
+                time_used = time_left;
+            }
+            if (pDrone->field_0xdc == 2) {
+                pDrone->field_0x4c = pDrone->field_0x10->field_0x1c - pDrone->field_0x6c;
+                BrVector3Scale(&pDrone->actor->t.t.translate.t, &pDrone->field_0x10->field_0x10, pDrone->field_0x4c);
+                BrVector3Accumulate(&pDrone->actor->t.t.translate.t, &gDrone_path_nodes[pDrone->field_0xa_pathnode_id].position);
+            } else {
+                pDrone->field_0x4c = pDrone->field_0x48 * time_used + pDrone->field_0x4c;
+                BrVector3Scale(&pDrone->actor->t.t.translate.t, &pDrone->field_0x10->field_0x10, pDrone->field_0x4c);
+                BrVector3Accumulate(&pDrone->actor->t.t.translate.t, &gDrone_path_nodes[pDrone->field_0xa_pathnode_id].position);
+            }
+            time_left -= time_used;
+            pDrone->field_0xe4 = pDrone->field_0x48;
+            break;
+        case 0:
+            DoNotDprintf_drone("eDDS_straight_start");
+            if (!ChooseNextNode(pDrone)) {
+                NewDroneState(pDrone, 4);
+                return;
+            }
+            CalculateDrivingInfo(pDrone);
+            BrVector3Copy(&direction, &pDrone->field_0x10->field_0x04);
+            if (pDrone->form->flags & 0x10) {
+                direction.v[1] = 0.0f;
+            }
+            PointActorAlongThisBloodyVector(pDrone->actor, &direction);
+            pDrone->field_0xdc = 1;
+            break;
+        }
+    }
 }
 
 #ifdef REC2_MATCHING

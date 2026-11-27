@@ -16,6 +16,7 @@
 
 extern int gDecode_thing;
 extern tU32 gTime_stamp_for_this_munging;
+extern float gDrone_delta_time;
 extern int gFunk_groove_flags[30];
 extern br_pixelmap* gCursors[8];
 

@@ -36,7 +36,7 @@ extern void C2_HOOK_CDECL DoNotDprintf_drone(const char* pMessage, ...);
 
 // CrappyLittleDrivingStateInfoDprintf
 
-// DroneStraightestArcForCorner2D
+extern int C2_HOOK_FASTCALL DroneStraightestArcForCorner2D(br_vector2* pCent, br_scalar* pRadius, br_scalar* pEntry_length, int* pLeft_not_right, const br_vector2* p1, const br_vector2* p2, const br_vector2* p3, br_scalar pWidth);
 
 extern FILE* C2_HOOK_FASTCALL OpenDroneFile(char* pDrone_name);
 
@@ -80,7 +80,7 @@ extern br_actor* C2_HOOK_CDECL MrFindy(br_actor* pActor, const char* pName);
 
 // LoadDrone
 
-// CalculateDrivingInfo
+extern void C2_HOOK_FASTCALL CalculateDrivingInfo(tDrone_spec* pDrone);
 
 // PauseDroneState
 
@@ -102,7 +102,7 @@ extern int C2_HOOK_FASTCALL DroneTrainWithinRenderingDistance(const br_vector3* 
 
 // InitDroneSpec
 
-// ChooseNextNode
+extern int C2_HOOK_FASTCALL ChooseNextNode(tDrone_spec* pDrone);
 
 // DroneOrientationChanged
 

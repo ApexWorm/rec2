@@ -5403,12 +5403,12 @@ typedef struct {
 typedef struct tDrone_spec {
     int id;
     tDrone_form* form;
-    tU16 field_0x8_pathnode_id;
-    tU16 field_0xa_pathnode_id;
+    tS16 field_0x8_pathnode_id;
+    tS16 field_0xa_pathnode_id;
     tS16 field_0xc;
     tS16 field_0xe;
     tDrone_path_node_section* field_0x10;
-    undefined4 field_0x14;
+    tDrone_path_node_section* field_0x14;
     br_vector3 field_0x18;
     br_vector3 pos;
     tU32 time_last_munge;
@@ -5422,11 +5422,16 @@ typedef struct tDrone_spec {
     float field_0x48;
     float field_0x4c;
     float field_0x50;
-    br_bounds3 field_0x54;
-    undefined4 field_0x6c;
+    br_vector2 field_0x54;
+    float field_0x5c;
+    float field_0x60;
+    float field_0x64;
+    float field_0x68;
+    float field_0x6c;
     float h_radius;
     float field_0x74;
-    undefined field_0x78[96];
+    br_matrix34 field_0x78;
+    br_matrix34 field_0xa8;
     tU8 left_turn;
     undefined field_0xd9[3];
     tU32 field_0xdc;
