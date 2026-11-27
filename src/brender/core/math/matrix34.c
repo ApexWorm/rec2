@@ -98,6 +98,7 @@ void C2_HOOK_CDECL BrMatrix34Identity(br_matrix34* mat) {
 
 // FUNCTION: CARMA2_HW 0x005327f0
 // FUNCTION: CARMA2_SW 0x0052de90
+// FUNCTION: CARMA2_CHEAT 0x005383e0
 void C2_HOOK_CDECL BrMatrix34RotateX(br_matrix34* mat, br_angle rx) {
     br_scalar s;
     br_scalar c;
