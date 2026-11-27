@@ -13,6 +13,7 @@
 #include "rec2_types.h"
 
 extern int gRender_indent;
+extern int gRecording_mouse_disabled;
 extern int gWidth;
 extern int gHeight;
 extern tU8 gTemporary_physics_render_buffer[300000];
