@@ -1088,7 +1088,7 @@ inline tEnvironment_sound_source* C2_HOOK_FASTCALL TryToSetEnvironmentalSound(vo
 // FUNCTION: CARMA2_HW 0x00456c60
 // FUNCTION: CARMA2_SW 0x004569f0
 // FUNCTION: CARMA2_CHEAT 0x004570e0
-void C2_HOOK_FASTCALL DoAnEnvironmentalSound(void* pSrc_object, tEnvironment_sound_generator_info* pEnv_info, int pVolume, br_vector3* pPos) {
+void C2_HOOK_FASTCALL DoAnEnvironmentalSound(void* pSrc_object, tSpecial_volume_soundfx_data* pSoundfx, int pVolume, br_vector3* pPos) {
     tU32 the_time;
     int start_sound;
     tEnvironment_sound_source* source;
@@ -1097,20 +1097,20 @@ void C2_HOOK_FASTCALL DoAnEnvironmentalSound(void* pSrc_object, tEnvironment_sou
 
     the_time = GetTotalTime();
     start_sound = 0;
-    switch (pEnv_info->soundfx.periodicity) {
+    switch (pSoundfx->periodicity) {
     case kSoundFxPeriodicity_Random:
-        if (the_time >= pEnv_info->soundfx.field_0xc) {
+        if (the_time >= pSoundfx->field_0xc) {
             start_sound = 1;
-            pEnv_info->soundfx.field_0xc = IRandomBetween(pEnv_info->soundfx.random.min_gap, pEnv_info->soundfx.random.max_gap) + the_time;
+            pSoundfx->field_0xc = IRandomBetween(pSoundfx->random.min_gap, pSoundfx->random.max_gap) + the_time;
         }
         break;
     case kSoundFxPeriodicity_Periodic:
-        if (the_time >= pEnv_info->soundfx.field_0xc) {
+        if (the_time >= pSoundfx->field_0xc) {
             start_sound = 1;
-            if (the_time - pEnv_info->soundfx.field_0xc > (tU32)pEnv_info->soundfx.period) {
-                pEnv_info->soundfx.field_0xc = the_time + pEnv_info->soundfx.period;
+            if (the_time - pSoundfx->field_0xc > (tU32)pSoundfx->period) {
+                pSoundfx->field_0xc = the_time + pSoundfx->period;
             } else {
-                pEnv_info->soundfx.field_0xc += pEnv_info->soundfx.period;
+                pSoundfx->field_0xc += pSoundfx->period;
             }
         }
         break;
@@ -1120,9 +1120,9 @@ void C2_HOOK_FASTCALL DoAnEnvironmentalSound(void* pSrc_object, tEnvironment_sou
             source->position = *pPos;
             source->field_0x18 = 1;
             S3UpdateSoundSource(gXXX_outlet,
-                (tU16)pEnv_info->soundfx.sound_alternatives[IRandomBetween(0, pEnv_info->soundfx.count_sound_alternatives - 1)],
+                (tU16)pSoundfx->sound_alternatives[IRandomBetween(0, pSoundfx->count_sound_alternatives - 1)],
                 source->source, -1.f, -1, -1, pVolume,
-                IRandomPosNeg(pEnv_info->soundfx.max_deviation) + 0x10000, -1);
+                IRandomPosNeg(pSoundfx->max_deviation) + 0x10000, -1);
         }
         gINT_0079e140 = 1;
         break;
@@ -1130,17 +1130,35 @@ void C2_HOOK_FASTCALL DoAnEnvironmentalSound(void* pSrc_object, tEnvironment_sou
         break;
     }
     if (start_sound) {
-        pitch = IRandomPosNeg(pEnv_info->soundfx.max_deviation) + 0x10000;
-        sound_id = (tU16)pEnv_info->soundfx.sound_alternatives[IRandomBetween(0, pEnv_info->soundfx.count_sound_alternatives - 1)];
+        pitch = IRandomPosNeg(pSoundfx->max_deviation) + 0x10000;
+        sound_id = (tU16)pSoundfx->sound_alternatives[IRandomBetween(0, pSoundfx->count_sound_alternatives - 1)];
         DRS3StartSound3D(gXXX_outlet, sound_id, pPos, &gZero_v__car, 1, pVolume, pitch, 0x10000);
     }
 }
 
-// STUB: CARMA2_HW 0x00456af0
-// STUB: CARMA2_SW 0x00456880
-// STUB: CARMA2_CHEAT 0x00456f70
+// FUNCTION: CARMA2_HW 0x00456af0
+// FUNCTION: CARMA2_SW 0x00456880
+// FUNCTION: CARMA2_CHEAT 0x00456f70
 void C2_HOOK_FASTCALL DoEnvSound(tSpecial_volume* pVolume, br_vector3* pP, tSpecial_volume_soundfx_type pType, tSpecial_volume_soundfx_data* pSound_data, float pSound_dist, br_vector3* pSound_dir) {
-    NOT_IMPLEMENTED();
+    br_vector3 pos;
+    br_vector3 dir;
+
+    if (gAmbient_sound && pType != kSoundFx_None) {
+        if (pType == kSoundFx_Saturated) {
+            if (pSound_dist != 0.0f) {
+                BrVector3Normalise(&dir, pSound_dir);
+                BrVector3Scale(&dir, &dir, -pSound_dist);
+                BrVector3Add(&pos, pP, &dir);
+            } else {
+                BrVector3Copy(&pos, pP);
+            }
+        } else {
+            pos.v[0] = SRandomPosNeg(10.0f) + pP->v[0];
+            pos.v[1] = SRandomPosNeg(10.0f) + pP->v[1];
+            pos.v[2] = SRandomPosNeg(10.0f) + pP->v[2];
+        }
+        DoAnEnvironmentalSound(pVolume, pSound_data, (int)((float)((10.0f - pSound_dist) * 255.0f) * 0.1f), &pos);
+    }
 }
 
 // FUNCTION: CARMA2_HW 0x00457260
@@ -1235,7 +1253,7 @@ void C2_HOOK_FASTCALL MungeSoundGenerators(void) {
             } else {
                 src_obj = src->generator;
             }
-            DoAnEnvironmentalSound(src_obj, src, (int)(((10.f - distance) * 255.f) / 10.f), &src->pos);
+            DoAnEnvironmentalSound(src_obj, &src->soundfx, (int)(((10.f - distance) * 255.f) / 10.f), &src->pos);
         }
     }
 }
