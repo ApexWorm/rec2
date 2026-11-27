@@ -87,8 +87,8 @@ tCar_spec* C2_HOOK_FASTCALL GetRaceLeader(void) {
     int score;
     tCar_spec* car;
 
-    car = gNet_players[0].car;
     score = gNet_players[0].last_score_index;
+    car = gNet_players[0].car;
     if (gCurrent_net_game->type == eNet_game_type_foxy && gIt_or_fox >= 0 && gIt_or_fox < gNumber_of_net_players) {
         return gNet_players[gIt_or_fox].car;
     } else {
@@ -506,11 +506,48 @@ void C2_HOOK_FASTCALL RestoreCameraPosition(int pIndex) {
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x00411fc0
-// STUB: CARMA2_SW 0x00411fa0
-// STUB: CARMA2_CHEAT 0x00412210
+// FUNCTION: CARMA2_HW 0x00411fc0
+// FUNCTION: CARMA2_SW 0x00411fa0
+// FUNCTION: CARMA2_CHEAT 0x00412210
 void C2_HOOK_FASTCALL PointCameraAtCar(br_vector3* pPos, br_matrix34* pMat, float pFov_factor) {
-    NOT_IMPLEMENTED();
+    br_vector3 vn;
+    br_vector3 tv;
+    br_vector3 tv2;
+    br_scalar dist;
+    br_scalar frac;
+    br_angle off_centre_angle;
+    br_vector3* pos;
+    br_camera* camera_ptr;
+    int swoop;
+
+    camera_ptr = gCamera->type_data;
+    off_centre_angle = (br_angle)(pFov_factor / 5.0f * (float)camera_ptr->field_of_view);
+    swoop = gCountdown && gCamera_height > pPos->v[1] + 0.01f;
+    if (swoop) {
+        BrVector3Sub(&tv, &gAverage_grid_position, pPos);
+        frac = (gCamera_height - pPos->v[1]) / 10.0f;
+        BrVector3Scale(&tv, &tv, frac);
+        BrVector3Accumulate(&tv, pPos);
+        pos = &tv;
+        off_centre_angle = (br_angle)((1.0f - frac) * (float)off_centre_angle);
+    } else {
+        pos = pPos;
+    }
+    BrVector3Sub(&vn, pPos, (br_vector3*)pMat->m[3]);
+    vn.v[1] = 0.0f;
+    BrVector3Normalise(&vn, &vn);
+    pMat->m[0][0] = -vn.v[2];
+    pMat->m[0][1] = 0.0f;
+    pMat->m[0][2] = vn.v[0];
+    pMat->m[1][0] = 0.0f;
+    pMat->m[1][1] = 1.0f;
+    pMat->m[1][2] = 0.0f;
+    pMat->m[2][0] = -vn.v[0];
+    pMat->m[2][1] = 0.0f;
+    pMat->m[2][2] = -vn.v[2];
+    BrVector3Sub(&tv2, pos, (br_vector3*)pMat->m[3]);
+    dist = BrVector3Dot(&tv2, &vn);
+    BrMatrix34PreRotateX(pMat, off_centre_angle - BrRadianToAngle(atan2f(pMat->m[3][1] - pos->v[1], dist)));
 }
 
 #ifdef REC2_MATCHING
