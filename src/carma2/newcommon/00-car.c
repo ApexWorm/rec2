@@ -33,6 +33,7 @@
 #include "59-camera.h"
 #include "60-phil.h"
 #include "61-pedestrn.h"
+#include "61-pedestrn-phys.h"
 #include "brender/brender.h"
 #include "globvars.h"
 #include "globvrkm.h"
@@ -1226,8 +1227,8 @@ void C2_HOOK_FASTCALL TumbleObjectWithV(tPhysics_object* pObject, br_vector3* pV
                 BrVector3Scale(&axis_object, &axis_object, k);
                 BrVector3Accumulate(&pObject->omega, &axis_object);
                 omega_squared = BrVector3LengthSquared(&pObject->omega);
-                if (omega_squared > 400.f) {
-                    k = (br_scalar)sqrt(400.f / omega_squared);
+                if (omega_squared > 400.0f) {
+                    k = (br_scalar)sqrt(400.0f / omega_squared);
                     BrVector3Scale(&pObject->omega, &pObject->omega, k);
                 }
             }

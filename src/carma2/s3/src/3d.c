@@ -418,6 +418,7 @@ int C2_HOOK_FASTCALL S3StartSound3D(tS3_outlet *pOutlet, int pSound, const br_ve
 
 // FUNCTION: CARMA2_HW 0x0056773c
 // FUNCTION: CARMA2_SW 0x00562ddc
+// FUNCTION: CARMA2_CHEAT 0x0056d333
 int C2_HOOK_FASTCALL S3BindAmbientSoundToOutlet(tS3_outlet* pOutlet, int pSound, tS3_sound_source* source, float pMax_distance, int pPeriod, int pRepeats, int pVolume, int pPitch, int pSpeed) {
     tS3_descriptor* desc;
 
