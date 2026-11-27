@@ -1780,9 +1780,10 @@ void C2_HOOK_FASTCALL PedPreCollisionStuff(void) {
 
     for (object = PHILGetFirstObject(); object != NULL; object = PHILGetNextObject(object)) {
         if (object->owner != NULL && object->flags_0x238 == 5) {
-            torque.v[0] = object->omega.v[0] * (0.002 * 0.002 * BrVector3Length(&object->omega));
-            torque.v[1] = object->omega.v[1] * (0.002 * 0.002 * BrVector3Length(&object->omega));
-            torque.v[2] = object->omega.v[2] * (br_scalar)(0.002 * 0.002 * BrVector3Length(&object->omega));
+            // FIXME: BrVector3Scale(&torque, &object->omega, 0.04 * 0.0001 * BrVector3Length(&object->omega));
+            torque.v[0] = (br_scalar)(object->omega.v[0] * (0.04 * 0.0001 * BrVector3Length(&object->omega)));
+            torque.v[1] = (br_scalar)(object->omega.v[1] * (0.04 * 0.0001 * BrVector3Length(&object->omega)));
+            torque.v[2] = object->omega.v[2] * (br_scalar)(0.04 * 0.0001 * BrVector3Length(&object->omega));
             ApplyDiminishingTorque(object, &torque);
         }
     }
