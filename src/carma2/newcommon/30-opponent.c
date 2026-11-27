@@ -1198,9 +1198,20 @@ void C2_HOOK_FASTCALL DisposeOpponentPaths(void) {
     gBit_per_node = NULL;
 }
 
-// MungeOpponents
+// STUB: CARMA2_HW 0x004a9e10
+// STUB: CARMA2_SW 0x004a5f80
+// STUB: CARMA2_CHEAT 0x004ab2f0
+void C2_HOOK_FASTCALL MungeOpponents(tU32 pFrame_period) {
+    /* FIXME: MungeAIWorld passes pFrame_period in ecx; the Mac version has no parameter */
+    NOT_IMPLEMENTED();
+}
 
-// InitOpponents
+// STUB: CARMA2_HW 0x004add50
+// STUB: CARMA2_SW 0x004a9ec0
+// STUB: CARMA2_CHEAT 0x004af260
+void C2_HOOK_FASTCALL InitOpponents(tRace_info* pRace_info) {
+    NOT_IMPLEMENTED();
+}
 
 // FUNCTION: CARMA2_HW 0x004ae5d0
 // FUNCTION: CARMA2_SW 0x004aa740
