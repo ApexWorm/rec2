@@ -905,6 +905,8 @@ typedef struct tPipe_chunk {
         tPipe_model_mash model_mash;
         tPipe_chunk_bend bend;
         tPipe_chunk_screen_wobble wobble;
+        tPipe_chunk_groove_stop groove_stop;
+        tS8 damage[12];
         tPipe_chunk_skid_adjustment skid_adjustment;
         tPipe_chunk_actor_trans actor_trans;
         tPipe_chunk_smoke smoke;

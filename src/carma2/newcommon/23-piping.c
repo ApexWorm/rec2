@@ -1895,7 +1895,18 @@ void C2_HOOK_FASTCALL ApplyScreenWobble(tPipe_chunk** pChunk) {
         (*pChunk)->data.wobble.wobble_y);
 }
 
-// ApplyGrooveStop
+// FUNCTION: CARMA2_HW 0x004c9190
+// FUNCTION: CARMA2_SW 0x004c58c0
+// FUNCTION: CARMA2_CHEAT 0x004cecb0
+void C2_HOOK_FASTCALL ApplyGrooveStop(tPipe_chunk** pChunk) {
+
+    SetGrooveInterrupt((*pChunk)->subject_index,
+        &(*pChunk)->data.groove_stop.matrix,
+        (*pChunk)->data.groove_stop.path_interrupt,
+        (*pChunk)->data.groove_stop.object_interrupt,
+        (*pChunk)->data.groove_stop.path_resumption,
+        (*pChunk)->data.groove_stop.object_resumption);
+}
 
 // FUNCTION: CARMA2_HW 0x004c91b0
 // FUNCTION: CARMA2_SW 0x004c58e0
@@ -2055,7 +2066,22 @@ void C2_HOOK_FASTCALL ApplyGWS(tPipe_chunk** pChunk) {
     car->steering_angle = (br_scalar)((tS16)(*pChunk)->data.graphical_wheel_stuff.steering_angle * (60.0 / 32767.0));
 }
 
-// ApplyDamage
+// FUNCTION: CARMA2_HW 0x004c9770
+// FUNCTION: CARMA2_SW 0x004c5ea0
+// FUNCTION: CARMA2_CHEAT 0x004cf290
+void C2_HOOK_FASTCALL ApplyDamage(tPipe_chunk** pChunk) {
+    tCar_spec* car;
+    int i;
+
+    if (((*pChunk)->subject_index & 0xffffff00) == (eVehicle_self << 8)) {
+        car = &gProgram_state.current_car;
+    } else {
+        car = GetCarSpec((*pChunk)->subject_index >> 8, (*pChunk)->subject_index & 0xff);
+    }
+    for (i = 0; i < (int)REC2_ASIZE(car->damage_units); i++) {
+        car->damage_units[i].damage_level += (*pChunk)->data.damage[i];
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x004c97c0
 // FUNCTION: CARMA2_SW 0x004c5ef0
@@ -2581,7 +2607,22 @@ void C2_HOOK_FASTCALL UndoSmudge(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk)
     DoSmudge(pChunk, -1);
 }
 
-// UndoDamage
+// FUNCTION: CARMA2_HW 0x004c9dd0
+// FUNCTION: CARMA2_SW 0x004c6500
+// FUNCTION: CARMA2_CHEAT 0x004cf900
+void C2_HOOK_FASTCALL UndoDamage(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
+    tCar_spec* car;
+    int i;
+
+    if (((*pChunk)->subject_index & 0xffffff00) == (eVehicle_self << 8)) {
+        car = &gProgram_state.current_car;
+    } else {
+        car = GetCarSpec((*pChunk)->subject_index >> 8, (*pChunk)->subject_index & 0xff);
+    }
+    for (i = 0; i < (int)REC2_ASIZE(car->damage_units); i++) {
+        car->damage_units[i].damage_level -= (*pChunk)->data.damage[i];
+    }
+}
 
 // UndoSpecial
 
