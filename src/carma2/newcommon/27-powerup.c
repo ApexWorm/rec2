@@ -1590,25 +1590,25 @@ void C2_HOOK_FASTCALL PositionMine(tShit_mine* pMine, tCar_spec* pCar) {
 
     if (pMine->flags & 0x40) {
         BrMatrix34Translate(&pMine->collision_info->actor->t.t.mat,
-            0.f,
+            0.0f,
             (pCar->collision_info->bb1.max.v[1] - pCar->collision_info->bb1.min.v[1]) * 0.5f,
             (br_scalar)(pCar->collision_info->bb1.min.v[2] - 0.15));
     } else {
         BrMatrix34Translate(&pMine->collision_info->actor->t.t.mat,
-            0.f,
+            0.0f,
             (pCar->collision_info->bb1.max.v[1] - pCar->collision_info->bb1.min.v[1]) * 0.5f,
             (br_scalar)(pCar->collision_info->bb1.max.v[2] + 0.15));
     }
     BrMatrix34Copy(&mat, &pCar->collision_info->transform_matrix);
     BrMatrix34Post(&pMine->collision_info->actor->t.t.mat, &mat);
     BrMatrix34Copy(&pMine->collision_info->transform_matrix, &pMine->collision_info->actor->t.t.mat);
-    BrVector3Set(&v, 0.f, pMine->field_0x20, pMine->field_0x24);
+    BrVector3Set(&v, 0.0f, pMine->field_0x20, pMine->field_0x24);
     BrMatrix34ApplyV(&pMine->collision_info->v, &v, &mat);
     BrVector3Add(&pMine->collision_info->v, &pCar->collision_info->v, &pMine->collision_info->v);
     if (pMine->flags & 0x40) {
         BrVector3Add(&pMine->collision_info->v, &pCar->collision_info->v, &pMine->collision_info->v);
     }
-    BrVector3Set(&pMine->collision_info->omega, 0.f, 0.f, 0.f);
+    BrVector3Set(&pMine->collision_info->omega, 0.0f, 0.0f, 0.0f);
 }
 
 // MineSound
