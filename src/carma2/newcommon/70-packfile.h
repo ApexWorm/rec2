@@ -52,6 +52,8 @@ extern int C2_HOOK_FASTCALL PFfeof(FILE* pFile);
 
 extern int C2_HOOK_FASTCALL DRferror(FILE* pFile);
 
+extern void C2_HOOK_FASTCALL DRclearerr(FILE* pFile);
+
 extern void C2_HOOK_FASTCALL PFForEveryFile(const char* pThe_path, tPDForEveryFileRecurse_cbfn pAction_routine);
 
 extern void C2_HOOK_FASTCALL PFForEveryFile2(const char* path, tEnumPathCallback pCallback, void* data);
