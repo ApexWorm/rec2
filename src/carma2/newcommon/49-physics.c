@@ -1377,6 +1377,8 @@ tPhysics_joint* C2_HOOK_FASTCALL AllocatePhysicsJoint(int pCount_limits, int pTy
 }
 
 // FUNCTION: CARMA2_HW 0x004c5e40
+// FUNCTION: CARMA2_SW 0x004c2570
+// FUNCTION: CARMA2_CHEAT 0x004cb960
 tPhysics_joint* C2_HOOK_FASTCALL ClonePhysicsJoint(const tPhysics_joint* pJoint, int pType) {
     size_t size;
     tPhysics_joint* clone;
@@ -1654,6 +1656,8 @@ int C2_HOOK_FASTCALL PhysicsObjectRecurse(tPhysics_object* pObject, tEnumCollisi
 }
 
 // FUNCTION: CARMA2_HW 0x004c64b0
+// FUNCTION: CARMA2_SW 0x004c2be0
+// FUNCTION: CARMA2_CHEAT 0x004cbfd0
 int C2_HOOK_FASTCALL PhysicsObjectRecurseChildren(tPhysics_object* pObject, tEnumCollision_cbfn* pCallback, void* pContext) {
     tPhysics_object* child;
 
@@ -1732,6 +1736,8 @@ int C2_HOOK_FASTCALL FindFacesInBox(tBounds* pBounds, tFace_ref* pFace_list, int
 }
 
 // FUNCTION: CARMA2_HW 0x004b5970
+// FUNCTION: CARMA2_SW 0x004b2090
+// FUNCTION: CARMA2_CHEAT 0x004bb240
 float C2_HOOK_FASTCALL GetFrictionFromFace(const tFace_ref* pFace) {
     int material_index;
 
