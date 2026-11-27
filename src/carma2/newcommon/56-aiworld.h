@@ -16,7 +16,7 @@
 
 #include <stdio.h>
 
-// MakeVertexAndOffsetIt
+extern void C2_HOOK_FASTCALL MakeVertexAndOffsetIt(br_scalar pX, br_scalar pY, br_scalar pZ, br_model* pModel, int pVertex_num, const br_vector3* pOffset);
 
 extern void C2_HOOK_FASTCALL MakeFaceAndTextureIt(br_model* pModel, int pFace_num, br_uint_16 pV0, br_uint_16 pV1, br_uint_16 pV2, br_material* pMaterial);
 
@@ -38,10 +38,10 @@ extern void C2_HOOK_FASTCALL PointActorAlongVectorWithUp(br_actor* pThe_actor, b
 
 extern br_material* C2_HOOK_FASTCALL CreateSimpleMaterial(int pIndex);
 
-// MakeAIEditCubeHere
+extern void C2_HOOK_FASTCALL MakeAIEditCubeHere(br_model* pModel, int pVertex_index, int pFace_index, const br_vector3* pPos, br_material* pMaterial_1, br_material* pMaterial_2, br_material* pMaterial_3);
 
-// CalcNegativeXVector
+extern void C2_HOOK_FASTCALL CalcNegativeXVector(br_vector3* pNegative_x_vector, const br_vector3* pStart, const br_vector3* pFinish, br_scalar pLength);
 
-// MakeAISimpleEditSectionHere
+extern void C2_HOOK_FASTCALL MakeAISimpleEditSectionHere(br_model* pModel, int pVertex_index, int pFace_index, const br_vector3* pStart, const br_vector3* pFinish, br_material* pMaterial_1, br_material* pMaterial_2);
 
 #endif // GUARD_56_AIWORLD_H
