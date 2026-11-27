@@ -228,16 +228,20 @@ int C2_HOOK_FASTCALL ActorPick2D(br_actor* pActor, br_model* pModel, br_material
 
 inline int C2_HOOK_FASTCALL DRScenePick2D(br_actor* world, br_actor* camera, dr_pick2d_cbfn* callback, void* arg) {
     br_matrix34 camera_tfm;
-    br_scalar cos_angle;
+    br_scalar scale;
     br_scalar sin_angle;
+    br_scalar cos_angle;
     br_camera* camera_data;
+    br_scalar aspect;
 
     camera_data = camera->type_data;
     DRActorToRoot(camera, world, &camera_tfm);
     BrMatrix34Inverse(&gPick_model_to_view__raycast, &camera_tfm);
-    cos_angle = BR_COS(camera_data->field_of_view / 2);
+    aspect = camera_data->aspect;
     sin_angle = BR_SIN(camera_data->field_of_view / 2);
-    BrMatrix34PostScale(&gPick_model_to_view__raycast, cos_angle / sin_angle / camera_data->aspect, cos_angle / sin_angle, 1.0f);
+    cos_angle = BR_COS(camera_data->field_of_view / 2);
+    scale = cos_angle / sin_angle;
+    BrMatrix34PostScale(&gPick_model_to_view__raycast, scale / aspect, scale, 1.0f);
     return ActorPick2D(world, NULL, gBlack_material, callback, arg);
 }
 
