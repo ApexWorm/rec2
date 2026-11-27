@@ -12,6 +12,7 @@
 #include "00-car.h"
 #include "08-loading1.h"
 #include "13-crush1.h"
+#include "15-displays.h"
 #include "23-piping.h"
 #include "26-oppoproc.h"
 #include "41-utility.h"
@@ -19,6 +20,7 @@
 #include "56-aiworld.h"
 #include "60-phil.h"
 #include "globvars.h"
+#include "globvrkm.h"
 #include "globvrpb.h"
 #include "c2_stdio.h"
 #include "platform.h"
@@ -1196,6 +1198,32 @@ void C2_HOOK_FASTCALL DisposeOpponentPaths(void) {
     gProgram_state.AI_vehicles.path_nodes = NULL;
     gProgram_state.AI_vehicles.path_sections = NULL;
     gBit_per_node = NULL;
+}
+
+// FUNCTION: CARMA2_HW 0x004a9cb0
+// FUNCTION: CARMA2_SW 0x004a5e20
+// FUNCTION: CARMA2_CHEAT 0x004ab190
+void C2_HOOK_FASTCALL FUN_004a9cb0(void) {
+    char str[256];
+    tOpponent_spec* opponent_spec;
+    int section_no;
+
+    if (gCar_to_view != NULL && gCar_to_view->driver == eDriver_oppo) {
+        opponent_spec = GetOpponentSpecFromCarSpec(gCar_to_view);
+        section_no = opponent_spec->follow_path_data.section_no;
+        sprintf(str, "%s: obj: %d nsect: %d sect: %d(%d%s)%s%s",
+            gCar_to_view->name,
+            opponent_spec->current_objective,
+            opponent_spec->nnext_sections,
+            section_no,
+            section_no >= 20000 ? opponent_spec->next_sections[section_no - 20000].section_no : section_no,
+            section_no >= 15000 && section_no < 20000 ? "T" : "",
+            section_no >= 20000 && !opponent_spec->next_sections[section_no - 20000].direction ? "0" : "1",
+            opponent_spec->cheating ? "*" : "");
+    } else {
+        str[0] = '\0';
+    }
+    ChangeHeadupText(gProgram_state.frame_rate_headup, str);
 }
 
 // MungeOpponents

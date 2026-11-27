@@ -184,6 +184,8 @@ extern void C2_HOOK_FASTCALL LoadInOppoPaths(FILE* pF);
 
 extern void C2_HOOK_FASTCALL DisposeOpponentPaths(void);
 
+extern void C2_HOOK_FASTCALL FUN_004a9cb0(void);
+
 // MungeOpponents
 
 // InitOpponents
