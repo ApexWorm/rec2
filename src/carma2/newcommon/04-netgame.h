@@ -72,9 +72,9 @@ extern void C2_HOOK_FASTCALL EnableCar(tCar_spec* pCar);
 
 // DoNetworkHeadups
 
-// SortNetHeadAscending
+extern int C2_HOOK_CDECL SortNetHeadAscending(const void* pFirst_one, const void* pSecond_one);
 
-// SortNetHeadDescending
+extern int C2_HOOK_CDECL SortNetHeadDescending(const void* pFirst_one, const void* pSecond_one);
 
 // ClipName
 

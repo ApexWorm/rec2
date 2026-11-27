@@ -37,12 +37,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-typedef struct {
-    int player_index;
-    int score;
-    int field_0x8;
-} tNet_head_sort_entry; /* FIXME: name and fields are guesses */
-
 // GLOBAL: CARMA2_HW 0x0075b8f8
 // GLOBAL: CARMA2_SW 0x00751e58
 // GLOBAL: CARMA2_cHEAT 0x00762f98
