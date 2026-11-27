@@ -11,6 +11,8 @@
 #include "04-netgame.h"
 #include "08-loading1.h"
 #include "10-loading2.h"
+#include "15-displays.h"
+#include "16-graphics1.h"
 #include "18-graphics2.h"
 #include "21-mainloop.h"
 #include "23-piping.h"
@@ -18,6 +20,7 @@
 #include "32-spark.h"
 #include "40-main.h"
 #include "41-utility.h"
+#include "42-input.h"
 #include "53-controls.h"
 #include "59-camera.h"
 #include "27-powerup.h"
@@ -257,7 +260,33 @@ void C2_HOOK_FASTCALL DoActionReplay(tU32 pFrame_period) {
 
 // PollActionReplayControls
 
-// CheckReplayTurnOn
+extern int C2_HOOK_FASTCALL ARToggleReplay(tTurn_on_AR_callback* pTurn_on_AR_cb, tTurn_off_AR_callback* pTurn_off_AR_cb, tAfter_AR_callback* pAfter_AR_cb, tReplay_session_callback* pZappy_AR_cb, tPreprocess_AR_callback* pPreprocess_cb, tPostProcess_AR_callback* pPostProcess_cb, tU32* pFrame_period, tU32* pFrame_period_2);
+
+// FUNCTION: CARMA2_HW 0x004e72e0
+// FUNCTION: CARMA2_CHEAT 0x004ecf80
+void C2_HOOK_FASTCALL ToggleReplay(tU32* pFrame_period, tU32* pFrame_period_2) {
+
+    if (gAction_replay_mode) {
+        RenderAFrame(1);
+        RenderAFrame(1);
+    }
+    if (!ARToggleReplay(TurnOnActionReplay, TurnOffActionReplay, AfterActionReplay, DoZappyActionReplayHeadups, PreProcess, PostProcess, pFrame_period, pFrame_period_2)) {
+        NewTextHeadupSlot(4, 0, 1000, -4, GetMiscString(eMiscString_action_replay_unavailable));
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x004e6ff0
+// FUNCTION: CARMA2_CHEAT 0x004ecce0
+void C2_HOOK_FASTCALL CheckReplayTurnOn(void) {
+
+    if (!gAction_replay_mode) {
+        if (!KeyIsDown(58) || gEntering_message) {
+            gKey_down = -1;
+        } else if (gKey_down == -1) {
+            ToggleReplay(NULL, NULL);
+        }
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x004e7090
 // FUNCTION: CARMA2_SW 0x004e2ed0
