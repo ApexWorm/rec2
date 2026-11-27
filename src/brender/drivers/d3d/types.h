@@ -32,6 +32,8 @@ enum {
     BT_FRONTSCREEN,
     BT_BACKSCREEN,
     BT_DEPTH,
+    BT_ALPHA,
+    BT_SYSMEM,
     BT_MAX,
 };
 
@@ -84,8 +86,6 @@ typedef struct br_device_d3d {
     void *res;
     br_device_clut_d3d* clut;
     br_device_pixelmap_d3d* active_buffers[BT_MAX];
-    undefined4 field_0x34;
-    undefined4 field_0x38;
     undefined4 field_0x3c;
     undefined4 field_0x40;
 } br_device_d3d;
