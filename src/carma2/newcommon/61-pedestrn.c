@@ -61,15 +61,27 @@ tSmashable_initial_position_spec gGiblet_initial_position;
 // GLOBAL: CARMA2_CHEAT 0x0069bc94
 float gGiblet_scrape_start;
 
+// GLOBAL: CARMA2_HW 0x00694140
+// GLOBAL: CARMA2_SW 0x0068e198
+// GLOBAL: CARMA2_CHEAT 0x0069bcb8
+tProximity_ray gProximity_rays[20] = { 0 };
+
+#ifdef REC2_MATCHING
+// GLOBAL: CARMA2_HW 0x00694230
+// GLOBAL: CARMA2_SW 0x0068e288
+// GLOBAL: CARMA2_CHEAT 0x0069bda8
+undefined4 gDAT_00694230 = 0;
+#endif
+
 // GLOBAL: CARMA2_HW 0x00694234
 // GLOBAL: CARMA2_SW 0x0068e28c
 // GLOBAL: CARMA2_CHEAT 0x0069bdac
-int gPed_severing_damage;
+int gPed_severing_damage = 0;
 
 // GLOBAL: CARMA2_HW 0x00694238
 // GLOBAL: CARMA2_SW 0x0068e290
 // GLOBAL: CARMA2_CHEAT 0x0069bdb0
-tSlick_spec gPed_slick;
+tSlick_spec gPed_slick = { 0 };
 
 // GLOBAL: CARMA2_HW 0x0069445c
 // GLOBAL: CARMA2_SW 0x0068e4b4
@@ -294,6 +306,11 @@ int gPeds_suicidal;
 // GLOBAL: CARMA2_SW 0x0073b270
 // GLOBAL: CARMA2_CHEAT 0x0074be50
 int gExploding_pedestrians;
+
+// GLOBAL: CARMA2_HW 0x007447b4
+// GLOBAL: CARMA2_SW 0x0073b274
+// GLOBAL: CARMA2_CHEAT 0x0074be54
+tPedestrian* gPedestrians_in_sight;
 
 // GLOBAL: CARMA2_HW 0x007447c0
 // GLOBAL: CARMA2_SW 0x0073b280
