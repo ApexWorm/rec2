@@ -4645,7 +4645,7 @@ typedef struct tPhysics_object {
     undefined field_0x1df;
     undefined field_0x1e0[8];
     br_matrix34 field_0x1e8;
-    undefined4 field_0x218;
+    struct tPhysics_workspace* field_0x218;
     float field_0x21c;
     tPhysics_object* next;
     tPhysics_object* child;

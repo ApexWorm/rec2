@@ -12,6 +12,14 @@
 #include "c2_hooks.h"
 #include "rec2_types.h"
 
+typedef struct tPhysics_workspace {
+    int count;
+    tPhysics_joint_force* forces;
+    undefined field_0x8[12];
+    br_scalar* field_0x14;
+    br_scalar* field_0x18;
+} tPhysics_workspace;
+
 extern int gINT_00692dc8;
 
 extern tPhysicsError_cbfn* gPhysics_error_cb;
@@ -128,7 +136,7 @@ extern int C2_HOOK_FASTCALL TestForObjectInSensiblePlace(tPhysics_object* pColli
 
 // ApplySingleForce
 
-// ApplyJointForces
+extern void C2_HOOK_FASTCALL ApplyJointForces(tPhysics_joint_force** pForces, br_scalar* pAmounts, int pCount);
 
 // SkipForces
 
@@ -140,7 +148,7 @@ extern void C2_HOOK_FASTCALL CreateJointForce(tPhysics_object* pObject, tPhysics
 
 extern void C2_HOOK_FASTCALL CreateJointTorque(tPhysics_object* pObject, tPhysics_object* pPartner, tPhysics_joint_force* pForce, const br_vector3* pDirection);
 
-// AllocateObjectWorkspace
+extern tPhysics_workspace* C2_HOOK_FASTCALL AllocateObjectWorkspace(int pCount);
 
 // RedoQuickHingeVelocities
 
@@ -262,7 +270,7 @@ extern void C2_HOOK_FASTCALL SetUpForce(br_vector3* pAngular, br_vector3* pLinea
 
 // SetUpHingePartners
 
-// MakeMatrix
+extern void C2_HOOK_FASTCALL MakeMatrix(br_scalar* pMatrix, int pRows, tPhysics_joint_force** pForces, int pColumns);
 
 extern void C2_HOOK_FASTCALL RestoreListOmega(tPhysics_object* pObject);
 
@@ -288,7 +296,7 @@ extern void C2_HOOK_FASTCALL RestoreListOmega(tPhysics_object* pObject);
 
 extern void C2_HOOK_FASTCALL RotateObjectFirstOrder(tPhysics_object* pObject, br_scalar pTime);
 
-// RotateObject
+extern void C2_HOOK_FASTCALL RotateObject(tPhysics_object* pObject, br_scalar pDelta_time);
 
 extern void C2_HOOK_FASTCALL TranslateObject(tPhysics_object* pObject, br_scalar pDelta_time);
 
@@ -356,7 +364,7 @@ extern int C2_HOOK_FASTCALL RQDcmpV(br_scalar* pMatrix, int pDim, br_scalar* pQ)
 
 // RQMatrixSolveNoNegatives
 
-// RQMatrixSolveWithNegatives
+extern void C2_HOOK_FASTCALL RQMatrixSolveWithNegatives(br_scalar* pR, br_scalar* pQ, br_scalar* pB, br_scalar* pX, int pCount);
 
 extern int C2_HOOK_FASTCALL MatrixProcess(br_scalar* pR, br_scalar* pQ, int pDim);
 

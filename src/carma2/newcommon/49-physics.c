@@ -500,15 +500,64 @@ int C2_HOOK_FASTCALL TestForObjectInSensiblePlace(tPhysics_object* pCollision_in
     NOT_IMPLEMENTED();
 }
 
-// HierarchyCalcEnergy
+// FUNCTION: CARMA2_HW 0x004b7290
+// FUNCTION: CARMA2_SW 0x004b39b0
+// FUNCTION: CARMA2_CHEAT 0x004bcdc0
+br_scalar C2_HOOK_FASTCALL HierarchyCalcEnergy(tPhysics_object* pObject) {
+    br_scalar energy;
+    br_scalar object_energy;
+    int i;
+
+    energy = 0.f;
+    for (; pObject != NULL; pObject = pObject->next) {
+        object_energy = 0.f;
+        for (i = 0; i < 3; i++) {
+            object_energy += pObject->I.v[i] * REC2_SQR(pObject->omega.v[i]) + pObject->M * REC2_SQR(pObject->v.v[i]);
+        }
+        energy = HierarchyCalcEnergy(pObject->child) + (object_energy + energy);
+    }
+    return energy;
+}
 
 // CheckCollisionList
 
-// MakeJointVelocitiesVector
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
 
-// ApplySingleForce
+// STUB: CARMA2_HW 0x004b77b0
+// STUB: CARMA2_SW 0x004b3ed0
+// STUB: CARMA2_CHEAT 0x004bd2e0
+void C2_HOOK_FASTCALL MakeJointVelocitiesVector(br_scalar* pVelocities, tPhysics_joint_force** pForces, int pCount) {
+    NOT_IMPLEMENTED();
+}
 
-// ApplyJointForces
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_HW 0x004b7960
+// STUB: CARMA2_SW 0x004b4080
+// STUB: CARMA2_CHEAT 0x004bd490
+void C2_HOOK_FASTCALL ApplySingleForce(tPhysics_joint_force* pForce, br_scalar pAmount) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
+
+inline void C2_HOOK_FASTCALL ApplyJointForces(tPhysics_joint_force** pForces, br_scalar* pAmounts, int pCount) {
+    int i;
+
+    for (i = 0; i < pCount; i++) {
+        ApplySingleForce(pForces[i], pAmounts[i]);
+    }
+}
 
 // SkipForces
 
@@ -557,11 +606,36 @@ void C2_HOOK_FASTCALL CreateJointTorque(tPhysics_object* pObject, tPhysics_objec
     pForce->type = 11;
 }
 
-// AllocateObjectWorkspace
+inline tPhysics_workspace* C2_HOOK_FASTCALL AllocateObjectWorkspace(int pCount) {
+    tPhysics_workspace* workspace;
+    int size;
+
+    size = pCount * sizeof(tPhysics_joint_force) + pCount * pCount * 2 * sizeof(br_scalar) + sizeof(tPhysics_workspace);
+    workspace = GetPhysicsScratchPointer(size);
+    IncreasePhysicsScratchPointer(size);
+    workspace->forces = (tPhysics_joint_force*)((tU8*)workspace + sizeof(tPhysics_workspace));
+    workspace->count = pCount;
+    workspace->field_0x14 = (br_scalar*)(workspace->forces + pCount);
+    workspace->field_0x18 = workspace->field_0x14 + pCount * pCount;
+    return workspace;
+}
 
 // RedoQuickHingeVelocities
 
-// GetJointForces
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_HW 0x004b8350
+// STUB: CARMA2_SW 0x004b4a70
+// STUB: CARMA2_CHEAT 0x004bde80
+int C2_HOOK_FASTCALL GetJointForces(tPhysics_object* pObject, tPhysics_joint_force* pForces) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // GetUniversalRotationAngle
 
@@ -619,19 +693,63 @@ void C2_HOOK_FASTCALL PositionWorldJointedObject(tPhysics_object* pObject, br_sc
 
 // TranslateAndRotatePartialObject
 
-// TranslateAndRotateJointedObject
-
-// CountJointForces
-
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x004b7510
-// STUB: CARMA2_SW 0x004b3c30
-// STUB: CARMA2_CHEAT 0x004bd040
-void C2_HOOK_FASTCALL MoveJointedObject(tPhysics_object* pObject, float pDelta_time) {
+// STUB: CARMA2_HW 0x004b8ee0
+// STUB: CARMA2_SW 0x004b5600
+// STUB: CARMA2_CHEAT 0x004bea10
+void C2_HOOK_FASTCALL TranslateAndRotateJointedObject(tPhysics_object* pObject, br_scalar pDelta_time) {
     NOT_IMPLEMENTED();
+}
+
+// STUB: CARMA2_HW 0x004b9650
+// STUB: CARMA2_SW 0x004b5d70
+// STUB: CARMA2_CHEAT 0x004bf180
+int C2_HOOK_FASTCALL CountJointForces(tPhysics_object* pObject, tPhysics_object* pParent) {
+    NOT_IMPLEMENTED();
+}
+
+// FUNCTION: CARMA2_HW 0x004b7510
+// FUNCTION: CARMA2_SW 0x004b3c30
+// FUNCTION: CARMA2_CHEAT 0x004bd040
+void C2_HOOK_FASTCALL MoveJointedObject(tPhysics_object* pObject, float pDelta_time) {
+    tPhysics_joint_force* force_list[40];
+    br_scalar velocities[100];
+    br_scalar amounts[100];
+    tPhysics_workspace* workspace;
+    tPhysics_joint_force* forces;
+    int count;
+    int i;
+
+    count = CountJointForces(pObject, NULL);
+    if (count != 0) {
+        workspace = AllocateObjectWorkspace(count);
+        forces = workspace->forces;
+        count = GetJointForces(pObject, forces);
+        pObject->field_0x218 = workspace;
+        for (i = 0; i < count; i++) {
+            force_list[i] = forces;
+            forces++;
+        }
+        MakeMatrix(workspace->field_0x18, count, force_list, count);
+        MakeJointVelocitiesVector(velocities, force_list, count);
+        RQMatrixSolveWithNegatives(workspace->field_0x18, workspace->field_0x14, velocities, amounts, count);
+        if (pDelta_time != 0.f) {
+            HierarchyCalcEnergy(pObject);
+            ApplyJointForces(force_list, amounts, count);
+            HierarchyCalcEnergy(pObject);
+            if (pDelta_time > 0.f) {
+                TranslateAndRotateJointedObject(pObject, pDelta_time);
+            }
+        }
+    } else if (pObject->child != NULL) {
+        TranslateAndRotateJointedObject(pObject, pDelta_time);
+    } else {
+        TranslateObject(pObject, pDelta_time);
+        RotateObject(pObject, pDelta_time);
+    }
 }
 
 #ifdef REC2_MATCHING
@@ -888,7 +1006,20 @@ void C2_HOOK_FASTCALL SetUpForce(br_vector3* pAngular, br_vector3* pLinear, cons
 
 // SetUpHingePartners
 
-// MakeMatrix
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_HW 0x004bf490
+// STUB: CARMA2_SW 0x004bbbb0
+// STUB: CARMA2_CHEAT 0x004c4fc0
+void C2_HOOK_FASTCALL MakeMatrix(br_scalar* pMatrix, int pRows, tPhysics_joint_force** pForces, int pColumns) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // FUNCTION: CARMA2_HW 0x004c03f0
 void C2_HOOK_FASTCALL RestoreListOmega(tPhysics_object* pObject) {
@@ -954,7 +1085,20 @@ void C2_HOOK_FASTCALL RotateObjectFirstOrder(tPhysics_object* pObject, br_scalar
     pObject->omega.v[2] = rotated.v[2] / pObject->I.v[2];
 }
 
-// RotateObject
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_HW 0x004c1be0
+// STUB: CARMA2_SW 0x004be310
+// STUB: CARMA2_CHEAT 0x004c7700
+void C2_HOOK_FASTCALL RotateObject(tPhysics_object* pObject, br_scalar pDelta_time) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 void C2_HOOK_FASTCALL TranslateObject(tPhysics_object* pObject, br_scalar pDelta_time) {
     br_vector3 tv;
@@ -1235,7 +1379,20 @@ int C2_HOOK_FASTCALL RQDcmpV(br_scalar* pMatrix, int pDim, br_scalar* pQ) {
 
 // RQMatrixSolveNoNegatives
 
-// RQMatrixSolveWithNegatives
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_HW 0x004c53b0
+// STUB: CARMA2_SW 0x004c1ae0
+// STUB: CARMA2_CHEAT 0x004caed0
+void C2_HOOK_FASTCALL RQMatrixSolveWithNegatives(br_scalar* pR, br_scalar* pQ, br_scalar* pB, br_scalar* pX, int pCount) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // FUNCTION: CARMA2_HW 0x004c5b50
 // FUNCTION: CARMA2_SW 0x004c2280
@@ -1279,6 +1436,10 @@ void C2_HOOK_FASTCALL RqBackSub(const br_scalar* pR, const br_scalar* pQ, const 
     }
 }
 
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
 // FUNCTION: CARMA2_HW 0x004c5c70
 void* C2_HOOK_FASTCALL GetPhysicsScratchPointer(int pSize) {
 
@@ -1296,6 +1457,10 @@ void C2_HOOK_FASTCALL IncreasePhysicsScratchPointer(int pSize) {
     }
     gPhysics_scratch_ptr = (tU8*)gPhysics_scratch_ptr + pSize;
 }
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // FUNCTION: CARMA2_HW 0x004c5d00
 // FUNCTION: CARMA2_SW 0x004c2430
