@@ -883,7 +883,8 @@ intptr_t C2_HOOK_FASTCALL DRActorEnumRecurseWithTranslation(br_actor* pActor, br
     br_actor* a;
 
     if (pDelta != NULL) {
-        BrVector3Add(&delta, &pActor->t.t.translate.t, pDelta);
+        BrVector3Copy(&delta, &pActor->t.t.translate.t);
+        BrVector3Accumulate(&delta, pDelta);
     } else {
         BrVector3Set(&delta, 0.0f, 0.0f, 0.0f);
     }
