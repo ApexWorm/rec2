@@ -247,7 +247,7 @@ extern void C2_HOOK_CDECL TurnLimbsOnAndOff(br_actor* pActor, br_model* pModel, 
 
 // MakeRandomPointInTriangle
 
-extern void C2_HOOK_FASTCALL SpawnPedsOnFace(br_face* pFace, br_model* pModel);
+// SpawnPedsOnFace
 
 extern void C2_HOOK_FASTCALL FinishUpLoadingPeds(void);
 
