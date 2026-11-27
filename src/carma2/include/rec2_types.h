@@ -5450,6 +5450,8 @@ typedef struct {
 typedef enum {
     eNet_message_chunk_type_5 = 0x5,
     eNet_message_chunk_poll_car_details = 0x6,
+    eNet_message_chunk_type_leave = 0x8,
+    eNet_message_chunk_type_hosticide = 0x9,
     eNet_message_chunk_type_race_over = 0xa,
     eNet_message_chunk_type_status_report = 0xb,
     eNet_message_chunk_type_start_race = 0xc,
@@ -5810,6 +5812,7 @@ enum {
     eMiscString_playing = 70,
     eMiscString_closed = 71,
     eMiscString_open = 72,
+    eMiscString_has_left_the_game = 74,
     eMiscString_status_unknown = 77,
     eMiscString_status_ready = 78,
     eMiscString_status_loading = 79,

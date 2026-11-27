@@ -509,7 +509,7 @@ void C2_HOOK_FASTCALL NetLeaveGame(tNet_game_details* pNet_game) {
             gDont_allow_joiners = 1;
             NetSendMessageStacks();
             dr_dprintf("NetLeaveGame() Point 2");
-            the_message = NetBuildGuaranteedMessage(9, 0);
+            the_message = NetBuildGuaranteedMessage(eNet_message_chunk_type_hosticide, 0);
             dr_dprintf("NetLeaveGame() Point 3");
             must_revert_reentrancy = PermitNetServiceReentrancy();
             dr_dprintf("NetLeaveGame() Point 4");
@@ -520,10 +520,10 @@ void C2_HOOK_FASTCALL NetLeaveGame(tNet_game_details* pNet_game) {
             }
             dr_dprintf("NetLeaveGame() Point 6");
         } else if (!gHost_died) {
-            the_message = NetBuildGuaranteedMessage(8, 0);
+            the_message = NetBuildGuaranteedMessage(eNet_message_chunk_type_leave, 0);
             NetGuaranteedSendMessageToHost(pNet_game, the_message, NULL);
             strcpy(s, gProgram_state.player_name);
-            s2 = GetMiscString(74);
+            s2 = GetMiscString(eMiscString_has_left_the_game);
             strcat(s, " ");
             strcat(s, s2);
             NetSendHeadupToAllPlayers(s);
