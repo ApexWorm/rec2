@@ -86,13 +86,13 @@ extern intptr_t C2_HOOK_FASTCALL DRActorEnumRecurseWithTranslation(br_actor* pAc
 
 // SoftnessOfNearestPoint
 
-// SetUpShapeLimitingStuff
+extern void C2_HOOK_FASTCALL SetUpShapeLimitingStuff(tCar_crush_spec* pCar_crush, tCar_spec* pCar_spec);
 
 extern void C2_HOOK_FASTCALL CopyShapePolyhedron(tCollision_shape_polyhedron* pDest, const tCollision_shape_polyhedron* pSource);
 
 extern void C2_HOOK_FASTCALL InitShapeStuff(tCar_crush_spec* pCar_crush, tPhysics_object* pCollision_info, tCar_spec* pCar_spec);
 
-// InitPhysMasterCrushData
+extern void C2_HOOK_FASTCALL InitPhysMasterCrushData(tCar_spec* pCar_spec);
 
 // CheckHingePointOrder
 
@@ -104,7 +104,7 @@ extern void C2_HOOK_FASTCALL InitShapeStuff(tCar_crush_spec* pCar_crush, tPhysic
 
 // SetUpSemiDetachJointStuff
 
-// InitPhysCrushDataCB
+extern intptr_t C2_HOOK_CDECL InitPhysCrushDataCB(br_actor* pActor, void* pContext);
 
 extern void C2_HOOK_FASTCALL InitPhysCrushData(tCar_spec* pCar_spec);
 
@@ -126,7 +126,7 @@ extern void C2_HOOK_FASTCALL InitVertexData(tCar_spec* pCar_spec);
 
 extern void C2_HOOK_FASTCALL CheckWheelPositions(tCar_spec* pCar_spec);
 
-// InitPhysModCrushData
+extern void C2_HOOK_FASTCALL InitPhysModCrushData(tCar_spec* pCar_spec);
 
 extern void C2_HOOK_FASTCALL DisposeMasterCrushData(tCar_crush_spec* pCar_crush, tCar_spec* pCar);
 
