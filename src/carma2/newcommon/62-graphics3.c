@@ -214,7 +214,12 @@ br_matrix34 gCar_in_map_space;
 // GLOBAL: CARMA2_HW 0x0068d6d8
 // GLOBAL: CARMA2_SW 0x00687730
 // GLOBAL: CARMA2_CHEAT 0x00694f78
-br_vector3 gVector3_0068d6d8;
+br_vector2 gVector2_0068d6d8;
+
+// GLOBAL: CARMA2_HW 0x0068d6e0
+// GLOBAL: CARMA2_SW 0x00687738
+// GLOBAL: CARMA2_CHEAT 0x00694f80
+float gFLOAT_0068d6e0;
 
 // GLOBAL: CARMA2_HW 0x0068d890
 // GLOBAL: CARMA2_SW 0x006878e8
@@ -229,7 +234,12 @@ int gINT_0068c858;
 // GLOBAL: CARMA2_HW 0x0068d8b0
 // GLOBAL: CARMA2_SW 0x00687908
 // GLOBAL: CARMA2_CHEAT 0x00695150
-br_vector3 gVector3_0068d8b0;
+br_vector2 gVector2_0068d8b0;
+
+// GLOBAL: CARMA2_HW 0x0068d8b8
+// GLOBAL: CARMA2_SW 0x00687910
+// GLOBAL: CARMA2_CHEAT 0x00695158
+float gFLOAT_0068d8b8;
 
 // GLOBAL: CARMA2_HW 0x0074abc4
 // GLOBAL: CARMA2_SW 0x00741270
@@ -649,7 +659,9 @@ void C2_HOOK_FASTCALL DrawMapBlip(br_pixelmap* pScreen, tCar_spec* pCar, tU32 pT
                 || (gTarget_lock_enabled && pCar == gTarget_lock_car_2))
             && !pCar->knackered) {
             gTarget_lock_car_2 = pCar;
-            gVector3_0068d6d8 = offset;
+            gVector2_0068d6d8.v[0] = offset.v[0];
+            gVector2_0068d6d8.v[1] = offset.v[1];
+            gFLOAT_0068d6e0 = offset.v[2];
             gFLOAT_0074ab90 = distance;
         }
     }
@@ -752,8 +764,10 @@ inline void C2_HOOK_FASTCALL DrawSmashBlip(br_pixelmap* pScreen, tU32 pTime, con
     offset.v[2] = 0.0f - map_pos.v[2];
     distance = offset.v[2] * offset.v[2] + offset.v[0] * offset.v[0] + offset.v[1] * offset.v[1];
     if (gNearest_smash_blip_index == -1 || distance < gFLOAT_0074abc4) {
-        gVector3_0068d8b0 = offset;
         gFLOAT_0074abc4 = distance;
+        gVector2_0068d8b0.v[0] = offset.v[0];
+        gVector2_0068d8b0.v[1] = offset.v[1];
+        gFLOAT_0068d8b8 = offset.v[2];
         gNearest_smash_blip_index = pIndex;
     }
     if (gNet_mode == eNet_mode_none && (pTime & 0x100)) {
