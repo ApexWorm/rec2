@@ -370,6 +370,8 @@ extern void C2_HOOK_FASTCALL ClearPhysicsScratchSpace(void);
 
 extern tCollision_shape_sphere* C2_HOOK_FASTCALL AllocateShapeSphere(int pType);
 
+extern tCollision_shape_polyhedron* C2_HOOK_FASTCALL FUN_004c5d30(int pCount_points, int pType);
+
 extern tCollision_shape_polyhedron* C2_HOOK_FASTCALL AllocateShapePolyhedron(int pCount_points, int pType);
 
 extern tCollision_shape_wireframe* C2_HOOK_FASTCALL AllocateShapeWireFrame(int pCount_points, int pCount_lines, int pType);
@@ -399,6 +401,10 @@ extern void C2_NORETURN C2_HOOK_FASTCALL PhysicsError(tPhysicsError pError, cons
 extern void C2_HOOK_FASTCALL PhysicsWarning(const char* pMessage);
 
 extern void C2_HOOK_FASTCALL PhysicsSetErrorHandler(tPhysicsError_cbfn* pError_cbfn);
+
+extern int C2_HOOK_FASTCALL FUN_004c6200(tPhysics_object* pObject, tPhysics_object* pBuffer, int pCount);
+
+extern int C2_HOOK_FASTCALL FUN_004c6270(tPhysics_object* pObject, const tPhysics_object* pBuffer, int pCount);
 
 extern void C2_HOOK_FASTCALL RepositionAndOrientateChildren(tPhysics_object* pObject, br_matrix34* pParent_matrix);
 

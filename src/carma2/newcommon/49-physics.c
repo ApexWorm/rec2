@@ -1319,6 +1319,28 @@ tCollision_shape_sphere* C2_HOOK_FASTCALL AllocateShapeSphere(int pType) {
     return result;
 }
 
+// FUNCTION: CARMA2_HW 0x004c5d30
+// FUNCTION: CARMA2_SW 0x004c2460
+// FUNCTION: CARMA2_CHEAT 0x004cb850
+tCollision_shape_polyhedron* C2_HOOK_FASTCALL FUN_004c5d30(int pCount_points, int pType) {
+    tCollision_shape_polyhedron* result;
+    tU8* raw_memory;
+
+    result = BrMemAllocate(sizeof(tCollision_shape_polyhedron) + pCount_points * sizeof(br_vector3)
+        + pCount_points * sizeof(tPolyhedron_edge_indexes) + (pCount_points + 2) * sizeof(br_vector4), (br_uint_8)pType);
+    raw_memory = (tU8*)result + sizeof(tCollision_shape_polyhedron);
+    result->polyhedron.points = (br_vector3*)raw_memory;
+    raw_memory += pCount_points * sizeof(br_vector3);
+    result->polyhedron.count_points = pCount_points;
+    result->polyhedron.edges = (tPolyhedron_edge_indexes*)raw_memory;
+    raw_memory += pCount_points * sizeof(tPolyhedron_edge_indexes);
+    result->polyhedron.planes = (br_vector4*)raw_memory;
+    result->polyhedron.count_edges = 0;
+    result->polyhedron.count_planes = 0;
+    result->common.type = kCollisionShapeType_Wireframe_Polyhedron;
+    return result;
+}
+
 // FUNCTION: CARMA2_HW 0x004c5d70
 // FUNCTION: CARMA2_SW 0x004c24a0
 // FUNCTION: CARMA2_CHEAT 0x004cb890
@@ -1554,6 +1576,48 @@ void C2_HOOK_FASTCALL PhysicsWarning(const char* pMessage) {
 void C2_HOOK_FASTCALL PhysicsSetErrorHandler(tPhysicsError_cbfn* pError_cbfn) {
 
     gPhysics_error_cb = pError_cbfn;
+}
+
+// FUNCTION: CARMA2_HW 0x004c6200
+// FUNCTION: CARMA2_SW 0x004c2930
+// FUNCTION: CARMA2_CHEAT 0x004cbd20
+int C2_HOOK_FASTCALL FUN_004c6200(tPhysics_object* pObject, tPhysics_object* pBuffer, int pCount) {
+    int count;
+
+    for (; pObject != NULL; pObject = pObject->next) {
+        if (pCount != 0) {
+            *pBuffer = *pObject;
+            pBuffer++;
+            pCount--;
+            count = pCount;
+            if (pObject->child != NULL) {
+                pCount = FUN_004c6200(pObject->child, pBuffer, pCount);
+                pBuffer += count - pCount;
+            }
+        }
+    }
+    return pCount;
+}
+
+// FUNCTION: CARMA2_HW 0x004c6270
+// FUNCTION: CARMA2_SW 0x004c29a0
+// FUNCTION: CARMA2_CHEAT 0x004cbd90
+int C2_HOOK_FASTCALL FUN_004c6270(tPhysics_object* pObject, const tPhysics_object* pBuffer, int pCount) {
+    int count;
+
+    for (; pObject != NULL; pObject = pObject->next) {
+        if (pCount != 0) {
+            *pObject = *pBuffer;
+            pBuffer++;
+            pCount--;
+            count = pCount;
+            if (pObject->child != NULL) {
+                pCount = FUN_004c6270(pObject->child, pBuffer, pCount);
+                pBuffer += count - pCount;
+            }
+        }
+    }
+    return pCount;
 }
 
 // FUNCTION: CARMA2_HW 0x004c62e0
