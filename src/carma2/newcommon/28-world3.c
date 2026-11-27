@@ -472,7 +472,7 @@ void C2_HOOK_FASTCALL LoadTrack(const char* pFile_name, tTrack_spec* pTrack_spec
         /* # quads for this checkpoint */
         pRace_info->checkpoints[i].count_quads = GetAnInt(f);
 
-        BrVector3Set(&pRace_info->checkpoints[i].pos, 0.f, 0.f, 0.f);
+        BrVector3Set(&pRace_info->checkpoints[i].pos, 0.0f, 0.0f, 0.0f);
 
         for (j = 0; j < pRace_info->checkpoints[i].count_quads; j++) {
             br_vector3 tmp1, tmp2;
@@ -743,12 +743,12 @@ void C2_HOOK_FASTCALL LoadTrack(const char* pFile_name, tTrack_spec* pTrack_spec
             &pRace_info->map_transformation.m[i][2]);
     }
     if (gGraf_specs[gGraf_spec_index].total_width != 640 || gGraf_specs[gGraf_spec_index].total_height != 480) {
-        pRace_info->map_transformation.m[3][0] -= 320.f;
-        pRace_info->map_transformation.m[3][1] -= 240.f;
+        pRace_info->map_transformation.m[3][0] -= 320.0f;
+        pRace_info->map_transformation.m[3][1] -= 240.0f;
         BrMatrix34PostRotateX(&pRace_info->map_transformation, BrDegreeToAngle(90));
         BrMatrix34PostScale(&pRace_info->map_transformation,
             (float)gGraf_specs[gGraf_spec_index].total_width / (float)640,
-            0.f,
+            0.0f,
             (float)gGraf_specs[gGraf_spec_index].total_height / (float)480);
         BrMatrix34PostRotateX(&pRace_info->map_transformation, BrDegreeToAngle(270));
         pRace_info->map_transformation.m[3][0] += (float)gGraf_specs[gGraf_spec_index].total_width / 2;
@@ -860,25 +860,25 @@ void C2_HOOK_FASTCALL LoadTrack(const char* pFile_name, tTrack_spec* pTrack_spec
     for (i = count_material_modifiers; i < REC2_ASIZE(pRace_info->material_modifiers) - 1; i++) {
         tMaterial_modifiers* modifier = &pRace_info->material_modifiers[i];
 
-        modifier->car_wall_friction = 1.f;
-        modifier->tyre_road_friction = 1.f;
-        modifier->down_force = 1.f;
-        modifier->bumpiness = 0.f;
+        modifier->car_wall_friction = 1.0f;
+        modifier->tyre_road_friction = 1.0f;
+        modifier->down_force = 1.0f;
+        modifier->bumpiness = 0.0f;
         modifier->tyre_noise_index = 0;
         modifier->crash_noise_index = 0;
         modifier->scrape_noise_index = 0;
-        modifier->sparkiness = 1.f;
+        modifier->sparkiness = 1.0f;
         modifier->smoke_type = 1;
         modifier->skid_mark_material = NULL;
     }
-    pRace_info->material_modifiers[REC2_ASIZE(pRace_info->material_modifiers) - 1].car_wall_friction = 1.f;
-    pRace_info->material_modifiers[REC2_ASIZE(pRace_info->material_modifiers) - 1].tyre_road_friction = 1.f;
-    pRace_info->material_modifiers[REC2_ASIZE(pRace_info->material_modifiers) - 1].down_force = 0.f;
-    pRace_info->material_modifiers[REC2_ASIZE(pRace_info->material_modifiers) - 1].bumpiness = 0.f;
+    pRace_info->material_modifiers[REC2_ASIZE(pRace_info->material_modifiers) - 1].car_wall_friction = 1.0f;
+    pRace_info->material_modifiers[REC2_ASIZE(pRace_info->material_modifiers) - 1].tyre_road_friction = 1.0f;
+    pRace_info->material_modifiers[REC2_ASIZE(pRace_info->material_modifiers) - 1].down_force = 0.0f;
+    pRace_info->material_modifiers[REC2_ASIZE(pRace_info->material_modifiers) - 1].bumpiness = 0.0f;
     pRace_info->material_modifiers[REC2_ASIZE(pRace_info->material_modifiers) - 1].tyre_noise_index = -1;
     pRace_info->material_modifiers[REC2_ASIZE(pRace_info->material_modifiers) - 1].crash_noise_index = 0;
     pRace_info->material_modifiers[REC2_ASIZE(pRace_info->material_modifiers) - 1].scrape_noise_index = 0;
-    pRace_info->material_modifiers[REC2_ASIZE(pRace_info->material_modifiers) - 1].sparkiness = 0.f;
+    pRace_info->material_modifiers[REC2_ASIZE(pRace_info->material_modifiers) - 1].sparkiness = 0.0f;
     pRace_info->material_modifiers[REC2_ASIZE(pRace_info->material_modifiers) - 1].smoke_type = 1;
     pRace_info->material_modifiers[REC2_ASIZE(pRace_info->material_modifiers) - 1].skid_mark_material = NULL;
 
