@@ -23,6 +23,9 @@ extern int gCount_smashable_noncar_shrapnel_actors;
 extern const char* gSmashable_track_environment_path;
 extern int gCount_track_smashable_environment_specs;
 extern tStored_smash* gNet_host_smashes;
+extern tQueued_net_smash gQueued_net_smashes[50];
+extern tPowerup_queue_item gPowerup_queue[50];
+extern int gSize_powerup_queue;
 
 extern tExplosion gExplosions[50];
 extern tRepair_animation gRepair_animations[25];
@@ -315,7 +318,7 @@ extern intptr_t C2_HOOK_CDECL MungeMaterialCB(br_actor* pActor, void* pData);
 
 extern void C2_HOOK_FASTCALL MungeMaterial(br_actor* pActor, int pRecursive, br_material* pMaterial_1, br_material* pMaterial_2, int pCapacity_indices, tU16* pIndices, int* pCount_indices, int pCapacity_vertices, tCar_crush_vertex_data* pVertices, int* pCount_vertices, br_vector3* pNormal);
 
-// ReinitSmashing
+extern void C2_HOOK_FASTCALL ReinitSmashing(void);
 
 extern void C2_HOOK_FASTCALL LinkSmashies(br_actor* pActor, tCar_crush_buffer_entry* pCrush_data, tModel_detail_vertex_data* pVertex_data);
 
