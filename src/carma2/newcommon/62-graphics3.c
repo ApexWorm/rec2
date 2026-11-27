@@ -539,7 +539,7 @@ void C2_HOOK_FASTCALL DrawMapSmallBlip(br_pixelmap* pScreen, tU32 pTime, const b
         pColour = 0;
     }
     BrMatrix34ApplyP(&map_pos, pPos, &gCurrent_race.map_transformation);
-    if (map_pos.v[0] >= 0.f && map_pos.v[0] < (float)pScreen->width
+    if (map_pos.v[0] >= 0.0f && map_pos.v[0] < (float)pScreen->width
             && map_pos.v[1] >= 0 && map_pos.v[1] < (float)pScreen->height) {
 #ifdef REC2_HW
         if (gMap_view == 2) {
