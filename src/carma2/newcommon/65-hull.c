@@ -10,6 +10,7 @@
 
 // GLOBAL: CARMA2_HW 0x0067942c
 // GLOBAL: CARMA2_SW 0x00673b9c
+// GLOBAL: CARMA2_CHEAT 0x00680cdc
 tCollision_shape_polyhedron_data* gPolyhedron_to_sort;
 
 // GLOBAL: CARMA2_HW 0x00679420
