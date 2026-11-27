@@ -51,6 +51,7 @@ int gCount_drone_path_nodes;
 
 // GLOBAL: CARMA2_HW 0x006844f8
 // GLOBAL: CARMA2_SW 0x0067ec38
+// GLOBAL: CARMA2_CHEAT 0x0068bda0
 int gCurrent_selected_drone;
 
 // GLOBAL: CARMA2_HW 0x00684504
@@ -70,6 +71,7 @@ int gTraffic_disabled;
 
 // GLOBAL: CARMA2_HW 0x00681fb0
 // GLOBAL: CARMA2_SW 0x0067c6f0
+// GLOBAL: CARMA2_CHEAT 0x00689858
 int gINT_00681fb0;
 
 // GLOBAL: CARMA2_HW 0x00684514
@@ -92,6 +94,7 @@ void C2_HOOK_CDECL DoNotDprintf_drone(const char* pMessage, ...) {
 
 // FUNCTION: CARMA2_HW 0x0044f640
 // FUNCTION: CARMA2_SW 0x0044f3e0
+// FUNCTION: CARMA2_CHEAT 0x0044fb90
 FILE* C2_HOOK_FASTCALL OpenDroneFile(char* pDrone_name) {
     tPath_name the_path;
     FILE* f;
@@ -191,6 +194,7 @@ int C2_HOOK_CDECL LinkyCallback(br_actor* pActor, void* pData) {
 
 // FUNCTION: CARMA2_HW 0x00450b30
 // FUNCTION: CARMA2_SW 0x004508c0
+// FUNCTION: CARMA2_CHEAT 0x00451080
 br_actor* C2_HOOK_CDECL MrFindy(br_actor* pActor, const char* pName) {
 
     if (DRStricmp(pActor->identifier, pName) == 0) {
@@ -482,6 +486,7 @@ void C2_HOOK_FASTCALL LoadInDronePaths(FILE* pF) {
 
 // FUNCTION: CARMA2_HW 0x004512d0
 // FUNCTION: CARMA2_SW 0x00451060
+// FUNCTION: CARMA2_CHEAT 0x00451820
 void C2_HOOK_FASTCALL DronePreCollisionStuff(void) {
     gINT_00681fb0 = 0;
     gFrame++;
@@ -512,11 +517,13 @@ void C2_HOOK_FASTCALL DoDroneFunkyGroovyThings(tDrone_spec* pDrone) {
 
 // FUNCTION: CARMA2_HW 0x004525c0
 // FUNCTION: CARMA2_SW 0x00452350
+// FUNCTION: CARMA2_CHEAT 0x00452b10
 void C2_HOOK_FASTCALL DroneLookWhereYoureGoingYouBlindCunt(void) {
 }
 
 // FUNCTION: CARMA2_HW 0x004525d0
 // FUNCTION: CARMA2_SW 0x00452360
+// FUNCTION: CARMA2_CHEAT 0x00452b20
 void C2_HOOK_FASTCALL SelectNextDrone(void) {
     char s[64];
 
@@ -530,6 +537,7 @@ void C2_HOOK_FASTCALL SelectNextDrone(void) {
 
 // FUNCTION: CARMA2_HW 0x00452620
 // FUNCTION: CARMA2_SW 0x004523b0
+// FUNCTION: CARMA2_CHEAT 0x00452b70
 void C2_HOOK_FASTCALL SelectPreviousDrone(void) {
     char s[64];
 
@@ -547,11 +555,20 @@ void C2_HOOK_FASTCALL SelectPreviousDrone(void) {
 // FUNCTION: CARMA2_SW 0x00452410
 // FUNCTION: CARMA2_CHEAT 0x00452bd0
 int C2_HOOK_FASTCALL OKToViewDrones(void) {
+#ifdef REC2_CHEAT
+    if (gCount_drones && gProgram_state.racing) {
+        return 1;
+    } else {
+        return 0;
+    }
+#else
     return 0;
+#endif
 }
 
 // FUNCTION: CARMA2_HW 0x00452690
 // FUNCTION: CARMA2_SW 0x00452420
+// FUNCTION: CARMA2_CHEAT 0x00452bf0
 br_matrix34* C2_HOOK_FASTCALL GetCurrentViewDroneMat(void) {
     return &gDrone_specs[gCurrent_selected_drone].actor->t.t.mat;
 }
@@ -612,6 +629,7 @@ void C2_HOOK_FASTCALL ApplyDroneCornerPos2(int pDrone_id, tU16 pSpeed, tU16 pFie
 
 // FUNCTION: CARMA2_HW 0x00452f40
 // FUNCTION: CARMA2_SW 0x00452cd0
+// FUNCTION: CARMA2_CHEAT 0x004534a0
 void C2_HOOK_FASTCALL ReallocModelFacesAndVertices(br_model* pModel, int pCount_faces, int pCount_vertices) {
     int i;
     br_vertex* vertices;
