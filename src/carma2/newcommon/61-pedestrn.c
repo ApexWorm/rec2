@@ -2516,7 +2516,12 @@ void C2_HOOK_FASTCALL SetGoreLevel(int pNewLevel) {
 
 // InitBoner
 
-// DRVector3SafeCross
+// STUB: CARMA2_HW 0x00403f90
+// STUB: CARMA2_SW 0x00403f90
+// STUB: CARMA2_CHEAT 0x00403f90
+void C2_HOOK_FASTCALL DRVector3SafeCross(br_vector3* pOut, const br_vector3* pA, const br_vector3* pB) {
+    NOT_IMPLEMENTED();
+}
 
 // DRVector3SafeCrossXZ
 

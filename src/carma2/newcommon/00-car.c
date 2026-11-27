@@ -1198,11 +1198,41 @@ void C2_HOOK_FASTCALL ControlCar1(tCar_spec* pCar, br_scalar pDt) {
 
 // TestNonCarSnapOff
 
-// STUB: CARMA2_HW 0x00417fb0
-// STUB: CARMA2_SW 0x00417fe0
-// STUB: CARMA2_CHEAT 0x00418210
+// FUNCTION: CARMA2_HW 0x00417fb0
+// FUNCTION: CARMA2_SW 0x00417fe0
+// FUNCTION: CARMA2_CHEAT 0x00418210
 void C2_HOOK_FASTCALL TumbleObjectWithV(tPhysics_object* pObject, br_vector3* pV, float pArg3, float pArg4) {
-    NOT_IMPLEMENTED();
+    br_vector3 axis;
+    br_vector3 axis_object;
+    br_scalar v_squared;
+    br_scalar speed;
+    br_scalar k;
+    br_scalar omega_squared;
+    int i;
+
+    if (pObject->collision_flag || pObject->disable_move_rotate) {
+        v_squared = BrVector3LengthSquared(pV);
+        if (v_squared >= pArg4 * pArg4) {
+            DRVector3SafeCross(&axis, &gFace_list__car[pObject->box_face_start].normal, pV);
+            BrVector3Normalise(&axis, &axis);
+            BrMatrix34TApplyV(&axis_object, &axis, &pObject->actor->t.t.mat);
+            if (BrVector3Dot(&pObject->omega, &axis_object) <= 1.5) {
+                speed = (br_scalar)sqrt(v_squared);
+                BrVector3Sub(&axis, &pObject->bb1.max, &pObject->bb1.min);
+                for (i = 0; i < 3; i++) {
+                    axis_object.v[i] = axis_object.v[i] * (axis.v[i] * 0.5f) / pObject->I.v[i];
+                }
+                k = (speed - pArg4) * (pArg3 * 0.1f) * pObject->M;
+                BrVector3Scale(&axis_object, &axis_object, k);
+                BrVector3Accumulate(&pObject->omega, &axis_object);
+                omega_squared = BrVector3LengthSquared(&pObject->omega);
+                if (omega_squared > 400.f) {
+                    k = (br_scalar)sqrt(400.f / omega_squared);
+                    BrVector3Scale(&pObject->omega, &pObject->omega, k);
+                }
+            }
+        }
+    }
 }
 
 // TumbleObject
