@@ -702,6 +702,10 @@ void C2_HOOK_CDECL d3d_debug_printf(const char* format, ...) {
 void C2_HOOK_CDECL d3d_check_result(int failed, const char* message) {
 }
 
+/* FIXME: empty in the original, where the linker folded it with d3d_debug_printf; the name is a guess */
+void C2_HOOK_CDECL d3d_open_console(void) {
+}
+
 // FUNCTION: D3D 0x10002130
 BOOL CALLBACK DDEnumCallback(GUID* lpDriverGuid, LPSTR lpDriverName, LPSTR lpDriverDescription, LPVOID lpContext) {
     LPDIRECTDRAW ddraw;
@@ -845,13 +849,17 @@ void C2_HOOK_CDECL d3d_read_registry(void) {
     gRegister_guid_valid = 1;
 }
 
+#if !defined(REC2_FIX_BUGS) && defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wreturn-type"
+#endif
 // FUNCTION: D3D 0x10005080
 int C2_HOOK_CDECL DetectD3DDevices(void) {
     int i;
     int enum_phase;
     gDevice_pixels = gPixel_buffer;
 
-    for (i = 0; i < BR_ASIZE(gCurrent_render_states); i++) {
+    for (i = 0; i < (int)BR_ASIZE(gCurrent_render_states); i++) {
         gCurrent_render_states[i].initialized = 0;
     }
     gActive_window = GetActiveWindow();
@@ -862,9 +870,10 @@ int C2_HOOK_CDECL DetectD3DDevices(void) {
         gOriginal_wndproc = (WNDPROC)SetWindowLongPtrA(gActive_window, GWLP_WNDPROC, (LONG_PTR)D3DWndProc);
 #endif
     }
-    d3d_debug_printf("Jims Brender driver for D3D  version 0.0.1");
-    d3d_debug_printf("------------------------------------------");
-    d3d_debug_printf("Compile with #define NOCONSOLE to remove these messages");
+    d3d_open_console();
+    d3d_debug_printf("Jims Brender driver for D3D  version 0.0.1", gError_code);
+    d3d_debug_printf("------------------------------------------", gError_code);
+    d3d_debug_printf("Compile with #define NOCONSOLE to remove these messages", gError_code);
     gModule_ddraw = LoadLibraryA("DDRAW");
     if (gModule_ddraw == NULL) {
         return 0;
@@ -880,8 +889,8 @@ int C2_HOOK_CDECL DetectD3DDevices(void) {
     d3d_debug_printf("Got proc details %d", gError_code);
     d3d_read_registry();
     gCount_ddraw_drivers = 0;
-    gIndex_ddraw_driver = 0;
     enum_phase = 0;
+    gIndex_ddraw_driver = 0;
     if (gDirectDrawEnumerateA(DDEnumCallback, &enum_phase) != DD_OK) {
         return 4;
     }
@@ -893,9 +902,15 @@ int C2_HOOK_CDECL DetectD3DDevices(void) {
     if (gDirectDrawEnumerateA(DDEnumCallback, &enum_phase) != DD_OK) {
         return 4;
     }
-    d3d_debug_printf("finished callback generic %d", gError_code);
+    d3d_debug_printf("finished callback generic &d", gError_code);
+#ifdef REC2_FIX_BUGS
+    /* The original falls off the end (eax still holds DD_OK here) */
     return 0;
+#endif
 }
+#if !defined(REC2_FIX_BUGS) && defined(__GNUC__)
+#pragma GCC diagnostic pop
+#endif
 
 // FUNCTION: D3D 0x10002460
 HRESULT PASCAL DDEnumDisplayModes(LPDDSURFACEDESC lpDDSurfaceDesc, LPVOID lpContext) {
@@ -1176,7 +1191,6 @@ int C2_HOOK_CDECL SetD3DViewport(void) {
     return 0;
 }
 
-
 // FUNCTION: D3D 0x10004030
 void C2_HOOK_CDECL D3DSetupTextureCacheColorKeyAlpha(void) {
     int i;
@@ -1437,12 +1451,13 @@ int C2_HOOK_CDECL InitD3D(void) {
     int phase;
     D3DMATERIAL black_material;
     DDBLTFX blt_fx;
+    int failed;
 
     g640x480x16_display_mode_flags = 0;
 
     gCount_display_modes = 0;
-    gSelected_display_mode = -1;
     phase = 0;
+    gSelected_display_mode = -1;
     if (IDirectDraw2_EnumDisplayModes(gDirectDraw2, 0, NULL, &phase, DDEnumDisplayModes) != DD_OK) {
         return 5;
     }
@@ -1458,8 +1473,8 @@ int C2_HOOK_CDECL InitD3D(void) {
 
     d3d_debug_printf("Create d3d2 object");
     gCount_d3d_devices = 0;
-    gSelected_d3d_device = 0;
     phase = 0;
+    gSelected_d3d_device = 0;
     if (IDirect3D2_EnumDevices(gDirect3D2, D3DEnumDevices, &phase) != D3D_OK) {
         return 7;
     }
@@ -1476,37 +1491,39 @@ int C2_HOOK_CDECL InitD3D(void) {
     surface_desc.ddsCaps.dwCaps = DDSCAPS_COMPLEX | DDSCAPS_FLIP | DDSCAPS_PRIMARYSURFACE | DDSCAPS_3DDEVICE;
     surface_desc.dwBackBufferCount = 1;
 
-    if (IDirectDraw_CreateSurface(gDirectDraw, &surface_desc, &gPrimary_surface, NULL) != DD_OK) {
-        d3d_debug_printf("Create Direct draw surface");
+    failed = IDirectDraw_CreateSurface(gDirectDraw, &surface_desc, &gPrimary_surface, NULL) != D3D_OK;
+    if (failed) {
+        d3d_check_result(failed, "Create Direct draw surface");
         gError_code = 1;
         return 9;
     }
     d3d_debug_printf("Create primary surface");
 
     surface_caps.dwCaps = DDSCAPS_BACKBUFFER;
-    if (IDirectDrawSurface_GetAttachedSurface(gPrimary_surface, &surface_caps, &gAttached_surface) != DD_OK) {
-        d3d_debug_printf("Get back surface");
+    failed = IDirectDrawSurface_GetAttachedSurface(gPrimary_surface, &surface_caps, &gAttached_surface) != D3D_OK;
+    if (failed) {
+        d3d_check_result(failed, "Get back surface");
         gError_code = 1;
         return 9;
     }
 
-    if (IDirectDrawSurface_GetPixelFormat(gAttached_surface, &gAttached_surface_pixel_format) != DD_OK) {
-        d3d_debug_printf("Get back buffer pixel format");
+    failed = IDirectDrawSurface_GetPixelFormat(gAttached_surface, &gAttached_surface_pixel_format) != D3D_OK;
+    if (failed) {
+        d3d_check_result(failed, "Get back buffer pixel format");
         gError_code = 1;
         return 9;
     }
 
-    if (gAttached_surface_pixel_format.dwRGBAlphaBitMask == 0) {
-        if (gAttached_surface_pixel_format.dwRBitMask == 0x7c00
-                && gAttached_surface_pixel_format.dwGBitMask == 0x03e0
-                && gAttached_surface_pixel_format.dwBBitMask == 0x001f) {
-            gPixel_format_is_xrgb1555 = 1;
-        } else if (gAttached_surface_pixel_format.dwRBitMask == 0xf800
-                && gAttached_surface_pixel_format.dwGBitMask == 0x07e0
-                && gAttached_surface_pixel_format.dwBBitMask == 0x001f) {
-        } else {
-            gPixel_format_is_xrgb1555 = 1;
-        }
+    if (gAttached_surface_pixel_format.dwRGBAlphaBitMask == 0
+            && gAttached_surface_pixel_format.dwRBitMask == 0x7c00
+            && gAttached_surface_pixel_format.dwGBitMask == 0x03e0
+            && gAttached_surface_pixel_format.dwBBitMask == 0x001f) {
+        gPixel_format_is_xrgb1555 = 1;
+    } else if (gAttached_surface_pixel_format.dwRGBAlphaBitMask == 0
+            && gAttached_surface_pixel_format.dwRBitMask == 0xf800
+            && gAttached_surface_pixel_format.dwGBitMask == 0x07e0
+            && gAttached_surface_pixel_format.dwBBitMask == 0x001f) {
+        gPixel_format_is_xrgb1555 = 0;
     } else {
         gPixel_format_is_xrgb1555 = 1;
     }
@@ -1517,7 +1534,7 @@ int C2_HOOK_CDECL InitD3D(void) {
     surface_desc.dwWidth = gDisplay_width_10015888;
     surface_desc.dwHeight = gDisplay_height_1001588c;
     surface_desc.dwFlags = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH | DDSD_ZBUFFERBITDEPTH;
-    surface_desc.ddsCaps.dwCaps = DDSCAPS_ZBUFFER | (gDevice_has_color_model == 1 ? DDSCAPS_VIDEOMEMORY : DDSCAPS_SYSTEMMEMORY);
+    surface_desc.ddsCaps.dwCaps = gDevice_has_color_model == 1 ? (DDSCAPS_ZBUFFER | DDSCAPS_VIDEOMEMORY) : (DDSCAPS_ZBUFFER | DDSCAPS_SYSTEMMEMORY);
     if (gDevice_description.dwDeviceZBufferBitDepth & DDBD_32) {
         surface_desc.dwZBufferBitDepth = 32;
     } else if (gDevice_description.dwDeviceZBufferBitDepth & DDBD_24) {
@@ -1533,73 +1550,82 @@ int C2_HOOK_CDECL InitD3D(void) {
     }
 
     d3d_debug_printf("About to create Z buffer");
-    if (IDirectDraw_CreateSurface(gDirectDraw, &surface_desc, &gDepth_surface, NULL) != DD_OK) {
-        d3d_debug_printf("Create Z-Buffer");
+    failed = IDirectDraw_CreateSurface(gDirectDraw, &surface_desc, &gDepth_surface, NULL) != D3D_OK;
+    if (failed) {
+        d3d_check_result(failed, "Create Z-Buffer");
         gError_code = 1;
         return 1;
     }
     d3d_debug_printf("About to Attach Z buffer");
-    if (IDirectDrawSurface_AddAttachedSurface(gAttached_surface, gDepth_surface) != DD_OK) {
-        d3d_debug_printf("Attach Z-Buffer");
+    failed = IDirectDrawSurface_AddAttachedSurface(gAttached_surface, gDepth_surface) != D3D_OK;
+    if (failed) {
+        d3d_check_result(failed, "Attach Z-Buffer");
         gError_code = 1;
         return 1;
     }
     d3d_debug_printf("Attached Z buffer");
     if (IDirect3D2_CreateDevice(gDirect3D2, &gDevice_guid, gAttached_surface, &gD3DDevice2) != D3D_OK) {
         gD3D_error_10038110 = "Create Device";
-        gError_code = 1;
         return 7;
     }
     d3d_debug_printf("Create DEvice");
 
-    if (IDirect3D2_CreateViewport(gDirect3D2, &gD3D_Viewport, NULL) != D3D_OK) {
-        d3d_debug_printf("Create d3d viewport");
+    failed = IDirect3D2_CreateViewport(gDirect3D2, &gD3D_Viewport, NULL) != D3D_OK;
+    if (failed) {
+        d3d_check_result(failed, "Create d3d viewport");
         gError_code = 1;
         return 1;
     }
-    if (IDirect3DDevice2_AddViewport(gD3DDevice2, gD3D_Viewport) != D3D_OK) {
-        d3d_debug_printf("Add viewport to device");
+    failed = IDirect3DDevice2_AddViewport(gD3DDevice2, gD3D_Viewport) != D3D_OK;
+    if (failed) {
+        d3d_check_result(failed, "Add viewport to device");
         gError_code = 1;
         return 1;
     }
     d3d_debug_printf("Create/add viewport Device");
     SetD3DViewport();
-    if (IDirect3DDevice2_SetCurrentViewport(gD3DDevice2, gD3D_Viewport) != D3D_OK) {
-        d3d_debug_printf("Set current viewport2");
+    failed = IDirect3DDevice2_SetCurrentViewport(gD3DDevice2, gD3D_Viewport) != D3D_OK;
+    if (failed) {
+        d3d_check_result(failed, "Set current viewport2");
         gError_code = 1;
         return 1;
     }
     d3d_debug_printf("Set current viewport [%d]", gError_code);
 
-    if (IDirect3D2_CreateMaterial(gDirect3D2, &gViewport_background_material, NULL) != D3D_OK) {
-        d3d_debug_printf("Create background material");
+    failed = IDirect3D2_CreateMaterial(gDirect3D2, &gViewport_background_material, NULL) != D3D_OK;
+    if (failed) {
+        d3d_check_result(failed, "Create background material");
         gError_code = 1;
         return 1;
     }
     memset(&black_material, 0, sizeof(black_material));
+    black_material.diffuse.b = 0.0f;
+    black_material.diffuse.g = 0.0f;
+    black_material.diffuse.r = 0.0f;
     black_material.dwSize = sizeof(black_material);
-    black_material.diffuse.b = 0.f;
-    black_material.diffuse.g = 0.f;
-    black_material.diffuse.r = 0.f;
-    if (IDirect3DMaterial2_SetMaterial(gViewport_background_material, &black_material) != D3D_OK) {
-        d3d_debug_printf("Set background material");
+    failed = IDirect3DMaterial2_SetMaterial(gViewport_background_material, &black_material) != D3D_OK;
+    if (failed) {
+        d3d_check_result(failed, "Set background material");
         gError_code = 1;
         return 1;
     }
-    if (IDirect3DMaterial2_GetHandle(gViewport_background_material, gD3DDevice2, &gViewport_background_material_handle) != D3D_OK) {
-        d3d_debug_printf("Get material handle");
+    failed = IDirect3DMaterial2_GetHandle(gViewport_background_material, gD3DDevice2, &gViewport_background_material_handle) != D3D_OK;
+    if (failed) {
+        d3d_check_result(failed, "Get material handle");
         gError_code = 1;
         return 1;
     }
-    if (IDirect3DViewport2_SetBackground(gD3D_Viewport, gViewport_background_material_handle) != D3D_OK) {
-        d3d_debug_printf("Set viewport material");
+    failed = IDirect3DViewport2_SetBackground(gD3D_Viewport, gViewport_background_material_handle) != D3D_OK;
+    if (failed) {
+        d3d_check_result(failed, "Set viewport material");
         gError_code = 1;
         return 1;
     }
     d3d_debug_printf("Set viewport material[%d]", gError_code);
 
-    if (IDirect3DViewport2_Clear(gD3D_Viewport, 0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER) != D3D_OK) {
-        d3d_debug_printf("Clear viewport");
+    failed = IDirect3DViewport2_Clear(gD3D_Viewport, 0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER) != D3D_OK;
+    if (failed) {
+        d3d_check_result(failed, "Clear viewport");
         gError_code = 1;
         return 1;
     }
