@@ -52,7 +52,7 @@ extern void C2_HOOK_FASTCALL ChangeCameraType(void);
 
 extern void C2_HOOK_FASTCALL ToggleCockpit(void);
 
-// PositionCarMountedCamera
+extern void C2_HOOK_FASTCALL PositionCarMountedCamera(tCar_spec* pCar, tU32 pTime);
 
 extern void C2_HOOK_FASTCALL PositionExternalCamera(tCar_spec* pCar_spec, tU32 pTime);
 

@@ -19,6 +19,7 @@
 #include "37-brucetrk.h"
 #include "41-utility.h"
 #include "42-input.h"
+#include "53-controls.h"
 #include "57-drone.h"
 #include "globvars.h"
 #include "globvrkm.h"
@@ -358,7 +359,65 @@ void C2_HOOK_FASTCALL ToggleCockpit(void) {
     }
 }
 
-// PositionCarMountedCamera
+// FUNCTION: CARMA2_HW 0x0040f590
+// FUNCTION: CARMA2_SW 0x0040f570
+void C2_HOOK_FASTCALL PositionCarMountedCamera(tCar_spec* pCar, tU32 pTime) {
+    // GLOBAL: CARMA2_HW 0x00679300
+    // GLOBAL: CARMA2_SW 0x00673a70
+    // GLOBAL: CARMA2_CHEAT 0x00680bb0
+    static float speed;
+    // GLOBAL: CARMA2_HW 0x0058f624
+    // GLOBAL: CARMA2_SW 0x0058a624
+    // GLOBAL: CARMA2_CHEAT 0x005946b4
+    static float position = 1.0f;
+    br_matrix34* mat;
+    br_matrix34* car_mat;
+    br_vector3 offset;
+    br_scalar p;
+    br_scalar inv;
+    br_scalar bx;
+    br_scalar by;
+    br_scalar bz;
+    br_scalar cx;
+    br_scalar cy;
+    br_scalar cz;
+
+    mat = &gCamera->t.t.mat;
+    car_mat = &pCar->car_master_actor->t.t.mat;
+    if (gCamera_key_flags.field_0x0_bit1 && !gCamera_key_flags.field_0x0_bit0 && speed >= 0.0f) {
+        speed = -0.0002f;
+    } else if (gCamera_key_flags.field_0x0_bit2 && !gCamera_key_flags.field_0x0_bit0 && speed <= 0.0f) {
+        speed = 0.0002f;
+    }
+    position += speed * pTime;
+    if (position > 1.0f) {
+        speed = 0.0f;
+        position = 1.0f;
+    } else if (position < 0.0f) {
+        speed = 0.0f;
+        position = 0.0f;
+    }
+    p = position;
+    bx = pCar->camera_bumper_position.v[0];
+    by = pCar->camera_bumper_position.v[1];
+    inv = 1.0f - p;
+    bz = pCar->camera_bumper_position.v[2];
+    cx = pCar->camera_cockpit_position.v[0];
+    cy = pCar->camera_cockpit_position.v[1];
+    cz = pCar->camera_cockpit_position.v[2];
+    offset.v[0] = cx * p + bx * inv;
+    offset.v[1] = cy * p + by * inv;
+    offset.v[2] = cz * p + bz * inv;
+    BrMatrix34Copy(mat, car_mat);
+    BrMatrix34PreTranslate(mat, offset.v[0], offset.v[1], offset.v[2]);
+    if (speed < 0.0f) {
+        speed = (float)(speed - 0.0001);
+    }
+    if (speed > 0.0f) {
+        speed = (float)(speed - -0.0001);
+    }
+    CollideCamera2(&pCar->pos, (br_vector3*)mat->m[3], NULL, 0, NULL);
+}
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
