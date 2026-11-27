@@ -283,6 +283,11 @@ int gCount_active_peds;
 // GLOBAL: CARMA2_CHEAT 0x0074be90
 int gSelected_ped;
 
+// GLOBAL: CARMA2_HW 0x007447fc
+// GLOBAL: CARMA2_SW 0x0073b2bc
+// GLOBAL: CARMA2_CHEAT 0x0074be9c
+float gPed_buoyancy_factor;
+
 // GLOBAL: CARMA2_HW 0x007447ac
 // GLOBAL: CARMA2_SW 0x0073b26c
 // GLOBAL: CARMA2_CHEAT 0x0074be4c
@@ -1041,11 +1046,52 @@ void C2_HOOK_FASTCALL CalcCollisionObjectThings(tPhysics_object* pObject, br_bou
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x004085f0
-// STUB: CARMA2_SW 0x004085f0
-// STUB: CARMA2_CHEAT 0x004085f0
-int C2_HOOK_FASTCALL SetCollisionObject(tPed_character_instance* pCharacter, tPhysics_object* pObject, br_actor* pActor, br_bounds3* pBounds, int pArg5, int pArg6, int pArg7, int pArg8, int pArg9, int pArg10, int pArg11) {
-    NOT_IMPLEMENTED();
+// FUNCTION: CARMA2_HW 0x004085f0
+// FUNCTION: CARMA2_SW 0x004085f0
+// FUNCTION: CARMA2_CHEAT 0x004085f0
+int C2_HOOK_FASTCALL SetCollisionObject(tPed_character_instance* pCharacter, tPhysics_object* pObject, br_actor* pActor, br_bounds3* pBounds, br_vector3* pCmpos, int pType, int pArg7, int pAdd_to_phil, int pUid, br_vector3* pBone_vec, br_vector3* pBone_ptr) {
+
+    BrMatrix34Copy(&pObject->transform_matrix, &pActor->t.t.mat);
+    pObject->actor = pActor;
+    CalcCollisionObjectThings(pObject, pBounds, pCmpos == NULL, pBone_vec, pBone_ptr);
+    pObject->owner = pCharacter;
+    pObject->flags_0x238 = pType + 2;
+    if (pCmpos != NULL) {
+        BrVector3Copy(&pObject->cmpos, pCmpos);
+    }
+    pObject->disable_move_rotate = 1;
+    pObject->field_0xed = 1;
+    BrVector3SetFloat(&pObject->v, 0.0f, 0.0f, 0.0f);
+    BrVector3SetFloat(&pObject->omega, 0.0f, 0.0f, 0.0f);
+    BrVector3SetFloat(&pObject->rotate_omega, 0.0f, 0.0f, 0.0f);
+    BrVector3SetFloat(&pObject->velocity_car_space, 0.0f, 0.0f, 0.0f);
+    pObject->uid = pUid;
+    pObject->world_friction = 1.0f;
+    pObject->last_special_volume = NULL;
+    pObject->auto_special_volume = NULL;
+    if (pType == 1) {
+        pObject->flags |= 0x1;
+    } else if (pType == 2) {
+        pObject->flags |= 0x2;
+    }
+    if (pAdd_to_phil) {
+        if (PHILAddObjectImmediately(pObject)) {
+            return 0;
+        }
+        PHILSetObjectProperty(pObject, 0, 1.0);
+        PHILSetObjectProperty(pObject, 3, pArg7 == 0);
+        PHILSetObjectProperty(pObject, 4, 1);
+        PHILSetObjectProperty(pObject, 5, 1);
+        PHILSetObjectProperty(pObject, 7, 1);
+        PHILSetObjectProperty(pObject, 8, (double)gPed_buoyancy_factor);
+        if (pType == 3) {
+            PHILSetObjectProperty(pObject, 6, 1);
+        }
+    }
+    if (gPed_vtable->fill_in_object != NULL) {
+        gPed_vtable->fill_in_object(pObject, pType + 2);
+    }
+    return 1;
 }
 
 #ifdef REC2_MATCHING

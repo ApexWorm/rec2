@@ -41,6 +41,7 @@ extern tPed_personality* gPed_personalities[50];
 extern float gPed_sin_table[256];
 extern float gPedestrian_speed_factor;
 extern int gSelected_ped;
+extern float gPed_buoyancy_factor;
 extern int gCount_active_peds;
 extern int gPeds_suicidal;
 extern int gExploding_pedestrians;
@@ -162,7 +163,7 @@ extern int C2_HOOK_FASTCALL MakeCharacterRenderable(tPed_character_instance* pCh
 
 extern void C2_HOOK_FASTCALL CalcCollisionObjectThings(tPhysics_object* pObject, br_bounds3* pFrame, int pNull, br_vector3* pBoneVec, br_vector3* pBonePtr);
 
-extern int C2_HOOK_FASTCALL SetCollisionObject(tPed_character_instance* pCharacter, tPhysics_object* pObject, br_actor* pActor, br_bounds3* pBounds, int pArg5, int pArg6, int pArg7, int pArg8, int pArg9, int pArg10, int pArg11);
+extern int C2_HOOK_FASTCALL SetCollisionObject(tPed_character_instance* pCharacter, tPhysics_object* pObject, br_actor* pActor, br_bounds3* pBounds, br_vector3* pCmpos, int pType, int pArg7, int pAdd_to_phil, int pUid, br_vector3* pBone_vec, br_vector3* pBone_ptr);
 
 extern int C2_HOOK_FASTCALL FindAndSetSeveredPhysicsSet(tPed_character_instance* pCharacter);
 
