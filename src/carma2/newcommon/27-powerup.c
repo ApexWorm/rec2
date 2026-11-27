@@ -1611,9 +1611,68 @@ void C2_HOOK_FASTCALL PositionMine(tShit_mine* pMine, tCar_spec* pCar) {
     BrVector3Set(&pMine->collision_info->omega, 0.f, 0.f, 0.f);
 }
 
-// MineSound
+inline void C2_HOOK_FASTCALL MineSound(tShit_mine* pMine) {
 
-// ReceivedMine
+    if (pMine->flags & 0x40) {
+        DRS3StartSound3D(gCar_outlet, 5405, &pMine->collision_info->actor->t.t.translate.t, &gZero_v__car, 1, 255, 0x10000, 0x10000);
+    } else {
+        DRS3StartSound3D(gCar_outlet, 5404, &pMine->collision_info->actor->t.t.translate.t, &gZero_v__car, 1, 255, 0x10000, 0x10000);
+    }
+    if (pMine->field_0x30 != NULL && pMine->field_0x30->driver == eDriver_local_human) {
+        PlayExclusiveFFBEffect("Mine_Shit", 0);
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x004dd210
+// FUNCTION: CARMA2_SW 0x004d9710
+// FUNCTION: CARMA2_CHEAT 0x004e2dd0
+void C2_HOOK_FASTCALL ReceivedMine(tNet_message_chunk* pContents) {
+    tShit_mine* mine;
+    tPowerup* powerup;
+    tCar_spec* car;
+    int player;
+    tU32 size;
+
+    mine = &gShit_mines[(tU8)pContents->mine_explode.mine_index];
+    player = pContents->mine_explode.field_0x5;
+    powerup = &gPowerup_array[pContents->mine_explode.field_0x4];
+    if (player >= 0 && player < gNumber_of_net_players) {
+        car = gNet_players[player].car;
+    } else {
+        car = gNet_players[0].car;
+    }
+    if (pContents->mine_explode.field_0x8 == -1) {
+        if (mine->field_0x35 == pContents->mine_explode.field_0x3 || (!(mine->flags & 0x2) && (mine->flags & 0x1))) {
+            if (!(mine->flags & 0x1)) {
+                ActivateMine(mine, powerup, car);
+            }
+            WriteHierarchyNetworkStuff(pContents->mine_explode.object_hierarchy, mine->collision_info, 2);
+            MineExplode(mine);
+        }
+    } else {
+        if (!(mine->flags & 0x1) || mine->field_0x35 != pContents->mine_explode.field_0x3) {
+            if (!(mine->flags & 0x1)) {
+                ActivateMine(mine, powerup, car);
+            }
+            if (player >= 0 && player < gNumber_of_net_players) {
+                PositionMine(mine, mine->field_0x30);
+            } else {
+                BrMatrix34Translate(&mine->collision_info->transform_matrix, 1000.f, 1000.f, 1000.f);
+                BrMatrix34Copy(&mine->collision_info->actor->t.t.mat, &mine->collision_info->transform_matrix);
+            }
+            MineSound(mine);
+            mine->field_0x35 = pContents->mine_explode.field_0x3;
+        }
+        mine->collision_info->message_time = pContents->mine_explode.field_0x8;
+        mine->collision_info->field_0x261 = pContents->mine_explode.header.type;
+        mine->collision_info->disable_move_rotate = 0;
+        size = pContents->mine_explode.header.size - 0xc;
+        if (size > 0x48) {
+            size = 0x48;
+        }
+        memcpy(mine->collision_info->network_data, pContents->mine_explode.object_hierarchy, size);
+    }
+}
 
 // ShitMine
 

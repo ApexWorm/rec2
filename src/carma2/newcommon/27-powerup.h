@@ -264,7 +264,7 @@ extern void C2_HOOK_FASTCALL ActivateMine(tShit_mine* pMine, tPowerup* pPowerup,
 
 // PositionMine
 
-// MineSound
+extern void C2_HOOK_FASTCALL MineSound(tShit_mine* pMine);
 
 // ReceivedMine
 

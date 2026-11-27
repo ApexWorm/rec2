@@ -236,7 +236,12 @@ int C2_HOOK_FASTCALL GetHierarchyNetworkStuff(tPhysics_object* pObject, tU8* pBu
 
 // FindObject
 
-// WriteHierarchyNetworkStuff
+// STUB: CARMA2_HW 0x0049cd90
+// STUB: CARMA2_SW 0x00498f10
+// STUB: CARMA2_CHEAT 0x0049d140
+void C2_HOOK_FASTCALL WriteHierarchyNetworkStuff(tU8* pData, tPhysics_object* pObject, int pArg3) {
+    NOT_IMPLEMENTED();
+}
 
 // FUNCTION: CARMA2_HW 0x0049ce60
 // FUNCTION: CARMA2_SW 0x00498fe0
