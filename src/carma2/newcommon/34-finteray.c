@@ -441,9 +441,9 @@ void C2_HOOK_FASTCALL MultiRayCheckSingleFace(int pNum_rays, tFace_ref* pFace, b
     this_material = pFace->material;
     d = BrVector3Dot(&pFace->normal, ray_dir);
     for (i = 0; i < pNum_rays; i++) {
-        rt[i] = 100.f;
+        rt[i] = 100.0f;
     }
-    if (this_material != NULL && (this_material->flags & (BR_MATF_TWO_SIDED | BR_MATF_ALWAYS_VISIBLE)) == 0 && d > 0.f) {
+    if (this_material != NULL && (this_material->flags & (BR_MATF_TWO_SIDED | BR_MATF_ALWAYS_VISIBLE)) == 0 && d > 0.0f) {
         return;
     }
     if (this_material != NULL && this_material->identifier != NULL
@@ -460,20 +460,20 @@ void C2_HOOK_FASTCALL MultiRayCheckSingleFace(int pNum_rays, tFace_ref* pFace, b
         if (BadDiv__finteray(numerator, d)) {
             return;
         }
-        if (d <= 0.f) {
+        if (d <= 0.0f) {
             if (numerator < -0.001 || numerator > 0.003 - d) {
-                t[i] = 100.f;
+                t[i] = 100.0f;
                 continue;
             }
         } else {
             if (-numerator < -0.001 || -numerator > d + 0.003) {
-                t[i] = 100.f;
+                t[i] = 100.0f;
                 continue;
             }
         }
         t[i] = -(numerator / d);
-        if (t[i] > 1.f) {
-            t[i] = 1.f;
+        if (t[i] > 1.0f) {
+            t[i] = 1.0f;
         }
         BrVector3Scale(&p[i], ray_dir, t[i]);
         BrVector3Accumulate(&p[i], &ray_pos[i]);
@@ -506,14 +506,14 @@ void C2_HOOK_FASTCALL MultiRayCheckSingleFace(int pNum_rays, tFace_ref* pFace, b
     u2 = pFace->v[2].v[axis_0] - v0i1;
     v2 = pFace->v[2].v[axis_1] - v0i2;
     for (i = 0; i < pNum_rays; i++) {
-        if (t[i] == 100.f) {
+        if (t[i] == 100.0f) {
             continue;
         }
         u0[i] = p[i].v[axis_0] - v0i1;
         v0[i] = p[i].v[axis_1] - v0i2;
         f_d = v0[i] * u1 - v1 * u0[i];
         f_n = (v2 * u1) - u2 * v1;
-        if (fabs(f_d) > fabs(f_n) * 1.0001 || f_n == 0.f) {
+        if (fabs(f_d) > fabs(f_n) * 1.0001 || f_n == 0.0f) {
             continue;
         }
         alpha = f_d / f_n;
@@ -522,7 +522,7 @@ void C2_HOOK_FASTCALL MultiRayCheckSingleFace(int pNum_rays, tFace_ref* pFace, b
         }
         f_n = (v1 * u2) - u1 * v2;
         f_d = (v0[i] * u2) - v2 * u0[i];
-        if (fabs(f_d) > fabs(f_n) * 1.0001 || f_n == 0.f) {
+        if (fabs(f_d) > fabs(f_n) * 1.0001 || f_n == 0.0f) {
             continue;
         }
         if (f_d / f_n < -0.0001 || alpha + f_d / f_n > 1.0001) {
