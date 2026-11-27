@@ -134,7 +134,20 @@ void C2_HOOK_FASTCALL ReceivedRecover(tNet_message_chunk_recover* pContents) {
 
 // CopyMechanics
 
-// ReceivedShapeNumbers
+// FUNCTION: CARMA2_HW 0x004983f0
+// FUNCTION: CARMA2_SW 0x00495020
+// FUNCTION: CARMA2_CHEAT 0x004987a0
+void C2_HOOK_FASTCALL ReceivedShapeNumbers(tNet_message_chunk* pContents) {
+    int i;
+    tCar_spec* car;
+
+    for (i = 0; i < pContents->shape_numbers.count; i++) {
+        car = NetCarFromPlayerID(pContents->shape_numbers.shapes[i].player);
+        if (car != NULL && pContents->shape_numbers.shapes[i].shape_number == car->car_crush_spec->field_0x24) {
+            ClearShapeStatusFlag(car->car_crush_spec->network_stuff, pContents->shape_numbers.player_id);
+        }
+    }
+}
 
 // FillInSimpleCarPos
 
