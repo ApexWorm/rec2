@@ -183,7 +183,26 @@ int C2_HOOK_FASTCALL PFfgetc(FILE* pFile) {
     return result;
 }
 
-// PFgetc
+// FUNCTION: CARMA2_HW 0x004b48c0
+// FUNCTION: CARMA2_SW 0x004b0a30
+// FUNCTION: CARMA2_CHEAT 0x004ba190
+int C2_HOOK_FASTCALL PFgetc(FILE* pFile) {
+    tTwatVfsFile* twtFile;
+    int result;
+
+    if ((intptr_t)pFile >= REC2_ASIZE(gTwatVfsFiles)) {
+        return fgetc(pFile);
+    }
+    twtFile = &gTwatVfsFiles[(uintptr_t)pFile];
+    if (twtFile->pos >= twtFile->end) {
+        twtFile->error = -1;
+        return EOF;
+    }
+    twtFile->error = 0;
+    result = *twtFile->pos;
+    twtFile->pos++;
+    return result;
+}
 
 // FUNCTION: CARMA2_HW 0x004b4900
 // FUNCTION: CARMA2_SW 0x004b0a70
