@@ -872,6 +872,7 @@ typedef struct tPipe_chunk {
     uintptr_t subject_index;
     union {
         tPipe_chunk_car_incident car_incident;
+        tPipe_ped_incident ped_incident;
         tPipe_chunk_frame_boundary frame_boundary;
         tPipe_chunk_car car;
         tPipe_chunk_non_car non_car;

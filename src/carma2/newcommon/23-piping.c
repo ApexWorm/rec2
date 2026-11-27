@@ -580,6 +580,7 @@ void C2_HOOK_CDECL ARDoSingleVariedSession(int pType, uintptr_t pOwner, int pCou
 
 // FUNCTION: CARMA2_HW 0x00402df0
 // FUNCTION: CARMA2_SW 0x00402df0
+// FUNCTION: CARMA2_CHEAT 0x00402df0
 tU8* C2_HOOK_FASTCALL ARGetPipePlayPtr(void) {
     return gPipe_play_ptr;
 }
@@ -1014,11 +1015,80 @@ int C2_HOOK_FASTCALL CheckIncident(tPipe_chunk* pChunk_ptr, int pChunk_count, tU
     return 1;
 }
 
+typedef enum {
+    eIncident_ped = 0,
+    eIncident_car = 1,
+    eIncident_wall = 2
+} tIncident_type;
+
+typedef struct {
+    br_actor* ped_actor;
+    br_actor* murderer_actor;
+} tPed_incident_info;
+
+typedef struct {
+    tCar_spec* car;
+    br_vector3 impact_point;
+} tCar_incident_info;
+
+typedef struct {
+    br_vector3 pos;
+} tWall_incident_info;
+
+typedef union {
+    tPed_incident_info ped_info;
+    tCar_incident_info car_info;
+    tWall_incident_info wall_info;
+} tIncident_info;
+
+// FUNCTION: CARMA2_HW 0x004c6c90
+// FUNCTION: CARMA2_SW 0x004c33c0
+// FUNCTION: CARMA2_CHEAT 0x004cc7b0
+int C2_HOOK_FASTCALL GetNextIncident(int pOffset_time, tIncident_type* pIncident_type, float* pSeverity, tIncident_info* pInfo, int* pTime_away) {
+    tU8* temp_ptr;
+    tCar_spec* car;
+
+    temp_ptr = ARGetPipePlayPtr();
+    gTrigger_time = 0;
+    if (ARReplayForwards()) {
+        gOldest_time = GetTotalTime() + pOffset_time;
+    } else {
+        gOldest_time = GetTotalTime() - pOffset_time;
+    }
+    ARScanBuffer(&temp_ptr, ePipe_chunk_ped_incident, GetTotalTime(), CheckIncident, NULL);
+    if (gTrigger_time != 0) {
+        *pTime_away = gTrigger_time - GetTotalTime();
+        *pIncident_type = gIncident_chunk->subject_index;
+        *pSeverity = gIncident_chunk->data.car_incident.force;
+        switch (*pIncident_type) {
+        case eIncident_ped:
+            pInfo->ped_info.ped_actor = GetCharacterActorPtr(gIncident_chunk->data.ped_incident.ped->character);
+            if (pInfo->ped_info.ped_actor == NULL) {
+                gTrigger_time = 0;
+            }
+            pInfo->ped_info.murderer_actor = gIncident_chunk->data.ped_incident.actor;
+            break;
+        case eIncident_car:
+            if ((gIncident_chunk->data.car_incident.car_ID & 0xffffff00) == (eVehicle_self << 8)) {
+                car = &gProgram_state.current_car;
+            } else {
+                car = GetCarSpec(gIncident_chunk->data.car_incident.car_ID >> 8, gIncident_chunk->data.car_incident.car_ID & 0xff);
+            }
+            pInfo->car_info.car = car;
+            BrVector3Copy(&pInfo->car_info.impact_point, &gIncident_chunk->data.car_incident.position);
+            break;
+        case eIncident_wall:
+            /* FIXME: a wall incident chunk is a float severity followed by the impact point, the same layout as a splash chunk */
+            BrVector3Copy(&pInfo->wall_info.pos, &gIncident_chunk->data.splash.normal);
+            break;
+        }
+    }
+    return gTrigger_time;
+}
+
 #if defined(REC2_MATCHING) && defined(_MSC_VER)
 #pragma inline_depth()
 #endif
-
-// GetNextIncident
 
 // AddCrushToPipingSession
 
