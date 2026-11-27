@@ -37,6 +37,11 @@ tGroovidelic_spec* gGroovidelics_array;
 // GLOBAL: CARMA2_CHEAT 0x006930f0
 int gGroovidelics_array_size;
 
+// GLOBAL: CARMA2_HW 0x0068b830
+// GLOBAL: CARMA2_SW 0x00685d90
+// GLOBAL: CARMA2_CHEAT 0x006930d8
+tFunk_temp_buffer* gFunk_temp_vertices;
+
 // GLOBAL: CARMA2_HW 0x0068b838
 // GLOBAL: CARMA2_SW 0x00685d98
 // GLOBAL: CARMA2_CHEAT 0x006930e0
@@ -140,7 +145,35 @@ br_uint_32 C2_HOOK_FASTCALL CalcProximities(br_actor* pActor, br_material* pMat,
     return 0;
 }
 
-// AddProximities
+// FUNCTION: CARMA2_HW 0x00476230
+// FUNCTION: CARMA2_SW 0x00475790
+// FUNCTION: CARMA2_CHEAT 0x004765b0
+br_uint_32 C2_HOOK_FASTCALL AddProximities(br_actor* pActor, br_material* pMat, void* pData) {
+    tFunkotronic_spec* the_funk;
+    br_face* the_face;
+    int i;
+    int j;
+    br_vertex* vertex;
+
+    (void)pMat;
+    the_funk = pData;
+    if (pActor->model != NULL) {
+        the_face = pActor->model->faces;
+        for (i = 0; i < pActor->model->nfaces; i++, the_face++) {
+            if (the_face->material == the_funk->material) {
+                for (j = 0; j < 3; j++) {
+                    vertex = &pActor->model->vertices[the_face->vertices[j]];
+                    the_funk->proximity_array[the_funk->proximity_count].v[j] = vertex->p;
+                    gFunk_temp_vertices[the_funk->proximity_count].vertices[j] = vertex;
+                }
+                BrVector3Normalise(&the_funk->proximity_array[the_funk->proximity_count].n, &the_face->n);
+                the_funk->proximity_array[the_funk->proximity_count].d = -the_face->d;
+                the_funk->proximity_count++;
+            }
+        }
+    }
+    return 0;
+}
 
 // TryThisFunkLink
 
