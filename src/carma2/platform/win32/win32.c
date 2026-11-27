@@ -181,6 +181,7 @@ int gKeyboardBufferLength;
 unsigned char gKeyboardBuffer[20];
 
 // GLOBAL: CARMA2_HW 0x006acc70
+// GLOBAL: CARMA2_SW 0x006a6414
 // GLOBAL: CARMA2_CHEAT 0x006b4300
 int gPerformanceCounterInitialized;
 
@@ -870,10 +871,12 @@ tU32 C2_HOOK_FASTCALL PDGetTotalTime(void) {
 int C2_HOOK_FASTCALL PDGetMicroseconds(void) {
     if (gPerformanceCounterInitialized) {
         LARGE_INTEGER perfCountValue;
+        DWORDLONG count;
+
         QueryPerformanceCounter(&perfCountValue);
-        // Is it okay to convert unsigned to int here?
-        return (int) ((perfCountValue.QuadPart - gPerformanceCounterStart.QuadPart) / gPerformanceCounterFrequency_us.
-                      QuadPart);
+        count = Int64ShllMod32(Int64ShllMod32(perfCountValue.HighPart, 16), 16) + perfCountValue.LowPart;
+        count = (count - gPerformanceCounterStart.QuadPart) / gPerformanceCounterFrequency_us.QuadPart;
+        return (int)count;
     }
     return 0;
 }

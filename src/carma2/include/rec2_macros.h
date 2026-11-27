@@ -40,7 +40,9 @@
 #define REC2_3PI_OVER_2  4.71238898038468985769
 
 #define Vector2Equals(V1, V2) \
-    ((V1)->v[0] == (V2)->v[0] && (V1)->v[1] == (V2)->v[1])
+((V1)->v[0] == (V2)->v[0] && (V1)->v[1] == (V2)->v[1])
+#define Vector2DistanceSquared(V1, V2) \
+    ((((V1)->v[0] - (V2)->v[0])) * (((V1)->v[0] - (V2)->v[0])) + (((V1)->v[1] - (V2)->v[1])) * (((V1)->v[1] - (V2)->v[1])))
 #define Vector3Equals(V1, V2) \
     ((V1)->v[0] == (V2)->v[0] && (V1)->v[1] == (V2)->v[1] && (V1)->v[2] == (V2)->v[2])
 #define Vector3EqualElements(V, A, B, C) \
