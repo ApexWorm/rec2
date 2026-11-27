@@ -4596,6 +4596,15 @@ typedef struct {
     int type;
 } tPhysics_joint_force;
 
+typedef struct {
+    br_vector3 old_points[64];
+    br_vector3 trial_points[64];
+    int point_flags[64];
+    tU16 count_points;
+    tU16 count_edges;
+    tPolyhedron_edge_indexes* edges;
+} tPhysics_wall_workspace;
+
 typedef struct tPhysics_object {
     br_actor* actor;
     float M;

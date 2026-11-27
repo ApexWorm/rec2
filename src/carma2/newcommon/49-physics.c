@@ -30,6 +30,11 @@
 #define PHYSICS_BUFFER_PART_SIZE 40000
 #define PHYSICS_BUFFER_OTHER_SIZE 50000
 
+// GLOBAL: CARMA2_HW 0x00679434
+// GLOBAL: CARMA2_SW 0x00673ba4
+// GLOBAL: CARMA2_CHEAT 0x00680ce4
+int gINT_00679434;
+
 // GLOBAL: CARMA2_HW 0x00692dc8
 // GLOBAL: CARMA2_SW 0x0068ce20
 // GLOBAL: CARMA2_CHEAT 0x0069a940
@@ -358,7 +363,44 @@ tFace_ref* C2_HOOK_FASTCALL RayCastThruFaceList2(br_vector3* pPosition, br_vecto
 
 // GetSphereToEdgePoints
 
-// GetCornerToFacePoints
+// FUNCTION: CARMA2_HW 0x00423ed0
+// FUNCTION: CARMA2_SW 0x00423f50
+// FUNCTION: CARMA2_CHEAT 0x00424050
+int C2_HOOK_FASTCALL GetCornerToFacePoints(tPhysics_object* pObject, tPhysics_shape* pShape, tPhysics_joint_force* pForces, int pCount, int pMax_count, tPhysics_wall_workspace* pWorkspace, void* pUnused) {
+    br_vector3 direction;
+    br_vector3 extension;
+    br_vector3 normal;
+    br_vector3 local_normal;
+    br_vector3 intersection;
+    br_vector3 local_position;
+    br_scalar t;
+    tFace_ref* face;
+    int i;
+
+    if (pMax_count < 4) {
+        return 0;
+    }
+    gINT_00679434 = 0;
+    for (i = 0; i < pWorkspace->count_points; i++) {
+        if (pWorkspace->point_flags[i] == 0) {
+            BrVector3Sub(&direction, &pWorkspace->trial_points[i], &pWorkspace->old_points[i]);
+            BrVector3Normalise(&extension, &direction);
+            BrVector3Scale(&extension, &extension, 0.0010434783f);
+            BrVector3Accumulate(&direction, &extension);
+            face = RayCastThruFaceList(&pWorkspace->old_points[i], &direction, &normal, &t, &intersection, &gFace_list__car[pObject->box_face_start], pObject->box_face_end - pObject->box_face_start);
+            if (face != NULL) {
+                BrMatrix34TApplyV(&local_normal, &normal, &pObject->transform_matrix);
+                BrVector3Sub(&extension, &pWorkspace->old_points[i], (br_vector3*)pObject->transform_matrix.m[3]);
+                BrMatrix34TApplyV(&local_position, &extension, &pObject->transform_matrix);
+                pCount = AddObjectWallForce(pForces, &local_position, t, &local_normal, BrVector3Dot(&normal, &direction), pCount, pObject, 1, face, NULL);
+            }
+        }
+    }
+    if (pCount > 3) {
+        pCount = 4;
+    }
+    return pCount;
+}
 
 // CylinderCheck
 
