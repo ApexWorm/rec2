@@ -818,7 +818,60 @@ void C2_HOOK_FASTCALL MakeObjectListDoSomething(tPhysics_object* pObject) {
 
 // MakeObjectDoSomething
 
-// GetReducedList
+// FUNCTION: CARMA2_HW 0x004bd830
+// FUNCTION: CARMA2_SW 0x004b9f50
+// FUNCTION: CARMA2_CHEAT 0x004c3360
+tPhysics_object** C2_HOOK_FASTCALL GetReducedList(tPhysics_object* pObject, tPhysics_object* pList, tPhysics_object** pTail) {
+    tPhysics_object* object;
+    tPhysics_object* children;
+    tPhysics_object** children_tail;
+    tPhysics_object** tail;
+    br_scalar limit;
+
+    tail = pTail;
+    if (pList->parent != NULL) {
+        for (object = pList; object != NULL; object = object->next) {
+            if ((object == pObject && !(pObject->flags & 0x8)) || BoundsOverlapTest(&pObject->field_0x10c, &object->field_0x10c)) {
+                *tail = object;
+                tail = &object->field_0x234;
+            }
+        }
+    } else {
+        limit = pObject->field_0x10c.min.v[0] - gPhysics_bounds_max_x;
+        for (object = pObject->prev; object != NULL && object->transform_matrix.m[3][0] >= limit; object = object->prev) {
+            if (BoundsOverlapTest(&pObject->field_0x10c, &object->field_0x10c)) {
+                *tail = object;
+                tail = &object->field_0x234;
+            }
+        }
+        limit = pObject->field_0x10c.max.v[0] - gPhysics_bounds_min_x;
+        for (object = pObject->next; object != NULL && object->transform_matrix.m[3][0] <= limit; object = object->next) {
+            if (BoundsOverlapTest(&pObject->field_0x10c, &object->field_0x10c)) {
+                *tail = object;
+                tail = &object->field_0x234;
+            }
+        }
+        if (!(pObject->flags & 0x8)) {
+            *tail = pObject;
+            tail = &pObject->field_0x234;
+        }
+    }
+    *tail = NULL;
+    children = NULL;
+    object = *pTail;
+    children_tail = &children;
+    for (; object != NULL; object = object->field_0x234) {
+        if (object->child != NULL) {
+            children_tail = GetReducedList(pObject, object->child, children_tail);
+        }
+    }
+    if (children != NULL) {
+        *children_tail = NULL;
+        *tail = children;
+        return children_tail;
+    }
+    return tail;
+}
 
 // ReduceReducedList
 

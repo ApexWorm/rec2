@@ -4652,7 +4652,7 @@ typedef struct tPhysics_object {
     tPhysics_object* parent;
     tPhysics_object* prev;
     tPhysics_object* field_0x230;
-    void* field_0x234;
+    tPhysics_object* field_0x234;
     tU8 flags_0x238;
     tU8 field_0x239;
     undefined field_0x23a[2];
