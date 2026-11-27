@@ -203,6 +203,7 @@ br_scalar gYon_squared;
 
 // STUB: CARMA2_HW 0x004e7650
 // STUB: CARMA2_SW 0x004e3470
+// STUB: CARMA2_CHEAT 0x004ed2f0
 void C2_HOOK_FASTCALL ProcessShadow(tCar_spec* pCar, br_actor* pWorld, tTrack_spec* pTrack_spec, br_actor* pCamera, br_matrix34* pCamera_to_world_transform, br_scalar pDistance_factor) {
     NOT_IMPLEMENTED();
 }
