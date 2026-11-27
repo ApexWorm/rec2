@@ -4671,7 +4671,16 @@ typedef struct tPhysics_object {
     tS16 field_0x278;
     undefined field_0x27a[0x27c - 0x27a];
     tU32 field_0x27c;
-    undefined field_0x280[0x49c - 0x280];
+    undefined field_0x280[0x292 - 0x280];
+    tU8 field_0x292;
+    undefined field_0x293;
+    tU8 network_data[0x2fc - 0x294]; /* FIXME: size taken from the next used offset */
+    tU8 shape_data[0x481 - 0x2fc]; /* FIXME: size taken from the next used offset */
+    tU8 field_0x481;
+    tU16 field_0x482;
+    undefined4 field_0x484;
+    undefined4 field_0x488;
+    undefined4 field_0x48c[4];
     undefined4 field_0x49c; /* tU32 last_car_car_collision: */
     undefined field_0x4a0[52];
     tU8 drivable_on;

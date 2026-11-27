@@ -28,6 +28,7 @@
 #include "63-loading3.h"
 #include "72-interface.h"
 #include "c2_stdio.h"
+#include "c2_string.h"
 #include "globvars.h"
 #include "globvrkm.h"
 #include "globvrpb.h"
@@ -132,7 +133,47 @@ void C2_HOOK_FASTCALL ReceivedRecover(tNet_message_chunk_recover* pContents) {
     }
 }
 
-// CopyMechanics
+// FUNCTION: CARMA2_HW 0x00498ab0
+// FUNCTION: CARMA2_SW 0x004956e0
+// FUNCTION: CARMA2_CHEAT 0x00498e60
+void C2_HOOK_FASTCALL CopyMechanics(tCar_spec* pCar, tU8* pSrc) {
+    int size;
+    int i;
+    tU8* pData;
+    tPhysics_object* object;
+
+    memcpy(&pCar->collision_info->field_0x260, pSrc, 0x34); /* FIXME: 0x34 is the block from field_0x260 up to network_data */
+    pData = pSrc + 0x34;
+    size = GetNetworkDataSize(pData);
+    memcpy(pCar->collision_info->network_data, pData, size);
+    pData += size;
+    if (pCar->collision_info->field_0x292 & 0x8) {
+        for (i = 0; i < (int)REC2_ASIZE(pCar->collision_info->field_0x48c); i++) {
+            pCar->collision_info->field_0x48c[i] = *(undefined4*)pData;
+            pData += sizeof(undefined4);
+        }
+    } else {
+        for (i = 0; i < (int)REC2_ASIZE(pCar->collision_info->field_0x48c); i++) {
+            pCar->collision_info->field_0x48c[i] = 0;
+        }
+    }
+    if (pCar->collision_info->field_0x292 & 0x1) {
+        size = GetNetShapeDataLengthFromData(pData);
+        memcpy(pCar->collision_info->shape_data, pData, size);
+        pData += size;
+    }
+    if (pCar->collision_info->field_0x292 & 0x2) {
+        pCar->collision_info->field_0x481 = *pData;
+        pData += sizeof(tU8);
+        pCar->collision_info->field_0x482 = *(tU16*)pData;
+        pData += sizeof(tU16);
+    }
+    object = pCar->collision_info;
+    if (object->field_0x292 & 0x4) {
+        object->field_0x484 = ((undefined4*)pData)[0];
+        object->field_0x488 = ((undefined4*)pData)[1];
+    }
+}
 
 // ReceivedShapeNumbers
 
