@@ -5313,7 +5313,7 @@ typedef struct tFace_ref {
 
 typedef struct {
     tSmoke_column_core core;
-    int time;
+    tU32 time;
     tU32 lifetime;
     int count;
     int colour;
