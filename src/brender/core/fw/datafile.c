@@ -1352,18 +1352,17 @@ void* C2_HOOK_STDCALL DfBlockReadText(br_datafile* df, void* base, int* count, i
         }
     }
     *count = l;
-    for (a = 0; a < l * size;) {
+    a = 0;
+    b[2] = '\0';
+    while (a < l * size) {
         TextReadLine(df, &id, &data);
         if (a != BrStrToL(id, NULL, 16)) {
             BrFailure("block address mismatch");
         }
-        while ((data[0] != '\0') && (data[1] != '\0')) {
+        for (; data[0] != '\0' && data[1] != '\0'; data += 2, a++) {
             b[0] = data[0];
             b[1] = data[1];
-            b[2] = '\0';
             ((br_uint_8*)base)[a] = (br_uint_8)BrStrToUL(b, NULL, 16);
-            data += 2;
-            a++;
         }
     }
     BrSwapBlock(base, l, size);
@@ -1530,9 +1529,8 @@ int C2_HOOK_STDCALL DfSkipText(br_datafile* df, br_uint_32 length) {
     char* id;
     char* data;
 
-    while ((BrFileEof(df->h) == 0) && (length != 0)) {
-        TextReadLine(df, &data, &id);
-        length--;
+    while (!BrFileEof(df->h) && length-- != 0) {
+        TextReadLine(df, &id, &data);
     }
     return 0;
 }
@@ -1555,20 +1553,18 @@ int C2_HOOK_STDCALL DfChunksInterpret(br_datafile* df, br_chunks_table* table) {
     int r;
     int i;
 
-    while (1) {
+    for (;;) {
         id = df->prims->chunk_read(df, &length);
         // LOG_DEBUG("chunk id=%d, len=%d", id, length);
-        if (id == (br_uint_32)-1) {
-            break;
+        if (id == 0xffffffff) {
+            return 0;
         }
         for (i = 0; i < table->nentries; i++) {
-            if (table->entries[i].id == id) {
+            if (id == table->entries[i].id) {
                 break;
             }
         }
-        if (i >= table->nentries) {
-            df->prims->skip(df, length);
-        } else {
+        if (i < table->nentries) {
             if (table->entries[i].has_count != 0) {
                 count = df->prims->count_read(df);
             } else {
@@ -1578,9 +1574,10 @@ int C2_HOOK_STDCALL DfChunksInterpret(br_datafile* df, br_chunks_table* table) {
             if (r != 0) {
                 return r;
             }
+        } else {
+            df->prims->skip(df, length);
         }
     }
-    return 0;
 }
 
 // FUNCTION: CARMA2_HW 0x0052ca30
