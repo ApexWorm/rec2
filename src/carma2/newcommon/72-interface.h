@@ -93,9 +93,9 @@ extern void C2_HOOK_FASTCALL DisposeJoinableGame(int pIndex);
 
 extern void C2_HOOK_FASTCALL DisposeJoinList(int pException);
 
-// AddToJoinList
+extern void C2_HOOK_FASTCALL AddToJoinList(tNet_game_details* pGame);
 
-// FillInRaceDescription
+extern void C2_HOOK_FASTCALL FillInRaceDescription(char* pText, int pRace_index);
 
 extern int C2_HOOK_FASTCALL temp(tFrontend_spec* pFrontend);
 
@@ -219,11 +219,11 @@ extern void C2_HOOK_FASTCALL MenuSetCarImage(int pCar_index, int pBrender_index)
 
 extern void C2_HOOK_FASTCALL MenuSetDriverImage(int pOpponent_index, int pFrontend_index);
 
-// MainMenuInfunc
+extern int C2_HOOK_FASTCALL MainMenuInfunc(tFrontend_spec* pFrontend);
 
 extern int C2_HOOK_FASTCALL MainMenuOutfunc(tFrontend_spec* pFrontend);
 
-// MainMenuSelectRace
+extern int C2_HOOK_FASTCALL MainMenuSelectRace(tFrontend_spec* pFrontend);
 
 extern int C2_HOOK_FASTCALL testUp(tFrontend_spec* pFrontend);
 
@@ -457,7 +457,7 @@ extern int C2_HOOK_FASTCALL NetOptions_Outfunc(tFrontend_spec* pFrontend);
 
 extern int C2_HOOK_FASTCALL NetOptions_CreditsRoller(tFrontend_spec* pFrontend);
 
-// NetOptions_TargetRoller
+extern int C2_HOOK_FASTCALL NetOptions_TargetRoller(tFrontend_spec* pFrontend);
 
 // NetOptions_Ok
 
