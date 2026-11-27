@@ -39,6 +39,7 @@ void C2_HOOK_FASTCALL SmoothlyLoadIfItsAModel(const char* pPath) {
 }
 
 // FUNCTION: CARMA2_HW 0x004f6580
+// FUNCTION: CARMA2_SW 0x004f21e0
 // FUNCTION: CARMA2_CHEAT 0x004fc220
 int C2_HOOK_FASTCALL AddSmoothModels(tBrender_storage* pStorage, const char* pPath) {
     br_model* temp_array[2000];
@@ -298,6 +299,7 @@ void C2_HOOK_FASTCALL LoadStaticLightingForRace(const char* pRace_lighting_path)
 
 // FUNCTION: CARMA2_HW 0x00486dc0
 // FUNCTION: CARMA2_SW 0x00483ef0
+// FUNCTION: CARMA2_CHEAT 0x004870e0
 void C2_HOOK_FASTCALL ReadGlobalLightingInfo(FILE* pF) {
 #ifdef REC2_HW
     GetThreeInts(pF, &gLighting_data.directional.red, &gLighting_data.directional.green, &gLighting_data.directional.blue);
