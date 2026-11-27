@@ -14,6 +14,8 @@
 
 extern int gAllow_material_adapt;
 extern br_material* gMaterials_to_adapt[200];
+extern tSmashable_item_spec gUnknown_smashable_006a3660;
+extern tSmashable_item_spec gPowerup_pickup_smashable;
 extern int gMaterials_to_adapt_count;
 extern int gShrapnel_child_count;
 
