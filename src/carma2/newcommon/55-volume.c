@@ -29,6 +29,7 @@ tSpecial_volume gDefault_default_water_spec_vol;
 
 // GLOBAL: CARMA2_HW 0x00761f44
 // GLOBAL: CARMA2_SW 0x007584a4
+// GLOBAL: CARMA2_CHEAT 0x007695e4
 tSpecial_volume* gDefault_water_spec_vol_real;
 
 // GLOBAL: CARMA2_HW 0x00660268
@@ -69,6 +70,7 @@ tSpecial_volume* C2_HOOK_FASTCALL FindSpecialVolume(br_vector3* pP, tSpecial_vol
 
 // FUNCTION: CARMA2_HW 0x004ff410
 // FUNCTION: CARMA2_SW 0x004facf0
+// FUNCTION: CARMA2_CHEAT 0x005050b0
 void C2_HOOK_FASTCALL MungeSpecialVolume(tPhysics_object* pObject) {
     tSpecial_volume* new_special_volume;
     tCar_spec* car;
@@ -262,6 +264,7 @@ void C2_HOOK_FASTCALL FindInverseAndWorldBox(tSpecial_volume* pSpec) {
 
 // FUNCTION: CARMA2_HW 0x004ffd80
 // FUNCTION: CARMA2_SW 0x004fb660
+// FUNCTION: CARMA2_CHEAT 0x00505a30
 void C2_HOOK_FASTCALL ReadSpecialVolumes(FILE* pF) {
     int i;
     int j;

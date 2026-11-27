@@ -41,6 +41,7 @@ int gAusterity_mode;
 
 // GLOBAL: CARMA2_HW 0x0068b878
 // GLOBAL: CARMA2_SW 0x00685dd8
+// GLOBAL: CARMA2_CHEAT 0x00693120
 int gDefault_engine_noise_index;
 
 // GLOBAL: CARMA2_HW 0x0068b884
