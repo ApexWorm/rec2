@@ -245,7 +245,7 @@ extern int C2_HOOK_FASTCALL CarClickNext(tFrontend_spec* pFrontend);
 
 extern int C2_HOOK_FASTCALL ChangeCarMenuOutfunc(tFrontend_spec* pFrontend);
 
-// FRONTEND_ChangeCarMenuHandler
+extern int C2_HOOK_FASTCALL FRONTEND_ChangeCarMenuHandler(tFrontend_spec* pFrontend);
 
 extern int C2_HOOK_FASTCALL StartGameInfunc(tFrontend_spec* pFrontend);
 
