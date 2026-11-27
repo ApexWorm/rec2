@@ -530,7 +530,34 @@ void C2_HOOK_FASTCALL DrawArrow(br_pixelmap* pScreen, br_uint_32 pArrow_index, c
 
 // DrawSmashBlip
 
-// DrawMapSmallBlip
+// FUNCTION: CARMA2_HW 0x004967c0
+// FUNCTION: CARMA2_CHEAT 0x00496b70
+void C2_HOOK_FASTCALL DrawMapSmallBlip(br_pixelmap* pScreen, tU32 pTime, const br_vector3 *pPos, int pColour) {
+    br_vector3 map_pos;
+
+    if (pTime & 0x100) {
+        pColour = 0;
+    }
+    BrMatrix34ApplyP(&map_pos, pPos, &gCurrent_race.map_transformation);
+    if (map_pos.v[0] >= 0.f && map_pos.v[0] < (float)pScreen->width
+            && map_pos.v[1] >= 0 && map_pos.v[1] < (float)pScreen->height) {
+#ifdef REC2_HW
+        if (gMap_view == 2) {
+            PossibleLock(1);
+        }
+#endif
+        if (gBack_screen->type != BR_PMT_INDEX_8) {
+            *(br_uint_16*)((br_uint_8*)pScreen->pixels + (int)map_pos.v[1] * pScreen->row_bytes + 2 * (int)map_pos.v[0]) = PaletteEntry16Bit(gRender_palette, pColour);
+        } else {
+            ((br_uint_8*)pScreen->pixels)[(int)map_pos.v[1] * pScreen->row_bytes + (int)map_pos.v[0]] = pColour;
+        }
+#ifdef REC2_HW
+        if (gMap_view == 2) {
+            PossibleUnlock(1);
+        }
+#endif
+    }
+}
 
 // CopyMapToScreen
 
