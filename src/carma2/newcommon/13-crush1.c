@@ -3213,7 +3213,81 @@ void C2_HOOK_FASTCALL SendDBNonCar(tNon_car_spec* pNon_car, tU32 pTime, tNet_gam
     }
 }
 
-// ReceivedDBNonCar
+// FUNCTION: CARMA2_HW 0x0043d340
+// FUNCTION: CARMA2_SW 0x0043d390
+// FUNCTION: CARMA2_CHEAT 0x0043d5c0
+void C2_HOOK_FASTCALL ReceivedDBNonCar(tNet_message_chunk* pContents) {
+    int i;
+    int changed;
+    tCar_spec* car;
+    br_actor* actor;
+    tPhysics_object* object;
+    tNon_car_spec* non_car;
+    tPhysics_object* non_car_object;
+    tUser_crush_data* user;
+    tCar_crush_detach_data* detach_data;
+    br_bounds3 bounds;
+
+    car = NetCarFromPlayerID(pContents->db_non_car.player);
+    if (car == NULL) {
+        return;
+    }
+    actor = DetachedBitFromID(car, pContents->db_non_car.id);
+    if (actor == NULL) {
+        object = SemiDetachedBitObjectFromID(car, pContents->db_non_car.id);
+        if (object != NULL) {
+            FullyDetachBit(car, object);
+            MungeDetachLists(car->car_crush_spec);
+            actor = object->actor;
+        } else {
+            actor = AttachedBitFromID(car, pContents->db_non_car.id);
+            if (actor == NULL) {
+                return;
+            }
+            ExpandVector3(&bounds.min, &pContents->db_non_car.bounds_min, -10.0f, 10.0f);
+            ExpandVector3(&bounds.max, &pContents->db_non_car.bounds_max, -10.0f, 10.0f);
+            if (DetachBit(car, actor, &bounds) == NULL) {
+                return;
+            }
+        }
+    }
+    non_car = actor->type_data;
+    if (non_car == NULL) {
+        return;
+    }
+    non_car_object = non_car->collision_info;
+    user = actor->user;
+    if (user == NULL || user->crush_data == NULL) {
+        return;
+    }
+    detach_data = user->crush_data->detach_data;
+    if (detach_data == NULL) {
+        return;
+    }
+    changed = 0;
+    for (i = 0; i < 3; i++) {
+        if (pContents->db_non_car.bounds_min.v[i] != detach_data->bounds_min.v[i]) {
+            non_car_object->shape->common.bb.min.v[i] = DRU16ToScalar(pContents->db_non_car.bounds_min.v[i], -10.0f, 10.0f);
+            changed = 1;
+        }
+        if (pContents->db_non_car.bounds_max.v[i] != detach_data->bounds_max.v[i]) {
+            non_car_object->shape->common.bb.max.v[i] = DRU16ToScalar(pContents->db_non_car.bounds_max.v[i], -10.0f, 10.0f);
+            changed = 1;
+        }
+    }
+    if (changed) {
+        UpdateCollisionObject(non_car_object);
+    }
+    if (!(pContents->db_non_car.flags & 0x2) && pContents->db_non_car.time != (tU32)-1) {
+        memcpy(non_car->collision_info->field_0x294, pContents->db_non_car.object_hierarchy, GetNetworkDataSize(pContents->db_non_car.object_hierarchy));
+        non_car->collision_info->message_time = pContents->db_non_car.time;
+        non_car->collision_info->field_0x261 = eNet_message_chunk_type_db_non_car;
+        non_car->collision_info->disable_move_rotate = 0;
+    } else {
+        WriteHierarchyNetworkStuff(pContents->db_non_car.object_hierarchy, non_car->collision_info, 2);
+        non_car->collision_info->disable_move_rotate = 1;
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x0043d5b0
 // FUNCTION: CARMA2_SW 0x0043d600

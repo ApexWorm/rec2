@@ -524,7 +524,7 @@ extern tCar_spec* C2_HOOK_FASTCALL DBNonCarOwner(tNon_car_spec* pNon_car);
 
 extern void C2_HOOK_FASTCALL SendDBNonCar(tNon_car_spec* pNon_car, tU32 pTime, tNet_game_player_info* pPlayer);
 
-// ReceivedDBNonCar
+extern void C2_HOOK_FASTCALL ReceivedDBNonCar(tNet_message_chunk* pContents);
 
 extern void C2_HOOK_FASTCALL SendAllDBNonCars(tNet_game_player_info* pPlayer);
 

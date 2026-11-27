@@ -4221,7 +4221,9 @@ typedef struct  {
     tU8 field_0x33;
     int count_shape_points; /* >0 if shape is poly, ==0 if box */
     int shape_points[16];
-    undefined field_0x78[16];
+    undefined field_0x78[4];
+    tCompressed_vector3 bounds_min;
+    tCompressed_vector3 bounds_max;
 } tCar_crush_detach_data;
 
 typedef struct {
