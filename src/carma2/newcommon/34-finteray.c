@@ -347,11 +347,80 @@ void C2_HOOK_FASTCALL PointSphereCollision(br_vector3* pVertex, br_vector3* pSph
     *pT = time;
 }
 
-// STUB: CARMA2_HW 0x0045d920
-// STUB: CARMA2_SW 0x0045d360
-// STUB: CARMA2_CHEAT 0x0045dd90
+// FUNCTION: CARMA2_HW 0x0045d920
+// FUNCTION: CARMA2_SW 0x0045d360
+// FUNCTION: CARMA2_CHEAT 0x0045dd90
 void C2_HOOK_FASTCALL SphereEdgeCollide(br_vector3* pEdge_start, br_vector3* pEdge_end, br_vector3* pSphere_start, br_vector3* pSphere_end, tCollision_shape_sphere_data* pSphere, br_vector3* pPoint, br_vector3* pNormal, br_scalar* pT, int pStart_flags, int pEnd_flags) {
-    NOT_IMPLEMENTED();
+    br_vector3 edge;
+    br_vector3 sphere_direction;
+    br_vector3 along;
+    br_vector3 perpendicular;
+    br_vector3 offset;
+    br_vector3 shifted;
+    br_vector3 movement;
+    br_vector3 position;
+    br_vector3 normal;
+    br_scalar edge_squared;
+    br_scalar perpendicular_squared;
+    br_scalar projection;
+    br_scalar time;
+    br_scalar distance;
+    br_scalar edge_parameter;
+
+    *pT = 100.0f;
+    BrVector3Sub(&edge, pEdge_end, pEdge_start);
+    BrVector3Sub(&sphere_direction, pSphere_end, pSphere_start);
+    edge_squared = BrVector3LengthSquared(&edge);
+    projection = BrVector3Dot(&sphere_direction, &edge) / edge_squared;
+    BrVector3Scale(&along, &edge, projection);
+    BrVector3Sub(&perpendicular, &sphere_direction, &along);
+    BrVector3Sub(&offset, pEdge_start, pSphere_start);
+    projection = -BrVector3Dot(&offset, &edge) / edge_squared;
+    perpendicular_squared = BrVector3LengthSquared(&perpendicular);
+    BrVector3Scale(&shifted, &edge, projection);
+    BrVector3Accumulate(&shifted, &offset);
+    if (perpendicular_squared >= 1e-6) {
+        time = BrVector3Dot(&shifted, &perpendicular) / perpendicular_squared;
+        BrVector3Scale(&perpendicular, &perpendicular, time);
+        distance = BrVector3LengthSquared(&shifted) - BrVector3LengthSquared(&perpendicular);
+        if (distance <= pSphere->radius_squared + pSphere->radius * 0.002f * 2.0f) {
+            if (distance <= pSphere->radius_squared) {
+                time -= (br_scalar)sqrt((pSphere->radius_squared - distance) / perpendicular_squared);
+                BrVector3Scale(&movement, &along, time);
+                BrVector3Accumulate(&movement, &shifted);
+                BrVector3Sub(&movement, &movement, &offset);
+                edge_parameter = BrVector3Dot(&movement, &edge) / edge_squared;
+                if (edge_parameter < 0.0f) {
+                    if (!(pStart_flags & 0x80)) {
+                        PointSphereCollision(pEdge_start, pSphere_start, pSphere_end, &sphere_direction, pSphere, pPoint, pNormal, pT);
+                    }
+                    if (*pT >= 2.0f) {
+                        StationarySphereEdgeCollide(pEdge_start, pEdge_end, &edge, edge_squared, pSphere_end, pSphere, pPoint, pNormal, pT);
+                    }
+                } else if (edge_parameter > 1.0f) {
+                    if (!(pEnd_flags & 0x80)) {
+                        PointSphereCollision(pEdge_end, pSphere_start, pSphere_end, &sphere_direction, pSphere, pPoint, pNormal, pT);
+                    }
+                    if (*pT >= 2.0f) {
+                        StationarySphereEdgeCollide(pEdge_start, pEdge_end, &edge, edge_squared, pSphere_end, pSphere, pPoint, pNormal, pT);
+                    }
+                } else if (time < 0.0f || time > 1.0f) {
+                    StationarySphereEdgeCollide(pEdge_start, pEdge_end, &edge, edge_squared, pSphere_end, pSphere, pPoint, pNormal, pT);
+                } else {
+                    BrVector3Add(pPoint, pEdge_start, &movement);
+                    BrVector3Scale(&position, &sphere_direction, time);
+                    BrVector3Accumulate(&position, pSphere_start);
+                    BrVector3Sub(&normal, pPoint, &position);
+                    BrVector3Normalise(pNormal, &normal);
+                    *pT = time;
+                }
+            } else {
+                StationarySphereEdgeCollide(pEdge_start, pEdge_end, &edge, edge_squared, pSphere_end, pSphere, pPoint, pNormal, pT);
+            }
+        }
+    } else {
+        StationarySphereEdgeCollide(pEdge_start, pEdge_end, &edge, edge_squared, pSphere_end, pSphere, pPoint, pNormal, pT);
+    }
 }
 
 // SpherePolyFaceCollide
