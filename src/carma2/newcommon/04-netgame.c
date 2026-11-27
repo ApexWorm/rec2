@@ -143,7 +143,7 @@ void C2_HOOK_FASTCALL FillInSimpleCarPos(tNet_message_chunk* pContents, int pPla
     tCar_spec* car;
 
     car = gNet_players[pPlayer_index].car;
-    CompressVector3(&pContents->simple_car_pos.pos, &car->car_master_actor->t.t.translate.t, -500.f, 500.f);
+    CompressVector3(&pContents->simple_car_pos.pos, &car->car_master_actor->t.t.translate.t, -500.0f, 500.0f);
     pContents->simple_car_pos.yaw = BrRadianToAngle(atan2(car->car_master_actor->t.t.mat.m[2][0], car->car_master_actor->t.t.mat.m[2][2]));
     pContents->simple_car_pos.player = gNet_players[pPlayer_index].ID;
     pContents->simple_car_pos.repair_time = car->repair_time;
