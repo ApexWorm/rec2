@@ -168,6 +168,12 @@ void C2_HOOK_FASTCALL FixificateClipulatingPlaneyThings(void) {
     // empty
 }
 
+// FUNCTION: CARMA2_HW 0x004472c0
+// FUNCTION: CARMA2_SW 0x004476e0
+// FUNCTION: CARMA2_CHEAT 0x004477e0
+// FUNCTION: CARMA2_HW 0x004472c0
+// FUNCTION: CARMA2_SW 0x004476e0
+// FUNCTION: CARMA2_CHEAT 0x004477e0
 void C2_HOOK_FASTCALL ProcessModelFaceMaterials(br_model* pModel, tPMFMCB* pCallback) {
     tU16 f;
     br_material* possible_mat;
@@ -188,6 +194,22 @@ void C2_HOOK_FASTCALL ProcessModelFaceMaterials(br_model* pModel, tPMFMCB* pCall
     if (new_mat != NULL) {
         BrModelUpdate(pModel, BR_MODU_ALL);
     }
+}
+
+// FUNCTION: CARMA2_HW 0x00447330
+// FUNCTION: CARMA2_SW 0x00447750
+// FUNCTION: CARMA2_CHEAT 0x00447850
+void C2_HOOK_FASTCALL FUN_00447330(void) {
+
+    // empty
+}
+
+// FUNCTION: CARMA2_HW 0x00447340
+// FUNCTION: CARMA2_SW 0x00447760
+// FUNCTION: CARMA2_CHEAT 0x00447860
+void C2_HOOK_FASTCALL FUN_00447340(void) {
+
+    // empty
 }
 
 // FUNCTION: CARMA2_HW 0x00448fd0
@@ -219,6 +241,7 @@ void C2_HOOK_FASTCALL ProcessModelFaceMaterials2(br_model* pModel, material_cbfn
 }
 
 // FUNCTION: CARMA2_HW 0x00448850
+// FUNCTION: CARMA2_SW 0x00448c70
 // FUNCTION: CARMA2_CHEAT 0x00448d60
 intptr_t C2_HOOK_CDECL ProcessFaceMaterials(br_actor* pActor, void* pData) {
     tPMFMCB* callback = pData;
