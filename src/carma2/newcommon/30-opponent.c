@@ -1172,6 +1172,7 @@ void C2_HOOK_FASTCALL LoadCopCars(tRace_info* pRace_info) {
 
 // STUB: CARMA2_HW 0x004a9610
 // STUB: CARMA2_SW 0x004a5780
+// STUB: CARMA2_CHEAT 0x004aa930
 void C2_HOOK_FASTCALL LoadInOppoPaths(FILE* pF) {
     NOT_IMPLEMENTED();
 }

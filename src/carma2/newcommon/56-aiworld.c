@@ -41,6 +41,7 @@ void C2_HOOK_FASTCALL InitPanGameAIWorld(void) {
 
 // FUNCTION: CARMA2_HW 0x00401030
 // FUNCTION: CARMA2_SW 0x00401030
+// FUNCTION: CARMA2_CHEAT 0x00401030
 void C2_HOOK_FASTCALL LoadAIWorldTrackInfo(FILE* pF) {
 
     PrintMemoryDump(0, "BEFORE LoadInOppoPaths()");
@@ -52,6 +53,7 @@ void C2_HOOK_FASTCALL LoadAIWorldTrackInfo(FILE* pF) {
 
 // FUNCTION: CARMA2_HW 0x00401070
 // FUNCTION: CARMA2_SW 0x00401070
+// FUNCTION: CARMA2_CHEAT 0x00401070
 void C2_HOOK_FASTCALL LoadAIWorldForRace(tRace_info* pRace_info) {
 
     PrintMemoryDump(0, "BEFORE LoadOpponentsCars()");

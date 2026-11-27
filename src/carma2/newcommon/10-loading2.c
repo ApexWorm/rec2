@@ -1205,6 +1205,7 @@ void C2_HOOK_FASTCALL AboutToLoadFirstCar(void) {
 
 // FUNCTION: CARMA2_HW 0x0048cda0
 // FUNCTION: CARMA2_SW 0x00489fe0
+// FUNCTION: CARMA2_CHEAT 0x0048d180
 void C2_HOOK_FASTCALL LoadOpponentsCars(tRace_info* pRace_info) {
     int i;
     int j;
