@@ -1803,7 +1803,7 @@ int C2_HOOK_FASTCALL DamagePedestrian(tPedestrian* pPed, int pDamage, int pArg3,
 // FUNCTION: CARMA2_HW 0x004ce050
 // FUNCTION: CARMA2_SW 0x004ca750
 // FUNCTION: CARMA2_CHEAT 0x004d3be0
-int C2_HOOK_FASTCALL BastardIt(tPedestrian* pPed, tCar_spec* pCar, float pDistance_squared, tU32 pTime, int pArg) {
+int C2_HOOK_FASTCALL BastardIt(tPedestrian* pPed, tCar_spec* pCar, float pDistance_squared, tU32 pTime, void* pContext) {
     int i;
 
     pPed->field_0x0c->field_0xc0 = pCar;
@@ -1835,7 +1835,7 @@ int C2_HOOK_FASTCALL BastardIt(tPedestrian* pPed, tCar_spec* pCar, float pDistan
 // FUNCTION: CARMA2_HW 0x004ce140
 // FUNCTION: CARMA2_SW 0x004ca840
 // FUNCTION: CARMA2_CHEAT 0x004d3cd0
-int C2_HOOK_FASTCALL DoToPeds(tCar_spec* pCar, int pOnly_alive, float pRange_squared, int pCheck_visible, int pArg, int (C2_HOOK_FASTCALL* pCallback)(tPedestrian* pPed, tCar_spec* pCar, float pDistance_squared, tU32 pTime, int pArg)) {
+int C2_HOOK_FASTCALL DoToPeds(tCar_spec* pCar, int pOnly_alive, float pRange_squared, int pCheck_visible, void* pContext, int (C2_HOOK_FASTCALL* pCallback)(tPedestrian* pPed, tCar_spec* pCar, float pDistance_squared, tU32 pTime, void* pContext)) {
     int result;
     float distance_squared;
     br_scalar t;
@@ -1863,7 +1863,7 @@ int C2_HOOK_FASTCALL DoToPeds(tCar_spec* pCar, int pOnly_alive, float pRange_squ
                     t = 100.f;
                 }
                 if (t >= 1.0) {
-                    pCallback(ped, pCar, distance_squared, time, pArg);
+                    pCallback(ped, pCar, distance_squared, time, pContext);
                     result = 1;
                 }
             }
@@ -1877,7 +1877,7 @@ int C2_HOOK_FASTCALL DoToPeds(tCar_spec* pCar, int pOnly_alive, float pRange_squ
 // FUNCTION: CARMA2_CHEAT 0x004d3bc0
 int C2_HOOK_FASTCALL DoPedAnnihilator(tCar_spec* pCar, float pRange_squared) {
 
-    return DoToPeds(pCar, 1, pRange_squared, 1, 0, BastardIt);
+    return DoToPeds(pCar, 1, pRange_squared, 1, NULL, BastardIt);
 }
 
 // RepulseIt
