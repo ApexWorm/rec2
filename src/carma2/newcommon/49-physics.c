@@ -35,6 +35,11 @@
 // GLOBAL: CARMA2_CHEAT 0x0069a940
 int gINT_00692dc8;
 
+// GLOBAL: CARMA2_HW 0x006940a0
+// GLOBAL: CARMA2_SW 0x0068e0f8
+// GLOBAL: CARMA2_CHEAT 0x0069bc18
+int gPHIL_collision_group;
+
 // GLOBAL: CARMA2_HW 0x006940c0
 // GLOBAL: CARMA2_SW 0x0068e118
 // GLOBAL: CARMA2_CHEAT 0x0069bc38
@@ -736,6 +741,7 @@ void C2_HOOK_FASTCALL SetHierarchyDoingNothingFlag(tPhysics_object* pObject, int
 
 // FUNCTION: CARMA2_HW 0x004bae80
 // FUNCTION: CARMA2_SW 0x004b75a0
+// FUNCTION: CARMA2_CHEAT 0x004c09b0
 void C2_HOOK_FASTCALL SetGroup(tPhysics_object* pObject, int pGroup) {
     tPhysics_object* child;
 
@@ -748,7 +754,51 @@ void C2_HOOK_FASTCALL SetGroup(tPhysics_object* pObject, int pGroup) {
     }
 }
 
-// GroupTogether
+// FUNCTION: CARMA2_HW 0x004bddd0
+// FUNCTION: CARMA2_SW 0x004ba4f0
+// FUNCTION: CARMA2_CHEAT 0x004c3900
+void C2_HOOK_FASTCALL GroupTogether(tPhysics_object* pObject_1, tPhysics_object* pObject_2) {
+    tPhysics_object* object;
+
+    while (pObject_1->parent != NULL && pObject_1->physics_joint1 != NULL && pObject_1->physics_joint1->type != eJoint_none) {
+        pObject_1 = pObject_1->parent;
+    }
+    while (pObject_2->parent != NULL && pObject_2->physics_joint1 != NULL && pObject_2->physics_joint1->type != eJoint_none) {
+        pObject_2 = pObject_2->parent;
+    }
+    if (pObject_1 != pObject_2) {
+        if (pObject_2 == NULL) {
+            if (pObject_1->field_0x1dc == 0) {
+                SetGroup(pObject_1, gPHIL_collision_group);
+                pObject_1->field183_0x1d8 = pObject_1;
+                gPHIL_collision_group++;
+            }
+        } else if (pObject_1->field_0x1dc == 0) {
+            if (pObject_2->field_0x1dc == 0) {
+                SetGroup(pObject_1, gPHIL_collision_group);
+                SetGroup(pObject_2, gPHIL_collision_group);
+                pObject_1->field183_0x1d8 = pObject_2;
+                pObject_2->field183_0x1d8 = pObject_1;
+                gPHIL_collision_group++;
+            } else {
+                SetGroup(pObject_1, pObject_2->field_0x1dc);
+                pObject_1->field183_0x1d8 = pObject_2->field183_0x1d8;
+                pObject_2->field183_0x1d8 = pObject_1;
+            }
+        } else if (pObject_2->field_0x1dc == 0) {
+            SetGroup(pObject_2, pObject_1->field_0x1dc);
+            pObject_2->field183_0x1d8 = pObject_1->field183_0x1d8;
+            pObject_1->field183_0x1d8 = pObject_2;
+        } else if (pObject_1->field_0x1dc != pObject_2->field_0x1dc) {
+            for (object = pObject_2; object->field183_0x1d8 != pObject_2; object = object->field183_0x1d8) {
+                SetGroup(object, pObject_1->field_0x1dc);
+            }
+            SetGroup(object, pObject_1->field_0x1dc);
+            object->field183_0x1d8 = pObject_1->field183_0x1d8;
+            pObject_1->field183_0x1d8 = pObject_2;
+        }
+    }
+}
 
 // GetPreCalculatedJointForces
 
