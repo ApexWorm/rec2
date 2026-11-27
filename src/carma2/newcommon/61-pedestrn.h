@@ -252,7 +252,7 @@ extern void C2_HOOK_FASTCALL DamagePedestrian(tPedestrian* pPed, int pDamage, in
 
 // DoToPeds
 
-// DoPedAnnihilator
+extern int C2_HOOK_FASTCALL DoPedAnnihilator(tCar_spec* pCar, float pRange);
 
 // RepulseIt
 
@@ -264,7 +264,7 @@ extern void C2_HOOK_FASTCALL DamagePedestrian(tPedestrian* pPed, int pDamage, in
 
 // ChoosePedToNapalm
 
-// DoPedNapalm
+extern int C2_HOOK_FASTCALL DoPedNapalm(tCar_spec* pCar);
 
 // KillNapalmBolt
 

@@ -1692,7 +1692,12 @@ void C2_HOOK_FASTCALL DamagePedestrian(tPedestrian* pPed, int pDamage, int pArg3
 
 // DoToPeds
 
-// DoPedAnnihilator
+// STUB: CARMA2_HW 0x004ce030
+// STUB: CARMA2_SW 0x004ca730
+// STUB: CARMA2_CHEAT 0x004d3bc0
+int C2_HOOK_FASTCALL DoPedAnnihilator(tCar_spec* pCar, float pRange) {
+    NOT_IMPLEMENTED();
+}
 
 // RepulseIt
 
@@ -1704,7 +1709,12 @@ void C2_HOOK_FASTCALL DamagePedestrian(tPedestrian* pPed, int pDamage, int pArg3
 
 // ChoosePedToNapalm
 
-// DoPedNapalm
+// STUB: CARMA2_HW 0x004ce560
+// STUB: CARMA2_SW 0x004cac60
+// STUB: CARMA2_CHEAT 0x004d40f0
+int C2_HOOK_FASTCALL DoPedNapalm(tCar_spec* pCar) {
+    NOT_IMPLEMENTED();
+}
 
 // KillNapalmBolt
 

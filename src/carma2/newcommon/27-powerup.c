@@ -1759,9 +1759,39 @@ int C2_HOOK_FASTCALL KangerooJump(tPowerup* pPowerup, tCar_spec* pCar) {
     return pPowerup - gPowerup_array;
 }
 
-// AnnihilatePeds
+// FUNCTION: CARMA2_HW 0x004de140
+// FUNCTION: CARMA2_SW 0x004da640
+// FUNCTION: CARMA2_CHEAT 0x004e3d00
+int C2_HOOK_FASTCALL AnnihilatePeds(tPowerup* pPowerup, tCar_spec* pCar) {
+    int result;
 
-// NapalmPeds
+    if (DoPedAnnihilator(pCar, pPowerup->float_params[0])) {
+        result = pPowerup - gPowerup_array;
+    } else {
+        result = -1;
+    }
+    if (result != -1) {
+        PlayExclusiveFFBEffect("Ped_Ray", 0);
+    }
+    return result;
+}
+
+// FUNCTION: CARMA2_HW 0x004de190
+// FUNCTION: CARMA2_SW 0x004da690
+// FUNCTION: CARMA2_CHEAT 0x004e3d50
+int C2_HOOK_FASTCALL NapalmPeds(tPowerup* pPowerup, tCar_spec* pCar) {
+    int result;
+
+    if (DoPedNapalm(pCar)) {
+        result = pPowerup - gPowerup_array;
+    } else {
+        result = -1;
+    }
+    if (result != -1) {
+        PlayExclusiveFFBEffect("Flamer", 0);
+    }
+    return result;
+}
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
