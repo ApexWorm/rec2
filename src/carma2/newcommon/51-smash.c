@@ -8,6 +8,7 @@
 
 #include "51-smash.h"
 
+#include "60-phil.h"
 #include "00-car.h"
 #include "08-loading1.h"
 #include "09-funks.h"
@@ -44,6 +45,16 @@ int gAllow_material_adapt;
 // GLOBAL: CARMA2_CHEAT 0x006aaeb8
 br_material* gMaterials_to_adapt[200];
 
+// GLOBAL: CARMA2_HW 0x006a3940
+// GLOBAL: CARMA2_SW 0x0069d9a0
+// GLOBAL: CARMA2_CHEAT 0x006ab4b8
+tQueued_net_smash gQueued_net_smashes[50] = { 0 };
+
+// GLOBAL: CARMA2_HW 0x006a4430
+// GLOBAL: CARMA2_SW 0x0069e490
+// GLOBAL: CARMA2_CHEAT 0x006abfa8
+tPowerup_queue_item gPowerup_queue[50] = { 0 };
+
 // GLOBAL: CARMA2_HW 0x006a3334
 // GLOBAL: CARMA2_SW 0x0069d394
 // GLOBAL: CARMA2_CHEAT 0x006aaeac
@@ -61,6 +72,16 @@ br_vector3 gVector3_006b78a0[4] = { { { 0.f } } };
 // GLOBAL: CARMA2_HW 0x006b78d0
 // GLOBAL: CARMA2_SW 0x006ae5b0
 int gINT_006b78d0 = 0;
+
+// GLOBAL: CARMA2_HW 0x006b78e0
+// GLOBAL: CARMA2_SW 0x006ae5c0
+// GLOBAL: CARMA2_CHEAT 0x006bef80
+tSmash_vertex gSmash_glass_fragments[200] = { 0 };
+
+// GLOBAL: CARMA2_HW 0x006ba4a0
+// GLOBAL: CARMA2_SW 0x006b1180
+// GLOBAL: CARMA2_CHEAT 0x006c1b40
+tSmashable_item_spec* gSmashable_track_indexable_triggers[100] = { 0 };
 
 // GLOBAL: CARMA2_HW 0x006a3338
 // GLOBAL: CARMA2_SW 0x0069d398
@@ -91,6 +112,11 @@ int gCount_track_smashable_environment_specs;
 // GLOBAL: CARMA2_SW 0x0069f618
 // GLOBAL: CARMA2_CHEAT 0x006ad130
 const char* gSmashable_track_environment_path;
+
+// GLOBAL: CARMA2_HW 0x006a55bc
+// GLOBAL: CARMA2_SW 0x0069f61c
+// GLOBAL: CARMA2_CHEAT 0x006ad134
+int gSize_powerup_queue;
 
 // GLOBAL: CARMA2_HW 0x006a55c0
 // GLOBAL: CARMA2_SW 0x0069f620
@@ -138,10 +164,17 @@ int gINT_006a80f4 = 0;
 // GLOBAL: CARMA2_CHEAT 0x006afc70
 tDecal gDecals[50] = { 0 };
 
+#ifdef REC2_MATCHING
+// GLOBAL: CARMA2_HW 0x006a8288
+// GLOBAL: CARMA2_SW 0x006a22e8
+// GLOBAL: CARMA2_CHEAT 0x006afe00
+int gINT_006a8288 = 0;
+#endif
+
 // GLOBAL: CARMA2_HW 0x006a828c
 // GLOBAL: CARMA2_SW 0x006a22ec
 // GLOBAL: CARMA2_CHEAT 0x006afe04
-int gCount_queued_smashes;
+int gCount_queued_smashes = 0;
 
 // GLOBAL: CARMA2_HW 0x006abee8
 // GLOBAL: CARMA2_SW 0x006a5438
@@ -2005,7 +2038,27 @@ void C2_HOOK_FASTCALL MungeMaterial(br_actor* pActor, int pRecursive, br_materia
     *pCount_vertices = munge_material_cb_ctx.count_vertices;
 }
 
-// ReinitSmashing
+// FUNCTION: CARMA2_HW 0x004f5750
+// FUNCTION: CARMA2_SW 0x004f13b0
+// FUNCTION: CARMA2_CHEAT 0x004fb3f0
+void C2_HOOK_FASTCALL ReinitSmashing(void) {
+    int i;
+
+    for (i = 0; i < (int)REC2_ASIZE(gSmash_glass_fragments); i++) {
+        gSmash_glass_fragments[i].end_time = 0;
+    }
+    for (i = 0; i < (int)REC2_ASIZE(gDecals); i++) {
+        gDecals[i].time = 0;
+    }
+    for (i = 0; i < (int)REC2_ASIZE(gQueued_net_smashes); i++) {
+        gQueued_net_smashes[i].field_0x4 = 0;
+    }
+    gSize_powerup_queue = 0;
+    gCount_host_smashes = 0;
+    if (gNet_mode == eNet_mode_host) {
+        gNet_host_smashes = BrMemAllocate(1000 * sizeof(tStored_smash), kMem_stored_smash);
+    }
+}
 
 // STUB: CARMA2_HW 0x004f57c0
 // STUB: CARMA2_SW 0x004f1420
@@ -2249,11 +2302,61 @@ void C2_HOOK_FASTCALL ChangeSmashTexture(br_material* pMaterial, tCar_spec* pCar
     NOT_IMPLEMENTED();
 }
 
-// DoNetSmash
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
 
-// ReceivedSmashEnvironment
+// STUB: CARMA2_HW 0x004f6130
+// STUB: CARMA2_SW 0x004f1d90
+// STUB: CARMA2_CHEAT 0x004fbdd0
+void C2_HOOK_FASTCALL DoNetSmash(tQueued_net_smash* pSmash) {
+    NOT_IMPLEMENTED();
+}
 
-// DoQueuedNetSmashes
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
+
+// FUNCTION: CARMA2_HW 0x004f60b0
+// FUNCTION: CARMA2_SW 0x004f1d10
+// FUNCTION: CARMA2_CHEAT 0x004fbd50
+void C2_HOOK_FASTCALL ReceivedSmashEnvironment(tQueued_net_smash* pSmash) {
+    int i;
+    tQueued_net_smash* queued;
+
+    if (gPHIL_last_physics_tick != 0 && gPHIL_last_physics_tick < pSmash->field_0x4) {
+        for (i = 0, queued = gQueued_net_smashes; i < (int)REC2_ASIZE(gQueued_net_smashes); i++, queued++) {
+            if (queued->field_0x4 == 0) {
+                *queued = *pSmash;
+                if (gNet_mode == eNet_mode_host && gCount_host_smashes < 1000) {
+                    queued = &gNet_host_smashes[gCount_host_smashes].smash;
+                    gCount_host_smashes++;
+                    *queued = *pSmash;
+                }
+                return;
+            }
+        }
+    } else {
+        DoNetSmash(pSmash);
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x004f62e0
+// FUNCTION: CARMA2_SW 0x004f1f40
+// FUNCTION: CARMA2_CHEAT 0x004fbf80
+void C2_HOOK_FASTCALL DoQueuedNetSmashes(void) {
+    int i;
+    tQueued_net_smash* queued;
+
+    if (gNet_mode != eNet_mode_none) {
+        for (i = 0, queued = gQueued_net_smashes; i < (int)REC2_ASIZE(gQueued_net_smashes); i++, queued++) {
+            if (queued->field_0x4 != 0 && gPHIL_last_physics_tick >= queued->field_0x4) {
+                queued->field_0x4 = 0;
+                DoNetSmash(queued);
+            }
+        }
+    }
+}
 
 // FindTheBastard
 

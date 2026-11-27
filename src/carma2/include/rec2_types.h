@@ -3641,8 +3641,8 @@ typedef struct {
     undefined4 field_0x8[12];
 } tQueued_net_smash;
 
-typedef struct { /* FIXME: maybe equal to tQueued_net_smash */
-    undefined4 field_0x0[14];
+typedef struct {
+    tQueued_net_smash smash;
 } tStored_smash;
 
 typedef struct {
