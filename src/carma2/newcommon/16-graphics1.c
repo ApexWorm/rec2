@@ -214,7 +214,7 @@ void C2_HOOK_FASTCALL MungeClipPlane(br_vector3* pLight, tCar_spec* pCar, br_vec
     BrVector3Cross(&v4, &v3, pLight);
     if (fabs(v4.v[0]) >= 0.01 || fabs(v4.v[1]) >= 0.01 || fabs(v4.v[2]) >= 0.01) {
         BrVector3Sub(&v3, p1, pOffset);
-        if (BrVector3Dot(&v3, &v4) > 0.f) {
+        if (BrVector3Dot(&v3, &v4) > 0.0f) {
             BrVector3Negate(&v4, &v4);
         }
         BrVector3Normalise(&v3, &v4);
