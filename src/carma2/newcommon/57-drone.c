@@ -332,7 +332,7 @@ void C2_HOOK_FASTCALL CalcRenderBoundsCentre(void) {
 
     BrVector3Negate(&direction, (br_vector3*)gCamera_to_world.m[2]);
     BrVector3Normalise(&direction, &direction);
-    BrVector3Scale(&direction, &direction, 5.f);
+    BrVector3Scale(&direction, &direction, 5.0f);
     BrVector3Add(&gRender_bounds_centre, &direction, (br_vector3*)gCamera_to_world.m[3]);
 }
 
