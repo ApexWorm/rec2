@@ -73,7 +73,7 @@ extern void C2_HOOK_FASTCALL DoTestPowerHeadup(int pLevel, const char* pAPO_str)
 
 extern void C2_HOOK_FASTCALL DoPSPowerupHeadups(void);
 
-// DoHeadups
+extern void C2_HOOK_FASTCALL DoHeadups(tU32 pThe_time);
 
 extern int C2_HOOK_FASTCALL FindAHeadupHoleWoofBarkSoundsABitRude(int pSlot_index);
 
@@ -101,7 +101,7 @@ extern void C2_HOOK_FASTCALL ChangeHeadupColour(int pHeadup_index, int pNew_colo
 
 extern void C2_HOOK_FASTCALL DoDamageScreen(tU32 pThe_time);
 
-// DoInstruments
+extern void C2_HOOK_FASTCALL DoInstruments(tU32 pThe_time);
 
 extern void C2_HOOK_FASTCALL DoSteeringWheel(tU32 pThe_time);
 

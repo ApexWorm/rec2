@@ -28,6 +28,8 @@ extern br_model* gShadow_model;
 extern br_actor* gShadow_actor;
 extern int gScreen_wobble_x;
 extern int gScreen_wobble_y;
+extern int gAR_fudge_headups;
+extern br_matrix34 gSheer_mat;
 extern int gFrontend_wrecks_car_count;
 extern br_material* gMaterial_below;
 extern int gHud_actor_storage_size;
@@ -88,7 +90,7 @@ extern void C2_HOOK_FASTCALL SetScreenWobble(int pX, int pY);
 
 extern void C2_HOOK_FASTCALL ResetScreenWobble(void);
 
-// CalculateWobblitude
+extern void C2_HOOK_FASTCALL CalculateWobblitude(tU32 pThe_time);
 
 // ProcessNonTrackActors
 
@@ -96,9 +98,9 @@ extern void C2_HOOK_FASTCALL ResetScreenWobble(void);
 
 // FoxyStuff
 
-// DoARenderPass
+extern void C2_HOOK_FASTCALL DoARenderPass(br_matrix34* pMat34, br_actor* pCamera, br_pixelmap* pColour, br_pixelmap* pDepth, br_scalar pYon_factor, int pShadows, int pEffects, int pArg8);
 
-// DoACompleteRenderPass
+extern void C2_HOOK_FASTCALL DoACompleteRenderPass(int pMirror, br_matrix34* pCamera_to_world, br_actor* pCamera, br_pixelmap* pScreen, br_pixelmap* pDepth);
 
 extern void C2_HOOK_FASTCALL RenderAFrame(int pDepth_mask_on);
 

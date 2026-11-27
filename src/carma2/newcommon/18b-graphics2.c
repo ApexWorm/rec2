@@ -889,9 +889,70 @@ void C2_HOOK_FASTCALL FancyDrawLine(br_pixelmap* pMpDestap, int pX1, int pY1, in
     NOT_IMPLEMENTED();
 }
 
-// DRPixelmapCopyMapBlack8Bit
+inline void C2_HOOK_FASTCALL DRPixelmapCopyMapBlack8Bit(br_pixelmap* pDest, br_pixelmap* pSrc) {
+    int dest_skip;
+    int src_skip;
+    tU8* dest_pixels;
+    tU8* src_pixels;
+    int dwords;
+    int i;
+    int y;
+    tU8 p0;
+    tU8 p1;
+    tU8 p2;
+    tU8 p3;
 
-// DRPixelmapCopyMapBlack
+    dest_pixels = pDest->pixels;
+    src_pixels = pSrc->pixels;
+    src_skip = pSrc->row_bytes - pSrc->width;
+    dest_skip = pDest->row_bytes - pDest->width;
+    dwords = pSrc->width / 4;
+    for (y = 0; y < pSrc->height; y++) {
+        for (i = dwords; i > 0; i--) {
+            p0 = *src_pixels++;
+            p1 = *src_pixels++;
+            p2 = *src_pixels++;
+            p3 = *src_pixels++;
+            if (p0 != 0) {
+                *dest_pixels = p0;
+            } else {
+                *dest_pixels = 0xf0;
+            }
+            dest_pixels++;
+            if (p1 != 0) {
+                *dest_pixels = p1;
+            } else {
+                *dest_pixels = 0xf0;
+            }
+            dest_pixels++;
+            if (p2 != 0) {
+                *dest_pixels = p2;
+            } else {
+                *dest_pixels = 0xf0;
+            }
+            dest_pixels++;
+            if (p3 != 0) {
+                *dest_pixels = p3;
+            } else {
+                *dest_pixels = 0xf0;
+            }
+            dest_pixels++;
+        }
+        src_pixels += src_skip;
+        dest_pixels += dest_skip;
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x0047d5b0
+// FUNCTION: CARMA2_SW 0x0047d880
+// FUNCTION: CARMA2_CHEAT 0x0047d930
+void C2_HOOK_FASTCALL DRPixelmapCopyMapBlack(br_pixelmap* pDest, br_pixelmap* pSrc) {
+    if (pDest->type == BR_PMT_INDEX_8) {
+        DRPixelmapCopyMapBlack8Bit(pDest, pSrc);
+    } else {
+        BrPixelmapCopy(pDest, pSrc);
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x0047d6a0
 // FUNCTION: CARMA2_CHEAT 0x0047da20

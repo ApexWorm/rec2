@@ -59,7 +59,7 @@ extern void C2_HOOK_FASTCALL MovieStopRecordingIfNecessary(void);
 
 extern OSErr C2_HOOK_FASTCALL GenerateOneMovieFrame(br_pixelmap* pScreen);
 
-// MovieRecordFrame
+extern int C2_HOOK_FASTCALL MovieRecordFrame(br_pixelmap* pScreen, int pFrame_period);
 
 extern int C2_HOOK_FASTCALL MovieRecording(void);
 

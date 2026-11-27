@@ -61,9 +61,9 @@ extern void C2_HOOK_FASTCALL DrawArrow(br_pixelmap* pScreen, br_uint_32 pArrow_i
 
 // DrawSmashBlip
 
-// DrawMapSmallBlip
+extern void C2_HOOK_FASTCALL DrawMapSmallBlip(br_pixelmap* pScreen, tU32 pTime, const br_vector3* pPos, int pColour);
 
-// CopyMapToScreen
+extern void C2_HOOK_FASTCALL CopyMapToScreen(void);
 
 // DrawCarArrow
 
@@ -79,7 +79,7 @@ extern void C2_HOOK_FASTCALL DrawOffsetCheckpoint(br_pixelmap* pMap, int pCheckp
 
 extern void C2_HOOK_FASTCALL DoMapOverlays(br_pixelmap* pScreen);
 
-// StartMap
+extern void C2_HOOK_FASTCALL StartMap(void);
 
 extern void C2_HOOK_FASTCALL FinishMap(void);
 
@@ -99,9 +99,9 @@ extern void C2_HOOK_FASTCALL AllocateOppoBarActor(int pX, int pY);
 
 extern void C2_HOOK_FASTCALL MapOverlay(void);
 
-// InitNearestCar
+extern void C2_HOOK_FASTCALL InitNearestCar(void);
 
-// MapStuffBeforeRender
+extern void C2_HOOK_FASTCALL MapStuffBeforeRender(void);
 
 extern void C2_HOOK_FASTCALL MapStuffAfterRender(void);
 

@@ -25,6 +25,12 @@ extern tU32 gOn_me_wheels_start;
 
 extern tU32 gWoz_upside_down_at_all;
 
+extern int gCount_extra_renders;
+
+extern tExtra_render gExtra_renders[6];
+
+extern int gMirror_on__graphics;
+
 extern void C2_HOOK_FASTCALL InitialiseExtraRenders(void);
 
 extern void C2_HOOK_FASTCALL AddExtraRender(br_actor* pActor, br_material* pMaterial);
