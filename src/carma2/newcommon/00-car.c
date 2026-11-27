@@ -275,6 +275,7 @@ intptr_t C2_HOOK_CDECL SwitchCarModel(br_actor* pActor, void* pData) {
 }
 
 // FUNCTION: CARMA2_HW 0x00413f40
+// FUNCTION: CARMA2_SW 0x00413f70
 // FUNCTION: CARMA2_CHEAT 0x004141a0
 void C2_HOOK_FASTCALL SwitchCarModels(tCar_spec* pCar, int pIndex) {
     DRActorEnumRecurse(pCar->car_model_actor, SwitchCarModel, &pIndex);

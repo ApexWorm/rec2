@@ -1340,6 +1340,8 @@ tCollision_shape_polyhedron* C2_HOOK_FASTCALL AllocateShapePolyhedron(int pCount
 }
 
 // FUNCTION: CARMA2_HW 0x004c5dc0
+// FUNCTION: CARMA2_SW 0x004c24f0
+// FUNCTION: CARMA2_CHEAT 0x004cb8e0
 tCollision_shape_wireframe* C2_HOOK_FASTCALL AllocateShapeWireFrame(int pCount_points, int pCount_lines, int pType) {
     tCollision_shape_wireframe* result;
     tU8* raw_memory;
