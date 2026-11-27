@@ -12,7 +12,6 @@
 #include "41-utility.h"
 #include "51-smash.h"
 #include "52-errors.h"
-#include "61-pedestrn-phys.h"
 #include "67-lighting.h"
 
 #include "globvars.h"
@@ -48,6 +47,8 @@ int gCount_track_non_cars;
 // GLOBAL: CARMA2_SW 0x006739d4
 // GLOBAL: CARMA2_CHEAT 0x00680b14
 br_actor* gMr_blendy;
+
+extern void C2_HOOK_FASTCALL SpawnPedsOnFace(br_face* pFace, br_model* pModel);
 
 // GLOBAL: CARMA2_HW 0x00679268
 // GLOBAL: CARMA2_SW 0x006739d8
@@ -308,6 +309,11 @@ void C2_HOOK_FASTCALL MungeFaces(br_actor* pActor, br_model* pModel) {
                 gMr_blendy->model->nvertices = 0;
                 gMr_blendy->model->flags |= BR_MODF_UPDATEABLE;
             }
+#ifdef REC2_V101A
+            if (gMr_blendy->model->nfaces >= 2000) {
+                PDFatalError("Huge explosion killing everybody in the vincinity");
+            }
+#endif
             blendy_face = &gMr_blendy->model->faces[gMr_blendy->model->nfaces];
             gMr_blendy->model->nfaces++;
             *blendy_face = *face;
