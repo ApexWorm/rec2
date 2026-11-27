@@ -174,7 +174,7 @@ extern void C2_HOOK_FASTCALL SimpleCrushCar(tCar_spec* pCar, tSpam_userdata* pCo
 
 extern void C2_HOOK_FASTCALL CrushCar(tCar_spec* pCar, br_actor* pActor, tCar_crush* pCrush);
 
-// SendCrush
+extern void C2_HOOK_FASTCALL SendCrush(tCar_spec* pCar, const tCompressed_car_crush* pCrush);
 
 extern void C2_HOOK_FASTCALL CompressCrush(tCompressed_car_crush* pDest, const tCar_crush* pSrc);
 
@@ -188,13 +188,13 @@ extern void C2_HOOK_FASTCALL CrushDrone(tDrone_crush_data* pCrush_data, int pCou
 
 extern void C2_HOOK_FASTCALL CrushDroneObject(tPhysics_object* pObject, int pCount, const br_vector3* pPoints, const br_vector3* pForce);
 
-// DoDroneCrushing
+extern void C2_HOOK_FASTCALL DoDroneCrushing(void);
 
 extern void C2_HOOK_FASTCALL AddDroneCrush(tQueued_drone_crush_item* pCrush, const br_vector3* pVector, float pScale, int pCount, const br_vector3* pPoints);
 
 extern void C2_HOOK_FASTCALL QueueDroneCrush(tPhysics_object* pObject, int pCount, const br_vector3* pPoints, const br_vector3* pForce);
 
-// DoCrushing
+extern void C2_HOOK_FASTCALL DoCrushing(void);
 
 extern void C2_HOOK_FASTCALL SetCrush(tCar_crush* pCrush, int pCount_vectors, br_vector3* pVectors, br_vector3* pVector1, br_vector3* pVector2, float pScalar, tU32 pValue);
 
@@ -266,7 +266,7 @@ extern void C2_HOOK_FASTCALL SendReAttachBit(tCar_spec* pCar, tPhysics_object* p
 
 extern void C2_HOOK_FASTCALL StopFlapping(br_actor* pActor, tCar_spec* pCar_spec);
 
-// DoFlapping
+extern void C2_HOOK_FASTCALL DoFlapping(void);
 
 extern intptr_t C2_HOOK_CDECL ToggleFlapsCB2(br_actor* pActor, void* pCar);
 
@@ -348,7 +348,7 @@ extern int C2_HOOK_FASTCALL MoveCarToSensiblePlace(tCar_spec* pCar);
 
 extern int C2_HOOK_FASTCALL SwapShapesIfPossible(tCar_spec* pCar_spec);
 
-// DoShapeSwapping
+extern void C2_HOOK_FASTCALL DoShapeSwapping(void);
 
 extern void C2_HOOK_FASTCALL BendPoint(br_vector3* pPoint, const tBend_point_context* pContext);
 
@@ -396,9 +396,9 @@ extern intptr_t C2_HOOK_CDECL FireOffBitsCB(br_actor* pActor, void* pContext);
 
 extern void C2_HOOK_FASTCALL FireSomeBitsOffCar(tCar_spec* pCar);
 
-// DoSpams
+extern void C2_HOOK_FASTCALL DoSpams(void);
 
-// CrushBendFlapRend
+extern void C2_HOOK_FASTCALL CrushBendFlapRend(void);
 
 // SphericizeModel
 

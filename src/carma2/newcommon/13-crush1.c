@@ -1550,7 +1550,20 @@ void C2_HOOK_FASTCALL CrushCar(tCar_spec* pCar, br_actor* pActor, tCar_crush* pC
     pCar->use_shell_model = 0;
 }
 
-// SendCrush
+inline void C2_HOOK_FASTCALL SendCrush(tCar_spec* pCar, const tCompressed_car_crush* pCrush) {
+    tNet_message_chunk* message;
+
+    message = NetStartBroadcastContents(eNet_message_chunk_type_car_crush, 0);
+    if (message != NULL) {
+        message->car_crush.car_id = NetPlayerFromCar(pCar)->ID;
+        message->car_crush.car_crush = *pCrush;
+        NetBroadcastContents(message);
+    }
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
 
 // FUNCTION: CARMA2_HW 0x00436940
 // FUNCTION: CARMA2_SW 0x00436970
@@ -1566,6 +1579,10 @@ void C2_HOOK_FASTCALL CompressCrush(tCompressed_car_crush* pDest, const tCar_cru
     CompressVector3(&pDest->field_0x1c, &pSrc->field_0x44, -1.0f, 1.0f);
     pDest->field_0x24 = pSrc->field_0x50;
 }
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // FUNCTION: CARMA2_HW 0x004369c0
 // FUNCTION: CARMA2_SW 0x004369f0
@@ -1612,6 +1629,10 @@ inline void C2_HOOK_FASTCALL CrushDrone(tDrone_crush_data* pCrush_data, int pCou
     }
 }
 
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
 // FUNCTION: CARMA2_HW 0x0042d180
 // FUNCTION: CARMA2_SW 0x0042d1f0
 // FUNCTION: CARMA2_CHEAT 0x0042d320
@@ -1624,7 +1645,26 @@ void C2_HOOK_FASTCALL CrushDroneObject(tPhysics_object* pObject, int pCount, con
     }
 }
 
-// DoDroneCrushing
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
+
+inline void C2_HOOK_FASTCALL DoDroneCrushing(void) {
+    br_vector3 force;
+    int i;
+    int j;
+
+    for (i = 0; i < gCount_queued_drone_crushes; i++) {
+        for (j = 0; j < gQueued_drone_crushes[i].count; j++) {
+            if (gQueued_drone_crushes[i].items[j].field_0x34 > 5.0f) {
+                gQueued_drone_crushes[i].items[j].field_0x34 = 5.0f;
+            }
+            BrVector3Scale(&force, &gQueued_drone_crushes[i].items[j].field_0x38, gQueued_drone_crushes[i].items[j].field_0x34);
+            CrushDroneObject(gQueued_drone_crushes[i].object, gQueued_drone_crushes[i].items[j].count, gQueued_drone_crushes[i].items[j].points, &force);
+        }
+    }
+    gCount_queued_drone_crushes = 0;
+}
 
 // FUNCTION: CARMA2_HW 0x0042d390
 // FUNCTION: CARMA2_SW 0x0042d400
@@ -1681,7 +1721,33 @@ void C2_HOOK_FASTCALL QueueDroneCrush(tPhysics_object* pObject, int pCount, cons
     }
 }
 
-// DoCrushing
+inline void C2_HOOK_FASTCALL DoCrushing(void) {
+    tCrush_list_item* list;
+    tCompressed_car_crush compressed;
+    br_scalar force;
+    int i;
+
+    for (list = gCrush_lists; list->car_spec != NULL; list++) {
+        for (i = 0; i < list->count; i++) {
+            force = list->items[i].field_0x40 * list->car_spec->car_crush_spec->bendability_factor;
+            if (list->car_spec == NULL || list->car_spec->driver != eDriver_local_human) {
+                force = (br_scalar)(force * (1.0 + ((1.0 - (double)gCurrent_race.index / gNumber_of_races) * 99.0) / 20.0));
+            }
+            if (force > gMin_bend_force) {
+                if (PercentageChance((int)gChance_of_bending)) {
+                    list->items[i].field_0x40 = -list->items[i].field_0x40;
+                }
+            } else {
+                if (gNet_mode != eNet_mode_none) {
+                    CompressCrush(&compressed, &list->items[i]);
+                    SendCrush(list->car_spec, &compressed);
+                    ExpandCrush(&list->items[i], &compressed);
+                }
+                CrushCar(list->car_spec, list->car_spec->car_master_actor, &list->items[i]);
+            }
+        }
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x0042d770
 // FUNCTION: CARMA2_SW 0x0042d7e0
@@ -2918,7 +2984,17 @@ int C2_HOOK_FASTCALL SwapShapesIfPossible(tCar_spec* pCar_spec) {
 #pragma auto_inline(on)
 #endif
 
-// DoShapeSwapping
+inline void C2_HOOK_FASTCALL DoShapeSwapping(void) {
+    int i;
+
+    for (i = 0; i < gNum_active_cars; i++) {
+        if (gActive_car_list[i] != NULL && gActive_car_list[i]->driver > eDriver_5) {
+            if (gActive_car_list[i]->car_crush_spec != NULL && (gActive_car_list[i]->car_crush_spec->expand_bounding_box & 0x1)) {
+                SwapShapesIfPossible(gActive_car_list[i]);
+            }
+        }
+    }
+}
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
@@ -3645,9 +3721,30 @@ void C2_HOOK_FASTCALL FireSomeBitsOffCar(tCar_spec* pCar) {
     DRActorEnumRecurseUltraPlus(pCar->car_model_actor, FireOffBitsCB, pCar);
 }
 
-// DoSpams
+inline void C2_HOOK_FASTCALL DoSpams(void) {
+    int i;
 
-// CrushBendFlapRend
+    for (i = 0; i < gCount_car_damage_crush_list; i++) {
+        TotallySpamTheCar(gCar_damage_crush_list[i].car, gCar_damage_crush_list[i].damage);
+    }
+    gCount_car_damage_crush_list = 0;
+}
+
+// FUNCTION: CARMA2_HW 0x00436170
+// FUNCTION: CARMA2_SW 0x004361a0
+// FUNCTION: CARMA2_CHEAT 0x00436360
+void C2_HOOK_FASTCALL CrushBendFlapRend(void) {
+
+    DoSpams();
+    DoCrushing();
+    DoDroneCrushing();
+    DoShapeSwapping();
+    DoFlapping();
+    DoDetaching();
+    DoFullyDetaching();
+    DoBending();
+    ClearCrushLists();
+}
 
 // SphericizeModel
 
