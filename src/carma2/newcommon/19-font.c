@@ -1344,26 +1344,17 @@ int C2_HOOK_FASTCALL DRTextCleverWidth(const tDR_font* pFont, const char* pText)
     int i;
     int len;
     int result;
-    int spacing;
+    const signed char* c;
 
     polyfont_index = GetPolyFontIndexToReplaceDRfontWith(pFont);
+    result = 0;
     len = strlen(pText);
 
-    i = 0;
-    result = 0;
-    for (; i < len; i++) {
-        tS8 c;
-
-        c = pText[i];
-        if (c < 0) {
-            polyfont_index = GetPolyFontIndexToReplaceDRfontWith(&gFonts[-(int)c]);
+    for (i = 0, c = (const signed char*)pText; i < len; i++, c++) {
+        if (*c < 0) {
+            polyfont_index = GetPolyFontIndexToReplaceDRfontWith(&gFonts[-*c]);
         } else {
-            if (i < len - 1) {
-                spacing = gPoly_fonts[polyfont_index].interCharacterSpacing;
-            } else {
-                spacing = 0;
-            }
-            result += spacing + CharacterWidth(polyfont_index, c);
+            result += CharacterWidth(polyfont_index, *c) + (i < len - 1 ? GetSpacing(polyfont_index) : 0);
         }
     }
     return result;
