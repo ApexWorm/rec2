@@ -343,7 +343,7 @@ extern intptr_t C2_HOOK_CDECL MakeCarModelsMaterialsSingleSided(br_actor* pActor
 
 // MoveCarToSensiblePlace
 
-// SwapShapesIfPossible
+extern int C2_HOOK_FASTCALL SwapShapesIfPossible(tCar_spec* pCar_spec);
 
 // DoShapeSwapping
 
@@ -409,15 +409,15 @@ extern int C2_HOOK_FASTCALL BattenDownTheObjects(tPhysics_object* pCollision_inf
 
 extern void C2_HOOK_FASTCALL CompletelyUnBendCollisionShape(tCar_crush_shape_info* pShape);
 
-// CompletelyUnBendCollisionShapes
+extern void C2_HOOK_FASTCALL CompletelyUnBendCollisionShapes(tCar_spec* pCar_spec);
 
 extern void C2_HOOK_FASTCALL CompletelyUnBendWheels(tCar_spec* pCar_spec);
 
-// CompletelyUnBendOtherThings
+extern void C2_HOOK_FASTCALL CompletelyUnBendOtherThings(tCar_spec* pCar_spec);
 
 extern intptr_t C2_HOOK_CDECL EnableGroovers(br_actor* pActor, void* pData);
 
-// DoCompletelyUnBentThings
+extern void C2_HOOK_FASTCALL DoCompletelyUnBentThings(tCar_spec* pCar_spec);
 
 extern void C2_HOOK_FASTCALL TotallyRepairCarCollisionShapes(tCar_spec* pCar_spec);
 
@@ -475,7 +475,7 @@ extern void C2_HOOK_FASTCALL RepairCarCollisionShapes(tCar_spec* pCar, float pSt
 
 // RestoreVitalBitsOfObject
 
-// WeldCar
+extern void C2_HOOK_FASTCALL WeldCar(tCar_spec* pCar_spec);
 
 // ARCompressCrush
 
