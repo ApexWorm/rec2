@@ -2015,11 +2015,60 @@ void C2_HOOK_FASTCALL MungeMaterial(br_actor* pActor, int pRecursive, br_materia
 
 // ReinitSmashing
 
-// STUB: CARMA2_HW 0x004f57c0
-// STUB: CARMA2_SW 0x004f1420
-// STUB: CARMA2_CHEAT 0x004fb460
+// FUNCTION: CARMA2_HW 0x004f57c0
+// FUNCTION: CARMA2_SW 0x004f1420
+// FUNCTION: CARMA2_CHEAT 0x004fb460
 void C2_HOOK_FASTCALL LinkSmashies(br_actor* pActor, tCar_crush_buffer_entry* pCrush_data, tModel_detail_vertex_data* pVertex_data) {
-    NOT_IMPLEMENTED();
+    int i;
+    int j;
+    tCar_crush_smashable_part* smashable;
+    tU16 indices[50];
+    int count_indices;
+    tCar_crush_vertex_data vertices[50];
+    int count_vertices;
+
+    smashable = pCrush_data->smashables;
+    for (i = 0; i < pCrush_data->count_smashables; i++, smashable++) {
+
+        smashable->funk_material = FindMaterial(smashable->material_name, pActor, 0);
+        if (smashable->funk_material == NULL) {
+            FatalError(kFatalError_CannotFindSmashMaterial_S, smashable->material_name);
+        }
+        MungeMaterial(pActor, 0, smashable->funk_material, smashable->funk_material,
+            REC2_ASIZE(indices), indices, &count_indices,
+            REC2_ASIZE(vertices), vertices, &count_vertices, &smashable->field_0x60);
+        for (j = 0; j < count_indices; j++) {
+            if (j != 0) {
+                BrVector3Accumulate(&smashable->field_0x54, &pActor->model->vertices[indices[j]].p);
+            } else {
+                BrVector3Copy(&smashable->field_0x54, &pActor->model->vertices[indices[j]].p);
+            }
+        }
+        if (count_indices != 0) {
+            smashable->field_0x54.v[0] = (br_scalar)(smashable->field_0x54.v[0] / (double)count_indices);
+            smashable->field_0x54.v[1] = (br_scalar)(smashable->field_0x54.v[1] / (double)count_indices);
+            smashable->field_0x54.v[2] = (br_scalar)(smashable->field_0x54.v[2] / (double)count_indices);
+        }
+        smashable->field_0x6c = count_indices;
+        if (count_indices != 0) {
+            smashable->field_0x70 = BrMemAllocate(count_indices * sizeof(*indices), kMem_smash_poly_array);
+            memcpy(smashable->field_0x70, indices, count_indices * sizeof(*indices));
+        } else {
+            smashable->field_0x70 = NULL;
+        }
+        smashable->field_0x74 = count_vertices;
+        if (count_vertices != 0) {
+            smashable->field_0x78 = BrMemAllocate(count_vertices * sizeof(*vertices), kMem_smash_vertex_array);
+            memcpy(smashable->field_0x78, vertices, count_vertices * sizeof(*vertices));
+        } else {
+            smashable->field_0x78 = NULL;
+        }
+        BrResFree(smashable->funk_material->identifier);
+        smashable->funk_material->identifier = NULL;
+        smashable->field_0x4c = 0;
+        smashable->funk_material->colour_map = smashable->levels->pixelmaps[0];
+        BrMaterialUpdate(smashable->funk_material, BR_MATU_COLOURMAP);
+    }
 }
 
 // FUNCTION: CARMA2_HW 0x004f5a00
