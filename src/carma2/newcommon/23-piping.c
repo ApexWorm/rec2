@@ -824,8 +824,6 @@ int C2_HOOK_FASTCALL PipeObjectPosition(tPhysics_object* pObject, void* pContext
 
 // PipeCarPositions
 
-extern void C2_HOOK_FASTCALL DoOilSpillAR(tPipe_chunk** pChunk, tU32 pStop_time);
-
 inline void C2_HOOK_FASTCALL DoOilSpillAR(tPipe_chunk** pChunk, tU32 pStop_time) {
 
     AdjustOilSpill((*pChunk)->subject_index,

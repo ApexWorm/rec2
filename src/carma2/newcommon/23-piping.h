@@ -157,7 +157,7 @@ extern int C2_HOOK_FASTCALL PipeObjectPosition(tPhysics_object* pObject, void* p
 
 extern void C2_HOOK_FASTCALL DoSmudge(tPipe_chunk** pChunk, int pDir);
 
-// DoOilSpillAR
+extern void C2_HOOK_FASTCALL DoOilSpillAR(tPipe_chunk** pChunk, tU32 pStop_time);
 
 // CheckCar
 
@@ -337,7 +337,7 @@ extern void C2_HOOK_FASTCALL ApplySplash(tPipe_chunk** pChunk);
 
 extern void C2_HOOK_FASTCALL ApplyExtendedSplash(tPipe_chunk** pChunk);
 
-// ApplyOilSpill
+extern void C2_HOOK_FASTCALL ApplyOilSpill(tPipe_chunk** pChunk);
 
 extern void C2_HOOK_FASTCALL ApplyFrameBoundary(tPipe_chunk** pChunk);
 
@@ -407,7 +407,7 @@ extern void C2_HOOK_FASTCALL ApplyPedPos(tPipe_chunk** pChunk);
 
 extern void C2_HOOK_FASTCALL ApplyPHILObject(tPipe_chunk** pChunk);
 
-// ApplyGibShower
+extern void C2_HOOK_FASTCALL ApplyGibShower(tPipe_chunk** pChunk);
 
 extern void C2_HOOK_FASTCALL ApplyBloodSpurt(tPipe_chunk** pChunk);
 
