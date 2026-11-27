@@ -177,6 +177,7 @@ int gScreenHeight;
 int gKeyboardBufferLength;
 
 // GLOBAL: CARMA2_HW 0x006ace88
+// GLOBAL: CARMA2_SW 0x006a6628
 // GLOBAL: CARMA2_CHEAT 0x006b4518
 unsigned char gKeyboardBuffer[20];
 
@@ -211,6 +212,7 @@ tU32 gTime_app_activated;
 
 
 // GLOBAL: CARMA2_HW 0x006aceb0
+// GLOBAL: CARMA2_SW 0x006a6650
 // GLOBAL: CARMA2_CHEAT 0x006b4540
 br_diaghandler gPD_error_handler;
 
