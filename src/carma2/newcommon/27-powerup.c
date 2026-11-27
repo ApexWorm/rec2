@@ -584,7 +584,7 @@ void C2_HOOK_FASTCALL MungeRepulseRays(tU32 pTime) {
         }
         BrVector3Sub(&delta, link->pos_victim, link->pos_origin);
         model = link->actor->model;
-        if (delta.v[0] == 0.f && delta.v[2] == 0.f) {
+        if (delta.v[0] == 0.0f && delta.v[2] == 0.0f) {
             continue;
         }
         delta_unit.v[0] = delta.v[0] / (float)(model->nvertices / 2 - 1);
@@ -609,7 +609,7 @@ void C2_HOOK_FASTCALL MungeRepulseRays(tU32 pTime) {
             BrVector3Add(&v1->p, &p, &orth_pieces1[j % 5]);
             BrVector3Add(&v2->p, &p, &orth_pieces2[j % 5]);
         }
-        percentage = (float)delta_time / 700.f;
+        percentage = (float)delta_time / 700.0f;
         if (percentage > .9) {
             blend = 25;
         } else if (percentage > .8) {
