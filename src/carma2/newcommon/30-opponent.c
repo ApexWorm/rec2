@@ -2322,6 +2322,9 @@ void C2_HOOK_FASTCALL InitOpponents(tRace_info* pRace_info) {
 
     gNext_grudge_reduction = gTime_stamp_for_this_munging + 10000;
     gGrudge_reduction_per_period = 3 - gProgram_state.skill_level;
+#ifdef REC2_CHEAT
+    gProcessing_opponents = 1;
+#endif
     gFirst_frame = 1;
     gAcknowledged_start = 0;
     gStart_jumped = 0;
