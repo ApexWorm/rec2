@@ -1143,8 +1143,10 @@ void C2_HOOK_FASTCALL DrawTranslations(tFlic_descriptor* pFlic_info) {
     int width;
     int right_edge;
 
+#ifdef REC2_FIX_BUGS
     x = 0;
     right_edge = 0;
+#endif
     for (i = 0, trans = gTranslations; i < gTranslation_count; i++, trans++) {
         if (trans->flic_index == pFlic_info->the_index) {
             width = DRTextWidth(gTrans_fonts[trans->font_index], trans->text);
