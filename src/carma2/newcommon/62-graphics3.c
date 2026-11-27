@@ -624,9 +624,9 @@ void C2_HOOK_FASTCALL DrawCheckpoint(br_pixelmap* pMap, int pCheckpoint, tU32 pT
             || Flash(300, &last_flash, &flash_rate)) {
 
         checkpoint = &gCurrent_race.checkpoints[pCheckpoint];
-        if (checkpoint->map_position.v[0] >= 0.f
+        if (checkpoint->map_position.v[0] >= 0.0f
                 && checkpoint->map_position.v[0] < (float)pMap->width
-                && checkpoint->map_position.v[1] >= 0.f
+                && checkpoint->map_position.v[1] >= 0.0f
                 && checkpoint->map_position.v[1] < (float)pMap->height) {
 
 #ifdef REC2_HW
