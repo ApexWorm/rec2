@@ -800,6 +800,7 @@ void C2_HOOK_FASTCALL LoadPolyFont(const char* pName, int pSize, int pIndex) {
 }
 
 // FUNCTION: CARMA2_HW 0x00464b80
+// FUNCTION: CARMA2_CHEAT 0x00464ff0
 br_model* C2_HOOK_FASTCALL CreateCharacterModel(int width, int height, int texture_id_x, int texture_id_y, const char* pageName) {
     br_model* pModel;
     br_scalar f_width;
