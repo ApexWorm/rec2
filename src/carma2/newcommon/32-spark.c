@@ -545,9 +545,7 @@ void C2_HOOK_CDECL DoTrueColModelThing(br_actor* pActor, br_model* pModel, br_ma
     int i;
     int j;
     int time;
-    int c;
     br_vertex* vertex;
-    int v;
 
     if (gAFE_color_cycle) {
         time = GetTotalTime();
@@ -557,27 +555,9 @@ void C2_HOOK_CDECL DoTrueColModelThing(br_actor* pActor, br_model* pModel, br_ma
                 for (j = 0; j < pModel->prepared->groups[i].nvertices; j++) {
                     vertex = &pModel->vertices[pModel->prepared->groups[i].vertex_user[j]];
                     if (vertex != NULL) {
-                        c = time & 0x3fff;
-                        if (c < 0x100) {
-                            v = c;
-                        } else {
-                            v = 0x3ff - c;
-                        }
-                        vertex->red = v;
-                        c = (time + 0x100) & 0x3ff;
-                        if (c < 0x100) {
-                            v = c;
-                        } else {
-                            v = 0x3ff - c;
-                        }
-                        vertex->grn = v;
-                        c = (time - 0x200) & 0x3ff;
-                        if (c < 0x100) {
-                            v = c;
-                        } else {
-                            v = 0x3ff - c;
-                        }
-                        vertex->blu = v;
+                        vertex->red = (time & 0x3fff) < 0x100 ? (time & 0x3fff) : 0x3ff - (time & 0x3fff);
+                        vertex->grn = ((time + 0x100) & 0x3ff) < 0x100 ? ((time + 0x100) & 0x3ff) : 0x3ff - ((time + 0x100) & 0x3ff);
+                        vertex->blu = ((time - 0x200) & 0x3ff) < 0x100 ? ((time - 0x200) & 0x3ff) : 0x3ff - ((time - 0x200) & 0x3ff);
                     }
                 }
             }
