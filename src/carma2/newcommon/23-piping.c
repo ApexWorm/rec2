@@ -2016,7 +2016,7 @@ void C2_HOOK_FASTCALL ApplyCar(tPipe_chunk** pChunk) {
     if (BrVector3LengthSquared(&collision_info->velocity_car_space) < 0.01) {
         BrVector3Negate(&car->direction, (br_vector3*)car->car_master_actor->t.t.mat.m[2]);
     } else {
-        BrVector3Normalise(&car->direction, &collision_info->v);
+        BrVector3Normalise(&car->direction, &car->collision_info->v);
     }
 
     car->pos = car->car_master_actor->t.t.translate.t;
