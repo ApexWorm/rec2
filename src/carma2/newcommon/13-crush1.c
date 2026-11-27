@@ -3260,6 +3260,10 @@ void C2_HOOK_FASTCALL SetModelForUpdate(br_model* pModel) {
     }
 }
 
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
 // FUNCTION: CARMA2_HW 0x00435d40
 // FUNCTION: CARMA2_SW 0x00435d70
 // FUNCTION: CARMA2_CHEAT 0x00435f30
@@ -3280,13 +3284,120 @@ void C2_HOOK_FASTCALL RandomlyXZSplitCar(tCar_spec* pCar) {
     }
 }
 
-// RandomlyBendCar
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
-// STUB: CARMA2_HW 0x00431610
-// STUB: CARMA2_SW 0x00431640
-// STUB: CARMA2_CHEAT 0x004317e0
+inline void C2_HOOK_FASTCALL RandomlyBendCar(tCar_spec* pCar) {
+    br_vector3 pivot;
+
+    switch (IRandomBetween(1, 8)) {
+    case 1:
+        BrVector3Set(&pivot, 0.0f, pCar->collision_info->bb1.max.v[1], pCar->car_crush_spec->bend_z_min);
+        BendCar(pCar, -BR_ANGLE_DEG(45), 0, 0, &pivot, pCar->collision_info->bb1.max.v[2], 0);
+        break;
+    case 2:
+        BrVector3Set(&pivot, 0.0f, pCar->collision_info->bb1.min.v[1], pCar->car_crush_spec->bend_z_min);
+        BendCar(pCar, BR_ANGLE_DEG(45), 0, 0, &pivot, pCar->collision_info->bb1.max.v[2], 0);
+        break;
+    case 3:
+        BrVector3Set(&pivot, pCar->collision_info->bb1.min.v[0], 0.0f, pCar->car_crush_spec->bend_z_min);
+        BendCar(pCar, 0, -BR_ANGLE_DEG(45), 0, &pivot, pCar->collision_info->bb1.max.v[2], 0);
+        break;
+    case 4:
+        BrVector3Set(&pivot, pCar->collision_info->bb1.max.v[0], 0.0f, pCar->car_crush_spec->bend_z_min);
+        BendCar(pCar, 0, BR_ANGLE_DEG(45), 0, &pivot, pCar->collision_info->bb1.max.v[2], 0);
+        break;
+    case 5:
+    case 6:
+    case 7:
+    case 8:
+        pivot.v[0] = (pCar->collision_info->bb1.min.v[0] + pCar->collision_info->bb1.max.v[0]) * 0.5f;
+        pivot.v[1] = (pCar->collision_info->bb1.min.v[1] + pCar->collision_info->bb1.max.v[1]) * 0.5f;
+        pivot.v[2] = pCar->car_crush_spec->bend_z_max;
+        BendCar(pCar, 0, 0, BR_ANGLE_DEG(45), &pivot, pCar->collision_info->bb1.min.v[2], 0);
+        break;
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x00431610
+// FUNCTION: CARMA2_SW 0x00431640
+// FUNCTION: CARMA2_CHEAT 0x004317e0
 void C2_HOOK_FASTCALL TotallySpamTheCar(tCar_spec* pCar, br_scalar pDamage) {
-    NOT_IMPLEMENTED();
+    tCar_crush crush;
+    br_bounds3 bounds;
+    int i;
+    int side;
+    int axis;
+
+    if (gArrow_mode) {
+        return;
+    }
+    if (gPHIL_doing_physics) {
+        if (gCount_car_damage_crush_list == REC2_ASIZE(gCar_damage_crush_list)) {
+            return;
+        }
+        for (i = 0; i < gCount_car_damage_crush_list; i++) {
+            if (gCar_damage_crush_list[i].car == pCar) {
+                if (pDamage > gCar_damage_crush_list[i].damage) {
+                    gCar_damage_crush_list[i].damage = pDamage;
+                }
+                return;
+            }
+        }
+        gCar_damage_crush_list[gCount_car_damage_crush_list].car = pCar;
+        gCar_damage_crush_list[gCount_car_damage_crush_list].damage = pDamage;
+        gCount_car_damage_crush_list += 1;
+        return;
+    }
+    if (pCar->car_crush_spec == NULL || pCar->invulnerable_no_crushage || pCar->car_crush_spec->field_0x4b8 || pCar->car_crush_spec->field_0x144) {
+        return;
+    }
+    if (gNet_mode != eNet_mode_none) {
+        srand(pCar->car_crush_spec->field_0x574);
+        pCar->car_crush_spec->field_0x574 = rand();
+    }
+    FireSomeBitsOffCar(pCar);
+    crush.count = 1;
+    crush.field_0x40 = pDamage * 1.5f;
+    crush.field_0x50 = gPHIL_last_physics_tick;
+    bounds.min.v[0] = pCar->collision_info->bb1.min.v[0] - 0.2f / WORLD_SCALE;
+    bounds.min.v[1] = pCar->collision_info->bb1.min.v[1] - 0.2f / WORLD_SCALE;
+    bounds.min.v[2] = pCar->collision_info->bb1.min.v[2] - 0.2f / WORLD_SCALE;
+    bounds.max.v[0] = pCar->collision_info->bb1.max.v[0] + 0.2f / WORLD_SCALE;
+    bounds.max.v[1] = pCar->collision_info->bb1.max.v[1] + 0.2f / WORLD_SCALE;
+    bounds.max.v[2] = pCar->collision_info->bb1.max.v[2] + 0.2f / WORLD_SCALE;
+    for (i = 0; i < 10; i++) {
+        side = IRandomBetween(0, 5);
+        axis = side >> 1;
+        if (side & 0x1) {
+            crush.vectors[0].v[axis] = bounds.min.v[axis];
+        } else {
+            crush.vectors[0].v[axis] = bounds.max.v[axis];
+        }
+        if (side & 0x1) {
+            crush.field_0x44.v[axis] = bounds.max.v[axis];
+        } else {
+            crush.field_0x44.v[axis] = bounds.min.v[axis];
+        }
+        axis = (axis + 1) % 3;
+        crush.vectors[0].v[axis] = SRandomBetween(bounds.min.v[axis], bounds.max.v[axis]);
+        crush.field_0x44.v[axis] = SRandomBetween(bounds.min.v[axis], bounds.max.v[axis]);
+        axis = (axis + 1) % 3;
+        crush.vectors[0].v[axis] = SRandomBetween(bounds.min.v[axis], bounds.max.v[axis]);
+        crush.field_0x44.v[axis] = SRandomBetween(bounds.min.v[axis], bounds.max.v[axis]);
+        BrVector3Sub(&crush.field_0x44, &crush.field_0x44, &crush.vectors[0]);
+        BrVector3Normalise(&crush.field_0x44, &crush.field_0x44);
+        BrVector3Copy(&crush.field_0x34, &crush.vectors[0]);
+        CrushCar(pCar, pCar->car_master_actor, &crush);
+    }
+    if (!pCar->car_crush_spec->field_0x144 && PercentageCarHealth(pCar) < 75) {
+        if (PercentageChance((int)(pCar->car_crush_spec->snappability_factor * 25.0f))) {
+            RandomlyXZSplitCar(pCar);
+        } else if (pCar->car_crush_spec->bendability_factor != 0.0f) {
+            RandomlyBendCar(pCar);
+        }
+    }
 }
 
 // FUNCTION: CARMA2_HW 0x00435dd0

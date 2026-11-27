@@ -385,7 +385,7 @@ extern void C2_HOOK_FASTCALL SetModelForUpdate(br_model* pModel);
 
 extern void C2_HOOK_FASTCALL RandomlyXZSplitCar(tCar_spec* pCar);
 
-// RandomlyBendCar
+extern void C2_HOOK_FASTCALL RandomlyBendCar(tCar_spec* pCar);
 
 extern void C2_HOOK_FASTCALL TotallySpamTheCar(tCar_spec* pCar, br_scalar pDamage);
 
