@@ -38,6 +38,7 @@ int gCount_drones;
 
 // GLOBAL: CARMA2_HW 0x00682178
 // GLOBAL: CARMA2_SW 0x0067c8b8
+// GLOBAL: CARMA2_CHEAT 0x00689a20
 tDrone_form gDrone_forms[64];
 
 // GLOBAL: CARMA2_HW 0x0068450c
@@ -112,6 +113,7 @@ void C2_HOOK_CDECL DoNotDprintf_drone(const char* pMessage, ...) {
 
 // FUNCTION: CARMA2_HW 0x0044f640
 // FUNCTION: CARMA2_SW 0x0044f3e0
+// FUNCTION: CARMA2_CHEAT 0x0044fb90
 FILE* C2_HOOK_FASTCALL OpenDroneFile(char* pDrone_name) {
     tPath_name the_path;
     FILE* f;
