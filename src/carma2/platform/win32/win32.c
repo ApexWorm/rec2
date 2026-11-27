@@ -416,9 +416,9 @@ void C2_NORETURN C2_HOOK_FASTCALL PDFatalError(const char *pThe_str) {
     gIsFatalError = 1;
     sprintf(gFatalErrorMessage, "%s\n%s", str1, str2);
 #endif
+#ifdef REC2_SW
     gIsFatalError = 1;
     sprintf(gFatalErrorMessage,"%s\n%s", pThe_str, "");
-#ifdef REC2_SW
 #endif
 #ifdef REC2_CHEAT
     time(&now);
