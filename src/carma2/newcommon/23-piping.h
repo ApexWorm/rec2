@@ -473,7 +473,7 @@ extern void C2_HOOK_FASTCALL UndoSplitWeld(tPipe_chunk** pChunk, tPipe_chunk* pP
 
 extern void C2_HOOK_FASTCALL UndoBend(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk);
 
-extern void C2_HOOK_FASTCALL UndoUnBend(void);
+extern void C2_HOOK_FASTCALL UndoUnBend(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk);
 
 // UndoShrapnelShower
 

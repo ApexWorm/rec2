@@ -30,6 +30,7 @@
 #include "60-phil.h"
 #include "69-sound.h"
 #include "globvars.h"
+#include "globvrpb.h"
 #include "platform.h"
 
 #include "rec2_macros.h"
@@ -941,11 +942,106 @@ int C2_HOOK_FASTCALL CarTimeout(tU32 pTime) {
 
 // ScanCarsPositions
 
-// InitialiseActionReplay
+// GLOBAL: CARMA2_HW 0x0065d0c8
+// GLOBAL: CARMA2_SW 0x00657a00
+// GLOBAL: CARMA2_CHEAT 0x00664780
+tReplay_callback gPiping_function_array[70] = {
+    { NULL, 0x4, NULL, ApplyFrameBoundary, 0x0, NULL },
+    { NULL, 0x14, NULL, NULL, 0x0, NULL },
+    { NULL, 0x14, NULL, NULL /* FIXME: ApplySound */, 0x0, NULL },
+    { NULL, 0x0, NULL /* FIXME: CalcCrushLength */, NULL /* FIXME: ApplyCrush */, 0x5, NULL /* FIXME: UndoCrush */ },
+    { NULL, 0x0, NULL, NULL, 0x1, NULL },
+    { NULL, 0x44, NULL, ApplyCar, 0x3, NULL },
+    { NULL, 0x6, NULL, ApplyGWS, 0x3, NULL },
+    { NULL, 0xc, NULL, NULL /* FIXME: ApplyDamage */, 0x4, NULL /* FIXME: UndoDamage */ },
+    { NULL, 0x2, NULL, ApplySpecial, 0x4, NULL /* FIXME: UndoSpecial */ },
+    { NULL, 0x0, NULL, NULL, 0x2, NULL },
+    { ResetSparks, 0x18, NULL, ApplySpark, 0x2, NULL },
+    { ResetShrapnel, 0x0, CalcShrapnelLength, ApplyShrapnel, 0x2, NULL },
+    { ResetScreenWobble, 0x2, NULL, ApplyScreenWobble, 0x4, UndoScreenWobble },
+    { NULL, 0x40, NULL, NULL /* FIXME: ApplyGrooveStop */, 0x2, NULL },
+    { NULL, 0x34, NULL, ApplyNonCar, 0x3, NULL },
+    { ResetSmoke, 0xa, NULL, ApplySmoke, 0x2, NULL },
+    { NULL, 0x54, NULL, NULL /* FIXME: ApplyOilSpill */, 0x2, NULL },
+    { NULL, 0x14, NULL, ApplySmokeColumn, 0x1, NULL },
+    { NULL, 0x14, NULL, ApplyFlame, 0x1, NULL },
+    { NULL, 0x0, CalcSmudgeLength, ApplySmudge, 0x4, UndoSmudge },
+    { NULL, 0x10, NULL, ApplySplash, 0x4, UndoSplash },
+    { NULL /* FIXME: ResetProxRay */, 0x8, NULL, ApplyProxRay, 0x1, NULL },
+    { NULL, 0x34, NULL, ApplySkidAdjustment, 0x4, UndoSkidAdjustment },
+    { NULL, 0x8, NULL, ApplyFlap, 0x5, UndoFlap },
+    { NULL, 0x0, CalcModelMashLength, ApplyModelMash, 0x5, UndoModelMash },
+    { NULL, 0xc, NULL, ApplyRelink, 0x5, UndoRelink },
+    { NULL, 0x4, NULL, ApplyIdentity, 0x1, NULL },
+    { NULL, 0x14, NULL, ApplySplitWeld, 0x4, UndoSplitWeld },
+    { NULL, 0x18, NULL, ApplyBend, 0x5, UndoBend },
+    { NULL, 0x6, NULL, ApplyUnBend, 0x5, UndoUnBend },
+    { NULL, 0xd0, NULL, NULL /* FIXME: ApplyShrapnelShower */, 0x4, NULL /* FIXME: UndoShrapnelShower */ },
+    { NULL, 0x78, NULL, ApplyExplosion, 0x2, NULL },
+    { NULL, 0x4, NULL, ApplyNonCarCreation, 0x5, UndoNonCarCreation },
+    { NULL, 0x8, NULL, ApplySmashModelChange, 0x5, UndoSmashModelChange },
+    { NULL, 0x0, NULL /* FIXME: CalcRemoveFacesLength */, ApplySmashRemoveFaces, 0x5, UndoSmashRemoveFaces },
+    { NULL, 0x4, NULL, ApplySmashDecal, 0x5, UndoSmashDecal },
+    { NULL, 0x10, NULL, ApplySmashTextureChange, 0x5, UndoSmashTextureChange },
+    { ResetRepulseRay, 0xc, NULL, ApplyRepulseRay, 0x2, NULL },
+    { NULL, 0x0, CalcEndMyBendLength, ApplyEndMyBend, 0x1, NULL },
+    { NULL, 0x10, NULL, ApplyActorTrans, 0x5, UndoActorTrans },
+    { NULL, 0x50, NULL, NULL /* FIXME: ApplyPedStatus */, 0x5, NULL /* FIXME: UndoPedStatus */ },
+    { NULL, 0xc, NULL, ApplyPedDir, 0x2, NULL },
+    { NULL, 0x64, NULL, NULL /* FIXME: ApplyPedMove */, 0x5, NULL /* FIXME: UndoPedMove */ },
+    { NULL, 0x30, NULL, NULL /* FIXME: ApplyPedPhysics */, 0x2, NULL },
+    { NULL, 0x4, NULL, NULL /* FIXME: ApplyPedDismember */, 0x5, UndoPedDismember },
+    { NULL, 0x8, NULL, ApplyPedFPChange, 0x5, UndoPedFPChange },
+    { NULL, 0x18, NULL, ApplyPedPos, 0x5, UndoPedPos },
+    { NULL, 0x18, NULL, NULL /* FIXME: ApplyPedModelChange */, 0x5, NULL /* FIXME: UndoPedModelChange */ },
+    { NULL, 0x30, NULL, ApplyPHILObject, 0x2, NULL },
+    { NULL, 0x34, NULL, NULL /* FIXME: ApplyGibShower */, 0x4, NULL /* FIXME: UndoGibShower */ },
+    { NULL, 0x2c, NULL, ApplyBloodSpurt, 0x4, NULL /* FIXME: UndoBloodSpurt */ },
+    { NULL, 0x8, NULL, ApplyGrooveOnOff, 0x5, UndoGrooveOnOff },
+    { NULL, 0x0, NULL, ApplyPowerupGot, 0x5, UndoPowerupGot },
+    { NULL, 0x0, NULL, ApplyPowerupLose, 0x5, UndoPowerupLose },
+    { NULL, 0x2, NULL, ApplyFunkEnable, 0x5, UndoFunkEnable },
+    { NULL, 0x8, NULL, ApplyVanishDismembered, 0x5, UndoVanishDismembered },
+    { NULL, 0x2, NULL, ApplyDSModel, 0x1, NULL },
+    { NULL, 0x26c, NULL, ApplyPedDiagnostics, 0x2, NULL },
+    { NULL, 0xc, NULL, ApplyVector3, 0x5, UndoVector3 },
+    { NULL, 0x2c, NULL, ApplyExtendedSplash, 0x4, NULL /* FIXME: UndoExtendedSplash */ },
+    { NULL, 0x2, NULL, NULL /* FIXME: ApplyDroneRender */, 0x1, NULL },
+    { NULL, 0x1e, NULL, ApplyDroneCornerPos, 0x1, NULL },
+    { NULL, 0x8, NULL, ApplyDroneStraightPos, 0x1, NULL },
+    { NULL, 0x4, NULL, ApplyDroneUnused, 0x1, NULL },
+    { ARResetNapalmBolts, 0x58, NULL, ApplyNapalmBolt, 0x4, UndoNapalmBolt },
+    { NULL, 0x4, NULL, ApplyPowerupRespawn, 0x5, UndoPowerupRespawn },
+    { NULL, 0x30, NULL, ApplyShitMine, 0x5, UndoShitMine },
+    { NULL, 0x30, NULL, ApplyEndShitMine, 0x5, UndoEndShitMine },
+    { NULL, 0x2, NULL, ApplyTransformType, 0x5, UndoTransformType },
+    { NULL, 0x2, NULL, ApplyOppoRenderage, 0x1, NULL },
+};
 
 #if defined(REC2_MATCHING) && defined(_MSC_VER)
 #pragma inline_depth(0)
 #endif
+
+// FUNCTION: CARMA2_HW 0x004c6bf0
+// FUNCTION: CARMA2_SW 0x004c3320
+// FUNCTION: CARMA2_CHEAT 0x004cc710
+void C2_HOOK_FASTCALL InitialiseActionReplay(void) {
+    int enable;
+
+    if (!gAusterity_mode && gNet_mode == eNet_mode_none) {
+        enable = 1;
+    } else {
+        enable = 0;
+    }
+    ARInitialise(enable, REC2_ASIZE(gPiping_function_array), gPiping_function_array);
+    if (!gAusterity_mode && gNet_mode == eNet_mode_none) {
+        gCrush_space = BrMemAllocate(0x4000, kMem_pipe_model_geometry);
+        gSmudge_space = gCrush_space;
+    } else {
+        gCrush_space = NULL;
+        gSmudge_space = NULL;
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x004c6c60
 // FUNCTION: CARMA2_SW 0x004c3390
@@ -2851,7 +2947,7 @@ void C2_HOOK_FASTCALL UndoBend(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
 // FUNCTION: CARMA2_HW 0x004ca060
 // FUNCTION: CARMA2_SW 0x004c6790
 // FUNCTION: CARMA2_CHEAT 0x004cfba0
-void C2_HOOK_FASTCALL UndoUnBend(void) {
+void C2_HOOK_FASTCALL UndoUnBend(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
 }
 
 // UndoShrapnelShower
