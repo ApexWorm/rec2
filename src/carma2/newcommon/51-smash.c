@@ -1227,9 +1227,9 @@ inline void C2_HOOK_FASTCALL VerySimpleRotate(br_scalar pDt, br_matrix34* pMatri
         pos.v[0] = pMatrix->m[3][0];
         pos.v[1] = pMatrix->m[3][1];
         pos.v[2] = pMatrix->m[3][2];
-        pMatrix->m[3][0] = 0.f;
-        pMatrix->m[3][1] = 0.f;
-        pMatrix->m[3][2] = 0.f;
+        pMatrix->m[3][0] = 0.0f;
+        pMatrix->m[3][1] = 0.0f;
+        pMatrix->m[3][2] = 0.0f;
         BrMatrix34PostRotate(pMatrix, BrRadianToAngle(omega * pDt), &axis);
         pMatrix->m[3][0] = pos.v[0];
         pMatrix->m[3][1] = pos.v[1];
@@ -1244,8 +1244,8 @@ void C2_HOOK_FASTCALL DoFragMovement(tSmash_vertex* pFragment, tU32 pTime, float
     float f_dt;
     br_vector3 move;
 
-    f_dt = pDelta_time / 1000.f;
-    if (f_dt != 0.f && pFragment->field_0x34 == 0) {
+    f_dt = pDelta_time / 1000.0f;
+    if (f_dt != 0.0f && pFragment->field_0x34 == 0) {
         move.v[0] = pFragment->v.v[0] * f_dt;
         move.v[1] = pFragment->v.v[1] * f_dt - 4.9 * gGravity_multiplier * f_dt * f_dt;
         move.v[2] = pFragment->v.v[2] * f_dt;
@@ -1289,7 +1289,7 @@ void C2_HOOK_FASTCALL MungeGlassFragments2(int pEnd_race) {
             if (fragment->end_time == 0) {
                 continue;
             }
-            if (!pEnd_race && (the_time < fragment->end_time || (gAction_replay_mode && ARGetReplayRate() <= 0.f)) && the_time >= fragment->field_0xc) {
+            if (!pEnd_race && (the_time < fragment->end_time || (gAction_replay_mode && ARGetReplayRate() <= 0.0f)) && the_time >= fragment->field_0xc) {
                 DoFragMovement(fragment, the_time, delta);
                 if (fragment->field_0x34) {
                     fragment->field_0x34 = 0;
@@ -1299,9 +1299,9 @@ void C2_HOOK_FASTCALL MungeGlassFragments2(int pEnd_race) {
                 id = fragment->field_0x18;
                 if (the_time >= fragment->end_time) {
                     if ((int)id >= 0) {
-                        PipeSingleShrapnelShower(id, fragment->time_last_move, 0, 0, NULL, NULL, 0.f, NULL, NULL, 0, NULL, 0, NULL, NULL, NULL);
+                        PipeSingleShrapnelShower(id, fragment->time_last_move, 0, 0, NULL, NULL, 0.0f, NULL, NULL, 0, NULL, 0, NULL, NULL, NULL);
                     } else if (id & 0x40000000) {
-                        PipeSingleGibShower(id, fragment->time_last_move, 0, 0.f, 0, NULL, NULL, NULL);
+                        PipeSingleGibShower(id, fragment->time_last_move, 0, 0.0f, 0, NULL, NULL, NULL);
                     } else {
                         PipeSingleBloodSpurt(id, fragment->time_last_move, 0, NULL, NULL, NULL);
                     }
