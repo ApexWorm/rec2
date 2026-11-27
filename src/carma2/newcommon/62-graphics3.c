@@ -25,6 +25,7 @@
 #include "70-packfile.h"
 #include "globvars.h"
 #include "globvrpb.h"
+#include "platform.h"
 #include "rec2_macros.h"
 
 #include <limits.h>
@@ -55,6 +56,11 @@ const int gArrows[2][4][60] = {
     },
 };
 
+// GLOBAL: CARMA2_HW 0x00659b20
+// GLOBAL: CARMA2_SW 0x00654508
+// GLOBAL: CARMA2_CHEAT 0x00660438
+tOpponent_Status gPrevious_opponent_status = eOpponent_status_Uninitialized;
+
 // GLOBAL: CARMA2_HW 0x00655df0
 // GLOBAL: CARMA2_SW 0x00650cd8
 // GLOBAL: CARMA2_CHEAT 0x0065c670
@@ -83,6 +89,11 @@ tCar_spec* gTarget_lock_car_1;
 // GLOBAL: CARMA2_CHEAT 0x00694f90
 tCar_spec* gTarget_lock_car_2;
 
+// GLOBAL: CARMA2_HW 0x0068d6f4
+// GLOBAL: CARMA2_SW 0x0068774c
+// GLOBAL: CARMA2_CHEAT 0x00694f94
+int gINT_0068d6f4;
+
 // GLOBAL: CARMA2_HW 0x0068d8c8
 // GLOBAL: CARMA2_SW 0x00687920
 // GLOBAL: CARMA2_CHEAT 0x00695168
@@ -92,6 +103,11 @@ int gTarget_lock_enabled;
 // GLOBAL: CARMA2_SW 0x00687924
 // GLOBAL: CARMA2_CHEAT 0x0069516c
 int gInitMap_done;
+
+// GLOBAL: CARMA2_HW 0x0068d8d0
+// GLOBAL: CARMA2_SW 0x00687928
+// GLOBAL: CARMA2_CHEAT 0x00695170
+tU32 gTime_oppobar_target_wasted;
 
 // GLOBAL: CARMA2_HW 0x0074abdc
 // GLOBAL: CARMA2_SW 0x00741288
@@ -122,6 +138,11 @@ int gINT_0074ab88;
 // GLOBAL: CARMA2_SW 0x00741238
 // GLOBAL: CARMA2_CHEAT 0x0075222c
 int gINT_0074ab8c;
+
+// GLOBAL: CARMA2_HW 0x0074ab90
+// GLOBAL: CARMA2_SW 0x0074123c
+// GLOBAL: CARMA2_CHEAT 0x00752230
+float gFLOAT_0074ab90;
 
 // GLOBAL: CARMA2_HW 0x0074ab94
 // GLOBAL: CARMA2_SW 0x00741240
@@ -559,7 +580,38 @@ void C2_HOOK_FASTCALL DrawMapSmallBlip(br_pixelmap* pScreen, tU32 pTime, const b
     }
 }
 
-// CopyMapToScreen
+extern void C2_HOOK_FASTCALL CopyMapToScreen(void);
+inline void C2_HOOK_FASTCALL CopyMapToScreen(void) {
+
+    if (gCurrent_race.map_image != NULL) {
+#ifdef REC2_SW
+        if (gGraf_data_index != 0) {
+            BrPixelmapCopy(gBack_screen, gCurrent_race.map_image);
+        } else {
+            BrPixelmapCopy(gBack_screen, gCurrent_race.map_image);
+        }
+#else
+        if (gGraf_data_index != 0) {
+            PossibleUnlock(1);
+            DrPixelmapRectangleCopyPossibleLock(gBack_screen,
+                -gBack_screen->origin_x,
+                -gBack_screen->origin_y,
+                gCurrent_race.map_image,
+                gCurrent_race.map_image->origin_x,
+                gCurrent_race.map_image->origin_y,
+                640, 480);
+        } else {
+            DRPixelmapCopy(gBack_screen, gCurrent_race.map_image);
+        }
+#endif
+    }
+    DimRectangleClipped(gBack_screen,
+        gMap_render_x_i - gCurrent_graf_data->map_render_x_marg,
+        gMap_render_y_i - gCurrent_graf_data->map_render_y_marg,
+        gMap_render_width_i + gMap_render_x_i + gCurrent_graf_data->map_render_x_marg,
+        gMap_render_height_i + gMap_render_y_i + gCurrent_graf_data->map_render_y_marg,
+        1);
+}
 
 // DrawCarArrow
 
@@ -682,7 +734,18 @@ void C2_HOOK_FASTCALL DoMapOverlays(br_pixelmap* pScreen) {
 #pragma auto_inline(on)
 #endif
 
-// StartMap
+extern void C2_HOOK_FASTCALL StartMap(void);
+inline void C2_HOOK_FASTCALL StartMap(void) {
+
+    gBack_original_origin_x = gBack_screen->origin_x;
+    gBack_original_origin_y = gBack_screen->origin_y;
+    gBack_original_base_x = gBack_screen->base_x;
+    gBack_original_base_y = gBack_screen->base_y;
+    gBack_screen->origin_x = 0;
+    gBack_screen->origin_y = 0;
+    gBack_screen->base_x = 0;
+    gBack_screen->base_y = 0;
+}
 
 void C2_HOOK_FASTCALL FinishMap(void) {
 
@@ -783,9 +846,40 @@ void C2_HOOK_FASTCALL MapOverlay(void) {
 #pragma auto_inline(on)
 #endif
 
-// InitNearestCar
+extern void C2_HOOK_FASTCALL InitNearestCar(void);
+inline void C2_HOOK_FASTCALL InitNearestCar(void) {
 
-// MapStuffBeforeRender
+    gINT_0068d6f4 = -1;
+    if (gNet_mode != eNet_mode_none && gCurrent_net_game->type == eNet_game_type_foxy) {
+        gTarget_lock_car_2 = NULL;
+    } else if (gPrevious_opponent_status == eOpponent_status_Wasted && gTarget_lock_car_1 != NULL) {
+        if (PDGetTotalTime() - gTime_oppobar_target_wasted <= 2500) {
+            gFLOAT_0074ab90 = 0.f;
+        } else {
+            gTarget_lock_car_2 = NULL;
+            gTarget_lock_car_1 = NULL;
+            if (gTarget_lock_enabled) {
+                gTarget_lock_enabled = 0;
+            }
+        }
+    } else if (gTarget_lock_enabled) {
+        gFLOAT_0074ab90 = 0.f;
+    } else {
+        gTarget_lock_car_2 = NULL;
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x00496be0
+// FUNCTION: CARMA2_SW 0x00493a80
+// FUNCTION: CARMA2_CHEAT 0x00496f90
+void C2_HOOK_FASTCALL MapStuffBeforeRender(void) {
+
+    InitNearestCar();
+    if (gCurrent_race.map_image != NULL && gMap_view == 2) {
+        StartMap();
+        CopyMapToScreen();
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x00496d80
 // FUNCTION: CARMA2_SW 0x00493bf0
