@@ -327,7 +327,7 @@ typedef struct tPed_character_instance {
     undefined2 field_0x20;
     undefined field_0x22[0x2];
     undefined4 field_0x24;
-    undefined4 field_0x28;
+    br_matrix34* field_0x28;
     br_matrix34 field_0x2c;
     br_matrix34 field_0x5c;
     br_matrix34 field_0x8c;
@@ -4538,7 +4538,7 @@ typedef struct {
 } tUser_crush_data;
 
 typedef struct {
-    undefined field_0x00[4];
+    void* field_0x00;
     tU16 field_0x04;
     undefined2 field_0x06;
     undefined4 field_0x08;
@@ -4660,7 +4660,7 @@ typedef struct tPhysics_object {
     void* owner; /* points to tCollision_info_owner (used in PHILSetObjectProperty) */
     void* field_0x240;
     br_vector3 water_normal;
-    br_scalar water_d; /* Created by retype action */
+    br_scalar water_d;
     br_scalar water_depth_factor;
     tSpecial_volume* last_special_volume;
     tSpecial_volume* auto_special_volume;
@@ -4670,45 +4670,50 @@ typedef struct tPhysics_object {
     tU32 message_time; // 0x268
     undefined field_0x26c[0x278 - 0x26c];
     tS16 field_0x278;
-    undefined field_0x27a[0x49c - 0x27a];
+    undefined field_0x27a[0x294 - 0x27a];
+    tU8 field_0x294[0x49c - 0x294];
     undefined4 field_0x49c; /* tU32 last_car_car_collision: */
     undefined field_0x4a0[52];
     tU8 drivable_on;
     undefined field_0x4d5[3];
 } tPhysics_object;
 
-typedef struct {
-    tPhysics_object* collision_info;
-    undefined2 field_0x4;
-    undefined field_0x6[0x8 - 0x6];
-    undefined4 field_0x8;
-    float field_0xc;
-    float field_0x10;
+#define PHIL_QUEUED_HEADER_MEMBERS \
+    tPhysics_object* collision_info; \
+    undefined2 field_0x4; \
+    undefined field_0x6[0x8 - 0x6]; \
+    undefined4 field_0x8; \
+    float field_0xc; \
+    float field_0x10; \
     float field_0x14;
+
+#define PHIL_QUEUED_OBJECT_INFO_DATA_MEMBERS \
+    br_vector3 field_0x18; \
+    br_vector3 field_0x24; \
+    br_matrix34 field_0x30; \
+    undefined flags; \
+    undefined field_0x61[3];
+
+typedef struct {
+    PHIL_QUEUED_HEADER_MEMBERS
+#ifdef REC2_CHEAT
+    undefined4 cheat_variable; /* Unknown offset */
+#endif
 } tPHIL_queued_header;
 
 typedef struct {
     /* FIXME: CARMA2_CHEAT has extra 32-bit member */
-    tPhysics_object* collision_info;
-    undefined2 field_0x4;
-    undefined field_0x6[0x2];
-    undefined4 field_0x8;
-    float field_0xc;
-    float field_0x10;
-    float field_0x14;
+    PHIL_QUEUED_HEADER_MEMBERS
 #ifdef REC2_CHEAT
     undefined4 cheat_variable; /* FIXME: unknown offset (before 0x18) */
 #endif
-    br_vector3 field_0x18;
-    br_vector3 field_0x24;
-    br_matrix34 field_0x30;
-    undefined flags;
-    undefined field_0x61[3];
+    PHIL_QUEUED_OBJECT_INFO_DATA_MEMBERS
 } tPHIL_queued_object_info;
 
 typedef union {
     struct {
-        tPHIL_queued_object_info _field_0x0;
+        PHIL_QUEUED_HEADER_MEMBERS
+        PHIL_QUEUED_OBJECT_INFO_DATA_MEMBERS
         undefined _field_0x64;
         tPHIL_queued_header headers[100];
     };
@@ -5450,6 +5455,7 @@ typedef enum {
     eNet_message_chunk_type_start_race = 0xc,
     eNet_message_chunk_type_headup = 0xd,
     eNet_message_chunk_type_netsynch = 0xe,
+    eNet_message_chunk_type_powerup = 0x16,
     eNet_message_chunk_type_player_scores = 0x18,
     eNet_message_chunk_type_gameplay = 0x1b,
     eNet_message_chunk_type_oil_spill = 0x1f,
@@ -5668,6 +5674,15 @@ typedef struct {
 
 typedef struct {
     tNet_message_chunk_header header;
+    undefined field_0x2[0x4-0x2];
+    tPlayer_ID player;
+    int powerup_index;
+    tU32 time_left;
+    int event;
+} tNet_message_chunk_powerup;
+
+typedef struct {
+    tNet_message_chunk_header header;
     undefined field_0x2[2];
     tPlayer_ID player;
     tU32 time;
@@ -5678,6 +5693,7 @@ typedef union {
     tNet_message_chunk_race_over race_over; /* type = 0xa */
     tNet_message_chunk_start_race start_race; /* type = 0xc */
     tNet_message_headup headup; /* type = 0xd */
+    tNet_message_chunk_powerup powerup; /* type = 0x16 */
     tNet_message_chunk_scores scores; /* type = 0x18 */
     tNet_message_chunk_gameplay gameplay; /* type = 0x1b */
     tNet_message_chunk_oil_spill oil_spill; /* type = 0x1f*/
