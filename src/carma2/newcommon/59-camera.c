@@ -53,6 +53,7 @@ br_actor* gPed_actor;
 
 // GLOBAL: CARMA2_HW 0x006792b8
 // GLOBAL: CARMA2_SW 0x00673a28
+// GLOBAL: CARMA2_CHEAT 0x00680b68
 int gCamera_frozen;
 
 // GLOBAL: CARMA2_HW 0x006792bc
