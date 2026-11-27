@@ -74,6 +74,9 @@ C2_NORETURN void C2_HOOK_FASTCALL QuitGame(void) {
     exit(0);
 }
 
+// FUNCTION: CARMA2_HW 0x00492050
+// FUNCTION: CARMA2_SW 0x0048f2b0
+// FUNCTION: CARMA2_CHEAT 0x004920b0
 inline void C2_HOOK_FASTCALL ServiceTheGame(int pRacing) {
 
     CheckMemory();
@@ -87,9 +90,9 @@ inline void C2_HOOK_FASTCALL ServiceTheGame(int pRacing) {
     }
     if (!pRacing) {
         CheckSystemKeys(0);
-        if (gSound_enabled) {
-            SoundService();
-        }
+    }
+    if (!pRacing && gSound_enabled) {
+        SoundService();
     }
     NetService(pRacing);
 }
