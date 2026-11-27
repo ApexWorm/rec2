@@ -12,6 +12,12 @@
 #include "c2_hooks.h"
 #include "rec2_types.h"
 
+typedef struct { /* FIXME: name is a guess, returned to PHIL by GetDroneCrushData */
+    br_model* model;
+    float crushability;
+    br_bounds3 bounds;
+} tDrone_crush_data;
+
 extern br_vector3 gRender_bounds_centre;
 extern int gINT_00681fb0;
 extern int gFrame;
@@ -151,7 +157,7 @@ extern void C2_HOOK_FASTCALL PipeDroneMatrix(tDrone_spec* pDrone);
 
 // DroneStateFuncStationaryPassive
 
-// GetNewCrushyModelForDrone
+extern int C2_HOOK_FASTCALL GetNewCrushyModelForDrone(tDrone_spec* pDrone);
 
 extern void C2_HOOK_FASTCALL SetTrafficOn(int pTraffic_on);
 
@@ -165,7 +171,7 @@ extern void C2_HOOK_FASTCALL DisposeDronesRaceStuff(void);
 
 extern void C2_HOOK_FASTCALL LoadPerRaceDroneStuff(void);
 
-// GetDroneCrushData
+extern tDrone_crush_data* C2_HOOK_FASTCALL GetDroneCrushData(tPhysics_object* pObject);
 
 // AllocateAndInitDrones
 

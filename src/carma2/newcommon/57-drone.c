@@ -72,6 +72,11 @@ int gTraffic_disabled;
 // GLOBAL: CARMA2_SW 0x0067c6f0
 int gINT_00681fb0;
 
+// GLOBAL: CARMA2_HW 0x006820d8
+// GLOBAL: CARMA2_SW 0x0067c818
+// GLOBAL: CARMA2_CHEAT 0x00689980
+tDrone_crush_data gDrone_crush_data;
+
 // GLOBAL: CARMA2_HW 0x00684514
 // GLOBAL: CARMA2_SW 0x0067ec54
 // GLOBAL: CARMA2_CHEAT 0x0068bdbc
@@ -380,7 +385,19 @@ void C2_HOOK_FASTCALL PipeDroneMatrix(tDrone_spec* pDrone) {
 
 // DroneStateFuncStationaryPassive
 
-// GetNewCrushyModelForDrone
+inline int C2_HOOK_FASTCALL GetNewCrushyModelForDrone(tDrone_spec* pDrone) {
+    int i;
+
+    for (i = 0; i < pDrone->form->count_models; i++) {
+        if (!pDrone->form->field_0x80[i]) {
+            pDrone->form->field_0x80[i] = 1;
+            pDrone->field_0xf4 = i;
+            pDrone->model_actor->model = pDrone->form->models[i];
+            return 1;
+        }
+    }
+    return 0;
+}
 
 // FUNCTION: CARMA2_HW 0x0044ecf0
 // FUNCTION: CARMA2_SW 0x0044ea90
@@ -469,7 +486,24 @@ void C2_HOOK_FASTCALL LoadPerRaceDroneStuff(void) {
     NOT_IMPLEMENTED();
 }
 
-// GetDroneCrushData
+// FUNCTION: CARMA2_HW 0x00450b50
+// FUNCTION: CARMA2_SW 0x004508e0
+// FUNCTION: CARMA2_CHEAT 0x004510a0
+tDrone_crush_data* C2_HOOK_FASTCALL GetDroneCrushData(tPhysics_object* pObject) {
+    tDrone_spec* drone;
+
+    drone = pObject->owner;
+    if (drone->form->crushability == 0.f) {
+        return NULL;
+    }
+    if (drone->field_0xf4 < 0 && !GetNewCrushyModelForDrone(drone)) {
+        return NULL;
+    }
+    gDrone_crush_data.model = drone->model_actor->model;
+    gDrone_crush_data.crushability = drone->form->crushability;
+    gDrone_crush_data.bounds = drone->form->field_0x54;
+    return &gDrone_crush_data;
+}
 
 // AllocateAndInitDrones
 
