@@ -303,7 +303,8 @@ C2_MATCHING_NAKED void C2_HOOK_CDECL HostFarDWordWrite(br_uint_32 offset, br_uin
 }
 #else
 void C2_HOOK_CDECL HostFarDWordWrite(br_uint_32 offset, br_uint_16 sel, br_uint_32 value) {
-    NOT_IMPLEMENTED();
+
+    *(br_uint_32*)FAR_POINTER(offset, sel) = value;
 }
 #endif
 
@@ -324,7 +325,7 @@ C2_MATCHING_NAKED br_uint_32 C2_HOOK_CDECL HostFarDWordRead(br_uint_32 offset, b
 }
 #else
 br_uint_32 C2_HOOK_CDECL HostFarDWordRead(br_uint_32 offset, br_uint_16 sel) {
-    NOT_IMPLEMENTED();
-    return 0;
+
+    return *(br_uint_32*)FAR_POINTER(offset, sel);
 }
 #endif
