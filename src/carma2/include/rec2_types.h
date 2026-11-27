@@ -4805,8 +4805,8 @@ typedef struct {
 typedef struct tPed_movement_spec{
     tU32 min_time_between;
     tU32 max_time_between;
-    float min_walk_speed_factor;
-    float max_walk_speed_factor;
+    int min_walk_speed_factor;
+    int max_walk_speed_factor;
     br_angle max_random_angle;
     tU8 padding_0x12[2];
 } tPed_movement_spec;
