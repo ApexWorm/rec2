@@ -3560,7 +3560,16 @@ int C2_HOOK_FASTCALL ScrollSet_GetItem(tConnected_items* pScroll_set, int pIndex
     }
 }
 
-// GetUpdown
+inline tStruct_00686508* C2_HOOK_FASTCALL GetUpdown(int pItem) {
+    tStruct_00686508* up_down;
+
+    for (up_down = gPTR_00686508; up_down != NULL; up_down = up_down->next) {
+        if (pItem == up_down->field_0x0 || pItem == up_down->field_0x4 || pItem == up_down->field_0x8) {
+            return up_down;
+        }
+    }
+    return NULL;
+}
 
 // FUNCTION: CARMA2_HW 0x00471d70
 // FUNCTION: CARMA2_CHEAT 0x00472100
@@ -3587,7 +3596,80 @@ int C2_HOOK_FASTCALL ScrollSet_TranslateItemToIndex(tConnected_items* pConnected
     return pConnected->field_0x8 + offset;
 }
 
-// Generic_FindNextActiveItem
+// FUNCTION: CARMA2_HW 0x00471dd0
+// FUNCTION: CARMA2_SW 0x00471360
+// FUNCTION: CARMA2_CHEAT 0x00472160
+int C2_HOOK_FASTCALL Generic_FindNextActiveItem(tFrontend_spec* pFrontend, int pItem) {
+    int original_selected_item_index;
+    tFrontend_slider* start_active_slider;
+    int start_item_group;
+    tStruct_00686508* start_up_down;
+    tConnected_items* connected;
+    tFrontend_slider* next_active_slider;
+    tStruct_00686508* next_up_down;
+    int i;
+    int index;
+
+    original_selected_item_index = gFrontend_selected_item_index;
+    gFrontend_selected_item_index = pItem;
+    start_active_slider = GetAnyActiveSlider();
+    start_item_group = pFrontend->items[gFrontend_selected_item_index].group;
+    start_up_down = GetUpdown(pItem);
+    for (connected = gConnected_items; connected != NULL; connected = connected->next) {
+        for (i = 0; i < connected->count_ranges; i++) {
+            if (pItem == connected->range_starts[i] + connected->range_length - 1) {
+                break;
+            }
+        }
+        if (i < connected->count_ranges) {
+            break;
+        }
+    }
+    if (connected != NULL) {
+        index = ScrollSet_TranslateItemToIndex(connected, pItem);
+        if (index == connected->field_0x8 + connected->range_length - 1 && connected->field_0x8 + connected->range_length < connected->field_0x0) {
+            connected->field_0x8 += 1;
+            RefreshScrollSet(pFrontend);
+            return pItem;
+        }
+    }
+    for (i = 1; i < pFrontend->count_items; i++) {
+        index = (pItem + i) % pFrontend->count_items;
+        if (pFrontend->items[index].enabled < kFrontendItemEnabled_enabled) {
+            continue;
+        }
+        if (!pFrontend->items[index].visible) {
+            continue;
+        }
+        gFrontend_selected_item_index = index;
+        next_active_slider = GetAnyActiveSlider();
+        if (start_active_slider != NULL && next_active_slider == start_active_slider) {
+            continue;
+        }
+        if (next_active_slider != NULL && (next_active_slider->flags & 0x1)) {
+            continue;
+        }
+        if (pFrontend->count_groups != 0 && start_item_group != 0 && start_item_group == pFrontend->items[index].group) {
+            continue;
+        }
+        if (connected != NULL && GetScrollSet(index) == connected) {
+            continue;
+        }
+        if (start_up_down != NULL) {
+            next_up_down = GetUpdown(index);
+            if (start_up_down == next_up_down) {
+                continue;
+            }
+            if (next_up_down != NULL && next_up_down->field_0x0 != index) {
+                continue;
+            }
+        }
+        gFrontend_selected_item_index = original_selected_item_index;
+        return index;
+    }
+    gFrontend_selected_item_index = original_selected_item_index;
+    return 0;
+}
 
 // Generic_FindPrevActiveItem
 
