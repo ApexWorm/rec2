@@ -1898,7 +1898,7 @@ void C2_HOOK_FASTCALL SetUpFlapJoint(tPhysics_joint* pJoint, tCar_crush_flap_dat
     BrVector3Copy(&pJoint->limits[1].child, &pJoint->limits[0].child);
     BrVector3Cross(&pJoint->limits[0].parent, &pJoint->hinge_axis, &pJoint->limits[0].child);
     BrVector3Normalise(&pJoint->limits[0].parent, &pJoint->limits[0].parent);
-    BrMatrix34Rotate(&mat, pFlap_data->field_0x6 - 0x3ffc, &pJoint->hinge_axis);
+    BrMatrix34Rotate(&mat, pFlap_data->field_0x6 - BR_ANGLE_DEG(90), &pJoint->hinge_axis);
     BrMatrix34ApplyV(&pJoint->limits[1].parent, &pJoint->limits[1].child, &mat);
     BrVector3Scale(&tv, &pJoint->limits[0].parent, 0.01f);
     BrVector3Accumulate(&pJoint->limits[0].child, &tv);
