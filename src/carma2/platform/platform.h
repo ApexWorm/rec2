@@ -178,8 +178,6 @@ extern void C2_HOOK_FASTCALL PDExtractFilename(char* pDest, const char* pPath);
 
 extern void C2_HOOK_FASTCALL PDExtractDirectory(char* pDest, const char* pPath);
 
-extern void* C2_HOOK_FASTCALL S3BufferWav(const char* pPath, tS3_buffer_desc* pBuffer_desc);
-
 extern void C2_HOOK_FASTCALL PDS3ReleaseSound(tS3_descriptor* pSound_descriptor);
 
 extern int C2_HOOK_FASTCALL PDS3UpdateChannelFrequency(tS3_channel* pChannel);
