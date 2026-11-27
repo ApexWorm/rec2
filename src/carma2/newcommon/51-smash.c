@@ -2079,7 +2079,7 @@ intptr_t C2_HOOK_CDECL SmashEverythingCB(br_actor* pActor, void* pContext) {
     }
     for (i = 0; i < crush_data->count_smashables; i++) {
         car = pContext;
-        QueueSmashIfNecessary2(car, car->collision_info, &car->pos, NULL, pActor, 0, &crush_data->smashables[i], 1000.f, 0, 0);
+        QueueSmashIfNecessary2(car, car->collision_info, &car->pos, NULL, pActor, 0, &crush_data->smashables[i], 1000.0f, 0, 0);
     }
     return 0;
 }
