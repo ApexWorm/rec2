@@ -2218,11 +2218,11 @@ inline void C2_HOOK_FASTCALL SphericizePhysics(tCar_spec* pCar, br_vector3* pCen
     pCar->collision_info->shape = gGonad_sphere_collision_shape;
     UpdateCollisionObject(pCar->collision_info);
     BrVector3Copy(&pCar->collision_info->cmpos, pCenter);
-    pCar->collision_info->M = 50.f;
-    pCar->collision_info->I.v[0] = (pCar->collision_info->shape->sphere.sphere.radius * pCar->collision_info->shape->sphere.sphere.radius) * pCar->collision_info->M / 6.f;
-    pCar->collision_info->I.v[1] = (pCar->collision_info->shape->sphere.sphere.radius * pCar->collision_info->shape->sphere.sphere.radius) * pCar->collision_info->M / 6.f;
-    pCar->collision_info->I.v[2] = (pCar->collision_info->shape->sphere.sphere.radius * pCar->collision_info->shape->sphere.sphere.radius) * pCar->collision_info->M / 6.f;
-    pCar->collision_info->world_friction = 16.f;
+    pCar->collision_info->M = 50.0f;
+    pCar->collision_info->I.v[0] = (pCar->collision_info->shape->sphere.sphere.radius * pCar->collision_info->shape->sphere.sphere.radius) * pCar->collision_info->M / 6.0f;
+    pCar->collision_info->I.v[1] = (pCar->collision_info->shape->sphere.sphere.radius * pCar->collision_info->shape->sphere.sphere.radius) * pCar->collision_info->M / 6.0f;
+    pCar->collision_info->I.v[2] = (pCar->collision_info->shape->sphere.sphere.radius * pCar->collision_info->shape->sphere.sphere.radius) * pCar->collision_info->M / 6.0f;
+    pCar->collision_info->world_friction = 16.0f;
     gGonad_sphere_collision_shape->common.type = kCollisionShapeType_Box;
     while (!TestForCarInSensiblePlace(pCar, &offset)) {
         BrVector3Scale(&offset, &offset, 0.5f / WORLD_SCALE);
