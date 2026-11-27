@@ -1087,11 +1087,53 @@ tPhysics_object* C2_HOOK_FASTCALL GetRootObject(tPed_character_instance* pPed) {
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x00409090
-// STUB: CARMA2_SW 0x00409090
-// STUB: CARMA2_CHEAT 0x004090c0
+// FUNCTION: CARMA2_HW 0x00409090
+// FUNCTION: CARMA2_SW 0x00409090
+// FUNCTION: CARMA2_CHEAT 0x004090c0
 int C2_HOOK_FASTCALL CharacterNoLongerCollideworthy(tPed_character_instance* pCharacter) {
-    NOT_IMPLEMENTED();
+    tPed_form* form;
+    tPhysics_object* object;
+    tPed_form_boned_phys* boned;
+    int i;
+
+#ifdef REC2_CHEAT
+    if (gAction_replay_mode) {
+        PDFatalError("Spam spam spam spam!");
+    }
+#endif
+    if (pCharacter->field_0x14 == 0) {
+        return 0x1f;
+    }
+    form = pCharacter->personality->form;
+    if (pCharacter->field_0x14 & 0x1) {
+        object = form->simple_physicing[(tS8)pCharacter->field_0x5].collision_info;
+        PHILRemoveObject(object);
+        object->field183_0x1d8 = 0;
+        object->owner = NULL;
+        form->simple_physicing[(tS8)pCharacter->field_0x5].field_0x0 = 0;
+        if (pCharacter->field_0xc != 0 && pCharacter->field_0x6 >= 0) {
+            boned = &form->boned_physicing[pCharacter->field_0x6];
+            for (i = 1; i < form->count_bones; i++) {
+                if (pCharacter->field_0xc & gPow2_array[i]) {
+                    if (PHILReturnObjectStatus(boned->collision_infos[i]) == 2) {
+                        pCharacter->field_0x10 |= gPow2_array[i];
+                    }
+                    PHILRemoveObject(boned->collision_infos[i]);
+                    boned->collision_infos[i]->field183_0x1d8 = 0;
+                    boned->collision_infos[i]->owner = NULL;
+                }
+            }
+            pCharacter->field_0x6 = -1;
+            boned->field_0x0 = 0;
+        }
+    } else {
+        object = GetRootObject(pCharacter);
+        PHILRemoveObject(object);
+        object->field183_0x1d8 = 0;
+        form->boned_physicing[(tS8)pCharacter->field_0x5].field_0x0 = 0;
+    }
+    pCharacter->field_0x14 = 0;
+    return 0;
 }
 
 #ifdef REC2_MATCHING
