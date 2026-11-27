@@ -724,6 +724,7 @@ br_pixelmap* gRender_screen;
 
 // GLOBAL: CARMA2_HW 0x00762130
 // GLOBAL: CARMA2_SW 0x00758690
+// GLOBAL: CARMA2_CHEAT 0x007697d0
 int gInitial_powerup_slots[3];
 
 // GLOBAL: CARMA2_HW 0x0075b940

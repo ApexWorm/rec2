@@ -957,7 +957,18 @@ int C2_HOOK_FASTCALL GainAPO2(tCar_spec* pCar, int pIndex, int pAmount) {
     return pCar->power_up_levels[pIndex] - old;
 }
 
-// GainAPOPot2
+inline int C2_HOOK_FASTCALL GainAPOPot2(tCar_spec* pCar, int pIndex, int pAmount) {
+    int* slots;
+    int old;
+
+    slots = &pCar->power_up_slots[pIndex];
+    old = *slots;
+    *slots += pAmount;
+    if (*slots > gInitial_powerup_slots[pIndex]) {
+        *slots = gInitial_powerup_slots[pIndex];
+    }
+    return *slots - old;
+}
 
 // FUNCTION: CARMA2_HW 0x004dc240
 // FUNCTION: CARMA2_SW 0x004d8740
@@ -1039,7 +1050,69 @@ int C2_HOOK_FASTCALL GotTimeOrPower(tPowerup* pPowerup, tCar_spec* pCar) {
     return pPowerup - gPowerup_array;
 }
 
-// GainAPOPotential
+// FUNCTION: CARMA2_HW 0x004dc4d0
+// FUNCTION: CARMA2_SW 0x004d89d0
+// FUNCTION: CARMA2_CHEAT 0x004e2090
+int C2_HOOK_FASTCALL GainAPOPotential(tPowerup* pPowerup, tCar_spec* pCar) {
+    int powerup_index;
+    int old_armour;
+    int old_power;
+    int old_offensive;
+    int index;
+    int amount;
+    int original_index;
+    int direction;
+
+    powerup_index = pPowerup - gPowerup_array;
+    old_armour = pCar->power_up_slots[0];
+    old_power = pCar->power_up_slots[1];
+    old_offensive = pCar->power_up_slots[2];
+    if (pPowerup->integer_params[0] != 0 && pPowerup->integer_params[1] != 0 && pPowerup->integer_params[2] != 0) {
+        GainAPOPot2(pCar, 0, pPowerup->integer_params[0]);
+        GainAPOPot2(pCar, 1, pPowerup->integer_params[1]);
+        GainAPOPot2(pCar, 2, pPowerup->integer_params[2]);
+    } else {
+        if (pPowerup->integer_params[0] != 0) {
+            index = 0;
+            amount = pPowerup->integer_params[0];
+        } else if (pPowerup->integer_params[1] != 0) {
+            index = 1;
+            amount = pPowerup->integer_params[1];
+        } else {
+            index = 2;
+            amount = pPowerup->integer_params[2];
+        }
+        if (GainAPOPot2(pCar, index, amount) == 0) {
+            original_index = index;
+            direction = PercentageChance(50) ? 1 : -1;
+            index += direction;
+            if (index < 0) {
+                index = 2;
+            } else if (index > 2) {
+                index = 0;
+            }
+            if (GainAPOPot2(pCar, index, amount) == 0) {
+                index += direction;
+                if (index < 0) {
+                    index = 2;
+                } else if (index > 2) {
+                    index = 0;
+                }
+                GainAPOPot2(pCar, index, amount);
+            }
+            powerup_index += index - original_index;
+        }
+    }
+    if (old_armour == pCar->power_up_slots[0] && old_power == pCar->power_up_slots[1] && old_offensive == pCar->power_up_slots[2]) {
+        if (gNet_mode != eNet_mode_none) {
+            EarnCredits(gPotential_substitution_value_APO.initial_network[gCurrent_net_game->type]);
+        } else {
+            EarnCredits(gPotential_substitution_value_APO.initial[gProgram_state.skill_level]);
+        }
+        return -1;
+    }
+    return powerup_index;
+}
 
 // FUNCTION: CARMA2_HW 0x004dc720
 // FUNCTION: CARMA2_SW 0x004d8c20

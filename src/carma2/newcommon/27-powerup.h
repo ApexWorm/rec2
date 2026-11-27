@@ -170,7 +170,7 @@ extern int C2_HOOK_FASTCALL GotCredits(tPowerup* pPowerup, tCar_spec* pCar);
 
 extern int C2_HOOK_FASTCALL GainAPO2(tCar_spec* pCar, int pIndex, int pAmount);
 
-// GainAPOPot2
+extern int C2_HOOK_FASTCALL GainAPOPot2(tCar_spec* pCar, int pIndex, int pAmount);
 
 extern int C2_HOOK_FASTCALL GainAPO(tPowerup* pPowerup, tCar_spec* pCar);
 
