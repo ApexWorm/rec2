@@ -185,6 +185,11 @@ int gCount_queued_smashes = 0;
 // GLOBAL: CARMA2_CHEAT 0x006afe0c
 int gINT_006a8294 = 0;
 
+// GLOBAL: CARMA2_HW 0x006a4698
+// GLOBAL: CARMA2_SW 0x0069e6f8
+// GLOBAL: CARMA2_CHEAT 0x006ac210
+tQueued_smash gQueued_smashes[20];
+
 // GLOBAL: CARMA2_HW 0x006abee8
 // GLOBAL: CARMA2_SW 0x006a5438
 // GLOBAL: CARMA2_CHEAT 0x006b3578
@@ -791,9 +796,25 @@ void C2_HOOK_FASTCALL FlushSmashQueue(int pFlush_powerups) {
 #pragma auto_inline(on)
 #endif
 
-// QueueSmashIfNecessary3
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
 
-// QueueSmashIfNecessary2
+// STUB: CARMA2_HW 0x004ee290
+// STUB: CARMA2_SW 0x004e9f60
+// STUB: CARMA2_CHEAT 0x004f3f30
+int C2_HOOK_FASTCALL QueueSmashIfNecessary3(tCar_spec* pCar, tPhysics_object* pObject, br_vector3* pPosition, br_vector3* pNormal, br_actor* pActor, int pArg6, tCar_crush_smashable_part* pSmashable, float pMagnitude, int pArg9, int pArg10) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
+
+inline void C2_HOOK_FASTCALL QueueSmashIfNecessary2(tCar_spec* pCar, tPhysics_object* pObject, br_vector3* pPosition, br_vector3* pNormal, br_actor* pActor, int pArg6, tCar_crush_smashable_part* pSmashable, float pMagnitude, int pArg9, int pArg10) {
+    gINT_006a3334 = 0;
+    QueueSmashIfNecessary3(pCar, pObject, pPosition, pNormal, pActor, pArg6, pSmashable, pMagnitude, pArg9, pArg10);
+}
 
 // AllocateSmashLevels
 
@@ -2404,9 +2425,36 @@ intptr_t C2_HOOK_CDECL RepairModels(br_actor* pActor, void* pUser) {
     return 0;
 }
 
-// SmashEverythingCB
+// FUNCTION: CARMA2_HW 0x004f5a70
+// FUNCTION: CARMA2_SW 0x004f16d0
+// FUNCTION: CARMA2_CHEAT 0x004fb710
+intptr_t C2_HOOK_CDECL SmashEverythingCB(br_actor* pActor, void* pContext) {
+    tUser_crush_data* user_crush;
+    tCar_crush_buffer_entry* crush_data;
+    tCar_spec* car;
+    int i;
 
-// SmashEverything
+    user_crush = pActor->user;
+    if (user_crush == NULL) {
+        return 0;
+    }
+    crush_data = user_crush->crush_data;
+    if (crush_data == NULL) {
+        return 0;
+    }
+    for (i = 0; i < crush_data->count_smashables; i++) {
+        car = pContext;
+        QueueSmashIfNecessary2(car, car->collision_info, &car->pos, NULL, pActor, 0, &crush_data->smashables[i], 1000.0f, 0, 0);
+    }
+    return 0;
+}
+
+// FUNCTION: CARMA2_HW 0x004f5a60
+// FUNCTION: CARMA2_SW 0x004f16c0
+// FUNCTION: CARMA2_CHEAT 0x004fb700
+void C2_HOOK_FASTCALL SmashEverything(tCar_spec* pCar) {
+    DRActorEnumRecurse(pCar->car_master_actor, SmashEverythingCB, pCar);
+}
 
 // FUNCTION: CARMA2_HW 0x004f5ae0
 // FUNCTION: CARMA2_SW 0x004f1740
