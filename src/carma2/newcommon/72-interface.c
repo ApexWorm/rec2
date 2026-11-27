@@ -3319,7 +3319,9 @@ int C2_HOOK_FASTCALL FRONTEND_Main(tFrontendMenuType pFrontend_type) {
         if (gCurrent_frontend_spec->unknownLastInt == 1 && gCurrent_frontend_spec != &gFrontend_START_GAME) {
             FRONTEND_DestroyMenu(gCurrent_frontend_spec);
             strcpy(gFrontend_START_GAME.backdrop_name, gCurrent_frontend_spec->backdrop_name);
+#ifdef REC2_HW
             Morph_Initialise(gCurrent_frontend_spec, &gFrontend_START_GAME);
+#endif
             gCurrent_frontend_spec = &gFrontend_START_GAME;
             FRONTEND_CreateMenu(&gFrontend_START_GAME);
         }
