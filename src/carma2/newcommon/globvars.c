@@ -483,6 +483,7 @@ tNet_game_details* gCurrent_net_game;
 int gPratcam_on = 1;
 
 // GLOBAL: CARMA2_HW 0x006aaa30
+// GLOBAL: CARMA2_SW 0x006a4480
 // GLOBAL: CARMA2_CHEAT 0x006b25a8
 int gCockpit_on;
 
@@ -542,6 +543,8 @@ int gHost_abandon_game;
 int gRecover_car;
 
 // GLOBAL: CARMA2_HW 0x0068b874
+// GLOBAL: CARMA2_SW 0x00685dd4
+// GLOBAL: CARMA2_CHEAT 0x0069311c
 int gDisallow_abandon_race;
 //int gPipe_reg_snap_before_new_game;
 //int gPipe_reg_snap_before_our_car;

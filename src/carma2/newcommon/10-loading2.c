@@ -1046,6 +1046,7 @@ intptr_t C2_HOOK_CDECL LinkCarActorsToGroovidelicsCB(br_actor* pActor, void* pDa
 
 // STUB: CARMA2_HW 0x00488f70
 // STUB: CARMA2_SW 0x00486190
+// STUB: CARMA2_CHEAT 0x00489350
 void C2_HOOK_FASTCALL LoadCar(const char* pCar_name, tDriver pDriver, tCar_spec* pCar_spec, int pOwner, const char* pDriver_name, tBrender_storage* pStorage_space) {
     NOT_IMPLEMENTED();
 }
