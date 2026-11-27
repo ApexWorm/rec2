@@ -43,12 +43,18 @@ int gHeight;
 // GLOBAL: CARMA2_CHEAT 0x0070c700
 int gX_offset;
 
+// GLOBAL: CARMA2_HW 0x006baa28
+// GLOBAL: CARMA2_SW 0x006b1704
+// GLOBAL: CARMA2_CHEAT 0x006c20c8
+int gRecording_mouse_disabled;
+
 // GLOBAL: CARMA2_HW 0x006baa2c
 // GLOBAL: CARMA2_SW 0x006b1708
 // GLOBAL: CARMA2_CHEAT 0x006c20cc
 int gY_offset;
 
 // GLOBAL: CARMA2_HW 0x0068be30
+// GLOBAL: CARMA2_SW 0x00685e74
 // GLOBAL: CARMA2_CHEAT 0x006936d0
 int gBrZb_initialized;
 
@@ -632,23 +638,30 @@ void C2_HOOK_FASTCALL RenderAFrame(int pDepth_mask_on) {
 // FUNCTION: CARMA2_CHEAT 0x004eb780
 void C2_HOOK_FASTCALL StartRenderingHeadups(void) {
     CleanPolyFontDanglers();
+#ifdef REC2_HW
     gHud_actor_storage_size = 0;
     gRender_poly_text = 0;
+#endif
 }
 
 // FUNCTION: CARMA2_HW 0x004e5ad0
+// FUNCTION: CARMA2_SW 0x004e1c70
 // FUNCTION: CARMA2_CHEAT 0x004eb7e0
 void C2_HOOK_FASTCALL RenderThisHeadup(br_actor* pActor) {
+#ifdef REC2_HW
     if (gHud_actor_storage_size >= (int)REC2_ASIZE(gHud_actor_storage)) {
         BrFailure("Not enough HUD actor storage");
     }
     gHud_actor_storage[gHud_actor_storage_size] = pActor;
     gHud_actor_storage_size += 1;
+#endif
 }
 
 // FUNCTION: CARMA2_HW 0x004e5b00
+// FUNCTION: CARMA2_SW 0x004e1c80
 // FUNCTION: CARMA2_CHEAT 0x004eb810
 void C2_HOOK_FASTCALL StopRenderingHeadups(void) {
+#ifdef REC2_HW
     int original_origin_x;
     int original_origin_y;
     int original_base_x;
@@ -690,6 +703,7 @@ void C2_HOOK_FASTCALL StopRenderingHeadups(void) {
     gHud_actor_storage_size = 0;
     CleanPolyFontDanglers();
     gRender_poly_text = 1;
+#endif
 }
 
 // FUNCTION: CARMA2_HW 0x004e5c70

@@ -264,8 +264,8 @@ typedef struct {
 typedef struct {
     tU32 start;
     tU32 period;
-    undefined field_0x8;
-    tU8 count_frames;
+    tS8 field_0x8;
+    tS8 count_frames;
     tU8 finished;
     undefined field_0xb;
     br_actor* collision_actor;
@@ -590,7 +590,7 @@ typedef struct {
         };
     };
     int field_0x40;
-} tPipe_car_chunk;
+} tPipe_chunk_car;
 
 typedef struct {
     undefined4 field_0x0;
@@ -754,7 +754,7 @@ typedef struct {
 typedef enum {
     ePipe_chunk_frame_finish = 0,
     ePipe_chunk_ped_incident = 1,
-    ePipe_chunk_single_sound = 2,
+    ePipe_chunk_sound = 2,
     ePipe_chunk_car = 5,
     ePipe_chunk_graphical_wheel_stuff = 6,
     ePipe_chunk_damage = 7,
@@ -873,6 +873,7 @@ typedef struct tPipe_chunk {
     union {
         tPipe_chunk_car_incident car_incident;
         tPipe_chunk_frame_boundary frame_boundary;
+        tPipe_chunk_car car;
         tPipe_chunk_non_car non_car;
         tPipe_ped_physics_data ped_physics;
         tPipe_single_ped_pos ped_pos;
@@ -4618,8 +4619,8 @@ typedef struct tPhysics_object {
     br_bounds3 field_0xf4;
     br_bounds3 field_0x10c;
     br_bounds3 field_0x124;
-    float radius_squared;
     float radius;
+    float radius_squared;
     br_matrix34 field_0x144;
     tU16 box_face_start;
     tU16 box_face_end;
@@ -5436,9 +5437,9 @@ typedef struct tDrone_spec {
 } tDrone_spec;
 
 typedef struct {
-    void *field_0x0;
+    void* field_0x0;
     tU32 field_0x4;
-    undefined4 field_0x8;
+    void* field_0x8;
 } tRepair_animation;
 
 typedef enum {
@@ -5875,6 +5876,7 @@ enum {
 enum {
     eInterfaceString_car_colon = 14,
     eInterfaceString_abort_race = 21,
+    eInterfaceString_mission = 78,
     eInterfaceString_closed = 179,
     eInterfaceString_target_none = 232,
     eInterfaceString_target_kills = 233,
