@@ -1348,11 +1348,78 @@ int C2_HOOK_FASTCALL PrintNetOptions(FILE* pF, int pIndex) {
     return 0;
 }
 
-// STUB: CARMA2_HW 0x0048d190
-// STUB: CARMA2_SW 0x0048a3d0
-// STUB: CARMA2_CHEAT 0x0048d570
+// FUNCTION: CARMA2_HW 0x0048d190
+// FUNCTION: CARMA2_SW 0x0048a3d0
+// FUNCTION: CARMA2_CHEAT 0x0048d570
 int C2_HOOK_FASTCALL SaveOptions(void) {
-    NOT_IMPLEMENTED();
+    tPath_name the_path;
+    FILE* f;
+
+    PathCat(the_path, gApplication_path, "OPTIONS.TXT");
+    PDFileUnlock(the_path);
+    f = DRfopen(the_path, "wt");
+    if (f == NULL) {
+        return 0;
+    }
+    if (fprintf(f, "YonFactor %f\n", GetYonFactor()) < 0
+        || fprintf(f, "SkyTextureOn %d\n", GetSkyTextureOn()) < 0
+        || fprintf(f, "CarTexturingLevel %d\n", GetCarTexturingLevel()) < 0
+        || fprintf(f, "RoadTexturingLevel %d\n", GetRoadTexturingLevel()) < 0
+        || fprintf(f, "WallTexturingLevel %d\n", GetWallTexturingLevel()) < 0
+        || fprintf(f, "ShadowLevel %d\n", GetShadowLevel()) < 0
+        || fprintf(f, "DepthCueingOn %d\n", GetDepthCueingOn()) < 0
+        || fprintf(f, "Yon %f\n", GetYon()) < 0
+        || fprintf(f, "CarSimplificationLevel %d\n", GetCarSimplificationLevel()) < 0
+        || fprintf(f, "AccessoryRendering %d\n", GetAccessoryRendering()) < 0
+        || fprintf(f, "SmokeOn %d\n", GetSmokeOn()) < 0
+        || fprintf(f, "SoundDetailLevel %d\n", GetSoundDetailLevel()) < 0
+        || fprintf(f, "ScreenSize %d\n", GetScreenSize()) < 0
+        || fprintf(f, "MapRenderX %f\n", gMap_render_x) < 0
+        || fprintf(f, "MapRenderY %f\n", gMap_render_y) < 0
+        || fprintf(f, "MapRenderWidth %f\n", gMap_render_width) < 0
+        || fprintf(f, "MapRenderHeight %f\n", gMap_render_height) < 0
+        || fprintf(f, "MapMode %d\n", 1) < 0
+        || fprintf(f, "PlayerName 0\n%s\n", gProgram_state.player_name[0] != '\0' ? gProgram_state.player_name : "MAX DAMAGE") < 0
+        || fprintf(f, "EVolume %d\n", gProgram_state.effects_volume) < 0
+        || fprintf(f, "MVolume %d\n", gProgram_state.music_volume) < 0
+        || fprintf(f, "KeyMapIndex %d\n", gKey_map_index) < 0
+        || fprintf(f, "MapTrans %d\n", gMap_trans) < 0
+        || fprintf(f, "HeadupMapX %d\n", gHeadup_map_x) < 0
+        || fprintf(f, "HeadupMapY %d\n", gHeadup_map_y) < 0
+        || fprintf(f, "HeadupMapW %d\n", gHeadup_map_w) < 0
+        || fprintf(f, "HeadupMapH %d\n", gHeadup_map_h) < 0
+        || fprintf(f, "CameraType %d\n", gCamera_type) < 0
+        || fprintf(f, "ARCameraType %d\n", gAR_camera_type) < 0
+        || fprintf(f, "GoreLevel %d\n", GetHowMuchBloodAndSnotToSmearAbout()) < 0
+        || fprintf(f, "AnimalsOn %d\n", AreWeGoingToOutrageAnimalLoversAroundTheGlobe()) < 0
+        || fprintf(f, "FlameThrowerOn %d\n", IsItOkayToFireHorribleBallsOfNastyNapalmDeathAtPerfectlyInnocentPassersByAndByInnocentIDoMeanInTheBiblicalSense()) < 0
+        || fprintf(f, "MinesOn %d\n", IsItReallyOKThatWeDontMakeAnyEffortToProtectAnySadFuckersOutThereThatDontWishToSeeInnocentPeopleBlownToBitsByHighExplosiveMinesAndShells()) < 0
+        || fprintf(f, "DronesOn %d\n", OtherPerambulatoryInstasificationIsEnablificated()) < 0
+        || fprintf(f, "MiniMapVisible %i\n", gMini_map_visible) < 0
+        || fprintf(f, "SkillLevel %d\n", gProgram_state.skill_level) < 0
+        || fprintf(f, "AmbientSound %i\n", gAmbient_sound) < 0
+        || fprintf(f, "AutoLoad %d\n", gAuto_load) < 0
+        || fprintf(f, "RussellsFannies %d\n", gRussels_fannies) < 0
+        || fprintf(f, "QuickTimeQuality 0\n%s\n", gQuick_time_quality) < 0
+        || fprintf(f, "QuickTimeCompressor 0\n%s\n", gQuick_time_compressor) < 0
+        || fprintf(f, "QuickTimeBanner %d\n%s\n", gQuick_time_banner_number, gQuick_time_banner_texture_name) < 0
+        || fprintf(f, "QuickTimeTempPath 0\n%s\n", gQuick_time_temp_path) < 0
+        || fprintf(f, "QuickTimeMoviePathStub 0\n%s\n", gQuick_time_movie_path_stub) < 0
+        || fprintf(f, "NETGAMETYPE %d\n", gNet_last_game_type) < 0
+        || PrintNetOptions(f, 0) < 0
+        || PrintNetOptions(f, 1) < 0
+        || PrintNetOptions(f, 2) < 0
+        || PrintNetOptions(f, 3) < 0
+        || PrintNetOptions(f, 4) < 0
+        || PrintNetOptions(f, 5) < 0
+        || PrintNetOptions(f, 6) < 0
+        || PrintNetOptions(f, 7) < 0
+        || PrintNetOptions(f, 8) < 0
+        || fprintf(f, "HeadupDetailLevel %d\n", gHeadup_detail_level) < 0) {
+        return 0;
+    }
+    PFfclose(f);
+    return 1;
 }
 
 // FUNCTION: CARMA2_HW 0x0048d8f0
