@@ -555,6 +555,8 @@ void C2_HOOK_FASTCALL MungeRepulseRays(tU32 pTime) {
     tU32 delta_time;
     tRepulse_link* link;
     br_model* model;
+    br_vertex* v1;
+    br_vertex* v2;
     br_vector3 delta;
     br_vector3 delta_unit;
     br_vector3 dir;
@@ -567,8 +569,8 @@ void C2_HOOK_FASTCALL MungeRepulseRays(tU32 pTime) {
     float percentage;
 
     ARStartPipingSession(ePipe_chunk_repulse_ray);
-    for (i = 0; i < (int)REC2_ASIZE(gRepulse_links); i++) {
-        link = &gRepulse_links[i];
+    link = gRepulse_links;
+    for (i = 0; i < (int)REC2_ASIZE(gRepulse_links); i++, link++) {
         if (link->time == 0) {
             continue;
         }
@@ -590,7 +592,7 @@ void C2_HOOK_FASTCALL MungeRepulseRays(tU32 pTime) {
         delta_unit.v[2] = delta.v[2] / (float)(model->nvertices / 2 - 1);
         BrVector3Normalise(&dir, &delta);
         BrVector3Cross(&delta_orth, &delta, &y_unit_vector);
-        BrVector3Copy(&p, link->pos_origin);
+        p = *link->pos_origin;
         BrVector3Normalise(&orth_dirs[0], &delta_orth);
         for (j = 1; j < 5; j++) {
             BrMatrix34Rotate(&mat, (j * 0x10000) / 5, &dir);
@@ -600,10 +602,12 @@ void C2_HOOK_FASTCALL MungeRepulseRays(tU32 pTime) {
             BrVector3Scale(&orth_pieces1[j], &orth_dirs[j], link->field_0x18);
             BrVector3Scale(&orth_pieces2[j], &orth_dirs[j], link->field_0x1c);
         }
-        for (j = 0; j < model->nvertices / 2; j++) {
+        v1 = model->vertices;
+        v2 = &model->vertices[model->nvertices / 2];
+        for (j = 0; j < model->nvertices / 2; j++, v1++, v2++) {
             BrVector3Accumulate(&p, &delta_unit);
-            BrVector3Add(&model->vertices[j].p, &p, &orth_pieces1[j % 5]);
-            BrVector3Add(&model->vertices[j + model->nvertices / 2].p, &p, &orth_pieces2[j % 5]);
+            BrVector3Add(&v1->p, &p, &orth_pieces1[j % 5]);
+            BrVector3Add(&v2->p, &p, &orth_pieces2[j % 5]);
         }
         percentage = (float)delta_time / 700.f;
         if (percentage > .9) {
