@@ -540,11 +540,11 @@ extern void C2_HOOK_FASTCALL SetObjectV(tPhysics_object* pObject, const br_vecto
 
 // SetObjectOmega
 
-extern void C2_HOOK_FASTCALL MakePartPhysicallyActive(tPhysics_object* pObject, const br_vector3* pV);
+// MakePartPhysicallyActive
 
-extern void C2_HOOK_FASTCALL TurnPhysicsOn(tPed_character_instance* pCharacter);
+// TurnPhysicsOn
 
-extern int C2_HOOK_FASTCALL MakeCharacterPhysicworthy(tPed_character_instance* pCharacter);
+// MakeCharacterPhysicworthy
 
 extern void C2_HOOK_FASTCALL RecalculateOrientationOfRoot(tPed_character_instance* pCharacter);
 
