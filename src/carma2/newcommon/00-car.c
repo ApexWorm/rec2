@@ -22,6 +22,7 @@
 #include "27-powerup.h"
 #include "29-raycast.h"
 #include "30-opponent.h"
+#include "32-spark.h"
 #include "34-finteray.h"
 #include "37-brucetrk.h"
 #include "41-utility.h"
@@ -45,6 +46,11 @@
 
 #include <limits.h>
 #include <math.h>
+
+// GLOBAL: CARMA2_HW 0x0079ef2c
+// GLOBAL: CARMA2_SW 0x007954cc
+// GLOBAL: CARMA2_CHEAT 0x007a65cc
+int gNum_cars_and_non_cars;
 
 // GLOBAL: CARMA2_HW 0x0079eda0
 // GLOBAL: CARMA2_SW 0x00795340
@@ -708,7 +714,60 @@ void C2_HOOK_FASTCALL CalcGraphicalWheelStuff(tCar_spec* pCar) {
     PipeSingleGraphicalWheelStuff(pCar);
 }
 
-// FinishCars
+// FUNCTION: CARMA2_HW 0x00416500
+// FUNCTION: CARMA2_SW 0x00416530
+// FUNCTION: CARMA2_CHEAT 0x00416760
+void C2_HOOK_FASTCALL FinishCars(tU32 pLast_frame_time, tU32 pTime) {
+    tCar_spec* car;
+    br_vector3 minus_k;
+    br_vector3 tv;
+    int i;
+    int wheel;
+    float old_speed;
+    float ts;
+
+    if (gCar_flying) {
+        BrMatrix34Copy(&gCar_to_view->collision_info->actor->t.t.mat, &gCar_to_view->collision_info->transform_matrix);
+    }
+    for (i = 0; i < gNum_cars_and_non_cars; i++) {
+        car = gActive_car_list[i];
+        BrMatrix34ApplyP(&car->pos, &car->collision_info->cmpos, &car->car_master_actor->t.t.mat);
+        old_speed = car->speed;
+        car->speed = BR_LENGTH2(car->collision_info->v.v[0], car->collision_info->v.v[2]) * 0.001f;
+        BrVector3Negate(&minus_k, (br_vector3*)car->car_master_actor->t.t.mat.m[2]);
+        if (old_speed < 0.0001f && car->speed > 0.0001f) {
+            car->speed = 0.0001f;
+        }
+        if (car->speed > 0.0001f) {
+            BrVector3Normalise(&car->direction, &car->collision_info->v);
+        } else {
+            if (BrVector3Dot(&car->direction, &minus_k) >= 0.0f) {
+                BrVector3SetFloat(&minus_k, 0.0f, 0.0f, -1.0f);
+            } else {
+                BrVector3SetFloat(&minus_k, 0.0f, 0.0f, 1.0f);
+            }
+            BrMatrix34ApplyV(&car->direction, &minus_k, &car->car_master_actor->t.t.mat);
+        }
+        if (car != NULL && car->driver > eDriver_5) {
+            car->speedo_speed = BrVector3Dot(&minus_k, &car->collision_info->v) * 0.001f;
+            CalcGraphicalWheelStuff(car);
+            for (wheel = 0; wheel < 4; wheel++) {
+                if (car->oldd[wheel] < car->susp_height[wheel >> 1]
+                        && gCurrent_race.material_modifiers[car->material_index[wheel]].smoke_type >= 2
+                        && !car->collision_info->disable_move_rotate) {
+                    GenerateContinuousSmoke(car, wheel, pTime);
+                }
+            }
+        }
+    }
+    if (gPHIL_last_physics_tick > pLast_frame_time && gCar_to_view->speed > 0.0001f) {
+        ts = (float)(gPHIL_last_physics_tick - pLast_frame_time) * 0.025f;
+        BrVector3Sub(&tv, &gCar_to_view_original_v, &gCar_to_view->collision_info->v);
+        BrVector3Scale(&tv, &tv, ts);
+        BrVector3Accumulate(&tv, &gCar_to_view->collision_info->v);
+        BrVector3Normalise(&gCar_to_view->direction, &tv);
+    }
+}
 
 // GetNonCars
 

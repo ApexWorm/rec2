@@ -157,7 +157,7 @@ extern void C2_HOOK_FASTCALL RenderRecordedSmokeCircles(void);
 
 // ReplaySmoke
 
-// GenerateContinuousSmoke
+extern void C2_HOOK_FASTCALL GenerateContinuousSmoke(tCar_spec* pCar, int pWheel, tU32 pTime);
 
 // RenderSmoke
 
