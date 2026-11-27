@@ -224,12 +224,9 @@ br_error C2_HOOK_CDECL _M_br_buffer_stored_d3d_update(br_buffer_stored_d3d* self
             self->buffer.palette_pointer = pal->pixels;
             return 0;
         } else {
-            NOT_IMPLEMENTED();
-            /* Not implemented */
-#if 0
-            br_device_d3d* dev = (br_device_d3d*)self->buffer.base->dispatch->_device(self->buffer.base);
-            self->buffer.palette_pointer = &dev->clut[8];
-#endif
+            /* FIXME: the original passes &self->buffer as the object */
+            br_device_d3d* dev = (br_device_d3d*)((br_object*)&self->buffer)->dispatch->_device((br_object*)&self->buffer);
+            self->buffer.palette_pointer = dev->clut->entries;
         }
     }
     return 0;

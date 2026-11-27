@@ -1273,7 +1273,6 @@ int C2_HOOK_CDECL FUN_10004280(int count, int width, int height) {
         surface_desc.ddsCaps.dwCaps = DDSCAPS_SYSTEMMEMORY | DDSCAPS_TEXTURE;
         surface_desc.dwFlags = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH | DDSD_PIXELFORMAT;
         if (IDirectDraw_CreateSurface(gDirectDraw, &surface_desc, &temp_surface, NULL) != DD_OK) {
-            NOT_IMPLEMENTED(); /* This should succeed */
             return -1;
         }
         if (IDirectDraw_QueryInterface(temp_surface, &IID_IDirect3DTexture2, (LPVOID)&temp_texture) != DD_OK) {
@@ -1802,10 +1801,64 @@ void C2_HOOK_CDECL DoD3DOperation(int operation) {
     }
 }
 
-// STUB: D3D 0x10008570
+// FUNCTION: D3D 0x10008570
 void C2_HOOK_CDECL FUN_10008570(void* dst, br_uint_32 dst_width, br_uint_32 dst_height, br_uint_32 dst_stride, void* src, br_uint_32 src_width, br_uint_32 src_height, br_uint_32 src_stride) {
-    NOT_IMPLEMENTED();
+    br_uint_32 x_step;
+    br_uint_32 y_step;
+    br_uint_32 x_frac;
+    br_uint_32 y_frac;
+    br_uint_32 x;
+    br_uint_32 y;
+    br_uint_16* d;
+    br_uint_16* d2;
+    br_uint_16* s;
+    br_uint_16* dst_row;
+    br_uint_16* src_row;
+
+    dst_row = dst;
+    src_row = src;
+    x_step = (src_width << 16) / dst_width;
+    src_stride /= 2;
+    dst_stride /= 2;
+    y_step = (src_height << 16) / dst_height;
+    if (x_step == 0x8000 && y_step == 0x8000) {
+        dst_width /= 2;
+        dst_height /= 2;
+        for (y = dst_height; y != 0; y--) {
+            s = src_row;
+            d = dst_row;
+            d2 = dst_row + dst_stride;
+            for (x = 0; x < dst_width; x++) {
+                br_uint_16 p = *s++;
+                *d++ = p;
+                *d2++ = p;
+                *d++ = p;
+                *d2++ = p;
+            }
+            dst_row += 2 * dst_stride;
+            src_row += src_stride;
+        }
+    } else {
+        y_frac = 0;
+        for (y = 0; y < dst_height; y++) {
+            s = src_row;
+            d = dst_row;
+            x_frac = 0;
+            for (x = 0; x < dst_width; x++) {
+                *d = *s;
+                x_frac += x_step;
+                d += 1;
+                s += x_frac >> 16;
+                x_frac &= 0xffff;
+            }
+            dst_row += dst_stride;
+            y_frac += y_step;
+            src_row += (y_frac >> 16) * src_stride;
+            y_frac &= 0xffff;
+        }
+    }
 }
+
 
 // FUNCTION: D3D 0x10002ba0
 int C2_HOOK_CDECL d3d_update_texture(int index, render_buffer_d3d* buffer, int arg3) {
