@@ -35,6 +35,7 @@
 #include "59-camera.h"
 #include "60-phil.h"
 #include "61-pedestrn-phys.h"
+#include "69-sound.h"
 #include "brender/brender.h"
 #include "globvars.h"
 #include "globvrkm.h"
@@ -57,6 +58,29 @@ int gNum_cars_and_non_cars;
 // GLOBAL: CARMA2_SW 0x00795340
 // GLOBAL: CARMA2_CHEAT 0x007a6440
 tNon_car_spec* gActive_non_car_list[99];
+
+// GLOBAL: CARMA2_HW 0x00676854
+int gStop_opponents_moving;
+
+// GLOBAL: CARMA2_HW 0x006793c0
+// GLOBAL: CARMA2_SW 0x00673b30
+// GLOBAL: CARMA2_CHEAT 0x00680c70
+int gSkid_tag[2];
+
+// GLOBAL: CARMA2_HW 0x006793c8
+// GLOBAL: CARMA2_SW 0x00673b38
+// GLOBAL: CARMA2_CHEAT 0x00680c78
+tCar_spec* gLast_car_to_skid[2];
+
+// GLOBAL: CARMA2_HW 0x0067935c
+// GLOBAL: CARMA2_SW 0x00673acc
+// GLOBAL: CARMA2_CHEAT 0x00680c0c
+int gLast_crunch_vol;
+
+// GLOBAL: CARMA2_HW 0x0058f680
+// GLOBAL: CARMA2_SW 0x0058a680
+// GLOBAL: CARMA2_CHEAT 0x00594710
+int gMetal_crunch_sound_id[5] = { 5000, 5001, 5002, 5003, 5004 };
 
 // GLOBAL: CARMA2_HW 0x0067939c
 // GLOBAL: CARMA2_SW 0x00673b0c
@@ -1303,11 +1327,81 @@ void C2_HOOK_FASTCALL NonCarCalcForce(tNon_car_spec* pNon_car, br_scalar pDt) {
 
 // ScrapeNoise
 
-// SkidNoise
+// FUNCTION: CARMA2_HW 0x0041bed0
+// FUNCTION: CARMA2_SW 0x0041bf00
+// FUNCTION: CARMA2_CHEAT 0x0041c130
+void C2_HOOK_FASTCALL SkidNoise(tCar_spec* pC, int pWheel_num, br_scalar pV, int pMaterial) {
+    br_vector3 pos;
+    br_vector3 world_pos;
+    br_vector3 wv;
+    br_vector3 wvw;
+    br_scalar ts;
+    br_vector3 tv;
+    // GLOBAL: CARMA2_HW 0x00679408
+    // GLOBAL: CARMA2_SW 0x00673b78
+    // GLOBAL: CARMA2_CHEAT 0x00680cb8
+    static int last_skid_vol[2];
+    int i;
+
+    i = IRandomBetween(0, 1);
+    if (pV < 5.0f) {
+        return;
+    }
+    if (gCurrent_race.material_modifiers[pMaterial].tyre_noise_index == -1) {
+        return;
+    }
+    if (IRandomBetween(0, 4) != 0) {
+        return;
+    }
+    last_skid_vol[i] = (int)(pV * 10.0f);
+    pos.v[0] = pC->wpos[pWheel_num].v[0];
+    pos.v[1] = pC->wpos[pWheel_num].v[1] - pC->oldd[pWheel_num];
+    pos.v[2] = pC->wpos[pWheel_num].v[2];
+    BrMatrix34ApplyP(&world_pos, &pos, &pC->car_master_actor->t.t.mat);
+    BrVector3Scale(&world_pos, &world_pos, 1.0f / WORLD_SCALE);
+    if (!DRS3SoundStillPlaying(gSkid_tag[i]) || (pC != NULL && pC->driver == eDriver_local_human && gLast_car_to_skid[i] != pC)) {
+        gSkid_tag[i] = DRS3StartSound3D(gCar_outlet, IRandomBetween(0, 4) + 9000, &world_pos, &pC->vel, 1, last_skid_vol[i], IRandomBetween(0xc000, 0x14000), 0x10000);
+        gLast_car_to_skid[i] = pC;
+    }
+    if (gCurrent_race.material_modifiers[pMaterial].smoke_type == 1) {
+        BrVector3Cross(&wv, &pC->collision_info->omega, &pos);
+        BrVector3Scale(&tv, &pC->collision_info->velocity_car_space, WORLD_SCALE);
+        BrVector3Accumulate(&wv, &tv);
+        ts = -BrVector3Dot(&wv, &pC->road_normal);
+        BrVector3Scale(&wvw, &pC->road_normal, ts);
+        BrVector3Accumulate(&wv, &wvw);
+        BrMatrix34ApplyV(&wvw, &wv, &pC->car_master_actor->t.t.mat);
+        CreatePuffOfSmoke(&world_pos, &wvw, pV * 0.04f, 1.0f, 4);
+    }
+}
 
 // StopSkid
 
-// CrashNoise
+// FUNCTION: CARMA2_HW 0x0041ddc0
+// FUNCTION: CARMA2_SW 0x0041ddf0
+// FUNCTION: CARMA2_CHEAT 0x0041e020
+void C2_HOOK_FASTCALL CrashNoise(br_vector3* pForce, br_vector3* pPosition, int pMaterial) {
+    // GLOBAL: CARMA2_HW 0x00679410
+    // GLOBAL: CARMA2_SW 0x00673b80
+    // GLOBAL: CARMA2_CHEAT 0x00680cc0
+    static int crunch_tag;
+    int vol;
+    br_vector3 velocity;
+
+    vol = (int)(60.0 * BrVector3Length(pForce));
+    if (gCurrent_race.material_modifiers[pMaterial].crash_noise_index != -1) {
+        if (vol > 255) {
+            vol = 255;
+        }
+        if ((crunch_tag == 0 || !DRS3SoundStillPlaying(crunch_tag)) && vol > 30) {
+            gLast_crunch_vol = vol;
+            BrVector3Set(&velocity, 0.0f, 0.0f, 0.0f);
+            crunch_tag = DRS3StartSound3D(gCar_outlet,
+                gMetal_crunch_sound_id[IRandomBetween(0, REC2_ASIZE(gMetal_crunch_sound_id) - 1)],
+                pPosition, &velocity, 1, vol, IRandomBetween(0xc000, 0x14000), 0x10000);
+        }
+    }
+}
 
 // CrushAndDamageCar
 
