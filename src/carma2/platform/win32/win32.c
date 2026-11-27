@@ -1473,21 +1473,31 @@ void C2_HOOK_FASTCALL PDGetMousePosition(int *pX, int *pY) {
     }
 #endif
     GetCursorPos(&pos);
-    ScreenToClient(gHWnd, &pos);
+#ifdef REC2_HW
+#ifdef REC2_V101A
+    if (!gOld_mouse || strcmp(gRenderer, "D3D") == 0) {
+#else
+    if (!gScale_mouse || strcmp(gRenderer, "D3D") == 0) {
+#endif
+        ScreenToClient(gHWnd, &pos);
+        *pX = pos.x;
+        *pY = pos.y;
+    } else {
+        *pX = (int) ((double) pos.x / (gScreenWidth / 640.));
+        *pY = (int) ((double) pos.y / (gScreenHeight / 480.));
+    }
+    gPD_mouse_position.x = *pX;
+    gPD_mouse_position.y = *pY;
+#endif
 #ifdef REC2_SW
+    ScreenToClient(gHWnd, &pos);
     if (gINT_006a6c3c != 0) {
         *pX = pos.x / 2;
         *pY = (pos.y -40) / 2;
         return;
     }
-#endif
     *pX = pos.x;
     *pY = pos.y;
-#ifdef REC2_HW
-    gPD_mouse_position.x = *pX;
-    gPD_mouse_position.y = *pY;
-#endif
-#ifdef REC2_SW
     if (gGraf_spec_index == 0) {
         *pX *= 2;
         *pY = (int)((float)*pY + (float)*pY);
