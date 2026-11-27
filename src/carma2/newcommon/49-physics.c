@@ -1804,6 +1804,8 @@ inline void C2_HOOK_FASTCALL ResetMan2(void) {
 }
 
 // FUNCTION: CARMA2_HW 0x004b5aa0
+// FUNCTION: CARMA2_SW 0x004b21c0
+// FUNCTION: CARMA2_CHEAT 0x004bb370
 void C2_HOOK_FASTCALL SetUpTestObjects(void) {
 
 }
