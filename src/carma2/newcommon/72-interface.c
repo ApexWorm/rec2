@@ -3982,7 +3982,6 @@ int C2_HOOK_FASTCALL Controls_Outfunc(tFrontend_spec* pFrontend) {
 int C2_HOOK_FASTCALL Controls_SlotActivated(tFrontend_spec* pFrontend) {
     int key_array_index;
     float dy;
-    br_model* model;
     int match;
     int key;
     int i;
@@ -3994,10 +3993,9 @@ int C2_HOOK_FASTCALL Controls_SlotActivated(tFrontend_spec* pFrontend) {
     WaitForNoKeys();
     pFrontend->items[0].visible = 1;
     dy = (float)(17 * (key_array_index - gControls_scroller.field_0x8));
-    model = gFrontend_brender_items[0].model;
-    model->vertices[0].p.v[1] = model->vertices[3].p.v[1] = -(pFrontend->items[0].y + dy);
-    model->vertices[1].p.v[1] = model->vertices[2].p.v[1] = -(pFrontend->items[0].y + dy + 20.f);
-    BrModelUpdate(model, BR_MODU_VERTEX_POSITIONS);
+    gFrontend_brender_items[0].model->vertices[0].p.v[1] = gFrontend_brender_items[0].model->vertices[3].p.v[1] = -(pFrontend->items[0].y + dy);
+    gFrontend_brender_items[0].model->vertices[1].p.v[1] = gFrontend_brender_items[0].model->vertices[2].p.v[1] = -(pFrontend->items[0].y + dy + 20.f);
+    BrModelUpdate(gFrontend_brender_items[0].model, BR_MODU_VERTEX_POSITIONS);
     match = -1;
     for (;;) {
         FRONTEND_Redraw();
