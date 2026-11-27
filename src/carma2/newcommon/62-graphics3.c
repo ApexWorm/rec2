@@ -560,7 +560,7 @@ void C2_HOOK_FASTCALL DrawMapSmallBlip(br_pixelmap* pScreen, tU32 pTime, const b
         pColour = 0;
     }
     BrMatrix34ApplyP(&map_pos, pPos, &gCurrent_race.map_transformation);
-    if (map_pos.v[0] >= 0.f && map_pos.v[0] < (float)pScreen->width
+    if (map_pos.v[0] >= 0.0f && map_pos.v[0] < (float)pScreen->width
             && map_pos.v[1] >= 0 && map_pos.v[1] < (float)pScreen->height) {
 #ifdef REC2_HW
         if (gMap_view == 2) {
@@ -854,7 +854,7 @@ inline void C2_HOOK_FASTCALL InitNearestCar(void) {
         gTarget_lock_car_2 = NULL;
     } else if (gPrevious_opponent_status == eOpponent_status_Wasted && gTarget_lock_car_1 != NULL) {
         if (PDGetTotalTime() - gTime_oppobar_target_wasted <= 2500) {
-            gFLOAT_0074ab90 = 0.f;
+            gFLOAT_0074ab90 = 0.0f;
         } else {
             gTarget_lock_car_2 = NULL;
             gTarget_lock_car_1 = NULL;
@@ -863,7 +863,7 @@ inline void C2_HOOK_FASTCALL InitNearestCar(void) {
             }
         }
     } else if (gTarget_lock_enabled) {
-        gFLOAT_0074ab90 = 0.f;
+        gFLOAT_0074ab90 = 0.0f;
     } else {
         gTarget_lock_car_2 = NULL;
     }
