@@ -741,7 +741,7 @@ inline float C2_HOOK_FASTCALL CalcBoundsRadius(const br_bounds3* pBounds) {
     float r;
     float v;
 
-    r = 0.f;
+    r = 0.0f;
     v = fabs(pBounds->min.v[0]);
     if (v > r) {
         r = v;
@@ -921,7 +921,7 @@ tPed_personality* C2_HOOK_FASTCALL ReadPersonality(const char* pName) {
     }
     personality->moves = BrMemAllocate(personality->form->count_moves * sizeof(tPed_personality_move), kBoner_mem_type_person_moves);
     for (i = 0; i < personality->form->count_moves; i++) {
-        personality->moves[i].scale_factor = 1.f;
+        personality->moves[i].scale_factor = 1.0f;
         personality->moves[i].grounding_mode = ePed_personality_floating;
     }
     g = BonerOpenDefaultMoves(default_moves_file);
