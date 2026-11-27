@@ -112,6 +112,11 @@ int gNet_score_targets[8];
 // GLOBAL: CARMA2_CHEAT 0x00752c2c
 int gDemo_race_rank_equivalent;
 
+// GLOBAL: CARMA2_HW 0x0074b584
+// GLOBAL: CARMA2_SW 0x00741c44
+// GLOBAL: CARMA2_CHEAT 0x00752c24
+tCar_spec* gCurrent_car_spec;
+
 // GLOBAL: CARMA2_HW 0x0074b4fc
 // GLOBAL: CARMA2_SW 0x00741bbc
 // GLOBAL: CARMA2_CHEAT 0x00752b9c
