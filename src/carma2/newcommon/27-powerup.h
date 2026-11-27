@@ -98,7 +98,7 @@ extern tPhysics_object* C2_HOOK_FASTCALL MungeShereObject(br_model* pModel, floa
 
 extern void C2_HOOK_FASTCALL ThisObjectHitAMineSoSpamItUpUsingThisPowerupsSettings(tPhysics_object* pObject, int pPowerup_index);
 
-// InitMineShit
+extern void C2_HOOK_FASTCALL InitMineShit(void);
 
 extern void C2_HOOK_FASTCALL InitPowerups(void);
 
