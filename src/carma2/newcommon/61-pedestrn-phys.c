@@ -1789,9 +1789,6 @@ void C2_HOOK_FASTCALL PedPreCollisionStuff(void) {
     }
 }
 
-extern void C2_HOOK_FASTCALL UpdateIfBackwardsAR(void);
-extern void C2_HOOK_FASTCALL ScaleBone(int pBone_index, br_vector3* pScale, int pArg3);
-
 inline void C2_HOOK_FASTCALL UpdateIfBackwardsAR(void) {
     int i;
     tPedestrian* ped;

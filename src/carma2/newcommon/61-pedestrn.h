@@ -608,7 +608,7 @@ extern float C2_HOOK_FASTCALL GetClearanceFromCharacterInstance(tPed_character_i
 
 // ScaleFormBone
 
-// ScaleBone
+extern void C2_HOOK_FASTCALL ScaleBone(int pBone_index, br_vector3* pScale, int pArg3);
 
 extern void C2_HOOK_FASTCALL MungeAllCharacterMaterials(material_cbfn* pCallback);
 
