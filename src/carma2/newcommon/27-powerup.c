@@ -599,7 +599,18 @@ void C2_HOOK_FASTCALL NewRepulseRay(tU32 pTime, tCar_spec* pCar, tCar_spec* pVic
     gRepulse_links[link_index].field_0x24 = pVictim_car;
 }
 
-// RemoveRepulsiveReferences
+// FUNCTION: CARMA2_HW 0x004da910
+// FUNCTION: CARMA2_SW 0x004d6de0
+// FUNCTION: CARMA2_CHEAT 0x004e04d0
+void C2_HOOK_FASTCALL RemoveRepulsiveReferences(tCar_spec* pCar) {
+    int i;
+
+    for (i = 0; i < (int)REC2_ASIZE(gRepulse_links); i++) {
+        if (gRepulse_links[i].time != 0 && (gRepulse_links[i].car == pCar || gRepulse_links[i].field_0x24 == pCar)) {
+            RemoveRepulseEffect(i);
+        }
+    }
+}
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
