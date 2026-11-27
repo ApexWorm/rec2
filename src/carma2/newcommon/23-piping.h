@@ -323,7 +323,7 @@ extern void C2_HOOK_FASTCALL ApplyShrapnel(tPipe_chunk** pChunk);
 
 extern void C2_HOOK_FASTCALL ApplyScreenWobble(tPipe_chunk** pChunk);
 
-// ApplyGrooveStop
+extern void C2_HOOK_FASTCALL ApplyGrooveStop(tPipe_chunk** pChunk);
 
 extern void C2_HOOK_FASTCALL ApplyNonCar(tPipe_chunk** pChunk);
 
@@ -347,7 +347,7 @@ extern void C2_HOOK_FASTCALL ApplyCar(tPipe_chunk** pChunk);
 
 extern void C2_HOOK_FASTCALL ApplyGWS(tPipe_chunk** pChunk);
 
-// ApplyDamage
+extern void C2_HOOK_FASTCALL ApplyDamage(tPipe_chunk** pChunk);
 
 extern void C2_HOOK_FASTCALL ApplySpecial(tPipe_chunk** pChunk);
 
@@ -451,7 +451,7 @@ extern void C2_HOOK_FASTCALL ApplyOppoRenderage(tPipe_chunk** pChunk);
 
 extern void C2_HOOK_FASTCALL UndoSmudge(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk);
 
-// UndoDamage
+extern void C2_HOOK_FASTCALL UndoDamage(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk);
 
 // UndoSpecial
 
