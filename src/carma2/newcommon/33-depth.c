@@ -20,9 +20,11 @@
 #include "41-utility.h"
 #include "52-errors.h"
 #include "55-volume.h"
+#include "59-camera.h"
 #include "66-tintedpoly.h"
 #include "globvars.h"
 #include "globvrkm.h"
+#include "globvrpb.h"
 #include "platform.h"
 #include "rec2_macros.h"
 
@@ -79,6 +81,21 @@ br_pixelmap* gSwap_sky_texture;
 // GLOBAL: CARMA2_SW 0x00676c58
 // GLOBAL: CARMA2_CHEAT 0x00683d88
 br_material* gHorizon_material;
+
+// GLOBAL: CARMA2_HW 0x0067c4ac
+// GLOBAL: CARMA2_SW 0x00676c24
+// GLOBAL: CARMA2_CHEAT 0x00683d54
+br_angle gOld_fov;
+
+// GLOBAL: CARMA2_HW 0x0067c4b8
+// GLOBAL: CARMA2_SW 0x00676c30
+// GLOBAL: CARMA2_CHEAT 0x00683d60
+br_scalar gOld_yon;
+
+// GLOBAL: CARMA2_HW 0x0067c4c0
+// GLOBAL: CARMA2_SW 0x00676c38
+// GLOBAL: CARMA2_CHEAT 0x00683d68
+br_actor* gRearview_sky_actor;
 
 // GLOBAL: CARMA2_HW 0x0067c4a0
 // GLOBAL: CARMA2_SW 0x00676c18
@@ -488,7 +505,40 @@ void C2_HOOK_FASTCALL InitDepthEffects(void) {
     BrActorAdd(gUniverse_actor, gForward_sky_actor);
 }
 
-// DoHorizon
+inline void C2_HOOK_FASTCALL DoHorizon(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_actor* pCamera, br_matrix34* pCamera_to_world) {
+    br_angle yaw;
+    br_actor* actor;
+    br_camera* camera;
+
+    yaw = BrRadianToAngle(atan2(pCamera_to_world->m[2][0], pCamera_to_world->m[2][2]));
+    if (gProgram_state.cockpit_on || (gAction_replay_camera_mode * gAction_replay_mode) != 0
+        || gAction_replay_camera_mode == kActionReplayCameraMode_Internal || gAdapt_sky_model_for_cockpit) {
+
+        if (gRendering_mirror) {
+            actor = gRearview_sky_actor;
+        } else {
+            actor = gForward_sky_actor;
+            camera = gCamera->type_data;
+            if (gOld_fov != camera->field_of_view || gOld_yon != camera->yon_z) {
+                gOld_fov = camera->field_of_view;
+                gOld_yon = ((br_camera*)gCamera->type_data)->yon_z;
+                MungeSkyModel(gCamera, gForward_sky_model);
+            }
+        }
+        BrMatrix34RotateY(&actor->t.t.mat, yaw);
+        BrVector3Copy(&actor->t.t.translate.t, (br_vector3*)pCamera_to_world->m[3]);
+        gHorizon_material->map_transform.m[0][0] = 1.f;
+        gHorizon_material->map_transform.m[0][1] = 0.f;
+        gHorizon_material->map_transform.m[1][0] = 0.f;
+        gHorizon_material->map_transform.m[1][1] = 1.f;
+        gHorizon_material->map_transform.m[2][0] = -BrFixedToFloat(yaw) / BrFixedToFloat(gSky_image_width);
+        gHorizon_material->map_transform.m[2][1] = 0.f;
+        BrMaterialUpdate(gHorizon_material, BR_MATU_ALL);
+        actor->render_style = BR_RSTYLE_FACES;
+        BrZbsSceneRenderAdd(actor);
+        actor->render_style = BR_RSTYLE_NONE;
+    }
+}
 
 // DoDepthCue
 
@@ -501,7 +551,13 @@ void C2_HOOK_FASTCALL InitDepthEffects(void) {
 void C2_HOOK_FASTCALL RenderLollipops(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_actor* pCamera, br_matrix34* pCamera_to_world) {
 }
 
-// DepthEffectSky
+// FUNCTION: CARMA2_HW 0x00445cb0
+// FUNCTION: CARMA2_SW 0x00445d40
+// FUNCTION: CARMA2_CHEAT 0x004461d0
+void C2_HOOK_FASTCALL DepthEffectSky(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_actor* pCamera, br_matrix34* pCamera_to_world) {
+
+    DoHorizon(pRender_buffer, pDepth_buffer, pCamera, pCamera_to_world);
+}
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
