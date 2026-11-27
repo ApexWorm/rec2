@@ -622,9 +622,56 @@ void C2_HOOK_FASTCALL SetCharacterMoveAR(tPed_character_instance* pCharacter, in
 
 // SetPedStartRun
 
-// PedApplyPedMove
+// FUNCTION: CARMA2_HW 0x004ca500
+// FUNCTION: CARMA2_SW 0x004c6c30
+// FUNCTION: CARMA2_CHEAT 0x004d0040
+void C2_HOOK_FASTCALL PedApplyPedMove(tPedestrian* pPed, int pMove_action, float pSpeed, int pArg5, int pArg4, int pFrame, br_vector3* pPos, int pAction, br_matrix34* pMat) {
+    int old_move;
 
-// PedUndoPedMove
+    if (!gBOOL_00744804) {
+        if (pMove_action != -1) {
+            old_move = pPed->character->personality->form->moves[pPed->character->field_0x7].id;
+            BrMatrix34Copy(&pPed->character->field_0x8c, pMat);
+            SetCharacterMove(pPed->character, pMove_action, pSpeed, pArg4, pArg5, GetTotalTime());
+            if (!(pPed->character->field_0x14 & 0x4)) {
+                SetCharacterPosition(pPed->character, pPos, -1);
+            }
+            if (old_move != pMove_action) {
+                pPed->character->field_0x1c = pFrame;
+                SetCharacterBonePositions(pPed->character, 0, 0);
+            }
+        }
+        if (pAction != -1) {
+            pPed->action = pAction;
+        }
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x004ca5a0
+// FUNCTION: CARMA2_SW 0x004c6cd0
+// FUNCTION: CARMA2_CHEAT 0x004d00e0
+void C2_HOOK_FASTCALL PedUndoPedMove(tPedestrian* pPed, int pMove_action, float pSpeed, int pArg5, int pArg4, int pFrame, br_vector3* pPos, int pAction, br_matrix34* pMat) {
+    int old_move;
+
+    if (!gBOOL_00744804) {
+        if (pMove_action != -1) {
+            old_move = pPed->character->personality->form->moves[pPed->character->field_0x7].id;
+            BrMatrix34Copy(&pPed->character->field_0x8c, pMat);
+            SetCharacterMove(pPed->character, pMove_action, pSpeed, pArg4, pArg5, GetTotalTime());
+            if (!(pPed->character->field_0x14 & 0x4)) {
+                SetCharacterPosition(pPed->character, pPos, -1);
+            }
+            if (old_move != pMove_action) {
+                pPed->character->field_0x1c = pFrame;
+                SetCharacterBonePositions(pPed->character, 0, 0);
+                pPed->character->field_0x24 = GetTotalTime();
+            }
+        }
+        if (pAction != -1) {
+            pPed->action = pAction;
+        }
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x004ca650
 // FUNCTION: CARMA2_SW 0x004c6d80
