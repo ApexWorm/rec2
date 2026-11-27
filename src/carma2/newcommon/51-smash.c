@@ -1081,8 +1081,6 @@ void C2_HOOK_FASTCALL ActuallyRepairSmash(tCar_spec* pCar_spec, tCar_crush_smash
 #pragma auto_inline(on)
 #endif
 
-extern void C2_HOOK_FASTCALL KillFragment(tSmash_vertex* pFragment);
-
 inline void C2_HOOK_FASTCALL KillFragment(tSmash_vertex* pFragment) {
 
     BrActorRemove(pFragment->actor);
