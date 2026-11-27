@@ -522,14 +522,14 @@ void C2_HOOK_FASTCALL S3Service(int pInside_cockpit, int pThings_moved) {
                         if (S3Service3D(channel) == 0) {
                             if (channel->sound_source_ptr != NULL) {
                                 if (channel->sound_source_ptr->ambient) {
-                                    S3UpdateSoundSource(NULL, -1, channel->sound_source_ptr, -1.f, -1, -1, 0, -1, -1);
+                                    S3UpdateSoundSource(NULL, -1, channel->sound_source_ptr, -1.0f, -1, -1, 0, -1, -1);
                                 }
                             } else {
                                 S3StopChannel(channel);
                             }
                         }
                         else if (channel->sound_source_ptr != NULL && channel->sound_source_ptr->ambient && !S3SoundStillPlaying(channel->tag)) {
-                            S3UpdateSoundSource(NULL, -1, channel->sound_source_ptr, -1.f, -1, -1, 0, -1, -1);
+                            S3UpdateSoundSource(NULL, -1, channel->sound_source_ptr, -1.0f, -1, -1, 0, -1, -1);
                         }
                     } else if (channel->type == 1 && channel->active) {
                         S3ServiceMIDIChannel(channel);
