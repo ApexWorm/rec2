@@ -376,11 +376,48 @@ void C2_HOOK_FASTCALL ARStartPipingSession(tPipe_chunk_type pType) {
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x00402660
-// STUB: CARMA2_SW 0x00402660
-// STUB: CARMA2_CHEAT 0x00402660
+// FUNCTION: CARMA2_HW 0x00402660
+// FUNCTION: CARMA2_SW 0x00402660
+// FUNCTION: CARMA2_CHEAT 0x00402660
 void C2_HOOK_FASTCALL EndPipingSession2(int pMunge_reentrancy) {
-    NOT_IMPLEMENTED();
+
+    if (gPipe_buffer_start == NULL || gAction_replay_mode || !gProgram_state.racing) {
+        return;
+    }
+    /* End session with buffer size */
+    *(tS16*)(gLocal_buffer + gLocal_buffer_size) = gLocal_buffer_size;
+    gLocal_buffer_size += sizeof(tS16);
+
+    if (((tPipe_session*)gLocal_buffer)->count != 0 && gLocal_buffer_size <= 15000) {
+        if (gPipe_record_ptr + gLocal_buffer_size > gPipe_buffer_phys_end) {
+            gPipe_buffer_working_end = gPipe_record_ptr;
+            gPipe_buffer_oldest = gPipe_buffer_start;
+            gPipe_record_ptr = gPipe_buffer_start;
+        }
+        while (gPipe_record_ptr <= gPipe_buffer_oldest && gPipe_record_ptr + gLocal_buffer_size > gPipe_buffer_oldest) {
+            // Remove older sessions
+            gPipe_buffer_oldest += LengthOfSession((tPipe_session*)gPipe_buffer_oldest);
+
+            if (gPipe_buffer_oldest >= gPipe_buffer_working_end) {
+                gPipe_buffer_working_end = gPipe_buffer_phys_end;
+                gPipe_buffer_oldest = gPipe_buffer_start;
+            }
+        }
+        if (gPipe_buffer_oldest == NULL) {
+            gPipe_buffer_oldest = gPipe_record_ptr;
+        }
+        memcpy(gPipe_record_ptr, gLocal_buffer, gLocal_buffer_size);
+        gPipe_record_ptr += gLocal_buffer_size;
+        if (gPipe_record_ptr > gPipe_buffer_working_end) {
+            gPipe_buffer_working_end = gPipe_record_ptr;
+        }
+    }
+    if (pMunge_reentrancy && gReentrancy_count != 0) {
+        gReentrancy_count -= 1;
+        if (gReentrancy_count != 0) {
+            StartPipingSession2(gReentrancy_array[gReentrancy_count - 1], 0);
+        }
+    }
 }
 
 #ifdef REC2_MATCHING
@@ -678,7 +715,15 @@ void C2_HOOK_FASTCALL ARMoveToStartOfReplay(tReplay_session_callback* pBetween_s
     gReplay_rate = old_rate;
 }
 
-// ARDoActionReplay
+// FUNCTION: CARMA2_HW 0x00403cc0
+// FUNCTION: CARMA2_SW 0x00403cc0
+// FUNCTION: CARMA2_CHEAT 0x00403cc0
+void C2_HOOK_FASTCALL ARDoActionReplay(int pUnused, tReplay_session_callback* pBetween_sessions, tPreprocess_AR_callback* pBefore_frame, tPostProcess_AR_callback* pAfter_frame) {
+
+    if (gReplay_rate != 0.0f) {
+        MoveReplayBuffer((int)gReplay_rate, pBetween_sessions, pBefore_frame, pAfter_frame);
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x00403d10
 // FUNCTION: CARMA2_SW 0x00403d10
@@ -965,9 +1010,11 @@ void C2_HOOK_FASTCALL AddFlameToPipingSession(int pIndex, int pFrame, br_scalar 
 // FUNCTION: CARMA2_SW 0x004c3860
 // FUNCTION: CARMA2_CHEAT 0x004ccc50
 void C2_HOOK_FASTCALL AddSplashToPipingSession(tPhysics_object* pObject) {
+    br_scalar water_d;
 
-    gFloat_pipe_union.f = pObject->water_d;
-    ARDoSingleVariedSession(ePipe_chunk_splash, (uintptr_t)pObject, 2,
+    water_d = pObject->water_d;
+    gFloat_pipe_union.f = water_d;
+    ARAddVariedDataToSession(ePipe_chunk_splash, (uintptr_t)pObject, 2,
         SIZE_OFFSET_PIPING(tPipe_chunk_splash, water_d), gFloat_pipe_union.u32,
         SIZE_OFFSET_PIPING(tPipe_chunk_splash, normal), &pObject->water_normal);
 }
@@ -1071,6 +1118,7 @@ void C2_HOOK_FASTCALL AddNapalmBoltToPipingSession(int pIndex, tPedestrian* pPed
 // PipeSingleCrush
 
 // FUNCTION: CARMA2_HW 0x004c8090
+// FUNCTION: CARMA2_SW 0x004c47c0
 // FUNCTION: CARMA2_CHEAT 0x004cdbb0
 void C2_HOOK_FASTCALL PipeSingleScreenWobble(int pWobble_x, int pWobble_y) {
     C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_chunk_screen_wobble, wobble_x, 0x1);
@@ -1197,7 +1245,7 @@ void C2_HOOK_FASTCALL PipeSingleSound(tS3_outlet* pOutlet, int pSound, tS3_volum
         if (pPosition == NULL) {
             pPosition = &gZero_vector__smash;
         }
-        ARDoSingleVariedSession(ePipe_chunk_single_sound, pSound, 4,
+        ARDoSingleVariedSession(ePipe_chunk_sound, pSound, 4,
             SIZE_OFFSET_PIPING(tPipe_shunk_single_sound, pitch), pPitch,
             SIZE_OFFSET_PIPING(tPipe_shunk_single_sound, position), pPosition,
             SIZE_OFFSET_PIPING(tPipe_shunk_single_sound, outlet), GetIndexFromOutlet(pOutlet),
@@ -1981,7 +2029,44 @@ void C2_HOOK_FASTCALL ApplyFrameBoundary(tPipe_chunk** pChunk) {
 
 // ApplySound
 
-// ApplyCar
+// FUNCTION: CARMA2_HW 0x004c9490
+// FUNCTION: CARMA2_SW 0x004c5bc0
+// FUNCTION: CARMA2_CHEAT 0x004cefb0
+void C2_HOOK_FASTCALL ApplyCar(tPipe_chunk** pChunk) {
+    tCar_spec* car;
+    br_vector3 com_offset_c;
+    br_vector3 com_offset_w;
+    tPhysics_object* collision_info;
+
+    if (((*pChunk)->subject_index & 0xffffff00) == (eVehicle_self << 8)) {
+        car = &gProgram_state.current_car;
+    } else {
+        car = GetCarSpec((*pChunk)->subject_index >> 8, (*pChunk)->subject_index & 0xff);
+    }
+
+    car->car_master_actor->t.t.mat = (*pChunk)->data.car.mat;
+    car->collision_info->v = (*pChunk)->data.car.v;
+    BrMatrix34TApplyV(&car->collision_info->velocity_car_space, &car->collision_info->v, &car->car_master_actor->t.t.mat);
+
+    collision_info = car->collision_info;
+
+    if (BrVector3LengthSquared(&collision_info->velocity_car_space) < 0.01) {
+        BrVector3Negate(&car->direction, (br_vector3*)car->car_master_actor->t.t.mat.m[2]);
+    } else {
+        BrVector3Normalise(&car->direction, &collision_info->v);
+    }
+
+    car->pos = car->car_master_actor->t.t.translate.t;
+    BrVector3InvScale(&com_offset_c, &car->centre_of_mass_world_scale, WORLD_SCALE);
+    BrMatrix34ApplyV(&com_offset_w, &com_offset_c, &car->car_master_actor->t.t.mat);
+    BrVector3Accumulate(&car->pos, &com_offset_w);
+
+    car->speedo_speed = (float)((double)(*pChunk)->data.car.speedo_speed / 468100.0);
+    car->revs = (float)((*pChunk)->data.car.revs * 10);
+    car->gear = (*pChunk)->data.car.gear - 1;
+    car->frame_collision_flag = (*pChunk)->data.car.frame_collision_flag;
+    car->field_0x18cc = (*pChunk)->data.car.field_0x40;
+}
 
 // FUNCTION: CARMA2_HW 0x004c96c0
 // FUNCTION: CARMA2_SW 0x004c5df0
@@ -2216,6 +2301,7 @@ void C2_HOOK_FASTCALL ApplySmashDecal(tPipe_chunk** pChunk) {
 }
 
 // FUNCTION: CARMA2_HW 0x004c9a30
+// FUNCTION: CARMA2_SW 0x004c6160
 // FUNCTION: CARMA2_CHEAT 0x004cf560
 void C2_HOOK_FASTCALL ApplySmashTextureChange(tPipe_chunk** pChunk) {
     tPipe_chunk* chunk;
