@@ -636,6 +636,7 @@ void C2_HOOK_FASTCALL RemoveTransientBitmaps(int pGraphically_remove_them) {
 // SaveTransient
 
 // STUB: CARMA2_HW 0x0043e0a0
+// STUB: CARMA2_SW 0x0043e0f0
 // STUB: CARMA2_CHEAT 0x0043e350
 int C2_HOOK_FASTCALL DoMouseCursor(void) {
     NOT_IMPLEMENTED();
