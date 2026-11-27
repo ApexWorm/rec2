@@ -676,7 +676,26 @@ void C2_HOOK_CDECL SetCharacterPhysicsLevelAR(tPed_character_instance* pCharacte
 #pragma auto_inline(on)
 #endif
 
-// PedApplyPedPhysics
+#if defined(REC2_MATCHING) && defined(_MSC_VER)
+#pragma inline_depth(0)
+#endif
+
+// FUNCTION: CARMA2_HW 0x004ca7d0
+// FUNCTION: CARMA2_SW 0x004c6f00
+// FUNCTION: CARMA2_CHEAT 0x004d0310
+void C2_HOOK_FASTCALL PedApplyPedPhysics(int pId, br_matrix34* pMat) {
+    tPedestrian* ped;
+
+    ped = &gPedestrian_array[(tU16)pId];
+    BrMatrix34Copy(GetCharacterMatrixPtr(ped->character), pMat);
+    BrVector3Copy(&ped->pos, (br_vector3*)pMat->m[3]);
+    RecalculateOrientationOfRoot(ped->character);
+    SetCharacterBonePositions(ped->character, 3, 0);
+}
+
+#if defined(REC2_MATCHING) && defined(_MSC_VER)
+#pragma inline_depth()
+#endif
 
 // FUNCTION: CARMA2_HW 0x004ca830
 // FUNCTION: CARMA2_SW 0x004c6f60
