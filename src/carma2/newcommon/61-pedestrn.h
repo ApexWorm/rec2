@@ -28,6 +28,7 @@ extern int gGiblet_size_count;
 
 extern int gPed_move_fsm[118][7];
 
+extern const char* gPed_remap_axis_choices[6];
 extern tPedForms_vtable* gPed_vtable;
 
 extern int gPed_retain_root_mode;
@@ -98,7 +99,7 @@ extern void C2_HOOK_FASTCALL ScaleModel(br_model* pModel, float pScale);
 
 // DisposeAllLoadedMoves
 
-// ReadRemap
+extern tPed_remap* C2_HOOK_FASTCALL ReadRemap(const char* pFile_name);
 
 extern void C2_HOOK_FASTCALL DisposeRemap(tPed_remap* pRemap);
 
