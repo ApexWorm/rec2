@@ -16,10 +16,12 @@
 // Carmageddon 2 adaptation
 
 // GLOBAL: CARMA2_HW 0x0079feb4
+// GLOBAL: CARMA2_SW 0x00796454
 // GLOBAL: CARMA2_CHEAT 0x007a7554
 br_scalar gScreenZOffset;
 
 // GLOBAL: CARMA2_HW 0x00670530
+// GLOBAL: CARMA2_SW 0x0066acc0
 const float gScreenZOffsetPresetChoices[7] = {
      0.0f,
     -1.5f,
@@ -70,6 +72,7 @@ static br_uint_32 calculate_outcode(const br_vector4* v) {
 }
 
 // FUNCTION: CARMA2_HW 0x005269f0
+// FUNCTION: CARMA2_SW 0x00522090
 // FUNCTION: CARMA2_CHEAT 0x0052c5e0
 void C2_HOOK_CDECL BrModelToScreenQuery(br_matrix4* dest) {
     br_uint_32 dummy;
@@ -82,6 +85,7 @@ void C2_HOOK_CDECL BrModelToScreenQuery(br_matrix4* dest) {
 }
 
 // FUNCTION: CARMA2_HW 0x00526a60
+// FUNCTION: CARMA2_SW 0x00522100
 // FUNCTION: CARMA2_CHEAT 0x0052c650
 void C2_HOOK_CDECL BrModelToViewQuery(br_matrix34* dest) {
     br_uint_32 dummy;
@@ -90,6 +94,7 @@ void C2_HOOK_CDECL BrModelToViewQuery(br_matrix34* dest) {
 }
 
 // FUNCTION: CARMA2_HW 0x00526a90
+// FUNCTION: CARMA2_SW 0x00522130
 // FUNCTION: CARMA2_CHEAT 0x0052c680
 br_uint_8 C2_HOOK_CDECL BrOriginToScreenXY(br_vector2* screen) {
 
@@ -105,6 +110,7 @@ br_uint_8 C2_HOOK_CDECL BrOriginToScreenXY(br_vector2* screen) {
 }
 
 // FUNCTION: CARMA2_HW 0x00526b70
+// FUNCTION: CARMA2_SW 0x00522210
 // FUNCTION: CARMA2_CHEAT 0x0052c760
 br_uint_32 C2_HOOK_CDECL BrOriginToScreenXYZO(br_vector3* screen) {
     br_uint_32 outcode;
@@ -125,6 +131,7 @@ br_uint_32 C2_HOOK_CDECL BrOriginToScreenXYZO(br_vector3* screen) {
 }
 
 // FUNCTION: CARMA2_HW 0x00526cf0
+// FUNCTION: CARMA2_SW 0x00522390
 // FUNCTION: CARMA2_CHEAT 0x0052c8e0
 br_uint_8 C2_HOOK_CDECL BrPointToScreenXY(br_vector2* screen, const br_vector3* point) {
     br_vector4 sp;
@@ -141,6 +148,7 @@ br_uint_8 C2_HOOK_CDECL BrPointToScreenXY(br_vector2* screen, const br_vector3* 
 }
 
 // FUNCTION: CARMA2_HW 0x00526df0
+// FUNCTION: CARMA2_SW 0x00522490
 // FUNCTION: CARMA2_CHEAT 0x0052c9e0
 br_uint_32 C2_HOOK_CDECL BrPointToScreenXYZO(br_vector3* screen, const br_vector3* point) {
     br_vector4 sp;
@@ -162,6 +170,7 @@ br_uint_32 C2_HOOK_CDECL BrPointToScreenXYZO(br_vector3* screen, const br_vector
 }
 
 // FUNCTION: CARMA2_HW 0x00526f80
+// FUNCTION: CARMA2_SW 0x00522620
 // FUNCTION: CARMA2_CHEAT 0x0052cb70
 void C2_HOOK_CDECL BrPointToScreenXYMany(br_vector2* screens, const br_vector3* points, br_uint_32 npoints) {
     br_vector4 sp;
@@ -181,6 +190,7 @@ void C2_HOOK_CDECL BrPointToScreenXYMany(br_vector2* screens, const br_vector3* 
 }
 
 // FUNCTION: CARMA2_HW 0x00527070
+// FUNCTION: CARMA2_SW 0x00522710
 // FUNCTION: CARMA2_CHEAT 0x0052cc60
 void C2_HOOK_CDECL BrPointToScreenXYZOMany(br_vector3* screens, br_uint_32* outcodes, br_vector3* points, br_uint_32 npoints) {
     br_uint_32 outcode;
@@ -205,6 +215,7 @@ void C2_HOOK_CDECL BrPointToScreenXYZOMany(br_vector3* screens, br_uint_32* outc
 }
 
 // FUNCTION: CARMA2_HW 0x00527240
+// FUNCTION: CARMA2_SW 0x005228e0
 // FUNCTION: CARMA2_CHEAT 0x0052ce30
 br_scalar C2_HOOK_CDECL BrZbDepthToScreenZ(br_uint_32 depth_z, br_camera* camera) {
 
@@ -212,6 +223,7 @@ br_scalar C2_HOOK_CDECL BrZbDepthToScreenZ(br_uint_32 depth_z, br_camera* camera
 }
 
 // FUNCTION: CARMA2_HW 0x00527260
+// FUNCTION: CARMA2_SW 0x00522900
 // FUNCTION: CARMA2_CHEAT 0x0052ce50
 br_uint_32 C2_HOOK_CDECL BrZbScreenZToDepth(br_scalar sz, br_camera* camera) {
     br_uint_32 depth;
@@ -227,6 +239,7 @@ br_uint_32 C2_HOOK_CDECL BrZbScreenZToDepth(br_scalar sz, br_camera* camera) {
 }
 
 // FUNCTION: CARMA2_HW 0x005272b0
+// FUNCTION: CARMA2_SW 0x00522950
 // FUNCTION: CARMA2_CHEAT 0x0052cea0
 br_scalar C2_HOOK_CDECL BrZsDepthToScreenZ(br_scalar depth_z, br_camera* camera) {
     br_scalar hither;
@@ -245,6 +258,7 @@ br_scalar C2_HOOK_CDECL BrZsDepthToScreenZ(br_scalar depth_z, br_camera* camera)
 }
 
 // FUNCTION: CARMA2_HW 0x00527320
+// FUNCTION: CARMA2_SW 0x005229c0
 // FUNCTION: CARMA2_CHEAT 0x0052cf10
 br_scalar C2_HOOK_CDECL BrZsScreenZToDepth(br_scalar sz, br_camera* camera) {
     br_scalar hither;
@@ -262,7 +276,12 @@ br_scalar C2_HOOK_CDECL BrZsScreenZToDepth(br_scalar sz, br_camera* camera) {
     return depth;
 }
 
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
 // FUNCTION: CARMA2_HW 0x005273a0
+// FUNCTION: CARMA2_SW 0x00522a40
 // FUNCTION: CARMA2_CHEAT 0x0052cf90
 br_scalar C2_HOOK_CDECL BrScreenZToCamera(br_actor* camera, br_scalar sz) {
     br_camera* data;
@@ -287,8 +306,13 @@ br_scalar C2_HOOK_CDECL BrScreenZToCamera(br_actor* camera, br_scalar sz) {
         return 0.f;
     }
 }
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
+
 
 // FUNCTION: CARMA2_HW 0x00527480
+// FUNCTION: CARMA2_SW 0x00522b20
 // FUNCTION: CARMA2_CHEAT 0x0052d070
 void C2_HOOK_CDECL BrScreenXYZToCamera(br_vector3* point, br_actor* camera, br_pixelmap* screen_buffer, br_int_16 x, br_int_16 y, br_scalar sz) {
     br_scalar hx;
@@ -297,25 +321,25 @@ void C2_HOOK_CDECL BrScreenXYZToCamera(br_vector3* point, br_actor* camera, br_p
     br_camera* data;
     br_angle fov;
     br_scalar scale;
-
+    br_scalar sw;
+    br_scalar sh;
 
     data = camera->type_data;
-
     vz = BrScreenZToCamera(camera, sz);
-
-    hx = (float)(screen_buffer->width - 2 * (x + screen_buffer->origin_x)) / (float)screen_buffer->width;
-    hy = (float)(2 * (y + screen_buffer->origin_y) - screen_buffer->height) / (float)screen_buffer->height;
-
+    sw = screen_buffer->width;
+    sh = screen_buffer->height;
+    hx = (br_scalar)(screen_buffer->width - 2 * (x + screen_buffer->origin_x)) / sw;
+    hy = (br_scalar)(2 * (y + screen_buffer->origin_y) - screen_buffer->height) / sh;
     switch (data->type) {
     case BR_CAMERA_PARALLEL:
-        point->v[0] = -0.5f * hx * data->width * data->aspect;
-        point->v[1] = -0.5f * hy * data->height / 2;
+        point->v[0] = (-hx) * (data->width * data->aspect) / 2.0f;
+        point->v[1] = (-hy) * data->height / 2.0f;
         point->v[2] = vz;
         break;
     case BR_CAMERA_PERSPECTIVE_FOV:
-        fov=(br_angle)(data->field_of_view / 2);
+        fov = (br_angle)(data->field_of_view / 2);
         scale = BR_COS(fov) / BR_SIN(fov);
-        point->v[0] = hx * data->aspect * vz / scale;
+        point->v[0] = vz * (hx * data->aspect) / scale;
         point->v[1] = hy * vz / scale;
         point->v[2] = vz;
         break;

@@ -19,6 +19,7 @@
 extern char gPathNetworkIni[240];
 extern int gPathNetworkIniValid;
 extern struct sockaddr gLocal_address;
+extern struct sockaddr* gPtr_local_address;
 
 void C2_HOOK_FASTCALL NetNowIPXLocalTarget2String(char* pString, struct sockaddr* pSock_addr);
 
@@ -28,7 +29,7 @@ int C2_HOOK_FASTCALL PDNetGetHeaderSize(void);
 
 int C2_HOOK_FASTCALL PDNetJoinGame(tNet_game_details* pGame_details, const char* pName);
 
-void C2_HOOK_FASTCALL PDNetHostFinishGame(void);
+void C2_HOOK_FASTCALL PDNetHostFinishGame(tNet_game_details* pDetails);
 
 void C2_HOOK_FASTCALL PDNetLeaveGame(void);
 
