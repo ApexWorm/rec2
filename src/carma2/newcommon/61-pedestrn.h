@@ -388,7 +388,7 @@ extern void C2_HOOK_FASTCALL PedPreCollisionStuff(void);
 
 extern int C2_HOOK_FASTCALL ChangePedScaling(br_vector3* pScale);
 
-// ChangeHeadScaling
+extern void C2_HOOK_FASTCALL ChangeHeadScaling(float pScale);
 
 extern void C2_HOOK_FASTCALL MakeMaterialBlendy(br_material* pMaterial);
 

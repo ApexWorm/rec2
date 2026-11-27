@@ -1061,7 +1061,16 @@ int C2_HOOK_FASTCALL SetPedSize(tPowerup* pPowerup, tCar_spec* pCar) {
     return pPowerup - gPowerup_array;
 }
 
-// SetPedHeadSize
+// FUNCTION: CARMA2_HW 0x004dc7a0
+// FUNCTION: CARMA2_SW 0x004d8ca0
+// FUNCTION: CARMA2_CHEAT 0x004e2360
+int C2_HOOK_FASTCALL SetPedHeadSize(tPowerup* pPowerup, tCar_spec* pCar) {
+    float scale;
+
+    scale = pPowerup->float_params[0];
+    ChangeHeadScaling(scale);
+    return pPowerup - gPowerup_array;
+}
 
 // FUNCTION: CARMA2_HW 0x004dc7d0
 // FUNCTION: CARMA2_SW 0x004d8cd0
