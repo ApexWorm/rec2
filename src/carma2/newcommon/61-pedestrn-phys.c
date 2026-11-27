@@ -26,6 +26,7 @@
 #include "51-smash.h"
 #include "52-errors.h"
 #include "54-runtime.h"
+#include "60-phil.h"
 #include "61-pedestrn.h"
 #include "62-graphics3.h"
 #include "63-loading3.h"
@@ -1770,20 +1771,51 @@ void C2_HOOK_FASTCALL ShowActivePedCount(void) {
     NewTextHeadupSlot2(4, 0, 1000, -4, text, 0);
 }
 
-// STUB: CARMA2_HW 0x004d6880
-// STUB: CARMA2_SW 0x004d2e80
-// STUB: CARMA2_CHEAT 0x004dc440
+// FUNCTION: CARMA2_HW 0x004d6880
+// FUNCTION: CARMA2_SW 0x004d2e80
+// FUNCTION: CARMA2_CHEAT 0x004dc440
 void C2_HOOK_FASTCALL PedPreCollisionStuff(void) {
-    NOT_IMPLEMENTED();
+    tPhysics_object* object;
+    br_vector3 torque;
+
+    for (object = PHILGetFirstObject(); object != NULL; object = PHILGetNextObject(object)) {
+        if (object->owner != NULL && object->flags_0x238 == 5) {
+            // FIXME: BrVector3Scale(&torque, &object->omega, 0.04 * 0.0001 * BrVector3Length(&object->omega));
+            torque.v[0] = (br_scalar)(object->omega.v[0] * (0.04 * 0.0001 * BrVector3Length(&object->omega)));
+            torque.v[1] = (br_scalar)(object->omega.v[1] * (0.04 * 0.0001 * BrVector3Length(&object->omega)));
+            torque.v[2] = object->omega.v[2] * (br_scalar)(0.04 * 0.0001 * BrVector3Length(&object->omega));
+            ApplyDiminishingTorque(object, &torque);
+        }
+    }
 }
 
-// UpdateIfBackwardsAR
+inline void C2_HOOK_FASTCALL UpdateIfBackwardsAR(void) {
+    int i;
+    tPedestrian* ped;
 
-// STUB: CARMA2_HW 0x004d69b0
-// STUB: CARMA2_SW 0x004d2fb0
-// STUB: CARMA2_CHEAT 0x004dc570
-int C2_HOOK_FASTCALL ChangePedScaling(br_vector3* pScale) {
-    NOT_IMPLEMENTED();
+    if (gAction_replay_mode && ARGetReplayRate() < 0.0f) {
+        ped = gPedestrian_array;
+        for (i = 0; i < gPed_count; i++, ped++) {
+            if (ped->flags & 0x1) {
+                SetCharacterBonePositions(ped->character, 3, 0);
+            }
+        }
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x004d69b0
+// FUNCTION: CARMA2_SW 0x004d2fb0
+// FUNCTION: CARMA2_CHEAT 0x004dc570
+void C2_HOOK_FASTCALL ChangePedScaling(const br_vector3* pScale) {
+    br_vector3 scale;
+
+    Vector3Div(&scale, pScale, &gPed_scale);
+    if (scale.v[0] != 1.0 || scale.v[1] != 1.0 || scale.v[2] != 1.0) {
+        ScaleBone(-1, &scale, 1);
+        BrVector3Copy(&gPed_scale, pScale);
+        gAverage_ped_scale = (gPed_scale.v[0] + gPed_scale.v[1] + gPed_scale.v[2]) / 3.0f;
+        UpdateIfBackwardsAR();
+    }
 }
 
 // ChangeHeadScaling
