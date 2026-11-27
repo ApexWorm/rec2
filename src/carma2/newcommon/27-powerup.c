@@ -19,18 +19,19 @@
 #include "19-font.h"
 #include "23-piping.h"
 #include "25-grafdata.h"
+#include "30-opponent.h"
 #include "32-spark.h"
 #include "39-oil.h"
 #include "41-utility.h"
 #include "42-input.h"
 #include "43-pratcam.h"
-
 #include "49-physics.h"
 #include "51-smash.h"
 #include "53-controls.h"
 #include "58-crush2.h"
 #include "60-phil.h"
 #include "61-pedestrn.h"
+#include "61-pedestrn-phys.h"
 #include "63-loading3.h"
 #include "69-sound.h"
 #include "70-packfile.h"
@@ -67,6 +68,11 @@ tU8* gRace_powerup_respawn_bools = NULL;
 // GLOBAL: CARMA2_SW 0x0069aaac
 // GLOBAL: CARMA2_CHEAT 0x006a85cc
 tPowerup* gPowerup_array = NULL;
+
+// GLOBAL: CARMA2_HW 0x006a0ad0
+// GLOBAL: CARMA2_SW 0x0069ab28
+// GLOBAL: CARMA2_CHEAT 0x006a8648
+int gNumber_of_powerups;
 
 // GLOBAL: CARMA2_HW 0x006a0a58
 // GLOBAL: CARMA2_SW 0x0069aab0
@@ -1516,10 +1522,23 @@ void C2_HOOK_FASTCALL SendMines(tU32 pNext_frame_time) {
     }
 }
 
-// STUB: CARMA2_HW 0x004dd1b0
-// STUB: CARMA2_SW 0x004d96b0
+// FUNCTION: CARMA2_HW 0x004dd1b0
+// FUNCTION: CARMA2_SW 0x004d96b0
+// FUNCTION: CARMA2_CHEAT 0x004e2d70
 void C2_HOOK_FASTCALL MinePreCollisionStuff(void) {
-    NOT_IMPLEMENTED();
+    int i;
+    tPhysics_object* object;
+
+    for (i = 0; i < (int)REC2_ASIZE(gShit_mines); i++) {
+        if (gShit_mines[i].flags & 0x1) {
+            object = gShit_mines[i].collision_info;
+            if (object->field_0x261 == 0x31 && object->message_time == gPHIL_last_physics_tick) {
+                object->field_0xf0 = 1;
+                WriteHierarchyNetworkStuff(object->field_0x294, object, 2);
+                object->field_0x261 = 0;
+            }
+        }
+    }
 }
 
 // FUNCTION: CARMA2_HW 0x004dd3f0
@@ -2217,11 +2236,50 @@ void C2_HOOK_FASTCALL ResetMutantCorpses(tPowerup* pPowerup, tCar_spec* pCar) {
 
 // ReceivedPowerup
 
-// STUB: CARMA2_HW 0x004dedf0
-// STUB: CARMA2_SW 0x004db2f0
-// STUB: CARMA2_CHEAT 0x004e49b0
+// FUNCTION: CARMA2_HW 0x004dedf0
+// FUNCTION: CARMA2_SW 0x004db2f0
+// FUNCTION: CARMA2_CHEAT 0x004e49b0
 void C2_HOOK_FASTCALL SendCurrentPowerups(void) {
-    NOT_IMPLEMENTED();
+    int cat;
+    int car_count;
+    int i;
+    int j;
+    tCar_spec* car;
+    tPlayer_ID ID;
+    tNet_message_chunk* contents;
+
+    for (cat = eVehicle_self; cat <= eVehicle_net_player; cat++) {
+        if (cat == eVehicle_self) {
+            car_count = 1;
+        } else {
+            car_count = GetCarCount(cat);
+        }
+        for (i = 0; i < car_count; i++) {
+            if (cat == eVehicle_self) {
+                car = &gProgram_state.current_car;
+            } else {
+                car = GetCarSpec(cat, i);
+            }
+            for (j = 0; j < gNumber_of_net_players; j++) {
+                if (gNet_players[j].car == car) {
+                    ID = gNet_players[j].ID;
+                    break;
+                }
+            }
+            for (j = 0; j < gNumber_of_powerups; j++) {
+                if (car->powerups[j] != 0) {
+                    contents = NetStartBroadcastContents(eNet_message_chunk_type_powerup, 0);
+                    if (contents != NULL) {
+                        contents->powerup.event = 1;
+                        contents->powerup.player = ID;
+                        contents->powerup.powerup_index = j;
+                        contents->powerup.time_left = car->powerups[j] - GetTotalTime();
+                        NetBroadcastContents(contents);
+                    }
+                }
+            }
+        }
+    }
 }
 
 // STUB: CARMA2_HW 0x004def00

@@ -82,6 +82,7 @@ void* gPhysics_buffer3_ptr;
 
 // GLOBAL: CARMA2_HW 0x0074a5e4
 // GLOBAL: CARMA2_SW 0x007410a4
+// GLOBAL: CARMA2_CHEAT 0x00751c84
 int gPHIL_mechanics_time_sync;
 
 // GLOBAL: CARMA2_HW 0x0074a5e8
@@ -741,11 +742,13 @@ void C2_HOOK_FASTCALL SetGroup(tPhysics_object* pObject, int pGroup) {
 // GetPreCalculatedJointForces
 
 // FUNCTION: CARMA2_HW 0x004b9f40
+// FUNCTION: CARMA2_SW 0x004b6660
+// FUNCTION: CARMA2_CHEAT 0x004bfa70
 void C2_HOOK_FASTCALL MakeObjectListDoSomething(tPhysics_object* pObject) {
     while (pObject != NULL) {
         if (pObject->disable_move_rotate) {
-            pObject->disable_move_rotate = 0;
             pObject->box_face_ref = gFace_num__car - 2;
+            pObject->disable_move_rotate = 0;
         }
         if (pObject->child != NULL) {
             MakeObjectListDoSomething(pObject->child);
@@ -1089,6 +1092,7 @@ void C2_HOOK_FASTCALL ApplyTorque(tPhysics_object* pObject, const br_vector3* pT
 
 // FUNCTION: CARMA2_HW 0x004c2c90
 // FUNCTION: CARMA2_SW 0x004bf3c0
+// FUNCTION: CARMA2_CHEAT 0x004c87b0
 void C2_HOOK_FASTCALL ApplyDiminishingTorque(tPhysics_object* pObject, const br_vector3* pV) {
     br_vector3 original_omega;
     br_vector3 tv;
@@ -1778,6 +1782,7 @@ void C2_HOOK_FASTCALL DoPhysicsError(tPhysicsError pError, const char* pMessage)
 // ResetMan2
 
 // FUNCTION: CARMA2_HW 0x004b5aa0
+// FUNCTION: CARMA2_CHEAT 0x004bb370
 void C2_HOOK_FASTCALL SetUpTestObjects(void) {
 
 }
