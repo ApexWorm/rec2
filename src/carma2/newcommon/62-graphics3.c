@@ -986,6 +986,7 @@ void C2_HOOK_FASTCALL DrawCheckpoint(br_pixelmap* pMap, int pCheckpoint, tU32 pT
 
 // FUNCTION: CARMA2_HW 0x00495d00
 // FUNCTION: CARMA2_SW 0x00493350
+// FUNCTION: CARMA2_CHEAT 0x00495f70
 void C2_HOOK_FASTCALL DrawOffsetCheckpoint(br_pixelmap* pMap, int pCheckpoint, tU32 pTime, int pTarget) {
     tRace_checkpoint_spec* checkpoint;
 
@@ -1153,6 +1154,7 @@ void C2_HOOK_FASTCALL FinishMap(void) {
 
 // FUNCTION: CARMA2_HW 0x00496b10
 // FUNCTION: CARMA2_SW 0x00493450
+// FUNCTION: CARMA2_CHEAT 0x00496ec0
 void C2_HOOK_FASTCALL CheckpointLine(br_pixelmap* pMap, int pCheckpoint, tU32 pTime, int pTarget) {
     int p2_x;
     int p2_y;
