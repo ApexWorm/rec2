@@ -4659,7 +4659,7 @@ typedef struct tPhysics_object {
     void* owner; /* points to tCollision_info_owner (used in PHILSetObjectProperty) */
     void* field_0x240;
     br_vector3 water_normal;
-    br_scalar water_d; /* Created by retype action */
+    br_scalar water_d;
     br_scalar water_depth_factor;
     tSpecial_volume* last_special_volume;
     tSpecial_volume* auto_special_volume;
@@ -4676,38 +4676,42 @@ typedef struct tPhysics_object {
     undefined field_0x4d5[3];
 } tPhysics_object;
 
-typedef struct {
-    tPhysics_object* collision_info;
-    undefined2 field_0x4;
-    undefined field_0x6[0x8 - 0x6];
-    undefined4 field_0x8;
-    float field_0xc;
-    float field_0x10;
+#define PHIL_QUEUED_HEADER_MEMBERS \
+    tPhysics_object* collision_info; \
+    undefined2 field_0x4; \
+    undefined field_0x6[0x8 - 0x6]; \
+    undefined4 field_0x8; \
+    float field_0xc; \
+    float field_0x10; \
     float field_0x14;
+
+#define PHIL_QUEUED_OBJECT_INFO_DATA_MEMBERS \
+    br_vector3 field_0x18; \
+    br_vector3 field_0x24; \
+    br_matrix34 field_0x30; \
+    undefined flags; \
+    undefined field_0x61[3];
+
+typedef struct {
+    PHIL_QUEUED_HEADER_MEMBERS
+#ifdef REC2_CHEAT
+    undefined4 cheat_variable; /* Unknown offset */
+#endif
 } tPHIL_queued_header;
 
 typedef struct {
     /* FIXME: CARMA2_CHEAT has extra 32-bit member */
-    tPhysics_object* collision_info;
-    undefined2 field_0x4;
-    undefined field_0x6[0x2];
-    undefined4 field_0x8;
-    float field_0xc;
-    float field_0x10;
-    float field_0x14;
+    PHIL_QUEUED_HEADER_MEMBERS
 #ifdef REC2_CHEAT
     undefined4 cheat_variable; /* FIXME: unknown offset (before 0x18) */
 #endif
-    br_vector3 field_0x18;
-    br_vector3 field_0x24;
-    br_matrix34 field_0x30;
-    undefined flags;
-    undefined field_0x61[3];
+    PHIL_QUEUED_OBJECT_INFO_DATA_MEMBERS
 } tPHIL_queued_object_info;
 
 typedef union {
     struct {
-        tPHIL_queued_object_info _field_0x0;
+        PHIL_QUEUED_HEADER_MEMBERS
+        PHIL_QUEUED_OBJECT_INFO_DATA_MEMBERS
         undefined _field_0x64;
         tPHIL_queued_header headers[100];
     };
