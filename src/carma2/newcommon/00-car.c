@@ -1610,7 +1610,20 @@ tNon_car_spec* C2_HOOK_FASTCALL DoPullActorFromWorld(br_actor* pActor) {
 #pragma auto_inline(on)
 #endif
 
-// PipeNonCarObject
+// FUNCTION: CARMA2_HW 0x004207a0
+// FUNCTION: CARMA2_SW 0x00420820
+// FUNCTION: CARMA2_CHEAT 0x00420a00
+int C2_HOOK_FASTCALL PipeNonCarObject(tPhysics_object* pObject) {
+    tNon_car_spec* non_car;
+
+    if (!pObject->disable_move_rotate && pObject->actor != NULL && pObject->actor->type_data != NULL) {
+        non_car = pObject->actor->type_data;
+        AddNonCarToPipingSession((tU16)non_car->car_ID, pObject->actor);
+    }
+    non_car = pObject->owner;
+    non_car->field_0xfc = pObject->disable_move_rotate;
+    return 0;
+}
 
 // PipeNonCars
 
