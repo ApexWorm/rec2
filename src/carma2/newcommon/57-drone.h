@@ -50,6 +50,8 @@ extern void C2_HOOK_FASTCALL RemoveDroneFromPHIL(tDrone_spec* pDrone);
 
 extern int C2_HOOK_FASTCALL ReallyAddDroneToPHIL(tDrone_spec* pDrone);
 
+extern void C2_HOOK_FASTCALL DoDefaultDroneStateAction(tDrone_spec* pDrone);
+
 // AddDroneToPHIL
 
 extern void C2_HOOK_FASTCALL PreprocessDronePaths(void);

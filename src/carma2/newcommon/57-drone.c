@@ -147,6 +147,16 @@ int C2_HOOK_FASTCALL ReallyAddDroneToPHIL(tDrone_spec* pDrone) {
     return 1;
 }
 
+// FUNCTION: CARMA2_HW 0x004516b0
+// FUNCTION: CARMA2_SW 0x00451440
+// FUNCTION: CARMA2_CHEAT 0x00451c00
+void C2_HOOK_FASTCALL DoDefaultDroneStateAction(tDrone_spec* pDrone) {
+
+    if (gDrone_state_functions[pDrone->current_state] != NULL) {
+        gDrone_state_functions[pDrone->current_state](pDrone, eDrone_state_DEFAULT);
+    }
+}
+
 // AddDroneToPHIL
 
 // FUNCTION: CARMA2_HW 0x00451070
