@@ -394,7 +394,7 @@ extern void C2_HOOK_FASTCALL ARPowerupLose(tPowerup* pPowerup, tCar_spec* pCar);
 
 extern void C2_HOOK_FASTCALL ResetPissed(tPowerup* pPowerup, tCar_spec* pCar);
 
-extern void C2_HOOK_FASTCALL PissedEffect(void);
+extern void C2_HOOK_FASTCALL PissedEffect(tPowerup* pPowerup, tU32 pPeriod);
 
 extern void C2_HOOK_CDECL RenderSpinningPowerup(br_actor* pActor, br_model* pModel, br_material* pMaterial, void* pOrder_table, br_uint_8 pStyle, int pOn_screen);
 

@@ -2290,7 +2290,7 @@ void C2_HOOK_FASTCALL ResetPissed(tPowerup* pPowerup, tCar_spec* pCar) {
 // FUNCTION: CARMA2_HW 0x004df3b0
 // FUNCTION: CARMA2_SW 0x004db8b0
 // FUNCTION: CARMA2_CHEAT 0x004e4f70
-void C2_HOOK_FASTCALL PissedEffect(void) {
+void C2_HOOK_FASTCALL PissedEffect(tPowerup* pPowerup, tU32 pPeriod) {
     int i;
     int j;
     tU32 the_time;
