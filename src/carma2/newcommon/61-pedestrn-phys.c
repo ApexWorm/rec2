@@ -1127,8 +1127,8 @@ void C2_HOOK_FASTCALL ScoreForKilledPedestrian(tPedestrian* pPed, float pHeight)
     } else {
         gPed_score_multiplier = 1;
     }
-    amount = gPed_points[gProgram_state.skill_level] * gPed_score_multiplier;
     gDAT_006a0418 = the_time;
+    amount = gPed_points[gProgram_state.skill_level] * gPed_score_multiplier;
     ped_object = pPed->character->personality->form->simple_physicing[(tS8)pPed->character->field_0x5].collision_info;
     BrVector3Sub(&offset, &pPed->pos, &car->pos);
     BrMatrix34TApplyV(&local_offset, &offset, &car->collision_info->actor->t.t.mat);
@@ -1192,8 +1192,8 @@ void C2_HOOK_FASTCALL ScoreForKilledPedestrian(tPedestrian* pPed, float pHeight)
         }
     }
     EarnCredits(amount);
-    gPTR_00694120 = pPed;
     gPed_recent_points = amount;
+    gPTR_00694120 = pPed;
     AwardTime(gPed_times[gProgram_state.skill_level]);
 }
 
@@ -1789,13 +1789,33 @@ void C2_HOOK_FASTCALL PedPreCollisionStuff(void) {
     }
 }
 
-// UpdateIfBackwardsAR
+inline void C2_HOOK_FASTCALL UpdateIfBackwardsAR(void) {
+    int i;
+    tPedestrian* ped;
 
-// STUB: CARMA2_HW 0x004d69b0
-// STUB: CARMA2_SW 0x004d2fb0
-// STUB: CARMA2_CHEAT 0x004dc570
-int C2_HOOK_FASTCALL ChangePedScaling(br_vector3* pScale) {
-    NOT_IMPLEMENTED();
+    if (gAction_replay_mode && ARGetReplayRate() < 0.0f) {
+        ped = gPedestrian_array;
+        for (i = 0; i < gPed_count; i++, ped++) {
+            if (ped->flags & 0x1) {
+                SetCharacterBonePositions(ped->character, 3, 0);
+            }
+        }
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x004d69b0
+// FUNCTION: CARMA2_SW 0x004d2fb0
+// FUNCTION: CARMA2_CHEAT 0x004dc570
+void C2_HOOK_FASTCALL ChangePedScaling(const br_vector3* pScale) {
+    br_vector3 scale;
+
+    Vector3Div(&scale, pScale, &gPed_scale);
+    if (scale.v[0] != 1.0 || scale.v[1] != 1.0 || scale.v[2] != 1.0) {
+        ScaleBone(-1, &scale, 1);
+        BrVector3Copy(&gPed_scale, pScale);
+        gAverage_ped_scale = (gPed_scale.v[0] + gPed_scale.v[1] + gPed_scale.v[2]) / 3.0f;
+        UpdateIfBackwardsAR();
+    }
 }
 
 // ChangeHeadScaling
