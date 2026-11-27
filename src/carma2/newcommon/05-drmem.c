@@ -10,6 +10,7 @@
 
 #include "brender/brender.h"
 #include "52-errors.h"
+#include "70-packfile.h"
 
 #include "rec2_macros.h"
 #include "rec2_types.h"
@@ -34,6 +35,11 @@ br_allocator gAllocator = {
     DRStdlibInquire,
     Claim4ByteAlignment
 };
+
+// GLOBAL: CARMA2_HW 0x00681fa0
+// GLOBAL: CARMA2_SW 0x0067c6e0
+// GLOBAL: CARMA2_CHEAT 0x00689848
+FILE* gGlobalPackedFile;
 
 // GLOBAL: CARMA2_HW 0x00681fa4
 // GLOBAL: CARMA2_SW 0x0067c6e4
@@ -337,6 +343,17 @@ int C2_HOOK_FASTCALL AllocationErrorsAreFatal(void) {
 // FUNCTION: CARMA2_CHEAT 0x0044cd70
 void C2_HOOK_FASTCALL MAMSInitMem(void) {
 
+}
+
+// FUNCTION: CARMA2_HW 0x0044c830
+// FUNCTION: CARMA2_SW 0x0044c5e0
+// FUNCTION: CARMA2_CHEAT 0x0044cd80
+void C2_HOOK_FASTCALL CloseGlobalPackedFile(void) {
+
+    if (gGlobalPackedFile != NULL) {
+        PFfclose(gGlobalPackedFile);
+        gGlobalPackedFile = NULL;
+    }
 }
 
 // FUNCTION: CARMA2_HW 0x0044c850
