@@ -43,8 +43,8 @@ typedef struct {
     uintptr_t value;
 } tDraw_d3d_10037ce0;
 typedef struct {
-    LPDIRECTDRAWSURFACE surface;
     LPDIRECT3DTEXTURE2 texture;
+    LPDIRECTDRAWSURFACE surface;
     undefined4 field_0x8;
     undefined4 field_0xc;
     undefined4 field_0x10;
@@ -64,9 +64,9 @@ typedef struct {
 } tStruct_100385e0;
 
 typedef struct {
-    undefined4 field_0x0;
-    undefined4 field_0x4;
-    undefined4 field_0x8;
+    int field_0x0;
+    int field_0x4;
+    int field_0x8;
     int width;
     int height;
     int count;

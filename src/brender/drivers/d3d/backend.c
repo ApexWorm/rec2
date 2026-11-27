@@ -1194,12 +1194,17 @@ int C2_HOOK_CDECL SetD3DViewport(void) {
 // FUNCTION: D3D 0x10004030
 void C2_HOOK_CDECL D3DSetupTextureCacheColorKeyAlpha(void) {
     int i;
+    int failed;
     LPDIRECTDRAWSURFACE surface;
     LPDIRECT3DTEXTURE2 texture;
     DDSURFACEDESC surface_desc;
+    DDCOLORKEY color_key;
+    void* pixels;
+    void* dst;
+    LONG pitch;
 
     d3d_debug_printf("TC: setup color key alpha");
-    for (i = 0; i < BR_ASIZE(gStruct_100381c0); i++) {
+    for (i = 0; i < (int)BR_ASIZE(gStruct_100381c0); i++) {
         gStruct_100381c0[i].surface = NULL;
         gStruct_100381c0[i].texture = NULL;
         gStruct_100381c0[i].texture_handle = 0;
@@ -1211,72 +1216,79 @@ void C2_HOOK_CDECL D3DSetupTextureCacheColorKeyAlpha(void) {
     memcpy(&surface_desc, &gPreferred_opaque_texture_surface_description, sizeof(surface_desc));
     surface_desc.dwWidth = 16;
     surface_desc.dwHeight = 16;
+    surface_desc.dwFlags = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH | DDSD_PIXELFORMAT;
     surface_desc.ddsCaps.dwCaps = DDSCAPS_SYSTEMMEMORY | DDSCAPS_TEXTURE;
-    surface_desc.dwFlags =  DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH | DDSD_PIXELFORMAT;
-    if (IDirectDraw_CreateSurface(gDirectDraw, &surface_desc, &surface, NULL) != DD_OK) {
+    failed = IDirectDraw_CreateSurface(gDirectDraw, &surface_desc, &surface, NULL) != DD_OK;
+    if (failed) {
         return;
     }
-    if (IDirectDrawSurface_QueryInterface(surface, &IID_IDirect3DTexture2, (LPVOID)&texture) != DD_OK) {
-        IDirectDrawSurface_Release(surface);
+    failed = IDirectDrawSurface_QueryInterface(surface, &IID_IDirect3DTexture2, (LPVOID*)&texture) != DD_OK;
+    if (failed) {
         return;
     }
-    for (i = 0; i <  BR_ASIZE(gStruct_100381c0); i++) {
-        DDCOLORKEY color_key;
-        int y;
-
+    pixels = gTextures_alpha_init;
+    for (i = 0; i < (int)BR_ASIZE(gStruct_100381c0); i++) {
         memset(&surface_desc, 0, sizeof(surface_desc));
         surface_desc.dwSize = sizeof(surface_desc);
         if (IDirectDrawSurface_Lock(surface, NULL, &surface_desc, 0, NULL) != DD_OK) {
-            IDirect3DTexture2_Release(texture);
-            IDirectDraw_Release(surface);
             return;
         }
-        for (y = 0; y < 16; y++) {
-            memcpy((br_uint_8*)surface_desc.lpSurface + y * surface_desc.lPitch, gTextures_alpha_init[i][y], 2 * 16);
+        pitch = surface_desc.lPitch;
+        dst = surface_desc.lpSurface;
+#ifdef REC2_MATCHING
+        __asm {
+            mov     edi, dst
+            mov     esi, pixels
+            mov     ecx, 16
+        copy_row:
+            push    ecx
+            push    edi
+            mov     ecx, 16 * 2 / 4
+            rep movsd
+            pop     edi
+            add     edi, pitch
+            pop     ecx
+            loop    copy_row
         }
+#else
+        {
+            int y;
+
+            for (y = 0; y < 16; y++) {
+                memcpy((br_uint_8*)dst + y * pitch, (br_uint_16*)pixels + y * 16, 16 * sizeof(br_uint_16));
+            }
+        }
+#endif
         if (IDirectDrawSurface_Unlock(surface, NULL) != DD_OK) {
-            IDirect3DTexture2_Release(texture);
-            IDirectDraw_Release(surface);
             return;
         }
         memcpy(&surface_desc, &gPreferred_opaque_texture_surface_description, sizeof(surface_desc));
-        surface_desc.dwSize = sizeof(surface_desc);
+        surface_desc.ddsCaps.dwCaps = gDevice_has_color_model ? (DDSCAPS_ALLOCONLOAD | DDSCAPS_LOCALVIDMEM | DDSCAPS_VIDEOMEMORY | DDSCAPS_TEXTURE) : (DDSCAPS_ALLOCONLOAD | DDSCAPS_SYSTEMMEMORY | DDSCAPS_TEXTURE);
         surface_desc.dwWidth = 16;
         surface_desc.dwHeight = 16;
-        surface_desc.ddsCaps.dwCaps = DDSCAPS_ALLOCONLOAD | DDSCAPS_TEXTURE | (gDevice_has_color_model ? (DDSCAPS_LOCALVIDMEM | DDSCAPS_VIDEOMEMORY) : DDSCAPS_SYSTEMMEMORY);
         surface_desc.dwFlags = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH | DDSD_PIXELFORMAT;
-        if (IDirectDraw_CreateSurface(gDirectDraw, &surface_desc, &gStruct_100381c0[i].surface, NULL) != DD_OK) {
-            IDirect3DTexture2_Release(texture);
-            IDirectDrawSurface_Release(surface);
+        failed = IDirectDraw_CreateSurface(gDirectDraw, &surface_desc, &gStruct_100381c0[i].surface, NULL) != DD_OK;
+        if (failed) {
             return;
         }
-        if (IDirectDraw_QueryInterface(gStruct_100381c0[i].surface, &IID_IDirect3DTexture2, (LPVOID)&gStruct_100381c0[i].texture) != DD_OK) {
-            IDirectDrawSurface_Release(gStruct_100381c0[i].surface);
-            gStruct_100381c0[i].surface = NULL;
-            IDirect3DTexture2_Release(texture);
-            IDirectDrawSurface_Release(surface);
+        failed = IDirectDrawSurface_QueryInterface(gStruct_100381c0[i].surface, &IID_IDirect3DTexture2, (LPVOID*)&gStruct_100381c0[i].texture) != DD_OK;
+        if (failed) {
             return;
         }
-        if (IDirect3DTexture2_GetHandle(gStruct_100381c0[i].texture, gD3DDevice2, &gStruct_100381c0[i].texture_handle) != D3D_OK) {
-            IDirectDrawSurface_Release(gStruct_100381c0[i].surface);
-            gStruct_100381c0[i].surface = NULL;
-            IDirect3DTexture2_Release(gStruct_100381c0[i].texture);
-            gStruct_100381c0[i].texture = NULL;
-            IDirect3DTexture2_Release(texture);
-            IDirectDrawSurface_Release(surface);
+        failed = IDirect3DTexture2_Load(gStruct_100381c0[i].texture, texture) != D3D_OK;
+        if (failed) {
             return;
         }
-        color_key.dwColorSpaceLowValue = 0;
+        failed = IDirect3DTexture2_GetHandle(gStruct_100381c0[i].texture, gD3DDevice2, &gStruct_100381c0[i].texture_handle) != D3D_OK;
+        if (failed) {
+            return;
+        }
         color_key.dwColorSpaceHighValue = 0;
+        color_key.dwColorSpaceLowValue = 0;
         if (IDirectDrawSurface_SetColorKey(gStruct_100381c0[i].surface, DDCKEY_SRCBLT, &color_key) != DD_OK) {
-            IDirectDrawSurface_Release(gStruct_100381c0[i].surface);
-            gStruct_100381c0[i].surface = NULL;
-            IDirect3DTexture2_Release(gStruct_100381c0[i].texture);
-            gStruct_100381c0[i].texture = NULL;
-            IDirect3DTexture2_Release(texture);
-            IDirectDrawSurface_Release(surface);
             return;
         }
+        pixels = (br_uint_16*)pixels + 16 * 16;
     }
     IDirect3DTexture2_Release(texture);
     IDirectDrawSurface_Release(surface);
@@ -1285,46 +1297,44 @@ void C2_HOOK_CDECL D3DSetupTextureCacheColorKeyAlpha(void) {
 // FUNCTION: D3D 0x10004280
 int C2_HOOK_CDECL FUN_10004280(int count, int width, int height) {
     int i;
+    int failed;
     LPDIRECTDRAWSURFACE temp_surface;
     LPDIRECT3DTEXTURE2 temp_texture;
     LPDIRECTDRAWSURFACE temp_opaque_surface;
     LPDIRECT3DTEXTURE2 temp_opaque_texture;
+    DDSURFACEDESC surface_desc;
+    LPDIRECTDRAWSURFACE* surface;
+    LPDIRECT3DTEXTURE2* texture;
 
     gBuffered_textures[gSize_texture_cache].width = width;
     gBuffered_textures[gSize_texture_cache].height = height;
     for (i = 0; gBuffered_textures[i].width != width || gBuffered_textures[i].height != height; i++) {
     }
     if (i == gSize_texture_cache) {
-        DDSURFACEDESC surface_desc;
-
         memcpy(&surface_desc, &gPreferred_texture_surface_description, sizeof(surface_desc));
+        surface_desc.dwFlags = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH | DDSD_PIXELFORMAT;
+        surface_desc.ddsCaps.dwCaps = DDSCAPS_SYSTEMMEMORY | DDSCAPS_TEXTURE;
         surface_desc.dwWidth = width;
         surface_desc.dwHeight = height;
-        surface_desc.ddsCaps.dwCaps = DDSCAPS_SYSTEMMEMORY | DDSCAPS_TEXTURE;
-        surface_desc.dwFlags = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH | DDSD_PIXELFORMAT;
-        if (IDirectDraw_CreateSurface(gDirectDraw, &surface_desc, &temp_surface, NULL) != DD_OK) {
-            NOT_IMPLEMENTED(); /* This should succeed */
+        failed = IDirectDraw_CreateSurface(gDirectDraw, &surface_desc, &temp_surface, NULL) != DD_OK;
+        if (failed) {
             return -1;
         }
-        if (IDirectDraw_QueryInterface(temp_surface, &IID_IDirect3DTexture2, (LPVOID)&temp_texture) != DD_OK) {
-            IDirectDrawSurface_Release(temp_surface);
+        failed = IDirectDrawSurface_QueryInterface(temp_surface, &IID_IDirect3DTexture2, (LPVOID*)&temp_texture) != DD_OK;
+        if (failed) {
             return -1;
         }
-
         memcpy(&surface_desc, &gPreferred_opaque_texture_surface_description, sizeof(surface_desc));
+        surface_desc.dwFlags = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH | DDSD_PIXELFORMAT;
+        surface_desc.ddsCaps.dwCaps = DDSCAPS_SYSTEMMEMORY | DDSCAPS_TEXTURE;
         surface_desc.dwWidth = width;
         surface_desc.dwHeight = height;
-        surface_desc.ddsCaps.dwCaps = DDSCAPS_SYSTEMMEMORY | DDSCAPS_TEXTURE;
-        surface_desc.dwFlags = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH | DDSD_PIXELFORMAT;
-        if (IDirectDraw_CreateSurface(gDirectDraw, &surface_desc, &temp_opaque_surface, NULL) != DD_OK) {
-            IDirect3DTexture2_Release(temp_texture);
-            IDirectDrawSurface_Release(temp_surface);
+        failed = IDirectDraw_CreateSurface(gDirectDraw, &surface_desc, &temp_opaque_surface, NULL) != DD_OK;
+        if (failed) {
             return -1;
         }
-        if (IDirectDraw_QueryInterface(temp_opaque_surface, &IID_IDirect3DTexture2, (LPVOID)&temp_opaque_texture) != DD_OK) {
-            IDirect3DTexture2_Release(temp_texture);
-            IDirectDrawSurface_Release(temp_surface);
-            IDirectDrawSurface_Release(temp_opaque_surface);
+        failed = IDirectDrawSurface_QueryInterface(temp_opaque_surface, &IID_IDirect3DTexture2, (LPVOID*)&temp_opaque_texture) != DD_OK;
+        if (failed) {
             return -1;
         }
         d3d_debug_printf("TC: made temp textures");
@@ -1335,41 +1345,45 @@ int C2_HOOK_CDECL FUN_10004280(int count, int width, int height) {
         temp_opaque_texture = gBuffered_textures[i].temp_opaque_texture;
     }
     for (i = 0; i < count; i++) {
-        DDSURFACEDESC surface_desc;
-
-        gBuffered_textures[gSize_texture_cache].width = width;
-        gBuffered_textures[gSize_texture_cache].height = height;
+        gBuffered_textures[gSize_texture_cache].field_0x20 = -1;
+        gBuffered_textures[gSize_texture_cache].field_0x24 = -1;
         gBuffered_textures[gSize_texture_cache].temp_texture = temp_texture;
         gBuffered_textures[gSize_texture_cache].temp_surface = temp_surface;
         gBuffered_textures[gSize_texture_cache].temp_opaque_texture = temp_opaque_texture;
         gBuffered_textures[gSize_texture_cache].temp_opaque_surface = temp_opaque_surface;
         gBuffered_textures[gSize_texture_cache].field_0x1c = 0;
-        gBuffered_textures[gSize_texture_cache].field_0x20 = -1;
-        gBuffered_textures[gSize_texture_cache].field_0x24 = -1;
+        gBuffered_textures[gSize_texture_cache].width = width;
+        gBuffered_textures[gSize_texture_cache].height = height;
+        surface = &gBuffered_textures[gSize_texture_cache].surface;
+        texture = &gBuffered_textures[gSize_texture_cache].texture;
         memcpy(&surface_desc, &gPreferred_opaque_texture_surface_description, sizeof(surface_desc));
-        surface_desc.dwWidth = width;
+        surface_desc.ddsCaps.dwCaps = gDevice_has_color_model ? (DDSCAPS_ALLOCONLOAD | DDSCAPS_LOCALVIDMEM | DDSCAPS_VIDEOMEMORY | DDSCAPS_TEXTURE) : (DDSCAPS_ALLOCONLOAD | DDSCAPS_SYSTEMMEMORY | DDSCAPS_TEXTURE);
         surface_desc.dwHeight = height;
-        surface_desc.ddsCaps.dwCaps = DDSCAPS_ALLOCONLOAD | DDSCAPS_TEXTURE | (gDevice_has_color_model ? (DDSCAPS_LOCALVIDMEM | DDSCAPS_VIDEOMEMORY) : DDSCAPS_SYSTEMMEMORY);
-        surface_desc.dwFlags =  DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH | DDSD_PIXELFORMAT;
-
-        if (IDirectDraw_CreateSurface(gDirectDraw, &surface_desc, &gBuffered_textures[gSize_texture_cache].surface, NULL) != DD_OK) {
+        surface_desc.dwFlags = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH | DDSD_PIXELFORMAT;
+        surface_desc.dwWidth = width;
+        failed = IDirectDraw_CreateSurface(gDirectDraw, &surface_desc, surface, NULL) != DD_OK;
+        if (failed) {
             return -1;
         }
-        if (IDirectDrawSurface_QueryInterface(gBuffered_textures[gSize_texture_cache].surface, &IID_IDirect3DTexture2, (LPVOID)&gBuffered_textures[gSize_texture_cache].texture) != DD_OK) {
+        d3d_debug_printf("TC: create");
+        failed = IDirectDrawSurface_QueryInterface(*surface, &IID_IDirect3DTexture2, (LPVOID*)texture) != DD_OK;
+        if (failed) {
             return -1;
         }
         d3d_debug_printf("TC: qi");
-        if (IDirect3DTexture2_Load(gBuffered_textures[gSize_texture_cache].texture, temp_opaque_texture) != D3D_OK) {
+        failed = IDirect3DTexture2_Load(*texture, temp_opaque_texture) != D3D_OK;
+        if (failed) {
             return -1;
         }
         d3d_debug_printf("TC: load");
-        if (IDirect3DTexture2_GetHandle(gBuffered_textures[gSize_texture_cache].texture, gD3DDevice2, &gBuffered_textures[gSize_texture_cache].texture_handle) != D3D_OK) {
+        failed = IDirect3DTexture2_GetHandle(*texture, gD3DDevice2, &gBuffered_textures[gSize_texture_cache].texture_handle) != D3D_OK;
+        if (failed) {
             return -1;
         }
         d3d_debug_printf("TC: allocated texture");
         gSize_texture_cache += 1;
     }
-    return count;
+    return i;
 }
 
 // FUNCTION: D3D 0x10004610
@@ -1377,9 +1391,12 @@ int C2_HOOK_CDECL StartTextureCache(void) {
     int i;
     int cache_full;
     int second_loop;
+    int count;
 
+    cache_full = 0;
     d3d_debug_printf("--Starting Texture Cache--");
     gSize_texture_cache = 0;
+    second_loop = 0;
     if (gDevice_description.dpcTriCaps.dwTextureCaps & D3DPTEXTURECAPS_SQUAREONLY) {
         d3d_debug_printf("TC: ditching non square textures");
 
@@ -1393,10 +1410,7 @@ int C2_HOOK_CDECL StartTextureCache(void) {
         }
     }
     D3DSetupTextureCacheColorKeyAlpha();
-    cache_full = 0;
-    second_loop = 0;
-    for (;;) {
-        int count;
+    do {
 
         for (i = 0; gStruct_10015898_ARRAY[i].field_0x8 != 0; i++) {
 
@@ -1417,19 +1431,17 @@ int C2_HOOK_CDECL StartTextureCache(void) {
                     gStruct_10015898_ARRAY[i].field_0x4 -= 1;
                     if (FUN_10004280(gStruct_10015898_ARRAY[i].field_0x8,
                             gStruct_10015898_ARRAY[i].width >> gINT_1001bbd0,
-                            gStruct_10015898_ARRAY[i].height >> gINT_1001bbd0) == -1) {
-                        cache_full = 1;
-                    } else {
+                            gStruct_10015898_ARRAY[i].height >> gINT_1001bbd0) != -1) {
                         gStruct_10015898_ARRAY[i].count += gStruct_10015898_ARRAY[i].field_0x8;
+                    } else {
+                        cache_full = 1;
                     }
                 }
+                count += gStruct_10015898_ARRAY[i].field_0x4;
             }
         }
-        if (second_loop || count != 0) {
-            break;
-        }
-        second_loop = 1;
-    }
+        second_loop += 1;
+    } while (second_loop == 1 && count == 0);
     for (i = 0; gStruct_10015898_ARRAY[i].field_0x8 != 0; i++) {
         d3d_debug_printf("Texture Alloc %d of %dx%d=%d at %dx%d",
             gStruct_10015898_ARRAY[i].count,
