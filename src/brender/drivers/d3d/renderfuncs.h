@@ -13,9 +13,9 @@
 
 #include "c2_hooks.h"
 
-void C2_HOOK_CDECL PointRender_d3d_RGB_555(brp_block* block, brp_vertex* vertex);
+void C2_HOOK_CDECL PointRender_d3d_RGB_555(brp_block* block, brp_vertex* v0);
 
-void C2_HOOK_CDECL LineRender_d3d(brp_block* block, brp_vertex* vertex);
+void C2_HOOK_CDECL LineRender_d3d(brp_block* block, brp_vertex* v0, brp_vertex* v1);
 
 void C2_HOOK_CDECL FUN_10007030(brp_block_d3d* block);
 

@@ -11,19 +11,65 @@
 #include "backend.h"
 #include "match.h"
 
-// STUB: D3D 0x100080e0
-void C2_HOOK_CDECL PointRender_d3d_RGB_555(brp_block* block, brp_vertex* vertex) {
-    NOT_IMPLEMENTED();
+// FUNCTION: D3D 0x100080e0
+void C2_HOOK_CDECL PointRender_d3d_RGB_555(brp_block* block, brp_vertex* v0) {
+    gINT_1001bbc4 += 1;
+    gQueued_vertices_indices[gCount_queued_vertices_indices] = gCount_queued_vertices;
+    gINT_1001dc2c = gCount_queued_vertices;
+    gCount_queued_vertices_indices += 1;
+    gQueued_vertices[gCount_queued_vertices].sx = v0->comp_f[C_SX];
+    gQueued_vertices[gCount_queued_vertices].sy = v0->comp_f[C_SY];
+    gQueued_vertices[gCount_queued_vertices].sz = v0->comp_f[C_SZ] / 65536.0f;
+    gQueued_vertices[gCount_queued_vertices].tu = v0->comp_f[C_U];
+    gQueued_vertices[gCount_queued_vertices].tv = v0->comp_f[C_V];
+    gQueued_vertices[gCount_queued_vertices].rhw = (D3DVALUE)(1.0 / v0->comp_f[C_W]);
+    gQueued_vertices[gCount_queued_vertices].color = ((((v0->comp_i[C_R] << 8) + v0->comp_i[C_G]) << 8) + v0->comp_i[C_B] + gCOLOUR_100156e8) | gCOLOUR_1001dc24;
+    gQueued_vertices[gCount_queued_vertices].specular = 0;
+    gCount_queued_vertices += 1;
+    gPrimitive_type = D3DPT_POINTLIST;
+    if (gCount_queued_vertices_indices > 100) {
+        FUN_10007140();
+    }
 }
 
-// STUB: D3D 0x10007f80
-void C2_HOOK_CDECL LineRender_d3d(brp_block* block, brp_vertex* vertex) {
-    NOT_IMPLEMENTED();
+// FUNCTION: D3D 0x10007f80
+void C2_HOOK_CDECL LineRender_d3d(brp_block* block, brp_vertex* v0, brp_vertex* v1) {
+    gINT_1001bbc4 += 1;
+    gQueued_vertices_indices[gCount_queued_vertices_indices] = gCount_queued_vertices;
+    gINT_1001dc2c = gCount_queued_vertices;
+    gCount_queued_vertices_indices += 1;
+    gQueued_vertices[gCount_queued_vertices].sx = v0->comp_f[C_SX];
+    gQueued_vertices[gCount_queued_vertices].sy = v0->comp_f[C_SY];
+    gQueued_vertices[gCount_queued_vertices].sz = v0->comp_f[C_SZ] / 65536.0f;
+    gQueued_vertices[gCount_queued_vertices].tu = v0->comp_f[C_U];
+    gQueued_vertices[gCount_queued_vertices].tv = v0->comp_f[C_V];
+    gQueued_vertices[gCount_queued_vertices].rhw = (D3DVALUE)(1.0 / v0->comp_f[C_W]);
+    gQueued_vertices[gCount_queued_vertices].color = (((((0xff << 8) + v0->comp_i[C_R]) << 8) + v0->comp_i[C_G]) << 8) + v0->comp_i[C_B];
+    gQueued_vertices[gCount_queued_vertices].specular = 0;
+    gCount_queued_vertices += 1;
+    gQueued_vertices_indices[gCount_queued_vertices_indices] = gCount_queued_vertices;
+    gINT_1001dc2c = gCount_queued_vertices;
+    gCount_queued_vertices_indices += 1;
+    gQueued_vertices[gCount_queued_vertices].sx = v1->comp_f[C_SX];
+    gQueued_vertices[gCount_queued_vertices].sy = v1->comp_f[C_SY];
+    gQueued_vertices[gCount_queued_vertices].sz = v1->comp_f[C_SZ] / 65536.0f;
+    gQueued_vertices[gCount_queued_vertices].tu = v1->comp_f[C_U];
+    gQueued_vertices[gCount_queued_vertices].tv = v1->comp_f[C_V];
+    gQueued_vertices[gCount_queued_vertices].rhw = (D3DVALUE)(1.0 / v1->comp_f[C_W]);
+    gQueued_vertices[gCount_queued_vertices].color = (((((0xff << 8) + v0->comp_i[C_R]) << 8) + v0->comp_i[C_G]) << 8) + v0->comp_i[C_B];
+    gQueued_vertices[gCount_queued_vertices].specular = 0;
+    gCount_queued_vertices += 1;
+    gPrimitive_type = D3DPT_LINELIST;
+    if (gCount_queued_vertices_indices > 100) {
+        FUN_10007140();
+    }
 }
 
-// STUB: D3D 0x10007030
+// FUNCTION: D3D 0x10007030
 void C2_HOOK_CDECL FUN_10007030(brp_block_d3d* block) {
-    NOT_IMPLEMENTED();
+    QUEUE_RENDER_STATE(1, gDWORD_1001bbb4);
+    QUEUE_RENDER_STATE(9, 2);
+    QUEUE_RENDER_STATE(0x15, 2);
 }
 
 // FUNCTION: D3D 0x10007080

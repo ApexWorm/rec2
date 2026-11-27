@@ -261,6 +261,12 @@ int gCount_queued_vertices_indices;
 // GLOBAL: D3D 0x1001dc28
 D3DPRIMITIVETYPE gPrimitive_type;
 
+// GLOBAL: D3D 0x1001dc2c
+int gINT_1001dc2c;
+
+// GLOBAL: D3D 0x1001dc24
+br_colour gCOLOUR_1001dc24;
+
 // GLOBAL: D3D 0x1001bbc4
 int gINT_1001bbc4;
 
