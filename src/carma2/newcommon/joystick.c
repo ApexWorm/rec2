@@ -113,6 +113,60 @@ int C2_HOOK_FASTCALL ReadUntilCharacter(FILE* pF, char* pBuffer, int pBuffer_siz
     }
 }
 
+// FUNCTION: CARMA2_HW 0x0045a920
+// FUNCTION: CARMA2_SW 0x0045a670
+// FUNCTION: CARMA2_CHEAT 0x0045ada0
+int C2_HOOK_FASTCALL StoreTextHeadup(tHeadup_text_buffer* pTexts, tHeadup_text* pNew, int pSorted) {
+    tHeadup_text* last;
+    tHeadup_text* current;
+    tHeadup_text* next;
+    int found;
+    int count;
+
+    current = pTexts->texts;
+    found = 0;
+    count = 0;
+    if (current == NULL) {
+        pTexts->texts = pNew;
+        pNew->next = NULL;
+        pTexts->count = 1;
+        pTexts->pos_last_add = 0;
+        pTexts->text_last_add = pNew;
+        return 0;
+    }
+    last = current;
+    if (!pSorted) {
+        while (last->next != NULL) {
+            last = last->next;
+            count++;
+        }
+        pNew->next = NULL;
+        last->next = pNew;
+    } else if (strcmp(last->text, pNew->text) > 0) {
+        pTexts->texts = pNew;
+        pNew->next = last;
+    } else {
+        next = NULL;
+        current = last->next;
+        while (current != NULL && !found) {
+            if (strcmp(current->text, pNew->text) > 0) {
+                found = 1;
+                next = current;
+            } else {
+                last = current;
+            }
+            current = last->next;
+            count++;
+        }
+        pNew->next = next;
+        last->next = pNew;
+    }
+    pTexts->count++;
+    pTexts->pos_last_add = count;
+    pTexts->text_last_add = last;
+    return count;
+}
+
 #ifdef REC2_HW
 // FUNCTION: CARMA2_HW 0x0045aa60
 // FUNCTION: CARMA2_CHEAT 0x0045aee0
