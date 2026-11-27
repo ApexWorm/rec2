@@ -31,6 +31,7 @@
 #include "58-crush2.h"
 #include "60-phil.h"
 #include "61-pedestrn.h"
+#include "62-graphics3.h"
 #include "63-loading3.h"
 #include "69-sound.h"
 #include "70-packfile.h"
@@ -544,10 +545,88 @@ void C2_HOOK_FASTCALL NewRepulseRay(tU32 pTime, tCar_spec* pCar, tCar_spec* pVic
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x004db8e0
-// STUB: CARMA2_SW 0x004d7de0
+// FUNCTION: CARMA2_HW 0x004db8e0
+// FUNCTION: CARMA2_SW 0x004d7de0
+// FUNCTION: CARMA2_CHEAT 0x004e14a0
 void C2_HOOK_FASTCALL MungeRepulseRays(tU32 pTime) {
-    NOT_IMPLEMENTED();
+    int i;
+    int j;
+    int blend;
+    tU32 delta_time;
+    tRepulse_link* link;
+    br_model* model;
+    br_vector3 delta;
+    br_vector3 delta_unit;
+    br_vector3 dir;
+    br_vector3 delta_orth;
+    br_vector3 p;
+    br_vector3 orth_dirs[12];
+    br_vector3 orth_pieces1[12];
+    br_vector3 orth_pieces2[12];
+    br_matrix34 mat;
+    float percentage;
+
+    ARStartPipingSession(ePipe_chunk_repulse_ray);
+    for (i = 0; i < (int)REC2_ASIZE(gRepulse_links); i++) {
+        link = &gRepulse_links[i];
+        if (link->time == 0) {
+            continue;
+        }
+        delta_time = pTime - link->time;
+        if (delta_time >= 700) {
+            link->time = 0;
+            if (link->actor->parent == gNon_track_actor) {
+                BrActorRemove(link->actor);
+            }
+            continue;
+        }
+        BrVector3Sub(&delta, link->pos_victim, link->pos_origin);
+        model = link->actor->model;
+        if (delta.v[0] == 0.f && delta.v[2] == 0.f) {
+            continue;
+        }
+        delta_unit.v[0] = delta.v[0] / (float)(model->nvertices / 2 - 1);
+        delta_unit.v[1] = delta.v[1] / (float)(model->nvertices / 2 - 1);
+        delta_unit.v[2] = delta.v[2] / (float)(model->nvertices / 2 - 1);
+        BrVector3Normalise(&dir, &delta);
+        BrVector3Cross(&delta_orth, &delta, &y_unit_vector);
+        BrVector3Copy(&p, link->pos_origin);
+        BrVector3Normalise(&orth_dirs[0], &delta_orth);
+        for (j = 1; j < 5; j++) {
+            BrMatrix34Rotate(&mat, (j * 0x10000) / 5, &dir);
+            BrMatrix34ApplyV(&orth_dirs[j], &orth_dirs[0], &mat);
+        }
+        for (j = 0; j < 5; j++) {
+            BrVector3Scale(&orth_pieces1[j], &orth_dirs[j], link->field_0x18);
+            BrVector3Scale(&orth_pieces2[j], &orth_dirs[j], link->field_0x1c);
+        }
+        for (j = 0; j < model->nvertices / 2; j++) {
+            BrVector3Accumulate(&p, &delta_unit);
+            BrVector3Add(&model->vertices[j].p, &p, &orth_pieces1[j % 5]);
+            BrVector3Add(&model->vertices[j + model->nvertices / 2].p, &p, &orth_pieces2[j % 5]);
+        }
+        percentage = (float)delta_time / 700.f;
+        if (percentage > .9) {
+            blend = 25;
+        } else if (percentage > .8) {
+            blend = 50;
+        } else if (percentage > .7) {
+            blend = 75;
+        } else {
+            blend = 100;
+        }
+        if (blend != link->field_0x10) {
+            BlendifyMaterial(link->material, blend);
+            BrMaterialUpdate(link->material, BR_MATU_ALL);
+            link->field_0x10 = blend;
+        }
+        BrModelUpdate(model, BR_MODU_ALL);
+        if (link->actor->parent != gNon_track_actor) {
+            BrActorAdd(gNon_track_actor, link->actor);
+        }
+        AddRepulseRayToPipingSession(i, link->pos_origin, link->pos_victim, link->time);
+    }
+    AREndPipingSession();
 }
 
 #ifdef REC2_MATCHING
