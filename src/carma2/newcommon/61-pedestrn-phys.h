@@ -321,9 +321,9 @@ extern void C2_HOOK_FASTCALL ShowActivePedCount(void);
 
 extern void C2_HOOK_FASTCALL PedPreCollisionStuff(void);
 
-// UpdateIfBackwardsAR
+extern void C2_HOOK_FASTCALL UpdateIfBackwardsAR(void);
 
-extern int C2_HOOK_FASTCALL ChangePedScaling(br_vector3* pScale);
+extern void C2_HOOK_FASTCALL ChangePedScaling(const br_vector3* pScale);
 
 // ChangeHeadScaling
 
