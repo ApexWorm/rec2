@@ -44,6 +44,7 @@ br_pixelmap* gDuplicate_pixelmap;
 
 // GLOBAL: CARMA2_HW 0x006aaa28
 // GLOBAL: CARMA2_SW 0x006a4478
+// GLOBAL: CARMA2_CHEAT 0x006b25a0
 br_material* gDuplicate_material;
 
 // GLOBAL: CARMA2_HW 0x006aaa24
@@ -295,7 +296,7 @@ tAdd_to_storage_result C2_HOOK_FASTCALL AddShadeTableToStorage(tBrender_storage*
 // FUNCTION: CARMA2_HW 0x00501190
 // FUNCTION: CARMA2_SW 0x004fcaf0
 // FUNCTION: CARMA2_CHEAT 0x00506e40
-tAdd_to_storage_result C2_HOOK_FASTCALL AddMaterialToStorage(tBrender_storage* pStorage_space, br_material* pThe_mat) {
+inline tAdd_to_storage_result C2_HOOK_FASTCALL AddMaterialToStorage(tBrender_storage* pStorage_space, br_material* pThe_mat) {
     int i;
 
     gDuplicate_material = NULL;
@@ -496,9 +497,7 @@ br_material* C2_HOOK_FASTCALL LoadSingleMaterial(tBrender_storage* pStorage_spac
         FatalError(kFatalError_InsufficientMaterialSlots);
         return NULL;
     }
-#ifdef REC2_FIX_BUGS
     return NULL;
-#endif
 }
 
 // FUNCTION: CARMA2_HW 0x00501930
