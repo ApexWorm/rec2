@@ -154,7 +154,7 @@ void C2_HOOK_FASTCALL FUN_0045a670(void) {
         ChangeHeadupFont(gRace_head_ups[i], -2);
     }
 #ifdef REC2_HW
-    CreateAccentPolyActor(8.f, 118.f, 130.f, 224.f);
+    CreateAccentPolyActor(8.0f, 118.0f, 130.0f, 224.0f);
 #endif
     ext = ".ACT";
     if (gPath_headup_buffer.count == 0) {
