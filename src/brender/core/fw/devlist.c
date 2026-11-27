@@ -100,6 +100,7 @@ br_error C2_HOOK_CDECL BrDevAddStatic(br_device** pdev, br_device_begin_fn* dev_
 
 // FUNCTION: CARMA2_HW 0x005285c0
 // FUNCTION: CARMA2_SW 0x00523c40
+// FUNCTION: CARMA2_CHEAT 0x0052e1b0
 br_error C2_HOOK_CDECL BrDevCheckAdd(br_device** pdev, const char* name, const char* args) {
 
     if (BrDevFind(pdev, name) == 0) {
@@ -109,6 +110,7 @@ br_error C2_HOOK_CDECL BrDevCheckAdd(br_device** pdev, const char* name, const c
 }
 
 // FUNCTION: CARMA2_HW 0x005286d0
+// FUNCTION: CARMA2_SW 0x00523d50
 // FUNCTION: CARMA2_CHEAT 0x0052e2c0
 br_error C2_HOOK_CDECL BrDevAddConfig(const char* config) {
     const char* end;
