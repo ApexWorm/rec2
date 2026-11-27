@@ -436,7 +436,7 @@ br_error C2_HOOK_CDECL _M_br_device_pixelmap_d3d_rectangleCopyTo(br_device_pixel
     }
     gINT_1001bb94 = 1;
     if (gNo_2d_during_3d_scene == 1) {
-        FUN_10004780((br_uint_8*)src->pm_pixels + ar.y * src->pm_row_bytes + 2 * ar.x, src->pm_row_bytes);
+        FUN_10004780((br_uint_8*)src->pm_pixels + ar.y * src->pm_row_bytes + 2 * ar.x, src->pm_row_bytes, ar.w, ar.h);
         return 0;
     }
     gLock_count += 1;

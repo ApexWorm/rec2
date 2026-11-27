@@ -36,7 +36,7 @@ typedef struct {
     int field_0x24;
     int width;
     int height;
-    undefined4 field_0x30;
+    void* field_0x30;
 } tStruct_1001dcc0;
 typedef struct {
     int type;
@@ -120,6 +120,6 @@ int C2_HOOK_CDECL d3d_load(render_buffer_d3d* buffer, int arg2);
 
 void C2_HOOK_CDECL FUN_10007140(void);
 
-void C2_HOOK_CDECL FUN_10004780(void* arg1, int stride);
+void C2_HOOK_CDECL FUN_10004780(void* arg1, int stride, int width, int height);
 
 #endif /* D3D_BACKEND_H */
