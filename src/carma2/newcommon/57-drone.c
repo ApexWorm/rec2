@@ -125,6 +125,16 @@ int gStatic_drone_path_model_max_vertices;
 // GLOBAL: CARMA2_CHEAT 0x0068bde4
 int gStatic_drone_path_model_max_faces;
 
+// GLOBAL: CARMA2_HW 0x00594760
+// GLOBAL: CARMA2_SW 0x0058f6c0
+// GLOBAL: CARMA2_CHEAT 0x0059b0b8
+tDrone_form_within_rendering_distance_cbfn* gDrone_form_within_rendering_distance_functions[4] = {
+    DroneCarWithinRenderingDistance,
+    DronePlaneWithinRenderingDistance,
+    DroneTrainWithinRenderingDistance,
+    DronePlaneWithinRenderingDistance,
+};
+
 // GLOBAL: CARMA2_HW 0x005947b4
 // GLOBAL: CARMA2_SW 0x0058f714
 // GLOBAL: CARMA2_CHEAT 0x0059b10c
@@ -469,7 +479,15 @@ inline void C2_HOOK_FASTCALL ResetDroneCrushyModel(br_model* pSource, br_model* 
     memcpy(pDest->vertices, pSource->vertices, pDest->nvertices * sizeof(br_vertex));
 }
 
-// ResetDroneModel
+inline void C2_HOOK_FASTCALL ResetDroneModel(tDrone_spec* pDrone) {
+
+    if (pDrone->field_0xf4 >= 0) {
+        ResetDroneCrushyModel(gDroneStorage.models[pDrone->form->model_index], pDrone->form->models[pDrone->field_0xf4]);
+        pDrone->form->field_0x80[pDrone->field_0xf4] = 0;
+        pDrone->field_0xf4 = -1;
+        pDrone->model_actor->model = gDroneStorage.models[pDrone->form->model_index];
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x0044ca90
 // FUNCTION: CARMA2_SW 0x0044c840
@@ -513,7 +531,24 @@ int C2_HOOK_FASTCALL DroneTrainWithinRenderingDistance(const br_vector3* pPos) {
     }
 }
 
-// SemiInitDroneSpec
+inline void C2_HOOK_FASTCALL SemiInitDroneSpec(tDrone_spec* pDrone) {
+
+    DoNotDprintf_drone("SemiInitDroneSpec() - REINITIALISING DRONE SPEC");
+    pDrone->field_0xa_pathnode_id = pDrone->field_0x8_pathnode_id;
+    pDrone->field_0xe = -1;
+    pDrone->field_0xc = -1;
+    pDrone->field_0x14 = 0;
+    pDrone->field_0x10 = 0;
+    BrVector3Set(&pDrone->field_0x18, 0.0f, 0.0f, 0.0f);
+    BrVector3Copy(&pDrone->pos, &gDrone_path_nodes[pDrone->field_0xa_pathnode_id].position);
+    pDrone->field_0xdc = 0;
+    pDrone->field_0xe4 = 1.0f;
+    pDrone->field_0x48 = 1.0f;
+    ResetDroneModel(pDrone);
+    pDrone->field_0x45 = gDrone_form_within_rendering_distance_functions[pDrone->form->type](&pDrone->actor->t.t.translate.t);
+    pDrone->field_0x5d4 = 0;
+    PipeDroneMatrix(pDrone);
+}
 
 // InitDroneSpec
 
@@ -661,11 +696,31 @@ int C2_HOOK_FASTCALL DroneTrainWithinProcessingDistance(const br_vector3* pPos) 
 
 // ProcessThisDrone
 
-// STUB: CARMA2_HW 0x0044cc70
-// STUB: CARMA2_SW 0x0044ca20
-// STUB: CARMA2_CHEAT 0x0044d1c0
+// FUNCTION: CARMA2_HW 0x0044cc70
+// FUNCTION: CARMA2_SW 0x0044ca20
+// FUNCTION: CARMA2_CHEAT 0x0044d1c0
 void C2_HOOK_FASTCALL DroneStateFuncReset(tDrone_spec* pDrone, tDroneStateFuncState pState) {
-    NOT_IMPLEMENTED();
+
+    switch (pState) {
+    case eDrone_state_START:
+        DoNotDprintf_drone("DroneStateFuncReset() START");
+        StopRenderingThisDrone(pDrone);
+        StopProcessingThisDrone(pDrone, 1);
+        SemiInitDroneSpec(pDrone);
+        BrVector3Copy(&pDrone->actor->t.t.translate.t, &gDrone_path_nodes[pDrone->field_0x8_pathnode_id].position);
+        break;
+    case eDrone_state_RUN:
+        DoNotDprintf_drone("DroneStateFuncReset() RUN");
+        if (!gShow_drone_paths) {
+            NewDroneState(pDrone, 2);
+        }
+        break;
+    case eDrone_state_STOP:
+        DoNotDprintf_drone("DroneStateFuncReset() STOP");
+        break;
+    default:
+        break;
+    }
 }
 
 // InitDroneDrivingInfo

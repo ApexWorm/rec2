@@ -34,6 +34,7 @@ extern int gDrone_paths_elasticating;
 extern int gStatic_drone_path_model_max_vertices;
 extern int gStatic_drone_path_model_max_faces;
 extern int gSelected_edit_drone_path;
+extern tDrone_form_within_rendering_distance_cbfn* gDrone_form_within_rendering_distance_functions[4];
 extern int gCount_drones;
 extern int gCurrent_selected_drone;
 
@@ -101,7 +102,7 @@ extern void C2_HOOK_FASTCALL NewDroneState(tDrone_spec* pDrone, int pNew_state);
 
 extern void C2_HOOK_FASTCALL ResetDroneCrushyModel(br_model* pSource, br_model* pDest);
 
-// ResetDroneModel
+extern void C2_HOOK_FASTCALL ResetDroneModel(tDrone_spec* pDrone);
 
 extern int C2_HOOK_FASTCALL DroneCarWithinRenderingDistance(const br_vector3* pPos);
 
@@ -109,7 +110,7 @@ extern int C2_HOOK_FASTCALL DronePlaneWithinRenderingDistance(const br_vector3* 
 
 extern int C2_HOOK_FASTCALL DroneTrainWithinRenderingDistance(const br_vector3* pPos);
 
-// SemiInitDroneSpec
+extern void C2_HOOK_FASTCALL SemiInitDroneSpec(tDrone_spec* pDrone);
 
 // InitDroneSpec
 
