@@ -583,7 +583,21 @@ br_scalar C2_HOOK_FASTCALL SetInitPosition(br_actor* pActor, tSmashable_initial_
 
 // DoNonCarShrapnel
 
-// DoShrapnel
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+/* FIXME: parameter types and names are guesses (from the Ghidra project and the call sites) */
+// STUB: CARMA2_HW 0x004eb8f0
+// STUB: CARMA2_SW 0x004e75c0
+// STUB: CARMA2_CHEAT 0x004f1590
+void C2_HOOK_FASTCALL DoShrapnel(int pArg1, tShrapnel_spec* pShrapnel, int pArg3, br_vector3* pArg4, br_vector3* pArg5, br_vector3* pArg6, undefined4 pArg7, tU32 pTime, uintptr_t pId, br_matrix34* pMat, br_bounds3* pBounds, br_vector3* pArg12, float pArg13, br_vector3* pArg14, int pArg15) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // DoAward
 
@@ -1338,7 +1352,25 @@ void C2_HOOK_FASTCALL DisposeSmashData(tCar_crush_buffer_entry* pCrush_data) {
     }
 }
 
-// DoBackwardShrapnel
+/* FIXME: parameter types and names are guesses, see DoShrapnel */
+// FUNCTION: CARMA2_HW 0x004f0380
+// FUNCTION: CARMA2_SW 0x004ebfe0
+// FUNCTION: CARMA2_CHEAT 0x004f6020
+void C2_HOOK_FASTCALL DoBackwardShrapnel(tU32 pTime_now, int pArg1, tShrapnel_spec* pShrapnel, int pArg3, br_vector3* pArg4, br_vector3* pArg5, br_vector3* pArg6, undefined4 pArg7, tU32 pTime, uintptr_t pId, br_matrix34* pMat, br_bounds3* pBounds, br_vector3* pArg12, float pArg13, br_vector3* pArg14) {
+    int i;
+    float dt;
+    tSmash_vertex* fragment;
+
+    DoShrapnel(pArg1, pShrapnel, pArg3, pArg4, pArg5, pArg6, pArg7, pTime, pId, pMat, pBounds, pArg12, pArg13, pArg14, 0);
+    dt = (float)(pTime_now - pTime);
+    for (i = 0, fragment = gSmash_glass_fragments; i < (int)REC2_ASIZE(gSmash_glass_fragments); i++, fragment++) {
+        if (fragment->end_time != 0 && fragment->field_0x18 == pId) {
+            fragment->field_0x34 = 0;
+            DoFragMovement(fragment, GetTotalTime(), dt);
+            fragment->field_0x34 = 1;
+        }
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x004f0430
 // FUNCTION: CARMA2_SW 0x004ec090
