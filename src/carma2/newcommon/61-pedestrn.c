@@ -1288,7 +1288,7 @@ inline void C2_HOOK_FASTCALL ResetAnimation(tPed_character_instance* pCharacter)
     pCharacter->field_0x18 = 0;
     pCharacter->field_0x8 = -1;
     if (pCharacter->field_0xbc != NULL) {
-        pCharacter->field_0xbc->field_0x4 = 0.f;
+        pCharacter->field_0xbc->field_0x4 = 0.0f;
         pCharacter->field_0xbc = NULL;
     }
 }
@@ -1355,7 +1355,7 @@ int C2_HOOK_FASTCALL SetCharacterMove(tPed_character_instance* pPed, int pMove_a
         }
     }
     original_speed = pPed->field_0x1e;
-    if (pSpeed >= 0.f) {
+    if (pSpeed >= 0.0f) {
         new_speed = pSpeed;
     } else {
         new_speed = -(form->moves[pPed->field_0x7].move->frametime * pSpeed);
@@ -1370,7 +1370,7 @@ int C2_HOOK_FASTCALL SetCharacterMove(tPed_character_instance* pPed, int pMove_a
         return 1;
     }
     ped_move = personality->form->moves[pPed->field_0x7].move;
-    BrVector3Set(&offset, 0.f, 0.f, 0.f);
+    BrVector3Set(&offset, 0.0f, 0.0f, 0.0f);
     if (original_ped_move != NULL && original_ped_move->field_0x2a == 0 && !gPed_overall_movement_disabled) {
         for (i = pPed->field_0x1c; i > 0; i--) {
             BrVector3Accumulate(&offset, (br_vector3*)original_ped_move->frames[i].mat.m[3]);
@@ -1382,7 +1382,7 @@ int C2_HOOK_FASTCALL SetCharacterMove(tPed_character_instance* pPed, int pMove_a
     ResetAnimation(pPed);
     if (pArg4 != 0 && original_ped_move != NULL && pTime != 0) {
         for (i = 0; i < 20; i++) {
-            if (gPed_morphs[i].field_0x4 == 0.f) {
+            if (gPed_morphs[i].field_0x4 == 0.0f) {
                 pPed->field_0xbc = &gPed_morphs[i];
                 break;
             }
@@ -1393,20 +1393,20 @@ int C2_HOOK_FASTCALL SetCharacterMove(tPed_character_instance* pPed, int pMove_a
     }
     if (pArg4 != 0) {
         pPed->field_0xbc->field_0x20 = original_ped_move->field_0x40;
-        sum = 0.f;
+        sum = 0.0f;
         if (original_speed != 0 && original_ped_move->field_0x2a == 0) {
             pPed->field_0xbc->field_0x8.v[0] = pPed->field_0xbc->field_0x20.v[0] / (double)(original_ped_move->count_frames * original_speed);
             pPed->field_0xbc->field_0x8.v[1] = pPed->field_0xbc->field_0x20.v[1] / (double)(original_ped_move->count_frames * original_speed);
             pPed->field_0xbc->field_0x8.v[2] = pPed->field_0xbc->field_0x20.v[2] / (double)(original_ped_move->count_frames * original_speed);
         } else {
-            BrVector3Set(&pPed->field_0xbc->field_0x8, 0.f, 0.f, 0.f);
+            BrVector3Set(&pPed->field_0xbc->field_0x8, 0.0f, 0.0f, 0.0f);
         }
         if (speed != 0 && ped_move->field_0x2a == 0) {
             pPed->field_0xbc->field_0x14.v[0] = ped_move->field_0x34.v[0] / (double)(ped_move->count_frames * speed);
             pPed->field_0xbc->field_0x14.v[1] = ped_move->field_0x34.v[1] / (double)(ped_move->count_frames * speed);
             pPed->field_0xbc->field_0x14.v[2] = ped_move->field_0x34.v[2] / (double)(ped_move->count_frames * speed);
         } else {
-            BrVector3Set(&pPed->field_0xbc->field_0x14, 0.f, 0.f, 0.f);
+            BrVector3Set(&pPed->field_0xbc->field_0x14, 0.0f, 0.0f, 0.0f);
         }
         e.order = 0;
         BrMatrix34ToEuler(&e, &ped_frame->mat);
@@ -1427,7 +1427,7 @@ int C2_HOOK_FASTCALL SetCharacterMove(tPed_character_instance* pPed, int pMove_a
             sum += abs(pPed->field_0xbc->field_0x2d[i][3]) + abs(pPed->field_0xbc->field_0x2d[i][4]) + abs(pPed->field_0xbc->field_0x2d[i][5]);
         }
         pPed->field_0xbc->field_0x2c = (pArg4 & 0x40000000) != 0;
-        pPed->field_0xbc->field_0x0 = 0.f;
+        pPed->field_0xbc->field_0x0 = 0.0f;
         pPed->field_0xbc->field_0x4 = 1.0 / (sum / (form->count_bones * 3.0) * (float)(pArg4 & ~0x40000000) / 64.0);
         pPed->field_0x24 = 0;
     }
@@ -1517,19 +1517,19 @@ void C2_HOOK_FASTCALL SetCharacterPosition(tPed_character_instance* pCharacter, 
         break;
     }
     mat = GetCharacterMatrixPtr(pCharacter);
-    BrVector3Set(&delta, 0.f, 0.f, 0.f);
+    BrVector3Set(&delta, 0.0f, 0.0f, 0.0f);
     if (move != NULL && move->field_0x2a == 0) {
         for (i = pCharacter->field_0x1c; i > 0; i--) {
             BrVector3Accumulate(&delta, (br_vector3*)move->frames[i].mat.m[3]);
         }
         if (!(move->looping_reset_flags & 0x1)) {
-            delta.v[0] = 0.f;
+            delta.v[0] = 0.0f;
         }
         if (!(move->looping_reset_flags & 0x2)) {
-            delta.v[1] = 0.f;
+            delta.v[1] = 0.0f;
         }
         if (!(move->looping_reset_flags & 0x4)) {
-            delta.v[2] = 0.f;
+            delta.v[2] = 0.0f;
         }
     }
     BrVector3Copy((br_vector3*)mat->m[3], &new_pos);
