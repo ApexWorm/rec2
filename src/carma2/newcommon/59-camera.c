@@ -48,6 +48,7 @@ br_actor* gPed_actor;
 
 // GLOBAL: CARMA2_HW 0x006792b8
 // GLOBAL: CARMA2_SW 0x00673a28
+// GLOBAL: CARMA2_CHEAT 0x00680b68
 int gCamera_frozen;
 
 // GLOBAL: CARMA2_HW 0x006792bc
@@ -67,6 +68,7 @@ tSave_camera gSave_camera[2];
 
 // GLOBAL: CARMA2_HW 0x007634ac
 // GLOBAL: CARMA2_SW 0x00759a0c
+// GLOBAL: CARMA2_CHEAT 0x0076ab4c
 float gCamera_cockpit_hither;
 
 // GLOBAL: CARMA2_HW 0x0079efa8
@@ -82,6 +84,7 @@ tActionReplayCameraMode gAction_replay_camera_mode;
 
 // FUNCTION: CARMA2_HW 0x0040f4a0
 // FUNCTION: CARMA2_SW 0x0040f480
+// FUNCTION: CARMA2_CHEAT 0x0040f560
 tCar_spec* C2_HOOK_FASTCALL GetRaceLeader(void) {
     int i;
     int score;
@@ -143,11 +146,13 @@ void C2_HOOK_FASTCALL ViewNetPlayer(void) {
 
 // FUNCTION: CARMA2_HW 0x0040e590
 // FUNCTION: CARMA2_SW 0x0040e570
+// FUNCTION: CARMA2_CHEAT 0x0040e650
 void C2_HOOK_FASTCALL ViewOpponent(void) {
     tNet_message* message;
 
     // GLOBAL: CARMA2_HW 0x0058f628
     // GLOBAL: CARMA2_SW 0x0058a628
+    // GLOBAL: CARMA2_CHEAT 0x005946b8
     static int n = -1;
 
     C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tNet_message_chunk_view_car, player, 0x4);
@@ -181,6 +186,7 @@ void C2_HOOK_FASTCALL ViewOpponent(void) {
 
 // FUNCTION: CARMA2_HW 0x0040e680
 // FUNCTION: CARMA2_SW 0x0040e660
+// FUNCTION: CARMA2_CHEAT 0x0040e740
 void C2_HOOK_FASTCALL ReallyViewOpponent(void) {
     int i;
 
@@ -200,6 +206,7 @@ void C2_HOOK_FASTCALL ReallyViewOpponent(void) {
 
 // FUNCTION: CARMA2_HW 0x0040f510
 // FUNCTION: CARMA2_SW 0x0040f4f0
+// FUNCTION: CARMA2_CHEAT 0x0040f5d0
 void C2_HOOK_FASTCALL CheckDisablePlingMaterials(tCar_spec* pCar) {
     br_matrix34* mat;
     br_scalar height;
@@ -282,6 +289,7 @@ void C2_HOOK_FASTCALL MungeCarMaterials(tCar_spec* pCar, int pInternal_cam) {
 
 // FUNCTION: CARMA2_HW 0x0040e790
 // FUNCTION: CARMA2_SW 0x0040e770
+// FUNCTION: CARMA2_CHEAT 0x0040e850
 void C2_HOOK_FASTCALL SetCameraType(tActionReplayCameraMode pCamPos) {
 
     gAction_replay_camera_mode = pCamPos;
@@ -519,6 +527,7 @@ void C2_HOOK_FASTCALL PointCameraAtCar(br_vector3* pPos, br_matrix34* pMat, floa
 
 // FUNCTION: CARMA2_HW 0x004121b0
 // FUNCTION: CARMA2_SW 0x00412190
+// FUNCTION: CARMA2_CHEAT 0x00412400
 void C2_HOOK_FASTCALL PointCamera(const br_vector3* pPos, br_matrix34* pMat) {
     br_vector3 vn;
     br_scalar dist;
