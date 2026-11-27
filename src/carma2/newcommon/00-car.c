@@ -1276,7 +1276,7 @@ void C2_HOOK_FASTCALL CrashNoise(br_vector3* pForce, br_vector3* pPosition, int 
         }
         if ((crunch_tag == 0 || !DRS3SoundStillPlaying(crunch_tag)) && vol > 30) {
             gLast_crunch_vol = vol;
-            BrVector3Set(&velocity, 0.f, 0.f, 0.f);
+            BrVector3Set(&velocity, 0.0f, 0.0f, 0.0f);
             crunch_tag = DRS3StartSound3D(gCar_outlet,
                 gMetal_crunch_sound_id[IRandomBetween(0, REC2_ASIZE(gMetal_crunch_sound_id) - 1)],
                 pPosition, &velocity, 1, vol, IRandomBetween(0xc000, 0x14000), 0x10000);
