@@ -12,6 +12,7 @@
 #include "08-loading1.h"
 #include "10-loading2.h"
 #include "15-displays.h"
+#include "20-skidmark.h"
 #include "21-mainloop.h"
 #include "22-replay.h"
 #include "23-piping.h"
@@ -1905,9 +1906,41 @@ void C2_HOOK_FASTCALL RenderLimbs(void) {
 
 // FUN_1011cb0c
 
-// PossiblePedSmear
+static inline void C2_HOOK_FASTCALL PossiblePedSmear(tPedestrian* pPed) {
+    tPed_cache_006944c0* cache;
+    br_vector3 pos;
 
-// LastChanceForPedEffects
+    cache = pPed->field_0x0c;
+    if (cache != NULL) {
+        if ((cache->field_0xc4 & 0x2) && cache->field_0xca >= 2) {
+            BrVector3Scale(&pos, &cache->field_0xe4, 1.0 / cache->field_0xca);
+            if (!(cache->field_0xc4 & 0x1)) {
+                cache->field_0xc4 |= 0x1;
+                cache->field_0xc8 = -1;
+            } else if (SkidSection(&cache->field_0xc8, &cache->field_0xcc, &cache->field_0xd8, gPed_smear_material, &pos, &cache->field_0xf0, &cache->field_0xfc, &cache->field_0x108, 0.f, cache->field_0x124 - cache->field_0x128 + .01f)) {
+                cache->field_0xc4 &= ~0x1;
+            }
+            cache->field_0xfc = pos;
+            cache->field_0x108 = cache->field_0xf0;
+        } else {
+            cache->field_0xc4 &= ~0x1;
+        }
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x004d5970
+// FUNCTION: CARMA2_SW 0x004d2060
+// FUNCTION: CARMA2_CHEAT 0x004db530
+void C2_HOOK_FASTCALL LastChanceForPedEffects(void) {
+    int i;
+    tPedestrian* ped;
+
+    for (i = 0, ped = gPedestrian_array; i < gPed_count; i++, ped++) {
+        if (ped->flags & 0x1) {
+            PossiblePedSmear(ped);
+        }
+    }
+}
 
 inline void C2_HOOK_FASTCALL ResetPedSystem(void) {
     ResetPedFaceCache();

@@ -380,7 +380,7 @@ typedef struct tPed_cache_006944c0 {
     tCar_spec* field_0xc0;
     int field_0xc4;
     tS16 field_0xc8;
-    undefined field_0xca;
+    tU8 field_0xca;
     undefined field_0xcb[1];
     br_vector3 field_0xcc;
     br_vector3 field_0xd8;

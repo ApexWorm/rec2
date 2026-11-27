@@ -223,6 +223,7 @@ void C2_HOOK_FASTCALL HideSkids(void) {
 
 // STUB: CARMA2_HW 0x004e9f20
 // STUB: CARMA2_SW 0x004e5cc0
+// STUB: CARMA2_CHEAT 0x004efbc0
 int C2_HOOK_FASTCALL SkidSection(tS16* pSkid_id, br_vector3* pSkid_start, br_vector3* pSkid_end, br_material* pMaterial, br_vector3* pPos, br_vector3* pNorm, br_vector3* pPrev_pos, br_vector3* pPrev_norm, br_scalar pTexture_start, br_scalar pTexture_step) {
 
     NOT_IMPLEMENTED();
