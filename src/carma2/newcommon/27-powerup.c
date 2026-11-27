@@ -297,6 +297,7 @@ char* C2_HOOK_FASTCALL GetPowerupMessage(int pPowerup_index) {
 
 // STUB: CARMA2_HW 0x004d9150
 // STUB: CARMA2_SW 0x004d5680
+// STUB: CARMA2_CHEAT 0x004ded10
 int C2_HOOK_FASTCALL GotPowerupX(tCar_spec* pCar, int pIndex, int pArg3, int pMessage, tU32 pTime) {
     NOT_IMPLEMENTED();
 }
@@ -2031,7 +2032,45 @@ void C2_HOOK_FASTCALL ResetMutantCorpses(tPowerup* pPowerup, tCar_spec* pCar) {
     gMutant_speed = 0.f;
 }
 
-// ReceivedPowerup
+// FUNCTION: CARMA2_HW 0x004dece0
+// FUNCTION: CARMA2_SW 0x004db1e0
+// FUNCTION: CARMA2_CHEAT 0x004e48a0
+void C2_HOOK_FASTCALL ReceivedPowerup(tNet_message_chunk* pContents) {
+    tPowerup* powerup;
+    tCar_spec* car;
+
+    if (gProgram_state.racing && pContents->powerup.powerup_index < gNumber_of_powerups && pContents->powerup.powerup_index >= 0) {
+        powerup = &gPowerup_array[pContents->powerup.powerup_index];
+        if (pContents->powerup.event == 0 || pContents->powerup.event == 1) {
+            if (powerup->net_type & eNet_powerup_global) {
+                GotPowerupX(&gProgram_state.current_car, pContents->powerup.powerup_index, 0, pContents->powerup.event == 0, pContents->powerup.time_left);
+            } else if (pContents->powerup.player != gLocal_net_ID && powerup->got_proc != NULL) {
+                car = NetCarFromPlayerID(pContents->powerup.player);
+                if (car != NULL) {
+                    powerup->got_proc(powerup, car);
+                    switch (powerup->type) {
+                    case ePowerup_instantaneous:
+                        break;
+                    case ePowerup_timed:
+                        car->powerups[pContents->powerup.powerup_index] = GetTotalTime() + pContents->powerup.time_left;
+                        break;
+                    case ePowerup_whole_race:
+                        car->powerups[pContents->powerup.powerup_index] = -1;
+                        break;
+                    default:
+                        break;
+                    }
+                }
+            }
+        } else if (!(powerup->net_type & eNet_powerup_global) && powerup->lose_proc != NULL) {
+            car = NetCarFromPlayerID(pContents->powerup.player);
+            if (car != NULL) {
+                powerup->lose_proc(powerup, car);
+                car->powerups[pContents->powerup.powerup_index] = 0;
+            }
+        }
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x004dedf0
 // FUNCTION: CARMA2_SW 0x004db2f0
