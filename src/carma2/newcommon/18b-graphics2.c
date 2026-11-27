@@ -754,9 +754,9 @@ void C2_HOOK_FASTCALL DeviouslyDimRectangle(br_pixelmap* pPixelmap, int pLeft, i
     gDim_model->vertices[0].p.v[0] = gDim_model->vertices[1].p.v[0];
     gDim_model->vertices[3].p.v[0] = (float)pRight;
     gDim_model->vertices[2].p.v[0] = gDim_model->vertices[3].p.v[0];
-    gDim_model->vertices[3].p.v[1] = -(float)pTop;
+    gDim_model->vertices[3].p.v[1] = -((float)pTop);
     gDim_model->vertices[0].p.v[1] = gDim_model->vertices[3].p.v[1];
-    gDim_model->vertices[2].p.v[1] = -(float)pBottom;
+    gDim_model->vertices[2].p.v[1] = -((float)pBottom);
     gDim_model->vertices[1].p.v[1] = gDim_model->vertices[2].p.v[1];
     BrModelUpdate(gDim_model, BR_MODU_VERTEX_POSITIONS);
     gDim_actor->render_style = BR_RSTYLE_FACES;

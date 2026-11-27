@@ -25,7 +25,7 @@
 #include "52-errors.h"
 #include "56-aiworld.h"
 #include "60-phil.h"
-#include "61-pedestrn.h"
+#include "61-pedestrn-phys.h"
 #include "67-lighting.h"
 #include "69-sound.h"
 #include "70-packfile.h"
