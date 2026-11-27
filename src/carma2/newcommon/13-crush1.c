@@ -1969,7 +1969,21 @@ void C2_HOOK_FASTCALL FullyDetachBit(tCar_spec* pCar, tPhysics_object* pObject) 
 
 // GetSplitVertex
 
-// SplitModel
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_HW 0x0042f5d0
+// STUB: CARMA2_SW 0x0042f620
+// STUB: CARMA2_CHEAT 0x0042f7a0
+/* FIXME: parameter types are from the call sites and the Mac build; the return value is not used by any caller */
+void C2_HOOK_FASTCALL SplitModel(br_model* pModel, br_model** pModel_1, br_model** pModel_2, const br_vector4* pPlane, int pFlags) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // CreateSplitPoints
 
@@ -2644,18 +2658,58 @@ void C2_HOOK_FASTCALL ARApplyFlap(br_actor* pActor, br_angle pAngle) {
         parent_model->vertices[flap->field_0xc].p.v[2]);
 }
 
-// STUB: CARMA2_HW 0x0043c240
-// STUB: CARMA2_SW 0x0043c290
-// STUB: CARMA2_CHEAT 0x0043c490
+// FUNCTION: CARMA2_HW 0x0043c240
+// FUNCTION: CARMA2_SW 0x0043c290
+// FUNCTION: CARMA2_CHEAT 0x0043c490
 void C2_HOOK_FASTCALL ARApplySplitWeld(tCar_spec* pCar, const br_vector4* pPlane) {
-    NOT_IMPLEMENTED();
+    tCar_crush_spec* car_crush;
+    tUser_crush_data* user_crush;
+    br_model** split_models;
+    br_model* dummy;
+    br_model* temp;
+    br_vector4 plane;
+    int i;
+
+    BrVector4Copy(&plane, pPlane);
+    car_crush = pCar->car_crush_spec;
+    user_crush = pCar->car_model_actor->user;
+    split_models = car_crush->field_0x4c4;
+    plane.v[3] -= plane.v[0] * pCar->car_model_actor->t.t.mat.m[3][0] + plane.v[1] * pCar->car_model_actor->t.t.mat.m[3][1] + plane.v[2] * pCar->car_model_actor->t.t.mat.m[3][2];
+    SplitModel(user_crush->models[0], &split_models[0], &car_crush->model_actor->model, &plane, 0);
+    for (i = 1; i < pCar->count_detail_levels; i++) {
+        if (user_crush->models[i] != NULL) {
+            SplitModel(user_crush->models[i], &split_models[i], &dummy, &plane, 1);
+        }
+    }
+    for (i = 0; i < pCar->count_detail_levels; i++) {
+        temp = user_crush->models[i];
+        user_crush->models[i] = split_models[i];
+        split_models[i] = temp;
+    }
+    pCar->car_model_actor->model = user_crush->models[0];
+    DRActorEnumRecurse(pCar->car_model_actor, MakeCarModelsMaterialsDoubleSided, pCar);
+    MakeModelMaterialsDoubleSided(car_crush->model_actor->model);
 }
 
-// STUB: CARMA2_HW 0x0043c3d0
-// STUB: CARMA2_SW 0x0043c420
-// STUB: CARMA2_CHEAT 0x0043c620
+// FUNCTION: CARMA2_HW 0x0043c3d0
+// FUNCTION: CARMA2_SW 0x0043c420
+// FUNCTION: CARMA2_CHEAT 0x0043c620
 void C2_HOOK_FASTCALL ARUndoSplitWeld(tCar_spec* pCar) {
-    NOT_IMPLEMENTED();
+    tCar_crush_spec* car_crush;
+    tUser_crush_data* user_crush;
+    int i;
+
+    car_crush = pCar->car_crush_spec;
+    user_crush = pCar->car_model_actor->user;
+    for (i = 0; i < pCar->count_detail_levels; i++) {
+        if (user_crush->models[i] != NULL) {
+            BrModelFree(BrModelRemove(user_crush->models[i]));
+            user_crush->models[i] = car_crush->field_0x4c4[i];
+        }
+    }
+    pCar->car_model_actor->model = user_crush->models[0];
+    BrModelFree(BrModelRemove(car_crush->model_actor->model));
+    DRActorEnumRecurse(pCar->car_model_actor, MakeCarModelsMaterialsSingleSided, pCar);
 }
 
 // ReceivedCrush

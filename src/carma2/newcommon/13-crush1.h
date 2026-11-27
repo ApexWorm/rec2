@@ -294,7 +294,7 @@ extern void C2_HOOK_FASTCALL FullyDetachBit(tCar_spec* pCar, tPhysics_object* pO
 
 // GetSplitVertex
 
-// SplitModel
+extern void C2_HOOK_FASTCALL SplitModel(br_model* pModel, br_model** pModel_1, br_model** pModel_2, const br_vector4* pPlane, int pFlags);
 
 // CreateSplitPoints
 
