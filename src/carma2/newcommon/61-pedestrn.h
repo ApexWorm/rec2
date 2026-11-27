@@ -84,7 +84,7 @@ extern tPed_face_cache_0x34* gPed_face_caches[4];
 extern int gPipe_halted_ped_status;
 extern int gPed_valium_left;
 
-// ClearOutMorphs
+extern void C2_HOOK_FASTCALL ClearOutMorphs(void);
 
 // InitBoner
 
@@ -96,9 +96,9 @@ extern void C2_HOOK_FASTCALL ScaleModelXYZ(br_model* pModel, br_scalar pScale_x,
 
 extern void C2_HOOK_FASTCALL ScaleModel(br_model* pModel, float pScale);
 
-// DisposeMove
+extern void C2_HOOK_FASTCALL DisposeMove(tPed_move* pMove);
 
-// DisposeAllLoadedMoves
+extern void C2_HOOK_FASTCALL DisposeAllLoadedMoves(void);
 
 // ReadRemap
 
@@ -140,9 +140,9 @@ extern tPed_form* C2_HOOK_FASTCALL FindOrOpenForm(const char* pName);
 
 extern tPed_personality* C2_HOOK_FASTCALL ReadPersonality(const char* pName);
 
-// DisposePersonality
+extern void C2_HOOK_FASTCALL DisposePersonality(tPed_personality* pPersonality);
 
-// DisposeAllLoadedPersonalities
+extern void C2_HOOK_FASTCALL DisposeAllLoadedPersonalities(void);
 
 extern tPed_personality* C2_HOOK_FASTCALL FindOrOpenPersonality(const char* pName);
 
@@ -218,7 +218,7 @@ extern void C2_HOOK_FASTCALL SetCharacterDirection(tPed_character_instance* pPed
 
 extern void C2_HOOK_FASTCALL SetCharacterPosition(tPed_character_instance* pCharacter, br_vector3* pPos, int pArg3);
 
-// DisposeClonedMaterials
+extern void C2_HOOK_FASTCALL DisposeClonedMaterials(void);
 
 extern void C2_HOOK_FASTCALL DisposeAllBonerData(void);
 
