@@ -28,9 +28,9 @@ extern void C2_HOOK_FASTCALL StretchMark(tSkid* pMark, br_vector3* pFrom, br_vec
 
 extern void C2_HOOK_FASTCALL AdjustSkid(int pSkid_num, br_matrix34* pMatrix, br_material* pMaterial);
 
-// FarFromLine2D
+extern int C2_HOOK_FASTCALL FarFromLine2D(br_vector3* pPt, br_vector3* pL1, br_vector3* pL2);
 
-// Reflex2D
+extern int C2_HOOK_FASTCALL Reflex2D(br_vector3* pPt, br_vector3* pL1, br_vector3* pL2);
 
 extern void C2_HOOK_FASTCALL InitSkids(void);
 
@@ -38,9 +38,9 @@ extern void C2_HOOK_FASTCALL HideSkid(int pSkid_num);
 
 extern void C2_HOOK_FASTCALL HideSkids(void);
 
-// SkidLen
+extern br_scalar C2_HOOK_FASTCALL SkidLen(int pSkid);
 
-// UglyWidthChange
+extern int C2_HOOK_FASTCALL UglyWidthChange(int pSkid, br_scalar pWidth);
 
 // GenericSkidSection
 
