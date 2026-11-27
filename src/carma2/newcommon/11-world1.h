@@ -151,9 +151,109 @@ extern void C2_HOOK_FASTCALL BuildSpecVolModel(tSpecial_volume* pSpec, int pInde
 
 extern void BuildSpecVolModel(tSpecial_volume* pSpec, int pIndex, br_material* pInt_mat, br_material* pExt_mat);
 
+extern void C2_HOOK_FASTCALL DropSpecVol2(void);
+
+extern void C2_HOOK_FASTCALL DropSpecVol3(void);
+
+extern void C2_HOOK_FASTCALL DropSpecVol4(void);
+
+extern void C2_HOOK_FASTCALL DropSpecVol5(void);
+
+extern void C2_HOOK_FASTCALL DropSpecVol6(void);
+
+extern void C2_HOOK_FASTCALL DropSpecVol7(void);
+
+extern void C2_HOOK_FASTCALL DropSpecVol8(void);
+
+extern void C2_HOOK_FASTCALL DropSpecVol9(void);
+
 extern void C2_HOOK_FASTCALL IdentifySpecVol(void);
 
+extern void C2_HOOK_FASTCALL DeleteSpecVol(void);
+
 extern void C2_HOOK_FASTCALL DelSpecVolumeGraph(int pIndex);
+
+extern void C2_HOOK_FASTCALL RotateSpecVolL(void);
+
+extern void C2_HOOK_FASTCALL RotateSpecVolL2(void);
+
+extern void C2_HOOK_FASTCALL RotateSpecVolL3(void);
+
+extern void C2_HOOK_FASTCALL RotateSpecVolL4(void);
+
+extern void C2_HOOK_FASTCALL RotateSpecVolR(void);
+
+extern void C2_HOOK_FASTCALL RotateSpecVolR2(void);
+
+extern void C2_HOOK_FASTCALL RotateSpecVolR3(void);
+
+extern void C2_HOOK_FASTCALL RotateSpecVolR4(void);
+
+extern void C2_HOOK_FASTCALL CycleSpecVolRotate(void);
+
+extern void C2_HOOK_FASTCALL CycleSpecVolScale(void);
+
+extern void C2_HOOK_FASTCALL ScaleSpecVolUp2(void);
+
+extern void C2_HOOK_FASTCALL ScaleSpecVolUp3(void);
+
+extern void C2_HOOK_FASTCALL ScaleSpecVolUp4(void);
+
+extern void C2_HOOK_FASTCALL ScaleSpecVolDown2(void);
+
+extern void C2_HOOK_FASTCALL ScaleSpecVolDown3(void);
+
+extern void C2_HOOK_FASTCALL ScaleSpecVolDown4(void);
+
+extern void C2_HOOK_FASTCALL MoveXSpecVolL(void);
+
+extern void C2_HOOK_FASTCALL MoveXSpecVolL2(void);
+
+extern void C2_HOOK_FASTCALL MoveXSpecVolL3(void);
+
+extern void C2_HOOK_FASTCALL MoveXSpecVolL4(void);
+
+extern void C2_HOOK_FASTCALL MoveXSpecVolR(void);
+
+extern void C2_HOOK_FASTCALL MoveXSpecVolR2(void);
+
+extern void C2_HOOK_FASTCALL MoveXSpecVolR3(void);
+
+extern void C2_HOOK_FASTCALL MoveXSpecVolR4(void);
+
+extern void C2_HOOK_FASTCALL MoveYSpecVolL(void);
+
+extern void C2_HOOK_FASTCALL MoveYSpecVolL2(void);
+
+extern void C2_HOOK_FASTCALL MoveYSpecVolL3(void);
+
+extern void C2_HOOK_FASTCALL MoveYSpecVolL4(void);
+
+extern void C2_HOOK_FASTCALL MoveYSpecVolR(void);
+
+extern void C2_HOOK_FASTCALL MoveYSpecVolR2(void);
+
+extern void C2_HOOK_FASTCALL MoveYSpecVolR3(void);
+
+extern void C2_HOOK_FASTCALL MoveYSpecVolR4(void);
+
+extern void C2_HOOK_FASTCALL MoveZSpecVolL(void);
+
+extern void C2_HOOK_FASTCALL MoveZSpecVolL2(void);
+
+extern void C2_HOOK_FASTCALL MoveZSpecVolL3(void);
+
+extern void C2_HOOK_FASTCALL MoveZSpecVolL4(void);
+
+extern void C2_HOOK_FASTCALL MoveZSpecVolR(void);
+
+extern void C2_HOOK_FASTCALL MoveZSpecVolR2(void);
+
+extern void C2_HOOK_FASTCALL MoveZSpecVolR3(void);
+
+extern void C2_HOOK_FASTCALL MoveZSpecVolR4(void);
+
+extern void C2_HOOK_FASTCALL SnapSpecVolToVertical(void);
 
 extern void C2_HOOK_FASTCALL ShowSpecialVolumes(void);
 

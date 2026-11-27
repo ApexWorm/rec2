@@ -29,6 +29,7 @@ tSpecial_volume gDefault_default_water_spec_vol;
 
 // GLOBAL: CARMA2_HW 0x00761f44
 // GLOBAL: CARMA2_SW 0x007584a4
+// GLOBAL: CARMA2_CHEAT 0x007695e4
 tSpecial_volume* gDefault_water_spec_vol_real;
 
 // GLOBAL: CARMA2_HW 0x00660268
