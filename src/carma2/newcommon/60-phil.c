@@ -33,6 +33,7 @@ tU32 gPHIL_last_physics_tick;
 
 // GLOBAL: CARMA2_HW 0x006923e0
 // GLOBAL: CARMA2_SW 0x0068c438
+// GLOBAL: CARMA2_CHEAT 0x00699dc8
 int gPHIL_count_list_collision_infos;
 
 // GLOBAL: CARMA2_HW 0x006923e4
@@ -42,6 +43,7 @@ int gPHIL_object_added;
 
 // GLOBAL: CARMA2_HW 0x006923f0
 // GLOBAL: CARMA2_SW 0x0068c448
+// GLOBAL: CARMA2_CHEAT 0x00699dd8
 tPHIL_queued_objects gPhil_queued_objects = { 0 };
 
 // GLOBAL: CARMA2_HW 0x00692db8
@@ -50,10 +52,12 @@ tWorld_callback_active_passive_cbfn* gPHIL_original_activate_passive = NULL;
 
 // GLOBAL: CARMA2_HW 0x00692dbc
 // GLOBAL: CARMA2_SW 0x0068ce14
+// GLOBAL: CARMA2_CHEAT 0x0069a934
 int gPHIL_count_queued_objects_for_removal;
 
 // GLOBAL: CARMA2_HW 0x00692dc0
 // GLOBAL: CARMA2_SW 0x0068ce18
+// GLOBAL: CARMA2_CHEAT 0x0069a938
 int gPHIL_count_queued_objects;
 
 // FUNCTION: CARMA2_HW 0x0049c5e0
@@ -274,6 +278,7 @@ int C2_HOOK_FASTCALL GetNetworkDataSize(tU8* pNet_data) {
 
 // FUNCTION: CARMA2_HW 0x004b5cc0
 // FUNCTION: CARMA2_SW 0x004b23e0
+// FUNCTION: CARMA2_CHEAT 0x004bb590
 int C2_HOOK_FASTCALL PHILInit(void) {
     int i;
 
@@ -470,7 +475,7 @@ int C2_HOOK_FASTCALL PHILMakeObjectActive(tPhysics_object* pObject, const br_vec
 
 // FUNCTION: CARMA2_HW 0x004b61a0
 // FUNCTION: CARMA2_SW 0x004b28c0
-// FUNCTION: CARMA2_cHEAT 0x004bbc00
+// FUNCTION: CARMA2_CHEAT 0x004bbc00
 inline int C2_HOOK_FASTCALL PHILSetPassiveObjectsMatrix(tPhysics_object* pObject, const br_matrix34* pMatrix) {
     tPHIL_queued_object_info* queued;
     tPHIL_queued_header* info;
@@ -685,6 +690,8 @@ float C2_HOOK_FASTCALL PHILGetObjectProperty(tPhysics_object* pObject, int pProp
 // ProcessDrag
 
 // FUNCTION: CARMA2_HW 0x004b6e90
+// FUNCTION: CARMA2_SW 0x004b35b0
+// FUNCTION: CARMA2_CHEAT 0x004bc9c0
 void C2_HOOK_FASTCALL MarkObjectAndChildrenAsPassive(tPhysics_object* pObject) {
     tPhysics_object* child;
 
