@@ -15,6 +15,7 @@
 #include "15-displays.h"
 #include "23-piping.h"
 #include "28-world3.h"
+#include "30-opponent.h"
 #include "34-finteray.h"
 #include "41-utility.h"
 #include "49-physics.h"
@@ -84,6 +85,50 @@ tDrone_spec* gDrone_specs;
 // GLOBAL: CARMA2_SW 0x0067ec48
 // GLOBAL: CARMA2_CHEAT 0x0068bdb0
 tDrone_path_node* gDrone_path_nodes;
+
+/* FIXME: name is a guess (the model is called "StaticDronePathModel") */
+// GLOBAL: CARMA2_HW 0x0068451c
+// GLOBAL: CARMA2_SW 0x0067ec5c
+// GLOBAL: CARMA2_CHEAT 0x0068bdc4
+br_model* gStatic_drone_path_model;
+
+// GLOBAL: CARMA2_HW 0x00684520
+// GLOBAL: CARMA2_SW 0x0067ec60
+// GLOBAL: CARMA2_CHEAT 0x0068bdc8
+br_model* gElasticatey_drone_path_model;
+
+/* FIXME: name is a guess */
+// GLOBAL: CARMA2_HW 0x00684524
+// GLOBAL: CARMA2_SW 0x0067ec64
+// GLOBAL: CARMA2_CHEAT 0x0068bdcc
+br_actor* gStatic_drone_path_model_actor;
+
+// GLOBAL: CARMA2_HW 0x00684528
+// GLOBAL: CARMA2_SW 0x0067ec68
+// GLOBAL: CARMA2_CHEAT 0x0068bdd0
+br_actor* gDrone_path_model_actor;
+
+// GLOBAL: CARMA2_HW 0x00684530
+// GLOBAL: CARMA2_SW 0x0067ec70
+// GLOBAL: CARMA2_CHEAT 0x0068bdd8
+int gDrone_paths_elasticating;
+
+/* FIXME: name is a guess */
+// GLOBAL: CARMA2_HW 0x00684538
+// GLOBAL: CARMA2_SW 0x0067ec78
+// GLOBAL: CARMA2_CHEAT 0x0068bde0
+int gStatic_drone_path_model_max_vertices;
+
+/* FIXME: name is a guess */
+// GLOBAL: CARMA2_HW 0x0068453c
+// GLOBAL: CARMA2_SW 0x0067ec7c
+// GLOBAL: CARMA2_CHEAT 0x0068bde4
+int gStatic_drone_path_model_max_faces;
+
+// GLOBAL: CARMA2_HW 0x005947b4
+// GLOBAL: CARMA2_SW 0x0058f714
+// GLOBAL: CARMA2_CHEAT 0x0059b10c
+int gSelected_edit_drone_path = -1;
 
 // GLOBAL: CARMA2_HW 0x00684518
 // GLOBAL: CARMA2_SW 0x0067ec58
@@ -1003,6 +1048,7 @@ void C2_HOOK_FASTCALL ApplyDroneCornerPos2(int pDrone_id, tU16 pSpeed, tU16 pFie
 
 // FUNCTION: CARMA2_HW 0x00452f40
 // FUNCTION: CARMA2_SW 0x00452cd0
+// FUNCTION: CARMA2_CHEAT 0x004534a0
 void C2_HOOK_FASTCALL ReallocModelFacesAndVertices(br_model* pModel, int pCount_faces, int pCount_vertices) {
     int i;
     br_vertex* vertices;
@@ -1032,11 +1078,115 @@ void C2_HOOK_FASTCALL ReallocModelFacesAndVertices(br_model* pModel, int pCount_
     pModel->faces = faces;
 }
 
-// CalcNFacesAndVerticesInEditModel
+inline void C2_HOOK_FASTCALL CalcNFacesAndVerticesInEditModel(int* pCount_faces, int* pCount_vertices) {
+    int i;
+    int j;
 
-// InitialiseEditModelsEtc
+    *pCount_faces = gCount_drone_path_nodes * 12;
+    *pCount_vertices = gCount_drone_path_nodes * 8;
+    for (i = 0; i < gCount_drone_path_nodes; i++) {
+        for (j = 0; j < gDrone_path_nodes[i].count_sections; j++) {
+            *pCount_faces += 2;
+            *pCount_vertices += 4;
+        }
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x00452ba0
+// FUNCTION: CARMA2_SW 0x00452930
+// FUNCTION: CARMA2_CHEAT 0x00453100
+int C2_HOOK_FASTCALL InitialiseEditModelsEtc(void) {
+    int count_faces;
+    int count_vertices;
+    int i;
+    int j;
+    tDrone_path_node* node;
+
+    if (gStatic_drone_path_model_actor == NULL) {
+        gStatic_drone_path_model_actor = BrActorAllocate(BR_ACTOR_MODEL, NULL);
+        BrActorAdd(gNon_track_actor, gStatic_drone_path_model_actor);
+    }
+    if (gDrone_path_model_actor == NULL) {
+        gDrone_path_model_actor = BrActorAllocate(BR_ACTOR_MODEL, NULL);
+        BrActorAdd(gNon_track_actor, gDrone_path_model_actor);
+    }
+    if (gStatic_drone_path_model == NULL) {
+        gStatic_drone_path_model = BrModelAllocate("StaticDronePathModel", 3, 1);
+        gStatic_drone_path_model->flags |= BR_MODF_GENERATE_TAGS | BR_MODF_KEEP_ORIGINAL | BR_MODF_DONT_WELD;
+        BrModelAdd(gStatic_drone_path_model);
+    }
+    if (gElasticatey_drone_path_model == NULL) {
+        gElasticatey_drone_path_model = BrModelAllocate("ElasticateyDronePathModel", 3, 1);
+        gElasticatey_drone_path_model->flags |= BR_MODF_GENERATE_TAGS | BR_MODF_KEEP_ORIGINAL | BR_MODF_DONT_WELD;
+        BrModelAdd(gElasticatey_drone_path_model);
+    }
+    if (gStatic_drone_path_model_actor == NULL || gDrone_path_model_actor == NULL || gStatic_drone_path_model == NULL || gElasticatey_drone_path_model == NULL) {
+        return 0;
+    }
+    gStatic_drone_path_model_actor->model = gStatic_drone_path_model;
+    gStatic_drone_path_model_actor->type = BR_ACTOR_MODEL;
+    gStatic_drone_path_model_actor->render_style = gCount_drone_path_nodes != 0 ? BR_RSTYLE_FACES : BR_RSTYLE_NONE;
+    gDrone_path_model_actor->model = gElasticatey_drone_path_model;
+    gDrone_path_model_actor->type = BR_ACTOR_MODEL;
+    gDrone_path_model_actor->render_style = gDrone_paths_elasticating ? BR_RSTYLE_FACES : BR_RSTYLE_NONE;
+    ReallocModelFacesAndVertices(gElasticatey_drone_path_model, 2, 4);
+    CalcNFacesAndVerticesInEditModel(&count_faces, &count_vertices);
+    if (count_vertices > gStatic_drone_path_model_max_vertices || count_faces > gStatic_drone_path_model_max_faces) {
+        ReallocModelFacesAndVertices(gStatic_drone_path_model, count_faces, count_vertices);
+        gStatic_drone_path_model_max_vertices = count_vertices;
+        gStatic_drone_path_model_max_faces = count_faces;
+    } else {
+        gStatic_drone_path_model->nvertices = count_vertices;
+        gStatic_drone_path_model->nfaces = count_faces;
+    }
+    count_faces = 0;
+    count_vertices = 0;
+    for (i = 0; i < gCount_drone_path_nodes; i++) {
+        if (i == gSelected_edit_drone_path) {
+            MakeAIEditCubeHere(gStatic_drone_path_model, count_vertices, count_faces, &gDrone_path_nodes[i].position, gMat_dk_turq, gMat_lt_turq, gMat_lt_turq);
+        } else if (gDrone_path_nodes[i].field_0x12e & 0x1) {
+            MakeAIEditCubeHere(gStatic_drone_path_model, count_vertices, count_faces, &gDrone_path_nodes[i].position, gMat_dk_yel, gMat_md_yel, gMat_lt_yel);
+        } else {
+            MakeAIEditCubeHere(gStatic_drone_path_model, count_vertices, count_faces, &gDrone_path_nodes[i].position, gMat_dk_grn, gMat_md_grn, gMat_lt_grn);
+        }
+        count_faces += 12;
+        count_vertices += 8;
+    }
+    for (i = 0; i < gCount_drone_path_nodes; i++) {
+        node = &gDrone_path_nodes[i];
+        for (j = 0; j < ((node->field_0x12e & 0x1) ? 1 : node->count_sections); j++) {
+            if (node->field_0x12e & 0x1) {
+                if (node->sections[j].node1 >= 0) {
+                    MakeAISimpleEditSectionHere(gStatic_drone_path_model, count_vertices, count_faces, &node->position, &gDrone_path_nodes[node->sections[j].node1].position, gMat_dk_yel, gMat_lt_yel);
+                }
+            } else {
+                MakeAISimpleEditSectionHere(gStatic_drone_path_model, count_vertices, count_faces, &node->position, &gDrone_path_nodes[node->sections[j].node1].position, gMat_dk_grn, gMat_lt_grn);
+            }
+            count_faces += 2;
+            count_vertices += 4;
+        }
+    }
+    if (count_vertices != 0) {
+        BrModelUpdate(gStatic_drone_path_model, BR_MODU_ALL);
+    } else {
+        gStatic_drone_path_model_actor->render_style = BR_RSTYLE_NONE;
+    }
+    WriteOutDronePaths();
+    return 1;
+}
 
 // UpdateEditModels
 
-// WriteOutDronePaths
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+// STUB: CARMA2_HW 0x00453050
+// STUB: CARMA2_SW 0x00452de0
+// STUB: CARMA2_CHEAT 0x004535b0
+void C2_HOOK_FASTCALL WriteOutDronePaths(void) {
+    NOT_IMPLEMENTED();
+}
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
