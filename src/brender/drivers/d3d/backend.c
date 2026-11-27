@@ -1164,7 +1164,6 @@ int C2_HOOK_CDECL SetD3DViewport(void) {
 
 
 
-
 // FUNCTION: D3D 0x10004030
 void C2_HOOK_CDECL D3DSetupTextureCacheColorKeyAlpha(void) {
     int i;
@@ -1864,7 +1863,6 @@ void C2_HOOK_CDECL DoD3DOperation(int operation) {
         return;
     }
 }
-
 
 
 // STUB: D3D 0x10008570
