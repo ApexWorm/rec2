@@ -361,6 +361,7 @@ void C2_HOOK_FASTCALL FillInBounds(tBounds* pBounds) {
 }
 
 // STUB: CARMA2_HW 0x0045f8c0
+// STUB: CARMA2_SW 0x0045f330
 // STUB: CARMA2_CHEAT 0x0045fd30
 int C2_HOOK_FASTCALL ActorBoxPick(tBounds* bnds, br_actor* ap, br_model* model, br_material* material, tFace_ref* face_list, int max_face, br_matrix34* pMat, tWorld_callbacks* pWorld_callbacks) {
     NOT_IMPLEMENTED();

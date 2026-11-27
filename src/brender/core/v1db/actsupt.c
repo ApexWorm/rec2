@@ -52,6 +52,7 @@ br_uint_32 C2_HOOK_CDECL BrActorSearchMany(br_actor* root, char* pattern, br_act
     int n;
     int remaining;
 
+    remaining = max;
     sub = NULL;
     if (pattern != NULL) {
         while (*pattern == '/') {
@@ -66,7 +67,6 @@ br_uint_32 C2_HOOK_CDECL BrActorSearchMany(br_actor* root, char* pattern, br_act
         }
     }
     a = root->children;
-    remaining = max;
     while (a != NULL && remaining > 0) {
         if (BrNamePatternMatch(pattern, a->identifier) != 0) {
             if (sub == NULL || *sub == '\0') {

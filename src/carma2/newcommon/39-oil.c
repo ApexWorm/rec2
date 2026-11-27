@@ -33,6 +33,7 @@ tOil_spill_info gOily_spills[32] = { 0 };
 
 // GLOBAL: CARMA2_HW 0x00691710
 // GLOBAL: CARMA2_SW 0x0068b768
+// GLOBAL: CARMA2_CHEAT 0x00698fb0
 int gNext_oil_pixie = 0;
 
 // GLOBAL: CARMA2_HW 0x00691714
@@ -109,6 +110,8 @@ void C2_HOOK_FASTCALL InitOilSpills(void) {
 }
 
 // FUNCTION: CARMA2_HW 0x004a6c50
+// FUNCTION: CARMA2_SW 0x004a2dc0
+// FUNCTION: CARMA2_CHEAT 0x004a7f60
 void C2_HOOK_FASTCALL ResetOilSpills(void) {
     int i;
 
@@ -205,6 +208,7 @@ void C2_HOOK_FASTCALL MungeIndexedOilsHeightAboveGround(int pIndex) {
 }
 
 // FUNCTION: CARMA2_HW 0x004a7460
+// FUNCTION: CARMA2_SW 0x004a35d0
 void C2_HOOK_FASTCALL SetInitialOilStuff(tOil_spill_info* pOil, br_model* pModel) {
     /* Resize the spill in the ground plane without changing vertex heights. */
     pModel->vertices[0].p.v[0] = -pOil->field_0x20;
@@ -317,6 +321,7 @@ void C2_HOOK_FASTCALL GetOilFrictionFactors(tCar_spec* pCar, br_scalar* pFl_fact
 }
 
 // FUNCTION: CARMA2_HW 0x004a7860
+// FUNCTION: CARMA2_SW 0x004a39d0
 // FUNCTION: CARMA2_CHEAT 0x004a8b70
 void C2_HOOK_FASTCALL AdjustOilSpill(int pIndex, br_matrix34* pMat, br_scalar pFull_size, br_scalar pGrow_rate, tU32 pSpill_time, tU32 pStop_time, tCar_spec* pCar, br_vector3* pOriginal_pos, br_pixelmap* pPixelmap) {
 

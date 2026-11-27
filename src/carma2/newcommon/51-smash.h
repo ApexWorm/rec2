@@ -20,6 +20,7 @@ extern int gShrapnel_child_count;
 extern tSmashable_item_spec* gTrack_smashable_environment_specs;
 extern tSmashable_item_spec gUnknown_smashable_006a3660;
 extern tSmashable_item_spec gPowerup_pickup_smashable;
+extern tSmashable_item_spec* gSmashable_track_indexable_triggers[100];
 extern br_actor* gSmashable_noncar_shrapnel_actors[100];
 extern int gCount_smashable_noncar_shrapnel_actors;
 extern const char* gSmashable_track_environment_path;
@@ -73,7 +74,7 @@ extern void C2_HOOK_FASTCALL ResetExplosions(void);
 
 extern void C2_HOOK_FASTCALL RemoveAllExplosionettes(void);
 
-// MungeExplosions
+extern void C2_HOOK_FASTCALL MungeExplosions(void);
 
 extern void C2_HOOK_FASTCALL CopyExplosionData(int pIndex, tExplosion* pExplosion);
 
@@ -213,9 +214,9 @@ extern void C2_HOOK_FASTCALL ActuallyRepairSmash(tCar_spec* pCar_spec, tCar_crus
 
 // KillFragment
 
-// AddRepairAnimationToQueue
+extern void C2_HOOK_FASTCALL AddRepairAnimationToQueue(tCar_spec* pCar_spec, tCar_crush_smashable_part* pSmashable);
 
-// RepairSmash
+extern void C2_HOOK_FASTCALL RepairSmash(tCar_spec* pCar_spec, tCar_crush_buffer_entry* pSmash_data);
 
 extern void C2_HOOK_FASTCALL TotallyRepairSmash(tCar_spec* pCar_Spec, tCar_crush_buffer_entry* pSmash_data);
 
@@ -235,7 +236,7 @@ extern void C2_HOOK_FASTCALL DoFragMovement(tSmash_vertex* pFragment, tU32 pTime
 
 extern void C2_HOOK_FASTCALL MungeGlassFragments2(int pEnd_race);
 
-// MungeAnimationRepairs
+extern void C2_HOOK_FASTCALL MungeAnimationRepairs(void);
 
 // MungeGlassFragments
 
@@ -297,9 +298,9 @@ extern int C2_HOOK_FASTCALL InsertQuad(tSmash_quad_mapping* pMapping, br_actor* 
 
 // ProcessModel
 
-// BashModel
+extern float C2_HOOK_FASTCALL BashModel(tSmashable_item_spec* pSpec, tPhysics_object* pObject, br_actor* pActor, float pMagnitude, br_vector3* pPosition, br_vector3* pNormal, br_vector3* pForce, int* pSmashed, int pNetwork);
 
-// SendNetSmash
+extern void C2_HOOK_FASTCALL SendNetSmash(tPhysics_object* pObject, undefined4 pArg2, float pMagnitude, br_vector3* pPosition, br_vector3* pNormal, br_vector3* pForce, int pArg7);
 
 // SendAllSmashes
 
