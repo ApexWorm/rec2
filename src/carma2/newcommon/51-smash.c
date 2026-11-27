@@ -168,7 +168,7 @@ tDecal gDecals[50] = { 0 };
 // GLOBAL: CARMA2_HW 0x006a8288
 // GLOBAL: CARMA2_SW 0x006a22e8
 // GLOBAL: CARMA2_CHEAT 0x006afe00
-int gINT_006a8288 = 0;
+undefined4 gDAT_006a8288 = 0;
 #endif
 
 // GLOBAL: CARMA2_HW 0x006a828c
