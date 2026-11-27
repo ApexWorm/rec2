@@ -2800,7 +2800,7 @@ typedef struct tCar_spec {
     undefined field_0x90[28];
     tU16 fire_vertex[12];
     float dt;
-    undefined* field_0xc8;
+    struct tCar_spec* field_0xc8; /* FIXME: car that owns this detached bit/split half? */
     char name[32];
     char driver_name[32];
     char grid_icon_names[3][14];
@@ -3001,7 +3001,7 @@ typedef struct tCar_spec {
     int time_last_hit;
     int time_last_victim;
     tCar_spec* last_hit_by;
-    undefined* field_0x13f0;
+    struct tCar_spec* last_culprit;
     int no_of_processes_recording_my_trail;
     tPursuee_trail my_trail;
     unsigned int grudge_raised_recently : 1;   // @0x13c  // 0x1
