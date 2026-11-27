@@ -13,6 +13,7 @@
 #include "core/fw/resource.h"
 
 // GLOBAL: CARMA2_HW 0x00666ea8
+// GLOBAL: CARMA2_CHEAT 0x0066e760
 char scratchString[512] = "SCRATCH";
 
 // FUNCTION: CARMA2_HW 0x00529e80

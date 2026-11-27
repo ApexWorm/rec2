@@ -20,6 +20,7 @@
 
 // FUNCTION: CARMA2_HW 0x0052f3f0
 // FUNCTION: CARMA2_SW 0x0052aa90
+// FUNCTION: CARMA2_CHEAT 0x00534fe0
 void C2_HOOK_CDECL lexerError(br_lexer* l, const char* string) {
 }
 
@@ -111,6 +112,7 @@ br_error C2_HOOK_CDECL BrLexerPushFile(br_lexer* l, char* file) {
 
 // FUNCTION: CARMA2_HW 0x0052f570
 // FUNCTION: CARMA2_SW 0x0052ac10
+// FUNCTION: CARMA2_CHEAT 0x00535160
 void C2_HOOK_CDECL stringGetchar(br_lexer_source* source) {
     char* cp;
 
@@ -159,6 +161,7 @@ br_lexer_source* C2_HOOK_CDECL BrLexerPop(br_lexer* l) {
 
 // FUNCTION: CARMA2_HW 0x0052f5c0
 // FUNCTION: CARMA2_SW 0x0052ac60
+// FUNCTION: CARMA2_CHEAT 0x005351b0
 void C2_HOOK_STDCALL lexerAdvance(br_lexer* l) {
     int n;
     br_boolean got_point;
