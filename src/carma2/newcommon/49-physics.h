@@ -322,6 +322,8 @@ extern void C2_HOOK_FASTCALL ApplyTorque(tPhysics_object* pObject, const br_vect
 
 extern void C2_HOOK_FASTCALL ApplyDiminishingTorque(tPhysics_object* pObject, const br_vector3 *pTorque);
 
+extern int C2_HOOK_FASTCALL FUN_004c2d60(tPhysics_object* pObject, tWorld_callbacks* pCallbacks);
+
 // OrderObjectListOnX
 
 // SwapPair

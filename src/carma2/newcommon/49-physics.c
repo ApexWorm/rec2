@@ -1115,6 +1115,22 @@ void C2_HOOK_FASTCALL ApplyDiminishingTorque(tPhysics_object* pObject, const br_
     }
 }
 
+// FUNCTION: CARMA2_HW 0x004c2d60
+// FUNCTION: CARMA2_SW 0x004bf490
+// FUNCTION: CARMA2_CHEAT 0x004c8880
+int C2_HOOK_FASTCALL FUN_004c2d60(tPhysics_object* pObject, tWorld_callbacks* pCallbacks) {
+    int count;
+    br_vector3 tv;
+
+    count = 0;
+    for (; pObject->next != NULL; pObject = pObject->next) {
+        if (!TestForObjectInSensiblePlace(pObject, pObject->next, &tv, pCallbacks)) {
+            count++;
+        }
+    }
+    return count;
+}
+
 // OrderObjectListOnX
 
 // SwapPair
