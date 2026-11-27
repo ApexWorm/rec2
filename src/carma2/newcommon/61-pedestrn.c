@@ -2516,14 +2516,35 @@ void C2_HOOK_FASTCALL SetGoreLevel(int pNewLevel) {
 
 // InitBoner
 
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
 // STUB: CARMA2_HW 0x00403f90
 // STUB: CARMA2_SW 0x00403f90
 // STUB: CARMA2_CHEAT 0x00403f90
-void C2_HOOK_FASTCALL DRVector3SafeCross(br_vector3* pOut, const br_vector3* pA, const br_vector3* pB) {
+void C2_HOOK_FASTCALL DRVector3SafeCross(br_vector3* pDest, const br_vector3* pA, const br_vector3* pB) {
     NOT_IMPLEMENTED();
 }
 
-// DRVector3SafeCrossXZ
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_HW 0x00404150
+// STUB: CARMA2_SW 0x00404150
+// STUB: CARMA2_CHEAT 0x00404150
+void C2_HOOK_FASTCALL DRVector3SafeCrossXZ(br_vector3* pDest, const br_vector3* pA, const br_vector3* pB) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // FUNCTION: CARMA2_HW 0x00404290
 // FUNCTION: CARMA2_SW 0x00404290
