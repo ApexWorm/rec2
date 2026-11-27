@@ -170,8 +170,7 @@ void C2_HOOK_FASTCALL CopyMechanics(tCar_spec* pCar, tU8* pSrc) {
     }
     object = pCar->collision_info;
     if (object->field_0x292 & 0x4) {
-        object->field_0x484 = ((undefined4*)pData)[0];
-        object->field_0x488 = ((undefined4*)pData)[1];
+        object->field_0x484 = *(tCompressed_vector4*)pData;
     }
 }
 

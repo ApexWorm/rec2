@@ -4313,7 +4313,9 @@ typedef struct tCar_crush_spec {
     float field_0x174;
     undefined field_0x178[0x180 - 0x178];
     float field_0x180;
-    undefined field_0x184[0x1cc - 0x184];
+    undefined field_0x184[0x190 - 0x184];
+    br_angle field_0x190[3];
+    undefined field_0x196[0x1cc - 0x196];
     tCar_crush_vertex_data* field_0x1cc;
     undefined field_0x1d0[28];
     br_vector3 field_0x1ec[6];
@@ -4332,8 +4334,7 @@ typedef struct tCar_crush_spec {
     br_actor* actor; /* ->user is tCar_spec pointer */
     br_actor* model_actor;
     undefined field_0x4d4[0x548 - 0x4d4];
-    br_vector3 field_0x548;
-    float field_0x554;
+    br_vector4 field_0x548;
     br_vector3 driver_position;
     tCollision_shape_wireframe* field_0x564[4];
     tU32 field_0x574;
@@ -4671,15 +4672,15 @@ typedef struct tPhysics_object {
     tS16 field_0x278;
     undefined field_0x27a[0x27c - 0x27a];
     tU32 field_0x27c;
-    undefined field_0x280[0x292 - 0x280];
+    undefined field_0x280[0x290 - 0x280];
+    tU16 field_0x290;
     tU8 field_0x292;
     undefined field_0x293;
     tU8 field_0x294[0x2fc - 0x294]; /* FIXME: size taken from the next used offset */
     tU8 shape_data[0x481 - 0x2fc]; /* FIXME: size taken from the next used offset */
     tU8 field_0x481;
-    tU16 field_0x482;
-    undefined4 field_0x484;
-    undefined4 field_0x488;
+    br_angle field_0x482;
+    tCompressed_vector4 field_0x484;
     undefined4 field_0x48c[4];
     undefined4 field_0x49c; /* tU32 last_car_car_collision: */
     undefined field_0x4a0[52];
@@ -5471,6 +5472,7 @@ typedef enum {
     eNet_message_chunk_type_car_crush = 0x20,
     eNet_message_chunk_type_semi_detach_bit = 0x24,
     eNet_message_chunk_type_reattach_bit = 0x26,
+    eNet_message_chunk_type_sh_non_car = 0x29,
     eNet_message_chunk_type_reattach_all_bits = 0x2b,
     eNet_message_chunk_type_toggle_doors = 0x2c,
     eNet_message_chunk_type_view_car = 0x2f,
@@ -5560,6 +5562,15 @@ typedef struct {
     tPlayer_ID player;
     tU32 time;
 } tNet_message_chunk_reattach_all_bits;
+
+typedef struct {
+    tNet_message_chunk_header header;
+    tPlayer_ID player;
+    tU32 time;
+    tU16 flags;
+    tCompressed_vector4 plane;
+    tU8 object_hierarchy[];
+} tNet_message_chunk_sh_non_car;
 
 typedef struct {
     tNet_message_chunk_header header;
@@ -5718,6 +5729,7 @@ typedef union {
     tNet_message_car_crush car_crush; /* type = 0x20 */
     tNet_message_chunk_semi_detach_bit semi_detach_bit; /* type = 0x24 */
     tNet_message_chunk_reattach_bit reattach_bit; /* type = 0x26 */
+    tNet_message_chunk_sh_non_car sh_non_car; /* type = 0x29 */
     tNet_message_chunk_reattach_all_bits reattach_all_bits; /* type = 0x2b */
     tNet_message_chunk_toggle_doors toggle_doors; /* type = 0x2c */
     tNet_message_chunk_view_car view_car; /* type = 0x2f */
@@ -6120,6 +6132,7 @@ enum {
     kFatalError_CannotLoadAGeneratedShadeTable = 0x6d,
     kFatalError_NetworkCodeSelfCheck = 0x6e,
     kFatalError_RanOutOfFunkGrooveSlotBunches = 0x71,
+    kFatalError_NetContentsTooBig_S = 0x72,
     kFatalError_FileIsCorrupted_S = 0x73,
     kFatalError_CantFindFile_S = 0x75,
     kFatalError_CantLoadCrushDataFile_S = 0x76,
