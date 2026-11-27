@@ -129,6 +129,7 @@ int C2_HOOK_FASTCALL CheckQuit(void) {
 
 // FUNCTION: CARMA2_HW 0x00513510
 // FUNCTION: CARMA2_SW 0x0050e950
+// FUNCTION: CARMA2_CHEAT 0x00518f00
 double C2_HOOK_FASTCALL sqr(double pN) {
 
     return pN * pN;
