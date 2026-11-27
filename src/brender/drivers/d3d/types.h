@@ -250,8 +250,8 @@ typedef struct br_primitive_state_d3d {
     struct {
         local_block_d3d* last_block;
         br_token last_type;
-        br_fixed_lu comp_offsets[NUM_COMPONENTS];
-        br_fixed_lu comp_scales[NUM_COMPONENTS];
+        br_fixed_ls comp_offsets[NUM_COMPONENTS];
+        br_fixed_ls comp_scales[NUM_COMPONENTS];
         br_uint_32 timestamp_prim;
         br_uint_32 timestamp_out;
     } cache;

@@ -19,7 +19,7 @@
 
 // FUNCTION: D3D 0x10006490
 void C2_HOOK_CDECL ResetComputedOffsetsAndScales(br_primitive_state_d3d* prim) {
-    br_device_pixelmap_d3d *pm = prim->out.pixelmap;
+    br_device_pixelmap_d3d* pm;
 
     prim->cache.comp_offsets[0] = BR_FIXED_UINT(0);
     prim->cache.comp_offsets[4] = BR_FIXED_UINT(0);
@@ -33,6 +33,7 @@ void C2_HOOK_CDECL ResetComputedOffsetsAndScales(br_primitive_state_d3d* prim) {
     prim->cache.comp_scales[6] = BR_FIXED_UINT(1);
     prim->cache.comp_scales[7] = BR_FIXED_UINT(1);
     prim->cache.comp_scales[14] = BR_FIXED_UINT(1);
+    pm = prim->out.pixelmap;
     prim->cache.comp_offsets[5] = BR_FIXED_UINT(pm->pm_base_x + pm->pm_width / 2);
     prim->cache.comp_scales[5] = BR_FIXED_UINT(pm->pm_width / 2);
     prim->cache.comp_offsets[6] = BR_FIXED_UINT(pm->pm_base_y + pm->pm_height / 2);
@@ -59,17 +60,22 @@ struct {
     { primInfo_d3d_t15, BR_ASIZE(primInfo_d3d_t15), },
 };
 
+/* FIXME: empty in the original, where the linker folded it with d3d_debug_printf (0x10005e20); the name is a guess */
+void C2_HOOK_CDECL PrimitiveStateD3DTrace(br_primitive_state_d3d* self) {
+}
+
 // FUNCTION: D3D 0x10005e30
 void C2_HOOK_CDECL FUN_10005e30(br_primitive_state_d3d* self, br_uint_32 flags_cmp, local_block_d3d* block) {
     int t;
 
     gCount_queued_render_states = 0;
+    PrimitiveStateD3DTrace(self);
     gINT_1001bba4 = 0;
     if (flags_cmp & 0x400) {
-        if (!(self->prim.flags & 2) && ((self->prim.flags & 0x80) || (self->prim.colour_map != NULL && self->prim.colour_map->buffer.blended))) {
+        if (!(self->prim.flags & 0x2) && ((self->prim.flags & 0x80) || (self->prim.colour_map != NULL && self->prim.colour_map->buffer.blended))) {
             if (self->prim.flags & 0x200) {
                 gINT_1001bba4 = 1;
-            } else if (self->prim.colour_map != NULL && self->prim.colour_map->buffer.field_0x74 != -1) {
+            } else if (self->prim.colour_map != NULL && self->prim.colour_map->buffer.field_0x74 == -1) {
                 gINT_1001bba4 = 9;
             } else {
                 gINT_1001bba4 = 2;
@@ -84,20 +90,20 @@ void C2_HOOK_CDECL FUN_10005e30(br_primitive_state_d3d* self, br_uint_32 flags_c
         }
         if (!gTexture_format_is_NOT_ARGB4444) {
             d3d_load(&self->prim.colour_map->buffer, -1);
-        } else if ((self->prim.flags & 1) && !(self->prim.flags & 2)) {
+        } else if ((self->prim.flags & 0x1) && !(self->prim.flags & 0x2)) {
             d3d_load(&self->prim.colour_map->buffer, -2);
-        } else if ((self->prim.flags & 0x80) == 0) {
-            d3d_load(&self->prim.colour_map->buffer, -1);
-        } else {
+        } else if (self->prim.flags & 0x80) {
             d3d_load(&self->prim.colour_map->buffer, (int)self->prim.alpha_val);
+        } else {
+            d3d_load(&self->prim.colour_map->buffer, -1);
         }
-        if (self->prim.colour_map != NULL && !gTexture_format_is_NOT_ARGB4444 && (gRegister_flags & 1)) {
+        if (self->prim.colour_map != NULL && !gTexture_format_is_NOT_ARGB4444 && (gRegister_flags & 0x1)) {
             if (self->prim.map_interpolation == 1 || self->prim.map_interpolation == 0x92) {
-                QUEUE_RENDER_STATE(0x11, 1);
-                QUEUE_RENDER_STATE(0x12, 1);
+                QUEUE_RENDER_STATE(D3DRENDERSTATE_TEXTUREMAG, D3DFILTER_NEAREST);
+                QUEUE_RENDER_STATE(D3DRENDERSTATE_TEXTUREMIN, D3DFILTER_NEAREST);
             } else {
-                QUEUE_RENDER_STATE(0x11, 2);
-                QUEUE_RENDER_STATE(0x12, 2);
+                QUEUE_RENDER_STATE(D3DRENDERSTATE_TEXTUREMAG, D3DFILTER_LINEAR);
+                QUEUE_RENDER_STATE(D3DRENDERSTATE_TEXTUREMIN, D3DFILTER_LINEAR);
             }
         }
     } else {
@@ -105,100 +111,90 @@ void C2_HOOK_CDECL FUN_10005e30(br_primitive_state_d3d* self, br_uint_32 flags_c
         if ((self->prim.flags & 0x200) && (self->prim.flags & 0x80)) {
             gINT_1001bba4 = 3;
         }
-        if ((self->prim.flags & 0x80) && (self->prim.alpha_val < 16.f)) {
+        if ((self->prim.flags & 0x80) && self->prim.alpha_val < 16.0f) {
             gINT_1001bba4 = 9;
         }
     }
     if (flags_cmp & 0x8) {
         t = 2;
-    } else if (flags_cmp & 0xb) {
-        t = 1;
     } else {
-        t = 0;
+        t = (flags_cmp >> 11) & 0x1;
     }
     switch (t) {
     case 0:
     case 2:
-        QUEUE_RENDER_STATE(0x17, 8);
-        QUEUE_RENDER_STATE(0xe, 1);
+        QUEUE_RENDER_STATE(D3DRENDERSTATE_ZFUNC, D3DCMP_ALWAYS);
+        QUEUE_RENDER_STATE(D3DRENDERSTATE_ZWRITEENABLE, 0);
         break;
     case 1:
-        QUEUE_RENDER_STATE(0x17, 7);
+        QUEUE_RENDER_STATE(D3DRENDERSTATE_ZFUNC, D3DCMP_LESSEQUAL);
         if (gTexture_format_is_NOT_ARGB4444) {
-            QUEUE_RENDER_STATE(0xe, 1);
+            QUEUE_RENDER_STATE(D3DRENDERSTATE_ZWRITEENABLE, 1);
+        } else if (self->prim.colour_map == NULL) {
+            if ((self->prim.flags & 0x80) || (self->prim.flags & 0x100)) {
+                QUEUE_RENDER_STATE(D3DRENDERSTATE_ZWRITEENABLE, 0);
+            } else {
+                QUEUE_RENDER_STATE(D3DRENDERSTATE_ZWRITEENABLE, 1);
+            }
+        } else if (self->prim.colour_map->buffer.blended || (self->prim.flags & 0x80)) {
+            QUEUE_RENDER_STATE(D3DRENDERSTATE_ZWRITEENABLE, 0);
+        } else if (self->prim.flags & 0x100) {
+            QUEUE_RENDER_STATE(D3DRENDERSTATE_ZWRITEENABLE, 0);
         } else {
-            if (self->prim.colour_map == NULL) {
-                if ((self->prim.flags & 0x80) || (self->prim.flags & 0x100)) {
-                    QUEUE_RENDER_STATE(0xe, 0);
-                } else {
-                    QUEUE_RENDER_STATE(0xe, 1);
-                }
-            }
-            else {
-                if (self->prim.colour_map->buffer.blended || (self->prim.flags & 0x80)) {
-                    QUEUE_RENDER_STATE(0xe, 1);
-                } else if (self->prim.flags & 0x100) {
-                    QUEUE_RENDER_STATE(0xe, 1);
-                } else {
-                    QUEUE_RENDER_STATE(0xe, 0);
-                }
-            }
+            QUEUE_RENDER_STATE(D3DRENDERSTATE_ZWRITEENABLE, 1);
         }
         break;
     case 3:
-        QUEUE_RENDER_STATE(0x17, 8);
+        QUEUE_RENDER_STATE(D3DRENDERSTATE_ZFUNC, D3DCMP_ALWAYS);
         if (gTexture_format_is_NOT_ARGB4444) {
-            QUEUE_RENDER_STATE(0xe, 1);
+            QUEUE_RENDER_STATE(D3DRENDERSTATE_ZWRITEENABLE, 1);
         } else if (self->prim.colour_map != NULL && self->prim.colour_map->buffer.blended) {
-            QUEUE_RENDER_STATE(0xe, 0);
+            QUEUE_RENDER_STATE(D3DRENDERSTATE_ZWRITEENABLE, 0);
+        } else if ((self->prim.flags & 0x80) || (self->prim.flags & 0x100)) {
+            QUEUE_RENDER_STATE(D3DRENDERSTATE_ZWRITEENABLE, 0);
         } else {
-            if ((self->prim.flags & 0x80) || (self->prim.flags & 0x100)) {
-                QUEUE_RENDER_STATE(0xe, 0);
-            } else {
-                QUEUE_RENDER_STATE(0xe, 1);
-            }
+            QUEUE_RENDER_STATE(D3DRENDERSTATE_ZWRITEENABLE, 1);
         }
         break;
     }
 
-    if (gTexture_format_is_NOT_ARGB4444) {
+    if (!gTexture_format_is_NOT_ARGB4444) {
+        QUEUE_RENDER_STATE(D3DRENDERSTATE_COLORKEYENABLE, 0);
         if (self->prim.flags & 0x80) {
             gINT_1001dc30 = (int)self->prim.alpha_val;
-            gDWORD_1001bbb4 = gStruct_100381c0[gINT_1001dc30 % 16].texture_handle;
+            QUEUE_RENDER_STATE(D3DRENDERSTATE_SRCBLEND, D3DBLEND_SRCALPHA);
+            gCOLOUR_100156e8 = gINT_1001dc30 << 24;
+            gINT_1001bbf0 = 4;
+            QUEUE_RENDER_STATE(D3DRENDERSTATE_DESTBLEND, D3DBLEND_INVSRCALPHA);
+            QUEUE_RENDER_STATE(D3DRENDERSTATE_BLENDENABLE, 1);
+            QUEUE_RENDER_STATE(D3DRENDERSTATE_ZWRITEENABLE, 0);
+            return;
+        }
+        if (self->prim.colour_map != NULL && self->prim.colour_map->buffer.blended) {
+            QUEUE_RENDER_STATE(D3DRENDERSTATE_SRCBLEND, D3DBLEND_SRCALPHA);
+            gCOLOUR_100156e8 = 0xff000000;
+            QUEUE_RENDER_STATE(D3DRENDERSTATE_DESTBLEND, D3DBLEND_INVSRCALPHA);
+            QUEUE_RENDER_STATE(D3DRENDERSTATE_BLENDENABLE, 1);
+            QUEUE_RENDER_STATE(D3DRENDERSTATE_ZWRITEENABLE, 0);
+        } else {
+            QUEUE_RENDER_STATE(D3DRENDERSTATE_BLENDENABLE, 0);
+            gCOLOUR_100156e8 = 0xff000000;
+            QUEUE_RENDER_STATE(D3DRENDERSTATE_ZWRITEENABLE, 1);
+        }
+    } else {
+        if (self->prim.flags & 0x80) {
+            gINT_1001dc30 = (int)self->prim.alpha_val;
+            gDWORD_1001bbb4 = gStruct_100381c0[(gINT_1001dc30 >> 4) & 0xf].texture_handle;
         } else {
             gDWORD_1001bbb4 = 0;
         }
         if ((self->prim.flags & 0x80) || (self->prim.colour_map != NULL && self->prim.colour_map->buffer.blended)) {
-            QUEUE_RENDER_STATE(0x29, 1);
+            QUEUE_RENDER_STATE(D3DRENDERSTATE_COLORKEYENABLE, 1);
         } else {
-            QUEUE_RENDER_STATE(0x29, 0);
+            QUEUE_RENDER_STATE(D3DRENDERSTATE_COLORKEYENABLE, 0);
         }
-        gINT_1001bbf0 = 2;
-    } else {
-        QUEUE_RENDER_STATE(0x29, 0);
-        if (self->prim.flags & 0x80) {
-            gINT_1001dc30 = (int)self->prim.alpha_val;
-            gCOLOUR_100156e8 = gINT_1001dc30 << 24;
-            QUEUE_RENDER_STATE(0x13, 5);
-            QUEUE_RENDER_STATE(0x14, 6);
-            QUEUE_RENDER_STATE(0x1b, 1);
-            QUEUE_RENDER_STATE(0xe, 0);
-            gINT_1001bbf0 = 4;
-        } else if (self->prim.colour_map != NULL && self->prim.colour_map->buffer.blended) {
-            gCOLOUR_100156e8 = 0xff000000;
-            QUEUE_RENDER_STATE(0x13, 5);
-            QUEUE_RENDER_STATE(0x14, 6);
-            QUEUE_RENDER_STATE(0x1b, 1);
-            QUEUE_RENDER_STATE(0xe, 0);
-            gINT_1001bbf0 = 2;
-        } else {
-            gCOLOUR_100156e8 = 0xff000000;
-            QUEUE_RENDER_STATE(0x1b, 0);
-            QUEUE_RENDER_STATE(0xe, 0);
-            gINT_1001bbf0 = 2;
-        }
-        return;
     }
+    gINT_1001bbf0 = 2;
 }
 
 // FUNCTION: D3D 0x10006570
@@ -331,8 +327,8 @@ br_error C2_HOOK_CDECL _M_br_primitive_state_d3d_rangesQueryF(br_primitive_state
         return 0xa001;
     }
     for (i = 0; i < max_comp; i++) {
-        offset[i] = BrFixedToFloat(self->cache.comp_offsets[i]);
-        scale[i] = BrFixedToFloat(self->cache.comp_scales[i]);
+        offset[i] = BrFixedToScalar(self->cache.comp_offsets[i]);
+        scale[i] = BrFixedToScalar(self->cache.comp_scales[i]);
     }
 
     return 0;
