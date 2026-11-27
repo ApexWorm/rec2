@@ -182,6 +182,7 @@ int gNext_guarantee;
 
 // GLOBAL: CARMA2_HW 0x0068d990
 // GLOBAL: CARMA2_SW 0x006879e8
+// GLOBAL: CARMA2_CHEAT 0x00695230
 tGuaranteed_message gGuarantee_list[200] = { 0 };
 
 // GLOBAL: CARMA2_HW 0x00690230
@@ -612,6 +613,7 @@ int C2_HOOK_FASTCALL NetSendMessageToPlayer(tNet_game_details* pDetails, tNet_me
 }
 
 // FUNCTION: CARMA2_HW 0x0049f0d0
+// FUNCTION: CARMA2_SW 0x0049b250
 // FUNCTION: CARMA2_CHEAT 0x0049f7d0
 int C2_HOOK_FASTCALL NetSendMessageToHost(tNet_game_details* pDetails, tNet_message* pMessage) {
 
@@ -1204,6 +1206,7 @@ void C2_HOOK_FASTCALL NetPlayerStatusChanged(tPlayer_status pNew_status) {
 }
 
 // FUNCTION: CARMA2_HW 0x004a5b30
+// FUNCTION: CARMA2_SW 0x004a1cb0
 // FUNCTION: CARMA2_CHEAT 0x004a6aa0
 tPlayer_status C2_HOOK_FASTCALL NetGetPlayerStatus(void) {
 
