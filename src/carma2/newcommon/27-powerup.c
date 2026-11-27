@@ -305,9 +305,33 @@ void C2_HOOK_FASTCALL QueueIconComing(tPowerup* pPowerup, tHeadup_icon* pHeadup_
     }
 }
 
-// LosePowerupX
+inline void C2_HOOK_FASTCALL LosePowerupX(tPowerup* pPowerup, int pTell_net_players) {
+    tNet_message* the_message;
 
-// LosePowerup
+    if (pPowerup->got_time != 0 && pPowerup->lose_proc != NULL) {
+        pPowerup->lose_proc(pPowerup, pPowerup->car);
+    }
+    if (pPowerup->net_type & 0x80) {
+        PipeSinglePowerupLose(pPowerup, pPowerup->car);
+    }
+    if (gNet_mode != eNet_mode_none) {
+        the_message = NetBuildGuaranteedMessage(eNet_message_chunk_type_powerup, 0);
+        the_message->contents.powerup.event = 2;
+        the_message->contents.powerup.player = gLocal_net_ID;
+        the_message->contents.powerup.powerup_index = pPowerup - gPowerup_array;
+        NetGuaranteedSendMessageToAllPlayers(gCurrent_net_game, the_message, NULL);
+    }
+    gProgram_state.current_car.powerups[pPowerup - gPowerup_array] = 0;
+    if (pPowerup->initial_value == 0) {
+        QueueIconComing(pPowerup, gPickedup_powerups, &gNumber_of_icons);
+    }
+    pPowerup->got_time = 0;
+}
+
+inline void C2_HOOK_FASTCALL LosePowerup(tPowerup* pPowerup) {
+
+    LosePowerupX(pPowerup, 1);
+}
 
 // LoseKeyboardPowerupN
 
@@ -2195,14 +2219,35 @@ void C2_HOOK_FASTCALL SendCurrentPowerups(void) {
     }
 }
 
-// STUB: CARMA2_HW 0x004def00
-// STUB: CARMA2_SW 0x004db400
-// STUB: CARMA2_CHEAT 0x004e4ac0
+// FUNCTION: CARMA2_HW 0x004def00
+// FUNCTION: CARMA2_SW 0x004db400
+// FUNCTION: CARMA2_CHEAT 0x004e4ac0
 void C2_HOOK_FASTCALL LoseAllLocalPowerups(tCar_spec* pCar) {
-    NOT_IMPLEMENTED();
+    int i;
+
+    if (pCar != NULL && pCar->driver == eDriver_local_human) {
+        for (i = 0; i < gNumber_of_powerups; i++) {
+            if (pCar->powerups[i] != 0 && !(gPowerup_array[i].net_type & eNet_powerup_global)) {
+                LosePowerup(&gPowerup_array[i]);
+            }
+        }
+    }
 }
 
-// LoseDodgyPowerups
+// FUNCTION: CARMA2_HW 0x004df070
+// FUNCTION: CARMA2_SW 0x004db570
+// FUNCTION: CARMA2_CHEAT 0x004e4c30
+void C2_HOOK_FASTCALL LoseDodgyPowerups(tCar_spec* pCar) {
+    int i;
+
+    if (pCar != NULL && pCar->driver == eDriver_local_human) {
+        for (i = 0; i < gNumber_of_powerups; i++) {
+            if (pCar->powerups[i] != 0 && (gPowerup_array[i].net_type & eNet_powerup_off_before_snapweld)) {
+                LosePowerup(&gPowerup_array[i]);
+            }
+        }
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x004df1e0
 // FUNCTION: CARMA2_SW 0x004db6e0
