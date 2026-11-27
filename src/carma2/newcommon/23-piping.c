@@ -147,7 +147,7 @@ int gPipe_count_callbacks;
 // GLOBAL: CARMA2_HW 0x00694104
 // GLOBAL: CARMA2_SW 0x0068e15c
 // GLOBAL: CARMA2_CHEAT 0x0069bc7c
-tPipe_smudge_data* gCrush_space;
+void* gCrush_space;
 
 // GLOBAL: CARMA2_HW 0x0069410c
 // GLOBAL: CARMA2_SW 0x0068e164
@@ -397,6 +397,7 @@ void C2_HOOK_FASTCALL AREndPipingSession(void) {
 
 // FUNCTION: CARMA2_HW 0x004028a0
 // FUNCTION: CARMA2_SW 0x004028a0
+// FUNCTION: CARMA2_CHEAT 0x004028a0
 void C2_HOOK_FASTCALL ARAddDataToSession(int pType, uintptr_t pOwner, void* pData, tU32 pSize) {
     tU32 new_size;
 
@@ -857,7 +858,33 @@ void C2_HOOK_FASTCALL DisposeActionReplay(void) {
 
 // GetNextIncident
 
-// AddCrushToPipingSession
+#if defined(REC2_MATCHING) && defined(_MSC_VER)
+#pragma inline_depth(0)
+#endif
+
+// FUNCTION: CARMA2_HW 0x004c6e40
+// FUNCTION: CARMA2_SW 0x004c3570
+// FUNCTION: CARMA2_CHEAT 0x004cc960
+void C2_HOOK_FASTCALL AddCrushToPipingSession(br_model* pModel, const br_vector3* pVector, const float* pValues) {
+    tPipe_chunk_crush* crush;
+    tU32 size;
+
+    crush = gCrush_space;
+    if (gCrush_space == NULL) {
+        return;
+    }
+    size = offsetof(tPipe_chunk_crush, values) + pModel->nvertices * sizeof(tU16);
+    if (size > 0x4000) {
+        FatalError(kFatalError_ChunkIsTooLargeToPipe);
+    }
+    crush->model = pModel;
+    ARCompressCrush(&crush->direction, crush->values, pModel, pVector, pValues);
+    ARAddDataToSession(ePipe_chunk_crush, -1, crush, size);
+}
+
+#if defined(REC2_MATCHING) && defined(_MSC_VER)
+#pragma inline_depth()
+#endif
 
 // AddSmudgeToPipingSession
 
@@ -1078,7 +1105,25 @@ void C2_HOOK_FASTCALL AddNapalmBoltToPipingSession(int pIndex, tPedestrian* pPed
         SIZE_OFFSET_PIPING(tPipe_chunk_napalm_bolt, positions), pPositions);
 }
 
-// PipeSingleCrush
+// FUNCTION: CARMA2_HW 0x004c7f40
+// FUNCTION: CARMA2_SW 0x004c4670
+// FUNCTION: CARMA2_CHEAT 0x004cda60
+void C2_HOOK_FASTCALL PipeSingleCrush(br_model* pModel, const br_vector3* pVector, const float* pValues) {
+    tPipe_chunk_crush* crush;
+    tU32 size;
+
+    crush = gCrush_space;
+    if (gCrush_space == NULL) {
+        return;
+    }
+    size = offsetof(tPipe_chunk_crush, values) + pModel->nvertices * sizeof(tU16);
+    if (size > 0x4000) {
+        FatalError(kFatalError_ChunkIsTooLargeToPipe);
+    }
+    crush->model = pModel;
+    ARCompressCrush(&crush->direction, crush->values, pModel, pVector, pValues);
+    ARDoSingleSession(ePipe_chunk_crush, -1, crush, size);
+}
 
 // FUNCTION: CARMA2_HW 0x004c8090
 // FUNCTION: CARMA2_SW 0x004c47c0
