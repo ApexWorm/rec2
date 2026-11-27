@@ -44,6 +44,7 @@ extern int gSelected_ped;
 extern int gCount_active_peds;
 extern int gPeds_suicidal;
 extern int gExploding_pedestrians;
+extern tPedestrian* gPedestrians_in_sight;
 extern tNapalm_bolt gNapalm_bolts[5];
 extern int gPed_severing_chance;
 
