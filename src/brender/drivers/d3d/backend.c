@@ -2579,7 +2579,7 @@ void C2_HOOK_CDECL FUN_10007140(void) {
 }
 
 // FUNCTION: D3D 0x10004780
-void C2_HOOK_CDECL FUN_10004780(void* arg1, int stride) {
+void C2_HOOK_CDECL FUN_10004780(void* arg1, int stride, int width, int height) {
     DDSURFACEDESC surface_desc;
     int pixel_format;
     int count_draws;
