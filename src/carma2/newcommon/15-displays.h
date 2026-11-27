@@ -47,8 +47,16 @@ extern tU32 gLast_earn_time;
 extern int gLast_time_credit_headup;
 extern tU32 gLast_time_earn_time;
 extern tU32 gLast_time_credit_amount;
+extern int gNet_ped_headup;
+extern int gCredits_won_headup;
 extern int gOld_times[10];
+extern int gNet_cash_headup;
+extern int gTimer_headup;
+extern int gLaps_headup;
+extern int gPed_kill_count_headup;
+extern int gCar_kill_count_headup;
 extern char gHeadup_oppo_ped_text[64];
+extern int gTime_awarded_headup;
 extern int gQueued_headup_count;
 extern tQueued_headup gQueued_headups[4];
 
