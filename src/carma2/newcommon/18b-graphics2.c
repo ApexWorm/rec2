@@ -841,7 +841,44 @@ void C2_HOOK_FASTCALL DimRectangleClipped(br_pixelmap* pPixelmap, int pLeft, int
 
 // DR8BitPixelmapRotatedAndFeatheredCopy
 
-// DR16BitPixelmapRotatedAndFeatheredCopy
+// FUNCTION: CARMA2_HW 0x0047d0d0
+// FUNCTION: CARMA2_SW 0x0047c260
+// FUNCTION: CARMA2_CHEAT 0x0047d450
+void C2_HOOK_FASTCALL DR16BitPixelmapRotatedAndFeatheredCopy(br_matrix23* pMat, br_pixelmap* pDest, tS16 pDest_x, tS16 pDest_y, br_pixelmap* pSrc, tS16 pSrc_x, tS16 pSrc_y, tS16 pSrc_width, tS16 pSrc_height, int pTrans) {
+    int width_div_2;
+    int height_div_2;
+    int dx;
+    int dy;
+    tU16* ptr_write;
+    float src_f_x;
+    float src_f_y;
+    float start_x;
+    float start_y;
+    float offset_x;
+    float offset_y;
+    float half_height;
+    float f_dy;
+
+    width_div_2 = pSrc_width / 2;
+    height_div_2 = pSrc_height / 2;
+    start_x = pSrc_x;
+    start_y = pSrc_y;
+    half_height = pSrc_height / 2.;
+    offset_x = -(pMat->m[0][0] * width_div_2);
+    offset_y = -(width_div_2 * pMat->m[1][0]);
+    for (dy = -height_div_2; dy < height_div_2; dy++) {
+        f_dy = dy;
+        src_f_x = offset_x - f_dy * pMat->m[0][1] + start_x;
+        src_f_y = f_dy * pMat->m[1][1] - offset_y + half_height + start_y;
+        ptr_write = (tU16*)((tU8*)pDest->pixels + (pDest_y + dy + height_div_2) * pDest->row_bytes * 2 / 2 + pDest_x * 2);
+        for (dx = -width_div_2; dx < width_div_2; dx++) {
+            *ptr_write = ((tU16*)pSrc->pixels)[(int)src_f_y * pSrc->row_bytes / 2 + width_div_2 + (int)src_f_x];
+            ptr_write++;
+            src_f_x += pMat->m[0][0];
+            src_f_y -= pMat->m[1][0];
+        }
+    }
+}
 
 // DRPixelmapRotatedAndFeatheredCopy
 
