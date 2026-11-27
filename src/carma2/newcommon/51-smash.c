@@ -673,7 +673,7 @@ inline void C2_HOOK_FASTCALL DoDelayedNonCar(tU32 pTime, tDelayed_non_car* pDela
                     if (non_car->flags & 0x10000) {
                         MakeLiftGoUp(non_car);
                     } else {
-                        ApplyInitialMovement(pDelayed_non_car->field_0x18, &pDelayed_non_car->field_0x0, &speed, &omega, 1.f,
+                        ApplyInitialMovement(pDelayed_non_car->field_0x18, &pDelayed_non_car->field_0x0, &speed, &omega, 1.0f,
                             &gZero_vector__smash, &pDelayed_non_car->field_0xc, &read_action->actor->t.t.translate.t);
                         BrVector3Scale(&non_car->collision_info->v, &speed, 1.0 / WORLD_SCALE_D);
                         BrVector3Scale(&non_car->collision_info->omega, &omega, REC2_TAU / 65.536);
