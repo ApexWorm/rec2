@@ -473,8 +473,8 @@ typedef struct {
 typedef struct {
     int pitch;
     br_vector3 position;
-    tS16 outlet;
-    tS16 volume;
+    tU16 outlet;
+    tU16 volume;
 } tPipe_shunk_single_sound;
 
 typedef struct {
@@ -915,6 +915,7 @@ typedef struct tPipe_chunk {
         tPipe_single_groove_on_of groove;
         tPipe_single_vanished_dismembered vanished_dismembered;
         tPipe_single_ds_model ds_model;
+        tPipe_shunk_single_sound single_sound;
         tPipe_drone_corner_pos drone_corner_pos;
         tPipe_chunk_napalm_bolt napalm_bolt;
         tPipe_ped_dir_data ped_dir;

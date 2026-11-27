@@ -1990,7 +1990,32 @@ void C2_HOOK_FASTCALL ApplyFrameBoundary(tPipe_chunk** pChunk) {
     ApplyTime((*pChunk)->data.frame_boundary.time);
 }
 
-// ApplySound
+// FUNCTION: CARMA2_HW 0x004c9370
+// FUNCTION: CARMA2_SW 0x004c5aa0
+// FUNCTION: CARMA2_CHEAT 0x004cee90
+void C2_HOOK_FASTCALL ApplySound(tPipe_chunk** pChunk) {
+
+    if (!gDisable_piped_sounds) {
+        if ((*pChunk)->data.single_sound.volume == 0) {
+            DRS3StartSound2(GetOutletFromIndex((*pChunk)->data.single_sound.outlet),
+                (*pChunk)->subject_index, 1, -1, -1,
+                (int)(fabs(ARGetReplayRate()) * 65536.0), 0x10000);
+        } else if (BrVector3LengthSquared(&(*pChunk)->data.single_sound.position) == 0.0f) {
+            DRS3StartSound2(GetOutletFromIndex((*pChunk)->data.single_sound.outlet),
+                (*pChunk)->subject_index, 1,
+                (*pChunk)->data.single_sound.volume & 0xff,
+                (*pChunk)->data.single_sound.volume >> 8,
+                (int)(fabs(ARGetReplayRate()) * (*pChunk)->data.single_sound.pitch), 0x10000);
+        } else {
+            DRS3StartSound3D(GetOutletFromIndex((*pChunk)->data.single_sound.outlet),
+                (*pChunk)->subject_index,
+                &(*pChunk)->data.single_sound.position,
+                &gZero_vector__smash, 1,
+                (*pChunk)->data.single_sound.volume,
+                (int)(fabs(ARGetReplayRate()) * (*pChunk)->data.single_sound.pitch), 0x10000);
+        }
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x004c9490
 // FUNCTION: CARMA2_SW 0x004c5bc0
