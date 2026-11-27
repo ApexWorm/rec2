@@ -30,10 +30,15 @@ extern int gPed_move_fsm[118][7];
 
 extern tPedForms_vtable* gPed_vtable;
 
+extern tPed_move* gPed_moves[250];
+extern float gPed_cos_table[256];
+extern float gFLOAT_00677230;
 extern int gPed_retain_root_mode;
 
 extern br_material* gPedestrian_character_cloned_materials[50];
 extern int gCount_pedestrian_personality_cloned_materials;
+extern float gFLOAT_00677728;
+extern tPed_morph gPed_morphs[20];
 
 extern tPed_remap* gPed_remaps[10];
 
