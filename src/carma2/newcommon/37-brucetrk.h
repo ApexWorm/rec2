@@ -16,6 +16,7 @@
 extern int gRender_alternative_track_actors;
 extern br_material* gDefault_track_material;
 extern int gCount_track_non_cars;
+extern br_actor* gMr_blendy;
 extern br_vector3 gAverage_grid_position;
 
 // AssertNoncars
@@ -36,7 +37,7 @@ extern void C2_HOOK_FASTCALL XZToColumnXZ(tU8* pColumn_x, tU8* pColumn_z, br_sca
 
 extern intptr_t C2_HOOK_CDECL FindNonCarsCB(br_actor* pActor, void* pData);
 
-// MungeFaces
+extern void C2_HOOK_FASTCALL MungeFaces(br_actor* pActor, br_model* pModel);
 
 // ProcessModelsCB
 

@@ -1959,7 +1959,7 @@ void C2_HOOK_FASTCALL NonCarSnapSmashCallback(tPhysics_object* pObject, br_vecto
 // FUNCTION: CARMA2_HW 0x004f5470
 // FUNCTION: CARMA2_SW 0x004f10d0
 // FUNCTION: CARMA2_CHEAT 0x004fb110
-int C2_HOOK_FASTCALL SmashFaceMustBeUpdateable(br_material* pMaterial) {
+int C2_HOOK_FASTCALL SmashFaceMustBeUpdateable(br_material* pMaterial, br_model* pModel) {
     int i;
 
     for (i = 0; i < gCount_track_smashable_environment_specs; i++) {
