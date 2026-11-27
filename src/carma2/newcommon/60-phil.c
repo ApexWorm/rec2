@@ -270,7 +270,30 @@ int C2_HOOK_FASTCALL GetNetworkDataSize(tU8* pNet_data) {
     return size;
 }
 
-// GetSingleMatrixFromNetworkData
+// FUNCTION: CARMA2_HW 0x0049cf50
+// FUNCTION: CARMA2_SW 0x004990d0
+// FUNCTION: CARMA2_CHEAT 0x0049d300
+int C2_HOOK_FASTCALL GetSingleMatrixFromNetworkData(tU8* pNet_data, br_matrix34* pMatrix) {
+    tObject_network_stuff* stuff = (tObject_network_stuff*)pNet_data;
+
+    switch (*pNet_data & 0xf) {
+    case eJoint_none:
+        GetMatrixFromOrientation(pMatrix, &stuff->none.orientation);
+        *(br_vector3*)pMatrix->m[3] = stuff->none.pos;
+        return sizeof(stuff->none);
+    case eJoint_hinge:
+    case eJoint_quick_hinge:
+        GetMatrixFromOrientation(pMatrix, &stuff->hinge.orientation);
+        return sizeof(stuff->hinge);
+    case eJoint_universal:
+    case eJoint_ball_n_socket:
+        GetMatrixFromOrientation(pMatrix, &stuff->universal.orientation);
+        return sizeof(stuff->universal);
+    default:
+        PhysicsError(ePhysicsError_error9, "netphys got messed up");
+        return -1;
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x004b5cc0
 // FUNCTION: CARMA2_SW 0x004b23e0
