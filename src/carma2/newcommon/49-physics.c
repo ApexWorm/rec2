@@ -35,6 +35,11 @@
 // GLOBAL: CARMA2_CHEAT 0x0069a940
 int gINT_00692dc8;
 
+// GLOBAL: CARMA2_HW 0x00692dcc
+// GLOBAL: CARMA2_SW 0x0068ce24
+// GLOBAL: CARMA2_CHEAT 0x0069a944
+int gPrepared_objects;
+
 // GLOBAL: CARMA2_HW 0x00692dd0
 // GLOBAL: CARMA2_SW 0x0068ce28
 // GLOBAL: CARMA2_CHEAT 0x0069a948
@@ -44,6 +49,16 @@ br_scalar gPhysics_bounds_max_x;
 // GLOBAL: CARMA2_SW 0x0068ce2c
 // GLOBAL: CARMA2_CHEAT 0x0069a94c
 br_scalar gPhysics_bounds_min_x;
+
+// GLOBAL: CARMA2_HW 0x006940a8
+// GLOBAL: CARMA2_SW 0x0068e100
+// GLOBAL: CARMA2_CHEAT 0x0069bc20
+tPhysics_object** gReduced_object_list;
+
+// GLOBAL: CARMA2_HW 0x006940ac
+// GLOBAL: CARMA2_SW 0x0068e104
+// GLOBAL: CARMA2_CHEAT 0x0069bc24
+int gINT_006940ac;
 
 // GLOBAL: CARMA2_HW 0x006940c0
 // GLOBAL: CARMA2_SW 0x0068e118
@@ -794,11 +809,20 @@ void C2_HOOK_FASTCALL InternalPrepareObject(tPhysics_object* pObject) {
     }
 }
 
-// STUB: CARMA2_HW 0x004b9770
-// STUB: CARMA2_SW 0x004b5e90
-// STUB: CARMA2_CHEAT 0x004bf2a0
+// FUNCTION: CARMA2_HW 0x004b9770
+// FUNCTION: CARMA2_SW 0x004b5e90
+// FUNCTION: CARMA2_CHEAT 0x004bf2a0
 void C2_HOOK_FASTCALL PrepareObject(tPhysics_object* pObject, tPhysics_object** pList) {
-    NOT_IMPLEMENTED();
+
+    InternalPrepareObject(pObject);
+    gPrepared_objects = 1;
+    CheckObjectsPostionInList(pObject, pList);
+    if (gINT_006940ac != 0) {
+        MakeObjectDoSomething(pObject, *pList);
+    }
+    if (gReduced_object_list != NULL) {
+        AddObjectToReducedList(pObject, gReduced_object_list);
+    }
 }
 
 void C2_HOOK_FASTCALL PrepareForCollisions(tPhysics_object* pObject) {
@@ -914,8 +938,6 @@ void C2_HOOK_FASTCALL MakeObjectListDoSomething(tPhysics_object* pObject) {
     }
 }
 
-extern void C2_HOOK_FASTCALL MakeObjectDoSomething(tPhysics_object* pObject, tPhysics_object* pList);
-
 // FUNCTION: CARMA2_HW 0x004b9f90
 // FUNCTION: CARMA2_SW 0x004b66b0
 // FUNCTION: CARMA2_CHEAT 0x004bfac0
@@ -1027,7 +1049,11 @@ int C2_HOOK_FASTCALL FlagsAreGo(tPhysics_object* pCollision_1, tPhysics_object* 
 
 // CollideObjectWithReducedObjectList
 
-// AddObjectToReducedList
+inline void C2_HOOK_FASTCALL AddObjectToReducedList(tPhysics_object* pObject, tPhysics_object** pList) {
+
+    pObject->field_0x234 = *pList;
+    *pList = pObject;
+}
 
 // ReducedFindObjectCollisions
 
@@ -1336,9 +1362,44 @@ void C2_HOOK_FASTCALL ApplyDiminishingTorque(tPhysics_object* pObject, const br_
 
 // OrderObjectListOnX
 
-// SwapPair
+inline void C2_HOOK_FASTCALL SwapPair(tPhysics_object* pObject_1, tPhysics_object* pObject_2) {
+    tPhysics_object* prev;
+    tPhysics_object* next;
 
-// CheckObjectsPostionInList
+    prev = pObject_1->prev;
+    next = pObject_2->next;
+    if (prev != NULL) {
+        prev->next = pObject_2;
+    }
+    if (next != NULL) {
+        next->prev = pObject_1;
+    }
+    pObject_1->prev = pObject_2;
+    pObject_2->prev = prev;
+    pObject_1->next = next;
+    pObject_2->next = pObject_1;
+}
+
+inline void C2_HOOK_FASTCALL CheckObjectsPostionInList(tPhysics_object* pObject, tPhysics_object** pList) {
+    tPhysics_object* other;
+
+    other = pObject->prev;
+    if (other != NULL && pObject->transform_matrix.m[3][0] < other->transform_matrix.m[3][0]) {
+        do {
+            SwapPair(other, pObject);
+            other = pObject->prev;
+        } while (other != NULL && pObject->transform_matrix.m[3][0] < other->transform_matrix.m[3][0]);
+        if (other == NULL) {
+            *pList = pObject;
+        }
+    } else {
+        other = pObject->next;
+        while (other != NULL && other->transform_matrix.m[3][0] < pObject->transform_matrix.m[3][0]) {
+            SwapPair(pObject, other);
+            other = pObject->next;
+        }
+    }
+}
 
 // TestForWrongAnswer
 

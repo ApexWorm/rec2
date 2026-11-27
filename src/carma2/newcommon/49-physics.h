@@ -14,6 +14,12 @@
 
 extern int gINT_00692dc8;
 
+extern int gPrepared_objects;
+
+extern tPhysics_object** gReduced_object_list;
+
+extern int gINT_006940ac;
+
 extern tPhysicsError_cbfn* gPhysics_error_cb;
 extern void* gPhysics_buffer1_ptr;
 extern void* gPhysics_buffer2_ptr;
@@ -218,7 +224,7 @@ extern void C2_HOOK_FASTCALL MakeObjectListDoSomething(tPhysics_object* pObject)
 
 // CheckForObjectHierachyTouchingObjectList
 
-// MakeObjectDoSomething
+extern void C2_HOOK_FASTCALL MakeObjectDoSomething(tPhysics_object* pObject, tPhysics_object* pList);
 
 // GetReducedList
 
@@ -232,7 +238,7 @@ extern int C2_HOOK_FASTCALL FlagsAreGo(tPhysics_object* pCollision_1, tPhysics_o
 
 // CollideObjectWithReducedObjectList
 
-// AddObjectToReducedList
+extern void C2_HOOK_FASTCALL AddObjectToReducedList(tPhysics_object* pObject, tPhysics_object** pList);
 
 // ReducedFindObjectCollisions
 
@@ -324,9 +330,9 @@ extern void C2_HOOK_FASTCALL ApplyDiminishingTorque(tPhysics_object* pObject, co
 
 // OrderObjectListOnX
 
-// SwapPair
+extern void C2_HOOK_FASTCALL SwapPair(tPhysics_object* pObject_1, tPhysics_object* pObject_2);
 
-// CheckObjectsPostionInList
+extern void C2_HOOK_FASTCALL CheckObjectsPostionInList(tPhysics_object* pObject, tPhysics_object** pList);
 
 // TestForWrongAnswer
 
