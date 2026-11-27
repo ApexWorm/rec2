@@ -32,7 +32,7 @@ extern int gCurrent_selected_drone;
 
 extern void C2_HOOK_CDECL DoNotDprintf_drone(const char* pMessage, ...);
 
-// CrappyLittleVector3DPrintf
+extern void C2_HOOK_FASTCALL CrappyLittleVector3DPrintf(const char* pName, br_vector3* pVector);
 
 // CrappyLittleDrivingStateInfoDprintf
 
@@ -82,7 +82,7 @@ extern br_actor* C2_HOOK_CDECL MrFindy(br_actor* pActor, const char* pName);
 
 // CalculateDrivingInfo
 
-// PauseDroneState
+extern void C2_HOOK_FASTCALL PauseDroneState(tDrone_spec* pDrone);
 
 // UnPauseDroneState
 
@@ -108,11 +108,11 @@ extern int C2_HOOK_FASTCALL DroneTrainWithinRenderingDistance(const br_vector3* 
 
 // DroneyObjectInSensiblePlace
 
-// StopRenderingThisDrone
+extern void C2_HOOK_FASTCALL StopRenderingThisDrone(tDrone_spec* pDrone);
 
-// StopProcessingThisDrone
+extern void C2_HOOK_FASTCALL StopProcessingThisDrone(tDrone_spec* pDrone, int pForce);
 
-// StartRenderingThisDrone
+extern void C2_HOOK_FASTCALL StartRenderingThisDrone(tDrone_spec* pDrone);
 
 // CheckDroneInSensiblePlaceBeforeStartingToProcessTheCuntingThing
 
