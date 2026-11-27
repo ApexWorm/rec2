@@ -755,6 +755,7 @@ typedef enum {
     ePipe_chunk_frame_finish = 0,
     ePipe_chunk_ped_incident = 1,
     ePipe_chunk_sound = 2,
+    ePipe_chunk_crush = 3,
     ePipe_chunk_car = 5,
     ePipe_chunk_graphical_wheel_stuff = 6,
     ePipe_chunk_damage = 7,
@@ -4761,6 +4762,12 @@ typedef struct {
 } tCar_crush;
 
 typedef struct {
+    tCar_spec* car;
+    tCar_crush* crush;
+    float scale;
+} tSpam_userdata; /* FIXME: name from Ghidra */
+
+typedef struct {
     tU8 count;
     undefined field_0x1;
     tCompressed_vector3 vectors[4];
@@ -5440,6 +5447,12 @@ typedef struct tDrone_spec {
     tFunk_grooves* funk_grooves;
     undefined4 field_0x5d4;
 } tDrone_spec;
+
+typedef struct { /* FIXME: name is a guess, returned to PHIL by GetDroneCrushData */
+    br_model* model;
+    float crushability;
+    br_bounds3 bounds;
+} tDrone_crush_data;
 
 typedef struct {
     void* field_0x0;

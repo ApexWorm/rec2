@@ -151,7 +151,7 @@ extern void C2_HOOK_FASTCALL PipeDroneMatrix(tDrone_spec* pDrone);
 
 // DroneStateFuncStationaryPassive
 
-// GetNewCrushyModelForDrone
+extern int C2_HOOK_FASTCALL GetNewCrushyModelForDrone(tDrone_spec* pDrone);
 
 extern void C2_HOOK_FASTCALL SetTrafficOn(int pTraffic_on);
 
@@ -165,7 +165,7 @@ extern void C2_HOOK_FASTCALL DisposeDronesRaceStuff(void);
 
 extern void C2_HOOK_FASTCALL LoadPerRaceDroneStuff(void);
 
-// GetDroneCrushData
+extern tDrone_crush_data* C2_HOOK_FASTCALL GetDroneCrushData(tPhysics_object* pObject);
 
 // AllocateAndInitDrones
 
