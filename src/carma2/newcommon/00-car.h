@@ -79,7 +79,7 @@ extern int C2_HOOK_FASTCALL IsCarInTheSea(void);
 
 // ControlOurCar
 
-// CalcEngineForce
+extern void C2_HOOK_FASTCALL CalcEngineForce(tCar_spec* pCar, br_scalar pDt);
 
 // PrepareCars
 
@@ -157,9 +157,9 @@ extern void C2_HOOK_FASTCALL NonCarCalcForce(tNon_car_spec* pNon_car, br_scalar 
 
 // NudgeObject
 
-// CalcForce
+extern void C2_HOOK_FASTCALL CalcForce(tCar_spec* pCar, br_scalar pDt);
 
-// DoRevs
+extern void C2_HOOK_FASTCALL DoRevs(tCar_spec* pCar, br_scalar pDt);
 
 // ScrapeNoise
 

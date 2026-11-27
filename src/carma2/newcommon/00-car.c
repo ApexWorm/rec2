@@ -691,7 +691,20 @@ int C2_HOOK_FASTCALL IsCarInTheSea(void) {
 
 // ControlOurCar
 
-// CalcEngineForce
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_HW 0x00415300
+// STUB: CARMA2_SW 0x00415330
+// STUB: CARMA2_CHEAT 0x00415560
+void C2_HOOK_FASTCALL CalcEngineForce(tCar_spec* pCar, br_scalar pDt) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // PrepareCars
 
@@ -923,19 +936,77 @@ void C2_HOOK_FASTCALL SetCollisionFlagsAndStuff(tPhysics_object* pObject) {
 
 // ApplyPhysicsToCars
 
-#ifdef REC2_MATCHING
-#pragma auto_inline(off)
-#endif
-
-// STUB: CARMA2_HW 0x004168c0
-// STUB: CARMA2_SW 0x004168f0
+// FUNCTION: CARMA2_HW 0x004168c0
+// FUNCTION: CARMA2_SW 0x004168f0
+// FUNCTION: CARMA2_CHEAT 0x00416b20
 void C2_HOOK_FASTCALL MoveAndCollideCar(tCar_spec* pCar, br_scalar pDt) {
-    NOT_IMPLEMENTED();
-}
+    tPhysics_object* car_info;
+    br_vector3 tv;
+    int wheel;
 
-#ifdef REC2_MATCHING
-#pragma auto_inline(on)
-#endif
+    if (pCar->dt >= 0.0f) {
+        pDt = pCar->dt;
+    }
+    if (pDt == 0.0f) {
+        return;
+    }
+    if (gCar_flying && pCar == gCar_to_view) {
+        return;
+    }
+    pCar->new_skidding = 0;
+    if (pCar->collision_info->water_d != 10000.0f) {
+        TestAutoSpecialVolume(pCar->collision_info);
+    }
+    MungeSpecialVolume(pCar->collision_info);
+    BrVector3Scale((br_vector3*)pCar->car_master_actor->t.t.mat.m[3], (br_vector3*)pCar->car_master_actor->t.t.mat.m[3], WORLD_SCALE);
+    if (pCar->field_0x18c8 != 0) {
+        car_info = pCar->collision_info;
+        if (!car_info->disable_move_rotate) {
+            if (car_info->last_special_volume == NULL) {
+                car_info->v.v[1] = (br_scalar)(car_info->v.v[1] - pDt * 10.0f / WORLD_SCALE_D);
+            } else {
+                car_info->v.v[1] = (br_scalar)(car_info->v.v[1] - pDt * 10.0f * car_info->last_special_volume->gravity_multiplier / WORLD_SCALE_D);
+            }
+        }
+        if (pCar->field_0x18c8 == 2) {
+            BrMatrix34TApplyV(&tv, (br_vector3*)gCamera->t.t.mat.m[0], &pCar->collision_info->actor->t.t.mat);
+            BrVector3Normalise(&tv, &tv);
+            if (pCar->keys.dec) {
+                BrVector3Accumulate(&pCar->collision_info->omega, &tv);
+            }
+            if (pCar->keys.acc) {
+                BrVector3Sub(&pCar->collision_info->omega, &pCar->collision_info->omega, &tv);
+            }
+            BrVector3Normalise(&tv, &pCar->collision_info->velocity_car_space);
+            if (pCar->keys.right) {
+                BrVector3Accumulate(&pCar->collision_info->omega, &tv);
+            }
+            if (pCar->keys.left) {
+                BrVector3Sub(&pCar->collision_info->omega, &pCar->collision_info->omega, &tv);
+            }
+            if (pCar->keys.brake) {
+                BrVector3Set(&pCar->collision_info->omega, 0.0f, 0.0f, 0.0f);
+            }
+        }
+    } else {
+        if (pCar == NULL || pCar->driver < eDriver_net_human) {
+            CalcForce(pCar, pDt);
+        } else {
+            if (gCar_flying && pCar->driver == eDriver_local_human) {
+                pCar->acc_force = 0.0f;
+            } else {
+                CalcEngineForce(pCar, pDt);
+            }
+            CalcForce(pCar, pDt);
+            DoRevs(pCar, pDt);
+        }
+    }
+    BrVector3InvScale((br_vector3*)pCar->car_master_actor->t.t.mat.m[3], (br_vector3*)pCar->car_master_actor->t.t.mat.m[3], WORLD_SCALE);
+    BrMatrix34ApplyP(&pCar->pos, &pCar->collision_info->cmpos, &pCar->collision_info->transform_matrix);
+    for (wheel = 0; wheel < 4; wheel++) {
+        SkidMark(pCar, wheel);
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x00417030
 // FUNCTION: CARMA2_SW 0x00417060
@@ -1237,9 +1308,80 @@ void C2_HOOK_FASTCALL NonCarCalcForce(tNon_car_spec* pNon_car, br_scalar pDt) {
 
 // NudgeObject
 
-// CalcForce
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
 
-// DoRevs
+// STUB: CARMA2_HW 0x00418850
+// STUB: CARMA2_SW 0x00418880
+// STUB: CARMA2_CHEAT 0x00418ab0
+void C2_HOOK_FASTCALL CalcForce(tCar_spec* pCar, br_scalar pDt) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
+
+inline void C2_HOOK_FASTCALL DoRevs(tCar_spec* pCar, br_scalar pDt) {
+    br_scalar wheel_spin_force;
+    br_scalar ts;
+
+    ts = (br_scalar)(-BrVector3Dot((br_vector3*)pCar->car_master_actor->t.t.mat.m[2], &pCar->collision_info->v) * WORLD_SCALE_D);
+    if (pCar->gear == 0) {
+        pCar->target_revs = 0.0f;
+    } else {
+        pCar->target_revs = ts / pCar->speed_revs_ratio / pCar->gear;
+    }
+    if (pCar->target_revs < 0.0f) {
+        pCar->target_revs = 0.0f;
+        pCar->gear = 0;
+    }
+    if (!pCar->number_of_wheels_on_ground || ((pCar->wheel_slip & 0x2) + 1) != 0 || pCar->gear == 0) {
+        if (!pCar->number_of_wheels_on_ground) {
+            wheel_spin_force = pCar->torque * pCar->force_torque_ratio;
+        } else {
+            wheel_spin_force = pCar->torque * pCar->force_torque_ratio - pCar->gear * pCar->acc_force;
+        }
+        if (pCar->gear == 0) {
+            if (pCar->revs > 1000.0f && !pCar->keys.brake && (pCar->keys.acc || pCar->joystick.acc > 0) && !gCountdown) {
+                if (pCar->keys.backwards) {
+                    pCar->gear = -1;
+                } else {
+                    pCar->gear = 1;
+                }
+                pCar->target_revs = ts / pCar->speed_revs_ratio / pCar->gear;
+            }
+            wheel_spin_force = pCar->torque * pCar->force_torque_ratio;
+        } else if (pCar->gear < 2 && (pCar->keys.dec || pCar->joystick.dec > 0) && (float)fabs(ts) < 1.0f && pCar->revs > 1000.0f) {
+            pCar->gear = -pCar->gear;
+        }
+        pCar->revs = (br_scalar)(wheel_spin_force / pCar->force_torque_ratio * pDt / 0.0002 + pCar->revs);
+        if (pCar->traction_control && wheel_spin_force > 0.0f && pCar->revs > pCar->target_revs && pCar->gear != 0 && pCar->target_revs > 1000.0f) {
+            pCar->revs = pCar->target_revs;
+        }
+        if (pCar->revs <= 0.0f) {
+            pCar->revs = 0.0f;
+        }
+    }
+    while ((pCar->wheel_slip & 0x2) == 0 && pCar->target_revs > 6000.0f && pCar->gear < pCar->max_gear && pCar->gear > 0 && !pCar->just_changed_gear) {
+        pCar->target_revs = pCar->target_revs * pCar->gear / (pCar->gear + 1);
+        pCar->gear++;
+    }
+    while (pCar->gear > 1 && pCar->target_revs < 3000.0f && !pCar->just_changed_gear) {
+        pCar->target_revs = pCar->target_revs * pCar->gear / (pCar->gear - 1);
+        pCar->gear--;
+    }
+    if (pCar->revs < 200.0f && pCar->target_revs < 200.0f && pCar->gear <= 1 && !pCar->keys.acc && pCar->joystick.acc <= 0 && !pCar->just_changed_gear) {
+        pCar->gear = 0;
+    }
+    if (pCar->just_changed_gear && pCar->revs < 6000.0f && pCar->revs > 200.0f && (pCar->gear < 2 || pCar->revs >= 3000.0f)) {
+        pCar->just_changed_gear = 0;
+    }
+    if (pCar->revs >= 6000.0f && (pCar->keys.acc || pCar->joystick.acc > 0)) {
+        pCar->just_changed_gear = 0;
+    }
+}
 
 // ScrapeNoise
 
