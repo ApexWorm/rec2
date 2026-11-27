@@ -2193,7 +2193,13 @@ intptr_t C2_HOOK_FASTCALL DRActorEnumRecurseUltraPlus(br_actor* pActor, br_actor
 
 // DoSpams
 
-// CrushBendFlapRend
+// STUB: CARMA2_HW 0x00436170
+// STUB: CARMA2_SW 0x004361a0
+// STUB: CARMA2_CHEAT 0x00436360
+void C2_HOOK_FASTCALL CrushBendFlapRend(void) {
+
+    NOT_IMPLEMENTED();
+}
 
 // SphericizeModel
 

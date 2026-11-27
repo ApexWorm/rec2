@@ -274,7 +274,13 @@ void C2_HOOK_FASTCALL WrongCheckpoint(int pCheckpoint_index) {
     }
 }
 
-// CheckCheckpoints
+// STUB: CARMA2_HW 0x005034b0
+// STUB: CARMA2_SW 0x004fee00
+// STUB: CARMA2_CHEAT 0x00509150
+void C2_HOOK_FASTCALL CheckCheckpoints(void) {
+
+    NOT_IMPLEMENTED();
+}
 
 // FUNCTION: CARMA2_HW 0x005039b0
 // FUNCTION: CARMA2_SW 0x004ff300

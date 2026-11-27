@@ -48,7 +48,7 @@ extern void C2_HOOK_FASTCALL FreeTrack(tTrack_spec* pTrack_spec);
 
 extern void C2_HOOK_FASTCALL ProcessTrack(br_actor* pWorld, tTrack_spec* pTrack_spec, br_actor* pCamera, br_matrix34* pCamera_to_world);
 
-// AnimateSky
+extern void C2_HOOK_FASTCALL AnimateSky(void);
 
 // CombineBounds
 

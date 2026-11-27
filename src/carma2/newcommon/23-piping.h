@@ -153,7 +153,7 @@ extern void C2_HOOK_FASTCALL ResetCars(void);
 
 extern int C2_HOOK_FASTCALL PipeObjectPosition(tPhysics_object* pObject, void* pContext);
 
-// PipeCarPositions
+extern void C2_HOOK_FASTCALL PipeCarPositions(void);
 
 extern void C2_HOOK_FASTCALL DoSmudge(tPipe_chunk** pChunk, int pDir);
 
@@ -165,7 +165,7 @@ extern void C2_HOOK_FASTCALL DoSmudge(tPipe_chunk** pChunk, int pDir);
 
 // ScanCarsPositions
 
-// InitialiseActionReplay
+extern void C2_HOOK_FASTCALL InitialiseActionReplay(void);
 
 extern void C2_HOOK_FASTCALL DisposeActionReplay(void);
 

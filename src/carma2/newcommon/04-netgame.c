@@ -335,7 +335,13 @@ void C2_HOOK_FASTCALL EnableCar(tCar_spec* pCar) {
     }
 }
 
-// DoNetworkHeadups
+// STUB: CARMA2_HW 0x00499360
+// STUB: CARMA2_SW 0x00495f90
+// STUB: CARMA2_CHEAT 0x00499710
+void C2_HOOK_FASTCALL DoNetworkHeadups(int pCredits) {
+
+    NOT_IMPLEMENTED();
+}
 
 // SortNetHeadAscending
 

@@ -272,7 +272,7 @@ extern int gOn_drugs;
 extern int gCheckpoint;
 //extern int gRoll_over_time[3];
 //extern int gWasted_creds[3];
-extern tU32 gTimer;
+extern int gTimer;
 extern int gCheckpoint_count;
 extern int gCountdown;
 extern int gFrame_rate;

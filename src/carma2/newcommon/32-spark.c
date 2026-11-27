@@ -749,7 +749,13 @@ void C2_HOOK_FASTCALL RestoreCarPixelmaps(tCar_spec* pCar_spec) {
     pCar_spec->field_0x1960 = NULL;
 }
 
-// MungeShrapnel
+// STUB: CARMA2_HW 0x004f9790
+// STUB: CARMA2_SW 0x004f4e10
+// STUB: CARMA2_CHEAT 0x004ff430
+void C2_HOOK_FASTCALL MungeShrapnel(tU32 pTime) {
+
+    NOT_IMPLEMENTED();
+}
 
 // DrMatrix34Rotate
 

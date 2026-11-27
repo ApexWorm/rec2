@@ -69,6 +69,14 @@ static inline void Timers_Pop(int pType) {
     gTimers_stack_size -= 1;
 }
 
+/* A macro, not an inline function: MainGameLoop is at MSVC's inline limit and stops inlining MungeRaceFinished otherwise */
+#define Timers_Force(pType)                                                                                                                        \
+    do {                                                                                                                                           \
+        gTimers[gTimers_max_index].durations[gTimers[gTimers_max_index].index] += PDGetMicroseconds() - gTimers[gTimers_max_index].start_time; \
+        gTimers_max_index = (pType);                                                                                                               \
+        gTimers[gTimers_max_index].start_time = PDGetMicroseconds();                                                                               \
+    } while (0)
+
 extern void C2_HOOK_FASTCALL Timers_Init(void);
 
 extern void C2_HOOK_FASTCALL Timers_StartFrame(void);

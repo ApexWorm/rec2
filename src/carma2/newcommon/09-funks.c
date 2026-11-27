@@ -214,7 +214,13 @@ void C2_HOOK_FASTCALL KillFunkotronic(int pOwner) {
 
 // NormaliseDegreeAngle
 
-// FunkThoseTronics
+// STUB: CARMA2_HW 0x00477230
+// STUB: CARMA2_SW 0x00476790
+// STUB: CARMA2_CHEAT 0x004775b0
+void C2_HOOK_FASTCALL FunkThoseTronics(void) {
+
+    NOT_IMPLEMENTED();
+}
 
 #define SAW(T, PERIOD) fmod((T), PERIOD) / (PERIOD)
 

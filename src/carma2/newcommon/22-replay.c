@@ -200,15 +200,33 @@ void C2_HOOK_FASTCALL DoActionReplayHeadups(void) {
 
 // PostProcess
 
-// DoActionReplay
+// STUB: CARMA2_HW 0x004e68e0
+// STUB: CARMA2_SW 0x004e27d0
+// STUB: CARMA2_CHEAT 0x004ec5d0
+void C2_HOOK_FASTCALL DoActionReplay(tU32 pFrame_period) {
+
+    NOT_IMPLEMENTED();
+}
 
 // MoveToEndOfReplay
 
 // MoveToStartOfReplay
 
-// PollActionReplayControls
+// STUB: CARMA2_HW 0x004e69b0
+// STUB: CARMA2_SW 0x004e28a0
+// STUB: CARMA2_CHEAT 0x004ec6a0
+void C2_HOOK_FASTCALL PollActionReplayControls(tU32* pFrame_period, tU32* pAverage_frame_period) {
 
-// CheckReplayTurnOn
+    NOT_IMPLEMENTED();
+}
+
+// STUB: CARMA2_HW 0x004e6ff0
+// STUB: CARMA2_SW 0x004e2e50
+// STUB: CARMA2_CHEAT 0x004ecce0
+void C2_HOOK_FASTCALL CheckReplayTurnOn(void) {
+
+    NOT_IMPLEMENTED();
+}
 
 // InitializeActionReplayPix
 
@@ -296,7 +314,13 @@ void C2_HOOK_FASTCALL AfterActionReplay(void) {
     ForceRebuildActiveCarList();
 }
 
-// ToggleReplay
+// STUB: CARMA2_HW 0x004e72e0
+// STUB: CARMA2_SW 0x004e3120
+// STUB: CARMA2_CHEAT 0x004ecf80
+void C2_HOOK_FASTCALL ToggleReplay(tU32* pFrame_period, tU32* pFrame_period_2) {
+
+    NOT_IMPLEMENTED();
+}
 
 // DisplayMovieStatusPanel
 

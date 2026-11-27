@@ -633,7 +633,13 @@ inline void C2_HOOK_FASTCALL DoSpecial(tSpecial_effects_spec* pSpecial, br_actor
 
 // DoDelayedSmash
 
-// MungeDelayedSideEffects
+// STUB: CARMA2_HW 0x004ecc80
+// STUB: CARMA2_SW 0x004e8950
+// STUB: CARMA2_CHEAT 0x004f2920
+void C2_HOOK_FASTCALL MungeDelayedSideEffects(void) {
+
+    NOT_IMPLEMENTED();
+}
 
 // ActivateNonCarSideEffects
 
@@ -667,7 +673,13 @@ void C2_HOOK_FASTCALL InitSmashQueue(void) {
 
 // FlushPowerupQueue
 
-// FlushSmashQueue
+// STUB: CARMA2_HW 0x004ecfb0
+// STUB: CARMA2_SW 0x004e8c80
+// STUB: CARMA2_CHEAT 0x004f2c50
+void C2_HOOK_FASTCALL FlushSmashQueue(int pFlush_powerups) {
+
+    NOT_IMPLEMENTED();
+}
 
 // QueueSmashIfNecessary3
 
@@ -2397,5 +2409,11 @@ void C2_HOOK_FASTCALL ChangeSmashTexture(br_material* pMaterial, tCar_spec* pCar
 
 // ReceivedSmashShraps
 
-// MungeSmashEdgeTriggers
+// STUB: CARMA2_HW 0x004f64d0
+// STUB: CARMA2_SW 0x004f2130
+// STUB: CARMA2_CHEAT 0x004fc170
+void C2_HOOK_FASTCALL MungeSmashEdgeTriggers(tU32 pTime) {
+
+    NOT_IMPLEMENTED();
+}
 

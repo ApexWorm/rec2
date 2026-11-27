@@ -689,7 +689,13 @@ int C2_HOOK_FASTCALL IsCarInTheSea(void) {
 
 // ControlNetCars
 
-// ControlOurCar
+// STUB: CARMA2_HW 0x00414cb0
+// STUB: CARMA2_SW 0x00414ce0
+// STUB: CARMA2_CHEAT 0x00414f10
+void C2_HOOK_FASTCALL ControlOurCar(tU32 pTime_difference) {
+
+    NOT_IMPLEMENTED();
+}
 
 // CalcEngineForce
 
@@ -921,7 +927,13 @@ void C2_HOOK_FASTCALL SetCollisionFlagsAndStuff(tPhysics_object* pObject) {
 
 // APTCChangedObjects
 
-// ApplyPhysicsToCars
+// STUB: CARMA2_HW 0x00416340
+// STUB: CARMA2_SW 0x00416370
+// STUB: CARMA2_CHEAT 0x004165a0
+void C2_HOOK_FASTCALL ApplyPhysicsToCars(tU32 pLast_tick_time, tU32 pFrame_period) {
+
+    NOT_IMPLEMENTED();
+}
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)

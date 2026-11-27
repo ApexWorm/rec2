@@ -77,7 +77,7 @@ extern int C2_HOOK_FASTCALL IsCarInTheSea(void);
 
 // ControlNetCars
 
-// ControlOurCar
+extern void C2_HOOK_FASTCALL ControlOurCar(tU32 pTime_difference);
 
 // CalcEngineForce
 
@@ -119,7 +119,7 @@ extern void C2_HOOK_FASTCALL SetCollisionFlagsAndStuff(tPhysics_object* pObject)
 
 // APTCChangedObjects
 
-// ApplyPhysicsToCars
+extern void C2_HOOK_FASTCALL ApplyPhysicsToCars(tU32 pLast_tick_time, tU32 pFrame_period);
 
 extern void C2_HOOK_FASTCALL MoveAndCollideCar(tCar_spec* pCar, br_scalar pDt);
 

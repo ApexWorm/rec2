@@ -749,7 +749,13 @@ void C2_HOOK_FASTCALL SetRecovery(void) {
 
 // ExplodeCar
 
-// CheckRecoveryOfCars
+// STUB: CARMA2_HW 0x00442500
+// STUB: CARMA2_SW 0x004425e0
+// STUB: CARMA2_CHEAT 0x00442620
+void C2_HOOK_FASTCALL CheckRecoveryOfCars(tU32 pEndFrameTime) {
+
+    NOT_IMPLEMENTED();
+}
 
 inline int C2_HOOK_FASTCALL TradeInAPO(int pCost) {
     int type;

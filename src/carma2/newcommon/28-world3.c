@@ -138,7 +138,13 @@ void C2_HOOK_FASTCALL ProcessTrack(br_actor* pWorld, tTrack_spec* pTrack_spec, b
     }
 }
 
-// AnimateSky
+// STUB: CARMA2_HW 0x00506e80
+// STUB: CARMA2_SW 0x005022d0
+// STUB: CARMA2_CHEAT 0x0050c870
+void C2_HOOK_FASTCALL AnimateSky(void) {
+
+    NOT_IMPLEMENTED();
+}
 
 // CombineBounds
 

@@ -205,6 +205,31 @@ int gOld_times[10];
 // GLOBAL: CARMA2_HW 0x0079eb00
 char gHeadup_oppo_ped_text[64];
 
+// GLOBAL: CARMA2_HW 0x0079eaa8
+// GLOBAL: CARMA2_SW 0x00795008
+// GLOBAL: CARMA2_CHEAT 0x007a6148
+int gCredits_won_headup;
+
+// GLOBAL: CARMA2_HW 0x0079eaec
+// GLOBAL: CARMA2_SW 0x0079504c
+// GLOBAL: CARMA2_CHEAT 0x007a618c
+int gTimer_headup;
+
+// GLOBAL: CARMA2_HW 0x0079eaf0
+// GLOBAL: CARMA2_SW 0x00795050
+// GLOBAL: CARMA2_CHEAT 0x007a6190
+int gLaps_headup;
+
+// GLOBAL: CARMA2_HW 0x0079eaf4
+// GLOBAL: CARMA2_SW 0x00795054
+// GLOBAL: CARMA2_CHEAT 0x007a6194
+int gPed_kill_count_headup;
+
+// GLOBAL: CARMA2_HW 0x0079eaf8
+// GLOBAL: CARMA2_SW 0x00795058
+// GLOBAL: CARMA2_CHEAT 0x007a6198
+int gCar_kill_count_headup;
+
 // GLOBAL: CARMA2_HW 0x0067f888
 // GLOBAL: CARMA2_SW 0x00679ff4
 // GLOBAL: CARMA2_CHEAT 0x00687130
@@ -464,6 +489,14 @@ inline void C2_HOOK_FASTCALL KillOldestQueuedHeadup(void) {
 
     gQueued_headup_count -= 1;
     memcpy(&gQueued_headups[0], &gQueued_headups[1], gQueued_headup_count * sizeof(tQueued_headup));
+}
+
+// STUB: CARMA2_HW 0x004497b0
+// STUB: CARMA2_SW 0x00449900
+// STUB: CARMA2_CHEAT 0x00449cc0
+void C2_HOOK_FASTCALL ClearQueuedHeadups(void) {
+
+    NOT_IMPLEMENTED();
 }
 
 #ifdef REC2_MATCHING

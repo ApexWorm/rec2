@@ -1047,7 +1047,13 @@ void C2_HOOK_FASTCALL ReadSoundSpec(FILE* pF, tSpecial_volume_soundfx_data* pSpe
 
 // MungeSoundGenerators
 
-// MungeEnvironmentalSound
+// STUB: CARMA2_HW 0x00456e20
+// STUB: CARMA2_SW 0x00456bb0
+// STUB: CARMA2_CHEAT 0x004572a0
+void C2_HOOK_FASTCALL MungeEnvironmentalSound(void) {
+
+    NOT_IMPLEMENTED();
+}
 
 void C2_HOOK_FASTCALL BuggerModelName(tTrack_spec* pTrack_spec, const char* pName, int pIndex) {
     br_model* model;

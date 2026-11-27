@@ -25,6 +25,8 @@ extern int C2_HOOK_FASTCALL FindJoystickPreferences(FILE* pF, const char* pJoyst
 
 extern int C2_HOOK_FASTCALL ReadJoystickPreferences(FILE* pF, tButtonJoystickInfo* pInfo);
 
+extern void C2_HOOK_FASTCALL MungeJoystickHeadups(void);
+
 extern void C2_HOOK_FASTCALL EnableJoysticks(void);
 
 extern void C2_HOOK_FASTCALL DisableJoysticks(void);

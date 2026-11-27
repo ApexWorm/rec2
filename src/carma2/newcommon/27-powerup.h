@@ -138,7 +138,7 @@ extern void C2_HOOK_FASTCALL DrawPowerups(tU32 pTime);
 
 // MungeKeyboardPowerup
 
-// DoPowerupPeriodics
+extern void C2_HOOK_FASTCALL DoPowerupPeriodics(tU32 pFrame_period);
 
 extern void C2_HOOK_FASTCALL CheckRespawnQueue(tU32 pTime);
 

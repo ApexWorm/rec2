@@ -126,7 +126,7 @@ extern void C2_HOOK_FASTCALL DoSpecial(tSpecial_effects_spec* pSpecial, br_actor
 
 // DoDelayedSmash
 
-// MungeDelayedSideEffects
+extern void C2_HOOK_FASTCALL MungeDelayedSideEffects(void);
 
 // ActivateNonCarSideEffects
 
@@ -148,7 +148,7 @@ extern void C2_HOOK_FASTCALL InitSmashQueue(void);
 
 // FlushPowerupQueue
 
-// FlushSmashQueue
+extern void C2_HOOK_FASTCALL FlushSmashQueue(int pFlush_powerups);
 
 // QueueSmashIfNecessary3
 
@@ -236,7 +236,7 @@ extern void C2_HOOK_FASTCALL MungeGlassFragments2(int pEnd_race);
 
 extern void C2_HOOK_FASTCALL MungeAnimationRepairs(void);
 
-// MungeGlassFragments
+extern void C2_HOOK_FASTCALL MungeGlassFragments(void);
 
 // KillAllGlassFragments
 
@@ -362,6 +362,6 @@ extern void C2_HOOK_FASTCALL ChangeSmashTexture(br_material* pMaterial, tCar_spe
 
 // ReceivedSmashShraps
 
-// MungeSmashEdgeTriggers
+extern void C2_HOOK_FASTCALL MungeSmashEdgeTriggers(tU32 pTime);
 
 #endif // GUARD_51_SMASH_H

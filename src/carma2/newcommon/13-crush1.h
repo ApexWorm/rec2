@@ -396,7 +396,7 @@ extern intptr_t C2_HOOK_FASTCALL DRActorEnumRecurseUltraPlus(br_actor* pActor, b
 
 // DoSpams
 
-// CrushBendFlapRend
+extern void C2_HOOK_FASTCALL CrushBendFlapRend(void);
 
 // SphericizeModel
 

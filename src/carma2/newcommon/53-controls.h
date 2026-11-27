@@ -145,7 +145,7 @@ extern void C2_HOOK_FASTCALL SetRecovery(void);
 
 // ExplodeCar
 
-// CheckRecoveryOfCars
+extern void C2_HOOK_FASTCALL CheckRecoveryOfCars(tU32 pEndFrameTime);
 
 extern int C2_HOOK_FASTCALL TradeInAPO(int pCost);
 

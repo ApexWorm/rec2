@@ -205,7 +205,7 @@ extern void C2_HOOK_FASTCALL DamagePedestrian(tPedestrian* pPed, int pDamage, in
 
 // KillNapalmBolt
 
-// MungeNapalm
+extern void C2_HOOK_FASTCALL MungeNapalm(void);
 
 // PedHeadingTowardsCollisionObject
 
@@ -281,13 +281,13 @@ extern void C2_HOOK_FASTCALL FUN_004d3600(void);
 
 extern void C2_HOOK_FASTCALL RenderLimbs(void);
 
-// MungePedestrians
+extern void C2_HOOK_FASTCALL MungePedestrians(tU32 pFrame_period);
 
 // FUN_1011cb0c
 
 // PossiblePedSmear
 
-// LastChanceForPedEffects
+extern void C2_HOOK_FASTCALL LastChanceForPedEffects(void);
 
 extern void C2_HOOK_FASTCALL ResetPedSystem(void);
 

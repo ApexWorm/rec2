@@ -70,7 +70,7 @@ extern void C2_HOOK_FASTCALL DisableCar(tCar_spec* pCar);
 
 extern void C2_HOOK_FASTCALL EnableCar(tCar_spec* pCar);
 
-// DoNetworkHeadups
+extern void C2_HOOK_FASTCALL DoNetworkHeadups(int pCredits);
 
 // SortNetHeadAscending
 

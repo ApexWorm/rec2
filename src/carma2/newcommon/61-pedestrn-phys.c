@@ -1270,7 +1270,13 @@ void C2_HOOK_FASTCALL DamagePedestrian(tPedestrian* pPed, int pDamage, int pArg3
 
 // KillNapalmBolt
 
-// MungeNapalm
+// STUB: CARMA2_HW 0x004ce7d0
+// STUB: CARMA2_SW 0x004caed0
+// STUB: CARMA2_CHEAT 0x004d4360
+void C2_HOOK_FASTCALL MungeNapalm(void) {
+
+    NOT_IMPLEMENTED();
+}
 
 // PedHeadingTowardsCollisionObject
 
@@ -1463,13 +1469,25 @@ void C2_HOOK_FASTCALL RenderLimbs(void) {
     gPed_count_limbed_actors = 0;
 }
 
-// MungePedestrians
+// STUB: CARMA2_HW 0x004d3740
+// STUB: CARMA2_SW 0x004cfe30
+// STUB: CARMA2_CHEAT 0x004d9300
+void C2_HOOK_FASTCALL MungePedestrians(tU32 pFrame_period) {
+
+    NOT_IMPLEMENTED();
+}
 
 // FUN_1011cb0c
 
 // PossiblePedSmear
 
-// LastChanceForPedEffects
+// STUB: CARMA2_HW 0x004d5970
+// STUB: CARMA2_SW 0x004d2060
+// STUB: CARMA2_CHEAT 0x004db530
+void C2_HOOK_FASTCALL LastChanceForPedEffects(void) {
+
+    NOT_IMPLEMENTED();
+}
 
 inline void C2_HOOK_FASTCALL ResetPedSystem(void) {
     ResetPedFaceCache();

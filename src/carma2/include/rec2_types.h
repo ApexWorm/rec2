@@ -5078,10 +5078,7 @@ typedef struct {
     int total_laps;
     int check_point_count;
     int initial_timer[3];
-    int completion_bonus[3];
-    int completion_bonus_peds[3];
-    int completion_bonus_opponents[3];
-    int completion_bonus_field_0x3c[3];
+    int completion_bonus[4][3]; /* FIXME: [0] race, [1] peds, [2] opponents, [3] unknown */
     undefined field_0x48[72];
     int number_of_racers;
     int count_network_start_points;
@@ -5764,6 +5761,7 @@ enum {
     eMiscString_wrong_checkpoint = 43,
     eMiscString_bad_boy = 44,
     eMiscString_credit_fine = 45,
+    eMiscString_wasted_46 = 46,
     eMiscString_credits_abbrev = 47,
     eMiscString_recovering_for_free = 48,
     eMiscString_has_joined_the_game = 58,

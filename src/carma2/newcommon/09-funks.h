@@ -61,7 +61,7 @@ extern void C2_HOOK_FASTCALL KillFunkotronic(int pOwner);
 
 // NormaliseDegreeAngle
 
-// FunkThoseTronics
+extern void C2_HOOK_FASTCALL FunkThoseTronics(void);
 
 extern void C2_HOOK_FASTCALL PathGrooveBastard(tGroovidelic_spec* pGroove, tU32 pTime, br_matrix34* pMat, int pInterrupt_it);
 

@@ -86,6 +86,14 @@ int C2_HOOK_FASTCALL ReadUntilCharacter(FILE* pF, char* pBuffer, int pBuffer_siz
     }
 }
 
+// STUB: CARMA2_HW 0x0045b3b0
+// STUB: CARMA2_SW 0x0045ae30
+// STUB: CARMA2_CHEAT 0x0045b830
+void C2_HOOK_FASTCALL MungeJoystickHeadups(void) {
+
+    NOT_IMPLEMENTED();
+}
+
 // FUNCTION: CARMA2_HW 0x0045b920
 // FUNCTION: CARMA2_SW 0x0045b3a0
 int C2_HOOK_FASTCALL WriteJoystickPreferences(FILE* pF, const tButtonJoystickInfo* pInfo) {

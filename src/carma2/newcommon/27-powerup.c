@@ -811,7 +811,13 @@ void C2_HOOK_FASTCALL DrawPowerups(tU32 pTime) {
 
 // MungeKeyboardPowerup
 
-// DoPowerupPeriodics
+// STUB: CARMA2_HW 0x004db1c0
+// STUB: CARMA2_SW 0x004d76c0
+// STUB: CARMA2_CHEAT 0x004e0d80
+void C2_HOOK_FASTCALL DoPowerupPeriodics(tU32 pFrame_period) {
+
+    NOT_IMPLEMENTED();
+}
 
 inline void C2_HOOK_FASTCALL CheckRespawnQueue(tU32 pTime) {
     int i;

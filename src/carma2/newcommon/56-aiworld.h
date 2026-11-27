@@ -30,7 +30,7 @@ extern void C2_HOOK_FASTCALL LoadAIWorldForRace(tRace_info* pRace_info);
 
 extern void C2_HOOK_FASTCALL DisposeAIWorldRaceStuff(void);
 
-// MungeAIWorld
+extern void C2_HOOK_FASTCALL MungeAIWorld(tU32 pFrame_period);
 
 extern void C2_HOOK_FASTCALL PointActorAlongThisBloodyVector(br_actor* pThe_actor, br_vector3* pThe_vector);
 

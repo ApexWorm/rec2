@@ -73,7 +73,13 @@ void C2_HOOK_FASTCALL DisposeAIWorldRaceStuff(void) {
     DisposeDronesRaceStuff();
 }
 
-// MungeAIWorld
+// STUB: CARMA2_HW 0x00401170
+// STUB: CARMA2_SW 0x00401170
+// STUB: CARMA2_CHEAT 0x00401170
+void C2_HOOK_FASTCALL MungeAIWorld(tU32 pFrame_period) {
+
+    NOT_IMPLEMENTED();
+}
 
 // FUNCTION: CARMA2_HW 0x004013d0
 // FUNCTION: CARMA2_SW 0x004013d0

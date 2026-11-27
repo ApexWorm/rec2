@@ -49,6 +49,11 @@ extern tU32 gLast_time_earn_time;
 extern tU32 gLast_time_credit_amount;
 extern int gOld_times[10];
 extern char gHeadup_oppo_ped_text[64];
+extern int gCredits_won_headup;
+extern int gTimer_headup;
+extern int gLaps_headup;
+extern int gPed_kill_count_headup;
+extern int gCar_kill_count_headup;
 extern int gQueued_headup_count;
 extern tQueued_headup gQueued_headups[4];
 
@@ -68,6 +73,8 @@ extern void C2_HOOK_FASTCALL ClearHeadups(void);
 extern void C2_HOOK_FASTCALL DimAFewBits(void);
 
 extern void C2_HOOK_FASTCALL KillOldestQueuedHeadup(void);
+
+extern void C2_HOOK_FASTCALL ClearQueuedHeadups(void);
 
 extern void C2_HOOK_FASTCALL DoTestPowerHeadup(int pLevel, const char* pAPO_str);
 

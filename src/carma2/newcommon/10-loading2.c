@@ -1098,9 +1098,9 @@ void C2_HOOK_FASTCALL LoadRaceInfo(int pRace_index, tRace_info* pRace_info) {
     pRace_info->total_laps = pRace_info->race_spec->count_laps;
     for (i = 0; i < (int)REC2_ASIZE(pRace_info->initial_timer); i++) {
         pRace_info->initial_timer[i] = pRace_info->race_spec->initial_timer[i];
-        pRace_info->completion_bonus[i] = pRace_info->race_spec->completion_bonus[i];
-        pRace_info->completion_bonus_peds[i] = pRace_info->race_spec->completion_bonus_peds[i];
-        pRace_info->completion_bonus_opponents[i] = pRace_info->race_spec->completion_bonus_opponents[i];
+        pRace_info->completion_bonus[0][i] = pRace_info->race_spec->completion_bonus[i];
+        pRace_info->completion_bonus[1][i] = pRace_info->race_spec->completion_bonus_peds[i];
+        pRace_info->completion_bonus[2][i] = pRace_info->race_spec->completion_bonus_opponents[i];
     }
 }
 

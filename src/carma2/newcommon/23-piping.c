@@ -856,7 +856,13 @@ int C2_HOOK_FASTCALL PipeObjectPosition(tPhysics_object* pObject, void* pContext
     return 0;
 }
 
-// PipeCarPositions
+// STUB: CARMA2_HW 0x004c6640
+// STUB: CARMA2_SW 0x004c2d70
+// STUB: CARMA2_CHEAT 0x004cc160
+void C2_HOOK_FASTCALL PipeCarPositions(void) {
+
+    NOT_IMPLEMENTED();
+}
 
 // DoOilSpillAR
 
@@ -866,7 +872,13 @@ int C2_HOOK_FASTCALL PipeObjectPosition(tPhysics_object* pObject, void* pContext
 
 // ScanCarsPositions
 
-// InitialiseActionReplay
+// STUB: CARMA2_HW 0x004c6bf0
+// STUB: CARMA2_SW 0x004c3320
+// STUB: CARMA2_CHEAT 0x004cc710
+void C2_HOOK_FASTCALL InitialiseActionReplay(void) {
+
+    NOT_IMPLEMENTED();
+}
 
 #if defined(REC2_MATCHING) && defined(_MSC_VER)
 #pragma inline_depth(0)
