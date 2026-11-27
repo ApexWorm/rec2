@@ -20,6 +20,7 @@
 
 // GLOBAL: CARMA2_HW 0x006700a8
 // GLOBAL: CARMA2_SW 0x0066a838
+// GLOBAL: CARMA2_CHEAT 0x00677958
 host_info const hostInfo = {
     sizeof(host_info),
     "Microsoft WIN32",
@@ -193,6 +194,7 @@ br_uint_16 nameOrdinals_BRHOST1[50] = {
 };
 
 // GLOBAL: CARMA2_HW 0x00670068
+// GLOBAL: CARMA2_SW 0x0066a7f8
 // GLOBAL: CARMA2_CHEAT 0x00677918
 br_image Image_BRHOST1 = {
     { 0 },
