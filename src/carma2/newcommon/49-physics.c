@@ -667,6 +667,7 @@ void C2_HOOK_FASTCALL TellPhysicsJointsHaveChanged(tPhysics_object* pCollision_i
 
 // FUNCTION: CARMA2_HW 0x004c2a10
 // FUNCTION: CARMA2_SW 0x004bf140
+// FUNCTION: CARMA2_CHEAT 0x004c8530
 void C2_HOOK_FASTCALL WriteNewPositions(tPhysics_object* pObject) {
     tPhysics_object* child;
     tPhysics_object* root;
@@ -773,6 +774,7 @@ void C2_HOOK_FASTCALL MakeObjectListDoSomething(tPhysics_object* pObject) {
 
 // FUNCTION: CARMA2_HW 0x004bd9b0
 // FUNCTION: CARMA2_SW 0x004ba0d0
+// FUNCTION: CARMA2_CHEAT 0x004c34e0
 void C2_HOOK_FASTCALL SetObjectTrialPositionType(tPhysics_object* pObject, int pType) {
     tPhysics_object* child;
 
@@ -974,6 +976,7 @@ void C2_HOOK_FASTCALL GetFacesNearObject(tPhysics_object *pObject, tWorld_callba
 
 // FUNCTION: CARMA2_HW 0x004c25a0
 // FUNCTION: CARMA2_SW 0x004becd0
+// FUNCTION: CARMA2_CHEAT 0x004c80c0
 void C2_HOOK_FASTCALL ResetObjectAndChildren(tPhysics_object* pObject) {
     tPhysics_object* child;
 
@@ -992,6 +995,7 @@ void C2_HOOK_FASTCALL ResetObjectAndChildren(tPhysics_object* pObject) {
 
 // FUNCTION: CARMA2_HW 0x004c2600
 // FUNCTION: CARMA2_SW 0x004bed30
+// FUNCTION: CARMA2_CHEAT 0x004c8120
 void C2_HOOK_FASTCALL ResetObjectList(tPhysics_object* pObjects) {
 
     while (pObjects != NULL) {
@@ -1022,6 +1026,7 @@ void C2_HOOK_FASTCALL ApplyGravitySingleObject(tPhysics_object* pObject) {
 
 // FUNCTION: CARMA2_HW 0x004c2970
 // FUNCTION: CARMA2_SW 0x004bf0a0
+// FUNCTION: CARMA2_CHEAT 0x004c8490
 void C2_HOOK_FASTCALL ApplyGravity(tPhysics_object* pObject) {
 
     for (; pObject != NULL; pObject = pObject->next) {
