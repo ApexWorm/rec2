@@ -246,7 +246,7 @@ extern int C2_HOOK_FASTCALL ReduceEffectOfForces(tPhysics_joint_force* pForces, 
 
 // DoCollisions
 
-// AddDoubleTorqueToMatrix
+extern void C2_HOOK_FASTCALL AddDoubleTorqueToMatrix(br_scalar* pMatrix, int pRows, int pIndex, tPhysics_joint_force** pForces, int pColumns);
 
 // DRMatrix33Inverse
 

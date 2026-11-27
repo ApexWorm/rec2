@@ -565,11 +565,115 @@ void C2_HOOK_FASTCALL MakeJointVelocitiesVector(br_scalar* pVelocities, tPhysics
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x004b7960
-// STUB: CARMA2_SW 0x004b4080
-// STUB: CARMA2_CHEAT 0x004bd490
+// FUNCTION: CARMA2_HW 0x004b7960
+// FUNCTION: CARMA2_SW 0x004b4080
+// FUNCTION: CARMA2_CHEAT 0x004bd490
 void C2_HOOK_FASTCALL ApplySingleForce(tPhysics_joint_force* pForce, br_scalar pAmount) {
-    NOT_IMPLEMENTED();
+    br_vector3 angular;
+    br_vector3 linear;
+    br_vector3 partner_angular;
+    br_vector3 partner_linear;
+    br_vector3 impulse;
+    br_vector3 delta;
+    br_vector3 tv;
+    tPhysics_object* object_a;
+    tPhysics_object* object_b;
+    tPhysics_object* partner;
+
+    if (pForce->type == 9 || pAmount == 0.0f) {
+        return;
+    }
+    object_a = pForce->object_a;
+    object_b = pForce->object_b;
+    if (pForce->type == 11) {
+        partner = SetUpTorqueHingePartners(&angular, &linear, &partner_angular, &partner_linear, &pForce->direction_a, object_a);
+        BrVector3Scale(&angular, &angular, pAmount);
+        BrVector3Accumulate(&object_a->omega, &angular);
+        if (partner != NULL) {
+            BrVector3Scale(&linear, &linear, pAmount);
+            BrVector3Accumulate(&object_a->velocity_car_space, &linear);
+            BrMatrix34ApplyV(&object_a->v, &object_a->velocity_car_space, &object_a->transform_matrix);
+            BrVector3Scale(&partner_linear, &partner_linear, pAmount);
+            BrVector3Accumulate(&partner->velocity_car_space, &partner_linear);
+            BrMatrix34ApplyV(&partner->v, &partner->velocity_car_space, &partner->transform_matrix);
+            BrVector3Scale(&partner_angular, &partner_angular, pAmount);
+            BrVector3Accumulate(&partner->omega, &partner_angular);
+        }
+        if (object_b != NULL) {
+            partner = SetUpTorqueHingePartners(&angular, &linear, &partner_angular, &partner_linear, &pForce->direction_b, object_b);
+            BrVector3Scale(&angular, &angular, -pAmount);
+            BrVector3Accumulate(&object_b->omega, &angular);
+            if (partner != NULL) {
+                BrVector3Scale(&linear, &linear, -pAmount);
+                BrVector3Accumulate(&object_b->velocity_car_space, &linear);
+                BrMatrix34ApplyV(&object_b->v, &object_b->velocity_car_space, &object_b->transform_matrix);
+                BrVector3Scale(&partner_linear, &partner_linear, -pAmount);
+                BrVector3Accumulate(&partner->velocity_car_space, &partner_linear);
+                BrMatrix34ApplyV(&partner->v, &partner->velocity_car_space, &partner->transform_matrix);
+                BrVector3Scale(&partner_angular, &partner_angular, -pAmount);
+                BrVector3Accumulate(&partner->omega, &partner_angular);
+            }
+        }
+        return;
+    }
+    if (object_a->field_0x1e4 != NULL) {
+        SetUpForce(&angular, &linear, &pForce->point_a, &pForce->direction_a, object_a);
+        partner = SetUpHingePartners(&angular, &linear, &partner_angular, &partner_linear, object_a);
+        BrVector3Scale(&angular, &angular, pAmount);
+        BrVector3Accumulate(&object_a->omega, &angular);
+        BrVector3Scale(&partner_angular, &partner_angular, pAmount);
+        BrVector3Accumulate(&partner->omega, &partner_angular);
+        BrVector3Scale(&linear, &linear, pAmount);
+        BrVector3Accumulate(&object_a->velocity_car_space, &linear);
+        BrMatrix34ApplyV(&tv, &linear, &object_a->transform_matrix);
+        BrVector3Accumulate(&object_a->v, &tv);
+        BrVector3Scale(&partner_linear, &partner_linear, pAmount);
+        BrVector3Accumulate(&partner->velocity_car_space, &partner_linear);
+        BrMatrix34ApplyV(&tv, &partner_linear, &partner->transform_matrix);
+        BrVector3Accumulate(&partner->v, &tv);
+    } else {
+        BrVector3Scale(&impulse, &pForce->direction_a, pAmount);
+        BrVector3InvScale(&delta, &impulse, object_a->M);
+        BrVector3Accumulate(&object_a->velocity_car_space, &delta);
+        BrMatrix34ApplyV(&tv, &delta, &object_a->transform_matrix);
+        BrVector3Accumulate(&object_a->v, &tv);
+        if (!(object_a->flags & 0x800)) {
+            BrVector3Cross(&tv, &pForce->point_a, &impulse);
+            object_a->omega.v[0] += tv.v[0] / object_a->I.v[0];
+            object_a->omega.v[1] += tv.v[1] / object_a->I.v[1];
+            object_a->omega.v[2] += tv.v[2] / object_a->I.v[2];
+        }
+    }
+    if (object_b != NULL && pForce->type != 14) {
+        if (object_b->field_0x1e4 != NULL) {
+            SetUpForce(&angular, &linear, &pForce->point_b, &pForce->direction_b, object_b);
+            partner = SetUpHingePartners(&angular, &linear, &partner_angular, &partner_linear, object_b);
+            BrVector3Scale(&angular, &angular, -pAmount);
+            BrVector3Accumulate(&object_b->omega, &angular);
+            BrVector3Scale(&partner_angular, &partner_angular, -pAmount);
+            BrVector3Accumulate(&partner->omega, &partner_angular);
+            BrVector3Scale(&linear, &linear, -pAmount);
+            BrVector3Accumulate(&object_b->velocity_car_space, &linear);
+            BrMatrix34ApplyV(&tv, &linear, &object_b->transform_matrix);
+            BrVector3Accumulate(&object_b->v, &tv);
+            BrVector3Scale(&partner_linear, &partner_linear, -pAmount);
+            BrVector3Accumulate(&partner->velocity_car_space, &partner_linear);
+            BrMatrix34ApplyV(&tv, &partner_linear, &partner->transform_matrix);
+            BrVector3Accumulate(&partner->v, &tv);
+        } else {
+            BrVector3Scale(&impulse, &pForce->direction_b, -pAmount);
+            BrVector3InvScale(&delta, &impulse, object_b->M);
+            BrVector3Accumulate(&object_b->velocity_car_space, &delta);
+            BrMatrix34ApplyV(&tv, &delta, &object_b->transform_matrix);
+            BrVector3Accumulate(&object_b->v, &tv);
+            if (!(object_b->flags & 0x800)) {
+                BrVector3Cross(&tv, &pForce->point_b, &impulse);
+                object_b->omega.v[0] += tv.v[0] / object_b->I.v[0];
+                object_b->omega.v[1] += tv.v[1] / object_b->I.v[1];
+                object_b->omega.v[2] += tv.v[2] / object_b->I.v[2];
+            }
+        }
+    }
 }
 
 #ifdef REC2_MATCHING
@@ -1099,7 +1203,116 @@ int C2_HOOK_FASTCALL ReduceEffectOfForces(tPhysics_joint_force* pForces, br_scal
 
 // DoCollisions
 
-// AddDoubleTorqueToMatrix
+#define FORCE_RESPONSE(DIRECTION, POINT, ANGULAR, LINEAR) \
+    BrVector3Cross(&tv, ANGULAR, POINT);                   \
+    BrVector3Accumulate(&tv, LINEAR);                      \
+    response = BrVector3Dot(DIRECTION, &tv)
+
+inline void C2_HOOK_FASTCALL AddDoubleTorqueToMatrix(br_scalar* pMatrix, int pRows, int pIndex, tPhysics_joint_force** pForces, int pColumns) {
+    br_vector3 angular_a;
+    br_vector3 linear_a;
+    br_vector3 partner_angular_a;
+    br_vector3 partner_linear_a;
+    br_vector3 angular_b;
+    br_vector3 linear_b;
+    br_vector3 partner_angular_b;
+    br_vector3 partner_linear_b;
+    tPhysics_object* object_a;
+    tPhysics_object* object_b;
+    tPhysics_object* partner_a;
+    tPhysics_object* partner_b;
+    tPhysics_joint_force* force;
+    br_vector3 tv;
+    br_scalar response;
+    br_scalar* value;
+    int j;
+
+    force = pForces[pIndex];
+    object_a = force->object_a;
+    object_b = force->object_b;
+    partner_a = SetUpTorqueHingePartners(&angular_a, &linear_a, &partner_angular_a, &partner_linear_a, &force->direction_a, object_a);
+    if (object_b != NULL) {
+        partner_b = SetUpTorqueHingePartners(&angular_b, &linear_b, &partner_angular_b, &partner_linear_b, &force->direction_b, object_b);
+    }
+    for (j = 0; j <= pIndex; j++) {
+        value = &pMatrix[j * pRows + pIndex];
+        force = pForces[j];
+        if (force->type == 11) {
+            if (force->object_a == object_a) {
+                *value = BrVector3Dot(&force->direction_a, &angular_a);
+            } else if (force->object_b == object_a) {
+                *value = -BrVector3Dot(&force->direction_b, &angular_a);
+            } else {
+                *value = 0.0f;
+            }
+            if (partner_a != NULL) {
+                force = pForces[j];
+                if (force->object_a == partner_a) {
+                    *value += BrVector3Dot(&force->direction_a, &partner_angular_a);
+                } else if (force->object_b == partner_a) {
+                    *value -= BrVector3Dot(&force->direction_b, &partner_angular_a);
+                }
+            }
+            if (object_b != NULL) {
+                force = pForces[j];
+                if (force->object_a == object_b) {
+                    *value -= BrVector3Dot(&force->direction_a, &angular_b);
+                } else if (force->object_b == object_b) {
+                    *value += BrVector3Dot(&force->direction_b, &angular_b);
+                }
+                if (partner_b != NULL) {
+                    force = pForces[j];
+                    if (force->object_a == partner_b) {
+                        *value -= BrVector3Dot(&force->direction_a, &partner_angular_b);
+                    } else if (force->object_b == partner_b) {
+                        *value += BrVector3Dot(&force->direction_b, &partner_angular_b);
+                    }
+                }
+            }
+        } else {
+            if (force->object_a == object_a) {
+                FORCE_RESPONSE(&force->direction_a, &force->point_a, &angular_a, &linear_a);
+                *value = response;
+            } else if (force->object_b == object_a) {
+                FORCE_RESPONSE(&force->direction_b, &force->point_b, &angular_a, &linear_a);
+                *value = -response;
+            } else {
+                *value = 0.0f;
+            }
+            if (partner_a != NULL) {
+                force = pForces[j];
+                if (force->object_a == partner_a) {
+                    FORCE_RESPONSE(&force->direction_a, &force->point_a, &partner_angular_a, &partner_linear_a);
+                    *value += response;
+                } else if (force->object_b == partner_a) {
+                    FORCE_RESPONSE(&force->direction_b, &force->point_b, &partner_angular_a, &partner_linear_a);
+                    *value -= response;
+                }
+            }
+            if (object_b != NULL) {
+                force = pForces[j];
+                if (force->object_a == object_b) {
+                    FORCE_RESPONSE(&force->direction_a, &force->point_a, &angular_b, &linear_b);
+                    *value -= response;
+                } else if (force->object_b == object_b) {
+                    FORCE_RESPONSE(&force->direction_b, &force->point_b, &angular_b, &linear_b);
+                    *value += response;
+                }
+                if (partner_b != NULL) {
+                    force = pForces[j];
+                    if (force->object_a == partner_b) {
+                        FORCE_RESPONSE(&force->direction_a, &force->point_a, &partner_angular_b, &partner_linear_b);
+                        *value -= response;
+                    } else if (force->object_b == partner_b) {
+                        FORCE_RESPONSE(&force->direction_b, &force->point_b, &partner_angular_b, &partner_linear_b);
+                        *value += response;
+                    }
+                }
+            }
+        }
+        pMatrix[pIndex * pRows + j] = *value;
+    }
+}
 
 // DRMatrix33Inverse
 
@@ -1111,6 +1324,7 @@ int C2_HOOK_FASTCALL ReduceEffectOfForces(tPhysics_joint_force* pForces, br_scal
 
 // FUNCTION: CARMA2_HW 0x004be4b0
 // FUNCTION: CARMA2_SW 0x004babd0
+// FUNCTION: CARMA2_CHEAT 0x004c3fe0
 void C2_HOOK_FASTCALL SetUpForce(br_vector3* pAngular, br_vector3* pLinear, const br_vector3* pPoint, const br_vector3* pDirection, tPhysics_object* pObject) {
     br_scalar inverse_mass;
     int i;
@@ -1314,12 +1528,126 @@ tPhysics_object* C2_HOOK_FASTCALL SetUpHingePartners(br_vector3* pAngular, br_ve
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x004bf490
-// STUB: CARMA2_SW 0x004bbbb0
-// STUB: CARMA2_CHEAT 0x004c4fc0
+// FUNCTION: CARMA2_HW 0x004bf490
+// FUNCTION: CARMA2_SW 0x004bbbb0
+// FUNCTION: CARMA2_CHEAT 0x004c4fc0
 void C2_HOOK_FASTCALL MakeMatrix(br_scalar* pMatrix, int pRows, tPhysics_joint_force** pForces, int pColumns) {
-    NOT_IMPLEMENTED();
+    br_vector3 angular_a;
+    br_vector3 linear_a;
+    br_vector3 partner_angular_a;
+    br_vector3 partner_linear_a;
+    br_vector3 angular_b;
+    br_vector3 linear_b;
+    br_vector3 partner_angular_b;
+    br_vector3 partner_linear_b;
+    tPhysics_object* object_a;
+    tPhysics_object* object_b;
+    tPhysics_object* partner_a;
+    tPhysics_object* partner_b;
+    tPhysics_joint_force* force;
+    br_vector3 tv;
+    br_scalar response;
+    br_scalar* value;
+    int i;
+    int j;
+
+    for (i = 0; i < pColumns; i++) {
+        force = pForces[i];
+        object_b = force->object_b;
+        object_a = force->object_a;
+        if (object_b != NULL && force->type == 14) {
+            object_b = NULL;
+        }
+        if (force->type == 11) {
+            AddDoubleTorqueToMatrix(pMatrix, pRows, i, pForces, pColumns);
+            continue;
+        }
+        SetUpForce(&angular_a, &linear_a, &force->point_a, &force->direction_a, object_a);
+        if (object_a->field_0x1e4 != NULL) {
+            partner_a = SetUpHingePartners(&angular_a, &linear_a, &partner_angular_a, &partner_linear_a, object_a);
+        } else {
+            partner_a = NULL;
+        }
+        partner_b = NULL;
+        if (object_b != NULL) {
+            SetUpForce(&angular_b, &linear_b, &force->point_b, &force->direction_b, object_b);
+            if (object_b->field_0x1e4 != NULL) {
+                partner_b = SetUpHingePartners(&angular_b, &linear_b, &partner_angular_b, &partner_linear_b, object_b);
+            }
+        }
+        for (j = 0; j <= i; j++) {
+            value = &pMatrix[j * pRows + i];
+            *value = 0.0f;
+            force = pForces[j];
+            if (force->type == 11) {
+                if (force->object_a == object_a) {
+                    *value += BrVector3Dot(&force->direction_a, &angular_a);
+                } else if (force->object_b == object_a) {
+                    *value -= BrVector3Dot(&force->direction_b, &angular_a);
+                }
+                if (object_b != NULL) {
+                    if (force->object_a == object_b) {
+                        *value -= BrVector3Dot(&force->direction_a, &angular_b);
+                    } else if (force->object_b == object_b) {
+                        *value += BrVector3Dot(&force->direction_b, &angular_b);
+                    }
+                }
+                if (partner_a != NULL) {
+                    if (force->object_a == partner_a) {
+                        *value += BrVector3Dot(&force->direction_a, &partner_angular_a);
+                    } else if (force->object_b == partner_a) {
+                        *value -= BrVector3Dot(&force->direction_b, &partner_angular_a);
+                    }
+                }
+                if (partner_b != NULL) {
+                    if (force->object_a == partner_b) {
+                        *value -= BrVector3Dot(&force->direction_a, &partner_angular_b);
+                    } else if (force->object_b == partner_b) {
+                        *value += BrVector3Dot(&force->direction_b, &partner_angular_b);
+                    }
+                }
+            } else {
+                if (force->object_a == object_a) {
+                    FORCE_RESPONSE(&force->direction_a, &force->point_a, &angular_a, &linear_a);
+                    *value += response;
+                } else if (force->object_b == object_a && force->type != 14) {
+                    FORCE_RESPONSE(&force->direction_b, &force->point_b, &angular_a, &linear_a);
+                    *value -= response;
+                }
+                if (object_b != NULL) {
+                    if (force->object_a == object_b) {
+                        FORCE_RESPONSE(&force->direction_a, &force->point_a, &angular_b, &linear_b);
+                        *value -= response;
+                    } else if (force->object_b == object_b && force->type != 14) {
+                        FORCE_RESPONSE(&force->direction_b, &force->point_b, &angular_b, &linear_b);
+                        *value += response;
+                    }
+                }
+                if (partner_a != NULL) {
+                    if (force->object_a == partner_a) {
+                        FORCE_RESPONSE(&force->direction_a, &force->point_a, &partner_angular_a, &partner_linear_a);
+                        *value += response;
+                    } else if (force->object_b == partner_a) {
+                        FORCE_RESPONSE(&force->direction_b, &force->point_b, &partner_angular_a, &partner_linear_a);
+                        *value -= response;
+                    }
+                }
+                if (partner_b != NULL) {
+                    if (force->object_a == partner_b) {
+                        FORCE_RESPONSE(&force->direction_a, &force->point_a, &partner_angular_b, &partner_linear_b);
+                        *value -= response;
+                    } else if (force->object_b == partner_b) {
+                        FORCE_RESPONSE(&force->direction_b, &force->point_b, &partner_angular_b, &partner_linear_b);
+                        *value += response;
+                    }
+                }
+            }
+            pMatrix[i * pRows + j] = *value;
+        }
+    }
 }
+
+#undef FORCE_RESPONSE
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(on)
