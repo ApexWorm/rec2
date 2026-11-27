@@ -15,6 +15,7 @@
 extern br_vector3 gRender_bounds_centre;
 extern int gINT_00681fb0;
 extern int gFrame;
+extern tDrone_state_function* gDrone_state_functions[6];
 extern int gCurrent_selected_drone;
 extern int gCount_drones;
 extern tDrone_form gDrone_forms[64];
@@ -85,7 +86,7 @@ extern br_actor* C2_HOOK_CDECL MrFindy(br_actor* pActor, const char* pName);
 
 // UnPauseDroneState
 
-// NewDroneState
+extern void C2_HOOK_FASTCALL NewDroneState(tDrone_spec* pDrone, int pNew_state);
 
 // ResetDroneCrushyModel
 
@@ -131,7 +132,7 @@ extern int C2_HOOK_FASTCALL DroneTrainWithinProcessingDistance(const br_vector3*
 
 // ProcessThisDrone
 
-// DroneStateFuncReset
+extern void C2_HOOK_FASTCALL DroneStateFuncReset(tDrone_spec* pDrone, tDroneStateFuncState pState);
 
 // InitDroneDrivingInfo
 
@@ -143,13 +144,13 @@ extern void C2_HOOK_FASTCALL PipeDroneMatrix(tDrone_spec* pDrone);
 
 // PossiblyPipeDroneMovement
 
-// DroneStateFuncControlledMovement
+extern void C2_HOOK_FASTCALL DroneStateFuncControlledMovement(tDrone_spec* pDrone, tDroneStateFuncState pState);
 
 // DoDroneHaltingStuff
 
-// DroneStateFuncPhysicsActive
+extern void C2_HOOK_FASTCALL DroneStateFuncPhysicsActive(tDrone_spec* pDrone, tDroneStateFuncState pState);
 
-// DroneStateFuncStationaryPassive
+extern void C2_HOOK_FASTCALL DroneStateFuncStationaryPassive(tDrone_spec* pDrone, tDroneStateFuncState pState);
 
 // GetNewCrushyModelForDrone
 
