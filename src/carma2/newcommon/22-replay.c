@@ -19,15 +19,16 @@
 #include "21-mainloop.h"
 #include "23-piping.h"
 #include "25-grafdata.h"
+#include "27-powerup.h"
 #include "30-opponent.h"
 #include "32-spark.h"
 #include "35-intrface.h"
+#include "39-oil.h"
 #include "40-main.h"
 #include "41-utility.h"
 #include "42-input.h"
 #include "53-controls.h"
 #include "59-camera.h"
-#include "27-powerup.h"
 #include "61-pedestrn-phys.h"
 #include "63-loading3.h"
 #include "64-movie.h"
@@ -280,9 +281,6 @@ void C2_HOOK_FASTCALL DoActionReplayHeadups(void) {
     ActualActionReplayHeadups(0);
 }
 
-extern void C2_HOOK_FASTCALL MungePedestrians(tU32 pFrame_period);
-extern void C2_HOOK_FASTCALL ProcessOilSpills(tU32 pFrame_period);
-
 // FUNCTION: CARMA2_HW 0x004e6950
 // FUNCTION: CARMA2_SW 0x004e2840
 // FUNCTION: CARMA2_CHEAT 0x004ec640
@@ -489,8 +487,6 @@ void C2_HOOK_FASTCALL PollActionReplayControls(tU32* pFrame_period, tU32* pAvera
         ARGoBackwards();
     }
 }
-
-extern int C2_HOOK_FASTCALL ARToggleReplay(tTurn_on_AR_callback* pTurn_on_AR_cb, tTurn_off_AR_callback* pTurn_off_AR_cb, tAfter_AR_callback* pAfter_AR_cb, tReplay_session_callback* pZappy_AR_cb, tPreprocess_AR_callback* pPreprocess_cb, tPostProcess_AR_callback* pPostProcess_cb, tU32* pFrame_period, tU32* pFrame_period_2);
 
 // FUNCTION: CARMA2_HW 0x004e72e0
 // FUNCTION: CARMA2_CHEAT 0x004ecf80
