@@ -53,6 +53,21 @@ int gInventory[20];
 // GLOBAL: CARMA2_CHEAT 0x006a85e4
 int gINT_006a0a6c;
 
+// GLOBAL: CARMA2_HW 0x006a0a64
+// GLOBAL: CARMA2_SW 0x0069aabc
+// GLOBAL: CARMA2_CHEAT 0x006a85dc
+tPowerup_respawn_spec* gPowerup_respawn_specs;
+
+// GLOBAL: CARMA2_HW 0x006a0aec
+// GLOBAL: CARMA2_SW 0x0069ab44
+// GLOBAL: CARMA2_CHEAT 0x006a8664
+tU32 gNext_goody_time;
+
+// GLOBAL: CARMA2_HW 0x006a0958
+// GLOBAL: CARMA2_SW 0x0069a9b0
+// GLOBAL: CARMA2_CHEAT 0x006a84d0
+undefined4 gDAT_006a0958;
+
 // GLOBAL: CARMA2_HW 0x006a0960
 // GLOBAL: CARMA2_SW 0x0069a9b8
 // GLOBAL: CARMA2_CHEAT 0x006a84d8
@@ -67,6 +82,11 @@ tU8* gRace_powerup_respawn_bools = NULL;
 // GLOBAL: CARMA2_SW 0x0069aaac
 // GLOBAL: CARMA2_CHEAT 0x006a85cc
 tPowerup* gPowerup_array = NULL;
+
+// GLOBAL: CARMA2_HW 0x006a0ad0
+// GLOBAL: CARMA2_SW 0x0069ab28
+// GLOBAL: CARMA2_CHEAT 0x006a8648
+int gNumber_of_powerups;
 
 // GLOBAL: CARMA2_HW 0x006a0a58
 // GLOBAL: CARMA2_SW 0x0069aab0
@@ -473,9 +493,21 @@ void C2_HOOK_FASTCALL InitPowerups(void) {
     NOT_IMPLEMENTED();
 }
 
-// RemoveRepulseEffect
+inline void C2_HOOK_FASTCALL RemoveRepulseEffect(int pIndex) {
 
-// ResetRepulseEffects
+    gRepulse_links[pIndex].time = 0;
+    if (gRepulse_links[pIndex].actor->parent == gNon_track_actor) {
+        BrActorRemove(gRepulse_links[pIndex].actor);
+    }
+}
+
+inline void C2_HOOK_FASTCALL ResetRepulseEffects(void) {
+    int i;
+
+    for (i = 0; i < (int)REC2_ASIZE(gRepulse_links); i++) {
+        RemoveRepulseEffect(i);
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x004da600
 // FUNCTION: CARMA2_SW 0x004d6ad0
@@ -493,7 +525,36 @@ void C2_HOOK_FASTCALL EmptyInventory(void) {
     gINT_006a0a5c = 0;
 }
 
-// ResetPowerups
+// FUNCTION: CARMA2_HW 0x004da630
+// FUNCTION: CARMA2_SW 0x004d6b00
+// FUNCTION: CARMA2_CHEAT 0x004e01f0
+void C2_HOOK_FASTCALL ResetPowerups(void) {
+    int i;
+    tPowerup* powerup;
+
+    gRace_powerup_respawn_bools = gPowerup_respawn_specs[gNet_mode != eNet_mode_none].bools;
+    powerup = gPowerup_array;
+    for (i = 0; i < gNumber_of_powerups; i++, powerup++) {
+        powerup->got_time = 0;
+        powerup->current_value = -1;
+    }
+    for (i = 0; i < (int)REC2_ASIZE(gRespawn_powerups); i++) {
+        gRespawn_powerups[i].actor = NULL;
+    }
+    for (i = 0; i < (int)REC2_ASIZE(gPickedup_powerups); i++) {
+        if (gPickedup_powerups[i].icon_actor != NULL) {
+            gPickedup_powerups[i].icon_actor->render_style = BR_RSTYLE_NONE;
+        }
+    }
+    EmptyInventory();
+    gNumber_of_icons = 0;
+    gDAT_006a0958 = 0;
+    gInventory_cycling = 0;
+    gInventory_timeout = 0;
+    gCount_cloaked_cars = 0;
+    ResetRepulseEffects();
+    gNext_goody_time = 0;
+}
 
 // STUB: CARMA2_HW 0x004da730
 // STUB: CARMA2_SW 0x004d6c00
