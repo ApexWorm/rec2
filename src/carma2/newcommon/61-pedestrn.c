@@ -1391,12 +1391,12 @@ void C2_HOOK_FASTCALL SetCharacterDirection(tPed_character_instance* pPed, const
     character_matrix = GetCharacterMatrixPtr(pPed);
     BrMatrix34Inverse(&inverse, &pPed->field_0x8c);
     original_pos = *(br_vector3*)character_matrix->m[3];
-    BrVector3Set((br_vector3*)character_matrix->m[3], 0.f, 0.f, 0.f);
+    BrVector3Set((br_vector3*)character_matrix->m[3], 0.0f, 0.0f, 0.0f);
     BrMatrix34Mul(&mat, character_matrix, &inverse);
     if (pUp != NULL) {
         BrVector3Normalise(&norm_up, pUp);
     } else {
-        BrVector3Set(&norm_up, 0.f, 1.f, 0.f);
+        BrVector3Set(&norm_up, 0.0f, 1.0f, 0.0f);
     }
     BrVector3Normalise(&norm_dir, pDir);
     BrVector3Copy(&move_dir, &move->field_0x40);
@@ -1412,7 +1412,7 @@ void C2_HOOK_FASTCALL SetCharacterDirection(tPed_character_instance* pPed, const
     DRVector3SafeCrossXZ(&cross, &dropped_move_dir, &norm_dropped_dir);
     BrVector3Normalise(&axis, &cross);
     DRMatrix34RotateCos(&pPed->field_0x8c, &axis, cos_a);
-    BrVector3Set(&cross, norm_up.v[2], 0.f, -norm_up.v[0]);
+    BrVector3Set(&cross, norm_up.v[2], 0.0f, -norm_up.v[0]);
     BrVector3Normalise(&axis, &cross);
     DRMatrix34RotateCos(&rot_up, &axis, norm_up.v[1]);
     BrMatrix34Pre(&pPed->field_0x8c, &rot_up);
