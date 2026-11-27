@@ -1708,11 +1708,135 @@ tPhysics_object* C2_HOOK_FASTCALL SetSeveredLimbObject(tPed_character_instance* 
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x00408c30
-// STUB: CARMA2_SW 0x00408c30
-// STUB: CARMA2_CHEAT 0x00408c40
+// FUNCTION: CARMA2_HW 0x00408c30
+// FUNCTION: CARMA2_SW 0x00408c30
+// FUNCTION: CARMA2_CHEAT 0x00408c40
 int C2_HOOK_FASTCALL MakeCharacterCollideworthy2(tPed_character_instance* pCharacter, int pArg2, int pArg3, int pArg4) {
-    NOT_IMPLEMENTED();
+    tPed_personality* personality;
+    tPed_form* form;
+    tPed_form_boned_phys* boned;
+    tPed_form_simple_phys* simple;
+    tPhysics_object* object;
+    br_actor* actor;
+    br_bounds3* bounds;
+    br_vector3* bone_vec;
+    br_vector3* bone_ptr;
+    int i;
+    int j;
+    int type;
+    int add_to_phil;
+    int got_friction;
+    float friction;
+
+#ifdef REC2_CHEAT
+    if (gAction_replay_mode) {
+        PDFatalError("Spam spam spam spam!");
+    }
+#endif
+    if (((pCharacter->field_0x14 & 0x1) && !pArg2) || ((pCharacter->field_0x14 & 0x2) && pArg2)) {
+        return 0x17;
+    }
+    if (MakeCharacterRenderable(pCharacter) == 1) {
+        return 0x15;
+    }
+    personality = pCharacter->personality;
+    form = personality->form;
+    if (pArg2) {
+        if (pArg4 < 0) {
+            for (i = 0, boned = form->boned_physicing; i < form->max_boned_physicing_at_once; i++, boned++) {
+                if (!boned->field_0x0) {
+                    break;
+                }
+            }
+        } else {
+            boned = &form->boned_physicing[pArg4];
+            i = pArg4;
+        }
+        if (i != form->max_boned_physicing_at_once) {
+            pCharacter->field_0x14 = 0x2;
+            pCharacter->field_0x5 = i;
+            boned->field_0x0 = 1;
+            add_to_phil = 1;
+            got_friction = 0;
+            for (i = 0; i < form->count_bones; i++) {
+                object = boned->collision_infos[i];
+                if (object->shape == NULL) {
+                    continue;
+                }
+                object->flags &= ~0x400;
+                if (personality->bones[i].hinge != NULL) {
+                    boned->collision_infos[i]->physics_joint1 = ClonePhysicsJoint(personality->bones[i].hinge, 0xdb);
+                } else {
+                    boned->collision_infos[i]->physics_joint1 = NULL;
+                }
+                for (j = 0; j < form->count_bones; j++) {
+                    if (form->bones[j].indices[0] == i) {
+                        bone_ptr = &personality->bones[j].field_0x2c;
+                        break;
+                    }
+                }
+                actor = form->actor_sets[pCharacter->field_0x4].actors[i];
+                if (form->bones[i].indices[0] >= 0) {
+                    bone_vec = &personality->bones[i].field_0x20;
+                } else {
+                    bone_vec = NULL;
+                }
+                if (actor->model != NULL) {
+                    bounds = &actor->model->bounds;
+                } else {
+                    bounds = NULL;
+                }
+                if (i < 2) {
+                    type = 1;
+                } else {
+                    type = 2;
+                }
+                SetCollisionObject(pCharacter, boned->collision_infos[i], actor, bounds, NULL, type, pArg3, add_to_phil, i, bone_vec, bone_ptr);
+                add_to_phil = 0;
+                if (got_friction) {
+                    if (boned->collision_infos[i]->physics_joint1 != NULL) {
+                        boned->collision_infos[i]->physics_joint1->friction = friction;
+                    }
+                } else {
+                    got_friction = 1;
+                    friction = boned->collision_infos[i]->I.v[0] * 25.0f;
+                }
+            }
+            PHILSetObjectProperty(boned->collision_infos[0], 1, 1);
+            return 0;
+        }
+    }
+    if (pArg4 < 0) {
+        for (i = 0, simple = form->simple_physicing; i < form->max_simple_physicing_at_once; i++, simple++) {
+            if (!simple->field_0x0) {
+                break;
+            }
+        }
+        if (i == form->max_simple_physicing_at_once) {
+            return 0x15;
+        }
+    } else {
+        simple = &form->simple_physicing[pArg4];
+        i = pArg4;
+    }
+    if (!SetCollisionObject(pCharacter, simple->collision_info, form->actor_sets[pCharacter->field_0x4].actors[0], &personality->bb, &personality->centre_of_mass, 0, pArg3, 1, 0, NULL, NULL)) {
+        return 0x15;
+    }
+    pCharacter->field_0x14 = 0x1;
+    pCharacter->field_0x5 = i;
+    simple->field_0x0 = 1;
+    if (pCharacter->field_0xc != 0 && FindAndSetSeveredPhysicsSet(pCharacter)) {
+        for (i = 1; i < form->count_bones; i++) {
+            if ((pCharacter->field_0xc & gPow2_array[i]) && !(pCharacter->field_0x10 & gPow2_array[i])) {
+                object = SetSeveredLimbObject(pCharacter, i, pArg3, 1);
+                if (object != NULL) {
+                    BrVector3Set(&object->v, 0.0f, 0.0f, 0.0f);
+                    BrVector3Set(&object->omega, 0.0f, 0.0f, 0.0f);
+                }
+            }
+        }
+    }
+    return 0;
 }
 
 #ifdef REC2_MATCHING

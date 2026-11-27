@@ -3944,7 +3944,8 @@ typedef struct {
 } tPed_form_actor_set;
 
 typedef struct {
-    tPed_form_collision_detection_type type;
+    tU8 field_0x0;
+    undefined field_0x1[3];
     tPhysics_object* collision_info;
 } tPed_form_simple_phys;
 
