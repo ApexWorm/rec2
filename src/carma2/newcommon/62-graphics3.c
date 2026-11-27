@@ -580,7 +580,6 @@ void C2_HOOK_FASTCALL DrawMapSmallBlip(br_pixelmap* pScreen, tU32 pTime, const b
     }
 }
 
-extern void C2_HOOK_FASTCALL CopyMapToScreen(void);
 inline void C2_HOOK_FASTCALL CopyMapToScreen(void) {
 
     if (gCurrent_race.map_image != NULL) {
@@ -734,7 +733,6 @@ void C2_HOOK_FASTCALL DoMapOverlays(br_pixelmap* pScreen) {
 #pragma auto_inline(on)
 #endif
 
-extern void C2_HOOK_FASTCALL StartMap(void);
 inline void C2_HOOK_FASTCALL StartMap(void) {
 
     gBack_original_origin_x = gBack_screen->origin_x;
@@ -846,7 +844,6 @@ void C2_HOOK_FASTCALL MapOverlay(void) {
 #pragma auto_inline(on)
 #endif
 
-extern void C2_HOOK_FASTCALL InitNearestCar(void);
 inline void C2_HOOK_FASTCALL InitNearestCar(void) {
 
     gINT_0068d6f4 = -1;
