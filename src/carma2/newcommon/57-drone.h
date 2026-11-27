@@ -14,6 +14,7 @@
 
 extern br_vector3 gRender_bounds_centre;
 extern int gINT_00681fb0;
+extern const char* gDrone_type_names[4];
 extern int gFrame;
 extern int gCurrent_selected_drone;
 extern int gCount_drones;
@@ -39,7 +40,7 @@ extern void C2_HOOK_CDECL DoNotDprintf_drone(const char* pMessage, ...);
 
 extern FILE* C2_HOOK_FASTCALL OpenDroneFile(char* pDrone_name);
 
-// LoadDroneTypeInfo
+extern void C2_HOOK_FASTCALL LoadDroneTypeInfo(char* pDrone_name);
 
 extern void C2_HOOK_FASTCALL ReallyRemoveDroneFromPHIL(tDrone_spec* pDrone);
 
