@@ -228,7 +228,7 @@ extern void C2_HOOK_FASTCALL RemoveNonCar(tNon_car_spec* pNon_car);
 
 extern void C2_HOOK_FASTCALL MakeModelMaterialsDoubleSided(br_model* pModel);
 
-extern intptr_t C2_HOOK_CDECL CheckFlapAngles(br_actor* pActor, void* pData);
+extern intptr_t C2_HOOK_CDECL CheckFlapAngles(br_actor* pActor, void* pContext);
 
 extern void C2_HOOK_FASTCALL MakeModelMaterialsSingleSided(br_model* pModel);
 
