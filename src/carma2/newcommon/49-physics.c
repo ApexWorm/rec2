@@ -976,6 +976,7 @@ void C2_HOOK_FASTCALL GetFacesNearObject(tPhysics_object *pObject, tWorld_callba
     br_matrix34 mat3;
     br_vector3 tv;
     br_matrix34* actor_mat;
+    br_matrix34* object_mat;
     int i;
 
     if (pObject->flags & 0x40) {
@@ -1014,6 +1015,7 @@ void C2_HOOK_FASTCALL GetFacesNearObject(tPhysics_object *pObject, tWorld_callba
         BrMatrix34Identity(&inv_mat);
     } else {
         actor_mat = &pObject->actor->t.t.mat;
+        object_mat = &pObject->transform_matrix;
         if (pObject->box_face_ref == gFace_num__car || (pObject->box_face_ref == gFace_num__car - 1 && pObject->box_face_start > gFace_count)) {
             BrMatrix34Mul(&mat2, actor_mat, &pObject->field_0x144);
             GetNewBoundingBox(&bb, &pObject->bb2, &mat2);
@@ -1027,11 +1029,11 @@ void C2_HOOK_FASTCALL GetFacesNearObject(tPhysics_object *pObject, tWorld_callba
             }
         }
         BrMatrix34LPInverse(&inv_mat, actor_mat);
-        BrMatrix34Mul(&mat, &pObject->transform_matrix, &inv_mat);
+        BrMatrix34Mul(&mat, object_mat, &inv_mat);
         GetNewBoundingBox(&bnds.original_bounds, &pObject->bb2, &mat);
         for (i = 0; i < 3; i++) {
-            bnds.original_bounds.min.v[i] = MIN(bnds.original_bounds.min.v[i], pObject->bb2.min.v[i]);
-            bnds.original_bounds.max.v[i] = MAX(bnds.original_bounds.max.v[i], pObject->bb2.max.v[i]);
+            bnds.original_bounds.min.v[i] = bnds.original_bounds.min.v[i] < pObject->bb2.min.v[i] ? bnds.original_bounds.min.v[i] : pObject->bb2.min.v[i];
+            bnds.original_bounds.max.v[i] = bnds.original_bounds.max.v[i] > pObject->bb2.max.v[i] ? bnds.original_bounds.max.v[i] : pObject->bb2.max.v[i];
             bnds.original_bounds.min.v[i] -= 0.0025f;
             bnds.original_bounds.max.v[i] += 0.0025f;
         }
@@ -1040,8 +1042,8 @@ void C2_HOOK_FASTCALL GetFacesNearObject(tPhysics_object *pObject, tWorld_callba
         BrMatrix34LPInverse(&mat2, &mat3);
         GetNewBoundingBox(&bb2, &pObject->bb2, &mat2);
         for (i = 0; i < 3; i++) {
-            bnds.original_bounds.min.v[i] = MIN(bnds.original_bounds.min.v[i], bb2.min.v[i]);
-            bnds.original_bounds.max.v[i] = MAX(bnds.original_bounds.max.v[i], bb2.max.v[i]);
+            bnds.original_bounds.min.v[i] = bnds.original_bounds.min.v[i] < bb2.min.v[i] ? bnds.original_bounds.min.v[i] : bb2.min.v[i];
+            bnds.original_bounds.max.v[i] = bnds.original_bounds.max.v[i] > bb2.max.v[i] ? bnds.original_bounds.max.v[i] : bb2.max.v[i];
             bnds.original_bounds.min.v[i] -= 0.02f;
             bnds.original_bounds.max.v[i] += 0.02f;
         }
@@ -1051,10 +1053,14 @@ void C2_HOOK_FASTCALL GetFacesNearObject(tPhysics_object *pObject, tWorld_callba
     }
     pObject->box_face_start = gFace_count;
     gPling_face = NULL;
-    gActorBoxPick_StopGroovidelics = (pObject->flags & 0x80) == 0;
+    if ((tU8)pObject->flags & 0x80) {
+        gActorBoxPick_StopGroovidelics = 0;
+    } else {
+        gActorBoxPick_StopGroovidelics = 1;
+    }
     if (pCallbacks != NULL && pCallbacks->find_faces_in_box != NULL) {
         gFace_count += pCallbacks->find_faces_in_box(&bnds, &gFace_list__car[gFace_count], REC2_ASIZE(gFace_list__car) - gFace_count, pCallbacks);
-        if (gFace_count >= REC2_ASIZE(gFace_list__car)) {
+        if (gFace_count >= (int)REC2_ASIZE(gFace_list__car)) {
             pObject->box_face_start = 0;
             gFace_count = pCallbacks->find_faces_in_box(&bnds, gFace_list__car, REC2_ASIZE(gFace_list__car), pCallbacks);
             gFace_num__car++;
