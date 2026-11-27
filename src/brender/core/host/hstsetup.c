@@ -29,6 +29,7 @@ host_info const hostInfo = {
 };
 
 // GLOBAL: CARMA2_HW 0x0066ffa0
+// GLOBAL: CARMA2_SW 0x0066a730
 void* functionPointers_BRHOST1[50] = {
     HostExceptionHook,
     HostExceptionUnhook,

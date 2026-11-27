@@ -10,6 +10,7 @@
 
 #include "08-loading1.h"
 #include "16-graphics1.h"
+#include "18b-graphics2.h"
 #include "25-grafdata.h"
 #include "33-depth.h"
 #include "35-intrface.h"
@@ -35,26 +36,32 @@ int gFancy_line_center_palette_indexes[5] = { 1, 2, 3, 2, 1 };
 int gFancy_line_side_palette_indexes[5] = { 1, 2, 3, 2, 1 };
 
 // GLOBAL: CARMA2_HW 0x0058fdc8
+// GLOBAL: CARMA2_SW 0x0058adc8
 // GLOBAL: CARMA2_CHEAT 0x00594f4c
 int gCursor_tinted_top = -1;
 
 // GLOBAL: CARMA2_HW 0x0058fdd0
+// GLOBAL: CARMA2_SW 0x0058add0
 // GLOBAL: CARMA2_CHEAT 0x00594f54
 int gCursor_tinted_left = -1;
 
 // GLOBAL: CARMA2_HW 0x0058fdcc
+// GLOBAL: CARMA2_SW 0x0058adcc
 // GLOBAL: CARMA2_CHEAT 0x00594f50
 int gCursor_tinted_bottom = -1;
 
 // GLOBAL: CARMA2_HW 0x0058fdd4
+// GLOBAL: CARMA2_SW 0x0058add4
 // GLOBAL: CARMA2_CHEAT 0x00594f58
 int gCursor_tinted_right = -1;
 
 // GLOBAL: CARMA2_HW 0x0058fdd8
+// GLOBAL: CARMA2_SW 0x0058add8
 // GLOBAL: CARMA2_CHEAT 0x00594f5c
 int gCursor_tinted_center = -1;
 
 // GLOBAL: CARMA2_HW 0x0058fde0
+// GLOBAL: CARMA2_SW 0x0058addc
 // GLOBAL: CARMA2_CHEAT 0x00594f64
 int gCursor_line_width = 5;
 
@@ -633,13 +640,155 @@ void C2_HOOK_FASTCALL RemoveTransientBitmaps(int pGraphically_remove_them) {
 #pragma auto_inline(on)
 #endif
 
-// SaveTransient
+inline void C2_HOOK_FASTCALL SaveTransient(int pX_coord, int pY_coord) {
+    /* FIXME: Mac build adds extra "int pIndex" argument, which is usually gCursor_transient_index */
+    if (!gNoTransients) {
 
-// STUB: CARMA2_HW 0x0043e0a0
-// STUB: CARMA2_SW 0x0043e0f0
-// STUB: CARMA2_CHEAT 0x0043e350
+        gTransient_bitmaps[gCursor_transient_index].x_coord = pX_coord & ~3;
+        gTransient_bitmaps[gCursor_transient_index].y_coord = pY_coord;
+        gTransient_bitmaps[gCursor_transient_index].in_use = 1;
+        gTransient_bitmaps[gCursor_transient_index].order_number = gNext_transient;
+        gNext_transient += 1;
+        BrPixelmapRectangleCopy(gTransient_bitmaps[gCursor_transient_index].pixmap,
+            0, 0,
+            gBack_screen,
+            gTransient_bitmaps[gCursor_transient_index].x_coord,
+            gTransient_bitmaps[gCursor_transient_index].y_coord,
+            gTransient_bitmaps[gCursor_transient_index].pixmap->width,
+            gTransient_bitmaps[gCursor_transient_index].pixmap->height);
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x0043e0a0
+// FUNCTION: CARMA2_SW 0x0043e0f0
+// FUNCTION: CARMA2_CHEAT 0x0043e350
 int C2_HOOK_FASTCALL DoMouseCursor(void) {
-    NOT_IMPLEMENTED();
+    int delta_time;
+    int mouse_moved;
+    int button_down;
+    int new_required;
+    tU32 time_now;
+    int pos_x, pos_y;
+
+    // GLOBAL: CARMA2_HW 0x0067c398
+    // GLOBAL: CARMA2_SW 0x00676b0c
+    // GLOBAL: CARMA2_CHEAT 0x00683c48
+    static tU32 last_call_time;
+    // GLOBAL: CARMA2_HW 0x0067c39c
+    // GLOBAL: CARMA2_SW 0x00676b10
+    // GLOBAL: CARMA2_CHEAT 0x00683c4c
+    static tU32 last_required_change;
+    // GLOBAL: CARMA2_HW 0x0067c3a0
+    // GLOBAL: CARMA2_SW 0x00676b14
+    // GLOBAL: CARMA2_CHEAT 0x00683c50
+    static int delta_x;
+    // GLOBAL: CARMA2_HW 0x0067c3a4
+    // GLOBAL: CARMA2_SW 0x00676b18
+    // GLOBAL: CARMA2_CHEAT 0x00683c54
+    static int required_cursor;
+    // GLOBAL: CARMA2_HW 0x0067c3a8
+    // GLOBAL: CARMA2_SW 0x00676b1c
+    // GLOBAL: CARMA2_CHEAT 0x00683c58
+    static int zero_count;
+    // GLOBAL: CARMA2_HW 0x0067c3ac
+    // GLOBAL: CARMA2_SW 0x00676b20
+    // GLOBAL: CARMA2_CHEAT 0x00683c5c
+    static int button_was_down;
+    // GLOBAL: CARMA2_HW 0x0058fddc
+    // GLOBAL: CARMA2_SW 0x00676b00
+    // GLOBAL: CARMA2_CHEAT 0x00594f60
+    static int draw_cursor = 1;
+
+    (void)button_was_down;
+
+    do {
+        time_now = PDGetTotalTime();
+        if (last_call_time != 0) {
+            delta_time = time_now - last_call_time;
+        } else {
+            delta_time = 1000;
+        }
+    } while (delta_time <= 20);
+    GetMousePosition(&pos_x, &pos_y);
+    mouse_moved = pos_x != gMouse_last_x_coord || pos_y != gMouse_last_y_coord;
+    button_down = EitherMouseButtonDown();
+    if (gMouse_in_use || mouse_moved) {
+        gMouse_in_use = 1;
+        if (pos_x == gMouse_last_x_coord) {
+            if (zero_count++ >= 5) {
+                delta_x = 0;
+            }
+        } else {
+            zero_count = 0;
+            delta_x = 1000 * (pos_x - gMouse_last_x_coord) / delta_time;
+        }
+        if (delta_x < -10) {
+            new_required = 0;
+        } else if (delta_x > 10) {
+            new_required = 3;
+        } else {
+            new_required = 2;
+        }
+        if (new_required != required_cursor && time_now - last_required_change >= 200) {
+            last_required_change = time_now;
+            required_cursor = new_required;
+        }
+        gCurrent_cursor_index = 2;
+        SaveTransient(pos_x - 7, pos_y - 7);
+        switch (draw_cursor) {
+        case 0:
+#ifdef REC2_SW
+            DRPixelmapRectangleMaskedCopy(gBack_screen,
+                pos_x - 7, pos_y - 7,
+                gCursors[gCurrent_cursor_index],
+                0, 0,
+                gCursors[gCurrent_cursor_index]->width,
+                gCursors[gCurrent_cursor_index]->height);
+#endif
+            break;
+        case 1:
+#ifdef REC2_HW
+            PossibleUnlock(1);
+#endif
+            SetTintedPolySize(gCursor_tinted_top,
+                pos_x - 1, 0,
+                gCursor_line_width, pos_y - 9);
+            SetTintedPolySize(gCursor_tinted_left,
+                0, pos_y - 1,
+                pos_x - 9, gCursor_line_width);
+            SetTintedPolySize(gCursor_tinted_bottom,
+                pos_x - 1, pos_y + 5 + gCursor_line_width,
+                gCursor_line_width, gCurrent_graf_data->height - gCursor_line_width - pos_y + 9);
+            SetTintedPolySize(gCursor_tinted_right,
+                pos_x + 5 + gCursor_line_width, pos_y - 1,
+                gCurrent_graf_data->width - gCursor_line_width - pos_x + 9, gCursor_line_width);
+            SetTintedPolySize(gCursor_tinted_center,
+                pos_x - 7, pos_y - 7,
+                16, 16);
+            TurnTintedPolyOn(gCursor_tinted_top);
+            TurnTintedPolyOn(gCursor_tinted_left);
+            TurnTintedPolyOn(gCursor_tinted_bottom);
+            TurnTintedPolyOn(gCursor_tinted_right);
+            TurnTintedPolyOn(gCursor_tinted_center);
+            ProcessTintedPoly(gCursor_tinted_top);
+            ProcessTintedPoly(gCursor_tinted_left);
+            ProcessTintedPoly(gCursor_tinted_bottom);
+            ProcessTintedPoly(gCursor_tinted_right);
+            ProcessTintedPoly(gCursor_tinted_center);
+            RenderTintedPolys();
+            TurnTintedPolyOff(gCursor_tinted_top);
+            TurnTintedPolyOff(gCursor_tinted_left);
+            TurnTintedPolyOff(gCursor_tinted_bottom);
+            TurnTintedPolyOff(gCursor_tinted_right);
+            TurnTintedPolyOff(gCursor_tinted_center);
+            break;
+        }
+    }
+    last_call_time = time_now;
+    gMouse_last_x_coord = pos_x;
+    gMouse_last_y_coord = pos_y;
+    button_was_down = button_down;
+    return mouse_moved;
 }
 
 int C2_HOOK_FASTCALL AllocateCursorTransient(void) {
@@ -666,6 +815,7 @@ int C2_HOOK_FASTCALL AllocateCursorTransient(void) {
 }
 
 // FUNCTION: CARMA2_HW 0x0043e3f0
+// FUNCTION: CARMA2_SW 0x0043e480
 // FUNCTION: CARMA2_CHEAT 0x0043e6a0
 void C2_HOOK_FASTCALL InitMouseTargetLines(void) {
     br_pixelmap* cross;
