@@ -181,9 +181,47 @@ void C2_HOOK_FASTCALL ProcessCurrentObjective(tOpponent_spec* pOpponent_spec, tP
 #pragma auto_inline(on)
 #endif
 
-// ReallocExtraPathNodes
+inline tS16 C2_HOOK_FASTCALL ReallocExtraPathNodes(int pHow_many_then) {
+    tPath_node* new_nodes;
+    tS16 first_new_node;
 
-// ReallocExtraPathSections
+    first_new_node = -1;
+    if (pHow_many_then != 0) {
+        first_new_node = gProgram_state.AI_vehicles.number_of_path_nodes;
+        new_nodes = BrMemAllocate(sizeof(tPath_node) * (pHow_many_then + gProgram_state.AI_vehicles.number_of_path_nodes), kMem_oppo_new_nodes);
+        memcpy(new_nodes, gProgram_state.AI_vehicles.path_nodes, sizeof(tPath_node) * gProgram_state.AI_vehicles.number_of_path_nodes);
+        if (gProgram_state.AI_vehicles.path_nodes != NULL) {
+            BrMemFree(gProgram_state.AI_vehicles.path_nodes);
+        }
+        gProgram_state.AI_vehicles.path_nodes = new_nodes;
+        gProgram_state.AI_vehicles.number_of_path_nodes += pHow_many_then;
+    }
+    DoNotDprintf("ReallocExtraPathNodes(): Allocated %d bytes for %d path nodes",
+        sizeof(tPath_node) * (pHow_many_then + gProgram_state.AI_vehicles.number_of_path_nodes),
+        pHow_many_then);
+    return first_new_node;
+}
+
+inline tS16 C2_HOOK_FASTCALL ReallocExtraPathSections(int pHow_many_then) {
+    tPath_section* new_sections;
+    tS16 first_new_section;
+
+    first_new_section = -1;
+    if (pHow_many_then != 0) {
+        first_new_section = gProgram_state.AI_vehicles.number_of_path_sections;
+        new_sections = BrMemAllocate(sizeof(tPath_section) * (pHow_many_then + gProgram_state.AI_vehicles.number_of_path_sections), kMem_oppo_new_sections);
+        memcpy(new_sections, gProgram_state.AI_vehicles.path_sections, sizeof(tPath_section) * gProgram_state.AI_vehicles.number_of_path_sections);
+        if (gProgram_state.AI_vehicles.path_sections != NULL) {
+            BrMemFree(gProgram_state.AI_vehicles.path_sections);
+        }
+        gProgram_state.AI_vehicles.path_sections = new_sections;
+        gProgram_state.AI_vehicles.number_of_path_sections += pHow_many_then;
+    }
+    DoNotDprintf("ReallocExtraPathSections(): Allocated %d bytes for %d path sections",
+        sizeof(tPath_section) * (pHow_many_then + gProgram_state.AI_vehicles.number_of_path_sections),
+        pHow_many_then);
+    return first_new_section;
+}
 
 // FUNCTION: CARMA2_HW 0x004aa400
 // FUNCTION: CARMA2_SW 0x004a6570
@@ -1170,10 +1208,121 @@ void C2_HOOK_FASTCALL LoadCopCars(tRace_info* pRace_info) {
     gProgram_state.AI_vehicles.number_of_cops = 0;
 }
 
-// STUB: CARMA2_HW 0x004a9610
-// STUB: CARMA2_SW 0x004a5780
+// FUNCTION: CARMA2_HW 0x004a9610
+// FUNCTION: CARMA2_SW 0x004a5780
+// FUNCTION: CARMA2_CHEAT 0x004aa930
 void C2_HOOK_FASTCALL LoadInOppoPaths(FILE* pF) {
-    NOT_IMPLEMENTED();
+    char s[256];
+    char* res;
+    int section_no;
+    int node_no;
+    int i;
+    br_scalar x;
+    br_scalar y;
+    br_scalar z;
+    br_scalar scalars[8];
+    br_scalar distance;
+    tPath_node* node_ptr;
+    br_vector3 section_v;
+    br_vector3 positive_y_vector;
+    br_vector3 intersect;
+    br_vector3 cop_to_section;
+
+    DoNotDprintf("Start of LoadInOppoPaths()...");
+    gProgram_state.AI_vehicles.number_of_path_nodes = 0;
+    gProgram_state.AI_vehicles.number_of_path_sections = 0;
+    gProgram_state.AI_vehicles.path_nodes = NULL;
+    gProgram_state.AI_vehicles.path_sections = NULL;
+    gBit_per_node = NULL;
+    gBIG_APC_index = -1;
+    do {
+        res = GetALineAndDontArgue(pF, s);
+    } while (res != NULL && strcmp("START OF OPPONENT PATHS", s) != 0);
+    if (res != NULL) {
+        ReallocExtraPathNodes(GetAnInt(pF));
+        if (gProgram_state.AI_vehicles.number_of_path_nodes != 0) {
+            for (node_no = 0; node_no < gProgram_state.AI_vehicles.number_of_path_nodes; node_no++) {
+                GetThreeFloats(pF, &x, &y, &z);
+                gProgram_state.AI_vehicles.path_nodes[node_no].pos.v[0] = x;
+                gProgram_state.AI_vehicles.path_nodes[node_no].pos.v[1] = y;
+                gProgram_state.AI_vehicles.path_nodes[node_no].pos.v[2] = z;
+                gProgram_state.AI_vehicles.path_nodes[node_no].number_of_sections = 0;
+            }
+        }
+        ReallocExtraPathSections(GetAnInt(pF));
+        if (gProgram_state.AI_vehicles.number_of_path_sections != 0) {
+            for (section_no = 0; section_no < gProgram_state.AI_vehicles.number_of_path_sections; section_no++) {
+                PossibleService();
+                GetNScalars(pF, 8, scalars);
+                gProgram_state.AI_vehicles.path_sections[section_no].node_indices[0] = (tU16)scalars[0];
+                gProgram_state.AI_vehicles.path_sections[section_no].node_indices[1] = (tU16)scalars[1];
+                gProgram_state.AI_vehicles.path_sections[section_no].min_speed[0] = (tU8)scalars[2];
+                gProgram_state.AI_vehicles.path_sections[section_no].max_speed[0] = (tU8)scalars[3];
+                gProgram_state.AI_vehicles.path_sections[section_no].min_speed[1] = (tU8)scalars[4];
+                gProgram_state.AI_vehicles.path_sections[section_no].max_speed[1] = (tU8)scalars[5];
+                gProgram_state.AI_vehicles.path_sections[section_no].width = scalars[6];
+                BrVector3Sub(&section_v,
+                    &gProgram_state.AI_vehicles.path_nodes[(tS16)gProgram_state.AI_vehicles.path_sections[section_no].node_indices[1]].pos,
+                    &gProgram_state.AI_vehicles.path_nodes[(tS16)gProgram_state.AI_vehicles.path_sections[section_no].node_indices[0]].pos);
+                gProgram_state.AI_vehicles.path_sections[section_no].length = BrVector3Length(&section_v);
+                if (scalars[7] >= 1000.f) {
+                    gProgram_state.AI_vehicles.path_sections[section_no].type = (tU8)(scalars[7] - 1000.f);
+                    gProgram_state.AI_vehicles.path_sections[section_no].one_way = 1;
+                } else {
+                    gProgram_state.AI_vehicles.path_sections[section_no].type = (tU8)scalars[7];
+                    gProgram_state.AI_vehicles.path_sections[section_no].one_way = 0;
+                }
+                for (node_no = 0; node_no < 2; node_no++) {
+                    node_ptr = &gProgram_state.AI_vehicles.path_nodes[(tS16)gProgram_state.AI_vehicles.path_sections[section_no].node_indices[node_no]];
+                    if (node_ptr->number_of_sections < 8) {
+                        node_ptr->sections[node_ptr->number_of_sections] = section_no;
+                        node_ptr->number_of_sections++;
+                    } else {
+                        DoNotDprintf("ERROR: Too many sections (including section #%d) attached to node #%d",
+                            section_no,
+                            (tS16)gProgram_state.AI_vehicles.path_sections[section_no].node_indices[node_no]);
+                    }
+                }
+            }
+        }
+        if (gAusterity_mode || gNet_mode != eNet_mode_none) {
+            gProgram_state.AI_vehicles.number_of_cops = GetAnInt(pF);
+            for (i = 0; i < gProgram_state.AI_vehicles.number_of_cops; i++) {
+                GetALineAndDontArgue(pF, s);
+            }
+            gProgram_state.AI_vehicles.number_of_cops = 0;
+        } else {
+            gProgram_state.AI_vehicles.number_of_cops = GetAnInt(pF);
+            if (gProgram_state.AI_vehicles.number_of_cops != 0) {
+                for (i = 0; i < gProgram_state.AI_vehicles.number_of_cops; i++) {
+                    PossibleService();
+                    GetNScalars(pF, 6, scalars);
+                    BrVector3Set(&gProgram_state.AI_vehicles.cop_start_points[i], scalars[0], scalars[1], scalars[2]);
+                    if (scalars[3] == 9.f && scalars[4] == 9.f && scalars[5] == 9.f) {
+                        gBIG_APC_index = i;
+                    }
+                    FindNearestGeneralSection(NULL, &gProgram_state.AI_vehicles.cop_start_points[i], &section_v, &intersect, &distance);
+                    BrVector3Set(&positive_y_vector, 0.f, 1.f, 0.f);
+                    BrVector3Cross(&gProgram_state.AI_vehicles.cop_start_vectors[i], &positive_y_vector, &section_v);
+                    BrVector3Sub(&cop_to_section, &intersect, &gProgram_state.AI_vehicles.cop_start_points[i]);
+                    if (BrVector3Dot(&gProgram_state.AI_vehicles.cop_start_vectors[i], &cop_to_section) < 0.f) {
+                        BrVector3Negate(&gProgram_state.AI_vehicles.cop_start_vectors[i], &gProgram_state.AI_vehicles.cop_start_vectors[i]);
+                    }
+                }
+            }
+        }
+        do {
+            GetALineAndDontArgue(pF, s);
+        } while (strcmp("END OF OPPONENT PATHS", s) != 0);
+        if (gProgram_state.AI_vehicles.number_of_path_sections != 0) {
+            gBit_per_node = BrMemAllocate((gProgram_state.AI_vehicles.number_of_path_nodes + 7) / 8, kMem_oppo_bit_per_node);
+        } else {
+            gBit_per_node = NULL;
+        }
+        DoNotDprintf("End of LoadInOppoPaths(), totals:");
+        DoNotDprintf("Nodes: %d", gProgram_state.AI_vehicles.number_of_path_nodes);
+        DoNotDprintf("Sections: %d", gProgram_state.AI_vehicles.number_of_path_sections);
+    }
 }
 
 // FUNCTION: CARMA2_HW 0x004a9c50

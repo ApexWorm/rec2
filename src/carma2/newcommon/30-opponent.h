@@ -48,9 +48,9 @@ extern void C2_HOOK_CDECL DoNotDprintf(const char* pMessage, ...);
 
 extern void C2_HOOK_FASTCALL ProcessCurrentObjective(tOpponent_spec* pOpponent_spec, tProcess_objective_command pCommand);
 
-// ReallocExtraPathNodes
+extern tS16 C2_HOOK_FASTCALL ReallocExtraPathNodes(int pHow_many_then);
 
-// ReallocExtraPathSections
+extern tS16 C2_HOOK_FASTCALL ReallocExtraPathSections(int pHow_many_then);
 
 extern int C2_HOOK_FASTCALL PointVisibleFromHere(br_vector3* pFrom, br_vector3* pTo);
 
