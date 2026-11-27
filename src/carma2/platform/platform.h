@@ -63,7 +63,7 @@ extern void C2_HOOK_FASTCALL PDSetPaletteEntries(br_pixelmap* pPalette, int pFir
 
 extern void C2_HOOK_FASTCALL PDSetPalette(br_pixelmap *pixelmap);
 
-extern void C2_HOOK_FASTCALL PDEnumPath(const char* path, tEnumPathCallback pCallback, void* data);
+extern int C2_HOOK_FASTCALL PDEnumPath(const char* path, tEnumPathCallback pCallback, void* data);
 
 extern int C2_HOOK_FASTCALL PDmkdir(const char* path);
 
@@ -107,7 +107,7 @@ extern int C2_HOOK_FASTCALL PDNetGetHeaderSize(void);
 
 extern int C2_HOOK_FASTCALL PDNetJoinGame(tNet_game_details* pGame_details, const char* pName);
 
-extern void C2_HOOK_FASTCALL PDNetHostFinishGame(void);
+extern void C2_HOOK_FASTCALL PDNetHostFinishGame(tNet_game_details* pDetails);
 
 extern void C2_HOOK_FASTCALL PDNetLeaveGame(void);
 
@@ -181,6 +181,8 @@ extern void C2_HOOK_FASTCALL PDExtractDirectory(char* pDest, const char* pPath);
 extern void C2_HOOK_FASTCALL PDS3ReleaseSound(tS3_descriptor* pSound_descriptor);
 
 extern int C2_HOOK_FASTCALL PDS3UpdateChannelFrequency(tS3_channel* pChannel);
+
+extern int C2_HOOK_FASTCALL S3PlaySample(tS3_channel* pChannel, tS3_descriptor* pDesc);
 
 extern tS3_error_codes C2_HOOK_FASTCALL PDS3StartMidiChannel(tS3_channel* pChannel);
 

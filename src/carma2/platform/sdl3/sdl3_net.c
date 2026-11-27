@@ -199,7 +199,7 @@ int PDNetJoinGame(tNet_game_details* pGame_details, const char *pName) {
     return 0;
 }
 
-void PDNetHostFinishGame(void) {
+void PDNetHostFinishGame(tNet_game_details* pDetails) {
 
     dr_dprintf("PDNetHostFinishGame()");
 }
