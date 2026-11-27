@@ -1982,7 +1982,12 @@ void* C2_HOOK_FASTCALL GetSplashIndex(tPhysics_object* pObject) {
     return NULL;
 }
 
-// ClearSplashes
+// STUB: CARMA2_HW 0x004fee70
+// STUB: CARMA2_SW 0x004fa750
+// STUB: CARMA2_CHEAT 0x00504b10
+void C2_HOOK_FASTCALL ClearSplashes(tPhysics_object* pObject) {
+    NOT_IMPLEMENTED();
+}
 
 // FUNCTION: CARMA2_HW 0x004fef40
 // FUNCTION: CARMA2_SW 0x004fa820

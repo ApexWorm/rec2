@@ -286,7 +286,7 @@ extern void C2_HOOK_FASTCALL ClearSplashReplay(uintptr_t pObject);
 
 extern void* C2_HOOK_FASTCALL GetSplashIndex(tPhysics_object* pObject);
 
-// ClearSplashes
+extern void C2_HOOK_FASTCALL ClearSplashes(tPhysics_object* pObject);
 
 extern void C2_HOOK_FASTCALL AdjustSplashReplay(void* pObject, int pType, float pWater_density, br_vector3* pNormal, br_bounds3* pBounds);
 
