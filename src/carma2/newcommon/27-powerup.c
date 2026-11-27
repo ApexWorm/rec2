@@ -493,8 +493,8 @@ void C2_HOOK_FASTCALL InitMineShit(void) {
         gShit_mines[i].collision_info->uid = i;
         gShit_mines[i].collision_info->flags_0x238 = 0x40;
         gShit_mines[i].collision_info->owner = &gShit_mines[i];
-        BrMatrix34Translate(&gShit_mines[i].collision_info->transform_matrix, 0.f, 0.f, 0.f);
-        BrMatrix34Translate(&gShit_mines[i].collision_info->actor->t.t.mat, 0.f, 0.f, 0.f);
+        BrMatrix34Translate(&gShit_mines[i].collision_info->transform_matrix, 0.0f, 0.0f, 0.0f);
+        BrMatrix34Translate(&gShit_mines[i].collision_info->actor->t.t.mat, 0.0f, 0.0f, 0.0f);
     }
 }
 
