@@ -54,11 +54,6 @@ br_pixelmap* gShade_list[16];
 br_pixelmap** gShade_table = &gShade_list[8];
 #endif
 
-// GLOBAL: CARMA2_HW 0x006b78e0
-// GLOBAL: CARMA2_SW 0x006ae5c0
-// GLOBAL: CARMA2_CHEAT 0x006bef80
-tSmash_vertex gSmash_glass_fragments[200];
-
 // GLOBAL: CARMA2_HW 0x006a82b4
 // GLOBAL: CARMA2_SW 0x006a2314
 // GLOBAL: CARMA2_CHEAT 0x006afe2c
@@ -73,6 +68,11 @@ int gSpark_flags;
 // GLOBAL: CARMA2_SW 0x006a3ffc
 // GLOBAL: CARMA2_CHEAT 0x006b2124
 br_pixelmap* gIt_shade_table;
+
+// GLOBAL: CARMA2_HW 0x006aa5b0
+// GLOBAL: CARMA2_SW 0x006a4000
+// GLOBAL: CARMA2_CHEAT 0x006b2128
+int gAFE_color_cycle;
 
 // GLOBAL: CARMA2_HW 0x006aa590
 // GLOBAL: CARMA2_SW 0x006a3fe0
@@ -606,10 +606,36 @@ void C2_HOOK_FASTCALL DoSolidGraniteThing(tCar_spec* pCar) {
 }
 
 #ifdef REC2_HW
-// STUB: CARMA2_HW 0x004f9180
-// STUB: CARMA2_CHEAT 0x004fee20
+// FUNCTION: CARMA2_HW 0x004f9180
+// FUNCTION: CARMA2_CHEAT 0x004fee20
 void C2_HOOK_CDECL DoTrueColModelThing(br_actor* pActor, br_model* pModel, br_material* pMaterial, void* pArg4, br_uint_8 pArg5, int pArg6) {
-    NOT_IMPLEMENTED();
+    int i;
+    int j;
+    int time;
+    br_vertex* vertex;
+
+    if (gAFE_color_cycle) {
+        time = GetTotalTime();
+        if (pModel != NULL) {
+            time >>= 1;
+            for (i = 0; i < pModel->prepared->ngroups; i++) {
+                for (j = 0; j < pModel->prepared->groups[i].nvertices; j++) {
+                    vertex = &pModel->vertices[pModel->prepared->groups[i].vertex_user[j]];
+                    if (vertex != NULL) {
+#define SAWTOOTH(V, PERIOD) ((V) & (PERIOD - 1)) < 0x100 ? ((V) & (PERIOD - 1)) : 0x3ff - ((V) & (PERIOD - 1));
+                        vertex->red = SAWTOOTH(time,         0x4000);
+                        vertex->grn = SAWTOOTH(time + 0x100, 0x0400);
+                        vertex->blu = SAWTOOTH(time - 0x200, 0x0400);
+#undef SAWTOOTH
+                    }
+                }
+            }
+        }
+        if (pModel->flags & BR_MODF_UPDATEABLE) {
+            BrModelUpdate(pModel, BR_MODU_VERTICES);
+        }
+    }
+    BrZsModelRender(pActor, pModel, pMaterial, pArg4, pArg5, BrOnScreenCheck(&pModel->bounds), 0);
 }
 
 // FUNCTION: CARMA2_HW 0x004f95e0
