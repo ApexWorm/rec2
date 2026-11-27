@@ -1716,7 +1716,63 @@ void C2_HOOK_FASTCALL AddNonCar(tNon_car_spec* pNon_car, const tDriver* pDriver)
 
 // DoDetaching
 
-// FlapBit
+// FUNCTION: CARMA2_HW 0x004384c0
+// FUNCTION: CARMA2_SW 0x004384f0
+// FUNCTION: CARMA2_CHEAT 0x004386d0
+intptr_t C2_HOOK_FASTCALL FlapBit(br_actor* pActor, br_matrix34* pMat, void* pContext) {
+    tCar_crush_buffer_entry* crush_data;
+    tFlapBit_arg* arg;
+    tCar_crush_flap_data* flap_data;
+    br_vector3* hinge;
+    br_vector3* pivot;
+    br_angle old_angle;
+    br_vector3 arm;
+    br_vector3 arm_world;
+    tUser_crush_data* user_crush;
+    br_angle angle;
+    br_vector3 axis;
+
+    arg = pContext;
+    user_crush = pActor->user;
+    if (user_crush != NULL) {
+        crush_data = user_crush->crush_data;
+        if (crush_data != NULL) {
+            flap_data = crush_data->flap_data;
+            if (flap_data != NULL && !flap_data->kev_o_flap && flap_data->field_0x0) {
+                hinge = &user_crush->models[0]->vertices[flap_data->hinge0].p;
+                BrVector3Sub(&axis, &user_crush->models[0]->vertices[flap_data->hinge1].p, hinge);
+                BrVector3Normalise(&axis, &axis);
+                BrVector3Sub(&arm, &user_crush->models[0]->vertices[flap_data->hinge2].p, hinge);
+                BrVector3Normalise(&arm, &arm);
+                BrMatrix34ApplyV(&arm_world, &arm, pMat);
+                angle = BrRadianToAngle(atan2((arg->force.v[0] * (axis.v[2] * arm_world.v[1] - arm_world.v[2] * axis.v[1])
+                        + ((arm_world.v[2] * axis.v[0]) - arm_world.v[0] * axis.v[2]) * arg->force.v[1]
+                        + ((axis.v[1] * arm_world.v[0]) - arm_world.v[1] * axis.v[0]) * arg->force.v[2])
+                    * gFlap_inertia_fudge_biscuit,
+                    crush_data->field_0x24));
+                if (angle != 0) {
+                    old_angle = flap_data->field_0x4;
+                    flap_data->field_0x4 += angle;
+                    if ((br_angle)(flap_data->field_0x4 - flap_data->field_0x2) > flap_data->field_0x8) {
+                        if ((br_angle)(flap_data->field_0x4 - flap_data->field_0x6) < 0x3ffc) {
+                            flap_data->field_0x4 = flap_data->field_0x6;
+                        } else {
+                            flap_data->field_0x4 = flap_data->field_0x2;
+                        }
+                    }
+                    BrMatrix34Translate(&pActor->t.t.mat, -hinge->v[0], -hinge->v[1], -hinge->v[2]);
+                    BrMatrix34PostRotate(&pActor->t.t.mat, flap_data->field_0x4, &axis);
+                    pivot = &((tUser_crush_data*)pActor->parent->user)->models[0]->vertices[flap_data->field_0xc].p;
+                    BrMatrix34PostTranslate(&pActor->t.t.mat, pivot->v[0], pivot->v[1], pivot->v[2]);
+                    if (old_angle != flap_data->field_0x4) {
+                        AddFlapToPipingSession(pActor, flap_data->field_0x4 - old_angle);
+                    }
+                }
+            }
+        }
+    }
+    return 0;
+}
 
 // FlapBits
 
