@@ -437,17 +437,17 @@ int C2_HOOK_FASTCALL PipeObjectPosition(tPhysics_object* pObject, void* pContext
 }
 
 void C2_HOOK_FASTCALL AddCarToPipingSession(int pCar_id, br_matrix34* pMatrix, br_vector3* pV, float pSpeedo_speed, float pRevs, int pGear, int pFrame_collision_flag, undefined4 pArg7) {
-    tPipe_car_chunk chunk;
+    tPipe_chunk_car chunk;
     chunk.revs = (int)pRevs / 10;
     chunk.frame_collision_flag = pFrame_collision_flag;
     chunk.gear = pGear + 1;
 
     ARAddVariedDataToSession(ePipe_chunk_car, (uintptr_t)pCar_id, 5,
-        SIZE_OFFSET_PIPING(tPipe_car_chunk, mat), pMatrix,
-        SIZE_OFFSET_PIPING(tPipe_car_chunk, v), pV,
-        SIZE_OFFSET_PIPING(tPipe_car_chunk, speedo_speed), (int)(pSpeedo_speed * 468100.f),
-        SIZE_OFFSET_PIPING(tPipe_car_chunk, flags), chunk.flags,
-        SIZE_OFFSET_PIPING(tPipe_car_chunk, field_0x40), chunk.flags);
+        SIZE_OFFSET_PIPING(tPipe_chunk_car, mat), pMatrix,
+        SIZE_OFFSET_PIPING(tPipe_chunk_car, v), pV,
+        SIZE_OFFSET_PIPING(tPipe_chunk_car, speedo_speed), (int)(pSpeedo_speed * 468100.f),
+        SIZE_OFFSET_PIPING(tPipe_chunk_car, flags), chunk.flags,
+        SIZE_OFFSET_PIPING(tPipe_chunk_car, field_0x40), chunk.flags);
 }
 
 void C2_HOOK_FASTCALL AddDamageToPipingSession(int pCar_id, tU8 *pDamage_deltas) {
@@ -686,7 +686,7 @@ void C2_HOOK_FASTCALL PipeSingleSound(tS3_outlet* pOutlet, int pSound, tS3_volum
         if (pPosition == NULL) {
             pPosition = &gZero_vector__smash;
         }
-        ARDoSingleVariedSession(ePipe_chunk_single_sound, pSound, 4,
+        ARDoSingleVariedSession(ePipe_chunk_sound, pSound, 4,
             SIZE_OFFSET_PIPING(tPipe_shunk_single_sound, pitch),           pPitch,
             SIZE_OFFSET_PIPING(tPipe_shunk_single_sound, position),        pPosition,
             SIZE_OFFSET_PIPING(tPipe_shunk_single_sound, outlet),          (tS16)GetIndexFromOutlet(pOutlet),

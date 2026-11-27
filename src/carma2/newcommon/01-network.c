@@ -15,6 +15,7 @@
 #include "32-spark.h"
 #include "47-win95net.h"
 #include "53-controls.h"
+#include "68-timer.h"
 #include "platform.h"
 #include "globvars.h"
 #include "globvrpb.h"
@@ -950,11 +951,16 @@ void C2_HOOK_FASTCALL NetReallyDisposeMessage(tNet_message* pMessage) {
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x0049ff70
-// STUB: CARMA2_SW 0x0049c0f0
-// STUB: CARMA2_CHEAT 0x004a0aa0
+// FUNCTION: CARMA2_HW 0x0049ff70
+// FUNCTION: CARMA2_SW 0x0049c0f0
+// FUNCTION: CARMA2_CHEAT 0x004a0aa0
 tNet_message* C2_HOOK_FASTCALL NetGetNextMessage(tNet_game_details* pDetails, void** pSender_address) {
-    NOT_IMPLEMENTED();
+    tNet_message* message;
+
+    Timers_Push(TIMER_LLR);
+    message = PDNetGetNextMessage(pDetails, pSender_address);
+    Timers_Pop(TIMER_LLR);
+    return message;
 }
 
 #ifdef REC2_MATCHING
