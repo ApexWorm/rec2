@@ -1676,7 +1676,7 @@ void C2_HOOK_FASTCALL ReceivedMine(tNet_message_chunk* pContents) {
             if (player >= 0 && player < gNumber_of_net_players) {
                 PositionMine(mine, mine->field_0x30);
             } else {
-                BrMatrix34Translate(&mine->collision_info->transform_matrix, 1000.f, 1000.f, 1000.f);
+                BrMatrix34Translate(&mine->collision_info->transform_matrix, 1000.0f, 1000.0f, 1000.0f);
                 BrMatrix34Copy(&mine->collision_info->actor->t.t.mat, &mine->collision_info->transform_matrix);
             }
             MineSound(mine);
