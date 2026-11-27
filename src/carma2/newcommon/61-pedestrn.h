@@ -166,7 +166,7 @@ extern int C2_HOOK_FASTCALL SetCollisionObject(tPed_character_instance* pCharact
 
 extern int C2_HOOK_FASTCALL FindAndSetSeveredPhysicsSet(tPed_character_instance* pCharacter);
 
-// SetSeveredLimbObject
+extern tPhysics_object* C2_HOOK_FASTCALL SetSeveredLimbObject(tPed_character_instance* pCharacter, int pBone_index, int pArg3, int pArg4);
 
 extern int C2_HOOK_FASTCALL MakeCharacterCollideworthy2(tPed_character_instance* pCharacter, int pArg2, int pArg3, int pArg4);
 
