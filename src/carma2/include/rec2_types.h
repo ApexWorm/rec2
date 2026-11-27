@@ -2171,7 +2171,6 @@ typedef struct {
 typedef struct {
     br_vertex* vertices[3];
     br_vector3 points[3];
-    undefined4 field_0x30; /* FIXME: unknown, the original indexes this buffer in steps of 13 dwords */
 } tFunk_temp_buffer;
 
 // FIXME: PROBABLY WRONG!!!!!!
