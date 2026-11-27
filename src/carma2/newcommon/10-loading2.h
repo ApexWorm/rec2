@@ -17,6 +17,7 @@ extern int gKey_map_index;
 
 extern const char* gPedTextTxtPath;
 extern int gGroove_funk_offset;
+extern tCar_spec* gCurrent_car_spec;
 extern const char* gNet_avail_names[4];
 extern tHeadup_info gHeadup_image_info[45];
 extern br_pixelmap* gHeadup_images[45];
