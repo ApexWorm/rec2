@@ -340,7 +340,7 @@ int C2_HOOK_FASTCALL EliminateFaces(tPhysics_object* pObject, tPhysics_shape* pS
                 d = BrVector3Dot(&face->v[0], (br_vector3*)mat->m[axis]);
                 limit = bounds->min.v[axis] - 0.005f + offset;
                 if (d >= limit) {
-                    limit = bounds->max.v[axis] + offset - -0.005f;
+                    limit = bounds->max.v[axis] + offset + 0.005f;
                     if (d > limit
                         && BrVector3Dot(&face->v[1], (br_vector3*)mat->m[axis]) > limit
                         && BrVector3Dot(&face->v[2], (br_vector3*)mat->m[axis]) > limit) {
