@@ -1273,6 +1273,7 @@ int C2_HOOK_CDECL FUN_10004280(int count, int width, int height) {
         surface_desc.ddsCaps.dwCaps = DDSCAPS_SYSTEMMEMORY | DDSCAPS_TEXTURE;
         surface_desc.dwFlags = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH | DDSD_PIXELFORMAT;
         if (IDirectDraw_CreateSurface(gDirectDraw, &surface_desc, &temp_surface, NULL) != DD_OK) {
+            NOT_IMPLEMENTED(); /* This should succeed */
             return -1;
         }
         if (IDirectDraw_QueryInterface(temp_surface, &IID_IDirect3DTexture2, (LPVOID)&temp_texture) != DD_OK) {
