@@ -4363,7 +4363,7 @@ typedef struct tCrush_net_semi_detach_bit_list_item {
 typedef struct tCrush_net_full_detach_bit_list_item {
     tCar_spec* car;
     tPhysics_object* object;
-    undefined field_0x8[0xc - 0x8];
+    tU32 time;
 } tCrush_net_full_detach_bit_list_item;
 
 typedef struct tCrush_net_reattach_bit_list_item {
@@ -5462,6 +5462,7 @@ typedef enum {
     eNet_message_chunk_type_oil_spill = 0x1f,
     eNet_message_chunk_type_car_crush = 0x20,
     eNet_message_chunk_type_semi_detach_bit = 0x24,
+    eNet_message_chunk_type_fully_detach_bit = 0x25,
     eNet_message_chunk_type_reattach_bit = 0x26,
     eNet_message_chunk_type_reattach_all_bits = 0x2b,
     eNet_message_chunk_type_toggle_doors = 0x2c,
@@ -5690,6 +5691,7 @@ typedef union {
     tNet_message_chunk_oil_spill oil_spill; /* type = 0x1f*/
     tNet_message_car_crush car_crush; /* type = 0x20 */
     tNet_message_chunk_semi_detach_bit semi_detach_bit; /* type = 0x24 */
+    tNet_message_chunk_semi_detach_bit fully_detach_bit; /* type = 0x25, value unused */
     tNet_message_chunk_reattach_bit reattach_bit; /* type = 0x26 */
     tNet_message_chunk_reattach_all_bits reattach_all_bits; /* type = 0x2b */
     tNet_message_chunk_toggle_doors toggle_doors; /* type = 0x2c */

@@ -1585,7 +1585,20 @@ void C2_HOOK_FASTCALL ReAttachBit(tCar_spec* pCar_spec, br_actor* pActor_arg2, b
 
 // CentreModelOnPoint
 
-// SemiDetachBit
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_HW 0x00436d60
+// STUB: CARMA2_SW 0x00436d90
+// STUB: CARMA2_CHEAT 0x00436f60
+tPhysics_object* C2_HOOK_FASTCALL SemiDetachBit(tCar_spec* pCar, br_actor* pActor, float pArg3, int* pArg4, br_vector3* pP1, br_bounds3* pBounds, br_vector3* pP2, br_vector3* pP3) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // FUNCTION: CARMA2_HW 0x0042dbd0
 // FUNCTION: CARMA2_SW 0x0042dc40
@@ -1953,7 +1966,29 @@ void C2_HOOK_FASTCALL FullyDetachBit(tCar_spec* pCar, tPhysics_object* pObject) 
     }
 }
 
-// SendFullyDetachBit
+// FUNCTION: CARMA2_HW 0x004314b0
+// FUNCTION: CARMA2_SW 0x004314e0
+// FUNCTION: CARMA2_CHEAT 0x00431680
+void C2_HOOK_FASTCALL SendFullyDetachBit(tCar_spec* pCar, tPhysics_object* pObject) {
+    tNet_message* message;
+    br_vector3 p1;
+    br_vector3 p2;
+    br_vector3 p3;
+    br_bounds3 bounds;
+
+    message = NetBuildGuaranteedMessage(eNet_message_chunk_type_fully_detach_bit, 0);
+    message->contents.fully_detach_bit.player = NetPlayerFromCar(pCar)->ID;
+    message->contents.fully_detach_bit.id = pObject->uid;
+    message->contents.fully_detach_bit.time = gPHIL_last_physics_tick + 120;
+    if (GetSDBJointPosAndBounds(&p1, &p2, &p3, &bounds, pObject->actor) == 0) {
+        CompressVector3(&message->contents.fully_detach_bit.point_1, &p1, -10.0f, 10.0f);
+        CompressVector3(&message->contents.fully_detach_bit.point_2, &p2, -10.0f, 10.0f);
+        CompressVector3(&message->contents.fully_detach_bit.point_3, &p3, -10.0f, 10.0f);
+        CompressVector3(&message->contents.fully_detach_bit.bounds_min, &bounds.min, -10.0f, 10.0f);
+        CompressVector3(&message->contents.fully_detach_bit.bounds_max, &bounds.max, -10.0f, 10.0f);
+        NetGuaranteedSendMessageToEverybody(gCurrent_net_game, message, NULL);
+    }
+}
 
 // DoFullyDetaching
 
@@ -2762,15 +2797,133 @@ void C2_HOOK_FASTCALL ReceivedDetachBit(tNet_message_chunk* pContents) {
     gCount_net_crush_detach_list += 1;
 }
 
-// SemiDetachedBitObjectFromID
+inline tPhysics_object* C2_HOOK_FASTCALL SemiDetachedBitObjectFromID(tCar_spec* pCar, tU8 pID) {
+    tCar_crush_spec* crush_spec;
+    tPhysics_object* object;
+    int i;
 
-// ReceivedFullyDetachBit
+    crush_spec = pCar->car_crush_spec;
+    if (crush_spec != NULL) {
+        for (i = 0; i < crush_spec->field_0x270; i++) {
+            object = crush_spec->field_0x274[i].field_0x8;
+            if (object->uid == pID) {
+                return object;
+            }
+        }
+    }
+    return NULL;
+}
 
-// DetachedBitFromID
+// FUNCTION: CARMA2_HW 0x0043cbd0
+// FUNCTION: CARMA2_SW 0x0043cc20
+// FUNCTION: CARMA2_CHEAT 0x0043ce30
+void C2_HOOK_FASTCALL ReceivedFullyDetachBit(tNet_message_chunk* pContents) {
+    tCar_spec* car;
+    tPhysics_object* object;
+    br_actor* actor;
+    int i;
+    int unused;
+    br_vector3 p1;
+    br_vector3 p2;
+    br_vector3 p3;
+    br_bounds3 bounds;
 
-// SemiDetachedBitFromID
+    if (gCount_net_crush_full_detach_bit_list == REC2_ASIZE(gNet_crush_full_detach_bit_list)) {
+        return;
+    }
+    car = NetCarFromPlayerID(pContents->fully_detach_bit.player);
+    if (car == NULL) {
+        return;
+    }
+    object = SemiDetachedBitObjectFromID(car, pContents->fully_detach_bit.id);
+    if (object == NULL) {
+        actor = AttachedBitFromID(car, pContents->fully_detach_bit.id);
+        if (actor == NULL) {
+            return;
+        }
+        ExpandVector3(&p1, &pContents->fully_detach_bit.point_1, -10.0f, 10.0f);
+        ExpandVector3(&p2, &pContents->fully_detach_bit.point_2, -10.0f, 10.0f);
+        ExpandVector3(&p3, &pContents->fully_detach_bit.point_3, -10.0f, 10.0f);
+        ExpandVector3(&bounds.min, &pContents->fully_detach_bit.bounds_min, -10.0f, 10.0f);
+        ExpandVector3(&bounds.max, &pContents->fully_detach_bit.bounds_max, -10.0f, 10.0f);
+        object = SemiDetachBit(car, actor, 0.0f, &unused, &p1, &bounds, &p2, &p3);
+        if (object == NULL) {
+            return;
+        }
+    }
+    for (i = 0; i < gCount_net_crush_full_detach_bit_list; i++) {
+        if (gNet_crush_full_detach_bit_list[i].object == object) {
+            return;
+        }
+    }
+    gNet_crush_full_detach_bit_list[gCount_net_crush_full_detach_bit_list].car = car;
+    gNet_crush_full_detach_bit_list[gCount_net_crush_full_detach_bit_list].object = object;
+    gNet_crush_full_detach_bit_list[gCount_net_crush_full_detach_bit_list].time = pContents->fully_detach_bit.time;
+    gCount_net_crush_full_detach_bit_list += 1;
+}
 
-// ReceivedReAttachBit
+inline br_actor* C2_HOOK_FASTCALL DetachedBitFromID(tCar_spec* pCar, tU8 pID) {
+    tCar_crush_spec* crush_spec;
+    int i;
+
+    crush_spec = pCar->car_crush_spec;
+    if (crush_spec != NULL) {
+        for (i = 0; i < crush_spec->field_0x2b0; i++) {
+            if (crush_spec->field_0x2b4[i].field_0x8->uid == pID) {
+                return crush_spec->field_0x2b4[i].field_0x0;
+            }
+        }
+    }
+    return NULL;
+}
+
+inline br_actor* C2_HOOK_FASTCALL SemiDetachedBitFromID(tCar_spec* pCar, tU8 pID) {
+    tCar_crush_spec* crush_spec;
+    int i;
+
+    crush_spec = pCar->car_crush_spec;
+    if (crush_spec != NULL) {
+        for (i = 0; i < crush_spec->field_0x270; i++) {
+            if (crush_spec->field_0x274[i].field_0x8->uid == pID) {
+                return crush_spec->field_0x274[i].field_0x0;
+            }
+        }
+    }
+    return NULL;
+}
+
+// FUNCTION: CARMA2_HW 0x0043cd60
+// FUNCTION: CARMA2_SW 0x0043cdb0
+// FUNCTION: CARMA2_CHEAT 0x0043cfc0
+void C2_HOOK_FASTCALL ReceivedReAttachBit(tNet_message_chunk* pContents) {
+    tCar_spec* car;
+    br_actor* actor;
+    int i;
+
+    if (gCount_net_crush_reattach_bit_list == REC2_ASIZE(gNet_crush_reattach_bit_list)) {
+        return;
+    }
+    car = NetCarFromPlayerID(pContents->reattach_bit.player);
+    if (car == NULL) {
+        return;
+    }
+    actor = DetachedBitFromID(car, pContents->reattach_bit.uid);
+    if (actor == NULL) {
+        actor = SemiDetachedBitFromID(car, pContents->reattach_bit.uid);
+        if (actor == NULL) {
+            return;
+        }
+    }
+    for (i = 0; i < gCount_net_crush_reattach_bit_list; i++) {
+        if (gNet_crush_reattach_bit_list[i].actor == actor) {
+            return;
+        }
+    }
+    gNet_crush_reattach_bit_list[gCount_net_crush_reattach_bit_list].car = car;
+    gNet_crush_reattach_bit_list[gCount_net_crush_reattach_bit_list].actor = actor;
+    gNet_crush_reattach_bit_list[gCount_net_crush_reattach_bit_list].time = pContents->reattach_bit.time;
+    gCount_net_crush_reattach_bit_list += 1;
+}
 
 // FUNCTION: CARMA2_HW 0x0043ce60
 // FUNCTION: CARMA2_SW 0x0043ceb0
