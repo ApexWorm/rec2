@@ -394,8 +394,10 @@ void C2_HOOK_FASTCALL PDBuildAppPath(char *pThe_path) {
 // FUNCTION: CARMA2_SW 0x005149a0
 // FUNCTION: CARMA2_CHEAT 0x00520690
 void C2_NORETURN C2_HOOK_FASTCALL PDFatalError(const char *pThe_str) {
+#ifdef REC2_HW
     const char *str1;
     const char *str2;
+#endif
 #ifdef REC2_CHEAT
     time_t now;
     FILE* f;
