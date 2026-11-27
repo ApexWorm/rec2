@@ -622,9 +622,11 @@ void C2_HOOK_CDECL DoTrueColModelThing(br_actor* pActor, br_model* pModel, br_ma
                 for (j = 0; j < pModel->prepared->groups[i].nvertices; j++) {
                     vertex = &pModel->vertices[pModel->prepared->groups[i].vertex_user[j]];
                     if (vertex != NULL) {
-                        vertex->red = (time & 0x3fff) < 0x100 ? (time & 0x3fff) : 0x3ff - (time & 0x3fff);
-                        vertex->grn = ((time + 0x100) & 0x3ff) < 0x100 ? ((time + 0x100) & 0x3ff) : 0x3ff - ((time + 0x100) & 0x3ff);
-                        vertex->blu = ((time - 0x200) & 0x3ff) < 0x100 ? ((time - 0x200) & 0x3ff) : 0x3ff - ((time - 0x200) & 0x3ff);
+#define SAWTOOTH(V, PERIOD) ((V) & (PERIOD - 1)) < 0x100 ? ((V) & (PERIOD - 1)) : 0x3ff - ((V) & (PERIOD - 1));
+                        vertex->red = SAWTOOTH(time,         0x4000);
+                        vertex->grn = SAWTOOTH(time + 0x100, 0x0400);
+                        vertex->blu = SAWTOOTH(time - 0x200, 0x0400);
+#undef SAWTOOTH
                     }
                 }
             }
