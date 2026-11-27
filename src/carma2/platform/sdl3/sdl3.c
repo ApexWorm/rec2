@@ -409,11 +409,13 @@ int PDFileUnlock(const char *pThe_path) {
 #endif
 }
 
-void PDEnumPath(const char* path, tEnumPathCallback pCallback, void* data) {
+int PDEnumPath(const char* path, tEnumPathCallback pCallback, void* data) {
     int count;
-    int i;
+    int callback_res;
     char **files;
+    int i;
 
+    callback_res = 0;
     files = SDL_GlobDirectory(path, "*.*", 0, &count);
     for (i = 0; i < count; i++) {
         tPath_name found_path;
@@ -429,11 +431,13 @@ void PDEnumPath(const char* path, tEnumPathCallback pCallback, void* data) {
         if (info.type != SDL_PATHTYPE_FILE) {
             continue;
         }
-        if (pCallback(found_path, data) != 0) {
+        callback_res = pCallback(found_path, data);
+        if (pCallback != 0) {
             break;
         }
     }
     SDL_free(files);
+    return callback_res;
 }
 
 int PDmkdir(const char *path) {
