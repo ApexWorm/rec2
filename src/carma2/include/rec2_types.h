@@ -615,7 +615,7 @@ typedef struct {
     tU32 length;
     int (C2_HOOK_FASTCALL * calc_length)(tPipe_chunk* pChunk);
     void (C2_HOOK_FASTCALL * apply)(tPipe_chunk** pChunk);
-    undefined4 flags;
+    int flags;
     void (C2_HOOK_FASTCALL * undo)(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk);
 } tReplay_callback;
 

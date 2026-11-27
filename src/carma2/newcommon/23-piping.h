@@ -63,7 +63,7 @@ extern tU32 C2_HOOK_FASTCALL LengthOfSession(tPipe_session* pSession);
 
 extern void C2_HOOK_FASTCALL ARAdvanceChunkPtr(tU8** pChunk, int pType);
 
-// PipingFrameReset
+extern void C2_HOOK_FASTCALL PipingFrameReset(void);
 
 extern int C2_HOOK_FASTCALL ARPipeSearchForwards(void);
 
@@ -97,15 +97,15 @@ extern tU8* C2_HOOK_FASTCALL ARGetPipePlayPtr(void);
 
 extern void C2_HOOK_FASTCALL ARSetPipePlayPtr(tU8* pPtr);
 
-// ApplyPipedSession
+extern int C2_HOOK_FASTCALL ApplyPipedSession(tU8** pPtr);
 
 extern int C2_HOOK_FASTCALL MoveSessionPointerBackOne(tU8** pPtr);
 
 extern int C2_HOOK_FASTCALL MoveSessionPointerForwardOne(tU8** pPtr);
 
-// FindPreviousChunk
+extern tPipe_chunk* C2_HOOK_FASTCALL FindPreviousChunk(tU8* pPtr, int pType, uintptr_t pIndex);
 
-// UndoPipedSession
+extern int C2_HOOK_FASTCALL UndoPipedSession(tU8** pPtr);
 
 // ARScanBuffer
 
@@ -113,7 +113,7 @@ extern int C2_HOOK_FASTCALL MoveSessionPointerForwardOne(tU8** pPtr);
 
 extern int C2_HOOK_FASTCALL SoundTimeout(tU32 pTime);
 
-// ScanAndPlaySoundsToBe
+extern void C2_HOOK_FASTCALL ScanAndPlaySoundsToBe(tU8* pPtr, tU32 pOldest_time, tU32 pYoungest_time);
 
 extern tU32 C2_HOOK_FASTCALL ARGetStartTime(void);
 
