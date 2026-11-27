@@ -63,7 +63,7 @@ extern void C2_HOOK_FASTCALL PDSetPaletteEntries(br_pixelmap* pPalette, int pFir
 
 extern void C2_HOOK_FASTCALL PDSetPalette(br_pixelmap *pixelmap);
 
-extern void C2_HOOK_FASTCALL PDEnumPath(const char* path, tEnumPathCallback pCallback, void* data);
+extern int C2_HOOK_FASTCALL PDEnumPath(const char* path, tEnumPathCallback pCallback, void* data);
 
 extern int C2_HOOK_FASTCALL PDmkdir(const char* path);
 
@@ -107,7 +107,7 @@ extern int C2_HOOK_FASTCALL PDNetGetHeaderSize(void);
 
 extern int C2_HOOK_FASTCALL PDNetJoinGame(tNet_game_details* pGame_details, const char* pName);
 
-extern void C2_HOOK_FASTCALL PDNetHostFinishGame(void);
+extern void C2_HOOK_FASTCALL PDNetHostFinishGame(tNet_game_details* pDetails);
 
 extern void C2_HOOK_FASTCALL PDNetLeaveGame(void);
 
