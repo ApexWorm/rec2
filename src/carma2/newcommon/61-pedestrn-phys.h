@@ -191,7 +191,7 @@ extern int C2_HOOK_FASTCALL DamagePedestrian(tPedestrian* pPed, int pDamage, int
 
 // DoPedAnnihilator
 
-// RepulseIt
+extern int C2_HOOK_FASTCALL RepulseIt(tPedestrian* pPed, tCar_spec* pCar, float pDistance_squared, tU32 pTime, void* pContext);
 
 extern int C2_HOOK_FASTCALL DoPedestrianRepulsifictor(tCar_spec* pCar, float pArg2, float pArg3, float pArg4, float pArg5);
 

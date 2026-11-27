@@ -1422,13 +1422,70 @@ int C2_HOOK_FASTCALL DoPedAnnihilator(tCar_spec* pCar, float pRange_squared) {
     return DoToPeds(pCar, 1, pRange_squared, 1, NULL, BastardIt);
 }
 
-// RepulseIt
+// FUNCTION: CARMA2_HW 0x004ce330
+// FUNCTION: CARMA2_SW 0x004caa30
+// FUNCTION: CARMA2_CHEAT 0x004d3ec0
+int C2_HOOK_FASTCALL RepulseIt(tPedestrian* pPed, tCar_spec* pCar, float pDistance_squared, tU32 pTime, void* pContext) {
+    br_vector4* params;
+    br_vector3 dir;
+    br_scalar factor;
+    tPhysics_object* root;
 
-// STUB: CARMA2_HW 0x004ce280
-// STUB: CARMA2_SW 0x004ca980
-// STUB: CARMA2_CHEAT 0x004d3e10
+    params = pContext;
+    pPed->field_0x0c->field_0xc0 = pCar;
+    DamagePedestrian(pPed, IRandomBetween(75, 200), 0x5b, 0x5b, NULL);
+    if (!(pPed->character->field_0x14 & 0x4)) {
+        SetCharacterPhysicsLevelAR(pPed->character, 5);
+    }
+    BrVector3Sub(&dir, &pPed->pos, &pCar->pos);
+    factor = (params->v[3] - pDistance_squared) / params->v[3] * 0.068
+        / pPed->character->personality->form->simple_physicing[(tS8)pPed->character->field_0x5].collision_info->M;
+    BrVector3Normalise(&dir, &dir);
+    if (fabs(dir.v[1]) < 0.1) {
+        dir.v[1] = params->v[2];
+    }
+    BrVector3Scale(&dir, &dir, factor * params->v[0]);
+    if (pPed->character->field_0x14 & 0x1) {
+        root = pPed->character->personality->form->simple_physicing[(tS8)pPed->character->field_0x5].collision_info;
+    } else {
+        root = GetRootObject(pPed->character);
+    }
+    BrVector3Accumulate(&root->v, &dir);
+    factor = params->v[1] * factor;
+    dir.v[0] = FRandomPosNeg(factor);
+    dir.v[1] = FRandomPosNeg(factor);
+    dir.v[2] = FRandomPosNeg(factor);
+    root->disable_move_rotate = 0;
+    BrVector3Accumulate(&root->omega, &dir);
+    root->field_0x49c = gPHIL_last_physics_tick + 40;
+    NewRepulseRay(pTime, pCar, NULL, &pCar->pos, &pPed->pos, 0.03f, 0.05f);
+    pPed->field_0x0c->field_0x8c = pTime;
+    if (pCar != NULL && pCar->driver == eDriver_local_human) {
+        PipeSinglePedIncident(pPed, pCar->collision_info->actor);
+    }
+    return 0;
+}
+
+// FUNCTION: CARMA2_HW 0x004ce280
+// FUNCTION: CARMA2_SW 0x004ca980
+// FUNCTION: CARMA2_CHEAT 0x004d3e10
 int C2_HOOK_FASTCALL DoPedestrianRepulsifictor(tCar_spec* pCar, float pArg2, float pArg3, float pArg4, float pArg5) {
-    NOT_IMPLEMENTED();
+    br_vector4 params;
+
+    params.v[0] = pArg2;
+    params.v[1] = pArg3;
+    params.v[2] = pArg4;
+    params.v[3] = pArg5;
+    if (DoToPeds(pCar, 1, pArg5, 1, &params, RepulseIt)) {
+        if (pCar != NULL && pCar->driver == eDriver_local_human) {
+            DRS3StartSound(gCar_outlet, 4900);
+        } else {
+            DRS3StartSound3D(gCar_outlet, 4900, &pCar->pos, &gZero_v__car, 1, 255, 0x10000, 0x10000);
+        }
+        return 1;
+    } else {
+        return 0;
+    }
 }
 
 // CompileBurnableList
