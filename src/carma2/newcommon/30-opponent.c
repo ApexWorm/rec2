@@ -271,7 +271,7 @@ inline void C2_HOOK_FASTCALL TurnOpponentPhysicsOff(tOpponent_spec* pOpponent_sp
 // FUNCTION: CARMA2_CHEAT 0x004a8d30
 void C2_HOOK_FASTCALL ApplyOppoRenderage2(tOpponent_spec* pOpponent_spec, int pRender) {
 
-    if (gAction_replay_mode && ARGetReplayRate() < 0.f) {
+    if (gAction_replay_mode && ARGetReplayRate() < 0.0f) {
         pRender = !pRender;
     }
     pOpponent_spec->car_spec->car_master_actor->render_style = !pRender;
