@@ -421,7 +421,7 @@ void C2_HOOK_FASTCALL CreateShrapnelShower2(const br_vector3* pPosition, const b
     br_vector3 tv2;
     br_vector3 vel;
 
-    if (pStrength < 10.f) {
+    if (pStrength < 10.0f) {
         return;
     }
     if (pMaterials != NULL) {
@@ -429,7 +429,7 @@ void C2_HOOK_FASTCALL CreateShrapnelShower2(const br_vector3* pPosition, const b
     } else {
         ts = .3f;
     }
-    if (pVelocity->v[1] < 0.f) {
+    if (pVelocity->v[1] < 0.0f) {
         ts -= pVelocity->v[1];
     }
     ts2 = pDirection->v[1] * ts;
@@ -439,11 +439,11 @@ void C2_HOOK_FASTCALL CreateShrapnelShower2(const br_vector3* pPosition, const b
     vel.v[0] = pVelocity->v[0] - tv2.v[0];
     vel.v[1] = pVelocity->v[1] + ts - tv2.v[1];
     vel.v[2] = pVelocity->v[2] - tv2.v[2];
-    num = (int)(pStrength / 10.f) * 12;
+    num = (int)(pStrength / 10.0f) * 12;
     if (num > 20) {
         num = 20;
     }
-    rnd = (pStrength + 20.f) * 3.f / 200.f;
+    rnd = (pStrength + 20.0f) * 3.0f / 200.0f;
     for (i = 0; i < num; i++) {
         if (!(gShrapnel_flags & (1 << gNext_shrapnel))) {
             BrActorAdd(gNon_track_actor, gShrapnel[gNext_shrapnel].actor);
