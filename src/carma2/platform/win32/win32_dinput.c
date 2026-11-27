@@ -1213,6 +1213,9 @@ void C2_HOOK_FASTCALL Win32InitInputDevice(void) {
 tU32 C2_HOOK_FASTCALL PDGetJoystickButtonStates(void) {
     IDirectInputDevice2 *device;
     HRESULT res;
+    DIJOYSTATE device_state;
+    tU32 button_mask;
+    int i;
 
     if (gJoystick_index == -1) {
         return 0;
@@ -1223,40 +1226,35 @@ tU32 C2_HOOK_FASTCALL PDGetJoystickButtonStates(void) {
     }
     res = IDirectInputDevice2_Poll(device);
     if (FAILED(res)) {
-        switch (res) {
-        case DIERR_INPUTLOST:
-        case DIERR_NOTACQUIRED:
+        if (res == DIERR_INPUTLOST) {
             if (AcquireDInputJoystickDevice(gJoystick_index) == 0) {
-                dr_dprintf("couldn't reacquire joystick %d ", gJoystick_index);
-                return 0;
+                dr_dprintf("couldn't reacquire joystick %d\n", gJoystick_index);
             }
-            break;
-        default:
+        } else if (res == DIERR_NOTACQUIRED) {
+            if (AcquireDInputJoystickDevice(gJoystick_index) == 0) {
+                dr_dprintf("couldn't reacquire joystick %d\n", gJoystick_index);
+            }
+        } else {
             dr_dprintf("Can't poll, unknown error\n");
-            return 0;
         }
-    } else {
-        DIJOYSTATE device_state;
-        tU32 button_mask;
-        int i;
-
-        C2_HOOK_BUG_ON(sizeof(device_state) != 0x50);
-        res = IDirectInputDevice2_GetDeviceState(device, sizeof(device_state), &device_state);
-        if (FAILED(res)) {
-            if (res == DIERR_INPUTLOST) {
-                AcquireDInputJoystickDevice(gJoystick_index);
-            }
-            return 0;
-        }
-        button_mask = 0;
-        for (i = 0; i < 32; i++) {
-            if (device_state.rgbButtons[i] & 0x80) {
-                button_mask |= (1 << i);
-            }
-        }
-        return button_mask;
+        return 0;
     }
-    return 0;
+    C2_HOOK_BUG_ON(sizeof(device_state) != 0x50);
+    res = IDirectInputDevice2_GetDeviceState(gDirectInputJoystickDevices[gJoystick_index], sizeof(device_state), &device_state);
+    if (FAILED(res)) {
+        dr_dprintf("attempting to reacquire\n");
+        if (res == DIERR_INPUTLOST) {
+            AcquireDInputJoystickDevice(gJoystick_index);
+        }
+        return 0;
+    }
+    button_mask = 0;
+    for (i = 0; i < 32; i++) {
+        if (device_state.rgbButtons[i] & 0x80) {
+            button_mask |= (1 << i);
+        }
+    }
+    return button_mask;
 }
 
 // FUNCTION: CARMA2_HW 0x0045b360
