@@ -3002,13 +3002,13 @@ void C2_HOOK_FASTCALL UndoTransformType(tPipe_chunk** pChunk, tPipe_chunk* pPrev
 }
 
 // FUNCTION: CARMA2_HW 0x004ca3f0
-// FUNCTION: CARMA2_SW 0x004c6b20
-// FUNCTION: CARMA2_CHEAT 0x004cff30
 int C2_HOOK_FASTCALL CalcCrushLength(tPipe_chunk* pChunk) {
-    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk_crush, direction, 0x4);
-    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk_crush, values, 0xa);
+    br_model* model;
 
-    return offsetof(tPipe_chunk_crush, values) + pChunk->data.crush.model->nvertices * sizeof(tU16);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk, data, 0x4);
+
+    model = *(br_model**)&pChunk->data;
+    return 0xa + 2 * model->nvertices;
 }
 
 // FUNCTION: CARMA2_HW 0x004ca400
