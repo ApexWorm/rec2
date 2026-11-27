@@ -44,6 +44,7 @@ void C2_HOOK_CDECL BrStdioWarning(char* message) {
 // FUNCTION: CARMA2_CHEAT 0x00545630
 void C2_HOOK_CDECL BrStdioFailure(char* message) {
 
+    BrEnd();
     fflush(stdout);
     fputs(message, stderr);
     fputc('\n', stderr);
