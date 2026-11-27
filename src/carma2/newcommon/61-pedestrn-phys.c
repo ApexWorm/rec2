@@ -26,6 +26,7 @@
 #include "51-smash.h"
 #include "52-errors.h"
 #include "54-runtime.h"
+#include "60-phil.h"
 #include "61-pedestrn.h"
 #include "62-graphics3.h"
 #include "63-loading3.h"
@@ -1770,11 +1771,22 @@ void C2_HOOK_FASTCALL ShowActivePedCount(void) {
     NewTextHeadupSlot2(4, 0, 1000, -4, text, 0);
 }
 
-// STUB: CARMA2_HW 0x004d6880
-// STUB: CARMA2_SW 0x004d2e80
-// STUB: CARMA2_CHEAT 0x004dc440
+// FUNCTION: CARMA2_HW 0x004d6880
+// FUNCTION: CARMA2_SW 0x004d2e80
+// FUNCTION: CARMA2_CHEAT 0x004dc440
 void C2_HOOK_FASTCALL PedPreCollisionStuff(void) {
-    NOT_IMPLEMENTED();
+    tPhysics_object* object;
+    br_vector3 torque;
+
+    for (object = PHILGetFirstObject(); object != NULL; object = PHILGetNextObject(object)) {
+        if (object->owner != NULL && object->flags_0x238 == 5) {
+            // FIXME: BrVector3Scale(&torque, &object->omega, 0.04 * 0.0001 * BrVector3Length(&object->omega));
+            torque.v[0] = (br_scalar)(object->omega.v[0] * (0.04 * 0.0001 * BrVector3Length(&object->omega)));
+            torque.v[1] = (br_scalar)(object->omega.v[1] * (0.04 * 0.0001 * BrVector3Length(&object->omega)));
+            torque.v[2] = object->omega.v[2] * (br_scalar)(0.04 * 0.0001 * BrVector3Length(&object->omega));
+            ApplyDiminishingTorque(object, &torque);
+        }
+    }
 }
 
 // UpdateIfBackwardsAR

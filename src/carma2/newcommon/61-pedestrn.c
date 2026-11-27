@@ -28,18 +28,15 @@
 #include "54-runtime.h"
 #include "62-graphics3.h"
 #include "63-loading3.h"
-#include "66-tintedpoly.h"
 #include "69-sound.h"
 #include "70-packfile.h"
 #include "globvars.h"
 #include "brender/brender.h"
-#include "globvars.h"
 #include "globvrkm.h"
 #include "platform.h"
 #include "rec2_macros.h"
 
 #include "c2_math.h"
-#include "c2_stdio.h"
 #include "c2_stdlib.h"
 #include "c2_string.h"
 
@@ -486,8 +483,6 @@ int gPed_movements_count;
 // GLOBAL: CARMA2_SW 0x00695d48
 // GLOBAL: CARMA2_CHEAT 0x006a3868
 tPed_movement_spec* gPed_movements;
-
-
 
 
 // ClearOutMorphs
