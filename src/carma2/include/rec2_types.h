@@ -128,6 +128,13 @@ typedef union {
     tU32 u32;
 } tFloat_u32_union;
 
+typedef struct {
+    int left;
+    int top;
+    int right;
+    int bottom;
+} tReplay_button_rect; /* FIXME: name and fields are guesses */
+
 typedef enum {
     eEdit_mode_options = 0,
     eEdit_mode_cheat = 1,

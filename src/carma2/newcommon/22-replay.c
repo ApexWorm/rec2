@@ -52,13 +52,6 @@ tU32 gDAT_006a2360;
 // GLOBAL: CARMA2_CHEAT 0x006a9edc
 tU32 gDAT_006a2364;
 
-typedef struct {
-    int left;
-    int top;
-    int right;
-    int bottom;
-} tReplay_button_rect; /* FIXME: no shared type for this layout yet */
-
 // GLOBAL: CARMA2_HW 0x0065fbf8
 // GLOBAL: CARMA2_SW 0x0065a538
 // GLOBAL: CARMA2_CHEAT 0x00667440
@@ -340,8 +333,6 @@ inline void C2_HOOK_FASTCALL MoveToStartOfReplay(void) {
         gRecording_mouse_disabled = 0;
     }
 }
-
-extern void C2_HOOK_FASTCALL ToggleReplay(tU32* pFrame_period, tU32* pFrame_period_2);
 
 // FUNCTION: CARMA2_HW 0x004e69b0
 // FUNCTION: CARMA2_SW 0x004e28a0
