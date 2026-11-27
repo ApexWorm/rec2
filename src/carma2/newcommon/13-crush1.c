@@ -2954,7 +2954,21 @@ void C2_HOOK_FASTCALL ReceivedReAttachAllBits(tNet_message_chunk* pContents) {
 
 // SendAllDBNonCars
 
-// ReceivedDBNonCarPosition
+// FUNCTION: CARMA2_HW 0x0043d5f0
+// FUNCTION: CARMA2_SW 0x0043d640
+// FUNCTION: CARMA2_CHEAT 0x0043d870
+void C2_HOOK_FASTCALL ReceivedDBNonCarPosition(tNet_message_chunk* pContents) {
+    tCar_spec* car;
+    br_actor* actor;
+
+    car = NetCarFromPlayerID(pContents->db_non_car_position.player);
+    if (car != NULL) {
+        actor = DetachedBitFromID(car, pContents->db_non_car_position.id);
+        if (actor != NULL && gNet_mode != eNet_mode_host) {
+            BrMatrix34Copy(&actor->t.t.mat, &pContents->db_non_car_position.mat);
+        }
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x0043d670
 // FUNCTION: CARMA2_SW 0x0043d6c0

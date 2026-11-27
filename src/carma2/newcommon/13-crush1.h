@@ -528,7 +528,7 @@ extern void C2_HOOK_FASTCALL ReceivedReAttachAllBits(tNet_message_chunk* pConten
 
 // SendAllDBNonCars
 
-// ReceivedDBNonCarPosition
+extern void C2_HOOK_FASTCALL ReceivedDBNonCarPosition(tNet_message_chunk* pContents);
 
 extern void C2_HOOK_FASTCALL ReceivedToggleFlaps(tNet_message_chunk* pContents);
 

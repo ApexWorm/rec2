@@ -5556,6 +5556,13 @@ typedef struct {
 
 typedef struct {
     tNet_message_chunk_header header;
+    tPlayer_ID player;
+    tU8 id;
+    br_matrix34 mat;
+} tNet_message_chunk_db_non_car_position;
+
+typedef struct {
+    tNet_message_chunk_header header;
     int general_score;
     int scores[12];
 } tNet_message_chunk_scores;
@@ -5699,6 +5706,7 @@ typedef union {
     tNet_message_chunk_mine_explode mine_explode; /* type = 0x31 */
     tNet_message_chunk_recover recover;
     tNet_message_chunk_detach_bit detach_bit; /* type = 0x33 */
+    tNet_message_chunk_db_non_car_position db_non_car_position; /* FIXME: type unknown */
 } tNet_message_chunk;
 
 typedef struct {
