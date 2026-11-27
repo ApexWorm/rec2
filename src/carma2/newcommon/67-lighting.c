@@ -29,6 +29,7 @@ void C2_HOOK_FASTCALL LoadTrackModels(tBrender_storage* pStorage, const char* pP
 
 // FUNCTION: CARMA2_HW 0x004f6540
 // FUNCTION: CARMA2_CHEAT 0x004fc1e0
+// FUNCTION: CARMA2_SW 0x004f21a0
 void C2_HOOK_FASTCALL SmoothlyLoadIfItsAModel(const char* pPath) {
     char s[256];
 

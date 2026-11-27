@@ -42,6 +42,7 @@ char* gMisc_strings[300] = { 0 };
 
 // GLOBAL: CARMA2_HW 0x006b63f0
 // GLOBAL: CARMA2_CHEAT 0x006bda90
+// GLOBAL: CARMA2_SW 0x006ad0d0
 br_pixelmap* gPalette_source = NULL;
 
 // GLOBAL: CARMA2_HW 0x0074ca04

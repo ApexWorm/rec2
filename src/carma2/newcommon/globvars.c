@@ -26,6 +26,7 @@ tPath_name gApplication_path;
 
 // GLOBAL: CARMA2_HW 0x0074d0a0
 // GLOBAL: CARMA2_CHEAT 0x00754740
+// GLOBAL: CARMA2_SW 0x00743600
 char gRace_path[256];
 
 // GLOBAL: CARMA2_HW 0x00761a5c
@@ -454,6 +455,7 @@ int gIs_boundary_race;
 
 // GLOBAL: CARMA2_HW 0x00761a80
 // GLOBAL: CARMA2_SW 0x00757fe0
+// GLOBAL: CARMA2_CHEAT 0x00769120
 char gCurrent_load_name[256];
 
 // GLOBAL: CARMA2_HW 0x0074d1ac
@@ -494,6 +496,7 @@ int gTree_surgery_pass1_count;
 int gTree_surgery_pass2_count;
 
 // GLOBAL: CARMA2_HW 0x006aaf18
+// GLOBAL: CARMA2_SW 0x006a4968
 tTree_surgery_pass1 gTree_surgery_pass1[5];
 
 // GLOBAL: CARMA2_HW 0x006aaa60
