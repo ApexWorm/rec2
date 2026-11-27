@@ -668,7 +668,30 @@ void C2_HOOK_FASTCALL AREnableAdvance(void) {
 #pragma auto_inline(on)
 #endif
 
-// FindNextChunk
+// FUNCTION: CARMA2_HW 0x004030f0
+// FUNCTION: CARMA2_SW 0x004030f0
+// FUNCTION: CARMA2_CHEAT 0x004030f0
+tPipe_chunk* C2_HOOK_FASTCALL FindNextChunk(tPipe_chunk_type pType, uintptr_t pOwner) {
+    tU8* ptr;
+    tU8* chunk;
+    tU32 i;
+
+    ptr = gPipe_play_ptr;
+    if (ptr != gPipe_record_ptr) {
+        do {
+            if (((tPipe_session*)ptr)->type == pType) {
+                chunk = (tU8*)((tPipe_session*)ptr)->data;
+                for (i = 0; i < ((tPipe_session*)ptr)->count; i++) {
+                    if (((tPipe_chunk*)chunk)->subject_index == pOwner) {
+                        return (tPipe_chunk*)chunk;
+                    }
+                    chunk += LengthOfChunk((tPipe_chunk*)chunk, pType);
+                }
+            }
+        } while (!MoveSessionPointerForwardOne(&ptr));
+    }
+    return NULL;
+}
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
