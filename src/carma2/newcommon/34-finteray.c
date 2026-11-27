@@ -299,25 +299,25 @@ int C2_HOOK_FASTCALL DRModelPick2D_finteray(br_model* pModel, br_material* pMate
             v0 = p.v[axis_1] - v0i2;
             f_n = v2 * u1 - v1 * u2;
             f_d = v0 * u1 - v1 * u0;
-            if ((float)fabs(f_d) > (float)fabs(f_n) || f_n == 0.f) {
+            if ((float)fabs(f_d) > (float)fabs(f_n) || f_n == 0.0f) {
                 continue;
             }
             beta = f_d / f_n;
-            if (beta < 0.f) {
+            if (beta < 0.0f) {
                 continue;
             }
             f_n = v1 * u2 - v2 * u1;
             f_d = v0 * u2 - v2 * u0;
-            if ((float)fabs(f_d) > (float)fabs(f_n) || f_n == 0.f) {
+            if ((float)fabs(f_d) > (float)fabs(f_n) || f_n == 0.0f) {
                 continue;
             }
             alpha = f_d / f_n;
-            if (alpha < 0.f || beta + alpha > 1.f) {
+            if (alpha < 0.0f || beta + alpha > 1.0f) {
                 continue;
             }
             BrVector2Scale(&map, &V11MODEL(pModel)->groups[group].vertices[fp->vertices[1]].map, alpha);
             DRVector2AccumulateScale__finteray(&map, &V11MODEL(pModel)->groups[group].vertices[fp->vertices[2]].map, beta);
-            DRVector2AccumulateScale__finteray(&map, &V11MODEL(pModel)->groups[group].vertices[fp->vertices[0]].map, 1.f - (beta + alpha));
+            DRVector2AccumulateScale__finteray(&map, &V11MODEL(pModel)->groups[group].vertices[fp->vertices[0]].map, 1.0f - (beta + alpha));
             v = 0;
             e = 1;
             if (alpha > beta) {
@@ -468,7 +468,7 @@ void C2_HOOK_FASTCALL CheckSingleFace(tFace_ref* pFace, br_vector3* ray_pos, br_
     this_material = pFace->material;
     *rt = 100.f;
     d = BrVector3Dot(&pFace->normal, ray_dir);
-    if (this_material != NULL && (this_material->flags & (BR_MATF_TWO_SIDED | BR_MATF_ALWAYS_VISIBLE)) == 0 && d > 0.f) {
+    if (this_material != NULL && (this_material->flags & (BR_MATF_TWO_SIDED | BR_MATF_ALWAYS_VISIBLE)) == 0 && d > 0.0f) {
         return;
     }
     if (this_material != NULL && this_material->identifier != NULL
@@ -484,18 +484,18 @@ void C2_HOOK_FASTCALL CheckSingleFace(tFace_ref* pFace, br_vector3* ray_pos, br_
     if (BadDiv__finteray(numerator, d)) {
         return;
     }
-    if (d <= 0.f) {
-        if (numerator < 0.f || numerator > 0.003 - d) {
+    if (d <= 0.0f) {
+        if (numerator < 0.0f || numerator > 0.003 - d) {
             return;
         }
     } else {
-        if (-numerator < 0.f || -numerator > d + 0.003) {
+        if (-numerator < 0.0f || -numerator > d + 0.003) {
             return;
         }
     }
     t = -(numerator / d);
-    if (t > 1.f) {
-        t = 1.f;
+    if (t > 1.0f) {
+        t = 1.0f;
     }
     BrVector3Scale(coll_pos, ray_dir, t);
     BrVector3Accumulate(coll_pos, ray_pos);
@@ -530,7 +530,7 @@ void C2_HOOK_FASTCALL CheckSingleFace(tFace_ref* pFace, br_vector3* ray_pos, br_
     v0 = coll_pos->v[axis_1] - v0i2;
     f_d = v0 * u1 - v1 * u0;
     f_n = (v2 * u1) - u2 * v1;
-    if (fabs(f_d) > fabs(f_n) * 1.0001 || f_n == 0.f) {
+    if (fabs(f_d) > fabs(f_n) * 1.0001 || f_n == 0.0f) {
         return;
     }
     alpha = f_d / f_n;
@@ -539,7 +539,7 @@ void C2_HOOK_FASTCALL CheckSingleFace(tFace_ref* pFace, br_vector3* ray_pos, br_
     }
     f_n = (v1 * u2) - u1 * v2;
     u1 = (v0 * u2) - v2 * u0;
-    if (fabs(u1) > 1.0001 * fabs(f_n) || f_n == 0.f) {
+    if (fabs(u1) > 1.0001 * fabs(f_n) || f_n == 0.0f) {
         return;
     }
     if (u1 / f_n < -0.0001 || alpha + u1 / f_n > 1.0001) {
