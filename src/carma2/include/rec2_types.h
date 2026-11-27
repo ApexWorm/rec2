@@ -2800,7 +2800,7 @@ typedef struct tCar_spec {
     undefined field_0x90[28];
     tU16 fire_vertex[12];
     float dt;
-    undefined* field_0xc8;
+    struct tCar_spec* field_0xc8; /* FIXME: car that owns this detached bit/split half? */
     char name[32];
     char driver_name[32];
     char grid_icon_names[3][14];
@@ -3001,7 +3001,7 @@ typedef struct tCar_spec {
     int time_last_hit;
     int time_last_victim;
     tCar_spec* last_hit_by;
-    undefined* field_0x13f0;
+    struct tCar_spec* last_culprit;
     int no_of_processes_recording_my_trail;
     tPursuee_trail my_trail;
     unsigned int grudge_raised_recently : 1;   // @0x13c  // 0x1
@@ -5456,6 +5456,7 @@ typedef enum {
     eNet_message_chunk_type_netsynch = 0xe,
     eNet_message_chunk_type_powerup = 0x16,
     eNet_message_chunk_type_player_scores = 0x18,
+    eNet_message_chunk_type_wasted = 0x19,
     eNet_message_chunk_type_gameplay = 0x1b,
     eNet_message_chunk_type_oil_spill = 0x1f,
     eNet_message_chunk_type_car_crush = 0x20,
@@ -5687,6 +5688,13 @@ typedef struct {
     tU32 time;
 } tNet_message_chunk_recover;
 
+typedef struct {
+    tNet_message_chunk_header header;
+    undefined field_0x2[2];
+    tPlayer_ID victim;
+    tPlayer_ID culprit;
+} tNet_message_chunk_wasted;
+
 typedef union {
     tNet_message_chunk_raw raw;
     tNet_message_chunk_race_over race_over; /* type = 0xa */
@@ -5694,6 +5702,7 @@ typedef union {
     tNet_message_headup headup; /* type = 0xd */
     tNet_message_chunk_powerup powerup; /* type = 0x16 */
     tNet_message_chunk_scores scores; /* type = 0x18 */
+    tNet_message_chunk_wasted wasted; /* type = 0x19 */
     tNet_message_chunk_gameplay gameplay; /* type = 0x1b */
     tNet_message_chunk_oil_spill oil_spill; /* type = 0x1f*/
     tNet_message_car_crush car_crush; /* type = 0x20 */

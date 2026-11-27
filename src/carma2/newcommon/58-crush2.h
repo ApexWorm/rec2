@@ -38,13 +38,13 @@ extern void C2_HOOK_FASTCALL RecordLastDamage(tCar_spec* pCar);
 
 extern void C2_HOOK_FASTCALL DoDamage(tCar_spec* pCar, tDamage_type pDamage_type, float pMagnitude, float pNastiness);
 
-// CalcModifiedLocation
+extern tImpact_location C2_HOOK_FASTCALL CalcModifiedLocation(tCar_spec* pCar);
 
 extern void C2_HOOK_FASTCALL DoPratcamHit(br_vector3* pVelocity);
 
 extern void C2_HOOK_FASTCALL DamageSystems(tCar_spec* pCar, br_vector3* pImpact_point, br_vector3* pEnergy_vector, int pWas_hitting_a_car);
 
-// GetDirection
+extern tImpact_location C2_HOOK_FASTCALL GetDirection(const br_vector3* pVelocity);
 
 extern void C2_HOOK_FASTCALL SetSmokeLastDamageLevel(tCar_spec* pCar);
 
