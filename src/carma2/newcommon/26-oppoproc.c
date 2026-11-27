@@ -115,30 +115,33 @@ inline br_scalar C2_HOOK_FASTCALL SectionLength2D(const tOpponent_spec* pOpponen
     return Distance2D(GetOpponentsSectionStartNodePoint(pOpponent_spec, pSection_no), GetOpponentsSectionFinishNodePoint(pOpponent_spec, pSection_no));
 }
 
-inline int C2_HOOK_FASTCALL NearestSectionInStraight(const br_vector2* pPos2d, const br_vector2* pStart2d, const br_vector2* pFinish2d, tS16 pSection_no, tS16 pEnd_section, const tOpponent_spec* pOpponent_spec) {
+inline int C2_HOOK_FASTCALL NearestSectionInStraight(const br_vector2* pPos2d, const br_vector2* pStart2d, const br_vector2* pFinish2d, tS16 pSection_no, int pEnd_section, const tOpponent_spec* pOpponent_spec) {
     br_vector2 dir;
     br_vector2 rel_pos;
     br_scalar t;
     br_scalar length;
-    tS16 section_no;
-    int further;
 
     BrVector2Sub(&dir, pFinish2d, pStart2d);
     BrVector2Sub(&rel_pos, pPos2d, pStart2d);
     t = BrVector2Dot(&dir, &rel_pos) / BrVector2Dot(&dir, &dir);
     length = 0.f;
-    do {
-        further = 0;
-        section_no = pSection_no;
-        pSection_no = GetOpponentsNextSection(pOpponent_spec, section_no);
+    for (;;) {
+        int smaller;
+        int prev_section;
+
+        smaller = 0;
+        prev_section = pSection_no;
+        pSection_no = GetOpponentsNextSection(pOpponent_spec, prev_section);
         if (pSection_no != pEnd_section) {
-            length += SectionLength2D(pOpponent_spec, section_no);
+            length += SectionLength2D(pOpponent_spec, prev_section);
             if (length < t) {
-                further = 1;
+                smaller = 1;
             }
         }
-    } while (further);
-    return section_no;
+        if (!smaller) {
+            return prev_section;
+        }
+    }
 }
 
 #ifdef REC2_MATCHING
@@ -229,7 +232,7 @@ inline tFollow_path_result C2_HOOK_FASTCALL FollowCheatyPath(tOpponent_spec* pOp
                 BrVector3Scale(&data->cheaty_intersect, &section_v, t);
                 BrVector3Accumulate(&data->cheaty_intersect, start);
             }
-            frame_period_in_secs = (br_scalar)(gFrame_period_for_this_munging * 0.001 * 6.f);
+            frame_period_in_secs = (br_scalar)(gFrame_period_for_this_munging / 1000.0 * 6.f);
             BrVector3Sub(&car_to_intersect, &data->cheaty_intersect, &pOpponent_spec->car_spec->car_master_actor->t.t.translate.t);
             TurnOpponentPhysicsOff(pOpponent_spec);
             distance_to_intersect = BrVector3Length(&car_to_intersect);
@@ -251,9 +254,9 @@ inline tFollow_path_result C2_HOOK_FASTCALL FollowCheatyPath(tOpponent_spec* pOp
             PDFatalError("No useful section number in ProcessCheatyPath()");
         }
         if (GetOpponentsSectionMaxSpeed(pOpponent_spec, data->section_no, 1) < 255) {
-            desired_speed_BRU = (br_scalar)(GetOpponentsSectionMaxSpeed(pOpponent_spec, data->section_no, 1) * (1.0 / WORLD_SCALE_D));
+            desired_speed_BRU = (br_scalar)(GetOpponentsSectionMaxSpeed(pOpponent_spec, data->section_no, 1) / WORLD_SCALE_D);
         } else if (GetOpponentsSectionMinSpeed(pOpponent_spec, data->section_no, 1) > 0) {
-            desired_speed_BRU = (br_scalar)(GetOpponentsSectionMinSpeed(pOpponent_spec, data->section_no, 1) * (1.0 / WORLD_SCALE_D));
+            desired_speed_BRU = (br_scalar)(GetOpponentsSectionMinSpeed(pOpponent_spec, data->section_no, 1) / WORLD_SCALE_D);
         } else {
             desired_speed_BRU = MAX(MIN(7.f, 2.f * distance_to_end), 1.f);
         }
@@ -264,7 +267,7 @@ inline tFollow_path_result C2_HOOK_FASTCALL FollowCheatyPath(tOpponent_spec* pOp
         }
         data->cheating = 1;
     }
-    frame_period_in_secs = (br_scalar)(gFrame_period_for_this_munging * 0.001 * 6.f);
+    frame_period_in_secs = (br_scalar)(gFrame_period_for_this_munging / 1000.0 * 6.f);
     BrVector3Set(&pOpponent_spec->car_spec->collision_info->v, 0.f, 41.4f, 0.f);
     if (data->moving_to_intersect) {
         BrVector3Sub(&car_to_intersect, &data->cheaty_intersect, &pOpponent_spec->car_spec->car_master_actor->t.t.translate.t);
@@ -349,6 +352,7 @@ tFollow_path_result C2_HOOK_FASTCALL ProcessFollowPath(tOpponent_spec* pOpponent
     br_vector2 oppo_pos_rel_next;
     br_vector2 v2d;
     br_vector2 delta;
+    br_vector2 temp2d;
 
     car_spec = pOpponent_spec->car_spec;
     engine_damage = car_spec->damage_units[eDamage_engine].damage_level;
@@ -480,22 +484,7 @@ tFollow_path_result C2_HOOK_FASTCALL ProcessFollowPath(tOpponent_spec* pOpponent
                 SetMaxSpeedFromSOCs(socs, count_socs, &data->desired_speed, speed, &oppo_pos2d, corners, pOpponent_spec);
             }
         }
-        if (data->cornering) {
-            BrVector2Sub(&delta, &oppo_pos2d, &data->field_0x40);
-            unk1 = (BrVector2Length(&delta) - data->field_0x48) / data->corner_width;
-            if (speed > BR_SCALAR_EPSILON) {
-                unk2 = BrVector2Dot(&delta, &v2d) / (data->field_0x48 * speed);
-            } else {
-                unk2 = 0.f;
-            }
-            unk3 = (br_scalar)(1.0 / (data->field_0x48 * WORLD_SCALE));
-            if (data->left_not_right) {
-                unk2 = -unk2;
-            } else {
-                unk1 = -unk1;
-                unk3 = -unk3;
-            }
-        } else {
+        if (!data->cornering) {
             BrVector2Sub(&oppo_pos_rel, &oppo_pos2d, &start2d);
             BrVector2Sub(&delta, &finish2d, &start2d);
             l = BrVector2Length(&delta);
@@ -517,6 +506,21 @@ tFollow_path_result C2_HOOK_FASTCALL ProcessFollowPath(tOpponent_spec* pOpponent
                 unk2 = 0.f;
             }
             unk3 = 0.f;
+        } else {
+            BrVector2Sub(&delta, &oppo_pos2d, &data->field_0x40);
+            unk1 = (BrVector2Length(&delta) - data->field_0x48) / data->corner_width;
+            if (speed > BR_SCALAR_EPSILON) {
+                unk2 = BrVector2Dot(&delta, &v2d) / (data->field_0x48 * speed);
+            } else {
+                unk2 = 0.f;
+            }
+            unk3 = (br_scalar)(1.0 / (data->field_0x48 * WORLD_SCALE));
+            if (data->left_not_right) {
+                unk2 = -unk2;
+            } else {
+                unk1 = -unk1;
+                unk3 = -unk3;
+            }
         }
         if ((br_scalar)fabs(unk1) > 1.f) {
             curv = 0.f;
@@ -526,18 +530,20 @@ tFollow_path_result C2_HOOK_FASTCALL ProcessFollowPath(tOpponent_spec* pOpponent
                 BrVector2Sub(&oppo_pos_rel, &oppo_pos2d, &start2d);
                 t = BrVector2Dot(&delta, &oppo_pos_rel) / BrVector2Dot(&delta, &delta);
                 if (t < 0.f) {
-                    BrVector2Set(&delta, 0.f, 0.f);
-                } else if (t <= 1.f) {
-                    BrVector2Scale(&delta, &delta, t);
+                    BrVector2Set(&temp2d, 0.f, 0.f);
+                } else if (t > 1.f) {
+                    BrVector2Copy(&temp2d, &delta);
+                } else {
+                    BrVector2Scale(&temp2d, &delta, t);
                 }
-                BrVector2Sub(&delta, &oppo_pos_rel, &delta);
-                l = BrVector2Length(&delta);
-                crs = Vector2Cross(&v2d, &delta);
+                BrVector2Sub(&temp2d, &oppo_pos_rel, &temp2d);
+                l = BrVector2Length(&temp2d);
+                crs = Vector2Cross(&v2d, &temp2d);
                 if (speed != 0.f && l != 0.f) {
                     crs /= speed * l;
                 }
                 curv = -crs * MaxCurvatureForCarSpeed(car_spec, speed);
-                if (BrVector2Dot(&v2d, &delta) > 0.f) {
+                if (BrVector2Dot(&v2d, &temp2d) > 0.f) {
                     if (data->field_0x08 == 0) {
                         data->field_0x08 = gTime_stamp_for_this_munging;
                         data->field_0x38 = 0;
@@ -555,7 +561,7 @@ tFollow_path_result C2_HOOK_FASTCALL ProcessFollowPath(tOpponent_spec* pOpponent
             if (data->desired_speed > 6.f) {
                 data->desired_speed += (6.f - data->desired_speed) * (br_scalar)fabs(unk2);
             }
-            curv = (unk1 * 0.1f - unk2) * MaxCurvatureForCarSpeed(car_spec, speed) + unk3;
+            curv = (unk1 / 10.f - unk2) * MaxCurvatureForCarSpeed(car_spec, speed) + unk3;
             if (curv > car_spec->maxcurve) {
                 curv = car_spec->maxcurve;
             } else if (curv < -car_spec->maxcurve) {
@@ -569,12 +575,12 @@ tFollow_path_result C2_HOOK_FASTCALL ProcessFollowPath(tOpponent_spec* pOpponent
         }
         acc_factor = MAX(effective_speed_factor, 1.f);
         if (engine_damage > 50 && engine_damage < 98) {
-            acc_factor -= (engine_damage - 50) * 0.0125f;
+            acc_factor -= (engine_damage - 50) / 80.f;
         } else if (engine_damage >= 98) {
             acc_factor -= 0.6f;
         }
         if (trans_damage > 50 && trans_damage < 98) {
-            acc_factor -= (trans_damage - 50) * 0.00625f;
+            acc_factor -= (trans_damage - 50) / 160.f;
         } else if (trans_damage >= 98) {
             acc_factor -= 0.3f;
         }
@@ -583,7 +589,7 @@ tFollow_path_result C2_HOOK_FASTCALL ProcessFollowPath(tOpponent_spec* pOpponent
         }
         max_acc = acc_factor * 12.f;
         error = data->desired_speed * effective_speed_factor - speed;
-        acc = (error - data->prev_acc_error) * 1000.f / gFrame_period_for_this_munging * 0.1f + error + data->prev_acc;
+        acc = (error - data->prev_acc_error) * 1000.f / gFrame_period_for_this_munging / 10.f + error + data->prev_acc;
         if (acc > max_acc) {
             acc = max_acc;
         }
