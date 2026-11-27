@@ -22,6 +22,7 @@ extern tFloat_bunch_info gCar_car_damage_multiplier;
 extern br_vector3 gZero_v__car;
 extern int gFreeze_mechanics;
 extern int gNum_active_non_cars;
+extern int gCamera_has_collided;
 extern tNon_car_spec* gActive_non_car_list[99];
 extern int gEliminate_faces;
 extern int gIn_the_sea;
