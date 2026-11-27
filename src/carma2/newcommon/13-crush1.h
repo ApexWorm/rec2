@@ -190,7 +190,7 @@ extern void C2_HOOK_FASTCALL ExpandCrush(tCar_crush* pDest, const tCompressed_ca
 
 extern void C2_HOOK_FASTCALL AddDroneCrush(tQueued_drone_crush_item* pCrush, const br_vector3* pVector, float pScale, int pCount, const br_vector3* pPoints);
 
-// QueueDroneCrush
+extern void C2_HOOK_FASTCALL QueueDroneCrush(tPhysics_object* pObject, int pCount, const br_vector3* pPoints, const br_vector3* pForce);
 
 // DoCrushing
 
@@ -330,9 +330,9 @@ extern intptr_t C2_HOOK_CDECL MakeCarModelsMaterialsSingleSided(br_actor* pActor
 
 // DoYSplitting
 
-// DoSplitting
+extern int C2_HOOK_FASTCALL DoSplitting(tPhysics_joint_force* pForces, br_scalar* pImpulses, int pCount);
 
-// DoJointSnapping
+extern int C2_HOOK_FASTCALL DoJointSnapping(tPhysics_joint_force* pForces, br_scalar* pImpulses, int pCount);
 
 // PointIsOutsideShape
 

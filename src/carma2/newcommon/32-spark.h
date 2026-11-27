@@ -71,9 +71,9 @@ extern void C2_HOOK_FASTCALL SetLineModelCols(tU8 pCol);
 
 // CreateSingleSpark
 
-// CreateSparks
+extern void C2_HOOK_FASTCALL CreateSparks(const br_vector3* pPosition, br_vector3* pVelocity, const br_vector3* pForce, br_scalar pSparkiness, tCar_spec* pCar);
 
-// CreateSparkShower
+extern void C2_HOOK_FASTCALL CreateSparkShower(br_vector3* pPosition, br_vector3* pVelocity, br_vector3* pForce, tCar_spec* pCar1, tCar_spec* pCar2);
 
 extern void C2_HOOK_FASTCALL AdjustSpark(int pSpark_num, br_vector3* pPos, br_vector3* pLength);
 

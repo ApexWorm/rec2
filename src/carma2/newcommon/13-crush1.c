@@ -1413,7 +1413,12 @@ void C2_HOOK_FASTCALL AddDroneCrush(tQueued_drone_crush_item* pCrush, const br_v
     }
 }
 
-// QueueDroneCrush
+// STUB: CARMA2_HW 0x0042d1e0
+// STUB: CARMA2_SW 0x0042d250
+// STUB: CARMA2_CHEAT 0x0042d380
+void C2_HOOK_FASTCALL QueueDroneCrush(tPhysics_object* pObject, int pCount, const br_vector3* pPoints, const br_vector3* pForce) {
+    NOT_IMPLEMENTED();
+}
 
 // DoCrushing
 
@@ -2070,9 +2075,19 @@ intptr_t C2_HOOK_CDECL MakeCarModelsMaterialsSingleSided(br_actor* pActor, void*
 
 // DoYSplitting
 
-// DoSplitting
+// STUB: CARMA2_HW 0x0042dfd0
+// STUB: CARMA2_SW 0x0042e040
+// STUB: CARMA2_CHEAT 0x0042e170
+int C2_HOOK_FASTCALL DoSplitting(tPhysics_joint_force* pForces, br_scalar* pImpulses, int pCount) {
+    NOT_IMPLEMENTED();
+}
 
-// DoJointSnapping
+// STUB: CARMA2_HW 0x00431310
+// STUB: CARMA2_SW 0x00431340
+// STUB: CARMA2_CHEAT 0x004314e0
+int C2_HOOK_FASTCALL DoJointSnapping(tPhysics_joint_force* pForces, br_scalar* pImpulses, int pCount) {
+    NOT_IMPLEMENTED();
+}
 
 // PointIsOutsideShape
 

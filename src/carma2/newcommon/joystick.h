@@ -64,4 +64,6 @@ extern float C2_HOOK_FASTCALL GetJoystickX(void);
 
 extern float C2_HOOK_FASTCALL GetJoystickY(void);
 
+extern void C2_HOOK_FASTCALL FUN_0045c910(tCar_spec* pCar, br_vector3* pPosition, br_vector3* pForce, br_scalar pMagnitude);
+
 #endif /* REC2_JOYSTICK_H */

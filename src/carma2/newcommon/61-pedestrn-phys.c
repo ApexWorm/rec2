@@ -1312,7 +1312,12 @@ int C2_HOOK_FASTCALL CBActiveHalted(tPed_character_instance* pCharacter, tPhysic
 
 // RecordPedSlide
 
-// PedProcessForces
+// STUB: CARMA2_HW 0x004d2320
+// STUB: CARMA2_SW 0x004cea20
+// STUB: CARMA2_CHEAT 0x004d7ee0
+void C2_HOOK_FASTCALL PedProcessForces(tPhysics_object* pPed_object, tPhysics_object* pOther, void* pFace, br_scalar pImpulse, br_vector3* pPosition) {
+    NOT_IMPLEMENTED();
+}
 
 // CBMovedByPhysics
 

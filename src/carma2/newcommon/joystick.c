@@ -602,3 +602,10 @@ float C2_HOOK_FASTCALL GetJoystickY(void) {
     }
     return gJoystick_y_throttle;
 }
+
+// STUB: CARMA2_HW 0x0045c910
+// STUB: CARMA2_SW 0x0045c350
+// STUB: CARMA2_CHEAT 0x0045cd90
+void C2_HOOK_FASTCALL FUN_0045c910(tCar_spec* pCar, br_vector3* pPosition, br_vector3* pForce, br_scalar pMagnitude) {
+    NOT_IMPLEMENTED();
+}

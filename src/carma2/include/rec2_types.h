@@ -5588,7 +5588,7 @@ typedef struct {
 } tToggled_door;
 
 typedef struct tWorld_callbacks {
-    int (C2_HOOK_FASTCALL * process_forces)(void*, float*, int arg3);
+    int (C2_HOOK_FASTCALL * process_forces)(tPhysics_joint_force*, br_scalar*, int);
     int (C2_HOOK_FASTCALL * process_joint_forces)(void*, void*, void*);
     void (C2_HOOK_FASTCALL * new_face_list)(tPhysics_object*, tFace_ref *);
     int (C2_HOOK_FASTCALL * find_faces_in_box)(tBounds*, tFace_ref*, int, struct tWorld_callbacks*);

@@ -161,7 +161,7 @@ extern void C2_HOOK_FASTCALL NonCarCalcForce(tNon_car_spec* pNon_car, br_scalar 
 
 // DoRevs
 
-// ScrapeNoise
+extern void C2_HOOK_FASTCALL ScrapeNoise(br_scalar pVelocity, br_vector3* pPosition, int pMaterial);
 
 // SkidNoise
 
@@ -169,13 +169,13 @@ extern void C2_HOOK_FASTCALL NonCarCalcForce(tNon_car_spec* pNon_car, br_scalar 
 
 // CrashNoise
 
-// CrushAndDamageCar
+extern void C2_HOOK_FASTCALL CrushAndDamageCar(tCar_spec* pCar, br_vector3* pPosition, br_vector3* pForce_car_space, tCar_spec* pCar2, int pCount_points, br_vector3* pPoints, br_actor* pActor);
 
-// PointInFaceByQuiteABitActually
+extern int C2_HOOK_FASTCALL PointInFaceByQuiteABitActually(br_scalar pD, br_vector3* pPoint, br_vector3* pNormal, tFace_ref* pFace, br_vector3* pV0, br_vector3* pV1, br_vector3* pV2);
 
-// DoEnvironmentSmashes
+extern int C2_HOOK_FASTCALL DoEnvironmentSmashes(tPhysics_joint_force* pForces, br_scalar* pImpulses, int pCount);
 
-extern int C2_HOOK_FASTCALL ProcessForcesCallback(void* pArg1, float *pArg2, int pArg3);
+extern int C2_HOOK_FASTCALL ProcessForcesCallback(tPhysics_joint_force* pForces, br_scalar* pImpulses, int pCount);
 
 extern int C2_HOOK_FASTCALL ProcessJointForcesCallBack(void* pArg1, void* pArg2, void* pArg3);
 

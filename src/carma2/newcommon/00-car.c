@@ -22,10 +22,12 @@
 #include "27-powerup.h"
 #include "29-raycast.h"
 #include "30-opponent.h"
+#include "32-spark.h"
 #include "34-finteray.h"
 #include "37-brucetrk.h"
 #include "41-utility.h"
 #include "49-physics.h"
+#include "51-smash.h"
 #include "53-controls.h"
 #include "55-volume.h"
 #include "57-drone.h"
@@ -33,6 +35,7 @@
 #include "59-camera.h"
 #include "60-phil.h"
 #include "61-pedestrn-phys.h"
+#include "joystick.h"
 #include "69-sound.h"
 #include "brender/brender.h"
 #include "globvars.h"
@@ -42,6 +45,7 @@
 
 #include "c2_math.h"
 #include "c2_stdio.h"
+#include "c2_string.h"
 #include "rec2_macros.h"
 
 #include <limits.h>
@@ -61,6 +65,16 @@ int gLast_crunch_vol;
 // GLOBAL: CARMA2_SW 0x0058a680
 // GLOBAL: CARMA2_CHEAT 0x00594710
 int gMetal_crunch_sound_id[5] = { 5000, 5001, 5002, 5003, 5004 };
+
+// GLOBAL: CARMA2_HW 0x0058f698
+// GLOBAL: CARMA2_SW 0x0058a698
+// GLOBAL: CARMA2_CHEAT 0x00594728
+int gMetal_scrape_sound_id[3] = { 5010, 5011, 5012 };
+
+// GLOBAL: CARMA2_HW 0x0058f6a8
+// GLOBAL: CARMA2_SW 0x0058a6a8
+// GLOBAL: CARMA2_CHEAT 0x00594738
+float gFLOAT_0058f6a8 = 0.2f;
 
 // GLOBAL: CARMA2_HW 0x0067939c
 // GLOBAL: CARMA2_SW 0x00673b0c
@@ -1252,7 +1266,33 @@ void C2_HOOK_FASTCALL NonCarCalcForce(tNon_car_spec* pNon_car, br_scalar pDt) {
 
 // DoRevs
 
-// ScrapeNoise
+inline void C2_HOOK_FASTCALL ScrapeNoise(br_scalar pVelocity, br_vector3* pPosition, int pMaterial) {
+    // GLOBAL: CARMA2_HW 0x00679400
+    // GLOBAL: CARMA2_SW 0x00673b70
+    // GLOBAL: CARMA2_CHEAT 0x00680cb0
+    static tS3_sound_tag scrape_tag;
+    // GLOBAL: CARMA2_HW 0x00679404
+    // GLOBAL: CARMA2_SW 0x00673b74
+    // GLOBAL: CARMA2_CHEAT 0x00680cb4
+    static tS3_volume last_scrape_vol;
+    tS3_volume vol;
+    br_vector3 velocity;
+
+    vol = (tS3_volume)((int)(pVelocity * 7.0f) * WORLD_SCALE_D);
+    if (gCurrent_race.material_modifiers[pMaterial].scrape_noise_index == -1) {
+        return;
+    }
+    if ((scrape_tag == 0 || !DRS3SoundStillPlaying(scrape_tag)) && vol > 30) {
+        BrVector3SetFloat(&velocity, 0.0f, 0.0f, 0.0f);
+        scrape_tag = DRS3StartSound3D(gCar_outlet,
+            gMetal_scrape_sound_id[IRandomBetween(0, REC2_ASIZE(gMetal_scrape_sound_id) - 1)],
+            pPosition, &velocity, 1, vol, IRandomBetween(0xc000, 0x14000), 0x10000);
+        last_scrape_vol = vol;
+    } else if (vol > last_scrape_vol) {
+        DRS3ChangeVolume(scrape_tag, vol);
+        last_scrape_vol = vol;
+    }
+}
 
 // SkidNoise
 
@@ -1284,16 +1324,439 @@ void C2_HOOK_FASTCALL CrashNoise(br_vector3* pForce, br_vector3* pPosition, int 
     }
 }
 
-// CrushAndDamageCar
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
 
-// PointInFaceByQuiteABitActually
-
-// DoEnvironmentSmashes
-
-// STUB: CARMA2_HW 0x0041c1b0
-// STUB: CARMA2_SW 0x0041c1e0
-int C2_HOOK_FASTCALL ProcessForcesCallback(void* pArg1, float *pArg2, int pArg3) {
+// STUB: CARMA2_HW 0x0041deb0
+// STUB: CARMA2_SW 0x0041dee0
+// STUB: CARMA2_CHEAT 0x0041e110
+void C2_HOOK_FASTCALL CrushAndDamageCar(tCar_spec* pCar, br_vector3* pPosition, br_vector3* pForce_car_space, tCar_spec* pCar2, int pCount_points, br_vector3* pPoints, br_actor* pActor) {
     NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
+
+/* FIXME: pFace is not used (the Mac build passes it) */
+inline int C2_HOOK_FASTCALL PointInFaceByQuiteABitActually(br_scalar pD, br_vector3* pPoint, br_vector3* pNormal, tFace_ref* pFace, br_vector3* pV0, br_vector3* pV1, br_vector3* pV2) {
+    br_scalar dist;
+    br_vector3 p;
+    int axis;
+    int a;
+    int b;
+    br_scalar e1_a;
+    br_scalar e1_b;
+    br_scalar e2_a;
+    br_scalar p_a;
+    br_scalar p_b;
+    br_scalar det;
+    br_scalar u;
+    br_scalar v;
+
+    dist = DistanceFromFaceND(pPoint, pNormal, pD);
+    if (fabs(dist) > 0.5) {
+        return 0;
+    }
+    dist = -dist;
+    p.v[0] = pNormal->v[0] * dist + pPoint->v[0];
+    p.v[1] = pNormal->v[1] * dist + pPoint->v[1];
+    p.v[2] = pNormal->v[2] * dist + pPoint->v[2];
+    if (fabs(pNormal->v[0]) < fabs(pNormal->v[1])) {
+        axis = 1;
+    } else {
+        axis = 0;
+    }
+    if (fabs(pNormal->v[axis]) < fabs(pNormal->v[2])) {
+        axis = 2;
+    }
+    if (axis == 0) {
+        a = 1;
+        b = 2;
+    } else if (axis == 1) {
+        a = 0;
+        b = 2;
+    } else {
+        a = 0;
+        b = 1;
+    }
+    e1_a = pV1->v[a] - pV0->v[a];
+    e1_b = pV1->v[b] - pV0->v[b];
+    e2_a = pV2->v[a] - pV0->v[a];
+    p_a = p.v[a] - pV0->v[a];
+    p_b = p.v[b] - pV0->v[b];
+    if (fabs(e1_a) > 2.384185791015625e-7) {
+        det = (pV2->v[b] - pV0->v[b]) * e1_a - e1_b * e2_a;
+        if (det == 0.0f) {
+            return 0;
+        }
+        v = (p_b * e1_a - p_a * e1_b) / det;
+        u = (p_a - v * e2_a) / e1_a;
+    } else {
+        v = p_a / e2_a;
+        u = (p_b - v * (pV2->v[b] - pV0->v[b])) / e1_b;
+    }
+    if (u >= 0.0001 && v >= 0.0001 && u + v <= 0.999) {
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
+inline int C2_HOOK_FASTCALL DoEnvironmentSmashes(tPhysics_joint_force* pForces, br_scalar* pImpulses, int pCount) {
+    int i;
+    int j;
+    int k;
+    int l;
+    int count_smashed;
+    int smashed[20];
+    tPhysics_joint_force* force;
+    tPhysics_object* object;
+    tFace_ref* face;
+    br_scalar threshold;
+    br_scalar result;
+    br_scalar d0;
+    br_scalar d1;
+    br_scalar d2;
+    br_vector3 force_v;
+    br_vector3 pos;
+    br_vector3 world_pos;
+    br_vector3 vel;
+    br_vector3 world_vel;
+    br_vector3 world_force;
+
+    threshold = -1.0f;
+    count_smashed = 0;
+    for (i = 0; i < pCount; i++) {
+        force = &pForces[i];
+        if (pImpulses[i] <= 0.02f) {
+            continue;
+        }
+        face = force->field_0xc;
+        if (force->object_b == NULL && face != NULL
+                && ((face->material != NULL && face->material->identifier != NULL
+                        && strlen(face->material->identifier) == 11 && face->material->identifier[5] == '|')
+                    || (face->a != NULL && face->a->identifier != NULL
+                        && ((strlen(face->a->identifier) == 11 && face->a->identifier[5] == '|')
+                            || face->a->identifier[1] == (char)0xa3)))) {
+            BrVector3Scale(&force_v, &force->direction_a, pImpulses[i]);
+            BrVector3Add(&pos, &force->object_a->cmpos, &force->point_a);
+            if (force->type == 0) {
+                BrVector3Copy(&world_pos, &force->point_b);
+                if (!PointInFaceByQuiteABitActually(face->d, &world_pos, &face->normal, face, &face->v[0], &face->v[1], &face->v[2])) {
+                    d0 = Vector3DistanceSquared(&world_pos, &face->v[0]);
+                    d1 = Vector3DistanceSquared(&world_pos, &face->v[1]);
+                    d2 = Vector3DistanceSquared(&world_pos, &face->v[2]);
+                    if (d0 < d1 && d0 < d2) {
+                        j = 0;
+                        k = 1;
+                        l = 2;
+                    } else if (d1 < d0 && d1 < d2) {
+                        j = 1;
+                        k = 0;
+                        l = 2;
+                    } else {
+                        j = 2;
+                        k = 1;
+                        l = 0;
+                    }
+                    world_pos.v[0] = (br_scalar)(face->v[j].v[0] * 0.98 + (face->v[k].v[0] + face->v[l].v[0]) * 0.01);
+                    world_pos.v[1] = (br_scalar)(face->v[j].v[1] * 0.98 + (face->v[k].v[1] + face->v[l].v[1]) * 0.01);
+                    world_pos.v[2] = (br_scalar)(face->v[j].v[2] * 0.98 + (face->v[k].v[2] + face->v[l].v[2]) * 0.01);
+                }
+            } else {
+                BrMatrix34ApplyP(&world_pos, &pos, &force->object_a->transform_matrix);
+            }
+            BrVector3Cross(&vel, &force->object_a->omega, &pos);
+            BrVector3Accumulate(&vel, &force->object_a->velocity_car_space);
+            BrMatrix34ApplyV(&world_vel, &vel, &force->object_a->transform_matrix);
+            BrMatrix34ApplyV(&world_force, &force_v, &force->object_a->transform_matrix);
+            result = SmashEnvironment(force->object_a, face, pImpulses[i], &world_pos, &world_vel, &world_force, 1, 0);
+            if (result != -1.0f && threshold == -1.0f) {
+                threshold = result;
+            }
+            if (threshold != -1.0f && count_smashed < REC2_ASIZE(smashed)) {
+                smashed[count_smashed] = i;
+                count_smashed++;
+            }
+        } else if (force->object_b != NULL) {
+            object = NULL;
+            if (force->object_a->actor != NULL && force->object_a->actor->identifier != NULL
+                    && force->object_a->actor->identifier[0] == '&'
+                    && gSmashable_track_indexable_triggers[(force->object_a->actor->identifier[1] - '0') * 10 + (force->object_a->actor->identifier[2] - '0')] != NULL) {
+                BrVector3Scale(&force_v, &force->direction_a, pImpulses[i]);
+                BrVector3Add(&pos, &force->point_a, &force->object_a->cmpos);
+                object = force->object_a;
+            } else if (force->object_b->actor != NULL && force->object_b->actor->identifier != NULL
+                    && force->object_b->actor->identifier[0] == '&'
+                    && gSmashable_track_indexable_triggers[(force->object_b->actor->identifier[1] - '0') * 10 + (force->object_b->actor->identifier[2] - '0')] != NULL) {
+                BrVector3Scale(&force_v, &force->direction_b, pImpulses[i]);
+                BrVector3Add(&pos, &force->point_b, &force->object_b->cmpos);
+                object = force->object_b;
+            }
+            if (object != NULL) {
+                BrVector3Cross(&vel, &object->omega, &pos);
+                BrVector3Accumulate(&vel, &object->velocity_car_space);
+                BrMatrix34ApplyV(&world_vel, &vel, &object->transform_matrix);
+                BrMatrix34ApplyV(&world_force, &force_v, &object->transform_matrix);
+                BrMatrix34ApplyP(&world_pos, &pos, &object->transform_matrix);
+                BrVector3Scale(&world_force, &world_force, WORLD_SCALE_D);
+                result = BashObject(object, object->actor, pImpulses[i], &world_pos, &world_vel, &world_force, 0, 0);
+                if (result != -1.0f && threshold == -1.0f) {
+                    threshold = result;
+                }
+                if (threshold != -1.0f && count_smashed < REC2_ASIZE(smashed)) {
+                    smashed[count_smashed] = i;
+                    count_smashed++;
+                }
+            }
+        }
+    }
+    FlushSmashQueue(1);
+    if (count_smashed != 0) {
+        ReduceEffectOfForces(pForces, pImpulses, pCount, smashed, count_smashed, threshold);
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x0041c1b0
+// FUNCTION: CARMA2_SW 0x0041c1e0
+// FUNCTION: CARMA2_CHEAT 0x0041c410
+int C2_HOOK_FASTCALL ProcessForcesCallback(tPhysics_joint_force* pForces, br_scalar* pImpulses, int pCount) {
+    int i;
+    int j;
+    int count;
+    int material;
+    int force_in_world;
+    tU8 done[40]; /* FIXME: size unknown */
+    tPhysics_joint_force* force;
+    tPhysics_joint_force* other;
+    tPhysics_object* object_a;
+    tPhysics_object* object_b;
+    tCar_spec* car_a;
+    tCar_spec* car_b;
+    tNon_car_spec* non_car;
+    br_scalar total;
+    br_scalar impulse;
+    br_scalar ts;
+    br_vector3 pos_a;
+    br_vector3 pos_b;
+    br_vector3 force_a;
+    br_vector3 force_b;
+    br_vector3 points_a[4];
+    br_vector3 points_b[4];
+    br_vector3 tv;
+    br_vector3 vel;
+    br_vector3 world_vel;
+    br_vector3 world_pos;
+    br_vector3 world_force;
+    br_vector3 pinball_v;
+
+    if (DoEnvironmentSmashes(pForces, pImpulses, pCount)) {
+        return 0;
+    }
+    if (DoSplitting(pForces, pImpulses, pCount)) {
+        return 0;
+    }
+    if (DoJointSnapping(pForces, pImpulses, pCount)) {
+        return 0;
+    }
+    for (i = 0; i < pCount; i++) {
+        done[i] = 0;
+    }
+    for (i = 0; i < pCount; i++) {
+        if (done[i]) {
+            continue;
+        }
+        force = &pForces[i];
+        force_in_world = 0;
+        BrVector3Scale(&pos_a, &force->point_a, pImpulses[i]);
+        BrVector3Scale(&force_a, &force->direction_a, pImpulses[i]);
+        BrVector3Add(&points_a[0], &force->point_a, &force->object_a->cmpos);
+        if (force->object_b != NULL) {
+            BrVector3Scale(&pos_b, &force->point_b, pImpulses[i]);
+            BrVector3Scale(&force_b, &force->direction_b, -pImpulses[i]);
+            BrVector3Add(&points_b[0], &force->object_b->cmpos, &force->point_b);
+        }
+        total = pImpulses[i];
+        done[i] = 1;
+        count = 1;
+        for (j = i + 1; j < pCount; j++) {
+            if (count == 4) {
+                break;
+            }
+            if (done[j]) {
+                continue;
+            }
+            other = &pForces[j];
+            impulse = pImpulses[j];
+            if (other->object_a == force->object_a && other->object_b == force->object_b
+                    && BrVector3Dot(&other->direction_a, &force->direction_a) > 0.707107f) {
+                if (impulse != 0.0f) {
+                    BrVector3Scale(&tv, &other->point_a, impulse);
+                    BrVector3Accumulate(&pos_a, &tv);
+                    BrVector3Scale(&tv, &other->direction_a, impulse);
+                    BrVector3Accumulate(&force_a, &tv);
+                    total += impulse;
+                }
+                BrVector3Add(&points_a[count], &other->object_a->cmpos, &other->point_a);
+                if (other->object_b != NULL) {
+                    if (impulse != 0.0f) {
+                        BrVector3Scale(&tv, &other->point_b, impulse);
+                        BrVector3Accumulate(&pos_b, &tv);
+                        BrVector3Scale(&tv, &other->direction_b, -impulse);
+                        BrVector3Accumulate(&force_b, &tv);
+                    }
+                    BrVector3Add(&points_b[count], &other->object_b->cmpos, &other->point_b);
+                }
+                count++;
+                done[j] = 1;
+            } else if (other->object_b == force->object_a && other->object_a == force->object_b
+                    && BrVector3Dot(&other->direction_b, &force->direction_a) < -0.707107f) {
+                if (impulse != 0.0f) {
+                    BrVector3Scale(&tv, &other->point_b, impulse);
+                    BrVector3Accumulate(&pos_a, &tv);
+                    BrVector3Scale(&tv, &other->direction_b, -impulse);
+                    BrVector3Accumulate(&force_a, &tv);
+                    BrVector3Scale(&tv, &other->point_a, impulse);
+                    BrVector3Accumulate(&pos_b, &tv);
+                    BrVector3Scale(&tv, &other->direction_a, impulse);
+                    BrVector3Accumulate(&force_b, &tv);
+                    total += impulse;
+                }
+                BrVector3Add(&points_a[count], &other->object_b->cmpos, &other->point_b);
+                BrVector3Add(&points_b[count], &other->object_a->cmpos, &other->point_a);
+                count++;
+                done[j] = 1;
+            }
+        }
+        object_a = force->object_a;
+        object_b = force->object_b;
+        pos_a.v[0] = pos_a.v[0] / total + object_a->cmpos.v[0];
+        pos_a.v[1] = pos_a.v[1] / total + object_a->cmpos.v[1];
+        pos_a.v[2] = pos_a.v[2] / total + object_a->cmpos.v[2];
+        if (object_b != NULL) {
+            pos_b.v[0] = object_b->cmpos.v[0] + pos_b.v[0] / total;
+            pos_b.v[1] = object_b->cmpos.v[1] + pos_b.v[1] / total;
+            pos_b.v[2] = object_b->cmpos.v[2] + pos_b.v[2] / total;
+        }
+        car_a = NULL;
+        car_b = NULL;
+        if (object_a != NULL) {
+            car_a = object_a->owner;
+        }
+        if (object_b != NULL) {
+            car_b = object_b->owner;
+        }
+        if (object_a != NULL && car_a != NULL && object_a->flags_0x238 == 1 && car_a->driver == eDriver_local_human) {
+            if (total > 0.02f) {
+                FUN_0045c910(car_a, &pos_a, &force_a, total);
+            }
+        } else if (object_b != NULL && car_b != NULL && object_b->flags_0x238 == 1 && car_b->driver == eDriver_local_human && total > 0.02f) {
+            FUN_0045c910(car_b, &pos_b, &force_b, total);
+        }
+        if (object_a != NULL && car_a != NULL && object_a->flags_0x238 == 1 && total > 0.02f) {
+            if (object_b != NULL && car_b != NULL && object_b->flags_0x238 == 1) {
+                CrushAndDamageCar(car_a, &pos_a, &force_a, car_b, count, points_a, object_a->actor);
+                CrushAndDamageCar(car_b, &pos_b, &force_b, car_a, count, points_b, object_b->actor);
+                CrashEarnings(car_a, car_b);
+                if (BrVector3LengthSquared(&object_a->v) > 0.0009 || BrVector3LengthSquared(&object_b->v) > 0.0009) {
+                    BrVector3Add(&world_vel, &object_b->v, &object_b->v);
+                    BrVector3Scale(&world_vel, &world_vel, 0.5f);
+                    BrMatrix34ApplyV(&world_force, &force_a, &object_a->transform_matrix);
+                    BrMatrix34ApplyP(&world_pos, &pos_a, &object_a->transform_matrix);
+                    BrVector3Scale(&world_force, &world_force, WORLD_SCALE_D);
+                    force_in_world = 1;
+                    CreateSparkShower(&world_pos, &world_vel, &world_force, car_a, car_b);
+                    CrashNoise(&world_force, &world_pos, 0);
+                }
+            } else {
+                CrushAndDamageCar(car_a, &pos_a, &force_a, NULL, count, points_a, object_a->actor);
+                if (object_b == NULL && force->field_0xc != NULL) {
+                    if (object_a->v.v[1] < -20.0f / WORLD_SCALE) {
+                        BrVector3Scale(&force_a, &force_a, 2.0f);
+                    }
+                    CrashEarnings(car_a, NULL);
+                    if (BrVector3LengthSquared(&object_a->v) > 0.0009) {
+                        BrVector3Cross(&vel, &object_a->omega, &pos_a);
+                        BrVector3Accumulate(&vel, &object_a->velocity_car_space);
+                        BrMatrix34ApplyV(&world_vel, &vel, &object_a->transform_matrix);
+                        BrMatrix34ApplyV(&world_force, &force_a, &object_a->transform_matrix);
+                        BrMatrix34ApplyP(&world_pos, &pos_a, &object_a->transform_matrix);
+                        BrVector3Scale(&world_force, &world_force, WORLD_SCALE_D);
+                        material = ((tFace_ref*)force->field_0xc)->material->identifier[0] - '/';
+                        if (material < 0 || material > 9) {
+                            material = 0;
+                        }
+                        force_in_world = 1;
+                        non_car = object_a->owner;
+                        if ((car_a != NULL && car_a->driver > eDriver_5) || (non_car->flags & 0x200000)) {
+                            CreateSparks(&world_pos, &world_vel, &world_force, gCurrent_race.material_modifiers[material].sparkiness, car_a);
+                        }
+                        CrashNoise(&world_force, &world_pos, material);
+                        ScrapeNoise(BrVector3Length(&world_vel), &world_pos, material);
+                    }
+                }
+            }
+        }
+        if (total > 0.0005f) {
+            if (object_a != NULL && object_a->owner != NULL && object_a->flags_0x238 >= 2 && object_a->flags_0x238 <= 4
+                    && !(object_b != NULL && object_b->owner != NULL && object_b->flags_0x238 >= 2 && object_b->flags_0x238 <= 4)) {
+                BrMatrix34ApplyP(&world_pos, &pos_a, &object_a->transform_matrix);
+                PedProcessForces(object_a, object_b, force->field_0xc, pImpulses[i], &world_pos);
+            } else if (object_b != NULL && object_b->owner != NULL && object_b->flags_0x238 >= 2 && object_b->flags_0x238 <= 4
+                    && !(object_a != NULL && object_a->owner != NULL && object_a->flags_0x238 >= 2 && object_a->flags_0x238 <= 4)) {
+                BrMatrix34ApplyP(&world_pos, &pos_b, &object_b->transform_matrix);
+                PedProcessForces(object_b, object_a, force->field_0xc, pImpulses[i], &world_pos);
+            }
+        }
+        if (total > 0.06f) {
+            if (object_a != NULL && object_a->flags_0x238 == 0x10) {
+                QueueDroneCrush(object_a, count, points_a, &force_a);
+                BrMatrix34ApplyV(&world_force, &force_a, &object_a->transform_matrix);
+                BrMatrix34ApplyP(&world_pos, &pos_a, &object_a->transform_matrix);
+                BrVector3Scale(&world_force, &world_force, WORLD_SCALE_D);
+                force_in_world = 1;
+                CrashNoise(&world_force, &world_pos, 0);
+            }
+            if (object_b != NULL && object_b->flags_0x238 == 0x10) {
+                QueueDroneCrush(object_b, count, points_b, &force_b);
+                BrMatrix34ApplyV(&world_force, &force_b, &object_b->transform_matrix);
+                BrMatrix34ApplyP(&world_pos, &pos_b, &object_b->transform_matrix);
+                BrVector3Scale(&world_force, &world_force, WORLD_SCALE_D);
+                force_in_world = 1;
+                CrashNoise(&world_force, &world_pos, 0);
+            }
+        }
+        if (total > 0.001f && ((object_a != NULL && object_a->flags_0x238 == 0x40) || (object_b != NULL && object_b->flags_0x238 == 0x40))) {
+            HitAShatOutMine(object_a, object_b, total);
+        }
+        if (gPinball_factor != 0.0f && object_b == NULL && total > 0.0002f) {
+            if (!force_in_world) {
+                BrMatrix34ApplyV(&world_force, &force_a, &object_a->transform_matrix);
+                BrVector3Scale(&world_force, &world_force, WORLD_SCALE_D);
+            }
+            pinball_v.v[0] = world_force.v[0] * gPinball_factor / object_a->M * gFLOAT_0058f6a8;
+            pinball_v.v[1] = world_force.v[1] * gPinball_factor / object_a->M * gFLOAT_0058f6a8;
+            pinball_v.v[2] = world_force.v[2] * gPinball_factor / object_a->M * gFLOAT_0058f6a8;
+            ts = BrVector3LengthSquared(&pinball_v);
+            if (ts > 500.0f) {
+                BrVector3Scale(&pinball_v, &pinball_v, 500.0f / ts);
+            }
+            BrVector3Accumulate(&object_a->v, &pinball_v);
+            if (BrVector3LengthSquared(&pinball_v) > 1.0f) {
+                if (object_a != NULL && car_a != NULL && object_a->flags_0x238 == 1 && car_a->driver == eDriver_local_human) {
+                    DRS3StartSound(gCar_outlet, 9011);
+                } else {
+                    DRS3StartSound3D(gCar_outlet, 9011, (br_vector3*)object_a->actor->t.t.mat.m[3], &gZero_v__car, 1, 255, 0x10000, 0x10000);
+                }
+            }
+        }
+    }
+    return 0;
 }
 
 // FUNCTION: CARMA2_HW 0x0041e310

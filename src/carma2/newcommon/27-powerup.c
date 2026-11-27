@@ -1647,7 +1647,20 @@ void C2_HOOK_FASTCALL TiggerMineToExplode(tCar_spec* pCar) {
     pCar->index |= 0x20;
 }
 
-// HitAShatOutMine
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_HW 0x004ddc20
+// STUB: CARMA2_SW 0x004da120
+// STUB: CARMA2_CHEAT 0x004e37e0
+void C2_HOOK_FASTCALL HitAShatOutMine(tPhysics_object* pObject1, tPhysics_object* pObject2, br_scalar pImpulse) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // FUNCTION: CARMA2_HW 0x004ddde0
 // FUNCTION: CARMA2_SW 0x004da2e0

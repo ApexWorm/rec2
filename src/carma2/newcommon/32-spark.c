@@ -335,9 +335,19 @@ void C2_HOOK_FASTCALL SetLineModelCols(tU8 pCol) {
 
 // CreateSingleSpark
 
-// CreateSparks
+// STUB: CARMA2_HW 0x004f7d60
+// STUB: CARMA2_SW 0x004f33d0
+// STUB: CARMA2_CHEAT 0x004fda00
+void C2_HOOK_FASTCALL CreateSparks(const br_vector3* pPosition, br_vector3* pVelocity, const br_vector3* pForce, br_scalar pSparkiness, tCar_spec* pCar) {
+    NOT_IMPLEMENTED();
+}
 
-// CreateSparkShower
+// STUB: CARMA2_HW 0x004f8290
+// STUB: CARMA2_SW 0x004f3910
+// STUB: CARMA2_CHEAT 0x004fdf30
+void C2_HOOK_FASTCALL CreateSparkShower(br_vector3* pPosition, br_vector3* pVelocity, br_vector3* pForce, tCar_spec* pCar1, tCar_spec* pCar2) {
+    NOT_IMPLEMENTED();
+}
 
 // FUNCTION: CARMA2_HW 0x004f8630
 // FUNCTION: CARMA2_SW 0x004f3cb0

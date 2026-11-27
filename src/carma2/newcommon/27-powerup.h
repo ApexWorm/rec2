@@ -274,7 +274,7 @@ extern int C2_HOOK_FASTCALL MineExplode(tShit_mine* pMine);
 
 extern void C2_HOOK_FASTCALL TiggerMineToExplode(tCar_spec* pCar);
 
-// HitAShatOutMine
+extern void C2_HOOK_FASTCALL HitAShatOutMine(tPhysics_object* pObject1, tPhysics_object* pObject2, br_scalar pImpulse);
 
 extern void C2_HOOK_FASTCALL ClearMineReferencesToCar(tCar_spec* pCar);
 
