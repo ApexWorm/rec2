@@ -114,7 +114,7 @@ extern void C2_HOOK_FASTCALL CloseDownPowerUps(void);
 
 extern void C2_HOOK_FASTCALL NewRepulseRay(tU32 pTime, tCar_spec* pCar, tCar_spec* pVictim_car, br_vector3* pPos_origin, br_vector3* pPos_victim, float pRadius1, float pRadius2);
 
-// RemoveRepulsiveReferences
+extern void C2_HOOK_FASTCALL RemoveRepulsiveReferences(tCar_spec* pCar);
 
 extern void C2_HOOK_FASTCALL MungeRepulseRays(tU32 pTime);
 
