@@ -758,7 +758,7 @@ void C2_HOOK_FASTCALL InitSmokeStuff(void) {
     // GLOBAL: CARMA2_CHEAT 0x00667990
     static br_token_value fadealpha[3] = {
         { BRT_BLEND_B, { 1 } },
-        { BRT_OPACITY_X, { 0x4b0000 } }, /* ~ 29.296875% = 75 / 256 */
+        { BRT_OPACITY_X, { BR_FIXED_INT(75) } },
         { 0 },
     };
 
@@ -797,17 +797,17 @@ void C2_HOOK_FASTCALL InitSmokeStuff(void) {
     gBlend_model2->faces[3].vertices[1] = 4;
     gBlend_model2->faces[3].vertices[2] = 5;
 
-    BrVector3Set(&gBlend_model->vertices[0].p, -1.f,  1.f, 0.f);
-    BrVector3Set(&gBlend_model->vertices[1].p, -1.f, -1.f, 0.f);
-    BrVector3Set(&gBlend_model->vertices[2].p,  1.f, -1.f, 0.f);
-    BrVector3Set(&gBlend_model->vertices[3].p,  1.f,  1.f, 0.f);
+    BrVector3Set(&gBlend_model->vertices[0].p, -1.0f,  1.0f, 0.0f);
+    BrVector3Set(&gBlend_model->vertices[1].p, -1.0f, -1.0f, 0.0f);
+    BrVector3Set(&gBlend_model->vertices[2].p,  1.0f, -1.0f, 0.0f);
+    BrVector3Set(&gBlend_model->vertices[3].p,  1.0f,  1.0f, 0.0f);
 
-    BrVector3Set(&gBlend_model2->vertices[0].p, -1.f, 1.f, 0.f);
-    BrVector3Set(&gBlend_model2->vertices[1].p, -1.f, 0.f, 0.f);
-    BrVector3Set(&gBlend_model2->vertices[2].p,  1.f, 0.f, 0.f);
-    BrVector3Set(&gBlend_model2->vertices[3].p,  1.f, 1.f, 0.f);
-    BrVector3Set(&gBlend_model2->vertices[4].p, -1.f, -.25f, 0.f);
-    BrVector3Set(&gBlend_model2->vertices[5].p,  1.f, -.25f, 0.f);
+    BrVector3Set(&gBlend_model2->vertices[0].p, -1.0f, 1.0f, 0.0f);
+    BrVector3Set(&gBlend_model2->vertices[1].p, -1.0f, 0.0f, 0.0f);
+    BrVector3Set(&gBlend_model2->vertices[2].p,  1.0f, 0.0f, 0.0f);
+    BrVector3Set(&gBlend_model2->vertices[3].p,  1.0f, 1.0f, 0.0f);
+    BrVector3Set(&gBlend_model2->vertices[4].p, -1.00f, -0.25f, 0.0f);
+    BrVector3Set(&gBlend_model2->vertices[5].p,  1.00f, -0.25f, 0.0f);
     gBlend_model->flags |= BR_MODF_KEEP_ORIGINAL;
     gBlend_model2->flags |= BR_MODF_KEEP_ORIGINAL;
 
