@@ -323,7 +323,7 @@ extern void C2_HOOK_FASTCALL PedPreCollisionStuff(void);
 
 extern void C2_HOOK_FASTCALL UpdateIfBackwardsAR(void);
 
-extern void C2_HOOK_FASTCALL ChangePedScaling(br_vector3* pScale);
+extern void C2_HOOK_FASTCALL ChangePedScaling(const br_vector3* pScale);
 
 // ChangeHeadScaling
 

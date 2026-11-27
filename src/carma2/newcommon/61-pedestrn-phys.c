@@ -1806,16 +1806,14 @@ inline void C2_HOOK_FASTCALL UpdateIfBackwardsAR(void) {
 // FUNCTION: CARMA2_HW 0x004d69b0
 // FUNCTION: CARMA2_SW 0x004d2fb0
 // FUNCTION: CARMA2_CHEAT 0x004dc570
-void C2_HOOK_FASTCALL ChangePedScaling(br_vector3* pScale) {
+void C2_HOOK_FASTCALL ChangePedScaling(const br_vector3* pScale) {
     br_vector3 scale;
 
-    scale.v[0] = pScale->v[0] / gPed_scale.v[0];
-    scale.v[1] = pScale->v[1] / gPed_scale.v[1];
-    scale.v[2] = pScale->v[2] / gPed_scale.v[2];
+    Vector3Div(&scale, pScale, &gPed_scale);
     if (scale.v[0] != 1.0 || scale.v[1] != 1.0 || scale.v[2] != 1.0) {
         ScaleBone(-1, &scale, 1);
         BrVector3Copy(&gPed_scale, pScale);
-        gAverage_ped_scale = (gPed_scale.v[0] + gPed_scale.v[1] + gPed_scale.v[2]) / 3.f;
+        gAverage_ped_scale = (gPed_scale.v[0] + gPed_scale.v[1] + gPed_scale.v[2]) / 3.0f;
         UpdateIfBackwardsAR();
     }
 }
