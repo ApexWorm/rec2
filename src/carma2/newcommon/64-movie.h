@@ -53,7 +53,7 @@ extern void C2_HOOK_CDECL InitQuickTimeStuff(void);
 
 extern void C2_HOOK_FASTCALL SetQuickTimeDefaults(void);
 
-// MovieRecordButtonPressed
+extern void C2_HOOK_FASTCALL MovieRecordButtonPressed(void);
 
 extern void C2_HOOK_FASTCALL MovieStopRecordingIfNecessary(void);
 

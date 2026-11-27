@@ -453,7 +453,12 @@ void C2_HOOK_FASTCALL SetQuickTimeDefaults(void) {
     }
 }
 
-// MovieRecordButtonPressed
+// STUB: CARMA2_HW 0x004e1810
+// STUB: CARMA2_SW 0x004ddb10
+// STUB: CARMA2_CHEAT 0x004e73b0
+void C2_HOOK_FASTCALL MovieRecordButtonPressed(void) {
+    NOT_IMPLEMENTED();
+}
 
 // FUNCTION: CARMA2_HW 0x004e1a20
 // FUNCTION: CARMA2_SW 0x004ddd20
