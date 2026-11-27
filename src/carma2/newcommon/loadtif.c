@@ -50,17 +50,17 @@ br_pixelmap* C2_HOOK_FASTCALL CreatePalettePixelmapFromRGBChannels(br_uint_16* p
         }
         pixels = pm->pixels;
 
-        pixels[0] = 0;
-        pixels[1] = 0;
         pixels[2] = 0;
+        pixels[1] = 0;
+        pixels[0] = 0;
         for (i = 1; i < 256; i++) {
             pixels[4 * i + 0] = pBlu_channel[i] >> 8;
             pixels[4 * i + 1] = pGrn_channel[i] >> 8;
             pixels[4 * i + 2] = pRed_channel[i] >> 8;
             if (pixels[4 * i + 0] == 0 && pixels[4 * i + 1] == 0 && pixels[4 * i + 2] == 0) {
-                pixels[4 * i + 0] = 1;
-                pixels[4 * i + 1] = 1;
                 pixels[4 * i + 2] = 1;
+                pixels[4 * i + 1] = 1;
+                pixels[4 * i + 0] = 1;
             }
         }
     }
@@ -673,8 +673,8 @@ int C2_HOOK_FASTCALL FindPaletteColourRGB565(br_colour pColour, br_pixelmap *pPa
 
         error = RGB565Error(pColour, pixel[i]);
         if (error < best_error) {
-            best_index = i;
             best_error = error;
+            best_index = i;
         }
     }
     return best_index;
@@ -701,8 +701,8 @@ int C2_HOOK_FASTCALL FindPaletteColourXRGB8888(br_colour pColour, br_pixelmap *p
 
         error = XRGB8888Error(pColour, pixel[i]);
         if (error < best_error) {
-            best_index = i;
             best_error = error;
+            best_index = i;
         }
     }
     return best_index;
