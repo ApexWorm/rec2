@@ -30,6 +30,12 @@
 #define PHYSICS_BUFFER_PART_SIZE 40000
 #define PHYSICS_BUFFER_OTHER_SIZE 50000
 
+/* FIXME: name is a guess; nothing in the exe writes it. */
+// GLOBAL: CARMA2_HW 0x006923d8
+// GLOBAL: CARMA2_SW 0x0068c430
+// GLOBAL: CARMA2_CHEAT 0x00699dc0
+tPhysics_object* gTest_object;
+
 // GLOBAL: CARMA2_HW 0x00692dc8
 // GLOBAL: CARMA2_SW 0x0068ce20
 // GLOBAL: CARMA2_CHEAT 0x0069a940
@@ -1066,6 +1072,10 @@ void C2_HOOK_FASTCALL InternalPositionChildren(tPhysics_object* pParent, tPhysic
     }
 }
 
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
 // FUNCTION: CARMA2_HW 0x004c2b10
 // FUNCTION: CARMA2_SW 0x004bf240
 // FUNCTION: CARMA2_CHEAT 0x004c8630
@@ -1073,6 +1083,10 @@ void C2_HOOK_FASTCALL PositionChildren(tPhysics_object* pCollision_info) {
 
     InternalPositionChildren(pCollision_info, pCollision_info);
 }
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // FUNCTION: CARMA2_HW 0x004c2c30
 // FUNCTION: CARMA2_SW 0x004bf360
@@ -1775,16 +1789,51 @@ void C2_HOOK_FASTCALL DoPhysicsError(tPhysicsError pError, const char* pMessage)
     FatalError(1000 + pError, s);
 }
 
-// ResetMan2
+inline void C2_HOOK_FASTCALL ResetMan2(void) {
+
+    if (gTest_object != NULL) {
+        BrMatrix34Translate(&gTest_object->transform_matrix, -54.f, 7.1325f, -155.f);
+        gTest_object->disable_move_rotate = 1;
+        BrVector3SetFloat(&gTest_object->v, 0.f, 0.f, 0.f);
+        BrVector3SetFloat(&gTest_object->omega, 0.f, 0.f, 0.f);
+        BrVector3SetFloat(&gTest_object->rotate_omega, 0.f, 0.f, 0.f);
+        BrVector3SetFloat(&gTest_object->velocity_car_space, 0.f, 0.f, 0.f);
+        ResetObjectList_test(gTest_object->child);
+        PositionChildren(gTest_object);
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x004b5aa0
 void C2_HOOK_FASTCALL SetUpTestObjects(void) {
 
 }
 
-// ResetObjectList
+/* The original names this static ResetObjectList too. */
+// FUNCTION: CARMA2_HW 0x004b5c00
+// FUNCTION: CARMA2_SW 0x004b2320
+// FUNCTION: CARMA2_CHEAT 0x004bb4d0
+void C2_HOOK_FASTCALL ResetObjectList_test(tPhysics_object* pObject) {
 
-// ResetMan
+    for (; pObject != NULL; pObject = pObject->next) {
+        BrMatrix34Translate(&pObject->transform_matrix, 0.f, 0.f, 0.f);
+        BrVector3SetFloat(&pObject->v, 0.f, 0.f, 0.f);
+        BrVector3SetFloat(&pObject->omega, 0.f, 0.f, 0.f);
+        BrVector3SetFloat(&pObject->rotate_omega, 0.f, 0.f, 0.f);
+        BrVector3SetFloat(&pObject->velocity_car_space, 0.f, 0.f, 0.f);
+        pObject->disable_move_rotate = 1;
+        if (pObject->child != NULL) {
+            ResetObjectList_test(pObject->child);
+        }
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x004b5ab0
+// FUNCTION: CARMA2_SW 0x004b21d0
+// FUNCTION: CARMA2_CHEAT 0x004bb380
+void C2_HOOK_FASTCALL ResetMan(void) {
+
+    ResetMan2();
+}
 
 #if defined(REC2_MATCHING) && defined(_MSC_VER)
 #pragma inline_depth(0)

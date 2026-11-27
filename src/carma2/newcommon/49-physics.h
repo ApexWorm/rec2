@@ -12,6 +12,8 @@
 #include "c2_hooks.h"
 #include "rec2_types.h"
 
+extern tPhysics_object* gTest_object;
+
 extern int gINT_00692dc8;
 
 extern tPhysicsError_cbfn* gPhysics_error_cb;
@@ -420,13 +422,13 @@ extern float C2_HOOK_FASTCALL GetFrictionFromFace(const tFace_ref* pFace);
 
 extern void C2_HOOK_FASTCALL DoPhysicsError(tPhysicsError pError, const char* pMessage);
 
-// ResetMan2
+extern void C2_HOOK_FASTCALL ResetMan2(void);
 
 extern void C2_HOOK_FASTCALL SetUpTestObjects(void);
 
-// ResetObjectList
+extern void C2_HOOK_FASTCALL ResetObjectList_test(tPhysics_object* pObject);
 
-// ResetMan
+extern void C2_HOOK_FASTCALL ResetMan(void);
 
 extern void C2_HOOK_FASTCALL InitPhysics(void);
 
