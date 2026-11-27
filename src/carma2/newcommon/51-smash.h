@@ -152,7 +152,7 @@ extern void C2_HOOK_FASTCALL InitSmashQueue(void);
 
 extern int C2_HOOK_FASTCALL QueueSmashIfNecessary3(tCar_spec* pCar, tPhysics_object* pObject, br_vector3* pPosition, br_vector3* pNormal, br_actor* pActor, int pArg6, tCar_crush_smashable_part* pSmashable, float pMagnitude, int pArg9, int pArg10);
 
-extern void C2_HOOK_FASTCALL QueueSmashIfNecessary2(tCar_spec* pCar, tPhysics_object* pObject, br_vector3* pPosition, br_vector3* pNormal, br_actor* pActor, int pArg6, tCar_crush_smashable_part* pSmashable, float pMagnitude, int pArg9, int pArg10);
+extern void C2_HOOK_FASTCALL QueueSmashIfNecessary2(tCar_spec* pCar, tPhysics_object* pObject, br_vector3* pPosition, br_vector3* pNormal, br_actor* pActor, int pArg6, tCar_crush_smashable_part* pSmashable, float pMagnitude, int pArg9);
 
 // AllocateSmashLevels
 

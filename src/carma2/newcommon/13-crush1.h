@@ -134,7 +134,7 @@ extern void C2_HOOK_FASTCALL DisposeCrushData(tCar_crush_buffer_entry* pCrush_da
 
 extern void C2_HOOK_FASTCALL DisposeVertexData(tModel_detail_vertex_data* pVertex_data);
 
-// BuckleTheBugger
+extern void C2_HOOK_FASTCALL BuckleTheBugger(tCar_spec* pCar, br_actor* pActor, const br_vector3* pDirection, br_scalar pForce, tU16 pVertex, int pSeed);
 
 // OutsideEdgeLine
 
@@ -156,7 +156,7 @@ extern int C2_HOOK_FASTCALL NearestAxis(const br_vector3* pVector);
 
 extern void C2_HOOK_FASTCALL CrushModel(br_model* pModel, int pCount, const br_vector3* pVertices, br_vector3* pEnergy, br_scalar pForce, const tCar_crush_limits* pLimits, int pAxis, int pMax_level, br_scalar* pMax_scale, br_scalar* pScale, tU16* pIndex);
 
-// PossibleShockSmash
+extern void C2_HOOK_FASTCALL PossibleShockSmash(tCar_spec* pCar, br_actor* pActor, int pCount, tCar_crush_smashable_part* pSmashables, const br_vector3* pPoint, br_scalar pForce);
 
 extern intptr_t C2_HOOK_FASTCALL CrushModels(br_actor* pActor, br_matrix34* pMat, void* pContext);
 
