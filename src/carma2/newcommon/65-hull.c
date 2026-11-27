@@ -25,6 +25,7 @@ tPhysicsError C2_HOOK_FASTCALL ConvexHull2D(tCollision_shape_polyhedron_data* pP
 }
 
 // FUNCTION: CARMA2_HW 0x00420d60
+// FUNCTION: CARMA2_SW 0x00420de0
 // FUNCTION: CARMA2_CHEAT 0x00420fc0
 br_scalar C2_HOOK_FASTCALL SignedTwiceAreaOf3DTriangle(const br_vector3* pV1, const br_vector3* pV2) {
     br_scalar x;
