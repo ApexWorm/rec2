@@ -1323,6 +1323,7 @@ void C2_HOOK_FASTCALL CBLoadForm(tPed_form* pPed_form, FILE* pF) {
 }
 
 // FUNCTION: CARMA2_HW 0x004cc940
+// FUNCTION: CARMA2_SW 0x004c9040
 // FUNCTION: CARMA2_CHEAT 0x004d24b0
 void C2_HOOK_FASTCALL CBDisposeForm(tPed_form* pForm) {
 }
@@ -1855,6 +1856,7 @@ void C2_HOOK_FASTCALL SetThisPedPhysicing(tPedestrian* pPed) {
 #ifdef REC2_MATCHING
 // FUNCTION: CARMA2_HW 0x004d3600
 // FUNCTION: CARMA2_SW 0x004cfcf0
+// FUNCTION: CARMA2_CHEAT 0x004d91c0
 void C2_HOOK_FASTCALL FUN_004d3600(void) {
     /* Unused */
 }
@@ -2505,6 +2507,7 @@ void C2_HOOK_FASTCALL ScaleModel(br_model* pModel, float pScale) {
 
 // FUNCTION: CARMA2_HW 0x004046d0
 // FUNCTION: CARMA2_SW 0x004046d0
+// FUNCTION: CARMA2_CHEAT 0x004046d0
 void C2_HOOK_FASTCALL DisposeRemap(tPed_remap* pRemap) {
 
     C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPed_remap, bones, 0x2c);
@@ -2519,6 +2522,7 @@ void C2_HOOK_FASTCALL DisposeRemap(tPed_remap* pRemap) {
 
 // FUNCTION: CARMA2_HW 0x00404700
 // FUNCTION: CARMA2_SW 0x00404700
+// FUNCTION: CARMA2_CHEAT 0x00404700
 void C2_HOOK_FASTCALL DisposeAllLoadedRemaps(void) {
     int i;
 
@@ -3066,6 +3070,7 @@ int C2_HOOK_FASTCALL BonerActiveHalted2(tPed_character_instance* pCharacter, und
 
 // FUNCTION: CARMA2_HW 0x004093e0
 // FUNCTION: CARMA2_SW 0x004093e0
+// FUNCTION: CARMA2_CHEAT 0x00409430
 int C2_HOOK_FASTCALL CharacterNoLongerPhysicworthy(tPed_character_instance* pCharacter) {
 
     if ((pCharacter->field_0x14 & 4) == 0) {
