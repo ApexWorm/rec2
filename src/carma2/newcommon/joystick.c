@@ -10,6 +10,7 @@
 
 #include "08-loading1.h"
 #include "15-displays.h"
+#include "24-loadsave.h"
 #include "41-utility.h"
 #include "globvars.h"
 #include "globvrbm.h"
@@ -21,6 +22,11 @@
 #include "c2_string.h"
 
 #include <ctype.h>
+
+typedef struct {
+    const char* name;
+    int key;
+} tJoystick_key_name;
 
 // GLOBAL: CARMA2_HW 0x00595f84
 // GLOBAL: CARMA2_SW 0x00590ee4
@@ -39,10 +45,32 @@ float gJoystick_x_steering = 1.f;
 // GLOBAL: CARMA2_SW 0x00590ef4
 float gJoystick_y_throttle = 1.f;
 
-// GLOBAL: CARMA2_HW 0x00596310
-// GLOBAL: CARMA2_SW 0x00591270
-// GLOBAL: CARMA2_CHEAT 0x0059cb90
-int gINT_00596310 = 50;
+// GLOBAL: CARMA2_HW 0x00596250
+// GLOBAL: CARMA2_SW 0x005911b0
+// GLOBAL: CARMA2_CHEAT 0x0059cad0
+tJoystick_key_name gJoystick_key_names[21] = {
+    { "Recover", 60 },
+    { "Reapir", 45 },
+    { "Hand Brake", 54 },
+    { "Use Powerup", 61 },
+    { "Next Powerup", 64 },
+    { "Prev Powerup", 63 },
+    { "Wheel Spin", 56 },
+    { "Map", 57 },
+    { "Cockpit View", 46 },
+    { "Buy Armour", 67 },
+    { "Buy Power", 68 },
+    { "Buy Offensive", 69 },
+    { "Target Lock", 72 },
+    { "Cycle Target", 73 },
+    { "Camera Mode", 75 },
+    { "Doors", 74 },
+    { "Horn", 59 },
+    { "Accelerate", 49 },
+    { "Brake", 50 },
+    { "Left", 47 },
+    { "Right", 48 },
+};
 
 #ifdef REC2_HW
 // GLOBAL: CARMA2_HW 0x00686174
@@ -60,15 +88,21 @@ br_model* gAcc_poly_model;
 // GLOBAL: CARMA2_HW 0x00686180
 // GLOBAL: CARMA2_CHEAT 0x0068da28
 int gRender_acc_poly_actor;
+#endif
 
 // GLOBAL: CARMA2_HW 0x005962f8
+// GLOBAL: CARMA2_SW 0x00591258
 // GLOBAL: CARMA2_CHEAT 0x0059cb78
 br_token_value gAccent_poly_prims[] = {
     { BRT_BLEND_B, { 1 } },
     { BRT_OPACITY_X, { 0x4b0000 } },
     { BR_NULL_TOKEN, { 0 } },
 };
-#endif
+
+// GLOBAL: CARMA2_HW 0x00596310
+// GLOBAL: CARMA2_SW 0x00591270
+// GLOBAL: CARMA2_CHEAT 0x0059cb90
+int gINT_00596310 = 50;
 
 // GLOBAL: CARMA2_HW 0x00686184
 // GLOBAL: CARMA2_SW 0x006808c4
@@ -83,6 +117,11 @@ tHeadup_text_buffer gPath_headup_buffer;
 // GLOBAL: CARMA2_SW 0x00793de0
 // GLOBAL: CARMA2_CHEAT 0x007a4f20
 tHeadup_text_buffer gTest_headup_buffer;
+
+// GLOBAL: CARMA2_HW 0x0079d8a0
+// GLOBAL: CARMA2_SW 0x00793e00
+// GLOBAL: CARMA2_CHEAT 0x007a4f40
+tHeadup_text_buffer gJoystick_headup_buffer;
 
 // GLOBAL: CARMA2_HW 0x0079d8c0
 // GLOBAL: CARMA2_SW 0x00793e20
@@ -735,6 +774,53 @@ void C2_HOOK_FASTCALL RestoreJoystickPreferences(void) {
         info = PDGetCurrentJoystickData();
         if (info != NULL) {
             *info = gJoystick_preferences_backup;
+        }
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x0045c240
+// FUNCTION: CARMA2_SW 0x0045bcc0
+// FUNCTION: CARMA2_CHEAT 0x0045c6c0
+void C2_HOOK_FASTCALL FUN_0045c240(void) {
+    int i;
+    tHeadup_text* text;
+
+    if (gINT_0068b8e8) {
+        gINT_0068b8e8 = 0;
+#ifdef REC2_HW
+        if (gAcc_poly_actor != NULL && gRender_acc_poly_actor) {
+            BrActorRemove(gAcc_poly_actor);
+            gRender_acc_poly_actor = 0;
+        }
+#endif
+        return;
+    }
+    gINT_0068b8e8 = 1;
+    MoveHeadupTo(gProgram_state.frame_rate_headup, 10, 350);
+    for (i = 0; i < (int)REC2_ASIZE(gRace_head_ups); i++) {
+        MoveHeadupTo(gRace_head_ups[i], 10, 120 + 10 * i);
+        ChangeHeadupFont(gRace_head_ups[i], -2);
+    }
+#ifdef REC2_HW
+    CreateAccentPolyActor(8.f, 118.f, 130.f, 224.f);
+#endif
+    if (gJoystick_headup_buffer.count == 0) {
+        if (gJoystick_headup_buffer.field_0x14 < 5) {
+            gJoystick_headup_buffer.field_0x14 = 10;
+        }
+        gJoystick_headup_buffer.texts = NULL;
+        gJoystick_headup_buffer.count = 0;
+        gJoystick_headup_buffer.pos_last_add = 0;
+        gJoystick_headup_buffer.text_last_add = NULL;
+        gJoystick_headup_buffer.field_0x4 = NULL;
+        gJoystick_headup_buffer.field_0x10 = 22;
+        for (i = 0; i < (int)REC2_ASIZE(gJoystick_key_names); i++) {
+            text = malloc(sizeof(tHeadup_text));
+            if (text != NULL) {
+                text->next = NULL;
+                strncpy(text->text, gJoystick_key_names[i].name, sizeof(text->text));
+                StoreTextHeadup(&gJoystick_headup_buffer, text, 0);
+            }
         }
     }
 }

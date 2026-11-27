@@ -58,6 +58,8 @@ extern int C2_HOOK_FASTCALL WriteJoystickPreferences(FILE* pF, const tButtonJoys
 
 extern int C2_HOOK_FASTCALL CountJoystickPreferences(FILE* pF);
 
+extern void C2_HOOK_FASTCALL FUN_0045c240(void);
+
 extern int C2_HOOK_FASTCALL ToggleJoystickThrottle(void);
 
 extern void C2_HOOK_FASTCALL SetJoystickDPadEnabled(int pEnabled);
