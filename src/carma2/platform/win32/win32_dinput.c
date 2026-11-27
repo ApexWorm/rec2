@@ -556,6 +556,72 @@ void C2_HOOK_FASTCALL CollectJoystickButtonInfos(void) {
 #pragma auto_inline(on)
 #endif
 
+// FUNCTION: CARMA2_HW 0x00457a60
+// FUNCTION: CARMA2_SW 0x004577f0
+// FUNCTION: CARMA2_CHEAT 0x00457ee0
+void C2_HOOK_FASTCALL PauseJoystickFFB(void) {
+    IDirectInputDevice2A* device;
+
+    if (gForceFeedbackAvailable && gJoystick_index != -1) {
+        device = gDirectInputJoystickDevices[gJoystick_index];
+        if (device != NULL && (gJoystickFFB & (1 << gJoystick_index))) {
+            IDirectInputDevice2_SendForceFeedbackCommand(device, DISFFC_PAUSE);
+        }
+    }
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// FUNCTION: CARMA2_HW 0x00457aa0
+// FUNCTION: CARMA2_SW 0x00457830
+// FUNCTION: CARMA2_CHEAT 0x00457f20
+void C2_HOOK_FASTCALL ContinueJoystickFFB(void) {
+    IDirectInputDevice2A* device;
+
+    if (gForceFeedbackAvailable && gJoystick_index != -1) {
+        device = gDirectInputJoystickDevices[gJoystick_index];
+        if (device != NULL && (gJoystickFFB & (1 << gJoystick_index))) {
+            IDirectInputDevice2_SendForceFeedbackCommand(device, DISFFC_CONTINUE);
+        }
+    }
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
+
+// FUNCTION: CARMA2_HW 0x00457ae0
+// FUNCTION: CARMA2_SW 0x00457870
+// FUNCTION: CARMA2_CHEAT 0x00457f60
+void C2_HOOK_FASTCALL EnableJoystickFFBActuators(void) {
+    IDirectInputDevice2A* device;
+
+    if (gForceFeedbackAvailable && gJoystick_index != -1) {
+        device = gDirectInputJoystickDevices[gJoystick_index];
+        if (device != NULL && (gJoystickFFB & (1 << gJoystick_index))) {
+            IDirectInputDevice2_SendForceFeedbackCommand(device, DISFFC_SETACTUATORSON);
+        }
+        ResetDInputJoystickFFB(gJoystick_index);
+        ContinueJoystickFFB();
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x00457b30
+// FUNCTION: CARMA2_SW 0x004578c0
+// FUNCTION: CARMA2_CHEAT 0x00457fb0
+void C2_HOOK_FASTCALL DisableJoystickFFBActuators(void) {
+    IDirectInputDevice2A* device;
+
+    if (gForceFeedbackAvailable && gJoystick_index != -1) {
+        device = gDirectInputJoystickDevices[gJoystick_index];
+        if (device != NULL && (gJoystickFFB & (1 << gJoystick_index))) {
+            IDirectInputDevice2_SendForceFeedbackCommand(device, DISFFC_SETACTUATORSOFF);
+        }
+    }
+}
+
 #if defined(REC2_MATCHING) && defined(_MSC_VER)
 #pragma inline_depth(0)
 #endif
@@ -940,6 +1006,18 @@ int C2_HOOK_FASTCALL SetDinputEffectGain(int pIndex, int pGain) {
         IDirectInputEffect_SetParameters(effect, &gJoystick_effects[pIndex].di_effect, DIEP_GAIN);
     }
     return 1;
+}
+
+// FUNCTION: CARMA2_HW 0x00458840
+// FUNCTION: CARMA2_SW 0x004585d0
+// FUNCTION: CARMA2_CHEAT 0x00458cc0
+void C2_HOOK_FASTCALL UnacquireDInputJoystickDevice(int pIndex) {
+    IDirectInputDevice2A* device;
+
+    device = gDirectInputJoystickDevices[pIndex];
+    if (device != NULL) {
+        IDirectInputDevice2_Unacquire(device);
+    }
 }
 
 // FUNCTION: CARMA2_HW 0x00458860
@@ -1669,6 +1747,36 @@ void C2_HOOK_FASTCALL StopDinputEffect(int pIndex) {
 #pragma auto_inline(on)
 #endif
 
+// FUNCTION: CARMA2_HW 0x00457ef0
+// FUNCTION: CARMA2_SW 0x00457c80
+// FUNCTION: CARMA2_CHEAT 0x00458370
+int C2_HOOK_FASTCALL StartDinputFFBEffectWithName(const char* name) {
+    int i;
+
+    for (i = 0; i < gCount_joystick_effects; i++) {
+        if (strcmp(gJoystick_effects[i].name, name) == 0) {
+            StartDinputEffect(i);
+            return 1;
+        }
+    }
+    return 0;
+}
+
+// FUNCTION: CARMA2_HW 0x00457f70
+// FUNCTION: CARMA2_SW 0x00457d00
+// FUNCTION: CARMA2_CHEAT 0x004583f0
+int C2_HOOK_FASTCALL StopDinputFFBEffectWithName(const char* name) {
+    int i;
+
+    for (i = 0; i < gCount_joystick_effects; i++) {
+        if (strcmp(gJoystick_effects[i].name, name) == 0) {
+            StopDinputEffect(i);
+            return 1;
+        }
+    }
+    return 0;
+}
+
 // FUNCTION: CARMA2_HW 0x0045a070
 // FUNCTION: CARMA2_SW 0x00459e00
 int C2_HOOK_FASTCALL PDEnableJoysticks(void) {
@@ -1727,6 +1835,19 @@ void C2_HOOK_FASTCALL PDPlayFFBEffect(const char* effectName) {
         int index = PDFindJoystickEffect(effectName);
         if (index != -1) {
             StartDinputEffect(index);
+        }
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x0045c740
+// FUNCTION: CARMA2_SW 0x0045c180
+// FUNCTION: CARMA2_CHEAT 0x0045cbc0
+void C2_HOOK_FASTCALL PDStopFFBEffect(const char* effectName) {
+
+    if (gForceFeedbackAvailable) {
+        int index = PDFindJoystickEffect(effectName);
+        if (index != -1) {
+            StopDinputEffect(index);
         }
     }
 }

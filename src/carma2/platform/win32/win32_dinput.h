@@ -32,6 +32,18 @@ extern void C2_HOOK_FASTCALL KeyBegin(void);
 
 extern int C2_HOOK_FASTCALL InitForceFeedback(void);
 
+extern void C2_HOOK_FASTCALL PauseJoystickFFB(void);
+
+extern void C2_HOOK_FASTCALL ContinueJoystickFFB(void);
+
+extern void C2_HOOK_FASTCALL EnableJoystickFFBActuators(void);
+
+extern void C2_HOOK_FASTCALL DisableJoystickFFBActuators(void);
+
+extern int C2_HOOK_FASTCALL StartDinputFFBEffectWithName(const char* name);
+
+extern int C2_HOOK_FASTCALL StopDinputFFBEffectWithName(const char* name);
+
 extern void C2_HOOK_FASTCALL ResetDInputJoystickFFB(int pIndex);
 
 extern void C2_HOOK_FASTCALL RegisterJoystickFFBForces(void);
@@ -39,6 +51,8 @@ extern void C2_HOOK_FASTCALL RegisterJoystickFFBForces(void);
 extern void C2_HOOK_FASTCALL Win32InitInputDevice(void);
 
 extern int C2_HOOK_FASTCALL SetDinputEffectGain(int pIndex, int pGain);
+
+extern void C2_HOOK_FASTCALL UnacquireDInputJoystickDevice(int pIndex);
 
 extern int C2_HOOK_FASTCALL JoystickDInputBegin(void);
 
@@ -85,6 +99,8 @@ extern void C2_HOOK_FASTCALL StopDinputEffect(int pIndex);
 extern int C2_HOOK_FASTCALL PDFindJoystickEffect(const char* effectName);
 
 extern void C2_HOOK_FASTCALL PDPlayFFBEffect(const char* effectName);
+
+extern void C2_HOOK_FASTCALL PDStopFFBEffect(const char* effectName);
 
 extern int C2_HOOK_FASTCALL PDIsJoystickDPadEnabled(void);
 
