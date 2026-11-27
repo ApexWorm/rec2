@@ -58,7 +58,7 @@ extern char* C2_HOOK_FASTCALL GetPowerupMessage(int pPowerup_index);
 
 extern void C2_HOOK_FASTCALL DoPowerupTextHeadup(tPowerup* pPowerup, int pGot_it);
 
-// QueueIconGoing
+extern void C2_HOOK_FASTCALL QueueIconGoing(tPowerup* pPowerup, tHeadup_icon* pHeadup_icons, int* pCount_icons, int pMax_count_icons);
 
 extern void C2_HOOK_FASTCALL QueueIconComing(tPowerup* pPowerup, tHeadup_icon* pHeadup_icons, int* pCount_icons);
 
@@ -70,7 +70,7 @@ extern void C2_HOOK_FASTCALL LosePowerup(tPowerup* pPowerup);
 
 extern void C2_HOOK_FASTCALL KeyboardPowerupFinished(tPowerup* pPowerup, int pSelect_new);
 
-// LoseAllSimilarPowerups
+extern void C2_HOOK_FASTCALL LoseAllSimilarPowerups(tPowerup* pPowerup);
 
 extern int C2_HOOK_FASTCALL ExcludedPowerup(int pIndex, tRace_list_spec* pRace_spec);
 

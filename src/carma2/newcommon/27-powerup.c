@@ -304,7 +304,42 @@ inline void C2_HOOK_FASTCALL DoPowerupTextHeadup(tPowerup* pPowerup, int pGot_it
     NewTextHeadupSlot(4, 0, 3000, -4, s2);
 }
 
-// QueueIconGoing
+inline void C2_HOOK_FASTCALL QueueIconGoing(tPowerup* pPowerup, tHeadup_icon* pHeadup_icons, int* pCount_icons, int pMax_count_icons) {
+    int i;
+#ifdef REC2_HW
+    // GLOBAL: CARMA2_HW 0x0065e8f8
+    // GLOBAL: CARMA2_CHEAT 0x00666060
+    static br_token_value icon_prims[3] = {
+        { BRT_BLEND_B, { 1 } },
+        { BRT_OPACITY_X, { BR_FIXED_INT(100) } },
+        { 0 },
+    };
+#endif
+
+    for (i = 0; i < *pCount_icons; i++) {
+        if (pPowerup == pHeadup_icons[i].powerup) {
+            pHeadup_icons[i].fizzle_stage = 4;
+            return;
+        }
+    }
+    if (*pCount_icons != pMax_count_icons) {
+        pHeadup_icons[*pCount_icons].powerup = pPowerup;
+        pHeadup_icons[*pCount_icons].fizzle_stage = 0;
+        pHeadup_icons[*pCount_icons].fizzle_direction = 1;
+        pHeadup_icons[*pCount_icons].fizzle_start = GetTotalTime();
+#ifdef REC2_HW
+        if (pPowerup->icon_actor != NULL) {
+            pHeadup_icons[*pCount_icons].icon_actor = pPowerup->icon_actor;
+            memcpy(pPowerup->material_prims, icon_prims, sizeof(icon_prims));
+            pPowerup->icon_actor->material->extra_prim[1].v.x = BR_FIXED_INT(255);
+            BrMaterialUpdate(pPowerup->icon_actor->material, BR_MATU_EXTRA_PRIM);
+            pPowerup->icon_actor->render_style = BR_RSTYLE_NONE;
+            RenderThisHeadup(pPowerup->icon_actor);
+        }
+#endif
+        *pCount_icons += 1;
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x004d9670
 // FUNCTION: CARMA2_SW 0x004d5b40
@@ -377,7 +412,17 @@ inline void C2_HOOK_FASTCALL KeyboardPowerupFinished(tPowerup* pPowerup, int pSe
     }
 }
 
-// LoseAllSimilarPowerups
+inline void C2_HOOK_FASTCALL LoseAllSimilarPowerups(tPowerup* pPowerup) {
+    int i;
+    tPowerup* the_powerup;
+
+    for (i = 0; i < gNumber_of_powerups; i++) {
+        the_powerup = &gPowerup_array[i];
+        if (the_powerup != pPowerup && the_powerup->got_time != 0 && (the_powerup->group_inclusion & pPowerup->group_inclusion)) {
+            LosePowerup(the_powerup);
+        }
+    }
+}
 
 inline int C2_HOOK_FASTCALL ExcludedPowerup(int pIndex, tRace_list_spec* pRace_spec) {
     int i;
@@ -414,10 +459,86 @@ inline int C2_HOOK_FASTCALL ExcludedPowerup(int pIndex, tRace_list_spec* pRace_s
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x004d9150
-// STUB: CARMA2_SW 0x004d5680
+// FUNCTION: CARMA2_HW 0x004d9150
+// FUNCTION: CARMA2_SW 0x004d5680
+// FUNCTION: CARMA2_CHEAT 0x004ded10
 int C2_HOOK_FASTCALL GotPowerupX(tCar_spec* pCar, int pIndex, int pArg3, int pMessage, tU32 pTime) {
-    NOT_IMPLEMENTED();
+    tPowerup* the_powerup;
+    int original_index;
+    int ps_power;
+    tNet_message* the_message;
+
+    if (pIndex >= gNumber_of_powerups || pIndex < 0) {
+        return -1;
+    }
+    the_powerup = &gPowerup_array[pIndex];
+    if (the_powerup->type == ePowerup_dummy) {
+        return -1;
+    }
+    if (ExcludedPowerup(pIndex, gCurrent_race.race_spec)) {
+        pIndex = 0;
+        the_powerup = &gPowerup_array[0];
+    }
+    the_powerup->current_value = -1;
+    LoseAllSimilarPowerups(the_powerup);
+    if (gNet_mode != eNet_mode_none && the_powerup->got_proc == GotTimeOrPower) {
+        ps_power = 1;
+    } else {
+        ps_power = 0;
+    }
+    original_index = pIndex;
+    the_powerup->car = pCar;
+    if (the_powerup->got_proc != NULL) {
+        pIndex = the_powerup->got_proc(the_powerup, pCar);
+    }
+    if (pIndex < 0) {
+        return -1;
+    }
+    the_powerup = &gPowerup_array[pIndex];
+    if (the_powerup->message[0] != '\0' && pMessage && the_powerup->initial_value == 0 && !ps_power) {
+        DoPowerupTextHeadup(the_powerup, pMessage == 2);
+    }
+    if ((the_powerup->net_type & 0x80) && gProgram_state.current_car.powerups[pIndex] == 0) {
+        PipeSinglePowerupGot(the_powerup, pCar);
+    }
+    switch (the_powerup->type) {
+    case ePowerup_instantaneous:
+        break;
+    case ePowerup_timed:
+        the_powerup->got_time = GetTotalTime();
+        if (!pArg3 && gNet_mode != eNet_mode_none) {
+            the_powerup->lose_time = the_powerup->got_time + pTime;
+        } else {
+            the_powerup->lose_time = the_powerup->got_time + the_powerup->duration;
+        }
+        gProgram_state.current_car.powerups[pIndex] = the_powerup->lose_time;
+        break;
+    case ePowerup_whole_race:
+        the_powerup->got_time = GetTotalTime();
+        gProgram_state.current_car.powerups[pIndex] = -1;
+        break;
+    default:
+        break;
+    }
+    if (the_powerup->prat_cam_event >= 0) {
+        PratcamEvent(the_powerup->prat_cam_event);
+    }
+    if (gNet_mode != eNet_mode_none && pArg3 && original_index == pIndex && !ps_power && the_powerup->got_proc != RepulseOpponents) {
+        the_message = NetBuildGuaranteedMessage(eNet_message_chunk_type_powerup, 0);
+        the_message->contents.powerup.event = 0;
+        the_message->contents.powerup.player = gLocal_net_ID;
+        the_message->contents.powerup.powerup_index = pIndex;
+        if (the_powerup->type == ePowerup_timed) {
+            the_message->contents.powerup.time_left = the_powerup->duration;
+        } else {
+            the_message->contents.powerup.time_left = 0;
+        }
+        NetGuaranteedSendMessageToAllPlayers(gCurrent_net_game, the_message, NULL);
+    }
+    if (the_powerup->type != ePowerup_instantaneous && the_powerup->icon != NULL && the_powerup->initial_value == 0) {
+        QueueIconGoing(the_powerup, gPickedup_powerups, &gNumber_of_icons, REC2_ASIZE(gPickedup_powerups));
+    }
+    return pIndex;
 }
 
 #ifdef REC2_MATCHING
