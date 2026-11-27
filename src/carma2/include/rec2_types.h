@@ -4360,6 +4360,11 @@ typedef struct tCrush_net_semi_detach_bit_list_item {
     float value;
 } tCrush_net_semi_detach_bit_list_item;
 
+typedef struct {
+    tU8 id;
+    br_actor* actor;
+} tFindBitWithID_context;
+
 typedef struct tCrush_net_full_detach_bit_list_item {
     tCar_spec* car;
     tPhysics_object* object;
