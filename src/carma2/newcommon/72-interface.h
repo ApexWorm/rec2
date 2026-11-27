@@ -135,7 +135,7 @@ extern int C2_HOOK_FASTCALL FuckingMakeTheFuckingRaceAndGroupsDisplayHaveTheRigh
 
 extern void C2_HOOK_FASTCALL RefreshRacesScroller(tFrontend_spec* pFrontend);
 
-// NetworkUpdateSelectedGameInfo
+extern void C2_HOOK_FASTCALL NetworkUpdateSelectedGameInfo(tFrontend_spec* pFrontend);
 
 // UpdateNetTrackScroller
 
@@ -187,7 +187,7 @@ extern void C2_HOOK_FASTCALL StopAllThatJoinyStuffThisInstant(void);
 
 extern int C2_HOOK_FASTCALL NetworkJoinMenuOutfunc(tFrontend_spec* pFrontend);
 
-// NetJoinChooseThisGame
+extern int C2_HOOK_FASTCALL NetJoinChooseThisGame(tFrontend_spec* pFrontend);
 
 extern int C2_HOOK_FASTCALL ChooseNetCar(tNet_game_details* pNet_game, tNet_game_options* pOptions, int* pCar_index, int pIm_the_host_so_fuck_off);
 

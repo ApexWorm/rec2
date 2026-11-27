@@ -1345,7 +1345,36 @@ void C2_HOOK_FASTCALL RefreshRacesScroller(tFrontend_spec* pFrontend) {
     MungeButtonModels(pFrontend, 0);
 }
 
-// NetworkUpdateSelectedGameInfo
+inline void C2_HOOK_FASTCALL NetworkUpdateSelectedGameInfo(tFrontend_spec* pFrontend) {
+    int netgame_index;
+    int len;
+    const char* stage_text;
+    const char* open_text;
+    char s[256];
+
+    netgame_index = 0;
+    if (gFrontend_selected_item_index >= pFrontend->scrollers[2].indexFirstScrollableItem
+            && gFrontend_selected_item_index <= pFrontend->scrollers[2].indexLastScrollableItem) {
+        netgame_index = gFrontend_selected_item_index - pFrontend->scrollers[2].indexFirstScrollableItem;
+    }
+    if (gGames_to_join[netgame_index].game != NULL
+            && gGames_to_join[netgame_index].game->type >= 0
+            && gGames_to_join[netgame_index].game->type <= 7) {
+
+        if (PDGetTotalTime() - gGames_to_join[netgame_index].time >= 15000) {
+            DisposeJoinableGame(netgame_index);
+            return;
+        }
+        len = sprintf(s, "Game: %s @R", gGames_to_join[netgame_index].game->pd_net_info.addr + 14);
+        len += sprintf(s + len, "Type: %s @R", GetMiscString(eMiscString_network_type_start + gGames_to_join[netgame_index].game->type));
+        len += sprintf(s + len, "Players: %d @R", gGames_to_join[netgame_index].game->num_players);
+        stage_text = GetMiscString(eMiscString_netgame_stage_start + gGames_to_join[netgame_index].game->status.stage);
+        open_text = GetMiscString(eMiscString_closed + gGames_to_join[netgame_index].game->options.open_game);
+        sprintf(s + len, "Status: %s, %s ", stage_text, open_text);
+        sprintf(pFrontend->items[30].text, "%s", s);
+        MungeMetaCharactersChar(pFrontend->items[30].text, 'R', '\r');
+    }
+}
 
 // UpdateNetTrackScroller
 
@@ -1556,7 +1585,22 @@ int C2_HOOK_FASTCALL NetworkJoinMenuOutfunc(tFrontend_spec* pFrontend) {
     return 0;
 }
 
-// NetJoinChooseThisGame
+// FUNCTION: CARMA2_HW 0x004682c0
+// FUNCTION: CARMA2_SW 0x00468040
+// FUNCTION: CARMA2_CHEAT 0x004686e0
+int C2_HOOK_FASTCALL NetJoinChooseThisGame(tFrontend_spec* pFrontend) {
+    int sel;
+
+    sel = gFrontend_selected_item_index - pFrontend->scrollers[2].indexFirstScrollableItem;
+    if (sel < 0 || gGames_to_join[sel].game == NULL || (!gGames_to_join[sel].game->options.open_game && !gGames_to_join[sel].game->no_races_yet) || gGames_to_join[sel].game->num_players >= kMax_netplayers) {
+        gLast_graph_sel = -1;
+    } else {
+        gLast_graph_sel = sel;
+    }
+    pFrontend->items[17].enabled = kFrontendItemEnabled_disabled;
+    NetworkUpdateSelectedGameInfo(pFrontend);
+    return 0;
+}
 
 // FUNCTION: CARMA2_HW 0x00468d70
 // FUNCTION: CARMA2_SW 0x00468af0
