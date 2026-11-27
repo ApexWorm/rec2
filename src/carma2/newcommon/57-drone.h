@@ -22,6 +22,14 @@ extern int gCount_drone_forms;
 extern int gCount_drone_path_nodes;
 extern tDrone_spec* gDrone_specs;
 extern tDrone_path_node* gDrone_path_nodes;
+extern br_model* gStatic_drone_path_model;
+extern br_model* gElasticatey_drone_path_model;
+extern br_actor* gStatic_drone_path_model_actor;
+extern br_actor* gDrone_path_model_actor;
+extern int gDrone_paths_elasticating;
+extern int gStatic_drone_path_model_max_vertices;
+extern int gStatic_drone_path_model_max_faces;
+extern int gSelected_edit_drone_path;
 extern int gCount_drones;
 extern int gCurrent_selected_drone;
 
@@ -203,12 +211,12 @@ extern void C2_HOOK_FASTCALL ApplyDroneCornerPos2(int pDrone_id, tU16 pSpeed, tU
 
 extern void C2_HOOK_FASTCALL ReallocModelFacesAndVertices(br_model* pModel, int pCount_faces, int pCount_vertices);
 
-// CalcNFacesAndVerticesInEditModel
+extern void C2_HOOK_FASTCALL CalcNFacesAndVerticesInEditModel(int* pCount_faces, int* pCount_vertices);
 
-// InitialiseEditModelsEtc
+extern int C2_HOOK_FASTCALL InitialiseEditModelsEtc(void);
 
 // UpdateEditModels
 
-// WriteOutDronePaths
+extern void C2_HOOK_FASTCALL WriteOutDronePaths(void);
 
 #endif // GUARD_57_DRONE_H
