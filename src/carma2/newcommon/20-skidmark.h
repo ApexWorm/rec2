@@ -18,6 +18,8 @@ extern const char* gShrapnel_type_names[4];
 extern const char* gInitial_position_type_names[3];
 extern const char* gInitial_position_sphere_where[2];
 extern const char* gExplosion_rotate_names[2];
+extern const char* gSmash_side_effect_direction_names[3];
+extern const char* gPosition_type_names[2];
 extern br_material* gMaterial[2];
 extern tSkid gSkids[100];
 extern int gCurrent_skid;

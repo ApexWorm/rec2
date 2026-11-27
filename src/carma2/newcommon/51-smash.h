@@ -179,6 +179,8 @@ extern void C2_HOOK_FASTCALL ReadShrapnelSpec(FILE* pF, tShrapnel_spec* pShrapne
 
 extern void C2_HOOK_FASTCALL LoadMinMax(FILE* pF, br_bounds3* pBounds);
 
+extern void C2_HOOK_FASTCALL ReadShrapnelSideEffects(FILE* pF, tShrapnel_side_effects* pShrapnel_side_effects);
+
 #ifdef REC2_MATCHING
 extern void C2_HOOK_FASTCALL FUN_004ef830(tCar_spec* pCar_spec, tCar_crush_smashable_part* pSmashable, undefined4 pArg3, int pLevel);
 #endif
@@ -224,6 +226,8 @@ extern void C2_HOOK_FASTCALL TotallyRepairSmash(tCar_spec* pCar_Spec, tCar_crush
 extern void C2_HOOK_FASTCALL RemoveAllDecals(void);
 
 extern void C2_HOOK_FASTCALL ReadPowerupSmash(FILE* pF);
+
+extern void C2_HOOK_FASTCALL ReadNonCarCuboidActivation(FILE* pF, tNon_car_cuboid_activations* pNon_car_cuboid_activations);
 
 extern void C2_HOOK_FASTCALL InitSmashing(void);
 

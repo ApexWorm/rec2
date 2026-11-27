@@ -35,16 +35,6 @@
 
 #include <stdio.h>
 
-// GLOBAL: CARMA2_HW 0x0065fef0
-// GLOBAL: CARMA2_SW 0x0065a830
-// GLOBAL: CARMA2_CHEAT 0x00667738
-const char* gSmash_side_effect_direction_names[3] = { "parallel", "toward", "away" };
-
-// GLOBAL: CARMA2_HW 0x0065ff00
-// GLOBAL: CARMA2_SW 0x0065a840
-// GLOBAL: CARMA2_CHEAT 0x00667748
-const char* gPosition_type_names[2] = { "relative", "absolute" };
-
 // GLOBAL: CARMA2_HW 0x006a8298
 // GLOBAL: CARMA2_SW 0x006a22f8
 // GLOBAL: CARMA2_CHEAT 0x006afe10
