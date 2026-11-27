@@ -1477,7 +1477,80 @@ void C2_HOOK_FASTCALL InitSplash(FILE* pF) {
 
 // DrawTheGlow
 
-// PipeInstantUnSmudge
+// FUNCTION: CARMA2_HW 0x004fc740
+// FUNCTION: CARMA2_SW 0x004f7ca0
+// FUNCTION: CARMA2_CHEAT 0x005023e0
+void C2_HOOK_FASTCALL PipeInstantUnSmudge(tCar_spec* pCar) {
+    br_model* model;
+    br_model* b_model;
+    br_actor* actor;
+    br_actor* bonny;
+    int j;
+    int n;
+    int v;
+    int group;
+    tSmudged_vertex data[1000];
+
+    if (gAction_replay_mode) {
+        return;
+    }
+    actor = pCar->car_actor;
+    model = actor->model;
+    bonny = pCar->car_actor;
+    n = 0;
+    if ((model->flags & BR_MODF_KEEP_ORIGINAL) != 0 || (model->flags & BR_MODF_UPDATEABLE) != 0) {
+        ARStartPipingSession(ePipe_chunk_smudge);
+        j = 0;
+        for (group = 0; group < model->prepared->ngroups; group++) {
+            for (v = 0; v < model->prepared->groups[group].nvertices; v++) {
+                if ((model->prepared->groups[group].vertex_colours[v] >> 24) != 0) {
+                    data[n].vertex_index = j;
+                    data[n].light_index = -(model->prepared->groups[group].vertex_colours[v] >> 24);
+                    n += 1;
+                    model->prepared->groups[group].vertex_colours[v] = 0;
+                    if ((model->flags & BR_MODF_UPDATEABLE) != 0) {
+                        model->vertices[model->prepared->groups[group].vertex_user[v]].index = 0;
+                    }
+                    if (n >= (int)REC2_ASIZE(data)) {
+                        group = model->prepared->ngroups;
+                        break;
+                    }
+                }
+                j += 1;
+            }
+        }
+        if (n != 0) {
+            AddSmudgeToPipingSession(pCar->car_ID, 0, n, data);
+        }
+        if (bonny != actor) {
+            b_model = bonny->model;
+            n = 0;
+            j = 0;
+            for (group = 0; group < b_model->prepared->ngroups; group++) {
+                for (v = 0; v < b_model->prepared->groups[group].nvertices; v++) {
+                    if ((b_model->prepared->groups[group].vertex_colours[v] >> 24) != 0) {
+                        data[n].vertex_index = j;
+                        data[n].light_index = -b_model->prepared->groups[group].nvertices;
+                        n += 1;
+                        b_model->prepared->groups[group].vertex_colours[v] = 0;
+                        if ((b_model->flags & BR_MODF_UPDATEABLE) != 0) {
+                            b_model->vertices[b_model->prepared->groups[group].vertex_user[v]].index = 0;
+                        }
+                        if (n >= (int)REC2_ASIZE(data)) {
+                            group = b_model->prepared->groups[group].nvertices;
+                            break;
+                        }
+                    }
+                    j += 1;
+                }
+            }
+            if (n != 0) {
+                AddSmudgeToPipingSession(pCar->car_ID, 0, n, data);
+            }
+        }
+        AREndPipingSession();
+    }
+}
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
