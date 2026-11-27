@@ -897,6 +897,7 @@ void C2_HOOK_FASTCALL AddShrapnelToPipingSession(int pShrapnel_index, const br_v
 
 // FUNCTION: CARMA2_HW 0x004c6ff0
 // FUNCTION: CARMA2_SW 0x004c3720
+// FUNCTION: CARMA2_CHEAT 0x004ccb10
 void C2_HOOK_FASTCALL AddNonCarToPipingSession(int pIndex, br_actor* pActor) {
     C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_chunk_non_car, actor, 0x4);
     C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk_non_car, matrix, 0x4);
