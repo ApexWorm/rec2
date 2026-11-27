@@ -20,21 +20,22 @@
 // GLOBAL: CARMA2_HW 0x00691b40
 // GLOBAL: CARMA2_SW 0x0068bb98
 // GLOBAL: CARMA2_CHEAT 0x00699528
-tTwatVfsMountPoint gTwatVfsMountPoints[5];
+tTwatVfsMountPoint gTwatVfsMountPoints[5] = { 0 };
+
+// GLOBAL: CARMA2_HW 0x00692068
+// GLOBAL: CARMA2_SW 0x0068c0c0
+// GLOBAL: CARMA2_CHEAT 0x00699a50
+int gDisableTiffConversionStack[2] = { 0 };
 
 // GLOBAL: CARMA2_HW 0x00692070
 // GLOBAL: CARMA2_SW 0x0068c0c8
 // GLOBAL: CARMA2_CHEAT 0x00699a58
-tTwatVfsFile gTwatVfsFiles[51];
+tTwatVfsFile gTwatVfsFiles[51] = { 0 };
 
 // GLOBAL: CARMA2_HW 0x006923a0
 // GLOBAL: CARMA2_SW 0x0068c3f8
 // GLOBAL: CARMA2_CHEAT 0x00699d88
-int gDisableTiffConversionStackPos;
-
-// GLOBAL: CARMA2_HW 0x00692068
-// GLOBAL: CARMA2_SW 0x0068c0c0
-int gDisableTiffConversionStack[2];
+int gDisableTiffConversionStackPos = 0;
 
 // GLOBAL: CARMA2_HW 0x0068c724
 // GLOBAL: CARMA2_SW 0x00686774
@@ -229,7 +230,7 @@ int C2_HOOK_FASTCALL PFungetc(int ch, FILE* pFile) {
         return ungetc(ch, pFile);
     }
     twtFile = &gTwatVfsFiles[(intptr_t)pFile];
-    if (twtFile->pos > twtFile->start && ch != -1) {
+    if (twtFile->pos > gTwatVfsFiles[(intptr_t)pFile].start && ch != -1) {
         twtFile->pos--;
         *twtFile->pos = ch;
         twtFile->error = 0;
@@ -298,13 +299,15 @@ int C2_HOOK_FASTCALL PFfgetpos(FILE* pF, fpos_t* pPos) {
 // FUNCTION: CARMA2_SW 0x004b0c70
 // FUNCTION: CARMA2_CHEAT 0x004ba3d0
 int C2_HOOK_FASTCALL PFftell(FILE* pF) {
+    tTwatVfsFile* twtFile;
     int pos;
 
     if ((uintptr_t)pF >= REC2_ASIZE(gTwatVfsFiles)) {
         return ftell(pF);
     }
-    pos = gTwatVfsFiles[(uintptr_t)pF].pos - gTwatVfsFiles[(uintptr_t)pF].start;
-    gTwatVfsFiles[(uintptr_t)pF].error = 0;
+    twtFile = &gTwatVfsFiles[(uintptr_t)pF];
+    pos = twtFile->pos - gTwatVfsFiles[(uintptr_t)pF].start;
+    twtFile->error = 0;
     return pos;
 }
 
@@ -347,7 +350,7 @@ int C2_HOOK_FASTCALL PFfseek(FILE* pF, int offset, int whence) {
     twtFile = &gTwatVfsFiles[(uintptr_t)pF];
     switch (whence) {
     case SEEK_SET:
-        newpos = twtFile->start + offset;
+        newpos = gTwatVfsFiles[(uintptr_t)pF].start + offset;
         break;
     case SEEK_END:
         newpos = twtFile->end + offset;
