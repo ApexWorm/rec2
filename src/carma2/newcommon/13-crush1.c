@@ -1673,7 +1673,7 @@ void C2_HOOK_FASTCALL ReAttachBit(tCar_spec* pCar_spec, br_actor* pActor_arg2, b
         BrMatrix34PostTranslate(&pActor_arg3->t.t.mat, model->vertices[flap_data->field_0xc].p.v[0], model->vertices[flap_data->field_0xc].p.v[1], model->vertices[flap_data->field_0xc].p.v[2]);
         PipeSingleFlap(pActor_arg3, -flap_data->field_0x4);
         flap_data->field_0x4 = 0;
-        SetFlappage(pActor_arg3, pCar_spec, 0x1, 0.f);
+        SetFlappage(pActor_arg3, pCar_spec, 0x1, 0.0f);
         CheckFlapAngles(pActor_arg3, NULL);
     } else {
         BrMatrix34Identity(&pActor_arg3->t.t.mat);
