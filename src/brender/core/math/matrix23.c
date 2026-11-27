@@ -263,6 +263,7 @@ void C2_HOOK_CDECL BrMatrix23Post(br_matrix23* mat, const br_matrix23* A) {
 }
 
 // FUNCTION: CARMA2_HW 0x00535050
+// FUNCTION: CARMA2_SW 0x005306f0
 // FUNCTION: CARMA2_CHEAT 0x0053ac40
 void C2_HOOK_CDECL BrMatrix23PreRotate(br_matrix23* mat, br_angle rz) {
 

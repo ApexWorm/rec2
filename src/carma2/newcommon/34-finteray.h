@@ -66,7 +66,7 @@ extern void C2_HOOK_FASTCALL CheckSingleFace(tFace_ref* pFace, br_vector3* ray_p
 
 // MultiRayCheckSingleFace
 
-extern void C2_HOOK_FASTCALL GetNewBoundingBox(br_bounds* b2, br_bounds* b1, br_matrix34* m);
+extern void C2_HOOK_FASTCALL GetNewBoundingBox(br_bounds* b2, const br_bounds* b1, const br_matrix34* m);
 
 extern void C2_HOOK_FASTCALL FillInBounds(tBounds* pBounds);
 

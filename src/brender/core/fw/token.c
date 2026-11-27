@@ -670,7 +670,7 @@ br_int_32 C2_HOOK_CDECL BrTokenFindMany(const char* pattern, br_token* tokens, b
 
     n = 0;
     te = (br_token_entry*)fw.tokens.head;
-    while (te->node.next != NULL) {
+    while (te->node.next != NULL && n < max_tokens) {
         if (BrNamePatternMatch(pattern, te->identifier) != 0) {
             *tokens = te->token;
             tokens++;
