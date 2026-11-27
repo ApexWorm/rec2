@@ -1515,7 +1515,7 @@ void C2_HOOK_FASTCALL S3CalculateRandomizedFields(tS3_channel* chan, tS3_descrip
     vol = S3IRandomBetween(desc->min_volume, desc->max_volume, 128);
     chan->source_volume = vol;
     chan->volume_multiplier = vol;
-    chan->field_0x28 = 0.f;
+    chan->field_0x28 = 0.0f;
     if (desc->type == 0 && desc->buffer_description != NULL) {
         chan->rate = S3IRandomBetweenLog__dup(desc->min_pitch, desc->max_pitch, desc->buffer_description->sample_rate);
     }
