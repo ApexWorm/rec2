@@ -158,6 +158,7 @@ br_uint_32* C2_HOOK_STDCALL ConvertLongCopy(br_uint_32** pextra, br_uint_32* src
 }
 
 // FUNCTION: CARMA2_HW 0x0052d8e0
+// FUNCTION: CARMA2_SW 0x00528f80
 // FUNCTION: CARMA2_CHEAT 0x005334d0
 br_error C2_HOOK_STDCALL ValueQuery(br_token_value* tv, void** pextra, br_size_t* pextra_size, void* block, br_tv_template_entry* tep) {
     void* mem;
