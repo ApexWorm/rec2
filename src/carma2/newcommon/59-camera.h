@@ -90,7 +90,7 @@ extern void C2_HOOK_FASTCALL DrVector3RotateY(br_vector3* v, br_angle t);
 
 // MoveWithWheels
 
-// SwingCamera
+extern void C2_HOOK_FASTCALL SwingCamera(br_matrix34* pM1, br_matrix34* pM2, br_vector3* pVn, br_vector3* pOmega, float pSpeed, float pSpeedo_speed, tU32 pTime, tCar_spec* pCar);
 
 extern void C2_HOOK_FASTCALL PointCameraAtCar(br_vector3* pPos, br_matrix34* pMat, float pFov_factor);
 
