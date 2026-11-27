@@ -77,11 +77,6 @@ tU32 gTime_for_punishment;
 // GLOBAL: CARMA2_CHEAT 0x006951d4
 int gNot_shown_race_type_headup;
 
-// GLOBAL: CARMA2_HW 0x0068d938
-// GLOBAL: CARMA2_SW 0x00687990
-// GLOBAL: CARMA2_CHEAT 0x006951d8
-int gWinner_declared;
-
 // SendShapeNumbers
 
 // FUNCTION: CARMA2_HW 0x00497ef0
