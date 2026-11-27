@@ -118,7 +118,7 @@ br_image* C2_HOOK_CDECL BrImageReference(const char* name) {
     }
 
     if (img != NULL) {
-        for (suffix2 = img->identifier; *suffix != '\0' && *suffix != '.'; suffix++) {
+        for (suffix2 = img->identifier; *suffix2 != '\0' && *suffix2 != '.'; suffix2++) {
         }
         if (suffix2 != NULL) {
             *suffix2 = '\0';
