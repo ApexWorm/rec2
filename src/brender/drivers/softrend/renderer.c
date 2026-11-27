@@ -99,6 +99,7 @@ br_tv_custom softrend_customPartsConv = {
 
 // GLOBAL: CARMA2_HW 0x00670618
 // GLOBAL: CARMA2_SW 0x0066ada8
+// GLOBAL: CARMA2_CHEAT 0x00677ec8
 br_tv_template_entry rendererTemplateEntries[] = {
     { BRT_IDENTIFIER_CSTR, NULL, offsetof(br_soft_renderer, identifier), 5, 3, 0, 0, },
     { BRT_PARTS_TL, NULL, 0, 5, 2, (uintptr_t)&softrend_customPartsConv, 0, },

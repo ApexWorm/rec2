@@ -27,6 +27,7 @@ static const struct br_renderer_facility_dispatch rendererFacilityDispatch;
 
 // GLOBAL: CARMA2_HW 0x0058bbd8
 // GLOBAL: CARMA2_SW 0x00586ba0
+// GLOBAL: CARMA2_CHEAT 0x00590c40
 br_tv_template_entry rendererFacilityTemplateEntries[] = {
     { BRT_IDENTIFIER_CSTR,  NULL,   offsetof(br_soft_renderer_facility, identifier),    5,  3,  0,  0, },
     { BRT_RENDERER_MAX_I32, NULL,   0,                                                  5,  1,  1,  0, },
@@ -35,6 +36,7 @@ br_tv_template_entry rendererFacilityTemplateEntries[] = {
 
 // GLOBAL: CARMA2_HW 0x00670570
 // GLOBAL: CARMA2_SW 0x0066ad00
+// GLOBAL: CARMA2_CHEAT 0x00677e20
 br_tv_template_entry rendererNewTemplateEntries[] = {
     { BRT_DESTINATION_O,        NULL,   offsetof(newRendererTokens, dest),  2, 3, 0, 0, },
     { BRT_OUTPUT_FACILITY_O,    NULL,   offsetof(newRendererTokens, dest),  2, 3, 0, 0, },
@@ -182,6 +184,7 @@ int C2_HOOK_CDECL _M_br_renderer_facility_soft_rendererNew(br_soft_renderer_faci
 
 // GLOBAL: CARMA2_HW 0x0058bc20
 // GLOBAL: CARMA2_SW 0x00586be8
+// GLOBAL: CARMA2_CHEAT 0x00590c88
 static const struct br_renderer_facility_dispatch rendererFacilityDispatch = {
     NULL,
     NULL,

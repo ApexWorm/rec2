@@ -16,12 +16,14 @@
 #include <stdlib.h>
 
 // GLOBAL: CARMA2_HW 0x0058c0d0
+// GLOBAL: CARMA2_SW 0x00587098
 br_tv_template_entry partCullTemplateEntries[] = {
     { BRT_TYPE_T,   NULL,   offsetof(soft_state_all, cull.type),    7,  3,  0x1001, },
     { BRT_SPACE_T,  NULL,   offsetof(soft_state_all, cull.space),   7,  3,  0x1001, },
 };
 
 // GLOBAL: CARMA2_HW 0x0058c100
+// GLOBAL: CARMA2_SW 0x005870c8
 br_tv_template_entry partSurfaceTemplateEntries[] = {
     { BRT_COLOUR_RGB,       NULL, offsetof(soft_state_all, surface.colour),         3,  3,  0, 1,        },
     { BRT_OPACITY_X,        NULL, offsetof(soft_state_all, surface.opacity),        3,  14, 0, 1,        },
@@ -43,6 +45,7 @@ br_tv_template_entry partSurfaceTemplateEntries[] = {
 };
 
 // GLOBAL: CARMA2_HW 0x0058c478
+// GLOBAL: CARMA2_SW 0x00587440
 br_tv_template_entry partMatrixTemplateEntries[] = {
     { BRT_MODEL_TO_VIEW_M34_X,          NULL,   offsetof(soft_state_all, matrix.model_to_view),             3,  24, 0,  0xe089, },
     { BRT_MODEL_TO_VIEW_M34_F,          NULL,   offsetof(soft_state_all, matrix.model_to_view),             7,  8,  0,  0xe089, },
@@ -56,6 +59,7 @@ br_tv_template_entry partMatrixTemplateEntries[] = {
 };
 
 // GLOBAL: CARMA2_HW 0x0058c550
+// GLOBAL: CARMA2_SW 0x00587518
 br_tv_template_entry partEnableTemplateEntries[] = {
     { BRT_CULL_B,       NULL,   offsetof(soft_state_all, enable.flags), 7,  31, 0x01,   0x3001, },
     { BRT_TRANSFORM_B,  NULL,   offsetof(soft_state_all, enable.flags), 7,  31, 0x02,   0x3001, },
@@ -66,6 +70,7 @@ br_tv_template_entry partEnableTemplateEntries[] = {
 };
 
 // GLOBAL: CARMA2_HW 0x0058c5e0
+// GLOBAL: CARMA2_SW 0x005875a8
 br_tv_template_entry partHiddenSurfaceTemplateEntries[] = {
     { BRT_TYPE_T,               NULL,   offsetof(soft_state_all, hidden.type),          7,  3,  0,  0x3001 },
     { BRT_V1ORDER_TABLE_P,      NULL,   offsetof(soft_state_all, hidden.order_table),   7,  3,  0,  0x1, },
@@ -77,6 +82,7 @@ br_tv_template_entry partHiddenSurfaceTemplateEntries[] = {
 };
 
 // GLOBAL: CARMA2_HW 0x0058c688
+// GLOBAL: CARMA2_SW 0x00587650
 br_tv_template_entry partBoundsTemplateEntries[] = {
     { BRT_MIN_V2_X, NULL, offsetof(soft_state_all, bounds.min), 3, 16,  0, 0 },
     { BRT_MIN_V2_F, NULL, offsetof(soft_state_all, bounds.min), 7, 4,   0, 0 },
@@ -85,6 +91,7 @@ br_tv_template_entry partBoundsTemplateEntries[] = {
 };
 
 // GLOBAL: CARMA2_HW 0x0058c298
+// GLOBAL: CARMA2_SW 0x00587260
 br_tv_template_entry partLightTemplateEntries[] = {
     { BRT_TYPE_T,               NULL,   offsetof(soft_state_all, light[0].type),		    7, 3, 0, 0x3003, },
     { BRT_SPACE_T,              NULL,   offsetof(soft_state_all, light[0].lighting_space), 7, 3, 0, 0x3003, },
@@ -106,6 +113,7 @@ br_tv_template_entry partLightTemplateEntries[] = {
 };
 
 // GLOBAL: CARMA2_HW 0x0058c430
+// GLOBAL: CARMA2_SW 0x005873f8
 br_tv_template_entry partClipTemplateEntries[] = {
     { BRT_TYPE_T,	    NULL, offsetof(soft_state_all, clip[0].type),   7,  3,  0,  0x1001, },
     { BRT_PLANE_V4_X,   NULL, offsetof(soft_state_all, clip[0].plane),  3,  20, 0,  0x1001, },

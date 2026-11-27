@@ -42,6 +42,7 @@ const br_geometry_lighting_dispatch geometryLightingDispatch = {
 
 // GLOBAL: CARMA2_HW 0x0058bef8
 // GLOBAL: CARMA2_SW 0x00586ec0
+// GLOBAL: CARMA2_CHEAT 0x00590f60
 br_tv_template_entry geometryLightingTemplateEntries[] = {
     { BRT_IDENTIFIER_CSTR,      NULL,   offsetof(br_geometry_lighting_soft, identifier),        4,  3,  0,  0, },
     { BRT_RENDERER_FACILITY_O,  NULL,   offsetof(br_geometry_lighting_soft, renderer_facility), 5,  3,  0,  0, },

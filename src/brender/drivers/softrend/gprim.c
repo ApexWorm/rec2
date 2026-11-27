@@ -15,6 +15,7 @@
 #include "core/fw/tokenval.h"
 
 // GLOBAL: CARMA2_HW 0x0058bfd8
+// GLOBAL: CARMA2_SW 0x00586fa0
 const br_geometry_primitives_dispatch geometryPrimitivesDispatch = {
     NULL,
     NULL,

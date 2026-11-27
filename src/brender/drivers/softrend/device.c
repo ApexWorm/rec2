@@ -18,6 +18,7 @@
 
 // GLOBAL: CARMA2_HW 0x0058bcb0
 // GLOBAL: CARMA2_SW 0x00586c78
+// GLOBAL: CARMA2_CHEAT 0x00590d18
 br_device_dispatch softrendr_deviceDispatch = {
     NULL,
     NULL,
@@ -50,6 +51,7 @@ br_device_dispatch softrendr_deviceDispatch = {
 
 // GLOBAL: CARMA2_HW 0x0058bc98
 // GLOBAL: CARMA2_SW 0x00586c60
+// GLOBAL: CARMA2_CHEAT 0x00590d00
 br_tv_template_entry deviceTemplateEntries[] = {
     { BRT_IDENTIFIER_CSTR, NULL, offsetof(br_soft_device, identifier), 5, 3, 0, 0 },
 };
