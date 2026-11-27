@@ -10,6 +10,7 @@
 #define GUARD_64_MOVIE_H
 
 #include "c2_hooks.h"
+#include "rec2_types.h"
 
 extern int gNext_replay_record_state;
 extern int gShow_status_message;
@@ -56,7 +57,7 @@ extern void C2_HOOK_FASTCALL MovieStopRecordingIfNecessary(void);
 
 // GenerateOneMovieFrame
 
-// MovieRecordFrame
+extern int C2_HOOK_FASTCALL MovieRecordFrame(br_pixelmap* pScreen, int pFrame_period);
 
 extern int C2_HOOK_FASTCALL MovieRecording(void);
 

@@ -31,6 +31,11 @@ tU32 gActual_last_tick_count;
 // GLOBAL: CARMA2_CHEAT 0x006940c4
 tU32 gAverage_frame_period;
 
+#ifdef REC2_SW
+// GLOBAL: CARMA2_SW 0x00795060
+char gSW_debug_text[96]; /* FIXME: name and size are guesses (written by MainGameLoop) */
+#endif
+
 // GLOBAL: CARMA2_HW 0x00761ef0
 // GLOBAL: CARMA2_SW 0x00758450
 // GLOBAL: CARMA2_CHEAT 0x00769590

@@ -101,7 +101,7 @@ extern void C2_HOOK_FASTCALL MapOverlay(void);
 
 // InitNearestCar
 
-// MapStuffBeforeRender
+extern void C2_HOOK_FASTCALL MapStuffBeforeRender(void);
 
 extern void C2_HOOK_FASTCALL MapStuffAfterRender(void);
 

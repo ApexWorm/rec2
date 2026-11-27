@@ -19,6 +19,7 @@ extern tU32 gNet_auto_increase_credits_dt[8];
 extern tU32 gOld_camera_time;
 extern tU32 gActual_last_tick_count;
 extern tU32 gAverage_frame_period;
+extern char gSW_debug_text[96];
 extern tU32 gLast_tick_count;
 extern int gPed_count;
 extern int gQueued_wasted_messages[5];

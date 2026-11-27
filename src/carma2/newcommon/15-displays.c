@@ -490,7 +490,12 @@ void C2_HOOK_FASTCALL DoPSPowerupHeadups(void) {
     DoTestPowerHeadup(gProgram_state.current_car.power_up_levels[2], "O");
 }
 
-// DoHeadups
+// STUB: CARMA2_HW 0x00449b10
+// STUB: CARMA2_SW 0x00449b80
+// STUB: CARMA2_CHEAT 0x0044a020
+void C2_HOOK_FASTCALL DoHeadups(tU32 pThe_time) {
+    NOT_IMPLEMENTED();
+}
 
 // FUNCTION: CARMA2_HW 0x00449fa0
 // FUNCTION: CARMA2_SW 0x0044a130
@@ -951,7 +956,12 @@ void C2_HOOK_FASTCALL DoDamageScreen(tU32 pThe_time) {
     }
 }
 
-// DoInstruments
+// STUB: CARMA2_HW 0x0044aad0
+// STUB: CARMA2_SW 0x0044acc0
+// STUB: CARMA2_CHEAT 0x0044aff0
+void C2_HOOK_FASTCALL DoInstruments(tU32 pThe_time) {
+    NOT_IMPLEMENTED();
+}
 
 // FUNCTION: CARMA2_HW 0x0044b050
 // FUNCTION: CARMA2_SW 0x0044b1e0
