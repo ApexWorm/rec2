@@ -285,9 +285,9 @@ extern void C2_HOOK_FASTCALL RenderLimbs(void);
 
 // FUN_1011cb0c
 
-// PossiblePedSmear
+extern void C2_HOOK_FASTCALL PossiblePedSmear(tPedestrian* pPed);
 
-// LastChanceForPedEffects
+extern void C2_HOOK_FASTCALL LastChanceForPedEffects(void);
 
 extern void C2_HOOK_FASTCALL ResetPedSystem(void);
 

@@ -1468,7 +1468,7 @@ void C2_HOOK_FASTCALL RenderLimbs(void) {
 
 // FUN_1011cb0c
 
-static inline void C2_HOOK_FASTCALL PossiblePedSmear(tPedestrian* pPed) {
+inline void C2_HOOK_FASTCALL PossiblePedSmear(tPedestrian* pPed) {
     tPed_cache_006944c0* cache;
     br_vector3 pos;
 
