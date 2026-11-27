@@ -15,7 +15,7 @@
 #include "globvars.h"
 #include "08-loading1.h"
 #include "40-main.h"
-#include "61-pedestrn.h"
+#include "61-pedestrn-phys.h"
 #include "platform.h"
 
 #include "rec2_macros.h"
