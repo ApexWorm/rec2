@@ -1009,7 +1009,23 @@ br_material* C2_HOOK_FASTCALL GetSimpleMaterial(char* pName, tRendererShadingTyp
     return gSimple_materials[i];
 }
 
-// ReadShrapnelMaterials
+// FUNCTION: CARMA2_HW 0x00488f00
+// FUNCTION: CARMA2_SW 0x00486120
+// FUNCTION: CARMA2_CHEAT 0x004892e0
+inline void C2_HOOK_FASTCALL ReadShrapnelMaterials(FILE* pF, tCar_spec* pCar_spec) {
+    int i;
+    char s[256];
+
+    pCar_spec->count_shrapnel_materials = GetAnInt(pF);
+    for (i = 0; i < pCar_spec->count_shrapnel_materials; i++) {
+        GetALineAndDontArgue(pF, s);
+        if (pCar_spec != NULL && pCar_spec->driver > eDriver_5) {
+            pCar_spec->shrapnel_materials[i] = GetSimpleMaterial(s, kRendererShadingType_Specular);
+        } else {
+            pCar_spec->shrapnel_materials[i] = GetSimpleMaterial(s, kRendererShadingType_Default);
+        }
+    }
+}
 
 // SetModelFlags
 
@@ -1043,24 +1059,6 @@ intptr_t C2_HOOK_CDECL LinkCarActorsToGroovidelicsCB(br_actor* pActor, void* pDa
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
 #endif
-
-// FUNCTION: CARMA2_HW 0x00488f00
-// FUNCTION: CARMA2_SW 0x00486120
-// FUNCTION: CARMA2_CHEAT 0x004892e0
-void C2_HOOK_FASTCALL LoadCarShrapnelMaterials(FILE* pF, tCar_spec* pCar_spec) {
-    int i;
-    char s[256];
-
-    pCar_spec->count_shrapnel_materials = GetAnInt(pF);
-    for (i = 0; i < pCar_spec->count_shrapnel_materials; i++) {
-        GetALineAndDontArgue(pF, s);
-        if (pCar_spec != NULL && pCar_spec->driver > eDriver_5) {
-            pCar_spec->shrapnel_materials[i] = GetSimpleMaterial(s, kRendererShadingType_Specular);
-        } else {
-            pCar_spec->shrapnel_materials[i] = GetSimpleMaterial(s, kRendererShadingType_Default);
-        }
-    }
-}
 
 // STUB: CARMA2_HW 0x00488f70
 // STUB: CARMA2_SW 0x00486190

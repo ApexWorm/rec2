@@ -83,7 +83,7 @@ extern intptr_t C2_HOOK_CDECL AllocateCarModelData(br_actor* pActor, void* pData
 
 extern br_material* C2_HOOK_FASTCALL GetSimpleMaterial(char* pName, tRendererShadingType pShading_type);
 
-// ReadShrapnelMaterials
+extern void C2_HOOK_FASTCALL ReadShrapnelMaterials(FILE* pF, tCar_spec* pCar_spec);
 
 // SetModelFlags
 
@@ -102,8 +102,6 @@ extern intptr_t C2_HOOK_CDECL LinkCarActorsToGroovidelicsCB(br_actor* pActor, vo
 // PivotizeWheel
 
 // SetUpGraphicalWheelStuff
-
-extern void C2_HOOK_FASTCALL LoadCarShrapnelMaterials(FILE* pF, tCar_spec* pCar_spec);
 
 extern void C2_HOOK_FASTCALL LoadCar(const char* pCar_name, tDriver pDriver, tCar_spec* pCar_spec, int pOwner, const char* pDriver_name, tBrender_storage* pStorage_space);
 
