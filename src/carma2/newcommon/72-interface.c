@@ -404,6 +404,7 @@ int gCredits_total_height;
 
 // GLOBAL: CARMA2_HW 0x006886d0
 // GLOBAL: CARMA2_SW 0x00682c30
+// GLOBAL: CARMA2_CHEAT 0x0068ff78
 double gFrontend_throb_factor;
 
 // GLOBAL: CARMA2_HW 0x00688b10
@@ -608,6 +609,7 @@ int gFrontend_backdrop2_opacity_mode;
 int gFrontend_interpolate_steps_left;
 
 // GLOBAL: CARMA2_HW 0x00763820
+// GLOBAL: CARMA2_SW 0x00759d80
 // GLOBAL: CARMA2_CHEAT 0x0076aec0
 tFrontend_slider gOptions_sound_slider;
 
@@ -975,6 +977,7 @@ br_pixelmap* C2_HOOK_FASTCALL GetThisFuckingPixelmapPleaseMrTwatter(const char* 
 
 // FUNCTION: CARMA2_HW 0x0046ad00
 // FUNCTION: CARMA2_SW 0x0046aa40
+// FUNCTION: CARMA2_CHEAT 0x0046b0a0
 int C2_HOOK_FASTCALL FUN_0046ad00(tFrontend_spec* pFrontend) {
     if (!pFrontend->loaded) {
         LoadMenuSettings(pFrontend);
@@ -1956,6 +1959,7 @@ int C2_HOOK_FASTCALL CarClickNext(tFrontend_spec* pFrontend) {
 }
 
 // FUNCTION: CARMA2_HW 0x0046ba70
+// FUNCTION: CARMA2_SW 0x0046b7b0
 // FUNCTION: CARMA2_CHEAT 0x0046be10
 int C2_HOOK_FASTCALL ChangeCarMenuOutfunc(tFrontend_spec* pFrontend) {
 
@@ -1987,6 +1991,7 @@ int C2_HOOK_FASTCALL StartGameInfunc(tFrontend_spec* pFrontend) {
 }
 
 // FUNCTION: CARMA2_HW 0x0046bd50
+// FUNCTION: CARMA2_SW 0x0046ba80
 // FUNCTION: CARMA2_CHEAT 0x0046c0f0
 int C2_HOOK_FASTCALL FRONTEND_StartGameMenuHandler(tFrontend_spec* pFrontend) {
 
@@ -2567,6 +2572,7 @@ int C2_HOOK_FASTCALL ProcessInputString(void) {
 }
 
 // FUNCTION: CARMA2_HW 0x0046e5c0
+// FUNCTION: CARMA2_SW 0x0046dc60
 // FUNCTION: CARMA2_CHEAT 0x0046e950
 int C2_HOOK_FASTCALL StopGettingInputString(void) {
 
@@ -2575,6 +2581,7 @@ int C2_HOOK_FASTCALL StopGettingInputString(void) {
 }
 
 // FUNCTION: CARMA2_HW 0x0046e5d0
+// FUNCTION: CARMA2_SW 0x0046dc70
 // FUNCTION: CARMA2_CHEAT 0x0046e960
 int C2_HOOK_FASTCALL StartGettingInputString(char* pBuffer, int pBuffer_size) {
 
@@ -3433,6 +3440,7 @@ int C2_HOOK_FASTCALL Ians_GetItemAtMousePos(tFrontend_spec* pFrontend, int pX, i
 // GetActiveSlider
 
 // FUNCTION: CARMA2_HW 0x00471cf0
+// FUNCTION: CARMA2_SW 0x00471250
 // FUNCTION: CARMA2_CHEAT 0x00472080
 tFrontend_slider* C2_HOOK_FASTCALL GetAnyActiveSlider(void) {
     tFrontend_slider* slider;
@@ -3490,6 +3498,7 @@ void C2_HOOK_FASTCALL Morph_Initialise(tFrontend_spec* pCurrent, tFrontend_spec*
 #endif
 
 // FUNCTION: CARMA2_HW 0x00470bb0
+// FUNCTION: CARMA2_SW 0x00470140
 // FUNCTION: CARMA2_CHEAT 0x00470f40
 int C2_HOOK_FASTCALL Generic_Infunc(tFrontend_spec* pFrontend) {
 
@@ -3501,6 +3510,7 @@ int C2_HOOK_FASTCALL Generic_Infunc(tFrontend_spec* pFrontend) {
 }
 
 // FUNCTION: CARMA2_HW 0x00470c10
+// FUNCTION: CARMA2_SW 0x004701a0
 // FUNCTION: CARMA2_CHEAT 0x00470fa0
 int C2_HOOK_FASTCALL Generic_Outfunc(tFrontend_spec* pFrontend) {
 
@@ -3520,6 +3530,7 @@ void C2_HOOK_FASTCALL Generic_LinkOutEffect(void) {
 }
 
 // FUNCTION: CARMA2_HW 0x00471d30
+// FUNCTION: CARMA2_SW 0x00471290
 // FUNCTION: CARMA2_CHEAT 0x004720c0
 tConnected_items* C2_HOOK_FASTCALL GetScrollSet(int pItem) {
     tConnected_items* scrollset;
@@ -3563,6 +3574,7 @@ int C2_HOOK_FASTCALL ScrollSet_GetItem(tConnected_items* pScroll_set, int pIndex
 // GetUpdown
 
 // FUNCTION: CARMA2_HW 0x00471d70
+// FUNCTION: CARMA2_SW 0x00471300
 // FUNCTION: CARMA2_CHEAT 0x00472100
 int C2_HOOK_FASTCALL ScrollSet_TranslateItemToIndex(tConnected_items* pConnected, int pItem) {
     int offset;
@@ -3611,6 +3623,8 @@ int C2_HOOK_FASTCALL Generic_MenuHandler(tFrontend_spec* pFrontend) {
 #endif
 
 // FUNCTION: CARMA2_HW 0x004b4020
+// FUNCTION: CARMA2_SW 0x004b0190
+// FUNCTION: CARMA2_CHEAT 0x004b98f0
 void C2_HOOK_FASTCALL StripControls(char* pStr) {
     int i;
     int len;
@@ -4510,6 +4524,7 @@ void C2_HOOK_FASTCALL DisplayVolumeSettings(tFrontend_spec* pFrontend) {
 }
 
 // FUNCTION: CARMA2_HW 0x00474660
+// FUNCTION: CARMA2_SW 0x00473bc0
 // FUNCTION: CARMA2_CHEAT 0x004749e0
 void C2_HOOK_FASTCALL Slider_EffectsProc(tFrontend_slider* pSlider) {
 
@@ -4519,6 +4534,7 @@ void C2_HOOK_FASTCALL Slider_EffectsProc(tFrontend_slider* pSlider) {
 }
 
 // FUNCTION: CARMA2_HW 0x00474530
+// FUNCTION: CARMA2_SW 0x00473a90
 // FUNCTION: CARMA2_CHEAT 0x004748b0
 int C2_HOOK_FASTCALL Options_Infunc(tFrontend_spec* pFrontend) {
 
@@ -4553,6 +4569,7 @@ int C2_HOOK_FASTCALL Options_Infunc(tFrontend_spec* pFrontend) {
 }
 
 // FUNCTION: CARMA2_HW 0x00474690
+// FUNCTION: CARMA2_SW 0x00473bf0
 // FUNCTION: CARMA2_CHEAT 0x00474a10
 int C2_HOOK_FASTCALL Options_Outfunc(tFrontend_spec* pFrontend) {
 
@@ -4562,6 +4579,7 @@ int C2_HOOK_FASTCALL Options_Outfunc(tFrontend_spec* pFrontend) {
 }
 
 // FUNCTION: CARMA2_HW 0x004746a0
+// FUNCTION: CARMA2_SW 0x00473c00
 // FUNCTION: CARMA2_CHEAT 0x00474a20
 int C2_HOOK_FASTCALL Options_MusicOn(tFrontend_spec* pFrontend) {
 
@@ -4572,6 +4590,7 @@ int C2_HOOK_FASTCALL Options_MusicOn(tFrontend_spec* pFrontend) {
 }
 
 // FUNCTION: CARMA2_HW 0x004746e0
+// FUNCTION: CARMA2_SW 0x00473c40
 // FUNCTION: CARMA2_CHEAT 0x00474a60
 int C2_HOOK_FASTCALL Options_MusicOff(tFrontend_spec* pFrontend) {
 
@@ -4582,6 +4601,7 @@ int C2_HOOK_FASTCALL Options_MusicOff(tFrontend_spec* pFrontend) {
 }
 
 // FUNCTION: CARMA2_HW 0x00474720
+// FUNCTION: CARMA2_SW 0x00473c80
 // FUNCTION: CARMA2_CHEAT 0x00474aa0
 int C2_HOOK_FASTCALL Options_Ok(tFrontend_spec* pFrontend) {
 
@@ -4589,6 +4609,7 @@ int C2_HOOK_FASTCALL Options_Ok(tFrontend_spec* pFrontend) {
 }
 
 // FUNCTION: CARMA2_HW 0x00474730
+// FUNCTION: CARMA2_SW 0x00473c90
 // FUNCTION: CARMA2_CHEAT 0x00474ab0
 int C2_HOOK_FASTCALL Options_AbortRace(tFrontend_spec* pFrontend) {
 
@@ -4602,6 +4623,7 @@ int C2_HOOK_FASTCALL Options_AbortRace(tFrontend_spec* pFrontend) {
 }
 
 // FUNCTION: CARMA2_HW 0x00474760
+// FUNCTION: CARMA2_SW 0x00473cc0
 // FUNCTION: CARMA2_CHEAT 0x00474ae0
 int C2_HOOK_FASTCALL Options_AbortGame(tFrontend_spec* pFrontend) {
 
@@ -4623,6 +4645,7 @@ int C2_HOOK_FASTCALL Options_AbortGame(tFrontend_spec* pFrontend) {
 }
 
 // FUNCTION: CARMA2_HW 0x004747d0
+// FUNCTION: CARMA2_SW 0x00473d30
 // FUNCTION: CARMA2_CHEAT 0x00474b50
 int C2_HOOK_FASTCALL Options_Quit(tFrontend_spec* pFrontend) {
 
@@ -4652,6 +4675,7 @@ int C2_HOOK_FASTCALL Graphics_Outfunc(tFrontend_spec* pFrontend) {
 }
 
 // FUNCTION: CARMA2_HW 0x00474860
+// FUNCTION: CARMA2_SW 0x00473dc0
 // FUNCTION: CARMA2_CHEAT 0x00474be0
 void C2_HOOK_FASTCALL FrontEndShowMouse(void) {
 
@@ -4659,6 +4683,7 @@ void C2_HOOK_FASTCALL FrontEndShowMouse(void) {
 }
 
 // FUNCTION: CARMA2_HW 0x00474870
+// FUNCTION: CARMA2_SW 0x00473dd0
 // FUNCTION: CARMA2_CHEAT 0x00474bf0
 void C2_HOOK_FASTCALL FrontEndHideMouse(void) {
 

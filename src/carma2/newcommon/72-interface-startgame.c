@@ -19,6 +19,8 @@ int gNet_grid_starts[10] = {
 };
 
 // GLOBAL: CARMA2_HW 0x0059c828
+// GLOBAL: CARMA2_SW 0x00597758
+// GLOBAL: CARMA2_CHEAT 0x005a30a8
 tFrontend_spec gFrontend_START_GAME = {
 #if 0 // FIXME: enable this
     "StartGame",

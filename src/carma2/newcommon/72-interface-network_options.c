@@ -12,6 +12,8 @@
 
 
 // GLOBAL: CARMA2_HW 0x00610208
+// GLOBAL: CARMA2_SW 0x0060b138
+// GLOBAL: CARMA2_CHEAT 0x00616a88
 tFrontend_spec gFrontend_NETWORK_OPTIONS = {
 #if 0 // FIXME: enable this
     "NetworkOptions",
