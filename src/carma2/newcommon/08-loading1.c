@@ -121,6 +121,7 @@ tU8 C2_HOOK_FASTCALL ReadU8(FILE* pF) {
 
 // FUNCTION: CARMA2_HW 0x0048f890
 // FUNCTION: CARMA2_SW 0x0048cb00
+// FUNCTION: CARMA2_CHEAT 0x0048f940
 float C2_HOOK_FASTCALL ReadF32(FILE* pF) {
     float f;
 
@@ -427,6 +428,7 @@ void C2_HOOK_FASTCALL GetThreeInts(FILE* pF, int* pF1, int* pF2, int* pF3) {
 
 // FUNCTION: CARMA2_HW 0x0048fed0
 // FUNCTION: CARMA2_SW 0x0048d140
+// FUNCTION: CARMA2_CHEAT 0x0048ff80
 void C2_HOOK_FASTCALL GetThreeIntsAndAString(FILE* pF, int* pF1, int* pF2, int* pF3, char* pS) {
     char s[256];
     char* str;
@@ -444,6 +446,7 @@ void C2_HOOK_FASTCALL GetThreeIntsAndAString(FILE* pF, int* pF1, int* pF2, int* 
 
 // FUNCTION: CARMA2_HW 0x0048ffa0
 // FUNCTION: CARMA2_SW 0x0048d210
+// FUNCTION: CARMA2_CHEAT 0x00490050
 void C2_HOOK_FASTCALL GetIntAndAString(FILE* pF, int* pF1, char* pS) {
     char s[256];
     char* str;
