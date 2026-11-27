@@ -42,6 +42,7 @@ int gServicing_sound;
 
 // GLOBAL: CARMA2_HW 0x00684560
 // GLOBAL: CARMA2_SW 0x0067eca0
+// GLOBAL: CARMA2_CHEAT 0x0068be08
 int gSound_sources_inited;
 
 // GLOBAL: CARMA2_HW 0x00684544
@@ -127,12 +128,13 @@ int gSound_detail_level = 1;
 
 // GLOBAL: CARMA2_HW 0x00684570
 // GLOBAL: CARMA2_SW 0x0067ecb0
-tEnvironment_sound_source gEnvironment_sound_sources[5];
+// GLOBAL: CARMA2_CHEAT 0x0068be18
+tEnvironment_sound_source gEnvironment_sound_sources[5] = { 0 };
 
 // GLOBAL: CARMA2_HW 0x006845fc
 // GLOBAL: CARMA2_SW 0x0067ed3c
 // GLOBAL: CARMA2_CHEAT 0x0068bea4
-tS3_outlet* gEffects_outlet;
+tS3_outlet* gEffects_outlet = NULL;
 
 // GLOBAL: CARMA2_HW 0x00684600
 // GLOBAL: CARMA2_SW 0x0067ed40
@@ -672,12 +674,11 @@ void C2_HOOK_FASTCALL DisposeSoundSources(void) {
     int toggle;
     tCar_spec* the_car;
 
+    toggle = 0;
     if (gSound_available) {
-        if (gSound_enabled) {
-            toggle = 0;
-        } else {
-            toggle = 1;
+        if (!gSound_enabled) {
             ToggleSoundEnable();
+            toggle = 1;
         }
         if (gSound_sources_inited) {
             DRS3StopOutletSound(gEngine_outlet);
