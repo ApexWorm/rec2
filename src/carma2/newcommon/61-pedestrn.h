@@ -44,6 +44,9 @@ extern int gCount_pedestrian_personality_cloned_materials;
 extern float gFLOAT_00677728;
 extern tPed_morph gPed_morphs[20];
 
+extern const char* gPed_form_collision_type_names[9];
+extern const char* gPed_form_bone_joint_type_names[10];
+extern const char* gPed_form_joint_limit_type_names[2];
 extern const char* gPed_personality_grounding_type_names[1];
 
 extern tPed_remap* gPed_remaps[10];
@@ -116,13 +119,13 @@ extern void C2_HOOK_FASTCALL DisposeRemap(tPed_remap* pRemap);
 
 extern void C2_HOOK_FASTCALL DisposeAllLoadedRemaps(void);
 
-// FindOrOpenRemap
+extern tPed_remap* C2_HOOK_FASTCALL FindOrOpenRemap(const char* pName);
 
-// Flip3DStoBRaxes
+extern void C2_HOOK_FASTCALL Flip3DStoBRaxes(br_matrix34* pMat);
 
-// ReadMove
+extern tPed_move* C2_HOOK_FASTCALL ReadMove(const char* pName, tPed_form* pForm, const char* pLooping_reset_flags, const br_vector3* pMovement_direction, tU32 pFlags);
 
-// FindOrOpenMove
+extern tPed_move* C2_HOOK_FASTCALL FindOrOpenMove(const char* pName, tPed_form* pForm, const char* pLooping_reset_flags, const br_vector3* pMovement_direction, tU32 pFlags);
 
 extern void C2_HOOK_FASTCALL RemapVector(br_vector3* pV, const tPed_remap_bone* pRemap);
 
