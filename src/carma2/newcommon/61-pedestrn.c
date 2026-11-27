@@ -8,6 +8,7 @@
 
 #include "61-pedestrn.h"
 
+#include "00-car.h"
 #include "07-structur.h"
 #include "08-loading1.h"
 #include "10-loading2.h"
@@ -72,10 +73,25 @@ tSmashable_initial_position_spec gGiblet_initial_position;
 // GLOBAL: CARMA2_CHEAT 0x0069bc94
 float gGiblet_scrape_start;
 
+// GLOBAL: CARMA2_HW 0x00694140
+// GLOBAL: CARMA2_SW 0x0068e198
+// GLOBAL: CARMA2_CHEAT 0x0069bcb8
+tProximity_ray gProximity_rays[20] = { 0 };
+
+// GLOBAL: CARMA2_HW 0x00694230
+// GLOBAL: CARMA2_SW 0x0068e288
+// GLOBAL: CARMA2_CHEAT 0x0069bda8
+int gINT_00694230 = 0;
+
+// GLOBAL: CARMA2_HW 0x00694234
+// GLOBAL: CARMA2_SW 0x0068e28c
+// GLOBAL: CARMA2_CHEAT 0x0069bdac
+int gPed_severing_damage = 0;
+
 // GLOBAL: CARMA2_HW 0x00694238
 // GLOBAL: CARMA2_SW 0x0068e290
 // GLOBAL: CARMA2_CHEAT 0x0069bdb0
-tSlick_spec gPed_slick;
+tSlick_spec gPed_slick = { 0 };
 
 // GLOBAL: CARMA2_HW 0x0069445c
 // GLOBAL: CARMA2_SW 0x0068e4b4
@@ -318,6 +334,11 @@ int gPeds_suicidal;
 // GLOBAL: CARMA2_SW 0x0073b270
 // GLOBAL: CARMA2_CHEAT 0x0074be50
 int gExploding_pedestrians;
+
+// GLOBAL: CARMA2_HW 0x007447b4
+// GLOBAL: CARMA2_SW 0x0073b274
+// GLOBAL: CARMA2_CHEAT 0x0074be54
+tPedestrian* gPedestrians_in_sight;
 
 // GLOBAL: CARMA2_HW 0x007447c0
 // GLOBAL: CARMA2_SW 0x0073b280
@@ -1171,7 +1192,20 @@ int C2_HOOK_FASTCALL IsActorRenderworthy(br_actor* pActor) {
 
 // StopPedNoise
 
-// MakePedNoise
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_HW 0x004cd880
+// STUB: CARMA2_SW 0x004c9f80
+// STUB: CARMA2_CHEAT 0x004d3410
+void C2_HOOK_FASTCALL MakePedNoise(tPedestrian* pPed, int pArg2, int pArg3, tPhysics_object* pCollision_info) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // FUNCTION: CARMA2_HW 0x004cbcd0
 // FUNCTION: CARMA2_SW 0x004c83d0
@@ -1635,7 +1669,20 @@ void C2_HOOK_FASTCALL ScoreForKilledPedestrian(tPedestrian* pPed, float pHeight)
     AwardTime(gPed_times[gProgram_state.skill_level]);
 }
 
-// KillPedestrian
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_HW 0x004cce70
+// STUB: CARMA2_SW 0x004c9570
+// STUB: CARMA2_CHEAT 0x004d29e0
+void C2_HOOK_FASTCALL KillPedestrian(tPedestrian* pPed, tPhysics_object* pCollision_info) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // FUNCTION: CARMA2_HW 0x004cd9e0
 // FUNCTION: CARMA2_SW 0x004ca0e0
@@ -1674,10 +1721,77 @@ int C2_HOOK_FASTCALL DismemberPed(tPedestrian* pPed, int pBone_index) {
     }
 }
 
-// STUB: CARMA2_HW 0x004cd640
-// STUB: CARMA2_SW 0x004c9d40
-void C2_HOOK_FASTCALL DamagePedestrian(tPedestrian* pPed, int pDamage, int pArg3, int pArg4, tPhysics_object* pObject) {
-    NOT_IMPLEMENTED();
+// FUNCTION: CARMA2_HW 0x004cd640
+// FUNCTION: CARMA2_SW 0x004c9d40
+// FUNCTION: CARMA2_CHEAT 0x004d31d0
+int C2_HOOK_FASTCALL DamagePedestrian(tPedestrian* pPed, int pDamage, int pArg3, int pArg4, tPhysics_object* pObject) {
+    tPed_form* form;
+    br_scalar mass_factor;
+    br_scalar damage_left;
+    int count;
+    int severing_damage;
+
+    count = 0;
+    form = pPed->character->personality->form;
+    mass_factor = 0.068 / form->simple_physicing[(tS8)pPed->character->field_0x5].collision_info->M;
+    pDamage = (int)(mass_factor * mass_factor * pDamage);
+    if (form->non_humanoid && (gPed_dismemberfest || gExploding_pedestrians) && pDamage < 100) {
+        pDamage = 100;
+    }
+    damage_left = (br_scalar)pDamage;
+    if (pObject != NULL && !gImmortal_peds && gGoreLevel >= 2) {
+        while (1) {
+            if (gPed_dismemberfest) {
+                severing_damage = 5;
+            } else {
+                severing_damage = gPed_severing_damage;
+            }
+            damage_left -= severing_damage;
+            if (damage_left < 0.f || count >= 5) {
+                break;
+            }
+            if (gExploding_pedestrians || gPed_dismemberfest || PercentageChance(gPed_severing_chance)) {
+                count += DismemberPed(pPed, IRandomBetween(1, pPed->character->personality->form->count_bones - 1));
+            }
+        }
+    }
+    if (count > 4) {
+        pPed->field_0x0c->field_0x2e |= 0x2;
+    }
+    if (pPed->hit_points <= 0) {
+        if (pDamage > 2) {
+            MakePedNoise(pPed, 5, 0, pObject);
+        }
+        return 1;
+    }
+    if (pPed->character->personality->form->non_humanoid && pPed->character->field_0xc) {
+        pPed->hit_points = 0;
+        pDamage = 0;
+    }
+    if (pPed->character->field_0xc & gPow2_array[pPed->character->personality->form->index_head_bone]) {
+        pPed->hit_points = 0;
+    } else if (pDamage >= 100) {
+        pPed->hit_points = 0;
+    } else {
+        pPed->hit_points -= pDamage;
+    }
+    if (gImmortal_peds && pPed->hit_points <= 0) {
+        pPed->hit_points = 1;
+    }
+    if (pPed->hit_points > 0) {
+        if (pArg3 >= 0) {
+            SetPedMove(pPed, pArg3, -1, 0, 1, GetTotalTime(), ePed_action_impacting);
+        }
+        MakePedNoise(pPed, 4, 0, pObject);
+        return 0;
+    } else {
+        if (pArg4 >= 0) {
+            SetPedMove(pPed, pArg4, -1, 0, 1, GetTotalTime(), ePed_action_impacting);
+        }
+        MakePedNoise(pPed, 1, 0, pObject);
+        KillPedestrian(pPed, pObject);
+        return 1;
+    }
 }
 
 // SetLastHitter
@@ -1686,17 +1800,84 @@ void C2_HOOK_FASTCALL DamagePedestrian(tPedestrian* pPed, int pDamage, int pArg3
 
 // CBPassiveCollision
 
-// BastardIt
+// FUNCTION: CARMA2_HW 0x004ce050
+// FUNCTION: CARMA2_SW 0x004ca750
+// FUNCTION: CARMA2_CHEAT 0x004d3be0
+int C2_HOOK_FASTCALL BastardIt(tPedestrian* pPed, tCar_spec* pCar, float pDistance_squared, tU32 pTime, void* pContext) {
+    int i;
+
+    pPed->field_0x0c->field_0xc0 = pCar;
+    if (pCar != NULL && pCar->driver == eDriver_local_human) {
+        PipeSinglePedIncident(pPed, pCar->collision_info->actor);
+    }
+    if (!gImmortal_peds) {
+        KillPedestrian(pPed, pCar->collision_info);
+        SetPedMove(pPed, 0x71, -1, 0, 1, pTime, ePed_action_dead);
+    }
+    for (i = 0; i < (int)REC2_ASIZE(gProximity_rays); i++) {
+        if (gProximity_rays[i].start_time == 0) {
+            gProximity_rays[i].start_time = GetTotalTime();
+            gProximity_rays[i].car = pCar;
+            gProximity_rays[i].ped = pPed;
+            if (pCar != NULL && pCar->driver == eDriver_local_human) {
+                DRS3StartSound(gCar_outlet, 0x157c);
+            } else {
+                DRS3StartSound3D(gCar_outlet, 0x157c, &pCar->pos, &gZero_v__car, 1, 255, 0x10000, 0x10000);
+            }
+            return 0;
+        }
+    }
+    return 0;
+}
 
 // MungeProxRay
 
-// DoToPeds
+// FUNCTION: CARMA2_HW 0x004ce140
+// FUNCTION: CARMA2_SW 0x004ca840
+// FUNCTION: CARMA2_CHEAT 0x004d3cd0
+int C2_HOOK_FASTCALL DoToPeds(tCar_spec* pCar, int pOnly_alive, float pRange_squared, int pCheck_visible, void* pContext, int (C2_HOOK_FASTCALL* pCallback)(tPedestrian* pPed, tCar_spec* pCar, float pDistance_squared, tU32 pTime, void* pContext)) {
+    int result;
+    float distance_squared;
+    br_scalar t;
+    br_material* material;
+    tU32 time;
+    br_vector3 normal;
+    br_vector3 dir;
+    tPedestrian* ped;
+    br_vector3* pos;
 
-// STUB: CARMA2_HW 0x004ce030
-// STUB: CARMA2_SW 0x004ca730
-// STUB: CARMA2_CHEAT 0x004d3bc0
-int C2_HOOK_FASTCALL DoPedAnnihilator(tCar_spec* pCar, float pRange) {
-    NOT_IMPLEMENTED();
+    result = 0;
+    if (gGhost_pedestrians) {
+        return 0;
+    }
+    pos = &pCar->pos;
+    time = GetTotalTime();
+    for (ped = gPedestrians_in_sight; ped != NULL; ped = ped->next) {
+        distance_squared = (pos->v[0] - ped->pos.v[0]) * (pos->v[0] - ped->pos.v[0]) + (pos->v[1] - ped->pos.v[1]) * (pos->v[1] - ped->pos.v[1]) + (pos->v[2] - ped->pos.v[2]) * (pos->v[2] - ped->pos.v[2]);
+        if (!pOnly_alive || ped->hit_points > 0) {
+            if (pRange_squared == 0.f || distance_squared < pRange_squared) {
+                if (pCheck_visible) {
+                    BrVector3Sub(&dir, &ped->pos, pos);
+                    FindFace(pos, &dir, &normal, &t, &material);
+                } else {
+                    t = 100.f;
+                }
+                if (t >= 1.0) {
+                    pCallback(ped, pCar, distance_squared, time, pContext);
+                    result = 1;
+                }
+            }
+        }
+    }
+    return result;
+}
+
+// FUNCTION: CARMA2_HW 0x004ce030
+// FUNCTION: CARMA2_SW 0x004ca730
+// FUNCTION: CARMA2_CHEAT 0x004d3bc0
+int C2_HOOK_FASTCALL DoPedAnnihilator(tCar_spec* pCar, float pRange_squared) {
+
+    return DoToPeds(pCar, 1, pRange_squared, 1, NULL, BastardIt);
 }
 
 // RepulseIt
