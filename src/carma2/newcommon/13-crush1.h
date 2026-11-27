@@ -478,11 +478,11 @@ extern void C2_HOOK_FASTCALL RepairCarCollisionShapes(tCar_spec* pCar, float pSt
 
 // WeldCar
 
-// ARCompressCrush
+extern void C2_HOOK_FASTCALL ARCompressCrush(tCompressed_vector3* pDirection, tU16* pDest, br_model* pModel, const br_vector3* pVector, const float* pValues);
 
-// ARApplyCrush
+extern void C2_HOOK_FASTCALL ARApplyCrush(br_model* pModel, const tCompressed_vector3* pDirection, const tU16* pValues);
 
-// ARUndoCrush
+extern void C2_HOOK_FASTCALL ARUndoCrush(br_model* pModel, const tCompressed_vector3* pDirection, const tU16* pValues);
 
 extern void C2_HOOK_FASTCALL ARCompressModelMash(tCompressed_vector3* pDest, br_model* pModel, br_vector3* pSrc);
 
