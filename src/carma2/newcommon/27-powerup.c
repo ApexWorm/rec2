@@ -2221,7 +2221,20 @@ void C2_HOOK_FASTCALL LoseAllLocalPowerups(tCar_spec* pCar) {
     }
 }
 
-// LoseDodgyPowerups
+// FUNCTION: CARMA2_HW 0x004df070
+// FUNCTION: CARMA2_SW 0x004db570
+// FUNCTION: CARMA2_CHEAT 0x004e4c30
+void C2_HOOK_FASTCALL LoseDodgyPowerups(tCar_spec* pCar) {
+    int i;
+
+    if (pCar != NULL && pCar->driver == eDriver_local_human) {
+        for (i = 0; i < gNumber_of_powerups; i++) {
+            if (pCar->powerups[i] != 0 && (gPowerup_array[i].net_type & eNet_powerup_off_before_snapweld)) {
+                LosePowerup(&gPowerup_array[i]);
+            }
+        }
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x004df1e0
 // FUNCTION: CARMA2_SW 0x004db6e0
