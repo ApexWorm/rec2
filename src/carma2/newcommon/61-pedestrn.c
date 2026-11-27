@@ -500,7 +500,7 @@ inline void C2_HOOK_FASTCALL ClearOutMorphs(void) {
     int i;
 
     for (i = 0; i < (int)REC2_ASIZE(gPed_morphs); i++) {
-        gPed_morphs[i].field_0x4 = 0.f;
+        gPed_morphs[i].field_0x4 = 0.0f;
     }
 }
 
