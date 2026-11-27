@@ -389,7 +389,7 @@ extern void C2_HOOK_FASTCALL ApplyRepulseRay(tPipe_chunk** pChunk);
 
 extern void C2_HOOK_FASTCALL ApplyActorTrans(tPipe_chunk** pChunk);
 
-// ApplyPedStatus
+extern void C2_HOOK_FASTCALL ApplyPedStatus(tPipe_chunk** pChunk);
 
 extern void C2_HOOK_FASTCALL ApplyPedDir(tPipe_chunk** pChunk);
 
@@ -489,7 +489,7 @@ extern void C2_HOOK_FASTCALL UndoSmashTextureChange(tPipe_chunk** pChunk, tPipe_
 
 extern void C2_HOOK_FASTCALL UndoActorTrans(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk);
 
-// UndoPedStatus
+extern void C2_HOOK_FASTCALL UndoPedStatus(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk);
 
 // UndoPedMove
 
