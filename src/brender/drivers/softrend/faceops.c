@@ -376,6 +376,7 @@ void C2_HOOK_STDCALL triangleSubdivideCheck(int depth, brp_block* block, brp_ver
 }
 
 // FUNCTION: CARMA2_HW 0x00545c60
+// FUNCTION: CARMA2_SW 0x00541300
 void C2_HOOK_CDECL OpTriangleSubdivide(brp_block* block, brp_vertex* v0, brp_vertex* v1, brp_vertex* v2, br_uint_16* fp_vertices, br_uint_16* fp_edges) {
 
     triangleSubdivide(6, block, v0, v1, v2, fp_vertices, fp_edges);
