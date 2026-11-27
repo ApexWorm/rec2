@@ -509,9 +509,9 @@ br_scalar C2_HOOK_FASTCALL HierarchyCalcEnergy(tPhysics_object* pObject) {
     br_scalar object_energy;
     int i;
 
-    energy = 0.f;
+    energy = 0.0f;
     for (; pObject != NULL; pObject = pObject->next) {
-        object_energy = 0.f;
+        object_energy = 0.0f;
         for (i = 0; i < 3; i++) {
             object_energy += pObject->I.v[i] * REC2_SQR(pObject->omega.v[i]) + pObject->M * REC2_SQR(pObject->v.v[i]);
         }
@@ -737,11 +737,11 @@ void C2_HOOK_FASTCALL MoveJointedObject(tPhysics_object* pObject, float pDelta_t
         MakeMatrix(workspace->field_0x18, count, force_list, count);
         MakeJointVelocitiesVector(velocities, force_list, count);
         RQMatrixSolveWithNegatives(workspace->field_0x18, workspace->field_0x14, velocities, amounts, count);
-        if (pDelta_time != 0.f) {
+        if (pDelta_time != 0.0f) {
             HierarchyCalcEnergy(pObject);
             ApplyJointForces(force_list, amounts, count);
             HierarchyCalcEnergy(pObject);
-            if (pDelta_time > 0.f) {
+            if (pDelta_time > 0.0f) {
                 TranslateAndRotateJointedObject(pObject, pDelta_time);
             }
         }
