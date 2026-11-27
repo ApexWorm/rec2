@@ -117,7 +117,7 @@ extern void C2_HOOK_FASTCALL MarkObjectAndChildrenAsPassive(tPhysics_object* pOb
 
 // PHILInterpolateObjects
 
-// PHILDoPhysics
+extern void C2_HOOK_FASTCALL PHILDoPhysics(tPhysics_callbacks* pCallbacks, tU32 pLast_tick_time, tU32 pFrame_period);
 
 extern void C2_HOOK_FASTCALL PHILApplyPHILObject(tPhysics_object* pObject, const br_matrix34* pMatrix);
 

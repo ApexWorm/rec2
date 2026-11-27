@@ -60,6 +60,8 @@ int gNum_cars_and_non_cars;
 tNon_car_spec* gActive_non_car_list[99];
 
 // GLOBAL: CARMA2_HW 0x00676854
+// GLOBAL: CARMA2_SW 0x00670fc4
+// GLOBAL: CARMA2_CHEAT 0x0067e104
 int gStop_opponents_moving;
 
 // GLOBAL: CARMA2_HW 0x006793c0
@@ -81,6 +83,24 @@ int gLast_crunch_vol;
 // GLOBAL: CARMA2_SW 0x0058a680
 // GLOBAL: CARMA2_CHEAT 0x00594710
 int gMetal_crunch_sound_id[5] = { 5000, 5001, 5002, 5003, 5004 };
+
+// GLOBAL: CARMA2_HW 0x0058f6e0
+// GLOBAL: CARMA2_SW 0x0058a6e0
+// GLOBAL: CARMA2_CHEAT 0x00594770
+tPhysics_callbacks gCar_physics_callbacks = {
+    &gWorld_callbacks,
+    APTCPreCollision,
+    APTCPostCollision,
+    APTCChangedObjects,
+    APTCActiveHalted,
+    APTCPassiveActivated,
+    NULL,
+};
+
+// GLOBAL: CARMA2_HW 0x0074a5f4
+// GLOBAL: CARMA2_SW 0x007410b4
+// GLOBAL: CARMA2_CHEAT 0x00751c94
+int gOver_shoot;
 
 // GLOBAL: CARMA2_HW 0x0067939c
 // GLOBAL: CARMA2_SW 0x00673b0c
@@ -129,6 +149,7 @@ br_vector3 gZero_v__car;  // FIXME: make const?
 
 // GLOBAL: CARMA2_HW 0x006793a0
 // GLOBAL: CARMA2_SW 0x00673b10
+// GLOBAL: CARMA2_CHEAT 0x00680c50
 int gFreeze_mechanics;
 
 // GLOBAL: CARMA2_HW 0x006793dc
@@ -724,7 +745,50 @@ int C2_HOOK_FASTCALL IsCarInTheSea(void) {
 
 // CalcEngineForce
 
-// PrepareCars
+inline void C2_HOOK_FASTCALL PrepareCars(tU32 pFrame_start_time) {
+    int i;
+    tCar_spec* car;
+    int flag;
+    // GLOBAL: CARMA2_HW 0x006793f4
+    // GLOBAL: CARMA2_SW 0x00673b64
+    // GLOBAL: CARMA2_CHEAT 0x00680ca4
+    static tU32 last_frame_start;
+
+    (void)last_frame_start;
+
+    last_frame_start = pFrame_start_time;
+    for (i = 0; i < gNum_cars_and_non_cars; i++) {
+        car = gActive_car_list[i];
+        if (gOver_shoot && car->collision_info->collision_flag) {
+            flag = 1;
+        } else {
+            flag = 0;
+        }
+        car->frame_collision_flag = flag;
+        if (car != NULL && car->driver > eDriver_5) {
+            RecordLastDamage(car);
+            if (car->driver == eDriver_oppo && gStop_opponents_moving) {
+                car->acc_force = 0.0f;
+                car->brake_force = 0.0f;
+                car->keys.acc = 0;
+                car->keys.dec = 0;
+                car->joystick.acc = -1;
+                car->joystick.dec = -1;
+            }
+            if (!car->wheel_slip) {
+                StopSkid(car);
+            }
+            if (car->driver == eDriver_net_human && car->collision_info->message_time < pFrame_start_time - 1000) {
+                car->keys.acc = 0;
+                car->keys.dec = 0;
+                car->joystick.acc = -1;
+                car->joystick.dec = -1;
+                car->keys.horn = 0;
+            }
+            SetSmokeLastDamageLevel(car);
+        }
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x004157e0
 // FUNCTION: CARMA2_SW 0x00415810
@@ -794,7 +858,17 @@ void C2_HOOK_FASTCALL FinishCars(tU32 pLast_frame_time, tU32 pTime) {
     }
 }
 
-// GetNonCars
+inline void C2_HOOK_FASTCALL GetNonCars(void) {
+    int i;
+    int j;
+
+    gNum_cars_and_non_cars = gNum_active_cars + gNum_active_non_cars;
+    j = 0;
+    for (i = gNum_active_cars; i < gNum_cars_and_non_cars; i++) {
+        gActive_car_list[i] = (tCar_spec*)gActive_non_car_list[j];
+        j++;
+    }
+}
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
@@ -997,15 +1071,55 @@ void C2_HOOK_FASTCALL SetCollisionFlagsAndStuff(tPhysics_object* pObject) {
     }
 }
 
-// APTCPostCollision
+// STUB: CARMA2_HW 0x00416070
+// STUB: CARMA2_SW 0x004160a0
+// STUB: CARMA2_CHEAT 0x004162d0
+void C2_HOOK_FASTCALL APTCPostCollision(void) {
+    NOT_IMPLEMENTED();
+}
 
-// APTCActiveHalted
+// STUB: CARMA2_HW 0x00416270
+// STUB: CARMA2_SW 0x004162a0
+// STUB: CARMA2_CHEAT 0x004164d0
+int C2_HOOK_FASTCALL APTCActiveHalted(tPhysics_object* pObject) {
+    NOT_IMPLEMENTED();
+}
 
-// APTCPassiveActivated
+// STUB: CARMA2_HW 0x004162b0
+// STUB: CARMA2_SW 0x004162e0
+// STUB: CARMA2_CHEAT 0x00416510
+int C2_HOOK_FASTCALL APTCPassiveActivated(tPhysics_object* pObject, tPhysics_object* pOther) {
+    NOT_IMPLEMENTED();
+}
 
-// APTCChangedObjects
+// STUB: CARMA2_HW 0x00416300
+// STUB: CARMA2_SW 0x00416330
+// STUB: CARMA2_CHEAT 0x00416560
+void C2_HOOK_FASTCALL APTCChangedObjects(tPhysics_object* pObject, undefined4 pArg2) {
+    NOT_IMPLEMENTED();
+}
 
-// ApplyPhysicsToCars
+// FUNCTION: CARMA2_HW 0x00416340
+// FUNCTION: CARMA2_SW 0x00416370
+// FUNCTION: CARMA2_CHEAT 0x004165a0
+void C2_HOOK_FASTCALL ApplyPhysicsToCars(tU32 pLast_tick_time, tU32 pFrame_period) {
+
+    if (gFreeze_mechanics) {
+        return;
+    }
+    if (gNet_mode == eNet_mode_client) {
+        ForceRebuildActiveCarList();
+    }
+    GetNonCars();
+    PrepareCars(pLast_tick_time);
+    PHILDoPhysics(&gCar_physics_callbacks, pLast_tick_time, pFrame_period);
+    if (TimeToSendData()) {
+        SendCarData(gPHIL_last_physics_tick);
+        SendMines(gPHIL_last_physics_tick);
+    }
+    FinishCars(pLast_tick_time + pFrame_period, pFrame_period);
+    CheckForDeAttachmentOfNonCars(pFrame_period);
+}
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
@@ -1375,7 +1489,15 @@ void C2_HOOK_FASTCALL SkidNoise(tCar_spec* pC, int pWheel_num, br_scalar pV, int
     }
 }
 
-// StopSkid
+inline void C2_HOOK_FASTCALL StopSkid(tCar_spec* pC) {
+
+    if (gLast_car_to_skid[0] == pC) {
+        DRS3StopSound(gSkid_tag[0]);
+    }
+    if (gLast_car_to_skid[1] == pC) {
+        DRS3StopSound(gSkid_tag[1]);
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x0041ddc0
 // FUNCTION: CARMA2_SW 0x0041ddf0

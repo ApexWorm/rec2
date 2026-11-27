@@ -433,6 +433,7 @@ void C2_HOOK_FASTCALL DamageSystems(tCar_spec* pCar, br_vector3* pImpact_point, 
 // GetDirection
 
 // FUNCTION: CARMA2_HW 0x00440210
+// FUNCTION: CARMA2_SW 0x004402f0
 // FUNCTION: CARMA2_CHEAT 0x004404c0
 void C2_HOOK_FASTCALL SetSmokeLastDamageLevel(tCar_spec* pCar) {
     int i;

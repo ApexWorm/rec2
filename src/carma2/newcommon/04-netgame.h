@@ -34,7 +34,7 @@ extern int C2_HOOK_FASTCALL CarShapeNeedsSendingToPlayer(tCar_crush_network_shap
 
 extern int C2_HOOK_FASTCALL TimeToSendData(void);
 
-// SendCarData
+extern void C2_HOOK_FASTCALL SendCarData(tU32 pNext_frame_time);
 
 extern void C2_HOOK_FASTCALL ReceivedRecover(tNet_message_chunk_recover* pContents);
 
