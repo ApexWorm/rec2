@@ -99,7 +99,7 @@ extern int C2_HOOK_FASTCALL DroneTrainWithinRenderingDistance(const br_vector3* 
 
 // SemiInitDroneSpec
 
-// InitDroneSpec
+extern void C2_HOOK_FASTCALL InitDroneSpec(tDrone_spec* pDrone_spec, int pPath_node);
 
 // ChooseNextNode
 
@@ -167,7 +167,7 @@ extern void C2_HOOK_FASTCALL LoadPerRaceDroneStuff(void);
 
 // GetDroneCrushData
 
-// AllocateAndInitDrones
+extern void C2_HOOK_FASTCALL AllocateAndInitDrones(void);
 
 extern void C2_HOOK_FASTCALL LoadInDronePaths(FILE* pF);
 
