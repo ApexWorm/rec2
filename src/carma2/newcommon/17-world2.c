@@ -83,6 +83,7 @@ int gMirror_on__graphics;
 
 // GLOBAL: CARMA2_HW 0x0065cf30
 // GLOBAL: CARMA2_SW 0x00657848
+// GLOBAL: CARMA2_CHEAT 0x00664528
 br_colour gRGB_colours[9] = {
     0x000000,   0xffffff,   0xff0000,   0x00ff00,
     0x0000ff,   0xffff00,   0x00ffff,   0xff00ff,
@@ -652,6 +653,7 @@ intptr_t C2_HOOK_CDECL ProcessMaterials(br_actor* pActor, void* pContext) {
 
 // FUNCTION: CARMA2_HW 0x004b4ed0
 // FUNCTION: CARMA2_SW 0x004b1040
+// FUNCTION: CARMA2_CHEAT 0x004ba7a0
 void C2_HOOK_FASTCALL BuildColourTable(br_pixelmap* pPalette) {
     int i;
     int j;
@@ -664,7 +666,7 @@ void C2_HOOK_FASTCALL BuildColourTable(br_pixelmap* pPalette) {
     double sum;
 
     for (i = 0; i < (int)REC2_ASIZE(gRGB_colours); i++) {
-        nearest_distance = 196608.f;
+        nearest_distance = (float)(3 * REC2_SQR(256));
         red = (gRGB_colours[i] >> 16) & 0xFF;
         green = (gRGB_colours[i] >> 8) & 0xFF;
         blue = gRGB_colours[i] & 0xFF;
