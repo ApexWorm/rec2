@@ -5238,6 +5238,12 @@ typedef struct {
     tPlayer_ID field_0xd0;
 } tNet_game_player_info;
 
+typedef struct {
+    int player_index;
+    int score;
+    int field_0x8;
+} tNet_head_sort_entry; /* FIXME: name and fields are guesses */
+
 typedef enum {
     kDroneType_car = 0,
     kDroneType_plane = 1,
