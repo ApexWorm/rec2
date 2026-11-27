@@ -8,6 +8,7 @@ address,type,name
 0x0057b8f0,library,_strtok
 0x0057b9d0,library,_sprintf
 0x0057ba40,library,_floor
+0x0057bb40,library,_strncat
 0x0057bc70,library,_memmove
 0x0057c080,library,_qsort
 0x0057c2c0,library,_strncpy

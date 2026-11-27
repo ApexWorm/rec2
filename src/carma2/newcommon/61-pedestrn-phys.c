@@ -1360,7 +1360,12 @@ void C2_HOOK_CDECL TurnLimbsOnAndOff(br_actor* pActor, br_model* pModel, br_mate
 
 // MakeRandomPointInTriangle
 
-// SpawnPedsOnFace
+// STUB: CARMA2_HW 0x004d2cc0
+// STUB: CARMA2_SW 0x004cf3b0
+// STUB: CARMA2_CHEAT 0x004d8880
+void C2_HOOK_FASTCALL SpawnPedsOnFace(br_face* pFace, br_model* pModel) {
+    NOT_IMPLEMENTED();
+}
 
 // FUNCTION: CARMA2_HW 0x004d3520
 // FUNCTION: CARMA2_SW 0x004cfc10

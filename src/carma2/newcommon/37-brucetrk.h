@@ -16,11 +16,13 @@
 extern int gRender_alternative_track_actors;
 extern br_material* gDefault_track_material;
 extern int gCount_track_non_cars;
+extern int gMax_count_non_cars;
+extern br_actor* gMr_blendy;
 extern br_vector3 gAverage_grid_position;
 
-// AssertNoncars
+extern void C2_HOOK_FASTCALL AssertNoncars(br_actor** pNon_cars, int* pCount_non_cars, int* pMax_count_non_cars, int* pTrack_count_non_cars);
 
-// AllocateActorMatrix
+extern void C2_HOOK_FASTCALL AllocateActorMatrix(tTrack_spec* pTrack_spec, tTrack_square*** pDst);
 
 // DisposeActorMatrix
 
@@ -36,13 +38,13 @@ extern void C2_HOOK_FASTCALL XZToColumnXZ(tU8* pColumn_x, tU8* pColumn_z, br_sca
 
 extern intptr_t C2_HOOK_CDECL FindNonCarsCB(br_actor* pActor, void* pData);
 
-// MungeFaces
+extern void C2_HOOK_FASTCALL MungeFaces(br_actor* pActor, br_model* pModel);
 
-// ProcessModelsCB
+extern intptr_t C2_HOOK_CDECL ProcessModelsCB(br_actor* pActor, void* pContext);
 
-// ProcessModels
+extern void C2_HOOK_FASTCALL ProcessModels(tTrack_spec* pTrack_spec);
 
-// ExtractColumns
+extern void C2_HOOK_FASTCALL ExtractColumns(tTrack_spec* pTrack_spec);
 
 extern void C2_HOOK_FASTCALL RenderTrack(br_actor* pWorld, tTrack_spec* pTrack_spec, br_actor* pCamera, br_matrix34* pCamera_to_world);
 
