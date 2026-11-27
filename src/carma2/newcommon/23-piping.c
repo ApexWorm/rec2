@@ -55,6 +55,7 @@ tU8* gPipe_buffer_working_end;
 
 // GLOBAL: CARMA2_HW 0x006768c8
 // GLOBAL: CARMA2_SW 0x00671038
+// GLOBAL: CARMA2_CHEAT 0x0067e178
 tU8* gEnd_of_session = NULL;
 
 #ifdef REC2_MATCHING
@@ -157,6 +158,7 @@ tFloat_u32_union gFloat_pipe_union;
 
 // FUNCTION: CARMA2_HW 0x00402300
 // FUNCTION: CARMA2_SW 0x00402300
+// FUNCTION: CARMA2_CHEAT 0x00402300
 int C2_HOOK_FASTCALL ARReplayForwards(void) {
     if (gPipe_play_ptr == gPipe_record_ptr) {
         return 0;
@@ -304,6 +306,7 @@ tU32 C2_HOOK_FASTCALL LengthOfSession(tPipe_session* pSession) {
 
 // FUNCTION: CARMA2_HW 0x004024e0
 // FUNCTION: CARMA2_SW 0x004024e0
+// FUNCTION: CARMA2_CHEAT 0x004024e0
 void C2_HOOK_FASTCALL ARAdvanceChunkPtr(tU8** pChunk, int pType) {
     tU8* old_chunk;
 
@@ -546,12 +549,14 @@ void C2_HOOK_CDECL ARDoSingleVariedSession(int pType, uintptr_t pOwner, int pCou
 
 // FUNCTION: CARMA2_HW 0x00402df0
 // FUNCTION: CARMA2_SW 0x00402df0
+// FUNCTION: CARMA2_CHEAT 0x00402df0
 tU8* C2_HOOK_FASTCALL ARGetPipePlayPtr(void) {
     return gPipe_play_ptr;
 }
 
 // FUNCTION: CARMA2_HW 0x00402e00
 // FUNCTION: CARMA2_SW 0x00402e00
+// FUNCTION: CARMA2_CHEAT 0x00402e00
 void C2_HOOK_FASTCALL ARSetPipePlayPtr(tU8* pPtr) {
     gPipe_play_ptr = pPtr;
 }
@@ -582,6 +587,7 @@ inline int C2_HOOK_FASTCALL ApplyPipedSession(tU8** pPtr) {
 
 // FUNCTION: CARMA2_HW 0x004037c0
 // FUNCTION: CARMA2_SW 0x004037c0
+// FUNCTION: CARMA2_CHEAT 0x004037c0
 int C2_HOOK_FASTCALL MoveSessionPointerBackOne(tU8** pPtr) {
     if (*pPtr == gPipe_buffer_oldest && *pPtr != gPipe_record_ptr) {
         return 1;
@@ -790,14 +796,13 @@ void C2_HOOK_FASTCALL MoveReplayBuffer(int pFrames, tReplay_session_callback* pB
                 } while (!MoveSessionPointerForwardOne(&ptr));
             }
         } else if (!MoveSessionPointerBackOne(&ptr)) {
-            do {
-                if (MoveSessionPointerBackOne(&ptr)) {
-                    goto applied;
+            while (!MoveSessionPointerBackOne(&ptr)) {
+                if (((tPipe_session*)ptr)->type == ePipe_chunk_frame_finish) {
+                    gLast_replay_frame_time = ((tPipe_chunk*)((tPipe_session*)ptr)->data)->data.frame_boundary.time;
+                    break;
                 }
-            } while (((tPipe_session*)ptr)->type != ePipe_chunk_frame_finish);
-            gLast_replay_frame_time = ((tPipe_chunk*)((tPipe_session*)ptr)->data)->data.frame_boundary.time;
+            }
         }
-    applied:
         if (ARSomeReplayLeft()) {
             PipingFrameReset();
         }
