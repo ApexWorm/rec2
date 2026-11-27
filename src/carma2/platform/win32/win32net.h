@@ -25,6 +25,8 @@ void C2_HOOK_FASTCALL NetNowIPXLocalTarget2String(char* pString, struct sockaddr
 
 int C2_HOOK_FASTCALL BroadcastMessage(void);
 
+extern int C2_HOOK_FASTCALL ReceiveHostResponses(void);
+
 int C2_HOOK_FASTCALL PDNetGetHeaderSize(void);
 
 int C2_HOOK_FASTCALL PDNetJoinGame(tNet_game_details* pGame_details, const char* pName);

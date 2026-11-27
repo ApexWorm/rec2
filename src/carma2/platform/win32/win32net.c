@@ -376,7 +376,7 @@ int C2_HOOK_FASTCALL GetMessageTypeFromMessage(char* pMessage_str) {
     return 999;
 }
 
-int C2_HOOK_FASTCALL ReceiveHostResponses(void) {
+inline int C2_HOOK_FASTCALL ReceiveHostResponses(void) {
     char str[256];
     int i;
     int already_registered;
@@ -455,7 +455,7 @@ int C2_HOOK_FASTCALL PDNetGetNextJoinGame(tNet_game_details* pGame, int pIndex) 
                 if (gJoinable_games[i].last_response + 10000 < (tU32)PDGetTotalTime()) {
                     number_of_hosts_has_changed = 1;
                     for (j = i; j < gNumber_of_hosts - 1; j++) {
-                        memmove(&gJoinable_games[j], &gJoinable_games[j + 1], sizeof(tPD_net_game_info));
+                        gJoinable_games[j] = gJoinable_games[j + 1];
                     }
                 }
             }
