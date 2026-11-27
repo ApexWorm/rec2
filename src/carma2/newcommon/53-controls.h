@@ -23,6 +23,7 @@ extern float gMap_render_x;
 extern float gMap_render_y;
 extern float gMap_render_width;
 extern float gMap_render_height;
+extern const br_uint_32 gCar_map_colours[4];
 extern int gMap_trans;
 extern int gHeadup_map_x;
 extern int gHeadup_map_y;

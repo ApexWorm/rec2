@@ -39,7 +39,7 @@ extern int gBack_original_origin_y;
 extern br_actor* gLit_op_stat_actor;
 #endif
 
-// CarArrowColour
+extern br_uint_32 C2_HOOK_FASTCALL CarArrowColour(tCar_spec* pCar, tVehicle_type pCategory);
 
 extern void C2_HOOK_FASTCALL ToggleTargetLock(void);
 
@@ -53,19 +53,19 @@ extern void C2_HOOK_FASTCALL InitTargetLock(void);
 
 extern void C2_HOOK_FASTCALL SetIntegerMapRenders(void);
 
-// OppositeColour
+extern int C2_HOOK_FASTCALL OppositeColour(int pColour);
 
 extern void C2_HOOK_FASTCALL DrawArrow(br_pixelmap* pScreen, br_uint_32 pArrow_index, const br_vector3* pPos, br_uint_32 pColour);
 
-// DrawMapBlip
+extern void C2_HOOK_FASTCALL DrawMapBlip(br_pixelmap* pScreen, tCar_spec* pCar, tU32 pTime, br_matrix34* pTrans, const br_vector3* pPos, br_uint_32 pColour);
 
-// DrawSmashBlip
+extern void C2_HOOK_FASTCALL DrawSmashBlip(br_pixelmap* pScreen, tU32 pTime, const br_vector3* pPos, int pIndex);
 
 extern void C2_HOOK_FASTCALL DrawMapSmallBlip(br_pixelmap* pScreen, tU32 pTime, const br_vector3* pPos, int pColour);
 
 extern void C2_HOOK_FASTCALL CopyMapToScreen(void);
 
-// DrawCarArrow
+extern void C2_HOOK_FASTCALL DrawCarArrow(br_pixelmap* pScreen, tCar_spec* pCar, tU32 pTime, const br_vector3* pPos, tVehicle_type pCategory);
 
 extern void C2_HOOK_FASTCALL DoSomeThingsToCheckpoints(br_pixelmap* pMap, tU32 pTime, tDoSomethingsToCheckpoints_cbfn* pCallback, int pDraw_prev);
 

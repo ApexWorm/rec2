@@ -68,6 +68,11 @@ float gMap_render_width = 128.f;
 // GLOBAL: CARMA2_CHEAT 0x00660450
 float gMap_render_height = 80.f;
 
+// GLOBAL: CARMA2_HW 0x00659b40
+// GLOBAL: CARMA2_SW 0x00654528
+// GLOBAL: CARMA2_CHEAT 0x00660458
+const br_uint_32 gCar_map_colours[4] = { 4, 0, 52, 132 };
+
 // GLOBAL: CARMA2_HW 0x0068d8d4
 // GLOBAL: CARMA2_SW 0x0068792c
 // GLOBAL: CARMA2_CHEAT 0x00695174
