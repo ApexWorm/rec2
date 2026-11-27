@@ -759,8 +759,8 @@ void C2_HOOK_FASTCALL InternalPrepareObject(tPhysics_object* pObject) {
         pObject->disable_move_rotate = pObject->parent->disable_move_rotate;
     }
     if (!pObject->disable_move_rotate && pObject->field_0x1df) {
-        pObject->field_0x21c *= 50.f;
-        BrVector3Scale(&pObject->I, &pObject->I, 50.f);
+        pObject->field_0x21c *= 50.0f;
+        BrVector3Scale(&pObject->I, &pObject->I, 50.0f);
     }
     if (pObject->disable_move_rotate & (pObject->field_0xf0 != 2)) {
         BrMatrix34Copy(&pObject->actor->t.t.mat, &pObject->transform_matrix);
