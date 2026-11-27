@@ -5450,19 +5450,24 @@ typedef struct {
 typedef enum {
     eNet_message_chunk_type_5 = 0x5,
     eNet_message_chunk_poll_car_details = 0x6,
+    eNet_message_chunk_type_leave = 0x8,
+    eNet_message_chunk_type_hosticide = 0x9,
     eNet_message_chunk_type_race_over = 0xa,
+    eNet_message_chunk_type_status_report = 0xb,
     eNet_message_chunk_type_start_race = 0xc,
     eNet_message_chunk_type_headup = 0xd,
     eNet_message_chunk_type_netsynch = 0xe,
     eNet_message_chunk_type_powerup = 0x16,
     eNet_message_chunk_type_player_scores = 0x18,
     eNet_message_chunk_type_gameplay = 0x1b,
+    eNet_message_chunk_type_game_scores = 0x1e,
     eNet_message_chunk_type_oil_spill = 0x1f,
     eNet_message_chunk_type_car_crush = 0x20,
     eNet_message_chunk_type_semi_detach_bit = 0x24,
     eNet_message_chunk_type_reattach_bit = 0x26,
     eNet_message_chunk_type_reattach_all_bits = 0x2b,
     eNet_message_chunk_type_toggle_doors = 0x2c,
+    eNet_message_chunk_type_group_status = 0x2e,
     eNet_message_chunk_type_view_car = 0x2f,
     eNet_message_chunk_type_mine_explosion = 0x31,
     eNet_message_chunk_type_detach_bit = 0x33,
@@ -5477,6 +5482,19 @@ typedef struct {
     tNet_message_chunk_header header;
     tRace_over_reason reason;
 } tNet_message_chunk_race_over;
+
+typedef struct {
+    tNet_message_chunk_header header;
+    tU16 status;
+} tNet_message_chunk_status_report;
+
+typedef struct {
+    tNet_message_chunk_header header;
+    undefined field_0x2[2];
+    tU32 player_id_sum;
+    tU8 number_of_players;
+    tU8 player_status[];
+} tNet_message_chunk_group_status;
 
 typedef struct {
     tU8 index;
@@ -5556,6 +5574,17 @@ typedef struct {
     int general_score;
     int scores[12];
 } tNet_message_chunk_scores;
+
+typedef struct {
+    int field_0x0;
+    int field_0x4;
+    int field_0x8;
+} tNet_message_chunk_game_scores_player;
+
+typedef struct {
+    tNet_message_chunk_header header;
+    tNet_message_chunk_game_scores_player players[12];
+} tNet_message_chunk_game_scores;
 
 typedef struct {
     tNet_message_chunk_header header;
@@ -5690,17 +5719,20 @@ typedef struct {
 typedef union {
     tNet_message_chunk_raw raw;
     tNet_message_chunk_race_over race_over; /* type = 0xa */
+    tNet_message_chunk_status_report status_report; /* type = 0xb */
     tNet_message_chunk_start_race start_race; /* type = 0xc */
     tNet_message_headup headup; /* type = 0xd */
     tNet_message_chunk_powerup powerup; /* type = 0x16 */
     tNet_message_chunk_scores scores; /* type = 0x18 */
     tNet_message_chunk_gameplay gameplay; /* type = 0x1b */
+    tNet_message_chunk_game_scores game_scores; /* type = 0x1e */
     tNet_message_chunk_oil_spill oil_spill; /* type = 0x1f*/
     tNet_message_car_crush car_crush; /* type = 0x20 */
     tNet_message_chunk_semi_detach_bit semi_detach_bit; /* type = 0x24 */
     tNet_message_chunk_reattach_bit reattach_bit; /* type = 0x26 */
     tNet_message_chunk_reattach_all_bits reattach_all_bits; /* type = 0x2b */
     tNet_message_chunk_toggle_doors toggle_doors; /* type = 0x2c */
+    tNet_message_chunk_group_status group_status; /* type = 0x2e */
     tNet_message_chunk_view_car view_car; /* type = 0x2f */
     tNet_message_chunk_mine_explode mine_explode; /* type = 0x31 */
     tNet_message_chunk_recover recover;
@@ -5780,6 +5812,7 @@ enum {
     eMiscString_playing = 70,
     eMiscString_closed = 71,
     eMiscString_open = 72,
+    eMiscString_has_left_the_game = 74,
     eMiscString_status_unknown = 77,
     eMiscString_status_ready = 78,
     eMiscString_status_loading = 79,
