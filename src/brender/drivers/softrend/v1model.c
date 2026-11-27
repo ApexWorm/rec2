@@ -111,13 +111,13 @@ void C2_HOOK_CDECL V1Face_CullNone(br_geometry* self, br_soft_renderer* renderer
 
 // FUNCTION: CARMA2_HW 0x00543190
 // FUNCTION: CARMA2_SW 0x0053e830
+// FUNCTION: CARMA2_CHEAT 0x00548d80
 void C2_HOOK_CDECL V1Face_OS_CullNone(br_geometry* self, br_soft_renderer* renderer) {
     int f;
     temp_face_soft* tfp;
 
-    for (f = 0; f < rend.nfaces; f++) {
-
-        tfp = &rend.temp_faces[f];
+    tfp = rend.temp_faces;
+    for (f = 0; f < rend.nfaces; f++, tfp++) {
         tfp->flag = TFF_VISIBLE;
     }
 
@@ -201,6 +201,7 @@ void C2_HOOK_CDECL V1Face_CullOneSidedParallel(br_geometry* self, br_soft_render
 
 // FUNCTION: CARMA2_HW 0x00543450
 // FUNCTION: CARMA2_SW 0x0053eaf0
+// FUNCTION: CARMA2_CHEAT 0x00549040
 void C2_HOOK_CDECL V1Face_OS_CullOneSided(br_geometry* self, br_soft_renderer* renderer) {
 
     switch (renderer->state.matrix.view_to_screen_hint) {
@@ -302,6 +303,7 @@ void C2_HOOK_CDECL V1Face_CullTwoSidedParallel(br_geometry* self, br_soft_render
 
 // FUNCTION: CARMA2_HW 0x005437c0
 // FUNCTION: CARMA2_SW 0x0053ee60
+// FUNCTION: CARMA2_CHEAT 0x005493b0
 void C2_HOOK_CDECL V1Face_OS_CullTwoSided(br_geometry* self, br_soft_renderer* renderer) {
 
     switch (renderer->state.matrix.view_to_screen_hint) {
