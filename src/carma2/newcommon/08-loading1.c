@@ -120,6 +120,7 @@ tU8 C2_HOOK_FASTCALL ReadU8(FILE* pF) {
 }
 
 // FUNCTION: CARMA2_HW 0x0048f890
+// FUNCTION: CARMA2_SW 0x0048cb00
 float C2_HOOK_FASTCALL ReadF32(FILE* pF) {
     float f;
 
@@ -129,6 +130,7 @@ float C2_HOOK_FASTCALL ReadF32(FILE* pF) {
 }
 
 // FUNCTION: CARMA2_HW 0x0048f8b0
+// FUNCTION: CARMA2_SW 0x0048cb20
 tS32 C2_HOOK_FASTCALL ReadS32(FILE* pF) {
     tS32 raw_long;
 
@@ -226,6 +228,7 @@ void C2_HOOK_FASTCALL SkipBytes(FILE* pF, int pBytes_to_skip) {
 
 // FUNCTION: CARMA2_HW 0x0048fa00
 // FUNCTION: CARMA2_SW 0x0048cc70
+// FUNCTION: CARMA2_CHEAT 0x0048fab0
 tU32 C2_HOOK_FASTCALL MemReadU32(char** pPtr) {
     tU32 raw_long;
 
@@ -236,6 +239,8 @@ tU32 C2_HOOK_FASTCALL MemReadU32(char** pPtr) {
 }
 
 // FUNCTION: CARMA2_HW 0x0048fa10
+// FUNCTION: CARMA2_SW 0x0048cc80
+// FUNCTION: CARMA2_CHEAT 0x0048fac0
 tU16 C2_HOOK_FASTCALL MemReadU16(char** pPtr) {
     tU16 raw_short;
 
@@ -289,6 +294,7 @@ tS8 C2_HOOK_FASTCALL MemReadS8(char** pPtr) {
 
 // FUNCTION: CARMA2_HW 0x0048fa60
 // FUNCTION: CARMA2_SW 0x0048ccd0
+// FUNCTION: CARMA2_CHEAT 0x0048fb10
 void C2_HOOK_FASTCALL MemSkipBytes(char** pPtr, int pBytes_to_skip) {
 
     *pPtr += pBytes_to_skip;
@@ -561,6 +567,7 @@ void C2_HOOK_FASTCALL GetFiveScalars(FILE* pF, br_scalar* pS1, br_scalar* pS2, b
 }
 
 // FUNCTION: CARMA2_HW 0x00490460
+// FUNCTION: CARMA2_SW 0x0048d6d0
 // FUNCTION: CARMA2_CHEAT 0x00490510
 void C2_HOOK_FASTCALL GetNScalars(FILE* pF, int n, br_scalar* pS) {
     char s[256];
@@ -578,6 +585,7 @@ void C2_HOOK_FASTCALL GetNScalars(FILE* pF, int n, br_scalar* pS) {
 }
 
 // FUNCTION: CARMA2_HW 0x004904e0
+// FUNCTION: CARMA2_SW 0x0048d750
 // FUNCTION: CARMA2_CHEAT 0x00490590
 void C2_HOOK_FASTCALL GetPairOfFloatPercents(FILE* pF, float* pF1, float* pF2) {
     char s[256];
@@ -593,6 +601,7 @@ void C2_HOOK_FASTCALL GetPairOfFloatPercents(FILE* pF, float* pF1, float* pF2) {
 }
 
 // FUNCTION: CARMA2_HW 0x00490570
+// FUNCTION: CARMA2_SW 0x0048d7e0
 // FUNCTION: CARMA2_CHEAT 0x00490620
 void C2_HOOK_FASTCALL GetThreeFloatPercents(FILE* pF, float* pF1, float* pF2, float* pF3) {
     char s[256];
