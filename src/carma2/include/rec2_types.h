@@ -5462,6 +5462,7 @@ typedef enum {
     eNet_message_chunk_type_netsynch = 0xe,
     eNet_message_chunk_type_powerup = 0x16,
     eNet_message_chunk_type_player_scores = 0x18,
+    eNet_message_chunk_type_wasted = 0x19,
     eNet_message_chunk_type_gameplay = 0x1b,
     eNet_message_chunk_type_oil_spill = 0x1f,
     eNet_message_chunk_type_car_crush = 0x20,
@@ -5471,6 +5472,7 @@ typedef enum {
     eNet_message_chunk_type_toggle_doors = 0x2c,
     eNet_message_chunk_type_view_car = 0x2f,
     eNet_message_chunk_type_mine_explosion = 0x31,
+    eNet_message_chunk_type_reposition = 0x32,
     eNet_message_chunk_type_detach_bit = 0x33,
 } tNet_message_chunk_type;
 
@@ -5679,6 +5681,16 @@ typedef struct {
 
 typedef struct {
     tNet_message_chunk_header header;
+    undefined field_0x2[2];
+    int racing;
+    int inactive;
+    tU8 index;
+    undefined field_0xd;
+    tCompressed_matrix3 matrix;
+} tNet_message_chunk_reposition; /* FIXME: name and fields are guesses */
+
+typedef struct {
+    tNet_message_chunk_header header;
     undefined field_0x2[0x4-0x2];
     tPlayer_ID player;
     int powerup_index;
@@ -5693,6 +5705,13 @@ typedef struct {
     tU32 time;
 } tNet_message_chunk_recover;
 
+typedef struct {
+    tNet_message_chunk_header header;
+    undefined field_0x2[2];
+    tPlayer_ID victim;
+    tPlayer_ID culprit;
+} tNet_message_chunk_wasted;
+
 typedef union {
     tNet_message_chunk_raw raw;
     tNet_message_chunk_race_over race_over; /* type = 0xa */
@@ -5700,6 +5719,7 @@ typedef union {
     tNet_message_headup headup; /* type = 0xd */
     tNet_message_chunk_powerup powerup; /* type = 0x16 */
     tNet_message_chunk_scores scores; /* type = 0x18 */
+    tNet_message_chunk_wasted wasted; /* type = 0x19 */
     tNet_message_chunk_gameplay gameplay; /* type = 0x1b */
     tNet_message_chunk_oil_spill oil_spill; /* type = 0x1f*/
     tNet_message_car_crush car_crush; /* type = 0x20 */
@@ -5709,6 +5729,7 @@ typedef union {
     tNet_message_chunk_toggle_doors toggle_doors; /* type = 0x2c */
     tNet_message_chunk_view_car view_car; /* type = 0x2f */
     tNet_message_chunk_mine_explode mine_explode; /* type = 0x31 */
+    tNet_message_chunk_reposition reposition; /* type = 0x32 */
     tNet_message_chunk_recover recover;
     tNet_message_chunk_detach_bit detach_bit; /* type = 0x33 */
 } tNet_message_chunk;

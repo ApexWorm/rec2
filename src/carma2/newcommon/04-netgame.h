@@ -12,6 +12,7 @@
 #include "c2_hooks.h"
 #include "rec2_types.h"
 
+extern int gGame_scores[12];
 extern int gINT_0068d920;
 extern tNet_game_player_info* gLast_lepper;
 extern int gLast_it_change;
@@ -58,13 +59,13 @@ extern void C2_HOOK_FASTCALL ReceivedCopInfo(void);
 
 extern void C2_HOOK_FASTCALL SignalToStartRace(void);
 
-// SignalToRepositionCar
+extern void C2_HOOK_FASTCALL SignalToRepositionCar(int pIndex);
 
 extern void C2_HOOK_FASTCALL SetUpNetCarPositions(void);
 
 // ReinitialiseCar
 
-// RepositionPlayer
+extern void C2_HOOK_FASTCALL RepositionPlayer(int pIndex);
 
 extern void C2_HOOK_FASTCALL DisableCar(tCar_spec* pCar);
 
@@ -76,7 +77,7 @@ extern int C2_HOOK_CDECL SortNetHeadAscending(const void* pFirst_one, const void
 
 extern int C2_HOOK_CDECL SortNetHeadDescending(const void* pFirst_one, const void* pSecond_one);
 
-// ClipName
+extern void C2_HOOK_FASTCALL ClipName(char* pName, const tDR_font* pFont, int pMax_width);
 
 #ifdef REC2_HW
 extern void C2_HOOK_FASTCALL CreateBoxes(void);
@@ -94,7 +95,7 @@ extern void C2_HOOK_FASTCALL InitNetHeadups(void);
 
 extern void C2_HOOK_FASTCALL DisposeNetHeadups(void);
 
-// EverybodysLost
+extern void C2_HOOK_FASTCALL EverybodysLost(void);
 
 extern void C2_HOOK_FASTCALL DeclareWinner(int pWinner_index);
 
@@ -102,13 +103,13 @@ extern void C2_HOOK_FASTCALL CheckForVampireWinner(void);
 
 extern void C2_HOOK_FASTCALL PlayerIsInfected(tNet_game_player_info* pPlayer);
 
-// FarEnoughAway
+extern int C2_HOOK_FASTCALL FarEnoughAway(tNet_game_player_info* pPlayer_1, tNet_game_player_info* pPlayer_2);
 
 extern void C2_HOOK_FASTCALL CarInContactWithFox(tNet_game_player_info* pPlayer);
 
 extern void C2_HOOK_FASTCALL PlayerIsIt(tNet_game_player_info* pPlayer);
 
-// SelectRandomFox
+extern void C2_HOOK_FASTCALL SelectRandomFox(int pNot_this_one);
 
 extern void C2_HOOK_FASTCALL CalcPlayerScores(void);
 
