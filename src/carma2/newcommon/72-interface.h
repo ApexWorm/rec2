@@ -34,6 +34,7 @@ extern tNet_game_options gFrontend_net_options;
 extern int gPicked_wreck;
 extern tWreck_gallery_car_info gWreck_gallery_car_infos[30];
 extern tNet_game_type gFrontend_game_type;
+extern int gRace_index;
 extern tStruct_00686508 gUNK_006883b0;
 extern tStruct_00686508 gUNK_006886e8;
 extern br_actor* gFrontend_wrecks_actor;
@@ -71,11 +72,11 @@ extern br_token_value gFrontend_backdrop0_material_prims[3];
 extern br_actor* gFrontend_camera;
 extern br_actor* gFrontend_backdrop_actors[3];
 
-// SetGameTarget
+extern void C2_HOOK_FASTCALL SetGameTarget(tNet_game_type* pGame_type, tNet_game_options* pGame_options);
 
 extern void C2_HOOK_FASTCALL SetOptions(tNet_game_type pGame_type, tNet_game_options* pGame_options);
 
-// ReadNetGameChoices
+extern void C2_HOOK_FASTCALL ReadNetGameChoices(tNet_game_type* pGame_type, tNet_game_options* pGame_options, int* pRace_index);
 
 extern int C2_HOOK_FASTCALL PickARandomCar(void);
 
@@ -137,7 +138,7 @@ extern void C2_HOOK_FASTCALL RefreshRacesScroller(tFrontend_spec* pFrontend);
 
 // NetworkUpdateSelectedGameInfo
 
-// UpdateNetTrackScroller
+extern void C2_HOOK_FASTCALL UpdateNetTrackScroller(tFrontend_spec* pFrontend);
 
 extern void C2_HOOK_FASTCALL RefreshNetRacesScroller(tFrontend_spec* pFrontend);
 
@@ -171,7 +172,7 @@ extern int C2_HOOK_FASTCALL StartFudge(tFrontend_spec* pFrontend);
 
 // FRONTEND_NewGameMenuHandler
 
-// UpdateNetGameTypeScroller
+extern void C2_HOOK_FASTCALL UpdateNetGameTypeScroller(tFrontend_spec* pFrontend);
 
 // NetGameTypeUp
 
@@ -201,7 +202,7 @@ extern void C2_HOOK_FASTCALL InitNetStorageSpace(void);
 
 // NetworkJoinGoAhead
 
-// NetSetRaceType
+extern int C2_HOOK_FASTCALL NetSetRaceType(tFrontend_spec* pFrontend);
 
 // NetworkStartJoin
 
