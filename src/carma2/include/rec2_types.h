@@ -2140,7 +2140,7 @@ typedef struct {
             };
             int texture_count;
             int current_frame;
-            undefined has_matrix;
+            int has_matrix;
             br_pixelmap *textures[8];
             br_matrix23 mat[8];
         } frames_info;
@@ -2171,7 +2171,6 @@ typedef struct {
 typedef struct {
     br_vertex* vertices[3];
     br_vector3 points[3];
-    undefined4 field_0x30; /* FIXME: unknown, the original indexes this buffer in steps of 13 dwords */
 } tFunk_temp_buffer;
 
 // FIXME: PROBABLY WRONG!!!!!!
