@@ -16,5 +16,4 @@ tCar_spec* gViewable_car_list[50];
 
 // GLOBAL: CARMA2_HW 0x0074c7a8
 // GLOBAL: CARMA2_SW 0x00742e68
-// GLOBAL: CARMA2_CHEAT 0x00753e48
 int gNum_viewable_cars;
