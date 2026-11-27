@@ -128,10 +128,12 @@ int gGoreLevel = 1;
 int gAnimalsOn = 1;
 
 // GLOBAL: CARMA2_HW 0x0065d7cc
+// GLOBAL: CARMA2_SW 0x00658104
 // GLOBAL: CARMA2_CHEAT 0x00664e84
 int gFlameThrowerOn = 1;
 
 // GLOBAL: CARMA2_HW 0x0065d7d0
+// GLOBAL: CARMA2_SW 0x00658108
 // GLOBAL: CARMA2_CHEAT 0x00664e88
 int gExplosives_on = 1;
 
