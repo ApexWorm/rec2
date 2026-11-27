@@ -16,8 +16,10 @@
 #include "41-utility.h"
 #include "55-volume.h"
 #include "61-pedestrn.h"
+#include "joystick.h"
 #include "70-packfile.h"
 #include "globvars.h"
+#include "platform.h"
 
 #include "c2_stdio.h"
 
@@ -497,4 +499,50 @@ void C2_HOOK_FASTCALL HideSpecialVolumes(void) {
             DelSpecVolumeGraph(i);
         }
     }
+}
+
+// FUNCTION: CARMA2_HW 0x00511280
+// FUNCTION: CARMA2_SW 0x0050c6d0
+// FUNCTION: CARMA2_CHEAT 0x00516c70
+void C2_HOOK_FASTCALL ToggleJoystickYAxis(void) {
+    char s[256];
+
+    if (ToggleJoystickThrottle()) {
+        sprintf(s, "Y Axis Enabled");
+    } else {
+        sprintf(s, "Y Axis Disabled");
+    }
+    NewTextHeadupSlot(4, 0, 3000, -4, s);
+}
+
+// FUNCTION: CARMA2_HW 0x005112d0
+// FUNCTION: CARMA2_SW 0x0050c720
+// FUNCTION: CARMA2_CHEAT 0x00516cc0
+void C2_HOOK_FASTCALL ToggleJoystickEnable(void) {
+    char s[256];
+
+    if (HasCurrentJoystick()) {
+        PDDisableJoysticks();
+        sprintf(s, "Joystick Disabled");
+    } else {
+        PDEnableJoysticks();
+        sprintf(s, "Joystick Enabled");
+    }
+    NewTextHeadupSlot(4, 0, 3000, -4, s);
+}
+
+// FUNCTION: CARMA2_HW 0x00511330
+// FUNCTION: CARMA2_SW 0x0050c780
+// FUNCTION: CARMA2_CHEAT 0x00516d20
+void C2_HOOK_FASTCALL ToggleJoystickDPad(void) {
+    char s[256];
+
+    if (PDIsJoystickDPadEnabled()) {
+        SetJoystickDPadEnabled(0);
+        sprintf(s, "D-Pad Mode Disabled");
+    } else {
+        SetJoystickDPadEnabled(1);
+        sprintf(s, "D-Pad Mode Enabled");
+    }
+    NewTextHeadupSlot(4, 0, 3000, -4, s);
 }

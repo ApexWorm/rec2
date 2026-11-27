@@ -162,6 +162,7 @@ int gINT_00595f9c = 1;
 
 // GLOBAL: CARMA2_HW 0x00595f8c
 // GLOBAL: CARMA2_SW 0x00590eec
+// GLOBAL: CARMA2_CHEAT 0x0059c80c
 int gLast_joystick_index = -1;
 
 // GLOBAL: CARMA2_HW 0x006ad094
@@ -1621,6 +1622,7 @@ void C2_HOOK_FASTCALL StopDinputEffect(int pIndex) {
 
 // FUNCTION: CARMA2_HW 0x0045a070
 // FUNCTION: CARMA2_SW 0x00459e00
+// FUNCTION: CARMA2_CHEAT 0x0045a4f0
 int C2_HOOK_FASTCALL PDEnableJoysticks(void) {
     int count;
 
@@ -1637,6 +1639,7 @@ int C2_HOOK_FASTCALL PDEnableJoysticks(void) {
 
 // FUNCTION: CARMA2_HW 0x0045a0c0
 // FUNCTION: CARMA2_SW 0x00459e50
+// FUNCTION: CARMA2_CHEAT 0x0045a540
 int C2_HOOK_FASTCALL PDDisableJoysticks(void) {
 
     gLast_joystick_index = gJoystick_index;

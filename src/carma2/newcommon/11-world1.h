@@ -61,4 +61,10 @@ extern void C2_HOOK_FASTCALL ShowSpecialVolumes(void);
 
 extern void C2_HOOK_FASTCALL HideSpecialVolumes(void);
 
+extern void C2_HOOK_FASTCALL ToggleJoystickYAxis(void);
+
+extern void C2_HOOK_FASTCALL ToggleJoystickEnable(void);
+
+extern void C2_HOOK_FASTCALL ToggleJoystickDPad(void);
+
 #endif // GUARD_11_WORLD1_H
