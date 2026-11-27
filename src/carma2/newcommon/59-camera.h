@@ -15,18 +15,25 @@
 extern int gNet_player_to_view_index;
 extern int gOpponent_viewing_mode;
 extern int gAction_replay_manual_camera_target_type;
+extern br_vector3 gAction_replay_manual_camera_target_pos;
+extern tCar_spec* gAction_replay_manual_camera_target_car;
+extern tPedestrian* gAction_replay_manual_camera_target_ped;
+extern br_actor* gAction_replay_manual_camera_target_actor;
 extern int gCamera_frozen;
 extern tSave_camera gSave_camera[2];
 extern int gCamera_mode;
 extern float gFLOAT_006792fc;
+extern br_angle gOld_yaw__car;
+extern br_angle gOld_zoom;
+extern br_vector3 gCamera_pos_before_collide;
 extern br_actor* gPed_actor;
 
 extern float gCamera_cockpit_hither;
 extern tActionReplayCameraMode gAction_replay_camera_mode;
 
-// DoCameraControls
+extern void C2_HOOK_FASTCALL DoCameraControls(tCamera_key_flags* pCamera_controls, tU32 pTime);
 
-// FrozenCamera
+extern void C2_HOOK_FASTCALL FrozenCamera(tCar_spec* pCar, tU32 pTime);
 
 // CheckCameraHither
 
@@ -80,15 +87,15 @@ extern void C2_HOOK_FASTCALL RestoreCameraPosition(int pIndex);
 
 extern void C2_HOOK_FASTCALL DrVector3RotateY(br_vector3* v, br_angle t);
 
-// GeneralisedPositionExternalCamera
+extern void C2_HOOK_FASTCALL GeneralisedPositionExternalCamera(tCar_spec* pCar, br_matrix34* pMat, br_vector3* pPos, float pSpeed, float pSpeedo_speed, br_vector3* pDirection, br_vector3* pOmega, tU32 pTime);
 
-// NormalPositionExternalCamera
+extern void C2_HOOK_FASTCALL NormalPositionExternalCamera(tCar_spec* pCar, tU32 pTime);
 
 // PositionPedCam
 
 // PositionDroneCam
 
-// MoveWithWheels
+extern void C2_HOOK_FASTCALL MoveWithWheels(tCar_spec* pCar, br_vector3* pDir, int pManual_swing);
 
 extern void C2_HOOK_FASTCALL SwingCamera(br_matrix34* pM1, br_matrix34* pM2, br_vector3* pVn, br_vector3* pOmega, float pSpeed, float pSpeedo_speed, tU32 pTime, tCar_spec* pCar);
 
@@ -96,7 +103,7 @@ extern void C2_HOOK_FASTCALL PointCameraAtCar(br_vector3* pPos, br_matrix34* pMa
 
 extern void C2_HOOK_FASTCALL PointCamera(const br_vector3* pPos, br_matrix34* pMat);
 
-// CollideCamera2
+extern int C2_HOOK_FASTCALL CollideCamera2(br_vector3* pCar_pos, br_vector3* pCam_pos, br_vector3* pOld_camera_pos, int pManual_move, tPhysics_object* pCollision_info);
 
 extern int C2_HOOK_FASTCALL CollideCameraWithOtherCars(br_vector3* pPos, br_vector3* pCamera_pos);
 
@@ -106,10 +113,10 @@ extern void C2_HOOK_FASTCALL FreezeCamera(void);
 
 extern void C2_HOOK_FASTCALL GetAverageGridPosition(tRace_info* pThe_race);
 
-// FindACar
+extern tCar_spec* C2_HOOK_FASTCALL FindACar(br_vector3* pPos, br_vector3* pDir, br_scalar* pT);
 
-// FindAPed
+extern tPedestrian* C2_HOOK_FASTCALL FindAPed(br_vector3* pPos, br_vector3* pDir, br_scalar* pT, br_actor** pActor);
 
-// MouseClickInActionReplay
+extern void C2_HOOK_FASTCALL MouseClickInActionReplay(int pX_coord, int pY_coord, int pUnknown);
 
 #endif // GUARD_59_CAMERA_H
