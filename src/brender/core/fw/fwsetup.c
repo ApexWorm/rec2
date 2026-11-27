@@ -45,6 +45,7 @@ br_framework_state fw;
 
 // GLOBAL: CARMA2_HW 0x00665518
 // GLOBAL: CARMA2_SW 0x0065fcc4
+// GLOBAL: CARMA2_CHEAT 0x0066cdd0
 br_resource_class fw_resourceClasses[25] = {
     { 0u, "REGISTRY", BR_MEMORY_REGISTRY, NULL, 0u },
     { 0u, "ANCHOR", BR_MEMORY_ANCHOR, NULL, 0u },
@@ -648,6 +649,7 @@ br_uint_16 nameOrdinals_BRCORE1[185] = {
 
 // GLOBAL: CARMA2_HW 0x00665e58
 // GLOBAL: CARMA2_SW 0x006605f0
+// GLOBAL: CARMA2_CHEAT 0x0066d710
 br_image Image_BRCORE1 = {
     { 0 },
     "BRCORE1",
