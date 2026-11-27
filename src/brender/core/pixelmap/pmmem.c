@@ -21,6 +21,8 @@
 #include "c2_string.h"
 
 // GLOBAL: CARMA2_HW 0x0066ea98
+// GLOBAL: CARMA2_CHEAT 0x00676348
+// GLOBAL: CARMA2_SW 0x00669228
 br_tv_template_entry matchTemplateEntries[] = {
     { BRT_USE_T,            NULL,  0, 2, 3, 0, 0, },
     { BRT_PIXEL_TYPE_U8,    NULL,  4, 2, 3, 0, 0, },
@@ -93,6 +95,8 @@ br_device_pixelmap_dispatch devicePixelmapDispatch = {
 };
 
 // GLOBAL: CARMA2_HW 0x0058ba90
+// GLOBAL: CARMA2_CHEAT 0x00590af8
+// GLOBAL: CARMA2_SW 0x00586a58
 br_tv_template_entry devicePixelmapTemplateEntries[] = {
     { BRT_IDENTIFIER_CSTR, NULL, offsetof(br_pixelmap, identifier), 0x5, 0x3, 0, 0, },
     { BRT_WIDTH_I32, NULL, offsetof(br_pixelmap, width),            0x5, 0xd, 0, 0, },

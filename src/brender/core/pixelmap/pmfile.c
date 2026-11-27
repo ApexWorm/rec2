@@ -82,6 +82,7 @@ br_file_struct br_pixelmap_F = { "br_pixelmap", BR_ASIZE(br_pixelmap_FM), br_pix
 
 // GLOBAL: CARMA2_HW 0x0066d948
 // GLOBAL: CARMA2_CHEAT 0x006751f8
+// GLOBAL: CARMA2_SW 0x006680d8
 br_file_struct br_old_pixelmap_F = { "br_old_pixelmap", BR_ASIZE(br_old_pixelmap_FM), br_old_pixelmap_FM, sizeof(br_pixelmap) };
 
 // GLOBAL: CARMA2_HW 0x0066d958
