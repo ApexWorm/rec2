@@ -52,13 +52,13 @@ extern tFace_ref* C2_HOOK_FASTCALL RayCastThruFaceList2(br_vector3* pPosition, b
 
 // RayCastInBox
 
-// FaceOffCount2
+extern void C2_HOOK_FASTCALL FaceOffCount2(void);
 
-// FaceOffCount
+extern void C2_HOOK_FASTCALL FaceOffCount(void);
 
-// FaceOnCount
+extern void C2_HOOK_FASTCALL FaceOnCount(void);
 
-// EliminateFaces
+extern int C2_HOOK_FASTCALL EliminateFaces(tPhysics_object* pObject, tPhysics_shape* pShape, br_matrix34* pMat);
 
 // GetShapePoint
 
