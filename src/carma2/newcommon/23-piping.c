@@ -2312,7 +2312,23 @@ void C2_HOOK_FASTCALL ApplyPedDir(tPipe_chunk** pChunk) {
     PedApplyPedDir((*pChunk)->subject_index, &(*pChunk)->data.ped_dir.direction);
 }
 
-// ApplyPedMove
+extern void C2_HOOK_FASTCALL PedApplyPedMove(tPedestrian* pPed, int pMove_action, float pSpeed, int pArg5, int pArg4, int pFrame, br_vector3* pPos, int pAction, br_matrix34* pMat);
+
+// FUNCTION: CARMA2_HW 0x004c9ae0
+// FUNCTION: CARMA2_SW 0x004c6210
+// FUNCTION: CARMA2_CHEAT 0x004cf610
+void C2_HOOK_FASTCALL ApplyPedMove(tPipe_chunk** pChunk) {
+
+    PedApplyPedMove((tPedestrian*)(*pChunk)->subject_index,
+        (*pChunk)->data.ped_move.move_id,
+        (*pChunk)->data.ped_move.field_0x8,
+        (*pChunk)->data.ped_move.field_0x4 & 0x1,
+        (*pChunk)->data.ped_move.field_0x10,
+        0,
+        &(*pChunk)->data.ped_move.pos,
+        (*pChunk)->data.ped_move.action,
+        &(*pChunk)->data.ped_move.field_0x34);
+}
 
 // ApplyPedPhysics
 
@@ -2802,7 +2818,25 @@ void C2_HOOK_FASTCALL UndoActorTrans(tPipe_chunk** pChunk, tPipe_chunk* pPrev_ch
 
 // UndoPedStatus
 
-// UndoPedMove
+extern void C2_HOOK_FASTCALL PedUndoPedMove(tPedestrian* pPed, int pMove_action, float pSpeed, int pArg5, int pArg4, int pFrame, br_vector3* pPos, int pAction, br_matrix34* pMat);
+
+// FUNCTION: CARMA2_HW 0x004ca1e0
+// FUNCTION: CARMA2_SW 0x004c6910
+// FUNCTION: CARMA2_CHEAT 0x004cfd20
+void C2_HOOK_FASTCALL UndoPedMove(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
+
+    if ((*pChunk)->data.ped_move.field_0x10 == 0) {
+        PedUndoPedMove((tPedestrian*)(*pChunk)->subject_index,
+            (*pChunk)->data.ped_move.original_move_id,
+            (*pChunk)->data.ped_move.field_0xc,
+            0,
+            0,
+            (*pChunk)->data.ped_move.field_0x6,
+            &(*pChunk)->data.ped_move.original_pos,
+            (*pChunk)->data.ped_move.original_action,
+            &(*pChunk)->data.ped_move.field_0x34);
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x004ca210
 // FUNCTION: CARMA2_SW 0x004c6940

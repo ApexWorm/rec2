@@ -460,8 +460,8 @@ typedef struct {
     tS16 original_move_id;
     tS16 field_0x4;
     tS16 field_0x6;
-    undefined4 field_0x8;
-    undefined4 field_0xc;
+    float field_0x8;
+    float field_0xc;
     undefined4 field_0x10;
     br_vector3 original_pos;
     br_vector3 pos;
@@ -915,6 +915,7 @@ typedef struct tPipe_chunk {
         tPipe_single_groove_on_of groove;
         tPipe_single_vanished_dismembered vanished_dismembered;
         tPipe_single_ds_model ds_model;
+        tPipe_ped_move_data ped_move;
         tPipe_drone_corner_pos drone_corner_pos;
         tPipe_chunk_napalm_bolt napalm_bolt;
         tPipe_ped_dir_data ped_dir;
