@@ -593,6 +593,7 @@ void C2_HOOK_FASTCALL CapOmega(tPhysics_object* pObject) {
 
 // FUNCTION: CARMA2_HW 0x004b8fe0
 // FUNCTION: CARMA2_SW 0x004b5700
+// FUNCTION: CARMA2_CHEAT 0x004beb10
 void C2_HOOK_FASTCALL PositionWorldJointedObject(tPhysics_object* pObject, br_scalar pDelta_time) {
     br_vector3 axis;
     br_vector3 tv;
@@ -868,6 +869,7 @@ int C2_HOOK_FASTCALL ReduceEffectOfForces(tPhysics_joint_force* pForces, br_scal
 
 // FUNCTION: CARMA2_HW 0x004be4b0
 // FUNCTION: CARMA2_SW 0x004babd0
+// FUNCTION: CARMA2_CHEAT 0x004c3fe0
 void C2_HOOK_FASTCALL SetUpForce(br_vector3* pAngular, br_vector3* pLinear, const br_vector3* pPoint, const br_vector3* pDirection, tPhysics_object* pObject) {
     br_scalar inverse_mass;
     int i;
@@ -925,6 +927,8 @@ void C2_HOOK_FASTCALL RestoreListOmega(tPhysics_object* pObject) {
 // RotateObjectSecondOrder
 
 // FUNCTION: CARMA2_HW 0x004c1f10
+// FUNCTION: CARMA2_SW 0x004be640
+// FUNCTION: CARMA2_CHEAT 0x004c7a30
 void C2_HOOK_FASTCALL RotateObjectFirstOrder(tPhysics_object* pObject, br_scalar pTime) {
     br_matrix34 rotation;
     br_vector3 axis;
