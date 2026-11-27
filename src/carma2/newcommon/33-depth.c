@@ -53,22 +53,22 @@ br_angle gSky_image_underground;
 // GLOBAL: CARMA2_HW 0x0067c4b4
 // GLOBAL: CARMA2_SW 0x00676c2c
 // GLOBAL: CARMA2_CHEAT 0x00683d5c
-float gSky_height;
+float gSky_width;
 
 // GLOBAL: CARMA2_HW 0x0067c4c8
 // GLOBAL: CARMA2_SW 0x00676c40
 // GLOBAL: CARMA2_CHEAT 0x00683d70
-float gSky_width;
+float gSky_height;
 
 // GLOBAL: CARMA2_HW 0x0067c4d0
 // GLOBAL: CARMA2_SW 0x00676c48
 // GLOBAL: CARMA2_CHEAT 0x00683d78
-float gSky_x_multiplier;
+float gSky_y_multiplier;
 
 // GLOBAL: CARMA2_HW 0x0067c4d4
 // GLOBAL: CARMA2_SW 0x00676c4c
 // GLOBAL: CARMA2_CHEAT 0x00683d7c
-float gSky_y_multiplier;
+float gSky_x_multiplier;
 
 // GLOBAL: CARMA2_HW 0x0079ec1c
 // GLOBAL: CARMA2_SW 0x0079517c
@@ -386,10 +386,10 @@ inline br_scalar C2_HOOK_FASTCALL EdgeU(br_angle pSky, br_angle pView, br_angle 
     br_scalar b;
     br_scalar c;
 
-    a = cosf(BrAngleToRadian(pPerfect));
-    b = sinf(BrAngleToRadian(pView));
-    c = cosf(BrAngleToRadian(pView));
-    return b * a * a / (BrAngleToRadian(pSky) * (1.f + c));
+    a = BR_COS(pPerfect) * BR_COS(pPerfect);
+    b = BR_SIN(pView);
+    c = (BR_COS(pView) + 1.0f) * BrAngleToRadian(pSky);
+    return b * a / c;
 }
 
 inline br_model* C2_HOOK_FASTCALL CreateHorizonModel(br_actor* pCamera) {
@@ -975,86 +975,84 @@ void C2_HOOK_FASTCALL MungeSkyModel(br_actor* pCamera, br_model* pModel) {
     br_scalar sky_distance;
     br_angle half_diag_fov;
     tU8 nbands;
-    tU8 band2;
-    tU8 band22;
-    tU8 stripe;
-    tU8 band222;
-    tU8 vertex2;
-    br_scalar edge_u;
+    tU8 band;
     tU8 vertex;
+    tU8 stripe;
+    br_scalar edge_u;
     br_scalar narrow_u;
+    br_angle min_angle;
     br_angle angle_range;
-    br_angle angle_range2;
     br_angle angle;
 
+    nbands = 21;
     camera_data = pCamera->type_data;
-    tan_half_fov = Tan((float)camera_data->field_of_view / 2);
-    sky_distance = camera_data->yon_z - 1.0f;
-    horizon_half_width = sky_distance * tan_half_fov;
-    horizon_half_height = horizon_half_width * camera_data->aspect;
-    horizon_half_diag = sqrt((horizon_half_height * horizon_half_height) + horizon_half_width * horizon_half_width);
+    tan_half_fov = Tan(camera_data->field_of_view / 2);
+    sky_distance = camera_data->yon_z - 1.f;
+    horizon_half_height = sky_distance * tan_half_fov;
+    horizon_half_width = horizon_half_height * camera_data->aspect;
+    horizon_half_diag = sqrt(horizon_half_height * horizon_half_height + horizon_half_width * horizon_half_width);
     half_diag_fov = BrRadianToAngle(atan2f(horizon_half_diag, sky_distance));
     edge_u = EdgeU(gSky_image_width, 2 * half_diag_fov, BR_ANGLE_DEG(10));
-    narrow_u = edge_u * 0.5f;
+    narrow_u = edge_u / 2.f;
+    gSky_height = horizon_half_height * 2.f;
     gSky_width = horizon_half_width * 2.f;
-    gSky_height = 2.f * horizon_half_height;
-    gSky_x_multiplier = CalculateWrappingMultiplier(gSky_width, camera_data->yon_z);
     gSky_y_multiplier = CalculateWrappingMultiplier(gSky_height, camera_data->yon_z);
+    gSky_x_multiplier = CalculateWrappingMultiplier(gSky_width, camera_data->yon_z);
 
-    for (vertex = 0; 88 > vertex; vertex += 4) {
+    for (vertex = 0; vertex < 4 * (nbands + 1); vertex += 4) {
         pModel->vertices[vertex].map.v[0] = -edge_u;
     }
-    for (vertex = 1; vertex < 88; vertex += 4) {
+    for (vertex = 1; vertex < 4 * (nbands + 1); vertex += 4) {
         pModel->vertices[vertex].map.v[0] = -narrow_u;
     }
-    for (vertex2 = 2; vertex2 < 88; vertex2 += 4) {
-        pModel->vertices[vertex2].map.v[0] = narrow_u;
+    for (vertex = 2; vertex < 4 * (nbands + 1); vertex += 4) {
+        pModel->vertices[vertex].map.v[0] = narrow_u;
     }
-    for (vertex2 = 3; vertex2 < 88; vertex2 += 4) {
-        pModel->vertices[vertex2].map.v[0] = edge_u;
+    for (vertex = 3; vertex < 4 * (nbands + 1); vertex += 4) {
+        pModel->vertices[vertex].map.v[0] = edge_u;
     }
-    for (vertex2 = 0; vertex2 < 88; vertex2 += 4) {
-        pModel->vertices[vertex2].p.v[0] = -horizon_half_diag;
+    for (vertex = 0; vertex < 4 * (nbands + 1); vertex += 4) {
+        pModel->vertices[vertex].p.v[0] = -horizon_half_diag;
     }
-    for (vertex2 = 1; vertex2 < 88; vertex2 += 4) {
-        pModel->vertices[vertex2].p.v[0] = -(horizon_half_diag / 2.0f);
+    for (vertex = 1; vertex < 4 * (nbands + 1); vertex += 4) {
+        pModel->vertices[vertex].p.v[0] = -(horizon_half_diag / 2.f);
     }
-    for (vertex2 = 2; 88 > vertex2; vertex2 += 4) {
-        pModel->vertices[vertex2].p.v[0] = horizon_half_diag * 0.5f;
+    for (vertex = 2; vertex < 4 * (nbands + 1); vertex += 4) {
+        pModel->vertices[vertex].p.v[0] = horizon_half_diag / 2.f;
     }
-    for (vertex2 = 3; 88 > vertex2; vertex2 += 4) {
-        pModel->vertices[vertex2].p.v[0] = horizon_half_diag;
-    }
-    PossibleService();
-    angle_range = -gSky_image_underground - (-BR_ANGLE_DEG(90) - half_diag_fov);
-    for (vertex = 0; 2u > vertex; vertex++) {
-        vertex2 = 4 * vertex;
-        angle = -BR_ANGLE_DEG(90) - half_diag_fov + (angle_range * vertex) / 2;
-        pModel->vertices[vertex2].p.v[1] = sinf(BrAngleToRadian(angle)) * sky_distance;
-        pModel->vertices[vertex2].p.v[2] = -cosf(BrAngleToRadian(angle)) * sky_distance;
-    }
-    angle_range2 = gSky_image_height;
-    angle_range = -gSky_image_underground;
-    nbands = 18;
-    for (band2 = 0; band2 < nbands; band2++) {
-        vertex2 = 8 + (band2 * 4);
-        pModel->vertices[vertex2].p.v[1] = sinf(BrAngleToRadian(angle_range + (angle_range2 * band2) / nbands)) * sky_distance;
-        pModel->vertices[vertex2].p.v[2] = -cosf(BrAngleToRadian(angle_range + (band2 * angle_range2) / nbands)) * sky_distance;
-    }
-    angle_range = gSky_image_height - gSky_image_underground;
-    angle_range2 = half_diag_fov + BR_ANGLE_DEG(90) - (gSky_image_height - gSky_image_underground);
-    for (band22 = 0; 1u >= band22; band22++) {
-        angle = angle_range + angle_range2 * band22;
-        vertex2 = 80 + band22 * 4;
-        pModel->vertices[vertex2].p.v[1] = sinf(BrAngleToRadian(angle)) * sky_distance;
-        pModel->vertices[vertex2].p.v[2] = -cosf(BrAngleToRadian(angle)) * sky_distance;
+    for (vertex = 3; vertex < 4 * (nbands + 1); vertex += 4) {
+        pModel->vertices[vertex].p.v[0] = horizon_half_diag;
     }
     PossibleService();
-    for (band222 = 0; 21u >= band222; ++band222) {
-        vertex2 = 4 * band222;
-        for (stripe = 1; stripe < 4u; ++stripe) {
-            pModel->vertices[vertex2 + stripe].p.v[1] = pModel->vertices[vertex2].p.v[1];
-            pModel->vertices[vertex2 + stripe].p.v[2] = pModel->vertices[vertex2].p.v[2];
+    min_angle = -BR_ANGLE_DEG(90) - half_diag_fov;
+    angle_range = -gSky_image_underground - min_angle;
+    for (band = 0; band < 2; band++) {
+        angle = min_angle + angle_range * band / 2;
+        vertex = 4 * band;
+        pModel->vertices[vertex].p.v[1] = sin(BrAngleToRadian(angle)) * sky_distance;
+        pModel->vertices[vertex].p.v[2] = (-cos(BrAngleToRadian(angle))) * sky_distance;
+    }
+    min_angle = -gSky_image_underground;
+    angle_range = gSky_image_height;
+    for (band = 0; band < 18; band++) {
+        angle = min_angle + angle_range * band / 18;
+        vertex = 4 * (band + 2);
+        pModel->vertices[vertex].p.v[1] = sin(BrAngleToRadian(angle)) * sky_distance;
+        pModel->vertices[vertex].p.v[2] = (-cos(BrAngleToRadian(angle))) * sky_distance;
+    }
+    min_angle = gSky_image_height - gSky_image_underground;
+    angle_range = half_diag_fov + BR_ANGLE_DEG(90) - min_angle;
+    for (band = 0; band <= 1; band++) {
+        angle = min_angle + angle_range * band;
+        pModel->vertices[4 * (band + 20)].p.v[1] = sinf(BrAngleToRadian(angle)) * sky_distance;
+        pModel->vertices[4 * (band + 20)].p.v[2] = (-cosf(BrAngleToRadian(angle))) * sky_distance;
+    }
+    PossibleService();
+    for (band = 0; band <= nbands; ++band) {
+        vertex = 4 * band;
+        for (stripe = 1; stripe < 4; ++stripe) {
+            pModel->vertices[vertex + stripe].p.v[1] = pModel->vertices[vertex].p.v[1];
+            pModel->vertices[vertex + stripe].p.v[2] = pModel->vertices[vertex].p.v[2];
         }
     }
 
