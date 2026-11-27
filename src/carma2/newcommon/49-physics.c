@@ -17,8 +17,10 @@
 #include "34-finteray.h"
 #include "37-brucetrk.h"
 #include "52-errors.h"
+#include "60-phil.h"
 #include "65-hull.h"
 #include "globvars.h"
+#include "globvrpb.h"
 #include "platform.h"
 #include "rec2_macros.h"
 #include "c2_math.h"
@@ -161,6 +163,10 @@ tWorld_callbacks gWorld_callbacks = {
 
 // count
 
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
 // FUNCTION: CARMA2_HW 0x004225b0
 // FUNCTION: CARMA2_SW 0x00422630
 // FUNCTION: CARMA2_CHEAT 0x00422800
@@ -170,6 +176,10 @@ void C2_HOOK_FASTCALL DrMatrix34ApplyLPInverse(br_vector3* dest, const br_vector
     BrVector3Sub(&relative, source, (br_vector3*)matrix->m[3]);
     BrMatrix34TApplyV(dest, &relative, matrix);
 }
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // AddObjectWallForce
 
@@ -720,11 +730,81 @@ void C2_HOOK_FASTCALL PositionWorldJointedObject(tPhysics_object* pObject, br_sc
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x004b9230
-// STUB: CARMA2_SW 0x004b5950
-// STUB: CARMA2_CHEAT 0x004bed60
+// FUNCTION: CARMA2_HW 0x004b9230
+// FUNCTION: CARMA2_SW 0x004b5950
+// FUNCTION: CARMA2_CHEAT 0x004bed60
 void C2_HOOK_FASTCALL TranslateAndRotatePartialObject(tPhysics_object* pObject, tPhysics_object** pRoot, br_scalar pDelta_time) {
-    NOT_IMPLEMENTED();
+    tPhysics_object* parent;
+    tPhysics_object* child;
+    br_matrix34 inverse;
+    br_matrix34 relative;
+    br_vector3 tv;
+    br_vector3 tv2;
+    br_vector3 parent_omega;
+    br_scalar angle;
+
+    if (pObject->physics_joint1 == NULL || pObject->physics_joint1->type == eJoint_none) {
+        if (pObject->physics_joint2 == NULL || pObject->physics_joint2->type == eJoint_none) {
+            TranslateObject(pObject, pDelta_time);
+            RotateObject(pObject, pDelta_time);
+        } else {
+            RotateObject(pObject, pDelta_time);
+            PositionWorldJointedObject(pObject, pDelta_time);
+        }
+    } else {
+        parent = pObject->field_0x230;
+        if (parent == NULL) {
+            PhysicsError(11, "");
+        }
+        if (pObject->flags & 0x400) {
+            BrMatrix34Mul(&pObject->actor->t.t.mat, &pObject->field_0x1e8, &parent->actor->t.t.mat);
+            BrMatrix34TApplyV(&pObject->omega, &parent->rotate_omega, &pObject->field_0x1e8);
+            BrVector3Copy(&pObject->rotate_omega, &pObject->omega);
+            DrMatrix34ApplyLPInverse(&tv, &parent->cmpos, &pObject->field_0x1e8);
+            BrVector3Sub(&tv, &pObject->cmpos, &tv);
+            BrVector3Cross(&tv2, &pObject->omega, &tv);
+            BrMatrix34ApplyV(&pObject->v, &tv2, &pObject->transform_matrix);
+            BrVector3Add(&pObject->v, &parent->v, &pObject->v);
+            BrMatrix34TApplyV(&pObject->velocity_car_space, &pObject->v, &pObject->transform_matrix);
+        } else {
+            switch (pObject->physics_joint1->type) {
+            case eJoint_hinge:
+            case eJoint_quick_hinge:
+                BrMatrix34ApplyV(&tv, &parent->rotate_omega, &parent->transform_matrix);
+                BrMatrix34TApplyV(&parent_omega, &tv, &pObject->transform_matrix);
+                angle = ((pObject->omega.v[0] - parent_omega.v[0]) * pObject->physics_joint1->hinge_axis.v[0]
+                    + (pObject->omega.v[1] - parent_omega.v[1]) * pObject->physics_joint1->hinge_axis.v[1]
+                    + (pObject->omega.v[2] - parent_omega.v[2]) * pObject->physics_joint1->hinge_axis.v[2])
+                    * pDelta_time;
+                BrMatrix34LPInverse(&inverse, &parent->transform_matrix);
+                BrMatrix34Mul(&relative, &pObject->transform_matrix, &inverse);
+                BrMatrix34Mul(&pObject->actor->t.t.mat, &relative, &parent->actor->t.t.mat);
+                BrMatrix34PreRotate(&pObject->actor->t.t.mat, BrRadianToAngle(angle), &pObject->physics_joint1->hinge_axis);
+                BrVector3Copy(&pObject->rotate_omega, &pObject->omega);
+                BrMatrix34ApplyV(&tv, &pObject->omega, &pObject->transform_matrix);
+                BrMatrix34TApplyV(&pObject->omega, &tv, &pObject->actor->t.t.mat);
+                break;
+            case eJoint_universal:
+                RotateObject(pObject, pDelta_time);
+                break;
+            case eJoint_ball_n_socket:
+                RotateObject(pObject, pDelta_time);
+                break;
+            default:
+                PhysicsError(ePhysicsError_UnknownHingeType, NULL);
+            }
+            BrMatrix34ApplyP(&tv, &pObject->physics_joint1->field_0x08, &pObject->actor->t.t.mat);
+            BrMatrix34ApplyP(&tv2, &pObject->physics_joint1->field_0x14, &parent->actor->t.t.mat);
+            BrVector3Sub(&tv, &tv2, &tv);
+            BrVector3Accumulate(&pObject->actor->t.t.translate.t, &tv);
+        }
+    }
+    for (child = pObject->child; child != NULL; child = child->next) {
+        TranslateAndRotatePartialObject(child, pRoot, pDelta_time);
+    }
+    if (pObject->physics_joint2 != NULL) {
+        *pRoot = pObject;
+    }
 }
 
 #ifdef REC2_MATCHING
@@ -1214,11 +1294,64 @@ void C2_HOOK_FASTCALL RotateObjectFirstOrder(tPhysics_object* pObject, br_scalar
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x004c1be0
-// STUB: CARMA2_SW 0x004be310
-// STUB: CARMA2_CHEAT 0x004c7700
+// FUNCTION: CARMA2_HW 0x004c1be0
+// FUNCTION: CARMA2_SW 0x004be310
+// FUNCTION: CARMA2_CHEAT 0x004c7700
 void C2_HOOK_FASTCALL RotateObject(tPhysics_object* pObject, br_scalar pDelta_time) {
-    NOT_IMPLEMENTED();
+    tFixed_quat orientation;
+    br_matrix34 rotation;
+    br_vector3 axis;
+    br_vector3 momentum;
+    br_vector3 rotated;
+    br_vector3 translation;
+    br_scalar length_squared;
+    br_scalar length;
+    int steps;
+    int i;
+
+    BrVector3Copy(&pObject->rotate_omega, &pObject->omega);
+    length_squared = BrVector3LengthSquared(&pObject->omega) * (pDelta_time * pDelta_time);
+    if (length_squared < 1e-7) {
+        return;
+    }
+    if (length_squared > 0.008f) {
+        steps = (int)sqrt(length_squared * 31.249998f) + 1;
+        pDelta_time /= steps;
+        for (i = 0; i < steps && i < 400; i++) {
+            length = BrVector3Length(&pObject->omega);
+            axis.v[0] = pObject->omega.v[0] / length;
+            axis.v[1] = pObject->omega.v[1] / length;
+            axis.v[2] = pObject->omega.v[2] / length;
+            momentum.v[0] = pObject->omega.v[0] * pObject->I.v[0];
+            momentum.v[1] = pObject->omega.v[1] * pObject->I.v[1];
+            momentum.v[2] = pObject->I.v[2] * pObject->omega.v[2];
+            BrMatrix34Rotate(&rotation, BrRadianToAngle(length * pDelta_time) / 2, &axis);
+            BrMatrix34TApplyV(&rotated, &momentum, &rotation);
+            axis.v[0] = rotated.v[0] / pObject->I.v[0];
+            axis.v[1] = rotated.v[1] / pObject->I.v[1];
+            axis.v[2] = rotated.v[2] / pObject->I.v[2];
+            length = BrVector3Length(&axis);
+            axis.v[0] /= length;
+            axis.v[1] /= length;
+            axis.v[2] /= length;
+            BrMatrix34Rotate(&rotation, BrRadianToAngle(length * pDelta_time), &axis);
+            BrMatrix34PreTranslate(&rotation, -pObject->cmpos.v[0], -pObject->cmpos.v[1], -pObject->cmpos.v[2]);
+            BrMatrix34PostTranslate(&rotation, pObject->cmpos.v[0], pObject->cmpos.v[1], pObject->cmpos.v[2]);
+            BrMatrix34Pre(&pObject->actor->t.t.mat, &rotation);
+            BrMatrix34TApplyV(&rotated, &momentum, &rotation);
+            pObject->omega.v[0] = rotated.v[0] / pObject->I.v[0];
+            pObject->omega.v[1] = rotated.v[1] / pObject->I.v[1];
+            pObject->omega.v[2] = rotated.v[2] / pObject->I.v[2];
+        }
+    } else {
+        RotateObjectFirstOrder(pObject, pDelta_time);
+    }
+    if (gNet_mode != eNet_mode_none) {
+        GetOrientationFromMatrix(&orientation, &pObject->actor->t.t.mat);
+        BrVector3Copy(&translation, &pObject->actor->t.t.translate.t);
+        GetMatrixFromOrientation(&pObject->actor->t.t.mat, &orientation);
+        BrVector3Copy(&pObject->actor->t.t.translate.t, &translation);
+    }
 }
 
 #ifdef REC2_MATCHING
