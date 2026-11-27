@@ -390,12 +390,15 @@ br_model* gLine_model;
 br_material* gLine_material;
 
 // GLOBAL: CARMA2_HW 0x0074cf30
+// GLOBAL: CARMA2_CHEAT 0x007545d0
 br_model* gBlend_model;
 
 // GLOBAL: CARMA2_HW 0x0074cf94
+// GLOBAL: CARMA2_CHEAT 0x00754634
 br_model* gBlend_model2;
 
 // GLOBAL: CARMA2_HW 0x0074caac
+// GLOBAL: CARMA2_CHEAT 0x0075414c
 br_actor* gBlend_actor;
 
 

@@ -82,6 +82,7 @@ int gSmoke_num;
 tBRender_smoke* gBR_smoke_pointers[35];
 
 // GLOBAL: CARMA2_HW 0x006a87f0
+// GLOBAL: CARMA2_CHEAT 0x006b0368
 tBRender_smoke gBR_smoke_structs[35] = { 0 };
 
 // GLOBAL: CARMA2_HW 0x006a8ce0
