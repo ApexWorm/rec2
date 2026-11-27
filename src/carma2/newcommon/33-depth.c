@@ -859,6 +859,7 @@ void C2_HOOK_FASTCALL SetSkyTextureOn(int skyTextureOn) {
 }
 
 // FUNCTION: CARMA2_HW 0x00446e80
+// FUNCTION: CARMA2_SW 0x004470c0
 // FUNCTION: CARMA2_CHEAT 0x004473a0
 void C2_HOOK_FASTCALL ToggleSkyQuietly(void) {
     br_pixelmap* temp;
@@ -988,6 +989,7 @@ void C2_HOOK_FASTCALL ChangeDepthEffect(void) {
 
 // STUB: CARMA2_HW 0x00445e20
 // STUB: CARMA2_SW 0x00445ea0
+// STUB: CARMA2_CHEAT 0x00446340
 void C2_HOOK_FASTCALL MungeSkyModel(br_actor* pCamera, br_model* pModel) {
     NOT_IMPLEMENTED();
 }
