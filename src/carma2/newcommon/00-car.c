@@ -595,6 +595,7 @@ void C2_HOOK_FASTCALL SetInitialPositions(tRace_info* pThe_race) {
 
 // FUNCTION: CARMA2_HW 0x00414910
 // FUNCTION: CARMA2_SW 0x00414940
+// FUNCTION: CARMA2_CHEAT 0x00414b70
 void C2_HOOK_FASTCALL NewFaceListCallBack(tPhysics_object* pObject, tFace_ref* pFace) {
     br_bounds3 current_bounds;
     br_scalar old_d;
@@ -734,6 +735,7 @@ void C2_HOOK_FASTCALL MungeCarsMass(tCar_spec* pCar, br_scalar pFactor) {
 
 // FUNCTION: CARMA2_HW 0x00415ef0
 // FUNCTION: CARMA2_SW 0x00415f20
+// FUNCTION: CARMA2_CHEAT 0x00416150
 void C2_HOOK_FASTCALL AddDrag(const tCar_spec* pCar, tPhysics_object* pObject, br_scalar pDelta_time) {
     br_scalar drag;
     br_scalar k;
@@ -760,6 +762,7 @@ void C2_HOOK_FASTCALL AddDrag(const tCar_spec* pCar, tPhysics_object* pObject, b
 
 // FUNCTION: CARMA2_HW 0x00416030
 // FUNCTION: CARMA2_SW 0x00416060
+// FUNCTION: CARMA2_CHEAT 0x00416290
 void C2_HOOK_FASTCALL DragChildren(tCar_spec* pCar, tPhysics_object* pObject) {
 
     for (; pObject != NULL; pObject = pObject->next) {
@@ -857,6 +860,7 @@ void C2_HOOK_FASTCALL GetDrivableOnList(tPhysics_object *pObjects) {
 
 // FUNCTION: CARMA2_HW 0x00415890
 // FUNCTION: CARMA2_SW 0x004158c0
+// FUNCTION: CARMA2_CHEAT 0x00415af0
 void C2_HOOK_FASTCALL APTCPreCollision(void) {
     int i;
 
@@ -887,6 +891,7 @@ void C2_HOOK_FASTCALL APTCPreCollision(void) {
 
 // FUNCTION: CARMA2_HW 0x004161a0
 // FUNCTION: CARMA2_SW 0x004161d0
+// FUNCTION: CARMA2_CHEAT 0x00416400
 void C2_HOOK_FASTCALL SetCollisionFlagsAndStuff(tPhysics_object* pObject) {
     tPhysics_object* child;
     tCar_spec* car;
@@ -939,6 +944,7 @@ void C2_HOOK_FASTCALL MoveAndCollideCar(tCar_spec* pCar, br_scalar pDt) {
 
 // FUNCTION: CARMA2_HW 0x00417030
 // FUNCTION: CARMA2_SW 0x00417060
+// FUNCTION: CARMA2_CHEAT 0x00417290
 void C2_HOOK_FASTCALL MoveAndCollideNonCar(tNon_car_spec* pNon_car, br_scalar pDt) {
 
     if (pNon_car->collision_info->water_d != 10000.0f) {
@@ -1286,6 +1292,7 @@ void C2_HOOK_FASTCALL FindFace(br_vector3* pPosition, br_vector3* pDir, br_vecto
 
 // FUNCTION: CARMA2_HW 0x0041e480
 // FUNCTION: CARMA2_SW 0x0041e4b0
+// FUNCTION: CARMA2_CHEAT 0x0041e6e0
 int C2_HOOK_FASTCALL FindFloorInBoxBU(br_vector3* pPosition, br_vector3* pDirection, br_vector3* pNormal, br_scalar* pDistance, tPhysics_object* pObject) {
     br_vector3 nor2;
     br_vector3 collision_position;
@@ -1494,6 +1501,7 @@ void C2_HOOK_FASTCALL SwapCar(void) {
 
 // FUNCTION: CARMA2_HW 0x0041f3c0
 // FUNCTION: CARMA2_SW 0x0041f440
+// FUNCTION: CARMA2_CHEAT 0x0041f620
 void C2_HOOK_FASTCALL AdjustDownForce(void) {
     char s[100];
     tCar_spec* c;
@@ -1587,6 +1595,7 @@ int C2_HOOK_FASTCALL TestForCarInSensiblePlace(tCar_spec* pCar_spec, br_vector3*
 
 // FUNCTION: CARMA2_HW 0x0041ff00
 // FUNCTION: CARMA2_SW 0x0041ff80
+// FUNCTION: CARMA2_CHEAT 0x00420160
 tNon_car_spec* C2_HOOK_FASTCALL PullActorFromWorld(br_actor* pActor) {
     if (!gPHIL_doing_physics && !gTesting_car_for_sensible_place) {
         return NULL;
