@@ -3189,6 +3189,12 @@ typedef struct tReturn_to_start_data {
     tU8 waiting_near_start;
 } tReturn_to_start_data;
 
+typedef struct {
+    float initial_y;
+    tU32 time_started;
+    unsigned int waiting_to_levitate : 1;
+} tLevitate_data;
+
 typedef struct tRun_away_data {
     tU32 time_to_stop;
 } tRun_away_data;
@@ -3294,7 +3300,7 @@ typedef struct {
     tComplete_race_data complete_race_data;
     tFollow_path_data follow_path_data;
     tPursue_car_data pursue_car_data;
-    undefined field_0x184[12];
+    tLevitate_data levitate_data;
     tRun_away_data run_away_data;
     tReturn_to_start_data return_to_start_data;
 } tOpponent_spec;
@@ -5821,6 +5827,7 @@ enum {
     eMiscString_net_games_always_accessorized = 124,
     eMiscString_recovery_cancelled = 125,
     eMiscString_task_switched = 139,
+    eMiscString_car_added_to_change_car_list = 170,
     eMiscString_you_re_already_at_max_you_need_more_slots = 174,
     eMiscString_armor_strengthened = 175,
     eMiscString_engine_power_increased = 176,

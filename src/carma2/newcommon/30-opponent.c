@@ -12,6 +12,7 @@
 #include "00-car.h"
 #include "08-loading1.h"
 #include "13-crush1.h"
+#include "15-displays.h"
 #include "23-piping.h"
 #include "26-oppoproc.h"
 #include "41-utility.h"
@@ -23,6 +24,7 @@
 #include "c2_stdio.h"
 #include "platform.h"
 #include "rec2_macros.h"
+#include <math.h>
 #include <stdarg.h>
 #include <string.h>
 
@@ -86,6 +88,7 @@ tU8* gBit_per_node;
 
 // GLOBAL: CARMA2_HW 0x00691764
 // GLOBAL: CARMA2_SW 0x0068b7bc
+// GLOBAL: CARMA2_CHEAT 0x00699114
 float gIn_view_distance;
 
 // GLOBAL: CARMA2_HW 0x0069176c
@@ -791,15 +794,87 @@ void C2_HOOK_FASTCALL ProcessWaitForSomeHaplessSod(tOpponent_spec* pOpponent_spe
     }
 }
 
+inline int C2_HOOK_FASTCALL TeleportCopToStart(tOpponent_spec* pOpponent_spec) {
+    br_vector3 wank;
+
+    if (!pOpponent_spec->cheating || !CAR_SPEC_IS_ROZZER(pOpponent_spec->car_spec)) {
+        return 0;
+    }
+    BrVector3Sub(&wank, &gProgram_state.current_car.car_master_actor->t.t.translate.t, &pOpponent_spec->start_pos);
+    if (BrVector3Length(&wank) > gIn_view_distance) {
+        BrVector3Copy(&pOpponent_spec->car_spec->car_master_actor->t.t.translate.t, &pOpponent_spec->start_pos);
+        PointActorAlongThisBloodyVector(pOpponent_spec->car_spec->car_master_actor, &pOpponent_spec->start_direction);
+        pOpponent_spec->physics_me = 0;
+        RematerialiseOpponent(pOpponent_spec, 0.0f);
+        TurnOpponentPhysicsOff(pOpponent_spec);
+        RebuildActiveCarList();
+        NewObjective(pOpponent_spec, eOOT_wait_for_some_hapless_sod);
+        return 1;
+    }
+    return 0;
+}
+
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x004abc40
-// STUB: CARMA2_SW 0x004a7db0
-// STUB: CARMA2_CHEAT 0x004ad130
+// FUNCTION: CARMA2_HW 0x004abc40
+// FUNCTION: CARMA2_SW 0x004a7db0
+// FUNCTION: CARMA2_CHEAT 0x004ad130
 void C2_HOOK_FASTCALL ProcessReturnToStart(tOpponent_spec* pOpponent_spec, tProcess_objective_command pCommand) {
-    NOT_IMPLEMENTED();
+    br_vector3 section_v;
+    br_vector3 our_pos_xz;
+    br_vector3 cop_to_start;
+    br_scalar distance;
+    int res;
+
+    switch (pCommand) {
+    case ePOC_start:
+        DoNotDprintf("%s: ProcessReturnToStart() - new objective started", pOpponent_spec->car_spec->driver_name);
+        pOpponent_spec->return_to_start_data.waiting_near_start = 0;
+        pOpponent_spec->return_to_start_data.section_no = FindNearestPathSection(&pOpponent_spec->start_pos, &section_v, &pOpponent_spec->return_to_start_data.nearest_path_point, &distance);
+        pOpponent_spec->return_to_start_data.nearest_path_point.v[1] = 0.0f;
+        CalcReturnToStartPointRoute(pOpponent_spec);
+        ProcessFollowPath(pOpponent_spec, ePOC_start, 0, 0, 0);
+        break;
+    case ePOC_run:
+        if (TeleportCopToStart(pOpponent_spec)) {
+            break;
+        }
+        if (!pOpponent_spec->return_to_start_data.waiting_near_start) {
+            BrVector3Copy(&our_pos_xz, &pOpponent_spec->car_spec->car_master_actor->t.t.translate.t);
+            our_pos_xz.v[1] = 0.0f;
+            BrVector3Sub(&cop_to_start, &pOpponent_spec->start_pos, &our_pos_xz);
+            if (BrVector3Length(&cop_to_start) < 10.0f) {
+                pOpponent_spec->return_to_start_data.waiting_near_start = 1;
+                pOpponent_spec->car_spec->brake_force = pOpponent_spec->car_spec->collision_info->M * 15.0f;
+            } else {
+                if (pOpponent_spec->follow_path_data.section_no > 20000) {
+                    ShiftOpponentsProjectedRoute(pOpponent_spec, pOpponent_spec->follow_path_data.section_no - 20000);
+                    pOpponent_spec->follow_path_data.section_no = 20000;
+                }
+                if (pOpponent_spec->nnext_sections <= 10) {
+                    CalcReturnToStartPointRoute(pOpponent_spec);
+                }
+                res = ProcessFollowPath(pOpponent_spec, ePOC_run, 0, 0, 0);
+                if (res == eFPR_given_up || res == eFPR_end_of_path) {
+                    if (res == eFPR_given_up) {
+                        DoNotDprintf("%s: Restarting return_to_start route because ProcessFollowPath() gave up.", pOpponent_spec->car_spec->driver_name);
+                    } else {
+                        DoNotDprintf("%s: Restarting return_to_start route because ran out of path!", pOpponent_spec->car_spec->driver_name);
+                    }
+                    ClearOpponentsProjectedRoute(pOpponent_spec);
+                    CalcReturnToStartPointRoute(pOpponent_spec);
+                    ProcessFollowPath(pOpponent_spec, ePOC_start, 0, 0, 0);
+                }
+            }
+        } else {
+            pOpponent_spec->car_spec->brake_force = pOpponent_spec->car_spec->collision_info->M * 15.0f;
+        }
+        break;
+    default:
+        break;
+    }
 }
 
 #ifdef REC2_MATCHING
@@ -810,11 +885,61 @@ void C2_HOOK_FASTCALL ProcessReturnToStart(tOpponent_spec* pOpponent_spec, tProc
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x004ac540
-// STUB: CARMA2_SW 0x004a86b0
-// STUB: CARMA2_CHEAT 0x004ada30
+// FUNCTION: CARMA2_HW 0x004ac540
+// FUNCTION: CARMA2_SW 0x004a86b0
+// FUNCTION: CARMA2_CHEAT 0x004ada30
 void C2_HOOK_FASTCALL ProcessLevitate(tOpponent_spec* pOpponent_spec, tProcess_objective_command pCommand) {
-    NOT_IMPLEMENTED();
+    float t;
+    float terminal_time;
+    float y;
+
+    switch (pCommand) {
+    case ePOC_start:
+        DoNotDprintf("%s: ProcessLevitate() - new objective started", pOpponent_spec->car_spec->driver_name);
+        pOpponent_spec->levitate_data.waiting_to_levitate = 1;
+        pOpponent_spec->car_spec->brake_force = 15.0f * pOpponent_spec->car_spec->collision_info->M;
+        pOpponent_spec->car_spec->acc_force = 0.0f;
+        pOpponent_spec->levitate_data.time_started = gTime_stamp_for_this_munging;
+        break;
+    case ePOC_run:
+        if (pOpponent_spec->levitate_data.waiting_to_levitate) {
+            if ((BrVector3Length(&pOpponent_spec->car_spec->collision_info->v) < 0.01f / WORLD_SCALE && BrVector3Length(&pOpponent_spec->car_spec->collision_info->omega) < 1.0f)
+                || gTime_stamp_for_this_munging - pOpponent_spec->levitate_data.time_started > 4000) {
+                pOpponent_spec->levitate_data.waiting_to_levitate = 0;
+                pOpponent_spec->levitate_data.time_started = gTime_stamp_for_this_munging;
+                pOpponent_spec->levitate_data.initial_y = pOpponent_spec->car_spec->car_master_actor->t.t.translate.t.v[1];
+                if (pOpponent_spec->car_spec->has_been_stolen) {
+                    NewTextHeadupSlot(4, 250, 5000, -4, GetMiscString(eMiscString_car_added_to_change_car_list));
+                }
+            } else {
+                pOpponent_spec->car_spec->brake_force = 15.0f * pOpponent_spec->car_spec->collision_info->M;
+                pOpponent_spec->car_spec->acc_force = 0.0f;
+#define OMEGA_DIVISOR pow(2.0, gFrame_period_for_this_munging / 1000.0)
+                /* FIXME: BrVector3InvScale(&omega, &omega, OMEGA_DIVISOR); the original divides each component */
+                pOpponent_spec->car_spec->collision_info->omega.v[0] = (br_scalar)(pOpponent_spec->car_spec->collision_info->omega.v[0] / OMEGA_DIVISOR);
+                pOpponent_spec->car_spec->collision_info->omega.v[1] = (br_scalar)(pOpponent_spec->car_spec->collision_info->omega.v[1] / OMEGA_DIVISOR);
+                pOpponent_spec->car_spec->collision_info->omega.v[2] = (br_scalar)(pOpponent_spec->car_spec->collision_info->omega.v[2] / OMEGA_DIVISOR);
+#undef OMEGA_DIVISOR
+            }
+        }
+        if (!pOpponent_spec->levitate_data.waiting_to_levitate) {
+            TurnOpponentPhysicsOff(pOpponent_spec);
+            t = (float)((gTime_stamp_for_this_munging - pOpponent_spec->levitate_data.time_started) / 1000.0);
+            terminal_time = 20.0f;
+            if (t < terminal_time) {
+                y = t * t * 0.5f / 2.0f;
+            } else {
+                y = (float)(terminal_time * terminal_time * 0.5 / 2.0 + (t - terminal_time) * 10.0);
+            }
+            pOpponent_spec->car_spec->car_master_actor->t.t.translate.t.v[1] = pOpponent_spec->levitate_data.initial_y + y;
+            if (y > 200.0f) {
+                pOpponent_spec->finished_for_this_race = 1;
+            }
+        }
+        break;
+    default:
+        break;
+    }
 }
 
 #ifdef REC2_MATCHING
@@ -1269,7 +1394,7 @@ void C2_HOOK_FASTCALL PossiblyRepairOpponent(tOpponent_spec* pOpponent_spec) {
 
 // OiStopCheating
 
-// TeleportCopToStart
+// TeleportCopToStart (moved above ProcessReturnToStart for inlining purposes)
 
 // FUNCTION: CARMA2_HW 0x004ada90
 // FUNCTION: CARMA2_SW 0x004a9c00
