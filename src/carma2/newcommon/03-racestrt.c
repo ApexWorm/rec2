@@ -13,6 +13,7 @@
 #include "41-utility.h"
 
 #include "globvars.h"
+#include "globvrpb.h"
 
 // GLOBAL: CARMA2_HW 0x006a0c74
 // GLOBAL: CARMA2_SW 0x0069accc
@@ -60,5 +61,23 @@ int C2_HOOK_FASTCALL SortOpponents(void) {
 
 // DoGridPosition
 
-// ReceivedViewCar
+// FUNCTION: CARMA2_HW 0x00497860
+// FUNCTION: CARMA2_SW 0x00494490
+// FUNCTION: CARMA2_CHEAT 0x00497c10
+void C2_HOOK_FASTCALL ReceivedViewCar(tNet_message_chunk_view_car* pContents, tNet_message* pMessage) {
+    int i;
+
+    if (gNet_mode == eNet_mode_none) {
+        return;
+    }
+    for (i = 0; i < gNumber_of_net_players; i++) {
+        if (gNet_players[i].ID == pMessage->header.field_0x8) {
+            gNet_players[i].field_0xd0 = pContents->player;
+            if (gNet_players[i].ID == gNet_players[i].field_0xd0) {
+                gNet_players[i].car->collision_info->field_0x49c += 40;
+            }
+            return;
+        }
+    }
+}
 

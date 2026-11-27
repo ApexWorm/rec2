@@ -21,6 +21,6 @@ extern int C2_HOOK_FASTCALL SortOpponents(void);
 
 // DoGridPosition
 
-// ReceivedViewCar
+extern void C2_HOOK_FASTCALL ReceivedViewCar(tNet_message_chunk_view_car* pContents, tNet_message* pMessage);
 
 #endif // GUARD_03_RACESTRT_H
