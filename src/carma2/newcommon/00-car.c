@@ -1194,9 +1194,36 @@ void C2_HOOK_FASTCALL ControlCar1(tCar_spec* pCar, br_scalar pDt) {
 
 // SteeringSelfCentre
 
-// NonCarSnapOff
+// FUNCTION: CARMA2_HW 0x00420310
+// FUNCTION: CARMA2_SW 0x00420390
+// FUNCTION: CARMA2_CHEAT 0x00420570
+int C2_HOOK_FASTCALL NonCarSnapOff(tPhysics_object* pObject) {
+    tNon_car_spec* non_car;
 
-// TestNonCarSnapOff
+    non_car = pObject->owner;
+    pObject->field_0xed = 1;
+    pObject->field_0x194 = 0;
+    pObject->field_0x198 = 0;
+    if (non_car->snap_off_cosine < 1.f) {
+        pObject->physics_joint2 = NULL;
+    }
+    pObject->field_0x218 = 0;
+    BrVector3Set(&pObject->v, 0.f, 0.f, 0.f);
+    return 0;
+}
+
+// FUNCTION: CARMA2_HW 0x00420360
+// FUNCTION: CARMA2_SW 0x004203e0
+// FUNCTION: CARMA2_CHEAT 0x004205c0
+int C2_HOOK_FASTCALL TestNonCarSnapOff(tPhysics_object* pObject) {
+    tNon_car_spec* non_car;
+
+    non_car = pObject->owner;
+    if (pObject->actor->t.t.mat.m[1][1] < non_car->snap_off_cosine) {
+        return NonCarSnapOff(pObject);
+    }
+    return 0;
+}
 
 // TumbleObjectWithV
 

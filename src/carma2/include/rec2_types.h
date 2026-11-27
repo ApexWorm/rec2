@@ -4630,7 +4630,9 @@ typedef struct tPhysics_object {
     tPhysics_joint* physics_joint1;
     tPhysics_joint* physics_joint2;
     tU8 uid;
-    undefined field_0x191[11];
+    undefined field_0x191[3];
+    undefined4 field_0x194;
+    undefined4 field_0x198;
     int flags;
     int field_0x1a0;
     undefined4 field_0x1a4;
