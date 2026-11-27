@@ -5460,6 +5460,7 @@ typedef enum {
     eNet_message_chunk_type_car_crush = 0x20,
     eNet_message_chunk_type_semi_detach_bit = 0x24,
     eNet_message_chunk_type_reattach_bit = 0x26,
+    eNet_message_chunk_type_db_non_car = 0x27,
     eNet_message_chunk_type_sh_non_car = 0x29,
     eNet_message_chunk_type_reattach_all_bits = 0x2b,
     eNet_message_chunk_type_toggle_doors = 0x2c,
@@ -5550,6 +5551,18 @@ typedef struct {
     tPlayer_ID player;
     tU32 time;
 } tNet_message_chunk_reattach_all_bits;
+
+typedef struct {
+    tNet_message_chunk_header header;
+    tPlayer_ID player;
+    tU8 id;
+    tCompressed_vector3 bounds_min;
+    tCompressed_vector3 bounds_max;
+    tU32 time;
+    undefined field_0x1c[4];
+    tU16 flags;
+    tU8 object_hierarchy[];
+} tNet_message_chunk_db_non_car;
 
 typedef struct {
     tNet_message_chunk_header header;
@@ -5708,6 +5721,7 @@ typedef union {
     tNet_message_car_crush car_crush; /* type = 0x20 */
     tNet_message_chunk_semi_detach_bit semi_detach_bit; /* type = 0x24 */
     tNet_message_chunk_reattach_bit reattach_bit; /* type = 0x26 */
+    tNet_message_chunk_db_non_car db_non_car; /* type = 0x27 */
     tNet_message_chunk_sh_non_car sh_non_car; /* type = 0x29 */
     tNet_message_chunk_reattach_all_bits reattach_all_bits; /* type = 0x2b */
     tNet_message_chunk_toggle_doors toggle_doors; /* type = 0x2c */

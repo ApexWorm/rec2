@@ -2700,13 +2700,97 @@ void C2_HOOK_FASTCALL ReceivedReAttachAllBits(tNet_message_chunk* pContents) {
 
 // DoQueuedNetDetaching
 
-// DBNonCarOwner
+inline tCar_spec* C2_HOOK_FASTCALL DBNonCarOwner(tNon_car_spec* pNon_car) {
+    tUser_crush_data* user;
 
-// SendDBNonCar
+    if (pNon_car->driver == eDriver_detached_bit && pNon_car->car_master_actor != NULL) {
+        user = pNon_car->car_master_actor->user;
+        if (user != NULL && user->crush_data != NULL && user->crush_data->detach_data != NULL) {
+            return user->crush_data->detach_data->field_0x2c;
+        }
+    }
+    return NULL;
+}
+
+// FUNCTION: CARMA2_HW 0x0043d1d0
+// FUNCTION: CARMA2_SW 0x0043d220
+// FUNCTION: CARMA2_CHEAT 0x0043d430
+void C2_HOOK_FASTCALL SendDBNonCar(tNon_car_spec* pNon_car, tU32 pTime, tNet_game_player_info* pPlayer) {
+    tNet_message* message;
+    tNet_message_chunk* contents;
+    tCar_spec* car;
+    tNet_game_player_info* player;
+    tUser_crush_data* user;
+    int size;
+    int contents_size;
+
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tNet_message_chunk_db_non_car, bounds_min, 0xa);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tNet_message_chunk_db_non_car, time, 0x18);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tNet_message_chunk_db_non_car, flags, 0x20);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tNet_message_chunk_db_non_car, object_hierarchy, 0x22);
+
+    message = NULL;
+    size = GetHierarchyNetworkSize(pNon_car->collision_info);
+    contents_size = size + offsetof(tNet_message_chunk_db_non_car, object_hierarchy);
+    if (pPlayer == NULL) {
+        if (pNon_car->collision_info->disable_move_rotate && (pNon_car->flags & 0x100000)) {
+            message = NetBuildGuaranteedMessage(eNet_message_chunk_type_db_non_car, contents_size);
+            contents = &message->contents;
+            pNon_car->flags &= ~0x100000;
+        } else {
+            contents = NetStartBroadcastContents(eNet_message_chunk_type_db_non_car, contents_size);
+        }
+    } else {
+        contents = NetGetToPlayerContents(eNet_message_chunk_type_db_non_car, contents_size, pPlayer->ID);
+    }
+    if (contents == NULL) {
+        return;
+    }
+    contents->db_non_car.time = pTime;
+    contents->db_non_car.flags = (pNon_car->car_master_actor->identifier[3] == '!') | (pNon_car->collision_info->disable_move_rotate << 1);
+    if (GetHierarchyNetworkStuff(pNon_car->collision_info, contents->db_non_car.object_hierarchy, NET_OBJECT_HIERARCHY_DEFAULT_SIZE) != size) {
+        FatalError(kFatalError_NetContentsTooBig_S, "in detached bit non_car object data");
+    }
+    car = DBNonCarOwner(pNon_car);
+#ifdef REC2_CHEAT
+    if (car == NULL) {
+        PDFatalError("Can't find detached bit's owner");
+    }
+#endif
+    player = NetPlayerFromCar(car);
+#ifdef REC2_CHEAT
+    if (player == NULL) {
+        PDFatalError("Can't find player for detached bit's car");
+    }
+#endif
+    contents->db_non_car.player = player->ID;
+    user = pNon_car->car_master_actor->user;
+    contents->db_non_car.id = user->crush_data->id;
+    CompressVector3(&contents->db_non_car.bounds_min, &pNon_car->collision_info->bb1.min, -10.0f, 10.0f);
+    CompressVector3(&contents->db_non_car.bounds_max, &pNon_car->collision_info->bb1.max, -10.0f, 10.0f);
+    if (pPlayer == NULL) {
+        if (message == NULL) {
+            NetBroadcastContents(contents);
+        } else {
+            NetGuaranteedSendMessageToEverybody(gCurrent_net_game, message, NULL);
+        }
+    }
+}
 
 // ReceivedDBNonCar
 
-// SendAllDBNonCars
+// FUNCTION: CARMA2_HW 0x0043d5b0
+// FUNCTION: CARMA2_SW 0x0043d600
+// FUNCTION: CARMA2_CHEAT 0x0043d830
+void C2_HOOK_FASTCALL SendAllDBNonCars(tNet_game_player_info* pPlayer) {
+    int i;
+
+    for (i = 0; i < gNum_active_non_cars; i++) {
+        if (gActive_non_car_list[i]->driver == eDriver_detached_bit) {
+            SendDBNonCar(gActive_non_car_list[i], (tU32)-1, pPlayer);
+        }
+    }
+}
 
 // ReceivedDBNonCarPosition
 
@@ -2789,7 +2873,18 @@ void C2_HOOK_FASTCALL SendSHNonCar(tNon_car_spec* pNon_car, tU32 pTime, tNet_gam
     }
 }
 
-// SendAllSHNonCars
+// FUNCTION: CARMA2_HW 0x0043d7d0
+// FUNCTION: CARMA2_SW 0x0043d820
+// FUNCTION: CARMA2_CHEAT 0x0043da80
+void C2_HOOK_FASTCALL SendAllSHNonCars(tNet_game_player_info* pPlayer) {
+    int i;
+
+    for (i = 0; i < gNum_active_non_cars; i++) {
+        if (gActive_non_car_list[i]->driver == eDriver_split_car) {
+            SendSHNonCar(gActive_non_car_list[i], (tU32)-1, pPlayer);
+        }
+    }
+}
 
 // ReceivedSHNonCar
 
