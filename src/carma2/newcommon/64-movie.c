@@ -152,6 +152,9 @@ void C2_HOOK_FASTCALL WriteBannerFrame(void) {
 
 // MovieStartNewMovie
 
+// FUNCTION: CARMA2_HW 0x004e1640
+// FUNCTION: CARMA2_SW 0x004dd940
+// FUNCTION: CARMA2_CHEAT 0x004e71e0
 inline void C2_HOOK_FASTCALL FreeOffQTshite(void) {
     char path[260];
 
