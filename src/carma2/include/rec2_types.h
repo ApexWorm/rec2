@@ -321,10 +321,10 @@ typedef struct tPed_character_instance {
     undefined4 field_0xc;
     undefined4 field_0x10;
     undefined4 field_0x14;
-    undefined4 field_0x18;
+    float field_0x18;
     tS16 field_0x1c;
-    undefined2 field_0x1e;
-    undefined2 field_0x20;
+    tS16 field_0x1e;
+    tS16 field_0x20;
     undefined field_0x22[0x2];
     undefined4 field_0x24;
     undefined4 field_0x28;
@@ -4029,7 +4029,7 @@ typedef struct {
     undefined4 (C2_HOOK_FASTCALL * passive_collision)(undefined4*, undefined4, undefined4*);
     int (C2_HOOK_FASTCALL * active_halted)(tPed_character_instance*, tPhysics_object*);
     void (C2_HOOK_FASTCALL * moved_by_physics)(undefined4*, undefined4*, undefined4);
-    int (C2_HOOK_FASTCALL * move_completed)(undefined4*);
+    int (C2_HOOK_FASTCALL * move_completed)(tPed_character_instance*);
     void (C2_HOOK_FASTCALL * fill_in_object)(tPhysics_object*, undefined4);
     void (C2_HOOK_FASTCALL * load_form)(tPed_form* pPed_form, FILE* pF);
     void (C2_HOOK_FASTCALL * dispose_form)(tPed_form*);

@@ -3143,9 +3143,122 @@ int C2_HOOK_FASTCALL MorphCharacterBonePositions(tPed_character_instance* pPed, 
 #pragma auto_inline(on)
 #endif
 
-// StopCharacterMove
+static inline int C2_HOOK_FASTCALL StopCharacterMove(tPed_character_instance* pCharacter, tU32 pTime) {
+    int result;
 
-// MungeCharacterAnimation
+    result = 0;
+    pCharacter->field_0x1c = pCharacter->personality->form->moves[pCharacter->field_0x7].move->count_frames - 1;
+    if (pCharacter->field_0x9 & 0x2) {
+        pCharacter->field_0x9 &= ~0x2;
+        gPed_vtable->move_completed(pCharacter);
+    }
+    if (pCharacter->field_0x8 < 0) {
+        pCharacter->field_0x1c = 0;
+    } else {
+        SetCharacterMove(pCharacter, pCharacter->field_0x8, (float)pCharacter->field_0x20, 0, (pCharacter->field_0x9 & 0x4) >> 2, pTime);
+        result = 1;
+    }
+    return result;
+}
+
+// FUNCTION: CARMA2_HW 0x00409ca0
+// FUNCTION: CARMA2_SW 0x00409ca0
+// FUNCTION: CARMA2_CHEAT 0x00409d10
+void C2_HOOK_FASTCALL MungeCharacterAnimation(tPed_character_instance* pCharacter, tU32 pTime, int pArg3) {
+    br_matrix34* mat;
+    tPed_move* move;
+    int i;
+    double t;
+    br_vector3 old_pos;
+    int frames;
+    float f;
+
+    frames = 0;
+    if (0 > pCharacter->field_0x7) {
+        return;
+    }
+    if ((pCharacter->field_0x14 & 0x4) && (pCharacter->field_0x14 & 0x2) && pCharacter->field_0xe8 == NULL) {
+        return;
+    }
+    if (pCharacter->field_0xbc != NULL) {
+        if (MorphCharacterBonePositions(pCharacter, pTime - pCharacter->field_0x24)) {
+            pCharacter->field_0x24 = pTime;
+            return;
+        }
+        pCharacter->field_0x24 = pTime - pCharacter->field_0x1e;
+    }
+    move = pCharacter->personality->form->moves[pCharacter->field_0x7].move;
+    mat = GetCharacterMatrixPtr(pCharacter);
+    old_pos = *(br_vector3*)mat->m[3];
+    if (pCharacter->field_0x1e != 0) {
+        if (!pCharacter->field_0x24) {
+            SetCharacterBonePositions(pCharacter, 0, 0);
+        } else {
+            f = (float)(int)(pTime - pCharacter->field_0x24) / pCharacter->field_0x1e;
+            if (f > 10.f) {
+                f = 10.f;
+            } else if (f < -10.f) {
+                f = -10.0f;
+            }
+            t = pCharacter->field_0x1c + (f + pCharacter->field_0x18);
+            pCharacter->field_0x18 = t - floor(t);
+            frames = floor(t) - pCharacter->field_0x1c;
+            if (0 < frames) {
+                for (i = 0; i < frames; i++) {
+                    pCharacter->field_0x1c++;
+                    if (pCharacter->personality->form->moves[pCharacter->field_0x7].move->count_frames <= pCharacter->field_0x1c) {
+                        if (gAction_replay_mode) {
+                            if (move->move_flags & 0x1) {
+                                pCharacter->field_0x1c--;
+                                i = frames - 1;
+                            } else {
+                                pCharacter->field_0x1c = 0;
+                            }
+                        } else if (StopCharacterMove(pCharacter, pTime)) {
+                            SetCharacterBonePositions(pCharacter, 0, 0);
+                            break;
+                        }
+                    }
+                    if (i == frames - 1) {
+                        SetCharacterBonePositions(pCharacter, 0, 1);
+                    } else {
+                        SetCharacterBonePositions(pCharacter, 2, 1);
+                    }
+                }
+            } else if (frames < 0) {
+                for (i = frames; i < 0; i++) {
+                    if (i < -1) {
+                        SetCharacterBonePositions(pCharacter, 2, 1);
+                    } else {
+                        SetCharacterBonePositions(pCharacter, 0, 1);
+                    }
+                    pCharacter->field_0x1c--;
+                    if (pCharacter->field_0x1c < 0) {
+                        if (move->move_flags & 0x1) {
+                            pCharacter->field_0x1c++;
+                            SetCharacterBonePositions(pCharacter, 3, 1);
+                            i = 0;
+                        } else {
+                            pCharacter->field_0x1c = pCharacter->personality->form->moves[pCharacter->field_0x7].move->count_frames - 1;
+                        }
+                    }
+                }
+            }
+            if (!frames && ((pCharacter->field_0x14 & 0x4) || gAction_replay_mode)) {
+                SetCharacterBonePositions(pCharacter, 0, 0);
+            }
+        }
+    }
+    pCharacter->field_0x24 = pTime;
+    if (frames != 0) {
+        BrVector3Sub(&pCharacter->field_0xd8, (br_vector3*)mat->m[3], &old_pos);
+        pCharacter->field_0xd8.v[0] /= pCharacter->field_0x1e * (float)frames * 0.001;
+        pCharacter->field_0xd8.v[1] /= pCharacter->field_0x1e * (float)frames * 0.001;
+        pCharacter->field_0xd8.v[2] /= (float)frames * pCharacter->field_0x1e * 0.001;
+    } else if (!pCharacter->field_0x1e) {
+        BrVector3Set(&pCharacter->field_0xd8, 0.0, 0.f, 0.0f);
+    }
+}
 
 // SetOnGroundVector
 
