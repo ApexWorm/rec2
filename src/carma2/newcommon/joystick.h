@@ -14,6 +14,7 @@
 #include "rec2_types.h"
 
 extern int gJoystick_index;
+extern int gForceFeedbackAvailable;
 extern float gJoystick_x_steering;
 extern float gJoystick_y_throttle;
 extern int gINT_00595f84;
@@ -66,11 +67,15 @@ extern int C2_HOOK_FASTCALL FUN_0045c590(int pKey);
 
 extern void C2_HOOK_FASTCALL FUN_0045c5d0(void);
 
+extern void C2_HOOK_FASTCALL FUN_0045c5f0(const char* pEffect_name);
+
 extern void C2_HOOK_FASTCALL FUN_0045c680(void);
 
 extern void C2_HOOK_FASTCALL StopDinputEffect(int pIndex);
 
 extern void C2_HOOK_FASTCALL UnloadDinputFFBEffectAtIndex(int index);
+
+extern int C2_HOOK_FASTCALL FUN_004583a0(const char* pEffect_name, int pTrigger_button);
 
 extern void C2_HOOK_FASTCALL SetJoystickDPadEnabled(int pEnabled);
 

@@ -933,6 +933,27 @@ void C2_HOOK_FASTCALL FUN_0045c5d0(void) {
     gINT_0059630c = -1;
 }
 
+// FUNCTION: CARMA2_HW 0x0045c5f0
+// FUNCTION: CARMA2_SW 0x0045c030
+// FUNCTION: CARMA2_CHEAT 0x0045ca70
+void C2_HOOK_FASTCALL FUN_0045c5f0(const char* pEffect_name) {
+    int button;
+    int index;
+
+    if (gForceFeedbackAvailable) {
+        button = FUN_0045c590(61);
+        if (button != -1) {
+            index = PDFindJoystickEffect(pEffect_name);
+            if (index != -1 && index != gINT_0059630c) {
+                FUN_0045c5d0();
+                if (FUN_004583a0(pEffect_name, button)) {
+                    gINT_0059630c = index;
+                }
+            }
+        }
+    }
+}
+
 // FUNCTION: CARMA2_HW 0x0045c680
 // FUNCTION: CARMA2_SW 0x0045c0c0
 // FUNCTION: CARMA2_CHEAT 0x0045cb00

@@ -21,6 +21,7 @@ int gASCII_shift_table[151];
 int gScan_code[SDL_SCANCODE_COUNT];
 int gJoystick_deadzone = 8000;
 int gINT_00595f9c = 1;
+int gForceFeedbackAvailable;
 
 static int gLast_joystick_index = -1;
 static bool gJoysticks_enabled = true;
@@ -571,6 +572,12 @@ void C2_HOOK_FASTCALL StopDinputEffect(int pIndex) {
 
 void C2_HOOK_FASTCALL UnloadDinputFFBEffectAtIndex(int index) {
     (void)index;
+}
+
+int C2_HOOK_FASTCALL FUN_004583a0(const char* pEffect_name, int pTrigger_button) {
+    (void)pEffect_name;
+    (void)pTrigger_button;
+    return 0;
 }
 
 tButtonJoystickInfo* C2_HOOK_FASTCALL PDGetCurrentJoystickData(void) {
