@@ -18,6 +18,7 @@ extern int gForceFeedbackAvailable;
 extern float gJoystick_x_steering;
 extern float gJoystick_y_throttle;
 extern int gINT_00595f84;
+extern int gCurrent_exclusive_ffb_effect;
 extern int gINT_00596310;
 extern int gJoystick_preferences_backup_valid;
 extern tButtonJoystickInfo gJoystick_preferences_backup;
@@ -79,7 +80,7 @@ extern int C2_HOOK_FASTCALL FUN_004583a0(const char* pEffect_name, int pTrigger_
 
 extern void C2_HOOK_FASTCALL SetJoystickDPadEnabled(int pEnabled);
 
-extern int C2_HOOK_FASTCALL PlayExclusiveFFBEffect(const char* pEffect_name, int pArg2);
+extern void C2_HOOK_FASTCALL PlayExclusiveFFBEffect(const char* pEffect_name, int pArg2);
 
 extern int C2_HOOK_FASTCALL CycleJoystickFFBGain(void);
 
