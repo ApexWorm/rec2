@@ -18,6 +18,7 @@
 #include "70-packfile.h"
 #include "globvars.h"
 #include "globvrpb.h"
+#include "platform.h"
 #include "rec2_macros.h"
 
 #include <string.h>
@@ -884,4 +885,23 @@ void C2_HOOK_FASTCALL DisallowDuplicates(void) {
 void C2_HOOK_FASTCALL AllowDuplicates(void) {
 
     gDisallow_duplicates = 0;
+}
+
+// FUNCTION: CARMA2_HW 0x00502d80
+// FUNCTION: CARMA2_SW 0x004fe6d0
+// FUNCTION: CARMA2_CHEAT 0x00508a20
+br_pixelmap* C2_HOOK_FASTCALL SwapPixelmapInStorage(br_pixelmap* pNew, br_pixelmap* pOriginal, tBrender_storage* pStorage) {
+    int i;
+
+    for (i = 0; i < pStorage->pixelmaps_count; i++) {
+        if (pOriginal == pStorage->pixelmaps[i]) {
+            BrMapRemove(pOriginal);
+            BrPixelmapFree(pOriginal);
+            pStorage->pixelmaps[i] = pNew;
+            BrMapAdd(pNew);
+            return pNew;
+        }
+    }
+    PDFatalError("Can't swap in pixelmap");
+    return NULL;
 }
