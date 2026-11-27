@@ -354,13 +354,13 @@ extern void C2_HOOK_FASTCALL ChangeSmashTexture(br_material* pMaterial, tCar_spe
 
 // DoNetSmash
 
-// ReceivedSmashEnvironment
+extern void C2_HOOK_FASTCALL ReceivedSmashEnvironment(tQueued_net_smash* pSmash);
 
 // DoQueuedNetSmashes
 
 // FindTheBastard
 
-// ReceivedSmashShraps
+extern void C2_HOOK_FASTCALL ReceivedSmashShraps(tNet_message_chunk* pContents);
 
 // MungeSmashEdgeTriggers
 

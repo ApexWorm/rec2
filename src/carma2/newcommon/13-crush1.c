@@ -2658,25 +2658,50 @@ void C2_HOOK_FASTCALL ARUndoSplitWeld(tCar_spec* pCar) {
     NOT_IMPLEMENTED();
 }
 
-// ReceivedCrush
+// STUB: CARMA2_HW 0x0043c480
+// STUB: CARMA2_SW 0x0043c4d0
+// STUB: CARMA2_CHEAT 0x0043c6d0
+void C2_HOOK_FASTCALL ReceivedCrush(tNet_message_chunk* pContents) {
+    NOT_IMPLEMENTED();
+}
 
 // FindBitWithID
 
 // AttachedBitFromID
 
-// ReceivedSemiDetachBit
+// STUB: CARMA2_HW 0x0043c940
+// STUB: CARMA2_SW 0x0043c990
+// STUB: CARMA2_CHEAT 0x0043cba0
+void C2_HOOK_FASTCALL ReceivedSemiDetachBit(tNet_message_chunk* pContents) {
+    NOT_IMPLEMENTED();
+}
 
-// ReceivedDetachBit
+// STUB: CARMA2_HW 0x0043caf0
+// STUB: CARMA2_SW 0x0043cb40
+// STUB: CARMA2_CHEAT 0x0043cd50
+void C2_HOOK_FASTCALL ReceivedDetachBit(tNet_message_chunk* pContents) {
+    NOT_IMPLEMENTED();
+}
 
 // SemiDetachedBitObjectFromID
 
-// ReceivedFullyDetachBit
+// STUB: CARMA2_HW 0x0043cbd0
+// STUB: CARMA2_SW 0x0043cc20
+// STUB: CARMA2_CHEAT 0x0043ce30
+void C2_HOOK_FASTCALL ReceivedFullyDetachBit(tNet_message_chunk* pContents) {
+    NOT_IMPLEMENTED();
+}
 
 // DetachedBitFromID
 
 // SemiDetachedBitFromID
 
-// ReceivedReAttachBit
+// STUB: CARMA2_HW 0x0043cd60
+// STUB: CARMA2_SW 0x0043cdb0
+// STUB: CARMA2_CHEAT 0x0043cfc0
+void C2_HOOK_FASTCALL ReceivedReAttachBit(tNet_message_chunk* pContents) {
+    NOT_IMPLEMENTED();
+}
 
 // FUNCTION: CARMA2_HW 0x0043ce60
 // FUNCTION: CARMA2_SW 0x0043ceb0
@@ -2703,11 +2728,21 @@ void C2_HOOK_FASTCALL ReceivedReAttachAllBits(tNet_message_chunk* pContents) {
 
 // SendDBNonCar
 
-// ReceivedDBNonCar
+// STUB: CARMA2_HW 0x0043d340
+// STUB: CARMA2_SW 0x0043d390
+// STUB: CARMA2_CHEAT 0x0043d5c0
+void C2_HOOK_FASTCALL ReceivedDBNonCar(tNet_message_chunk* pContents) {
+    NOT_IMPLEMENTED();
+}
 
 // SendAllDBNonCars
 
-// ReceivedDBNonCarPosition
+// STUB: CARMA2_HW 0x0043d5f0
+// STUB: CARMA2_SW 0x0043d640
+// STUB: CARMA2_CHEAT 0x0043d870
+void C2_HOOK_FASTCALL ReceivedDBNonCarPosition(tNet_message_chunk* pContents) {
+    NOT_IMPLEMENTED();
+}
 
 // FUNCTION: CARMA2_HW 0x0043d670
 // FUNCTION: CARMA2_SW 0x0043d6c0
@@ -2727,7 +2762,12 @@ void C2_HOOK_FASTCALL ReceivedToggleFlaps(tNet_message_chunk* pContents) {
 
 // SendAllSHNonCars
 
-// ReceivedSHNonCar
+// STUB: CARMA2_HW 0x0043d810
+// STUB: CARMA2_SW 0x0043d860
+// STUB: CARMA2_CHEAT 0x0043dac0
+void C2_HOOK_FASTCALL ReceivedSHNonCar(tNet_message_chunk* pContents) {
+    NOT_IMPLEMENTED();
+}
 
 // FUNCTION: CARMA2_HW 0x0043d900
 // FUNCTION: CARMA2_SW 0x0043d950

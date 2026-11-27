@@ -496,25 +496,25 @@ extern void C2_HOOK_FASTCALL ARApplySplitWeld(tCar_spec* pCar, const br_vector4*
 
 extern void C2_HOOK_FASTCALL ARUndoSplitWeld(tCar_spec* pCar);
 
-// ReceivedCrush
+extern void C2_HOOK_FASTCALL ReceivedCrush(tNet_message_chunk* pContents);
 
 // FindBitWithID
 
 // AttachedBitFromID
 
-// ReceivedSemiDetachBit
+extern void C2_HOOK_FASTCALL ReceivedSemiDetachBit(tNet_message_chunk* pContents);
 
-// ReceivedDetachBit
+extern void C2_HOOK_FASTCALL ReceivedDetachBit(tNet_message_chunk* pContents);
 
 // SemiDetachedBitObjectFromID
 
-// ReceivedFullyDetachBit
+extern void C2_HOOK_FASTCALL ReceivedFullyDetachBit(tNet_message_chunk* pContents);
 
 // DetachedBitFromID
 
 // SemiDetachedBitFromID
 
-// ReceivedReAttachBit
+extern void C2_HOOK_FASTCALL ReceivedReAttachBit(tNet_message_chunk* pContents);
 
 extern void C2_HOOK_FASTCALL ReceivedReAttachAllBits(tNet_message_chunk* pContents);
 
@@ -524,11 +524,11 @@ extern void C2_HOOK_FASTCALL ReceivedReAttachAllBits(tNet_message_chunk* pConten
 
 // SendDBNonCar
 
-// ReceivedDBNonCar
+extern void C2_HOOK_FASTCALL ReceivedDBNonCar(tNet_message_chunk* pContents);
 
 // SendAllDBNonCars
 
-// ReceivedDBNonCarPosition
+extern void C2_HOOK_FASTCALL ReceivedDBNonCarPosition(tNet_message_chunk* pContents);
 
 extern void C2_HOOK_FASTCALL ReceivedToggleFlaps(tNet_message_chunk* pContents);
 
@@ -538,7 +538,7 @@ extern void C2_HOOK_FASTCALL ReceivedToggleFlaps(tNet_message_chunk* pContents);
 
 // SendAllSHNonCars
 
-// ReceivedSHNonCar
+extern void C2_HOOK_FASTCALL ReceivedSHNonCar(tNet_message_chunk* pContents);
 
 extern int C2_HOOK_FASTCALL GetNetShapeDataLengthFromShape(tCar_spec* pCar);
 

@@ -5450,8 +5450,14 @@ typedef struct {
 } tRepair_animation;
 
 typedef enum {
+    eNet_message_chunk_type_send_me_details = 0x0,
+    eNet_message_chunk_type_details = 0x1,
+    eNet_message_chunk_type_join = 0x2,
+    eNet_message_chunk_type_player_list = 0x3,
+    eNet_message_chunk_type_guarantee_reply = 0x4,
     eNet_message_chunk_type_5 = 0x5,
     eNet_message_chunk_poll_car_details = 0x6,
+    eNet_message_chunk_type_car_details = 0x7,
     eNet_message_chunk_type_leave = 0x8,
     eNet_message_chunk_type_hosticide = 0x9,
     eNet_message_chunk_type_race_over = 0xa,
@@ -5459,20 +5465,44 @@ typedef enum {
     eNet_message_chunk_type_start_race = 0xc,
     eNet_message_chunk_type_headup = 0xd,
     eNet_message_chunk_type_netsynch = 0xe,
+    eNet_message_chunk_type_host_reply = 0xf,
+    eNet_message_chunk_type_mechanics = 0x10,
+    eNet_message_chunk_type_non_car = 0x11,
+    eNet_message_chunk_type_time_sync = 0x12,
+    eNet_message_chunk_type_confirm = 0x13,
+    eNet_message_chunk_type_disable_car = 0x14,
+    eNet_message_chunk_type_enable_car = 0x15,
     eNet_message_chunk_type_powerup = 0x16,
+    eNet_message_chunk_type_recover = 0x17,
     eNet_message_chunk_type_player_scores = 0x18,
+    eNet_message_chunk_type_wasted = 0x19,
+    eNet_message_chunk_type_pedestrian = 0x1a,
     eNet_message_chunk_type_gameplay = 0x1b,
+    eNet_message_chunk_type_non_car_position = 0x1c,
+    eNet_message_chunk_type_cop_info = 0x1d,
     eNet_message_chunk_type_game_scores = 0x1e,
     eNet_message_chunk_type_oil_spill = 0x1f,
     eNet_message_chunk_type_car_crush = 0x20,
+    eNet_message_chunk_type_smash = 0x21,
+    eNet_message_chunk_type_smash_shraps = 0x22,
+    eNet_message_chunk_type_repulse = 0x23,
     eNet_message_chunk_type_semi_detach_bit = 0x24,
+    eNet_message_chunk_type_fully_detach_bit = 0x25,
     eNet_message_chunk_type_reattach_bit = 0x26,
+    eNet_message_chunk_type_db_non_car = 0x27,
+    eNet_message_chunk_type_db_non_car_position = 0x28,
+    eNet_message_chunk_type_sh_non_car = 0x29,
+    eNet_message_chunk_type_shape_numbers = 0x2a,
     eNet_message_chunk_type_reattach_all_bits = 0x2b,
     eNet_message_chunk_type_toggle_doors = 0x2c,
+    eNet_message_chunk_type_simple_car_pos = 0x2d,
     eNet_message_chunk_type_group_status = 0x2e,
     eNet_message_chunk_type_view_car = 0x2f,
+    eNet_message_chunk_type_activate_lift = 0x30,
     eNet_message_chunk_type_mine_explosion = 0x31,
+    eNet_message_chunk_type_reposition_car = 0x32,
     eNet_message_chunk_type_detach_bit = 0x33,
+    eNet_message_chunk_type_duplicate = 0xfe,
 } tNet_message_chunk_type;
 
 typedef struct {
@@ -5500,15 +5530,15 @@ typedef struct {
 
 typedef struct {
     tU8 index;
-    tU8 next_car_index;
+    tS8 next_car_index;
     tCompressed_matrix3 matrix;
 } tNet_start_race_car;
 
 typedef struct {
     tNet_message_chunk_header header;
-    tU8 car_count;
+    tS8 car_count;
     tU8 racing;
-    tU8 next_race;
+    tS8 next_race;
     tNet_start_race_car car_list[12];
 } tNet_message_chunk_start_race;
 
@@ -5599,7 +5629,80 @@ typedef struct {
 
 typedef struct {
     tNet_message_chunk_header header;
+    tU16 guarantee_number;
 } tNet_message_guaranteed;
+
+typedef struct {
+    tNet_message_chunk_header header;
+    tU16 guarantee_number;
+} tNet_message_chunk_guarantee_reply;
+
+typedef struct {
+    tNet_message_chunk_header header;
+    undefined field_0x2[2];
+    tNet_game_details details;
+} tNet_message_chunk_details;
+
+typedef struct {
+    int car_index;
+    char owner[16];
+} tNet_car_details;
+
+typedef struct {
+    tNet_message_chunk_header header;
+    undefined field_0x2[2];
+    int count;
+    tNet_car_details details[12];
+} tNet_message_chunk_car_details;
+
+typedef struct {
+    tNet_message_chunk_header header;
+    undefined field_0x2[2];
+    int race_has_started;
+    int race_index;
+    int pending_race;
+} tNet_message_chunk_host_reply;
+
+typedef struct {
+    tNet_message_chunk_header header;
+    undefined field_0x2[2];
+    tU32 race_start_time;
+} tNet_message_chunk_time_sync;
+
+typedef struct {
+    tNet_message_chunk_header header;
+    undefined field_0x2[2];
+    tPlayer_ID player;
+} tNet_message_chunk_confirm;
+
+typedef struct {
+    tNet_message_chunk_header header;
+    undefined field_0x2[2];
+    tPlayer_ID victim;
+    tPlayer_ID culprit;
+} tNet_message_chunk_wasted;
+
+typedef struct {
+    tNet_message_chunk_header header;
+    tU16 index;
+    tU32 id;
+} tNet_message_chunk_activate_lift;
+
+typedef struct {
+    tNet_message_chunk_header header;
+    undefined field_0x2[2];
+    undefined4 field_0x4;
+    int inactive;
+    tU8 player_index;
+    undefined field_0xd;
+    tCompressed_matrix3 matrix;
+} tNet_message_chunk_reposition_car;
+
+typedef struct {
+    tPlayer_ID sender;
+    tU16 guarantee_number;
+    tU16 type;
+} tRecent_guarantee;
 
 typedef struct {
     tNet_message_chunk_header header;
@@ -5735,26 +5838,37 @@ typedef struct {
 
 typedef union {
     tNet_message_chunk_raw raw;
+    tNet_message_chunk_details details; /* type = 0x1 */
     tNet_message_chunk_join join; /* type = 0x2 */
     tNet_message_chunk_player_list player_list; /* type = 0x3 */
+    tNet_message_chunk_guarantee_reply guarantee_reply; /* type = 0x4 */
+    tNet_message_guaranteed guaranteed; /* type = 0x5 */
+    tNet_message_chunk_car_details car_details; /* type = 0x7 */
     tNet_message_chunk_race_over race_over; /* type = 0xa */
     tNet_message_chunk_status_report status_report; /* type = 0xb */
     tNet_message_chunk_start_race start_race; /* type = 0xc */
     tNet_message_headup headup; /* type = 0xd */
+    tNet_message_chunk_host_reply host_reply; /* type = 0xf */
+    tNet_message_chunk_time_sync time_sync; /* type = 0x12 */
+    tNet_message_chunk_confirm confirm; /* type = 0x13 */
     tNet_message_chunk_powerup powerup; /* type = 0x16 */
     tNet_message_chunk_scores scores; /* type = 0x18 */
+    tNet_message_chunk_wasted wasted; /* type = 0x19 */
     tNet_message_chunk_gameplay gameplay; /* type = 0x1b */
     tNet_message_chunk_game_scores game_scores; /* type = 0x1e */
     tNet_message_chunk_oil_spill oil_spill; /* type = 0x1f*/
     tNet_message_car_crush car_crush; /* type = 0x20 */
+    tQueued_net_smash smash; /* type = 0x21 */
     tNet_message_chunk_semi_detach_bit semi_detach_bit; /* type = 0x24 */
     tNet_message_chunk_reattach_bit reattach_bit; /* type = 0x26 */
     tNet_message_chunk_reattach_all_bits reattach_all_bits; /* type = 0x2b */
     tNet_message_chunk_toggle_doors toggle_doors; /* type = 0x2c */
     tNet_message_chunk_group_status group_status; /* type = 0x2e */
     tNet_message_chunk_view_car view_car; /* type = 0x2f */
+    tNet_message_chunk_activate_lift activate_lift; /* type = 0x30 */
     tNet_message_chunk_mine_explode mine_explode; /* type = 0x31 */
-    tNet_message_chunk_recover recover;
+    tNet_message_chunk_reposition_car reposition_car; /* type = 0x32 */
+    tNet_message_chunk_recover recover; /* type = 0x17 */
     tNet_message_chunk_detach_bit detach_bit; /* type = 0x33 */
 } tNet_message_chunk;
 
@@ -5831,6 +5945,7 @@ enum {
     eMiscString_playing = 70,
     eMiscString_closed = 71,
     eMiscString_open = 72,
+    eMiscString_game_terminated_by_host = 73,
     eMiscString_has_left_the_game = 74,
     eMiscString_status_unknown = 77,
     eMiscString_status_ready = 78,
@@ -5844,6 +5959,7 @@ enum {
     eMiscString_status_in_action_replay = 86,
     eMiscString_host_abandoned_race = 87,
     eMiscString_host = 88,
+    eMiscString_sorry_youre_too_late = 89,
     eMiscString_cant_afford_to_recover = 96,
     eMiscString_recovery_in = 97,
     eMiscString_second = 98,
@@ -5872,7 +5988,11 @@ enum {
     eMiscString_accessories_off = 121,
     eMiscString_net_games_always_accessorized = 124,
     eMiscString_recovery_cancelled = 125,
+    eMiscString_and = 126,
+    eMiscString_wasted_each_other = 127,
+    eMiscString_race_changed_during_loading = 128,
     eMiscString_task_switched = 139,
+    eMiscString_wasted_by = 171,
     eMiscString_you_re_already_at_max_you_need_more_slots = 174,
     eMiscString_armor_strengthened = 175,
     eMiscString_engine_power_increased = 176,
@@ -5895,6 +6015,7 @@ enum {
     eMiscString_won = 212,
     eMiscString_score = 213,
     eMiscString_fox_cant_do_that = 214,
+    eMiscString_cop = 216,
     eMiscString_watching = 217,
     eMiscString_race_leader = 218,
     eMiscString_message_sent = 226,

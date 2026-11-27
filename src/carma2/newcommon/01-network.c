@@ -8,19 +8,29 @@
 
 #include "01-network.h"
 
+#include "00-car.h"
+#include "03-racestrt.h"
 #include "04-netgame.h"
+#include "07-structur.h"
 #include "13-crush1.h"
 #include "15-displays.h"
 #include "18-graphics2.h"
 #include "18b-graphics2.h"
 #include "19-font.h"
+#include "27-powerup.h"
 #include "28-world3.h"
 #include "32-spark.h"
+#include "39-oil.h"
 #include "41-utility.h"
+#include "43-pratcam.h"
 #include "47-win95net.h"
+#include "51-smash.h"
 #include "52-errors.h"
 #include "53-controls.h"
+#include "58-crush2.h"
+#include "59-camera.h"
 #include "68-timer.h"
+#include "72-interface.h"
 #include "platform.h"
 #include "globvars.h"
 #include "globvrpb.h"
@@ -126,6 +136,11 @@ tNet_message_memory* gDynamic_messages;
 // GLOBAL: CARMA2_CHEAT 0x006984ec
 tU32 gLast_flush_message;
 
+// GLOBAL: CARMA2_HW 0x00690c50
+// GLOBAL: CARMA2_SW 0x0068aca8
+// GLOBAL: CARMA2_CHEAT 0x006984f0
+int gNext_recent_guarantee;
+
 // GLOBAL: CARMA2_HW 0x00690c54
 // GLOBAL: CARMA2_SW 0x0068acac
 // GLOBAL: CARMA2_CHEAT 0x006984f4
@@ -181,6 +196,11 @@ tU32 gUINT_0074a690;
 // GLOBAL: CARMA2_CHEAT 0x00751d34
 int gReceived_game_scores;
 
+// GLOBAL: CARMA2_HW 0x0074a6a0
+// GLOBAL: CARMA2_SW 0x00741160
+// GLOBAL: CARMA2_CHEAT 0x00751d40
+tRecent_guarantee gRecent_guarantees[15];
+
 // GLOBAL: CARMA2_HW 0x0074a718
 // GLOBAL: CARMA2_SW 0x007411d8
 // GLOBAL: CARMA2_CHEAT 0x00751db8
@@ -227,6 +247,16 @@ tU16 gGuarantee_number = 1;
 // GLOBAL: CARMA2_SW 0x0065464c
 // GLOBAL: CARMA2_CHEAT 0x00660654
 int INT_00659d34 = -1;
+
+// GLOBAL: CARMA2_HW 0x00659d38
+// GLOBAL: CARMA2_SW 0x00654650
+// GLOBAL: CARMA2_CHEAT 0x00660658
+int gRace_only_flags[52] = {
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1,
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1,
+    1, 1, 1, 1,
+};
 
 // GLOBAL: CARMA2_HW 0x0068d958
 // GLOBAL: CARMA2_SW 0x006879b0
@@ -1205,9 +1235,25 @@ tNet_message* C2_HOOK_FASTCALL NetGetNextMessage(tNet_game_details* pDetails, vo
 #pragma auto_inline(on)
 #endif
 
-// ReceivedSendMeDetails
+inline void C2_HOOK_FASTCALL ReceivedSendMeDetails(tNet_message_chunk* pContents, void* pSender_address) {
+    tNet_message* message;
 
-// ReceivedDetails
+    if (!gDont_allow_joiners) {
+        message = NetBuildMessage(eNet_message_chunk_type_details, 0);
+        memcpy(message->contents.details.details.host_name, gCurrent_net_game->host_name,
+            sizeof(tNet_game_details) - offsetof(tNet_game_details, host_name));
+        NetSendMessageToAddress(gCurrent_net_game, message, pSender_address);
+    }
+}
+
+inline void C2_HOOK_FASTCALL ReceivedDetails(tNet_message_chunk* pContents) {
+
+    if (gCurrent_join_poll_game != NULL) {
+        gBastard_has_answered = 1;
+        memcpy(gCurrent_join_poll_game->host_name, pContents->details.details.host_name,
+            sizeof(tNet_game_details) - offsetof(tNet_game_details, host_name));
+    }
+}
 
 inline void C2_HOOK_FASTCALL SendOutPlayerList(void) {
     tNet_message* message;
@@ -1235,7 +1281,66 @@ inline void C2_HOOK_FASTCALL SendOutPlayerList(void) {
     }
 }
 
-// ReceivedJoin
+inline void C2_HOOK_FASTCALL ReceivedJoin(tNet_message_chunk* pContents, void* pSender_address, tPlayer_ID pPlayer) {
+    int i;
+    int new_player_count;
+    int slot_index;
+    tNet_message* message;
+    tNet_game_player_info* new_players;
+
+    if (gNet_mode != eNet_mode_host || gCurrent_net_game == NULL) {
+        return;
+    }
+    for (i = 0; i < gNumber_of_net_players; i++) {
+        if (gNet_players[i].ID == pPlayer) {
+            return;
+        }
+    }
+    slot_index = gNumber_of_net_players;
+    new_player_count = slot_index + 1;
+    new_players = BrMemAllocate(new_player_count * sizeof(tNet_game_player_info), kMem_player_list_join);
+    memcpy(new_players, gNet_players, slot_index * sizeof(tNet_game_player_info));
+    if ((!gCurrent_net_game->options.open_game && gProgram_state.racing)
+            || gCurrent_net_game->num_players >= 12
+            || gDont_allow_joiners) {
+        message = NetBuildMessage(eNet_message_chunk_type_player_list, 0);
+        message->contents.player_list.number_of_players = 0;
+        NetSendMessageToAddress(gCurrent_net_game, message, pSender_address);
+        return;
+    }
+    for (i = 0; i < slot_index; i++) {
+        if (new_players[i].ID == pContents->join.player_info.ID) {
+            return;
+        }
+    }
+    if (pContents->join.player_info.car_index < 0) {
+        pContents->join.player_info.car_index = PickARandomCar();
+    } else {
+        for (i = 0; i < gNumber_of_net_players; i++) {
+            if (gNet_players[i].car_index == pContents->join.player_info.car_index) {
+                message = NetBuildMessage(eNet_message_chunk_type_player_list, 0);
+                message->contents.player_list.number_of_players = -1;
+                NetSendMessageToAddress(gCurrent_net_game, message, pSender_address);
+                return;
+            }
+        }
+    }
+    if (pContents->join.player_info.car_index >= 0) {
+        gCar_details[pContents->join.player_info.car_index].ownership = eCar_owner_someone;
+    }
+    memcpy(&new_players[slot_index], &pContents->join.player_info, sizeof(tNet_game_player_info));
+    new_players[slot_index].player_status = ePlayer_status_loading;
+    new_players[slot_index].last_heard_from_him = PDGetTotalTime();
+    new_players[slot_index].grid_position_set = 0;
+    new_players[slot_index].field_0x58 = 0;
+    if (new_players[slot_index].player_name[0] == '\0') {
+        sprintf(new_players[slot_index].player_name, "%s %d", "PLAYER", slot_index);
+    }
+    NetSetPlayerSystemInfo(&new_players[slot_index], pSender_address);
+    NetPlayersChanged(new_player_count, new_players);
+    BrMemFree(new_players);
+    SendOutPlayerList();
+}
 
 // FUNCTION: CARMA2_HW 0x004a4660
 // FUNCTION: CARMA2_SW 0x004a07e0
@@ -1270,7 +1375,10 @@ void C2_HOOK_FASTCALL KickPlayerOut(tPlayer_ID pID) {
     SendOutPlayerList();
 }
 
-// ReceivedLeave
+inline void C2_HOOK_FASTCALL ReceivedLeave(tNet_message_chunk* pContents, tNet_message* pMessage) {
+
+    KickPlayerOut(pMessage->header.field_0x8);
+}
 
 // FUNCTION: CARMA2_HW 0x004a0080
 // FUNCTION: CARMA2_SW 0x0049c200
@@ -1328,9 +1436,19 @@ void C2_HOOK_FASTCALL NetFullScreenMessage(int pStr_index, int pLeave_it_up_ther
     }
 }
 
-// HostHasBittenTheDust
+inline void C2_HOOK_FASTCALL HostHasBittenTheDust(int pMessage_index) {
 
-// ReceivedHosticide
+    if (!gHost_died) {
+        gHost_died = 1;
+        NetFullScreenMessage(pMessage_index, 0);
+        gProgram_state.prog_status = eProg_idling;
+    }
+}
+
+inline void C2_HOOK_FASTCALL ReceivedHosticide(tNet_message_chunk* pContents) {
+
+    HostHasBittenTheDust(eMiscString_game_terminated_by_host);
+}
 
 // FUNCTION: CARMA2_HW 0x004a48d0
 // FUNCTION: CARMA2_SW 0x004a0a50
@@ -1391,59 +1509,715 @@ void C2_HOOK_FASTCALL ReceivedNewPlayerList(tNet_message_chunk* pContents, tNet_
     }
 }
 
-// ReceivedRaceOver
+inline void C2_HOOK_FASTCALL ReceivedRaceOver(tNet_message_chunk* pContents) {
 
-// ReceivedStatusReport
+    gRace_finished = 0;
+    if (gProgram_state.racing) {
+        if (gNet_mode == eNet_mode_client || pContents->race_over.reason >= eRace_over_8) {
+            RaceCompleted(pContents->race_over.reason);
+        }
+    }
+}
 
-// ReceivedGroupStatus
+inline void C2_HOOK_FASTCALL ReceivedStatusReport(tNet_message_chunk* pContents, tNet_message* pMessage) {
+    int i;
 
-// ReceivedRepositionCar
+    for (i = 0; i < gNumber_of_net_players; i++) {
+        if (gNet_players[i].ID == pMessage->header.field_0x8) {
+            gNet_players[i].player_status = pContents->status_report.status;
+            gNet_players[i].last_heard_from_him = PDGetTotalTime();
+            if (gNet_players[i].player_status >= ePlayer_status_racing && gNet_players[i].player_status != ePlayer_status_recovering) {
+                if (gNet_players[i].car->disabled) {
+                    SendCurrentPowerups();
+                }
+                EnableCar(gNet_players[i].car);
+            } else if (gNet_players[i].player_status < ePlayer_status_racing) {
+                DisableCar(gNet_players[i].car);
+            }
+            return;
+        }
+    }
+}
 
-// ReceivedStartRace
+inline void C2_HOOK_FASTCALL ReceivedGroupStatus(tNet_message_chunk* pContents) {
+    int i;
+    tU32 the_time;
+    tPlayer_ID id_sum;
 
-// ReceivedGuaranteeReply
+    the_time = PDGetTotalTime();
+    id_sum = 0;
+    for (i = 0; i < gNumber_of_net_players; i++) {
+        id_sum += gNet_players[i].ID;
+    }
+    if (id_sum == pContents->group_status.player_id_sum && gNumber_of_net_players == pContents->group_status.number_of_players) {
+        for (i = 0; i < gNumber_of_net_players; i++) {
+            if (i != gThis_net_player_index) {
+                gNet_players[i].player_status = pContents->group_status.player_status[i];
+                if (gNet_players[i].player_status != ePlayer_status_not_responding) {
+                    gNet_players[i].last_heard_from_him = the_time;
+                    if (gNet_players[i].player_status >= ePlayer_status_racing && gNet_players[i].player_status != ePlayer_status_recovering) {
+                        if (gNet_players[i].car->disabled) {
+                            SendCurrentPowerups();
+                        }
+                        EnableCar(gNet_players[i].car);
+                    } else if (gNet_players[i].player_status < ePlayer_status_racing) {
+                        DisableCar(gNet_players[i].car);
+                    }
+                }
+            }
+        }
+    } else {
+        gNet_players[0].player_status = pContents->group_status.player_status[0];
+        gNet_players[0].last_heard_from_him = the_time;
+    }
+}
 
-// ReceivedHeadup
+inline void C2_HOOK_FASTCALL ReceivedRepositionCar(tNet_message_chunk* pContents) {
+    int index;
 
-// ReceivedHostQuery
+    if (gProgram_state.racing) {
+        index = pContents->reposition_car.player_index;
+        ExpandMatrix34(&gNet_players[index].car->car_master_actor->t.t.mat, &pContents->reposition_car.matrix, pContents->reposition_car.inactive);
+        ReinitialiseCar(gNet_players[index].car);
+        if (index == gThis_net_player_index) {
+            if (!gInterface_within_race_mode) {
+                FadePaletteDown();
+            }
+            CancelPendingCunningStunt();
+            gProgram_state.credits = gCurrent_net_game->options.starting_credits;
+            InitialiseExternalCamera();
+        }
+        gNet_players[index].last_waste_message = 0;
+        gNet_players[index].wasteage_attributed = 0;
+    }
+}
 
-// ReceivedHostReply
+inline void C2_HOOK_FASTCALL ReceivedStartRace(tNet_message_chunk* pContents) {
+    int i;
+    int index;
 
-// ReceivedGuaranteedMessage
+    if (!gStart_race_sent) {
+        for (i = 0; i < pContents->start_race.car_count && i < gNumber_of_net_players; i++) {
+            gCurrent_race.number_of_racers = i + 1;
+            gCurrent_race.opponent_list[i].index = -1;
+            gCurrent_race.opponent_list[i].ranking = -1;
+            gCurrent_race.opponent_list[i].car_spec = gNet_players[pContents->start_race.car_list[i].index & 0x7f].car;
+            if (gCurrent_race.opponent_list[i].car_spec == NULL) {
+                HostHasBittenTheDust(eMiscString_sorry_youre_too_late);
+                return;
+            }
+            gCurrent_race.opponent_list[i].net_player_index = pContents->start_race.car_list[i].index & 0x7f;
+            index = gCurrent_race.opponent_list[i].net_player_index;
+            gNet_players[index].last_waste_message = 0;
+            gNet_players[index].wasteage_attributed = 0;
+            gNet_players[index].field_0x80 = 0;
+            if (!gProgram_state.racing
+                    || gCurrent_race.opponent_list[i].car_spec == NULL
+                    || gCurrent_race.opponent_list[i].car_spec->driver != eDriver_local_human) {
+                ExpandMatrix34(&gCurrent_race.opponent_list[i].car_spec->car_master_actor->t.t.mat,
+                    &pContents->start_race.car_list[i].matrix,
+                    pContents->start_race.car_list[i].index & 0x80);
+                InitialiseCar(gCurrent_race.opponent_list[i].car_spec);
+            }
+            gNet_players[pContents->start_race.car_list[i].index & 0x7f].next_car_index = pContents->start_race.car_list[i].next_car_index;
+        }
+        gPending_race = pContents->start_race.next_race;
+        gCurrent_race.number_of_racers = i;
+        gStart_race_sent = 1;
+        if (!pContents->start_race.racing || gProgram_state.racing) {
+            gWait_for_it = 0;
+        } else {
+            gWait_for_it = 1000;
+        }
+    } else {
+        for (i = 0; i < pContents->start_race.car_count && i < gNumber_of_net_players; i++) {
+            gNet_players[pContents->start_race.car_list[i].index & 0x7f].next_car_index = pContents->start_race.car_list[i].next_car_index;
+        }
+    }
+}
 
-// PlayerIsInList
+inline void C2_HOOK_FASTCALL ReceivedGuaranteeReply(tNet_message_chunk* pContents) {
+    int i;
 
-// ReceivedTimeSync
+    for (i = 0; i < gNext_guarantee; i++) {
+        if (gGuarantee_list[i].field_0x2c == pContents->guarantee_reply.guarantee_number) {
+            gGuarantee_list[i].recieved = 1;
+        }
+    }
+}
 
-// ReceivedConfirm
+inline void C2_HOOK_FASTCALL ReceivedHeadup(tNet_message_chunk* pContents) {
 
-// ReceivedDisableCar
+    if (gProgram_state.racing) {
+        NewTextHeadupSlot(4, 0, 3000, -4, pContents->headup.text);
+    }
+}
 
-// ReceivedEnableCar
+inline void C2_HOOK_FASTCALL ReceivedHostQuery(tNet_message_chunk* pContents, tNet_message* pMessage) {
+    tNet_message* message;
 
-// ReceivedActivateLift
+    message = NetBuildGuaranteedMessage(eNet_message_chunk_type_host_reply, 0);
+    message->contents.host_reply.race_has_started = gProgram_state.racing;
+    message->contents.host_reply.race_index = gProgram_state.current_race_index;
+    message->contents.host_reply.pending_race = gPending_race;
+    NetGuaranteedSendMessageToPlayer(gCurrent_net_game, message, pMessage->header.field_0x8, NULL);
+    if (gProgram_state.racing) {
+        SignalToStartRace();
+        NetPlayerFromID(pMessage->header.field_0x8)->field_0x58 = 1;
+    }
+}
 
-// ReceivedScores
+inline void C2_HOOK_FASTCALL ReceivedHostReply(tNet_message_chunk* pContents) {
 
-// ReceivedWasted
+    if (pContents->host_reply.race_index == gProgram_state.current_race_index) {
+        if (pContents->host_reply.race_has_started) {
+            if (!gCurrent_net_game->options.open_game) {
+                NetFullScreenMessage(eMiscString_sorry_youre_too_late, 0);
+                gProgram_state.prog_status = eProg_idling;
+            } else {
+                gPending_race = pContents->host_reply.pending_race;
+            }
+        }
+    } else {
+        NetLeaveGame(gCurrent_net_game);
+        NetFullScreenMessage(eMiscString_race_changed_during_loading, 0);
+        gProgram_state.prog_status = eProg_idling;
+    }
+}
 
-// ReceivedCarDetailsReq
+inline void C2_HOOK_FASTCALL ReceivedGuaranteedMessage(tNet_message* pMessage, tNet_message_chunk* pContents, void* pSender_address) {
+    tNet_message_chunk* reply;
+    tNet_message* message;
 
-// ReceivedCarDetails
+    reply = NetGetToPlayerContents(eNet_message_chunk_type_guarantee_reply, 0, pMessage->header.field_0x8);
+    if (reply == NULL) {
+        message = NetBuildMessage(eNet_message_chunk_type_guarantee_reply, 0);
+        message->contents.guarantee_reply.guarantee_number = pContents->guaranteed.guarantee_number;
+        NetSendMessageToAddress(gCurrent_net_game, message, pSender_address);
+    } else {
+        reply->guarantee_reply.guarantee_number = pContents->guaranteed.guarantee_number;
+    }
+}
 
-// ReceivedGameScores
+inline int C2_HOOK_FASTCALL PlayerIsInList(tPlayer_ID pID) {
+    int i;
 
-// ProcessGuaranteeStuff
+    for (i = 0; i < gNumber_of_net_players; i++) {
+        if (gNet_players[i].ID == pID) {
+            gNet_players[i].last_heard_from_him = PDGetTotalTime();
+            return 1;
+        }
+    }
+    return 0;
+}
+
+inline void C2_HOOK_FASTCALL ReceivedTimeSync(tNet_message_chunk* pContents, tNet_message* pMessage, tU32 pReceive_time) {
+
+    if (pMessage->header.field_0x10 - pContents->time_sync.race_start_time > pReceive_time + 10) {
+        gRace_start -= pMessage->header.field_0x10 - pContents->time_sync.race_start_time - pReceive_time;
+    }
+}
+
+inline void C2_HOOK_FASTCALL ReceivedConfirm(tNet_message_chunk* pContents) {
+    int i;
+
+    for (i = 0; i < gNumber_of_net_players; i++) {
+        if (gNet_players[i].ID == pContents->confirm.player) {
+            gNet_players[i].awaiting_confirmation = 0;
+            return;
+        }
+    }
+}
+
+inline void C2_HOOK_FASTCALL ReceivedDisableCar(tNet_message_chunk* pContents) {
+
+}
+
+inline void C2_HOOK_FASTCALL ReceivedEnableCar(tNet_message_chunk* pContents) {
+
+}
+
+inline void C2_HOOK_FASTCALL ReceivedActivateLift(tNet_message_chunk* pContents) {
+    br_actor* actor;
+    tNon_car_spec* non_car;
+
+    if (pContents->activate_lift.id < (tU32)gProgram_state.track_spec.count_non_cars) {
+        actor = gProgram_state.track_spec.non_car_list[pContents->activate_lift.index];
+        if (actor != NULL) {
+            non_car = actor->type_data;
+            if (non_car != NULL && (non_car->driver != eDriver_4 || (tU16)non_car->car_ID != pContents->activate_lift.id)) {
+                non_car = NULL;
+            }
+            if (non_car == NULL && actor->identifier[1] >= '0' && actor->identifier[1] <= '9') {
+                DoPullActorFromWorld(actor);
+                non_car = actor->type_data;
+            }
+            if (non_car != NULL) {
+                non_car->flags &= ~0xff;
+                non_car->flags |= 0x1;
+            }
+        }
+    }
+}
+
+inline void C2_HOOK_FASTCALL ReceivedScores(tNet_message_chunk* pContents) {
+    int i;
+
+    UseGeneralScore(pContents->scores.general_score);
+    for (i = 0; i < gNumber_of_net_players; i++) {
+        gNet_players[i].score2 = pContents->scores.scores[i];
+    }
+}
+
+inline void C2_HOOK_FASTCALL ReceivedWasted(tNet_message_chunk* pContents) {
+    tNet_game_player_info* victim;
+    tNet_game_player_info* culprit;
+    char s[256];
+    tCar_spec* car;
+    // GLOBAL: CARMA2_HW 0x00690c6c
+    // GLOBAL: CARMA2_SW 0x0068acc4
+    // GLOBAL: CARMA2_CHEAT 0x0069850c
+    static tU32 last_got_wasted_time;
+    // GLOBAL: CARMA2_HW 0x00690c70
+    // GLOBAL: CARMA2_SW 0x0068acc8
+    // GLOBAL: CARMA2_CHEAT 0x00698510
+    static tU32 last_wasted_em_time;
+    // GLOBAL: CARMA2_HW 0x00690c74
+    // GLOBAL: CARMA2_SW 0x0068accc
+    // GLOBAL: CARMA2_CHEAT 0x00698514
+    static tU32 last_wasty_message_time;
+    // GLOBAL: CARMA2_HW 0x00690c78
+    // GLOBAL: CARMA2_SW 0x0068acd0
+    // GLOBAL: CARMA2_CHEAT 0x00698518
+    static tNet_game_player_info* last_culprit;
+    // GLOBAL: CARMA2_HW 0x00690c7c
+    // GLOBAL: CARMA2_SW 0x0068acd4
+    // GLOBAL: CARMA2_CHEAT 0x0069851c
+    static tNet_game_player_info* last_victim;
+
+    victim = NetPlayerFromID(pContents->wasted.victim);
+    if (victim == NULL) {
+        return;
+    }
+    car = victim->car;
+    car->knackered = 1;
+    if (gNet_mode != eNet_mode_host) {
+        ExplodeMeCarUpMeOldMatey(car);
+    }
+    if (pContents->wasted.victim == gLocal_net_ID) {
+        if (gCurrent_net_game->type == eNet_game_type_fight_to_death) {
+            DoFancyHeadup(28);
+            gRace_finished = 1;
+        } else {
+            last_got_wasted_time = PDGetTotalTime();
+            if (last_got_wasted_time - last_wasted_em_time <= 1000) {
+                DoFancyHeadup(25);
+            } else {
+                DoFancyHeadup(24);
+            }
+        }
+    }
+    if (pContents->wasted.culprit == (tPlayer_ID)-1) {
+        if (victim->last_waste_message == 0) {
+            victim->last_waste_message = GetTotalTime();
+        }
+    } else if (!victim->wasteage_attributed) {
+        if (pContents->wasted.culprit == (tPlayer_ID)-2) {
+            culprit = NULL;
+        } else {
+            culprit = NetPlayerFromID(pContents->wasted.culprit);
+        }
+        if (culprit != NULL && gNet_mode == eNet_mode_host && gCurrent_net_game->type == eNet_game_type_1) {
+            culprit->score2++;
+            if (culprit->score2 >= gCurrent_net_game->options.starting_target) {
+                DeclareWinner(culprit - gNet_players);
+            }
+        }
+        victim->last_waste_message = GetTotalTime();
+        victim->wasteage_attributed = 1;
+        if (victim == last_culprit && culprit == last_victim && culprit != NULL && PDGetTotalTime() - last_wasty_message_time < 1000) {
+            sprintf(s, "%s %s %s %s", victim->player_name, GetMiscString(eMiscString_and), culprit->player_name, GetMiscString(eMiscString_wasted_each_other));
+        } else if (culprit != NULL) {
+            sprintf(s, "%s %s %s", victim->player_name, GetMiscString(eMiscString_wasted_by), culprit->player_name);
+        } else {
+            sprintf(s, "%s %s %s", victim->player_name, GetMiscString(eMiscString_wasted_by), GetMiscString(eMiscString_cop));
+        }
+        NewTextHeadupSlot2(4, 0, 3000, -4, s, 0);
+        last_wasty_message_time = PDGetTotalTime();
+        last_culprit = culprit;
+        last_victim = victim;
+        if (pContents->wasted.culprit == gLocal_net_ID) {
+            PratcamEvent(32);
+            last_wasted_em_time = PDGetTotalTime();
+            if (last_wasted_em_time - last_got_wasted_time <= 1000) {
+                DoFancyHeadup(25);
+            } else {
+                DoFancyHeadup(20);
+            }
+        }
+    }
+}
+
+inline void C2_HOOK_FASTCALL ReceivedCarDetailsReq(tNet_message_chunk* pContents, void* pSender_address) {
+    tNet_message* message;
+    int i;
+
+    message = NetBuildGuaranteedMessage(eNet_message_chunk_type_car_details, 0);
+    message->contents.car_details.count = gNumber_of_net_players;
+    for (i = 0; i < gNumber_of_net_players; i++) {
+        message->contents.car_details.details[i].car_index = gNet_players[i].car_index;
+        memcpy(message->contents.car_details.details[i].owner, gNet_players[i].player_name, sizeof(message->contents.car_details.details[i].owner));
+        message->contents.car_details.details[i].owner[sizeof(message->contents.car_details.details[i].owner) - 1] = '\0';
+    }
+    NetGuaranteedSendMessageToAddress(gCurrent_net_game, message, pSender_address, NULL);
+}
+
+inline void C2_HOOK_FASTCALL ReceivedCarDetails(tNet_message_chunk* pContents) {
+    int i;
+    int j;
+
+    SetNetAvailability(gNet_options);
+    for (i = 0; i < gNumber_of_racers; i++) {
+        for (j = 0; j < pContents->car_details.count; j++) {
+            if (i == pContents->car_details.details[j].car_index) {
+                gCar_details[i].ownership = eCar_owner_someone;
+                strcpy(gCar_details[i].name, pContents->car_details.details[j].owner);
+            }
+        }
+    }
+    gReceived_car_details = 1;
+}
+
+inline void C2_HOOK_FASTCALL ReceivedGameScores(tNet_message_chunk* pContents) {
+    int i;
+
+    gReceived_game_scores = 1;
+    for (i = 0; i < gNumber_of_net_players; i++) {
+        gNet_players[i].field_0x7c = pContents->game_scores.players[i].field_0x0;
+        gNet_players[i].field_0x88 = pContents->game_scores.players[i].field_0x4;
+        gNet_players[i].score = pContents->game_scores.players[i].field_0x8;
+    }
+}
+
+inline void C2_HOOK_FASTCALL ProcessGuaranteeStuff(tNet_message* pMessage) {
+    tNet_message_chunk* previous;
+    tNet_message_chunk* contents;
+    int i;
+    int j;
+    int found;
+
+    previous = &pMessage->contents;
+    contents = (tNet_message_chunk*)((tU8*)previous + previous->raw.header.size);
+    for (i = 1; i < pMessage->header.field_0x14; i++) {
+        if (contents->raw.header.type == eNet_message_chunk_type_5) {
+            found = 0;
+            for (j = 0; j < (int)REC2_ASIZE(gRecent_guarantees); j++) {
+                if (contents->guaranteed.guarantee_number == gRecent_guarantees[j].guarantee_number
+                        && pMessage->header.field_0x8 == gRecent_guarantees[j].sender
+                        && previous->raw.header.type == gRecent_guarantees[j].type) {
+                    found = 1;
+                    break;
+                }
+            }
+            if (found) {
+                previous->raw.header.type = eNet_message_chunk_type_duplicate;
+            } else {
+                gRecent_guarantees[gNext_recent_guarantee].guarantee_number = contents->guaranteed.guarantee_number;
+                gRecent_guarantees[gNext_recent_guarantee].sender = pMessage->header.field_0x8;
+                gRecent_guarantees[gNext_recent_guarantee].type = previous->raw.header.type;
+                gNext_recent_guarantee++;
+                if (gNext_recent_guarantee >= (int)REC2_ASIZE(gRecent_guarantees)) {
+                    gNext_recent_guarantee = 0;
+                }
+            }
+        }
+        previous = contents;
+        contents = (tNet_message_chunk*)((tU8*)contents + contents->raw.header.size);
+    }
+}
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x004a0260
-// STUB: CARMA2_SW 0x0049c3e0
-// STUB: CARMA2_CHEAT 0x004a0d90
+// FUNCTION: CARMA2_HW 0x004a0260
+// FUNCTION: CARMA2_SW 0x0049c3e0
+// FUNCTION: CARMA2_CHEAT 0x004a0d90
 void C2_HOOK_FASTCALL ReceivedMessage(tNet_message* pMessage, void* pSender_address, tU32 pReceive_time) {
-    NOT_IMPLEMENTED();
+    tNet_message_chunk* contents;
+    int i;
+
+    contents = &pMessage->contents;
+    if (pMessage->header.field_0x14 == 0xff) {
+        pMessage->header.field_0x14 = 2;
+    }
+    Timers_Push(TIMER_GUA);
+    ProcessGuaranteeStuff(pMessage);
+    Timers_Pop(TIMER_GUA);
+    for (i = 0; i < pMessage->header.field_0x14; i++) {
+        if ((gProgram_state.racing || !gRace_only_flags[contents->raw.header.type])
+                && (!gOnly_receive_guarantee_replies || contents->raw.header.type == eNet_message_chunk_type_guarantee_reply)
+                && (contents->raw.header.type < eNet_message_chunk_type_leave || PlayerIsInList(pMessage->header.field_0x8))) {
+            switch (contents->raw.header.type) {
+            case eNet_message_chunk_type_send_me_details:
+                Timers_Push(TIMER_MAN);
+                ReceivedSendMeDetails(contents, pSender_address);
+                Timers_Pop(TIMER_MAN);
+                break;
+            case eNet_message_chunk_type_details:
+                Timers_Push(TIMER_MAN);
+                ReceivedDetails(contents);
+                Timers_Pop(TIMER_MAN);
+                break;
+            case eNet_message_chunk_type_join:
+                Timers_Push(TIMER_MAN);
+                ReceivedJoin(contents, pSender_address, pMessage->header.field_0x8);
+                Timers_Pop(TIMER_MAN);
+                break;
+            case eNet_message_chunk_type_player_list:
+                Timers_Push(TIMER_MAN);
+                ReceivedNewPlayerList(contents, pMessage);
+                Timers_Pop(TIMER_MAN);
+                break;
+            case eNet_message_chunk_type_guarantee_reply:
+                Timers_Push(TIMER_GUA);
+                ReceivedGuaranteeReply(contents);
+                Timers_Pop(TIMER_GUA);
+                break;
+            case eNet_message_chunk_type_5:
+                Timers_Push(TIMER_GUA);
+                ReceivedGuaranteedMessage(pMessage, contents, pSender_address);
+                Timers_Pop(TIMER_GUA);
+                break;
+            case eNet_message_chunk_poll_car_details:
+                Timers_Push(TIMER_MAN);
+                ReceivedCarDetailsReq(contents, pSender_address);
+                Timers_Pop(TIMER_MAN);
+                break;
+            case eNet_message_chunk_type_car_details:
+                Timers_Push(TIMER_MAN);
+                ReceivedCarDetails(contents);
+                Timers_Pop(TIMER_MAN);
+                break;
+            case eNet_message_chunk_type_leave:
+                Timers_Push(TIMER_MAN);
+                ReceivedLeave(contents, pMessage);
+                Timers_Pop(TIMER_MAN);
+                break;
+            case eNet_message_chunk_type_hosticide:
+                Timers_Push(TIMER_MAN);
+                ReceivedHosticide(contents);
+                Timers_Pop(TIMER_MAN);
+                break;
+            case eNet_message_chunk_type_race_over:
+                Timers_Push(TIMER_MAN);
+                ReceivedRaceOver(contents);
+                Timers_Pop(TIMER_MAN);
+                break;
+            case eNet_message_chunk_type_status_report:
+                Timers_Push(TIMER_MAN);
+                ReceivedStatusReport(contents, pMessage);
+                Timers_Pop(TIMER_MAN);
+                break;
+            case eNet_message_chunk_type_start_race:
+                Timers_Push(TIMER_MAN);
+                ReceivedStartRace(contents);
+                Timers_Pop(TIMER_MAN);
+                break;
+            case eNet_message_chunk_type_headup:
+                Timers_Push(TIMER_MAN);
+                ReceivedHeadup(contents);
+                Timers_Pop(TIMER_MAN);
+                break;
+            case eNet_message_chunk_type_netsynch:
+                Timers_Push(TIMER_MAN);
+                ReceivedHostQuery(contents, pMessage);
+                Timers_Pop(TIMER_MAN);
+                break;
+            case eNet_message_chunk_type_host_reply:
+                Timers_Push(TIMER_MAN);
+                ReceivedHostReply(contents);
+                Timers_Pop(TIMER_MAN);
+                break;
+            case eNet_message_chunk_type_mechanics:
+                Timers_Push(TIMER_PRC);
+                ReceivedMechanics(contents);
+                Timers_Pop(TIMER_PRC);
+                break;
+            case eNet_message_chunk_type_non_car:
+                Timers_Push(TIMER_PRC);
+                ReceivedNonCar(contents);
+                Timers_Pop(TIMER_PRC);
+                break;
+            case eNet_message_chunk_type_time_sync:
+                Timers_Push(TIMER_MAN);
+                ReceivedTimeSync(contents, pMessage, pReceive_time);
+                Timers_Pop(TIMER_MAN);
+                break;
+            case eNet_message_chunk_type_confirm:
+                Timers_Push(TIMER_MAN);
+                ReceivedConfirm(contents);
+                Timers_Pop(TIMER_MAN);
+                break;
+            case eNet_message_chunk_type_disable_car:
+                Timers_Push(TIMER_MAN);
+                ReceivedDisableCar(contents);
+                Timers_Pop(TIMER_MAN);
+                break;
+            case eNet_message_chunk_type_enable_car:
+                Timers_Push(TIMER_MAN);
+                ReceivedEnableCar(contents);
+                Timers_Pop(TIMER_MAN);
+                break;
+            case eNet_message_chunk_type_powerup:
+                Timers_Push(TIMER_MAN);
+                ReceivedPowerup(contents);
+                Timers_Pop(TIMER_MAN);
+                break;
+            case eNet_message_chunk_type_recover:
+                Timers_Push(TIMER_MAN);
+                ReceivedRecover(&contents->recover);
+                Timers_Pop(TIMER_MAN);
+                break;
+            case eNet_message_chunk_type_player_scores:
+                Timers_Push(TIMER_MAN);
+                ReceivedScores(contents);
+                Timers_Pop(TIMER_MAN);
+                break;
+            case eNet_message_chunk_type_wasted:
+                Timers_Push(TIMER_MAN);
+                ReceivedWasted(contents);
+                Timers_Pop(TIMER_MAN);
+                break;
+            case eNet_message_chunk_type_gameplay:
+                Timers_Push(TIMER_MAN);
+                ReceivedGameplay(contents, pMessage, pReceive_time);
+                Timers_Pop(TIMER_MAN);
+                break;
+            case eNet_message_chunk_type_non_car_position:
+                Timers_Push(TIMER_PRC);
+                ReceivedNonCarPosition(contents);
+                Timers_Pop(TIMER_PRC);
+                break;
+            case eNet_message_chunk_type_cop_info:
+                Timers_Push(TIMER_MAN);
+                ReceivedCopInfo(contents);
+                Timers_Pop(TIMER_MAN);
+                break;
+            case eNet_message_chunk_type_game_scores:
+                Timers_Push(TIMER_MAN);
+                ReceivedGameScores(contents);
+                Timers_Pop(TIMER_MAN);
+                break;
+            case eNet_message_chunk_type_oil_spill:
+                Timers_Push(TIMER_MAN);
+                ReceivedOilSpill(contents);
+                Timers_Pop(TIMER_MAN);
+                break;
+            case eNet_message_chunk_type_car_crush:
+                Timers_Push(TIMER_CRC);
+                ReceivedCrush(contents);
+                Timers_Pop(TIMER_CRC);
+                break;
+            case eNet_message_chunk_type_smash:
+                Timers_Push(TIMER_SRC);
+                ReceivedSmashEnvironment(&contents->smash);
+                Timers_Pop(TIMER_SRC);
+                break;
+            case eNet_message_chunk_type_smash_shraps:
+                Timers_Push(TIMER_SRC);
+                ReceivedSmashShraps(contents);
+                Timers_Pop(TIMER_SRC);
+                break;
+            case eNet_message_chunk_type_repulse:
+                Timers_Push(TIMER_MAN);
+                ReceivedRepulse(contents);
+                Timers_Pop(TIMER_MAN);
+                break;
+            case eNet_message_chunk_type_semi_detach_bit:
+                Timers_Push(TIMER_CRC);
+                ReceivedSemiDetachBit(contents);
+                Timers_Pop(TIMER_CRC);
+                break;
+            case eNet_message_chunk_type_fully_detach_bit:
+                Timers_Push(TIMER_CRC);
+                ReceivedFullyDetachBit(contents);
+                Timers_Pop(TIMER_CRC);
+                break;
+            case eNet_message_chunk_type_reattach_bit:
+                Timers_Push(TIMER_CRC);
+                ReceivedReAttachBit(contents);
+                Timers_Pop(TIMER_CRC);
+                break;
+            case eNet_message_chunk_type_db_non_car:
+                Timers_Push(TIMER_CRC);
+                ReceivedDBNonCar(contents);
+                Timers_Pop(TIMER_CRC);
+                break;
+            case eNet_message_chunk_type_db_non_car_position:
+                Timers_Push(TIMER_CRC);
+                ReceivedDBNonCarPosition(contents);
+                Timers_Pop(TIMER_CRC);
+                break;
+            case eNet_message_chunk_type_sh_non_car:
+                Timers_Push(TIMER_CRC);
+                ReceivedSHNonCar(contents);
+                Timers_Pop(TIMER_CRC);
+                break;
+            case eNet_message_chunk_type_shape_numbers:
+                Timers_Push(TIMER_CRC);
+                ReceivedShapeNumbers(contents);
+                Timers_Pop(TIMER_CRC);
+                break;
+            case eNet_message_chunk_type_reattach_all_bits:
+                Timers_Push(TIMER_CRC);
+                ReceivedReAttachAllBits(contents);
+                Timers_Pop(TIMER_CRC);
+                break;
+            case eNet_message_chunk_type_toggle_doors:
+                Timers_Push(TIMER_CRC);
+                ReceivedToggleFlaps(contents);
+                Timers_Pop(TIMER_CRC);
+                break;
+            case eNet_message_chunk_type_simple_car_pos:
+                Timers_Push(TIMER_PRC);
+                ReceivedSimpleCarPos(contents);
+                Timers_Pop(TIMER_PRC);
+                break;
+            case eNet_message_chunk_type_group_status:
+                Timers_Push(TIMER_MAN);
+                ReceivedGroupStatus(contents);
+                Timers_Pop(TIMER_MAN);
+                break;
+            case eNet_message_chunk_type_view_car:
+                Timers_Push(TIMER_MAN);
+                ReceivedViewCar(&contents->view_car, pMessage);
+                Timers_Pop(TIMER_MAN);
+                break;
+            case eNet_message_chunk_type_activate_lift:
+                Timers_Push(TIMER_PRC);
+                ReceivedActivateLift(contents);
+                Timers_Pop(TIMER_PRC);
+                break;
+            case eNet_message_chunk_type_mine_explosion:
+                Timers_Push(TIMER_PRC);
+                ReceivedMine(contents);
+                Timers_Pop(TIMER_PRC);
+                break;
+            case eNet_message_chunk_type_reposition_car:
+                Timers_Push(TIMER_MAN);
+                ReceivedRepositionCar(contents);
+                Timers_Pop(TIMER_MAN);
+                break;
+            case eNet_message_chunk_type_detach_bit:
+                Timers_Push(TIMER_CRC);
+                ReceivedDetachBit(contents);
+                Timers_Pop(TIMER_CRC);
+                break;
+            }
+        }
+        contents = (tNet_message_chunk*)((tU8*)contents + contents->raw.header.size);
+    }
 }
 
 #ifdef REC2_MATCHING

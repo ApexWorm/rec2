@@ -2389,13 +2389,23 @@ void C2_HOOK_FASTCALL ChangeSmashTexture(br_material* pMaterial, tCar_spec* pCar
 
 // DoNetSmash
 
-// ReceivedSmashEnvironment
+// STUB: CARMA2_HW 0x004f60b0
+// STUB: CARMA2_SW 0x004f1d10
+// STUB: CARMA2_CHEAT 0x004fbd50
+void C2_HOOK_FASTCALL ReceivedSmashEnvironment(tQueued_net_smash* pSmash) {
+    NOT_IMPLEMENTED();
+}
 
 // DoQueuedNetSmashes
 
 // FindTheBastard
 
-// ReceivedSmashShraps
+// STUB: CARMA2_HW 0x004f6320
+// STUB: CARMA2_SW 0x004f1f80
+// STUB: CARMA2_CHEAT 0x004fbfc0
+void C2_HOOK_FASTCALL ReceivedSmashShraps(tNet_message_chunk* pContents) {
+    NOT_IMPLEMENTED();
+}
 
 // MungeSmashEdgeTriggers
 

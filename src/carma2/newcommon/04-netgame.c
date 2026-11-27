@@ -144,25 +144,50 @@ void C2_HOOK_FASTCALL ReceivedRecover(tNet_message_chunk_recover* pContents) {
 
 // CopyMechanics
 
-// ReceivedShapeNumbers
+// STUB: CARMA2_HW 0x004983f0
+// STUB: CARMA2_SW 0x00495020
+// STUB: CARMA2_CHEAT 0x004987a0
+void C2_HOOK_FASTCALL ReceivedShapeNumbers(tNet_message_chunk* pContents) {
+    NOT_IMPLEMENTED();
+}
 
 // FillInSimpleCarPos
 
-// ReceivedSimpleCarPos
+// STUB: CARMA2_HW 0x004984c0
+// STUB: CARMA2_SW 0x004950f0
+// STUB: CARMA2_CHEAT 0x00498870
+void C2_HOOK_FASTCALL ReceivedSimpleCarPos(tNet_message_chunk* pContents) {
+    NOT_IMPLEMENTED();
+}
 
-// ReceivedMechanics
+// STUB: CARMA2_HW 0x004985f0
+// STUB: CARMA2_SW 0x00495220
+// STUB: CARMA2_CHEAT 0x004989a0
+void C2_HOOK_FASTCALL ReceivedMechanics(tNet_message_chunk* pContents) {
+    NOT_IMPLEMENTED();
+}
 
 // FUNCTION: CARMA2_HW 0x00498bb0
 // FUNCTION: CARMA2_SW 0x004957e0
 // FUNCTION: CARMA2_CHEAT 0x00498f60
-void C2_HOOK_FASTCALL ReceivedCopInfo(void) {
+void C2_HOOK_FASTCALL ReceivedCopInfo(tNet_message_chunk* pContents) {
 }
 
 // SendAllNonCarPositions
 
-// ReceivedNonCarPosition
+// STUB: CARMA2_HW 0x00498bc0
+// STUB: CARMA2_SW 0x004957f0
+// STUB: CARMA2_CHEAT 0x00498f70
+void C2_HOOK_FASTCALL ReceivedNonCarPosition(tNet_message_chunk* pContents) {
+    NOT_IMPLEMENTED();
+}
 
-// ReceivedNonCar
+// STUB: CARMA2_HW 0x00498c00
+// STUB: CARMA2_SW 0x00495830
+// STUB: CARMA2_CHEAT 0x00498fb0
+void C2_HOOK_FASTCALL ReceivedNonCar(tNet_message_chunk* pContents) {
+    NOT_IMPLEMENTED();
+}
 
 // FUNCTION: CARMA2_HW 0x00498e70
 // FUNCTION: CARMA2_SW 0x00495aa0

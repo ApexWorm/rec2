@@ -266,7 +266,7 @@ extern void C2_HOOK_FASTCALL ActivateMine(tShit_mine* pMine, tPowerup* pPowerup,
 
 // MineSound
 
-// ReceivedMine
+extern void C2_HOOK_FASTCALL ReceivedMine(tNet_message_chunk* pContents);
 
 // ShitMine
 
@@ -298,7 +298,7 @@ extern int C2_HOOK_FASTCALL RepulseOpponents(tPowerup* pPowerup, tCar_spec* pCar
 
 // RepulsePedestrians
 
-// ReceivedRepulse
+extern void C2_HOOK_FASTCALL ReceivedRepulse(tNet_message_chunk* pContents);
 
 // ResetEngineFactor
 
@@ -374,7 +374,7 @@ extern int C2_HOOK_FASTCALL SetMutantCorpses(tPowerup* pPowerup, tCar_spec* pCar
 
 extern void C2_HOOK_FASTCALL ResetMutantCorpses(tPowerup* pPowerup, tCar_spec* pCar);
 
-// ReceivedPowerup
+extern void C2_HOOK_FASTCALL ReceivedPowerup(tNet_message_chunk* pContents);
 
 extern void C2_HOOK_FASTCALL SendCurrentPowerups(void);
 

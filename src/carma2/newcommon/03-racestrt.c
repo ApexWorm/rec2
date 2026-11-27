@@ -60,5 +60,10 @@ int C2_HOOK_FASTCALL SortOpponents(void) {
 
 // DoGridPosition
 
-// ReceivedViewCar
+// STUB: CARMA2_HW 0x00497860
+// STUB: CARMA2_SW 0x00494490
+// STUB: CARMA2_CHEAT 0x00497c10
+void C2_HOOK_FASTCALL ReceivedViewCar(tNet_message_chunk_view_car* pContents, tNet_message* pMessage) {
+    NOT_IMPLEMENTED();
+}
 

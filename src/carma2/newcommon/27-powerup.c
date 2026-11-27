@@ -1604,7 +1604,12 @@ void C2_HOOK_FASTCALL ActivateMine(tShit_mine* pMine, tPowerup* pPowerup, tCar_s
 
 // MineSound
 
-// ReceivedMine
+// STUB: CARMA2_HW 0x004dd210
+// STUB: CARMA2_SW 0x004d9710
+// STUB: CARMA2_CHEAT 0x004e2dd0
+void C2_HOOK_FASTCALL ReceivedMine(tNet_message_chunk* pContents) {
+    NOT_IMPLEMENTED();
+}
 
 // ShitMine
 
@@ -1807,7 +1812,12 @@ int C2_HOOK_FASTCALL RepulseOpponents(tPowerup* pPowerup, tCar_spec* pCar) {
 
 // RepulsePedestrians
 
-// ReceivedRepulse
+// STUB: CARMA2_HW 0x004de5a0
+// STUB: CARMA2_SW 0x004daaa0
+// STUB: CARMA2_CHEAT 0x004e4160
+void C2_HOOK_FASTCALL ReceivedRepulse(tNet_message_chunk* pContents) {
+    NOT_IMPLEMENTED();
+}
 
 // ResetEngineFactor
 
@@ -2147,7 +2157,12 @@ void C2_HOOK_FASTCALL ResetMutantCorpses(tPowerup* pPowerup, tCar_spec* pCar) {
     gMutant_speed = 0.f;
 }
 
-// ReceivedPowerup
+// STUB: CARMA2_HW 0x004dece0
+// STUB: CARMA2_SW 0x004db1e0
+// STUB: CARMA2_CHEAT 0x004e48a0
+void C2_HOOK_FASTCALL ReceivedPowerup(tNet_message_chunk* pContents) {
+    NOT_IMPLEMENTED();
+}
 
 // FUNCTION: CARMA2_HW 0x004dedf0
 // FUNCTION: CARMA2_SW 0x004db2f0

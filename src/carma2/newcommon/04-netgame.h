@@ -42,21 +42,21 @@ extern void C2_HOOK_FASTCALL ReceivedRecover(tNet_message_chunk_recover* pConten
 
 // CopyMechanics
 
-// ReceivedShapeNumbers
+extern void C2_HOOK_FASTCALL ReceivedShapeNumbers(tNet_message_chunk* pContents);
 
 // FillInSimpleCarPos
 
-// ReceivedSimpleCarPos
+extern void C2_HOOK_FASTCALL ReceivedSimpleCarPos(tNet_message_chunk* pContents);
 
-// ReceivedMechanics
+extern void C2_HOOK_FASTCALL ReceivedMechanics(tNet_message_chunk* pContents);
 
-extern void C2_HOOK_FASTCALL ReceivedCopInfo(void);
+extern void C2_HOOK_FASTCALL ReceivedCopInfo(tNet_message_chunk* pContents);
 
 // SendAllNonCarPositions
 
-// ReceivedNonCarPosition
+extern void C2_HOOK_FASTCALL ReceivedNonCarPosition(tNet_message_chunk* pContents);
 
-// ReceivedNonCar
+extern void C2_HOOK_FASTCALL ReceivedNonCar(tNet_message_chunk* pContents);
 
 extern void C2_HOOK_FASTCALL SignalToStartRace(void);
 
@@ -64,7 +64,7 @@ extern void C2_HOOK_FASTCALL SignalToStartRace(void);
 
 extern void C2_HOOK_FASTCALL SetUpNetCarPositions(void);
 
-// ReinitialiseCar
+extern void C2_HOOK_FASTCALL ReinitialiseCar(tCar_spec* pCar);
 
 // RepositionPlayer
 
