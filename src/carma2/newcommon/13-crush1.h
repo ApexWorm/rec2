@@ -146,7 +146,7 @@ extern void C2_HOOK_FASTCALL DisposeVertexData(tModel_detail_vertex_data* pVerte
 
 extern float C2_HOOK_FASTCALL DistSq(const br_vector3* pP, int pCount, const br_vector3* pVertices);
 
-// LimitImpactScale
+extern void C2_HOOK_FASTCALL LimitImpactScale(float* pScale, int pAxis, float pPos, float pDirection, tU16 pLimit_number, const tCar_crush_limits* pLimits, int pMax_index);
 
 extern float C2_HOOK_FASTCALL GetImpactScale(const br_vector3* pP, int pCount, const br_vector3* pVertices, float pMax_dist_sq);
 

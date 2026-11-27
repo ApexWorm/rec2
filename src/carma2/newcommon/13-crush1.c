@@ -1263,7 +1263,27 @@ float C2_HOOK_FASTCALL DistSq(const br_vector3* pP, int pCount, const br_vector3
     return closest_distance;
 }
 
-// LimitImpactScale
+// FUNCTION: CARMA2_HW 0x004367a0
+// FUNCTION: CARMA2_SW 0x004367d0
+// FUNCTION: CARMA2_CHEAT 0x004369a0
+void C2_HOOK_FASTCALL LimitImpactScale(float* pScale, int pAxis, float pPos, float pDirection, tU16 pLimit_number, const tCar_crush_limits* pLimits, int pMax_index) {
+    int index;
+    int shift;
+    float scale;
+
+    shift = ((pDirection > 0.0f) + pAxis * 2) * 2;
+    index = (pLimit_number >> shift) & 0x3;
+    if (index > pMax_index) {
+        *pScale = 0.0f;
+    } else {
+        scale = (pLimits->limits[pAxis][pDirection > 0.0f].values[index] - pPos) / pDirection;
+        if (scale < 0.0f) {
+            *pScale = 0.0f;
+        } else if (scale < *pScale) {
+            *pScale = scale;
+        }
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x00436850
 // FUNCTION: CARMA2_SW 0x00436880
