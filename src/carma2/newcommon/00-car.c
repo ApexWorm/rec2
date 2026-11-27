@@ -1282,7 +1282,7 @@ void C2_HOOK_FASTCALL SkidNoise(tCar_spec* pC, int pWheel_num, br_scalar pV, int
     int i;
 
     i = IRandomBetween(0, 1);
-    if (pV < 5.f) {
+    if (pV < 5.0f) {
         return;
     }
     if (gCurrent_race.material_modifiers[pMaterial].tyre_noise_index == -1) {
@@ -1291,12 +1291,12 @@ void C2_HOOK_FASTCALL SkidNoise(tCar_spec* pC, int pWheel_num, br_scalar pV, int
     if (IRandomBetween(0, 4) != 0) {
         return;
     }
-    last_skid_vol[i] = (int)(pV * 10.f);
+    last_skid_vol[i] = (int)(pV * 10.0f);
     pos.v[0] = pC->wpos[pWheel_num].v[0];
     pos.v[1] = pC->wpos[pWheel_num].v[1] - pC->oldd[pWheel_num];
     pos.v[2] = pC->wpos[pWheel_num].v[2];
     BrMatrix34ApplyP(&world_pos, &pos, &pC->car_master_actor->t.t.mat);
-    BrVector3Scale(&world_pos, &world_pos, 1.f / WORLD_SCALE);
+    BrVector3Scale(&world_pos, &world_pos, 1.0f / WORLD_SCALE);
     if (!DRS3SoundStillPlaying(gSkid_tag[i]) || (pC != NULL && pC->driver == eDriver_local_human && gLast_car_to_skid[i] != pC)) {
         gSkid_tag[i] = DRS3StartSound3D(gCar_outlet, IRandomBetween(0, 4) + 9000, &world_pos, &pC->vel, 1, last_skid_vol[i], IRandomBetween(0xc000, 0x14000), 0x10000);
         gLast_car_to_skid[i] = pC;
@@ -1309,7 +1309,7 @@ void C2_HOOK_FASTCALL SkidNoise(tCar_spec* pC, int pWheel_num, br_scalar pV, int
         BrVector3Scale(&wvw, &pC->road_normal, ts);
         BrVector3Accumulate(&wv, &wvw);
         BrMatrix34ApplyV(&wvw, &wv, &pC->car_master_actor->t.t.mat);
-        CreatePuffOfSmoke(&world_pos, &wvw, pV * 0.04f, 1.f, 4);
+        CreatePuffOfSmoke(&world_pos, &wvw, pV * 0.04f, 1.0f, 4);
     }
 }
 
@@ -1333,7 +1333,7 @@ void C2_HOOK_FASTCALL CrashNoise(br_vector3* pForce, br_vector3* pPosition, int 
         }
         if ((crunch_tag == 0 || !DRS3SoundStillPlaying(crunch_tag)) && vol > 30) {
             gLast_crunch_vol = vol;
-            BrVector3Set(&velocity, 0.f, 0.f, 0.f);
+            BrVector3Set(&velocity, 0.0f, 0.0f, 0.0f);
             crunch_tag = DRS3StartSound3D(gCar_outlet,
                 gMetal_crunch_sound_id[IRandomBetween(0, REC2_ASIZE(gMetal_crunch_sound_id) - 1)],
                 pPosition, &velocity, 1, vol, IRandomBetween(0xc000, 0x14000), 0x10000);
