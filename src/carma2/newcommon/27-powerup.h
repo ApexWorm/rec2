@@ -54,7 +54,7 @@ extern tShit_mine gShit_mines[20];
 
 extern char* C2_HOOK_FASTCALL GetPowerupMessage(int pPowerup_index);
 
-// GetNextGoodyTime
+extern tU32 C2_HOOK_FASTCALL GetNextGoodyTime(tU32 pTime);
 
 extern void C2_HOOK_FASTCALL DoPowerupTextHeadup(tPowerup* pPowerup, int pGot_it);
 
@@ -80,7 +80,7 @@ extern int C2_HOOK_FASTCALL GotPowerupXX(tCar_spec* pCar, int pIndex, int pMessa
 
 extern void C2_HOOK_FASTCALL GotPowerupEarwig(tCar_spec* pCar, int pIndex, int pMessage, int pSelect_inventory);
 
-// AutoGoody
+extern void C2_HOOK_FASTCALL AutoGoody(tU32 pTime);
 
 extern void C2_HOOK_FASTCALL GotPowerup(tCar_spec* pCar, int pIndex);
 
@@ -136,7 +136,7 @@ extern void C2_HOOK_FASTCALL ToggleInventory(void);
 
 extern void C2_HOOK_FASTCALL DrawPowerups(tU32 pTime);
 
-// MungeKeyboardPowerup
+extern void C2_HOOK_FASTCALL MungeKeyboardPowerup(void);
 
 // DoPowerupPeriodics
 
@@ -446,6 +446,6 @@ extern int C2_HOOK_FASTCALL IsCarCloaked(tCar_spec* pCar);
 
 extern void C2_HOOK_FASTCALL TurnOffCloaking(tPowerup* pPowerup, tCar_spec* pCar);
 
-// PeriodicCloaking
+extern void C2_HOOK_FASTCALL PeriodicCloaking(void);
 
 #endif // GUARD_27_POWERUP_H

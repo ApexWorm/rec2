@@ -285,6 +285,26 @@ int gFizzle_height;
 // GLOBAL: CARMA2_CHEAT 0x006a84cc
 tU32 gInventory_timeout;
 
+// GLOBAL: CARMA2_HW 0x006a0a60
+// GLOBAL: CARMA2_SW 0x0069aab8
+// GLOBAL: CARMA2_CHEAT 0x006a85d8
+int gNet_powerup_time_between_goodies_min;
+
+// GLOBAL: CARMA2_HW 0x006a090c
+// GLOBAL: CARMA2_SW 0x0069a964
+// GLOBAL: CARMA2_CHEAT 0x006a8484
+int gNet_powerup_time_between_goodies_max;
+
+// GLOBAL: CARMA2_HW 0x006a0450
+// GLOBAL: CARMA2_SW 0x0069a4a8
+// GLOBAL: CARMA2_CHEAT 0x006a7fc8
+int gNet_count_powerup_goodies;
+
+// GLOBAL: CARMA2_HW 0x006a094c
+// GLOBAL: CARMA2_SW 0x0069a9a4
+// GLOBAL: CARMA2_CHEAT 0x006a84c4
+int* gNet_powerup_goodies;
+
 // GLOBAL: CARMA2_HW 0x0079ec50
 // GLOBAL: CARMA2_SW 0x007951b0
 // GLOBAL: CARMA2_CHEAT 0x007a62f0
@@ -298,7 +318,10 @@ char* C2_HOOK_FASTCALL GetPowerupMessage(int pPowerup_index) {
     return gPowerup_array[pPowerup_index].message;
 }
 
-// GetNextGoodyTime
+inline tU32 C2_HOOK_FASTCALL GetNextGoodyTime(tU32 pTime) {
+
+    return pTime + IRandomBetween(gNet_powerup_time_between_goodies_min, gNet_powerup_time_between_goodies_max);
+}
 
 inline void C2_HOOK_FASTCALL DoPowerupTextHeadup(tPowerup* pPowerup, int pGot_it) {
     char s[256];
@@ -502,7 +525,20 @@ void C2_HOOK_FASTCALL GotPowerupEarwig(tCar_spec* pCar, int pIndex, int pMessage
 #pragma auto_inline(on)
 #endif
 
-// AutoGoody
+inline void C2_HOOK_FASTCALL AutoGoody(tU32 pTime) {
+
+    if (gNext_goody_time == 0) {
+        gNext_goody_time = GetNextGoodyTime(pTime);
+    } else if (gNet_mode != eNet_mode_none
+            && !gRace_finished
+            && !gProgram_state.current_car.knackered
+            && gCurrent_net_game->options.random_car_choice /* FIXME: the Mac build calls the field read here starting_target */
+            && pTime > gNext_goody_time) {
+        gNext_goody_time = GetNextGoodyTime(pTime);
+        GotPowerupEarwig(&gProgram_state.current_car,
+            gNet_powerup_goodies[IRandomBetween(0, gNet_count_powerup_goodies - 1)], 2, 0);
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x004d8d30
 // FUNCTION: CARMA2_SW 0x004d5260
@@ -1004,9 +1040,62 @@ void C2_HOOK_FASTCALL DrawPowerups(tU32 pTime) {
     DrawKeyPowerups(pTime);
 }
 
-// MungeKeyboardPowerup
+inline void C2_HOOK_FASTCALL MungeKeyboardPowerup(void) {
+    tPowerup* powerup;
 
-// DoPowerupPeriodics
+    if (gInventory_selected >= 0 && !gCountdown && !gRace_finished && !gProgram_state.current_car.knackered) {
+        powerup = &gPowerup_array[gInventory[gInventory_selected]];
+        if (gINT_006a0a5c) {
+            gINT_006a0a5c = KeyIsDown(61);
+        } else if (KeyIsDown(61) != gINT_006a0a6c) {
+            if (!gINT_006a0a6c && !gProgram_state.current_car.knackered) {
+                gINT_006a0a6c = 1;
+            } else {
+                gINT_006a0a6c = 0;
+            }
+            if (!gINT_006a0a6c) {
+                LosePowerup(powerup);
+            } else if (GotPowerupXX(&gProgram_state.current_car, gInventory[gInventory_selected], 1) >= 0
+                    && powerup->initial_value < 0) {
+                powerup->value++;
+                if (powerup->value >= 0) {
+                    KeyboardPowerupFinished(powerup, 1);
+                }
+            }
+        }
+        if (powerup->initial_value > 0 && gINT_006a0a6c) {
+            powerup->value -= gFrame_period;
+            if (powerup->value <= 0) {
+                KeyboardPowerupFinished(powerup, 1);
+            }
+        }
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x004db1c0
+// FUNCTION: CARMA2_SW 0x004d76c0
+// FUNCTION: CARMA2_CHEAT 0x004e0d80
+void C2_HOOK_FASTCALL DoPowerupPeriodics(tU32 pFrame_period) {
+    tU32 the_time;
+    int i;
+    tPowerup* powerup;
+
+    the_time = GetTotalTime();
+    AutoGoody(the_time);
+    PeriodicCloaking();
+    for (i = 0, powerup = gPowerup_array; i < gNumber_of_powerups; i++, powerup++) {
+        if (powerup->got_time != 0) {
+            if (powerup->type == ePowerup_timed && the_time >= powerup->lose_time && powerup->initial_value == 0) {
+                LosePowerup(powerup);
+            } else if (powerup->current_value == 0 && powerup->initial_value == 0) {
+                LosePowerup(powerup);
+            } else if (powerup->periodic_proc != NULL) {
+                powerup->periodic_proc(powerup, pFrame_period);
+            }
+        }
+    }
+    MungeKeyboardPowerup();
+}
 
 inline void C2_HOOK_FASTCALL CheckRespawnQueue(tU32 pTime) {
     int i;
