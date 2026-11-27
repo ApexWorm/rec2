@@ -47,6 +47,7 @@ targets:
       - src/carma2/s3
       - external/dummyqt
     data-sources:
+      - reccmp/carma2_cheat-libtiff.csv
       - reccmp/carma2_cheat-mslibc.csv
       - reccmp/carma2_cheat-zlib.csv
     hash:
