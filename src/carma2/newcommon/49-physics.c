@@ -909,7 +909,148 @@ void C2_HOOK_FASTCALL RestoreListOmega(tPhysics_object* pObject) {
 
 // RestoreGroupOmegas
 
-// MakeVelocitiesVector2
+#if defined(REC2_MATCHING) && defined(_MSC_VER)
+#pragma inline_depth(0)
+#endif
+
+// FUNCTION: CARMA2_HW 0x004c0430
+// FUNCTION: CARMA2_SW 0x004bcb60
+// FUNCTION: CARMA2_CHEAT 0x004c5f50
+int C2_HOOK_FASTCALL MakeVelocitiesVector2(br_scalar* pOutput, tPhysics_joint_force** pForces, int pCapacity, int pCount) {
+    tPhysics_object* object_a;
+    tPhysics_object* object_b;
+    br_vector3 velocity;
+    br_vector3 point;
+    br_vector3 world;
+    br_vector3 delta;
+    br_vector3 other;
+    br_scalar value;
+    int has_velocity;
+    int has_separation;
+    int i;
+
+    has_velocity = 0;
+    for (i = pCount; i < pCapacity; i++) {
+        pOutput[i] = 0.0f;
+    }
+    for (i = 0; i < pCount; i++) {
+        object_a = pForces[i]->object_a;
+        if (pForces[i]->type == 11) {
+            pOutput[i] = -BrVector3Dot(&object_a->omega, &pForces[i]->direction_a);
+            object_b = pForces[i]->object_b;
+            if (object_b != NULL) {
+                pOutput[i] += BrVector3Dot(&object_b->omega, &pForces[i]->direction_b);
+            }
+            if (pOutput[i] < 0.001) {
+                pOutput[i] = 0.001f;
+            } else {
+                has_velocity = 1;
+            }
+        } else {
+            BrVector3Cross(&velocity, &object_a->omega, &pForces[i]->point_a);
+            BrVector3Accumulate(&velocity, &object_a->velocity_car_space);
+            pOutput[i] = -BrVector3Dot(&pForces[i]->direction_a, &velocity);
+            object_b = pForces[i]->object_b;
+            if (object_b != NULL) {
+                BrVector3Cross(&velocity, &object_b->omega, &pForces[i]->point_b);
+                BrVector3Accumulate(&velocity, &object_b->velocity_car_space);
+                pOutput[i] += BrVector3Dot(&pForces[i]->direction_b, &velocity);
+            }
+            if (pOutput[i] > 0.01) {
+                has_velocity = 1;
+            }
+            if (pOutput[i] > 0.1) {
+                value = (br_scalar)(0.1 - (pForces[i]->field_0x0 - 1.0f));
+                if (value > 1.0f) {
+                    value = 1.0f;
+                }
+                if (value < 0.1) {
+                    value = 0.1f;
+                }
+                pOutput[i] = (br_scalar)(value * (pOutput[i] - 0.1) + 0.1);
+            }
+            if (pOutput[i] < 0.0f) {
+                pOutput[i] = 0.0f;
+            }
+            pOutput[i] = (br_scalar)(pOutput[i] * 1.001 + 0.01);
+            if ((object_b == NULL || object_b->field_0x1df != 0) && object_a->field_0x1df != 0) {
+                pOutput[i] = (br_scalar)(pOutput[i] - 0.0099);
+            }
+        }
+    }
+    if (!has_velocity) {
+        has_separation = 0;
+        for (i = 0; i < pCount; i++) {
+            if (pForces[i]->type == 11) {
+                pOutput[i] = (br_scalar)((0.001 - pForces[i]->field_0x0) * 25.0);
+                if (pOutput[i] < 0.001) {
+                    pOutput[i] = 0.001f;
+                } else {
+                    has_velocity = 1;
+                }
+            } else {
+                object_a = pForces[i]->object_a;
+                object_b = pForces[i]->object_b;
+                BrVector3Add(&point, &pForces[i]->point_a, &object_a->cmpos);
+                if (object_b == NULL) {
+                    BrMatrix34ApplyP(&world, &point, &object_a->actor->t.t.mat);
+                    DrMatrix34ApplyLPInverse(&delta, &world, &object_a->transform_matrix);
+                    BrVector3Sub(&delta, &delta, &point);
+                    pOutput[i] = (br_scalar)(0.01 - BrVector3Dot(&pForces[i]->direction_a, &delta) * 25.0f);
+                } else {
+                    BrMatrix34ApplyP(&world, &point, &object_a->transform_matrix);
+                    DrMatrix34ApplyLPInverse(&delta, &world, &object_b->transform_matrix);
+                    BrMatrix34ApplyP(&world, &point, &object_a->actor->t.t.mat);
+                    DrMatrix34ApplyLPInverse(&other, &world, &object_b->actor->t.t.mat);
+                    BrVector3Sub(&delta, &other, &delta);
+                    pOutput[i] = -(BrVector3Dot(&pForces[i]->direction_b, &delta) * 25.0f);
+                    if (pForces[i]->type == 5) {
+                        BrMatrix34ApplyV(&world, &pForces[i]->direction_b, &object_b->transform_matrix);
+                        BrMatrix34TApplyV(&other, &world, &object_b->actor->t.t.mat);
+                        value = -(BrVector3Dot(&other, &delta) * 25.0f);
+                        if (value > pOutput[i]) {
+                            pOutput[i] = value;
+                        }
+                    }
+                    if (pForces[i]->field_0x10 > 0.0f) {
+                        value = pForces[i]->field_0x10 * 25.0f;
+                        if (value > pOutput[i]) {
+                            pOutput[i] = value;
+                        }
+                    }
+                }
+                if (pOutput[i] > 0.1) {
+                    value = (br_scalar)(0.1 - (pForces[i]->field_0x0 - 1.0f));
+                    if (value > 1.0f) {
+                        value = 1.0f;
+                    }
+                    if (value < 0.1) {
+                        value = 0.1f;
+                    }
+                    pOutput[i] = (br_scalar)(value * (pOutput[i] - 0.1) + 0.1);
+                } else if (pOutput[i] < 0.0f) {
+                    pOutput[i] = 0.0f;
+                }
+                if (pOutput[i] > 0.001) {
+                    has_separation = 1;
+                }
+                pOutput[i] = (br_scalar)(pOutput[i] * 1.001 + 0.01);
+            }
+        }
+        if (!has_separation) {
+            for (i = 0; i < pCount; i++) {
+                if (pForces[i]->type != 11) {
+                    pOutput[i] = 0.05f;
+                }
+            }
+        }
+    }
+    return !has_velocity;
+}
+
+#if defined(REC2_MATCHING) && defined(_MSC_VER)
+#pragma inline_depth()
+#endif
 
 // MakeVelocitiesVector
 
