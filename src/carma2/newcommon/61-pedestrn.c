@@ -236,6 +236,21 @@ int gPed_move_fsm[118][7] = {
 // GLOBAL: CARMA2_CHEAT 0x0067e22c
 tPedForms_vtable* gPed_vtable = NULL;
 
+// GLOBAL: CARMA2_HW 0x00676980
+// GLOBAL: CARMA2_SW 0x006710f0
+// GLOBAL: CARMA2_CHEAT 0x0067e230
+tPed_move* gPed_moves[250] = { 0 };
+
+// GLOBAL: CARMA2_HW 0x00676e30
+// GLOBAL: CARMA2_SW 0x006715a0
+// GLOBAL: CARMA2_CHEAT 0x0067e6e0
+float gPed_cos_table[256] = { 0 };
+
+// GLOBAL: CARMA2_HW 0x00677230
+// GLOBAL: CARMA2_SW 0x006719a0
+// GLOBAL: CARMA2_CHEAT 0x0067eae0
+float gFLOAT_00677230 = 0.0f;
+
 // GLOBAL: CARMA2_HW 0x00677234
 // GLOBAL: CARMA2_SW 0x006719a4
 // GLOBAL: CARMA2_CHEAT 0x0067eae4
@@ -250,6 +265,16 @@ br_material* gPedestrian_character_cloned_materials[50];
 // GLOBAL: CARMA2_SW 0x00671e9c
 // GLOBAL: CARMA2_CHEAT 0x0067efdc
 int gCount_pedestrian_personality_cloned_materials;
+
+// GLOBAL: CARMA2_HW 0x00677728
+// GLOBAL: CARMA2_SW 0x00671e98
+// GLOBAL: CARMA2_CHEAT 0x0067efd8
+float gFLOAT_00677728;
+
+// GLOBAL: CARMA2_HW 0x00677730
+// GLOBAL: CARMA2_SW 0x00671ea0
+// GLOBAL: CARMA2_CHEAT 0x0067efe0
+tPed_morph gPed_morphs[20];
 
 // GLOBAL: CARMA2_HW 0x00677238
 // GLOBAL: CARMA2_SW 0x006719a8
@@ -488,9 +513,40 @@ int gPed_movements_count;
 tPed_movement_spec* gPed_movements;
 
 
-// ClearOutMorphs
+inline void C2_HOOK_FASTCALL ClearOutMorphs(void) {
+    int i;
 
-// InitBoner
+    for (i = 0; i < (int)REC2_ASIZE(gPed_morphs); i++) {
+        gPed_morphs[i].field_0x4 = 0.0f;
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x00403ed0
+// FUNCTION: CARMA2_SW 0x00403ed0
+// FUNCTION: CARMA2_CHEAT 0x00403ed0
+void C2_HOOK_FASTCALL InitBoner(tPedForms_vtable* pTable) {
+    int i;
+    float s;
+    float c;
+
+    gPed_vtable = pTable;
+    memset(gPed_forms, 0, sizeof(gPed_forms));
+    memset(gPed_personalities, 0, sizeof(gPed_personalities));
+    memset(gPed_moves, 0, sizeof(gPed_moves));
+    memset(gPed_remaps, 0, sizeof(gPed_remaps));
+    ClearOutMorphs();
+    for (i = 0; i < 256; i++) {
+        s = sin((i << 8) * (2 * 3.141592653589793 / 65536.0));
+        c = cos((i << 8) * (2 * 3.141592653589793 / 65536.0));
+        gPed_sin_table[i] = s;
+        gPed_cos_table[i] = c;
+    }
+    gFLOAT_00677728 = 0.0f;
+    gFLOAT_00677230 = 1.0f;
+    gCount_pedestrian_personality_cloned_materials = 0;
+    gPed_overall_movement_disabled = 0;
+    gPed_retain_root_mode = 0;
+}
 
 // DRVector3SafeCross
 
