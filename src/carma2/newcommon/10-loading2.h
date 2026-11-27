@@ -61,7 +61,7 @@ extern void C2_HOOK_FASTCALL LoadHeadups(FILE* pF, int pIndex, tCar_spec* pCar_s
 
 // ReadPartHeader
 
-// ReadMechanicsShapes
+extern void C2_HOOK_FASTCALL ReadMechanicsShapes(tPhysics_shape** pShapes, FILE* pF);
 
 // NewReadMechanicsData
 
