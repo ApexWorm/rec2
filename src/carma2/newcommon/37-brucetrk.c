@@ -150,6 +150,10 @@ br_uint_8 C2_HOOK_CDECL ActorToActorMatrix34(br_matrix34* m, br_actor* a, br_act
     return transform_type_combine[a_type][b_type];
 }
 
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
 // FUNCTION: CARMA2_HW 0x0040ca40
 // FUNCTION: CARMA2_SW 0x0040ca30
 // FUNCTION: CARMA2_CHEAT 0x0040cae0
@@ -162,6 +166,10 @@ void C2_HOOK_CDECL ActorRelink(br_actor* parent, br_actor* a) {
         BrActorAdd(parent, BrActorRemove(a));
     }
 }
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // FUNCTION: CARMA2_HW 0x0040ca90
 // FUNCTION: CARMA2_SW 0x0040ca80
@@ -354,7 +362,66 @@ void C2_HOOK_FASTCALL MungeFaces(br_actor* pActor, br_model* pModel) {
     }
 }
 
-// ProcessModelsCB
+// FUNCTION: CARMA2_HW 0x0040cf10
+// FUNCTION: CARMA2_SW 0x0040cf00
+// FUNCTION: CARMA2_CHEAT 0x0040cfb0
+intptr_t C2_HOOK_CDECL ProcessModelsCB(br_actor* pActor, void* pContext) {
+    unsigned int x;
+    unsigned int z;
+    int area_1;
+    int area_2;
+    tTrack_spec* track_spec;
+    br_actor* child;
+    br_model* model;
+    br_vertex* new_vertices;
+    br_face* new_faces;
+    int nvertices;
+    int nfaces;
+
+    track_spec = pContext;
+    if (sscanf(pActor->identifier, "%u%u", &x, &z) == 2 && x < track_spec->ncolumns_x && z < track_spec->ncolumns_z) {
+        pActor->material = gDefault_track_material;
+        track_spec->columns[z][x].actor_0x0 = BrActorAllocate(BR_ACTOR_NONE, NULL);
+        BrActorAdd(pActor->parent, track_spec->columns[z][x].actor_0x0);
+        track_spec->columns[z][x].actor_0x4 = pActor;
+        track_spec->columns[z][x].actor_0x8 = NULL;
+        ActorRelink(track_spec->columns[z][x].actor_0x0, pActor);
+        gMr_blendy = NULL;
+        if (pActor->model != NULL && !gAusterity_mode) {
+            MungeFaces(pActor, pActor->model);
+        } else {
+            for (child = pActor->children; child != NULL && child->identifier[0] == '&'; child = child->next) {
+            }
+            if (child != NULL) {
+                MungeFaces(child, child->model);
+            }
+        }
+        BrActorEnum(pActor, FindNonCarsCB, track_spec);
+        if (gMr_blendy != NULL) {
+            model = gMr_blendy->model;
+            BrActorAdd(track_spec->columns[z][x].actor_0x0, gMr_blendy);
+            gMr_blendy->model->flags |= BR_MODF_UPDATEABLE;
+            BrModelAdd(gMr_blendy->model);
+            DetermineTilitudinality(gMr_blendy->model, &area_1, &area_2);
+            nvertices = model->nvertices + area_2;
+            nfaces = model->nfaces + area_1;
+            new_vertices = BrResAllocate(gMr_blendy->model, nvertices * sizeof(br_vertex), BR_MEMORY_VERTICES);
+            memcpy(new_vertices, gMr_blendy->model->vertices, gMr_blendy->model->nvertices * sizeof(br_vertex));
+            BrResFree(gMr_blendy->model->vertices);
+            gMr_blendy->model->vertices = new_vertices;
+            new_faces = BrResAllocate(gMr_blendy->model, nfaces * sizeof(br_face), BR_MEMORY_FACES);
+            memcpy(new_faces, gMr_blendy->model->faces, gMr_blendy->model->nfaces * sizeof(br_face));
+            BrResFree(gMr_blendy->model->faces);
+            gMr_blendy->model->faces = new_faces;
+            DRModelUpdateAndKevificateMaterials(gMr_blendy->model, BR_MODU_ALL);
+            track_spec->columns[z][x].actor_0x8 = gMr_blendy;
+        }
+    } else {
+        BrActorEnum(pActor, ProcessModelsCB, track_spec);
+    }
+    SetSmashableModel(pActor);
+    return 0;
+}
 
 // ProcessModels
 
