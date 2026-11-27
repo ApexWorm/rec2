@@ -49,7 +49,7 @@ extern void C2_HOOK_FASTCALL NetSendHeadupToEverybody(const char* pMessage);
 
 extern void C2_HOOK_FASTCALL NetSendHeadupToPlayer(char* pMessage, tPlayer_ID pPlayer);
 
-// InitialisePlayerStati
+extern void C2_HOOK_FASTCALL InitialisePlayerStati(void);
 
 extern void C2_HOOK_FASTCALL LeaveTempGame(void);
 
@@ -89,7 +89,7 @@ extern void C2_HOOK_FASTCALL NetPlayersChanged(int pNew_count, tNet_game_player_
 
 extern int C2_HOOK_FASTCALL NetJoinGameLowLevel(tNet_game_details* pGame_details, const char* pName);
 
-// NetJoinGame
+extern int C2_HOOK_FASTCALL NetJoinGame(tNet_game_details* pDetails, char* pPlayer_name, int pCar_index);
 
 extern void C2_HOOK_FASTCALL NetObtainSystemUserName(char* pName, int pMax_length);
 

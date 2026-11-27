@@ -5725,8 +5725,15 @@ typedef struct {
     tNet_game_player_info player;
 } tNet_message_chunk_player_list;
 
+typedef struct {
+    tNet_message_chunk_header header;
+    undefined field_0x2[2];
+    tNet_game_player_info player_info;
+} tNet_message_chunk_join;
+
 typedef union {
     tNet_message_chunk_raw raw;
+    tNet_message_chunk_join join; /* type = 0x2 */
     tNet_message_chunk_player_list player_list; /* type = 0x3 */
     tNet_message_chunk_race_over race_over; /* type = 0xa */
     tNet_message_chunk_status_report status_report; /* type = 0xb */

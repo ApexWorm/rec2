@@ -404,7 +404,14 @@ void C2_HOOK_FASTCALL NetSendHeadupToPlayer(char* pMessage, tPlayer_ID pPlayer) 
     }
 }
 
-// InitialisePlayerStati
+inline void C2_HOOK_FASTCALL InitialisePlayerStati(void) {
+    int i;
+
+    for (i = 0; i < (int)REC2_ASIZE(gNet_players); i++) {
+        gNet_players[i].last_heard_from_him = PDGetTotalTime();
+        gNet_players[i].player_status = ePlayer_status_loading;
+    }
+}
 
 void C2_HOOK_FASTCALL LeaveTempGame(void) {
 
@@ -669,7 +676,57 @@ int C2_HOOK_FASTCALL NetJoinGameLowLevel(tNet_game_details* pGame_details, const
     return PDNetJoinGame(pGame_details, pName);
 }
 
-// NetJoinGame
+// FUNCTION: CARMA2_HW 0x0049e970
+// FUNCTION: CARMA2_SW 0x0049aaf0
+// FUNCTION: CARMA2_CHEAT 0x0049eeb0
+int C2_HOOK_FASTCALL NetJoinGame(tNet_game_details* pDetails, char* pPlayer_name, int pCar_index) {
+    int result;
+    tNet_message* the_message;
+    tU32 start_time;
+
+    result = NetJoinGameLowLevel(pDetails, pPlayer_name);
+    if (result == 0) {
+        DisableNetService();
+        gReceiving_new_players = 0;
+        gNet_mode = eNet_mode_client;
+        gCurrent_net_game = pDetails;
+        gLocal_net_ID = NetExtractPlayerID(pDetails);
+        gNumber_of_net_players = 0;
+        gLast_player_list_received = 0;
+        gJoin_request_denied = 0;
+        gCar_was_taken = 0;
+        gHost_died = 0;
+        the_message = NetBuildGuaranteedMessage(2, 0);
+        FillInThisPlayer(pDetails, &the_message->contents.join.player_info, pCar_index, 0);
+        ReenableNetService();
+        NetGuaranteedSendMessageToAddress(pDetails, the_message, pDetails, NULL);
+        start_time = PDGetTotalTime();
+        do {
+            NetService(0);
+        } while (gNumber_of_net_players == 0
+            && PDGetTotalTime() - start_time < 30000
+            && !gJoin_request_denied
+            && !gHost_died);
+        DisableNetService();
+        InitialisePlayerStati();
+        if (gNumber_of_net_players == 0) {
+            ReenableNetService();
+            if (gJoin_request_denied && gCar_was_taken) {
+                result = -4;
+            } else {
+                gNet_mode = eNet_mode_none;
+                NetDisposeGameDetails(gCurrent_net_game);
+                gCurrent_net_game = NULL;
+                if (gJoin_request_denied) {
+                    result = -2;
+                } else {
+                    result = -1;
+                }
+            }
+        }
+    }
+    return result;
+}
 
 // FUNCTION: CARMA2_HW 0x0049ee20
 // FUNCTION: CARMA2_SW 0x0049afa0
