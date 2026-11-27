@@ -136,6 +136,7 @@ int gCount_crush_detach_list;
 
 // GLOBAL: CARMA2_HW 0x0067bdfc
 // GLOBAL: CARMA2_SW 0x0067656c
+// GLOBAL: CARMA2_CHEAT 0x006836ac
 int gINT_0067bdfc;
 
 // GLOBAL: CARMA2_HW 0x0067be08
@@ -534,6 +535,7 @@ void C2_HOOK_FASTCALL InitCrushSystems(void) {
 
 // FUNCTION: CARMA2_HW 0x0042a190
 // FUNCTION: CARMA2_SW 0x0042a220
+// FUNCTION: CARMA2_CHEAT 0x0042a320
 void C2_HOOK_FASTCALL ResetCrushSystems(void) {
     int i;
 
