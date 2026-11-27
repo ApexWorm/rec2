@@ -5835,6 +5835,8 @@ enum {
     eMiscString_status_in_action_replay = 86,
     eMiscString_host_abandoned_race = 87,
     eMiscString_host = 88,
+    eMiscString_is_no_longer_responding = 90,
+    eMiscString_host_has_disappeared = 91,
     eMiscString_cant_afford_to_recover = 96,
     eMiscString_recovery_in = 97,
     eMiscString_second = 98,

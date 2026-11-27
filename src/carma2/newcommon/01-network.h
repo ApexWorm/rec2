@@ -153,7 +153,7 @@ extern void C2_HOOK_FASTCALL KickPlayerOut(tPlayer_ID pID);
 
 extern void C2_HOOK_FASTCALL NetFullScreenMessage(int pStr_index, int pLeave_it_up_there);
 
-// HostHasBittenTheDust
+extern void C2_HOOK_FASTCALL HostHasBittenTheDust(int pMessage_index);
 
 // ReceivedHosticide
 

@@ -1192,7 +1192,14 @@ void C2_HOOK_FASTCALL NetFullScreenMessage(int pStr_index, int pLeave_it_up_ther
     }
 }
 
-// HostHasBittenTheDust
+inline void C2_HOOK_FASTCALL HostHasBittenTheDust(int pMessage_index) {
+
+    if (!gHost_died) {
+        gHost_died = 1;
+        NetFullScreenMessage(pMessage_index, 0);
+        gProgram_state.prog_status = eProg_idling;
+    }
+}
 
 // ReceivedHosticide
 
@@ -1320,11 +1327,38 @@ void C2_HOOK_FASTCALL BroadcastStatus(void) {
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x004a4da0
-// STUB: CARMA2_SW 0x004a0f20
-// STUB: CARMA2_CHEAT 0x004a5c10
+// FUNCTION: CARMA2_HW 0x004a4da0
+// FUNCTION: CARMA2_SW 0x004a0f20
+// FUNCTION: CARMA2_CHEAT 0x004a5c10
 void C2_HOOK_FASTCALL CheckForDisappearees(void) {
-    NOT_IMPLEMENTED();
+    int i;
+    tU32 the_time;
+    char s[256];
+    const char* s2;
+
+    the_time = PDGetTotalTime();
+    if (gNet_mode == eNet_mode_host) {
+        for (i = 0; i < gNumber_of_net_players; i++) {
+            if (!gNet_players[i].host
+                    && gNet_players[i].last_heard_from_him != 0
+                    && (int)(the_time - gNet_players[i].last_heard_from_him) >= 60000) {
+                strcpy(s, gNet_players[i].player_name);
+                s2 = GetMiscString(eMiscString_is_no_longer_responding);
+                strcat(s, " ");
+                strcat(s, s2);
+                NetSendHeadupToAllPlayers(s);
+                KickPlayerOut(gNet_players[i].ID);
+                if (gProgram_state.racing) {
+                    NewTextHeadupSlot(4, 0, 3000, -4, s);
+                }
+            }
+        }
+    } else if (!gHost_died
+            && gNumber_of_net_players != 0
+            && gNet_players[0].last_heard_from_him != 0
+            && (int)(the_time - gNet_players[0].last_heard_from_him) >= 60000) {
+        HostHasBittenTheDust(eMiscString_host_has_disappeared);
+    }
 }
 
 #ifdef REC2_MATCHING
