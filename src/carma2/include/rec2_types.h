@@ -5668,6 +5668,15 @@ typedef struct {
 typedef struct {
     tNet_message_chunk_header header;
     undefined field_0x2[2];
+    undefined4 field_0x4;
+    int index;
+    br_matrix34 mat;
+    tU16 field_0x3c;
+} tNet_message_chunk_non_car_position;
+
+typedef struct {
+    tNet_message_chunk_header header;
+    undefined field_0x2[2];
     tPlayer_ID player;
     tU32 time;
 } tNet_message_chunk_recover;
@@ -5687,6 +5696,7 @@ typedef union {
     tNet_message_chunk_toggle_doors toggle_doors; /* type = 0x2c */
     tNet_message_chunk_view_car view_car; /* type = 0x2f */
     tNet_message_chunk_mine_explode mine_explode; /* type = 0x31 */
+    tNet_message_chunk_non_car_position non_car_position;
     tNet_message_chunk_recover recover;
     tNet_message_chunk_detach_bit detach_bit; /* type = 0x33 */
 } tNet_message_chunk;
