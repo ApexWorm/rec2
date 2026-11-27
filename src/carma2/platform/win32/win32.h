@@ -70,7 +70,7 @@ extern void C2_HOOK_FASTCALL PDExtractFilename(char* pDest, const char* pPath);
 
 extern void C2_HOOK_FASTCALL PDExtractDirectory(char* pDest, const char* pPath);
 
-extern void C2_HOOK_FASTCALL PDPageInMemory(void* pMemory);
+extern int C2_HOOK_FASTCALL PDPageInMemory(void* pMemory);
 
 extern void C2_HOOK_FASTCALL PDPageInProcessMemory(void);
 

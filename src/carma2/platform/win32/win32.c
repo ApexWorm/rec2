@@ -1535,8 +1535,17 @@ void C2_HOOK_FASTCALL PDExtractDirectory(char *pDest, const char *pPath) {
 }
 
 // FUNCTION: CARMA2_HW 0x004928a0
-void C2_HOOK_FASTCALL PDPageInMemory(void *pMemory) {
+// FUNCTION: CARMA2_SW 0x0048fac0
+// FUNCTION: CARMA2_CHEAT 0x00492840
+// FUNCTION: CARMA2_SW 0x0048fac0
+// FUNCTION: CARMA2_CHEAT 0x00492840
+int C2_HOOK_FASTCALL PDPageInMemory(void *pMemory) {
     tHeap_block_information *heap_block;
+    tHeap_memory *block;
+    DWORD size;
+    DWORD current;
+    DWORD limit;
+    volatile tU8* data;
 
     C2_HOOK_BUG_ON(offsetof(tHeap_block_information, next) != 0x48);
     C2_HOOK_BUG_ON(offsetof(tHeap_block_information, field_0x72) != 0x72);
@@ -1544,31 +1553,32 @@ void C2_HOOK_FASTCALL PDPageInMemory(void *pMemory) {
 
     heap_block = pMemory;
 
-    if (!IsBadReadPtr(heap_block, sizeof(tHeap_block_information)) && heap_block->field_0x72 == 0x4948) {
-        for (; heap_block != NULL; heap_block = heap_block->next) {
-            tHeap_memory *block;
-
-            block = (tHeap_memory *) (heap_block + 1);
-            for (;;) {
-                DWORD size = block->flags & 0x5ffffffc;
-                DWORD current;
-                if (size == 0) {
-                    break;
-                }
-                if (!(block->flags & 0x1)) {
-                    if (gPD_page_size == 0) {
-                        GetSystemInfo(&gSystem_info);
-                        gPD_page_size = gSystem_info.dwPageSize;
-                    }
-                    for (current = 16 * gPD_page_size; current < size - 4; current += gPD_page_size) {
-                        block->data[current + 16 - 16 * gPD_page_size] = block->data[current + 16 - 16 * gPD_page_size];
-                        block->data[current + 16] = block->data[current + 16];
-                    }
-                }
-                block = (tHeap_memory *) ((BYTE *) block + size);
+    if (IsBadReadPtr(heap_block, sizeof(tHeap_block_information)) || heap_block->field_0x72 != 0x4948) {
+        return 0;
+    }
+    for (; heap_block != NULL; heap_block = heap_block->next) {
+        block = (tHeap_memory *) (heap_block + 1);
+        while (1) {
+            size = block->flags & 0x5ffffffc;
+            if (size == 0) {
+                break;
             }
+            if (!(block->flags & 0x1)) {
+                limit = size - 4;
+                data = &block->data[16];
+                if (gPD_page_size == 0) {
+                    GetSystemInfo(&gSystem_info);
+                    gPD_page_size = gSystem_info.dwPageSize;
+                }
+                for (current = 16 * gPD_page_size; current < limit; current += gPD_page_size) {
+                    data[current - 16 * gPD_page_size] = data[current - 16 * gPD_page_size];
+                    data[current] = data[current];
+                }
+            }
+            block = (tHeap_memory *) ((BYTE *) block + size);
         }
     }
+    return 0;
 }
 
 void C2_HOOK_FASTCALL PDPageInProcessMemory(void) {
