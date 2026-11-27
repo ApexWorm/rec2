@@ -1661,10 +1661,23 @@ void C2_HOOK_FASTCALL SendMines(tU32 pNext_frame_time) {
     }
 }
 
-// STUB: CARMA2_HW 0x004dd1b0
-// STUB: CARMA2_SW 0x004d96b0
+// FUNCTION: CARMA2_HW 0x004dd1b0
+// FUNCTION: CARMA2_SW 0x004d96b0
+// FUNCTION: CARMA2_CHEAT 0x004e2d70
 void C2_HOOK_FASTCALL MinePreCollisionStuff(void) {
-    NOT_IMPLEMENTED();
+    int i;
+    tPhysics_object* object;
+
+    for (i = 0; i < (int)REC2_ASIZE(gShit_mines); i++) {
+        if (gShit_mines[i].flags & 0x1) {
+            object = gShit_mines[i].collision_info;
+            if (object->field_0x261 == 0x31 && object->message_time == gPHIL_last_physics_tick) {
+                object->field_0xf0 = 1;
+                WriteHierarchyNetworkStuff(object->field_0x294, object, 2);
+                object->field_0x261 = 0;
+            }
+        }
+    }
 }
 
 // FUNCTION: CARMA2_HW 0x004dd3f0
