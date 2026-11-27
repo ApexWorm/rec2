@@ -84,7 +84,7 @@ extern void C2_HOOK_FASTCALL AutoGoody(tU32 pTime);
 
 extern void C2_HOOK_FASTCALL GotPowerup(tCar_spec* pCar, int pIndex);
 
-// DRMapFindMeAPixie
+extern br_pixelmap* C2_HOOK_FASTCALL DRMapFindMeAPixie(const char* pName);
 
 extern void C2_HOOK_FASTCALL LoadPowerups(void);
 
@@ -176,13 +176,13 @@ extern int C2_HOOK_FASTCALL GainAPO(tPowerup* pPowerup, tCar_spec* pCar);
 
 extern int C2_HOOK_FASTCALL GotTimeOrPower(tPowerup* pPowerup, tCar_spec* pCar);
 
-// GainAPOPotential
+extern int C2_HOOK_FASTCALL GainAPOPotential(tPowerup* pPowerup, tCar_spec* pCar);
 
 extern int C2_HOOK_FASTCALL SetPedSpeed(tPowerup* pPowerup, tCar_spec* pCar);
 
 extern int C2_HOOK_FASTCALL SetPedSize(tPowerup* pPowerup, tCar_spec* pCar);
 
-// SetPedHeadSize
+extern int C2_HOOK_FASTCALL SetPedHeadSize(tPowerup* pPowerup, tCar_spec* pCar);
 
 extern int C2_HOOK_FASTCALL SetPedExplode(tPowerup* pPowerup, tCar_spec* pCar);
 
@@ -210,7 +210,7 @@ extern void C2_HOOK_FASTCALL ResetPedSpeed(tPowerup* powerup, tCar_spec* car);
 
 extern void C2_HOOK_FASTCALL ResetPedSize(tPowerup* pPowerup, tCar_spec* pCar);
 
-// ResetPedHeadSize
+extern void C2_HOOK_FASTCALL ResetPedHeadSize(tPowerup* pPowerup, tCar_spec* pCar);
 
 extern void C2_HOOK_FASTCALL ResetPedExplode(tPowerup* powerup, tCar_spec* car);
 
@@ -288,25 +288,25 @@ extern int C2_HOOK_FASTCALL PissOutOil(tPowerup* pPowerup, tCar_spec* pCar);
 
 extern int C2_HOOK_FASTCALL KangerooJump(tPowerup* pPowerup, tCar_spec* pCar);
 
-// AnnihilatePeds
+extern int C2_HOOK_FASTCALL AnnihilatePeds(tPowerup* pPowerup, tCar_spec* pCar);
 
-// NapalmPeds
+extern int C2_HOOK_FASTCALL NapalmPeds(tPowerup* pPowerup, tCar_spec* pCar);
 
 extern int C2_HOOK_FASTCALL RepulseOpponents2(tPowerup* pPowerup, tCar_spec* pCar, int pSend_message);
 
 extern int C2_HOOK_FASTCALL RepulseOpponents(tPowerup* pPowerup, tCar_spec* pCar);
 
-// RepulsePedestrians
+extern int C2_HOOK_FASTCALL RepulsePedestrians(tPowerup* pPowerup, tCar_spec* pCar);
 
 // ReceivedRepulse
 
-// ResetEngineFactor
+extern void C2_HOOK_FASTCALL ResetEngineFactor(tPowerup* pPowerup, tCar_spec* pCar);
 
 extern void C2_HOOK_FASTCALL ResetUnderwater(tPowerup* pPowerup, tCar_spec* pCar);
 
 extern void C2_HOOK_FASTCALL PukeDrugsBackUp(tPowerup* pPowerup, tCar_spec* pCar);
 
-// ResetOpponentsSpeed
+extern void C2_HOOK_FASTCALL ResetOpponentsSpeed(tPowerup* pPowerup, tCar_spec* pCar);
 
 extern void C2_HOOK_FASTCALL ResetCopsSpeed(tPowerup* powerup, tCar_spec* car);
 
@@ -356,7 +356,7 @@ extern void C2_HOOK_FASTCALL ResetGhostPeds(tPowerup* pPowerup, tCar_spec* pCar)
 
 extern void C2_HOOK_FASTCALL DoBouncey(tPowerup* pPowerup, tU32 pPeriod);
 
-// HitMine
+extern int C2_HOOK_FASTCALL HitMine(tPowerup* pPowerup, tCar_spec* pCar);
 
 extern int C2_HOOK_FASTCALL SetMassMultiplier(tPowerup* pPowerup, tCar_spec* pCar);
 
@@ -390,11 +390,11 @@ extern void C2_HOOK_FASTCALL ARPowerupGot(tPowerup* pPowerup, tCar_spec* pCar);
 
 extern void C2_HOOK_FASTCALL ARPowerupLose(tPowerup* pPowerup, tCar_spec* pCar);
 
-// SetPissed
+extern int C2_HOOK_FASTCALL SetPissed(tPowerup* pPowerup, tCar_spec* pCar);
 
 extern void C2_HOOK_FASTCALL ResetPissed(tPowerup* pPowerup, tCar_spec* pCar);
 
-// PissedEffect
+extern void C2_HOOK_FASTCALL PissedEffect(tPowerup* pPowerup, tU32 pPeriod);
 
 extern void C2_HOOK_CDECL RenderSpinningPowerup(br_actor* pActor, br_model* pModel, br_material* pMaterial, void* pOrder_table, br_uint_8 pStyle, int pOn_screen);
 
@@ -408,11 +408,11 @@ extern void C2_HOOK_FASTCALL SetChangingPowerup(br_actor* pActor);
 
 extern int C2_HOOK_FASTCALL PedValium(tPowerup* pPowerup, tCar_spec* pCar);
 
-// PowerupCancel
+extern int C2_HOOK_FASTCALL PowerupCancel(tPowerup* pPowerup, tCar_spec* pCar);
 
 extern int C2_HOOK_FASTCALL GrowATail(tPowerup* pPowerup, tCar_spec* pCar);
 
-// CutOffTail
+extern int C2_HOOK_FASTCALL CutOffTail(tPowerup* pPowerup, tCar_spec* pCar);
 
 extern void C2_HOOK_FASTCALL RemoveTail(void);
 

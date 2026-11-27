@@ -3425,7 +3425,8 @@ typedef struct tPowerup{
     undefined4 got_time;
     int duration;
     tU32 lose_time;
-    int group_inclusion;
+    tU16 group_inclusion;
+    undefined field_0x12[2];
     br_pixelmap * icon;
     int fizzle_type;
     int number_of_float_params;
@@ -3435,7 +3436,8 @@ typedef struct tPowerup{
     int prat_cam_event;
     int value;
     int initial_value;
-    tNet_powerup_type net_type;
+    tU8 net_type; /* tNet_powerup_type flags */
+    undefined field_0x39[3];
     tGot_proc* got_proc;
     tLose_proc* lose_proc;
     tPeriodic_proc* periodic_proc;
