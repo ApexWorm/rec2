@@ -415,6 +415,11 @@ int gPed_dismember_spurting_member_count;
 // GLOBAL: CARMA2_CHEAT 0x0069c008
 int gPed_nearness;
 
+// GLOBAL: CARMA2_HW 0x00694494
+// GLOBAL: CARMA2_SW 0x0068e4ec
+// GLOBAL: CARMA2_CHEAT 0x0069c00c
+float gPed_max_survivable_impact;
+
 // GLOBAL: CARMA2_HW 0x00694498
 // GLOBAL: CARMA2_SW 0x0068e4f0
 // GLOBAL: CARMA2_CHEAT 0x0069c010
@@ -1307,7 +1312,10 @@ void C2_HOOK_FASTCALL StartPedRunning(tPedestrian* pPed, tU32 pTime, int pArg3) 
 
 // PedAnimCausesMovement
 
-// StopSmoothTurning
+inline void C2_HOOK_FASTCALL StopSmoothTurning(tPedestrian* pPed) {
+
+    pPed->field_0x0c->field_0x6c = 0;
+}
 
 // SetKnockedOverMove
 
@@ -1825,7 +1833,74 @@ void C2_HOOK_FASTCALL SetLastHitter(tPedestrian* pPed, tPhysics_object* pObject)
 
 // MakePedVanish
 
-// CBPassiveCollision
+// FUNCTION: CARMA2_HW 0x004cdc00
+// FUNCTION: CARMA2_SW 0x004ca300
+// FUNCTION: CARMA2_CHEAT 0x004d3790
+int C2_HOOK_FASTCALL CBPassiveCollision(tPed_character_instance* pCharacter, tPhysics_object* pObject, tPhysics_object* pOther_object) {
+    tU32 time;
+    tPedestrian* ped;
+    int was_alive;
+    br_scalar mass;
+    br_scalar x;
+    br_scalar y;
+    br_scalar z;
+    br_scalar energy;
+    float damage;
+
+    time = GetTotalTime();
+    ped = pCharacter->ped;
+    was_alive = ped->hit_points > 0;
+    if (!(ped->flags & 0x40)) {
+        return 0;
+    }
+    ped->field_0x06++;
+    if (ped->field_0x0c != NULL) {
+        ped->field_0x0c->field_0x19 = 0;
+    }
+    StopSmoothTurning(ped);
+    SetLastHitter(ped, pOther_object);
+    mass = -pCharacter->personality->M;
+    x = pCharacter->field_0xd8.v[0] * mass;
+    y = pCharacter->field_0xd8.v[1] * mass;
+    z = pCharacter->field_0xd8.v[2] * mass;
+    if (pOther_object != NULL) {
+        x = pOther_object->v.v[0] * pOther_object->M + x;
+        y = pOther_object->v.v[1] * pOther_object->M + y;
+        z = pOther_object->v.v[2] * pOther_object->M + z;
+    }
+    energy = x * x + y * y + z * z;
+    if (pOther_object != NULL && pOther_object->owner != NULL && pOther_object->flags_0x238 == 0x20 && pOther_object->M == gMass_mutant_tail_ball) {
+        energy *= 10.f;
+    }
+    if (gExploding_pedestrians) {
+        damage = gPed_severing_damage * 5;
+    } else {
+        damage = energy / gPed_max_survivable_impact * 100.f;
+    }
+    DamagePedestrian(ped, damage, 0x5a, energy < 10.0 ? 0x5b : 0x5c, pOther_object);
+    if (ped->hit_points <= 0) {
+        MakePedNoise(ped, damage > 200.f ? 2 : 1, 0, pOther_object);
+        SetPedMove(ped, 0x5e, -1, 0, 0, time, ePed_action_dead);
+    } else {
+        MakePedNoise(ped, damage > 66.f ? 1 : 0, 0, pOther_object);
+    }
+    if (pObject->flags_0x238 == 5) {
+        pObject->field_0x1a0 = 0x40000;
+        pObject->field_0x1a4 = 0x40000;
+    } else {
+        pObject->field_0x1a0 = 0x20000;
+        pObject->field_0x1a4 = 0x40000;
+    }
+    PipeSinglePedStatus(pCharacter->ped, -1, -1, 1, 5, pCharacter->field_0x4, pCharacter->field_0x4, pCharacter->field_0x5, pCharacter->field_0x5,
+        &pCharacter->field_0xc0, &pCharacter->field_0xcc, &pCharacter->field_0x8c);
+    if (was_alive) {
+        if ((pOther_object != NULL && pOther_object->owner != NULL && pOther_object->flags_0x238 == 1 && ((tCar_spec*)pOther_object->owner)->driver == eDriver_local_human)
+                || (pOther_object->flags_0x238 == 0x20 && (gMutant_tail_state == 2 || GetTotalTime() - gDAT_00705b70 < 7500))) {
+            PipeSinglePedIncident(ped, pOther_object->actor);
+        }
+    }
+    return 1;
+}
 
 // BastardIt
 

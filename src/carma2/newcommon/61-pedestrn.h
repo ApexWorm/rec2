@@ -198,7 +198,7 @@ extern void C2_HOOK_FASTCALL StartPedRunning(tPedestrian* pPed, tU32 pTime, int 
 
 // PedAnimCausesMovement
 
-// StopSmoothTurning
+extern void C2_HOOK_FASTCALL StopSmoothTurning(tPedestrian* pPed);
 
 // SetKnockedOverMove
 
