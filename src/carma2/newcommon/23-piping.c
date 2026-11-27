@@ -575,6 +575,7 @@ void C2_HOOK_CDECL ARDoSingleVariedSession(int pType, uintptr_t pOwner, int pCou
 
 // FUNCTION: CARMA2_HW 0x00402df0
 // FUNCTION: CARMA2_SW 0x00402df0
+// FUNCTION: CARMA2_CHEAT 0x00402df0
 tU8* C2_HOOK_FASTCALL ARGetPipePlayPtr(void) {
     return gPipe_play_ptr;
 }
@@ -958,11 +959,37 @@ int C2_HOOK_FASTCALL CarTimeout(tU32 pTime) {
     return 1;
 }
 
+extern void C2_HOOK_FASTCALL ARScanBuffer(tU8** pPtr, tPipe_chunk_type pType, tU32 pDefault_time, tARScanBuffer_callback* pCallback, tARScanBuffer_time_check* pTime_check);
+
+// FUNCTION: CARMA2_HW 0x004c6920
+// FUNCTION: CARMA2_SW 0x004c3050
+// FUNCTION: CARMA2_CHEAT 0x004cc440
+void C2_HOOK_FASTCALL ScanCarsPositions(tCar_spec* pCar, br_vector3* pSource_pos, br_scalar pMax_distance_sqr, tU32 pOffset_time, tU32 pTime_period, br_vector3* pCar_pos, tU32* pTime_returned) {
+    tU8* temp_ptr;
+
+    temp_ptr = ARGetPipePlayPtr();
+    gTrigger_time = 0;
+    gMax_distance = pMax_distance_sqr;
+    BrVector3Copy(&gReference_pos, pSource_pos);
+    gCar_ptr = pCar;
+    if (ARReplayForwards()) {
+        gOldest_time = GetTotalTime() + pOffset_time;
+        gYoungest_time = gOldest_time + pTime_period;
+    } else {
+        gOldest_time = GetTotalTime() - pOffset_time;
+        gYoungest_time = gOldest_time - pTime_period;
+    }
+    ARScanBuffer(&temp_ptr, ePipe_chunk_car, GetTotalTime(), CheckCar, CarTimeout);
+    *pCar_pos = gCar_pos;
+    if (pCar_pos->v[0] > 500.0f) {
+        BrVector3Sub(pCar_pos, pCar_pos, &gInitial_position);
+    }
+    *pTime_returned = gTrigger_time;
+}
+
 #if defined(REC2_MATCHING) && defined(_MSC_VER)
 #pragma inline_depth()
 #endif
-
-// ScanCarsPositions
 
 // InitialiseActionReplay
 
