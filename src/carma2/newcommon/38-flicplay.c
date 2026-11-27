@@ -643,6 +643,7 @@ void C2_HOOK_FASTCALL TurnOnPanelFlics(void) {
 
 // FUNCTION: CARMA2_HW 0x00461a40
 // FUNCTION: CARMA2_SW 0x004614e0
+// FUNCTION: CARMA2_CHEAT 0x00461eb0
 int C2_HOOK_FASTCALL GetPanelFlicFrameIndex(int pIndex) {
 
     return gPanel_flic[pIndex].current_frame;
@@ -705,6 +706,7 @@ int C2_HOOK_FASTCALL EndFlic(tFlic_descriptor_ptr pFlic_info) {
 
 // FUNCTION: CARMA2_HW 0x00462390
 // FUNCTION: CARMA2_SW 0x00461e20
+// FUNCTION: CARMA2_CHEAT 0x00462800
 void C2_HOOK_FASTCALL DoDifferenceX(tFlic_descriptor* pFlic_info, tU32 pChunk_length) {
     int i;
     int j;
@@ -751,6 +753,7 @@ void C2_HOOK_FASTCALL DoDifferenceX(tFlic_descriptor* pFlic_info, tU32 pChunk_le
 
 // FUNCTION: CARMA2_HW 0x00462480
 // FUNCTION: CARMA2_SW 0x00461f10
+// FUNCTION: CARMA2_CHEAT 0x004628f0
 void C2_HOOK_FASTCALL DoDifferenceTrans(tFlic_descriptor* pFlic_info, tU32 pChunk_length) {
     int i;
     int j;
@@ -809,6 +812,7 @@ void C2_HOOK_FASTCALL DoDifferenceTrans(tFlic_descriptor* pFlic_info, tU32 pChun
 
 // FUNCTION: CARMA2_HW 0x00462580
 // FUNCTION: CARMA2_SW 0x00462010
+// FUNCTION: CARMA2_CHEAT 0x004629f0
 void C2_HOOK_FASTCALL DoBlack(tFlic_descriptor* pFlic_info, tU32 pChunk_length) {
     int i;
     int j;
@@ -832,6 +836,7 @@ void C2_HOOK_FASTCALL DoBlack(tFlic_descriptor* pFlic_info, tU32 pChunk_length) 
 
 // FUNCTION: CARMA2_HW 0x004626a0
 // FUNCTION: CARMA2_SW 0x00462130
+// FUNCTION: CARMA2_CHEAT 0x00462b10
 void C2_HOOK_FASTCALL DoRunLengthTrans(tFlic_descriptor* pFlic_info, tU32 pChunk_length) {
     int i;
     int j;
@@ -879,6 +884,7 @@ void C2_HOOK_FASTCALL DoRunLengthTrans(tFlic_descriptor* pFlic_info, tU32 pChunk
 
 // FUNCTION: CARMA2_HW 0x00462780
 // FUNCTION: CARMA2_SW 0x00462210
+// FUNCTION: CARMA2_CHEAT 0x00462bf0
 void C2_HOOK_FASTCALL DoUncompressed(tFlic_descriptor* pFlic_info, tU32 pChunk_length) {
     int i;
     int j;
@@ -904,6 +910,7 @@ void C2_HOOK_FASTCALL DoUncompressed(tFlic_descriptor* pFlic_info, tU32 pChunk_l
 
 // FUNCTION: CARMA2_HW 0x004627f0
 // FUNCTION: CARMA2_SW 0x00462280
+// FUNCTION: CARMA2_CHEAT 0x00462c60
 void C2_HOOK_FASTCALL DoUncompressedTrans(tFlic_descriptor* pFlic_info, tU32 pChunk_length) {
     int i;
     int j;
@@ -1015,6 +1022,7 @@ int C2_HOOK_FASTCALL LoadFlicData(char* pName, tU8** pData, tU32* pData_length) 
 
 // FUNCTION: CARMA2_HW 0x00462b80
 // FUNCTION: CARMA2_SW 0x00462610
+// FUNCTION: CARMA2_CHEAT 0x00462ff0
 void C2_HOOK_FASTCALL FreeFlic(int pIndex) {
 
     PossibleService();
@@ -1040,6 +1048,7 @@ void C2_HOOK_FASTCALL RunFlic(int pIndex) {
 
 // FUNCTION: CARMA2_HW 0x00462c30
 // FUNCTION: CARMA2_SW 0x004626c0
+// FUNCTION: CARMA2_CHEAT 0x004630a0
 void C2_HOOK_FASTCALL PreloadBunchOfFlics(int pBunch_index) {
 
 }
@@ -1088,6 +1097,8 @@ void C2_HOOK_FASTCALL InitFlicQueue(void) {
 }
 
 // FUNCTION: CARMA2_HW 0x00462cd0
+// FUNCTION: CARMA2_SW 0x00462760
+// FUNCTION: CARMA2_CHEAT 0x00463140
 int C2_HOOK_FASTCALL FlicQueueFinished(void) {
     tFlic_descriptor* the_flic;
 
@@ -1102,6 +1113,8 @@ int C2_HOOK_FASTCALL FlicQueueFinished(void) {
 }
 
 // FUNCTION: CARMA2_HW 0x00462d00
+// FUNCTION: CARMA2_SW 0x00462790
+// FUNCTION: CARMA2_CHEAT 0x00463170
 void C2_HOOK_FASTCALL ProcessFlicQueue(tU32 pInterval) {
     tFlic_descriptor* the_flic;
     tFlic_descriptor* last_flic;
