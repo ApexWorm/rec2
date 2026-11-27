@@ -1915,7 +1915,19 @@ void C2_HOOK_FASTCALL PukeDrugsBackUp(tPowerup* pPowerup, tCar_spec* pCar) {
     }
 }
 
-// ResetOpponentsSpeed
+// FUNCTION: CARMA2_HW 0x004de6b0
+// FUNCTION: CARMA2_SW 0x004dabb0
+// FUNCTION: CARMA2_CHEAT 0x004e4270
+void C2_HOOK_FASTCALL ResetOpponentsSpeed(tPowerup* pPowerup, tCar_spec* pCar) {
+    int i;
+
+    for (i = 0; i < gCurrent_race.number_of_racers && gCurrent_race.opponent_list[i].index != 29; i++) {
+    }
+    if (i < gCurrent_race.number_of_racers) {
+        ResetEngineFactor(&gPowerup_array[5], gCurrent_race.opponent_list[i].car_spec);
+    }
+    gOpponent_speed_factor = 1.f;
+}
 
 // FUNCTION: CARMA2_HW 0x004de710
 // FUNCTION: CARMA2_SW 0x004dac10
