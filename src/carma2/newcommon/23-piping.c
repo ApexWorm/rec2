@@ -128,10 +128,12 @@ tU8* gPipe_record_ptr;
 
 // GLOBAL: CARMA2_HW 0x00676904
 // GLOBAL: CARMA2_SW 0x00671074
+// GLOBAL: CARMA2_CHEAT 0x0067e1b4
 tU32 gPipe_sound_start_time;
 
 // GLOBAL: CARMA2_HW 0x006768a8
 // GLOBAL: CARMA2_SW 0x00671018
+// GLOBAL: CARMA2_CHEAT 0x0067e158
 tU32 gPipe_sound_time_window;
 
 // GLOBAL: CARMA2_HW 0x0067690c
@@ -2992,6 +2994,7 @@ void C2_HOOK_FASTCALL UndoTransformType(tPipe_chunk** pChunk, tPipe_chunk* pPrev
 // CalcCrushLength
 
 // FUNCTION: CARMA2_HW 0x004ca400
+// FUNCTION: CARMA2_SW 0x004c6b30
 // FUNCTION: CARMA2_CHEAT 0x004cff40
 int C2_HOOK_FASTCALL CalcShrapnelLength(tPipe_chunk* pChunk) {
     C2_HOOK_BUG_ON(sizeof(tPipe_chunk_shrapnel) != 0x14);
