@@ -211,6 +211,11 @@ tHeadup_icon gPickedup_powerups[20] = { 0 };
 // GLOBAL: CARMA2_CHEAT 0x0070cbe0
 int gMutant_tail_state;
 
+// GLOBAL: CARMA2_HW 0x00705b70
+// GLOBAL: CARMA2_SW 0x006fc630
+// GLOBAL: CARMA2_CHEAT 0x0070d210
+tU32 gMutant_tail_cut_off_time; /* FIXME: name is a guess */
+
 // GLOBAL: CARMA2_HW 0x00705b78
 // GLOBAL: CARMA2_SW 0x006fc638
 // GLOBAL: CARMA2_CHEAT 0x0070d218
@@ -2567,7 +2572,26 @@ int C2_HOOK_FASTCALL GrowATail(tPowerup* pPowerup, tCar_spec* pCar) {
     return pPowerup - gPowerup_array;
 }
 
-// CutOffTail
+// FUNCTION: CARMA2_HW 0x004e04c0
+// FUNCTION: CARMA2_SW 0x004dc9c0
+// FUNCTION: CARMA2_CHEAT 0x004e60a0
+int C2_HOOK_FASTCALL CutOffTail(tPowerup* pPowerup, tCar_spec* pCar) {
+
+    if (gMutant_tail_state == 2) {
+        PhysicsRemoveObject(gMutant_tail_object);
+        gMutant_tail_object->physics_joint1 = NULL;
+        PHILAddActiveObject(gMutant_tail_object, NULL, NULL, NULL);
+        PHILSetObjectProperty(gMutant_tail_object, 0, 1.0);
+        PHILSetObjectProperty(gMutant_tail_object, 1, 1);
+        PHILSetObjectProperty(gMutant_tail_object, 7, 1);
+        PHILSetObjectProperty(gMutant_tail_object, 6, 1);
+        LosePowerup(&gPowerup_array[94]);
+        gMutant_tail_state = 1;
+        DRS3StartSound2(gCar_outlet, 3902, 1, 255, 255, -1, -1);
+        gMutant_tail_cut_off_time = GetTotalTime();
+    }
+    return pPowerup - gPowerup_array;
+}
 
 // FUNCTION: CARMA2_HW 0x004e06a0
 // FUNCTION: CARMA2_SW 0x004dcba0
