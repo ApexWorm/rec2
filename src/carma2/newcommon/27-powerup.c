@@ -257,6 +257,7 @@ int gNumber_of_icons;
 
 // GLOBAL: CARMA2_HW 0x006a0950
 // GLOBAL: CARMA2_SW 0x0069a9a8
+// GLOBAL: CARMA2_CHEAT 0x006a84c8
 int gFizzle_height;
 
 // GLOBAL: CARMA2_HW 0x006a0954
@@ -2771,6 +2772,7 @@ void C2_HOOK_FASTCALL TurnOffCloaking(tPowerup* pPowerup, tCar_spec* pCar) {
 }
 
 // FUNCTION: CARMA2_HW 0x004e0de0
+// FUNCTION: CARMA2_SW 0x004dd100
 // FUNCTION: CARMA2_CHEAT 0x004e69a0
 void C2_HOOK_FASTCALL PeriodicCloaking(void) {
     int i;
