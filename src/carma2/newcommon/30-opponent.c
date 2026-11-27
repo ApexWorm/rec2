@@ -277,8 +277,7 @@ static inline void C2_HOOK_FASTCALL WeightedFindNearestNodeAndSection(tCar_spec*
             }
             nearest_section = section_no;
         }
-        length_squared_a = BrVector3LengthSquared(&a);
-        if (length_squared_a >= 0.0001f) {
+        if ((length_squared_a = BrVector3LengthSquared(&a)) >= 0.0001f) {
             t = BrVector3Dot(&p, &a) / length_squared_a;
             if (t >= 0.f && t <= 1.f) {
                 BrVector3Scale(&wank, &a, t);
