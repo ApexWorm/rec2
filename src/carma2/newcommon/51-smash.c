@@ -426,7 +426,7 @@ void C2_HOOK_FASTCALL ApplyInitialMovement(tMovement_spec* pSpeed_info, br_vecto
     pVelocity->v[0] = pImpactee_velocity->v[0] * (pSpeed_info->impactee_velocity_factor);
     pVelocity->v[1] = pImpactee_velocity->v[1] * pSpeed_info->impactee_velocity_factor;
     pVelocity->v[2] = pImpactee_velocity->v[2] * pSpeed_info->impactee_velocity_factor;
-    if (pSource_position != NULL && pPosition != NULL && pSpeed_info->min_speed != 0.f && pSpeed_info->max_speed != 0.f) {
+    if (pSource_position != NULL && pPosition != NULL && pSpeed_info->min_speed != 0.0f && pSpeed_info->max_speed != 0.0f) {
         BrVector3Sub(&tv, pSource_position, pPosition);
         distance = BrVector3Length(&tv);
         tv.v[0] *= FRandomBetween(pSpeed_info->min_speed, pSpeed_info->max_speed) / distance;
@@ -436,24 +436,24 @@ void C2_HOOK_FASTCALL ApplyInitialMovement(tMovement_spec* pSpeed_info, br_vecto
     }
     for (i = 0; i < 3; i++) {
         pVelocity->v[i] = (pVelocity->v[i] + FRandomPosNeg(pSpeed_info->random_velocity_max)) * pScale;
-        pOmega->v[i] = FRandomBetween(0.f, 1.f);
+        pOmega->v[i] = FRandomBetween(0.0f, 1.0f);
     }
-    pVelocity->v[1] += FRandomBetween(0.f, pSpeed_info->random_up_velocity_max);
+    pVelocity->v[1] += FRandomBetween(0.0f, pSpeed_info->random_up_velocity_max);
     distance = BrVector3Length(pNormal);
     if (distance > BR_SCALAR_EPSILON * 2) {
         BrVector3Scale(&tv, pNormal, 1.0 / distance);
     } else {
-        BrVector3Set(&tv, 1.f, 0.f, 0.f);
+        BrVector3Set(&tv, 1.0f, 0.0f, 0.0f);
     }
-    tv.v[0] *= FRandomBetween(0.f, pSpeed_info->random_normal_velocity_max);
-    tv.v[1] *= FRandomBetween(0.f, pSpeed_info->random_normal_velocity_max);
-    tv.v[2] *= FRandomBetween(0.f, pSpeed_info->random_normal_velocity_max);
+    tv.v[0] *= FRandomBetween(0.0f, pSpeed_info->random_normal_velocity_max);
+    tv.v[1] *= FRandomBetween(0.0f, pSpeed_info->random_normal_velocity_max);
+    tv.v[2] *= FRandomBetween(0.0f, pSpeed_info->random_normal_velocity_max);
     BrVector3Accumulate(pVelocity, &tv);
     distance = BrVector3Length(pOmega);
     if (distance > BR_SCALAR_EPSILON * 2) {
         BrVector3Scale(pOmega, pOmega, 1.0 / distance);
     } else {
-        BrVector3Set(pOmega, 1.f, 0.f, 0.f);
+        BrVector3Set(pOmega, 1.0f, 0.0f, 0.0f);
     }
     pOmega->v[0] *= FRandomPosNeg(pScale * pSpeed_info->random_spin_rate_max);
     pOmega->v[1] *= FRandomPosNeg(pScale * pSpeed_info->random_spin_rate_max);
