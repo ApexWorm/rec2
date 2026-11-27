@@ -1089,6 +1089,8 @@ void C2_HOOK_FASTCALL InitFlicQueue(void) {
 }
 
 // FUNCTION: CARMA2_HW 0x00462cd0
+// FUNCTION: CARMA2_SW 0x00462760
+// FUNCTION: CARMA2_CHEAT 0x00463140
 int C2_HOOK_FASTCALL FlicQueueFinished(void) {
     tFlic_descriptor* the_flic;
 
@@ -1103,6 +1105,8 @@ int C2_HOOK_FASTCALL FlicQueueFinished(void) {
 }
 
 // FUNCTION: CARMA2_HW 0x00462d00
+// FUNCTION: CARMA2_SW 0x00462790
+// FUNCTION: CARMA2_CHEAT 0x00463170
 inline void C2_HOOK_FASTCALL ProcessFlicQueue(tU32 pInterval) {
     tFlic_descriptor* the_flic;
     tFlic_descriptor* last_flic;
