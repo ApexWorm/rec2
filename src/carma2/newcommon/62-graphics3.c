@@ -323,6 +323,7 @@ br_pixelmap* gAlt_meter;
 
 // GLOBAL: CARMA2_HW 0x0068c880
 // GLOBAL: CARMA2_SW 0x006868d8
+// GLOBAL: CARMA2_CHEAT 0x00694120
 br_matrix23 gMatrix23_0068c880;
 
 // GLOBAL: CARMA2_HW 0x0068c878
@@ -1225,6 +1226,7 @@ inline void C2_HOOK_FASTCALL DoDirectionFinderStuff(br_pixelmap* pMap) {
 #endif
 
 // STUB: CARMA2_HW 0x00494900
+// STUB: CARMA2_SW 0x00493520
 // STUB: CARMA2_CHEAT 0x00494b30
 void C2_HOOK_FASTCALL DoOpponentStatusHeadup(void) {
     NOT_IMPLEMENTED();
