@@ -34,6 +34,7 @@ br_material* gMaterial[2] = { NULL };
 
 #ifdef REC2_HW
 // GLOBAL: CARMA2_HW 0x0074cef0
+// GLOBAL: CARMA2_CHEAT 0x00754590
 br_actor* gHUDsquare_actor = NULL;
 
 // GLOBAL: CARMA2_HW 0x0074cf0c
