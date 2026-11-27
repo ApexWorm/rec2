@@ -236,7 +236,7 @@ extern void C2_HOOK_FASTCALL ReAttachBit(tCar_spec* pCar_spec, br_actor* pActor_
 
 // CentreModelOnPoint
 
-// SemiDetachBit
+extern tPhysics_object* C2_HOOK_FASTCALL SemiDetachBit(tCar_spec* pCar, br_actor* pActor, float pArg3, int* pArg4, br_vector3* pP1, br_bounds3* pBounds, br_vector3* pP2, br_vector3* pP3);
 
 extern int C2_HOOK_FASTCALL GetSDBJointPosAndBounds(br_vector3* pP1, br_vector3* pP2, br_vector3* pP3, br_bounds3* pBounds, br_actor* pActor);
 
@@ -248,7 +248,7 @@ extern void C2_HOOK_FASTCALL SendAllSemiDetachedBits(tNet_game_player_info* pPla
 
 extern void C2_HOOK_FASTCALL AddNonCar(tNon_car_spec* pNon_car, const tDriver* pDriver);
 
-// DetachBit
+extern tPhysics_object* C2_HOOK_FASTCALL DetachBit(tCar_spec* pCar, br_actor* pActor, br_bounds3* pBounds);
 
 // DoDetaching
 
@@ -278,9 +278,9 @@ extern int C2_HOOK_FASTCALL BitObjectIsSufficientlyOutsideCarObjectToDetach(tPhy
 
 extern void C2_HOOK_FASTCALL FullyDetachBit(tCar_spec* pCar, tPhysics_object* pObject);
 
-// SendFullyDetachBit
+extern void C2_HOOK_FASTCALL SendFullyDetachBit(tCar_spec* pCar, tPhysics_object* pObject);
 
-// DoFullyDetaching
+extern void C2_HOOK_FASTCALL DoFullyDetaching(void);
 
 // CalculateCollisionObjectStuffForSplitHalves
 
@@ -498,27 +498,27 @@ extern void C2_HOOK_FASTCALL ARUndoSplitWeld(tCar_spec* pCar);
 
 // ReceivedCrush
 
-// FindBitWithID
+extern intptr_t C2_HOOK_CDECL FindBitWithID(br_actor* pActor, void* pContext);
 
-// AttachedBitFromID
+extern br_actor* C2_HOOK_FASTCALL AttachedBitFromID(tCar_spec* pCar, tU8 pID);
 
-// ReceivedSemiDetachBit
+extern void C2_HOOK_FASTCALL ReceivedSemiDetachBit(tNet_message_chunk* pContents);
 
 // ReceivedDetachBit
 
-// SemiDetachedBitObjectFromID
+extern tPhysics_object* C2_HOOK_FASTCALL SemiDetachedBitObjectFromID(tCar_spec* pCar, tU8 pID);
 
-// ReceivedFullyDetachBit
+extern void C2_HOOK_FASTCALL ReceivedFullyDetachBit(tNet_message_chunk* pContents);
 
-// DetachedBitFromID
+extern br_actor* C2_HOOK_FASTCALL DetachedBitFromID(tCar_spec* pCar, tU8 pID);
 
-// SemiDetachedBitFromID
+extern br_actor* C2_HOOK_FASTCALL SemiDetachedBitFromID(tCar_spec* pCar, tU8 pID);
 
-// ReceivedReAttachBit
+extern void C2_HOOK_FASTCALL ReceivedReAttachBit(tNet_message_chunk* pContents);
 
 extern void C2_HOOK_FASTCALL ReceivedReAttachAllBits(tNet_message_chunk* pContents);
 
-// DoQueuedNetDetaching
+extern void C2_HOOK_FASTCALL DoQueuedNetDetaching(void);
 
 // DBNonCarOwner
 
