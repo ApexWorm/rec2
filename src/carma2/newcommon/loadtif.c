@@ -50,17 +50,17 @@ br_pixelmap* C2_HOOK_FASTCALL CreatePalettePixelmapFromRGBChannels(br_uint_16* p
         }
         pixels = pm->pixels;
 
-        pixels[0] = 0;
-        pixels[1] = 0;
         pixels[2] = 0;
+        pixels[1] = 0;
+        pixels[0] = 0;
         for (i = 1; i < 256; i++) {
             pixels[4 * i + 0] = pBlu_channel[i] >> 8;
             pixels[4 * i + 1] = pGrn_channel[i] >> 8;
             pixels[4 * i + 2] = pRed_channel[i] >> 8;
             if (pixels[4 * i + 0] == 0 && pixels[4 * i + 1] == 0 && pixels[4 * i + 2] == 0) {
-                pixels[4 * i + 0] = 1;
-                pixels[4 * i + 1] = 1;
                 pixels[4 * i + 2] = 1;
+                pixels[4 * i + 1] = 1;
+                pixels[4 * i + 0] = 1;
             }
         }
     }
