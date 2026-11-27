@@ -1178,7 +1178,42 @@ void C2_HOOK_FASTCALL FlameAnimate(int pColumn, const br_vector3* pPos, tU32 pTi
     }
 }
 
-// DoSmokeColumn
+// FUNCTION: CARMA2_HW 0x004fc0e0
+// FUNCTION: CARMA2_SW 0x004f7640
+// FUNCTION: CARMA2_CHEAT 0x00501d80
+void C2_HOOK_FASTCALL DoSmokeColumn(int pColumn, tU32 pTime, br_vector3* pRet_car_pos) {
+    br_actor* actor;
+    br_actor* bonny;
+
+    if (gSmoke_column[pColumn].core.field_0x0 == 1) {
+        if (gSmoke_column[pColumn].core.car->car_master_actor->t.t.mat.m[1][1] > .1f) {
+            gSmoke_column[pColumn].upright = 1;
+        }
+        if (gSmoke_column[pColumn].core.car->car_master_actor->t.t.mat.m[1][1] < -.1f) {
+            gSmoke_column[pColumn].upright = 0;
+        }
+        actor = gSmoke_column[pColumn].core.car->car_actor;
+        bonny = gSmoke_column[pColumn].core.car->car_actor;
+        BrVector3Add(pRet_car_pos, &actor->model->prepared->groups[0].vertices[gSmoke_column[pColumn].vertex_index].p, &actor->t.t.translate.t);
+    } else {
+        actor = gSmoke_column[pColumn].core.car_actor;
+        gSmoke_column[pColumn].upright = 1;
+        BrVector3Copy(pRet_car_pos, &actor->model->prepared->groups[0].vertices[gSmoke_column[pColumn].vertex_index].p);
+    }
+    if (gSmoke_column[pColumn].core.field_0x0 == 1 && gProgram_state.cockpit_on && gSmoke_column[pColumn].core.car != NULL
+        && gSmoke_column[pColumn].core.car->driver == eDriver_local_human) {
+        if (gSmoke_column[pColumn].core.car->driver_z_offset + .2 > pRet_car_pos->v[2]) {
+            BrMatrix34ApplyP(pRet_car_pos, &actor->model->prepared->groups[0].vertices[gSmoke_column[pColumn].vertex_index].p, &bonny->t.t.mat);
+        } else {
+            pRet_car_pos->v[1] = (float)(pRet_car_pos->v[1] - .07);
+        }
+    }
+    if (!gSmoke_column[pColumn].upright) {
+        pRet_car_pos->v[1] = gSmoke_column[pColumn].core.car->collision_info->shape->common.bb.min.v[1] * (1.f / WORLD_SCALE);
+    }
+    BrMatrix34ApplyP(&gSmoke_column[pColumn].pos, pRet_car_pos, &gSmoke_column[pColumn].core.car_actor->t.t.mat);
+    gSmoke_column[pColumn].pos.v[1] -= .03f;
+}
 
 // ReplaySmokeColumn
 
