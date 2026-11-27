@@ -376,11 +376,48 @@ void C2_HOOK_FASTCALL ARStartPipingSession(tPipe_chunk_type pType) {
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x00402660
-// STUB: CARMA2_SW 0x00402660
-// STUB: CARMA2_CHEAT 0x00402660
+// FUNCTION: CARMA2_HW 0x00402660
+// FUNCTION: CARMA2_SW 0x00402660
+// FUNCTION: CARMA2_CHEAT 0x00402660
 void C2_HOOK_FASTCALL EndPipingSession2(int pMunge_reentrancy) {
-    NOT_IMPLEMENTED();
+
+    if (gPipe_buffer_start == NULL || gAction_replay_mode || !gProgram_state.racing) {
+        return;
+    }
+    /* End session with buffer size */
+    *(tS16*)(gLocal_buffer + gLocal_buffer_size) = gLocal_buffer_size;
+    gLocal_buffer_size += sizeof(tS16);
+
+    if (((tPipe_session*)gLocal_buffer)->count != 0 && gLocal_buffer_size <= 15000) {
+        if (gPipe_record_ptr + gLocal_buffer_size > gPipe_buffer_phys_end) {
+            gPipe_buffer_working_end = gPipe_record_ptr;
+            gPipe_buffer_oldest = gPipe_buffer_start;
+            gPipe_record_ptr = gPipe_buffer_start;
+        }
+        while (gPipe_record_ptr <= gPipe_buffer_oldest && gPipe_record_ptr + gLocal_buffer_size > gPipe_buffer_oldest) {
+            // Remove older sessions
+            gPipe_buffer_oldest += LengthOfSession((tPipe_session*)gPipe_buffer_oldest);
+
+            if (gPipe_buffer_oldest >= gPipe_buffer_working_end) {
+                gPipe_buffer_working_end = gPipe_buffer_phys_end;
+                gPipe_buffer_oldest = gPipe_buffer_start;
+            }
+        }
+        if (gPipe_buffer_oldest == NULL) {
+            gPipe_buffer_oldest = gPipe_record_ptr;
+        }
+        memcpy(gPipe_record_ptr, gLocal_buffer, gLocal_buffer_size);
+        gPipe_record_ptr += gLocal_buffer_size;
+        if (gPipe_record_ptr > gPipe_buffer_working_end) {
+            gPipe_buffer_working_end = gPipe_record_ptr;
+        }
+    }
+    if (pMunge_reentrancy && gReentrancy_count != 0) {
+        gReentrancy_count -= 1;
+        if (gReentrancy_count != 0) {
+            StartPipingSession2(gReentrancy_array[gReentrancy_count - 1], 0);
+        }
+    }
 }
 
 #ifdef REC2_MATCHING
