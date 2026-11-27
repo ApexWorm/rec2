@@ -192,7 +192,7 @@ extern void C2_HOOK_FASTCALL TellPhysicsJointsHaveChanged(tPhysics_object* pColl
 
 // CheckPointVelocities
 
-extern void C2_HOOK_FASTCALL WriteNewPositions(tPhysics_object* pObject);
+// WriteNewPositions
 
 extern void C2_HOOK_FASTCALL SetListDoingNothingFlag(tPhysics_object* pObject, int pFlag);
 
@@ -312,7 +312,7 @@ extern void C2_HOOK_FASTCALL ApplyGravity(tPhysics_object* pObject);
 
 extern void C2_HOOK_FASTCALL SetGravityDeltaV(tPhysics_object* pObject, br_vector3* pImpulse);
 
-// TrialPositionChildren
+extern void C2_HOOK_FASTCALL TrialPositionChildren(tPhysics_object* pObject);
 
 extern void C2_HOOK_FASTCALL InternalPositionChildren(tPhysics_object* pParent, tPhysics_object* pRoot);
 
