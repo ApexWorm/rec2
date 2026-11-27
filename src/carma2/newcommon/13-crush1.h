@@ -534,7 +534,7 @@ extern void C2_HOOK_FASTCALL ReceivedToggleFlaps(tNet_message_chunk* pContents);
 
 // SHNonCarOwner
 
-// SendSHNonCar
+extern void C2_HOOK_FASTCALL SendSHNonCar(tNon_car_spec* pNon_car, tU32 pTime, tNet_game_player_info* pPlayer);
 
 extern void C2_HOOK_FASTCALL SendAllSHNonCars(tNet_game_player_info* pPlayer);
 

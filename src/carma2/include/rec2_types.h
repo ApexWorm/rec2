@@ -4668,11 +4668,14 @@ typedef struct tPhysics_object {
     undefined field_0x261;
     undefined field_0x262[6];
     tU32 message_time; // 0x268
-    undefined field_0x26c[0x278 - 0x26c];
+    tU8 field_0x26c[4];
+    tCar_controls field_0x270;
+    tU32 field_0x274;
     tS16 field_0x278;
     undefined field_0x27a[0x27c - 0x27a];
     tU32 field_0x27c;
-    undefined field_0x280[0x290 - 0x280];
+    tU8 field_0x280[12];
+    undefined field_0x28c[0x290 - 0x28c];
     tU16 field_0x290;
     tU8 field_0x292;
     undefined field_0x293;
@@ -5465,8 +5468,11 @@ typedef enum {
     eNet_message_chunk_type_start_race = 0xc,
     eNet_message_chunk_type_headup = 0xd,
     eNet_message_chunk_type_netsynch = 0xe,
+    eNet_message_chunk_type_mechanics = 0x10,
     eNet_message_chunk_type_non_car = 0x11,
+    eNet_message_chunk_type_time_sync = 0x12,
     eNet_message_chunk_type_powerup = 0x16,
+    eNet_message_chunk_type_recover = 0x17,
     eNet_message_chunk_type_player_scores = 0x18,
     eNet_message_chunk_type_gameplay = 0x1b,
     eNet_message_chunk_type_oil_spill = 0x1f,
@@ -5475,8 +5481,10 @@ typedef enum {
     eNet_message_chunk_type_reattach_bit = 0x26,
     eNet_message_chunk_type_db_non_car = 0x27,
     eNet_message_chunk_type_sh_non_car = 0x29,
+    eNet_message_chunk_type_shape_numbers = 0x2a,
     eNet_message_chunk_type_reattach_all_bits = 0x2b,
     eNet_message_chunk_type_toggle_doors = 0x2c,
+    eNet_message_chunk_type_simple_car_pos = 0x2d,
     eNet_message_chunk_type_view_car = 0x2f,
     eNet_message_chunk_type_mine_explosion = 0x31,
     eNet_message_chunk_type_detach_bit = 0x33,
@@ -5747,6 +5755,32 @@ typedef struct {
 typedef struct {
     tNet_message_chunk_header header;
     undefined field_0x2[2];
+    tU32 race_start_time;
+} tNet_message_chunk_time_sync;
+
+typedef struct {
+    tNet_message_chunk_header header;
+    undefined field_0x2[2];
+    tPlayer_ID player;
+    tU32 time;
+    tU8 d[4];
+    tCar_controls keys;
+    tU32 cc_coll_time;
+    tS16 curvature;
+    tS16 revs;
+    tU32 repair_time;
+    tU8 damage[12];
+    tU8 powerups[3];
+    undefined field_0x2f;
+    tU16 shape_number;
+    tU8 flags;
+    undefined field_0x33;
+    tU8 data[]; /* hierarchy network data, then the optional parts selected by flags */
+} tNet_message_chunk_mechanics;
+
+typedef struct {
+    tNet_message_chunk_header header;
+    undefined field_0x2[2];
     tU32 ID;
     tU32 time;
     undefined field_0xc[4];
@@ -5759,7 +5793,9 @@ typedef union {
     tNet_message_chunk_race_over race_over; /* type = 0xa */
     tNet_message_chunk_start_race start_race; /* type = 0xc */
     tNet_message_headup headup; /* type = 0xd */
+    tNet_message_chunk_mechanics mechanics; /* type = 0x10 */
     tNet_message_chunk_non_car non_car; /* type = 0x11 */
+    tNet_message_chunk_time_sync time_sync; /* type = 0x12 */
     tNet_message_chunk_powerup powerup; /* type = 0x16 */
     tNet_message_chunk_scores scores; /* type = 0x18 */
     tNet_message_chunk_gameplay gameplay; /* type = 0x1b */

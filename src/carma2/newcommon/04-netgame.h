@@ -16,25 +16,25 @@ extern int gINT_0068d920;
 extern tNet_game_player_info* gLast_lepper;
 extern int gLast_it_change;
 
-// SendShapeNumbers
+extern void C2_HOOK_FASTCALL SendShapeNumbers(void);
 
 extern void C2_HOOK_FASTCALL ClearShapeStatusFlag(tCar_crush_network_shapes* pShapes, int pPlayer_id);
 
 extern void C2_HOOK_FASTCALL SendNonCar(tNon_car_spec* pNon_car, tU32 pTime);
 
-// HostFillInCarContents
+extern void C2_HOOK_FASTCALL HostFillInCarContents(tNet_message_chunk* pContents, int pPlayer_index, tU32 pTime);
 
-// ClientSendCarData
+extern void C2_HOOK_FASTCALL ClientSendCarData(tU32 pNext_frame_time);
 
-// DistanceBetweenCars
+extern br_scalar C2_HOOK_FASTCALL DistanceBetweenCars(tCar_spec* pCar_1, tCar_spec* pCar_2);
 
 extern int C2_HOOK_FASTCALL CarShapeNeedsSendingToPlayer(tCar_crush_network_shapes* pShapes, int pPlayer_id);
 
-// AddShapeStuffToMechanicsMessage
+extern void C2_HOOK_FASTCALL AddShapeStuffToMechanicsMessage(tNet_message_chunk* pContents, tNet_game_player_info* pPlayer, tNet_game_player_info* pTo_player);
 
 extern int C2_HOOK_FASTCALL TimeToSendData(void);
 
-// SendCarData
+extern void C2_HOOK_FASTCALL SendCarData(tU32 pNext_frame_time);
 
 extern void C2_HOOK_FASTCALL ReceivedRecover(tNet_message_chunk_recover* pContents);
 
@@ -42,11 +42,11 @@ extern void C2_HOOK_FASTCALL ReceivedRecover(tNet_message_chunk_recover* pConten
 
 // ReceivedShapeNumbers
 
-// FillInSimpleCarPos
+extern void C2_HOOK_FASTCALL FillInSimpleCarPos(tNet_message_chunk* pContents, int pPlayer_index);
 
 // ReceivedSimpleCarPos
 
-// ReceivedMechanics
+extern void C2_HOOK_FASTCALL ReceivedMechanics(tNet_message_chunk* pContents);
 
 extern void C2_HOOK_FASTCALL ReceivedCopInfo(void);
 
