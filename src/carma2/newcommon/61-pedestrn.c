@@ -26,6 +26,7 @@
 #include "51-smash.h"
 #include "52-errors.h"
 #include "54-runtime.h"
+#include "60-phil.h"
 #include "61-pedestrn-phys.h"
 #include "62-graphics3.h"
 #include "63-loading3.h"
@@ -40,6 +41,8 @@
 #include "c2_math.h"
 #include "c2_stdlib.h"
 #include "c2_string.h"
+
+#include <stdarg.h>
 
 // GLOBAL: CARMA2_HW 0x006a0420
 // GLOBAL: CARMA2_SW 0x0069a478
@@ -491,9 +494,35 @@ tPed_movement_spec* gPed_movements;
 
 // InitBoner
 
-// DRVector3SafeCross
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
 
-// DRVector3SafeCrossXZ
+// STUB: CARMA2_HW 0x00403f90
+// STUB: CARMA2_SW 0x00403f90
+// STUB: CARMA2_CHEAT 0x00403f90
+void C2_HOOK_FASTCALL DRVector3SafeCross(br_vector3* pDest, const br_vector3* pA, const br_vector3* pB) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_HW 0x00404150
+// STUB: CARMA2_SW 0x00404150
+// STUB: CARMA2_CHEAT 0x00404150
+void C2_HOOK_FASTCALL DRVector3SafeCrossXZ(br_vector3* pDest, const br_vector3* pA, const br_vector3* pB) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // FUNCTION: CARMA2_HW 0x00404290
 // FUNCTION: CARMA2_SW 0x00404290
@@ -1046,6 +1075,7 @@ void C2_HOOK_FASTCALL CalcCollisionObjectThings(tPhysics_object* pObject, br_bou
 
 // STUB: CARMA2_HW 0x00408c30
 // STUB: CARMA2_SW 0x00408c30
+// STUB: CARMA2_CHEAT 0x00408c40
 int C2_HOOK_FASTCALL MakeCharacterCollideworthy2(tPed_character_instance* pCharacter, int pArg2, int pArg3, int pArg4) {
     NOT_IMPLEMENTED();
 }
@@ -1060,10 +1090,6 @@ int C2_HOOK_FASTCALL MakeCharacterCollideworthy2(tPed_character_instance* pChara
 int C2_HOOK_FASTCALL MakeCharacterCollideworthy(tPed_character_instance* pCharacter, int pArg2, int pArg3) {
     return MakeCharacterCollideworthy2(pCharacter, pArg2, pArg3, -1);
 }
-
-#ifdef REC2_MATCHING
-#pragma auto_inline(off)
-#endif
 
 // FUNCTION: CARMA2_HW 0x00409040
 // FUNCTION: CARMA2_SW 0x00409040
@@ -1084,10 +1110,19 @@ tPhysics_object* C2_HOOK_FASTCALL GetRootObject(tPed_character_instance* pPed) {
 }
 
 #ifdef REC2_MATCHING
-#pragma auto_inline(on)
+#pragma auto_inline(off)
 #endif
 
-// CharacterNoLongerCollideworthy
+// STUB: CARMA2_HW 0x00409090
+// STUB: CARMA2_SW 0x00409090
+// STUB: CARMA2_CHEAT 0x004090c0
+int C2_HOOK_FASTCALL CharacterNoLongerCollideworthy(tPed_character_instance* pCharacter) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // FUNCTION: CARMA2_HW 0x00409300
 // FUNCTION: CARMA2_SW 0x00409300
@@ -1102,11 +1137,44 @@ void C2_HOOK_FASTCALL SetObjectV(tPhysics_object* pObject, const br_vector3* pV)
 
 // SetObjectOmega
 
-// MakePartPhysicallyActive
+inline void C2_HOOK_FASTCALL MakePartPhysicallyActive(tPhysics_object* pObject, const br_vector3* pV) {
 
-// TurnPhysicsOn
+#ifdef REC2_CHEAT
+    if (gAction_replay_mode) {
+        PDFatalError("Spam spam spam spam!");
+    }
+#endif
+    pObject->disable_move_rotate = 0;
+    if (pV != NULL) {
+        SetObjectV(pObject, pV);
+    }
+    PHILMakeObjectActive(pObject, NULL, NULL, 1);
+    pObject->field_0xed = 1;
+    PHILSetObjectProperty(pObject, 0, 1.0);
+    PHILSetObjectProperty(pObject, 3, 0);
+    PHILSetObjectProperty(pObject, 4, 0);
+    PHILSetObjectProperty(pObject, 5, 0);
+}
 
-// MakeCharacterPhysicworthy
+inline void C2_HOOK_FASTCALL TurnPhysicsOn(tPed_character_instance* pCharacter) {
+    tPhysics_object* object;
+
+    object = (pCharacter->field_0x14 & 0x1) ? pCharacter->personality->form->simple_physicing[(tS8)pCharacter->field_0x5].collision_info : GetRootObject(pCharacter);
+    MakePartPhysicallyActive(object, &pCharacter->field_0xd8);
+    pCharacter->field_0x14 |= 0x4;
+}
+
+inline int C2_HOOK_FASTCALL MakeCharacterPhysicworthy(tPed_character_instance* pCharacter) {
+
+    if (pCharacter->field_0x14 & 0x4) {
+        return 0x17;
+    }
+    if (pCharacter->field_0x14 == 0) {
+        return 0x15;
+    }
+    TurnPhysicsOn(pCharacter);
+    return 0;
+}
 
 // FUNCTION: CARMA2_HW 0x00409340
 // FUNCTION: CARMA2_SW 0x00409340
@@ -1127,10 +1195,26 @@ void C2_HOOK_FASTCALL RecalculateOrientationOfRoot(tPed_character_instance* pCha
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x00409400
-// STUB: CARMA2_SW 0x00409400
+// FUNCTION: CARMA2_HW 0x00409400
+// FUNCTION: CARMA2_SW 0x00409400
+// FUNCTION: CARMA2_CHEAT 0x00409450
 int C2_HOOK_FASTCALL BonerActiveHalted2(tPed_character_instance* pCharacter, undefined4 pArg2) {
-    NOT_IMPLEMENTED();
+    tPhysics_object* object;
+
+    object = (pCharacter->field_0x14 & 0x1) ? pCharacter->personality->form->simple_physicing[(tS8)pCharacter->field_0x5].collision_info : GetRootObject(pCharacter);
+    RecalculateOrientationOfRoot(pCharacter);
+    SetCharacterBonePositions(pCharacter, 3, 0);
+    pCharacter->field_0x14 &= ~0x4;
+    if (gPed_vtable->active_halted != NULL && !gPed_vtable->active_halted(pCharacter, object)) {
+        pCharacter->field_0x14 |= 0x4;
+        return 0;
+    }
+    object->disable_move_rotate = 1;
+    BrVector3Copy(&pCharacter->field_0xd8, &object->v);
+    PHILSetObjectProperty(object, 3, 1);
+    PHILSetObjectProperty(object, 4, 1);
+    PHILSetObjectProperty(object, 5, 1);
+    return 1;
 }
 
 #ifdef REC2_MATCHING
@@ -1152,11 +1236,35 @@ int C2_HOOK_FASTCALL CharacterNoLongerPhysicworthy(tPed_character_instance* pCha
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x00409570
-// STUB: CARMA2_SW 0x00409570
-// STUB: CARMA2_CHEAT 0x004095c0
-void C2_HOOK_CDECL SetCharacterPhysicsLevel(tPed_character_instance* pCharacter, tU32 pLevel, ...) {
-    NOT_IMPLEMENTED();
+// FUNCTION: CARMA2_HW 0x00409570
+// FUNCTION: CARMA2_SW 0x00409570
+// FUNCTION: CARMA2_CHEAT 0x004095c0
+int C2_HOOK_CDECL SetCharacterPhysicsLevel(tPed_character_instance* pCharacter, tU32 pLevel, ...) {
+    va_list ap;
+    int result;
+
+    result = 0;
+    if ((int)pLevel < 5) {
+        result = CharacterNoLongerPhysicworthy(pCharacter);
+    }
+    if ((int)pLevel < 1) {
+        result = CharacterNoLongerCollideworthy(pCharacter);
+    }
+    if (pLevel != 0) {
+        va_start(ap, pLevel);
+        result = MakeCharacterCollideworthy(pCharacter, pLevel & 0x2, va_arg(ap, int));
+        va_end(ap);
+        if (result == 0x17) {
+            result = 0;
+        }
+        if ((pLevel & 0x4) && result == 0) {
+            result = MakeCharacterPhysicworthy(pCharacter);
+            if (result == 0x17) {
+                result = 0;
+            }
+        }
+    }
+    return result;
 }
 
 #ifdef REC2_MATCHING
@@ -1205,7 +1313,24 @@ int C2_HOOK_FASTCALL SetCharacterMove(tPed_character_instance* pPed, int pMove_a
 #pragma auto_inline(on)
 #endif
 
-// DRMatrix34RotateCos
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_HW 0x0040aed0
+// STUB: CARMA2_SW 0x0040aec0
+// STUB: CARMA2_CHEAT 0x0040af40
+void C2_HOOK_FASTCALL DRMatrix34RotateCos(br_matrix34* pDest, const br_vector3* pAxis, br_scalar pCos_a) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
 
 // FUNCTION: CARMA2_HW 0x0040b030
 // FUNCTION: CARMA2_SW 0x0040b020
@@ -1219,14 +1344,90 @@ void C2_HOOK_FASTCALL DropPointOntoPlane(const br_vector3* pPoint, const br_vect
 }
 
 #ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
+
+#ifdef REC2_MATCHING
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x0040a730
-// STUB: CARMA2_SW 0x0040a730
-// STUB: CARMA2_CHEAT 0x0040a7a0
+// FUNCTION: CARMA2_HW 0x0040a730
+// FUNCTION: CARMA2_SW 0x0040a730
+// FUNCTION: CARMA2_CHEAT 0x0040a7a0
 void C2_HOOK_FASTCALL SetCharacterDirection(tPed_character_instance* pPed, const br_vector3* pDir, const br_vector3* pUp) {
-    NOT_IMPLEMENTED();
+    br_vector3 dropped_move_dir;
+    br_vector3 dropped_dir;
+    br_matrix34 mat;
+    br_vector3 move_dir;
+    int keep_direction;
+    br_vector3 axis;
+    tPed_move* move;
+    br_matrix34 rot_up;
+    br_matrix34* character_matrix;
+    br_vector3 cross;
+    br_vector3 norm_dir;
+    br_matrix34 inverse;
+    br_vector3 norm_up;
+    br_vector3 norm_dropped_dir;
+    br_scalar cos_a;
+    br_vector3 original_pos;
+    br_matrix34 rot_dir;
+
+    if (pPed->field_0x7 < 0) {
+        return;
+    }
+    if ((pPed->field_0x14 & 0x4) && !gAction_replay_mode) {
+        return;
+    }
+    if (pDir == NULL) {
+        pDir = &pPed->field_0xc0;
+        pUp = &pPed->field_0xcc;
+        keep_direction = 1;
+    } else {
+        BrVector3Normalise(&pPed->field_0xc0, pDir);
+        pPed->field_0xcc = *pUp;
+        keep_direction = 0;
+    }
+    move = pPed->personality->form->moves[pPed->field_0x7].move;
+    character_matrix = GetCharacterMatrixPtr(pPed);
+    BrMatrix34Inverse(&inverse, &pPed->field_0x8c);
+    original_pos = *(br_vector3*)character_matrix->m[3];
+    BrVector3Set((br_vector3*)character_matrix->m[3], 0.0f, 0.0f, 0.0f);
+    BrMatrix34Mul(&mat, character_matrix, &inverse);
+    if (pUp != NULL) {
+        BrVector3Normalise(&norm_up, pUp);
+    } else {
+        BrVector3Set(&norm_up, 0.0f, 1.0f, 0.0f);
+    }
+    BrVector3Normalise(&norm_dir, pDir);
+    BrVector3Copy(&move_dir, &move->field_0x40);
+    if (pPed->field_0xbc != NULL) {
+        Vector3Lerp(&move_dir, &move_dir, &pPed->field_0xbc->field_0x20, pPed->field_0xbc->field_0x0);
+        BrVector3Normalise(&move_dir, &move_dir);
+    }
+    DropPointOntoPlane(&norm_dir, &norm_up, &dropped_dir);
+    DropPointOntoPlane(&move_dir, &norm_up, &dropped_move_dir);
+    BrVector3Normalise(&norm_dropped_dir, &dropped_dir);
+    BrVector3Normalise(&dropped_move_dir, &dropped_move_dir);
+    cos_a = BrVector3Dot(&norm_dropped_dir, &dropped_move_dir);
+    DRVector3SafeCrossXZ(&cross, &dropped_move_dir, &norm_dropped_dir);
+    BrVector3Normalise(&axis, &cross);
+    DRMatrix34RotateCos(&pPed->field_0x8c, &axis, cos_a);
+    BrVector3Set(&cross, norm_up.v[2], 0.0f, -norm_up.v[0]);
+    BrVector3Normalise(&axis, &cross);
+    DRMatrix34RotateCos(&rot_up, &axis, norm_up.v[1]);
+    BrMatrix34Pre(&pPed->field_0x8c, &rot_up);
+    cos_a = BrVector3Dot(&norm_dropped_dir, &norm_dir);
+    DRVector3SafeCross(&cross, &norm_dropped_dir, &norm_dir);
+    BrVector3Normalise(&axis, &cross);
+    DRMatrix34RotateCos(&rot_dir, &axis, cos_a);
+    BrMatrix34Mul(&pPed->field_0x5c, &pPed->field_0x8c, &rot_dir);
+    BrMatrix34Post(&mat, &pPed->field_0x8c);
+    BrVector3Add((br_vector3*)mat.m[3], &original_pos, (br_vector3*)mat.m[3]);
+    BrMatrix34LPNormalise(character_matrix, &mat);
+    if (!keep_direction) {
+        SetCharacterBonePositions(pPed, 3, 0);
+    }
 }
 
 #ifdef REC2_MATCHING
