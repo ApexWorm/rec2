@@ -71,16 +71,19 @@ tWobble_spec gWobble_array[5] = { 0 };
 #ifdef REC2_MATCHING
 // GLOBAL: CARMA2_HW 0x006a2348
 // GLOBAL: CARMA2_SW 0x0069c3a0
+// GLOBAL: CARMA2_CHEAT 0x006a9ec0
 int gINT_006a2348 = 0;
 #endif
 
 // GLOBAL: CARMA2_HW 0x006a234c
 // GLOBAL: CARMA2_SW 0x0069c3a4
+// GLOBAL: CARMA2_CHEAT 0x006a9ec4
 float gPrevious_rear_yon = 0.0f;
 
 #ifdef REC2_MATCHING
 // GLOBAL: CARMA2_HW 0x006a2350
 // GLOBAL: CARMA2_SW 0x0069c3a8
+// GLOBAL: CARMA2_CHEAT 0x006a9ec8
 int gINT_006a2350[2] = { 0 };
 #endif
 
@@ -129,14 +132,17 @@ int gFancy_shadow;
 br_material* gShadow_material;
 
 // GLOBAL: CARMA2_HW 0x006a27d0
+// GLOBAL: CARMA2_SW 0x0069c828
 // GLOBAL: CARMA2_CHEAT 0x006aa348
 br_vector3 gShadow_light_ray;
 
 // GLOBAL: CARMA2_HW 0x006a27c0
+// GLOBAL: CARMA2_SW 0x0069c818
 // GLOBAL: CARMA2_CHEAT 0x006aa338
 br_vector3 gShadow_light_z;
 
 // GLOBAL: CARMA2_HW 0x006a27b0
+// GLOBAL: CARMA2_SW 0x0069c808
 // GLOBAL: CARMA2_CHEAT 0x006aa328
 br_vector3 gShadow_light_x;
 
