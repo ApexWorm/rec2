@@ -426,6 +426,11 @@ br_vector3 gChanged_points[10];
 // GLOBAL: CARMA2_CHEAT 0x0069bfcc
 int gPed_dismember_spurting_member_count;
 
+// GLOBAL: CARMA2_HW 0x00694458
+// GLOBAL: CARMA2_SW 0x0068e4b0
+// GLOBAL: CARMA2_CHEAT 0x0069bfd0
+br_pixelmap* gProx_ray_shade_table;
+
 // GLOBAL: CARMA2_HW 0x00694490
 // GLOBAL: CARMA2_SW 0x0068e4e8
 // GLOBAL: CARMA2_CHEAT 0x0069c008
@@ -2180,7 +2185,90 @@ void C2_HOOK_FASTCALL InitPedsForRace(void) {
     memset(gPed_cache_006944c0, 0, sizeof(gPed_cache_006944c0));
 }
 
-// RenderElectroBastardRays
+// FUNCTION: CARMA2_HW 0x004d5d60
+// FUNCTION: CARMA2_SW 0x004d2450
+// FUNCTION: CARMA2_CHEAT 0x004db920
+void C2_HOOK_FASTCALL RenderElectroBastardRays(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_actor* pCamera, br_matrix34* pCamera_to_world, tU32 pTime) {
+    tU32 the_time;
+    int i;
+    union {
+        float f;
+        int i;
+    } seed;
+    br_vector3 car_pos;
+    br_vector3 ped_pos;
+    br_vector3 car_pos_cam;
+    br_vector3 ped_pos_cam;
+    br_vector3 car_add;
+    br_vector3 car_add_c;
+    br_vector3 r1;
+    br_vector3 from_pos;
+    br_vector3 to_pos;
+    br_model* car_model;
+    br_scalar distance;
+    br_scalar t;
+    int model_updated;
+
+    model_updated = 0;
+    the_time = GetTotalTime();
+    ARStartPipingSession(ePipe_chunk_prox_ray);
+    for (i = 0; i < (int)REC2_ASIZE(gProximity_rays); i++) {
+        if (gProximity_rays[i].start_time == 0) {
+            continue;
+        }
+        if (the_time - gProximity_rays[i].start_time >= 500) {
+            gProximity_rays[i].start_time = 0;
+            continue;
+        }
+#ifndef REC2_SW
+        if (gNo_2d_effects && !model_updated) {
+            BrActorRemove(gLine_actor);
+            BrActorAdd(gCamera, gLine_actor);
+            gLine_model->vertices[0].red = 0x80;
+            gLine_model->vertices[0].grn = 0x80;
+            gLine_model->vertices[0].blu = 0xff;
+            gLine_model->vertices[1].red = 0xff;
+            gLine_model->vertices[1].grn = 0xff;
+            gLine_model->vertices[1].blu = 0xff;
+            BrModelUpdate(gLine_model, BR_MODU_ALL);
+            model_updated = 1;
+        }
+#endif
+        AddProxRayToPipingSession(i, gProximity_rays[i].car, gProximity_rays[i].ped - gPedestrian_array, gProximity_rays[i].start_time);
+        car_model = gProximity_rays[i].car->car_actor->model;
+        BrVector3Set(&car_add_c, 0.f, (car_model->bounds.max.v[1] - car_model->bounds.min.v[1]) * -.2f, 0.f);
+        BrMatrix34ApplyV(&car_add, &car_add_c, &gProximity_rays[i].car->car_master_actor->t.t.mat);
+        BrVector3Add(&car_pos, &gProximity_rays[i].car->pos, &car_add);
+        BrVector3Copy(&ped_pos, &gProximity_rays[i].ped->pos);
+        DRMatrix34TApplyP(&car_pos_cam, &car_pos, &gCamera_to_world);
+        DRMatrix34TApplyP(&ped_pos_cam, &ped_pos, &gCamera_to_world);
+        BrVector3Sub(&r1, &ped_pos_cam, &car_pos_cam);
+        distance = BrVector3Length(&r1);
+        BrVector3Normalise(&r1, &r1);
+        BrVector3Copy(&from_pos, &car_pos_cam);
+        seed.f = ped_pos.v[0] + ped_pos.v[1] + ped_pos.v[2] + car_pos.v[0] + car_pos.v[1] + car_pos.v[2];
+        srand(the_time + seed.i);
+        for (t = 0.f; t < distance; t -= -.05f) {
+            to_pos.v[0] = r1.v[0] * t + car_pos_cam.v[0];
+            to_pos.v[1] = r1.v[1] * t + car_pos_cam.v[1];
+            to_pos.v[2] = r1.v[2] * t + car_pos_cam.v[2];
+            to_pos.v[0] += SRandomPosNeg(.1f);
+            to_pos.v[1] += SRandomPosNeg(.1f);
+            to_pos.v[2] += SRandomPosNeg(.1f);
+            DrawLine3D(&to_pos, &from_pos, pRender_screen, pDepth_buffer, gProx_ray_shade_table);
+            BrVector3Copy(&from_pos, &to_pos);
+            t -= -.05f;
+        }
+        DrawLine3D(&ped_pos_cam, &from_pos, pRender_screen, pDepth_buffer, gProx_ray_shade_table);
+    }
+    AREndPipingSession();
+#ifndef REC2_SW
+    if (gNo_2d_effects && model_updated) {
+        BrActorRemove(gLine_actor);
+        BrActorAdd(gDont_render_actor, gLine_actor);
+    }
+#endif
+}
 
 // FUNCTION: CARMA2_HW 0x004d6180
 // FUNCTION: CARMA2_SW 0x004d2780
