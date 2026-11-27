@@ -506,32 +506,32 @@ int C2_HOOK_FASTCALL ModelPickBox(br_actor* actor, tBounds* bnds, br_model* mode
             v2 = v11f->vertices[1];
             v3 = v11f->vertices[2];
             t = bnds->real_bounds.min.v[0];
-            if (t > v11g->vertices[v1].p.v[0] && t > v11g->vertices[v2].p.v[0] && t > v11g->vertices[v3].p.v[0]) {
+            if (t > prepared->groups[group].vertices[v1].p.v[0] && t > prepared->groups[group].vertices[v2].p.v[0] && t > prepared->groups[group].vertices[v3].p.v[0]) {
                 continue;
             }
             t = bnds->real_bounds.max.v[0];
-            if (t < v11g->vertices[v1].p.v[0] && t < v11g->vertices[v2].p.v[0] && t < v11g->vertices[v3].p.v[0]) {
+            if (t < prepared->groups[group].vertices[v1].p.v[0] && t < prepared->groups[group].vertices[v2].p.v[0] && t < prepared->groups[group].vertices[v3].p.v[0]) {
                 continue;
             }
             t = bnds->real_bounds.min.v[1];
-            if (t > v11g->vertices[v1].p.v[1] && t > v11g->vertices[v2].p.v[1] && t > v11g->vertices[v3].p.v[1]) {
+            if (t > prepared->groups[group].vertices[v1].p.v[1] && t > prepared->groups[group].vertices[v2].p.v[1] && t > prepared->groups[group].vertices[v3].p.v[1]) {
                 continue;
             }
             t = bnds->real_bounds.max.v[1];
-            if (t < v11g->vertices[v1].p.v[1] && t < v11g->vertices[v2].p.v[1] && t < v11g->vertices[v3].p.v[1]) {
+            if (t < prepared->groups[group].vertices[v1].p.v[1] && t < prepared->groups[group].vertices[v2].p.v[1] && t < prepared->groups[group].vertices[v3].p.v[1]) {
                 continue;
             }
             t = bnds->real_bounds.min.v[2];
-            if (t > v11g->vertices[v1].p.v[2] && t > v11g->vertices[v2].p.v[2] && t > v11g->vertices[v3].p.v[2]) {
+            if (t > prepared->groups[group].vertices[v1].p.v[2] && t > prepared->groups[group].vertices[v2].p.v[2] && t > prepared->groups[group].vertices[v3].p.v[2]) {
                 continue;
             }
             t = bnds->real_bounds.max.v[2];
-            if (t < v11g->vertices[v1].p.v[2] && t < v11g->vertices[v2].p.v[2] && t < v11g->vertices[v3].p.v[2]) {
+            if (t < prepared->groups[group].vertices[v1].p.v[2] && t < prepared->groups[group].vertices[v2].p.v[2] && t < prepared->groups[group].vertices[v3].p.v[2]) {
                 continue;
             }
-            BrVector3Sub(&polygon[1], &v11g->vertices[v1].p, (br_vector3*)bnds->mat->m[3]);
-            BrVector3Sub(&polygon[2], &v11g->vertices[v2].p, (br_vector3*)bnds->mat->m[3]);
-            BrVector3Sub(&polygon[3], &v11g->vertices[v3].p, (br_vector3*)bnds->mat->m[3]);
+            BrVector3Sub(&polygon[1], &V11MODEL(model)->groups[group].vertices[v1].p, (br_vector3*)bnds->mat->m[3]);
+            BrVector3Sub(&polygon[2], &V11MODEL(model)->groups[group].vertices[v2].p, (br_vector3*)bnds->mat->m[3]);
+            BrVector3Sub(&polygon[3], &V11MODEL(model)->groups[group].vertices[v3].p, (br_vector3*)bnds->mat->m[3]);
             BrMatrix34TApplyV(&polygon[0], &polygon[1], bnds->mat);
             BrMatrix34TApplyV(&polygon[1], &polygon[2], bnds->mat);
             BrMatrix34TApplyV(&polygon[2], &polygon[3], bnds->mat);
@@ -548,19 +548,19 @@ int C2_HOOK_FASTCALL ModelPickBox(br_actor* actor, tBounds* bnds, br_model* mode
             }
             if (n >= 3) {
                 if (pMat != NULL) {
-                    BrMatrix34ApplyP(&face_list->v[0], &v11g->vertices[v1].p, pMat);
-                    BrMatrix34ApplyP(&face_list->v[1], &v11g->vertices[v2].p, pMat);
-                    BrMatrix34ApplyP(&face_list->v[2], &v11g->vertices[v3].p, pMat);
+                    BrMatrix34ApplyP(&face_list->v[0], &V11MODEL(model)->groups[group].vertices[v1].p, pMat);
+                    BrMatrix34ApplyP(&face_list->v[1], &V11MODEL(model)->groups[group].vertices[v2].p, pMat);
+                    BrMatrix34ApplyP(&face_list->v[2], &V11MODEL(model)->groups[group].vertices[v3].p, pMat);
                     BrVector3Copy(&tv, &v11f->eqn);
                     BrMatrix34ApplyV(&face_list->normal, &tv, pMat);
                 } else {
-                    BrVector3Copy(&face_list->v[0], &v11g->vertices[v1].p);
-                    BrVector3Copy(&face_list->v[1], &v11g->vertices[v2].p);
-                    BrVector3Copy(&face_list->v[2], &v11g->vertices[v3].p);
+                    BrVector3Copy(&face_list->v[0], &V11MODEL(model)->groups[group].vertices[v1].p);
+                    BrVector3Copy(&face_list->v[1], &V11MODEL(model)->groups[group].vertices[v2].p);
+                    BrVector3Copy(&face_list->v[2], &V11MODEL(model)->groups[group].vertices[v3].p);
                     BrVector3Copy(&face_list->normal, &v11f->eqn);
                 }
-                if (v11g->face_colours.materials[0] != NULL) {
-                    face_list->material = v11g->face_colours.materials[0];
+                if (V11MODEL(model)->groups[group].face_colours.materials[0] != NULL) {
+                    face_list->material = V11MODEL(model)->groups[group].face_colours.materials[0];
                 } else {
                     face_list->material = model_material;
                 }
@@ -572,7 +572,7 @@ int C2_HOOK_FASTCALL ModelPickBox(br_actor* actor, tBounds* bnds, br_model* mode
                 face_list->a = actor;
                 if (model->flags & BR_MODF_UPDATEABLE) {
                     face_list->g = -1;
-                    face_list->f = v11g->face_user[f];
+                    face_list->f = V11MODEL(model)->groups[group].face_user[f];
                     face_list->flags = model->faces[face_list->f].flags;
                     face_list->map[0] = &model->vertices[model->faces[face_list->f].vertices[0]].map;
                     face_list->map[1] = &model->vertices[model->faces[face_list->f].vertices[1]].map;
@@ -590,9 +590,9 @@ int C2_HOOK_FASTCALL ModelPickBox(br_actor* actor, tBounds* bnds, br_model* mode
                     if (v11f->edges[2] == 0) {
                         face_list->flags |= 0x4;
                     }
-                    face_list->map[0] = &v11g->vertices[v1].map;
-                    face_list->map[1] = &v11g->vertices[v2].map;
-                    face_list->map[2] = &v11g->vertices[v3].map;
+                    face_list->map[0] = &V11MODEL(model)->groups[group].vertices[v1].map;
+                    face_list->map[1] = &V11MODEL(model)->groups[group].vertices[v2].map;
+                    face_list->map[2] = &V11MODEL(model)->groups[group].vertices[v3].map;
                 }
                 if (face_list->material != NULL && face_list->material->identifier != NULL && face_list->material->identifier[0] == '!') {
                     gPling_face = face_list;
