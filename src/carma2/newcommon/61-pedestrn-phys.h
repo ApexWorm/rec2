@@ -135,9 +135,9 @@ extern void C2_HOOK_FASTCALL SetPedHeadAnim(tPedestrian* pPed, const tPed_anim_s
 
 // StopSmoothTurning
 
-// SetKnockedOverMove
+extern void C2_HOOK_FASTCALL SetKnockedOverMove(tPedestrian* pPed, tU32 pTime);
 
-// DoPostElectricution
+extern void C2_HOOK_FASTCALL DoPostElectricution(tPedestrian* pPed, tU32 pTime, float pSpeed, float pSpin);
 
 // CBMoveCompleted
 

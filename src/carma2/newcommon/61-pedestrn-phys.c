@@ -896,7 +896,7 @@ inline void C2_HOOK_FASTCALL SetPedHeadAnim(tPedestrian* pPed, const tPed_anim_s
 
 // StopSmoothTurning
 
-static inline void C2_HOOK_FASTCALL SetKnockedOverMove(tPedestrian* pPed, tU32 pTime) {
+inline void C2_HOOK_FASTCALL SetKnockedOverMove(tPedestrian* pPed, tU32 pTime) {
 
     if (pPed->hit_points > 0) {
         SetPedMove(pPed, 0x5d, -1, 0, 0, pTime, ePed_action_impacting);
