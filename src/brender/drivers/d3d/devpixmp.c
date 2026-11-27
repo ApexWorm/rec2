@@ -205,6 +205,7 @@ br_error C2_HOOK_CDECL DevicePixelmapD3DAllocateMode(br_device_d3d* dev, br_outp
     devicePixelmapD3DAllocateTemplate.entries = devicePixelmapD3DAllocateTemplateEntries;
     devicePixelmapD3DAllocateTemplate.res = dev->res;
 
+    hWnd = NULL;
     BrTokenValueSetMany(&hWnd, &c, 0, tv, &devicePixelmapD3DAllocateTemplate);
     if (hWnd == NULL) {
         return 0xa001;
@@ -230,21 +231,23 @@ br_error C2_HOOK_CDECL DevicePixelmapD3DAllocateMode(br_device_d3d* dev, br_outp
     self->pm_base_x = 0;
     self->pm_base_y = 0;
     self->output_facility = facility;
-    self->buffer_type = 0;
     self->clut = dev->clut;
+    self->buffer_type = 0;
     dev->active_buffers[BT_FRONTSCREEN] = self;
     facility->dispatch->_addFront((br_object_container*)facility, (br_object*)self);
     *newpm = self;
     current_width = facility->width;
     current_height = facility->height;
     passthru_vga = 0;
-    if (gAttached_surface_pixel_format.dwRGBAlphaBitMask == 0x0000
-            && !(gAttached_surface_pixel_format.dwRBitMask == 0x7c00
-                && gAttached_surface_pixel_format.dwGBitMask == 0x03e0
-                && gAttached_surface_pixel_format.dwBBitMask == 0x001f)
-            && (gAttached_surface_pixel_format.dwRBitMask == 0xf800
-                && gAttached_surface_pixel_format.dwGBitMask == 0x07e0
-                && gAttached_surface_pixel_format.dwBBitMask == 0x001f)) {
+    if (gAttached_surface_pixel_format.dwRGBAlphaBitMask == 0
+            && gAttached_surface_pixel_format.dwRBitMask == 0x7c00
+            && gAttached_surface_pixel_format.dwGBitMask == 0x03e0
+            && gAttached_surface_pixel_format.dwBBitMask == 0x001f) {
+        self->pm_type = BR_PMT_RGB_555;
+    } else if (gAttached_surface_pixel_format.dwRGBAlphaBitMask == 0
+            && gAttached_surface_pixel_format.dwRBitMask == 0xf800
+            && gAttached_surface_pixel_format.dwGBitMask == 0x07e0
+            && gAttached_surface_pixel_format.dwBBitMask == 0x001f) {
         self->pm_type = BR_PMT_RGB_565;
     } else {
         self->pm_type = BR_PMT_RGB_555;
@@ -321,6 +324,12 @@ br_error C2_HOOK_CDECL _M_br_device_pixelmap_d3d_match(br_device_pixelmap_d3d* s
         pm->pm_flags = BR_PMF_NO_ACCESS;
         pm->output_facility = self->output_facility;
         pm->pm_type = self->pm_type;
+#ifdef REC2_FIX_BUGS
+#define PIXELMAP_TYPE pm->pm_type
+#else
+        /* The original sets the type of the front screen (self) here, not of the new back buffer */
+#define PIXELMAP_TYPE self->pm_type
+#endif
         if (gAttached_surface_pixel_format.dwRGBAlphaBitMask == 0
                 && !(gAttached_surface_pixel_format.dwRBitMask == 0x7c00
                     && gAttached_surface_pixel_format.dwGBitMask == 0x03e0
@@ -328,10 +337,11 @@ br_error C2_HOOK_CDECL _M_br_device_pixelmap_d3d_match(br_device_pixelmap_d3d* s
                 && (gAttached_surface_pixel_format.dwRBitMask == 0xf800
                     && gAttached_surface_pixel_format.dwGBitMask == 0x07e0
                     && gAttached_surface_pixel_format.dwBBitMask == 0x001f)) {
-            pm->pm_type = BR_PMT_RGB_565;
+            PIXELMAP_TYPE = BR_PMT_RGB_565;
         } else {
-            pm->pm_type = BR_PMT_RGB_555;
+            PIXELMAP_TYPE = BR_PMT_RGB_555;
         }
+#undef PIXELMAP_TYPE
         pm->dispatch = &devicePixelmapD3DDispatch;
         pm->pm_identifier = "Offscreen";
         pm->buffer_type = BT_BACKSCREEN;
@@ -400,34 +410,33 @@ br_error C2_HOOK_CDECL _M_br_device_pixelmap_d3d_fill(br_device_pixelmap *self, 
 
 // FUNCTION: D3D 0x100018d0
 br_error C2_HOOK_CDECL _M_br_device_pixelmap_d3d_doubleBuffer(br_device_pixelmap_d3d* self, br_device_pixelmap_d3d* src) {
-    br_device_d3d* dev = (br_device_d3d*)self->dispatch->_device((br_object*)self);
 
-    if (self != dev->active_buffers[BT_FRONTSCREEN]) {
-        return 0xa005;
+    if (self == ((br_device_d3d*)self->dispatch->_device((br_object*)self))->active_buffers[BT_FRONTSCREEN]
+            && src == ((br_device_d3d*)self->dispatch->_device((br_object*)self))->active_buffers[BT_BACKSCREEN]) {
+        DoD3DOperation(4);
+        return 0;
     }
-    if (src != dev->active_buffers[BT_BACKSCREEN]) {
-        return 0xa005;
-    }
-
-    DoD3DOperation(4);
-    return 0;
+    return 0xa005;
 }
 
 // FUNCTION: D3D 0x10001b00
 br_error C2_HOOK_CDECL _M_br_device_pixelmap_d3d_rectangleCopyTo(br_device_pixelmap_d3d* self, br_point* p, br_device_pixelmap_d3d* src, br_rectangle* r) {
     br_rectangle ar;
     br_point ap;
-    br_int_32 y;
-    br_uint_8* src_ptr;
-    br_uint_8* dst_ptr;
     DDSURFACEDESC surface_desc;
+    void* src_ptr;
+    void* dst_ptr;
+    int src_stride;
+    LONG pitch;
+    int width_dwords;
+    int height;
 
     if (PixelmapRectangleClipTwo(&ar, &ap, r, p, (br_pixelmap*)self, (br_pixelmap*)src) == BR_CLIP_REJECT) {
         return 0;
     }
     gINT_1001bb94 = 1;
     if (gNo_2d_during_3d_scene == 1) {
-        FUN_10004780((br_uint_8*)src->pm_pixels + 2 * ar.x + ar.y * src->pm_row_bytes, src->pm_row_bytes);
+        FUN_10004780((br_uint_8*)src->pm_pixels + ar.y * src->pm_row_bytes + 2 * ar.x, src->pm_row_bytes);
         return 0;
     }
     gLock_count += 1;
@@ -439,21 +448,46 @@ br_error C2_HOOK_CDECL _M_br_device_pixelmap_d3d_rectangleCopyTo(br_device_pixel
             return 0;
         }
     }
-    src_ptr = (br_uint_8*)src->pm_pixels + 2 * ar.x + ar.y * src->pm_row_bytes;
-    dst_ptr = (br_uint_8*)surface_desc.lpSurface + 2 * (self->pm_base_x + ap.x) + (self->pm_base_y + ap.y) * surface_desc.lPitch;
-
-    for (y = 0; y < ar.h; y++) {
-        memcpy(dst_ptr, src_ptr, 2 * ar.w);
-        src_ptr += src->pm_row_bytes;
-        dst_ptr += surface_desc.lPitch;
+    src_stride = src->pm_row_bytes;
+    src_ptr = (br_uint_8*)src->pm_pixels + ar.y * src_stride + 2 * ar.x;
+    pitch = surface_desc.lPitch;
+    dst_ptr = (br_uint_8*)surface_desc.lpSurface + (self->pm_base_y + ap.y) * pitch + 2 * (self->pm_base_x + ap.x);
+    width_dwords = ar.w >> 1;
+    height = ar.h;
+#ifdef REC2_MATCHING
+    __asm {
+        mov     esi, src_ptr
+        mov     edi, dst_ptr
+        mov     ecx, height
+    copy_row:
+        push    ecx
+        push    esi
+        push    edi
+        mov     ecx, width_dwords
+        rep movsd
+        pop     edi
+        pop     esi
+        add     esi, src_stride
+        add     edi, pitch
+        pop     ecx
+        loop    copy_row
     }
+#else
+    for (; height != 0; height--) {
+        memcpy(dst_ptr, src_ptr, width_dwords * 4);
+        src_ptr = (br_uint_8*)src_ptr + src_stride;
+        dst_ptr = (br_uint_8*)dst_ptr + pitch;
+    }
+#endif
     gLock_count -= 1;
     if (gLock_count == 0) {
         if (IDirectDrawSurface_Unlock(gAttached_surface, NULL) != DD_OK) {
             return 0;
         }
         DoD3DOperation(2);
-    } else if (gLock_count < 0) {
+        return 0;
+    }
+    if (gLock_count < 0) {
         gLock_count = 0;
     }
     return 0;
