@@ -26,20 +26,18 @@
 #include "51-smash.h"
 #include "52-errors.h"
 #include "54-runtime.h"
+#include "61-pedestrn-phys.h"
 #include "62-graphics3.h"
 #include "63-loading3.h"
-#include "66-tintedpoly.h"
 #include "69-sound.h"
 #include "70-packfile.h"
 #include "globvars.h"
 #include "brender/brender.h"
-#include "globvars.h"
 #include "globvrkm.h"
 #include "platform.h"
 #include "rec2_macros.h"
 
 #include "c2_math.h"
-#include "c2_stdio.h"
 #include "c2_stdlib.h"
 #include "c2_string.h"
 
@@ -410,6 +408,7 @@ int gPed_score_multiplier;
 
 // GLOBAL: CARMA2_HW 0x0069bcf8
 // GLOBAL: CARMA2_SW 0x00695d50
+// GLOBAL: CARMA2_CHEAT 0x006a3870
 int gPed_points[3];
 
 // GLOBAL: CARMA2_HW 0x006a0418
@@ -486,8 +485,6 @@ int gPed_movements_count;
 // GLOBAL: CARMA2_SW 0x00695d48
 // GLOBAL: CARMA2_CHEAT 0x006a3868
 tPed_movement_spec* gPed_movements;
-
-
 
 
 // ClearOutMorphs
@@ -1393,7 +1390,20 @@ float C2_HOOK_FASTCALL GetClearanceFromCharacterInstance(tPed_character_instance
 
 // ScaleFormBone
 
-// ScaleBone
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_HW 0x0040c420
+// STUB: CARMA2_SW 0x0040c410
+// STUB: CARMA2_CHEAT 0x0040c4c0
+void C2_HOOK_FASTCALL ScaleBone(int pBone_index, br_vector3* pScale, int pArg3) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
