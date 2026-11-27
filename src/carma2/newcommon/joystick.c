@@ -86,6 +86,49 @@ int C2_HOOK_FASTCALL ReadUntilCharacter(FILE* pF, char* pBuffer, int pBuffer_siz
     }
 }
 
+// FUNCTION: CARMA2_HW 0x0045b0a0
+// FUNCTION: CARMA2_SW 0x0045ab20
+// FUNCTION: CARMA2_CHEAT 0x0045b520
+void C2_HOOK_FASTCALL FUN_0045b0a0(tHeadup_text_buffer* pText_buffer) {
+    tHeadup_text* t;
+    int i;
+    int pos;
+
+    if (pText_buffer->texts == NULL) {
+        return;
+    }
+    if (pText_buffer->field_0x4 == NULL) {
+        pText_buffer->field_0x4 = pText_buffer->texts;
+        if (pText_buffer->count - pText_buffer->pos_last_add < pText_buffer->field_0x10) {
+            t = pText_buffer->texts;
+            for (i = pText_buffer->count - pText_buffer->field_0x10; i > 0; i--) {
+                t = t->next;
+            }
+            pText_buffer->field_0x4 = t;
+            return;
+        }
+    }
+    pos = 0;
+    for (t = pText_buffer->texts; t != pText_buffer->field_0x4; t = t->next) {
+        pos++;
+    }
+    if (pos + pText_buffer->field_0x10 <= pText_buffer->pos_last_add || pText_buffer->pos_last_add <= pos) {
+        if (pText_buffer->pos_last_add == pos + pText_buffer->field_0x10) {
+            if (pText_buffer->count - pos >= pText_buffer->field_0x10) {
+                pText_buffer->field_0x4 = pText_buffer->field_0x4->next;
+            }
+        } else if (pText_buffer->count - pText_buffer->pos_last_add < pText_buffer->field_0x10) {
+            t = pText_buffer->texts;
+            for (i = pText_buffer->count - pText_buffer->field_0x10; i > 0; i--) {
+                t = t->next;
+            }
+            pText_buffer->field_0x4 = t;
+        } else {
+            pText_buffer->field_0x4 = pText_buffer->text_last_add;
+        }
+    }
+}
+
 // FUNCTION: CARMA2_HW 0x0045b920
 // FUNCTION: CARMA2_SW 0x0045b3a0
 int C2_HOOK_FASTCALL WriteJoystickPreferences(FILE* pF, const tButtonJoystickInfo* pInfo) {

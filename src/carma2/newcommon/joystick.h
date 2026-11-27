@@ -36,6 +36,8 @@ extern void C2_HOOK_FASTCALL RestoreJoystickPreferences(void);
 
 extern int C2_HOOK_FASTCALL HasCurrentJoystick(void);
 
+extern void C2_HOOK_FASTCALL FUN_0045b0a0(tHeadup_text_buffer* pText_buffer);
+
 extern void C2_HOOK_FASTCALL PeekCharacter(FILE* pF);
 
 extern int C2_HOOK_FASTCALL ReadUntilCharacter(FILE* pF, char* pBuffer, int pBuffer_size, char pLimit_char);
