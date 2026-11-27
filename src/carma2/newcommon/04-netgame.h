@@ -20,7 +20,7 @@ extern int gLast_it_change;
 
 extern void C2_HOOK_FASTCALL ClearShapeStatusFlag(tCar_crush_network_shapes* pShapes, int pPlayer_id);
 
-// SendNonCar
+extern void C2_HOOK_FASTCALL SendNonCar(tNon_car_spec* pNon_car, tU32 pTime);
 
 // HostFillInCarContents
 
