@@ -136,6 +136,7 @@ void* gPhysics_other_buffer;
 
 // GLOBAL: CARMA2_HW 0x006940bc
 // GLOBAL: CARMA2_SW 0x0068e114
+// GLOBAL: CARMA2_CHEAT 0x0069bc34
 void* gPhysics_scratch_ptr;
 
 // GLOBAL: CARMA2_HW 0x006940b0
@@ -1127,6 +1128,7 @@ void C2_HOOK_FASTCALL ApplyDiminishingTorque(tPhysics_object* pObject, const br_
 
 // FUNCTION: CARMA2_HW 0x004c5830
 // FUNCTION: CARMA2_SW 0x004c1f60
+// FUNCTION: CARMA2_CHEAT 0x004cb350
 int C2_HOOK_FASTCALL RQDcmpV(br_scalar* pMatrix, int pDim, br_scalar* pQ) {
     int i;
     int j;
@@ -1239,11 +1241,14 @@ int C2_HOOK_FASTCALL RQDcmpV(br_scalar* pMatrix, int pDim, br_scalar* pQ) {
 
 // FUNCTION: CARMA2_HW 0x004c5b50
 // FUNCTION: CARMA2_SW 0x004c2280
+// FUNCTION: CARMA2_CHEAT 0x004cb670
 int C2_HOOK_FASTCALL MatrixProcess(br_scalar* pR, br_scalar* pQ, int pDim) {
     return RQDcmpV(pR, pDim, pQ);
 }
 
 // FUNCTION: CARMA2_HW 0x004c5b60
+// FUNCTION: CARMA2_SW 0x004c2290
+// FUNCTION: CARMA2_CHEAT 0x004cb680
 void C2_HOOK_FASTCALL RqBackSub(const br_scalar* pR, const br_scalar* pQ, const br_scalar* pRhs, br_scalar* pX, int pDim) {
     br_scalar intermediate[100];
     br_scalar sum;
@@ -1299,6 +1304,7 @@ void C2_HOOK_FASTCALL IncreasePhysicsScratchPointer(int pSize) {
 
 // FUNCTION: CARMA2_HW 0x004c5d00
 // FUNCTION: CARMA2_SW 0x004c2430
+// FUNCTION: CARMA2_CHEAT 0x004cb820
 void C2_HOOK_FASTCALL ClearPhysicsScratchSpace(void) {
 
     gPhysics_scratch_ptr = gPhysics_other_buffer;
