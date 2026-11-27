@@ -985,10 +985,6 @@ void C2_HOOK_FASTCALL ChooseNewObjective(tOpponent_spec* pOpponent_spec, int pMu
     }
 }
 
-extern void C2_HOOK_FASTCALL DisplayOpponentRecoveringHeadup(tOpponent_spec* pOpponent_spec);
-extern void C2_HOOK_FASTCALL StartToCheat(tOpponent_spec* pOpponent_spec);
-extern void C2_HOOK_FASTCALL OiStopCheating(tOpponent_spec* pOpponent_spec);
-
 inline void C2_HOOK_FASTCALL DisplayOpponentRecoveringHeadup(tOpponent_spec* pOpponent_spec) {
 }
 
