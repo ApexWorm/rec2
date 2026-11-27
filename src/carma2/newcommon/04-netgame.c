@@ -763,6 +763,7 @@ void C2_HOOK_FASTCALL UseGeneralScore(int pScore) {
 
 // STUB: CARMA2_HW 0x0049b9a0
 // STUB: CARMA2_SW 0x00497b20
+// STUB: CARMA2_CHEAT 0x0049bd50
 void C2_HOOK_FASTCALL CheckForNeedyEnvironmentRecipients(void) {
     NOT_IMPLEMENTED();
 }
