@@ -207,7 +207,7 @@ extern void C2_HOOK_FASTCALL InitNetStorageSpace(void);
 
 // NetworkStartHost
 
-// NetHostChooseThisRace
+extern int C2_HOOK_FASTCALL NetHostChooseThisRace(tFrontend_spec* pFrontend);
 
 extern int C2_HOOK_FASTCALL NetCancel(tFrontend_spec* pFrontend);
 

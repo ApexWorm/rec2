@@ -1602,7 +1602,18 @@ void C2_HOOK_FASTCALL InitNetStorageSpace(void) {
 
 // NetworkStartHost
 
-// NetHostChooseThisRace
+// FUNCTION: CARMA2_HW 0x004691a0
+// FUNCTION: CARMA2_SW 0x00468f20
+// FUNCTION: CARMA2_CHEAT 0x004695c0
+int C2_HOOK_FASTCALL NetHostChooseThisRace(tFrontend_spec* pFrontend) {
+
+    pFrontend->items[17].enabled = kFrontendItemEnabled_enabled;
+    pFrontend->items[29].enabled = kFrontendItemEnabled_disabled;
+    gProgram_state.current_race_index = RaceIndex(pFrontend->items[gFrontend_selected_item_index].text);
+    FillInRaceDescription(pFrontend->items[30].text, gProgram_state.current_race_index);
+    FuckWithWidths(pFrontend);
+    return 0;
+}
 
 // FUNCTION: CARMA2_HW 0x00469280
 // FUNCTION: CARMA2_SW 0x00469000
