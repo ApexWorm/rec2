@@ -46,6 +46,8 @@ extern int C2_HOOK_FASTCALL StoreTextHeadup(tHeadup_text_buffer* pTexts, tHeadup
 extern void C2_HOOK_FASTCALL CreateAccentPolyActor(float pX, float pY, float pWidth, float pHeight);
 #endif
 
+extern void C2_HOOK_FASTCALL FUN_0045acf0(void);
+
 extern void C2_HOOK_FASTCALL FUN_0045b0a0(tHeadup_text_buffer* pText_buffer);
 
 extern void C2_HOOK_FASTCALL PeekCharacter(FILE* pF);

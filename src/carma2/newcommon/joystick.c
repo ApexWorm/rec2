@@ -79,6 +79,11 @@ int gJoystick_preferences_backup_valid;
 // GLOBAL: CARMA2_CHEAT 0x007a4f00
 tHeadup_text_buffer gPath_headup_buffer;
 
+// GLOBAL: CARMA2_HW 0x0079d880
+// GLOBAL: CARMA2_SW 0x00793de0
+// GLOBAL: CARMA2_CHEAT 0x007a4f20
+tHeadup_text_buffer gTest_headup_buffer;
+
 // GLOBAL: CARMA2_HW 0x0079d8c0
 // GLOBAL: CARMA2_SW 0x00793e20
 tButtonJoystickInfo gJoystick_preferences_backup;
@@ -303,6 +308,53 @@ void C2_HOOK_FASTCALL CreateAccentPolyActor(float pX, float pY, float pWidth, fl
     }
 }
 #endif
+
+// FUNCTION: CARMA2_HW 0x0045acf0
+// FUNCTION: CARMA2_SW 0x0045a7b0
+// FUNCTION: CARMA2_CHEAT 0x0045b170
+void C2_HOOK_FASTCALL FUN_0045acf0(void) {
+    int i;
+    tHeadup_text* text;
+
+    if (gINT_0068b8e4) {
+        gINT_0068b8e4 = 0;
+#ifdef REC2_HW
+        if (gAcc_poly_actor != NULL && gRender_acc_poly_actor) {
+            BrActorRemove(gAcc_poly_actor);
+            gRender_acc_poly_actor = 0;
+        }
+#endif
+        return;
+    }
+    gINT_0068b8e4 = 2;
+    MoveHeadupTo(gProgram_state.frame_rate_headup, 10, 350);
+    for (i = 0; i < (int)REC2_ASIZE(gRace_head_ups); i++) {
+        MoveHeadupTo(gRace_head_ups[i], 10, 120 + 10 * i);
+        ChangeHeadupFont(gRace_head_ups[i], -2);
+    }
+#ifdef REC2_HW
+    CreateAccentPolyActor(8.f, 118.f, 130.f, 224.f);
+#endif
+    if (gTest_headup_buffer.count == 0) {
+        if (gTest_headup_buffer.field_0x14 < 5) {
+            gTest_headup_buffer.field_0x14 = 10;
+        }
+        gTest_headup_buffer.texts = NULL;
+        gTest_headup_buffer.count = 0;
+        gTest_headup_buffer.pos_last_add = 0;
+        gTest_headup_buffer.text_last_add = NULL;
+        gTest_headup_buffer.field_0x4 = NULL;
+        gTest_headup_buffer.field_0x10 = 22;
+        for (i = 0; i < 10; i++) {
+            text = malloc(sizeof(tHeadup_text));
+            if (text != NULL) {
+                memset(text->text, 0, 4);
+                sprintf(text->text, "WANKER  %02d", i);
+                StoreTextHeadup(&gTest_headup_buffer, text, 0);
+            }
+        }
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x0045b0a0
 // FUNCTION: CARMA2_SW 0x0045ab20
