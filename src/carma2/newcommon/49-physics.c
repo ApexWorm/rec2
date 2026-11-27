@@ -82,6 +82,7 @@ void* gPhysics_buffer3_ptr;
 
 // GLOBAL: CARMA2_HW 0x0074a5e4
 // GLOBAL: CARMA2_SW 0x007410a4
+// GLOBAL: CARMA2_CHEAT 0x00751c84
 int gPHIL_mechanics_time_sync;
 
 // GLOBAL: CARMA2_HW 0x0074a5e8
@@ -1089,6 +1090,7 @@ void C2_HOOK_FASTCALL ApplyTorque(tPhysics_object* pObject, const br_vector3* pT
 
 // FUNCTION: CARMA2_HW 0x004c2c90
 // FUNCTION: CARMA2_SW 0x004bf3c0
+// FUNCTION: CARMA2_CHEAT 0x004c87b0
 void C2_HOOK_FASTCALL ApplyDiminishingTorque(tPhysics_object* pObject, const br_vector3* pV) {
     br_vector3 original_omega;
     br_vector3 tv;
@@ -1298,6 +1300,7 @@ void C2_HOOK_FASTCALL IncreasePhysicsScratchPointer(int pSize) {
 }
 
 // FUNCTION: CARMA2_HW 0x004c5d00
+// FUNCTION: CARMA2_SW 0x004c2430
 void C2_HOOK_FASTCALL ClearPhysicsScratchSpace(void) {
 
     gPhysics_scratch_ptr = gPhysics_other_buffer;
@@ -1685,6 +1688,7 @@ void C2_HOOK_FASTCALL InitPhysicsWorkspace(tU8* pBuffer, int pSize) {
 }
 
 // FUNCTION: CARMA2_HW 0x004b57d0
+// FUNCTION: CARMA2_SW 0x004b1ef0
 // FUNCTION: CARMA2_CHEAT 0x004bb0a0
 int C2_HOOK_FASTCALL FindFacesInBox(tBounds* pBounds, tFace_ref* pFace_list, int pMax_face, tWorld_callbacks* pWorld_callbacks) {
     tU8 cx_min;
@@ -1776,6 +1780,7 @@ void C2_HOOK_FASTCALL DoPhysicsError(tPhysicsError pError, const char* pMessage)
 // ResetMan2
 
 // FUNCTION: CARMA2_HW 0x004b5aa0
+// FUNCTION: CARMA2_CHEAT 0x004bb370
 void C2_HOOK_FASTCALL SetUpTestObjects(void) {
 
 }
