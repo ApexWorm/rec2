@@ -402,6 +402,7 @@ void C2_NORETURN C2_HOOK_FASTCALL PDFatalError(const char *pThe_str) {
 #endif
 
     dr_dprintf("FATAL ERROR: %s", pThe_str);
+#ifdef REC2_HW
     str2 = "";
     str1 = pThe_str;
     if (str1 == NULL) {
@@ -412,6 +413,11 @@ void C2_NORETURN C2_HOOK_FASTCALL PDFatalError(const char *pThe_str) {
     }
     gIsFatalError = 1;
     sprintf(gFatalErrorMessage, "%s\n%s", str1, str2);
+#endif
+    gIsFatalError = 1;
+    sprintf(gFatalErrorMessage,"%s\n%s", pThe_str, "");
+#ifdef REC2_SW
+#endif
 #ifdef REC2_CHEAT
     time(&now);
     f = fopen("Last_Error.TXT", "at");
