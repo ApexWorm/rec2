@@ -742,11 +742,13 @@ void C2_HOOK_FASTCALL SetGroup(tPhysics_object* pObject, int pGroup) {
 // GetPreCalculatedJointForces
 
 // FUNCTION: CARMA2_HW 0x004b9f40
+// FUNCTION: CARMA2_SW 0x004b6660
+// FUNCTION: CARMA2_CHEAT 0x004bfa70
 void C2_HOOK_FASTCALL MakeObjectListDoSomething(tPhysics_object* pObject) {
     while (pObject != NULL) {
         if (pObject->disable_move_rotate) {
-            pObject->disable_move_rotate = 0;
             pObject->box_face_ref = gFace_num__car - 2;
+            pObject->disable_move_rotate = 0;
         }
         if (pObject->child != NULL) {
             MakeObjectListDoSomething(pObject->child);
@@ -755,15 +757,77 @@ void C2_HOOK_FASTCALL MakeObjectListDoSomething(tPhysics_object* pObject) {
     }
 }
 
-// CheckForObjectTouchingAnotherObject
+extern void C2_HOOK_FASTCALL MakeObjectDoSomething(tPhysics_object* pObject, tPhysics_object* pList);
 
-// CheckForObjectListTouchingAnotherObject
+// FUNCTION: CARMA2_HW 0x004b9f90
+// FUNCTION: CARMA2_SW 0x004b66b0
+// FUNCTION: CARMA2_CHEAT 0x004bfac0
+int C2_HOOK_FASTCALL CheckForObjectTouchingAnotherObject(tPhysics_object* pObject, tPhysics_object* pOther, tPhysics_object* pList) {
 
-// CheckForObjectHierachyTouchingAnotherObject
+    if (pObject->field_0xf4.min.v[0] - pOther->field_0xf4.max.v[0] > 0.01
+            || pObject->field_0xf4.min.v[1] - pOther->field_0xf4.max.v[1] > 0.01
+            || pObject->field_0xf4.min.v[2] - pOther->field_0xf4.max.v[2] > 0.01
+            || pOther->field_0xf4.min.v[0] - pObject->field_0xf4.max.v[0] > 0.01
+            || pOther->field_0xf4.min.v[1] - pObject->field_0xf4.max.v[1] > 0.01
+            || pOther->field_0xf4.min.v[2] - pObject->field_0xf4.max.v[2] > 0.01) {
+        return 0;
+    } else {
+        MakeObjectDoSomething(pOther, pList);
+        return 1;
+    }
+}
 
-// CheckForObjectHierachyTouchingObjectList
+void C2_HOOK_FASTCALL CheckForObjectListTouchingAnotherObject(tPhysics_object* pObject, tPhysics_object* pOther, tPhysics_object* pList) {
 
-// MakeObjectDoSomething
+    while (pObject != NULL && !CheckForObjectTouchingAnotherObject(pObject, pOther, pList)) {
+        pObject = pObject->next;
+    }
+}
+
+void C2_HOOK_FASTCALL CheckForObjectHierachyTouchingAnotherObject(tPhysics_object* pObject, tPhysics_object* pOther, tPhysics_object* pList) {
+
+    CheckForObjectTouchingAnotherObject(pObject, pOther, pList);
+    if (pObject->child != NULL && pOther->disable_move_rotate) {
+        CheckForObjectListTouchingAnotherObject(pObject->child, pOther, pList);
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x004ba190
+// FUNCTION: CARMA2_SW 0x004b68b0
+// FUNCTION: CARMA2_CHEAT 0x004bfcc0
+void C2_HOOK_FASTCALL CheckForObjectHierachyTouchingObjectList(tPhysics_object* pObject, tPhysics_object* pList, tPhysics_object* pList_original) {
+    tPhysics_object* list;
+
+    for (list = pList; list != NULL; list = list->next) {
+        if (list->disable_move_rotate) {
+            CheckForObjectHierachyTouchingAnotherObject(pObject, list, pList_original);
+            if (list->child != NULL) {
+                CheckForObjectHierachyTouchingObjectList(pObject, list->child, pList_original);
+            }
+        }
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x004be0e0
+// FUNCTION: CARMA2_SW 0x004ba800
+// FUNCTION: CARMA2_CHEAT 0x004c3c10
+void C2_HOOK_FASTCALL MakeObjectDoSomething(tPhysics_object* pObject, tPhysics_object* pList) {
+
+    if (pObject->disable_move_rotate) {
+        while (pObject->parent != NULL && pObject->physics_joint1 != NULL && pObject->physics_joint1->type != eJoint_none) {
+            pObject = pObject->parent;
+        }
+        pObject->box_face_ref = gFace_num__car - 2;
+        pObject->disable_move_rotate = 0;
+        if (pObject->child != NULL || pObject->physics_joint1 != NULL || pObject->physics_joint2 != NULL) {
+            if (pObject->field_0x218 == 0) {
+                MoveJointedObject(pObject, 0.0f);
+            }
+            MakeObjectListDoSomething(pObject->child);
+        }
+        CheckForObjectHierachyTouchingObjectList(pObject, pList, pList);
+    }
+}
 
 // GetReducedList
 
