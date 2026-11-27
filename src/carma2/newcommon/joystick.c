@@ -939,10 +939,10 @@ void C2_HOOK_FASTCALL FUN_0045c5f0(const char* pEffect_name) {
         button = FUN_0045c590(61);
         if (button != -1) {
             index = PDFindJoystickEffect(pEffect_name);
-            if (index != -1 && index != gINT_0059630c) {
+            if (index != -1 && index != gCurrent_exclusive_ffb_effect) {
                 FUN_0045c5d0();
                 if (FUN_004583a0(pEffect_name, button)) {
-                    gINT_0059630c = index;
+                    gCurrent_exclusive_ffb_effect = index;
                 }
             }
         }
