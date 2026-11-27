@@ -49,22 +49,24 @@ void C2_HOOK_STDCALL BrDevLastBeginSet(br_pixelmap* pm) {
 br_error C2_HOOK_CDECL BrDevBeginVar(br_pixelmap** ppm, const char* setup_string, ...) {
     va_list vl;
     br_uint_32 i;
+    br_uint_32 n;
     br_token_value tv[64];
 
     va_start(vl, setup_string);
-    for (i = 0; ; i++) {
+    for (i = 0, n = BR_NULL_TOKEN;; i++) {
         if (i == BR_ASIZE(tv)) {
             BrFailure("Too many token value pairs");
         }
-        tv[i].t = va_arg(vl, br_token);
-        if (tv[i].t == BR_NULL_TOKEN) {
+        n = va_arg(vl, int);
+        if (n == BR_NULL_TOKEN) {
             break;
         }
-        tv[i].v = va_arg(vl, br_value);
+        tv[i].t = n;
+        tv[i].v.u32 = va_arg(vl, int);
     }
-    va_end(vl);
     tv[i].t = BR_NULL_TOKEN;
-    tv[i].v.p = NULL;
+    tv[i].v.u32 = 0;
+    va_end(vl);
     return BrDevBeginTV(ppm, setup_string, tv);
 }
 
