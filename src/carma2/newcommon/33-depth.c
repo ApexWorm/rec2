@@ -199,7 +199,7 @@ inline br_scalar C2_HOOK_FASTCALL CalculateWrappingMultiplier(br_scalar pValue, 
     if (k - (br_scalar)int_k <= .5f) {
         trunc_k = (br_scalar)int_k;
     } else {
-        trunc_k = (br_scalar)int_k + 1.f;
+        trunc_k = (br_scalar)int_k + 1.0f;
     }
     return (float)(trunc_k / REC2_TAU * pValue);
 }
@@ -987,15 +987,15 @@ void C2_HOOK_FASTCALL MungeSkyModel(br_actor* pCamera, br_model* pModel) {
     nbands = 21;
     camera_data = pCamera->type_data;
     tan_half_fov = Tan(camera_data->field_of_view / 2);
-    sky_distance = camera_data->yon_z - 1.f;
+    sky_distance = camera_data->yon_z - 1.0f;
     horizon_half_height = sky_distance * tan_half_fov;
     horizon_half_width = horizon_half_height * camera_data->aspect;
     horizon_half_diag = sqrt(horizon_half_height * horizon_half_height + horizon_half_width * horizon_half_width);
     half_diag_fov = BrRadianToAngle(atan2f(horizon_half_diag, sky_distance));
     edge_u = EdgeU(gSky_image_width, 2 * half_diag_fov, BR_ANGLE_DEG(10));
-    narrow_u = edge_u / 2.f;
-    gSky_height = horizon_half_height * 2.f;
-    gSky_width = horizon_half_width * 2.f;
+    narrow_u = edge_u / 2.0f;
+    gSky_height = horizon_half_height * 2.0f;
+    gSky_width = horizon_half_width * 2.0f;
     gSky_y_multiplier = CalculateWrappingMultiplier(gSky_height, camera_data->yon_z);
     gSky_x_multiplier = CalculateWrappingMultiplier(gSky_width, camera_data->yon_z);
 
@@ -1015,10 +1015,10 @@ void C2_HOOK_FASTCALL MungeSkyModel(br_actor* pCamera, br_model* pModel) {
         pModel->vertices[vertex].p.v[0] = -horizon_half_diag;
     }
     for (vertex = 1; vertex < 4 * (nbands + 1); vertex += 4) {
-        pModel->vertices[vertex].p.v[0] = -(horizon_half_diag / 2.f);
+        pModel->vertices[vertex].p.v[0] = -(horizon_half_diag / 2.0f);
     }
     for (vertex = 2; vertex < 4 * (nbands + 1); vertex += 4) {
-        pModel->vertices[vertex].p.v[0] = horizon_half_diag / 2.f;
+        pModel->vertices[vertex].p.v[0] = horizon_half_diag / 2.0f;
     }
     for (vertex = 3; vertex < 4 * (nbands + 1); vertex += 4) {
         pModel->vertices[vertex].p.v[0] = horizon_half_diag;
