@@ -637,6 +637,7 @@ br_vector3* gOur_pos;
 
 // GLOBAL: CARMA2_HW 0x007634b4
 // GLOBAL: CARMA2_SW 0x00759a14
+// GLOBAL: CARMA2_CHEAT 0x0076ab54
 int gTrack_version;
 //float gCar_crush_max_fold;
 
