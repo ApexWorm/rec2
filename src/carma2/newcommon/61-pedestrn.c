@@ -2560,7 +2560,7 @@ inline void C2_HOOK_FASTCALL RemapVector(br_vector3* pV, const tPed_remap_bone* 
     if (pRemap == NULL) {
         return;
     }
-    BrVector3Copy(&original, pV);
+    original = *pV;
     for (i = 0; i < 3; i++) {
         pV->v[i] = original.v[pRemap->general_remap[i] % 3];
         if (pRemap->general_remap[i] >= 3) {
@@ -2573,10 +2573,12 @@ inline void C2_HOOK_FASTCALL RemapVector(br_vector3* pV, const tPed_remap_bone* 
 
 inline void C2_HOOK_FASTCALL RemapModelAxis(br_model* pModel, const tPed_remap_bone* pRemap) {
     int i;
+    br_vertex* vertices;
 
     if (pRemap != NULL) {
+        vertices = pModel->vertices;
         for (i = 0; i < pModel->nvertices; i++) {
-            RemapVector(&pModel->vertices[i].p, pRemap);
+            RemapVector(&vertices[i].p, pRemap);
         }
     }
     BrModelUpdate(pModel, BR_MODU_ALL);
@@ -2863,10 +2865,11 @@ tPed_personality* C2_HOOK_FASTCALL ReadPersonality(const char* pName) {
                 next_str = NULL;
             }
             if (DRStricmp(str, "NULL") != 0) {
-                personality->bones[bone_index].models[model_i++].models[0] = BrModelFind(str);
-                if (personality->bones[bone_index].models[model_i - 1].models[0] == NULL) {
+                personality->bones[bone_index].models[model_i].models[0] = BrModelFind(str);
+                if (personality->bones[bone_index].models[model_i].models[0] == NULL) {
                     FatalError(kFatalError_BonerError_UnableToFindModel_S, str);
                 }
+                model_i++;
                 RemapModelAxis(personality->bones[bone_index].models[model_i - 1].models[0], personality->form->bones[bone_index].remapped_bone);
             }
             str = next_str;
