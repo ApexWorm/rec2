@@ -228,7 +228,7 @@ extern void C2_HOOK_FASTCALL SetFlappage(br_actor* pActor, tCar_spec* pCar, int 
 
 extern void C2_HOOK_FASTCALL MakeModelMaterialsDoubleSided(br_model* pModel);
 
-// CheckFlapAngles
+extern intptr_t C2_HOOK_CDECL CheckFlapAngles(br_actor* pActor, void* pContext);
 
 extern void C2_HOOK_FASTCALL MakeModelMaterialsSingleSided(br_model* pModel);
 
@@ -440,7 +440,7 @@ extern intptr_t C2_HOOK_CDECL AddTotalDeflection(br_actor* pActor, void* pContex
 
 // RepairModel
 
-// RepairModels
+extern intptr_t C2_HOOK_CDECL RepairModels2(br_actor* pActor, void* pContext);
 
 // UnBendModel
 
@@ -466,7 +466,7 @@ extern void C2_HOOK_FASTCALL CompletelyUnBendCar(tCar_spec* pCar_spec);
 
 // ReAttachBits
 
-// RepairObject
+extern int C2_HOOK_FASTCALL RepairObject(tPhysics_object* pObject, void* pContext);
 
 extern void C2_HOOK_FASTCALL RepairCarCollisionShapes(tCar_spec* pCar, float pStep);
 

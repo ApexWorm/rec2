@@ -1547,7 +1547,12 @@ void C2_HOOK_FASTCALL MakeModelMaterialsDoubleSided(br_model* pModel) {
     }
 }
 
-// CheckFlapAngles
+// STUB: CARMA2_HW 0x00434320
+// STUB: CARMA2_SW 0x00434350
+// STUB: CARMA2_CHEAT 0x00434510
+intptr_t C2_HOOK_CDECL CheckFlapAngles(br_actor* pActor, void* pContext) {
+    NOT_IMPLEMENTED();
+}
 
 // FUNCTION: CARMA2_HW 0x0042d9b0
 // FUNCTION: CARMA2_SW 0x0042da20
@@ -2497,9 +2502,117 @@ intptr_t C2_HOOK_CDECL AddTotalDeflection(br_actor* pActor, void* pContext) {
     return 0;
 }
 
-// RepairModel
+typedef struct {
+    tCar_spec* car;
+    float repair_step;
+    float repaired_amount;
+    float* total_deflection;
+} tRepair_model_context;
 
-// RepairModels
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// FUNCTION: CARMA2_HW 0x0043b510
+// FUNCTION: CARMA2_SW 0x0043b560
+// FUNCTION: CARMA2_CHEAT 0x0043b740
+int C2_HOOK_FASTCALL RepairModel(br_model* pModel, tRepair_model_context* pContext) {
+    tUser_detail_level_model* user_detail_model;
+    tModel_detail_vertex_data* vertex_data;
+    br_vector3 mash[1024];
+    br_vector3 pos;
+    br_vector3 old_pos;
+    float repaired;
+    float deflection;
+    float delta;
+    int i;
+    int j;
+
+    if (pModel == NULL || (user_detail_model = pModel->user) == NULL || (vertex_data = user_detail_model->field_0x4) == NULL) {
+        return 0;
+    }
+    if (pModel->nvertices > REC2_ASIZE(mash)) {
+        PDFatalError("Dog gone it, there's a lot of vertices on that model.");
+    }
+    repaired = 0.0f;
+    for (i = 0; i < pModel->nvertices; i++) {
+        ExpandVector3(&pos, &vertex_data[i].p, -10.0f, 10.0f);
+        BrVector3Copy(&old_pos, &pModel->vertices[i].p);
+        for (j = 0; j < 3; j++) {
+            deflection = (float)fabs(pos.v[j] - old_pos.v[j]);
+            if (deflection <= 0.0f) {
+                mash[i].v[j] = 0.0f;
+            } else {
+                *pContext->total_deflection += deflection;
+                if (old_pos.v[j] <= pos.v[j]) {
+                    pModel->vertices[i].p.v[j] += pContext->repair_step;
+                    if (pModel->vertices[i].p.v[j] > pos.v[j]) {
+                        pModel->vertices[i].p.v[j] = pos.v[j];
+                    }
+                    delta = pModel->vertices[i].p.v[j] - old_pos.v[j];
+                    repaired += delta;
+                } else {
+                    pModel->vertices[i].p.v[j] -= pContext->repair_step;
+                    if (pModel->vertices[i].p.v[j] < pos.v[j]) {
+                        pModel->vertices[i].p.v[j] = pos.v[j];
+                    }
+                    delta = pModel->vertices[i].p.v[j] - old_pos.v[j];
+                    repaired -= delta;
+                }
+                mash[i].v[j] = delta;
+                vertex_data[i].flags &= ~0x4;
+            }
+        }
+    }
+    if (repaired == 0.0f) {
+        return 1;
+    }
+    SetModelForUpdate(pModel);
+    AddModelMashToPipingSession(pModel, mash);
+    pContext->repaired_amount += repaired;
+    return 0;
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
+
+// FUNCTION: CARMA2_HW 0x0043b470
+// FUNCTION: CARMA2_SW 0x0043b4c0
+// FUNCTION: CARMA2_CHEAT 0x0043b6a0
+intptr_t C2_HOOK_CDECL RepairModels2(br_actor* pActor, void* pContext) {
+    tRepair_model_context* context;
+    tUser_crush_data* user_crush;
+    tCar_crush_buffer_entry* crush_data;
+    int i;
+
+    context = pContext;
+    user_crush = pActor->user;
+    if (user_crush == NULL) {
+        return 0;
+    }
+    crush_data = user_crush->crush_data;
+    if (crush_data == NULL) {
+        return 0;
+    }
+    if (RepairModel(user_crush->models[0], context)) {
+        RepairSmash(context->car, user_crush->crush_data);
+        crush_data->field_0x2c = 0;
+        if (crush_data->flap_data != NULL && !crush_data->flap_data->kev_o_flap) {
+            crush_data->flap_data->field_0x15 = 0;
+            crush_data->flap_data->field_0x14 = 1;
+            crush_data->flap_data->field_0x18 = 0.0f;
+        }
+        if (crush_data->detach_data != NULL) {
+            crush_data->detach_data->field_0x0 = 0.0f;
+        }
+    } else {
+        for (i = 1; i < context->car->count_detail_levels; i++) {
+            RepairModel(user_crush->models[i], context);
+        }
+    }
+    return 0;
+}
 
 // UnBendModel
 
@@ -2564,7 +2677,25 @@ void C2_HOOK_FASTCALL CompletelyUnBendCar(tCar_spec* pCar_spec) {
 
 // ReAttachBits
 
-// RepairObject
+// FUNCTION: CARMA2_HW 0x0043b400
+// FUNCTION: CARMA2_SW 0x0043b450
+// FUNCTION: CARMA2_CHEAT 0x0043b630
+int C2_HOOK_FASTCALL RepairObject(tPhysics_object* pObject, void* pContext) {
+    tRepair_context* context;
+    tRepair_model_context model_context;
+
+    context = pContext;
+    model_context.repaired_amount = 0.0f;
+    model_context.car = context->car;
+    model_context.repair_step = context->repair_step;
+    model_context.total_deflection = context->total_deflection;
+    ARStartPipingSession(ePipe_chunk_model_mash);
+    DRActorEnumRecurse(pObject->actor, RepairModels2, &model_context);
+    AREndPipingSession();
+    DRActorEnumRecurse(pObject->actor, CheckFlapAngles, NULL);
+    context->repaired_amount += model_context.repaired_amount;
+    return 0;
+}
 
 // FUNCTION: CARMA2_HW 0x0043b740
 // FUNCTION: CARMA2_SW 0x0043b790
