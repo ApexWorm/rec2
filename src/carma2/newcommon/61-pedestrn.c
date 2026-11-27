@@ -27,6 +27,7 @@
 #include "51-smash.h"
 #include "52-errors.h"
 #include "54-runtime.h"
+#include "60-phil.h"
 #include "62-graphics3.h"
 
 #include "63-loading3.h"
@@ -374,6 +375,13 @@ int gINT_0069fda4 = 0;
 // GLOBAL: CARMA2_SW 0x0068e360
 // GLOBAL: CARMA2_CHEAT 0x0069be80
 br_model* gNapalm_bolt_models[7];
+
+// GLOBAL: CARMA2_HW 0x0065e4e0
+// GLOBAL: CARMA2_SW 0x00658e18
+// GLOBAL: CARMA2_CHEAT 0x00665b98
+const tPed_anim_seq gKnocked_over_ped_anim_sequence = {
+    3, { 1, 2, 1 },
+};
 
 // GLOBAL: CARMA2_HW 0x0065e4e4
 // GLOBAL: CARMA2_SW 0x00658e1c
@@ -1294,9 +1302,41 @@ inline void C2_HOOK_FASTCALL SetPedHeadAnim(tPedestrian* pPed, const tPed_anim_s
 
 // StopSmoothTurning
 
-// SetKnockedOverMove
+static inline void C2_HOOK_FASTCALL SetKnockedOverMove(tPedestrian* pPed, tU32 pTime) {
 
-// DoPostElectricution
+    if (pPed->hit_points > 0) {
+        SetPedMove(pPed, 0x5d, -1, 0, 0, pTime, ePed_action_impacting);
+        SetPedHeadAnim(pPed, &gKnocked_over_ped_anim_sequence, pTime);
+    } else {
+        SetPedMove(pPed, 0x5e, -1, 0, 0, pTime, ePed_action_impacting);
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x004cc6e0
+// FUNCTION: CARMA2_SW 0x004c8de0
+// FUNCTION: CARMA2_CHEAT 0x004d2250
+void C2_HOOK_FASTCALL DoPostElectricution(tPedestrian* pPed, tU32 pTime, float pSpeed, float pSpin) {
+    tPhysics_object* object;
+    float spin;
+
+    SetKnockedOverMove(pPed, pTime);
+    if (!(pPed->character->field_0x14 & 0x4)) {
+        SetCharacterPhysicsLevelAR(pPed->character, 5);
+    }
+    object = pPed->character->personality->form->simple_physicing[(tS8)pPed->character->field_0x5].collision_info;
+    if (object != NULL) {
+        pSpeed *= .7;
+        object->v.v[0] = SRandomPosNeg(pSpeed);
+        object->v.v[1] = SRandomBetween(0.f, pSpeed);
+        object->v.v[2] = SRandomPosNeg(pSpeed);
+        spin = pSpin * 4.0;
+        object->omega.v[0] = SRandomPosNeg(spin);
+        object->omega.v[1] = SRandomPosNeg(spin);
+        object->omega.v[2] = SRandomPosNeg(spin);
+        object->disable_move_rotate = 0;
+        object->field_0x49c = gPHIL_last_physics_tick + 40;
+    }
+}
 
 // CBMoveCompleted
 
