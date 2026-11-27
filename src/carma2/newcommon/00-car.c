@@ -32,7 +32,7 @@
 #include "58-crush2.h"
 #include "59-camera.h"
 #include "60-phil.h"
-#include "61-pedestrn.h"
+#include "61-pedestrn-phys.h"
 #include "brender/brender.h"
 #include "globvars.h"
 #include "globvrkm.h"
