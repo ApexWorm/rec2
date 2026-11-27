@@ -16,12 +16,12 @@
 #include "32-spark.h"
 #include "41-utility.h"
 #include "47-win95net.h"
+#include "52-errors.h"
 #include "53-controls.h"
 #include "68-timer.h"
 #include "platform.h"
 #include "globvars.h"
 #include "globvrpb.h"
-#include "52-errors.h"
 
 #include "rec2_macros.h"
 

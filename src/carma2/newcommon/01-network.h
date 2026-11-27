@@ -242,6 +242,10 @@ extern tCar_spec* C2_HOOK_FASTCALL NetCarFromPlayerID(tPlayer_ID pPlayer);
 
 extern tNet_game_player_info* C2_HOOK_FASTCALL NetPlayerFromCar(tCar_spec* pCar);
 
+#ifdef REC2_V101A
+extern tU32 C2_HOOK_FASTCALL CalculateCheckSum(tNet_message* pMessage);
+#endif
+
 extern void C2_HOOK_FASTCALL GetCheckSum(tNet_message* pMessage);
 
 extern void C2_HOOK_FASTCALL CheckCheckSum(tNet_message* pMessage);
