@@ -26,6 +26,7 @@
 #include "37-brucetrk.h"
 #include "41-utility.h"
 #include "49-physics.h"
+#include "51-smash.h"
 #include "53-controls.h"
 #include "55-volume.h"
 #include "57-drone.h"
@@ -45,6 +46,11 @@
 
 #include <limits.h>
 #include <math.h>
+
+// GLOBAL: CARMA2_HW 0x0079ef2c
+// GLOBAL: CARMA2_SW 0x007954cc
+// GLOBAL: CARMA2_CHEAT 0x007a65cc
+int gNum_cars_and_non_cars;
 
 // GLOBAL: CARMA2_HW 0x0079eda0
 // GLOBAL: CARMA2_SW 0x00795340
@@ -140,6 +146,7 @@ int gDouble_pling_water;
 
 // GLOBAL: CARMA2_HW 0x0079ed88
 // GLOBAL: CARMA2_SW 0x00795328
+// GLOBAL: CARMA2_CHEAT 0x007a6428
 int gDrivable_on_count;
 
 // GLOBAL: CARMA2_HW 0x0079ecc0
@@ -147,6 +154,8 @@ int gDrivable_on_count;
 tPhysics_object* gDrivable_on_list[50];
 
 // GLOBAL: CARMA2_HW 0x00679390
+// GLOBAL: CARMA2_SW 0x00673b00
+// GLOBAL: CARMA2_CHEAT 0x00680c40
 br_vector3 gCar_to_view_original_v;
 
 // FUNCTION: CARMA2_HW 0x00413cc0
@@ -718,6 +727,7 @@ void C2_HOOK_FASTCALL CalcGraphicalWheelStuff(tCar_spec* pCar) {
 
 // STUB: CARMA2_HW 0x00415c40
 // STUB: CARMA2_SW 0x00415c70
+// STUB: CARMA2_CHEAT 0x00415ea0
 void C2_HOOK_FASTCALL GetNetPos(tCar_spec* pCar) {
     NOT_IMPLEMENTED();
 }
@@ -726,7 +736,7 @@ void C2_HOOK_FASTCALL GetNetPos(tCar_spec* pCar) {
 #pragma auto_inline(on)
 #endif
 
-void C2_HOOK_FASTCALL MungeCarsMass(tCar_spec* pCar, br_scalar pFactor) {
+void C2_HOOK_FASTCALL MungeCarsMass(tCar_spec* pCar, double pFactor) {
 
     pCar->collision_info->M *= pFactor;
     BrVector3Scale(&pCar->collision_info->I, &pCar->collision_info->I, pFactor);
@@ -734,6 +744,7 @@ void C2_HOOK_FASTCALL MungeCarsMass(tCar_spec* pCar, br_scalar pFactor) {
 
 // FUNCTION: CARMA2_HW 0x00415ef0
 // FUNCTION: CARMA2_SW 0x00415f20
+// FUNCTION: CARMA2_CHEAT 0x00416150
 void C2_HOOK_FASTCALL AddDrag(const tCar_spec* pCar, tPhysics_object* pObject, br_scalar pDelta_time) {
     br_scalar drag;
     br_scalar k;
@@ -760,6 +771,7 @@ void C2_HOOK_FASTCALL AddDrag(const tCar_spec* pCar, tPhysics_object* pObject, b
 
 // FUNCTION: CARMA2_HW 0x00416030
 // FUNCTION: CARMA2_SW 0x00416060
+// FUNCTION: CARMA2_CHEAT 0x00416290
 void C2_HOOK_FASTCALL DragChildren(tCar_spec* pCar, tPhysics_object* pObject) {
 
     for (; pObject != NULL; pObject = pObject->next) {
@@ -842,7 +854,13 @@ void C2_HOOK_FASTCALL RemoveFlyingCar(tCar_spec* pCar) {
     SetHierarchyDoingNothingFlag(pCar->collision_info, 0x1);
 }
 
-// RestoreFlyingCar
+void C2_HOOK_FASTCALL RestoreFlyingCar(tCar_spec* pCar) {
+
+    pCar->collision_info->transform_matrix.m[3][1] -= 1000.0f;
+    BrMatrix34Copy(&pCar->car_master_actor->t.t.mat, &pCar->collision_info->transform_matrix);
+    PositionChildren(pCar->collision_info);
+    SetHierarchyDoingNothingFlag(pCar->collision_info, 0);
+}
 
 void C2_HOOK_FASTCALL GetDrivableOnList(tPhysics_object *pObjects) {
     tPhysics_object* object;
@@ -857,6 +875,7 @@ void C2_HOOK_FASTCALL GetDrivableOnList(tPhysics_object *pObjects) {
 
 // FUNCTION: CARMA2_HW 0x00415890
 // FUNCTION: CARMA2_SW 0x004158c0
+// FUNCTION: CARMA2_CHEAT 0x00415af0
 void C2_HOOK_FASTCALL APTCPreCollision(void) {
     int i;
 
@@ -887,6 +906,7 @@ void C2_HOOK_FASTCALL APTCPreCollision(void) {
 
 // FUNCTION: CARMA2_HW 0x004161a0
 // FUNCTION: CARMA2_SW 0x004161d0
+// FUNCTION: CARMA2_CHEAT 0x00416400
 void C2_HOOK_FASTCALL SetCollisionFlagsAndStuff(tPhysics_object* pObject) {
     tPhysics_object* child;
     tCar_spec* car;
@@ -913,7 +933,32 @@ void C2_HOOK_FASTCALL SetCollisionFlagsAndStuff(tPhysics_object* pObject) {
     }
 }
 
-// APTCPostCollision
+// FUNCTION: CARMA2_HW 0x00416070
+// FUNCTION: CARMA2_SW 0x004160a0
+// FUNCTION: CARMA2_CHEAT 0x004162d0
+void C2_HOOK_FASTCALL APTCPostCollision(void) {
+    int i;
+
+    if (gCar_flying) {
+        RestoreFlyingCar(gCar_to_view);
+    }
+    for (i = 0; i < gNum_active_cars; i++) {
+        if (gActive_car_list[i]->field_0x4c8 != 1.0) {
+            MungeCarsMass(gActive_car_list[i], (br_scalar)(1.0 / gActive_car_list[i]->field_0x4c8));
+        }
+        if (gActive_car_list[i]->number_of_wheels_on_ground) {
+            SetHierarchyDoingNothingFlag(gActive_car_list[i]->collision_info, 0);
+        }
+    }
+    for (i = 0; i < gNum_cars_and_non_cars; i++) {
+        gActive_car_list[i]->frame_collision_flag |= (tS8)gActive_car_list[i]->collision_info->collision_flag;
+    }
+    DoQueuedNetSmashes();
+    if (gNet_mode != eNet_mode_none) {
+        DoQueuedNetDetaching();
+    }
+    SetCollisionFlagsAndStuff(gPHIL_list_collision_infos);
+}
 
 // APTCActiveHalted
 
@@ -929,6 +974,7 @@ void C2_HOOK_FASTCALL SetCollisionFlagsAndStuff(tPhysics_object* pObject) {
 
 // STUB: CARMA2_HW 0x004168c0
 // STUB: CARMA2_SW 0x004168f0
+// STUB: CARMA2_CHEAT 0x00416b20
 void C2_HOOK_FASTCALL MoveAndCollideCar(tCar_spec* pCar, br_scalar pDt) {
     NOT_IMPLEMENTED();
 }
@@ -939,6 +985,7 @@ void C2_HOOK_FASTCALL MoveAndCollideCar(tCar_spec* pCar, br_scalar pDt) {
 
 // FUNCTION: CARMA2_HW 0x00417030
 // FUNCTION: CARMA2_SW 0x00417060
+// FUNCTION: CARMA2_CHEAT 0x00417290
 void C2_HOOK_FASTCALL MoveAndCollideNonCar(tNon_car_spec* pNon_car, br_scalar pDt) {
 
     if (pNon_car->collision_info->water_d != 10000.0f) {

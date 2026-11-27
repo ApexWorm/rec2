@@ -2697,7 +2697,12 @@ void C2_HOOK_FASTCALL ReceivedReAttachAllBits(tNet_message_chunk* pContents) {
     gCount_net_crush_reattach_bit_list += 1;
 }
 
-// DoQueuedNetDetaching
+// STUB: CARMA2_HW 0x0043ceb0
+// STUB: CARMA2_SW 0x0043cf00
+// STUB: CARMA2_CHEAT 0x0043d110
+void C2_HOOK_FASTCALL DoQueuedNetDetaching(void) {
+    NOT_IMPLEMENTED();
+}
 
 // DBNonCarOwner
 

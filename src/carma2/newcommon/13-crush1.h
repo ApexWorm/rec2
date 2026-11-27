@@ -518,7 +518,7 @@ extern void C2_HOOK_FASTCALL ARUndoSplitWeld(tCar_spec* pCar);
 
 extern void C2_HOOK_FASTCALL ReceivedReAttachAllBits(tNet_message_chunk* pContents);
 
-// DoQueuedNetDetaching
+extern void C2_HOOK_FASTCALL DoQueuedNetDetaching(void);
 
 // DBNonCarOwner
 
