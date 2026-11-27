@@ -215,7 +215,8 @@ C2_MATCHING_NAKED void C2_HOOK_CDECL HostFarByteWrite(br_uint_32 offset, br_uint
 }
 #else
 void C2_HOOK_CDECL HostFarByteWrite(br_uint_32 offset, br_uint_16 sel, br_uint_8 value) {
-    NOT_IMPLEMENTED();
+
+    *(br_uint_8*)FAR_POINTER(offset, sel) = value;
 }
 #endif
 
@@ -236,8 +237,8 @@ C2_MATCHING_NAKED br_uint_8 C2_HOOK_CDECL HostFarByteRead(br_uint_32 offset, br_
 }
 #else
 br_uint_8 C2_HOOK_CDECL HostFarByteRead(br_uint_32 offset, br_uint_16 sel) {
-    NOT_IMPLEMENTED();
-    return 0;
+
+    return *(br_uint_8*)FAR_POINTER(offset, sel);
 }
 #endif
 
@@ -259,7 +260,8 @@ C2_MATCHING_NAKED void C2_HOOK_CDECL HostFarWordWrite(br_uint_32 offset, br_uint
 }
 #else
 void C2_HOOK_CDECL HostFarWordWrite(br_uint_32 offset, br_uint_16 sel, br_uint_16 value) {
-    NOT_IMPLEMENTED();
+
+    *(br_uint_16*)FAR_POINTER(offset, sel) = value;
 }
 #endif
 
@@ -280,8 +282,8 @@ C2_MATCHING_NAKED br_uint_16 C2_HOOK_CDECL HostFarWordRead(br_uint_32 offset, br
 }
 #else
 br_uint_16 C2_HOOK_CDECL HostFarWordRead(br_uint_32 offset, br_uint_16 sel) {
-    NOT_IMPLEMENTED();
-    return 0;
+
+    return *(br_uint_16*)FAR_POINTER(offset, sel);
 }
 #endif
 
