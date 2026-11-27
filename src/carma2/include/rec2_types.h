@@ -4289,6 +4289,18 @@ typedef struct tCar_bit_spec {
     tU32 field_0x10;
 } tCar_bit_spec;
 
+typedef struct tCar_vital_bits {
+    br_actor* actor;
+    float M;
+    br_vector3 I;
+    br_vector3 cmpos;
+    br_bounds3 bb1;
+    br_bounds3 bb2;
+    br_vector3 field_0x50;
+    br_vector3 v;
+    br_vector3 omega;
+} tCar_vital_bits;
+
 typedef struct tCar_crush_spec {
     int count_shapes;
     tCar_crush_shape_info* field_0x4;
@@ -4333,12 +4345,11 @@ typedef struct tCar_crush_spec {
     undefined field_0x4b9[3];
     float snappability_factor;
     float split_y_pos;
-    undefined field_0x4c4[8];
+    br_model* field_0x4c4[2];
     br_actor* actor; /* ->user is tCar_spec pointer */
     br_actor* model_actor;
-    undefined field_0x4d4[0x548 - 0x4d4];
-    br_vector3 field_0x548;
-    float field_0x554;
+    tCar_vital_bits field_0x4d4;
+    br_vector4 field_0x548;
     br_vector3 driver_position;
     tCollision_shape_wireframe* field_0x564[4];
     tU32 field_0x574;

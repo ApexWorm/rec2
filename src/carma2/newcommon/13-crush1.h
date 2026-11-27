@@ -473,7 +473,7 @@ extern void C2_HOOK_FASTCALL RepairCarCollisionShapes(tCar_spec* pCar, float pSt
 
 // RepairCar
 
-// RestoreVitalBitsOfObject
+extern void C2_HOOK_FASTCALL RestoreVitalBitsOfObject(tPhysics_object* pObject, const tCar_vital_bits* pVital_bits);
 
 extern void C2_HOOK_FASTCALL WeldCar(tCar_spec* pCar_spec);
 

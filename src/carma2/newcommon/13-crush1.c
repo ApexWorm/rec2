@@ -12,8 +12,10 @@
 #include "01-network.h"
 #include "08-loading1.h"
 #include "09-funks.h"
+#include "15-displays.h"
 #include "18-graphics2.h"
 #include "23-piping.h"
+#include "27-powerup.h"
 #include "30-opponent.h"
 #include "32-spark.h"
 #include "37-brucetrk.h"
@@ -3153,17 +3155,110 @@ void C2_HOOK_FASTCALL RepairCarCollisionShapes(tCar_spec* pCar, float pStep) {
 
 // RepairCar
 
-// RestoreVitalBitsOfObject
+inline void C2_HOOK_FASTCALL RestoreVitalBitsOfObject(tPhysics_object* pObject, const tCar_vital_bits* pVital_bits) {
+
+    pObject->actor = pVital_bits->actor;
+    pObject->M = pVital_bits->M;
+    BrVector3Copy(&pObject->I, &pVital_bits->I);
+    BrVector3Copy(&pObject->cmpos, &pVital_bits->cmpos);
+    BrVector3Copy(&pObject->field_0x54, &pVital_bits->field_0x50);
+}
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x0043b8a0
-// STUB: CARMA2_SW 0x0043b8f0
-// STUB: CARMA2_CHEAT 0x0043bad0
+// FUNCTION: CARMA2_HW 0x0043b8a0
+// FUNCTION: CARMA2_SW 0x0043b8f0
+// FUNCTION: CARMA2_CHEAT 0x0043bad0
 void C2_HOOK_FASTCALL WeldCar(tCar_spec* pCar_spec) {
-    NOT_IMPLEMENTED();
+    tCar_crush_spec* crush_spec;
+    tNon_car_spec* non_car;
+    tPhysics_object* object;
+    tPhysics_object* next;
+    tPhysics_shape* last_shape;
+    tUser_crush_data* user_crush;
+    br_actor* actor;
+    char s[256];
+    int i;
+
+    crush_spec = pCar_spec->car_crush_spec;
+    if (!crush_spec->field_0x4b8) {
+        return;
+    }
+    LoseAllLocalPowerups(pCar_spec);
+    non_car = crush_spec->actor->type_data;
+    if (non_car != NULL) {
+        while (non_car->collision_info->shape->common.type == kCollisionShapeType_Wireframe) {
+            non_car->collision_info->shape = non_car->collision_info->shape->common.next;
+        }
+        for (object = non_car->collision_info->child; object != NULL; object = next) {
+            PipeSingleNonCar((tU16)((tNon_car_spec*)object->actor->type_data)->car_ID, object->actor);
+            next = object->next;
+            PhysicsRemoveObject(object);
+            PhysicsAddObject(pCar_spec->collision_info, object);
+        }
+        PipeSingleNonCar((tU16)non_car->car_ID, crush_spec->actor);
+        RemoveNonCar(non_car);
+    }
+    while (crush_spec->model_actor->children != NULL) {
+        actor = crush_spec->model_actor->children;
+        PipeSingleRelink(NULL, actor);
+        BrActorRemove(actor);
+        PipeSingleRelink(pCar_spec->car_model_actor, actor);
+        BrActorAdd(pCar_spec->car_model_actor, actor);
+    }
+    for (i = 0; i < crush_spec->field_0x494; i++) {
+        PipeSingleRelink(pCar_spec->car_model_actor, crush_spec->field_0x498[i]);
+        BrActorAdd(pCar_spec->car_model_actor, crush_spec->field_0x498[i]);
+    }
+    crush_spec->field_0x494 = 0;
+    user_crush = pCar_spec->car_model_actor->user;
+    for (i = 0; i < pCar_spec->count_detail_levels; i++) {
+        if (user_crush->models[i] != NULL) {
+            BrModelFree(BrModelRemove(user_crush->models[i]));
+            user_crush->models[i] = crush_spec->field_0x4c4[i];
+        }
+    }
+    pCar_spec->car_model_actor->model = user_crush->models[0];
+    BrModelFree(BrModelRemove(crush_spec->model_actor->model));
+    PipeSingleRelink(NULL, crush_spec->actor);
+    BrActorRemove(crush_spec->actor);
+    DRActorEnumRecurse(pCar_spec->car_model_actor, MakeCarModelsMaterialsSingleSided, pCar_spec);
+    last_shape = NULL;
+    for (i = 0; i < crush_spec->count_shapes; i++) {
+        if (!crush_spec->field_0x4[i].field_0x8) {
+            if (last_shape != NULL) {
+                last_shape->common.next = (tPhysics_shape*)crush_spec->field_0x4[i].field_0x0;
+            } else {
+                pCar_spec->collision_info->shape = (tPhysics_shape*)crush_spec->field_0x4[i].field_0x0;
+            }
+            last_shape = (tPhysics_shape*)crush_spec->field_0x4[i].field_0x0;
+        }
+    }
+    if (last_shape != NULL) {
+        last_shape->common.next = NULL;
+    }
+    UpdateCollisionObject(pCar_spec->collision_info);
+    pCar_spec->collision_info->bb2.min.v[1] = GetCarOverallBoundsMinY(pCar_spec);
+    pCar_spec->number_of_wheels_on_ground = 0;
+    RestoreVitalBitsOfObject(pCar_spec->collision_info, &crush_spec->field_0x4d4);
+    pCar_spec->collision_info->box_face_ref = gFace_num__car - 2;
+    SetCarSuspGiveAndHeight(pCar_spec, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f);
+    pCar_spec->car_crush_spec->field_0x28 = 1;
+    pCar_spec->field_0x18c8 = 0;
+    crush_spec->field_0x4b8 = 0;
+    if (gProgram_state.racing) {
+        DRS3StartSound3D(gCar_outlet, 5252,
+            &pCar_spec->collision_info->actor->t.t.translate.t, &gZero_v__car,
+            1, 255, IRandomBetween(S3_FIXED_INT(0.875f), S3_FIXED_INT(1.125f)), S3_FIXED_INT(1));
+    }
+    if (pCar_spec != NULL && pCar_spec->driver == eDriver_local_human) {
+        SpendCredits(2000);
+        sprintf(s, "%s %d", "REPAIR COST", 2000);
+        NewTextHeadupSlot(4, 0, 1500, -4, s);
+    }
+    PipeSingleSplitWeld((tU16)pCar_spec->car_ID, &crush_spec->field_0x548, 0);
 }
 
 #ifdef REC2_MATCHING
