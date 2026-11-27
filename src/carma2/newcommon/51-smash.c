@@ -1318,7 +1318,7 @@ void C2_HOOK_FASTCALL InitRepairAnimations(void) {
 // FUNCTION: CARMA2_HW 0x004f3560
 // FUNCTION: CARMA2_SW 0x004ef1c0
 // FUNCTION: CARMA2_CHEAT 0x004f9200
-void C2_HOOK_FASTCALL SplondificatalizeIdentifier(br_actor* pActor, char **pIdentifier, int pIndex) {
+void C2_HOOK_FASTCALL SplondificatalizeIdentifier(void* pOwner, char **pIdentifier, int pIndex) {
     char s[64];
     char s2[64];
     int len;
@@ -1337,7 +1337,7 @@ void C2_HOOK_FASTCALL SplondificatalizeIdentifier(br_actor* pActor, char **pIden
     s[11] = '\0';
     if (strlen(*pIdentifier) < 12) {
         BrResFree(*pIdentifier);
-        *pIdentifier = BrResStrDup(pActor, s);
+        *pIdentifier = BrResStrDup(pOwner, s);
     } else {
         strcpy(*pIdentifier, s);
     }
@@ -1453,7 +1453,25 @@ void C2_HOOK_FASTCALL FreeConnotations(tConnotations* pConnotations, int pKeep_a
     }
 }
 
-// MungeSmashMaterialNames
+// FUNCTION: CARMA2_HW 0x004f0bc0
+// FUNCTION: CARMA2_SW 0x004ec820
+// FUNCTION: CARMA2_CHEAT 0x004f6860
+void C2_HOOK_FASTCALL MungeSmashMaterialNames(void) {
+    int i;
+    tSmashable_item_spec* spec;
+
+    i = 0;
+    if (i < gCount_track_smashable_environment_specs) {
+        spec = gTrack_smashable_environment_specs;
+        do {
+            if (spec->trigger_type == kSmashableTrigger_Material) {
+                SplondificatalizeIdentifier(spec->trigger_object.material, &spec->trigger_object.material->identifier, i);
+            }
+            i++;
+            spec++;
+        } while (i < gCount_track_smashable_environment_specs);
+    }
+}
 
 // ExtrapolateTextureCoordinates
 

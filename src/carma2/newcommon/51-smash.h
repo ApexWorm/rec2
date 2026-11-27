@@ -247,7 +247,7 @@ extern void C2_HOOK_FASTCALL DisposeSmashData(tCar_crush_buffer_entry* pCrush_da
 
 extern void C2_HOOK_FASTCALL InitRepairAnimations(void);
 
-extern void C2_HOOK_FASTCALL SplondificatalizeIdentifier(br_actor* pActor, char **pIdentifier, int pIndex);
+extern void C2_HOOK_FASTCALL SplondificatalizeIdentifier(void* pOwner, char **pIdentifier, int pIndex);
 
 // ReadSmashReplace
 
