@@ -110,7 +110,7 @@ extern br_scalar C2_HOOK_FASTCALL SetInitPosition(br_actor* pActor, tSmashable_i
 
 // DoNonCarShrapnel
 
-// DoShrapnel
+extern void C2_HOOK_FASTCALL DoShrapnel(int pArg1, tShrapnel_spec* pShrapnel, int pArg3, br_vector3* pArg4, br_vector3* pArg5, br_vector3* pArg6, undefined4 pArg7, tU32 pTime, uintptr_t pId, br_matrix34* pMat, br_bounds3* pBounds, br_vector3* pArg12, float pArg13, br_vector3* pArg14, int pArg15);
 
 // DoAward
 
@@ -244,7 +244,7 @@ extern void C2_HOOK_FASTCALL CleanUpSmashStuff(void);
 
 extern void C2_HOOK_FASTCALL DisposeSmashData(tCar_crush_buffer_entry* pCrush_data);
 
-// DoBackwardShrapnel
+extern void C2_HOOK_FASTCALL DoBackwardShrapnel(tU32 pTime_now, int pArg1, tShrapnel_spec* pShrapnel, int pArg3, br_vector3* pArg4, br_vector3* pArg5, br_vector3* pArg6, undefined4 pArg7, tU32 pTime, uintptr_t pId, br_matrix34* pMat, br_bounds3* pBounds, br_vector3* pArg12, float pArg13, br_vector3* pArg14);
 
 extern void C2_HOOK_FASTCALL InitRepairAnimations(void);
 
