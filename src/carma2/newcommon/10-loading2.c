@@ -262,6 +262,7 @@ const char* gDamage_names[12] = {
 
 // GLOBAL: CARMA2_HW 0x00657500
 // GLOBAL: CARMA2_SW 0x00651eb0
+// GLOBAL: CARMA2_CHEAT 0x0065dd90
 const char* gWheel_actor_names[6] = {
     "FLWHEEL.ACT",
     "FRWHEEL.ACT",

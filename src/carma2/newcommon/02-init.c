@@ -91,6 +91,7 @@ int gStarting_money[3];
 
 // GLOBAL: CARMA2_HW 0x00762160
 // GLOBAL: CARMA2_SW 0x007586c0
+// GLOBAL: CARMA2_CHEAT 0x00769800
 int gNet_starting_money[8];
 
 // GLOBAL: CARMA2_HW 0x0074d4c0

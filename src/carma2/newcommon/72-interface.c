@@ -75,6 +75,7 @@ tNet_game_options gNet_settings[9] = { 0 };
 #ifdef REC2_MATCHING
 // GLOBAL: CARMA2_HW 0x00763b10
 // GLOBAL: CARMA2_SW 0x0075a070
+// GLOBAL: CARMA2_CHEAT 0x0076b1b0
 int gINT_00763b10 = 0;
 #endif
 
@@ -173,6 +174,7 @@ int gBackup_key_mappings[4][77] = { 0 };
 
 // GLOBAL: CARMA2_HW 0x00686eb0
 // GLOBAL: CARMA2_SW 0x006815f0
+// GLOBAL: CARMA2_CHEAT 0x0068e758
 int gINT_00686eb0 = 0;
 
 // GLOBAL: CARMA2_HW 0x00688700

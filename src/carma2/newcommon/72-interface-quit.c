@@ -12,6 +12,7 @@
 
 // GLOBAL: CARMA2_HW 0x00649df0
 // GLOBAL: CARMA2_CHEAT 0x00650670
+// GLOBAL: CARMA2_SW 0x00644d20
 tFrontend_spec gFrontend_QUIT = {
 #if 0 // FIXME: enable this
     "Quit",
