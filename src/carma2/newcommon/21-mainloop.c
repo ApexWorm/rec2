@@ -8,7 +8,11 @@
 
 #include "21-mainloop.h"
 
+#include "16-graphics1.h"
+#include "36-trig.h"
 #include "41-utility.h"
+#include "59-camera.h"
+#include "61-pedestrn-phys.h"
 #include "69-sound.h"
 #include "globvars.h"
 #include "globvrpb.h"
@@ -50,6 +54,16 @@ tU32 gNet_auto_increase_credits_dt[8];
 // GLOBAL: CARMA2_SW 0x0073b294
 // GLOBAL: CARMA2_CHEAT 0x0074be74
 int gPed_count;
+
+// GLOBAL: CARMA2_HW 0x0068c738
+// GLOBAL: CARMA2_SW 0x00686788
+// GLOBAL: CARMA2_CHEAT 0x00693fd8
+br_vector3 gPrev_camera_position;
+
+// GLOBAL: CARMA2_HW 0x00704e44
+// GLOBAL: CARMA2_SW 0x006fbb24
+// GLOBAL: CARMA2_CHEAT 0x0070c4e4
+br_scalar gCamera_to_horiz_angle;
 
 // GLOBAL: CARMA2_HW 0x0068c748
 // GLOBAL: CARMA2_SW 0x00686798
@@ -188,7 +202,25 @@ tU32 C2_HOOK_FASTCALL GetLastTickCount(void) {
 
 // MungeRaceFinished
 
-// CalculateCameraStuff
+// FUNCTION: CARMA2_HW 0x004940e0
+// FUNCTION: CARMA2_SW 0x004913e0
+// FUNCTION: CARMA2_CHEAT 0x00494310
+void C2_HOOK_FASTCALL CalculateCameraStuff(tU32 pCamera_period) {
+
+    gOur_pos = &gPlayer_car_master_actor->t.t.translate.t;
+    PositionExternalCamera(&gProgram_state.current_car, pCamera_period);
+    BrActorToActorMatrix34(&gCamera_to_world, gCamera, gUniverse_actor);
+    BrActorToActorMatrix34(&gRearview_camera_to_world, gRearview_camera, gUniverse_actor);
+    gCamera_to_horiz_angle = FastScalarArcTan2(gCamera_to_world.m[2][1], gCamera_to_world.m[1][1]);
+    gYon_squared = gYon_multiplier * gYon_multiplier * ((br_camera*)gCamera->type_data)->yon_z * ((br_camera*)gCamera->type_data)->yon_z;
+    if ((gCamera_to_world.m[3][2] - gPrev_camera_position.v[2]) * (gCamera_to_world.m[3][2] - gPrev_camera_position.v[2])
+            + ((gCamera_to_world.m[3][0] - gPrev_camera_position.v[0]) * (gCamera_to_world.m[3][0] - gPrev_camera_position.v[0])
+                + (gCamera_to_world.m[3][1] - gPrev_camera_position.v[1]) * (gCamera_to_world.m[3][1] - gPrev_camera_position.v[1]))
+        > 400.0) {
+        ResetPedNearness();
+    }
+    BrVector3Copy(&gPrev_camera_position, (br_vector3*)gCamera_to_world.m[3]);
+}
 
 // CheckActiveCarList
 
