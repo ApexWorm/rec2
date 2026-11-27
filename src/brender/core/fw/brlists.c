@@ -115,10 +115,11 @@ void C2_HOOK_CDECL BrSimpleNewList(br_simple_list* list) {
 void C2_HOOK_CDECL BrSimpleAddHead(br_simple_list* list, br_simple_node* node) {
 
     node->next = list->head;
-    node->prev = (br_simple_node**)&list->head;
-    if (list->head != NULL) {
-        list->head->prev = &node->next;
-    }
+    node->prev = &list->head;
+
+    if(node->next)
+        node->next->prev = & node->next;
+
     list->head = node;
 }
 
