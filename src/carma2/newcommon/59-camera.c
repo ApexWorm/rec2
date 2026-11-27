@@ -369,7 +369,7 @@ void C2_HOOK_FASTCALL PositionCarMountedCamera(tCar_spec* pCar, tU32 pTime) {
     // GLOBAL: CARMA2_HW 0x0058f624
     // GLOBAL: CARMA2_SW 0x0058a624
     // GLOBAL: CARMA2_CHEAT 0x005946b4
-    static float position = 1.f;
+    static float position = 1.0f;
     br_matrix34* mat;
     br_matrix34* car_mat;
     br_vector3 offset;
@@ -384,23 +384,23 @@ void C2_HOOK_FASTCALL PositionCarMountedCamera(tCar_spec* pCar, tU32 pTime) {
 
     mat = &gCamera->t.t.mat;
     car_mat = &pCar->car_master_actor->t.t.mat;
-    if (gCamera_key_flags.field_0x0_bit1 && !gCamera_key_flags.field_0x0_bit0 && speed >= 0.f) {
+    if (gCamera_key_flags.field_0x0_bit1 && !gCamera_key_flags.field_0x0_bit0 && speed >= 0.0f) {
         speed = -0.0002f;
-    } else if (gCamera_key_flags.field_0x0_bit2 && !gCamera_key_flags.field_0x0_bit0 && speed <= 0.f) {
+    } else if (gCamera_key_flags.field_0x0_bit2 && !gCamera_key_flags.field_0x0_bit0 && speed <= 0.0f) {
         speed = 0.0002f;
     }
     position += speed * pTime;
-    if (position > 1.f) {
-        speed = 0.f;
-        position = 1.f;
-    } else if (position < 0.f) {
-        speed = 0.f;
-        position = 0.f;
+    if (position > 1.0f) {
+        speed = 0.0f;
+        position = 1.0f;
+    } else if (position < 0.0f) {
+        speed = 0.0f;
+        position = 0.0f;
     }
     p = position;
     bx = pCar->camera_bumper_position.v[0];
     by = pCar->camera_bumper_position.v[1];
-    inv = 1.f - p;
+    inv = 1.0f - p;
     bz = pCar->camera_bumper_position.v[2];
     cx = pCar->camera_cockpit_position.v[0];
     cy = pCar->camera_cockpit_position.v[1];
@@ -410,11 +410,11 @@ void C2_HOOK_FASTCALL PositionCarMountedCamera(tCar_spec* pCar, tU32 pTime) {
     offset.v[2] = cz * p + bz * inv;
     BrMatrix34Copy(mat, car_mat);
     BrMatrix34PreTranslate(mat, offset.v[0], offset.v[1], offset.v[2]);
-    if (speed < 0.f) {
-        speed -= 0.0001;
+    if (speed < 0.0f) {
+        speed = (float)(speed - 0.0001);
     }
-    if (speed > 0.f) {
-        speed -= -0.0001;
+    if (speed > 0.0f) {
+        speed = (float)(speed - -0.0001);
     }
     CollideCamera2(&pCar->pos, (br_vector3*)mat->m[3], NULL, 0, NULL);
 }
