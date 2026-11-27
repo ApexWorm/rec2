@@ -1415,10 +1415,10 @@ int C2_HOOK_FASTCALL SaveOptions(void) {
         || PrintNetOptions(f, 6) < 0
         || PrintNetOptions(f, 7) < 0
         || PrintNetOptions(f, 8) < 0
-        || fprintf(f, "HeadupDetailLevel %d\n", gHeadup_detail_level) < 0) {
+        || fprintf(f, "HeadupDetailLevel %d\n", gHeadup_detail_level) < 0
+        || PFfclose(f) != 0) {
         return 0;
     }
-    PFfclose(f);
     return 1;
 }
 

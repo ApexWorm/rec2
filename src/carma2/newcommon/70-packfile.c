@@ -121,13 +121,16 @@ void C2_HOOK_FASTCALL ClosePackFile(tTWTVFS twt) {
 // FUNCTION: CARMA2_HW 0x004b4760
 // FUNCTION: CARMA2_SW 0x004b08d0
 // FUNCTION: CARMA2_CHEAT 0x004ba030
-void C2_HOOK_FASTCALL PFfclose(FILE* pFile) {
+int C2_HOOK_FASTCALL PFfclose(FILE* pFile) {
 
     if ((uintptr_t)pFile >= REC2_ASIZE(gTwatVfsFiles)) {
-        fclose(pFile);
+        return fclose(pFile);
     } else {
         gTwatVfsFiles[(uintptr_t)pFile].start = NULL;
     }
+#ifndef REC2_MATCHING
+    return 0;
+#endif
 }
 
 // FUNCTION: CARMA2_HW 0x004b4780
