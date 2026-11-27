@@ -2349,55 +2349,6 @@ typedef struct {
     br_actor* actor;
 } tPowerup_queue_item;
 
-typedef struct {
-    tCar_spec* car;
-    undefined4 field_0x4;
-    br_actor* actor;
-    undefined field_0xc;
-    undefined field_0xd;
-    undefined field_0xe;
-    undefined field_0xf;
-    undefined4 field_0x10;
-    undefined field_0x14;
-    undefined field_0x15;
-    undefined field_0x16;
-    undefined field_0x17;
-    undefined field_0x18;
-    undefined field_0x19;
-    undefined field_0x1a;
-    undefined field_0x1b;
-    undefined field_0x1c;
-    undefined field_0x1d;
-    undefined field_0x1e;
-    undefined field_0x1f;
-    br_vector3 field_0x20;
-    undefined field_0x2c;
-    undefined field_0x2d;
-    undefined field_0x2e;
-    undefined field_0x2f;
-    undefined field_0x30;
-    undefined field_0x31;
-    undefined field_0x32;
-    undefined field_0x33;
-    undefined field_0x34;
-    undefined field_0x35;
-    undefined field_0x36;
-    undefined field_0x37;
-    undefined field_0x38;
-    undefined field_0x39;
-    undefined field_0x3a;
-    undefined field_0x3b;
-    undefined field_0x3c;
-    undefined field_0x3d;
-    undefined field_0x3e;
-    undefined field_0x3f;
-    undefined4 field_0x40;
-    undefined4 field_0x44;
-    undefined4 field_0x48;
-    br_matrix34 field_0x4c;
-    br_vector3 field_0x7c;
-} tQueued_smash;
-
 typedef enum {
     kRendererShadingType_Undefined = -1,
     kRendererShadingType_Default = 1,
@@ -4244,7 +4195,7 @@ typedef struct {
     int funk;
     br_material* funk_material;
     int count_smashable_levels;
-    undefined4 field_0x4c;
+    int field_0x4c;
     tSmashable_level* levels;
     br_vector3 field_0x54;
     br_vector3 field_0x60;
@@ -4253,6 +4204,24 @@ typedef struct {
     int field_0x74;
     tCar_crush_vertex_data* field_0x78;
 } tCar_crush_smashable_part;
+
+typedef struct {
+    tCar_spec* car;
+    tPhysics_object* object;
+    br_actor* actor;
+    undefined4 field_0xc;
+    tCar_crush_smashable_part* smashable;
+    br_vector3 velocity;
+    br_vector3 field_0x20;
+    br_vector3 position;
+    int level;
+    int field_0x3c;
+    int field_0x40;
+    int field_0x44;
+    int field_0x48;
+    br_vector3 field_0x4c[4];
+    br_vector3 field_0x7c;
+} tQueued_smash;
 
 typedef struct {
     char actor_name[16];

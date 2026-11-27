@@ -34,6 +34,8 @@ extern tRepair_animation gRepair_animations[25];
 extern br_vector3 gZero_vector__smash;
 extern tDecal gDecals[50];
 extern int gCount_queued_smashes;
+
+extern int gINT_006a829c;
 extern tSmash_explosion gSmash_explosions[20];
 
 typedef struct {
@@ -140,21 +142,21 @@ extern void C2_HOOK_FASTCALL MungeDelayedSideEffects(void);
 
 // DoVariableEffects
 
-// DoConnotations
+extern void C2_HOOK_FASTCALL DoConnotations(tPhysics_object* pObject, int pArg2, tCar_crush_smashable_part* pSmashable, tConnotations* pConnotations, int pSeed, br_vector3* pVelocity, br_vector3* pPosition, br_vector3* pSound_position, br_actor* pActor, tU32 pTime, uintptr_t pId, br_matrix34* pMat, br_bounds3* pBounds, br_vector3* pArg14, float pForce_magnitude, br_vector3* pForce, int pNo_side_effects);
 
 extern void C2_HOOK_FASTCALL DoPowerupRespawnSmash(br_actor* pActor);
 
-// DoConnotationsMultiLevel
+extern void C2_HOOK_FASTCALL DoConnotationsMultiLevel(tPhysics_object* pObject, int pArg2, tCar_crush_smashable_part* pSmashable, tConnotations* pConnotations, int pSeed, br_vector3* pVelocity, br_vector3* pPosition, br_vector3* pSound_position, br_actor* pActor, tU32 pTime, uintptr_t pId, br_matrix34* pMat, int pFrom_level, int pTo_level, br_vector3* pForce, int pNo_side_effects);
 
-// SmashItIntoVerySmallPiecesIndeed
+extern void C2_HOOK_FASTCALL SmashItIntoVerySmallPiecesIndeed(tCar_spec* pCar, tPhysics_object* pObject, br_actor* pActor, int pArg4, tCar_crush_smashable_part* pSmashable, br_vector3* pVelocity, br_vector3* pPosition, int pLevel, br_vector3* pForce, int pNo_side_effects);
 
 extern void C2_HOOK_FASTCALL InitSmashQueue(void);
 
-// FlushPowerupQueue
+extern void C2_HOOK_FASTCALL FlushPowerupQueue(void);
 
-// FlushSmashQueue
+extern void C2_HOOK_FASTCALL FlushSmashQueue(int pFlush_powerups);
 
-extern int C2_HOOK_FASTCALL QueueSmashIfNecessary3(tCar_spec* pCar, tPhysics_object* pObject, br_vector3* pPosition, br_vector3* pNormal, br_actor* pActor, int pArg6, tCar_crush_smashable_part* pSmashable, float pMagnitude, int pArg9, int pArg10);
+extern tSmashable_level* C2_HOOK_FASTCALL QueueSmashIfNecessary3(tCar_spec* pCar, tPhysics_object* pObject, br_vector3* pPosition, br_vector3* pNormal, br_actor* pActor, int pArg6, tCar_crush_smashable_part* pSmashable, float pMagnitude, int pArg9, int pArg10);
 
 extern void C2_HOOK_FASTCALL QueueSmashIfNecessary2(tCar_spec* pCar, tPhysics_object* pObject, br_vector3* pPosition, br_vector3* pNormal, br_actor* pActor, int pArg6, tCar_crush_smashable_part* pSmashable, float pMagnitude, int pArg9, int pArg10);
 
