@@ -33,9 +33,8 @@ extern tPedForms_vtable* gPed_vtable;
 extern int gPed_retain_root_mode;
 
 extern br_material* gPedestrian_character_cloned_materials[50];
-extern int gCount_pedestrian_personality_cloned_materials;
-
 extern tPed_morph gPed_morphs[20];
+extern int gCount_pedestrian_personality_cloned_materials;
 
 extern tPed_remap* gPed_remaps[10];
 
@@ -522,7 +521,7 @@ extern int C2_HOOK_FASTCALL MakeCharacterRenderable(tPed_character_instance* pCh
 
 // CharacterNoLongerRenderable
 
-// CalcCollisionObjectThings
+extern void C2_HOOK_FASTCALL CalcCollisionObjectThings(tPhysics_object* pObject, br_bounds3* pFrame, int pNull, br_vector3* pBoneVec, br_vector3* pBonePtr);
 
 // SetCollisionObject
 
@@ -542,11 +541,11 @@ extern void C2_HOOK_FASTCALL SetObjectV(tPhysics_object* pObject, const br_vecto
 
 // SetObjectOmega
 
-extern void C2_HOOK_FASTCALL MakePartPhysicallyActive(tPhysics_object* pObject, const br_vector3* pV);
+// MakePartPhysicallyActive
 
-extern void C2_HOOK_FASTCALL TurnPhysicsOn(tPed_character_instance* pCharacter);
+// TurnPhysicsOn
 
-extern int C2_HOOK_FASTCALL MakeCharacterPhysicworthy(tPed_character_instance* pCharacter);
+// MakeCharacterPhysicworthy
 
 extern void C2_HOOK_FASTCALL RecalculateOrientationOfRoot(tPed_character_instance* pCharacter);
 
@@ -564,15 +563,15 @@ extern void C2_HOOK_FASTCALL StopCharacterMorphing(tPed_character_instance* pCha
 
 // MungeCharacterAnimation
 
-extern void C2_HOOK_FASTCALL SetOnGroundVector(tPed_character_instance* pCharacter, br_vector3* pPos, br_vector3* pNew_pos);
+// SetOnGroundVector
 
-extern void C2_HOOK_FASTCALL ResetAnimation(tPed_character_instance* pCharacter);
+// ResetAnimation
 
 extern int C2_HOOK_FASTCALL SetCharacterMove(tPed_character_instance* pPed, int pMove_action, float pSpeed, int pArg4, int pArg5, tU32 pTime);
 
 // DRMatrix34RotateCos
 
-// DropPointOntoPlane
+extern void C2_HOOK_FASTCALL DropPointOntoPlane(const br_vector3* pPoint, const br_vector3* pPlane, br_vector3* pDest);
 
 extern void C2_HOOK_FASTCALL SetCharacterDirection(tPed_character_instance* pPed, const br_vector3* pDir, const br_vector3* pUp);
 
