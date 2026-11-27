@@ -176,7 +176,7 @@ extern int C2_HOOK_FASTCALL RematerialiseOpponent(tOpponent_spec* pOpponent_spec
 
 // NumberOfOpponentsStillRunning
 
-// ResetPredominantJobbies
+extern void C2_HOOK_FASTCALL ResetPredominantJobbies(void);
 
 extern void C2_HOOK_FASTCALL LoadCopCars(tRace_info* pRace_info);
 
