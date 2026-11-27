@@ -1123,7 +1123,7 @@ inline int C2_HOOK_FASTCALL MassageOpponentPosition(tOpponent_spec* pOpponent_sp
             BrVector3Normalise(&displacement, &direction_v);
             BrVector3Scale(&displacement, &displacement, (pMassage_count / 4) * 0.5f);
         } else {
-            BrVector3Set(&positive_y_vector, 0.f, 1.f, 0.f);
+            BrVector3Set(&positive_y_vector, 0.0f, 1.0f, 0.0f);
             BrVector3Cross(&displacement, &positive_y_vector, &direction_v);
             BrVector3Normalise(&displacement, &displacement);
             BrVector3Scale(&displacement, &displacement, (pMassage_count / 4) * 0.1f);
@@ -1231,30 +1231,30 @@ int C2_HOOK_FASTCALL RematerialiseOpponent(tOpponent_spec* pOpponent_spec, br_sc
         BrVector3Copy(&b, (br_vector3*)mat->m[3]);
         BrMatrix34RotateY(mat, theta);
         BrVector3Copy((br_vector3*)mat->m[3], &b);
-        BrVector3SetFloat(&b, 0.f, -100.f, 0.f);
+        BrVector3SetFloat(&b, 0.0f, -100.0f, 0.0f);
         BrVector3Copy(&a, (br_vector3*)mat->m[3]);
-        a.v[1] += 1.f;
+        a.v[1] += 1.0f;
         findfloor(&a, &b, &norm, &dist);
-        a.v[1] += 100.f;
+        a.v[1] += 100.0f;
         findfloor(&a, &b, &norm2, &dist2);
-        if (dist2 <= 1.f) {
-            BrVector3SetFloat(&b, 0.f, -5.01f, 0.f);
-            a.v[1] -= 100.f;
+        if (dist2 <= 1.0f) {
+            BrVector3SetFloat(&b, 0.0f, -5.01f, 0.0f);
+            a.v[1] -= 100.0f;
             for (i = 0; i < 20; i++) {
-                a.v[1] += 5.f;
+                a.v[1] += 5.0f;
                 findfloor(&a, &b, &norm2, &dist2);
-                if (dist2 <= 1.f) {
+                if (dist2 <= 1.0f) {
                     break;
                 }
             }
-            dist2 = (i + 1) * 0.05f + -dist2 / 20.f;
+            dist2 = (i + 1) * 0.05f + -dist2 / 20.0f;
         }
         if (dist2 < dist) {
             dist = -dist2;
             BrVector3Copy(&norm, &norm2);
         }
-        if (fabs(dist) <= 1.f) {
-            mat->m[3][1] -= dist * 100.f - 2.f;
+        if (fabs(dist) <= 1.0f) {
+            mat->m[3][1] -= dist * 100.0f - 2.0f;
             phi = BrRadianToAngle(asin(BrVector3Dot((br_vector3*)mat->m[2], &norm)));
             BrMatrix34PreRotateX(mat, phi);
             phi = BrRadianToAngle(-asin(BrVector3Dot((br_vector3*)mat->m[0], &norm)));
@@ -1267,16 +1267,16 @@ int C2_HOOK_FASTCALL RematerialiseOpponent(tOpponent_spec* pOpponent_spec, br_sc
         BrVector3Copy(&pOpponent_spec->car_spec->collision_info->v, (br_vector3*)pOpponent_spec->car_spec->car_master_actor->t.t.mat.m[2]);
         BrVector3Negate(&pOpponent_spec->car_spec->collision_info->v, &pOpponent_spec->car_spec->collision_info->v);
         BrVector3Normalise(&pOpponent_spec->car_spec->collision_info->v, &pOpponent_spec->car_spec->collision_info->v);
-        BrVector3Scale(&pOpponent_spec->car_spec->collision_info->v, &pOpponent_spec->car_spec->collision_info->v, MIN(10.f, pSpeed));
-        BrVector3Set(&pOpponent_spec->car_spec->collision_info->omega, 0.f, 0.f, 0.f);
-        pOpponent_spec->car_spec->curvature = 0.f;
+        BrVector3Scale(&pOpponent_spec->car_spec->collision_info->v, &pOpponent_spec->car_spec->collision_info->v, MIN(10.0f, pSpeed));
+        BrVector3Set(&pOpponent_spec->car_spec->collision_info->omega, 0.0f, 0.0f, 0.0f);
+        pOpponent_spec->car_spec->curvature = 0.0f;
         BrMatrix34Copy(&pOpponent_spec->car_spec->collision_info->transform_matrix, mat);
         BrMatrix34Copy(&pOpponent_spec->car_spec->old_frame_mat, mat);
         for (j = 0; j < 4; j++) {
             pOpponent_spec->car_spec->oldd[j] = pOpponent_spec->car_spec->ride_height;
         }
         pOpponent_spec->car_spec->gear = 0;
-        pOpponent_spec->car_spec->revs = 0.f;
+        pOpponent_spec->car_spec->revs = 0.0f;
         pOpponent_spec->car_spec->traction_control = 1;
         BrMatrix34ApplyP(&pOpponent_spec->car_spec->pos, &pOpponent_spec->car_spec->centre_of_mass_world_scale, mat);
         BrVector3InvScale(&pOpponent_spec->car_spec->pos, &pOpponent_spec->car_spec->pos, WORLD_SCALE);
