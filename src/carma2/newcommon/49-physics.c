@@ -662,7 +662,34 @@ int C2_HOOK_FASTCALL GetJointForces(tPhysics_object* pObject, tPhysics_joint_for
 #pragma auto_inline(on)
 #endif
 
-// GetUniversalRotationAngle
+/* FIXME: pArg6 is never read; its type is a guess. */
+// FUNCTION: CARMA2_HW 0x004bd4f0
+// FUNCTION: CARMA2_SW 0x004b9c00
+// FUNCTION: CARMA2_CHEAT 0x004c3020
+void C2_HOOK_FASTCALL GetUniversalRotationAngle(br_matrix34* pMat_1, br_matrix34* pMat_2, br_vector3* pV1, br_vector3* pV2, br_vector3* pV3, undefined4 pArg6, br_vector3* pOut, br_vector3* pAxis) {
+    br_vector3 tv;
+    br_vector3 tv2;
+    br_scalar length;
+    br_scalar dot;
+
+    BrMatrix34ApplyV(&tv, pV1, pMat_1);
+    BrMatrix34TApplyV(&tv2, &tv, pMat_2);
+    BrVector3Add(pAxis, &tv2, pV2);
+    length = BrVector3Length(pAxis);
+    if (length > 2.3841858e-7f) {
+        BrVector3Scale(pAxis, pAxis, 1.0 / length);
+    } else {
+        BrVector3Set(pAxis, 1.0f, 0.0f, 0.0f);
+    }
+    BrMatrix34ApplyV(&tv, pV3, pMat_1);
+    BrMatrix34TApplyV(pOut, &tv, pMat_2);
+    dot = 2.0f * BrVector3Dot(pOut, pAxis);
+    BrVector3Scale(&tv, pAxis, dot);
+    BrVector3Sub(pOut, pOut, &tv);
+    dot = 2.0f * BrVector3Dot(pOut, pV2);
+    BrVector3Scale(&tv, pV2, dot);
+    BrVector3Sub(pOut, pOut, &tv);
+}
 
 // GetObjectsParent
 

@@ -146,7 +146,7 @@ extern tPhysics_workspace* C2_HOOK_FASTCALL AllocateObjectWorkspace(int pCount);
 
 extern int C2_HOOK_FASTCALL GetJointForces(tPhysics_object* pObject, tPhysics_joint_force* pForces);
 
-// GetUniversalRotationAngle
+extern void C2_HOOK_FASTCALL GetUniversalRotationAngle(br_matrix34* pMat_1, br_matrix34* pMat_2, br_vector3* pV1, br_vector3* pV2, br_vector3* pV3, undefined4 pArg6, br_vector3* pOut, br_vector3* pAxis);
 
 // GetObjectsParent
 
