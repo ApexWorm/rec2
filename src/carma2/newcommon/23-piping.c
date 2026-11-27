@@ -825,7 +825,7 @@ void C2_HOOK_FASTCALL MoveReplayBuffer(int pFrames, tReplay_session_callback* pB
         ScanAndPlaySoundsToBe(old_play_ptr2, old_time, GetTotalTime());
     }
     if (old_play_ptr == play_ptr) {
-        gReplay_rate = 0.f;
+        gReplay_rate = 0.0f;
         gPaused = 1;
     }
     if (KeyIsDown(0)) {
