@@ -492,7 +492,7 @@ void C2_HOOK_FASTCALL InitCrushSystems(void) {
     gDetached_bit_crush_info_buffer.crush_infos = BrMemAllocate(gDetached_bit_crush_info_buffer.capacity * sizeof(tNon_car_spec), kMem_crush_data);
     gDetached_bit_collision_infos = BrMemAllocate(gDetached_bit_crush_info_buffer.capacity * sizeof(tPhysics_object), kMem_crush_data);
     for (i = 0; i < gDetached_bit_crush_info_buffer.capacity; i++) {
-        gDetached_bit_crush_info_buffer.crush_infos[i].tumble_factor = 1.f;
+        gDetached_bit_crush_info_buffer.crush_infos[i].tumble_factor = 1.0f;
         gDetached_bit_crush_info_buffer.crush_infos[i].tumble_threshold = 0.28985506f;
         gDetached_bit_crush_info_buffer.crush_infos[i].collision_info = &gDetached_bit_collision_infos[i];
         gDetached_bit_collision_infos[i].shape = (tPhysics_shape*)AllocateShapePolyhedron(16, kMem_crush_data);
@@ -508,7 +508,7 @@ void C2_HOOK_FASTCALL InitCrushSystems(void) {
         int j;
         tPhysics_shape* shape = NULL;
 
-        gSplit_car_crush_info_buffer.crush_infos[i].tumble_factor = 0.f;
+        gSplit_car_crush_info_buffer.crush_infos[i].tumble_factor = 0.0f;
         gSplit_car_crush_info_buffer.crush_infos[i].collision_info = &gSplit_car_collision_infos[i];
         for (j = 0; j < 4; j++) {
             tPhysics_shape* polyhedron = (tPhysics_shape*)AllocateShapePolyhedron(16, kMem_crush_data);
