@@ -118,6 +118,11 @@ tU8 gTemporary_physics_render_buffer[300000];
 // GLOBAL: CARMA2_CHEAT 0x006a9fc0
 tClip_details gShadow_clip_planes[8];
 
+// GLOBAL: CARMA2_HW 0x006a27dc
+// GLOBAL: CARMA2_SW 0x0069c834
+// GLOBAL: CARMA2_CHEAT 0x006aa354
+int gShadow_clip_plane_count;
+
 // GLOBAL: CARMA2_HW 0x006a23d8
 // GLOBAL: CARMA2_SW 0x0069c430
 // GLOBAL: CARMA2_CHEAT 0x006a9f50
@@ -193,7 +198,37 @@ int gNumber_of_lollipops;
 // GLOBAL: CARMA2_CHEAT 0x007697a0
 br_scalar gYon_squared;
 
-// MungeClipPlane
+// FUNCTION: CARMA2_HW 0x004e9680
+// FUNCTION: CARMA2_SW 0x004e5450
+// FUNCTION: CARMA2_CHEAT 0x004ef320
+void C2_HOOK_FASTCALL MungeClipPlane(br_vector3* pLight, tCar_spec* pCar, br_vector3* p1, br_vector3* p2, br_vector3* pOffset) {
+    br_vector3 v1;
+    br_vector3 v2;
+    br_vector3 v3;
+    br_vector3 v4;
+    br_scalar length;
+
+    BrMatrix34ApplyP(&v1, p1, &pCar->car_master_actor->t.t.mat);
+    BrMatrix34ApplyP(&v2, p2, &pCar->car_master_actor->t.t.mat);
+    BrVector3Sub(&v3, p2, p1);
+    BrVector3Cross(&v4, &v3, pLight);
+    if (fabs(v4.v[0]) >= 0.01 || fabs(v4.v[1]) >= 0.01 || fabs(v4.v[2]) >= 0.01) {
+        BrVector3Sub(&v3, p1, pOffset);
+        if (BrVector3Dot(&v3, &v4) > 0.f) {
+            BrVector3Negate(&v4, &v4);
+        }
+        BrVector3Normalise(&v3, &v4);
+        BrMatrix34ApplyV(&v4, &v3, &pCar->car_master_actor->t.t.mat);
+
+        length = REC2_SQR(v1.v[2] - v2.v[2]) + REC2_SQR(v1.v[0] - v2.v[0]);
+        ((br_vector4*)gShadow_clip_planes[gShadow_clip_plane_count].clip->type_data)->v[0] = v4.v[0];
+        ((br_vector4*)gShadow_clip_planes[gShadow_clip_plane_count].clip->type_data)->v[1] = v4.v[1];
+        ((br_vector4*)gShadow_clip_planes[gShadow_clip_plane_count].clip->type_data)->v[2] = v4.v[2];
+        ((br_vector4*)gShadow_clip_planes[gShadow_clip_plane_count].clip->type_data)->v[3] = -BrVector3Dot(&v1, &v4);
+        gShadow_clip_planes[gShadow_clip_plane_count].length = length;
+        gShadow_clip_plane_count += 1;
+    }
+}
 
 // TryThisEdge
 
