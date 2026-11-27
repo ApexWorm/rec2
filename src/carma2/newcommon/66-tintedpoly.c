@@ -21,22 +21,10 @@
 #include "rec2_macros.h"
 #include "c2_string.h"
 
-// GLOBAL: CARMA2_HW 0x0065e560
-// GLOBAL: CARMA2_SW 0x00658e98
-// GLOBAL: CARMA2_CHEAT 0x00665c18
-const char* gForm_non_humanoid_names[1] = {
-    "NONHUMANOID",
-};
-
 // GLOBAL: CARMA2_HW 0x00705c80
 // GLOBAL: CARMA2_SW 0x006fc740
 // GLOBAL: CARMA2_CHEAT 0x0070d320
 tTintedPoly gTintedPolys[10] = {0};
-
-// GLOBAL: CARMA2_HW 0x007447a0
-// GLOBAL: CARMA2_SW 0x0073b260
-// GLOBAL: CARMA2_CHEAT 0x0074be40
-int gGhost_pedestrians = 0;
 
 // GLOBAL: CARMA2_HW 0x006a0430
 // GLOBAL: CARMA2_SW 0x0069a488
