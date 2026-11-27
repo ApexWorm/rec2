@@ -43,15 +43,93 @@ void C2_HOOK_CDECL FUN_100070e0(brp_block_d3d* block) {
     }
 }
 
-// STUB: D3D 0x10007690
-void C2_HOOK_CDECL FUN_10007690(brp_block* block, brp_vertex* vertex) {
-    NOT_IMPLEMENTED();
+// FUNCTION: D3D 0x10007690
+void C2_HOOK_CDECL FUN_10007690(brp_block* block, brp_vertex* v0, brp_vertex* v1, brp_vertex* v2) {
+    gINT_1001bbc4 += 1;
+    gQueued_vertices_indices[gCount_queued_vertices_indices] = gCount_queued_vertices;
+    gCount_queued_vertices_indices += 1;
+    gQueued_vertices[gCount_queued_vertices].sx = v0->comp_f[C_SX];
+    gQueued_vertices[gCount_queued_vertices].sy = v0->comp_f[C_SY];
+    gQueued_vertices[gCount_queued_vertices].sz = v0->comp_f[C_SZ] / 65536.0f;
+    gQueued_vertices[gCount_queued_vertices].tu = v0->comp_f[C_U];
+    gQueued_vertices[gCount_queued_vertices].tv = v0->comp_f[C_V];
+    gQueued_vertices[gCount_queued_vertices].rhw = (D3DVALUE)(1.0 / v0->comp_f[C_W]);
+    gQueued_vertices[gCount_queued_vertices].color = (((v0->comp_i[C_R] << 8) | v0->comp_i[C_G]) << 8) | v0->comp_i[C_B] | gCOLOUR_100156e8;
+    gQueued_vertices[gCount_queued_vertices].specular = 0;
+    gCount_queued_vertices += 1;
+    gQueued_vertices_indices[gCount_queued_vertices_indices] = gCount_queued_vertices;
+    gCount_queued_vertices_indices += 1;
+    gQueued_vertices[gCount_queued_vertices].sx = v1->comp_f[C_SX];
+    gQueued_vertices[gCount_queued_vertices].sy = v1->comp_f[C_SY];
+    gQueued_vertices[gCount_queued_vertices].sz = v1->comp_f[C_SZ] / 65536.0f;
+    gQueued_vertices[gCount_queued_vertices].tu = v1->comp_f[C_U];
+    gQueued_vertices[gCount_queued_vertices].tv = v1->comp_f[C_V];
+    gQueued_vertices[gCount_queued_vertices].rhw = (D3DVALUE)(1.0 / v1->comp_f[C_W]);
+    gQueued_vertices[gCount_queued_vertices].color = (((v1->comp_i[C_R] << 8) | v1->comp_i[C_G]) << 8) | v1->comp_i[C_B] | gCOLOUR_100156e8;
+    gQueued_vertices[gCount_queued_vertices].specular = 0;
+    gCount_queued_vertices += 1;
+    gQueued_vertices_indices[gCount_queued_vertices_indices] = gCount_queued_vertices;
+    gCount_queued_vertices_indices += 1;
+    gQueued_vertices[gCount_queued_vertices].sx = v2->comp_f[C_SX];
+    gQueued_vertices[gCount_queued_vertices].sy = v2->comp_f[C_SY];
+    gQueued_vertices[gCount_queued_vertices].sz = v2->comp_f[C_SZ] / 65536.0f;
+    gQueued_vertices[gCount_queued_vertices].tu = v2->comp_f[C_U];
+    gQueued_vertices[gCount_queued_vertices].tv = v2->comp_f[C_V];
+    gQueued_vertices[gCount_queued_vertices].rhw = (D3DVALUE)(1.0 / v2->comp_f[C_W]);
+    gQueued_vertices[gCount_queued_vertices].color = (((v2->comp_i[C_R] << 8) | v2->comp_i[C_G]) << 8) | v2->comp_i[C_B] | gCOLOUR_100156e8;
+    gQueued_vertices[gCount_queued_vertices].specular = 0;
+    gCount_queued_vertices += 1;
+    gPrimitive_type = D3DPT_TRIANGLELIST;
+    if (gCount_queued_vertices > 100) {
+        FUN_10007140();
+    }
 }
 
-// STUB: D3D 0x10007850
-void C2_HOOK_CDECL FUN_10007850(brp_block* block, brp_vertex* vertex) {
-    NOT_IMPLEMENTED();
+// FUNCTION: D3D 0x10007850
+void C2_HOOK_CDECL FUN_10007850(brp_block* block, brp_vertex* v0, brp_vertex* v1, brp_vertex* v2) {
+    br_colour colour;
+
+    gINT_1001bbc4 += 1;
+    gQueued_vertices_indices[gCount_queued_vertices_indices] = gCount_queued_vertices;
+    gCount_queued_vertices_indices += 1;
+    gQueued_vertices[gCount_queued_vertices].sx = v0->comp_f[C_SX];
+    gQueued_vertices[gCount_queued_vertices].sy = v0->comp_f[C_SY];
+    gQueued_vertices[gCount_queued_vertices].sz = v0->comp_f[C_SZ] / 65536.0f;
+    gQueued_vertices[gCount_queued_vertices].tu = v0->comp_f[C_U];
+    gQueued_vertices[gCount_queued_vertices].tv = v0->comp_f[C_V];
+    gQueued_vertices[gCount_queued_vertices].rhw = (D3DVALUE)(1.0 / v0->comp_f[C_W]);
+    colour = (((v0->comp_i[C_R] << 8) | v0->comp_i[C_G]) << 8) | v0->comp_i[C_B] | gCOLOUR_100156e8;
+    gQueued_vertices[gCount_queued_vertices].color = colour;
+    gQueued_vertices[gCount_queued_vertices].specular = 0;
+    gCount_queued_vertices += 1;
+    gQueued_vertices_indices[gCount_queued_vertices_indices] = gCount_queued_vertices;
+    gCount_queued_vertices_indices += 1;
+    gQueued_vertices[gCount_queued_vertices].sx = v1->comp_f[C_SX];
+    gQueued_vertices[gCount_queued_vertices].sy = v1->comp_f[C_SY];
+    gQueued_vertices[gCount_queued_vertices].sz = v1->comp_f[C_SZ] / 65536.0f;
+    gQueued_vertices[gCount_queued_vertices].tu = v1->comp_f[C_U];
+    gQueued_vertices[gCount_queued_vertices].tv = v1->comp_f[C_V];
+    gQueued_vertices[gCount_queued_vertices].rhw = (D3DVALUE)(1.0 / v1->comp_f[C_W]);
+    gQueued_vertices[gCount_queued_vertices].color = colour;
+    gQueued_vertices[gCount_queued_vertices].specular = 0;
+    gCount_queued_vertices += 1;
+    gQueued_vertices_indices[gCount_queued_vertices_indices] = gCount_queued_vertices;
+    gCount_queued_vertices_indices += 1;
+    gQueued_vertices[gCount_queued_vertices].sx = v2->comp_f[C_SX];
+    gQueued_vertices[gCount_queued_vertices].sy = v2->comp_f[C_SY];
+    gQueued_vertices[gCount_queued_vertices].sz = v2->comp_f[C_SZ] / 65536.0f;
+    gQueued_vertices[gCount_queued_vertices].tu = v2->comp_f[C_U];
+    gQueued_vertices[gCount_queued_vertices].tv = v2->comp_f[C_V];
+    gQueued_vertices[gCount_queued_vertices].rhw = (D3DVALUE)(1.0 / v2->comp_f[C_W]);
+    gQueued_vertices[gCount_queued_vertices].color = colour;
+    gQueued_vertices[gCount_queued_vertices].specular = 0;
+    gCount_queued_vertices += 1;
+    gPrimitive_type = D3DPT_TRIANGLELIST;
+    if (gCount_queued_vertices > 100) {
+        FUN_10007140();
+    }
 }
+
 
 // FUNCTION: D3D 0x10007a00
 void C2_HOOK_CDECL FUN_10007a00(brp_block* block, brp_vertex* v0, brp_vertex* v1, brp_vertex* v2) {
@@ -97,12 +175,89 @@ void C2_HOOK_CDECL FUN_10007a00(brp_block* block, brp_vertex* v0, brp_vertex* v1
     }
 }
 
-// STUB: D3D 0x10007ba0
-void C2_HOOK_CDECL FUN_10007ba0(brp_block* block, brp_vertex* vertex) {
-    NOT_IMPLEMENTED();
+// FUNCTION: D3D 0x10007ba0
+void C2_HOOK_CDECL FUN_10007ba0(brp_block* block, brp_vertex* v0, brp_vertex* v1, brp_vertex* v2) {
+    gINT_1001bbc4 += 1;
+    gQueued_vertices_indices[gCount_queued_vertices_indices] = gCount_queued_vertices;
+    gCount_queued_vertices_indices += 1;
+    gQueued_vertices[gCount_queued_vertices].sx = v0->comp_f[C_SX];
+    gQueued_vertices[gCount_queued_vertices].sy = v0->comp_f[C_SY];
+    gQueued_vertices[gCount_queued_vertices].sz = v0->comp_f[C_SZ] / 65536.0f;
+    gQueued_vertices[gCount_queued_vertices].rhw = (D3DVALUE)(1.0 / v0->comp_f[C_W]);
+    gQueued_vertices[gCount_queued_vertices].color = (((v0->comp_i[C_R] << 8) | v0->comp_i[C_G]) << 8) | v0->comp_i[C_B] | gCOLOUR_100156e8;
+    gQueued_vertices[gCount_queued_vertices].specular = 0;
+    gQueued_vertices[gCount_queued_vertices].tu = (D3DVALUE)(gQueued_vertices[gCount_queued_vertices].sx * 0.0625);
+    gQueued_vertices[gCount_queued_vertices].tv = (D3DVALUE)(gQueued_vertices[gCount_queued_vertices].sy * 0.0625);
+    gCount_queued_vertices += 1;
+    gQueued_vertices_indices[gCount_queued_vertices_indices] = gCount_queued_vertices;
+    gCount_queued_vertices_indices += 1;
+    gQueued_vertices[gCount_queued_vertices].sx = v1->comp_f[C_SX];
+    gQueued_vertices[gCount_queued_vertices].sy = v1->comp_f[C_SY];
+    gQueued_vertices[gCount_queued_vertices].sz = v1->comp_f[C_SZ] / 65536.0f;
+    gQueued_vertices[gCount_queued_vertices].rhw = (D3DVALUE)(1.0 / v1->comp_f[C_W]);
+    gQueued_vertices[gCount_queued_vertices].color = (((v1->comp_i[C_R] << 8) | v1->comp_i[C_G]) << 8) | v1->comp_i[C_B] | gCOLOUR_100156e8;
+    gQueued_vertices[gCount_queued_vertices].specular = 0;
+    gQueued_vertices[gCount_queued_vertices].tu = (D3DVALUE)(gQueued_vertices[gCount_queued_vertices].sx * 0.0625);
+    gQueued_vertices[gCount_queued_vertices].tv = (D3DVALUE)(gQueued_vertices[gCount_queued_vertices].sy * 0.0625);
+    gCount_queued_vertices += 1;
+    gQueued_vertices_indices[gCount_queued_vertices_indices] = gCount_queued_vertices;
+    gCount_queued_vertices_indices += 1;
+    gQueued_vertices[gCount_queued_vertices].sx = v2->comp_f[C_SX];
+    gQueued_vertices[gCount_queued_vertices].sy = v2->comp_f[C_SY];
+    gQueued_vertices[gCount_queued_vertices].sz = v2->comp_f[C_SZ] / 65536.0f;
+    gQueued_vertices[gCount_queued_vertices].rhw = (D3DVALUE)(1.0 / v2->comp_f[C_W]);
+    gQueued_vertices[gCount_queued_vertices].color = (((v2->comp_i[C_R] << 8) | v2->comp_i[C_G]) << 8) | v2->comp_i[C_B] | gCOLOUR_100156e8;
+    gQueued_vertices[gCount_queued_vertices].specular = 0;
+    gQueued_vertices[gCount_queued_vertices].tu = (D3DVALUE)(gQueued_vertices[gCount_queued_vertices].sx * 0.0625);
+    gQueued_vertices[gCount_queued_vertices].tv = (D3DVALUE)(gQueued_vertices[gCount_queued_vertices].sy * 0.0625);
+    gCount_queued_vertices += 1;
+    gPrimitive_type = D3DPT_TRIANGLELIST;
+    if (gCount_queued_vertices > 100) {
+        FUN_10007140();
+    }
 }
 
-// STUB: D3D 0x10007da0
-void C2_HOOK_CDECL FUN_10007da0(brp_block* block, brp_vertex* vertex) {
-    NOT_IMPLEMENTED();
+// FUNCTION: D3D 0x10007da0
+void C2_HOOK_CDECL FUN_10007da0(brp_block* block, brp_vertex* v0, brp_vertex* v1, brp_vertex* v2) {
+    br_colour colour;
+
+    gINT_1001bbc4 += 1;
+    gQueued_vertices_indices[gCount_queued_vertices_indices] = gCount_queued_vertices;
+    gCount_queued_vertices_indices += 1;
+    gQueued_vertices[gCount_queued_vertices].sx = v0->comp_f[C_SX];
+    gQueued_vertices[gCount_queued_vertices].sy = v0->comp_f[C_SY];
+    gQueued_vertices[gCount_queued_vertices].sz = v0->comp_f[C_SZ] / 65536.0f;
+    gQueued_vertices[gCount_queued_vertices].rhw = (D3DVALUE)(1.0 / v0->comp_f[C_W]);
+    colour = (((v0->comp_i[C_R] << 8) | v0->comp_i[C_G]) << 8) | v0->comp_i[C_B] | gCOLOUR_100156e8;
+    gQueued_vertices[gCount_queued_vertices].color = colour;
+    gQueued_vertices[gCount_queued_vertices].specular = 0;
+    gQueued_vertices[gCount_queued_vertices].tu = (D3DVALUE)(gQueued_vertices[gCount_queued_vertices].sx * 0.0625);
+    gQueued_vertices[gCount_queued_vertices].tv = (D3DVALUE)(gQueued_vertices[gCount_queued_vertices].sy * 0.0625);
+    gCount_queued_vertices += 1;
+    gQueued_vertices_indices[gCount_queued_vertices_indices] = gCount_queued_vertices;
+    gCount_queued_vertices_indices += 1;
+    gQueued_vertices[gCount_queued_vertices].sx = v1->comp_f[C_SX];
+    gQueued_vertices[gCount_queued_vertices].sy = v1->comp_f[C_SY];
+    gQueued_vertices[gCount_queued_vertices].sz = v1->comp_f[C_SZ] / 65536.0f;
+    gQueued_vertices[gCount_queued_vertices].rhw = (D3DVALUE)(1.0 / v1->comp_f[C_W]);
+    gQueued_vertices[gCount_queued_vertices].color = colour;
+    gQueued_vertices[gCount_queued_vertices].specular = 0;
+    gQueued_vertices[gCount_queued_vertices].tu = (D3DVALUE)(gQueued_vertices[gCount_queued_vertices].sx * 0.0625);
+    gQueued_vertices[gCount_queued_vertices].tv = (D3DVALUE)(gQueued_vertices[gCount_queued_vertices].sy * 0.0625);
+    gCount_queued_vertices += 1;
+    gQueued_vertices_indices[gCount_queued_vertices_indices] = gCount_queued_vertices;
+    gCount_queued_vertices_indices += 1;
+    gQueued_vertices[gCount_queued_vertices].sx = v2->comp_f[C_SX];
+    gQueued_vertices[gCount_queued_vertices].sy = v2->comp_f[C_SY];
+    gQueued_vertices[gCount_queued_vertices].sz = v2->comp_f[C_SZ] / 65536.0f;
+    gQueued_vertices[gCount_queued_vertices].rhw = (D3DVALUE)(1.0 / v2->comp_f[C_W]);
+    gQueued_vertices[gCount_queued_vertices].color = colour;
+    gQueued_vertices[gCount_queued_vertices].specular = 0;
+    gQueued_vertices[gCount_queued_vertices].tu = (D3DVALUE)(gQueued_vertices[gCount_queued_vertices].sx * 0.0625);
+    gQueued_vertices[gCount_queued_vertices].tv = (D3DVALUE)(gQueued_vertices[gCount_queued_vertices].sy * 0.0625);
+    gCount_queued_vertices += 1;
+    gPrimitive_type = D3DPT_TRIANGLELIST;
+    if (gCount_queued_vertices > 100) {
+        FUN_10007140();
+    }
 }
