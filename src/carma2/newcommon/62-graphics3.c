@@ -325,6 +325,16 @@ br_pixelmap* gAlt_meter;
 // GLOBAL: CARMA2_SW 0x006868d8
 br_matrix23 gMatrix23_0068c880;
 
+// GLOBAL: CARMA2_HW 0x0068c878
+// GLOBAL: CARMA2_SW 0x006868d0
+// GLOBAL: CARMA2_CHEAT 0x00694118
+int gINT_0068c878;
+
+// GLOBAL: CARMA2_HW 0x0068c874
+// GLOBAL: CARMA2_SW 0x006868cc
+// GLOBAL: CARMA2_CHEAT 0x00694114
+int gINT_0068c874;
+
 // GLOBAL: CARMA2_HW 0x0068c868
 // GLOBAL: CARMA2_SW 0x006868c0
 // GLOBAL: CARMA2_CHEAT 0x00694108
@@ -1162,11 +1172,67 @@ void C2_HOOK_FASTCALL CheckpointLine(br_pixelmap* pMap, int pCheckpoint, tU32 pT
     }
 }
 
-// DoDirectionFinderStuff
+inline void C2_HOOK_FASTCALL DoDirectionFinderStuff(br_pixelmap* pMap) {
+    tU32 the_time;
+    const br_vector2* offset;
+    br_scalar distance;
+    br_vector2 dir;
+
+    the_time = PDGetTotalTime();
+    if ((gMini_map_visible || gMap_view == 2)
+        && gCheckpoint_finder_enabled
+        && (gCurrent_race.race_spec->race_type == kRaceType_Carma1 || gCurrent_race.race_spec->race_type == kRaceType_Checkpoints)) {
+        DoSomeThingsToCheckpoints(pMap, the_time, CheckpointLine, 0);
+    }
+    if (gCurrent_race.race_spec->race_type >= kRaceType_Smash) {
+        if (gNearest_smash_blip_index < 0) {
+            return;
+        }
+        distance = gFLOAT_0074abc4;
+        offset = &gVector2_0068d8b0;
+    } else if ((gNet_mode != eNet_mode_none
+                   || gCurrent_race.race_spec->race_type == kRaceType_Carma1
+                   || gCurrent_race.race_spec->race_type == kRaceType_Cars)
+               && gTarget_lock_car_2 != NULL) {
+        distance = gFLOAT_0074ab90;
+        offset = &gVector2_0068d6d8;
+    } else {
+        return;
+    }
+    if (distance > gFLOAT_0074abb8) {
+        BrMatrix23TApplyV(&dir, offset, &gMatrix23_0068c880);
+        distance = (br_scalar)sqrt(distance) - (float)gCurrent_graf_data->field_0x51c;
+        BrVector2Normalise(&dir, &dir);
+        if (fabs(distance * dir.v[0]) > gINT_0074abd4) {
+            distance *= gINT_0074abd4 / fabs(distance * dir.v[0]);
+        }
+        if (gMini_map_visible || gMap_view == 2) {
+            FancyDrawLine(pMap,
+                gINT_0074abd4 + 8,
+                gINT_0074abd0,
+                (int)(gINT_0074abd4 - distance * dir.v[0] + 8.0f),
+                (int)(gINT_0074abd0 - distance * dir.v[1]),
+                52,
+                75);
+        }
+    }
+}
 
 // MungeMoodMessage
 
-// DoOpponentStatusHeadup
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_HW 0x00494900
+// STUB: CARMA2_CHEAT 0x00494b30
+void C2_HOOK_FASTCALL DoOpponentStatusHeadup(void) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 #ifdef REC2_HW
 // FUNCTION: CARMA2_HW 0x00494f40
@@ -1214,17 +1280,156 @@ void C2_HOOK_FASTCALL AllocateOppoBarActor(int pX, int pY) {
 }
 #endif
 
-// DoNearestOpponentRelativeHeightMarkerStuff
+inline void C2_HOOK_FASTCALL DoNearestOpponentRelativeHeightMarkerStuff(br_pixelmap* pMap) {
+    int half_height;
+    int border_height;
+    br_scalar delta_height;
+    int ym;
+    int yt;
+
+    if ((gMini_map_visible || gMap_view == 2) && gTarget_lock_car_2 != NULL) {
+        half_height = pMap->height / 2;
+        border_height = (int)(pMap->height * 0.05);
+        BrPixelmapLine(pMap, 1, border_height, 3, border_height, RGB565_TO_BACKSCREEN_COLOUR(7, 46, 7));
+        BrPixelmapLine(pMap, 1, pMap->height - border_height, 3, pMap->height - border_height, RGB565_TO_BACKSCREEN_COLOUR(7, 46, 7));
+        BrPixelmapLine(pMap, 0, border_height + 1, 0, pMap->height - border_height - 1, RGB565_TO_BACKSCREEN_COLOUR(7, 46, 7));
+        BrPixelmapLine(pMap, 4, border_height + 1, 4, pMap->height - border_height - 1, RGB565_TO_BACKSCREEN_COLOUR(7, 46, 7));
+        BrPixelmapLine(pMap, 0, half_height, 4, half_height, RGB565_TO_BACKSCREEN_COLOUR(31, 62, 31));
+        BrPixelmapPixelSet(pMap, 0, border_height, RGB565_TO_BACKSCREEN_COLOUR(6, 42, 6));
+        BrPixelmapPixelSet(pMap, 4, border_height, RGB565_TO_BACKSCREEN_COLOUR(6, 42, 6));
+        BrPixelmapPixelSet(pMap, 0, pMap->height - border_height, RGB565_TO_BACKSCREEN_COLOUR(6, 42, 6));
+        BrPixelmapPixelSet(pMap, 4, pMap->height - border_height, RGB565_TO_BACKSCREEN_COLOUR(6, 42, 6));
+        delta_height = gPlayer_car_master_actor->t.t.translate.t.v[1] - gTarget_lock_car_2->pos.v[1];
+        if (fabs(delta_height) > 15.0 / WORLD_SCALE_D) {
+            delta_height = (br_scalar)(sign((int)delta_height) * (15.0 / WORLD_SCALE_D));
+        }
+        delta_height = (br_scalar)(delta_height * 0.46);
+        if (fabs(delta_height) < 0.05) {
+            ym = half_height;
+        } else {
+            ym = (int)((half_height - border_height) * delta_height + half_height);
+        }
+        yt = border_height + 1;
+        if (ym > border_height) {
+            yt = ym;
+            if (ym >= pMap->height - border_height) {
+                yt = pMap->height - border_height - 1;
+            }
+        }
+        if (yt < half_height) {
+            BrPixelmapLine(pMap, 1, yt, 1, half_height - 1, RGB565_TO_BACKSCREEN_COLOUR(0, 38, 31));
+            BrPixelmapLine(pMap, 2, yt, 2, half_height - 1, RGB565_TO_BACKSCREEN_COLOUR(6, 0, 31));
+            BrPixelmapLine(pMap, 3, yt, 3, half_height - 1, 0x15);
+        } else if (yt > half_height) {
+            BrPixelmapLine(pMap, 1, half_height + 1, 1, yt, RGB565_TO_BACKSCREEN_COLOUR(0, 38, 31));
+            BrPixelmapLine(pMap, 2, half_height + 1, 2, yt, RGB565_TO_BACKSCREEN_COLOUR(6, 0, 31));
+            BrPixelmapLine(pMap, 3, half_height + 1, 3, yt, 0x15);
+        }
+    }
+}
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x004950b0
-// STUB: CARMA2_SW 0x00491c00
-// STUB: CARMA2_CHEAT 0x004952e0
+// FUNCTION: CARMA2_HW 0x004950b0
+// FUNCTION: CARMA2_SW 0x00491c00
+// FUNCTION: CARMA2_CHEAT 0x004952e0
 void C2_HOOK_FASTCALL MapOverlay(void) {
-    NOT_IMPLEMENTED();
+    tU32 the_time;
+    br_uint_16 original_base_x;
+    br_matrix23 mat23;
+    br_vector3 player_pos;
+
+    BrMatrix34ApplyP(&gOrigin_map, &gPlayer_car_master_actor->t.t.translate.t, &gCurrent_race.map_transformation);
+    gOrigin_headup_map.v[0] = gOrigin_map.v[0] - (float)(gINT_0074ab94 / 2);
+    gOrigin_headup_map.v[1] = gOrigin_map.v[1] - (float)(gINT_0074abec / 2);
+    gINT_0068c878 = (int)(gOrigin_headup_map.v[0] + 0.5);
+    gINT_0068c874 = (int)(gOrigin_headup_map.v[1] + 0.5);
+    if (gINT_0068c878 < 0 || gINT_0068c874 < 0
+        || gINT_0068c878 > gCurrent_race.map_image->width
+        || gINT_0068c874 > gCurrent_race.map_image->height) {
+        BrPixelmapFill(gMap_overlay, 0);
+    }
+    if (gINT_0074ab94 > gINT_0074abec) {
+        gINT_0068c858 = (gINT_0074ab94 - gINT_0074abec) / 2;
+        gINT_0068d890 = 0;
+        BrPixelmapRectangleCopy(gMap_overlay,
+            0,
+            0,
+            gCurrent_race.map_image,
+            gINT_0068c878,
+            gINT_0068c874 - gINT_0068c858,
+            gINT_0074ab94,
+            gINT_0074ab94);
+    } else {
+        gINT_0068d890 = (gINT_0074abec - gINT_0074ab94) / 2;
+        gINT_0068c858 = 0;
+        BrPixelmapRectangleCopy(gMap_overlay,
+            0,
+            0,
+            gCurrent_race.map_image,
+            gINT_0068c878 - gINT_0068d890,
+            gINT_0068c874,
+            gINT_0074abec,
+            gINT_0074abec);
+    }
+    gCurrent_race.map_transformation.m[3][0] -= gOrigin_headup_map.v[0] - (float)gINT_0068d890;
+    gCurrent_race.map_transformation.m[3][1] -= gOrigin_headup_map.v[1] - (float)gINT_0068c858;
+    BrMatrix34Mul(&gCar_in_map_space, &gProgram_state.current_car.car_master_actor->t.t.mat, &gCurrent_race.map_transformation);
+    mat23.m[0][0] = gCar_in_map_space.m[0][0];
+    mat23.m[0][1] = gCar_in_map_space.m[0][1];
+    mat23.m[1][0] = gCar_in_map_space.m[2][0];
+    mat23.m[1][1] = gCar_in_map_space.m[2][1];
+    mat23.m[2][0] = 0.0f;
+    mat23.m[2][1] = 0.0f;
+    BrMatrix23LPNormalise(&gMatrix23_0068c880, &mat23);
+    DoMapOverlays(gMap_overlay);
+    gCurrent_race.map_transformation.m[3][0] += gOrigin_headup_map.v[0] - (float)gINT_0068d890;
+    gCurrent_race.map_transformation.m[3][1] += gOrigin_headup_map.v[1] - (float)gINT_0068c858;
+    the_time = PDGetTotalTime();
+#ifdef REC2_HW
+    PossibleLock(1);
+#endif
+    if (gMini_map_visible && gMap_overlay != NULL) {
+        DRPixelmapRotatedAndFeatheredCopy(&gMatrix23_0068c880,
+            gBack_screen,
+            gHeadup_map_x + 8,
+            gHeadup_map_y,
+            gMap_overlay,
+            gINT_0068d890 + gINT_0074ab8c,
+            gINT_0068c858 + gINT_0074ab88,
+            gHeadup_map_w,
+            gHeadup_map_h,
+            gMap_trans);
+    }
+    InitMap();
+    original_base_x = gMini_map->base_x;
+    gMini_map->base_x = gMini_map->base_x / 2;
+    DoDirectionFinderStuff(gMini_map);
+    gMini_map->base_x = original_base_x;
+    if (gMini_map_visible) {
+        if (gCurrent_race.race_spec->race_type == kRaceType_Carma1 || gCurrent_race.race_spec->race_type == kRaceType_Checkpoints) {
+            DoSomeThingsToCheckpoints(gMini_map, the_time, DrawOffsetCheckpoint, 1);
+        }
+        if (gMini_map->type == BR_PMT_INDEX_8) {
+            gMini_map->base_x = 0;
+        } else {
+            gMini_map->base_x /= 2;
+        }
+        player_pos.v[0] = (float)(gHeadup_map_w / 2 + gHeadup_map_x + 8);
+        player_pos.v[1] = (float)(gHeadup_map_h / 2 + gHeadup_map_y);
+        player_pos.v[2] = gMini_map_arrow_z;
+        DrawArrow(gBack_screen, 0, &player_pos, CarArrowColour(&gProgram_state.current_car, eVehicle_self));
+    }
+    DoNearestOpponentRelativeHeightMarkerStuff(gMini_map);
+    gMini_map->base_x = original_base_x;
+#ifdef REC2_HW
+    PossibleUnlock(1);
+#endif
+    if (gHeadup_detail_level > 2) {
+        DoOpponentStatusHeadup();
+    }
 }
 
 #ifdef REC2_MATCHING
