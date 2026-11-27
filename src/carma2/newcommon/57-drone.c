@@ -617,10 +617,6 @@ inline void C2_HOOK_FASTCALL StopRenderingThisDrone(tDrone_spec* pDrone) {
     }
 }
 
-#ifdef REC2_MATCHING
-#pragma auto_inline(off)
-#endif
-
 // FUNCTION: CARMA2_HW 0x00451710
 // FUNCTION: CARMA2_SW 0x004514a0
 // FUNCTION: CARMA2_CHEAT 0x00451c60
@@ -657,10 +653,6 @@ void C2_HOOK_FASTCALL StartRenderingThisDrone(tDrone_spec* pDrone) {
         }
     }
 }
-
-#ifdef REC2_MATCHING
-#pragma auto_inline(on)
-#endif
 
 // FUNCTION: CARMA2_HW 0x004518e0
 // FUNCTION: CARMA2_SW 0x00451670
@@ -746,6 +738,9 @@ void C2_HOOK_FASTCALL CalcRenderBoundsCentre(void) {
     BrVector3Add(&gRender_bounds_centre, &direction, (br_vector3*)gCamera_to_world.m[3]);
 }
 
+#ifdef REC2_MATCHING
+#pragma inline_depth(1)
+#endif
 inline void C2_HOOK_FASTCALL DoDroneDistanceChecks(tDrone_spec* pDrone) {
     int within_distance;
 
@@ -774,6 +769,9 @@ inline void C2_HOOK_FASTCALL DoDroneDistanceChecks(tDrone_spec* pDrone) {
         }
     }
 }
+#ifdef REC2_MATCHING
+#pragma inline_depth()
+#endif
 
 // DoDroneFunkyGroovyThings
 
