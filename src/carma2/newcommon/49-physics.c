@@ -1305,21 +1305,21 @@ void C2_HOOK_FASTCALL RQSingleExpand(br_scalar* pMatrix, const br_scalar* pOrigi
         row[i] = pOriginal[100 * pIndices[pSize] + pIndices[i]];
     }
     for (k = 0; k < pSize; k++) {
-        sum = 0.f;
+        sum = 0.0f;
         for (j = 0; j < pSize; j++) {
             sum += pOrthogonal[j + k * 100] * row[j];
         }
         pMatrix[100 * pSize + k] = sum;
     }
-    pOrthogonal[101 * pSize] = 1.f;
+    pOrthogonal[101 * pSize] = 1.0f;
     for (i = 0; i < pSize; i++) {
-        pOrthogonal[i * 100 + pSize] = 0.f;
-        pOrthogonal[100 * pSize + i] = 0.f;
+        pOrthogonal[i * 100 + pSize] = 0.0f;
+        pOrthogonal[100 * pSize + i] = 0.0f;
     }
     for (i = 0; i < pSize; i++) {
         magnitude = (br_scalar)fabs(row[i]);
-        pMatrix[i * 100 + pSize] = 0.f;
-        if (magnitude == 0.f) {
+        pMatrix[i * 100 + pSize] = 0.0f;
+        if (magnitude == 0.0f) {
             continue;
         }
         maximum = (br_scalar)fabs(pMatrix[i * 101]);
@@ -1330,7 +1330,7 @@ void C2_HOOK_FASTCALL RQSingleExpand(br_scalar* pMatrix, const br_scalar* pOrigi
         diagonal = pMatrix[i * 101] / maximum;
         length = (br_scalar)fabs(sqrt((diagonal * diagonal) + second * second));
         row[i] = second;
-        if (diagonal <= 0.f) {
+        if (diagonal <= 0.0f) {
             length = -length;
         }
         head = diagonal + length;
