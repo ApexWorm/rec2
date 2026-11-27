@@ -195,7 +195,7 @@ int C2_HOOK_FASTCALL AddObjectWallForce(tPhysics_joint_force* pForces, const br_
                 size = d;
             }
         }
-        size = (br_scalar)(size - -0.01);
+        size = (br_scalar)(size + 0.01);
         BrVector3Sub(&joint_bounds.min, pPosition, &pObject->physics_joint2->field_0x08);
         if (fabs(joint_bounds.min.v[0]) < size) {
             d = (br_scalar)fabs(joint_bounds.min.v[1]);
