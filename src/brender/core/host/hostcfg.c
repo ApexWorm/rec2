@@ -40,6 +40,7 @@ br_boolean C2_HOOK_CDECL HostIniSectionExists(char* ini_file, char* section_name
 
 // FUNCTION: CARMA2_HW 0x0053fbe0
 // FUNCTION: CARMA2_SW 0x0053b280
+// FUNCTION: CARMA2_CHEAT 0x005457d0
 br_error C2_HOOK_CDECL HostIniQuery(char* ini_file, char* section_name, char* entry, char* Buffer, int max, br_uint_16* size) {
 
 #ifdef _WIN32
