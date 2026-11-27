@@ -99,6 +99,7 @@ address,type,name
 0x00579f24,library,_sqrt
 0x00579fd0,library,_memchr
 0x0057a094,library,_log10
+0x0057a150,library,__splitpath
 0x0057a8b0,library,__input
 0x0057b6d0,library,__flsbuf
 0x0057b800,library,__output
@@ -170,6 +171,7 @@ address,type,name
 0x00582c10,library,___wtomb_environ
 0x00582dc0,library,___crtMessageBoxA
 0x00583070,library,__copysign
+0x00583600,library,__mbsnbcpy
 0x005838e0,library,__ZeroTail
 0x00583950,library,__IncMan
 0x005839c0,library,__RoundMan
