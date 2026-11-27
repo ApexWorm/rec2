@@ -1101,11 +1101,41 @@ void C2_HOOK_FASTCALL CalcDistanceFromHome(tOpponent_spec* pOpponent_spec) {
 
 // MassageOpponentPosition
 
-// STUB: CARMA2_HW 0x004a7f20
-// STUB: CARMA2_SW 0x004a4090
-// STUB: CARMA2_CHEAT 0x004a9230
+// FUNCTION: CARMA2_HW 0x004a7f20
+// FUNCTION: CARMA2_SW 0x004a4090
+// FUNCTION: CARMA2_CHEAT 0x004a9230
 int C2_HOOK_FASTCALL RematerialiseOpponentOnThisSection(tOpponent_spec* pOpponent_spec, tS16 pSection_no, br_scalar pSpeed) {
-    NOT_IMPLEMENTED();
+    const br_vector3* start;
+    const br_vector3* finish;
+    br_vector3 a;
+    br_vector3 p;
+    br_vector3 section_v;
+    br_vector3 intersect;
+    br_scalar t;
+    br_scalar length;
+
+    if (pOpponent_spec->physics_me) {
+        DoNotDprintf("%s: Actually, we're already materialised", pOpponent_spec->car_spec->driver_name);
+        return 1;
+    }
+    start = GetOpponentsSectionStartNodePoint(pOpponent_spec, pSection_no);
+    finish = GetOpponentsSectionFinishNodePoint(pOpponent_spec, pSection_no);
+    BrVector3Sub(&a, finish, start);
+    if ((length = BrVector3Length(&a)) != 0.0f) {
+        BrVector3Sub(&p, &pOpponent_spec->car_spec->car_master_actor->t.t.translate.t, start);
+        if ((t = BrVector3Dot(&a, &p) / BrVector3LengthSquared(&a)) < 0.0f) {
+            BrVector3Copy(&intersect, start);
+        } else if (t > 1.0f) {
+            BrVector3Copy(&intersect, finish);
+        } else {
+            BrVector3Scale(&intersect, &a, t);
+            BrVector3Accumulate(&intersect, start);
+        }
+        BrVector3Copy(&pOpponent_spec->car_spec->car_master_actor->t.t.translate.t, &intersect);
+        BrVector3Sub(&section_v, finish, start);
+        PointActorAlongThisBloodyVector(pOpponent_spec->car_spec->car_master_actor, &section_v);
+    }
+    return RematerialiseOpponent(pOpponent_spec, pSpeed);
 }
 
 // FUNCTION: CARMA2_HW 0x004a8170
@@ -1448,6 +1478,10 @@ const br_vector3* C2_HOOK_FASTCALL GetOpponentsSectionStartNodePoint(const tOppo
     return NULL;
 }
 
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
 // FUNCTION: CARMA2_HW 0x004aec40
 // FUNCTION: CARMA2_SW 0x004aadb0
 // FUNCTION: CARMA2_CHEAT 0x004b0150
@@ -1467,6 +1501,10 @@ const br_vector3* C2_HOOK_FASTCALL GetOpponentsSectionFinishNodePoint(const tOpp
     PDEnterDebugger("BIG ERROR - GetOpponentsSectionFinishNodePoint()");
     return NULL;
 }
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // FUNCTION: CARMA2_HW 0x004aece0
 // FUNCTION: CARMA2_SW 0x004aae50
