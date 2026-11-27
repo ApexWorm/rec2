@@ -230,7 +230,7 @@ int C2_HOOK_FASTCALL PFungetc(int ch, FILE* pFile) {
         return ungetc(ch, pFile);
     }
     twtFile = &gTwatVfsFiles[(intptr_t)pFile];
-    if (twtFile->pos > twtFile->start && ch != -1) {
+    if (twtFile->pos > gTwatVfsFiles[(intptr_t)pFile].start && ch != -1) {
         twtFile->pos--;
         *twtFile->pos = ch;
         twtFile->error = 0;
