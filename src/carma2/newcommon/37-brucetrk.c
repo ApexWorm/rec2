@@ -50,14 +50,46 @@ br_actor* gMr_blendy;
 
 extern void C2_HOOK_FASTCALL SpawnPedsOnFace(br_face* pFace, br_model* pModel);
 
+// GLOBAL: CARMA2_HW 0x0079efac
+// GLOBAL: CARMA2_SW 0x0079554c
+// GLOBAL: CARMA2_CHEAT 0x007a664c
+int gMax_count_non_cars;
+
 // GLOBAL: CARMA2_HW 0x00679268
 // GLOBAL: CARMA2_SW 0x006739d8
 // GLOBAL: CARMA2_CHEAT 0x00680b18
 br_vector3 gAverage_grid_position;
 
-// AssertNoncars
+inline void C2_HOOK_FASTCALL AssertNoncars(br_actor** pNon_cars, int* pCount_non_cars, int* pMax_count_non_cars, int* pTrack_count_non_cars) {
+    int i;
+    int count_nulls;
+    int count_non_nulls;
 
-// AllocateActorMatrix
+    count_nulls = 0;
+    count_non_nulls = 0;
+    for (i = 0; i < *pCount_non_cars; i++) {
+        if (pNon_cars[i] == NULL) {
+            count_nulls++;
+        } else {
+            pNon_cars[count_non_nulls] = pNon_cars[i];
+            sprintf(&pNon_cars[count_non_nulls]->identifier[4], "%04d", count_non_nulls);
+            count_non_nulls++;
+        }
+    }
+    *pMax_count_non_cars -= count_nulls;
+    *pTrack_count_non_cars -= count_nulls;
+    *pCount_non_cars -= count_nulls;
+}
+
+inline void C2_HOOK_FASTCALL AllocateActorMatrix(tTrack_spec* pTrack_spec, tTrack_square*** pDst) {
+    tU16 z;
+
+    *pDst = BrMemAllocate(pTrack_spec->ncolumns_z * sizeof(tTrack_square*), kMem_columns_z);
+    for (z = 0; z != pTrack_spec->ncolumns_z; z++) {
+        (*pDst)[z] = BrMemAllocate(pTrack_spec->ncolumns_x * sizeof(tTrack_square), kMem_columns_x);
+        memset((*pDst)[z], 0, pTrack_spec->ncolumns_x * sizeof(tTrack_square));
+    }
+}
 
 // DisposeActorMatrix
 
@@ -423,9 +455,76 @@ intptr_t C2_HOOK_CDECL ProcessModelsCB(br_actor* pActor, void* pContext) {
     return 0;
 }
 
-// ProcessModels
+inline void C2_HOOK_FASTCALL ProcessModels(tTrack_spec* pTrack_spec) {
 
-// ExtractColumns
+    BrActorEnum(pTrack_spec->the_actor, ProcessModelsCB, pTrack_spec);
+}
+
+// FUNCTION: CARMA2_HW 0x0040cc50
+// FUNCTION: CARMA2_SW 0x0040cc40
+// FUNCTION: CARMA2_CHEAT 0x0040ccf0
+void C2_HOOK_FASTCALL ExtractColumns(tTrack_spec* pTrack_spec) {
+    char* identifier;
+    char* str;
+    int count;
+    int single_column;
+    unsigned int x;
+    unsigned int z;
+    float extra_room;
+    br_scalar room;
+    int ad;
+    br_bounds bounds;
+    char s[256];
+
+    single_column = 0;
+    identifier = pTrack_spec->the_actor->identifier;
+    if (identifier[0] == 'P' && identifier[1] == 'P') {
+        if (identifier[3] == '1') {
+            str = identifier + 5;
+        } else {
+            sprintf(s, "The World has officially ended: Wrong format of track!!! '");
+            strncat(s, pTrack_spec->the_actor->identifier, 4);
+            strcat(s, "'");
+            PDFatalError(s);
+        }
+    } else {
+        str = identifier;
+    }
+    count = sscanf(str, "%u%u%f%d", &x, &z, &extra_room, &ad);
+    switch (count) {
+    case 3:
+        BrFailure("Attempt to extract columns from invalid track\n(It might have been produced by an ancient preproc.\nThis is no longer supported.\n");
+        break;
+    case 4:
+        pTrack_spec->count_non_cars = ad;
+        break;
+    default:
+        single_column = 1;
+        x = 1;
+        z = 1;
+        extra_room = 0.f;
+        pTrack_spec->count_non_cars = 0;
+        break;
+    }
+    pTrack_spec->ncolumns_x = x;
+    pTrack_spec->ncolumns_z = z;
+    room = extra_room;
+    BrActorToBounds(&bounds, pTrack_spec->the_actor);
+    pTrack_spec->column_size_x = (bounds.max.v[0] - bounds.min.v[0] + 2.f * room) / pTrack_spec->ncolumns_x;
+    pTrack_spec->column_size_z = (bounds.max.v[2] - bounds.min.v[2] + 2.f * room) / pTrack_spec->ncolumns_z;
+    pTrack_spec->origin_x = bounds.min.v[0] - room;
+    pTrack_spec->origin_z = bounds.min.v[2] - room;
+    AllocateActorMatrix(pTrack_spec, &pTrack_spec->columns);
+    gMax_count_non_cars = pTrack_spec->count_non_cars + 250;
+    gCount_track_non_cars = pTrack_spec->count_non_cars;
+    pTrack_spec->non_car_list = BrMemAllocate(gMax_count_non_cars * sizeof(br_actor*), kMem_non_car_list);
+    if (single_column) {
+        pTrack_spec->columns[0][0].actor_0x0 = pTrack_spec->the_actor;
+    } else {
+        ProcessModels(pTrack_spec);
+    }
+    AssertNoncars(pTrack_spec->non_car_list, &pTrack_spec->count_non_cars, &gMax_count_non_cars, &gCount_track_non_cars);
+}
 
 // FUNCTION: CARMA2_HW 0x0040d7c0
 // FUNCTION: CARMA2_SW 0x0040d7b0
