@@ -64,9 +64,12 @@ br_uint_32 C2_HOOK_CDECL BrModelAddMany(br_model** items, int n) {
 
     r = 0;
     for (i = 0; i < n; i++) {
-        BrRegistryAdd(&v1db.reg_models, items[i]);
-        BrModelUpdate(items[i], BR_MODU_ALL);
-        if (items[i] != NULL) {
+        br_model* m;
+
+        m = *items++;
+        BrRegistryAdd(&v1db.reg_models, m);
+        BrModelUpdate(m, BR_MODU_ALL);
+        if (m != NULL) {
             r++;
         }
     }
