@@ -87,6 +87,7 @@ br_error C2_HOOK_STDCALL BrAssociativeArraySetEntry(br_associative_array* pArray
 
 // FUNCTION: CARMA2_HW 0x00531750
 // FUNCTION: CARMA2_SW 0x0052cdf0
+// FUNCTION: CARMA2_CHEAT 0x00537340
 br_error C2_HOOK_STDCALL BrAssociativeArrayRemoveEntry(br_associative_array* pArray, br_token t) {
     br_uint_16 i;
     br_boolean bFound;
@@ -105,7 +106,11 @@ br_error C2_HOOK_STDCALL BrAssociativeArrayRemoveEntry(br_associative_array* pAr
         BrResFree(pArray->tv[i].v.str);
     }
     for (; i < pArray->num_elements - 1; i++) {
+#ifdef BRENDER_FIX_BUGS
         BrMemCpy(&pArray->tv[i], &pArray->tv[i + 1], sizeof(br_token_value));
+#else
+        BrMemCpy(&pArray->tv[i], &pArray[i + 1], sizeof(br_token_value));
+#endif
     }
     pArray->num_elements -= 1;
     return 0; // BRE_OK
