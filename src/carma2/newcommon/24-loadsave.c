@@ -128,7 +128,7 @@ int C2_HOOK_FASTCALL StartSavedGamesList(void) {
         gCount_saved_games = size / sizeof(tSave_game);
         gSaved_games = BrMemAllocate(size, kMem_misc);
         PFfread(gSaved_games, 1, size, f);
-        Encryptificate(gSaved_games, gCount_saved_games);
+        SplungeSomeData(gSaved_games, gCount_saved_games * sizeof(tSave_game));
         PFfclose(f);
         return gCount_saved_games;
     } else {
@@ -203,5 +203,14 @@ int C2_HOOK_FASTCALL DoLoadGame(int pIndex) {
     return 0;
 }
 
-// DoLoadMostRecentGame
+// FUNCTION: CARMA2_HW 0x00491e50
+// FUNCTION: CARMA2_SW 0x0048f0c0
+// FUNCTION: CARMA2_CHEAT 0x00491f00
+void C2_HOOK_FASTCALL DoLoadMostRecentGame(void) {
+
+    if (StartSavedGamesList()) {
+        DoLoadGame(0);
+        EndSavedGamesList();
+    }
+}
 
