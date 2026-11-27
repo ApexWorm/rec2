@@ -165,6 +165,7 @@ JOYINFOEX gJoy2_info;
 
 // GLOBAL: CARMA2_HW 0x00595f98
 // GLOBAL: CARMA2_SW 0x00590ef8
+// GLOBAL: CARMA2_CHEAT 0x0059c818
 int gINT_00595f98 = 1;
 
 // GLOBAL: CARMA2_HW 0x00595f9c
@@ -1386,6 +1387,7 @@ void C2_HOOK_FASTCALL PDReadJoysticks(void) {
 
 // FUNCTION: CARMA2_HW 0x00459050
 // FUNCTION: CARMA2_SW 0x00458de0
+// FUNCTION: CARMA2_CHEAT 0x004594d0
 int C2_HOOK_FASTCALL GetDirectInputJoy1X(void) {
     IDirectInputDevice2A* device;
     HRESULT res;
@@ -1404,24 +1406,24 @@ int C2_HOOK_FASTCALL GetDirectInputJoy1X(void) {
     }
     res = IDirectInputDevice2_Poll(device);
     if (res != DI_OK) {
-        if (res == DIERR_INPUTLOST || res == DIERR_NOTACQUIRED) {
+        if (res == DIERR_INPUTLOST) {
             if (AcquireDInputJoystickDevice(gJoystick_index) == 0) {
-                dr_dprintf("couldn't reacquire joystick %d ", gJoystick_index);
+                dr_dprintf("couldn't reacquire joystick %d\n", gJoystick_index);
+            }
+        } else if (res == DIERR_NOTACQUIRED) {
+            if (AcquireDInputJoystickDevice(gJoystick_index) == 0) {
+                dr_dprintf("couldn't reacquire joystick %d\n", gJoystick_index);
             }
         } else {
             dr_dprintf("Can't poll, unknown error\n");
         }
         return -1;
     }
-
-    res = IDirectInputDevice_GetDeviceState(device, sizeof(joy_state), &joy_state);
+    res = IDirectInputDevice_GetDeviceState(gDirectInputJoystickDevices[gJoystick_index], sizeof(joy_state), &joy_state);
     if (res != DI_OK) {
+        dr_dprintf("attempting to reacquire\n");
         if (res == DIERR_INPUTLOST) {
-            if (AcquireDInputJoystickDevice(gJoystick_index) == 0) {
-                dr_dprintf("couldn't reacquire joystick %d ", gJoystick_index);
-            }
-        } else {
-            dr_dprintf("Can't poll, unknown error\n");
+            AcquireDInputJoystickDevice(gJoystick_index);
         }
         return -1;
     }
@@ -1436,6 +1438,8 @@ int C2_HOOK_FASTCALL GetDirectInputJoy1X(void) {
 }
 
 // FUNCTION: CARMA2_HW 0x00459370
+// FUNCTION: CARMA2_SW 0x00459100
+// FUNCTION: CARMA2_CHEAT 0x004597f0
 int C2_HOOK_FASTCALL GetDirectInputJoy1Y(void) {
     IDirectInputDevice2A* device;
     HRESULT res;
@@ -1454,24 +1458,24 @@ int C2_HOOK_FASTCALL GetDirectInputJoy1Y(void) {
     }
     res = IDirectInputDevice2_Poll(device);
     if (res != DI_OK) {
-        if (res == DIERR_INPUTLOST || res == DIERR_NOTACQUIRED) {
+        if (res == DIERR_INPUTLOST) {
             if (AcquireDInputJoystickDevice(gJoystick_index) == 0) {
-                dr_dprintf("couldn't reacquire joystick %d ", gJoystick_index);
+                dr_dprintf("couldn't reacquire joystick %d\n", gJoystick_index);
+            }
+        } else if (res == DIERR_NOTACQUIRED) {
+            if (AcquireDInputJoystickDevice(gJoystick_index) == 0) {
+                dr_dprintf("couldn't reacquire joystick %d\n", gJoystick_index);
             }
         } else {
             dr_dprintf("Can't poll, unknown error\n");
         }
         return -1;
     }
-
-    res = IDirectInputDevice_GetDeviceState(device, sizeof(joy_state), &joy_state);
+    res = IDirectInputDevice_GetDeviceState(gDirectInputJoystickDevices[gJoystick_index], sizeof(joy_state), &joy_state);
     if (res != DI_OK) {
+        dr_dprintf("attempting to reacquire\n");
         if (res == DIERR_INPUTLOST) {
-            if (AcquireDInputJoystickDevice(gJoystick_index) == 0) {
-                dr_dprintf("couldn't reacquire joystick %d ", gJoystick_index);
-            }
-        } else {
-            dr_dprintf("Can't poll, unknown error\n");
+            AcquireDInputJoystickDevice(gJoystick_index);
         }
         return -1;
     }
