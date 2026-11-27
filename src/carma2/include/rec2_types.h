@@ -4637,13 +4637,15 @@ typedef struct tPhysics_object {
     br_vector3 velocity_car_space;
     br_vector3 field_0x1b4;
     br_vector3 rotate_omega;
-    undefined field_0x1cc[12];
-    undefined4 field183_0x1d8;
+    br_vector3 field_0x1cc;
+    tPhysics_object* field183_0x1d8;
     undefined field_0x1dc;
     undefined collision_flag;
     undefined field_0x1de;
     undefined field_0x1df;
-    undefined field_0x1e0[8];
+    tU8 field_0x1e0;
+    undefined field_0x1e1[3];
+    undefined4 field_0x1e4;
     br_matrix34 field_0x1e8;
     undefined4 field_0x218;
     float field_0x21c;

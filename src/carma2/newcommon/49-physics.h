@@ -190,9 +190,9 @@ extern void C2_HOOK_FASTCALL TellPhysicsJointsHaveChanged(tPhysics_object* pColl
 
 // PrepareForCollisions
 
-// CheckPointVelocities
+extern int CheckPointVelocities(tPhysics_object* pObject, br_scalar pMax_velocity_squared);
 
-// WriteNewPositions
+extern int C2_HOOK_FASTCALL WriteNewPositions(tPhysics_object* pObject);
 
 extern void C2_HOOK_FASTCALL SetListDoingNothingFlag(tPhysics_object* pObject, int pFlag);
 
