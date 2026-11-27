@@ -338,9 +338,9 @@ extern void C2_HOOK_FASTCALL ApplyDiminishingTorque(tPhysics_object* pObject, co
 
 extern int C2_HOOK_FASTCALL RQDcmpV(br_scalar* pMatrix, int pDim, br_scalar* pQ);
 
-// MakeIdentity
+extern void C2_HOOK_FASTCALL MakeIdentity(int pDim, br_scalar* pMatrix);
 
-// SparseRQDcmpV
+extern int C2_HOOK_FASTCALL SparseRQDcmpV(br_scalar* pMatrix, int pDim, br_scalar* pQ);
 
 // MakeMatrixFromIndices
 

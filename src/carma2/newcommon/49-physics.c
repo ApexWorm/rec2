@@ -1366,9 +1366,96 @@ int C2_HOOK_FASTCALL RQDcmpV(br_scalar* pMatrix, int pDim, br_scalar* pQ) {
     return singular;
 }
 
-// MakeIdentity
+inline void C2_HOOK_FASTCALL MakeIdentity(int pDim, br_scalar* pMatrix) {
+    int i;
+    int j;
 
-// SparseRQDcmpV
+    for (i = 0; i < pDim; i++) {
+        for (j = 0; j < pDim; j++) {
+            pMatrix[i * pDim + j] = 0.0f;
+        }
+        pMatrix[i * pDim + i] = 1.0f;
+    }
+}
+
+inline int C2_HOOK_FASTCALL SparseRQDcmpV(br_scalar* pMatrix, int pDim, br_scalar* pQ) {
+    br_scalar values[40];
+    tU16 offsets[40];
+    tU8 columns[40];
+    br_scalar* row;
+    br_scalar scale;
+    br_scalar sum;
+    br_scalar norm;
+    br_scalar divisor;
+    br_scalar matrix_sum;
+    br_scalar orthogonal_sum;
+    int singular;
+    int count;
+    int i;
+    int j;
+    int k;
+
+    /* Same as RQDcmpV, but only the non-zero values of each upper-diagonal row are used */
+    singular = 0;
+    MakeIdentity(pDim, pQ);
+    for (i = 0; i < pDim; i++) {
+        row = &pMatrix[i * pDim];
+        columns[0] = i;
+        offsets[0] = i * pDim;
+        values[0] = row[i];
+        scale = (br_scalar)fabs(values[0]);
+        count = 1;
+        for (j = i + 1; j < pDim; j++) {
+            if (row[j] != 0.0f) {
+                scale = (br_scalar)MAX(scale, fabs(row[j]));
+                columns[count] = j;
+                offsets[count] = j * pDim;
+                values[count] = row[j];
+                count++;
+                row[j] = 0.0f;
+            }
+        }
+        if (scale == 0.0) {
+            singular = 1;
+            continue;
+        }
+        for (k = 0; k < count; k++) {
+            values[k] /= scale;
+        }
+        sum = 0.0f;
+        for (k = 0; k < count; k++) {
+            sum += values[k] * values[k];
+        }
+        norm = (br_scalar)(values[0] > 0.0 ? fabs(sqrt(sum)) : -fabs(sqrt(sum)));
+        divisor = norm * (norm + values[0]);
+        values[0] += norm;
+        for (j = 0; j <= i; j++) {
+            orthogonal_sum = 0.0f;
+            for (k = 0; k < count; k++) {
+                orthogonal_sum += values[k] * pQ[offsets[k] + j];
+            }
+            for (k = 0; k < count; k++) {
+                pQ[offsets[k] + j] -= orthogonal_sum / divisor * values[k];
+            }
+        }
+        for (j = i + 1; j < pDim; j++) {
+            matrix_sum = 0.0f;
+            for (k = 0; k < count; k++) {
+                matrix_sum += values[k] * pMatrix[j * pDim + columns[k]];
+            }
+            orthogonal_sum = 0.0f;
+            for (k = 0; k < count; k++) {
+                orthogonal_sum += values[k] * pQ[offsets[k] + j];
+            }
+            for (k = 0; k < count; k++) {
+                pMatrix[j * pDim + columns[k]] -= matrix_sum / divisor * values[k];
+                pQ[offsets[k] + j] -= orthogonal_sum / divisor * values[k];
+            }
+        }
+        row[i] = -(scale * norm);
+    }
+    return singular;
+}
 
 // MakeMatrixFromIndices
 
@@ -1388,11 +1475,36 @@ int C2_HOOK_FASTCALL RQDcmpV(br_scalar* pMatrix, int pDim, br_scalar* pQ) {
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x004c53b0
-// STUB: CARMA2_SW 0x004c1ae0
-// STUB: CARMA2_CHEAT 0x004caed0
+// FUNCTION: CARMA2_HW 0x004c53b0
+// FUNCTION: CARMA2_SW 0x004c1ae0
+// FUNCTION: CARMA2_CHEAT 0x004caed0
 void C2_HOOK_FASTCALL RQMatrixSolveWithNegatives(br_scalar* pR, br_scalar* pQ, br_scalar* pB, br_scalar* pX, int pCount) {
-    NOT_IMPLEMENTED();
+    br_scalar intermediate[100];
+    br_scalar sum;
+    int i;
+    int j;
+
+    if (pCount >= 10) {
+        SparseRQDcmpV(pR, pCount, pQ);
+    } else {
+        RQDcmpV(pR, pCount, pQ);
+    }
+    if (pB != NULL && pX != NULL) {
+        intermediate[0] = pB[0] / pR[0];
+        for (i = 1; i < pCount; i++) {
+            sum = 0.0f;
+            for (j = 0; j < i; j++) {
+                sum += intermediate[j] * pR[i * pCount + j];
+            }
+            intermediate[i] = (pB[i] - sum) / pR[i * pCount + i];
+        }
+        for (i = 0; i < pCount; i++) {
+            pX[i] = intermediate[0] * pQ[i];
+            for (j = 1; j < pCount; j++) {
+                pX[i] += intermediate[j] * pQ[j * pCount + i];
+            }
+        }
+    }
 }
 
 #ifdef REC2_MATCHING
