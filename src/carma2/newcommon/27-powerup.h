@@ -38,6 +38,7 @@ extern float gPed_gravity_multiplier;
 extern int gCount_mutant_tail_parts;
 extern tPhysics_joint* gMutant_tail_first_joint;
 extern int gMutant_tail_state;
+extern tU32 gDAT_00705b70;
 extern tPhysics_object* gMutant_tail_object;
 extern tRespawn_powerup gRespawn_powerups[100];
 extern tU8* gRace_powerup_respawn_bools;
