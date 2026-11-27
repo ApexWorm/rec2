@@ -36,6 +36,7 @@ extern tSaved_table gSaved_shade_tables[100];
 extern int gNumber_of_lollipops;
 extern br_scalar gYon_squared;
 extern int gHud_tinted4;
+extern float gCosine_array[65];
 
 // MungeClipPlane
 
