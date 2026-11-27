@@ -110,6 +110,7 @@ Movie C2_HOOK_CDECL FlattenMovieData(Movie theMovie, long movieFlattenFlags, con
 
 // STUB: CARMA2_HW 0x0056c720
 // STUB: CARMA2_SW 0x00567dc0
+// STUB: CARMA2_CHEAT 0x00572310
 OSErr C2_HOOK_CDECL CreateMovieFile(const FSSpec* fileSpec, OSType creator, ScriptCode scriptTag, long createMovieFileFlags, short* resRefNum, Movie* newmovie) {
     return 1;
 }

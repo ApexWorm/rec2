@@ -1950,6 +1950,11 @@ typedef struct tHeadup_info {
     tNet_head_avail avail;
 } tHeadup_info;
 
+typedef struct {
+    char name[32];
+    tU32 value;
+} tQuick_time_option;
+
 typedef enum {
     kSoundFx_None = -1,
     kSoundFx_Saturated = 0,

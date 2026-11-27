@@ -35,15 +35,15 @@ extern int C2_HOOK_FASTCALL WriteBannerFrame(void);
 
 extern tU16* C2_HOOK_FASTCALL Allocate555BackScreen(void);
 
-// GetCompressorQualityFromOptions
+extern int C2_HOOK_FASTCALL GetCompressorQualityFromOptions(void);
 
-// GetCompressorTypeFromOptions
+extern int C2_HOOK_FASTCALL GetCompressorTypeFromOptions(void);
 
 // InitMovie
 
 extern OSErr C2_HOOK_FASTCALL CreateMovie(void);
 
-// MovieStartNewMovie
+extern OSErr C2_HOOK_FASTCALL MovieStartNewMovie(void);
 
 extern int C2_HOOK_FASTCALL MovieStopRecordingAndSave(void);
 

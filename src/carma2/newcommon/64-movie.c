@@ -14,8 +14,10 @@
 #include "41-utility.h"
 #include "52-errors.h"
 #include "63-loading3.h"
+#include "69-sound.h"
 #include "globvars.h"
 #include "platform.h"
+#include "rec2_macros.h"
 
 #include <FileTypesAndCreators.h>
 #include <FixMath.h>
@@ -70,13 +72,35 @@ char gQuick_time_movie_path_stub[256];
 char gQuick_time_banner_texture_name[256];
 
 // GLOBAL: CARMA2_HW 0x0065ee50
+// GLOBAL: CARMA2_SW 0x006597b0
 // GLOBAL: CARMA2_CHEAT 0x00666628
-char gDefault_quick_time_quality[32] = "normal";
+tQuick_time_option gDefault_quick_time_quality[6] = {
+    { "normal", codecNormalQuality },
+    { "min", codecMinQuality },
+    { "low", codecLowQuality },
+    { "high", codecHighQuality },
+    { "max", codecMaxQuality },
+    { "lossless", codecLosslessQuality },
+};
 
 // GLOBAL: CARMA2_HW 0x0065ed30
 // GLOBAL: CARMA2_SW 0x00659690
 // GLOBAL: CARMA2_CHEAT 0x00666508
-char gDefault_quick_time_compressor[32] = "animation";
+tQuick_time_option gDefault_quick_time_compressor[8] = {
+    { "animation", FOUR_CHAR_CODE('r', 'l', 'e', ' ') },
+    { "video", FOUR_CHAR_CODE('r', 'p', 'z', 'a') },
+    { "jpeg", FOUR_CHAR_CODE('j', 'p', 'e', 'g') },
+    { "raw", FOUR_CHAR_CODE('r', 'a', 'w', ' ') },
+    { "flic", FOUR_CHAR_CODE('f', 'l', 'i', 'c') },
+    { "gif", FOUR_CHAR_CODE('g', 'i', 'f', ' ') },
+    { "cinepak", FOUR_CHAR_CODE('c', 'v', 'i', 'd') },
+    { "compactvideo", FOUR_CHAR_CODE('c', 'd', 'v', 'c') },
+};
+
+// GLOBAL: CARMA2_HW 0x0065ef28
+// GLOBAL: CARMA2_SW 0x00659888
+// GLOBAL: CARMA2_CHEAT 0x00666700
+CodecQ gQuicktime_quality = (CodecQ)-1;
 
 // GLOBAL: CARMA2_HW 0x006a0af0
 // GLOBAL: CARMA2_SW 0x0069ab48
@@ -98,6 +122,11 @@ long gQuicktime_max_compressed_size;
 // GLOBAL: CARMA2_CHEAT 0x006a8674
 Media gQuicktime_media;
 
+// GLOBAL: CARMA2_HW 0x006a0b08
+// GLOBAL: CARMA2_SW 0x0069ab60
+// GLOBAL: CARMA2_CHEAT 0x006a8680
+FSSpec gQuicktime_fs_spec;
+
 // GLOBAL: CARMA2_HW 0x006a0c10
 // GLOBAL: CARMA2_SW 0x0069ac68
 // GLOBAL: CARMA2_CHEAT 0x006a8788
@@ -107,6 +136,11 @@ Track gQuicktime_track;
 // GLOBAL: CARMA2_SW 0x0069ac70
 // GLOBAL: CARMA2_CHEAT 0x006a8790
 Rect gQuicktime_rect;
+
+// GLOBAL: CARMA2_HW 0x006a0c28
+// GLOBAL: CARMA2_SW 0x0069ac80
+// GLOBAL: CARMA2_CHEAT 0x006a87a0
+int gQuicktime_paused;
 
 // GLOBAL: CARMA2_HW 0x006a0c2c
 // GLOBAL: CARMA2_SW 0x0069ac84
@@ -162,6 +196,11 @@ int gQuicktime_key_frame = 1;
 // GLOBAL: CARMA2_SW 0x00659894
 // GLOBAL: CARMA2_CHEAT 0x0066670c
 short gQuicktime_depth = 16;
+
+// GLOBAL: CARMA2_HW 0x006a0c54
+// GLOBAL: CARMA2_SW 0x0069acac
+// GLOBAL: CARMA2_CHEAT 0x006a87cc
+tU32 gQuicktime_frame_time;
 
 inline void C2_HOOK_FASTCALL Create555BELookupTable(void) {
     int i;
@@ -286,9 +325,29 @@ inline tU16* C2_HOOK_FASTCALL Allocate555BackScreen(void) {
     return gQuicktime_555_back_screen;
 }
 
-// GetCompressorQualityFromOptions
+inline int C2_HOOK_FASTCALL GetCompressorQualityFromOptions(void) {
+    int i;
 
-// GetCompressorTypeFromOptions
+    for (i = 0; i < REC2_ASIZE(gDefault_quick_time_quality); i++) {
+        if (strcmp(gDefault_quick_time_quality[i].name, gQuick_time_quality) == 0) {
+            gQuicktime_quality = gDefault_quick_time_quality[i].value;
+            return 1;
+        }
+    }
+    return 0;
+}
+
+inline int C2_HOOK_FASTCALL GetCompressorTypeFromOptions(void) {
+    int i;
+
+    for (i = 0; i < REC2_ASIZE(gDefault_quick_time_compressor); i++) {
+        if (strcmp(gDefault_quick_time_compressor[i].name, gQuick_time_compressor) == 0) {
+            gQuicktime_codec_type = gDefault_quick_time_compressor[i].value;
+            return 1;
+        }
+    }
+    return 0;
+}
 
 // InitMovie
 
@@ -351,7 +410,24 @@ OSErr C2_HOOK_FASTCALL CreateMovie(void) {
     return WriteBannerFrame();
 }
 
-// MovieStartNewMovie
+inline OSErr C2_HOOK_FASTCALL MovieStartNewMovie(void) {
+
+    gNext_replay_record_state = 1;
+    ShowStatusMessage(278, eMiscString_please_wait);
+    gQuicktime_movie_file = 0;
+    gQuicktime_paused = 0;
+    if (gQuicktime_quality == (CodecQ)-1 && !GetCompressorQualityFromOptions()) {
+        gQuicktime_quality = codecLowQuality;
+    }
+    if (gQuicktime_codec_type == 0 && !GetCompressorTypeFromOptions()) {
+        gQuicktime_codec_type = FOUR_CHAR_CODE('r', 'l', 'e', ' ');
+    }
+    gQuicktime_fs_spec.vRefNum = 0;
+    gQuicktime_fs_spec.parID = 0;
+    strcpy(gQuicktime_fs_spec.name, gQuick_time_temp_path);
+    c2pstr(gQuicktime_fs_spec.name);
+    return noErr;
+}
 
 // FUNCTION: CARMA2_HW 0x004e1640
 // FUNCTION: CARMA2_SW 0x004dd940
@@ -437,10 +513,10 @@ void C2_HOOK_CDECL InitQuickTimeStuff(void) {
 void C2_HOOK_FASTCALL SetQuickTimeDefaults(void) {
 
     if (gQuick_time_quality[0] == '\0') {
-        strcpy(gQuick_time_quality, gDefault_quick_time_quality);
+        strcpy(gQuick_time_quality, gDefault_quick_time_quality[0].name);
     }
     if (gQuick_time_compressor[0] == '\0') {
-        strcpy(gQuick_time_compressor, gDefault_quick_time_compressor);
+        strcpy(gQuick_time_compressor, gDefault_quick_time_compressor[0].name);
     }
     if (gQuick_time_temp_path[0] == '\0') {
         PathCat(gQuick_time_temp_path, gApplication_path, "QTTMP");
@@ -453,11 +529,33 @@ void C2_HOOK_FASTCALL SetQuickTimeDefaults(void) {
     }
 }
 
-// STUB: CARMA2_HW 0x004e1810
-// STUB: CARMA2_SW 0x004ddb10
-// STUB: CARMA2_CHEAT 0x004e73b0
+// FUNCTION: CARMA2_HW 0x004e1810
+// FUNCTION: CARMA2_SW 0x004ddb10
+// FUNCTION: CARMA2_CHEAT 0x004e73b0
 void C2_HOOK_FASTCALL MovieRecordButtonPressed(void) {
-    NOT_IMPLEMENTED();
+
+    if (gQuickTime_initialized) {
+        if (gNext_replay_record_state == 4) {
+            if (gQuicktime_paused == 0) {
+                gQuicktime_paused = 1;
+            } else {
+                gQuicktime_paused = 0;
+            }
+            if (gQuicktime_paused) {
+                DRS3StartSound(gEffects_outlet, 9003);
+                DRS3StartSound(gEffects_outlet, 5500);
+                ShowStatusMessage(281, 0);
+            } else {
+                DRS3StartSound(gEffects_outlet, 9011);
+                ShowStatusMessage(eMiscString_recording_movie, 0);
+            }
+        } else if (gNext_replay_record_state == 0) {
+            if (MovieStartNewMovie() != noErr) {
+                gNext_replay_record_state = 10;
+                ShowStatusMessage(eMiscString_movie_error, eMiscString_aborting);
+            }
+        }
+    }
 }
 
 // FUNCTION: CARMA2_HW 0x004e1a20
@@ -537,11 +635,67 @@ OSErr C2_HOOK_FASTCALL GenerateOneMovieFrame(br_pixelmap* pScreen) {
     return noErr;
 }
 
-// STUB: CARMA2_HW 0x004e1da0
-// STUB: CARMA2_SW 0x004de050
-// STUB: CARMA2_CHEAT 0x004e7930
+// FUNCTION: CARMA2_HW 0x004e1da0
+// FUNCTION: CARMA2_SW 0x004de050
+// FUNCTION: CARMA2_CHEAT 0x004e7930
 int C2_HOOK_FASTCALL MovieRecordFrame(br_pixelmap* pScreen, int pFrame_period) {
-    NOT_IMPLEMENTED();
+    tU32 time;
+
+    switch (gNext_replay_record_state) {
+    case 1:
+        gNext_replay_record_state = 2;
+        break;
+    case 2:
+        WaitFor(2000);
+        gQuicktime_rect.top = 0;
+        gQuicktime_rect.left = 0;
+        gQuicktime_rect.right = GetMovieWidth();
+        gQuicktime_rect.bottom = GetMovieHeight();
+        if (CreateMovieFile(&gQuicktime_fs_spec, sigMoviePlayer, smCurrentScript, createMovieFileDeleteCurFile, &gQuicktime_movie_file, &gQuicktime_movie) != noErr) {
+            PathCat(gQuick_time_temp_path, gApplication_path, "QTTMP");
+            PathCat(gQuick_time_movie_path_stub, gApplication_path, "MOVIE");
+            if (CreateMovieFile(&gQuicktime_fs_spec, sigMoviePlayer, smCurrentScript, createMovieFileDeleteCurFile, &gQuicktime_movie_file, &gQuicktime_movie) != noErr) {
+                gNext_replay_record_state = 10;
+                ShowStatusMessage(eMiscString_movie_error, eMiscString_aborting);
+                break;
+            }
+        }
+        gNext_replay_record_state = 3;
+        ShowStatusMessage(eMiscString_initialising_movie, eMiscString_please_wait);
+        break;
+    case 3:
+        if (CreateMovie() != noErr) {
+            gNext_replay_record_state = 10;
+            ShowStatusMessage(eMiscString_movie_error, eMiscString_aborting);
+        } else {
+            gNext_replay_record_state = 4;
+            ShowStatusMessage(eMiscString_recording_movie, 0);
+        }
+        break;
+    case 4:
+        if (!gQuicktime_paused) {
+            time = pFrame_period + gQuicktime_frame_time;
+            while (time >= 55) {
+                if (GenerateOneMovieFrame(pScreen) != noErr) {
+                    gNext_replay_record_state = 10;
+                    ShowStatusMessage(eMiscString_movie_error, eMiscString_aborting);
+                    return 0;
+                }
+                time -= 55;
+            }
+            gQuicktime_frame_time = time;
+        }
+        break;
+    case 10:
+        WaitFor(2000);
+        gNext_replay_record_state = 0;
+        FreeOffQTshite();
+        break;
+    case 5:
+        gRecording_mouse_disabled = 0;
+        break;
+    }
+    return 0;
 }
 
 // FUNCTION: CARMA2_HW 0x004e2100
