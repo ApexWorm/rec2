@@ -2338,7 +2338,18 @@ void C2_HOOK_FASTCALL ApplyPedPos(tPipe_chunk** pChunk) {
     PedApplyPedPos((tPedestrian*)(*pChunk)->subject_index, &(*pChunk)->data.ped_pos.v);
 }
 
-// ApplyPedModelChange
+extern void C2_HOOK_FASTCALL PedApplyPedModelChange(tPedestrian* pPed, int pBone_index, int pModel_index, int pModel_set);
+
+// FUNCTION: CARMA2_HW 0x004c9b60
+// FUNCTION: CARMA2_SW 0x004c6290
+// FUNCTION: CARMA2_CHEAT 0x004cf690
+void C2_HOOK_FASTCALL ApplyPedModelChange(tPipe_chunk** pChunk) {
+
+    PedApplyPedModelChange((tPedestrian*)(*pChunk)->subject_index,
+        (*pChunk)->data.ped_model_change.field_0x0,
+        (*pChunk)->data.ped_model_change.field_0x2,
+        (*pChunk)->data.ped_model_change.field_0x4);
+}
 
 // FUNCTION: CARMA2_HW 0x004c9b80
 // FUNCTION: CARMA2_SW 0x004c62b0
@@ -2841,7 +2852,18 @@ void C2_HOOK_FASTCALL UndoPedPos(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk)
     PedApplyPedPos((tPedestrian*)(*pChunk)->subject_index, &(*pChunk)->data.ped_pos.p);
 }
 
-// UndoPedModelChange
+extern void C2_HOOK_FASTCALL PedApplyPedModelChangeP(tPedestrian* pPed, int pBone_index, br_model* pModel, int pModel_set);
+
+// FUNCTION: CARMA2_HW 0x004ca250
+// FUNCTION: CARMA2_SW 0x004c6980
+// FUNCTION: CARMA2_CHEAT 0x004cfd90
+void C2_HOOK_FASTCALL UndoPedModelChange(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
+
+    PedApplyPedModelChangeP((tPedestrian*)(*pChunk)->subject_index,
+        (*pChunk)->data.ped_model_change.field_0x0,
+        (*pChunk)->data.ped_model_change.model,
+        (*pChunk)->data.ped_model_change.field_0x6);
+}
 
 // UndoGibShower
 

@@ -562,10 +562,10 @@ typedef struct {
 } tPipe_single_vanished_dismembered;
 
 typedef struct {
-    undefined2 field_0x0;
-    undefined2 field_0x2;
-    undefined2 field_0x4;
-    undefined2 field_0x6;
+    tS16 field_0x0;
+    tS16 field_0x2;
+    tS16 field_0x4;
+    tS16 field_0x6;
     br_model* model;
 } tPipe_single_ped_model_change;
 
@@ -915,6 +915,7 @@ typedef struct tPipe_chunk {
         tPipe_single_groove_on_of groove;
         tPipe_single_vanished_dismembered vanished_dismembered;
         tPipe_single_ds_model ds_model;
+        tPipe_single_ped_model_change ped_model_change;
         tPipe_drone_corner_pos drone_corner_pos;
         tPipe_chunk_napalm_bolt napalm_bolt;
         tPipe_ped_dir_data ped_dir;
