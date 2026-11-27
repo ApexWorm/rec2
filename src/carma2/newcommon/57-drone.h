@@ -146,7 +146,7 @@ extern void C2_HOOK_FASTCALL PipeDroneMatrix(tDrone_spec* pDrone);
 
 extern void C2_HOOK_FASTCALL DroneStateFuncControlledMovement(tDrone_spec* pDrone, tDroneStateFuncState pState);
 
-// DoDroneHaltingStuff
+extern void C2_HOOK_FASTCALL DoDroneHaltingStuff(tDrone_spec* pDrone);
 
 extern void C2_HOOK_FASTCALL DroneStateFuncPhysicsActive(tDrone_spec* pDrone, tDroneStateFuncState pState);
 
@@ -180,7 +180,7 @@ extern void C2_HOOK_FASTCALL DoDroneFunkyGroovyThings(tDrone_spec* pDrone);
 
 // MyDroneHathCollideth
 
-// MyDroneHathHalteth
+extern int C2_HOOK_FASTCALL MyDroneHathHalteth(tPhysics_object* pObject);
 
 extern void C2_HOOK_FASTCALL MoveMyDroneBaby(tPhysics_object* pObject);
 

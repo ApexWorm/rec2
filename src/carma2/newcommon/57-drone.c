@@ -413,7 +413,11 @@ void C2_HOOK_FASTCALL DroneStateFuncControlledMovement(tDrone_spec* pDrone, tDro
     NOT_IMPLEMENTED();
 }
 
-// DoDroneHaltingStuff
+inline void C2_HOOK_FASTCALL DoDroneHaltingStuff(tDrone_spec* pDrone) {
+    pDrone->collision_info.field_0x1a0 = 0x100000;
+    PHILSetObjectProperty(&pDrone->collision_info, 3, 1);
+    pDrone->field_0x5d4 = 0;
+}
 
 // FUNCTION: CARMA2_HW 0x0044eb70
 // FUNCTION: CARMA2_SW 0x0044e910
@@ -425,9 +429,7 @@ void C2_HOOK_FASTCALL DroneStateFuncPhysicsActive(tDrone_spec* pDrone, tDroneSta
         DoNotDprintf_drone("DroneStateFuncPhysicsActive() RUN");
         if ((!pDrone->field_0x44 || ((pDrone->form->flags & 0x4) && !pDrone->field_0x45)) && (pDrone->form->flags & 0x2)) {
             RemoveDroneFromPHIL(pDrone);
-            pDrone->collision_info.field_0x1a0 = 0x100000;
-            PHILSetObjectProperty(&pDrone->collision_info, 3, 1);
-            pDrone->field_0x5d4 = 0;
+            DoDroneHaltingStuff(pDrone);
             NewDroneState(pDrone, 1);
         }
         break;
@@ -579,7 +581,18 @@ void C2_HOOK_FASTCALL DoDroneFunkyGroovyThings(tDrone_spec* pDrone) {
 
 // MyDroneHathCollideth
 
-// MyDroneHathHalteth
+// FUNCTION: CARMA2_HW 0x00452360
+// FUNCTION: CARMA2_SW 0x004520f0
+// FUNCTION: CARMA2_CHEAT 0x004528b0
+int C2_HOOK_FASTCALL MyDroneHathHalteth(tPhysics_object* pObject) {
+    tDrone_spec* drone;
+
+    drone = pObject->owner;
+    DoNotDprintf_drone("MyDroneHathHalteth(): PHIL called a bloody callback. Rejoice!");
+    DoDroneHaltingStuff(drone);
+    NewDroneState(pObject->owner, 4);
+    return 1;
+}
 
 // FUNCTION: CARMA2_HW 0x00452410
 // FUNCTION: CARMA2_SW 0x004521a0
