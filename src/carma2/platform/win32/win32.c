@@ -952,48 +952,42 @@ int C2_HOOK_FASTCALL PDFileUnlock(const char *pThe_path) {
 // FUNCTION: CARMA2_HW 0x00486c30
 // FUNCTION: CARMA2_SW 0x00483d70
 // FUNCTION: CARMA2_CHEAT 0x00486f50
-void C2_HOOK_FASTCALL PDEnumPath(const char *path, tEnumPathCallback pCallback, void *data) {
+int C2_HOOK_FASTCALL PDEnumPath(const char *path, tEnumPathCallback pCallback, void *data) {
     char originalCurrentDirectory[MAX_PATH];
     tPath_name filePath;
-    BOOL bSucceeded;
     WIN32_FIND_DATAA findFileData;
     HANDLE hFindFile;
-    size_t lenFilename;
-    size_t lenLnk;
+    int lenFilename;
+    int lenLnk;
+    const char* lnk;
     int callback_res;
 
-    GetCurrentDirectory(REC2_ASIZE(originalCurrentDirectory), originalCurrentDirectory);
-    bSucceeded = SetCurrentDirectoryA(path);
-    if (!bSucceeded) {
-        return;
-    }
-    hFindFile = FindFirstFileA("*.???", &findFileData);
-    if (hFindFile != NULL) {
-        while (1) {
-            if ((findFileData.dwFileAttributes & (
-                     FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_SYSTEM | FILE_ATTRIBUTE_HIDDEN)) == 0) {
-                lenFilename = strlen(findFileData.cFileName);
-                lenLnk = strlen(".lnk");
-                if (lenFilename > lenLnk && PDstricmp(&findFileData.cFileName[lenFilename - lenLnk], ".lnk") == 0) {
-                    memmove(filePath, findFileData.cFileName, lenFilename - lenLnk);
-                    filePath[lenFilename - lenLnk] = '\0';
-                } else {
-                    memmove(filePath, findFileData.cFileName, lenFilename + 1);
+    callback_res = 0;
+    GetCurrentDirectoryA(REC2_ASIZE(originalCurrentDirectory), originalCurrentDirectory);
+    if (SetCurrentDirectoryA(path)) {
+        hFindFile = FindFirstFileA("*.???", &findFileData);
+        if (hFindFile != INVALID_HANDLE_VALUE) {
+            do {
+                if ((findFileData.dwFileAttributes & (FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_SYSTEM | FILE_ATTRIBUTE_HIDDEN)) == 0) {
+                    lenFilename = strlen(findFileData.cFileName);
+                    lnk = ".lnk";
+                    lenLnk = strlen(lnk);
+                    if (lenFilename >= lenLnk && PDstricmp(&findFileData.cFileName[lenFilename - lenLnk], ".lnk") == 0) {
+                        memmove(filePath, findFileData.cFileName, lenFilename - lenLnk);
+                        filePath[lenFilename - lenLnk] = '\0';
+                    } else {
+                        memmove(filePath, findFileData.cFileName, lenFilename + 1);
+                    }
+                    callback_res = pCallback(filePath, data);
                 }
-                callback_res = pCallback(filePath, data);
-                if (callback_res != 0) {
-                    break;
-                }
-            }
-            bSucceeded = FindNextFileA(hFindFile, &findFileData);
-            if (!bSucceeded) {
-                break;
-            }
+            } while (callback_res == 0 && FindNextFileA(hFindFile, &findFileData));
+            FindClose(hFindFile);
         }
-        FindClose(hFindFile);
+        SetCurrentDirectoryA(originalCurrentDirectory);
     }
-    SetCurrentDirectoryA(originalCurrentDirectory);
+    return callback_res;
 }
+
 
 // FUNCTION: CARMA2_HW 0x00486c20
 // FUNCTION: CARMA2_SW 0x00483d60
@@ -1511,28 +1505,39 @@ void C2_HOOK_FASTCALL PDMouseButtons(int *pLeftButtonDown, int *pRightButtonDown
     }
 }
 
+#if defined(REC2_MATCHING) && defined(_MSC_VER)
+#pragma optimize("", off)
+#endif
+
 // FUNCTION: CARMA2_HW 0x0056a3a9
+// FUNCTION: CARMA2_SW 0x00565a49
 // FUNCTION: CARMA2_CHEAT 0x0056ff91
 void C2_HOOK_FASTCALL PDExtractFilename(char *pDest, const char *pPath) {
-    char dirname[256];
-    char drive[4];
+    char drive_name[4];
     char filename[256];
     char extension[256];
+    char dir[256];
 
-    _splitpath(pPath, drive, dirname, filename, extension);
+    _splitpath(pPath, drive_name, dir, filename, extension);
     sprintf(pDest, "%s%s", filename, extension);
 }
 
 // FUNCTION: CARMA2_HW 0x0056a349
+// FUNCTION: CARMA2_SW 0x005659e9
+// FUNCTION: CARMA2_CHEAT 0x0056ff31
 void C2_HOOK_FASTCALL PDExtractDirectory(char *pDest, const char *pPath) {
-    char dirname[256];
-    char drive[4];
+    char drive_name[4];
     char filename[256];
     char extension[256];
+    char dir[256];
 
-    _splitpath(pPath, drive, dirname, filename, extension);
-    sprintf(pDest, "%s%s", drive, dirname);
+    _splitpath(pPath, drive_name, dir, filename, extension);
+    sprintf(pDest, "%s%s", drive_name, dir);
 }
+
+#if defined(REC2_MATCHING) && defined(_MSC_VER)
+#pragma optimize("", on)
+#endif
 
 // FUNCTION: CARMA2_HW 0x004928a0
 void C2_HOOK_FASTCALL PDPageInMemory(void *pMemory) {
@@ -1589,11 +1594,21 @@ void C2_HOOK_FASTCALL PDFileDelete(const char *pPath, int pIgnore_read_only) {
     DeleteFileA(pPath);
 }
 
-// FUNCTION: CARMA2_SW 0x0047da1b
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// FUNCTION: CARMA2_HW 0x0047d850
+// FUNCTION: CARMA2_SW 0x0047da10
+// FUNCTION: CARMA2_CHEAT 0x0047dbd0
 int C2_HOOK_FASTCALL PDstricmp(const char* str1, const char* str2) {
 
     return strcasecmp(str1, str2);
 }
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // FUNCTION: CARMA2_HW 0x0047d860
 // FUNCTION: CARMA2_SW 0x0047da20
