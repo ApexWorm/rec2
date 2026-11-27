@@ -2368,13 +2368,15 @@ int C2_HOOK_CDECL d3d_update_texture(int index, render_buffer_d3d* buffer, int a
 
 // FUNCTION: D3D 0x10003bd0
 int C2_HOOK_CDECL d3d_load(render_buffer_d3d* buffer, int arg2) {
-    br_uint_8 shift1;
     int w_p_shift1;
     int h_p_shift1;
     int size_i;
     int slot_index;
     int tex_w;
     int tex_h;
+    int i;
+    int flip_limit;
+    int oldest_flip_count;
 
     gINT_1001bbe4 += 1;
     gDWORD_1001bbb0 = 0;
@@ -2387,12 +2389,14 @@ int C2_HOOK_CDECL d3d_load(render_buffer_d3d* buffer, int arg2) {
         return 1;
     }
 
-    shift1 = (br_uint_8)gINT_1001bbd0;
-    w_p_shift1 = buffer->width_p >> shift1;
-    w_p_shift1 = D3D_MAX(16 >> shift1, w_p_shift1);
-
-    h_p_shift1 = buffer->height >> shift1;
-    h_p_shift1 = D3D_MAX(16 >> shift1, h_p_shift1);
+    w_p_shift1 = buffer->width_p >> gINT_1001bbd0;
+    if (w_p_shift1 < (16 >> gINT_1001bbd0)) {
+        w_p_shift1 = 16 >> gINT_1001bbd0;
+    }
+    h_p_shift1 = buffer->height >> gINT_1001bbd0;
+    if (h_p_shift1 < (16 >> gINT_1001bbd0)) {
+        h_p_shift1 = 16 >> gINT_1001bbd0;
+    }
 
     if (buffer->field_0x5c != gFlip_count) {
         buffer->field_0x5c = gFlip_count;
@@ -2408,112 +2412,115 @@ int C2_HOOK_CDECL d3d_load(render_buffer_d3d* buffer, int arg2) {
         return 0;
     }
 
-    size_i = -1;
-    for (;;) {
-        int i;
-        int new_h_shift = 0;
+    do {
+        int new_h_shift;
 
+        size_i = -1;
+        new_h_shift = 0;
         for (i = 0; gStruct_10015898_ARRAY[i].field_0x8 != 0; i++) {
             if (gStruct_10015898_ARRAY[i].count != 0) {
                 if (new_h_shift < 10 && w_p_shift1 == gStruct_10015898_ARRAY[i].width && h_p_shift1 == gStruct_10015898_ARRAY[i].height) {
-                    new_h_shift = 10;
                     size_i = i;
+                    new_h_shift = 10;
                 }
                 if (new_h_shift < 9 && w_p_shift1 == gStruct_10015898_ARRAY[i].width && h_p_shift1 < gStruct_10015898_ARRAY[i].height) {
-                    new_h_shift = 9;
                     size_i = i;
+                    new_h_shift = 9;
                 }
                 if (new_h_shift < 8 && w_p_shift1 < gStruct_10015898_ARRAY[i].width && h_p_shift1 == gStruct_10015898_ARRAY[i].height) {
-                    new_h_shift = 8;
                     size_i = i;
+                    new_h_shift = 8;
                 }
             }
         }
-        if (size_i != -1) {
-            break;
-        }
-        w_p_shift1 >>= 1;
-        h_p_shift1 >>= 1;
-        w_p_shift1 = D3D_MAX(w_p_shift1, 16 >> shift1);
-        h_p_shift1 = D3D_MAX(h_p_shift1, 16 >> shift1);
-    }
-    tex_w = gStruct_10015898_ARRAY[size_i].width >> shift1;
-    tex_h = gStruct_10015898_ARRAY[size_i].height >> shift1;
-    slot_index = -1;
-    if (gPreferred_opaque_texture_format == gPreferred_texture_format) {
-        int i;
-        int oldest_flip_count = gFlip_count + 1;
-
-        for (i = 0; i < gSize_texture_cache; i++) {
-            if (gBuffered_textures[i].texture != NULL
-                    && gBuffered_textures[i].width == tex_w
-                    && gBuffered_textures[i].height == tex_h
-                    && gBuffered_textures[i].field_0x24 < oldest_flip_count) {
-                slot_index = i;
-                oldest_flip_count = gBuffered_textures[i].field_0x24;
+        if (size_i == -1) {
+            w_p_shift1 >>= 1;
+            h_p_shift1 >>= 1;
+            if (w_p_shift1 < (16 >> gINT_1001bbd0)) {
+                w_p_shift1 = 16 >> gINT_1001bbd0;
+            }
+            if (h_p_shift1 < (16 >> gINT_1001bbd0)) {
+                h_p_shift1 = 16 >> gINT_1001bbd0;
             }
         }
-    } else if (buffer->blended == 1) {
-        int i;
-        int oldest_flip_count = gFlip_count + 1;
-
-        for (i = 0; i < gSize_texture_cache; i++) {
-            if (gBuffered_textures[i].field_0x1c == 0) {
-                gBuffered_textures[i].field_0x24 -= 2;
+    } while (size_i == -1);
+    tex_w = gStruct_10015898_ARRAY[size_i].width >> gINT_1001bbd0;
+    tex_h = gStruct_10015898_ARRAY[size_i].height >> gINT_1001bbd0;
+    if (gPreferred_opaque_texture_format != gPreferred_texture_format) {
+        if (buffer->blended == 1) {
+            slot_index = -1;
+            flip_limit = gFlip_count + 1;
+            oldest_flip_count = flip_limit;
+            for (i = 0; i < gSize_texture_cache; i++) {
+                if (gBuffered_textures[i].field_0x1c == 0) {
+                    gBuffered_textures[i].field_0x24 -= 2;
+                }
+                if (gBuffered_textures[i].texture != NULL
+                        && tex_w == gBuffered_textures[i].width
+                        && tex_h == gBuffered_textures[i].height
+                        && gBuffered_textures[i].field_0x24 < oldest_flip_count) {
+                    oldest_flip_count = gBuffered_textures[i].field_0x24;
+                    slot_index = i;
+                }
+                if (gBuffered_textures[i].field_0x1c == 0) {
+                    gBuffered_textures[i].field_0x24 += 2;
+                }
             }
-            if (gBuffered_textures[i].texture != NULL
-                    && gBuffered_textures[i].width == tex_w
-                    && gBuffered_textures[i].height == tex_h
-                    && gBuffered_textures[i].field_0x24 < oldest_flip_count) {
-                slot_index = i;
-                oldest_flip_count = gBuffered_textures[i].field_0x24;
-            }
-            if (gBuffered_textures[i].field_0x1c == 0) {
-                gBuffered_textures[i].field_0x24 += 2;
+        } else {
+            slot_index = -1;
+            flip_limit = gFlip_count + 1;
+            oldest_flip_count = flip_limit;
+            for (i = 0; i < gSize_texture_cache; i++) {
+                if (gBuffered_textures[i].field_0x1c == 1) {
+                    gBuffered_textures[i].field_0x24 -= 2;
+                }
+                if (gBuffered_textures[i].texture != NULL
+                        && tex_w == gBuffered_textures[i].width
+                        && tex_h == gBuffered_textures[i].height
+                        && gBuffered_textures[i].field_0x24 < oldest_flip_count) {
+                    oldest_flip_count = gBuffered_textures[i].field_0x24;
+                    slot_index = i;
+                }
+                if (gBuffered_textures[i].field_0x1c == 1) {
+                    gBuffered_textures[i].field_0x24 += 2;
+                }
             }
         }
     } else {
-        int i;
-        int oldest_flip_count = gFlip_count + 1;
-
+        slot_index = -1;
+        flip_limit = gFlip_count + 1;
+        oldest_flip_count = flip_limit;
         for (i = 0; i < gSize_texture_cache; i++) {
-            if (gBuffered_textures[i].field_0x1c == 1) {
-                gBuffered_textures[i].field_0x24 -= 2;
-            }
             if (gBuffered_textures[i].texture != NULL
-                    && gBuffered_textures[i].width == tex_w
-                    && gBuffered_textures[i].height == tex_h
+                    && tex_w == gBuffered_textures[i].width
+                    && tex_h == gBuffered_textures[i].height
                     && gBuffered_textures[i].field_0x24 < oldest_flip_count) {
-                slot_index = i;
                 oldest_flip_count = gBuffered_textures[i].field_0x24;
-            }
-            if (gBuffered_textures[i].field_0x1c == 1) {
-                gBuffered_textures[i].field_0x24 += 2;
+                slot_index = i;
             }
         }
     }
 
-    if (gNo_2d_during_3d_scene == 1 && (slot_index == -1 || gFlip_count <= gBuffered_textures[slot_index].field_0x24)) {
-        int i;
-        int oldest_flip_count = gFlip_count + 1;
-
+    if (gNo_2d_during_3d_scene == 1 && (slot_index == -1 || gBuffered_textures[slot_index].field_0x24 >= gFlip_count)) {
+        oldest_flip_count = flip_limit;
         slot_index = -1;
         for (i = 0; i < gSize_texture_cache; i++) {
             if (gBuffered_textures[i].texture != NULL
-                    && gBuffered_textures[i].width <= tex_w
-                    && gBuffered_textures[i].height <= tex_h
+                    && tex_w >= gBuffered_textures[i].width
+                    && tex_h >= gBuffered_textures[i].height
                     && gBuffered_textures[i].field_0x24 < oldest_flip_count) {
-                slot_index = i;
                 oldest_flip_count = gBuffered_textures[i].field_0x24;
+                slot_index = i;
             }
         }
         if (slot_index == -1 || gBuffered_textures[slot_index].field_0x24 >= gFlip_count) {
+            oldest_flip_count = flip_limit;
             slot_index = -1;
             for (i = 0; i < gSize_texture_cache; i++) {
                 if (gBuffered_textures[i].texture != NULL
                         && gBuffered_textures[i].field_0x24 < oldest_flip_count) {
-                    slot_index = i;
                     oldest_flip_count = gBuffered_textures[i].field_0x24;
+                    slot_index = i;
                 }
             }
         }
