@@ -1658,7 +1658,7 @@ void C2_HOOK_FASTCALL MakeModelMaterialsDoubleSided(br_model* pModel) {
 // STUB: CARMA2_HW 0x00434320
 // STUB: CARMA2_SW 0x00434350
 // STUB: CARMA2_CHEAT 0x00434510
-intptr_t C2_HOOK_CDECL CheckFlapAngles(br_actor* pActor, void* pData) {
+intptr_t C2_HOOK_CDECL CheckFlapAngles(br_actor* pActor, void* pContext) {
     NOT_IMPLEMENTED();
 }
 
