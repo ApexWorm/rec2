@@ -2641,11 +2641,61 @@ void C2_HOOK_FASTCALL RepairCarCollisionShapes(tCar_spec* pCar, float pStep) {
 
 // WeldCar
 
-// ARCompressCrush
+// FUNCTION: CARMA2_HW 0x0043bca0
+// FUNCTION: CARMA2_SW 0x0043bcf0
+// FUNCTION: CARMA2_CHEAT 0x0043bee0
+void C2_HOOK_FASTCALL ARCompressCrush(tCompressed_vector3* pDirection, tU16* pDest, br_model* pModel, const br_vector3* pVector, const float* pValues) {
+    float length;
+    br_vector3 direction;
+    tU16 i;
 
-// ARApplyCrush
+    length = BrVector3Length(pVector);
+    BrVector3Set(&direction, pVector->v[0] / length, pVector->v[1] / length, pVector->v[2] / length);
+    CompressVector3(pDirection, &direction, -1.0f, 1.0f);
+    for (i = 0; i < pModel->nvertices; i++) {
+        pDest[i] = DRScalarToU16(pValues[i] * length, 0.0f, 10.0f);
+    }
+}
 
-// ARUndoCrush
+// FUNCTION: CARMA2_HW 0x0043bd70
+// FUNCTION: CARMA2_SW 0x0043bdc0
+// FUNCTION: CARMA2_CHEAT 0x0043bfb0
+void C2_HOOK_FASTCALL ARApplyCrush(br_model* pModel, const tCompressed_vector3* pDirection, const tU16* pValues) {
+    br_vector3 direction;
+    br_vector3 delta;
+    float scale;
+    int i;
+
+    ExpandVector3(&direction, pDirection, -1.0f, 1.0f);
+    for (i = 0; i < pModel->nvertices; i++) {
+        if (pValues[i] != 0) {
+            scale = DRU16ToScalar(pValues[i], 0.0f, 10.0f);
+            BrVector3Set(&delta, direction.v[0] * scale, direction.v[1] * scale, direction.v[2] * scale);
+            BrVector3Accumulate(&pModel->vertices[i].p, &delta);
+        }
+    }
+    SetModelForUpdate(pModel);
+}
+
+// FUNCTION: CARMA2_HW 0x0043be50
+// FUNCTION: CARMA2_SW 0x0043bea0
+// FUNCTION: CARMA2_CHEAT 0x0043c0a0
+void C2_HOOK_FASTCALL ARUndoCrush(br_model* pModel, const tCompressed_vector3* pDirection, const tU16* pValues) {
+    br_vector3 direction;
+    br_vector3 delta;
+    float scale;
+    int i;
+
+    ExpandVector3(&direction, pDirection, -1.0f, 1.0f);
+    for (i = 0; i < pModel->nvertices; i++) {
+        if (pValues[i] != 0) {
+            scale = DRU16ToScalar(pValues[i], 0.0f, 10.0f);
+            BrVector3Scale(&delta, &direction, -scale);
+            BrVector3Accumulate(&pModel->vertices[i].p, &delta);
+        }
+    }
+    SetModelForUpdate(pModel);
+}
 
 // FUNCTION: CARMA2_HW 0x0043bf30
 // FUNCTION: CARMA2_SW 0x0043bf80
