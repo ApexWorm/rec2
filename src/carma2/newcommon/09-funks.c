@@ -84,6 +84,7 @@ void C2_HOOK_STDCALL SetSightDistance(br_scalar pYon) {
 // AddFunkGrooveBinding
 
 // FUNCTION: CARMA2_HW 0x004748a0
+// FUNCTION: CARMA2_SW 0x00473e00
 // FUNCTION: CARMA2_CHEAT 0x00474c20
 void C2_HOOK_FASTCALL ControlBoundFunkGroove(int pSlot_number, float pValue) {
 
