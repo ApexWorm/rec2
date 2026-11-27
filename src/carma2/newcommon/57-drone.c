@@ -122,10 +122,45 @@ int gStatic_drone_path_model_max_vertices;
 // GLOBAL: CARMA2_CHEAT 0x0068bde4
 int gStatic_drone_path_model_max_faces;
 
+// GLOBAL: CARMA2_HW 0x00594760
+// GLOBAL: CARMA2_SW 0x0058f6c0
+// GLOBAL: CARMA2_CHEAT 0x0059b0b8
+tDrone_form_within_rendering_distance_cbfn* gDrone_form_within_rendering_distance_functions[4] = {
+    DroneCarWithinRenderingDistance,
+    DronePlaneWithinRenderingDistance,
+    DroneTrainWithinRenderingDistance,
+    DronePlaneWithinRenderingDistance,
+};
+
+// GLOBAL: CARMA2_HW 0x00594750
+// GLOBAL: CARMA2_SW 0x0058f6b0
+// GLOBAL: CARMA2_CHEAT 0x0059b0a8
+tDrone_form_within_processing_distance_cbfn* gDrone_form_within_processing_distance_functions[4] = {
+    DroneCarWithinProcessingDistance,
+    DronePlaneWithinProcessingDistance,
+    DroneTrainWithinProcessingDistance,
+    DronePlaneWithinProcessingDistance,
+};
+
+// GLOBAL: CARMA2_HW 0x005947b0
+// GLOBAL: CARMA2_SW 0x0058f710
+// GLOBAL: CARMA2_CHEAT 0x0059b108
+int gSelected_drone_path_node_index = -1;
+
 // GLOBAL: CARMA2_HW 0x005947b4
 // GLOBAL: CARMA2_SW 0x0058f714
 // GLOBAL: CARMA2_CHEAT 0x0059b10c
 int gSelected_edit_drone_path = -1;
+
+// GLOBAL: CARMA2_HW 0x005947b8
+// GLOBAL: CARMA2_SW 0x0058f718
+// GLOBAL: CARMA2_CHEAT 0x0059b110
+int gSelected_drone_path_index = -1;
+
+// GLOBAL: CARMA2_HW 0x006820cc
+// GLOBAL: CARMA2_SW 0x0067c80c
+// GLOBAL: CARMA2_CHEAT 0x00689974
+tU32 gNext_drone_edit_path_munge;
 
 // GLOBAL: CARMA2_HW 0x00684518
 // GLOBAL: CARMA2_SW 0x0067ec58
@@ -487,6 +522,10 @@ inline void C2_HOOK_FASTCALL StopRenderingThisDrone(tDrone_spec* pDrone) {
     }
 }
 
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
 // FUNCTION: CARMA2_HW 0x00451710
 // FUNCTION: CARMA2_SW 0x004514a0
 // FUNCTION: CARMA2_CHEAT 0x00451c60
@@ -523,6 +562,10 @@ void C2_HOOK_FASTCALL StartRenderingThisDrone(tDrone_spec* pDrone) {
         }
     }
 }
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // FUNCTION: CARMA2_HW 0x004518e0
 // FUNCTION: CARMA2_SW 0x00451670
@@ -608,7 +651,34 @@ void C2_HOOK_FASTCALL CalcRenderBoundsCentre(void) {
     BrVector3Add(&gRender_bounds_centre, &direction, (br_vector3*)gCamera_to_world.m[3]);
 }
 
-// DoDroneDistanceChecks
+inline void C2_HOOK_FASTCALL DoDroneDistanceChecks(tDrone_spec* pDrone) {
+    int within_distance;
+
+    if (pDrone->actor->t.t.translate.t.v[1] < gTrack_drone_min_y - 50.0f) {
+        NewDroneState(pDrone, 5);
+    } else {
+        CalcRenderBoundsCentre();
+        within_distance = gDrone_form_within_rendering_distance_functions[pDrone->form->type](&pDrone->actor->t.t.translate.t);
+        pDrone->field_0x45 = within_distance;
+        if (!pDrone->field_0x45) {
+            if ((pDrone->form->flags & 0x4) || gDrone_form_within_processing_distance_functions[pDrone->form->type](&pDrone->actor->t.t.translate.t)) {
+                within_distance = 1;
+            } else {
+                within_distance = 0;
+            }
+        }
+        if (!within_distance) {
+            StopProcessingThisDrone(pDrone, 0);
+        } else if (!pDrone->field_0x45 || gFirst_drone_processing) {
+            StartProcessingThisDrone(pDrone);
+        }
+        if (pDrone->field_0x45) {
+            StartRenderingThisDrone(pDrone);
+        } else {
+            StopRenderingThisDrone(pDrone);
+        }
+    }
+}
 
 // DoDroneFunkyGroovyThings
 
@@ -855,11 +925,24 @@ void C2_HOOK_FASTCALL DronePreCollisionStuff(void) {
     gFrame++;
 }
 
-// STUB: CARMA2_HW 0x004512f0
-// STUB: CARMA2_SW 0x00451080
-// STUB: CARMA2_CHEAT 0x00451840
+// FUNCTION: CARMA2_HW 0x004512f0
+// FUNCTION: CARMA2_SW 0x00451080
+// FUNCTION: CARMA2_CHEAT 0x00451840
 void C2_HOOK_FASTCALL DoDronePerGameFrameStuff(void) {
-    NOT_IMPLEMENTED();
+    int i;
+
+    UpdateEditModels();
+    gINT_006844fc = 0;
+    gINT_006820d4 = 0;
+    if (gDrones_unmodified) {
+        for (i = 0; i < gCount_drones; i++) {
+            DoDroneDistanceChecks(&gDrone_specs[i]);
+            if (gDrone_specs[i].current_state != 5) {
+                ProcessThisDrone(i);
+            }
+            DoNotDprintf_drone("FINISHED processing Drone %d, state %d", gDrone_specs[i].id, gDrone_specs[i].current_state);
+        }
+    }
 }
 
 #ifdef REC2_MATCHING
@@ -1195,7 +1278,24 @@ int C2_HOOK_FASTCALL InitialiseEditModelsEtc(void) {
     return 1;
 }
 
-// UpdateEditModels
+inline void C2_HOOK_FASTCALL UpdateEditModels(void) {
+
+    if (gDrone_path_model_actor != NULL && gElasticatey_drone_path_model != NULL && gDrone_paths_elasticating && gSelected_drone_path_node_index >= 0) {
+        MakeAISimpleEditSectionHere(gElasticatey_drone_path_model, 0, 0, &gDrone_path_nodes[gSelected_drone_path_node_index].position, &gProgram_state.current_car.car_master_actor->t.t.translate.t, gMat_dk_grn, gMat_lt_grn);
+        BrModelUpdate(gElasticatey_drone_path_model, BR_MODU_ALL);
+    }
+    if (gSelected_edit_drone_path >= 0 && gTime_stamp_for_this_munging > gNext_drone_edit_path_munge) {
+        gSelected_edit_drone_path = -1;
+        InitialiseEditModelsEtc();
+    }
+    if (gSelected_drone_path_index >= 0) {
+        if (gTime_stamp_for_this_munging % 1000 > 700) {
+            gDrone_specs[gSelected_drone_path_index].actor->render_style = BR_RSTYLE_BOUNDING_FACES;
+        } else {
+            gDrone_specs[gSelected_drone_path_index].actor->render_style = BR_RSTYLE_FACES;
+        }
+    }
+}
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)

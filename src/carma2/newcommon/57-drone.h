@@ -34,6 +34,11 @@ extern int gDrone_paths_elasticating;
 extern int gStatic_drone_path_model_max_vertices;
 extern int gStatic_drone_path_model_max_faces;
 extern int gSelected_edit_drone_path;
+extern tDrone_form_within_rendering_distance_cbfn* gDrone_form_within_rendering_distance_functions[4];
+extern tDrone_form_within_processing_distance_cbfn* gDrone_form_within_processing_distance_functions[4];
+extern int gSelected_drone_path_node_index;
+extern int gSelected_drone_path_index;
+extern tU32 gNext_drone_edit_path_munge;
 extern int gCount_drones;
 extern int gCurrent_selected_drone;
 
@@ -137,7 +142,7 @@ extern int C2_HOOK_FASTCALL DroneTrainWithinProcessingDistance(const br_vector3*
 
 extern void C2_HOOK_FASTCALL CalcRenderBoundsCentre(void);
 
-// DoDroneDistanceChecks
+extern void C2_HOOK_FASTCALL DoDroneDistanceChecks(tDrone_spec* pDrone);
 
 // DoDroneFunkyGroovyThings
 
@@ -219,7 +224,7 @@ extern void C2_HOOK_FASTCALL CalcNFacesAndVerticesInEditModel(int* pCount_faces,
 
 extern int C2_HOOK_FASTCALL InitialiseEditModelsEtc(void);
 
-// UpdateEditModels
+extern void C2_HOOK_FASTCALL UpdateEditModels(void);
 
 extern void C2_HOOK_FASTCALL WriteOutDronePaths(void);
 
