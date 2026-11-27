@@ -285,9 +285,67 @@ void C2_HOOK_FASTCALL StationarySphereSphereCollide(const br_vector3* pPoint, co
 
 // SphereSphereCollide
 
-// StationarySphereEdgeCollide
+// FUNCTION: CARMA2_HW 0x0045dea0
+// FUNCTION: CARMA2_SW 0x0045d8e0
+// FUNCTION: CARMA2_CHEAT 0x0045e310
+void C2_HOOK_FASTCALL StationarySphereEdgeCollide(br_vector3* pEdge_start, br_vector3* pEdge_end, br_vector3* pEdge_direction, br_scalar pEdge_length_squared, br_vector3* pSphere_end, tCollision_shape_sphere_data* pSphere, br_vector3* pPoint, br_vector3* pNormal, br_scalar* pT) {
+    br_vector3 tv;
+    br_scalar ratio;
+    br_scalar length_squared;
+    br_scalar length;
 
-// PointSphereCollision
+    BrVector3Sub(&tv, pSphere_end, pEdge_start);
+    ratio = BrVector3Dot(&tv, pEdge_direction) / pEdge_length_squared;
+    if (ratio <= 0.0f) {
+        BrVector3Copy(pPoint, pEdge_start);
+    } else if (ratio >= 1.0f) {
+        BrVector3Copy(pPoint, pEdge_end);
+    } else {
+        BrVector3Scale(pPoint, pEdge_direction, ratio);
+        BrVector3Accumulate(pPoint, pEdge_start);
+    }
+    BrVector3Sub(pNormal, pPoint, pSphere_end);
+    length_squared = BrVector3LengthSquared(pNormal);
+    if (length_squared > pSphere->radius_squared
+            && length_squared < pSphere->radius_squared + (pSphere->radius * 0.002f) * 2.0f) {
+        length = (br_scalar)sqrt(length_squared);
+        *pT = 1.f;
+        pNormal->v[0] /= length;
+        pNormal->v[1] /= length;
+        pNormal->v[2] /= length;
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x0045e020
+// FUNCTION: CARMA2_SW 0x0045da60
+// FUNCTION: CARMA2_CHEAT 0x0045e490
+void C2_HOOK_FASTCALL PointSphereCollision(br_vector3* pVertex, br_vector3* pSphere_start, br_vector3* pSphere_end, br_vector3* pSphere_direction, tCollision_shape_sphere_data* pSphere, br_vector3* pPoint, br_vector3* pNormal, br_scalar* pT) {
+    br_vector3 delta;
+    br_vector3 position;
+    br_vector3 normal;
+    br_scalar direction_squared;
+    br_scalar projection;
+    br_scalar distance_squared;
+    br_scalar time;
+
+    BrVector3Sub(&delta, pVertex, pSphere_start);
+    direction_squared = BrVector3LengthSquared(pSphere_direction);
+    projection = BrVector3Dot(pSphere_direction, &delta) / direction_squared;
+    distance_squared = BrVector3LengthSquared(&delta) - (projection * projection) * direction_squared;
+    if (distance_squared > pSphere->radius_squared) {
+        return;
+    }
+    time = projection - (br_scalar)sqrt((pSphere->radius_squared - distance_squared) / direction_squared);
+    if (time < 0.0f || time > 1.0f) {
+        return;
+    }
+    BrVector3Copy(pPoint, pVertex);
+    BrVector3Scale(&position, pSphere_direction, time);
+    BrVector3Accumulate(&position, pSphere_start);
+    BrVector3Sub(&normal, pVertex, &position);
+    BrVector3Normalise(pNormal, &normal);
+    *pT = time;
+}
 
 // STUB: CARMA2_HW 0x0045d920
 // STUB: CARMA2_SW 0x0045d360
