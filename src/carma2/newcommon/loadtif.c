@@ -25,6 +25,7 @@
 #include <sys/stat.h>
 
 // FUNCTION: CARMA2_HW 0x00485590
+// FUNCTION: CARMA2_SW 0x004826d0
 // FUNCTION: CARMA2_CHEAT 0x004858b0
 br_pixelmap* C2_HOOK_FASTCALL CreatePalettePixelmapFromRGBChannels(br_uint_16* pRed_channel, br_uint_16* pGrn_channel, br_uint_16* pBlu_channel, int pRGB555) {
     br_pixelmap* pm;
@@ -382,8 +383,8 @@ br_pixelmap* C2_HOOK_FASTCALL LoadTiff8bit(const char *pPath, int pFlags, int *p
     br_uint_32 width;
     br_uint_16 samples_per_pixel;
     br_uint_8* scanline_buffer;
-    br_uint_8* curSrcPos;
     br_uint_32 x;
+    br_uint_8* pixels;
     br_uint_32 y;
     br_uint_16* colorMap_Red;
     br_uint_16* colorMap_Green;
@@ -396,19 +397,22 @@ br_pixelmap* C2_HOOK_FASTCALL LoadTiff8bit(const char *pPath, int pFlags, int *p
     }
     TIFFGetField(tif, TIFFTAG_IMAGELENGTH, &height);
     TIFFGetField(tif, TIFFTAG_IMAGEWIDTH, &width);
-    TIFFGetField(tif, TIFFTAG_SAMPLESPERPIXEL, &samples_per_pixel);
+    TIFFGetFieldDefaulted(tif, TIFFTAG_SAMPLESPERPIXEL, &samples_per_pixel);
     pm = BrPixelmapAllocate(BR_PMT_INDEX_8, width, height, NULL, 0);
     if (pm == NULL) {
         TIFFClose(tif);
         *pError_code = 2;
         return NULL;
     }
+    pixels = pm->pixels;
     if (samples_per_pixel == 1) {
         for (y = 0; y < height; y++) {
-            TIFFReadScanline(tif, (br_uint_8*)pm->pixels + y * pm->row_bytes, y, 0);
+            if (TIFFReadScanline(tif, pixels + y * pm->row_bytes, y, 0) <= 0) {
+                break;
+            }
         }
     } else {
-        scanline_buffer = malloc(TIFFScanlineSize(tif));
+        scanline_buffer = _TIFFmalloc(TIFFScanlineSize(tif));
         if (scanline_buffer == NULL) {
             TIFFClose(tif);
             BrPixelmapFree(pm);
@@ -416,22 +420,16 @@ br_pixelmap* C2_HOOK_FASTCALL LoadTiff8bit(const char *pPath, int pFlags, int *p
             return NULL;
         }
         for (y = 0; y < height; y++) {
-            if (TIFFReadScanline(tif, scanline_buffer, y, 0) < 1) {
+            if (TIFFReadScanline(tif, scanline_buffer, y, 0) <= 0) {
                 break;
             }
-            curSrcPos = scanline_buffer;
             for (x = 0; x < width; x++) {
-                if (curSrcPos[1] < 0x80) {
-                    *(((br_uint_8 *) pm->pixels) + y * pm->row_bytes + x) = 0;
-                } else {
-                    *(((br_uint_8 *) pm->pixels) + y * pm->row_bytes + x) = curSrcPos[0];
-                }
-                curSrcPos += samples_per_pixel;
+                pixels[y * pm->row_bytes + x] = (scanline_buffer[x * samples_per_pixel + 1] < 0x80) ? 0 : scanline_buffer[x * samples_per_pixel];
             }
         }
-        free(scanline_buffer);
+        _TIFFfree(scanline_buffer);
     }
-    if (y < height) {
+    if (y != height) {
         TIFFClose(tif);
         BrPixelmapFree(pm);
         *pError_code = 4;
@@ -458,17 +456,18 @@ br_pixelmap* C2_HOOK_FASTCALL LoadTiff8bit(const char *pPath, int pFlags, int *p
 br_pixelmap* C2_HOOK_FASTCALL LoadTiff16bit(const char *pPath, int pFlags, int *pError_code) {
     TIFF* tif;
     br_pixelmap* pm;
-    br_uint_8 pixel_type;
+    int pixel_type;
     br_uint_32 height;
     br_uint_32 width;
     br_uint_16 samples_per_pixel;
     br_uint_8* scanline_buffer;
+    br_uint_16* pixels;
     br_uint_32 x;
     br_uint_32 y;
-    br_uint_8 red;
-    br_uint_8 grn;
-    br_uint_8 blu;
-    br_uint_8 alp;
+    br_uint_32 red;
+    br_uint_32 grn;
+    br_uint_32 blu;
+    br_uint_32 alp;
 
     tif = TIFFOpen(pPath, "r");
     if (tif == NULL) {
@@ -493,6 +492,7 @@ br_pixelmap* C2_HOOK_FASTCALL LoadTiff16bit(const char *pPath, int pFlags, int *
         *pError_code = 2;
         return NULL;
     }
+    pixels = pm->pixels;
     scanline_buffer = _TIFFmalloc(TIFFScanlineSize(tif));
     if (scanline_buffer == NULL) {
         TIFFClose(tif);
@@ -502,34 +502,28 @@ br_pixelmap* C2_HOOK_FASTCALL LoadTiff16bit(const char *pPath, int pFlags, int *
     }
 
     for (y = 0; y < height && TIFFReadScanline(tif, scanline_buffer, y, 0) > 0; y++) {
-
         if (samples_per_pixel == 3) {
-            // RGB888 -> RGB565
             for (x = 0; x < width; x++) {
-                red = scanline_buffer[3 * x + 0];
-                grn = scanline_buffer[3 * x + 1];
-                blu = scanline_buffer[3 * x + 2];
-
-                *((br_uint_16*)((br_uint_8*)pm->pixels + y * pm->row_bytes + sizeof(br_uint_16) * x)) = ((red >> 3) << 11) | ((grn >> 2) << 5) | (blu >> 3);
+                red = scanline_buffer[3 * x + 0] >> 3;
+                grn = scanline_buffer[3 * x + 1] >> 2;
+                blu = scanline_buffer[3 * x + 2] >> 3;
+                pixels[(y * (int)pm->row_bytes >> 1) + x] = (red * 0x40 | grn) * 0x20 | blu;
             }
-        }
-        else if (pFlags & kLoadTextureFlags_UseARGB1555) {
-            // RGBA8888 -> ARGB1555
+        } else if (pFlags & kLoadTextureFlags_UseARGB1555) {
             for (x = 0; x < width; x++) {
-                red = scanline_buffer[4 * x + 0];
-                grn = scanline_buffer[4 * x + 1];
-                blu = scanline_buffer[4 * x + 2];
-                alp = scanline_buffer[4 * x + 3];
-                *((br_uint_16*)((br_uint_8*)pm->pixels + y * pm->row_bytes + sizeof(br_uint_16) * x)) = ((alp >= 0x80) << 15) | ((red >> 3) << 10) | ((grn >> 3) << 5) | (blu >> 3);
+                red = scanline_buffer[4 * x + 0] >> 3;
+                grn = scanline_buffer[4 * x + 1] >> 3;
+                blu = scanline_buffer[4 * x + 2] >> 3;
+                alp = scanline_buffer[4 * x + 3] >= 0x80;
+                pixels[(y * (int)pm->row_bytes >> 1) + x] = ((alp * 0x20 | red) * 0x20 | grn) * 0x20 | blu;
             }
         } else {
-            // RGBA8888 -> ARGB4444
             for (x = 0; x < width; x++) {
-                red = scanline_buffer[4 * x + 0];
-                grn = scanline_buffer[4 * x + 1];
-                blu = scanline_buffer[4 * x + 2];
-                alp = scanline_buffer[4 * x + 3];
-                *((br_uint_16*)((br_uint_8*)pm->pixels + y * pm->row_bytes + sizeof(br_uint_16) * x)) = ((alp >> 4) << 12) | ((red >> 4) << 8) | ((grn >> 4) << 4) | (blu >> 4);
+                red = scanline_buffer[4 * x + 0] >> 4;
+                grn = scanline_buffer[4 * x + 1] >> 4;
+                blu = scanline_buffer[4 * x + 2] >> 4;
+                alp = scanline_buffer[4 * x + 3] >> 4;
+                pixels[(y * (int)pm->row_bytes >> 1) + x] = ((alp * 0x10 | red) * 0x10 | grn) * 0x10 | blu;
             }
         }
     }

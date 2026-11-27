@@ -1,4 +1,5 @@
 address,type,name
+0x00549cda,library,TIFFOpen
 0x00549dcb,library,_TIFFmalloc
 0x00549de2,library,_TIFFfree
 0x00549f20,library,TIFFReadScanline
