@@ -157,7 +157,7 @@ br_matrix34* C2_HOOK_CDECL BrQuatToMatrix34(br_matrix34* mat, const br_quat* q) 
 
 // FUNCTION: CARMA2_HW 0x00535ae0
 // FUNCTION: CARMA2_SW 0x00531180
-// FUNCTION: CARMA2_cHEAT 0x0053b6d0
+// FUNCTION: CARMA2_CHEAT 0x0053b6d0
 br_quat* C2_HOOK_CDECL BrMatrix34ToQuat(br_quat* q, const br_matrix34* mat) {
     br_scalar tr;
     br_scalar s;

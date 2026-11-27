@@ -183,7 +183,7 @@ const char* gSound_generator_type_names[3] = {
 
 // GLOBAL: CARMA2_HW 0x00655dd8
 // GLOBAL: CARMA2_SW 0x00650cc0
-// GLOBAL: CARMA2_cHEAT 0x0065c658
+// GLOBAL: CARMA2_CHEAT 0x0065c658
 int gVirgin_pass = 1;
 
 // GLOBAL: CARMA2_HW 0x00595c4c
