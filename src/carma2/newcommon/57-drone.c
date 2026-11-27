@@ -942,7 +942,8 @@ void C2_HOOK_FASTCALL LoadPanGameDroneInfo(void) {
 // FUNCTION: CARMA2_HW 0x0044f700
 // FUNCTION: CARMA2_SW 0x0044f4a0
 // FUNCTION: CARMA2_CHEAT 0x0044fc50
-void C2_HOOK_FASTCALL InitDrones(void) {
+void C2_HOOK_FASTCALL InitDrones(tRace_info* pRace_info) {
+    /* FIXME: InitialiseAIWorldForRace passes pRace_info in ecx; the Mac version has no parameter */
     int i;
 
     gDrones_unmodified = 1;

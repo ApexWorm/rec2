@@ -95,7 +95,7 @@ void C2_HOOK_FASTCALL InitialiseAIWorldForRace(tRace_info* pRace_info) {
     PrintMemoryDump(0, "BEFORE InitOpponents()");
     InitOpponents(pRace_info);
     PrintMemoryDump(0, "AFTER InitOpponents(), BEFORE InitDrones()");
-    InitDrones();
+    InitDrones(pRace_info);
     PrintMemoryDump(0, "AFTER InitDrones()");
 }
 
