@@ -16,6 +16,8 @@ extern int gAnimalsOn;
 extern int gFlameThrowerOn;
 extern int gExplosives_on;
 extern int gGoreLevel;
+
+extern float gPed_tumble_spin;
 extern const char* gForm_non_humanoid_names[1];
 extern int gGhost_pedestrians;
 
@@ -185,7 +187,7 @@ extern int C2_HOOK_FASTCALL DamagePedestrian(tPedestrian* pPed, int pDamage, int
 
 // BastardIt
 
-// MungeProxRay
+extern int C2_HOOK_FASTCALL MungeProxRay(tPedestrian* pPed, tPhysics_object* pObject, float pDistance_squared, tU32 pTime);
 
 // DoToPeds
 
@@ -207,21 +209,21 @@ extern int C2_HOOK_FASTCALL DamagePedestrian(tPedestrian* pPed, int pDamage, int
 
 // MungeNapalm
 
-// PedHeadingTowardsCollisionObject
+extern int C2_HOOK_FASTCALL PedHeadingTowardsCollisionObject(tPedestrian* pPed, tPhysics_object** pObject, float* pDistance_squared, br_vector3* pPos, tU32 pTime);
 
 extern int C2_HOOK_FASTCALL OutsideFaceXZ(const br_vector3* pPos, const tFace_ref* pFace);
 
-// RescanPedProximity
+extern br_scalar C2_HOOK_FASTCALL RescanPedProximity(tPedestrian* pPed, const br_vector3* pDir);
 
 extern tPed_face_cache_0x34* C2_HOOK_FASTCALL RecacheAndSetFace(tPedestrian* pPed, int* pOn_face, int* pFace_changed, br_vector3* pPos, int pForce, tU32 pTime);
 
-// PedScanForObjects
+extern void C2_HOOK_FASTCALL PedScanForObjects(tPedestrian* pPed, tU32 pTime);
 
-// CatAndMouseBonus
+extern void C2_HOOK_FASTCALL CatAndMouseBonus(tPedestrian* pPed);
 
-// StillifyCorpse
+extern void C2_HOOK_FASTCALL StillifyCorpse(tPedestrian* pPed, tU32 pTime, int pArg3);
 
-// StraightenOutPed
+extern void C2_HOOK_FASTCALL StraightenOutPed(tPedestrian* pPed, tU32 pTime);
 
 extern int C2_HOOK_FASTCALL ActiveHalted(tPed_character_instance* pCharacter, tPhysics_object* pObject, tFace_ref* pFace);
 

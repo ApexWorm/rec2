@@ -21,6 +21,8 @@ extern int gPed_severing_damage;
 extern tSlick_spec gPed_slick;
 extern int gPed_spurting_period;
 extern br_material* gPed_smear_material;
+
+extern float gPed_cos_max_slope;
 extern tExplosion_animation gPed_explosion_small_blood_cloud;
 extern tExplosion_animation gPed_medium_blood_cloud;
 extern tExplosion_animation gPed_large_blood_cloud;
@@ -53,6 +55,10 @@ extern br_material* gPed_slick_material;
 extern br_material* gNapalm_bolt_materials[7];
 extern br_model* gNapalm_bolt_models[7];
 extern const char* gNapalm_bolt_texture_names[7];
+
+extern const tU16 gPed_plane_tested_bits[8];
+
+extern const tU16 gPed_plane_side_bits[8];
 extern int gCount_changed_points;
 extern br_vector3 gChanged_points[10];
 extern int gPed_dismember_spurting_member_count;
@@ -61,6 +67,8 @@ extern tTWTVFS gTwtPeds;
 extern tU32 gDAT_006a0418;
 extern tPedestrian* gPTR_00694120;
 extern int gPed_points[3];
+
+extern tPed_vertex_side_cache gPed_vertex_side_caches[16];
 extern int gPed_score_multiplier;
 extern int gPed_recent_points;
 extern float gMutant_speed;

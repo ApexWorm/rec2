@@ -301,7 +301,7 @@ typedef struct tPedestrian {
     tRace_ped_exclusion_spec* exclusion_spec;
     br_vector3 pos;
     tU32 field_0x28;
-    undefined field_0x2c[0x30 - 0x2c];
+    tU32 field_0x2c;
     tU32 field_0x30;
     undefined field_0x34[0x4c - 0x34];
     float speed_factor;
@@ -376,7 +376,7 @@ typedef struct tPed_cache_006944c0 {
     tPed_face_cache_0x34* field_0xb0;
     tPedestrian* field_0xb4;
     float field_0xb8;
-    undefined field_0xbc[0x4];
+    float field_0xbc;
     tCar_spec* field_0xc0;
     int field_0xc4;
     tS16 field_0xc8;
@@ -4830,6 +4830,17 @@ typedef struct tPed_face_cache_0x34 {
 } tPed_face_cache_0x34;
 
 typedef struct {
+    br_vector3 normal;
+    br_scalar d;
+} tPed_proximity_plane;
+
+typedef struct {
+    br_model* model;
+    int group;
+    tU16 vertex_sides[512];
+} tPed_vertex_side_cache;
+
+typedef struct {
     tU8 flags;
     tU8 max_count;
     tU8 model_count;
@@ -5307,7 +5318,7 @@ typedef struct tFace_ref {
     br_scalar d;
     br_actor* a;
     tS16 g;
-    tS16 f;
+    tU16 f;
 } tFace_ref;
 
 typedef struct {

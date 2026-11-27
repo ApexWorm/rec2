@@ -93,6 +93,11 @@ int gPed_spurting_period;
 // GLOBAL: CARMA2_CHEAT 0x0069bfd8
 br_material* gPed_smear_material;
 
+// GLOBAL: CARMA2_HW 0x00694464
+// GLOBAL: CARMA2_SW 0x0068e4bc
+// GLOBAL: CARMA2_CHEAT 0x0069bfdc
+float gPed_cos_max_slope;
+
 // GLOBAL: CARMA2_HW 0x00694478
 // GLOBAL: CARMA2_SW 0x0068e4d0
 // GLOBAL: CARMA2_CHEAT 0x0069bff0
@@ -383,6 +388,20 @@ const char* gNapalm_bolt_texture_names[7] = {
     "Ex00006",
 };
 
+// GLOBAL: CARMA2_HW 0x0065e5d8
+// GLOBAL: CARMA2_SW 0x00658f10
+// GLOBAL: CARMA2_CHEAT 0x00665c90
+const tU16 gPed_plane_tested_bits[8] = {
+    0x1, 0x2, 0x4, 0x8, 0x10, 0x20, 0x40, 0x80,
+};
+
+// GLOBAL: CARMA2_HW 0x0065e5e8
+// GLOBAL: CARMA2_SW 0x00658f20
+// GLOBAL: CARMA2_CHEAT 0x00665ca0
+const tU16 gPed_plane_side_bits[8] = {
+    0x100, 0x200, 0x400, 0x800, 0x1000, 0x2000, 0x4000, 0x8000,
+};
+
 // GLOBAL: CARMA2_HW 0x0069412c
 // GLOBAL: CARMA2_SW 0x0068e184
 // GLOBAL: CARMA2_CHEAT 0x0069bca4
@@ -432,6 +451,11 @@ int gPed_score_multiplier;
 // GLOBAL: CARMA2_SW 0x00695d50
 // GLOBAL: CARMA2_CHEAT 0x006a3870
 int gPed_points[3];
+
+// GLOBAL: CARMA2_HW 0x0069bd08
+// GLOBAL: CARMA2_SW 0x00695d60
+// GLOBAL: CARMA2_CHEAT 0x006a3880
+tPed_vertex_side_cache gPed_vertex_side_caches[16];
 
 // GLOBAL: CARMA2_HW 0x006a0418
 // GLOBAL: CARMA2_SW 0x0069a470
