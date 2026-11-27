@@ -9,7 +9,9 @@
 #include "28-world3.h"
 
 #include "08-loading1.h"
+#include "33-depth.h"
 #include "37-brucetrk.h"
+#include "38-flicplay.h"
 #include "41-utility.h"
 #include "51-smash.h"
 #include "52-errors.h"
@@ -53,6 +55,21 @@ br_model* gDuplicate_model;
 // GLOBAL: CARMA2_SW 0x0065b62c
 // GLOBAL: CARMA2_CHEAT 0x00668500
 tRendererShadingType gMaterial_shading_for_callback = kRendererShadingType_Undefined;
+
+// GLOBAL: CARMA2_HW 0x006aaf40
+// GLOBAL: CARMA2_SW 0x006a4990
+// GLOBAL: CARMA2_CHEAT 0x006b25d8
+tU8* gTrack_flic_buffer;
+
+// GLOBAL: CARMA2_HW 0x006aaf48
+// GLOBAL: CARMA2_SW 0x006a4998
+// GLOBAL: CARMA2_CHEAT 0x006b25dc
+tU32 gTrack_flic_buffer_size;
+
+// GLOBAL: CARMA2_HW 0x006aaf50
+// GLOBAL: CARMA2_SW 0x006a49a0
+// GLOBAL: CARMA2_CHEAT 0x006b25e0
+tFlic_descriptor gTrack_flic_descriptor;
 
 // FUNCTION: CARMA2_HW 0x00504b30
 // FUNCTION: CARMA2_SW 0x005002f0
@@ -138,7 +155,42 @@ void C2_HOOK_FASTCALL ProcessTrack(br_actor* pWorld, tTrack_spec* pTrack_spec, b
     }
 }
 
-// AnimateSky
+// FUNCTION: CARMA2_HW 0x00506e80
+// FUNCTION: CARMA2_SW 0x005022d0
+// FUNCTION: CARMA2_CHEAT 0x0050c870
+void C2_HOOK_FASTCALL AnimateSky(void) {
+    // GLOBAL: CARMA2_HW 0x006aafc0
+    // GLOBAL: CARMA2_SW 0x006a4a10
+    // GLOBAL: CARMA2_CHEAT 0x006b2650
+    static int last_sky_time;
+    int i;
+    int now;
+    int then;
+    int frames;
+
+    then = GetTotalTime();
+    if (gTrack_flic_buffer == NULL) {
+        return;
+    }
+    now = then;
+    if (then < last_sky_time) {
+        then = 2 * last_sky_time - then;
+    }
+    if (last_sky_time != 0) {
+        frames = ((then - last_sky_time) / gTrack_flic_descriptor.frame_period) % (gTrack_flic_descriptor.frames_left + gTrack_flic_descriptor.current_frame);
+    } else {
+        frames = 1;
+    }
+    for (i = 0; i < frames; i++) {
+        if (PlayNextFlicFrame(&gTrack_flic_descriptor)) {
+            EndFlic(&gTrack_flic_descriptor);
+            StartFlic(gTrack_flic_descriptor.file_name, -1, &gTrack_flic_descriptor, gTrack_flic_buffer_size, (tS8*)gTrack_flic_buffer, NULL, 0, 0, 0);
+            AssertFlicPixelmap(&gTrack_flic_descriptor, gProgram_state.default_depth_effect.sky_texture);
+        }
+        last_sky_time = now;
+        SkyTextureChanged();
+    }
+}
 
 // CombineBounds
 
