@@ -12,6 +12,7 @@
 #include "00-car.h"
 #include "08-loading1.h"
 #include "13-crush1.h"
+#include "20-skidmark.h"
 #include "23-piping.h"
 #include "26-oppoproc.h"
 #include "39-oil.h"
@@ -172,8 +173,14 @@ int gRoute_search_max_calls;
 // GLOBAL: CARMA2_CHEAT 0x00699154
 int gRoute_search_total_calls;
 
+// GLOBAL: CARMA2_HW 0x00691730
+// GLOBAL: CARMA2_SW 0x0068b788
+// GLOBAL: CARMA2_CHEAT 0x006990dc
+float gDefinite_cop_pursuit_speed;
+
 // GLOBAL: CARMA2_HW 0x00691734
 // GLOBAL: CARMA2_SW 0x0068b78c
+// GLOBAL: CARMA2_CHEAT 0x006990e0
 float gDefinite_no_cop_pursuit_speed;
 
 // GLOBAL: CARMA2_HW 0x00691738
@@ -183,6 +190,7 @@ int gFirst_frame;
 
 // GLOBAL: CARMA2_HW 0x00691748
 // GLOBAL: CARMA2_SW 0x0068b7a0
+// GLOBAL: CARMA2_CHEAT 0x006990f4
 float gCop_pursuit_speed_percentage_multiplier;
 
 // GLOBAL: CARMA2_HW 0x00691768
@@ -1245,6 +1253,16 @@ inline void C2_HOOK_FASTCALL ResetPredominantJobbies(void) {
     }
 }
 
+// FUNCTION: CARMA2_HW 0x004a95f0
+// FUNCTION: CARMA2_SW 0x004a5760
+// FUNCTION: CARMA2_CHEAT 0x004aa910
+void C2_HOOK_FASTCALL ChallengeOccurred(int pChallenger_index, int pAccepted) {
+
+    if (pAccepted) {
+        gChallenger_index__opponent = pChallenger_index;
+    }
+}
+
 // FUNCTION: CARMA2_HW 0x004a9600
 // FUNCTION: CARMA2_SW 0x004a5770
 // FUNCTION: CARMA2_CHEAT 0x004aa920
@@ -1392,6 +1410,70 @@ void C2_HOOK_FASTCALL InitOpponents(tRace_info* pRace_info) {
     ResetPredominantJobbies();
     gActive_car_list_rebuild_required = 1;
     RebuildActiveCarList();
+}
+
+// FUNCTION: CARMA2_HW 0x004ae380
+// FUNCTION: CARMA2_SW 0x004aa4f0
+// FUNCTION: CARMA2_CHEAT 0x004af890
+void C2_HOOK_FASTCALL FUN_004ae380(void) {
+    int i;
+
+    gNumber_of_cops_before_faffage = gProgram_state.AI_vehicles.number_of_cops;
+    gDefinite_no_cop_pursuit_speed = 17.8788f;
+    gDefinite_cop_pursuit_speed = 44.697f;
+    gCop_pursuit_speed_percentage_multiplier = 3.728811f;
+    for (i = 0; i < gProgram_state.AI_vehicles.number_of_cops; i++) {
+        PossibleService();
+        gProgram_state.AI_vehicles.cops[i].car_spec->car_ID = i + 0x300;
+        gProgram_state.AI_vehicles.cops[i].index = 98;
+        gProgram_state.AI_vehicles.cops[i].time_last_processed = gTime_stamp_for_this_munging;
+        gProgram_state.AI_vehicles.cops[i].time_this_objective_started = gTime_stamp_for_this_munging;
+        gProgram_state.AI_vehicles.cops[i].last_moved_ok = gTime_stamp_for_this_munging;
+        gProgram_state.AI_vehicles.cops[i].last_in_view = 0;
+        gProgram_state.AI_vehicles.cops[i].stun_time_ends = 0;
+        gProgram_state.AI_vehicles.cops[i].next_player_visibility_check = gTime_stamp_for_this_munging + IRandomBetween(0, 900) + 5000;
+        gProgram_state.AI_vehicles.cops[i].next_out_of_world_check = gTime_stamp_for_this_munging + 500;
+        gProgram_state.AI_vehicles.cops[i].finished_for_this_race = 0;
+        gProgram_state.AI_vehicles.cops[i].physics_me = 1;
+        gProgram_state.AI_vehicles.cops[i].pursue_from_start = 0;
+        gProgram_state.AI_vehicles.cops[i].cheating = 0;
+        gProgram_state.AI_vehicles.cops[i].murder_reported = 0;
+        gProgram_state.AI_vehicles.cops[i].knackeredness_detected = 0;
+        gProgram_state.AI_vehicles.cops[i].players_section_when_last_calced_full_path = -1;
+        gProgram_state.AI_vehicles.cops[i].nnext_sections = 0;
+        gProgram_state.AI_vehicles.cops[i].new_objective_required = 1;
+        gProgram_state.AI_vehicles.cops[i].current_objective = eOOT_none;
+        gProgram_state.AI_vehicles.cops[i].has_moved_at_some_point = 0;
+        gProgram_state.AI_vehicles.cops[i].player_in_view_now = 0;
+        gProgram_state.AI_vehicles.cops[i].acknowledged_piv = 0;
+#ifdef REC2_FIX_BUGS
+        gProgram_state.AI_vehicles.cops[i].nastiness =
+#else
+        gProgram_state.AI_vehicles.opponents[i].nastiness =
+#endif
+            (float)((gCurrent_race.race_spec->opponent_nastiness_level - gProgram_state.skill_level * -0.5 - -2.25) * 0.3333333333333333 * gOpponent_nastyness_frigger);
+        BrVector3Copy(&gProgram_state.AI_vehicles.cops[i].start_pos, &gProgram_state.AI_vehicles.cop_start_points[i]);
+        BrVector3Copy(&gProgram_state.AI_vehicles.cops[i].start_direction, &gProgram_state.AI_vehicles.cop_start_vectors[i]);
+        BrVector3Set(&gProgram_state.AI_vehicles.cops[i].pos_last_frame, 0.0f, 0.0f, 0.0f);
+        gViewable_car_list[gNum_viewable_cars] = gProgram_state.AI_vehicles.cops[i].car_spec;
+        gNum_viewable_cars++;
+        gProgram_state.AI_vehicles.cops[i].car_spec->last_person_to_hit_us = NULL;
+        gProgram_state.AI_vehicles.cops[i].car_spec->last_person_we_hit = NULL;
+        gProgram_state.AI_vehicles.cops[i].car_spec->last_collision_time = 0;
+        gProgram_state.AI_vehicles.cops[i].car_spec->last_time_we_touched_a_player = 0;
+        gProgram_state.AI_vehicles.cops[i].car_spec->no_of_processes_recording_my_trail = 0;
+        gProgram_state.AI_vehicles.cops[i].car_spec->grudge_raised_recently = 1;
+        gOpponents[gProgram_state.AI_vehicles.cops[i].index].psyche.grudge_against_player = 10;
+        StunTheBugger(&gProgram_state.AI_vehicles.cops[i], 0xfffffff);
+    }
+    for (i = 0; i < gNumber_of_cops_before_faffage; i++) {
+        PossibleService();
+        BrVector3Copy(&gProgram_state.AI_vehicles.cops[i].car_spec->car_master_actor->t.t.translate.t, &gProgram_state.AI_vehicles.cop_start_points[i]);
+        PointActorAlongThisBloodyVector(gProgram_state.AI_vehicles.cops[i].car_spec->car_master_actor, &gProgram_state.AI_vehicles.cop_start_vectors[i]);
+        gProgram_state.AI_vehicles.cops[i].physics_me = 0;
+        RematerialiseOpponent(&gProgram_state.AI_vehicles.cops[i], 0.0f);
+        InitCarSkidStuff(gProgram_state.AI_vehicles.cops[i].car_spec);
+    }
 }
 
 // FUNCTION: CARMA2_HW 0x004ae5d0

@@ -44,6 +44,7 @@ extern int gNum_of_opponents_completing_race;
 extern int gRoute_search_attempts;
 extern int gRoute_search_max_calls;
 extern int gRoute_search_total_calls;
+extern float gDefinite_cop_pursuit_speed;
 extern float gDefinite_no_cop_pursuit_speed;
 extern int gFirst_frame;
 extern float gCop_pursuit_speed_percentage_multiplier;
@@ -183,6 +184,8 @@ extern int C2_HOOK_FASTCALL RematerialiseOpponent(tOpponent_spec* pOpponent_spec
 
 extern void C2_HOOK_FASTCALL ResetPredominantJobbies(void);
 
+extern void C2_HOOK_FASTCALL ChallengeOccurred(int pChallenger_index, int pAccepted);
+
 extern void C2_HOOK_FASTCALL LoadCopCars(tRace_info* pRace_info);
 
 extern void C2_HOOK_FASTCALL LoadInOppoPaths(FILE* pF);
@@ -192,6 +195,8 @@ extern void C2_HOOK_FASTCALL DisposeOpponentPaths(void);
 extern void C2_HOOK_FASTCALL MungeOpponents(tU32 pFrame_period);
 
 extern void C2_HOOK_FASTCALL InitOpponents(tRace_info* pRace_info);
+
+extern void C2_HOOK_FASTCALL FUN_004ae380(void);
 
 extern void C2_HOOK_FASTCALL DisposeOpponents(void);
 
