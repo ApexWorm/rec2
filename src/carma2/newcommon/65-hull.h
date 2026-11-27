@@ -49,9 +49,9 @@ typedef struct {
 extern tFUN_00421fd0* C2_HOOK_FASTCALL FUN_00421fd0(int pCount_points);
 #endif
 
-// AdjustEdges
+extern void C2_HOOK_FASTCALL AdjustEdges(tCollision_shape_polyhedron_data* pPolyhedron, tU8 pOld_index, tU8 pNew_index);
 
-// PointOnShape
+extern int C2_HOOK_FASTCALL PointOnShape(tCollision_shape_polyhedron_data* pPolyhedron, tU8 pIndex);
 
 extern tPhysicsError C2_HOOK_FASTCALL ConvexHull3D(tCollision_shape_polyhedron_data* pPolyhedron);
 

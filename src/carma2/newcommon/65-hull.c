@@ -167,7 +167,7 @@ tFUN_00421fd0* C2_HOOK_FASTCALL FUN_00421fd0(int pCount_points) {
 }
 #endif
 
-static void C2_HOOK_FASTCALL AdjustEdges(tCollision_shape_polyhedron_data* pPolyhedron, tU8 pOld_index, tU8 pNew_index) {
+inline void C2_HOOK_FASTCALL AdjustEdges(tCollision_shape_polyhedron_data* pPolyhedron, tU8 pOld_index, tU8 pNew_index) {
     int i;
 
     for (i = 0; i < pPolyhedron->count_edges; i++) {
@@ -179,7 +179,7 @@ static void C2_HOOK_FASTCALL AdjustEdges(tCollision_shape_polyhedron_data* pPoly
     }
 }
 
-static int C2_HOOK_FASTCALL PointOnShape(tCollision_shape_polyhedron_data* pPolyhedron, tU8 pIndex) {
+inline int C2_HOOK_FASTCALL PointOnShape(tCollision_shape_polyhedron_data* pPolyhedron, tU8 pIndex) {
     int i;
 
     for (i = 0; i < pPolyhedron->count_edges; i++) {
