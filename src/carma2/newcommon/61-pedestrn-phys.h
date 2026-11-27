@@ -193,7 +193,7 @@ extern int C2_HOOK_FASTCALL DamagePedestrian(tPedestrian* pPed, int pDamage, int
 
 // RepulseIt
 
-// DoPedestrianRepulsifictor
+extern int C2_HOOK_FASTCALL DoPedestrianRepulsifictor(tCar_spec* pCar, float pArg2, float pArg3, float pArg4, float pArg5);
 
 // CompileBurnableList
 

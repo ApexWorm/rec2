@@ -1424,7 +1424,12 @@ int C2_HOOK_FASTCALL DoPedAnnihilator(tCar_spec* pCar, float pRange_squared) {
 
 // RepulseIt
 
-// DoPedestrianRepulsifictor
+// STUB: CARMA2_HW 0x004ce280
+// STUB: CARMA2_SW 0x004ca980
+// STUB: CARMA2_CHEAT 0x004d3e10
+int C2_HOOK_FASTCALL DoPedestrianRepulsifictor(tCar_spec* pCar, float pArg2, float pArg3, float pArg4, float pArg5) {
+    NOT_IMPLEMENTED();
+}
 
 // CompileBurnableList
 

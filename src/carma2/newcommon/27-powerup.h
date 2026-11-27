@@ -296,11 +296,11 @@ extern int C2_HOOK_FASTCALL RepulseOpponents2(tPowerup* pPowerup, tCar_spec* pCa
 
 extern int C2_HOOK_FASTCALL RepulseOpponents(tPowerup* pPowerup, tCar_spec* pCar);
 
-// RepulsePedestrians
+extern int C2_HOOK_FASTCALL RepulsePedestrians(tPowerup* pPowerup, tCar_spec* pCar);
 
-// ReceivedRepulse
+extern void C2_HOOK_FASTCALL ReceivedRepulse(tNet_message_chunk* pContents);
 
-// ResetEngineFactor
+extern void C2_HOOK_FASTCALL ResetEngineFactor(tPowerup* pPowerup, tCar_spec* pCar);
 
 extern void C2_HOOK_FASTCALL ResetUnderwater(tPowerup* pPowerup, tCar_spec* pCar);
 

@@ -20,6 +20,7 @@
 #include "23-piping.h"
 #include "25-grafdata.h"
 #include "30-opponent.h"
+#include "30-opponent.h"
 #include "32-spark.h"
 #include "39-oil.h"
 #include "41-utility.h"
@@ -41,6 +42,7 @@
 #include "platform.h"
 #include "rec2_macros.h"
 
+#include "c2_math.h"
 #include "c2_stdio.h"
 #include "c2_string.h"
 
@@ -1786,11 +1788,80 @@ int C2_HOOK_FASTCALL KangerooJump(tPowerup* pPowerup, tCar_spec* pCar) {
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x004de1f0
-// STUB: CARMA2_SW 0x004da6f0
-// STUB: CARMA2_CHEAT 0x004e3db0
+// FUNCTION: CARMA2_HW 0x004de1f0
+// FUNCTION: CARMA2_SW 0x004da6f0
+// FUNCTION: CARMA2_CHEAT 0x004e3db0
 int C2_HOOK_FASTCALL RepulseOpponents2(tPowerup* pPowerup, tCar_spec* pCar, int pSend_message) {
-    NOT_IMPLEMENTED();
+    int cat;
+    int car_count;
+    int i;
+    int count;
+    tU32 the_time;
+    tCar_spec* car;
+    br_vector3 delta;
+    br_vector3 dir;
+    br_vector3 spin;
+    float dist;
+    float factor;
+    float spin_range;
+    tNet_message* the_message;
+
+    count = 0;
+    the_time = GetTotalTime();
+    for (cat = eVehicle_self; cat <= eVehicle_drone; cat++) {
+        if (cat == eVehicle_self) {
+            car_count = 1;
+        } else {
+            car_count = GetCarCount(cat);
+        }
+        for (i = 0; i < car_count; i++) {
+            if (cat == eVehicle_self) {
+                car = &gProgram_state.current_car;
+            } else {
+                car = GetCarSpec(cat, i);
+            }
+            if (pCar == car) {
+                continue;
+            }
+            BrVector3Sub(&delta, &car->pos, &pCar->pos);
+            dist = BrVector3Length(&delta);
+            if (dist < pPowerup->float_params[3]) {
+                count++;
+                if (gNet_mode != eNet_mode_client) {
+                    factor = (pPowerup->float_params[3] - dist) / pPowerup->float_params[3] / car->field_0x4c8;
+                    BrVector3Normalise(&dir, &delta);
+                    if (fabs(dir.v[1]) < 0.1) {
+                        dir.v[1] = pPowerup->float_params[1];
+                    }
+                    BrVector3Scale(&dir, &dir, (factor * pPowerup->float_params[0]));
+                    BrVector3Accumulate(&car->collision_info->v, &dir);
+                    spin_range = factor * pPowerup->float_params[2];
+                    BrVector3Set(&spin, FRandomPosNeg(spin_range), FRandomPosNeg(spin_range), FRandomPosNeg(spin_range));
+                    BrVector3Accumulate(&car->collision_info->omega, &spin);
+                    car->collision_info->disable_move_rotate = 0;
+                    car->collision_info->field_0x49c = gPHIL_last_physics_tick + 40;
+                    car->time_last_hit = PDGetTotalTime();
+                    car->last_hit_by = pCar;
+                }
+                NewRepulseRay(the_time, pCar, car, &pCar->pos, &car->pos, 0.06f, 0.12f);
+            }
+        }
+    }
+    if (gNet_mode != eNet_mode_none && pSend_message) {
+        the_message = NetBuildGuaranteedMessage(eNet_message_chunk_type_repulse, 0);
+        the_message->contents.repulse.player = gLocal_net_ID;
+        the_message->contents.repulse.powerup_index = pPowerup - gPowerup_array;
+        NetGuaranteedSendMessageToAllPlayers(gCurrent_net_game, the_message, NULL);
+    }
+    if (count != 0 && pCar != NULL && pCar->driver == eDriver_local_human) {
+        DRS3StartSound3D(gCar_outlet, 4900, &pCar->pos, &gZero_v__car, 1, 255, S3_FIXED_INT(1), S3_FIXED_INT(1));
+    }
+    if (count != 0) {
+        count = pPowerup - gPowerup_array;
+    } else {
+        count = -1;
+    }
+    return count;
 }
 
 #ifdef REC2_MATCHING
@@ -1805,11 +1876,41 @@ int C2_HOOK_FASTCALL RepulseOpponents(tPowerup* pPowerup, tCar_spec* pCar) {
     return RepulseOpponents2(pPowerup, pCar, 1);
 }
 
-// RepulsePedestrians
+// FUNCTION: CARMA2_HW 0x004de540
+// FUNCTION: CARMA2_SW 0x004daa40
+// FUNCTION: CARMA2_CHEAT 0x004e4100
+int C2_HOOK_FASTCALL RepulsePedestrians(tPowerup* pPowerup, tCar_spec* pCar) {
+    int result;
 
-// ReceivedRepulse
+    if (DoPedestrianRepulsifictor(pCar, pPowerup->float_params[0], pPowerup->float_params[2], pPowerup->float_params[1], pPowerup->float_params[3])) {
+        result = pPowerup - gPowerup_array;
+    } else {
+        result = -1;
+    }
+    if (result != -1) {
+        PlayExclusiveFFBEffect("Repulse", 0);
+    }
+    return result;
+}
 
-// ResetEngineFactor
+// FUNCTION: CARMA2_HW 0x004de5a0
+// FUNCTION: CARMA2_SW 0x004daaa0
+// FUNCTION: CARMA2_CHEAT 0x004e4160
+void C2_HOOK_FASTCALL ReceivedRepulse(tNet_message_chunk* pContents) {
+
+    RepulseOpponents2(&gPowerup_array[pContents->repulse.powerup_index], NetCarFromPlayerID(pContents->repulse.player), 0);
+}
+
+// FUNCTION: CARMA2_HW 0x004de5d0
+// FUNCTION: CARMA2_SW 0x004daad0
+// FUNCTION: CARMA2_CHEAT 0x004e4190
+void C2_HOOK_FASTCALL ResetEngineFactor(tPowerup* pPowerup, tCar_spec* pCar) {
+
+    StopExclusiveFFBEffect();
+    pCar->field_0x4d4 = 1.0f;
+    pCar->grip_multiplier = 1.0f;
+    SetCarSuspGiveAndHeight(pCar, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f);
+}
 
 // FUNCTION: CARMA2_HW 0x004de600
 // FUNCTION: CARMA2_SW 0x004dab00

@@ -5459,6 +5459,7 @@ typedef enum {
     eNet_message_chunk_type_gameplay = 0x1b,
     eNet_message_chunk_type_oil_spill = 0x1f,
     eNet_message_chunk_type_car_crush = 0x20,
+    eNet_message_chunk_type_repulse = 0x23,
     eNet_message_chunk_type_semi_detach_bit = 0x24,
     eNet_message_chunk_type_reattach_bit = 0x26,
     eNet_message_chunk_type_reattach_all_bits = 0x2b,
@@ -5687,6 +5688,13 @@ typedef struct {
     tU32 time;
 } tNet_message_chunk_recover;
 
+typedef struct {
+    tNet_message_chunk_header header;
+    undefined field_0x2[2];
+    tPlayer_ID player;
+    int powerup_index;
+} tNet_message_chunk_repulse;
+
 typedef union {
     tNet_message_chunk_raw raw;
     tNet_message_chunk_race_over race_over; /* type = 0xa */
@@ -5697,6 +5705,7 @@ typedef union {
     tNet_message_chunk_gameplay gameplay; /* type = 0x1b */
     tNet_message_chunk_oil_spill oil_spill; /* type = 0x1f*/
     tNet_message_car_crush car_crush; /* type = 0x20 */
+    tNet_message_chunk_repulse repulse; /* type = 0x23 */
     tNet_message_chunk_semi_detach_bit semi_detach_bit; /* type = 0x24 */
     tNet_message_chunk_reattach_bit reattach_bit; /* type = 0x26 */
     tNet_message_chunk_reattach_all_bits reattach_all_bits; /* type = 0x2b */
