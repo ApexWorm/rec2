@@ -1455,6 +1455,76 @@ void C2_HOOK_FASTCALL FreeConnotations(tConnotations* pConnotations, int pKeep_a
 
 // MungeSmashMaterialNames
 
+// FUNCTION: CARMA2_HW 0x004f0d50
+// FUNCTION: CARMA2_SW 0x004ec9b0
+// FUNCTION: CARMA2_CHEAT 0x004f69f0
+int C2_HOOK_FASTCALL PointInFace(br_vector3* pPoint, br_vector3* pNormal, br_scalar pD, br_vector3* pV0, br_vector3* pV1, br_vector3* pV2) {
+    br_scalar u2;
+    int axis;
+    int i1;
+    br_scalar det;
+    br_scalar u1;
+    br_scalar v2;
+    br_scalar v1;
+    int i0;
+    br_scalar alpha;
+    br_scalar u0;
+    br_scalar t;
+    br_vector3 p;
+    br_scalar beta;
+
+    t = BrVector3Dot(pNormal, pPoint) - pD;
+    if (fabs(t) > 0.5) {
+        return 0;
+    }
+    t = -t;
+    p.v[0] = (pNormal->v[0] * t) + pPoint->v[0];
+    p.v[1] = pNormal->v[1] * t + pPoint->v[1];
+    p.v[2] = (pNormal->v[2] * t) + pPoint->v[2];
+    axis = 0;
+    if (fabs(pNormal->v[0]) < fabs(pNormal->v[1])) {
+        axis = 1;
+    }
+    if (fabs(pNormal->v[axis]) < fabs(pNormal->v[2])) {
+        axis = 2;
+    }
+    switch (axis) {
+    case 0:
+        i0 = 1;
+        i1 = 2;
+        break;
+    case 1:
+        i0 = 0;
+        i1 = 2;
+        break;
+    case 2:
+        i0 = 0;
+        i1 = 1;
+        break;
+    }
+    v1 = pV1->v[i1] - pV0->v[i1];
+    u2 = pV2->v[i0] - pV0->v[i0];
+    t = p.v[i1] - pV0->v[i1];
+    v2 = pV2->v[i1] - pV0->v[i1];
+    u1 = pV1->v[i0] - pV0->v[i0];
+    u0 = p.v[i0] - pV0->v[i0];
+    if (fabs(u1) <= 2.384185791015625e-07) {
+        beta = u0 / u2;
+        alpha = (t - beta * v2) / v1;
+    } else {
+        det = (v2 * u1) - u2 * v1;
+        if (0.0 == det) {
+            return 0;
+        }
+        beta = ((t * u1) - u0 * v1) / det;
+        alpha = (u0 - beta * u2) / u1;
+    }
+    if (alpha >= -0.0001 && beta >= -0.0001 && alpha + beta <= 1.0001) {
+        return 1;
+    }
+    return 0;
+}
+
 // ExtrapolateTextureCoordinates
 
 #ifdef REC2_MATCHING
