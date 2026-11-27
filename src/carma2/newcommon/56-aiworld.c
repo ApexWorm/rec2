@@ -80,7 +80,7 @@ void C2_HOOK_FASTCALL InitialiseAIWorldForRace(tRace_info* pRace_info) {
         gTime_stamp_for_this_munging = PDGetTotalTime();
     }
     gFrame_period_for_this_munging = 100;
-    gDrone_delta_time = 100.f / 1000.f;
+    gDrone_delta_time = 100.0f / 1000.0f;
     BrActorToBounds(&track_bounds, gTrack_actor);
     if (track_bounds.min.v[1] < track_bounds.max.v[1]) {
         gTrack_drone_min_y = track_bounds.min.v[1];
@@ -112,7 +112,7 @@ void C2_HOOK_FASTCALL MungeAIWorld(tU32 pFrame_period) {
     if (gTime_stamp_for_this_munging == 0) {
         gTime_stamp_for_this_munging = PDGetTotalTime();
     }
-    gDrone_delta_time = pFrame_period / 1000.f;
+    gDrone_delta_time = pFrame_period / 1000.0f;
     gFrame_period_for_this_munging = pFrame_period;
     Timers_Push(TIMER_DRN);
     DoDronePerGameFrameStuff();
