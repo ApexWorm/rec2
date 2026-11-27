@@ -9,9 +9,13 @@
 #include "39-oil.h"
 
 #include "01-network.h"
+#include "23-piping.h"
+#include "34-finteray.h"
 #include "41-utility.h"
+#include "49-physics.h"
 #include "63-loading3.h"
 #include "globvars.h"
+#include "globvrpb.h"
 #include "rec2_macros.h"
 
 // GLOBAL: CARMA2_HW 0x0065a398
@@ -185,7 +189,75 @@ void C2_HOOK_FASTCALL QueueOilSpill(tCar_spec* pCar) {
         oily_material, NULL);
 }
 
-// OKToSpillOil
+inline int C2_HOOK_FASTCALL OKToSpillOil(tOil_spill_info* pOil) {
+    br_scalar distance;
+    br_scalar mr_dotty;
+    br_vector3 pos;
+    br_vector3 v;
+    br_vector3 ray_pos;
+    br_vector3 ray_dir;
+    br_vector3 normal;
+    tCar_spec* car;
+    int i;
+    int face_count;
+    int found_one;
+    br_angle angle_to_rotate_by;
+    tBounds kev_bounds;
+    tFace_ref the_list[10];
+    tFace_ref* face_ref;
+
+    car = pOil->car;
+    if (car != NULL && car->driver >= eDriver_net_human && car->damage_units[eDamage_engine].damage_level < 99 && car->damage_units[eDamage_transmission].damage_level < 99) {
+        return 0;
+    }
+    angle_to_rotate_by = IRandomBetween(0, 0xffff);
+    BrVector3Set(&kev_bounds.original_bounds.min,
+        -pOil->full_size,
+        (br_scalar)(pOil->car_model->bounds.min.v[1] - 1.0 / WORLD_SCALE_D),
+        -pOil->full_size);
+    BrVector3Set(&kev_bounds.original_bounds.max,
+        pOil->full_size,
+        pOil->car_model->bounds.max.v[1],
+        pOil->full_size);
+    BrMatrix34PreRotateY(&pOil->actor->t.t.mat, angle_to_rotate_by);
+    kev_bounds.mat = &pOil->car_actor->t.t.mat;
+    face_count = FindFacesInBox(&kev_bounds, the_list, REC2_ASIZE(the_list), NULL);
+    BrVector3Copy(&ray_pos, &pOil->car_actor->t.t.translate.t);
+    ray_pos.v[1] += 0.2f;
+    BrVector3Set(&ray_dir, 0.0f, kev_bounds.original_bounds.min.v[1] - kev_bounds.original_bounds.max.v[1], 0.0f);
+    BrVector3Normalise(&ray_dir, &ray_dir);
+    if (face_count == 0) {
+        return 0;
+    }
+    found_one = 0;
+    for (i = 0; i < face_count; i++) {
+        face_ref = &the_list[i];
+        if (!found_one) {
+            CheckSingleFace(face_ref, &ray_pos, &ray_dir, &normal, &distance, &pos);
+            if (distance < 100.0f) {
+                found_one = 1;
+                BrVector3Copy(&pOil->actor->t.t.look_up.up, &normal);
+                BrVector3Set(&v, 0.0f, 0.0f, 1.0f);
+                BrVector3Cross(&pOil->actor->t.t.look_up.look, &normal, &v);
+                BrVector3Set(&v, -1.0f, 0.0f, 0.0f);
+                BrVector3Cross((br_vector3*)pOil->actor->t.t.mat.m[2], &normal, &v);
+                BrVector3Copy(&pOil->position, &pos);
+                BrMatrix34PreRotateY(&pOil->actor->t.t.mat, angle_to_rotate_by);
+            }
+        }
+    }
+    if (!found_one || normal.v[1] < 0.97f) {
+        return 0;
+    }
+    for (i = 0; i < face_count; i++) {
+        face_ref = &the_list[i];
+        mr_dotty = BrVector3Dot(&face_ref->normal, &normal);
+        if (mr_dotty < 0.98f && (mr_dotty > 0.8f || !NormalSideOfPlane(&pOil->actor->t.t.translate.t, &face_ref->normal, face_ref->d))) {
+            return 0;
+        }
+    }
+    return 1;
+}
 
 void C2_HOOK_FASTCALL MungeOilsHeightAboveGround(tOil_spill_info* pOil) {
 
@@ -209,6 +281,7 @@ void C2_HOOK_FASTCALL MungeIndexedOilsHeightAboveGround(int pIndex) {
 
 // FUNCTION: CARMA2_HW 0x004a7460
 // FUNCTION: CARMA2_SW 0x004a35d0
+// FUNCTION: CARMA2_CHEAT 0x004a8770
 void C2_HOOK_FASTCALL SetInitialOilStuff(tOil_spill_info* pOil, br_model* pModel) {
     /* Resize the spill in the ground plane without changing vertex heights. */
     pModel->vertices[0].p.v[0] = -pOil->field_0x20;
@@ -224,7 +297,111 @@ void C2_HOOK_FASTCALL SetInitialOilStuff(tOil_spill_info* pOil, br_model* pModel
     BrModelUpdate(pModel, BR_MODU_ALL);
 }
 
-// ProcessOilSpills
+// FUNCTION: CARMA2_HW 0x004a6e50
+// FUNCTION: CARMA2_SW 0x004a2fc0
+// FUNCTION: CARMA2_CHEAT 0x004a8160
+void C2_HOOK_FASTCALL ProcessOilSpills(tU32 pFrame_period) {
+    int i;
+    tU32 time;
+    br_scalar this_size;
+    br_vector3 v;
+    tNet_message* message;
+
+    time = GetTotalTime();
+    for (i = 0; i < (int)REC2_ASIZE(gOily_spills); i++) {
+        br_model* the_model;
+        tOil_spill_info* oil = &gOily_spills[i];
+
+        if (oil->car_actor == NULL) {
+            oil->actor->render_style = BR_RSTYLE_NONE;
+        } else {
+            the_model = oil->actor->model;
+            if (oil->actor->render_style == BR_RSTYLE_NONE
+                    && time >= oil->spill_time
+                    && (oil->car == NULL || ((br_scalar)fabs(oil->car->collision_info->v.v[0]) < 1 / WORLD_SCALE / 100.0f
+                                          && (br_scalar)fabs(oil->car->collision_info->v.v[1]) < 1 / WORLD_SCALE / 100.0f
+                                          && (br_scalar)fabs(oil->car->collision_info->v.v[2]) < 1 / WORLD_SCALE / 100.0f))) {
+                if (gAction_replay_mode) {
+                    SetInitialOilStuff(oil, the_model);
+                } else {
+                    if (!OKToSpillOil(oil)) {
+                        oil->car = NULL;
+                        oil->car_actor = NULL;
+                    } else {
+                        oil->spill_time = time;
+                        if (gNext_oil_pixie > 0) {
+                            gNext_oil_pixie = 0;
+                        }
+                        if (oil->car != NULL) {
+                            BrVector3Copy(&oil->original_pos, &oil->car->pos);
+                        } else {
+                            BrVector3Copy(&oil->original_pos, &oil->car_actor->t.t.translate.t);
+                        }
+                        PipeSingleOilSpill(i,
+                            &oil->actor->t.t.mat,
+                            oil->full_size,
+                            oil->grow_rate,
+                            oil->spill_time,
+                            oil->stop_time,
+                            oil->car,
+                            &oil->original_pos,
+                            oil->actor->material->colour_map);
+                        oil->stop_time = 0;
+                        SetInitialOilStuff(oil, the_model);
+                        if (gNet_mode == eNet_mode_host && oil->car != NULL) {
+                            message = NetBuildGuaranteedMessage(eNet_message_chunk_type_oil_spill, 0);
+                            message->contents.oil_spill.player = NetPlayerFromCar(oil->car)->ID;
+                            message->contents.oil_spill.full_size = oil->full_size;
+                            message->contents.oil_spill.grow_rate = oil->grow_rate;
+                            message->contents.oil_spill.current_size = oil->current_size;
+                            NetGuaranteedSendMessageToAllPlayers(gCurrent_net_game, message, NULL);
+                        }
+                    }
+                }
+            } else if (oil->actor->render_style == BR_RSTYLE_FACES
+                    && (oil->stop_time == 0 || time < oil->stop_time)) {
+                if (oil->car != NULL) {
+                    BrVector3Sub(&v, &oil->original_pos, &oil->car->pos);
+                    if (oil->stop_time == 0 && BrVector3LengthSquared(&v) > 0.2f) {
+                        oil->stop_time = time;
+                        continue;
+                    }
+                }
+                this_size = (int)(time - oil->spill_time) * oil->grow_rate + oil->field_0x20;
+                if (this_size < oil->field_0x20) {
+                    oil->actor->render_style = BR_RSTYLE_NONE;
+                } else {
+                    oil->actor->render_style = BR_RSTYLE_FACES;
+                    if (this_size > oil->full_size) {
+                        the_model->vertices[0].p.v[0] = -oil->full_size;
+                        the_model->vertices[0].p.v[2] = -oil->full_size;
+                        the_model->vertices[1].p.v[0] = oil->full_size;
+                        the_model->vertices[1].p.v[2] = -oil->full_size;
+                        the_model->vertices[2].p.v[0] = oil->full_size;
+                        the_model->vertices[2].p.v[2] = oil->full_size;
+                        the_model->vertices[3].p.v[0] = -oil->full_size;
+                        the_model->vertices[3].p.v[2] = oil->full_size;
+                        oil->current_size = oil->full_size;
+                    } else {
+                        the_model->vertices[0].p.v[0] = -this_size;
+                        the_model->vertices[0].p.v[2] = -this_size;
+                        the_model->vertices[1].p.v[0] = this_size;
+                        the_model->vertices[1].p.v[2] = -this_size;
+                        the_model->vertices[2].p.v[0] = this_size;
+                        the_model->vertices[2].p.v[2] = this_size;
+                        the_model->vertices[3].p.v[0] = -this_size;
+                        the_model->vertices[3].p.v[2] = this_size;
+                        oil->current_size = this_size;
+                    }
+                    BrModelUpdate(the_model, BR_MODU_ALL);
+                }
+            }
+        }
+        if (oil->actor->render_style == BR_RSTYLE_FACES) {
+            MungeOilsHeightAboveGround(oil);
+        }
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x004a74e0
 // FUNCTION: CARMA2_SW 0x004a3650
