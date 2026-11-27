@@ -380,7 +380,7 @@ void C2_HOOK_FASTCALL CopyExplosionData(int pIndex, tExplosion* pExplosion) {
     gExplosions[pIndex] = *pExplosion;
 }
 
-inline int C2_HOOK_FASTCALL DoExplosionette(float pScale, br_actor* pActor, tU32 pStart, tU32 pPeriod, int pCount_frames, tExplosion_animation_frame* pFrames, br_vector3* pPos, br_angle pAngle) {
+inline int C2_HOOK_FASTCALL DoExplosionette(br_actor* pActor, tU32 pStart, tU32 pPeriod, float pScale, int pCount_frames, tExplosion_animation_frame* pFrames, br_vector3* pPos, br_angle pAngle) {
     int i;
     int found;
     tExplosion* explosion;
@@ -444,7 +444,6 @@ void C2_HOOK_FASTCALL Explode(tExplosion_animation *pExplosion_animation,br_acto
     br_vector3 max;
     br_vector3 pos;
     br_angle angle;
-    float scale;
 
     the_time = GetTotalTime();
     if (pActor == NULL) {
@@ -471,8 +470,7 @@ void C2_HOOK_FASTCALL Explode(tExplosion_animation *pExplosion_animation,br_acto
             } else {
                 angle = 0;
             }
-            scale = FRandomBetween(group->min_scaling_factor, group->max_scaling_factor);
-            if (!DoExplosionette(scale, pActor, the_time + IRandomBetween((tS16)group->min_start_delay_ms, (tS16)group->max_start_delay_ms), IRandomBetween((tS16)group->min_frametime_ms, (tS16)group->max_frametime_ms), group->count_frames, group->frames, &pos, angle)) {
+            if (!DoExplosionette(pActor, the_time + IRandomBetween((tS16)group->min_start_delay_ms, (tS16)group->max_start_delay_ms), IRandomBetween((tS16)group->min_frametime_ms, (tS16)group->max_frametime_ms), FRandomBetween(group->min_scaling_factor, group->max_scaling_factor), group->count_frames, group->frames, &pos, angle)) {
                 return;
             }
         }

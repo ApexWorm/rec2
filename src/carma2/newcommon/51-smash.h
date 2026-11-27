@@ -76,7 +76,7 @@ extern void C2_HOOK_FASTCALL MungeExplosions(void);
 
 extern void C2_HOOK_FASTCALL CopyExplosionData(int pIndex, tExplosion* pExplosion);
 
-extern int C2_HOOK_FASTCALL DoExplosionette(float pScale, br_actor* pActor, tU32 pStart, tU32 pPeriod, int pCount_frames, tExplosion_animation_frame* pFrames, br_vector3* pPos, br_angle pAngle);
+extern int C2_HOOK_FASTCALL DoExplosionette(br_actor* pActor, tU32 pStart, tU32 pPeriod, float pScale, int pCount_frames, tExplosion_animation_frame* pFrames, br_vector3* pPos, br_angle pAngle);
 
 extern void C2_HOOK_FASTCALL Explode(tExplosion_animation *pExplosion_animation,br_actor *pActor, const br_bounds3* pBounds, const br_vector3* pPos);
 
