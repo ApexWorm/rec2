@@ -322,6 +322,9 @@ void C2_HOOK_FASTCALL QueueIconComing(tPowerup* pPowerup, tHeadup_icon* pHeadup_
     }
 }
 
+// FUNCTION: CARMA2_HW 0x004db630
+// FUNCTION: CARMA2_SW 0x004d7b30
+// FUNCTION: CARMA2_CHEAT 0x004e11f0
 inline void C2_HOOK_FASTCALL LosePowerupX(tPowerup* pPowerup, int pTell_net_players) {
     tNet_message* the_message;
 
@@ -352,6 +355,9 @@ inline void C2_HOOK_FASTCALL LosePowerup(tPowerup* pPowerup) {
 
 // LoseKeyboardPowerupN
 
+// FUNCTION: CARMA2_HW 0x004db730
+// FUNCTION: CARMA2_SW 0x004d7c30
+// FUNCTION: CARMA2_CHEAT 0x004e12f0
 inline void C2_HOOK_FASTCALL KeyboardPowerupFinished(tPowerup* pPowerup, int pSelect_new) {
     int i;
 
@@ -934,9 +940,51 @@ void C2_HOOK_FASTCALL ToggleInventory(void) {
     }
 }
 
-// RightInventory
+// FUNCTION: CARMA2_HW 0x004daa00
+// FUNCTION: CARMA2_SW 0x004d6ed0
+// FUNCTION: CARMA2_CHEAT 0x004e05c0
+void C2_HOOK_FASTCALL RightInventory(void) {
+    int i;
 
-// LeftInventory
+    gInventory_timeout = GetTotalTime() + 3000;
+    gInventory_cycling = 1;
+    if (gInventory_selected >= 0) {
+        i = gInventory_selected;
+        do {
+            i--;
+            if (i < 0) {
+                i = (int)REC2_ASIZE(gInventory) - 1;
+            }
+            if (gInventory[i] >= 0) {
+                KeyboardPowerupFinished(&gPowerup_array[gInventory[gInventory_selected]], 0);
+                gInventory_selected = i;
+            }
+        } while (i != gInventory_selected);
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x004dab80
+// FUNCTION: CARMA2_SW 0x004d7050
+// FUNCTION: CARMA2_CHEAT 0x004e0740
+void C2_HOOK_FASTCALL LeftInventory(void) {
+    int i;
+
+    gInventory_timeout = GetTotalTime() + 3000;
+    gInventory_cycling = 1;
+    if (gInventory_selected >= 0) {
+        i = gInventory_selected;
+        do {
+            i++;
+            if (i >= (int)REC2_ASIZE(gInventory)) {
+                i = 0;
+            }
+            if (gInventory[i] >= 0) {
+                KeyboardPowerupFinished(&gPowerup_array[gInventory[gInventory_selected]], 0);
+                gInventory_selected = i;
+            }
+        } while (i != gInventory_selected);
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x004dad00
 // FUNCTION: CARMA2_SW 0x004d71d0
