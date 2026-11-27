@@ -161,6 +161,7 @@ br_pixelmap* C2_HOOK_FASTCALL LoadPixelmapForcedSize(const char* pName, int pWid
 
 // FUNCTION: CARMA2_HW 0x0048eec0
 // FUNCTION: CARMA2_SW 0x0048c160
+// FUNCTION: CARMA2_CHEAT 0x0048f250
 int C2_HOOK_FASTCALL LoadInterfacePixelmaps(const char *pPath_name, br_pixelmap** pMaps, int pCapacity) {
     tPath_name path;
     size_t count;
