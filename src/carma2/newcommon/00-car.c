@@ -32,7 +32,7 @@
 #include "58-crush2.h"
 #include "59-camera.h"
 #include "60-phil.h"
-#include "61-pedestrn.h"
+#include "61-pedestrn-phys.h"
 #include "brender/brender.h"
 #include "globvars.h"
 #include "globvrkm.h"
@@ -652,7 +652,7 @@ void C2_HOOK_FASTCALL NewFaceListCallBack(tPhysics_object* pObject, tFace_ref* p
     }
     if (fabs(old_d - pObject->water_d) > 1e-05) {
         if (PHILGetObjectProperty(pObject, 6) != 0.f) {
-            ARStartPipingSession(ePipe_extended_splash);
+            ARStartPipingSession(ePipe_chunk_extended_splash);
             AddExtendedSplashToPipingSession(pObject, pObject);
             AREndPipingSession();
         }
@@ -664,13 +664,13 @@ void C2_HOOK_FASTCALL NewFaceListCallBack(tPhysics_object* pObject, tFace_ref* p
                 AREndPipingSession();
                 return;
             }
-            ARStartPipingSession(ePipe_extended_splash);
+            ARStartPipingSession(ePipe_chunk_extended_splash);
             AddExtendedSplashToPipingSession(pObject, pObject->actor);
             AREndPipingSession();
             return;
         }
         if (pObject != NULL && pObject->owner != NULL && pObject->flags_0x238 >= 2 && pObject->flags_0x238 <= 4) {
-            ARStartPipingSession(ePipe_extended_splash);
+            ARStartPipingSession(ePipe_chunk_extended_splash);
             AddExtendedSplashToPipingSession(pObject, pObject->owner);
             AREndPipingSession();
         }
