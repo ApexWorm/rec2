@@ -2140,10 +2140,10 @@ void C2_HOOK_FASTCALL BendCar(tCar_spec* pCar, br_angle pAngle_x, br_angle pAngl
 
 inline br_angle C2_HOOK_FASTCALL QuantizeAngle(br_angle pAngle, br_angle pMin, br_angle pMax, br_angle pStep) {
 
-    if (pAngle < 0x7ff8 && pAngle > pMax) {
+    if (pAngle < BR_ANGLE_DEG(180) && pAngle > pMax) {
         return pMax;
     }
-    if (pAngle > 0x7ff8 && pAngle < pMin) {
+    if (pAngle > BR_ANGLE_DEG(180) && pAngle < pMin) {
         return pMin;
     }
     return pAngle / pStep * pStep;
