@@ -189,6 +189,14 @@ float gCop_pursuit_speed_percentage_multiplier;
 // GLOBAL: CARMA2_SW 0x0068b7c0
 float gHead_on_cos_value;
 
+#ifdef REC2_CHEAT
+// GLOBAL: CARMA2_CHEAT 0x00698fb8
+tS16 gMobile_section;
+
+// GLOBAL: CARMA2_CHEAT 0x00699130
+int gAlready_elasticating;
+#endif
+
 // FUNCTION: CARMA2_HW 0x004a8160
 // FUNCTION: CARMA2_SW 0x004a42d0
 // FUNCTION: CARMA2_CHEAT 0x004a9470
@@ -278,17 +286,124 @@ inline int C2_HOOK_FASTCALL PointVisibleFromHere(br_vector3* pFrom, br_vector3* 
     }
 }
 
-// WeightedFindNearestNodeAndSection
+inline void C2_HOOK_FASTCALL WeightedFindNearestNodeAndSection(tCar_spec* pCar, const br_vector3* pActor_coords, int* pNearest_node_section_no, int* pNearest_node, br_scalar* pT, br_scalar pWeight) {
+    int section_no;
+    int no_sections;
+    int nearest_section;
+    br_scalar nearest_section_distance_squared;
+    br_scalar closest_distance_squared;
+    br_scalar the_distance_squared;
+    br_scalar t;
+    br_scalar length_squared_a;
+    br_vector3 a;
+    br_vector3 p;
+    br_vector3 wank;
+    br_vector3* start;
+    br_vector3* finish;
+
+    *pNearest_node_section_no = -1;
+    *pNearest_node = -1;
+    nearest_section_distance_squared = BR_SCALAR_MAX;
+    closest_distance_squared = BR_SCALAR_MAX;
+    if (pCar != NULL) {
+        no_sections = pCar->my_trail.number_of_nodes - 1;
+    } else {
+        no_sections = gProgram_state.AI_vehicles.number_of_path_sections;
+    }
+    for (section_no = 0; section_no < no_sections; section_no++) {
+        if (pCar != NULL) {
+            start = &pCar->my_trail.trail_nodes[section_no];
+            finish = &pCar->my_trail.trail_nodes[section_no + 1];
+        } else {
+            start = &gProgram_state.AI_vehicles.path_nodes[(tS16)gProgram_state.AI_vehicles.path_sections[section_no].node_indices[0]].pos;
+            finish = &gProgram_state.AI_vehicles.path_nodes[(tS16)gProgram_state.AI_vehicles.path_sections[section_no].node_indices[1]].pos;
+        }
+#ifdef REC2_CHEAT
+        if (gAlready_elasticating && section_no == gMobile_section) {
+            continue;
+        }
+#endif
+        BrVector3Sub(&a, finish, start);
+        a.v[1] *= pWeight;
+        BrVector3Sub(&p, pActor_coords, start);
+        p.v[1] *= pWeight;
+        BrVector3Sub(&wank, &p, &a);
+        the_distance_squared = BrVector3LengthSquared(&wank);
+        if (the_distance_squared < closest_distance_squared) {
+            closest_distance_squared = the_distance_squared;
+            if (pCar != NULL) {
+                *pNearest_node = section_no;
+            } else {
+                *pNearest_node = (tS16)gProgram_state.AI_vehicles.path_sections[section_no].node_indices[1];
+            }
+            nearest_section = section_no;
+        }
+        the_distance_squared = BrVector3LengthSquared(&p);
+        if (the_distance_squared < closest_distance_squared) {
+            closest_distance_squared = the_distance_squared;
+            if (pCar != NULL) {
+                *pNearest_node = section_no + 1;
+            } else {
+                *pNearest_node = (tS16)gProgram_state.AI_vehicles.path_sections[section_no].node_indices[0];
+            }
+            nearest_section = section_no;
+        }
+        if ((length_squared_a = BrVector3LengthSquared(&a)) >= 0.0001f) {
+            t = BrVector3Dot(&p, &a) / length_squared_a;
+            if (t >= 0.0f && t <= 1.0f) {
+                BrVector3Scale(&wank, &a, t);
+                BrVector3Sub(&wank, &p, &wank);
+                the_distance_squared = BrVector3LengthSquared(&wank);
+                if (the_distance_squared < nearest_section_distance_squared) {
+                    *pNearest_node_section_no = section_no;
+                    *pT = t;
+                    nearest_section_distance_squared = the_distance_squared;
+                }
+            }
+        }
+    }
+    if (closest_distance_squared < nearest_section_distance_squared) {
+        *pNearest_node_section_no = nearest_section;
+    } else {
+        *pNearest_node = -1;
+    }
+}
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x004a82d0
-// STUB: CARMA2_SW 0x004a4440
-// STUB: CARMA2_CHEAT 0x004a95e0
+// FUNCTION: CARMA2_HW 0x004a82d0
+// FUNCTION: CARMA2_SW 0x004a4440
+// FUNCTION: CARMA2_CHEAT 0x004a95e0
 tS16 C2_HOOK_FASTCALL FindNearestGeneralSection(tCar_spec* pCar, const br_vector3* pActor_coords, br_vector3* pPath_direction, br_vector3* pIntersect, br_scalar* pDistance) {
-    NOT_IMPLEMENTED();
+    int nearest_node_section_no;
+    int nearest_node;
+    br_scalar t;
+    br_vector3 delta;
+    br_vector3 tv;
+
+    WeightedFindNearestNodeAndSection(pCar, pActor_coords, &nearest_node_section_no, &nearest_node, &t, 2.0f);
+    if (pCar != NULL) {
+        BrVector3Sub(&delta, &pCar->my_trail.trail_nodes[nearest_node_section_no + 1], &pCar->my_trail.trail_nodes[nearest_node_section_no]);
+    } else {
+        BrVector3Sub(&delta,
+            &gProgram_state.AI_vehicles.path_nodes[(tS16)gProgram_state.AI_vehicles.path_sections[nearest_node_section_no].node_indices[1]].pos,
+            &gProgram_state.AI_vehicles.path_nodes[(tS16)gProgram_state.AI_vehicles.path_sections[nearest_node_section_no].node_indices[0]].pos);
+    }
+    if (nearest_node >= 0) {
+        BrVector3Copy(pIntersect, pCar != NULL ? &pCar->my_trail.trail_nodes[nearest_node] : &gProgram_state.AI_vehicles.path_nodes[nearest_node].pos);
+    } else {
+        BrVector3Scale(pIntersect, &delta, t);
+        BrVector3Accumulate(pIntersect, &gProgram_state.AI_vehicles.path_nodes[(tS16)gProgram_state.AI_vehicles.path_sections[nearest_node_section_no].node_indices[0]].pos);
+    }
+    BrVector3NormaliseQuick(pPath_direction, &delta);
+    BrVector3Sub(&tv, pActor_coords, pIntersect);
+    *pDistance = BrVector3Length(&tv);
+    if (pCar != NULL) {
+        nearest_node_section_no += 15000;
+    }
+    return nearest_node_section_no;
 }
 
 #ifdef REC2_MATCHING
