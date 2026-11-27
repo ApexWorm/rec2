@@ -221,16 +221,16 @@ void C2_HOOK_FASTCALL ActualActionReplayHeadups(int pSpecial_zappy_bastard) {
             gReplay_pixies[10]);
     }
     if (pSpecial_zappy_bastard < 0) {
-        DRMaskedStamp(gCurrent_graf_data->field_0x300 + gCurrent_graf_data->field_0x310,
-            gCurrent_graf_data->field_0x304 + gCurrent_graf_data->field_0x314,
+        DRMaskedStamp(gCurrent_graf_data->field_0x310 + gCurrent_graf_data->field_0x300,
+            gCurrent_graf_data->field_0x314 + gCurrent_graf_data->field_0x304,
             gReplay_pixies[2]);
     } else if (pSpecial_zappy_bastard > 0) {
         DRMaskedStamp(gCurrent_graf_data->field_0x300 + gCurrent_graf_data->field_0x340,
             gCurrent_graf_data->field_0x304 + gCurrent_graf_data->field_0x344,
             gReplay_pixies[8]);
     } else if (ARGetReplayRate() < -1.0f) {
-        DRMaskedStamp(gCurrent_graf_data->field_0x300 + gCurrent_graf_data->field_0x318,
-            gCurrent_graf_data->field_0x304 + gCurrent_graf_data->field_0x31c,
+        DRMaskedStamp(gCurrent_graf_data->field_0x318 + gCurrent_graf_data->field_0x300,
+            gCurrent_graf_data->field_0x31c + gCurrent_graf_data->field_0x304,
             gReplay_pixies[3]);
     } else if (ARGetReplayRate() > 1.0f) {
         DRMaskedStamp(gCurrent_graf_data->field_0x300 + gCurrent_graf_data->field_0x338,
@@ -306,7 +306,7 @@ void C2_HOOK_FASTCALL ActualActionReplayHeadups(int pSpecial_zappy_bastard) {
         cam_text_shown = 1;
         DRPixelmapText(gBack_screen,
             gCurrent_graf_data->field_0x350, gCurrent_graf_data->field_0x354,
-            &gFonts[4],
+            &gFonts[1],
             GetMiscString(eMiscString_standard_cam + gAction_replay_camera_mode),
             gCurrent_graf_data->field_0x350 * 2);
     }
@@ -469,6 +469,9 @@ void C2_HOOK_FASTCALL AfterActionReplay(void) {
 
 // ToggleReplay
 
+// FUNCTION: CARMA2_HW 0x004e7350
+// FUNCTION: CARMA2_SW 0x004e3170
+// FUNCTION: CARMA2_CHEAT 0x004ecff0
 inline void C2_HOOK_FASTCALL DisplayMovieStatusPanel(int pCam_text_shown) {
     int x;
     int y;
@@ -478,14 +481,14 @@ inline void C2_HOOK_FASTCALL DisplayMovieStatusPanel(int pCam_text_shown) {
             x = gCurrent_graf_data->field_0x350;
             y = gCurrent_graf_data->field_0x354;
             if (!pCam_text_shown) {
-                DRPixelmapText(gBack_screen, x, y, &gFonts[4], GetMiscString(gStatus_message_1), gBack_screen->width);
+                DRPixelmapText(gBack_screen, x, y, &gFonts[1], GetMiscString(gStatus_message_1), gBack_screen->width);
             }
         } else {
             x = gCurrent_graf_data->width / 2;
             y = gCurrent_graf_data->height / 2;
-            DRPixelmapCentredText(gBack_screen, x, y - 64, &gFonts[16], GetMiscString(gStatus_message_1));
+            DRPixelmapCentredText(gBack_screen, x, y - 64, &gFonts[4], GetMiscString(gStatus_message_1));
             if (gStatus_message_2 != 0) {
-                DRPixelmapCentredText(gBack_screen, x, y - 32, &gFonts[24], GetMiscString(gStatus_message_2));
+                DRPixelmapCentredText(gBack_screen, x, y - 32, &gFonts[6], GetMiscString(gStatus_message_2));
             }
         }
     }
