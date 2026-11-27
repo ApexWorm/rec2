@@ -565,6 +565,8 @@ int C2_HOOK_FASTCALL PDIsJoystickDPadEnabled(void) {
     return info != NULL && info->field_0xe0 != 0;
 }
 
+int gCurrent_exclusive_ffb_effect = -1;
+
 void C2_HOOK_FASTCALL StopDinputEffect(int pIndex) {
     (void)pIndex;
 }

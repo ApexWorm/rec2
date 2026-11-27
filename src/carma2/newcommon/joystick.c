@@ -107,11 +107,6 @@ br_token_value gAccent_poly_prims[] = {
 // GLOBAL: CARMA2_CHEAT 0x0059cb88
 int gINT_00596308 = -1;
 
-// GLOBAL: CARMA2_HW 0x0059630c
-// GLOBAL: CARMA2_SW 0x0059126c
-// GLOBAL: CARMA2_CHEAT 0x0059cb8c
-int gINT_0059630c = -1;
-
 // GLOBAL: CARMA2_HW 0x00596310
 // GLOBAL: CARMA2_SW 0x00591270
 // GLOBAL: CARMA2_CHEAT 0x0059cb90
@@ -1072,10 +1067,10 @@ int C2_HOOK_FASTCALL FUN_0045c590(int pKey) {
 // FUNCTION: CARMA2_CHEAT 0x0045ca50
 void C2_HOOK_FASTCALL FUN_0045c5d0(void) {
 
-    if (gINT_0059630c != -1) {
-        UnloadDinputFFBEffectAtIndex(gINT_0059630c);
+    if (gCurrent_exclusive_ffb_effect != -1) {
+        UnloadDinputFFBEffectAtIndex(gCurrent_exclusive_ffb_effect);
     }
-    gINT_0059630c = -1;
+    gCurrent_exclusive_ffb_effect = -1;
 }
 
 // FUNCTION: CARMA2_HW 0x0045c680
@@ -1083,18 +1078,11 @@ void C2_HOOK_FASTCALL FUN_0045c5d0(void) {
 // FUNCTION: CARMA2_CHEAT 0x0045cb00
 void C2_HOOK_FASTCALL FUN_0045c680(void) {
 
-    if (gINT_0059630c != -1) {
-        StopDinputEffect(gINT_0059630c);
-        UnloadDinputFFBEffectAtIndex(gINT_0059630c);
+    if (gCurrent_exclusive_ffb_effect != -1) {
+        StopDinputEffect(gCurrent_exclusive_ffb_effect);
+        UnloadDinputFFBEffectAtIndex(gCurrent_exclusive_ffb_effect);
     }
-    gINT_0059630c = -1;
-}
-
-// STUB: CARMA2_HW 0x0045c6b0
-// STUB: CARMA2_SW 0x0045c0f0
-// STUB: CARMA2_CHEAT 0x0045cb30
-int C2_HOOK_FASTCALL PlayExclusiveFFBEffect(const char* pEffect_name, int pArg2) {
-    NOT_IMPLEMENTED();
+    gCurrent_exclusive_ffb_effect = -1;
 }
 
 // FUNCTION: CARMA2_HW 0x0045c780
