@@ -4816,7 +4816,7 @@ typedef struct {
 } tQueued_drone_crush_item;
 
 typedef struct {
-    undefined4* field_0x0;
+    tPhysics_object* object; /* FIXME: type is a guess, passed on to GetDroneCrushData */
     int count;
     tQueued_drone_crush_item items[2];
 } tQueued_drone_crush;

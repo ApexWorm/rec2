@@ -29,6 +29,7 @@ extern tPhysics_shape* gGonad_sphere_collision_shape;
 extern int gCount_toggled_doors;
 extern tCrush_list_item gCrush_lists[8];
 extern int gCount_queued_drone_crushes;
+extern tQueued_drone_crush gQueued_drone_crushes[4];
 extern int gCount_crush_detach_list;
 extern int gINT_0067bdfc;
 extern tU8 gCrush_data_entry_counter;
@@ -191,7 +192,7 @@ extern void C2_HOOK_FASTCALL CrushDroneObject(tPhysics_object* pObject, int pCou
 
 extern void C2_HOOK_FASTCALL AddDroneCrush(tQueued_drone_crush_item* pCrush, const br_vector3* pVector, float pScale, int pCount, const br_vector3* pPoints);
 
-// QueueDroneCrush
+extern void C2_HOOK_FASTCALL QueueDroneCrush(tPhysics_object* pObject, int pCount, const br_vector3* pPoints, const br_vector3* pForce);
 
 // DoCrushing
 
