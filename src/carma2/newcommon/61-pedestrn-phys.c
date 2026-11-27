@@ -1744,9 +1744,13 @@ void C2_HOOK_FASTCALL RenderElectroBastardRays(br_pixelmap* pRender_screen, br_p
     br_model* car_model;
     br_scalar distance;
     br_scalar t;
+#ifndef REC2_SW
     int model_updated;
+#endif
 
+#ifndef REC2_SW
     model_updated = 0;
+#endif
     the_time = GetTotalTime();
     ARStartPipingSession(ePipe_chunk_prox_ray);
     for (i = 0; i < (int)REC2_ASIZE(gProximity_rays); i++) {
