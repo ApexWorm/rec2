@@ -102,7 +102,7 @@ int gShow_drone_paths;
 // GLOBAL: CARMA2_HW 0x005947c0
 // GLOBAL: CARMA2_SW 0x0058f720
 // GLOBAL: CARMA2_CHEAT 0x0059b118
-br_vector3 gDefault_drone_direction = { { 0.f, 0.f, -1.f } };
+br_vector3 gDefault_drone_direction = { { 0.0f, 0.0f, -1.0f } };
 
 // GLOBAL: CARMA2_HW 0x00684514
 // GLOBAL: CARMA2_SW 0x0067ec54
@@ -707,7 +707,7 @@ br_matrix34* C2_HOOK_FASTCALL GetCurrentViewDroneMat(void) {
 br_vector3* C2_HOOK_FASTCALL GetCurrentViewDroneDirection(void) {
 
     StartRenderingThisDrone(&gDrone_specs[gCurrent_selected_drone]);
-    if (BrVector3LengthSquared(&gDrone_specs[gCurrent_selected_drone].field_0x18) > 0.f) {
+    if (BrVector3LengthSquared(&gDrone_specs[gCurrent_selected_drone].field_0x18) > 0.0f) {
         return &gDrone_specs[gCurrent_selected_drone].field_0x18;
     } else {
         return &gDefault_drone_direction;
