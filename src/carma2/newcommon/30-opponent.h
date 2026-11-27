@@ -139,7 +139,7 @@ extern void C2_HOOK_FASTCALL TeleportOpponentToNearestSafeLocation(tOpponent_spe
 
 extern void C2_HOOK_FASTCALL ChooseNewObjective(tOpponent_spec* pOpponent_spec, int pMust_choose_one);
 
-// ProcessThisOpponent
+extern void C2_HOOK_FASTCALL ProcessThisOpponent(tOpponent_spec* pOpponent_spec);
 
 // IsNetCarActive
 
@@ -157,11 +157,11 @@ extern int C2_HOOK_FASTCALL OpponentRepairNecessary(tOpponent_spec* pOpponent_sp
 
 extern void C2_HOOK_FASTCALL PossiblyRepairOpponent(tOpponent_spec* pOpponent_spec);
 
-// DisplayOpponentRecoveringHeadup
+extern void C2_HOOK_FASTCALL DisplayOpponentRecoveringHeadup(tOpponent_spec* pOpponent_spec);
 
-// StartToCheat
+extern void C2_HOOK_FASTCALL StartToCheat(tOpponent_spec* pOpponent_spec);
 
-// OiStopCheating
+extern void C2_HOOK_FASTCALL OiStopCheating(tOpponent_spec* pOpponent_spec);
 
 // TeleportCopToStart
 
