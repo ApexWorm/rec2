@@ -16,6 +16,18 @@ extern int gPed_count_limbed_actors;
 extern br_actor* gLimbs_actor;
 extern tSmashable_initial_position_spec gGiblet_initial_position;
 extern float gGiblet_scrape_start;
+extern float gPed_process_distance;
+extern float gPed_process_distance_inner;
+extern float gPed_popup_distance;
+extern float gPed_popup_distance_inner;
+extern float gPed_cos_max_slope;
+extern float gPed_reach_squared;
+extern float gPed_min_dist_avoid_collisions_squared;
+extern float gPed_buoyancy_factor;
+extern float gPed_damage_per_force;
+extern tExplosion_animation gNapalmed_ped_animation;
+extern int gPed_animal_count;
+extern char gPed_animal_names[50][32];
 extern tSlick_spec gPed_slick;
 extern int gPed_spurting_period;
 extern br_material* gPed_smear_material;
@@ -48,6 +60,8 @@ extern tNapalm_bolt gNapalm_bolts[5];
 extern int gPed_severing_chance;
 
 extern int gPed_severing_damage;
+extern float gPed_max_survivable_impact;
+extern br_pixelmap* gProx_ray_shade_table;
 extern br_material* gPed_slick_material;
 extern br_material* gNapalm_bolt_materials[7];
 extern br_model* gNapalm_bolt_models[7];
@@ -68,6 +82,8 @@ extern tSmashable_initial_position_spec gPed_spurt_initial_position;
 extern int gDancing_peds;
 extern int gDrunk_pedestrians;
 extern int gPeds_already_munged;
+extern tPedForms_vtable gPed_forms_vtable;
+extern int gPed_cache_sizes_2[4];
 extern int gPed_cache_sizes_1[4];
 extern tPed_face_cache_0x34* gPed_face_cache_heads[4];
 extern int gPed_cache_notify_flags;
@@ -81,12 +97,13 @@ extern br_vector3 gPed_scale;
 extern float gAverage_ped_scale;
 extern tPed_cache_006944c0 gPed_cache_006944c0[100];
 extern tPed_face_cache_0x34* gPed_face_caches[4];
+extern tFace_ref* gPed_face_cache;
 extern int gPipe_halted_ped_status;
 extern int gPed_valium_left;
 
 // ClearOutMorphs
 
-// InitBoner
+extern void C2_HOOK_FASTCALL InitBoner(tPedForms_vtable* pTable);
 
 // DRVector3SafeCross
 

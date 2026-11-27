@@ -352,7 +352,7 @@ typedef struct tPed_cache_006944c0 {
     undefined field_0x22[1];
     undefined field_0x23[10];
     undefined field_0x2d[1];
-    undefined2 field_0x2e;
+    tU16 field_0x2e;
     br_vector3 field_0x30;
     br_vector3 field_0x3c;
     br_vector3 field_0x48;
@@ -388,7 +388,8 @@ typedef struct tPed_cache_006944c0 {
     br_vector3 field_0xf0;
     br_vector3 field_0xfc;
     br_vector3 field_0x108;
-    undefined field_0x114[0x124-0x114];
+    br_vector3 field_0x114;
+    undefined field_0x120[0x124-0x120];
     float field_0x124;
     float field_0x128;
 } tPed_cache_006944c0;
@@ -4027,15 +4028,15 @@ typedef struct tPed_morph {
 } tPed_morph;
 
 typedef struct {
-    undefined4 (C2_HOOK_FASTCALL * passive_collision)(undefined4*, undefined4, undefined4*);
-    int (C2_HOOK_FASTCALL * active_halted)(undefined4*, undefined4*);
-    void (C2_HOOK_FASTCALL * moved_by_physics)(undefined4*, undefined4*, undefined4);
-    int (C2_HOOK_FASTCALL * move_completed)(undefined4*);
+    int (C2_HOOK_FASTCALL * passive_collision)(tPed_character_instance*, tPhysics_object*, tPhysics_object*);
+    int (C2_HOOK_FASTCALL * active_halted)(tPed_character_instance*, tPhysics_object*);
+    void (C2_HOOK_FASTCALL * moved_by_physics)(tPed_character_instance*, tPhysics_object*, undefined4);
+    int (C2_HOOK_FASTCALL * move_completed)(tPed_character_instance*);
     void (C2_HOOK_FASTCALL * fill_in_object)(tPhysics_object*, undefined4);
     void (C2_HOOK_FASTCALL * load_form)(tPed_form* pPed_form, FILE* pF);
     void (C2_HOOK_FASTCALL * dispose_form)(tPed_form*);
     void (C2_HOOK_FASTCALL * load_personality)(tPed_personality*, FILE*);
-    void (C2_HOOK_FASTCALL * dispose_personality)(undefined4*);
+    void (C2_HOOK_FASTCALL * dispose_personality)(tPed_personality*);
 } tPedForms_vtable;
 
 typedef enum {
