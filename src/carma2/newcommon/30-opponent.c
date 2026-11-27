@@ -201,9 +201,9 @@ void C2_HOOK_FASTCALL ProcessCurrentObjective(tOpponent_spec* pOpponent_spec, tP
         break;
     case eOOT_knackered_and_freewheeling:
         memset(&pOpponent_spec->car_spec->keys, 0, sizeof(pOpponent_spec->car_spec->keys));
-        pOpponent_spec->car_spec->acc_force = 0.f;
-        pOpponent_spec->car_spec->brake_force = 0.f;
-        pOpponent_spec->car_spec->curvature = 0.f;
+        pOpponent_spec->car_spec->acc_force = 0.0f;
+        pOpponent_spec->car_spec->brake_force = 0.0f;
+        pOpponent_spec->car_spec->curvature = 0.0f;
         break;
     case eOOT_frozen:
         ProcessFrozen(pOpponent_spec, pCommand);
@@ -736,7 +736,7 @@ static inline void C2_HOOK_FASTCALL ProcessRunAway(tOpponent_spec* pOpponent_spe
         pOpponent_spec->run_away_data.time_to_stop = gTime_stamp_for_this_munging + 1000 * IRandomBetween(30, 90);
         ClearOpponentsProjectedRoute(pOpponent_spec);
         section_no = FindNearestPathSection(&pOpponent_spec->car_spec->car_master_actor->t.t.translate.t, &direction_v, &intersect, &distance);
-        if (BrVector3Dot(&pOpponent_spec->car_spec->direction, &direction_v) >= 0.f) {
+        if (BrVector3Dot(&pOpponent_spec->car_spec->direction, &direction_v) >= 0.0f) {
             AddToOpponentsProjectedRoute(pOpponent_spec, section_no, 1);
         } else {
             AddToOpponentsProjectedRoute(pOpponent_spec, section_no, 0);
@@ -759,7 +759,7 @@ static inline void C2_HOOK_FASTCALL ProcessRunAway(tOpponent_spec* pOpponent_spe
             if (ProcessFollowPath(pOpponent_spec, ePOC_run, 0, 0, 0) == eFPR_given_up) {
                 ClearOpponentsProjectedRoute(pOpponent_spec);
                 section_no = FindNearestPathSection(&pOpponent_spec->car_spec->car_master_actor->t.t.translate.t, &direction_v, &intersect, &distance);
-                if (BrVector3Dot(&pOpponent_spec->car_spec->direction, &direction_v) >= 0.f) {
+                if (BrVector3Dot(&pOpponent_spec->car_spec->direction, &direction_v) >= 0.0f) {
                     AddToOpponentsProjectedRoute(pOpponent_spec, section_no, 1);
                 } else {
                     AddToOpponentsProjectedRoute(pOpponent_spec, section_no, 0);
@@ -871,15 +871,15 @@ static inline void C2_HOOK_FASTCALL ProcessFrozen(tOpponent_spec* pOpponent_spec
     case ePOC_start:
         DoNotDprintf("%d ProcessFrozen() - new task started", pOpponent_spec->index);
         DoNotDprintf("%s: Rematerialising from ePOC_start in ProcessFrozen()...", pOpponent_spec->car_spec->driver_name);
-        RematerialiseOpponentOnNearestSection(pOpponent_spec, 0.f);
-        pOpponent_spec->car_spec->acc_force = 0.f;
-        pOpponent_spec->car_spec->brake_force = 15.f * pOpponent_spec->car_spec->collision_info->M;
+        RematerialiseOpponentOnNearestSection(pOpponent_spec, 0.0f);
+        pOpponent_spec->car_spec->acc_force = 0.0f;
+        pOpponent_spec->car_spec->brake_force = 15.0f * pOpponent_spec->car_spec->collision_info->M;
         break;
     case ePOC_run:
-        pOpponent_spec->car_spec->brake_force = 15.f * pOpponent_spec->car_spec->collision_info->M;
+        pOpponent_spec->car_spec->brake_force = 15.0f * pOpponent_spec->car_spec->collision_info->M;
         break;
     case ePOC_die:
-        pOpponent_spec->car_spec->brake_force = 0.f;
+        pOpponent_spec->car_spec->brake_force = 0.0f;
         break;
     }
 }
