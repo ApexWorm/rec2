@@ -137,6 +137,7 @@ br_error C2_HOOK_STDCALL StateCopyToStored(br_renderer_state_stored_soft* dest, 
 
 // FUNCTION: CARMA2_HW 0x00542630
 // FUNCTION: CARMA2_SW 0x0053dcd0
+// FUNCTION: CARMA2_CHEAT 0x00548220
 br_error C2_HOOK_STDCALL StateCopyFromStored(soft_state_all* dest, br_renderer_state_stored_soft* src, br_uint_32 copy_mask, void* res) {
 
     C2_HOOK_BUG_ON(MASK_STATE_SURFACE != 0x1);

@@ -365,6 +365,7 @@ br_error C2_HOOK_CDECL _M_br_soft_renderer_modelInvert(br_soft_renderer* self) {
 
 // FUNCTION: CARMA2_HW 0x00541e70
 // FUNCTION: CARMA2_SW 0x0053d510
+// FUNCTION: CARMA2_CHEAT 0x00547a60
 br_error C2_HOOK_STDCALL StateCopy(soft_state_all* dest, soft_state_all* src, br_uint_32 copy_mask, void* res) {
     int i;
 
