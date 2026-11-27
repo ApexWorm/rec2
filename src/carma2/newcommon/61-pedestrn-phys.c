@@ -8,6 +8,7 @@
 
 #include "61-pedestrn-phys.h"
 
+#include "00-car.h"
 #include "07-structur.h"
 #include "08-loading1.h"
 #include "10-loading2.h"
@@ -87,6 +88,8 @@ const tPed_anim_seq gCalm_ped_anim_sequence = {
 const char* gForm_non_humanoid_names[1] = {
     "NONHUMANOID",
 };
+
+#define GET_PED_COLLISION_OBJECT(PED) (((PED)->character->field_0x14 & 0x1) ? (PED)->character->personality->form->simple_physicing[(tS8)(PED)->character->field_0x5].collision_info : GetRootObject((PED)->character))
 
 // GLOBAL: CARMA2_HW 0x006a0414
 // GLOBAL: CARMA2_SW 0x0069a46c
@@ -1699,7 +1702,51 @@ int C2_HOOK_FASTCALL CBActiveHalted(tPed_character_instance* pCharacter, tPhysic
 
 // PedProcessForces
 
-// CBMovedByPhysics
+// FUNCTION: CARMA2_HW 0x004d2930
+// FUNCTION: CARMA2_SW 0x004cf020
+// FUNCTION: CARMA2_CHEAT 0x004d84f0
+void C2_HOOK_FASTCALL CBMovedByPhysics(tPed_character_instance* pCharacter, tPhysics_object* pObject, tU32 pTime) {
+    tPedestrian* ped;
+    br_scalar speed;
+    int frame_time;
+    int move_id;
+
+    ped = pCharacter->ped;
+    BrVector3Copy(&ped->pos, (br_vector3*)pObject->actor->t.t.mat.m[3]);
+    BrVector3Copy(&pCharacter->field_0xd8, &pObject->v);
+    speed = BrVector3Length(&pObject->v);
+    TumbleObjectWithV(pObject, &pObject->v, 1.39f, .1f);
+    move_id = pCharacter->personality->form->moves[pCharacter->field_0x7].id;
+    if (move_id == 0x5d || move_id == 0x5e || move_id == 0x61) {
+        if (speed != 0.0f) {
+            frame_time = 25.0 / speed * FRandomBetween(.6f, 1.4f);
+            if (frame_time < 20) {
+                frame_time = 20;
+            } else if (frame_time > 150) {
+                frame_time = 150;
+            }
+            if (GET_PED_COLLISION_OBJECT(ped)->last_special_volume != NULL && GET_PED_COLLISION_OBJECT(ped)->last_special_volume->gravity_multiplier < 1.0f) {
+                frame_time = frame_time * 1.5;
+            }
+        } else {
+            frame_time = 0;
+        }
+        SetCharacterMoveAR(pCharacter, -1, (float)frame_time, 0, 0, GetTotalTime());
+    }
+    if (GET_PED_COLLISION_OBJECT(ped)->last_special_volume != NULL && GET_PED_COLLISION_OBJECT(ped)->last_special_volume->gravity_multiplier < 1.0f && ped->hit_points > 0) {
+        if (BrVector3Length(&pObject->omega) < 1.0) {
+            pObject->omega.v[0] += SRandomPosNeg(5.0f);
+            pObject->omega.v[1] += SRandomPosNeg(5.0f);
+            pObject->omega.v[2] += SRandomPosNeg(5.0f);
+        }
+        if (pObject->water_depth_factor <= 1.0 && pObject->v.v[1] > -.02 && pObject->water_depth_factor < 1.0) {
+            pObject->v.v[1] += FRandomBetween(0.0f, -.3f);
+        }
+    }
+    if (!gAction_replay_mode) {
+        PipeSinglePedPhysics(((tS16)ped->field_0x06 << 16) | (ped - gPedestrian_array), GetCharacterMatrixPtr(pCharacter));
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x004d2c40
 // FUNCTION: CARMA2_SW 0x004cf330
