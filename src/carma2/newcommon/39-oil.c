@@ -33,6 +33,7 @@ tOil_spill_info gOily_spills[32] = { 0 };
 
 // GLOBAL: CARMA2_HW 0x00691710
 // GLOBAL: CARMA2_SW 0x0068b768
+// GLOBAL: CARMA2_CHEAT 0x00698fb0
 int gNext_oil_pixie = 0;
 
 // GLOBAL: CARMA2_HW 0x00691714
@@ -110,6 +111,7 @@ void C2_HOOK_FASTCALL InitOilSpills(void) {
 
 // FUNCTION: CARMA2_HW 0x004a6c50
 // FUNCTION: CARMA2_SW 0x004a2dc0
+// FUNCTION: CARMA2_CHEAT 0x004a7f60
 void C2_HOOK_FASTCALL ResetOilSpills(void) {
     int i;
 
