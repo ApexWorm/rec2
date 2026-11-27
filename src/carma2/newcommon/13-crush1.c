@@ -912,7 +912,26 @@ intptr_t C2_HOOK_FASTCALL DRActorEnumRecurseWithTranslation(br_actor* pActor, br
 
 // CheckHingePointOrder
 
-// FindNearestVertex
+// FUNCTION: CARMA2_HW 0x0042bb00
+// FUNCTION: CARMA2_SW 0x0042bb90
+// FUNCTION: CARMA2_CHEAT 0x0042bca0
+tU16 C2_HOOK_FASTCALL FindNearestVertex(const br_vector3* pPoint, const br_model* pModel) {
+    tU16 closest_vertex;
+    tU16 i;
+    float closest_distance;
+    float distance;
+
+    closest_vertex = 0;
+    closest_distance = BR_SCALAR_MAX;
+    for (i = 0; i < pModel->nvertices; i++) {
+        distance = Vector3DistanceSquared(pPoint, &pModel->vertices[i].p);
+        if (distance < closest_distance) {
+            closest_vertex = i;
+            closest_distance = distance;
+        }
+    }
+    return closest_vertex;
+}
 
 // DistanceToBounds
 

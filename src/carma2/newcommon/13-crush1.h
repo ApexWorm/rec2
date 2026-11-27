@@ -96,7 +96,7 @@ extern intptr_t C2_HOOK_FASTCALL DRActorEnumRecurseWithTranslation(br_actor* pAc
 
 // CheckHingePointOrder
 
-// FindNearestVertex
+extern tU16 C2_HOOK_FASTCALL FindNearestVertex(const br_vector3* pPoint, const br_model* pModel);
 
 // DistanceToBounds
 
