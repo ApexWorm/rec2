@@ -915,7 +915,7 @@ void C2_HOOK_FASTCALL SetCharacterBonePositions(tPed_character_instance* pPed, i
             if (pArg3 != 0 && !gPed_overall_movement_disabled) {
                 BrVector3Scale(&move, (br_vector3*)frame->mat.m[3], personality->moves[pPed->field_0x7].scale_factor);
                 BrMatrix34ApplyV(&delta, &move, &pPed->field_0x5c);
-                if (gAction_replay_mode && ARGetReplayRate() < 0.f) {
+                if (gAction_replay_mode && ARGetReplayRate() < 0.0f) {
                     BrVector3Sub((br_vector3*)mat->m[3], &original_pos, &delta);
                 } else {
                     BrVector3Add((br_vector3*)mat->m[3], &delta, &original_pos);
@@ -1336,9 +1336,9 @@ void C2_HOOK_FASTCALL MungeCharacterAnimation(tPed_character_instance* pCharacte
             SetCharacterBonePositions(pCharacter, 0, 0);
         } else {
             f = (float)(int)(pTime - pCharacter->field_0x24) / pCharacter->field_0x1e;
-            if (f > 10.f) {
-                f = 10.f;
-            } else if (f < -10.f) {
+            if (f > 10.0f) {
+                f = 10.0f;
+            } else if (f < -10.0f) {
                 f = -10.0f;
             }
             t = pCharacter->field_0x1c + (f + pCharacter->field_0x18);
@@ -1397,7 +1397,7 @@ void C2_HOOK_FASTCALL MungeCharacterAnimation(tPed_character_instance* pCharacte
         pCharacter->field_0xd8.v[1] /= pCharacter->field_0x1e * (float)frames * 0.001;
         pCharacter->field_0xd8.v[2] /= (float)frames * pCharacter->field_0x1e * 0.001;
     } else if (!pCharacter->field_0x1e) {
-        BrVector3Set(&pCharacter->field_0xd8, 0.0, 0.f, 0.0f);
+        BrVector3Set(&pCharacter->field_0xd8, 0.0, 0.0f, 0.0f);
     }
 }
 
