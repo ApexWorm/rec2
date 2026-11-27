@@ -835,7 +835,7 @@ int C2_HOOK_FASTCALL ReduceEffectOfForces(tPhysics_joint_force* pForces, br_scal
         pImpulses[i] = -pImpulses[i];
     }
     for (i = 0; i < pIndex_count; i++) {
-        pImpulses[pIndices[i]] *= -1.f * pThreshold;
+        pImpulses[pIndices[i]] *= -1.0f * pThreshold;
         if (pForces[pIndices[i]].type & 0x100) {
             BrVector3Scale(&pForces[pIndices[i]].field_0x44, &pForces[pIndices[i]].field_0x44,pThreshold);
             if (pForces[pIndices[i]].object_b != NULL) {
