@@ -2250,7 +2250,24 @@ void C2_HOOK_FASTCALL ApplyActorTrans(tPipe_chunk** pChunk) {
     BrVector3Accumulate(&(*pChunk)->data.actor_trans.actor->t.t.translate.t, &(*pChunk)->data.actor_trans.delta);
 }
 
-// ApplyPedStatus
+extern void C2_HOOK_FASTCALL PedApplyStatus(tPedestrian* pPed, tS8 pArg2, tS8 pArg3, tS8 pArg4, tS8 pArg5, tS8 pArg6, tS8 pArg7, br_vector3* pArg8, br_vector3* pArg9, br_matrix34* pArg10);
+
+// FUNCTION: CARMA2_HW 0x004c9aa0
+// FUNCTION: CARMA2_SW 0x004c61d0
+// FUNCTION: CARMA2_CHEAT 0x004cf5d0
+void C2_HOOK_FASTCALL ApplyPedStatus(tPipe_chunk** pChunk) {
+
+    PedApplyStatus((tPedestrian*)(*pChunk)->subject_index,
+        (*pChunk)->data.ped_status.field_0x00,
+        (*pChunk)->data.ped_status.field_0x01,
+        (*pChunk)->data.ped_status.field_0x02,
+        (*pChunk)->data.ped_status.field_0x03,
+        (*pChunk)->data.ped_status.field_0x05,
+        (*pChunk)->data.ped_status.field_0x07,
+        &(*pChunk)->data.ped_status.field_0x08,
+        &(*pChunk)->data.ped_status.field_0x14,
+        &(*pChunk)->data.ped_status.field_0x20);
+}
 
 // FUNCTION: CARMA2_HW 0x004c9ad0
 // FUNCTION: CARMA2_SW 0x004c6200
@@ -2751,7 +2768,24 @@ void C2_HOOK_FASTCALL UndoActorTrans(tPipe_chunk** pChunk, tPipe_chunk* pPrev_ch
     (*pChunk)->data.actor_trans.actor->t.t.translate.t.v[2] -= (*pChunk)->data.actor_trans.delta.v[2];
 }
 
-// UndoPedStatus
+extern void C2_HOOK_FASTCALL PedUndoStatus(tPedestrian* pPed, tS8 pArg2, tS8 pArg3, tS8 pArg4, tS8 pArg5, tS8 pArg6, tS8 pArg7, br_vector3* pArg8, br_vector3* pArg9, br_matrix34* pArg10);
+
+// FUNCTION: CARMA2_HW 0x004ca1b0
+// FUNCTION: CARMA2_SW 0x004c68e0
+// FUNCTION: CARMA2_CHEAT 0x004cfcf0
+void C2_HOOK_FASTCALL UndoPedStatus(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
+
+    PedUndoStatus((tPedestrian*)(*pChunk)->subject_index,
+        (*pChunk)->data.ped_status.field_0x00,
+        (*pChunk)->data.ped_status.field_0x01,
+        (*pChunk)->data.ped_status.field_0x02,
+        (*pChunk)->data.ped_status.field_0x03,
+        (*pChunk)->data.ped_status.field_0x04,
+        (*pChunk)->data.ped_status.field_0x06,
+        &(*pChunk)->data.ped_status.field_0x08,
+        &(*pChunk)->data.ped_status.field_0x14,
+        &(*pChunk)->data.ped_status.field_0x20);
+}
 
 // UndoPedMove
 
