@@ -11,6 +11,7 @@
 #include "00-car.h"
 
 #include "08-loading1.h"
+#include "10-loading2.h"
 #include "15-displays.h"
 #include "23-piping.h"
 #include "28-world3.h"
@@ -20,6 +21,7 @@
 #include "52-errors.h"
 #include "56-aiworld.h"
 #include "60-phil.h"
+#include "70-packfile.h"
 #include "c2_string.h"
 #include "globvars.h"
 #include "c2_stdio.h"
@@ -50,6 +52,7 @@ int gINT_006820d4;
 
 // GLOBAL: CARMA2_HW 0x00682178
 // GLOBAL: CARMA2_SW 0x0067c8b8
+// GLOBAL: CARMA2_CHEAT 0x00689a20
 tDrone_form gDrone_forms[64];
 
 // GLOBAL: CARMA2_HW 0x0068450c
@@ -287,9 +290,33 @@ int C2_HOOK_CDECL LinkyCallback(br_actor* pActor, void* pData) {
 
 // LinkDroneActorsToModelsAndSetRenderStyle
 
-// LoadDroneActorsModels
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
 
-// ReadPastBoundsShapesHeader
+// STUB: CARMA2_HW 0x00450150
+// STUB: CARMA2_SW 0x0044fef0
+// STUB: CARMA2_CHEAT 0x004506a0
+void C2_HOOK_FASTCALL LoadDroneActorsModels(tDrone_spec* pDrone_spec) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
+
+inline int C2_HOOK_FASTCALL ReadPastBoundsShapesHeader(FILE* pF) {
+    char s[256];
+
+    while (!PFfeof(pF)) {
+        GetALineAndDontArgue(pF, s);
+        if (strcmp(s, "START OF BOUNDING SHAPES") == 0) {
+            DoNotDprintf_drone("ReadPastBoundsShapesHeader() returning TRUE");
+            return 1;
+        }
+    }
+    return 0;
+}
 
 // ReadPastThisLine
 
@@ -314,9 +341,47 @@ br_actor* C2_HOOK_CDECL MrFindy(br_actor* pActor, const char* pName) {
 
 // GetReversenessFromString
 
-// LoadFunksAndGrooves
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
 
-// LoadDrone
+// STUB: CARMA2_HW 0x00450680
+// STUB: CARMA2_SW 0x00450410
+// STUB: CARMA2_CHEAT 0x00450bd0
+void C2_HOOK_FASTCALL LoadFunksAndGrooves(tDrone_spec* pDrone_spec, FILE* pF) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
+
+inline void C2_HOOK_FASTCALL LoadDrone(int pIndex) {
+    tPath_name the_path;
+    tDrone_spec* drone;
+    tTWTVFS twt;
+    FILE* f;
+
+    drone = &gDrone_specs[pIndex];
+    strcpy(the_path, gApplication_path);
+    PathCat(the_path, the_path, "DRONES");
+    PathCat(the_path, the_path, drone->form->name);
+    twt = OpenPackFileAndSetTiffLoading(the_path);
+    LoadDroneActorsModels(drone);
+    f = OpenDroneFile(drone->form->name);
+    if (ReadPastBoundsShapesHeader(f)) {
+        DoNotDprintf_drone("DRONE.C: Reading mechanics data for drone of type %s", drone->form->name);
+        ReadMechanicsShapes(&drone->collision_info.shape, f);
+        if (drone->collision_info.shape != NULL) {
+            drone->field_0x46 = 1;
+        }
+    } else {
+        FatalError(kFatalError_UnableToOpenDroneFileOrFileCorrupted_S, drone->form->name);
+    }
+    LoadFunksAndGrooves(drone, f);
+    PFfclose(f);
+    ClosePackFileAndSetTiffLoading(twt);
+}
 
 // CalculateDrivingInfo
 
@@ -352,7 +417,12 @@ inline void C2_HOOK_FASTCALL NewDroneState(tDrone_spec* pDrone, int pNew_state) 
     }
 }
 
-// ResetDroneCrushyModel
+inline void C2_HOOK_FASTCALL ResetDroneCrushyModel(br_model* pSource, br_model* pDest) {
+
+    pDest->faces = pSource->faces;
+    pDest->nfaces = pSource->nfaces;
+    memcpy(pDest->vertices, pSource->vertices, pDest->nvertices * sizeof(br_vertex));
+}
 
 // ResetDroneModel
 
@@ -738,11 +808,56 @@ void C2_HOOK_FASTCALL DisposeDronesRaceStuff(void) {
     gCount_drone_path_nodes = 0;
 }
 
-// STUB: CARMA2_HW 0x0044fda0
-// STUB: CARMA2_SW 0x0044fb40
-// STUB: CARMA2_CHEAT 0x004502f0
+// FUNCTION: CARMA2_HW 0x0044fda0
+// FUNCTION: CARMA2_SW 0x0044fb40
+// FUNCTION: CARMA2_CHEAT 0x004502f0
 void C2_HOOK_FASTCALL LoadPerRaceDroneStuff(void) {
-    NOT_IMPLEMENTED();
+    int i;
+    int j;
+    int count;
+    tDrone_form* form;
+    br_model* model;
+
+    for (i = 0; i < gCount_drone_forms; i++) {
+        form = &gDrone_forms[i];
+        form->field_0x6c = 0;
+        form->model_start = -1;
+        form->model_end = 0;
+        form->model_index = -1;
+        form->count_models = 0;
+        form->field_0x80 = NULL;
+        form->models = NULL;
+    }
+    for (i = 0; i < gCount_drones; i++) {
+        gDrone_specs[i].form->field_0x6c++;
+        LoadDrone(i);
+    }
+    for (i = 0; i < gCount_drone_forms; i++) {
+        form = &gDrone_forms[i];
+        if (form->field_0x6c != 0) {
+            if (form->crushability != 0.0f) {
+                if ((int)form->field_0x6c > 10) {
+                    count = 10;
+                } else {
+                    count = form->field_0x6c;
+                }
+            } else {
+                count = 0;
+            }
+            form->count_models = count;
+            if (form->count_models != 0) {
+                form->models = BrMemCalloc(form->count_models, sizeof(br_model*), kMem_drone_model_dup);
+                form->field_0x80 = BrMemCalloc(form->count_models, sizeof(tU8), kMem_drone_model_dup);
+                for (j = 0; j < form->count_models; j++) {
+                    model = gDroneStorage.models[form->model_index];
+                    form->models[j] = BrModelAllocate(model->identifier, model->nvertices, 0);
+                    form->models[j]->flags |= BR_MODF_UPDATEABLE;
+                    ResetDroneCrushyModel(model, form->models[j]);
+                    BrModelAdd(form->models[j]);
+                }
+            }
+        }
+    }
 }
 
 // GetDroneCrushData
