@@ -1096,6 +1096,7 @@ void C2_HOOK_FASTCALL RunFlicAt(int pIndex, int pX, int pY) {
 
 // FUNCTION: CARMA2_HW 0x00462c10
 // FUNCTION: CARMA2_SW 0x004626a0
+// FUNCTION: CARMA2_CHEAT 0x00463080
 void C2_HOOK_FASTCALL SwapScreen(void) {
 
     PDScreenBufferSwap(0);
