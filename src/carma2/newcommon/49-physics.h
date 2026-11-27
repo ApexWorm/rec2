@@ -430,7 +430,7 @@ extern void C2_HOOK_FASTCALL SetUpTestObjects(void);
 
 extern void C2_HOOK_FASTCALL InitPhysics(void);
 
-// PointOutOfSightNotAR
+// PointOutOfSightNotAR (moved to 51-smash for inlining purposes)
 
 // CalcCollObjIDFromCarSpec
 
