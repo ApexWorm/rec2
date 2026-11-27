@@ -1822,7 +1822,13 @@ void C2_HOOK_FASTCALL PipeSingleOppoRenderage(tOpponent_spec* pOpponent_spec, in
         SIZE_OFFSET_PIPING(tPipe_single_oppo_renderage, enable), pEnable);
 }
 
-// ApplyCrush
+// FUNCTION: CARMA2_HW 0x004c9040
+// FUNCTION: CARMA2_SW 0x004c5770
+// FUNCTION: CARMA2_CHEAT 0x004ceb60
+void C2_HOOK_FASTCALL ApplyCrush(tPipe_chunk** pChunk) {
+
+    ARApplyCrush((*pChunk)->data.crush.model, &(*pChunk)->data.crush.direction, (*pChunk)->data.crush.values);
+}
 
 // FUNCTION: CARMA2_HW 0x004c9060
 // FUNCTION: CARMA2_SW 0x004c5790
@@ -2571,7 +2577,13 @@ void C2_HOOK_FASTCALL ApplyOppoRenderage(tPipe_chunk** pChunk) {
     ApplyOppoRenderage2((tOpponent_spec*)(*pChunk)->subject_index, (*pChunk)->data.oppo_renderage.enable);
 }
 
-// UndoCrush
+// FUNCTION: CARMA2_HW 0x004c9d90
+// FUNCTION: CARMA2_SW 0x004c64c0
+// FUNCTION: CARMA2_CHEAT 0x004cf8c0
+void C2_HOOK_FASTCALL UndoCrush(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
+
+    ARUndoCrush((*pChunk)->data.crush.model, &(*pChunk)->data.crush.direction, (*pChunk)->data.crush.values);
+}
 
 // FUNCTION: CARMA2_HW 0x004c9db0
 // FUNCTION: CARMA2_SW 0x004c64e0
@@ -2989,7 +3001,15 @@ void C2_HOOK_FASTCALL UndoTransformType(tPipe_chunk** pChunk, tPipe_chunk* pPrev
     ((br_actor*)chunk->subject_index)->t.type = chunk->data.transform_type.type_from;
 }
 
-// CalcCrushLength
+// FUNCTION: CARMA2_HW 0x004ca3f0
+// FUNCTION: CARMA2_SW 0x004c6b20
+// FUNCTION: CARMA2_CHEAT 0x004cff30
+int C2_HOOK_FASTCALL CalcCrushLength(tPipe_chunk* pChunk) {
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk_crush, direction, 0x4);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk_crush, values, 0xa);
+
+    return offsetof(tPipe_chunk_crush, values) + pChunk->data.crush.model->nvertices * sizeof(tU16);
+}
 
 // FUNCTION: CARMA2_HW 0x004ca400
 // FUNCTION: CARMA2_CHEAT 0x004cff40
