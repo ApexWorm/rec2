@@ -8,12 +8,14 @@
 
 #include "01-network.h"
 
+#include "04-netgame.h"
 #include "15-displays.h"
 #include "18-graphics2.h"
 #include "18b-graphics2.h"
 #include "19-font.h"
 #include "28-world3.h"
 #include "32-spark.h"
+#include "41-utility.h"
 #include "47-win95net.h"
 #include "52-errors.h"
 #include "53-controls.h"
@@ -21,8 +23,6 @@
 #include "platform.h"
 #include "globvars.h"
 #include "globvrpb.h"
-#include "04-netgame.h"
-#include "41-utility.h"
 
 #include "rec2_macros.h"
 
