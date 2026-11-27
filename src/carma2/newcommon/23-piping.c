@@ -165,6 +165,11 @@ br_vector3 gReference_pos;
 // GLOBAL: CARMA2_CHEAT 0x0069bc68
 br_vector3 gCar_pos;
 
+// GLOBAL: CARMA2_HW 0x006940fc
+// GLOBAL: CARMA2_SW 0x0068e154
+// GLOBAL: CARMA2_CHEAT 0x0069bc74
+tPipe_chunk* gIncident_chunk;
+
 // GLOBAL: CARMA2_HW 0x00694100
 // GLOBAL: CARMA2_SW 0x0068e158
 // GLOBAL: CARMA2_CHEAT 0x0069bc78
@@ -957,7 +962,32 @@ void C2_HOOK_FASTCALL DisposeActionReplay(void) {
 #pragma inline_depth()
 #endif
 
-// CheckIncident
+#if defined(REC2_MATCHING) && defined(_MSC_VER)
+#pragma inline_depth(0)
+#endif
+
+// FUNCTION: CARMA2_HW 0x004c6e00
+// FUNCTION: CARMA2_SW 0x004c3530
+// FUNCTION: CARMA2_CHEAT 0x004cc920
+int C2_HOOK_FASTCALL CheckIncident(tPipe_chunk* pChunk_ptr, int pChunk_count, tU32 pTime) {
+
+    if (ARReplayForwards()) {
+        if (pTime <= gOldest_time) {
+            return 0;
+        }
+    } else {
+        if (pTime >= gOldest_time) {
+            return 0;
+        }
+    }
+    gTrigger_time = pTime;
+    gIncident_chunk = pChunk_ptr;
+    return 1;
+}
+
+#if defined(REC2_MATCHING) && defined(_MSC_VER)
+#pragma inline_depth()
+#endif
 
 // GetNextIncident
 
