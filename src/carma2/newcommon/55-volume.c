@@ -111,8 +111,7 @@ tSpecial_volume* C2_HOOK_FASTCALL FindSpecialVolume(br_vector3* pP, tSpecial_vol
                     }
                 } else {
                     axis = fartest_bnds_axis % 3;
-                    fartest_dist /= v->boundary.box.axis_length.v[axis];
-                    if (1e7f > fartest_dist) {
+                    if ((fartest_dist /= v->boundary.box.axis_length.v[axis]) < 1e7f) {
                         sound_dir.v[0] = v->boundary.box.mat.m[axis][0] * (float)(fartest_bnds_axis >= 3 ? -1 : 1);
                         sound_volume = v;
                         sound_dir.v[1] = v->boundary.box.mat.m[axis][1] * (float)(fartest_bnds_axis >= 3 ? -1 : 1);
