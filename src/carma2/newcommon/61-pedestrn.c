@@ -465,6 +465,18 @@ int gDrunk_pedestrians;
 // GLOBAL: CARMA2_CHEAT 0x006a3858
 int gPeds_already_munged;
 
+// GLOBAL: CARMA2_HW 0x0065d7a8
+// GLOBAL: CARMA2_SW 0x006580e0
+// GLOBAL: CARMA2_CHEAT 0x00664e60
+int gPed_cache_sizes_2[4] = { 5, 10, 40, 75 };
+
+// GLOBAL: CARMA2_HW 0x0065e568
+// GLOBAL: CARMA2_SW 0x00658ea0
+// GLOBAL: CARMA2_CHEAT 0x00665c20
+br_matrix34 gPed_identity_matrix = {
+    { { 1.f, 0.f, 0.f }, { 0.f, 1.f, 0.f }, { 0.f, 0.f, 1.f }, { 0.f, 0.f, 0.f } }
+};
+
 // GLOBAL: CARMA2_HW 0x0065d7b8
 // GLOBAL: CARMA2_SW 0x006580f0
 // GLOBAL: CARMA2_CHEAT 0x00664e70
@@ -474,6 +486,11 @@ int gPed_cache_sizes_1[4] = { 40, 25, 15, 5 };
 // GLOBAL: CARMA2_SW 0x0068e178
 // GLOBAL: CARMA2_CHEAT 0x0069bc98
 tPedestrian* gPTR_00694120;
+
+// GLOBAL: CARMA2_HW 0x0069bc54
+// GLOBAL: CARMA2_SW 0x00695cac
+// GLOBAL: CARMA2_CHEAT 0x006a37cc
+tFace_ref* gPed_face_cache;
 
 // GLOBAL: CARMA2_HW 0x0069bc58
 // GLOBAL: CARMA2_SW 0x00695cb0
@@ -579,10 +596,12 @@ inline void C2_HOOK_FASTCALL ResetPedFaceCache(void) {
 
 static inline void C2_HOOK_FASTCALL SetPedCurrentFace(tPedestrian* pPed, br_vector3* pPos) {
     tPed_face_cache_0x34* face_cache;
+    br_matrix34* mat;
 
     if (pPed->field_0x0c != NULL) {
         face_cache = pPed->field_0x0c->field_0xb0;
-        face_cache->field_0x30 = CastRayDownThruFaces((br_vector3*)GetCharacterMatrixPtr(pPed->character)->m[3], face_cache->field_0x0, face_cache->field_0x4,
+        mat = GetCharacterMatrixPtr(pPed->character);
+        face_cache->field_0x30 = CastRayDownThruFaces((br_vector3*)mat->m[3], face_cache->field_0x0, face_cache->field_0x4,
             GetClearanceFromCharacterInstance(pPed->character, 0), pPos);
     }
 }
@@ -591,11 +610,89 @@ static inline void C2_HOOK_FASTCALL SetPedCurrentFace(tPedestrian* pPed, br_vect
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x004d2060
-// STUB: CARMA2_SW 0x004ce760
-// STUB: CARMA2_CHEAT 0x004d7c00
+// FUNCTION: CARMA2_HW 0x004d2060
+// FUNCTION: CARMA2_SW 0x004ce760
+// FUNCTION: CARMA2_CHEAT 0x004d7c00
 void C2_HOOK_FASTCALL RecachePedestrian(tPedestrian* pPed, br_vector3* pPos, tU32 pTime) {
-    NOT_IMPLEMENTED();
+    br_matrix34* mat;
+    br_matrix34 bounds_mat;
+    tBounds bounds;
+    int count;
+    int i;
+    tPed_face_cache_0x34* face_cache;
+
+    if (pPed->hit_points <= 0 && !gBOOL_00744804) {
+        SetPedMove(pPed, 0x5e, -1, 0, 1, GetTotalTime(), ePed_action_dead);
+        return;
+    }
+    mat = GetCharacterMatrixPtr(pPed->character);
+    bounds_mat.m[0][0] = pPed->character->field_0x5c.m[0][0];
+    bounds_mat.m[0][1] = pPed->character->field_0x5c.m[0][1];
+    bounds_mat.m[0][2] = pPed->character->field_0x5c.m[0][2];
+    bounds_mat.m[1][0] = pPed->character->field_0x5c.m[1][0];
+    bounds_mat.m[1][1] = pPed->character->field_0x5c.m[1][1];
+    bounds_mat.m[1][2] = pPed->character->field_0x5c.m[1][2];
+    bounds_mat.m[2][0] = pPed->character->field_0x5c.m[2][0];
+    bounds_mat.m[2][1] = pPed->character->field_0x5c.m[2][1];
+    bounds_mat.m[2][2] = pPed->character->field_0x5c.m[2][2];
+    bounds_mat.m[3][0] = mat->m[3][0];
+    bounds_mat.m[3][1] = mat->m[3][1];
+    bounds_mat.m[3][2] = mat->m[3][2];
+    bounds.mat = &bounds_mat;
+    bounds.original_bounds.min.v[0] = -.43478259f;
+    bounds.original_bounds.min.v[1] = -.36231884057971014 - pPed->character->personality->jump_height;
+    bounds.original_bounds.min.v[2] = -.28985506f;
+    bounds.original_bounds.max.v[0] = .43478259f;
+    bounds.original_bounds.max.v[1] = pPed->character->personality->jump_height - -.36231884057971014;
+    bounds.original_bounds.max.v[2] = 1.4492754f;
+    FillInBounds(&bounds);
+    bounds.original_bounds.min.v[0] = bounds.real_bounds.min.v[0];
+    bounds.original_bounds.min.v[1] = bounds.real_bounds.min.v[1];
+    bounds.original_bounds.min.v[2] = bounds.real_bounds.min.v[2];
+    bounds.original_bounds.max.v[0] = bounds.real_bounds.max.v[0];
+    bounds.original_bounds.max.v[1] = bounds.real_bounds.max.v[1];
+    bounds.original_bounds.max.v[2] = bounds.real_bounds.max.v[2];
+    bounds.mat = &gPed_identity_matrix;
+    count = FindFacesInBox(&bounds, gPed_face_cache, gPed_cache_sizes_2[REC2_ASIZE(gPed_cache_sizes_2) - 1] + 1, &gWorld_callbacks);
+    if (count > gPed_cache_sizes_2[REC2_ASIZE(gPed_cache_sizes_2) - 1]) {
+        gPed_cache_notify_flags |= 0x2;
+        count = gPed_cache_sizes_2[REC2_ASIZE(gPed_cache_sizes_2) - 1];
+    }
+    for (i = 0; i < (int)REC2_ASIZE(gPed_cache_sizes_2); i++) {
+        if (count <= gPed_cache_sizes_2[i]) {
+            break;
+        }
+    }
+    face_cache = pPed->field_0x0c->field_0xb0;
+    if (face_cache == NULL || face_cache->count != gPed_cache_sizes_2[i]) {
+        if (face_cache != NULL) {
+            face_cache->field_0x14 = NULL;
+        }
+        face_cache = gPed_face_caches[i];
+        if (face_cache->field_0x14 != NULL) {
+            face_cache->field_0x14->field_0x0c->field_0xb0 = NULL;
+            if (face_cache->field_0x8 == pTime) {
+                gPed_cache_notify_flags |= 0x1;
+            }
+        }
+    }
+    if (face_cache == gPed_face_caches[i]) {
+        gPed_face_caches[i] = gPed_face_caches[i]->next;
+    } else {
+        face_cache->next->prev = face_cache->prev;
+        face_cache->prev->next = face_cache->next;
+        face_cache->prev = gPed_face_caches[i]->prev;
+        face_cache->next = gPed_face_caches[i];
+        gPed_face_caches[i]->prev->next = face_cache;
+        gPed_face_caches[i]->prev = face_cache;
+    }
+    memcpy(face_cache->field_0x0, gPed_face_cache, count * sizeof(tFace_ref));
+    face_cache->field_0x8 = pTime;
+    face_cache->field_0x14 = pPed;
+    face_cache->field_0x4 = count;
+    face_cache->field_0x18 = bounds.real_bounds;
+    pPed->field_0x0c->field_0xb0 = face_cache;
+    SetPedCurrentFace(pPed, pPos);
 }
 
 #ifdef REC2_MATCHING
