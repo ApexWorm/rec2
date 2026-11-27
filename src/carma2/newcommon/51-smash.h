@@ -110,7 +110,7 @@ extern void C2_HOOK_FASTCALL ActuallySmashPart(tCar_spec* pCar_spec, tCar_crush_
 
 extern void C2_HOOK_FASTCALL MakeSmashSound(tConnotations* pConnotations, br_vector3* pPos);
 
-// MungeSmokeFire
+extern void C2_HOOK_FASTCALL MungeSmokeFire(br_actor* pActor, tNon_car_spec* pNon_car, tSmoke_fire_chance* pSmoke_fire_chance);
 
 // Random34Matrix
 
@@ -298,7 +298,7 @@ extern int C2_HOOK_FASTCALL InsertQuad(tSmash_quad_mapping* pMapping, br_actor* 
 
 // PointInFace
 
-// FindFaceWithPoint
+extern int C2_HOOK_FASTCALL FindFaceWithPoint(tFace_ref* pFace, br_vector3* pPoint, tFace_ref* pNew_face, int pInclude_same_face);
 
 // ProcessTexture
 
@@ -308,9 +308,13 @@ extern int C2_HOOK_FASTCALL InsertQuad(tSmash_quad_mapping* pMapping, br_actor* 
 
 extern float C2_HOOK_FASTCALL BashModel(tSmashable_item_spec* pSpec, tPhysics_object* pObject, br_actor* pActor, float pMagnitude, br_vector3* pPosition, br_vector3* pNormal, br_vector3* pForce, int* pSmashed, int pNetwork);
 
-extern void C2_HOOK_FASTCALL SendNetSmash(tPhysics_object* pObject, undefined4 pArg2, float pMagnitude, br_vector3* pPosition, br_vector3* pNormal, br_vector3* pForce, int pArg7);
+extern int C2_HOOK_FASTCALL CalcCollObjIDFromCarSpec(tCar_spec* pCar);
 
-// SendAllSmashes
+extern int C2_HOOK_FASTCALL CalcCollObjID(tPhysics_object* pObject);
+
+extern void C2_HOOK_FASTCALL SendNetSmash(tPhysics_object* pObject, tFace_ref* pFace, float pMagnitude, br_vector3* pPosition, br_vector3* pNormal, br_vector3* pForce, int pSnap);
+
+extern void C2_HOOK_FASTCALL SendAllSmashes(tNet_game_player_info* pPlayer);
 
 extern void C2_HOOK_FASTCALL HitPowerup(tPhysics_object* pObject, int pIndex, int pArg3);
 
@@ -372,9 +376,9 @@ extern void C2_HOOK_FASTCALL DoNetSmash(tQueued_net_smash* pSmash);
 
 extern void C2_HOOK_FASTCALL DoQueuedNetSmashes(void);
 
-// FindTheBastard
+extern br_actor* C2_HOOK_FASTCALL FindTheBastard(const char* pShrapnel_id);
 
-// ReceivedSmashShraps
+extern void C2_HOOK_FASTCALL ReceivedSmashShraps(tNet_message_chunk_smash_shraps* pContents);
 
 // MungeSmashEdgeTriggers
 
