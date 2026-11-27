@@ -36,7 +36,7 @@ typedef struct {
     int field_0x24;
     int width;
     int height;
-    undefined4 field_0x30;
+    void* field_0x30;
 } tStruct_1001dcc0;
 typedef struct {
     int type;

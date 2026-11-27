@@ -339,6 +339,9 @@ undefined4 gDAT_1001bc6c;
 // GLOBAL: D3D 0x1001b070
 br_uint_16 gD3D_16bit_palette_buffer[256];
 
+// GLOBAL: D3D 0x1001b270
+D3DTLVERTEX gBlit_quad_vertices[4];
+
 // GLOBAL: D3D 0x10015898
 tStruct_10015898 gStruct_10015898_ARRAY[] = {
     {   4,   0,  16,  16,  16,   0, },
@@ -2575,7 +2578,386 @@ void C2_HOOK_CDECL FUN_10007140(void) {
     gCount_queued_vertices = 0;
 }
 
-// STUB: D3D 0x10004780
+// FUNCTION: D3D 0x10004780
 void C2_HOOK_CDECL FUN_10004780(void* arg1, int stride) {
-    NOT_IMPLEMENTED();
+    DDSURFACEDESC surface_desc;
+    int pixel_format;
+    int count_draws;
+    int row_offset;
+    int x;
+    int y;
+    int i;
+    double fx;
+    double fy;
+    void* src;
+    void* dst;
+    int src_stride;
+    int dst_stride;
+#ifndef REC2_MATCHING
+    int r;
+    int j;
+#endif
+
+    if (gAttached_surface_pixel_format.dwRGBAlphaBitMask == 0
+            && !(gAttached_surface_pixel_format.dwRBitMask == 0x7c00
+                && gAttached_surface_pixel_format.dwGBitMask == 0x03e0
+                && gAttached_surface_pixel_format.dwBBitMask == 0x001f)
+            && gAttached_surface_pixel_format.dwRGBAlphaBitMask == 0
+            && gAttached_surface_pixel_format.dwRBitMask == 0xf800
+            && gAttached_surface_pixel_format.dwGBitMask == 0x07e0
+            && gAttached_surface_pixel_format.dwBBitMask == 0x001f) {
+        pixel_format = 4;
+    } else {
+        pixel_format = 2;
+    }
+    d3d_debug_printf("CIWT: start");
+    gBlit_quad_vertices[0].color = 0xffff0000;
+    gBlit_quad_vertices[0].specular = 0;
+    gBlit_quad_vertices[1].color = 0xff00ff00;
+    gBlit_quad_vertices[1].specular = 0;
+    gBlit_quad_vertices[2].color = 0xff0000ff;
+    gBlit_quad_vertices[2].specular = 0;
+    gBlit_quad_vertices[3].color = 0xffffffff;
+    gBlit_quad_vertices[3].specular = 0;
+    gBlit_quad_vertices[3].sz = 0.99999f;
+    gBlit_quad_vertices[2].sz = 0.99999f;
+    gBlit_quad_vertices[1].sz = 0.99999f;
+    gBlit_quad_vertices[0].sz = 0.99999f;
+    gBlit_quad_vertices[3].rhw = 1.00001f;
+    gBlit_quad_vertices[2].rhw = 1.00001f;
+    gBlit_quad_vertices[1].rhw = 1.00001f;
+    gBlit_quad_vertices[0].rhw = 1.00001f;
+    gBlit_quad_vertices[0].tu = 0.0f;
+    gBlit_quad_vertices[0].tv = 0.0f;
+    gBlit_quad_vertices[1].tu = 1.0f;
+    gBlit_quad_vertices[1].tv = 0.0f;
+    gBlit_quad_vertices[2].tu = 1.0f;
+    gBlit_quad_vertices[2].tv = 1.0f;
+    gBlit_quad_vertices[3].tu = 0.0f;
+    gBlit_quad_vertices[3].tv = 1.0f;
+    count_draws = 0;
+    gQueued_render_states[0].type = D3DRENDERSTATE_TEXTUREHANDLE;
+    gQueued_render_states[0].value = 0;
+    gQueued_render_states[1].type = D3DRENDERSTATE_CULLMODE;
+    gQueued_render_states[1].value = D3DCULL_NONE;
+    gQueued_render_states[2].type = D3DRENDERSTATE_ALPHABLENDENABLE;
+    gQueued_render_states[2].value = FALSE;
+    gQueued_render_states[3].type = D3DRENDERSTATE_TEXTUREMAPBLEND;
+    gQueued_render_states[3].value = D3DTBLEND_DECAL;
+    gCount_queued_render_states = 4;
+    ApplyD3DRenderStateQueue();
+
+    /* The top 640x384 pixels as 64x64 tiles */
+    i = 0;
+    row_offset = 0;
+    for (y = 0; y < 6; y++) {
+        for (x = 0; x < 10; x++) {
+            for (; i < gSize_texture_cache; i++) {
+                if (gBuffered_textures[i].width == 64 && gBuffered_textures[i].height == 64
+                        && gBuffered_textures[i].field_0x24 < gFlip_count && gBuffered_textures[i].field_0x1c == 0) {
+                    break;
+                }
+            }
+            if (i >= gSize_texture_cache) {
+                continue;
+            }
+            src_stride = stride;
+            if (gBuffered_textures[i].field_0x24 == gFlip_count - 1 && gBuffered_textures[i].field_0x20 == -42 && gBuffered_textures[i].field_0x30 == (br_uint_8*)arg1 + 64 * (row_offset + 2 * x)) {
+                gBuffered_textures[i].field_0x24 = gFlip_count;
+                QUEUE_RENDER_STATE(D3DRENDERSTATE_TEXTUREHANDLE, gBuffered_textures[i].texture_handle);
+                if (gCount_queued_render_states != 0) {
+                    ApplyD3DRenderStateQueue();
+                }
+            } else {
+                gBuffered_textures[i].field_0x24 = gFlip_count;
+                gBuffered_textures[i].field_0x20 = -42;
+                gBuffered_textures[i].field_0x30 = (br_uint_8*)arg1 + 64 * (row_offset + 2 * x);
+                memset(&surface_desc, 0, sizeof(surface_desc));
+                surface_desc.dwSize = sizeof(surface_desc);
+                if (IDirectDrawSurface_Lock(gBuffered_textures[i].temp_opaque_surface, NULL, &surface_desc, 0, NULL) == DD_OK) {
+                    dst = surface_desc.lpSurface;
+                    dst_stride = surface_desc.lPitch;
+                    src = (br_uint_8*)arg1 + 64 * (row_offset + 2 * x);
+                    if (pixel_format == gPreferred_opaque_texture_format) {
+#ifdef REC2_MATCHING
+                        __asm {
+                            mov     esi, src
+                            mov     edi, dst
+                            mov     ecx, 64
+                        t64_copy_row:
+                            push    ecx
+                            push    esi
+                            push    edi
+                            mov     ecx, 64
+                            rep movsw
+                            pop     edi
+                            pop     esi
+                            add     edi, dst_stride
+                            add     esi, src_stride
+                            pop     ecx
+                            loop    t64_copy_row
+                        }
+#else
+                        for (r = 0; r < 64; r++) {
+                            br_uint_16* row_src = (br_uint_16*)((br_uint_8*)src + r * src_stride);
+                            br_uint_16* row_dst = (br_uint_16*)((br_uint_8*)dst + r * dst_stride);
+
+                            for (j = 0; j < 64; j++) {
+                                row_dst[j] = row_src[j];
+                            }
+                        }
+#endif
+                    } else if (pixel_format == 4) {
+#ifdef REC2_MATCHING
+                        __asm {
+                            mov     esi, src
+                            mov     edi, dst
+                            mov     ecx, 64
+                        t64_a_row:
+                            push    ecx
+                            push    esi
+                            push    edi
+                            mov     ecx, 64
+                        t64_a_pixel:
+                            lodsw
+                            mov     ebx, eax
+                            and     eax, 0xffc0
+                            and     ebx, 0x1f
+                            shr     eax, 1
+                            or      eax, ebx
+                            stosw
+                            loop    t64_a_pixel
+                            pop     edi
+                            pop     esi
+                            add     edi, dst_stride
+                            add     esi, src_stride
+                            pop     ecx
+                            loop    t64_a_row
+                        }
+#else
+                        for (r = 0; r < 64; r++) {
+                            br_uint_16* row_src = (br_uint_16*)((br_uint_8*)src + r * src_stride);
+                            br_uint_16* row_dst = (br_uint_16*)((br_uint_8*)dst + r * dst_stride);
+
+                            for (j = 0; j < 64; j++) {
+                                row_dst[j] = ((row_src[j] & 0xffc0) >> 1) | (row_src[j] & 0x1f);
+                            }
+                        }
+#endif
+                    } else {
+#ifdef REC2_MATCHING
+                        __asm {
+                            mov     esi, src
+                            mov     edi, dst
+                            mov     ecx, 64
+                        t64_b_row:
+                            push    ecx
+                            push    esi
+                            push    edi
+                            mov     ecx, 64
+                        t64_b_pixel:
+                            lodsw
+                            mov     ebx, eax
+                            shr     eax, 1
+                            and     eax, 0xffc0
+                            and     ebx, 0x1f
+                            or      eax, ebx
+                            stosw
+                            loop    t64_b_pixel
+                            pop     edi
+                            pop     esi
+                            add     edi, dst_stride
+                            add     esi, src_stride
+                            pop     ecx
+                            loop    t64_b_row
+                        }
+#else
+                        for (r = 0; r < 64; r++) {
+                            br_uint_16* row_src = (br_uint_16*)((br_uint_8*)src + r * src_stride);
+                            br_uint_16* row_dst = (br_uint_16*)((br_uint_8*)dst + r * dst_stride);
+
+                            for (j = 0; j < 64; j++) {
+                                row_dst[j] = ((row_src[j] >> 1) & 0xffc0) | (row_src[j] & 0x1f);
+                            }
+                        }
+#endif
+                    }
+                    if (IDirectDrawSurface_Unlock(gBuffered_textures[i].temp_opaque_surface, NULL) == DD_OK
+                            && IDirect3DTexture2_Load(gBuffered_textures[i].texture, gBuffered_textures[i].temp_opaque_texture) == DD_OK) {
+                        QUEUE_RENDER_STATE(D3DRENDERSTATE_TEXTUREHANDLE, gBuffered_textures[i].texture_handle);
+                        if (gCount_queued_render_states != 0) {
+                            ApplyD3DRenderStateQueue();
+                        }
+                    }
+                }
+            }
+            fx = x * 64.0;
+            fy = y * 64.0;
+            gBlit_quad_vertices[3].sx = gBlit_quad_vertices[0].sx = (float)fx;
+            gBlit_quad_vertices[1].sy = gBlit_quad_vertices[0].sy = (float)fy;
+            gBlit_quad_vertices[2].sx = gBlit_quad_vertices[1].sx = (float)(fx + 64.0);
+            gBlit_quad_vertices[3].sy = gBlit_quad_vertices[2].sy = (float)(fy + 64.0);
+            IDirect3DDevice2_DrawPrimitive(gD3DDevice2, D3DPT_TRIANGLEFAN, D3DVT_TLVERTEX, gBlit_quad_vertices, 4, 0);
+            count_draws += 1;
+        }
+        row_offset += stride;
+    }
+
+    /* The remaining 640x96 pixels as 32x32 tiles */
+    i = 0;
+    row_offset = 12 * stride;
+    for (y = 12; y < 15; y++) {
+        for (x = 0; x < 20; x++) {
+            for (; i < gSize_texture_cache; i++) {
+                if (gBuffered_textures[i].width == 32 && gBuffered_textures[i].height == 32
+                        && gBuffered_textures[i].field_0x24 < gFlip_count && gBuffered_textures[i].field_0x1c == 0) {
+                    break;
+                }
+            }
+            if (i >= gSize_texture_cache) {
+                continue;
+            }
+            src_stride = stride;
+            /* FIXME: the cache key is twice the source offset */
+            if (gBuffered_textures[i].field_0x24 == gFlip_count - 1 && gBuffered_textures[i].field_0x20 == -42 && gBuffered_textures[i].field_0x30 == (br_uint_8*)arg1 + 64 * (row_offset + 2 * x)) {
+                gBuffered_textures[i].field_0x24 = gFlip_count;
+                QUEUE_RENDER_STATE(D3DRENDERSTATE_TEXTUREHANDLE, gBuffered_textures[i].texture_handle);
+                if (gCount_queued_render_states != 0) {
+                    ApplyD3DRenderStateQueue();
+                }
+            } else {
+                gBuffered_textures[i].field_0x24 = gFlip_count;
+                gBuffered_textures[i].field_0x20 = -42;
+                gBuffered_textures[i].field_0x30 = (br_uint_8*)arg1 + 64 * (row_offset + 2 * x);
+                memset(&surface_desc, 0, sizeof(surface_desc));
+                surface_desc.dwSize = sizeof(surface_desc);
+                if (IDirectDrawSurface_Lock(gBuffered_textures[i].temp_opaque_surface, NULL, &surface_desc, 0, NULL) == DD_OK) {
+                    dst = surface_desc.lpSurface;
+                    dst_stride = surface_desc.lPitch;
+                    src = (br_uint_8*)arg1 + 32 * (row_offset + 2 * x);
+                    if (pixel_format == gPreferred_opaque_texture_format) {
+#ifdef REC2_MATCHING
+                        __asm {
+                            mov     esi, src
+                            mov     edi, dst
+                            mov     ecx, 32
+                        t32_copy_row:
+                            push    ecx
+                            push    esi
+                            push    edi
+                            mov     ecx, 32
+                            rep movsw
+                            pop     edi
+                            pop     esi
+                            add     edi, dst_stride
+                            add     esi, src_stride
+                            pop     ecx
+                            loop    t32_copy_row
+                        }
+#else
+                        for (r = 0; r < 32; r++) {
+                            br_uint_16* row_src = (br_uint_16*)((br_uint_8*)src + r * src_stride);
+                            br_uint_16* row_dst = (br_uint_16*)((br_uint_8*)dst + r * dst_stride);
+
+                            for (j = 0; j < 32; j++) {
+                                row_dst[j] = row_src[j];
+                            }
+                        }
+#endif
+                    } else if (pixel_format == 4) {
+#ifdef REC2_MATCHING
+                        __asm {
+                            mov     esi, src
+                            mov     edi, dst
+                            mov     ecx, 32
+                        t32_a_row:
+                            push    ecx
+                            push    esi
+                            push    edi
+                            mov     ecx, 32
+                        t32_a_pixel:
+                            lodsw
+                            mov     ebx, eax
+                            and     eax, 0xffc0
+                            and     ebx, 0x1f
+                            shr     eax, 1
+                            or      eax, ebx
+                            stosw
+                            loop    t32_a_pixel
+                            pop     edi
+                            pop     esi
+                            add     edi, dst_stride
+                            add     esi, src_stride
+                            pop     ecx
+                            loop    t32_a_row
+                        }
+#else
+                        for (r = 0; r < 32; r++) {
+                            br_uint_16* row_src = (br_uint_16*)((br_uint_8*)src + r * src_stride);
+                            br_uint_16* row_dst = (br_uint_16*)((br_uint_8*)dst + r * dst_stride);
+
+                            for (j = 0; j < 32; j++) {
+                                row_dst[j] = ((row_src[j] & 0xffc0) >> 1) | (row_src[j] & 0x1f);
+                            }
+                        }
+#endif
+                    } else {
+#ifdef REC2_MATCHING
+                        __asm {
+                            mov     esi, src
+                            mov     edi, dst
+                            mov     ecx, 32
+                        t32_b_row:
+                            push    ecx
+                            push    esi
+                            push    edi
+                            mov     ecx, 32
+                        t32_b_pixel:
+                            lodsw
+                            mov     ebx, eax
+                            shr     eax, 1
+                            and     eax, 0xffc0
+                            and     ebx, 0x1f
+                            or      eax, ebx
+                            stosw
+                            loop    t32_b_pixel
+                            pop     edi
+                            pop     esi
+                            add     edi, dst_stride
+                            add     esi, src_stride
+                            pop     ecx
+                            loop    t32_b_row
+                        }
+#else
+                        for (r = 0; r < 32; r++) {
+                            br_uint_16* row_src = (br_uint_16*)((br_uint_8*)src + r * src_stride);
+                            br_uint_16* row_dst = (br_uint_16*)((br_uint_8*)dst + r * dst_stride);
+
+                            for (j = 0; j < 32; j++) {
+                                row_dst[j] = ((row_src[j] >> 1) & 0xffc0) | (row_src[j] & 0x1f);
+                            }
+                        }
+#endif
+                    }
+                    if (IDirectDrawSurface_Unlock(gBuffered_textures[i].temp_opaque_surface, NULL) == DD_OK
+                            && IDirect3DTexture2_Load(gBuffered_textures[i].texture, gBuffered_textures[i].temp_opaque_texture) == DD_OK) {
+                        QUEUE_RENDER_STATE(D3DRENDERSTATE_TEXTUREHANDLE, gBuffered_textures[i].texture_handle);
+                        if (gCount_queued_render_states != 0) {
+                            ApplyD3DRenderStateQueue();
+                        }
+                    }
+                }
+            }
+            fx = x * 32.0;
+            fy = y * 32.0;
+            gBlit_quad_vertices[3].sx = gBlit_quad_vertices[0].sx = (float)fx;
+            gBlit_quad_vertices[1].sy = gBlit_quad_vertices[0].sy = (float)fy;
+            gBlit_quad_vertices[2].sx = gBlit_quad_vertices[1].sx = (float)(fx + 32.0);
+            gBlit_quad_vertices[3].sy = gBlit_quad_vertices[2].sy = (float)(fy + 32.0);
+            IDirect3DDevice2_DrawPrimitive(gD3DDevice2, D3DPT_TRIANGLEFAN, D3DVT_TLVERTEX, gBlit_quad_vertices, 4, 0);
+            count_draws += 1;
+        }
+        row_offset += stride;
+    }
+    d3d_debug_printf("CIWT: dpc=%d lslot=%d/%d", count_draws, i, gSize_texture_cache);
 }
