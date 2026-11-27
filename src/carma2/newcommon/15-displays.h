@@ -50,6 +50,7 @@ extern tU32 gLast_time_credit_amount;
 extern int gOld_times[10];
 extern char gHeadup_oppo_ped_text[64];
 extern int gQueued_headup_count;
+extern tQueued_headup gQueued_headups[4];
 
 
 // static void C2_HOOK_FASTCALL LoadHeadupMessageFile(void);
@@ -66,7 +67,7 @@ extern void C2_HOOK_FASTCALL ClearHeadups(void);
 
 extern void C2_HOOK_FASTCALL DimAFewBits(void);
 
-// KillOldestQueuedHeadup
+extern void C2_HOOK_FASTCALL KillOldestQueuedHeadup(void);
 
 extern void C2_HOOK_FASTCALL DoTestPowerHeadup(int pLevel, const char* pAPO_str);
 
@@ -76,7 +77,7 @@ extern void C2_HOOK_FASTCALL DoPSPowerupHeadups(void);
 
 extern int C2_HOOK_FASTCALL FindAHeadupHoleWoofBarkSoundsABitRude(int pSlot_index);
 
-// IsHeadupTextClever
+extern int C2_HOOK_FASTCALL IsHeadupTextClever(char* pText);
 
 extern int C2_HOOK_FASTCALL MungeHeadupWidth(tHeadup* pHeadup);
 
