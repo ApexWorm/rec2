@@ -2040,7 +2040,35 @@ void C2_HOOK_FASTCALL DoBouncey(tPowerup* pPowerup, tU32 pPeriod) {
     }
 }
 
-// HitMine
+// FUNCTION: CARMA2_HW 0x004dea40
+// FUNCTION: CARMA2_SW 0x004daf40
+// FUNCTION: CARMA2_CHEAT 0x004e4600
+int C2_HOOK_FASTCALL HitMine(tPowerup* pPowerup, tCar_spec* pCar) {
+    int i;
+    float softness;
+
+    if (pCar->field_0x4c8 <= 1.0) {
+        if (gNet_mode == eNet_mode_none || NetPlayerFromCar(pCar) == NULL || NetPlayerFromCar(pCar)->field_0x80 == 0) {
+            pCar->collision_info->v.v[1] = (br_scalar)(pCar->collision_info->v.v[1] + FRandomBetween(pPowerup->float_params[0], pPowerup->float_params[1]) / (pCar->collision_info->M * WORLD_SCALE_D));
+            pCar->collision_info->omega.v[2] = (br_scalar)(pCar->collision_info->omega.v[2] + (FRandomPosNeg(pPowerup->float_params[2]) * TAU) / pCar->collision_info->M);
+            pCar->collision_info->omega.v[0] = (br_scalar)(pCar->collision_info->omega.v[0] + (FRandomPosNeg(pPowerup->float_params[3]) * TAU) / pCar->collision_info->M);
+            if (pCar != NULL && pCar->driver > eDriver_5) {
+                softness = pCar->softness_factor / 0.7;
+                if (!pCar->invulnerable_no_damage) {
+                    for (i = 0; i < 12; i++) {
+                        DamageUnit(pCar, i, IRandomBetween(0, (int)(25.f * softness)));
+                    }
+                }
+                if (!pCar->invulnerable_no_crushage) {
+                    TotallySpamTheCar(pCar, 0.1f * softness);
+                }
+            }
+            pCar->collision_info->disable_move_rotate = 0;
+            return pPowerup - gPowerup_array;
+        }
+    }
+    return pPowerup - gPowerup_array;
+}
 
 // FUNCTION: CARMA2_HW 0x004debb0
 // FUNCTION: CARMA2_SW 0x004db0b0
