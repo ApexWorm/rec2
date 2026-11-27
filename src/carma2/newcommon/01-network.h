@@ -15,6 +15,7 @@
 extern int INT_00659d34;
 
 extern int gIt_or_fox;
+extern tPlayer_ID gLocal_net_ID;
 extern int INT_00659d34;
 extern int rr_min;
 extern int rr_mid;
