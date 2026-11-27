@@ -233,7 +233,16 @@ br_pixelmap* gFog_shade_table;
 // GLOBAL: CARMA2_CHEAT 0x007a62c4
 br_pixelmap* gAcid_shade_table;
 
-// DrawDot
+extern void C2_HOOK_FASTCALL DrawDot(br_scalar z, tU8* scr_ptr, tU16* depth_ptr, tU8* shade_ptr);
+
+inline void C2_HOOK_FASTCALL DrawDot(br_scalar z, tU8* scr_ptr, tU16* depth_ptr, tU8* shade_ptr) {
+
+    z = (1.0f - z) * 32768.0f;
+    if (z < *depth_ptr) {
+        *depth_ptr = (tU16)z;
+        *scr_ptr = shade_ptr[*scr_ptr];
+    }
+}
 
 // SetWorldToScreen
 
@@ -293,10 +302,171 @@ int C2_HOOK_FASTCALL DrawLine3D(const br_vector3* pStart, const br_vector3* pEnd
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x004f6de0
-// STUB: CARMA2_SW 0x004f2690
+// FUNCTION: CARMA2_HW 0x004f6de0
+// FUNCTION: CARMA2_SW 0x004f2690
+// FUNCTION: CARMA2_CHEAT 0x004fca80
 int C2_HOOK_FASTCALL DrawLine2D(br_vector3* pStart, br_vector3* pEnd, br_pixelmap* pScreen, br_pixelmap* pDepth, br_scalar pBrightness, br_pixelmap* pShade) {
-    NOT_IMPLEMENTED();
+    tU8* scr_ptr;
+    tU16* depth_ptr;
+    tU8* shade_ptr;
+    int x1;
+    int x2;
+    int y1;
+    int y2;
+    int d;
+    int dx;
+    int dy;
+    int ax;
+    int sx;
+    int ay;
+    int sy;
+    int x;
+    int y;
+    br_scalar zbuff;
+    br_scalar zbuff_inc;
+    int darken_count;
+    int darken_init;
+
+    scr_ptr = (tU8*)pScreen->pixels + pScreen->base_x + pScreen->base_y * pScreen->row_bytes;
+    depth_ptr = (tU16*)pDepth->pixels;
+    shade_ptr = (tU8*)pShade->pixels + pShade->base_y * pShade->row_bytes;
+    x1 = (int)pStart->v[0] + pScreen->width / 2;
+    x2 = (int)pEnd->v[0] + pScreen->width / 2;
+    y1 = pScreen->height / 2 - (int)pStart->v[1];
+    y2 = pScreen->height / 2 - (int)pEnd->v[1];
+    if (pBrightness < 0.001f || pBrightness > 1.0f) {
+        return 0;
+    }
+    if (x1 < 0 || x2 < 0) {
+        if (x1 < 0 && x2 < 0) {
+            return 0;
+        }
+        if (x1 < 0) {
+            y1 = y2 - (y2 - y1) * x2 / (x2 - x1);
+            pStart->v[2] = pEnd->v[2] - (pEnd->v[2] - pStart->v[2]) * (float)x2 / (float)(x2 - x1);
+            x1 = 0;
+        } else {
+            y2 = y1 - (y1 - y2) * x1 / (x1 - x2);
+            pEnd->v[2] = pStart->v[2] - (pStart->v[2] - pEnd->v[2]) * (float)x1 / (float)(x1 - x2);
+            x2 = 0;
+        }
+    }
+    if (x1 >= pScreen->width || x2 >= pScreen->width) {
+        if (x1 >= pScreen->width && x2 >= pScreen->width) {
+            return 0;
+        }
+        if (x1 >= pScreen->width) {
+            y1 = y2 - (y2 - y1) * (x2 - (pScreen->width - 1)) / (x2 - x1);
+            pStart->v[2] = pEnd->v[2] - (pEnd->v[2] - pStart->v[2]) * (x2 - (pScreen->width - 1)) / (float)(x2 - x1);
+            x1 = pScreen->width - 1;
+        } else {
+            y2 = y1 - (y1 - y2) * (x1 - (pScreen->width - 1)) / (x1 - x2);
+            pEnd->v[2] = pStart->v[2] - (pStart->v[2] - pEnd->v[2]) * (x1 - (pScreen->width - 1)) / (float)(x1 - x2);
+            x2 = pScreen->width - 1;
+        }
+    }
+    if (y1 < 0 || y2 < 0) {
+        if (y1 < 0 && y2 < 0) {
+            return 0;
+        }
+        if (y1 < 0) {
+            x1 = x2 - (x2 - x1) * y2 / (y2 - y1);
+            pStart->v[2] = pEnd->v[2] - (pEnd->v[2] - pStart->v[2]) * (float)y2 / (float)(y2 - y1);
+            y1 = 0;
+        } else {
+            x2 = x1 - (x1 - x2) * y1 / (y1 - y2);
+            pEnd->v[2] = pStart->v[2] - (pStart->v[2] - pEnd->v[2]) * (float)y1 / (float)(y1 - y2);
+            y2 = 0;
+        }
+    }
+    if (y1 >= pScreen->height || y2 >= pScreen->height) {
+        if (y1 >= pScreen->height && y2 >= pScreen->height) {
+            return 0;
+        }
+        if (y1 >= pScreen->height) {
+            x1 = x2 - (x2 - x1) * (y2 - (pScreen->height - 1)) / (y2 - y1);
+            pStart->v[2] = pEnd->v[2] - (pEnd->v[2] - pStart->v[2]) * (y2 - (pScreen->height - 1)) / (float)(y2 - y1);
+            y1 = pScreen->height - 1;
+        } else {
+            x2 = x1 - (x1 - x2) * (y1 - (pScreen->height - 1)) / (y1 - y2);
+            pEnd->v[2] = pStart->v[2] - (pStart->v[2] - pEnd->v[2]) * (y1 - (pScreen->height - 1)) / (float)(y1 - y2);
+            y2 = pScreen->height - 1;
+        }
+    }
+    zbuff = pStart->v[2];
+    dx = x2 - x1;
+    dy = y2 - y1;
+    ax = 2 * abs(dx);
+    if (dx < 0) {
+        sx = -1;
+    } else {
+        sx = 1;
+    }
+    ay = 2 * abs(dy);
+    if (dy < 0) {
+        sy = -1;
+    } else {
+        sy = 1;
+    }
+    x = x1;
+    y = y1;
+    scr_ptr += x + y * pScreen->row_bytes;
+    depth_ptr += x + y * (pDepth->row_bytes / 2);
+    darken_init = (pBrightness - 0.001f) * pShade->height;
+    if (ax > ay) {
+        d = ay - ax / 2;
+        darken_init = 500 * ax / darken_init;
+        darken_count = darken_init;
+        zbuff_inc = (pEnd->v[2] - pStart->v[2]) * 2.0f / (float)ax;
+        while (1) {
+            DrawDot(zbuff, scr_ptr, depth_ptr, shade_ptr);
+            if (x == x2) {
+                break;
+            }
+            if (d >= 0) {
+                scr_ptr += sy * pScreen->row_bytes;
+                depth_ptr += sy * (pDepth->row_bytes / 2);
+                d -= ax;
+            }
+            x += sx;
+            scr_ptr += sx;
+            depth_ptr += sx;
+            d += ay;
+            zbuff = zbuff_inc + zbuff;
+            darken_count -= 1000;
+            while (darken_count <= 0) {
+                darken_count += darken_init;
+                shade_ptr += pShade->row_bytes;
+            }
+        }
+    } else {
+        d = ax - ay / 2;
+        darken_init = 500 * ay / darken_init;
+        darken_count = darken_init;
+        zbuff_inc = (pEnd->v[2] - pStart->v[2]) * 2.0f / (float)ay;
+        while (1) {
+            DrawDot(zbuff, scr_ptr, depth_ptr, shade_ptr);
+            if (y == y2) {
+                break;
+            }
+            if (d >= 0) {
+                scr_ptr += sx;
+                depth_ptr += sx;
+                d -= ay;
+            }
+            y += sy;
+            d += ax;
+            scr_ptr += sy * pScreen->row_bytes;
+            depth_ptr += sy * (pDepth->row_bytes / 2);
+            zbuff = zbuff_inc + zbuff;
+            darken_count -= 1000;
+            while (darken_count <= 0) {
+                darken_count += darken_init;
+                shade_ptr += pShade->row_bytes;
+            }
+        }
+    }
+    return 1;
 }
 
 #ifdef REC2_MATCHING
