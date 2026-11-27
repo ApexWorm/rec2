@@ -356,7 +356,7 @@ extern void C2_HOOK_FASTCALL ResetGhostPeds(tPowerup* pPowerup, tCar_spec* pCar)
 
 extern void C2_HOOK_FASTCALL DoBouncey(tPowerup* pPowerup, tU32 pPeriod);
 
-// HitMine
+extern int C2_HOOK_FASTCALL HitMine(tPowerup* pPowerup, tCar_spec* pCar);
 
 extern int C2_HOOK_FASTCALL SetMassMultiplier(tPowerup* pPowerup, tCar_spec* pCar);
 
