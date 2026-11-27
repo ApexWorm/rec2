@@ -150,8 +150,19 @@ C2_MATCHING_NAKED br_uint_32 C2_HOOK_CDECL HostFarStringWrite(br_uint_32 offset,
 }
 #else
 br_uint_32 C2_HOOK_CDECL HostFarStringWrite(br_uint_32 offset, br_uint_16 sel, br_uint_8 *string, br_uint_32 max) {
-    NOT_IMPLEMENTED();
-    return 0;
+    br_uint_8* far_string = FAR_POINTER(offset, sel);
+    br_uint_32 i;
+
+    for (i = 0; i < max; i++) {
+        far_string[i] = string[i];
+        if (string[i] == '\0') {
+            return i + 1;
+        }
+    }
+    if (max != 0) {
+        far_string[max - 1] = '\0';
+    }
+    return max;
 }
 #endif
 
@@ -192,8 +203,19 @@ C2_MATCHING_NAKED br_uint_32 C2_HOOK_CDECL HostFarStringRead(br_uint_32 offset, 
 }
 #else
 br_uint_32 C2_HOOK_CDECL HostFarStringRead(br_uint_32 offset, br_uint_16 sel, br_uint_8 *string, br_uint_32 max) {
-    NOT_IMPLEMENTED();
-    return 0;
+    br_uint_8* far_string = FAR_POINTER(offset, sel);
+    br_uint_32 i;
+
+    for (i = 0; i < max; i++) {
+        string[i] = far_string[i];
+        if (far_string[i] == '\0') {
+            return i + 1;
+        }
+    }
+    if (max != 0) {
+        string[max - 1] = '\0';
+    }
+    return max;
 }
 #endif
 
