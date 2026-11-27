@@ -9,6 +9,7 @@
 #include "38-flicplay.h"
 
 #include "08-loading1.h"
+#include "18-graphics2.h"
 #include "19-font.h"
 #include "41-utility.h"
 #include "52-errors.h"
@@ -1232,9 +1233,6 @@ inline void C2_HOOK_FASTCALL ProcessFlicQueue(tU32 pInterval) {
     TurnFlicTransparencyOff();
     LetFlicFuckWithPalettes();
 }
-
-extern void C2_HOOK_FASTCALL RemoveTransientBitmaps(int pGraphically_remove_them);
-extern int C2_HOOK_FASTCALL DoMouseCursor(void);
 
 // FUNCTION: CARMA2_HW 0x00462dc0
 // FUNCTION: CARMA2_SW 0x00462850
