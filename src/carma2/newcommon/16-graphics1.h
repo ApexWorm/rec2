@@ -25,6 +25,7 @@ extern br_vector3 gShadow_light_z;
 extern br_vector3 gShadow_light_x;
 extern br_model* gShadow_model;
 extern br_actor* gShadow_actor;
+extern float gCosine_array[65];
 extern int gScreen_wobble_x;
 extern int gScreen_wobble_y;
 extern int gAR_fudge_headups;
