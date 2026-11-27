@@ -27,6 +27,7 @@ br_error C2_HOOK_STDCALL GeneralCopy(br_device_pixelmap* dst, br_device_pixelmap
 
 // FUNCTION: CARMA2_HW 0x0053c0e0
 // FUNCTION: CARMA2_SW 0x00537780
+// FUNCTION: CARMA2_CHEAT 0x00541cd0
 br_error C2_HOOK_STDCALL GeneralRectangleStretchCopy(br_device_pixelmap* dst, br_rectangle* d, br_device_pixelmap* src, br_rectangle* s) {
 
     return 0x1008;
