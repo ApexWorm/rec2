@@ -1923,14 +1923,29 @@ void C2_HOOK_CDECL FUN_10008570(void* dst, br_uint_32 dst_width, br_uint_32 dst_
     NOT_IMPLEMENTED();
 }
 
+#if !defined(REC2_FIX_BUGS) && defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif
 // FUNCTION: D3D 0x10002ba0
 int C2_HOOK_CDECL d3d_update_texture(int index, render_buffer_d3d* buffer, int arg3) {
     DDSURFACEDESC surface_desc;
+    DDCOLORKEY color_key;
     int texture_format;
+    int failed;
+    int extra_processing;
+    br_uint_16* ptr;
+    br_uint_16 c;
+    int alpha;
+    int r;
+    int g;
+    int b;
+    br_uint_32 x;
+    br_uint_32 y;
 
     gINT_1001bbe0 += 1;
     buffer->field_0x74 = -2;
-    if (gPreferred_texture_format != gPreferred_opaque_texture_format) {
+    if (gPreferred_opaque_texture_format != gPreferred_texture_format) {
         if (buffer->blended == 1) {
             if (gBuffered_textures[index].field_0x1c == 0) {
                 gBuffered_textures[index].field_0x1c = 1;
@@ -1942,18 +1957,22 @@ int C2_HOOK_CDECL d3d_update_texture(int index, render_buffer_d3d* buffer, int a
                 memcpy(&surface_desc, &gPreferred_texture_surface_description, sizeof(surface_desc));
                 surface_desc.dwWidth = gBuffered_textures[index].width;
                 surface_desc.dwHeight = gBuffered_textures[index].height;
-                surface_desc.ddsCaps.dwCaps = DDSCAPS_ALLOCONLOAD | DDSCAPS_TEXTURE | (gDevice_has_color_model ? (DDSCAPS_LOCALVIDMEM | DDSCAPS_VIDEOMEMORY) : DDSCAPS_SYSTEMMEMORY);
                 surface_desc.dwFlags = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH | DDSD_PIXELFORMAT;
-                if (IDirectDraw_CreateSurface(gDirectDraw, &surface_desc, &gBuffered_textures[index].surface, NULL) != DD_OK) {
+                surface_desc.ddsCaps.dwCaps = gDevice_has_color_model ? (DDSCAPS_ALLOCONLOAD | DDSCAPS_LOCALVIDMEM | DDSCAPS_VIDEOMEMORY | DDSCAPS_TEXTURE) : (DDSCAPS_ALLOCONLOAD | DDSCAPS_SYSTEMMEMORY | DDSCAPS_TEXTURE);
+                failed = IDirectDraw_CreateSurface(gDirectDraw, &surface_desc, &gBuffered_textures[index].surface, NULL) != DD_OK;
+                if (failed) {
                     return -1;
                 }
-                if (IDirectDrawSurface_QueryInterface(gBuffered_textures[index].surface, &IID_IDirect3DTexture2, (LPVOID)&gBuffered_textures[index].texture) != DD_OK) {
+                failed = IDirectDrawSurface_QueryInterface(gBuffered_textures[index].surface, &IID_IDirect3DTexture2, (LPVOID*)&gBuffered_textures[index].texture) != DD_OK;
+                if (failed) {
                     return -1;
                 }
-                if (IDirect3DTexture2_Load(gBuffered_textures[index].texture, gBuffered_textures[index].temp_texture) != DD_OK) {
+                failed = IDirect3DTexture2_Load(gBuffered_textures[index].texture, gBuffered_textures[index].temp_texture) != D3D_OK;
+                if (failed) {
                     return -1;
                 }
-                if (IDirect3DTexture2_GetHandle(gBuffered_textures[index].texture, gD3DDevice2, &gBuffered_textures[index].texture_handle) != DD_OK) {
+                failed = IDirect3DTexture2_GetHandle(gBuffered_textures[index].texture, gD3DDevice2, &gBuffered_textures[index].texture_handle) != D3D_OK;
+                if (failed) {
                     return -1;
                 }
             }
@@ -1967,21 +1986,29 @@ int C2_HOOK_CDECL d3d_update_texture(int index, render_buffer_d3d* buffer, int a
             memcpy(&surface_desc, &gPreferred_opaque_texture_surface_description, sizeof(surface_desc));
             surface_desc.dwWidth = gBuffered_textures[index].width;
             surface_desc.dwHeight = gBuffered_textures[index].height;
-            surface_desc.ddsCaps.dwCaps = DDSCAPS_ALLOCONLOAD | DDSCAPS_TEXTURE | (gDevice_has_color_model ? (DDSCAPS_LOCALVIDMEM | DDSCAPS_VIDEOMEMORY) : DDSCAPS_SYSTEMMEMORY);
             surface_desc.dwFlags = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH | DDSD_PIXELFORMAT;
-            if (IDirectDraw_CreateSurface(gDirectDraw, &surface_desc, &gBuffered_textures[index].surface, NULL) != DD_OK) {
+            surface_desc.ddsCaps.dwCaps = gDevice_has_color_model ? (DDSCAPS_ALLOCONLOAD | DDSCAPS_LOCALVIDMEM | DDSCAPS_VIDEOMEMORY | DDSCAPS_TEXTURE) : (DDSCAPS_ALLOCONLOAD | DDSCAPS_SYSTEMMEMORY | DDSCAPS_TEXTURE);
+            failed = IDirectDraw_CreateSurface(gDirectDraw, &surface_desc, &gBuffered_textures[index].surface, NULL) != DD_OK;
+            if (failed) {
                 return -1;
             }
-            if (IDirectDrawSurface_QueryInterface(gBuffered_textures[index].surface, &IID_IDirect3DTexture2, (LPVOID)&gBuffered_textures[index].texture) != DD_OK) {
+            failed = IDirectDrawSurface_QueryInterface(gBuffered_textures[index].surface, &IID_IDirect3DTexture2, (LPVOID*)&gBuffered_textures[index].texture) != DD_OK;
+            if (failed) {
                 return -1;
             }
-            if (IDirect3DTexture2_Load(gBuffered_textures[index].texture, gBuffered_textures[index].temp_texture) != DD_OK) {
+            failed = IDirect3DTexture2_Load(gBuffered_textures[index].texture, gBuffered_textures[index].temp_opaque_texture) != D3D_OK;
+            if (failed) {
                 return -1;
             }
-            if (IDirect3DTexture2_GetHandle(gBuffered_textures[index].texture, gD3DDevice2, &gBuffered_textures[index].texture_handle) != DD_OK) {
+            failed = IDirect3DTexture2_GetHandle(gBuffered_textures[index].texture, gD3DDevice2, &gBuffered_textures[index].texture_handle) != D3D_OK;
+            if (failed) {
                 return -1;
             }
         }
+    }
+    texture_format = gPreferred_opaque_texture_format;
+    if (gBuffered_textures[index].field_0x1c != 0) {
+        texture_format = gPreferred_texture_format;
     }
     gINT_1001bbe8 += 1;
     buffer->field_0x58 = 0;
@@ -1990,320 +2017,349 @@ int C2_HOOK_CDECL d3d_update_texture(int index, render_buffer_d3d* buffer, int a
     }
     memset(&surface_desc, 0, sizeof(surface_desc));
     surface_desc.dwSize = sizeof(surface_desc);
-    if (gBuffered_textures[index].field_0x1c) {
-        if (IDirectDrawSurface_Lock(gBuffered_textures[index].temp_surface, NULL, &surface_desc, 0, NULL) != DD_OK) {
-            d3d_debug_printf("Lock Temporary Texture Surface");
+    if (gBuffered_textures[index].field_0x1c == 0) {
+        failed = IDirectDrawSurface_Lock(gBuffered_textures[index].temp_opaque_surface, NULL, &surface_desc, 0, NULL) != DD_OK;
+        if (failed) {
+            d3d_check_result(failed, "Lock Temporary Texture Surface");
             return 1;
         }
     } else {
-        if (IDirectDrawSurface_Lock(gBuffered_textures[index].temp_opaque_surface, NULL, &surface_desc, 0, NULL) != DD_OK) {
-            d3d_debug_printf("Lock Temporary Texture Surface");
+        failed = IDirectDrawSurface_Lock(gBuffered_textures[index].temp_surface, NULL, &surface_desc, 0, NULL) != DD_OK;
+        if (failed) {
+            d3d_check_result(failed, "Lock Temporary Texture Surface");
             return 1;
         }
     }
-    texture_format = gBuffered_textures[index].field_0x1c ? gPreferred_texture_format : gPreferred_opaque_texture_format;
-    if (buffer->pm_type == 3 && buffer->width_p == 64 && buffer->height == 64) {
-        br_colour* pal_ptr = buffer->palette_pointer;
-        int pal_i;
-        br_uint_8* read_row_ptr;
-        br_uint_8* write_row_ptr;
-        int y;
+    if (buffer->pm_type == BR_PMT_INDEX_8 && buffer->width_p == 64 && buffer->height == 64) {
+        br_uint_8* pal;
+        int i;
+        void* src;
+        void* dst;
+        LONG pitch;
+        br_uint_16* conversion;
+        br_uint_32 src_stride;
 
+        pal = buffer->palette_pointer;
         switch (texture_format) {
-        case 2:
-            for (pal_i = 0; pal_i < 256; pal_i++) {
-                br_colour c = pal_ptr[pal_i];
-                gD3D_16bit_palette_buffer[pal_i] = ((c & 0xf80000) >> 9) | ((c & 0xf800) >> 6) | ((c & 0xff) >> 3);
+        case 16:
+            for (i = 0; i < (int)BR_ASIZE(gD3D_16bit_palette_buffer); i++, pal += 4) {
+                gD3D_16bit_palette_buffer[i] = ((pal[1] >> 4) << 4) + (pal[0] >> 4) + ((pal[2] >> 4) << 8) + 0xf000;
             }
             break;
-        case 4:
-            for (pal_i = 0; pal_i < 256; pal_i++) {
-                br_colour c = pal_ptr[pal_i];
-                gD3D_16bit_palette_buffer[pal_i] = ((c & 0xf80000) >> 8) | ((c & 0xfc00) >> 5) | ((c & 0xff) >> 3);
+        case 2:
+            for (i = 0; i < (int)BR_ASIZE(gD3D_16bit_palette_buffer); i++, pal += 4) {
+                gD3D_16bit_palette_buffer[i] = ((pal[2] >> 3) << 10) + ((pal[1] >> 3) << 5) + (pal[0] >> 3);
             }
             break;
         case 8:
-            for (pal_i = 0; pal_i < 256; pal_i++) {
-                br_colour c = pal_ptr[pal_i];
-                gD3D_16bit_palette_buffer[pal_i] = 0x1000 | ((c & 0xf80000) >> 9) | ((c & 0xf800) >> 5) | ((c & 0xff) >> 3);
+            for (i = 0; i < (int)BR_ASIZE(gD3D_16bit_palette_buffer); i++, pal += 4) {
+                gD3D_16bit_palette_buffer[i] = 0x8000 + ((pal[2] >> 3) << 10) + ((pal[1] >> 3) << 5) + (pal[0] >> 3);
             }
             break;
-        case 16:
-            for (pal_i = 0; pal_i < 256; pal_i++) {
-                br_colour c = pal_ptr[pal_i];
-                gD3D_16bit_palette_buffer[pal_i] = 0xf000 | ((c & 0xf00000) >> 12) | ((c & 0xf000) >> 8) | ((c & 0xf0) >> 4);
+        case 4:
+            for (i = 0; i < (int)BR_ASIZE(gD3D_16bit_palette_buffer); i++, pal += 4) {
+                gD3D_16bit_palette_buffer[i] = ((pal[2] >> 3) << 11) + ((pal[1] >> 2) << 5) + (pal[0] >> 3);
             }
             break;
         }
-
-        write_row_ptr = surface_desc.lpSurface;
-        read_row_ptr = buffer->field_0x68;
+        pitch = surface_desc.lPitch;
+        conversion = gD3D_16bit_palette_buffer;
+        src_stride = buffer->width_b;
+        src = buffer->field_0x68;
+        dst = surface_desc.lpSurface;
+#ifdef REC2_MATCHING
+        __asm {
+            mov     esi, src
+            mov     edi, dst
+            mov     ebx, conversion
+            mov     ecx, 64
+        row_loop:
+            push    ecx
+            push    esi
+            push    edi
+            mov     ecx, 64
+        pixel_loop:
+            xor     eax, eax
+            lodsb
+            mov     ax, [ebx + eax * 2]
+            stosw
+            loop    pixel_loop
+            pop     edi
+            pop     esi
+            add     edi, pitch
+            add     esi, src_stride
+            pop     ecx
+            loop    row_loop
+        }
+#else
         for (y = 0; y < 64; y++) {
-            int x;
-            br_uint_16* write_ptr = (br_uint_16*)write_row_ptr;
-            br_uint_8* read_ptr = read_row_ptr;
-            for (x = 0; x < 64; x++, read_ptr++, write_ptr++) {
-                *write_ptr = gD3D_16bit_palette_buffer[*read_ptr];
+            for (x = 0; x < 64; x++) {
+                ((br_uint_16*)dst)[x] = conversion[((br_uint_8*)src)[x]];
             }
-            write_row_ptr += surface_desc.lPitch;
-            read_row_ptr += buffer->width_b;
+            dst = (br_uint_8*)dst + pitch;
+            src = (br_uint_8*)src + src_stride;
         }
-        if (gBuffered_textures[index].field_0x1c) {
-            /* FIXME: original uses temp_opaque_texture everywhere */
-            if (IDirectDrawSurface_Unlock(gBuffered_textures[index].temp_surface, NULL) != DD_OK) {
-                d3d_debug_printf("UNLock Temporary Texture Surface");
+#endif
+#ifdef REC2_FIX_BUGS
+        if (gBuffered_textures[index].field_0x1c == 0) {
+            failed = IDirectDrawSurface_Unlock(gBuffered_textures[index].temp_opaque_surface, NULL) != DD_OK;
+            if (failed) {
+                d3d_check_result(failed, "UNLock Temporary Texture Surface");
                 return 1;
             }
-            if (IDirect3DTexture2_Load(gBuffered_textures[index].texture, gBuffered_textures[index].temp_opaque_texture) != D3D_OK) {
-                d3d_debug_printf("Load Temporary Texture Surface");
+            failed = IDirect3DTexture2_Load(gBuffered_textures[index].texture, gBuffered_textures[index].temp_opaque_texture) != D3D_OK;
+            if (failed) {
+                d3d_check_result(failed, "Load Temporary Texture Surface");
                 return 1;
             }
         } else {
-            if (IDirectDrawSurface_Unlock(gBuffered_textures[index].temp_opaque_surface, NULL) != DD_OK) {
-                d3d_debug_printf("UNLock Temporary Texture Surface");
+            failed = IDirectDrawSurface_Unlock(gBuffered_textures[index].temp_surface, NULL) != DD_OK;
+            if (failed) {
+                d3d_check_result(failed, "UNLock Temporary Texture Surface");
                 return 1;
             }
-            if (IDirect3DTexture2_Load(gBuffered_textures[index].texture, gBuffered_textures[index].temp_opaque_texture) != D3D_OK) {
-                d3d_debug_printf("Load Temporary Texture Surface");
+            failed = IDirect3DTexture2_Load(gBuffered_textures[index].texture, gBuffered_textures[index].temp_texture) != D3D_OK;
+            if (failed) {
+                d3d_check_result(failed, "Load Temporary Texture Surface");
                 return 1;
             }
         }
+#else
+        /* Both branches unlock and load the opaque temporary texture in the original */
+        if (gBuffered_textures[index].field_0x1c == 0) {
+            failed = IDirectDrawSurface_Unlock(gBuffered_textures[index].temp_opaque_surface, NULL) != DD_OK;
+            if (failed) {
+                d3d_check_result(failed, "UNLock Temporary Texture Surface");
+                return 1;
+            }
+            failed = IDirect3DTexture2_Load(gBuffered_textures[index].texture, gBuffered_textures[index].temp_opaque_texture) != D3D_OK;
+            if (failed) {
+                d3d_check_result(failed, "Load Temporary Texture Surface");
+                return 1;
+            }
+        } else {
+            failed = IDirectDrawSurface_Unlock(gBuffered_textures[index].temp_opaque_surface, NULL) != DD_OK;
+            if (failed) {
+                d3d_check_result(failed, "UNLock Temporary Texture Surface");
+                return 1;
+            }
+            failed = IDirect3DTexture2_Load(gBuffered_textures[index].texture, gBuffered_textures[index].temp_opaque_texture) != D3D_OK;
+            if (failed) {
+                d3d_check_result(failed, "Load Temporary Texture Surface");
+                return 1;
+            }
+        }
+#endif
         gBuffered_textures[index].field_0x20 = buffer->uid;
         buffer->field_0x4c = index;
         gBuffered_textures[index].field_0x24 = gFlip_count;
         return 0;
     }
     if (buffer->width_p == surface_desc.dwWidth && buffer->height == surface_desc.dwHeight) {
-        br_uint_32 y;
-        br_uint_8* read_ptr = buffer->field_0x68;
-        br_uint_8* write_ptr = surface_desc.lpSurface;
-        for (y = 0; y < buffer->height; y++, write_ptr += surface_desc.lPitch, read_ptr += buffer->width_b) {
-            memcpy(write_ptr, read_ptr, 2 * surface_desc.dwWidth);
+        br_uint_32 width;
+        br_uint_32 height;
+        br_uint_32 src_stride;
+        void* src;
+        LONG pitch;
+        void* dst;
+
+        width = buffer->width_p;
+        height = buffer->height;
+        src_stride = buffer->width_b;
+        src = buffer->field_0x68;
+        pitch = surface_desc.lPitch;
+        dst = surface_desc.lpSurface;
+#ifdef REC2_MATCHING
+        __asm {
+            mov     esi, src
+            mov     edi, dst
+            mov     ecx, height
+        copy_row:
+            push    ecx
+            push    esi
+            push    edi
+            mov     ecx, width
+            rep movsw
+            pop     edi
+            pop     esi
+            add     edi, pitch
+            add     esi, src_stride
+            pop     ecx
+            loop    copy_row
         }
+#else
+        for (y = 0; y < height; y++) {
+            memcpy(dst, src, width * sizeof(br_uint_16));
+            dst = (br_uint_8*)dst + pitch;
+            src = (br_uint_8*)src + src_stride;
+        }
+#endif
     } else {
         FUN_10008570(surface_desc.lpSurface, surface_desc.dwWidth, surface_desc.dwHeight, surface_desc.lPitch,
             buffer->field_0x68, buffer->width_p, buffer->height, buffer->width_b);
     }
+    ptr = surface_desc.lpSurface;
     if (gTexture_format_is_NOT_ARGB4444 && (buffer->pm_type == BR_PMT_RGBA_4444 || buffer->pm_type == BR_PMT_ARGB_1555)) {
-        if (arg3 == -2) {
-            br_uint_32 y;
-            br_uint_8* row_ptr = surface_desc.lpSurface;
+        if (arg3 != -2) {
+            gDAT_1001bc6c = 0;
             switch (texture_format) {
-            case 2:
-            case 8:
-                for (y = 0; y < surface_desc.dwHeight; y++, row_ptr += surface_desc.lPitch) {
-                    br_uint_32 x;
-                    br_uint_16* ptr = (br_uint_16*)row_ptr;
-                    for (x = 0; x < surface_desc.dwWidth; x++, ptr++) {
-                        if (buffer->pm_type == BR_PMT_RGBA_4444) {
-                            br_uint_16 c = *ptr;
-                            br_uint_32 a = (c & 0xf000) >> 12;
-                            /* RGBA4444 -> RGB555 */
-                            *ptr = (((a * (c & 0xf00)) >> 11) << 10) | (((a * (c & 0xf0)) >> 7) << 5) | ((a * (c & 0xf)) >> 3);
-                            if (a < 25) {
+            case 4:
+                for (y = 0; y < surface_desc.dwHeight; y++) {
+                    for (x = 0; x < surface_desc.dwWidth; x++) {
+                        switch (buffer->pm_type) {
+                        case BR_PMT_RGBA_4444:
+                            c = *ptr;
+                            alpha = ((c >> 8) & 0xf0) + (c >> 12);
+                            if (arg3 >= 0) {
+                                alpha = (alpha * arg3) >> 8;
+                            }
+                            *ptr = ((((((c & 0xff00) << 1) | (c & 0xf0)) << 2) | (c & 0xf)) * 2);
+                            if (*ptr == 0) {
+                                *ptr = 1;
+                            }
+                            if (gTextures_alpha_init[0][((alpha ^ y) & 0xf) ^ alpha][x & 0xf] == 0) {
                                 *ptr = 0;
                             }
+                            break;
+                        case BR_PMT_ARGB_1555:
+                            *ptr = (*ptr & 0x1f) * 0x21 + (*ptr & 0x7c00) * 2;
+                            break;
                         }
+                        ptr++;
                     }
+                    ptr += (surface_desc.lPitch - 2 * surface_desc.dwWidth) / 2;
                 }
                 break;
-            case 4:
-                for (y = 0; y < surface_desc.dwHeight; y++, row_ptr += surface_desc.lPitch) {
-                    br_uint_32 x;
-                    br_uint_16* ptr = (br_uint_16*)row_ptr;
-                    for (x = 0; x < surface_desc.dwWidth; x++, ptr++) {
+            case 2:
+            case 8:
+                for (y = 0; y < surface_desc.dwHeight; y++) {
+                    for (x = 0; x < surface_desc.dwWidth; x++) {
                         if (buffer->pm_type == BR_PMT_RGBA_4444) {
-                            br_uint_16 c = *ptr;
-                            br_uint_32 a = (c & 0xf000) >> 12;
-                            /* RGBA4444 -> RGB565 */
-                            *ptr = (((a * (c & 0xf00)) >> 11) << 11) | (((a * (c & 0xf0)) >> 6) << 5) | ((a * (c & 0xf)) >> 3);
-                            if (a < 25) {
+                            c = *ptr;
+                            alpha = ((c >> 8) & 0xf0) + (c >> 12);
+                            if (arg3 >= 0) {
+                                alpha = (alpha * arg3) >> 8;
+                            }
+                            *ptr = ((((((c & 0xf00) << 1) | (c & 0xf0)) << 1) | (c & 0xf)) * 2);
+                            if (*ptr == 0) {
+                                *ptr = 1;
+                            }
+                            if (gTextures_alpha_init[0][((alpha ^ y) & 0xf) ^ alpha][x & 0xf] == 0) {
                                 *ptr = 0;
                             }
-                        } else if (buffer->pm_type == BR_PMT_ARGB_1555) {
-                            /* RGB555 -> RGB565 */
-                            /* FIXME: original converts to RBB565 */
-                            br_uint_16 c = *ptr;
-                            *ptr = ((c & 0x7fe0) << 1) | (c & 0x1f);
                         }
+                        ptr++;
                     }
+                    ptr += (surface_desc.lPitch - 2 * surface_desc.dwWidth) / 2;
                 }
                 break;
             }
         } else {
-            br_uint_8* row_ptr = surface_desc.lpSurface;
-            br_uint_32 y;
-            gDAT_1001bc6c = 0;
             switch (texture_format) {
-            case 2:
-            case 8:
-                for (y = 0; y < surface_desc.dwHeight; y++, row_ptr += surface_desc.lPitch) {
-                    br_uint_32 x;
-                    br_uint_16* ptr = (br_uint_16*)row_ptr;
-                    for (x = 0; x < surface_desc.dwWidth; x++, ptr++) {
-                        if (buffer->pm_type == BR_PMT_RGBA_4444) {
-                            br_uint_16 c = *ptr;
-                            br_uint_32 a = ((c & 0xf000) >> 12) * 0x11;
-                            if (arg3 >= 0) {
-                                a = (a * arg3) >> 8;
-                            }
-                            /* RGBA4444 -> RGB555 */
-                            *ptr = ((c & 0xf00) << 3) | ((c & 0xf0) << 2) | ((c & 0xf) << 1);
-                            if (*ptr == 0) {
-                                *ptr = 1;
-                            }
-                            if (gTextures_alpha_init[0][(((a ^ y) & 0xf) ^ a)][x & 0xf] == 0) {
+            case 4:
+                for (y = 0; y < surface_desc.dwHeight; y++) {
+                    for (x = 0; x < surface_desc.dwWidth; x++) {
+                        switch (buffer->pm_type) {
+                        case BR_PMT_RGBA_4444:
+                            c = *ptr;
+                            alpha = (c >> 8) & 0xf0;
+                            r = (((c >> 4) & 0xf0) * alpha) >> 8;
+                            g = ((c & 0xf0) * alpha) >> 8;
+                            b = (((c & 0xf) << 4) * alpha) >> 8;
+                            *ptr = ((((r >> 3) << 6) | ((g >> 2) & 0x3f)) << 5) | ((b >> 3) & 0x1f);
+                            if (alpha < 25) {
                                 *ptr = 0;
                             }
+                            break;
+                        case BR_PMT_ARGB_1555:
+                            *ptr = (*ptr & 0x1f) * 0x21 + (*ptr & 0x7c00) * 2;
+                            break;
                         }
+                        ptr++;
                     }
+                    ptr += (surface_desc.lPitch - 2 * surface_desc.dwWidth) / 2;
                 }
                 break;
-            case 4:
-                for (y = 0; y < surface_desc.dwHeight; y++, row_ptr += surface_desc.lPitch) {
-                    br_uint_32 x;
-                    br_uint_16* ptr = (br_uint_16*)row_ptr;
-                    for (x = 0; x < surface_desc.dwWidth; x++, ptr++) {
+            case 2:
+            case 8:
+                for (y = 0; y < surface_desc.dwHeight; y++) {
+                    for (x = 0; x < surface_desc.dwWidth; x++) {
                         if (buffer->pm_type == BR_PMT_RGBA_4444) {
-                            br_uint_16 c = *ptr;
-                            br_uint_32 a = ((c & 0xf000) >> 12) * 0x11;
-                            if (arg3 >= 0) {
-                                a = (a * arg3) >> 8;
-                            }
-                            /* RGBA4444 -> RGB565 */
-                            *ptr = ((c & 0xf00) << 4) | ((c & 0xf0) << 3) | ((c & 0xf) << 1);
-                            if (*ptr == 0) {
-                                *ptr = 1;
-                            }
-                            if (gTextures_alpha_init[0][((a ^ y) & 0xf) ^ a][x & 0xf] == 0) {
+                            c = *ptr;
+                            alpha = (c >> 8) & 0xf0;
+                            r = (((c >> 4) & 0xf0) * alpha) >> 8;
+                            g = ((c & 0xf0) * alpha) >> 8;
+                            b = (((c & 0xf) << 4) * alpha) >> 8;
+                            *ptr = (((((r >> 3) & 0x1f) << 5) | ((g >> 3) & 0x1f)) << 5) | ((b >> 3) & 0x1f);
+                            if (alpha < 25) {
                                 *ptr = 0;
                             }
-                        } else if (buffer->pm_type == BR_PMT_ARGB_1555) {
-                            /* RGB555 -> RGB565 */
-                            /* FIXME: original converts to RBB565 */
-                            br_uint_16 c = *ptr;
-                            *ptr = ((c & 0x7fe0) << 1) | (c & 0x1f);
                         }
+                        ptr++;
                     }
+                    ptr += (surface_desc.lPitch - 2 * surface_desc.dwWidth) / 2;
                 }
                 break;
             }
         }
-    }
-    if (gTexture_format_is_NOT_ARGB4444 && (buffer->pm_type == BR_PMT_RGBA_4444 || buffer->pm_type == BR_PMT_ARGB_1555)) {
-        int extra_processing = 0;
+    } else {
+        extra_processing = 0;
         switch (texture_format) {
-        case 2:
-        case 8:
-            switch (buffer->pm_type) {
-            case 5:
-            case 18:
-            case 31:
-                extra_processing = 1;
-                break;
-            }
-            break;
-        case 4:
-            switch (buffer->pm_type) {
-            case 4:
-            case 18:
-            case 31:
-                extra_processing = 1;
-                break;
-            }
-            break;
         case 16:
             switch (buffer->pm_type) {
-            case 4:
-            case 5:
-            case 31:
+            case BR_PMT_RGB_555:
+            case BR_PMT_RGB_565:
+            case BR_PMT_ARGB_1555:
                 extra_processing = 1;
                 break;
-            case 18:
+            case BR_PMT_RGBA_4444:
                 if (gNo_2d_during_3d_scene) {
                     extra_processing = 1;
                 }
                 break;
             }
             break;
+        case 2:
+        case 8:
+            if (buffer->pm_type == BR_PMT_RGB_565 || buffer->pm_type == BR_PMT_RGBA_4444 || buffer->pm_type == BR_PMT_ARGB_1555) {
+                extra_processing = 1;
+            }
+            break;
+        case 4:
+            if (buffer->pm_type == BR_PMT_RGB_555 || buffer->pm_type == BR_PMT_RGBA_4444 || buffer->pm_type == BR_PMT_ARGB_1555) {
+                extra_processing = 1;
+            }
+            break;
         }
-        if (extra_processing) {
-            br_uint_32 y;
-            br_uint_8* row_ptr = surface_desc.lpSurface;
+        if (extra_processing == 1) {
             switch (texture_format) {
-            case 2:
-            case 8:
-                for (y = 0; y < surface_desc.dwHeight; y++, row_ptr += surface_desc.lPitch) {
-                    br_uint_32 x;
-                    br_uint_16* ptr = (br_uint_16*)row_ptr;
-                    for (x = 0; x < surface_desc.dwWidth; x++, row_ptr++) {
-                        br_uint_16 c;
-                        switch (buffer->pm_type) {
-                        case BR_PMT_RGB_555:
-                            *ptr |= 0x8000;
-                            break;
-                        case BR_PMT_RGB_565:
-                            c = *ptr;
-                            *ptr = 0x8000 | ((c & 0xffc0) >> 1) | (c & 0x1f);
-                            break;
-                        case BR_PMT_RGBA_4444:
-                            c = *ptr;
-                            *ptr = (c & 0x8000) | ((c & 0xf00) << 3) | ((c & 0xf0) << 2) | ((c & 0xf) << 1);
-                            break;
-                        }
-                    }
-                }
-                break;
-            case 4:
-                for (y = 0; y < surface_desc.dwHeight; y++, row_ptr += surface_desc.lPitch) {
-                    br_uint_32 x;
-                    br_uint_16* ptr = (br_uint_16*)row_ptr;
-                    for (x = 0; x < surface_desc.dwWidth; x++, row_ptr++) {
-                        br_uint_16 c;
-                        /* FIXME: original does RGB -> RBB */
-                        switch (buffer->pm_type) {
-                        case BR_PMT_RGB_555:
-                            /* 555 -> 565*/
-                            c = *ptr;
-                            *ptr = (c & 0x1f) * 0x21 | (c & 0x7c00) * 2;
-                            break;
-                        case BR_PMT_RGBA_4444:
-                            c = *ptr;
-                            *ptr = ((c & 0xf00) << 3) | ((c & 0xf0) << 2) | ((c & 0xf) << 1);
-                            break;
-                        case BR_PMT_ARGB_1555:
-                            c = *ptr;
-                            *ptr = (c & 0x1f) * 0x21 | (c & 0x7c00) * 2;
-                            break;
-                        }
-                    }
-                }
-                break;
             case 16:
                 {
-                    int min_x = 6000;
-                    int max_x = -1;
-                    int min_y = 6000;
-                    int max_y = -1;
-                    for (y = 0; y < surface_desc.dwHeight; y++, row_ptr += surface_desc.lPitch) {
-                        br_uint_32 x;
-                        br_uint_16 *ptr = (br_uint_16*)row_ptr;
-                        for (x = 0; x < surface_desc.dwWidth; x++, row_ptr++) {
-                            br_uint_16 c;
+                    int min_x;
+                    int max_x;
+                    int min_y;
+                    int max_y;
+
+#ifdef REC2_FIX_BUGS
+                    /* The original leaves min_x and max_x uninitialised */
+                    min_x = 6000;
+                    max_x = -1;
+#endif
+                    min_y = 6000;
+                    max_y = -1;
+                    for (y = 0; y < surface_desc.dwHeight; y++) {
+                        for (x = 0; x < surface_desc.dwWidth; x++) {
                             switch (buffer->pm_type) {
                             case BR_PMT_RGB_555:
-                                /* RGB555 -> ARGB4444 */
                                 c = *ptr;
-                                *ptr = ((c & 0x7800) >> 3) | ((c >> 2) & 0xf0) | ((c >> 1) & 0xf);
+                                *ptr = ((c & 0x7800) >> 3) + ((c >> 1) & 0xf) - 0x1000 + ((c >> 2) & 0xf0);
                                 break;
                             case BR_PMT_RGB_565:
-                                /* RGB565 -> ARGB4444 */
                                 c = *ptr;
-                                *ptr = ((c & 0xf000) >> 4) | ((c >> 3) & 0xf0) | ((c >> 1) & 0xf);
+                                *ptr = ((c & 0xf000) >> 4) + ((c >> 1) & 0xf) - 0x1000 + ((c >> 3) & 0xf0);
                                 break;
                             case BR_PMT_RGBA_4444:
-                                c = *ptr;
-                                if ((c & 0xf000) <= 0x3000) {
+                                if ((*ptr & 0xf000) <= 0x3000) {
                                     if ((int)x < min_x) {
                                         min_x = x;
                                     }
@@ -2320,46 +2376,93 @@ int C2_HOOK_CDECL d3d_update_texture(int index, render_buffer_d3d* buffer, int a
                                 break;
                             case BR_PMT_ARGB_1555:
                                 c = *ptr;
-                                *ptr = ((c & 0x8000) ? 0xf000 : 0) | ((c >> 3) & 0xf00) | ((c >> 2) & 0xf0) | ((c >> 1) & 0xf);
+                                *ptr = ((c & 0x8000) != 0) * 0xf000 + ((c >> 3) & 0xf00) + ((c >> 1) & 0xf) + ((c & 0x3c0) >> 2);
                                 break;
                             }
+                            ptr++;
                         }
+                        ptr += (surface_desc.lPitch - 2 * surface_desc.dwWidth) / 2;
                     }
                     buffer->field_0x6c = min_x;
                     buffer->field_0x74 = max_x;
                     buffer->field_0x70 = min_y;
                     buffer->field_0x78 = max_y;
-                    break;
                 }
+                break;
+            case 2:
+            case 8:
+                for (y = 0; y < surface_desc.dwHeight; y++) {
+                    for (x = 0; x < surface_desc.dwWidth; x++) {
+                        switch (buffer->pm_type) {
+                        case BR_PMT_RGB_555:
+                            ((br_uint_8*)ptr)[1] |= 0x80;
+                            break;
+                        case BR_PMT_RGB_565:
+                            c = *ptr;
+                            *ptr = ((c >> 1) & 0x7c00) + (c & 0x1f) + 0x8000 + ((c >> 1) & 0x3e0);
+                            break;
+                        case BR_PMT_RGBA_4444:
+                            c = *ptr;
+                            *ptr = (c & 0x8000) + ((c & 0xf) + (c & 0xf00) * 2 + (c & 0xf0)) * 2;
+                            break;
+                        }
+                        ptr++;
+                    }
+                    ptr += (surface_desc.lPitch - 2 * surface_desc.dwWidth) / 2;
+                }
+                break;
+            case 4:
+                for (y = 0; y < surface_desc.dwHeight; y++) {
+                    for (x = 0; x < surface_desc.dwWidth; x++) {
+                        switch (buffer->pm_type) {
+                        case BR_PMT_RGB_555:
+                            *ptr = (*ptr & 0x1f) * 0x21 + (*ptr & 0x7c00) * 2;
+                            break;
+                        case BR_PMT_RGBA_4444:
+                            c = *ptr;
+                            *ptr = ((c & 0xf) + ((c & 0xf0) + (c & 0xf00) * 2) * 2) * 2;
+                            break;
+                        case BR_PMT_ARGB_1555:
+                            *ptr = (*ptr & 0x1f) * 0x21 + (*ptr & 0x7c00) * 2;
+                            break;
+                        }
+                        ptr++;
+                    }
+                    ptr += (surface_desc.lPitch - 2 * surface_desc.dwWidth) / 2;
+                }
+                break;
             }
         }
     }
-    if (gBuffered_textures[index].field_0x1c) {
-        if (IDirectDrawSurface_Unlock(gBuffered_textures[index].temp_surface, NULL) != DD_OK) {
-            d3d_debug_printf("UNLock Temporary Texture Surface");
+    if (gBuffered_textures[index].field_0x1c == 0) {
+        failed = IDirectDrawSurface_Unlock(gBuffered_textures[index].temp_opaque_surface, NULL) != DD_OK;
+        if (failed) {
+            d3d_check_result(failed, "UNLock Temporary Texture Surface");
             return 1;
         }
-        if (IDirect3DTexture2_Load(gBuffered_textures[index].texture, gBuffered_textures[index].temp_texture) != D3D_OK) {
-            d3d_debug_printf("Load Temporary Texture Surface");
+        failed = IDirect3DTexture2_Load(gBuffered_textures[index].texture, gBuffered_textures[index].temp_opaque_texture) != D3D_OK;
+        if (failed) {
+            d3d_check_result(failed, "Load Temporary Texture Surface");
             return 1;
         }
     } else {
-        if (IDirectDrawSurface_Unlock(gBuffered_textures[index].temp_opaque_surface, NULL) != DD_OK) {
-            d3d_debug_printf("UNLock Temporary Texture Surface");
+        failed = IDirectDrawSurface_Unlock(gBuffered_textures[index].temp_surface, NULL) != DD_OK;
+        if (failed) {
+            d3d_check_result(failed, "UNLock Temporary Texture Surface");
             return 1;
         }
-        if (IDirect3DTexture2_Load(gBuffered_textures[index].texture, gBuffered_textures[index].temp_opaque_texture) != D3D_OK) {
-            d3d_debug_printf("Load Temporary Texture Surface");
+        failed = IDirect3DTexture2_Load(gBuffered_textures[index].texture, gBuffered_textures[index].temp_texture) != D3D_OK;
+        if (failed) {
+            d3d_check_result(failed, "Load Temporary Texture Surface");
             return 1;
         }
     }
     if (gTexture_format_is_NOT_ARGB4444) {
-        DDCOLORKEY color_key;
-
         color_key.dwColorSpaceHighValue = 0;
         color_key.dwColorSpaceLowValue = 0;
-        if (IDirectDrawSurface_SetColorKey(gBuffered_textures[index].surface, 8, &color_key) != DD_OK) {
-            d3d_debug_printf("Set color key");
+        failed = IDirectDrawSurface_SetColorKey(gBuffered_textures[index].surface, DDCKEY_SRCBLT, &color_key) != DD_OK;
+        if (failed) {
+            d3d_check_result(failed, "Set color key");
             return 1;
         }
     }
@@ -2368,6 +2471,9 @@ int C2_HOOK_CDECL d3d_update_texture(int index, render_buffer_d3d* buffer, int a
     gBuffered_textures[index].field_0x24 = gFlip_count;
     return 0;
 }
+#if !defined(REC2_FIX_BUGS) && defined(__GNUC__)
+#pragma GCC diagnostic pop
+#endif
 
 // FUNCTION: D3D 0x10003bd0
 int C2_HOOK_CDECL d3d_load(render_buffer_d3d* buffer, int arg2) {
