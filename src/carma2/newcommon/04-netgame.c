@@ -345,7 +345,7 @@ void C2_HOOK_FASTCALL EnableCar(tCar_spec* pCar) {
 
 #ifdef REC2_HW
 // FUNCTION: CARMA2_HW 0x0049a410
-void C2_HOOK_FASTCALL CreateBoxes(void) {
+inline void C2_HOOK_FASTCALL CreateBoxes(void) {
     br_camera* camera;
     br_pixelmap* pixelmap;
     br_material* material;
@@ -409,7 +409,26 @@ void C2_HOOK_FASTCALL CreateBoxes(void) {
 }
 #endif
 
-// DrawScoreBoxes
+#ifdef REC2_HW
+// FUNCTION: CARMA2_HW 0x00499640
+// FUNCTION: CARMA2_CHEAT 0x004999f0
+void C2_HOOK_FASTCALL DrawScoreBoxes(int pX, int pY, int pBox_index, int pMaterial_index) {
+    br_actor* actor;
+
+    if (!gNetscore_box_created) {
+        CreateBoxes();
+    }
+    if (gNetscore_box_created) {
+        actor = gNetscore_box_actors[pBox_index];
+        actor->material = gNetscore_box_materials[pMaterial_index];
+        actor->model = gNetScore_box_model;
+        BrMatrix34Translate(&actor->t.t.mat, (br_scalar)(pX - 320), (br_scalar)(240 - pY), 0.0f);
+        BrActorAdd(gNetscore_box_universe, actor);
+        BrZbSceneRender(gNetscore_box_universe, gNetscore_box_camera, gRender_screen, gDepth_buffer);
+        BrActorRemove(actor);
+    }
+}
+#endif
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
