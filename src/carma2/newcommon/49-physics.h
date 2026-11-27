@@ -332,9 +332,9 @@ extern void C2_HOOK_FASTCALL ApplyDiminishingTorque(tPhysics_object* pObject, co
 
 // RQIterativeImprovement
 
-// RQExpand
+extern void C2_HOOK_FASTCALL RQExpand(br_scalar* pMatrix, const br_scalar* pOriginal, int pOld_size, int pSize, br_scalar* pOrthogonal, const tU8* pIndices);
 
-// RQSingleExpand
+extern void C2_HOOK_FASTCALL RQSingleExpand(br_scalar* pMatrix, const br_scalar* pOriginal, int pSize, br_scalar* pOrthogonal, const tU8* pIndices);
 
 extern int C2_HOOK_FASTCALL RQDcmpV(br_scalar* pMatrix, int pDim, br_scalar* pQ);
 
@@ -342,7 +342,7 @@ extern int C2_HOOK_FASTCALL RQDcmpV(br_scalar* pMatrix, int pDim, br_scalar* pQ)
 
 // SparseRQDcmpV
 
-// MakeMatrixFromIndices
+extern void C2_HOOK_FASTCALL MakeMatrixFromIndices(br_scalar* pMatrix, br_scalar* pOrthogonal, const br_scalar* pOriginal, br_scalar* pResult, const br_scalar* pRhs, const tU8* pIndices, int pSize, tForce_group** pGroups, int pCount_groups);
 
 // HasBeenDoneBefore
 

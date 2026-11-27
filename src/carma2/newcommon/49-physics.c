@@ -82,6 +82,7 @@ void* gPhysics_buffer3_ptr;
 
 // GLOBAL: CARMA2_HW 0x0074a5e4
 // GLOBAL: CARMA2_SW 0x007410a4
+// GLOBAL: CARMA2_CHEAT 0x00751c84
 int gPHIL_mechanics_time_sync;
 
 // GLOBAL: CARMA2_HW 0x0074a5e8
@@ -741,11 +742,13 @@ void C2_HOOK_FASTCALL SetGroup(tPhysics_object* pObject, int pGroup) {
 // GetPreCalculatedJointForces
 
 // FUNCTION: CARMA2_HW 0x004b9f40
+// FUNCTION: CARMA2_SW 0x004b6660
+// FUNCTION: CARMA2_CHEAT 0x004bfa70
 void C2_HOOK_FASTCALL MakeObjectListDoSomething(tPhysics_object* pObject) {
     while (pObject != NULL) {
         if (pObject->disable_move_rotate) {
-            pObject->disable_move_rotate = 0;
             pObject->box_face_ref = gFace_num__car - 2;
+            pObject->disable_move_rotate = 0;
         }
         if (pObject->child != NULL) {
             MakeObjectListDoSomething(pObject->child);
@@ -1089,6 +1092,7 @@ void C2_HOOK_FASTCALL ApplyTorque(tPhysics_object* pObject, const br_vector3* pT
 
 // FUNCTION: CARMA2_HW 0x004c2c90
 // FUNCTION: CARMA2_SW 0x004bf3c0
+// FUNCTION: CARMA2_CHEAT 0x004c87b0
 void C2_HOOK_FASTCALL ApplyDiminishingTorque(tPhysics_object* pObject, const br_vector3* pV) {
     br_vector3 original_omega;
     br_vector3 tv;
@@ -1452,15 +1456,6 @@ int C2_HOOK_FASTCALL RQDcmpV(br_scalar* pMatrix, int pDim, br_scalar* pQ) {
 
 // SparseRQDcmpV
 
-/* FIXME: name and layout are guesses; only count, orthogonal and matrix are read here. */
-typedef struct tForce_group {
-    int count;
-    tPhysics_joint_force* forces;
-    undefined field_0x8[12];
-    br_scalar* orthogonal;
-    br_scalar* matrix;
-} tForce_group;
-
 // FUNCTION: CARMA2_HW 0x004c5220
 // FUNCTION: CARMA2_SW 0x004c1950
 // FUNCTION: CARMA2_CHEAT 0x004cad40
@@ -1598,10 +1593,12 @@ tCollision_shape_polyhedron* C2_HOOK_FASTCALL AllocateShapePolyhedron(int pCount
     tCollision_shape_polyhedron* result;
     tU8* raw_memory;
     int count_edges;
+    int count_planes;
 
+    count_planes = (pCount_points - 2) * 2;
     count_edges = (pCount_points - 2) * 3;
     result = BrMemAllocate(sizeof(tCollision_shape_polyhedron) + pCount_points * sizeof(br_vector3)
-        + count_edges * sizeof(tPolyhedron_edge_indexes) + (pCount_points - 2) * 2 * sizeof(br_vector4), (br_uint_8)pType);
+        + count_edges * sizeof(tPolyhedron_edge_indexes) + count_planes * sizeof(br_vector4), (br_uint_8)pType);
     raw_memory = (tU8*)result + sizeof(tCollision_shape_polyhedron);
     result->polyhedron.points = (br_vector3*)raw_memory;
     raw_memory += pCount_points * sizeof(br_vector3);
@@ -2054,6 +2051,7 @@ void C2_HOOK_FASTCALL DoPhysicsError(tPhysicsError pError, const char* pMessage)
 // ResetMan2
 
 // FUNCTION: CARMA2_HW 0x004b5aa0
+// FUNCTION: CARMA2_CHEAT 0x004bb370
 void C2_HOOK_FASTCALL SetUpTestObjects(void) {
 
 }
