@@ -24,6 +24,7 @@
 #include "25-grafdata.h"
 #include "27-powerup.h"
 #include "29-raycast.h"
+#include "32-spark.h"
 #include "37-brucetrk.h"
 #include "41-utility.h"
 #include "42-input.h"
@@ -745,13 +746,79 @@ void C2_HOOK_FASTCALL SetRecovery(void) {
     }
 }
 
-// RecoverCar
+extern void C2_HOOK_FASTCALL RecoverCar(void);
+
+inline void C2_HOOK_FASTCALL RecoverCar(void) {
+
+    if (gNet_mode == eNet_mode_none || gPalette_fade_time == 0) {
+        gRecover_car = 1;
+    }
+    gProgram_state.current_car.time_to_recover = 0;
+}
 
 // CheckMapRenderMove
 
-// ExplodeCar
+extern void C2_HOOK_FASTCALL ExplodeCar(tCar_spec* pCar);
 
-// CheckRecoveryOfCars
+inline void C2_HOOK_FASTCALL ExplodeCar(tCar_spec* pCar) {
+    br_vector3 tv;
+    br_vector3 v;
+    br_vector3 pos;
+
+    pCar->collision_info->field_0x49c = 0;
+    BrVector3Copy(&tv, &pCar->collision_info->cmpos);
+    BrVector3Scale(&v, &pCar->collision_info->v, 6.9);
+    tv.v[2] = (pCar->collision_info->bb2.max.v[2] - pCar->collision_info->bb2.min.v[2]) * 0.3 + pCar->collision_info->bb2.min.v[2];
+    BrMatrix34ApplyP(&pos, &tv, &pCar->car_master_actor->t.t.mat);
+    CreatePuffOfSmoke(&pos, &v, 1.0f, 1.0f, 7);
+    tv.v[2] = (pCar->collision_info->bb2.max.v[2] - pCar->collision_info->bb2.min.v[2]) * 0.7 + pCar->collision_info->bb2.min.v[2];
+    BrMatrix34ApplyP(&pos, &tv, &pCar->car_master_actor->t.t.mat);
+    CreatePuffOfSmoke(&pos, &v, 1.0f, 1.0f, 7);
+    if (pCar->car_crush_spec->field_0x4b8) {
+        WeldCar(pCar);
+    }
+    DisableCar(pCar);
+}
+
+// FUNCTION: CARMA2_HW 0x00442500
+// FUNCTION: CARMA2_SW 0x004425e0
+// FUNCTION: CARMA2_CHEAT 0x00442620
+void C2_HOOK_FASTCALL CheckRecoveryOfCars(tU32 pEndFrameTime) {
+    int i;
+    int time;
+    int index;
+    char str[256];
+
+    if (gProgram_state.current_car.time_to_recover != 0) {
+        if (gProgram_state.current_car.knackered) {
+            gProgram_state.current_car.time_to_recover = 0;
+        } else {
+            time = (gProgram_state.current_car.time_to_recover - pEndFrameTime + 1000) / 1000;
+            index = eMiscString_seconds;
+            if (time <= 1) {
+                index = eMiscString_second;
+            }
+            sprintf(str, "%s %d %s", GetMiscString(eMiscString_recovery_in), time, GetMiscString(index));
+            if (!gToo_late && gCancel_recover) {
+                NewTextHeadupSlot2(4, 0, 2000, -4, str, 0);
+            }
+            if (gProgram_state.current_car.time_to_recover <= pEndFrameTime) {
+                RecoverCar();
+            }
+        }
+    }
+    if (gNet_mode != eNet_mode_none) {
+        for (i = 0; i < gNumber_of_net_players; i++) {
+            if (i != gThis_net_player_index && gNet_players[i].car->time_to_recover != 0 && gNet_players[i].car->time_to_recover <= pEndFrameTime) {
+                gNet_players[i].player_status = ePlayer_status_recovering;
+                gNet_players[i].car->collision_info->field_0x261 = 0xff;
+                gNet_players[i].car->collision_info->message_time = pEndFrameTime;
+                ExplodeCar(gNet_players[i].car);
+                gNet_players[i].car->time_to_recover = 0;
+            }
+        }
+    }
+}
 
 inline int C2_HOOK_FASTCALL TradeInAPO(int pCost) {
     int type;
