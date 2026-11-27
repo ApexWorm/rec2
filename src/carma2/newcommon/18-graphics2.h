@@ -15,6 +15,9 @@
 
 extern int gPHIL_doing_physics;
 
+extern int gFancy_line_center_palette_indexes[5];
+extern int gFancy_line_side_palette_indexes[5];
+
 extern int gCursor_tinted_top;
 extern int gCursor_tinted_left;
 extern int gCursor_tinted_bottom;
@@ -42,6 +45,7 @@ extern void C2_HOOK_FASTCALL DRPixelmapShadedHRectFill(br_pixelmap* pMap, int pX
 extern void C2_HOOK_FASTCALL DRPixelmapShadedVRectFill(br_pixelmap* pMap, int pX, int pY, int pWidth, int pHeight, br_colour pColour);
 
 extern br_pixelmap* gBlend75_table;
+extern br_pixelmap* gBlend_palettes[4];
 extern int gCurrent_cursor_index;
 extern tMouse_coord gMouse_last_pos;
 extern int gNext_transient;

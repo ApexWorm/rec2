@@ -881,11 +881,7 @@ void C2_HOOK_FASTCALL DRPixelmapBlendedLine(br_pixelmap* pDest, int pX1, int pY1
 #endif
 }
 
-extern int gFancy_line_center_palette_indexes[5];
-extern int gFancy_line_side_palette_indexes[5];
-extern br_pixelmap* gBlend_palettes[4];
-
-static void C2_HOOK_FASTCALL DR8BitFancyDrawLine(br_pixelmap* pMap, int pX1, int pY1, int pX2, int pY2, br_uint_32 pColour, tU32 pTime_period) {
+inline void C2_HOOK_FASTCALL DR8BitFancyDrawLine(br_pixelmap* pMap, int pX1, int pY1, int pX2, int pY2, br_uint_32 pColour, tU32 pTime_period) {
     int anim_index;
     int dy;
     int dx;
