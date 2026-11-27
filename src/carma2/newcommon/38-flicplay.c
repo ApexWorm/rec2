@@ -1219,6 +1219,74 @@ void C2_HOOK_FASTCALL FlushFlicQueue(void) {
     NOT_IMPLEMENTED();
 }
 
+// FUNCTION: CARMA2_HW 0x00462f00
+// FUNCTION: CARMA2_SW 0x00462990
+// FUNCTION: CARMA2_CHEAT 0x00463370
+void C2_HOOK_FASTCALL AddToFlicQueue(int pIndex, int pX, int pY, int pMust_finish) {
+    tFlic_descriptor* the_flic;
+    tFlic_descriptor* new_flic;
+    tFlic_descriptor* last_flic;
+
+    last_flic = NULL;
+    for (the_flic = gFirst_flic; the_flic != NULL; the_flic = the_flic->next) {
+        if (the_flic->x_offset == pX && the_flic->y_offset == pY) {
+            EndFlic(the_flic);
+            if (last_flic != NULL) {
+                last_flic->next = the_flic->next;
+            } else {
+                gFirst_flic = the_flic->next;
+            }
+            BrMemFree(the_flic);
+            break;
+        }
+        last_flic = the_flic;
+    }
+
+    LoadFlic(pIndex);
+    new_flic = BrMemAllocate(sizeof(tFlic_descriptor), kMem_misc);
+    new_flic->next = NULL;
+    if (gFirst_flic == NULL) {
+        gFirst_flic = new_flic;
+    } else {
+        for (the_flic = gFirst_flic; the_flic->next != NULL; the_flic = the_flic->next) {
+        }
+        the_flic->next = new_flic;
+    }
+    new_flic->last_frame = 0;
+    new_flic->the_index = pIndex;
+    new_flic->must_finish = pMust_finish;
+    new_flic->data_start = NULL;
+    StartFlic(gMain_flic_list[pIndex].file_name,
+        pIndex,
+        new_flic,
+        gMain_flic_list[pIndex].the_size,
+        gMain_flic_list[pIndex].data_ptr,
+        gBack_screen,
+        pX >= 0 ? pX : gMain_flic_list[pIndex].x_offset,
+        pY >= 0 ? pY : gMain_flic_list[pIndex].y_offset,
+        20);
+}
+
+// FUNCTION: CARMA2_HW 0x00463020
+// FUNCTION: CARMA2_SW 0x00462ab0
+// FUNCTION: CARMA2_CHEAT 0x00463490
+void C2_HOOK_FASTCALL InitialiseFlicPanel(int pIndex, int pLeft, int pTop, int pWidth, int pHeight) {
+    void* the_pixels;
+
+    gPanel_flic[pIndex].data = NULL;
+    gPanel_flic_left[pIndex] = pLeft;
+    gPanel_flic_top[pIndex] = pTop;
+    the_pixels = BrMemAllocate(pHeight * ((pWidth + 3) & ~3), kMem_misc);
+    if (gScreen->row_bytes < 0) {
+        BrFatal(
+                "C:\\Carma2\\Source\\Common\\Flicplay.c",
+                2082,
+                "Bruce bug at line %d, file C:\\Carma2\\Source\\Common\\Flicplay.c",
+                2082);
+    }
+    gPanel_buffer[pIndex] = DRPixelmapAllocate(BR_PMT_INDEX_8, pWidth, pHeight, the_pixels, 0);
+}
+
 // FUNCTION: CARMA2_HW 0x004630b0
 // FUNCTION: CARMA2_SW 0x00462b40
 // FUNCTION: CARMA2_CHEAT 0x00463520
