@@ -215,7 +215,7 @@ int C2_HOOK_FASTCALL PointVisibleFromHere(br_vector3* pFrom, br_vector3* pTo) {
     }
 }
 
-static inline void C2_HOOK_FASTCALL WeightedFindNearestNodeAndSection(tCar_spec* pCar, const br_vector3* pActor_coords, int* pNearest_node_section_no, int* pNearest_node, br_scalar* pT, br_scalar pWeight) {
+inline void C2_HOOK_FASTCALL WeightedFindNearestNodeAndSection(tCar_spec* pCar, const br_vector3* pActor_coords, int* pNearest_node_section_no, int* pNearest_node, br_scalar* pT, br_scalar pWeight) {
     int section_no;
     int no_sections;
     int nearest_section;
