@@ -493,7 +493,7 @@ tDrone_crush_data* C2_HOOK_FASTCALL GetDroneCrushData(tPhysics_object* pObject) 
     tDrone_spec* drone;
 
     drone = pObject->owner;
-    if (drone->form->crushability == 0.f) {
+    if (drone->form->crushability == 0.0f) {
         return NULL;
     }
     if (drone->field_0xf4 < 0 && !GetNewCrushyModelForDrone(drone)) {
