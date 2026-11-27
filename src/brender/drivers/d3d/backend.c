@@ -1859,7 +1859,6 @@ void C2_HOOK_CDECL FUN_10008570(void* dst, br_uint_32 dst_width, br_uint_32 dst_
     }
 }
 
-
 // FUNCTION: D3D 0x10002ba0
 int C2_HOOK_CDECL d3d_update_texture(int index, render_buffer_d3d* buffer, int arg3) {
     DDSURFACEDESC surface_desc;
