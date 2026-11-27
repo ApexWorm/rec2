@@ -9,8 +9,10 @@
 #include "32-spark.h"
 
 #include "00-car.h"
+#include "09-funks.h"
 #include "08-loading1.h"
 #include "10-loading2.h"
+#include "13-crush1.h"
 #include "15-displays.h"
 #include "18-graphics2.h"
 #include "23-piping.h"
@@ -21,6 +23,7 @@
 #include "59-camera.h"
 #include "60-phil.h"
 #include "63-loading3.h"
+#include "70-packfile.h"
 
 #include "globvars.h"
 #include "globvrkm.h"
@@ -39,10 +42,11 @@ int gSmoke_on = 1;
 int gShade_list[16];
 
 // GLOBAL: CARMA2_HW 0x00660140
+// GLOBAL: CARMA2_CHEAT 0x00667988
 int* gShade_table = &gShade_list[8];
 #endif
-#ifdef REC2_SW
 
+#ifdef REC2_SW
 // GLOBAL: CARMA2_SW 0x006ae520
 br_pixelmap* gShade_list[16];
 
@@ -57,6 +61,7 @@ tSmash_vertex gSmash_glass_fragments[200];
 
 // GLOBAL: CARMA2_HW 0x006a82b4
 // GLOBAL: CARMA2_SW 0x006a2314
+// GLOBAL: CARMA2_CHEAT 0x006afe2c
 int gNum_dust_tables;
 
 // GLOBAL: CARMA2_HW 0x006aa57c
@@ -97,6 +102,7 @@ tReplay_splash gReplay_splashes[10] = { 0 };
 
 // GLOBAL: CARMA2_HW 0x006aa568
 // GLOBAL: CARMA2_SW 0x006a3fb8
+// GLOBAL: CARMA2_CHEAT 0x006b20e0
 int gDust_rotate = 0;
 
 // GLOBAL: CARMA2_HW 0x006aa56c
@@ -178,6 +184,7 @@ int gCount_smashable_noncars;
 br_matrix4 gCameraToScreen;
 
 // GLOBAL: CARMA2_HW 0x006a82b0
+// GLOBAL: CARMA2_SW 0x006a2310
 // GLOBAL: CARMA2_CHEAT 0x006afe28
 br_camera* gSpark_cam;
 
@@ -202,6 +209,7 @@ int gNum_splash_types;
 
 // GLOBAL: CARMA2_HW 0x006a82b8
 // GLOBAL: CARMA2_SW 0x006a2318
+// GLOBAL: CARMA2_CHEAT 0x006afe30
 tSplash gSplash[32] = { 0 };
 
 // GLOBAL: CARMA2_HW 0x006aa570
@@ -211,6 +219,7 @@ int gSplash_flags;
 
 // GLOBAL: CARMA2_HW 0x006a9130
 // GLOBAL: CARMA2_SW 0x006a2b80
+// GLOBAL: CARMA2_CHEAT 0x006b0ca8
 br_material* gSplash_material[20];
 
 // GLOBAL: CARMA2_HW 0x006a8758
@@ -218,10 +227,14 @@ br_material* gSplash_material[20];
 // GLOBAL: CARMA2_CHEAT 0x006b02d0
 br_model* gSplash_model;
 
+// GLOBAL: CARMA2_HW 0x0079ec38
 // GLOBAL: CARMA2_SW 0x00795198
+// GLOBAL: CARMA2_CHEAT 0x007a62d8
 br_pixelmap* gFog_shade_table;
 
+// GLOBAL: CARMA2_HW 0x0079ec24
 // GLOBAL: CARMA2_SW 0x00795184
+// GLOBAL: CARMA2_CHEAT 0x007a62c4
 br_pixelmap* gAcid_shade_table;
 
 // DrawDot
@@ -231,6 +244,7 @@ br_pixelmap* gAcid_shade_table;
 // DrawLine3DThroughBRender
 
 // FUNCTION: CARMA2_HW 0x004f6b80
+// FUNCTION: CARMA2_SW 0x004f24b0
 // FUNCTION: CARMA2_CHEAT 0x004fc820
 int C2_HOOK_FASTCALL DrawLine3D(const br_vector3* pStart, const br_vector3* pEnd, br_pixelmap* pScreen, br_pixelmap* pDepth, br_pixelmap* pShade) {
     br_vector3 start;
@@ -413,12 +427,43 @@ void C2_HOOK_FASTCALL CreateShrapnelShowerWorld(const br_vector3* pPosition, con
 
 // random
 
-// InitShrapnel
+inline void C2_HOOK_FASTCALL InitShrapnel(void) {
+    int i;
+    br_scalar scale;
+    double dscale;
+
+    for (i = 0; i < (int)REC2_ASIZE(gShrapnel); i++) {
+        gShrapnel[i].actor = BrActorAllocate(BR_ACTOR_MODEL, NULL);
+        gShrapnel[i].actor->parent = NULL;
+        gShrapnel[i].actor->model = gShrapnel_model[i & 1];
+        gShrapnel[i].actor->render_style = BR_RSTYLE_DEFAULT;
+        gShrapnel[i].actor->t.type = BR_TRANSFORM_MATRIX34;
+        gShrapnel[i].actor->material = BrMaterialFind("DEBRIS.MAT");
+        gShrapnel[i].age = 0;
+        gShrapnel[i].shear1 = FRandomBetween(-2.0f, 2.0f);
+        gShrapnel[i].shear2 = FRandomBetween(-2.0f, 2.0f);
+        BrVector3SetFloat(&gShrapnel[i].axis,
+            FRandomBetween(-1.f, 1.f),
+            FRandomBetween(-1.f, 1.f),
+            FRandomBetween(-1.f, 1.f));
+        scale = BR_LENGTH3(gShrapnel[i].axis.v[0], gShrapnel[i].axis.v[1], gShrapnel[i].axis.v[2]);
+        if (scale > BR_SCALAR_EPSILON * 2) {
+            dscale = 1.0 / scale;
+            gShrapnel[i].axis.v[0] = (br_scalar)(gShrapnel[i].axis.v[0] * dscale);
+            gShrapnel[i].axis.v[1] = (br_scalar)(gShrapnel[i].axis.v[1] * dscale);
+            gShrapnel[i].axis.v[2] = (br_scalar)(gShrapnel[i].axis.v[2] * dscale);
+        } else {
+            gShrapnel[i].axis.v[0] = 1.0f;
+            gShrapnel[i].axis.v[1] = 0.0f;
+            gShrapnel[i].axis.v[2] = 0.0f;
+        }
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x004f8b90
 // FUNCTION: CARMA2_SW 0x004f4210
 // FUNCTION: CARMA2_CHEAT 0x004fe830
-void C2_HOOK_FASTCALL LoadInShrapnel(void) {
+inline void C2_HOOK_FASTCALL LoadInShrapnel(void) {
     gShrapnel_model[0] = LoadModel("FRAG4.DAT");
     DRScaleModel(gShrapnel_model[0], 0.5f);
     gShrapnel_model[1] = LoadModel("FRAG5.DAT");
@@ -461,17 +506,15 @@ void C2_HOOK_FASTCALL DisposeShrapnel(void) {
 // FUNCTION: CARMA2_CHEAT 0x004fea60
 intptr_t C2_HOOK_CDECL ActorFunks(br_actor* pActor, void* pContext) {
     tFunk_index_cbfn* funk_index_callback = pContext;
-    tUser_crush_data* user_crush_data = pActor->user;
     tCar_crush_buffer_entry* crush_data;
     int i;
 
-    if (user_crush_data != NULL) {
-        crush_data = user_crush_data->crush_data;
+    if (pActor->user != NULL) {
+        crush_data = ((tUser_crush_data*)pActor->user)->crush_data;
         if (crush_data != NULL && crush_data->smashables != NULL) {
             for (i = 0; i < crush_data->count_smashables; i++) {
-                int funk_index = crush_data->smashables[i].funk;
-                if (funk_index >= 0) {
-                    funk_index_callback(funk_index);
+                if (crush_data->smashables[i].funk >= 0) {
+                    funk_index_callback(crush_data->smashables[i].funk);
                 }
             }
         }
@@ -479,17 +522,38 @@ intptr_t C2_HOOK_CDECL ActorFunks(br_actor* pActor, void* pContext) {
     return 0;
 }
 
-// STUB: CARMA2_HW 0x004f8ca0
-// STUB: CARMA2_CHEAT 0x004fe940
+// FUNCTION: CARMA2_HW 0x004f8ca0
+// FUNCTION: CARMA2_SW 0x004f4320
+// FUNCTION: CARMA2_CHEAT 0x004fe940
 void C2_HOOK_FASTCALL MasterDisableCarFunks(tCar_spec* pCar) {
-    NOT_IMPLEMENTED();
+    tCar_crush_spec* crush_spec;
+    int i;
+
+    crush_spec = pCar->car_crush_spec;
+    DRActorEnumRecurse(pCar->car_model_actor, ActorFunks, (void*)MasterDisableFunkotronic);
+    for (i = 0; i < crush_spec->field_0x270; i++) {
+        ActorFunks(crush_spec->field_0x274[i].field_0x0, (void*)MasterDisableFunkotronic);
+    }
+    for (i = 0; i < crush_spec->field_0x2b0; i++) {
+        ActorFunks(crush_spec->field_0x2b4[i].field_0x0, (void*)MasterDisableFunkotronic);
+    }
 }
 
-// STUB: CARMA2_HW 0x004f8e10
-// STUB: CARMA2_SW 0x004f4490
-// STUB: CARMA2_CHEAT 0x004feab0
+// FUNCTION: CARMA2_HW 0x004f8e10
+// FUNCTION: CARMA2_SW 0x004f4490
+// FUNCTION: CARMA2_CHEAT 0x004feab0
 void C2_HOOK_FASTCALL MasterEnableCarFunks(tCar_spec* pCar) {
-    NOT_IMPLEMENTED();
+    tCar_crush_spec* crush_spec;
+    int i;
+
+    crush_spec = pCar->car_crush_spec;
+    DRActorEnumRecurse(pCar->car_model_actor, ActorFunks, (void*)MasterEnableFunkotronic);
+    for (i = 0; i < crush_spec->field_0x270; i++) {
+        ActorFunks(crush_spec->field_0x274[i].field_0x0, (void*)MasterEnableFunkotronic);
+    }
+    for (i = 0; i < crush_spec->field_0x2b0; i++) {
+        ActorFunks(crush_spec->field_0x2b4[i].field_0x0, (void*)MasterEnableFunkotronic);
+    }
 }
 
 // FUNCTION: CARMA2_HW 0x004f8ff0
@@ -530,11 +594,19 @@ void C2_HOOK_FASTCALL DoCamouflageThing(tCar_spec* pCar) {
     }
 }
 
-// STUB: CARMA2_HW 0x004f9020
-// STUB: CARMA2_SW 0x004f46a0
-// STUB: CARMA2_CHEAT 0x004fecc0
+// FUNCTION: CARMA2_HW 0x004f9020
+// FUNCTION: CARMA2_SW 0x004f46a0
+// FUNCTION: CARMA2_CHEAT 0x004fecc0
 void C2_HOOK_FASTCALL DoSolidGraniteThing(tCar_spec* pCar) {
-    NOT_IMPLEMENTED();
+    br_material* material;
+
+    MasterDisableCarFunks(pCar);
+    material = BrMaterialFind("solidgrn");
+    if (material != NULL && material->colour_map != NULL) {
+        gCar_of_material = pCar;
+        pCar->field_0x1960 = material->colour_map;
+        ForEveryCarMaterial(pCar, SetPixelmap, 1);
+    }
 }
 
 #ifdef REC2_HW
@@ -548,8 +620,8 @@ void C2_HOOK_CDECL DoTrueColModelThing(br_actor* pActor, br_model* pModel, br_ma
 // FUNCTION: CARMA2_CHEAT 0x004ff280
 int C2_HOOK_FASTCALL SetFoxModelCallback(br_model* pModel) {
 
-    pModel->flags |= BR_MODF_CUSTOM;
     pModel->custom = DoTrueColModelThing;
+    pModel->flags |= BR_MODF_CUSTOM;
     return 1;
 }
 
@@ -574,11 +646,61 @@ int C2_HOOK_FASTCALL ResetFoxLighting(br_material* pMaterial) {
     }
 }
 
-// CancelAlternateFoxEffect
+inline void C2_HOOK_FASTCALL CancelAlternateFoxEffect(tCar_spec* pCar_spec) {
 
-// SetFoxLighting
+    ForEveryCarModel(pCar_spec, ResetFoxModelCallback, 1);
+    ForEveryCarMaterial(pCar_spec, ResetFoxLighting, 1);
+}
 
-// SetupAlternateFoxEffect
+// FUNCTION: CARMA2_HW 0x004f9600
+// FUNCTION: CARMA2_CHEAT 0x004ff2a0
+int C2_HOOK_FASTCALL SetFoxLighting(br_material* pMaterial) {
+
+    if (!(pMaterial->flags & BR_MATF_PRELIT)) {
+        pMaterial->flags |= BR_MATF_PRELIT;
+        BrMaterialUpdate(pMaterial, BR_MATU_LIGHTING | BR_MATU_RENDERING);
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
+inline void C2_HOOK_FASTCALL SetupAlternateFoxEffect(tCar_spec* pCar_spec) {
+    br_material* material;
+
+    MasterDisableCarFunks(pCar_spec);
+    material = BrMaterialFind("solidgrn");
+    if (material != NULL && material->colour_map != NULL) {
+        gCar_of_material = pCar_spec;
+        pCar_spec->field_0x1960 = material->colour_map;
+        ForEveryCarMaterial(pCar_spec, SetFoxLighting, 1);
+        ForEveryCarModel(pCar_spec, SetFoxModelCallback, 1);
+    }
+}
+#endif
+#ifdef REC2_SW
+// STUB: CARMA2_SW 0x004f9b00
+void C2_HOOK_CDECL DoModelThing(br_actor* pActor, br_model* pModel, br_material* pMaterial, void* pArg4, br_uint_8 pArg5, int pArg6) {
+    NOT_IMPLEMENTED();
+}
+
+inline void C2_HOOK_FASTCALL SetModelShade(br_model* pModel, br_pixelmap* pIndex_shade, int pArg3) {
+    int i;
+    br_material* mat;
+
+    for (i = 0; i < pModel->nfaces; i++) {
+        mat = pModel->faces[i].material;
+        if (mat != NULL && mat->index_shade != pIndex_shade) {
+            mat->index_shade = pIndex_shade;
+            if (pArg3) {
+                mat->flags |= BR_MATF_LIGHT | BR_MATF_PRELIT | BR_MATF_SMOOTH;
+            } else {
+                mat->flags &= ~(BR_MATF_LIGHT | BR_MATF_PRELIT | BR_MATF_SMOOTH);
+            }
+            BrMaterialUpdate(mat, BR_MATU_ALL);
+        }
+    }
+}
 #endif
 
 // FUNCTION: CARMA2_HW 0x004f9760
@@ -595,11 +717,14 @@ int C2_HOOK_FASTCALL RestorePixelmap(br_material* pMaterial) {
     }
 }
 
-// STUB: CARMA2_HW 0x004f9620
-// STUB: CARMA2_SW 0x004f4ca0
-// STUB: CARMA2_CHEAT 0x004ff2c0
+// FUNCTION: CARMA2_HW 0x004f9620
+// FUNCTION: CARMA2_SW 0x004f4ca0
+// FUNCTION: CARMA2_CHEAT 0x004ff2c0
 void C2_HOOK_FASTCALL RestoreCarPixelmaps(tCar_spec* pCar_spec) {
-    NOT_IMPLEMENTED();
+
+    MasterEnableCarFunks(pCar_spec);
+    ForEveryCarMaterial(pCar_spec, RestorePixelmap, 1);
+    pCar_spec->field_0x1960 = NULL;
 }
 
 // MungeShrapnel
@@ -721,6 +846,7 @@ void C2_HOOK_FASTCALL InitSmokeStuff(void) {
 
 // FUNCTION: CARMA2_HW 0x004fa8d0
 // FUNCTION: CARMA2_SW 0x004f5960
+// FUNCTION: CARMA2_CHEAET 0x00500570
 void C2_HOOK_FASTCALL DustRotate(void) {
 
     gDust_rotate += 1;
@@ -936,11 +1062,18 @@ void C2_HOOK_FASTCALL CreateSmokeColumn2(int pType, br_actor* pActor, tCar_spec*
     }
 }
 
-// STUB: CARMA2_HW 0x004fb890
-// STUB: CARMA2_SW 0x004f6dd0
-// STUB: CARMA2_CHEAT 0x00501530
+// FUNCTION: CARMA2_HW 0x004fb890
+// FUNCTION: CARMA2_SW 0x004f6dd0
+// FUNCTION: CARMA2_CHEAT 0x00501530
 void C2_HOOK_FASTCALL CreateSmokeColumn(tCar_spec *pCar, br_colour pColour, int pVertex_index, tU32 pLifetime) {
-    NOT_IMPLEMENTED();
+
+    if (pCar->collision_info->last_special_volume == NULL || pCar->collision_info->last_special_volume->gravity_multiplier >= 1.f) {
+        SmudgeCar(pCar, pVertex_index);
+        if (pCar->knackered) {
+            SmudgeCar(pCar, pCar->fire_vertex[IRandomBetween(0, (int)REC2_ASIZE(pCar->fire_vertex) - 1)]);
+        }
+        CreateSmokeColumn2(1, pCar->car_master_actor, pCar, NULL, pColour, pVertex_index, pLifetime);
+    }
 }
 
 // FUNCTION: CARMA2_HW 0x004fb910
@@ -1213,14 +1346,14 @@ void C2_HOOK_FASTCALL InitFlame(void) {
         }
     }
     gLollipop_model->nvertices = 4;
-    BrVector3SetFloat(&gLollipop_model->vertices[0].p, -.5f, 0.f, 0.f);
-    BrVector3SetFloat(&gLollipop_model->vertices[1].p, .5f, 0.f, 0.f);
-    BrVector3SetFloat(&gLollipop_model->vertices[2].p, .5f, 1.f, 0.f);
-    BrVector3SetFloat(&gLollipop_model->vertices[3].p, -.5f, 1.f, 0.f);
-    BrVector2Set(&gLollipop_model->vertices[0].map, 0.f, 1.f);
-    BrVector2Set(&gLollipop_model->vertices[1].map, 1.f, 1.f);
-    BrVector2Set(&gLollipop_model->vertices[2].map, 1.f, 0.f);
-    BrVector2Set(&gLollipop_model->vertices[3].map, 0.f, 0.f);
+    BrVector3SetFloat(&gLollipop_model->vertices[0].p, -0.5f, 0.0f, 0.0f);
+    BrVector3SetFloat(&gLollipop_model->vertices[1].p, 0.5f, 0.0f, 0.0f);
+    BrVector3SetFloat(&gLollipop_model->vertices[2].p, 0.5f, 1.0f, 0.0f);
+    BrVector3SetFloat(&gLollipop_model->vertices[3].p, -0.5f, 1.0f, 0.0f);
+    BrVector2Set(&gLollipop_model->vertices[0].map, 0.0f, 1.0f);
+    BrVector2Set(&gLollipop_model->vertices[1].map, 1.0f, 1.0f);
+    BrVector2Set(&gLollipop_model->vertices[2].map, 1.0f, 0.0f);
+    BrVector2Set(&gLollipop_model->vertices[3].map, 0.0f, 0.0f);
     gLollipop_model->nfaces = 2;
     gLollipop_model->faces[0].vertices[0] = 0;
     gLollipop_model->faces[0].vertices[1] = 1;
@@ -1235,6 +1368,7 @@ void C2_HOOK_FASTCALL InitFlame(void) {
 
 // FUNCTION: CARMA2_HW 0x004fdde0
 // FUNCTION: CARMA2_SW 0x004f9380
+// FUNCTION: CARMA2_CHEAT 0x00503a80
 void C2_HOOK_FASTCALL InitSplash(FILE* pF) {
     int i;
     int num_files;
@@ -1319,11 +1453,21 @@ void C2_HOOK_FASTCALL InitSplash(FILE* pF) {
 
 // PipeInstantUnSmudge
 
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
 // FUNCTION: CARMA2_HW 0x004fc9c0
+// FUNCTION: CARMA2_SW 0x004f7f20
+// FUNCTION: CARMA2_CHEAT 0x00502660
 void C2_HOOK_FASTCALL SmudgeCar(tCar_spec* pCar, int pFire_point) {
     (void)pCar;
     (void)pFire_point;
 }
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 void C2_HOOK_FASTCALL ResetSmokeColumns(void) {
     int i;
@@ -1346,6 +1490,7 @@ void C2_HOOK_FASTCALL SetSmokeOn(int pSmoke_on) {
 
 // FUNCTION: CARMA2_HW 0x004fc9e0
 // FUNCTION: CARMA2_SW 0x004f7f40
+// FUNCTION: CARMA2_CHEAT 0x00502680
 void C2_HOOK_FASTCALL ReallySetSmokeOn(int pSmoke_on) {
 
     C2_HOOK_BUG_ON(REC2_ASIZE(gSmoke_column) != 10);
@@ -1404,11 +1549,26 @@ void C2_HOOK_FASTCALL StopObjectSmokingInstantly(tPhysics_object* pObject) {
     }
 }
 
-// STUB: CARMA2_HW 0x004fcab0
-// STUB: CARMA2_SW 0x004f8010
-// STUB: CARMA2_CHEAT 0x00502750
+// FUNCTION: CARMA2_HW 0x004fcab0
+// FUNCTION: CARMA2_SW 0x004f8010
+// FUNCTION: CARMA2_CHEAT 0x00502750
 void C2_HOOK_FASTCALL ConditionalSmokeColumn(tCar_spec* pCar, int pFire_point, int pColour) {
-    NOT_IMPLEMENTED();
+    int i;
+
+    if (pColour == 0 && (pCar == NULL || pCar->driver < eDriver_net_human)) {
+        pColour = 1;
+    }
+    if (IsCarSmoking(pCar) > 0) {
+        for (i = 0; i < (int)REC2_ASIZE(gSmoke_column); i++) {
+            if (gSmoke_column[i].core.car == pCar) {
+                if ((gColumn_flags & (1 << i)) && gSmoke_column[i].colour <= pColour && gSmoke_column[i].lifetime != 0) {
+                    return;
+                }
+                gSmoke_column[i].lifetime = 2000;
+            }
+        }
+    }
+    CreateSmokeColumn(pCar, pColour, pCar->fire_vertex[pFire_point], 10000000);
 }
 
 // SingleSplash
@@ -1427,17 +1587,41 @@ void C2_HOOK_FASTCALL GeneralCreateSplash(tPhysics_object* pObject, const br_vec
 #endif
 
 // FUNCTION: CARMA2_HW 0x004fda40
+// FUNCTION: CARMA2_SW 0x004f8fa0
 void C2_HOOK_FASTCALL CreateSplash(tPhysics_object* pObject, tU32 pTime) {
     GeneralCreateSplash(pObject, &pObject->v, &pObject->omega, &pObject->water_normal,
         pObject->water_d, &pObject->bb1, &pObject->actor->t.t.mat, pTime);
 }
 
-// GetVelocitiesFromMatrices
+// FUNCTION: CARMA2_HW 0x004fda70
+// FUNCTION: CARMA2_SW 0x004f8fd0
+// FUNCTION: CARMA2_CHEAT 0x00503710
+void C2_HOOK_FASTCALL GetVelocitiesFromMatrices(br_vector3* pVel, br_vector3* pRot, br_matrix34* pMat_now, br_matrix34* pMat_prev, tU32 pTime) {
+    br_quat quat_now;
+    br_quat quat_prev;
+    br_quat quat_speed;
+    br_scalar ts;
+
+    ts = (br_scalar)(pTime / 1000.0);
+    BrVector3Sub(pVel, (br_vector3*)pMat_prev->m[3], (br_vector3*)pMat_now->m[3]);
+    pVel->v[0] /= ts;
+    pVel->v[1] /= ts;
+    pVel->v[2] /= ts;
+
+    BrMatrix34ToQuat(&quat_now, pMat_now);
+    BrMatrix34ToQuat(&quat_prev, pMat_now);
+    BrQuatInvert(&quat_now, &quat_now);
+    BrQuatMul(&quat_speed, &quat_now, &quat_prev);
+    pRot->v[0] = 2 * quat_speed.x / ts;
+    pRot->v[1] = 2 * quat_speed.y / ts;
+    pRot->v[2] = 2 * quat_speed.z / ts;
+}
 
 // MungeSplash
 
 // FUNCTION: CARMA2_HW 0x004fdb70
 // FUNCTION: CARMA2_SW 0x004f90d0
+// FUNCTION: CARMA2_CHEAT 0x00503810
 void C2_HOOK_FASTCALL GetSmokeShadeTables(FILE* pF) {
     int i;
     int red;
@@ -1479,7 +1663,22 @@ void C2_HOOK_FASTCALL FreeSmokeShadeTables(void) {
 #endif
 }
 
-// LoadInKevStuff
+// FUNCTION: CARMA2_HW 0x004fdc10
+// FUNCTION: CARMA2_SW 0x004f91b0
+// FUNCTION: CARMA2_CHEAT 0x005038b0
+void C2_HOOK_FASTCALL LoadInKevStuff(FILE* pF) {
+
+    PackFileRevertTiffLoading();
+    PossibleService();
+    LoadInShrapnel();
+    PossibleService();
+    InitShrapnel();
+    PossibleService();
+    InitFlame();
+    PossibleService();
+    InitSplash(pF);
+    PackFileRerevertTiffLoading();
+}
 
 // DisposeKevStuff
 
@@ -1514,22 +1713,85 @@ void C2_HOOK_FASTCALL DisposeKevStuffCar(tCar_spec* pCar) {
     }
 }
 
-// STUB: CARMA2_HW 0x004fe360
-// STUB: CARMA2_SW 0x004f9900
-// STUB: CARMA2_CHEAT 0x00504000
+// FUNCTION: CARMA2_HW 0x004fe360
+// FUNCTION: CARMA2_SW 0x004f9900
+// FUNCTION: CARMA2_CHEAT 0x00504000
 void C2_HOOK_FASTCALL MakeCarIt(tCar_spec* pCar) {
-    NOT_IMPLEMENTED();
+
+#ifdef REC2_HW
+    if (gAFE) {
+        SetupAlternateFoxEffect(pCar);
+    }
+#endif
+#ifdef REC2_SW
+    int i;
+    tCar_crush_spec* car_crush;;
+
+    car_crush = pCar->car_crush_spec;
+    FoxifyModel(pCar->shell_model);
+    DRActorEnumRecurse(pCar->car_model_actor, FoxifyModelCB, pCar);
+    for (i = 0; i < car_crush->field_0x270; i++) {
+        FoxifyModel(car_crush->field_0x274[i].field_0x0->model);
+    }
+    for (i = 0; i < car_crush->field_0x2b0; i++) {
+        FoxifyModel(car_crush->field_0x2b4[i].field_0x0->model);
+    }
+#endif
 }
+
+#ifdef REC2_SW
+inline void C2_HOOK_FASTCALL FoxifyModel(br_model *pModel) {
+
+    if (pModel != NULL) {
+        pModel->custom = DoModelThing;
+        pModel->flags |= BR_MODF_CUSTOM;
+        if (pModel->user != NULL) {
+            ((tUser_detail_level_model*)pModel->user)->field_0x0 = 1;
+        }
+        SetModelShade(pModel, gIt_shade_table, 1);
+    }
+}
+
+// FUNCTION: CARMA2_SW 0x004f9cf0
+intptr_t C2_HOOK_CDECL FoxifyModelCB(br_actor* pActor, void* pContext) {
+    tUser_crush_data* user_crush;
+
+    if (pActor->type == BR_ACTOR_MODEL && pActor->model != NULL
+            && (user_crush = pActor->user) != NULL && user_crush->crush_data != NULL && user_crush->groove == NULL && pActor->model != NULL) {
+        FoxifyModel(pActor->model);
+    }
+    return 0;
+}
+#endif
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x004fe570
-// STUB: CARMA2_SW 0x004f9d90
-// STUB: CARMA2_CHEAT 0x00504210
+// FUNCTION: CARMA2_HW 0x004fe570
+// FUNCTION: CARMA2_SW 0x004f9d90
+// FUNCTION: CARMA2_CHEAT 0x00504210
 void C2_HOOK_FASTCALL StopCarBeingIt(tCar_spec* pCar) {
-    NOT_IMPLEMENTED();
+
+#ifdef REC2_HW
+    if (gAFE) {
+        CancelAlternateFoxEffect(pCar);
+    }
+#endif
+#ifdef REC2_SW
+    int i;
+    tCar_crush_spec* car_crush;;
+
+    car_crush = pCar->car_crush_spec;
+    UnFoxifyModel(pCar->shell_model);
+    DRActorEnumRecurse(pCar->car_model_actor, UnFoxifyModelCB, pCar);
+    for (i = 0; i < car_crush->field_0x270; i++) {
+        UnFoxifyModel(car_crush->field_0x274[i].field_0x0->model);
+    }
+    for (i = 0; i < car_crush->field_0x2b0; i++) {
+        UnFoxifyModel(car_crush->field_0x2b4[i].field_0x0->model);
+    }
+#endif
 }
 
 #ifdef REC2_MATCHING
@@ -1558,6 +1820,7 @@ inline void C2_HOOK_FASTCALL ForEveryModelMaterial(br_model* pModel, tMaterialMa
 
 // FUNCTION: CARMA2_HW 0x004fe8a0
 // FUNCTION: CARMA2_SW 0x004fa180
+// FUNCTION: CARMA2_CHEAT 0x00504540
 intptr_t C2_HOOK_CDECL ForEveryActorMaterial(br_actor* pActor, void* pContext) {
     tUser_crush_data* user_crush_data;
     tMaterialMaybeUpdate_cbfn* callback;
@@ -1582,6 +1845,7 @@ intptr_t C2_HOOK_CDECL ForEveryActorMaterial(br_actor* pActor, void* pContext) {
 
 // FUNCTION: CARMA2_HW 0x004fe930
 // FUNCTION: CARMA2_SW 0x004fa210
+// FUNCTION: CARMA2_CHEAT 0x005045d0
 intptr_t C2_HOOK_CDECL ForEveryActorMaterialNoGrooves(br_actor* pActor, void* pContext) {
     tUser_crush_data* user_crush_data;
     tMaterialMaybeUpdate_cbfn* callback;
@@ -1607,15 +1871,79 @@ intptr_t C2_HOOK_CDECL ForEveryActorMaterialNoGrooves(br_actor* pActor, void* pC
     return 0;
 }
 
+#ifdef REC2_SW
+// FUNCTION: CARMA2_SW 0x004f9e10
+void C2_HOOK_FASTCALL UnFoxifyModel(br_model *pModel) {
+    br_pixelmap* shade0;
+    br_material* mat;
+    int i;
+    int j;
+
+    if (pModel != NULL) {
+        pModel->flags &= ~BR_MODF_CUSTOM;
+        pModel->custom = NULL;
+        shade0 = gShade_list[0];
+        for (i = 0; i < pModel->nfaces; i++) {
+            mat = pModel->faces[i].material;
+
+            if (mat != NULL && mat->index_shade != shade0) {
+
+                mat->index_shade = shade0;
+                mat->flags &= ~(BR_MATF_LIGHT | BR_MATF_PRELIT | BR_MATF_SMOOTH);
+                BrMaterialUpdate(mat, BR_MATU_ALL);
+            }
+        }
+        for (i = 0; i < pModel->prepared->ngroups; i++) {
+            for (j = 0; j < pModel->prepared->groups[i].nvertices; j++) {
+                pModel->prepared->groups[i].vertex_colours[j] = 0;
+                if (pModel->flags & BR_MATF_I_FROM_U) {
+                    pModel->vertices[pModel->prepared->groups[i].vertex_user[j]].index = 0;
+                }
+            }
+        }
+        SetModelForUpdate(pModel);
+    }
+}
+
+// FUNCTION: CARMA2_SW 0x004f9ef0
+intptr_t C2_HOOK_CDECL UnFoxifyModelCB(br_actor* pActor, void* pContext) {
+
+    if (pActor->type == BR_ACTOR_MODEL && pActor->model != NULL
+            && pActor->user != NULL && ((tUser_crush_data*)pActor->user)->groove == NULL) {
+        UnFoxifyModel(pActor->model);
+    }
+    return 0;
+}
+#endif
+
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x004fe640
-// STUB: CARMA2_SW 0x004f9f20
-// STUB: CARMA2_CHEAT 0x005042e0
+// FUNCTION: CARMA2_HW 0x004fe640
+// FUNCTION: CARMA2_SW 0x004f9f20
+// FUNCTION: CARMA2_CHEAT 0x005042e0
 void C2_HOOK_FASTCALL ForEveryCarMaterial(tCar_spec* pCar_spec, tMaterialMaybeUpdate_cbfn* pCallback, int pGrooves) {
-    NOT_IMPLEMENTED();
+    tCar_crush_spec* crush_spec;
+    int i;
+
+    crush_spec = pCar_spec->car_crush_spec;
+    if (pCar_spec->car_master_actor->material != NULL) {
+        pCallback(pCar_spec->car_master_actor->material);
+    }
+    ForEveryModelMaterial(pCar_spec->shell_model, pCallback);
+    ForEveryModelMaterial(((tUser_crush_data*)pCar_spec->car_model_actor->user)->models[1], pCallback);
+    if (pGrooves) {
+        DRActorEnumRecurse(pCar_spec->car_model_actor, ForEveryActorMaterial, pCallback);
+    } else {
+        DRActorEnumRecurse(pCar_spec->car_model_actor, ForEveryActorMaterialNoGrooves, pCallback);
+    }
+    for (i = 0; i < crush_spec->field_0x270; i++) {
+        ForEveryModelMaterial(crush_spec->field_0x274[i].field_0x0->model, pCallback);
+    }
+    for (i = 0; i < crush_spec->field_0x2b0; i++) {
+        ForEveryModelMaterial(crush_spec->field_0x2b4[i].field_0x0->model, pCallback);
+    }
 }
 
 #ifdef REC2_MATCHING
@@ -1624,6 +1952,7 @@ void C2_HOOK_FASTCALL ForEveryCarMaterial(tCar_spec* pCar_spec, tMaterialMaybeUp
 
 // FUNCTION: CARMA2_HW 0x004fec30
 // FUNCTION: CARMA2_SW 0x004fa510
+// FUNCTION: CARMA2_CHEAT 0x005048d0
 intptr_t C2_HOOK_CDECL ForEveryCarModelCB(br_actor* pActor, void* pContext) {
     tUser_crush_data* user_crush;
     int (C2_HOOK_FASTCALL* model_callback)(br_model*) = pContext;
@@ -1637,7 +1966,26 @@ intptr_t C2_HOOK_CDECL ForEveryCarModelCB(br_actor* pActor, void* pContext) {
     return 0;
 }
 
-// ForEveryCarModel
+// FUNCTION: CARMA2_HW 0x004fec60
+// FUNCTION: CARMA2_SW 0x004fa540
+// FUNCTION: CARMA2_CHEAT 0x00504900
+inline void C2_HOOK_FASTCALL ForEveryCarModel(tCar_spec* pCar_spec, intptr_t (C2_HOOK_FASTCALL* pCallback)(br_model*), int pGrooves) {
+    tCar_crush_spec* crush_spec;
+    int i;
+
+    crush_spec = pCar_spec->car_crush_spec;
+    pCallback(pCar_spec->shell_model);
+    if (((tUser_crush_data*)pCar_spec->car_model_actor->user)->models[1] != NULL) {
+        pCallback(((tUser_crush_data*)pCar_spec->car_model_actor->user)->models[1]);
+    }
+    DRActorEnumRecurse(pCar_spec->car_model_actor, ForEveryCarModelCB, (void*)pCallback);
+    for (i = 0; i < crush_spec->field_0x270; i++) {
+        pCallback(crush_spec->field_0x274[i].field_0x0->model);
+    }
+    for (i = 0; i < crush_spec->field_0x2b0; i++) {
+        pCallback(crush_spec->field_0x2b4[i].field_0x0->model);
+    }
+}
 
 int C2_HOOK_FASTCALL MightBlendifyMaterial(br_material* pMaterial, int pBlend_factor) {
 
@@ -1691,10 +2039,25 @@ int C2_HOOK_FASTCALL IsCarSmoking(tCar_spec* pCar) {
     return 0;
 }
 
-// ClearSplashReplay
+// FUNCTION: CARMA2_HW 0x004fedd0
+// FUNCTION: CARMA2_SW 0x004fa6b0
+// FUNCTION: CARMA2_CHEAT 0x00504a70
+void C2_HOOK_FASTCALL ClearSplashReplay(uintptr_t pObject) {
+    int flags;
+    int i;
+
+    flags = gReplay_splash_flags;
+    for (i = 0; i < (int)REC2_ASIZE(gReplay_splashes); i++) {
+        if (pObject == (uintptr_t)gReplay_splashes[i].object.ptr) {
+            flags &= ~(1 << i);
+        }
+    }
+    gReplay_splash_flags = flags;
+}
 
 // FUNCTION: CARMA2_HW 0x004fee10
 // FUNCTION: CARMA2_SW 0x004fa6f0
+// FUNCTION: CARMA2_CHEAT 0x00504ab0
 void* C2_HOOK_FASTCALL GetSplashIndex(tPhysics_object* pObject) {
 
     if (PHILGetObjectProperty(pObject, 6) != 0.f) {
@@ -1731,7 +2094,7 @@ void C2_HOOK_FASTCALL AdjustSplashReplay(void* pObject, int pType, float pWater_
             if (free_index < 0) {
                 free_index = i;
             }
-        } else if (gReplay_splashes[i].object.ptr == pObject) {
+        } else if (pObject == gReplay_splashes[i].object.ptr) {
             gReplay_splashes[i].water_density = pWater_density;
             BrVector3Copy(&gReplay_splashes[i].normal, pNormal);
             BrVector3Copy(&gReplay_splashes[i].bb.min, &pBounds->min);
@@ -1753,8 +2116,35 @@ void C2_HOOK_FASTCALL AdjustSplashReplay(void* pObject, int pType, float pWater_
     BrVector3Copy(&gReplay_splashes[i].bb.max, &pBounds->max);
 }
 
-// STUB: CARMA2_HW 0x004ff030
-// STUB: CARMA2_SW 0x004fa910
+// FUNCTION: CARMA2_HW 0x004ff030
+// FUNCTION: CARMA2_SW 0x004fa910
+// FUNCTION: CARMA2_CHEAT 0x00504cd0
 void C2_HOOK_FASTCALL InitReplaySplashes(void) {
-    NOT_IMPLEMENTED();
+    tPhysics_object* object;
+    void* owner;
+    tU8 type;
+    tCar_spec* car;
+
+    gReplay_splash_flags = 0;
+    for (object = gPHIL_list_collision_infos; object != NULL; object = object->next) {
+        if (object->water_d != 10000.0f) {
+            owner = NULL;
+            if (PHILGetObjectProperty(object, 6) != 0.0f) {
+                owner = object;
+                type = 0xff;
+            } else if (object != NULL && object->owner != NULL && object->flags_0x238 == 1) {
+                car = (tCar_spec*)object->owner;
+                if (car == NULL || car->driver <= eDriver_5) {
+                    owner = object->actor;
+                    type = 1;
+                }
+            } else if (object != NULL && object->owner != NULL && object->flags_0x238 >= 2 && object->flags_0x238 <= 4) {
+                owner = object->owner;
+                type = object->flags_0x238;
+            }
+            if (owner != NULL) {
+                AdjustSplashReplay(owner, type, object->water_d, &object->water_normal, &object->bb1);
+            }
+        }
+    }
 }

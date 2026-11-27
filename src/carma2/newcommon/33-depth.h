@@ -15,6 +15,12 @@
 
 extern int gHas_sky_texture;
 extern br_pixelmap* gDepth_shade_table;
+extern int gDepth_shade_table_power;
+extern int gFog_shade_table_power;
+extern int gAcid_shade_table_power;
+extern br_pixelmap* gWater_shade_table;
+extern int gWater_shade_table_power;
+extern br_actor* gForward_sky_actor;
 extern tSpecial_volume* gLast_camera_special_volume;
 
 extern int C2_HOOK_CDECL Log2(int pNumber);
@@ -39,7 +45,7 @@ extern void C2_HOOK_FASTCALL InstantDepthChange(tDepth_effect_type pType, br_pix
 
 extern void C2_HOOK_FASTCALL MungeSkyModel(br_actor* pCamera, br_model* pModel);
 
-// CreateHorizonModel
+extern br_model* C2_HOOK_FASTCALL CreateHorizonModel(br_actor* pCamera);
 
 extern void C2_HOOK_FASTCALL LoadDepthTable(char* pName, br_pixelmap** pTable, int* pPower);
 

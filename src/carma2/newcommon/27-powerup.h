@@ -60,7 +60,7 @@ extern char* C2_HOOK_FASTCALL GetPowerupMessage(int pPowerup_index);
 
 // QueueIconGoing
 
-// QueueIconComing
+extern void C2_HOOK_FASTCALL QueueIconComing(tPowerup* pPowerup, tHeadup_icon* pHeadup_icons, int* pCount_icons);
 
 // LosePowerupX
 
@@ -256,7 +256,7 @@ extern int C2_HOOK_FASTCALL SetDamageMultiplier(tPowerup* pPowerup, tCar_spec* p
 
 extern void C2_HOOK_FASTCALL FillInMine(tNet_message_chunk* pChunk, tShit_mine* pMine, int pArg3);
 
-// SendMines
+extern void C2_HOOK_FASTCALL SendMines(tU32 pNext_frame_time);
 
 extern void C2_HOOK_FASTCALL MinePreCollisionStuff(void);
 
@@ -276,7 +276,7 @@ extern void C2_HOOK_FASTCALL TiggerMineToExplode(tCar_spec* pCar);
 
 // HitAShatOutMine
 
-// ClearMineReferencesToCar
+extern void C2_HOOK_FASTCALL ClearMineReferencesToCar(tCar_spec* pCar);
 
 extern void C2_HOOK_FASTCALL MungeShatMines(tU32 pTime);
 
@@ -392,7 +392,7 @@ extern void C2_HOOK_FASTCALL ARPowerupLose(tPowerup* pPowerup, tCar_spec* pCar);
 
 // SetPissed
 
-// ResetPissed
+extern void C2_HOOK_FASTCALL ResetPissed(tPowerup* pPowerup, tCar_spec* pCar);
 
 // PissedEffect
 
