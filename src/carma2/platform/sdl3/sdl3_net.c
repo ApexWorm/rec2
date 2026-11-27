@@ -203,7 +203,7 @@ void PDNetHostFinishGame(tNet_game_details* pDetails) {
     dr_dprintf("PDNetHostFinishGame()");
 }
 
-void PDNetLeaveGame(void) {
+void PDNetLeaveGame(tNet_game_details* pDetails) {
     dr_dprintf("PDNetLeaveGame()");
 }
 
