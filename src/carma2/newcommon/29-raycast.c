@@ -9,6 +9,7 @@
 #include "29-raycast.h"
 
 #include "16-graphics1.h"
+#include "32-spark.h"
 #include "globvars.h"
 #include "rec2_macros.h"
 
@@ -57,7 +58,23 @@ br_matrix34 gPick_model_to_view__raycast;
 // GLOBAL: CARMA2_CHEAT 0x006a9c98
 float gHighest_y_below;
 
-// DRActorToRoot
+extern int C2_HOOK_FASTCALL DRActorToRoot(br_actor* pActor, br_actor* pWorld, br_matrix34* pMat);
+
+inline int C2_HOOK_FASTCALL DRActorToRoot(br_actor* pActor, br_actor* pWorld, br_matrix34* pMat) {
+
+    if (pActor == pWorld) {
+        BrMatrix34Identity(pMat);
+        return 1;
+    } else {
+        BrTransformToMatrix34(pMat, &pActor->t);
+        for (pActor = pActor->parent; pActor != NULL && pActor != pWorld; pActor = pActor->parent) {
+            if (pActor->t.type != BR_TRANSFORM_IDENTITY) {
+                BrMatrix34PostTransform(pMat, &pActor->t);
+            }
+        }
+        return pActor == pWorld;
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x004e3660
 // FUNCTION: CARMA2_SW 0x004df9f0
@@ -209,7 +226,30 @@ int C2_HOOK_FASTCALL ActorPick2D(br_actor* pActor, br_model* pModel, br_material
     return r;
 }
 
-// DRScenePick2DXY
+// FUNCTION: CARMA2_HW 0x004e36f0
+// FUNCTION: CARMA2_SW 0x004dfa80
+// FUNCTION: CARMA2_CHEAT 0x004e9270
+int C2_HOOK_FASTCALL DRScenePick2DXY(br_actor* pWorld, br_actor* pCamera, br_pixelmap* pViewport, int pPick_x, int pPick_y, dr_pick2d_cbfn* pCallback, void* pArg) {
+    br_matrix34 camera_tfm;
+    br_scalar scale;
+    br_scalar cos_angle;
+    br_scalar sin_angle;
+    br_camera* camera_data;
+    br_angle view_over_2;
+
+    camera_data = pCamera->type_data;
+    DRActorToRoot(pCamera, pWorld, &camera_tfm);
+    BrMatrix34Inverse(&gPick_model_to_view__raycast, &camera_tfm);
+    view_over_2 = camera_data->field_of_view / 2;
+    cos_angle = BR_COS(view_over_2);
+    sin_angle = BR_SIN(view_over_2);
+    scale = cos_angle / sin_angle;
+    BrMatrix34PostScale(&gPick_model_to_view__raycast, scale / camera_data->aspect, scale, 1.f);
+    BrMatrix34PostShearZ(&gPick_model_to_view__raycast,
+        (float)(2 * pPick_x) / (float)pViewport->width,
+        (float)(-2 * pPick_y) / (float)pViewport->height);
+    return ActorPick2D(pWorld, NULL, gBlack_material, pCallback, pArg);
+}
 
 // DRScenePick2D
 
