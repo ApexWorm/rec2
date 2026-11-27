@@ -1284,7 +1284,7 @@ int C2_HOOK_FASTCALL MorphCharacterBonePositions(tPed_character_instance* pPed, 
 #pragma auto_inline(on)
 #endif
 
-static inline int C2_HOOK_FASTCALL StopCharacterMove(tPed_character_instance* pCharacter, tU32 pTime) {
+inline int C2_HOOK_FASTCALL StopCharacterMove(tPed_character_instance* pCharacter, tU32 pTime) {
     int result;
 
     result = 0;
