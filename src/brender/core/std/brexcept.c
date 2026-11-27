@@ -19,6 +19,7 @@
 void* exceptionValue;
 
 // GLOBAL: CARMA2_HW 0x006b0a54
+// GLOBAL: CARMA2_CHEAT 0x006b80e4
 br_exception_handler* _BrExceptionHandler;
 
 // FUNCTION: CARMA2_HW 0x0053f510
