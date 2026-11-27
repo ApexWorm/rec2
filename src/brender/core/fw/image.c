@@ -130,6 +130,7 @@ br_image* C2_HOOK_CDECL BrImageReference(const char* name) {
 }
 
 // FUNCTION: CARMA2_HW 0x00530260
+// FUNCTION: CARMA2_SW 0x0052b900
 void* C2_HOOK_STDCALL imageLookupName(br_image* img, const char* name, br_uint_32 hint) {
     int c;
     int limit;
