@@ -1121,9 +1121,27 @@ void C2_HOOK_FASTCALL ApplyDiminishingTorque(tPhysics_object* pObject, const br_
 
 // RQIterativeImprovement
 
-// RQExpand
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
 
-// RQSingleExpand
+// STUB: CARMA2_HW 0x004c4850
+// STUB: CARMA2_SW 0x004c0f80
+// STUB: CARMA2_CHEAT 0x004ca370
+void C2_HOOK_FASTCALL RQExpand(br_scalar* pMatrix, const br_scalar* pOriginal, int pOld_size, int pSize, br_scalar* pOrthogonal, const tU8* pIndices) {
+    NOT_IMPLEMENTED();
+}
+
+// STUB: CARMA2_HW 0x004c4f40
+// STUB: CARMA2_SW 0x004c1670
+// STUB: CARMA2_CHEAT 0x004caa60
+void C2_HOOK_FASTCALL RQSingleExpand(br_scalar* pMatrix, const br_scalar* pOriginal, int pSize, br_scalar* pOrthogonal, const tU8* pIndices) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // FUNCTION: CARMA2_HW 0x004c5830
 // FUNCTION: CARMA2_SW 0x004c1f60
@@ -1221,7 +1239,52 @@ int C2_HOOK_FASTCALL RQDcmpV(br_scalar* pMatrix, int pDim, br_scalar* pQ) {
 
 // SparseRQDcmpV
 
-// MakeMatrixFromIndices
+/* FIXME: name and layout are guesses; only count, orthogonal and matrix are read here. */
+typedef struct tForce_group {
+    int count;
+    tPhysics_joint_force* forces;
+    undefined field_0x8[12];
+    br_scalar* orthogonal;
+    br_scalar* matrix;
+} tForce_group;
+
+// FUNCTION: CARMA2_HW 0x004c5220
+// FUNCTION: CARMA2_SW 0x004c1950
+// FUNCTION: CARMA2_CHEAT 0x004cad40
+void C2_HOOK_FASTCALL MakeMatrixFromIndices(br_scalar* pMatrix, br_scalar* pOrthogonal, const br_scalar* pOriginal, br_scalar* pResult, const br_scalar* pRhs, const tU8* pIndices, int pSize, tForce_group** pGroups, int pCount_groups) {
+    int total;
+    int g;
+    int count;
+    int i;
+    int j;
+    int k;
+
+    total = 0;
+    for (g = 0; g < pCount_groups; g++) {
+        count = pGroups[g]->count;
+        for (i = 0; i < count; i++) {
+            for (j = 0; j < count; j++) {
+                pMatrix[(total + i) * 100 + total + j] = pGroups[g]->matrix[i * count + j];
+                pOrthogonal[(total + i) * 100 + total + j] = pGroups[g]->orthogonal[i * count + j];
+            }
+            for (k = 0; k < total; k++) {
+                pMatrix[k * 100 + total + i] = 0.0f;
+                pMatrix[(total + i) * 100 + k] = 0.0f;
+                pOrthogonal[k * 100 + total + i] = 0.0f;
+                pOrthogonal[(total + i) * 100 + k] = 0.0f;
+            }
+        }
+        total += count;
+    }
+    if (pSize - total == 1) {
+        RQSingleExpand(pMatrix, pOriginal, total, pOrthogonal, pIndices);
+    } else if (pSize > total) {
+        RQExpand(pMatrix, pOriginal, total, pSize, pOrthogonal, pIndices);
+    }
+    for (i = 0; i < pSize; i++) {
+        pResult[i] = pRhs[pIndices[i]];
+    }
+}
 
 // HasBeenDoneBefore
 
