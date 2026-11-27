@@ -279,9 +279,45 @@ tFace_ref* C2_HOOK_FASTCALL RayCastThruFaceList2(br_vector3* pPosition, br_vecto
 
 // GetSphereToFacePoints
 
-// CheckSingleEdgeWithSphere
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
 
-// GetSphereToEdgePoints
+// STUB: CARMA2_HW 0x00423ce0
+// STUB: CARMA2_SW 0x00423d60
+// STUB: CARMA2_CHEAT 0x00423e60
+int C2_HOOK_FASTCALL CheckSingleEdgeWithSphere(br_vector3* pEdge_start, br_vector3* pEdge_end, tPhysics_object* pObject, tCollision_shape_sphere_data* pSphere, tPhysics_joint_force* pForces, int pCount, br_vector3* pSphere_start, br_vector3* pSphere_end, tFace_ref* pFace) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
+
+// FUNCTION: CARMA2_HW 0x00423c00
+// FUNCTION: CARMA2_SW 0x00423c80
+// FUNCTION: CARMA2_CHEAT 0x00423d80
+int C2_HOOK_FASTCALL GetSphereToEdgePoints(tPhysics_object* pObject, tCollision_shape_sphere_data* pSphere, tPhysics_joint_force* pForces, int pCount, int pMax_count, br_vector3* pSphere_start, br_vector3* pSphere_end, br_matrix34* pMatrix) {
+    int i;
+    tFace_ref* face;
+
+    i = pObject->box_face_start;
+    face = &gFace_list__car[i];
+    for (; i < pObject->box_face_end; i++, face++) {
+        if (!(face->flags & 0x80)) {
+            if (!(face->flags & 0x1)) {
+                pCount = CheckSingleEdgeWithSphere(&face->v[0], &face->v[1], pObject, pSphere, pForces, pCount, pSphere_start, pSphere_end, face);
+            }
+            if (!(face->flags & 0x2)) {
+                pCount = CheckSingleEdgeWithSphere(&face->v[1], &face->v[2], pObject, pSphere, pForces, pCount, pSphere_start, pSphere_end, face);
+            }
+            if (!(face->flags & 0x4)) {
+                pCount = CheckSingleEdgeWithSphere(&face->v[2], &face->v[0], pObject, pSphere, pForces, pCount, pSphere_start, pSphere_end, face);
+            }
+        }
+    }
+    return pCount;
+}
 
 // GetCornerToFacePoints
 
