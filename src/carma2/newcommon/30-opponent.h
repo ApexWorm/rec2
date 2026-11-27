@@ -228,6 +228,64 @@ extern void C2_HOOK_FASTCALL TwoCarsHitEachOther(tCar_spec* pA_car, tCar_spec* p
 
 // RecordOpponentTwattageOccurrence
 
-// GetOpponentMood
+extern void C2_HOOK_FASTCALL FUN_004af490(void);
+
+extern void C2_HOOK_FASTCALL FUN_004af4a0(void);
+
+extern void C2_HOOK_FASTCALL FUN_004af4b0(void);
+
+extern void C2_HOOK_FASTCALL FUN_004af4c0(void);
+
+extern void C2_HOOK_FASTCALL FUN_004af4d0(void);
+
+extern void C2_HOOK_FASTCALL FUN_004af4e0(void);
+
+extern void C2_HOOK_FASTCALL FUN_004af4f0(void);
+
+extern void C2_HOOK_FASTCALL FUN_004af500(void);
+
+extern void C2_HOOK_FASTCALL FUN_004af510(void);
+
+extern void C2_HOOK_FASTCALL FUN_004af520(void);
+
+extern void C2_HOOK_FASTCALL FUN_004af530(void);
+
+extern void C2_HOOK_FASTCALL FUN_004af540(void);
+
+extern void C2_HOOK_FASTCALL FUN_004af550(void);
+
+extern void C2_HOOK_FASTCALL FUN_004af560(void);
+
+extern void C2_HOOK_FASTCALL FUN_004af570(void);
+
+extern void C2_HOOK_FASTCALL FUN_004af580(void);
+
+extern void C2_HOOK_FASTCALL FUN_004af590(void);
+
+extern void C2_HOOK_FASTCALL FUN_004af5a0(void);
+
+extern void C2_HOOK_FASTCALL FUN_004af5b0(void);
+
+extern void C2_HOOK_FASTCALL FUN_004af5c0(void);
+
+extern void C2_HOOK_FASTCALL FUN_004af5d0(void);
+
+extern void C2_HOOK_FASTCALL FUN_004af5e0(void);
+
+extern void C2_HOOK_FASTCALL FUN_004af5f0(void);
+
+extern void C2_HOOK_FASTCALL FUN_004af600(void);
+
+extern void C2_HOOK_FASTCALL FUN_004af610(void);
+
+extern void C2_HOOK_FASTCALL FUN_004af620(void);
+
+extern void C2_HOOK_FASTCALL FUN_004af630(void);
+
+extern tOpponent_Status C2_HOOK_FASTCALL GetOpponentMood(tCar_spec* pCar_spec);
+
+extern void C2_HOOK_FASTCALL FUN_004af770(void);
+
+extern int C2_HOOK_FASTCALL FUN_004af780(char* pBuffer);
 
 #endif // GUARD_30_OPPONENT_H
