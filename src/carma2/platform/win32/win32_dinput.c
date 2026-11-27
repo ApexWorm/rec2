@@ -60,6 +60,7 @@ int gJoystick_deadzone;
 
 // GLOBAL: CARMA2_HW 0x00686158
 // GLOBAL: CARMA2_SW 0x00680898
+// GLOBAL: CARMA2_CHEAT 0x0068da00
 IDirectInputA* gDirectInputJoystickHandle;
 
 // GLOBAL: CARMA2_HW 0x0079e060
@@ -84,6 +85,7 @@ IDirectInputEffect* gDirectInputEffects[MAX_COUNT_EFFECTS];
 
 // GLOBAL: CARMA2_HW 0x00686170
 // GLOBAL: CARMA2_SW 0x006808b0
+// GLOBAL: CARMA2_CHEAT 0x0068da18
 int gDirectInputJoystickEnumerated;
 
 // GLOBAL: CARMA2_HW 0x0079d9c0
@@ -187,7 +189,10 @@ int gINT_006ad0b8;
 // GLOBAL: CARMA2_CHEAT 0x0059cb8c
 int gCurrent_exclusive_ffb_effect = -1;
 
-static int C2_HOOK_FASTCALL InitDirectInput(void) {
+// FUNCTION: CARMA2_HW 0x004587c0
+// FUNCTION: CARMA2_SW 0x00458550
+// FUNCTION: CARMA2_CHEAT 0x00458c40
+void C2_HOOK_FASTCALL InitDirectInput(void) {
     int i;
 
     if (gDirectInputJoystickHandle == NULL) {
@@ -204,12 +209,7 @@ static int C2_HOOK_FASTCALL InitDirectInput(void) {
         gJoystickFFB = 0;
         gCountEnumeratedJoystickDinputDevices = 0;
         DirectInputCreateA(GetModuleHandleA(NULL), 0x0500, &gDirectInputJoystickHandle, NULL);
-        if (gDirectInputJoystickHandle == NULL) {
-            return 1;
-        }
-        gDirectInputJoystickEnumerated = 0;
     }
-    return 0;
 }
 
 void C2_HOOK_FASTCALL CloseDirectInput(void) {
@@ -257,6 +257,7 @@ static int C2_HOOK_FASTCALL AcquireDInputJoystickDevice(int pIndex) {
 
 // FUNCTION: CARMA2_HW 0x004589d0
 // FUNCTION: CARMA2_SW 0x00458760
+// FUNCTION: CARMA2_CHEAT 0x00458e50
 tDirectInputJoystickInfo* C2_HOOK_FASTCALL JoystickDInputGetInfo(int pJoystickIndex, tU32* pButtonMask, tU32* pAxisMask) {
     IDirectInputDevice2A* device;
     tDirectInputJoystickInfo* info;
@@ -267,7 +268,8 @@ tDirectInputJoystickInfo* C2_HOOK_FASTCALL JoystickDInputGetInfo(int pJoystickIn
     if (pAxisMask != NULL) {
         *pAxisMask = 0;
     }
-    if (InitDirectInput()) {
+    InitDirectInput();
+    if (gDirectInputJoystickHandle == NULL) {
         return NULL;
     }
     device = gDirectInputJoystickDevices[pJoystickIndex];
@@ -412,6 +414,83 @@ BOOL CALLBACK Win32DInputJoystickEnum(const DIDEVICEINSTANCEA* pDeviceInstance, 
     }
     gCountEnumeratedJoystickDinputDevices++;
     return DIENUM_CONTINUE;
+}
+
+// FUNCTION: CARMA2_HW 0x00459970
+// FUNCTION: CARMA2_SW 0x00459700
+// FUNCTION: CARMA2_CHEAT 0x00459df0
+void C2_HOOK_FASTCALL CloseDInputJoysticks(void) {
+    int i;
+
+    if (gDirectInputJoystickHandle != NULL) {
+        for (i = 0; i < MAX_COUNT_JOYSTICKS; i++) {
+            if (gDirectInputJoystickDevices[i] != NULL) {
+                IDirectInputDevice2_Unacquire(gDirectInputJoystickDevices[i]);
+                IDirectInputDevice2_Release(gDirectInputJoystickDevices[i]);
+                gDirectInputJoystickDevices[i] = NULL;
+            }
+        }
+        IDirectInput_Release(gDirectInputJoystickHandle);
+        gDirectInputJoystickHandle = NULL;
+    }
+    gJoystickFFB = 0;
+    gCountEnumeratedJoystickDinputDevices = 0;
+}
+
+// FUNCTION: CARMA2_HW 0x00459b50
+// FUNCTION: CARMA2_SW 0x004598e0
+// FUNCTION: CARMA2_CHEAT 0x00459fd0
+int C2_HOOK_FASTCALL SetDInputJoystickAxesRange(IDirectInputDevice2A* pDevice, int pMin, int pMax) {
+    DIPROPRANGE range;
+
+    range.diph.dwSize = sizeof(range);
+    range.diph.dwHeaderSize = sizeof(range.diph);
+    range.diph.dwHow = DIPH_BYOFFSET;
+    range.lMin = pMin;
+    range.lMax = pMax;
+    range.diph.dwObj = DIJOFS_X;
+    if (IDirectInputDevice2_SetProperty(pDevice, DIPROP_RANGE, &range.diph) != DI_OK) {
+        dr_dprintf("IDirectInputDevice::SetProperty(DIPH_RANGE)  FAILED\n");
+        IDirectInputDevice2_Release(pDevice);
+        return 0;
+    }
+    range.diph.dwObj = DIJOFS_Y;
+    if (IDirectInputDevice2_SetProperty(pDevice, DIPROP_RANGE, &range.diph) != DI_OK) {
+        dr_dprintf("IDirectInputDevice::SetProperty(DIPH_RANGE)  FAILED\n");
+        IDirectInputDevice2_Release(pDevice);
+        return 0;
+    }
+    return 1;
+}
+
+// FUNCTION: CARMA2_HW 0x00459be0
+// FUNCTION: CARMA2_SW 0x00459970
+// FUNCTION: CARMA2_CHEAT 0x0045a060
+int C2_HOOK_FASTCALL SetDInputJoystickAxesDeadzone(IDirectInputDevice2A* pDevice, int pPercentage) {
+    DIPROPDWORD deadzone;
+    DWORD value;
+
+    value = 100 * pPercentage;
+    if (value > 10000) {
+        value = 10000;
+    }
+    deadzone.dwData = value;
+    deadzone.diph.dwSize = sizeof(deadzone);
+    deadzone.diph.dwHeaderSize = sizeof(deadzone.diph);
+    deadzone.diph.dwHow = DIPH_BYOFFSET;
+    deadzone.diph.dwObj = DIJOFS_X;
+    if (IDirectInputDevice2_SetProperty(pDevice, DIPROP_DEADZONE, &deadzone.diph) != DI_OK) {
+        dr_dprintf("IDirectInputDevice:: SetProperty(DIPH_DEADZONE) FAILED\n");
+        IDirectInputDevice2_Release(pDevice);
+        return 0;
+    }
+    deadzone.diph.dwObj = DIJOFS_Y;
+    if (IDirectInputDevice2_SetProperty(pDevice, DIPROP_DEADZONE, &deadzone.diph) != DI_OK) {
+        dr_dprintf("IDirectInputDevice:: SetProperty(DIPH_DEADZONE) FAILED\n");
+        IDirectInputDevice2_Release(pDevice);
+        return 0;
+    }
+    return 1;
 }
 
 // FUNCTION: CARMA2_HW 0x00459ed0
@@ -948,8 +1027,12 @@ int C2_HOOK_FASTCALL SetDinputEffectGain(int pIndex, int pGain) {
 int C2_HOOK_FASTCALL JoystickDInputBegin(void) {
     int i;
 
-    if (InitDirectInput()) {
-        return 0;
+    if (gDirectInputJoystickHandle == NULL) {
+        InitDirectInput();
+        if (gDirectInputJoystickHandle == NULL) {
+            return 0;
+        }
+        gDirectInputJoystickEnumerated = 0;
     }
     if (!gDirectInputJoystickEnumerated) {
         gDirectInputJoystickEnumerated = 1;

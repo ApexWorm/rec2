@@ -24,6 +24,8 @@ extern void C2_HOOK_FASTCALL KeyBegin(void);
 
 extern void C2_HOOK_FASTCALL Win32InitInputDevice(void);
 
+extern void C2_HOOK_FASTCALL InitDirectInput(void);
+
 extern void C2_HOOK_FASTCALL CloseDirectInput(void);
 
 extern int C2_HOOK_FASTCALL InitForceFeedback(void);
@@ -39,6 +41,12 @@ extern void C2_HOOK_FASTCALL RegisterJoystickFFBForces(void);
 extern void C2_HOOK_FASTCALL Win32InitInputDevice(void);
 
 extern int C2_HOOK_FASTCALL SetDinputEffectGain(int pIndex, int pGain);
+
+extern void C2_HOOK_FASTCALL CloseDInputJoysticks(void);
+
+extern int C2_HOOK_FASTCALL SetDInputJoystickAxesRange(IDirectInputDevice2A* pDevice, int pMin, int pMax);
+
+extern int C2_HOOK_FASTCALL SetDInputJoystickAxesDeadzone(IDirectInputDevice2A* pDevice, int pPercentage);
 
 extern int C2_HOOK_FASTCALL JoystickDInputBegin(void);
 
