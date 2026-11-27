@@ -66,4 +66,6 @@ extern void C2_HOOK_FASTCALL PackFileRerevertTiffLoading(void);
 
 extern void C2_HOOK_FASTCALL TurnOnPaletteConversion(void);
 
+extern void C2_HOOK_FASTCALL TurnOffPaletteConversion(void);
+
 #endif // GUARD_70_PACKFILE_H

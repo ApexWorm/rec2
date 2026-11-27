@@ -284,13 +284,23 @@ void C2_HOOK_FASTCALL InitLightingEffects(void) {
 
 // FUNCTION: CARMA2_HW 0x00486d90
 // FUNCTION: CARMA2_SW 0x00483ec0
+// FUNCTION: CARMA2_CHEAT 0x004870b0
 void C2_HOOK_FASTCALL FUN_00486d90(br_scalar pArg1, br_scalar pArg2) {
 
     // empty
 }
 
+// FUNCTION: CARMA2_HW 0x00486da0
+// FUNCTION: CARMA2_SW 0x00483ed0
+// FUNCTION: CARMA2_CHEAT 0x004870c0
+int C2_HOOK_FASTCALL FUN_00486da0(void) {
+
+    return 0;
+}
+
 // FUNCTION: CARMA2_HW 0x00486db0
 // FUNCTION: CARMA2_SW 0x00483ee0
+// FUNCTION: CARMA2_CHEAT 0x004870d0
 void C2_HOOK_FASTCALL LoadStaticLightingForRace(const char* pRace_lighting_path) {
 
     // empty

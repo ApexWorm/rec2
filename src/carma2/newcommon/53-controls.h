@@ -119,6 +119,8 @@ extern void C2_HOOK_FASTCALL TDamageRRBrake(void);
 
 extern void C2_HOOK_FASTCALL TDamageRRWheel(void);
 
+extern void C2_HOOK_FASTCALL FUN_004420d0(void);
+
 extern void C2_HOOK_FASTCALL ToggleMiniMap(void);
 
 // CheckToggles
@@ -192,6 +194,8 @@ extern void C2_HOOK_FASTCALL ToggleHeadupMap(int pArg);
 extern void C2_HOOK_FASTCALL HackyMapFixForMac3dfx(void);
 
 extern void C2_HOOK_FASTCALL ToggleMap(void);
+
+extern void C2_HOOK_FASTCALL FUN_004446e0(void);
 
 extern int C2_HOOK_FASTCALL GetRecoverVoucherCount(void);
 

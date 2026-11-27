@@ -508,3 +508,9 @@ void C2_HOOK_FASTCALL PackFileRerevertTiffLoading(void) {
 // FUNCTION: CARMA2_CHEAT 0x004ba780
 void C2_HOOK_FASTCALL TurnOnPaletteConversion(void) {
 }
+
+// FUNCTION: CARMA2_HW 0x004b4ec0
+// FUNCTION: CARMA2_SW 0x004b1030
+// FUNCTION: CARMA2_CHEAT 0x004ba790
+void C2_HOOK_FASTCALL TurnOffPaletteConversion(void) {
+}
