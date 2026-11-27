@@ -2198,7 +2198,16 @@ void C2_HOOK_FASTCALL AdjustProxRay(int pRay_index, tU16 pCar_ID, tU16 pPed_inde
     gProximity_rays[pRay_index].start_time = pTime;
 }
 
-// ResetProxRay
+// FUNCTION: CARMA2_HW 0x004d61f0
+// FUNCTION: CARMA2_SW 0x004d27f0
+// FUNCTION: CARMA2_CHEAT 0x004dbdb0
+void C2_HOOK_FASTCALL ResetProxRay(void) {
+    int i;
+
+    for (i = 0; i < (int)REC2_ASIZE(gProximity_rays); i++) {
+        gProximity_rays[i].start_time = 0;
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x004d6210
 // FUNCTION: CARMA2_SW 0x004d2810
