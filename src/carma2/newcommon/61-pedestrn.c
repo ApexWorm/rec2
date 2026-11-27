@@ -511,7 +511,7 @@ int gPed_movements_count;
 tPed_movement_spec* gPed_movements;
 
 
-static inline void C2_HOOK_FASTCALL ClearOutMorphs(void) {
+inline void C2_HOOK_FASTCALL ClearOutMorphs(void) {
     int i;
 
     for (i = 0; i < (int)REC2_ASIZE(gPed_morphs); i++) {

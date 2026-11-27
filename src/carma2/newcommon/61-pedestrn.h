@@ -87,9 +87,9 @@ extern tPed_face_cache_0x34* gPed_face_caches[4];
 extern int gPipe_halted_ped_status;
 extern int gPed_valium_left;
 
-// ClearOutMorphs
+extern void C2_HOOK_FASTCALL ClearOutMorphs(void);
 
-// InitBoner
+extern void C2_HOOK_FASTCALL InitBoner(tPedForms_vtable* pTable);
 
 // DRVector3SafeCross
 
