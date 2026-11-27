@@ -264,8 +264,8 @@ typedef struct {
 typedef struct {
     tU32 start;
     tU32 period;
-    undefined field_0x8;
-    tU8 count_frames;
+    tS8 field_0x8;
+    tS8 count_frames;
     tU8 finished;
     undefined field_0xb;
     br_actor* collision_actor;
@@ -327,7 +327,7 @@ typedef struct tPed_character_instance {
     undefined2 field_0x20;
     undefined field_0x22[0x2];
     undefined4 field_0x24;
-    undefined4 field_0x28;
+    br_matrix34* field_0x28;
     br_matrix34 field_0x2c;
     br_matrix34 field_0x5c;
     br_matrix34 field_0x8c;
@@ -590,13 +590,20 @@ typedef struct {
         };
     };
     int field_0x40;
-} tPipe_car_chunk;
+} tPipe_chunk_car;
 
 typedef struct {
     undefined4 field_0x0;
     tPedestrian* ped;
     br_actor* actor;
 } tPipe_ped_incident;
+
+typedef struct {
+    float force;
+    tU16 car_ID;
+    tU16 padding_0x6;
+    br_vector3 position;
+} tPipe_chunk_car_incident;
 
 typedef struct {
     tPedestrian* ped;
@@ -626,6 +633,16 @@ typedef struct {
     tU16 age;
     br_material* material;
 } tPipe_chunk_shrapnel;
+
+typedef struct {
+    undefined4 field_0x0;
+    tU32 uid;
+    tU32 time;
+    float force;
+    br_vector3 p1;
+    br_vector3 p2;
+    br_vector3 v;
+} tPipe_chunk_gib_shower;
 
 typedef struct {
     tSmoke_column_core core;
@@ -662,6 +679,14 @@ typedef struct {
     tS8 wobble_x;
     tS8 wobble_y;
 } tPipe_chunk_screen_wobble;
+
+typedef struct {
+    int path_interrupt;
+    int object_interrupt;
+    float path_resumption;
+    float object_resumption;
+    br_matrix34 matrix;
+} tPipe_chunk_groove_stop;
 
 typedef struct {
     tU32 time;
@@ -729,14 +754,15 @@ typedef struct {
 typedef enum {
     ePipe_chunk_frame_finish = 0,
     ePipe_chunk_ped_incident = 1,
-    ePipe_chunk_single_sound = 2,
+    ePipe_chunk_sound = 2,
     ePipe_chunk_car = 5,
-    ePipe_chunk_single_graphical_wheel_stuff = 6,
+    ePipe_chunk_graphical_wheel_stuff = 6,
     ePipe_chunk_damage = 7,
     ePipe_chunk_special = 8,
     ePipe_chunk_spark = 10,
     ePipe_chunk_shrapnel = 11,
     ePipe_chunk_screen_wobble = 12,
+    ePipe_chunk_groove_stop = 13,
     ePipe_chunk_non_car = 14,
     ePipe_chunk_smoke = 15,
     ePipe_chunk_oil_spill = 16,
@@ -747,7 +773,7 @@ typedef enum {
     ePipe_chunk_prox_ray = 21,
     ePipe_chunk_skid_adjustment = 22,
     ePipe_chunk_flap = 23,
-    ePipe_model_mash = 24,
+    ePipe_chunk_model_mash = 24,
     ePipe_chunk_relink = 25,
     ePipe_chunk_identity = 26,
     ePipe_chunk_split_weld = 27,
@@ -766,23 +792,26 @@ typedef enum {
     ePipe_chunk_single_ped_pos = 46,
     ePipe_chunk_single_ped_model_change = 47,
     ePipe_chunk_phil_object = 48,
-    ePipe_single_groove_on_off = 51,
+    ePipe_chunk_gib_shower = 49,
+    ePipe_chunk_blood_spurt = 50,
+    ePipe_chunk_groove_on_off = 51,
     ePipe_chunk_powerup_got = 52,
     ePipe_chunk_powerup_lose = 53,
-    ePipe_funk_enable = 54,
+    ePipe_chunk_funk_enable = 54,
     ePipe_chunk_vanished_dismembered = 55,
     ePipe_chunk_ds_model = 56,
-    ePipe_ped_diagnostic = 57,
+    ePipe_chunk_ped_diagnostic = 57,
     ePipe_chunk_vector3 = 58,
-    ePipe_extended_splash = 59,
+    ePipe_chunk_extended_splash = 59,
     ePipe_chunk_drone_render = 60,
     ePipe_chunk_drone_corner_pos = 61,
-    ePipe_chunk_single_drone_straight_pos = 62,
+    ePipe_chunk_drone_straight_pos = 62,
     ePipe_chunk_burning_ped = 64,
     ePipe_chunk_powerup_respawn = 65,
+    ePipe_chunk_shit_mine = 66,
     ePipe_chunk_end_shit_mine = 67,
     ePipe_chunk_transform_type = 68,
-    ePipe_chunk_single_oppo_renderage = 69,
+    ePipe_chunk_oppo_renderage = 69,
 } tPipe_chunk_type;
 
 typedef struct {
@@ -797,7 +826,7 @@ typedef struct {
 } tPipe_chunk_smash_model_change;
 
 typedef struct {
-    unsigned int seed;
+    tU32 seed;
     tU32 time;
     br_vector3 position;
     br_vector3 impactee_velocity;
@@ -842,7 +871,9 @@ typedef struct {
 typedef struct tPipe_chunk {
     uintptr_t subject_index;
     union {
+        tPipe_chunk_car_incident car_incident;
         tPipe_chunk_frame_boundary frame_boundary;
+        tPipe_chunk_car car;
         tPipe_chunk_non_car non_car;
         tPipe_ped_physics_data ped_physics;
         tPipe_single_ped_pos ped_pos;
@@ -869,14 +900,17 @@ typedef struct tPipe_chunk {
         tPipe_chunk_shit_mine shit_mine;
         tPipe_chunk_end_shit_mine end_shit_mine;
         tPipe_chunk_prox_ray prox_ray;
+        tPipe_chunk_gib_shower gib_shower;
         tPipe_smudge_data smudge;
         tPipe_model_mash model_mash;
         tPipe_chunk_bend bend;
         tPipe_chunk_screen_wobble wobble;
         tPipe_chunk_skid_adjustment skid_adjustment;
         tPipe_chunk_actor_trans actor_trans;
+        tPipe_chunk_smoke smoke;
         tPipe_chunk_smoke_column smoke_column;
         tPipe_chunk_explosion explosion;
+        tPipe_single_oppo_renderage oppo_renderage;
         tPipe_chunk_blood_spurt blood_spurt;
         tPipe_single_groove_on_of groove;
         tPipe_single_vanished_dismembered vanished_dismembered;
@@ -1154,8 +1188,9 @@ typedef enum {
 } tPed_form_bone_hinge_type;
 
 typedef enum tSpecial_type {
-    ePipe_special_fade = 0,
-} tSpecial_type;
+    ePipe_special_action_recovery = 0,
+    ePipe_special_action_tail_growth = 1,
+} tPipe_special_action;
 
 typedef struct {
     tCar_detail_ownership ownership;
@@ -4584,8 +4619,8 @@ typedef struct tPhysics_object {
     br_bounds3 field_0xf4;
     br_bounds3 field_0x10c;
     br_bounds3 field_0x124;
-    float radius_squared;
     float radius;
+    float radius_squared;
     br_matrix34 field_0x144;
     tU16 box_face_start;
     tU16 box_face_end;
@@ -4624,7 +4659,7 @@ typedef struct tPhysics_object {
     void* owner; /* points to tCollision_info_owner (used in PHILSetObjectProperty) */
     void* field_0x240;
     br_vector3 water_normal;
-    br_scalar water_d; /* Created by retype action */
+    br_scalar water_d;
     br_scalar water_depth_factor;
     tSpecial_volume* last_special_volume;
     tSpecial_volume* auto_special_volume;
@@ -4642,35 +4677,42 @@ typedef struct tPhysics_object {
     undefined field_0x4d5[3];
 } tPhysics_object;
 
-typedef struct {
-    tPhysics_object* collision_info;
-    undefined2 field_0x4;
-    undefined field_0x6[0x8 - 0x6];
-    undefined4 field_0x8;
-    float field_0xc;
-    float field_0x10;
+#define PHIL_QUEUED_HEADER_MEMBERS \
+    tPhysics_object* collision_info; \
+    undefined2 field_0x4; \
+    undefined field_0x6[0x8 - 0x6]; \
+    undefined4 field_0x8; \
+    float field_0xc; \
+    float field_0x10; \
     float field_0x14;
+
+#define PHIL_QUEUED_OBJECT_INFO_DATA_MEMBERS \
+    br_vector3 field_0x18; \
+    br_vector3 field_0x24; \
+    br_matrix34 field_0x30; \
+    undefined flags; \
+    undefined field_0x61[3];
+
+typedef struct {
+    PHIL_QUEUED_HEADER_MEMBERS
+#ifdef REC2_CHEAT
+    undefined4 cheat_variable; /* Unknown offset */
+#endif
 } tPHIL_queued_header;
 
 typedef struct {
     /* FIXME: CARMA2_CHEAT has extra 32-bit member */
-    tPhysics_object* collision_info;
-    undefined2 field_0x4;
-    undefined field_0x6[0x2];
-    undefined4 field_0x8;
-    float field_0xc;
-    float field_0x10;
-    float field_0x14;
-    br_vector3 field_0x18;
-    br_vector3 field_0x24;
-    br_matrix34 field_0x30;
-    undefined flags;
-    undefined field_0x61[3];
+    PHIL_QUEUED_HEADER_MEMBERS
+#ifdef REC2_CHEAT
+    undefined4 cheat_variable; /* FIXME: unknown offset (before 0x18) */
+#endif
+    PHIL_QUEUED_OBJECT_INFO_DATA_MEMBERS
 } tPHIL_queued_object_info;
 
 typedef union {
     struct {
-        tPHIL_queued_object_info _field_0x0;
+        PHIL_QUEUED_HEADER_MEMBERS
+        PHIL_QUEUED_OBJECT_INFO_DATA_MEMBERS
         undefined _field_0x64;
         tPHIL_queued_header headers[100];
     };
@@ -5400,9 +5442,9 @@ typedef struct tDrone_spec {
 } tDrone_spec;
 
 typedef struct {
-    void *field_0x0;
+    void* field_0x0;
     tU32 field_0x4;
-    undefined4 field_0x8;
+    void* field_0x8;
 } tRepair_animation;
 
 typedef enum {
@@ -5628,6 +5670,13 @@ typedef struct {
     tU8 object_hierarchy[];
 } tNet_message_chunk_mine_explode;
 
+typedef struct {
+    tNet_message_chunk_header header;
+    undefined field_0x2[2];
+    tPlayer_ID player;
+    tU32 time;
+} tNet_message_chunk_recover;
+
 typedef union {
     tNet_message_chunk_raw raw;
     tNet_message_chunk_race_over race_over; /* type = 0xa */
@@ -5643,6 +5692,7 @@ typedef union {
     tNet_message_chunk_toggle_doors toggle_doors; /* type = 0x2c */
     tNet_message_chunk_view_car view_car; /* type = 0x2f */
     tNet_message_chunk_mine_explode mine_explode; /* type = 0x31 */
+    tNet_message_chunk_recover recover;
     tNet_message_chunk_detach_bit detach_bit; /* type = 0x33 */
 } tNet_message_chunk;
 
@@ -5831,6 +5881,7 @@ enum {
 enum {
     eInterfaceString_car_colon = 14,
     eInterfaceString_abort_race = 21,
+    eInterfaceString_mission = 78,
     eInterfaceString_closed = 179,
     eInterfaceString_target_none = 232,
     eInterfaceString_target_kills = 233,
@@ -6047,6 +6098,7 @@ enum {
     kFatalError_TooManyCrushLimits = 0x7a,
     kFatalError_TooManyCrushDatas = 0x7c,
     kFatalError_ChunkIsTooLargeToPipe = 0x7d,
+    kFatalError_RelinActorNullToNullInActionReplay = 0x7e,
     kFatalError_CannotFindSmashActorModel_S = 0x81,
     kFatalError_ProblemWithSpecialVolumeNumber_I = 0x82,
     kFatalError_TooManyEnvironmentalSoundAlternatives = 0x83,

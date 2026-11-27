@@ -500,6 +500,7 @@ tWreck_gallery_sell_info gWreck_gallery_sell_infos[32];
 br_actor* gFrontend_actor;
 
 // GLOBAL: CARMA2_HW 0x00686f10
+// GLOBAL: CARMA2_SW 0x00681650
 // GLOBAL: CARMA2_CHEAT 0x0068e7b8
 br_material* gFrontend_backdrop_materials[3];
 
@@ -770,9 +771,49 @@ void C2_HOOK_FASTCALL DisposeJoinList(int pException) {
     }
 }
 
-// AddToJoinList
+// FUNCTION: CARMA2_HW 0x004681d0
+// FUNCTION: CARMA2_SW 0x00467f50
+// FUNCTION: CARMA2_CHEAT 0x004685f0
+void C2_HOOK_FASTCALL AddToJoinList(tNet_game_details* pGame) {
+    int i;
+    int slot_to_use;
+    tU32 this_game_ID;
 
-// FillInRaceDescription
+    slot_to_use = -1;
+    this_game_ID = NetExtractGameID(pGame);
+    for (i = 0; i < (int)REC2_ASIZE(gGames_to_join); i++) {
+        if (gGames_to_join[i].game != NULL) {
+            if (NetExtractGameID(gGames_to_join[i].game) == this_game_ID) {
+                DisposeJoinableGame(i);
+                slot_to_use = i;
+                break;
+            }
+        }
+    }
+    if (slot_to_use < 0) {
+        for (i = 0; i < (int)REC2_ASIZE(gGames_to_join); i++) {
+            if (gGames_to_join[i].game == NULL) {
+                slot_to_use = i;
+                break;
+            }
+        }
+    }
+    if (slot_to_use >= 0) {
+        gGames_to_join[slot_to_use].game = pGame;
+        gGames_to_join[slot_to_use].time = PDGetTotalTime();
+    }
+}
+
+void C2_HOOK_FASTCALL FillInRaceDescription(char* pText, int pRace_index) {
+    const tRace_list_spec* race;
+
+    race = &gRace_list[pRace_index];
+
+    strcpy(pText, gRace_list[pRace_index].description);
+    MungeMetaCharactersChar(pText, 'R', '\r');
+    MungeMetaCharactersNum(pText, 'O', race->count_explicit_opponents);
+    MungeMetaCharactersNum(pText, 'L', race->count_laps);
+}
 
 // FUNCTION: CARMA2_HW 0x00466450
 // FUNCTION: CARMA2_SW 0x004661e0
@@ -1235,7 +1276,18 @@ int C2_HOOK_FASTCALL FindPrevActiveItem(tFrontend_spec* pFrontend, int pStart_in
     return FindPrevActiveItem(pFrontend, pFrontend->count_items);
 }
 
-// RaceIndex
+int C2_HOOK_FASTCALL RaceIndex(const char* pName) {
+    int i;
+
+    for (i = 0; i < gNumber_of_races; i++) {
+        if (DRStricmp(pName, gRace_list[i].name) == 0) {
+            return i;
+        }
+    }
+#ifndef REC2_MATCHING
+    return 0;
+#endif
+}
 
 // FUNCTION: CARMA2_HW 0x00466bb0
 // FUNCTION: CARMA2_SW 0x00466940
@@ -1651,7 +1703,61 @@ void C2_HOOK_FASTCALL MenuSetDriverImage(int pOpponent_index, int pFrontend_inde
     BrModelUpdate(gFrontend_brender_items[pFrontend_index].model, BR_MODU_VERTEX_POSITIONS);
 }
 
-// MainMenuInfunc
+// FUNCTION: CARMA2_HW 0x00469a40
+// FUNCTION: CARMA2_SW 0x004697a0
+// FUNCTION: CARMA2_CHEAT 0x00469e60
+int C2_HOOK_FASTCALL MainMenuInfunc(tFrontend_spec* pFrontend) {
+    char group_name[12];
+    br_camera* camera;
+    tFrontend_item_spec* item;
+    int group;
+    int race_index;
+    int i;
+
+    DefaultInfunc(pFrontend);
+    ResetInterfaceTimeout();
+    group = (gCurrent_race_group - gRace_groups) % 10 + 1;
+    sprintf(group_name, "%s %d", IString_Get(eInterfaceString_mission), group);
+    strcpy(pFrontend->items[2].text, group_name);
+    for (race_index = 4 * (group - 1), i = pFrontend->scrollers[0].indexFirstScrollableItem; i <= pFrontend->scrollers[0].indexLastScrollableItem; race_index++, i++) {
+        item = &pFrontend->items[i];
+        strcpy(item->text, gRace_list[race_index].name);
+        if (race_index == gProgram_state.current_race_index) {
+            item->radioButton_selected = 1;
+        } else {
+            item->radioButton_selected = 0;
+        }
+        if (gRace_list[race_index].is_boundary) {
+            item->unlitFont = 2;
+            item->highFont = 3;
+        } else {
+            item->unlitFont = 0;
+            item->highFont = 1;
+        }
+    }
+    FuckingMakeTheFuckingRaceAndGroupsDisplayHaveTheRightCuntingStuffInIt(pFrontend);
+    FillInRaceDescription(pFrontend->items[22].text, gProgram_state.current_race_index);
+    strcpy(pFrontend->items[18].text, gProgram_state.player_name);
+    strcpy(pFrontend->items[20].text, gOpponents[gProgram_state.current_car_index].car_name);
+    strcpy(pFrontend->items[23].text, MungeCommas(gProgram_state.credits));
+    gFrontend_car_image_outdated = 1;
+    pFrontend->isPreviousSomeOtherMenu = 1;
+    gMouse_in_use = 0;
+    gFrontend_menu_camera = BrActorAllocate(BR_ACTOR_CAMERA, NULL);
+    camera = gFrontend_menu_camera->type_data;
+    camera->type = BR_CAMERA_PARALLEL;
+    camera->field_of_view = BR_ANGLE_DEG(90);
+    camera->hither_z = 1.0f;
+    camera->yon_z = 3.0f;
+    camera->width = 640.0f;
+    camera->height = 480.0f;
+    gFrontend_billboard_actors[0] = CreateAPOactor();
+    gFrontend_APO_Colour_1 = FudgeBRenderIntoTheNinetiesWithSomeProperFuckingColourSupport(gFrontend_billboard_actors[0]->material->colour_map, 0xff, 0x80, 0x00, 0xff);
+    gFrontend_APO_Colour_2 = FudgeBRenderIntoTheNinetiesWithSomeProperFuckingColourSupport(gFrontend_billboard_actors[0]->material->colour_map, 0x00, 0x00, 0x80, 0xff);
+    gFrontend_APO_Colour_3 = FudgeBRenderIntoTheNinetiesWithSomeProperFuckingColourSupport(gFrontend_billboard_actors[0]->material->colour_map, 0x00, 0x00, 0xff, 0xff);
+    FuckWithWidths(pFrontend);
+    return 1;
+}
 
 // FUNCTION: CARMA2_HW 0x00469df0
 // FUNCTION: CARMA2_SW 0x00469b50
@@ -1665,7 +1771,26 @@ int C2_HOOK_FASTCALL MainMenuOutfunc(tFrontend_spec* pFrontend) {
     return 1;
 }
 
-// MainMenuSelectRace
+// FUNCTION: CARMA2_HW 0x00469ea0
+// FUNCTION: CARMA2_SW 0x00469c00
+// FUNCTION: CARMA2_CHEAT 0x0046a2a0
+int C2_HOOK_FASTCALL MainMenuSelectRace(tFrontend_spec* pFrontend) {
+    char group_name[12];
+    int race_index;
+
+    race_index = RaceIndex(pFrontend->items[gFrontend_selected_item_index].text);
+    gProgram_state.current_race_index = race_index;;
+    pFrontend->items[22].highFont = 11;
+    pFrontend->items[22].unlitFont = 11;
+    if (!gMouse_in_use) {
+        FillInRaceDescription(pFrontend->items[22].text, race_index);
+    }
+    gCurrent_race_group = gRace_list[gProgram_state.current_race_index].group;
+    sprintf(group_name, "%s %d", IString_Get(eInterfaceString_mission), (gCurrent_race_group - gRace_groups) % 10 + 1);
+    strcpy(pFrontend->items[2].text, group_name);
+    FuckWithWidths(pFrontend);
+    return 0;
+}
 
 // FUNCTION: CARMA2_HW 0x0046a010
 // FUNCTION: CARMA2_SW 0x00469d70
@@ -1771,6 +1896,7 @@ int C2_HOOK_FASTCALL ChangeCarMenuInfunc(tFrontend_spec* pFrontend) {
 }
 
 // FUNCTION: CARMA2_HW 0x0046b610
+// FUNCTION: CARMA2_SW 0x0046b330
 // FUNCTION: CARMA2_CHEAT 0x0046b9b0
 int C2_HOOK_FASTCALL ChangeCarCancel(tFrontend_spec* pFrontend) {
 
@@ -2355,6 +2481,7 @@ void C2_HOOK_FASTCALL FRONTEND_Setup(tFrontendMenuType pType) {
 // FRONTEND_Redraw
 
 // FUNCTION: CARMA2_HW 0x0046d8b0
+// FUNCTION: CARMA2_SW 0x0046cfb0
 // FUNCTION: CARMA2_CHEAT 0x0046dc20
 void C2_HOOK_FASTCALL MaybeDoMouseCursor(void) {
 
@@ -4029,7 +4156,76 @@ int C2_HOOK_FASTCALL NetOptions_CreditsRoller(tFrontend_spec* pFrontend) {
     return 0;
 }
 
-// NetOptions_TargetRoller
+// FUNCTION: CARMA2_HW 0x004732b0
+// FUNCTION: CARMA2_SW 0x00472820
+// FUNCTION: CARMA2_CHEAT 0x00473650
+int C2_HOOK_FASTCALL NetOptions_TargetRoller(tFrontend_spec* pFrontend) {
+    int increment;
+    int minimum;
+    int maximum;
+
+    gFrontend_net_current_roll = PDGetTotalTime();
+    if ((int)(gFrontend_net_current_roll - gFrontend_net_last_roll) >= 300) {
+        gFrontend_net_last_roll = gFrontend_net_current_roll;
+        switch (gFrontend_game_type) {
+        case eNet_game_type_1:
+            increment = 1;
+            minimum = 1;
+            maximum = 64;
+            break;
+        case eNet_game_type_5:
+            increment = 1;
+            minimum = 1;
+            maximum = 100;
+            break;
+        case eNet_game_type_foxy:
+            increment = 30 * 1000;
+            minimum = 30 * 1000;
+            maximum = 2 * 60 * 60 * 1000;
+            break;
+        default:
+            return 0;
+        }
+        if (gFrontend_selected_item_index == 30) {
+            gFrontend_net_options.starting_target += increment;
+        } else if (gFrontend_selected_item_index == 29) {
+            gFrontend_net_options.starting_target -= increment;
+        }
+        if (gFrontend_net_options.starting_target < minimum) {
+            gFrontend_net_options.starting_target = minimum;
+        } else if (gFrontend_net_options.starting_target > maximum) {
+            gFrontend_net_options.starting_target = maximum;
+        }
+        switch (gFrontend_game_type) {
+        case eNet_game_type_1:
+        case eNet_game_type_5:
+            sprintf(pFrontend->items[26].text, "%i", gFrontend_net_options.starting_target);
+            break;
+        case eNet_game_type_foxy:
+            {
+                int seconds = gFrontend_net_options.starting_target / 1000;
+                int hours = seconds / 3600;
+                int minutes = (seconds / 60) % 60;
+                int secs = seconds % 60;
+                if (hours != 0) {
+                    sprintf(pFrontend->items[26].text, "%02i:%02i:%02i", hours, minutes, secs);
+                } else {
+                    sprintf(pFrontend->items[26].text, "%02i:%02i", minutes, secs);
+                }
+            }
+            break;
+        case eNet_game_type_fight_to_death:
+        case eNet_game_type_2:
+        case eNet_game_type_checkpoint:
+        case eNet_game_type_4:
+        case eNet_game_type_6:
+            strcpy(pFrontend->items[26].text, "----");
+            break;
+        }
+        FuckWithWidths(pFrontend);
+    }
+    return 0;
+}
 
 // NetOptions_Ok
 
