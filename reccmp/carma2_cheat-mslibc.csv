@@ -30,6 +30,7 @@ address,type,name
 0x0057ccd0,library,_rewind
 0x0057cd30,library,__fsopen
 0x0057cd60,library,_fopen
+0x0057cd90,library,_toupper
 0x0057ce90,library,_fsetpos
 0x0057cee0,library,_ftell
 0x0057d090,library,_fwrite

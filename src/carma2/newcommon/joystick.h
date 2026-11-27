@@ -36,6 +36,10 @@ extern void C2_HOOK_FASTCALL RestoreJoystickPreferences(void);
 
 extern int C2_HOOK_FASTCALL HasCurrentJoystick(void);
 
+extern void C2_HOOK_FASTCALL FUN_0045a670(void);
+
+extern int C2_HOOK_FASTCALL AddToTextBufferCallback(const char* pPath, void* pContext);
+
 extern int C2_HOOK_FASTCALL StoreTextHeadup(tHeadup_text_buffer* pTexts, tHeadup_text* pNew, int pSorted);
 
 #ifdef REC2_HW

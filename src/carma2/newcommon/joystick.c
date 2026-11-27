@@ -9,14 +9,18 @@
 #include "joystick.h"
 
 #include "08-loading1.h"
+#include "15-displays.h"
 #include "41-utility.h"
 #include "globvars.h"
 #include "globvrbm.h"
 #include "platform.h"
+#include "rec2_macros.h"
 
 #include "c2_stdio.h"
 #include "c2_stdlib.h"
 #include "c2_string.h"
+
+#include <ctype.h>
 
 // GLOBAL: CARMA2_HW 0x00595f84
 // GLOBAL: CARMA2_SW 0x00590ee4
@@ -70,9 +74,19 @@ br_token_value gAccent_poly_prims[] = {
 // GLOBAL: CARMA2_SW 0x006808c4
 int gJoystick_preferences_backup_valid;
 
+// GLOBAL: CARMA2_HW 0x0079d860
+// GLOBAL: CARMA2_SW 0x00793dc0
+// GLOBAL: CARMA2_CHEAT 0x007a4f00
+tHeadup_text_buffer gPath_headup_buffer;
+
 // GLOBAL: CARMA2_HW 0x0079d8c0
 // GLOBAL: CARMA2_SW 0x00793e20
 tButtonJoystickInfo gJoystick_preferences_backup;
+
+typedef struct {
+    tHeadup_text_buffer* buffer;
+    const char* name;
+} tHeadup_text_buffer_filter;
 
 typedef struct tJoystick_preference_node {
     tButtonJoystickInfo* info;
@@ -111,6 +125,87 @@ int C2_HOOK_FASTCALL ReadUntilCharacter(FILE* pF, char* pBuffer, int pBuffer_siz
     } else {
         return 0;
     }
+}
+
+// FUNCTION: CARMA2_HW 0x0045a670
+// FUNCTION: CARMA2_SW 0x0045a400
+// FUNCTION: CARMA2_CHEAT 0x0045aaf0
+void C2_HOOK_FASTCALL FUN_0045a670(void) {
+    int i;
+    const char* ext;
+    char name[16];
+    tHeadup_text_buffer_filter filter;
+    tPath_name the_path;
+
+    if (gINT_0068b8e4) {
+        gINT_0068b8e4 = 0;
+#ifdef REC2_HW
+        if (gAcc_poly_actor != NULL && gRender_acc_poly_actor) {
+            BrActorRemove(gAcc_poly_actor);
+            gRender_acc_poly_actor = 0;
+        }
+#endif
+        return;
+    }
+    gINT_0068b8e4 = 1;
+    MoveHeadupTo(gProgram_state.frame_rate_headup, 10, 350);
+    for (i = 0; i < (int)REC2_ASIZE(gRace_head_ups); i++) {
+        MoveHeadupTo(gRace_head_ups[i], 10, 120 + 10 * i);
+        ChangeHeadupFont(gRace_head_ups[i], -2);
+    }
+#ifdef REC2_HW
+    CreateAccentPolyActor(8.f, 118.f, 130.f, 224.f);
+#endif
+    ext = ".ACT";
+    if (gPath_headup_buffer.count == 0) {
+        PathCat(the_path, gRace_path, "");
+        if (gPath_headup_buffer.field_0x14 < 5) {
+            gPath_headup_buffer.field_0x14 = 10;
+        }
+        gPath_headup_buffer.texts = NULL;
+        gPath_headup_buffer.count = 0;
+        strcpy(name, ext);
+        gPath_headup_buffer.pos_last_add = 0;
+        gPath_headup_buffer.text_last_add = NULL;
+        gPath_headup_buffer.field_0x4 = NULL;
+        gPath_headup_buffer.field_0x10 = 22;
+        filter.buffer = &gPath_headup_buffer;
+        DRstrupr(name);
+        filter.name = name;
+        PDEnumPath(the_path, AddToTextBufferCallback, &filter);
+        gPath_headup_buffer.pos_last_add = 0;
+        gPath_headup_buffer.text_last_add = gPath_headup_buffer.texts;
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x0045a7f0
+// FUNCTION: CARMA2_SW 0x0045a540
+// FUNCTION: CARMA2_CHEAT 0x0045ac70
+int C2_HOOK_FASTCALL AddToTextBufferCallback(const char* pPath, void* pContext) {
+    char buffer[256];
+    tHeadup_text_buffer* text_buffer;
+    const char* name;
+    tHeadup_text* text;
+
+    text_buffer = ((tHeadup_text_buffer_filter*)pContext)->buffer;
+    name = ((tHeadup_text_buffer_filter*)pContext)->name;
+    strcpy(buffer, pPath);
+    DRstrupr(buffer);
+    if (strstr(buffer, "POWERUP") != NULL || strstr(buffer, "CPOINT") != NULL || strstr(buffer, "TRACKX") != NULL) {
+        return 0;
+    }
+    if (strstr(buffer, name) == NULL && strcmp(name, ".*") != 0) {
+        return 0;
+    }
+    text = malloc(sizeof(tHeadup_text));
+    if (text != NULL) {
+        text->next = NULL;
+        strncpy(text->text, buffer, sizeof(text->text));
+        DRstrlwr(text->text);
+        text->text[0] = toupper(text->text[0]);
+        StoreTextHeadup(text_buffer, text, 1);
+    }
+    return 0;
 }
 
 // FUNCTION: CARMA2_HW 0x0045a920
