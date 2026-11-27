@@ -20,6 +20,7 @@
 #include "53-controls.h"
 #include "59-camera.h"
 #include "61-pedestrn.h"
+#include "63-loading3.h"
 #include "globvars.h"
 #include "globvrpb.h"
 #include "platform.h"
@@ -53,6 +54,23 @@ float gPending_replay_rate;
 // GLOBAL: CARMA2_SW 0x0069c3d4
 // GLOBAL: CARMA2_CHEAT 0x006a9ef4
 tU32 gUINT_006a237c;
+
+// GLOBAL: CARMA2_HW 0x0065fbb0
+// GLOBAL: CARMA2_SW 0x0065a4f0
+// GLOBAL: CARMA2_CHEAT 0x006673f8
+const char* gReplay_pixie_names[11] = {
+    "REPLAY.PIX",
+    "RBUTTONS.PIX",
+    "REWSTART.PIX",
+    "REW.PIX",
+    "REVPLAY.PIX",
+    "PAUSE.PIX",
+    "PLAY.PIX",
+    "FFWD.PIX",
+    "FWDEND.PIX",
+    "CAMERA.PIX",
+    "RECORD.PIX",
+};
 
 // GLOBAL: CARMA2_HW 0x006a2380
 // GLOBAL: CARMA2_SW 0x0069c3d8
@@ -210,7 +228,20 @@ void C2_HOOK_FASTCALL DoActionReplayHeadups(void) {
 
 // CheckReplayTurnOn
 
-// InitializeActionReplayPix
+// FUNCTION: CARMA2_HW 0x004e7090
+// FUNCTION: CARMA2_SW 0x004e2ed0
+// FUNCTION: CARMA2_CHEAT 0x004ecd80
+void C2_HOOK_FASTCALL InitializeActionReplayPix(void) {
+    int i;
+
+    for (i = 0; i < (int)REC2_ASIZE(gReplay_pixies); i++) {
+        gReplay_pixies[i] = LoadPixelmap(gReplay_pixie_names[i]);
+        BRPM_convert(gReplay_pixies[i], gBack_screen->type);
+#ifndef REC2_CHEAT
+        BrMapAdd(gReplay_pixies[i]);
+#endif
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x004e70d0
 // FUNCTION: CARMA2_SW 0x004e2f10
