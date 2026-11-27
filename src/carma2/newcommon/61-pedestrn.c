@@ -1317,11 +1317,45 @@ int C2_HOOK_FASTCALL SetCharacterMove(tPed_character_instance* pPed, int pMove_a
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x0040aed0
-// STUB: CARMA2_SW 0x0040aec0
-// STUB: CARMA2_CHEAT 0x0040af40
+// FUNCTION: CARMA2_HW 0x0040aed0
+// FUNCTION: CARMA2_SW 0x0040aec0
+// FUNCTION: CARMA2_CHEAT 0x0040af40
 void C2_HOOK_FASTCALL DRMatrix34RotateCos(br_matrix34* pDest, const br_vector3* pAxis, br_scalar pCos_a) {
-    NOT_IMPLEMENTED();
+    br_scalar s;
+    br_scalar t;
+    br_scalar txy;
+    br_scalar txz;
+    br_scalar tyz;
+    br_scalar sx;
+    br_scalar sy;
+    br_scalar sz;
+    br_scalar c;
+
+    if (pCos_a < -1.0f) {
+        c = -1.0f;
+    } else if (pCos_a > 1.0f) {
+        c = 1.0f;
+    } else {
+        c = pCos_a;
+    }
+    s = (br_scalar)sqrt(1.0f - c * c);
+    t = 1.0f - c;
+    txy = t * (pAxis->v[0] * pAxis->v[1]);
+    txz = t * (pAxis->v[0] * pAxis->v[2]);
+    tyz = t * (pAxis->v[1] * pAxis->v[2]);
+    sx = s * pAxis->v[0];
+    sy = s * pAxis->v[1];
+    sz = s * pAxis->v[2];
+    pDest->m[0][0] = t * (pAxis->v[0] * pAxis->v[0]) + c;
+    pDest->m[0][1] = txy + sz;
+    pDest->m[0][2] = txz - sy;
+    pDest->m[1][0] = txy - sz;
+    pDest->m[1][1] = t * (pAxis->v[1] * pAxis->v[1]) + c;
+    pDest->m[1][2] = tyz + sx;
+    pDest->m[2][0] = txz + sy;
+    pDest->m[2][1] = tyz - sx;
+    pDest->m[2][2] = t * (pAxis->v[2] * pAxis->v[2]) + c;
+    pDest->m[3][0] = pDest->m[3][1] = pDest->m[3][2] = 0.0f;
 }
 
 #ifdef REC2_MATCHING
