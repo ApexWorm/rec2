@@ -2179,7 +2179,58 @@ intptr_t C2_HOOK_CDECL MakeCarModelsMaterialsSingleSided(br_actor* pActor, void*
 
 // DoSplitting
 
-// DoJointSnapping
+// FUNCTION: CARMA2_HW 0x00431310
+// FUNCTION: CARMA2_SW 0x00431340
+// FUNCTION: CARMA2_CHEAT 0x004314e0
+int C2_HOOK_FASTCALL DoJointSnapping(tPhysics_joint_force* pForces, br_scalar* pImpulses, int pCount) {
+    int i;
+    tPhysics_joint_force* force;
+    br_scalar* impulse;
+    tPhysics_object* object;
+    tPhysics_object* parent;
+    tCar_spec* car;
+    tUser_crush_data* user_crush;
+    br_scalar threshold;
+    int index;
+
+    force = pForces;
+    impulse = pImpulses;
+    for (i = 0; i < pCount; i++, force++, impulse++) {
+        if (force->type != 11) {
+            continue;
+        }
+        object = force->object_a;
+        if (object == NULL || object->owner == NULL || object->flags_0x238 != 1) {
+            continue;
+        }
+        parent = object->parent;
+        if (parent == NULL) {
+            continue;
+        }
+        car = parent->owner;
+        if (car == NULL || parent->flags_0x238 != 1 || car == NULL || car->driver <= eDriver_oppo - 1 || car->invulnerable_no_crushage) {
+            continue;
+        }
+        user_crush = object->actor->user;
+        if (user_crush == NULL || user_crush->crush_data == NULL || user_crush->crush_data->flap_data == NULL || !user_crush->crush_data->flap_data->kev_o_flap) {
+            continue;
+        }
+        threshold = object->M * gTorque_to_snap_per_tonne;
+        if (*impulse > threshold && BrVector3Dot(&force->direction_a, &object->physics_joint1->hinge_axis) < 0.0f) {
+            if (gNet_mode == eNet_mode_none) {
+                index = i;
+                ReduceEffectOfForces(pForces, pImpulses, pCount, &index, 1, threshold);
+                FullyDetachBit(car, object);
+                MungeDetachLists(car->car_crush_spec);
+                return 1;
+            }
+            if (gNet_mode == eNet_mode_host) {
+                SendFullyDetachBit(car, object);
+            }
+        }
+    }
+    return 0;
+}
 
 // PointIsOutsideShape
 

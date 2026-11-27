@@ -332,7 +332,7 @@ extern intptr_t C2_HOOK_CDECL MakeCarModelsMaterialsSingleSided(br_actor* pActor
 
 // DoSplitting
 
-// DoJointSnapping
+extern int C2_HOOK_FASTCALL DoJointSnapping(tPhysics_joint_force* pForces, br_scalar* pImpulses, int pCount);
 
 // PointIsOutsideShape
 
