@@ -162,11 +162,11 @@ extern int C2_HOOK_FASTCALL MakeCharacterRenderable(tPed_character_instance* pCh
 
 extern void C2_HOOK_FASTCALL CalcCollisionObjectThings(tPhysics_object* pObject, br_bounds3* pFrame, int pNull, br_vector3* pBoneVec, br_vector3* pBonePtr);
 
-// SetCollisionObject
+extern int C2_HOOK_FASTCALL SetCollisionObject(tPed_character_instance* pCharacter, tPhysics_object* pObject, br_actor* pActor, br_bounds3* pBounds, int pArg5, int pArg6, int pArg7, int pArg8, int pArg9, int pArg10, int pArg11);
 
-// FindAndSetSeveredPhysicsSet
+extern int C2_HOOK_FASTCALL FindAndSetSeveredPhysicsSet(tPed_character_instance* pCharacter);
 
-// SetSeveredLimbObject
+extern tPhysics_object* C2_HOOK_FASTCALL SetSeveredLimbObject(tPed_character_instance* pCharacter, int pBone_index, int pArg3, int pArg4);
 
 extern int C2_HOOK_FASTCALL MakeCharacterCollideworthy2(tPed_character_instance* pCharacter, int pArg2, int pArg3, int pArg4);
 
@@ -174,17 +174,17 @@ extern int C2_HOOK_FASTCALL MakeCharacterCollideworthy(tPed_character_instance* 
 
 extern tPhysics_object* C2_HOOK_FASTCALL GetRootObject(tPed_character_instance* pPed);
 
-// CharacterNoLongerCollideworthy
+extern int C2_HOOK_FASTCALL CharacterNoLongerCollideworthy(tPed_character_instance* pCharacter);
 
 extern void C2_HOOK_FASTCALL SetObjectV(tPhysics_object* pObject, const br_vector3* pV);
 
-// SetObjectOmega
+extern void C2_HOOK_FASTCALL SetObjectOmega(tPhysics_object* pObject, const br_vector3* pOmega);
 
-// MakePartPhysicallyActive
+extern void C2_HOOK_FASTCALL MakePartPhysicallyActive(tPhysics_object* pObject, const br_vector3* pV, const br_vector3* pOmega, int pArg4);
 
-// TurnPhysicsOn
+extern void C2_HOOK_FASTCALL TurnPhysicsOn(tPed_character_instance* pCharacter);
 
-// MakeCharacterPhysicworthy
+extern int C2_HOOK_FASTCALL MakeCharacterPhysicworthy(tPed_character_instance* pCharacter);
 
 extern void C2_HOOK_FASTCALL RecalculateOrientationOfRoot(tPed_character_instance* pCharacter);
 
@@ -192,7 +192,7 @@ extern int C2_HOOK_FASTCALL BonerActiveHalted2(tPed_character_instance* pCharact
 
 extern int C2_HOOK_FASTCALL CharacterNoLongerPhysicworthy(tPed_character_instance* pCharacter);
 
-extern void C2_HOOK_CDECL SetCharacterPhysicsLevel(tPed_character_instance* pCharacter, tU32 pLevel, ...);
+extern int C2_HOOK_CDECL SetCharacterPhysicsLevel(tPed_character_instance* pCharacter, tU32 pLevel, ...);
 
 extern void C2_HOOK_FASTCALL StopCharacterMorphing(tPed_character_instance* pCharacter);
 
