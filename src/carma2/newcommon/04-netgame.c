@@ -572,6 +572,13 @@ void C2_HOOK_FASTCALL PlayerIsIt(tNet_game_player_info* pPlayer) {
     }
 }
 
+// FUNCTION: CARMA2_HW 0x0049aaf0
+// FUNCTION: CARMA2_SW 0x00496c70
+// FUNCTION: CARMA2_CHEAT 0x0049aea0
+void C2_HOOK_FASTCALL FUN_0049aaf0(void) {
+
+}
+
 // SelectRandomFox
 
 #ifdef REC2_MATCHING
@@ -842,6 +849,44 @@ void C2_HOOK_FASTCALL InitNetGameplayStuff(void) {
 void C2_HOOK_FASTCALL DefaultNetName(void) {
 
     NetObtainSystemUserName(gProgram_state.player_name, 32);
+}
+
+// FUNCTION: CARMA2_HW 0x0049bd20
+// FUNCTION: CARMA2_SW 0x00497ea0
+// FUNCTION: CARMA2_CHEAT 0x0049c0d0
+void C2_HOOK_FASTCALL GetReducedMatrix(tReduced_matrix* m1, const br_matrix34* m2) {
+
+    m1->row1.v[0] = m2->m[0][0];
+    m1->row1.v[1] = m2->m[0][1];
+    m1->row1.v[2] = m2->m[0][2];
+    m1->row2.v[0] = m2->m[1][0];
+    m1->row2.v[1] = m2->m[1][1];
+    m1->row2.v[2] = m2->m[1][2];
+    m1->translation.v[0] = m2->m[3][0];
+    m1->translation.v[1] = m2->m[3][1];
+    m1->translation.v[2] = m2->m[3][2];
+}
+
+// FUNCTION: CARMA2_HW 0x0049bd60
+// FUNCTION: CARMA2_SW 0x00497ee0
+// FUNCTION: CARMA2_CHEAT 0x0049c110
+void C2_HOOK_FASTCALL GetExpandedMatrix(br_matrix34* m1, const tReduced_matrix* m2) {
+
+    m1->m[0][0] = m2->row1.v[0];
+    m1->m[0][1] = m2->row1.v[1];
+    m1->m[0][2] = m2->row1.v[2];
+
+    m1->m[1][0] = m2->row2.v[0];
+    m1->m[1][1] = m2->row2.v[1];
+    m1->m[1][2] = m2->row2.v[2];
+
+    m1->m[3][0] = m2->translation.v[0];
+    m1->m[3][1] = m2->translation.v[1];
+    m1->m[3][2] = m2->translation.v[2];
+
+    m1->m[2][0] = m2->row1.v[1] * m2->row2.v[2] - m2->row1.v[2] * m2->row2.v[1];
+    m1->m[2][1] = m2->row1.v[2] * m2->row2.v[0] - m2->row1.v[0] * m2->row2.v[2];
+    m1->m[2][2] = m2->row1.v[0] * m2->row2.v[1] - m2->row1.v[1] * m2->row2.v[0];
 }
 
 // FUNCTION: CARMA2_HW 0x0049bde0

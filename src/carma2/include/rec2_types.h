@@ -707,6 +707,12 @@ typedef struct {
 } tReduced_pos;
 
 typedef struct {
+    br_vector3 row1;
+    br_vector3 row2;
+    br_vector3 translation;
+} tReduced_matrix;
+
+typedef struct {
     tReduced_pos pos;
     tU16 radius;
     tU8 strength;

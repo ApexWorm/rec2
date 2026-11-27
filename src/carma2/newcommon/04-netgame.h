@@ -106,6 +106,8 @@ extern void C2_HOOK_FASTCALL CarInContactWithFox(tNet_game_player_info* pPlayer)
 
 extern void C2_HOOK_FASTCALL PlayerIsIt(tNet_game_player_info* pPlayer);
 
+extern void C2_HOOK_FASTCALL FUN_0049aaf0(void);
+
 // SelectRandomFox
 
 extern void C2_HOOK_FASTCALL CalcPlayerScores(void);
@@ -135,6 +137,10 @@ extern void C2_HOOK_FASTCALL SendGameplayToHost(tNet_gameplay_mess pMess, int pP
 extern void C2_HOOK_FASTCALL InitNetGameplayStuff(void);
 
 extern void C2_HOOK_FASTCALL DefaultNetName(void);
+
+extern void C2_HOOK_FASTCALL GetReducedMatrix(tReduced_matrix* m1, const br_matrix34* m2);
+
+extern void C2_HOOK_FASTCALL GetExpandedMatrix(br_matrix34* m1, const tReduced_matrix* m2);
 
 extern void C2_HOOK_FASTCALL AddPlayerToShapeStatusLists(int pPlayer_id, int pCount, tNet_game_player_info* pPlayers);
 
