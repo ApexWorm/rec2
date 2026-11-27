@@ -15,6 +15,7 @@
 #include "17-world2.h"
 #include "20-skidmark.h"
 #include "23-piping.h"
+#include "27-powerup.h"
 #include "28-world3.h"
 #include "32-spark.h"
 #include "33-depth.h"
@@ -1914,7 +1915,36 @@ int C2_HOOK_FASTCALL InsertQuad(tSmash_quad_mapping* pMapping, br_actor* pActor,
 
 // SendAllSmashes
 
-// HitPowerup
+// FUNCTION: CARMA2_HW 0x004f1030
+// FUNCTION: CARMA2_SW 0x004ecc90
+// FUNCTION: CARMA2_CHEAT 0x004f6cd0
+void C2_HOOK_FASTCALL HitPowerup(tPhysics_object* pObject, int pPowerup_index, br_actor* pActor) {
+    tCar_spec* car;
+
+    car = pObject->owner;
+    if (pPowerup_index == 14) {
+        if (pObject != NULL && car != NULL && pObject->flags_0x238 == 1
+                && !(car != NULL && car->driver != eDriver_non_car_unused_slot && (car->driver == eDriver_detached_bit || car->driver == eDriver_split_car))
+                && gSize_powerup_queue < (int)REC2_ASIZE(gPowerup_queue) && car != NULL && car->driver > eDriver_5) {
+            gPowerup_queue[gSize_powerup_queue].actor = pActor;
+            gPowerup_queue[gSize_powerup_queue].car = pObject->owner;
+            gPowerup_queue[gSize_powerup_queue].powerup_index = 14;
+            gSize_powerup_queue++;
+        } else {
+            ThisObjectHitAMineSoSpamItUpUsingThisPowerupsSettings(pObject, 14);
+        }
+    } else {
+        if ((pObject != NULL && car != NULL && pObject->flags_0x238 == 1
+                && !(car != NULL && car->driver != eDriver_non_car_unused_slot && (car->driver == eDriver_detached_bit || car->driver == eDriver_split_car))
+                && gSize_powerup_queue < (int)REC2_ASIZE(gPowerup_queue) && car != NULL && car->driver == eDriver_local_human)
+            || (pObject->flags_0x238 == 0x20 && (gMutant_tail_state == 2 || GetTotalTime() - gDAT_00705b70 < 7500))) {
+            gPowerup_queue[gSize_powerup_queue].actor = pActor;
+            gPowerup_queue[gSize_powerup_queue].car = &gProgram_state.current_car;
+            gPowerup_queue[gSize_powerup_queue].powerup_index = pPowerup_index;
+            gSize_powerup_queue++;
+        }
+    }
+}
 
 // SmashEnvironment
 
