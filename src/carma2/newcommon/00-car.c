@@ -1601,6 +1601,7 @@ tNon_car_spec* C2_HOOK_FASTCALL PullActorFromWorld(br_actor* pActor) {
 
 // STUB: CARMA2_HW 0x0041ff20
 // STUB: CARMA2_SW 0x0041ffa0
+// STUB: CARMA2_CHEAT 0x00420180
 tNon_car_spec* C2_HOOK_FASTCALL DoPullActorFromWorld(br_actor* pActor) {
     NOT_IMPLEMENTED();
     return NULL;

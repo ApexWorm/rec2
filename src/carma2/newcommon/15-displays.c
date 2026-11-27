@@ -1143,6 +1143,7 @@ void C2_HOOK_FASTCALL EarnCredits(int pAmount) {
 
 // FUNCTION: CARMA2_HW 0x0044b450
 // FUNCTION: CARMA2_SW 0x0044b5e0
+// FUNCTION: CARMA2_CHEAT 0x0044b9a0
 void C2_HOOK_FASTCALL EarnCredits100(int pAmount) {
     EarnCredits(pAmount - (pAmount + 50) % 100 + 50);
 }
