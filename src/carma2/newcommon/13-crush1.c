@@ -19,6 +19,7 @@
 #include "49-physics.h"
 #include "51-smash.h"
 #include "53-controls.h"
+#include "57-drone.h"
 #include "60-phil.h"
 #include "69-sound.h"
 #include "globvars.h"
@@ -1383,11 +1384,43 @@ void C2_HOOK_FASTCALL ExpandCrush(tCar_crush* pDest, const tCompressed_car_crush
 
 // RemoveDuplicatePoints
 
-// SimpleCrushModel
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
 
-// CrushDrone
+// STUB: CARMA2_HW 0x0042c540
+// STUB: CARMA2_SW 0x0042c5d0
+// STUB: CARMA2_CHEAT 0x0042c6e0
+void C2_HOOK_FASTCALL SimpleCrushModel(br_model* pModel, int pCount, const br_vector3* pPoints, const br_vector3* pForce, const br_bounds3* pBounds) {
+    NOT_IMPLEMENTED();
+}
 
-// CrushDroneObject
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
+
+extern void C2_HOOK_FASTCALL CrushDrone(tDrone_crush_data* pCrush_data, int pCount, const br_vector3* pPoints, const br_vector3* pForce);
+
+inline void C2_HOOK_FASTCALL CrushDrone(tDrone_crush_data* pCrush_data, int pCount, const br_vector3* pPoints, const br_vector3* pForce) {
+    br_vector3 force;
+
+    if (pCount >= 1) {
+        BrVector3Scale(&force, pForce, pCrush_data->crushability);
+        SimpleCrushModel(pCrush_data->model, pCount, pPoints, &force, &pCrush_data->bounds);
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x0042d180
+// FUNCTION: CARMA2_SW 0x0042d1f0
+// FUNCTION: CARMA2_CHEAT 0x0042d320
+void C2_HOOK_FASTCALL CrushDroneObject(tPhysics_object* pObject, int pCount, const br_vector3* pPoints, const br_vector3* pForce) {
+    tDrone_crush_data* crush_data;
+
+    crush_data = GetDroneCrushData(pObject);
+    if (crush_data != NULL) {
+        CrushDrone(crush_data, pCount, pPoints, pForce);
+    }
+}
 
 // DoDroneCrushing
 
