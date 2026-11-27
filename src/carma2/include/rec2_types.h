@@ -5689,6 +5689,14 @@ typedef struct {
 
 typedef union {
     tNet_message_chunk_raw raw;
+    struct {
+        tNet_message_chunk_header header;
+        undefined field_0x2[2];
+        int number_of_players;
+        int this_index;
+        int batch_number;
+        tNet_game_player_info player;
+    } player_list; /* type = 0x3 */
     tNet_message_chunk_race_over race_over; /* type = 0xa */
     tNet_message_chunk_start_race start_race; /* type = 0xc */
     tNet_message_headup headup; /* type = 0xd */

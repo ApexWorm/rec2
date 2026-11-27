@@ -82,7 +82,7 @@ extern void C2_HOOK_FASTCALL FillInThisPlayer(tNet_game_details* pGame, tNet_gam
 
 // RemoveReferencesToCar
 
-// NetPlayersChanged
+extern void C2_HOOK_FASTCALL NetPlayersChanged(int pNew_count, tNet_game_player_info* pNew_players);
 
 // NetHostGame
 
@@ -142,11 +142,11 @@ extern tNet_message* C2_HOOK_FASTCALL NetGetNextMessage(tNet_game_details* pDeta
 
 // ReceivedDetails
 
-// SendOutPlayerList
+extern void C2_HOOK_FASTCALL SendOutPlayerList(void);
 
 // ReceivedJoin
 
-// KickPlayerOut
+extern void C2_HOOK_FASTCALL KickPlayerOut(tPlayer_ID pID);
 
 // ReceivedLeave
 
