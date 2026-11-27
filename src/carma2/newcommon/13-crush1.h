@@ -178,7 +178,7 @@ extern void C2_HOOK_FASTCALL CompressCrush(tCompressed_car_crush* pDest, const t
 
 extern void C2_HOOK_FASTCALL ExpandCrush(tCar_crush* pDest, const tCompressed_car_crush* pSrc);
 
-// RemoveDuplicatePoints
+extern void C2_HOOK_FASTCALL RemoveDuplicatePoints(int* pUnique_count, br_vector3* pUnique, int pCount, const br_vector3* pPoints);
 
 extern void C2_HOOK_FASTCALL SimpleCrushModel(br_model* pModel, int pCount, const br_vector3* pPoints, const br_vector3* pForce, const br_bounds3* pBounds);
 

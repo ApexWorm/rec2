@@ -1429,17 +1429,93 @@ void C2_HOOK_FASTCALL ExpandCrush(tCar_crush* pDest, const tCompressed_car_crush
     pDest->field_0x50 = pSrc->field_0x24;
 }
 
-// RemoveDuplicatePoints
+inline void C2_HOOK_FASTCALL RemoveDuplicatePoints(int* pUnique_count, br_vector3* pUnique, int pCount, const br_vector3* pPoints) {
+    int i;
+    int j;
+    int unique;
+
+    BrVector3Copy(&pUnique[0], &pPoints[0]);
+    *pUnique_count = 1;
+    for (i = 1; i < pCount; i++) {
+        unique = 1;
+        for (j = 0; j < *pUnique_count; j++) {
+            if ((float)fabs(pUnique[j].v[0] - pPoints[i].v[0]) < 0.005f
+                && (float)fabs(pUnique[j].v[1] - pPoints[i].v[1]) < 0.005f
+                && (float)fabs(pUnique[j].v[2] - pPoints[i].v[2]) < 0.005f) {
+                unique = 0;
+                break;
+            }
+        }
+        if (unique) {
+            BrVector3Copy(&pUnique[*pUnique_count], &pPoints[i]);
+            *pUnique_count += 1;
+        }
+    }
+}
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x0042c540
-// STUB: CARMA2_SW 0x0042c5d0
-// STUB: CARMA2_CHEAT 0x0042c6e0
+// FUNCTION: CARMA2_HW 0x0042c540
+// FUNCTION: CARMA2_SW 0x0042c5d0
+// FUNCTION: CARMA2_CHEAT 0x0042c6e0
 void C2_HOOK_FASTCALL SimpleCrushModel(br_model* pModel, int pCount, const br_vector3* pPoints, const br_vector3* pForce, const br_bounds3* pBounds) {
-    NOT_IMPLEMENTED();
+    int count;
+    br_vector3 points[4];
+    br_vector3 direction;
+    br_vector3 tv;
+    br_vertex* vertex;
+    br_scalar scale;
+    br_scalar limit;
+    br_scalar limit_max;
+    int axis;
+    tU16 i;
+    float scales[1024];
+
+    if (pModel == NULL) {
+        return;
+    }
+    if (pModel->nvertices > REC2_ASIZE(scales)) {
+        PDFatalError("SimpleCrushModel can't cope with that many vertices");
+    }
+    if (pCount < 1) {
+        return;
+    }
+    if (pCount > (int)REC2_ASIZE(points)) {
+        pCount = REC2_ASIZE(points);
+    }
+    RemoveDuplicatePoints(&count, points, pCount, pPoints);
+    if (TooFarToCrush(pModel, count, points, gMax_crush_dist_sq)) {
+        return;
+    }
+    BrVector3Normalise(&direction, pForce);
+    axis = NearestAxis(&direction);
+    for (i = 0; i < pModel->nvertices; i++) {
+        vertex = &pModel->vertices[i];
+        scale = GetImpactScale(&vertex->p, count, points, (1.0f / WORLD_SCALE) * (1.0f / WORLD_SCALE));
+        scales[i] = scale;
+        if (scales[i] != 0.0f) {
+            limit = (pBounds->min.v[axis] - vertex->p.v[axis]) / pForce->v[axis];
+            limit_max = (pBounds->max.v[axis] - vertex->p.v[axis]) / pForce->v[axis];
+            if (limit_max < limit) {
+                limit = limit_max;
+            }
+            if (limit > 0.0f) {
+                if (scale > limit) {
+                    scales[i] = limit;
+                }
+            } else {
+                scales[i] = 0.0f;
+            }
+            if (scales[i] != 0.0f) {
+                BrVector3Scale(&tv, pForce, scales[i]);
+                BrVector3Accumulate(&vertex->p, &tv);
+            }
+        }
+    }
+    PipeSingleCrush(pModel, pForce, scales);
+    SetModelForUpdate(pModel);
 }
 
 #ifdef REC2_MATCHING
