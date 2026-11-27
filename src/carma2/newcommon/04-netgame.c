@@ -75,6 +75,16 @@ tU32 gLast_flash__netgame;
 // GLOBAL: CARMA2_CHEAT 0x006951e8
 int gFlash_state__netgame;
 
+// GLOBAL: CARMA2_HW 0x0079eaa4
+// GLOBAL: CARMA2_SW 0x00795004
+// GLOBAL: CARMA2_CHEAT 0x007a6144
+int gNet_ped_headup;
+
+// GLOBAL: CARMA2_HW 0x0079eae8
+// GLOBAL: CARMA2_SW 0x00795048
+// GLOBAL: CARMA2_CHEAT 0x007a6188
+int gNet_cash_headup;
+
 // SendShapeNumbers
 
 // FUNCTION: CARMA2_HW 0x00497ef0
@@ -408,18 +418,33 @@ void C2_HOOK_FASTCALL DoNetworkHeadups(int pCredits) {
     switch (gHeadup_detail_level) {
     case 0:
     case 3:
-        MoveHeadupTo(gNet_cash_headup, 80, 25);
-        MoveHeadupTo(gNet_ped_headup, 80, 0);
+#ifdef REC2_SW
+        MoveHeadupKeepingOffset(gNet_cash_headup, 40, 12);
+        MoveHeadupKeepingOffset(gNet_ped_headup, 40, 2);
+#else
+        MoveHeadupKeepingOffset(gNet_cash_headup, 80, 25);
+        MoveHeadupKeepingOffset(gNet_ped_headup, 80, 0);
+#endif
         break;
     case 1:
     case 4:
-        MoveHeadupTo(gNet_cash_headup, 480, 25);
-        MoveHeadupTo(gNet_ped_headup, 480, 0);
+#ifdef REC2_SW
+        MoveHeadupKeepingOffset(gNet_cash_headup, 230, 12);
+        MoveHeadupKeepingOffset(gNet_ped_headup, 230, 2);
+#else
+        MoveHeadupKeepingOffset(gNet_cash_headup, 480, 25);
+        MoveHeadupKeepingOffset(gNet_ped_headup, 480, 0);
+#endif
         break;
     case 2:
     case 5:
-        MoveHeadupTo(gNet_cash_headup, 430, 60);
-        MoveHeadupTo(gNet_ped_headup, 430, 20);
+#ifdef REC2_SW
+        MoveHeadupKeepingOffset(gNet_cash_headup, 215, 12);
+        MoveHeadupKeepingOffset(gNet_ped_headup, 215, 2);
+#else
+        MoveHeadupKeepingOffset(gNet_cash_headup, 430, 60);
+        MoveHeadupKeepingOffset(gNet_ped_headup, 430, 20);
+#endif
         break;
     }
 }

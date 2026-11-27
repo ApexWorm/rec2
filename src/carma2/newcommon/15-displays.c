@@ -197,20 +197,10 @@ tU32 gLast_time_earn_time;
 // GLOBAL: CARMA2_CHEAT 0x00687128
 tU32 gLast_time_credit_amount;
 
-// GLOBAL: CARMA2_HW 0x0079eaa4
-// GLOBAL: CARMA2_SW 0x00795004
-// GLOBAL: CARMA2_CHEAT 0x007a6144
-int gNet_ped_headup;
-
 // GLOBAL: CARMA2_HW 0x0079eac0
 // GLOBAL: CARMA2_SW 0x00795020
 // GLOBAL: CARMA2_CHEAT 0x007a6160
 int gOld_times[10];
-
-// GLOBAL: CARMA2_HW 0x0079eae8
-// GLOBAL: CARMA2_SW 0x00795048
-// GLOBAL: CARMA2_CHEAT 0x007a6188
-int gNet_cash_headup;
 
 // GLOBAL: CARMA2_HW 0x0079eb00
 char gHeadup_oppo_ped_text[64];
@@ -810,10 +800,11 @@ void C2_HOOK_FASTCALL DoFancyHeadup(int pIndex) {
     }
 }
 
+/* FIXME: this is the Mac build's MoveHeadupTo; master's MoveHeadupTo (0x0044a8a0) has no Mac counterpart */
 // FUNCTION: CARMA2_HW 0x0044a860
 // FUNCTION: CARMA2_SW 0x0044a9f0
 // FUNCTION: CARMA2_CHEAT 0x0044ad80
-void C2_HOOK_FASTCALL MoveHeadupTo(int pHeadup_index, int pNew_x, int pNew_y) {
+void C2_HOOK_FASTCALL MoveHeadupKeepingOffset(int pHeadup_index, int pNew_x, int pNew_y) {
     int delta_x;
     tHeadup* the_headup;
 
@@ -826,11 +817,8 @@ void C2_HOOK_FASTCALL MoveHeadupTo(int pHeadup_index, int pNew_x, int pNew_y) {
     }
 }
 
-/* FIXME: Windows-only function (no Mac counterpart), name invented */
 // FUNCTION: CARMA2_HW 0x0044a8a0
-// FUNCTION: CARMA2_SW 0x0044aa30
-// FUNCTION: CARMA2_CHEAT 0x0044adc0
-void C2_HOOK_FASTCALL MoveAndLeftJustifyHeadup(int pHeadup_index, int pNew_x, int pNew_y) {
+void C2_HOOK_FASTCALL MoveHeadupTo(int pHeadup_index, int pNew_x, int pNew_y) {
     tHeadup* the_headup;
 
     if (pHeadup_index >= 0) {
