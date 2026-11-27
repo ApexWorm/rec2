@@ -99,6 +99,11 @@ int gCount_rendered_drones;
 // GLOBAL: CARMA2_CHEAT 0x0068bdd4
 int gShow_drone_paths;
 
+// GLOBAL: CARMA2_HW 0x005947c0
+// GLOBAL: CARMA2_SW 0x0058f720
+// GLOBAL: CARMA2_CHEAT 0x0059b118
+br_vector3 gDefault_drone_direction = { { 0.f, 0.f, -1.f } };
+
 // GLOBAL: CARMA2_HW 0x00684514
 // GLOBAL: CARMA2_SW 0x0067ec54
 // GLOBAL: CARMA2_CHEAT 0x0068bdbc
@@ -696,7 +701,18 @@ br_matrix34* C2_HOOK_FASTCALL GetCurrentViewDroneMat(void) {
     return &gDrone_specs[gCurrent_selected_drone].actor->t.t.mat;
 }
 
-// GetCurrentViewDroneDirection
+// FUNCTION: CARMA2_HW 0x004526c0
+// FUNCTION: CARMA2_SW 0x00452450
+// FUNCTION: CARMA2_CHEAT 0x00452c20
+br_vector3* C2_HOOK_FASTCALL GetCurrentViewDroneDirection(void) {
+
+    StartRenderingThisDrone(&gDrone_specs[gCurrent_selected_drone]);
+    if (BrVector3LengthSquared(&gDrone_specs[gCurrent_selected_drone].field_0x18) > 0.f) {
+        return &gDrone_specs[gCurrent_selected_drone].field_0x18;
+    } else {
+        return &gDefault_drone_direction;
+    }
+}
 
 // ApplyDroneRender2
 
