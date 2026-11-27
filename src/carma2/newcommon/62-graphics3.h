@@ -61,7 +61,7 @@ extern void C2_HOOK_FASTCALL DrawArrow(br_pixelmap* pScreen, br_uint_32 pArrow_i
 
 // DrawSmashBlip
 
-// DrawMapSmallBlip
+extern void C2_HOOK_FASTCALL DrawMapSmallBlip(br_pixelmap* pScreen, tU32 pTime, const br_vector3* pPos, int pColour);
 
 // CopyMapToScreen
 
