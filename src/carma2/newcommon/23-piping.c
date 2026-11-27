@@ -2583,7 +2583,21 @@ void C2_HOOK_FASTCALL UndoSmudge(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk)
 
 // UndoDamage
 
-// UndoSpecial
+// FUNCTION: CARMA2_HW 0x004c9e20
+// FUNCTION: CARMA2_SW 0x004c6550
+// FUNCTION: CARMA2_CHEAT 0x004cf950
+void C2_HOOK_FASTCALL UndoSpecial(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
+
+    if ((*pChunk)->subject_index == ePipe_special_action_recovery) {
+        ApplySpecial(pChunk);
+    } else {
+        switch ((*pChunk)->subject_index) {
+        case ePipe_special_action_tail_growth:
+            UndoInitialTail();
+            break;
+        }
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x004c9e50
 // FUNCTION: CARMA2_SW 0x004c6580
@@ -2613,7 +2627,19 @@ void C2_HOOK_FASTCALL UndoSplash(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk)
     AREnableAdvance();
 }
 
-// UndoExtendedSplash
+// FUNCTION: CARMA2_HW 0x004c9ee0
+// FUNCTION: CARMA2_SW 0x004c6610
+// FUNCTION: CARMA2_CHEAT 0x004cfa10
+void C2_HOOK_FASTCALL UndoExtendedSplash(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
+
+    ARDisableAdvance();
+    if (pPrev_chunk != NULL) {
+        ApplyExtendedSplash(&pPrev_chunk);
+    } else {
+        ClearSplashReplay((*pChunk)->subject_index);
+    }
+    AREnableAdvance();
+}
 
 // FUNCTION: CARMA2_HW 0x004c9f20
 // FUNCTION: CARMA2_SW 0x004c6650
