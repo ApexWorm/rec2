@@ -940,13 +940,6 @@ void C2_HOOK_FASTCALL FUN_0045c680(void) {
     gCurrent_exclusive_ffb_effect = -1;
 }
 
-// STUB: CARMA2_HW 0x0045c6b0
-// STUB: CARMA2_SW 0x0045c0f0
-// STUB: CARMA2_CHEAT 0x0045cb30
-int C2_HOOK_FASTCALL PlayExclusiveFFBEffect(const char* pEffect_name, int pArg2) {
-    NOT_IMPLEMENTED();
-}
-
 // FUNCTION: CARMA2_HW 0x0045c780
 // FUNCTION: CARMA2_SW 0x0045c1c0
 // FUNCTION: CARMA2_CHEAT 0x0045cc00
