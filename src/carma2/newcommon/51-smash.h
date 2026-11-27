@@ -49,6 +49,8 @@ typedef struct {
     tSmash_triangle_mapping triangles[2];
 } tSmash_quad_mapping;
 
+extern int C2_HOOK_FASTCALL PointOutOfSightNotAR(const br_vector3* pPos, br_scalar pMax_distance);
+
 extern void C2_HOOK_FASTCALL InitFogificateMaterials(void);
 
 extern void C2_HOOK_FASTCALL FogificateMaterials(tRendererShadingType pShading_type);
@@ -69,7 +71,7 @@ extern void C2_HOOK_FASTCALL ResetExplosions(void);
 
 extern void C2_HOOK_FASTCALL RemoveAllExplosionettes(void);
 
-// MungeExplosions
+extern void C2_HOOK_FASTCALL MungeExplosions(void);
 
 extern void C2_HOOK_FASTCALL CopyExplosionData(int pIndex, tExplosion* pExplosion);
 
@@ -95,7 +97,7 @@ extern void C2_HOOK_FASTCALL MungeInternalCarGlass(tCar_spec* pCar_spec);
 
 extern void C2_HOOK_FASTCALL ActuallySmashPart(tCar_spec* pCar_spec, tCar_crush_smashable_part* pSmash, int pLevel);
 
-// MakeSmashSound
+extern void C2_HOOK_FASTCALL MakeSmashSound(tConnotations* pConnotations, br_vector3* pPos);
 
 // MungeSmokeFire
 
@@ -113,7 +115,7 @@ extern br_scalar C2_HOOK_FASTCALL SetInitPosition(br_actor* pActor, tSmashable_i
 
 extern void C2_HOOK_FASTCALL DoSpillage(tSlick_spec* pSlick, br_actor* pActor);
 
-// DoSpecial
+extern void C2_HOOK_FASTCALL DoSpecial(tSpecial_effects_spec* pSpecial, br_actor* pActor, br_bounds3* pBounds);
 
 // GiveNonCarsAShove
 
@@ -209,9 +211,9 @@ extern void C2_HOOK_FASTCALL ActuallyRepairSmash(tCar_spec* pCar_spec, tCar_crus
 
 // KillFragment
 
-// AddRepairAnimationToQueue
+extern void C2_HOOK_FASTCALL AddRepairAnimationToQueue(tCar_spec* pCar_spec, tCar_crush_smashable_part* pSmashable);
 
-// RepairSmash
+extern void C2_HOOK_FASTCALL RepairSmash(tCar_spec* pCar_spec, tCar_crush_buffer_entry* pSmash_data);
 
 extern void C2_HOOK_FASTCALL TotallyRepairSmash(tCar_spec* pCar_Spec, tCar_crush_buffer_entry* pSmash_data);
 
@@ -231,7 +233,7 @@ extern void C2_HOOK_FASTCALL DoFragMovement(tSmash_vertex* pFragment, tU32 pTime
 
 extern void C2_HOOK_FASTCALL MungeGlassFragments2(int pEnd_race);
 
-// MungeAnimationRepairs
+extern void C2_HOOK_FASTCALL MungeAnimationRepairs(void);
 
 // MungeGlassFragments
 
@@ -269,9 +271,9 @@ extern void C2_HOOK_FASTCALL FreeConnotations(tConnotations* pConnotations, int 
 
 // ExtrapolateTextureCoordinates
 
-// ExtrapolateGeometryCoordinates2
-
 extern void C2_HOOK_FASTCALL ExtrapolateGeometryCoordinates(tSmash_quad_mapping* pMapping, br_vector2* pMap, br_vertex* pVertex);
+
+extern void C2_HOOK_FASTCALL ExtrapolateGeometryCoordinates2(tSmash_quad_mapping* pMapping, tSmash_triangle_mapping* pTriangle, br_vector2* pMap, br_vertex* pVertex);
 
 // ExtractDeTiledFaces
 

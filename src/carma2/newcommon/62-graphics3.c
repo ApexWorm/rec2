@@ -144,6 +144,7 @@ int gHeadup_map_half_width;
 int gINT_0074abec;
 
 // GLOBAL: CARMA2_HW 0x0068d8d8
+// GLOBAL: CARMA2_SW 0x00687930
 // GLOBAL: CARMA2_CHEAT 0x00695178
 br_pixelmap* gMap_overlay;
 
@@ -436,22 +437,31 @@ void C2_HOOK_FASTCALL InitTargetLock(void) {
 }
 
 // FUNCTION: CARMA2_HW 0x004948b0
+// FUNCTION: CARMA2_SW 0x00491bb0
 // FUNCTION: CARMA2_CHEAT 0x00494ae0
 void C2_HOOK_FASTCALL SetIntegerMapRenders(void) {
 
-    gMap_render_width = 128.f;
-    gMap_render_height = 80.f;
+#ifdef REC2_HW
+    gMap_render_width = 128.0f;
+    gMap_render_height = 80.0f;
     gMap_render_x_i = ((int)gMap_render_x) & ~0x3;
     gMap_render_y_i = ((int)gMap_render_y) & ~0x1;
     gMap_render_width_i = (int)gMap_render_width;
     gMap_render_height_i = (int)gMap_render_height;
+#endif
+#ifdef REC2_SW
+    gMap_render_x_i = ((int)gMap_render_x) & ~0x3;
+    gMap_render_y_i = ((int)gMap_render_y) & ~0x1;
+    gMap_render_width_i = ((int)gMap_render_width) & ~0x3;
+    gMap_render_height_i = ((int)gMap_render_height) & ~0x1;
+#endif
 }
 
 // OppositeColour
 
 // FUNCTION: CARMA2_HW 0x00495a00
-// FUNCTION: CARMA2_CHEAT 0x00495c70
 // STUB: CARMA2_SW 0x00492400
+// FUNCTION: CARMA2_CHEAT 0x00495c70
 void C2_HOOK_FASTCALL DrawArrow(br_pixelmap* pScreen, br_uint_32 pArrow_index, const br_vector3* pPos, br_uint_32 pColour) {
     int colours[2];
     int colour;
@@ -485,6 +495,7 @@ void C2_HOOK_FASTCALL DrawArrow(br_pixelmap* pScreen, br_uint_32 pArrow_index, c
             }
         }
     }
+#ifdef REC2_HW
     if (gBack_screen->type != BR_PMT_INDEX_8) {
         colours[0] = PaletteEntry16Bit(gRender_palette, colours[0]);
         colours[1] = PaletteEntry16Bit(gRender_palette, colours[1]);
@@ -492,6 +503,7 @@ void C2_HOOK_FASTCALL DrawArrow(br_pixelmap* pScreen, br_uint_32 pArrow_index, c
             colours[1] = Colour24BitTo16Bit(0xff00ff);
         }
     }
+#endif
     for (i = 0; i < REC2_ASIZE(colours); i++) {
         arrow_ptr = &gArrows[i][pArrow_index & 0x3][0];
         point_count = *arrow_ptr++;
@@ -525,6 +537,7 @@ void C2_HOOK_FASTCALL DrawArrow(br_pixelmap* pScreen, br_uint_32 pArrow_index, c
 // DrawCarArrow
 
 // FUNCTION: CARMA2_HW 0x00495ba0
+// FUNCTION: CARMA2_SW 0x00492540
 // FUNCTION: CARMA2_CHEAT 0x00495e10
 void C2_HOOK_FASTCALL DoSomeThingsToCheckpoints(br_pixelmap* pMap, tU32 pTime, tDoSomethingsToCheckpoints_cbfn* pCallback, int pDraw_prev) {
     int i;
@@ -653,6 +666,7 @@ void C2_HOOK_FASTCALL FinishMap(void) {
 }
 
 // FUNCTION: CARMA2_HW 0x00496b10
+// FUNCTION: CARMA2_SW 0x00493450
 void C2_HOOK_FASTCALL CheckpointLine(br_pixelmap* pMap, int pCheckpoint, tU32 pTime, int pTarget) {
     int p2_x;
     int p2_y;
@@ -1026,6 +1040,7 @@ void C2_HOOK_FASTCALL CheckMapMoveKeys(int pKey0, int pKey1) {
 }
 
 // FUNCTION: CARMA2_HW 0x004977e0
+// FUNCTION: CARMA2_SW 0x00494410
 void C2_HOOK_FASTCALL InitSmashTargets(void) {
     gCount_smashable_race_targets = 0;
 }

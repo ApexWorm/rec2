@@ -427,6 +427,7 @@ void C2_HOOK_FASTCALL RestoreJoystickPreferences(void) {
 }
 
 // FUNCTION: CARMA2_HW 0x0045c460
+// FUNCTION: CARMA2_SW 0x0045bea0
 // FUNCTION: CARMA2_CHEAT 0x0045c8e0
 int C2_HOOK_FASTCALL ToggleJoystickThrottle(void) {
     tButtonJoystickInfo* info;
