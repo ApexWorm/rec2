@@ -700,7 +700,30 @@ void C2_HOOK_FASTCALL MarkObjectAndChildrenAsPassive(tPhysics_object* pObject) {
 
 // ProcessGravity
 
-// LevelOutOnSurface
+// FUNCTION: CARMA2_HW 0x004b6fb0
+// FUNCTION: CARMA2_SW 0x004b36d0
+// FUNCTION: CARMA2_CHEAT 0x004bcae0
+void C2_HOOK_FASTCALL LevelOutOnSurface(tPhysics_object* pObject) {
+    br_vector3 down;
+    br_vector3 cross;
+    br_vector3 correction;
+    br_scalar dot;
+
+    if (pObject->I.v[0] > pObject->I.v[1] && pObject->I.v[0] > pObject->I.v[2]) {
+        BrVector3Scale(&down, (br_vector3*)pObject->actor->t.t.mat.m[0], -1.f);
+    } else if (pObject->I.v[1] > pObject->I.v[2] && pObject->I.v[1] > pObject->I.v[0]) {
+        BrVector3Scale(&down, (br_vector3*)pObject->actor->t.t.mat.m[1], -1.f);
+    } else {
+        BrVector3Scale(&down, (br_vector3*)pObject->actor->t.t.mat.m[2], -1.f);
+    }
+    dot = BrVector3Dot(&pObject->water_normal, &down);
+    if (dot > -0.99) {
+        BrVector3Cross(&cross, &down, &pObject->water_normal);
+        BrVector3Scale(&cross, &cross, (dot + 1.f) / BrVector3Length(&cross));
+        BrMatrix34TApplyV(&correction, &cross, &pObject->actor->t.t.mat);
+        BrVector3Accumulate(&pObject->omega, &correction);
+    }
+}
 
 // PHILMungeObjects
 

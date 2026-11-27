@@ -109,7 +109,7 @@ extern void C2_HOOK_FASTCALL MarkObjectAndChildrenAsPassive(tPhysics_object* pOb
 
 // ProcessGravity
 
-// LevelOutOnSurface
+extern void C2_HOOK_FASTCALL LevelOutOnSurface(tPhysics_object* pObject);
 
 // PHILMungeObjects
 
