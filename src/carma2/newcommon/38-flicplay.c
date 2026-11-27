@@ -9,9 +9,13 @@
 #include "38-flicplay.h"
 
 #include "08-loading1.h"
+#include "18-graphics2.h"
 #include "19-font.h"
+#include "40-main.h"
 #include "41-utility.h"
+#include "42-input.h"
 #include "52-errors.h"
+#include "69-sound.h"
 #include "70-packfile.h"
 #include "globvars.h"
 #include "platform.h"
@@ -151,6 +155,11 @@ tFlic_descriptor gPanel_flic[2] = { 0 };
 // GLOBAL: CARMA2_CHEAT 0x0068dba0
 tU32 gLast_panel_frame_time[2] = { 0 };
 
+// GLOBAL: CARMA2_HW 0x00686300
+// GLOBAL: CARMA2_SW 0x00680a40
+// GLOBAL: CARMA2_CHEAT 0x0068dba8
+int gSound_ID;
+
 // GLOBAL: CARMA2_HW 0x006861d0
 // GLOBAL: CARMA2_SW 0x00680910
 // GLOBAL: CARMA2_CHEAT 0x0068da78
@@ -175,6 +184,11 @@ int gPanel_flic_top[2];
 // GLOBAL: CARMA2_SW 0x00680a60
 // GLOBAL: CARMA2_CHEAT 0x0068dbc8
 br_pixelmap* gPanel_buffer[2];
+
+// GLOBAL: CARMA2_HW 0x00686328
+// GLOBAL: CARMA2_SW 0x00680a68
+// GLOBAL: CARMA2_CHEAT 0x0068dbd0
+tU32 gSound_time;
 
 // GLOBAL: CARMA2_HW 0x006861e0
 // GLOBAL: CARMA2_SW 0x00680920
@@ -951,6 +965,44 @@ int C2_HOOK_FASTCALL PlayNextFlicFrame(tFlic_descriptor* pFlic_info) {
 #pragma auto_inline(on)
 #endif
 
+// FUNCTION: CARMA2_HW 0x00462930
+// FUNCTION: CARMA2_SW 0x004623c0
+// FUNCTION: CARMA2_CHEAT 0x00462da0
+int C2_HOOK_FASTCALL PlayFlic(int pIndex, tU32 pSize, tS8* pData_ptr, br_pixelmap* pDest_pixelmap, int pX_offset, int pY_offset, tPlayFlic_DoPerFrame DoPerFrame, int pInterruptable, int pFrame_rate) {
+    int finished_playing;
+    tFlic_descriptor the_flic;
+    tU32 last_frame;
+    tU32 new_time;
+    tU32 frame_period;
+
+    finished_playing = 0;
+    the_flic.data_start = NULL;
+    if (StartFlic(gMain_flic_list[pIndex].file_name, pIndex, &the_flic, pSize, pData_ptr, pDest_pixelmap, pX_offset, pY_offset, pFrame_rate)) {
+        return -1;
+    }
+    last_frame = 0;
+    while ((!pInterruptable || !AnyKeyDown()) && !finished_playing) {
+        new_time = PDGetTotalTime();
+        frame_period = new_time - last_frame;
+        if (gSound_time != 0 && new_time >= gSound_time) {
+            DRS3StartSound(gEffects_outlet, gSound_ID);
+            gSound_time = 0;
+        }
+        if (frame_period >= the_flic.frame_period) {
+            finished_playing = PlayNextFlicFrame(&the_flic);
+            DoPerFrame();
+            if (!gDark_mode) {
+                EnsurePaletteUp();
+            }
+            ServiceGame();
+            last_frame = new_time;
+        }
+    }
+    ServiceGame();
+    EndFlic(&the_flic);
+    return 0;
+}
+
 // FUNCTION: CARMA2_HW 0x00462a40
 // FUNCTION: CARMA2_SW 0x004624d0
 // FUNCTION: CARMA2_CHEAT 0x00462eb0
@@ -962,6 +1014,10 @@ void C2_HOOK_FASTCALL InitFlics(void) {
     }
 }
 
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
 // FUNCTION: CARMA2_HW 0x00462a60
 // FUNCTION: CARMA2_SW 0x004624f0
 // FUNCTION: CARMA2_CHEAT 0x00462ed0
@@ -969,6 +1025,10 @@ int C2_HOOK_FASTCALL LoadFlic(int pIndex) {
 
     return 0;
 }
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // FUNCTION: CARMA2_HW 0x00462a70
 // FUNCTION: CARMA2_SW 0x00462500
@@ -1022,6 +1082,16 @@ void C2_HOOK_FASTCALL FreeFlic(int pIndex) {
         BrMemFree(gMain_flic_list[pIndex].data_ptr);
         gMain_flic_list[pIndex].data_ptr = NULL;
     }
+}
+
+// FUNCTION: CARMA2_HW 0x00462bb0
+// FUNCTION: CARMA2_SW 0x00462640
+// FUNCTION: CARMA2_CHEAT 0x00463020
+void C2_HOOK_FASTCALL RunFlicAt(int pIndex, int pX, int pY) {
+
+    LoadFlic(pIndex);
+    PlayFlic(pIndex, gMain_flic_list[pIndex].the_size, gMain_flic_list[pIndex].data_ptr, gBack_screen, pX, pY, SwapScreen, 0, 0);
+    UnlockFlic(pIndex);
 }
 
 // FUNCTION: CARMA2_HW 0x00462c10
