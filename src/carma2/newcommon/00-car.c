@@ -1282,7 +1282,18 @@ void C2_HOOK_FASTCALL FindFace(br_vector3* pPosition, br_vector3* pDir, br_vecto
     ActorFindFace(pPosition, pDir, gTrack_actor, nor, t, material, NULL);
 }
 
-// findfloor
+// FUNCTION: CARMA2_HW 0x0041e360
+// FUNCTION: CARMA2_SW 0x0041e390
+// FUNCTION: CARMA2_CHEAT 0x0041e5c0
+void C2_HOOK_FASTCALL findfloor(br_vector3* a, br_vector3* b, br_vector3* nor, br_scalar* d) {
+    br_material* material;
+    br_vector3 aa;
+    br_vector3 bb;
+
+    BrVector3Set(&aa, a->v[0] / WORLD_SCALE, a->v[1] / WORLD_SCALE, a->v[2] / WORLD_SCALE);
+    BrVector3Set(&bb, b->v[0] / WORLD_SCALE, b->v[1] / WORLD_SCALE, b->v[2] / WORLD_SCALE);
+    FindFace(&aa, &bb, nor, d, &material);
+}
 
 // FUNCTION: CARMA2_HW 0x0041e480
 // FUNCTION: CARMA2_SW 0x0041e4b0

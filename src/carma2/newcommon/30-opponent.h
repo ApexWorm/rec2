@@ -162,7 +162,7 @@ extern void C2_HOOK_FASTCALL PossiblyRepairOpponent(tOpponent_spec* pOpponent_sp
 
 extern void C2_HOOK_FASTCALL CalcDistanceFromHome(tOpponent_spec* pOpponent_spec);
 
-// MassageOpponentPosition
+extern int C2_HOOK_FASTCALL MassageOpponentPosition(tOpponent_spec* pOpponent_spec, int pMassage_count);
 
 // RematerialiseOpponentOnThisSection
 

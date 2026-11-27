@@ -187,7 +187,7 @@ extern int C2_HOOK_FASTCALL ProcessJointForcesCallBack(void* pArg1, void* pArg2,
 
 extern void C2_HOOK_FASTCALL FindFace(br_vector3* pPosition, br_vector3* pDir, br_vector3* nor, br_scalar* t, br_material** material);
 
-// findfloor
+extern void C2_HOOK_FASTCALL findfloor(br_vector3* a, br_vector3* b, br_vector3* nor, br_scalar* d);
 
 extern int C2_HOOK_FASTCALL FindFloorInBoxBU(br_vector3* pPosition, br_vector3* pDirection, br_vector3* pNormal, br_scalar* pDistance, tPhysics_object* pObject);
 
