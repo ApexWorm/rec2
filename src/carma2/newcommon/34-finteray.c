@@ -412,7 +412,129 @@ void C2_HOOK_FASTCALL CheckSingleFace(tFace_ref* pFace, br_vector3* ray_pos, br_
     }
 }
 
-// MultiRayCheckSingleFace
+// FUNCTION: CARMA2_HW 0x0045f0d0
+// FUNCTION: CARMA2_SW 0x0045eb40
+// FUNCTION: CARMA2_CHEAT 0x0045f540
+void C2_HOOK_FASTCALL MultiRayCheckSingleFace(int pNum_rays, tFace_ref* pFace, br_vector3* ray_pos, br_vector3* ray_dir, br_vector3* normal, br_scalar* rt) {
+    int i;
+    br_scalar t[4];
+    br_vector3 p[4];
+    float u0[4];
+    float v0[4];
+    br_scalar numerator;
+    br_vector3 tv;
+    br_scalar d;
+    int axis_m;
+    int axis_0;
+    int axis_1;
+    float u1;
+    float u2;
+    float v1;
+    float v2;
+    br_scalar v0i1;
+    br_scalar v0i2;
+    float alpha;
+    float f_d;
+    float f_n;
+    br_material* this_material;
+
+    this_material = pFace->material;
+    d = BrVector3Dot(&pFace->normal, ray_dir);
+    for (i = 0; i < pNum_rays; i++) {
+        rt[i] = 100.f;
+    }
+    if (this_material != NULL && (this_material->flags & (BR_MATF_TWO_SIDED | BR_MATF_ALWAYS_VISIBLE)) == 0 && d > 0.f) {
+        return;
+    }
+    if (this_material != NULL && this_material->identifier != NULL
+            && (this_material->identifier[0] == '!' || this_material->identifier[0] == '>' || this_material->identifier[0] == '?')
+            && gPling_materials) {
+        return;
+    }
+    if ((float)fabs(d) < 2.3841858e-7f) {
+        return;
+    }
+    for (i = 0; i < pNum_rays; i++) {
+        BrVector3Sub(&tv, &ray_pos[i], &pFace->v[0]);
+        numerator = BrVector3Dot(&tv, &pFace->normal);
+        if (BadDiv__finteray(numerator, d)) {
+            return;
+        }
+        if (d <= 0.f) {
+            if (numerator < -0.001 || numerator > 0.003 - d) {
+                t[i] = 100.f;
+                continue;
+            }
+        } else {
+            if (-numerator < -0.001 || -numerator > d + 0.003) {
+                t[i] = 100.f;
+                continue;
+            }
+        }
+        t[i] = -(numerator / d);
+        if (t[i] > 1.f) {
+            t[i] = 1.f;
+        }
+        BrVector3Scale(&p[i], ray_dir, t[i]);
+        BrVector3Accumulate(&p[i], &ray_pos[i]);
+    }
+    axis_m = 0;
+    if ((float)fabs(pFace->normal.v[1]) > (float)fabs(pFace->normal.v[0])) {
+        axis_m = 1;
+    }
+    if ((float)fabs(pFace->normal.v[2]) > (float)fabs(pFace->normal.v[axis_m])) {
+        axis_m = 2;
+    }
+    switch (axis_m) {
+    case 0:
+        axis_0 = 1;
+        axis_1 = 2;
+        break;
+    case 1:
+        axis_0 = 0;
+        axis_1 = 2;
+        break;
+    case 2:
+        axis_0 = 0;
+        axis_1 = 1;
+        break;
+    }
+    v0i1 = pFace->v[0].v[axis_0];
+    v0i2 = pFace->v[0].v[axis_1];
+    u1 = pFace->v[1].v[axis_0] - v0i1;
+    v1 = pFace->v[1].v[axis_1] - v0i2;
+    u2 = pFace->v[2].v[axis_0] - v0i1;
+    v2 = pFace->v[2].v[axis_1] - v0i2;
+    for (i = 0; i < pNum_rays; i++) {
+        if (t[i] == 100.f) {
+            continue;
+        }
+        u0[i] = p[i].v[axis_0] - v0i1;
+        v0[i] = p[i].v[axis_1] - v0i2;
+        f_d = v0[i] * u1 - v1 * u0[i];
+        f_n = (v2 * u1) - u2 * v1;
+        if (fabs(f_d) > fabs(f_n) * 1.0001 || f_n == 0.f) {
+            continue;
+        }
+        alpha = f_d / f_n;
+        if (alpha < -0.0001) {
+            continue;
+        }
+        f_n = (v1 * u2) - u1 * v2;
+        f_d = (v0[i] * u2) - v2 * u0[i];
+        if (fabs(f_d) > fabs(f_n) * 1.0001 || f_n == 0.f) {
+            continue;
+        }
+        if (f_d / f_n < -0.0001 || alpha + f_d / f_n > 1.0001) {
+            continue;
+        }
+        rt[i] = t[i];
+        BrVector3Copy(normal, &pFace->normal);
+        if (d > 0.0f) {
+            BrVector3Negate(normal, &pFace->normal);
+        }
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x0045f5b0
 // FUNCTION: CARMA2_SW 0x0045f020
