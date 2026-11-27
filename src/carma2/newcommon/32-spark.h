@@ -52,7 +52,7 @@ extern br_model* gSplash_model;
 extern br_pixelmap* gFog_shade_table;
 extern br_pixelmap* gAcid_shade_table;
 
-// DrawDot
+extern void C2_HOOK_FASTCALL DrawDot(br_scalar z, tU8* scr_ptr, tU16* depth_ptr, tU8* shade_ptr);
 
 // SetWorldToScreen
 

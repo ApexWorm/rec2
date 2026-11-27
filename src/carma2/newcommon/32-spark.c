@@ -233,8 +233,6 @@ br_pixelmap* gFog_shade_table;
 // GLOBAL: CARMA2_CHEAT 0x007a62c4
 br_pixelmap* gAcid_shade_table;
 
-extern void C2_HOOK_FASTCALL DrawDot(br_scalar z, tU8* scr_ptr, tU16* depth_ptr, tU8* shade_ptr);
-
 inline void C2_HOOK_FASTCALL DrawDot(br_scalar z, tU8* scr_ptr, tU16* depth_ptr, tU8* shade_ptr) {
 
     z = (1.0f - z) * 32768.0f;
