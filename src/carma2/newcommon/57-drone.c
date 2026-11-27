@@ -8,10 +8,13 @@
 
 #include "57-drone.h"
 
+#include "00-car.h"
+
 #include "08-loading1.h"
 #include "15-displays.h"
 #include "23-piping.h"
 #include "28-world3.h"
+#include "34-finteray.h"
 #include "41-utility.h"
 #include "49-physics.h"
 #include "52-errors.h"
@@ -118,7 +121,62 @@ void C2_HOOK_FASTCALL RemoveDroneFromPHIL(tDrone_spec* pDrone) {
     ReallyRemoveDroneFromPHIL(pDrone);
 }
 
-// InitDroneCollisionObject
+// FUNCTION: CARMA2_HW 0x0044f980
+// FUNCTION: CARMA2_SW 0x0044f720
+// FUNCTION: CARMA2_CHEAT 0x0044fed0
+void C2_HOOK_FASTCALL InitDroneCollisionObject(tDrone_spec* pDrone) {
+    br_bounds3 bnds;
+    br_vector3 size;
+    tPhysics_shape* original_shape;
+    tPhysics_object* object;
+
+    object = &pDrone->collision_info;
+    BrActorToBounds(&bnds, pDrone->actor);
+    bnds.min.v[1] -= -.001f;
+    if (pDrone->field_0x46) {
+        original_shape = object->shape;
+    }
+    memset(object, 0, sizeof(*object));
+    if (pDrone->field_0x46) {
+        object->shape = original_shape;
+    } else {
+        object->shape = (tPhysics_shape*)AllocateShapeBox(kMem_drone_collision_stuff);
+        object->shape->box.common.bb = bnds;
+        object->shape->box.common.field_0x1c = bnds;
+        object->shape->box.common.next = NULL;
+        pDrone->field_0x46 = 1;
+    }
+    object->flags_0x238 = 0x10;
+    object->owner = pDrone;
+    object->actor = pDrone->actor;
+    object->M = pDrone->form->M;
+    BrVector3Set(&object->cmpos, 0.f, .09f, 0.f);
+    BrVector3Set(&object->field_0x54, 0.f, -.4f / WORLD_SCALE, 0.f);
+    BrMatrix34Copy(&object->transform_matrix, &pDrone->actor->t.t.mat);
+    object->box_face_ref = gFace_num__car - 2;
+    object->field_0x1a0 = 0x100000;
+    FillInShape(object->shape);
+    UpdateCollisionObject(object);
+    GetNewBoundingBox(&object->field_0xf4, &object->bb1, &object->transform_matrix);
+    BrVector3Sub(&size, &bnds.max, &bnds.min);
+    object->I.v[0] = (size.v[2] * size.v[2] + size.v[1] * size.v[1]) * (object->M / 12.f);
+    object->I.v[1] = (size.v[2] * size.v[2] + size.v[0] * size.v[0]) * (object->M / 12.f);
+    object->I.v[2] = (size.v[1] * size.v[1] + size.v[0] * size.v[0]) * (object->M / 12.f);
+    object->cmpos.v[0] = bnds.min.v[0] - pDrone->form->center.v[1] * size.v[0] * -0.01;
+    object->cmpos.v[1] = bnds.min.v[1] - pDrone->form->center.v[2] * size.v[1] * -0.01;
+    object->cmpos.v[2] = bnds.min.v[2] - pDrone->form->center.v[0] * size.v[2] * -0.01;
+    if (pDrone->form->type == kDroneType_train) {
+        object->world_friction = -.75f;
+    }
+    object->disable_move_rotate = 1;
+    object->field_0xed = 1;
+    object->flags |= 0x40;
+    object->drivable_on = (pDrone->form->flags >> 3) & 0x1;
+    BrVector3SetFloat(&object->v, 0.f, 0.f, 0.f);
+    BrVector3SetFloat(&object->omega, 0.f, 0.f, 0.f);
+    BrVector3SetFloat(&object->rotate_omega, 0.f, 0.f, 0.f);
+    BrVector3SetFloat(&object->velocity_car_space, 0.f, 0.f, 0.f);
+}
 
 // FUNCTION: CARMA2_HW 0x00451650
 // FUNCTION: CARMA2_SW 0x004513e0
