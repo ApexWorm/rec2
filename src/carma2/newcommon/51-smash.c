@@ -2204,10 +2204,6 @@ float C2_HOOK_FASTCALL BashModel(tSmashable_item_spec* pSpec, tPhysics_object* p
     NOT_IMPLEMENTED();
 }
 
-extern int C2_HOOK_FASTCALL CalcCollObjIDFromCarSpec(tCar_spec* pCar);
-
-extern int C2_HOOK_FASTCALL CalcCollObjID(tPhysics_object* pObject);
-
 inline int C2_HOOK_FASTCALL CalcCollObjIDFromCarSpec(tCar_spec* pCar) {
 
     if (pCar == NULL || pCar->driver <= eDriver_5) {
