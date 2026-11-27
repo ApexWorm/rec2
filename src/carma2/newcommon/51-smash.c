@@ -2273,11 +2273,16 @@ void C2_HOOK_FASTCALL MungeSmashEdgeTriggers(tU32 pTime) {
     tSmashable_item_spec* item;
 
     if (gLast_munge_smash_edge_triggers != gPHIL_last_physics_tick) {
-        item = gTrack_smashable_environment_specs;
-        for (i = 0; i < gCount_track_smashable_environment_specs; i++, item++) {
-            if (item->field_0x10 != 0 && item->field_0x10 != pTime) {
-                item->field_0x10 = 0;
-            }
+        i = 0;
+        if (i < gCount_track_smashable_environment_specs) {
+            item = gTrack_smashable_environment_specs;
+            do {
+                if (item->field_0x10 != 0 && item->field_0x10 != pTime) {
+                    item->field_0x10 = 0;
+                }
+                i++;
+                item++;
+            } while (i < gCount_track_smashable_environment_specs);
         }
     }
     gLast_munge_smash_edge_triggers = gPHIL_last_physics_tick;
