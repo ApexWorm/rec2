@@ -391,9 +391,9 @@ extern int C2_HOOK_FASTCALL ScrollSet_TranslateItemToIndex(tConnected_items* pCo
 
 // Generic_FindPrevActiveItem
 
-// Generic_MungeActiveItems
+extern void C2_HOOK_FASTCALL Generic_MungeActiveItems(tFrontend_spec* pFrontend);
 
-// Generic_UnMungeActiveItems
+extern void C2_HOOK_FASTCALL Generic_UnMungeActiveItems(tFrontend_spec* pFrontend);
 
 extern int C2_HOOK_FASTCALL Generic_MenuHandler(tFrontend_spec* pFrontend);
 

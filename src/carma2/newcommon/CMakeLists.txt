@@ -79,6 +79,7 @@ foreach(edition ${REC2_EDITIONS})
         69-sound.c
         70-packfile.c
         72-interface.c
+        72-interface-loadgame.c
         72-interface-main.c
         72-interface-netsync.c
         72-interface-network.c
