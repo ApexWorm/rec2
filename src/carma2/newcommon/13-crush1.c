@@ -933,11 +933,82 @@ tU16 C2_HOOK_FASTCALL FindNearestVertex(const br_vector3* pPoint, const br_model
     return closest_vertex;
 }
 
-// DistanceToBounds
+inline float C2_HOOK_FASTCALL DistanceToBounds(const br_vector3* pPoint, const br_bounds3* pBounds) {
+    float closest;
+    float d;
+    int i;
+
+    closest = BR_SCALAR_MAX;
+    for (i = 0; i < 3; i++) {
+        d = (float)fabs(pPoint->v[i] - pBounds->min.v[i]);
+        if (d < closest) {
+            closest = d;
+        }
+        d = (float)fabs(pPoint->v[i] - pBounds->max.v[i]);
+        if (d < closest) {
+            closest = d;
+        }
+    }
+    return closest;
+}
 
 // FindNearestParentVertex
 
-// SetUpSemiDetachJointStuff
+// FUNCTION: CARMA2_HW 0x0042bb90
+// FUNCTION: CARMA2_SW 0x0042bc20
+// FUNCTION: CARMA2_CHEAT 0x0042bd30
+void C2_HOOK_FASTCALL SetUpSemiDetachJointStuff(tCar_crush_detach_data* pDetach_data, const br_model* pModel, const br_bounds3* pBounds) {
+    const br_vector3* bounds[2];
+    br_vector3 corner;
+    br_vector3 point;
+    float closest;
+    float d;
+    tU8 closest_index;
+    int i;
+
+    bounds[0] = &pModel->bounds.min;
+    bounds[1] = &pModel->bounds.max;
+    if (pDetach_data->type == eDetachType_joint_index) {
+        closest = BR_SCALAR_MAX;
+        BrVector3Copy(&point, &pModel->vertices[pDetach_data->field_0x30].p);
+        for (i = 0; i < 8; i++) {
+            BrVector3Set(&corner, bounds[i & 1]->v[0], bounds[(i >> 1) & 1]->v[1], bounds[(i >> 2) & 1]->v[2]);
+            d = Vector3DistanceSquared(&corner, &point);
+            if (d < closest) {
+                closest_index = i;
+                closest = d;
+            }
+        }
+    } else {
+        closest = BR_SCALAR_MAX;
+        for (i = 0; i < 8; i++) {
+            BrVector3Set(&corner, bounds[i & 1]->v[0], bounds[(i >> 1) & 1]->v[1], bounds[(i >> 2) & 1]->v[2]);
+            d = DistanceToBounds(&corner, pBounds);
+            if (d < closest) {
+                BrVector3Copy(&point, &corner);
+                closest_index = i;
+                closest = d;
+            }
+        }
+        pDetach_data->field_0x30 = FindNearestVertex(&point, pModel);
+    }
+    pDetach_data->field_0x32 = closest_index;
+    Vector3Average(&corner, &pModel->bounds.min, &pModel->bounds.max);
+    closest_index = 0;
+    bounds[0] = &pBounds->min;
+    bounds[1] = &pBounds->max;
+    closest = BR_SCALAR_MAX;
+    for (i = 0; i < 6; i++) {
+        if (i != 2) {
+            d = (float)fabs(corner.v[i >> 1] - bounds[i & 1]->v[i >> 1]);
+            if (d < closest) {
+                closest_index = i;
+                closest = d;
+            }
+        }
+    }
+    pDetach_data->field_0x33 = closest_index;
+}
 
 // InitPhysCrushDataCB
 
