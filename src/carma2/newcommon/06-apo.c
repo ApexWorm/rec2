@@ -24,6 +24,7 @@
 
 // FUNCTION: CARMA2_HW 0x00502e00
 // FUNCTION: CARMA2_SW 0x004fe750
+// FUNCTION: CARMA2_CHEAT 0x00508aa0
 void C2_HOOK_FASTCALL MaxOutAPO(void) {
     int i;
 
@@ -36,6 +37,7 @@ void C2_HOOK_FASTCALL MaxOutAPO(void) {
 
 // FUNCTION: CARMA2_HW 0x00502e20
 // FUNCTION: CARMA2_SW 0x004fe770
+// FUNCTION: CARMA2_CHEAT 0x00508ac0
 void C2_HOOK_FASTCALL ImprovePSPowerup(tCar_spec* pCar, int pIndex) {
 
     pCar->power_up_levels[pIndex]++;
