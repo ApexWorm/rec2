@@ -26,6 +26,7 @@
 #include "51-smash.h"
 #include "52-errors.h"
 #include "54-runtime.h"
+#include "61-pedestrn-phys.h"
 #include "62-graphics3.h"
 #include "63-loading3.h"
 #include "69-sound.h"
@@ -1388,7 +1389,20 @@ float C2_HOOK_FASTCALL GetClearanceFromCharacterInstance(tPed_character_instance
 
 // ScaleFormBone
 
-// ScaleBone
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_HW 0x0040c420
+// STUB: CARMA2_SW 0x0040c410
+// STUB: CARMA2_CHEAT 0x0040c4c0
+void C2_HOOK_FASTCALL ScaleBone(int pBone_index, br_vector3* pScale, int pArg3) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)

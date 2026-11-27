@@ -59,7 +59,7 @@ extern void C2_HOOK_FASTCALL PedApplyVanishDismembered(tPedestrian* pPedestrian,
 
 // SetCharacterPositionAR
 
-// SetCharacterBoneModelAR
+extern void C2_HOOK_FASTCALL SetCharacterBoneModelAR(tPed_character_instance* pCharacter, int pBone_index, int pModel_index, int pModel_set);
 
 // PedApplyPedModelChangeP
 
@@ -125,7 +125,7 @@ extern void C2_HOOK_FASTCALL StartPedRunning(tPedestrian* pPed, tU32 pTime, int 
 
 // MungePedHeadAnim
 
-// SetPedHeadAnim
+extern void C2_HOOK_FASTCALL SetPedHeadAnim(tPedestrian* pPed, const tPed_anim_seq* pSeq, tU32 pTime);
 
 // ClearPedHeadAnim
 
@@ -321,9 +321,9 @@ extern void C2_HOOK_FASTCALL ShowActivePedCount(void);
 
 extern void C2_HOOK_FASTCALL PedPreCollisionStuff(void);
 
-// UpdateIfBackwardsAR
+extern void C2_HOOK_FASTCALL UpdateIfBackwardsAR(void);
 
-extern int C2_HOOK_FASTCALL ChangePedScaling(br_vector3* pScale);
+extern void C2_HOOK_FASTCALL ChangePedScaling(const br_vector3* pScale);
 
 // ChangeHeadScaling
 
