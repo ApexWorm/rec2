@@ -1857,11 +1857,41 @@ int C2_HOOK_FASTCALL RepulseOpponents(tPowerup* pPowerup, tCar_spec* pCar) {
     return RepulseOpponents2(pPowerup, pCar, 1);
 }
 
-// RepulsePedestrians
+// FUNCTION: CARMA2_HW 0x004de540
+// FUNCTION: CARMA2_SW 0x004daa40
+// FUNCTION: CARMA2_CHEAT 0x004e4100
+int C2_HOOK_FASTCALL RepulsePedestrians(tPowerup* pPowerup, tCar_spec* pCar) {
+    int result;
 
-// ReceivedRepulse
+    if (DoPedestrianRepulsifictor(pCar, pPowerup->float_params[0], pPowerup->float_params[2], pPowerup->float_params[1], pPowerup->float_params[3])) {
+        result = pPowerup - gPowerup_array;
+    } else {
+        result = -1;
+    }
+    if (result != -1) {
+        PlayExclusiveFFBEffect("Repulse", 0);
+    }
+    return result;
+}
 
-// ResetEngineFactor
+// FUNCTION: CARMA2_HW 0x004de5a0
+// FUNCTION: CARMA2_SW 0x004daaa0
+// FUNCTION: CARMA2_CHEAT 0x004e4160
+void C2_HOOK_FASTCALL ReceivedRepulse(tNet_message_chunk* pContents) {
+
+    RepulseOpponents2(&gPowerup_array[pContents->repulse.powerup_index], NetCarFromPlayerID(pContents->repulse.player), 0);
+}
+
+// FUNCTION: CARMA2_HW 0x004de5d0
+// FUNCTION: CARMA2_SW 0x004daad0
+// FUNCTION: CARMA2_CHEAT 0x004e4190
+void C2_HOOK_FASTCALL ResetEngineFactor(tPowerup* pPowerup, tCar_spec* pCar) {
+
+    StopExclusiveFFBEffect();
+    pCar->field_0x4d4 = 1.f;
+    pCar->grip_multiplier = 1.f;
+    SetCarSuspGiveAndHeight(pCar, 1.f, 1.f, 1.f, 0.f, 0.f);
+}
 
 // FUNCTION: CARMA2_HW 0x004de600
 // FUNCTION: CARMA2_SW 0x004dab00

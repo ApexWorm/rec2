@@ -298,7 +298,7 @@ extern int C2_HOOK_FASTCALL RepulseOpponents(tPowerup* pPowerup, tCar_spec* pCar
 
 // RepulsePedestrians
 
-// ReceivedRepulse
+extern void C2_HOOK_FASTCALL ReceivedRepulse(tNet_message_chunk* pContents);
 
 // ResetEngineFactor
 
