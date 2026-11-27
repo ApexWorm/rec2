@@ -55,6 +55,7 @@ struct sockaddr* gPtr_local_address; /* FIXME: rename to gLocal_addr_ipx? */
 struct sockaddr gListen_address;
 
 // GLOBAL: CARMA2_HW 0x006ac340
+// GLOBAL: CARMA2_SW 0x006a5890
 // GLOBAL: CARMA2_CHEAT 0x006b39d0
 struct sockaddr* gPtr_listen_address;  /* FIXME: rename to gRemote_addr_ipx? */
 
@@ -62,6 +63,8 @@ struct sockaddr* gPtr_listen_address;  /* FIXME: rename to gRemote_addr_ipx? */
 struct sockaddr gBroadcast_address;
 
 // GLOBAL: CARMA2_HW 0x006ac348
+// GLOBAL: CARMA2_SW 0x006a5898
+// GLOBAL: CARMA2_CHEAT 0x006b39d8
 struct sockaddr gLast_received_addr;
 
 // GLOBAL: CARMA2_HW 0x006abf00
@@ -84,6 +87,7 @@ char gLocal_address_text[32];
 int gNumber_of_networks;
 
 // GLOBAL: CARMA2_HW 0x006abf04
+// GLOBAL: CARMA2_SW 0x006a5454
 // GLOBAL: CARMA2_CHEAT 0x006b3594
 int gMsg_header_strlen;
 
@@ -350,7 +354,7 @@ void C2_HOOK_FASTCALL MakeMessageToSend(int pMessage_type) {
 
 int C2_HOOK_FASTCALL SameEthernetAddress(struct sockaddr* pAddr_ipx1, struct sockaddr* pAddr_ipx2) {
 
-    return memcmp(&pAddr_ipx1->sa_data[4], &pAddr_ipx2->sa_data[4], 6) == 0;
+    return *(tU32*)&pAddr_ipx1->sa_data[4] == *(tU32*)&pAddr_ipx2->sa_data[4] && *(tU16*)&pAddr_ipx1->sa_data[8] == *(tU16*)&pAddr_ipx2->sa_data[8];
 }
 
 int C2_HOOK_FASTCALL GetMessageTypeFromMessage(char* pMessage_str) {
@@ -365,7 +369,7 @@ int C2_HOOK_FASTCALL GetMessageTypeFromMessage(char* pMessage_str) {
         if (isdigit(real_msg[gMsg_header_strlen])) {
             msg_type_int = real_msg[gMsg_header_strlen] - '0';
         }
-        if (msg_type_int != 0 && msg_type_int < 2) {
+        if (msg_type_int != 0 && msg_type_int < 3) {
             return msg_type_int;
         }
     }
@@ -523,34 +527,40 @@ tNet_message* C2_HOOK_FASTCALL PDNetGetNextMessage(tNet_game_details* pDetails, 
     msg = NetAllocateMessage(512);
     receive_buffer = (char*)msg;
     res = recvfrom(gSocket, receive_buffer, 512, 0, &gListen_address, &sa_len) != SOCKET_ERROR;
-    if (res == SOCKET_ERROR) {
-        WSAGetLastError();
-    } else {
-        NetNowIPXLocalTarget2String(addr_str, gPtr_listen_address);
-        if (!SameEthernetAddress(gPtr_local_address, gPtr_listen_address)) {
-            int msg_type;
+    if (res != 0) {
+        if (res > 0) {
+            NetNowIPXLocalTarget2String(addr_str, gPtr_listen_address);
+            if (!SameEthernetAddress(gPtr_local_address, gPtr_listen_address)) {
+                int msg_type;
 
-            msg_type = GetMessageTypeFromMessage(receive_buffer);
-            switch (msg_type) {
-            case 1:
-                if (gNet_mode == eNet_mode_host) {
-                    dr_dprintf("PDNetGetNextMessage(): Received '%s' from '%s', replying to joiner", receive_buffer, addr_str);
-                    MakeMessageToSend(2);
-                    if (sendto(gSocket, gSend_buffer, strlen(gSend_buffer) + 1, 0, &gListen_address, sizeof(gListen_address)) == SOCKET_ERROR) {
-                        dr_dprintf("PDNetGetNextMessage(): Error on sendto() - WSAGetLastError=%d", WSAGetLastError());
+                msg_type = GetMessageTypeFromMessage(receive_buffer);
+                switch (msg_type) {
+                case 1:
+                    if (gNet_mode == eNet_mode_host) {
+                        dr_dprintf("PDNetGetNextMessage(): Received '%s' from '%s', replying to joiner", receive_buffer, addr_str);
+                        MakeMessageToSend(2);
+                        if (sendto(gSocket, gSend_buffer, strlen(gSend_buffer) + 1, 0, &gListen_address, sizeof(SOCKADDR_IPX)) == SOCKET_ERROR) {
+#ifdef REC2_FIX_BUGS
+                            dr_dprintf("PDNetGetNextMessage(): Error on sendto() - WSAGetLastError=%d", WSAGetLastError());
+#else
+                            dr_dprintf("PDNetGetNextMessage(): Error on sendto() - WSAGetLastError=%d", res);
+#endif
+                        }
                     }
+                    break;
+                case 2:
+                    // no-op
+                    break;
+                default:
+                    dr_dprintf("PDNetGetNextMessage(): res is %d, received message type %d from '%s', passing up", res, msg->contents.raw.header.type, addr_str);
+                    memcpy(&gLast_received_addr, gPtr_listen_address, sizeof(SOCKADDR_IPX));
+                    *pSender_address = &gLast_received_addr;
+                    return msg;
                 }
-                break;
-            case 2:
-                // no-op
-                break;
-            default:
-                dr_dprintf("PDNetGetNextMessage(): res is %d, received message type %d from '%s', passing up", res, msg->contents.raw.header.type, addr_str);
-                memcpy(&gLast_received_addr, gPtr_listen_address, sizeof(gLast_received_addr));
-                *pSender_address = &gLast_received_addr;
-                return msg;
             }
         }
+    } else {
+        WSAGetLastError();
     }
     msg->header.field_0x14 = 0;
     NetDisposeMessage(pDetails, msg);
