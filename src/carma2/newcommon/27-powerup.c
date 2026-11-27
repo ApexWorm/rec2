@@ -1689,7 +1689,7 @@ void C2_HOOK_FASTCALL ReceivedMine(tNet_message_chunk* pContents) {
         if (size > 0x48) {
             size = 0x48;
         }
-        memcpy(mine->collision_info->network_data, pContents->mine_explode.object_hierarchy, size);
+        memcpy(mine->collision_info->field_0x294, pContents->mine_explode.object_hierarchy, size);
     }
 }
 
