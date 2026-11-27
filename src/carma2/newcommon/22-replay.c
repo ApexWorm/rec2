@@ -67,6 +67,7 @@ br_pixelmap* gReplay_pixies[11] = { NULL };
 #ifdef REC2_MATCHING
 // GLOBAL: CARMA2_HW 0x006a23b4
 // GLOBAL: CARMA2_SW 0x0069c40c
+// GLOBAL: CARMA2_CHEAT 0x006a9f2c
 int gINT_006a23b4 = 0;
 #endif
 
@@ -133,6 +134,7 @@ int gAR_camera_type = 2;
 
 // GLOBAL: CARMA2_HW 0x0058f6a4
 // GLOBAL: CARMA2_SW 0x0058a6a4
+// GLOBAL: CARMA2_CHEAT 0x00594734
 int gCar_car_collisions = 1;
 
 // GLOBAL: CARMA2_HW 0x0058f6b0
