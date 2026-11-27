@@ -330,6 +330,7 @@ void C2_HOOK_CDECL dr_dprintf(const char* fmt_string, ...) {
 
 // FUNCTION: CARMA2_HW 0x0044c5a0
 // FUNCTION: CARMA2_SW 0x0044c350
+// FUNCTION: CARMA2_CHEAT 0x0044caf0
 void C2_HOOK_FASTCALL TraceVector3(const char* pName, const br_vector3* pVec) {
 
     dr_dprintf(pName);
@@ -338,6 +339,7 @@ void C2_HOOK_FASTCALL TraceVector3(const char* pName, const br_vector3* pVec) {
 
 // FUNCTION: CARMA2_HW 0x0044c5e0
 // FUNCTION: CARMA2_SW 0x0044c390
+// FUNCTION: CARMA2_CHEAT 0x0044cb30
 void C2_HOOK_FASTCALL TraceMatrix34(const char* pName, const br_matrix34* pMat) {
 
     dr_dprintf(pName);
