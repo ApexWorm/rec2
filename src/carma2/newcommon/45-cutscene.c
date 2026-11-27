@@ -93,10 +93,18 @@ void C2_HOOK_FASTCALL StartLoadingScreen(void) {
     SwitchToLoresMode();
     StartMusicTrack(9998);
     PossibleService();
+#ifdef REC2_SW
+    if (gProgram_state.sausage_eater_mode) {
+        SplashScreenWith("LOADSCLO");
+    } else {
+        SplashScreenWith("LOADSCLO");
+    }
+#else
     if (gProgram_state.sausage_eater_mode) {
         SplashScreenWith("LOADSCRN.PIX");
     } else {
         SplashScreenWith("LOADSCRN.PIX");
     }
+#endif
 }
 
