@@ -1384,26 +1384,66 @@ float C2_HOOK_FASTCALL GetClearanceFromCharacterInstance(tPed_character_instance
 
 // VectorScaleVector
 
-// ScaleCharacterBone
-
-// ScaleCollisionObject
-
-// ScaleFormBone
-
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x0040c420
-// STUB: CARMA2_SW 0x0040c410
-// STUB: CARMA2_CHEAT 0x0040c4c0
-void C2_HOOK_FASTCALL ScaleBone(int pBone_index, br_vector3* pScale, int pArg3) {
+// STUB: CARMA2_HW 0x0040bb20
+// STUB: CARMA2_SW 0x0040bb10
+// STUB: CARMA2_CHEAT 0x0040bbc0
+void C2_HOOK_FASTCALL ScaleCharacterBone(tPed_personality* pPersonality, int pBone_index, br_vector3* pScale, int pArg4) {
     NOT_IMPLEMENTED();
 }
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(on)
 #endif
+
+// ScaleCollisionObject
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_HW 0x0040bee0
+// STUB: CARMA2_SW 0x0040bed0
+// STUB: CARMA2_CHEAT 0x0040bf80
+void C2_HOOK_FASTCALL ScaleFormBone(tPed_form* pForm, int pBone_index, br_vector3* pScale, int pArg4) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
+
+// FUNCTION: CARMA2_HW 0x0040c420
+// FUNCTION: CARMA2_SW 0x0040c410
+// FUNCTION: CARMA2_CHEAT 0x0040c4c0
+void C2_HOOK_FASTCALL ScaleBone(int pBone_index, br_vector3* pScale, int pArg3) {
+    int i;
+    int bone_index;
+
+    for (i = 0; i < (int)REC2_ASIZE(gPed_personalities); i++) {
+        if (gPed_personalities[i] != NULL) {
+            if (pBone_index != -2) {
+                bone_index = pBone_index;
+            } else {
+                bone_index = gPed_personalities[i]->form->index_head_bone;
+            }
+            ScaleCharacterBone(gPed_personalities[i], bone_index, pScale, pArg3);
+        }
+    }
+    for (i = 0; i < (int)REC2_ASIZE(gPed_forms); i++) {
+        if (gPed_forms[i] != NULL) {
+            if (pBone_index != -2) {
+                bone_index = pBone_index;
+            } else {
+                bone_index = gPed_forms[i]->index_head_bone;
+            }
+            ScaleFormBone(gPed_forms[i], bone_index, pScale, pArg3);
+        }
+    }
+}
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
