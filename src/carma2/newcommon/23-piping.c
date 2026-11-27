@@ -27,6 +27,7 @@
 #include "52-errors.h"
 #include "57-drone.h"
 #include "61-pedestrn.h"
+#include "64-movie.h"
 #include "60-phil.h"
 #include "69-sound.h"
 #include "globvars.h"
@@ -86,10 +87,20 @@ tU8* gPipe_buffer_phys_end;
 // GLOBAL: CARMA2_CHEAT 0x0067e1a4
 tU32 gLocal_buffer_size;
 
+// GLOBAL: CARMA2_HW 0x006768f8
+// GLOBAL: CARMA2_SW 0x00671068
+// GLOBAL: CARMA2_CHEAT 0x0067e1a8
+tU32 gSaved_frame_period_2;
+
 // GLOBAL: CARMA2_HW 0x006768a0
 // GLOBAL: CARMA2_SW 0x00671010
 // GLOBAL: CARMA2_CHEAT 0x0067e150
 tU8* gMr_chunky;
+
+// GLOBAL: CARMA2_HW 0x006768a4
+// GLOBAL: CARMA2_SW 0x00671014
+// GLOBAL: CARMA2_CHEAT 0x0067e154
+tU32 gSaved_frame_period;
 
 // GLOBAL: CARMA2_HW 0x00676908
 // GLOBAL: CARMA2_SW 0x00671078
@@ -533,7 +544,12 @@ void C2_HOOK_CDECL ARDoSingleVariedSession(int pType, uintptr_t pOwner, int pCou
     AREndPipingSession();
 }
 
-// ARResetPipePlayToEnd
+extern void C2_HOOK_FASTCALL ARResetPipePlayToEnd(void);
+
+inline void C2_HOOK_FASTCALL ARResetPipePlayToEnd(void) {
+
+    gPipe_play_ptr = gPipe_record_ptr;
+}
 
 // FUNCTION: CARMA2_HW 0x00402df0
 // FUNCTION: CARMA2_SW 0x00402df0
@@ -723,7 +739,56 @@ void C2_HOOK_FASTCALL ARMainLoopStart(void) {
     gLast_replay_frame_time = PDGetTotalTime();
 }
 
-// ARToggleReplay
+extern void C2_HOOK_FASTCALL InitializeActionReplayPix(void);
+
+// FUNCTION: CARMA2_HW 0x00403d60
+// FUNCTION: CARMA2_SW 0x00403d60
+// FUNCTION: CARMA2_CHEAT 0x00403d60
+int C2_HOOK_FASTCALL ARToggleReplay(tTurn_on_AR_callback* pTurn_on_AR_cb, tTurn_off_AR_callback* pTurn_off_AR_cb, tAfter_AR_callback* pAfter_AR_cb, tReplay_session_callback* pZappy_AR_cb, tPreprocess_AR_callback* pPreprocess_cb, tPostProcess_AR_callback* pPostProcess_cb, tU32* pFrame_period, tU32* pFrame_period_2) {
+
+    if (ARIsActionReplayAvailable()) {
+        if (!gAction_replay_mode) {
+            dr_dprintf("Action replay getting turned on");
+            InitializeActionReplayPix();
+            if (pFrame_period != NULL) {
+                gSaved_frame_period = *pFrame_period;
+            } else {
+                gSaved_frame_period = gFrame_period;
+            }
+            if (pFrame_period_2 != NULL) {
+                gSaved_frame_period_2 = *pFrame_period_2;
+            } else {
+                gSaved_frame_period_2 = gFrame_period;
+            }
+            gReplay_rate = 1.0f;
+            gPaused = 1;
+            gPlay_direction = 1;
+            gLast_replay_frame_time = GetTotalTime();
+            ARResetPipePlayToEnd();
+            pTurn_on_AR_cb();
+        } else {
+            ARMoveToEndOfReplay(pZappy_AR_cb, pPreprocess_cb, pPostProcess_cb);
+            ARGoForwards();
+            pTurn_off_AR_cb();
+            if (pFrame_period != NULL) {
+                *pFrame_period = gSaved_frame_period;
+            }
+            if (pFrame_period_2 != NULL) {
+                *pFrame_period_2 = gSaved_frame_period_2;
+            }
+            MovieStopRecordingIfNecessary();
+            dr_dprintf("Action replay getting turned off");
+#ifndef REC2_CHEAT
+            FreeActionReplayPix();
+#endif
+        }
+        gAction_replay_mode = !gAction_replay_mode;
+        pAfter_AR_cb();
+        return 1;
+    } else {
+        return 0;
+    }
+}
 
 void C2_HOOK_FASTCALL GetReducedPos(br_vector3* pPos, const tReduced_pos* pReduced_pos) {
 
