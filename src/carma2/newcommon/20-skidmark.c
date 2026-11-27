@@ -251,7 +251,7 @@ inline int C2_HOOK_FASTCALL UglyWidthChange(int pSkid, br_scalar pWidth) {
     br_scalar old_width_sq;
 
     old_width_sq = BrVector3LengthSquared((br_vector3*)gSkids[pSkid].actor->t.t.mat.m[2]);
-    if (old_width_sq < 2.f * (pWidth * pWidth) && pWidth * pWidth <= 2.f * old_width_sq) {
+    if (old_width_sq < 2.0f * (pWidth * pWidth) && pWidth * pWidth <= 2.0f * old_width_sq) {
         return 0;
     } else {
         return 1;
