@@ -129,6 +129,7 @@ int C2_HOOK_FASTCALL CheckQuit(void) {
 
 // FUNCTION: CARMA2_HW 0x00513510
 // FUNCTION: CARMA2_SW 0x0050e950
+// FUNCTION: CARMA2_CHEAT 0x00518f00
 double C2_HOOK_FASTCALL sqr(double pN) {
 
     return pN * pN;
@@ -234,6 +235,7 @@ float C2_HOOK_STDCALL tandeg(float pAngle) {
 
 // FUNCTION: CARMA2_SW 0x0050ebd0
 // FUNCTION: CARMA2_HW 0x00513790
+// FUNCTION: CARMA2_CHEAT 0x00519180
 tU32 C2_HOOK_FASTCALL GetFileLength(FILE* pF) {
     tU32 the_size;
 
@@ -452,15 +454,15 @@ void C2_HOOK_FASTCALL WaitFor(tU32 pDelay) {
 // FUNCTION: CARMA2_HW 0x005146f0
 // FUNCTION: CARMA2_SW 0x0050fb30
 // FUNCTION: CARMA2_CHEAT 0x0051a0e0
-intptr_t C2_HOOK_FASTCALL DRActorEnumRecurse(br_actor* pActor, br_actor_enum_cbfn* callback, void* arg) {
+intptr_t C2_HOOK_FASTCALL DRActorEnumRecurse(br_actor* pActor, br_actor_enum_cbfn* callback, void* pContext) {
     intptr_t result;
 
-    result = callback(pActor, arg);
+    result = callback(pActor, pContext);
     if (result != 0) {
         return result;
     }
     for (pActor = pActor->children; pActor != NULL; pActor = pActor->next) {
-        result = DRActorEnumRecurse(pActor, callback, arg);
+        result = DRActorEnumRecurse(pActor, callback, pContext);
         if (result != 0) {
             return result;
         }
@@ -1387,6 +1389,7 @@ br_scalar C2_HOOK_FASTCALL DistanceFromFace(const br_vector3* pPoint, const tFac
 }
 
 // FUNCTION: CARMA2_HW 0x005160c0
+// FUNCTION: CARMA2_SW 0x00511530
 // FUNCTION: CARMA2_CHEAT 0x0051bae0
 void C2_HOOK_FASTCALL DRBoundsCopy(br_bounds3* pDest, const br_bounds3* pSrc) {
 
@@ -2122,6 +2125,7 @@ const char* C2_HOOK_FASTCALL GetActorRenderStyleString(br_actor* pActor) {
 
 // STUB: CARMA2_HW 0x00518d60
 // STUB: CARMA2_SW 0x00512820
+// STUB: CARMA2_CHEAT 0x0051e750
 tU32 C2_HOOK_FASTCALL FudgeBRenderIntoTheNinetiesWithSomeProperFuckingColourSupport(br_pixelmap* pm, tU32 red, tU32 grn, tU32 blu, tU32 alp) {
     NOT_IMPLEMENTED();
 }
