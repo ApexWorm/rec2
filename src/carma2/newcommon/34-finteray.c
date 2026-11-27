@@ -13,6 +13,7 @@
 
 // GLOBAL: CARMA2_HW 0x005964c0
 // GLOBAL: CARMA2_SW 0x00591404
+// GLOBAL: CARMA2_CHEAT 0x0059cd40
 int gPling_materials = 1;
 
 // GLOBAL: CARMA2_HW 0x00686190
@@ -198,6 +199,7 @@ int C2_HOOK_FASTCALL ActorRayPick2D(br_actor* pActor, br_vector3* pPosition, br_
 
 // STUB: CARMA2_HW 0x0045cf60
 // STUB: CARMA2_SW 0x0045c9a0
+// STUB: CARMA2_CHEAT 0x0045d3d0
 int C2_HOOK_FASTCALL DRModelPick2D_finteray(br_model* pModel, br_material* pMaterial, br_actor* pActor, br_vector3* pRay_pos, br_vector3* pRay_dir, br_scalar pT_near, br_scalar pT_far, dr_modelpick2d_cbfn* pCallback, void* pArg) {
     NOT_IMPLEMENTED();
 }
@@ -268,6 +270,7 @@ void C2_HOOK_FASTCALL DisablePlingMaterials(void) {
 
 // FUNCTION: CARMA2_HW 0x0045d860
 // FUNCTION: CARMA2_SW 0x0045d2a0
+// FUNCTION: CARMA2_CHEAT 0x0045dcd0
 void C2_HOOK_FASTCALL StationarySphereSphereCollide(const br_vector3* pPoint, const br_vector3* pSphere_center, br_scalar pRadius, br_vector3* pNormal, br_scalar* pCollision_t) {
     br_vector3 dp;
     br_scalar distance_squared;
@@ -394,6 +397,7 @@ int C2_HOOK_FASTCALL LineBoxColl(br_vector3* pStart, br_vector3* pEnd, br_bounds
 
 // FUNCTION: CARMA2_HW 0x00460da0
 // FUNCTION: CARMA2_SW 0x00460810
+// FUNCTION: CARMA2_CHEAT 0x00461210
 int C2_HOOK_FASTCALL SphereBoxIntersection(const br_bounds* pBounds, const br_vector3* pCenter, br_scalar pRadius_squared, br_vector3* pClosest) {
     int axis;
     br_scalar closest;
@@ -420,6 +424,7 @@ int C2_HOOK_FASTCALL SphereBoxIntersection(const br_bounds* pBounds, const br_ve
 
 // STUB: CARMA2_HW 0x00460e10
 // STUB: CARMA2_SW 0x00460880
+// STUB: CARMA2_CHEAT 0x00461280
 int C2_HOOK_FASTCALL LineBoxCollWithSphere(br_vector3* pStart, br_vector3* pEnd, br_bounds* pBounds, br_vector3* pPoint, br_vector3* pNormal, br_scalar* pT) {
     NOT_IMPLEMENTED();
 }
@@ -434,6 +439,7 @@ int C2_HOOK_FASTCALL LineBoxCollWithSphere(br_vector3* pStart, br_vector3* pEnd,
 
 // STUB: CARMA2_HW 0x00460f60
 // STUB: CARMA2_SW 0x004609e0
+// STUB: CARMA2_CHEAT 0x004613d0
 int C2_HOOK_FASTCALL LineSphereColl(br_vector3* pStart, br_vector3* pEnd, tCollision_shape_sphere_data* pSphere, br_vector3* pPoint, br_vector3* pNormal, br_scalar* pT) {
     NOT_IMPLEMENTED();
 }
@@ -448,6 +454,7 @@ int C2_HOOK_FASTCALL LineSphereColl(br_vector3* pStart, br_vector3* pEnd, tColli
 
 // STUB: CARMA2_HW 0x004611b0
 // STUB: CARMA2_SW 0x00460c40
+// STUB: CARMA2_CHEAT 0x00461620
 int C2_HOOK_FASTCALL LineSphereCollWithSphere(br_vector3* pStart, br_vector3* pEnd, tCollision_shape_sphere_data* pSphere, br_vector3* pPoint, br_vector3* pNormal, br_scalar* pT) {
     NOT_IMPLEMENTED();
 }
@@ -479,6 +486,7 @@ int C2_HOOK_FASTCALL LinePolyColl(br_vector3* pStart, br_vector3* pEnd, tCollisi
 
 // STUB: CARMA2_HW 0x00461520
 // STUB: CARMA2_SW 0x00460fc0
+// STUB: CARMA2_CHEAT 0x00461990
 int C2_HOOK_FASTCALL LinePolyCollWithSphere(br_vector3* pStart, br_vector3* pEnd, tCollision_shape_polyhedron* pShape, br_vector3* pPoint, br_vector3* pNormal, br_scalar* pT) {
     NOT_IMPLEMENTED();
 }
@@ -489,6 +497,7 @@ int C2_HOOK_FASTCALL LinePolyCollWithSphere(br_vector3* pStart, br_vector3* pEnd
 
 // FUNCTION: CARMA2_HW 0x00461740
 // FUNCTION: CARMA2_SW 0x004611e0
+// FUNCTION: CARMA2_CHEAT 0x00461bb0
 int C2_HOOK_FASTCALL ShapeRayCast(br_vector3* pStart, br_vector3* pEnd, tPhysics_shape* pShape, br_vector3* pPoint, br_scalar* pT, br_vector3* pNormal) {
     int result;
     int axis;
@@ -523,6 +532,7 @@ int C2_HOOK_FASTCALL ShapeRayCast(br_vector3* pStart, br_vector3* pEnd, tPhysics
 
 // FUNCTION: CARMA2_HW 0x00461850
 // FUNCTION: CARMA2_SW 0x004612f0
+// FUNCTION: CARMA2_CHEAT 0x00461cc0
 int C2_HOOK_FASTCALL ShapeRayCastWithSphere(br_vector3* pStart, br_vector3* pEnd, tPhysics_shape* pShape, br_vector3* pPoint, br_vector3* pNormal, br_scalar* pT) {
     switch (pShape->common.type) {
     case kCollisionShapeType_Box:
