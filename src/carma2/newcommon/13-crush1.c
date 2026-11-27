@@ -134,6 +134,11 @@ int gCount_queued_drone_crushes;
 // GLOBAL: CARMA2_CHEAT 0x00683380
 int gCount_crush_detach_list;
 
+// GLOBAL: CARMA2_HW 0x0067bad8
+// GLOBAL: CARMA2_SW 0x00676248
+// GLOBAL: CARMA2_CHEAT 0x00683388
+tQueued_drone_crush gQueued_drone_crushes[4];
+
 // GLOBAL: CARMA2_HW 0x0067bdfc
 // GLOBAL: CARMA2_SW 0x0067656c
 int gINT_0067bdfc;
@@ -1413,7 +1418,38 @@ void C2_HOOK_FASTCALL AddDroneCrush(tQueued_drone_crush_item* pCrush, const br_v
     }
 }
 
-// QueueDroneCrush
+// FUNCTION: CARMA2_HW 0x0042d1e0
+// FUNCTION: CARMA2_SW 0x0042d250
+// FUNCTION: CARMA2_CHEAT 0x0042d380
+void C2_HOOK_FASTCALL QueueDroneCrush(tPhysics_object* pObject, int pCount, const br_vector3* pPoints, const br_vector3* pForce) {
+    br_scalar force;
+    br_vector3 direction;
+    int i;
+    int j;
+
+    force = BrVector3Length(pForce);
+    BrVector3Set(&direction, pForce->v[0] / force, pForce->v[1] / force, pForce->v[2] / force);
+    for (i = 0; i < gCount_queued_drone_crushes; i++) {
+        if (gQueued_drone_crushes[i].object == pObject) {
+            for (j = 0; j < gQueued_drone_crushes[i].count; j++) {
+                if (BrVector3Dot(&direction, &gQueued_drone_crushes[i].items[j].field_0x38) > 0.707107f) {
+                    gQueued_drone_crushes[i].items[j].field_0x34 += force;
+                    return;
+                }
+            }
+            if (gQueued_drone_crushes[i].count < (int)REC2_ASIZE(gQueued_drone_crushes[i].items)) {
+                AddDroneCrush(&gQueued_drone_crushes[i].items[gQueued_drone_crushes[i].count], &direction, force, pCount, pPoints);
+                gQueued_drone_crushes[i].count++;
+            }
+        }
+    }
+    if (gCount_queued_drone_crushes < (int)REC2_ASIZE(gQueued_drone_crushes)) {
+        gQueued_drone_crushes[gCount_queued_drone_crushes].object = pObject;
+        gQueued_drone_crushes[gCount_queued_drone_crushes].count = 0;
+        AddDroneCrush(&gQueued_drone_crushes[gCount_queued_drone_crushes].items[0], &direction, force, pCount, pPoints);
+        gCount_queued_drone_crushes++;
+    }
+}
 
 // DoCrushing
 
