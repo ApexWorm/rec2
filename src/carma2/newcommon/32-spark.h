@@ -55,7 +55,7 @@ extern br_pixelmap* gAcid_shade_table;
 
 // DrawDot
 
-// SetWorldToScreen
+extern void C2_HOOK_FASTCALL SetWorldToScreen(br_pixelmap* pScreen);
 
 // DrawLine3DThroughBRender
 
@@ -65,9 +65,9 @@ extern int C2_HOOK_FASTCALL DrawLine2D(br_vector3* pStart, br_vector3* pEnd, br_
 
 extern void C2_HOOK_FASTCALL SetLineModelCols(tU8 pCol);
 
-// ReplaySparks
+extern void C2_HOOK_FASTCALL ReplaySparks(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_actor* pCamera, tU32 pTime);
 
-// RenderSparks
+extern void C2_HOOK_FASTCALL RenderSparks(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_actor* pCamera, br_matrix34* pCamera_to_world, tU32 pTime);
 
 // CreateSingleSpark
 
@@ -151,15 +151,17 @@ extern void C2_HOOK_FASTCALL DustRotate(void);
 
 extern void C2_HOOK_FASTCALL RenderRecordedSmokeCircles(void);
 
-// RecordSmokeCircle
+extern void C2_HOOK_FASTCALL RecordSmokeCircle(br_vector3* pCent, br_scalar pR, br_scalar pStrength, br_colour pShade, br_scalar pAspect);
 
-// SmokeCircle3D
+extern void C2_HOOK_FASTCALL SmokeCircle3D(br_vector3* o, br_scalar r, br_scalar strength, br_scalar pAspect, br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_colour pShade, br_actor* pCamera);
 
-// ReplaySmoke
+extern void C2_HOOK_FASTCALL ReplaySmoke(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_actor* pCamera);
+
+extern void C2_HOOK_FASTCALL DrawTheGlow(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_actor* pCamera);
 
 // GenerateContinuousSmoke
 
-// RenderSmoke
+extern void C2_HOOK_FASTCALL RenderSmoke(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_actor* pCamera, br_matrix34* pCamera_to_world, tU32 pTime);
 
 extern void C2_HOOK_FASTCALL CreatePuffOfSmoke(br_vector3* pPos, br_vector3* pV, float pStrength, float pDecay_factor, int pType);
 
@@ -199,7 +201,7 @@ extern void C2_HOOK_FASTCALL InitSplash(FILE* pF);
 
 // DisposeSplash
 
-// DrawTheGlow
+// DrawTheGlow (moved above RenderSmoke for inlining purposes)
 
 // PipeInstantUnSmudge
 

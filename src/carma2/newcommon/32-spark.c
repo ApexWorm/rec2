@@ -27,6 +27,7 @@
 
 #include "globvars.h"
 #include "globvrkm.h"
+#include "globvrpb.h"
 #include "rec2_macros.h"
 
 #include "c2_string.h"
@@ -239,7 +240,14 @@ br_pixelmap* gAcid_shade_table;
 
 // DrawDot
 
-// SetWorldToScreen
+inline void C2_HOOK_FASTCALL SetWorldToScreen(br_pixelmap* pScreen) {
+    br_matrix4 mat;
+    br_matrix4 mat2;
+
+    BrMatrix4Perspective(&mat, gSpark_cam->field_of_view, gSpark_cam->aspect, -gSpark_cam->hither_z, -gSpark_cam->yon_z);
+    BrMatrix4Scale(&mat2, (br_scalar)(pScreen->width / 2), (br_scalar)(pScreen->height / 2), 1.0f);
+    BrMatrix4Mul(&gCameraToScreen, &mat, &mat2);
+}
 
 // DrawLine3DThroughBRender
 
@@ -329,9 +337,155 @@ void C2_HOOK_FASTCALL SetLineModelCols(tU8 pCol) {
     BrModelUpdate(gLine_model, BR_MODU_ALL);
 }
 
-// ReplaySparks
+inline void C2_HOOK_FASTCALL ReplaySparks(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_actor* pCamera, tU32 pTime) {
+    int i;
+    br_vector3 pos;
+    br_vector3 o;
+    br_vector3 p;
+    br_vector3 tv;
+    br_vector3 new_pos;
 
-// RenderSparks
+    for (i = 0; i < (int)REC2_ASIZE(gSparks); i++) {
+        if ((gSpark_flags & (1 << i)) == 0) {
+            continue;
+        }
+        if (gSparks[i].car != NULL) {
+            BrMatrix34ApplyP(&tv, &pos, &gSparks[i].car->car_master_actor->t.t.mat);
+            BrVector3Copy(&pos, &tv);
+            BrMatrix34ApplyP(&new_pos, &gSparks[i].pos, &gSparks[i].car->car_master_actor->t.t.mat);
+        } else {
+            BrVector3Copy(&new_pos, &gSparks[i].pos);
+        }
+        BrVector3Add(&pos, &new_pos, &gSparks[i].length);
+        if (gRendering_mirror) {
+            BrVector3Sub(&tv, &new_pos, (br_vector3*)gRearview_camera_to_world.m[3]);
+            BrMatrix34TApplyV(&p, &tv, &gRearview_camera_to_world);
+            BrVector3Sub(&tv, &pos, (br_vector3*)gRearview_camera_to_world.m[3]);
+            BrMatrix34TApplyV(&o, &tv, &gRearview_camera_to_world);
+        } else {
+            BrVector3Sub(&tv, &new_pos, (br_vector3*)gCamera_to_world.m[3]);
+            BrMatrix34TApplyV(&p, &tv, &gCamera_to_world);
+            BrVector3Sub(&tv, &pos, (br_vector3*)gCamera_to_world.m[3]);
+            BrMatrix34TApplyV(&o, &tv, &gCamera_to_world);
+        }
+        if (gNo_2d_effects) {
+            SetLineModelCols(gSparks[i].colour);
+        }
+        if (gSparks[i].colour != 0) {
+            DrawLine3D(&o, &p, pRender_screen, pDepth_buffer, gFog_shade_table);
+        } else {
+            DrawLine3D(&o, &p, pRender_screen, pDepth_buffer, gAcid_shade_table);
+        }
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x004f7450
+// FUNCTION: CARMA2_CHEAT 0x004fd0f0
+void C2_HOOK_FASTCALL RenderSparks(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_actor* pCamera, br_matrix34* pCamera_to_world, tU32 pTime) {
+    int i;
+    int time;
+    br_vector3 tv;
+    br_vector3 o;
+    br_vector3 p;
+    br_vector3 pos;
+    br_vector3 new_pos;
+    br_scalar ts;
+
+    gSpark_cam = pCamera->type_data;
+    SetWorldToScreen(pRender_screen);
+    if (gSpark_flags == 0) {
+        return;
+    }
+    if (gNo_2d_effects) {
+        BrActorRemove(gLine_actor);
+        BrActorAdd(pCamera, gLine_actor);
+    }
+    if (gAction_replay_mode) {
+        ReplaySparks(pRender_screen, pDepth_buffer, pCamera, pTime);
+        if (gNo_2d_effects) {
+            BrActorRemove(gLine_actor);
+            BrActorAdd(gDont_render_actor, gLine_actor);
+        }
+        return;
+    }
+    ARStartPipingSession(ePipe_chunk_spark);
+    for (i = 0; i < (int)REC2_ASIZE(gSparks); i++) {
+        if ((gSpark_flags & (1 << i)) == 0) {
+            continue;
+        }
+        if (gSparks[i].count <= 0) {
+            gSparks[i].count = 0;
+            gSpark_flags &= ~(1 << i);
+        }
+        ts = BrVector3Dot(&gSparks[i].normal, &gSparks[i].v);
+        BrVector3Scale(&tv, &gSparks[i].normal, ts);
+        BrVector3Sub(&gSparks[i].v, &gSparks[i].v, &tv);
+        if (gSparks[i].time_sync != 0) {
+            BrVector3Scale(&o, &gSparks[i].v, gSparks[i].time_sync / 1000.f);
+            gSparks[i].count += gSparks[i].time_sync - pTime;
+            gSparks[i].time_sync = 0;
+        } else {
+            BrVector3Scale(&o, &gSparks[i].v, pTime / 1000.f);
+            gSparks[i].count -= pTime;
+        }
+        BrVector3Accumulate(&gSparks[i].pos, &o);
+        time = 1000 - gSparks[i].count;
+        if (time > 150) {
+            time = 150;
+        }
+        ts = -time / 1000.f;
+        if (gSparks[i].colour != 0) {
+            ts /= 2.0f;
+        }
+        BrVector3Scale(&gSparks[i].length, &gSparks[i].v, ts);
+        ts = pTime * 10.f / (WORLD_SCALE * 100.f);
+        if (gSparks[i].car != NULL) {
+            BrMatrix34ApplyV(&tv, &gSparks[i].length, &gSparks[i].car->car_master_actor->t.t.mat);
+            BrVector3Copy(&gSparks[i].length, &tv);
+            BrMatrix34ApplyP(&pos, &gSparks[i].pos, &gSparks[i].car->car_master_actor->t.t.mat);
+            BrVector3Copy(&o, &tv);
+            gSparks[i].v.v[0] -= gSparks[i].car->car_master_actor->t.t.mat.m[0][1] * ts;
+            gSparks[i].v.v[1] -= gSparks[i].car->car_master_actor->t.t.mat.m[1][1] * ts;
+            gSparks[i].v.v[2] -= gSparks[i].car->car_master_actor->t.t.mat.m[2][1] * ts;
+        } else {
+            BrVector3Copy(&pos, &gSparks[i].pos);
+            gSparks[i].v.v[1] -= ts;
+        }
+        AddSparkToPipingSession(i + (gSparks[i].colour << 8), &pos, &gSparks[i].length);
+        BrVector3Add(&o, &gSparks[i].length, &pos);
+        if (gRendering_mirror) {
+            BrVector3Sub(&tv, &pos, (br_vector3*)gRearview_camera_to_world.m[3]);
+            BrMatrix34TApplyV(&new_pos, &tv, &gRearview_camera_to_world);
+            BrVector3Sub(&tv, &o, (br_vector3*)gRearview_camera_to_world.m[3]);
+            BrMatrix34TApplyV(&p, &tv, &gRearview_camera_to_world);
+        } else {
+            BrVector3Sub(&tv, &pos, (br_vector3*)gCamera_to_world.m[3]);
+            BrMatrix34TApplyV(&new_pos, &tv, &gCamera_to_world);
+            BrVector3Sub(&tv, &o, (br_vector3*)gCamera_to_world.m[3]);
+            BrMatrix34TApplyV(&p, &tv, &gCamera_to_world);
+        }
+        BrVector3SetFloat(&tv, FRandomBetween(-0.1f, 0.1f), FRandomBetween(-0.1f, 0.1f), FRandomBetween(-0.1f, 0.1f));
+        BrVector3Accumulate(&gSparks[i].v, &tv);
+        ts = 1.0f - BrVector3Length(&gSparks[i].v) / 1.4f * pTime / 1000.0f;
+        if (ts < 0.1f) {
+            ts = 0.1f;
+        }
+        BrVector3Scale(&gSparks[i].v, &gSparks[i].v, ts);
+        if (gNo_2d_effects) {
+            SetLineModelCols(gSparks[i].colour);
+        }
+        if (gSparks[i].colour != 0) {
+            DrawLine3D(&p, &new_pos, pRender_screen, pDepth_buffer, gFog_shade_table);
+        } else {
+            DrawLine3D(&p, &new_pos, pRender_screen, pDepth_buffer, gAcid_shade_table);
+        }
+    }
+    AREndPipingSession();
+    if (gNo_2d_effects) {
+        BrActorRemove(gLine_actor);
+        BrActorAdd(gDont_render_actor, gLine_actor);
+    }
+}
 
 // CreateSingleSpark
 
@@ -919,15 +1073,209 @@ void C2_HOOK_FASTCALL RenderRecordedSmokeCircles(void) {
     }
 }
 
-// RecordSmokeCircle
+#ifdef REC2_HW
+inline void C2_HOOK_FASTCALL RecordSmokeCircle(br_vector3* pCent, br_scalar pR, br_scalar pStrength, br_colour pShade, br_scalar pAspect) {
+    br_matrix34* camera_to_world;
 
-// SmokeCircle3D
+    if (gRendering_mirror) {
+        camera_to_world = &gRearview_camera_to_world;
+    } else {
+        camera_to_world = &gCamera_to_world;
+    }
+    DRMatrix34TApplyP(&gBR_smoke_structs[gN_BR_smoke_structs].pos, pCent, camera_to_world);
+    gBR_smoke_structs[gN_BR_smoke_structs].r = pR;
+    gBR_smoke_structs[gN_BR_smoke_structs].strength = pStrength;
+    gBR_smoke_structs[gN_BR_smoke_structs].col = pShade;
+    gBR_smoke_structs[gN_BR_smoke_structs].aspect = pAspect;
+    gBR_smoke_pointers[gN_BR_smoke_structs] = &gBR_smoke_structs[gN_BR_smoke_structs];
+    if (pShade == (br_colour)gShade_list[7]) {
+        gBR_smoke_structs[gN_BR_smoke_structs].model = gBlend_model2;
+    } else {
+        gBR_smoke_structs[gN_BR_smoke_structs].model = gBlend_model;
+    }
+    gN_BR_smoke_structs += 1;
+}
 
-// ReplaySmoke
+inline void C2_HOOK_FASTCALL SmokeCircle3D(br_vector3* o, br_scalar r, br_scalar strength, br_scalar pAspect, br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_colour pShade, br_actor* pCamera) {
+
+    if (gNo_2d_effects) {
+        RecordSmokeCircle(o, r, strength, pShade, pAspect);
+    }
+}
+
+inline void C2_HOOK_FASTCALL ReplaySmoke(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_actor* pCamera) {
+    br_scalar aspect;
+    int i;
+
+    for (i = 0; i < (int)REC2_ASIZE(gSmoke); i++) {
+        if ((gSmoke_flags & (1 << i)) != 0) {
+            aspect = (br_scalar)(1.0 + (gSmoke[i].radius - 0.05f) / 0.25f * 0.5);
+            if ((gSmoke[i].type & 0x10) != 0) {
+                SmokeCircle3D(&gSmoke[i].pos, gSmoke[i].radius / aspect, gSmoke[i].strength, 1.0f,
+                    pRender_screen, pDepth_buffer, gShade_list[gSmoke[i].type & 0xf], pCamera);
+            } else {
+                SmokeCircle3D(&gSmoke[i].pos, gSmoke[i].radius, gSmoke[i].strength, aspect,
+                    pRender_screen, pDepth_buffer, gShade_list[gSmoke[i].type & 0xf], pCamera);
+            }
+        }
+    }
+}
+
+inline void C2_HOOK_FASTCALL DrawTheGlow(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_actor* pCamera) {
+    int i;
+    br_scalar strength;
+    br_vector3 tv;
+    tU32 seed;
+
+    if (gColumn_flags == 0) {
+        return;
+    }
+    seed = rand();
+    srand(GetTotalTime());
+    for (i = 0; i < (int)REC2_ASIZE(gSmoke_column); i++) {
+        if ((gColumn_flags & (1 << i)) == 0 || gSmoke_column[i].colour > 1) {
+            continue;
+        }
+        strength = 0.5f;
+        if (gSmoke_column[i].lifetime < 4000) {
+            strength = gSmoke_column[i].lifetime * strength / 4000.0f;
+        }
+        BrVector3Set(&tv, gSmoke_column[i].pos.v[0], (br_scalar)(gSmoke_column[i].pos.v[1] + 0.02), gSmoke_column[i].pos.v[2]);
+        SmokeCircle3D(&tv, 0.07f, strength, SRandomBetween(0.5f, 0.99f), pRender_screen, pDepth_buffer, gShade_list[7], pCamera);
+    }
+    srand(seed);
+}
+#endif
 
 // GenerateContinuousSmoke
 
-// RenderSmoke
+// FUNCTION: CARMA2_HW 0x004fa910
+// FUNCTION: CARMA2_CHEAT 0x005005b0
+void C2_HOOK_FASTCALL RenderSmoke(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_actor* pCamera, br_matrix34* pCamera_to_world, tU32 pTime) {
+#ifdef REC2_HW
+    int i;
+    int j;
+    br_vector3 tv;
+    br_scalar aspect;
+    br_scalar ts;
+    tU32 seed;
+    tU32 not_lonely;
+
+    not_lonely = 0;
+    if (gNo_2d_effects) {
+        gBlend_actor->render_style = BR_RSTYLE_FACES;
+        if (gBlend_actor->parent != NULL) {
+            BrActorRemove(gBlend_actor);
+        }
+        BrActorAdd(pCamera, gBlend_actor);
+        gN_BR_smoke_structs = 0;
+    }
+    DrawTheGlow(pRender_screen, pDepth_buffer, pCamera);
+    if (gSmoke_flags == 0) {
+        if (gNo_2d_effects) {
+            if (gBlend_actor->parent != NULL) {
+                BrActorRemove(gBlend_actor);
+            }
+            BrActorAdd(gDont_render_actor, gBlend_actor);
+        }
+        return;
+    }
+    seed = rand();
+    if (gAction_replay_mode) {
+        ReplaySmoke(pRender_screen, pDepth_buffer, pCamera);
+        srand(seed);
+        if (gNo_2d_effects) {
+            RenderRecordedSmokeCircles();
+            if (gBlend_actor->parent != NULL) {
+                BrActorRemove(gBlend_actor);
+            }
+            BrActorAdd(gDont_render_actor, gBlend_actor);
+        }
+        return;
+    }
+    ARStartPipingSession(ePipe_chunk_smoke);
+    for (i = 0; i < (int)REC2_ASIZE(gSmoke); i++) {
+        if ((gSmoke_flags & (1 << i)) != 0) {
+            if (gSmoke[i].strength > 0.0f) {
+                if (gSmoke[i].time_sync != 0) {
+                    BrVector3Scale(&tv, &gSmoke[i].v, gSmoke[i].time_sync / 1000.0f);
+                    gSmoke[i].time_sync = 0;
+                } else {
+                    BrVector3Scale(&tv, &gSmoke[i].v, pTime / 1000.0f);
+                }
+                BrVector3Accumulate(&gSmoke[i].pos, &tv);
+            } else {
+                gSmoke_flags &= ~(1 << i);
+            }
+        }
+    }
+    for (i = 0; i < (int)REC2_ASIZE(gSmoke); i++) {
+        if ((gSmoke_flags & (1 << i)) != 0) {
+            if ((gSmoke[i].type & 0xf) == 7) {
+                not_lonely |= 1 << i;
+            } else if ((not_lonely & (1 << i)) == 0) {
+                for (j = i + 1; j < (int)REC2_ASIZE(gSmoke); j++) {
+                    if ((gSmoke_flags & (1 << j)) != 0) {
+                        /* FIXME: this measures the distance of smoke i to itself, so ts is always 0 */
+                        BrVector3Sub(&tv, &gSmoke[i].pos, &gSmoke[i].pos);
+                        ts = BrVector3LengthSquared(&tv);
+                        if (REC2_SQR(gSmoke[i].radius + gSmoke[j].radius) > ts) {
+                            not_lonely |= (1 << j) | (1 << i);
+                            break;
+                        }
+                    }
+                }
+            }
+            if ((not_lonely & (1 << i)) == 0) {
+                gSmoke[i].strength = gSmoke[i].strength / 2.0f;
+            }
+            aspect = (br_scalar)(1.0 + (gSmoke[i].radius - 0.05f) / 0.25f * 0.5);
+            if ((gSmoke[i].type & 0x10) != 0) {
+                SmokeCircle3D(&gSmoke[i].pos, gSmoke[i].radius / aspect, gSmoke[i].strength, 1.0f,
+                    pRender_screen, pDepth_buffer, gShade_list[gSmoke[i].type & 0xf], pCamera);
+            } else {
+                SmokeCircle3D(&gSmoke[i].pos, gSmoke[i].radius, gSmoke[i].strength, aspect,
+                    pRender_screen, pDepth_buffer, gShade_list[gSmoke[i].type & 0xf], pCamera);
+            }
+            if (gSmoke[i].pipe_me) {
+                AddSmokeToPipingSession(i, gSmoke[i].type, &gSmoke[i].pos, gSmoke[i].radius, gSmoke[i].strength);
+            }
+            gSmoke[i].radius = (br_scalar)(pTime / 1000.0f * gSmoke[i].strength * 0.5 + gSmoke[i].radius);
+            gSmoke[i].strength -= pTime * gSmoke[i].decay_factor / 1000.0f;
+            if (gSmoke[i].radius > 0.3f) {
+                gSmoke[i].radius = 0.3f;
+            }
+            if (gSmoke[i].strength > 0.0f) {
+                ts = 1.0f - pTime * 0.002f;
+                if (ts < 0.5f) {
+                    ts = 0.5f;
+                }
+                BrVector3Scale(&gSmoke[i].v, &gSmoke[i].v, ts);
+                if (fabs(gSmoke[i].v.v[1]) < 0.43478259f && (gSmoke[i].type & 0xf) < 7) {
+                    if (gSmoke[i].v.v[1] < 0.0f) {
+                        gSmoke[i].v.v[1] += 0.43478259f;
+                    } else {
+                        gSmoke[i].v.v[1] = 0.43478259f;
+                    }
+                }
+            } else {
+                gSmoke_flags &= ~(1 << i);
+            }
+        }
+    }
+    AREndPipingSession();
+    srand(seed);
+    if (gNo_2d_effects) {
+        RenderRecordedSmokeCircles();
+        if (gBlend_actor->parent != NULL) {
+            BrActorRemove(gBlend_actor);
+        }
+        BrActorAdd(gDont_render_actor, gBlend_actor);
+    }
+#else
+    NOT_IMPLEMENTED();
+#endif
+}
 
 // FUNCTION: CARMA2_HW 0x004fb330
 // FUNCTION: CARMA2_SW 0x004f6870
@@ -1475,7 +1823,7 @@ void C2_HOOK_FASTCALL InitSplash(FILE* pF) {
 
 // DisposeSplash
 
-// DrawTheGlow
+// DrawTheGlow (moved above RenderSmoke for inlining purposes)
 
 // PipeInstantUnSmudge
 
