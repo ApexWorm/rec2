@@ -126,9 +126,9 @@ extern void C2_HOOK_FASTCALL DoSpillage(tSlick_spec* pSlick, br_actor* pActor);
 
 extern void C2_HOOK_FASTCALL DoSpecial(tSpecial_effects_spec* pSpecial, br_actor* pActor, br_bounds3* pBounds);
 
-// GiveNonCarsAShove
+extern intptr_t C2_HOOK_CDECL GiveNonCarsAShove(br_actor* pActor, void* pContext);
 
-// QueueDelayedSideEffect
+extern void C2_HOOK_FASTCALL QueueDelayedSideEffect(int pType, void* pData, int pSize, tPhysics_object* pObject);
 
 extern void C2_HOOK_FASTCALL DoDelayedNonCar(tU32 pTime, tDelayed_non_car* pDelayed_non_car);
 

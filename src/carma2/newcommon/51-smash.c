@@ -24,6 +24,7 @@
 #include "32-spark.h"
 #include "33-depth.h"
 #include "34-finteray.h"
+#include "37-brucetrk.h"
 #include "39-oil.h"
 #include "41-utility.h"
 #include "49-physics.h"
@@ -727,9 +728,44 @@ inline void C2_HOOK_FASTCALL DoSpecial(tSpecial_effects_spec* pSpecial, br_actor
     }
 }
 
-// GiveNonCarsAShove
+// FUNCTION: CARMA2_HW 0x004edb20
+// FUNCTION: CARMA2_SW 0x004e97f0
+// FUNCTION: CARMA2_CHEAT 0x004f37c0
+intptr_t C2_HOOK_CDECL GiveNonCarsAShove(br_actor* pActor, void* pContext) {
+    tNon_car_shove_context* context;
 
-// QueueDelayedSideEffect
+    context = pContext;
+    if (pActor->identifier != NULL && pActor->identifier[0] == '&') {
+        if (pActor->t.t.translate.t.v[0] >= context->bounds->min.v[0]
+            && pActor->t.t.translate.t.v[1] >= context->bounds->min.v[1]
+            && pActor->t.t.translate.t.v[2] >= context->bounds->min.v[2]
+            && pActor->t.t.translate.t.v[0] <= context->bounds->max.v[0]
+            && pActor->t.t.translate.t.v[1] <= context->bounds->max.v[1]
+            && pActor->t.t.translate.t.v[2] <= context->bounds->max.v[2]
+            && pActor->identifier[1] >= '0' && pActor->identifier[1] <= '9'
+            && (context->number < 0 || context->number == (pActor->identifier[1] - '0') * 10 + (pActor->identifier[2] - '0'))) {
+            if (context->count_actors >= (int)REC2_ASIZE(context->actors)) {
+                return -1;
+            }
+            context->actors[context->count_actors] = pActor;
+            context->count_actors++;
+        }
+    }
+    return 0;
+}
+
+inline void C2_HOOK_FASTCALL QueueDelayedSideEffect(int pType, void* pData, int pSize, tPhysics_object* pObject) {
+    int i;
+
+    for (i = 0; i < (int)REC2_ASIZE(gSmash_explosions); i++) {
+        if (gSmash_explosions[i].active == NULL) {
+            gSmash_explosions[i].type = pType;
+            gSmash_explosions[i].active = pObject;
+            memcpy(&gSmash_explosions[i].what, pData, pSize);
+            break;
+        }
+    }
+}
 
 inline void C2_HOOK_FASTCALL DoDelayedNonCar(tU32 pTime, tDelayed_non_car* pDelayed_non_car) {
     int i;
@@ -817,18 +853,207 @@ void C2_HOOK_FASTCALL MungeDelayedSideEffects(void) {
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x004ed860
-// STUB: CARMA2_SW 0x004e9530
-// STUB: CARMA2_CHEAT 0x004f3500
+// FUNCTION: CARMA2_HW 0x004ed860
+// FUNCTION: CARMA2_SW 0x004e9530
+// FUNCTION: CARMA2_CHEAT 0x004f3500
 void C2_HOOK_FASTCALL ActivateNonCarSideEffects(br_actor* pActor, tNon_car_cuboid_activations* pActivations, tPhysics_object* pObject) {
-    NOT_IMPLEMENTED();
+    int i;
+    int j;
+    int x;
+    int z;
+    tU32 the_time;
+    br_matrix34* mat;
+    tNon_car_cuboid_activation* activation;
+    br_bounds3 bounds;
+    tNon_car_shove_context context;
+    tDelayed_non_car delayed;
+    tU8 x_min;
+    tU8 z_min;
+    tU8 x_max;
+    tU8 z_max;
+    br_scalar tmp;
+
+    the_time = GetTotalTime();
+    if (pActor != NULL && pActor->identifier != NULL && pActor->identifier[0] == '&') {
+        mat = &pActor->t.t.mat;
+    } else {
+        mat = &pObject->transform_matrix;
+    }
+    for (i = 0, activation = pActivations->activations; i < pActivations->count_activations; i++, activation++) {
+        context.count_actors = 0;
+        if (activation->field_0x4 == 1) {
+            bounds = activation->bounds;
+        } else {
+            BrMatrix34ApplyP(&bounds.min, &activation->bounds.min, mat);
+            BrMatrix34ApplyP(&bounds.max, &activation->bounds.max, mat);
+            for (j = 0; j < 3; j++) {
+                if (bounds.min.v[j] > bounds.max.v[j]) {
+                    tmp = bounds.min.v[j];
+                    bounds.min.v[j] = bounds.max.v[j];
+                    bounds.max.v[j] = tmp;
+                }
+            }
+        }
+        context.bounds = &bounds;
+        context.number = activation->field_0x8;
+        XZToColumnXZ(&x_min, &z_min, bounds.min.v[0], bounds.min.v[2], &gProgram_state.track_spec);
+        XZToColumnXZ(&x_max, &z_max, bounds.max.v[0], bounds.max.v[2], &gProgram_state.track_spec);
+        for (x = x_min; x <= x_max; x++) {
+            for (z = z_min; z <= z_max; z++) {
+                if (gProgram_state.track_spec.columns[z][x].actor_0x0 != NULL
+                    && DRActorEnumRecurse(gProgram_state.track_spec.columns[z][x].actor_0x0, GiveNonCarsAShove, &context) != 0) {
+                    break;
+                }
+            }
+        }
+        delayed.field_0x0 = pObject->v;
+        BrVector3Copy(&delayed.field_0xc, (br_vector3*)mat->m[3]);
+        delayed.field_0x18 = &activation->speed_info;
+        delayed.count_actions = context.count_actors;
+        for (j = 0; j < delayed.count_actions; j++) {
+            delayed.actor_time_actions[j].actor = context.actors[j];
+            delayed.actor_time_actions[j].time = the_time + IRandomBetween(activation->field_0x0, activation->field_0x2);
+        }
+        QueueDelayedSideEffect(0, &delayed, sizeof(delayed), pObject);
+    }
 }
 
-// STUB: CARMA2_HW 0x004edbe0
-// STUB: CARMA2_SW 0x004e98b0
-// STUB: CARMA2_CHEAT 0x004f3880
+// FUNCTION: CARMA2_HW 0x004edbe0
+// FUNCTION: CARMA2_SW 0x004e98b0
+// FUNCTION: CARMA2_CHEAT 0x004f3880
 void C2_HOOK_FASTCALL ActivateSmashSideEffects(int pArg1, tPhysics_object* pObject, tShrapnel_side_effects* pSide_effects, br_vector3* pForce, float pForce_magnitude) {
-    NOT_IMPLEMENTED();
+    int i;
+    int j;
+    int k;
+    int count_faces;
+    int type;
+    tU32 the_time;
+    tSmash_side_effect* side_effect;
+    tFace_ref* face;
+    tSmashable_item_spec* spec;
+    char* identifier;
+    tSmash_explosion* explosion;
+    tBounds bounds;
+    tDelayed_smash smash;
+    br_vector3 direction;
+    br_vector3 position;
+    br_scalar tmp;
+    tFace_ref faces[400];
+
+    the_time = GetTotalTime();
+    for (i = 0, side_effect = pSide_effects->side_effects; i < pSide_effects->count_side_effects; i++, side_effect++) {
+        if (side_effect->field_0x4 == 1) {
+            bounds.original_bounds = side_effect->bounds;
+        } else {
+            BrMatrix34ApplyP(&bounds.original_bounds.min, &side_effect->bounds.min, &pObject->transform_matrix);
+            BrMatrix34ApplyP(&bounds.original_bounds.max, &side_effect->bounds.max, &pObject->transform_matrix);
+            for (j = 0; j < 3; j++) {
+                if (bounds.original_bounds.min.v[j] > bounds.original_bounds.max.v[j]) {
+                    tmp = bounds.original_bounds.min.v[j];
+                    bounds.original_bounds.min.v[j] = bounds.original_bounds.max.v[j];
+                    bounds.original_bounds.max.v[j] = tmp;
+                }
+            }
+        }
+        bounds.mat = &gTrack_actor->t.t.mat;
+        count_faces = FindFacesInBox(&bounds, faces, REC2_ASIZE(faces), NULL);
+        if (side_effect->field_0x44 == 0) {
+#ifdef REC2_FIX_BUGS
+            BrVector3Copy(&direction, pForce);
+#endif
+            /* FIXME: BrVector3InvScale(&direction, &direction, pForce_magnitude) */
+            direction.v[0] = direction.v[0] / pForce_magnitude;
+            direction.v[1] = direction.v[1] / pForce_magnitude;
+            direction.v[2] = direction.v[2] / pForce_magnitude;
+        }
+        for (j = 0, face = faces; j < count_faces; j++, face++) {
+            type = -1;
+            spec = NULL;
+            if (face->material != NULL
+                && face->material->identifier != NULL
+                && strlen(face->material->identifier) == 11
+                && face->material->identifier[5] == '|') {
+                if (side_effect->field_0x28 != 0
+                    && side_effect->field_0x28 != 1
+                    && (side_effect->field_0x28 != 4 || strcmp(face->material->identifier, side_effect->field_0x8) != 0)) {
+                    continue;
+                }
+                position.v[0] = (face->v[0].v[0] + face->v[1].v[0] + face->v[2].v[0]) / 3.0f;
+                position.v[1] = (face->v[0].v[1] + face->v[1].v[1] + face->v[2].v[1]) / 3.0f;
+                position.v[2] = (face->v[0].v[2] + face->v[1].v[2] + face->v[2].v[2]) / 3.0f;
+                type = 0;
+                spec = &gTrack_smashable_environment_specs[(tU8)face->material->identifier[6] - 1];
+            } else if (face->a != NULL) {
+                identifier = face->a->identifier;
+                if ((identifier != NULL && ((strlen(identifier) == 11 && identifier[5] == '|') || identifier[1] == (char)0xa3))
+                    || (identifier != NULL && identifier[0] == '&' && gSmashable_track_indexable_triggers[(identifier[1] - '0') * 10 + (identifier[2] - '0')] != NULL)) {
+                    if (identifier[0] == '&' && identifier[1] >= '0' && identifier[1] <= '9') {
+                        if (identifier[3] == '!') {
+                            continue;
+                        }
+                        if (side_effect->field_0x28 != 0
+                            && side_effect->field_0x28 != 3
+                            && (side_effect->field_0x28 != 6 || identifier[1] != side_effect->field_0x8[1] || identifier[2] != side_effect->field_0x8[2])) {
+                            continue;
+                        }
+                    } else if (side_effect->field_0x28 != 0
+                        && side_effect->field_0x28 != 2
+                        && (side_effect->field_0x28 != 5 || strcmp(identifier, side_effect->field_0x8) != 0)) {
+                        continue;
+                    }
+                    type = 1;
+                    position = face->a->t.t.translate.t;
+                    spec = &gTrack_smashable_environment_specs[(tU8)identifier[6] - 1];
+                }
+            }
+            if (type == -1) {
+                continue;
+            }
+            for (k = 0, explosion = gSmash_explosions; k < (int)REC2_ASIZE(gSmash_explosions); k++, explosion++) {
+                if (explosion->active != NULL && explosion->type == 1) {
+                    if (type == 1 && explosion->what.smash.field_0x38.a == face->a) {
+                        spec = NULL;
+                        break;
+                    }
+                    if (type == 0
+                        && explosion->what.smash.field_0x38.a == face->a
+                        && explosion->what.smash.field_0x38.g == face->g
+                        && explosion->what.smash.field_0x38.f == face->f) {
+                        spec = NULL;
+                        break;
+                    }
+                }
+            }
+            if (spec == NULL || face->a == pObject->actor) {
+                continue;
+            }
+            smash.field_0x0 = pObject->v;
+            smash.field_0x18 = the_time + IRandomBetween(side_effect->field_0x0, side_effect->field_0x2);
+            smash.field_0x88 = type;
+            switch (side_effect->field_0x44) {
+            case 1:
+                BrVector3Sub(&direction, (br_vector3*)pObject->transform_matrix.m[3], &position);
+                BrVector3Normalise(&direction, &direction);
+                break;
+            case 2:
+                BrVector3Sub(&direction, &position, (br_vector3*)pObject->transform_matrix.m[3]);
+                BrVector3Normalise(&direction, &direction);
+                break;
+            }
+            if (side_effect->field_0x48 >= 0.0f) {
+                BrVector3Scale(&smash.field_0x1c, &direction, side_effect->field_0x48);
+                smash.field_0x8c = side_effect->field_0x48;
+            } else {
+                smash.field_0x8c = -(pForce_magnitude * side_effect->field_0x48);
+                BrVector3Scale(&smash.field_0x1c, &direction, smash.field_0x8c);
+            }
+            smash.field_0xc = position;
+            smash.field_0x38 = *face;
+            smash.field_0x34 = spec;
+            smash.field_0x90 = pObject;
+            QueueDelayedSideEffect(1, &smash, sizeof(smash), pObject);
+        }
+    }
 }
 
 #ifdef REC2_MATCHING
