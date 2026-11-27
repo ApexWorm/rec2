@@ -616,7 +616,36 @@ int C2_HOOK_FASTCALL MoveSessionPointerForwardOne(tU8** pPtr) {
 
 // UndoPipedSession
 
-// ARScanBuffer
+// FUNCTION: CARMA2_HW 0x00402e10
+// FUNCTION: CARMA2_SW 0x00402e10
+// FUNCTION: CARMA2_CHEAT 0x00402e10
+void C2_HOOK_FASTCALL ARScanBuffer(tU8** pPtr, tPipe_chunk_type pType, tU32 pDefault_time, tARScanBuffer_callback* pCallback, tARScanBuffer_time_check* pTime_check) {
+    tU32 time;
+
+    time = pDefault_time;
+    for (;;) {
+        if (ARReplayForwards()) {
+            if (MoveSessionPointerForwardOne(pPtr)) {
+                return;
+            }
+        } else {
+            if (MoveSessionPointerBackOne(pPtr)) {
+                return;
+            }
+        }
+        gEnd_of_session = *pPtr + LengthOfSession((tPipe_session*)*pPtr) - sizeof(tU16);
+        if (((tPipe_session*)*pPtr)->type == ePipe_chunk_frame_finish) {
+            time = ((tPipe_chunk*)((tPipe_session*)*pPtr)->data)->data.frame_boundary.time;
+        } else if (((tPipe_session*)*pPtr)->type == pType) {
+            if (pCallback((tPipe_chunk*)((tPipe_session*)*pPtr)->data, ((tPipe_session*)*pPtr)->count, time)) {
+                return;
+            }
+        }
+        if (pTime_check != NULL && !pTime_check(time)) {
+            return;
+        }
+    }
+}
 
 // CheckSound
 
