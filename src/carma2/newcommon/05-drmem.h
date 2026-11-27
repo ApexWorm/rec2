@@ -20,6 +20,8 @@ extern int C2_HOOK_FASTCALL AllocationErrorsAreFatal(void);
 
 extern void C2_HOOK_FASTCALL MAMSInitMem(void);
 
+extern void C2_HOOK_FASTCALL CloseGlobalPackedFile(void);
+
 extern void C2_HOOK_FASTCALL PrintMemoryDump(int pFlags, char* pTitle);
 
 extern void C2_HOOK_FASTCALL TouchMemoryPages(void* pMemory, br_size_t pSize);
