@@ -96,8 +96,20 @@ int gRender_acc_poly_actor;
 br_token_value gAccent_poly_prims[] = {
     { BRT_BLEND_B, { 1 } },
     { BRT_OPACITY_X, { 0x4b0000 } },
+#ifdef REC2_FIX_BUGS
     { BR_NULL_TOKEN, { 0 } },
+#endif
 };
+
+// GLOBAL: CARMA2_HW 0x00596308
+// GLOBAL: CARMA2_SW 0x00591268
+// GLOBAL: CARMA2_CHEAT 0x0059cb88
+int gINT_00596308 = -1;
+
+// GLOBAL: CARMA2_HW 0x0059630c
+// GLOBAL: CARMA2_SW 0x0059126c
+// GLOBAL: CARMA2_CHEAT 0x0059cb8c
+int gINT_0059630c = -1;
 
 // GLOBAL: CARMA2_HW 0x00596310
 // GLOBAL: CARMA2_SW 0x00591270
@@ -890,6 +902,47 @@ void C2_HOOK_FASTCALL SetJoystickDPadEnabled(int pEnabled) {
     if (info != NULL) {
         info->field_0xe0 = pEnabled;
     }
+}
+
+// FUNCTION: CARMA2_HW 0x0045c590
+// FUNCTION: CARMA2_SW 0x0045bfd0
+// FUNCTION: CARMA2_CHEAT 0x0045ca10
+int C2_HOOK_FASTCALL FUN_0045c590(int pKey) {
+    tButtonJoystickInfo* info;
+    size_t i;
+
+    info = PDGetCurrentJoystickData();
+    if (info != NULL) {
+        for (i = 0; i < info->count_buttons; i++) {
+            if (gJoystick_key_names[info->buttons[i]].key == pKey) {
+                return i;
+            }
+        }
+    }
+    return -1;
+}
+
+// FUNCTION: CARMA2_HW 0x0045c5d0
+// FUNCTION: CARMA2_SW 0x0045c010
+// FUNCTION: CARMA2_CHEAT 0x0045ca50
+void C2_HOOK_FASTCALL FUN_0045c5d0(void) {
+
+    if (gINT_0059630c != -1) {
+        UnloadDinputFFBEffectAtIndex(gINT_0059630c);
+    }
+    gINT_0059630c = -1;
+}
+
+// FUNCTION: CARMA2_HW 0x0045c680
+// FUNCTION: CARMA2_SW 0x0045c0c0
+// FUNCTION: CARMA2_CHEAT 0x0045cb00
+void C2_HOOK_FASTCALL FUN_0045c680(void) {
+
+    if (gINT_0059630c != -1) {
+        StopDinputEffect(gINT_0059630c);
+        UnloadDinputFFBEffectAtIndex(gINT_0059630c);
+    }
+    gINT_0059630c = -1;
 }
 
 // STUB: CARMA2_HW 0x0045c6b0
