@@ -12,6 +12,7 @@
 #include "15-displays.h"
 #include "24-loadsave.h"
 #include "41-utility.h"
+#include "42-input.h"
 #include "globvars.h"
 #include "globvrbm.h"
 #include "platform.h"
@@ -446,6 +447,150 @@ void C2_HOOK_FASTCALL FUN_0045b0a0(tHeadup_text_buffer* pText_buffer) {
             pText_buffer->field_0x4 = t;
         } else {
             pText_buffer->field_0x4 = pText_buffer->text_last_add;
+        }
+    }
+}
+
+inline void C2_HOOK_FASTCALL HeadupTextBufferSelectPrevious(tHeadup_text_buffer* pBuffer) {
+    int i;
+
+    if (pBuffer != NULL && pBuffer->text_last_add != NULL && pBuffer->text_last_add != pBuffer->texts) {
+        pBuffer->text_last_add = pBuffer->texts;
+        pBuffer->pos_last_add--;
+        for (i = 0; i < pBuffer->pos_last_add; i++) {
+            pBuffer->text_last_add = pBuffer->text_last_add->next;
+        }
+    }
+}
+
+inline void C2_HOOK_FASTCALL HeadupTextBufferSelectNext(tHeadup_text_buffer* pBuffer) {
+
+    if (pBuffer != NULL && pBuffer->text_last_add != NULL && pBuffer->text_last_add->next != NULL) {
+        pBuffer->text_last_add = pBuffer->text_last_add->next;
+        pBuffer->pos_last_add++;
+    }
+}
+
+inline int C2_HOOK_FASTCALL ResetJoystickHeadupSelection(tButtonJoystickInfo** pJoystick_info) {
+    tHeadup_text* text;
+    size_t j;
+    int i;
+    int index;
+
+    if (gINT_00596308 != -1) {
+        gINT_00596308 = -1;
+    } else {
+        *pJoystick_info = PDGetCurrentJoystickData();
+        if (*pJoystick_info == NULL) {
+            return 0;
+        }
+        index = -1;
+        i = 0;
+        for (text = gJoystick_headup_buffer.texts; text != NULL; text = text->next) {
+            if (text == gJoystick_headup_buffer.text_last_add) {
+                index = i;
+            }
+            i++;
+        }
+        for (j = 0; j < (*pJoystick_info)->count_buttons; j++) {
+            if ((*pJoystick_info)->buttons[j] == index && (*pJoystick_info)->buttons[j] != -1) {
+                (*pJoystick_info)->buttons[j] = -1;
+            }
+        }
+    }
+    while (PDKeyDown(65)) {
+    }
+    return 1;
+}
+
+// FUNCTION: CARMA2_HW 0x0045b3b0
+// FUNCTION: CARMA2_SW 0x0045ae30
+// FUNCTION: CARMA2_CHEAT 0x0045b830
+void C2_HOOK_FASTCALL MungeJoystickHeadups(void) {
+    tButtonJoystickInfo* joystick_info;
+    tHeadup_text* text;
+    tU32 the_time;
+    size_t j;
+    int i;
+    int index;
+    char s[80];
+
+    joystick_info = NULL;
+    if (gINT_0068b8e8) {
+        the_time = PDGetTotalTime();
+        if ((!PDKeyDown(65) || ResetJoystickHeadupSelection(&joystick_info)) && gINT_00596308 == -1) {
+            if (PDKeyDown(64) && gINT_00596308 == -1) {
+                index = -1;
+                i = 0;
+                for (text = gJoystick_headup_buffer.texts; text != NULL; text = text->next) {
+                    if (text == gJoystick_headup_buffer.text_last_add) {
+                        index = i;
+                    }
+                    i++;
+                }
+                gINT_00596308 = index;
+                while (PDKeyDown(64)) {
+                }
+            }
+            if (PDKeyDown(66)) {
+                HeadupTextBufferSelectPrevious(&gJoystick_headup_buffer);
+                do {
+                } while (PDGetTotalTime() - the_time < 100);
+            }
+            if (PDKeyDown(67)) {
+                HeadupTextBufferSelectNext(&gJoystick_headup_buffer);
+                do {
+                } while (PDGetTotalTime() - the_time < 100);
+            }
+            if (PDKeyDown(68)) {
+                for (i = 0; i < gJoystick_headup_buffer.field_0x10 - 1; i++) {
+                    HeadupTextBufferSelectPrevious(&gJoystick_headup_buffer);
+                }
+                while (PDKeyDown(68)) {
+                }
+            }
+            if (PDKeyDown(69)) {
+                for (i = 0; i < gJoystick_headup_buffer.field_0x10 - 1; i++) {
+                    HeadupTextBufferSelectNext(&gJoystick_headup_buffer);
+                }
+                while (PDKeyDown(69)) {
+                }
+            }
+        }
+        FUN_0045b0a0(&gJoystick_headup_buffer);
+        text = gJoystick_headup_buffer.field_0x4;
+        joystick_info = PDGetCurrentJoystickData();
+        if (joystick_info == NULL) {
+            return;
+        }
+    } else if (gINT_0068b8e4) {
+        return;
+    }
+    for (i = 0; i < (int)REC2_ASIZE(gRace_head_ups); i++) {
+        if (gINT_0068b8e8 && text != NULL) {
+            if (gINT_00596308 == i) {
+                ChangeHeadupFont(gRace_head_ups[i], -3);
+            } else if (text == gJoystick_headup_buffer.text_last_add) {
+                ChangeHeadupFont(gRace_head_ups[i], -1);
+            } else {
+                ChangeHeadupFont(gRace_head_ups[i], -2);
+            }
+            if (gINT_00596308 == i) {
+                sprintf(s, "%s      ???", text->text);
+            } else if (joystick_info != NULL) {
+                sprintf(s, "%s", text->text);
+                for (j = 0; j < joystick_info->count_buttons; j++) {
+                    if (joystick_info->buttons[j] == i) {
+                        sprintf(s, "%s      #%02d", text->text, j);
+                    }
+                }
+            } else {
+                sprintf(s, "%s", text->text);
+            }
+            ChangeHeadupText(gRace_head_ups[i], s);
+            text = text->next;
+        } else {
+            ChangeHeadupText(gRace_head_ups[i], "");
         }
     }
 }

@@ -50,6 +50,14 @@ extern void C2_HOOK_FASTCALL FUN_0045acf0(void);
 
 extern void C2_HOOK_FASTCALL FUN_0045b0a0(tHeadup_text_buffer* pText_buffer);
 
+extern void C2_HOOK_FASTCALL HeadupTextBufferSelectPrevious(tHeadup_text_buffer* pBuffer);
+
+extern void C2_HOOK_FASTCALL HeadupTextBufferSelectNext(tHeadup_text_buffer* pBuffer);
+
+extern int C2_HOOK_FASTCALL ResetJoystickHeadupSelection(tButtonJoystickInfo** pJoystick_info);
+
+extern void C2_HOOK_FASTCALL MungeJoystickHeadups(void);
+
 extern void C2_HOOK_FASTCALL PeekCharacter(FILE* pF);
 
 extern int C2_HOOK_FASTCALL ReadUntilCharacter(FILE* pF, char* pBuffer, int pBuffer_size, char pLimit_char);
