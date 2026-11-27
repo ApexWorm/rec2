@@ -114,9 +114,11 @@ int gReplay_splash_flags;
 // GLOBAL: CARMA2_CHEAT 0x006b01b0
 br_pixelmap* gFlame_map[20] = { 0 };
 
-#ifdef REC2_MATCHING
-// GLOBAL: CARMA2_HW 0x006a8688
+#if defined(REC2_SW)
 // GLOBAL: CARMA2_SW 0x006a26e8
+br_matrix4 gCameraToScreen = { { { 0.f } } };
+#elif defined(REC2_MATCHING)
+// GLOBAL: CARMA2_HW 0x006a8688
 // GLOBAL: CARMA2_CHEAT 0x006b0200
 int gINT_006a8688 = 0;
 #endif
@@ -176,8 +178,10 @@ tSmashable_environment_name* gSmashable_noncars;
 // GLOBAL: CARMA2_CHEAT 0x006bef2c
 int gCount_smashable_noncars;
 
+#ifndef REC2_SW
 // GLOBAL: CARMA2_HW 0x006a8718
 br_matrix4 gCameraToScreen;
+#endif
 
 // GLOBAL: CARMA2_HW 0x006a82b0
 // GLOBAL: CARMA2_SW 0x006a2310
@@ -249,6 +253,7 @@ int C2_HOOK_FASTCALL DrawLine3D(const br_vector3* pStart, const br_vector3* pEnd
     br_vector4 projected_end;
     br_scalar fraction;
 
+#ifndef REC2_SW
     if (gNo_2d_effects) {
         BrVector3Copy(&gLine_model->vertices[0].p, pStart);
         BrVector3Copy(&gLine_model->vertices[1].p, pEnd);
@@ -256,6 +261,7 @@ int C2_HOOK_FASTCALL DrawLine3D(const br_vector3* pStart, const br_vector3* pEnd
         BrZbsSceneRenderAdd(gLine_actor);
         return 999;
     }
+#endif
     BrVector3Copy(&start, pStart);
     BrVector3Copy(&end, pEnd);
     if (start.v[2] > -gSpark_cam->hither_z || end.v[2] > -gSpark_cam->hither_z) {
