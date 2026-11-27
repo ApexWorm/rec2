@@ -151,7 +151,7 @@ void C2_HOOK_FASTCALL TestAutoSpecialVolume(tPhysics_object* pObject) {
 
     mat = &pObject->transform_matrix;
     bounds = &pObject->bb2;
-    max_d = 0.f;
+    max_d = 0.0f;
     for (i = 0; i < 3; i++) {
         max_d += bounds->min.v[i] * BrVector3Dot((br_vector3*)mat->m[i], &pObject->water_normal);
     }
@@ -159,7 +159,7 @@ void C2_HOOK_FASTCALL TestAutoSpecialVolume(tPhysics_object* pObject) {
     min_d = max_d;
     for (i = 0; i < 3; i++) {
         d = (bounds->max.v[i] - bounds->min.v[i]) * BrVector3Dot((br_vector3*)mat->m[i], &pObject->water_normal);
-        if (d < 0.f) {
+        if (d < 0.0f) {
             min_d += d;
         } else {
             max_d += d;
@@ -167,13 +167,13 @@ void C2_HOOK_FASTCALL TestAutoSpecialVolume(tPhysics_object* pObject) {
     }
     if (min_d >= pObject->water_d) {
         pObject->auto_special_volume = NULL;
-        pObject->water_depth_factor = 1.f;
+        pObject->water_depth_factor = 1.0f;
         return;
     }
     if (max_d - 0.001 > pObject->water_d) {
         pObject->water_depth_factor = (pObject->water_d - min_d) / (max_d - min_d);
     } else {
-        pObject->water_depth_factor = 1.f;
+        pObject->water_depth_factor = 1.0f;
     }
     if (pObject->auto_special_volume != NULL) {
         return;
@@ -184,7 +184,7 @@ void C2_HOOK_FASTCALL TestAutoSpecialVolume(tPhysics_object* pObject) {
         BrVector3Copy(&p_high, &p_low);
         for (i = 0; i < 3; i++) {
             BrVector3Scale(&edge, (br_vector3*)mat->m[i], bounds->max.v[i] - bounds->min.v[i]);
-            if (BrVector3Dot(&edge, &pObject->water_normal) > 0.f) {
+            if (BrVector3Dot(&edge, &pObject->water_normal) > 0.0f) {
                 BrVector3Accumulate(&p_high, &edge);
             } else {
                 BrVector3Accumulate(&p_low, &edge);
@@ -200,7 +200,7 @@ void C2_HOOK_FASTCALL TestAutoSpecialVolume(tPhysics_object* pObject) {
             return;
         }
     }
-    pObject->water_depth_factor = 1.f;
+    pObject->water_depth_factor = 1.0f;
     pObject->auto_special_volume = NULL;
 }
 
