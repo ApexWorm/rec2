@@ -925,7 +925,12 @@ void C2_HOOK_FASTCALL RenderRecordedSmokeCircles(void) {
 
 // ReplaySmoke
 
-// GenerateContinuousSmoke
+// STUB: CARMA2_HW 0x004fa5b0
+// STUB: CARMA2_SW 0x004f5640
+// STUB: CARMA2_CHEAT 0x00500250
+void C2_HOOK_FASTCALL GenerateContinuousSmoke(tCar_spec* pCar, int pWheel, tU32 pTime) {
+    NOT_IMPLEMENTED();
+}
 
 // RenderSmoke
 
@@ -2098,7 +2103,28 @@ void* C2_HOOK_FASTCALL GetSplashIndex(tPhysics_object* pObject) {
     return NULL;
 }
 
-// ClearSplashes
+// FUNCTION: CARMA2_HW 0x004fee70
+// FUNCTION: CARMA2_SW 0x004fa750
+// FUNCTION: CARMA2_CHEAT 0x00504b10
+void C2_HOOK_FASTCALL ClearSplashes(tPhysics_object* pObject) {
+    void* subject;
+    int i;
+
+    if (pObject->water_d != 10000.0f) {
+        pObject->water_d = 10000.0f;
+        subject = GetSplashIndex(pObject);
+        if (subject != NULL) {
+            for (i = 0; i < (int)REC2_ASIZE(gReplay_splashes); i++) {
+                if ((gReplay_splash_flags & (1 << i)) && subject == gReplay_splashes[i].object.ptr) {
+                    ARStartPipingSession(ePipe_chunk_extended_splash);
+                    AddExtendedSplashToPipingSession(pObject, subject);
+                    AREndPipingSession();
+                    return;
+                }
+            }
+        }
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x004fef40
 // FUNCTION: CARMA2_SW 0x004fa820

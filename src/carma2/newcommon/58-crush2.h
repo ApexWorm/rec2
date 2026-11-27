@@ -34,11 +34,11 @@ extern int C2_HOOK_FASTCALL SetKnackeredFlag(tCar_spec* pCar);
 
 extern void C2_HOOK_FASTCALL DamageUnit2(tCar_spec *pCar, tDamage_type pDamage_type, int pMagnitude);
 
-// RecordLastDamage
+extern void C2_HOOK_FASTCALL RecordLastDamage(tCar_spec* pCar);
 
 extern void C2_HOOK_FASTCALL DoDamage(tCar_spec* pCar, tDamage_type pDamage_type, float pMagnitude, float pNastiness);
 
-extern void C2_HOOK_FASTCALL CalcModifiedLocation(tCar_spec* pCar);
+// CalcModifiedLocation
 
 extern void C2_HOOK_FASTCALL DoPratcamHit(br_vector3* pVelocity);
 

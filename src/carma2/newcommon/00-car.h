@@ -231,7 +231,7 @@ extern tNon_car_spec* C2_HOOK_FASTCALL DoPullActorFromWorld(br_actor* pActor);
 
 // PipeNonCarObject
 
-// PipeNonCars
+extern void C2_HOOK_FASTCALL PipeNonCars(void);
 
 // CheckForDeAttachmentOfNonCars
 
