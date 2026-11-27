@@ -2204,7 +2204,7 @@ int C2_HOOK_FASTCALL SetPissed(tPowerup* pPowerup, tCar_spec* pCar) {
                 gPissed_info.amplitude[i][j] = pPowerup->float_params[0];
                 period = FRandomBetween(pPowerup->float_params[1], pPowerup->float_params[2]);
                 gPissed_info.period[i][j] = period;
-                gPissed_info.phase[i][j] = FRandomBetween(0.f, period);
+                gPissed_info.phase[i][j] = FRandomBetween(0.0f, period);
             }
         }
     }
