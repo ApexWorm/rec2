@@ -1222,7 +1222,6 @@ float C2_HOOK_FASTCALL PointRectDistSq(const br_vector3* pP, const br_vector3* p
 // FUNCTION: CARMA2_SW 0x0042c930
 // FUNCTION: CARMA2_CHEAT 0x0042ca50
 float C2_HOOK_FASTCALL DistSq(const br_vector3* pP, int pCount, const br_vector3* pVertices) {
-    br_vector3 offset;
     float closest_distance;
     int i;
 
@@ -1230,8 +1229,7 @@ float C2_HOOK_FASTCALL DistSq(const br_vector3* pP, int pCount, const br_vector3
     case 0:
         return 0.0f;
     case 1:
-        BrVector3Sub(&offset, pP, &pVertices[0]);
-        return BrVector3LengthSquared(&offset);
+        return Vector3DistanceSquared(pP, &pVertices[0]);
     case 2:
         return PointEdgeDistSq(pP, &pVertices[0], &pVertices[1]);
     case 3:
@@ -1252,8 +1250,7 @@ float C2_HOOK_FASTCALL DistSq(const br_vector3* pP, int pCount, const br_vector3
             for (k = j + 1; k < pCount; k++) {
                 float distance;
 
-                distance = PointTriangleDistSq(pP, &pVertices[i], &pVertices[j], &pVertices[k]);
-                if (!(distance >= closest_distance)) {
+                if ((distance = PointTriangleDistSq(pP, &pVertices[i], &pVertices[j], &pVertices[k])) < closest_distance) {
                     closest_distance = distance;
                 }
             }
