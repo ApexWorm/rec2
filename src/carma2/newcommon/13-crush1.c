@@ -2525,13 +2525,43 @@ intptr_t C2_HOOK_CDECL MakeCarModelsMaterialsSingleSided(br_actor* pActor, void*
 
 // IsOnNonCarHalf
 
-// SplitCar
+typedef struct {
+    undefined field_0x0[12]; /* FIXME: unknown, filled by SplitCheck and read by SplitCar */
+} tSplit_info;
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_HW 0x0042e2e0
+// STUB: CARMA2_SW 0x0042e350
+// STUB: CARMA2_CHEAT 0x0042e480
+void C2_HOOK_FASTCALL SplitCar(tCar_spec* pCar, tSplit_info* pSplit_info, int pArg3) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // QuantizePlane
 
 // WithinBounds
 
-// SplitCheck
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_HW 0x004307e0
+// STUB: CARMA2_SW 0x00430810
+// STUB: CARMA2_CHEAT 0x004309b0
+int C2_HOOK_FASTCALL SplitCheck(tCar_spec* pCar, int pArg2, const br_vector4* pPlane, float pArg4, tSplit_info* pSplit_info) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // FindForceEdge
 
@@ -3230,7 +3260,25 @@ void C2_HOOK_FASTCALL SetModelForUpdate(br_model* pModel) {
     }
 }
 
-// RandomlyXZSplitCar
+// FUNCTION: CARMA2_HW 0x00435d40
+// FUNCTION: CARMA2_SW 0x00435d70
+// FUNCTION: CARMA2_CHEAT 0x00435f30
+void C2_HOOK_FASTCALL RandomlyXZSplitCar(tCar_spec* pCar) {
+    br_bounds3* bounds;
+    float angle;
+    br_vector4 plane;
+    tSplit_info split_info;
+
+    bounds = &pCar->collision_info->bb1;
+    angle = FRandomBetween(0.0f, 6.2831855f);
+    plane.v[0] = (float)sin(angle);
+    plane.v[1] = 0.0f;
+    plane.v[2] = (float)cos(angle);
+    plane.v[3] = plane.v[0] * ((bounds->min.v[0] + bounds->max.v[0]) * 0.5f) + plane.v[2] * ((bounds->min.v[2] + bounds->max.v[2]) * 0.5f);
+    if (SplitCheck(pCar, 0, &plane, 0.0f, &split_info)) {
+        SplitCar(pCar, &split_info, 0);
+    }
+}
 
 // RandomlyBendCar
 
