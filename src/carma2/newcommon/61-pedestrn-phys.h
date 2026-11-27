@@ -45,9 +45,9 @@ extern void C2_HOOK_FASTCALL SetCharacterMoveAR(tPed_character_instance* pCharac
 
 extern void C2_HOOK_FASTCALL PedApplyPedFPChange(tPedestrian* pPed, float pSpeed);
 
-// PedApplyStatus
+extern void C2_HOOK_FASTCALL PedApplyStatus(tPedestrian* pPed, tS8 pArg2, tS8 pArg3, tS8 pArg4, tS8 pArg5, tS8 pArg6, tS8 pArg7, br_vector3* pArg8, br_vector3* pArg9, br_matrix34* pArg10);
 
-// PedUndoStatus
+extern void C2_HOOK_FASTCALL PedUndoStatus(tPedestrian* pPed, tS8 pArg2, tS8 pArg3, tS8 pArg4, tS8 pArg5, tS8 pArg6, tS8 pArg7, br_vector3* pArg8, br_vector3* pArg9, br_matrix34* pArg10);
 
 extern void C2_HOOK_CDECL SetCharacterPhysicsLevelAR(tPed_character_instance* pCharacter, tU32 pLevel, ...);
 
@@ -321,9 +321,9 @@ extern void C2_HOOK_FASTCALL ShowActivePedCount(void);
 
 extern void C2_HOOK_FASTCALL PedPreCollisionStuff(void);
 
-// UpdateIfBackwardsAR
+extern void C2_HOOK_FASTCALL UpdateIfBackwardsAR(void);
 
-extern int C2_HOOK_FASTCALL ChangePedScaling(br_vector3* pScale);
+extern void C2_HOOK_FASTCALL ChangePedScaling(const br_vector3* pScale);
 
 // ChangeHeadScaling
 
