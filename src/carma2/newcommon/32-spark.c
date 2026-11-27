@@ -804,7 +804,12 @@ void C2_HOOK_FASTCALL RenderRecordedSmokeCircles(void) {
 
 // ReplaySmoke
 
-// GenerateContinuousSmoke
+// STUB: CARMA2_HW 0x004fa5b0
+// STUB: CARMA2_SW 0x004f5640
+// STUB: CARMA2_CHEAT 0x00500250
+void C2_HOOK_FASTCALL GenerateContinuousSmoke(tCar_spec* pCar, int pWheel, tU32 pTime) {
+    NOT_IMPLEMENTED();
+}
 
 // RenderSmoke
 
