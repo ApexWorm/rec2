@@ -159,9 +159,9 @@ extern void C2_HOOK_FASTCALL DoSmudge(tPipe_chunk** pChunk, int pDir);
 
 // DoOilSpillAR
 
-// CheckCar
+extern int C2_HOOK_FASTCALL CheckCar(tPipe_chunk* pChunk_ptr, int pChunk_count, tU32 pTime);
 
-// CarTimeout
+extern int C2_HOOK_FASTCALL CarTimeout(tU32 pTime);
 
 // ScanCarsPositions
 
