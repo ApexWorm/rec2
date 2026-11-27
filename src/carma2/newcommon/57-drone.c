@@ -558,7 +558,23 @@ br_matrix34* C2_HOOK_FASTCALL GetCurrentViewDroneMat(void) {
 
 // GetCurrentViewDroneDirection
 
-// ApplyDroneRender2
+// FUNCTION: CARMA2_HW 0x00452810
+// FUNCTION: CARMA2_SW 0x004525a0
+// FUNCTION: CARMA2_CHEAT 0x00452d70
+void C2_HOOK_FASTCALL ApplyDroneRender2(int pDrone_id, int pRender) {
+
+    if (gAction_replay_mode && ARGetReplayRate() < 0.0f) {
+        if (pRender) {
+            pRender = 0;
+        } else {
+            pRender = 1;
+        }
+        DoNotDprintf_drone("B DRONERENDER");
+    } else {
+        DoNotDprintf_drone("F DRONERENDER");
+    }
+    gDrone_specs[pDrone_id].actor->render_style = pRender ? BR_RSTYLE_FACES : BR_RSTYLE_NONE;
+}
 
 // FUNCTION: CARMA2_HW 0x00452880
 // FUNCTION: CARMA2_SW 0x00452610

@@ -2471,7 +2471,13 @@ void C2_HOOK_FASTCALL ApplyVector3(tPipe_chunk** pChunk) {
         (br_vector3*)(*pChunk)->subject_index);
 }
 
-// ApplyDroneRender
+// FUNCTION: CARMA2_HW 0x004c9cc0
+// FUNCTION: CARMA2_SW 0x004c63f0
+// FUNCTION: CARMA2_CHEAT 0x004cf7f0
+void C2_HOOK_FASTCALL ApplyDroneRender(tPipe_chunk** pChunk) {
+
+    ApplyDroneRender2((*pChunk)->subject_index, (*pChunk)->data.drone_render.render);
+}
 
 // FUNCTION: CARMA2_HW 0x004c9cd0
 // FUNCTION: CARMA2_SW 0x004c6400
