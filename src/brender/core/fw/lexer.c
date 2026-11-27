@@ -368,9 +368,10 @@ br_fixed_ls C2_HOOK_CDECL BrParseFixed(br_lexer* l) {
         x = 0;
     }
     if (neg) {
-        x = -x;
+        return -x;
+    } else {
+        return x;
     }
-    return x;
 }
 
 // FUNCTION: CARMA2_HW 0x0052fb40
@@ -407,15 +408,17 @@ br_float C2_HOOK_CDECL BrParseFloat(br_lexer* l) {
 
 // FUNCTION: CARMA2_HW 0x0052fbb0
 // FUNCTION: CARMA2_SW 0x0052b250
+// FUNCTION: CARMA2_CHEAT 0x005357a0
 br_int_32 C2_HOOK_CDECL BrParseInteger(br_lexer* l) {
     br_boolean neg;
     br_int_32 i;
 
+    neg = 0;
     if (l->current.id == T_PLUS) {
         l->advance(l);
     }
-    neg = l->current.id == T_DASH;
-    if (neg) {
+    if (l->current.id == T_DASH) {
+        neg = 1;
         l->advance(l);
     }
     if (l->current.id == T_INTEGER) {
@@ -428,8 +431,9 @@ br_int_32 C2_HOOK_CDECL BrParseInteger(br_lexer* l) {
     }
     if (neg) {
         return -i;
+    } else {
+        return i;
     }
-    return i;
 }
 
 // FUNCTION: CARMA2_HW 0x0052fc00
