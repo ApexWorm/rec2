@@ -222,7 +222,7 @@ extern void C2_HOOK_FASTCALL SetFlappage(br_actor* pActor, tCar_spec* pCar, int 
 
 // SetUpSemiDetachedBitJoint
 
-// BitIsInBentPartOfCar
+extern int C2_HOOK_FASTCALL BitIsInBentPartOfCar(br_actor* pActor, br_scalar pBend_z, br_scalar pPivot_z);
 
 // SetUpFlapJoint
 
@@ -242,7 +242,7 @@ extern int C2_HOOK_FASTCALL GetSDBJointPosAndBounds(br_vector3* pP1, br_vector3*
 
 extern void C2_HOOK_FASTCALL SendSemiDetachBit(tCar_spec* pCar, br_actor* pActor, float pArg3, tNet_game_player_info* pPlayer);
 
-// SendDetachBit
+extern void C2_HOOK_FASTCALL SendDetachBit(tCar_spec* pCar, br_actor* pActor);
 
 extern void C2_HOOK_FASTCALL SendAllSemiDetachedBits(tNet_game_player_info* pPlayer);
 
@@ -250,7 +250,7 @@ extern void C2_HOOK_FASTCALL AddNonCar(tNon_car_spec* pNon_car, const tDriver* p
 
 extern tPhysics_object* C2_HOOK_FASTCALL DetachBit(tCar_spec* pCar, br_actor* pActor, br_bounds3* pBounds);
 
-// DoDetaching
+extern void C2_HOOK_FASTCALL DoDetaching(void);
 
 // FlapBit
 

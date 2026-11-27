@@ -1524,7 +1524,34 @@ void C2_HOOK_FASTCALL SetFlappage(br_actor* pActor, tCar_spec* pCar, int pFlags,
 
 // SetUpSemiDetachedBitJoint
 
-// BitIsInBentPartOfCar
+inline int C2_HOOK_FASTCALL BitIsInBentPartOfCar(br_actor* pActor, br_scalar pBend_z, br_scalar pPivot_z) {
+    tUser_crush_data* user;
+    br_model* model;
+    br_scalar delta;
+
+    user = pActor->user;
+    if (user == NULL) {
+        return 1;
+    }
+    model = user->models[0];
+    if (model == NULL) {
+        return 1;
+    }
+    delta = (pBend_z - pPivot_z) * 0.4f;
+    if (delta < 0.0f) {
+        if (model->bounds.min.v[2] < pPivot_z + delta) {
+            return 1;
+        } else {
+            return 0;
+        }
+    } else {
+        if (model->bounds.max.v[2] > pPivot_z + delta) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+}
 
 // SetUpFlapJoint
 
@@ -1682,7 +1709,26 @@ void C2_HOOK_FASTCALL SendSemiDetachBit(tCar_spec* pCar, br_actor* pActor, float
     }
 }
 
-// SendDetachBit
+inline void C2_HOOK_FASTCALL SendDetachBit(tCar_spec* pCar, br_actor* pActor) {
+    tNet_message* message;
+    tUser_crush_data* user;
+    br_vector3 p1;
+    br_vector3 p2;
+    br_vector3 p3;
+    br_bounds3 bounds;
+
+    message = NetBuildGuaranteedMessage(eNet_message_chunk_type_detach_bit, 0);
+    message->contents.detach_bit.player = NetPlayerFromCar(pCar)->ID;
+    user = pActor->user;
+    message->contents.detach_bit.id = user->crush_data->id;
+    message->contents.detach_bit.time = gPHIL_last_physics_tick + 120;
+    if (GetSDBJointPosAndBounds(&p1, &p2, &p3, &bounds, pActor)) {
+        return;
+    }
+    CompressVector3(&message->contents.detach_bit.bounds_min, &bounds.min, -10.0f, 10.0f);
+    CompressVector3(&message->contents.detach_bit.bounds_max, &bounds.max, -10.0f, 10.0f);
+    NetGuaranteedSendMessageToEverybody(gCurrent_net_game, message, NULL);
+}
 
 // FUNCTION: CARMA2_HW 0x0042da20
 // FUNCTION: CARMA2_SW 0x0042da90
@@ -1740,7 +1786,71 @@ tPhysics_object* C2_HOOK_FASTCALL DetachBit(tCar_spec* pCar, br_actor* pActor, b
 #pragma auto_inline(on)
 #endif
 
-// DoDetaching
+// FUNCTION: CARMA2_HW 0x00436ad0
+// FUNCTION: CARMA2_SW 0x00436b00
+// FUNCTION: CARMA2_CHEAT 0x00436cd0
+void C2_HOOK_FASTCALL DoDetaching(void) {
+    int i;
+    int j;
+    int new_count;
+    int keep;
+    int synced;
+
+    if (gNet_mode != eNet_mode_none && gNet_mode != eNet_mode_host) {
+        return;
+    }
+    for (i = 0, new_count = 0; i < gCount_crush_detach_list; i++) {
+        keep = 1;
+        if (gCrush_detach_list[i].time <= gPHIL_last_physics_tick) {
+            keep = 0;
+            if (gCrush_detach_list[i].car->car_crush_spec->field_0x144
+                && BitIsInBentPartOfCar(gCrush_detach_list[i].actor,
+                    gCrush_detach_list[i].car->car_crush_spec->field_0x174,
+                    gCrush_detach_list[i].car->car_crush_spec->field_0x180)) {
+                continue;
+            }
+            if (gCrush_detach_list[i].car->car_crush_spec->field_0x4b8) {
+                continue;
+            }
+            if (gNet_mode != eNet_mode_none) {
+                if (gCrush_detach_list[i].field_0x10) {
+                    synced = 0;
+                    for (j = 0; j < gCount_net_crush_detach_list; j++) {
+                        if (gNet_crush_detach_list[j].actor == gCrush_detach_list[i].actor) {
+                            synced = 1;
+                            break;
+                        }
+                    }
+                    if (!synced) {
+                        SendDetachBit(gCrush_detach_list[i].car, gCrush_detach_list[i].actor);
+                    }
+                } else {
+                    synced = 0;
+                    for (j = 0; j < gCount_net_crush_semi_detach_bit_list; j++) {
+                        if (gNet_crush_semi_detach_bit_list[j].actor == gCrush_detach_list[i].actor) {
+                            synced = 1;
+                            break;
+                        }
+                    }
+                    if (!synced) {
+                        SendSemiDetachBit(gCrush_detach_list[i].car, gCrush_detach_list[i].actor, gCrush_detach_list[i].field_0x8, NULL);
+                    }
+                }
+            } else if (gCrush_detach_list[i].field_0x10) {
+                DetachBit(gCrush_detach_list[i].car, gCrush_detach_list[i].actor, NULL);
+            } else {
+                SemiDetachBit(gCrush_detach_list[i].car, gCrush_detach_list[i].actor, gCrush_detach_list[i].field_0x8, &keep, NULL, NULL, NULL, NULL);
+            }
+        }
+        if (keep) {
+            if (new_count != i) {
+                gCrush_detach_list[new_count] = gCrush_detach_list[i];
+            }
+            new_count++;
+        }
+    }
+    gCount_crush_detach_list = new_count;
+}
 
 // FlapBit
 
