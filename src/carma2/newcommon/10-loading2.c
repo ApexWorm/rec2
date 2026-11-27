@@ -989,7 +989,8 @@ void C2_HOOK_FASTCALL ReadNonCarMechanicsData(FILE* pF, tNon_car_spec* pNon_car_
     UpdateCollisionObject(pNon_car_spec->collision_info);
     pNon_car_spec->collision_info->actor = pNon_car_spec->car_master_actor;
     pNon_car_spec->collision_info->bb2 = pNon_car_spec->collision_info->bb1;
-    ReadShrapnelMaterials(pF, pNon_car_spec);
+    /* FIXME: the original passes the tNon_car_spec as the tCar_spec it shares this layout with (as LoadCar) */
+    ReadShrapnelMaterials(pF, (tCar_spec*)pNon_car_spec);
     pNon_car_spec->collision_info->object_friction = 0.4f;
     while (index_version > 100) {
         GetAString(pF, s);
@@ -1324,18 +1325,20 @@ br_material* C2_HOOK_FASTCALL GetSimpleMaterial(char* pName, tRendererShadingTyp
     return gSimple_materials[i];
 }
 
-inline void C2_HOOK_FASTCALL ReadShrapnelMaterials(FILE* pF, tNon_car_spec* pNon_car_spec) {
+// FUNCTION: CARMA2_HW 0x00488f00
+// FUNCTION: CARMA2_SW 0x00486120
+// FUNCTION: CARMA2_CHEAT 0x004892e0
+inline void C2_HOOK_FASTCALL ReadShrapnelMaterials(FILE* pF, tCar_spec* pCar_spec) {
     int i;
     char s[256];
 
-    /* FIXME: LoadCar reads a tCar_spec's shrapnel materials the same way (both structs share this layout) */
-    pNon_car_spec->count_shrapnel_materials = GetAnInt(pF);
-    for (i = 0; i < pNon_car_spec->count_shrapnel_materials; i++) {
+    pCar_spec->count_shrapnel_materials = GetAnInt(pF);
+    for (i = 0; i < pCar_spec->count_shrapnel_materials; i++) {
         GetALineAndDontArgue(pF, s);
-        if (pNon_car_spec == NULL || pNon_car_spec->driver < eDriver_oppo) {
-            pNon_car_spec->shrapnel_materials[i] = GetSimpleMaterial(s, kRendererShadingType_Default);
+        if (pCar_spec != NULL && pCar_spec->driver > eDriver_5) {
+            pCar_spec->shrapnel_materials[i] = GetSimpleMaterial(s, kRendererShadingType_Specular);
         } else {
-            pNon_car_spec->shrapnel_materials[i] = GetSimpleMaterial(s, kRendererShadingType_Specular);
+            pCar_spec->shrapnel_materials[i] = GetSimpleMaterial(s, kRendererShadingType_Default);
         }
     }
 }
