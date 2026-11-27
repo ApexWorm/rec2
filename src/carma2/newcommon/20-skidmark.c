@@ -60,6 +60,7 @@ int gINT_006a32e0 = 0;
 
 // GLOBAL: CARMA2_HW 0x006a27e8
 // GLOBAL: CARMA2_SW 0x0069c840
+// GLOBAL: CARMA2_CHEAT 0x006aa360
 tU16 gCurrent_skid = 0;
 
 // FUNCTION: CARMA2_HW 0x004ea2c0
@@ -273,16 +274,16 @@ int C2_HOOK_FASTCALL SkidSection(tU16* pSkid_id, br_vector3* pSkid_start, br_vec
         return 1;
     }
     if (*pSkid_id >= REC2_ASIZE(gSkids)
-        || gSkids[*pSkid_id].actor->material != pMaterial
+        || pMaterial != gSkids[*pSkid_id].actor->material
         || UglyWidthChange(*pSkid_id, pTexture_step)
         || SkidLen(*pSkid_id) > 0.5f
         || FarFromLine2D(pPos, pSkid_start, pSkid_end)
         || Reflex2D(pPos, pSkid_start, pPrev_pos)) {
-        BrVector3Copy(pSkid_start, pPrev_pos);
-        BrVector3Copy(pSkid_end, pPos);
+        *pSkid_start = *pPrev_pos;
+        *pSkid_end = *pPos;
         gSkids[gCurrent_skid].actor->render_style = BR_RSTYLE_DEFAULT;
         gSkids[gCurrent_skid].actor->material = pMaterial;
-        BrVector3Copy(&gSkids[gCurrent_skid].normal, pNorm);
+        gSkids[gCurrent_skid].normal = *pNorm;
         StretchMark(&gSkids[gCurrent_skid], pPrev_pos, pPos, pTexture_start, pTexture_step);
         PipeSingleSkidAdjustment(gCurrent_skid, &gSkids[gCurrent_skid].actor->t.t.mat, pMaterial);
         *pSkid_id = gCurrent_skid;
