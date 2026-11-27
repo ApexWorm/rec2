@@ -1361,9 +1361,9 @@ inline void C2_HOOK_FASTCALL SetAmbientPratCam(tCar_spec* pCar) {
     if (pCar->number_of_wheels_on_ground != 0) {
         last_time_on_ground = the_time;
     }
-    vcs_x = pCar->collision_info->velocity_car_space.v[0] / 1000.f;
-    vcs_y = pCar->collision_info->velocity_car_space.v[1] / 1000.f;
-    vcs_z = pCar->collision_info->velocity_car_space.v[2] / 1000.f;
+    vcs_x = pCar->collision_info->velocity_car_space.v[0] / 1000.0f;
+    vcs_y = pCar->collision_info->velocity_car_space.v[1] / 1000.0f;
+    vcs_z = pCar->collision_info->velocity_car_space.v[2] / 1000.0f;
     abs_vcs_x = fabs(vcs_x);
     abs_vcs_y = fabs(vcs_y);
     abs_vcs_z = fabs(vcs_z);
@@ -1375,9 +1375,9 @@ inline void C2_HOOK_FASTCALL SetAmbientPratCam(tCar_spec* pCar) {
         ChangeAmbientPratcam(9);
     } else if (abs_omega_y > 4.5f) {
         ChangeAmbientPratcam(12);
-    } else if (abs_omega_x > 3.f || abs_omega_z > 3.f) {
+    } else if (abs_omega_x > 3.0f || abs_omega_z > 3.0f) {
         ChangeAmbientPratcam(8);
-    } else if (abs_omega_y > 3.f) {
+    } else if (abs_omega_y > 3.0f) {
         ChangeAmbientPratcam(11);
     } else if (pCar->car_master_actor->t.t.mat.m[1][1] < 0.1f) {
         ChangeAmbientPratcam(44);
@@ -1516,16 +1516,16 @@ void C2_HOOK_FASTCALL MungeCarGraphics(tU32 pFrame_period) {
                     float raw_revs;
                     float rev_reducer;
 
-                    sine_angle = FRandomBetween(.4f, 1.6f) * ((float)GetTotalTime() / ((float)gCountdown * 100.f));
+                    sine_angle = FRandomBetween(.4f, 1.6f) * ((float)GetTotalTime() / ((float)gCountdown * 100.0f));
                     sine_angle = frac(sine_angle) * 360.0f;
                     sine_angle = FastScalarSin((int)sine_angle);
                     raw_revs = the_car->red_line * fabs(sine_angle);
-                    rev_reducer = (11.f - (float)(gCountdown)) / 10.f;
+                    rev_reducer = (11.0f - (float)(gCountdown)) / 10.0f;
                     the_car->revs = rev_reducer * raw_revs;
                 } else {
                     the_car->revs = (the_car->speedo_speed / 0.003f - (float)(int)(the_car->speedo_speed / 0.003))
                                     * (float)(the_car->red_line - 800)
-                                    + 800.f;
+                                    + 800.0f;
                 }
             }
             for (i = 0; i < the_car->number_of_steerable_wheels; i++) {
@@ -1564,7 +1564,7 @@ void C2_HOOK_FASTCALL MungeCarGraphics(tU32 pFrame_period) {
                                         * the_car->speed_revs_ratio
                                         * (float)the_car->gear
                                         * (float)gFrame_period
-                                        / (1000.f * WORLD_SCALE))
+                                        / (1000.0f * WORLD_SCALE))
                                         / the_car->driven_wheels_circum;
                     } else if (the_car->keys.brake) {
                         wheel_speed = 0.0;
@@ -1581,7 +1581,7 @@ void C2_HOOK_FASTCALL MungeCarGraphics(tU32 pFrame_period) {
                 ControlBoundFunkGroovePlus(the_car->driven_wheels_spin_ref_4, wheel_speed);
             }
             if (!gAction_replay_mode) {
-                if (the_car->driver == eDriver_local_human && the_car->collision_info->M < 5.f) {
+                if (the_car->driver == eDriver_local_human && the_car->collision_info->M < 5.0f) {
                     br_scalar abs_omega_x;
                     br_scalar abs_omega_y;
                     br_scalar abs_omega_z;
