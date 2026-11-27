@@ -19,6 +19,7 @@
 
 // GLOBAL: CARMA2_HW 0x00595f84
 // GLOBAL: CARMA2_SW 0x00590ee4
+// GLOBAL: CARMA2_CHEAT 0x0059c804
 int gINT_00595f84 = 7500;
 
 // GLOBAL: CARMA2_HW 0x00595f88
@@ -28,10 +29,12 @@ int gJoystick_index = -1;
 
 // GLOBAL: CARMA2_HW 0x00595f90
 // GLOBAL: CARMA2_SW 0x00590ef0
+// GLOBAL: CARMA2_CHEAT 0x0059c810
 float gJoystick_x_steering = 1.f;
 
 // GLOBAL: CARMA2_HW 0x00595f94
 // GLOBAL: CARMA2_SW 0x00590ef4
+// GLOBAL: CARMA2_CHEAT 0x0059c814
 float gJoystick_y_throttle = 1.f;
 
 // GLOBAL: CARMA2_HW 0x00596310
@@ -88,6 +91,7 @@ int C2_HOOK_FASTCALL ReadUntilCharacter(FILE* pF, char* pBuffer, int pBuffer_siz
 
 // FUNCTION: CARMA2_HW 0x0045b920
 // FUNCTION: CARMA2_SW 0x0045b3a0
+// FUNCTION: CARMA2_CHEAT 0x0045bda0
 int C2_HOOK_FASTCALL WriteJoystickPreferences(FILE* pF, const tButtonJoystickInfo* pInfo) {
     char s[256];
     char joystick_name[256];
@@ -124,6 +128,7 @@ int C2_HOOK_FASTCALL WriteJoystickPreferences(FILE* pF, const tButtonJoystickInf
 
 // FUNCTION: CARMA2_HW 0x0045b7e0
 // FUNCTION: CARMA2_SW 0x0045b260
+// FUNCTION: CARMA2_CHEAT 0x0045bc60
 int C2_HOOK_FASTCALL FindJoystickPreferences(FILE* pF, const char* pJoystick_name) {
     fpos_t position;
     char joystick_name[256];
@@ -162,6 +167,7 @@ int C2_HOOK_FASTCALL FindJoystickPreferences(FILE* pF, const char* pJoystick_nam
 
 // FUNCTION: CARMA2_HW 0x0045bbc0
 // FUNCTION: CARMA2_SW 0x0045b640
+// FUNCTION: CARMA2_CHEAT 0x0045c040
 int C2_HOOK_FASTCALL ReadJoystickPreferences(FILE* pF, tButtonJoystickInfo* pInfo) {
     char s[256];
     size_t count_buttons;
