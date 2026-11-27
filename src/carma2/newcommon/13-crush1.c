@@ -18,6 +18,7 @@
 #include "41-utility.h"
 #include "49-physics.h"
 #include "51-smash.h"
+#include "52-errors.h"
 #include "53-controls.h"
 #include "60-phil.h"
 #include "69-sound.h"
@@ -2721,9 +2722,72 @@ void C2_HOOK_FASTCALL ReceivedToggleFlaps(tNet_message_chunk* pContents) {
     }
 }
 
-// SHNonCarOwner
+extern tCar_spec* C2_HOOK_FASTCALL SHNonCarOwner(tNon_car_spec* pNon_car);
 
-// SendSHNonCar
+inline tCar_spec* C2_HOOK_FASTCALL SHNonCarOwner(tNon_car_spec* pNon_car) {
+
+    if (pNon_car->car_master_actor != NULL) {
+        return pNon_car->car_master_actor->user;
+    } else {
+        return NULL;
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x0043d690
+// FUNCTION: CARMA2_SW 0x0043d6e0
+// FUNCTION: CARMA2_CHEAT 0x0043d910
+void C2_HOOK_FASTCALL SendSHNonCar(tNon_car_spec* pNon_car, tU32 pTime, tNet_game_player_info* pPlayer) {
+    tNet_message* message;
+    tNet_message_chunk* contents;
+    tCar_spec* car;
+    tNet_game_player_info* player;
+    int size;
+    int contents_size;
+
+    message = NULL;
+    size = GetHierarchyNetworkSize(pNon_car->collision_info);
+    contents_size = size + offsetof(tNet_message_chunk_sh_non_car, object_hierarchy);
+    if (pPlayer == NULL) {
+        if (pNon_car->collision_info->disable_move_rotate && (pNon_car->flags & 0x100000)) {
+            message = NetBuildGuaranteedMessage(eNet_message_chunk_type_sh_non_car, contents_size);
+            contents = &message->contents;
+            pNon_car->flags &= ~0x100000;
+        } else {
+            contents = NetStartBroadcastContents(eNet_message_chunk_type_sh_non_car, contents_size);
+        }
+    } else {
+        contents = NetGetToPlayerContents(eNet_message_chunk_type_sh_non_car, contents_size, pPlayer->ID);
+    }
+    if (contents == NULL) {
+        return;
+    }
+    car = SHNonCarOwner(pNon_car);
+#ifdef REC2_CHEAT
+    if (car == NULL) {
+        PDFatalError("Can't find split half's owner");
+    }
+#endif
+    player = NetPlayerFromCar(car);
+#ifdef REC2_CHEAT
+    if (player == NULL) {
+        PDFatalError("Can't find player for split half's car");
+    }
+#endif
+    contents->sh_non_car.player = player->ID;
+    contents->sh_non_car.time = pTime;
+    contents->sh_non_car.flags = pNon_car->collision_info->disable_move_rotate << 1;
+    CompressPlane(&contents->sh_non_car.plane, &car->car_crush_spec->field_0x548);
+    if (GetHierarchyNetworkStuff(pNon_car->collision_info, contents->sh_non_car.object_hierarchy, NET_OBJECT_HIERARCHY_DEFAULT_SIZE) != size) {
+        FatalError(kFatalError_NetContentsTooBig_S, "in split half non_car object data");
+    }
+    if (pPlayer == NULL) {
+        if (message == NULL) {
+            NetBroadcastContents(contents);
+        } else {
+            NetGuaranteedSendMessageToEverybody(gCurrent_net_game, message, NULL);
+        }
+    }
+}
 
 // SendAllSHNonCars
 

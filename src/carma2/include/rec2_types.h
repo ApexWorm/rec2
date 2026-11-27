@@ -4332,8 +4332,7 @@ typedef struct tCar_crush_spec {
     br_actor* actor; /* ->user is tCar_spec pointer */
     br_actor* model_actor;
     undefined field_0x4d4[0x548 - 0x4d4];
-    br_vector3 field_0x548;
-    float field_0x554;
+    br_vector4 field_0x548;
     br_vector3 driver_position;
     tCollision_shape_wireframe* field_0x564[4];
     tU32 field_0x574;
@@ -5461,6 +5460,7 @@ typedef enum {
     eNet_message_chunk_type_car_crush = 0x20,
     eNet_message_chunk_type_semi_detach_bit = 0x24,
     eNet_message_chunk_type_reattach_bit = 0x26,
+    eNet_message_chunk_type_sh_non_car = 0x29,
     eNet_message_chunk_type_reattach_all_bits = 0x2b,
     eNet_message_chunk_type_toggle_doors = 0x2c,
     eNet_message_chunk_type_view_car = 0x2f,
@@ -5550,6 +5550,15 @@ typedef struct {
     tPlayer_ID player;
     tU32 time;
 } tNet_message_chunk_reattach_all_bits;
+
+typedef struct {
+    tNet_message_chunk_header header;
+    tPlayer_ID player;
+    tU32 time;
+    tU16 flags;
+    tCompressed_vector4 plane;
+    tU8 object_hierarchy[];
+} tNet_message_chunk_sh_non_car;
 
 typedef struct {
     tNet_message_chunk_header header;
@@ -5699,6 +5708,7 @@ typedef union {
     tNet_message_car_crush car_crush; /* type = 0x20 */
     tNet_message_chunk_semi_detach_bit semi_detach_bit; /* type = 0x24 */
     tNet_message_chunk_reattach_bit reattach_bit; /* type = 0x26 */
+    tNet_message_chunk_sh_non_car sh_non_car; /* type = 0x29 */
     tNet_message_chunk_reattach_all_bits reattach_all_bits; /* type = 0x2b */
     tNet_message_chunk_toggle_doors toggle_doors; /* type = 0x2c */
     tNet_message_chunk_view_car view_car; /* type = 0x2f */
