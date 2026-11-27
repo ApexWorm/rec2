@@ -12,6 +12,7 @@
 #include "c2_hooks.h"
 #include "rec2_types.h"
 
+extern tU8 gPed_noise_interruptible[11];
 extern int gAnimalsOn;
 extern int gFlameThrowerOn;
 extern int gExplosives_on;
@@ -127,7 +128,7 @@ extern void C2_HOOK_FASTCALL StartPedRunning(tPedestrian* pPed, tU32 pTime, int 
 
 extern void C2_HOOK_FASTCALL SetPedHeadAnim(tPedestrian* pPed, const tPed_anim_seq* pSeq, tU32 pTime);
 
-// ClearPedHeadAnim
+extern void C2_HOOK_FASTCALL ClearPedHeadAnim(tPedestrian* pPed);
 
 // ScarePedestrian
 

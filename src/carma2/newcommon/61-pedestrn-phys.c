@@ -42,6 +42,12 @@
 #include <stdarg.h>
 #include <string.h>
 
+/* FIXME: name is a guess: MakePedNoise only interrupts a playing noise whose entry is set with one whose entry is not */
+// GLOBAL: CARMA2_HW 0x0065d758
+// GLOBAL: CARMA2_SW 0x00658090
+// GLOBAL: CARMA2_CHEAT 0x00664e10
+tU8 gPed_noise_interruptible[11] = { 0, 0, 0, 0, 1, 0, 1, 1, 1, 1, 1 };
+
 // GLOBAL: CARMA2_HW 0x0065d7c8
 // GLOBAL: CARMA2_SW 0x00658100
 // GLOBAL: CARMA2_CHEAT 0x00664e80
@@ -771,11 +777,40 @@ int C2_HOOK_FASTCALL IsActorRenderworthy(br_actor* pActor) {
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x004cd880
-// STUB: CARMA2_SW 0x004c9f80
-// STUB: CARMA2_CHEAT 0x004d3410
+// FUNCTION: CARMA2_HW 0x004cd880
+// FUNCTION: CARMA2_SW 0x004c9f80
+// FUNCTION: CARMA2_CHEAT 0x004d3410
 void C2_HOOK_FASTCALL MakePedNoise(tPedestrian* pPed, int pArg2, int pArg3, tPhysics_object* pCollision_info) {
-    NOT_IMPLEMENTED();
+    tPed_personality_sound* sound;
+    int sound_id;
+    tS3_sound_tag tag;
+
+    if (pPed->field_0x0c == NULL) {
+        return;
+    }
+    if (pPed->field_0x0c->field_0x9c != 0 && pPed->field_0x0c->field_0xa0 >= 0 && DRS3SoundStillPlaying(pPed->field_0x0c->field_0x9c)) {
+        if (pPed->field_0x0c->field_0xa0 == pArg2) {
+            return;
+        }
+        if (gPed_noise_interruptible[pArg2]) {
+            return;
+        }
+        if (!gPed_noise_interruptible[pPed->field_0x0c->field_0xa0]) {
+            return;
+        }
+        DRS3StopSound(pPed->field_0x0c->field_0x9c);
+        pPed->field_0x0c->field_0x9c = 0;
+    }
+    pPed->field_0x0c->field_0x20 = pArg3;
+    pPed->field_0x0c->field_0xa0 = pArg2;
+    sound = &pPed->character->personality->sounds->sounds[pArg2];
+    sound_id = sound->sounds[IRandomBetween(0, sound->count_sounds - 1)];
+    if (pCollision_info != NULL && pCollision_info->owner != NULL && pCollision_info->flags_0x238 == 1 && ((tCar_spec*)pCollision_info->owner)->driver == eDriver_local_human) {
+        tag = DRS3StartSound2(gPedestrians_outlet, sound_id, pArg3 == 0, 255, 255, (int)(65536.0 / gAverage_ped_scale), 0x10000);
+    } else {
+        tag = DRS3StartSound3D(gPedestrians_outlet, sound_id, &pPed->pos, &gZero_v__car, pArg3 == 0, 255, (int)(65536.0 / gAverage_ped_scale), 0x10000);
+    }
+    pPed->field_0x0c->field_0x9c = tag;
 }
 
 #ifdef REC2_MATCHING
@@ -900,7 +935,12 @@ inline void C2_HOOK_FASTCALL SetPedHeadAnim(tPedestrian* pPed, const tPed_anim_s
     }
 }
 
-// ClearPedHeadAnim
+inline void C2_HOOK_FASTCALL ClearPedHeadAnim(tPedestrian* pPed) {
+
+    if (pPed->field_0x0c != NULL) {
+        pPed->field_0x0c->field_0x1c = NULL;
+    }
+}
 
 // ScarePedestrian
 
@@ -1285,11 +1325,23 @@ void C2_HOOK_FASTCALL ScoreForKilledPedestrian(tPedestrian* pPed, float pHeight)
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x004cce70
-// STUB: CARMA2_SW 0x004c9570
-// STUB: CARMA2_CHEAT 0x004d29e0
+// FUNCTION: CARMA2_HW 0x004cce70
+// FUNCTION: CARMA2_SW 0x004c9570
+// FUNCTION: CARMA2_CHEAT 0x004d29e0
 void C2_HOOK_FASTCALL KillPedestrian(tPedestrian* pPed, tPhysics_object* pCollision_info) {
-    NOT_IMPLEMENTED();
+
+#define ROOT_OBJECT(C) (((C)->field_0x14 & 0x1) ? (C)->personality->form->simple_physicing[(tS8)(C)->field_0x5].collision_info : GetRootObject(C))
+    if ((ROOT_OBJECT(pPed->character)->last_special_volume == NULL
+            || ROOT_OBJECT(pPed->character)->last_special_volume->gravity_multiplier >= 1.0f)
+        && gGoreLevel > 0) {
+        SetCharacterBoneModelAR(pPed->character, -1, 0, 1);
+        SetCharacterBoneModelAR(pPed->character, pPed->character->personality->form->index_head_bone, 2, 1);
+        ClearPedHeadAnim(pPed);
+        DoGiblets(pPed, ROOT_OBJECT(pPed->character), pCollision_info, 0.4f, &pPed->pos, 1);
+    }
+#undef ROOT_OBJECT
+    OneLessPed(pPed);
+    ScoreForKilledPedestrian(pPed, 0.0f);
 }
 
 #ifdef REC2_MATCHING
