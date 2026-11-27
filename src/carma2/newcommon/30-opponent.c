@@ -31,10 +31,12 @@
 
 // GLOBAL: CARMA2_HW 0x0065a3bc
 // GLOBAL: CARMA2_SW 0x00654cd4
+// GLOBAL: CARMA2_CHEAT 0x00660d48
 const char* gCop_name = "Faceless Cop";
 
 // GLOBAL: CARMA2_HW 0x0065a3c0
 // GLOBAL: CARMA2_SW 0x00654cd8
+// GLOBAL: CARMA2_CHEAT 0x00660d4c
 const char* gDrone_name = "Innocent Civilian";
 
 // GLOBAL: CARMA2_HW 0x0065a3c4
@@ -69,14 +71,17 @@ int gNumber_of_cops_before_faffage;
 
 // GLOBAL: CARMA2_HW 0x00691758
 // GLOBAL: CARMA2_SW 0x0068b7b0
+// GLOBAL: CARMA2_CHEAT 0x00699108
 int gNum_of_opponents_completing_race;
 
 // GLOBAL: CARMA2_HW 0x00691740
 // GLOBAL: CARMA2_SW 0x0068b798
+// GLOBAL: CARMA2_CHEAT 0x006990ec
 int gNum_of_opponents_getting_near;
 
 // GLOBAL: CARMA2_HW 0x00691718
 // GLOBAL: CARMA2_SW 0x0068b770
+// GLOBAL: CARMA2_CHEAT 0x00698fc0
 int gNum_of_opponents_pursuing;
 
 // GLOBAL: CARMA2_HW 0x0069175c
@@ -86,6 +91,7 @@ tU8* gBit_per_node;
 
 // GLOBAL: CARMA2_HW 0x00691764
 // GLOBAL: CARMA2_SW 0x0068b7bc
+// GLOBAL: CARMA2_CHEAT 0x00699114
 float gIn_view_distance;
 
 // GLOBAL: CARMA2_HW 0x0069176c
