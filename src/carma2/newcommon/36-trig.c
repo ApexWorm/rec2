@@ -475,6 +475,16 @@ void C2_HOOK_FASTCALL DRMatrix23Rotate(br_matrix23* mat, br_angle rz) {
     mat->m[2][1] = 0.0f;
 }
 
+// FUNCTION: CARMA2_HW 0x00513140
+// FUNCTION: CARMA2_SW 0x0050e580
+// FUNCTION: CARMA2_CHEAT 0x00518b30
+void C2_HOOK_FASTCALL DRMatrix23PreRotate(br_matrix23* mat, br_angle rz) {
+
+    DRMatrix23Rotate(&mat23tmp2__trig, rz);
+    BrMatrix23Mul(&mat23tmp1__trig, &mat23tmp2__trig, mat);
+    BrMatrix23Copy(mat, &mat23tmp1__trig);
+}
+
 // FUNCTION: CARMA2_HW 0x005132a0
 // FUNCTION: CARMA2_SW 0x0050e6e0
 // FUNCTION: CARMA2_CHEAT 0x00518c90
