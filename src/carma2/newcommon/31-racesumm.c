@@ -8,17 +8,70 @@
 
 #include "31-racesumm.h"
 
+#include "01-network.h"
+#include "18-graphics2.h"
 #include "30-opponent.h"
+#include "35-intrface.h"
+#include "69-sound.h"
+#include "72-interface.h"
+#include "platform.h"
 
 #include "globvars.h"
+#include "globvrpb.h"
 
-// SortScores
+#include <stdlib.h>
 
-// SortGameScores
+// GLOBAL: CARMA2_HW 0x007051a0
+// GLOBAL: CARMA2_SW 0x006fbc60
+// GLOBAL: CARMA2_CHEAT 0x0070c840
+int gPlayer_lookup_racesumm[12]; /* FIXME: size is a guess (one per net player) */
 
-// DoNetRaceSummary
+// FUNCTION: CARMA2_HW 0x004e33a0
+// FUNCTION: CARMA2_SW 0x004df720
+// FUNCTION: CARMA2_CHEAT 0x004e8f20
+static int C2_HOOK_CDECL SortScores(const void* pFirst_one, const void* pSecond_one) {
 
-// DoEndRaceSummary
+    return gNet_players[*(const int*)pSecond_one].score - gNet_players[*(const int*)pFirst_one].score;
+}
+
+void C2_HOOK_FASTCALL SortGameScores(void) {
+
+    qsort(gPlayer_lookup_racesumm, gNumber_of_net_players, sizeof(int), SortScores);
+}
+
+void C2_HOOK_FASTCALL DoNetRaceSummary(void) {
+    int i;
+    tU32 start_time;
+
+    NetPlayerStatusChanged(ePlayer_status_summary);
+    start_time = PDGetTotalTime();
+    while (!gReceived_game_scores && (int)(PDGetTotalTime() - start_time) < 20000) {
+        NetService(0);
+    }
+    if (gReceived_game_scores) {
+        for (i = 0; i < gNumber_of_net_players; i++) {
+            gPlayer_lookup_racesumm[i] = i;
+        }
+        SortGameScores();
+        FRONTEND_Main(kFrontend_menu_networksummary);
+        NetPlayerStatusChanged(ePlayer_status_loading);
+        FadePaletteDown();
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x004e32b0
+// FUNCTION: CARMA2_SW 0x004df630
+// FUNCTION: CARMA2_CHEAT 0x004e8e30
+void C2_HOOK_FASTCALL DoEndRaceSummary(tRace_result pRace_result, int pGame_completed) {
+
+    ResetInterfaceTimeout__intrface();
+    if (gNet_mode != eNet_mode_none) {
+        DoNetRaceSummary();
+    } else if (!pGame_completed && AnyBuyableCars()) {
+        StartMusicTrack(9998);
+        FRONTEND_Main(kFrontend_menu_wrecks);
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x004e33d0
 // FUNCTION: CARMA2_SW 0x004df760
