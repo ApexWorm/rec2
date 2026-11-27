@@ -129,7 +129,7 @@ extern void C2_HOOK_FASTCALL ARMoveToEndOfReplay(tReplay_session_callback* pBetw
 
 extern void C2_HOOK_FASTCALL ARMoveToStartOfReplay(tReplay_session_callback* pBetween_sessions, tPreprocess_AR_callback* pBefore_frame, tPostProcess_AR_callback* pAfter_frame);
 
-// ARDoActionReplay
+extern void C2_HOOK_FASTCALL ARDoActionReplay(int pUnused, tReplay_session_callback* pBetween_sessions, tPreprocess_AR_callback* pBefore_frame, tPostProcess_AR_callback* pAfter_frame);
 
 extern void C2_HOOK_FASTCALL ReverseSound(tS3_effect_tag pEffect, tS3_sound_tag pTag);
 
@@ -305,7 +305,7 @@ extern void C2_HOOK_FASTCALL PipeSingleDroneStraightPos(tDrone_spec* pDrone, tDr
 
 extern void C2_HOOK_FASTCALL PipeSinglePowerupRespawn(br_actor* pActor, int pPowerup_id);
 
-// PipeSingleShitMine
+extern void C2_HOOK_FASTCALL PipeSingleShitMine(br_actor* pActor);
 
 extern void C2_HOOK_FASTCALL PipeSingleEndShitMine(br_actor* pActor);
 
@@ -343,7 +343,7 @@ extern void C2_HOOK_FASTCALL ApplyFrameBoundary(tPipe_chunk** pChunk);
 
 // ApplySound
 
-// ApplyCar
+extern void C2_HOOK_FASTCALL ApplyCar(tPipe_chunk** pChunk);
 
 extern void C2_HOOK_FASTCALL ApplyGWS(tPipe_chunk** pChunk);
 
@@ -359,7 +359,7 @@ extern void C2_HOOK_FASTCALL ApplyFlap(tPipe_chunk** pChunk);
 
 extern void C2_HOOK_FASTCALL ApplyModelMash(tPipe_chunk** pChunk);
 
-// ApplyRelink
+extern void C2_HOOK_FASTCALL ApplyRelink(tPipe_chunk** pChunk);
 
 extern void C2_HOOK_FASTCALL ApplyIdentity(tPipe_chunk** pChunk);
 
@@ -401,7 +401,7 @@ extern void C2_HOOK_FASTCALL ApplyPedDir(tPipe_chunk** pChunk);
 
 extern void C2_HOOK_FASTCALL ApplyPedFPChange(tPipe_chunk** pChunk);
 
-// ApplyPedPos
+extern void C2_HOOK_FASTCALL ApplyPedPos(tPipe_chunk** pChunk);
 
 // ApplyPedModelChange
 
@@ -445,7 +445,7 @@ extern void C2_HOOK_FASTCALL ApplyEndShitMine(tPipe_chunk** pChunk);
 
 extern void C2_HOOK_FASTCALL ApplyTransformType(tPipe_chunk** pChunk);
 
-// ApplyOppoRenderage
+extern void C2_HOOK_FASTCALL ApplyOppoRenderage(tPipe_chunk** pChunk);
 
 // UndoCrush
 
@@ -469,7 +469,7 @@ extern void C2_HOOK_FASTCALL UndoModelMash(tPipe_chunk** pChunk, tPipe_chunk* pP
 
 extern void C2_HOOK_FASTCALL UndoRelink(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk);
 
-// UndoSplitWeld
+extern void C2_HOOK_FASTCALL UndoSplitWeld(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk);
 
 extern void C2_HOOK_FASTCALL UndoBend(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk);
 
