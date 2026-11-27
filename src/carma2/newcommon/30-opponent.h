@@ -178,6 +178,20 @@ extern int C2_HOOK_FASTCALL RematerialiseOpponent(tOpponent_spec* pOpponent_spec
 
 // ResetPredominantJobbies
 
+#ifdef REC2_CHEAT
+extern char gOppo_path_filename[256];
+
+extern void C2_HOOK_FASTCALL DeleteSection(tS16 pSection_to_delete);
+
+extern void C2_HOOK_FASTCALL DeleteNode(tS16 pNode_to_delete, int pAnd_sections);
+
+extern void C2_HOOK_FASTCALL DeleteOrphanNodes(void);
+
+extern int C2_HOOK_FASTCALL ConsistencyCheck(void);
+
+extern void C2_HOOK_FASTCALL WriteOutOppoPaths(void);
+#endif
+
 extern void C2_HOOK_FASTCALL LoadCopCars(tRace_info* pRace_info);
 
 extern void C2_HOOK_FASTCALL LoadInOppoPaths(FILE* pF);

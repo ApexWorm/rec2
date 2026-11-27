@@ -133,6 +133,11 @@ int gNum_active_cars;
 // GLOBAL: CARMA2_CHEAT 0x00699150
 int gRoute_search_attempts;
 
+#ifdef REC2_CHEAT
+// GLOBAL: CARMA2_CHEAT 0x00698fd0
+char gOppo_path_filename[256];
+#endif
+
 // GLOBAL: CARMA2_HW 0x00691778
 // GLOBAL: CARMA2_SW 0x0068b7d0
 // GLOBAL: CARMA2_CHEAT 0x00699158
@@ -1199,6 +1204,54 @@ int C2_HOOK_FASTCALL RematerialiseOpponent(tOpponent_spec* pOpponent_spec, br_sc
 
 // ResetPredominantJobbies
 
+#ifdef REC2_CHEAT
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_CHEAT 0x004b0d30
+void C2_HOOK_FASTCALL DeleteSection(tS16 pSection_to_delete) {
+    NOT_IMPLEMENTED();
+}
+
+// STUB: CARMA2_CHEAT 0x004b0ea0
+void C2_HOOK_FASTCALL DeleteNode(tS16 pNode_to_delete, int pAnd_sections) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
+
+inline void C2_HOOK_FASTCALL DeleteOrphanNodes(void) {
+    tS16 node_no;
+
+    for (node_no = 0; node_no < gProgram_state.AI_vehicles.number_of_path_nodes; node_no++) {
+        while (node_no < gProgram_state.AI_vehicles.number_of_path_nodes && gProgram_state.AI_vehicles.path_nodes[node_no].number_of_sections == 0) {
+            DeleteNode(node_no, 1);
+        }
+    }
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_CHEAT 0x004b1ec0
+int C2_HOOK_FASTCALL ConsistencyCheck(void) {
+    NOT_IMPLEMENTED();
+}
+
+// STUB: CARMA2_CHEAT 0x004b2310
+void C2_HOOK_FASTCALL WriteOutOppoPaths(void) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
+#endif
+
 // FUNCTION: CARMA2_HW 0x004a9600
 // FUNCTION: CARMA2_SW 0x004a5770
 // FUNCTION: CARMA2_CHEAT 0x004aa920
@@ -1227,7 +1280,14 @@ void C2_HOOK_FASTCALL LoadInOppoPaths(FILE* pF) {
     br_vector3 positive_y_vector;
     br_vector3 intersect;
     br_vector3 cop_to_section;
+#ifdef REC2_CHEAT
+    int data_errors;
+    int sections_to_delete;
+    tS16 delete_these[1024];
 
+    data_errors = 0;
+    sections_to_delete = 0;
+#endif
     DoNotDprintf("Start of LoadInOppoPaths()...");
     gProgram_state.AI_vehicles.number_of_path_nodes = 0;
     gProgram_state.AI_vehicles.number_of_path_sections = 0;
@@ -1281,10 +1341,44 @@ void C2_HOOK_FASTCALL LoadInOppoPaths(FILE* pF) {
                         DoNotDprintf("ERROR: Too many sections (including section #%d) attached to node #%d",
                             section_no,
                             (tS16)gProgram_state.AI_vehicles.path_sections[section_no].node_indices[node_no]);
+#ifdef REC2_CHEAT
+                        data_errors = 1;
+#endif
                     }
                 }
+#ifdef REC2_CHEAT
+                BrVector3Sub(&section_v,
+                    &gProgram_state.AI_vehicles.path_nodes[(tS16)gProgram_state.AI_vehicles.path_sections[section_no].node_indices[1]].pos,
+                    &gProgram_state.AI_vehicles.path_nodes[(tS16)gProgram_state.AI_vehicles.path_sections[section_no].node_indices[0]].pos);
+                if (BrVector3LengthSquared(&section_v) == 0.f) {
+                    DoNotDprintf("ERROR: Opponent path section #%d has zero length (nodes #%d and #%d are in same position). Section and one node will be deleted.",
+                        section_no,
+                        (tS16)gProgram_state.AI_vehicles.path_sections[section_no].node_indices[0],
+                        (tS16)gProgram_state.AI_vehicles.path_sections[section_no].node_indices[1]);
+                    delete_these[sections_to_delete] = section_no;
+                    sections_to_delete++;
+                }
+#endif
             }
         }
+#ifdef REC2_CHEAT
+        if (data_errors) {
+            PDFatalError("Opponent path data inconsistencies. Unable to rectumify them.");
+        }
+        if (sections_to_delete != 0) {
+            for (i = 0; i < sections_to_delete; i++) {
+                DoNotDprintf("Deleting section #%d (was #%d)", delete_these[i], i + delete_these[i]);
+                DeleteSection(delete_these[i]);
+                DeleteOrphanNodes();
+                for (node_no = i; node_no < sections_to_delete; node_no++) {
+                    delete_these[i]--;
+                }
+            }
+            WriteOutOppoPaths();
+            sprintf(s, "Errors in opponent path data. All have been corrected and written out to '%s'. Refer to diagnostic file for more details.", gOppo_path_filename);
+            PDFatalError(s);
+        }
+#endif
         if (gAusterity_mode || gNet_mode != eNet_mode_none) {
             gProgram_state.AI_vehicles.number_of_cops = GetAnInt(pF);
             for (i = 0; i < gProgram_state.AI_vehicles.number_of_cops; i++) {
@@ -1322,6 +1416,9 @@ void C2_HOOK_FASTCALL LoadInOppoPaths(FILE* pF) {
         DoNotDprintf("End of LoadInOppoPaths(), totals:");
         DoNotDprintf("Nodes: %d", gProgram_state.AI_vehicles.number_of_path_nodes);
         DoNotDprintf("Sections: %d", gProgram_state.AI_vehicles.number_of_path_sections);
+#ifdef REC2_CHEAT
+        ConsistencyCheck();
+#endif
     }
 }
 
