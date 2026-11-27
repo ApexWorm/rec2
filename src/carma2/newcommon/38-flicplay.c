@@ -589,6 +589,15 @@ int gFlic_bunch0[29] = {
     27, 36, 28, 29, 130, 131, 132, 42, 43, 135, 45
 };
 
+// FUNCTION: CARMA2_HW 0x00461980
+// FUNCTION: CARMA2_SW 0x00461420
+// FUNCTION: CARMA2_CHEAT 0x00461df0
+void C2_HOOK_FASTCALL SetFlicSound(int pSound_ID, tU32 pSound_time) {
+
+    gSound_ID = pSound_ID;
+    gSound_time = pSound_time;
+}
+
 // FUNCTION: CARMA2_HW 0x00461990
 // FUNCTION: CARMA2_SW 0x00461430
 // FUNCTION: CARMA2_CHEAT 0x00461e00

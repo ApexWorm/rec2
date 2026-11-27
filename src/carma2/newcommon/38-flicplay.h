@@ -49,6 +49,8 @@ extern int gPanel_flic_disable;
 extern int gPending_flic;
 extern int gPending_pending_flic;
 
+extern void C2_HOOK_FASTCALL SetFlicSound(int pSound_ID, tU32 pSound_time);
+
 extern int C2_HOOK_FASTCALL TranslationMode(void);
 
 extern void C2_HOOK_FASTCALL DontLetFlicFuckWithPalettes(void);
