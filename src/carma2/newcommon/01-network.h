@@ -76,7 +76,7 @@ extern void C2_HOOK_FASTCALL FillInThisPlayer(tNet_game_details* pGame, tNet_gam
 
 // LoadCarN
 
-// DisposeCarN
+extern void C2_HOOK_FASTCALL DisposeCarN(int pIndex);
 
 // PlayerHasLeft
 

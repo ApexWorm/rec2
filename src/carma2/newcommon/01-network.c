@@ -9,14 +9,18 @@
 #include "01-network.h"
 
 #include "04-netgame.h"
+#include "08-loading1.h"
 #include "15-displays.h"
 #include "18-graphics2.h"
 #include "18b-graphics2.h"
 #include "19-font.h"
+#include "22-replay.h"
+#include "23-piping.h"
 #include "32-spark.h"
 #include "41-utility.h"
 #include "47-win95net.h"
 #include "53-controls.h"
+#include "60-phil.h"
 #include "68-timer.h"
 #include "platform.h"
 #include "globvars.h"
@@ -515,7 +519,37 @@ void C2_HOOK_FASTCALL FillInThisPlayer(tNet_game_details* pGame, tNet_game_playe
 
 // LoadCarN
 
-// DisposeCarN
+// FUNCTION: CARMA2_HW 0x0049e100
+// FUNCTION: CARMA2_SW 0x0049a280
+// FUNCTION: CARMA2_CHEAT 0x0049e640
+void C2_HOOK_FASTCALL DisposeCarN(int pIndex) {
+    int i;
+    int j;
+
+    if (gNet_players[pIndex].car != NULL) {
+        for (i = 0; i < gCurrent_race.number_of_racers; i++) {
+            if (gCurrent_race.opponent_list[i].car_spec == gNet_players[pIndex].car) {
+                gCurrent_race.number_of_racers--;
+                for (j = i; j < gCurrent_race.number_of_racers; j++) {
+                    gCurrent_race.opponent_list[j] = gCurrent_race.opponent_list[j + 1];
+                }
+            }
+        }
+        PHILRemoveObject(gNet_players[pIndex].car->collision_info);
+        if (gProgram_state.racing) {
+            DisposeKevStuffCar(gNet_players[pIndex].car);
+        }
+        DisposeCar(gNet_players[pIndex].car, gNet_players[pIndex].car_index);
+        if (pIndex != gThis_net_player_index) {
+            BrMemFree(gNet_players[pIndex].car);
+            gNet_players[pIndex].car = NULL;
+        }
+        if (gAction_replay_mode) {
+            ToggleReplay(NULL, NULL);
+        }
+        ARResetPiping();
+    }
+}
 
 // PlayerHasLeft
 
