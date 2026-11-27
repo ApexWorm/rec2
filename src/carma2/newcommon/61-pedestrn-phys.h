@@ -27,9 +27,9 @@ extern void C2_HOOK_FASTCALL AssertRootObjectsMatrix(tPed_character_instance* pP
 
 extern void C2_HOOK_FASTCALL ResetPedFaceCache(void);
 
-// SetPedCurrentFace
+extern void C2_HOOK_FASTCALL SetPedCurrentFace(tPedestrian* pPed, br_vector3* pPos);
 
-// RecachePedestrian
+extern void C2_HOOK_FASTCALL RecachePedestrian(tPedestrian* pPed, br_vector3* pPos, tU32 pTime);
 
 extern void C2_HOOK_FASTCALL SetCharacterDirectionAR(tPed_character_instance* pPed, const br_vector3* pDir, const br_vector3* pUp);
 
@@ -209,11 +209,11 @@ extern void C2_HOOK_FASTCALL DamagePedestrian(tPedestrian* pPed, int pDamage, in
 
 // PedHeadingTowardsCollisionObject
 
-// OutsideFaceXZ
+extern int C2_HOOK_FASTCALL OutsideFaceXZ(const br_vector3* pPos, const tFace_ref* pFace);
 
 // RescanPedProximity
 
-// RecacheAndSetFace
+extern tPed_face_cache_0x34* C2_HOOK_FASTCALL RecacheAndSetFace(tPedestrian* pPed, int* pOn_face, int* pFace_changed, br_vector3* pPos, int pForce, tU32 pTime);
 
 // PedScanForObjects
 

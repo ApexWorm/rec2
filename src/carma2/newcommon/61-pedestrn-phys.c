@@ -139,7 +139,7 @@ inline void C2_HOOK_FASTCALL ResetPedFaceCache(void) {
     }
 }
 
-static inline void C2_HOOK_FASTCALL SetPedCurrentFace(tPedestrian* pPed, br_vector3* pPos) {
+inline void C2_HOOK_FASTCALL SetPedCurrentFace(tPedestrian* pPed, br_vector3* pPos) {
     tPed_face_cache_0x34* face_cache;
 
     if (pPed->field_0x0c != NULL) {
@@ -1317,7 +1317,7 @@ void C2_HOOK_FASTCALL DamagePedestrian(tPedestrian* pPed, int pDamage, int pArg3
 
 // PedHeadingTowardsCollisionObject
 
-static inline int C2_HOOK_FASTCALL OutsideFaceXZ(const br_vector3* pPos, const tFace_ref* pFace) {
+inline int C2_HOOK_FASTCALL OutsideFaceXZ(const br_vector3* pPos, const tFace_ref* pFace) {
     int result;
     br_scalar dx1;
     br_scalar dz1;
