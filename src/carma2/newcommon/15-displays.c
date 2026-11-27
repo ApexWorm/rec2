@@ -466,6 +466,18 @@ inline void C2_HOOK_FASTCALL KillOldestQueuedHeadup(void) {
     memcpy(&gQueued_headups[0], &gQueued_headups[1], gQueued_headup_count * sizeof(tQueued_headup));
 }
 
+// FUNCTION: CARMA2_HW 0x004497b0
+// FUNCTION: CARMA2_SW 0x00449900
+// FUNCTION: CARMA2_CHEAT 0x00449cc0
+void C2_HOOK_FASTCALL ClearQueuedHeadups(void) {
+
+    if (gQueued_headup_count != 0) {
+        do {
+            KillOldestQueuedHeadup();
+        } while (gQueued_headup_count != 0);
+    }
+}
+
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
 #endif
