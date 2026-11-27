@@ -48,7 +48,7 @@ extern int C2_HOOK_FASTCALL ToggleJoystickThrottle(void);
 
 extern void C2_HOOK_FASTCALL SetJoystickDPadEnabled(int pEnabled);
 
-extern int C2_HOOK_FASTCALL PlayExclusiveFFBEffect(const char* pEffect_name, int pArg2);
+extern void C2_HOOK_FASTCALL PlayExclusiveFFBEffect(const char* pEffect_name, int pArg2);
 
 extern int C2_HOOK_FASTCALL CycleJoystickFFBGain(void);
 
