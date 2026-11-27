@@ -31,6 +31,7 @@ address,type,name
 0x0057cd30,library,__fsopen
 0x0057cd60,library,_fopen
 0x0057ce90,library,_fsetpos
+0x0057ceb0,library,_fgetpos
 0x0057cee0,library,_ftell
 0x0057d090,library,_fwrite
 0x0057d1e0,library,_free

@@ -19,6 +19,7 @@
 
 // GLOBAL: CARMA2_HW 0x00595f84
 // GLOBAL: CARMA2_SW 0x00590ee4
+// GLOBAL: CARMA2_CHEAT 0x0059c804
 int gINT_00595f84 = 7500;
 
 // GLOBAL: CARMA2_HW 0x00595f88
@@ -28,10 +29,12 @@ int gJoystick_index = -1;
 
 // GLOBAL: CARMA2_HW 0x00595f90
 // GLOBAL: CARMA2_SW 0x00590ef0
+// GLOBAL: CARMA2_CHEAT 0x0059c810
 float gJoystick_x_steering = 1.f;
 
 // GLOBAL: CARMA2_HW 0x00595f94
 // GLOBAL: CARMA2_SW 0x00590ef4
+// GLOBAL: CARMA2_CHEAT 0x0059c814
 float gJoystick_y_throttle = 1.f;
 
 // GLOBAL: CARMA2_HW 0x00596310
@@ -41,10 +44,12 @@ int gINT_00596310 = 50;
 
 // GLOBAL: CARMA2_HW 0x00686184
 // GLOBAL: CARMA2_SW 0x006808c4
+// GLOBAL: CARMA2_CHEAT 0x0068da2c
 int gJoystick_preferences_backup_valid;
 
 // GLOBAL: CARMA2_HW 0x0079d8c0
 // GLOBAL: CARMA2_SW 0x00793e20
+// GLOBAL: CARMA2_CHEAT 0x007a4f60
 tButtonJoystickInfo gJoystick_preferences_backup;
 
 typedef struct tJoystick_preference_node {
@@ -61,6 +66,7 @@ int C2_HOOK_FASTCALL HasCurrentJoystick(void) {
 
 // FUNCTION: CARMA2_HW 0x0045a2e0
 // FUNCTION: CARMA2_SW 0x0045a070
+// FUNCTION: CARMA2_CHEAT 0x0045a760
 void C2_HOOK_FASTCALL PeekCharacter(FILE* pF) {
     char c;
 
@@ -70,6 +76,7 @@ void C2_HOOK_FASTCALL PeekCharacter(FILE* pF) {
 
 // FUNCTION: CARMA2_HW 0x0045a300
 // FUNCTION: CARMA2_SW 0x0045a090
+// FUNCTION: CARMA2_CHEAT 0x0045a780
 int C2_HOOK_FASTCALL ReadUntilCharacter(FILE* pF, char* pBuffer, int pBuffer_size, char pLimit_char) {
     int i;
     char s[2];
@@ -88,6 +95,7 @@ int C2_HOOK_FASTCALL ReadUntilCharacter(FILE* pF, char* pBuffer, int pBuffer_siz
 
 // FUNCTION: CARMA2_HW 0x0045b920
 // FUNCTION: CARMA2_SW 0x0045b3a0
+// FUNCTION: CARMA2_CHEAT 0x0045bda0
 int C2_HOOK_FASTCALL WriteJoystickPreferences(FILE* pF, const tButtonJoystickInfo* pInfo) {
     char s[256];
     char joystick_name[256];
@@ -124,6 +132,7 @@ int C2_HOOK_FASTCALL WriteJoystickPreferences(FILE* pF, const tButtonJoystickInf
 
 // FUNCTION: CARMA2_HW 0x0045b7e0
 // FUNCTION: CARMA2_SW 0x0045b260
+// FUNCTION: CARMA2_CHEAT 0x0045bc60
 int C2_HOOK_FASTCALL FindJoystickPreferences(FILE* pF, const char* pJoystick_name) {
     fpos_t position;
     char joystick_name[256];
@@ -162,6 +171,7 @@ int C2_HOOK_FASTCALL FindJoystickPreferences(FILE* pF, const char* pJoystick_nam
 
 // FUNCTION: CARMA2_HW 0x0045bbc0
 // FUNCTION: CARMA2_SW 0x0045b640
+// FUNCTION: CARMA2_CHEAT 0x0045c040
 int C2_HOOK_FASTCALL ReadJoystickPreferences(FILE* pF, tButtonJoystickInfo* pInfo) {
     char s[256];
     size_t count_buttons;
@@ -192,6 +202,7 @@ int C2_HOOK_FASTCALL ReadJoystickPreferences(FILE* pF, tButtonJoystickInfo* pInf
 
 // FUNCTION: CARMA2_HW 0x0045bcc0
 // FUNCTION: CARMA2_SW 0x0045b740
+// FUNCTION: CARMA2_CHEAT 0x0045c140
 int C2_HOOK_FASTCALL CountJoystickPreferences(FILE* pF) {
     char s[256];
     int count = 0;
@@ -403,6 +414,7 @@ int C2_HOOK_FASTCALL LoadJoystickPreferences(void) {
 
 // FUNCTION: CARMA2_HW 0x0045c1e0
 // FUNCTION: CARMA2_SW 0x0045bc60
+// FUNCTION: CARMA2_CHEAT 0x0045c660
 void C2_HOOK_FASTCALL BackupJoystickPreferences(void) {
     tButtonJoystickInfo* info;
 
@@ -415,6 +427,7 @@ void C2_HOOK_FASTCALL BackupJoystickPreferences(void) {
 
 // FUNCTION: CARMA2_HW 0x0045c210
 // FUNCTION: CARMA2_SW 0x0045bc90
+// FUNCTION: CARMA2_CHEAT 0x0045c690
 void C2_HOOK_FASTCALL RestoreJoystickPreferences(void) {
     tButtonJoystickInfo* info;
 
