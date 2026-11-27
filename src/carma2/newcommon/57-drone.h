@@ -57,9 +57,9 @@ extern int C2_HOOK_CDECL LinkyCallback(br_actor* pActor, void* pData);
 
 // LinkDroneActorsToModelsAndSetRenderStyle
 
-// LoadDroneActorsModels
+extern void C2_HOOK_FASTCALL LoadDroneActorsModels(tDrone_spec* pDrone_spec);
 
-// ReadPastBoundsShapesHeader
+extern int C2_HOOK_FASTCALL ReadPastBoundsShapesHeader(FILE* pF);
 
 // ReadPastThisLine
 
@@ -75,9 +75,9 @@ extern br_actor* C2_HOOK_CDECL MrFindy(br_actor* pActor, const char* pName);
 
 // GetReversenessFromString
 
-// LoadFunksAndGrooves
+extern void C2_HOOK_FASTCALL LoadFunksAndGrooves(tDrone_spec* pDrone_spec, FILE* pF);
 
-// LoadDrone
+extern void C2_HOOK_FASTCALL LoadDrone(int pIndex);
 
 // CalculateDrivingInfo
 
@@ -87,7 +87,7 @@ extern br_actor* C2_HOOK_CDECL MrFindy(br_actor* pActor, const char* pName);
 
 // NewDroneState
 
-// ResetDroneCrushyModel
+extern void C2_HOOK_FASTCALL ResetDroneCrushyModel(br_model* pSource, br_model* pDest);
 
 // ResetDroneModel
 
