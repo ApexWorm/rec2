@@ -841,9 +841,28 @@ void C2_HOOK_FASTCALL MungeButtonModels(tFrontend_spec* pFrontend, int pButton_i
     }
 }
 
-// ScrollUp
+inline void C2_HOOK_FASTCALL ScrollUp(tFrontend_spec* pFrontend, int pScroller) {
 
-// ScrollDn
+    if (pFrontend->scrollers[pScroller].indexTopItem > pFrontend->scrollers[pScroller].indexFirstScrollableItem) {
+        pFrontend->scrollers[pScroller].indexTopItem -= 1;
+    }
+}
+
+inline void C2_HOOK_FASTCALL ScrollDn(tFrontend_spec* pFrontend, int pScroller) {
+#ifdef REC2_SW
+
+    if (pFrontend->scrollers[pScroller].indexTopItem + pFrontend->scrollers[pScroller].nbDisplayedAtOnce < pFrontend->scrollers[pScroller].indexFirstScrollableItem + pFrontend->scrollers[pScroller].count) {
+        pFrontend->scrollers[pScroller].indexTopItem += 1;
+    }
+#else
+    int top;
+
+    top = pFrontend->scrollers[pScroller].indexTopItem;
+    if (top + pFrontend->scrollers[pScroller].nbDisplayedAtOnce < pFrontend->scrollers[pScroller].count + pFrontend->scrollers[pScroller].indexFirstScrollableItem) {
+        pFrontend->scrollers[pScroller].indexTopItem = top + 1;
+    }
+#endif
+}
 
 // int C2_HOOK_FASTCALL GetItemAtMousePos(tFrontend_spec *pFrontend, int pX, int pY); // Moved for inlining purposes
 
@@ -1349,11 +1368,48 @@ void C2_HOOK_FASTCALL RefreshRacesScroller(tFrontend_spec* pFrontend) {
 
 // UpdateNetTrackScroller
 
-// void C2_HOOK_FASTCALL RefreshNetRacesScroller(tFrontend_spec* pFrontend); // Moved for inlining purposes
+inline void C2_HOOK_FASTCALL RefreshNetRacesScroller(tFrontend_spec* pFrontend) {
+    int i;
+    int race_index;
 
-// NetRaceUp
+    race_index = pFrontend->scrollers[1].indexTopItem - pFrontend->scrollers[1].indexFirstScrollableItem;
+    for (i = pFrontend->scrollers[1].indexFirstScrollableItem; i <= pFrontend->scrollers[1].indexLastScrollableItem; i++) {
+        strcpy(pFrontend->items[i].text, gRace_list[race_index].name);
+        race_index++;
+    }
+    FuckWithWidths(pFrontend);
+    MungeButtonModels(pFrontend, 0);
+}
 
-// NetRaceDn
+// FUNCTION: CARMA2_HW 0x00466c00
+// FUNCTION: CARMA2_SW 0x00466990
+// FUNCTION: CARMA2_CHEAT 0x00467050
+int C2_HOOK_FASTCALL NetRaceUp(tFrontend_spec* pFrontend) {
+
+    gFrontend_net_current_roll = PDGetTotalTime();
+    if ((int)(gFrontend_net_current_roll - gFrontend_net_last_roll) < 300) {
+        return 0;
+    }
+    gFrontend_net_last_roll = gFrontend_net_current_roll;
+    ScrollUp(pFrontend, 1);
+    RefreshNetRacesScroller(pFrontend);
+    return 0;
+}
+
+// FUNCTION: CARMA2_HW 0x00466da0
+// FUNCTION: CARMA2_SW 0x00466b30
+// FUNCTION: CARMA2_CHEAT 0x004671f0
+int C2_HOOK_FASTCALL NetRaceDn(tFrontend_spec* pFrontend) {
+
+    gFrontend_net_current_roll = PDGetTotalTime();
+    if ((int)(gFrontend_net_current_roll - gFrontend_net_last_roll) < 300) {
+        return 0;
+    }
+    gFrontend_net_last_roll = gFrontend_net_current_roll;
+    ScrollDn(pFrontend, 1);
+    RefreshNetRacesScroller(pFrontend);
+    return 0;
+}
 
 // SaveSinglePlayerState
 
@@ -1376,7 +1432,26 @@ void C2_HOOK_FASTCALL MaybeRestoreSavedGame(void) {
 
 // NetworkJoinUpdateScroller
 
-// void C2_HOOK_FASTCALL UpdateScrollPositions(tFrontend_spec* pFrontend); // Moved for inlining purposes
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// FUNCTION: CARMA2_HW 0x00467a70
+// FUNCTION: CARMA2_SW 0x004677f0
+// FUNCTION: CARMA2_CHEAT 0x00467ec0
+void C2_HOOK_FASTCALL UpdateScrollPositions(tFrontend_spec* pFrontend) {
+
+    if (gCurrent_frontend_spec == &gFrontend_MAIN) {
+        RefreshRacesScroller(pFrontend);
+    }
+    if (gCurrent_frontend_spec == &gFrontend_NETWORK) {
+        RefreshNetRacesScroller(pFrontend);
+    }
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // FUNCTION: CARMA2_HW 0x00466ec0
 // FUNCTION: CARMA2_SW 0x00466c50

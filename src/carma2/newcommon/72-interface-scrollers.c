@@ -31,29 +31,3 @@ int C2_HOOK_FASTCALL GetItemAtMousePos(tFrontend_spec *pFrontend, int pX, int pY
     }
     return -1;
 }
-
-void C2_HOOK_FASTCALL RefreshNetRacesScroller(tFrontend_spec* pFrontend) {
-    const tRace_list_spec* race_list_item;
-    int i;
-
-    race_list_item = &gRace_list[pFrontend->scrollers[1].indexTopItem - pFrontend->scrollers[1].indexFirstScrollableItem];
-    for (i = pFrontend->scrollers[1].indexFirstScrollableItem; i <= pFrontend->scrollers[1].indexLastScrollableItem; race_list_item++, i++) {
-
-        strcpy(pFrontend->items[i].text, race_list_item->name);
-    }
-    FuckWithWidths(pFrontend);
-    MungeButtonModels(pFrontend, 0);
-}
-
-// FUNCTION: CARMA2_HW 0x00467a70
-// FUNCTION: CARMA2_SW 0x004677f0
-// FUNCTION: CARMA2_CHEAT 0x00467ec0
-void C2_HOOK_FASTCALL UpdateScrollPositions(tFrontend_spec* pFrontend) {
-
-    if (gCurrent_frontend_spec == &gFrontend_MAIN) {
-        RefreshRacesScroller(pFrontend);
-    }
-    if (gCurrent_frontend_spec == &gFrontend_NETWORK) {
-        RefreshNetRacesScroller(pFrontend);
-    }
-}
