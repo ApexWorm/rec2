@@ -17,6 +17,7 @@
 
 // GLOBAL: CARMA2_HW 0x00667f48
 // GLOBAL: CARMA2_SW 0x006626d8
+// GLOBAL: CARMA2_CHEAT 0x0066f7f8
 br_token_entry predefinedTokens[461] = {
     { { NULL, NULL }, "ABGR_1_5_5_5",                BRT_NONE,              BRT_ABGR_1_5_5_5,               12  },
     { { NULL, NULL }, "ABGR_4_4_4_4",                BRT_NONE,              BRT_ABGR_4_4_4_4,               12  },
@@ -483,6 +484,7 @@ br_token_entry predefinedTokens[461] = {
 
 // GLOBAL: CARMA2_HW 0x0066aa80
 // GLOBAL: CARMA2_SW 0x00665210
+// GLOBAL: CARMA2_CHEAT 0x00672330
 token_type tokenTypes[37] = {
     { "_M34_X", BRT_MATRIX34_FIXED,   6, },
     { "_M23_F", BRT_MATRIX23_FLOAT,   6, },
