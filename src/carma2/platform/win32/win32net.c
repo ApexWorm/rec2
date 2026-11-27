@@ -35,6 +35,7 @@ char gPathNetworkIni[240];
 int gPathNetworkIniValid;
 
 // GLOBAL: CARMA2_HW 0x006ac12c
+// GLOBAL: CARMA2_SW 0x006a567c
 // GLOBAL: CARMA2_CHEAT 0x006b37bc
 tU16 gIpx_sock_addr;
 
@@ -44,6 +45,8 @@ tU16 gIpx_sock_addr;
 struct sockaddr gLocal_address;
 
 // GLOBAL: CARMA2_HW 0x006abf08
+// GLOBAL: CARMA2_SW 0x006a5458
+// GLOBAL: CARMA2_CHEAT 0x006b3598
 struct sockaddr gLocal_address_2;
 
 // GLOBAL: CARMA2_HW 0x006ac358
@@ -52,6 +55,8 @@ struct sockaddr gLocal_address_2;
 struct sockaddr* gPtr_local_address; /* FIXME: rename to gLocal_addr_ipx? */
 
 // GLOBAL: CARMA2_HW 0x006ac118
+// GLOBAL: CARMA2_SW 0x006a5668
+// GLOBAL: CARMA2_CHEAT 0x006b37a8
 struct sockaddr gListen_address;
 
 // GLOBAL: CARMA2_HW 0x006ac340
@@ -59,16 +64,21 @@ struct sockaddr gListen_address;
 struct sockaddr* gPtr_listen_address;  /* FIXME: rename to gRemote_addr_ipx? */
 
 // GLOBAL: CARMA2_HW 0x006ac300
+// GLOBAL: CARMA2_SW 0x006a5850
+// GLOBAL: CARMA2_CHEAT 0x006b3990
 struct sockaddr gBroadcast_address;
 
 // GLOBAL: CARMA2_HW 0x006ac348
 struct sockaddr gLast_received_addr;
 
 // GLOBAL: CARMA2_HW 0x006abf00
+// GLOBAL: CARMA2_SW 0x006a5450
 // GLOBAL: CARMA2_CHEAT 0x006b3590
 struct sockaddr* gPtr_broadcast_address;
 
 // GLOBAL: CARMA2_HW 0x006ac170
+// GLOBAL: CARMA2_SW 0x006a56c0
+// GLOBAL: CARMA2_CHEAT 0x006b3800
 WSADATA gWSA_data;
 
 // GLOBAL: CARMA2_HW 0x006619b0
@@ -77,6 +87,8 @@ WSADATA gWSA_data;
 SOCKET gSocket = SOCKET_ERROR;
 
 // GLOBAL: CARMA2_HW 0x006ac320
+// GLOBAL: CARMA2_SW 0x006a5870
+// GLOBAL: CARMA2_CHEAT 0x006b39b0
 char gLocal_address_text[32];
 
 // GLOBAL: CARMA2_HW 0x006ac128
@@ -92,13 +104,18 @@ int gMsg_header_strlen;
 int gSpecial_server;
 
 // GLOBAL: CARMA2_HW 0x006ac130
+// GLOBAL: CARMA2_SW 0x006a5680
 // GLOBAL: CARMA2_CHEAT 0x006b37c0
 char gIpx_network_numbers [16][4];
 
 // GLOBAL: CARMA2_HW 0x006ac360
+// GLOBAL: CARMA2_SW 0x006a58b0
+// GLOBAL: CARMA2_CHEAT 0x006b39f0
 char gSend_buffer[512];
 
 // GLOBAL: CARMA2_HW 0x006abf18
+// GLOBAL: CARMA2_SW 0x006a5468
+// GLOBAL: CARMA2_CHEAT 0x006b35a8
 char gReceive_buffer[512];
 
 // GLOBAL: CARMA2_HW 0x006ac35c
