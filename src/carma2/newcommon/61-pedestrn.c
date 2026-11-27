@@ -517,7 +517,7 @@ tPed_movement_spec* gPed_movements;
 // FUNCTION: CARMA2_HW 0x004d5730
 // FUNCTION: CARMA2_SW 0x004d1e20
 // FUNCTION: CARMA2_CHEAT 0x004db2f0
-int C2_HOOK_FASTCALL OrientationChanged(const br_matrix34* pOrientation_1, const br_matrix34* pOrientation_2, float pCos_angle) {
+inline int C2_HOOK_FASTCALL OrientationChanged(const br_matrix34* pOrientation_1, const br_matrix34* pOrientation_2, float pCos_angle) {
     if (BrVector3Dot((br_vector3*)pOrientation_1->m[0], (br_vector3*)pOrientation_2->m[0]) < pCos_angle
         || BrVector3Dot((br_vector3*)pOrientation_1->m[1], (br_vector3*)pOrientation_2->m[1]) < pCos_angle
         || BrVector3Dot((br_vector3*)pOrientation_1->m[2], (br_vector3*)pOrientation_2->m[2]) < pCos_angle) {
@@ -580,7 +580,28 @@ inline void C2_HOOK_FASTCALL ResetPedFaceCache(void) {
 
 // RecachePedestrian
 
-// SetCharacterDirectionAR
+// FUNCTION: CARMA2_HW 0x004d3360
+// FUNCTION: CARMA2_SW 0x004cfa50
+// FUNCTION: CARMA2_CHEAT 0x004d8f20
+void C2_HOOK_FASTCALL SetCharacterDirectionAR(tPed_character_instance* pPed, const br_vector3* pDir, const br_vector3* pUp) {
+    tPhysics_object* object;
+
+    if (pPed->field_0x14 & 0x1) {
+        object = pPed->personality->form->simple_physicing[(tS8)pPed->field_0x5].collision_info;
+    } else {
+        object = GetRootObject(pPed);
+    }
+    if (gAction_replay_mode && !gBOOL_00744804) {
+        return;
+    }
+    if (!(pPed->field_0x14 & 0x4) && gProgram_state.racing) {
+        PipeSinglePedDir(((tS16)pPed->ped->field_0x06 << 16) | (pPed->ped - gPedestrian_array), pDir);
+    }
+    SetCharacterDirection(pPed, pDir, pUp);
+    if (gProgram_state.racing && OrientationChanged(&object->transform_matrix, &object->actor->t.t.mat, .7f)) {
+        AssertRootObjectsMatrix(pPed);
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x004ca4d0
 // FUNCTION: CARMA2_SW 0x004c6c00
