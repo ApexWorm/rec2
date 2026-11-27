@@ -15,7 +15,7 @@
 #include "28-world3.h"
 #include "41-utility.h"
 #include "55-volume.h"
-#include "61-pedestrn.h"
+#include "61-pedestrn-phys.h"
 #include "70-packfile.h"
 #include "globvars.h"
 
