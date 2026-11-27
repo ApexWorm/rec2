@@ -14,8 +14,10 @@
 #include "globvars.h"
 #include "platform.h"
 
-#include <QTML.h>
+#include <FileTypesAndCreators.h>
 #include <Movies.h>
+#include <QTML.h>
+#include <Script.h>
 
 #include "c2_string.h"
 
@@ -23,6 +25,26 @@
 // GLOBAL: CARMA2_SW 0x0069ac7c
 // GLOBAL: CARMA2_CHEAT 0x006a879c
 int gQuickTime_initialized;
+
+// GLOBAL: CARMA2_HW 0x006a0af0
+// GLOBAL: CARMA2_SW 0x0069ab48
+// GLOBAL: CARMA2_CHEAT 0x006a8668
+short gQuicktime_movie_file;
+
+// GLOBAL: CARMA2_HW 0x006a0b08
+// GLOBAL: CARMA2_SW 0x0069ab60
+// GLOBAL: CARMA2_CHEAT 0x006a8680
+FSSpec gQt_file_spec;
+
+// GLOBAL: CARMA2_HW 0x006a0c18
+// GLOBAL: CARMA2_SW 0x0069ac70
+// GLOBAL: CARMA2_CHEAT 0x006a8790
+struct Rect gQuicktime_rect;
+
+// GLOBAL: CARMA2_HW 0x006a0c30
+// GLOBAL: CARMA2_SW 0x0069ac88
+// GLOBAL: CARMA2_CHEAT 0x006a87a8
+Movie gQuicktime_movie;
 
 // GLOBAL: CARMA2_HW 0x006a0c50
 // GLOBAL: CARMA2_SW 0x0069aca8
@@ -82,7 +104,24 @@ char gDefault_quick_time_compressor[32] = "animation";
 
 // GetCompressorTypeFromOptions
 
-// InitMovie
+// FUNCTION: CARMA2_HW 0x004e0f20
+// FUNCTION: CARMA2_SW 0x004dd240
+// FUNCTION: CARMA2_CHEAT 0x004e6ae0
+OSErr C2_HOOK_FASTCALL InitMovie(void) {
+    OSErr err;
+
+    gQuicktime_rect.top = 0;
+    gQuicktime_rect.left = 0;
+    gQuicktime_rect.right = GetMovieWidth();
+    gQuicktime_rect.bottom = GetMovieHeight();
+    err = CreateMovieFile(&gQt_file_spec, sigMoviePlayer, smCurrentScript, createMovieFileDeleteCurFile, &gQuicktime_movie_file, &gQuicktime_movie);
+    if (err != noErr) {
+        PathCat(gQuick_time_temp_path, gApplication_path, "QTTMP");
+        PathCat(gQuick_time_movie_path_stub, gApplication_path, "MOVIE");
+        err = CreateMovieFile(&gQt_file_spec, sigMoviePlayer, smCurrentScript, createMovieFileDeleteCurFile, &gQuicktime_movie_file, &gQuicktime_movie);
+    }
+    return err;
+}
 
 // CreateMovie
 

@@ -9,6 +9,8 @@
 #ifndef __MOVIES__
 #define __MOVIES__
 
+#include "c2_hooks.h"
+
 #include "Files.h"
 #include "MacTypes.h"
 
@@ -51,7 +53,7 @@ extern Movie  FlattenMovieData(
     ScriptCode      scriptTag,
     long            createMovieFileFlags);
 
-extern OSErr CreateMovieFile(
+extern OSErr C2_HOOK_CDECL CreateMovieFile(
     const FSSpec *  fileSpec,
     OSType          creator,
     ScriptCode      scriptTag,

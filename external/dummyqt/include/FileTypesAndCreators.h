@@ -12,7 +12,7 @@
 #include "ConditionalMacros.h"
 
 enum {
-    sigMoviePlayer              = FOUR_CHAR_CODE('T', 'V', '0', 'D'),
+    sigMoviePlayer              = FOUR_CHAR_CODE('T', 'V', 'O', 'D'),
 };
 
 #endif /* __FILETYPESANDCREATORS__ */
