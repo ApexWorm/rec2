@@ -1438,7 +1438,24 @@ void C2_HOOK_FASTCALL PedApplyGibShower(tU32 pId, tU32 pTime, unsigned int pSeed
     DoGibShower(pId, pTime, pSeed, pForce, pStart_size, pPosition, pAlternate_position, pImpactee_velocity);
 }
 
-// PedUndoGibShower
+// FUNCTION: CARMA2_HW 0x004ccc40
+// FUNCTION: CARMA2_SW 0x004c9340
+// FUNCTION: CARMA2_CHEAT 0x004d27b0
+void C2_HOOK_FASTCALL PedUndoGibShower(tU32 pCurrent_time, tU32 pId, tU32 pTime, unsigned int pSeed, float pForce, int pStart_size, br_vector3* pPosition, br_vector3* pAlternate_position, br_vector3* pImpactee_velocity) {
+    int i;
+    tSmash_vertex* frag;
+    float delta_time;
+
+    DoGibShower(pId, pTime, pSeed, pForce, pStart_size, pPosition, pAlternate_position, pImpactee_velocity);
+    delta_time = (float)(int)(pCurrent_time - pTime);
+    for (i = 0, frag = gSmash_glass_fragments; i < (int)REC2_ASIZE(gSmash_glass_fragments); i++, frag++) {
+        if (frag->end_time != 0 && frag->field_0x18 == pId) {
+            frag->field_0x34 = 0;
+            DoFragMovement(frag, GetTotalTime(), delta_time);
+            frag->field_0x34 = 1;
+        }
+    }
+}
 
 // DoGiblets
 
