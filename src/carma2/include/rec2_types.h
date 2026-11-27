@@ -5172,7 +5172,10 @@ typedef enum {
 } tNet_game_type;
 
 typedef struct {
-    char addr[16]; /* struct sockaddr addr; */
+    /* FIXME: the original stores a 14-byte SOCKADDR_IPX here (NetHostGame copies the host name to offset 0xe of
+     * tNet_game_details, PDNetGetNextJoinGame copies 14 bytes into it). A port using another transport must fit its
+     * address into these 14 bytes (a sockaddr_in does: only its zero padding is cut off). */
+    char addr[14]; /* SOCKADDR_IPX addr; */
 } tPD_net_player_info;
 
 typedef struct {
@@ -5192,8 +5195,7 @@ typedef struct {
 
 typedef struct tNet_game_details {
     tPD_net_player_info pd_net_info;
-    undefined4 field_0x10;
-    char field_0x14[28];
+    char host_name[32];
     tPlayer_ID host_ID;
     int num_players;
     int start_race;

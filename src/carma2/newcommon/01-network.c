@@ -8,6 +8,7 @@
 
 #include "01-network.h"
 
+#include "13-crush1.h"
 #include "15-displays.h"
 #include "18-graphics2.h"
 #include "18b-graphics2.h"
@@ -26,6 +27,7 @@
 
 #include "rec2_macros.h"
 
+#include "c2_stdio.h"
 #include "c2_string.h"
 #include <stddef.h>
 
@@ -595,7 +597,10 @@ void C2_HOOK_FASTCALL NetLeaveGame(tNet_game_details* pNet_game) {
     }
 }
 
-// NetSetPlayerSystemInfo
+inline void C2_HOOK_FASTCALL NetSetPlayerSystemInfo(tNet_game_player_info* pPlayer, void* pSender_address) {
+
+    PDNetSetPlayerSystemInfo(pPlayer, pSender_address);
+}
 
 // FUNCTION: CARMA2_HW 0x0049e3a0
 // FUNCTION: CARMA2_SW 0x0049a520
@@ -669,7 +674,51 @@ void C2_HOOK_FASTCALL NetPlayersChanged(int pNew_count, tNet_game_player_info* p
 #pragma auto_inline(on)
 #endif
 
-// NetHostGame
+// FUNCTION: CARMA2_HW 0x0049e210
+// FUNCTION: CARMA2_SW 0x0049a390
+// FUNCTION: CARMA2_CHEAT 0x0049e750
+tNet_game_details* C2_HOOK_FASTCALL NetHostGame(tNet_game_type pGame_type, tNet_game_options* pOptions, int pStart_rank, char* pHost_name, int pCar_index) {
+    tNet_game_details* game;
+    void* host_address;
+    tNet_game_player_info me;
+
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tNet_game_details, host_name, 0xe);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tNet_game_details, host_ID, 0x30);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tNet_game_details, type, 0x74);
+
+    game = NetAllocatePIDGameDetails();
+    if (pHost_name[0] == '\0') {
+        sprintf(pHost_name, "%s", "HOST");
+    }
+    DisableNetService();
+    if (!PDNetHostGame(game, pHost_name, &host_address)) {
+        NetDisposeGameDetails(game);
+        return NULL;
+    }
+    gCurrent_net_game = game;
+    gSynch_race_start = 0;
+    strcpy(game->host_name, pHost_name);
+    game->host_ID = NetExtractPlayerID(game);
+    game->num_players = 1;
+    memcpy(&game->options, pOptions, sizeof(tNet_game_options));
+    game->status.stage = eNet_game_stage0;
+    game->type = pGame_type;
+    game->start_race = pStart_rank;
+    game->no_races_yet = 1;
+    gReceiving_new_players = 0;
+    gHost_died = 0;
+    gNumber_of_net_players = 0;
+    gThis_net_player_index = 0;
+    gLocal_net_ID = game->host_ID;
+    FillInThisPlayer(game, &me, pCar_index, 1);
+    NetSetPlayerSystemInfo(&me, host_address);
+    NetPlayersChanged(1, &me);
+    InitialisePlayerStati();
+    gNet_mode = eNet_mode_host;
+    InitNetworkShapesStuff(gNet_players[0].car->car_crush_spec);
+    gDont_allow_joiners = 0;
+    return game;
+}
 
 int C2_HOOK_FASTCALL NetJoinGameLowLevel(tNet_game_details* pGame_details, const char* pName) {
 
