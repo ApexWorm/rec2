@@ -444,7 +444,7 @@ extern void C2_HOOK_FASTCALL TotallyRepairCar(void);
 
 // UnBendModel
 
-// UnBendModels
+extern intptr_t C2_HOOK_FASTCALL UnBendModels(br_actor* pActor, br_vector3* pTranslation, void* pContext);
 
 // UnBendActor
 

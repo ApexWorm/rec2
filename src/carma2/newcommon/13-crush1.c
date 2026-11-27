@@ -2450,9 +2450,47 @@ void C2_HOOK_FASTCALL TotallyRepairCar(void) {
 
 // RepairModels
 
-// UnBendModel
+typedef struct {
+    br_matrix34 matrix;
+    undefined field_0x30[0x64 - 0x30]; /* FIXME: unknown, read by UnBendModel */
+    tCar_spec* car;
+} tUnBend_models_context;
 
-// UnBendModels
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_HW 0x0043a5b0
+// STUB: CARMA2_SW 0x0043a5f0
+// STUB: CARMA2_CHEAT 0x0043a7d0
+void C2_HOOK_FASTCALL UnBendModel(br_model* pModel, br_vector3* pTranslation, tUnBend_models_context* pContext) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
+
+// FUNCTION: CARMA2_HW 0x0043a560
+// FUNCTION: CARMA2_SW 0x0043a5a0
+// FUNCTION: CARMA2_CHEAT 0x0043a780
+intptr_t C2_HOOK_FASTCALL UnBendModels(br_actor* pActor, br_vector3* pTranslation, void* pContext) {
+    tUnBend_models_context* context;
+    tUser_crush_data* user_crush;
+    int i;
+
+    user_crush = pActor->user;
+    if (user_crush == NULL) {
+        return 0;
+    }
+    if (user_crush->crush_data != NULL) {
+        context = pContext;
+        for (i = 0; i < context->car->count_detail_levels; i++) {
+            UnBendModel(user_crush->models[i], pTranslation, context);
+        }
+    }
+    return 0;
+}
 
 // UnBendActor
 
