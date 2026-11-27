@@ -1971,7 +1971,24 @@ void C2_HOOK_FASTCALL FullyDetachBit(tCar_spec* pCar, tPhysics_object* pObject) 
 
 // SplitModel
 
-// CreateSplitPoints
+// FUNCTION: CARMA2_HW 0x00430600
+// FUNCTION: CARMA2_SW 0x00430630
+// FUNCTION: CARMA2_CHEAT 0x004307d0
+void C2_HOOK_FASTCALL CreateSplitPoints(br_vector3* pDest1, br_vector3* pDest2, const br_vector3* pV1, const br_vector3* pV2, float pMin, float pMax) {
+    float t;
+    br_vector3 a;
+    br_vector3 b;
+
+    t = -((pMin - 0.007246377f) / (pMax - pMin));
+    BrVector3Scale(&a, pV1, 1.0f - t);
+    BrVector3Scale(&b, pV2, t);
+    BrVector3Add(pDest1, &a, &b);
+    t = -((pMin + 0.007246377f) / (pMax - pMin));
+    BrVector3Scale(&a, pV1, 1.0f - t);
+    BrVector3Scale(&b, pV2, t);
+    BrVector3Add(pDest2, &a, &b);
+
+}
 
 // SplitCollisionShape
 
