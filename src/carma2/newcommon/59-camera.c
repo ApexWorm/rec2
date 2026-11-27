@@ -451,11 +451,87 @@ inline int C2_HOOK_FASTCALL CheckForWall(br_vector3* pStart, br_vector3* pEnd) {
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x004105f0
-// STUB: CARMA2_SW 0x004105d0
-// STUB: CARMA2_CHEAT 0x00410840
+// FUNCTION: CARMA2_HW 0x004105f0
+// FUNCTION: CARMA2_SW 0x004105d0
+// FUNCTION: CARMA2_CHEAT 0x00410840
 void C2_HOOK_FASTCALL SetUpPanningCamera(tCar_spec* c) {
-    NOT_IMPLEMENTED();
+    br_vector3 pos;
+    br_vector3 perp;
+    br_vector3 dir;
+    br_vector3 tv;
+    br_vector3 tv2;
+    br_scalar ts;
+    tU32 time;
+    tU32 t;
+    tU32 t2;
+    tU32 time_step;
+    br_matrix34* m1;
+    br_vector3 left;
+    br_vector3 right;
+    br_vector3 car_centre;
+
+    m1 = &c->car_master_actor->t.t.mat;
+    gInside_camera_zone = 0;
+    ScanCarsPositions(c, &c->pos, 411.678222f, -1, 5000, &pos, &time);
+    BrVector3Sub(&dir, &pos, &c->pos);
+    if (GetTotalTime() < time) {
+        time_step = time - GetTotalTime();
+    } else {
+        time_step = GetTotalTime() - time;
+    }
+    time_step *= SRandomBetween(0.8f, 1.5f);
+    if (BrVector3LengthSquared(&dir) < .01 || time == 0) {
+        BrVector3Negate(&dir, (br_vector3*)m1->m[2]);
+        BrVector3Copy(&car_centre, &c->pos);
+        time_step = 0;
+    } else {
+        ScanCarsPositions(c, &c->pos, 102.919556f, -1, time_step / 2, &car_centre, &t);
+        if (t == 0) {
+            BrVector3Copy(&car_centre, &c->pos);
+        }
+    }
+    BrVector3SetFloat(&tv, 0.0f, 1.0f, 0.0f);
+    BrVector3Cross(&perp, &tv, &dir);
+    ts = BrVector3Length(&perp);
+    if (ts < .1f) {
+        return;
+    }
+    ts = 2.0 / ts;
+    ts *= SRandomBetween(0.33333334f, 1.0f);
+    BrVector3Scale(&perp, &perp, ts);
+    ts = SRandomBetween(0.33333334f, 1.0f) * 2.0f;
+    BrVector3Set(&tv, 0.0f, ts, 0.0f);
+    BrVector3Add(&tv, &car_centre, &tv);
+    BrVector3Add(&left, &tv, &perp);
+    BrVector3Sub(&right, &tv, &perp);
+    CollideCamera2(&car_centre, &left, NULL, 1, NULL);
+    CollideCamera2(&car_centre, &right, NULL, 1, NULL);
+    BrVector3Sub(&tv, &left, &car_centre);
+    BrVector3Sub(&tv2, &right, &car_centre);
+    if (BrVector3LengthSquared(&tv) + SRandomPosNeg(.01f) > BrVector3LengthSquared(&tv2)) {
+        BrVector3Copy(&gCamera->t.t.translate.t, &left);
+    } else {
+        BrVector3Copy(&gCamera->t.t.translate.t, &right);
+    }
+    if (time != 0 && CheckForWall(&c->pos, &gCamera->t.t.translate.t)) {
+        ScanCarsPositions(c, &c->pos, 10000.0f, -1, 1000, &tv, &t2);
+        CollideCamera2(&tv, &gCamera->t.t.translate.t, NULL, 1, NULL);
+    }
+    if (time != 0 && CheckForWall(&pos, &gCamera->t.t.translate.t)) {
+        time_step = time_step / 16;
+        BrVector3Copy(&tv, &car_centre);
+        do {
+            ScanCarsPositions(c, &tv, 10000.0f, abs(t - GetTotalTime()), time_step, &tv2, &t2);
+            t += (ARGetReplayDirection() ? 1 : -1) * time_step;
+            BrVector3Copy(&tv, &tv2);
+        } while (!CheckForWall(&tv, &gCamera->t.t.translate.t) && t < GetTotalTime() + 5000);
+        gSwitch_time = t;
+    } else {
+        if (time == 0) {
+            time = 5000;
+        }
+        gSwitch_time = time;
+    }
 }
 
 #ifdef REC2_MATCHING
@@ -580,7 +656,20 @@ void C2_HOOK_FASTCALL PointCamera(const br_vector3* pPos, br_matrix34* pMat) {
     BrMatrix34PreRotateX(pMat, camera_ptr->field_of_view / 5 - theta);
 }
 
-// CollideCamera2
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_HW 0x004122b0
+// STUB: CARMA2_SW 0x00412290
+// STUB: CARMA2_CHEAT 0x00412500
+int C2_HOOK_FASTCALL CollideCamera2(br_vector3* pCar_pos, br_vector3* pCam_pos, br_vector3* pOld_camera_pos, int pManual_move, tPhysics_object* pCollision_info) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // FUNCTION: CARMA2_HW 0x00413570
 // FUNCTION: CARMA2_SW 0x004135a0

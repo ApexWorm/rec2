@@ -1003,7 +1003,20 @@ int C2_HOOK_FASTCALL CarTimeout(tU32 pTime) {
 #pragma inline_depth()
 #endif
 
-// ScanCarsPositions
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_HW 0x004c6920
+// STUB: CARMA2_SW 0x004c3050
+// STUB: CARMA2_CHEAT 0x004cc440
+void C2_HOOK_FASTCALL ScanCarsPositions(tCar_spec* pCar, br_vector3* pSource_pos, br_scalar pMax_distance_sqr, tU32 pOffset_time, tU32 pTime_period, br_vector3* pCar_pos, tU32* pTime_returned) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // InitialiseActionReplay
 
