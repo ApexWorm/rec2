@@ -1514,7 +1514,7 @@ int C2_HOOK_FASTCALL DismemberCharacter(tPed_character_instance* pCharacter, int
 
     if (!(pCharacter->field_0xc & gPow2_array[pBone_index]) && FindAndSetSeveredPhysicsSet(pCharacter)) {
         if (pAngular_velocity == NULL) {
-            BrVector3Set(&omega, SRandomPosNeg(1.f), SRandomPosNeg(1.f), SRandomPosNeg(1.f));
+            BrVector3Set(&omega, SRandomPosNeg(1.0f), SRandomPosNeg(1.0f), SRandomPosNeg(1.0f));
         } else {
             BrVector3Copy(&omega, pAngular_velocity);
         }
