@@ -1300,6 +1300,28 @@ void C2_HOOK_FASTCALL AddSmashModelChangeToPipingSession(br_actor* pActor, br_mo
 #pragma inline_depth(0)
 #endif
 
+// FUNCTION: CARMA2_HW 0x004c7880
+// FUNCTION: CARMA2_SW 0x004c3fb0
+// FUNCTION: CARMA2_CHEAT 0x004cd3a0
+void C2_HOOK_FASTCALL AddSmashRemoveFacesToPipingSession(br_model* pModel, int pCount, const tPipe_remove_face* pFaces, br_material* pMaterial) {
+    tPipe_chunk_remove_faces* remove_faces;
+    tU32 size;
+
+    remove_faces = gCrush_space;
+    if (remove_faces == NULL) {
+        return;
+    }
+    ((tPipe_chunk_remove_faces*)gCrush_space)->count = pCount;
+    remove_faces->material = pMaterial;
+    size = pCount * sizeof(tPipe_remove_face);
+    memcpy(remove_faces->faces, pFaces, size);
+    size += offsetof(tPipe_chunk_remove_faces, faces);
+    if (size > 0x4000) {
+        FatalError(kFatalError_ChunkIsTooLargeToPipe);
+    }
+    ARAddDataToSession(ePipe_chunk_smash_remove_faces, (uintptr_t)pModel, remove_faces, size);
+}
+
 // FUNCTION: CARMA2_HW 0x004c78f0
 // FUNCTION: CARMA2_SW 0x004c4020
 // FUNCTION: CARMA2_CHEAT 0x004cd410
@@ -1782,7 +1804,7 @@ void C2_HOOK_FASTCALL PipeSingleSmashRemoveFaces(br_model* pModel, int pCount, c
     if (size > 0x4000) {
         FatalError(kFatalError_ChunkIsTooLargeToPipe);
     }
-    ARDoSingleSession(34, (uintptr_t)pModel, remove_faces, size);
+    ARDoSingleSession(ePipe_chunk_smash_remove_faces, (uintptr_t)pModel, remove_faces, size);
 }
 
 // FUNCTION: CARMA2_HW 0x004c89f0
