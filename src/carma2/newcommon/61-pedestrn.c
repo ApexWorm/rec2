@@ -1185,7 +1185,7 @@ void C2_HOOK_FASTCALL StopCharacterMorphing(tPed_character_instance* pCharacter)
 // FUNCTION: CARMA2_HW 0x00409c20
 // FUNCTION: CARMA2_SW 0x00409c20
 // FUNCTION: CARMA2_CHEAT 0x00409c90
-int C2_HOOK_FASTCALL StopCharacterMove(tPed_character_instance* pCharacter, tU32 pTime) {
+inline int C2_HOOK_FASTCALL StopCharacterMove(tPed_character_instance* pCharacter, tU32 pTime) {
     int result;
 
     result = 0;
