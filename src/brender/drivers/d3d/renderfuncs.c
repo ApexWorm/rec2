@@ -15,7 +15,7 @@
 void C2_HOOK_CDECL PointRender_d3d_RGB_555(brp_block* block, brp_vertex* v0) {
     gINT_1001bbc4 += 1;
     gQueued_vertices_indices[gCount_queued_vertices_indices] = gCount_queued_vertices;
-    gINT_1001dc2c = gCount_queued_vertices;
+    gLast_queued_vertex = gCount_queued_vertices;
     gCount_queued_vertices_indices += 1;
     gQueued_vertices[gCount_queued_vertices].sx = v0->comp_f[C_SX];
     gQueued_vertices[gCount_queued_vertices].sy = v0->comp_f[C_SY];
@@ -36,7 +36,7 @@ void C2_HOOK_CDECL PointRender_d3d_RGB_555(brp_block* block, brp_vertex* v0) {
 void C2_HOOK_CDECL LineRender_d3d(brp_block* block, brp_vertex* v0, brp_vertex* v1) {
     gINT_1001bbc4 += 1;
     gQueued_vertices_indices[gCount_queued_vertices_indices] = gCount_queued_vertices;
-    gINT_1001dc2c = gCount_queued_vertices;
+    gLast_queued_vertex = gCount_queued_vertices;
     gCount_queued_vertices_indices += 1;
     gQueued_vertices[gCount_queued_vertices].sx = v0->comp_f[C_SX];
     gQueued_vertices[gCount_queued_vertices].sy = v0->comp_f[C_SY];
@@ -48,7 +48,7 @@ void C2_HOOK_CDECL LineRender_d3d(brp_block* block, brp_vertex* v0, brp_vertex* 
     gQueued_vertices[gCount_queued_vertices].specular = 0;
     gCount_queued_vertices += 1;
     gQueued_vertices_indices[gCount_queued_vertices_indices] = gCount_queued_vertices;
-    gINT_1001dc2c = gCount_queued_vertices;
+    gLast_queued_vertex = gCount_queued_vertices;
     gCount_queued_vertices_indices += 1;
     gQueued_vertices[gCount_queued_vertices].sx = v1->comp_f[C_SX];
     gQueued_vertices[gCount_queued_vertices].sy = v1->comp_f[C_SY];

@@ -90,7 +90,7 @@ extern WORD gQueued_vertices_indices[100];
 extern int gCount_queued_vertices;
 extern int gCount_queued_vertices_indices;
 extern D3DPRIMITIVETYPE gPrimitive_type;
-extern int gINT_1001dc2c;
+extern int gLast_queued_vertex;
 extern br_colour gCOLOUR_1001dc24;
 extern int gINT_1001bbc4;
 extern int gINT_1001bba4;

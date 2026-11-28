@@ -262,7 +262,7 @@ int gCount_queued_vertices_indices;
 D3DPRIMITIVETYPE gPrimitive_type;
 
 // GLOBAL: D3D 0x1001dc2c
-int gINT_1001dc2c;
+int gLast_queued_vertex;
 
 // GLOBAL: D3D 0x1001dc24
 br_colour gCOLOUR_1001dc24;
