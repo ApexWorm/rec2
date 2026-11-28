@@ -25,7 +25,7 @@ extern const char* gSmashable_track_environment_path;
 extern int gCount_track_smashable_environment_specs;
 extern tStored_smash* gNet_host_smashes;
 extern tQueued_net_smash gQueued_net_smashes[50];
-extern int gINT_006a8294;
+extern int gDoing_net_smash;
 extern tPowerup_queue_item gPowerup_queue[50];
 extern int gSize_powerup_queue;
 
