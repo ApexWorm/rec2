@@ -609,7 +609,7 @@ void C2_HOOK_FASTCALL CheckAvailabilityOfThisFont(int pFont) {
 // FUNCTION: CARMA2_CHEAT 0x00464560
 void C2_HOOK_FASTCALL DisposeInterfaceFonts(void) {
     int i;
-    br_pixelmap* map;
+    int j;
 
     if (gInterface_fonts_loaded) {
 
@@ -628,13 +628,11 @@ void C2_HOOK_FASTCALL DisposeInterfaceFonts(void) {
         RemovePolyFont(kPolyfont_highlighter);
 
         for (i = 0; i < gInterface_polyfont_texture_pages; i++) {
-            map = gTexture_maps[gInterface_polyfont_texture_pages + i];
-
-            if (map != NULL) {
-
-                BrMapRemove(map);
-                BrPixelmapFree(map);
-                gTexture_maps[gInterface_polyfont_texture_pages + i] = NULL;
+            j = gInterface_polyfont_texture_pages + i;
+            if (gTexture_maps[j] != NULL) {
+                BrMapRemove(gTexture_maps[j]);
+                BrPixelmapFree(gTexture_maps[j]);
+                gTexture_maps[j] = NULL;
             }
         }
         gInterface_fonts_loaded = 0;
@@ -642,18 +640,16 @@ void C2_HOOK_FASTCALL DisposeInterfaceFonts(void) {
 }
 
 // FUNCTION: CARMA2_HW 0x00464290
+// FUNCTION: CARMA2_SW 0x00463cf0
 // FUNCTION: CARMA2_CHEAT 0x00464700
 void C2_HOOK_FASTCALL RemovePolyFont(int pFont) {
     int i;
 
     for (i = 0; i < (int)REC2_ASIZE(gPoly_fonts[pFont].glyphs); i++) {
-        tPolyFontGlyph* glyph = &gPoly_fonts[pFont].glyphs[i];
-
-        if (glyph->used) {
-
-            glyph->material = NULL;
-            glyph->model = NULL;
-            glyph->used = 0;
+        if (gPoly_fonts[pFont].glyphs[i].used) {
+            gPoly_fonts[pFont].glyphs[i].material = NULL;
+            gPoly_fonts[pFont].glyphs[i].model = NULL;
+            gPoly_fonts[pFont].glyphs[i].used = 0;
         }
     }
     gPoly_fonts[pFont].available = 0;

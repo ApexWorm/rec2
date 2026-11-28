@@ -696,9 +696,6 @@ static void C2_HOOK_FASTCALL UpdatePulsePoly(int pIndex) {
         switch (gTintedPolys[pIndex].subClass) {
         case 1:
             UpdatePolyVertexColours(pIndex);
-            /* fall through */
-        default:
-            red = grn = blu = pIndex;
             break;
         case 0:
             value = (GetTotalTime() >> gTintedPolys[pIndex].colour) & 0x1ff;
