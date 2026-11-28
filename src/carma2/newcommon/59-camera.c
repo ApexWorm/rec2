@@ -141,11 +141,25 @@ void C2_HOOK_FASTCALL ViewNetPlayer(void) {
     }
 }
 
-// STUB: CARMA2_HW 0x0040e530
-// STUB: CARMA2_SW 0x0040e510
-// STUB: CARMA2_CHEAT 0x0040e5f0
+// FUNCTION: CARMA2_HW 0x0040e530
+// FUNCTION: CARMA2_SW 0x0040e510
+// FUNCTION: CARMA2_CHEAT 0x0040e5f0
 void C2_HOOK_FASTCALL FUN_0040e530(br_actor* pActor) {
-    NOT_IMPLEMENTED();
+
+    if (pActor == NULL) {
+        gCar_to_view = &gProgram_state.current_car;
+    } else if (pActor->parent != gNon_track_actor) {
+        /* FIXME: gCar_to_view can point to a tNon_car_spec */
+        gCar_to_view = (tCar_spec*)DoPullActorFromWorld(pActor);
+        if (gCar_to_view == NULL) {
+            gCar_to_view = &gProgram_state.current_car;
+        }
+    } else {
+        gCar_to_view = pActor->type_data;
+    }
+    gCamera_yaw = 0;
+    InitialiseExternalCamera();
+    PositionExternalCamera(gCar_to_view, 200);
 }
 
 // FUNCTION: CARMA2_HW 0x0040e590
