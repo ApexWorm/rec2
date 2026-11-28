@@ -108,11 +108,9 @@ void C2_HOOK_FASTCALL UpdateFramePeriod(tU32* pCamera_period) {
     int error;
 
     if (gAction_replay_mode) {
-        tU32 last_tick_count;
         tU32 camera_period;
 
-        last_tick_count = gLast_tick_count;
-        gFrame_period = abs((int)(gLast_replay_frame_time - last_tick_count));
+        gFrame_period = abs((int)(gLast_replay_frame_time - gLast_tick_count));
         gLast_tick_count = gLast_replay_frame_time;
         new_camera_tick_count = PDGetTotalTime();
         new_tick_count = GetTotalTime();
