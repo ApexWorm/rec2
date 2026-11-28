@@ -1447,8 +1447,8 @@ void C2_HOOK_FASTCALL MungeAllCharacterObjects(void (C2_HOOK_FASTCALL *pCallback
     int j;
     int k;
 
-    for (i = 0, form = gPed_forms; i < (int)REC2_ASIZE(gPed_forms); i++, form++) {
-
+    for (i = 0; i < (int)REC2_ASIZE(gPed_forms); i++) {
+        form = &gPed_forms[i];
         if (*form != NULL) {
             for (j = 0; j < (*form)->max_boned_physicing_at_once; j++) {
                 for (k = 0; k < (*form)->count_bones; k++) {

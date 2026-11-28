@@ -122,16 +122,23 @@ tU8 C2_HOOK_FASTCALL ReadU8(FILE* pF) {
 
 // FUNCTION: CARMA2_HW 0x0048f890
 // FUNCTION: CARMA2_SW 0x0048cb00
+// FUNCTION: CARMA2_CHEAT 0x0048f940
 float C2_HOOK_FASTCALL ReadF32(FILE* pF) {
-    float f;
+    tU32 u32;
+    union {
+        float f;
+        tU32 u;
+    } f_u;
 
-    PFfread(&f, sizeof(f), 1, pF);
+    PFfread(&u32, sizeof(u32), 1, pF);
     // FIXME: byteswap for BE
-    return f;
+    f_u.u = u32;
+    return f_u.f;
 }
 
 // FUNCTION: CARMA2_HW 0x0048f8b0
 // FUNCTION: CARMA2_SW 0x0048cb20
+// FUNCTION: CARMA2_CHEAT 0x0048f960
 tS32 C2_HOOK_FASTCALL ReadS32(FILE* pF) {
     tS32 raw_long;
 
@@ -142,6 +149,7 @@ tS32 C2_HOOK_FASTCALL ReadS32(FILE* pF) {
 
 // FUNCTION: CARMA2_HW 0x0048f8d0
 // FUNCTION: CARMA2_SW 0x0048cb40
+// FUNCTION: CARMA2_CHEAT 0x0048f980
 tS16 C2_HOOK_FASTCALL ReadS16(FILE* pF) {
     tS16 raw_short;
 
@@ -152,6 +160,7 @@ tS16 C2_HOOK_FASTCALL ReadS16(FILE* pF) {
 
 // FUNCTION: CARMA2_HW 0x0048f8f0
 // FUNCTION: CARMA2_SW 0x0048cb60
+// FUNCTION: CARMA2_CHEAT 0x0048f9a0
 tS8 C2_HOOK_FASTCALL ReadS8(FILE* pF) {
     tS8 raw_byte;
 
@@ -193,6 +202,7 @@ void C2_HOOK_FASTCALL WriteU8L(FILE* pF, tU8 pNumber) {
 
 // FUNCTION: CARMA2_HW 0x0048f980
 // FUNCTION: CARMA2_SW 0x0048cbf0
+// FUNCTION: CARMA2_CHEAT 0x0048fa30
 void C2_HOOK_FASTCALL WriteS32L(FILE* pF, tS32 pNumber) {
     tS32 raw_long;
 
@@ -203,6 +213,7 @@ void C2_HOOK_FASTCALL WriteS32L(FILE* pF, tS32 pNumber) {
 
 // FUNCTION: CARMA2_HW 0x0048f9a0
 // FUNCTION: CARMA2_SW 0x0048cc10
+// FUNCTION: CARMA2_CHEAT 0x0048fa50
 void C2_HOOK_FASTCALL WriteS16L(FILE* pF, tS16 pNumber) {
     tS16 raw_short;
 
@@ -213,6 +224,7 @@ void C2_HOOK_FASTCALL WriteS16L(FILE* pF, tS16 pNumber) {
 
 // FUNCTION: CARMA2_HW 0x0048f9d0
 // FUNCTION: CARMA2_SW 0x0048cc40
+// FUNCTION: CARMA2_CHEAT 0x0048fa80
 void C2_HOOK_FASTCALL WriteS8L(FILE* pF, tS8 pNumber) {
     tS8 raw_byte;
 
@@ -222,6 +234,7 @@ void C2_HOOK_FASTCALL WriteS8L(FILE* pF, tS8 pNumber) {
 
 // FUNCTION: CARMA2_HW 0x0048f9f0
 // FUNCTION: CARMA2_SW 0x0048cc60
+// FUNCTION: CARMA2_CHEAT 0x0048faa0
 void C2_HOOK_FASTCALL SkipBytes(FILE* pF, int pBytes_to_skip) {
 
     PFfseek(pF, pBytes_to_skip, SEEK_CUR);
@@ -253,6 +266,7 @@ tU16 C2_HOOK_FASTCALL MemReadU16(char** pPtr) {
 
 // FUNCTION: CARMA2_HW 0x0048fa20
 // FUNCTION: CARMA2_SW 0x0048cc90
+// FUNCTION: CARMA2_CHEAT 0x0048fad0
 tU8 C2_HOOK_FASTCALL MemReadU8(char** pPtr) {
     tU8 raw_byte;
 
@@ -263,6 +277,7 @@ tU8 C2_HOOK_FASTCALL MemReadU8(char** pPtr) {
 
 // FUNCTION: CARMA2_HW 0x0048fa30
 // FUNCTION: CARMA2_SW 0x0048cca0
+// FUNCTION: CARMA2_CHEAT 0x0048fae0
 tS32 C2_HOOK_FASTCALL MemReadS32(char** pPtr) {
     tS32 raw_long;
 
@@ -274,6 +289,7 @@ tS32 C2_HOOK_FASTCALL MemReadS32(char** pPtr) {
 
 // FUNCTION: CARMA2_HW 0x0048fa40
 // FUNCTION: CARMA2_SW 0x0048ccb0
+// FUNCTION: CARMA2_CHEAT 0x0048faf0
 tS16 C2_HOOK_FASTCALL MemReadS16(char** pPtr) {
     tS16 raw_short;
 
@@ -285,6 +301,7 @@ tS16 C2_HOOK_FASTCALL MemReadS16(char** pPtr) {
 
 // FUNCTION: CARMA2_HW 0x0048fa50
 // FUNCTION: CARMA2_SW 0x0048ccc0
+// FUNCTION: CARMA2_CHEAT 0x0048fb00
 tS8 C2_HOOK_FASTCALL MemReadS8(char** pPtr) {
     tS8 raw_byte;
 
@@ -431,6 +448,7 @@ void C2_HOOK_FASTCALL GetThreeInts(FILE* pF, int* pF1, int* pF2, int* pF3) {
 
 // FUNCTION: CARMA2_HW 0x0048fed0
 // FUNCTION: CARMA2_SW 0x0048d140
+// FUNCTION: CARMA2_CHEAT 0x0048ff80
 void C2_HOOK_FASTCALL GetThreeIntsAndAString(FILE* pF, int* pF1, int* pF2, int* pF3, char* pS) {
     char s[256];
     char* str;
@@ -448,6 +466,7 @@ void C2_HOOK_FASTCALL GetThreeIntsAndAString(FILE* pF, int* pF1, int* pF2, int* 
 
 // FUNCTION: CARMA2_HW 0x0048ffa0
 // FUNCTION: CARMA2_SW 0x0048d210
+// FUNCTION: CARMA2_CHEAT 0x00490050
 void C2_HOOK_FASTCALL GetIntAndAString(FILE* pF, int* pF1, char* pS) {
     char s[256];
     char* str;

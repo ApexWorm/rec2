@@ -115,6 +115,7 @@ int gLast_tune = -1;
 
 // GLOBAL: CARMA2_HW 0x00595c28
 // GLOBAL: CARMA2_SW 0x00590b88
+// GLOBAL: CARMA2_CHEAT 0x0059c580
 const char* gSound_periodicity_choices[3] = {
     "RANDOM",
     "PERIODIC",
@@ -173,10 +174,12 @@ tS3_outlet* gIndexed_outlets[7] = { 0 };
 
 // GLOBAL: CARMA2_HW 0x0079e17c
 // GLOBAL: CARMA2_SW 0x007946dc
+// GLOBAL: CARMA2_CHEAT 0x007a581c
 int gEnvironmental_sound_sources_buffer_index = 0;
 
 // GLOBAL: CARMA2_HW 0x00595c38
 // GLOBAL: CARMA2_SW 0x00590b98
+// GLOBAL: CARMA2_CHEAT 0x0059c590
 const char* gSound_generator_type_names[3] = {
     "NONCAR",
     "ACTOR",
@@ -195,10 +198,12 @@ int gOld_sound_detail_level = -1;
 
 // GLOBAL: CARMA2_HW 0x0079e120
 // GLOBAL: CARMA2_SW 0x00794680
+// GLOBAL: CARMA2_CHEAT 0x007a57c0
 br_vector3 gCamera_left;
 
 // GLOBAL: CARMA2_HW 0x0079e130
 // GLOBAL: CARMA2_SW 0x00794690
+// GLOBAL: CARMA2_CHEAT 0x007a57d0
 br_vector3 gCamera_position;
 
 // GLOBAL: CARMA2_HW 0x0079e180
@@ -207,14 +212,17 @@ br_vector3 gOld_camera_position;
 
 // GLOBAL: CARMA2_HW 0x0079ea60
 // GLOBAL: CARMA2_SW 0x00794fc0
+// GLOBAL: CARMA2_CHEAT 0x007a6100
 br_vector3 gCamera_velocity;
 
 // GLOBAL: CARMA2_HW 0x00684540
 // GLOBAL: CARMA2_SW 0x0067ec80
+// GLOBAL: CARMA2_CHEAT 0x0068bde8
 tU32 gNext_sound_generator_munging;
 
 // GLOBAL: CARMA2_HW 0x0079e18c
 // GLOBAL: CARMA2_SW 0x007946ec
+// GLOBAL: CARMA2_CHEAT 0x007a582c
 int gCount_environmental_sound_sources;
 
 // FUNCTION: CARMA2_HW 0x00500060
@@ -596,21 +604,19 @@ void C2_HOOK_FASTCALL InitSoundSources(void) {
     int cat;
     int car_count;
     tCar_spec* car;
-    tEnvironment_sound_source* env_src;
     int i;
 
+    toggle = 0;
     if (!gSound_available) {
         return;
     }
 
     if (!gSound_enabled) {
-        toggle = 1;
         ToggleSoundEnable();
-    } else {
-        toggle = 0;
+        toggle = 1;
     }
-    BrVector3Scale(&gCamera_left, (br_vector3*)gCamera_to_world.m[0], -1.0f);
     BrVector3Copy(&gCamera_position, (br_vector3*)gCamera_to_world.m[3]);
+    BrVector3Scale(&gCamera_left, (br_vector3*)gCamera_to_world.m[0], -1.0f);
     S3BindListenerPositionBRender(&gCamera_position);
     S3BindListenerVelocityBRender(&gCamera_velocity);
     S3BindListenerLeftBRender(&gCamera_left);
@@ -636,7 +642,7 @@ void C2_HOOK_FASTCALL InitSoundSources(void) {
 
                     car->sound_source = S3CreateSoundSourceBR(&car->pos, &car->vel, gEngine_outlet);
                     if (car->sound_source != NULL) {
-                        S3BindAmbientSoundToOutlet(gEngine_outlet, cat == eVehicle_rozzer ? eSoundId_Cop_Siren : car->engine_noises[0], car->sound_source, 250.0f, 0, 0, 0, BR_FIXED_INT(1), BR_FIXED_INT(1));
+                        S3BindAmbientSoundToOutlet(gEngine_outlet, cat != eVehicle_rozzer ? car->engine_noises[0] : eSoundId_Cop_Siren, car->sound_source, 250.0f, 0, 0, 0, BR_FIXED_INT(1), BR_FIXED_INT(1));
                     }
                 }
             }
@@ -644,12 +650,11 @@ void C2_HOOK_FASTCALL InitSoundSources(void) {
 
         for (i = 0; i < (int)REC2_ASIZE(gEnvironment_sound_sources); i++) {
 
-            env_src = &gEnvironment_sound_sources[i];
-            env_src->field_0x10 = NULL;
-            if (env_src->source == NULL) {
-                env_src->source = S3CreateSoundSourceBR(&env_src->position, &gZero_v__car, gXXX_outlet);
-                if (env_src->source != NULL) {
-                    S3BindAmbientSoundToOutlet(gXXX_outlet, eSoundId_Cop_Siren, env_src->source, 100.f, 0, 0, 0, S3_FIXED_INT(1), S3_FIXED_INT(1));
+            gEnvironment_sound_sources[i].field_0x10 = NULL;
+            if (gEnvironment_sound_sources[i].source == NULL) {
+                gEnvironment_sound_sources[i].source = S3CreateSoundSourceBR(&gEnvironment_sound_sources[i].position, &gZero_v__car, gXXX_outlet);
+                if (gEnvironment_sound_sources[i].source != NULL) {
+                    S3BindAmbientSoundToOutlet(gXXX_outlet, eSoundId_Cop_Siren, gEnvironment_sound_sources[i].source, 100.0f, 0, 0, 0, S3_FIXED_INT(1), S3_FIXED_INT(1));
                 }
             }
         }
@@ -1055,7 +1060,7 @@ void C2_HOOK_FASTCALL BuggerModelName(tTrack_spec* pTrack_spec, const char* pNam
     char identifier[4];
 
     sprintf(identifier, "%c%02d", ')', pIndex);
-    model = BrModelFind(identifier);
+    model = BrModelFind(pName);
     if (model == NULL || model->identifier == NULL) {
 #ifdef REC2_FIX_BUGS
         FatalError(kFatalError_CannotFindModelReferencedInSoundGeneratorList_S, identifier);
@@ -1069,10 +1074,8 @@ void C2_HOOK_FASTCALL BuggerModelName(tTrack_spec* pTrack_spec, const char* pNam
 
 // FUNCTION: CARMA2_HW 0x004572f0
 // FUNCTION: CARMA2_SW 0x00457080
+// FUNCTION: CARMA2_CHEAT 0x00457770
 void C2_HOOK_FASTCALL ReadSoundGenerators(tTrack_spec* pTrack_spec, FILE* pF) {
-    float x;
-    float y;
-    float z;
     char name[32];
     tTrackSoundGenerator* generator;
     int i;
@@ -1085,10 +1088,15 @@ void C2_HOOK_FASTCALL ReadSoundGenerators(tTrack_spec* pTrack_spec, FILE* pF) {
 
             generator->type = GetALineAndInterpretCommand(pF, gSound_generator_type_names, REC2_ASIZE(gSound_generator_type_names));
             switch (generator->type) {
-            case kSoundGeneratorType_point:
+            case kSoundGeneratorType_point: {
+                float x;
+                float y;
+                float z;
+
                 GetThreeFloats(pF, &x, &y, &z);
                 BrVector3Set(&generator->point, x, y, z);
                 break;
+            }
             case kSoundGeneratorType_actor:
                 GetAString(pF, name);
                 BuggerModelName(pTrack_spec, name, i);
@@ -1109,6 +1117,7 @@ void C2_HOOK_FASTCALL ReadSoundGenerators(tTrack_spec* pTrack_spec, FILE* pF) {
 
 // FUNCTION: CARMA2_HW 0x00457450
 // FUNCTION: CARMA2_SW 0x004571e0
+// FUNCTION: CARMA2_CHEAT 0x004578d0
 void C2_HOOK_FASTCALL WriteOutSoundSpec(FILE* pF, tSpecial_volume_soundfx_data* pSpec) {
     int i;
 
@@ -1121,12 +1130,12 @@ void C2_HOOK_FASTCALL WriteOutSoundSpec(FILE* pF, tSpecial_volume_soundfx_data* 
     switch (pSpec->periodicity) {
     case kSoundFxPeriodicity_Periodic:
         fprintf(pF,"%.2f\t\t\t\t\t// period\n",
-            (double)pSpec->period / 1000.0);
+            (double)(tU32)pSpec->period / 1000.0);
         break;
     case kSoundFxPeriodicity_Random:
         fprintf(pF, "%.2f,%.2f\t\t\t\t\t// min,max gap\n",
-           (double)pSpec->random.min_gap / 1000.0,
-           (double)pSpec->random.max_gap / 1000.0);
+           (double)(tU32)pSpec->random.min_gap / 1000.0,
+           (double)(tU32)pSpec->random.max_gap / 1000.0);
         break;
 #ifdef REC2_FIX_BUGS
     default:
@@ -1137,7 +1146,7 @@ void C2_HOOK_FASTCALL WriteOutSoundSpec(FILE* pF, tSpecial_volume_soundfx_data* 
     fprintf(pF, "%d\t\t\t\t\t// num sounds\n", pSpec->count_sound_alternatives);
     for (i = 0; i < pSpec->count_sound_alternatives; i++) {
 
-        fprintf(pF, "%d\t\t\t\t\t// sound ID\n", pSpec->sound_alternatives[i]);
+        fprintf(pF, "%d\t\t\t\t\t// sound ID\n", (tU16)pSpec->sound_alternatives[i]);
     }
 }
 

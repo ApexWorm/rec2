@@ -876,10 +876,12 @@ static void C2_HOOK_FASTCALL SetLevelBar(tFrontend_spec* pFrontend, int pLevel_i
 // FUNCTION: CARMA2_CHEAT 0x00467ce0
 void C2_HOOK_FASTCALL ToggleSelection(tFrontend_spec* pFrontend) {
     int i;
+    int group;
 
-    if (pFrontend->items[gFrontend_selected_item_index].group != 0) {
+    group = pFrontend->items[gFrontend_selected_item_index].group;
+    if (group != 0) {
         for (i = 0; i < pFrontend->count_items; i++) {
-            if (pFrontend->items[i].group == pFrontend->items[gFrontend_selected_item_index].group && pFrontend->items[gFrontend_selected_item_index].selectable != kFrontendSelectableButton) {
+            if (pFrontend->items[i].group == group && pFrontend->items[gFrontend_selected_item_index].selectable != kFrontendSelectableButton) {
                 pFrontend->items[i].radioButton_selected = 0;
             }
         }
@@ -4501,7 +4503,14 @@ int C2_HOOK_FASTCALL NetSummary_MenuHandler(tFrontend_spec* pFrontend) {
 
 void C2_HOOK_FASTCALL DisplayVolumeSettings(tFrontend_spec* pFrontend) {
 
-    gOptions_sound_slider.value = (float)(gProgram_state.effects_volume / 255.0);
+#if defined(_MSC_VER) && _MSC_VER >= 1400
+#pragma warning(push)
+#pragma warning(disable : 4244) // '=' : conversion from 'double ' to 'float ', possible loss of data
+#endif
+    gOptions_sound_slider.value = gProgram_state.effects_volume / 255.0;
+#if defined(_MSC_VER) && _MSC_VER >= 1400
+#pragma warning(pop)
+#endif
     if (gProgram_state.music_volume >= 128) {
         SelectThisItemIn(pFrontend, 1, 14);
     } else {
