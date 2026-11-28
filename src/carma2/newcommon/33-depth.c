@@ -213,7 +213,7 @@ inline br_scalar C2_HOOK_FASTCALL CalculateWrappingMultiplier(br_scalar pValue, 
 
     k = (float)(pYon * 1.3f * REC2_TAU / pValue);
     int_k = (int)k;
-    if (k - (br_scalar)int_k <= .5f) {
+    if (k - (br_scalar)int_k <= 0.5f) {
         trunc_k = (br_scalar)int_k;
     } else {
         trunc_k = (br_scalar)int_k + 1.0f;
