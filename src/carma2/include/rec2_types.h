@@ -4933,6 +4933,16 @@ typedef struct tPed_anim_seq {
     tU8 poses[];
 } tPed_anim_seq;
 
+typedef struct {
+    float distance;
+    tPedestrian* ped;
+} tPedestrian_distance;
+
+struct tPedestrian_distances {
+    int count;
+    tPedestrian_distance items[98]; /* FIXME: size guessed from DoPedNapalm's stack frame */
+};
+
 typedef struct tRace_pedestrian {
     undefined field_0x0[228];
     tPedestrian* ped;

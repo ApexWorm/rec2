@@ -1141,8 +1141,8 @@ void C2_HOOK_FASTCALL ScoreForKilledPedestrian(tPedestrian* pPed, float pHeight)
     } else {
         gPed_score_multiplier = 1;
     }
-    amount = gPed_points[gProgram_state.skill_level] * gPed_score_multiplier;
     gDAT_006a0418 = the_time;
+    amount = gPed_points[gProgram_state.skill_level] * gPed_score_multiplier;
     ped_object = pPed->character->personality->form->simple_physicing[(tS8)pPed->character->field_0x5].collision_info;
     BrVector3Sub(&offset, &pPed->pos, &car->pos);
     BrMatrix34TApplyV(&local_offset, &offset, &car->collision_info->actor->t.t.mat);
@@ -1206,8 +1206,8 @@ void C2_HOOK_FASTCALL ScoreForKilledPedestrian(tPedestrian* pPed, float pHeight)
         }
     }
     EarnCredits(amount);
-    gPTR_00694120 = pPed;
     gPed_recent_points = amount;
+    gPTR_00694120 = pPed;
     AwardTime(gPed_times[gProgram_state.skill_level]);
 }
 
@@ -1426,9 +1426,29 @@ int C2_HOOK_FASTCALL DoPedAnnihilator(tCar_spec* pCar, float pRange_squared) {
 
 // DoPedestrianRepulsifictor
 
-// CompileBurnableList
+// FUNCTION: CARMA2_HW 0x004ce770
+// FUNCTION: CARMA2_SW 0x004cae70
+// FUNCTION: CARMA2_CHEAT 0x004d4300
+int C2_HOOK_FASTCALL CompileBurnableList(tPedestrian* pPed, tCar_spec* pCar, float pDistance_squared, tU32 pTime, tPedestrian_distances* pList) {
 
-// SortPedListFunction
+    if (pPed->field_0x0c != NULL && pPed->field_0x0c->field_0x98 == 0) {
+        pList->items[pList->count].ped = pPed;
+        pList->items[pList->count].distance = pDistance_squared;
+        pList->count++;
+        return 1;
+    }
+#ifdef REC2_FIX_BUGS
+    return 0;
+#endif
+}
+
+// FUNCTION: CARMA2_HW 0x004ce7b0
+// FUNCTION: CARMA2_SW 0x004caeb0
+// FUNCTION: CARMA2_CHEAT 0x004d4340
+int C2_HOOK_CDECL SortPedListFunction(const void* pFirst, const void* pSecond) {
+
+    return (int)(((const tPedestrian_distance*)pFirst)->distance - ((const tPedestrian_distance*)pSecond)->distance);
+}
 
 // ChoosePedToNapalm
 
@@ -1826,6 +1846,17 @@ void C2_HOOK_FASTCALL ResetPedNearness(void) {
     gPed_nearness = 1;
 }
 
+// FUNCTION: CARMA2_HW 0x004d63a0
+// FUNCTION: CARMA2_SW 0x004d29a0
+// FUNCTION: CARMA2_CHEAT 0x004dbf60
+void C2_HOOK_FASTCALL FUN_004d63a0(void) {
+    tPedestrian* ped;
+
+    ped = &gPedestrian_array[gSelected_ped];
+    ped->field_0x0c->field_0x6c = 0;
+    SetCharacterPhysicsLevelAR(ped->character, 5);
+}
+
 // FUNCTION: CARMA2_HW 0x004d63e0
 // FUNCTION: CARMA2_SW 0x004d29e0
 // FUNCTION: CARMA2_CHEAT 0x004dbfa0
@@ -1940,6 +1971,13 @@ void C2_HOOK_FASTCALL ShowActivePedCount(void) {
 
     sprintf(text, "%d out of %d peds are active", gCount_active_peds, gPed_count);
     NewTextHeadupSlot2(4, 0, 1000, -4, text, 0);
+}
+
+// FUNCTION: CARMA2_HW 0x004d6870
+// FUNCTION: CARMA2_SW 0x004d2e70
+// FUNCTION: CARMA2_CHEAT 0x004dc430
+void C2_HOOK_FASTCALL FUN_004d6870(void) {
+
 }
 
 // FUNCTION: CARMA2_HW 0x004d6880
