@@ -1300,6 +1300,16 @@ void C2_HOOK_FASTCALL DisposeCar(tCar_spec* pCar_spec, int pOwner) {
 }
 
 #ifdef REC2_MATCHING
+// FUNCTION: CARMA2_HW 0x0044bf20
+// FUNCTION: CARMA2_SW 0x0044bcd0
+// FUNCTION: CARMA2_CHEAT 0x0044c470
+void C2_HOOK_FASTCALL FUN_0044bf20(tCar_spec* pCar_spec) {
+    /* Unused */
+    /* FIXME: the parameter type is a guess: the original only uses a br_actor* at offset 0x10 (car_master_actor of tCar_spec) */
+    BrActorRemove(pCar_spec->car_master_actor);
+    BrActorFree(pCar_spec->car_master_actor);
+}
+
 // FUNCTION: CARMA2_HW 0x0044bf40
 // FUNCTION: CARMA2_SW 0x0044bcf0
 // FUNCTION: CARMA2_CHEAT 0x0044c490
