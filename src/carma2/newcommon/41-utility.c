@@ -224,6 +224,18 @@ void C2_HOOK_FASTCALL PathCat(char* pDestn_str, const char* pStr_1, const char* 
     }
 }
 
+// FUNCTION: CARMA2_HW 0x00513720
+// FUNCTION: CARMA2_SW 0x0050eb60
+// FUNCTION: CARMA2_CHEAT 0x00519110
+int C2_HOOK_FASTCALL Chance(float pChance_per_second, int pPeriod) {
+
+    if (FRandomBetween(0.0f, 1.0f) <= pPeriod * pChance_per_second / 1000.0) {
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
 // FUNCTION: CARMA2_HW 0x00513770
 // FUNCTION: CARMA2_SW 0x0050ebb0
 // FUNCTION: CARMA2_CHEAT 0x000519160
@@ -243,6 +255,18 @@ tU32 C2_HOOK_FASTCALL GetFileLength(FILE* pF) {
     the_size = PFftell(pF);
     PFrewind(pF);
     return the_size;
+}
+
+// FUNCTION: CARMA2_HW 0x005137c0
+// FUNCTION: CARMA2_SW 0x0050ec00
+// FUNCTION: CARMA2_CHEAT 0x005191b0
+int C2_HOOK_FASTCALL BooleanTo1Or0(int pB) {
+
+    if (pB) {
+        return 1;
+    } else {
+        return 0;
+    }
 }
 
 // FUNCTION: CARMA2_HW 0x005137d0
@@ -1264,6 +1288,27 @@ void C2_HOOK_FASTCALL GetBlendTableName(int pPercent, char* pDest) {
     sprintf(pDest, "BLEND%d.TAB", 100 - pPercent);
 }
 
+// FUNCTION: CARMA2_HW 0x00515e30
+// FUNCTION: CARMA2_SW 0x005112a0
+// FUNCTION: CARMA2_CHEAT 0x0051b820
+int C2_HOOK_FASTCALL IsMaterialOpaque(br_material* pMaterial) {
+    br_token_value* tv;
+
+    if (pMaterial->index_blend == NULL) {
+        tv = pMaterial->extra_prim;
+        if (tv != NULL) {
+            while (tv->t != BR_NULL_TOKEN && tv->t != BRT_OPACITY_X) {
+                tv++;
+            }
+            if (tv->t != BR_NULL_TOKEN) {
+                return 1;
+            }
+        }
+        return 0;
+    }
+    return 1;
+}
+
 void C2_HOOK_FASTCALL BlendifyMaterialTablishly(br_material* pMaterial, int pPercent) {
     char* s;
 
@@ -1738,7 +1783,9 @@ void C2_HOOK_FASTCALL DRPixelmapCopy(br_pixelmap* dst, br_pixelmap* src) {
     }
 }
 
-static tMaterial_exception* C2_HOOK_FASTCALL FindExceptionInList(const char* pIdentifier, tMaterial_exception* pList) {
+// FUNCTION: CARMA2_HW 0x00517f10
+// FUNCTION: CARMA2_CHEAT 0x0051d940
+tMaterial_exception* C2_HOOK_FASTCALL FindExceptionInList(const char* pIdentifier, tMaterial_exception* pList) {
 
     for (; pList != NULL; pList = pList->next) {
         if (DRStricmp(pIdentifier, pList->texture_name) == 0) {
@@ -2018,6 +2065,17 @@ void C2_HOOK_FASTCALL PrintScreen(void) {
 #endif
         PFfclose(f);
     }
+}
+
+// FUNCTION: CARMA2_HW 0x00518ac0
+// FUNCTION: CARMA2_SW 0x00512580
+// FUNCTION: CARMA2_CHEAT 0x0051e4b0
+void C2_HOOK_FASTCALL DumpActorTree(br_actor* pActor, const char* pMessage) {
+
+    printf("MSG:\"%s\"\n", pMessage);
+    BrActorEnum(pActor, DumpVisibleActorsCB, NULL);
+    printf("----------------------------------\n\n");
+    fflush(stdout);
 }
 
 // FUNCTION: CARMA2_HW 0x00518b00

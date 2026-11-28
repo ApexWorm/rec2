@@ -40,9 +40,13 @@ extern br_scalar C2_HOOK_STDCALL SRandomPosNeg(br_scalar pN);
 
 extern void C2_HOOK_FASTCALL PathCat(char* pDestn_str, const char* pStr_1, const char* pStr_2);
 
+extern int C2_HOOK_FASTCALL Chance(float pChance_per_second, int pPeriod);
+
 extern float C2_HOOK_STDCALL tandeg(float pAngle);
 
 extern tU32 C2_HOOK_FASTCALL GetFileLength(FILE* pF);
+
+extern int C2_HOOK_FASTCALL BooleanTo1Or0(int pB);
 
 extern br_pixelmap* C2_HOOK_FASTCALL DRPixelmapAllocate(br_uint_8 pType, br_uint_16 pW, br_uint_16 pH, void* pPixels, int pFlags);
 
@@ -146,6 +150,8 @@ extern br_material* C2_HOOK_FASTCALL FindMaterial(const char* pName, br_actor* p
 
 extern void C2_HOOK_FASTCALL GetBlendTableName(int pPercent, char* pDest);
 
+extern int C2_HOOK_FASTCALL IsMaterialOpaque(br_material* pMaterial);
+
 extern void C2_HOOK_FASTCALL BlendifyMaterialTablishly(br_material* pMaterial, int pPercent);
 
 extern void C2_HOOK_FASTCALL BlendifyMaterialPrimitively(br_material* pMaterial, int pPercent);
@@ -204,7 +210,7 @@ extern void C2_HOOK_FASTCALL Copy8BitTo16Bit(br_pixelmap* pDst, br_pixelmap* pSr
 
 extern void C2_HOOK_FASTCALL DRPixelmapCopy(br_pixelmap* dst, br_pixelmap* src);
 
-// tMaterial_exception* C2_HOOK_FASTCALL FindExceptionInList(const char* pIdentifier, tMaterial_exception* pList)
+extern tMaterial_exception* C2_HOOK_FASTCALL FindExceptionInList(const char* pIdentifier, tMaterial_exception* pList);
 
 extern void C2_HOOK_FASTCALL NobbleNonzeroBlacks(br_pixelmap* pPalette);
 
@@ -221,6 +227,8 @@ extern void C2_HOOK_FASTCALL WhitenVertexRGB(br_model** pModels, int pCount);
 extern void C2_HOOK_FASTCALL BRPM_convert(br_pixelmap* pMap, int pPixel_type);
 
 extern void C2_HOOK_FASTCALL PrintScreen(void);
+
+extern void C2_HOOK_FASTCALL DumpActorTree(br_actor* pActor, const char* pMessage);
 
 extern intptr_t C2_HOOK_CDECL DumpVisibleActorsCB(br_actor* pActor, void* pData);
 
