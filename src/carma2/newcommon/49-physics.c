@@ -43,7 +43,7 @@ int gINT_00679434;
 // GLOBAL: CARMA2_HW 0x00679438
 // GLOBAL: CARMA2_SW 0x00673ba8
 // GLOBAL: CARMA2_CHEAT 0x00680ce8
-int gINT_00679438;
+int gTesting_sensible_place;
 
 // GLOBAL: CARMA2_HW 0x00692dc8
 // GLOBAL: CARMA2_SW 0x0068ce20
@@ -162,7 +162,7 @@ int gFace_count;
 // GLOBAL: CARMA2_HW 0x00679438
 // GLOBAL: CARMA2_SW 0x00673ba8
 // GLOBAL: CARMA2_CHEAT 0x00680ce8
-int gINT_00679438;
+int gTesting_sensible_place;
 
 // GLOBAL: CARMA2_HW 0x0079ecbc
 // GLOBAL: CARMA2_SW 0x00795248
@@ -843,7 +843,7 @@ int C2_HOOK_FASTCALL CheckTwoEdges(const br_vector3* pEdge_start, const br_vecto
             return CylinderCheck(&n0, &n1, pEdge_start, pEdge_direction, pOther_start, pOther_direction, pOther_velocity, pOther_direction_change, pForce, pCount, pObject, pOther);
         }
         t = -(c / b) - c * c * a / (b2 * b) * (-4.0f / 3.0f);
-        if (t < 0.0f || t > 1.0f || gINT_00679438 != 0) {
+        if (t < 0.0f || t > 1.0f || gTesting_sensible_place != 0) {
             t = -(b / a) - t;
         }
     }
@@ -1079,7 +1079,7 @@ inline void C2_HOOK_FASTCALL SetUpWorkspace(tPhysics_object* pObject, tPhysics_s
     br_vector3 corner;
     int i;
 
-    if (gINT_00679438 != 0) {
+    if (gTesting_sensible_place != 0) {
         trial_matrix = &pObject->transform_matrix;
     } else {
         trial_matrix = &pObject->actor->t.t.mat;
@@ -1141,7 +1141,7 @@ inline void C2_HOOK_FASTCALL SetUpWorkspace(tPhysics_object* pObject, tPhysics_s
         PhysicsError(ePhysicsError_UnknownShapeType, "");
         break;
     }
-    if (gINT_00679438 != 0) {
+    if (gTesting_sensible_place != 0) {
         BrMatrix34ApplyP(&pWorkspace->old_points[0], &pObject->cmpos, &pObject->transform_matrix);
         for (i = 1; i < pWorkspace->count_points; i++) {
             BrVector3Copy(&pWorkspace->old_points[i], &pWorkspace->old_points[0]);
@@ -1445,9 +1445,9 @@ int C2_HOOK_FASTCALL TestForObjectInSensiblePlace(tPhysics_object* pCollision_in
     gObject_blocking_sensible_place = NULL;
     GetNewBoundingBox(&pCollision_info_1->field_0xf4, &pCollision_info_1->bb1, &pCollision_info_1->transform_matrix);
     GetFacesNearObject(pCollision_info_1, pCar_callbacks);
-    gINT_00679438 = 1;
+    gTesting_sensible_place = 1;
     count = GetObjectWallForceInfo(pCollision_info_1, forces, 0);
-    gINT_00679438 = 0;
+    gTesting_sensible_place = 0;
     if (count != 0) {
         BrVector3Copy(&normal, &forces[0].direction_a);
         if (count > 1) {
