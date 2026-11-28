@@ -224,12 +224,12 @@ float gFLOAT_0068d6e0;
 // GLOBAL: CARMA2_HW 0x0068d890
 // GLOBAL: CARMA2_SW 0x006878e8
 // GLOBAL: CARMA2_CHEAT 0x00695130
-int gINT_0068d890;
+int gMap_overlay_offset_x;
 
 // GLOBAL: CARMA2_HW 0x0068c858
 // GLOBAL: CARMA2_SW 0x006868b0
 // GLOBAL: CARMA2_CHEAT 0x006940f8
-int gINT_0068c858;
+int gMap_overlay_offset_y;
 
 // GLOBAL: CARMA2_HW 0x0068d8b0
 // GLOBAL: CARMA2_SW 0x00687908
@@ -650,8 +650,8 @@ void C2_HOOK_FASTCALL DrawMapBlip(br_pixelmap* pScreen, tCar_spec* pCar, tU32 pT
             || (gCurrent_net_game->type == eNet_game_type_6 && !NetPlayerFromCar(pCar)->field_0x80)
             || (gCurrent_net_game->type == eNet_game_type_foxy && pCar == gNet_players[gIt_or_fox].car)
             || (gCurrent_net_game->type != eNet_game_type_6 && gCurrent_net_game->type != eNet_game_type_foxy))) {
-        offset.v[0] = (float)(gHeadup_map_half_width + gINT_0068d890 + gINT_0074ab8c) - map_pos.v[0];
-        offset.v[1] = (float)(gHeadup_map_half_height + gINT_0068c858 + gINT_0074ab88) - map_pos.v[1];
+        offset.v[0] = (float)(gHeadup_map_half_width + gMap_overlay_offset_x + gINT_0074ab8c) - map_pos.v[0];
+        offset.v[1] = (float)(gHeadup_map_half_height + gMap_overlay_offset_y + gINT_0074ab88) - map_pos.v[1];
         offset.v[2] = 0.0f - map_pos.v[2];
         distance = offset.v[2] * offset.v[2] + offset.v[0] * offset.v[0] + offset.v[1] * offset.v[1];
         if ((gTarget_lock_car_2 == NULL
@@ -759,8 +759,8 @@ inline void C2_HOOK_FASTCALL DrawSmashBlip(br_pixelmap* pScreen, tU32 pTime, con
 
     BrMatrix34ApplyP(&map_pos, pPos, &gCurrent_race.map_transformation);
     map_pos.v[2] = 0.0f;
-    offset.v[0] = (float)(gHeadup_map_half_width + gINT_0068d890 + gINT_0074ab8c) - map_pos.v[0];
-    offset.v[1] = (float)(gHeadup_map_half_height + gINT_0068c858 + gINT_0074ab88) - map_pos.v[1];
+    offset.v[0] = (float)(gHeadup_map_half_width + gMap_overlay_offset_x + gINT_0074ab8c) - map_pos.v[0];
+    offset.v[1] = (float)(gHeadup_map_half_height + gMap_overlay_offset_y + gINT_0074ab88) - map_pos.v[1];
     offset.v[2] = 0.0f - map_pos.v[2];
     distance = offset.v[2] * offset.v[2] + offset.v[0] * offset.v[0] + offset.v[1] * offset.v[1];
     if (gNearest_smash_blip_index == -1 || distance < gFLOAT_0074abc4) {
