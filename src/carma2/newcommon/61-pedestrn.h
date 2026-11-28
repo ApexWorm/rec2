@@ -105,7 +105,7 @@ extern void C2_HOOK_FASTCALL DisposeRemap(tPed_remap* pRemap);
 
 extern void C2_HOOK_FASTCALL DisposeAllLoadedRemaps(void);
 
-// FindOrOpenRemap
+extern tPed_remap* C2_HOOK_FASTCALL FindOrOpenRemap(const char* pName);
 
 // Flip3DStoBRaxes
 

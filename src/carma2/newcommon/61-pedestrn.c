@@ -616,7 +616,19 @@ void C2_HOOK_FASTCALL DisposeAllLoadedRemaps(void) {
     }
 }
 
-// FindOrOpenRemap
+// FUNCTION: CARMA2_HW 0x00404740
+// FUNCTION: CARMA2_SW 0x00404740
+// FUNCTION: CARMA2_CHEAT 0x00404740
+tPed_remap* C2_HOOK_FASTCALL FindOrOpenRemap(const char* pName) {
+    int i;
+
+    for (i = 0; i < (int)REC2_ASIZE(gPed_remaps); i++) {
+        if (gPed_remaps[i] != NULL && strcmp(pName, gPed_remaps[i]->name) == 0) {
+            return gPed_remaps[i];
+        }
+    }
+    return ReadRemap(pName);
+}
 
 // Flip3DStoBRaxes
 
