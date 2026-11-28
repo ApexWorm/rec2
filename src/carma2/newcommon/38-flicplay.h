@@ -57,6 +57,8 @@ extern void C2_HOOK_FASTCALL LetFlicFuckWithPalettes(void);
 
 extern void C2_HOOK_STDCALL PlayFlicsInDarkness(void);
 
+extern void C2_HOOK_STDCALL ReilluminateFlics(void);
+
 extern void C2_HOOK_FASTCALL TurnFlicTransparencyOn(void);
 
 extern void C2_HOOK_FASTCALL TurnFlicTransparencyOff(void);

@@ -618,6 +618,14 @@ void C2_HOOK_STDCALL PlayFlicsInDarkness(void) {
     gDark_mode = 1;
 }
 
+// FUNCTION: CARMA2_HW 0x004619d0
+// FUNCTION: CARMA2_SW 0x00461470
+// FUNCTION: CARMA2_CHEAT 0x00461e40
+void C2_HOOK_STDCALL ReilluminateFlics(void) {
+    gDark_mode = 0;
+    FadePaletteUp();
+}
+
 // FUNCTION: CARMA2_HW 0x004619e0
 // FUNCTION: CARMA2_SW 0x00461480
 // FUNCTION: CARMA2_CHEAT 0x00461e50
