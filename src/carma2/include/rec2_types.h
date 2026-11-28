@@ -4647,8 +4647,8 @@ typedef struct tPhysics_object {
     br_vector3 field_0x1b4;
     br_vector3 rotate_omega;
     undefined field_0x1cc[12];
-    undefined4 field183_0x1d8;
-    undefined field_0x1dc;
+    tPhysics_object* field183_0x1d8;
+    tS8 field_0x1dc;
     undefined collision_flag;
     undefined field_0x1de;
     undefined field_0x1df;
