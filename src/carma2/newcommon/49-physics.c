@@ -147,7 +147,7 @@ int gFace_count;
 // GLOBAL: CARMA2_HW 0x00679438
 // GLOBAL: CARMA2_SW 0x00673ba8
 // GLOBAL: CARMA2_CHEAT 0x00680ce8
-int gINT_00679438;
+int gTesting_sensible_place;
 
 // GLOBAL: CARMA2_HW 0x0079ecbc
 // GLOBAL: CARMA2_SW 0x00795248
@@ -551,9 +551,9 @@ int C2_HOOK_FASTCALL TestForObjectInSensiblePlace(tPhysics_object* pCollision_in
     gObject_blocking_sensible_place = NULL;
     GetNewBoundingBox(&pCollision_info_1->field_0xf4, &pCollision_info_1->bb1, &pCollision_info_1->transform_matrix);
     GetFacesNearObject(pCollision_info_1, pCar_callbacks);
-    gINT_00679438 = 1;
+    gTesting_sensible_place = 1;
     count = GetObjectWallForceInfo(pCollision_info_1, forces, 0);
-    gINT_00679438 = 0;
+    gTesting_sensible_place = 0;
     if (count != 0) {
         BrVector3Copy(&normal, &forces[0].direction_a);
         if (count > 1) {
