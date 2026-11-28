@@ -12,6 +12,8 @@
 #include "18-graphics2.h"
 #include "30-opponent.h"
 #include "35-intrface.h"
+#include "41-utility.h"
+#include "45-cutscene.h"
 #include "69-sound.h"
 #include "72-interface.h"
 #include "platform.h"
@@ -102,12 +104,59 @@ void C2_HOOK_FASTCALL RecordAPOAndCredits(void) {
     gAPO_pre_race[2] = gProgram_state.current_car.power_up_levels[2];
 }
 
-// PickRaceWhenGameCompleted
+inline void C2_HOOK_FASTCALL PickRaceWhenGameCompleted(void) {
 
-// STUB: CARMA2_HW 0x004e3440
-// STUB: CARMA2_SW 0x004df7d0
-// STUB: CARMA2_CHEAT 0x004e8fc0
+    gProgram_state.current_race_index = IRandomBetween(0, gNumber_of_races - 1);
+    gCurrent_race_group = gRace_list[gProgram_state.current_race_index].group;
+}
+
+// FUNCTION: CARMA2_HW 0x004e3440
+// FUNCTION: CARMA2_SW 0x004df7d0
+// FUNCTION: CARMA2_CHEAT 0x004e8fc0
 int C2_HOOK_FASTCALL MungeRaceProgression(tRace_result pRace_result) {
-    NOT_IMPLEMENTED();
+    int i;
+    int least_raced;
+    int least_races;
+    int game_completed;
+
+    game_completed = 0;
+    if (pRace_result == eRace_completed) {
+        gCurrent_race.race_spec->count_opponents++;
+        if (gProgram_state.game_completed) {
+            PickRaceWhenGameCompleted();
+        } else if (gCurrent_race.race_spec->is_boundary) {
+            gIs_boundary_race = 0;
+            gCurrent_race_group++;
+            if (gCurrent_race_group - gRace_groups >= gCountRaceGroups) {
+                gProgram_state.game_completed = 1;
+                DoGameCompletedAnimation();
+                FRONTEND_Main(kFrontend_menu_credits);
+                PickRaceWhenGameCompleted();
+                game_completed = 1;
+            } else {
+                gProgram_state.current_race_index = gCurrent_race_group->races - gRace_list;
+            }
+        } else {
+            least_races = 10000;
+            for (i = 0; i < gCurrent_race_group->count_races; i++) {
+                if (gCurrent_race_group->races[i].count_opponents < least_races) {
+                    least_races = gCurrent_race_group->races[i].count_opponents;
+                    least_raced = i;
+                }
+            }
+            if (least_races != 0) {
+                gIs_boundary_race = 1;
+                gProgram_state.current_race_index = gCurrent_race_group->mission - gRace_list;
+            } else {
+                gProgram_state.current_race_index = &gCurrent_race_group->races[least_raced] - gRace_list;
+            }
+        }
+    } else if (!gNo_credits_APO_restore) {
+        gProgram_state.credits = gMoney_pre_race;
+        gProgram_state.current_car.power_up_levels[0] = gAPO_pre_race[0];
+        gProgram_state.current_car.power_up_levels[1] = gAPO_pre_race[1];
+        gProgram_state.current_car.power_up_levels[2] = gAPO_pre_race[2];
+    }
+    return game_completed;
 }
 

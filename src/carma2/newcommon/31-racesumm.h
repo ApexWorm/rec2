@@ -24,7 +24,7 @@ extern int C2_HOOK_FASTCALL AnyBuyableCars(void);
 
 extern void C2_HOOK_FASTCALL RecordAPOAndCredits(void);
 
-// PickRaceWhenGameCompleted
+extern void C2_HOOK_FASTCALL PickRaceWhenGameCompleted(void);
 
 extern int C2_HOOK_FASTCALL MungeRaceProgression(tRace_result pRace_result);
 
