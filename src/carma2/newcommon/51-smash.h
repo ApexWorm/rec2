@@ -258,6 +258,8 @@ extern void C2_HOOK_FASTCALL SplondificatalizeIdentifier(br_actor* pActor, char 
 
 extern void C2_HOOK_FASTCALL DisposeSmashEnvNonCars(void);
 
+extern void C2_HOOK_FASTCALL FUN_004f0950(void);
+
 extern void C2_HOOK_FASTCALL DisposeSmashableEnvironment(void);
 
 // CloneMemory

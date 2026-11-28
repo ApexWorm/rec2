@@ -27,4 +27,6 @@ extern void C2_HOOK_FASTCALL TraceVector3(const char* pName, const br_vector3* p
 
 extern void C2_HOOK_FASTCALL TraceMatrix34(const char* pName, const br_matrix34* pMat);
 
+extern int C2_HOOK_FASTCALL FUN_0044c690(int pStr_index);
+
 #endif // GUARD_52_ERRORS_H

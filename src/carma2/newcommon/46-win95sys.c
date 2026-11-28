@@ -174,6 +174,16 @@ void C2_HOOK_FASTCALL PDDisposeActionReplayBuffer(void* pBuffer) {
     (void)pBuffer;
 }
 
+// FUNCTION: CARMA2_HW 0x0051b9e0
+// FUNCTION: CARMA2_SW 0x005157b0
+// FUNCTION: CARMA2_CHEAT 0x00521290
+int C2_HOOK_FASTCALL FUN_0051b9e0(int pArg1, int* pArg2) {
+    (void)pArg1;
+
+    *pArg2 = 0;
+    return 0;
+}
+
 // PDInitJoysticks
 
 // PDReadJoySticks

@@ -8,6 +8,7 @@
 
 #include "52-errors.h"
 
+#include "01-network.h"
 #include "08-loading1.h"
 #include "platform.h"
 #include "rec2_types.h"
@@ -345,4 +346,13 @@ void C2_HOOK_FASTCALL TraceMatrix34(const char* pName, const br_matrix34* pMat) 
     dr_dprintf("[%8.3f, %8.3f, %8.3f]", pMat->m[1][0], pMat->m[1][1], pMat->m[1][2]);
     dr_dprintf("[%8.3f, %8.3f, %8.3f]", pMat->m[2][0], pMat->m[2][1], pMat->m[2][2]);
     dr_dprintf("[%8.3f, %8.3f, %8.3f]", pMat->m[3][0], pMat->m[3][1], pMat->m[3][2]);
+}
+
+// FUNCTION: CARMA2_HW 0x0044c690
+// FUNCTION: CARMA2_SW 0x0044c440
+// FUNCTION: CARMA2_CHEAT 0x0044cbe0
+int C2_HOOK_FASTCALL FUN_0044c690(int pStr_index) {
+
+    NetFullScreenMessage(pStr_index, 0);
+    return 0;
 }

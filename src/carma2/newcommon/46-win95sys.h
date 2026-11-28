@@ -122,6 +122,8 @@ extern void C2_HOOK_FASTCALL PDAllocateActionReplayBuffer(tU8** pBuffer, tU32* p
 
 extern void C2_HOOK_FASTCALL PDDisposeActionReplayBuffer(void* pBuffer);
 
+extern int C2_HOOK_FASTCALL FUN_0051b9e0(int pArg1, int* pArg2);
+
 // PDInitJoysticks
 
 // PDReadJoySticks

@@ -1130,6 +1130,13 @@ void C2_HOOK_FASTCALL TransparentPolyFontText(const char *pText, int pX, int pY,
     }
 }
 
+// FUNCTION: CARMA2_HW 0x004657b0
+// FUNCTION: CARMA2_SW 0x00465310
+// FUNCTION: CARMA2_CHEAT 0x00465c30
+void C2_HOOK_FASTCALL FUN_004657b0(void) {
+
+}
+
 void C2_HOOK_FASTCALL DrawDigitAt(const br_pixelmap* pSource, br_pixelmap* pDest, br_uint_16 pX, br_uint_16 pY, br_uint_16 pDigit_height, int pDigit) {
 
     DRPixelmapRectangleMaskedCopy(pDest, pX, pY, pSource, 0, pDigit * pDigit_height ,pSource->width, pDigit_height);

@@ -1415,6 +1415,15 @@ void C2_HOOK_FASTCALL DisposeSmashEnvNonCars(void) {
     BrMemFree(gSmashable_noncars);
 }
 
+// FUNCTION: CARMA2_HW 0x004f0950
+// FUNCTION: CARMA2_SW 0x004ec5b0
+// FUNCTION: CARMA2_CHEAT 0x004f65f0
+void C2_HOOK_FASTCALL FUN_004f0950(void) {
+
+    gCount_track_smashable_environment_specs = 0;
+    gTrack_smashable_environment_specs = NULL;
+}
+
 // FUNCTION: CARMA2_HW 0x004f0960
 // FUNCTION: CARMA2_SW 0x004ec5c0
 // FUNCTION: CARMA2_CHEAT 0x004f6600

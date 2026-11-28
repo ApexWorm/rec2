@@ -72,6 +72,8 @@ extern void C2_HOOK_FASTCALL PolyFontText(const char *pText, int pX, int pY, int
 
 extern void C2_HOOK_FASTCALL TransparentPolyFontText(const char* pText, int pX, int pY, int pFont, tJustification pJust, int pRender, double pOpacity_factor);
 
+extern void C2_HOOK_FASTCALL FUN_004657b0(void);
+
 extern void C2_HOOK_FASTCALL DrawDigitAt(const br_pixelmap* pSource, br_pixelmap* pDest, br_uint_16 pX, br_uint_16 pY, br_uint_16 pDigit_height, int pDigit);
 
 extern void C2_HOOK_FASTCALL DrawNumberAt(const br_pixelmap* pSrc, br_pixelmap* pDest, int pX, int pY, int pX_pitch, int pY_pitch, int pValue ,int pDigit_count, int pLeading_zeroes);
