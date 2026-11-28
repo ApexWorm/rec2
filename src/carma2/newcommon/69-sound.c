@@ -115,6 +115,7 @@ int gLast_tune = -1;
 
 // GLOBAL: CARMA2_HW 0x00595c28
 // GLOBAL: CARMA2_SW 0x00590b88
+// GLOBAL: CARMA2_CHEAT 0x0059c580
 const char* gSound_periodicity_choices[3] = {
     "RANDOM",
     "PERIODIC",
@@ -1069,6 +1070,7 @@ void C2_HOOK_FASTCALL BuggerModelName(tTrack_spec* pTrack_spec, const char* pNam
 
 // FUNCTION: CARMA2_HW 0x004572f0
 // FUNCTION: CARMA2_SW 0x00457080
+// FUNCTION: CARMA2_CHEAET 0x00457770
 void C2_HOOK_FASTCALL ReadSoundGenerators(tTrack_spec* pTrack_spec, FILE* pF) {
     char name[32];
     tTrackSoundGenerator* generator;
@@ -1111,6 +1113,7 @@ void C2_HOOK_FASTCALL ReadSoundGenerators(tTrack_spec* pTrack_spec, FILE* pF) {
 
 // FUNCTION: CARMA2_HW 0x00457450
 // FUNCTION: CARMA2_SW 0x004571e0
+// FUNCTION: CARMA2_CHEAT 0x004578d0
 void C2_HOOK_FASTCALL WriteOutSoundSpec(FILE* pF, tSpecial_volume_soundfx_data* pSpec) {
     int i;
 
