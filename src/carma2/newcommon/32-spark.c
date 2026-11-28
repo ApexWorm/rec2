@@ -1480,10 +1480,10 @@ void C2_HOOK_FASTCALL DoSmokeColumn(int pColumn, tU32 pTime, br_vector3* pRet_ca
     br_actor* bonny;
 
     if (gSmoke_column[pColumn].core.field_0x0 == 1) {
-        if (gSmoke_column[pColumn].core.car->car_master_actor->t.t.mat.m[1][1] > .1f) {
+        if (gSmoke_column[pColumn].core.car->car_master_actor->t.t.mat.m[1][1] > 0.1f) {
             gSmoke_column[pColumn].upright = 1;
         }
-        if (gSmoke_column[pColumn].core.car->car_master_actor->t.t.mat.m[1][1] < -.1f) {
+        if (gSmoke_column[pColumn].core.car->car_master_actor->t.t.mat.m[1][1] < -0.1f) {
             gSmoke_column[pColumn].upright = 0;
         }
         actor = gSmoke_column[pColumn].core.car->car_actor;
@@ -1503,10 +1503,10 @@ void C2_HOOK_FASTCALL DoSmokeColumn(int pColumn, tU32 pTime, br_vector3* pRet_ca
         }
     }
     if (!gSmoke_column[pColumn].upright) {
-        pRet_car_pos->v[1] = gSmoke_column[pColumn].core.car->collision_info->shape->common.bb.min.v[1] * (1.f / WORLD_SCALE);
+        pRet_car_pos->v[1] = gSmoke_column[pColumn].core.car->collision_info->shape->common.bb.min.v[1] * (1.0f / WORLD_SCALE);
     }
     BrMatrix34ApplyP(&gSmoke_column[pColumn].pos, pRet_car_pos, &gSmoke_column[pColumn].core.car_actor->t.t.mat);
-    gSmoke_column[pColumn].pos.v[1] -= .03f;
+    gSmoke_column[pColumn].pos.v[1] -= 0.03f;
 }
 
 inline void C2_HOOK_FASTCALL ReplaySmokeColumn(tU32 pTime) {
