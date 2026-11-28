@@ -19,6 +19,7 @@
 #include "20-skidmark.h"
 #include "22-replay.h"
 #include "23-piping.h"
+#include "23-piping-ar.h"
 #include "27-powerup.h"
 #include "29-raycast.h"
 #include "30-opponent.h"

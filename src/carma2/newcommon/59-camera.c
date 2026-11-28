@@ -15,6 +15,7 @@
 #include "21-mainloop.h"
 #include "22-replay.h"
 #include "23-piping.h"
+#include "23-piping-ar.h"
 #include "34-finteray.h"
 #include "37-brucetrk.h"
 #include "41-utility.h"

@@ -11,6 +11,7 @@
 #include "16-graphics1.h"
 #include "17-world2.h"
 #include "23-piping.h"
+#include "23-piping-ar.h"
 #include "36-trig.h"
 #include "41-utility.h"
 #include "52-errors.h"

@@ -13,6 +13,7 @@
 #include "10-loading2.h"
 #include "18-graphics2.h"
 #include "23-piping.h"
+#include "23-piping-ar.h"
 #include "30-opponent.h"
 #include "32-spark.h"
 #include "40-main.h"

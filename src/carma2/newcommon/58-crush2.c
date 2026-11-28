@@ -16,6 +16,7 @@
 #include "17-world2.h"
 #include "21-mainloop.h"
 #include "23-piping.h"
+#include "23-piping-ar.h"
 #include "30-opponent.h"
 #include "32-spark.h"
 #include "39-oil.h"

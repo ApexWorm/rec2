@@ -11,6 +11,7 @@
 #include "00-car.h"
 #include "08-loading1.h"
 #include "23-piping.h"
+#include "23-piping-ar.h"
 #include "28-world3.h"
 #include "30-opponent.h"
 #include "41-utility.h"

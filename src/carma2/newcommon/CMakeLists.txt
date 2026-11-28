@@ -31,6 +31,7 @@ foreach(edition ${REC2_EDITIONS})
         20-skidmark.c
         21-mainloop.c
         22-replay.c
+        23-piping-ar.c
         23-piping.c
         24-loadsave.c
         25-grafdata.c

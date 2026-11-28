@@ -16,6 +16,7 @@
 #include "15-displays.h"
 #include "18-graphics2.h"
 #include "23-piping.h"
+#include "23-piping-ar.h"
 #include "36-trig.h"
 #include "41-utility.h"
 #include "49-physics.h"
