@@ -3124,7 +3124,7 @@ intptr_t C2_HOOK_CDECL MakeCarModelsMaterialsDoubleSided(br_actor* pActor, void*
 
 // SwapCarShapes
 
-inline int C2_HOOK_FASTCALL IsAWheelOrPivotActor(const br_actor* pActor, const tCar_spec* pCar) {
+inline int C2_HOOK_FASTCALL IsAWheelOrPivotActor(br_actor* pActor, tCar_spec* pCar) {
     int i;
 
     for (i = 0; i < (int)REC2_ASIZE(pCar->wheel_actors); i++) {

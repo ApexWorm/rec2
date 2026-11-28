@@ -313,7 +313,7 @@ extern intptr_t C2_HOOK_CDECL MakeCarModelsMaterialsDoubleSided(br_actor* pActor
 
 // SwapCarShapes
 
-extern int C2_HOOK_FASTCALL IsAWheelOrPivotActor(const br_actor* pActor, const tCar_spec* pCar);
+extern int C2_HOOK_FASTCALL IsAWheelOrPivotActor(br_actor* pActor, tCar_spec* pCar);
 
 extern intptr_t C2_HOOK_CDECL MakeCarModelsMaterialsSingleSided(br_actor* pActor, void* pArg);
 
