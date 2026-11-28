@@ -1519,12 +1519,12 @@ int C2_HOOK_FASTCALL DoToPeds(tCar_spec* pCar, int pOnly_alive, float pRange_squ
     for (ped = gPedestrians_in_sight; ped != NULL; ped = ped->next) {
         distance_squared = (pos->v[0] - ped->pos.v[0]) * (pos->v[0] - ped->pos.v[0]) + (pos->v[1] - ped->pos.v[1]) * (pos->v[1] - ped->pos.v[1]) + (pos->v[2] - ped->pos.v[2]) * (pos->v[2] - ped->pos.v[2]);
         if (!pOnly_alive || ped->hit_points > 0) {
-            if (pRange_squared == 0.f || distance_squared < pRange_squared) {
+            if (pRange_squared == 0.0f || distance_squared < pRange_squared) {
                 if (pCheck_visible) {
                     BrVector3Sub(&dir, &ped->pos, pos);
                     FindFace(pos, &dir, &normal, &t, &material);
                 } else {
-                    t = 100.f;
+                    t = 100.0f;
                 }
                 if (t >= 1.0) {
                     pCallback(ped, pCar, distance_squared, time, pContext);
