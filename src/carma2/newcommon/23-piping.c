@@ -130,11 +130,23 @@ tU8* gPipe_record_ptr;
 
 // GLOBAL: CARMA2_HW 0x00676904
 // GLOBAL: CARMA2_SW 0x00671074
+// GLOBAL: CARMA2_CHEAT 0x0067e1b4
 tU32 gPipe_sound_start_time;
 
 // GLOBAL: CARMA2_HW 0x006768a8
 // GLOBAL: CARMA2_SW 0x00671018
+// GLOBAL: CARMA2_CHEAT 0x0067e158
 tU32 gPipe_sound_time_window;
+
+// GLOBAL: CARMA2_HW 0x006768b0
+// GLOBAL: CARMA2_SW 0x00671020
+// GLOBAL: CARMA2_CHEAT 0x0067e160
+tU32 gOldest_time;
+
+// GLOBAL: CARMA2_HW 0x0058f1e8
+// GLOBAL: CARMA2_SW 0x0058a1e8
+// GLOBAL: CARMA2_CHEAT 0x005941e8
+int gMax_rewind_chunks = 1000;
 
 // GLOBAL: CARMA2_HW 0x0067690c
 // GLOBAL: CARMA2_SW 0x0067107c
@@ -615,11 +627,41 @@ int C2_HOOK_FASTCALL MoveSessionPointerForwardOne(tU8** pPtr) {
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x00403800
-// STUB: CARMA2_SW 0x00403800
-// STUB: CARMA2_CHEAT 0x00403800
+// FUNCTION: CARMA2_HW 0x00403800
+// FUNCTION: CARMA2_SW 0x00403800
+// FUNCTION: CARMA2_CHEAT 0x00403800
 tPipe_chunk* C2_HOOK_FASTCALL FindPreviousChunk(tU8* pPtr, int pType, uintptr_t pIndex) {
-    NOT_IMPLEMENTED();
+    tU8* ptr;
+    tU32 i;
+    int reached_end;
+    int chunk_counter;
+    tPipe_chunk* mr_chunky;
+    uintptr_t masked_index;
+
+    ptr = pPtr;
+    chunk_counter = 0;
+    masked_index = pIndex & 0xfff;
+    do {
+        if (MoveSessionPointerBackOne(&ptr) || chunk_counter++ >= gMax_rewind_chunks) {
+            reached_end = 1;
+        } else {
+            reached_end = 0;
+        }
+        if (!reached_end) {
+            gEnd_of_session = ptr + LengthOfSession((tPipe_session*)ptr) - sizeof(tU16);
+            mr_chunky = (tPipe_chunk*)((tPipe_session*)ptr)->data;
+            for (i = 0; i < ((tPipe_session*)ptr)->count; i++) {
+                if (((tPipe_session*)ptr)->type != pType) {
+                    break;
+                }
+                if ((mr_chunky->subject_index & 0xfff) == masked_index) {
+                    return mr_chunky;
+                }
+                ARAdvanceChunkPtr((tU8**)&mr_chunky, pType);
+            }
+        }
+    } while (!reached_end);
+    return NULL;
 }
 
 #ifdef REC2_MATCHING
@@ -695,9 +737,50 @@ inline int C2_HOOK_FASTCALL UndoPipedSession(tU8** pPtr) {
     return ((tPipe_session*)temp_ptr)->type == ePipe_chunk_frame_finish;
 }
 
-// ARScanBuffer
+inline void C2_HOOK_FASTCALL ARScanBuffer(tU8** pPtr, int pType, tU32 pDefault_time, tScan_buffer_callback* pCall_back, tScan_buffer_time_check* pTime_check) {
+    tU32 the_time;
 
-// CheckSound
+    the_time = pDefault_time;
+    do {
+        if (ARReplayForwards()) {
+            if (MoveSessionPointerForwardOne(pPtr)) {
+                return;
+            }
+        } else if (MoveSessionPointerBackOne(pPtr)) {
+            return;
+        }
+        gEnd_of_session = *pPtr + LengthOfSession((tPipe_session*)*pPtr) - sizeof(tU16);
+        if (((tPipe_session*)*pPtr)->type == ePipe_chunk_frame_finish) {
+            the_time = ((tPipe_chunk*)((tPipe_session*)*pPtr)->data)->data.frame_boundary.time;
+        } else if (((tPipe_session*)*pPtr)->type == pType) {
+            if (pCall_back((tPipe_chunk*)((tPipe_session*)*pPtr)->data, ((tPipe_session*)*pPtr)->count, the_time)) {
+                break;
+            }
+        }
+    } while (pTime_check == NULL || pTime_check(the_time));
+}
+
+inline int C2_HOOK_FASTCALL CheckSound(tPipe_chunk* pChunk_ptr, int pChunk_count, tU32 pTime) {
+    int i;
+    int sound_length;
+    tPipe_chunk* temp_ptr;
+
+    temp_ptr = pChunk_ptr;
+    for (i = 0; i < pChunk_count; i++) {
+        sound_length = S3GetSampleLength(temp_ptr->subject_index);
+        if (temp_ptr->data.sound.pitch > 1) {
+            sound_length = (int)((double)sound_length / ((double)temp_ptr->data.sound.pitch / 65536.0));
+        }
+        if (pTime + sound_length >= gPipe_sound_start_time && pTime + sound_length < gOldest_time) {
+            if (gPipe_callbacks[ePipe_chunk_sound].apply != NULL) {
+                gPipe_callbacks[ePipe_chunk_sound].apply(&temp_ptr);
+            }
+        } else {
+            ARAdvanceChunkPtr((tU8**)&temp_ptr, ePipe_chunk_sound);
+        }
+    }
+    return 0;
+}
 
 // FUNCTION: CARMA2_HW 0x00403c50
 // FUNCTION: CARMA2_SW 0x00403c50
@@ -707,20 +790,20 @@ int C2_HOOK_FASTCALL SoundTimeout(tU32 pTime) {
         || gPipe_sound_start_time - pTime < gPipe_sound_time_window;
 }
 
-#ifdef REC2_MATCHING
-#pragma auto_inline(off)
-#endif
-
-// STUB: CARMA2_HW 0x00403990
-// STUB: CARMA2_SW 0x00403990
-// STUB: CARMA2_CHEAT 0x00403990
+// FUNCTION: CARMA2_HW 0x00403990
+// FUNCTION: CARMA2_SW 0x00403990
+// FUNCTION: CARMA2_CHEAT 0x00403990
 void C2_HOOK_FASTCALL ScanAndPlaySoundsToBe(tU8* pPtr, tU32 pOldest_time, tU32 pYoungest_time) {
-    NOT_IMPLEMENTED();
-}
+    tU8* temp_ptr;
 
-#ifdef REC2_MATCHING
-#pragma auto_inline(on)
-#endif
+    if (!gDisable_piped_sounds) {
+        temp_ptr = pPtr;
+        gPipe_sound_start_time = pYoungest_time;
+        gOldest_time = pOldest_time;
+        gPipe_sound_time_window = (tU32)(fabs(gReplay_rate) * 1500.0);
+        ARScanBuffer(&temp_ptr, ePipe_chunk_sound, pOldest_time, CheckSound, SoundTimeout);
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x00403020
 // FUNCTION: CARMA2_SW 0x00403020

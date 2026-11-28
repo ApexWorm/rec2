@@ -32,6 +32,8 @@ extern tU8* gPipe_buffer_oldest;
 extern tU8* gPipe_record_ptr;
 extern tU32 gPipe_sound_start_time;
 extern tU32 gPipe_sound_time_window;
+extern tU32 gOldest_time;
+extern int gMax_rewind_chunks;
 extern int gDisable_advance;
 extern int gPipe_count_callbacks;
 extern tPipe_smudge_data* gCrush_space;
@@ -107,9 +109,9 @@ extern tPipe_chunk* C2_HOOK_FASTCALL FindPreviousChunk(tU8* pPtr, int pType, uin
 
 extern int C2_HOOK_FASTCALL UndoPipedSession(tU8** pPtr);
 
-// ARScanBuffer
+extern void C2_HOOK_FASTCALL ARScanBuffer(tU8** pPtr, int pType, tU32 pDefault_time, tScan_buffer_callback* pCall_back, tScan_buffer_time_check* pTime_check);
 
-// CheckSound
+extern int C2_HOOK_FASTCALL CheckSound(tPipe_chunk* pChunk_ptr, int pChunk_count, tU32 pTime);
 
 extern int C2_HOOK_FASTCALL SoundTimeout(tU32 pTime);
 

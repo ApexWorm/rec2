@@ -872,6 +872,7 @@ typedef struct tPipe_chunk {
     uintptr_t subject_index;
     union {
         tPipe_chunk_car_incident car_incident;
+        tPipe_shunk_single_sound sound;
         tPipe_chunk_frame_boundary frame_boundary;
         tPipe_chunk_car car;
         tPipe_chunk_non_car non_car;
@@ -933,6 +934,10 @@ typedef struct tPipe_session {
     tU32 count;
     char data[];
 } tPipe_session;
+
+typedef int C2_HOOK_FASTCALL tScan_buffer_callback(tPipe_chunk* pChunk, int pChunk_count, tU32 pTime);
+
+typedef int C2_HOOK_FASTCALL tScan_buffer_time_check(tU32 pTime);
 
 typedef void C2_HOOK_FASTCALL tDrone_state_function(tDrone_spec*, tDroneStateFuncState);
 
