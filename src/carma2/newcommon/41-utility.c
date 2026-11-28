@@ -35,7 +35,7 @@
 // GLOBAL: CARMA2_CHEAT 0x006b3588
 tU32 last_service;
 
-/* FIXME: name and file unknown; only NonCarCalcForce uses it */
+/* FIXME: name and file unknown */
 // GLOBAL: CARMA2_HW 0x00661678
 // GLOBAL: CARMA2_SW 0x0065bfd0
 // GLOBAL: CARMA2_CHEAT 0x00668eb0
