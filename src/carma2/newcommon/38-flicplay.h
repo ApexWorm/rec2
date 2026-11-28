@@ -103,6 +103,8 @@ extern void C2_HOOK_FASTCALL DoUncompressedTrans(tFlic_descriptor* pFlic_info, t
 
 extern int C2_HOOK_FASTCALL PlayNextFlicFrame(tFlic_descriptor* pFlic_info);
 
+extern int C2_HOOK_FASTCALL PlayFlic(int pIndex, tU32 pSize, tS8* pData_ptr, br_pixelmap* pDest_pixelmap, int pX_offset, int pY_offset, tPlayFlic_DoPerFrame DoPerFrame, int pInterruptable, int pFrame_rate);
+
 extern void C2_HOOK_FASTCALL InitFlics(void);
 
 extern int C2_HOOK_FASTCALL LoadFlic(int pIndex);
@@ -112,6 +114,8 @@ extern void C2_HOOK_FASTCALL UnlockFlic(int pIndex);
 extern int C2_HOOK_FASTCALL LoadFlicData(char* pName, tU8** pData, tU32* pData_length);
 
 extern void C2_HOOK_FASTCALL FreeFlic(int pIndex);
+
+extern void C2_HOOK_FASTCALL RunFlicAt(int pIndex, int pX, int pY);
 
 extern void C2_HOOK_FASTCALL SwapScreen(void);
 
@@ -130,6 +134,10 @@ extern int C2_HOOK_FASTCALL FlicQueueFinished(void);
 extern void C2_HOOK_FASTCALL ProcessFlicQueue(tU32 pInterval);
 
 extern void C2_HOOK_FASTCALL FlushFlicQueue(void);
+
+extern void C2_HOOK_FASTCALL AddToFlicQueue(int pIndex, int pX, int pY, int pMust_finish);
+
+extern void C2_HOOK_FASTCALL InitialiseFlicPanel(int pIndex, int pLeft, int pTop, int pWidth, int pHeight);
 
 extern void C2_HOOK_FASTCALL DisposeFlicPanel(int pIndex);
 
