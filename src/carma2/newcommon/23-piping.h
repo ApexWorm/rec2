@@ -273,7 +273,7 @@ extern void C2_HOOK_FASTCALL PipeSingleUnBend(uintptr_t pId, tU16 pArg2, tU16 pA
 
 extern void C2_HOOK_FASTCALL PipeSingleEndMyBend(uintptr_t pId, const tU8* pArg2, const tU8* pArg3, int pArg4, const tU16* pArg5);
 
-extern void C2_HOOK_FASTCALL PipeSingleShrapnelShower(uintptr_t pId, undefined4 pArg2, undefined4 pArg3, undefined4 pArg4, const br_vector3* pArg5, const br_vector3* pArg6, float pArg7, const br_vector3* pArg8, const br_vector3* pArg9, undefined4 pArg10, const br_bounds3* pArg11, undefined4 pArg12, const br_matrix34* pArg13, const br_vector3* pArg14, const br_matrix34* pArg15);
+extern void C2_HOOK_FASTCALL PipeSingleShrapnelShower(uintptr_t pId, tU32 pArg2, int pArg3, tCar_crush_smashable_part* pArg4, const br_vector3* pArg5, const br_vector3* pArg6, float pArg7, const br_vector3* pArg8, const br_vector3* pArg9, tShrapnel_spec* pArg10, const br_bounds3* pArg11, br_actor* pArg12, const br_matrix34* pArg13, const br_vector3* pArg14, const br_vector3* pArg15);
 
 extern void C2_HOOK_FASTCALL PipeSingleExplosion(int pIndex, const tExplosion* pExplosion);
 
