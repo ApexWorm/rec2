@@ -1231,7 +1231,7 @@ inline int C2_HOOK_FASTCALL SteeringSelfCentre(tCar_spec* c, br_scalar dt, br_ve
     if (c->keys.left || c->keys.right || c->keys.holdw) {
         return 0;
     }
-    if (!gINT_0074cf98 && (c->joystick.left > 0 || c->joystick.right > 0)) {
+    if (!gJoystick_self_centre && (c->joystick.left > 0 || c->joystick.right > 0)) {
         return 0;
     }
     if (c->susp_height[1] <= c->oldd[2] && c->susp_height[1] <= c->oldd[3]) {
