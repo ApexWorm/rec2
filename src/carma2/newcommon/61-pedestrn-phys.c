@@ -783,7 +783,7 @@ void C2_HOOK_FASTCALL SetPedXZDirection(tPedestrian* pPed, br_vector3* pDir, flo
             pPed->field_0x0c->field_0x54.v[2] = pPed->field_0x0c->field_0x48.v[2];
             turn_time = (tS16)pPed->character->field_0x1e * (pSpeed / BrVector3Length(&pPed->character->field_0xd8)) / 30.0f;
             if (turn_time > .5) {
-                turn_time = .5f;
+                turn_time = 0.5f;
             }
             pPed->field_0x0c->field_0x6c = pTime;
             pPed->field_0x0c->field_0x70 = pTime - turn_time * -1000.0f;
