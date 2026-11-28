@@ -33,6 +33,7 @@ tSpecial_volume* gDefault_water_spec_vol_real;
 
 // GLOBAL: CARMA2_HW 0x00660268
 // GLOBAL: CARMA2_SW 0x0065ab48
+// GLOBAL: CARMA2_CHEAT 0x00667ab0
 const char* gSoundType_choices[2] = {
     "SATURATED",
     "SCATTERED"
