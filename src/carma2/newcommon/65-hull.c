@@ -135,6 +135,10 @@ tFUN_00421fd0* C2_HOOK_FASTCALL FUN_00421fd0(int pCount_points) {
 
 // PointOnShape
 
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
 // STUB: CARMA2_HW 0x00420fb0
 // STUB: CARMA2_SW 0x00421030
 // STUB: CARMA2_CHEAT 0x00421200
@@ -142,9 +146,83 @@ tPhysicsError C2_HOOK_FASTCALL ConvexHull3D(tCollision_shape_polyhedron_data* pP
     NOT_IMPLEMENTED();
 }
 
-// GetPointSample
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
-// SampledConvexHull
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
 
-// NPointConvexHullUsingSample
+// STUB: CARMA2_HW 0x00422030
+// STUB: CARMA2_SW 0x004220b0
+// STUB: CARMA2_CHEAT 0x00422280
+tPhysicsError C2_HOOK_FASTCALL GetPointSample(br_model* pModel, int pCount, int* pIndices) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
+
+// FUNCTION: CARMA2_HW 0x00422400
+// FUNCTION: CARMA2_SW 0x00422480
+// FUNCTION: CARMA2_CHEAT 0x00422650
+tPhysicsError C2_HOOK_FASTCALL SampledConvexHull(tCollision_shape_polyhedron_data* pPolyhedron, int* pIndices, br_model* pModel, int pCount) {
+    int i;
+    tPhysicsError error;
+
+    if (pModel->nvertices > pCount) {
+        error = GetPointSample(pModel, pCount, pIndices);
+        if (error != ePhysicsError_Ok) {
+            return error;
+        }
+        pPolyhedron->count_points = pCount;
+        for (i = 0; i < pCount; i++) {
+            BrVector3Copy(&pPolyhedron->points[i], &pModel->vertices[pIndices[i]].p);
+        }
+    } else {
+        pPolyhedron->count_points = pModel->nvertices;
+        for (i = 0; i < pModel->nvertices; i++) {
+            pIndices[i] = i;
+            BrVector3Copy(&pPolyhedron->points[i], &pModel->vertices[i].p);
+        }
+    }
+    return ConvexHull3D(pPolyhedron);
+}
+
+// FUNCTION: CARMA2_HW 0x00422500
+// FUNCTION: CARMA2_SW 0x00422580
+// FUNCTION: CARMA2_CHEAT 0x00422750
+tPhysicsError C2_HOOK_FASTCALL NPointConvexHullUsingSample(tCollision_shape_polyhedron_data* pPolyhedron, br_model* pModel, int pMin_points, int pMax_points, int* pIndices) {
+    tPhysicsError error;
+    int count;
+
+    if (pModel == NULL) {
+        return ePhysicsError_UnknownHingeType;
+    }
+    if (pMax_points < 3) {
+        return ePhysicsError_OutOfMemory;
+    }
+    if (pMax_points > pModel->nvertices) {
+        pMax_points = pModel->nvertices;
+    }
+    if (pMin_points < 3) {
+        pMin_points = 3;
+    } else if (pMin_points > pMax_points) {
+        pMin_points = pMax_points;
+    }
+    count = pMax_points;
+    do {
+        error = SampledConvexHull(pPolyhedron, pIndices, pModel, count);
+        if (pPolyhedron->count_points == 0 || (error != ePhysicsError_Ok && error != ePhysicsError_WireFrameHasNoPoints)) {
+            break;
+        }
+        count = count * pMin_points / pPolyhedron->count_points;
+        if (pPolyhedron->count_points == pMin_points) {
+            break;
+        }
+    } while (count < pMax_points);
+    return error;
+}
 
