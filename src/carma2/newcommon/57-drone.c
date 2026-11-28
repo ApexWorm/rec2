@@ -49,7 +49,7 @@ int gCount_drones;
 // GLOBAL: CARMA2_HW 0x006820d4
 // GLOBAL: CARMA2_SW 0x0067c814
 // GLOBAL: CARMA2_CHEAT 0x0068997c
-int gINT_006820d4;
+undefined4 gDAT_006820d4;
 
 // GLOBAL: CARMA2_HW 0x00682178
 // GLOBAL: CARMA2_SW 0x0067c8b8
@@ -74,7 +74,7 @@ int gCurrent_selected_drone;
 // GLOBAL: CARMA2_HW 0x006844fc
 // GLOBAL: CARMA2_SW 0x0067ec3c
 // GLOBAL: CARMA2_CHEAT 0x0068bda4
-int gINT_006844fc;
+undefined4 gDAT_006844fc;
 
 // GLOBAL: CARMA2_HW 0x00684504
 // GLOBAL: CARMA2_SW 0x0067ec44
@@ -947,8 +947,8 @@ void C2_HOOK_FASTCALL InitDrones(tRace_info* pRace_info) {
     gDrones_unmodified = 1;
     gCount_rendered_drones = 0;
     gCurrent_selected_drone = 0;
-    gINT_006820d4 = 0;
-    gINT_006844fc = 0;
+    gDAT_006820d4 = 0;
+    gDAT_006844fc = 0;
     gINT_00681fb0 = 0;
     for (i = 0; i < gCount_drones; i++) {
         NewDroneState(&gDrone_specs[i], 1);
@@ -1091,8 +1091,8 @@ void C2_HOOK_FASTCALL DoDronePerGameFrameStuff(void) {
     int i;
 
     UpdateEditModels();
-    gINT_006844fc = 0;
-    gINT_006820d4 = 0;
+    gDAT_006844fc = 0;
+    gDAT_006820d4 = 0;
     if (gDrones_unmodified) {
         for (i = 0; i < gCount_drones; i++) {
             DoDroneDistanceChecks(&gDrone_specs[i]);
