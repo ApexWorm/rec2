@@ -230,6 +230,8 @@ extern br_model* C2_HOOK_FASTCALL GetCharacterBoneModel(tPed_character_instance*
 
 extern int C2_HOOK_FASTCALL GetCharacterModelSet(tPed_character_instance* pCharacter);
 
+extern int C2_HOOK_FASTCALL FUN_0040b5a0(tPed_character_instance* pCharacter, const char* pBone_name);
+
 // BonerPassiveCollision
 
 extern int C2_HOOK_FASTCALL BonerActiveHalted(tPed_character_instance* pCharacter);
@@ -263,5 +265,9 @@ extern void C2_HOOK_FASTCALL EnableOverallMovement(void);
 extern void C2_HOOK_FASTCALL EnableRetainRootMode(void);
 
 extern void C2_HOOK_FASTCALL DisableRetainRootMode(void);
+
+extern void C2_HOOK_FASTCALL FUN_0040c640(void);
+
+extern void C2_HOOK_FASTCALL FUN_0040c650(void);
 
 #endif // GUARD_61_PEDESTRN_H

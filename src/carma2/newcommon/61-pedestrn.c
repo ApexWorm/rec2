@@ -1345,6 +1345,20 @@ int C2_HOOK_FASTCALL GetCharacterModelSet(tPed_character_instance* pCharacter) {
     return pCharacter->field_0xa;
 }
 
+// FUNCTION: CARMA2_HW 0x0040b5a0
+// FUNCTION: CARMA2_SW 0x0040b590
+// FUNCTION: CARMA2_CHEAT 0x0040b610
+int C2_HOOK_FASTCALL FUN_0040b5a0(tPed_character_instance* pCharacter, const char* pBone_name) {
+    int i;
+
+    for (i = 0; i < pCharacter->personality->form->count_bones; i++) {
+        if (strcmp(pBone_name, pCharacter->personality->form->bones[i].name) == 0) {
+            return i;
+        }
+    }
+    return -1;
+}
+
 // BonerPassiveCollision
 
 // FUNCTION: CARMA2_HW 0x0040b760
@@ -1526,4 +1540,18 @@ void C2_HOOK_FASTCALL EnableRetainRootMode(void) {
 // FUNCTION: CARMA2_CHEAT 0x0040c6d0
 void C2_HOOK_FASTCALL DisableRetainRootMode(void) {
     gPed_retain_root_mode = 0;
+}
+
+// FUNCTION: CARMA2_HW 0x0040c640
+// FUNCTION: CARMA2_SW 0x0040c630
+// FUNCTION: CARMA2_CHEAT 0x0040c6e0
+void C2_HOOK_FASTCALL FUN_0040c640(void) {
+
+}
+
+// FUNCTION: CARMA2_HW 0x0040c650
+// FUNCTION: CARMA2_SW 0x0040c640
+// FUNCTION: CARMA2_CHEAT 0x0040c6f0
+void C2_HOOK_FASTCALL FUN_0040c650(void) {
+
 }
