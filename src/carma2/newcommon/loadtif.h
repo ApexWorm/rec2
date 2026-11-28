@@ -19,6 +19,10 @@ extern br_pixelmap* C2_HOOK_FASTCALL LoadTiffTexture_Ex2(const char* texturePath
 
 extern br_pixelmap* C2_HOOK_FASTCALL LoadTiffTexture_Ex(const char* texturePathDir, const char* textureName, br_pixelmap* pPalette, int flags, int* errorCode);
 
+extern void C2_HOOK_FASTCALL LoadAllTiffTexturesInDirectory(const char* pDirectory, br_pixelmap* pPalette, int pFlags, int* pError_code);
+
+extern int C2_HOOK_FASTCALL LoadTiffTextureCB(const char* pPath, void* pContext);
+
 extern int C2_HOOK_FASTCALL WriteFileLink(const char* pLink_dest, const char* pLink_source);
 
 extern int C2_HOOK_FASTCALL ReadFileLink(char* pDest, const char* pPath);

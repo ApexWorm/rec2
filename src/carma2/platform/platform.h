@@ -57,6 +57,8 @@ extern tU32 C2_HOOK_FASTCALL PDGetTotalTime(void);
 
 extern int C2_HOOK_FASTCALL PDGetMicroseconds(void);
 
+extern int C2_HOOK_FASTCALL PDstricmp(const char* str1, const char* str2);
+
 extern void C2_HOOK_FASTCALL PDScreenBufferSwap(int pRendering_area_only);
 
 extern void C2_HOOK_FASTCALL PDSetPaletteEntries(br_pixelmap* pPalette, int pFirst_colour, int pCount);

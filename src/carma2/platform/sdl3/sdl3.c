@@ -381,6 +381,10 @@ int PDGetMicroseconds(void) {
     return 0;
 }
 
+int PDstricmp(const char* str1, const char* str2) {
+    return SDL_strcasecmp(str1, str2);
+}
+
 void PDEnterDebugger(const char *pStr) {
     dr_dprintf("PDEnterDebugger(): %s", pStr);
     SDL_ShowCursor();

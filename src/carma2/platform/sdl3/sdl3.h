@@ -78,6 +78,8 @@ extern tU32 PDGetTotalTime(void);
 
 extern int PDGetMicroseconds(void);
 
+extern int PDstricmp(const char* str1, const char* str2);
+
 extern void PDEnterDebugger(const char *pStr);
 
 extern int PDFileUnlock(const char *pThe_path);
