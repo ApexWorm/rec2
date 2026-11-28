@@ -123,7 +123,7 @@ br_pixelmap* gLit_op_stat_bloc;
 // GLOBAL: CARMA2_HW 0x0074c6d0
 // GLOBAL: CARMA2_SW 0x00742d90
 // GLOBAL: CARMA2_CHEAT 0x00753d70
-int gINT_0074c6d0;
+undefined4 gDAT_0074c6d0;
 
 // GLOBAL: CARMA2_HW 0x00655e58
 // GLOBAL: CARMA2_SW 0x00650d40
@@ -1111,7 +1111,7 @@ void C2_HOOK_FASTCALL InitRace(void) {
     InitPedsForRace();
     BuildColourTable(gRender_palette);
     PossibleService();
-    gINT_0074c6d0 = 0;
+    gDAT_0074c6d0 = 0;
     gINT_0074b780 = 0;
     gLast_camera_special_volume = NULL;
     if (!TranslationMode()) {

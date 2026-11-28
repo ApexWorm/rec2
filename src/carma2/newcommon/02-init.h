@@ -24,7 +24,7 @@ extern tSlot_info gInitial_APO[3];
 extern tSlot_info gInitial_APO_potential[3];
 extern tSlot_info gMax_APO[3];
 extern br_pixelmap* gLit_op_stat_bloc;
-extern int gINT_0074c6d0;
+extern undefined4 gDAT_0074c6d0;
 extern float gForce_feedback_upper_limit;
 extern float gForce_feedback_lower_limit;
 
