@@ -1479,7 +1479,7 @@ inline void C2_HOOK_FASTCALL PossiblePedSmear(tPedestrian* pPed) {
             if (!(cache->field_0xc4 & 0x1)) {
                 cache->field_0xc4 |= 0x1;
                 cache->field_0xc8 = -1;
-            } else if (SkidSection(&cache->field_0xc8, &cache->field_0xcc, &cache->field_0xd8, gPed_smear_material, &pos, &cache->field_0xf0, &cache->field_0xfc, &cache->field_0x108, 0.0f, cache->field_0x124 - cache->field_0x128 + .01f)) {
+            } else if (SkidSection(&cache->field_0xc8, &cache->field_0xcc, &cache->field_0xd8, gPed_smear_material, &pos, &cache->field_0xf0, &cache->field_0xfc, &cache->field_0x108, 0.0f, cache->field_0x124 - cache->field_0x128 + 0.01f)) {
                 cache->field_0xc4 &= ~0x1;
             }
             cache->field_0xfc = pos;
