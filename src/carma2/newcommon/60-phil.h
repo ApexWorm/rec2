@@ -19,6 +19,7 @@ extern tPhysics_object* gPHIL_list_collision_infos;
 extern tU32 gPHIL_last_physics_tick;
 extern int gPHIL_count_list_collision_infos;
 extern int gPHIL_object_added;
+extern tPhysics_callbacks* gPHIL_callbacks;
 extern tPHIL_queued_objects gPhil_queued_objects;
 extern int gPHIL_count_queued_objects_for_removal;
 extern int gPHIL_count_queued_objects;
@@ -113,7 +114,7 @@ extern void C2_HOOK_FASTCALL LevelOutOnSurface(tPhysics_object* pObject);
 
 // PHILMungeObjects
 
-// PHILActivatePassive
+extern void C2_HOOK_FASTCALL PHILActivatePassive(tPhysics_object* pObject, void* pContext);
 
 // PHILInterpolateObjects
 

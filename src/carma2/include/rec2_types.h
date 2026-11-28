@@ -113,7 +113,7 @@ typedef intptr_t C2_HOOK_FASTCALL tDRActorEnumRecurseWithSnart_cbfn(br_actor*, b
 typedef int C2_HOOK_FASTCALL tDrone_form_within_rendering_distance_cbfn(const br_vector3 *pPos);
 typedef int C2_HOOK_FASTCALL tDrone_form_within_processing_distance_cbfn(const br_vector3 *pPos);
 typedef void C2_HOOK_FASTCALL tFunk_index_cbfn(int pFunk_index);
-typedef void C2_HOOK_FASTCALL tWorld_callback_active_passive_cbfn(tPhysics_object*);
+typedef void C2_HOOK_FASTCALL tWorld_callback_active_passive_cbfn(tPhysics_object*, void*);
 typedef intptr_t C2_HOOK_FASTCALL tNearbyActors_cbfn(br_actor*, void*);
 typedef void C2_HOOK_FASTCALL tDoSomethingsToCheckpoints_cbfn(br_pixelmap* pMap, int pCheckPoint, tU32 pTime, int pEnable);
 typedef void C2_HOOK_FASTCALL tTurn_on_AR_callback(void);
@@ -5597,7 +5597,7 @@ typedef struct tWorld_callbacks {
     tNon_car_spec* (C2_HOOK_FASTCALL * pull_actor_from_world)(br_actor*);
     void (C2_HOOK_FASTCALL * stop_groovidelic)(br_actor*);
     float (C2_HOOK_FASTCALL * get_friction_from_face)(const tFace_ref*);
-    void (C2_HOOK_FASTCALL * activate_passive)(tPhysics_object*);
+    void (C2_HOOK_FASTCALL * activate_passive)(tPhysics_object*, void*);
 } tWorld_callbacks;
 
 typedef struct {
@@ -5606,7 +5606,7 @@ typedef struct {
     void (C2_HOOK_FASTCALL *post_collision)(void);
     void (C2_HOOK_FASTCALL *changed_objects)(tPhysics_object*, undefined4);
     int (C2_HOOK_FASTCALL *active_halted)(tPhysics_object*);
-    int (C2_HOOK_FASTCALL *passive_activated)(tPhysics_object*);
+    int (C2_HOOK_FASTCALL *passive_activated)(tPhysics_object*, void*);
     void* callback_0x18;
 } tPhysics_callbacks;
 
