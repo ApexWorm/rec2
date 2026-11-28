@@ -91,7 +91,7 @@ tReplay_button_rect gReplay_button_rects[2][9] = {
 // GLOBAL: CARMA2_HW 0x006a2368
 // GLOBAL: CARMA2_SW 0x0069c3c0
 // GLOBAL: CARMA2_CHEAT 0x006a9ee0
-int gINT_006a2368;
+int gReplay_camera_key_down;
 
 // GLOBAL: CARMA2_HW 0x006a2374
 // GLOBAL: CARMA2_SW 0x0069c3cc
@@ -154,7 +154,7 @@ tU32 gCam_change_time;
 // GLOBAL: CARMA2_HW 0x006a23cc
 // GLOBAL: CARMA2_SW 0x0069c424
 // GLOBAL: CARMA2_CHEAT 0x006a9f44
-int gINT_006a23cc;
+int gReplay_mouse_down;
 
 // GLOBAL: CARMA2_HW 0x006a23d0
 // GLOBAL: CARMA2_SW 0x0069c428
@@ -363,7 +363,7 @@ void C2_HOOK_FASTCALL ActualActionReplayHeadups(int pSpecial_zappy_bastard) {
         gProgress_line_right[gReal_graf_data_index], gProgress_line_top[gReal_graf_data_index],
         gProgress_line_right[gReal_graf_data_index], gProgress_line_top[gReal_graf_data_index] + 6,
         to_play_col2);
-    if (gINT_006a2368) {
+    if (gReplay_camera_key_down) {
         DRMaskedStamp(gCurrent_graf_data->field_0x300 + gCurrent_graf_data->field_0x348,
             gCurrent_graf_data->field_0x304 + gCurrent_graf_data->field_0x34c,
             gReplay_pixies[9]);
@@ -532,24 +532,24 @@ void C2_HOOK_FASTCALL PollActionReplayControls(tU32* pFrame_period, tU32* pAvera
                     break;
                 }
             }
-            if (i == (int)REC2_ASIZE(gReplay_button_keys) && !gINT_006a23cc) {
+            if (i == (int)REC2_ASIZE(gReplay_button_keys) && !gReplay_mouse_down) {
                 MouseClickInActionReplay(x_coord, y_coord, 0);
             }
-            gINT_006a23cc = 1;
+            gReplay_mouse_down = 1;
         } else {
-            gINT_006a23cc = 0;
+            gReplay_mouse_down = 0;
         }
     }
     if (gKey_down == 75 && (old_key_down == -1 || old_key_down == 4)) {
         MovieRecordButtonPressed();
     } else if (gKey_down == 76) {
-        gINT_006a2368 = 1;
+        gReplay_camera_key_down = 1;
         if (old_key_down != 76) {
             ChangeCameraType();
             gCam_change_time = PDGetTotalTime();
         }
     } else {
-        gINT_006a2368 = 0;
+        gReplay_camera_key_down = 0;
     }
     if ((gKey_down == 86 || gKey_down == 106) && (old_key_down == -1 || old_key_down == 4)) {
         ARSetPause(!ARReplayPauseState());
