@@ -145,7 +145,7 @@ br_material* gMat_lt_gry;
 // GLOBAL: CARMA2_HW 0x0067689c
 // GLOBAL: CARMA2_SW 0x0067100c
 // GLOBAL: CARMA2_CHEAT 0x0067e14c
-int gINT_0067689c;
+int gAI_world_alternate_frame;
 
 // GLOBAL: CARMA2_HW 0x0069173c
 // GLOBAL: CARMA2_SW 0x0068b794

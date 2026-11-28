@@ -36,7 +36,7 @@ extern br_material* gMat_lt_turq;
 extern br_material* gMat_dk_gry;
 extern br_material* gMat_md_gry;
 extern br_material* gMat_lt_gry;
-extern int gINT_0067689c;
+extern int gAI_world_alternate_frame;
 extern int gNumber_of_cops_before_faffage;
 extern int gNum_of_opponents_completing_race;
 extern int gNum_of_opponents_getting_near;

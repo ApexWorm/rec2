@@ -167,8 +167,8 @@ void C2_HOOK_FASTCALL FUN_004017c0(void) {
     }
     ToggleDronePaths();
     FUN_004af490();
-    if (gINT_0067689c++ != 0) {
-        gINT_0067689c = 0;
+    if (gAI_world_alternate_frame++ != 0) {
+        gAI_world_alternate_frame = 0;
     } else {
         FUN_004af4a0();
     }
