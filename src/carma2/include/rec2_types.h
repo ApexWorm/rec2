@@ -5404,7 +5404,7 @@ typedef struct tDrone_spec {
     int id;
     tDrone_form* form;
     tS16 field_0x8_pathnode_id;
-    tU16 field_0xa_pathnode_id;
+    tS16 field_0xa_pathnode_id;
     tS16 field_0xc;
     tS16 field_0xe;
     undefined4 field_0x10;

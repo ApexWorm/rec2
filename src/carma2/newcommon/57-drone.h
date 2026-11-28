@@ -12,9 +12,8 @@
 #include "c2_hooks.h"
 #include "rec2_types.h"
 
-extern int gDrones_unmodified;
-
 extern br_vector3 gRender_bounds_centre;
+extern int gDrones_unmodified;
 extern int gINT_00681fb0;
 extern int gFrame;
 extern int gCurrent_selected_drone;
