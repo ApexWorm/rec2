@@ -1368,7 +1368,7 @@ void C2_HOOK_FASTCALL PDSwitchToLoresMode(void) {
     Win32ServiceMessages();
 }
 
-// FUNCTION: CARMA@_SW 0x005171c0
+// FUNCTION: CARMA2_SW 0x005171c0
 void C2_HOOK_FASTCALL FUN_005171c0(void) {
     void* pixels;
 
