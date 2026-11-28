@@ -139,11 +139,11 @@ extern void C2_HOOK_FASTCALL CheckHorn3D(tCar_spec* pCar);
 
 extern void C2_HOOK_FASTCALL SetRecovery(void);
 
-// RecoverCar
+extern void C2_HOOK_FASTCALL RecoverCar(void);
 
 // CheckMapRenderMove
 
-// ExplodeCar
+extern void C2_HOOK_FASTCALL ExplodeCar(tCar_spec* pCar);
 
 // CheckRecoveryOfCars
 
