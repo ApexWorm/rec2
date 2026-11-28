@@ -55,6 +55,8 @@
 
 #include "c2_string.h"
 
+#include <ctype.h>
+
 // GLOBAL: CARMA2_HW 0x0068c6ec
 // GLOBAL: CARMA2_SW 0x0068673c
 // GLOBAL: CARMA2_CHEAT 0x00693f8c
@@ -1295,11 +1297,85 @@ intptr_t C2_HOOK_CDECL AllocateCarModelData(br_actor* pActor, void* pData) {
 
 // AddCarModelToList
 
-// STUB: CARMA2_HW 0x0048bfa0
-// STUB: CARMA2_SW 0x004891e0
-// STUB: CARMA2_CHEAT 0x0048c380
+// FUNCTION: CARMA2_HW 0x0048bfa0
+// FUNCTION: CARMA2_SW 0x004891e0
+// FUNCTION: CARMA2_CHEAT 0x0048c380
 intptr_t C2_HOOK_CDECL LinkCarModel(br_actor* pActor, void* pContext) {
-    NOT_IMPLEMENTED();
+    tCrush_model_pool* pool;
+    tUser_crush_data* user_crush_data;
+    br_model* model;
+    char* actor_dot;
+    char* model_dot;
+    int actor_name_length;
+    int model_name_length;
+    int i;
+    int j;
+    int index;
+    int count;
+
+    pool = pContext;
+    if (pActor == NULL || pActor->identifier == NULL) {
+        return 0;
+    }
+    user_crush_data = pActor->user;
+    if (user_crush_data == NULL) {
+        return 0;
+    }
+    actor_dot = strrchr(pActor->identifier, '.');
+    if (actor_dot == NULL) {
+        actor_name_length = strlen(pActor->identifier);
+    } else {
+        actor_name_length = actor_dot - pActor->identifier;
+    }
+    for (i = 0; i < pool->model_count; i++) {
+        model = pool->models[i];
+        if (model == NULL || model->identifier == NULL) {
+            continue;
+        }
+        model_dot = strrchr(model->identifier, '.');
+        if (model_dot == NULL) {
+            model_name_length = strlen(model->identifier);
+        } else {
+            model_name_length = model_dot - model->identifier;
+        }
+        if (model_name_length != actor_name_length || strncmp(model->identifier, pActor->identifier, actor_name_length) != 0) {
+            continue;
+        }
+        count = pool->count_detail_levels;
+        if (model_dot != NULL && isdigit(model_dot[1])) {
+            index = model_dot[1] - '0';
+        } else {
+            index = -1;
+        }
+        if (index >= 0) {
+            if (index >= count) {
+                continue;
+            }
+        } else {
+            for (index = 0; index < count; index++) {
+                if (user_crush_data->models[index] == NULL || model->nvertices > user_crush_data->models[index]->nvertices) {
+                    break;
+                }
+            }
+            if (index == count) {
+                continue;
+            }
+        }
+        if (user_crush_data->models[index] != NULL && index < count - 1) {
+#ifdef REC2_FIX_BUGS
+            /* Shift the models up instead of copying models[index] into every later slot */
+            for (j = count - 1; j > index; j--) {
+                user_crush_data->models[j] = user_crush_data->models[j - 1];
+            }
+#else
+            for (j = index; j < count - 1; j++) {
+                user_crush_data->models[j + 1] = user_crush_data->models[j];
+            }
+#endif
+        }
+        user_crush_data->models[index] = model;
+    }
+    return 0;
 }
 
 inline void C2_HOOK_FASTCALL LinkCarModelsToActor(br_actor* pActor, br_model** pModels, int pModel_count, int pCount_detail_levels) {
