@@ -182,7 +182,7 @@ void C2_HOOK_FASTCALL SetCharacterDirectionAR(tPed_character_instance* pPed, con
         PipeSinglePedDir(((tS16)pPed->ped->field_0x06 << 16) | (pPed->ped - gPedestrian_array), pDir);
     }
     SetCharacterDirection(pPed, pDir, pUp);
-    if (gProgram_state.racing && OrientationChanged(&object->transform_matrix, &object->actor->t.t.mat, .7f)) {
+    if (gProgram_state.racing && OrientationChanged(&object->transform_matrix, &object->actor->t.t.mat, 0.7f)) {
         AssertRootObjectsMatrix(pPed);
     }
 }
