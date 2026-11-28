@@ -33,7 +33,7 @@
 // GLOBAL: CARMA2_HW 0x00679434
 // GLOBAL: CARMA2_SW 0x00673ba4
 // GLOBAL: CARMA2_CHEAT 0x00680ce4
-int gINT_00679434;
+undefined4 gDAT_00679434;
 
 // GLOBAL: CARMA2_HW 0x00692dc8
 // GLOBAL: CARMA2_SW 0x0068ce20
@@ -472,7 +472,7 @@ int C2_HOOK_FASTCALL GetCornerToFacePoints(tPhysics_object* pObject, tPhysics_sh
     if (pMax_count < 4) {
         return 0;
     }
-    gINT_00679434 = 0;
+    gDAT_00679434 = 0;
     for (i = 0; i < pWorkspace->count_points; i++) {
         if (pWorkspace->point_flags[i] == 0) {
             BrVector3Sub(&direction, &pWorkspace->trial_points[i], &pWorkspace->old_points[i]);
