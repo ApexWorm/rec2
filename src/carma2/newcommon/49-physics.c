@@ -758,7 +758,7 @@ void C2_HOOK_FASTCALL TranslateAndRotateJointedObject(tPhysics_object* pObject, 
             BrVector3Accumulate(&object->parent->actor->t.t.translate.t, &pos);
             object = object->field_0x230;
         } while (object->field_0x230 != NULL);
-        WriteNewPositions(pObject);
+        TrialPositionChildren(pObject);
     }
 }
 
