@@ -1129,6 +1129,7 @@ void C2_HOOK_FASTCALL RunFlic(int pIndex) {
 
 // FUNCTION: CARMA2_HW 0x00462c30
 // FUNCTION: CARMA2_SW 0x004626c0
+// FUNCTION: CARMA2_CHEAT 0x004630a0
 void C2_HOOK_FASTCALL PreloadBunchOfFlics(int pBunch_index) {
 
 }

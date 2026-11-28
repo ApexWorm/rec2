@@ -11,6 +11,12 @@
 
 #include "c2_hooks.h"
 
+extern int C2_HOOK_FASTCALL MainMenuDone1(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out);
+
+extern int C2_HOOK_FASTCALL MainMenuDone2(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out);
+
+// StartMainMenu
+
 // QuitVerifyStart
 
 // QuitVerifyDone
