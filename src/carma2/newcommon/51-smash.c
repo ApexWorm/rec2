@@ -2391,7 +2391,12 @@ void C2_HOOK_FASTCALL ChangeSmashTexture(br_material* pMaterial, tCar_spec* pCar
 
 // ReceivedSmashEnvironment
 
-// DoQueuedNetSmashes
+// STUB: CARMA2_HW 0x004f62e0
+// STUB: CARMA2_SW 0x004f1f40
+// STUB: CARMA2_CHEAT 0x004fbf80
+void C2_HOOK_FASTCALL DoQueuedNetSmashes(void) {
+    NOT_IMPLEMENTED();
+}
 
 // FindTheBastard
 

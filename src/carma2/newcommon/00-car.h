@@ -93,7 +93,7 @@ extern void C2_HOOK_FASTCALL GetNonCars(void);
 
 extern void C2_HOOK_FASTCALL GetNetPos(tCar_spec* pCar);
 
-extern void C2_HOOK_FASTCALL MungeCarsMass(tCar_spec* pCar, br_scalar pFactor);
+extern void C2_HOOK_FASTCALL MungeCarsMass(tCar_spec* pCar, double pFactor);
 
 extern void C2_HOOK_FASTCALL AddDrag(const tCar_spec* pCar, tPhysics_object* pObject, br_scalar pDelta_time);
 
@@ -105,7 +105,7 @@ extern void C2_HOOK_FASTCALL DoNonCarStuff(tNon_car_spec* pNon_car);
 
 extern void C2_HOOK_FASTCALL RemoveFlyingCar(tCar_spec* pCar);
 
-// RestoreFlyingCar
+extern void C2_HOOK_FASTCALL RestoreFlyingCar(tCar_spec* pCar);
 
 extern void C2_HOOK_FASTCALL GetDrivableOnList(tPhysics_object *pObjects);
 
