@@ -493,7 +493,7 @@ void C2_HOOK_FASTCALL SetUpPanningCamera(tCar_spec* c) {
     BrVector3SetFloat(&tv, 0.0f, 1.0f, 0.0f);
     BrVector3Cross(&perp, &tv, &dir);
     ts = BrVector3Length(&perp);
-    if (ts < .1f) {
+    if (ts < 0.1f) {
         return;
     }
     ts = 2.0 / ts;
@@ -508,7 +508,7 @@ void C2_HOOK_FASTCALL SetUpPanningCamera(tCar_spec* c) {
     CollideCamera2(&car_centre, &right, NULL, 1, NULL);
     BrVector3Sub(&tv, &left, &car_centre);
     BrVector3Sub(&tv2, &right, &car_centre);
-    if (BrVector3LengthSquared(&tv) + SRandomPosNeg(.01f) > BrVector3LengthSquared(&tv2)) {
+    if (BrVector3LengthSquared(&tv) + SRandomPosNeg(0.01f) > BrVector3LengthSquared(&tv2)) {
         BrVector3Copy(&gCamera->t.t.translate.t, &left);
     } else {
         BrVector3Copy(&gCamera->t.t.translate.t, &right);
