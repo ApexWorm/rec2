@@ -12,6 +12,8 @@
 #include "c2_hooks.h"
 #include "rec2_types.h"
 
+extern tWreck_info gWreck_array[30];
+
 // SortScores
 
 // SortGameScores
@@ -21,6 +23,10 @@
 // DoEndRaceSummary
 
 extern void C2_HOOK_FASTCALL PrepareBoundingRadius_racesumm(br_model* model);
+
+extern int C2_HOOK_FASTCALL MatrixIsIdentity(br_matrix34* pMat);
+
+extern void C2_HOOK_FASTCALL SpinWrecks(tU32 pFrame_period);
 
 extern int C2_HOOK_FASTCALL AnyBuyableCars(void);
 

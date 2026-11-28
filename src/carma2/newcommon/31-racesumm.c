@@ -8,11 +8,18 @@
 
 #include "31-racesumm.h"
 
+#include "16-graphics1.h"
 #include "30-opponent.h"
 
 #include "globvars.h"
 
 #include <math.h>
+#include <string.h>
+
+// GLOBAL: CARMA2_HW 0x006a0da0
+// GLOBAL: CARMA2_SW 0x0069adf8
+// GLOBAL: CARMA2_CHEAT 0x006a8918
+tWreck_info gWreck_array[30];
 
 // SortScores
 
@@ -39,6 +46,42 @@ void C2_HOOK_FASTCALL PrepareBoundingRadius_racesumm(br_model* model) {
         }
     }
     model->radius = (br_scalar)sqrt(max);
+}
+
+inline int C2_HOOK_FASTCALL MatrixIsIdentity(br_matrix34* pMat) {
+
+    if (pMat->m[0][0] == 1.0f && pMat->m[1][1] == 1.0f && pMat->m[2][2] == 1.0f
+        && pMat->m[0][1] == 0.0f && pMat->m[0][2] == 0.0f && pMat->m[1][0] == 0.0f
+        && pMat->m[1][2] == 0.0f && pMat->m[2][0] == 0.0f && pMat->m[2][1] == 0.0f) {
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x004e3130
+// FUNCTION: CARMA2_SW 0x004df4b0
+// FUNCTION: CARMA2_CHEAT 0x004e8cb0
+void C2_HOOK_FASTCALL SpinWrecks(tU32 pFrame_period) {
+    int i;
+    br_vector3 translation;
+    br_matrix34 old_mat;
+
+    for (i = 0; i < gFrontend_wrecks_car_count; i++) {
+        if (gWreck_array[i].customised == 0) {
+            BrMatrix34RotateY(&gWreck_array[i].rotation, BrDegreeToAngle(0.05 * pFrame_period));
+        }
+        translation = gWreck_array[i].actor->t.t.translate.t;
+        BrVector3Set(&gWreck_array[i].actor->t.t.translate.t, 0.0f, 0.0f, 0.0f);
+        BrMatrix34Post(&gWreck_array[i].actor->t.t.mat, &gWreck_array[i].rotation);
+        if (!MatrixIsIdentity(&gWreck_array[i].actor->t.t.mat)) {
+            memcpy(&old_mat, &gWreck_array[i].actor->t.t.mat, sizeof(br_matrix34));
+            BrMatrix34LPNormalise(&gWreck_array[i].actor->t.t.mat, &old_mat);
+            BrMatrix34PostScale(&gWreck_array[i].actor->t.t.mat,
+                gWreck_array[i].scaling_factor, gWreck_array[i].scaling_factor, gWreck_array[i].scaling_factor);
+        }
+        gWreck_array[i].actor->t.t.translate.t = translation;
+    }
 }
 
 // FUNCTION: CARMA2_HW 0x004e33d0

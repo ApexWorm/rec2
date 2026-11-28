@@ -2538,6 +2538,16 @@ typedef struct {
     br_matrix34 field_0x74;
 } tWreck_gallery_car_info;
 
+typedef struct {
+    int customised;
+    br_actor* actor;
+    br_matrix34 rotation;
+    br_matrix34 field_0x38; /* FIXME: original_matrix in Carmageddon 1 */
+    br_matrix34 field_0x68;
+    br_scalar scaling_factor;
+    undefined field_0x9c[8]; /* FIXME: pos_x and pos_y in Carmageddon 1 */
+} tWreck_info;
+
 typedef struct tConnected_items {
     int field_0x0;
     int range_length;
