@@ -103,6 +103,7 @@ MCI_OPEN_PARMS mci_open_params;
 
 // GLOBAL: CARMA2_HW 0x007a0530
 // GLOBAL: CARMA2_SW 0x00796ad0
+// GLOBAL: CARMA2_CHEAT 0007a7bd0
 MCI_PLAY_PARMS mci_play_parms;
 
 // GLOBAL: CARMA2_HW 0x007a04e0
@@ -114,7 +115,9 @@ MCI_PLAY_PARMS gPDS3_cda_play_parms;
 // GLOBAL: CARMA2_CHEAT 0x006b2588
 int gSSDXPitch;
 
+// GLOBAL: CARMA2_HW 0x006ac860
 // GLOBAL: CARMA2_SW 0x006a5db0
+// GLOBAL: CARMA2_CHEAT 0x006b3eec
 PALETTEENTRY gPD_palette_entries[256];
 
 
@@ -343,6 +346,7 @@ void C2_HOOK_FASTCALL SSDXRelease(void) {
 
 // FUNCTION: CARMA2_HW 0x00500760
 // FUNCTION: CARMA2_SW 0x004fc0c0
+// FUNCTION: CARMA2_CHEAT 0x00506410
 int C2_HOOK_FASTCALL SSDXDirectDrawSetup(int pWidth, int pHeight, int pBits, int* pPitch) {
     HRESULT result;
     int enum_counter = 0;
@@ -487,6 +491,7 @@ int C2_HOOK_FASTCALL SSDXBlitOrFlip(void) {
 }
 
 // FUNCTION: CARMA2_HW 0x00500bd0
+// FUNCTION: CARMA2_SW 0x004fc530
 // FUNCTION: CARMA2_CHEAT 0x00506880
 int C2_HOOK_FASTCALL SSDXBlit(void) {
     if (gWindowed) {
@@ -517,6 +522,7 @@ void C2_HOOK_FASTCALL SSDXSetPaletteEntries(PALETTEENTRY* pPalette, int pStart, 
 }
 
 // FUNCTION: CARMA2_HW 0x00500ca0
+// FUNCTION: CARMA2_SW 0x004fc600
 // FUNCTION: CARMA2_CHEAT 0x00506950
 void C2_HOOK_FASTCALL SSDXSetPrimaryPalette(void) {
     HRESULT result;
