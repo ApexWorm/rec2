@@ -122,7 +122,7 @@ extern int C2_HOOK_FASTCALL DroneTrainWithinRenderingDistance(const br_vector3* 
 
 extern void C2_HOOK_FASTCALL SemiInitDroneSpec(tDrone_spec* pDrone);
 
-// InitDroneSpec
+extern void C2_HOOK_FASTCALL InitDroneSpec(tDrone_spec* pDrone_spec, int pNode);
 
 // ChooseNextNode
 
