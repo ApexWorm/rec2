@@ -26,6 +26,7 @@
 #include "42-input.h"
 #include "43-pratcam.h"
 #include "49-physics.h"
+#include "49-physics-support.h"
 #include "51-smash.h"
 #include "53-controls.h"
 #include "58-crush2.h"

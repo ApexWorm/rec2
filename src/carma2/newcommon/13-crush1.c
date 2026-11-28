@@ -17,6 +17,7 @@
 #include "30-opponent.h"
 #include "41-utility.h"
 #include "49-physics.h"
+#include "49-physics-support.h"
 #include "51-smash.h"
 #include "53-controls.h"
 #include "60-phil.h"

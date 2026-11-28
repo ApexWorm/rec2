@@ -21,6 +21,7 @@
 #include "38-flicplay.h"
 #include "43-pratcam.h"
 #include "49-physics.h"
+#include "49-physics-support.h"
 #include "51-smash.h"
 #include "52-errors.h"
 #include "56-aiworld.h"

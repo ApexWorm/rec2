@@ -9,6 +9,7 @@
 #include "34-finteray.h"
 
 #include "49-physics.h"
+#include "49-physics-support.h"
 #include "rec2_macros.h"
 
 // GLOBAL: CARMA2_HW 0x005964c0

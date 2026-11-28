@@ -11,6 +11,7 @@
 #include "00-car.h"
 #include "18-graphics2.h"
 #include "49-physics.h"
+#include "49-physics-support.h"
 #include "55-volume.h"
 #include "platform.h"
 #include "rec2_macros.h"

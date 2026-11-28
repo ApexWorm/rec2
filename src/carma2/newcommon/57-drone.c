@@ -14,6 +14,7 @@
 #include "28-world3.h"
 #include "41-utility.h"
 #include "49-physics.h"
+#include "49-physics-support.h"
 #include "52-errors.h"
 #include "56-aiworld.h"
 #include "60-phil.h"
