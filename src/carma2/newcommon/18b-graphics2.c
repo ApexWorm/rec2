@@ -41,7 +41,13 @@ void C2_HOOK_FASTCALL ClearEntireScreen(void) {
 #endif
 }
 
-// DistanceFromPlane
+// FUNCTION: CARMA2_HW 0x0047b910
+// FUNCTION: CARMA2_SW 0x0047ac00
+// FUNCTION: CARMA2_CHEAT 0x0047bc90
+br_scalar C2_HOOK_FASTCALL DistanceFromPlane(const br_vector3* pPos, br_scalar pA, br_scalar pB, br_scalar pC, br_scalar pD) {
+
+    return (br_scalar)fabs((pPos->v[0] * pA + pPos->v[1] * pB + pPos->v[2] * pC + pD) / (pA * pA + pB * pB + pC * pC));
+}
 
 // FUNCTION: CARMA2_HW 0x0047b960
 // FUNCTION: CARMA2_SW 0x0047ac50
