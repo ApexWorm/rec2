@@ -208,6 +208,13 @@ void C2_HOOK_FASTCALL DoActionReplayHeadups(void) {
 
 // PollActionReplayControls
 
+// STUB: CARMA2_HW 0x004e72e0
+// STUB: CARMA2_SW 0x004e3120
+// STUB: CARMA2_CHEAT 0x004ecf80
+void C2_HOOK_FASTCALL ToggleReplay(tU32* pFrame_period, tU32* pFrame_period_2) {
+    NOT_IMPLEMENTED();
+}
+
 // CheckReplayTurnOn
 
 // InitializeActionReplayPix
