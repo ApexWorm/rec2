@@ -91,7 +91,7 @@ extern void C2_HOOK_FASTCALL DeallocateAllTransientBitmaps(void);
 
 extern void C2_HOOK_FASTCALL RemoveTransientBitmaps(int pGraphically_remove_them);
 
-// SaveTransient
+extern void C2_HOOK_FASTCALL SaveTransient(int pX_coord, int pY_coord);
 
 extern int C2_HOOK_FASTCALL DoMouseCursor(void);
 
