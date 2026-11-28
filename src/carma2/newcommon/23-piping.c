@@ -1487,7 +1487,28 @@ void C2_HOOK_FASTCALL PipeSingleSplitWeld(uintptr_t pId, const br_vector4* pPlan
         SIZE_OFFSET_PIPING(tPipe_chunk_split_weld, split), pSplit);
 }
 
-// PipeSingleShrapnelShower
+// FUNCTION: CARMA2_HW 0x004c8870
+// FUNCTION: CARMA2_SW 0x004c4fa0
+// FUNCTION: CARMA2_CHEAT 0x004ce390
+void C2_HOOK_FASTCALL PipeSingleShrapnelShower(uintptr_t pId, undefined4 pArg2, undefined4 pArg3, undefined4 pArg4, const br_vector3* pArg5, const br_vector3* pArg6, float pArg7, const br_vector3* pArg8, const br_vector3* pArg9, undefined4 pArg10, const br_bounds3* pArg11, undefined4 pArg12, const br_matrix34* pArg13, const br_vector3* pArg14, const br_matrix34* pArg15) {
+    C2_HOOK_BUG_ON(sizeof(tPipe_chunk_shrapnel_shower) != 0xd0);
+
+    ARDoSingleVariedSession(ePipe_chunk_shrapnel_shower, pId, 14,
+        SIZE_OFFSET_PIPING(tPipe_chunk_shrapnel_shower, field_0x40), pArg3,
+        SIZE_OFFSET_PIPING(tPipe_chunk_shrapnel_shower, field_0x0), pArg4,
+        SIZE_OFFSET_PIPING(tPipe_chunk_shrapnel_shower, field_0x4), pArg5,
+        SIZE_OFFSET_PIPING(tPipe_chunk_shrapnel_shower, field_0x10), pArg6,
+        SIZE_OFFSET_PIPING(tPipe_chunk_shrapnel_shower, field_0x9c), (int)pArg7,
+        SIZE_OFFSET_PIPING(tPipe_chunk_shrapnel_shower, field_0x1c), pArg8,
+        SIZE_OFFSET_PIPING(tPipe_chunk_shrapnel_shower, field_0x28), pArg9,
+        SIZE_OFFSET_PIPING(tPipe_chunk_shrapnel_shower, field_0x44), pArg2,
+        SIZE_OFFSET_PIPING(tPipe_chunk_shrapnel_shower, field_0x50), pArg13,
+        SIZE_OFFSET_PIPING(tPipe_chunk_shrapnel_shower, field_0x4c), pArg12,
+        SIZE_OFFSET_PIPING(tPipe_chunk_shrapnel_shower, field_0x80), pArg10,
+        SIZE_OFFSET_PIPING(tPipe_chunk_shrapnel_shower, field_0x84), pArg11,
+        SIZE_OFFSET_PIPING(tPipe_chunk_shrapnel_shower, field_0x34), pArg14,
+        SIZE_OFFSET_PIPING(tPipe_chunk_shrapnel_shower, field_0xa0), pArg15);
+}
 
 // FUNCTION: CARMA2_HW 0x004c8920
 // FUNCTION: CARMA2_SW 0x004c5050

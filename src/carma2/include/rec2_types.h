@@ -636,6 +636,24 @@ typedef struct {
 
 typedef struct {
     undefined4 field_0x0;
+    br_vector3 field_0x4;
+    br_vector3 field_0x10;
+    br_vector3 field_0x1c;
+    br_vector3 field_0x28;
+    br_vector3 field_0x34;
+    undefined4 field_0x40;
+    undefined4 field_0x44;
+    undefined4 field_0x48;
+    undefined4 field_0x4c;
+    br_matrix34 field_0x50;
+    undefined4 field_0x80;
+    br_bounds3 field_0x84;
+    int field_0x9c;
+    br_matrix34 field_0xa0;
+} tPipe_chunk_shrapnel_shower;
+
+typedef struct {
+    undefined4 field_0x0;
     tU32 uid;
     tU32 time;
     float force;
@@ -777,6 +795,7 @@ typedef enum {
     ePipe_chunk_relink = 25,
     ePipe_chunk_identity = 26,
     ePipe_chunk_split_weld = 27,
+    ePipe_chunk_shrapnel_shower = 30,
     ePipe_chunk_explosion = 31,
     ePipe_chunk_non_car_creation = 32,
     ePipe_chunk_smash_model_change = 33,
@@ -882,6 +901,7 @@ typedef struct tPipe_chunk {
         tPipe_phil_object phil_object;
         tPipe_funk_enable funk_enable;
         tPipe_chunk_shrapnel shrapnel;
+        tPipe_chunk_shrapnel_shower shrapnel_shower;
         tPipe_chunk_remove_faces remove_faces;
         tPipe_chunk_identity identity;
         tPipe_chunk_flame flame;
