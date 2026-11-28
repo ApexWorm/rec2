@@ -14,8 +14,8 @@
 
 extern br_vector3 gRender_bounds_centre;
 extern int gDrones_unmodified;
-extern int gINT_006820d4;
-extern int gINT_006844fc;
+extern undefined4 gDAT_006820d4;
+extern undefined4 gDAT_006844fc;
 extern int gINT_00681fb0;
 extern int gFrame;
 extern tDrone_state_function* gDrone_state_functions[6];
