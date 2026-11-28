@@ -16,6 +16,8 @@ extern int gPed_count_limbed_actors;
 extern br_actor* gLimbs_actor;
 extern tSmashable_initial_position_spec gGiblet_initial_position;
 extern float gGiblet_scrape_start;
+extern tProximity_ray gProximity_rays[20];
+extern int gPed_severing_damage;
 extern tSlick_spec gPed_slick;
 extern int gPed_spurting_period;
 extern br_material* gPed_smear_material;
@@ -47,8 +49,6 @@ extern int gExploding_pedestrians;
 extern tPedestrian* gPedestrians_in_sight;
 extern tNapalm_bolt gNapalm_bolts[5];
 extern int gPed_severing_chance;
-
-extern int gPed_severing_damage;
 extern br_material* gPed_slick_material;
 extern br_material* gNapalm_bolt_materials[7];
 extern br_model* gNapalm_bolt_models[7];

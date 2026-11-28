@@ -1141,8 +1141,8 @@ void C2_HOOK_FASTCALL ScoreForKilledPedestrian(tPedestrian* pPed, float pHeight)
     } else {
         gPed_score_multiplier = 1;
     }
-    amount = gPed_points[gProgram_state.skill_level] * gPed_score_multiplier;
     gDAT_006a0418 = the_time;
+    amount = gPed_points[gProgram_state.skill_level] * gPed_score_multiplier;
     ped_object = pPed->character->personality->form->simple_physicing[(tS8)pPed->character->field_0x5].collision_info;
     BrVector3Sub(&offset, &pPed->pos, &car->pos);
     BrMatrix34TApplyV(&local_offset, &offset, &car->collision_info->actor->t.t.mat);
@@ -1206,8 +1206,8 @@ void C2_HOOK_FASTCALL ScoreForKilledPedestrian(tPedestrian* pPed, float pHeight)
         }
     }
     EarnCredits(amount);
-    gPTR_00694120 = pPed;
     gPed_recent_points = amount;
+    gPTR_00694120 = pPed;
     AwardTime(gPed_times[gProgram_state.skill_level]);
 }
 
@@ -1289,7 +1289,7 @@ int C2_HOOK_FASTCALL DamagePedestrian(tPedestrian* pPed, int pDamage, int pArg3,
                 severing_damage = gPed_severing_damage;
             }
             damage_left -= severing_damage;
-            if (damage_left < 0.f || count >= 5) {
+            if (damage_left < 0.0f || count >= 5) {
                 break;
             }
             if (gExploding_pedestrians || gPed_dismemberfest || PercentageChance(gPed_severing_chance)) {
@@ -1397,12 +1397,12 @@ int C2_HOOK_FASTCALL DoToPeds(tCar_spec* pCar, int pOnly_alive, float pRange_squ
     for (ped = gPedestrians_in_sight; ped != NULL; ped = ped->next) {
         distance_squared = (pos->v[0] - ped->pos.v[0]) * (pos->v[0] - ped->pos.v[0]) + (pos->v[1] - ped->pos.v[1]) * (pos->v[1] - ped->pos.v[1]) + (pos->v[2] - ped->pos.v[2]) * (pos->v[2] - ped->pos.v[2]);
         if (!pOnly_alive || ped->hit_points > 0) {
-            if (pRange_squared == 0.f || distance_squared < pRange_squared) {
+            if (pRange_squared == 0.0f || distance_squared < pRange_squared) {
                 if (pCheck_visible) {
                     BrVector3Sub(&dir, &ped->pos, pos);
                     FindFace(pos, &dir, &normal, &t, &material);
                 } else {
-                    t = 100.f;
+                    t = 100.0f;
                 }
                 if (t >= 1.0) {
                     pCallback(ped, pCar, distance_squared, time, pContext);

@@ -8,7 +8,6 @@
 
 #include "61-pedestrn.h"
 
-#include "00-car.h"
 #include "07-structur.h"
 #include "08-loading1.h"
 #include "10-loading2.h"
@@ -429,6 +428,7 @@ int gPed_score_multiplier;
 
 // GLOBAL: CARMA2_HW 0x0069bcf8
 // GLOBAL: CARMA2_SW 0x00695d50
+// GLOBAL: CARMA2_CHEAT 0x006a3870
 int gPed_points[3];
 
 // GLOBAL: CARMA2_HW 0x006a0418
