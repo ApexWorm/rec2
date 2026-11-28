@@ -58,8 +58,6 @@ br_matrix34 gPick_model_to_view__raycast;
 // GLOBAL: CARMA2_CHEAT 0x006a9c98
 float gHighest_y_below;
 
-extern int C2_HOOK_FASTCALL DRActorToRoot(br_actor* pActor, br_actor* pWorld, br_matrix34* pMat);
-
 inline int C2_HOOK_FASTCALL DRActorToRoot(br_actor* pActor, br_actor* pWorld, br_matrix34* pMat) {
 
     if (pActor == pWorld) {
