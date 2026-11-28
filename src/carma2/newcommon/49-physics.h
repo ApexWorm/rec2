@@ -22,7 +22,7 @@ extern tPhysics_joint_force gFriction_forces[50];
 
 extern int gPHIL_collision_group;
 
-extern int gINT_006940a4;
+extern int gInter_group_hit_count;
 
 extern tPhysicsError_cbfn* gPhysics_error_cb;
 extern void* gPhysics_buffer1_ptr;

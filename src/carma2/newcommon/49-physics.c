@@ -68,7 +68,7 @@ int gPHIL_collision_group;
 // GLOBAL: CARMA2_HW 0x006940a4
 // GLOBAL: CARMA2_SW 0x0068e0fc
 // GLOBAL: CARMA2_CHEAT 0x0069bc1c
-int gINT_006940a4;
+int gInter_group_hit_count;
 
 // GLOBAL: CARMA2_HW 0x006940c0
 // GLOBAL: CARMA2_SW 0x0068e118
@@ -1176,7 +1176,7 @@ void C2_HOOK_FASTCALL DoCollisions(tPhysics_object** pObject_list, tWorld_callba
                 gPHIL_collision_group++;
             }
             loops = 0;
-            gINT_006940a4 = 0;
+            gInter_group_hit_count = 0;
             count = 0;
             for (;;) {
                 count = DoInterGroupCollisions(pObject_list, object, forces, old_forces, count, pCallbacks);
@@ -1187,7 +1187,7 @@ void C2_HOOK_FASTCALL DoCollisions(tPhysics_object** pObject_list, tWorld_callba
                 tmp = forces;
                 forces = old_forces;
                 old_forces = tmp;
-                if (loops >= 30 || gINT_006940a4 >= 3) {
+                if (loops >= 30 || gInter_group_hit_count >= 3) {
                     break;
                 }
             }
