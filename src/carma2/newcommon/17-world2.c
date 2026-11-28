@@ -221,13 +221,12 @@ void C2_HOOK_FASTCALL ProcessModelFaceMaterials2(br_model* pModel, material_cbfn
 // FUNCTION: CARMA2_HW 0x00448850
 // FUNCTION: CARMA2_CHEAT 0x00448d60
 intptr_t C2_HOOK_CDECL ProcessFaceMaterials(br_actor* pActor, void* pData) {
-    tPMFMCB* callback = pData;
 
     if (pActor->identifier != NULL && pActor->identifier[0] == '&') {
         return 0;
     }
     if (pActor->type == BR_ACTOR_MODEL && pActor->model != NULL) {
-        ProcessModelFaceMaterials(pActor->model, callback);
+        ProcessModelFaceMaterials(pActor->model, (tPMFMCB*)pData);
     }
     return BrActorEnum(pActor, ProcessFaceMaterials, pData);
 }
