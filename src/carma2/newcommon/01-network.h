@@ -73,6 +73,8 @@ extern void C2_HOOK_FASTCALL NetLeaveGame(tNet_game_details* pNet_game);
 
 extern void C2_HOOK_FASTCALL NetSetPlayerSystemInfo(tNet_game_player_info* pPlayer, void* pSender_address);
 
+extern void C2_HOOK_FASTCALL NetDisposePlayer(tNet_game_player_info* pPlayer);
+
 extern void C2_HOOK_FASTCALL FillInThisPlayer(tNet_game_details* pGame, tNet_game_player_info* pPlayer, int pCar_index, int pHost);
 
 // LoadCarN
@@ -234,6 +236,8 @@ extern int C2_HOOK_FASTCALL NetGuaranteedSendMessageToPlayer(tNet_game_details* 
 extern int C2_HOOK_FASTCALL NetGuaranteedSendMessageToAddress(tNet_game_details* pDetails, tNet_message* pMessage, void* pAddress, void* pNotifyFail);
 
 extern void C2_HOOK_FASTCALL ResendGuaranteedMessages(void);
+
+extern int C2_HOOK_FASTCALL SampleFailNotifier(tU32 pAge, tNet_message* pMessage);
 
 extern void C2_HOOK_FASTCALL NetWaitForGuaranteeReplies(void);
 
