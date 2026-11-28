@@ -48,7 +48,7 @@ tU32 gDAT_006a2364;
 // GLOBAL: CARMA2_HW 0x006a2368
 // GLOBAL: CARMA2_SW 0x0069c3c0
 // GLOBAL: CARMA2_CHEAT 0x006a9ee0
-int gINT_006a2368;
+int gReplay_camera_key_down;
 
 // GLOBAL: CARMA2_HW 0x006a2374
 // GLOBAL: CARMA2_SW 0x0069c3cc
@@ -293,7 +293,7 @@ void C2_HOOK_FASTCALL ActualActionReplayHeadups(int pSpecial_zappy_bastard) {
         gProgress_line_right[gReal_graf_data_index], gProgress_line_top[gReal_graf_data_index],
         gProgress_line_right[gReal_graf_data_index], gProgress_line_top[gReal_graf_data_index] + 6,
         to_play_col2);
-    if (gINT_006a2368) {
+    if (gReplay_camera_key_down) {
         DRMaskedStamp(gCurrent_graf_data->field_0x300 + gCurrent_graf_data->field_0x348,
             gCurrent_graf_data->field_0x304 + gCurrent_graf_data->field_0x34c,
             gReplay_pixies[9]);
