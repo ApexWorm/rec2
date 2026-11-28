@@ -2854,11 +2854,11 @@ void C2_HOOK_FASTCALL CBMovedByPhysics(tPed_character_instance* pCharacter, tPhy
     BrVector3Copy(&ped->pos, (br_vector3*)pObject->actor->t.t.mat.m[3]);
     BrVector3Copy(&pCharacter->field_0xd8, &pObject->v);
     speed = BrVector3Length(&pObject->v);
-    TumbleObjectWithV(pObject, &pObject->v, 1.39f, .1f);
+    TumbleObjectWithV(pObject, &pObject->v, 1.39f, 0.1f);
     move_id = pCharacter->personality->form->moves[pCharacter->field_0x7].id;
     if (move_id == 0x5d || move_id == 0x5e || move_id == 0x61) {
         if (speed != 0.0f) {
-            frame_time = 25.0 / speed * FRandomBetween(.6f, 1.4f);
+            frame_time = 25.0 / speed * FRandomBetween(0.6f, 1.4f);
             if (frame_time < 20) {
                 frame_time = 20;
             } else if (frame_time > 150) {
@@ -2879,7 +2879,7 @@ void C2_HOOK_FASTCALL CBMovedByPhysics(tPed_character_instance* pCharacter, tPhy
             pObject->omega.v[2] += SRandomPosNeg(5.0f);
         }
         if (pObject->water_depth_factor <= 1.0 && pObject->v.v[1] > -.02 && pObject->water_depth_factor < 1.0) {
-            pObject->v.v[1] += FRandomBetween(0.0f, -.3f);
+            pObject->v.v[1] += FRandomBetween(0.0f, -0.3f);
         }
     }
     if (!gAction_replay_mode) {
