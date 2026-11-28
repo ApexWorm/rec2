@@ -105,9 +105,9 @@ extern void C2_HOOK_FASTCALL ChangedObjectsCallbacks(tPhysics_object* pObjects, 
 
 extern void C2_HOOK_FASTCALL MarkObjectAndChildrenAsPassive(tPhysics_object* pObject);
 
-// SetStandardGravity
+extern void C2_HOOK_FASTCALL SetStandardGravity(br_vector3* pV, br_scalar pGravity);
 
-// ProcessGravity
+extern void C2_HOOK_FASTCALL ProcessGravity(tPHIL_queued_header* pObject_info, tPhysics_object* pObject, br_scalar pGravity);
 
 extern void C2_HOOK_FASTCALL LevelOutOnSurface(tPhysics_object* pObject);
 

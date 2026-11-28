@@ -13,6 +13,7 @@
 #include "23-piping.h"
 #include "49-physics.h"
 #include "55-volume.h"
+#include "globvars.h"
 #include "platform.h"
 #include "rec2_macros.h"
 
@@ -808,9 +809,38 @@ void C2_HOOK_FASTCALL MarkObjectAndChildrenAsPassive(tPhysics_object* pObject) {
     }
 }
 
-// SetStandardGravity
+inline void C2_HOOK_FASTCALL SetStandardGravity(br_vector3* pV, br_scalar pGravity) {
 
-// ProcessGravity
+    pV->v[0] = 0.0f;
+    pV->v[1] = (br_scalar)(pGravity * gGravity_multiplier * (-9.8 / 6.9 * 0.04));
+    pV->v[2] = 0.0f;
+}
+
+// FUNCTION: CARMA2_HW 0x004b6ec0
+// FUNCTION: CARMA2_SW 0x004b35e0
+// FUNCTION: CARMA2_CHEAT 0x004bc9f0
+void C2_HOOK_FASTCALL ProcessGravity(tPHIL_queued_header* pObject_info, tPhysics_object* pObject, br_scalar pGravity) {
+    tSpecial_volume* volume;
+    br_vector3 gravity;
+
+    volume = NULL;
+    if (pObject_info->field_0x4 & 0x8) {
+        volume = pObject->last_special_volume;
+    }
+    if (volume != NULL) {
+        if (pObject_info->field_0x14 == 0.0f || volume == NULL || volume->viscosity_multiplier <= 2.0) {
+            SetStandardGravity(&gravity, volume->gravity_multiplier * pObject->water_depth_factor * pGravity);
+        } else {
+            gravity.v[0] = 0.0f;
+            gravity.v[1] = (br_scalar)(0.04 * (-9.8 / 6.9 * gGravity_multiplier * pGravity + pObject->water_depth_factor * pObject_info->field_0x14 * (1.0f - volume->gravity_multiplier)));
+            gravity.v[2] = 0.0f;
+        }
+    } else {
+        SetStandardGravity(&gravity, pGravity);
+    }
+    SetGravityDeltaV(pObject, &gravity);
+    ApplyGravitySingleObject(pObject);
+}
 
 // FUNCTION: CARMA2_HW 0x004b6fb0
 // FUNCTION: CARMA2_SW 0x004b36d0
