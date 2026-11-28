@@ -18,9 +18,11 @@
 #include "41-utility.h"
 #include "49-physics.h"
 #include "51-smash.h"
+#include "52-errors.h"
 #include "53-controls.h"
 #include "60-phil.h"
 #include "69-sound.h"
+#include "70-packfile.h"
 #include "globvars.h"
 #include "globvrpb.h"
 
@@ -740,11 +742,93 @@ void C2_HOOK_FASTCALL CreateDefaultCrushData(br_actor* pActor, tCar_spec* pCar_s
 
 // ReadMasterCrushData
 
-// STUB: CARMA2_HW 0x0042a280
-// STUB: CARMA2_SW 0x0042a310
-// STUB: CARMA2_CHEAT 0x0042a410
+// FUNCTION: CARMA2_HW 0x0042a280
+// FUNCTION: CARMA2_SW 0x0042a310
+// FUNCTION: CARMA2_CHEAT 0x0042a410
 int C2_HOOK_FASTCALL LoadCrushDataFile(tCar_crush_buffer* pCar_crush_buffer, const char* pPath, tBrender_storage* pBrender_storage, tCar_crush_spec** pCar_crush_spec) {
-    NOT_IMPLEMENTED();
+    int i;
+    int j;
+    int k;
+    FILE* f;
+    char s[256];
+    int count;
+    int version;
+    int version_le_100;
+    tCar_crush_spec* car_crush;
+
+    *pCar_crush_spec = NULL;
+    pCar_crush_buffer->count_entries = 0;
+    f = DRfopen(pPath, "rt");
+    if (f == NULL) {
+        return 1;
+    }
+    GetALineAndDontArgue(f, s);
+    if (sscanf(s, "VERSION %d", &version) != 1) {
+        FatalError(kFatalError_WrongCrushDataFileVersion_SDD, pPath, 0, 4);
+    }
+    if (version > 100) {
+        version_le_100 = 0;
+        version -= 100;
+    } else {
+        version_le_100 = 1;
+    }
+    if (version != 4) {
+        FatalError(kFatalError_WrongCrushDataFileVersion_SDD, pPath, version, 4);
+    }
+    car_crush = BrMemAllocate(sizeof(tCar_crush_spec), kMem_crush_data);
+    *pCar_crush_spec = car_crush;
+    for (i = 0; i < 3; i++) {
+        for (j = 0; j < 2; j++) {
+            car_crush->count_limits.counts[i][j] = GetAnInt(f);
+            if (car_crush->count_limits.counts[i][j] == 0) {
+                continue;
+            }
+            if (car_crush->count_limits.counts[i][j] > 2) {
+                FatalError(kFatalError_TooManyCrushLimits);
+            }
+            for (k = 0; k < car_crush->count_limits.counts[i][j]; k++) {
+                car_crush->limits.limits[i][j].values[k] = GetAScalar(f);
+            }
+        }
+    }
+    car_crush->field_0x134 = 0;
+    car_crush->field_0x144 = 0;
+    car_crush->bendability_factor = GetAScalar(f);
+    car_crush->bend_z_min = GetAScalar(f);
+    car_crush->bend_z_max = GetAScalar(f);
+    car_crush->field_0x270 = 0;
+    car_crush->field_0x2b0 = 0;
+    car_crush->field_0x4b8 = 0;
+    car_crush->snappability_factor = GetAScalar(f);
+    car_crush->split_y_pos = GetAScalar(f);
+    {
+        float x;
+        float y;
+        float z;
+
+        GetThreeFloats(f, &x, &y, &z);
+        BrVector3Set(&car_crush->driver_position, x, y, z);
+    }
+    car_crush->model_actor = BrActorAllocate(BR_ACTOR_MODEL, NULL);
+    car_crush->actor = BrActorAllocate(BR_ACTOR_NONE, NULL);
+    BrActorAdd(car_crush->actor, car_crush->model_actor);
+    car_crush->actor->identifier = BrResStrDup(car_crush->actor, "Sx?!");
+    (*pCar_crush_spec)->version_le_100 = version_le_100;
+    count = GetAnInt(f);
+    pCar_crush_buffer->count_entries = count;
+    (*pCar_crush_spec)->nb_entries = count;
+    if (pCar_crush_buffer->count_entries != 0) {
+        if (pCar_crush_buffer->count_entries > kMax_crush_datas) {
+            FatalError(kFatalError_TooManyCrushDatas);
+        }
+        gCrush_data_entry_counter = 1;
+        for (i = 0; i < pCar_crush_buffer->count_entries; i++) {
+            pCar_crush_buffer->entries[i] = BrMemAllocate(sizeof(tCar_crush_buffer_entry), kMem_crush_data);
+            ReadCrushData(f, pCar_crush_buffer->entries[i], pBrender_storage);
+        }
+    }
+    PFfclose(f);
+    return 0;
 }
 
 // LinkCrushDataToActor
