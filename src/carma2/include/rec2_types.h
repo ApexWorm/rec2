@@ -1353,6 +1353,13 @@ typedef struct tFlicette {
     int y[2];
 } tFlicette;
 
+typedef struct tRadio_bastards {
+    int count;
+    int top;
+    int current_value;
+    int left[5];
+} tRadio_bastards;
+
 typedef struct tMouse_area {
     int left[2];
     int top[2];
@@ -1786,10 +1793,10 @@ typedef struct {
     int field_0x494;
     int field_0x498;
     int field_0x49c;
-    int field_0x4a0;
-    int field_0x4a4;
-    int field_0x4a8;
-    int field_0x4ac;
+    int graph_opt_disable_x;
+    int graph_opt_disable_y;
+    int sound_opt_disable_x;
+    int sound_opt_disable_y;
     int field_0x4b0;
     int net_message_enter_y;
     int field_0x4b8;

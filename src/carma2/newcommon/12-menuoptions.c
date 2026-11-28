@@ -8,13 +8,16 @@
 
 #include "12-menuoptions.h"
 
+#include "05-drmem.h"
 #include "10-loading2.h"
 
 #include "16-graphics1.h"
 #include "17-world2.h"
 #include "18-graphics2.h"
 #include "18b-graphics2.h"
+#include "19-font.h"
 #include "25-grafdata.h"
+#include "32-spark.h"
 #include "33-depth.h"
 #include "35-intrface.h"
 #include "37-brucetrk.h"
@@ -30,6 +33,35 @@
 #include "rec2_macros.h"
 
 #include <math.h>
+
+// GLOBAL: CARMA2_HW 0x0065bd78
+// GLOBAL: CARMA2_SW 0x00656690
+// GLOBAL: CARMA2_CHEAT 0x00663370
+tRadio_bastards gRadio_bastards__options[13] = {
+    { 4, 36, 0, { 132, 175, 221, 253, 0 } },
+    { 3, 45, 0, { 132, 157, 217, 0, 0 } },
+    { 3, 54, 0, { 132, 183, 236, 0, 0 } },
+    { 3, 67, 0, { 132, 194, 234, 0, 0 } },
+    { 3, 76, 0, { 132, 194, 234, 0, 0 } },
+    { 4, 89, 0, { 132, 176, 204, 246, 0 } },
+    { 4, 98, 0, { 132, 176, 204, 246, 0 } },
+    { 2, 111, 0, { 132, 158, 0, 0, 0 } },
+    { 2, 120, 0, { 132, 158, 0, 0, 0 } },
+    { 2, 129, 0, { 132, 158, 0, 0, 0 } },
+    { 2, 138, 0, { 132, 158, 0, 0, 0 } },
+    { 3, 150, 0, { 132, 164, 207, 0, 0 } },
+    { 4, 153, 0, { 177, 199, 220, 242, 0 } },
+};
+
+// GLOBAL: CARMA2_HW 0x00691788
+// GLOBAL: CARMA2_SW 0x0068b7e0
+// GLOBAL: CARMA2_CHEAT 0x00699170
+int gLast_graph_sel__options;
+
+// GLOBAL: CARMA2_HW 0x006918cc
+// GLOBAL: CARMA2_SW 0x0068b924
+// GLOBAL: CARMA2_CHEAT 0x006992b4
+tInterface_spec* gThe_interface_spec__options;
 
 // GLOBAL: CARMA2_HW 0x00691790
 // GLOBAL: CARMA2_SW 0x0068b7e8
@@ -218,6 +250,173 @@ int C2_HOOK_FASTCALL SoundClick(int* pCurrent_choice, int* pCurrent_mode, int pX
 #undef ANGLE_RANGE_END
 }
 
+inline void C2_HOOK_FASTCALL PlayRadioOn2(int pIndex, int pValue) {
+
+    RunFlicAt(288,
+        gRadio_bastards__options[pIndex].left[pValue],
+        gRadio_bastards__options[pIndex].top);
+}
+
+inline void C2_HOOK_FASTCALL PlayRadioOff2(int pIndex, int pValue) {
+
+    RunFlicAt(287,
+        gRadio_bastards__options[pIndex].left[pValue],
+        gRadio_bastards__options[pIndex].top);
+}
+
+inline void C2_HOOK_FASTCALL PlayRadioOn__options(int pIndex, int pValue) {
+
+    RemoveTransientBitmaps(1);
+    DontLetFlicFuckWithPalettes();
+    TurnFlicTransparencyOn();
+    PlayRadioOn2(pIndex, pValue);
+    TurnFlicTransparencyOff();
+    LetFlicFuckWithPalettes();
+}
+
+inline void C2_HOOK_FASTCALL PlayRadioOff__options(int pIndex, int pValue) {
+
+    RemoveTransientBitmaps(1);
+    DontLetFlicFuckWithPalettes();
+    TurnFlicTransparencyOn();
+    PlayRadioOff2(pIndex, pValue);
+    TurnFlicTransparencyOff();
+    LetFlicFuckWithPalettes();
+}
+
+// FUNCTION: CARMA2_HW 0x004b23d0
+// FUNCTION: CARMA2_SW 0x004ae540
+// FUNCTION: CARMA2_CHEAT 0x004b7ca0
+void C2_HOOK_FASTCALL DrawInitialRadios(void) {
+    int i;
+
+    RemoveTransientBitmaps(1);
+    DontLetFlicFuckWithPalettes();
+    TurnFlicTransparencyOn();
+    for (i = 0; i < (int)REC2_ASIZE(gRadio_bastards__options) - 1; i++) {
+        PlayRadioOn2(i, gRadio_bastards__options[i].current_value);
+    }
+    TurnFlicTransparencyOff();
+    LetFlicFuckWithPalettes();
+}
+
+inline void C2_HOOK_FASTCALL RadioChanged(int pIndex, int pNew_value) {
+
+    PlayRadioOff__options(pIndex, gRadio_bastards__options[pIndex].current_value);
+    PlayRadioOn__options(pIndex, pNew_value);
+    gRadio_bastards__options[pIndex].current_value = pNew_value;
+}
+
+// FUNCTION: CARMA2_HW 0x004b2430
+// FUNCTION: CARMA2_SW 0x004ae5a0
+// FUNCTION: CARMA2_CHEAT 0x004b7d00
+int C2_HOOK_FASTCALL GraphOptLeft(int* pCurrent_choice, int* pCurrent_mode) {
+    int new_value;
+
+    DRS3StartSound(gEffects_outlet, eSoundId_LeftButton);
+    new_value = gRadio_bastards__options[*pCurrent_choice - 2].current_value - 1;
+    if (new_value < 0) {
+        new_value = gRadio_bastards__options[*pCurrent_choice - 2].count - 1;
+    }
+    RadioChanged(*pCurrent_choice - 2, new_value);
+    return 1;
+}
+
+// FUNCTION: CARMA2_HW 0x004b24f0
+// FUNCTION: CARMA2_SW 0x004ae660
+// FUNCTION: CARMA2_CHEAT 0x004b7dc0
+int C2_HOOK_FASTCALL GraphOptRight(int* pCurrent_choice, int* pCurrent_mode) {
+    int new_value;
+
+    DRS3StartSound(gEffects_outlet, eSoundId_LeftButton);
+    new_value = gRadio_bastards__options[*pCurrent_choice - 2].current_value + 1;
+    if (new_value == gRadio_bastards__options[*pCurrent_choice - 2].count) {
+        new_value = 0;
+    }
+    RadioChanged(*pCurrent_choice - 2, new_value);
+    return 1;
+}
+
+// FUNCTION: CARMA2_HW 0x004b25c0
+// FUNCTION: CARMA2_SW 0x004ae730
+// FUNCTION: CARMA2_CHEAT 0x004b7e90
+int C2_HOOK_FASTCALL GraphOptUp(int* pCurrent_choice, int* pCurrent_mode) {
+
+    if (*pCurrent_mode == 0) {
+        *pCurrent_mode = 1;
+        *pCurrent_choice = 13;
+        DRS3StartSound(gEffects_outlet, eSoundId_LeftButton);
+        return 1;
+    } else if (*pCurrent_choice == 1) {
+        *pCurrent_mode = 0;
+        *pCurrent_choice = 0;
+        DRS3StartSound(gEffects_outlet, eSoundId_LeftButton);
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x004b2640
+// FUNCTION: CARMA2_SW 0x004ae7b0
+// FUNCTION: CARMA2_CHEAT 0x004b7f10
+int C2_HOOK_FASTCALL RadioClick(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_offset) {
+    int i;
+
+    for (i = gRadio_bastards__options[*pCurrent_choice - 2].count - 1; i >= 0; i--) {
+        if (gThe_interface_spec__options->mouse_areas[2].left[gReal_graf_data_index] + pX_offset + 3 >= gRadio_bastards__options[*pCurrent_choice - 2].left[i]) {
+            DRS3StartSound(gEffects_outlet, eSoundId_LeftButton);
+            RadioChanged(*pCurrent_choice - 2, i);
+            return 0;
+        }
+    }
+    return 0;
+}
+
+// FUNCTION: CARMA2_HW 0x004b2740
+// FUNCTION: CARMA2_SW 0x004ae8b0
+// FUNCTION: CARMA2_CHEAT 0x004b8010
+int C2_HOOK_FASTCALL GraphOptGoAhead(int* pCurrent_choice, int* pCurrent_mode) {
+
+    GraphOptRight(pCurrent_choice, pCurrent_mode);
+    return 0;
+}
+
+inline void C2_HOOK_FASTCALL PlotAGraphBox__options(int pIndex, int pColour_value) {
+
+    if (pIndex < 0) {
+        return;
+    }
+    DrawRRectangle(gBack_screen,
+        gThe_interface_spec__options->mouse_areas[2].left[gReal_graf_data_index] - 6,
+        gRadio_bastards__options[pIndex].top - 3,
+        gThe_interface_spec__options->mouse_areas[2].right[gReal_graf_data_index] + 3,
+        gRadio_bastards__options[pIndex].top + gFonts[12].height + 2,
+        pColour_value);
+}
+
+inline void C2_HOOK_FASTCALL DrawAGraphBox__options(int pIndex) {
+
+    PlotAGraphBox__options(pIndex, 45);
+}
+
+inline void C2_HOOK_FASTCALL EraseAGraphBox__options(int pIndex) {
+
+    PlotAGraphBox__options(pIndex, 0);
+}
+
+// FUNCTION: CARMA2_HW 0x004b2800
+// FUNCTION: CARMA2_SW 0x004ae970
+// FUNCTION: CARMA2_CHEAT 0x004b80d0
+void C2_HOOK_FASTCALL DrawGraphBox(int pCurrent_choice, int pCurrent_mode) {
+
+    if (gLast_graph_sel__options != pCurrent_choice) {
+        EraseAGraphBox__options(gLast_graph_sel__options - 2);
+        DrawAGraphBox__options(pCurrent_choice - 2);
+        gLast_graph_sel__options = pCurrent_choice;
+    }
+}
+
 // FUNCTION: CARMA2_HW 0x004b3900
 // FUNCTION: CARMA2_SW 0x004afa70
 // FUNCTION: CARMA2_CHEAT 0x004b91d0
@@ -235,6 +434,118 @@ void C2_HOOK_FASTCALL LoadSoundOptionsData(void) {
 void C2_HOOK_FASTCALL FreeSoundOptionsData(void) {
 
     BrPixelmapFree(gDials_pix);
+}
+
+// FUNCTION: CARMA2_HW 0x004b3930
+// FUNCTION: CARMA2_SW 0x004afaa0
+// FUNCTION: CARMA2_CHEAT 0x004b9200
+void C2_HOOK_FASTCALL DrawDisabledOptions(void) {
+    br_pixelmap* image;
+
+    PrintMemoryDump(0, "INSIDE OPTIONS");
+
+    image = LoadPixelmap("NOSNDOPT.PIX");
+    DisableChoice(0);
+    if (image != NULL) {
+        DRPixelmapRectangleMaskedCopy(gBack_screen,
+            gCurrent_graf_data->sound_opt_disable_x,
+            gCurrent_graf_data->sound_opt_disable_y,
+            image, 0, 0, image->width, image->height);
+        BrPixelmapFree(image);
+    }
+
+    if (gProgram_state.track_spec.the_actor != NULL) {
+        image = LoadPixelmap("NODETOPT.PIX");
+        DisableChoice(1);
+        if (image != NULL) {
+            DRPixelmapRectangleMaskedCopy(gBack_screen,
+                gCurrent_graf_data->graph_opt_disable_x,
+                gCurrent_graf_data->graph_opt_disable_y,
+                image, 0, 0, image->width, image->height);
+            BrPixelmapFree(image);
+        }
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x004b3ec0
+// FUNCTION: CARMA2_SW 0x004b0030
+// FUNCTION: CARMA2_CHEAT 0x004b9790
+void C2_HOOK_FASTCALL SetGraphicsOptions(void) {
+
+    if (gRadio_bastards__options[0].current_value >= 2) {
+        SetCarSimplificationLevel(gRadio_bastards__options[0].current_value + 1);
+    } else {
+        SetCarSimplificationLevel(gRadio_bastards__options[0].current_value);
+    }
+
+    switch (gRadio_bastards__options[1].current_value) {
+    case 2:
+        SetCarTexturingLevel(eCTL_none);
+        break;
+    case 1:
+        SetCarTexturingLevel(eCTL_transparent);
+        break;
+    case 0:
+        SetCarTexturingLevel(eCTL_full);
+        break;
+    }
+
+    switch (gRadio_bastards__options[2].current_value) {
+    case 0:
+        SetShadowLevel(eShadow_everyone);
+        break;
+    case 1:
+        SetShadowLevel(eShadow_us_only);
+        break;
+    case 2:
+        SetShadowLevel(eShadow_none);
+        break;
+    }
+
+    switch (gRadio_bastards__options[3].current_value) {
+    case 0:
+        SetWallTexturingLevel(eWTL_full);
+        break;
+    case 1:
+        SetWallTexturingLevel(eWTL_linear);
+        break;
+    case 2:
+        SetWallTexturingLevel(eWTL_none);
+        break;
+    }
+
+    switch (gRadio_bastards__options[4].current_value) {
+    case 0:
+        SetRoadTexturingLevel(eRTL_full);
+        break;
+    case 2:
+        SetRoadTexturingLevel(eRTL_none);
+        break;
+    }
+
+    SetYon(35.0f - gRadio_bastards__options[5].current_value * 5.0f);
+
+    switch (gRadio_bastards__options[6].current_value) {
+    case 0:
+        SetYonFactor(1.0f);
+        break;
+    case 1:
+        SetYonFactor(0.5f);
+        break;
+    case 2:
+        SetYonFactor(0.25f);
+        break;
+    case 3:
+        SetYonFactor(0.125f);
+        break;
+    }
+
+    SetSkyTextureOn(1 - gRadio_bastards__options[7].current_value);
+    SetDepthCueingOn(1 - gRadio_bastards__options[8].current_value);
+    SetAccessoryRendering(1 - gRadio_bastards__options[9].current_value);
+    SetSmokeOn(1 - gRadio_bastards__options[10].current_value);
+    SetSoundDetailLevel(2 - gRadio_bastards__options[11].current_value);
+    SaveOptions();
 }
 
 // SaveOrigKeyMapping
