@@ -67,6 +67,7 @@ address,type,name
 0x0057f620,library,_strcpy
 0x0057f710,library,_calloc
 0x0057fc84,library,_log10
+0x0057fd40,library,__splitpath
 0x005804a0,library,__input
 0x005812c0,library,__flsbuf
 0x005813f0,library,__output
@@ -136,6 +137,7 @@ address,type,name
 0x00588220,library,__NMSG_WRITE
 0x005887c0,library,__mbsnbicoll
 0x00588800,library,___wtomb_environ
+0x005891f0,library,__mbsnbcpy
 0x00589c90,library,__fptrap
 0x00589ca0,library,_mbtowc
 0x00589e90,library,_isspace
