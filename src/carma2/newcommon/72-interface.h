@@ -14,7 +14,7 @@
 
 extern int gNet_storage_space_initialized;
 extern int gOrig_key_map_index;
-extern int gINT_00688444;
+extern int gFrontend_dragging_slider;
 extern int gBackup_key_mappings[4][77];
 extern int gOrig_joystick_index;
 extern float gOriginal_joystick_x;

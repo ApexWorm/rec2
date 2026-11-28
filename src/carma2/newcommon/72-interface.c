@@ -170,7 +170,7 @@ int gOrig_key_map_index;
 // GLOBAL: CARMA2_HW 0x00688444
 // GLOBAL: CARMA2_SW 0x006829a4
 // GLOBAL: CARMA2_CHEAT 0x0068fcec
-int gINT_00688444;
+int gFrontend_dragging_slider;
 
 // GLOBAL: CARMA2_HW 0x006869e0
 // GLOBAL: CARMA2_SW 0x00681120
@@ -4002,10 +4002,10 @@ int C2_HOOK_FASTCALL Generic_MenuHandler(tFrontend_spec* pFrontend) {
         }
         EdgeTriggerModeOn();
         selected_item = gFrontend_selected_item_index;
-        if (gINT_00688444) {
+        if (gFrontend_dragging_slider) {
             GetMousePosition(&mouse_x, &mouse_y);
             if (!EitherMouseButtonDown()) {
-                gINT_00688444 = 0;
+                gFrontend_dragging_slider = 0;
                 if (gMouse_in_use) {
                     ResetInterfaceTimeout();
                     button_down = EitherMouseButtonDown();
@@ -4066,7 +4066,7 @@ int C2_HOOK_FASTCALL Generic_MenuHandler(tFrontend_spec* pFrontend) {
                 value_changed = 0;
             }
             if (value_changed) {
-                gINT_00688444 = 1;
+                gFrontend_dragging_slider = 1;
                 if (new_pos < 0) {
                     new_pos = 0;
                 } else if (new_pos > slider->width) {
