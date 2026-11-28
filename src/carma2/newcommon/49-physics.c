@@ -69,7 +69,7 @@ br_scalar gPhysics_bounds_min_x;
 // GLOBAL: CARMA2_HW 0x00692dd8
 // GLOBAL: CARMA2_SW 0x0068ce30
 // GLOBAL: CARMA2_CHEAT 0x0069a950
-int gINT_00692dd8;
+int gJoint_limit_10_hit;
 
 // GLOBAL: CARMA2_HW 0x00692ddc
 // GLOBAL: CARMA2_SW 0x0068ce34
@@ -2528,7 +2528,7 @@ int C2_HOOK_FASTCALL GetJointLimits(tPhysics_object* pObject, tPhysics_joint_for
             switch (limit->type) {
             case eJoint_limit_10:
                 if (pObject->field_0x1e0 != 0) {
-                    gINT_00692dd8 = 1;
+                    gJoint_limit_10_hit = 1;
                     for (j = 0; j < pCount; j++) {
                         force = &pForces[j];
                         if (force->object_a == pObject) {
@@ -3723,7 +3723,7 @@ int C2_HOOK_FASTCALL DoInterGroupCollisions(tPhysics_object** pObject_list, tPhy
         object = next;
     } while (next != pObject);
 
-    gINT_00692dd8 = 0;
+    gJoint_limit_10_hit = 0;
     count = GetGroupJointLimits(pObject, pForces, count, 40, pCallbacks);
     if (count == 0) {
         return 0;
@@ -3748,7 +3748,7 @@ int C2_HOOK_FASTCALL DoInterGroupCollisions(tPhysics_object** pObject_list, tPhy
     if (RQMatrixSolveNoNegatives(gPhysics_buffer3_ptr, velocities, impulses, count_joint_forces + total, 100, excluded, &count_excluded, count_joint_forces, count, groups, count_groups) != 0) {
         gINT_006940a4++;
     }
-    if (gINT_00692dd8 != 0) {
+    if (gJoint_limit_10_hit != 0) {
         broken = 0;
         object = pObject;
         do {

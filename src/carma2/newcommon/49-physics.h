@@ -20,7 +20,7 @@ extern int gINT_00692dc8;
 
 extern int gPrepared_objects;
 
-extern int gINT_00692dd8;
+extern int gJoint_limit_10_hit;
 
 extern int gCount_friction_forces;
 extern tPhysics_joint_force gFriction_forces[50];
