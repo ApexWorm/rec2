@@ -530,11 +530,19 @@ void C2_HOOK_FASTCALL DRVector3SafeCross(br_vector3* pDest, const br_vector3* pA
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x00404150
-// STUB: CARMA2_SW 0x00404150
-// STUB: CARMA2_CHEAT 0x00404150
+// FUNCTION: CARMA2_HW 0x00404150
+// FUNCTION: CARMA2_SW 0x00404150
+// FUNCTION: CARMA2_CHEAT 0x00404150
 void C2_HOOK_FASTCALL DRVector3SafeCrossXZ(br_vector3* pDest, const br_vector3* pA, const br_vector3* pB) {
-    NOT_IMPLEMENTED();
+
+    BrVector3Cross(pDest, pA, pB);
+    if ((br_scalar)fabs(pDest->v[0]) < BR_SCALAR_EPSILON * 20 && (br_scalar)fabs(pDest->v[1]) < BR_SCALAR_EPSILON * 20 && (br_scalar)fabs(pDest->v[2]) < BR_SCALAR_EPSILON * 20) {
+        if ((br_scalar)fabs(pA->v[0]) <= (br_scalar)fabs(pA->v[2])) {
+            BrVector3Cross(pDest, pA, &gPed_x_unit_vector);
+        } else {
+            BrVector3Cross(pDest, pA, &gPed_z_unit_vector);
+        }
+    }
 }
 
 #ifdef REC2_MATCHING
