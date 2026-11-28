@@ -672,6 +672,8 @@ int C2_HOOK_FASTCALL ResetFoxLighting(br_material* pMaterial) {
     }
 }
 
+// FUNCTION: CARMA2_HW 0x004f92d0
+// FUNCTION: CARMA2_CHEAT 0x004fef70
 inline void C2_HOOK_FASTCALL CancelAlternateFoxEffect(tCar_spec* pCar_spec) {
 
     ForEveryCarModel(pCar_spec, ResetFoxModelCallback, 1);
@@ -691,6 +693,8 @@ int C2_HOOK_FASTCALL SetFoxLighting(br_material* pMaterial) {
     }
 }
 
+// FUNCTION: CARMA2_HW 0x004f93d0
+// FUNCTION: CARMA2_CHEAT 0x004ff070
 inline void C2_HOOK_FASTCALL SetupAlternateFoxEffect(tCar_spec* pCar_spec) {
     br_material* material;
 
