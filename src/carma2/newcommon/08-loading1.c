@@ -484,6 +484,21 @@ br_scalar C2_HOOK_FASTCALL GetAScalar(FILE* pF) {
     return GetAFloat(pF);
 }
 
+// FUNCTION: CARMA2_HW 0x0048fbd0
+// FUNCTION: CARMA2_SW 0x0048ce40
+// FUNCTION: CARMA2_CHEAT 0x0048fc80
+float C2_HOOK_FASTCALL GetAFloatPercent(FILE* pF) {
+    char s[256];
+    char* str;
+    float f;
+
+    PossibleService();
+    GetALineWithNoPossibleService(pF, s);
+    str = strtok(s, "	 ,/");
+    sscanf(str, "%f", &f);
+    return f / 100.0f;
+}
+
 // FUNCTION: CARMA2_HW 0x00490130
 // FUNCTION: CARMA2_SW 0x0048d3a0
 // FUNCTION: CARMA2_CHEAT 0x004901e0
@@ -793,7 +808,7 @@ void C2_HOOK_FASTCALL EncodeLine_DEMO(char* pS) {
 // FUNCTION: CARMA2_HW 0x00490840
 // FUNCTION: CARMA2_SW 0x0048dab0
 // FUNCTION: CARMA2_CHEAT 0x004908f0
-void C2_HOOK_FASTCALL EncodeFile(char* pThe_path) {
+void C2_HOOK_FASTCALL EncodeFile(const char* pThe_path) {
     FILE* f;
     FILE* d;
     char line[257];
@@ -876,10 +891,20 @@ void C2_HOOK_FASTCALL EncodeFile(char* pThe_path) {
     rename(new_file, pThe_path);
 }
 
+// FUNCTION: CARMA2_HW 0x00490b90
+// FUNCTION: CARMA2_SW 0x0048de00
+// FUNCTION: CARMA2_CHEAT 0x00490c40
+void C2_HOOK_FASTCALL EncodeAllFilesInDirectory(char* pThe_path) {
+    char s[256];
+
+    PathCat(s, gApplication_path, pThe_path);
+    PFForEveryFile(s, EncodeFileWrapper);
+}
+
 // FUNCTION: CARMA2_HW 0x00490bc0
 // FUNCTION: CARMA2_SW 0x0048de30
 // FUNCTION: CARMA2_CHEAT 0x00490c70
-void C2_HOOK_FASTCALL EncodeFileWrapper(char* pThe_path) {
+void C2_HOOK_FASTCALL EncodeFileWrapper(const char* pThe_path) {
     int len;
 
     len = strlen(pThe_path);

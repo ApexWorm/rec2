@@ -87,6 +87,8 @@ extern void C2_HOOK_FASTCALL GetFourInts(FILE* pF, int* pF1, int* pF2, int* pF3,
 
 extern br_scalar C2_HOOK_FASTCALL GetAScalar(FILE* pF);
 
+extern float C2_HOOK_FASTCALL GetAFloatPercent(FILE* pF);
+
 extern void GetPairOfScalars(FILE* pF, br_scalar* pS1, br_scalar* pS2);
 
 extern void C2_HOOK_FASTCALL GetThreeScalars(FILE* pF, br_scalar* pS1, br_scalar* pS2, br_scalar* pS3);
@@ -109,11 +111,13 @@ extern void C2_HOOK_CDECL SubsStringJob(char *pFormat, ...);
 
 extern void C2_HOOK_FASTCALL EncodeLine_DEMO(char* pS);
 
-extern void C2_HOOK_FASTCALL EncodeFile(char* pThe_path);
+extern void C2_HOOK_FASTCALL EncodeFile(const char* pThe_path);
+
+extern void C2_HOOK_FASTCALL EncodeAllFilesInDirectory(char* pThe_path);
 
 extern void C2_HOOK_FASTCALL SkipNLines(FILE* pF);
 
-extern void C2_HOOK_FASTCALL EncodeFileWrapper(char* pThe_path);
+extern void C2_HOOK_FASTCALL EncodeFileWrapper(const char* pThe_path);
 
 extern char* C2_HOOK_FASTCALL GetALineWithNoPossibleService(FILE* pF, char* pS);
 
