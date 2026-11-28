@@ -1193,12 +1193,16 @@ inline void C2_HOOK_FASTCALL MakePartPhysicallyActive(tPhysics_object* pObject, 
     PHILSetObjectProperty(pObject, 5, 0);
 }
 
-inline void C2_HOOK_FASTCALL TurnPhysicsOn(tPed_character_instance* pCharacter) {
+inline tPhysics_object* C2_HOOK_FASTCALL TurnPhysicsOn(tPed_character_instance* pCharacter) {
     tPhysics_object* object;
 
+    if (pCharacter->field_0x14 & 0x4) {
+        return NULL;
+    }
     object = (pCharacter->field_0x14 & 0x1) ? pCharacter->personality->form->simple_physicing[(tS8)pCharacter->field_0x5].collision_info : GetRootObject(pCharacter);
     MakePartPhysicallyActive(object, &pCharacter->field_0xd8, NULL, 1);
     pCharacter->field_0x14 |= 0x4;
+    return object;
 }
 
 inline int C2_HOOK_FASTCALL MakeCharacterPhysicworthy(tPed_character_instance* pCharacter) {
