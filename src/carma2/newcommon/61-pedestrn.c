@@ -594,9 +594,26 @@ void C2_HOOK_FASTCALL DisposeAllLoadedRemaps(void) {
 
 // Flip3DStoBRaxes
 
-// ReadMove
+// FUNCTION: CARMA2_HW 0x004047b0
+// FUNCTION: CARMA2_SW 0x004047b0
+// FUNCTION: CARMA2_CHEAT 0x004047b0
+tPed_move* C2_HOOK_FASTCALL FindOrOpenMove(const char* pName, tPed_form* pForm, char* pLooping_reset_flags, br_vector3* pMovement_direction, tU32 pFlags) {
+    int i;
 
-// FindOrOpenMove
+    for (i = 0; i < (int)REC2_ASIZE(gPed_moves); i++) {
+        if (gPed_moves[i] != NULL && strcmp(pName, gPed_moves[i]->name) == 0) {
+            return gPed_moves[i];
+        }
+    }
+    return ReadMove(pName, pForm, pLooping_reset_flags, pMovement_direction, pFlags);
+}
+
+// STUB: CARMA2_HW 0x00404840
+// STUB: CARMA2_SW 0x00404840
+// STUB: CARMA2_CHEAT 0x00404840
+tPed_move* C2_HOOK_FASTCALL ReadMove(const char* pName, tPed_form* pForm, char* pLooping_reset_flags, br_vector3* pMovement_direction, tU32 pFlags) {
+    NOT_IMPLEMENTED();
+}
 
 // RemapVector
 

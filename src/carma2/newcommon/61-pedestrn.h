@@ -110,9 +110,9 @@ extern void C2_HOOK_FASTCALL DisposeAllLoadedRemaps(void);
 
 // Flip3DStoBRaxes
 
-// ReadMove
+extern tPed_move* C2_HOOK_FASTCALL FindOrOpenMove(const char* pName, tPed_form* pForm, char* pLooping_reset_flags, br_vector3* pMovement_direction, tU32 pFlags);
 
-// FindOrOpenMove
+extern tPed_move* C2_HOOK_FASTCALL ReadMove(const char* pName, tPed_form* pForm, char* pLooping_reset_flags, br_vector3* pMovement_direction, tU32 pFlags);
 
 // RemapVector
 
