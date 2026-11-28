@@ -305,6 +305,10 @@ extern int C2_HOOK_FASTCALL CalcCollObjIDFromCarSpec(tCar_spec* pCar);
 
 extern int C2_HOOK_FASTCALL CalcCollObjID(tPhysics_object* pObject);
 
+extern tCar_spec* C2_HOOK_FASTCALL GetCarSpecFromCollObjID(int pID);
+
+extern tPhysics_object* C2_HOOK_FASTCALL GetCollObjFromID(int pID);
+
 extern void C2_HOOK_FASTCALL SendNetSmash(tPhysics_object* pObject, tFace_ref* pFace, float pMagnitude, br_vector3* pPosition, br_vector3* pNormal, br_vector3* pForce, int pSnap);
 
 extern void C2_HOOK_FASTCALL SendAllSmashes(tNet_game_player_info* pPlayer);
