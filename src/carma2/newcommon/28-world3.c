@@ -9,6 +9,7 @@
 #include "28-world3.h"
 
 #include "08-loading1.h"
+#include "17-world2.h"
 #include "37-brucetrk.h"
 #include "41-utility.h"
 #include "51-smash.h"
@@ -682,6 +683,63 @@ void C2_HOOK_FASTCALL DodgyModelUpdate(br_model* pM) {
     pM->nvertices = 0;
     pM->faces = NULL;
     pM->vertices = NULL;
+}
+
+// FUNCTION: CARMA2_HW 0x00502240
+// FUNCTION: CARMA2_SW 0x004fdb90
+// FUNCTION: CARMA2_CHEAT 0x00507ef0
+int C2_HOOK_FASTCALL LoadNTrackModels(tBrender_storage* pStorage_space, FILE* pF, int pCount) {
+    tPath_name the_path;
+    int i;
+    int j;
+    int new_ones;
+    int total;
+    char s[256];
+    char* str;
+    br_model* temp_array[2000];
+
+    total = 0;
+    for (i = 0; i < pCount; i++) {
+        GetALineAndDontArgue(pF, s);
+        str = strtok(s, "\t ,/");
+        PathCat(the_path, gApplication_path, "MODELS");
+        PathCat(the_path, the_path, str);
+        new_ones = BrModelLoadMany(the_path, temp_array, REC2_ASIZE(temp_array));
+        if (new_ones == 0) {
+            FatalError(kFatalError_CannotLoadModelFileOrItIsEmpty_S, str);
+        }
+        for (j = 0; j < new_ones; j++) {
+            if (temp_array[j] != NULL) {
+                switch (AddModelToStorage(pStorage_space, temp_array[j])) {
+                case eStorage_allocated:
+                    temp_array[j]->flags |= BR_MODF_UPDATEABLE;
+                    if (gRoad_texturing_level == eRTL_none) {
+                        ProcessModelFaceMaterials(temp_array[j], RoadPerspToUntex);
+                    }
+                    if (gWall_texturing_level == eWTL_linear) {
+                        ProcessModelFaceMaterials(temp_array[j], WallPerspToLinear);
+                    }
+                    if (gWall_texturing_level == eWTL_none) {
+                        ProcessModelFaceMaterials(temp_array[j], WallPerspToUntex);
+                    }
+                    BrModelAdd(temp_array[j]);
+                    total++;
+                    break;
+                case eStorage_duplicate:
+                    if (gDisallow_duplicates) {
+                        FatalError(kFatalError_DuplicateModel_S, temp_array[j]->identifier);
+                    } else {
+                        BrModelFree(temp_array[j]);
+                    }
+                    break;
+                case eStorage_not_enough_room:
+                    FatalError(kFatalError_InsufficientModelSlots);
+                    break;
+                }
+            }
+        }
+    }
+    return total;
 }
 
 // FUNCTION: CARMA2_HW 0x005024b0

@@ -13,6 +13,8 @@
 #include "rec2_types.h"
 
 extern int gCar_simplification_level;
+extern tRoad_texturing_level gRoad_texturing_level;
+extern tWall_texturing_level gWall_texturing_level;
 extern br_colour gColours[9];
 
 extern tU32 gWild_start;
