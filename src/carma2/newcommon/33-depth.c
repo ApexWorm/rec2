@@ -521,7 +521,12 @@ void C2_HOOK_FASTCALL ExternalSky(br_pixelmap* pRender_buffer, br_pixelmap* pDep
 
 // DoFog
 
-// DepthEffect
+#ifdef REC2_SW
+// STUB: CARMA2_SW 0x00445a30
+void C2_HOOK_FASTCALL DepthEffect(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_actor* pCamera, br_matrix34* pCamera_to_world) {
+    NOT_IMPLEMENTED();
+}
+#endif
 
 // FUNCTION: CARMA2_HW 0x00445ca0
 // FUNCTION: CARMA2_CHEAT 0x004461c0

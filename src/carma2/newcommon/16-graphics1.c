@@ -23,6 +23,7 @@
 #include "33-depth.h"
 #include "41-utility.h"
 #include "52-errors.h"
+#include "59-camera.h"
 #include "61-pedestrn-phys.h"
 #include "62-graphics3.h"
 #include "63-loading3.h"
@@ -714,6 +715,7 @@ inline int C2_HOOK_FASTCALL ConditionallyFillWithSky(br_pixelmap* pPixelmap) {
     } else {
         bgnd_col = 0x00;
     }
+#ifdef REC2_HW
     if (gNet_mode != eNet_mode_none && (gCurrent_net_game->type == eNet_game_type_6 || gCurrent_net_game->type == eNet_game_type_foxy)) {
         SetSkyColour(((br_colour*)gRender_palette->pixels)[bgnd_col]);
         return 0;
@@ -725,6 +727,10 @@ inline int C2_HOOK_FASTCALL ConditionallyFillWithSky(br_pixelmap* pPixelmap) {
         BrPixelmapFill(pPixelmap, bgnd_col);
         return 1;
     }
+#else
+    BrPixelmapFill(pPixelmap, bgnd_col);
+    return 1;
+#endif
 }
 
 inline void C2_HOOK_FASTCALL FoxyStuff(br_matrix34* pMat34, br_actor* pCamera, br_pixelmap* pColour, br_pixelmap* pDepth) {
@@ -840,9 +846,47 @@ void C2_HOOK_FASTCALL DoARenderPass(br_matrix34* pMat34, br_actor* pCamera, br_p
     camera_data->yon_z = original_yon;
 }
 #else
-// STUB: CARMA2_SW 0x004e1a40
+// FUNCTION: CARMA2_SW 0x004e1a40
 void C2_HOOK_FASTCALL DoARenderPass(br_matrix34* pMat34, br_actor* pCamera, br_pixelmap* pColour, br_pixelmap* pDepth, br_scalar pYon_factor, int pShadows, int pEffects, int pArg8) {
-    NOT_IMPLEMENTED();
+    int i;
+    br_camera* camera_data;
+    br_scalar original_yon;
+
+    camera_data = (br_camera*)pCamera->type_data;
+    original_yon = camera_data->yon_z;
+    camera_data->yon_z *= pYon_factor;
+    BrPixelmapRectangleFill(pDepth, 0, 0, pColour->width, pColour->height, 0xffffffff);
+    if (gAction_replay_camera_mode != kActionReplayCameraMode_Internal) {
+        if (!ConditionallyFillWithSky(pColour)) {
+            ExternalSky(pColour, pDepth, pCamera, pMat34);
+        }
+    }
+    DoSpecialCameraEffect(pCamera, pMat34);
+    if (pShadows) {
+        RenderShadows(gUniverse_actor, &gProgram_state.track_spec, pCamera, pMat34);
+    }
+    BrZbsSceneRenderBegin(gUniverse_actor, pCamera, pColour, pDepth);
+    for (i = REC2_ASIZE(gOther_selfs); i > 0; i--) {
+        if (i != 2) {
+            BrSetScreenZOffset(i);
+            BrZbsSceneRenderAdd(gOther_selfs[i - 1]);
+        }
+    }
+    BrSetScreenZOffset(0);
+    ProcessTrack(gUniverse_actor, &gProgram_state.track_spec, pCamera, pMat34);
+    BrZbsSceneRenderAdd(gNon_track_actor);
+    RenderLimbs();
+    DepthEffect(pColour, pDepth, pCamera, pMat34);
+    if (gAction_replay_camera_mode == kActionReplayCameraMode_Internal) {
+        DepthEffectSky(pColour, pDepth, pCamera, pMat34);
+    }
+    if (pEffects) {
+        RenderSparks(pColour, pDepth, pCamera, pMat34, gFrame_period);
+        RenderSmoke(pColour, pDepth, pCamera, pMat34, gFrame_period);
+        RenderElectroBastardRays(pColour, pDepth, pCamera, pMat34, gFrame_period);
+    }
+    BrZbsSceneRenderEnd();
+    camera_data->yon_z = original_yon;
 }
 #endif
 

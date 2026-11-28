@@ -62,7 +62,9 @@ extern void C2_HOOK_FASTCALL ExternalSky(br_pixelmap* pRender_buffer, br_pixelma
 
 // DoFog
 
-// DepthEffect
+#ifdef REC2_SW
+extern void C2_HOOK_FASTCALL DepthEffect(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_actor* pCamera, br_matrix34* pCamera_to_world);
+#endif
 
 extern void C2_HOOK_FASTCALL RenderLollipops(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_actor* pCamera, br_matrix34* pCamera_to_world);
 
