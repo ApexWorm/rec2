@@ -54,7 +54,7 @@ extern void C2_HOOK_FASTCALL SphereSphereCollide(const tCollision_shape_sphere_d
 
 // PointSphereCollision
 
-// SphereEdgeCollide
+extern void C2_HOOK_FASTCALL SphereEdgeCollide(br_vector3* pEdge_start, br_vector3* pEdge_end, br_vector3* pSphere_start, br_vector3* pSphere_end, tCollision_shape_sphere_data* pSphere, br_vector3* pPoint, br_vector3* pNormal, br_scalar* pT, int pStart_flags, int pEnd_flags);
 
 extern void C2_HOOK_FASTCALL SpherePolyFaceCollide(const tCollision_shape_sphere_data* pSphere, const tCollision_shape_polyhedron_data* pPolyhedron, const br_vector3* pStart, const br_vector3* pEnd, br_vector3* pPoint, br_vector3* pNormal, br_scalar* pCollision_t);
 
