@@ -178,7 +178,7 @@ tSmashable_environment_name* gSmashable_noncars;
 // GLOBAL: CARMA2_CHEAT 0x006bef2c
 int gCount_smashable_noncars;
 
-#ifndef REC2_SW
+#ifdef REC2_HW
 // GLOBAL: CARMA2_HW 0x006a8718
 br_matrix4 gCameraToScreen;
 #endif
@@ -253,7 +253,7 @@ int C2_HOOK_FASTCALL DrawLine3D(const br_vector3* pStart, const br_vector3* pEnd
     br_vector4 projected_end;
     br_scalar fraction;
 
-#ifndef REC2_SW
+#ifdef REC2_HW
     if (gNo_2d_effects) {
         BrVector3Copy(&gLine_model->vertices[0].p, pStart);
         BrVector3Copy(&gLine_model->vertices[1].p, pEnd);
