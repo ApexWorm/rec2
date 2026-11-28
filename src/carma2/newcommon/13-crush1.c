@@ -1081,8 +1081,8 @@ void C2_HOOK_FASTCALL DisposeMasterCrushData(tCar_crush_spec* pCar_crush, tCar_s
 
     if (pCar_crush != NULL) {
         BrActorFree(pCar_crush->actor);
-        if (pCar_crush->field_0x1cc != NULL) {
-            BrMemFree(pCar_crush->field_0x1cc);
+        if (pCar_crush->field_0x154.field_0x78 != NULL) {
+            BrMemFree(pCar_crush->field_0x154.field_0x78);
         }
         for (i = 0; i < pCar_crush->count_shapes; i++) {
             BrMemFree(pCar_crush->field_0x4[i].field_0x18);
@@ -2633,11 +2633,89 @@ inline void C2_HOOK_FASTCALL BendCollisionShapes(tCar_spec* pCar, const tBend_po
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x00435960
-// STUB: CARMA2_SW 0x00435990
-// STUB: CARMA2_CHEAT 0x00435b50
+// FUNCTION: CARMA2_HW 0x00435960
+// FUNCTION: CARMA2_SW 0x00435990
+// FUNCTION: CARMA2_CHEAT 0x00435b50
 void C2_HOOK_FASTCALL BendModel(br_model* pModel, br_vector3* pTranslation, tBend_point_context* pContext, br_actor* pActor) {
-    NOT_IMPLEMENTED();
+    tUser_detail_level_model* user_detail_model;
+    tModel_detail_vertex_data* vertex_detail_data;
+    tBend_point_spec* spec;
+    tU16 i;
+    int changed;
+    br_vector3* v;
+    br_vector3 p;
+    br_vector3 tv;
+    br_vector3 d;
+    br_scalar x;
+    br_scalar y;
+    br_scalar z;
+    br_scalar xy;
+    br_scalar sx;
+    br_scalar sy;
+    br_scalar sz;
+    br_vector3 vector_mash[1024];
+
+    if (pModel == NULL) {
+        return;
+    }
+    user_detail_model = pModel->user;
+    if (user_detail_model == NULL) {
+        return;
+    }
+    vertex_detail_data = user_detail_model->field_0x4;
+    if (vertex_detail_data == NULL) {
+        return;
+    }
+    if (pModel->nvertices > REC2_ASIZE(vector_mash)) {
+        PDFatalError("Alas, there's a lot of vertices on that model.");
+    }
+    changed = 0;
+    spec = pContext->field_0x34;
+    user_detail_model->field_0x8 = gBend_counter;
+    for (i = 0; i < pModel->nvertices; i++) {
+        v = &pModel->vertices[i].p;
+        BrVector3Add(&p, v, pTranslation);
+        z = p.v[2] - spec->field_0x20;
+        if ((spec->field_0x74 && z <= 0.0f) || (!spec->field_0x74 && z >= 0.0f)) {
+            BrMatrix34ApplyP(&tv, &p, &pContext->field_0x4);
+            changed = 1;
+            BrVector3Negate(&vector_mash[i], v);
+            BrVector3Sub(v, &tv, pTranslation);
+            BrVector3Accumulate(&vector_mash[i], v);
+            vertex_detail_data[i].flags |= 0x8 | 0x10;
+        } else {
+            BrVector3Sub(&d, &p, &spec->field_0x24);
+            if ((spec->field_0x74 && d.v[2] <= 0.0f) || (!spec->field_0x74 && d.v[2] >= 0.0f)) {
+                vertex_detail_data[i].flags &= ~0x10;
+                vertex_detail_data[i].flags |= 0x8;
+                CompressVector3(&spec->field_0x78[gBend_counter], &p, -10.0f, 10.0f);
+                changed = 1;
+                gBend_counter++;
+                sx = spec->field_0x30.v[0];
+                sy = spec->field_0x30.v[1];
+                sz = spec->field_0x30.v[2];
+                x = d.v[0] / sx;
+                y = d.v[1] / sy;
+                z = d.v[2] / sz;
+                xy = y * x;
+                d.v[0] = spec->field_0x44.v[0] * xy + spec->field_0x50.v[0] * x + spec->field_0x5c.v[0] * y;
+                d.v[1] = spec->field_0x44.v[1] * xy + spec->field_0x50.v[1] * x + spec->field_0x5c.v[1] * y;
+                d.v[2] = spec->field_0x44.v[2] * xy + spec->field_0x50.v[2] * x + spec->field_0x5c.v[2] * y;
+                BrVector3Accumulate(&d, &spec->field_0x68);
+                BrVector3Scale(&d, &d, z);
+                BrVector3Accumulate(&p, &d);
+                BrVector3Copy(&vector_mash[i], &d);
+                BrVector3Sub(v, &p, pTranslation);
+            } else {
+                BrVector3Set(&vector_mash[i], 0.0f, 0.0f, 0.0f);
+                vertex_detail_data[i].flags &= ~0x8;
+            }
+        }
+    }
+    if (changed) {
+        SetModelForUpdate(pModel);
+        AddModelMashToPipingSession(pModel, vector_mash);
+    }
 }
 
 #ifdef REC2_MATCHING
@@ -3391,11 +3469,96 @@ typedef struct {
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x0043a5b0
-// STUB: CARMA2_SW 0x0043a5f0
-// STUB: CARMA2_CHEAT 0x0043a7d0
+// FUNCTION: CARMA2_HW 0x0043a5b0
+// FUNCTION: CARMA2_SW 0x0043a5f0
+// FUNCTION: CARMA2_CHEAT 0x0043a7d0
 void C2_HOOK_FASTCALL UnBendModel(br_model* pModel, br_vector3* pTranslation, tUnBend_models_context* pContext) {
-    NOT_IMPLEMENTED();
+    tUser_detail_level_model* user_detail_model;
+    tModel_detail_vertex_data* vertex_detail_data;
+    tBend_point_spec* spec;
+    tU16 i;
+    tU16 bend_index;
+    int changed;
+    br_vector3* v;
+    br_vector3 p;
+    br_vector3 tv;
+    br_vector3 d;
+    br_vector3 old_v;
+    br_vector3 new_bend;
+    br_vector3 old_bend;
+    br_scalar x;
+    br_scalar y;
+    br_scalar z;
+    br_scalar xy;
+    br_scalar sx;
+    br_scalar sy;
+    br_scalar sz;
+    br_vector3 vector_mash[1024];
+
+    if (pModel == NULL) {
+        return;
+    }
+    user_detail_model = pModel->user;
+    if (user_detail_model == NULL) {
+        return;
+    }
+    vertex_detail_data = user_detail_model->field_0x4;
+    if (vertex_detail_data == NULL) {
+        return;
+    }
+    if (pModel->nvertices > REC2_ASIZE(vector_mash)) {
+        PDFatalError("My Lord! There's a lot of vertices on that model.");
+    }
+    bend_index = user_detail_model->field_0x8;
+    spec = pContext->spec;
+    changed = 0;
+    for (i = 0; i < pModel->nvertices; i++) {
+        if (vertex_detail_data[i].flags & 0x8) {
+            v = &pModel->vertices[i].p;
+            if (vertex_detail_data[i].flags & 0x10) {
+                BrVector3Negate(&vector_mash[i], v);
+                BrVector3Add(&p, v, pTranslation);
+                BrMatrix34ApplyP(&tv, &p, &pContext->matrix);
+                BrVector3Sub(v, &tv, pTranslation);
+                BrVector3Accumulate(&vector_mash[i], v);
+            } else {
+                ExpandVector3(&p, &spec->field_0x78[bend_index], -10.0f, 10.0f);
+                bend_index++;
+                BrVector3Sub(&d, &p, &spec->field_0x24);
+                sx = spec->field_0x30.v[0];
+                sy = spec->field_0x30.v[1];
+                sz = spec->field_0x30.v[2];
+                x = d.v[0] / sx;
+                y = d.v[1] / sy;
+                z = d.v[2] / sz;
+                xy = y * x;
+                new_bend.v[0] = pContext->corners[0].v[0] * xy + pContext->corners[1].v[0] * x + pContext->corners[2].v[0] * y;
+                new_bend.v[1] = pContext->corners[0].v[1] * xy + pContext->corners[1].v[1] * x + pContext->corners[2].v[1] * y;
+                new_bend.v[2] = pContext->corners[0].v[2] * xy + pContext->corners[1].v[2] * x + pContext->corners[2].v[2] * y;
+                BrVector3Accumulate(&new_bend, &pContext->corners[3]);
+                BrVector3Scale(&new_bend, &new_bend, z);
+                old_bend.v[0] = spec->field_0x44.v[0] * xy + spec->field_0x50.v[0] * x + spec->field_0x5c.v[0] * y;
+                old_bend.v[1] = spec->field_0x44.v[1] * xy + spec->field_0x50.v[1] * x + spec->field_0x5c.v[1] * y;
+                old_bend.v[2] = spec->field_0x44.v[2] * xy + spec->field_0x50.v[2] * x + spec->field_0x5c.v[2] * y;
+                BrVector3Accumulate(&old_bend, &spec->field_0x68);
+                BrVector3Scale(&old_bend, &old_bend, z);
+                BrVector3Sub(&d, &p, pTranslation);
+                BrVector3Sub(&old_v, v, &d);
+                BrVector3Negate(&vector_mash[i], v);
+                BrVector3Add(v, &d, &new_bend);
+                BrVector3Sub(&old_v, &old_v, &old_bend);
+                BrVector3Accumulate(v, &old_v);
+                BrVector3Accumulate(&vector_mash[i], v);
+            }
+            changed = 1;
+        } else {
+            BrVector3Set(&vector_mash[i], 0.0f, 0.0f, 0.0f);
+        }
+    }
+    if (changed) {
+        SetModelForUpdate(pModel);
+        AddModelMashToPipingSession(pModel, vector_mash);
+    }
 }
 
 #ifdef REC2_MATCHING

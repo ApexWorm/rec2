@@ -4299,6 +4299,7 @@ typedef struct {
     br_vector3 field_0x5c;
     br_vector3 field_0x68;
     int field_0x74;
+    tCompressed_vector3* field_0x78;
 } tBend_point_spec;
 
 typedef struct tBend_point_context {
@@ -4332,7 +4333,6 @@ typedef struct tCar_crush_spec {
     float bend_z_min;
     float bend_z_max;
     tBend_point_spec field_0x154;
-    tCar_crush_vertex_data* field_0x1cc;
     int field_0x1d0;
     undefined field_0x1d4[24];
     br_vector3 field_0x1ec[6];
@@ -4552,7 +4552,8 @@ typedef struct {
 typedef struct {
     int field_0x0;
     tModel_detail_vertex_data* field_0x4;
-    undefined field_0x8[4];
+    tU16 field_0x8;
+    undefined field_0xa[2];
 } tUser_detail_level_model;
 
 typedef struct {
