@@ -2079,8 +2079,6 @@ void C2_HOOK_FASTCALL SplitCar(tCar_spec* pCar, const tSplit_info* pSplit_info, 
 #pragma auto_inline(on)
 #endif
 
-extern void C2_HOOK_FASTCALL QuantizePlane(tSplit_info* pPlane);
-
 inline void C2_HOOK_FASTCALL QuantizePlane(tSplit_info* pPlane) {
     tCompressed_vector4 compressed;
 
