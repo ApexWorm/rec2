@@ -104,7 +104,7 @@ br_token_value gAccent_poly_prims[] = {
 // GLOBAL: CARMA2_HW 0x00596308
 // GLOBAL: CARMA2_SW 0x00591268
 // GLOBAL: CARMA2_CHEAT 0x0059cb88
-int gINT_00596308 = -1;
+int gJoystick_headup_selection = -1;
 
 // GLOBAL: CARMA2_HW 0x00596310
 // GLOBAL: CARMA2_SW 0x00591270
@@ -205,7 +205,7 @@ void C2_HOOK_FASTCALL FUN_0045a670(void) {
         ChangeHeadupFont(gRace_head_ups[i], -2);
     }
 #ifdef REC2_HW
-    CreateAccentPolyActor(8.f, 118.f, 130.f, 224.f);
+    CreateAccentPolyActor(8.0f, 118.0f, 130.0f, 224.0f);
 #endif
     ext = ".ACT";
     if (gPath_headup_buffer.count == 0) {
@@ -379,7 +379,7 @@ void C2_HOOK_FASTCALL FUN_0045acf0(void) {
         ChangeHeadupFont(gRace_head_ups[i], -2);
     }
 #ifdef REC2_HW
-    CreateAccentPolyActor(8.f, 118.f, 130.f, 224.f);
+    CreateAccentPolyActor(8.0f, 118.0f, 130.0f, 224.0f);
 #endif
     if (gTest_headup_buffer.count == 0) {
         if (gTest_headup_buffer.field_0x14 < 5) {
@@ -809,7 +809,7 @@ void C2_HOOK_FASTCALL FUN_0045c240(void) {
         ChangeHeadupFont(gRace_head_ups[i], -2);
     }
 #ifdef REC2_HW
-    CreateAccentPolyActor(8.f, 118.f, 130.f, 224.f);
+    CreateAccentPolyActor(8.0f, 118.0f, 130.0f, 224.0f);
 #endif
     if (gJoystick_headup_buffer.count == 0) {
         if (gJoystick_headup_buffer.field_0x14 < 5) {
