@@ -38,7 +38,7 @@ int gINT_00692dc8;
 // GLOBAL: CARMA2_HW 0x00692dcc
 // GLOBAL: CARMA2_SW 0x0068ce24
 // GLOBAL: CARMA2_CHEAT 0x0069a944
-int gINT_00692dcc;
+int gPrepared_objects;
 
 // GLOBAL: CARMA2_HW 0x00692dd0
 // GLOBAL: CARMA2_SW 0x0068ce28
@@ -1170,7 +1170,7 @@ void C2_HOOK_FASTCALL DoCollisions(tPhysics_object** pObject_list, tWorld_callba
     PrepareForCollisions(*pObject_list);
     OrderObjectListOnX(pObject_list);
     do {
-        gINT_00692dcc = 0;
+        gPrepared_objects = 0;
         for (object = *pObject_list; object != NULL; object = object->next) {
             if (object->field_0x1dc || object->disable_move_rotate) {
                 continue;
@@ -1199,7 +1199,7 @@ void C2_HOOK_FASTCALL DoCollisions(tPhysics_object** pObject_list, tWorld_callba
                 PhysicsWarning("Too many loops in DoCollisions");
             }
         }
-    } while (gINT_00692dcc != 0);
+    } while (gPrepared_objects != 0);
     PostAddFriction(pCallbacks);
     WriteNewPositions(*pObject_list);
     CheckDoingNothingFlag(*pObject_list);

@@ -14,7 +14,7 @@
 
 extern int gINT_00692dc8;
 
-extern int gINT_00692dcc;
+extern int gPrepared_objects;
 
 extern int gCount_friction_forces;
 
