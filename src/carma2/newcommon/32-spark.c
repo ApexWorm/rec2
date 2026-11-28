@@ -1897,6 +1897,44 @@ intptr_t C2_HOOK_CDECL ForEveryActorMaterialNoGrooves(br_actor* pActor, void* pC
     return 0;
 }
 
+inline void C2_HOOK_FASTCALL ForEveryModelVertex(br_model* pModel, int (C2_HOOK_FASTCALL* pCallback)(br_vertex*)) {
+    int i;
+    int j;
+    int need_update;
+
+    need_update = 0;
+    if (pModel == NULL) {
+        return;
+    }
+    for (i = 0; i < pModel->prepared->ngroups; i++) {
+        for (j = 0; j < pModel->prepared->groups[i].nvertices; j++) {
+            br_vertex* vertex = &pModel->vertices[pModel->prepared->groups[i].vertex_user[j]];
+
+            if (vertex != NULL) {
+                need_update |= pCallback(vertex);
+            }
+        }
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x004fe9c0
+// FUNCTION: CARMA2_SW 0x004fa2a0
+// FUNCTION: CARMA2_CHEAT 0x00504660
+void C2_HOOK_FASTCALL FUN_004fe9c0(tCar_spec* pCar_spec, int (C2_HOOK_FASTCALL* pCallback)(br_vertex*)) {
+    tCar_crush_spec* crush_spec;
+    int i;
+
+    crush_spec = pCar_spec->car_crush_spec;
+    ForEveryModelVertex(pCar_spec->shell_model, pCallback);
+    ForEveryModelVertex(((tUser_crush_data*)pCar_spec->car_model_actor->user)->models[1], pCallback);
+    for (i = 0; i < crush_spec->field_0x270; i++) {
+        ForEveryModelVertex(crush_spec->field_0x274[i].field_0x0->model, pCallback);
+    }
+    for (i = 0; i < crush_spec->field_0x2b0; i++) {
+        ForEveryModelVertex(crush_spec->field_0x2b4[i].field_0x0->model, pCallback);
+    }
+}
+
 #ifdef REC2_SW
 // FUNCTION: CARMA2_SW 0x004f9e10
 void C2_HOOK_FASTCALL UnFoxifyModel(br_model *pModel) {

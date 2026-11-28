@@ -257,6 +257,10 @@ extern intptr_t C2_HOOK_CDECL ForEveryActorMaterial(br_actor* pActor, void* pCon
 
 extern intptr_t C2_HOOK_CDECL ForEveryActorMaterialNoGrooves(br_actor* pActor, void* pContext);
 
+extern void C2_HOOK_FASTCALL ForEveryModelVertex(br_model* pModel, int (C2_HOOK_FASTCALL* pCallback)(br_vertex*));
+
+extern void C2_HOOK_FASTCALL FUN_004fe9c0(tCar_spec* pCar_spec, int (C2_HOOK_FASTCALL* pCallback)(br_vertex*));
+
 #ifdef REC2_SW
 extern void C2_HOOK_FASTCALL UnFoxifyModel(br_model *pModel);
 
