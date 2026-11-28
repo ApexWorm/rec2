@@ -465,11 +465,40 @@ int C2_HOOK_FASTCALL DroneTrainWithinRenderingDistance(const br_vector3* pPos) {
 
 // InitDroneSpec
 
-// STUB: CARMA2_HW 0x0044e410
-// STUB: CARMA2_SW 0x0044e1b0
-// STUB: CARMA2_CHEAT 0x0044e960
+// FUNCTION: CARMA2_HW 0x0044e410
+// FUNCTION: CARMA2_SW 0x0044e1b0
+// FUNCTION: CARMA2_CHEAT 0x0044e960
 int C2_HOOK_FASTCALL ChooseNextNode(tDrone_spec* pDrone) {
-    NOT_IMPLEMENTED();
+
+    if (pDrone->field_0xc < 0) {
+        if (gDrone_path_nodes[pDrone->field_0xa_pathnode_id].count_sections != 0) {
+            pDrone->field_0x10 = &gDrone_path_nodes[pDrone->field_0xa_pathnode_id].sections[IRandomBetween(0, MAX(0, gDrone_path_nodes[pDrone->field_0xa_pathnode_id].count_sections - 1))];
+        } else {
+            pDrone->field_0x14 = NULL;
+            pDrone->field_0x10 = NULL;
+            pDrone->field_0xc = -1;
+            pDrone->field_0xa_pathnode_id = -1;
+        }
+    } else {
+        pDrone->field_0xa_pathnode_id = pDrone->field_0xc;
+        pDrone->field_0x10 = pDrone->field_0x14;
+    }
+    if (pDrone->field_0x10 != NULL) {
+        pDrone->field_0xc = pDrone->field_0x10->node1;
+    } else {
+        pDrone->field_0xc = -1;
+    }
+    if (pDrone->field_0xc < 0) {
+        return 0;
+    }
+    if (gDrone_path_nodes[pDrone->field_0xc].count_sections != 0) {
+        pDrone->field_0x14 = &gDrone_path_nodes[pDrone->field_0xc].sections[IRandomBetween(0, MAX(0, gDrone_path_nodes[pDrone->field_0xc].count_sections - 1))];
+        pDrone->field_0xe = pDrone->field_0x14->node1;
+    } else {
+        pDrone->field_0x14 = NULL;
+        pDrone->field_0xe = -1;
+    }
+    return 1;
 }
 
 // DroneOrientationChanged
