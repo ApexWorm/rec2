@@ -316,13 +316,13 @@ extern intptr_t C2_HOOK_CDECL MakeCarModelsMaterialsSingleSided(br_actor* pActor
 
 // IsOnNonCarHalf
 
-// SplitCar
+extern void C2_HOOK_FASTCALL SplitCar(tCar_spec* pCar, const tSplit_info* pSplit_info, int pArg3);
 
 // QuantizePlane
 
 // WithinBounds
 
-// SplitCheck
+extern int C2_HOOK_FASTCALL SplitCheck(tCar_spec* pCar, int pArg2, const br_vector3* pPlane, float pArg4, tSplit_info* pSplit_info);
 
 extern int C2_HOOK_FASTCALL FindForceEdge(const br_vector3* pPoint, const tPhysics_object* pObject, br_vector3* pEdge, br_scalar* pDot);
 
