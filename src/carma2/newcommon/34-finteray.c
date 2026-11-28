@@ -466,7 +466,7 @@ void C2_HOOK_FASTCALL CheckSingleFace(tFace_ref* pFace, br_vector3* ray_pos, br_
     br_material* this_material;
 
     this_material = pFace->material;
-    *rt = 100.f;
+    *rt = 100.0f;
     d = BrVector3Dot(&pFace->normal, ray_dir);
     if (this_material != NULL && (this_material->flags & (BR_MATF_TWO_SIDED | BR_MATF_ALWAYS_VISIBLE)) == 0 && d > 0.0f) {
         return;
