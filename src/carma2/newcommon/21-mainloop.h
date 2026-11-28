@@ -39,6 +39,8 @@ extern void C2_HOOK_FASTCALL UpdateFramePeriod(tU32* pCamera_period);
 extern tU32 C2_HOOK_FASTCALL GetLastTickCount(void);
 #endif
 
+extern void C2_HOOK_FASTCALL PrecacheData(void* pData, tU32 pSize);
+
 // CheckTimer
 
 // MungeRaceFinished

@@ -16,6 +16,13 @@
 #include "rec2_macros.h"
 #include <stdlib.h>
 
+#ifdef REC2_MATCHING
+#include <windows.h>
+
+extern SYSTEM_INFO gSystem_info;
+extern DWORD gPD_page_size;
+#endif
+
 // GLOBAL: CARMA2_HW 0x0068c814
 // GLOBAL: CARMA2_SW 0x00686868
 // GLOBAL: CARMA2_CHEAT 0x006940b4
@@ -183,6 +190,28 @@ tU32 C2_HOOK_FASTCALL GetLastTickCount(void) {
     return gLast_tick_count;
 }
 #endif
+
+// FUNCTION: CARMA2_HW 0x00492840
+// FUNCTION: CARMA2_SW 0x0048fa60
+// FUNCTION: CARMA2_CHEAT 0x004927e0
+void C2_HOOK_FASTCALL PrecacheData(void* pData, tU32 pSize) {
+#ifdef REC2_MATCHING
+    tU32 offset;
+
+    /* Win32: touches every page of the block so that it is paged in */
+    if (gPD_page_size == 0) {
+        GetSystemInfo(&gSystem_info);
+        gPD_page_size = gSystem_info.dwPageSize;
+    }
+    for (offset = gPD_page_size * 16; offset < pSize; offset += gPD_page_size) {
+        *((volatile tU8*)pData + (offset - 16 * gPD_page_size)) = *((volatile tU8*)pData + (offset - 16 * gPD_page_size));
+        *((volatile tU8*)pData + offset) = *((volatile tU8*)pData + offset);
+    }
+#else
+    (void)pData;
+    (void)pSize;
+#endif
+}
 
 // CheckTimer
 
