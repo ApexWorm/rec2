@@ -3756,7 +3756,7 @@ typedef struct {
     int field_0x40;
     tSmashable_item_spec_trigger trigger;
     int count_levels;
-    undefined4 field_0x4c;
+    int field_0x4c;
     tSmashable_level* levels;
     float field_0x54;
     float field_0x58;
@@ -3768,6 +3768,12 @@ typedef struct {
     void* field_0x70;
     undefined4 field_0x74;
     void* field_0x78;
+    undefined4 field_0x7c;
+    undefined4 field_0x80;
+    br_face* field_0x84;
+    br_face* field_0x88;
+    tU8 field_0x8c;
+    tU8 field_0x8d;
 } tSmashable_item_spec_texture_change;
 
 typedef struct {
@@ -3787,8 +3793,8 @@ typedef struct tSmashable_item_spec {
         tU16 field_0x14; /* FIXME */
     } mode_data;
     tSmashReplace replace;
-    undefined4 field_0x2d4;
-    undefined4 field_0x2d8;
+    br_actor* field_0x2d4;
+    struct tSmashable_item_spec* field_0x2d8;
     undefined field_0x2dc;
     undefined field_0x2dd[3];
 } tSmashable_item_spec;

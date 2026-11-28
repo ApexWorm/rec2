@@ -93,6 +93,7 @@ extern void C2_HOOK_CDECL BrMatrix23PreShearX(br_matrix23* mat, br_scalar sy);
 extern void C2_HOOK_CDECL BrMatrix23PostShearX(br_matrix23* mat, br_scalar sy);
 extern void C2_HOOK_CDECL BrMatrix23PreShearY(br_matrix23* mat, br_scalar sx);
 extern void C2_HOOK_CDECL BrMatrix23PostShearY(br_matrix23* mat, br_scalar sx);
+extern void C2_HOOK_CDECL BrMatrix23ApplyP(br_vector2* A, const br_vector2* B, const br_matrix23* C);
 extern void C2_HOOK_CDECL BrMatrix23TApplyV(br_vector2* A, const br_vector2* B, const br_matrix23* C);
 
 // BrMatrix34
