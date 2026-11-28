@@ -12,6 +12,7 @@
 #include "41-utility.h"
 #include "51-smash.h"
 #include "52-errors.h"
+#include "61-pedestrn-phys.h"
 #include "67-lighting.h"
 
 #include "globvars.h"
@@ -47,8 +48,6 @@ int gCount_track_non_cars;
 // GLOBAL: CARMA2_SW 0x006739d4
 // GLOBAL: CARMA2_CHEAT 0x00680b14
 br_actor* gMr_blendy;
-
-extern void C2_HOOK_FASTCALL SpawnPedsOnFace(br_face* pFace, br_model* pModel);
 
 // GLOBAL: CARMA2_HW 0x00679268
 // GLOBAL: CARMA2_SW 0x006739d8
