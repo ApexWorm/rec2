@@ -12,9 +12,9 @@
 #include "c2_hooks.h"
 #include "rec2_types.h"
 
-extern int gINT_00679434;
+extern undefined4 gDAT_00679434;
 
-extern int gINT_00679438;
+extern int gTesting_sensible_place;
 
 extern int gINT_00692dc8;
 
@@ -22,7 +22,7 @@ extern int gPrepared_objects;
 
 extern tPhysics_object** gReduced_object_list;
 
-extern int gINT_006940ac;
+extern int gReduced_object_not_moving;
 
 extern tPhysicsError_cbfn* gPhysics_error_cb;
 extern void* gPhysics_buffer1_ptr;
@@ -46,7 +46,7 @@ extern tShrapnel_time_info gPed_spurt_min_max_time;
 extern void* gPhysics_other_buffer;
 extern void* gPhysics_scratch_ptr;
 extern int gFace_count;
-extern int gINT_00679438;
+extern int gTesting_sensible_place;
 extern tPhysics_object* gObject_blocking_sensible_place;
 extern tWorld_callbacks gWorld_callbacks;
 
@@ -192,7 +192,7 @@ extern void C2_HOOK_FASTCALL TellPhysicsJointsHaveChanged(tPhysics_object* pColl
 
 // GetWorldBoundingBoxForObjects
 
-// GetWorldBoundingBoxForObject
+extern void C2_HOOK_FASTCALL GetWorldBoundingBoxForObject(tPhysics_object* pObject, br_bounds* pBounds);
 
 // MatricesAreIdentical
 
@@ -200,7 +200,7 @@ extern void C2_HOOK_FASTCALL TellPhysicsJointsHaveChanged(tPhysics_object* pColl
 
 extern void C2_HOOK_FASTCALL PrepareObject(tPhysics_object* pObject, tPhysics_object** pList);
 
-// PrepareForCollisions
+extern void C2_HOOK_FASTCALL PrepareForCollisions(tPhysics_object* pObject);
 
 // CheckPointVelocities
 
