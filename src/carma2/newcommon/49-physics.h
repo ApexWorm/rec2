@@ -25,12 +25,12 @@ extern int gJoint_limit_10_hit;
 extern int gCount_friction_forces;
 extern tPhysics_joint_force gFriction_forces[50];
 extern int gPHIL_collision_group;
-extern int gINT_006940a4;
+extern int gInter_group_hit_count;
 extern tPhysics_object** gReduced_object_list;
 extern int gReduced_object_not_moving;
 extern undefined4 gDAT_006940b8;
 
-extern int gINT_0065d014;
+extern undefined4 gDAT_0065d014;
 
 extern tPhysicsError_cbfn* gPhysics_error_cb;
 extern br_scalar* gPhysics_buffer1_ptr;

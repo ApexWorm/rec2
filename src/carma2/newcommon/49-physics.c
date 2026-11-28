@@ -89,7 +89,7 @@ int gPHIL_collision_group;
 // GLOBAL: CARMA2_HW 0x006940a4
 // GLOBAL: CARMA2_SW 0x0068e0fc
 // GLOBAL: CARMA2_CHEAT 0x0069bc1c
-int gINT_006940a4;
+int gInter_group_hit_count;
 
 // GLOBAL: CARMA2_HW 0x006940a8
 // GLOBAL: CARMA2_SW 0x0068e100
@@ -229,7 +229,7 @@ tPhysics_object* gObject_blocking_sensible_place;
 // GLOBAL: CARMA2_HW 0x0065d014
 // GLOBAL: CARMA2_SW 0x0065794c
 // GLOBAL: CARMA2_CHEAT 0x006646d0
-int gINT_0065d014 = 1;
+undefined4 gDAT_0065d014 = 1;
 
 // GLOBAL: CARMA2_HW 0x0065cf78
 // GLOBAL: CARMA2_SW 0x006578b0
@@ -3742,7 +3742,7 @@ int C2_HOOK_FASTCALL DoInterGroupCollisions(tPhysics_object** pObject_list, tPhy
     separating = MakeVelocitiesVector(&velocities[count_joint_forces], &forces[count_joint_forces], total, count);
     MakeJointVelocitiesVector(velocities, forces, count_joint_forces);
     if (RQMatrixSolveNoNegatives(gPhysics_buffer3_ptr, velocities, impulses, count_joint_forces + total, 100, excluded, &count_excluded, count_joint_forces, count, groups, count_groups) != 0) {
-        gINT_006940a4++;
+        gInter_group_hit_count++;
     }
     if (gJoint_limit_10_hit != 0) {
         broken = 0;
@@ -3920,7 +3920,7 @@ void C2_HOOK_FASTCALL DoCollisions(tPhysics_object** pObject_list, tWorld_callba
                 gPHIL_collision_group++;
             }
             loops = 0;
-            gINT_006940a4 = 0;
+            gInter_group_hit_count = 0;
             count = 0;
             for (;;) {
                 count = DoInterGroupCollisions(pObject_list, object, forces, old_forces, count, pCallbacks);
@@ -3931,7 +3931,7 @@ void C2_HOOK_FASTCALL DoCollisions(tPhysics_object** pObject_list, tWorld_callba
                 tmp = forces;
                 forces = old_forces;
                 old_forces = tmp;
-                if (loops >= 30 || gINT_006940a4 >= 3) {
+                if (loops >= 30 || gInter_group_hit_count >= 3) {
                     break;
                 }
             }
@@ -4122,7 +4122,7 @@ void C2_HOOK_FASTCALL SetUpForce(br_vector3* pAngular, br_vector3* pLinear, cons
             pAngular->v[i] /= pObject->I.v[i];
         }
     } else {
-        BrVector3Set(pAngular, 0.0f, 0.0f, 0.f);
+        BrVector3Set(pAngular, 0.0f, 0.0f, 0.0f);
     }
     inverse_mass = (br_scalar)(1.0 / pObject->M);
     BrVector3Scale(pLinear, pDirection, inverse_mass);
@@ -4620,7 +4620,7 @@ inline int C2_HOOK_FASTCALL MakeVelocitiesVector(br_scalar* pVelocities, tPhysic
     int i;
 
     separating = 0;
-    if (gINT_0065d014 != 0) {
+    if (gDAT_0065d014 != 0) {
         return MakeVelocitiesVector2(pVelocities, pForces, pCapacity, pCount);
     }
     for (i = pCount; i < pCapacity; i++) {
