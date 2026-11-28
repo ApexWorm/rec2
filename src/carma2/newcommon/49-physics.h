@@ -66,7 +66,7 @@ extern tFace_ref* C2_HOOK_FASTCALL RayCastThruFaceList2(br_vector3* pPosition, b
 
 // GetShapePoint
 
-// GetObjectObjectEdgeIntersections
+extern int C2_HOOK_FASTCALL GetObjectObjectEdgeIntersections(tPhysics_object* pObject_a, tPhysics_object* pObject_b, tPhysics_shape* pShape_a, tPhysics_shape* pShape_b, br_vector3* pPoints_a, tPhysics_joint_force* pForces, int pCount, int pMax_count, tU8* pCodes, int* pFound, const br_vector3* pNormal);
 
 // GetFaceEdgeIntersection
 
@@ -92,11 +92,11 @@ extern int C2_HOOK_FASTCALL GetEdgeToEdgePoints(tPhysics_object* pObject, tPhysi
 
 // GetObjectWallForceInfo
 
-// GetObjectCornerToObjectFacePoints
+extern int C2_HOOK_FASTCALL GetObjectCornerToObjectFacePoints(tPhysics_object* pObject_a, tPhysics_object* pObject_b, tPhysics_shape* pShape_a, tPhysics_shape* pShape_b, br_vector3* pPoints_a, int pCount_a, tPhysics_joint_force* pForces, int pCount, int pMax_count, tU8* pCodes);
 
 extern int C2_HOOK_FASTCALL BoundsOverlapTest(const br_bounds3* pBounds_1, const br_bounds3* pBounds_2);
 
-// GetObjectObjectEdgePoints
+extern int C2_HOOK_FASTCALL GetObjectObjectEdgePoints(tPhysics_object* pObject_a, tPhysics_object* pObject_b, tPhysics_shape* pShape_a, tPhysics_shape* pShape_b, br_vector3* pPoints_a, br_vector3* pPoints_b, tPhysics_joint_force* pForces, int pCount, int pMax_count, tU8* pCodes_a, tU8* pCodes_b);
 
 extern int C2_HOOK_FASTCALL GetSphereNonSphereForceInfo(tPhysics_object* pObject_a, tPhysics_object* pObject_b, tPhysics_shape* pShape_a, tPhysics_shape* pShape_b, br_vector3* pPoints_a, br_vector3* pPoints_b, int pCount_a, int pCount_b, tPhysics_joint_force* pForces, int pCount, int pMax_count);
 

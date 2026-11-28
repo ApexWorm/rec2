@@ -363,7 +363,93 @@ tFace_ref* C2_HOOK_FASTCALL RayCastThruFaceList2(br_vector3* pPosition, br_vecto
 
 // GetShapePoint
 
-// GetObjectObjectEdgeIntersections
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// FUNCTION: CARMA2_HW 0x00427fd0
+// FUNCTION: CARMA2_SW 0x00428060
+// FUNCTION: CARMA2_CHEAT 0x00428160
+int C2_HOOK_FASTCALL GetObjectObjectEdgeIntersections(tPhysics_object* pObject_a, tPhysics_object* pObject_b, tPhysics_shape* pShape_a, tPhysics_shape* pShape_b, br_vector3* pPoints_a, tPhysics_joint_force* pForces, int pCount, int pMax_count, tU8* pCodes, int* pFound, const br_vector3* pNormal) {
+    int i;
+    int edge_count;
+    int result;
+    tPolyhedron_edge_indexes* edges;
+    br_scalar t;
+    br_scalar other_t;
+    br_scalar speed;
+    br_vector3 point;
+    br_vector3 normal;
+    br_vector3 temp_a;
+    br_vector3 temp_b;
+    br_vector3 point_a;
+    br_vector3 world_normal;
+
+    switch (pShape_a->common.type) {
+    case kCollisionShapeType_Box:
+        edges = gDefault_box_collision_wireframe_edges;
+        edge_count = 12;
+        break;
+    case kCollisionShapeType_Wireframe:
+        edges = pShape_a->wireframe.wireframe.lines;
+        edge_count = pShape_a->wireframe.wireframe.count_lines;
+        break;
+    case kCollisionShapeType_Polyhedron:
+    case kCollisionShapeType_Wireframe_Polyhedron:
+        edges = pShape_a->polyhedron.polyhedron.edges;
+        edge_count = pShape_a->polyhedron.polyhedron.count_edges;
+        break;
+    default:
+        PhysicsError(ePhysicsError_UnknownShapeType, "");
+        break;
+    }
+    for (i = 0; i < edge_count; i++) {
+        if ((pCodes[edges[i].index1] & pCodes[edges[i].index2]) != 0) {
+            continue;
+        }
+        result = ShapeRayCast(&pPoints_a[2 * edges[i].index1], &pPoints_a[2 * edges[i].index2], pShape_b, &point, &t, &normal);
+        if (result == 0) {
+            continue;
+        }
+        *pFound = 1;
+        if (result & 0x40) {
+            result = ShapeRayCast(&pPoints_a[2 * edges[i].index2], &pPoints_a[2 * edges[i].index1], pShape_b, &point, &t, &normal);
+            t = 1.0f - t;
+        } else if ((ShapeRayCast(&pPoints_a[2 * edges[i].index2], &pPoints_a[2 * edges[i].index1], pShape_b, &temp_a, &other_t, &temp_b) & 0x40) == 0) {
+            continue;
+        }
+        if (result & 0x40) {
+            continue;
+        }
+        BrVector3Negate(&normal, &normal);
+        if (BrVector3Dot(pNormal, &normal) < 0.2f) {
+            continue;
+        }
+        BrVector3Sub(&temp_a, &point, &pObject_b->cmpos);
+        BrVector3Cross(&temp_b, &pObject_b->rotate_omega, &temp_a);
+        BrVector3Add(&temp_b, &pObject_b->velocity_car_space, &temp_b);
+        speed = BrVector3Dot(&temp_b, &normal);
+        GetShapePoint(&temp_a, pShape_a, edges[i].index1);
+        GetShapePoint(&temp_b, pShape_a, edges[i].index2);
+        BrVector3Sub(&point_a, &temp_b, &temp_a);
+        BrVector3Scale(&point_a, &point_a, t);
+        BrVector3Accumulate(&point_a, &temp_a);
+        BrVector3Sub(&temp_a, &point_a, &pObject_a->cmpos);
+        BrVector3Cross(&temp_b, &pObject_a->rotate_omega, &temp_a);
+        BrVector3Add(&temp_b, &pObject_a->velocity_car_space, &temp_b);
+        BrMatrix34ApplyV(&world_normal, &normal, &pObject_b->transform_matrix);
+        BrMatrix34TApplyV(&temp_a, &world_normal, &pObject_a->transform_matrix);
+        if (speed - BrVector3Dot(&temp_b, &temp_a) > 0.0f) {
+            /* FIXME: AddObjectObjectForce's 10th argument is the edge index here */
+            pCount = AddObjectObjectForce(pForces, &point_a, 0.0f, &point, &world_normal, pCount, pObject_a, pObject_b, 6, (void*)(intptr_t)i, 0.0f);
+        }
+    }
+    return pCount;
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // GetFaceEdgeIntersection
 
@@ -802,7 +888,61 @@ int C2_HOOK_FASTCALL GetEdgeToEdgePoints(tPhysics_object* pObject, tPhysics_shap
 
 // GetObjectWallForceInfo
 
-// GetObjectCornerToObjectFacePoints
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// FUNCTION: CARMA2_HW 0x00428530
+// FUNCTION: CARMA2_SW 0x004285c0
+// FUNCTION: CARMA2_CHEAT 0x004286c0
+int C2_HOOK_FASTCALL GetObjectCornerToObjectFacePoints(tPhysics_object* pObject_a, tPhysics_object* pObject_b, tPhysics_shape* pShape_a, tPhysics_shape* pShape_b, br_vector3* pPoints_a, int pCount_a, tPhysics_joint_force* pForces, int pCount, int pMax_count, tU8* pCodes) {
+    int i;
+    int result;
+    br_scalar t;
+    br_vector3 point;
+    br_vector3 normal;
+    br_vector3 world_normal;
+    br_vector3 tmp;
+    br_vector3 shape_point;
+
+    switch (pShape_b->common.type) {
+    case kCollisionShapeType_Wireframe:
+        return pCount;
+    default:
+        for (i = 0; i < pCount_a; i++) {
+            if (pCodes[i] == 0) {
+                result = ShapeRayCastWithSphere(&pPoints_a[2 * i], &pPoints_a[2 * i + 1], pShape_b, &point, &normal, &t);
+                if (result != 0) {
+                    if (result == -1) {
+                        pCodes[i] = 0xff;
+                        pObject_a->flags |= 0x200;
+                        pObject_b->flags |= 0x200;
+                    } else {
+                        GetShapePoint(&shape_point, pShape_a, i);
+                        if (result & 0x40) {
+                            t = 1.05f;
+                            BrMatrix34ApplyV(&world_normal, &normal, &pObject_b->actor->t.t.mat);
+                            BrVector3Negate(&world_normal, &world_normal);
+                        } else {
+                            BrMatrix34ApplyV(&world_normal, &normal, &pObject_b->actor->t.t.mat);
+                            BrMatrix34ApplyV(&tmp, &normal, &pObject_b->transform_matrix);
+                            BrVector3Scale(&tmp, &tmp, -(1.0f - t));
+                            BrVector3Scale(&world_normal, &world_normal, -t);
+                            BrVector3Accumulate(&world_normal, &tmp);
+                            BrVector3Normalise(&world_normal, &world_normal);
+                        }
+                        pCount = AddObjectObjectForce(pForces, &shape_point, t, &point, &world_normal, pCount, pObject_a, pObject_b, 5, NULL, 0.0f);
+                    }
+                }
+            }
+        }
+        return pCount;
+    }
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 static int C2_HOOK_FASTCALL TestForNan_physics(const float* f) {
 
@@ -847,7 +987,124 @@ int C2_HOOK_FASTCALL BoundsOverlapTest(const br_bounds3* pBounds_1, const br_bou
 #pragma auto_inline(on)
 #endif
 
-// GetObjectObjectEdgePoints
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// FUNCTION: CARMA2_HW 0x004287a0
+// FUNCTION: CARMA2_SW 0x00428830
+// FUNCTION: CARMA2_CHEAT 0x00428930
+int C2_HOOK_FASTCALL GetObjectObjectEdgePoints(tPhysics_object* pObject_a, tPhysics_object* pObject_b, tPhysics_shape* pShape_a, tPhysics_shape* pShape_b, br_vector3* pPoints_a, br_vector3* pPoints_b, tPhysics_joint_force* pForces, int pCount, int pMax_count, tU8* pCodes_a, tU8* pCodes_b) {
+    int i;
+    int j;
+    int k;
+    int edge_count_a;
+    int edge_count_b;
+    int count;
+    tPolyhedron_edge_indexes* edges_a;
+    tPolyhedron_edge_indexes* edges_b;
+    tPhysics_joint_force force;
+    br_scalar t;
+    br_vector3 end;
+    br_vector3 point;
+    br_vector3 direction;
+    br_vector3 direction_change;
+    br_vector3 velocity;
+    tU8 edge_indices[186];   /* FIXME: array sizes are guesses from the stack frame */
+    br_vector3 starts[186];
+    br_vector3 directions[186];
+
+    force.field_0x0 = 2.0f;
+    switch (pShape_a->common.type) {
+    case kCollisionShapeType_Box:
+        edges_a = gDefault_box_collision_wireframe_edges;
+        edge_count_a = 12;
+        break;
+    case kCollisionShapeType_Wireframe:
+        edges_a = pShape_a->wireframe.wireframe.lines;
+        edge_count_a = pShape_a->wireframe.wireframe.count_lines;
+        break;
+    case kCollisionShapeType_Polyhedron:
+    case kCollisionShapeType_Wireframe_Polyhedron:
+        edges_a = pShape_a->polyhedron.polyhedron.edges;
+        edge_count_a = pShape_a->polyhedron.polyhedron.count_edges;
+        break;
+    default:
+        PhysicsError(ePhysicsError_UnknownShapeType, "");
+        break;
+    }
+    switch (pShape_b->common.type) {
+    case kCollisionShapeType_Box:
+        edges_b = gDefault_box_collision_wireframe_edges;
+        edge_count_b = 12;
+        break;
+    case kCollisionShapeType_Wireframe:
+        edges_b = pShape_b->wireframe.wireframe.lines;
+        edge_count_b = pShape_b->wireframe.wireframe.count_lines;
+        break;
+    case kCollisionShapeType_Polyhedron:
+    case kCollisionShapeType_Wireframe_Polyhedron:
+        edges_b = pShape_b->polyhedron.polyhedron.edges;
+        edge_count_b = pShape_b->polyhedron.polyhedron.count_edges;
+        break;
+    default:
+        PhysicsError(ePhysicsError_UnknownShapeType, "");
+        break;
+    }
+    count = 0;
+    for (j = 0; j < edge_count_b; j++) {
+        if ((pCodes_b[edges_b[j].index1] & pCodes_b[edges_b[j].index2]) == 0) {
+            switch (pShape_b->common.type) {
+            case kCollisionShapeType_Box:
+                starts[count].v[0] = (edges_b[j].index1 & 0x2) ? pShape_b->common.bb.min.v[0] : pShape_b->common.bb.max.v[0];
+                starts[count].v[1] = (edges_b[j].index1 & 0x1) ? pShape_b->common.bb.min.v[1] : pShape_b->common.bb.max.v[1];
+                starts[count].v[2] = (edges_b[j].index1 & 0x4) ? pShape_b->common.bb.min.v[2] : pShape_b->common.bb.max.v[2];
+                end.v[0] = (edges_b[j].index2 & 0x2) ? pShape_b->common.bb.min.v[0] : pShape_b->common.bb.max.v[0];
+                end.v[1] = (edges_b[j].index2 & 0x1) ? pShape_b->common.bb.min.v[1] : pShape_b->common.bb.max.v[1];
+                end.v[2] = (edges_b[j].index2 & 0x4) ? pShape_b->common.bb.min.v[2] : pShape_b->common.bb.max.v[2];
+                break;
+            case kCollisionShapeType_Wireframe:
+                BrVector3Copy(&starts[count], &pShape_b->wireframe.wireframe.points[edges_b[j].index1]);
+                BrVector3Copy(&end, &pShape_b->wireframe.wireframe.points[edges_b[j].index2]);
+                break;
+            case kCollisionShapeType_Polyhedron:
+            case kCollisionShapeType_Wireframe_Polyhedron:
+                BrVector3Copy(&starts[count], &pShape_b->polyhedron.polyhedron.points[edges_b[j].index1]);
+                BrVector3Copy(&end, &pShape_b->polyhedron.polyhedron.points[edges_b[j].index2]);
+                break;
+            default:
+                PhysicsError(ePhysicsError_UnknownShapeType, "");
+                break;
+            }
+            BrVector3Sub(&directions[count], &end, &starts[count]);
+            edge_indices[count] = j;
+            count++;
+        }
+    }
+    for (i = 0; i < edge_count_a; i++) {
+        if ((pCodes_a[edges_a[i].index2] & pCodes_a[edges_a[i].index1]) == 0
+                && pCodes_a[edges_a[i].index1] != 0xff
+                && pCodes_a[edges_a[i].index2] != 0xff) {
+            BrVector3Sub(&direction, &pPoints_a[2 * edges_a[i].index2], &pPoints_a[2 * edges_a[i].index1]);
+            BrVector3Sub(&direction_change, &pPoints_a[2 * edges_a[i].index2 + 1], &pPoints_a[2 * edges_a[i].index1 + 1]);
+            BrVector3Sub(&direction_change, &direction_change, &direction);
+            BrVector3Sub(&velocity, &pPoints_a[2 * edges_a[i].index1 + 1], &pPoints_a[2 * edges_a[i].index1]);
+            for (k = 0; k < count; k++) {
+                if (CheckTwoEdges(&starts[k], &directions[k], &pPoints_a[2 * edges_a[i].index1], &direction, &velocity, &direction_change, &force, 0, pObject_a, pObject_b) != 0
+                        && ShapeRayCast(&pPoints_a[2 * edges_a[i].index1], &pPoints_a[2 * edges_a[i].index2], pShape_b, &point, &t, NULL) == 0
+                        && ShapeRayCast(&pPoints_b[2 * edges_b[edge_indices[k]].index1], &pPoints_b[2 * edges_b[edge_indices[k]].index2], pShape_a, &point, &t, NULL) == 0) {
+                    pCount = AddObjectObjectForce(pForces, &force.point_a, force.field_0x0, &force.point_b, &force.direction_a, pCount, pObject_a, pObject_b, 6, NULL, 0.0f);
+                    force.field_0x0 = 2.0f;
+                }
+            }
+        }
+    }
+    return pCount;
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
@@ -1110,11 +1367,140 @@ inline int C2_HOOK_FASTCALL GetSphereShapeForceInfo(tPhysics_object* pObject_a, 
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x00427870
-// STUB: CARMA2_SW 0x00427900
-// STUB: CARMA2_CHEAT 0x00427a00
+// FUNCTION: CARMA2_HW 0x00427870
+// FUNCTION: CARMA2_SW 0x00427900
+// FUNCTION: CARMA2_CHEAT 0x00427a00
 int C2_HOOK_FASTCALL GetNonSphereNonSphereForceInfo(tPhysics_object* pObject_a, tPhysics_object* pObject_b, tPhysics_shape* pShape_a, tPhysics_shape* pShape_b, br_vector3* pPoints_a, br_vector3* pPoints_b, int pCount_a, int pCount_b, tPhysics_joint_force* pForces, int pCount, int pMax_count) {
-    NOT_IMPLEMENTED();
+    int i;
+    int count;
+    int found;
+    int below_x;
+    int below_y;
+    int below_z;
+    int above_x;
+    int above_y;
+    int above_z;
+    tU8 all_codes_a;
+    tU8 all_codes_b;
+    tU8 codes_a[64];
+    tU8 codes_b[64];
+    br_vector3 centre;
+    br_vector3 world;
+    br_vector3 normal;
+
+    all_codes_b = 0xff;
+    all_codes_a = 0xff;
+    for (i = 0; i < pCount_b; i++) {
+        if (pPoints_b[2 * i].v[0] < pShape_a->common.bb.min.v[0] - 0.005f && pPoints_b[2 * i + 1].v[0] < pShape_a->common.bb.min.v[0] - 0.005f) {
+            below_x = 1;
+        } else {
+            below_x = 0;
+        }
+        if (pPoints_b[2 * i].v[1] < pShape_a->common.bb.min.v[1] - 0.005f && pPoints_b[2 * i + 1].v[1] < pShape_a->common.bb.min.v[1] - 0.005f) {
+            below_y = 1;
+        } else {
+            below_y = 0;
+        }
+        if (pPoints_b[2 * i].v[2] < pShape_a->common.bb.min.v[2] - 0.005f && pPoints_b[2 * i + 1].v[2] < pShape_a->common.bb.min.v[2] - 0.005f) {
+            below_z = 1;
+        } else {
+            below_z = 0;
+        }
+        if (pPoints_b[2 * i].v[0] > pShape_a->common.bb.max.v[0] + 0.005f && pPoints_b[2 * i + 1].v[0] > pShape_a->common.bb.max.v[0] + 0.005f) {
+            above_x = 1;
+        } else {
+            above_x = 0;
+        }
+        if (pPoints_b[2 * i].v[1] > pShape_a->common.bb.max.v[1] + 0.005f && pPoints_b[2 * i + 1].v[1] > pShape_a->common.bb.max.v[1] + 0.005f) {
+            above_y = 1;
+        } else {
+            above_y = 0;
+        }
+        if (pPoints_b[2 * i].v[2] > pShape_a->common.bb.max.v[2] + 0.005f && pPoints_b[2 * i + 1].v[2] > pShape_a->common.bb.max.v[2] + 0.005f) {
+            above_z = 1;
+        } else {
+            above_z = 0;
+        }
+        codes_b[i] = below_x + 2 * (below_y + 2 * (below_z + 2 * (above_x + 2 * (above_y + 2 * above_z))));
+        all_codes_b &= codes_b[i];
+    }
+    if (all_codes_b != 0) {
+        return pCount;
+    }
+    for (i = 0; i < pCount_a; i++) {
+        if (pPoints_a[2 * i].v[0] < pShape_b->common.bb.min.v[0] - 0.005f && pPoints_a[2 * i + 1].v[0] < pShape_b->common.bb.min.v[0] - 0.005f) {
+            below_x = 1;
+        } else {
+            below_x = 0;
+        }
+        if (pPoints_a[2 * i].v[1] < pShape_b->common.bb.min.v[1] - 0.005f && pPoints_a[2 * i + 1].v[1] < pShape_b->common.bb.min.v[1] - 0.005f) {
+            below_y = 1;
+        } else {
+            below_y = 0;
+        }
+        if (pPoints_a[2 * i].v[2] < pShape_b->common.bb.min.v[2] - 0.005f && pPoints_a[2 * i + 1].v[2] < pShape_b->common.bb.min.v[2] - 0.005f) {
+            below_z = 1;
+        } else {
+            below_z = 0;
+        }
+        if (pPoints_a[2 * i].v[0] > pShape_b->common.bb.max.v[0] + 0.005f && pPoints_a[2 * i + 1].v[0] > pShape_b->common.bb.max.v[0] + 0.005f) {
+            above_x = 1;
+        } else {
+            above_x = 0;
+        }
+        if (pPoints_a[2 * i].v[1] > pShape_b->common.bb.max.v[1] + 0.005f && pPoints_a[2 * i + 1].v[1] > pShape_b->common.bb.max.v[1] + 0.005f) {
+            above_y = 1;
+        } else {
+            above_y = 0;
+        }
+        if (pPoints_a[2 * i].v[2] > pShape_b->common.bb.max.v[2] + 0.005f && pPoints_a[2 * i + 1].v[2] > pShape_b->common.bb.max.v[2] + 0.005f) {
+            above_z = 1;
+        } else {
+            above_z = 0;
+        }
+        codes_a[i] = below_x + 2 * (below_y + 2 * (below_z + 2 * (above_x + 2 * (above_y + 2 * above_z))));
+        all_codes_a &= codes_a[i];
+    }
+    if (all_codes_a != 0) {
+        return pCount;
+    }
+    count = pCount;
+    if ((pObject_a->flags & 0x100) || (pObject_b->flags & 0x100)) {
+        found = 0;
+        BrVector3Add(&centre, &pObject_a->bb1.max, &pObject_a->bb1.min);
+        BrVector3Scale(&centre, &centre, 0.5f);
+        BrMatrix34ApplyP(&world, &centre, &pObject_a->transform_matrix);
+        DrMatrix34ApplyLPInverse(&centre, &world, &pObject_b->transform_matrix);
+        BrVector3Add(&normal, &pObject_b->bb1.max, &pObject_b->bb1.min);
+        BrVector3Scale(&normal, &normal, 0.5f);
+        BrVector3Sub(&normal, &centre, &normal);
+        BrVector3Normalise(&normal, &normal);
+        count = GetObjectObjectEdgeIntersections(pObject_a, pObject_b, pShape_a, pShape_b, pPoints_a, pForces, count, pMax_count, codes_a, &found, &normal);
+        BrMatrix34ApplyV(&world, &normal, &pObject_a->transform_matrix);
+        BrMatrix34TApplyV(&normal, &world, &pObject_b->transform_matrix);
+        BrVector3Negate(&normal, &normal);
+        count = GetObjectObjectEdgeIntersections(pObject_b, pObject_a, pShape_b, pShape_a, pPoints_b, pForces, count, pMax_count, codes_b, &found, &normal);
+        if (found) {
+            pObject_a->flags |= 0x200;
+            pObject_b->flags |= 0x200;
+            if (pObject_a->parent != NULL && pObject_a->parent == pObject_b->parent) {
+                return pCount;
+            } else {
+                return count;
+            }
+        }
+    }
+    if (pShape_b->common.type != kCollisionShapeType_Wireframe) {
+        count = GetObjectCornerToObjectFacePoints(pObject_a, pObject_b, pShape_a, pShape_b, pPoints_a, pCount_a, pForces, count, pMax_count, codes_a);
+    }
+    if (pShape_a->common.type != kCollisionShapeType_Wireframe) {
+        count = GetObjectCornerToObjectFacePoints(pObject_b, pObject_a, pShape_b, pShape_a, pPoints_b, pCount_b, pForces, count, pMax_count, codes_b);
+    }
+    if (count != 0 && pObject_a != pForces[pCount].object_a) {
+        return GetObjectObjectEdgePoints(pObject_b, pObject_a, pShape_b, pShape_a, pPoints_b, pPoints_a, pForces, count, pMax_count, codes_b, codes_a);
+    } else {
+        return GetObjectObjectEdgePoints(pObject_a, pObject_b, pShape_a, pShape_b, pPoints_a, pPoints_b, pForces, count, pMax_count, codes_a, codes_b);
+    }
 }
 
 #ifdef REC2_MATCHING
