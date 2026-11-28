@@ -1723,11 +1723,7 @@ void C2_HOOK_FASTCALL CalcForce(tCar_spec* c, br_scalar dt) {
             PDSetJoystickForceFFB(ffb_force - (int)((d_change[2] - d_change[3]) * -30000.0f));
         }
     }
-    if (normnum == 0) {
-        c->max_force_front = 0.0f;
-        c->max_force_rear = 0.0f;
-        StopSkid(c);
-    } else {
+    if (normnum != 0) {
         SmashFacesWithWheels(c, face_refs, force, wheel_pos);
         BrVector3Scale(&vcs, &c->collision_info->velocity_car_space, WORLD_SCALE);
         BrVector3NormaliseQuick(&c->road_normal, &c->road_normal);
@@ -2089,6 +2085,10 @@ void C2_HOOK_FASTCALL CalcForce(tCar_spec* c, br_scalar dt) {
         BrVector3Accumulate(&f, &b);
         BrVector3Cross(&tv, &a, &b);
         BrVector3Accumulate(&t, &tv);
+    } else {
+        c->max_force_front = 0.0f;
+        c->max_force_rear = 0.0f;
+        StopSkid(c);
     }
     c->number_of_wheels_on_ground = normnum;
     BrMatrix34ApplyV(&b, &f, mat);
