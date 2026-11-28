@@ -2707,10 +2707,17 @@ br_actor* C2_HOOK_FASTCALL CreateBillBoard(br_pixelmap* pTexture) {
     model->faces[1].vertices[2] = 0;
     model->faces[0].material = NULL;
     model->faces[1].material = NULL;
+#if defined(_MSC_VER) && _MSC_VER >= 1400
+#pragma warning(push)
+#pragma warning(disable : 4244) // '=' : conversion from 'int ' to 'br_scalar ', possible loss of data
+#endif
     BrVector3Set(&model->vertices[0].p, -(width / 2), height / 2, -2.0f);
     BrVector3Set(&model->vertices[1].p, -(width / 2), -(height / 2), -2.0f);
     BrVector3Set(&model->vertices[2].p, width / 2, -(height / 2), -2.0f);
     BrVector3Set(&model->vertices[3].p, width / 2, height / 2, -2.0f);
+#if defined(_MSC_VER) && _MSC_VER >= 1400
+#pragma warning(pop
+#endif
     BrVector2Set(&model->vertices[0].map, 0.0f, 0.0f);
     BrVector2Set(&model->vertices[1].map, 0.0f, 1.0f);
     BrVector2Set(&model->vertices[2].map, 1.0f, 1.0f);
