@@ -876,10 +876,12 @@ static void C2_HOOK_FASTCALL SetLevelBar(tFrontend_spec* pFrontend, int pLevel_i
 // FUNCTION: CARMA2_CHEAT 0x00467ce0
 void C2_HOOK_FASTCALL ToggleSelection(tFrontend_spec* pFrontend) {
     int i;
+    int group;
 
-    if (pFrontend->items[gFrontend_selected_item_index].group != 0) {
+    group = pFrontend->items[gFrontend_selected_item_index].group;
+    if (group != 0) {
         for (i = 0; i < pFrontend->count_items; i++) {
-            if (pFrontend->items[i].group == pFrontend->items[gFrontend_selected_item_index].group && pFrontend->items[gFrontend_selected_item_index].selectable != kFrontendSelectableButton) {
+            if (pFrontend->items[i].group == group && pFrontend->items[gFrontend_selected_item_index].selectable != kFrontendSelectableButton) {
                 pFrontend->items[i].radioButton_selected = 0;
             }
         }
