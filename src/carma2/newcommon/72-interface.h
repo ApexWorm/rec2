@@ -383,11 +383,11 @@ extern void C2_HOOK_FASTCALL ScrollSet_DisplayEntry(tConnected_items* pScroll_se
 
 extern int C2_HOOK_FASTCALL ScrollSet_GetItem(tConnected_items* pScroll_set, int pIndex);
 
-// GetUpdown
+extern tStruct_00686508* C2_HOOK_FASTCALL GetUpdown(int pItem);
 
 extern int C2_HOOK_FASTCALL ScrollSet_TranslateItemToIndex(tConnected_items* pConnected, int pItem);
 
-// Generic_FindNextActiveItem
+extern int C2_HOOK_FASTCALL Generic_FindNextActiveItem(tFrontend_spec* pFrontend, int pItem);
 
 // Generic_FindPrevActiveItem
 
