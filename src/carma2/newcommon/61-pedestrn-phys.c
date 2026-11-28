@@ -13,6 +13,7 @@
 #include "08-loading1.h"
 #include "10-loading2.h"
 #include "15-displays.h"
+#include "18-graphics2.h"
 #include "21-mainloop.h"
 #include "22-replay.h"
 #include "23-piping.h"
@@ -21,6 +22,7 @@
 #include "29-raycast.h"
 #include "30-opponent.h"
 #include "32-spark.h"
+#include "34-finteray.h"
 #include "41-utility.h"
 #include "42-input.h"
 #include "43-pratcam.h"
@@ -28,6 +30,7 @@
 #include "51-smash.h"
 #include "52-errors.h"
 #include "54-runtime.h"
+#include "57-drone.h"
 #include "60-phil.h"
 #include "61-pedestrn.h"
 #include "62-graphics3.h"
@@ -36,6 +39,7 @@
 #include "70-packfile.h"
 #include "globvars.h"
 #include "globvrkm.h"
+#include "globvrpb.h"
 #include "platform.h"
 
 #include "rec2_macros.h"
@@ -62,6 +66,11 @@ int gExplosives_on = 1;
 // GLOBAL: CARMA2_SW 0x0065810c
 // GLOBAL: CARMA2_CHEAT 0x00664e8c
 int gGoreLevel = 1;
+
+// GLOBAL: CARMA2_HW 0x0065d7d8
+// GLOBAL: CARMA2_SW 0x00658110
+// GLOBAL: CARMA2_CHEAT 0x00664e90
+float gPed_tumble_spin = 8.0f;
 
 // GLOBAL: CARMA2_HW 0x0065e4d8
 // GLOBAL: CARMA2_SW 0x00658e10
@@ -106,6 +115,20 @@ const char* gForm_non_humanoid_names[1] = {
     "NONHUMANOID",
 };
 
+#define GET_PED_COLLISION_OBJECT(PED) (((PED)->character->field_0x14 & 0x1) ? (PED)->character->personality->form->simple_physicing[(tS8)(PED)->character->field_0x5].collision_info : GetRootObject((PED)->character))
+// GLOBAL: CARMA2_HW 0x0065e5b8
+// GLOBAL: CARMA2_SW 0x00658ef0
+// GLOBAL: CARMA2_CHEAT 0x00665c70
+const float gFlamed_ped_flame_scales[7] = {
+    0.275f,
+    0.225f,
+    0.2f,
+    0.175f,
+    0.15f,
+    0.075f,
+    0.05f,
+};
+
 // GLOBAL: CARMA2_HW 0x006a0414
 // GLOBAL: CARMA2_SW 0x0069a46c
 // GLOBAL: CARMA2_CHEAT 0x006a7f8c
@@ -119,7 +142,7 @@ int gGhost_pedestrians = 0;
 // FUNCTION: CARMA2_HW 0x004d5730
 // FUNCTION: CARMA2_SW 0x004d1e20
 // FUNCTION: CARMA2_CHEAT 0x004db2f0
-int C2_HOOK_FASTCALL OrientationChanged(const br_matrix34* pOrientation_1, const br_matrix34* pOrientation_2, float pCos_angle) {
+inline int C2_HOOK_FASTCALL OrientationChanged(const br_matrix34* pOrientation_1, const br_matrix34* pOrientation_2, float pCos_angle) {
     if (BrVector3Dot((br_vector3*)pOrientation_1->m[0], (br_vector3*)pOrientation_2->m[0]) < pCos_angle
         || BrVector3Dot((br_vector3*)pOrientation_1->m[1], (br_vector3*)pOrientation_2->m[1]) < pCos_angle
         || BrVector3Dot((br_vector3*)pOrientation_1->m[2], (br_vector3*)pOrientation_2->m[2]) < pCos_angle) {
@@ -151,7 +174,19 @@ void C2_HOOK_FASTCALL AssertRootObjectsMatrix(tPed_character_instance* pPed) {
     collision_info->flags |= 0x100;
 }
 
-// InitFaceCaches
+inline void C2_HOOK_FASTCALL InitFaceCaches(void) {
+    int i;
+    int j;
+
+    for (i = 0; i < (int)REC2_ASIZE(gPed_cache_sizes_1); i++) {
+        gPed_face_cache_heads[i] = BrMemAllocate(gPed_cache_sizes_1[i] * sizeof(tPed_face_cache_0x34), kMem_ped_face_cache);
+        for (j = 0; j < gPed_cache_sizes_1[i]; j++) {
+            gPed_face_cache_heads[i][j].field_0x0 = BrMemAllocate(gPed_cache_sizes_2[i] * sizeof(tFace_ref), kMem_ped_face_cache);
+            gPed_face_cache_heads[i][j].count = gPed_cache_sizes_2[i];
+        }
+    }
+    gPed_face_cache = BrMemAllocate((gPed_cache_sizes_2[3] + 1) * sizeof(tFace_ref), kMem_ped_face_cache);
+}
 
 inline void C2_HOOK_FASTCALL ResetPedFaceCache(void) {
     int i;
@@ -178,9 +213,30 @@ inline void C2_HOOK_FASTCALL ResetPedFaceCache(void) {
     }
 }
 
-// SetPedCurrentFace
+inline void C2_HOOK_FASTCALL SetPedCurrentFace(tPedestrian* pPed, br_vector3* pPos) {
+    tPed_face_cache_0x34* face_cache;
 
-// RecachePedestrian
+    if (pPed->field_0x0c != NULL) {
+        face_cache = pPed->field_0x0c->field_0xb0;
+        face_cache->field_0x30 = CastRayDownThruFaces((br_vector3*)GetCharacterMatrixPtr(pPed->character)->m[3], face_cache->field_0x0, face_cache->field_0x4,
+            GetClearanceFromCharacterInstance(pPed->character, 0), pPos);
+    }
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_HW 0x004d2060
+// STUB: CARMA2_SW 0x004ce760
+// STUB: CARMA2_CHEAT 0x004d7c00
+void C2_HOOK_FASTCALL RecachePedestrian(tPedestrian* pPed, br_vector3* pPos, tU32 pTime) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // FUNCTION: CARMA2_HW 0x004d3360
 // FUNCTION: CARMA2_SW 0x004cfa50
@@ -603,9 +659,70 @@ void C2_HOOK_FASTCALL ReadInGiblets(FILE* pFile) {
     BrMaterialUpdate(gPed_spurt_model->faces[0].material, BR_MATU_ALL);
 }
 
-// ReadSettingsFile
+inline void C2_HOOK_FASTCALL ReadSettingsFile(void) {
+    tPath_name the_path;
+    FILE* file;
+    int i;
+    int j;
+    float v;
 
-// InitOtherPedStuff
+    PathCat(the_path, gApplication_path, gPedsFolder);
+    PathCat(the_path, the_path, "SETTINGS.TXT");
+    file = DRfopen(the_path, "rt");
+    if (file == NULL) {
+        FatalError(kFatalError_CannotOpenPedFile_S, "SETTINGS.TXT");
+    }
+    gPed_process_distance = GetAScalar(file);
+    gPed_process_distance_inner = gPed_process_distance * 0.6;
+    gPed_popup_distance = GetAScalar(file);
+    gPed_popup_distance_inner = gPed_popup_distance * 0.6;
+    gPed_cos_max_slope = BR_COS(BR_ANGLE_DEG(GetAScalar(file)));
+    v = GetAScalar(file);
+    gPed_reach_squared = v * v;
+    v = GetAScalar(file);
+    gPed_min_dist_avoid_collisions_squared = v * v;
+    gPed_buoyancy_factor = GetAScalar(file);
+    GetThreeInts(file, &gPed_points[0], &gPed_points[1], &gPed_points[2]);
+    GetThreeInts(file, &gPed_times[0], &gPed_times[1], &gPed_times[2]);
+    gPed_severing_damage = GetAnInt(file);
+    gPed_severing_chance = GetAnInt(file);
+    gPed_max_survivable_impact = GetAScalar(file);
+    gPed_damage_per_force = GetAScalar(file);
+    ReadInGiblets(file);
+    ReadExplosion(file, &gNapalmed_ped_animation);
+
+    gPed_movements_count = GetAnInt(file);
+    gPed_movements = BrMemAllocate(gPed_movements_count * sizeof(tPed_movement_spec), kMem_misc_poly_ped);
+    for (i = 0; i < gPed_movements_count; i++) {
+        gPed_movements[i].min_time_between = GetAScalar(file) * 1000.0f;
+        gPed_movements[i].max_time_between = GetAScalar(file) * 1000.0f;
+        gPed_movements[i].max_random_angle = BR_ANGLE_DEG(GetAScalar(file));
+        gPed_movements[i].min_walk_speed_factor = 1000.0 / (GetAScalar(file) * 30.0);
+        gPed_movements[i].max_walk_speed_factor = 1000.0 / (GetAScalar(file) * 30.0);
+    }
+
+    gPed_groups_count = GetAnInt(file);
+    gPed_groups = BrMemAllocate(gPed_groups_count * sizeof(tPed_group_spec), kMem_misc_poly_ped);
+    for (i = 0; i < gPed_groups_count; i++) {
+        gPed_groups[i].count = GetAnInt(file);
+        gPed_groups[i].members = BrMemAllocate(gPed_groups[i].count * sizeof(tPed_group_member_spec), kMem_misc_poly_ped);
+        for (j = 0; j < gPed_groups[i].count; j++) {
+            GetAString(file, gPed_groups[i].members[j].name);
+        }
+    }
+
+    gPed_animal_count = GetAnInt(file);
+    for (i = 0; i < gPed_animal_count; i++) {
+        GetAString(file, gPed_animal_names[i]);
+    }
+    PFfclose(file);
+}
+
+inline void C2_HOOK_FASTCALL InitOtherPedStuff(void) {
+
+    gSelected_ped = 0;
+    gProx_ray_shade_table = GenerateShadeTable(8, gRender_palette, 0xd7, 0xff, 0xe9, 0.5f, 0.75f, 0.9f);
+}
 
 // FUNCTION: CARMA2_HW 0x004cb630
 // FUNCTION: CARMA2_SW 0x004c7d30
@@ -666,11 +783,19 @@ void C2_HOOK_FASTCALL InitNapalmNolts(void) {
     }
 }
 
-// STUB: CARMA2_HW 0x004cadc0
-// STUB: CARMA2_SW 0x004c74f0
-// STUB: CARMA2_CHEAT 0x004d0900
+// FUNCTION: CARMA2_HW 0x004cadc0
+// FUNCTION: CARMA2_SW 0x004c74f0
+// FUNCTION: CARMA2_CHEAT 0x004d0900
 void C2_HOOK_FASTCALL InitPolyPedSystem(void) {
-    NOT_IMPLEMENTED();
+
+    if (gPedsFolder == NULL) {
+        SetDefaultPedFolderNames();
+    }
+    InitBoner(&gPed_forms_vtable);
+    ReadSettingsFile();
+    InitFaceCaches();
+    InitNapalmNolts();
+    InitOtherPedStuff();
 }
 
 inline void C2_HOOK_FASTCALL DisposePedSpawnSpec(void) {
@@ -1646,7 +1771,20 @@ int C2_HOOK_FASTCALL DamagePedestrian(tPedestrian* pPed, int pDamage, int pArg3,
     }
 }
 
-// SetLastHitter
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_HW 0x004cdeb0
+// STUB: CARMA2_SW 0x004ca5b0
+// STUB: CARMA2_CHEAT 0x004d3a40
+void C2_HOOK_FASTCALL SetLastHitter(tPedestrian* pPed, tPhysics_object* pObject) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 inline void C2_HOOK_FASTCALL MakePedVanish(tPedestrian* pPed) {
 
@@ -1661,15 +1799,103 @@ inline void C2_HOOK_FASTCALL MakePedVanish(tPedestrian* pPed) {
     }
 }
 
-// CBPassiveCollision
+// STUB: CARMA2_HW 0x004cdc00
+// STUB: CARMA2_SW 0x004ca300
+// STUB: CARMA2_CHEAT 0x004d3790
+int C2_HOOK_FASTCALL CBPassiveCollision(tPed_character_instance* pCharacter, tPhysics_object* pObject, tPhysics_object* pOther_object) {
+    NOT_IMPLEMENTED();
+}
 
-// BastardIt
+// FUNCTION: CARMA2_HW 0x004ce050
+// FUNCTION: CARMA2_SW 0x004ca750
+// FUNCTION: CARMA2_CHEAT 0x004d3be0
+int C2_HOOK_FASTCALL BastardIt(tPedestrian* pPed, tCar_spec* pCar, float pDistance_squared, tU32 pTime, void* pContext) {
+    int i;
 
-// MungeProxRay
+    pPed->field_0x0c->field_0xc0 = pCar;
+    if (pCar != NULL && pCar->driver == eDriver_local_human) {
+        PipeSinglePedIncident(pPed, pCar->collision_info->actor);
+    }
+    if (!gImmortal_peds) {
+        KillPedestrian(pPed, pCar->collision_info);
+        SetPedMove(pPed, 0x71, -1, 0, 1, pTime, ePed_action_dead);
+    }
+    for (i = 0; i < (int)REC2_ASIZE(gProximity_rays); i++) {
+        if (gProximity_rays[i].start_time == 0) {
+            gProximity_rays[i].start_time = GetTotalTime();
+            gProximity_rays[i].car = pCar;
+            gProximity_rays[i].ped = pPed;
+            if (pCar != NULL && pCar->driver == eDriver_local_human) {
+                DRS3StartSound(gCar_outlet, 0x157c);
+            } else {
+                DRS3StartSound3D(gCar_outlet, 0x157c, &pCar->pos, &gZero_v__car, 1, 255, 0x10000, 0x10000);
+            }
+            return 0;
+        }
+    }
+    return 0;
+}
 
-// DoToPeds
+inline int C2_HOOK_FASTCALL MungeProxRay(tPedestrian* pPed, tPhysics_object* pObject, float pDistance_squared, tU32 pTime) {
+    tCar_spec* car;
 
-// DoPedAnnihilator
+    if (!gGhost_pedestrians && pObject != NULL && pObject->owner != NULL && pObject->flags_0x238 == 1) {
+        car = pObject->owner;
+        if (car != NULL && car->driver > eDriver_5 && pDistance_squared < car->proxy_ray_distance) {
+            BastardIt(pPed, car, pDistance_squared, pTime, NULL);
+            return 1;
+        }
+    }
+    return 0;
+}
+
+// FUNCTION: CARMA2_HW 0x004ce140
+// FUNCTION: CARMA2_SW 0x004ca840
+// FUNCTION: CARMA2_CHEAT 0x004d3cd0
+int C2_HOOK_FASTCALL DoToPeds(tCar_spec* pCar, int pOnly_alive, float pRange_squared, int pCheck_visible, void* pContext, int (C2_HOOK_FASTCALL* pCallback)(tPedestrian* pPed, tCar_spec* pCar, float pDistance_squared, tU32 pTime, void* pContext)) {
+    int result;
+    float distance_squared;
+    br_scalar t;
+    br_material* material;
+    tU32 time;
+    br_vector3 normal;
+    br_vector3 dir;
+    tPedestrian* ped;
+    br_vector3* pos;
+
+    result = 0;
+    if (gGhost_pedestrians) {
+        return 0;
+    }
+    pos = &pCar->pos;
+    time = GetTotalTime();
+    for (ped = gPedestrians_in_sight; ped != NULL; ped = ped->next) {
+        distance_squared = (pos->v[0] - ped->pos.v[0]) * (pos->v[0] - ped->pos.v[0]) + (pos->v[1] - ped->pos.v[1]) * (pos->v[1] - ped->pos.v[1]) + (pos->v[2] - ped->pos.v[2]) * (pos->v[2] - ped->pos.v[2]);
+        if (!pOnly_alive || ped->hit_points > 0) {
+            if (pRange_squared == 0.0f || distance_squared < pRange_squared) {
+                if (pCheck_visible) {
+                    BrVector3Sub(&dir, &ped->pos, pos);
+                    FindFace(pos, &dir, &normal, &t, &material);
+                } else {
+                    t = 100.0f;
+                }
+                if (t >= 1.0) {
+                    pCallback(ped, pCar, distance_squared, time, pContext);
+                    result = 1;
+                }
+            }
+        }
+    }
+    return result;
+}
+
+// FUNCTION: CARMA2_HW 0x004ce030
+// FUNCTION: CARMA2_SW 0x004ca730
+// FUNCTION: CARMA2_CHEAT 0x004d3bc0
+int C2_HOOK_FASTCALL DoPedAnnihilator(tCar_spec* pCar, float pRange_squared) {
+
+    return DoToPeds(pCar, 1, pRange_squared, 1, NULL, BastardIt);
+}
 
 // RepulseIt
 
@@ -1692,58 +1918,724 @@ inline void C2_HOOK_FASTCALL KillNapalmBolt(tNapalm_bolt* pBolt) {
     pBolt->ped = NULL;
 }
 
-// MungeNapalm
+// FUNCTION: CARMA2_HW 0x004ce7d0
+// FUNCTION: CARMA2_SW 0x004caed0
+// FUNCTION: CARMA2_CHEAT 0x004d4360
+void C2_HOOK_FASTCALL MungeNapalm(void) {
+    tU32 the_time;
+    int i;
+    int j;
+    tNapalm_bolt* bolt;
+    tPed_character_instance* character;
+    tPhysics_object* object;
+    br_actor* actor;
+    br_vector3 delta;
+    br_vector3 local_delta;
+    br_vector3 positions[7];
+    float dist_squared;
+    float dt;
+    int age;
+    int hit;
+    int t;
+    int k;
 
-// PedHeadingTowardsCollisionObject
+    C2_HOOK_BUG_ON(REC2_ASIZE(positions) != REC2_ASIZE(gFlamed_ped_flame_scales));
+    C2_HOOK_BUG_ON(REC2_ASIZE(positions) != REC2_ASIZE(gNapalm_bolts[0].actors));
 
-// OutsideFaceXZ
-
-#ifdef REC2_MATCHING
-#pragma auto_inline(off)
-#endif
-
-// STUB: CARMA2_HW 0x004cfab0
-// STUB: CARMA2_SW 0x004cc1b0
-// STUB: CARMA2_CHEAT 0x004d5640
-float C2_HOOK_FASTCALL RescanPedProximity(tPedestrian* pPed, br_vector3* pDir) {
-    NOT_IMPLEMENTED();
+    the_time = GetTotalTime();
+    ARStartPipingSession(ePipe_chunk_burning_ped);
+    for (i = 0; i < (int)REC2_ASIZE(gNapalm_bolts); i++) {
+        bolt = &gNapalm_bolts[i];
+        if (bolt->ped == NULL) {
+            continue;
+        }
+        if (!gAction_replay_mode) {
+            if (!(bolt->ped->flags & 0x1)) {
+                bolt->ped->field_0x0c->field_0x98 = 0;
+                KillNapalmBolt(bolt);
+                continue;
+            }
+            age = the_time - bolt->field_0x28;
+            if ((int)(the_time - bolt->field_0x24) > 50) {
+                memmove(&bolt->field_0x2c[1], &bolt->field_0x2c[0], (REC2_ASIZE(bolt->field_0x2c) - 1) * sizeof(br_vector3));
+                BrVector3Sub(&bolt->field_0x2c[0], &bolt->ped->pos, &bolt->actors[0]->t.t.translate.t);
+                BrVector3Normalise(&bolt->field_0x2c[0], &bolt->field_0x2c[0]);
+                bolt->field_0x2c[0].v[0] *= FRandomBetween(0.8f, 1.25f);
+                bolt->field_0x2c[0].v[1] *= FRandomBetween(0.8f, 1.25f);
+                bolt->field_0x2c[0].v[2] *= FRandomBetween(0.8f, 1.25f);
+                if (age < 500) {
+                    bolt->field_0x2c[0].v[1] += (500 - age) * 0.002f;
+                }
+            }
+            dt = gFrame_period * 0.002f;
+            bolt->actors[0]->t.t.translate.t.v[0] += bolt->field_0x2c[0].v[0] * dt;
+            bolt->actors[0]->t.t.translate.t.v[1] += bolt->field_0x2c[0].v[1] * dt;
+            bolt->actors[0]->t.t.translate.t.v[2] += bolt->field_0x2c[0].v[2] * dt;
+            character = bolt->ped->character;
+            object = character->personality->form->simple_physicing[(tS8)character->field_0x5].collision_info;
+            BrVector3Sub(&delta, &bolt->actors[0]->t.t.translate.t, &object->actor->t.t.translate.t);
+            dist_squared = BrVector3LengthSquared(&delta);
+            hit = 0;
+            if (dist_squared < REC2_SQR(object->bb1.max.v[0])
+                    || dist_squared < REC2_SQR(object->bb1.max.v[1])
+                    || dist_squared < REC2_SQR(object->bb1.max.v[2])
+                    || dist_squared < REC2_SQR(object->bb1.min.v[0])
+                    || dist_squared < REC2_SQR(object->bb1.min.v[1])
+                    || dist_squared < REC2_SQR(object->bb1.min.v[2])) {
+                for (j = 0; j < (int)REC2_ASIZE(bolt->actors); j++) {
+                    if (j != 0) {
+                        BrVector3Sub(&delta, &bolt->actors[j]->t.t.translate.t, &object->actor->t.t.translate.t);
+                    }
+                    BrMatrix34TApplyP(&local_delta, &delta, &object->actor->t.t.mat);
+                    if (local_delta.v[0] <= object->bb1.max.v[0] && local_delta.v[0] >= object->bb1.min.v[0]
+                            && local_delta.v[1] <= object->bb1.max.v[1] && local_delta.v[1] >= object->bb1.min.v[1]
+                            && local_delta.v[2] <= object->bb1.max.v[2] && local_delta.v[2] >= object->bb1.min.v[2]) {
+                        hit = 1;
+                        break;
+                    }
+                }
+            }
+            if (hit) {
+                character = bolt->ped->character;
+                Explode(&gNapalmed_ped_animation, GetCharacterActorPtr(character), &character->personality->bb,
+                    &character->personality->form->simple_physicing[(tS8)character->field_0x5].collision_info->cmpos);
+                bolt->ped->field_0x0c->field_0x98 = the_time + 15000;
+                actor = GetCharacterActorPtr(bolt->ped->character);
+                bolt->ped->field_0x0c->field_0xc0 = bolt->field_0x68;
+                bolt->ped->field_0x0c->field_0x2e |= 0x20;
+                ScarePedestrian(bolt->ped, the_time, 1, 1);
+                character = bolt->ped->character;
+                CreateSmokeColumn2(2, actor, NULL, character->personality->form->simple_physicing[(tS8)character->field_0x5].collision_info,
+                    0, IRandomBetween(0, V11MODEL(actor->model)->groups->nvertices), 25000);
+                DRS3StartSound3D(gPedestrians_outlet, eSoundId_NapalmHitCrackls, &bolt->ped->pos, &gZero_v__car, 1, 255, S3_FIXED_INT(1), S3_FIXED_INT(1));
+                if (bolt->ped->hit_points > 0 && bolt->field_0x68 != NULL && bolt->field_0x68->driver == eDriver_local_human) {
+                    PipeSinglePedIncident(bolt->ped, bolt->field_0x68->collision_info->actor);
+                }
+                KillNapalmBolt(bolt);
+                continue;
+            }
+        }
+        t = the_time;
+        memset(positions, 0, sizeof(positions));
+        for (j = 0; j < (int)REC2_ASIZE(gFlamed_ped_flame_scales); j++) {
+            actor = bolt->actors[j];
+            if (gAction_replay_mode) {
+                if (actor->render_style != BR_RSTYLE_FACES) {
+                    break;
+                }
+            } else {
+                t = t - 0.036;
+                if (j != 0) {
+                    if (t < (int)bolt->field_0x28) {
+                        break;
+                    }
+                    k = (int)(bolt->field_0x24 - t) / 50;
+                    if (k < 0) {
+                        k = 0;
+                    }
+                    actor->t.t.translate.t.v[0] = bolt->actors[j - 1]->t.t.translate.t.v[0] - bolt->field_0x2c[k].v[0] * 0.036;
+                    actor->t.t.translate.t.v[1] = bolt->actors[j - 1]->t.t.translate.t.v[1] - bolt->field_0x2c[k].v[1] * 0.036;
+                    actor->t.t.translate.t.v[2] = bolt->actors[j - 1]->t.t.translate.t.v[2] - bolt->field_0x2c[k].v[2] * 0.036;
+                    actor->render_style = BR_RSTYLE_FACES;
+                }
+            }
+            memcpy(&actor->t.t.mat, &gCamera->t.t.mat, 3 * sizeof(br_vector3));
+            BrMatrix34PreScale(&actor->t.t.mat,
+                actor->material->colour_map->width * gFlamed_ped_flame_scales[j] / 128.0f,
+                actor->material->colour_map->height * gFlamed_ped_flame_scales[j] / 128.0f,
+                1.0f);
+            BrMatrix34PreRotateZ(&actor->t.t.mat,
+                (br_angle)(*(tU32*)&bolt->actors[j]->t.t.translate.t.v[2]
+                    ^ *(tU32*)&bolt->actors[j]->t.t.translate.t.v[1]
+                    ^ *(tU32*)&bolt->actors[j]->t.t.translate.t.v[0]));
+            actor->render_style = BR_RSTYLE_FACES;
+            BrVector3Copy(&positions[j], &actor->t.t.translate.t);
+        }
+        AddNapalmBoltToPipingSession(i, bolt->ped, positions);
+    }
+    AREndPipingSession();
 }
 
-#ifdef REC2_MATCHING
-#pragma auto_inline(on)
-#endif
+inline int C2_HOOK_FASTCALL PedHeadingTowardsCollisionObject(tPedestrian* pPed, tPhysics_object** pObject, float* pDistance_squared, br_vector3* pPos, tU32 pTime) {
+    tPhysics_object* object;
+    br_vector3* ped_velocity;
+    br_actor* car_actor;
+    float max_t;
+    float distance_squared;
+    float t;
+    br_vector3 offset;
+    br_vector3 relative_velocity;
 
-#ifdef REC2_MATCHING
-#pragma auto_inline(off)
-#endif
+    ped_velocity = &pPed->character->field_0xd8;
+    srand((unsigned int)pPed);
+    max_t = (float)(SRandomBetween(0.8f, 1.2f) * 7.0);
+    object = PHILGetFirstObject();
+    *pDistance_squared = BR_SCALAR_MAX;
+    if (gProgram_state.current_car.keys.horn) {
+        car_actor = gProgram_state.current_car.collision_info->actor;
+        if ((float)fabs(car_actor->t.t.translate.t.v[0] - pPed->pos.v[0]) < 5.0f
+                && (float)fabs(car_actor->t.t.translate.t.v[1] - pPed->pos.v[1]) < 5.0f
+                && (float)fabs(car_actor->t.t.translate.t.v[2] - pPed->pos.v[2]) < 5.0f) {
+            *pObject = gProgram_state.current_car.collision_info;
+            *pDistance_squared = 0.0f;
+            BrVector3Copy(pPos, &(*pObject)->actor->t.t.translate.t);
+            return 1;
+        }
+    }
+    for (; object != NULL; object = PHILGetNextObject(object)) {
+        if (!(object != NULL && object->owner != NULL && object->flags_0x238 >= 2 && object->flags_0x238 <= 4)
+                && !(object != NULL && object->owner != NULL && object->flags_0x238 == 5)) {
+            BrVector3Sub(&offset, &object->actor->t.t.translate.t, &pPed->pos);
+            if ((float)fabs(offset.v[0]) < 5.0f && (float)fabs(offset.v[1]) < 5.0f && (float)fabs(offset.v[2]) < 5.0f) {
+                if (gPeds_suicidal) {
+                    distance_squared = BrVector3LengthSquared(&offset);
+                    if (MungeProxRay(pPed, object, distance_squared, pTime)) {
+                        return 0;
+                    }
+                    if (distance_squared < *pDistance_squared) {
+                        *pDistance_squared = distance_squared;
+                        *pObject = object;
+                        BrVector3Copy(pPos, &object->actor->t.t.translate.t);
+                    }
+                } else {
+                    relative_velocity.v[0] = object->v.v[0] - ped_velocity->v[0];
+                    relative_velocity.v[2] = object->v.v[2] - ped_velocity->v[2];
+                    if (relative_velocity.v[0] != 0.0f || relative_velocity.v[2] != 0.0f
+                            || (object != NULL && object->owner != NULL && object->flags_0x238 == 1
+                                && ((tCar_spec*)object->owner)->driver > eDriver_5
+                                && ((tCar_spec*)object->owner)->proxy_ray_distance != 0.0f)) {
+                        if (relative_velocity.v[0] == 0.0f && relative_velocity.v[2] == 0.0f) {
+                            distance_squared = offset.v[0] * offset.v[0] + offset.v[2] * offset.v[2];
+                        } else {
+                            distance_squared = offset.v[0] * relative_velocity.v[2] - relative_velocity.v[0] * offset.v[2];
+                            distance_squared = distance_squared * distance_squared
+                                / (relative_velocity.v[0] * relative_velocity.v[0] + relative_velocity.v[2] * relative_velocity.v[2]);
+                        }
+                        if (MungeProxRay(pPed, object, distance_squared, pTime)) {
+                            return 0;
+                        }
+                        if (distance_squared < 2.0f * object->radius_squared) {
+                            t = -(offset.v[0] * relative_velocity.v[0] + offset.v[2] * relative_velocity.v[2])
+                                / (relative_velocity.v[0] * relative_velocity.v[0] + relative_velocity.v[2] * relative_velocity.v[2]);
+                            if (t >= 0.0f && t < max_t) {
+                                *pObject = object;
+                                *pDistance_squared = distance_squared;
+                                BrVector3Copy(pPos, &object->actor->t.t.translate.t);
+                                if (object != NULL && object->flags_0x238 == 0x10) {
+                                    DroneLookWhereYoureGoingYouBlindCunt();
+                                }
+                                srand((unsigned int)pPed ^ pTime);
+                                return 1;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    srand((unsigned int)pPed ^ pTime);
+    if (!gPeds_suicidal || *pDistance_squared == BR_SCALAR_MAX) {
+        return 0;
+    } else {
+        return 1;
+    }
+}
 
-// STUB: CARMA2_HW 0x004d1d70
-// STUB: CARMA2_SW 0x004ce470
-// STUB: CARMA2_CHEAT 0x004d7910
+inline int C2_HOOK_FASTCALL OutsideFaceXZ(const br_vector3* pPos, const tFace_ref* pFace) {
+    int result;
+    br_scalar dx1;
+    br_scalar dz1;
+    br_scalar dx2;
+    br_scalar dz2;
+    br_scalar px;
+    br_scalar pz;
+
+#ifdef REC2_FIX_BUGS
+    result = 0;
+#endif
+    if (pFace != NULL) {
+        dx1 = pFace->v[1].v[0] - pFace->v[0].v[0];
+        dz1 = pFace->v[1].v[2] - pFace->v[0].v[2];
+        dx2 = pFace->v[2].v[0] - pFace->v[0].v[0];
+        dz2 = pFace->v[2].v[2] - pFace->v[0].v[2];
+        px = pPos->v[0] - pFace->v[0].v[0];
+        pz = pPos->v[2] - pFace->v[0].v[2];
+        if ((dx1 * pz - dz1 * px) * (dx1 * dz2 - dz1 * dx2) >= 0.0f && (dx2 * pz - dz2 * px) * (dx2 * dz1 - dz2 * dx1) >= 0.0f) {
+            dx1 = pFace->v[2].v[0] - pFace->v[1].v[0];
+            dz1 = pFace->v[2].v[2] - pFace->v[1].v[2];
+            if ((dx1 * (pPos->v[2] - pFace->v[1].v[2]) - dz1 * (pPos->v[0] - pFace->v[1].v[0])) * (dx1 * (pFace->v[0].v[2] - pFace->v[1].v[2]) - dz1 * (pFace->v[0].v[0] - pFace->v[1].v[0])) < 0.0f) {
+                result = 1;
+            } else {
+                result = 0;
+            }
+        }
+    }
+    return result;
+}
+
+// FUNCTION: CARMA2_HW 0x004cfab0
+// FUNCTION: CARMA2_SW 0x004cc1b0
+// FUNCTION: CARMA2_CHEAT 0x004d5640
+br_scalar C2_HOOK_FASTCALL RescanPedProximity(tPedestrian* pPed, const br_vector3* pDir) {
+    tPed_face_cache_0x34* face_cache;
+    tFace_ref* face;
+    tRace_ped_exclusion_spec* exclusion_spec;
+    tPed_vertex_side_cache* vertex_cache;
+    br_model* model;
+    br_vector3* pos;
+    br_uint_16* vertices;
+    fmt_vertex* model_vertices;
+    br_vector3* p0;
+    br_vector3* p1;
+    br_vector3* p2;
+    int i;
+    int j;
+    int group;
+    int v0;
+    int v1;
+    int v2;
+    int count_vertex_caches;
+    int planes_set;
+    int scared;
+    int walkable;
+    int cached;
+    int side;
+    int facing;
+    br_scalar best_t;
+    br_scalar t;
+    br_scalar t1;
+    br_scalar t2;
+    br_scalar t3;
+    br_scalar d;
+    br_scalar dot;
+    br_scalar xz_length;
+    br_scalar dir_x;
+    br_scalar dir_z;
+    br_scalar e1x;
+    br_scalar e1z;
+    br_scalar e2x;
+    br_scalar e2z;
+    br_scalar e3x;
+    br_scalar e3z;
+    double half_width;
+    br_vector3 dir;
+    br_vector3 tv;
+    tPed_proximity_plane planes[5];
+
+    face_cache = pPed->field_0x0c->field_0xb0;
+    if (face_cache == NULL || face_cache->field_0x30 == NULL) {
+        return 10000.0f;
+    }
+    BrVector3Copy(&pPed->field_0x0c->field_0x00, &face_cache->field_0x30->normal);
+    if (pDir != NULL) {
+        BrVector3Normalise(&dir, pDir);
+    } else {
+        BrVector3Normalise(&dir, &pPed->character->field_0xc0);
+    }
+    BrVector3Copy(&pPed->field_0x0c->field_0x0c, &dir);
+    best_t = 10000.0f;
+    count_vertex_caches = 0;
+    planes_set = 0;
+    xz_length = (br_scalar)sqrt(dir.v[0] * dir.v[0] + dir.v[2] * dir.v[2]);
+    if (pPed->action == ePed_action_running) {
+        scared = 1;
+    } else {
+        scared = 0;
+    }
+    pPed->field_0x0c->field_0x18 &= ~0xb;
+    dir_x = dir.v[0] / xz_length;
+    dir_z = dir.v[2] / xz_length;
+    pos = GetPedPos(pPed);
+
+#define VERTEX_SIDE(RESULT, VERTEX, INDEX, PLANE)                                                              \
+    do {                                                                                                       \
+        if (vertex_cache != NULL && (VERTEX) < (int)REC2_ASIZE(vertex_cache->vertex_sides)) {                   \
+            cached = 1;                                                                                        \
+        } else {                                                                                               \
+            cached = 0;                                                                                        \
+        }                                                                                                      \
+        if (cached && (vertex_cache->vertex_sides[VERTEX] & gPed_plane_tested_bits[PLANE])) {                  \
+            RESULT = vertex_cache->vertex_sides[VERTEX] & gPed_plane_side_bits[PLANE];                         \
+        } else {                                                                                               \
+            RESULT = NormalSideOfPlane(&face->v[INDEX], &planes[PLANE].normal, planes[PLANE].d);               \
+            if (cached) {                                                                                      \
+                vertex_cache->vertex_sides[VERTEX] |= gPed_plane_tested_bits[PLANE];                           \
+                if (RESULT) {                                                                                  \
+                    vertex_cache->vertex_sides[VERTEX] |= gPed_plane_side_bits[PLANE];                         \
+                }                                                                                              \
+            }                                                                                                  \
+        }                                                                                                      \
+    } while (0)
+#define FACE_SIDE(RESULT, PLANE)                   \
+    do {                                           \
+        VERTEX_SIDE(RESULT, v0, 0, PLANE);         \
+        if (!(RESULT)) {                           \
+            VERTEX_SIDE(RESULT, v1, 1, PLANE);     \
+            if (!(RESULT)) {                       \
+                VERTEX_SIDE(RESULT, v2, 2, PLANE); \
+            }                                      \
+        }                                          \
+    } while (0)
+
+    for (i = 0, face = face_cache->field_0x0; i < face_cache->field_0x4; i++, face++) {
+        walkable = 0;
+        if (face->normal.v[1] > gPed_cos_max_slope) {
+            if (gPeds_suicidal) {
+                continue;
+            }
+            exclusion_spec = pPed->exclusion_spec;
+            if (exclusion_spec == NULL) {
+                continue;
+            }
+            if (scared && exclusion_spec->exclusions_ok_when_scared) {
+                continue;
+            }
+            for (j = 0; j < exclusion_spec->count_exclusion_materials; j++) {
+                if (exclusion_spec->exclusion_materials[j].material == face->material
+                        && (!scared || exclusion_spec->exclusion_materials[j].flags == 0)) {
+                    walkable = 1;
+                    break;
+                }
+            }
+            if (j == exclusion_spec->count_exclusion_materials) {
+                continue;
+            }
+        } else {
+            exclusion_spec = pPed->exclusion_spec;
+            if (exclusion_spec != NULL) {
+                for (j = 0; j < exclusion_spec->count_exception_materials; j++) {
+                    if (exclusion_spec->exception_materials[j] == face->material) {
+                        break;
+                    }
+                }
+                if (j != exclusion_spec->count_exception_materials) {
+                    continue;
+                }
+            }
+        }
+        if (!walkable) {
+            dot = BrVector3Dot(&dir, &face->normal);
+            if (fabs(dot) < 0.001) {
+                t = 20.0f;
+            } else {
+                t = (face->d - pos->v[0] * face->normal.v[0] - pos->v[1] * face->normal.v[1] - pos->v[2] * face->normal.v[2]) / dot;
+            }
+            if (t < 0.0f || t > 20.0f || t > best_t) {
+                continue;
+            }
+        }
+        if (!planes_set) {
+            BrVector3Copy(&planes[0].normal, &face_cache->field_0x30->normal);
+            planes[0].d = face_cache->field_0x30->d;
+            DRVector3SafeCross(&planes[1].normal, &y_unit_vector, &dir);
+            BrVector3Normalise(&planes[1].normal, &planes[1].normal);
+            BrVector3Negate(&planes[2].normal, &planes[1].normal);
+            half_width = pPed->character->personality->bb.max.v[0] * 1.3;
+            BrVector3Scale(&tv, &planes[2].normal, half_width);
+            BrVector3Accumulate(&tv, pos);
+            planes[1].d = BrVector3Dot(&tv, &planes[1].normal);
+            half_width = pPed->character->personality->bb.max.v[0] * 1.3;
+            BrVector3Scale(&tv, &planes[1].normal, half_width);
+            BrVector3Accumulate(&tv, pos);
+            planes[2].d = BrVector3Dot(&tv, &planes[2].normal);
+            BrVector3Copy(&planes[3].normal, &dir);
+            planes[3].d = BrVector3Dot(pos, &planes[3].normal);
+            planes_set = 1;
+            BrVector3Negate(&planes[4].normal, &face_cache->field_0x30->normal);
+            planes[4].d = BrVector3Dot(pos, &planes[4].normal);
+        }
+        model = face->a->model;
+        group = face->g;
+        if (group < 0) {
+            if (face->f >= model->nfaces) {
+                continue;
+            }
+            vertices = model->faces[face->f].vertices;
+        } else {
+            if (group >= model->prepared->ngroups) {
+                continue;
+            }
+            if (face->f >= model->prepared->groups[group].nfaces) {
+                continue;
+            }
+            vertices = model->prepared->groups[group].faces[face->f].vertices;
+        }
+        v0 = vertices[0];
+        v1 = vertices[1];
+        v2 = vertices[2];
+        vertex_cache = NULL;
+        for (j = 0; j < count_vertex_caches; j++) {
+            if (gPed_vertex_side_caches[j].model == model && gPed_vertex_side_caches[j].group == group) {
+                vertex_cache = &gPed_vertex_side_caches[j];
+                break;
+            }
+        }
+        if (vertex_cache == NULL && count_vertex_caches < (int)REC2_ASIZE(gPed_vertex_side_caches)) {
+            vertex_cache = &gPed_vertex_side_caches[count_vertex_caches];
+            count_vertex_caches++;
+            memset(vertex_cache->vertex_sides, 0, sizeof(vertex_cache->vertex_sides));
+            vertex_cache->model = model;
+            vertex_cache->group = group;
+        }
+        FACE_SIDE(side, 3);
+        if (!side) {
+            continue;
+        }
+        FACE_SIDE(side, 1);
+        if (!side) {
+            continue;
+        }
+        FACE_SIDE(side, 2);
+        if (!side) {
+            continue;
+        }
+        if (walkable) {
+            /* FIXME: the original takes the vertices from the prepared group, also when the face has no group */
+            model_vertices = model->prepared->groups[group].vertices;
+            p0 = &model_vertices[v0].p;
+            p1 = &model_vertices[v1].p;
+            p2 = &model_vertices[v2].p;
+            e1x = p1->v[0] - p0->v[0];
+            e1z = p1->v[2] - p0->v[2];
+            e2x = p2->v[0] - p1->v[0];
+            e2z = p2->v[2] - p1->v[2];
+            e3x = p0->v[0] - p2->v[0];
+            e3z = p0->v[2] - p2->v[2];
+            /* FIXME: the original uses the first edge's end points for all three edges */
+            d = dir_x * e1z - dir_z * e1x;
+            if (fabs(d) > 0.0001) {
+                t1 = (e1x * pos->v[2] - e1z * pos->v[0] + p0->v[0] * p1->v[2] - p1->v[0] * p0->v[2]) / d;
+                if (t1 < 0.0f) {
+                    t1 = BR_SCALAR_MAX;
+                }
+            } else {
+                t1 = BR_SCALAR_MAX;
+            }
+            d = dir_x * e2z - dir_z * e2x;
+            if (fabs(d) > 0.0001) {
+                t2 = (e2x * pos->v[2] - e2z * pos->v[0] + p0->v[0] * p1->v[2] - p1->v[0] * p0->v[2]) / d;
+                if (t2 < 0.0f) {
+                    t2 = BR_SCALAR_MAX;
+                }
+            } else {
+                t2 = BR_SCALAR_MAX;
+            }
+            d = dir_x * e3z - dir_z * e3x;
+            if (fabs(d) > 0.0001) {
+                t3 = (e3x * pos->v[2] - e3z * pos->v[0] + p0->v[0] * p1->v[2] - p1->v[0] * p0->v[2]) / d;
+                if (t3 < 0.0f) {
+                    t3 = BR_SCALAR_MAX;
+                }
+            } else {
+                t3 = BR_SCALAR_MAX;
+            }
+            if (t1 < t2 && t1 < t3) {
+                if (t1 >= best_t) {
+                    continue;
+                }
+                best_t = t1;
+                pPed->field_0x0c->field_0xa4.v[0] = e1x;
+                pPed->field_0x0c->field_0xa4.v[1] = 0.0f;
+                pPed->field_0x0c->field_0xa4.v[2] = -e1z;
+            } else if (t2 < t1 && t2 < t3) {
+                if (t2 >= best_t) {
+                    continue;
+                }
+                best_t = t2;
+                pPed->field_0x0c->field_0xa4.v[0] = e2x;
+                pPed->field_0x0c->field_0xa4.v[1] = 0.0f;
+                pPed->field_0x0c->field_0xa4.v[2] = -e2z;
+            } else {
+                if (t3 >= best_t) {
+                    continue;
+                }
+                best_t = t3;
+                pPed->field_0x0c->field_0xa4.v[0] = e3x;
+                pPed->field_0x0c->field_0xa4.v[1] = 0.0f;
+                pPed->field_0x0c->field_0xa4.v[2] = -e3z;
+            }
+            if (best_t <= 20.0f) {
+                pPed->field_0x0c->field_0xbc = best_t * best_t;
+                BrVector3Set(&pPed->field_0x0c->field_0x30, 0.0f, 0.0f, 0.0f);
+                pPed->field_0x0c->field_0x3c.v[0] = dir_x * best_t + pos->v[0];
+                pPed->field_0x0c->field_0x3c.v[1] = pos->v[1];
+                pPed->field_0x0c->field_0x3c.v[2] = dir_z * best_t + pos->v[2];
+                BrVector3Normalise(&pPed->field_0x0c->field_0xa4, &pPed->field_0x0c->field_0xa4);
+                pPed->field_0x0c->field_0x18 |= 0x8;
+            }
+        } else {
+            if (BrVector3Dot(&face->normal, &dir) > 0.0f) {
+                facing = 1;
+            } else {
+                facing = 0;
+            }
+            if (facing && (face->material->flags & BR_MATF_TWO_SIDED)) {
+                BrVector3Scale(&face->normal, &face->normal, -1.0f);
+                face->d = -face->d;
+                facing = 0;
+            }
+            if (facing) {
+                FACE_SIDE(side, 4);
+                if (side) {
+                    pPed->field_0x0c->field_0x18 |= 0x1;
+                }
+            } else {
+                FACE_SIDE(side, 0);
+                if (side) {
+                    pPed->field_0x0c->field_0x18 |= 0x2;
+                }
+            }
+            if (pPed->field_0x0c->field_0x18 != 0) {
+                pPed->field_0x0c->field_0xbc = t * t;
+                BrVector3Set(&pPed->field_0x0c->field_0x30, 0.0f, 0.0f, 0.0f);
+                pPed->field_0x0c->field_0x3c.v[0] = dir.v[0] * t + pos->v[0];
+                pPed->field_0x0c->field_0x3c.v[1] = dir.v[1] * t + pos->v[1];
+                pPed->field_0x0c->field_0x3c.v[2] = dir.v[2] * t + pos->v[2];
+                best_t = t;
+                BrVector3Copy(&pPed->field_0x0c->field_0xa4, &face->normal);
+            }
+        }
+    }
+#undef FACE_SIDE
+#undef VERTEX_SIDE
+    return best_t;
+}
+
+// FUNCTION: CARMA2_HW 0x004d1d70
+// FUNCTION: CARMA2_SW 0x004ce470
+// FUNCTION: CARMA2_CHEAT 0x004d7910
 tPed_face_cache_0x34* C2_HOOK_FASTCALL RecacheAndSetFace(tPedestrian* pPed, int* pOn_face, int* pFace_changed, br_vector3* pPos, int pForce, tU32 pTime) {
-    NOT_IMPLEMENTED();
+    br_vector3* pos;
+    tPed_face_cache_0x34* face_cache;
+    tFace_ref* old_face;
+
+    *pOn_face = 0;
+    *pFace_changed = 0;
+    pos = GetPedPos(pPed);
+    face_cache = pPed->field_0x0c->field_0xb0;
+    if (!pForce && face_cache != NULL
+            && pos->v[0] - face_cache->field_0x18.max.v[0] <= -.21739130434782608
+            && pos->v[1] - face_cache->field_0x18.max.v[1] <= -.21739130434782608
+            && pos->v[2] - face_cache->field_0x18.max.v[2] <= -.21739130434782608
+            && face_cache->field_0x18.min.v[0] - pos->v[0] <= -.21739130434782608
+            && face_cache->field_0x18.min.v[1] - pos->v[1] <= -.21739130434782608
+            && face_cache->field_0x18.min.v[2] - pos->v[2] <= -.21739130434782608) {
+        if (OutsideFaceXZ(pos, face_cache->field_0x30)) {
+            old_face = face_cache->field_0x30;
+            SetPedCurrentFace(pPed, pPos);
+            *pOn_face = 1;
+            if (old_face == NULL || face_cache->field_0x30 == NULL || BrVector3Dot(&old_face->normal, &pPed->field_0x0c->field_0x00) < .99) {
+                *pFace_changed = 1;
+            }
+        }
+        return face_cache;
+    }
+    RecachePedestrian(pPed, pPos, pTime);
+    face_cache = pPed->field_0x0c->field_0xb0;
+    if (face_cache != NULL) {
+        *pOn_face = 1;
+    } else {
+        *pOn_face = 0;
+    }
+    *pFace_changed = 1;
+    return face_cache;
 }
 
-#ifdef REC2_MATCHING
-#pragma auto_inline(on)
-#endif
-
-#ifdef REC2_MATCHING
-#pragma auto_inline(off)
-#endif
-
-// STUB: CARMA2_HW 0x004cef80
-// STUB: CARMA2_SW 0x004cb680
-// STUB: CARMA2_CHEAT 0x004d4b10
+// FUNCTION: CARMA2_HW 0x004cef80
+// FUNCTION: CARMA2_SW 0x004cb680
+// FUNCTION: CARMA2_CHEAT 0x004d4b10
 void C2_HOOK_FASTCALL PedScanForObjects(tPedestrian* pPed, tU32 pTime) {
-    NOT_IMPLEMENTED();
+    tPhysics_object* object;
+    float distance_squared;
+    br_vector3 pos;
+    br_vector3 dir;
+    br_vector3 offset;
+    br_matrix34 mat;
+    int move;
+    tPed_action action;
+
+    if (pPed->field_0x0c == NULL) {
+        return;
+    }
+    pPed->field_0x0c->field_0x18 &= ~0x4;
+    if (PedHeadingTowardsCollisionObject(pPed, &object, &distance_squared, &pos, pTime)
+            && ((!gBlind_pedestrians && !gPed_valium_left) || gProgram_state.current_car.keys.horn)
+            && (!(pPed->field_0x0c->field_0x18 & 0x2) || distance_squared / pPed->field_0x0c->field_0xbc < 0.25)) {
+        pPed->field_0x0c->field_0x18 |= 0x4;
+        if (gPeds_suicidal) {
+            BrVector3Sub(&dir, &pos, &pPed->pos);
+            SetPedXZDirection(pPed, &dir, 0.0f, pTime);
+            RescanPedProximity(pPed, NULL);
+            return;
+        }
+        BrVector3Copy(&pPed->field_0x0c->field_0x30, &object->v);
+        BrVector3Copy(&pPed->field_0x0c->field_0x3c, &pos);
+        BrVector3Sub(&offset, &pPed->pos, &pos);
+        BrVector3Normalise(&pos, &offset);
+        BrMatrix34Rotate(&mat, IRandomPosNeg(0x2aa8), &y_unit_vector);
+        BrVector3Copy(&pPed->field_0x0c->field_0xa4, &pos);
+        if (BrVector3LengthSquared(&object->v) > 1.0
+                || (gProgram_state.current_car.keys.horn && object == gProgram_state.current_car.collision_info)) {
+            if (pPed->action == ePed_action_walking) {
+                BrVector3Scale(&dir, &pPed->field_0x0c->field_0xa4, -1.0f);
+                SetPedXZDirection(pPed, &dir, 0.0f, pTime);
+                RescanPedProximity(pPed, NULL);
+                ScarePedestrian(pPed, pTime, 1, 0);
+                pPed->field_0x2c = pTime;
+            } else {
+                if (pTime - pPed->field_0x2c > 9999 && pPed->field_0x0c->field_0x98 <= 0) {
+                    SetPedHeadAnim(pPed, &gKnocked_over_ped_anim_sequence, pTime);
+                    /* FIXME: rows 114 and up of gPed_move_fsm are probably separate tables */
+                    move = gPed_move_fsm[115][1 + IRandomBetween(0, 8)];
+                    if (move < 0) {
+                        move = -move;
+                        action = ePed_action_running;
+                    } else {
+                        action = ePed_action_panicking;
+                    }
+                    if (move != 0xd && move != 0x28 && move != 0x29) {
+                        BrVector3Scale(&dir, &pPed->field_0x0c->field_0xa4, -1.0f);
+                        SetPedXZDirection(pPed, &dir, 0.0f, pTime);
+                        RescanPedProximity(pPed, NULL);
+                    }
+                    SetPedMove(pPed, move, -1, 0, 1, pTime, action);
+                    switch (move) {
+                    case 2:
+                        MakePedNoise(pPed, 6, 0, NULL);
+                        break;
+                    case 10:
+                    case 11:
+                        MakePedNoise(pPed, 8, 0, NULL);
+                        break;
+                    case 13:
+                        MakePedNoise(pPed, 10, 1, NULL);
+                        break;
+                    }
+                }
+                ScarePedestrian(pPed, pTime, 1, 0);
+            }
+        }
+        return;
+    }
+    if (pPed->hit_points > 0
+            && pPed->action == ePed_action_running
+            && pPed->field_0x0c->field_0x18 == 0
+            && pTime - pPed->field_0x28 > 9999
+            && pPed->character->field_0xc == 0
+            && pPed->field_0x0c->field_0x98 <= 0) {
+        SetPedMove(pPed, 0x1e, IRandomBetween(pPed->movement_spec->min_walk_speed_factor, pPed->movement_spec->max_walk_speed_factor), 0, 1, pTime, ePed_action_walking);
+        SetPedHeadAnim(pPed, &gCalm_ped_anim_sequence, pTime);
+    }
 }
 
-#ifdef REC2_MATCHING
-#pragma auto_inline(on)
-#endif
+inline void C2_HOOK_FASTCALL CatAndMouseBonus(tPedestrian* pPed) {
 
-// CatAndMouseBonus
+    if (pPed->field_0x0c != NULL && pPed->field_0x0c->field_0xc0 == &gProgram_state.current_car && !(pPed->field_0x0c->field_0x2e & 0x4)) {
+        pPed->field_0x0c->field_0x2e |= 0x4;
+        EarnCredits(gPed_points[gProgram_state.skill_level]);
+        DoFancyHeadup(4);
+    }
+}
 
 inline void C2_HOOK_FASTCALL StillifyCorpse(tPedestrian* pPed, tU32 pTime, int pArg3) {
 
@@ -1754,17 +2646,185 @@ inline void C2_HOOK_FASTCALL StillifyCorpse(tPedestrian* pPed, tU32 pTime, int p
     }
 }
 
-// StraightenOutPed
+inline void C2_HOOK_FASTCALL StraightenOutPed(tPedestrian* pPed, tU32 pTime) {
+
+    EnableRetainRootMode();
+    switch (pPed->character->personality->form->moves[pPed->character->field_0x7].id) {
+    case 0x5a:
+    case 0x5b:
+    case 0x5c:
+    case 0x61:
+    case 0x71:
+        SetKnockedOverMove(pPed, pTime);
+        break;
+    }
+    DisableRetainRootMode();
+}
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x004d1030
-// STUB: CARMA2_SW 0x004cd730
-// STUB: CARMA2_CHEAT 0x004d6bd0
+// FUNCTION: CARMA2_HW 0x004d1030
+// FUNCTION: CARMA2_SW 0x004cd730
+// FUNCTION: CARMA2_CHEAT 0x004d6bd0
 int C2_HOOK_FASTCALL ActiveHalted(tPed_character_instance* pCharacter, tPhysics_object* pObject, tFace_ref* pFace) {
-    NOT_IMPLEMENTED();
+    tPedestrian* ped;
+    tU32 time;
+    int i;
+    int flat;
+    int upright;
+    int max_tumbles;
+    int axis_index;
+    int on_face;
+    int face_changed;
+    br_scalar max_up;
+    br_scalar dot;
+    br_vector3 normal;
+    br_vector3 axis;
+    br_vector3 tumble_v;
+    br_vector3 pos;
+
+    if (gAction_replay_mode) {
+        return 1;
+    }
+    if (gPipe_halted_ped_status) {
+        PipeSinglePedStatus(pCharacter->ped, -1, -1, 5, 1, pCharacter->field_0x4, pCharacter->field_0x4, pCharacter->field_0x5, pCharacter->field_0x5,
+            &pCharacter->field_0xc0, &pCharacter->field_0xcc, &pCharacter->field_0x8c);
+        return 1;
+    }
+    ped = pCharacter->ped;
+    BrVector3Copy(&ped->pos, &pObject->actor->t.t.translate.t);
+    time = GetTotalTime();
+    if ((pCharacter->field_0x14 & 0x1) || pFace != NULL) {
+        if (pFace != NULL) {
+            BrVector3Copy(&normal, &pFace->normal);
+            max_up = pFace->normal.v[1];
+        } else {
+#ifdef REC2_FIX_BUGS
+            BrVector3Set(&normal, 0.0f, 0.0f, 0.0f);
+#endif
+            max_up = 0.0f;
+            for (i = pObject->box_face_start; i < pObject->box_face_end; i++) {
+                if (max_up < gFace_list__car[i].normal.v[1]) {
+                    BrVector3Copy(&normal, &gFace_list__car[i].normal);
+                    max_up = gFace_list__car[i].normal.v[1];
+                }
+            }
+        }
+        if (pCharacter->field_0x8c.m[1][1] <= 0.93 || ped->hit_points <= 0) {
+            upright = 0;
+            if (pObject->I.v[0] > pObject->I.v[1] && pObject->I.v[0] > pObject->I.v[2]) {
+                BrVector3Scale(&axis, (br_vector3*)pObject->actor->t.t.mat.m[0], -1.0f);
+            } else if (pObject->I.v[1] > pObject->I.v[2] && pObject->I.v[1] > pObject->I.v[0]) {
+                BrVector3Scale(&axis, (br_vector3*)pObject->actor->t.t.mat.m[1], -1.0f);
+            } else {
+                BrVector3Scale(&axis, (br_vector3*)pObject->actor->t.t.mat.m[2], -1.0f);
+            }
+            dot = BrVector3Dot(&normal, &axis);
+            if (max_up != 0.0f && (float)fabs(dot) < 0.706) {
+                flat = 1;
+            } else {
+                flat = 0;
+            }
+        } else {
+            flat = 0;
+            upright = 1;
+        }
+        if (flat && ped->field_0x0c != NULL) {
+            if (ped->hit_points > 0) {
+                max_tumbles = 3;
+            } else {
+                max_tumbles = 2;
+            }
+            if (ped->field_0x0c->field_0x19 < max_tumbles) {
+                StraightenOutPed(ped, time);
+                if (!(pCharacter->field_0x14 & 0x1)) {
+                    SetCharacterPhysicsLevelAR(pCharacter, 5);
+                }
+                if (PercentageChance(50)) {
+                    gPed_tumble_spin = -gPed_tumble_spin;
+                }
+                MakePedNoise(ped, 3, 0, NULL);
+                BrVector3Scale(&tumble_v, &axis, gPed_tumble_spin);
+                TumbleObjectWithV(pObject, &tumble_v, 1.39f, 0.0f);
+                if (ped->field_0x0c != NULL) {
+                    ped->field_0x0c->field_0x19++;
+                }
+                pObject->disable_move_rotate = 0;
+                AssertRootObjectsMatrix(pCharacter);
+                return 0;
+            }
+        }
+        PipeSinglePedStatus(pCharacter->ped, -1, -1, 5, 1, pCharacter->field_0x4, pCharacter->field_0x4, pCharacter->field_0x5, pCharacter->field_0x5,
+            &pCharacter->field_0xc0, &pCharacter->field_0xcc, &pCharacter->field_0x8c);
+        pCharacter->ped->field_0x06++;
+        StraightenOutPed(ped, time);
+        if (ped->field_0x0c != NULL) {
+            ped->field_0x0c->field_0x19 = 0;
+        }
+        if (ped->hit_points > 0) {
+            RecacheAndSetFace(ped, &on_face, &face_changed, &pos, 1, time);
+            if ((flat || (upright && gPeds_suicidal)) && !gImmortal_peds) {
+                MakePedNoise(ped, 5, 0, NULL);
+                KillPedestrian(ped, NULL);
+                SetKnockedOverMove(ped, time);
+                StillifyCorpse(ped, time, 0);
+            } else if (!(pCharacter->field_0xc & gPow2_array[3]) || !(pCharacter->field_0xc & gPow2_array[5])) {
+                if (ped->character->field_0xc != 0) {
+                    CatAndMouseBonus(ped);
+                }
+                ped->flags &= ~0x8;
+                if (upright) {
+                    SetPedXZDirection(ped, (br_vector3*)pCharacter->field_0x8c.m[2], 0.0f, time);
+                    ped->action = ePed_action_walking;
+                    ScarePedestrian(ped, time, 0, 0);
+                } else {
+                    if (dot > 0.0f) {
+                        axis_index = pCharacter->personality->form->axis_when_lying_down_A;
+                    } else {
+                        axis_index = pCharacter->personality->form->axis_when_lying_down_B;
+                    }
+                    if (axis_index < 0) {
+                        BrVector3Scale(&axis, (br_vector3*)pCharacter->field_0x8c.m[-axis_index], -1.0f);
+                    } else {
+                        BrVector3Copy(&axis, (br_vector3*)pCharacter->field_0x8c.m[axis_index]);
+                    }
+                    SetPedXZDirection(ped, &axis, 0.0f, time);
+                    if (dot > 0.0f) {
+                        SetPedMove(ped, 0x50, -1, 0, 1, time, ePed_action_getting_up);
+                    } else {
+                        SetPedMove(ped, 0x51, -1, 0, 1, time, ePed_action_getting_up);
+                    }
+                }
+                RescanPedProximity(ped, NULL);
+                PedScanForObjects(ped, time);
+            } else {
+                SetKnockedOverMove(ped, time);
+                CatAndMouseBonus(ped);
+            }
+        } else {
+            StillifyCorpse(ped, time, 0);
+#define PED_ROOT_OBJECT(C) (((C)->field_0x14 & 0x1) ? (C)->personality->form->simple_physicing[(tS8)(C)->field_0x5].collision_info : GetRootObject(C))
+            if (PED_ROOT_OBJECT(ped->character)->last_special_volume == NULL
+                    || PED_ROOT_OBJECT(ped->character)->last_special_volume->gravity_multiplier >= 1.0f) {
+                if (!gAction_replay_mode && PercentageChance(75) && !(ped->flags & 0x10) && gGoreLevel > 0) {
+                    ped->flags |= 0x10;
+                    DoSpillage(&gPed_slick, GetCharacterActorPtr(ped->character));
+                }
+            }
+#undef PED_ROOT_OBJECT
+        }
+        AssertRootObjectsMatrix(pCharacter);
+    }
+    if (pObject->flags_0x238 == 5) {
+        pObject->field_0x1a0 = 0x40000;
+    } else {
+        pObject->field_0x1a0 = 0x10000;
+    }
+    pObject->field_0x1a4 = 0x50000;
+    ClearSplashes(pObject);
+    return 1;
 }
 
 #ifdef REC2_MATCHING
@@ -1778,11 +2838,160 @@ int C2_HOOK_FASTCALL CBActiveHalted(tPed_character_instance* pCharacter, tPhysic
     return ActiveHalted(pCharacter, pObject, NULL);
 }
 
-// RecordPedSlide
+inline void C2_HOOK_FASTCALL RecordPedSlide(tPedestrian* pPed, tFace_ref* pFace, br_vector3* pPos, br_vector3* pVelocity) {
+    tPed_cache_006944c0* data;
+    br_vector3 dir;
+    float d;
 
-// PedProcessForces
+    data = pPed->field_0x0c;
+    if (data == NULL) {
+        dr_dprintf("Can't smear a ped with no process data");
+        return;
+    }
+    if (!(data->field_0xc4 & 0x2)) {
+        data->field_0xc4 |= 0x2;
+        data->field_0xca = 1;
+        BrVector3Copy(&data->field_0xe4, pPos);
+        BrVector3Copy(&data->field_0xf0, &pFace->normal);
+        BrVector3Normalise(&dir, pVelocity);
+        BrVector3Cross(&data->field_0x114, &pFace->normal, &dir);
+        d = BrVector3Dot(&data->field_0x114, pPos);
+        data->field_0x124 = d;
+        data->field_0x128 = d;
+    } else if (BrVector3Dot(&data->field_0xf0, &pFace->normal) > 0.997f) {
+        if (fabs(BrVector3Dot(&data->field_0xe4, &data->field_0xf0) / data->field_0xca - BrVector3Dot(&data->field_0xf0, pPos)) < 0.01f) {
+            d = BrVector3Dot(&data->field_0x114, pPos);
+            if (data->field_0x124 < d) {
+                data->field_0x124 = d;
+            }
+            if (d < data->field_0x128) {
+                data->field_0x128 = d;
+            }
+            BrVector3Accumulate(&data->field_0xe4, pPos);
+            data->field_0xca++;
+        }
+    }
+}
 
-// CBMovedByPhysics
+// FUNCTION: CARMA2_HW 0x004d2320
+// FUNCTION: CARMA2_SW 0x004cea20
+// FUNCTION: CARMA2_CHEAT 0x004d7ee0
+void C2_HOOK_FASTCALL PedProcessForces(tPhysics_object* pObject, tPhysics_object* pOther_object, tFace_ref* pFace, float pForce, br_vector3* pPos) {
+    tPedestrian* ped;
+    tPhysics_object* object;
+    int damage;
+
+    if (gAction_replay_mode) {
+        return;
+    }
+    ped = ((tPed_character_instance*)pObject->owner)->ped;
+    SetLastHitter(ped, pOther_object);
+    if ((pOther_object != NULL && pOther_object->owner != NULL && pOther_object->flags_0x238 == 0x20 && pOther_object->M == gMass_mutant_tail_ball)
+            || pObject->v.v[1] < -1.7) {
+        pForce *= 10.0f;
+    }
+    if (gExploding_pedestrians) {
+        damage = ped->character->personality->form->count_bones * gPed_severing_damage;
+    } else {
+        damage = pForce * gPed_damage_per_force * (pOther_object == NULL ? 1.5 : 1.0);
+    }
+    if (damage == 0) {
+        return;
+    }
+    DamagePedestrian(ped, damage, -1, 0x5e, pOther_object);
+    if (ped->hit_points > 0 && pOther_object != NULL && pOther_object->owner != NULL && pOther_object->flags_0x238 == 1
+            && gProgram_state.current_car.collision_info == pOther_object
+            && ped->field_0x0c != NULL && !(ped->field_0x0c->field_0x2e & 0x4)
+            && BrVector3LengthSquared(&gProgram_state.current_car.collision_info->v) > 0.001) {
+        ped->field_0x0c->field_0x21++;
+        if (ped->field_0x0c->field_0x21 >= 80) {
+            CatAndMouseBonus(ped);
+        }
+    }
+    if (pForce >= 0.01) {
+        if (pOther_object != NULL) {
+            ped->flags |= 0x4;
+        } else if (pFace != NULL) {
+#ifdef REC2_FIX_BUGS
+            if (fabs(pFace->normal.v[1]) < 0.707) {
+#else
+            if (fabs(pFace->normal.v[1] < 0.707)) {
+#endif
+                ped->flags |= 0x2;
+            }
+        }
+        if ((ped->flags & 0x4) && (ped->flags & 0x2) && !(ped->flags & 0x8)) {
+            SetPedMove(ped, 0x60, -1, 0, 1, GetTotalTime(), ePed_action_impacting);
+            ped->flags |= 0x8;
+            if (gPed_recent_points != 0 && gPTR_00694120 == ped && ped->hit_points <= 0 && GetTotalTime() - ped->field_0x30 < 750) {
+                DoFancyHeadup(1);
+                PratcamEvent(30);
+                EarnCredits(gPed_recent_points);
+                gPed_recent_points = 0;
+            }
+        }
+    }
+    if ((pObject->last_special_volume == NULL || pObject->last_special_volume->gravity_multiplier >= 1.0f) && gGoreLevel > 0) {
+        object = ped->character->personality->form->simple_physicing[(tS8)ped->character->field_0x5].collision_info;
+        DoGiblets(ped, pObject, pOther_object, pForce * REC2_SQR(0.068 / object->M), pPos, gGiblet_scrape_start);
+        if (pOther_object == NULL) {
+            if (pFace->material != NULL && pFace->material->colour_map != NULL && pFace->material->colour_map->type == BR_PMT_RGBA_4444) {
+                return;
+            }
+            if (ped->hit_points <= 0
+                    && (pFace->material == NULL || pFace->material->identifier == NULL
+                        || strlen(pFace->material->identifier) != 11 || pFace->material->identifier[5] != '|')) {
+                RecordPedSlide(ped, pFace, pPos, &pObject->v);
+            }
+        }
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x004d2930
+// FUNCTION: CARMA2_SW 0x004cf020
+// FUNCTION: CARMA2_CHEAT 0x004d84f0
+void C2_HOOK_FASTCALL CBMovedByPhysics(tPed_character_instance* pCharacter, tPhysics_object* pObject, tU32 pTime) {
+    tPedestrian* ped;
+    br_scalar speed;
+    int frame_time;
+    int move_id;
+
+    ped = pCharacter->ped;
+    BrVector3Copy(&ped->pos, (br_vector3*)pObject->actor->t.t.mat.m[3]);
+    BrVector3Copy(&pCharacter->field_0xd8, &pObject->v);
+    speed = BrVector3Length(&pObject->v);
+    TumbleObjectWithV(pObject, &pObject->v, 1.39f, .1f);
+    move_id = pCharacter->personality->form->moves[pCharacter->field_0x7].id;
+    if (move_id == 0x5d || move_id == 0x5e || move_id == 0x61) {
+        if (speed != 0.0f) {
+            frame_time = 25.0 / speed * FRandomBetween(.6f, 1.4f);
+            if (frame_time < 20) {
+                frame_time = 20;
+            } else if (frame_time > 150) {
+                frame_time = 150;
+            }
+            if (GET_PED_COLLISION_OBJECT(ped)->last_special_volume != NULL && GET_PED_COLLISION_OBJECT(ped)->last_special_volume->gravity_multiplier < 1.0f) {
+                frame_time = frame_time * 1.5;
+            }
+        } else {
+            frame_time = 0;
+        }
+        SetCharacterMoveAR(pCharacter, -1, (float)frame_time, 0, 0, GetTotalTime());
+    }
+    if (GET_PED_COLLISION_OBJECT(ped)->last_special_volume != NULL && GET_PED_COLLISION_OBJECT(ped)->last_special_volume->gravity_multiplier < 1.0f && ped->hit_points > 0) {
+        if (BrVector3Length(&pObject->omega) < 1.0) {
+            pObject->omega.v[0] += SRandomPosNeg(5.0f);
+            pObject->omega.v[1] += SRandomPosNeg(5.0f);
+            pObject->omega.v[2] += SRandomPosNeg(5.0f);
+        }
+        if (pObject->water_depth_factor <= 1.0 && pObject->v.v[1] > -.02 && pObject->water_depth_factor < 1.0) {
+            pObject->v.v[1] += FRandomBetween(0.0f, -.3f);
+        }
+    }
+    if (!gAction_replay_mode) {
+        PipeSinglePedPhysics(((tS16)ped->field_0x06 << 16) | (ped - gPedestrian_array), GetCharacterMatrixPtr(pCharacter));
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x004d2c40
 // FUNCTION: CARMA2_SW 0x004cf330
@@ -1820,15 +3029,179 @@ void C2_HOOK_CDECL TurnLimbsOnAndOff(br_actor* pActor, br_model* pModel, br_mate
     BrZsModelRender(pActor, pModel, pMaterial, pOrder_table, pStyle, pOn_screen, 0);
 }
 
-// SetModelCallBacks
+inline void C2_HOOK_FASTCALL SetModelCallBacks(tPed_character_instance* pCharacter) {
+    int i;
+    int j;
 
-// BuildPedestrian
+    for (i = 0; i < (int)REC2_ASIZE(pCharacter->personality->bones->models); i++) {
+        for (j = 0; j < (int)REC2_ASIZE(pCharacter->personality->bones->models[i].models); j++) {
+            if (pCharacter->personality->bones->models[i].models[j] != NULL) {
+                pCharacter->personality->bones->models[i].models[j]->flags |= BR_MODF_CUSTOM;
+                pCharacter->personality->bones->models[i].models[j]->custom = TurnLimbsOnAndOff;
+            }
+        }
+    }
+}
 
-// AreaOfTriangle
+inline void C2_HOOK_FASTCALL BuildPedestrian(tPedestrian* pPed, const char* pGroup_name, const br_vector3* pPos, br_vector3* pDir, tPed_movement_spec* pMovement_spec, tRace_ped_exclusion_spec* pExclusion_spec) {
+    br_matrix34 mat;
+    char s[32];
+    char material_name[32];
+    br_pixelmap* map;
+    br_material* material;
 
-// MakeRandomPointInTriangle
+    BrMatrix34Identity(&mat);
+    BrVector3Copy((br_vector3*)mat.m[3], pPos);
+    pPed->character = BuildCharacterInstance(pGroup_name, &mat);
+    SetModelCallBacks(pPed->character);
+    sprintf(s, "%sB", pGroup_name);
+    map = BrMapFind(s);
+    if (map == NULL) {
+        FatalError(kFatalError_CantFindPedTexture_S, s);
+    }
+    strcpy(material_name, pGroup_name);
+    sprintf(material_name + strlen(material_name), "%d.MAT", 1);
+    material = BrMaterialFind(material_name);
+    if (material != NULL) {
+        material->colour_map = map;
+        BrMaterialUpdate(material, BR_MATU_COLOURMAP);
+    }
+    pPed->hit_points = 100;
+    pPed->movement_spec = pMovement_spec;
+    pPed->exclusion_spec = pExclusion_spec;
+    pPed->speed_factor = 1.0f;
+    if (pPed->movement_spec->max_walk_speed_factor != 0) {
+        SetPedMove(pPed, 30, IRandomBetween(pPed->movement_spec->min_walk_speed_factor, pPed->movement_spec->max_walk_speed_factor), 0, 0, 0, ePed_action_walking);
+    } else {
+        SetPedMove(pPed, 0, -1, 0, 0, 0, ePed_action_walking);
+    }
+    BrVector3Normalise(pDir, pDir);
+    SetCharacterDirectionAR(pPed->character, pDir, &y_unit_vector);
+    BrVector3Copy(&pPed->pos, pPos);
+}
 
-// SpawnPedsOnFace
+inline br_scalar C2_HOOK_FASTCALL AreaOfTriangle(const br_vector3* pV0, const br_vector3* pV1, const br_vector3* pV2) {
+
+    return fabs(pV1->v[2] * pV0->v[0] - pV1->v[0] * pV0->v[2]
+        + pV2->v[2] * pV1->v[0] - pV2->v[0] * pV1->v[2]
+        + pV2->v[0] * pV0->v[2] - pV2->v[2] * pV0->v[0]) * 0.5f;
+}
+
+inline void C2_HOOK_FASTCALL MakeRandomPointInTriangle(br_vector3* pPos, const br_vector3* pV0, const br_vector3* pV1, const br_vector3* pV2) {
+    float r0;
+    float r1;
+    float r2;
+
+    r1 = SRandomBetween(0.1f, 0.9f);
+    r2 = SRandomBetween(0.1f, 0.9f);
+    if (r1 + r2 > 1.0f) {
+        r1 = 1.0f - r1;
+        r2 = 1.0f - r2;
+    }
+    r0 = 1.0f - r1 - r2;
+    BrVector3Scale(pPos, pV1, r1);
+    pPos->v[0] += pV0->v[0] * r0;
+    pPos->v[1] += pV0->v[1] * r0;
+    pPos->v[2] += pV0->v[2] * r0;
+    pPos->v[0] += pV2->v[0] * r2;
+    pPos->v[1] += pV2->v[1] * r2;
+    pPos->v[2] += pV2->v[2] * r2;
+}
+
+// FUNCTION: CARMA2_HW 0x004d2cc0
+// FUNCTION: CARMA2_SW 0x004cf3b0
+// FUNCTION: CARMA2_CHEAT 0x004d8880
+void C2_HOOK_FASTCALL SpawnPedsOnFace(br_face* pFace, br_model* pModel) {
+    tRace_ped_spec* spec;
+    int i;
+    int j;
+    int k;
+    int count;
+    int is_animal;
+    float area;
+    float number;
+    br_vector3 v0;
+    br_vector3 v1;
+    br_vector3 v2;
+    br_vector3 pos;
+    br_vector3 dir;
+    char group_name[32];
+
+    if (gNet_mode != eNet_mode_none) {
+        return;
+    }
+    if (pFace->n.v[1] <= gPed_cos_max_slope) {
+        return;
+    }
+    if (pFace->material == NULL || pFace->material->identifier == NULL) {
+        return;
+    }
+    if (strlen(pFace->material->identifier) - 4 <= 7 || pFace->material->identifier[7] != '?') {
+        return;
+    }
+    if (gPed_count >= 2000) {
+        return;
+    }
+    spec = gRace_pedestrian_specs;
+    for (i = 0; i < gCount_race_pedestrian_specs; i++, spec++) {
+        if (spec->spawn_material == pFace->material) {
+            BrVector3Copy(&v0, &pModel->vertices[pFace->vertices[0]].p);
+            BrVector3Copy(&v1, &pModel->vertices[pFace->vertices[1]].p);
+            BrVector3Copy(&v2, &pModel->vertices[pFace->vertices[2]].p);
+            area = WORLD_SCALE_D * WORLD_SCALE_D * AreaOfTriangle(&v0, &v1, &v2);
+            if (spec->density < 0.0f) {
+                number = -spec->density;
+            } else {
+                number = spec->field_0x10 + area * spec->density * 0.001f;
+            }
+            count = floor(number);
+            for (j = 0; j < count; j++) {
+                if (gPed_count >= 2000) {
+                    return;
+                }
+                strcpy(group_name, spec->group->members[IRandomBetween(0, spec->group->count - 1)].name);
+                is_animal = 0;
+                if (!gAnimalsOn) {
+                    for (k = 0; k < gPed_animal_count; k++) {
+                        if (DRStricmp(group_name, gPed_animal_names[k]) == 0) {
+                            is_animal = 1;
+                            break;
+                        }
+                    }
+                }
+                if (is_animal) {
+                    continue;
+                }
+                dir.v[0] = SRandomPosNeg(1.0f);
+                dir.v[1] = 0.0f;
+                dir.v[2] = SRandomPosNeg(1.0f);
+                MakeRandomPointInTriangle(&pos, &v0, &v1, &v2);
+                BuildPedestrian(&gPedestrian_array[gPed_count], group_name, &pos, &dir, spec->movement, &spec->exclusion);
+                if (gCurrent_race.race_spec->race_type == kRaceType_SmashNPed
+                        && spec->group - gPed_groups == gCurrent_race.race_spec->options.smash_and_peds.ped_group_index) {
+                    gPedestrian_array[gPed_count].flags |= 0x200;
+                    AddSmashTarget(NULL, NULL, gPed_count);
+                } else if (gCurrent_race.race_spec->race_type == kRaceType_Peds) {
+                    if (gCurrent_race.race_spec->options.peds.count_ped_groups < 0) {
+                        gTotal_count_smash_peds++;
+                        gPedestrian_array[gPed_count].flags |= 0x200;
+                    } else {
+                        for (k = 0; k < gCurrent_race.race_spec->options.peds.count_ped_groups; k++) {
+                            if (spec->group - gPed_groups == gCurrent_race.race_spec->options.peds.ped_groups[k]) {
+                                gTotal_count_smash_peds++;
+                                gPedestrian_array[gPed_count].flags |= 0x200;
+                                break;
+                            }
+                        }
+                    }
+                }
+                gPed_count++;
+            }
+            spec->field_0x10 = number - count;
+            break;
+        }
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x004d3520
 // FUNCTION: CARMA2_SW 0x004cfc10

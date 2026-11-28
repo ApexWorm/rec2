@@ -16,7 +16,10 @@ extern int gAnimalsOn;
 extern int gFlameThrowerOn;
 extern int gExplosives_on;
 extern int gGoreLevel;
+
+extern float gPed_tumble_spin;
 extern const char* gForm_non_humanoid_names[1];
+extern const float gFlamed_ped_flame_scales[7];
 extern int gGhost_pedestrians;
 extern const br_vector3 gPed_bone_look_vecs[9];
 
@@ -24,13 +27,13 @@ extern int C2_HOOK_FASTCALL OrientationChanged(const br_matrix34* pOrientation_1
 
 extern void C2_HOOK_FASTCALL AssertRootObjectsMatrix(tPed_character_instance* pPed);
 
-// InitFaceCaches
+extern void C2_HOOK_FASTCALL InitFaceCaches(void);
 
 extern void C2_HOOK_FASTCALL ResetPedFaceCache(void);
 
-// SetPedCurrentFace
+extern void C2_HOOK_FASTCALL SetPedCurrentFace(tPedestrian* pPed, br_vector3* pPos);
 
-// RecachePedestrian
+extern void C2_HOOK_FASTCALL RecachePedestrian(tPedestrian* pPed, br_vector3* pPos, tU32 pTime);
 
 extern void C2_HOOK_FASTCALL SetCharacterDirectionAR(tPed_character_instance* pPed, const br_vector3* pDir, const br_vector3* pUp);
 
@@ -80,9 +83,9 @@ extern void C2_HOOK_FASTCALL SetUpGibSlicks(void);
 
 extern void C2_HOOK_FASTCALL ReadInGiblets(FILE* pFile);
 
-// ReadSettingsFile
+extern void C2_HOOK_FASTCALL ReadSettingsFile(void);
 
-// InitOtherPedStuff
+extern void C2_HOOK_FASTCALL InitOtherPedStuff(void);
 
 extern void C2_HOOK_FASTCALL InitNapalmNolts(void);
 
@@ -178,15 +181,15 @@ extern int C2_HOOK_FASTCALL DismemberPed(tPedestrian* pPed, int pBone_index);
 
 extern int C2_HOOK_FASTCALL DamagePedestrian(tPedestrian* pPed, int pDamage, int pArg3, int pArg4, tPhysics_object* pObject);
 
-// SetLastHitter
+extern void C2_HOOK_FASTCALL SetLastHitter(tPedestrian* pPed, tPhysics_object* pObject);
 
 extern void C2_HOOK_FASTCALL MakePedVanish(tPedestrian* pPed);
 
-// CBPassiveCollision
+extern int C2_HOOK_FASTCALL CBPassiveCollision(tPed_character_instance* pCharacter, tPhysics_object* pObject, tPhysics_object* pOther_object);
 
 // BastardIt
 
-// MungeProxRay
+extern int C2_HOOK_FASTCALL MungeProxRay(tPedestrian* pPed, tPhysics_object* pObject, float pDistance_squared, tU32 pTime);
 
 // DoToPeds
 
@@ -206,33 +209,33 @@ extern void C2_HOOK_FASTCALL MakePedVanish(tPedestrian* pPed);
 
 extern void C2_HOOK_FASTCALL KillNapalmBolt(tNapalm_bolt* pBolt);
 
-// MungeNapalm
+extern void C2_HOOK_FASTCALL MungeNapalm(void);
 
-// PedHeadingTowardsCollisionObject
+extern int C2_HOOK_FASTCALL PedHeadingTowardsCollisionObject(tPedestrian* pPed, tPhysics_object** pObject, float* pDistance_squared, br_vector3* pPos, tU32 pTime);
 
-// OutsideFaceXZ
+extern int C2_HOOK_FASTCALL OutsideFaceXZ(const br_vector3* pPos, const tFace_ref* pFace);
 
-extern float C2_HOOK_FASTCALL RescanPedProximity(tPedestrian* pPed, br_vector3* pDir);
+extern br_scalar C2_HOOK_FASTCALL RescanPedProximity(tPedestrian* pPed, const br_vector3* pDir);
 
 extern tPed_face_cache_0x34* C2_HOOK_FASTCALL RecacheAndSetFace(tPedestrian* pPed, int* pOn_face, int* pFace_changed, br_vector3* pPos, int pForce, tU32 pTime);
 
 extern void C2_HOOK_FASTCALL PedScanForObjects(tPedestrian* pPed, tU32 pTime);
 
-// CatAndMouseBonus
+extern void C2_HOOK_FASTCALL CatAndMouseBonus(tPedestrian* pPed);
 
 extern void C2_HOOK_FASTCALL StillifyCorpse(tPedestrian* pPed, tU32 pTime, int pArg3);
 
-// StraightenOutPed
+extern void C2_HOOK_FASTCALL StraightenOutPed(tPedestrian* pPed, tU32 pTime);
 
 extern int C2_HOOK_FASTCALL ActiveHalted(tPed_character_instance* pCharacter, tPhysics_object* pObject, tFace_ref* pFace);
 
 extern int C2_HOOK_FASTCALL CBActiveHalted(tPed_character_instance* pCharacter, tPhysics_object* pObject);
 
-// RecordPedSlide
+extern void C2_HOOK_FASTCALL RecordPedSlide(tPedestrian* pPed, tFace_ref* pFace, br_vector3* pPos, br_vector3* pVelocity);
 
-// PedProcessForces
+extern void C2_HOOK_FASTCALL PedProcessForces(tPhysics_object* pObject, tPhysics_object* pOther_object, tFace_ref* pFace, float pForce, br_vector3* pPos);
 
-// CBMovedByPhysics
+extern void C2_HOOK_FASTCALL CBMovedByPhysics(tPed_character_instance* pCharacter, tPhysics_object* pObject, tU32 pTime);
 
 extern int C2_HOOK_FASTCALL GetPedCount(void);
 
@@ -240,15 +243,15 @@ extern int C2_HOOK_FASTCALL GetPedPosition(int pIndex, br_vector3* pPos);
 
 extern void C2_HOOK_CDECL TurnLimbsOnAndOff(br_actor* pActor, br_model* pModel, br_material* pMaterial, void* pOrder_table, br_uint_8 pStyle, int pOn_screen);
 
-// SetModelCallBacks
+extern void C2_HOOK_FASTCALL SetModelCallBacks(tPed_character_instance* pCharacter);
 
-// BuildPedestrian
+extern void C2_HOOK_FASTCALL BuildPedestrian(tPedestrian* pPed, const char* pGroup_name, const br_vector3* pPos, br_vector3* pDir, tPed_movement_spec* pMovement_spec, tRace_ped_exclusion_spec* pExclusion_spec);
 
-// AreaOfTriangle
+extern br_scalar C2_HOOK_FASTCALL AreaOfTriangle(const br_vector3* pV0, const br_vector3* pV1, const br_vector3* pV2);
 
-// MakeRandomPointInTriangle
+extern void C2_HOOK_FASTCALL MakeRandomPointInTriangle(br_vector3* pPos, const br_vector3* pV0, const br_vector3* pV1, const br_vector3* pV2);
 
-// SpawnPedsOnFace
+extern void C2_HOOK_FASTCALL SpawnPedsOnFace(br_face* pFace, br_model* pModel);
 
 extern void C2_HOOK_FASTCALL FinishUpLoadingPeds(void);
 

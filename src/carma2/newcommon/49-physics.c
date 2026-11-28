@@ -95,11 +95,6 @@ int gPHIL_munging_objects;
 // GLOBAL: CARMA2_CHEAT 0x0069bc40
 int gPhysics_other_buffer_capacity;
 
-// GLOBAL: CARMA2_HW 0x00694140
-// GLOBAL: CARMA2_SW 0x0068e198
-// GLOBAL: CARMA2_CHEAT 0x0069bcb8
-tProximity_ray gProximity_rays[20];
-
 // GLOBAL: CARMA2_HW 0x00694274
 // GLOBAL: CARMA2_SW 0x0068e2cc
 // GLOBAL: CARMA2_CHEAT 0x0069bdec
