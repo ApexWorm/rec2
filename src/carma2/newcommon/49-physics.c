@@ -782,7 +782,7 @@ void C2_HOOK_FASTCALL ScaleUpObjectMI(tPhysics_object* pObject, br_scalar pFacto
 // FUNCTION: CARMA2_HW 0x004bc190
 // FUNCTION: CARMA2_SW 0x004b88b0
 // FUNCTION: CARMA2_CHEAT 0x004c1cc0
-void C2_HOOK_FASTCALL CheckForTwang(tPhysics_joint_force** pForces, br_scalar* pImpulses, int pCount) {
+void C2_HOOK_FASTCALL CheckForTwang(tPhysics_joint_force** pForces, br_scalar* pImpulses, int pCount, tWorld_callbacks* pCallbacks) {
     tPhysics_object* object;
     tPhysics_object* other;
     br_vector3 axis;
