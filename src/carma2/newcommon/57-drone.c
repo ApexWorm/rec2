@@ -239,7 +239,7 @@ inline void C2_HOOK_FASTCALL InitDroneCollisionObject(tDrone_spec* pDrone) {
 
     object = &pDrone->collision_info;
     BrActorToBounds(&bnds, pDrone->actor);
-    bnds.min.v[1] -= -.001f;
+    bnds.min.v[1] -= -0.001f;
     if (pDrone->field_0x46) {
         original_shape = object->shape;
     }
@@ -257,8 +257,8 @@ inline void C2_HOOK_FASTCALL InitDroneCollisionObject(tDrone_spec* pDrone) {
     object->owner = pDrone;
     object->actor = pDrone->actor;
     object->M = pDrone->form->M;
-    BrVector3Set(&object->cmpos, 0.0f, .09f, 0.0f);
-    BrVector3Set(&object->field_0x54, 0.0f, -.4f / WORLD_SCALE, 0.0f);
+    BrVector3Set(&object->cmpos, 0.0f, 0.09f, 0.0f);
+    BrVector3Set(&object->field_0x54, 0.0f, -0.4f / WORLD_SCALE, 0.0f);
     BrMatrix34Copy(&object->transform_matrix, &pDrone->actor->t.t.mat);
     object->box_face_ref = gFace_num__car - 2;
     object->field_0x1a0 = 0x100000;
@@ -273,7 +273,7 @@ inline void C2_HOOK_FASTCALL InitDroneCollisionObject(tDrone_spec* pDrone) {
     object->cmpos.v[1] = bnds.min.v[1] - pDrone->form->center.v[2] * size.v[1] * -0.01;
     object->cmpos.v[2] = bnds.min.v[2] - pDrone->form->center.v[0] * size.v[2] * -0.01;
     if (pDrone->form->type == kDroneType_train) {
-        object->world_friction = -.75f;
+        object->world_friction = -0.75f;
     }
     object->disable_move_rotate = 1;
     object->field_0xed = 1;
