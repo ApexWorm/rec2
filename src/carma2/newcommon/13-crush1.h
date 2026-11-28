@@ -254,9 +254,9 @@ extern void C2_HOOK_FASTCALL AddNonCar(tNon_car_spec* pNon_car, const tDriver* p
 
 // FlapBit
 
-// FlapBits
+extern void C2_HOOK_FASTCALL FlapBits(tCar_spec* pCar);
 
-// StartFlapping
+extern void C2_HOOK_FASTCALL StartFlapping(br_actor* pActor, tCar_spec* pCar, tU8 pBits, float pForce);
 
 extern void C2_HOOK_FASTCALL MungeDetachLists(tCar_crush_spec* pCar_crush);
 
