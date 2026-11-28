@@ -501,6 +501,145 @@ int C2_HOOK_FASTCALL TestForObjectInSensiblePlace(tPhysics_object* pCollision_in
     NOT_IMPLEMENTED();
 }
 
+#define BOX_CORNER(CORNER, SHAPE, INDEX)                                                            \
+    BrVector3Set((CORNER),                                                                          \
+        ((INDEX) & 0x2) ? (SHAPE)->common.bb.min.v[0] : (SHAPE)->common.bb.max.v[0],                \
+        ((INDEX) & 0x1) ? (SHAPE)->common.bb.min.v[1] : (SHAPE)->common.bb.max.v[1],                \
+        ((INDEX) & 0x4) ? (SHAPE)->common.bb.min.v[2] : (SHAPE)->common.bb.max.v[2])
+
+// FUNCTION: CARMA2_HW 0x00429490
+// FUNCTION: CARMA2_SW 0x00429520
+// FUNCTION: CARMA2_CHEAT 0x00429620
+void C2_HOOK_FASTCALL FUN_00429490(tPhysics_object* pObjects) {
+    br_matrix34 inverse;
+    br_matrix34 relative;
+    br_vector3 points_a[8];
+    br_vector3 points_b[8];
+    br_vector3 corner;
+    br_vector3 offset;
+    br_scalar t;
+    tPhysics_object* object_a;
+    tPhysics_object* object_b;
+    int count;
+    int i;
+
+    count = 0;
+    for (object_a = pObjects; object_a != NULL; object_a = object_a->next) {
+        for (object_b = object_a->next; object_b != NULL; object_b = object_b->next) {
+            BrMatrix34LPInverse(&inverse, &object_b->transform_matrix);
+            BrMatrix34Mul(&relative, &object_a->transform_matrix, &inverse);
+            if (object_a->shape->common.type == kCollisionShapeType_Box && object_b->shape->common.type == kCollisionShapeType_Box) {
+                for (i = 0; i < 8; i++) {
+                    BOX_CORNER(&corner, object_a->shape, i);
+                    BrMatrix34ApplyP(&points_a[i], &corner, &relative);
+                    BOX_CORNER(&corner, object_b->shape, i);
+                    BrVector3Sub(&offset, &corner, (br_vector3*)relative.m[3]);
+                    BrMatrix34TApplyV(&points_b[i], &offset, &relative);
+                }
+                for (i = 0; i < REC2_ASIZE(gDefault_box_collision_wireframe_edges); i++) {
+                    if (LineBoxColl(&points_a[gDefault_box_collision_wireframe_edges[i].index1], &points_a[gDefault_box_collision_wireframe_edges[i].index2], &object_b->shape->common.bb, &corner, &t)
+                        || LineBoxColl(&points_b[gDefault_box_collision_wireframe_edges[i].index1], &points_b[gDefault_box_collision_wireframe_edges[i].index2], &object_a->shape->common.bb, &corner, &t)) {
+                        count++;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x004296f0
+// FUNCTION: CARMA2_SW 0x00429780
+// FUNCTION: CARMA2_CHEAT 0x00429880
+int C2_HOOK_FASTCALL FUN_004296f0(tPhysics_object* pObjects) {
+    br_matrix34 inverse;
+    br_matrix34 relative;
+    br_vector3 points[8];
+    br_vector3 corner;
+    br_vector3 start;
+    br_vector3 end;
+    tPhysics_shape* shape_a;
+    tPhysics_shape* shape_b;
+    tPhysics_object* object_a;
+    tPhysics_object* object_b;
+    int i;
+    int j;
+
+    for (object_a = pObjects; object_a != NULL; object_a = object_a->next) {
+        for (object_b = object_a->next; object_b != NULL; object_b = object_b->next) {
+            shape_a = object_a->shape;
+            shape_b = object_b->shape;
+            if (BoundsOverlapTest(&object_a->field_0xf4, &object_b->field_0xf4)
+                && object_a->shape->common.type == kCollisionShapeType_Box
+                && object_b->shape->common.type == kCollisionShapeType_Box) {
+                BrMatrix34LPInverse(&inverse, &object_a->actor->t.t.mat);
+                BrMatrix34Mul(&relative, &object_b->actor->t.t.mat, &inverse);
+                for (i = 0; i < 8; i++) {
+                    BOX_CORNER(&corner, shape_b, i);
+                    BrMatrix34ApplyP(&points[i], &corner, &relative);
+                }
+                for (i = 0; i < REC2_ASIZE(gDefault_box_collision_wireframe_edges); i++) {
+                    BOX_CORNER(&start, shape_a, gDefault_box_collision_wireframe_edges[i].index1);
+                    BOX_CORNER(&end, shape_a, gDefault_box_collision_wireframe_edges[i].index2);
+                    for (j = 0; j < REC2_ASIZE(gDefault_box_collision_wireframe_edges); j++) {
+                        if (FUN_00429900(&start, &end, &points[gDefault_box_collision_wireframe_edges[j].index1], &points[gDefault_box_collision_wireframe_edges[j].index2])) {
+                            return 1;
+                        }
+                    }
+                }
+            }
+        }
+    }
+#ifdef REC2_FIX_BUGS
+    return 0;
+#endif
+}
+
+#undef BOX_CORNER
+
+// FUNCTION: CARMA2_HW 0x00429900
+// FUNCTION: CARMA2_SW 0x00429990
+// FUNCTION: CARMA2_CHEAT 0x00429a90
+int C2_HOOK_FASTCALL FUN_00429900(const br_vector3* pStart_1, const br_vector3* pEnd_1, const br_vector3* pStart_2, const br_vector3* pEnd_2) {
+    br_vector3 d;
+    br_vector3 normal;
+    br_vector3 e;
+    br_vector3 w;
+    br_vector3 m;
+    br_vector3 p;
+    br_scalar length;
+    br_scalar denominator;
+    br_scalar s;
+    br_scalar t;
+
+    BrVector3Sub(&d, pEnd_1, pStart_1);
+    BrVector3Sub(&e, pEnd_2, pStart_2);
+    BrVector3Cross(&normal, &d, &e);
+    length = BrVector3Length(&normal);
+    if (length > 1e-7) {
+        BrVector3Sub(&w, pStart_2, pStart_1);
+        if (fabs(BrVector3Dot(&w, &normal) / length) < 0.002) {
+            normal.v[0] /= length;
+            normal.v[1] /= length;
+            normal.v[2] /= length;
+            BrVector3Cross(&m, &d, &normal);
+            denominator = BrVector3Dot(&m, &e);
+            if (fabs(denominator) > 1e-7) {
+                s = -BrVector3Dot(&m, &w) / denominator;
+                if (s >= 0.0f && s <= 1.0f) {
+                    BrVector3Scale(&p, &e, s);
+                    BrVector3Accumulate(&p, &w);
+                    t = BrVector3Dot(&p, &d) / BrVector3Dot(&d, &d);
+                    if (t >= 0.0f && t <= 1.0f) {
+                        return 1;
+                    }
+                }
+            }
+        }
+    }
+    return 0;
+}
+
 // HierarchyCalcEnergy
 
 // CheckCollisionList

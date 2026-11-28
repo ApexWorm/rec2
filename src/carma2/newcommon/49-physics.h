@@ -120,6 +120,12 @@ extern int C2_HOOK_FASTCALL TestShapeEdgeIntersection(tPhysics_object* pCollisio
 
 extern int C2_HOOK_FASTCALL TestForObjectInSensiblePlace(tPhysics_object* pCollision_info_1, tPhysics_object* pCollision_info_2, br_vector3* pVec3, tWorld_callbacks* pCar_callbacks);
 
+extern void C2_HOOK_FASTCALL FUN_00429490(tPhysics_object* pObjects);
+
+extern int C2_HOOK_FASTCALL FUN_004296f0(tPhysics_object* pObjects);
+
+extern int C2_HOOK_FASTCALL FUN_00429900(const br_vector3* pStart_1, const br_vector3* pEnd_1, const br_vector3* pStart_2, const br_vector3* pEnd_2);
+
 // HierarchyCalcEnergy
 
 // CheckCollisionList
