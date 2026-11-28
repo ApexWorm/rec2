@@ -128,9 +128,9 @@ br_image* C2_HOOK_STDCALL ImageLoad(const char* name) {
 		img->sections[i].mem_size	 = section_header.virtual_size;
 		img->sections[i].data_size 	 = section_header.data_size;
 		img->sections[i].data_offset = section_header.data_offset;
-#ifdef REC2_FIX_BUGS
+#ifdef BRENDER_FIX_BUGS
 		img->sections[i].flags       = section_header.flags;  /* Added by rec2 */
-#endif /* REC2_FIX_BUGS */
+#endif /* BRENDER_FIX_BUGS */
 	}
 
 	arena_size = nt_header.image_size;
