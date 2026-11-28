@@ -2800,7 +2800,7 @@ typedef struct tCar_spec {
     undefined field_0x90[28];
     tU16 fire_vertex[12];
     float dt;
-    undefined* field_0xc8;
+    tCar_spec* field_0xc8;
     char name[32];
     char driver_name[32];
     char grid_icon_names[3][14];
