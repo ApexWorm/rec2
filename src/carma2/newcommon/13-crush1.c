@@ -2064,7 +2064,7 @@ intptr_t C2_HOOK_CDECL MakeCarModelsMaterialsSingleSided(br_actor* pActor, void*
 // STUB: CARMA2_HW 0x0042e2e0
 // STUB: CARMA2_SW 0x0042e350
 // STUB: CARMA2_CHEAT 0x0042e480
-void C2_HOOK_FASTCALL SplitCar(tCar_spec* pCar, br_vector4* pPlane, int pArg3) {
+void C2_HOOK_FASTCALL SplitCar(tCar_spec* pCar, const tSplit_info* pSplit_info, int pArg3) {
     NOT_IMPLEMENTED();
 }
 
@@ -3216,7 +3216,7 @@ void C2_HOOK_FASTCALL CopySplitInMessage(tCar_spec* pCar) {
         }
         WeldCar(pCar);
     }
-    SplitCar(pCar, &plane, 0);
+    SplitCar(pCar, (tSplit_info*)&plane, 0); /* FIXME: ExpandPlane writes the plane as a br_vector4 */
 }
 
 // FUNCTION: CARMA2_HW 0x0043dfd0
