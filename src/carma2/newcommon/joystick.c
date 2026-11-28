@@ -105,7 +105,7 @@ br_token_value gAccent_poly_prims[] = {
 // GLOBAL: CARMA2_HW 0x00596308
 // GLOBAL: CARMA2_SW 0x00591268
 // GLOBAL: CARMA2_CHEAT 0x0059cb88
-int gINT_00596308 = -1;
+int gJoystick_headup_selection = -1;
 
 // GLOBAL: CARMA2_HW 0x00596310
 // GLOBAL: CARMA2_SW 0x00591270
@@ -206,7 +206,7 @@ void C2_HOOK_FASTCALL FUN_0045a670(void) {
         ChangeHeadupFont(gRace_head_ups[i], -2);
     }
 #ifdef REC2_HW
-    CreateAccentPolyActor(8.f, 118.f, 130.f, 224.f);
+    CreateAccentPolyActor(8.0f, 118.0f, 130.0f, 224.0f);
 #endif
     ext = ".ACT";
     if (gPath_headup_buffer.count == 0) {
@@ -380,7 +380,7 @@ void C2_HOOK_FASTCALL FUN_0045acf0(void) {
         ChangeHeadupFont(gRace_head_ups[i], -2);
     }
 #ifdef REC2_HW
-    CreateAccentPolyActor(8.f, 118.f, 130.f, 224.f);
+    CreateAccentPolyActor(8.0f, 118.0f, 130.0f, 224.0f);
 #endif
     if (gTest_headup_buffer.count == 0) {
         if (gTest_headup_buffer.field_0x14 < 5) {
@@ -472,8 +472,8 @@ inline int C2_HOOK_FASTCALL ResetJoystickHeadupSelection(tButtonJoystickInfo** p
     int i;
     int index;
 
-    if (gINT_00596308 != -1) {
-        gINT_00596308 = -1;
+    if (gJoystick_headup_selection != -1) {
+        gJoystick_headup_selection = -1;
     } else {
         *pJoystick_info = PDGetCurrentJoystickData();
         if (*pJoystick_info == NULL) {
@@ -513,8 +513,8 @@ void C2_HOOK_FASTCALL MungeJoystickHeadups(void) {
     joystick_info = NULL;
     if (gINT_0068b8e8) {
         the_time = PDGetTotalTime();
-        if ((!PDKeyDown(65) || ResetJoystickHeadupSelection(&joystick_info)) && gINT_00596308 == -1) {
-            if (PDKeyDown(64) && gINT_00596308 == -1) {
+        if ((!PDKeyDown(65) || ResetJoystickHeadupSelection(&joystick_info)) && gJoystick_headup_selection == -1) {
+            if (PDKeyDown(64) && gJoystick_headup_selection == -1) {
                 index = -1;
                 i = 0;
                 for (text = gJoystick_headup_buffer.texts; text != NULL; text = text->next) {
@@ -523,7 +523,7 @@ void C2_HOOK_FASTCALL MungeJoystickHeadups(void) {
                     }
                     i++;
                 }
-                gINT_00596308 = index;
+                gJoystick_headup_selection = index;
                 while (PDKeyDown(64)) {
                 }
             }
@@ -563,14 +563,14 @@ void C2_HOOK_FASTCALL MungeJoystickHeadups(void) {
     }
     for (i = 0; i < (int)REC2_ASIZE(gRace_head_ups); i++) {
         if (gINT_0068b8e8 && text != NULL) {
-            if (gINT_00596308 == i) {
+            if (gJoystick_headup_selection == i) {
                 ChangeHeadupFont(gRace_head_ups[i], -3);
             } else if (text == gJoystick_headup_buffer.text_last_add) {
                 ChangeHeadupFont(gRace_head_ups[i], -1);
             } else {
                 ChangeHeadupFont(gRace_head_ups[i], -2);
             }
-            if (gINT_00596308 == i) {
+            if (gJoystick_headup_selection == i) {
                 sprintf(s, "%s      ???", text->text);
             } else if (joystick_info != NULL) {
                 sprintf(s, "%s", text->text);
@@ -954,7 +954,7 @@ void C2_HOOK_FASTCALL FUN_0045c240(void) {
         ChangeHeadupFont(gRace_head_ups[i], -2);
     }
 #ifdef REC2_HW
-    CreateAccentPolyActor(8.f, 118.f, 130.f, 224.f);
+    CreateAccentPolyActor(8.0f, 118.0f, 130.0f, 224.0f);
 #endif
     if (gJoystick_headup_buffer.count == 0) {
         if (gJoystick_headup_buffer.field_0x14 < 5) {
