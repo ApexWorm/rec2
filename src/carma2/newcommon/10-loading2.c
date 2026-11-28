@@ -37,7 +37,7 @@
 #include "57-drone.h"
 #include "58-crush2.h"
 #include "59-camera.h"
-#include "61-pedestrn.h"
+#include "61-pedestrn-phys.h"
 #include "62-graphics3.h"
 #include "63-loading3.h"
 #include "64-movie.h"
