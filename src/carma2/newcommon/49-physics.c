@@ -992,12 +992,7 @@ int C2_HOOK_FASTCALL MakeVelocitiesVector2(br_scalar* pOutput, tPhysics_joint_fo
                 object_a = pForces[i]->object_a;
                 object_b = pForces[i]->object_b;
                 BrVector3Add(&point, &pForces[i]->point_a, &object_a->cmpos);
-                if (object_b == NULL) {
-                    BrMatrix34ApplyP(&world, &point, &object_a->actor->t.t.mat);
-                    DrMatrix34ApplyLPInverse(&delta, &world, &object_a->transform_matrix);
-                    BrVector3Sub(&delta, &delta, &point);
-                    pOutput[i] = (br_scalar)(0.01 - BrVector3Dot(&pForces[i]->direction_a, &delta) * 25.0f);
-                } else {
+                if (object_b != NULL) {
                     BrMatrix34ApplyP(&world, &point, &object_a->transform_matrix);
                     DrMatrix34ApplyLPInverse(&delta, &world, &object_b->transform_matrix);
                     BrMatrix34ApplyP(&world, &point, &object_a->actor->t.t.mat);
@@ -1018,6 +1013,11 @@ int C2_HOOK_FASTCALL MakeVelocitiesVector2(br_scalar* pOutput, tPhysics_joint_fo
                             pOutput[i] = value;
                         }
                     }
+                } else {
+                    BrMatrix34ApplyP(&world, &point, &object_a->actor->t.t.mat);
+                    DrMatrix34ApplyLPInverse(&delta, &world, &object_a->transform_matrix);
+                    BrVector3Sub(&delta, &delta, &point);
+                    pOutput[i] = (br_scalar)(0.01 - BrVector3Dot(&pForces[i]->direction_a, &delta) * 25.0f);
                 }
                 if (pOutput[i] > 0.1) {
                     value = (br_scalar)(0.1 - (pForces[i]->field_0x0 - 1.0f));
