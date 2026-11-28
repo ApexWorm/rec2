@@ -1030,7 +1030,55 @@ int C2_HOOK_FASTCALL FUN_00453ab0(void) {
     return 1;
 }
 
-// FUN_00453b80
+// FUNCTION: CARMA2_HW 0x00453b80
+// FUNCTION: CARMA2_SW 0x00453910
+// FUNCTION: CARMA2_CHEAT 0x004540e0
+void C2_HOOK_FASTCALL FUN_00453b80(void) {
+    int i;
+    int node;
+    int selected;
+    tDrone_path_node* path_node;
+
+    if (!gShow_drone_paths) {
+        NewTextHeadupSlot(4, 0, 3000, -1, "You must show Drone Paths first");
+        return;
+    }
+    if (FUN_004538a0(0)) {
+        path_node = &gDrone_path_nodes[gCount_drone_path_nodes];
+        node = gCount_drone_path_nodes++;
+        BrVector3Copy(&path_node->position, &gProgram_state.current_car.car_master_actor->t.t.translate.t);
+        for (i = 0; i < REC2_ASIZE(path_node->sections); i++) {
+            path_node->sections[i].node1 = -1;
+        }
+        path_node->field_0x12e = 0;
+        path_node->count_sections = 0;
+        path_node->type = -1;
+        selected = gSelected_drone_path_node_index;
+        if (gDrone_path_nodes[selected].count_sections < 8) {
+            gDrone_path_nodes[selected].sections[gDrone_path_nodes[selected].count_sections].node1 = node;
+            gDrone_path_nodes[selected].count_sections++;
+        }
+        sprintf(gDrone_edit_message, "Shat out drone path node #%d", node);
+        NewTextHeadupSlot(4, 0, 2000, -1, gDrone_edit_message);
+    } else {
+        node = FindNearestNodeDrone(&gProgram_state.current_car.car_master_actor->t.t.translate.t, 2.0f);
+        if (node >= 0 && gDrone_path_nodes[node].count_sections >= 8) {
+            NewTextHeadupSlot(4, 0, 3000, -1, "No more free links on this node");
+            node = -1;
+        }
+    }
+    InitialiseEditModelsEtc();
+    if (node >= 0 && gDrone_path_model_actor != NULL && gElasticatey_drone_path_model != NULL) {
+        gDrone_paths_elasticating = 1;
+        gDrone_path_model_actor->render_style = BR_RSTYLE_FACES;
+        gSelected_drone_path_node_index = node;
+        MakeAISimpleEditSectionHere(gElasticatey_drone_path_model, 0, 0,
+            &gDrone_path_nodes[node].position,
+            &gProgram_state.current_car.car_master_actor->t.t.translate.t,
+            gMat_dk_grn, gMat_lt_grn);
+        BrModelUpdate(gElasticatey_drone_path_model, BR_MODU_ALL);
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x00453d60
 // FUNCTION: CARMA2_SW 0x00453af0
@@ -1043,7 +1091,40 @@ void C2_HOOK_FASTCALL FUN_00453d60(void) {
     }
 }
 
-// FUN_00453d80
+// FUNCTION: CARMA2_HW 0x00453d80
+// FUNCTION: CARMA2_SW 0x00453b10
+// FUNCTION: CARMA2_CHEAT 0x004542e0
+void C2_HOOK_FASTCALL FUN_00453d80(void) {
+    int i;
+    int node;
+    int selected;
+    tDrone_path_node* path_node;
+
+    if (!gShow_drone_paths) {
+        NewTextHeadupSlot(4, 0, 3000, -1, "You must show Drone Paths first");
+        return;
+    }
+    if (FUN_004538a0(1) && FUN_00453ab0()) {
+        path_node = &gDrone_path_nodes[gCount_drone_path_nodes];
+        node = gCount_drone_path_nodes++;
+        BrVector3Copy(&path_node->position, &gProgram_state.current_car.car_master_actor->t.t.translate.t);
+        for (i = 0; i < REC2_ASIZE(path_node->sections); i++) {
+            path_node->sections[i].node1 = -1;
+        }
+        path_node->field_0x12e = 0;
+        path_node->count_sections = 0;
+        path_node->type = -1;
+        selected = gSelected_drone_path_node_index;
+        if (gDrone_path_nodes[selected].count_sections < 8) {
+            gDrone_path_nodes[selected].sections[gDrone_path_nodes[selected].count_sections].node1 = node;
+            gDrone_path_nodes[selected].count_sections++;
+        }
+        InitialiseEditModelsEtc();
+        FUN_00453d60();
+        sprintf(gDrone_edit_message, "Shat out drone path node #%d", gCount_drone_path_nodes);
+        NewTextHeadupSlot(4, 0, 2000, -1, gDrone_edit_message);
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x00453ed0
 // FUNCTION: CARMA2_SW 0x00453c60
@@ -1087,9 +1168,179 @@ void C2_HOOK_FASTCALL FUN_00453f20(void) {
 void C2_HOOK_FASTCALL FUN_00453f30(void) {
 }
 
-// FUN_00453f40
+// FUNCTION: CARMA2_HW 0x00453f40
+// FUNCTION: CARMA2_SW 0x00453cd0
+// FUNCTION: CARMA2_CHEAT 0x004544a0
+void C2_HOOK_FASTCALL FUN_00453f40(void) {
+    int i;
+    int node;
+    int current;
+    int found;
+    int looped;
+    int start;
+    int previous;
+    tDrone_path_node* path_node;
 
-// FUN_00454360
+    if (!gShow_drone_paths) {
+        NewTextHeadupSlot(4, 0, 3000, -1, "You must show Drone Paths first");
+        return;
+    }
+    if (gDrone_paths_elasticating) {
+        NewTextHeadupSlot(4, 0, 3000, -1, "Stop elasticating first");
+        return;
+    }
+    node = FindNearestNodeDrone(&gProgram_state.current_car.car_master_actor->t.t.translate.t, 2.0f);
+    if (node < 0) {
+        return;
+    }
+    path_node = &gDrone_path_nodes[node];
+    if (path_node->field_0x12e & 0x1) {
+        current = node;
+        looped = 0;
+        do {
+            found = 0;
+            for (i = 0; i < gCount_drone_path_nodes; i++) {
+                if (gDrone_path_nodes[i].sections[0].node1 == current) {
+                    current = i;
+                    if (i == node) {
+                        looped = 1;
+                    }
+                    found = 1;
+                    break;
+                }
+            }
+        } while (found && !looped);
+        if (looped) {
+            start = -1;
+        } else {
+            start = current;
+        }
+        if (start < 0) {
+            i = node;
+            do {
+                gDrone_path_nodes[i].sections[1].node1 = -1;
+                gDrone_path_nodes[i].count_sections = 1;
+                gDrone_path_nodes[i].field_0x12e &= ~0x1;
+                i = gDrone_path_nodes[i].sections[0].node1;
+            } while (i != node);
+            InitialiseEditModelsEtc();
+            return;
+        } else {
+            i = start;
+            do {
+                gDrone_path_nodes[i].sections[1].node1 = -1;
+                if (gDrone_path_nodes[i].sections[0].node1 >= 0) {
+                    gDrone_path_nodes[i].count_sections = 1;
+                } else {
+                    gDrone_path_nodes[i].count_sections = 0;
+                }
+                gDrone_path_nodes[i].field_0x12e &= ~0x1;
+                i = gDrone_path_nodes[i].sections[0].node1;
+            } while (i >= 0);
+        }
+        InitialiseEditModelsEtc();
+        return;
+    }
+    do {
+        i = path_node->sections[0].node1;
+        path_node = &gDrone_path_nodes[i];
+    } while (path_node->count_sections == 1 && i != node);
+    if (gDrone_path_nodes[i].count_sections > 1) {
+        NewTextHeadupSlot(4, 0, 2000, -1, "NOT a valid path");
+        return;
+    }
+    current = node;
+    do {
+        found = -1;
+        for (i = 0; i < gCount_drone_path_nodes; i++) {
+            if (gDrone_path_nodes[i].count_sections != 0 && gDrone_path_nodes[i].sections[0].node1 == current) {
+                if (found >= 0) {
+                    NewTextHeadupSlot(4, 0, 2000, -1, "NOT a valid path");
+                    return;
+                }
+                found = i;
+            }
+        }
+        current = found;
+    } while (found >= 0 && found != node);
+    start = FUN_00454360(node);
+    if (start < 0) {
+        gDrone_path_nodes[node].field_0x12e |= 0x1;
+        gDrone_path_nodes[node].count_sections = 2;
+        gDrone_path_nodes[node].sections[1].node1 = -1;
+        previous = node;
+        i = gDrone_path_nodes[node].sections[0].node1;
+        do {
+            gDrone_path_nodes[i].field_0x12e |= 0x1;
+            gDrone_path_nodes[i].count_sections = 2;
+            gDrone_path_nodes[i].sections[1].node1 = previous;
+            previous = i;
+            i = gDrone_path_nodes[i].sections[0].node1;
+        } while (previous != node);
+        InitialiseEditModelsEtc();
+        NewTextHeadupSlot(4, 0, 2000, -1, "OK, valid path");
+        return;
+    }
+    if (gDrone_path_nodes[start].count_sections != 0) {
+        gDrone_path_nodes[start].field_0x12e |= 0x1;
+        gDrone_path_nodes[start].count_sections = 2;
+        gDrone_path_nodes[start].sections[1].node1 = -1;
+        previous = start;
+        i = gDrone_path_nodes[start].sections[0].node1;
+        while (gDrone_path_nodes[i].count_sections != 0) {
+            gDrone_path_nodes[i].field_0x12e |= 0x1;
+            gDrone_path_nodes[i].count_sections = 2;
+            gDrone_path_nodes[i].sections[1].node1 = previous;
+            previous = i;
+            i = gDrone_path_nodes[i].sections[0].node1;
+        }
+        gDrone_path_nodes[i].field_0x12e |= 0x1;
+        gDrone_path_nodes[i].count_sections = 2;
+        gDrone_path_nodes[i].sections[0].node1 = -1;
+        gDrone_path_nodes[i].sections[1].node1 = previous;
+    }
+    InitialiseEditModelsEtc();
+    NewTextHeadupSlot(4, 0, 2000, -1, "OK, valid path");
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+// FUNCTION: CARMA2_HW 0x00454360
+// FUNCTION: CARMA2_SW 0x004540f0
+// FUNCTION: CARMA2_CHEAT 0x004548c0
+int C2_HOOK_FASTCALL FUN_00454360(int pNode) {
+    int i;
+    int current;
+    int found;
+    int looped;
+    int result;
+
+    current = pNode;
+    looped = 0;
+    do {
+        found = 0;
+        for (i = 0; i < gCount_drone_path_nodes; i++) {
+            if (gDrone_path_nodes[i].sections[0].node1 == current) {
+                current = i;
+                if (i == pNode) {
+                    looped = 1;
+                }
+                found = 1;
+                break;
+            }
+        }
+    } while (found && !looped);
+    if (looped) {
+        result = -1;
+    } else {
+        result = current;
+    }
+    return result;
+}
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // FUN_004543d0
 

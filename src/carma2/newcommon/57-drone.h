@@ -240,11 +240,11 @@ extern void C2_HOOK_FASTCALL FUN_00453940(void);
 
 extern int C2_HOOK_FASTCALL FUN_00453ab0(void);
 
-// FUN_00453b80
+extern void C2_HOOK_FASTCALL FUN_00453b80(void);
 
 extern void C2_HOOK_FASTCALL FUN_00453d60(void);
 
-// FUN_00453d80
+extern void C2_HOOK_FASTCALL FUN_00453d80(void);
 
 extern void C2_HOOK_FASTCALL FUN_00453ed0(void);
 
@@ -260,9 +260,9 @@ extern void C2_HOOK_FASTCALL FUN_00453f20(void);
 
 extern void C2_HOOK_FASTCALL FUN_00453f30(void);
 
-// FUN_00453f40
+extern void C2_HOOK_FASTCALL FUN_00453f40(void);
 
-// FUN_00454360
+extern int C2_HOOK_FASTCALL FUN_00454360(int pNode);
 
 // FUN_004543d0
 
