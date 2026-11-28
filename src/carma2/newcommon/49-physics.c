@@ -827,7 +827,12 @@ void C2_HOOK_FASTCALL InternalPrepareObject(tPhysics_object* pObject) {
     }
 }
 
-// PrepareObject
+// STUB: CARMA2_HW 0x004b9770
+// STUB: CARMA2_SW 0x004b5e90
+// STUB: CARMA2_CHEAT 0x004bf2a0
+void C2_HOOK_FASTCALL PrepareObject(tPhysics_object* pObject, tPhysics_object** pList) {
+    NOT_IMPLEMENTED();
+}
 
 void C2_HOOK_FASTCALL PrepareForCollisions(tPhysics_object* pObject) {
 

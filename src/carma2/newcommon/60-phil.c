@@ -18,6 +18,7 @@
 #include "rec2_macros.h"
 
 #include <stdarg.h>
+#include <string.h>
 
 // GLOBAL: CARMA2_HW 0x0065d004
 // GLOBAL: CARMA2_SW 0x0065793c
@@ -335,11 +336,69 @@ void C2_HOOK_FASTCALL PHILDisable(void) {
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x004b5d40
-// STUB: CARMA2_SW 0x004b2460
-// STUB: CARMA2_CHEAT 0x004bb610
+// FUNCTION: CARMA2_HW 0x004b5d40
+// FUNCTION: CARMA2_SW 0x004b2460
+// FUNCTION: CARMA2_CHEAT 0x004bb610
 int C2_HOOK_FASTCALL PHILAddObject(tPhysics_object* pObject) {
-    NOT_IMPLEMENTED();
+    int i;
+    tPHIL_queued_header* free_header;
+
+    free_header = NULL;
+    if (gPHIL_disabled) {
+        return 0;
+    }
+    PHILVerify();
+    if (gPHIL_munging_objects && !gPHIL_object_added) {
+#ifdef REC2_CHEAT
+        PDFatalError("Queued PHIL actions are not currently supported");
+#endif
+        gPhil_queued_objects.objects[gPHIL_count_queued_objects].collision_info = pObject;
+        gPhil_queued_objects.objects[gPHIL_count_queued_objects].field_0x8 = 1;
+        gPhil_queued_objects.objects[gPHIL_count_queued_objects].flags = 0;
+        pObject->field_0x240 = &gPhil_queued_objects.objects[gPHIL_count_queued_objects];
+        pObject->field_0x239 = 2;
+        gPHIL_count_queued_objects++;
+        PHILVerify();
+        return 0;
+    }
+    for (i = 0; i < (int)REC2_ASIZE(gPhil_queued_objects.headers); i++) {
+        if (gPhil_queued_objects.headers[i].collision_info == NULL) {
+            if (free_header == NULL) {
+                free_header = &gPhil_queued_objects.headers[i];
+            }
+        } else if (pObject == gPhil_queued_objects.headers[i].collision_info) {
+            PHILVerify();
+            return 2;
+        }
+    }
+    if (free_header != NULL) {
+        memset(free_header, 0, sizeof(*free_header));
+        free_header->collision_info = pObject;
+        free_header->field_0x8 = 1;
+        pObject->flags |= 0x20;
+        pObject->field_0x240 = free_header;
+        pObject->field_0x239 = 1;
+        gPHIL_count_list_collision_infos++;
+        if (gPHIL_list_collision_infos != NULL) {
+            pObject->next = gPHIL_list_collision_infos->next;
+            gPHIL_list_collision_infos->next = pObject;
+            pObject->prev = gPHIL_list_collision_infos;
+            if (pObject->next != NULL) {
+                pObject->next->prev = pObject;
+            }
+        } else {
+            gPHIL_list_collision_infos = pObject;
+            pObject->next = NULL;
+            pObject->prev = NULL;
+        }
+        if (gPHIL_doing_physics) {
+            PrepareObject(pObject, &gPHIL_list_collision_infos);
+        }
+        PHILVerify();
+        return 0;
+    }
+    PHILVerify();
+    return 1;
 }
 #ifdef REC2_MATCHING
 #pragma auto_inline(on)

@@ -196,7 +196,7 @@ extern void C2_HOOK_FASTCALL TellPhysicsJointsHaveChanged(tPhysics_object* pColl
 
 // InternalPrepareObject
 
-// PrepareObject
+extern void C2_HOOK_FASTCALL PrepareObject(tPhysics_object* pObject, tPhysics_object** pList);
 
 // PrepareForCollisions
 
