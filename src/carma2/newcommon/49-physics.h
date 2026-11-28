@@ -14,6 +14,16 @@
 
 extern int gINT_00692dc8;
 
+extern int gINT_00692dcc;
+
+extern int gCount_friction_forces;
+
+extern tPhysics_joint_force gFriction_forces[50];
+
+extern int gPHIL_collision_group;
+
+extern int gINT_006940a4;
+
 extern tPhysicsError_cbfn* gPhysics_error_cb;
 extern void* gPhysics_buffer1_ptr;
 extern void* gPhysics_buffer2_ptr;
@@ -200,7 +210,7 @@ extern void C2_HOOK_FASTCALL SetListDoingNothingFlag(tPhysics_object* pObject, i
 
 extern void C2_HOOK_FASTCALL SetHierarchyDoingNothingFlag(tPhysics_object* pObject, int pFlag);
 
-// CheckDoingNothingFlag
+extern void CheckDoingNothingFlag(tPhysics_object* pObject);
 
 extern void C2_HOOK_FASTCALL SetGroup(tPhysics_object* pObject, int pGroup);
 
@@ -240,11 +250,11 @@ extern int C2_HOOK_FASTCALL FlagsAreGo(tPhysics_object* pCollision_1, tPhysics_o
 
 // DoRigidJoints
 
-// DoInterGroupCollisions
+extern int C2_HOOK_FASTCALL DoInterGroupCollisions(tPhysics_object** pObject_list, tPhysics_object* pObject, tPhysics_joint_force* pForces, tPhysics_joint_force* pOld_forces, int pCount_old_forces, tWorld_callbacks* pCallbacks);
 
 extern int C2_HOOK_FASTCALL ReduceEffectOfForces(tPhysics_joint_force* pForces, br_scalar* pImpulses, int pCount, const int* pIndices, int pIndex_count, br_scalar pThreshold);
 
-// DoCollisions
+extern void C2_HOOK_FASTCALL DoCollisions(tPhysics_object** pObject_list, tWorld_callbacks* pCallbacks);
 
 // AddDoubleTorqueToMatrix
 
@@ -280,9 +290,9 @@ extern void C2_HOOK_FASTCALL NewAddFriction(tPhysics_joint_force* pForce, tWorld
 
 // DoJointFriction
 
-// ListDoJointFriction
+extern void ListDoJointFriction(tPhysics_object* pObject);
 
-// PostAddFriction
+extern void PostAddFriction(tWorld_callbacks* pCallbacks);
 
 // RotateObjectSecondOrder
 
@@ -322,7 +332,7 @@ extern void C2_HOOK_FASTCALL ApplyTorque(tPhysics_object* pObject, const br_vect
 
 extern void C2_HOOK_FASTCALL ApplyDiminishingTorque(tPhysics_object* pObject, const br_vector3 *pTorque);
 
-// OrderObjectListOnX
+extern void OrderObjectListOnX(tPhysics_object** pObject_list);
 
 // SwapPair
 

@@ -35,6 +35,11 @@
 // GLOBAL: CARMA2_CHEAT 0x0069a940
 int gINT_00692dc8;
 
+// GLOBAL: CARMA2_HW 0x00692dcc
+// GLOBAL: CARMA2_SW 0x0068ce24
+// GLOBAL: CARMA2_CHEAT 0x0069a944
+int gINT_00692dcc;
+
 // GLOBAL: CARMA2_HW 0x00692dd0
 // GLOBAL: CARMA2_SW 0x0068ce28
 // GLOBAL: CARMA2_CHEAT 0x0069a948
@@ -44,6 +49,26 @@ br_scalar gPhysics_bounds_max_x;
 // GLOBAL: CARMA2_SW 0x0068ce2c
 // GLOBAL: CARMA2_CHEAT 0x0069a94c
 br_scalar gPhysics_bounds_min_x;
+
+// GLOBAL: CARMA2_HW 0x00692ddc
+// GLOBAL: CARMA2_SW 0x0068ce34
+// GLOBAL: CARMA2_CHEAT 0x0069a954
+int gCount_friction_forces;
+
+// GLOBAL: CARMA2_HW 0x00692de0
+// GLOBAL: CARMA2_SW 0x0068ce38
+// GLOBAL: CARMA2_CHEAT 0x0069a958
+tPhysics_joint_force gFriction_forces[50];
+
+// GLOBAL: CARMA2_HW 0x006940a0
+// GLOBAL: CARMA2_SW 0x0068e0f8
+// GLOBAL: CARMA2_CHEAT 0x0069bc18
+int gPHIL_collision_group;
+
+// GLOBAL: CARMA2_HW 0x006940a4
+// GLOBAL: CARMA2_SW 0x0068e0fc
+// GLOBAL: CARMA2_CHEAT 0x0069bc1c
+int gINT_006940a4;
 
 // GLOBAL: CARMA2_HW 0x006940c0
 // GLOBAL: CARMA2_SW 0x0068e118
@@ -956,7 +981,22 @@ void C2_HOOK_FASTCALL SetHierarchyDoingNothingFlag(tPhysics_object* pObject, int
     }
 }
 
-// CheckDoingNothingFlag
+inline void CheckDoingNothingFlag(tPhysics_object* pObject) {
+    tPhysics_object* object;
+    tU8 flag;
+
+    for (; pObject != NULL; pObject = pObject->next) {
+        if (!pObject->disable_move_rotate && (pObject->field_0x1df & 0x2)) {
+            flag = 0x2;
+            for (object = pObject->field183_0x1d8; object != pObject; object = object->field183_0x1d8) {
+                flag &= object->field_0x1df;
+            }
+            if (flag & 0x2) {
+                SetGroupDoingNothingFlag(pObject, 1);
+            }
+        }
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x004bae80
 // FUNCTION: CARMA2_SW 0x004b75a0
@@ -1052,7 +1092,21 @@ int C2_HOOK_FASTCALL FlagsAreGo(tPhysics_object* pCollision_1, tPhysics_object* 
 
 // DoRigidJoints
 
-// DoInterGroupCollisions
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_HW 0x004baec0
+// STUB: CARMA2_SW 0x004b75e0
+// STUB: CARMA2_CHEAT 0x004c09f0
+int C2_HOOK_FASTCALL DoInterGroupCollisions(tPhysics_object** pObject_list, tPhysics_object* pObject, tPhysics_joint_force* pForces, tPhysics_joint_force* pOld_forces, int pCount_old_forces, tWorld_callbacks* pCallbacks) {
+    /* FIXME: the types of pForces, pOld_forces and pCount_old_forces are guesses */
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // FUNCTION: CARMA2_HW 0x004ba550
 // FUNCTION: CARMA2_SW 0x004b6c70
@@ -1093,7 +1147,64 @@ int C2_HOOK_FASTCALL ReduceEffectOfForces(tPhysics_joint_force* pForces, br_scal
     // return 0;
 }
 
-// DoCollisions
+// FUNCTION: CARMA2_HW 0x004ba6b0
+// FUNCTION: CARMA2_SW 0x004b6dd0
+// FUNCTION: CARMA2_CHEAT 0x004c01e0
+void C2_HOOK_FASTCALL DoCollisions(tPhysics_object** pObject_list, tWorld_callbacks* pCallbacks) {
+    tPhysics_joint_force forces_1[40];
+    tPhysics_joint_force forces_2[40];
+    tPhysics_joint_force* forces;
+    tPhysics_joint_force* old_forces;
+    tPhysics_joint_force* tmp;
+    tPhysics_object* object;
+    int count;
+    int loops;
+
+    forces = forces_1;
+    old_forces = forces_2;
+    ClearPhysicsScratchSpace();
+    gPHIL_collision_group = 1;
+    gCount_friction_forces = 0;
+    gPhysics_bounds_max_x = 0.0f;
+    gPhysics_bounds_min_x = 0.0f;
+    PrepareForCollisions(*pObject_list);
+    OrderObjectListOnX(pObject_list);
+    do {
+        gINT_00692dcc = 0;
+        for (object = *pObject_list; object != NULL; object = object->next) {
+            if (object->field_0x1dc || object->disable_move_rotate) {
+                continue;
+            }
+            if (object->child != NULL && object->child->physics_joint1 != NULL && object->child->physics_joint1->type != eJoint_none) {
+                SetGroup(object, gPHIL_collision_group);
+                gPHIL_collision_group++;
+            }
+            loops = 0;
+            gINT_006940a4 = 0;
+            count = 0;
+            for (;;) {
+                count = DoInterGroupCollisions(pObject_list, object, forces, old_forces, count, pCallbacks);
+                if (count == 0) {
+                    break;
+                }
+                loops++;
+                tmp = forces;
+                forces = old_forces;
+                old_forces = tmp;
+                if (loops >= 30 || gINT_006940a4 >= 3) {
+                    break;
+                }
+            }
+            if (loops >= 30) {
+                PhysicsWarning("Too many loops in DoCollisions");
+            }
+        }
+    } while (gINT_00692dcc != 0);
+    PostAddFriction(pCallbacks);
+    WriteNewPositions(*pObject_list);
+    CheckDoingNothingFlag(*pObject_list);
+    ListDoJointFriction(*pObject_list);
+}
 
 // AddDoubleTorqueToMatrix
 
@@ -1379,9 +1490,22 @@ void C2_HOOK_FASTCALL DoJointFriction(tPhysics_object* pObject) {
     }
 }
 
-// ListDoJointFriction
+inline void ListDoJointFriction(tPhysics_object* pObject) {
 
-// PostAddFriction
+    for (; pObject != NULL; pObject = pObject->next) {
+        if (!pObject->disable_move_rotate) {
+            DoJointFriction(pObject);
+        }
+    }
+}
+
+inline void PostAddFriction(tWorld_callbacks* pCallbacks) {
+    int i;
+
+    for (i = 0; i < gCount_friction_forces; i++) {
+        NewAddFriction(&gFriction_forces[i], pCallbacks);
+    }
+}
 
 // RotateObjectSecondOrder
 
@@ -1604,7 +1728,46 @@ void C2_HOOK_FASTCALL ApplyDiminishingTorque(tPhysics_object* pObject, const br_
     }
 }
 
-// OrderObjectListOnX
+inline void OrderObjectListOnX(tPhysics_object** pObject_list) {
+    tPhysics_object* first;
+    tPhysics_object* last;
+    tPhysics_object* current;
+    tPhysics_object* position;
+    tPhysics_object* next;
+
+    first = *pObject_list;
+    first->prev = NULL;
+    last = first;
+    current = first->next;
+    while (current != NULL) {
+        position = last;
+        while (position != NULL && current->transform_matrix.m[3][0] < position->transform_matrix.m[3][0]) {
+            position = position->prev;
+        }
+        if (position == last) {
+            position->next = current;
+            current->prev = position;
+            last = current;
+            current = current->next;
+        } else if (position == NULL) {
+            first->prev = current;
+            next = current->next;
+            current->next = first;
+            current->prev = NULL;
+            first = current;
+            current = next;
+        } else {
+            next = current->next;
+            current->next = position->next;
+            current->next->prev = current;
+            position->next = current;
+            current->prev = position;
+            current = next;
+        }
+    }
+    last->next = NULL;
+    *pObject_list = first;
+}
 
 // SwapPair
 
@@ -1790,12 +1953,21 @@ void C2_HOOK_FASTCALL IncreasePhysicsScratchPointer(int pSize) {
     gPhysics_scratch_ptr = (tU8*)gPhysics_scratch_ptr + pSize;
 }
 
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
 // FUNCTION: CARMA2_HW 0x004c5d00
 // FUNCTION: CARMA2_SW 0x004c2430
+// FUNCTION: CARMA2_CHEAT 0x004cb820
 void C2_HOOK_FASTCALL ClearPhysicsScratchSpace(void) {
 
     gPhysics_scratch_ptr = gPhysics_other_buffer;
 }
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // FUNCTION: CARMA2_HW 0x004c5d10
 // FUNCTION: CARMA2_SW 0x004c2440
