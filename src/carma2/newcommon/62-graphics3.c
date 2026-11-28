@@ -231,11 +231,6 @@ int gMap_render_width_i;
 // GLOBAL: CARMA2_CHEAT 0x00694f84
 br_pixelmap* gCheckpoint_numbers;
 
-// GLOBAL: CARMA2_HW 0x0068d884
-// GLOBAL: CARMA2_SW 0x006878dc
-// GLOBAL: CARMA2_CHEAT 0x00695124
-br_pixelmap* gSmashy_dot;
-
 // GLOBAL: CARMA2_HW 0x0068d88c
 // GLOBAL: CARMA2_SW 0x006878e4
 // GLOBAL: CARMA2_CHEAT 0x0069512c
@@ -301,7 +296,12 @@ int flash_state;
 // GLOBAL: CARMA2_HW 0x0068d6f8
 // GLOBAL: CARMA2_SW 0x00687750
 // GLOBAL: CARMA2_CHEAT 0x00694f98
-tOppo_status_messages gOppo_status_messages[9];
+tOppo_status_messages gOppo_status_messages[9] = { 0 };
+
+// GLOBAL: CARMA2_HW 0x0068d884
+// GLOBAL: CARMA2_SW 0x006878dc
+// GLOBAL: CARMA2_CHEAT 0x00695124
+br_pixelmap* gSmashy_dot = NULL;
 
 // GLOBAL: CARMA2_HW 0x0074abe0
 // GLOBAL: CARMA2_SW 0x0074128c

@@ -113,8 +113,8 @@ tCar_spec* C2_HOOK_FASTCALL GetRaceLeader(void) {
     int score;
     tCar_spec* car;
 
-    car = gNet_players[0].car;
     score = gNet_players[0].last_score_index;
+    car = gNet_players[0].car;
     if (gCurrent_net_game->type == eNet_game_type_foxy && gIt_or_fox >= 0 && gIt_or_fox < gNumber_of_net_players) {
         return gNet_players[gIt_or_fox].car;
     } else {
