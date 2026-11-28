@@ -24,7 +24,7 @@
 #include "42-input.h"
 #include "53-controls.h"
 #include "59-camera.h"
-#include "61-pedestrn.h"
+#include "61-pedestrn-phys.h"
 #include "64-movie.h"
 #include "globvars.h"
 #include "globvrpb.h"
