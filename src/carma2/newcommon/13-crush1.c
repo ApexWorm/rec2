@@ -2795,8 +2795,6 @@ void C2_HOOK_FASTCALL ReceivedToggleFlaps(tNet_message_chunk* pContents) {
     }
 }
 
-extern tCar_spec* C2_HOOK_FASTCALL SHNonCarOwner(tNon_car_spec* pNon_car);
-
 inline tCar_spec* C2_HOOK_FASTCALL SHNonCarOwner(tNon_car_spec* pNon_car) {
 
     if (pNon_car->car_master_actor != NULL) {
