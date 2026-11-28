@@ -1260,9 +1260,29 @@ void C2_HOOK_FASTCALL DamagePedestrian(tPedestrian* pPed, int pDamage, int pArg3
 
 // DoPedestrianRepulsifictor
 
-// CompileBurnableList
+// FUNCTION: CARMA2_HW 0x004ce770
+// FUNCTION: CARMA2_SW 0x004cae70
+// FUNCTION: CARMA2_CHEAT 0x004d4300
+int C2_HOOK_FASTCALL CompileBurnableList(tPedestrian* pPed, tCar_spec* pCar, float pDistance_squared, tU32 pTime, tPedestrian_distances* pList) {
 
-// SortPedListFunction
+    if (pPed->field_0x0c != NULL && pPed->field_0x0c->field_0x98 == 0) {
+        pList->items[pList->count].ped = pPed;
+        pList->items[pList->count].distance = pDistance_squared;
+        pList->count++;
+        return 1;
+    }
+#ifdef REC2_FIX_BUGS
+    return 0;
+#endif
+}
+
+// FUNCTION: CARMA2_HW 0x004ce7b0
+// FUNCTION: CARMA2_SW 0x004caeb0
+// FUNCTION: CARMA2_CHEAT 0x004d4340
+int C2_HOOK_CDECL SortPedListFunction(const void* pFirst, const void* pSecond) {
+
+    return (int)(((const tPedestrian_distance*)pFirst)->distance - ((const tPedestrian_distance*)pSecond)->distance);
+}
 
 // ChoosePedToNapalm
 
@@ -1655,6 +1675,17 @@ void C2_HOOK_FASTCALL ResetPedNearness(void) {
     gPed_nearness = 1;
 }
 
+// FUNCTION: CARMA2_HW 0x004d63a0
+// FUNCTION: CARMA2_SW 0x004d29a0
+// FUNCTION: CARMA2_CHEAT 0x004dbf60
+void C2_HOOK_FASTCALL FUN_004d63a0(void) {
+    tPedestrian* ped;
+
+    ped = &gPedestrian_array[gSelected_ped];
+    ped->field_0x0c->field_0x6c = 0;
+    SetCharacterPhysicsLevelAR(ped->character, 5);
+}
+
 // FUNCTION: CARMA2_HW 0x004d63e0
 // FUNCTION: CARMA2_SW 0x004d29e0
 // FUNCTION: CARMA2_CHEAT 0x004dbfa0
@@ -1769,6 +1800,13 @@ void C2_HOOK_FASTCALL ShowActivePedCount(void) {
 
     sprintf(text, "%d out of %d peds are active", gCount_active_peds, gPed_count);
     NewTextHeadupSlot2(4, 0, 1000, -4, text, 0);
+}
+
+// FUNCTION: CARMA2_HW 0x004d6870
+// FUNCTION: CARMA2_SW 0x004d2e70
+// FUNCTION: CARMA2_CHEAT 0x004dc430
+void C2_HOOK_FASTCALL FUN_004d6870(void) {
+
 }
 
 // FUNCTION: CARMA2_HW 0x004d6880

@@ -195,9 +195,9 @@ extern void C2_HOOK_FASTCALL DamagePedestrian(tPedestrian* pPed, int pDamage, in
 
 // DoPedestrianRepulsifictor
 
-// CompileBurnableList
+extern int C2_HOOK_FASTCALL CompileBurnableList(tPedestrian* pPed, tCar_spec* pCar, float pDistance_squared, tU32 pTime, tPedestrian_distances* pList);
 
-// SortPedListFunction
+extern int C2_HOOK_CDECL SortPedListFunction(const void* pFirst, const void* pSecond);
 
 // ChoosePedToNapalm
 
@@ -315,9 +315,13 @@ extern void C2_HOOK_FASTCALL FindNearestPed(void);
 
 extern void C2_HOOK_FASTCALL ResetPedNearness(void);
 
+extern void C2_HOOK_FASTCALL FUN_004d63a0(void);
+
 extern void C2_HOOK_FASTCALL GetPedestrianDebugInfo(char* pBuffer, int pPed_index);
 
 extern void C2_HOOK_FASTCALL ShowActivePedCount(void);
+
+extern void C2_HOOK_FASTCALL FUN_004d6870(void);
 
 extern void C2_HOOK_FASTCALL PedPreCollisionStuff(void);
 
