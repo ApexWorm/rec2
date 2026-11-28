@@ -40,6 +40,7 @@
 #include "rec2_macros.h"
 
 #include <stdarg.h>
+#include <stdlib.h>
 #include <string.h>
 
 // GLOBAL: CARMA2_HW 0x0065d7c8
@@ -1429,12 +1430,14 @@ int C2_HOOK_FASTCALL DoPedAnnihilator(tCar_spec* pCar, float pRange_squared) {
 // FUNCTION: CARMA2_HW 0x004ce770
 // FUNCTION: CARMA2_SW 0x004cae70
 // FUNCTION: CARMA2_CHEAT 0x004d4300
-int C2_HOOK_FASTCALL CompileBurnableList(tPedestrian* pPed, tCar_spec* pCar, float pDistance_squared, tU32 pTime, tPedestrian_distances* pList) {
+int C2_HOOK_FASTCALL CompileBurnableList(tPedestrian* pPed, tCar_spec* pCar, float pDistance_squared, tU32 pTime, void* pContext) {
+    tPedestrian_distances* list;
 
+    list = pContext;
     if (pPed->field_0x0c != NULL && pPed->field_0x0c->field_0x98 == 0) {
-        pList->items[pList->count].ped = pPed;
-        pList->items[pList->count].distance = pDistance_squared;
-        pList->count++;
+        list->items[list->count].ped = pPed;
+        list->items[list->count].distance = pDistance_squared;
+        list->count++;
         return 1;
     }
 #ifdef REC2_FIX_BUGS
@@ -1450,13 +1453,64 @@ int C2_HOOK_CDECL SortPedListFunction(const void* pFirst, const void* pSecond) {
     return (int)(((const tPedestrian_distance*)pFirst)->distance - ((const tPedestrian_distance*)pSecond)->distance);
 }
 
-// ChoosePedToNapalm
+#define PED_ROOT_OBJECT(PED) (((PED)->character->field_0x14 & 0x1) ? (PED)->character->personality->form->simple_physicing[(tS8)(PED)->character->field_0x5].collision_info : GetRootObject((PED)->character))
 
-// STUB: CARMA2_HW 0x004ce560
-// STUB: CARMA2_SW 0x004cac60
-// STUB: CARMA2_CHEAT 0x004d40f0
+inline tPedestrian* C2_HOOK_FASTCALL ChoosePedToNapalm(tCar_spec* pCar) {
+    tPedestrian_distances list;
+    int i;
+
+    list.count = 0;
+    if (DoToPeds(pCar, 1, 0.0f, 1, &list, CompileBurnableList)) {
+        qsort(list.items, list.count, sizeof(tPedestrian_distance), SortPedListFunction);
+        for (i = 0; i < list.count; i++) {
+            if (PED_ROOT_OBJECT(list.items[i].ped)->last_special_volume == NULL
+                || PED_ROOT_OBJECT(list.items[i].ped)->last_special_volume->gravity_multiplier >= 1.0f) {
+                return list.items[i].ped;
+            }
+        }
+    }
+    return NULL;
+}
+
+#undef PED_ROOT_OBJECT
+
+// FUNCTION: CARMA2_HW 0x004ce560
+// FUNCTION: CARMA2_SW 0x004cac60
+// FUNCTION: CARMA2_CHEAT 0x004d40f0
 int C2_HOOK_FASTCALL DoPedNapalm(tCar_spec* pCar) {
-    NOT_IMPLEMENTED();
+    int i;
+    tNapalm_bolt* bolt;
+    tPedestrian* ped;
+
+    if (pCar->collision_info->last_special_volume == NULL || pCar->collision_info->last_special_volume->gravity_multiplier >= 1.0f) {
+        bolt = NULL;
+        for (i = 0; i < (int)REC2_ASIZE(gNapalm_bolts); i++) {
+            if (gNapalm_bolts[i].ped == NULL) {
+                bolt = &gNapalm_bolts[i];
+                break;
+            }
+        }
+        if (bolt != NULL) {
+            ped = ChoosePedToNapalm(pCar);
+            if (ped != NULL) {
+                ped->field_0x0c->field_0x98 = gNapalm_bolts - bolt - 1;
+                bolt->field_0x28 = GetTotalTime();
+                bolt->field_0x24 = 0;
+                bolt->field_0x20 = 1;
+                bolt->ped = ped;
+                bolt->field_0x68 = pCar;
+                BrVector3Set(&bolt->field_0x2c[0], 0.0f, 0.0f, 0.0f);
+                BrVector3Copy(&bolt->actors[0]->t.t.translate.t, &pCar->pos);
+                if (pCar != NULL && pCar->driver == eDriver_local_human) {
+                    DRS3StartSound(gCar_outlet, 3701);
+                } else {
+                    DRS3StartSound3D(gCar_outlet, 3701, &pCar->pos, &gZero_v__car, 1, 255, 0x10000, 0x10000);
+                }
+                return 1;
+            }
+        }
+    }
+    return 0;
 }
 
 // KillNapalmBolt

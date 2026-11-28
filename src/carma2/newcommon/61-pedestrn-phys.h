@@ -195,11 +195,11 @@ extern int C2_HOOK_FASTCALL DoPedAnnihilator(tCar_spec* pCar, float pRange);
 
 // DoPedestrianRepulsifictor
 
-extern int C2_HOOK_FASTCALL CompileBurnableList(tPedestrian* pPed, tCar_spec* pCar, float pDistance_squared, tU32 pTime, tPedestrian_distances* pList);
+extern int C2_HOOK_FASTCALL CompileBurnableList(tPedestrian* pPed, tCar_spec* pCar, float pDistance_squared, tU32 pTime, void* pContext);
 
 extern int C2_HOOK_CDECL SortPedListFunction(const void* pFirst, const void* pSecond);
 
-// ChoosePedToNapalm
+extern tPedestrian* C2_HOOK_FASTCALL ChoosePedToNapalm(tCar_spec* pCar);
 
 extern int C2_HOOK_FASTCALL DoPedNapalm(tCar_spec* pCar);
 

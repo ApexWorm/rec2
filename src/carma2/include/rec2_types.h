@@ -4940,7 +4940,7 @@ typedef struct {
 
 struct tPedestrian_distances {
     int count;
-    tPedestrian_distance items[98]; /* FIXME: size guessed from DoPedNapalm's stack frame */
+    tPedestrian_distance items[100]; /* FIXME: size guessed from DoPedNapalm's stack frame */
 };
 
 typedef struct tRace_pedestrian {
