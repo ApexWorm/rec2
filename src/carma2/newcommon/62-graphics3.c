@@ -233,12 +233,12 @@ float gFLOAT_0068d6e0;
 // GLOBAL: CARMA2_HW 0x0068d890
 // GLOBAL: CARMA2_SW 0x006878e8
 // GLOBAL: CARMA2_CHEAT 0x00695130
-int gINT_0068d890;
+int gMap_overlay_offset_x;
 
 // GLOBAL: CARMA2_HW 0x0068c858
 // GLOBAL: CARMA2_SW 0x006868b0
 // GLOBAL: CARMA2_CHEAT 0x006940f8
-int gINT_0068c858;
+int gMap_overlay_offset_y;
 
 // GLOBAL: CARMA2_HW 0x0068d8b0
 // GLOBAL: CARMA2_SW 0x00687908
@@ -671,8 +671,8 @@ void C2_HOOK_FASTCALL DrawMapBlip(br_pixelmap* pScreen, tCar_spec* pCar, tU32 pT
             || (gCurrent_net_game->type == eNet_game_type_6 && !NetPlayerFromCar(pCar)->field_0x80)
             || (gCurrent_net_game->type == eNet_game_type_foxy && pCar == gNet_players[gIt_or_fox].car)
             || (gCurrent_net_game->type != eNet_game_type_6 && gCurrent_net_game->type != eNet_game_type_foxy))) {
-        offset.v[0] = (float)(gHeadup_map_half_width + gINT_0068d890 + gINT_0074ab8c) - map_pos.v[0];
-        offset.v[1] = (float)(gHeadup_map_half_height + gINT_0068c858 + gINT_0074ab88) - map_pos.v[1];
+        offset.v[0] = (float)(gHeadup_map_half_width + gMap_overlay_offset_x + gINT_0074ab8c) - map_pos.v[0];
+        offset.v[1] = (float)(gHeadup_map_half_height + gMap_overlay_offset_y + gINT_0074ab88) - map_pos.v[1];
         offset.v[2] = 0.0f - map_pos.v[2];
         distance = offset.v[2] * offset.v[2] + offset.v[0] * offset.v[0] + offset.v[1] * offset.v[1];
         if ((gTarget_lock_car_2 == NULL
@@ -780,8 +780,8 @@ inline void C2_HOOK_FASTCALL DrawSmashBlip(br_pixelmap* pScreen, tU32 pTime, con
 
     BrMatrix34ApplyP(&map_pos, pPos, &gCurrent_race.map_transformation);
     map_pos.v[2] = 0.0f;
-    offset.v[0] = (float)(gHeadup_map_half_width + gINT_0068d890 + gINT_0074ab8c) - map_pos.v[0];
-    offset.v[1] = (float)(gHeadup_map_half_height + gINT_0068c858 + gINT_0074ab88) - map_pos.v[1];
+    offset.v[0] = (float)(gHeadup_map_half_width + gMap_overlay_offset_x + gINT_0074ab8c) - map_pos.v[0];
+    offset.v[1] = (float)(gHeadup_map_half_height + gMap_overlay_offset_y + gINT_0074ab88) - map_pos.v[1];
     offset.v[2] = 0.0f - map_pos.v[2];
     distance = offset.v[2] * offset.v[2] + offset.v[0] * offset.v[0] + offset.v[1] * offset.v[1];
     if (gNearest_smash_blip_index == -1 || distance < gFLOAT_0074abc4) {
@@ -1589,30 +1589,30 @@ void C2_HOOK_FASTCALL MapOverlay(void) {
         BrPixelmapFill(gMap_overlay, 0);
     }
     if (gINT_0074ab94 > gINT_0074abec) {
-        gINT_0068c858 = (gINT_0074ab94 - gINT_0074abec) / 2;
-        gINT_0068d890 = 0;
+        gMap_overlay_offset_y = (gINT_0074ab94 - gINT_0074abec) / 2;
+        gMap_overlay_offset_x = 0;
         BrPixelmapRectangleCopy(gMap_overlay,
             0,
             0,
             gCurrent_race.map_image,
             gINT_0068c878,
-            gINT_0068c874 - gINT_0068c858,
+            gINT_0068c874 - gMap_overlay_offset_y,
             gINT_0074ab94,
             gINT_0074ab94);
     } else {
-        gINT_0068d890 = (gINT_0074abec - gINT_0074ab94) / 2;
-        gINT_0068c858 = 0;
+        gMap_overlay_offset_x = (gINT_0074abec - gINT_0074ab94) / 2;
+        gMap_overlay_offset_y = 0;
         BrPixelmapRectangleCopy(gMap_overlay,
             0,
             0,
             gCurrent_race.map_image,
-            gINT_0068c878 - gINT_0068d890,
+            gINT_0068c878 - gMap_overlay_offset_x,
             gINT_0068c874,
             gINT_0074abec,
             gINT_0074abec);
     }
-    gCurrent_race.map_transformation.m[3][0] -= gOrigin_headup_map.v[0] - (float)gINT_0068d890;
-    gCurrent_race.map_transformation.m[3][1] -= gOrigin_headup_map.v[1] - (float)gINT_0068c858;
+    gCurrent_race.map_transformation.m[3][0] -= gOrigin_headup_map.v[0] - (float)gMap_overlay_offset_x;
+    gCurrent_race.map_transformation.m[3][1] -= gOrigin_headup_map.v[1] - (float)gMap_overlay_offset_y;
     BrMatrix34Mul(&gCar_in_map_space, &gProgram_state.current_car.car_master_actor->t.t.mat, &gCurrent_race.map_transformation);
     mat23.m[0][0] = gCar_in_map_space.m[0][0];
     mat23.m[0][1] = gCar_in_map_space.m[0][1];
@@ -1622,8 +1622,8 @@ void C2_HOOK_FASTCALL MapOverlay(void) {
     mat23.m[2][1] = 0.0f;
     BrMatrix23LPNormalise(&gMatrix23_0068c880, &mat23);
     DoMapOverlays(gMap_overlay);
-    gCurrent_race.map_transformation.m[3][0] += gOrigin_headup_map.v[0] - (float)gINT_0068d890;
-    gCurrent_race.map_transformation.m[3][1] += gOrigin_headup_map.v[1] - (float)gINT_0068c858;
+    gCurrent_race.map_transformation.m[3][0] += gOrigin_headup_map.v[0] - (float)gMap_overlay_offset_x;
+    gCurrent_race.map_transformation.m[3][1] += gOrigin_headup_map.v[1] - (float)gMap_overlay_offset_y;
     the_time = PDGetTotalTime();
 #ifdef REC2_HW
     PossibleLock(1);
@@ -1634,8 +1634,8 @@ void C2_HOOK_FASTCALL MapOverlay(void) {
             gHeadup_map_x + 8,
             gHeadup_map_y,
             gMap_overlay,
-            gINT_0068d890 + gINT_0074ab8c,
-            gINT_0068c858 + gINT_0074ab88,
+            gMap_overlay_offset_x + gINT_0074ab8c,
+            gMap_overlay_offset_y + gINT_0074ab88,
             gHeadup_map_w,
             gHeadup_map_h,
             gMap_trans);
