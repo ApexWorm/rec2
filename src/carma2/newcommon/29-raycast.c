@@ -58,19 +58,19 @@ br_matrix34 gPick_model_to_view__raycast;
 // GLOBAL: CARMA2_CHEAT 0x006a9c98
 float gHighest_y_below;
 
-inline int C2_HOOK_FASTCALL DRActorToRoot(br_actor* pActor, br_actor* pWorld, br_matrix34* pMat) {
+inline int C2_HOOK_FASTCALL DRActorToRoot(br_actor* a, br_actor* world, br_matrix34* m) {
 
-    if (pActor == pWorld) {
-        BrMatrix34Identity(pMat);
+    if (a == world) {
+        BrMatrix34Identity(m);
         return 1;
     } else {
-        BrTransformToMatrix34(pMat, &pActor->t);
-        for (pActor = pActor->parent; pActor != NULL && pActor != pWorld; pActor = pActor->parent) {
-            if (pActor->t.type != BR_TRANSFORM_IDENTITY) {
-                BrMatrix34PostTransform(pMat, &pActor->t);
+        BrTransformToMatrix34(m, &a->t);
+        for (a = a->parent; a != NULL && a != world; a = a->parent) {
+            if (a->t.type != BR_TRANSFORM_IDENTITY) {
+                BrMatrix34PostTransform(m, &a->t);
             }
         }
-        return pActor == pWorld;
+        return a == world;
     }
 }
 

@@ -25,7 +25,7 @@ extern br_matrix34 gPick_model_to_view__raycast;
 
 extern float gHighest_y_below;
 
-extern int C2_HOOK_FASTCALL DRActorToRoot(br_actor* pActor, br_actor* pWorld, br_matrix34* pMat);
+extern int C2_HOOK_FASTCALL DRActorToRoot(br_actor* a, br_actor* world, br_matrix34* m);
 
 extern void C2_HOOK_FASTCALL InitRayCasting(void);
 
