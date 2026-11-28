@@ -248,10 +248,16 @@ extern void C2_HOOK_FASTCALL DRPixelmapRectangleFill(br_pixelmap* dst, br_int_16
 
 extern void C2_HOOK_FASTCALL PixelmapSwapByteOrder(br_pixelmap* pMap);
 
+extern void C2_HOOK_FASTCALL ConvertPixelmapType16(br_pixelmap* pMap, int pType);
+
 extern void C2_HOOK_FASTCALL ConvertRGB565ToARGB1555(br_uint_16* pPixel);
 
 extern void C2_HOOK_FASTCALL ConvertARGB4444ToARGB1555(br_uint_16* pPixel);
 
+extern void C2_HOOK_FASTCALL ConvertMapRGBA4444ToRGBA8888(br_pixelmap* pMap);
+
 extern void C2_HOOK_FASTCALL EnsurePixelmapAllowed(br_pixelmap* pMap, undefined4 pArg2);
+
+extern void C2_HOOK_FASTCALL ConvertRGBA5x5ToRGBA1555Map(br_pixelmap* pMap);
 
 #endif // GUARD_41_UTILITY_H

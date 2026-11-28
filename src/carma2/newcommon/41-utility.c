@@ -2259,6 +2259,40 @@ void C2_HOOK_FASTCALL PixelmapSwapByteOrder(br_pixelmap* pMap) {
 #endif
 }
 
+// FUNCTION: CARMA2_HW 0x00519200
+// FUNCTION: CARMA2_SW 0x00512ce0
+void C2_HOOK_FASTCALL ConvertPixelmapType16(br_pixelmap* pMap, int pType) {
+    void (C2_HOOK_FASTCALL * convert)(br_uint_16* pPixel);
+    br_uint_16* row;
+    br_uint_16* pixel;
+    int x;
+    int y;
+
+    convert = NULL;
+    switch (pMap->type) {
+    case BR_PMT_RGB_565:
+        if (pType == BR_PMT_RGB_555) {
+            convert = ConvertRGB565ToARGB1555;
+        }
+        break;
+    case BR_PMT_RGBA_4444:
+        if (pType == BR_PMT_ARGB_1555) {
+            convert = ConvertARGB4444ToARGB1555;
+        }
+        break;
+    }
+    if (convert != NULL) {
+        row = pMap->pixels;
+        for (y = 0; y < pMap->height; y++, row += pMap->row_bytes / 2) {
+            pixel = row;
+            for (x = 0; x < pMap->width; x++, pixel++) {
+                convert(pixel);
+            }
+        }
+        pMap->type = pType;
+    }
+}
+
 // FUNCTION: CARMA2_HW 0x005192a0
 // FUNCTION: CARMA2_SW 0x00512d80
 void C2_HOOK_FASTCALL ConvertRGB565ToARGB1555(br_uint_16* pPixel) {
@@ -2282,9 +2316,64 @@ void C2_HOOK_FASTCALL ConvertARGB4444ToARGB1555(br_uint_16* pPixel) {
     }
 }
 
+// FUNCTION: CARMA2_HW 0x00519300
+// FUNCTION: CARMA2_SW 0x00512de0
+void C2_HOOK_FASTCALL ConvertMapRGBA4444ToRGBA8888(br_pixelmap* pMap) {
+    br_uint_32* new_pixels;
+    br_uint_32* dst;
+    br_uint_16* row;
+    br_uint_16* src;
+    br_uint_32 v;
+    int x;
+    int y;
+
+    new_pixels = BrResAllocate(pMap, pMap->width * pMap->height * sizeof(br_uint_32), BR_MEMORY_PIXELS);
+    row = pMap->pixels;
+    dst = new_pixels;
+    for (y = 0; y < pMap->height; y++, row += pMap->row_bytes / 2) {
+        src = row;
+        for (x = 0; x < pMap->width; x++, src++, dst++) {
+            v = *src;
+            *dst = (((((((v & 0xf000) << 4) + (v & 0x0f00)) << 4) + (v & 0x00f0)) << 4) + (v & 0x000f)) << 4;
+        }
+    }
+    BrResFree(pMap->pixels);
+    pMap->pixels = new_pixels;
+    pMap->row_bytes = pMap->width * sizeof(br_uint_32);
+    pMap->type = BR_PMT_RGBA_8888;
+}
+
 // FUNCTION: CARMA2_HW 0x005193f0
 // FUNCTION: CARMA2_SW 0x00512ed0
 void C2_HOOK_FASTCALL EnsurePixelmapAllowed(br_pixelmap* pMap, undefined4 pArg2) {
 
+}
+
+// FUNCTION: CARMA2_HW 0x00519400
+// FUNCTION: CARMA2_SW 0x00512ee0
+void C2_HOOK_FASTCALL ConvertRGBA5x5ToRGBA1555Map(br_pixelmap* pMap) {
+    br_uint_16* row;
+    br_uint_16* pixel;
+    int x;
+    int y;
+
+    switch (pMap->type) {
+    case BR_PMT_RGB_555:
+    case BR_PMT_ARGB_1555:
+        break;
+    case BR_PMT_RGB_565:
+        ConvertPixelmapType16(pMap, BR_PMT_RGB_555);
+        break;
+    default:
+        return;
+    }
+    row = pMap->pixels;
+    for (y = 0; y < pMap->height; y++, row += pMap->row_bytes / 2) {
+        pixel = row;
+        for (x = 0; x < pMap->width; x++, pixel++) {
+            *pixel = (((*pixel & 0x7fff) != 0) << 15) | (*pixel & 0x7fff);
+        }
+    }
+    pMap->type = BR_PMT_ARGB_1555;
 }
 
