@@ -345,6 +345,8 @@ extern void C2_HOOK_FASTCALL MutatePed(tPed_character_instance* pCharacter, void
 
 extern void C2_HOOK_FASTCALL FlushAllPedCaches(void);
 
+extern void C2_HOOK_FASTCALL FUN_004d6cc0(void);
+
 extern void C2_HOOK_FASTCALL SavePedStuff(void);
 
 extern void C2_HOOK_FASTCALL ComparePedStuff(void);

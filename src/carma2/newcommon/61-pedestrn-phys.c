@@ -59,6 +59,13 @@ int gExplosives_on = 1;
 // GLOBAL: CARMA2_CHEAT 0x00664e8c
 int gGoreLevel = 1;
 
+// GLOBAL: CARMA2_HW 0x0065e4d8
+// GLOBAL: CARMA2_SW 0x00658e10
+// GLOBAL: CARMA2_CHEAT 0x00665b90
+const tPed_anim_seq gScare_ped_anim_sequence = {
+    4, { 1, 2, 1, 99 },
+};
+
 // GLOBAL: CARMA2_HW 0x0065e4e4
 // GLOBAL: CARMA2_SW 0x00658e1c
 // GLOBAL: CARMA2_CHEAT 0x00665b9c
@@ -273,6 +280,9 @@ void C2_HOOK_FASTCALL PedApplyVanishDismembered(tPedestrian* pPedestrian, tU32 p
 
 // SetCharacterPositionAR
 
+// FUNCTION: CARMA2_HW 0x004cfa30
+// FUNCTION: CARMA2_SW 0x004cc130
+// FUNCTION: CARMA2_CHEAT 0x004d55c0
 inline void C2_HOOK_FASTCALL SetCharacterBoneModelAR(tPed_character_instance* pCharacter, int pBone_index, int pModel_index, int pModel_set) {
 
     if (pCharacter->field_0x4 >= 0) {
@@ -1945,6 +1955,16 @@ void C2_HOOK_FASTCALL FlushAllPedCaches(void) {
             ped->field_0x0c->field_0xb0 = NULL;
         }
     }
+}
+
+// FUNCTION: CARMA2_HW 0x004d6cc0
+// FUNCTION: CARMA2_SW 0x004d32c0
+// FUNCTION: CARMA2_CHEAT 0x004dc880
+void C2_HOOK_FASTCALL FUN_004d6cc0(void) {
+    tU32 the_time;
+
+    the_time = GetTotalTime();
+    SetPedHeadAnim(&gPedestrian_array[gSelected_ped], &gScare_ped_anim_sequence, the_time);
 }
 
 // FUNCTION: CARMA2_HW 0x004d6d90

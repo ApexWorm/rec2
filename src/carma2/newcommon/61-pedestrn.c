@@ -534,6 +534,9 @@ void C2_HOOK_FASTCALL ScaleModel(br_model* pModel, float pScale) {
     ScaleModelXYZ(pModel, pScale, pScale, pScale);
 }
 
+// FUNCTION: CARMA2_HW 0x00404350
+// FUNCTION: CARMA2_SW 0x00404350
+// FUNCTION: CARMA2_CHEAT 0x00404350
 inline void C2_HOOK_FASTCALL DisposeMove(tPed_move* pMove) {
     int i;
 
@@ -550,6 +553,9 @@ inline void C2_HOOK_FASTCALL DisposeMove(tPed_move* pMove) {
     }
 }
 
+// FUNCTION: CARMA2_HW 0x004043a0
+// FUNCTION: CARMA2_SW 0x004043a0
+// FUNCTION: CARMA2_CHEAT 0x004043a0
 inline void C2_HOOK_FASTCALL DisposeAllLoadedMoves(void) {
     int i;
 
@@ -705,6 +711,9 @@ void C2_HOOK_FASTCALL DisposeCharacterForm(tPed_form* pForm) {
 #pragma inline_depth()
 #endif
 
+// FUNCTION: CARMA2_HW 0x00406a00
+// FUNCTION: CARMA2_SW 0x00406a00
+// FUNCTION: CARMA2_CHEAT 0x00406a00
 inline void C2_HOOK_FASTCALL DisposeAllLoadedForms(void) {
     int i;
 
