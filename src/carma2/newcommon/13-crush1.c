@@ -2064,11 +2064,6 @@ intptr_t C2_HOOK_CDECL MakeCarModelsMaterialsSingleSided(br_actor* pActor, void*
 
 // IsOnNonCarHalf
 
-typedef struct {
-    br_vector3 normal;
-    br_scalar d;
-} tSplit_info;
-
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
 #endif
@@ -2076,7 +2071,7 @@ typedef struct {
 // STUB: CARMA2_HW 0x0042e2e0
 // STUB: CARMA2_SW 0x0042e350
 // STUB: CARMA2_CHEAT 0x0042e480
-void C2_HOOK_FASTCALL SplitCar(tCar_spec* pCar, tSplit_info* pSplit_info, int pArg3) {
+void C2_HOOK_FASTCALL SplitCar(tCar_spec* pCar, const tSplit_info* pSplit_info, int pArg3) {
     NOT_IMPLEMENTED();
 }
 
