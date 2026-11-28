@@ -1744,11 +1744,11 @@ void C2_HOOK_FASTCALL RenderElectroBastardRays(br_pixelmap* pRender_screen, br_p
     br_model* car_model;
     br_scalar distance;
     br_scalar t;
-#ifndef REC2_SW
+#ifdef REC2_HW
     int model_updated;
 #endif
 
-#ifndef REC2_SW
+#ifdef REC2_HW
     model_updated = 0;
 #endif
     the_time = GetTotalTime();
@@ -1761,7 +1761,7 @@ void C2_HOOK_FASTCALL RenderElectroBastardRays(br_pixelmap* pRender_screen, br_p
             gProximity_rays[i].start_time = 0;
             continue;
         }
-#ifndef REC2_SW
+#ifdef REC2_HW
         if (gNo_2d_effects && !model_updated) {
             BrActorRemove(gLine_actor);
             BrActorAdd(gCamera, gLine_actor);
@@ -1803,7 +1803,7 @@ void C2_HOOK_FASTCALL RenderElectroBastardRays(br_pixelmap* pRender_screen, br_p
         DrawLine3D(&ped_pos_cam, &from_pos, pRender_screen, pDepth_buffer, gProx_ray_shade_table);
     }
     AREndPipingSession();
-#ifndef REC2_SW
+#ifdef REC2_HW
     if (gNo_2d_effects && model_updated) {
         BrActorRemove(gLine_actor);
         BrActorAdd(gDont_render_actor, gLine_actor);
