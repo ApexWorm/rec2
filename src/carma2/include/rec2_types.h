@@ -4779,6 +4779,15 @@ typedef struct {
     undefined4 field_0x8;
 } tCrush_info_buffer;
 
+/* FIXME: name and layout are guesses. */
+typedef struct tForce_group {
+    int count;
+    tPhysics_joint_force* forces;
+    undefined field_0x8[12];
+    br_scalar* orthogonal;
+    br_scalar* matrix;
+} tForce_group;
+
 typedef struct {
     int count;
     br_vector3 vectors[4];

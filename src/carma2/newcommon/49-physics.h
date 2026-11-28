@@ -28,10 +28,11 @@ extern int gPHIL_collision_group;
 extern int gINT_006940a4;
 extern tPhysics_object** gReduced_object_list;
 extern int gINT_006940ac;
+extern int gINT_006940b8;
 
 extern tPhysicsError_cbfn* gPhysics_error_cb;
-extern void* gPhysics_buffer1_ptr;
-extern void* gPhysics_buffer2_ptr;
+extern br_scalar* gPhysics_buffer1_ptr;
+extern br_scalar* gPhysics_buffer2_ptr;
 extern int gImmortal_peds;
 extern int gTotal_count_smash_peds;
 extern int gBOOL_00744804;
@@ -345,13 +346,13 @@ extern void C2_HOOK_FASTCALL SwapPair(tPhysics_object* pObject_1, tPhysics_objec
 
 extern void C2_HOOK_FASTCALL CheckObjectsPostionInList(tPhysics_object* pObject, tPhysics_object** pList);
 
-// TestForWrongAnswer
+extern int C2_HOOK_FASTCALL TestForWrongAnswer(const br_scalar* pOriginal, const br_scalar* pRhs, const br_scalar* pResult, int pSize);
 
-// RQIterativeImprovement
+extern void C2_HOOK_FASTCALL RQIterativeImprovement(br_scalar* pForces, const br_scalar* pMatrix, const br_scalar* pOrthogonal, const br_scalar* pRhs, const br_scalar* pOriginal, const tU8* pIndices, int pSize);
 
-// RQExpand
+extern void C2_HOOK_FASTCALL RQExpand(br_scalar* pMatrix, const br_scalar* pOriginal, int pOld_size, int pSize, br_scalar* pOrthogonal, const tU8* pIndices);
 
-// RQSingleExpand
+extern void C2_HOOK_FASTCALL RQSingleExpand(br_scalar* pMatrix, const br_scalar* pOriginal, int pSize, br_scalar* pOrthogonal, const tU8* pIndices);
 
 extern int C2_HOOK_FASTCALL RQDcmpV(br_scalar* pMatrix, int pDim, br_scalar* pQ);
 
@@ -359,19 +360,19 @@ extern int C2_HOOK_FASTCALL RQDcmpV(br_scalar* pMatrix, int pDim, br_scalar* pQ)
 
 // SparseRQDcmpV
 
-// MakeMatrixFromIndices
+extern void C2_HOOK_FASTCALL MakeMatrixFromIndices(br_scalar* pMatrix, br_scalar* pOrthogonal, const br_scalar* pOriginal, br_scalar* pResult, const br_scalar* pRhs, const tU8* pIndices, int pSize, tForce_group** pGroups, int pCount_groups);
 
-// HasBeenDoneBefore
+extern int C2_HOOK_FASTCALL HasBeenDoneBefore(tU32 pHistory[][2], int pCount, int pToggle);
 
-// RemoveRQSingularities
+extern int C2_HOOK_FASTCALL RemoveRQSingularities(int pLast, const br_scalar* pMatrix, const br_scalar* pOrthogonal, const br_scalar* pRhs, const br_scalar* pForward, int pFirst, tU32 pHistory[][2], int pCount, const tU8* pIndices);
 
-// AddToMatrix
+extern void C2_HOOK_FASTCALL AddToMatrix(tU8 pIndex, br_scalar* pMatrix, const br_scalar* pOriginal, br_scalar* pResult, const br_scalar* pRhs, br_scalar* pOrthogonal, tU8* pIndices, int* pSize);
 
-// RQRemovedOneTooManyForces
+extern int C2_HOOK_FASTCALL RQRemovedOneTooManyForces(int* pCount_excluded, tU8* pExcluded, int pSize, const br_scalar* pResult, const br_scalar* pRhs, const br_scalar* pOriginal, tU32 pHistory[][2], int pCount, int pFirst);
 
-// GetInverseM
+extern void C2_HOOK_FASTCALL GetInverseM(const br_scalar* pMatrix, const br_scalar* pOrthogonal, br_scalar* pResult, int pSize, int pFirst);
 
-// RQMatrixSolveNoNegatives
+extern int C2_HOOK_FASTCALL RQMatrixSolveNoNegatives(const br_scalar* pOriginal, br_scalar* pRhs, br_scalar* pResult, int pSize, int pRow_size, tU8* pExcluded, int* pCount_excluded, int pFirst, int pUnused, tForce_group** pGroups, int pCount_groups);
 
 extern void C2_HOOK_FASTCALL RQMatrixSolveWithNegatives(br_scalar* pR, br_scalar* pQ, br_scalar* pB, br_scalar* pX, int pCount);
 
