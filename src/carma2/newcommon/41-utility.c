@@ -1892,10 +1892,10 @@ tU8* C2_HOOK_FASTCALL CompressPixels(br_pixelmap* pSrc) {
                 count++;
                 x++;
             }
-            if (!black) {
-                line[line_size - 2 * count - 1] = -2 * count;
-            } else {
+            if (black) {
                 line_ptr[-1] = 2 * count;
+            } else {
+                line[line_size - 2 * count - 1] = -2 * count;
             }
             black = pixel == 0;
             count = 0;
