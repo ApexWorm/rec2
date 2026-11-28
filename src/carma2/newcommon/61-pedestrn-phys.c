@@ -184,10 +184,10 @@ void C2_HOOK_FASTCALL RecachePedestrian(tPedestrian* pPed, br_vector3* pPos, tU3
     bounds_mat.m[3][1] = mat->m[3][1];
     bounds_mat.m[3][2] = mat->m[3][2];
     bounds.mat = &bounds_mat;
-    bounds.original_bounds.min.v[0] = -.43478259f;
+    bounds.original_bounds.min.v[0] = -0.43478259f;
     bounds.original_bounds.min.v[1] = -.36231884057971014 - pPed->character->personality->jump_height;
-    bounds.original_bounds.min.v[2] = -.28985506f;
-    bounds.original_bounds.max.v[0] = .43478259f;
+    bounds.original_bounds.min.v[2] = -0.28985506f;
+    bounds.original_bounds.max.v[0] = 0.43478259f;
     bounds.original_bounds.max.v[1] = pPed->character->personality->jump_height - -.36231884057971014;
     bounds.original_bounds.max.v[2] = 1.4492754f;
     FillInBounds(&bounds);
@@ -262,7 +262,7 @@ void C2_HOOK_FASTCALL SetCharacterDirectionAR(tPed_character_instance* pPed, con
         PipeSinglePedDir(((tS16)pPed->ped->field_0x06 << 16) | (pPed->ped - gPedestrian_array), pDir);
     }
     SetCharacterDirection(pPed, pDir, pUp);
-    if (gProgram_state.racing && OrientationChanged(&object->transform_matrix, &object->actor->t.t.mat, .7f)) {
+    if (gProgram_state.racing && OrientationChanged(&object->transform_matrix, &object->actor->t.t.mat, 0.7f)) {
         AssertRootObjectsMatrix(pPed);
     }
 }
