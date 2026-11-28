@@ -149,7 +149,6 @@ void C2_HOOK_FASTCALL SmoothlySetCarMaterialFlags(tBrender_storage* pStorage, tC
 // FUNCTION: CARMA2_HW 0x004f6820
 // FUNCTION: CARMA2_SW 0x004f23d0
 // FUNCTION: CARMA2_CHEAT 0x004fc4c0
-// STUB: CARMA2_SW 0x004f23d0
 void C2_HOOK_FASTCALL SmoothlySetWorldMaterialFlags(tBrender_storage* pStorage) {
 #ifdef REC2_HW
     int i;
@@ -160,7 +159,38 @@ void C2_HOOK_FASTCALL SmoothlySetWorldMaterialFlags(tBrender_storage* pStorage) 
     }
 #endif
 #ifdef REC2_SW
-    NOT_IMPLEMENTED();
+    int i;
+    br_material* material;
+    int need_update;
+
+    for (i = 0; i < pStorage->materials_count; i++) {
+        material = pStorage->materials[i];
+        PossibleService();
+        need_update = 0;
+        if (material->flags & (BR_MATF_LIGHT | BR_MATF_PRELIT | BR_MATF_SMOOTH)) {
+            material->flags &= ~(BR_MATF_LIGHT | BR_MATF_PRELIT | BR_MATF_SMOOTH);
+            material->flags |= BR_MATF_PERSPECTIVE;
+            need_update = 1;
+        }
+        if (material != NULL && material->identifier != NULL && material->identifier[1] == '\\') {
+            switch (material->identifier[2]) {
+            case '2':
+                BlendifyMaterial(material, 25);
+                break;
+            case '7':
+                BlendifyMaterial(material, 75);
+                break;
+            default:
+                BlendifyMaterial(material, 50);
+                break;
+            }
+            material->flags |= BR_MATF_TWO_SIDED;
+            need_update = 1;
+        }
+        if (need_update) {
+            BrMaterialUpdate(material, BR_MATU_ALL);
+        }
+    }
 #endif
 }
 
