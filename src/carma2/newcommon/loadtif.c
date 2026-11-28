@@ -308,53 +308,40 @@ int C2_HOOK_FASTCALL LoadTiffTextureCB(const char* pPath, void* pContext) {
 
     data = pContext;
     length = strlen(pPath) - 4;
-    if (length <= 0) {
-        return 0;
-    }
-    if (PDstricmp(&pPath[length], ".TIF") != 0) {
-        return 0;
-    }
-    sprintf(texture_name, "%.*s", length, pPath);
-    if (!data->isTiffx) {
-        for (result = data->results; result != NULL; result = result->next) {
-            if (PDstricmp(texture_name, result->name) == 0) {
-                break;
+    if (length > 0 && PDstricmp(&pPath[length], ".TIF") == 0) {
+        sprintf(texture_name, "%.*s", length, pPath);
+        result = NULL;
+        if (!data->isTiffx) {
+            for (result = data->results; result != NULL; result = result->next) {
+                if (PDstricmp(texture_name, result->name) == 0) {
+                    break;
+                }
             }
         }
-        if (result != NULL) {
-            return 0;
+        if (result == NULL) {
+            texture = LoadTiffTexture_Ex(data->directory, texture_name, data->pPalette, data->loadFlags, data->errorCode);
+            if (texture != NULL) {
+                BrPixelmapFree(texture);
+            }
+            if (*data->errorCode != 0) {
+                return *data->errorCode;
+            }
         }
-    }
-    if ((!(data->loadFlags & kLoadTextureFlags_16bbp)
-            && (texture = LoadTiffTexture_Ex2(data->directory, texture_name, data->pPalette, data->loadFlags, data->errorCode, 1)) != NULL)
-        || (texture = LoadTiffTexture_Ex2(data->directory, texture_name, data->pPalette, data->loadFlags, data->errorCode, 0)) != NULL) {
-        texture->identifier = BrResStrDup(texture, texture_name);
-        if (texture->identifier == NULL) {
-            BrPixelmapFree(texture);
+        if (data->isTiffx) {
+            result = BrMemAllocate(sizeof(tLoadDirectoryStructureCBResult), BR_MEMORY_APPLICATION);
+            if (result != NULL) {
+                result->name = BrMemStrDup(texture_name);
+                if (result->name != NULL) {
+                    result->next = data->results;
+                    data->results = result;
+                    return 0;
+                }
+            }
             *data->errorCode = 2;
-            texture = NULL;
-        }
-        if (texture != NULL) {
-            BrPixelmapFree(texture);
+            return 2;
         }
     }
-    if (*data->errorCode != 0) {
-        return *data->errorCode;
-    }
-    if (!data->isTiffx) {
-        return 0;
-    }
-    result = BrMemAllocate(sizeof(tLoadDirectoryStructureCBResult), BR_MEMORY_APPLICATION);
-    if (result != NULL) {
-        result->name = BrMemStrDup(texture_name);
-        if (result->name != NULL) {
-            result->next = data->results;
-            data->results = result;
-            return 0;
-        }
-    }
-    *data->errorCode = 2;
-    return 2;
+    return 0;
 }
 
 // FUNCTION: CARMA2_HW 0x004869e0
