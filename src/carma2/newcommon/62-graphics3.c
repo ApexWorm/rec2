@@ -9,9 +9,11 @@
 #include "62-graphics3.h"
 
 #include "01-network.h"
+#include "02-init.h"
 #include "08-loading1.h"
 #include "10-loading2.h"
 #include "15-displays.h"
+#include "16-graphics1.h"
 #include "18-graphics2.h"
 #include "18b-graphics2.h"
 #include "19-font.h"
@@ -24,6 +26,7 @@
 #include "49-physics.h"
 #include "52-errors.h"
 #include "53-controls.h"
+#include "58-crush2.h"
 #include "61-pedestrn-phys.h"
 #include "63-loading3.h"
 #include "70-packfile.h"
@@ -34,6 +37,7 @@
 
 #include <limits.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 // GLOBAL: CARMA2_HW 0x006593a0
@@ -64,6 +68,11 @@ const int gArrows[2][4][60] = {
 // GLOBAL: CARMA2_SW 0x00654508
 // GLOBAL: CARMA2_CHEAT 0x00660438
 tOpponent_Status gPrevious_opponent_status = eOpponent_status_Uninitialized;
+
+// GLOBAL: CARMA2_HW 0x00659b24
+// GLOBAL: CARMA2_SW 0x0065450c
+// GLOBAL: CARMA2_CHEAT 0x0066043c
+int gPrevious_opponent_message_index = -1;
 
 // GLOBAL: CARMA2_HW 0x00655df0
 // GLOBAL: CARMA2_SW 0x00650cd8
@@ -391,6 +400,7 @@ tSmashable_race_target gSmashable_race_targets[300];
 
 #ifdef REC2_HW
 // GLOBAL: CARMA2_HW 0x0068d8c0
+// GLOBAL: CARMA2_CHEAT 0x00695160
 br_actor* gLit_op_stat_actor;
 #endif
 
@@ -1221,18 +1231,186 @@ inline void C2_HOOK_FASTCALL DoDirectionFinderStuff(br_pixelmap* pMap) {
     }
 }
 
-// MungeMoodMessage
+inline void C2_HOOK_FASTCALL MungeMoodMessage(char* pDest, const char* pSrc, int pIs_girl) {
+    char* pos;
+    const char* word;
+    char rest[256];
+
+    strcpy(pDest, pSrc);
+    while ((pos = strchr(pDest, '%')) != NULL) {
+        strcpy(rest, pos + 1);
+        if (!pIs_girl) {
+            word = GetMiscString(eMiscString_he);
+        } else {
+            word = GetMiscString(eMiscString_she);
+        }
+        strcpy(pos, word);
+        strcat(pDest, rest);
+    }
+    while ((pos = strchr(pDest, '&')) != NULL) {
+        strcpy(rest, pos + 1);
+        if (!pIs_girl) {
+            word = GetMiscString(eMiscString_him);
+        } else {
+            word = GetMiscString(eMiscString_her);
+        }
+        strcpy(pos, word);
+        strcat(pDest, rest);
+    }
+}
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x00494900
+#ifdef REC2_HW
+// FUNCTION: CARMA2_HW 0x00494900
+// FUNCTION: CARMA2_CHEAT 0x00494b30
+void C2_HOOK_FASTCALL DoOpponentStatusHeadup(void) {
+    // GLOBAL: CARMA2_HW 0x0068d900
+    // GLOBAL: CARMA2_CHEAT 0x006951a0
+    static tU32 last_label_flash;
+    // GLOBAL: CARMA2_HW 0x0068d904
+    // GLOBAL: CARMA2_CHEAT 0x006951a4
+    static tU32 last_lock_flash;
+    // GLOBAL: CARMA2_HW 0x0068d908
+    // GLOBAL: CARMA2_CHEAT 0x006951a8
+    static int label_flash_state;
+    // GLOBAL: CARMA2_HW 0x0068d90c
+    // GLOBAL: CARMA2_CHEAT 0x006951ac
+    static int lock_flash_state;
+    char s[256];
+    int percentage;
+    int message_index;
+    int colour;
+    const char* label;
+    br_model* model;
+    tOpponent_Status mood;
+
+    if (gLit_op_stat_bloc == NULL) {
+        gLit_op_stat_bloc = LoadPixelmap("litopstat.tif");
+    }
+    BRPM_convert(gLit_op_stat_bloc, gBack_screen->type);
+    Flash(250, &last_label_flash, &label_flash_state);
+    if (gTarget_lock_enabled && Flash(500, &last_lock_flash, &lock_flash_state)) {
+        DRPixelmapText(gBack_screen,
+            gCurrent_graf_data->field_0x4d8,
+            gCurrent_graf_data->field_0x4dc,
+            &gFonts[23],
+            GetMiscString(eMiscString_oppobar_target_locked),
+            gBack_screen->width);
+    } else {
+        if (gTarget_lock_car_2 == NULL || gTarget_lock_car_2->driver == eDriver_oppo) {
+            label = GetMiscString(eMiscString_oppobar_opponent);
+        } else {
+            label = GetMiscString(eMiscString_oppobar_player);
+        }
+        DRPixelmapText(gBack_screen,
+            gCurrent_graf_data->field_0x4d8,
+            gCurrent_graf_data->field_0x4dc,
+            &gFonts[23],
+            label,
+            gBack_screen->width);
+    }
+    DRPixelmapText(gBack_screen,
+        gCurrent_graf_data->field_0x4e0,
+        gCurrent_graf_data->field_0x4e4,
+        &gFonts[23],
+        GetMiscString(eMiscString_oppobar_condition),
+        gBack_screen->width);
+    if (gNet_mode == eNet_mode_none) {
+        DRPixelmapText(gBack_screen,
+            gCurrent_graf_data->field_0x4e8,
+            gCurrent_graf_data->field_0x4ec,
+            &gFonts[23],
+            GetMiscString(eMiscString_oppobar_status),
+            gBack_screen->width);
+    }
+    if (gTarget_lock_car_2 == NULL) {
+        return;
+    }
+    if (gNet_mode != eNet_mode_none) {
+        strcpy(s, NetPlayerFromCar(gTarget_lock_car_2)->player_name);
+    } else {
+        strcpy(s, GetDriverName((tU16)gTarget_lock_car_2->car_ID >> 8, (tU16)gTarget_lock_car_2->car_ID & 0xff));
+    }
+    DRPixelmapText(gBack_screen,
+        gCurrent_graf_data->field_0x4f0,
+        gCurrent_graf_data->field_0x4f4,
+        &gFonts[23],
+        s,
+        gBack_screen->width);
+    BrMatrix34Translate(&gCar_icons_model_actor->t.t.mat,
+        (br_scalar)gCurrent_graf_data->field_0x4f8,
+        (br_scalar)-gCurrent_graf_data->field_0x4fc,
+        0.0f);
+    gCar_icons_model_actor->material->colour_map = gTexture_maps[gCar_icons[gTarget_lock_car_2->index].index];
+    BrMaterialUpdate(gCar_icons_model_actor->material, BR_MATU_COLOURMAP);
+    gCar_icons_model_actor->model = gCar_icons[gTarget_lock_car_2->index].model;
+    RenderThisHeadup(gCar_icons_model_actor);
+    if (gTarget_lock_car_2 == NULL) {
+        return;
+    }
+    percentage = PercentageCarHealth(gTarget_lock_car_2);
+    sprintf(s, "%d%%", percentage);
+    DRPixelmapText(gBack_screen,
+        gCurrent_graf_data->field_0x500,
+        gCurrent_graf_data->field_0x504,
+        &gFonts[23],
+        s,
+        gBack_screen->width);
+    div(percentage, 10);
+    if (gLit_op_stat_actor == NULL) {
+        AllocateOppoBarActor(gCurrent_graf_data->field_0x508, gCurrent_graf_data->field_0x50c + 2);
+    }
+    if (percentage > 0) {
+        if (percentage > 100) {
+            percentage = 100;
+        }
+        model = gLit_op_stat_actor->model;
+        model->vertices[1].p.v[0] = model->vertices[0].p.v[0] + percentage;
+        model->vertices[3].p.v[0] = model->vertices[2].p.v[0] + percentage;
+        colour = percentage * 255 / 100;
+        model->vertices[1].red = 255 - colour;
+        model->vertices[1].grn = colour;
+        model->vertices[1].blu = 0;
+        model->vertices[3].red = 255 - colour;
+        model->vertices[3].grn = colour;
+        model->vertices[3].blu = 0;
+        BrModelUpdate(model, BR_MODU_VERTICES);
+        RenderThisHeadup(gLit_op_stat_actor);
+    }
+    if (gTarget_lock_car_2 == NULL || gTarget_lock_car_2->driver != eDriver_oppo) {
+        return;
+    }
+    mood = GetOpponentMood(gTarget_lock_car_2);
+    if (gTarget_lock_car_1 == gTarget_lock_car_2 && gPrevious_opponent_status == mood) {
+        message_index = gPrevious_opponent_message_index;
+    } else {
+        message_index = IRandomBetween(0, gOppo_status_messages[mood].count - 1);
+    }
+    if ((mood == eOpponent_status_Wasted && gTarget_lock_car_1 != gTarget_lock_car_2) || gPrevious_opponent_status != mood) {
+        gTime_oppobar_target_wasted = PDGetTotalTime();
+    }
+    gPrevious_opponent_message_index = message_index;
+    gPrevious_opponent_status = mood;
+    gTarget_lock_car_1 = gTarget_lock_car_2;
+    if ((mood != eOpponent_status_Wasted || label_flash_state) && gNet_mode == eNet_mode_none) {
+        MungeMoodMessage(s, gOppo_status_messages[mood].messages[message_index], gTarget_lock_car_2->is_girl);
+        DRPixelmapText(gBack_screen,
+            gCurrent_graf_data->field_0x510,
+            gCurrent_graf_data->field_0x514,
+            &gFonts[23],
+            s,
+            gBack_screen->width);
+    }
+}
+#else
 // STUB: CARMA2_SW 0x00493520
-// STUB: CARMA2_CHEAT 0x00494b30
 void C2_HOOK_FASTCALL DoOpponentStatusHeadup(void) {
     NOT_IMPLEMENTED();
 }
+#endif
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(on)
@@ -1240,6 +1418,7 @@ void C2_HOOK_FASTCALL DoOpponentStatusHeadup(void) {
 
 #ifdef REC2_HW
 // FUNCTION: CARMA2_HW 0x00494f40
+// FUNCTION: CARMA2_CHEAT 0x00495170
 void C2_HOOK_FASTCALL AllocateOppoBarActor(int pX, int pY) {
     br_material* material;
     br_model* model;

@@ -15,6 +15,7 @@
 extern const int gArrows[2][4][60];
 extern br_vector3 y_unit_vector;
 extern int gMini_map_visible;
+extern int gPrevious_opponent_message_index;
 extern int gCount_smashable_race_targets;
 extern tSmashable_race_target gSmashable_race_targets[300];
 extern tCar_icon gCar_icons[128];
@@ -87,7 +88,7 @@ extern void C2_HOOK_FASTCALL CheckpointLine(br_pixelmap* pMap, int pCheckpoint, 
 
 extern void C2_HOOK_FASTCALL DoDirectionFinderStuff(br_pixelmap* pMap);
 
-// MungeMoodMessage
+extern void C2_HOOK_FASTCALL MungeMoodMessage(char* pDest, const char* pSrc, int pIs_girl);
 
 extern void C2_HOOK_FASTCALL DoOpponentStatusHeadup(void);
 
