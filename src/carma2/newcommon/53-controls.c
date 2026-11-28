@@ -1055,12 +1055,12 @@ void C2_HOOK_FASTCALL CheckOtherRacingKeys(void) {
     CheckMapRenderMove();
     CheckHorns();
     CheckForBeingOutOfThisWorld();
-    if (gPalette_fade_time == 0) {
+    if (gPalette_fade_time != 0) {
+        SortOutRecover(car);
+    } else {
         if (gNet_mode != eNet_mode_none && NetGetPlayerStatus() == ePlayer_status_recovering) {
             NetPlayerStatusChanged(ePlayer_status_racing);
         }
-    } else {
-        SortOutRecover(car);
     }
     if ((gAuto_repair || KeyIsDown(45))
         && !gRace_finished
