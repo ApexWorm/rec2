@@ -15,6 +15,7 @@
 #include "platform.h"
 #include "rec2_macros.h"
 
+#include "c2_stdio.h"
 #include "c2_string.h"
 
 #define NBR_ROLLING_LETTERS 500
@@ -572,6 +573,25 @@ void C2_HOOK_FASTCALL WaitForNoKeys(void) {
     CheckQuit();
 }
 
+// FUNCTION: CARMA2_HW 0x004835d0
+// FUNCTION: CARMA2_SW 0x00480710
+// FUNCTION: CARMA2_CHEAT 0x004838f0
+void C2_HOOK_FASTCALL WaitForAKey(void) {
+
+    do {
+        CheckQuit();
+    } while (!AnyKeyDown() && !EitherMouseButtonDown());
+    WaitForNoKeys();
+}
+
+// FUNCTION: CARMA2_HW 0x00483970
+// FUNCTION: CARMA2_SW 0x00480ab0
+// FUNCTION: CARMA2_CHEAT 0x00483c90
+int C2_HOOK_FASTCALL Key1Or2AreDown(int pKey_index1, int pKey_index2) {
+
+    return KeyIsDown(pKey_index1) || KeyIsDown(pKey_index2);
+}
+
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
 #endif
@@ -673,12 +693,69 @@ void C2_HOOK_FASTCALL AddRollingString(char* pStr, int pX, int pY, tRolling_type
     }
 }
 
+// FUNCTION: CARMA2_HW 0x00483e20
+// FUNCTION: CARMA2_SW 0x00480f60
+// FUNCTION: CARMA2_CHEAT 0x00484140
+void C2_HOOK_FASTCALL AddRollingNumber(tU32 pNumber, int pWidth, int pX, int pY) {
+    char the_string[32];
+
+    sprintf(the_string, "%0.*d", pWidth, pNumber);
+    AddRollingString(the_string, pX, pY, eRT_numeric);
+}
+
 #ifdef REC2_MATCHING
 // FUNCTION: CARMA2_HW 0x00483e90
 void C2_HOOK_FASTCALL FUN_00483e90(void) {
     /* Unused */
 }
 #endif
+
+// FUNCTION: CARMA2_HW 0x00483ea0
+// FUNCTION: CARMA2_SW 0x00480fe0
+// FUNCTION: CARMA2_CHEAT 0x004841c0
+void C2_HOOK_FASTCALL ChangeTextTo(int pXcoord, int pYcoord, char* pNew_str, char* pOld_str) {
+    int x_coord;
+    int i;
+    int len;
+    int len2;
+    int j;
+    tRolling_letter* let;
+    tRolling_type new_type;
+    char new_char;
+
+    len = strlen(pOld_str);
+    len2 = strlen(pNew_str);
+    for (i = 0; i < len; i++) {
+        x_coord = gCurrent_graf_data->rolling_letter_x_pitch * i + pXcoord;
+        if (i < len2) {
+            new_char = pNew_str[i];
+        } else {
+            new_char = ' ';
+        }
+        if (new_char == ROLLING_LETTER_LOOP_RANDOM) {
+            new_type = eRT_looping_random;
+        } else if (new_char >= '0' && new_char <= '9') {
+            new_type = eRT_numeric;
+        } else {
+            new_type = eRT_alpha;
+        }
+        for (let = gRolling_letters, j = 0; j < NBR_ROLLING_LETTERS; j++, let++) {
+            if (let->number_of_letters >= 0 && let->x_coord == x_coord && let->y_coord == pYcoord) {
+                if (new_char != ROLLING_LETTER_LOOP_RANDOM) {
+                    let->letters[0] = (tS8)new_char;
+                }
+                if (new_char == ' ') {
+                    let->letters[0] = ' ';
+                }
+                let->current_offset = (float)(gCurrent_graf_data->save_slot_letter_height * let->number_of_letters);
+                let->rolling_type = new_type;
+            }
+        }
+    }
+    for (i = len; i < len2; i++) {
+        AddRollingLetter(pNew_str[i], gCurrent_graf_data->rolling_letter_x_pitch * i + pXcoord, pYcoord, new_type);
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x00483fd0
 void C2_HOOK_FASTCALL BlankSlot(int pIndex, int pName_length, int pVisible_length) {
