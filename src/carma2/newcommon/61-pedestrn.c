@@ -592,7 +592,26 @@ void C2_HOOK_FASTCALL DisposeAllLoadedRemaps(void) {
 
 // FindOrOpenRemap
 
-// Flip3DStoBRaxes
+inline void C2_HOOK_FASTCALL Flip3DStoBRaxes(br_matrix34* pMat) {
+    br_vector3 tv;
+    float f;
+
+    BrVector3Copy(&tv, (br_vector3*)pMat->m[1]);
+    BrVector3Copy((br_vector3*)pMat->m[1], (br_vector3*)pMat->m[2]);
+    BrVector3Negate((br_vector3*)pMat->m[2], &tv);
+    f = pMat->m[0][1];
+    pMat->m[0][1] = pMat->m[0][2];
+    pMat->m[0][2] = -1.0f * f;
+    f = pMat->m[1][1];
+    pMat->m[1][1] = pMat->m[1][2];
+    pMat->m[1][2] = -1.0f * f;
+    f = pMat->m[2][1];
+    pMat->m[2][1] = pMat->m[2][2];
+    pMat->m[2][2] = -1.0f * f;
+    f = pMat->m[3][1];
+    pMat->m[3][1] = pMat->m[3][2];
+    pMat->m[3][2] = -1.0f * f;
+}
 
 // FUNCTION: CARMA2_HW 0x004047b0
 // FUNCTION: CARMA2_SW 0x004047b0
@@ -608,11 +627,133 @@ tPed_move* C2_HOOK_FASTCALL FindOrOpenMove(const char* pName, tPed_form* pForm, 
     return ReadMove(pName, pForm, pLooping_reset_flags, pMovement_direction, pFlags);
 }
 
-// STUB: CARMA2_HW 0x00404840
-// STUB: CARMA2_SW 0x00404840
-// STUB: CARMA2_CHEAT 0x00404840
+// FUNCTION: CARMA2_HW 0x00404840
+// FUNCTION: CARMA2_SW 0x00404840
+// FUNCTION: CARMA2_CHEAT 0x00404840
 tPed_move* C2_HOOK_FASTCALL ReadMove(const char* pName, tPed_form* pForm, char* pLooping_reset_flags, br_vector3* pMovement_direction, tU32 pFlags) {
-    NOT_IMPLEMENTED();
+    FILE* f;
+    tPed_move* move;
+    int count_bones_in_anim_file;
+    int i;
+    int j;
+    int k;
+    int l;
+    tPed_move_frame* frame;
+    char bone_names[50][36];
+    br_matrix34 mat;
+    br_matrix34 mat_lp;
+    br_euler e;
+    br_vector3 rot_pos;
+    br_vector3 move_pos;
+
+    f = BonerOpenMoves(pName);
+    if (f == NULL) {
+        FatalError(kFatalError_BonerError_UnableToOpenFile_S, pName);
+    }
+    move = BrMemAllocate(sizeof(tPed_move), kBoner_mem_type_sequence);
+    if (move == NULL) {
+        FatalError(kFatalError_BonerError_UnableToAllocateMemory, 0);
+    }
+    count_bones_in_anim_file = ReadS32(f);
+    move->count_frames = ReadS32(f);
+    for (i = 0; i < count_bones_in_anim_file; i++) {
+        PFfread(bone_names[i], 1, 33, f);
+        j = ReadS32(f);
+        PFfseek(f, j * sizeof(tU32), SEEK_CUR);
+    }
+#ifdef REC2_FIX_BUGS
+    BrVector3Set(&rot_pos, 0.0f, 0.0f, 0.0f);
+#endif
+    BrVector3Set(&move_pos, 0.0f, 0.0f, 0.0f);
+    move->frames = BrMemAllocate(move->count_frames * sizeof(tPed_move_frame), kMem_boner_type_frames);
+    frame = move->frames;
+    for (i = 0; i < move->count_frames; i++, frame++) {
+        frame->axis = BrMemAllocate(pForm->count_bones * sizeof(tPed_move_frame_axis), kBoner_mem_type_frame_2);
+        for (j = 0; j < count_bones_in_anim_file; j++) {
+            for (k = 0; k < 4; k++) {
+                for (l = 0; l < 3; l++) {
+                    mat.m[k][l] = ReadF32(f);
+                }
+            }
+            for (k = 0; k < pForm->count_bones; k++) {
+                if (strcmp(bone_names[j], pForm->bones[k].name) == 0) {
+                    Flip3DStoBRaxes(&mat);
+                    BrMatrix34LPNormalise(&mat_lp, &mat);
+                    if (pForm->bones[k].indices[0] == -1) {
+                        memcpy(&frame->mat, &mat_lp, 3 * sizeof(mat_lp.m[0]));
+                        if (i != 0) {
+                            BrVector3Sub((br_vector3*)frame->mat.m[3], (br_vector3*)mat_lp.m[3], &rot_pos);
+                            BrVector3Accumulate(&move_pos, (br_vector3*)frame->mat.m[3]);
+                        }
+                        BrVector3Copy(&rot_pos, (br_vector3*)mat_lp.m[3]);
+                    }
+                    e.order = 0;
+                    BrMatrix34ToEuler(&e, &mat_lp);
+                    frame->axis[k].euler1 = e.a >> 8;
+                    frame->axis[k].euler2 = e.b >> 8;
+                    frame->axis[k].euler3 = e.c >> 8;
+                    break;
+                }
+            }
+        }
+    }
+    if (strchr(pLooping_reset_flags, 'X') != NULL) {
+        move->frames[0].mat.m[3][0] = -move_pos.v[0];
+        move_pos.v[0] = 0.0f;
+        move->looping_reset_flags |= 0x1;
+    } else if (move->count_frames > 1) {
+        move->frames[0].mat.m[3][0] = move->frames[1].mat.m[3][0];
+        move_pos.v[0] += move->frames[0].mat.m[3][0];
+    } else {
+        move->frames[0].mat.m[3][0] = 0.0f;
+    }
+    if (strchr(pLooping_reset_flags, 'Y') != NULL) {
+        move->frames[0].mat.m[3][1] = -move_pos.v[1];
+        move_pos.v[1] = 0.0f;
+        move->looping_reset_flags |= 0x2;
+    } else if (move->count_frames > 1) {
+        move->frames[0].mat.m[3][1] = move->frames[1].mat.m[3][1];
+        move_pos.v[1] += move->frames[0].mat.m[3][1];
+    } else {
+        move->frames[0].mat.m[3][1] = 0.0f;
+    }
+    if (strchr(pLooping_reset_flags, 'Z') != NULL) {
+        move->frames[0].mat.m[3][2] = -move_pos.v[2];
+        move_pos.v[2] = 0.0f;
+        move->looping_reset_flags |= 0x4;
+    } else if (move->count_frames > 1) {
+        move->frames[0].mat.m[3][2] = move->frames[1].mat.m[3][2];
+        move_pos.v[2] += move->frames[0].mat.m[3][2];
+    } else {
+        move->frames[0].mat.m[3][2] = 0.0f;
+    }
+    if (BrVector3LengthSquared(&move_pos) != 0.0f && !(move->looping_reset_flags & 0x1)) {
+        BrVector3Normalise(&move->field_0x34, &move_pos);
+        move->field_0x2a = 0;
+        if (BrVector3LengthSquared(pMovement_direction) == 0.0f) {
+            BrVector3Copy(&move->field_0x40, &move->field_0x34);
+        } else {
+            BrVector3Copy(&move->field_0x40, pMovement_direction);
+        }
+    } else {
+        move->field_0x2a = 1;
+        if (BrVector3LengthSquared(pMovement_direction) == 0.0f) {
+            BrVector3Set(&move->field_0x40, 0.0f, 0.0f, 1.0f);
+        } else {
+            BrVector3Copy(&move->field_0x40, pMovement_direction);
+        }
+        BrVector3Set(&move->field_0x34, 0.0f, 0.0f, 0.0f);
+    }
+    move->move_flags = pFlags;
+    PFfclose(f);
+    strcpy(move->name, pName);
+    for (i = 0; i < (int)REC2_ASIZE(gPed_moves); i++) {
+        if (gPed_moves[i] == NULL) {
+            gPed_moves[i] = move;
+            return move;
+        }
+    }
+    FatalError(kFatalError_BonerError_TooManyMovesLoaded, 0);
 }
 
 // RemapVector

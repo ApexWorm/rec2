@@ -108,7 +108,7 @@ extern void C2_HOOK_FASTCALL DisposeAllLoadedRemaps(void);
 
 // FindOrOpenRemap
 
-// Flip3DStoBRaxes
+extern void C2_HOOK_FASTCALL Flip3DStoBRaxes(br_matrix34* pMat);
 
 extern tPed_move* C2_HOOK_FASTCALL FindOrOpenMove(const char* pName, tPed_form* pForm, char* pLooping_reset_flags, br_vector3* pMovement_direction, tU32 pFlags);
 
