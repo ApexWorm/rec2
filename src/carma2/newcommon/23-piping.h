@@ -181,6 +181,10 @@ extern void C2_HOOK_FASTCALL AddSparkToPipingSession(int pSpark_index, const br_
 
 extern void C2_HOOK_FASTCALL AddShrapnelToPipingSession(int pShrapnel_index, const br_vector3* pPos, tU16 pAge, br_material* pMaterial);
 
+extern void C2_HOOK_FASTCALL AddScreenWobbleToPipingSession(int pWobble_x, int pWobble_y);
+
+extern void C2_HOOK_FASTCALL AddGrooveStopToPipingSession(int pGroove_index, br_matrix34* pMatrix, int pPath_interrupt, int pObject_interrupt, float pPath_resumption, float pObject_resumption);
+
 extern void C2_HOOK_FASTCALL AddNonCarToPipingSession(int pIndex, br_actor* pActor);
 
 extern void C2_HOOK_FASTCALL AddSmokeToPipingSession(int pIndex, tU8 pType, br_vector3* pPos, br_scalar pRadius, br_scalar pStrength);
@@ -192,6 +196,10 @@ extern void C2_HOOK_FASTCALL AddFlameToPipingSession(int pIndex, int pFrame, br_
 extern void C2_HOOK_FASTCALL AddSplashToPipingSession(tPhysics_object* pObject);
 
 extern void C2_HOOK_FASTCALL AddExtendedSplashToPipingSession(tPhysics_object* pObject, void* pSubject);
+
+extern void C2_HOOK_FASTCALL AddOilSpillToPipingSession(int pIndex, br_matrix34* pMat, br_scalar pFull_size, br_scalar pGrow_rate, tU32 pSpill_time, tU32 pStop_time, tCar_spec* pCar, br_vector3* pOriginal_pos, br_pixelmap* pPixelmap);
+
+extern void C2_HOOK_FASTCALL AddFrameFinishToPipingSession(void);
 
 extern void C2_HOOK_FASTCALL AddCarToPipingSession(int pCar_ID, br_matrix34* pCar_mat, br_vector3* pCar_velocity, float pSpeedo_speed, float pRevs, int pGear, int pFrame_coll_flag, int pField_0x18cc);
 
