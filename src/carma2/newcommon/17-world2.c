@@ -8,6 +8,7 @@
 
 #include "17-world2.h"
 
+#include "18-graphics2.h"
 #include "37-brucetrk.h"
 #include "41-utility.h"
 #include "42-input.h"
@@ -166,6 +167,40 @@ void C2_HOOK_FASTCALL CancelificateClipulatingPlaneyThings(void) {
 void C2_HOOK_FASTCALL FixificateClipulatingPlaneyThings(void) {
 
     // empty
+}
+
+// FUNCTION: CARMA2_HW 0x004e5f10
+// FUNCTION: CARMA2_SW 0x004e1f30
+// FUNCTION: CARMA2_CHEAT 0x004ebc20
+int C2_HOOK_FASTCALL GetBestMatchingRenderPaletteIndex(int pRed, int pGreen, int pBlue) {
+    br_colour colour;
+    br_colour* palette;
+    int i;
+    int best_index;
+    tU32 best_distance;
+    tU32 distance;
+    int delta_blue;
+    int delta_red;
+    int delta_green;
+
+    colour = BR_COLOUR_RGB(pRed, pGreen, pBlue);
+    palette = gRender_palette->pixels;
+    best_index = 1;
+    delta_blue = BR_BLU(colour) - BR_BLU(palette[1]);
+    delta_red = BR_RED(colour) - BR_RED(palette[1]);
+    delta_green = BR_GRN(colour) - BR_GRN(palette[1]);
+    best_distance = delta_blue * delta_blue + delta_red * delta_red + delta_green * delta_green;
+    for (i = 2; i < 256; i++) {
+        delta_blue = BR_BLU(colour) - BR_BLU(palette[i]);
+        delta_red = BR_RED(colour) - BR_RED(palette[i]);
+        delta_green = BR_GRN(colour) - BR_GRN(palette[i]);
+        distance = delta_blue * delta_blue + delta_red * delta_red + delta_green * delta_green;
+        if (distance < best_distance) {
+            best_distance = distance;
+            best_index = i;
+        }
+    }
+    return best_index;
 }
 
 void C2_HOOK_FASTCALL ProcessModelFaceMaterials(br_model* pModel, tPMFMCB* pCallback) {
