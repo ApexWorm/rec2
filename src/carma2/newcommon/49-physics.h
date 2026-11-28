@@ -186,7 +186,7 @@ extern void C2_HOOK_FASTCALL TellPhysicsJointsHaveChanged(tPhysics_object* pColl
 
 // GetWorldBoundingBoxForObjects
 
-// GetWorldBoundingBoxForObject
+extern void C2_HOOK_FASTCALL GetWorldBoundingBoxForObject(tPhysics_object* pObject, br_bounds* pBounds);
 
 // MatricesAreIdentical
 
@@ -194,7 +194,7 @@ extern void C2_HOOK_FASTCALL TellPhysicsJointsHaveChanged(tPhysics_object* pColl
 
 extern void C2_HOOK_FASTCALL PrepareObject(tPhysics_object* pObject, tPhysics_object** pList);
 
-// PrepareForCollisions
+extern void C2_HOOK_FASTCALL PrepareForCollisions(tPhysics_object* pObject);
 
 // CheckPointVelocities
 

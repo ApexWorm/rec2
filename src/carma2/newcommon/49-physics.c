@@ -687,8 +687,6 @@ void C2_HOOK_FASTCALL CombineBounds(br_bounds* pBounds, br_bounds* pOther) {
     }
 }
 
-extern void C2_HOOK_FASTCALL GetWorldBoundingBoxForObject(tPhysics_object* pObject, br_bounds* pBounds);
-
 void C2_HOOK_FASTCALL GetWorldBoundingBoxForObjects(tPhysics_object* pObject, br_bounds* pBounds) {
 
     for (; pObject != NULL; pObject = pObject->next) {
@@ -745,8 +743,6 @@ int C2_HOOK_FASTCALL MatricesAreIdentical(br_matrix34* pMat1, br_matrix34* pMat2
     }
     return 1;
 }
-
-extern void C2_HOOK_FASTCALL PrepareForCollisions(tPhysics_object* pObject);
 
 // FUNCTION: CARMA2_HW 0x004b99e0
 // FUNCTION: CARMA2_SW 0x004b6100
