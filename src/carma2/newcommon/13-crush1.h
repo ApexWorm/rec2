@@ -352,7 +352,7 @@ extern void C2_HOOK_FASTCALL DoShapeSwapping(void);
 
 extern void C2_HOOK_FASTCALL BendPoint(br_vector3* pPoint, const tBend_point_context* pContext);
 
-// EdgeCrossesZPlane
+extern int C2_HOOK_FASTCALL EdgeCrossesZPlane(br_scalar pZ, const br_vector3* pP1, const br_vector3* pP2);
 
 // BendCollisionShape
 
