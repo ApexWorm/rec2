@@ -14,8 +14,11 @@
 
 extern br_vector3 gRender_bounds_centre;
 extern int gDrones_unmodified;
+extern int gINT_006820d4;
+extern int gINT_006844fc;
 extern int gINT_00681fb0;
 extern int gFrame;
+extern tDrone_state_function* gDrone_state_functions[6];
 extern int gCurrent_selected_drone;
 extern int gCount_drones;
 extern tDrone_form gDrone_forms[64];
@@ -37,6 +40,7 @@ extern char gDrone_edit_message[256];
 extern int gSelected_drone_path_index;
 extern tU32 gNext_drone_edit_path_munge;
 extern int gShow_drone_paths;
+extern tDrone_form_within_rendering_distance_cbfn* gDrone_form_within_rendering_distance_functions[4];
 extern int gCount_drones;
 extern int gCurrent_selected_drone;
 
@@ -46,7 +50,7 @@ extern int gCurrent_selected_drone;
 
 extern void C2_HOOK_CDECL DoNotDprintf_drone(const char* pMessage, ...);
 
-// CrappyLittleVector3DPrintf
+extern void C2_HOOK_FASTCALL CrappyLittleVector3DPrintf(const char* pName, br_vector3* pVector);
 
 // CrappyLittleDrivingStateInfoDprintf
 
@@ -60,11 +64,11 @@ extern void C2_HOOK_FASTCALL ReallyRemoveDroneFromPHIL(tDrone_spec* pDrone);
 
 extern void C2_HOOK_FASTCALL RemoveDroneFromPHIL(tDrone_spec* pDrone);
 
-// InitDroneCollisionObject
+extern void C2_HOOK_FASTCALL InitDroneCollisionObject(tDrone_spec* pDrone);
 
 extern int C2_HOOK_FASTCALL ReallyAddDroneToPHIL(tDrone_spec* pDrone);
 
-// AddDroneToPHIL
+extern int C2_HOOK_FASTCALL AddDroneToPHIL(tDrone_spec* pDrone);
 
 extern void C2_HOOK_FASTCALL PreprocessDronePaths(void);
 
@@ -72,9 +76,9 @@ extern int C2_HOOK_CDECL LinkyCallback(br_actor* pActor, void* pData);
 
 // LinkDroneActorsToModelsAndSetRenderStyle
 
-// LoadDroneActorsModels
+extern void C2_HOOK_FASTCALL LoadDroneActorsModels(tDrone_spec* pDrone_spec);
 
-// ReadPastBoundsShapesHeader
+extern int C2_HOOK_FASTCALL ReadPastBoundsShapesHeader(FILE* pF);
 
 // ReadPastThisLine
 
@@ -90,21 +94,21 @@ extern br_actor* C2_HOOK_CDECL MrFindy(br_actor* pActor, const char* pName);
 
 // GetReversenessFromString
 
-// LoadFunksAndGrooves
+extern void C2_HOOK_FASTCALL LoadFunksAndGrooves(tDrone_spec* pDrone_spec, FILE* pF);
 
-// LoadDrone
+extern void C2_HOOK_FASTCALL LoadDrone(int pIndex);
 
 // CalculateDrivingInfo
 
-// PauseDroneState
+extern void C2_HOOK_FASTCALL PauseDroneState(tDrone_spec* pDrone);
 
-// UnPauseDroneState
+extern void C2_HOOK_FASTCALL UnPauseDroneState(tDrone_spec* pDrone);
 
-// NewDroneState
+extern void C2_HOOK_FASTCALL NewDroneState(tDrone_spec* pDrone, int pNew_state);
 
-// ResetDroneCrushyModel
+extern void C2_HOOK_FASTCALL ResetDroneCrushyModel(br_model* pSource, br_model* pDest);
 
-// ResetDroneModel
+extern void C2_HOOK_FASTCALL ResetDroneModel(tDrone_spec* pDrone);
 
 extern int C2_HOOK_FASTCALL DroneCarWithinRenderingDistance(const br_vector3* pPos);
 
@@ -112,7 +116,7 @@ extern int C2_HOOK_FASTCALL DronePlaneWithinRenderingDistance(const br_vector3* 
 
 extern int C2_HOOK_FASTCALL DroneTrainWithinRenderingDistance(const br_vector3* pPos);
 
-// SemiInitDroneSpec
+extern void C2_HOOK_FASTCALL SemiInitDroneSpec(tDrone_spec* pDrone);
 
 // InitDroneSpec
 
@@ -120,17 +124,17 @@ extern int C2_HOOK_FASTCALL DroneTrainWithinRenderingDistance(const br_vector3* 
 
 // DroneOrientationChanged
 
-// DroneyObjectInSensiblePlace
+extern int C2_HOOK_FASTCALL DroneyObjectInSensiblePlace(tPhysics_object* pObject, tPhysics_object* pList);
 
-// StopRenderingThisDrone
+extern void C2_HOOK_FASTCALL StopRenderingThisDrone(tDrone_spec* pDrone);
 
-// StopProcessingThisDrone
+extern void C2_HOOK_FASTCALL StopProcessingThisDrone(tDrone_spec* pDrone, int pForce);
 
-// StartRenderingThisDrone
+extern void C2_HOOK_FASTCALL StartRenderingThisDrone(tDrone_spec* pDrone);
 
-// CheckDroneInSensiblePlaceBeforeStartingToProcessTheCuntingThing
+extern int C2_HOOK_FASTCALL CheckDroneInSensiblePlaceBeforeStartingToProcessTheCuntingThing(tDrone_spec* pDrone);
 
-// StartProcessingThisDrone
+extern void C2_HOOK_FASTCALL StartProcessingThisDrone(tDrone_spec* pDrone);
 
 extern int C2_HOOK_FASTCALL DroneCarWithinProcessingDistance(const br_vector3* pPos);
 
@@ -146,7 +150,7 @@ extern int C2_HOOK_FASTCALL DroneTrainWithinProcessingDistance(const br_vector3*
 
 // ProcessThisDrone
 
-// DroneStateFuncReset
+extern void C2_HOOK_FASTCALL DroneStateFuncReset(tDrone_spec* pDrone, tDroneStateFuncState pState);
 
 // InitDroneDrivingInfo
 
@@ -158,13 +162,13 @@ extern void C2_HOOK_FASTCALL PipeDroneMatrix(tDrone_spec* pDrone);
 
 // PossiblyPipeDroneMovement
 
-// DroneStateFuncControlledMovement
+extern void C2_HOOK_FASTCALL DroneStateFuncControlledMovement(tDrone_spec* pDrone, tDroneStateFuncState pState);
 
 // DoDroneHaltingStuff
 
-// DroneStateFuncPhysicsActive
+extern void C2_HOOK_FASTCALL DroneStateFuncPhysicsActive(tDrone_spec* pDrone, tDroneStateFuncState pState);
 
-// DroneStateFuncStationaryPassive
+extern void C2_HOOK_FASTCALL DroneStateFuncStationaryPassive(tDrone_spec* pDrone, tDroneStateFuncState pState);
 
 // GetNewCrushyModelForDrone
 
@@ -174,7 +178,7 @@ extern int C2_HOOK_FASTCALL OtherPerambulatoryInstasificationIsEnablificated(voi
 
 extern void C2_HOOK_FASTCALL LoadPanGameDroneInfo(void);
 
-// InitDrones
+extern void C2_HOOK_FASTCALL InitDrones(void);
 
 extern void C2_HOOK_FASTCALL DisposeDronesRaceStuff(void);
 

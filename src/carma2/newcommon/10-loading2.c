@@ -842,7 +842,20 @@ void C2_HOOK_FASTCALL LoadHeadups(FILE* pF, int pIndex, tCar_spec* pCar_spec) {
 
 // ReadPartHeader
 
-// ReadMechanicsShapes
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// STUB: CARMA2_HW 0x00488b00
+// STUB: CARMA2_SW 0x00485d40
+// STUB: CARMA2_CHEAT 0x00488ee0
+void C2_HOOK_FASTCALL ReadMechanicsShapes(tPhysics_shape** pShapes, FILE* pF) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // NewReadMechanicsData
 
