@@ -19,4 +19,26 @@ extern void C2_HOOK_FASTCALL InitPratcam(void);
 
 extern void C2_HOOK_FASTCALL DisposePratcam(void);
 
+extern void C2_HOOK_FASTCALL FUN_004e0e70(void);
+
+extern void C2_HOOK_FASTCALL FUN_004e0e80(void);
+
+extern void C2_HOOK_FASTCALL FUN_004e0e90(void);
+
+extern void C2_HOOK_FASTCALL FUN_004e0ea0(void);
+
+extern void C2_HOOK_FASTCALL FUN_004e0eb0(void);
+
+extern void C2_HOOK_FASTCALL FUN_004e0ec0(void);
+
+extern void C2_HOOK_FASTCALL FUN_004e0ed0(void);
+
+extern void C2_HOOK_FASTCALL FUN_004e0ee0(void);
+
+extern void C2_HOOK_FASTCALL FUN_004e0ef0(void);
+
+extern void C2_HOOK_FASTCALL FUN_004e0f00(void);
+
+extern void C2_HOOK_FASTCALL FUN_004e0f10(void);
+
 #endif // GUARD_43_PRATCAM_H
