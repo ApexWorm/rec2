@@ -4928,6 +4928,13 @@ typedef struct tPed_personality {
     tPed_personality_sounds* sounds;
 } tPed_personality;
 
+typedef struct {
+    int red;
+    int green;
+    int blue;
+    undefined4 field_0xc;
+} tPalette_rgb_entry;
+
 typedef struct tPed_anim_seq {
     tU8 count;
     tU8 poses[];

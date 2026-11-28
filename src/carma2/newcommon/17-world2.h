@@ -37,6 +37,8 @@ extern void C2_HOOK_FASTCALL FixificateClipulatingPlaneyThings(void);
 
 extern int C2_HOOK_FASTCALL GetBestMatchingRenderPaletteIndex(int pRed, int pGreen, int pBlue);
 
+extern int C2_HOOK_FASTCALL GetBestMatchingFilteredRenderPaletteIndex(br_pixelmap* pMap, int pX, int pY);
+
 extern void C2_HOOK_FASTCALL ProcessModelFaceMaterials(br_model* pModel, tPMFMCB* pCallback);
 
 extern void C2_HOOK_FASTCALL ProcessModelFaceMaterials2(br_model* pModel, material_cbfn* pCallback);

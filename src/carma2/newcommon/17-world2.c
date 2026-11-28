@@ -77,6 +77,25 @@ int gCount_extra_renders;
 // GLOBAL: CARMA2_CHEAT 0x006a9e40
 tExtra_render gExtra_renders[6];
 
+// GLOBAL: CARMA2_HW 0x0065fb58
+// GLOBAL: CARMA2_SW 0x0065a4b8
+// GLOBAL: CARMA2_CHEAT 0x00667308
+int gRender_palette_rgb_dirty = 1;
+
+// GLOBAL: CARMA2_HW 0x0065fb60
+// GLOBAL: CARMA2_SW 0x0065a4c0
+// GLOBAL: CARMA2_CHEAT 0x00667310
+int gPalette_filter_weights[3][3] = {
+    { 1, 5, 1 },
+    { 5, 8, 5 },
+    { 1, 5, 1 },
+};
+
+// GLOBAL: CARMA2_HW 0x00703e40
+// GLOBAL: CARMA2_SW 0x006fab20
+// GLOBAL: CARMA2_CHEAT 0x0070b4e0
+tPalette_rgb_entry gRender_palette_rgb[256];
+
 // GLOBAL: CARMA2_HW 0x00704e40
 // GLOBAL: CARMA2_SW 0x006fbb20
 // GLOBAL: CARMA2_CHEAT 0x0070c4e0
@@ -172,7 +191,7 @@ void C2_HOOK_FASTCALL FixificateClipulatingPlaneyThings(void) {
 // FUNCTION: CARMA2_HW 0x004e5f10
 // FUNCTION: CARMA2_SW 0x004e1f30
 // FUNCTION: CARMA2_CHEAT 0x004ebc20
-int C2_HOOK_FASTCALL GetBestMatchingRenderPaletteIndex(int pRed, int pGreen, int pBlue) {
+inline int C2_HOOK_FASTCALL GetBestMatchingRenderPaletteIndex(int pRed, int pGreen, int pBlue) {
     br_colour colour;
     br_colour* palette;
     int i;
@@ -201,6 +220,44 @@ int C2_HOOK_FASTCALL GetBestMatchingRenderPaletteIndex(int pRed, int pGreen, int
         }
     }
     return best_index;
+}
+
+// FUNCTION: CARMA2_HW 0x004e6010
+// FUNCTION: CARMA2_SW 0x004e2030
+// FUNCTION: CARMA2_CHEAT 0x004ebd20
+int C2_HOOK_FASTCALL GetBestMatchingFilteredRenderPaletteIndex(br_pixelmap* pMap, int pX, int pY) {
+    int i;
+    int j;
+    int red;
+    int green;
+    int blue;
+    tU8 index;
+    br_colour* palette;
+
+    red = 0;
+    green = 0;
+    blue = 0;
+    if (pX == 0 || pY == 0 || pX == pMap->width - 1 || pY == pMap->height - 1) {
+        return BrPixelmapPixelGet(pMap, pX, pY);
+    }
+    if (gRender_palette_rgb_dirty) {
+        palette = gRender_palette->pixels;
+        for (i = 0; i < (int)REC2_ASIZE(gRender_palette_rgb); i++) {
+            gRender_palette_rgb[i].red = BR_RED(palette[i]);
+            gRender_palette_rgb[i].green = BR_GRN(palette[i]);
+            gRender_palette_rgb[i].blue = BR_BLU(palette[i]);
+        }
+        gRender_palette_rgb_dirty = 0;
+    }
+    for (j = 0; j < 3; j++) {
+        for (i = 0; i < 3; i++) {
+            index = (tU8)BrPixelmapPixelGet(pMap, pX + i - 1, pY + j - 1);
+            red += gRender_palette_rgb[index].red * gPalette_filter_weights[i][j];
+            green += gRender_palette_rgb[index].green * gPalette_filter_weights[i][j];
+            blue += gRender_palette_rgb[index].blue * gPalette_filter_weights[i][j];
+        }
+    }
+    return GetBestMatchingRenderPaletteIndex(red >> 5, green >> 5, blue >> 5);
 }
 
 void C2_HOOK_FASTCALL ProcessModelFaceMaterials(br_model* pModel, tPMFMCB* pCallback) {
