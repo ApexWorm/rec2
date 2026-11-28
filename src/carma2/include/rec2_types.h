@@ -2716,6 +2716,7 @@ typedef struct {
 
 typedef enum tDriver {
     eDriver_non_car_unused_slot = 0,
+    eDriver_non_car = 1,
     eDriver_detached_bit = 2,
     eDriver_split_car = 3,
     eDriver_4 = 4,
@@ -4226,7 +4227,8 @@ typedef struct  {
     tU8 field_0x33;
     int count_shape_points; /* >0 if shape is poly, ==0 if box */
     int shape_points[16];
-    undefined field_0x78[16];
+    int field_0x78;
+    undefined field_0x7c[12];
 } tCar_crush_detach_data;
 
 typedef struct {
@@ -4328,7 +4330,9 @@ typedef struct tCar_crush_spec {
     tCar_bit_spec field_0x274[3];
     int field_0x2b0;
     tCar_bit_spec field_0x2b4[3];
-    undefined field_0x2f0[456];
+    undefined field_0x2f0[0x494 - 0x2f0];
+    int field_0x494;
+    br_actor* field_0x498[8];
     tU8 field_0x4b8;
     undefined field_0x4b9[3];
     float snappability_factor;
@@ -4742,18 +4746,10 @@ typedef struct {
 } tQueued_object_info;
 
 typedef struct {
-    undefined field_0x0[0x8];
-    tPhysics_object* collision_object;
-    undefined field_0xc[0xd0];
-    float field_0xdc;
-    float field_0xe0;
-    undefined field_0xe4[0x20];
-} tCrush_info;
-
-typedef struct {
-    tCrush_info* crush_infos;
+    tNon_car_spec* crush_infos;
     int capacity;
-    undefined4 field_0x8;
+    int field_0x8;
+    tDriver driver;
 } tCrush_info_buffer;
 
 typedef struct {
@@ -4958,7 +4954,7 @@ typedef struct {
 
 typedef struct tNon_car_spec {
     int index;
-    undefined field_0x4[4];
+    int field_0x4;
     tPhysics_object* collision_info;
     tDriver driver;
     br_actor* car_master_actor;
@@ -4975,7 +4971,7 @@ typedef struct tNon_car_spec {
     br_material* shrapnel_materials[3];
     undefined field_0x90[0xc4 - 0x90];
     float field_0xc4;
-    undefined field_0xc8[0xcc - 0xc8];
+    tCar_spec* field_0xc8;
     float free_mass;
     float attached_mass;
     float min_torque_squared;
