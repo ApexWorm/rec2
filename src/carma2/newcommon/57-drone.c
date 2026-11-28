@@ -591,22 +591,18 @@ void C2_HOOK_FASTCALL ApplyDroneCornerPos2(int pDrone_id, tU16 pSpeed, tU16 pFie
     drone->field_0xe4 = DRU16ToScalar(pSpeed, -500.0f, 500.0f);
     drone->field_0xe0 = DRU16ToScalar(pField_0x74, 0.0f, 1.0f);
     drone->field_0xe8 = DRU16ToScalar(pRadius, 0.0f, 100.0f);
-    BrVector3Set((br_vector3*)drone->actor->t.t.mat.m[0],
-        DRU16ToScalar(pMatrix->m[0].v[0], -1.0f, 1.0f),
-        DRU16ToScalar(pMatrix->m[0].v[1], -1.0f, 1.0f),
-        DRU16ToScalar(pMatrix->m[0].v[2], -1.0f, 1.0f));
-    BrVector3Set((br_vector3*)drone->actor->t.t.mat.m[1],
-        DRU16ToScalar(pMatrix->m[1].v[0], -1.0f, 1.0f),
-        DRU16ToScalar(pMatrix->m[1].v[1], -1.0f, 1.0f),
-        DRU16ToScalar(pMatrix->m[1].v[2], -1.0f, 1.0f));
-    BrVector3Set((br_vector3*)drone->actor->t.t.mat.m[2],
-        DRU16ToScalar(pMatrix->m[2].v[0], -1.0f, 1.0f),
-        DRU16ToScalar(pMatrix->m[2].v[1], -1.0f, 1.0f),
-        DRU16ToScalar(pMatrix->m[2].v[2], -1.0f, 1.0f));
-    BrVector3Set((br_vector3*)drone->actor->t.t.mat.m[3],
-        DRU16ToScalar(pMatrix->m[3].v[0], -1000.0f, 1000.0f),
-        DRU16ToScalar(pMatrix->m[3].v[1], -1000.0f, 1000.0f),
-        DRU16ToScalar(pMatrix->m[3].v[2], -1000.0f, 1000.0f));
+    drone->actor->t.t.mat.m[0][0] = DRU16ToScalar(pMatrix->m[0].v[0], -1.0f, 1.0f);
+    drone->actor->t.t.mat.m[0][1] = DRU16ToScalar(pMatrix->m[0].v[1], -1.0f, 1.0f);
+    drone->actor->t.t.mat.m[0][2] = DRU16ToScalar(pMatrix->m[0].v[2], -1.0f, 1.0f);
+    drone->actor->t.t.mat.m[1][0] = DRU16ToScalar(pMatrix->m[1].v[0], -1.0f, 1.0f);
+    drone->actor->t.t.mat.m[1][1] = DRU16ToScalar(pMatrix->m[1].v[1], -1.0f, 1.0f);
+    drone->actor->t.t.mat.m[1][2] = DRU16ToScalar(pMatrix->m[1].v[2], -1.0f, 1.0f);
+    drone->actor->t.t.mat.m[2][0] = DRU16ToScalar(pMatrix->m[2].v[0], -1.0f, 1.0f);
+    drone->actor->t.t.mat.m[2][1] = DRU16ToScalar(pMatrix->m[2].v[1], -1.0f, 1.0f);
+    drone->actor->t.t.mat.m[2][2] = DRU16ToScalar(pMatrix->m[2].v[2], -1.0f, 1.0f);
+    drone->actor->t.t.mat.m[3][0] = DRU16ToScalar(pMatrix->m[3].v[0], -1000.0f, 1000.0f);
+    drone->actor->t.t.mat.m[3][1] = DRU16ToScalar(pMatrix->m[3].v[1], -1000.0f, 1000.0f);
+    drone->actor->t.t.mat.m[3][2] = DRU16ToScalar(pMatrix->m[3].v[2], -1000.0f, 1000.0f);
     DoDroneFunkyGroovyThings(drone);
 }
 

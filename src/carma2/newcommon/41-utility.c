@@ -2189,9 +2189,9 @@ char* C2_HOOK_FASTCALL MungeCommas(int pValue) {
 // FUNCTION: CARMA2_HW 0x00518fa0
 // FUNCTION: CARMA2_CHEAT 0x0051e9b0
 void C2_HOOK_FASTCALL MungeMetaCharacters(char* pText, char pMeta, const char* pRepl) {
+    int i;
     int len_text;
     int len_repl;
-    int i;
 
     len_text = strlen(pText);
     len_repl = strlen(pRepl);
