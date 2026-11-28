@@ -926,6 +926,7 @@ void C2_HOOK_FASTCALL InitMap(void) {
 
 #ifdef REC2_HW
 // FUNCTION: CARMA2_HW 0x004973b0
+// FUNCTION: CARMA2_CHEAT 0x00497760
 void C2_HOOK_FASTCALL ConvertCarIcons(br_pixelmap* pMap) {
     int i;
     int j;
