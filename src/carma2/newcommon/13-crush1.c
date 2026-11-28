@@ -24,6 +24,7 @@
 #include "51-smash.h"
 #include "52-errors.h"
 #include "53-controls.h"
+#include "58-crush2.h"
 #include "60-phil.h"
 #include "65-hull.h"
 #include "69-sound.h"
@@ -2501,9 +2502,95 @@ void C2_HOOK_FASTCALL DoFullyDetaching(void) {
     }
 }
 
-// CalculateCollisionObjectStuffForSplitHalves
+inline void C2_HOOK_FASTCALL CalculateCollisionObjectStuffForSplitHalves(br_scalar pSplit_pos, const tCar_vital_bits* pVital_bits, tPhysics_object* pObject1, tPhysics_object* pObject2, int pAxis, int pSwap) {
+    br_scalar below;
+    br_scalar above;
+    br_scalar cm_offset;
+    br_scalar cm_below;
+    br_scalar mass_term;
+    br_scalar mass1;
+    br_scalar mass2;
+    br_scalar pos_below;
+    br_scalar pos_above;
+    br_scalar d1;
+    br_scalar d2;
+    br_scalar inertia;
+    br_vector3 I;
+    br_vector3 tv;
+    int axis1;
+    int axis2;
 
-// SetUpCollisionInfoStuffForSplitHalf
+    below = pSplit_pos - pVital_bits->bb1.min.v[pAxis];
+    above = pVital_bits->bb1.max.v[pAxis] - pSplit_pos;
+    cm_offset = pVital_bits->cmpos.v[pAxis] - pVital_bits->bb1.min.v[pAxis];
+    BrVector3Copy(&pObject1->cmpos, &pVital_bits->cmpos);
+    cm_below = cm_offset * below / (below + above);
+    BrVector3Copy(&pObject2->cmpos, &pVital_bits->cmpos);
+    mass_term = below * (below - cm_below);
+    pos_below = cm_below + pVital_bits->bb1.min.v[pAxis];
+    pos_above = below + cm_offset * above / (below + above) + pVital_bits->bb1.min.v[pAxis];
+    mass2 = pVital_bits->M * mass_term / (above * cm_below + mass_term);
+    mass1 = pVital_bits->M - mass2;
+    if (pos_below > pSplit_pos - 0.1f / WORLD_SCALE) {
+        pos_below = pSplit_pos - 0.1f / WORLD_SCALE;
+    }
+    if (pos_above < pSplit_pos + 0.1f / WORLD_SCALE) {
+        pos_above = pSplit_pos + 0.1f / WORLD_SCALE;
+    }
+    if (!pSwap) {
+        pObject1->M = mass1;
+        pObject2->M = mass2;
+        pObject1->cmpos.v[pAxis] = pos_above;
+        pObject2->cmpos.v[pAxis] = pos_below;
+    } else {
+        pObject1->M = mass2;
+        pObject2->M = mass1;
+        pObject1->cmpos.v[pAxis] = pos_below;
+        pObject2->cmpos.v[pAxis] = pos_above;
+    }
+    BrVector3Copy(&pObject1->omega, &pVital_bits->omega);
+    BrVector3Copy(&pObject2->omega, &pVital_bits->omega);
+
+    BrVector3Sub(&tv, &pObject1->cmpos, &pVital_bits->cmpos);
+    BrVector3Cross(&pObject1->v, &pVital_bits->omega, &tv);
+    BrMatrix34ApplyV(&tv, &pObject1->v, &pVital_bits->actor->t.t.mat);
+    BrVector3Add(&pObject1->v, &tv, &pVital_bits->v);
+    BrMatrix34TApplyV(&pObject1->velocity_car_space, &pObject1->v, &pObject1->actor->t.t.mat);
+
+    BrVector3Sub(&tv, &pObject2->cmpos, &pVital_bits->cmpos);
+    BrVector3Cross(&pObject2->v, &pVital_bits->omega, &tv);
+    BrMatrix34ApplyV(&tv, &pObject2->v, &pVital_bits->actor->t.t.mat);
+    BrVector3Add(&pObject2->v, &tv, &pVital_bits->v);
+    BrMatrix34TApplyV(&pObject2->velocity_car_space, &pObject2->v, &pObject2->actor->t.t.mat);
+
+    pObject1->I.v[pAxis] = pVital_bits->I.v[pAxis] * pObject1->M / pVital_bits->M;
+    axis1 = (pAxis + 1) % 3;
+    axis2 = (pAxis + 2) % 3;
+    pObject2->I.v[pAxis] = pVital_bits->I.v[pAxis] * pObject2->M / pVital_bits->M;
+    d2 = pObject2->cmpos.v[pAxis] - pVital_bits->cmpos.v[pAxis];
+    d1 = pObject1->cmpos.v[pAxis] - pVital_bits->cmpos.v[pAxis];
+    inertia = pObject1->M * d1 * d1 + pObject2->M * d2 * d2;
+    I.v[axis1] = pVital_bits->I.v[axis1] - inertia;
+    pObject1->I.v[axis1] = pObject1->M * I.v[axis1] / pVital_bits->M;
+    pObject2->I.v[axis1] = pObject2->M * I.v[axis1] / pVital_bits->M;
+    I.v[axis2] = pVital_bits->I.v[axis2] - inertia;
+    pObject1->I.v[axis2] = pObject1->M * I.v[axis2] / pVital_bits->M;
+    pObject2->I.v[axis2] = pObject2->M * I.v[axis2] / pVital_bits->M;
+    pObject1->field_0xed = 1;
+    pObject2->field_0xed = 1;
+    pObject1->disable_move_rotate = 0;
+    pObject2->disable_move_rotate = 0;
+}
+
+inline void C2_HOOK_FASTCALL SetUpCollisionInfoStuffForSplitHalf(tNon_car_spec* pNon_car, const tCar_spec* pCar) {
+
+    BrMatrix34Copy(&pNon_car->collision_info->transform_matrix, &pCar->collision_info->transform_matrix);
+    pNon_car->collision_info->last_special_volume = pCar->collision_info->last_special_volume;
+    pNon_car->collision_info->auto_special_volume = pCar->collision_info->auto_special_volume;
+    BrVector3Copy(&pNon_car->collision_info->water_normal, &pCar->collision_info->water_normal);
+    pNon_car->collision_info->water_d = pCar->collision_info->water_d;
+    pNon_car->collision_info->water_depth_factor = pCar->collision_info->water_depth_factor;
+}
 
 inline void C2_HOOK_FASTCALL SetFace(br_face* pFace, tU16 pVertex1, tU16 pVertex2, tU16 pVertex3) {
 
@@ -2914,7 +3001,50 @@ void C2_HOOK_FASTCALL SplitCollisionShape(tPhysics_shape* pShape, tCollision_sha
     }
 }
 
-// SplitCarCollisionShapes
+inline void C2_HOOK_FASTCALL SplitCarCollisionShapes(tCar_spec* pCar, tPhysics_object* pNon_car_object, const tSplit_info* pSplit_info) {
+    tCar_crush_spec* crush_spec;
+    tPhysics_shape* shape;
+    tPhysics_shape* last_shape;
+    tPhysics_shape* next;
+    int i;
+
+    last_shape = NULL;
+    crush_spec = pCar->car_crush_spec;
+    shape = pNon_car_object->shape;
+    for (i = 0; i < crush_spec->count_shapes; i++) {
+        if (!crush_spec->field_0x4[i].field_0x8) {
+            /* FIXME: SplitCollisionShape takes the plane as a br_vector4 */
+            SplitCollisionShape((tPhysics_shape*)crush_spec->field_0x4[i].field_0x0, crush_spec->field_0x4[i].field_0x4, &shape->polyhedron, (const br_vector4*)pSplit_info);
+            shape = shape->common.next;
+            if (last_shape != NULL) {
+                last_shape->common.next = (tPhysics_shape*)crush_spec->field_0x4[i].field_0x4;
+            } else {
+                pCar->collision_info->shape = (tPhysics_shape*)crush_spec->field_0x4[i].field_0x4;
+            }
+            last_shape = (tPhysics_shape*)crush_spec->field_0x4[i].field_0x4;
+        }
+    }
+    if (last_shape != NULL) {
+        last_shape->common.next = NULL;
+    }
+    for (; i < 4; i++) {
+        shape->polyhedron.polyhedron.count_points = 0;
+        shape->polyhedron.polyhedron.count_edges = 0;
+        shape->polyhedron.polyhedron.count_planes = 0;
+        shape = shape->common.next;
+    }
+    for (i = 0; i < (int)REC2_ASIZE(crush_spec->field_0x564); i++) {
+        if (BrVector3Dot(&crush_spec->field_0x564[i]->wireframe.points[0], &pSplit_info->normal) - pSplit_info->d <= 0.0f) {
+            next = pNon_car_object->shape;
+            pNon_car_object->shape = (tPhysics_shape*)crush_spec->field_0x564[i];
+            crush_spec->field_0x564[i]->common.next = next;
+        } else {
+            next = pCar->collision_info->shape;
+            pCar->collision_info->shape = (tPhysics_shape*)crush_spec->field_0x564[i];
+            crush_spec->field_0x564[i]->common.next = next;
+        }
+    }
+}
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
@@ -2959,7 +3089,20 @@ int C2_HOOK_FASTCALL QuantizeWithinBounds(br_scalar pQuant, br_scalar pMin, br_s
 #pragma auto_inline(on)
 #endif
 
-// SaveVitalBitsOfObject
+inline void C2_HOOK_FASTCALL SaveVitalBitsOfObject(tCar_vital_bits* pVital_bits, const tPhysics_object* pObject, const tCar_spec* pCar) {
+
+    pVital_bits->actor = pObject->actor;
+    pVital_bits->M = pObject->M / pCar->field_0x4c8;
+    pVital_bits->I.v[0] = pObject->I.v[0] / pCar->field_0x4c8;
+    pVital_bits->I.v[1] = pObject->I.v[1] / pCar->field_0x4c8;
+    pVital_bits->I.v[2] = pObject->I.v[2] / pCar->field_0x4c8;
+    BrVector3Copy(&pVital_bits->cmpos, &pObject->cmpos);
+    DRBoundsCopy(&pVital_bits->bb1, &pObject->bb1);
+    DRBoundsCopy(&pVital_bits->bb2, &pObject->bb2);
+    BrVector3Copy(&pVital_bits->field_0x50, &pObject->field_0x54);
+    BrVector3Copy(&pVital_bits->v, &pObject->v);
+    BrVector3Copy(&pVital_bits->omega, &pObject->omega);
+}
 
 // FUNCTION: CARMA2_HW 0x00430730
 // FUNCTION: CARMA2_SW 0x00430760
@@ -2981,7 +3124,16 @@ intptr_t C2_HOOK_CDECL MakeCarModelsMaterialsDoubleSided(br_actor* pActor, void*
 
 // SwapCarShapes
 
-// IsAWheelOrPivotActor
+inline int C2_HOOK_FASTCALL IsAWheelOrPivotActor(const br_actor* pActor, const tCar_spec* pCar) {
+    int i;
+
+    for (i = 0; i < (int)REC2_ASIZE(pCar->wheel_actors); i++) {
+        if (pActor == pCar->pivot_actors[i] || pActor == pCar->wheel_actors[i]) {
+            return 1;
+        }
+    }
+    return 0;
+}
 
 // FUNCTION: CARMA2_HW 0x0042deb0
 // FUNCTION: CARMA2_SW 0x0042df20
@@ -3007,11 +3159,181 @@ intptr_t C2_HOOK_CDECL MakeCarModelsMaterialsSingleSided(br_actor* pActor, void*
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x0042e2e0
-// STUB: CARMA2_SW 0x0042e350
-// STUB: CARMA2_CHEAT 0x0042e480
+// FUNCTION: CARMA2_HW 0x0042e2e0
+// FUNCTION: CARMA2_SW 0x0042e350
+// FUNCTION: CARMA2_CHEAT 0x0042e480
 void C2_HOOK_FASTCALL SplitCar(tCar_spec* pCar, const tSplit_info* pSplit_info, int pArg3) {
-    NOT_IMPLEMENTED();
+    tCar_crush_spec* crush_spec;
+    br_bounds3* bounds;
+    tUser_crush_data* user_crush;
+    tUser_crush_data* child_user;
+    tNon_car_spec* non_car;
+    tPhysics_object* object;
+    tPhysics_object* next_object;
+    br_actor* non_car_actor;
+    br_actor* model_actor;
+    br_actor* child;
+    br_actor* next_child;
+    br_model** split_models;
+    br_model* dummy;
+    br_model* temp;
+    br_model* model;
+    br_vector3 point;
+    br_vector4 plane;
+    br_scalar split_pos;
+    int axis;
+    int swap;
+    int min_positive;
+    int max_positive;
+    int i;
+
+    if (pCar->invulnerable_no_crushage && !pCar->knackered) {
+        return;
+    }
+    if (pCar->field_0x4c8 != 1.0) {
+        return;
+    }
+    bounds = &pCar->collision_info->bb1;
+    crush_spec = pCar->car_crush_spec;
+    point.v[0] = 0.25f * (bounds->max.v[0] - bounds->min.v[0]);
+    point.v[1] = 0.25f * (bounds->max.v[1] - bounds->min.v[1]);
+    point.v[2] = 0.25f * (bounds->max.v[2] - bounds->min.v[2]);
+    axis = NearestAxis(&pSplit_info->normal);
+    point.v[axis] = 0.0f;
+    point.v[(axis + 1) % 3] = 0.5f * (bounds->max.v[(axis + 1) % 3] + bounds->min.v[(axis + 1) % 3]);
+    point.v[(axis + 2) % 3] = 0.5f * (bounds->max.v[(axis + 2) % 3] + bounds->min.v[(axis + 2) % 3]);
+    split_pos = -((BrVector3Dot(&point, &pSplit_info->normal) - pSplit_info->d) / pSplit_info->normal.v[axis]);
+    if (pSplit_info->normal.v[axis] < 0.0f) {
+        swap = 1;
+    } else {
+        swap = 0;
+    }
+    DRActorEnumRecurse(pCar->car_model_actor, MakeCarModelsMaterialsDoubleSided, pCar);
+    split_models = crush_spec->field_0x4c4;
+    model_actor = crush_spec->model_actor;
+    non_car_actor = crush_spec->actor;
+    user_crush = pCar->car_model_actor->user;
+    plane.v[0] = pSplit_info->normal.v[0];
+    plane.v[1] = pSplit_info->normal.v[1];
+    plane.v[2] = pSplit_info->normal.v[2];
+    plane.v[3] = pSplit_info->d - (plane.v[0] * pCar->car_model_actor->t.t.mat.m[3][0] + plane.v[1] * pCar->car_model_actor->t.t.mat.m[3][1] + plane.v[2] * pCar->car_model_actor->t.t.mat.m[3][2]);
+    SplitModel(user_crush->models[0], &split_models[0], &model_actor->model, &plane, 0);
+    for (i = 1; i < pCar->count_detail_levels; i++) {
+        if (user_crush->models[i] != NULL) {
+            SplitModel(user_crush->models[i], &split_models[i], &dummy, &plane, 1);
+        }
+    }
+    non_car = GetNonCar(&gSplit_car_crush_info_buffer, non_car_actor, pCar);
+    if (non_car == NULL) {
+        for (i = 0; i < pCar->count_detail_levels; i++) {
+            BrModelFree(BrModelRemove(split_models[i]));
+        }
+        BrModelFree(model_actor->model);
+        DRActorEnumRecurse(pCar->car_model_actor, MakeCarModelsMaterialsSingleSided, pCar);
+        return;
+    }
+    LoseAllLocalPowerups(pCar);
+    while (non_car->collision_info->shape->common.type == kCollisionShapeType_Wireframe) {
+        non_car->collision_info->shape = non_car->collision_info->shape->common.next;
+    }
+    for (i = 0; i < pCar->count_detail_levels; i++) {
+        temp = user_crush->models[i];
+        user_crush->models[i] = split_models[i];
+        split_models[i] = temp;
+    }
+    pCar->car_model_actor->model = user_crush->models[0];
+    SmashEverything(pCar);
+    if (gNet_mode != eNet_mode_none) {
+        for (i = 0; i < crush_spec->field_0x270; i++) {
+            FullyDetachBit(pCar, crush_spec->field_0x274[i].field_0x8);
+        }
+        MungeDetachLists(crush_spec);
+    }
+    PipeSingleRelink(gNon_track_actor, non_car_actor);
+    BrActorAdd(gNon_track_actor, non_car_actor);
+    BrMatrix34Copy(&non_car_actor->t.t.mat, &pCar->car_master_actor->t.t.mat);
+    PipeSingleNonCar((tU16)non_car->car_ID, non_car_actor);
+    for (child = pCar->car_model_actor->children; child != NULL; child = next_child) {
+        next_child = child->next;
+        child_user = child->user;
+        if ((child_user != NULL && child_user->groove != NULL) || IsAWheelOrPivotActor(child, pCar)) {
+            if (BrVector3Dot(&child->t.t.translate.t, &pSplit_info->normal) - pSplit_info->d < 0.0f) {
+                PipeSingleRelink(NULL, child);
+                BrActorRemove(child);
+                PipeSingleRelink(model_actor, child);
+                BrActorAdd(model_actor, child);
+            }
+        } else {
+            if (child_user != NULL && child_user->models[0] != NULL) {
+                model = child_user->models[0];
+                if (model->bounds.min.v[0] * plane.v[0] + model->bounds.min.v[1] * plane.v[1] + model->bounds.min.v[2] * plane.v[2] - plane.v[3] > 0.0f) {
+                    min_positive = 1;
+                } else {
+                    min_positive = 0;
+                }
+                if (model->bounds.max.v[0] * plane.v[0] + model->bounds.max.v[1] * plane.v[1] + model->bounds.max.v[2] * plane.v[2] - plane.v[3] > 0.0f) {
+                    max_positive = 1;
+                } else {
+                    max_positive = 0;
+                }
+                if (min_positive == max_positive) {
+                    if (!min_positive) {
+                        PipeSingleRelink(NULL, child);
+                        BrActorRemove(child);
+                        PipeSingleRelink(model_actor, child);
+                        BrActorAdd(model_actor, child);
+                        child->model = model;
+                    }
+                } else {
+                    RemoveBit(child, pCar);
+                }
+            }
+        }
+    }
+    gCount_crush_detach_list = 0;
+    SaveVitalBitsOfObject(&crush_spec->field_0x4d4, pCar->collision_info, pCar);
+    SetUpCollisionInfoStuffForSplitHalf(non_car, pCar);
+    CalculateCollisionObjectStuffForSplitHalves(split_pos, &crush_spec->field_0x4d4, pCar->collision_info, non_car->collision_info, axis, swap);
+    SplitCarCollisionShapes(pCar, non_car->collision_info, pSplit_info);
+    crush_spec->field_0x28 = 1;
+    for (i = 0; i < (int)REC2_ASIZE(pCar->oldd); i++) {
+        pCar->oldd[i] = pCar->ride_height;
+    }
+    UpdateCollisionObject(non_car->collision_info);
+    UpdateCollisionObject(pCar->collision_info);
+    pCar->collision_info->bb2.min.v[1] = GetCarOverallBoundsMinY(pCar);
+    pCar->number_of_wheels_on_ground = 0;
+    for (object = pCar->collision_info->child; object != NULL; object = next_object) {
+        if (BrVector3Dot(&object->physics_joint1->field_0x14, &pSplit_info->normal) - pSplit_info->d < 0.0f) {
+            PipeSingleNonCar((tU16)((tNon_car_spec*)object->actor->type_data)->car_ID, object->actor);
+            next_object = object->next;
+            PhysicsRemoveObject(object);
+            TellPhysicsJointsHaveChanged(pCar->collision_info);
+            PhysicsAddObject(non_car->collision_info, object);
+            TellPhysicsJointsHaveChanged(non_car->collision_info);
+        } else {
+            next_object = object->next;
+        }
+    }
+    AddNonCar(non_car, &gSplit_car_crush_info_buffer.driver);
+    crush_spec->field_0x4b8 = 1;
+    pCar->use_shell_model = 0;
+    crush_spec->field_0x548.v[0] = pSplit_info->normal.v[0];
+    crush_spec->field_0x548.v[1] = pSplit_info->normal.v[1];
+    crush_spec->field_0x548.v[2] = pSplit_info->normal.v[2];
+    crush_spec->field_0x548.v[3] = pSplit_info->d;
+    if (axis != 1) {
+        pCar->field_0x18c8 = 1;
+        pCar->revs = 0.0f;
+        if ((pCar != NULL && pCar->driver == eDriver_oppo) || gNet_mode == eNet_mode_host) {
+            KnackerThisCar(pCar);
+        }
+    }
+    if (pArg3) {
+        ChristmasLights(pCar, gMin_split_damage, gMax_split_damage);
+    }
+    /* FIXME: PipeSingleSplitWeld takes the plane as a br_vector4 */
+    PipeSingleSplitWeld((tU16)pCar->car_ID, (const br_vector4*)pSplit_info, 1);
 }
 
 #ifdef REC2_MATCHING

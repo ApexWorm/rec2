@@ -285,9 +285,9 @@ extern void C2_HOOK_FASTCALL SendFullyDetachBit(tCar_spec* pCar, tPhysics_object
 
 extern void C2_HOOK_FASTCALL DoFullyDetaching(void);
 
-// CalculateCollisionObjectStuffForSplitHalves
+extern void C2_HOOK_FASTCALL CalculateCollisionObjectStuffForSplitHalves(br_scalar pSplit_pos, const tCar_vital_bits* pVital_bits, tPhysics_object* pObject1, tPhysics_object* pObject2, int pAxis, int pSwap);
 
-// SetUpCollisionInfoStuffForSplitHalf
+extern void C2_HOOK_FASTCALL SetUpCollisionInfoStuffForSplitHalf(tNon_car_spec* pNon_car, const tCar_spec* pCar);
 
 extern void C2_HOOK_FASTCALL SetFace(br_face* pFace, tU16 pVertex1, tU16 pVertex2, tU16 pVertex3);
 
@@ -303,17 +303,17 @@ extern void C2_HOOK_FASTCALL CreateSplitPoints(br_vector3* pDest1, br_vector3* p
 
 extern void C2_HOOK_FASTCALL SplitCollisionShape(tPhysics_shape* pShape, tCollision_shape_polyhedron* pPositive, tCollision_shape_polyhedron* pNegative, const br_vector4* pPlane);
 
-// SplitCarCollisionShapes
+extern void C2_HOOK_FASTCALL SplitCarCollisionShapes(tCar_spec* pCar, tPhysics_object* pNon_car_object, const tSplit_info* pSplit_info);
 
 // QuantizeWithinBounds
 
-// SaveVitalBitsOfObject
+extern void C2_HOOK_FASTCALL SaveVitalBitsOfObject(tCar_vital_bits* pVital_bits, const tPhysics_object* pObject, const tCar_spec* pCar);
 
 extern intptr_t C2_HOOK_CDECL MakeCarModelsMaterialsDoubleSided(br_actor* pActor, void* pArg);
 
 // SwapCarShapes
 
-// IsAWheelOrPivotActor
+extern int C2_HOOK_FASTCALL IsAWheelOrPivotActor(const br_actor* pActor, const tCar_spec* pCar);
 
 extern intptr_t C2_HOOK_CDECL MakeCarModelsMaterialsSingleSided(br_actor* pActor, void* pArg);
 
