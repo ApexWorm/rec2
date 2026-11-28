@@ -339,12 +339,8 @@ void C2_HOOK_FASTCALL InstantDepthChange(tDepth_effect_type pType, br_pixelmap* 
 #endif
 
 inline br_scalar C2_HOOK_FASTCALL Tan(br_scalar pAngle) {
-    br_scalar s;
-    br_scalar c;
 
-    s = (br_scalar)sin(BrAngleToRadian(pAngle));
-    c = (br_scalar)cos(BrAngleToRadian(pAngle));
-    return s / c;
+    return sinf(BrAngleToRadian(pAngle)) / cosf(BrAngleToRadian(pAngle));
 }
 
 // EdgeU
