@@ -365,6 +365,52 @@ tAdd_to_storage_result C2_HOOK_FASTCALL AddSoundToStorage(tBrender_storage* pSto
     }
 }
 
+// FUNCTION: CARMA2_HW 0x00501380
+// FUNCTION: CARMA2_SW 0x004fcce0
+// FUNCTION: CARMA2_CHEAT 0x00507030
+int C2_HOOK_FASTCALL LoadNPixelmaps(tBrender_storage* pStorage_space, FILE* pF, int pCount) {
+    int i;
+    int j;
+    int new_ones;
+    int total;
+    char s[256];
+    char* str;
+    br_pixelmap* temp_array[500];
+
+    total = 0;
+    for (i = 0; i < pCount; i++) {
+        PossibleService();
+        GetALineAndDontArgue(pF, s);
+        str = strtok(s, "\t ,/");
+        DoNotAllowOpenToFail();
+        new_ones = DRLoadMultiplePix(str, temp_array, REC2_ASIZE(temp_array));
+        if (new_ones == 0) {
+            FatalError(kFatalError_CantLoadPixelmapFile_S, str);
+        }
+        for (j = 0; j < new_ones; j++) {
+            if (temp_array[j] != NULL) {
+                switch (AddPixelmapToStorage(pStorage_space, temp_array[j])) {
+                case eStorage_allocated:
+                    BrMapAdd(temp_array[j]);
+                    total++;
+                    break;
+                case eStorage_duplicate:
+                    if (gDisallow_duplicates) {
+                        FatalError(kFatalError_DuplicatePixelmap_S, temp_array[j]->identifier);
+                    } else {
+                        BrPixelmapFree(temp_array[j]);
+                    }
+                    break;
+                case eStorage_not_enough_room:
+                    FatalError(kFatalError_InsufficientPixelmapSlots);
+                    break;
+                }
+            }
+        }
+    }
+    return total;
+}
+
 // FUNCTION: CARMA2_HW 0x005024f0
 // FUNCTION: CARMA2_SW 0x004fde40
 // FUNCTION: CARMA2_CHEAT 0x005081a0
@@ -524,11 +570,13 @@ tAdd_to_storage_result C2_HOOK_FASTCALL LoadSingleSound(tBrender_storage* pStora
     return 0;
 }
 
-int C2_HOOK_FASTCALL AddShadeTables(tBrender_storage* pStorage_space, const char* pPath) {
+inline int C2_HOOK_FASTCALL AddShadeTables(tBrender_storage* pStorage_space, const char* pPath) {
     br_pixelmap* temp_array[50];
+    int new_ones;
     int total;
     int i;
 
+    new_ones = 0;
     total = BrPixelmapLoadMany(pPath, temp_array, REC2_ASIZE(temp_array));
     if (total == 0) {
         FatalError(kFatalError_CannotLoadShadeTableFileOrItIsEmpty_S, pPath);
@@ -540,6 +588,7 @@ int C2_HOOK_FASTCALL AddShadeTables(tBrender_storage* pStorage_space, const char
         switch (AddShadeTableToStorage(pStorage_space, temp_array[i])) {
         case eStorage_allocated:
             BrTableAdd(temp_array[i]);
+            new_ones++;
             break;
         case eStorage_duplicate:
             if (gDisallow_duplicates) {
@@ -551,6 +600,77 @@ int C2_HOOK_FASTCALL AddShadeTables(tBrender_storage* pStorage_space, const char
         case eStorage_not_enough_room:
             FatalError(kFatalError_InsufficientShadeTableSlots);
             break;
+        }
+    }
+    return new_ones;
+}
+
+// FUNCTION: CARMA2_HW 0x005019c0
+// FUNCTION: CARMA2_SW 0x004fd320
+// FUNCTION: CARMA2_CHEAT 0x00507670
+int C2_HOOK_FASTCALL LoadNShadeTables(tBrender_storage* pStorage_space, FILE* pF, int pCount) {
+    tPath_name the_path;
+    int i;
+    int total;
+    char s[256];
+    char* str;
+
+    total = 0;
+    for (i = 0; i < pCount; i++) {
+        PossibleService();
+        GetALineAndDontArgue(pF, s);
+        str = strtok(s, "\t ,/");
+        PathCat(the_path, gApplication_path, "SHADETAB");
+        PathCat(the_path, the_path, str);
+        total += AddShadeTables(pStorage_space, the_path);
+    }
+    return total;
+}
+
+// FUNCTION: CARMA2_HW 0x00501bb0
+// FUNCTION: CARMA2_SW 0x004fd510
+// FUNCTION: CARMA2_CHEAT 0x00507860
+int C2_HOOK_FASTCALL LoadNMaterials(tBrender_storage* pStorage_space, FILE* pF, int pCount, tRendererShadingType pShading) {
+    tPath_name the_path;
+    int i;
+    int j;
+    int new_ones;
+    int total;
+    char s[256];
+    char* str;
+    br_material* temp_array[500];
+
+    total = 0;
+    for (i = 0; i < pCount; i++) {
+        PossibleService();
+        GetALineAndDontArgue(pF, s);
+        str = strtok(s, "\t ,/");
+        PathCat(the_path, gApplication_path, "MATERIAL");
+        PathCat(the_path, the_path, str);
+        new_ones = BrMaterialLoadMany(the_path, temp_array, REC2_ASIZE(temp_array));
+        if (new_ones == 0) {
+            FatalError(kFatalError_CannotLoadMaterialFileOrItIsEmpty_S, str);
+        }
+        GlorifyMaterial(temp_array, new_ones, pShading);
+        for (j = 0; j < new_ones; j++) {
+            if (temp_array[j] != NULL) {
+                switch (AddMaterialToStorage(pStorage_space, temp_array[j])) {
+                case eStorage_allocated:
+                    BrMaterialAdd(temp_array[j]);
+                    total++;
+                    break;
+                case eStorage_duplicate:
+                    if (gDisallow_duplicates) {
+                        FatalError(kFatalError_DuplicateMaterial_S, temp_array[j]->identifier);
+                    } else {
+                        BrMaterialFree(temp_array[j]);
+                    }
+                    break;
+                case eStorage_not_enough_room:
+                    FatalError(kFatalError_InsufficientMaterialSlots);
+                    break;
+                }
+            }
         }
     }
     return total;
