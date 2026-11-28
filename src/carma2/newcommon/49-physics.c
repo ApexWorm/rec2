@@ -905,34 +905,7 @@ void C2_HOOK_FASTCALL TellPhysicsJointsHaveChanged(tPhysics_object* pCollision_i
 
 // CheckPointVelocities
 
-// FUNCTION: CARMA2_HW 0x004c2a10
-// FUNCTION: CARMA2_SW 0x004bf140
-void C2_HOOK_FASTCALL WriteNewPositions(tPhysics_object* pObject) {
-    tPhysics_object* child;
-    tPhysics_object* root;
-    br_vector3 parent_point;
-    br_vector3 child_point;
-
-    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPhysics_object, field_0x1e8, 0x1e8);
-    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPhysics_object, field_0x230, 0x230);
-
-    root = pObject;
-    child = pObject->child;
-    if (pObject->flags & 0x400) {
-        root = pObject->field_0x230;
-    }
-    for (; child != NULL; child = child->next) {
-        if (!(pObject->flags & 0x400)) {
-            BrMatrix34ApplyP(&parent_point, &child->physics_joint1->field_0x14, &pObject->actor->t.t.mat);
-            BrMatrix34ApplyP(&child_point, &child->physics_joint1->field_0x08, &child->actor->t.t.mat);
-            BrVector3Sub(&parent_point, &parent_point, &child_point);
-            BrVector3Accumulate((br_vector3*)child->actor->t.t.mat.m[3], &parent_point);
-        } else {
-            BrMatrix34Mul(&pObject->actor->t.t.mat, &pObject->field_0x1e8, &root->actor->t.t.mat);
-        }
-        WriteNewPositions(child);
-    }
-}
+// WriteNewPositions
 
 // FUNCTION: CARMA2_HW 0x004b9eb0
 // FUNCTION: CARMA2_SW 0x004b65d0
@@ -1013,6 +986,7 @@ void C2_HOOK_FASTCALL MakeObjectListDoSomething(tPhysics_object* pObject) {
 
 // FUNCTION: CARMA2_HW 0x004bd9b0
 // FUNCTION: CARMA2_SW 0x004ba0d0
+// FUNCTION: CARMA2_CHEAT 0x004c34e0
 void C2_HOOK_FASTCALL SetObjectTrialPositionType(tPhysics_object* pObject, int pType) {
     tPhysics_object* child;
 
@@ -1240,6 +1214,7 @@ void C2_HOOK_FASTCALL GetFacesNearObject(tPhysics_object *pObject, tWorld_callba
 
 // FUNCTION: CARMA2_HW 0x004c25a0
 // FUNCTION: CARMA2_SW 0x004becd0
+// FUNCTION: CARMA2_CHEAT 0x004c80c0
 void C2_HOOK_FASTCALL ResetObjectAndChildren(tPhysics_object* pObject) {
     tPhysics_object* child;
 
@@ -1258,6 +1233,7 @@ void C2_HOOK_FASTCALL ResetObjectAndChildren(tPhysics_object* pObject) {
 
 // FUNCTION: CARMA2_HW 0x004c2600
 // FUNCTION: CARMA2_SW 0x004bed30
+// FUNCTION: CARMA2_CHEAT 0x004c8120
 void C2_HOOK_FASTCALL ResetObjectList(tPhysics_object* pObjects) {
 
     while (pObjects != NULL) {
@@ -1288,6 +1264,7 @@ void C2_HOOK_FASTCALL ApplyGravitySingleObject(tPhysics_object* pObject) {
 
 // FUNCTION: CARMA2_HW 0x004c2970
 // FUNCTION: CARMA2_SW 0x004bf0a0
+// FUNCTION: CARMA2_CHEAT 0x004c8490
 void C2_HOOK_FASTCALL ApplyGravity(tPhysics_object* pObject) {
 
     for (; pObject != NULL; pObject = pObject->next) {
@@ -1306,7 +1283,35 @@ void C2_HOOK_FASTCALL SetGravityDeltaV(tPhysics_object* pObject, br_vector3* pIm
     }
 }
 
-// TrialPositionChildren
+// FUNCTION: CARMA2_HW 0x004c2a10
+// FUNCTION: CARMA2_SW 0x004bf140
+// FUNCTION: CARMA2_CHEAT 0x004c8530
+void C2_HOOK_FASTCALL TrialPositionChildren(tPhysics_object* pObject) {
+    tPhysics_object* child;
+    tPhysics_object* root;
+    br_vector3 parent_point;
+    br_vector3 child_point;
+
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPhysics_object, field_0x1e8, 0x1e8);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPhysics_object, field_0x230, 0x230);
+
+    root = pObject;
+    child = pObject->child;
+    if (pObject->flags & 0x400) {
+        root = pObject->field_0x230;
+    }
+    for (; child != NULL; child = child->next) {
+        if (!(pObject->flags & 0x400)) {
+            BrMatrix34ApplyP(&parent_point, &child->physics_joint1->field_0x14, &pObject->actor->t.t.mat);
+            BrMatrix34ApplyP(&child_point, &child->physics_joint1->field_0x08, &child->actor->t.t.mat);
+            BrVector3Sub(&parent_point, &parent_point, &child_point);
+            BrVector3Accumulate((br_vector3*)child->actor->t.t.mat.m[3], &parent_point);
+        } else {
+            BrMatrix34Mul(&pObject->actor->t.t.mat, &pObject->field_0x1e8, &root->actor->t.t.mat);
+        }
+        TrialPositionChildren(child);
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x004c2b20
 // FUNCTION: CARMA2_SW 0x004bf250
@@ -1617,10 +1622,12 @@ tCollision_shape_polyhedron* C2_HOOK_FASTCALL AllocateShapePolyhedron(int pCount
     tCollision_shape_polyhedron* result;
     tU8* raw_memory;
     int count_edges;
+    int count_planes;
 
+    count_planes = (pCount_points - 2) * 2;
     count_edges = (pCount_points - 2) * 3;
     result = BrMemAllocate(sizeof(tCollision_shape_polyhedron) + pCount_points * sizeof(br_vector3)
-        + count_edges * sizeof(tPolyhedron_edge_indexes) + (pCount_points - 2) * 2 * sizeof(br_vector4), (br_uint_8)pType);
+        + count_edges * sizeof(tPolyhedron_edge_indexes) + count_planes * sizeof(br_vector4), (br_uint_8)pType);
     raw_memory = (tU8*)result + sizeof(tCollision_shape_polyhedron);
     result->polyhedron.points = (br_vector3*)raw_memory;
     raw_memory += pCount_points * sizeof(br_vector3);
