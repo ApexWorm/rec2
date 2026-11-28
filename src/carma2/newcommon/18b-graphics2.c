@@ -851,9 +851,284 @@ void C2_HOOK_FASTCALL DimRectangleClipped(br_pixelmap* pPixelmap, int pLeft, int
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_SW 0x0047c440
+// FUNCTION: CARMA2_SW 0x0047c440
 void C2_HOOK_FASTCALL DR8BitPixelmapBlendedLine(br_pixelmap* pDest, int pX1, int pY1, int pX2, int pY2, int pColour, br_pixelmap *pPalette) {
-    NOT_IMPLEMENTED();
+    int dx;
+    int dy;
+    int incr1;
+    int incr2;
+    int D;
+    int x;
+    int y;
+    int xend;
+    int c;
+    int pixels_left;
+    int x1;
+    int y1;
+    int sign_x;
+    int sign_y;
+    int step;
+    int reverse;
+    int i;
+    int temp;
+    br_int_16 max_x;
+    br_int_16 max_y;
+    tU8* ptr;
+
+#define BLENDED_PLOT(X, Y)                                                  \
+    do {                                                                    \
+        if (reverse) {                                                      \
+            ptr = (tU8*)pDest->pixels + (Y) + (X) * pDest->row_bytes;       \
+        } else {                                                            \
+            ptr = (tU8*)pDest->pixels + (X) + (Y) * pDest->row_bytes;       \
+        }                                                                   \
+        *ptr = ((tU8*)pPalette->pixels)[*ptr + pColour];                    \
+    } while (0)
+
+    max_y = pDest->height - 1;
+    pColour <<= 8;
+    max_x = pDest->width - 1;
+    if (pX1 > pX2) {
+        temp = pX1;
+        pX1 = pX2;
+        pX2 = temp;
+        temp = pY1;
+        pY1 = pY2;
+        pY2 = temp;
+    }
+    if (pX2 < 0 || pX1 > max_x) {
+        return;
+    }
+    if (pY1 < pY2) {
+        if (pY2 < 0 || pY1 > max_y) {
+            return;
+        }
+        if (pY1 < 0) {
+            pX1 += -(pX2 - pX1) * pY1 / (unsigned int)(pY2 - pY1);
+            if (pX1 > max_x) {
+                return;
+            }
+            pY1 = 0;
+        }
+        if (pY2 > max_y) {
+            pX2 -= (pY2 - max_y) * (pX2 - pX1) / (unsigned int)(pY2 - pY1);
+            if (pX2 < 0) {
+                return;
+            }
+            pY2 = max_y;
+        }
+        if (pX1 < 0) {
+            pY1 += -(pY2 - pY1) * pX1 / (unsigned int)(pX2 - pX1);
+            pX1 = 0;
+        }
+        if (pX2 > max_x) {
+            pY2 -= (pX2 - max_x) * (pY2 - pY1) / (unsigned int)(pX2 - pX1);
+            pX2 = max_x;
+        }
+    } else {
+        if (pY1 < 0 || pY2 > max_y) {
+            return;
+        }
+        if (pY1 > max_y) {
+            pX1 += (pY1 - max_y) * (pX2 - pX1) / (unsigned int)(pY1 - pY2);
+            if (pX1 > max_x) {
+                return;
+            }
+            pY1 = max_y;
+        }
+        if (pY2 < 0) {
+            pX2 -= -(pX2 - pX1) * pY2 / (unsigned int)(pY1 - pY2);
+            if (pX2 < 0) {
+                return;
+            }
+            pY2 = 0;
+        }
+        if (pX1 < 0) {
+            pY1 -= -(pY1 - pY2) * pX1 / (unsigned int)(pX2 - pX1);
+            pX1 = 0;
+        }
+        if (pX2 > max_x) {
+            pY2 += (pX2 - max_x) * (pY1 - pY2) / (unsigned int)(pX2 - pX1);
+            pX2 = max_x;
+        }
+    }
+    BrPixelmapPixelSize(pDest);
+
+    if (pX2 - pX1 < 0) {
+        sign_x = -1;
+    } else {
+        sign_x = 1;
+    }
+    dx = (pX2 - pX1) * sign_x;
+    if (pY2 - pY1 < 0) {
+        sign_y = -1;
+    } else {
+        sign_y = 1;
+    }
+    dy = (pY2 - pY1) * sign_y;
+    if (dx == 0 && dy == 0) {
+        ptr = (tU8*)pDest->pixels + pY1 * pDest->row_bytes + pX1;
+        *ptr = ((tU8*)pPalette->pixels)[*ptr + pColour];
+        return;
+    }
+    if (sign_x == sign_y) {
+        step = 1;
+    } else {
+        step = -1;
+    }
+    if (dy > dx) {
+        pX1 ^= pY1;
+        pY1 ^= pX1;
+        pX1 ^= pY1;
+        pX2 ^= pY2;
+        pY2 ^= pX2;
+        pX2 ^= pY2;
+        dx ^= dy;
+        dy ^= dx;
+        dx ^= dy;
+        reverse = 1;
+    } else {
+        reverse = 0;
+    }
+    if (pX1 > pX2) {
+        x = pX2;
+        y = pY2;
+        x1 = pX1;
+        y1 = pY1;
+    } else {
+        x = pX1;
+        y = pY1;
+        x1 = pX2;
+        y1 = pY2;
+    }
+
+    xend = (dx - 1) / 4;
+    pixels_left = (dx - 1) % 4;
+    BLENDED_PLOT(x, y);
+    BLENDED_PLOT(x1, y1);
+    incr2 = 4 * dy - 2 * dx;
+    if (incr2 < 0) {
+        c = 2 * dy;
+        incr1 = 2 * c;
+        D = incr1 - dx;
+
+        for (i = 0; i < xend; i++) {
+            ++x;
+            --x1;
+            if (D < 0) {
+                BLENDED_PLOT(x, y);
+                BLENDED_PLOT(++x, y);
+                BLENDED_PLOT(x1, y1);
+                BLENDED_PLOT(--x1, y1);
+                D += incr1;
+            } else {
+                if (D < c) {
+                    BLENDED_PLOT(x, y);
+                    BLENDED_PLOT(++x, y += step);
+                    BLENDED_PLOT(x1, y1);
+                    BLENDED_PLOT(--x1, y1 -= step);
+                } else {
+                    BLENDED_PLOT(x, y += step);
+                    BLENDED_PLOT(++x, y);
+                    BLENDED_PLOT(x1, y1 -= step);
+                    BLENDED_PLOT(--x1, y1);
+                }
+                D += incr2;
+            }
+        }
+
+        if (pixels_left) {
+            if (D < 0) {
+                BLENDED_PLOT(++x, y);
+                if (pixels_left > 1) {
+                    BLENDED_PLOT(++x, y);
+                }
+                if (pixels_left > 2) {
+                    BLENDED_PLOT(--x1, y1);
+                }
+            } else {
+                if (D < c) {
+                    BLENDED_PLOT(++x, y);
+                    if (pixels_left > 1) {
+                        BLENDED_PLOT(++x, y += step);
+                    }
+                    if (pixels_left > 2) {
+                        BLENDED_PLOT(--x1, y1);
+                    }
+                } else {
+                    BLENDED_PLOT(++x, y += step);
+                    if (pixels_left > 1) {
+                        BLENDED_PLOT(++x, y);
+                    }
+                    if (pixels_left > 2) {
+                        BLENDED_PLOT(--x1, y1 -= step);
+                    }
+                }
+            }
+        }
+    } else {
+        c = 2 * (dy - dx);
+        incr1 = 2 * c;
+        D = incr1 + dx;
+        for (i = 0; i < xend; i++) {
+            ++x;
+            --x1;
+            if (D > 0) {
+                BLENDED_PLOT(x, y += step);
+                BLENDED_PLOT(++x, y += step);
+                BLENDED_PLOT(x1, y1 -= step);
+                BLENDED_PLOT(--x1, y1 -= step);
+                D += incr1;
+            } else {
+                if (D < c) {
+                    BLENDED_PLOT(x, y);
+                    BLENDED_PLOT(++x, y += step);
+                    BLENDED_PLOT(x1, y1);
+                    BLENDED_PLOT(--x1, y1 -= step);
+                } else {
+                    BLENDED_PLOT(x, y += step);
+                    BLENDED_PLOT(++x, y);
+                    BLENDED_PLOT(x1, y1 -= step);
+                    BLENDED_PLOT(--x1, y1);
+                }
+                D += incr2;
+            }
+        }
+        if (pixels_left) {
+            if (D > 0) {
+                BLENDED_PLOT(++x, y += step);
+                if (pixels_left > 1) {
+                    BLENDED_PLOT(++x, y += step);
+                }
+                if (pixels_left > 2) {
+                    BLENDED_PLOT(--x1, y1 -= step);
+                }
+            } else {
+                if (D < c) {
+                    BLENDED_PLOT(++x, y);
+                    if (pixels_left > 1) {
+                        BLENDED_PLOT(++x, y += step);
+                    }
+                    if (pixels_left > 2) {
+                        BLENDED_PLOT(--x1, y1);
+                    }
+                } else {
+                    BLENDED_PLOT(++x, y += step);
+                    if (pixels_left > 1) {
+                        BLENDED_PLOT(++x, y);
+                    }
+                    if (pixels_left > 2) {
+                        if (D > c) {
+                            BLENDED_PLOT(--x1, y1 -= step);
+                        } else {
+                            BLENDED_PLOT(--x1, y1);
+                        }
+                    }
+                }
+            }
+        }
+    }
+#undef BLENDED_PLOT
 }
 
 #ifdef REC2_MATCHING
