@@ -6133,6 +6133,7 @@ enum {
     kFatalError_CannotFindPedSpawnMaterial_S = 0xa4,
     kFatalError_CannotMovePedIndexOutOfRangeForMaterial_S = 0xa5,
     kFatalError_CannotGroupPedIndexOutOfRangeForMaterial_S = 0xa6,
+    kFatalError_PHILIntegrityFailure_S = 0xa7,
     kFatalError_CantFindPedTexture_S = 0xa8,
     kFatalError_CannotFindGibletModel_S = 0xa9,
     kFatalError_WrongCrushDataFileVersion_SDD = 0xab,

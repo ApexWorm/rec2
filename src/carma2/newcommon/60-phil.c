@@ -11,6 +11,7 @@
 #include "00-car.h"
 #include "18-graphics2.h"
 #include "49-physics.h"
+#include "52-errors.h"
 #include "55-volume.h"
 #include "platform.h"
 #include "rec2_macros.h"
@@ -348,9 +349,47 @@ int C2_HOOK_FASTCALL PHILAddObject(tPhysics_object* pObject) {
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_CHEAT 0x004bb790
+// FUNCTION: CARMA2_CHEAT 0x004bb790
 void C2_HOOK_FASTCALL PHILVerify(void) {
-    NOT_IMPLEMENTED();
+    int i;
+    int count;
+    tPhysics_object* obj;
+    tPHIL_queued_header* header;
+
+    for (i = 0; i < (int)REC2_ASIZE(gPhil_queued_objects.headers); i++) {
+        gPhil_queued_objects.headers[i].cheat_variable = 0;
+    }
+    count = 0;
+    for (i = 0; i < (int)REC2_ASIZE(gPhil_queued_objects.headers); i++) {
+        header = &gPhil_queued_objects.headers[i];
+        if (header->collision_info != NULL) {
+            count++;
+            if (header->collision_info->field_0x240 != header) {
+                FatalError(kFatalError_PHILIntegrityFailure_S, "PHIL/Kev cross-pointers mismatch");
+            }
+            if (header->field_0x8 != 1 && header->field_0x8 != 2) {
+                FatalError(kFatalError_PHILIntegrityFailure_S, "Status mismatch");
+            }
+        }
+    }
+    if (count != gPHIL_count_list_collision_infos) {
+        FatalError(kFatalError_PHILIntegrityFailure_S, "Count is wrong (1)");
+    }
+    count = 0;
+    for (obj = gPHIL_list_collision_infos; obj != NULL; obj = obj->next) {
+        header = obj->field_0x240;
+        if (header->cheat_variable != 0) {
+            FatalError(kFatalError_PHILIntegrityFailure_S, "List is cyclic");
+        }
+        header->cheat_variable = 1;
+        if (obj == obj->next) {
+            FatalError(kFatalError_PHILIntegrityFailure_S, "Object's next pointer points to itself");
+        }
+        count++;
+    }
+    if (count != gPHIL_count_list_collision_infos) {
+        FatalError(kFatalError_PHILIntegrityFailure_S, "Count is wrong (2)");
+    }
 }
 
 #ifdef REC2_MATCHING
