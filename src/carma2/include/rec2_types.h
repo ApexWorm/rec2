@@ -771,10 +771,17 @@ typedef struct {
     br_pixelmap* pixelmap;
 } tPipe_chunk_oil_spill;
 
+typedef struct {
+    br_model* model;
+    tCompressed_vector3 direction;
+    tU16 values[];
+} tPipe_chunk_crush;
+
 typedef enum {
     ePipe_chunk_frame_finish = 0,
     ePipe_chunk_ped_incident = 1,
     ePipe_chunk_sound = 2,
+    ePipe_chunk_crush = 3,
     ePipe_chunk_car = 5,
     ePipe_chunk_graphical_wheel_stuff = 6,
     ePipe_chunk_damage = 7,
@@ -961,6 +968,7 @@ typedef struct tPipe_chunk {
         tPipe_single_drone_straight_pos drone_straight_pos;
         tPipe_chunk_repulse_ray repulse_ray;
         tPipe_chunk_oil_spill oil_spill;
+        tPipe_chunk_crush crush;
         tPipe_chunk_extended_splash extended_splash;
         tPipe_single_graphical_wheel_stuff graphical_wheel_stuff;
         char raw_data[0];
