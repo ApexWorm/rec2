@@ -83,6 +83,8 @@ extern tRoad_texturing_level C2_HOOK_FASTCALL GetRoadTexturingLevel(void);
 
 extern void C2_HOOK_FASTCALL SetRoadTexturingLevel(tRoad_texturing_level pLevel);
 
+extern void C2_HOOK_FASTCALL ReallySetRoadTexturingLevel(tRoad_texturing_level pLevel);
+
 extern tWall_texturing_level C2_HOOK_FASTCALL GetWallTexturingLevel(void);
 
 extern void C2_HOOK_FASTCALL SetWallTexturingLevel(tWall_texturing_level pLevel);

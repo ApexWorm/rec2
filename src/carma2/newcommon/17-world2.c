@@ -588,6 +588,22 @@ void C2_HOOK_FASTCALL SetRoadTexturingLevel(tRoad_texturing_level pLevel) {
     gRoad_texturing_level = pLevel;
 }
 
+// FUNCTION: CARMA2_HW 0x00448790
+// FUNCTION: CARMA2_SW 0x00448bb0
+// FUNCTION: CARMA2_CHEAT 0x00448ca0
+void C2_HOOK_FASTCALL ReallySetRoadTexturingLevel(tRoad_texturing_level pLevel) {
+    tPMFMCB* callback;
+
+    if (pLevel != gRoad_texturing_level) {
+        if (pLevel != eRTL_none) {
+            callback = RoadUntexToPersp;
+        } else {
+            callback = RoadPerspToUntex;
+        }
+        ProcessFaceMaterials(gProgram_state.track_spec.the_actor, callback);
+    }
+}
+
 // FUNCTION: CARMA2_HW 0x004488f0
 // FUNCTION: CARMA2_SW 0x00448d10
 // FUNCTION: CARMA2_CHEAT 0x00448e00
