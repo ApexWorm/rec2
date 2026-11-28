@@ -237,6 +237,8 @@ extern void C2_HOOK_FASTCALL PipeSingleSkidAdjustment(int pSkid_num, br_matrix34
 
 extern void C2_HOOK_FASTCALL PipeSingleFlap(br_actor* pActor, br_angle pAngle);
 
+extern void C2_HOOK_FASTCALL PipeSingleModelMash(br_model* pModel, br_vector3* pMash);
+
 extern void C2_HOOK_FASTCALL PipeSingleRelink(br_actor* pParent, br_actor* pActor);
 
 extern void C2_HOOK_FASTCALL PipeSingleIdentity(br_actor* pActor);

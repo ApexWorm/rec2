@@ -1322,6 +1322,26 @@ void C2_HOOK_FASTCALL PipeSingleFlap(br_actor* pActor, br_angle pAngle) {
         SIZE_OFFSET_PIPING(tPipe_chunk_flap, angle), pAngle);
 }
 
+// FUNCTION: CARMA2_HW 0x004c8650
+// FUNCTION: CARMA2_SW 0x004c4d80
+// FUNCTION: CARMA2_CHEAT 0x004ce170
+void C2_HOOK_FASTCALL PipeSingleModelMash(br_model* pModel, br_vector3* pMash) {
+    tPipe_model_mash* model_mash;
+    tU32 size;
+
+    model_mash = gCrush_space;
+    if (gCrush_space == NULL) {
+        return;
+    }
+    size = offsetof(tPipe_model_mash, vectors) + pModel->nvertices * sizeof(tCompressed_vector3);
+    if (size > 0x4000) {
+        FatalError(kFatalError_ChunkIsTooLargeToPipe);
+    }
+    model_mash->model = pModel;
+    ARCompressModelMash(model_mash->vectors, pModel, pMash);
+    ARDoSingleSession(ePipe_chunk_model_mash, -1, model_mash, size);
+}
+
 // FUNCTION: CARMA2_HW 0x004c86b0
 // FUNCTION: CARMA2_SW 0x004c4de0
 // FUNCTION: CARMA2_CHEAT 0x004ce1d0
