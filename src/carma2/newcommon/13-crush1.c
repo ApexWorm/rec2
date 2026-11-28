@@ -2108,13 +2108,13 @@ void C2_HOOK_FASTCALL BendPoint(br_vector3* pPoint, const tBend_point_context* p
 
     flag = pContext->field_0x34->field_0x74;
     z = pPoint->v[2] - pContext->field_0x34->field_0x20;
-    if ((flag && z <= 0.f) || (!flag && z >= 0.f)) {
+    if ((flag && z <= 0.0f) || (!flag && z >= 0.0f)) {
         BrMatrix34ApplyP(&tv, pPoint, &pContext->field_0x4);
         BrVector3Copy(pPoint, &tv);
         return;
     }
     BrVector3Sub(&tv, pPoint, &pContext->field_0x34->field_0x24);
-    if ((flag && tv.v[2] <= 0.f) || (!flag && tv.v[2] >= 0.f)) {
+    if ((flag && tv.v[2] <= 0.0f) || (!flag && tv.v[2] >= 0.0f)) {
         sx = pContext->field_0x34->field_0x30.v[0];
         sy = pContext->field_0x34->field_0x30.v[1];
         sz = pContext->field_0x34->field_0x30.v[2];
@@ -2136,8 +2136,6 @@ void C2_HOOK_FASTCALL BendPoint(br_vector3* pPoint, const tBend_point_context* p
 #ifdef REC2_MATCHING
 #pragma auto_inline(on)
 #endif
-
-extern int C2_HOOK_FASTCALL EdgeCrossesZPlane(br_scalar pZ, const br_vector3* pP1, const br_vector3* pP2);
 
 inline int C2_HOOK_FASTCALL EdgeCrossesZPlane(br_scalar pZ, const br_vector3* pP1, const br_vector3* pP2) {
 
