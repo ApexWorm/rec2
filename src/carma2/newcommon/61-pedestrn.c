@@ -176,6 +176,21 @@ tShrapnel_time_info gGiblet_min_max_time;
 // GLOBAL: CARMA2_CHEAT 0x006a3790
 int gGiblet_size_count;
 
+// GLOBAL: CARMA2_HW 0x0058f2a8
+// GLOBAL: CARMA2_SW 0x0058a2a8
+// GLOBAL: CARMA2_CHEAT 0x005942a8
+const br_vector3 gPed_x_unit_vector = { { 1.0f, 0.0f, 0.0f } };
+
+// GLOBAL: CARMA2_HW 0x0058f2b8
+// GLOBAL: CARMA2_SW 0x0058a2b8
+// GLOBAL: CARMA2_CHEAT 0x005942b8
+const br_vector3 gPed_y_unit_vector = { { 0.0f, 1.0f, 0.0f } };
+
+// GLOBAL: CARMA2_HW 0x0058f2c8
+// GLOBAL: CARMA2_SW 0x0058a2c8
+// GLOBAL: CARMA2_CHEAT 0x005942c8
+const br_vector3 gPed_z_unit_vector = { { 0.0f, 0.0f, 1.0f } };
+
 // GLOBAL: CARMA2_HW 0x0065d7f0
 // GLOBAL: CARMA2_SW 0x00658128
 // GLOBAL: CARMA2_CHEAT 0x00664ea8
@@ -625,20 +640,22 @@ void C2_HOOK_FASTCALL InitBoner(tPedForms_vtable* pTable) {
     NOT_IMPLEMENTED();
 }
 
-#ifdef REC2_MATCHING
-#pragma auto_inline(off)
-#endif
-
-// STUB: CARMA2_HW 0x00403f90
-// STUB: CARMA2_SW 0x00403f90
-// STUB: CARMA2_CHEAT 0x00403f90
+// FUNCTION: CARMA2_HW 0x00403f90
+// FUNCTION: CARMA2_SW 0x00403f90
+// FUNCTION: CARMA2_CHEAT 0x00403f90
 void C2_HOOK_FASTCALL DRVector3SafeCross(br_vector3* pDest, const br_vector3* pA, const br_vector3* pB) {
-    NOT_IMPLEMENTED();
-}
 
-#ifdef REC2_MATCHING
-#pragma auto_inline(on)
-#endif
+    BrVector3Cross(pDest, pA, pB);
+    if ((br_scalar)fabs(pDest->v[0]) < BR_SCALAR_EPSILON * 20 && (br_scalar)fabs(pDest->v[1]) < BR_SCALAR_EPSILON * 20 && (br_scalar)fabs(pDest->v[2]) < BR_SCALAR_EPSILON * 20) {
+        if ((br_scalar)fabs(pA->v[0]) <= (br_scalar)fabs(pA->v[1]) && (br_scalar)fabs(pA->v[0]) <= (br_scalar)fabs(pA->v[2])) {
+            BrVector3Cross(pDest, pA, &gPed_x_unit_vector);
+        } else if ((br_scalar)fabs(pA->v[1]) <= (br_scalar)fabs(pA->v[0]) && (br_scalar)fabs(pA->v[1]) <= (br_scalar)fabs(pA->v[2])) {
+            BrVector3Cross(pDest, pA, &gPed_y_unit_vector);
+        } else {
+            BrVector3Cross(pDest, pA, &gPed_z_unit_vector);
+        }
+    }
+}
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
