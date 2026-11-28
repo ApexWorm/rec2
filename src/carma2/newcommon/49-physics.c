@@ -1798,12 +1798,12 @@ void C2_HOOK_FASTCALL DoPhysicsError(tPhysicsError pError, const char* pMessage)
 inline void C2_HOOK_FASTCALL ResetMan2(void) {
 
     if (gTest_object != NULL) {
-        BrMatrix34Translate(&gTest_object->transform_matrix, -54.f, 7.1325f, -155.f);
+        BrMatrix34Translate(&gTest_object->transform_matrix, -54.0f, 7.1325f, -155.0f);
         gTest_object->disable_move_rotate = 1;
-        BrVector3SetFloat(&gTest_object->v, 0.f, 0.f, 0.f);
-        BrVector3SetFloat(&gTest_object->omega, 0.f, 0.f, 0.f);
-        BrVector3SetFloat(&gTest_object->rotate_omega, 0.f, 0.f, 0.f);
-        BrVector3SetFloat(&gTest_object->velocity_car_space, 0.f, 0.f, 0.f);
+        BrVector3SetFloat(&gTest_object->v, 0.0f, 0.0f, 0.0f);
+        BrVector3SetFloat(&gTest_object->omega, 0.0f, 0.0f, 0.0f);
+        BrVector3SetFloat(&gTest_object->rotate_omega, 0.0f, 0.0f, 0.0f);
+        BrVector3SetFloat(&gTest_object->velocity_car_space, 0.0f, 0.0f, 0.0f);
         ResetObjectList_test(gTest_object->child);
         PositionChildren(gTest_object);
     }
@@ -1823,11 +1823,11 @@ void C2_HOOK_FASTCALL SetUpTestObjects(void) {
 void C2_HOOK_FASTCALL ResetObjectList_test(tPhysics_object* pObject) {
 
     for (; pObject != NULL; pObject = pObject->next) {
-        BrMatrix34Translate(&pObject->transform_matrix, 0.f, 0.f, 0.f);
-        BrVector3SetFloat(&pObject->v, 0.f, 0.f, 0.f);
-        BrVector3SetFloat(&pObject->omega, 0.f, 0.f, 0.f);
-        BrVector3SetFloat(&pObject->rotate_omega, 0.f, 0.f, 0.f);
-        BrVector3SetFloat(&pObject->velocity_car_space, 0.f, 0.f, 0.f);
+        BrMatrix34Translate(&pObject->transform_matrix, 0.0f, 0.0f, 0.0f);
+        BrVector3SetFloat(&pObject->v, 0.0f, 0.0f, 0.0f);
+        BrVector3SetFloat(&pObject->omega, 0.0f, 0.0f, 0.0f);
+        BrVector3SetFloat(&pObject->rotate_omega, 0.0f, 0.0f, 0.0f);
+        BrVector3SetFloat(&pObject->velocity_car_space, 0.0f, 0.0f, 0.0f);
         pObject->disable_move_rotate = 1;
         if (pObject->child != NULL) {
             ResetObjectList_test(pObject->child);
