@@ -40,8 +40,6 @@ extern void C2_HOOK_FASTCALL Win32InitInputDevice(void);
 
 extern int C2_HOOK_FASTCALL SetDinputEffectGain(int pIndex, int pGain);
 
-extern int C2_HOOK_FASTCALL SetJoystickCollisionFFB(int pForce, LONG pDirection);
-
 extern int C2_HOOK_FASTCALL JoystickDInputBegin(void);
 
 extern tU32 C2_HOOK_FASTCALL PDGetJoystickButtonStates(void);

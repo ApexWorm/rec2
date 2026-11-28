@@ -18,6 +18,8 @@ extern float gJoystick_x_steering;
 extern float gJoystick_y_throttle;
 extern int gINT_00595f84;
 extern int gINT_00596310;
+extern float gForce_feedback_upper_limit;
+extern float gForce_feedback_lower_limit;
 extern int gJoystick_preferences_backup_valid;
 extern tButtonJoystickInfo gJoystick_preferences_backup;
 

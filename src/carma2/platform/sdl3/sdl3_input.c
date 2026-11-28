@@ -567,6 +567,10 @@ int C2_HOOK_FASTCALL PDSetJoystickForceFFB(int pForce) {
     return 0;
 }
 
+int C2_HOOK_FASTCALL SetJoystickCollisionFFB(int pForce, int pDirection) {
+    return 0;
+}
+
 int C2_HOOK_FASTCALL PDIsJoystickDPadEnabled(void) {
     tButtonJoystickInfo* info = PDGetCurrentJoystickData();
 

@@ -13,6 +13,7 @@
 #include "globvars.h"
 #include "platform.h"
 
+#include "c2_math.h"
 #include "c2_stdio.h"
 #include "c2_stdlib.h"
 #include "c2_string.h"
@@ -38,6 +39,14 @@ float gJoystick_y_throttle = 1.f;
 // GLOBAL: CARMA2_SW 0x00591270
 // GLOBAL: CARMA2_CHEAT 0x0059cb90
 int gINT_00596310 = 50;
+
+// GLOBAL: CARMA2_HW 0x00655e58
+// GLOBAL: CARMA2_SW 0x00650d40
+float gForce_feedback_upper_limit = 2.7f;
+
+// GLOBAL: CARMA2_HW 0x00655e5c
+// GLOBAL: CARMA2_SW 0x00650d44
+float gForce_feedback_lower_limit = 1.5f;
 
 // GLOBAL: CARMA2_HW 0x00686184
 // GLOBAL: CARMA2_SW 0x006808c4
@@ -603,9 +612,47 @@ float C2_HOOK_FASTCALL GetJoystickY(void) {
     return gJoystick_y_throttle;
 }
 
-// STUB: CARMA2_HW 0x0045c910
-// STUB: CARMA2_SW 0x0045c350
-// STUB: CARMA2_CHEAT 0x0045cd90
+// FUNCTION: CARMA2_HW 0x0045c910
+// FUNCTION: CARMA2_SW 0x0045c350
+// FUNCTION: CARMA2_CHEAT 0x0045cd90
 void C2_HOOK_FASTCALL FUN_0045c910(tCar_spec* pCar, br_vector3* pPosition, br_vector3* pForce, br_scalar pMagnitude) {
-    NOT_IMPLEMENTED();
+    br_vector3 direction;
+    int force;
+    int angle;
+    int flip;
+
+#ifdef REC2_CHEAT
+    if (pMagnitude > 2.7) {
+        pMagnitude = 2.7f;
+    }
+    if (pMagnitude < 1.5) {
+        pMagnitude = 1.5f;
+    }
+    force = (int)(pMagnitude * (10000.0 / 2.7));
+#else
+    if (pMagnitude > gForce_feedback_upper_limit) {
+        pMagnitude = gForce_feedback_upper_limit;
+    }
+    if (pMagnitude < gForce_feedback_lower_limit) {
+        pMagnitude = gForce_feedback_lower_limit;
+    }
+    force = (int)(pMagnitude * (10000.0 / gForce_feedback_upper_limit));
+#endif
+    BrVector3Normalise(&direction, pPosition);
+    if (direction.v[0] > 0.0f) {
+        flip = 0;
+    } else {
+        flip = 1;
+    }
+    angle = (int)(acos(-direction.v[2]) * 57.29577951308);
+    if (angle < 45) {
+        angle = 90 - angle;
+    }
+    if (angle > 135) {
+        angle = 270 - angle;
+    }
+    if (flip) {
+        angle = 360 - angle;
+    }
+    SetJoystickCollisionFFB(force, angle * 100);
 }

@@ -997,7 +997,7 @@ int C2_HOOK_FASTCALL PDSetJoystickForceFFB(int pForce) {
 // FUNCTION: CARMA2_HW 0x00458720
 // FUNCTION: CARMA2_SW 0x004584b0
 // FUNCTION: CARMA2_CHEAT 0x00458ba0
-int C2_HOOK_FASTCALL SetJoystickCollisionFFB(int pForce, LONG pDirection) {
+int C2_HOOK_FASTCALL SetJoystickCollisionFFB(int pForce, int pDirection) {
     IDirectInputEffect* effect;
 
     if (!gForceFeedbackAvailable) {
