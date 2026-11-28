@@ -49,11 +49,15 @@ extern void C2_HOOK_FASTCALL CreateAccentPolyActor(float pX, float pY, float pWi
 
 extern void C2_HOOK_FASTCALL FUN_0045acf0(void);
 
-extern void C2_HOOK_FASTCALL FUN_0045b0a0(tHeadup_text_buffer* pText_buffer);
-
 extern void C2_HOOK_FASTCALL HeadupTextBufferSelectPrevious(tHeadup_text_buffer* pBuffer);
 
 extern void C2_HOOK_FASTCALL HeadupTextBufferSelectNext(tHeadup_text_buffer* pBuffer);
+
+extern void C2_HOOK_FASTCALL FUN_0045ae20(void);
+
+extern void C2_HOOK_FASTCALL FUN_0045b0a0(tHeadup_text_buffer* pText_buffer);
+
+extern void C2_HOOK_FASTCALL FUN_0045b150(void);
 
 extern int C2_HOOK_FASTCALL ResetJoystickHeadupSelection(tButtonJoystickInfo** pJoystick_info);
 

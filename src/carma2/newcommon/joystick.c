@@ -9,6 +9,7 @@
 #include "joystick.h"
 
 #include "08-loading1.h"
+#include "11-world1.h"
 #include "15-displays.h"
 #include "24-loadsave.h"
 #include "41-utility.h"
@@ -403,6 +404,95 @@ void C2_HOOK_FASTCALL FUN_0045acf0(void) {
     }
 }
 
+inline void C2_HOOK_FASTCALL HeadupTextBufferSelectPrevious(tHeadup_text_buffer* pBuffer) {
+    int i;
+
+    if (pBuffer != NULL && pBuffer->text_last_add != NULL && pBuffer->text_last_add != pBuffer->texts) {
+        pBuffer->text_last_add = pBuffer->texts;
+        pBuffer->pos_last_add--;
+        for (i = 0; i < pBuffer->pos_last_add; i++) {
+            pBuffer->text_last_add = pBuffer->text_last_add->next;
+        }
+    }
+}
+
+inline void C2_HOOK_FASTCALL HeadupTextBufferSelectNext(tHeadup_text_buffer* pBuffer) {
+
+    if (pBuffer != NULL && pBuffer->text_last_add != NULL && pBuffer->text_last_add->next != NULL) {
+        pBuffer->text_last_add = pBuffer->text_last_add->next;
+        pBuffer->pos_last_add++;
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x0045ae20
+// FUNCTION: CARMA2_SW 0x0045a8a0
+// FUNCTION: CARMA2_CHEAT 0x0045b2a0
+void C2_HOOK_FASTCALL FUN_0045ae20(void) {
+    tHeadup_text* text;
+    tU32 the_time;
+    tU32 now;
+    int i;
+
+    if (gINT_0068b8e4) {
+        the_time = PDGetTotalTime();
+        if (PDKeyDown(66)) {
+            HeadupTextBufferSelectPrevious(&gPath_headup_buffer);
+            now = the_time;
+            while (now - the_time < 100) {
+                now = PDGetTotalTime();
+            }
+        }
+        if (PDKeyDown(67)) {
+            HeadupTextBufferSelectNext(&gPath_headup_buffer);
+            now = the_time;
+            while (now - the_time < 100) {
+                now = PDGetTotalTime();
+            }
+        }
+        if (PDKeyDown(68)) {
+            for (i = 0; i < gPath_headup_buffer.field_0x10 - 1; i++) {
+                HeadupTextBufferSelectPrevious(&gPath_headup_buffer);
+            }
+            while (PDKeyDown(68)) {
+            }
+        }
+        if (PDKeyDown(69)) {
+            for (i = 0; i < gPath_headup_buffer.field_0x10 - 1; i++) {
+                HeadupTextBufferSelectNext(&gPath_headup_buffer);
+            }
+            while (PDKeyDown(69)) {
+            }
+        }
+        if (PDKeyDown(64)) {
+            gSelected_path_headup = gPath_headup_buffer.text_last_add;
+            FUN_005076a0(0, 0);
+            gSelected_path_headup = NULL;
+            while (PDKeyDown(64)) {
+            }
+        }
+        if (PDKeyDown(65)) {
+            FUN_005088b0();
+            while (PDKeyDown(65)) {
+            }
+        }
+        FUN_0045b0a0(&gPath_headup_buffer);
+        text = gPath_headup_buffer.field_0x4;
+        for (i = 0; i < (int)REC2_ASIZE(gRace_head_ups); i++) {
+            if (text != NULL) {
+                if (text == gPath_headup_buffer.text_last_add) {
+                    ChangeHeadupFont(gRace_head_ups[i], -1);
+                } else {
+                    ChangeHeadupFont(gRace_head_ups[i], -2);
+                }
+                ChangeHeadupText(gRace_head_ups[i], text->text);
+                text = text->next;
+            } else {
+                ChangeHeadupText(gRace_head_ups[i], "");
+            }
+        }
+    }
+}
+
 // FUNCTION: CARMA2_HW 0x0045b0a0
 // FUNCTION: CARMA2_SW 0x0045ab20
 // FUNCTION: CARMA2_CHEAT 0x0045b520
@@ -446,23 +536,60 @@ void C2_HOOK_FASTCALL FUN_0045b0a0(tHeadup_text_buffer* pText_buffer) {
     }
 }
 
-inline void C2_HOOK_FASTCALL HeadupTextBufferSelectPrevious(tHeadup_text_buffer* pBuffer) {
+// FUNCTION: CARMA2_HW 0x0045b150
+// FUNCTION: CARMA2_SW 0x0045abd0
+// FUNCTION: CARMA2_CHEAT 0x0045b5d0
+void C2_HOOK_FASTCALL FUN_0045b150(void) {
+    tHeadup_text* text;
+    tU32 the_time;
+    tU32 now;
     int i;
 
-    if (pBuffer != NULL && pBuffer->text_last_add != NULL && pBuffer->text_last_add != pBuffer->texts) {
-        pBuffer->text_last_add = pBuffer->texts;
-        pBuffer->pos_last_add--;
-        for (i = 0; i < pBuffer->pos_last_add; i++) {
-            pBuffer->text_last_add = pBuffer->text_last_add->next;
+    if (gINT_0068b8e4) {
+        the_time = PDGetTotalTime();
+        if (PDKeyDown(66)) {
+            HeadupTextBufferSelectPrevious(&gTest_headup_buffer);
+            now = the_time;
+            while (now - the_time < 100) {
+                now = PDGetTotalTime();
+            }
         }
-    }
-}
-
-inline void C2_HOOK_FASTCALL HeadupTextBufferSelectNext(tHeadup_text_buffer* pBuffer) {
-
-    if (pBuffer != NULL && pBuffer->text_last_add != NULL && pBuffer->text_last_add->next != NULL) {
-        pBuffer->text_last_add = pBuffer->text_last_add->next;
-        pBuffer->pos_last_add++;
+        if (PDKeyDown(67)) {
+            HeadupTextBufferSelectNext(&gTest_headup_buffer);
+            now = the_time;
+            while (now - the_time < 100) {
+                now = PDGetTotalTime();
+            }
+        }
+        if (PDKeyDown(68)) {
+            for (i = 0; i < gTest_headup_buffer.field_0x10 - 1; i++) {
+                HeadupTextBufferSelectPrevious(&gTest_headup_buffer);
+            }
+            while (PDKeyDown(68)) {
+            }
+        }
+        if (PDKeyDown(69)) {
+            for (i = 0; i < gTest_headup_buffer.field_0x10 - 1; i++) {
+                HeadupTextBufferSelectNext(&gTest_headup_buffer);
+            }
+            while (PDKeyDown(69)) {
+            }
+        }
+        FUN_0045b0a0(&gTest_headup_buffer);
+        text = gTest_headup_buffer.field_0x4;
+        for (i = 0; i < (int)REC2_ASIZE(gRace_head_ups); i++) {
+            if (text != NULL) {
+                if (text == gTest_headup_buffer.text_last_add) {
+                    ChangeHeadupFont(gRace_head_ups[i], -1);
+                } else {
+                    ChangeHeadupFont(gRace_head_ups[i], -2);
+                }
+                ChangeHeadupText(gRace_head_ups[i], text->text);
+                text = text->next;
+            } else {
+                ChangeHeadupText(gRace_head_ups[i], "");
+            }
+        }
     }
 }
 
