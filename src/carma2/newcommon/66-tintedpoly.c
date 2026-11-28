@@ -95,10 +95,10 @@ int gFire_poly_delayed_iteration;
 // GLOBAL: CARMA2_SW 0x006591c4
 int gDefaultOpacity_TintedPoly = 0x80;
 
-#ifdef REC2_SW
+// GLOBAL: CARMA2_HW 0x006a0434
 // GLOBAL: CARMA2_SW 0x0069a48c
+// GLOBAL: CARMA2_CHEAT 0x006a7fac
 br_colour* gTinted_original_palette_colours;
-#endif
 
 
 // FUNCTION: CARMA2_HW 0x004d7040
@@ -541,19 +541,65 @@ void C2_HOOK_FASTCALL UpdateTintedPolyByMaterial(int pIndex) {
     }
 }
 
-#ifdef REC2_SW
 #if defined(REC2_MATCHING) && defined(_MSC_VER)
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_SW 0x004d4520
+// FUNCTION: CARMA2_HW 0x004d8050
+// FUNCTION: CARMA2_SW 0x004d4520
+// FUNCTION: CARMA2_CHEAT 0x004ddc10
 void C2_HOOK_FASTCALL UpdateTintedPalette(int pIndex) {
-    NOT_IMPLEMENTED();
+    int grn;
+    int blu;
+    double factor;
+    int red;
+    double red_factor;
+    int i;
+    double grn_factor;
+    double blu_factor;
+    tU32 max;
+    tU32 b;
+    double scale;
+    br_colour colour;
+    tU32 r;
+    tU32 g;
+    tU32 half;
+
+    if (gTinted_original_palette_colours != NULL && pIndex != -1) {
+        red = gTintedPolys[pIndex].color_red;
+        grn = gTintedPolys[pIndex].color_grn;
+        blu = gTintedPolys[pIndex].color_blu;
+        if (red > grn) {
+            max = red;
+        } else {
+            max = grn;
+        }
+        if (max <= (tU32)blu) {
+            max = blu;
+        }
+        factor = 50.0 / max;
+        red_factor = 0.5 + red * factor * 0.01;
+        grn_factor = 0.5 + grn * factor * 0.01;
+        blu_factor = 0.5 + blu * factor * 0.01;
+        for (i = 1; i < 256; i++) {
+            colour = gTinted_original_palette_colours[i];
+            b = colour & 0xff;
+            g = (colour >> 8) & 0xff;
+            r = (colour >> 16) & 0xff;
+            half = (tU8)((r + g + b) / 3 / 2);
+            if (half * 2 != 0) {
+                scale = 100.0 / (half * 2) * (int)half * 0.01;
+                ((br_colour*)gRender_palette->pixels)[i] = BR_COLOUR_RGB(
+                    (tU8)(scale * ((half + r) * red_factor)),
+                    (tU8)(scale * ((half + g) * grn_factor)),
+                    (tU8)(scale * ((half + b) * blu_factor)));
+            }
+        }
+    }
 }
 
 #if defined(REC2_MATCHING) && defined(_MSC_VER)
 #pragma auto_inline(on)
-#endif
 #endif
 
 // FUNCTION: CARMA2_HW 0x004d8220
