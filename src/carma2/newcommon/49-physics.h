@@ -14,8 +14,6 @@
 
 extern undefined4 gDAT_00679434;
 
-extern int gTesting_sensible_place;
-
 extern int gINT_00692dc8;
 
 extern tPhysicsError_cbfn* gPhysics_error_cb;
