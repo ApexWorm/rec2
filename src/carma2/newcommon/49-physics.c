@@ -558,7 +558,35 @@ int C2_HOOK_FASTCALL GetFaceEdgeIntersection(tPhysics_object* pObject, tPhysics_
     return pCount;
 }
 
-// GetSphereToFacePoints
+inline int C2_HOOK_FASTCALL GetSphereToFacePoints(tPhysics_object* pObject, tCollision_shape_sphere_data* pSphere, tPhysics_joint_force* pForces, int pCount, int pMax_count, br_vector3* pSphere_start, br_vector3* pSphere_end, br_matrix34* pMatrix) {
+    tFace_ref* face;
+    tFace_ref* best_face;
+    br_vector3 point;
+    br_vector3 normal;
+    br_vector3 best_normal;
+    br_vector3 old_normal;
+    br_scalar t;
+    br_scalar best_t;
+    int i;
+
+    best_t = 2.0f;
+    for (i = pObject->box_face_start, face = &gFace_list__car[i]; i < pObject->box_face_end; i++, face++) {
+        SphereFaceCollide(face, pSphere_start, pSphere_end, pSphere->radius, &point, &normal, &t);
+        if (t < best_t) {
+            best_t = t;
+            best_face = face;
+            BrVector3Copy(&best_normal, &normal);
+        }
+    }
+    if (best_t <= 1.0f) {
+        BrMatrix34TApplyV(&normal, &best_normal, &pObject->transform_matrix);
+        BrMatrix34TApplyV(&old_normal, &best_normal, &pObject->actor->t.t.mat);
+        BrVector3Scale(&point, &old_normal, -pSphere->radius);
+        BrVector3Accumulate(&point, &pSphere->center);
+        pCount = AddObjectWallForce(pForces, &point, best_t, &normal, 0.0f, pCount, pObject, 3, best_face, NULL);
+    }
+    return pCount;
+}
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
@@ -1019,7 +1047,7 @@ int C2_HOOK_FASTCALL CheckSingleEdgeWithObjectEdges(br_vector3* pEdge_start, br_
 // FUNCTION: CARMA2_HW 0x00424140
 // FUNCTION: CARMA2_SW 0x004241c0
 // FUNCTION: CARMA2_CHEAT 0x004242c0
-int C2_HOOK_FASTCALL GetEdgeToEdgePoints(tPhysics_object* pObject, tPhysics_shape* pShape, tPhysics_joint_force* pForces, int pCount, int pMax_count, tPhysics_wall_workspace* pWorkspace, undefined4 pUnused) {
+int C2_HOOK_FASTCALL GetEdgeToEdgePoints(tPhysics_object* pObject, tPhysics_shape* pShape, tPhysics_joint_force* pForces, int pCount, int pMax_count, tPhysics_wall_workspace* pWorkspace, void* pUnused) {
     int i;
     tFace_ref* face;
     br_vector3 tv;
@@ -1046,17 +1074,143 @@ int C2_HOOK_FASTCALL GetEdgeToEdgePoints(tPhysics_object* pObject, tPhysics_shap
     return pCount;
 }
 
-// SetUpWorkspace
+inline void C2_HOOK_FASTCALL SetUpWorkspace(tPhysics_object* pObject, tPhysics_shape* pShape, tPhysics_wall_workspace* pWorkspace) {
+    br_matrix34* trial_matrix;
+    br_vector3 corner;
+    int i;
+
+    if (gINT_00679438 != 0) {
+        trial_matrix = &pObject->transform_matrix;
+    } else {
+        trial_matrix = &pObject->actor->t.t.mat;
+    }
+    switch (pShape->common.type) {
+    case kCollisionShapeType_Box:
+        pWorkspace->count_points = 8;
+        pWorkspace->count_edges = 12;
+        for (i = 0; i < 8; i++) {
+            if (i & 0x2) {
+                corner.v[0] = pShape->common.bb.min.v[0];
+            } else {
+                corner.v[0] = pShape->common.bb.max.v[0];
+            }
+            if (i & 0x1) {
+                corner.v[1] = pShape->common.bb.min.v[1];
+            } else {
+                corner.v[1] = pShape->common.bb.max.v[1];
+            }
+            if (i & 0x4) {
+                corner.v[2] = pShape->common.bb.min.v[2];
+            } else {
+                corner.v[2] = pShape->common.bb.max.v[2];
+            }
+            BrMatrix34ApplyP(&pWorkspace->old_points[i], &corner, &pObject->transform_matrix);
+            BrMatrix34ApplyP(&pWorkspace->trial_points[i], &corner, trial_matrix);
+            pWorkspace->point_flags[i] = 0;
+        }
+        pWorkspace->edges = gDefault_box_collision_wireframe_edges;
+        break;
+    case kCollisionShapeType_Wireframe:
+        pWorkspace->count_points = pShape->wireframe.wireframe.count_points;
+        pWorkspace->count_edges = pShape->wireframe.wireframe.count_lines;
+        for (i = 0; i < pWorkspace->count_points; i++) {
+            BrMatrix34ApplyP(&pWorkspace->old_points[i], &pShape->wireframe.wireframe.points[i], &pObject->transform_matrix);
+            BrMatrix34ApplyP(&pWorkspace->trial_points[i], &pShape->wireframe.wireframe.points[i], trial_matrix);
+            pWorkspace->point_flags[i] = 0;
+        }
+        pWorkspace->edges = pShape->wireframe.wireframe.lines;
+        break;
+    case kCollisionShapeType_Polyhedron:
+    case kCollisionShapeType_Wireframe_Polyhedron:
+        pWorkspace->count_points = pShape->polyhedron.polyhedron.count_points;
+        pWorkspace->count_edges = pShape->polyhedron.polyhedron.count_edges;
+        for (i = 0; i < pWorkspace->count_points; i++) {
+            BrMatrix34ApplyP(&pWorkspace->old_points[i], &pShape->polyhedron.polyhedron.points[i], &pObject->transform_matrix);
+            BrMatrix34ApplyP(&pWorkspace->trial_points[i], &pShape->polyhedron.polyhedron.points[i], trial_matrix);
+            pWorkspace->point_flags[i] = 0;
+        }
+        pWorkspace->edges = pShape->polyhedron.polyhedron.edges;
+        break;
+    case kCollisionShapeType_Sphere:
+        pWorkspace->count_points = 1;
+        pWorkspace->count_edges = 0;
+        BrMatrix34ApplyP(&pWorkspace->old_points[0], &pShape->sphere.sphere.center, &pObject->transform_matrix);
+        BrMatrix34ApplyP(&pWorkspace->trial_points[0], &pShape->sphere.sphere.center, trial_matrix);
+        break;
+    default:
+        PhysicsError(ePhysicsError_UnknownShapeType, "");
+        break;
+    }
+    if (gINT_00679438 != 0) {
+        BrMatrix34ApplyP(&pWorkspace->old_points[0], &pObject->cmpos, &pObject->transform_matrix);
+        for (i = 1; i < pWorkspace->count_points; i++) {
+            BrVector3Copy(&pWorkspace->old_points[i], &pWorkspace->old_points[0]);
+        }
+    }
+}
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x004228b0
-// STUB: CARMA2_SW 0x00422930
-// STUB: CARMA2_CHEAT 0x00422a30
+// FUNCTION: CARMA2_HW 0x004228b0
+// FUNCTION: CARMA2_SW 0x00422930
+// FUNCTION: CARMA2_CHEAT 0x00422a30
 int C2_HOOK_FASTCALL GetObjectWallForceInfo(tPhysics_object* pObject, tPhysics_joint_force* pForces, int pCount) {
-    NOT_IMPLEMENTED();
+    tPhysics_wall_workspace workspace;
+    br_matrix34 inverse;
+    br_matrix34 delta;
+    tPhysics_shape* shape;
+    int count;
+    int sphere_count;
+    int touched;
+    int touched_all;
+    int i;
+
+    count = 0;
+    touched_all = 0;
+    shape = pObject->shape;
+    i = 1;
+    if (pObject->box_face_start == pObject->box_face_end) {
+        return 0;
+    }
+    if (pCount > 36) {
+        return 0;
+    }
+    BrMatrix34LPInverse(&inverse, &pObject->actor->t.t.mat);
+    BrMatrix34Mul(&delta, &pObject->transform_matrix, &inverse);
+    for (; shape != NULL; shape = shape->common.next) {
+        if (EliminateFaces(pObject, shape, &delta) != 0) {
+            SetUpWorkspace(pObject, shape, &workspace);
+            if (shape->common.type == kCollisionShapeType_Sphere) {
+                sphere_count = GetSphereToFacePoints(pObject, &shape->sphere.sphere, &pForces[pCount], count, 40 - pCount, workspace.old_points, workspace.trial_points, &delta);
+                if (GetSphereToEdgePoints(pObject, &shape->sphere.sphere, &pForces[pCount], sphere_count, 40 - pCount, workspace.old_points, workspace.trial_points, &delta) > count) {
+                    count++;
+                }
+            } else {
+                touched = 0;
+                if (pObject->field_0xed != 0) {
+                    count = GetFaceEdgeIntersection(pObject, shape, &pForces[pCount], count, 40 - pCount, &workspace, &delta, &touched);
+                }
+                touched_all |= touched;
+                count = GetCornerToFacePoints(pObject, shape, &pForces[pCount], count, 40 - pCount, &workspace, &delta);
+                if (touched == 0) {
+                    count = GetEdgeToEdgePoints(pObject, shape, &pForces[pCount], count, 40 - pCount, &workspace, &delta);
+                }
+            }
+        }
+    }
+    pObject->field_0xed = touched_all;
+    if (count == 0) {
+        return 0;
+    }
+    for (; i < count; i++) {
+        if (BrVector3Dot(&pForces[pCount].direction_a, &pForces[pCount + i].direction_a) <= 0.95) {
+            break;
+        }
+    }
+    BrVector3Copy(&pObject->omega, &pObject->rotate_omega);
+    return i;
 }
 
 #ifdef REC2_MATCHING

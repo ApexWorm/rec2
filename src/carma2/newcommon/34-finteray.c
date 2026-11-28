@@ -303,7 +303,7 @@ void C2_HOOK_FASTCALL SphereEdgeCollide(br_vector3* pEdge_start, br_vector3* pEd
 // FUNCTION: CARMA2_HW 0x0045e850
 // FUNCTION: CARMA2_SW 0x0045e2b0
 // FUNCTION: CARMA2_CHEAT 0x0045ecc0
-void C2_HOOK_FASTCALL SphereFaceCollide(tFace_ref* pFace, const br_vector3* pStart, const br_vector3* pEnd, br_scalar pRadius, br_scalar* pT, br_vector3* pNormal, br_vector3* pPoint) {
+void C2_HOOK_FASTCALL SphereFaceCollide(tFace_ref* pFace, const br_vector3* pStart, const br_vector3* pEnd, br_scalar pRadius, br_vector3* pPoint, br_vector3* pNormal, br_scalar* pT) {
     br_material* material;
     br_vector3 n;
     br_vector3 p;

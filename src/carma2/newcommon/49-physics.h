@@ -72,7 +72,7 @@ extern int C2_HOOK_FASTCALL EliminateFaces(tPhysics_object* pObject, tPhysics_sh
 
 extern int C2_HOOK_FASTCALL GetFaceEdgeIntersection(tPhysics_object* pObject, tPhysics_shape* pShape, tPhysics_joint_force* pForces, int pCount, int pMax_count, tPhysics_wall_workspace* pWorkspace, void* pUnused, int* pTouched);
 
-// GetSphereToFacePoints
+extern int C2_HOOK_FASTCALL GetSphereToFacePoints(tPhysics_object* pObject, tCollision_shape_sphere_data* pSphere, tPhysics_joint_force* pForces, int pCount, int pMax_count, br_vector3* pSphere_start, br_vector3* pSphere_end, br_matrix34* pMatrix);
 
 extern int C2_HOOK_FASTCALL CheckSingleEdgeWithSphere(br_vector3* pEdge_start, br_vector3* pEdge_end, tPhysics_object* pObject, tCollision_shape_sphere_data* pSphere, tPhysics_joint_force* pForces, int pCount, br_vector3* pSphere_start, br_vector3* pSphere_end, tFace_ref* pFace);
 
@@ -88,9 +88,9 @@ extern int C2_HOOK_FASTCALL WorldPointCollision(const br_vector3* pPoint, tPhysi
 
 extern int C2_HOOK_FASTCALL CheckSingleEdgeWithObjectEdges(br_vector3* pEdge_start, br_vector3* pEdge_end, tPhysics_object* pObject, tPhysics_shape* pShape, tPhysics_joint_force* pForces, int pCount, tFace_ref* pFace, tPhysics_wall_workspace* pWorkspace);
 
-extern int C2_HOOK_FASTCALL GetEdgeToEdgePoints(tPhysics_object* pObject, tPhysics_shape* pShape, tPhysics_joint_force* pForces, int pCount, int pMax_count, tPhysics_wall_workspace* pWorkspace, undefined4 pUnused);
+extern int C2_HOOK_FASTCALL GetEdgeToEdgePoints(tPhysics_object* pObject, tPhysics_shape* pShape, tPhysics_joint_force* pForces, int pCount, int pMax_count, tPhysics_wall_workspace* pWorkspace, void* pUnused);
 
-// SetUpWorkspace
+extern void C2_HOOK_FASTCALL SetUpWorkspace(tPhysics_object* pObject, tPhysics_shape* pShape, tPhysics_wall_workspace* pWorkspace);
 
 extern int C2_HOOK_FASTCALL GetObjectWallForceInfo(tPhysics_object* pObject, tPhysics_joint_force* pForces, int pCount);
 

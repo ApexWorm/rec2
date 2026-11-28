@@ -60,7 +60,7 @@ extern void C2_HOOK_FASTCALL SphereEdgeCollide(br_vector3* pEdge_start, br_vecto
 
 // SphereBoxFaceCollide
 
-extern void C2_HOOK_FASTCALL SphereFaceCollide(tFace_ref* pFace, const br_vector3* pStart, const br_vector3* pEnd, br_scalar pRadius, br_scalar* pT, br_vector3* pNormal, br_vector3* pPoint);
+extern void C2_HOOK_FASTCALL SphereFaceCollide(tFace_ref* pFace, const br_vector3* pStart, const br_vector3* pEnd, br_scalar pRadius, br_vector3* pPoint, br_vector3* pNormal, br_scalar* pT);
 
 extern void C2_HOOK_FASTCALL CheckSingleFace(tFace_ref* pFace, br_vector3* ray_pos, br_vector3* ray_dir, br_vector3* normal, br_scalar* rt, br_vector3* coll_pos);
 
