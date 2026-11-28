@@ -70,6 +70,7 @@ tTWTVFS C2_HOOK_FASTCALL OpenPackFile(const char* path) {
     tU32 fileSize;
     tU8* fileData;
     int i;
+    tTwatHeader* header;
 
     // file header must be 56 bytes for compatibility with .TWT files
     REC2_BUG_ON(sizeof(tTwatFileHeader) != 56);
@@ -79,31 +80,28 @@ tTWTVFS C2_HOOK_FASTCALL OpenPackFile(const char* path) {
 
     f = fopen(twatFilePath, "rb");
     if (f != NULL) {
-        for (twt = 0; ; twt++) {
-            if (twt >= (int)REC2_ASIZE(gTwatVfsMountPoints)) {
-                fclose(f);
-                return -1;
-            }
+        for (twt = 0; twt < (int)REC2_ASIZE(gTwatVfsMountPoints); twt++) {
             if (gTwatVfsMountPoints[twt].header == NULL) {
-                break;
+                strcpy(gTwatVfsMountPoints[twt].path, path);
+                fileSize = ReadU32(f);
+                rewind(f);
+
+                gTwatVfsMountPoints[twt].header = BrMemAllocate(fileSize, kMem_packed_file);
+                fread(gTwatVfsMountPoints[twt].header, fileSize, 1, f);
+                SplungeSomeData(gTwatVfsMountPoints[twt].header, fileSize);
+                header = gTwatVfsMountPoints[twt].header;
+                gTwatVfsMountPoints[twt].data = (tU8*)header;
+                fclose(f);
+
+                fileData = (tU8*)&gTwatVfsMountPoints[twt].header->fileHeaders[header->nbFiles];
+                for (i = 0; i < header->nbFiles; i++) {
+                    header->fileHeaders[i].data = fileData;
+                    fileData += (header->fileHeaders[i].fileSize + 3u) & ~3u;
+                }
+                return twt;
             }
         }
-        strcpy(gTwatVfsMountPoints[twt].path, path);
-        fileSize = ReadU32(f);
-        rewind(f);
-
-        gTwatVfsMountPoints[twt].header = BrMemAllocate(fileSize, kMem_packed_file);
-        fread(gTwatVfsMountPoints[twt].header, fileSize, 1, f);
-        SplungeSomeData(gTwatVfsMountPoints[twt].header, fileSize);
-        gTwatVfsMountPoints[twt].data = (tU8*)gTwatVfsMountPoints[twt].header;
         fclose(f);
-
-        fileData = (tU8*)&gTwatVfsMountPoints[twt].header->fileHeaders[gTwatVfsMountPoints[twt].header->nbFiles];
-        for (i = 0; i < gTwatVfsMountPoints[twt].header->nbFiles; i++) {
-            gTwatVfsMountPoints[twt].header->fileHeaders[i].data = fileData;
-            fileData += (gTwatVfsMountPoints[twt].header->fileHeaders[i].fileSize + 3u) & ~3u;
-        }
-        return twt;
     }
     return -1;
 }
