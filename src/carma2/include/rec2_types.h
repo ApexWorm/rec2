@@ -4605,6 +4605,21 @@ typedef struct {
     tPolyhedron_edge_indexes* edges;
 } tPhysics_wall_workspace;
 
+typedef struct tPhysics_quick_hinge {
+    tU32 field_0x0;
+    tPhysics_object* partner;
+    br_matrix34 field_0x8;
+    br_matrix34 field_0x38;
+} tPhysics_quick_hinge;
+
+typedef struct tPhysics_workspace {
+    int count;
+    tPhysics_joint_force* forces;
+    undefined field_0x8[12];
+    br_scalar* field_0x14;
+    br_scalar* field_0x18;
+} tPhysics_workspace;
+
 typedef struct tPhysics_object {
     br_actor* actor;
     float M;
@@ -4639,7 +4654,9 @@ typedef struct tPhysics_object {
     tPhysics_joint* physics_joint1;
     tPhysics_joint* physics_joint2;
     tU8 uid;
-    undefined field_0x191[11];
+    undefined field_0x191[3];
+    int (C2_HOOK_FASTCALL * field_0x194)(tPhysics_object*);
+    int (C2_HOOK_FASTCALL * field_0x198)(tPhysics_object*);
     int flags;
     int field_0x1a0;
     undefined4 field_0x1a4;
@@ -4654,9 +4671,9 @@ typedef struct tPhysics_object {
     undefined field_0x1df;
     tU8 field_0x1e0;
     undefined field_0x1e1[3];
-    undefined4 field_0x1e4;
+    tPhysics_quick_hinge* field_0x1e4;
     br_matrix34 field_0x1e8;
-    undefined4 field_0x218;
+    struct tPhysics_workspace* field_0x218;
     float field_0x21c;
     tPhysics_object* next;
     tPhysics_object* child;

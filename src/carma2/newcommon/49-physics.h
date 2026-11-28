@@ -20,6 +20,8 @@ extern int gINT_00692dc8;
 
 extern int gPrepared_objects;
 
+extern int gINT_00692dd8;
+
 extern int gCount_friction_forces;
 extern tPhysics_joint_force gFriction_forces[50];
 extern int gPHIL_collision_group;
@@ -135,57 +137,57 @@ extern int C2_HOOK_FASTCALL TestObjectOverlapRecurse(tPhysics_object* pCollision
 
 extern int C2_HOOK_FASTCALL TestForObjectInSensiblePlace(tPhysics_object* pCollision_info_1, tPhysics_object* pCollision_info_2, br_vector3* pVec3, tWorld_callbacks* pCar_callbacks);
 
-// HierarchyCalcEnergy
+extern br_scalar C2_HOOK_FASTCALL HierarchyCalcEnergy(tPhysics_object* pObject);
 
 // CheckCollisionList
 
-// MakeJointVelocitiesVector
+extern void C2_HOOK_FASTCALL MakeJointVelocitiesVector(br_scalar* pVelocities, tPhysics_joint_force** pForces, int pCount);
 
-// ApplySingleForce
+extern void C2_HOOK_FASTCALL ApplySingleForce(tPhysics_joint_force* pForce, br_scalar pAmount);
 
-// ApplyJointForces
+extern void C2_HOOK_FASTCALL ApplyJointForces(tPhysics_joint_force** pForces, br_scalar* pAmounts, int pCount);
 
-// SkipForces
+extern void C2_HOOK_FASTCALL SkipForces(tPhysics_joint_force* pForce, int* pIndex);
 
-// ScaleUpObjectMI
+extern void C2_HOOK_FASTCALL ScaleUpObjectMI(tPhysics_object* pObject, br_scalar pFactor);
 
-// CheckForTwang
+extern void C2_HOOK_FASTCALL CheckForTwang(tPhysics_joint_force** pForces, br_scalar* pImpulses, int pCount);
 
 extern void C2_HOOK_FASTCALL CreateJointForce(tPhysics_object* pObject, tPhysics_object* pPartner, tPhysics_joint_force* pForce, const br_vector3* pDirection);
 
 extern void C2_HOOK_FASTCALL CreateJointTorque(tPhysics_object* pObject, tPhysics_object* pPartner, tPhysics_joint_force* pForce, const br_vector3* pDirection);
 
-// AllocateObjectWorkspace
+extern tPhysics_workspace* C2_HOOK_FASTCALL AllocateObjectWorkspace(int pCount);
 
-// RedoQuickHingeVelocities
+extern void C2_HOOK_FASTCALL RedoQuickHingeVelocities(tPhysics_object* pObject);
 
-// GetJointForces
+extern int C2_HOOK_FASTCALL GetJointForces(tPhysics_object* pObject, tPhysics_joint_force* pForces);
 
-// GetUniversalRotationAngle
+extern void C2_HOOK_FASTCALL GetUniversalRotationAngle(br_matrix34* pMat_1, br_matrix34* pMat_2, br_vector3* pV1, br_vector3* pV2, br_vector3* pV3, br_vector3* pV4, br_vector3* pOut, br_vector3* pAxis);
 
-// GetObjectsParent
+extern tPhysics_object* C2_HOOK_FASTCALL GetObjectsParent(tPhysics_object* pObject);
 
-// GetJointLimits
+extern int C2_HOOK_FASTCALL GetJointLimits(tPhysics_object* pObject, tPhysics_joint_force* pForces, int pCount, int pMax_count);
 
-// GetListJointLimits
+extern int C2_HOOK_FASTCALL GetListJointLimits(tPhysics_object* pObject, tPhysics_joint_force* pForces, int pCount, int pMax_count);
 
 // GetGroupJointLimits
 
-// LimitOmega
+extern int C2_HOOK_FASTCALL LimitOmega(tPhysics_object* pObject);
 
 extern void C2_HOOK_FASTCALL CapOmega(tPhysics_object* pObject);
 
-// ListLimitOmega
+extern int C2_HOOK_FASTCALL ListLimitOmega(tPhysics_object* pObject);
 
 // GroupLimitOmega
 
 extern void C2_HOOK_FASTCALL PositionWorldJointedObject(tPhysics_object* pObject, br_scalar pDelta_time);
 
-// TranslateAndRotatePartialObject
+extern void C2_HOOK_FASTCALL TranslateAndRotatePartialObject(tPhysics_object* pObject, tPhysics_object** pRoot, br_scalar pDelta_time);
 
-// TranslateAndRotateJointedObject
+extern void C2_HOOK_FASTCALL TranslateAndRotateJointedObject(tPhysics_object* pObject, br_scalar pDelta_time);
 
-// CountJointForces
+extern int C2_HOOK_FASTCALL CountJointForces(tPhysics_object* pObject, tPhysics_object* pParent);
 
 extern void C2_HOOK_FASTCALL MoveJointedObject(tPhysics_object* pObject, float pDelta_time);
 
@@ -261,23 +263,23 @@ extern int C2_HOOK_FASTCALL ReduceEffectOfForces(tPhysics_joint_force* pForces, 
 
 extern void C2_HOOK_FASTCALL DoCollisions(tPhysics_object** pObject_list, tWorld_callbacks* pCallbacks);
 
-// AddDoubleTorqueToMatrix
+extern void C2_HOOK_FASTCALL AddDoubleTorqueToMatrix(br_scalar* pMatrix, int pRows, int pIndex, tPhysics_joint_force** pForces, int pColumns);
 
-// DRMatrix33Inverse
+extern void C2_HOOK_FASTCALL DRMatrix33Inverse(br_scalar* pResult, const br_scalar* pInput);
 
-// SetUpQuickHingeData
+extern void C2_HOOK_FASTCALL SetUpQuickHingeData(tPhysics_object* pObject, tPhysics_object* pPartner, br_vector3* pAxis);
 
-// InitQuickHinge
+extern void C2_HOOK_FASTCALL InitQuickHinge(tPhysics_object* pObject);
 
-// CalcQuickHingeData
+extern void C2_HOOK_FASTCALL CalcQuickHingeData(tPhysics_object* pObject);
 
 extern void C2_HOOK_FASTCALL SetUpForce(br_vector3* pAngular, br_vector3* pLinear, const br_vector3* pPoint, const br_vector3* pDirection, tPhysics_object* pObject);
 
-// SetUpTorqueHingePartners
+extern tPhysics_object* C2_HOOK_FASTCALL SetUpTorqueHingePartners(br_vector3* pAngular, br_vector3* pLinear, br_vector3* pPartner_angular, br_vector3* pPartner_linear, const br_vector3* pTorque, tPhysics_object* pObject);
 
-// SetUpHingePartners
+extern tPhysics_object* C2_HOOK_FASTCALL SetUpHingePartners(br_vector3* pAngular, br_vector3* pLinear, br_vector3* pPartner_angular, br_vector3* pPartner_linear, tPhysics_object* pObject);
 
-// MakeMatrix
+extern void C2_HOOK_FASTCALL MakeMatrix(br_scalar* pMatrix, int pRows, tPhysics_joint_force** pForces, int pColumns);
 
 extern void C2_HOOK_FASTCALL RestoreListOmega(tPhysics_object* pObject);
 
@@ -303,7 +305,7 @@ extern void PostAddFriction(tWorld_callbacks* pCallbacks);
 
 extern void C2_HOOK_FASTCALL RotateObjectFirstOrder(tPhysics_object* pObject, br_scalar pTime);
 
-// RotateObject
+extern void C2_HOOK_FASTCALL RotateObject(tPhysics_object* pObject, br_scalar pDelta_time);
 
 extern void C2_HOOK_FASTCALL TranslateObject(tPhysics_object* pObject, br_scalar pDelta_time);
 
@@ -371,7 +373,7 @@ extern int C2_HOOK_FASTCALL RQDcmpV(br_scalar* pMatrix, int pDim, br_scalar* pQ)
 
 // RQMatrixSolveNoNegatives
 
-// RQMatrixSolveWithNegatives
+extern void C2_HOOK_FASTCALL RQMatrixSolveWithNegatives(br_scalar* pR, br_scalar* pQ, br_scalar* pB, br_scalar* pX, int pCount);
 
 extern int C2_HOOK_FASTCALL MatrixProcess(br_scalar* pR, br_scalar* pQ, int pDim);
 
