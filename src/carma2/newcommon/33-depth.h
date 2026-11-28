@@ -14,6 +14,8 @@
 #include "rec2_types.h"
 
 extern int gHas_sky_texture;
+extern br_angle gSky_image_height;
+extern br_angle gSky_image_underground;
 extern br_pixelmap* gDepth_shade_table;
 extern int gDepth_shade_table_power;
 extern int gFog_shade_table_power;
@@ -39,7 +41,7 @@ extern void C2_HOOK_FASTCALL MungeSkyVs(br_model* pModel, br_material* pMaterial
 
 extern void C2_HOOK_FASTCALL InstantDepthChange(tDepth_effect_type pType, br_pixelmap* pSky_texture, int pStart, int pEnd, int pRed, int pGreen, int pBlue, int pParam_8);
 
-// Tan
+extern br_scalar C2_HOOK_FASTCALL Tan(br_scalar pAngle);
 
 // EdgeU
 
@@ -50,6 +52,8 @@ extern br_model* C2_HOOK_FASTCALL CreateHorizonModel(br_actor* pCamera);
 extern void C2_HOOK_FASTCALL LoadDepthTable(char* pName, br_pixelmap** pTable, int* pPower);
 
 extern void C2_HOOK_FASTCALL InitDepthEffects(void);
+
+extern void C2_HOOK_FASTCALL ExternalSky(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_actor* pCamera, br_matrix34* pCamera_to_world);
 
 // DoHorizon
 
