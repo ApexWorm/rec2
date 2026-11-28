@@ -51,6 +51,11 @@
 // GLOBAL: CARMA2_CHEAT 0x007a6440
 tNon_car_spec* gActive_non_car_list[99];
 
+// GLOBAL: CARMA2_HW 0x00676854
+// GLOBAL: CARMA2_SW 0x00670fc4
+// GLOBAL: CARMA2_CHEAT 0x0067e104
+int gStop_opponents_moving;
+
 // GLOBAL: CARMA2_HW 0x0067939c
 // GLOBAL: CARMA2_SW 0x00673b0c
 // GLOBAL: CARMA2_CHEAT 0x00680c4c
@@ -1519,6 +1524,19 @@ void C2_HOOK_FASTCALL FreezeMechanics(void) {
         NewTextHeadupSlot(4, 0, 3000, -4, "Mechanics Frozen");
     } else {
         NewTextHeadupSlot(4, 0, 3000, -4, "Thawed Mechanics");
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x0041f4a0
+// FUNCTION: CARMA2_SW 0x0041f520
+// FUNCTION: CARMA2_CHEAT 0x0041f700
+void C2_HOOK_FASTCALL PutOpponentsInNeutral(void) {
+
+    gStop_opponents_moving = !gStop_opponents_moving;
+    if (gStop_opponents_moving) {
+        NewTextHeadupSlot(4, 0, 3000, -4, "Opponents in neutral");
+    } else {
+        NewTextHeadupSlot(4, 0, 3000, -4, "Back in gear");
     }
 }
 

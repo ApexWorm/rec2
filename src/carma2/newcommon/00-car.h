@@ -11,6 +11,8 @@
 
 #include "rec2_types.h"
 
+extern int gStop_opponents_moving;
+
 extern int gTesting_car_for_sensible_place;
 extern int gCunning_stunt_bonus[3];
 extern float gArmour_starting_value[100];
@@ -216,6 +218,8 @@ extern void C2_HOOK_FASTCALL SwapCar(void);
 extern void C2_HOOK_FASTCALL AdjustDownForce(void);
 
 extern void C2_HOOK_FASTCALL FreezeMechanics(void);
+
+extern void C2_HOOK_FASTCALL PutOpponentsInNeutral(void);
 
 // FlyCar
 
