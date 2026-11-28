@@ -18,7 +18,7 @@ extern int gPrepared_objects;
 
 extern tPhysics_object** gReduced_object_list;
 
-extern int gINT_006940ac;
+extern int gReduced_object_not_moving;
 
 extern tPhysicsError_cbfn* gPhysics_error_cb;
 extern void* gPhysics_buffer1_ptr;

@@ -58,7 +58,7 @@ tPhysics_object** gReduced_object_list;
 // GLOBAL: CARMA2_HW 0x006940ac
 // GLOBAL: CARMA2_SW 0x0068e104
 // GLOBAL: CARMA2_CHEAT 0x0069bc24
-int gINT_006940ac;
+int gReduced_object_not_moving;
 
 // GLOBAL: CARMA2_HW 0x006940c0
 // GLOBAL: CARMA2_SW 0x0068e118
@@ -813,7 +813,7 @@ void C2_HOOK_FASTCALL PrepareObject(tPhysics_object* pObject, tPhysics_object** 
     InternalPrepareObject(pObject);
     gPrepared_objects = 1;
     CheckObjectsPostionInList(pObject, pList);
-    if (gINT_006940ac != 0) {
+    if (gReduced_object_not_moving != 0) {
         MakeObjectDoSomething(pObject, *pList);
     }
     if (gReduced_object_list != NULL) {
