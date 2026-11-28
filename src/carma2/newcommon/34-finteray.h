@@ -44,15 +44,13 @@ extern void C2_HOOK_FASTCALL EnablePlingMaterials(void);
 
 extern void C2_HOOK_FASTCALL DisablePlingMaterials(void);
 
-extern void C2_HOOK_FASTCALL StationarySphereEdgeCollide(const br_vector3* pPoint, const br_vector3* pSphere_center, br_scalar pRadius, br_vector3* pNormal, br_scalar* pCollision_t);
-
-// StationarySphereSphereCollide
+extern void C2_HOOK_FASTCALL StationarySphereSphereCollide(const br_vector3* pPoint, const br_vector3* pSphere_center, br_scalar pRadius, br_vector3* pNormal, br_scalar* pCollision_t);
 
 // SphereSphereCollide
 
-// StationarySphereEdgeCollide
+extern void C2_HOOK_FASTCALL StationarySphereEdgeCollide(br_vector3* pEdge_start, br_vector3* pEdge_end, br_vector3* pEdge_direction, br_scalar pEdge_length_squared, br_vector3* pSphere_end, tCollision_shape_sphere_data* pSphere, br_vector3* pPoint, br_vector3* pNormal, br_scalar* pT);
 
-// PointSphereCollision
+extern void C2_HOOK_FASTCALL PointSphereCollision(br_vector3* pVertex, br_vector3* pSphere_start, br_vector3* pSphere_end, br_vector3* pSphere_direction, tCollision_shape_sphere_data* pSphere, br_vector3* pPoint, br_vector3* pNormal, br_scalar* pT);
 
 // SphereEdgeCollide
 

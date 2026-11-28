@@ -309,7 +309,7 @@ void C2_HOOK_FASTCALL StationarySphereEdgeCollide(br_vector3* pEdge_start, br_ve
     if (length_squared > pSphere->radius_squared
             && length_squared < pSphere->radius_squared + (pSphere->radius * 0.002f) * 2.0f) {
         length = (br_scalar)sqrt(length_squared);
-        *pT = 1.f;
+        *pT = 1.0f;
         pNormal->v[0] /= length;
         pNormal->v[1] /= length;
         pNormal->v[2] /= length;
