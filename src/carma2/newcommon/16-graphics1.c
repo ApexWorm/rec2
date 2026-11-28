@@ -509,9 +509,9 @@ void C2_HOOK_FASTCALL SetBRenderScreenAndBuffers(int pX_offset, int pY_offset, i
     }
     gRender_screen = DRPixelmapAllocateSub(gBack_screen, (br_uint_16)pX_offset, (br_uint_16)pY_offset, (br_uint_16)pWidth, (br_uint_16)pHeight);
     gWidth = pWidth;
-    gHeight = pHeight;
     gX_offset = pX_offset;
     gY_offset = pY_offset;
+    gHeight = pHeight;
     if (gGraf_specs[gGraf_spec_index].doubled) {
         gScreen->base_x = (gGraf_specs[gGraf_spec_index].phys_width - 2 * gGraf_specs[gGraf_spec_index].total_width) / 2;
         gScreen->base_y = (gGraf_specs[gGraf_spec_index].phys_height - 2 * gGraf_specs[gGraf_spec_index].total_height) / 2;

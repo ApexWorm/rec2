@@ -105,6 +105,8 @@ int gInterface_polyfont_texture_pages;
 tNet_game_options gFrontend_backup_net_options;
 
 // GLOBAL: CARMA2_HW 0x00686340
+// GLOBAL: CARMA2_SW 0x00680a80
+// GLOBAL: CARMA2_CHEAT 0x0068dbe8
 br_material* gPoly_font_materials[80];
 
 // GLOBAL: CARMA2_HW 0x0074cf10
@@ -608,7 +610,7 @@ void C2_HOOK_FASTCALL CheckAvailabilityOfThisFont(int pFont) {
 // FUNCTION: CARMA2_CHEAT 0x00464560
 void C2_HOOK_FASTCALL DisposeInterfaceFonts(void) {
     int i;
-    br_pixelmap* map;
+    int j;
 
     if (gInterface_fonts_loaded) {
 
@@ -627,13 +629,11 @@ void C2_HOOK_FASTCALL DisposeInterfaceFonts(void) {
         RemovePolyFont(kPolyfont_highlighter);
 
         for (i = 0; i < gInterface_polyfont_texture_pages; i++) {
-            map = gTexture_maps[gInterface_polyfont_texture_pages + i];
-
-            if (map != NULL) {
-
-                BrMapRemove(map);
-                BrPixelmapFree(map);
-                gTexture_maps[gInterface_polyfont_texture_pages + i] = NULL;
+            j = gInterface_polyfont_texture_pages + i;
+            if (gTexture_maps[j] != NULL) {
+                BrMapRemove(gTexture_maps[j]);
+                BrPixelmapFree(gTexture_maps[j]);
+                gTexture_maps[j] = NULL;
             }
         }
         gInterface_fonts_loaded = 0;
@@ -641,18 +641,16 @@ void C2_HOOK_FASTCALL DisposeInterfaceFonts(void) {
 }
 
 // FUNCTION: CARMA2_HW 0x00464290
+// FUNCTION: CARMA2_SW 0x00463cf0
 // FUNCTION: CARMA2_CHEAT 0x00464700
 void C2_HOOK_FASTCALL RemovePolyFont(int pFont) {
     int i;
 
     for (i = 0; i < (int)REC2_ASIZE(gPoly_fonts[pFont].glyphs); i++) {
-        tPolyFontGlyph* glyph = &gPoly_fonts[pFont].glyphs[i];
-
-        if (glyph->used) {
-
-            glyph->material = NULL;
-            glyph->model = NULL;
-            glyph->used = 0;
+        if (gPoly_fonts[pFont].glyphs[i].used) {
+            gPoly_fonts[pFont].glyphs[i].material = NULL;
+            gPoly_fonts[pFont].glyphs[i].model = NULL;
+            gPoly_fonts[pFont].glyphs[i].used = 0;
         }
     }
     gPoly_fonts[pFont].available = 0;
@@ -822,6 +820,7 @@ void C2_HOOK_FASTCALL LoadPolyFont(const char* pName, int pSize, int pIndex) {
 }
 
 // FUNCTION: CARMA2_HW 0x00464b80
+// FUNCTION: CARMA2_CHEAT 0x00464ff0
 br_model* C2_HOOK_FASTCALL CreateCharacterModel(int width, int height, int texture_id_x, int texture_id_y, const char* pageName) {
     br_model* pModel;
     br_scalar f_width;
@@ -913,16 +912,21 @@ void C2_HOOK_FASTCALL InitPolyFontMaterials(void) {
 
 // FUNCTION: CARMA2_HW 0x00465250
 // FUNCTION: CARMA2_SW 0x00464db0
+// FUNCTION: CARMA2_CHEAT 0x004656c0
 br_material* C2_HOOK_FASTCALL GetPolyFontMaterial(int pFont_index, char pChar) {
     tU8 uchar;
     br_material* material;
     float f_size;
     tU32 packed_font_character;
 
-    // GLOBAL: CARMA2 0x00686480
+    // GLOBAL: CARMA2_HW 0x00686480
+    // GLOBAL: CARMA2_SW 0x00680bc0
+    // GLOBAL: CARMA2_CHEAT 0x0068dd28
     static int poly_font_material_index;
 
-    // GLOBAL: CARMA2 0x00686498
+    // GLOBAL: CARMA2_HW 0x00686498
+    // GLOBAL: CARMA2_SW 0x00680bd8
+    // GLOBAL: CARMA2_CHEAT 0x0068dd40
     static tU16 poly_font_material_generation;
 
     C2_HOOK_BUG_ON(sizeof(tPolyFont) != 0x1c68);
@@ -942,7 +946,7 @@ br_material* C2_HOOK_FASTCALL GetPolyFontMaterial(int pFont_index, char pChar) {
         if (poly_font_material_index >= (int)REC2_ASIZE(gPoly_font_materials)) {
             poly_font_material_index = 0;
         }
-    } while ((poly_font_material_generation - POLYFONT_MATERIAL_GET_GENERATION(gPoly_font_materials[poly_font_material_index])) < (int)REC2_ASIZE(gPoly_font_materials));
+    } while ((tU16)(poly_font_material_generation - POLYFONT_MATERIAL_GET_GENERATION(gPoly_font_materials[poly_font_material_index])) < REC2_ASIZE(gPoly_font_materials));
     material = gPoly_font_materials[poly_font_material_index];
     gPoly_fonts[pFont_index].glyphs[uchar].material = material;
     material->colour_map = gTexture_maps[gPoly_fonts[pFont_index].glyphs[uchar].index];
