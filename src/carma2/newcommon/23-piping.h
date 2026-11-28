@@ -223,6 +223,8 @@ extern void C2_HOOK_FASTCALL PipeSingleGraphicalWheelStuff(tCar_spec* pCar);
 
 extern void C2_HOOK_FASTCALL PipeSingleSound(tS3_outlet* pOutlet, int pSound, tS3_volume pL_volume, tS3_volume pR_volume, int pPitch, const br_vector3* pPosition);
 
+extern void C2_HOOK_FASTCALL PipeSingleDamage(int pCar_ID, tS8* pDamage_deltas);
+
 extern void C2_HOOK_FASTCALL PipeSingleSpecial(tPipe_special_action pType);
 
 extern void C2_HOOK_FASTCALL PipeSingleCarIncident(tCar_spec* pCar, br_vector3* pPosition, float pForce);
@@ -302,6 +304,10 @@ extern void C2_HOOK_FASTCALL PipeSingleDroneRender(tDrone_spec* pDrone_spec, int
 extern void C2_HOOK_FASTCALL PipeSingleDroneCornerPos(tDrone_spec* pDrone, tU16 pField_0x48, tU16 pField_0x74, tU16 pRadius, tCompressed_matrix34* pMat);
 
 extern void C2_HOOK_FASTCALL PipeSingleDroneStraightPos(tDrone_spec* pDrone, tDrone_path_node_section* pSection, tU16 pSpeed, tU16 pDistance);
+
+extern void C2_HOOK_FASTCALL PipeSingleDroneUnused(undefined4 pArg1, undefined4 pArg2, undefined4 pArg3);
+
+extern void C2_HOOK_FASTCALL PipeSingleNapalmBolt(int pIndex, tPedestrian* pPed, br_vector3* pPositions);
 
 extern void C2_HOOK_FASTCALL PipeSinglePowerupRespawn(br_actor* pActor, int pPowerup_id);
 
@@ -451,6 +457,8 @@ extern void C2_HOOK_FASTCALL ApplyOppoRenderage(tPipe_chunk** pChunk);
 
 extern void C2_HOOK_FASTCALL UndoSmudge(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk);
 
+extern void C2_HOOK_FASTCALL UndoFrameBoundary(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk);
+
 // UndoDamage
 
 // UndoSpecial
@@ -514,6 +522,8 @@ extern void C2_HOOK_FASTCALL UndoPowerupLose(tPipe_chunk** pChunk, tPipe_chunk* 
 extern void C2_HOOK_FASTCALL UndoFunkEnable(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk);
 
 extern void C2_HOOK_FASTCALL UndoVanishDismembered(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk);
+
+extern void C2_HOOK_FASTCALL UndoDSModel(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk);
 
 extern void C2_HOOK_FASTCALL UndoVector3(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk);
 

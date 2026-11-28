@@ -1251,6 +1251,16 @@ void C2_HOOK_FASTCALL PipeSingleSound(tS3_outlet* pOutlet, int pSound, tS3_volum
     }
 }
 
+// FUNCTION: CARMA2_HW 0x004c8500
+// FUNCTION: CARMA2_SW 0x004c4c30
+// FUNCTION: CARMA2_CHEAT 0x004ce020
+void C2_HOOK_FASTCALL PipeSingleDamage(int pCar_ID, tS8* pDamage_deltas) {
+    tS8 damage_deltas[12];
+
+    memcpy(damage_deltas, pDamage_deltas, sizeof(damage_deltas));
+    ARDoSingleSession(ePipe_chunk_damage, pCar_ID, damage_deltas, sizeof(damage_deltas));
+}
+
 // FUNCTION: CARMA2_HW 0x004c8530
 // FUNCTION: CARMA2_SW 0x004c4c60
 // FUNCTION: CARMA2_CHEAT 0x004ce050
@@ -1799,6 +1809,25 @@ void C2_HOOK_FASTCALL PipeSingleDroneStraightPos(tDrone_spec* pDrone, tDrone_pat
         SIZE_OFFSET_PIPING(tPipe_single_drone_straight_pos, section), pSection,
         SIZE_OFFSET_PIPING(tPipe_single_drone_straight_pos, speed), pDistance,
         SIZE_OFFSET_PIPING(tPipe_single_drone_straight_pos, distance), pDistance);
+}
+
+// FUNCTION: CARMA2_HW 0x004c8f60
+// FUNCTION: CARMA2_SW 0x004c5690
+// FUNCTION: CARMA2_CHEAT 0x004cea80
+void C2_HOOK_FASTCALL PipeSingleDroneUnused(undefined4 pArg1, undefined4 pArg2, undefined4 pArg3) {
+}
+
+// FUNCTION: CARMA2_HW 0x004c8f70
+// FUNCTION: CARMA2_SW 0x004c56a0
+// FUNCTION: CARMA2_CHEAT 0x004cea90
+void C2_HOOK_FASTCALL PipeSingleNapalmBolt(int pIndex, tPedestrian* pPed, br_vector3* pPositions) {
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_chunk_napalm_bolt, ped, 0x4);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk_napalm_bolt, positions, 0x4);
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_chunk_napalm_bolt, positions, 0x54);
+
+    ARDoSingleVariedSession(ePipe_chunk_burning_ped, pIndex, 2,
+        SIZE_OFFSET_PIPING(tPipe_chunk_napalm_bolt, ped), pPed,
+        SIZE_OFFSET_PIPING(tPipe_chunk_napalm_bolt, positions), pPositions);
 }
 
 // FUNCTION: CARMA2_HW 0x004c8f90
@@ -2616,6 +2645,16 @@ void C2_HOOK_FASTCALL UndoSmudge(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk)
     DoSmudge(pChunk, -1);
 }
 
+// FUNCTION: CARMA2_HW 0x004c9dc0
+// FUNCTION: CARMA2_SW 0x004c64f0
+// FUNCTION: CARMA2_CHEAT 0x004cf8f0
+void C2_HOOK_FASTCALL UndoFrameBoundary(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
+
+    (void)pPrev_chunk;
+
+    ApplyFrameBoundary(pChunk);
+}
+
 // UndoDamage
 
 // UndoSpecial
@@ -2946,6 +2985,22 @@ void C2_HOOK_FASTCALL UndoVanishDismembered(tPipe_chunk** pChunk, tPipe_chunk* p
     (void)pPrev_chunk;
 
     PedApplyVanishDismembered((tPedestrian*)(*pChunk)->subject_index, (*pChunk)->data.vanished_dismembered.field_0x0);
+}
+
+// FUNCTION: CARMA2_HW 0x004ca340
+// FUNCTION: CARMA2_SW 0x004c6a70
+// FUNCTION: CARMA2_CHEAT 0x004cfe80
+void C2_HOOK_FASTCALL UndoDSModel(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk, data, 0x4);
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_single_ds_model, field_0x0, 0x2);
+
+    (void)pPrev_chunk;
+
+    if ((*pChunk)->data.ds_model.field_0x0 != 0) {
+        MakeModelMaterialsSingleSided((br_model*)(*pChunk)->subject_index);
+    } else {
+        MakeModelMaterialsDoubleSided((br_model*)(*pChunk)->subject_index);
+    }
 }
 
 // FUNCTION: CARMA2_HW 0x004ca360
