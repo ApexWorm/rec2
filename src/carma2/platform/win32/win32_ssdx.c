@@ -38,6 +38,7 @@ HWND gHWnd_SSDX;
 
 // GLOBAL: CARMA2_HW 0x006aa5d8
 // GLOBAL: CARMA2_SW 0x006a4028
+// GLOBAL: CARMA2_CHEAT 0x006b2150
 PALETTEENTRY gSSDX_system_palette[256] = { 0 };
 
 // GLOBAL: CARMA2_HW 0x006aa9d8
@@ -47,22 +48,27 @@ int gEnumerate_DirectX_surfaces = 0;
 
 // GLOBAL: CARMA2_HW 0x006aa5c8
 // GLOBAL: CARMA2_SW 0x006a4018
+// GLOBAL: CARMA2_CHEAT 0x006b2140
 RECT gSSDXRect;
 
 // GLOBAL: CARMA2_HW 0x006aa9f8
 // GLOBAL: CARMA2_SW 0x006a4448
+// GLOBAL: CARMA2_CHEAT 0x006b2570
 LPDIRECTDRAWSURFACE gPrimary_surface;
 
 // GLOBAL: CARMA2_HW 0x006aa9fc
 // GLOBAL: CARMA2_SW 0x006a444c
+// GLOBAL: CARMA2_CHEAT 0x006b2574
 LPDIRECTDRAWSURFACE gAttached_surface;
 
 // GLOBAL: CARMA2_HW 0x006aaa00
 // GLOBAL: CARMA2_SW 0x006a4450
+// GLOBAL: CARMA2_CHEAT 0x006b2578
 LPDIRECTDRAWCLIPPER gDirectDrawClipper;
 
 // GLOBAL: CARMA2_HW 0x006aaa14
 // GLOBAL: CARMA2_SW 0x006a4464
+// GLOBAL: CARMA2_CHEAT 0x006b258c
 LPDIRECTDRAW gDirectDraw;
 
 // GLOBAL: CARMA2_HW 0x006aaa18
@@ -71,18 +77,22 @@ LPDIRECTDRAW2 gDirectDraw2;
 
 // GLOBAL: CARMA2_HW 0x006aaa04
 // GLOBAL: CARMA2_SW 0x006a4454
+// GLOBAL: CARMA2_CHEAT 0x006b257c
 LPDIRECTDRAWPALETTE gDirectDrawPalette;
 
 // GLOBAL: CARMA2_HW 0x006aa9dc
 // GLOBAL: CARMA2_SW 0x006a442c
+// GLOBAL: CARMA2_CHEAT 0x006b2554
 LPVOID gSSDXLockedSurfaceData;
 
 // GLOBAL: CARMA2_HW 0x006aaa0c
 // GLOBAL: CARMA2_SW 0x006a445c
+// GLOBAL: CARMA2_CHEAT 0x006b2584
 int gAttached_surface_locked;
 
 // GLOBAL: CARMA2_HW 0x006aa9e8
 // GLOBAL: CARMA2_SW 0x006a4438
+// GLOBAL: CARMA2_CHEAT 0x006b2560
 RECT gSSDXWindowPos;
 
 // GLOBAL: CARMA2_HW 0x007a0540
@@ -100,6 +110,7 @@ MCI_PLAY_PARMS gPDS3_cda_play_parms;
 
 // GLOBAL: CARMA2_HW 0x006aaa10
 // GLOBAL: CARMA2_SW 0x006a4460
+// GLOBAL: CARMA2_CHEAT 0x006b2588
 int gSSDXPitch;
 
 // GLOBAL: CARMA2_SW 0x006a5db0
@@ -108,6 +119,7 @@ PALETTEENTRY gPD_palette_entries[256];
 
 // FUNCTION: CARMA2_HW 0x00500070
 // FUNCTION: CARMA2_SW 0x004fb950
+// FUNCTION: CARMA2_CHEAT 0x00505d20
 HRESULT CALLBACK LocalEnumAttachedSurfacesCallback(LPDIRECTDRAWSURFACE lpSurface, LPDDSURFACEDESC lpSurfaceDesc, LPVOID lpContext) {
     int* counter = lpContext;
     dr_dprintf("LocalEnumAttachedSurfacesCallback(): Enum-ing attached surface #%d, address 0x%p", *counter, lpSurface);
@@ -117,6 +129,7 @@ HRESULT CALLBACK LocalEnumAttachedSurfacesCallback(LPDIRECTDRAWSURFACE lpSurface
 
 // FUNCTION: CARMA2_HW 0x005000a0
 // FUNCTION: CARMA2_SW 0x004fb980
+// FUNCTION: CARMA2_CHEAT 0x00505d50
 HRESULT C2_HOOK_FASTCALL LocalWindowedDDSetup(int pWidth, int pHeight, int* pPitch) {
     DDSURFACEDESC desc;
     HRESULT res;
@@ -403,6 +416,7 @@ int C2_HOOK_FASTCALL SSDXDirectDrawSetup(int pWidth, int pHeight, int pBits, int
 
 // FUNCTION: CARMA2_HW 0x00500a30
 // FUNCTION: CARMA2_SW 0x004fc390
+// FUNCTION: CARMA2_CHEAT 0x005066e0
 void* C2_HOOK_FASTCALL SSDXLockAttachedSurface(void) {
     HRESULT result;
     DDSURFACEDESC surfaceDesc;
@@ -446,6 +460,7 @@ void* C2_HOOK_FASTCALL SSDXLockAttachedSurface(void) {
 
 // FUNCTION: CARMA2_HW 0x00500b40
 // FUNCTION: CARMA2_SW 0x004fc4a0
+// FUNCTION: CARMA2_CHEAT 0x005067f0
 void C2_HOOK_FASTCALL SSDXUnlockAttachedSurface(void) {
 
     if (gAttached_surface_locked) {
@@ -460,23 +475,29 @@ void C2_HOOK_FASTCALL SSDXUnlockAttachedSurface(void) {
 }
 
 // FUNCTION: CARMA2_HW 0x00500b90
-void C2_HOOK_FASTCALL SSDXBlitOrFlip(void) {
-
+// FUNCTION: CARMA2_SW 0x004fc4f0
+// FUNCTION: CARMA2_CHEAT 0x00506840
+int C2_HOOK_FASTCALL SSDXBlitOrFlip(void) {
     if (gWindowed) {
-        SSDXBlit();
+        return IDirectDrawSurface_Blt(gPrimary_surface, &gSSDXWindowPos, gAttached_surface, &gSSDXRect, DDBLT_WAIT, NULL);
     } else {
-        IDirectDrawSurface_Flip(gPrimary_surface, NULL, DDFLIP_WAIT);
+        return IDirectDrawSurface_Flip(gPrimary_surface, NULL, DDFLIP_WAIT);
     }
 }
 
 // FUNCTION: CARMA2_HW 0x00500bd0
-void C2_HOOK_FASTCALL SSDXBlit(void) {
-
-    IDirectDrawSurface_Blt(gPrimary_surface, &gSSDXWindowPos, gAttached_surface, &gSSDXRect, DDBLT_WAIT, NULL);
+// FUNCTION: CARMA2_CHEAT 0x00506880
+int C2_HOOK_FASTCALL SSDXBlit(void) {
+    if (gWindowed) {
+        return IDirectDrawSurface_Blt(gPrimary_surface, &gSSDXWindowPos, gAttached_surface, &gSSDXRect, DDBLT_WAIT, NULL);
+    } else {
+        return IDirectDrawSurface_Blt(gPrimary_surface, &gSSDXWindowPos, gAttached_surface, &gSSDXRect, DDBLT_WAIT, NULL);
+    }
 }
 
 // FUNCTION: CARMA2_HW 0x00500c00
 // FUNCTION: CARMA2_SW 0x004fc560
+// FUNCTION: CARMA2_CHEAT 0x005068b0
 void C2_HOOK_FASTCALL SSDXSetPaletteEntries(PALETTEENTRY* pPalette, int pStart, int pCount) {
 
     if (gWindowed && gDirectDrawPalette != NULL) {
@@ -495,6 +516,7 @@ void C2_HOOK_FASTCALL SSDXSetPaletteEntries(PALETTEENTRY* pPalette, int pStart, 
 }
 
 // FUNCTION: CARMA2_HW 0x00500ca0
+// FUNCTION: CARMA2_CHEAT 0x00506950
 void C2_HOOK_FASTCALL SSDXSetPrimaryPalette(void) {
     HRESULT result;
 
@@ -516,6 +538,7 @@ void C2_HOOK_FASTCALL SSDXSetPrimaryPalette(void) {
 
 // FUNCTION: CARMA2_HW 0x00500cf0
 // FUNCTION: CARMA2_SW 0x004fc650
+// FUNCTION: CARMA2_CHEAT 0x005069a0
 void C2_HOOK_FASTCALL SSDXWindowPosOrSizeChanged(HWND pHwnd) {
 
     if (gWindowed) {
@@ -528,12 +551,4 @@ void C2_HOOK_FASTCALL SSDXWindowPosOrSizeChanged(HWND pHwnd) {
 }
 
 #ifdef REC2_SW
-// FUNCTION: CARMA2_SW 0x004fc4f0
-int C2_HOOK_FASTCALL SSDXFlip(void) {
-    if (gWindowed) {
-        return IDirectDrawSurface_Blt(gPrimary_surface, &gSSDXWindowPos, gAttached_surface, &gSSDXRect, DDBLT_WAIT, 0);
-    } else {
-        return IDirectDrawSurface_Flip(gPrimary_surface, 0, DDFLIP_WAIT);
-    }
-}
 #endif

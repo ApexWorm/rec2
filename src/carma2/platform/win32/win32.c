@@ -1412,7 +1412,7 @@ void C2_HOOK_FASTCALL PDScreenBufferSwap(int pRendering_area_only) {
         }
         SSDXUnlockAttachedSurface();
         dr_dprintf("Flipping...");
-        if (SSDXFlip()) {
+        if (SSDXBlitOrFlip()) {
             PDFatalError("Problem while flipping...");
         }
         dr_dprintf("Flipped OK.");

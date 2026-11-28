@@ -35,18 +35,14 @@ extern void* C2_HOOK_FASTCALL SSDXLockAttachedSurface(void);
 
 extern void C2_HOOK_FASTCALL SSDXUnlockAttachedSurface(void);
 
-extern void C2_HOOK_FASTCALL SSDXBlitOrFlip(void);
+extern int C2_HOOK_FASTCALL SSDXBlitOrFlip(void);
 
-extern void C2_HOOK_FASTCALL SSDXBlit(void);
+extern int C2_HOOK_FASTCALL SSDXBlit(void);
 
 extern void C2_HOOK_FASTCALL SSDXSetPaletteEntries(PALETTEENTRY* pPalette, int pStart, int pCount);
 
 extern void C2_HOOK_FASTCALL SSDXSetPrimaryPalette(void);
 
 extern void C2_HOOK_FASTCALL SSDXWindowPosOrSizeChanged(HWND pHwnd);
-
-#ifdef REC2_SW
-extern int C2_HOOK_FASTCALL SSDXFlip(void);
-#endif
 
 #endif // C2_WIN32_SSDX_H
