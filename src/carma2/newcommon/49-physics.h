@@ -132,11 +132,11 @@ extern void C2_HOOK_FASTCALL ApplySingleForce(tPhysics_joint_force* pForce, br_s
 
 extern void C2_HOOK_FASTCALL ApplyJointForces(tPhysics_joint_force** pForces, br_scalar* pAmounts, int pCount);
 
-// SkipForces
+extern void C2_HOOK_FASTCALL SkipForces(tPhysics_joint_force* pForce, int* pIndex);
 
 extern void C2_HOOK_FASTCALL ScaleUpObjectMI(tPhysics_object* pObject, br_scalar pFactor);
 
-// CheckForTwang
+extern void C2_HOOK_FASTCALL CheckForTwang(tPhysics_joint_force** pForces, br_scalar* pImpulses, int pCount);
 
 extern void C2_HOOK_FASTCALL CreateJointForce(tPhysics_object* pObject, tPhysics_object* pPartner, tPhysics_joint_force* pForce, const br_vector3* pDirection);
 

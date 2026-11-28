@@ -693,7 +693,47 @@ inline void C2_HOOK_FASTCALL ApplyJointForces(tPhysics_joint_force** pForces, br
     }
 }
 
-// SkipForces
+inline void C2_HOOK_FASTCALL SkipForces(tPhysics_joint_force* pForce, int* pIndex) {
+
+    if (pForce->object_a->physics_joint1 != NULL) {
+        switch (pForce->object_a->physics_joint1->type) {
+        case eJoint_hinge:
+            *pIndex += 5;
+            break;
+        case eJoint_universal:
+            *pIndex += 4;
+            break;
+        case eJoint_ball_n_socket:
+            *pIndex += 3;
+            break;
+        case eJoint_quick_hinge:
+            *pIndex += 2;
+            break;
+        default:
+            PhysicsError(ePhysicsError_UnknownHingeType, "");
+            break;
+        }
+    }
+    if (pForce->object_a->physics_joint2 != NULL) {
+        switch (pForce->object_a->physics_joint2->type) {
+        case eJoint_hinge:
+            *pIndex += 5;
+            break;
+        case eJoint_universal:
+            *pIndex += 4;
+            break;
+        case eJoint_ball_n_socket:
+            *pIndex += 3;
+            break;
+        case eJoint_translation:
+            *pIndex += 2;
+            break;
+        default:
+            PhysicsError(ePhysicsError_UnknownHingeType, "");
+            break;
+        }
+    }
+}
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
@@ -735,7 +775,73 @@ void C2_HOOK_FASTCALL ScaleUpObjectMI(tPhysics_object* pObject, br_scalar pFacto
 #pragma auto_inline(on)
 #endif
 
-// CheckForTwang
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// FUNCTION: CARMA2_HW 0x004bc190
+// FUNCTION: CARMA2_SW 0x004b88b0
+// FUNCTION: CARMA2_CHEAT 0x004c1cc0
+void C2_HOOK_FASTCALL CheckForTwang(tPhysics_joint_force** pForces, br_scalar* pImpulses, int pCount) {
+    tPhysics_object* object;
+    tPhysics_object* other;
+    br_vector3 axis;
+    br_vector3 omega_axis;
+    br_vector3 rotated;
+    br_vector3 direction;
+    br_vector3 cross_before;
+    br_vector3 cross_after;
+    br_matrix34 rotation;
+    br_scalar length;
+    br_scalar cutoff;
+    int i;
+    int j;
+
+    i = 0;
+    while (i < pCount) {
+        object = pForces[i]->object_a;
+        if (object->child != NULL) {
+            j = i;
+            while (j < pCount) {
+                if (pForces[j]->object_b == object && BrVector3LengthSquared(&object->rotate_omega) < BrVector3LengthSquared(&object->omega)) {
+                    other = pForces[j]->object_a;
+                    BrVector3Sub(&axis, &object->physics_joint1->field_0x08, &other->physics_joint1->field_0x14);
+                    length = BrVector3Length(&axis);
+                    axis.v[0] /= length;
+                    axis.v[1] /= length;
+                    axis.v[2] /= length;
+                    cutoff = (br_scalar)(0.5 * object->M);
+                    if (cutoff <= axis.v[0] * pImpulses[i] + axis.v[1] * pImpulses[i + 1] + axis.v[2] * pImpulses[i + 2]) {
+                        if (cutoff <= pImpulses[j] * BrVector3Dot(&axis, &pForces[j]->direction_b)
+                                + pImpulses[j + 1] * BrVector3Dot(&axis, &pForces[j + 1]->direction_b)
+                                + pImpulses[j + 2] * BrVector3Dot(&axis, &pForces[j + 2]->direction_b)) {
+                            length = BrVector3Length(&object->omega);
+                            omega_axis.v[0] = object->omega.v[0] / length;
+                            omega_axis.v[1] = object->omega.v[1] / length;
+                            omega_axis.v[2] = object->omega.v[2] / length;
+                            BrMatrix34Rotate(&rotation, BrRadianToAngle(0.04f * length), &omega_axis);
+                            BrMatrix34ApplyV(&rotated, &axis, &rotation);
+                            BrVector3Set(&direction, pImpulses[i], pImpulses[i + 1], pImpulses[i + 2]);
+                            BrVector3Normalise(&direction, &direction);
+                            BrVector3Cross(&cross_before, &axis, &direction);
+                            BrVector3Cross(&cross_after, &rotated, &direction);
+                            if (BrVector3Dot(&cross_before, &cross_after) < 0.0f) {
+                                BrVector3InvScale(&object->omega, &object->omega, 10.0f);
+                                ScaleUpObjectMI(object, 25.0f);
+                            }
+                        }
+                    }
+                }
+                SkipForces(pForces[j], &j);
+            }
+        }
+        SkipForces(pForces[i], &i);
+    }
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // FUNCTION: CARMA2_HW 0x004b8c20
 void C2_HOOK_FASTCALL CreateJointForce(tPhysics_object* pObject, tPhysics_object* pPartner, tPhysics_joint_force* pForce, const br_vector3* pDirection) {
