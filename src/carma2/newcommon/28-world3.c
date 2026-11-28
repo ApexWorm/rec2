@@ -187,22 +187,22 @@ void C2_HOOK_FASTCALL DisposeStorageSpace(tBrender_storage* pStorage) {
 void C2_HOOK_FASTCALL ClearMatertrialSetFromStorageSpace(tBrender_storage* pStorage_space, int pStart, int pEnd) {
     int i;
     int move_to;
+    int j;
 
     for (i = pStart; i < pEnd && i < pStorage_space->materials_count; i++) {
         BrMaterialRemove(pStorage_space->materials[i]);
         BrMaterialFree(pStorage_space->materials[i]);
         RemoveMaterialFromFogification(pStorage_space->materials[i]);
     }
-    for (move_to = pStart, i = pEnd; i < pStorage_space->materials_count; ) {
-        pStorage_space->materials[move_to++] = pStorage_space->materials[i++];
+    for (move_to = pStart, j = pEnd; j < pStorage_space->materials_count; j++, move_to++) {
+        pStorage_space->materials[move_to] = pStorage_space->materials[j];
     }
     pStorage_space->materials_count = move_to;
     if (pStorage_space == &gNet_cars_storage_space) {
         for (i = 0; i < gNumber_of_net_players; i++) {
-            tCar_spec* car = gNet_players[i].car;
-            if (car != NULL && car->old_material_count >= pEnd) {
-                car->old_material_count += pStart - pEnd;
-                car->new_material_count += pStart - pEnd;
+            if (gNet_players[i].car != NULL && gNet_players[i].car->old_material_count >= pEnd) {
+                gNet_players[i].car->old_material_count += pStart - pEnd;
+                gNet_players[i].car->new_material_count += pStart - pEnd;
             }
         }
     }
