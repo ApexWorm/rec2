@@ -1319,7 +1319,65 @@ void C2_HOOK_FASTCALL NewAddFriction(tPhysics_joint_force* pForce, tWorld_callba
 
 // ApplyForces
 
-// DoJointFriction
+// FUNCTION: CARMA2_HW 0x004c18d0
+// FUNCTION: CARMA2_SW 0x004be000
+// FUNCTION: CARMA2_CHEAT 0x004c73f0
+void C2_HOOK_FASTCALL DoJointFriction(tPhysics_object* pObject) {
+    br_scalar total_sq;
+    br_vector3 impulse;
+    int j;
+    br_vector3 tv;
+    int i;
+    br_scalar max_impulse_sq;
+    br_scalar s;
+    tPhysics_object* child;
+    br_vector3 rel[3];
+
+    if (pObject->physics_joint1 != NULL && pObject->physics_joint1->friction != 0.0f && pObject->field_0x230 != NULL) {
+        total_sq = 0.0f;
+        max_impulse_sq = pObject->physics_joint1->friction * 0.04f;
+        max_impulse_sq = max_impulse_sq * max_impulse_sq;
+        for (i = 0; i < 3; i++) {
+            BrMatrix34TApplyV(&tv, (br_vector3*)pObject->transform_matrix.m[i], &pObject->field_0x230->transform_matrix);
+            impulse.v[i] = BrVector3Dot(&tv, &pObject->field_0x230->omega) - pObject->omega.v[i];
+            for (j = 0; j < 3; j++) {
+                rel[i].v[j] = tv.v[j] / pObject->field_0x230->I.v[j];
+            }
+            impulse.v[i] /= (br_scalar)(1.0 / pObject->I.v[i] + BrVector3Dot(&rel[i], &tv));
+            total_sq += impulse.v[i] * impulse.v[i];
+        }
+        if (total_sq > max_impulse_sq) {
+            s = (br_scalar)sqrt(max_impulse_sq / total_sq);
+            BrVector3Scale(&impulse, &impulse, s);
+        }
+        for (i = 0; i < 3; i++) {
+            pObject->omega.v[i] += impulse.v[i] / pObject->I.v[i];
+            BrVector3Scale(&rel[i], &rel[i], -impulse.v[i]);
+            BrVector3Accumulate(&pObject->field_0x230->omega, &rel[i]);
+        }
+    }
+    if (pObject->physics_joint2 != NULL && pObject->physics_joint2->friction != 0.0f) {
+        max_impulse_sq = pObject->physics_joint2->friction * 0.04f;
+        total_sq = 0.0f;
+        max_impulse_sq = max_impulse_sq * max_impulse_sq;
+        for (i = 0; i < 3; i++) {
+            impulse.v[i] = pObject->omega.v[i] * pObject->I.v[i];
+            total_sq += impulse.v[i] * impulse.v[i];
+        }
+        if (total_sq > max_impulse_sq) {
+            s = (br_scalar)sqrt(max_impulse_sq / total_sq);
+            BrVector3Scale(&impulse, &impulse, s);
+        }
+        for (i = 0; i < 3; i++) {
+            pObject->omega.v[i] -= impulse.v[i] / pObject->I.v[i];
+        }
+    }
+    for (child = pObject->child; child != NULL; child = child->next) {
+        if (!child->disable_move_rotate) {
+            DoJointFriction(child);
+        }
+    }
+}
 
 // ListDoJointFriction
 
