@@ -34,7 +34,7 @@ extern tU32 gPipe_sound_start_time;
 extern tU32 gPipe_sound_time_window;
 extern int gDisable_advance;
 extern int gPipe_count_callbacks;
-extern tPipe_smudge_data* gCrush_space;
+extern void* gCrush_space;
 extern tU8* gEnd_of_session;
 
 extern int C2_HOOK_FASTCALL ARReplayForwards(void);
@@ -209,6 +209,12 @@ extern void C2_HOOK_FASTCALL AddIdentityToPipingSession(br_actor* pActor);
 
 extern void C2_HOOK_FASTCALL AddSplitWeldToPipingSession(uintptr_t pId, const br_vector4* pPlane, int pSplit);
 
+extern void C2_HOOK_FASTCALL AddBendToPipingSession(uintptr_t pId, tU16 pArg2, tU16 pArg3, tU16 pArg4, const br_vector3* pArg5, float pArg6);
+
+extern void C2_HOOK_FASTCALL AddUnBendToPipingSession(uintptr_t pId, tU16 pArg2, tU16 pArg3, tU16 pArg4);
+
+extern void C2_HOOK_FASTCALL AddEndMyBendToPipingSession(uintptr_t pId, const tU8* pArg2, const tU8* pArg3, int pArg4, const tU16* pArg5);
+
 extern void C2_HOOK_FASTCALL AddExplosionToPipingSession(int pIndex, const tExplosion* pExplosion);
 
 extern void C2_HOOK_FASTCALL AddNonCarCreationToPipingSession(int pIndex);
@@ -258,6 +264,12 @@ extern void C2_HOOK_FASTCALL PipeSingleRelink(br_actor* pParent, br_actor* pActo
 extern void C2_HOOK_FASTCALL PipeSingleIdentity(br_actor* pActor);
 
 extern void C2_HOOK_FASTCALL PipeSingleSplitWeld(uintptr_t pId, const br_vector4* pPlane, int pSplit);
+
+extern void C2_HOOK_FASTCALL PipeSingleBend(uintptr_t pId, tU16 pArg2, tU16 pArg3, tU16 pArg4, const br_vector3* pArg5, float pArg6);
+
+extern void C2_HOOK_FASTCALL PipeSingleUnBend(uintptr_t pId, tU16 pArg2, tU16 pArg3, tU16 pArg4);
+
+extern void C2_HOOK_FASTCALL PipeSingleEndMyBend(uintptr_t pId, const tU8* pArg2, const tU8* pArg3, int pArg4, const tU16* pArg5);
 
 extern void C2_HOOK_FASTCALL PipeSingleShrapnelShower(uintptr_t pId, undefined4 pArg2, undefined4 pArg3, undefined4 pArg4, const br_vector3* pArg5, const br_vector3* pArg6, float pArg7, const br_vector3* pArg8, const br_vector3* pArg9, undefined4 pArg10, const br_bounds3* pArg11, undefined4 pArg12, const br_matrix34* pArg13, const br_vector3* pArg14, const br_matrix34* pArg15);
 

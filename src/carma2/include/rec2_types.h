@@ -717,6 +717,8 @@ typedef struct {
 
 typedef struct {
     tU32 size; // size is size of complete chunk (including size member)
+    tU8 field_0x4[124]; /* FIXME: unknown type */
+    tU16 field_0x80[64];
     tU8 data[];
 } tPipe_chunk_bend;
 
@@ -795,6 +797,8 @@ typedef enum {
     ePipe_chunk_relink = 25,
     ePipe_chunk_identity = 26,
     ePipe_chunk_split_weld = 27,
+    ePipe_chunk_bend = 28,
+    ePipe_chunk_unbend = 29,
     ePipe_chunk_shrapnel_shower = 30,
     ePipe_chunk_explosion = 31,
     ePipe_chunk_non_car_creation = 32,
@@ -802,6 +806,7 @@ typedef enum {
     ePipe_chunk_smash_decal = 35,
     ePipe_smash_texture_change = 36,
     ePipe_chunk_repulse_ray = 37,
+    ePipe_chunk_end_my_bend = 38,
     ePipe_chunk_ped_status = 40,
     ePipe_chunk_ped_dir = 41,
     ePipe_chunk_ped_move = 42,
@@ -856,6 +861,20 @@ typedef struct {
     br_vector4 plane;
     int split;
 } tPipe_chunk_split_weld;
+
+typedef struct {
+    tU16 field_0x0;
+    tU16 field_0x2;
+    tU16 field_0x4;
+    br_vector3 field_0x8;
+    float field_0x14;
+} tPipe_chunk_bend_point;
+
+typedef struct {
+    tU16 field_0x0;
+    tU16 field_0x2;
+    tU16 field_0x4;
+} tPipe_chunk_unbend;
 
 typedef struct {
     br_uint_16 vertices[3];
