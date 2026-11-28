@@ -1586,11 +1586,48 @@ void C2_HOOK_FASTCALL ResetObjectList(tPhysics_object* pObjects) {
 
 // RepositionObjectGroup
 
-// SimpleRotate
+// FUNCTION: CARMA2_HW 0x004c2670
+// FUNCTION: CARMA2_SW 0x004beda0
+// FUNCTION: CARMA2_CHEAT 0x004c8190
+void C2_HOOK_FASTCALL SimpleRotate(tPhysics_object* pObject, br_scalar pDt) {
+    br_scalar length;
+    br_vector3 axis;
+    br_vector3 tv;
 
-// InterpolateSingleObject
+    if (!pObject->disable_move_rotate) {
+        length = BrVector3Length(&pObject->rotate_omega);
+        axis.v[0] = pObject->rotate_omega.v[0] / length;
+        axis.v[1] = pObject->rotate_omega.v[1] / length;
+        axis.v[2] = pObject->rotate_omega.v[2] / length;
+        pDt = length * pDt;
+        if (fabs(pDt) >= 0.0001) {
+            BrMatrix34ApplyV(&tv, &pObject->cmpos, &pObject->actor->t.t.mat);
+            BrVector3Accumulate(&pObject->actor->t.t.translate.t, &tv);
+            BrMatrix34PreRotate(&pObject->actor->t.t.mat, BrRadianToAngle(pDt), &axis);
+            BrMatrix34ApplyV(&tv, &pObject->cmpos, &pObject->actor->t.t.mat);
+            BrVector3Sub(&pObject->actor->t.t.translate.t, &pObject->actor->t.t.translate.t, &tv);
+        }
+    }
+}
 
-// InterpolateObjects
+// FUNCTION: CARMA2_HW 0x004c2830
+// FUNCTION: CARMA2_SW 0x004bef60
+// FUNCTION: CARMA2_CHEAT 0x004c8350
+void C2_HOOK_FASTCALL InterpolateSingleObject(tPhysics_object* pObject, br_scalar pDt) {
+
+    TranslateObject(pObject, pDt);
+    SimpleRotate(pObject, pDt);
+    if (pObject->child != NULL) {
+        InterpolateObjects(pObject->child, pDt);
+    }
+}
+
+inline void C2_HOOK_FASTCALL InterpolateObjects(tPhysics_object* pList, br_scalar pDt) {
+
+    for (; pList != NULL; pList = pList->next) {
+        InterpolateSingleObject(pList, pDt);
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x004c2910
 // FUNCTION: CARMA2_SW 0x004bf040
