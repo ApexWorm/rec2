@@ -356,6 +356,8 @@ extern int C2_HOOK_FASTCALL RQRemovedOneTooManyForces(int* pCount_excluded, tU8*
 
 extern void C2_HOOK_FASTCALL GetInverseM(const br_scalar* pMatrix, const br_scalar* pOrthogonal, br_scalar* pResult, int pSize, int pFirst);
 
+extern int C2_HOOK_FASTCALL FUN_004c2db0(br_scalar** pA, int pCount_rows, int pCount_columns, br_scalar* pW, br_scalar** pV);
+
 extern int C2_HOOK_FASTCALL RQMatrixSolveNoNegatives(const br_scalar* pOriginal, br_scalar* pRhs, br_scalar* pResult, int pSize, int pRow_size, tU8* pExcluded, int* pCount_excluded, int pFirst, int pUnused, tForce_group** pGroups, int pCount_groups);
 
 // RQMatrixSolveWithNegatives

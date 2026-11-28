@@ -1684,6 +1684,280 @@ inline void C2_HOOK_FASTCALL GetInverseM(const br_scalar* pMatrix, const br_scal
     }
 }
 
+#define PYTHAGORAS(RESULT, A, B)                                                         \
+    do {                                                                                  \
+        abs_a = (br_scalar)fabs(A);                                                       \
+        abs_b = (br_scalar)fabs(B);                                                       \
+        if (abs_a > abs_b) {                                                              \
+            (RESULT) = (br_scalar)(abs_a * sqrt(1.0f + abs_b / abs_a * abs_b / abs_a));   \
+        } else if (abs_b == 0.0) {                                                        \
+            (RESULT) = (br_scalar)0.0;                                                    \
+        } else {                                                                          \
+            (RESULT) = (br_scalar)(abs_b * sqrt(1.0f + abs_a / abs_b * abs_a / abs_b));   \
+        }                                                                                 \
+    } while (0)
+
+// FUNCTION: CARMA2_HW 0x004c2db0
+// FUNCTION: CARMA2_SW 0x004bf4e0
+// FUNCTION: CARMA2_CHEAT 0x004c88d0
+int C2_HOOK_FASTCALL FUN_004c2db0(br_scalar** pA, int pCount_rows, int pCount_columns, br_scalar* pW, br_scalar** pV) {
+    br_scalar rv1[256];
+    br_scalar anorm;
+    br_scalar scale;
+    br_scalar abs_a;
+    br_scalar abs_b;
+    br_scalar c;
+    br_scalar f;
+    br_scalar g;
+    br_scalar h;
+    br_scalar s;
+    br_scalar x;
+    br_scalar y;
+    br_scalar z;
+    int flag;
+    int its;
+    int i;
+    int column;
+    int j;
+    int jj;
+    int k;
+    int l;
+    int nm;
+
+    /* Singular value decomposition A = U W V^T (Householder bidiagonalisation and QR iteration):
+     * pA (pCount_rows x pCount_columns, rows by pointer) is replaced by U, pW gets the singular values,
+     * pV (pCount_columns x pCount_columns) gets V. Returns -1 when an iteration does not converge. */
+    g = 0.0f;
+    scale = 0.0f;
+    anorm = 0.0f;
+    for (i = 0; i < pCount_columns; i++) {
+        l = i + 1;
+        rv1[i] = scale * g;
+        g = 0.0f;
+        s = 0.0f;
+        scale = 0.0f;
+        if (i <= pCount_rows) {
+            for (k = i; k < pCount_rows; k++) {
+                scale += (br_scalar)fabs(pA[k][i]);
+            }
+            if (scale != 0.0f) {
+                for (k = i; k < pCount_rows; k++) {
+                    pA[k][i] /= scale;
+                    s += pA[k][i] * pA[k][i];
+                }
+                f = pA[i][i];
+                g = -(br_scalar)(f > 0.0 ? fabs(sqrt(s)) : -fabs(sqrt(s)));
+                h = f * g - s;
+                pA[i][i] = f - g;
+                for (j = l; j < pCount_columns; j++) {
+                    s = 0.0f;
+                    for (k = i; k < pCount_rows; k++) {
+                        s += pA[k][i] * pA[k][j];
+                    }
+                    f = s / h;
+                    for (k = i; k < pCount_rows; k++) {
+                        pA[k][j] += f * pA[k][i];
+                    }
+                }
+                for (k = i; k < pCount_rows; k++) {
+                    pA[k][i] *= scale;
+                }
+            }
+        }
+        pW[i] = scale * g;
+        g = 0.0f;
+        s = 0.0f;
+        scale = 0.0f;
+        if (i < pCount_rows && i != pCount_columns - 1) {
+            for (k = l; k < pCount_columns; k++) {
+                scale += (br_scalar)fabs(pA[i][k]);
+            }
+            if (scale != 0.0f) {
+                for (k = l; k < pCount_columns; k++) {
+                    pA[i][k] /= scale;
+                    s += pA[i][k] * pA[i][k];
+                }
+                f = pA[i][l];
+                g = -(br_scalar)(f > 0.0 ? fabs(sqrt(s)) : -fabs(sqrt(s)));
+                h = f * g - s;
+                pA[i][l] = f - g;
+                for (k = l; k < pCount_columns; k++) {
+                    rv1[k] = pA[i][k] / h;
+                }
+                for (j = l; j < pCount_rows; j++) {
+                    s = 0.0f;
+                    for (k = l; k < pCount_columns; k++) {
+                        s += pA[j][k] * pA[i][k];
+                    }
+                    for (k = l; k < pCount_columns; k++) {
+                        pA[j][k] += s * rv1[k];
+                    }
+                }
+                for (k = l; k < pCount_columns; k++) {
+                    pA[i][k] *= scale;
+                }
+            }
+        }
+        anorm = (br_scalar)MAX(anorm, fabs(pW[i]) + fabs(rv1[i]));
+    }
+    for (column = pCount_columns - 1; column >= 0; column--) {
+        if (column < pCount_columns - 1) {
+            if (g != 0.0f) {
+                for (j = l; j < pCount_columns; j++) {
+                    pV[j][column] = pA[column][j] / pA[column][l] / g;
+                }
+                for (j = l; j < pCount_columns; j++) {
+                    s = 0.0f;
+                    for (k = l; k < pCount_columns; k++) {
+                        s += pA[column][k] * pV[k][j];
+                    }
+                    for (k = l; k < pCount_columns; k++) {
+                        pV[k][j] += s * pV[k][column];
+                    }
+                }
+            }
+            for (j = l; j < pCount_columns; j++) {
+                pV[j][column] = 0.0f;
+                pV[column][j] = 0.0f;
+            }
+        }
+        pV[column][column] = 1.0f;
+        g = rv1[column];
+        l = column;
+    }
+    for (i = MIN(pCount_rows, pCount_columns) - 1; i >= 0; i--) {
+        l = i + 1;
+        g = pW[i];
+        for (j = l; j < pCount_columns; j++) {
+            pA[i][j] = 0.0f;
+        }
+        if (g != 0.0f) {
+            g = (br_scalar)(1.0 / g);
+            for (j = l; j < pCount_columns; j++) {
+                s = 0.0f;
+                for (k = l; k < pCount_rows; k++) {
+                    s += pA[k][i] * pA[k][j];
+                }
+                f = s / pA[i][i] * g;
+                for (k = i; k < pCount_rows; k++) {
+                    pA[k][j] += f * pA[k][i];
+                }
+            }
+            for (j = i; j < pCount_rows; j++) {
+                pA[j][i] *= g;
+            }
+        } else {
+            for (j = i; j < pCount_rows; j++) {
+                pA[j][i] = 0.0f;
+            }
+        }
+        pA[i][i] += 1.0f;
+    }
+    for (k = pCount_columns - 1; k >= 0; k--) {
+        for (its = 1; its <= 30; its++) {
+            flag = 1;
+            for (l = k; l >= 0; l--) {
+                nm = l - 1;
+                if ((br_scalar)fabs(rv1[l]) + anorm == anorm) {
+                    flag = 0;
+                    break;
+                }
+                if ((br_scalar)fabs(pW[nm]) + anorm == anorm) {
+                    break;
+                }
+            }
+            if (flag != 0) {
+                c = 0.0f;
+                s = 1.0f;
+                for (i = l; i <= k; i++) {
+                    f = s * rv1[i];
+                    rv1[i] = c * rv1[i];
+                    if ((br_scalar)fabs(f) + anorm == anorm) {
+                        break;
+                    }
+                    g = pW[i];
+                    PYTHAGORAS(h, f, g);
+                    pW[i] = h;
+                    h = (br_scalar)(1.0 / h);
+                    c = g * h;
+                    s = -(f * h);
+                    for (j = 0; j < pCount_rows; j++) {
+                        y = pA[j][nm];
+                        z = pA[j][i];
+                        pA[j][nm] = y * c + z * s;
+                        pA[j][i] = z * c - y * s;
+                    }
+                }
+            }
+            z = pW[k];
+            if (l == k) {
+                if (z < 0.0) {
+                    pW[k] = -z;
+                    for (j = 0; j < pCount_columns; j++) {
+                        pV[j][k] = -pV[j][k];
+                    }
+                }
+                break;
+            }
+            if (its == 30) {
+                return -1;
+            }
+            x = pW[l];
+            nm = k - 1;
+            y = pW[nm];
+            g = rv1[nm];
+            h = rv1[k];
+            f = ((y - z) * (y + z) + (g - h) * (g + h)) / (2.0f * h * y);
+            PYTHAGORAS(g, f, 1.0);
+            f = ((x - z) * (x + z) + h * (y / (f + (f > 0.0 ? fabs(g) : -fabs(g))) - h)) / x;
+            c = 1.0f;
+            s = 1.0f;
+            for (j = l; j <= nm; j++) {
+                i = j + 1;
+                g = rv1[i];
+                y = pW[i];
+                h = s * g;
+                g = c * g;
+                PYTHAGORAS(z, f, h);
+                rv1[j] = z;
+                c = f / z;
+                s = h / z;
+                f = x * c + g * s;
+                g = g * c - x * s;
+                h = y * s;
+                y *= c;
+                for (jj = 0; jj < pCount_columns; jj++) {
+                    x = pV[jj][j];
+                    z = pV[jj][i];
+                    pV[jj][j] = x * c + z * s;
+                    pV[jj][i] = z * c - x * s;
+                }
+                PYTHAGORAS(z, f, h);
+                pW[j] = z;
+                if (z != 0.0f) {
+                    z = (br_scalar)(1.0 / z);
+                    c = f * z;
+                    s = h * z;
+                }
+                f = c * g + s * y;
+                x = c * y - s * g;
+                for (jj = 0; jj < pCount_rows; jj++) {
+                    y = pA[jj][j];
+                    z = pA[jj][i];
+                    pA[jj][j] = y * c + z * s;
+                    pA[jj][i] = z * c - y * s;
+                }
+            }
+            rv1[l] = 0.0f;
+            rv1[k] = f;
+            pW[k] = x;
+        }
+    }
+    return 0;
+}
+
+#undef PYTHAGORAS
+
 // FUNCTION: CARMA2_HW 0x004c3b60
 // FUNCTION: CARMA2_SW 0x004c0290
 // FUNCTION: CARMA2_CHEAT 0x004c9680
