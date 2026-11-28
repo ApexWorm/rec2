@@ -1051,19 +1051,17 @@ void C2_HOOK_FASTCALL DoShrapnel(tCar_crush_smashable_part* pSmashable, tShrapne
     br_matrix34 mat;
     br_vector3 tv;
 
-    if (!gAction_replay_mode) {
-        if ((pShrapnel->type == kShrapnelType_GhostParts || pShrapnel->type == kShrapnelType_NonCars)
-                && pShrapnel->initial_pos.type == kInitialSmashablePosition_ActorBased
-                && gINT_006a3334) {
-            BrVector3Sub(&tv, &gVector3_006b78a0[1], &gVector3_006b78a0[0]);
-            BrVector3Normalise((br_vector3*)mat.m[0], &tv);
-            BrVector3Sub(&tv, &gVector3_006b78a0[2], &gVector3_006b78a0[0]);
-            BrVector3Normalise((br_vector3*)mat.m[1], &tv);
-            BrVector3Normalise((br_vector3*)mat.m[2], &gVector3_006a4688);
-            BrVector3Copy((br_vector3*)mat.m[3], &gVector3_006b78a0[1]);
-        }
-    } else {
+    if (gAction_replay_mode) {
         BrMatrix34Copy(&mat, pMat);
+    } else if ((pShrapnel->type == kShrapnelType_GhostParts || pShrapnel->type == kShrapnelType_NonCars)
+            && pShrapnel->initial_pos.type == kInitialSmashablePosition_ActorBased
+            && gINT_006a3334) {
+        BrVector3Sub(&tv, &gVector3_006b78a0[1], &gVector3_006b78a0[0]);
+        BrVector3Normalise((br_vector3*)mat.m[0], &tv);
+        BrVector3Sub(&tv, &gVector3_006b78a0[2], &gVector3_006b78a0[0]);
+        BrVector3Normalise((br_vector3*)mat.m[1], &tv);
+        BrVector3Normalise((br_vector3*)mat.m[2], &gVector3_006a4688);
+        BrVector3Copy((br_vector3*)mat.m[3], &gVector3_006b78a0[1]);
     }
     switch (pShrapnel->type) {
     case kShrapnelType_Abstract:
