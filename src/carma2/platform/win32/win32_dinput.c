@@ -1641,7 +1641,7 @@ void C2_HOOK_FASTCALL StartDinputEffect(int pIndex) {
 
     effect = gDirectInputEffects[pIndex];
     if (effect != NULL) {
-        IDirectInputEffect_Start(effect, 1, DIES_NODOWNLOAD);
+        IDirectInputEffect_Start(effect, 1, 0);
     }
 }
 

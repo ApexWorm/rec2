@@ -2165,18 +2165,18 @@ int C2_HOOK_FASTCALL GetBlenficatiousnessOfMaterial(br_material* pMaterial) {
 char* C2_HOOK_FASTCALL MungeCommas(int pValue) {
     // GLOBAL: CARMA2_HW 0x006b5f20
     // GLOBAL: CARMA2_SW 0x006acc00
+    // GLOBAL: CARMA2_CHEAT 0x006bd5c0
     static char result_buffer[32];
     char buffer[32];
     int len;
     int get_pos;
     int put_pos;
-    int remaining;
 
     sprintf(buffer, "%i", pValue);
     len = (int)strlen(buffer);
-    for (get_pos = 0, put_pos = 0, remaining = len; get_pos < len; get_pos++, put_pos++, remaining--) {
+    for (get_pos = 0, put_pos = 0; get_pos < len; get_pos++, put_pos++) {
 
-        if (remaining % 3 == 0 && get_pos != 0) {
+        if ((len - get_pos) % 3 == 0 && get_pos != 0) {
             result_buffer[put_pos] = gMisc_strings[294][0];
             put_pos++;
         }
@@ -2189,9 +2189,9 @@ char* C2_HOOK_FASTCALL MungeCommas(int pValue) {
 // FUNCTION: CARMA2_HW 0x00518fa0
 // FUNCTION: CARMA2_CHEAT 0x0051e9b0
 void C2_HOOK_FASTCALL MungeMetaCharacters(char* pText, char pMeta, const char* pRepl) {
+    int i;
     int len_text;
     int len_repl;
-    int i;
 
     len_text = strlen(pText);
     len_repl = strlen(pRepl);
