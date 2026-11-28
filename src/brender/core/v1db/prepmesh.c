@@ -644,43 +644,46 @@ void C2_HOOK_STDCALL PrepareBoundingBox(br_model* model) {
     }
 }
 
+static int MaterialTypeSupportsBlending(const br_material* pMaterial) {
+    br_uint_8 type;
+
+    if (pMaterial->colour_map == NULL) {
+        return 0;
+    }
+    type = pMaterial->colour_map->type;
+
+    return type == BR_PMT_ALPHA_8 || type == BR_PMT_INDEXA_88 || type == BR_PMT_RGBA_4444 || type == BR_PMT_ALPHA_4 || type == BR_PMT_INDEXA_44 || type == BR_PMT_DEPTH_15 || type == BR_PMT_ARGB_1555;
+}
+
+static int MaterialHasIndexBlendTable(const br_material* pMaterial) {
+    return pMaterial->index_blend != NULL;
+}
+
+static int MaterialPrimsSupportBlending(const br_material* pMaterial) {
+    br_token_value* tvp;
+
+    tvp = pMaterial->extra_prim;
+    if (tvp != NULL) {
+        while (tvp->t != BR_NULL_TOKEN && tvp->t != BRT_OPACITY_X && tvp->t != BRT_OPACITY_F) {
+            tvp++;
+        }
+        if (tvp->t != BR_NULL_TOKEN) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
 // FUNCTION: CARMA2_HW 0x0051f630
 // FUNCTION: CARMA2_SW 0x0051acd0
 // FUNCTION: CARMA2_CHEAT 0x00525220
 int C2_HOOK_STDCALL IsMaterialTransparent(const br_material* material) {
-    br_token_value* tvp;
 
-    if (material == NULL) {
+    if (material != NULL && (MaterialTypeSupportsBlending(material) || MaterialHasIndexBlendTable(material) || MaterialPrimsSupportBlending(material))) {
+        return 1;
+    } else {
         return 0;
     }
-    if (material->colour_map != NULL) {
-        br_uint_8 type = material->colour_map->type;
-
-        switch (type) {
-        case BR_PMT_ALPHA_8:
-        case BR_PMT_INDEXA_88:
-        case BR_PMT_RGBA_4444:
-        case BR_PMT_ALPHA_4:
-        case BR_PMT_INDEXA_44:
-        case BR_PMT_DEPTH_15:
-        case BR_PMT_ARGB_1555:
-            return 1;
-        }
-        if (material->index_blend != NULL) {
-            return 1;
-        }
-    }
-
-    tvp = material->extra_prim;
-    if (tvp != NULL) {
-        while (tvp->t != BR_NULL_TOKEN) {
-            if (tvp->t == BRT_OPACITY_X || tvp->t == BRT_OPACITY_F) {
-                return 1;
-            }
-            tvp++;
-        }
-    }
-    return 0;
 }
 
 // FUNCTION: CARMA2_HW 0x0051f6a0
