@@ -32,6 +32,7 @@
 #include "c2_direct.h"
 #include <stdio.h>
 #include "c2_string.h"
+#include <signal.h>
 #include <time.h>
 
 #include "brender/brender.h"
@@ -887,6 +888,40 @@ int C2_HOOK_FASTCALL PDGetMicroseconds(void) {
         return (int)count;
     }
     return 0;
+}
+
+// FUNCTION: CARMA2_HW 0x0051a6b0
+// FUNCTION: CARMA2_CHEAT 0x0051fdd0
+void C2_HOOK_FASTCALL PDSignalHandler(int pSignal) {
+    // GLOBAL: CARMA2_HW 0x006ad4cc
+    // GLOBAL: CARMA2_CHEAT 0x006b4b58
+    static int handled;
+    char s[256];
+
+    if (!handled) {
+        handled = 1;
+        strcpy(s, "*** SIGNAL RECEIVED: ");
+        switch (pSignal) {
+        case SIGABRT:
+            strcat(s, "SIGABRT");
+            break;
+        case SIGFPE:
+            strcat(s, "SIGFPE");
+            break;
+        case SIGILL:
+            strcat(s, "SIGILL");
+            break;
+        case SIGSEGV:
+            strcat(s, "SIGSEGV");
+            break;
+        case SIGTERM:
+            strcat(s, "SIGTERM");
+            break;
+        }
+        dr_dprintf(s);
+        PDShutdownSystem();
+    }
+    ExitProcess(701);
 }
 
 // FUNCTION: CARMA2_HW 0x0051a7b0

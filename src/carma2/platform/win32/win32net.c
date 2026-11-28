@@ -511,6 +511,60 @@ void C2_HOOK_FASTCALL PDNetLeaveGame(void) {
     dr_dprintf("PDNetLeaveGame()");
 }
 
+inline tNet_game_player_info* C2_HOOK_FASTCALL PDNetPlayerFromID(tPlayer_ID pPlayer) {
+    int i;
+
+    for (i = 0; i < gNumber_of_net_players; i++) {
+        if (gNet_players[i].pd_net_info.addr[8] == (char)(pPlayer >> 24)
+            && gNet_players[i].pd_net_info.addr[9] == (char)(pPlayer >> 16)
+            && gNet_players[i].pd_net_info.addr[10] == (char)(pPlayer >> 8)
+            && gNet_players[i].pd_net_info.addr[11] == (char)pPlayer) {
+            return &gNet_players[i];
+        }
+    }
+    return NULL;
+}
+
+// FUNCTION: CARMA2_HW 0x0051a210
+// FUNCTION: CARMA2_SW 0x00513cf0
+// FUNCTION: CARMA2_CHEAT 0x0051f930
+int C2_HOOK_FASTCALL PDNetSendMessageToPlayer(tNet_game_details* pDetails, tNet_message* pMessage, tPlayer_ID pPlayer) {
+    tNet_game_player_info* player;
+
+    player = PDNetPlayerFromID(pPlayer);
+    if (player != NULL) {
+        /* FIXME: sizeof(struct sockaddr) == 16 */
+        if (sendto(gSocket, (const char*)pMessage, pMessage->header.field_0x16, 0, (struct sockaddr*)player->pd_net_info.addr, 14) == SOCKET_ERROR) {
+            dr_dprintf("PDNetSendMessageToPlayer(): Error on sendto() - WSAGetLastError=%d", WSAGetLastError());
+            NetDisposeMessage(pDetails, pMessage);
+            return 1;
+        }
+    }
+    NetDisposeMessage(pDetails, pMessage);
+    return 0;
+}
+
+// FUNCTION: CARMA2_HW 0x0051a2e0
+// FUNCTION: CARMA2_SW 0x00513dc0
+// FUNCTION: CARMA2_CHEAT 0x0051fa00
+int C2_HOOK_FASTCALL PDNetSendMessageToAllPlayers(tNet_game_details* pDetails, tNet_message* pMessage) {
+    int i;
+
+    for (i = 0; i < gNumber_of_net_players; i++) {
+        if (i == gThis_net_player_index) {
+            continue;
+        }
+        /* FIXME: sizeof(struct sockaddr) == 16 */
+        if (sendto(gSocket, (const char*)pMessage, pMessage->header.field_0x16, 0, (struct sockaddr*)gNet_players[i].pd_net_info.addr, 14) == SOCKET_ERROR) {
+            dr_dprintf("PDNetSendMessageToAllPlayers(): Error on sendto() - WSAGetLastError=%d", WSAGetLastError());
+            NetDisposeMessage(pDetails, pMessage);
+            return 1;
+        }
+    }
+    NetDisposeMessage(pDetails, pMessage);
+    return 0;
+}
+
 // FUNCTION: CARMA2_HW 0x0051a380
 // FUNCTION: CARMA2_SW 0x00513e60
 // FUNCTION: CARMA2_CHEAT 0x0051faa0

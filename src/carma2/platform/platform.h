@@ -33,6 +33,8 @@ extern int C2_HOOK_FASTCALL PDServiceSystem(tU32 pTime_since_last_call);
 extern void C2_HOOK_FASTCALL PDInitialiseSystem(void);
 
 extern void C2_HOOK_FASTCALL PDBuildAppPath(char* pThe_path);
+extern void C2_HOOK_FASTCALL PDSignalHandler(int pSignal);
+
 extern void C2_HOOK_FASTCALL PDEnterDebugger(const char* pStr);
 extern void C2_NORETURN C2_HOOK_FASTCALL PDFatalError(const char* pThe_str);
 extern void C2_HOOK_FASTCALL PDNonFatalError(const char* pThe_str);
@@ -110,6 +112,10 @@ extern int C2_HOOK_FASTCALL PDNetJoinGame(tNet_game_details* pGame_details, cons
 extern void C2_HOOK_FASTCALL PDNetHostFinishGame(tNet_game_details* pDetails);
 
 extern void C2_HOOK_FASTCALL PDNetLeaveGame(void);
+
+extern int C2_HOOK_FASTCALL PDNetSendMessageToPlayer(tNet_game_details* pDetails, tNet_message* pMessage, tPlayer_ID pPlayer);
+
+extern int C2_HOOK_FASTCALL PDNetSendMessageToAllPlayers(tNet_game_details* pDetails, tNet_message* pMessage);
 
 extern tNet_message* C2_HOOK_FASTCALL PDNetGetNextMessage(tNet_game_details* pDetails, void** gRemote_addr);
 
