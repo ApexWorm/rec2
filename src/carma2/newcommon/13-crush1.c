@@ -2204,8 +2204,6 @@ void C2_HOOK_FASTCALL BendCollisionShape(tCar_crush_shape_info* pShape, const tB
 
 // BendModels
 
-extern br_scalar C2_HOOK_FASTCALL BrAngleToSignedDegree(br_angle pAngle);
-
 inline br_scalar C2_HOOK_FASTCALL BrAngleToSignedDegree(br_angle pAngle) {
     br_scalar degrees;
 
