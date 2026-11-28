@@ -194,7 +194,7 @@ tDecal gDecals[50] = { 0 };
 // GLOBAL: CARMA2_HW 0x006a8288
 // GLOBAL: CARMA2_SW 0x006a22e8
 // GLOBAL: CARMA2_CHEAT 0x006afe00
-int gINT_006a8288 = 0;
+int gCount_track_smashable_environment_specs_2 = 0;
 
 // GLOBAL: CARMA2_HW 0x006a828c
 // GLOBAL: CARMA2_SW 0x006a22ec
@@ -209,7 +209,7 @@ int gINT_006a8290 = 0;
 // GLOBAL: CARMA2_HW 0x006a8294
 // GLOBAL: CARMA2_SW 0x006a22f4
 // GLOBAL: CARMA2_CHEAT 0x006afe0c
-int gINT_006a8294 = 0;
+int gDoing_net_smash = 0;
 
 // GLOBAL: CARMA2_HW 0x006a829c
 // GLOBAL: CARMA2_SW 0x006a22fc
@@ -2523,7 +2523,7 @@ void C2_HOOK_FASTCALL ReadSmashableEnvironment(FILE* pF, const char* pPath) {
     gCount_smashable_noncar_shrapnel_actors = 0;
     gSmashable_noncars = BrMemAllocate(100 * sizeof(tSmashable_environment_name), kMem_smashable_env_info);
     gCount_track_smashable_environment_specs = GetAnInt(pF);
-    gINT_006a8288 = gCount_track_smashable_environment_specs;
+    gCount_track_smashable_environment_specs_2 = gCount_track_smashable_environment_specs;
     gCapacity_track_smashable_environment_specs = 5 * (gCount_track_smashable_environment_specs + 30);
     gTrack_smashable_environment_specs = BrMemAllocate(gCapacity_track_smashable_environment_specs * sizeof(tSmashable_item_spec), kMem_smashable_env_info);
     gSmashable_track_environment_path = pPath;
@@ -4133,10 +4133,10 @@ void C2_HOOK_FASTCALL DoNetSmash(tQueued_net_smash* pSmash) {
     count = FindFacesInBox(&bounds, faces, REC2_ASIZE(faces), &gWorld_callbacks);
     for (i = 0, face = faces; i < count; i++, face++) {
         if (PointInFace(&pSmash->position, &face->normal, face->d, &face->v[0], &face->v[1], &face->v[2])) {
-            gINT_006a8294 = pSmash->flags & 0x1;
+            gDoing_net_smash = pSmash->flags & 0x1;
             SmashEnvironment(object, face, pSmash->magnitude, &pSmash->position, &pSmash->normal, &pSmash->force, (pSmash->flags >> 1) & 0x1, 1);
             FlushSmashQueue(0);
-            gINT_006a8294 = 0;
+            gDoing_net_smash = 0;
             return;
         }
     }
