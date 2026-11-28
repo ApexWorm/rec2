@@ -36,7 +36,7 @@ extern tShrapnel_time_info gPed_spurt_min_max_time;
 extern void* gPhysics_other_buffer;
 extern void* gPhysics_scratch_ptr;
 extern int gFace_count;
-extern int gINT_00679438;
+extern int gTesting_sensible_place;
 extern tPhysics_object* gObject_blocking_sensible_place;
 extern tWorld_callbacks gWorld_callbacks;
 
