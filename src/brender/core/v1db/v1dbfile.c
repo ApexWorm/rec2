@@ -928,19 +928,20 @@ int C2_HOOK_STDCALL FopRead_PIXELMAP_REF(br_datafile* df, br_uint_32 id, br_uint
         }
     }
 
+#ifdef BRENDER_FIX_BUGS
     if (i >= BR_ASIZE(MaterialMaps)) {
         // FIXME: error message
         abort();
     }
+#endif
 
     mp = DfTop(DF_MATERIAL, NULL);
-    df->prims->name_read(df, name);
     if (MaterialMaps[i].table != 0) {
-        pm = BrTableFind(name);
+        pm = BrTableFind(df->prims->name_read(df, name));
     } else {
-        pm = BrMapFind(name);
+        pm = BrMapFind(df->prims->name_read(df, name));
     }
-    *(intptr_t*)(mp + MaterialMaps[i].offset) = (intptr_t)pm;
+    *(br_pixelmap**)(mp + MaterialMaps[i].offset) = pm;
     return 0;
 }
 
