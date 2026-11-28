@@ -214,7 +214,7 @@ int gDoing_net_smash = 0;
 // GLOBAL: CARMA2_HW 0x006a829c
 // GLOBAL: CARMA2_SW 0x006a22fc
 // GLOBAL: CARMA2_CHEAT 0x006afe14
-int gINT_006a829c = 0;
+int gShrapnel_counter = 0;
 
 // GLOBAL: CARMA2_HW 0x006a4698
 // GLOBAL: CARMA2_SW 0x0069e6f8
@@ -1190,7 +1190,7 @@ inline void C2_HOOK_FASTCALL SmashItIntoVerySmallPiecesIndeed(tCar_spec* pCar, t
         BrActorToActorMatrix34(&mat, pActor, gUniverse_actor);
         ActuallySmashPart(pCar, pSmashable, pLevel);
         DoConnotationsMultiLevel(pObject, pSpec, pSmashable, &pSmashable->levels[pLevel].connotations, seed,
-            pVelocity, pPosition, pPosition, pActor, the_time, gINT_006a829c, &mat, old_level, pLevel, pForce, pNo_side_effects);
+            pVelocity, pPosition, pPosition, pActor, the_time, gShrapnel_counter, &mat, old_level, pLevel, pForce, pNo_side_effects);
         if (pSmashable->funk_material != NULL && pSmashable->funk_material->identifier != NULL) {
             switch (pSmashable->levels[pSmashable->field_0x4c].collision_type) {
             case kTextureLevelCollisionChange_Solid:
@@ -3214,7 +3214,7 @@ float C2_HOOK_FASTCALL BashModel(tSmashable_item_spec* pSpec, tPhysics_object* p
         *pSmashed = 1;
         BrActorToActorMatrix34(&mat, pActor, gUniverse_actor);
         DoConnotations(pObject, pSpec, NULL, &pSpec->mode_data.shrapnel.connotations, seed, &velocity, &pActor->t.t.translate.t, pPosition,
-            pActor, the_time, gINT_006a829c, &mat, &bounds, &gZero_vector__smash, pMagnitude, pForce, pNetwork);
+            pActor, the_time, gShrapnel_counter, &mat, &bounds, &gZero_vector__smash, pMagnitude, pForce, pNetwork);
     }
     return result;
 }
@@ -3405,7 +3405,7 @@ float C2_HOOK_FASTCALL SmashEnvironment(tPhysics_object* pObject, tFace_ref* pFa
             result = spec->mode_data.shrapnel.removal_threshold;
             BrActorToActorMatrix34(&mat, pFace->a, gUniverse_actor);
             DoConnotations(pObject, spec, NULL, &spec->mode_data.shrapnel.connotations, seed, &velocity, pPosition, pPosition, pFace->a,
-                the_time, gINT_006a829c, &mat, NULL, &pFace->normal, pMagnitude, pForce, pNetwork);
+                the_time, gShrapnel_counter, &mat, NULL, &pFace->normal, pMagnitude, pForce, pNetwork);
             if (!pNetwork) {
                 SendNetSmash(pObject, pFace, pMagnitude, pPosition, pNormal, pForce, pSnap);
             }
