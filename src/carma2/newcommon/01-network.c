@@ -478,7 +478,7 @@ void C2_HOOK_FASTCALL NetLeaveGame(tNet_game_details* pNet_game) {
 // FUNCTION: CARMA2_HW 0x0049e0e0
 // FUNCTION: CARMA2_SW 0x0049a260
 // FUNCTION: CARMA2_CHEAT 0x0049e620
-void C2_HOOK_FASTCALL NetSetPlayerSystemInfo(tNet_game_player_info* pPlayer, void* pSender_address) {
+inline void C2_HOOK_FASTCALL NetSetPlayerSystemInfo(tNet_game_player_info* pPlayer, void* pSender_address) {
 
     PDNetSetPlayerSystemInfo(pPlayer, pSender_address);
 }
