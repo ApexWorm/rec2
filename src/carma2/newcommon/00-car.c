@@ -1252,7 +1252,7 @@ void C2_HOOK_FASTCALL NonCarCalcForce(tNon_car_spec* pNon_car, br_scalar pDt) {
 // FUNCTION: CARMA2_HW 0x0041deb0
 // FUNCTION: CARMA2_SW 0x0041dee0
 // FUNCTION: CARMA2_CHEAT 0x0041e110
-void C2_HOOK_FASTCALL CrushAndDamageCar(tCar_spec* pCar, br_vector3* pPosition, br_vector3* pForce_car_space, tCar_spec* pCar2, int pCount_points, br_vector3* pPoints, int pArg7) {
+void C2_HOOK_FASTCALL CrushAndDamageCar(tCar_spec* pCar, br_vector3* pPosition, br_vector3* pForce_car_space, tCar_spec* pCar2, int pCount_points, br_vector3* pPoints, br_actor* pActor) {
     br_vector3 force;
     br_vector3 force_for_bodywork;
     br_vector3 car_to_cam;
