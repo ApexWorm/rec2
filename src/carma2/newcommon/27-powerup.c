@@ -1760,11 +1760,71 @@ void C2_HOOK_FASTCALL TiggerMineToExplode(tCar_spec* pCar) {
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x004ddc20
-// STUB: CARMA2_SW 0x004da120
-// STUB: CARMA2_CHEAT 0x004e37e0
+// FUNCTION: CARMA2_HW 0x004ddc20
+// FUNCTION: CARMA2_SW 0x004da120
+// FUNCTION: CARMA2_CHEAT 0x004e37e0
 void C2_HOOK_FASTCALL HitAShatOutMine(tPhysics_object* pObject1, tPhysics_object* pObject2, br_scalar pImpulse) {
-    NOT_IMPLEMENTED();
+    tShit_mine* mine;
+    tPhysics_object* other;
+    tNon_car_spec* non_car;
+    tCar_spec* car;
+
+    mine = NULL;
+    other = NULL;
+    if (gNet_mode == eNet_mode_client) {
+        return;
+    }
+    if (pObject1 != NULL && pObject1->flags_0x238 == 0x40) {
+        mine = pObject1->owner;
+        other = pObject2;
+        if (mine->flags & 0x20) {
+            return;
+        }
+    } else if (pObject2 != NULL && pObject2->flags_0x238 == 0x40) {
+        mine = pObject2->owner;
+        other = pObject1;
+        if (mine->flags & 0x20) {
+            return;
+        }
+    }
+    if (mine != NULL && other != NULL) {
+        if (other->owner != NULL && other->flags_0x238 == 1) {
+            non_car = other->owner;
+        } else {
+            non_car = NULL;
+        }
+        if (non_car == NULL
+            || non_car->driver == eDriver_non_car_unused_slot
+            || (non_car->driver != eDriver_4 && non_car->driver != eDriver_detached_bit && non_car->driver != eDriver_split_car)
+            || !(non_car->flags & 0x10000)) {
+            if (other->flags_0x238 == 0x40) {
+                ((tShit_mine*)other->owner)->flags |= 0x20;
+                return;
+            }
+            car = other->owner;
+            if (car != NULL && other->flags_0x238 == 1
+                && (car->driver == eDriver_non_car_unused_slot || (car->driver != eDriver_detached_bit && car->driver != eDriver_split_car))
+                && car->driver > eDriver_5) {
+                if (car->field_0x4c8 <= 1.0
+                    && !(gNet_mode != eNet_mode_none && NetPlayerFromCar(car) != NULL && NetPlayerFromCar(car)->field_0x80 != 0)) {
+                    mine->car = car;
+                    mine->max_damage = (br_scalar)(car->softness_factor / 0.7);
+                    mine->flags |= 0x80;
+                }
+            } else {
+                ThisObjectHitAMineSoSpamItUpUsingThisPowerupsSettings(other, 0);
+            }
+            mine->flags |= 0x20;
+            return;
+        }
+    }
+    if (pImpulse > mine->field_0x1c && gPinball_factor == 0.0f) {
+        mine->flags |= 0x20;
+        return;
+    }
+    if (pImpulse > 0.025f) {
+        DRS3StartSound3D(gCar_outlet, 5403, &mine->collision_info->actor->t.t.translate.t, &gZero_v__car, 1, 255, 0x10000, 0x10000);
+    }
 }
 
 #ifdef REC2_MATCHING
