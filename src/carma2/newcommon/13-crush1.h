@@ -532,7 +532,7 @@ extern void C2_HOOK_FASTCALL SendAllDBNonCars(tNet_game_player_info* pPlayer);
 
 extern void C2_HOOK_FASTCALL ReceivedToggleFlaps(tNet_message_chunk* pContents);
 
-// SHNonCarOwner
+extern tCar_spec* C2_HOOK_FASTCALL SHNonCarOwner(tNon_car_spec* pNon_car);
 
 extern void C2_HOOK_FASTCALL SendSHNonCar(tNon_car_spec* pNon_car, tU32 pTime, tNet_game_player_info* pPlayer);
 
