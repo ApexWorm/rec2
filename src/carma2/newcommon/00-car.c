@@ -1493,11 +1493,44 @@ inline void C2_HOOK_FASTCALL SmashFacesWithWheels(tCar_spec* c, tFace_ref** pFac
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x0041bd40
-// STUB: CARMA2_SW 0x0041bd70
-// STUB: CARMA2_CHEAT 0x0041bfa0
+// FUNCTION: CARMA2_HW 0x0041bd40
+// FUNCTION: CARMA2_SW 0x0041bd70
+// FUNCTION: CARMA2_CHEAT 0x0041bfa0
 void C2_HOOK_FASTCALL ConditionallyNoteSkid(tCar_spec* pCar, tFace_ref** pFace_refs, int pWheel) {
-    NOT_IMPLEMENTED();
+    br_vector3 pos;
+    br_scalar d;
+
+    if (pFace_refs[pWheel] == NULL) {
+        return;
+    }
+    if (pFace_refs[pWheel]->material != NULL
+            && pFace_refs[pWheel]->material->colour_map != NULL
+            && pFace_refs[pWheel]->material->colour_map->type == BR_PMT_RGBA_4444) {
+        return;
+    }
+    if (pFace_refs[pWheel]->material != NULL
+            && pFace_refs[pWheel]->material->identifier != NULL
+            && strlen(pFace_refs[pWheel]->material->identifier) == 11
+            && pFace_refs[pWheel]->material->identifier[5] == '|') {
+        return;
+    }
+    if (pCar->new_skidding & (1 << pWheel)) {
+        return;
+    }
+    pCar->new_skidding |= 1 << pWheel;
+    if (pWheel & 1) {
+        pos.v[0] = pCar->wpos[pWheel].v[0] - 0.1725f;
+    } else {
+        pos.v[0] = pCar->wpos[pWheel].v[0] + 0.1725f;
+    }
+    pos.v[0] = pos.v[0] / WORLD_SCALE;
+    pos.v[1] = (pCar->wpos[pWheel].v[1] - pCar->oldd[pWheel]) / WORLD_SCALE;
+    pos.v[2] = pCar->wpos[pWheel].v[2] / WORLD_SCALE;
+    BrMatrix34ApplyP(&pCar->special_start[pWheel], &pos, &pCar->collision_info->transform_matrix);
+    d = BrVector3Dot(&pFace_refs[pWheel]->v[0], &pFace_refs[pWheel]->normal) - BrVector3Dot(&pCar->special_start[pWheel], &pFace_refs[pWheel]->normal);
+    pCar->special_start[pWheel].v[0] += pFace_refs[pWheel]->normal.v[0] * d;
+    pCar->special_start[pWheel].v[1] += pFace_refs[pWheel]->normal.v[1] * d;
+    pCar->special_start[pWheel].v[2] += pFace_refs[pWheel]->normal.v[2] * d;
 }
 
 #ifdef REC2_MATCHING
