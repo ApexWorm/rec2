@@ -4333,7 +4333,7 @@ typedef struct tCar_crush_spec {
     undefined field_0x4b9[3];
     float snappability_factor;
     float split_y_pos;
-    undefined field_0x4c4[8];
+    br_model* field_0x4c4[2];
     br_actor* actor; /* ->user is tCar_spec pointer */
     br_actor* model_actor;
     undefined field_0x4d4[0x548 - 0x4d4];
