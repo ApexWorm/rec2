@@ -930,6 +930,39 @@ void C2_HOOK_FASTCALL AddShrapnelToPipingSession(int pShrapnel_index, const br_v
     }
 }
 
+// FUNCTION: CARMA2_HW 0x004c6f90
+// FUNCTION: CARMA2_SW 0x004c36c0
+// FUNCTION: CARMA2_CHEAT 0x004ccab0
+void C2_HOOK_FASTCALL AddScreenWobbleToPipingSession(int pWobble_x, int pWobble_y) {
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_chunk_screen_wobble, wobble_x, 0x1);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk_screen_wobble, wobble_y, 0x1);
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_chunk_screen_wobble, wobble_y, 0x1);
+
+    ARAddVariedDataToSession(ePipe_chunk_screen_wobble, 0, 2,
+        SIZE_OFFSET_PIPING(tPipe_chunk_screen_wobble, wobble_x), pWobble_x,
+        SIZE_OFFSET_PIPING(tPipe_chunk_screen_wobble, wobble_y), pWobble_y);
+}
+
+// FUNCTION: CARMA2_HW 0x004c6fb0
+// FUNCTION: CARMA2_SW 0x004c36e0
+// FUNCTION: CARMA2_CHEAT 0x004ccad0
+void C2_HOOK_FASTCALL AddGrooveStopToPipingSession(int pGroove_index, br_matrix34* pMatrix, int pPath_interrupt, int pObject_interrupt, float pPath_resumption, float pObject_resumption) {
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk_groove_stop, path_interrupt, 0x0);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk_groove_stop, object_interrupt, 0x4);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk_groove_stop, path_resumption, 0x8);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk_groove_stop, object_resumption, 0xc);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk_groove_stop, matrix, 0x10);
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_chunk_groove_stop, matrix, 0x30);
+
+    gFloat_pipe_union.f = pPath_resumption;
+    ARAddVariedDataToSession(ePipe_chunk_groove_stop, pGroove_index, 5,
+        SIZE_OFFSET_PIPING(tPipe_chunk_groove_stop, path_interrupt), pObject_interrupt,
+        SIZE_OFFSET_PIPING(tPipe_chunk_groove_stop, object_interrupt), pObject_interrupt,
+        SIZE_OFFSET_PIPING(tPipe_chunk_groove_stop, path_resumption), gFloat_pipe_union.u32,
+        SIZE_OFFSET_PIPING(tPipe_chunk_groove_stop, object_resumption), gFloat_pipe_union.u32,
+        SIZE_OFFSET_PIPING(tPipe_chunk_groove_stop, matrix), pMatrix);
+}
+
 // FUNCTION: CARMA2_HW 0x004c6ff0
 // FUNCTION: CARMA2_SW 0x004c3720
 void C2_HOOK_FASTCALL AddNonCarToPipingSession(int pIndex, br_actor* pActor) {
@@ -1044,6 +1077,52 @@ void C2_HOOK_FASTCALL AddExtendedSplashToPipingSession(tPhysics_object* pObject,
         SIZE_OFFSET_PIPING(tPipe_chunk_extended_splash, water_d), gFloat_pipe_union.u32,
         SIZE_OFFSET_PIPING(tPipe_chunk_extended_splash, normal), &pObject->water_normal,
         SIZE_OFFSET_PIPING(tPipe_chunk_extended_splash, bb), &pObject->bb2);
+}
+
+// FUNCTION: CARMA2_HW 0x004c71e0
+// FUNCTION: CARMA2_SW 0x004c3910
+// FUNCTION: CARMA2_CHEAT 0x004ccd00
+void C2_HOOK_FASTCALL AddOilSpillToPipingSession(int pIndex, br_matrix34* pMat, br_scalar pFull_size, br_scalar pGrow_rate, tU32 pSpill_time, tU32 pStop_time, tCar_spec* pCar, br_vector3* pOriginal_pos, br_pixelmap* pPixelmap) {
+
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk_oil_spill, mat, 0x0);
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_chunk_oil_spill, mat, 0x30);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk_oil_spill, size_min, 0x30);
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_chunk_oil_spill, size_min, 0x4);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk_oil_spill, size_max, 0x34);
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_chunk_oil_spill, size_max, 0x4);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk_oil_spill, spill_time, 0x38);
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_chunk_oil_spill, spill_time, 0x4);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk_oil_spill, previous_stop_time, 0x3c);
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_chunk_oil_spill, previous_stop_time, 0x4);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk_oil_spill, car, 0x40);
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_chunk_oil_spill, car, 0x4);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk_oil_spill, original_pos, 0x44);
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_chunk_oil_spill, original_pos, 0xc);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk_oil_spill, pixelmap, 0x50);
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_chunk_oil_spill, pixelmap, 0x4);
+
+    (void)pGrow_rate;
+    gFloat_pipe_union.f = pFull_size;
+    ARAddVariedDataToSession(ePipe_chunk_oil_spill, pIndex, 8,
+        SIZE_OFFSET_PIPING(tPipe_chunk_oil_spill, mat), pMat,
+        SIZE_OFFSET_PIPING(tPipe_chunk_oil_spill, size_min), gFloat_pipe_union.u32,
+        SIZE_OFFSET_PIPING(tPipe_chunk_oil_spill, size_max), gFloat_pipe_union.u32,
+        SIZE_OFFSET_PIPING(tPipe_chunk_oil_spill, spill_time), pSpill_time,
+        SIZE_OFFSET_PIPING(tPipe_chunk_oil_spill, previous_stop_time), pStop_time,
+        SIZE_OFFSET_PIPING(tPipe_chunk_oil_spill, car), pCar,
+        SIZE_OFFSET_PIPING(tPipe_chunk_oil_spill, original_pos), pOriginal_pos,
+        SIZE_OFFSET_PIPING(tPipe_chunk_oil_spill, pixelmap), pPixelmap);
+}
+
+// FUNCTION: CARMA2_HW 0x004c7240
+// FUNCTION: CARMA2_SW 0x004c3970
+// FUNCTION: CARMA2_CHEAT 0x004ccd60
+void C2_HOOK_FASTCALL AddFrameFinishToPipingSession(void) {
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk_frame_boundary, time, 0x0);
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_chunk_frame_boundary, time, 0x4);
+
+    ARAddVariedDataToSession(ePipe_chunk_frame_finish, 0, 1,
+        SIZE_OFFSET_PIPING(tPipe_chunk_frame_boundary, time), GetTotalTime());
 }
 
 // AddCarToPipingSession
