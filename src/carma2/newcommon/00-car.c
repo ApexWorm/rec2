@@ -1590,6 +1590,30 @@ int C2_HOOK_FASTCALL TestForCarInSensiblePlace(tCar_spec* pCar_spec, br_vector3*
     return r;
 }
 
+// FUNCTION: CARMA2_HW 0x0041fe90
+// FUNCTION: CARMA2_SW 0x0041ff10
+// FUNCTION: CARMA2_CHEAT 0x004200f0
+void C2_HOOK_FASTCALL FUN_0041fe90(br_actor* pActor) {
+    tNon_car_spec* non_car;
+    int i;
+
+    non_car = pActor->type_data;
+    for (i = 0; i < gNum_active_non_cars; i++) {
+        if (gActive_non_car_list[i] == non_car) {
+            gNum_active_non_cars--;
+            PHILRemoveObject(non_car->collision_info);
+            for (; i < gNum_active_non_cars; i++) {
+                gActive_non_car_list[i] = gActive_non_car_list[i + 1];
+            }
+            non_car->driver = eDriver_non_car_unused_slot;
+            if ((void*)gCar_to_view == (void*)non_car) {
+                FUN_0040e530(NULL);
+            }
+            return;
+        }
+    }
+}
+
 // FUNCTION: CARMA2_HW 0x0041ff00
 // FUNCTION: CARMA2_SW 0x0041ff80
 tNon_car_spec* C2_HOOK_FASTCALL PullActorFromWorld(br_actor* pActor) {

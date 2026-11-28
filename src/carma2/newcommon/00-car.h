@@ -226,6 +226,8 @@ extern void C2_HOOK_FASTCALL SetCarSuspGiveAndHeight(tCar_spec* pCar, float pFro
 
 extern int C2_HOOK_FASTCALL TestForCarInSensiblePlace(tCar_spec* pCar_spec, br_vector3* pVec3);
 
+extern void C2_HOOK_FASTCALL FUN_0041fe90(br_actor* pActor);
+
 extern tNon_car_spec* C2_HOOK_FASTCALL PullActorFromWorld(br_actor* pActor);
 
 extern tNon_car_spec* C2_HOOK_FASTCALL DoPullActorFromWorld(br_actor* pActor);
