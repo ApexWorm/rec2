@@ -1760,6 +1760,17 @@ void C2_HOOK_FASTCALL PlayExclusiveFFBEffect(const char* pEffect_name, int pArg2
     }
 }
 
+/* FIXME: name is a guess; it stops the effect started by PlayExclusiveFFBEffect */
+// FUNCTION: CARMA2_HW 0x0045c760
+// FUNCTION: CARMA2_SW 0x0045c1a0
+// FUNCTION: CARMA2_CHEAT 0x0045cbe0
+void C2_HOOK_FASTCALL StopExclusiveFFBEffect(void) {
+
+    if (gCurrent_exclusive_ffb_effect != -1) {
+        StopDinputEffect(gCurrent_exclusive_ffb_effect);
+    }
+}
+
 // FUNCTION: CARMA2_HW 0x0045c550
 // FUNCTION: CARMA2_SW 0x0045bf90
 // FUNCTION: CARMA2_CHEAT 0x0045c9d0

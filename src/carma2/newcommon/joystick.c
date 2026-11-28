@@ -493,14 +493,6 @@ void C2_HOOK_FASTCALL SetJoystickDPadEnabled(int pEnabled) {
     }
 }
 
-/* FIXME: name is a guess; it stops the effect started by PlayExclusiveFFBEffect */
-// STUB: CARMA2_HW 0x0045c760
-// STUB: CARMA2_SW 0x0045c1a0
-// STUB: CARMA2_CHEAT 0x0045cbe0
-void C2_HOOK_FASTCALL StopExclusiveFFBEffect(void) {
-    NOT_IMPLEMENTED();
-}
-
 // FUNCTION: CARMA2_HW 0x0045c780
 // FUNCTION: CARMA2_SW 0x0045c1c0
 // FUNCTION: CARMA2_CHEAT 0x0045cc00
