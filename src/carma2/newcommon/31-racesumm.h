@@ -10,6 +10,7 @@
 #define GUARD_31_RACESUMM_H
 
 #include "c2_hooks.h"
+#include "rec2_types.h"
 
 // SortScores
 
@@ -18,6 +19,8 @@
 // DoNetRaceSummary
 
 // DoEndRaceSummary
+
+extern void C2_HOOK_FASTCALL PrepareBoundingRadius_racesumm(br_model* model);
 
 extern int C2_HOOK_FASTCALL AnyBuyableCars(void);
 

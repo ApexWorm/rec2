@@ -12,6 +12,8 @@
 
 #include "globvars.h"
 
+#include <math.h>
+
 // SortScores
 
 // SortGameScores
@@ -19,6 +21,25 @@
 // DoNetRaceSummary
 
 // DoEndRaceSummary
+
+// FUNCTION: CARMA2_HW 0x004e30c0
+// FUNCTION: CARMA2_SW 0x004df440
+// FUNCTION: CARMA2_CHEAT 0x004e8c40
+void C2_HOOK_FASTCALL PrepareBoundingRadius_racesumm(br_model* model) {
+    float d;
+    float max;
+    int v;
+    br_vertex* vp;
+
+    max = 0.0f;
+    for (v = 0, vp = model->vertices; v < model->nvertices; v++, vp++) {
+        d = BrVector3LengthSquared(&vp->p);
+        if (d > max) {
+            max = d;
+        }
+    }
+    model->radius = (br_scalar)sqrt(max);
+}
 
 // FUNCTION: CARMA2_HW 0x004e33d0
 // FUNCTION: CARMA2_SW 0x004df760
