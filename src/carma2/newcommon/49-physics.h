@@ -28,7 +28,7 @@ extern int gPHIL_collision_group;
 extern int gINT_006940a4;
 extern tPhysics_object** gReduced_object_list;
 extern int gINT_006940ac;
-extern int gINT_006940b8;
+extern undefined4 gDAT_006940b8;
 
 extern int gINT_0065d014;
 

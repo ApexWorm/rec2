@@ -104,7 +104,7 @@ int gINT_006940ac;
 // GLOBAL: CARMA2_HW 0x006940b8
 // GLOBAL: CARMA2_SW 0x0068e110
 // GLOBAL: CARMA2_CHEAT 0x0069bc30
-int gINT_006940b8;
+undefined4 gDAT_006940b8;
 
 // GLOBAL: CARMA2_HW 0x006940c0
 // GLOBAL: CARMA2_SW 0x0068e118
@@ -5801,7 +5801,7 @@ inline void C2_HOOK_FASTCALL AddToMatrix(tU8 pIndex, br_scalar* pMatrix, const b
 
     pIndices[*pSize] = pIndex;
     *pSize += 1;
-    if (gINT_006940b8 == 0) {
+    if (gDAT_006940b8 == 0) {
         RQSingleExpand(pMatrix, pOriginal, *pSize - 1, pOrthogonal, pIndices);
     } else {
         RQExpand(pMatrix, pOriginal, *pSize - 1, *pSize, pOrthogonal, pIndices);
