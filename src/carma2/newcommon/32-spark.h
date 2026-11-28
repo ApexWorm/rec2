@@ -24,6 +24,7 @@ extern tSmash_vertex gSmash_glass_fragments[200];
 extern int gNum_dust_tables;
 extern int gSpark_flags;
 extern br_pixelmap* gIt_shade_table;
+extern int gAFE_color_cycle;
 extern int gSmoke_flags;
 extern int gSmoke_num;
 extern tSmoke gSmoke[25];
@@ -140,7 +141,7 @@ extern void C2_HOOK_FASTCALL RestoreCarPixelmaps(tCar_spec* pCar);
 
 // MungeShrapnel
 
-// DrMatrix34Rotate
+extern void C2_HOOK_FASTCALL DrMatrix34Rotate(br_matrix34* mat, br_angle r, const br_vector3* a);
 
 extern int C2_HOOK_CDECL CmpSmokeZ(const void* p1, const void* p2);
 
@@ -196,7 +197,7 @@ extern void C2_HOOK_FASTCALL InitFlame(void);
 
 extern void C2_HOOK_FASTCALL InitSplash(FILE* pF);
 
-// DisposeSplash
+extern void C2_HOOK_FASTCALL DisposeSplash(void);
 
 // DrawTheGlow
 
@@ -236,7 +237,7 @@ extern void C2_HOOK_FASTCALL FreeSmokeShadeTables(void);
 
 extern void C2_HOOK_FASTCALL LoadInKevStuff(FILE* pF);
 
-// DisposeKevStuff
+extern void C2_HOOK_FASTCALL DisposeKevStuff(void);
 
 extern void C2_HOOK_FASTCALL DisposeKevStuffCar(tCar_spec* pCar);
 
