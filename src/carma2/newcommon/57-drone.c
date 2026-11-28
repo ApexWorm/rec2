@@ -465,12 +465,20 @@ int C2_HOOK_FASTCALL DroneTrainWithinRenderingDistance(const br_vector3* pPos) {
 
 // InitDroneSpec
 
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
 // STUB: CARMA2_HW 0x0044e410
 // STUB: CARMA2_SW 0x0044e1b0
 // STUB: CARMA2_CHEAT 0x0044e960
 int C2_HOOK_FASTCALL ChooseNextNode(tDrone_spec* pDrone) {
     NOT_IMPLEMENTED();
 }
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // DroneOrientationChanged
 
