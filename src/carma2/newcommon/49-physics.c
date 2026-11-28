@@ -351,7 +351,10 @@ tFace_ref* C2_HOOK_FASTCALL RayCastThruFaceList2(br_vector3* pPosition, br_vecto
     }
 }
 
-// RayCastInBox
+inline tFace_ref* C2_HOOK_FASTCALL RayCastInBox(br_vector3* pPosition, br_vector3* pDirection, br_vector3* pNormal, br_scalar* pT, br_vector3* pCollision_position, tPhysics_object* pObject) {
+
+    return RayCastThruFaceList(pPosition, pDirection, pNormal, pT, pCollision_position, &gFace_list__car[pObject->box_face_start], pObject->box_face_end - pObject->box_face_start);
+}
 
 // FaceOffCount2
 
@@ -365,7 +368,96 @@ tFace_ref* C2_HOOK_FASTCALL RayCastThruFaceList2(br_vector3* pPosition, br_vecto
 
 // GetObjectObjectEdgeIntersections
 
-// GetFaceEdgeIntersection
+// FUNCTION: CARMA2_HW 0x004236a0
+// FUNCTION: CARMA2_SW 0x00423720
+// FUNCTION: CARMA2_CHEAT 0x00423820
+int C2_HOOK_FASTCALL GetFaceEdgeIntersection(tPhysics_object* pObject, tPhysics_shape* pShape, tPhysics_joint_force* pForces, int pCount, int pMax_count, tPhysics_wall_workspace* pWorkspace, void* pUnused, int* pTouched) {
+    br_vector3 centre;
+    br_vector3 direction;
+    br_vector3 reverse;
+    br_vector3 normal;
+    br_vector3 other_normal;
+    br_vector3 intersection;
+    br_vector3 other_intersection;
+    br_vector3 tv;
+    br_vector3 local_position;
+    br_vector3 old_position;
+    br_vector3* start;
+    br_vector3* end;
+    tFace_ref* face;
+    tFace_ref* other_face;
+    br_scalar t;
+    br_scalar other_t;
+    br_scalar dot;
+    br_scalar other_dot;
+    br_scalar depth;
+    int start_index;
+    int end_index;
+    int found;
+    int i;
+
+    if (pShape->common.type != kCollisionShapeType_Sphere) {
+        BrMatrix34ApplyP(&centre, &pObject->cmpos, &pObject->transform_matrix);
+        for (i = 0; i < pWorkspace->count_edges; i++) {
+            start_index = pWorkspace->edges[i].index1;
+            end_index = pWorkspace->edges[i].index2;
+            start = &pWorkspace->old_points[start_index];
+            end = &pWorkspace->old_points[end_index];
+            BrVector3Sub(&direction, end, start);
+            face = RayCastInBox(start, &direction, &normal, &t, &intersection, pObject);
+            BrVector3Sub(&reverse, start, end);
+            found = 0;
+            if (face == NULL) {
+                face = RayCastInBox(end, &reverse, &normal, &t, &intersection, pObject);
+                if (face != NULL) {
+                    BrVector3Sub(&tv, &centre, &intersection);
+                    BrVector3Normalise(&tv, &tv);
+                    if (BrVector3Dot(&tv, &normal) >= 0.01f) {
+                        pWorkspace->point_flags[start_index] = 1;
+                        found = 1;
+                    }
+                }
+            } else {
+                BrVector3Sub(&tv, &centre, &intersection);
+                BrVector3Normalise(&tv, &tv);
+                dot = BrVector3Dot(&tv, &normal);
+                other_face = RayCastInBox(end, &reverse, &other_normal, &other_t, &other_intersection, pObject);
+                if (other_face == NULL) {
+                    if (dot > 0.01f) {
+                        pWorkspace->point_flags[end_index] = 1;
+                        found = 1;
+                    }
+                } else {
+                    BrVector3Sub(&tv, &centre, &other_intersection);
+                    BrVector3Normalise(&tv, &tv);
+                    other_dot = BrVector3Dot(&tv, &other_normal);
+                    if (dot >= 0.05f || other_dot >= 0.05f) {
+                        if (other_dot <= dot) {
+                            pWorkspace->point_flags[end_index] = 1;
+                        } else {
+                            BrVector3Copy(&intersection, &other_intersection);
+                            BrVector3Copy(&normal, &other_normal);
+                            pWorkspace->point_flags[start_index] = 1;
+                        }
+                        found = 1;
+                    }
+                }
+            }
+            if (found && face != NULL) {
+                DrMatrix34ApplyLPInverse(&local_position, &intersection, &pObject->transform_matrix);
+                BrMatrix34ApplyP(&old_position, &local_position, &pObject->actor->t.t.mat);
+                BrVector3Sub(&tv, &intersection, &old_position);
+                depth = BrVector3Dot(&tv, &normal);
+                if (depth > 0.0f) {
+                    BrMatrix34TApplyV(&other_normal, &normal, &pObject->transform_matrix);
+                    pCount = AddObjectWallForce(pForces, &local_position, 0.0f, &other_normal, depth, pCount, pObject, 1, face, NULL);
+                }
+                *pTouched = 1;
+            }
+        }
+    }
+    return pCount;
+}
 
 // GetSphereToFacePoints
 
