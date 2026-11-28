@@ -63,6 +63,8 @@ extern int C2_HOOK_FASTCALL PHILInit(void);
 
 extern void C2_HOOK_FASTCALL PHILDisable(void);
 
+extern int C2_HOOK_FASTCALL FUN_004b5d30(void);
+
 extern int C2_HOOK_FASTCALL PHILAddObject(tPhysics_object* pObject);
 
 #ifdef REC2_CHEAT
@@ -120,5 +122,11 @@ extern void C2_HOOK_FASTCALL MarkObjectAndChildrenAsPassive(tPhysics_object* pOb
 // PHILDoPhysics
 
 extern void C2_HOOK_FASTCALL PHILApplyPHILObject(tPhysics_object* pObject, const br_matrix34* pMatrix);
+
+extern float C2_HOOK_FASTCALL FUN_004b7250(tPhysics_object* pObject);
+
+extern void C2_HOOK_FASTCALL FUN_004b7310(tPhysics_object* pObject);
+
+extern void C2_HOOK_FASTCALL FUN_004b73a0(tPhysics_object* pObject, const br_matrix34* pOld, const br_matrix34* pNew);
 
 #endif // GUARD_60_PHIL_H

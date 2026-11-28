@@ -329,6 +329,14 @@ void C2_HOOK_FASTCALL PHILDisable(void) {
     gPHIL_disabled = 1;
 }
 
+// FUNCTION: CARMA2_HW 0x004b5d30
+// FUNCTION: CARMA2_SW 0x004b2450
+// FUNCTION: CARMA2_CHEAT 0x004bb600
+int C2_HOOK_FASTCALL FUN_004b5d30(void) {
+
+    return 100 - gPHIL_count_list_collision_infos;
+}
+
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
 #endif
@@ -799,5 +807,77 @@ void C2_HOOK_FASTCALL PHILApplyPHILObject(tPhysics_object* pObject, const br_mat
 
     BrMatrix34Copy(&pObject->transform_matrix, pMatrix);
     BrMatrix34Copy(&pObject->actor->t.t.mat, pMatrix);
+}
+
+// FUNCTION: CARMA2_HW 0x004b7250
+// FUNCTION: CARMA2_SW 0x004b3970
+// FUNCTION: CARMA2_CHEAT 0x004bcd80
+float C2_HOOK_FASTCALL FUN_004b7250(tPhysics_object* pObject) {
+    float energy;
+    float v;
+    float w;
+    int i;
+
+    energy = 0.0f;
+    for (i = 0; i < 3; i++) {
+        v = pObject->v.v[i];
+        w = pObject->omega.v[i];
+        energy += pObject->M * (v * v) + pObject->I.v[i] * (w * w);
+    }
+    return energy;
+}
+
+// FUNCTION: CARMA2_HW 0x004b7310
+// FUNCTION: CARMA2_SW 0x004b3a30
+// FUNCTION: CARMA2_CHEAT 0x004bce40
+void C2_HOOK_FASTCALL FUN_004b7310(tPhysics_object* pObject) {
+    tPhysics_object* root;
+    br_matrix34 inverse;
+    br_matrix34 normalised;
+
+    pObject->flags |= 0x400;
+    for (root = pObject->parent; root != NULL && (root->flags & 0x400); root = root->parent) {
+    }
+    BrMatrix34LPInverse(&inverse, &root->transform_matrix);
+    BrMatrix34LPNormalise(&normalised, &inverse);
+    BrMatrix34Mul(&pObject->field_0x1e8, &pObject->transform_matrix, &normalised);
+    FUN_004b73a0(pObject->child, &pObject->transform_matrix, &root->transform_matrix);
+}
+
+// FUNCTION: CARMA2_HW 0x004b73a0
+// FUNCTION: CARMA2_SW 0x004b3ac0
+// FUNCTION: CARMA2_CHEAT 0x004bced0
+void C2_HOOK_FASTCALL FUN_004b73a0(tPhysics_object* pObject, const br_matrix34* pOld, const br_matrix34* pNew) {
+    br_matrix34 m1;
+    br_matrix34 m2;
+    br_vector3 tv;
+    tPhysics_joint* joint;
+    int i;
+
+    for (; pObject != NULL; pObject = pObject->next) {
+        if (pObject->flags & 0x400) {
+            BrMatrix34LPInverse(&m1, &pObject->parent->transform_matrix);
+            BrMatrix34LPNormalise(&m2, &m1);
+            BrMatrix34Mul(&m1, &pObject->transform_matrix, &m2);
+            BrMatrix34Mul(&pObject->field_0x1e8, &m1, &pObject->parent->field_0x1e8);
+        }
+        joint = pObject->physics_joint1;
+        if (joint != NULL) {
+            if (pObject->flags & 0x400) {
+                FUN_004b73a0(pObject->child, pOld, pNew);
+            } else {
+                BrMatrix34ApplyP(&tv, &joint->field_0x14, pOld);
+                DrMatrix34ApplyLPInverse(&joint->field_0x14, &tv, pNew);
+                if (joint->type == eJoint_hinge || joint->type == eJoint_quick_hinge) {
+                    BrMatrix34ApplyV(&tv, &joint->parent_bone_axis, pOld);
+                    BrMatrix34TApplyV(&joint->parent_bone_axis, &tv, pNew);
+                }
+            }
+            for (i = 0; i < joint->count_limits; i++) {
+                BrMatrix34ApplyV(&tv, &joint->limits[i].parent, pOld);
+                BrMatrix34TApplyV(&joint->limits[i].parent, &tv, pNew);
+            }
+        }
+    }
 }
 
