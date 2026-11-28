@@ -1241,14 +1241,14 @@ tU8* C2_HOOK_FASTCALL RunLengthEncode8bitPixelmap(br_pixelmap* pMap) {
             } else {
                 line[line_size - count - 1] = -count;
             }
+            black = pixel == 0;
+            count = 0;
             count_chunks++;
             if (x == width) {
                 break;
             }
             line_size++;
             line_ptr++;
-            black = pixel == 0;
-            count = 0;
         }
         line[0] = count_chunks;
         memcpy(buffer + total_size, line, line_size);
