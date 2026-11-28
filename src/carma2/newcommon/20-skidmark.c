@@ -26,6 +26,21 @@ const char* gBoring_material_names[2] = { "OILSMEAR.MAT", "ROBSMEAR.MAT" };
 // GLOBAL: CARMA2_CHEAT 0x00667658
 const char* gMaterial_names[2] = { "OILSMEAR.MAT", "GIBSMEAR.MAT" };
 
+// GLOBAL: CARMA2_HW 0x0065fe88
+// GLOBAL: CARMA2_SW 0x0065a7c8
+// GLOBAL: CARMA2_CHEAT 0x006676d0
+const char* gSmashable_item_mode_names[6] = { "nochange", "decal", "texturechange", "remove", "replacemodel", "crush" };
+
+// GLOBAL: CARMA2_HW 0x0065fea0
+// GLOBAL: CARMA2_SW 0x0065a7e0
+// GLOBAL: CARMA2_CHEAT 0x006676e8
+const char* gSmashable_collision_type_names[3] = { "solid", "passthrough", "edges" };
+
+// GLOBAL: CARMA2_HW 0x0065feb0
+// GLOBAL: CARMA2_SW 0x0065a7f0
+// GLOBAL: CARMA2_CHEAT 0x006676f8
+const char* gRepeatability_names[4] = { "none", "singleshot", "repeated", "doitregardless" };
+
 // GLOBAL: CARMA2_HW 0x0065fec0
 // GLOBAL: CARMA2_SW 0x0065a800
 // GLOBAL: CARMA2_CHEAT 0x00667708
@@ -47,6 +62,16 @@ const char* gExplosion_rotate_names[2] = {
     "norotate",
     "randomrotate",
 };
+
+// GLOBAL: CARMA2_HW 0x0065fef0
+// GLOBAL: CARMA2_SW 0x0065a830
+// GLOBAL: CARMA2_CHEAT 0x00667738
+const char* gSmash_side_effect_direction_names[3] = { "parallel", "toward", "away" };
+
+// GLOBAL: CARMA2_HW 0x0065ff00
+// GLOBAL: CARMA2_SW 0x0065a840
+// GLOBAL: CARMA2_CHEAT 0x00667748
+const char* gPosition_type_names[2] = { "relative", "absolute" };
 
 // GLOBAL: CARMA2_HW 0x006a27f0
 // GLOBAL: CARMA2_SW 0x0069c848

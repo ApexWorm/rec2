@@ -1371,6 +1371,7 @@ void C2_HOOK_FASTCALL DRModelUpdateAndKevificateMaterials(br_model* pModel, br_u
 }
 
 // FUNCTION: CARMA2_HW 0x00516010
+// FUNCTION: CARMA2_SW 0x00511480
 // FUNCTION: CARMA2_CHEAT 0x0051ba30
 int C2_HOOK_FASTCALL DRModelUpdateDeluxTurbo(br_actor* pActor, br_model* pModel, br_uint_16 pFlags) {
 

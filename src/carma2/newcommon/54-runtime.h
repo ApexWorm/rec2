@@ -18,7 +18,7 @@ extern int C2_HOOK_FASTCALL GetRuntimeVariable(int pAddress);
 
 extern int C2_HOOK_FASTCALL AccumulateRuntimeVariable(int pAddress, int pDelta);
 
-// ToggleRuntimeVariable
+extern int C2_HOOK_FASTCALL ToggleRuntimeVariable(int pAddress);
 
 extern void C2_HOOK_FASTCALL ClearAllRuntimeVariables(void);
 

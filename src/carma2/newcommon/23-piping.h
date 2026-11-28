@@ -34,7 +34,7 @@ extern tU32 gPipe_sound_start_time;
 extern tU32 gPipe_sound_time_window;
 extern int gDisable_advance;
 extern int gPipe_count_callbacks;
-extern tPipe_smudge_data* gCrush_space;
+extern void* gCrush_space;
 extern tU8* gEnd_of_session;
 
 extern int C2_HOOK_FASTCALL ARReplayForwards(void);
@@ -243,7 +243,7 @@ extern void C2_HOOK_FASTCALL PipeSingleIdentity(br_actor* pActor);
 
 extern void C2_HOOK_FASTCALL PipeSingleSplitWeld(uintptr_t pId, const br_vector4* pPlane, int pSplit);
 
-// PipeSingleShrapnelShower
+extern void C2_HOOK_FASTCALL PipeSingleShrapnelShower(uintptr_t pId, tU32 pArg2, int pArg3, tCar_crush_smashable_part* pArg4, const br_vector3* pArg5, const br_vector3* pArg6, float pArg7, const br_vector3* pArg8, const br_vector3* pArg9, tShrapnel_spec* pArg10, const br_bounds3* pArg11, br_actor* pArg12, const br_matrix34* pArg13, const br_vector3* pArg14, const br_vector3* pArg15);
 
 extern void C2_HOOK_FASTCALL PipeSingleExplosion(int pIndex, const tExplosion* pExplosion);
 
@@ -251,7 +251,7 @@ extern void C2_HOOK_FASTCALL PipeSingleNonCarCreation(int pIndex);
 
 extern void C2_HOOK_FASTCALL PipeSingleSmashModelChange(br_actor* pActor, br_model* pOld_model, br_model* pNew_model);
 
-// PipeSingleSmashRemoveFaces
+extern void C2_HOOK_FASTCALL PipeSingleSmashRemoveFaces(br_model* pModel, int pCount, const tPipe_remove_face* pFaces, br_material* pMaterial);
 
 extern void C2_HOOK_FASTCALL PipeSingleSmashDecal(int pIndex);
 

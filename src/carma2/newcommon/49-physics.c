@@ -1817,10 +1817,10 @@ void C2_HOOK_FASTCALL InitPhysics(void) {
 
 // PointOutOfSightNotAR (moved to 51-smash for inlining purposes)
 
-// CalcCollObjIDFromCarSpec
+// CalcCollObjIDFromCarSpec (moved to 51-smash for inlining purposes)
 
-// CalcCollObjID
+// CalcCollObjID (moved to 51-smash for inlining purposes)
 
-// GetCarSpecFromCollObjID
+// GetCarSpecFromCollObjID (moved to 51-smash for inlining purposes)
 
-// GetCollObjFromID
+// GetCollObjFromID (moved to 51-smash for inlining purposes)
