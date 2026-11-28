@@ -238,7 +238,19 @@ void C2_HOOK_FASTCALL FrozenCamera(tCar_spec* pCar, tU32 pTime) {
     } else {
         yaw_speed = 0.0f;
     }
-    if (gCamera_key_flags.field_0x0_bit0) {
+    if (!gCamera_key_flags.field_0x0_bit0) {
+        height_speed = 0.0f;
+        if (!gCamera_key_flags.field_0x0_bit1 && !gCamera_key_flags.field_0x0_bit2) {
+            zoom_speed = 0.0f;
+        } else {
+            if (gCamera_key_flags.field_0x0_bit1) {
+                zoom_speed += 0.00025f;
+            }
+            if (gCamera_key_flags.field_0x0_bit2) {
+                zoom_speed -= 0.00025f;
+            }
+        }
+    } else {
         zoom_speed = 0.0f;
         if (!gCamera_key_flags.field_0x0_bit1 && !gCamera_key_flags.field_0x0_bit2) {
             height_speed = 0.0f;
@@ -251,18 +263,6 @@ void C2_HOOK_FASTCALL FrozenCamera(tCar_spec* pCar, tU32 pTime) {
             }
             if (gCamera_key_flags.field_0x0_bit2) {
                 height_speed -= 0.00025f;
-            }
-        }
-    } else {
-        height_speed = 0.0f;
-        if (!gCamera_key_flags.field_0x0_bit1 && !gCamera_key_flags.field_0x0_bit2) {
-            zoom_speed = 0.0f;
-        } else {
-            if (gCamera_key_flags.field_0x0_bit1) {
-                zoom_speed += 0.00025f;
-            }
-            if (gCamera_key_flags.field_0x0_bit2) {
-                zoom_speed -= 0.00025f;
             }
         }
     }
