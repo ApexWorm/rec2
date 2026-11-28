@@ -226,7 +226,7 @@ int gCount_environmental_sound_sources;
 // GLOBAL: CARMA2_HW 0x0079e140
 // GLOBAL: CARMA2_SW 0x007946a0
 // GLOBAL: CARMA2_CHEAT 0x007a57e0
-int gINT_0079e140;
+undefined4 gDAT_0079e140;
 
 extern int gFaded_palette;
 
@@ -1057,8 +1057,6 @@ void C2_HOOK_FASTCALL ReadSoundSpec(FILE* pF, tSpecial_volume_soundfx_data* pSpe
     }
 }
 
-extern tEnvironment_sound_source* C2_HOOK_FASTCALL TryToSetEnvironmentalSound(void* pSrc_object);
-
 inline tEnvironment_sound_source* C2_HOOK_FASTCALL TryToSetEnvironmentalSound(void* pSrc_object) {
     int i;
     int free_index;
@@ -1121,10 +1119,10 @@ void C2_HOOK_FASTCALL DoAnEnvironmentalSound(void* pSrc_object, tEnvironment_sou
             source->field_0x18 = 1;
             S3UpdateSoundSource(gXXX_outlet,
                 (tU16)pEnv_info->soundfx.sound_alternatives[IRandomBetween(0, pEnv_info->soundfx.count_sound_alternatives - 1)],
-                source->source, -1.f, -1, -1, pVolume,
+                source->source, -1.0f, -1, -1, pVolume,
                 IRandomPosNeg(pEnv_info->soundfx.max_deviation) + 0x10000, -1);
         }
-        gINT_0079e140 = 1;
+        gDAT_0079e140 = 1;
         break;
     default:
         break;
@@ -1184,10 +1182,10 @@ void C2_HOOK_FASTCALL MungeSoundGenerators(void) {
             gNext_sound_generator_munging += 200;
             found_sources.count = 0;
             found_sources.sources = gEnvironmental_sound_sources_buffer[gEnvironmental_sound_sources_buffer_index ^ 1];
-            ProcessNearbyActors(&gProgram_state.track_spec, (br_vector3*)gCamera_to_world.m[3], 10.f, 1, ')', 0, 0x1003, FoundSoundSource, &found_sources);
+            ProcessNearbyActors(&gProgram_state.track_spec, (br_vector3*)gCamera_to_world.m[3], 10.0f, 1, ')', 0, 0x1003, FoundSoundSource, &found_sources);
             generator = gProgram_state.track_sound_generators;
             for (i = 0; i < gProgram_state.count_track_sound_generators; i++, generator++) {
-                if (generator->type == kSoundGeneratorType_point && (float)sqrt(Vector3DistanceSquared(&generator->point, (br_vector3*)gCamera_to_world.m[3])) < 100.f) {
+                if (generator->type == kSoundGeneratorType_point && (float)sqrt(Vector3DistanceSquared(&generator->point, (br_vector3*)gCamera_to_world.m[3])) < 100.0f) {
                     src = &found_sources.sources[found_sources.count];
                     found_sources.count++;
                     src->generator = generator;
@@ -1201,7 +1199,7 @@ void C2_HOOK_FASTCALL MungeSoundGenerators(void) {
                 actor = non_car->collision_info->actor;
                 if (actor != NULL && actor->model != NULL
                         && actor->model->identifier != NULL && actor->model->identifier[0] == ')'
-                        && Vector3DistanceSquared(&actor->t.t.translate.t, (br_vector3*)gCamera_to_world.m[3]) < 100.f) {
+                        && Vector3DistanceSquared(&actor->t.t.translate.t, (br_vector3*)gCamera_to_world.m[3]) < 100.0f) {
                     src_count = found_sources.count;
                     FoundSoundSource(actor, &found_sources);
                     if (found_sources.count > src_count && !Vector3IsZero(&non_car->collision_info->v)) {
@@ -1230,7 +1228,7 @@ void C2_HOOK_FASTCALL MungeSoundGenerators(void) {
             } else {
                 src_obj = src->generator;
             }
-            DoAnEnvironmentalSound(src_obj, src, (int)(((10.f - distance) * 255.f) / 10.f), &src->pos);
+            DoAnEnvironmentalSound(src_obj, src, (int)(((10.0f - distance) * 255.0f) / 10.0f), &src->pos);
         }
     }
 }
@@ -1251,7 +1249,7 @@ void C2_HOOK_FASTCALL MungeEnvironmentalSound(void) {
         }
         for (i = 0; i < (int)REC2_ASIZE(gEnvironment_sound_sources); i++) {
             if (gEnvironment_sound_sources[i].field_0x18 == 0 && gEnvironment_sound_sources[i].field_0x10 != 0) {
-                S3UpdateSoundSource(gXXX_outlet, -1, gEnvironment_sound_sources[i].source, -1.f, -1, -1, 0, -1, -1);
+                S3UpdateSoundSource(gXXX_outlet, -1, gEnvironment_sound_sources[i].source, -1.0f, -1, -1, 0, -1, -1);
                 gEnvironment_sound_sources[i].field_0x10 = 0;
             }
         }

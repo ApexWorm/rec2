@@ -101,7 +101,7 @@ extern int C2_HOOK_FASTCALL GetSoundDetailLevel(void);
 
 extern void C2_HOOK_FASTCALL ReadSoundSpec(FILE* pF, tSpecial_volume_soundfx_data* pSpec);
 
-// TryToSetEnvironmentalSound
+extern tEnvironment_sound_source* C2_HOOK_FASTCALL TryToSetEnvironmentalSound(void* pSrc_object);
 
 // DoAnEnvironmentalSound
 
