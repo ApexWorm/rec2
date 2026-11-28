@@ -1182,7 +1182,26 @@ void C2_HOOK_FASTCALL StopCharacterMorphing(tPed_character_instance* pCharacter)
 
 // MorphCharacterBonePositions
 
-// StopCharacterMove
+// FUNCTION: CARMA2_HW 0x00409c20
+// FUNCTION: CARMA2_SW 0x00409c20
+// FUNCTION: CARMA2_CHEAT 0x00409c90
+int C2_HOOK_FASTCALL StopCharacterMove(tPed_character_instance* pCharacter, tU32 pTime) {
+    int result;
+
+    result = 0;
+    pCharacter->field_0x1c = pCharacter->personality->form->moves[pCharacter->field_0x7].move->count_frames - 1;
+    if (pCharacter->field_0x9 & 0x2) {
+        pCharacter->field_0x9 &= ~0x2;
+        result = gPed_vtable->move_completed((undefined4*)pCharacter);
+    }
+    if (pCharacter->field_0x8 >= 0) {
+        SetCharacterMove(pCharacter, pCharacter->field_0x8, (float)pCharacter->field_0x20, 0, (pCharacter->field_0x9 & 0x4) >> 2, pTime);
+        return 1;
+    } else {
+        pCharacter->field_0x1c = 0;
+        return result;
+    }
+}
 
 // MungeCharacterAnimation
 

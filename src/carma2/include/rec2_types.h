@@ -324,7 +324,7 @@ typedef struct tPed_character_instance {
     undefined4 field_0x18;
     tS16 field_0x1c;
     undefined2 field_0x1e;
-    undefined2 field_0x20;
+    tS16 field_0x20;
     undefined field_0x22[0x2];
     undefined4 field_0x24;
     br_matrix34* field_0x28;

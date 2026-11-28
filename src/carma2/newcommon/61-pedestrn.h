@@ -198,7 +198,7 @@ extern void C2_HOOK_FASTCALL StopCharacterMorphing(tPed_character_instance* pCha
 
 // MorphCharacterBonePositions
 
-// StopCharacterMove
+extern int C2_HOOK_FASTCALL StopCharacterMove(tPed_character_instance* pCharacter, tU32 pTime);
 
 // MungeCharacterAnimation
 
