@@ -518,6 +518,33 @@ void C2_HOOK_FASTCALL MoveMyDroneBaby(tPhysics_object* pObject, undefined4 pArg2
     DoNotDprintf_drone("MoveMyDroneBaby(): Drone %d, State %d", drone->id, drone->current_state);
 }
 
+// FUNCTION: CARMA2_HW 0x00452430
+// FUNCTION: CARMA2_SW 0x004521c0
+// FUNCTION: CARMA2_CHEAT 0x00452980
+void C2_HOOK_FASTCALL FUN_00452430(tPhysics_object* pObject) {
+    tDrone_spec* drone;
+    br_vector3 v;
+    br_vector3 current_v;
+    br_vector3* actor_pos;
+
+    drone = pObject->owner;
+    BrVector3Sub(&v, &pObject->actor->t.t.translate.t, (br_vector3*)pObject->transform_matrix.m[3]);
+    DoNotDprintf_drone("************");
+    DoNotDprintf_drone("%d: DRONE PHYSICS WARNING - Drone index %d", gFrame, drone->id);
+    DoNotDprintf_drone("guilty length %f", BrVector3Length(&v));
+    DoNotDprintf_drone("State %d, last state %d, last last state %d", drone->current_state, drone->prev_states[0], drone->prev_states[1]);
+    if (pObject->actor == drone->actor) {
+        DoNotDprintf_drone("Object and drone actors are the same thing. OK.");
+    } else {
+        DoNotDprintf_drone("FUCKING HELL! Object and drone actors differ!");
+    }
+    actor_pos = &pObject->actor->t.t.translate.t;
+    BrVector3Sub(&current_v, actor_pos, &drone->pos);
+    DoNotDprintf_drone("%d: %s: %3.3f, %3.3f, %3.3f", gFrame, "Object matrix-to-actor v", v.v[0], v.v[1], v.v[2]);
+    DoNotDprintf_drone("%d: %s: %3.3f, %3.3f, %3.3f", gFrame, "Alleged current_v", current_v.v[0], current_v.v[1], current_v.v[2]);
+    DoNotDprintf_drone("%d: %s: %3.3f, %3.3f, %3.3f", gFrame, "Drone spec current_v", drone->field_0x18.v[0], drone->field_0x18.v[1], drone->field_0x18.v[2]);
+}
+
 // FUNCTION: CARMA2_HW 0x004525c0
 // FUNCTION: CARMA2_SW 0x00452350
 void C2_HOOK_FASTCALL DroneLookWhereYoureGoingYouBlindCunt(void) {
