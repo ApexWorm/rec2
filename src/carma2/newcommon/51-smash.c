@@ -204,7 +204,7 @@ int gCount_queued_smashes = 0;
 // GLOBAL: CARMA2_HW 0x006a8290
 // GLOBAL: CARMA2_SW 0x006a22f0
 // GLOBAL: CARMA2_CHEAT 0x006afe08
-int gINT_006a8290 = 0;
+int gSmash_environment_count = 0;
 
 // GLOBAL: CARMA2_HW 0x006a8294
 // GLOBAL: CARMA2_SW 0x006a22f4
@@ -3384,7 +3384,7 @@ float C2_HOOK_FASTCALL SmashEnvironment(tPhysics_object* pObject, tFace_ref* pFa
         && pFace->material->identifier != NULL
         && strlen(pFace->material->identifier) == 11
         && pFace->material->identifier[5] == '|') {
-        gINT_006a8290 = 0;
+        gSmash_environment_count = 0;
         material = pFace->material;
         spec = &gTrack_smashable_environment_specs[(tU8)material->identifier[6] - 1];
         if ((pSnap && (spec->flags & 0x2)) || (!pSnap && (spec->flags & 0x1))) {
