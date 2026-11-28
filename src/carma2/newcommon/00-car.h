@@ -11,6 +11,8 @@
 
 #include "rec2_types.h"
 
+extern int gStop_opponents_moving;
+
 extern int gTesting_car_for_sensible_place;
 extern int gCunning_stunt_bonus[3];
 extern float gArmour_starting_value[100];
@@ -81,13 +83,13 @@ extern int C2_HOOK_FASTCALL IsCarInTheSea(void);
 
 // CalcEngineForce
 
-// PrepareCars
+extern void C2_HOOK_FASTCALL PrepareCars(tU32 pFrame_start_time);
 
 extern void C2_HOOK_FASTCALL CalcGraphicalWheelStuff(tCar_spec* pCar);
 
 // FinishCars
 
-// GetNonCars
+extern void C2_HOOK_FASTCALL GetNonCars(void);
 
 extern void C2_HOOK_FASTCALL GetNetPos(tCar_spec* pCar);
 
@@ -111,15 +113,15 @@ extern void C2_HOOK_FASTCALL APTCPreCollision(void);
 
 extern void C2_HOOK_FASTCALL SetCollisionFlagsAndStuff(tPhysics_object* pObject);
 
-// APTCPostCollision
+extern void C2_HOOK_FASTCALL APTCPostCollision(void);
 
-// APTCActiveHalted
+extern int C2_HOOK_FASTCALL APTCActiveHalted(tPhysics_object* pObject);
 
-// APTCPassiveActivated
+extern int C2_HOOK_FASTCALL APTCPassiveActivated(tPhysics_object* pObject, tPhysics_object* pOther);
 
-// APTCChangedObjects
+extern void C2_HOOK_FASTCALL APTCChangedObjects(tPhysics_object* pObject, undefined4 pArg2);
 
-// ApplyPhysicsToCars
+extern void C2_HOOK_FASTCALL ApplyPhysicsToCars(tU32 pLast_tick_time, tU32 pFrame_period);
 
 extern void C2_HOOK_FASTCALL MoveAndCollideCar(tCar_spec* pCar, br_scalar pDt);
 
@@ -165,7 +167,7 @@ extern void C2_HOOK_FASTCALL NonCarCalcForce(tNon_car_spec* pNon_car, br_scalar 
 
 // SkidNoise
 
-// StopSkid
+extern void C2_HOOK_FASTCALL StopSkid(tCar_spec* pC);
 
 // CrashNoise
 
@@ -231,9 +233,9 @@ extern tNon_car_spec* C2_HOOK_FASTCALL DoPullActorFromWorld(br_actor* pActor);
 
 // PipeNonCarObject
 
-// PipeNonCars
+extern void C2_HOOK_FASTCALL PipeNonCars(void);
 
-// CheckForDeAttachmentOfNonCars
+extern void C2_HOOK_FASTCALL CheckForDeAttachmentOfNonCars(tU32 pTime);
 
 extern void C2_HOOK_FASTCALL AdjustNonCar(br_actor* pActor, const br_matrix34* pMatrix);
 

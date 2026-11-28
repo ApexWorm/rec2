@@ -987,7 +987,12 @@ void C2_HOOK_FASTCALL PHILActivatePassive(tPhysics_object* pObject, void* pConte
 
 // PHILInterpolateObjects
 
-// PHILDoPhysics
+// STUB: CARMA2_HW 0x004b6630
+// STUB: CARMA2_SW 0x004b2d50
+// STUB: CARMA2_CHEAT 0x004bc110
+void C2_HOOK_FASTCALL PHILDoPhysics(tPhysics_callbacks* pCallbacks, tU32 pLast_tick_time, tU32 pFrame_period) {
+    NOT_IMPLEMENTED();
+}
 
 // FUNCTION: CARMA2_HW 0x004b7220
 // FUNCTION: CARMA2_SW 0x004b3940

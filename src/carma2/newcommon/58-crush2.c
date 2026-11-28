@@ -196,25 +196,10 @@ void C2_HOOK_FASTCALL DamageUnit2(tCar_spec *pCar, tDamage_type pDamage_type, in
     }
 }
 
-// RecordLastDamage
-
-inline void C2_HOOK_FASTCALL DoDamage(tCar_spec* pCar, tDamage_type pDamage_type, float pMagnitude, float pNastiness) {
-
-    if (pCar != NULL && pCar->driver >= eDriver_net_human) {
-        if (gNet_mode != eNet_mode_none) {
-            DamageUnit2(pCar, pDamage_type, (int)(pNastiness * pMagnitude * 15.0f));
-        } else if (PercentageChance((int)(pNastiness * pMagnitude * 1500.0f))) {
-            DamageUnit2(pCar, pDamage_type, (int)(pNastiness * pMagnitude * 30.0f));
-        }
-    } else {
-        DamageUnit2(pCar, pDamage_type, (int)(pNastiness * pMagnitude * 10.0f * (((1.0 - (double)gCurrent_race.index / (double)gNumber_of_races) * 99.0) / 20.0 + 1.0)));
-    }
-}
-
 // FUNCTION: CARMA2_HW 0x0043f9f0
 // FUNCTION: CARMA2_SW 0x0043fad0
 // FUNCTION: CARMA2_CHEAT 0x0043fca0
-void C2_HOOK_FASTCALL CalcModifiedLocation(tCar_spec* pCar) {
+void C2_HOOK_FASTCALL RecordLastDamage(tCar_spec* pCar) {
     int i;
 
     C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tCar_spec, last_impact_location, 0x6f4);
@@ -231,6 +216,21 @@ void C2_HOOK_FASTCALL CalcModifiedLocation(tCar_spec* pCar) {
     pCar->pre_car_col_velocity = pCar->collision_info->v;
     pCar->pre_car_col_velocity_car_space = pCar->collision_info->velocity_car_space;
 }
+
+inline void C2_HOOK_FASTCALL DoDamage(tCar_spec* pCar, tDamage_type pDamage_type, float pMagnitude, float pNastiness) {
+
+    if (pCar != NULL && pCar->driver >= eDriver_net_human) {
+        if (gNet_mode != eNet_mode_none) {
+            DamageUnit2(pCar, pDamage_type, (int)(pNastiness * pMagnitude * 15.0f));
+        } else if (PercentageChance((int)(pNastiness * pMagnitude * 1500.0f))) {
+            DamageUnit2(pCar, pDamage_type, (int)(pNastiness * pMagnitude * 30.0f));
+        }
+    } else {
+        DamageUnit2(pCar, pDamage_type, (int)(pNastiness * pMagnitude * 10.0f * (((1.0 - (double)gCurrent_race.index / (double)gNumber_of_races) * 99.0) / 20.0 + 1.0)));
+    }
+}
+
+// CalcModifiedLocation
 
 // FUNCTION: CARMA2_HW 0x0043faa0
 // FUNCTION: CARMA2_SW 0x0043fb80
@@ -433,6 +433,7 @@ void C2_HOOK_FASTCALL DamageSystems(tCar_spec* pCar, br_vector3* pImpact_point, 
 // GetDirection
 
 // FUNCTION: CARMA2_HW 0x00440210
+// FUNCTION: CARMA2_SW 0x004402f0
 // FUNCTION: CARMA2_CHEAT 0x004404c0
 void C2_HOOK_FASTCALL SetSmokeLastDamageLevel(tCar_spec* pCar) {
     int i;
