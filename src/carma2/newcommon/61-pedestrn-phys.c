@@ -1818,11 +1818,18 @@ void C2_HOOK_FASTCALL ChangePedScaling(const br_vector3* pScale) {
     }
 }
 
-// STUB: CARMA2_HW 0x004d6ab0
-// STUB: CARMA2_SW 0x004d30b0
-// STUB: CARMA2_CHEAT 0x004dc670
+// FUNCTION: CARMA2_HW 0x004d6ab0
+// FUNCTION: CARMA2_SW 0x004d30b0
+// FUNCTION: CARMA2_CHEAT 0x004dc670
 void C2_HOOK_FASTCALL ChangeHeadScaling(float pScale) {
-    NOT_IMPLEMENTED();
+    br_vector3 scale;
+
+    scale.v[0] = pScale / gPed_head_scale;
+    scale.v[1] = scale.v[0];
+    scale.v[2] = scale.v[0];
+    ScaleBone(-2, &scale, 0);
+    gPed_head_scale = pScale;
+    UpdateIfBackwardsAR();
 }
 
 // FUNCTION: CARMA2_HW 0x004d6b70

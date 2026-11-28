@@ -1848,11 +1848,12 @@ void C2_HOOK_FASTCALL ResetPedSize(tPowerup* pPowerup, tCar_spec* pCar) {
     ChangePedScaling(&scale);
 }
 
-// STUB: CARMA2_HW 0x004dca00
-// STUB: CARMA2_SW 0x004d8f00
-// STUB: CARMA2_CHEAT 0x004e25c0
+// FUNCTION: CARMA2_HW 0x004dca00
+// FUNCTION: CARMA2_SW 0x004d8f00
+// FUNCTION: CARMA2_CHEAT 0x004e25c0
 void C2_HOOK_FASTCALL ResetPedHeadSize(tPowerup* pPowerup, tCar_spec* pCar) {
-    NOT_IMPLEMENTED();
+
+    ChangeHeadScaling(1.0f);
 }
 
 // FUNCTION: CARMA2_HW 0x004dca10
