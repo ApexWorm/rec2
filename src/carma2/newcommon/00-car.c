@@ -1613,7 +1613,7 @@ tNon_car_spec* C2_HOOK_FASTCALL DoPullActorFromWorld(br_actor* pActor) {
 // FUNCTION: CARMA2_HW 0x004207a0
 // FUNCTION: CARMA2_SW 0x00420820
 // FUNCTION: CARMA2_CHEAT 0x00420a00
-int C2_HOOK_FASTCALL PipeNonCarObject(tPhysics_object* pObject) {
+int C2_HOOK_FASTCALL PipeNonCarObject(tPhysics_object* pObject, void* pContext) {
     tNon_car_spec* non_car;
 
     if (!pObject->disable_move_rotate && pObject->actor != NULL && pObject->actor->type_data != NULL) {

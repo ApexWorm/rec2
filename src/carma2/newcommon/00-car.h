@@ -229,7 +229,7 @@ extern tNon_car_spec* C2_HOOK_FASTCALL PullActorFromWorld(br_actor* pActor);
 
 extern tNon_car_spec* C2_HOOK_FASTCALL DoPullActorFromWorld(br_actor* pActor);
 
-extern int C2_HOOK_FASTCALL PipeNonCarObject(tPhysics_object* pObject);
+extern int C2_HOOK_FASTCALL PipeNonCarObject(tPhysics_object* pObject, void* pContext);
 
 // PipeNonCars
 
