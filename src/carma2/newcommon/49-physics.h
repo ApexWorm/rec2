@@ -14,7 +14,7 @@
 
 extern int gINT_00692dc8;
 
-extern int gINT_006940b8;
+extern undefined4 gDAT_006940b8;
 
 extern tPhysicsError_cbfn* gPhysics_error_cb;
 extern br_scalar* gPhysics_buffer1_ptr;
