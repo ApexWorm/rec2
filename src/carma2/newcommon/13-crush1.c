@@ -3027,15 +3027,15 @@ void C2_HOOK_FASTCALL CopyBendInMessage(tCar_spec* pCar) {
     crush = pCar->car_crush_spec;
     if (crush->field_0x144) {
         object = pCar->collision_info;
-        if (((object->field_0x481 & 0x1) && crush->field_0x174 == crush->bend_z_min)
-                || (!(object->field_0x481 & 0x1) && crush->field_0x174 == crush->bend_z_max)) {
+        if (((object->field_0x481 & 0x1) && crush->field_0x154.field_0x20 == crush->bend_z_min)
+                || (!(object->field_0x481 & 0x1) && crush->field_0x154.field_0x20 == crush->bend_z_max)) {
             same_z = 1;
         } else {
             same_z = 0;
         }
-        if (((object->field_0x481 & 0x2) && crush->field_0x190[0] == object->field_0x482)
-                || ((object->field_0x481 & 0x4) && crush->field_0x190[1] == object->field_0x482)
-                || ((object->field_0x481 & 0x8) && crush->field_0x190[2] == object->field_0x482)) {
+        if (((object->field_0x481 & 0x2) && crush->field_0x154.field_0x3c[0] == object->field_0x482)
+                || ((object->field_0x481 & 0x4) && crush->field_0x154.field_0x3c[1] == object->field_0x482)
+                || ((object->field_0x481 & 0x8) && crush->field_0x154.field_0x3c[2] == object->field_0x482)) {
             same_angle = 1;
         } else {
             same_angle = 0;

@@ -4333,13 +4333,7 @@ typedef struct tCar_crush_spec {
     float bendability_factor;
     float bend_z_min;
     float bend_z_max;
-    undefined field_0x154[0x174 - 0x154];
-    float field_0x174;
-    undefined field_0x178[0x180 - 0x178];
-    float field_0x180;
-    undefined field_0x184[0x190 - 0x184];
-    br_angle field_0x190[3];
-    undefined field_0x196[0x1cc - 0x196];
+    tBend_point_spec field_0x154;
     tCar_crush_vertex_data* field_0x1cc;
     undefined field_0x1d0[28];
     br_vector3 field_0x1ec[6];
