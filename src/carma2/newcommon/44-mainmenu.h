@@ -10,12 +10,15 @@
 #define GUARD_44_MAINMENU_H
 
 #include "c2_hooks.h"
+#include "rec2_types.h"
+
+extern tInterface_spec* gMain_menu_spec;
 
 extern int C2_HOOK_FASTCALL MainMenuDone1(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out);
 
 extern int C2_HOOK_FASTCALL MainMenuDone2(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out);
 
-// StartMainMenu
+extern void C2_HOOK_FASTCALL StartMainMenu(void);
 
 // QuitVerifyStart
 

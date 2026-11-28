@@ -542,6 +542,8 @@ int gHost_abandon_game;
 int gRecover_car;
 
 // GLOBAL: CARMA2_HW 0x0068b874
+// GLOBAL: CARMA2_SW 0x00685dd4
+// GLOBAL: CARMA2_CHEAT 0x0069311c
 int gDisallow_abandon_race;
 //int gPipe_reg_snap_before_new_game;
 //int gPipe_reg_snap_before_our_car;
