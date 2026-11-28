@@ -730,6 +730,9 @@ void C2_HOOK_FASTCALL UseGeneralScore(int pScore) {
     }
 }
 
+// FUNCTION: CARMA2_HW 0x0049b8d0
+// FUNCTION: CARMA2_SW 0x00497a50
+// FUNCTION: CARMA2_CHEAT 0x0049bc80
 inline void C2_HOOK_FASTCALL NetSendEnvironmentChanges(tNet_game_player_info* pPlayer) {
 
     SendAllNonCarPositions(pPlayer);
