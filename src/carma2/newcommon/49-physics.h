@@ -238,7 +238,7 @@ extern void C2_HOOK_FASTCALL MakeObjectListDoSomething(tPhysics_object* pObject)
 
 extern void C2_HOOK_FASTCALL MakeObjectDoSomething(tPhysics_object* pObject, tPhysics_object* pList);
 
-// GetReducedList
+extern tPhysics_object** C2_HOOK_FASTCALL GetReducedList(tPhysics_object* pObject, tPhysics_object* pList, tPhysics_object** pTail);
 
 extern tPhysics_object** C2_HOOK_FASTCALL ReduceReducedList(tPhysics_object* pObject, tPhysics_object** pList);
 
