@@ -822,6 +822,9 @@ int C2_HOOK_FASTCALL PipeObjectPosition(tPhysics_object* pObject, void* pContext
     return 0;
 }
 
+// FUNCTION: CARMA2_HW 0x004c7260
+// FUNCTION: CARMA2_SW 0x004c3990
+// FUNCTION: CARMA2_CHEAT 0x004ccd80
 inline void C2_HOOK_FASTCALL AddCarToPipingSession(int pCar_ID, br_matrix34* pCar_mat, br_vector3* pCar_velocity, float pSpeedo_speed, float pRevs, int pGear, int pFrame_coll_flag, int pField_0x18cc) {
 
     ARAddVariedDataToSession(ePipe_chunk_car, pCar_ID, 5,
@@ -832,12 +835,23 @@ inline void C2_HOOK_FASTCALL AddCarToPipingSession(int pCar_ID, br_matrix34* pCa
         SIZE_OFFSET_PIPING(tPipe_chunk_car, field_0x40), pField_0x18cc);
 }
 
+#if defined(REC2_MATCHING) && defined(_MSC_VER)
+#pragma inline_depth(0)
+#endif
+
+// FUNCTION: CARMA2_HW 0x004c7400
+// FUNCTION: CARMA2_SW 0x004c3b30
+// FUNCTION: CARMA2_CHEAT 0x004ccf20
 inline void C2_HOOK_FASTCALL AddDamageToPipingSession(int pCar_ID, tS8* pDamage_deltas) {
     tS8 damage_deltas[12];
 
     memcpy(damage_deltas, pDamage_deltas, sizeof(damage_deltas));
     ARAddDataToSession(ePipe_chunk_damage, pCar_ID, damage_deltas, sizeof(damage_deltas));
 }
+
+#if defined(REC2_MATCHING) && defined(_MSC_VER)
+#pragma inline_depth()
+#endif
 
 // FUNCTION: CARMA2_HW 0x004c6640
 // FUNCTION: CARMA2_SW 0x004c2d70
@@ -1118,9 +1132,9 @@ void C2_HOOK_FASTCALL AddExtendedSplashToPipingSession(tPhysics_object* pObject,
         SIZE_OFFSET_PIPING(tPipe_chunk_extended_splash, bb), &pObject->bb2);
 }
 
-// AddCarToPipingSession
+// AddCarToPipingSession (moved before PipeCarPositions for inlining purposes)
 
-// AddDamageToPipingSession
+// AddDamageToPipingSession (moved before PipeCarPositions for inlining purposes)
 
 // FUNCTION: CARMA2_HW 0x004c74c0
 // FUNCTION: CARMA2_SW 0x004c3bf0
