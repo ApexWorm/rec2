@@ -1195,6 +1195,71 @@ br_actor* C2_HOOK_FASTCALL CloneActor(br_actor* pActor) {
     return clone;
 }
 
+// FUNCTION: CARMA2_HW 0x00515960
+// FUNCTION: CARMA2_SW 0x00510dd0
+// FUNCTION: CARMA2_CHEAT 0x0051b350
+tU8* C2_HOOK_FASTCALL RunLengthEncode8bitPixelmap(br_pixelmap* pMap) {
+    tU8* buffer;
+    tU8* result;
+    tU8* row;
+    tU8* line_ptr;
+    int total_size;
+    int line_size;
+    int count_chunks;
+    int count;
+    int black;
+    int x;
+    int y;
+    tU8 pixel;
+    tU16 width;
+    tU8 line[800];
+
+    buffer = BrMemAllocate(pMap->row_bytes * pMap->height, kMem_misc);
+    *(tU16*)buffer = pMap->height;
+    total_size = 2;
+    for (y = 0; y < pMap->height; y++) {
+        row = (tU8*)pMap->pixels + y * pMap->row_bytes;
+        line_size = 2;
+        black = row[0] == 0;
+        count = 0;
+        x = 0;
+        count_chunks = 0;
+        width = pMap->width;
+        line_ptr = &line[2];
+        for (;;) {
+            while (count < 127 && x != width && ((pixel = row[x]) == 0) == black) {
+                if (!black) {
+                    *line_ptr = pixel;
+                    line_size++;
+                    line_ptr++;
+                }
+                count++;
+                x++;
+            }
+            if (black) {
+                line_ptr[-1] = count;
+            } else {
+                line[line_size - count - 1] = -count;
+            }
+            count_chunks++;
+            if (x == width) {
+                break;
+            }
+            line_size++;
+            line_ptr++;
+            black = pixel == 0;
+            count = 0;
+        }
+        line[0] = count_chunks;
+        memcpy(buffer + total_size, line, line_size);
+        total_size += line_size;
+    }
+    result = BrMemAllocate(total_size, kMem_misc);
+    memcpy(result, buffer, total_size);
+    BrMemFree(buffer);
+    return result;
+}
+
 // FUNCTION: CARMA2_HW 0x00515b80
 // FUNCTION: CARMA2_SW 0x00510ff0
 // FUNCTION: CARMA2_CHEAT 0x0051b570
@@ -1778,6 +1843,77 @@ void C2_HOOK_FASTCALL NobbleNonzeroBlacks(br_pixelmap* pPalette) {
     if (modified) {
         BrMapUpdate(pPalette, BR_MAPU_ALL);
     }
+}
+
+// FUNCTION: CARMA2_HW 0x00518010
+// FUNCTION: CARMA2_CHEAT 0x0051da40
+tU8* C2_HOOK_FASTCALL CompressPixels(br_pixelmap* pSrc) {
+    tU16* palette_entry;
+    tU8* line;
+    tU8* buffer;
+    tU8* result;
+    tU8* src_pixel;
+    tU8* line_ptr;
+    size_t size;
+    int total_size;
+    int line_size;
+    int count_chunks;
+    int count;
+    int black;
+    int x;
+    int y;
+    tU8 pixel;
+
+    palette_entry = PaletteOf16Bits(gRender_palette)->pixels;
+    size = (pSrc->width + 61) / 62 * 125 + 2;
+    line = BrMemAllocate(size, kMem_misc);
+    buffer = BrMemAllocate(size * pSrc->height, kMem_misc);
+    *(tU16*)buffer = pSrc->height;
+    total_size = 2;
+    for (y = 0; y < pSrc->height; y++) {
+        src_pixel = (tU8*)pSrc->pixels + y * pSrc->row_bytes;
+        line_size = 2;
+        black = *src_pixel == 0;
+        count = 0;
+        count_chunks = 0;
+        x = 0;
+        line_ptr = line + 2;
+        for (;;) {
+            for (; count < 62 && x != pSrc->width; src_pixel++) {
+                pixel = *src_pixel;
+                if ((pixel == 0) != black) {
+                    break;
+                }
+                if (!black) {
+                    line_size += 2;
+                    *(tU16*)line_ptr = palette_entry[pixel];
+                    line_ptr += 2;
+                }
+                count++;
+                x++;
+            }
+            if (!black) {
+                line[line_size - 2 * count - 1] = -2 * count;
+            } else {
+                line_ptr[-1] = 2 * count;
+            }
+            black = pixel == 0;
+            count = 0;
+            count_chunks++;
+            if (x == pSrc->width) {
+                break;
+            }
+            line_size++;
+            line_ptr++;
+        }
+        line[0] = count_chunks;
+        memcpy(buffer + total_size, line, line_size);
+        total_size += line_size;
+    }
+    result = BrMemAllocate(total_size, kMem_misc);
+    memcpy(result, buffer, total_size);
+    BrMemFree(buffer);
+    return result;
 }
 
 // FUNCTION: CARMA2_HW 0x005182f0

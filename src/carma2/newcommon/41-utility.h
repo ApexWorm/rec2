@@ -136,6 +136,8 @@ int C2_HOOK_FASTCALL PDCheckDriveExists(const char* pThe_path);
 
 extern br_actor* C2_HOOK_FASTCALL CloneActor(br_actor* pActor);
 
+extern tU8* C2_HOOK_FASTCALL RunLengthEncode8bitPixelmap(br_pixelmap* pMap);
+
 extern void C2_HOOK_FASTCALL CalcActorGlobalPos(br_vector3* pResult, br_actor* pActor);
 
 extern float C2_HOOK_STDCALL frac(float pN);
@@ -207,6 +209,8 @@ extern void C2_HOOK_FASTCALL DRPixelmapCopy(br_pixelmap* dst, br_pixelmap* src);
 // tMaterial_exception* C2_HOOK_FASTCALL FindExceptionInList(const char* pIdentifier, tMaterial_exception* pList)
 
 extern void C2_HOOK_FASTCALL NobbleNonzeroBlacks(br_pixelmap* pPalette);
+
+extern tU8* C2_HOOK_FASTCALL CompressPixels(br_pixelmap* pSrc);
 
 extern void C2_HOOK_FASTCALL GlorifyMaterial(br_material** pMaterials, int pCount, tRendererShadingType pShading);
 
