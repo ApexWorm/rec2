@@ -1302,7 +1302,7 @@ void C2_HOOK_FASTCALL AddPedIncidentToPipingSession(tPedestrian* pPed, br_actor*
     C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_ped_incident, actor, 0x8);
     C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_ped_incident, actor, 0x4);
 
-    gFloat_pipe_union.f = 0.f;
+    gFloat_pipe_union.f = 0.0f;
     ARAddVariedDataToSession(ePipe_chunk_ped_incident, 0, 3,
         SIZE_OFFSET_PIPING(tPipe_ped_incident, field_0x0), gFloat_pipe_union.u32,
         SIZE_OFFSET_PIPING(tPipe_ped_incident, ped), pPed,
