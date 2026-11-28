@@ -41,7 +41,7 @@
 #include "51-smash.h"
 #include "52-errors.h"
 #include "56-aiworld.h"
-#include "61-pedestrn.h"
+#include "61-pedestrn-phys.h"
 #include "62-graphics3.h"
 #include "63-loading3.h"
 #include "66-tintedpoly.h"

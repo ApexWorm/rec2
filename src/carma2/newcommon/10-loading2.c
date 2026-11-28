@@ -30,6 +30,7 @@
 #include "38-flicplay.h"
 #include "41-utility.h"
 #include "42-input.h"
+#include "49-physics.h"
 #include "51-smash.h"
 #include "52-errors.h"
 #include "53-controls.h"
@@ -37,7 +38,7 @@
 #include "57-drone.h"
 #include "58-crush2.h"
 #include "59-camera.h"
-#include "61-pedestrn.h"
+#include "61-pedestrn-phys.h"
 #include "62-graphics3.h"
 #include "63-loading3.h"
 #include "64-movie.h"
@@ -842,20 +843,94 @@ void C2_HOOK_FASTCALL LoadHeadups(FILE* pF, int pIndex, tCar_spec* pCar_spec) {
 
 // ReadPartHeader
 
-#ifdef REC2_MATCHING
-#pragma auto_inline(off)
-#endif
-
-// STUB: CARMA2_HW 0x00488b00
-// STUB: CARMA2_SW 0x00485d40
-// STUB: CARMA2_CHEAT 0x00488ee0
+// FUNCTION: CARMA2_HW 0x00488b00
+// FUNCTION: CARMA2_SW 0x00485d40
+// FUNCTION: CARMA2_CHEAT 0x00488ee0
 void C2_HOOK_FASTCALL ReadMechanicsShapes(tPhysics_shape** pShapes, FILE* pF) {
-    NOT_IMPLEMENTED();
-}
+    int i;
+    int j;
+    int count;
+    int count_points;
+    int count_lines;
+    int index1;
+    int index2;
+    tPhysics_shape* shape;
+    br_vector3* p;
+    tPolyhedron_edge_indexes* line;
+    float min_x;
+    float min_y;
+    float min_z;
+    float max_x;
+    float max_y;
+    float max_z;
+    float point_x;
+    float point_y;
+    float point_z;
+    float centre_x;
+    float centre_y;
+    float centre_z;
+    float wire_x;
+    float wire_y;
+    float wire_z;
+    char s[256];
+    br_vector3 points[64];
 
-#ifdef REC2_MATCHING
-#pragma auto_inline(on)
-#endif
+    count = GetAnInt(pF);
+    for (i = 0; i < count; i++) {
+        GetAString(pF, s);
+        if (DRStricmp(s, "box") == 0) {
+            shape = (tPhysics_shape*)AllocateShapeBox(kMem_collision_shape);
+            GetThreeFloats(pF, &min_x, &min_y, &min_z);
+            BrVector3Set(&shape->box.common.bb.min, min_x, min_y, min_z);
+            GetThreeFloats(pF, &max_x, &max_y, &max_z);
+            BrVector3Set(&shape->box.common.bb.max, max_x, max_y, max_z);
+        } else if (DRStricmp(s, "polyhedron") == 0) {
+            count_points = GetAnInt(pF);
+            if (count_points > 32) {
+                sprintf(s, "Ow! Physics shape is mad (having %d points is silly)", count_points);
+                PDFatalError(s);
+            }
+            shape = (tPhysics_shape*)AllocateShapePolyhedron(count_points, kMem_collision_shape);
+            shape->polyhedron.polyhedron.count_points = count_points;
+            p = shape->polyhedron.polyhedron.points;
+            for (j = 0; j < count_points; j++) {
+                GetThreeFloats(pF, &point_x, &point_y, &point_z);
+                BrVector3Set(&p[j], point_x, point_y, point_z);
+            }
+        } else if (DRStricmp(s, "sphere") == 0) {
+            shape = (tPhysics_shape*)AllocateShapeSphere(kMem_collision_shape);
+            shape->sphere.sphere.radius = GetAScalar(pF);
+            GetThreeFloats(pF, &centre_x, &centre_y, &centre_z);
+            BrVector3Set(&shape->sphere.sphere.center, centre_x, centre_y, centre_z);
+        } else if (DRStricmp(s, "wire") == 0) {
+            count_points = GetAnInt(pF);
+            if (count_points > (int)REC2_ASIZE(points)) {
+                FatalError(kFatalError_TooManyExtraPointsForCarIndex_S, " Too many points in wire frame shape ");
+            }
+            for (j = 0; j < count_points; j++) {
+                GetThreeFloats(pF, &wire_x, &wire_y, &wire_z);
+                BrVector3Set(&points[j], wire_x, wire_y, wire_z);
+            }
+            count_lines = GetAnInt(pF);
+            shape = (tPhysics_shape*)AllocateShapeWireFrame(count_points, count_lines, kMem_collision_shape);
+            p = shape->wireframe.wireframe.points;
+            for (j = 0; j < count_points; j++) {
+                BrVector3Copy(&p[j], &points[j]);
+            }
+            line = shape->wireframe.wireframe.lines;
+            for (j = 0; j < count_lines; j++) {
+                GetPairOfInts(pF, &index1, &index2);
+                line[j].index1 = index1;
+                line[j].index2 = index2;
+            }
+        } else {
+            FatalError(kFatalError_ShapeDataIsWrong);
+        }
+        FillInShape(shape);
+        *pShapes = shape;
+        pShapes = &shape->common.next;
+    }
+}
 
 // NewReadMechanicsData
 
