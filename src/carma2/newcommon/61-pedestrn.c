@@ -409,6 +409,7 @@ int gPed_score_multiplier;
 
 // GLOBAL: CARMA2_HW 0x0069bcf8
 // GLOBAL: CARMA2_SW 0x00695d50
+// GLOBAL: CARMA2_CHEAT 0x006a3870
 int gPed_points[3];
 
 // GLOBAL: CARMA2_HW 0x006a0418
@@ -1284,6 +1285,9 @@ int C2_HOOK_FASTCALL MorphCharacterBonePositions(tPed_character_instance* pPed, 
 #pragma auto_inline(on)
 #endif
 
+// FUNCTION: CARMA2_HW 0x00409c20
+// FUNCTION: CARMA2_SW 0x00409c20
+// FUNCTION: CARMA2_CHEAT 0x00409c90
 inline int C2_HOOK_FASTCALL StopCharacterMove(tPed_character_instance* pCharacter, tU32 pTime) {
     int result;
 
@@ -1291,15 +1295,15 @@ inline int C2_HOOK_FASTCALL StopCharacterMove(tPed_character_instance* pCharacte
     pCharacter->field_0x1c = pCharacter->personality->form->moves[pCharacter->field_0x7].move->count_frames - 1;
     if (pCharacter->field_0x9 & 0x2) {
         pCharacter->field_0x9 &= ~0x2;
-        gPed_vtable->move_completed(pCharacter);
+        result = gPed_vtable->move_completed(pCharacter);
     }
-    if (pCharacter->field_0x8 < 0) {
-        pCharacter->field_0x1c = 0;
-    } else {
+    if (pCharacter->field_0x8 >= 0) {
         SetCharacterMove(pCharacter, pCharacter->field_0x8, (float)pCharacter->field_0x20, 0, (pCharacter->field_0x9 & 0x4) >> 2, pTime);
-        result = 1;
+        return 1;
+    } else {
+        pCharacter->field_0x1c = 0;
+        return result;
     }
-    return result;
 }
 
 // FUNCTION: CARMA2_HW 0x00409ca0
