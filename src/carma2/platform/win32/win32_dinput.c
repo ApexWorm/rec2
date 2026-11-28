@@ -1695,6 +1695,52 @@ int C2_HOOK_FASTCALL PDDisableJoysticks(void) {
     return gCountEnumeratedJoystickDinputDevices;
 }
 
+// FUNCTION: CARMA2_HW 0x0045a100
+// FUNCTION: CARMA2_SW 0x00459e90
+// FUNCTION: CARMA2_CHEAT 0x0045a580
+int C2_HOOK_FASTCALL FUN_0045a100(int pJoystick_index, IFR_Effect* pEffect, const char* pName) {
+
+    gJoystick_effects[gCount_joystick_effects].di_effect = *pEffect->di_effect;
+    IDirectInputDevice2_CreateEffect(gDirectInputJoystickDevices[pJoystick_index], &pEffect->guid, &gJoystick_effects[gCount_joystick_effects].di_effect, &gDirectInputEffects[gCount_joystick_effects], NULL);
+    strcpy(gJoystick_effects[gCount_joystick_effects].name, pName);
+    gCount_joystick_effects += 1;
+    return gCount_joystick_effects - 1;
+}
+
+// FUNCTION: CARMA2_HW 0x0045a190
+// FUNCTION: CARMA2_SW 0x00459f20
+// FUNCTION: CARMA2_CHEAT 0x0045a610
+int C2_HOOK_FASTCALL FUN_0045a190(const char* pFile_name) {
+    tPath_name path;
+    int count_effects;
+    char* effect_names[20];
+    int i;
+    int count;
+    IFR_Effect** effects;
+
+    PathCat(path, gApplication_path, pFile_name);
+    gIfr_project = IFLoadProjectFile(path, gDirectInputJoystickDevices[gJoystick_index]);
+    if (gIfr_project == NULL) {
+        return 0;
+    }
+    count_effects = ReadIforceEffectsNames(path, effect_names, REC2_ASIZE(effect_names));
+    for (i = 0; i < count_effects; i++) {
+        effects = IFCreateEffectStructs(gIfr_project, effect_names[i], &count);
+        FUN_0045a100(gJoystick_index, effects[0], effect_names[i]);
+        UnloadDinputFFBEfectwithName(effect_names[i]);
+    }
+    IFReleaseProject(gIfr_project);
+    return 1;
+}
+
+// FUNCTION: CARMA2_HW 0x0045a2d0
+// FUNCTION: CARMA2_SW 0x0045a060
+// FUNCTION: CARMA2_CHEAT 0x0045a750
+void C2_HOOK_FASTCALL FUN_0045a2d0(void) {
+
+    IFReleaseProject(gIfr_project);
+}
+
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
 #endif

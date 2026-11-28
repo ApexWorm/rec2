@@ -14,6 +14,8 @@
 #include "platform.h"
 #include "win32_types.h"
 
+#include <iforce2.h>
+
 extern int gASCII_table[151];
 extern int gASCII_shift_table[151];
 extern int gScan_code[256];
@@ -93,5 +95,11 @@ extern void C2_HOOK_FASTCALL UnloadDinputFFBEffectAtIndex(int index);
 extern tJoystick_force_effect* C2_HOOK_FASTCALL GetJoystickEffect(int pIndex);
 
 extern void C2_HOOK_FASTCALL DownloadDinputFFBEffectAtIndex(int index);
+
+extern int C2_HOOK_FASTCALL FUN_0045a100(int pJoystick_index, IFR_Effect* pEffect, const char* pName);
+
+extern int C2_HOOK_FASTCALL FUN_0045a190(const char* pFile_name);
+
+extern void C2_HOOK_FASTCALL FUN_0045a2d0(void);
 
 #endif // C2_WIN32_INPUT_H
