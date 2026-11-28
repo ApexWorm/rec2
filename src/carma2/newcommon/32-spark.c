@@ -425,9 +425,9 @@ void C2_HOOK_FASTCALL CreateShrapnelShower2(const br_vector3* pPosition, const b
         return;
     }
     if (pMaterials != NULL) {
-        ts = .7f;
+        ts = 0.7f;
     } else {
-        ts = .3f;
+        ts = 0.3f;
     }
     if (pVelocity->v[1] < 0.0f) {
         ts -= pVelocity->v[1];
