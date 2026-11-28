@@ -67,7 +67,7 @@ typedef enum {
 
 typedef union {
     struct {
-        undefined4 field_0x0;
+        LONG lMagnitude;
     } constant;
     struct {
         undefined4 field_0x0;
@@ -92,7 +92,7 @@ typedef struct {
 
 typedef struct {
     DIEFFECT di_effect;
-    undefined type_specific_params[24];
+    tJoystick_effect_type_params type_specific_params;
     undefined field_0x4c[20];
     LONG field_0x60;
     undefined4 field_0x64;
