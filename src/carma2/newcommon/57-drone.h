@@ -13,8 +13,6 @@
 #include "rec2_types.h"
 
 extern br_vector3 gRender_bounds_centre;
-
-extern tU32 gNext_drone_edit_path_munge;
 extern int gINT_00681fb0;
 extern int gFrame;
 extern int gCurrent_selected_drone;
@@ -36,6 +34,7 @@ extern int gSelected_drone_path_node_index;
 extern int gSelected_drone_form_index;
 extern char gDrone_edit_message[256];
 extern int gSelected_drone_path_index;
+extern tU32 gNext_drone_edit_path_munge;
 extern int gShow_drone_paths;
 extern int gCount_drones;
 extern int gCurrent_selected_drone;
