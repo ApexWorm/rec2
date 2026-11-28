@@ -108,6 +108,16 @@ int gStatic_drone_path_model_max_faces;
 // GLOBAL: CARMA2_CHEAT 0x0059b10c
 int gSelected_edit_drone_path = -1;
 
+// GLOBAL: CARMA2_HW 0x005947b8
+// GLOBAL: CARMA2_SW 0x0058f718
+// GLOBAL: CARMA2_CHEAT 0x0059b110
+int gSelected_drone_path_index = -1;
+
+// GLOBAL: CARMA2_HW 0x0068452c
+// GLOBAL: CARMA2_SW 0x0067ec6c
+// GLOBAL: CARMA2_CHEAT 0x0068bdd4
+int gShow_drone_paths;
+
 // GLOBAL: CARMA2_HW 0x00684518
 // GLOBAL: CARMA2_SW 0x0067ec58
 // GLOBAL: CARMA2_CHEAT 0x0068bdc0
@@ -798,4 +808,163 @@ void C2_HOOK_FASTCALL WriteOutDronePaths(void) {
 #ifdef REC2_MATCHING
 #pragma auto_inline(on)
 #endif
+
+// SelectClosestDrone
+
+// FUN_00453460
+
+// FUNCTION: CARMA2_HW 0x00453680
+// FUNCTION: CARMA2_SW 0x00453410
+// FUNCTION: CARMA2_CHEAT 0x00453be0
+void C2_HOOK_FASTCALL ToggleDronePaths(void) {
+
+    if (gSelected_drone_path_index >= 0) {
+        gDrone_specs[gSelected_drone_path_index].actor->render_style = BR_RSTYLE_FACES;
+        gSelected_drone_path_index = -1;
+    }
+    if (gShow_drone_paths) {
+        if (gStatic_drone_path_model_actor != NULL) {
+            gStatic_drone_path_model_actor->render_style = BR_RSTYLE_NONE;
+        }
+        if (gDrone_path_model_actor != NULL) {
+            gDrone_path_model_actor->render_style = BR_RSTYLE_NONE;
+        }
+        WriteOutDronePaths();
+        gShow_drone_paths = 0;
+        NewTextHeadupSlot(4, 0, 3000, -1, "Hiding Drone Paths");
+    } else {
+        NewTextHeadupSlot(4, 0, 3000, -1, "Drone Paths Already Hidden");
+    }
+}
+
+// FUN_00453720
+
+// FindNearestNodeDrone
+
+// FUN_004538a0
+
+// FUN_00453940
+
+// FUN_00453ab0
+
+// FUN_00453b80
+
+// FUNCTION: CARMA2_HW 0x00453d60
+// FUNCTION: CARMA2_SW 0x00453af0
+// FUNCTION: CARMA2_CHEAT 0x004542c0
+void C2_HOOK_FASTCALL FUN_00453d60(void) {
+
+    gDrone_paths_elasticating = 0;
+    if (gDrone_path_model_actor != NULL) {
+        gDrone_path_model_actor->render_style = BR_RSTYLE_NONE;
+    }
+}
+
+// FUN_00453d80
+
+// FUNCTION: CARMA2_HW 0x00453ed0
+// FUNCTION: CARMA2_SW 0x00453c60
+// FUNCTION: CARMA2_CHEAT 0x00454430
+void C2_HOOK_FASTCALL FUN_00453ed0(void) {
+}
+
+// FUNCTION: CARMA2_HW 0x00453ee0
+// FUNCTION: CARMA2_SW 0x00453c70
+// FUNCTION: CARMA2_CHEAT 0x00454440
+void C2_HOOK_FASTCALL FUN_00453ee0(void) {
+}
+
+// FUNCTION: CARMA2_HW 0x00453ef0
+// FUNCTION: CARMA2_SW 0x00453c80
+// FUNCTION: CARMA2_CHEAT 0x00454450
+void C2_HOOK_FASTCALL FUN_00453ef0(void) {
+}
+
+// FUNCTION: CARMA2_HW 0x00453f00
+// FUNCTION: CARMA2_SW 0x00453c90
+// FUNCTION: CARMA2_CHEAT 0x00454460
+void C2_HOOK_FASTCALL FUN_00453f00(void) {
+}
+
+// FUNCTION: CARMA2_HW 0x00453f10
+// FUNCTION: CARMA2_SW 0x00453ca0
+// FUNCTION: CARMA2_CHEAT 0x00454470
+void C2_HOOK_FASTCALL FUN_00453f10(void) {
+}
+
+// FUNCTION: CARMA2_HW 0x00453f20
+// FUNCTION: CARMA2_SW 0x00453cb0
+// FUNCTION: CARMA2_CHEAT 0x00454480
+void C2_HOOK_FASTCALL FUN_00453f20(void) {
+}
+
+// FUNCTION: CARMA2_HW 0x00453f30
+// FUNCTION: CARMA2_SW 0x00453cc0
+// FUNCTION: CARMA2_CHEAT 0x00454490
+void C2_HOOK_FASTCALL FUN_00453f30(void) {
+}
+
+// FUN_00453f40
+
+// FUN_00454360
+
+// FUN_004543d0
+
+// FUN_00454470
+
+// FUNCTION: CARMA2_HW 0x00454640
+// FUNCTION: CARMA2_SW 0x004543d0
+// FUNCTION: CARMA2_CHEAT 0x00454ba0
+void C2_HOOK_FASTCALL FUN_00454640(void) {
+
+    WriteOutDronePaths();
+}
+
+// FUNCTION: CARMA2_HW 0x00454650
+// FUNCTION: CARMA2_SW 0x004543e0
+// FUNCTION: CARMA2_CHEAT 0x00454bb0
+void C2_HOOK_FASTCALL FUN_00454650(void) {
+
+    WriteOutDronePaths();
+}
+
+// FUNCTION: CARMA2_HW 0x00454660
+// FUNCTION: CARMA2_SW 0x004543f0
+// FUNCTION: CARMA2_CHEAT 0x00454bc0
+void C2_HOOK_FASTCALL FUN_00454660(void) {
+
+    WriteOutDronePaths();
+}
+
+// FUNCTION: CARMA2_HW 0x00454670
+// FUNCTION: CARMA2_SW 0x00454400
+// FUNCTION: CARMA2_CHEAT 0x00454bd0
+void C2_HOOK_FASTCALL FUN_00454670(void) {
+
+    WriteOutDronePaths();
+}
+
+// FUNCTION: CARMA2_HW 0x00454680
+// FUNCTION: CARMA2_SW 0x00454410
+// FUNCTION: CARMA2_CHEAT 0x00454be0
+void C2_HOOK_FASTCALL FUN_00454680(void) {
+
+    WriteOutDronePaths();
+}
+
+// FUN_00454690
+
+// FUN_00454710
+
+// DeleteNodeSectionsAndOrphan
+
+// DeleteNodeAndSections
+
+// FUN_00454bb0
+
+// SelectNextDroneForm
+
+// SelectPreviousDroneForm
+
+// CreateNewDrone
 
