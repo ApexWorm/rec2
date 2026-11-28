@@ -699,7 +699,14 @@ void C2_HOOK_FASTCALL AddRollingString(char* pStr, int pX, int pY, tRolling_type
 void C2_HOOK_FASTCALL AddRollingNumber(tU32 pNumber, int pWidth, int pX, int pY) {
     char the_string[32];
 
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat"
+#endif
     sprintf(the_string, "%0.*d", pWidth, pNumber);
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif
     AddRollingString(the_string, pX, pY, eRT_numeric);
 }
 
