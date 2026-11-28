@@ -697,7 +697,7 @@ int C2_HOOK_FASTCALL S3Calculate3D(tS3_channel* pChannel, int pAmbient) {
                 + (pChannel->position.z - gS3_listener_position_now.v[2]) * (pChannel->velocity.z - gS3_listener_vel_now.v[2])) / len) / gFLOAT_006b2c68) > 2.0f) {
             pitch = 2.0f;
         } else if (pitch < 0.5) {
-            pitch = .5f;
+            pitch = 0.5f;
         }
         pChannel->rate = (int)(pChannel->source_rate * pitch);
     } else {
