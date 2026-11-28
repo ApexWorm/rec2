@@ -80,6 +80,8 @@ extern void C2_HOOK_FASTCALL PDInitJoysticks(void);
 
 extern int C2_HOOK_FASTCALL FUN_00458150(int pIndex, int pPlay, int* pDirection, DWORD* pDuration, DWORD* pGain, void* pType_specific_params, int* pTrigger_button, DWORD* pEnvelope);
 
+extern void C2_HOOK_FASTCALL FUN_00458460(void);
+
 extern void C2_HOOK_FASTCALL StartDinputEffect(int pIndex);
 
 extern void C2_HOOK_FASTCALL StopDinputEffect(int pIndex);

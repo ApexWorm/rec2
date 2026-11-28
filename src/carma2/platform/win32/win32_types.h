@@ -88,6 +88,7 @@ typedef struct {
     int field_0x44;
     undefined4 field_0x48;
     undefined4 field_0x4c;
+    undefined4 field_0x50[4]; /* FIXME: unused by the game; maybe envelope levels/times */
 } tJoystick_effect_description;
 
 typedef struct {
