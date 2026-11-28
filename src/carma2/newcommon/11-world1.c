@@ -12,12 +12,14 @@
 #include "08-loading1.h"
 
 #include "15-displays.h"
+#include "24-loadsave.h"
 #include "28-world3.h"
 #include "41-utility.h"
 #include "55-volume.h"
 #include "61-pedestrn-phys.h"
 #include "70-packfile.h"
 #include "globvars.h"
+#include "joystick.h"
 
 #include "c2_stdio.h"
 
@@ -513,9 +515,16 @@ void C2_HOOK_FASTCALL FUN_00511210(void) {
     NOT_IMPLEMENTED();
 }
 
-// STUB: CARMA2_HW 0x00511240
-// STUB: CARMA2_SW 0x0050c690
-// STUB: CARMA2_CHEAT 0x00516c30
+// FUNCTION: CARMA2_HW 0x00511240
+// FUNCTION: CARMA2_SW 0x0050c690
+// FUNCTION: CARMA2_CHEAT 0x00516c30
 void C2_HOOK_FASTCALL ToggleJoystickHeadup(void) {
-    NOT_IMPLEMENTED();
+
+    if (gINT_0068b8e8) {
+        SaveJoystickPreferences();
+    }
+    FUN_0045c240();
+    if (!gINT_0068b8e8) {
+        LoadJoystickPreferences();
+    }
 }
