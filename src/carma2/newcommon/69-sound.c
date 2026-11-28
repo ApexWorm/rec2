@@ -1070,7 +1070,7 @@ void C2_HOOK_FASTCALL BuggerModelName(tTrack_spec* pTrack_spec, const char* pNam
 
 // FUNCTION: CARMA2_HW 0x004572f0
 // FUNCTION: CARMA2_SW 0x00457080
-// FUNCTION: CARMA2_CHEAET 0x00457770
+// FUNCTION: CARMA2_CHEAT 0x00457770
 void C2_HOOK_FASTCALL ReadSoundGenerators(tTrack_spec* pTrack_spec, FILE* pF) {
     char name[32];
     tTrackSoundGenerator* generator;
