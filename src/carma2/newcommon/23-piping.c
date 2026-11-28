@@ -432,6 +432,7 @@ void C2_HOOK_FASTCALL AREndPipingSession(void) {
 
 // FUNCTION: CARMA2_HW 0x004028a0
 // FUNCTION: CARMA2_SW 0x004028a0
+// FUNCTION: CARMA2_CHEAT 0x004028a0
 void C2_HOOK_FASTCALL ARAddDataToSession(int pType, uintptr_t pOwner, void* pData, tU32 pSize) {
     tU32 new_size;
 
@@ -1084,6 +1085,118 @@ void C2_HOOK_FASTCALL AddFlapToPipingSession(br_actor* pActor, br_angle pAngle) 
 // STUB: CARMA2_CHEAT 0x004cd070
 void C2_HOOK_FASTCALL AddModelMashToPipingSession(br_model* pModel, br_vector3* pMash) {
     NOT_IMPLEMENTED();
+}
+
+// FUNCTION: CARMA2_HW 0x004c75b0
+// FUNCTION: CARMA2_SW 0x004c3ce0
+// FUNCTION: CARMA2_CHEAT 0x004cd0d0
+void C2_HOOK_FASTCALL AddRelinkToPipingSession(br_actor* pParent, br_actor* pActor) {
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_chunk_relink, actor, 0x4);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk_relink, old_parent, 0x4);
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_chunk_relink, old_parent, 0x4);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk_relink, new_parent, 0x8);
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_chunk_relink, new_parent, 0x4);
+
+    ARAddVariedDataToSession(ePipe_chunk_relink, (uintptr_t)pActor, 3,
+        SIZE_OFFSET_PIPING(tPipe_chunk_relink, actor), pActor,
+        SIZE_OFFSET_PIPING(tPipe_chunk_relink, old_parent), pActor->parent,
+        SIZE_OFFSET_PIPING(tPipe_chunk_relink, new_parent), pParent);
+}
+
+// FUNCTION: CARMA2_HW 0x004c75d0
+// FUNCTION: CARMA2_SW 0x004c3d00
+// FUNCTION: CARMA2_CHEAT 0x004cd0f0
+void C2_HOOK_FASTCALL AddIdentityToPipingSession(br_actor* pActor) {
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_chunk_identity, actor, 0x4);
+
+    ARAddVariedDataToSession(ePipe_chunk_identity, (uintptr_t)pActor, 1,
+        SIZE_OFFSET_PIPING(tPipe_chunk_identity, actor), pActor);
+}
+
+// FUNCTION: CARMA2_HW 0x004c75f0
+// FUNCTION: CARMA2_SW 0x004c3d20
+// FUNCTION: CARMA2_CHEAT 0x004cd110
+void C2_HOOK_FASTCALL AddSplitWeldToPipingSession(uintptr_t pId, const br_vector4* pPlane, int pSplit) {
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_chunk_split_weld, plane, 0x10);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk_split_weld, split, 0x10);
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_chunk_split_weld, split, 0x4);
+
+    ARAddVariedDataToSession(ePipe_chunk_split_weld, pId, 2,
+        SIZE_OFFSET_PIPING(tPipe_chunk_split_weld, plane), pPlane,
+        SIZE_OFFSET_PIPING(tPipe_chunk_split_weld, split), pSplit);
+}
+
+// FUNCTION: CARMA2_HW 0x004c7820
+// FUNCTION: CARMA2_SW 0x004c3f50
+// FUNCTION: CARMA2_CHEAT 0x004cd340
+void C2_HOOK_FASTCALL AddExplosionToPipingSession(int pIndex, const tExplosion* pExplosion) {
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_chunk_explosion, explosion, 120);
+
+    ARAddVariedDataToSession(ePipe_chunk_explosion, (uintptr_t)pIndex, 1,
+        SIZE_OFFSET_PIPING(tPipe_chunk_explosion, explosion), pExplosion);
+}
+
+#if defined(REC2_MATCHING) && defined(_MSC_VER)
+#pragma inline_depth(0)
+#endif
+
+// FUNCTION: CARMA2_HW 0x004c7840
+// FUNCTION: CARMA2_SW 0x004c3f70
+// FUNCTION: CARMA2_CHEAT 0x004cd360
+void C2_HOOK_FASTCALL AddNonCarCreationToPipingSession(int pIndex) {
+    C2_HOOK_BUG_ON(sizeof(gZero_vector__smash.v[0]) != 0x4);
+
+    ARAddDataToSession(ePipe_chunk_non_car_creation, pIndex, &gZero_vector__smash, sizeof(gZero_vector__smash.v[0]));
+}
+
+#if defined(REC2_MATCHING) && defined(_MSC_VER)
+#pragma inline_depth()
+#endif
+
+// FUNCTION: CARMA2_HW 0x004c7860
+// FUNCTION: CARMA2_SW 0x004c3f90
+// FUNCTION: CARMA2_CHEAT 0x004cd380
+void C2_HOOK_FASTCALL AddSmashModelChangeToPipingSession(br_actor* pActor, br_model* pOld_model, br_model* pNew_model) {
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_chunk_smash_model_change, old_model, 0x4);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk_smash_model_change, new_model, 0x4);
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_chunk_smash_model_change, new_model, 0x4);
+
+    ARAddVariedDataToSession(ePipe_chunk_smash_model_change, (uintptr_t)pActor, 2,
+        SIZE_OFFSET_PIPING(tPipe_chunk_smash_model_change, old_model), pOld_model,
+        SIZE_OFFSET_PIPING(tPipe_chunk_smash_model_change, new_model), pNew_model);
+}
+
+#if defined(REC2_MATCHING) && defined(_MSC_VER)
+#pragma inline_depth(0)
+#endif
+
+// FUNCTION: CARMA2_HW 0x004c78f0
+// FUNCTION: CARMA2_SW 0x004c4020
+// FUNCTION: CARMA2_CHEAT 0x004cd410
+void C2_HOOK_FASTCALL AddSmashDecalToPipingSession(int pIndex) {
+    C2_HOOK_BUG_ON(sizeof(gZero_vector__smash.v[0]) != 0x4);
+
+    ARAddDataToSession(ePipe_chunk_smash_decal, pIndex, &gZero_vector__smash, sizeof(gZero_vector__smash.v[0]));
+}
+
+#if defined(REC2_MATCHING) && defined(_MSC_VER)
+#pragma inline_depth()
+#endif
+
+// FUNCTION: CARMA2_HW 0x004c7910
+// FUNCTION: CARMA2_SW 0x004c4040
+// FUNCTION: CARMA2_CHEAT 0x004cd430
+void C2_HOOK_FASTCALL AddSmashTextureChangeToPipingSession(tCar_spec* pCar_spec, br_material* pMaterial, br_pixelmap* pTexture) {
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_smash_texture_change, car_spec, 0x4);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_smash_texture_change, texture1, 0x8);
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_smash_texture_change, texture1, 0x4);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_smash_texture_change, texture2, 0xc);
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_smash_texture_change, texture2, 0x4);
+
+    ARAddVariedDataToSession(ePipe_smash_texture_change, (uintptr_t)pMaterial, 3,
+        SIZE_OFFSET_PIPING(tPipe_smash_texture_change, car_spec), pCar_spec,
+        SIZE_OFFSET_PIPING(tPipe_smash_texture_change, texture1), pMaterial->colour_map,
+        SIZE_OFFSET_PIPING(tPipe_smash_texture_change, texture2), pTexture);
 }
 
 // FUNCTION: CARMA2_HW 0x004c7940

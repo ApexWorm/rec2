@@ -203,6 +203,22 @@ extern void C2_HOOK_FASTCALL AddFlapToPipingSession(br_actor* pActor, br_angle p
 
 extern void C2_HOOK_FASTCALL AddModelMashToPipingSession(br_model* pModel, br_vector3* pMash);
 
+extern void C2_HOOK_FASTCALL AddRelinkToPipingSession(br_actor* pParent, br_actor* pActor);
+
+extern void C2_HOOK_FASTCALL AddIdentityToPipingSession(br_actor* pActor);
+
+extern void C2_HOOK_FASTCALL AddSplitWeldToPipingSession(uintptr_t pId, const br_vector4* pPlane, int pSplit);
+
+extern void C2_HOOK_FASTCALL AddExplosionToPipingSession(int pIndex, const tExplosion* pExplosion);
+
+extern void C2_HOOK_FASTCALL AddNonCarCreationToPipingSession(int pIndex);
+
+extern void C2_HOOK_FASTCALL AddSmashModelChangeToPipingSession(br_actor* pActor, br_model* pOld_model, br_model* pNew_model);
+
+extern void C2_HOOK_FASTCALL AddSmashDecalToPipingSession(int pIndex);
+
+extern void C2_HOOK_FASTCALL AddSmashTextureChangeToPipingSession(tCar_spec* pCar_spec, br_material* pMaterial, br_pixelmap* pTexture);
+
 extern void C2_HOOK_FASTCALL AddRepulseRayToPipingSession(int pIndex, br_vector3* pOrigin, br_vector3* pVictim, tU32 pTime);
 
 extern void C2_HOOK_FASTCALL AddNapalmBoltToPipingSession(int pIndex, tPedestrian* pPed, br_vector3* pPositions);
