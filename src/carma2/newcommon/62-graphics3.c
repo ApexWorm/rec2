@@ -329,12 +329,12 @@ br_matrix23 gMatrix23_0068c880;
 // GLOBAL: CARMA2_HW 0x0068c878
 // GLOBAL: CARMA2_SW 0x006868d0
 // GLOBAL: CARMA2_CHEAT 0x00694118
-int gINT_0068c878;
+int gHeadup_map_src_x;
 
 // GLOBAL: CARMA2_HW 0x0068c874
 // GLOBAL: CARMA2_SW 0x006868cc
 // GLOBAL: CARMA2_CHEAT 0x00694114
-int gINT_0068c874;
+int gHeadup_map_src_y;
 
 // GLOBAL: CARMA2_HW 0x0068c868
 // GLOBAL: CARMA2_SW 0x006868c0
@@ -1348,11 +1348,11 @@ void C2_HOOK_FASTCALL MapOverlay(void) {
     BrMatrix34ApplyP(&gOrigin_map, &gPlayer_car_master_actor->t.t.translate.t, &gCurrent_race.map_transformation);
     gOrigin_headup_map.v[0] = gOrigin_map.v[0] - (float)(gINT_0074ab94 / 2);
     gOrigin_headup_map.v[1] = gOrigin_map.v[1] - (float)(gINT_0074abec / 2);
-    gINT_0068c878 = (int)(gOrigin_headup_map.v[0] + 0.5);
-    gINT_0068c874 = (int)(gOrigin_headup_map.v[1] + 0.5);
-    if (gINT_0068c878 < 0 || gINT_0068c874 < 0
-        || gINT_0068c878 > gCurrent_race.map_image->width
-        || gINT_0068c874 > gCurrent_race.map_image->height) {
+    gHeadup_map_src_x = (int)(gOrigin_headup_map.v[0] + 0.5);
+    gHeadup_map_src_y = (int)(gOrigin_headup_map.v[1] + 0.5);
+    if (gHeadup_map_src_x < 0 || gHeadup_map_src_y < 0
+        || gHeadup_map_src_x > gCurrent_race.map_image->width
+        || gHeadup_map_src_y > gCurrent_race.map_image->height) {
         BrPixelmapFill(gMap_overlay, 0);
     }
     if (gINT_0074ab94 > gINT_0074abec) {
@@ -1362,8 +1362,8 @@ void C2_HOOK_FASTCALL MapOverlay(void) {
             0,
             0,
             gCurrent_race.map_image,
-            gINT_0068c878,
-            gINT_0068c874 - gMap_overlay_offset_y,
+            gHeadup_map_src_x,
+            gHeadup_map_src_y - gMap_overlay_offset_y,
             gINT_0074ab94,
             gINT_0074ab94);
     } else {
@@ -1373,8 +1373,8 @@ void C2_HOOK_FASTCALL MapOverlay(void) {
             0,
             0,
             gCurrent_race.map_image,
-            gINT_0068c878 - gMap_overlay_offset_x,
-            gINT_0068c874,
+            gHeadup_map_src_x - gMap_overlay_offset_x,
+            gHeadup_map_src_y,
             gINT_0074abec,
             gINT_0074abec);
     }
