@@ -111,15 +111,15 @@ float gPed_damage_per_force;
 // GLOBAL: CARMA2_CHEAT 0x006a37a0
 tExplosion_animation gNapalmed_ped_animation;
 
-// GLOBAL: CARMA2_HW 0x00694230
-// GLOBAL: CARMA2_SW 0x0068e288
-// GLOBAL: CARMA2_CHEAT 0x0069bda8
-int gPed_animal_count;
-
 // GLOBAL: CARMA2_HW 0x0069fdb8
 // GLOBAL: CARMA2_SW 0x00699e10
 // GLOBAL: CARMA2_CHEAT 0x006a7930
 char gPed_animal_names[50][32];
+
+// GLOBAL: CARMA2_HW 0x00694230
+// GLOBAL: CARMA2_SW 0x0068e288
+// GLOBAL: CARMA2_CHEAT 0x0069bda8
+int gPed_animal_count = 0;
 
 // GLOBAL: CARMA2_HW 0x00694234
 // GLOBAL: CARMA2_SW 0x0068e28c
