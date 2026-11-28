@@ -70,7 +70,7 @@ tProximity_ray gProximity_rays[20] = { 0 };
 // GLOBAL: CARMA2_HW 0x00694230
 // GLOBAL: CARMA2_SW 0x0068e288
 // GLOBAL: CARMA2_CHEAT 0x0069bda8
-int gINT_00694230 = 0;
+int gPed_animal_count = 0;
 
 // GLOBAL: CARMA2_HW 0x00694234
 // GLOBAL: CARMA2_SW 0x0068e28c
