@@ -708,11 +708,18 @@ void C2_HOOK_FASTCALL SetListDoingNothingFlag(tPhysics_object* pObject, int pFla
     }
 }
 
-// STUB: CARMA2_HW 0x004b9e40
-// STUB: CARMA2_SW 0x004b6560
-// STUB: CARMA2_CHEAT 0x004bf970
+// FUNCTION: CARMA2_HW 0x004b9e40
+// FUNCTION: CARMA2_SW 0x004b6560
+// FUNCTION: CARMA2_CHEAT 0x004bf970
 void C2_HOOK_FASTCALL SetGroupDoingNothingFlag(tPhysics_object* pObject, int pFlag) {
-    NOT_IMPLEMENTED();
+    tPhysics_object* object;
+
+    pObject->disable_move_rotate = pFlag;
+    object = pObject;
+    do {
+        SetHierarchyDoingNothingFlag(object, pFlag);
+        object = object->field183_0x1d8;
+    } while (object != NULL && object != pObject);
 }
 
 // FUNCTION: CARMA2_HW 0x004b9ef0
@@ -1817,10 +1824,10 @@ void C2_HOOK_FASTCALL InitPhysics(void) {
 
 // PointOutOfSightNotAR (moved to 51-smash for inlining purposes)
 
-// CalcCollObjIDFromCarSpec
+// CalcCollObjIDFromCarSpec (moved to 51-smash for inlining purposes)
 
-// CalcCollObjID
+// CalcCollObjID (moved to 51-smash for inlining purposes)
 
-// GetCarSpecFromCollObjID
+// GetCarSpecFromCollObjID (moved to 51-smash for inlining purposes)
 
-// GetCollObjFromID
+// GetCollObjFromID (moved to 51-smash for inlining purposes)

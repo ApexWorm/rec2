@@ -35,7 +35,7 @@
 // GLOBAL: CARMA2_CHEAT 0x006b3588
 tU32 last_service;
 
-/* FIXME: name and file unknown; only NonCarCalcForce uses it */
+/* FIXME: name and file unknown */
 // GLOBAL: CARMA2_HW 0x00661678
 // GLOBAL: CARMA2_SW 0x0065bfd0
 // GLOBAL: CARMA2_CHEAT 0x00668eb0
@@ -1371,6 +1371,7 @@ void C2_HOOK_FASTCALL DRModelUpdateAndKevificateMaterials(br_model* pModel, br_u
 }
 
 // FUNCTION: CARMA2_HW 0x00516010
+// FUNCTION: CARMA2_SW 0x00511480
 // FUNCTION: CARMA2_CHEAT 0x0051ba30
 int C2_HOOK_FASTCALL DRModelUpdateDeluxTurbo(br_actor* pActor, br_model* pModel, br_uint_16 pFlags) {
 
