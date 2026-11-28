@@ -204,7 +204,7 @@ int gCount_queued_smashes = 0;
 // GLOBAL: CARMA2_HW 0x006a8290
 // GLOBAL: CARMA2_SW 0x006a22f0
 // GLOBAL: CARMA2_CHEAT 0x006afe08
-int gINT_006a8290 = 0;
+int gSmash_environment_count = 0;
 
 // GLOBAL: CARMA2_HW 0x006a8294
 // GLOBAL: CARMA2_SW 0x006a22f4
@@ -214,7 +214,7 @@ int gDoing_net_smash = 0;
 // GLOBAL: CARMA2_HW 0x006a829c
 // GLOBAL: CARMA2_SW 0x006a22fc
 // GLOBAL: CARMA2_CHEAT 0x006afe14
-int gINT_006a829c = 0;
+int gShrapnel_counter = 0;
 
 // GLOBAL: CARMA2_HW 0x006a4698
 // GLOBAL: CARMA2_SW 0x0069e6f8
@@ -1101,11 +1101,11 @@ void C2_HOOK_FASTCALL DoShrapnel(tCar_crush_smashable_part* pSmashable, tShrapne
         /* FIXME: the original passes the matrix in the bounds argument for ghost parts */
         PipeSingleShrapnelShower(pId, pTime, pSeed, pSmashable, pVelocity, pDirection, pForce, pPosition, pAlternate_position,
             pShrapnel, (br_bounds3*)pMat, pActor, &mat, pSource_position, gVector3_006b78a0);
-        gINT_006a829c++;
+        gShrapnel_counter++;
     } else if (pShrapnel->type == kShrapnelType_Shards) {
         PipeSingleShrapnelShower(pId, pTime, pSeed, pSmashable, pVelocity, pDirection, pForce, pPosition, pAlternate_position,
             pShrapnel, pBounds, pActor, pMat, pSource_position, gVector3_006b78a0);
-        gINT_006a829c++;
+        gShrapnel_counter++;
     }
 }
 
@@ -1600,7 +1600,7 @@ inline void C2_HOOK_FASTCALL SmashItIntoVerySmallPiecesIndeed(tCar_spec* pCar, t
         BrActorToActorMatrix34(&mat, pActor, gUniverse_actor);
         ActuallySmashPart(pCar, pSmashable, pLevel);
         DoConnotationsMultiLevel(pObject, pSpec, pSmashable, &pSmashable->levels[pLevel].connotations, seed,
-            pVelocity, pPosition, pPosition, pActor, the_time, gINT_006a829c, &mat, old_level, pLevel, pForce, pNo_side_effects);
+            pVelocity, pPosition, pPosition, pActor, the_time, gShrapnel_counter, &mat, old_level, pLevel, pForce, pNo_side_effects);
         if (pSmashable->funk_material != NULL && pSmashable->funk_material->identifier != NULL) {
             switch (pSmashable->levels[pSmashable->field_0x4c].collision_type) {
             case kTextureLevelCollisionChange_Solid:
@@ -3672,7 +3672,7 @@ float C2_HOOK_FASTCALL BashModel(tSmashable_item_spec* pSpec, tPhysics_object* p
         *pSmashed = 1;
         BrActorToActorMatrix34(&mat, pActor, gUniverse_actor);
         DoConnotations(pObject, pSpec, NULL, &pSpec->mode_data.shrapnel.connotations, seed, &velocity, &pActor->t.t.translate.t, pPosition,
-            pActor, the_time, gINT_006a829c, &mat, &bounds, &gZero_vector__smash, pMagnitude, pForce, pNetwork);
+            pActor, the_time, gShrapnel_counter, &mat, &bounds, &gZero_vector__smash, pMagnitude, pForce, pNetwork);
     }
     return result;
 }
@@ -3842,7 +3842,7 @@ float C2_HOOK_FASTCALL SmashEnvironment(tPhysics_object* pObject, tFace_ref* pFa
         && pFace->material->identifier != NULL
         && strlen(pFace->material->identifier) == 11
         && pFace->material->identifier[5] == '|') {
-        gINT_006a8290 = 0;
+        gSmash_environment_count = 0;
         material = pFace->material;
         spec = &gTrack_smashable_environment_specs[(tU8)material->identifier[6] - 1];
         if ((pSnap && (spec->flags & 0x2)) || (!pSnap && (spec->flags & 0x1))) {
@@ -3863,7 +3863,7 @@ float C2_HOOK_FASTCALL SmashEnvironment(tPhysics_object* pObject, tFace_ref* pFa
             result = spec->mode_data.shrapnel.removal_threshold;
             BrActorToActorMatrix34(&mat, pFace->a, gUniverse_actor);
             DoConnotations(pObject, spec, NULL, &spec->mode_data.shrapnel.connotations, seed, &velocity, pPosition, pPosition, pFace->a,
-                the_time, gINT_006a829c, &mat, NULL, &pFace->normal, pMagnitude, pForce, pNetwork);
+                the_time, gShrapnel_counter, &mat, NULL, &pFace->normal, pMagnitude, pForce, pNetwork);
             if (!pNetwork) {
                 SendNetSmash(pObject, pFace, pMagnitude, pPosition, pNormal, pForce, pSnap);
             }

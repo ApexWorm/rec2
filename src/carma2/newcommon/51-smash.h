@@ -29,7 +29,7 @@ extern int gCapacity_track_smashable_environment_specs;
 extern int gCount_track_smashable_environment_specs_2;
 extern tStored_smash* gNet_host_smashes;
 extern tQueued_net_smash gQueued_net_smashes[50];
-extern int gINT_006a8290;
+extern int gSmash_environment_count;
 extern int gDoing_net_smash;
 extern tPowerup_queue_item gPowerup_queue[50];
 extern int gSize_powerup_queue;
@@ -40,7 +40,7 @@ extern br_vector3 gZero_vector__smash;
 extern tDecal gDecals[50];
 extern int gCount_queued_smashes;
 
-extern int gINT_006a829c;
+extern int gShrapnel_counter;
 extern tSmash_explosion gSmash_explosions[20];
 
 typedef struct {
