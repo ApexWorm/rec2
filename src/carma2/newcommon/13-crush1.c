@@ -2671,8 +2671,6 @@ intptr_t C2_HOOK_FASTCALL BendModels(br_actor* pActor, br_vector3* pTranslation,
     return 0;
 }
 
-extern br_scalar C2_HOOK_FASTCALL BrAngleToSignedDegree(br_angle pAngle);
-
 inline br_scalar C2_HOOK_FASTCALL BrAngleToSignedDegree(br_angle pAngle) {
     br_scalar degrees;
 
