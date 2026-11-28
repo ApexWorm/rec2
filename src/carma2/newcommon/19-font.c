@@ -639,6 +639,7 @@ void C2_HOOK_FASTCALL DisposeInterfaceFonts(void) {
 }
 
 // FUNCTION: CARMA2_HW 0x00464290
+// FUNCTION: CARMA2_SW 0x00463cf0
 // FUNCTION: CARMA2_CHEAT 0x00464700
 void C2_HOOK_FASTCALL RemovePolyFont(int pFont) {
     int i;
