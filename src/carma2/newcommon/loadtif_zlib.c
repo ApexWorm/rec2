@@ -61,6 +61,7 @@ void* C2_HOOK_CDECL ZlibFsOpenWrite(const char* path, int type) {
 
 // FUNCTION: CARMA2_HW 0x0051dba0
 // FUNCTION: CARMA2_SW 0x00519240
+// FUNCTION: CARMA2_CHEAT 0x00523790
 void C2_HOOK_CDECL ZlibFsClose(void* context) {
 
     gzclose(context);
@@ -75,6 +76,7 @@ int C2_HOOK_CDECL ZlibFsEof(void* context) {
 
 // FUNCTION: CARMA2_HW 0x0051db40
 // FUNCTION: CARMA2_SW 0x005191e0
+// FUNCTION: CARMA2_CHEAT 0x00523730
 int C2_HOOK_CDECL ZlibFsGetChr(void* context) {
     char chr;
 
@@ -119,6 +121,7 @@ br_size_t C2_HOOK_CDECL ZlibFsWrite(const void* buffer, br_size_t elem_size, uns
 
 // FUNCTION: CARMA2_HW 0x0051dbc0
 // FUNCTION: CARMA2_SW 0x00519260
+// FUNCTION: CARMA2_CHEAT 0x005237b0
 br_size_t C2_HOOK_CDECL ZlibFsGetLine(char* buffer, br_size_t capacity, void* context) {
     char char_buffer[1];
     int chr;
@@ -154,6 +157,7 @@ void C2_HOOK_CDECL ZlibFsPutLine(char* line, void* context) {
 
 // FUNCTION: CARMA2_HW 0x0051db60
 // FUNCTION: CARMA2_SW 0x00519200
+// FUNCTION: CARMA2_CHEAT 0x00523750
 void C2_HOOK_CDECL ZlibFsAdvance(br_size_t advance, void* context) {
     char buffer[1];
 

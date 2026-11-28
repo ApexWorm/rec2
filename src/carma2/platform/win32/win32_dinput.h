@@ -18,6 +18,7 @@ extern int gASCII_table[151];
 extern int gASCII_shift_table[151];
 extern int gScan_code[256];
 extern int gJoystick_deadzone;
+extern int gForceFeedbackAvailable;
 
 extern void C2_HOOK_FASTCALL KeyBegin(void);
 
@@ -90,6 +91,8 @@ extern void C2_HOOK_FASTCALL PDPlayFFBEffect(const char* effectName);
 extern int C2_HOOK_FASTCALL PDIsJoystickDPadEnabled(void);
 
 extern void C2_HOOK_FASTCALL UnloadDinputFFBEffectAtIndex(int index);
+
+extern tJoystick_force_effect* C2_HOOK_FASTCALL GetJoystickEffect(int pIndex);
 
 extern void C2_HOOK_FASTCALL DownloadDinputFFBEffectAtIndex(int index);
 
