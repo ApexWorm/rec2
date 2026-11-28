@@ -21,6 +21,7 @@ extern int gEdge_trigger_mode;
 extern tMouse_coord gCurrent_mouse_position;
 extern tU32 gLast_roll;
 extern int gCurrent_cursor;
+extern int gInsert_mode;
 extern tRolling_letter* gRolling_letters;
 extern int gLetter_x_coords[15];
 extern int gVisible_length;
@@ -93,6 +94,22 @@ extern void C2_HOOK_FASTCALL StopTyping(int pSlot_index);
 extern void C2_HOOK_FASTCALL RevertTyping(int pSlot_index, char* pRevert_str);
 
 extern void C2_HOOK_FASTCALL StartTyping(int pSlot_index, char* pText, int pVisible_length);
+
+extern void C2_HOOK_FASTCALL SetRollingCursor(int pSlot_index);
+
+extern void C2_HOOK_FASTCALL DoRLBackspace(int pSlot_index);
+
+extern void C2_HOOK_FASTCALL DoRLDelete(int pSlot_index);
+
+extern void C2_HOOK_FASTCALL DoRLInsert(int pSlot_index);
+
+extern void C2_HOOK_FASTCALL DoRLCursorLeft(int pSlot_index);
+
+extern void C2_HOOK_FASTCALL DoRLCursorRight(int pSlot_index);
+
+extern void C2_HOOK_FASTCALL DoRLTypeLetter(int pChar, int pSlot_index);
+
+extern void C2_HOOK_FASTCALL TypeKey(int pSlot_index, char pKey);
 
 extern void C2_HOOK_FASTCALL SetSlotXY(int pSlot_index, int pX_coord, int pY_coord);
 

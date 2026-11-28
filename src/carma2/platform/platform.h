@@ -55,6 +55,8 @@ extern void C2_HOOK_FASTCALL PDInitTimer(void);
 
 extern tU32 C2_HOOK_FASTCALL PDGetTotalTime(void);
 
+extern int C2_HOOK_FASTCALL PDGetASCIIFromKey(int pKey);
+
 extern int C2_HOOK_FASTCALL PDGetMicroseconds(void);
 
 extern void C2_HOOK_FASTCALL PDScreenBufferSwap(int pRendering_area_only);

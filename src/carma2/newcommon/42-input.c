@@ -12,6 +12,7 @@
 
 #include "41-utility.h"
 #include "25-grafdata.h"
+#include "52-errors.h"
 #include "platform.h"
 #include "rec2_macros.h"
 
@@ -68,6 +69,11 @@ tU32 gLast_roll;
 // GLOBAL: CARMA2_SW 0x00686188
 // GLOBAL: CARMA2_CHEAT 0x006939e0
 int gCurrent_cursor;
+
+// GLOBAL: CARMA2_HW 0x0068c1cc
+// GLOBAL: CARMA2_SW 0x00686214
+// GLOBAL: CARMA2_CHEAT 0x00693a6c
+int gInsert_mode;
 
 // GLOBAL: CARMA2_HW 0x0068be88
 // GLOBAL: CARMA2_SW 0x00685ed0
@@ -787,6 +793,144 @@ void C2_HOOK_FASTCALL StartTyping(int pSlot_index, char* pText, int pVisible_len
     gCurrent_position = (int)strlen(gCurrent_typing);
     gVisible_length = pVisible_length;
     gCurrent_cursor = ChangeCharTo(pSlot_index, gCurrent_position, ROLLING_LETTER_LOOP_RANDOM);
+}
+
+inline void C2_HOOK_FASTCALL SetRollingCursor(int pSlot_index) {
+
+    gCurrent_cursor = ChangeCharTo(pSlot_index, gCurrent_position, ROLLING_LETTER_LOOP_RANDOM);
+}
+
+inline void C2_HOOK_FASTCALL DoRLBackspace(int pSlot_index) {
+    int i;
+    int new_len;
+
+    if (gCurrent_position != 0) {
+        if ((size_t)gCurrent_position == strlen(gCurrent_typing)) {
+            ChangeCharTo(pSlot_index, (int)strlen(gCurrent_typing), ' ');
+        } else {
+            ChangeCharTo(pSlot_index, (int)strlen(gCurrent_typing) - 1, ' ');
+        }
+        new_len = (int)strlen(gCurrent_typing) - 1;
+        for (i = gCurrent_position - 1; i < new_len; i++) {
+            gCurrent_typing[i] = gCurrent_typing[i + 1];
+            ChangeCharTo(pSlot_index, i, gCurrent_typing[i]);
+        }
+        gCurrent_typing[new_len] = '\0';
+        gCurrent_position = gCurrent_position - 1;
+        SetRollingCursor(pSlot_index);
+    }
+}
+
+inline void C2_HOOK_FASTCALL DoRLDelete(int pSlot_index) {
+    int i;
+    int new_len;
+
+    if ((size_t)gCurrent_position < strlen(gCurrent_typing) - 1) {
+        ChangeCharTo(pSlot_index, (int)strlen(gCurrent_typing) - 1, ' ');
+        new_len = (int)strlen(gCurrent_typing) - 1;
+        for (i = gCurrent_position; new_len > i; i++) {
+            gCurrent_typing[i] = gCurrent_typing[i + 1];
+            ChangeCharTo(pSlot_index, i, gCurrent_typing[i]);
+        }
+        gCurrent_typing[new_len] = '\0';
+        SetRollingCursor(pSlot_index);
+    }
+}
+
+inline void C2_HOOK_FASTCALL DoRLInsert(int pSlot_index) {
+
+    if (gInsert_mode) {
+        gInsert_mode = 0;
+    } else {
+        gInsert_mode = 1;
+    }
+}
+
+inline void C2_HOOK_FASTCALL DoRLCursorLeft(int pSlot_index) {
+
+    if (gCurrent_position != 0) {
+        if ((size_t)gCurrent_position == strlen(gCurrent_typing)) {
+            ChangeCharTo(pSlot_index, (int)strlen(gCurrent_typing), ' ');
+        } else {
+            ChangeCharTo(pSlot_index, gCurrent_position, gCurrent_typing[gCurrent_position]);
+        }
+        gCurrent_position--;
+        SetRollingCursor(pSlot_index);
+    }
+}
+
+inline void C2_HOOK_FASTCALL DoRLCursorRight(int pSlot_index) {
+
+    if ((size_t)gCurrent_position < strlen(gCurrent_typing)) {
+        ChangeCharTo(pSlot_index, gCurrent_position, gCurrent_typing[gCurrent_position]);
+        gCurrent_position++;
+        SetRollingCursor(pSlot_index);
+    }
+}
+
+inline void C2_HOOK_FASTCALL DoRLTypeLetter(int pChar, int pSlot_index) {
+    int i;
+    int new_len;
+
+    if (pChar < ' ') {
+        return;
+    }
+    if (gInsert_mode) {
+        new_len = (int)strlen(gCurrent_typing) + 1;
+        if (new_len > 100) {
+            new_len = 100;
+            FUN_0044c690(-1);
+        }
+        for (i = new_len - 1; i > gCurrent_position; i--) {
+            gCurrent_typing[i] = gCurrent_typing[i - 1];
+            ChangeCharTo(pSlot_index, i, gCurrent_typing[i]);
+        }
+    } else if ((size_t)gCurrent_position == strlen(gCurrent_typing)) {
+        new_len = (int)strlen(gCurrent_typing) + 1;
+    } else {
+        new_len = (int)strlen(gCurrent_typing);
+    }
+    if (new_len > 100) {
+        new_len = 100;
+        FUN_0044c690(-1);
+    }
+    gCurrent_typing[new_len] = '\0';
+    if (gCurrent_position > new_len - 1) {
+        gCurrent_position = new_len - 1;
+    }
+    gCurrent_typing[gCurrent_position] = pChar;
+    ChangeCharTo(pSlot_index, gCurrent_position, pChar);
+    gCurrent_position++;
+    SetRollingCursor(pSlot_index);
+}
+
+// FUNCTION: CARMA2_HW 0x004841e0
+// FUNCTION: CARMA2_SW 0x00481320
+// FUNCTION: CARMA2_CHEAT 0x00484500
+void C2_HOOK_FASTCALL TypeKey(int pSlot_index, char pKey) {
+
+    switch (pKey) {
+    case 50:
+        DoRLBackspace(pSlot_index);
+        return;
+    case 65:
+        DoRLDelete(pSlot_index);
+        return;
+    case 64:
+        DoRLInsert(pSlot_index);
+        return;
+    case 70:
+        DoRLCursorLeft(pSlot_index);
+        return;
+    case 71:
+        DoRLCursorRight(pSlot_index);
+        return;
+    case 47:
+        return;
+    default:
+        DoRLTypeLetter(PDGetASCIIFromKey(pKey), pSlot_index);
+        return;
+    }
 }
 
 // FUNCTION: CARMA2_HW 0x00484510
