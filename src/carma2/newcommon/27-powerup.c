@@ -2733,6 +2733,27 @@ br_actor* C2_HOOK_FASTCALL CreateBillBoard(br_pixelmap* pTexture) {
     return actor;
 }
 
+// FUNCTION: CARMA2_HW 0x004e0ba0
+// FUNCTION: CARMA2_SW 0x004dcec0
+// FUNCTION: CARMA2_CHEAT 0x004e6760
+void C2_HOOK_FASTCALL FUN_004e0ba0(br_actor* pActor) {
+
+    if (pActor != NULL) {
+        if (pActor->material != NULL) {
+            BrMaterialRemove(pActor->material);
+            BrMaterialFree(pActor->material);
+        }
+        if (pActor->model != NULL) {
+            BrModelRemove(pActor->model);
+            BrModelFree(pActor->model);
+        }
+        if (pActor->parent != NULL) {
+            BrActorRemove(pActor);
+        }
+        BrActorFree(pActor);
+    }
+}
+
 // FUNCTION: CARMA2_HW 0x004e0c00
 // FUNCTION: CARMA2_SW 0x004dcf20
 // FUNCTION: CARMA2_CHEAT 0x004e67c0
@@ -2839,4 +2860,11 @@ void C2_HOOK_FASTCALL PeriodicCloaking(void) {
             DoCamouflageThing(gCloaked_cars[i]);
         }
     }
+}
+
+// FUNCTION: CARMA2_HW 0x004e0e20
+// FUNCTION: CARMA2_SW 0x004dd140
+// FUNCTION: CARMA2_CHEAT 0x004e69e0
+void C2_HOOK_FASTCALL FUN_004e0e20(void) {
+
 }

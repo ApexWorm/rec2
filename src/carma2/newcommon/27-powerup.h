@@ -430,6 +430,8 @@ extern void C2_HOOK_FASTCALL PrintPowerupIconIn3D(int pX, int pY, tHeadup_icon* 
 
 extern br_actor* C2_HOOK_FASTCALL CreateBillBoard(br_pixelmap* pTexture);
 
+extern void C2_HOOK_FASTCALL FUN_004e0ba0(br_actor* pActor);
+
 extern void C2_HOOK_FASTCALL SetDefaultPowerupFilename(void);
 
 extern void C2_HOOK_FASTCALL ConfigureBloodPedPowerupTxtPath(void);
@@ -447,5 +449,7 @@ extern int C2_HOOK_FASTCALL IsCarCloaked(tCar_spec* pCar);
 extern void C2_HOOK_FASTCALL TurnOffCloaking(tPowerup* pPowerup, tCar_spec* pCar);
 
 // PeriodicCloaking
+
+extern void C2_HOOK_FASTCALL FUN_004e0e20(void);
 
 #endif // GUARD_27_POWERUP_H
