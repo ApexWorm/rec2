@@ -459,14 +459,32 @@ void C2_HOOK_FASTCALL SetIntegerMapRenders(void) {
 #endif
 }
 
-// OppositeColour
+inline int C2_HOOK_FASTCALL OppositeColour(int pColour) {
+    int brightness;
+
+    if (pColour < 0xe0) {
+        brightness = pColour & 0x7;
+        if (brightness < 4) {
+            pColour = 0xff;
+        } else {
+            pColour = 0;
+        }
+    } else {
+        brightness = pColour & 0xf;
+        if (brightness < 8) {
+            pColour = 0xff;
+        } else {
+            pColour = 0;
+        }
+    }
+    return pColour;
+}
 
 // FUNCTION: CARMA2_HW 0x00495a00
-// STUB: CARMA2_SW 0x00492400
+// FUNCTION: CARMA2_SW 0x00492400
 // FUNCTION: CARMA2_CHEAT 0x00495c70
 void C2_HOOK_FASTCALL DrawArrow(br_pixelmap* pScreen, br_uint_32 pArrow_index, const br_vector3* pPos, br_uint_32 pColour) {
     int colours[2];
-    int colour;
     int x;
     int y;
     int temp;
@@ -483,19 +501,7 @@ void C2_HOOK_FASTCALL DrawArrow(br_pixelmap* pScreen, br_uint_32 pArrow_index, c
         colours[1] = 0x84;
     } else {
         colours[0] = pColour;
-        if ((int)pColour < 0xe0) {
-            if ((int)(pColour & 0x7) < 4) {
-                colours[1] = 0xff;
-            } else {
-                colours[1] = 0;
-            }
-        } else {
-            if ((int)(pColour & 0xf) < 8) {
-                colours[1] = 0xff;
-            } else {
-                colours[1] = 0;
-            }
-        }
+        colours[1] = OppositeColour(pColour);
     }
 #ifdef REC2_HW
     if (gBack_screen->type != BR_PMT_INDEX_8) {
@@ -510,7 +516,6 @@ void C2_HOOK_FASTCALL DrawArrow(br_pixelmap* pScreen, br_uint_32 pArrow_index, c
         arrow_ptr = &gArrows[i][pArrow_index & 0x3][0];
         point_count = *arrow_ptr++;
         for (j = 0; j < point_count; j++) {
-            colour = colours[i];
             if (pArrow_index & 0x8) {
                 x = -*arrow_ptr++;
                 y = -*arrow_ptr++;
@@ -519,11 +524,11 @@ void C2_HOOK_FASTCALL DrawArrow(br_pixelmap* pScreen, br_uint_32 pArrow_index, c
                 y = *arrow_ptr++;
             }
             if (pArrow_index & 0x4) {
-                temp = x;
-                x = -y;
-                y = temp;
+                temp = y;
+                y = x;
+                x = -temp;
             }
-            BrPixelmapPixelSet(pScreen, (int)(pPos->v[0] + x), (int)(pPos->v[1] + y), colour);
+            BrPixelmapPixelSet(pScreen, (int)(pPos->v[0] + x), (int)(pPos->v[1] + y), colours[i]);
         }
     }
 }

@@ -53,7 +53,7 @@ extern void C2_HOOK_FASTCALL InitTargetLock(void);
 
 extern void C2_HOOK_FASTCALL SetIntegerMapRenders(void);
 
-// OppositeColour
+extern int C2_HOOK_FASTCALL OppositeColour(int pColour);
 
 extern void C2_HOOK_FASTCALL DrawArrow(br_pixelmap* pScreen, br_uint_32 pArrow_index, const br_vector3* pPos, br_uint_32 pColour);
 
