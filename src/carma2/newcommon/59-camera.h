@@ -34,6 +34,8 @@ extern tCar_spec* C2_HOOK_FASTCALL GetRaceLeader(void);
 
 extern void C2_HOOK_FASTCALL ViewNetPlayer(void);
 
+extern void C2_HOOK_FASTCALL FUN_0040e530(br_actor* pActor);
+
 extern void C2_HOOK_FASTCALL ViewOpponent(void);
 
 extern void C2_HOOK_FASTCALL ReallyViewOpponent(void);
