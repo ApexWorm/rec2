@@ -783,6 +783,7 @@ typedef enum {
     ePipe_chunk_smash_decal = 35,
     ePipe_smash_texture_change = 36,
     ePipe_chunk_repulse_ray = 37,
+    ePipe_chunk_actor_trans = 39,
     ePipe_chunk_ped_status = 40,
     ePipe_chunk_ped_dir = 41,
     ePipe_chunk_ped_move = 42,

@@ -205,6 +205,54 @@ extern void C2_HOOK_FASTCALL AddModelMashToPipingSession(br_model* pModel, br_ve
 
 extern void C2_HOOK_FASTCALL AddRepulseRayToPipingSession(int pIndex, br_vector3* pOrigin, br_vector3* pVictim, tU32 pTime);
 
+extern void C2_HOOK_FASTCALL AddActorTransToPipingSession(br_actor* pActor, br_vector3* pDelta);
+
+extern void C2_HOOK_FASTCALL AddPedStatusToPipingSession(const tPedestrian* pPed, tS8 pArg2, tS8 pArg3, tS8 pArg4, tS8 pArg5, tS8 pArg6, tU8 pArg7, tS8 pArg8, tU8 pArg9, const br_vector3* pArg10, const br_vector3* pArg11, const br_matrix34* pArg12);
+
+extern void C2_HOOK_FASTCALL AddPedDirToPipingSession(int pId, const br_vector3* pDir);
+
+extern void C2_HOOK_FASTCALL AddPedMoveToPipingSession(tPedestrian* pPed, tS16 pArg2, tS16 pOriginal_move_id, tS16 pMove_id, float pOriginal_speed, float pSpeed, int pArg7, int pArg8, br_vector3* pOriginal_pos, br_vector3* pPos, int pOriginal_action, int pAction, br_matrix34* pMatrix);
+
+extern void C2_HOOK_FASTCALL AddPedPhysicsToPipingSession(int pId, br_matrix34* pMat);
+
+extern void C2_HOOK_FASTCALL AddPedDismemberToPipingSession(tPedestrian* pPed, tU8 pBone_index, tS8 pOld_value, tS8 pNew_value);
+
+extern void C2_HOOK_FASTCALL AddPedFPChangeToPipingSession(tPedestrian* pPed, float pOld_speed, float pNew_speed);
+
+extern void C2_HOOK_FASTCALL AddPedPosToPipingSession(const tPedestrian* pPed, const br_vector3* pPos, const br_vector3* pVelocity);
+
+extern void C2_HOOK_FASTCALL AddPedModelChangeToPipingSession(tPedestrian* pPed, int pBone_index, br_model* pOld_model, int pModel_index, int pOld_model_set, int pModel_set);
+
+extern void C2_HOOK_FASTCALL AddPHILObjectToPipingSession(tPhysics_object* pObject);
+
+extern void C2_HOOK_FASTCALL AddGibShowerToPipingSession(uintptr_t pId, tU32 pTime, tU32 pUid, float pForce, undefined4 pArg5, const br_vector3* pPos1, const br_vector3* pPos2, const br_vector3* pV);
+
+extern void C2_HOOK_FASTCALL AddBloodSpurtToPipingSession(uintptr_t pId, tU32 pTime, tU32 pSeed, const br_vector3* pPosition, const br_vector3* pImpactee_velocity, const br_vector3* pNormal);
+
+extern void C2_HOOK_FASTCALL AddGrooveOnOffToPipingSession(int pOn, br_actor* pActor, int pBlock_flags);
+
+extern void C2_HOOK_FASTCALL AddPowerupGotToPipingSession(tPowerup* pPowerup, tCar_spec* pCar_spec);
+
+extern void C2_HOOK_FASTCALL AddPowerupLoseToPipingSession(tPowerup* pPowerup, tCar_spec* pCar_spec);
+
+extern void C2_HOOK_FASTCALL AddFunkEnableToPipingSession(int pIndex, tU16 pFlags);
+
+extern void C2_HOOK_FASTCALL AddVanishedDismemberedToPipingSession(const tPedestrian* pPed, tU32 pOld_value, tU32 pNew_value);
+
+extern void C2_HOOK_FASTCALL AddDSModelToPipingSession(int pDouble_sided, void* pThing);
+
+extern void C2_HOOK_FASTCALL AddPedDiagnosticToPipingSession(tPedestrian* pPed);
+
+extern void C2_HOOK_FASTCALL AddVector3ToPipingSession(br_vector3* pDest, br_vector3* pValue);
+
+extern void C2_HOOK_FASTCALL AddDroneRenderToPipingSession(tDrone_spec* pDrone_spec, int pRender);
+
+extern void C2_HOOK_FASTCALL AddDroneCornerPosToPipingSession(tDrone_spec* pDrone, tU16 pField_0x48, tU16 pField_0x74, tU16 pField_0x70, tCompressed_matrix34* pMatrix);
+
+extern void C2_HOOK_FASTCALL AddDroneStraightPosToPipingSession(tDrone_spec* pDrone, tDrone_path_node_section* pSection, tU16 pSpeed, tU16 pDistance);
+
+extern void C2_HOOK_FASTCALL AddDroneUnusedToPipingSession(undefined4 pArg1, undefined4 pArg2, undefined4 pArg3);
+
 extern void C2_HOOK_FASTCALL AddNapalmBoltToPipingSession(int pIndex, tPedestrian* pPed, br_vector3* pPositions);
 
 // PipeSingleCrush
@@ -258,6 +306,8 @@ extern void C2_HOOK_FASTCALL PipeSingleSmashDecal(int pIndex);
 extern void C2_HOOK_FASTCALL PipeSingleSmashTextureChange(tCar_spec* pCar_spec, br_material* pMaterial, br_pixelmap* pTexture);
 
 extern void C2_HOOK_FASTCALL PipeSingleRepulseRay(int pIndex, br_vector3* pOrigin, br_vector3* pVictim, tU32 pTime);
+
+extern void C2_HOOK_FASTCALL PipeSingleActorTrans(br_actor* pActor, br_vector3* pDelta);
 
 extern void C2_HOOK_FASTCALL PipeSinglePedStatus(const tPedestrian* pPed, tS8 pArg2, tS8 pArg3, tS8 pArg4, tS8 pArg5, tS8 pArg6, tU8 pArg7, tS8 pArg8, tU8 pArg9, const br_vector3* pArg10, const br_vector3* pArg11, const br_matrix34* pArg12);
 
