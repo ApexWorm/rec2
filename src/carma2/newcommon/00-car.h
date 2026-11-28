@@ -177,7 +177,7 @@ extern void C2_HOOK_FASTCALL NonCarCalcForce(tNon_car_spec* pNon_car, br_scalar 
 
 extern int C2_HOOK_FASTCALL ProcessForcesCallback(void* pArg1, float *pArg2, int pArg3);
 
-extern int C2_HOOK_FASTCALL ProcessJointForcesCallBack(void* pArg1, void* pArg2, void* pArg3);
+extern int C2_HOOK_FASTCALL ProcessJointForcesCallBack(tPhysics_joint_force** pForces, br_scalar* pImpulses, int pCount);
 
 // MultiFindFloorInBoxM
 

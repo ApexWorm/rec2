@@ -1263,7 +1263,7 @@ int C2_HOOK_FASTCALL ProcessForcesCallback(void* pArg1, float *pArg2, int pArg3)
 
 // FUNCTION: CARMA2_HW 0x0041e310
 // FUNCTION: CARMA2_SW 0x0041e340
-int C2_HOOK_FASTCALL ProcessJointForcesCallBack(void* pArg1, void* pArg2, void* pArg3) {
+int C2_HOOK_FASTCALL ProcessJointForcesCallBack(tPhysics_joint_force** pForces, br_scalar* pImpulses, int pCount) {
 
     return 0;
 }

@@ -4612,13 +4612,14 @@ typedef struct tPhysics_quick_hinge {
     br_matrix34 field_0x38;
 } tPhysics_quick_hinge;
 
-typedef struct tPhysics_workspace {
+/* FIXME: name and layout are guesses. */
+typedef struct tForce_group {
     int count;
     tPhysics_joint_force* forces;
     undefined field_0x8[12];
-    br_scalar* field_0x14;
-    br_scalar* field_0x18;
-} tPhysics_workspace;
+    br_scalar* orthogonal;
+    br_scalar* matrix;
+} tForce_group;
 
 typedef struct tPhysics_object {
     br_actor* actor;
@@ -4673,7 +4674,7 @@ typedef struct tPhysics_object {
     undefined field_0x1e1[3];
     tPhysics_quick_hinge* field_0x1e4;
     br_matrix34 field_0x1e8;
-    struct tPhysics_workspace* field_0x218;
+    tForce_group* field_0x218;
     float field_0x21c;
     tPhysics_object* next;
     tPhysics_object* child;
@@ -4778,15 +4779,6 @@ typedef struct {
     int capacity;
     undefined4 field_0x8;
 } tCrush_info_buffer;
-
-/* FIXME: name and layout are guesses. */
-typedef struct tForce_group {
-    int count;
-    tPhysics_joint_force* forces;
-    undefined field_0x8[12];
-    br_scalar* orthogonal;
-    br_scalar* matrix;
-} tForce_group;
 
 typedef struct {
     int count;
@@ -5626,7 +5618,7 @@ typedef struct {
 
 typedef struct tWorld_callbacks {
     int (C2_HOOK_FASTCALL * process_forces)(void*, float*, int arg3);
-    int (C2_HOOK_FASTCALL * process_joint_forces)(void*, void*, void*);
+    int (C2_HOOK_FASTCALL * process_joint_forces)(tPhysics_joint_force** pForces, br_scalar* pImpulses, int pCount);
     void (C2_HOOK_FASTCALL * new_face_list)(tPhysics_object*, tFace_ref *);
     int (C2_HOOK_FASTCALL * find_faces_in_box)(tBounds*, tFace_ref*, int, struct tWorld_callbacks*);
     tNon_car_spec* (C2_HOOK_FASTCALL * pull_actor_from_world)(br_actor*);
@@ -6073,6 +6065,7 @@ typedef enum {
     ePhysicsError_UnknownHingeType = 5,
     ePhysicsError_OutOfMemory = 6,
     ePhysicsError_error9 = 9,
+    ePhysicsError_CorruptGroup = 10,
     ePhysicsError_InsufficientSizedBuffer = 12
 } tPhysicsError;
 

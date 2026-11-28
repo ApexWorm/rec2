@@ -30,6 +30,8 @@ extern tPhysics_object** gReduced_object_list;
 extern int gINT_006940ac;
 extern int gINT_006940b8;
 
+extern int gINT_0065d014;
+
 extern tPhysicsError_cbfn* gPhysics_error_cb;
 extern br_scalar* gPhysics_buffer1_ptr;
 extern br_scalar* gPhysics_buffer2_ptr;
@@ -140,7 +142,7 @@ extern int C2_HOOK_FASTCALL TestForObjectInSensiblePlace(tPhysics_object* pColli
 
 extern br_scalar C2_HOOK_FASTCALL HierarchyCalcEnergy(tPhysics_object* pObject);
 
-// CheckCollisionList
+extern void C2_HOOK_FASTCALL CheckCollisionList(tPhysics_object* pObject);
 
 extern void C2_HOOK_FASTCALL MakeJointVelocitiesVector(br_scalar* pVelocities, tPhysics_joint_force** pForces, int pCount);
 
@@ -152,13 +154,13 @@ extern void C2_HOOK_FASTCALL SkipForces(tPhysics_joint_force* pForce, int* pInde
 
 extern void C2_HOOK_FASTCALL ScaleUpObjectMI(tPhysics_object* pObject, br_scalar pFactor);
 
-extern void C2_HOOK_FASTCALL CheckForTwang(tPhysics_joint_force** pForces, br_scalar* pImpulses, int pCount);
+extern void C2_HOOK_FASTCALL CheckForTwang(tPhysics_joint_force** pForces, br_scalar* pImpulses, int pCount, tWorld_callbacks* pCallbacks);
 
 extern void C2_HOOK_FASTCALL CreateJointForce(tPhysics_object* pObject, tPhysics_object* pPartner, tPhysics_joint_force* pForce, const br_vector3* pDirection);
 
 extern void C2_HOOK_FASTCALL CreateJointTorque(tPhysics_object* pObject, tPhysics_object* pPartner, tPhysics_joint_force* pForce, const br_vector3* pDirection);
 
-extern tPhysics_workspace* C2_HOOK_FASTCALL AllocateObjectWorkspace(int pCount);
+extern tForce_group* C2_HOOK_FASTCALL AllocateObjectWorkspace(int pCount);
 
 extern void C2_HOOK_FASTCALL RedoQuickHingeVelocities(tPhysics_object* pObject);
 
@@ -172,7 +174,7 @@ extern int C2_HOOK_FASTCALL GetJointLimits(tPhysics_object* pObject, tPhysics_jo
 
 extern int C2_HOOK_FASTCALL GetListJointLimits(tPhysics_object* pObject, tPhysics_joint_force* pForces, int pCount, int pMax_count);
 
-// GetGroupJointLimits
+extern int C2_HOOK_FASTCALL GetGroupJointLimits(tPhysics_object* pObject, tPhysics_joint_force* pForces, int pCount, int pMax_count, tWorld_callbacks* pCallbacks);
 
 extern int C2_HOOK_FASTCALL LimitOmega(tPhysics_object* pObject);
 
@@ -180,7 +182,7 @@ extern void C2_HOOK_FASTCALL CapOmega(tPhysics_object* pObject);
 
 extern int C2_HOOK_FASTCALL ListLimitOmega(tPhysics_object* pObject);
 
-// GroupLimitOmega
+extern int C2_HOOK_FASTCALL GroupLimitOmega(tPhysics_object* pObject);
 
 extern void C2_HOOK_FASTCALL PositionWorldJointedObject(tPhysics_object* pObject, br_scalar pDelta_time);
 
@@ -224,7 +226,7 @@ extern void C2_HOOK_FASTCALL SetGroup(tPhysics_object* pObject, int pGroup);
 
 // GroupTogether
 
-// GetPreCalculatedJointForces
+extern int C2_HOOK_FASTCALL GetPreCalculatedJointForces(tPhysics_joint_force** pForces, tPhysics_object* pObject, tForce_group** pGroups, int* pCount_groups);
 
 extern void C2_HOOK_FASTCALL MakeObjectListDoSomething(tPhysics_object* pObject);
 
@@ -254,9 +256,9 @@ extern void C2_HOOK_FASTCALL AddObjectToReducedList(tPhysics_object* pObject, tP
 
 extern int C2_HOOK_FASTCALL ReducedFindObjectCollisions(tPhysics_object* pObject, tPhysics_object** pList, tPhysics_joint_force* pForces, int pCount, tWorld_callbacks* pCallbacks, tPhysics_object* pDo_something_list);
 
-// FindObjectCollisions
+extern int C2_HOOK_FASTCALL FindObjectCollisions(tPhysics_object* pObject, tPhysics_object* pList, tPhysics_joint_force* pForces, int pCount, tWorld_callbacks* pCallbacks);
 
-// DoRigidJoints
+extern void C2_HOOK_FASTCALL DoRigidJoints(tPhysics_joint_force* pForces, int pCount);
 
 extern int C2_HOOK_FASTCALL DoInterGroupCollisions(tPhysics_object** pObject_list, tPhysics_object* pObject, tPhysics_joint_force* pForces, tPhysics_joint_force* pOld_forces, int pCount_old_forces, tWorld_callbacks* pCallbacks);
 
@@ -284,17 +286,17 @@ extern void C2_HOOK_FASTCALL MakeMatrix(br_scalar* pMatrix, int pRows, tPhysics_
 
 extern void C2_HOOK_FASTCALL RestoreListOmega(tPhysics_object* pObject);
 
-// RestoreGroupOmegas
+extern void C2_HOOK_FASTCALL RestoreGroupOmegas(tPhysics_object* pObject);
 
 extern int C2_HOOK_FASTCALL MakeVelocitiesVector2(br_scalar* pOutput, tPhysics_joint_force** pForces, int pCapacity, int pCount);
 
-// MakeVelocitiesVector
+extern int C2_HOOK_FASTCALL MakeVelocitiesVector(br_scalar* pVelocities, tPhysics_joint_force** pForces, int pCapacity, int pCount);
 
 extern void C2_HOOK_FASTCALL NewAddFrictionObjectObject(tPhysics_joint_force* pForce);
 
 extern void C2_HOOK_FASTCALL NewAddFriction(tPhysics_joint_force* pForce, tWorld_callbacks* pCallbacks);
 
-// ApplyForces
+extern void C2_HOOK_FASTCALL ApplyForces(tPhysics_joint_force* pForces, br_scalar* pImpulses, int pCount);
 
 // DoJointFriction
 
@@ -316,7 +318,7 @@ extern void C2_HOOK_FASTCALL ResetObjectAndChildren(tPhysics_object* pObject);
 
 extern void C2_HOOK_FASTCALL ResetObjectList(tPhysics_object* pObjects);
 
-// RepositionObjectGroup
+extern int C2_HOOK_FASTCALL RepositionObjectGroup(tPhysics_object** pObject_list, tPhysics_object* pObject, tWorld_callbacks* pCallbacks);
 
 // SimpleRotate
 
