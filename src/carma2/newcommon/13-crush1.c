@@ -1349,6 +1349,9 @@ intptr_t C2_HOOK_FASTCALL CrushModels(br_actor* pActor, br_matrix34* pMat, void*
 #pragma auto_inline(on)
 #endif
 
+// FUNCTION: CARMA2_HW 0x0043c7a0
+// FUNCTION: CARMA2_SW 0x0043c7f0
+// FUNCTION: CARMA2_CHEAT 0x0043ca00
 inline void C2_HOOK_FASTCALL CrushPoint(br_vector3* pPoint, int pCount, const br_vector3* pVertices, const br_vector3* pDirection, br_scalar pForce, tU16 pLimit_number, const tCar_crush_limits* pLimits, int pMax_index) {
     br_scalar scale;
     int axis;
