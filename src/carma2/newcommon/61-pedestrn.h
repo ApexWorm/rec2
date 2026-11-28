@@ -114,7 +114,7 @@ extern void C2_HOOK_FASTCALL DisposeAllLoadedRemaps(void);
 
 // RemapVector
 
-// RemapPowerupVector
+extern void C2_HOOK_FASTCALL RemapPowerupVector(br_vector3* pDest, const br_vector3* pSrc, const tPed_remap_bone* pRemap);
 
 // RemapModelAxis
 
@@ -240,11 +240,11 @@ extern int C2_HOOK_FASTCALL DismemberCharacter(tPed_character_instance* pCharact
 
 extern float C2_HOOK_FASTCALL GetClearanceFromCharacterInstance(tPed_character_instance* pCharacter, int pMoveNum);
 
-// VectorScaleVector
+extern void C2_HOOK_FASTCALL VectorScaleVector(br_vector3* pV, const br_vector3* pScale);
 
 extern void C2_HOOK_FASTCALL ScaleCharacterBone(tPed_personality* pPersonality, int pBone_index, br_vector3* pScale, int pArg4);
 
-// ScaleCollisionObject
+extern void C2_HOOK_FASTCALL ScaleCollisionObject(tPhysics_object* pObject, br_bounds3* pBounds, const br_vector3* pScale);
 
 extern void C2_HOOK_FASTCALL ScaleFormBone(tPed_form* pForm, int pBone_index, br_vector3* pScale, int pArg4);
 

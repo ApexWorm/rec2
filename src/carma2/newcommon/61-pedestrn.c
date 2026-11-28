@@ -17,6 +17,7 @@
 #include "23-piping.h"
 #include "27-powerup.h"
 #include "28-world3.h"
+#include "29-raycast.h"
 #include "30-opponent.h"
 #include "32-spark.h"
 #include "41-utility.h"
@@ -562,7 +563,18 @@ void C2_HOOK_FASTCALL DisposeAllLoadedRemaps(void) {
 
 // RemapVector
 
-// RemapPowerupVector
+inline void C2_HOOK_FASTCALL RemapPowerupVector(br_vector3* pDest, const br_vector3* pSrc, const tPed_remap_bone* pRemap) {
+    int i;
+
+    if (pRemap != NULL) {
+        for (i = 0; i < 3; i++) {
+            pDest->v[pRemap->powerup_axis[i] % 3] = pSrc->v[i];
+            if (pRemap->powerup_axis[i] >= ePed_remap_axis_negative_x) {
+                pDest->v[i] = -pDest->v[i];
+            }
+        }
+    }
+}
 
 // RemapModelAxis
 
@@ -1382,39 +1394,141 @@ float C2_HOOK_FASTCALL GetClearanceFromCharacterInstance(tPed_character_instance
     return pCharacter->personality->moves[pMoveNum].grounding_offset;
 }
 
-// VectorScaleVector
+inline void C2_HOOK_FASTCALL VectorScaleVector(br_vector3* pV, const br_vector3* pScale) {
 
-#ifdef REC2_MATCHING
-#pragma auto_inline(off)
-#endif
+    BrVector3Mul(pV, pV, pScale);
+}
 
-// STUB: CARMA2_HW 0x0040bb20
-// STUB: CARMA2_SW 0x0040bb10
-// STUB: CARMA2_CHEAT 0x0040bbc0
+// FUNCTION: CARMA2_HW 0x0040bb20
+// FUNCTION: CARMA2_SW 0x0040bb10
+// FUNCTION: CARMA2_CHEAT 0x0040bbc0
 void C2_HOOK_FASTCALL ScaleCharacterBone(tPed_personality* pPersonality, int pBone_index, br_vector3* pScale, int pArg4) {
-    NOT_IMPLEMENTED();
+    int i;
+    int j;
+    int k;
+    int end;
+    tPed_personality_bone* bone;
+    br_vector3 scale;
+
+    if (pBone_index == -1) {
+        end = pPersonality->form->count_bones;
+    } else {
+        end = pBone_index + 1;
+    }
+    for (i = pBone_index == -1 ? 0 : pBone_index; i < end; i++) {
+        bone = &pPersonality->bones[i];
+        RemapPowerupVector(&scale, pScale, pPersonality->form->bones[i].remapped_bone);
+        for (j = 0; j < (int)REC2_ASIZE(bone->models[0].models); j++) {
+            for (k = 0; k < (int)REC2_ASIZE(bone->models); k++) {
+                if (bone->models[k].models[j] == NULL) {
+                    break;
+                }
+                ScaleModelXYZ(bone->models[k].models[j], scale.v[0], scale.v[1], scale.v[2]);
+            }
+        }
+        VectorScaleVector(&bone->field_0x20, &scale);
+        if (pBone_index == -1) {
+            if (pPersonality->form->bones[i].indices[0] >= 0) {
+                RemapPowerupVector(&scale, pScale, pPersonality->form->bones[pPersonality->form->bones[i].indices[0]].remapped_bone);
+                VectorScaleVector(&bone->field_0x2c, &scale);
+            }
+        } else {
+            for (j = 0; j < pPersonality->form->count_bones; j++) {
+                if (pPersonality->form->bones[j].indices[0] == pBone_index) {
+                    RemapPowerupVector(&scale, pScale, pPersonality->form->bones[pPersonality->form->bones[j].indices[0]].remapped_bone);
+                    VectorScaleVector(&pPersonality->bones[j].field_0x2c, &scale);
+                }
+            }
+        }
+    }
+    if (pArg4) {
+        for (i = 0; i < pPersonality->form->count_moves; i++) {
+            pPersonality->moves[i].grounding_offset *= pScale->v[0];
+        }
+        VectorScaleVector(&pPersonality->bb.min, pScale);
+        VectorScaleVector(&pPersonality->bb.max, pScale);
+        pPersonality->M = pScale->v[0] * pPersonality->M * pScale->v[2] * pScale->v[1];
+        pPersonality->radius = (pScale->v[0] + pScale->v[2] + pScale->v[1]) * pPersonality->radius / 3.0f;
+    }
 }
 
-#ifdef REC2_MATCHING
-#pragma auto_inline(on)
-#endif
+inline void C2_HOOK_FASTCALL ScaleCollisionObject(tPhysics_object* pObject, br_bounds3* pBounds, const br_vector3* pScale) {
 
-// ScaleCollisionObject
+    pObject->M *= pScale->v[0] * pScale->v[1] * pScale->v[2];
+    VectorScaleVector(&pObject->cmpos, pScale);
+    CalcCollisionObjectThings(pObject, pBounds, 0, NULL, NULL);
+}
 
-#ifdef REC2_MATCHING
-#pragma auto_inline(off)
-#endif
-
-// STUB: CARMA2_HW 0x0040bee0
-// STUB: CARMA2_SW 0x0040bed0
-// STUB: CARMA2_CHEAT 0x0040bf80
+// FUNCTION: CARMA2_HW 0x0040bee0
+// FUNCTION: CARMA2_SW 0x0040bed0
+// FUNCTION: CARMA2_CHEAT 0x0040bf80
 void C2_HOOK_FASTCALL ScaleFormBone(tPed_form* pForm, int pBone_index, br_vector3* pScale, int pArg4) {
-    NOT_IMPLEMENTED();
-}
+    int i;
+    int j;
+    int end;
+    tPhysics_object* object;
+    br_actor* actor;
+    br_scalar y;
+    br_vector3 scale;
 
-#ifdef REC2_MATCHING
-#pragma auto_inline(on)
-#endif
+    if (pBone_index == -1) {
+        end = pForm->count_bones;
+    } else {
+        end = pBone_index + 1;
+    }
+    for (i = pBone_index == -1 ? 0 : pBone_index; i < end; i++) {
+        if (pForm->bones[i].hinge != NULL) {
+            RemapPowerupVector(&scale, pScale, pForm->bones[i].remapped_bone);
+            VectorScaleVector(&pForm->bones[i].hinge->field_0x08, &scale);
+        }
+        if (pBone_index == -1) {
+            if (pForm->bones[i].hinge != NULL) {
+                RemapPowerupVector(&scale, pScale, pForm->bones[pForm->bones[i].indices[0]].remapped_bone);
+                VectorScaleVector(&pForm->bones[i].hinge->field_0x14, &scale);
+            }
+        } else {
+            for (j = 0; j < pForm->count_bones; j++) {
+                if (pForm->bones[j].indices[0] == pBone_index && pForm->bones[j].hinge != NULL) {
+                    RemapPowerupVector(&scale, pScale, pForm->bones[pForm->bones[j].indices[0]].remapped_bone);
+                    VectorScaleVector(&pForm->bones[j].hinge->field_0x14, &scale);
+                }
+            }
+        }
+        for (j = 0; j < pForm->max_boned_physicing_at_once; j++) {
+            object = pForm->boned_physicing[j].collision_infos[i];
+            if (object->owner != NULL) {
+                RemapPowerupVector(&scale, pScale, pForm->bones[i].remapped_bone);
+                ScaleCollisionObject(object, &((tPed_character_instance*)object->owner)->personality->bones[i].models[0].models[0]->bounds, &scale);
+            } else {
+                object->M *= pScale->v[1] * pScale->v[2] * pScale->v[0];
+            }
+        }
+    }
+    if (pArg4) {
+        for (j = 0; j < pForm->max_simple_physicing_at_once; j++) {
+            object = pForm->simple_physicing[j].collision_info;
+            if (object->owner != NULL) {
+                RemapPowerupVector(&scale, pScale, pForm->bones[0].remapped_bone);
+                ScaleCollisionObject(object, &((tPed_character_instance*)object->owner)->personality->bb, &scale);
+            } else {
+                object->M *= pScale->v[1] * pScale->v[2] * pScale->v[0];
+            }
+        }
+    }
+    if (pArg4) {
+        for (j = 0; j < pForm->max_rendering_at_once; j++) {
+            if (pForm->actor_sets[j].field_0x0) {
+                for (i = 0; i < pForm->count_bones; i++) {
+                    actor = pForm->actor_sets[j].actors[i];
+                    y = FindYVerticallyBelow2(&actor->t.t.translate.t);
+                    if (y > -100.0f) {
+                        actor->t.t.translate.t.v[1] = (actor->t.t.translate.t.v[1] - y) * pScale->v[0] + y;
+                    }
+                }
+            }
+        }
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x0040c420
 // FUNCTION: CARMA2_SW 0x0040c410
