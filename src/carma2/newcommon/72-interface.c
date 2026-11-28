@@ -535,7 +535,7 @@ br_actor* gFrontend_backdrop_actors[3];
 // GLOBAL: CARMA2_HW 0x0068703c
 // GLOBAL: CARMA2_SW 0x0068177c
 // GLOBAL: CARMA2_CHEAT 0x0068e8e4
-int gINT_0068703c;
+undefined4 gDAT_0068703c;
 
 // GLOBAL: CARMA2_HW 0x0068683c
 // GLOBAL: CARMA2_SW 0x00680f7c
@@ -1592,7 +1592,7 @@ int C2_HOOK_FASTCALL MultiplayerSetup(tFrontend_spec* pFrontend) {
 
 inline void C2_HOOK_FASTCALL NetworkJoinSetup(void) {
 
-    gINT_0068703c = 0;
+    gDAT_0068703c = 0;
     SetAlwaysTyping();
     InitGamesToJoin();
     NetStartProducingJoinList(AddToJoinList);
