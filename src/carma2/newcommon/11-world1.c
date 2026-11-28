@@ -10,6 +10,7 @@
 
 #include "00-car.h"
 #include "08-loading1.h"
+#include "09-funks.h"
 
 #include "15-displays.h"
 #include "27-powerup.h"
@@ -17,11 +18,14 @@
 #include "41-utility.h"
 #include "42-input.h"
 #include "49-physics.h"
+#include "53-controls.h"
 #include "55-volume.h"
+#include "59-camera.h"
 #include "61-pedestrn-phys.h"
 #include "63-loading3.h"
 #include "70-packfile.h"
 #include "globvars.h"
+#include "globvrkm.h"
 
 #include "c2_stdio.h"
 
@@ -779,6 +783,89 @@ void C2_HOOK_FASTCALL FUN_00508400(void) {
     DropActor(9, 1);
 }
 
+// FUNCTION: CARMA2_HW 0x00508410
+// FUNCTION: CARMA2_SW 0x00503860
+// FUNCTION: CARMA2_CHEAT 0x0050de00
+void C2_HOOK_FASTCALL IdentifyAcc(void) {
+    br_actor* a;
+    br_actor* nearest_actor;
+    br_scalar nearest_distance;
+    br_scalar distance;
+    br_vector3 v;
+    int i;
+    tNon_car_spec* non_car;
+
+    if (gCar_to_view != &gProgram_state.current_car) {
+        FUN_0040e530(NULL);
+    } else {
+        nearest_distance = BR_SCALAR_MAX;
+        nearest_actor = NULL;
+        for (a = gAdditional_actors->children; a != NULL; a = a->next) {
+            if (a->model != NULL) {
+                v.v[0] = (a->model->bounds.min.v[0] + a->model->bounds.max.v[0]) / 2.0f;
+                v.v[1] = (a->model->bounds.min.v[1] + a->model->bounds.max.v[1]) / 2.0f;
+                v.v[2] = (a->model->bounds.min.v[2] + a->model->bounds.max.v[2]) / 2.0f;
+                BrVector3Accumulate(&v, &a->t.t.translate.t);
+                BrVector3Sub(&v, &v, gOur_pos);
+                distance = BrVector3LengthSquared(&v);
+                if (distance < nearest_distance) {
+                    nearest_distance = distance;
+                    nearest_actor = a;
+                }
+            }
+        }
+        for (i = 0; i < gNum_active_non_cars; i++) {
+            non_car = gActive_non_car_list[i];
+            if ((tU16)non_car->car_ID == 0xffff) {
+                a = non_car->car_master_actor;
+                BrMatrix34ApplyP(&v, &non_car->collision_info->cmpos, &a->t.t.mat);
+                BrVector3Sub(&v, &v, gOur_pos);
+                distance = BrVector3LengthSquared(&v);
+                if (distance < nearest_distance) {
+                    nearest_distance = distance;
+                    nearest_actor = a;
+                }
+            }
+        }
+        if (nearest_actor != NULL) {
+            gLast_actor = nearest_actor;
+            AccessoryHeadup(gLast_actor, "Locked onto ");
+            if (nearest_actor->identifier != NULL && nearest_actor->identifier[0] == '&'
+                && nearest_actor->identifier[1] >= '0' && nearest_actor->identifier[1] <= '9') {
+                FUN_0040e530(gLast_actor);
+                if (!gCar_flying) {
+                    ToggleFlying();
+                }
+            }
+        }
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x00508690
+// FUNCTION: CARMA2_SW 0x00503ae0
+// FUNCTION: CARMA2_CHEAT 0x0050e080
+void C2_HOOK_FASTCALL FUN_00508690(const char* pName) {
+    int i;
+    br_actor* actor;
+
+    for (i = 0; i < gNum_active_non_cars; i++) {
+        if ((tU16)gActive_non_car_list[i]->car_ID == 0xffff) {
+            actor = gActive_non_car_list[i]->car_master_actor;
+            if (actor != NULL && actor->identifier != NULL && DRStricmp(actor->identifier, pName) == 0
+                && actor->identifier[0] == '&' && actor->identifier[1] >= '0' && actor->identifier[1] <= '9'
+                && actor->parent != gAdditional_actors) {
+                FUN_0041fe90(actor);
+                DRActorEnumRecurse(actor, DelReferencedModels, NULL);
+                DRActorEnumRecurse(actor, DelGrooveRef, NULL);
+                BrActorRemove(actor);
+                BrActorFree(actor);
+                gLast_actor = NULL;
+                AutoSaveAdditionalStuff();
+            }
+        }
+    }
+}
+
 // FUNCTION: CARMA2_HW 0x00508830
 // FUNCTION: CARMA2_SW 0x00503c80
 // FUNCTION: CARMA2_CHEAT 0x0050e220
@@ -795,6 +882,25 @@ intptr_t C2_HOOK_CDECL DelReferencedModels(br_actor* pActor, void* pContext) {
         }
     }
     return 0;
+}
+
+// FUNCTION: CARMA2_HW 0x005088b0
+// FUNCTION: CARMA2_SW 0x00503d00
+// FUNCTION: CARMA2_CHEAT 0x0050e2a0
+void C2_HOOK_FASTCALL DeleteAcc(void) {
+
+    if (gLast_actor != NULL) {
+        if (gLast_actor->parent != gAdditional_actors) {
+            FUN_0041fe90(gLast_actor);
+        }
+        AccessoryHeadup(gLast_actor, "Murdered ");
+        DRActorEnumRecurse(gLast_actor, DelReferencedModels, NULL);
+        DRActorEnumRecurse(gLast_actor, DelGrooveRef, NULL);
+        BrActorRemove(gLast_actor);
+        BrActorFree(gLast_actor);
+        gLast_actor = NULL;
+        AutoSaveAdditionalStuff();
+    }
 }
 
 // FUNCTION: CARMA2_HW 0x00508a50

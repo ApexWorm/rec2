@@ -632,6 +632,7 @@ float gOpponent_speed_factor;
 //float gCar_crush_softness;
 
 // GLOBAL: CARMA2_HW 0x007634b0
+// GLOBAL: CARMA2_SW 0x00759a10
 // GLOBAL: CARMA2_CHEAT 0x0076ab50
 br_vector3* gOur_pos;
 

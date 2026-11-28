@@ -105,7 +105,13 @@ extern void C2_HOOK_FASTCALL FUN_005083f0(void);
 
 extern void C2_HOOK_FASTCALL FUN_00508400(void);
 
+extern void C2_HOOK_FASTCALL IdentifyAcc(void);
+
+extern void C2_HOOK_FASTCALL FUN_00508690(const char* pName);
+
 extern intptr_t C2_HOOK_CDECL DelReferencedModels(br_actor* pActor, void* pContext);
+
+extern void C2_HOOK_FASTCALL DeleteAcc(void);
 
 extern void C2_HOOK_FASTCALL SnapAccToVertical(void);
 
