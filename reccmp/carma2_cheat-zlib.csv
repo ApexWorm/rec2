@@ -1,0 +1,4 @@
+address,type,name
+0x00563bf0,library,gzread
+0x00563e00,library,gzwrite
+0x00563f80,library,gzclose

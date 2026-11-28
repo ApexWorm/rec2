@@ -14,6 +14,8 @@
 
 extern int gCamera_type;
 extern int gKey_map_index;
+extern int gCurrent_race_file_index;
+extern const char* gRaces_file_names[10];
 
 extern const char* gPedTextTxtPath;
 extern int gGroove_funk_offset;
@@ -53,15 +55,15 @@ extern void C2_HOOK_FASTCALL LoadTacho(FILE* pF, int pIndex, tCar_spec* pCar_spe
 
 extern void C2_HOOK_FASTCALL LoadHeadups(FILE* pF, int pIndex, tCar_spec* pCar_spec);
 
-// OldReadNonCarMechanicsData
+extern void C2_HOOK_FASTCALL OldReadNonCarMechanicsData(FILE* pF, tNon_car_spec* pNon_car_spec, int pIndex);
 
-// GetPerpendicular
+extern void C2_HOOK_FASTCALL GetPerpendicular(br_vector3* pPerpendicular, const br_vector3* pV);
 
-// ReadNonCarMechanicsData
+extern void C2_HOOK_FASTCALL ReadNonCarMechanicsData(FILE* pF, tNon_car_spec* pNon_car_spec);
 
 // ReadPartHeader
 
-// ReadMechanicsShapes
+extern void C2_HOOK_FASTCALL ReadMechanicsShapes(tPhysics_shape** pShapes, FILE* pF);
 
 // NewReadMechanicsData
 
@@ -83,7 +85,7 @@ extern intptr_t C2_HOOK_CDECL AllocateCarModelData(br_actor* pActor, void* pData
 
 extern br_material* C2_HOOK_FASTCALL GetSimpleMaterial(char* pName, tRendererShadingType pShading_type);
 
-// ReadShrapnelMaterials
+extern void C2_HOOK_FASTCALL ReadShrapnelMaterials(FILE* pF, tCar_spec* pCar_spec);
 
 // SetModelFlags
 
@@ -107,7 +109,7 @@ extern void C2_HOOK_FASTCALL LoadCar(const char* pCar_name, tDriver pDriver, tCa
 
 extern void C2_HOOK_FASTCALL LoadHeadupImages(void);
 
-// OpenRaceFile
+extern FILE* C2_HOOK_FASTCALL OpenRaceFile(void);
 
 extern void C2_HOOK_FASTCALL LoadRaces(tRace_list_spec* pRace_list, int* pCount, int pRace_type_index);
 

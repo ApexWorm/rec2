@@ -48,6 +48,7 @@ targets:
       - external/dummyqt
     data-sources:
       - reccmp/carma2_cheat-mslibc.csv
+      - reccmp/carma2_cheat-zlib.csv
     hash:
       sha256: 9981b70bb222b2ecd5d1d74f186f120b01fdeef1d2dad9d10682416c4b1a92c8
     report:

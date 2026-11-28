@@ -252,6 +252,7 @@ extern int gJump_start_fine[3];
 //extern float gCar_time_value[3];
 //extern int gTyping_slot;
 //extern int gCunning_stunt_bonus[3];
+extern int gCountRaceGroups;
 extern tU32 gKnobbled_frame_period;
 //extern int gWait_for_it;
 //extern int gCheck_point_cash[3];

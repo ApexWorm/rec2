@@ -30,6 +30,7 @@
 #include "38-flicplay.h"
 #include "41-utility.h"
 #include "42-input.h"
+#include "49-physics.h"
 #include "51-smash.h"
 #include "52-errors.h"
 #include "53-controls.h"
@@ -86,6 +87,11 @@ char gDecode_string[14] = {
     (char)('g' + DECODE_OFFSET),
     '\0'
 };
+
+// GLOBAL: CARMA2_HW 0x0068c6f4
+// GLOBAL: CARMA2_SW 0x00686744
+// GLOBAL: CARMA2_CHEAT 0x00693f94
+int gCurrent_race_file_index;
 
 // GLOBAL: CARMA2_HW 0x0068c6f8
 // GLOBAL: CARMA2_SW 0x00686748
@@ -269,6 +275,22 @@ const char* gWheel_actor_names[6] = {
     "RRWHEEL.ACT",
     "IRLWHEEL.ACT",
     "IRRWHEEL.ACT",
+};
+
+// GLOBAL: CARMA2_HW 0x00657530
+// GLOBAL: CARMA2_SW 0x00651ee0
+// GLOBAL: CARMA2_CHEAT 0x0065ddc0
+const char* gRaces_file_names[10] = {
+    "RACES.TXT",
+    "NETRACES.TXT",
+    "NETRACES.TXT",
+    "NETRACES.TXT",
+    "RACES.TXT",
+    "RACES.TXT",
+    "RACES.TXT",
+    "NETRACES.TXT",
+    "NETRACES.TXT",
+    "NETRACES.TXT",
 };
 
 void C2_HOOK_FASTCALL LoadInRegisteeDir(const char *pRoot, const char *pSubDir, int pInitialize_palettes) {
@@ -834,15 +856,309 @@ void C2_HOOK_FASTCALL LoadHeadups(FILE* pF, int pIndex, tCar_spec* pCar_spec) {
     }
 }
 
-// OldReadNonCarMechanicsData
+inline void C2_HOOK_FASTCALL OldReadNonCarMechanicsData(FILE* pF, tNon_car_spec* pNon_car_spec, int pIndex) {
+    int i;
+    int extra_point_num;
+    br_scalar x;
+    br_scalar y;
+    br_scalar z;
+    br_scalar free_mass;
+    br_scalar attached_mass;
+    br_scalar len;
+    br_scalar wid;
+    br_scalar het;
+    br_scalar snap_angle;
+    br_scalar ts;
+    br_vector3 attached_cmpos;
+    br_bounds3 bounds;
+    char s[256];
 
-// GetPerpendicular
+    pNon_car_spec->index = pIndex;
+    GetThreeFloats(pF, &x, &y, &z);
+    BrVector3Set(&pNon_car_spec->collision_info->cmpos, x, y, z);
+    GetThreeFloats(pF, &x, &y, &z);
+    BrVector3Set(&attached_cmpos, x, y, z);
+    GetThreeFloats(pF, &x, &y, &z);
+    BrVector3Set(&bounds.min, x, y, z);
+    GetThreeFloats(pF, &x, &y, &z);
+    BrVector3Set(&bounds.max, x, y, z);
+    extra_point_num = GetAnInt(pF);
+    if (extra_point_num > 6) {
+        sprintf(s, "%d", pNon_car_spec->index);
+        FatalError(kFatalError_TooManyExtraPointsForCarIndex_S, s);
+    }
+    for (i = 0; i < extra_point_num; i++) {
+        GetThreeFloats(pF, &x, &y, &z);
+    }
+    GetPairOfFloats(pF, &free_mass, &attached_mass);
+    pNon_car_spec->free_mass = free_mass;
+    pNon_car_spec->attached_mass = attached_mass;
+    GetThreeFloats(pF, &len, &wid, &het);
+    snap_angle = GetAScalar(pF);
+    pNon_car_spec->snap_off_cosine = (br_scalar)cos(BrAngleToRadian(BrDegreeToAngle(snap_angle)));
+    pNon_car_spec->break_off_radians_squared = (br_scalar)REC2_SQR(snap_angle * (3.14 / 180.0));
+    ts = GetAScalar(pF);
+    pNon_car_spec->min_torque_squared = REC2_SQR(ts / WORLD_SCALE);
+    BrVector3Set(&pNon_car_spec->I_over_M,
+        (het * het + wid * wid) / 12.0f,
+        (het * het + len * len) / 12.0f,
+        (wid * wid + len * len) / 12.0f);
+    pNon_car_spec->collision_info->shape = BrMemAllocate(sizeof(tCollision_shape_polyhedron), kMem_collision_shape);
+    pNon_car_spec->collision_info->shape->common.bb = bounds;
+    if (snap_angle != 0.0f) {
+        pNon_car_spec->field_0xf0 = pNon_car_spec->collision_info->physics_joint2 = AllocatePhysicsJoint(1, kMem_physics_joint);
+        pNon_car_spec->collision_info->physics_joint2->type = eJoint_ball_n_socket;
+        BrVector3Copy(&pNon_car_spec->collision_info->physics_joint2->field_0x08, &attached_cmpos);
+        pNon_car_spec->collision_info->physics_joint2->count_limits = 1;
+        pNon_car_spec->collision_info->physics_joint2->limits[0].type = eJoint_limit_10;
+        pNon_car_spec->collision_info->physics_joint2->limits[0].value = pNon_car_spec->min_torque_squared;
+    }
+    UpdateCollisionObject(pNon_car_spec->collision_info);
+    pNon_car_spec->collision_info->actor = pNon_car_spec->car_master_actor;
+    pNon_car_spec->collision_info->bb2 = pNon_car_spec->collision_info->bb1;
+}
 
-// ReadNonCarMechanicsData
+inline void C2_HOOK_FASTCALL GetPerpendicular(br_vector3* pPerpendicular, const br_vector3* pV) {
+
+    if (fabs(pV->v[0]) <= fabs(pV->v[1]) && fabs(pV->v[0]) <= fabs(pV->v[2])) {
+        BrVector3Set(pPerpendicular, 0.0f, pV->v[2], -pV->v[1]);
+    } else if (fabs(pV->v[1]) <= fabs(pV->v[2])) {
+        BrVector3Set(pPerpendicular, -pV->v[2], 0.0f, -pV->v[0]);
+    } else {
+        BrVector3Set(pPerpendicular, pV->v[1], -pV->v[0], 0.0f);
+    }
+    BrVector3Normalise(pPerpendicular, pPerpendicular);
+}
+
+// FUNCTION: CARMA2_HW 0x00487ec0
+// FUNCTION: CARMA2_SW 0x00485100
+// FUNCTION: CARMA2_CHEAT 0x004882a0
+void C2_HOOK_FASTCALL ReadNonCarMechanicsData(FILE* pF, tNon_car_spec* pNon_car_spec) {
+    int index_version;
+    int count_limits;
+    br_scalar x;
+    br_scalar y;
+    br_scalar z;
+    br_scalar free_mass;
+    br_scalar attached_mass;
+    br_scalar len;
+    br_scalar wid;
+    br_scalar het;
+    br_scalar snap_angle;
+    br_scalar ts;
+    br_scalar friction;
+    br_scalar limit;
+    br_vector3 attached_cmpos;
+    br_vector3 pos;
+    br_vector3 dir;
+    char s[256];
+
+    pNon_car_spec->driver = eDriver_non_car_unused_slot;
+    index_version = GetAnInt(pF);
+    if (index_version < 100) {
+        OldReadNonCarMechanicsData(pF, pNon_car_spec, index_version);
+        return;
+    }
+    pNon_car_spec->index = (int)GetAScalar(pF);
+    GetThreeFloats(pF, &x, &y, &z);
+    BrVector3Set(&pNon_car_spec->collision_info->cmpos, x, y, z);
+    GetThreeFloats(pF, &x, &y, &z);
+    BrVector3Set(&attached_cmpos, x, y, z);
+    ReadMechanicsShapes(&pNon_car_spec->collision_info->shape, pF);
+    GetPairOfFloats(pF, &free_mass, &attached_mass);
+    pNon_car_spec->free_mass = free_mass;
+    pNon_car_spec->attached_mass = attached_mass;
+    GetThreeFloats(pF, &len, &wid, &het);
+    snap_angle = GetAScalar(pF);
+    pNon_car_spec->snap_off_cosine = (br_scalar)cos(BrAngleToRadian(BrDegreeToAngle(snap_angle)));
+    pNon_car_spec->break_off_radians_squared = (br_scalar)REC2_SQR(snap_angle * (3.14 / 180.0));
+    ts = GetAScalar(pF);
+    pNon_car_spec->min_torque_squared = REC2_SQR(ts / WORLD_SCALE);
+    BrVector3Set(&pNon_car_spec->I_over_M,
+        (het * het + wid * wid) / 12.0f,
+        (het * het + len * len) / 12.0f,
+        (wid * wid + len * len) / 12.0f);
+    if (snap_angle != 0.0f) {
+        pNon_car_spec->field_0xf0 = pNon_car_spec->collision_info->physics_joint2 = AllocatePhysicsJoint(1, kMem_physics_joint);
+        pNon_car_spec->collision_info->physics_joint2->type = eJoint_ball_n_socket;
+        BrVector3Copy(&pNon_car_spec->collision_info->physics_joint2->field_0x08, &attached_cmpos);
+        pNon_car_spec->collision_info->physics_joint2->count_limits = 1;
+        pNon_car_spec->collision_info->physics_joint2->limits[0].type = eJoint_limit_10;
+        pNon_car_spec->collision_info->physics_joint2->limits[0].value = pNon_car_spec->min_torque_squared;
+    }
+    UpdateCollisionObject(pNon_car_spec->collision_info);
+    pNon_car_spec->collision_info->actor = pNon_car_spec->car_master_actor;
+    pNon_car_spec->collision_info->bb2 = pNon_car_spec->collision_info->bb1;
+    /* FIXME: the original passes the tNon_car_spec as the tCar_spec it shares this layout with (as LoadCar) */
+    ReadShrapnelMaterials(pF, (tCar_spec*)pNon_car_spec);
+    pNon_car_spec->collision_info->object_friction = 0.4f;
+    while (index_version > 100) {
+        GetAString(pF, s);
+        if (DRStricmp(s, "END") == 0) {
+            break;
+        }
+        if (DRStricmp(s, "WORLD_FRICTION") == 0) {
+            pNon_car_spec->collision_info->world_friction = GetAScalar(pF) - 1.0f;
+        } else if (DRStricmp(s, "OBJECT_FRICTION") == 0) {
+            pNon_car_spec->collision_info->object_friction = GetAScalar(pF) - 1.0f;
+        } else if (DRStricmp(s, "TUMBLE") == 0) {
+            pNon_car_spec->tumble_factor = GetAScalar(pF);
+            pNon_car_spec->tumble_threshold = GetAScalar(pF) / WORLD_SCALE;
+        } else if (DRStricmp(s, "WORLD_BALL_JOINT") == 0) {
+            GetThreeFloats(pF, &x, &y, &z);
+            friction = GetAScalar(pF);
+            count_limits = GetAnInt(pF);
+            pNon_car_spec->field_0xf0 = pNon_car_spec->collision_info->physics_joint2 = AllocatePhysicsJoint(count_limits, kMem_physics_joint);
+            pNon_car_spec->field_0xf0->friction = friction;
+            BrVector3Set(&pNon_car_spec->field_0xf0->field_0x08, x, y, z);
+            pNon_car_spec->field_0xf0->type = eJoint_ball_n_socket;
+        } else if (DRStricmp(s, "WORLD_HINGE_JOINT") == 0) {
+            GetThreeFloats(pF, &x, &y, &z);
+            BrVector3Set(&pos, x, y, z);
+            GetThreeFloats(pF, &x, &y, &z);
+            BrVector3Set(&dir, x, y, z);
+            friction = GetAScalar(pF);
+            count_limits = GetAnInt(pF);
+            pNon_car_spec->field_0xf0 = pNon_car_spec->collision_info->physics_joint2 = AllocatePhysicsJoint(count_limits, kMem_physics_joint);
+            pNon_car_spec->field_0xf0->friction = friction;
+            BrVector3Copy(&pNon_car_spec->field_0xf0->field_0x08, &pos);
+            pNon_car_spec->field_0xf0->type = eJoint_ball_n_socket;
+        } else if (DRStricmp(s, "WORLD_TRANSLATION_JOINT") == 0) {
+            GetThreeFloats(pF, &x, &y, &z);
+            BrVector3Set(&pos, x, y, z);
+            GetThreeFloats(pF, &x, &y, &z);
+            BrVector3Set(&dir, x, y, z);
+            limit = GetAScalar(pF);
+            pNon_car_spec->field_0xf0 = pNon_car_spec->collision_info->physics_joint2 = AllocatePhysicsJoint(1, kMem_physics_joint);
+            BrVector3Copy(&pNon_car_spec->field_0xf0->field_0x08, &pos);
+            BrVector3Copy(&pNon_car_spec->field_0xf0->hinge_axis, &dir);
+            GetPerpendicular(&pNon_car_spec->field_0xf0->hinge_axis2, &dir);
+            BrVector3Cross(&pNon_car_spec->field_0xf0->hinge_axis3, &dir, &pNon_car_spec->field_0xf0->hinge_axis2);
+            pNon_car_spec->field_0xf0->type = eJoint_translation;
+            pNon_car_spec->flags |= 0x10000;
+            pNon_car_spec->field_0xf0->count_limits = 1;
+            pNon_car_spec->field_0xf0->limits[0].type = eJoint_limit_11;
+            pNon_car_spec->field_0xf0->limits[0].value = limit;
+            pNon_car_spec->translation_parameters = BrMemAllocate(sizeof(tJoint_translation_params), kMem_non_car_spec);
+            pNon_car_spec->translation_parameters->forward_acceleration = GetAScalar(pF);
+            pNon_car_spec->translation_parameters->reverse_acceleration = GetAScalar(pF);
+            pNon_car_spec->translation_parameters->forward_resistance = GetAScalar(pF);
+            pNon_car_spec->translation_parameters->reverse_resistance = GetAScalar(pF);
+            pNon_car_spec->translation_parameters->pause_at_top = GetAnInt(pF);
+            pNon_car_spec->translation_parameters->forward_resistance = (br_scalar)exp(-pNon_car_spec->translation_parameters->forward_resistance * 0.43);
+            pNon_car_spec->translation_parameters->reverse_resistance = (br_scalar)exp(-pNon_car_spec->translation_parameters->reverse_resistance * 0.43);
+        } else if (DRStricmp(s, "RISE_WHEN_HIT") == 0) {
+            pNon_car_spec->flags |= 0x20000;
+        } else if (DRStricmp(s, "RISE_WHEN_DRIVEN_ON") == 0) {
+            pNon_car_spec->flags |= 0x40000;
+        } else if (DRStricmp(s, "NUMBER_OF_PUSHES") == 0) {
+            pNon_car_spec->number_of_pushes = GetAnInt(pF);
+        } else if (DRStricmp(s, "DRIVABLE_ON") == 0) {
+            pNon_car_spec->collision_info->drivable_on = 1;
+        } else if (DRStricmp(s, "INFINITE_I") == 0) {
+            pNon_car_spec->collision_info->flags |= 0x800;
+        } else if (DRStricmp(s, "IGNORE_WORLD_COLLISIONS") == 0) {
+            pNon_car_spec->collision_info->flags |= 0x80;
+        } else if (DRStricmp(s, "BLOCK_CAMERA") == 0) {
+            pNon_car_spec->flags |= 0x80000;
+        } else if (DRStricmp(s, "SPARKY") == 0) {
+            pNon_car_spec->flags |= 0x200000;
+        } else {
+            FatalError(kFatalError_UnknownNonCarCommand);
+        }
+    }
+}
 
 // ReadPartHeader
 
-// ReadMechanicsShapes
+// FUNCTION: CARMA2_HW 0x00488b00
+// FUNCTION: CARMA2_SW 0x00485d40
+// FUNCTION: CARMA2_CHEAT 0x00488ee0
+void C2_HOOK_FASTCALL ReadMechanicsShapes(tPhysics_shape** pShapes, FILE* pF) {
+    int i;
+    int j;
+    int count;
+    int count_points;
+    int count_lines;
+    int index1;
+    int index2;
+    tPhysics_shape* shape;
+    br_vector3* p;
+    tPolyhedron_edge_indexes* line;
+    float min_x;
+    float min_y;
+    float min_z;
+    float max_x;
+    float max_y;
+    float max_z;
+    float point_x;
+    float point_y;
+    float point_z;
+    float centre_x;
+    float centre_y;
+    float centre_z;
+    float wire_x;
+    float wire_y;
+    float wire_z;
+    char s[256];
+    br_vector3 points[64];
+
+    count = GetAnInt(pF);
+    for (i = 0; i < count; i++) {
+        GetAString(pF, s);
+        if (DRStricmp(s, "box") == 0) {
+            shape = (tPhysics_shape*)AllocateShapeBox(kMem_collision_shape);
+            GetThreeFloats(pF, &min_x, &min_y, &min_z);
+            BrVector3Set(&shape->box.common.bb.min, min_x, min_y, min_z);
+            GetThreeFloats(pF, &max_x, &max_y, &max_z);
+            BrVector3Set(&shape->box.common.bb.max, max_x, max_y, max_z);
+        } else if (DRStricmp(s, "polyhedron") == 0) {
+            count_points = GetAnInt(pF);
+            if (count_points > 32) {
+                sprintf(s, "Ow! Physics shape is mad (having %d points is silly)", count_points);
+                PDFatalError(s);
+            }
+            shape = (tPhysics_shape*)AllocateShapePolyhedron(count_points, kMem_collision_shape);
+            shape->polyhedron.polyhedron.count_points = count_points;
+            p = shape->polyhedron.polyhedron.points;
+            for (j = 0; j < count_points; j++) {
+                GetThreeFloats(pF, &point_x, &point_y, &point_z);
+                BrVector3Set(&p[j], point_x, point_y, point_z);
+            }
+        } else if (DRStricmp(s, "sphere") == 0) {
+            shape = (tPhysics_shape*)AllocateShapeSphere(kMem_collision_shape);
+            shape->sphere.sphere.radius = GetAScalar(pF);
+            GetThreeFloats(pF, &centre_x, &centre_y, &centre_z);
+            BrVector3Set(&shape->sphere.sphere.center, centre_x, centre_y, centre_z);
+        } else if (DRStricmp(s, "wire") == 0) {
+            count_points = GetAnInt(pF);
+            if (count_points > (int)REC2_ASIZE(points)) {
+                FatalError(kFatalError_TooManyExtraPointsForCarIndex_S, " Too many points in wire frame shape ");
+            }
+            for (j = 0; j < count_points; j++) {
+                GetThreeFloats(pF, &wire_x, &wire_y, &wire_z);
+                BrVector3Set(&points[j], wire_x, wire_y, wire_z);
+            }
+            count_lines = GetAnInt(pF);
+            shape = (tPhysics_shape*)AllocateShapeWireFrame(count_points, count_lines, kMem_collision_shape);
+            p = shape->wireframe.wireframe.points;
+            for (j = 0; j < count_points; j++) {
+                BrVector3Copy(&p[j], &points[j]);
+            }
+            line = shape->wireframe.wireframe.lines;
+            for (j = 0; j < count_lines; j++) {
+                GetPairOfInts(pF, &index1, &index2);
+                line[j].index1 = index1;
+                line[j].index2 = index2;
+            }
+        } else {
+            FatalError(kFatalError_ShapeDataIsWrong);
+        }
+        FillInShape(shape);
+        *pShapes = shape;
+        pShapes = &shape->common.next;
+    }
+}
 
 // NewReadMechanicsData
 
@@ -1009,7 +1325,23 @@ br_material* C2_HOOK_FASTCALL GetSimpleMaterial(char* pName, tRendererShadingTyp
     return gSimple_materials[i];
 }
 
-// ReadShrapnelMaterials
+// FUNCTION: CARMA2_HW 0x00488f00
+// FUNCTION: CARMA2_SW 0x00486120
+// FUNCTION: CARMA2_CHEAT 0x004892e0
+inline void C2_HOOK_FASTCALL ReadShrapnelMaterials(FILE* pF, tCar_spec* pCar_spec) {
+    int i;
+    char s[256];
+
+    pCar_spec->count_shrapnel_materials = GetAnInt(pF);
+    for (i = 0; i < pCar_spec->count_shrapnel_materials; i++) {
+        GetALineAndDontArgue(pF, s);
+        if (pCar_spec != NULL && pCar_spec->driver > eDriver_5) {
+            pCar_spec->shrapnel_materials[i] = GetSimpleMaterial(s, kRendererShadingType_Specular);
+        } else {
+            pCar_spec->shrapnel_materials[i] = GetSimpleMaterial(s, kRendererShadingType_Default);
+        }
+    }
+}
 
 // SetModelFlags
 
@@ -1074,13 +1406,201 @@ void C2_HOOK_FASTCALL LoadHeadupImages(void) {
     }
 }
 
-// OpenRaceFile
+inline FILE* C2_HOOK_FASTCALL OpenRaceFile(void) {
+    FILE* f;
+    tPath_name the_path;
 
-// STUB: CARMA2_HW 0x0048c1c0
-// STUB: CARMA2_SW 0x00489400
-// STUB: CARMA2_CHEAT 0x0048c5a0
+    PathCat(the_path, gApplication_path, gRaces_file_names[gCurrent_race_file_index]);
+    f = DRfopen(the_path, "rt");
+    if (f == NULL) {
+        FatalError(kFatalError_CannotOpenRacesFile);
+    }
+    return f;
+}
+
+// FUNCTION: CARMA2_HW 0x0048c1c0
+// FUNCTION: CARMA2_SW 0x00489400
+// FUNCTION: CARMA2_CHEAT 0x0048c5a0
 void C2_HOOK_FASTCALL LoadRaces(tRace_list_spec* pRace_list, int* pCount, int pRace_type_index) {
-    NOT_IMPLEMENTED();
+    FILE* f;
+    br_scalar opponent_count_first_race;
+    br_scalar opponent_count_last_race;
+    br_scalar opponent_softness_first_race;
+    br_scalar opponent_hardness_first_race;
+    br_scalar opponent_softness_last_race;
+    br_scalar opponent_hardness_last_race;
+    br_scalar opponent_nastiness_first_race;
+    br_scalar opponent_nastiness_last_race;
+    tTWTVFS twt;
+    int powerup_exclusions[50];
+    tRace_group_spec* current_group;
+    br_scalar factor;
+    br_scalar softness;
+    br_scalar hardness;
+    int hardness_oppo;
+    int count_opponents;
+    int last_race;
+    int i;
+    int j;
+    char s[256];
+    char* str;
+
+    C2_HOOK_BUG_ON(sizeof(tRace_list_spec) != 0x244);
+    C2_HOOK_BUG_ON(sizeof(tRace_group_spec) != 12);
+
+    if (!gApplicationDataTwtMounted) {
+        twt = OpenPackFileAndSetTiffLoading(gApplication_path);
+    }
+    gCurrent_race_file_index = pRace_type_index + 1;
+    f = OpenRaceFile();
+    GetAnInt(f);
+    gDev_initial_race = 0;
+    opponent_count_first_race = GetAScalar(f);
+    opponent_count_last_race = GetAScalar(f);
+    GetPairOfFloats(f, &opponent_softness_first_race, &opponent_hardness_first_race);
+    GetPairOfFloats(f, &opponent_softness_last_race, &opponent_hardness_last_race);
+    opponent_nastiness_first_race = GetAScalar(f);
+    opponent_nastiness_last_race = GetAScalar(f);
+    gCountRaceGroups = 0;
+    i = 0;
+    do {
+        GetALineAndDontArgue(f, pRace_list[i].name);
+        if (strcmp(pRace_list[i].name, "END") == 0) {
+            last_race = 1;
+        } else {
+            GetAString(f, pRace_list[i].file_name);
+            GetAString(f, pRace_list[i].interface_name);
+            pRace_list[i].count_opponents = GetAnInt(f);
+            pRace_list[i].count_explicit_opponents = GetAnInt(f);
+            for (j = 0; j < pRace_list[i].count_explicit_opponents; j++) {
+                pRace_list[i].explicit_opponents[j] = GetAnInt(f);
+            }
+            pRace_list[i].opponent_nastiness_level = GetAScalar(f);
+            GetALineAndDontArgue(f, s);
+            str = strtok(s, "\t ,/");
+            for (j = 0; str != NULL; j++) {
+                sscanf(str, "%d", &powerup_exclusions[j]);
+                if (powerup_exclusions[j] < 0) {
+                    break;
+                }
+                str = strtok(NULL, "\t ,/");
+            }
+            pRace_list[i].count_powerup_exclusions = j;
+            if (pRace_list[i].count_powerup_exclusions != 0) {
+                pRace_list[i].powerup_exclusions = BrMemAllocate(pRace_list[i].count_powerup_exclusions * sizeof(int), kMem_misc);
+                memcpy(pRace_list[i].powerup_exclusions, powerup_exclusions, pRace_list[i].count_powerup_exclusions * sizeof(int));
+            }
+            pRace_list[i].no_time_awards = GetAnInt(f);
+            pRace_list[i].is_boundary = GetAnInt(f);
+            if (pRace_list[i].is_boundary) {
+                gCountRaceGroups++;
+            }
+            pRace_list[i].race_type = GetAnInt(f);
+            GetThreeInts(f, &pRace_list[i].initial_timer[0], &pRace_list[i].initial_timer[1], &pRace_list[i].initial_timer[2]);
+            switch (pRace_list[i].race_type) {
+            case kRaceType_Carma1:
+            case kRaceType_Checkpoints:
+                pRace_list[i].count_laps = GetAnInt(f);
+                break;
+            case kRaceType_Cars:
+                pRace_list[i].options.cars.count_opponents = GetAnInt(f);
+                for (j = 0; j < pRace_list[i].options.cars.count_opponents; j++) {
+                    pRace_list[i].options.cars.opponents[j] = GetAnInt(f);
+                }
+                break;
+            case kRaceType_Peds:
+                pRace_list[i].options.peds.count_ped_groups = GetAnInt(f);
+                for (j = 0; j < pRace_list[i].options.peds.count_ped_groups; j++) {
+                    pRace_list[i].options.peds.ped_groups[j] = GetAnInt(f);
+                }
+                break;
+            case kRaceType_Smash:
+                pRace_list[i].options.smash.var_smash_number = GetAnInt(f);
+                pRace_list[i].options.smash.var_smash_target = GetAnInt(f);
+                break;
+            case kRaceType_SmashNPed:
+                pRace_list[i].options.smash_and_peds.var_smash_number = GetAnInt(f);
+                pRace_list[i].options.smash_and_peds.var_smash_target = GetAnInt(f);
+                pRace_list[i].options.smash_and_peds.ped_group_index = GetAnInt(f);
+                break;
+            default:
+                break;
+            }
+            GetThreeInts(f, &pRace_list[i].completion_bonus[0], &pRace_list[i].completion_bonus[1], &pRace_list[i].completion_bonus[2]);
+            if (pRace_list[i].race_type == kRaceType_Carma1) {
+                GetThreeInts(f, &pRace_list[i].completion_bonus_peds[0], &pRace_list[i].completion_bonus_peds[1], &pRace_list[i].completion_bonus_peds[2]);
+                GetThreeInts(f, &pRace_list[i].completion_bonus_opponents[0], &pRace_list[i].completion_bonus_opponents[1], &pRace_list[i].completion_bonus_opponents[2]);
+            }
+            GetALineAndDontArgue(f, pRace_list[i].description);
+            if (DRStricmp(pRace_list[i].description, "none") == 0) {
+                pRace_list[i].description[0] = '\0';
+            }
+            pRace_list[i].expansion = GetAnInt(f) & 0x1;
+            if (pRace_type_index < 0 || pRace_list[i].race_type == kRaceType_Carma1) {
+                i++;
+            }
+            last_race = 0;
+        }
+    } while (!last_race);
+    *pCount = i;
+    PFfclose(f);
+    if (gRace_groups != NULL) {
+        BrMemFree(gRace_groups);
+    }
+    gRace_groups = BrMemAllocate((gCountRaceGroups == 0 ? 1 : gCountRaceGroups) * sizeof(tRace_group_spec), kMem_misc);
+    gRace_groups[0].count_races = 0;
+    gRace_groups[0].races = pRace_list;
+    current_group = &gRace_groups[0];
+    for (i = 0; i < *pCount; i++) {
+        if (pRace_list[i].opponent_nastiness_level <= 0.0f) {
+            pRace_list[i].opponent_nastiness_level = (br_scalar)((br_scalar)i / ((br_scalar)*pCount - 1.0)
+                * (opponent_nastiness_last_race - opponent_nastiness_first_race)
+                + opponent_nastiness_first_race);
+        }
+        count_opponents = pRace_list[i].count_opponents;
+        if (count_opponents < 0) {
+            count_opponents = (int)((br_scalar)i / ((br_scalar)*pCount - 1.0)
+                * (opponent_count_last_race - opponent_count_first_race)
+                + opponent_count_first_race);
+        }
+        pRace_list[i].count_opponents = 0;
+        if (pRace_list[i].count_explicit_opponents < count_opponents) {
+            factor = (br_scalar)((br_scalar)i / ((br_scalar)*pCount - 1.0));
+            softness = factor * (opponent_softness_last_race - opponent_softness_first_race) + opponent_softness_first_race;
+            hardness = factor * (opponent_hardness_last_race - opponent_hardness_first_race) + opponent_hardness_first_race - softness;
+            for (j = pRace_list[i].count_explicit_opponents; j < count_opponents; j++) {
+                hardness_oppo = (int)((br_scalar)(j - pRace_list[i].count_explicit_opponents)
+                    / ((br_scalar)(count_opponents - pRace_list[i].count_explicit_opponents) - 1.0)
+                    * hardness
+                    + softness);
+                if (hardness_oppo < 1) {
+                    pRace_list[i].explicit_opponents[j] = -1;
+                } else if (hardness_oppo > 5) {
+                    pRace_list[i].explicit_opponents[j] = -5;
+                } else {
+                    pRace_list[i].explicit_opponents[j] = -hardness_oppo;
+                }
+            }
+        } else {
+            pRace_list[i].count_explicit_opponents = count_opponents;
+        }
+        pRace_list[i].count_explicit_opponents = count_opponents;
+        pRace_list[i].group = current_group;
+        if (pRace_list[i].is_boundary) {
+            current_group->mission = &pRace_list[i];
+            current_group++;
+            if (current_group - gRace_groups < gCountRaceGroups) {
+                current_group->count_races = 0;
+                current_group->races = &pRace_list[i + 1];
+            }
+        } else {
+            current_group->count_races++;
+        }
+    }
+    gCurrent_race_group = gRace_groups;
+    if (!gApplicationDataTwtMounted) {
+        ClosePackFileAndSetTiffLoading(twt);
+    }
 }
 
 // FUNCTION: CARMA2_HW 0x0048c860
