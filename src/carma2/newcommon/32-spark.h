@@ -24,6 +24,7 @@ extern tSmash_vertex gSmash_glass_fragments[200];
 extern int gNum_dust_tables;
 extern int gSpark_flags;
 extern br_pixelmap* gIt_shade_table;
+extern int gAFE_color_cycle;
 extern int gSmoke_flags;
 extern int gSmoke_num;
 extern tSmoke gSmoke[25];
