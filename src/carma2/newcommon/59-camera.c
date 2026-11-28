@@ -1414,7 +1414,7 @@ void C2_HOOK_FASTCALL InitialiseExternalCamera(void) {
     gCamera_mode = -2;
     gMin_camera_car_distance = 0.6f;
     if (gCountdown && (gNet_mode == eNet_mode_none || gCurrent_net_game->options.grid_start) && gCountdown > 4) {
-        gCamera_height += 10.f;
+        gCamera_height += 10.0f;
     }
 }
 
