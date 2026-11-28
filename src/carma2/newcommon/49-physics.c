@@ -38,12 +38,12 @@ tU32 gUINT_00679430;
 // GLOBAL: CARMA2_HW 0x00679434
 // GLOBAL: CARMA2_SW 0x00673ba4
 // GLOBAL: CARMA2_CHEAT 0x00680ce4
-int gINT_00679434;
+undefined4 gDAT_00679434;
 
 // GLOBAL: CARMA2_HW 0x00679438
 // GLOBAL: CARMA2_SW 0x00673ba8
 // GLOBAL: CARMA2_CHEAT 0x00680ce8
-int gINT_00679438;
+int gTesting_sensible_place;
 
 // GLOBAL: CARMA2_HW 0x00692dc8
 // GLOBAL: CARMA2_SW 0x0068ce20
@@ -476,7 +476,7 @@ int C2_HOOK_FASTCALL GetCornerToFacePoints(tPhysics_object* pObject, tPhysics_sh
     if (pMax_count < 4) {
         return 0;
     }
-    gINT_00679434 = 0;
+    gDAT_00679434 = 0;
     for (i = 0; i < pWorkspace->count_points; i++) {
         if (pWorkspace->point_flags[i] == 0) {
             BrVector3Sub(&direction, &pWorkspace->trial_points[i], &pWorkspace->old_points[i]);
@@ -653,7 +653,7 @@ int C2_HOOK_FASTCALL CheckTwoEdges(const br_vector3* pEdge_start, const br_vecto
             return CylinderCheck(&n0, &n1, pEdge_start, pEdge_direction, pOther_start, pOther_direction, pOther_velocity, pOther_direction_change, pForce, pCount, pObject, pOther);
         }
         t = -(c / b) - c * c * a / (b2 * b) * (-4.0f / 3.0f);
-        if (t < 0.0f || t > 1.0f || gINT_00679438 != 0) {
+        if (t < 0.0f || t > 1.0f || gTesting_sensible_place != 0) {
             t = -(b / a) - t;
         }
     }
