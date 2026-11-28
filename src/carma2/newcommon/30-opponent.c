@@ -282,6 +282,12 @@ tU32 gNext_elastication;
 
 // GLOBAL: CARMA2_CHEAT 0x0069914c
 tU32 gNext_write_during_elastication;
+
+// GLOBAL: CARMA2_CHEAT 0x00699120
+br_actor* gOppo_path_actor;
+
+// GLOBAL: CARMA2_CHEAT 0x00699124
+br_model* gOppo_path_model;
 #endif
 
 // FUNCTION: CARMA2_HW 0x004a8160
@@ -2052,14 +2058,271 @@ void C2_HOOK_FASTCALL DeleteNode(tS16 pNode_to_delete, int pAnd_sections) {
     NOT_IMPLEMENTED();
 }
 
-// STUB: CARMA2_CHEAT 0x004b10c0
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
+
+inline void C2_HOOK_FASTCALL MakeSection(br_uint_16 pFirst_vertex, br_uint_16 pFirst_face, const br_vector3* pStart, const br_vector3* pFinish, br_scalar pWidth, br_material* pMaterial_centre_lt, br_material* pMaterial_centre_dk, br_material* pMaterial_edges_start_lt, br_material* pMaterial_edges_start_dk, br_material* pMaterial_edges_finish_lt, br_material* pMaterial_edges_finish_dk) {
+    int i;
+    br_vector3 offset_v;
+    br_vector3 centre_length_v;
+    br_material* the_material_start_lt;
+    br_material* the_material_start_dk;
+    br_material* the_material_finish_lt;
+    br_material* the_material_finish_dk;
+    br_scalar height;
+
+    CalcNegativeXVector(&offset_v, pStart, pFinish, pWidth);
+    for (i = 0; i < 3; i++) {
+        the_material_start_lt = pMaterial_edges_start_lt;
+        the_material_start_dk = pMaterial_edges_start_dk;
+        the_material_finish_lt = pMaterial_edges_finish_lt;
+        the_material_finish_dk = pMaterial_edges_finish_dk;
+        height = 0.15f;
+        if (i == 1) {
+            BrVector3Negate(&offset_v, &offset_v);
+        } else if (i == 2) {
+            height = 0.3f;
+            BrVector3Set(&offset_v, 0.0f, 0.0f, 0.0f);
+            the_material_finish_lt = pMaterial_centre_lt;
+            the_material_start_lt = the_material_finish_lt;
+            the_material_finish_dk = pMaterial_centre_dk;
+            the_material_start_dk = the_material_finish_dk;
+        }
+        BrVector3Sub(&centre_length_v, pFinish, pStart);
+        BrVector3InvScale(&centre_length_v, &centre_length_v, 2.0f);
+        BrVector3Accumulate(&centre_length_v, pStart);
+
+        MakeVertexAndOffsetIt__opponent(pStart->v[0], pStart->v[1], pStart->v[2], gOppo_path_model, pFirst_vertex + 6 * i + 0, &offset_v);
+        MakeVertexAndOffsetIt__opponent(pStart->v[0], pStart->v[1] + height, pStart->v[2], gOppo_path_model, pFirst_vertex + 6 * i + 1, &offset_v);
+        MakeVertexAndOffsetIt__opponent(centre_length_v.v[0], centre_length_v.v[1] + height, centre_length_v.v[2], gOppo_path_model, pFirst_vertex + 6 * i + 2, &offset_v);
+        MakeVertexAndOffsetIt__opponent(centre_length_v.v[0], centre_length_v.v[1], centre_length_v.v[2], gOppo_path_model, pFirst_vertex + 6 * i + 3, &offset_v);
+        MakeVertexAndOffsetIt__opponent(pFinish->v[0], pFinish->v[1] + height, pFinish->v[2], gOppo_path_model, pFirst_vertex + 6 * i + 4, &offset_v);
+        MakeVertexAndOffsetIt__opponent(pFinish->v[0], pFinish->v[1], pFinish->v[2], gOppo_path_model, pFirst_vertex + 6 * i + 5, &offset_v);
+
+        MakeFaceAndTextureIt__opponent(gOppo_path_model, pFirst_face + 4 * i + 0, pFirst_vertex + 6 * i + 0, pFirst_vertex + 6 * i + 1, pFirst_vertex + 6 * i + 2, the_material_start_lt);
+        MakeFaceAndTextureIt__opponent(gOppo_path_model, pFirst_face + 4 * i + 1, pFirst_vertex + 6 * i + 0, pFirst_vertex + 6 * i + 2, pFirst_vertex + 6 * i + 3, the_material_start_dk);
+        MakeFaceAndTextureIt__opponent(gOppo_path_model, pFirst_face + 4 * i + 2, pFirst_vertex + 6 * i + 3, pFirst_vertex + 6 * i + 2, pFirst_vertex + 6 * i + 4, the_material_finish_lt);
+        MakeFaceAndTextureIt__opponent(gOppo_path_model, pFirst_face + 4 * i + 3, pFirst_vertex + 6 * i + 3, pFirst_vertex + 6 * i + 4, pFirst_vertex + 6 * i + 5, the_material_finish_dk);
+    }
+}
+
+inline void C2_HOOK_FASTCALL CalcNumberOfFacesAndVerticesForOppoPathModel(br_uint_16* pFace_index_ptr, br_uint_16* pVertex_index_ptr) {
+
+    *pFace_index_ptr = gProgram_state.AI_vehicles.number_of_cops * 12 + gProgram_state.AI_vehicles.number_of_path_sections * 12;
+    *pVertex_index_ptr = gProgram_state.AI_vehicles.number_of_path_sections * 18 + gProgram_state.AI_vehicles.number_of_cops * 8;
+}
+
+inline void C2_HOOK_FASTCALL CopyVertex__opponent(br_vertex* pDest_vertex, const br_vertex* pSrc_vertex) {
+
+    BrVector3Copy(&pDest_vertex->p, &pSrc_vertex->p);
+    pDest_vertex->map.v[0] = pSrc_vertex->map.v[0];
+    pDest_vertex->map.v[1] = pSrc_vertex->map.v[1];
+    pDest_vertex->index = pSrc_vertex->index;
+    pDest_vertex->red = pSrc_vertex->red;
+    pDest_vertex->grn = pSrc_vertex->grn;
+    pDest_vertex->blu = pSrc_vertex->blu;
+}
+
+inline void C2_HOOK_FASTCALL CopyFace__opponent(br_face* pDest_face, const br_face* pSrc_face) {
+
+    pDest_face->vertices[0] = pSrc_face->vertices[0];
+    pDest_face->vertices[1] = pSrc_face->vertices[1];
+    pDest_face->vertices[2] = pSrc_face->vertices[2];
+    pDest_face->material = pSrc_face->material;
+    pDest_face->smoothing = pSrc_face->smoothing;
+    pDest_face->flags = pSrc_face->flags;
+}
+
+inline void C2_HOOK_FASTCALL ReallocModelFacesAndVertices__opponent(br_model* pModel, int pNum_faces, int pNum_vertices) {
+    br_vertex* new_vertices;
+    br_face* new_faces;
+    int i;
+
+    new_vertices = BrResAllocate(pModel, pNum_vertices * sizeof(br_vertex), BR_MEMORY_VERTICES);
+    BrBlockFill(new_vertices, 0, pNum_vertices * sizeof(br_vertex) / sizeof(br_uint_32));
+    if (pModel->nvertices != 0) {
+        for (i = 0; i < (pModel->nvertices < pNum_vertices ? pModel->nvertices : pNum_vertices); i++) {
+            CopyVertex__opponent(&new_vertices[i], &pModel->vertices[i]);
+        }
+        BrResRemove(pModel->vertices);
+        BrResFree(pModel->vertices);
+    }
+    pModel->vertices = new_vertices;
+    pModel->nvertices = pNum_vertices;
+
+    new_faces = BrResAllocate(pModel, pNum_faces * sizeof(br_face), BR_MEMORY_FACES);
+    BrBlockFill(new_faces, 0, pNum_faces * sizeof(br_face) / sizeof(br_uint_32));
+    if (pModel->nfaces != 0) {
+        for (i = 0; i < (pModel->nfaces < pNum_faces ? pModel->nfaces : pNum_faces); i++) {
+            CopyFace__opponent(&new_faces[i], &pModel->faces[i]);
+        }
+        BrResRemove(pModel->faces);
+        BrResFree(pModel->faces);
+    }
+    pModel->faces = new_faces;
+    pModel->nfaces = pNum_faces;
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// FUNCTION: CARMA2_CHEAT 0x004b10c0
 void C2_HOOK_FASTCALL RebuildOppoPathModel(void) {
-    NOT_IMPLEMENTED();
+    // GLOBAL: CARMA2_CHEAT 0x00699168
+    static int nvertices_last_time;
+    // GLOBAL: CARMA2_CHEAT 0x0069916c
+    static int nfaces_last_time;
+    int i;
+    br_uint_16 nfaces;
+    br_uint_16 nvertices;
+    br_uint_16 first_face;
+    br_uint_16 first_vertex;
+    br_material* centre_mat_lt;
+    br_material* centre_mat_dk;
+    br_material* edge_mat_start_lt;
+    br_material* edge_mat_start_dk;
+    br_material* edge_mat_finish_lt;
+    br_material* edge_mat_finish_dk;
+
+    if (gProgram_state.AI_vehicles.number_of_path_nodes < 2) {
+        if (gOppo_path_model != NULL) {
+            BrModelRemove(gOppo_path_model);
+            BrModelFree(gOppo_path_model);
+            gOppo_path_model = NULL;
+        }
+        if (gOppo_path_actor != NULL) {
+            gOppo_path_actor->type = BR_ACTOR_NONE;
+            gOppo_path_actor->render_style = BR_RSTYLE_NONE;
+        }
+    } else {
+        if (gOppo_path_actor == NULL) {
+            gOppo_path_actor = BrActorAllocate(BR_ACTOR_MODEL, NULL);
+            BrActorAdd(gNon_track_actor, gOppo_path_actor);
+        }
+        if (gOppo_path_model == NULL) {
+            gOppo_path_actor->model = BrModelAllocate("OppoPathModel", 3, 1);
+            gOppo_path_model = gOppo_path_actor->model;
+            gOppo_path_model->flags |= BR_MODF_DONT_WELD | BR_MODF_KEEP_ORIGINAL | BR_MODF_GENERATE_TAGS;
+            BrModelAdd(gOppo_path_model);
+        }
+        gOppo_path_actor->model = gOppo_path_model;
+        gOppo_path_actor->type = BR_ACTOR_MODEL;
+        gOppo_path_actor->render_style = BR_RSTYLE_FACES;
+        CalcNumberOfFacesAndVerticesForOppoPathModel(&nfaces, &nvertices);
+        if (nvertices_last_time < nvertices || nfaces_last_time < nfaces) {
+            ReallocModelFacesAndVertices__opponent(gOppo_path_model, nfaces, nvertices);
+            nvertices_last_time = nvertices;
+            nfaces_last_time = nfaces;
+        } else {
+            gOppo_path_model->nvertices = nvertices;
+            gOppo_path_model->nfaces = nfaces;
+        }
+        for (i = 0; i < gProgram_state.AI_vehicles.number_of_path_sections; i++) {
+            centre_mat_lt = gMat_lt_grn;
+            centre_mat_dk = gMat_dk_grn;
+            edge_mat_start_lt = gMat_lt_grn;
+            edge_mat_start_dk = gMat_dk_grn;
+            edge_mat_finish_lt = gMat_lt_grn;
+            edge_mat_finish_dk = gMat_dk_grn;
+            if (gProgram_state.AI_vehicles.path_sections[i].type == 1) {
+                centre_mat_lt = gMat_lt_red;
+                centre_mat_dk = gMat_dk_red;
+            } else if (gProgram_state.AI_vehicles.path_sections[i].type == 2) {
+                centre_mat_lt = gMat_lt_blu;
+                centre_mat_dk = gMat_dk_blu;
+            }
+            if (gProgram_state.AI_vehicles.path_sections[i].one_way) {
+                centre_mat_lt = gMat_lt_yel;
+            }
+            if (gProgram_state.AI_vehicles.path_sections[i].min_speed[0] != 0 || gProgram_state.AI_vehicles.path_sections[i].max_speed[0] != 255) {
+                edge_mat_start_lt = gMat_lt_turq;
+                edge_mat_start_dk = gMat_dk_turq;
+            }
+            if (gProgram_state.AI_vehicles.path_sections[i].min_speed[1] != 0 || gProgram_state.AI_vehicles.path_sections[i].max_speed[1] != 255) {
+                edge_mat_finish_lt = gMat_lt_turq;
+                edge_mat_finish_dk = gMat_dk_turq;
+            }
+            if (gAlready_elasticating && i == gMobile_section) {
+                BrVector3Copy(&gProgram_state.AI_vehicles.path_nodes[(tS16)gProgram_state.AI_vehicles.path_sections[i].node_indices[1]].pos, &gPlayer_car_master_actor->t.t.translate.t);
+            }
+            MakeSection(18 * i, 12 * i,
+                &gProgram_state.AI_vehicles.path_nodes[(tS16)gProgram_state.AI_vehicles.path_sections[i].node_indices[0]].pos,
+                &gProgram_state.AI_vehicles.path_nodes[(tS16)gProgram_state.AI_vehicles.path_sections[i].node_indices[1]].pos,
+                gProgram_state.AI_vehicles.path_sections[i].width,
+                centre_mat_lt, centre_mat_dk,
+                edge_mat_start_lt, edge_mat_start_dk,
+                edge_mat_finish_lt, edge_mat_finish_dk);
+        }
+        first_face = 12 * gProgram_state.AI_vehicles.number_of_path_sections;
+        first_vertex = 18 * gProgram_state.AI_vehicles.number_of_path_sections;
+        for (i = 0; i < gProgram_state.AI_vehicles.number_of_cops; i++) {
+            MakeCube(first_vertex + 8 * i, first_face + 12 * i, &gProgram_state.AI_vehicles.cop_start_points[i], gMat_lt_turq, gMat_lt_turq, gMat_dk_turq);
+        }
+        BrModelUpdate(gOppo_path_model, BR_MODU_ALL);
+    }
 }
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(on)
 #endif
+
+// FUNCTION: CARMA2_CHEAT 0x004b1830
+void C2_HOOK_FASTCALL MakeVertexAndOffsetIt__opponent(br_scalar pX, br_scalar pY, br_scalar pZ, br_model* pModel, int pVertex_num, const br_vector3* pOffset) {
+
+    BrVector3Set(&pModel->vertices[pVertex_num].p, pX, pY, pZ);
+    BrVector3Accumulate(&pModel->vertices[pVertex_num].p, pOffset);
+}
+
+// FUNCTION: CARMA2_CHEAT 0x004b1890
+void C2_HOOK_FASTCALL MakeFaceAndTextureIt__opponent(br_model* pModel, int pFace_num, br_uint_16 pV0, br_uint_16 pV1, br_uint_16 pV2, br_material* pMaterial) {
+
+    pModel->faces[pFace_num].vertices[0] = pV0;
+    pModel->faces[pFace_num].vertices[1] = pV1;
+    pModel->faces[pFace_num].vertices[2] = pV2;
+    pModel->faces[pFace_num].smoothing = 0xffff;
+    pModel->faces[pFace_num].material = pMaterial;
+}
+
+// FUNCTION: CARMA2_CHEAT 0x004b18e0
+void C2_HOOK_FASTCALL MakeCube(br_uint_16 pFirst_vertex, br_uint_16 pFirst_face, const br_vector3* pPoint, br_material* pMaterial_1, br_material* pMaterial_2, br_material* pMaterial_3) {
+    br_vector3 offset_v;
+    br_vector3 point;
+
+    BrVector3Copy(&point, pPoint);
+    point.v[1] += 0.15f;
+
+    BrVector3Set(&offset_v, 0.1f, 0.1f, 0.1f);
+    MakeVertexAndOffsetIt__opponent(point.v[0], point.v[1], point.v[2], gOppo_path_model, pFirst_vertex + 0, &offset_v);
+    BrVector3Set(&offset_v, 0.1f, -0.1f, 0.1f);
+    MakeVertexAndOffsetIt__opponent(point.v[0], point.v[1], point.v[2], gOppo_path_model, pFirst_vertex + 1, &offset_v);
+    BrVector3Set(&offset_v, -0.1f, -0.1f, 0.1f);
+    MakeVertexAndOffsetIt__opponent(point.v[0], point.v[1], point.v[2], gOppo_path_model, pFirst_vertex + 2, &offset_v);
+    BrVector3Set(&offset_v, -0.1f, 0.1f, 0.1f);
+    MakeVertexAndOffsetIt__opponent(point.v[0], point.v[1], point.v[2], gOppo_path_model, pFirst_vertex + 3, &offset_v);
+    BrVector3Set(&offset_v, 0.1f, 0.1f, -0.1f);
+    MakeVertexAndOffsetIt__opponent(point.v[0], point.v[1], point.v[2], gOppo_path_model, pFirst_vertex + 4, &offset_v);
+    BrVector3Set(&offset_v, 0.1f, -0.1f, -0.1f);
+    MakeVertexAndOffsetIt__opponent(point.v[0], point.v[1], point.v[2], gOppo_path_model, pFirst_vertex + 5, &offset_v);
+    BrVector3Set(&offset_v, -0.1f, -0.1f, -0.1f);
+    MakeVertexAndOffsetIt__opponent(point.v[0], point.v[1], point.v[2], gOppo_path_model, pFirst_vertex + 6, &offset_v);
+    BrVector3Set(&offset_v, -0.1f, 0.1f, -0.1f);
+    MakeVertexAndOffsetIt__opponent(point.v[0], point.v[1], point.v[2], gOppo_path_model, pFirst_vertex + 7, &offset_v);
+
+    MakeFaceAndTextureIt__opponent(gOppo_path_model, pFirst_face + 0, pFirst_vertex + 3, pFirst_vertex + 2, pFirst_vertex + 1, pMaterial_1);
+    MakeFaceAndTextureIt__opponent(gOppo_path_model, pFirst_face + 1, pFirst_vertex + 0, pFirst_vertex + 3, pFirst_vertex + 1, pMaterial_1);
+    MakeFaceAndTextureIt__opponent(gOppo_path_model, pFirst_face + 2, pFirst_vertex + 1, pFirst_vertex + 5, pFirst_vertex + 4, pMaterial_2);
+    MakeFaceAndTextureIt__opponent(gOppo_path_model, pFirst_face + 3, pFirst_vertex + 1, pFirst_vertex + 4, pFirst_vertex + 0, pMaterial_2);
+    MakeFaceAndTextureIt__opponent(gOppo_path_model, pFirst_face + 4, pFirst_vertex + 0, pFirst_vertex + 4, pFirst_vertex + 3, pMaterial_3);
+    MakeFaceAndTextureIt__opponent(gOppo_path_model, pFirst_face + 5, pFirst_vertex + 3, pFirst_vertex + 4, pFirst_vertex + 7, pMaterial_3);
+    MakeFaceAndTextureIt__opponent(gOppo_path_model, pFirst_face + 6, pFirst_vertex + 4, pFirst_vertex + 5, pFirst_vertex + 7, pMaterial_1);
+    MakeFaceAndTextureIt__opponent(gOppo_path_model, pFirst_face + 7, pFirst_vertex + 5, pFirst_vertex + 6, pFirst_vertex + 7, pMaterial_1);
+    MakeFaceAndTextureIt__opponent(gOppo_path_model, pFirst_face + 8, pFirst_vertex + 2, pFirst_vertex + 7, pFirst_vertex + 6, pMaterial_2);
+    MakeFaceAndTextureIt__opponent(gOppo_path_model, pFirst_face + 9, pFirst_vertex + 2, pFirst_vertex + 3, pFirst_vertex + 7, pMaterial_2);
+    MakeFaceAndTextureIt__opponent(gOppo_path_model, pFirst_face + 10, pFirst_vertex + 1, pFirst_vertex + 2, pFirst_vertex + 6, pMaterial_3);
+    MakeFaceAndTextureIt__opponent(gOppo_path_model, pFirst_face + 11, pFirst_vertex + 1, pFirst_vertex + 6, pFirst_vertex + 5, pMaterial_3);
+}
 
 inline void C2_HOOK_FASTCALL DeleteOrphanNodes(void) {
     tS16 node_no;

@@ -66,6 +66,8 @@ extern float gHead_on_cos_value;
 extern int gProcessing_opponents;
 extern tU32 gNext_elastication;
 extern tU32 gNext_write_during_elastication;
+extern br_actor* gOppo_path_actor;
+extern br_model* gOppo_path_model;
 #endif
 
 extern void C2_HOOK_CDECL DoNotDprintf(const char* pMessage, ...);
@@ -209,7 +211,23 @@ extern void C2_HOOK_FASTCALL DeleteSection(tS16 pSection_to_delete);
 
 extern void C2_HOOK_FASTCALL DeleteNode(tS16 pNode_to_delete, int pAnd_sections);
 
+extern void C2_HOOK_FASTCALL MakeSection(br_uint_16 pFirst_vertex, br_uint_16 pFirst_face, const br_vector3* pStart, const br_vector3* pFinish, br_scalar pWidth, br_material* pMaterial_centre_lt, br_material* pMaterial_centre_dk, br_material* pMaterial_edges_start_lt, br_material* pMaterial_edges_start_dk, br_material* pMaterial_edges_finish_lt, br_material* pMaterial_edges_finish_dk);
+
+extern void C2_HOOK_FASTCALL CalcNumberOfFacesAndVerticesForOppoPathModel(br_uint_16* pFace_index_ptr, br_uint_16* pVertex_index_ptr);
+
+extern void C2_HOOK_FASTCALL CopyVertex__opponent(br_vertex* pDest_vertex, const br_vertex* pSrc_vertex);
+
+extern void C2_HOOK_FASTCALL CopyFace__opponent(br_face* pDest_face, const br_face* pSrc_face);
+
+extern void C2_HOOK_FASTCALL ReallocModelFacesAndVertices__opponent(br_model* pModel, int pNum_faces, int pNum_vertices);
+
 extern void C2_HOOK_FASTCALL RebuildOppoPathModel(void);
+
+extern void C2_HOOK_FASTCALL MakeVertexAndOffsetIt__opponent(br_scalar pX, br_scalar pY, br_scalar pZ, br_model* pModel, int pVertex_num, const br_vector3* pOffset);
+
+extern void C2_HOOK_FASTCALL MakeFaceAndTextureIt__opponent(br_model* pModel, int pFace_num, br_uint_16 pV0, br_uint_16 pV1, br_uint_16 pV2, br_material* pMaterial);
+
+extern void C2_HOOK_FASTCALL MakeCube(br_uint_16 pFirst_vertex, br_uint_16 pFirst_face, const br_vector3* pPoint, br_material* pMaterial_1, br_material* pMaterial_2, br_material* pMaterial_3);
 
 extern void C2_HOOK_FASTCALL DeleteOrphanNodes(void);
 
