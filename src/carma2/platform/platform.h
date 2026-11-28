@@ -167,6 +167,9 @@ extern tButtonJoystickInfo* C2_HOOK_FASTCALL PDGetCurrentJoystickData(void);
 extern int C2_HOOK_FASTCALL PDIsJoystickAvailable(int pIndex);
 extern const char* C2_HOOK_FASTCALL GetCurrentJoystickName(void);
 extern void C2_HOOK_FASTCALL PDSetJoystickFFBGain(int pGain);
+/* FIXME: names of the next two unknown (Windows-only force feedback helpers called by CalcForce) */
+extern int C2_HOOK_FASTCALL PDSetJoystickFrictionFFB(int pGain);
+extern int C2_HOOK_FASTCALL PDSetJoystickForceFFB(int pForce);
 extern int C2_HOOK_FASTCALL PDEnableJoysticks(void);
 extern int C2_HOOK_FASTCALL PDDisableJoysticks(void);
 

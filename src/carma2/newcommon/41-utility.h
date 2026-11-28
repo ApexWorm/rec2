@@ -15,6 +15,7 @@
 
 extern char* gMisc_strings[300];
 extern char gCurrent_load_directory[256];
+extern br_vector3 gBR_VECTOR3_00661678;
 
 extern br_error C2_HOOK_FASTCALL DRBrEnd(void);
 

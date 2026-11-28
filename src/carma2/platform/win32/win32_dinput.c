@@ -903,7 +903,7 @@ void C2_HOOK_FASTCALL RegisterJoystickFFBForces(void) {
     memset(&description, 0, sizeof(description));
 #endif
     description.type = eJoystick_effect_ConstantForce;
-    description.type_specific_params.constant.field_0x0 = 0;
+    description.type_specific_params.constant.lMagnitude = 0;
     description.time_ms = 5000000;
     description.field_0x38 = 1000;
     description.field_0x3c = 5000;
@@ -915,7 +915,7 @@ void C2_HOOK_FASTCALL RegisterJoystickFFBForces(void) {
     memset(&description, 0, sizeof(description));
 #endif
     description.type = eJoystick_effect_ConstantForce;
-    description.type_specific_params.constant.field_0x0 = 0;
+    description.type_specific_params.constant.lMagnitude = 0;
     description.time_ms = 1000000;
     description.field_0x38 = 1000;
     description.field_0x3c = 5000;
@@ -924,8 +924,13 @@ void C2_HOOK_FASTCALL RegisterJoystickFFBForces(void) {
     gCollision_force_joystick_effect_index = CreateDinputEffect(gJoystick_index, &description, "Collision Force");
 }
 
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
 // FUNCTION: CARMA2_HW 0x00458610
 // FUNCTION: CARMA2_SW 0x004583a0
+// FUNCTION: CARMA2_CHEAT 0x00458a90
 int C2_HOOK_FASTCALL SetDinputEffectGain(int pIndex, int pGain) {
     IDirectInputEffect* effect;
 
@@ -939,6 +944,76 @@ int C2_HOOK_FASTCALL SetDinputEffectGain(int pIndex, int pGain) {
     if (effect != NULL) {
         IDirectInputEffect_SetParameters(effect, &gJoystick_effects[pIndex].di_effect, DIEP_GAIN);
     }
+    return 1;
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
+
+// FUNCTION: CARMA2_HW 0x00458660
+// FUNCTION: CARMA2_SW 0x004583f0
+// FUNCTION: CARMA2_CHEAT 0x00458ae0
+int C2_HOOK_FASTCALL PDSetJoystickFrictionFFB(int pGain) {
+
+    if (!gForceFeedbackAvailable) {
+        return 0;
+    }
+    if (pGain < 1) {
+        StopDinputEffect(gBasic_friction_joystick_effect_index);
+        return 1;
+    }
+    if (pGain > 10000) {
+        pGain = 10000;
+    }
+    SetDinputEffectGain(gBasic_friction_joystick_effect_index, pGain);
+    StartDinputEffect(gBasic_friction_joystick_effect_index);
+    return 1;
+}
+
+// FUNCTION: CARMA2_HW 0x004586b0
+// FUNCTION: CARMA2_SW 0x00458440
+// FUNCTION: CARMA2_CHEAT 0x00458b30
+int C2_HOOK_FASTCALL PDSetJoystickForceFFB(int pForce) {
+    IDirectInputEffect* effect;
+
+    if (gForceFeedbackAvailable) {
+        if (pForce > 10000) {
+            pForce = 10000;
+        }
+        if (gJoystick_effects[gBasic_force_joystick_effect_index].type_specific_params.constant.lMagnitude != pForce) {
+            gJoystick_effects[gBasic_force_joystick_effect_index].type_specific_params.constant.lMagnitude = pForce;
+            effect = gDirectInputEffects[gBasic_force_joystick_effect_index];
+            if (effect != NULL) {
+                IDirectInputEffect_SetParameters(effect, &gJoystick_effects[gBasic_force_joystick_effect_index].di_effect, DIEP_TYPESPECIFICPARAMS);
+            }
+            StartDinputEffect(gBasic_force_joystick_effect_index);
+            return 1;
+        }
+    }
+    return 0;
+}
+
+// FUNCTION: CARMA2_HW 0x00458720
+// FUNCTION: CARMA2_SW 0x004584b0
+// FUNCTION: CARMA2_CHEAT 0x00458ba0
+int C2_HOOK_FASTCALL SetJoystickCollisionFFB(int pForce, LONG pDirection) {
+    IDirectInputEffect* effect;
+
+    if (!gForceFeedbackAvailable) {
+        return 0;
+    }
+    if (pForce > 10000) {
+        pForce = 10000;
+    }
+    gJoystick_effects[gCollision_force_joystick_effect_index].type_specific_params.constant.lMagnitude = pForce;
+    gJoystick_effects[gCollision_force_joystick_effect_index].field_0x60 = pDirection;
+    effect = gDirectInputEffects[gCollision_force_joystick_effect_index];
+    if (effect != NULL) {
+        IDirectInputEffect_SetParameters(effect, &gJoystick_effects[gCollision_force_joystick_effect_index].di_effect, DIEP_TYPESPECIFICPARAMS);
+        IDirectInputEffect_SetParameters(gDirectInputEffects[gCollision_force_joystick_effect_index], &gJoystick_effects[gCollision_force_joystick_effect_index].di_effect, DIEP_DIRECTION);
+    }
+    StartDinputEffect(gCollision_force_joystick_effect_index);
     return 1;
 }
 

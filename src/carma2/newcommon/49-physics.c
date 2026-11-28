@@ -708,7 +708,12 @@ void C2_HOOK_FASTCALL SetListDoingNothingFlag(tPhysics_object* pObject, int pFla
     }
 }
 
-// SetGroupDoingNothingFlag
+// STUB: CARMA2_HW 0x004b9e40
+// STUB: CARMA2_SW 0x004b6560
+// STUB: CARMA2_CHEAT 0x004bf970
+void C2_HOOK_FASTCALL SetGroupDoingNothingFlag(tPhysics_object* pObject, int pFlag) {
+    NOT_IMPLEMENTED();
+}
 
 // FUNCTION: CARMA2_HW 0x004b9ef0
 // FUNCTION: CARMA2_SW 0x004b6610

@@ -135,37 +135,37 @@ extern void C2_HOOK_FASTCALL ControlCar5(tCar_spec* pCar, br_scalar pDt);
 
 extern void C2_HOOK_FASTCALL ControlCar1(tCar_spec* pCar, br_scalar pDt);
 
-// SteeringSelfCentre
+extern int C2_HOOK_FASTCALL SteeringSelfCentre(tCar_spec* c, br_scalar dt, br_vector3* n);
 
 // NonCarSnapOff
 
 // TestNonCarSnapOff
 
-// TumbleObjectWithV
+extern void C2_HOOK_FASTCALL TumbleObjectWithV(tPhysics_object* pObject, br_vector3* pV, float pArg3, float pArg4);
 
-// TumbleObject
+extern void C2_HOOK_FASTCALL TumbleObject(tPhysics_object* pObject, float pTumble_factor, float pTumble_threshold);
 
 extern void C2_HOOK_FASTCALL MakeLiftGoUp(tNon_car_spec* pNon_car);
 
 extern void C2_HOOK_FASTCALL NonCarCalcForce(tNon_car_spec* pNon_car, br_scalar pDt);
 
-// DoBumpiness
+extern void C2_HOOK_FASTCALL DoBumpiness(tCar_spec* c, br_vector3* wheel_pos, br_vector3* norm, br_scalar* d, int n);
 
-// SmashFacesWithWheels
+extern void C2_HOOK_FASTCALL SmashFacesWithWheels(tCar_spec* c, tFace_ref** pFace_refs, br_scalar* pForces, br_vector3* pWheel_pos);
 
-// ConditionallyNoteSkid
+extern void C2_HOOK_FASTCALL ConditionallyNoteSkid(tCar_spec* pCar, tFace_ref** pFace_refs, int pWheel);
 
-// NudgeObject
+extern void C2_HOOK_FASTCALL NudgeObject(tPhysics_object* pObject);
 
-// CalcForce
+extern void C2_HOOK_FASTCALL CalcForce(tCar_spec* c, br_scalar dt);
 
 // DoRevs
 
 extern void C2_HOOK_FASTCALL ScrapeNoise(br_scalar pVelocity, br_vector3* pPosition, int pMaterial);
 
-// SkidNoise
+extern void C2_HOOK_FASTCALL SkidNoise(tCar_spec* pC, int pWheel_num, br_scalar pV, int pMaterial);
 
-// StopSkid
+extern void C2_HOOK_FASTCALL StopSkid(tCar_spec* pC);
 
 // CrashNoise
 
@@ -179,15 +179,15 @@ extern int C2_HOOK_FASTCALL ProcessForcesCallback(tPhysics_joint_force* pForces,
 
 extern int C2_HOOK_FASTCALL ProcessJointForcesCallBack(void* pArg1, void* pArg2, void* pArg3);
 
-// MultiFindFloorInBoxM
+extern void C2_HOOK_FASTCALL MultiFindFloorInBoxM(int pNum_rays, br_vector3* a, br_vector3* b, br_vector3* nor, br_scalar* d, tCar_spec* c, tFace_ref** pFace_refs, tPhysics_object** pObjects);
 
-// MultiRayCastOnObjects
+extern void C2_HOOK_FASTCALL MultiRayCastOnObjects(int pNum_rays, br_vector3* a, br_vector3* b, br_vector3* nor, br_scalar* d, tCar_spec* c, tFace_ref** pFace_refs, tPhysics_object** pObjects);
 
-// MultiFindFloorInBoxBU
+extern void C2_HOOK_FASTCALL MultiFindFloorInBoxBU(int pNum_rays, br_vector3* a, br_vector3* b, br_vector3* nor, br_scalar* d, tCar_spec* c, tFace_ref** pFace_refs);
 
 extern void C2_HOOK_FASTCALL FindFace(br_vector3* pPosition, br_vector3* pDir, br_vector3* nor, br_scalar* t, br_material** material);
 
-// findfloor
+extern void C2_HOOK_FASTCALL findfloor(br_vector3* a, br_vector3* b, br_vector3* nor, br_scalar* d);
 
 extern int C2_HOOK_FASTCALL FindFloorInBoxBU(br_vector3* pPosition, br_vector3* pDirection, br_vector3* pNormal, br_scalar* pDistance, tPhysics_object* pObject);
 

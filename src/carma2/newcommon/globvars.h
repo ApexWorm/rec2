@@ -101,6 +101,7 @@ extern br_material* gLine_material;
 
 extern br_model* gBlend_model;
 extern br_model* gBlend_model2;
+extern int gINT_0074cf98;
 extern br_actor* gBlend_actor;
 extern tBRender_smoke gBR_smoke_structs[35];
 
