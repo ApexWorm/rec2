@@ -547,9 +547,9 @@ void C2_HOOK_FASTCALL CollectJoystickButtonInfo(tButtonJoystickInfo* pInfo) {
     pInfo->field_0xd4 = 1;
     pInfo->field_0xd8 = 1.0f;
     pInfo->field_0xdc = 1.0f;
-    pInfo->field_0xe0 = 0; /* or 0.f */
+    pInfo->field_0xe0 = 0; /* or 0.0f */
     pInfo->field_0xe4 = 50;
-    pInfo->field_0xe8 = 0; /* or 0.f */
+    pInfo->field_0xe8 = 0; /* or 0.0f */
 }
 
 #if defined(REC2_MATCHING) && defined(_MSC_VER)
