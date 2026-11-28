@@ -16,6 +16,20 @@
 // GLOBAL: CARMA2_CHEAT 0x006c1ce0
 tS8 gRace_memory[1000];
 
+// FUNCTION: CARMA2_HW 0x004e7420
+// FUNCTION: CARMA2_SW 0x004e3240
+// FUNCTION: CARMA2_CHEAT 0x004ed0c0
+int C2_HOOK_FASTCALL SetRuntimeVariable(int pAddress, tS8 pValue) {
+
+    if (pAddress >= 0 && pAddress < (int)REC2_ASIZE(gRace_memory)) {
+        gRace_memory[pAddress] = pValue;
+        return gRace_memory[pAddress];
+    }
+#ifdef REC2_FIX_BUGS
+    return 0;
+#endif
+}
+
 // FUNCTION: CARMA2_HW 0x004e7440
 // FUNCTION: CARMA2_SW 0x004e3260
 // FUNCTION: CARMA2_CHEAT 0x004ed0e0
