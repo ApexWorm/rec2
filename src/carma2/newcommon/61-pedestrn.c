@@ -616,7 +616,7 @@ inline void C2_HOOK_FASTCALL Flip3DStoBRaxes(br_matrix34* pMat) {
 // FUNCTION: CARMA2_HW 0x004047b0
 // FUNCTION: CARMA2_SW 0x004047b0
 // FUNCTION: CARMA2_CHEAT 0x004047b0
-tPed_move* C2_HOOK_FASTCALL FindOrOpenMove(const char* pName, tPed_form* pForm, char* pLooping_reset_flags, br_vector3* pMovement_direction, tU32 pFlags) {
+inline tPed_move* C2_HOOK_FASTCALL FindOrOpenMove(const char* pName, tPed_form* pForm, const char* pLooping_reset_flags, const br_vector3* pMovement_direction, tU32 pFlags) {
     int i;
 
     for (i = 0; i < (int)REC2_ASIZE(gPed_moves); i++) {
@@ -630,7 +630,7 @@ tPed_move* C2_HOOK_FASTCALL FindOrOpenMove(const char* pName, tPed_form* pForm, 
 // FUNCTION: CARMA2_HW 0x00404840
 // FUNCTION: CARMA2_SW 0x00404840
 // FUNCTION: CARMA2_CHEAT 0x00404840
-tPed_move* C2_HOOK_FASTCALL ReadMove(const char* pName, tPed_form* pForm, char* pLooping_reset_flags, br_vector3* pMovement_direction, tU32 pFlags) {
+inline tPed_move* C2_HOOK_FASTCALL ReadMove(const char* pName, tPed_form* pForm, const char* pLooping_reset_flags, const br_vector3* pMovement_direction, tU32 pFlags) {
     FILE* f;
     tPed_move* move;
     int count_bones_in_anim_file;
