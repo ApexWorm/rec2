@@ -21,6 +21,7 @@ extern undefined4 gDAT_00679440;
 extern br_vertex* gDAT_00679444;
 extern br_vertex* gDAT_006796c0;
 extern br_vertex* gDAT_006796c4;
+extern br_face* gDAT_0067be70;
 extern tCrush_info_buffer gDetached_bit_crush_info_buffer;
 extern tPhysics_object* gDetached_bit_collision_infos;
 extern tDriver gDetached_bit_driver;
@@ -289,9 +290,9 @@ extern void C2_HOOK_FASTCALL FullyDetachBit(tCar_spec* pCar, tPhysics_object* pO
 
 // SetUpCollisionInfoStuffForSplitHalf
 
-// SetFace
+extern void C2_HOOK_FASTCALL SetFace(br_face* pFace, tU16 pVertex1, tU16 pVertex2, tU16 pVertex3);
 
-// AddSplitVertexIndex
+extern int C2_HOOK_FASTCALL AddSplitVertexIndex(tU16 pVertex1, tU16 pVertex2, tU16 pSplit_vertex1, tU16 pSplit_vertex2);
 
 // CreateSplitVertex
 

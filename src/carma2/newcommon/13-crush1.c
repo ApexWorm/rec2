@@ -297,6 +297,11 @@ typedef struct {
 // GLOBAL: CARMA2_CHEAT 0x00681c60
 tSplit_vertex gSplit_vertices_0067a3b0[512]; /* FIXME: size is a guess (space up to the next known global) */
 
+// GLOBAL: CARMA2_HW 0x0067be70
+// GLOBAL: CARMA2_SW 0x006765e0
+// GLOBAL: CARMA2_CHEAT 0x00683720
+br_face* gDAT_0067be70;
+
 // GLOBAL: CARMA2_HW 0x006796a0
 // GLOBAL: CARMA2_SW 0x00673e10
 // GLOBAL: CARMA2_CHEAT 0x00680f50
@@ -1990,9 +1995,30 @@ void C2_HOOK_FASTCALL FullyDetachBit(tCar_spec* pCar, tPhysics_object* pObject) 
 
 // SetUpCollisionInfoStuffForSplitHalf
 
-// SetFace
+inline void C2_HOOK_FASTCALL SetFace(br_face* pFace, tU16 pVertex1, tU16 pVertex2, tU16 pVertex3) {
 
-// AddSplitVertexIndex
+    pFace->vertices[0] = pVertex1;
+    pFace->vertices[1] = pVertex2;
+    pFace->vertices[2] = pVertex3;
+    pFace->material = gDAT_0067be70->material;
+    pFace->smoothing = gDAT_0067be70->smoothing;
+}
+
+inline int C2_HOOK_FASTCALL AddSplitVertexIndex(tU16 pVertex1, tU16 pVertex2, tU16 pSplit_vertex1, tU16 pSplit_vertex2) {
+    tSplit_vertex* split;
+
+    for (split = gSplit_vertices_0067a3b0; split->split_vertex1 != 0; split++) {
+        if (split->vertex1 == pVertex1 && split->vertex2 == pVertex2) {
+            return 0;
+        }
+    }
+    split->vertex1 = pVertex1;
+    split->vertex2 = pVertex2;
+    split->split_vertex1 = pSplit_vertex1;
+    split->split_vertex2 = pSplit_vertex2;
+    split->needs_update = 1;
+    return 1;
+}
 
 // CreateSplitVertex
 
@@ -2037,12 +2063,251 @@ void C2_HOOK_FASTCALL GetSplitVertex(tU16 pVertex1, tU16 pVertex2, tU16* pSplit_
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x0042f5d0
-// STUB: CARMA2_SW 0x0042f620
-// STUB: CARMA2_CHEAT 0x0042f7a0
-/* FIXME: parameter types are from the call sites and the Mac build; the return value is not used by any caller */
+// FUNCTION: CARMA2_HW 0x0042f5d0
+// FUNCTION: CARMA2_SW 0x0042f620
+// FUNCTION: CARMA2_CHEAT 0x0042f7a0
 void C2_HOOK_FASTCALL SplitModel(br_model* pModel, br_model** pModel_1, br_model** pModel_2, const br_vector4* pPlane, int pFlags) {
-    NOT_IMPLEMENTED();
+    tU16 count_faces_1;
+    tU16 nfaces;
+    tU16 split_01_0;
+    tU16 count_vertices_2;
+    tU16 count_vertices_1;
+    tU16 split_12_1;
+    br_face* face_1;
+    tU16 n0;
+    tU16 split_12_2;
+    tU16 split_02_0;
+    br_vertex* vertex_2;
+    tU16 split_02_2;
+    br_face* face_2;
+    tU16 n2;
+    tU8 sides[1024];
+    tU16 i;
+    tU16 v0;
+    tU16 split_01_1;
+    tU16 v2;
+    br_vertex* vertex;
+    tS8 face_types[1024];
+    tU16 v1;
+    tU16 vertex_indices[1024];
+    br_scalar distances[1024];
+    tU16 n1;
+    br_vertex* vertex_1;
+    tU16 nvertices;
+    tU16 count_faces_2;
+
+    if (pModel->nvertices > 1024) {
+        PDFatalError("By the death spanners of Mars, there's a lot of vertices on that model.");
+    }
+    nfaces = pModel->nfaces;
+    nvertices = pModel->nvertices;
+    count_vertices_1 = 0;
+    count_vertices_2 = 0;
+    gDAT_00679444 = pModel->vertices;
+    vertex = pModel->vertices;
+    for (i = 0; i < nvertices; i++, vertex++) {
+        distances[i] = BrVector3Dot(&vertex->p, (const br_vector3*)pPlane) - pPlane->v[3];
+        if (distances[i] > 0.0f) {
+            sides[i] = 0;
+            count_vertices_1++;
+        } else {
+            sides[i] = 1;
+            count_vertices_2++;
+        }
+    }
+    for (i = 0; i < REC2_ASIZE(gSplit_vertices_0067a3b0); i++) {
+        gSplit_vertices_0067a3b0[i].split_vertex1 = 0;
+    }
+    count_faces_1 = 0;
+    count_faces_2 = 0;
+    gDAT_0067be70 = pModel->faces;
+    for (i = 0; i < nfaces; i++) {
+        v0 = gDAT_0067be70->vertices[0];
+        v1 = gDAT_0067be70->vertices[1];
+        v2 = gDAT_0067be70->vertices[2];
+        face_types[i] = sides[v0] | (sides[v1] << 1) | (sides[v2] << 2);
+        switch (face_types[i]) {
+        case 0:
+            count_faces_1++;
+            break;
+        case 1:
+            if (AddSplitVertexIndex(v1, v0, count_vertices_1, count_vertices_2)) {
+                count_vertices_1++;
+                count_vertices_2++;
+            }
+            if (AddSplitVertexIndex(v2, v0, count_vertices_1, count_vertices_2)) {
+                count_vertices_1++;
+                count_vertices_2++;
+            }
+            count_faces_1 += 2;
+            count_faces_2++;
+            break;
+        case 2:
+            if (AddSplitVertexIndex(v0, v1, count_vertices_1, count_vertices_2)) {
+                count_vertices_1++;
+                count_vertices_2++;
+            }
+            if (AddSplitVertexIndex(v2, v1, count_vertices_1, count_vertices_2)) {
+                count_vertices_1++;
+                count_vertices_2++;
+            }
+            count_faces_1 += 2;
+            count_faces_2++;
+            break;
+        case 3:
+            if (AddSplitVertexIndex(v2, v0, count_vertices_1, count_vertices_2)) {
+                count_vertices_1++;
+                count_vertices_2++;
+            }
+            if (AddSplitVertexIndex(v2, v1, count_vertices_1, count_vertices_2)) {
+                count_vertices_1++;
+                count_vertices_2++;
+            }
+            count_faces_1++;
+            count_faces_2 += 2;
+            break;
+        case 4:
+            if (AddSplitVertexIndex(v0, v2, count_vertices_1, count_vertices_2)) {
+                count_vertices_1++;
+                count_vertices_2++;
+            }
+            if (AddSplitVertexIndex(v1, v2, count_vertices_1, count_vertices_2)) {
+                count_vertices_1++;
+                count_vertices_2++;
+            }
+            count_faces_1 += 2;
+            count_faces_2++;
+            break;
+        case 5:
+            if (AddSplitVertexIndex(v1, v0, count_vertices_1, count_vertices_2)) {
+                count_vertices_1++;
+                count_vertices_2++;
+            }
+            if (AddSplitVertexIndex(v1, v2, count_vertices_1, count_vertices_2)) {
+                count_vertices_1++;
+                count_vertices_2++;
+            }
+            count_faces_1++;
+            count_faces_2 += 2;
+            break;
+        case 6:
+            if (AddSplitVertexIndex(v0, v1, count_vertices_1, count_vertices_2)) {
+                count_vertices_1++;
+                count_vertices_2++;
+            }
+            if (AddSplitVertexIndex(v0, v2, count_vertices_1, count_vertices_2)) {
+                count_vertices_1++;
+                count_vertices_2++;
+            }
+            count_faces_1++;
+            count_faces_2 += 2;
+            break;
+        case 7:
+            count_faces_2++;
+            break;
+        }
+        gDAT_0067be70++;
+    }
+    *pModel_1 = BrModelAllocate(pModel->identifier, count_vertices_1, count_faces_1);
+    *pModel_2 = BrModelAllocate(pModel->identifier, count_vertices_2, count_faces_2);
+    (*pModel_1)->flags |= BR_MODF_UPDATEABLE | BR_MODF_FACES_ONLY;
+    (*pModel_2)->flags |= BR_MODF_UPDATEABLE | BR_MODF_FACES_ONLY;
+    count_vertices_1 = 0;
+    count_vertices_2 = 0;
+    gDAT_006796c0 = (*pModel_1)->vertices;
+    vertex_1 = gDAT_006796c0;
+    gDAT_006796c4 = (*pModel_2)->vertices;
+    vertex_2 = gDAT_006796c4;
+    vertex = pModel->vertices;
+    for (i = 0; i < nvertices; i++, vertex++) {
+        if (sides[i] != 0) {
+            BrVector3Copy(&vertex_2->p, &vertex->p);
+            BrVector2Copy(&vertex_2->map, &vertex->map);
+            vertex_indices[i] = count_vertices_2;
+            count_vertices_2++;
+            vertex_2++;
+        } else {
+            BrVector3Copy(&vertex_1->p, &vertex->p);
+            BrVector2Copy(&vertex_1->map, &vertex->map);
+            vertex_indices[i] = count_vertices_1;
+            count_vertices_1++;
+            vertex_1++;
+        }
+    }
+    face_1 = (*pModel_1)->faces;
+    face_2 = (*pModel_2)->faces;
+    gDAT_0067be70 = pModel->faces;
+    for (i = 0; i < nfaces; i++) {
+        v0 = gDAT_0067be70->vertices[0];
+        v1 = gDAT_0067be70->vertices[1];
+        v2 = gDAT_0067be70->vertices[2];
+        n0 = vertex_indices[v0];
+        n1 = vertex_indices[v1];
+        n2 = vertex_indices[v2];
+        switch (face_types[i]) {
+        case 0:
+            SetFace(face_1++, n0, n1, n2);
+            break;
+        case 1:
+            GetSplitVertex(v1, v0, &split_01_1, &split_01_0, distances);
+            GetSplitVertex(v2, v0, &split_02_2, &split_02_0, distances);
+            SetFace(face_2++, n0, split_01_0, split_02_0);
+            SetFace(face_1++, n1, n2, split_01_1);
+            SetFace(face_1++, n2, split_02_2, split_01_1);
+            break;
+        case 2:
+            GetSplitVertex(v0, v1, &split_01_0, &split_01_1, distances);
+            GetSplitVertex(v2, v1, &split_12_2, &split_12_1, distances);
+            SetFace(face_1++, n0, split_01_0, split_12_2);
+            SetFace(face_2++, n1, split_12_1, split_01_1);
+            SetFace(face_1++, n2, n0, split_12_2);
+            break;
+        case 3:
+            GetSplitVertex(v2, v0, &split_02_2, &split_02_0, distances);
+            GetSplitVertex(v2, v1, &split_12_2, &split_12_1, distances);
+            SetFace(face_2++, n0, split_12_1, split_02_0);
+            SetFace(face_2++, n1, split_12_1, n0);
+            SetFace(face_1++, n2, split_02_2, split_12_2);
+            break;
+        case 4:
+            GetSplitVertex(v0, v2, &split_02_0, &split_02_2, distances);
+            GetSplitVertex(v1, v2, &split_12_1, &split_12_2, distances);
+            SetFace(face_1++, n0, split_12_1, split_02_0);
+            SetFace(face_1++, n1, split_12_1, n0);
+            SetFace(face_2++, n2, split_02_2, split_12_2);
+            break;
+        case 5:
+            GetSplitVertex(v1, v0, &split_01_1, &split_01_0, distances);
+            GetSplitVertex(v1, v2, &split_12_1, &split_12_2, distances);
+            SetFace(face_2++, n0, split_01_0, split_12_2);
+            SetFace(face_1++, n1, split_12_1, split_01_1);
+            SetFace(face_2++, n2, n0, split_12_2);
+            break;
+        case 6:
+            GetSplitVertex(v0, v1, &split_01_0, &split_01_1, distances);
+            GetSplitVertex(v0, v2, &split_02_0, &split_02_2, distances);
+            SetFace(face_1++, n0, split_01_0, split_02_0);
+            SetFace(face_2++, n1, n2, split_01_1);
+            SetFace(face_2++, n2, split_02_2, split_01_1);
+            break;
+        case 7:
+            SetFace(face_2++, n0, n1, n2);
+            break;
+        }
+        gDAT_0067be70++;
+    }
+#ifdef REC2_HW
+    WhitenVertexRGB(pModel_1, 1);
+#endif
+    BrModelAdd(*pModel_1);
+    if (pFlags != 0) {
+        BrModelFree(*pModel_2);
+    } else {
+#ifdef REC2_HW
+        WhitenVertexRGB(pModel_2, 1);
+#endif
+        BrModelAdd(*pModel_2);
+    }
 }
 
 #ifdef REC2_MATCHING
