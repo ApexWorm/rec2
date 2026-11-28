@@ -1137,6 +1137,9 @@ inline void C2_HOOK_FASTCALL TurnPhysicsOn(tPed_character_instance* pCharacter) 
     pCharacter->field_0x14 |= 0x4;
 }
 
+// FUNCTION: CARMA2_HW 0x004091e0
+// FUNCTION: CARMA2_SW 0x004091e0
+// FUNCTION: CARMA2_CHEAT 0x00409220
 inline int C2_HOOK_FASTCALL MakeCharacterPhysicworthy(tPed_character_instance* pCharacter) {
 
     if (pCharacter->field_0x14 & 0x4) {
