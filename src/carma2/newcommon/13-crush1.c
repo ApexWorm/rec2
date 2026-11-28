@@ -135,7 +135,7 @@ int gCount_queued_drone_crushes;
 // GLOBAL: CARMA2_HW 0x0067baa0
 // GLOBAL: CARMA2_SW 0x00676210
 // GLOBAL: CARMA2_CHEAT 0x00683350
-int gINT_0067baa0[10];
+int gFire_off_crush_ids[10];
 
 // GLOBAL: CARMA2_HW 0x0067bad0
 // GLOBAL: CARMA2_SW 0x00676240
@@ -3677,8 +3677,8 @@ inline intptr_t C2_HOOK_CDECL FireOffBitsCB(br_actor* pActor, void* pContext) {
         return 0;
     }
     found = 0;
-    for (i = 0; i < (int)REC2_ASIZE(gINT_0067baa0); i++) {
-        if (gINT_0067baa0[i] == user_crush->crush_data->id) {
+    for (i = 0; i < (int)REC2_ASIZE(gFire_off_crush_ids); i++) {
+        if (gFire_off_crush_ids[i] == user_crush->crush_data->id) {
             found = 1;
             break;
         }
@@ -3706,8 +3706,8 @@ inline intptr_t C2_HOOK_CDECL FireOffBitsCB(br_actor* pActor, void* pContext) {
 void C2_HOOK_FASTCALL FireSomeBitsOffCar(tCar_spec* pCar) {
     int i;
 
-    for (i = 0; i < (int)REC2_ASIZE(gINT_0067baa0); i++) {
-        gINT_0067baa0[i] = IRandomBetween(1, pCar->car_crush_spec->nb_entries);
+    for (i = 0; i < (int)REC2_ASIZE(gFire_off_crush_ids); i++) {
+        gFire_off_crush_ids[i] = IRandomBetween(1, pCar->car_crush_spec->nb_entries);
     }
     DRActorEnumRecurseUltraPlus(pCar->car_model_actor, FireOffBitsCB, pCar);
 }
