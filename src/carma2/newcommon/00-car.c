@@ -1381,23 +1381,23 @@ inline void C2_HOOK_FASTCALL SetAmbientPratCam(tCar_spec* pCar) {
         ChangeAmbientPratcam(11);
     } else if (pCar->car_master_actor->t.t.mat.m[1][1] < 0.1f) {
         ChangeAmbientPratcam(44);
-    } else if (abs_vcs_y > abs_vcs_z && abs_vcs_y > abs_vcs_x && vcs_y < -.004f) {
+    } else if (abs_vcs_y > abs_vcs_z && abs_vcs_y > abs_vcs_x && vcs_y < -0.004f) {
         ChangeAmbientPratcam(6);
     } else if (the_time - last_time_on_ground > 500) {
         ChangeAmbientPratcam(5);
-    } else if (abs_vcs_x > abs_vcs_z && vcs_x > .001f) {
+    } else if (abs_vcs_x > abs_vcs_z && vcs_x > 0.001f) {
         ChangeAmbientPratcam(26);
-    } else if (abs_vcs_x > abs_vcs_z && vcs_x < -.001f) {
+    } else if (abs_vcs_x > abs_vcs_z && vcs_x < -0.001f) {
         ChangeAmbientPratcam(25);
     } else if (abs_omega_x > 1.5f || abs_omega_z > 1.5f) {
         ChangeAmbientPratcam(7);
     } else if (abs_omega_y > 1.5f) {
         ChangeAmbientPratcam(10);
-    } else if (abs_vcs_z > .01f) {
+    } else if (abs_vcs_z > 0.01f) {
         ChangeAmbientPratcam(3);
-    } else if (abs_vcs_z > .004f) {
+    } else if (abs_vcs_z > 0.004f) {
         ChangeAmbientPratcam(2);
-    } else if (abs_vcs_z > .0015f) {
+    } else if (abs_vcs_z > 0.0015f) {
         ChangeAmbientPratcam(1);
     } else {
         ChangeAmbientPratcam(0);
@@ -1516,7 +1516,7 @@ void C2_HOOK_FASTCALL MungeCarGraphics(tU32 pFrame_period) {
                     float raw_revs;
                     float rev_reducer;
 
-                    sine_angle = FRandomBetween(.4f, 1.6f) * ((float)GetTotalTime() / ((float)gCountdown * 100.0f));
+                    sine_angle = FRandomBetween(0.4f, 1.6f) * ((float)GetTotalTime() / ((float)gCountdown * 100.0f));
                     sine_angle = frac(sine_angle) * 360.0f;
                     sine_angle = FastScalarSin((int)sine_angle);
                     raw_revs = the_car->red_line * fabs(sine_angle);
@@ -1608,7 +1608,7 @@ void C2_HOOK_FASTCALL MungeCarGraphics(tU32 pFrame_period) {
                         int spinning_mildly;
 
                         gWild_start = 0;
-                        spinning_mildly = abs_omega_x > 1.65f || abs_omega_z > .22f;
+                        spinning_mildly = abs_omega_x > 1.65f || abs_omega_z > 0.22f;
                         if (the_car->number_of_wheels_on_ground > 3) {
                             if (gQuite_wild_end == 0) {
                                 gQuite_wild_end = the_time;
@@ -1644,7 +1644,7 @@ void C2_HOOK_FASTCALL MungeCarGraphics(tU32 pFrame_period) {
                                 if (gQuite_wild_start == 0) {
                                     gQuite_wild_start = the_time;
                                 }
-                                if (the_car->car_master_actor->t.t.mat.m[1][1] < -.8f) {
+                                if (the_car->car_master_actor->t.t.mat.m[1][1] < -0.8f) {
                                     gWoz_upside_down_at_all = the_time;
                                 }
                             } else {
