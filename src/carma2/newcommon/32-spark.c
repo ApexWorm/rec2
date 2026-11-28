@@ -19,6 +19,7 @@
 #include "36-trig.h"
 #include "41-utility.h"
 #include "49-physics.h"
+#include "49-physics-collide.h"
 #include "52-errors.h"
 #include "59-camera.h"
 #include "60-phil.h"

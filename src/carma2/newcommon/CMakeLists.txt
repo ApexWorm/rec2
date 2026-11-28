@@ -57,6 +57,7 @@ foreach(edition ${REC2_EDITIONS})
         46-win95sys.c
         47-win95net.c
         48-radhelp.c
+        49-physics-collide.c
         49-physics-support.c
         49-physics.c
         51-smash.c
