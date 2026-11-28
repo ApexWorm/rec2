@@ -15,6 +15,12 @@
 
 extern void C2_HOOK_FASTCALL DRDrawLine(br_pixelmap* pDestn, int pX1, int pY1, int pX2, int pY2, int pColour);
 
+extern tS8* C2_HOOK_FASTCALL SkipLines(tS8* pSource, int pCount);
+
+extern void C2_HOOK_FASTCALL CopyWords(char* pDst, char* pSrc, int pN);
+
+extern void C2_HOOK_FASTCALL Copy8BitStripImageTo16Bit(br_pixelmap* pDest, br_int_16 pDest_x, br_int_16 pOffset_x, br_int_16 pDest_y, br_int_16 pOffset_y, tS8* pSource, br_int_16 pSource_x, br_int_16 pSource_y, br_uint_16 pWidth, br_uint_16 pHeight);
+
 extern void C2_HOOK_FASTCALL ClearEntireScreen(void);
 
 // DistanceFromPlane

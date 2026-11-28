@@ -25,6 +25,182 @@ void C2_HOOK_FASTCALL DRDrawLine(br_pixelmap* pDestn, int pX1, int pY1, int pX2,
     BrPixelmapLine(pDestn, pX1, pY1, pX2, pY2, pColour);
 }
 
+inline tS8* C2_HOOK_FASTCALL SkipLines(tS8* pSource, int pCount) {
+    int i;
+    int j;
+    int number_of_chunks;
+    int chunk_length;
+
+    for (i = 0; i < pCount; i++) {
+        number_of_chunks = *pSource;
+        pSource++;
+        for (j = 0; j < number_of_chunks; j++) {
+            chunk_length = *pSource;
+            pSource++;
+            if (chunk_length < 0) {
+                pSource -= chunk_length;
+            }
+        }
+    }
+    return pSource;
+}
+
+inline void C2_HOOK_FASTCALL CopyWords(char* pDst, char* pSrc, int pN) {
+    tU16* dst;
+    tU16* src;
+    int count;
+
+    dst = (tU16*)pDst;
+    src = (tU16*)pSrc;
+    count = pN / 2;
+    if (count & 0x1) {
+        *dst = *src;
+        dst++;
+        src++;
+    }
+    BrBlockCopy(dst, src, count / 2);
+}
+
+// FUNCTION: CARMA2_HW 0x0047b4a0
+// FUNCTION: CARMA2_SW 0x0047a9e0
+// FUNCTION: CARMA2_CHEAT 0x0047b820
+void C2_HOOK_FASTCALL Copy8BitStripImageTo16Bit(br_pixelmap* pDest, br_int_16 pDest_x, br_int_16 pOffset_x, br_int_16 pDest_y, br_int_16 pOffset_y, tS8* pSource, br_int_16 pSource_x, br_int_16 pSource_y, br_uint_16 pWidth, br_uint_16 pHeight) {
+    int i;
+    int j;
+    int height;
+    int number_of_chunks;
+    int old_x_byte;
+    int x_byte;
+    int destn_width;
+    int chunk_length;
+    char* destn_ptr;
+    char* destn_ptr2;
+
+#ifdef REC2_HW
+    if (gBack_screen->type != BR_PMT_INDEX_8) {
+        height = *(tU16*)pSource;
+        pSource += 2;
+        if (pDest_y + pOffset_y < 0) {
+            pSource = SkipLines(pSource, -pDest_y - pOffset_y);
+            destn_ptr = (char*)pDest->pixels;
+            height += pDest_y + pOffset_y;
+            pOffset_y = 0;
+            pDest_y = 0;
+        } else {
+            destn_ptr = (char*)pDest->pixels + pDest->row_bytes * (pDest_y + pOffset_y);
+        }
+        if (height + pDest_y + pOffset_y > pDest->height) {
+            height = pDest->height - pDest_y - pOffset_y;
+        }
+        pDest_x *= 2;
+        pOffset_x *= 2;
+        if (pDest_x + pOffset_x > 0) {
+            destn_ptr += 2 * (pDest_x + pOffset_x);
+        }
+        destn_width = 2 * pDest->width;
+        for (i = 0; i < height; i++) {
+            number_of_chunks = *pSource;
+            pSource++;
+            destn_ptr2 = destn_ptr;
+            x_byte = pOffset_x + pDest_x;
+            for (j = 0; j < number_of_chunks; j++) {
+                chunk_length = *pSource;
+                pSource++;
+                if (chunk_length < 0) {
+                    chunk_length = -chunk_length;
+                    old_x_byte = x_byte;
+                    x_byte += chunk_length;
+                    if (old_x_byte < 0) {
+                        if (x_byte > 0) {
+                            CopyWords(destn_ptr2, (char*)(pSource - old_x_byte), chunk_length + old_x_byte);
+                            destn_ptr2 += chunk_length + old_x_byte;
+                        }
+                    } else if (x_byte > destn_width) {
+                        if (old_x_byte < destn_width) {
+                            CopyWords(destn_ptr2, (char*)pSource, destn_width - old_x_byte);
+                        }
+                    } else {
+                        CopyWords(destn_ptr2, (char*)pSource, chunk_length);
+                        destn_ptr2 += chunk_length;
+                    }
+                    pSource += chunk_length;
+                } else {
+                    old_x_byte = x_byte;
+                    x_byte += chunk_length;
+                    if (old_x_byte < 0) {
+                        if (x_byte > 0) {
+                            destn_ptr2 += chunk_length + old_x_byte;
+                        }
+                    } else {
+                        destn_ptr2 += chunk_length;
+                    }
+                }
+            }
+            destn_ptr += pDest->row_bytes;
+        }
+        return;
+    }
+#endif
+    height = *(tU16*)pSource;
+    pSource += 2;
+    if (pDest_y + pOffset_y < 0) {
+        pSource = SkipLines(pSource, -pDest_y - pOffset_y);
+        destn_ptr = (char*)pDest->pixels;
+        height += pDest_y + pOffset_y;
+        pOffset_y = 0;
+        pDest_y = 0;
+    } else {
+        destn_ptr = (char*)pDest->pixels + pDest->row_bytes * (pDest_y + pOffset_y);
+    }
+    if (height + pDest_y + pOffset_y > pDest->height) {
+        height = pDest->height - pDest_y - pOffset_y;
+    }
+    if (pDest_x + pOffset_x > 0) {
+        destn_ptr += pDest_x + pOffset_x;
+    }
+    destn_width = pDest->width;
+    for (i = 0; i < height; i++) {
+        number_of_chunks = *pSource;
+        pSource++;
+        destn_ptr2 = destn_ptr;
+        x_byte = pOffset_x + pDest_x;
+        for (j = 0; j < number_of_chunks; j++) {
+            chunk_length = *pSource;
+            pSource++;
+            if (chunk_length < 0) {
+                chunk_length = -chunk_length;
+                old_x_byte = x_byte;
+                x_byte += chunk_length;
+                if (old_x_byte < 0) {
+                    if (x_byte > 0) {
+                        memcpy(destn_ptr2, pSource - old_x_byte, chunk_length + old_x_byte);
+                        destn_ptr2 += chunk_length + old_x_byte;
+                    }
+                } else if (x_byte > destn_width) {
+                    if (old_x_byte < destn_width) {
+                        memcpy(destn_ptr2, pSource, destn_width - old_x_byte);
+                    }
+                } else {
+                    memcpy(destn_ptr2, pSource, chunk_length);
+                    destn_ptr2 += chunk_length;
+                }
+                pSource += chunk_length;
+            } else {
+                old_x_byte = x_byte;
+                x_byte += chunk_length;
+                if (old_x_byte < 0) {
+                    if (x_byte > 0) {
+                        destn_ptr2 += chunk_length + old_x_byte;
+                    }
+                } else {
+                    destn_ptr2 += chunk_length;
+                }
+            }
+        }
+        destn_ptr += pDest->row_bytes;
+    }
+}
+
 // FUNCTION: CARMA2_HW 0x0047b880
 // FUNCTION: CARMA2_SW 0x0047aba0
 // FUNCTION: CARMA2_CHEAT 0x0047bc00
