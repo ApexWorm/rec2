@@ -447,6 +447,38 @@ br_material* C2_HOOK_FASTCALL RoadUntexToPersp(br_model* pModel, tU16 pFace) {
     return new_mat;
 }
 
+inline br_material* C2_HOOK_FASTCALL SuffixedMaterial(br_material* pOld, const char* pSuffix) {
+    br_material* new_mat;
+    char* new_id;
+
+    new_id = BrMemAllocate(strlen(pOld->identifier) + strlen(pSuffix) + 1, kMem_new_mat_id);
+    sprintf(new_id, "%s%s", pOld->identifier, pSuffix);
+    new_mat = BrMaterialFind(new_id);
+    if (new_mat != NULL) {
+        BrMemFree(new_id);
+    } else {
+        new_mat = BrMaterialAllocate(NULL);
+        MaterialCopy(new_mat, pOld);
+        new_mat->identifier = new_id;
+        BrMaterialAdd(new_mat);
+    }
+    return new_mat;
+}
+
+// FUNCTION: CARMA2_HW 0x00447ef0
+// FUNCTION: CARMA2_SW 0x00448310
+// FUNCTION: CARMA2_CHEAT 0x00448400
+int C2_HOOK_FASTCALL FaceIsRoad(br_model* pModel, tU16 pFace) {
+    br_vector3 v0;
+    br_vector3 v1;
+    br_vector3 cross;
+
+    BrVector3Sub(&v0, &pModel->vertices[pModel->faces[pFace].vertices[0]].p, &pModel->vertices[pModel->faces[pFace].vertices[1]].p);
+    BrVector3Sub(&v1, &pModel->vertices[pModel->faces[pFace].vertices[1]].p, &pModel->vertices[pModel->faces[pFace].vertices[2]].p);
+    BrVector3Cross(&cross, &v0, &v1);
+    return 0.7f * cross.v[1] > sqrt(cross.v[0] * cross.v[0] + cross.v[2] * cross.v[2]);
+}
+
 // FUNCTION: CARMA2_HW 0x004481d0
 // FUNCTION: CARMA2_CHEAT 0x004486e0
 br_material* C2_HOOK_FASTCALL WallUntexToPersp(br_model* pModel, tU16 pFace) {
@@ -477,6 +509,67 @@ br_material* C2_HOOK_FASTCALL WallLinearToPersp(br_model* pModel, tU16 pFace) {
         new_mat = NULL;
     }
     return new_mat;
+}
+
+// FUNCTION: CARMA2_HW 0x00448480
+// FUNCTION: CARMA2_SW 0x004488a0
+// FUNCTION: CARMA2_CHEAT 0x00448990
+br_material* C2_HOOK_FASTCALL RoadPerspToUntex(br_model* pModel, tU16 pFace) {
+    br_material* old_mat;
+    br_material* new_mat;
+
+    old_mat = pModel->faces[pFace].material;
+    if (old_mat->colour_map != NULL && FaceIsRoad(pModel, pFace)) {
+        new_mat = SuffixedMaterial(old_mat, ".road");
+        if (new_mat->colour_map != NULL) {
+            new_mat->colour_map = NULL;
+            BrMaterialUpdate(new_mat, BR_MATU_ALL);
+        }
+        return new_mat;
+    }
+    return NULL;
+}
+
+// FUNCTION: CARMA2_HW 0x00448560
+// FUNCTION: CARMA2_SW 0x00448980
+// FUNCTION: CARMA2_CHEAT 0x00448a70
+br_material* C2_HOOK_FASTCALL WallPerspToLinear(br_model* pModel, tU16 pFace) {
+    br_material* old_mat;
+    br_material* new_mat;
+
+    old_mat = pModel->faces[pFace].material;
+    if (old_mat->colour_map != NULL && (old_mat->flags & BR_MATF_PERSPECTIVE) && !FaceIsRoad(pModel, pFace)) {
+        new_mat = SuffixedMaterial(old_mat, ".pwall");
+        if (new_mat->flags & BR_MATF_PERSPECTIVE) {
+            new_mat->flags &= ~BR_MATF_PERSPECTIVE;
+            BrMaterialUpdate(new_mat, BR_MATU_ALL);
+        }
+        return new_mat;
+    }
+    return NULL;
+}
+
+// FUNCTION: CARMA2_HW 0x00448650
+// FUNCTION: CARMA2_SW 0x00448a70
+// FUNCTION: CARMA2_CHEAT 0x00448b60
+br_material* C2_HOOK_FASTCALL WallPerspToUntex(br_model* pModel, tU16 pFace) {
+    br_material* old_mat;
+    br_material* new_mat;
+
+    old_mat = pModel->faces[pFace].material;
+    if (old_mat->colour_map != NULL && !FaceIsRoad(pModel, pFace)) {
+        if (old_mat->flags & BR_MATF_PERSPECTIVE) {
+            new_mat = SuffixedMaterial(old_mat, ".pwall");
+        } else {
+            new_mat = SuffixedMaterial(old_mat, ".lwall");
+        }
+        if (new_mat->colour_map != NULL) {
+            new_mat->colour_map = NULL;
+            BrMaterialUpdate(new_mat, BR_MATU_ALL);
+        }
+        return new_mat;
+    }
+    return NULL;
 }
 
 // FUNCTION: CARMA2_HW 0x00448770

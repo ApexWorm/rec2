@@ -65,9 +65,19 @@ extern br_material* C2_HOOK_FASTCALL UnsuffixedMaterial(const char* pOld_ident, 
 
 extern br_material* C2_HOOK_FASTCALL RoadUntexToPersp(br_model* pModel, tU16 pFace);
 
+extern br_material* C2_HOOK_FASTCALL SuffixedMaterial(br_material* pOld, const char* pSuffix);
+
+extern int C2_HOOK_FASTCALL FaceIsRoad(br_model* pModel, tU16 pFace);
+
 extern br_material* C2_HOOK_FASTCALL WallUntexToPersp(br_model* pModel, tU16 pFace);
 
 extern br_material* C2_HOOK_FASTCALL WallLinearToPersp(br_model* pModel, tU16 pFace);
+
+extern br_material* C2_HOOK_FASTCALL RoadPerspToUntex(br_model* pModel, tU16 pFace);
+
+extern br_material* C2_HOOK_FASTCALL WallPerspToLinear(br_model* pModel, tU16 pFace);
+
+extern br_material* C2_HOOK_FASTCALL WallPerspToUntex(br_model* pModel, tU16 pFace);
 
 extern tRoad_texturing_level C2_HOOK_FASTCALL GetRoadTexturingLevel(void);
 
