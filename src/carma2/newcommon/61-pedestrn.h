@@ -12,6 +12,9 @@
 #include "c2_hooks.h"
 #include "rec2_types.h"
 
+extern const br_vector3 gPed_x_unit_vector;
+extern const br_vector3 gPed_y_unit_vector;
+extern const br_vector3 gPed_z_unit_vector;
 extern int gPed_count_limbed_actors;
 extern br_actor* gLimbs_actor;
 extern tSmashable_initial_position_spec gGiblet_initial_position;
