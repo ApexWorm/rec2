@@ -35,6 +35,11 @@
 // GLOBAL: CARMA2_CHEAT 0x0069a940
 int gINT_00692dc8;
 
+// GLOBAL: CARMA2_HW 0x006940b8
+// GLOBAL: CARMA2_SW 0x0068e110
+// GLOBAL: CARMA2_CHEAT 0x0069bc30
+int gINT_006940b8;
+
 // GLOBAL: CARMA2_HW 0x006940c0
 // GLOBAL: CARMA2_SW 0x0068e118
 // GLOBAL: CARMA2_CHEAT 0x0069bc38
@@ -43,12 +48,12 @@ tPhysicsError_cbfn* gPhysics_error_cb;
 // GLOBAL: CARMA2_HW 0x00744818
 // GLOBAL: CARMA2_SW 0x0073b2d8
 // GLOBAL: CARMA2_CHEAT 0x0074beb8
-void* gPhysics_buffer1_ptr;
+br_scalar* gPhysics_buffer1_ptr;
 
 // GLOBAL: CARMA2_HW 0x00744814
 // GLOBAL: CARMA2_SW 0x0073b2d4
 // GLOBAL: CARMA2_CHEAT 0x0074beb4
-void* gPhysics_buffer2_ptr;
+br_scalar* gPhysics_buffer2_ptr;
 
 // GLOBAL: CARMA2_HW 0x0074480c
 // GLOBAL: CARMA2_SW 0x0073b2cc
@@ -1122,8 +1127,54 @@ void C2_HOOK_FASTCALL ApplyDiminishingTorque(tPhysics_object* pObject, const br_
 // CheckObjectsPostionInList
 
 // TestForWrongAnswer
+inline int C2_HOOK_FASTCALL TestForWrongAnswer(const br_scalar* pOriginal, const br_scalar* pRhs, const br_scalar* pResult, int pSize) {
+    br_scalar product[100];
+    int wrong;
+    int i;
+    int j;
+
+    wrong = 0;
+    for (i = 0; i < pSize; i++) {
+        product[i] = 0.0f;
+        for (j = 0; j < pSize; j++) {
+            product[i] += pOriginal[i * 100 + j] * pResult[j];
+        }
+        if ((pResult[i] != 0.0f && fabs(product[i] - pRhs[i]) > 0.01) || product[i] - pRhs[i] < -0.01) {
+            wrong = 1;
+        }
+    }
+    return wrong;
+}
 
 // RQIterativeImprovement
+inline void C2_HOOK_FASTCALL RQIterativeImprovement(br_scalar* pForces, const br_scalar* pMatrix, const br_scalar* pOrthogonal, const br_scalar* pRhs, const br_scalar* pOriginal, const tU8* pIndices, int pSize) {
+    br_scalar residual[100];
+    br_scalar correction[100];
+    br_scalar sum;
+    int i;
+    int j;
+
+    for (i = 0; i < pSize; i++) {
+        sum = -pRhs[i];
+        for (j = 0; j < pSize; j++) {
+            sum += pOriginal[pIndices[i] * 100 + pIndices[j]] * pForces[j];
+        }
+        residual[i] = sum;
+    }
+    correction[0] = residual[0] / pMatrix[0];
+    for (i = 1; i < pSize; i++) {
+        sum = 0.0f;
+        for (j = 0; j < i; j++) {
+            sum += correction[j] * pMatrix[i * 100 + j];
+        }
+        correction[i] = (residual[i] - sum) / pMatrix[i * 101];
+    }
+    for (i = 0; i < pSize; i++) {
+        for (j = 0; j < pSize; j++) {
+            pForces[i] += pOrthogonal[j * 100 + i] * correction[j];
+        }
+    }
+}
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
@@ -1495,16 +1546,314 @@ void C2_HOOK_FASTCALL MakeMatrixFromIndices(br_scalar* pMatrix, br_scalar* pOrth
 }
 
 // HasBeenDoneBefore
+inline int C2_HOOK_FASTCALL HasBeenDoneBefore(tU32 pHistory[][2], int pCount, int pToggle) {
+    tU32 mask[2];
+    int i;
+    int j;
+
+    mask[0] = pHistory[pCount][0];
+    mask[1] = pHistory[pCount][1];
+    if (pToggle >= 0) {
+        mask[pToggle >> 5] ^= 1 << (pToggle & 0x1f);
+    }
+    for (i = 0; i < pCount; i++) {
+        for (j = 0; j <= 1; j++) {
+            if (mask[j] != pHistory[i][j]) {
+                break;
+            }
+        }
+        if (j > 1) {
+            return 1;
+        }
+    }
+    return 0;
+}
 
 // RemoveRQSingularities
+inline int C2_HOOK_FASTCALL RemoveRQSingularities(int pLast, const br_scalar* pMatrix, const br_scalar* pOrthogonal, const br_scalar* pRhs, const br_scalar* pForward, int pFirst, tU32 pHistory[][2], int pCount, const tU8* pIndices) {
+    br_scalar biggest;
+    br_scalar value;
+    int chosen;
+    int i;
+
+    chosen = pLast;
+    biggest = 0.0f;
+    for (i = pFirst; i < pLast; i++) {
+        value = (br_scalar)fabs(pOrthogonal[pLast * 100 + i]);
+        if (value > biggest) {
+            biggest = value;
+            chosen = i;
+        }
+    }
+    if (chosen == pLast) {
+        return pFirst;
+    }
+    if (HasBeenDoneBefore(pHistory, pCount, pIndices[chosen] - pFirst) != 0) {
+        biggest = 0.0f;
+        for (i = pFirst; i < pLast; i++) {
+            value = (br_scalar)fabs(pOrthogonal[pLast * 100 + i]);
+            if (value > biggest) {
+                if (HasBeenDoneBefore(pHistory, pCount, pIndices[i] - pFirst) == 0) {
+                    biggest = value;
+                    chosen = i;
+                }
+            }
+        }
+        if (chosen == pLast) {
+            return pFirst;
+        }
+    }
+    return chosen;
+}
 
 // AddToMatrix
+inline void C2_HOOK_FASTCALL AddToMatrix(tU8 pIndex, br_scalar* pMatrix, const br_scalar* pOriginal, br_scalar* pResult, const br_scalar* pRhs, br_scalar* pOrthogonal, tU8* pIndices, int* pSize) {
+
+    pIndices[*pSize] = pIndex;
+    *pSize += 1;
+    if (gINT_006940b8 == 0) {
+        RQSingleExpand(pMatrix, pOriginal, *pSize - 1, pOrthogonal, pIndices);
+    } else {
+        RQExpand(pMatrix, pOriginal, *pSize - 1, *pSize, pOrthogonal, pIndices);
+    }
+    pResult[*pSize - 1] = pRhs[pIndices[*pSize - 1]];
+}
 
 // RQRemovedOneTooManyForces
+inline int C2_HOOK_FASTCALL RQRemovedOneTooManyForces(int* pCount_excluded, tU8* pExcluded, int pSize, const br_scalar* pResult, const br_scalar* pRhs, const br_scalar* pOriginal, tU32 pHistory[][2], int pCount, int pFirst) {
+    br_scalar sum;
+    br_scalar scaled;
+    br_scalar lowest;
+    int repeated;
+    int chosen;
+    int i;
+    int j;
+    tU8 index;
+
+    repeated = HasBeenDoneBefore(pHistory, pCount, -1);
+    chosen = -1;
+    lowest = 0.0f;
+    for (i = 0; i < *pCount_excluded; i++) {
+        index = pExcluded[i];
+        sum = 0.0f;
+        for (j = 0; j < pSize; j++) {
+            sum += pOriginal[index * 100 + j] * pResult[j];
+        }
+        sum -= pRhs[index];
+        scaled = sum / pOriginal[index * 101];
+        if (sum < -0.001 && scaled < lowest) {
+            if (repeated != 0 && HasBeenDoneBefore(pHistory, pCount, index - pFirst) != 0) {
+                if (chosen == -1) {
+                    chosen = i;
+                }
+            } else {
+                lowest = scaled;
+                chosen = i;
+            }
+        }
+    }
+    if (chosen < 0) {
+        return 0;
+    }
+    index = pExcluded[chosen];
+    for (i = chosen + 1; i < *pCount_excluded; i++) {
+        pExcluded[i - 1] = pExcluded[i];
+    }
+    *pCount_excluded -= 1;
+    pExcluded[*pCount_excluded] = index;
+    return 1;
+}
 
 // GetInverseM
+inline void C2_HOOK_FASTCALL GetInverseM(const br_scalar* pMatrix, const br_scalar* pOrthogonal, br_scalar* pResult, int pSize, int pFirst) {
+    br_scalar column[100];
+    br_scalar sum;
+    int i;
+    int j;
+    int k;
 
-// RQMatrixSolveNoNegatives
+    for (i = pFirst; i < pSize; i++) {
+        for (j = pSize - 1; j >= i; j--) {
+            sum = 0.0f;
+            for (k = pSize - 1; k > j; k--) {
+                sum += column[k] * pMatrix[k * 100 + j];
+            }
+            column[j] = (pOrthogonal[j * 100 + i] - sum) / pMatrix[j * 101];
+        }
+        pResult[i] = column[i];
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x004c3b60
+// FUNCTION: CARMA2_SW 0x004c0290
+// FUNCTION: CARMA2_CHEAT 0x004c9680
+int C2_HOOK_FASTCALL RQMatrixSolveNoNegatives(const br_scalar* pOriginal, br_scalar* pRhs, br_scalar* pResult, int pSize, int pRow_size, tU8* pExcluded, int* pCount_excluded, int pFirst, int pUnused, tForce_group** pGroups, int pCount_groups) {
+    tU8 indices[100];
+    br_scalar forward[100];
+    br_scalar active_rhs[100];
+    br_scalar forces[100];
+    tU32 history[60][2];
+    tU32 mask[2];
+    br_scalar sum;
+    br_scalar limit;
+    br_scalar lowest;
+    br_scalar biggest;
+    int count;
+    int matrix_count;
+    int iteration;
+    int last;
+    int removed;
+    int negative;
+    int boundary;
+    int bit;
+    int i;
+    int j;
+
+    removed = -1;
+#ifdef REC2_FIX_BUGS
+    negative = -1;
+#endif
+    *pCount_excluded = 0;
+    if (pSize == 1) {
+        if (pOriginal[0] > 0.0001) {
+            pResult[0] = pRhs[0] / pOriginal[0];
+        } else {
+            pResult[0] = 0.0f;
+        }
+        return 0;
+    }
+    for (i = 0; i < pSize; i++) {
+        indices[i] = i;
+    }
+    count = pFirst + 1;
+    matrix_count = count;
+    *pCount_excluded = pSize - pFirst - 1;
+    for (i = 0; i < *pCount_excluded; i++) {
+        pExcluded[i] = i + pFirst + 1;
+    }
+    MakeMatrixFromIndices(gPhysics_buffer1_ptr, gPhysics_buffer2_ptr, pOriginal, active_rhs, pRhs, indices, count, pGroups, pCount_groups);
+    mask[1] = 0;
+    mask[0] = 0;
+    mask[0] |= 1;
+    for (iteration = 0;; iteration++) {
+        if (iteration >= 50 && negative == -1) {
+            PhysicsWarning("Matrix solve loop overflow");
+            return -1;
+        }
+        history[iteration][0] = mask[0];
+        history[iteration][1] = mask[1];
+        forward[0] = active_rhs[0] / gPhysics_buffer1_ptr[0];
+        for (i = 1; i < count; i++) {
+            sum = 0.0f;
+            for (j = 0; j < i; j++) {
+                sum += forward[j] * gPhysics_buffer1_ptr[i * 100 + j];
+            }
+            forward[i] = (active_rhs[i] - sum) / gPhysics_buffer1_ptr[i * 101];
+        }
+        last = count - 1;
+        limit = (br_scalar)fabs(gPhysics_buffer1_ptr[last * 101] * 100000.0f);
+        for (j = 0; j < last; j++) {
+            if (fabs(gPhysics_buffer1_ptr[last * 100 + j]) > limit) {
+                break;
+            }
+        }
+        if (j != last) {
+            removed = RemoveRQSingularities(last, gPhysics_buffer1_ptr, gPhysics_buffer2_ptr, active_rhs, forward, pFirst, history, iteration, indices);
+            pExcluded[*pCount_excluded] = indices[removed];
+            bit = indices[removed] - pFirst;
+            mask[bit >> 5] &= ~(1 << (bit & 0x1f));
+            *pCount_excluded += 1;
+            for (i = removed; i < last; i++) {
+                indices[i] = indices[i + 1];
+            }
+            count = last;
+            matrix_count = last;
+            MakeMatrixFromIndices(gPhysics_buffer1_ptr, gPhysics_buffer2_ptr, pOriginal, active_rhs, pRhs, indices, count, pGroups, pCount_groups);
+        } else {
+            for (i = 0; i < count; i++) {
+                forces[i] = 0.0f;
+                for (j = 0; j < count; j++) {
+                    forces[i] += gPhysics_buffer2_ptr[j * 100 + i] * forward[j];
+                }
+            }
+            negative = -1;
+            if (removed >= 0) {
+                removed = -1;
+                if (pRhs[pExcluded[*pCount_excluded - 1]] == 0.0f) {
+                    pRhs[pExcluded[*pCount_excluded - 1]] = -10000.0f;
+                }
+            }
+            lowest = -0.0001f;
+            for (i = pFirst; i < count; i++) {
+                if (forces[i] < lowest) {
+                    lowest = forces[i];
+                    negative = i;
+                }
+            }
+            if (negative >= 0) {
+                if (forces[count - 1] < 0.0f) {
+                    boundary = 0;
+                } else {
+                    for (boundary = last; boundary >= matrix_count; boundary--) {
+                        if (forces[boundary] > 0.0f) {
+                            boundary--;
+                            break;
+                        }
+                    }
+                    boundary++;
+                }
+                if (negative < boundary) {
+                    pExcluded[*pCount_excluded] = indices[negative];
+                    bit = indices[negative] - pFirst;
+                    mask[bit >> 5] &= ~(1 << (bit & 0x1f));
+                    *pCount_excluded += 1;
+                    indices[negative] = 0xff;
+                } else {
+                    biggest = 0.0f;
+                    negative = pFirst;
+                    GetInverseM(gPhysics_buffer1_ptr, gPhysics_buffer2_ptr, forward, count, pFirst);
+                    for (i = pFirst; i < count; i++) {
+                        if (forces[i] / forward[i] < 0.0f && fabs(forward[i]) > biggest) {
+                            biggest = (br_scalar)fabs(forward[i]);
+                            negative = i;
+                        }
+                    }
+                    pExcluded[*pCount_excluded] = indices[negative];
+                    bit = indices[negative] - pFirst;
+                    mask[bit >> 5] &= ~(1 << (bit & 0x1f));
+                    *pCount_excluded += 1;
+                    indices[negative] = 0xff;
+                }
+                matrix_count = 0;
+                for (i = 0; i < count; i++) {
+                    if (indices[i] != 0xff) {
+                        indices[matrix_count] = indices[i];
+                        active_rhs[matrix_count] = active_rhs[i];
+                        matrix_count++;
+                    }
+                }
+                count = matrix_count;
+                MakeMatrixFromIndices(gPhysics_buffer1_ptr, gPhysics_buffer2_ptr, pOriginal, active_rhs, pRhs, indices, count, pGroups, pCount_groups);
+            } else {
+                for (i = 0; i < pSize; i++) {
+                    pResult[i] = 0.0f;
+                }
+                for (i = 0; i < count; i++) {
+                    pResult[indices[i]] = forces[i];
+                }
+                if (RQRemovedOneTooManyForces(pCount_excluded, pExcluded, pSize, pResult, pRhs, pOriginal, history, iteration, pFirst) == 0) {
+                    if (TestForWrongAnswer(pOriginal, pRhs, pResult, pSize) != 0) {
+                        RQIterativeImprovement(forces, gPhysics_buffer1_ptr, gPhysics_buffer2_ptr, active_rhs, pOriginal, indices, count);
+                    }
+                    return 0;
+                }
+                bit = pExcluded[*pCount_excluded] - pFirst;
+                mask[bit >> 5] |= 1 << (bit & 0x1f);
+                AddToMatrix(pExcluded[*pCount_excluded], gPhysics_buffer1_ptr, pOriginal, active_rhs, pRhs, gPhysics_buffer2_ptr, indices, &count);
+            }
+        }
+    }
+}
 
 // RQMatrixSolveWithNegatives
 
@@ -1808,12 +2157,20 @@ void C2_NORETURN C2_HOOK_FASTCALL PhysicsError(tPhysicsError pError, const char*
     exit(pError);
 }
 
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
 // FUNCTION: CARMA2_HW 0x004c61e0
 // FUNCTION: CARMA2_SW 0x004c2910
 // FUNCTION: CARMA2_CHEAT 0x004cbd00
 void C2_HOOK_FASTCALL PhysicsWarning(const char* pMessage) {
     (void)pMessage;
 }
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // FUNCTION: CARMA2_HW 0x004c61f0
 // FUNCTION: CARMA2_SW 0x004c2920
@@ -1946,9 +2303,9 @@ int C2_HOOK_FASTCALL PhysicsObjectRecurseChildren(tPhysics_object* pObject, tEnu
 // FUNCTION: CARMA2_CHEAT 0x004cc030
 void C2_HOOK_FASTCALL InitPhysicsWorkspace(tU8* pBuffer, int pSize) {
 
-    gPhysics_buffer1_ptr = pBuffer;
+    gPhysics_buffer1_ptr = (br_scalar*)pBuffer;
     pSize -= 3 * PHYSICS_BUFFER_PART_SIZE;
-    gPhysics_buffer2_ptr = pBuffer + PHYSICS_BUFFER_PART_SIZE;
+    gPhysics_buffer2_ptr = (br_scalar*)(pBuffer + PHYSICS_BUFFER_PART_SIZE);
     gPhysics_buffer3_ptr = pBuffer + 2 * PHYSICS_BUFFER_PART_SIZE;
     pBuffer += 3 * PHYSICS_BUFFER_PART_SIZE;
     if (pSize < PHYSICS_BUFFER_OTHER_SIZE) {
