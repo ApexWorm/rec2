@@ -95,4 +95,6 @@ extern void C2_HOOK_FASTCALL AdjustFunkEnable(int pIndex, tS16 pFlags);
 
 extern tGroovidelic_spec* C2_HOOK_FASTCALL ActorsGroove(br_actor* pActor);
 
+extern void C2_HOOK_FASTCALL FUN_0047b390(br_pixelmap* pMap, int pWidth, int pHeight, int pFlags);
+
 #endif // GUARD_09_FUNKS_H

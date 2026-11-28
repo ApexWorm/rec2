@@ -769,3 +769,28 @@ tGroovidelic_spec* C2_HOOK_FASTCALL ActorsGroove(br_actor* pActor) {
     }
     return NULL;
 }
+
+// FUNCTION: CARMA2_HW 0x0047b390
+// FUNCTION: CARMA2_SW 0x0047a8f0
+// FUNCTION: CARMA2_CHEAT 0x0047b710
+void C2_HOOK_FASTCALL FUN_0047b390(br_pixelmap* pMap, int pWidth, int pHeight, int pFlags) {
+    tU16* pixels;
+    int row_skip;
+    int x;
+    int y;
+    tU16 value;
+
+    pixels = pMap->pixels;
+    row_skip = pMap->row_bytes / 2;
+    for (y = 0; y < pHeight; y++) {
+        for (x = 0; x < pWidth; x++) {
+            value = *pixels;
+            pixels++;
+            if (value != 0) {
+                *pixels = value | pFlags;
+            }
+            pixels++;
+        }
+        pixels += row_skip;
+    }
+}
