@@ -402,6 +402,11 @@ typedef struct {
 } tCompressed_vector4;
 
 typedef struct {
+    br_vector3 normal;
+    br_scalar d;
+} tSplit_info;
+
+typedef struct {
     tCompressed_vector3 m0;
     tCompressed_vector3 m1;
     tCompressed_vector3 p;
