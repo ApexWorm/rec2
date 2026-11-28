@@ -781,6 +781,9 @@ void C2_HOOK_FASTCALL DisposeAllLoadedRemaps(void) {
     }
 }
 
+// FUNCTION: CARMA2_HW 0x00404740
+// FUNCTION: CARMA2_SW 0x00404740
+// FUNCTION: CARMA2_CHEAT 0x00404740
 inline tPed_remap* C2_HOOK_FASTCALL FindOrOpenRemap(const char* pName) {
     int i;
 
