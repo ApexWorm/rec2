@@ -1411,7 +1411,7 @@ int C2_HOOK_FASTCALL DamagePedestrian(tPedestrian* pPed, int pDamage, int pArg3,
                 severing_damage = gPed_severing_damage;
             }
             damage_left -= severing_damage;
-            if (damage_left < 0.f || count >= 5) {
+            if (damage_left < 0.0f || count >= 5) {
                 break;
             }
             if (gExploding_pedestrians || gPed_dismemberfest || PercentageChance(gPed_severing_chance)) {
