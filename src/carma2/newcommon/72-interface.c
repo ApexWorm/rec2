@@ -1537,18 +1537,18 @@ int C2_HOOK_FASTCALL StartFudge(tFrontend_spec* pFrontend) {
 
 inline void C2_HOOK_FASTCALL UpdateNetGameTypeScroller(tFrontend_spec* pFrontend) {
     int i;
-    int type_index;
     int text_index;
+    int string_index;
 
-    type_index = pFrontend->scrollers[0].indexTopItem - pFrontend->scrollers[0].indexFirstScrollableItem;
-    for (i = pFrontend->scrollers[0].indexFirstScrollableItem; i < pFrontend->scrollers[0].nbDisplayedAtOnce + pFrontend->scrollers[0].indexFirstScrollableItem; i++) {
-        if (type_index >= 2) {
-            text_index = type_index + 1;
+    text_index = pFrontend->scrollers[0].indexTopItem - pFrontend->scrollers[0].indexFirstScrollableItem;
+    for (i = pFrontend->scrollers[0].indexFirstScrollableItem; i < pFrontend->scrollers[0].indexFirstScrollableItem + pFrontend->scrollers[0].nbDisplayedAtOnce; i++) {
+        if (text_index >= 2) {
+            string_index = text_index + 1;
         } else {
-            text_index = type_index;
+            string_index = text_index;
         }
-        strcpy(pFrontend->items[i].text, GetMiscString(eMiscString_network_type_start + text_index));
-        type_index++;
+        strcpy(pFrontend->items[i].text, GetMiscString(eMiscString_network_type_start + string_index));
+        text_index++;
     }
     FuckWithWidths(pFrontend);
 }
