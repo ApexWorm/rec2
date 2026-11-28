@@ -27,7 +27,7 @@ extern void C2_HOOK_FASTCALL AssertRootObjectsMatrix(tPed_character_instance* pP
 
 extern void C2_HOOK_FASTCALL ResetPedFaceCache(void);
 
-// SetPedCurrentFace
+extern void C2_HOOK_FASTCALL SetPedCurrentFace(tPedestrian* pPed, br_vector3* pPos);
 
 // RecachePedestrian
 

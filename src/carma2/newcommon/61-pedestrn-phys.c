@@ -139,7 +139,7 @@ inline void C2_HOOK_FASTCALL ResetPedFaceCache(void) {
     }
 }
 
-static inline void C2_HOOK_FASTCALL SetPedCurrentFace(tPedestrian* pPed, br_vector3* pPos) {
+inline void C2_HOOK_FASTCALL SetPedCurrentFace(tPedestrian* pPed, br_vector3* pPos) {
     tPed_face_cache_0x34* face_cache;
     br_matrix34* mat;
 
