@@ -34,11 +34,11 @@ extern int gPed_move_fsm[118][7];
 extern const char* gPed_remap_axis_choices[6];
 extern tPedForms_vtable* gPed_vtable;
 
-extern tPed_move* gPed_moves[250];
 extern float gPed_cos_table[256];
 extern float gFLOAT_00677230;
 extern int gPed_retain_root_mode;
 
+extern tPed_move* gPed_moves[250];
 extern br_material* gPedestrian_character_cloned_materials[50];
 extern int gCount_pedestrian_personality_cloned_materials;
 extern float gFLOAT_00677728;
@@ -109,9 +109,9 @@ extern void C2_HOOK_FASTCALL ScaleModelXYZ(br_model* pModel, br_scalar pScale_x,
 
 extern void C2_HOOK_FASTCALL ScaleModel(br_model* pModel, float pScale);
 
-// DisposeMove
+extern void C2_HOOK_FASTCALL DisposeMove(tPed_move* pMove);
 
-// DisposeAllLoadedMoves
+extern void C2_HOOK_FASTCALL DisposeAllLoadedMoves(void);
 
 extern tPed_remap* C2_HOOK_FASTCALL ReadRemap(const char* pFile_name);
 
@@ -123,9 +123,9 @@ extern tPed_remap* C2_HOOK_FASTCALL FindOrOpenRemap(const char* pName);
 
 extern void C2_HOOK_FASTCALL Flip3DStoBRaxes(br_matrix34* pMat);
 
-extern tPed_move* C2_HOOK_FASTCALL ReadMove(const char* pName, tPed_form* pForm, const char* pLooping_reset_flags, const br_vector3* pMovement_direction, tU32 pFlags);
-
 extern tPed_move* C2_HOOK_FASTCALL FindOrOpenMove(const char* pName, tPed_form* pForm, const char* pLooping_reset_flags, const br_vector3* pMovement_direction, tU32 pFlags);
+
+extern tPed_move* C2_HOOK_FASTCALL ReadMove(const char* pName, tPed_form* pForm, const char* pLooping_reset_flags, const br_vector3* pMovement_direction, tU32 pFlags);
 
 extern void C2_HOOK_FASTCALL RemapVector(br_vector3* pV, const tPed_remap_bone* pRemap);
 
@@ -137,7 +137,7 @@ extern tPed_form* C2_HOOK_FASTCALL SetUpCharacterForm(const char* pName);
 
 extern void C2_HOOK_FASTCALL DisposeCharacterForm(tPed_form* pForm);
 
-// DisposeAllLoadedForms
+extern void C2_HOOK_FASTCALL DisposeAllLoadedForms(void);
 
 extern void C2_HOOK_FASTCALL DisposeCharacterInstance(tPed_character_instance* pCharacter);
 
@@ -153,9 +153,9 @@ extern br_model* C2_HOOK_FASTCALL BonerCloneModel(br_model* pModel, int pIndex, 
 
 extern tPed_personality* C2_HOOK_FASTCALL ReadPersonality(const char* pName);
 
-// DisposePersonality
+extern void C2_HOOK_FASTCALL DisposePersonality(tPed_personality* pPersonality);
 
-// DisposeAllLoadedPersonalities
+extern void C2_HOOK_FASTCALL DisposeAllLoadedPersonalities(void);
 
 extern tPed_personality* C2_HOOK_FASTCALL FindOrOpenPersonality(const char* pName);
 
@@ -231,7 +231,7 @@ extern void C2_HOOK_FASTCALL SetCharacterDirection(tPed_character_instance* pPed
 
 extern void C2_HOOK_FASTCALL SetCharacterPosition(tPed_character_instance* pCharacter, br_vector3* pPos, int pArg3);
 
-// DisposeClonedMaterials
+extern void C2_HOOK_FASTCALL DisposeClonedMaterials(void);
 
 extern void C2_HOOK_FASTCALL DisposeAllBonerData(void);
 

@@ -312,11 +312,6 @@ const char* gPed_remap_axis_choices[6] = {
 // GLOBAL: CARMA2_CHEAT 0x0067e22c
 tPedForms_vtable* gPed_vtable = NULL;
 
-// GLOBAL: CARMA2_HW 0x00676980
-// GLOBAL: CARMA2_SW 0x006710f0
-// GLOBAL: CARMA2_CHEAT 0x0067e230
-tPed_move* gPed_moves[250] = { 0 };
-
 // GLOBAL: CARMA2_HW 0x00676e30
 // GLOBAL: CARMA2_SW 0x006715a0
 // GLOBAL: CARMA2_CHEAT 0x0067e6e0
@@ -332,10 +327,15 @@ float gFLOAT_00677230 = 0.0f;
 // GLOBAL: CARMA2_CHEAT 0x0067eae4
 int gPed_retain_root_mode = 0;
 
+// GLOBAL: CARMA2_HW 0x00676980
+// GLOBAL: CARMA2_SW 0x006710f0
+// GLOBAL: CARMA2_CHEAT 0x0067e230
+tPed_move* gPed_moves[250] = { 0 };
+
 // GLOBAL: CARMA2_HW 0x00676d68
 // GLOBAL: CARMA2_SW 0x006714d8
 // GLOBAL: CARMA2_CHEAT 0x0067e618
-br_material* gPedestrian_character_cloned_materials[50];
+br_material* gPedestrian_character_cloned_materials[50] = { 0 };
 
 // GLOBAL: CARMA2_HW 0x0067772c
 // GLOBAL: CARMA2_SW 0x00671e9c
@@ -672,9 +672,32 @@ void C2_HOOK_FASTCALL ScaleModel(br_model* pModel, float pScale) {
     ScaleModelXYZ(pModel, pScale, pScale, pScale);
 }
 
-// DisposeMove
+inline void C2_HOOK_FASTCALL DisposeMove(tPed_move* pMove) {
+    int i;
 
-// DisposeAllLoadedMoves
+    for (i = 0; i < pMove->count_frames; i++) {
+        if (pMove->frames[i].axis != NULL) {
+            BrMemFree(pMove->frames[i].axis);
+        }
+    }
+    if (pMove->frames != NULL) {
+        BrMemFree(pMove->frames);
+    }
+    if (pMove != NULL) {
+        BrMemFree(pMove);
+    }
+}
+
+inline void C2_HOOK_FASTCALL DisposeAllLoadedMoves(void) {
+    int i;
+
+    for (i = 0; i < (int)REC2_ASIZE(gPed_moves); i++) {
+        if (gPed_moves[i] != NULL) {
+            DisposeMove(gPed_moves[i]);
+            gPed_moves[i] = NULL;
+        }
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x00404410
 // FUNCTION: CARMA2_SW 0x00404410
@@ -790,6 +813,23 @@ inline void C2_HOOK_FASTCALL Flip3DStoBRaxes(br_matrix34* pMat) {
     pMat->m[3][2] = -1.0f * f;
 }
 
+// FUNCTION: CARMA2_HW 0x004047b0
+// FUNCTION: CARMA2_SW 0x004047b0
+// FUNCTION: CARMA2_CHEAT 0x004047b0
+inline tPed_move* C2_HOOK_FASTCALL FindOrOpenMove(const char* pName, tPed_form* pForm, const char* pLooping_reset_flags, const br_vector3* pMovement_direction, tU32 pFlags) {
+    int i;
+
+    for (i = 0; i < (int)REC2_ASIZE(gPed_moves); i++) {
+        if (gPed_moves[i] != NULL && strcmp(pName, gPed_moves[i]->name) == 0) {
+            return gPed_moves[i];
+        }
+    }
+    return ReadMove(pName, pForm, pLooping_reset_flags, pMovement_direction, pFlags);
+}
+
+// FUNCTION: CARMA2_HW 0x00404840
+// FUNCTION: CARMA2_SW 0x00404840
+// FUNCTION: CARMA2_CHEAT 0x00404840
 inline tPed_move* C2_HOOK_FASTCALL ReadMove(const char* pName, tPed_form* pForm, const char* pLooping_reset_flags, const br_vector3* pMovement_direction, tU32 pFlags) {
     FILE* f;
     tPed_move* move;
@@ -798,6 +838,7 @@ inline tPed_move* C2_HOOK_FASTCALL ReadMove(const char* pName, tPed_form* pForm,
     int j;
     int k;
     int l;
+    tPed_move_frame* frame;
     char bone_names[50][36];
     br_matrix34 mat;
     br_matrix34 mat_lp;
@@ -817,15 +858,17 @@ inline tPed_move* C2_HOOK_FASTCALL ReadMove(const char* pName, tPed_form* pForm,
     move->count_frames = ReadS32(f);
     for (i = 0; i < count_bones_in_anim_file; i++) {
         PFfread(bone_names[i], 1, 33, f);
-        PFfseek(f, ReadS32(f) * sizeof(tU32), SEEK_CUR);
+        j = ReadS32(f);
+        PFfseek(f, j * sizeof(tU32), SEEK_CUR);
     }
 #ifdef REC2_FIX_BUGS
     BrVector3Set(&rot_pos, 0.0f, 0.0f, 0.0f);
 #endif
     BrVector3Set(&move_pos, 0.0f, 0.0f, 0.0f);
     move->frames = BrMemAllocate(move->count_frames * sizeof(tPed_move_frame), kMem_boner_type_frames);
-    for (i = 0; i < move->count_frames; i++) {
-        move->frames[i].axis = BrMemAllocate(pForm->count_bones * sizeof(tPed_move_frame_axis), kBoner_mem_type_frame_2);
+    frame = move->frames;
+    for (i = 0; i < move->count_frames; i++, frame++) {
+        frame->axis = BrMemAllocate(pForm->count_bones * sizeof(tPed_move_frame_axis), kBoner_mem_type_frame_2);
         for (j = 0; j < count_bones_in_anim_file; j++) {
             for (k = 0; k < 4; k++) {
                 for (l = 0; l < 3; l++) {
@@ -837,18 +880,18 @@ inline tPed_move* C2_HOOK_FASTCALL ReadMove(const char* pName, tPed_form* pForm,
                     Flip3DStoBRaxes(&mat);
                     BrMatrix34LPNormalise(&mat_lp, &mat);
                     if (pForm->bones[k].indices[0] == -1) {
-                        memcpy(&move->frames[i].mat, &mat_lp, 3 * sizeof(mat_lp.m[0]));
+                        memcpy(&frame->mat, &mat_lp, 3 * sizeof(mat_lp.m[0]));
                         if (i != 0) {
-                            BrVector3Sub((br_vector3*)move->frames[i].mat.m[3], (br_vector3*)mat_lp.m[3], &rot_pos);
-                            BrVector3Accumulate(&move_pos, (br_vector3*)move->frames[i].mat.m[3]);
+                            BrVector3Sub((br_vector3*)frame->mat.m[3], (br_vector3*)mat_lp.m[3], &rot_pos);
+                            BrVector3Accumulate(&move_pos, (br_vector3*)frame->mat.m[3]);
                         }
                         BrVector3Copy(&rot_pos, (br_vector3*)mat_lp.m[3]);
                     }
                     e.order = 0;
                     BrMatrix34ToEuler(&e, &mat_lp);
-                    move->frames[i].axis[k].euler1 = e.a >> 8;
-                    move->frames[i].axis[k].euler2 = e.b >> 8;
-                    move->frames[i].axis[k].euler3 = e.c >> 8;
+                    frame->axis[k].euler1 = e.a >> 8;
+                    frame->axis[k].euler2 = e.b >> 8;
+                    frame->axis[k].euler3 = e.c >> 8;
                     break;
                 }
             }
@@ -885,8 +928,8 @@ inline tPed_move* C2_HOOK_FASTCALL ReadMove(const char* pName, tPed_form* pForm,
         move->frames[0].mat.m[3][2] = 0.0f;
     }
     if (BrVector3LengthSquared(&move_pos) != 0.0f && !(move->looping_reset_flags & 0x1)) {
-        move->field_0x2a = 0;
         BrVector3Normalise(&move->field_0x34, &move_pos);
+        move->field_0x2a = 0;
         if (BrVector3LengthSquared(pMovement_direction) == 0.0f) {
             BrVector3Copy(&move->field_0x40, &move->field_0x34);
         } else {
@@ -911,17 +954,6 @@ inline tPed_move* C2_HOOK_FASTCALL ReadMove(const char* pName, tPed_form* pForm,
         }
     }
     FatalError(kFatalError_BonerError_TooManyMovesLoaded, 0);
-}
-
-inline tPed_move* C2_HOOK_FASTCALL FindOrOpenMove(const char* pName, tPed_form* pForm, const char* pLooping_reset_flags, const br_vector3* pMovement_direction, tU32 pFlags) {
-    int i;
-
-    for (i = 0; i < (int)REC2_ASIZE(gPed_moves); i++) {
-        if (gPed_moves[i] != NULL && strcmp(pName, gPed_moves[i]->name) == 0) {
-            return gPed_moves[i];
-        }
-    }
-    return ReadMove(pName, pForm, pLooping_reset_flags, pMovement_direction, pFlags);
 }
 
 inline void C2_HOOK_FASTCALL RemapVector(br_vector3* pV, const tPed_remap_bone* pRemap) {
@@ -1210,6 +1242,7 @@ tPed_form* C2_HOOK_FASTCALL SetUpCharacterForm(const char* pName) {
 
 // FUNCTION: CARMA2_HW 0x004067e0
 // FUNCTION: CARMA2_SW 0x004067e0
+// FUNCTION: CARMA2_CHEAT 0x004067e0
 void C2_HOOK_FASTCALL DisposeCharacterForm(tPed_form* pForm) {
     int i;
     int j;
@@ -1290,7 +1323,16 @@ void C2_HOOK_FASTCALL DisposeCharacterForm(tPed_form* pForm) {
 #pragma inline_depth()
 #endif
 
-// DisposeAllLoadedForms
+inline void C2_HOOK_FASTCALL DisposeAllLoadedForms(void) {
+    int i;
+
+    for (i = 0; i < (int)REC2_ASIZE(gPed_forms); i++) {
+        if (gPed_forms[i] != NULL) {
+            DisposeCharacterForm(gPed_forms[i]);
+            gPed_forms[i] = NULL;
+        }
+    }
+}
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
@@ -1665,9 +1707,31 @@ tPed_personality* C2_HOOK_FASTCALL ReadPersonality(const char* pName) {
 #pragma auto_inline(on)
 #endif
 
-// DisposePersonality
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
 
-// DisposeAllLoadedPersonalities
+// STUB: CARMA2_HW 0x004077f0
+// STUB: CARMA2_SW 0x004077f0
+// STUB: CARMA2_CHEAT 0x004077f0
+void C2_HOOK_FASTCALL DisposePersonality(tPed_personality* pPersonality) {
+    NOT_IMPLEMENTED();
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
+
+inline void C2_HOOK_FASTCALL DisposeAllLoadedPersonalities(void) {
+    int i;
+
+    for (i = 0; i < (int)REC2_ASIZE(gPed_personalities); i++) {
+        if (gPed_personalities[i] != NULL) {
+            DisposePersonality(gPed_personalities[i]);
+            gPed_personalities[i] = NULL;
+        }
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x00407930
 // FUNCTION: CARMA2_SW 0x00407920
@@ -2645,22 +2709,33 @@ void C2_HOOK_FASTCALL SetCharacterPosition(tPed_character_instance* pCharacter, 
 #pragma auto_inline(on)
 #endif
 
-// DisposeClonedMaterials
+inline void C2_HOOK_FASTCALL DisposeClonedMaterials(void) {
+    int i;
+
+    for (i = 0; i < gCount_pedestrian_personality_cloned_materials; i++) {
+        BrMaterialRemove(gPedestrian_character_cloned_materials[i]);
+        BrMaterialFree(gPedestrian_character_cloned_materials[i]);
+    }
+    gCount_pedestrian_personality_cloned_materials = 0;
+}
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x0040b2e0
-// STUB: CARMA2_SW 0x0040b2d0
-// STUB: CARMA2_CHEAT 0x0040b350
+// FUNCTION: CARMA2_HW 0x0040b2e0
+// FUNCTION: CARMA2_SW 0x0040b2d0
+// FUNCTION: CARMA2_CHEAT 0x0040b350
 void C2_HOOK_FASTCALL DisposeAllBonerData(void) {
-    NOT_IMPLEMENTED();
-}
 
-#ifdef REC2_MATCHING
-#pragma auto_inline(on)
-#endif
+    DisposeAllLoadedRemaps();
+    DisposeAllLoadedPersonalities();
+    DisposeAllLoadedMoves();
+    DisposeAllLoadedForms();
+    ClearOutMorphs();
+    DisposeClonedMaterials();
+    gPed_overall_movement_disabled = 0;
+}
 
 // FUNCTION: CARMA2_HW 0x0040b420
 // FUNCTION: CARMA2_SW 0x0040b410
@@ -2741,6 +2816,10 @@ int C2_HOOK_FASTCALL GetCharacterModelSet(tPed_character_instance* pCharacter) {
 
     return pCharacter->field_0xa;
 }
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // BonerPassiveCollision
 
