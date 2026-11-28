@@ -46,7 +46,7 @@ extern int gKeyboardBufferLength;
 extern unsigned char gKeyboardBuffer[20];
 
 extern int gPerformanceCounterInitialized;
-extern int gINT_006acc74;
+extern undefined4 gDAT_006acc74;
 extern LARGE_INTEGER gPerformanceCounterStart;
 extern LARGE_INTEGER gPerformanceCounterFrequency_s;
 extern LARGE_INTEGER gPerformanceCounterFrequency_ms;
