@@ -12,11 +12,13 @@
 #include "01-network.h"
 #include "04-netgame.h"
 #include "07-structur.h"
+#include "08-loading1.h"
 #include "11-world1.h"
 #include "13-crush1.h"
 #include "15-displays.h"
 #include "16-graphics1.h"
 #include "17-world2.h"
+#include "18-graphics2.h"
 #include "18b-graphics2.h"
 #include "19-font.h"
 #include "24-loadsave.h"
@@ -1570,5 +1572,79 @@ void C2_HOOK_FASTCALL ToggleHeadupLevel(void) {
         }
     }
     NewTextHeadupSlot2(4, 0, 250, -4, GetMiscString(eMiscString_no_HUD + gHeadup_detail_level % 3), 0);
+}
+
+// FUNCTION: CARMA2_HW 0x00444fa0
+// FUNCTION: CARMA2_SW 0x00445080
+// FUNCTION: CARMA2_CHEAT 0x004454c0
+void C2_HOOK_FASTCALL FUN_00444fa0(void) {
+
+    gCar_to_view->use_shell_model = !gCar_to_view->use_shell_model;
+    if (gCar_to_view->use_shell_model) {
+        NewTextHeadupSlot(4, 0, 2000, -4, "SHELL MODEL");
+    } else {
+        NewTextHeadupSlot(4, 0, 2000, -4, "COMPLEX MODELS");
+    }
+}
+
+// GLOBAL: CARMA2_HW 0x00591100
+// GLOBAL: CARMA2_SW 0x0058c0f8
+// GLOBAL: CARMA2_CHEAT 0x00597a54
+int gLast_demo = -1;
+
+// FUNCTION: CARMA2_HW 0x00445000
+// FUNCTION: CARMA2_SW 0x004450e0
+// FUNCTION: CARMA2_CHEAT 0x00445520
+void C2_HOOK_FASTCALL DoDemo(void) {
+    tS32 start_time;
+    tS32 frame_time;
+    FILE* f;
+    tPath_name the_path;
+    int i;
+    int count;
+    char s[256];
+    tS3_sound_tag song_tag;
+
+    PathCat(the_path, gApplication_path, "DEMOFILE.TXT");
+    f = DRfopen(the_path, "rt");
+    if (f == NULL) {
+        return;
+    }
+    count = GetAnInt(f);
+    gLast_demo++;
+    if (gLast_demo >= count) {
+        gLast_demo = 0;
+    }
+    for (i = 0; i < gLast_demo + 1; i++) {
+        GetALineAndDontArgue(f, s);
+    }
+    PFfclose(f);
+    PathCat(the_path, gApplication_path, s);
+    f = DRfopen(the_path, "rb");
+    if (f == NULL) {
+        return;
+    }
+    ClearEntireScreen();
+    song_tag = S3StartSound(gEffects_outlet, 10000);
+    DRSetPalette(gRender_palette);
+    FadePaletteUp();
+    do {
+        SoundService();
+        start_time = PDGetTotalTime();
+        frame_time = ReadS32(f);
+        PFfread(gBack_screen->pixels, gBack_screen->width * gBack_screen->height, 1, f);
+        PDScreenBufferSwap(0);
+        do {
+        } while ((tS32)(PDGetTotalTime() - start_time) < frame_time && !AnyKeyDown() && !EitherMouseButtonDown());
+        if (!S3SoundStillPlaying(song_tag)) {
+            song_tag = S3StartSound(gEffects_outlet, 10000);
+        }
+    } while (!AnyKeyDown() && !EitherMouseButtonDown() && !PFfeof(f));
+    S3StopSound(song_tag);
+    S3StopOutletSound(gEffects_outlet);
+    S3StopAllOutletSounds();
+    PFfclose(f);
+    FadePaletteDown();
+    WaitForNoKeys();
 }
 

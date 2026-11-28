@@ -36,6 +36,7 @@ extern int gCancel_recover;
 extern tRace_over_reason gRace_over_reason;
 extern tU32 gPalette_fade_time;
 extern tEdit_func* gEdit_funcs[eEdit_mode_count][18][8];
+extern int gLast_demo;
 
 extern void C2_HOOK_FASTCALL CompleteRace(void);
 
@@ -226,5 +227,9 @@ extern void C2_HOOK_FASTCALL ChangeCameraTypeInGame(void);
 extern void C2_HOOK_FASTCALL RichardsSphere(int pNum);
 
 extern void C2_HOOK_FASTCALL ToggleHeadupLevel(void);
+
+extern void C2_HOOK_FASTCALL FUN_00444fa0(void);
+
+extern void C2_HOOK_FASTCALL DoDemo(void);
 
 #endif // GUARD_53_CONTROLS_H
