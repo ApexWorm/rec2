@@ -1284,8 +1284,21 @@ void C2_HOOK_FASTCALL FindFace(br_vector3* pPosition, br_vector3* pDir, br_vecto
 
 // findfloor
 
+// FUNCTION: CARMA2_HW 0x0041e3f0
+// FUNCTION: CARMA2_SW 0x0041e420
+// FUNCTION: CARMA2_CHEAT 0x0041e650
+int C2_HOOK_FASTCALL FindFloorInBoxM(br_vector3* pPosition, br_vector3* pDirection, br_vector3* pNormal, br_scalar* pDistance, tCar_spec* pCar) {
+    br_vector3 pos;
+    br_vector3 dir;
+
+    BrVector3InvScale(&pos, pPosition, WORLD_SCALE);
+    BrVector3InvScale(&dir, pDirection, WORLD_SCALE);
+    return FindFloorInBoxBU(&pos, &dir, pNormal, pDistance, pCar->collision_info);
+}
+
 // FUNCTION: CARMA2_HW 0x0041e480
 // FUNCTION: CARMA2_SW 0x0041e4b0
+// FUNCTION: CARMA2_CHEAT 0x0041e6e0
 int C2_HOOK_FASTCALL FindFloorInBoxBU(br_vector3* pPosition, br_vector3* pDirection, br_vector3* pNormal, br_scalar* pDistance, tPhysics_object* pObject) {
     br_vector3 nor2;
     br_vector3 collision_position;

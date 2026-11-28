@@ -189,6 +189,8 @@ extern void C2_HOOK_FASTCALL FindFace(br_vector3* pPosition, br_vector3* pDir, b
 
 // findfloor
 
+extern int C2_HOOK_FASTCALL FindFloorInBoxM(br_vector3* pPosition, br_vector3* pDirection, br_vector3* pNormal, br_scalar* pDistance, tCar_spec* pCar);
+
 extern int C2_HOOK_FASTCALL FindFloorInBoxBU(br_vector3* pPosition, br_vector3* pDirection, br_vector3* pNormal, br_scalar* pDistance, tPhysics_object* pObject);
 
 extern void C2_HOOK_FASTCALL CancelPendingCunningStunt(void);
