@@ -772,27 +772,35 @@ inline int C2_HOOK_FASTCALL UndoPipedSession(tU8** pPtr) {
     return ((tPipe_session*)temp_ptr)->type == ePipe_chunk_frame_finish;
 }
 
-inline void C2_HOOK_FASTCALL ARScanBuffer(tU8** pPtr, int pType, tU32 pDefault_time, tScan_buffer_callback* pCall_back, tScan_buffer_time_check* pTime_check) {
-    tU32 the_time;
+// FUNCTION: CARMA2_HW 0x00402e10
+// FUNCTION: CARMA2_SW 0x00402e10
+// FUNCTION: CARMA2_CHEAT 0x00402e10
+void C2_HOOK_FASTCALL ARScanBuffer(tU8** pPtr, tPipe_chunk_type pType, tU32 pDefault_time, tARScanBuffer_callback* pCallback, tARScanBuffer_time_check* pTime_check) {
+    tU32 time;
 
-    the_time = pDefault_time;
-    do {
+    time = pDefault_time;
+    for (;;) {
         if (ARReplayForwards()) {
             if (MoveSessionPointerForwardOne(pPtr)) {
                 return;
             }
-        } else if (MoveSessionPointerBackOne(pPtr)) {
-            return;
+        } else {
+            if (MoveSessionPointerBackOne(pPtr)) {
+                return;
+            }
         }
         gEnd_of_session = *pPtr + LengthOfSession((tPipe_session*)*pPtr) - sizeof(tU16);
         if (((tPipe_session*)*pPtr)->type == ePipe_chunk_frame_finish) {
-            the_time = ((tPipe_chunk*)((tPipe_session*)*pPtr)->data)->data.frame_boundary.time;
+            time = ((tPipe_chunk*)((tPipe_session*)*pPtr)->data)->data.frame_boundary.time;
         } else if (((tPipe_session*)*pPtr)->type == pType) {
-            if (pCall_back((tPipe_chunk*)((tPipe_session*)*pPtr)->data, ((tPipe_session*)*pPtr)->count, the_time)) {
-                break;
+            if (pCallback((tPipe_chunk*)((tPipe_session*)*pPtr)->data, ((tPipe_session*)*pPtr)->count, time)) {
+                return;
             }
         }
-    } while (pTime_check == NULL || pTime_check(the_time));
+        if (pTime_check != NULL && !pTime_check(time)) {
+            return;
+        }
+    }
 }
 
 inline int C2_HOOK_FASTCALL CheckSound(tPipe_chunk* pChunk_ptr, int pChunk_count, tU32 pTime) {

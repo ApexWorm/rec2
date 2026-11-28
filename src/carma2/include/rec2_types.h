@@ -935,10 +935,6 @@ typedef struct tPipe_session {
     char data[];
 } tPipe_session;
 
-typedef int C2_HOOK_FASTCALL tScan_buffer_callback(tPipe_chunk* pChunk, int pChunk_count, tU32 pTime);
-
-typedef int C2_HOOK_FASTCALL tScan_buffer_time_check(tU32 pTime);
-
 typedef void C2_HOOK_FASTCALL tDrone_state_function(tDrone_spec*, tDroneStateFuncState);
 
 typedef int tJoy_array[8];

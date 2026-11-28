@@ -109,7 +109,7 @@ extern tPipe_chunk* C2_HOOK_FASTCALL FindPreviousChunk(tU8* pPtr, int pType, uin
 
 extern int C2_HOOK_FASTCALL UndoPipedSession(tU8** pPtr);
 
-extern void C2_HOOK_FASTCALL ARScanBuffer(tU8** pPtr, int pType, tU32 pDefault_time, tScan_buffer_callback* pCall_back, tScan_buffer_time_check* pTime_check);
+extern void C2_HOOK_FASTCALL ARScanBuffer(tU8** pPtr, tPipe_chunk_type pType, tU32 pDefault_time, tARScanBuffer_callback* pCallback, tARScanBuffer_time_check* pTime_check);
 
 extern int C2_HOOK_FASTCALL CheckSound(tPipe_chunk* pChunk_ptr, int pChunk_count, tU32 pTime);
 
