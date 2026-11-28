@@ -9,7 +9,7 @@
 #include "57-drone.h"
 
 #include "00-car.h"
-
+#include "05-drmem.h"
 #include "08-loading1.h"
 #include "10-loading2.h"
 #include "15-displays.h"
@@ -35,6 +35,40 @@
 // GLOBAL: CARMA2_SW 0x0067c7f8
 // GLOBAL: CARMA2_CHEAT 0x00689960
 int gDrones_unmodified;
+
+// GLOBAL: CARMA2_HW 0x00594780
+// GLOBAL: CARMA2_SW 0x0058f6e0
+// GLOBAL: CARMA2_CHEAT 0x0059b0d8
+const char* gGroove_funk_type_names[3] = {
+    "spinnyGroove",
+    "steeringGroove",
+    "spinnyFunk",
+};
+
+// GLOBAL: CARMA2_HW 0x00594790
+// GLOBAL: CARMA2_SW 0x0058f6f0
+// GLOBAL: CARMA2_CHEAT 0x0059b0e8
+const char* gAxis_names[3] = {
+    "x",
+    "y",
+    "z",
+};
+
+// GLOBAL: CARMA2_HW 0x005947a0
+// GLOBAL: CARMA2_SW 0x0058f700
+// GLOBAL: CARMA2_CHEAT 0x0059b0f8
+const char* gFunk_speed_control_names[2] = {
+    "controller",
+    "dronespeed",
+};
+
+// GLOBAL: CARMA2_HW 0x005947a8
+// GLOBAL: CARMA2_SW 0x0058f708
+// GLOBAL: CARMA2_CHEAT 0x0059b100
+const char* gReverseness_type_names[2] = {
+    "forward",
+    "reverse",
+};
 
 // GLOBAL: CARMA2_HW 0x006820c0
 // GLOBAL: CARMA2_SW 0x0067c800
@@ -374,17 +408,112 @@ int C2_HOOK_CDECL LinkyCallback(br_actor* pActor, void* pData) {
     return 0;
 }
 
-// LinkDroneActorsToModelsAndSetRenderStyle
+inline void C2_HOOK_FASTCALL LinkDroneActorsToModelsAndSetRenderStyle(tDrone_spec* pDrone_spec, int pModel_start, int pModel_end) {
+    tLinkyCallback_context context;
+
+    context.drone = pDrone_spec;
+    context.model_start = pModel_start;
+    context.model_end = pModel_end;
+    DRActorEnumRecurse(pDrone_spec->model_actor, LinkyCallback, &context);
+}
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x00450150
-// STUB: CARMA2_SW 0x0044fef0
-// STUB: CARMA2_CHEAT 0x004506a0
+// FUNCTION: CARMA2_HW 0x00450150
+// FUNCTION: CARMA2_SW 0x0044fef0
+// FUNCTION: CARMA2_CHEAT 0x004506a0
 void C2_HOOK_FASTCALL LoadDroneActorsModels(tDrone_spec* pDrone_spec) {
-    NOT_IMPLEMENTED();
+    int i;
+    int first_material;
+    br_bounds* bounds;
+    br_matrix34 mat;
+    tPath_name the_path;
+    char s[256];
+    tPath_name actor_path;
+    tDrone_form* form;
+
+    PossibleService();
+    BrMatrix34Identity(&mat);
+    if (pDrone_spec->model_actor != NULL) {
+        if (pDrone_spec->model_actor->parent != NULL) {
+            BrActorRemove(pDrone_spec->model_actor);
+        }
+        BrActorFree(pDrone_spec->model_actor);
+        pDrone_spec->model_actor = NULL;
+    }
+    if (pDrone_spec->actor != NULL) {
+        BrMatrix34Copy(&mat, &pDrone_spec->actor->t.t.mat);
+        if (pDrone_spec->actor->parent != NULL) {
+            BrActorRemove(pDrone_spec->actor);
+        }
+        BrActorFree(pDrone_spec->actor);
+        pDrone_spec->actor = NULL;
+    }
+    strcpy(gCurrent_load_directory, "DRONES");
+    strcpy(gCurrent_load_name, pDrone_spec->form->name);
+    strcpy(the_path, gApplication_path);
+    PathCat(the_path, the_path, gCurrent_load_directory);
+    PathCat(the_path, the_path, gCurrent_load_name);
+    if (pDrone_spec->form->model_start < 0) {
+        PrintMemoryDump(0, "BEFORE LOADING DRONE ACTORS/MODELS");
+        LoadAllImagesInDirectory(&gDroneStorage, the_path);
+        LoadAllShadeTablesInDirectory(&gDroneStorage, the_path);
+        first_material = gDroneStorage.materials_count;
+        LoadAllMaterialsInDirectory(&gDroneStorage, the_path, 2);
+        for (i = first_material; i < gDroneStorage.materials_count; i++) {
+            if (gDroneStorage.materials[i] != NULL && gDroneStorage.materials[i]->colour_map != NULL) {
+                gDroneStorage.materials[i]->flags |= BR_MATF_LIGHT | BR_MATF_PRELIT;
+                gDroneStorage.materials[i]->flags |= BR_MATF_SMOOTH;
+                BrMaterialUpdate(gDroneStorage.materials[i], BR_MATU_ALL);
+            }
+            PossibleService();
+        }
+        pDrone_spec->form->model_start = gDroneStorage.models_count;
+        LoadAllModelsInDirectory(&gDroneStorage, the_path);
+        pDrone_spec->form->model_end = gDroneStorage.models_count - pDrone_spec->form->model_start;
+        if (pDrone_spec->form->crushability != 0.0f) {
+            pDrone_spec->form->model_index = -1;
+            for (i = pDrone_spec->form->model_start; i < pDrone_spec->form->model_start + pDrone_spec->form->model_end; i++) {
+                if (DRStricmp(gDroneStorage.models[i]->identifier, pDrone_spec->form->name) == 0) {
+                    pDrone_spec->form->model_index = i;
+                    break;
+                }
+            }
+            if (pDrone_spec->form->model_index < 0) {
+                sprintf(s, "Can't find model called '%s' for drone '%s'", pDrone_spec->form->name, pDrone_spec->form->name);
+                PDFatalError(s);
+            }
+        }
+        PrintMemoryDump(0, "AFTER LOADING DRONE ACTORS/MODELS");
+    }
+    pDrone_spec->actor = BrActorAllocate(BR_ACTOR_NONE, NULL);
+    BrMatrix34Copy(&pDrone_spec->actor->t.t.mat, &mat);
+    sprintf(s, "Drone%d", pDrone_spec->id);
+    pDrone_spec->actor->identifier = BrResStrDup(pDrone_spec->actor, s);
+    BrActorAdd(gNon_track_actor, pDrone_spec->actor);
+    PathCat(actor_path, the_path, pDrone_spec->form->name);
+    strcat(actor_path, ".ACT");
+    pDrone_spec->model_actor = BrActorLoad(actor_path);
+    if (pDrone_spec->model_actor == NULL) {
+        sprintf(s, "Can't load drone car actor file for %s", pDrone_spec->form->name);
+        PDFatalError(s);
+    }
+    LinkDroneActorsToModelsAndSetRenderStyle(pDrone_spec, pDrone_spec->form->model_start, pDrone_spec->form->model_end);
+    pDrone_spec->actor->render_style = BR_RSTYLE_NONE;
+    BrActorAdd(pDrone_spec->actor, pDrone_spec->model_actor);
+    form = pDrone_spec->form;
+    if (!(form->flags & 0x20)) {
+        bounds = &pDrone_spec->model_actor->model->bounds;
+        form->field_0x54.min.v[0] = (bounds->max.v[0] - bounds->min.v[0]) * (form->crush_limits_left * 0.01) + bounds->min.v[0];
+        form->field_0x54.min.v[1] = (bounds->max.v[1] - bounds->min.v[1]) * (form->crush_limits_bottom * 0.01) + bounds->min.v[1];
+        form->field_0x54.min.v[2] = (bounds->max.v[2] - bounds->min.v[2]) * (form->crush_limits_back * 0.01) + bounds->min.v[2];
+        form->field_0x54.max.v[0] = bounds->max.v[0] - (bounds->max.v[0] - bounds->min.v[0]) * (form->crush_limits_right * 0.01);
+        form->field_0x54.max.v[1] = bounds->max.v[1] - (bounds->max.v[1] - bounds->min.v[1]) * (form->crush_limits_top * 0.01);
+        form->field_0x54.max.v[2] = bounds->max.v[2] - (bounds->max.v[2] - bounds->min.v[2]) * (form->crush_limits_front * 0.01);
+        form->flags |= 0x20;
+    }
 }
 
 #ifdef REC2_MATCHING
@@ -404,16 +533,54 @@ inline int C2_HOOK_FASTCALL ReadPastBoundsShapesHeader(FILE* pF) {
     return 0;
 }
 
-// ReadPastThisLine
+inline int C2_HOOK_FASTCALL ReadPastThisLine(FILE* pF, const char* pLine) {
+    char s[256];
 
-// MatchFGType
+    while (!PFfeof(pF)) {
+        GetALineAndDontArgue(pF, s);
+        if (strcmp(s, pLine) == 0) {
+            return 1;
+        }
+    }
+    return 0;
+}
 
-// GetAxisFromString
+inline int C2_HOOK_FASTCALL MatchFGType(const char* pName) {
+    int i;
 
-// GetSpeedControlFromString
+    for (i = 0; i < REC2_ASIZE(gGroove_funk_type_names); i++) {
+        if (strcmp(pName, gGroove_funk_type_names[i]) == 0) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+inline int C2_HOOK_FASTCALL GetAxisFromString(const char* pName) {
+    int i;
+
+    for (i = 0; i < REC2_ASIZE(gAxis_names); i++) {
+        if (strcmp(pName, gAxis_names[i]) == 0) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+inline int C2_HOOK_FASTCALL GetSpeedControlFromString(const char* pName) {
+    int i;
+
+    for (i = 0; i < REC2_ASIZE(gFunk_speed_control_names); i++) {
+        if (strcmp(pName, gFunk_speed_control_names[i]) == 0) {
+            return i;
+        }
+    }
+    return -1;
+}
 
 // FUNCTION: CARMA2_HW 0x00450b30
 // FUNCTION: CARMA2_SW 0x004508c0
+// FUNCTION: CARMA2_CHEAT 0x00451080
 br_actor* C2_HOOK_CDECL MrFindy(br_actor* pActor, const char* pName) {
 
     if (DRStricmp(pActor->identifier, pName) == 0) {
@@ -423,19 +590,93 @@ br_actor* C2_HOOK_CDECL MrFindy(br_actor* pActor, const char* pName) {
     }
 }
 
-// FindDroneChildActor
+inline br_actor* C2_HOOK_FASTCALL FindDroneChildActor(tDrone_spec* pDrone_spec, const char* pName) {
 
-// GetReversenessFromString
+    return (br_actor*)DRActorEnumRecurse(pDrone_spec->model_actor, (br_actor_enum_cbfn*)MrFindy, (void*)pName);
+}
+
+inline int C2_HOOK_FASTCALL GetReversenessFromString(const char* pName) {
+    int i;
+
+    for (i = 0; i < REC2_ASIZE(gReverseness_type_names); i++) {
+        if (strcmp(pName, gReverseness_type_names[i]) == 0) {
+            return i;
+        }
+    }
+    return -1;
+}
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x00450680
-// STUB: CARMA2_SW 0x00450410
-// STUB: CARMA2_CHEAT 0x00450bd0
+// FUNCTION: CARMA2_HW 0x00450680
+// FUNCTION: CARMA2_SW 0x00450410
+// FUNCTION: CARMA2_CHEAT 0x00450bd0
 void C2_HOOK_FASTCALL LoadFunksAndGrooves(tDrone_spec* pDrone_spec, FILE* pF) {
-    NOT_IMPLEMENTED();
+    int value;
+    tFunk_groove* item;
+    char s[256];
+
+    if (!ReadPastThisLine(pF, "START OF FUNKYGROOVY STUFF")) {
+        FatalError(kFatalError_UnableToOpenDroneFileOrFileCorrupted_S, pDrone_spec->form->name);
+    }
+    if (pDrone_spec->funk_grooves == NULL) {
+        pDrone_spec->funk_grooves = BrMemAllocate(sizeof(tFunk_grooves), kMem_drone_funk_groove);
+    }
+    GetALineAndDontArgue(pF, s);
+    while (strcmp(s, "END OF FUNKYGROOVY STUFF") != 0 && !PFfeof(pF)) {
+        if (pDrone_spec->funk_grooves->count >= (int)REC2_ASIZE(pDrone_spec->funk_grooves->items)) {
+            FatalError(kFatalError_UnableToOpenDroneFileOrFileCorrupted_S, pDrone_spec->form->name);
+        }
+        item = &pDrone_spec->funk_grooves->items[pDrone_spec->funk_grooves->count];
+        item->type = MatchFGType(s);
+        switch (item->type) {
+        case eFunk_groove_type_spinny_groove:
+            GetALineAndDontArgue(pF, s);
+            item->actor = FindDroneChildActor(pDrone_spec, s);
+            if (item->actor == NULL) {
+                FatalError(kFatalError_UnableToOpenDroneFileOrFileCorrupted_S, pDrone_spec->form->name);
+            }
+            GetALineAndDontArgue(pF, s);
+            value = GetAxisFromString(s);
+            if (value < 0) {
+                FatalError(kFatalError_UnableToOpenDroneFileOrFileCorrupted_S, pDrone_spec->form->name);
+            }
+            item->spinny.axis = value;
+            GetALineAndDontArgue(pF, s);
+            value = GetSpeedControlFromString(s);
+            if (value < 0) {
+                FatalError(kFatalError_UnableToOpenDroneFileOrFileCorrupted_S, pDrone_spec->form->name);
+            }
+            item->spinny.speed_control = value;
+            GetALineAndDontArgue(pF, s);
+            value = GetReversenessFromString(s);
+            if (value < 0) {
+                FatalError(kFatalError_UnableToOpenDroneFileOrFileCorrupted_S, pDrone_spec->form->name);
+            }
+            item->spinny.reverse = value;
+            item->spinny.omega = GetAScalar(pF) * REC2_PI;
+            break;
+        case eFunk_groove_type_steering_groove:
+            GetALineAndDontArgue(pF, s);
+            item->actor = FindDroneChildActor(pDrone_spec, s);
+            if (item->actor == NULL) {
+                FatalError(kFatalError_UnableToOpenDroneFileOrFileCorrupted_S, pDrone_spec->form->name);
+            }
+            GetALineAndDontArgue(pF, s);
+            value = GetReversenessFromString(s);
+            if (value < 0) {
+                FatalError(kFatalError_UnableToOpenDroneFileOrFileCorrupted_S, pDrone_spec->form->name);
+            }
+            item->steering.reverse = value;
+            break;
+        default:
+            break;
+        }
+        pDrone_spec->funk_grooves->count++;
+        GetALineAndDontArgue(pF, s);
+    }
 }
 
 #ifdef REC2_MATCHING
