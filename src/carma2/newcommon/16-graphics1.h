@@ -19,12 +19,14 @@ extern tU8 gTemporary_physics_render_buffer[300000];
 
 extern tClip_details gShadow_clip_planes[8];
 extern int gFancy_shadow;
+extern br_vector3 gShadow_points[8];
 extern br_material* gShadow_material;
 extern br_vector3 gShadow_light_ray;
 extern br_vector3 gShadow_light_z;
 extern br_vector3 gShadow_light_x;
 extern br_model* gShadow_model;
 extern br_actor* gShadow_actor;
+extern int gShadow_dim_amount;
 extern int gScreen_wobble_x;
 extern int gScreen_wobble_y;
 extern int gFrontend_wrecks_car_count;
@@ -37,9 +39,9 @@ extern int gNumber_of_lollipops;
 extern br_scalar gYon_squared;
 extern int gHud_tinted4;
 
-// MungeClipPlane
+extern void C2_HOOK_FASTCALL MungeClipPlane(br_vector3* pLight, tCar_spec* pCar, br_vector3* p1, br_vector3* p2, br_vector3* pOffset);
 
-// TryThisEdge
+extern void C2_HOOK_FASTCALL TryThisEdge(tCar_spec* pCar, br_vector3* pLight, int pIndex_1, br_scalar pSign_1, int pIndex_2, br_scalar pSign_2, int pPoint_index_1, int pPoint_index_2, br_vector3* pOffset);
 
 extern void C2_HOOK_FASTCALL ProcessShadow(tCar_spec* pCar, br_actor* pWorld, tTrack_spec* pTrack_spec, br_actor* pCamera, br_matrix34* pCamera_to_world_transform, br_scalar pDistance_factor);
 

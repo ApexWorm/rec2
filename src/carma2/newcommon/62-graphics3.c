@@ -65,6 +65,18 @@ br_vector3 y_unit_vector = { { 0.0f, 1.0f, 0.0f } };
 // GLOBAL: CARMA2_CHEAT 0x0065c67c
 int gMini_map_visible = 2;
 
+// GLOBAL: CARMA2_HW 0x00655e00
+// GLOBAL: CARMA2_SW 0x00650ce8
+// GLOBAL: CARMA2_CHEAT 0x0065c688
+br_matrix34 gIdentity34 = {
+    {
+        { 1.0f, 0.0f, 0.0f },
+        { 0.0f, 1.0f, 0.0f },
+        { 0.0f, 0.0f, 1.0f },
+        { 0.0f, 0.0f, 0.0f },
+    }
+};
+
 // GLOBAL: CARMA2_HW 0x0074a780
 // GLOBAL: CARMA2_CHEAT 0x00751e20
 tCar_icon gCar_icons[128];

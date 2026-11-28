@@ -15,6 +15,7 @@
 extern const int gArrows[2][4][60];
 extern br_vector3 y_unit_vector;
 extern int gMini_map_visible;
+extern br_matrix34 gIdentity34;
 extern int gCount_smashable_race_targets;
 extern tSmashable_race_target gSmashable_race_targets[300];
 extern tCar_icon gCar_icons[128];
