@@ -26,13 +26,13 @@ extern int C2_HOOK_FASTCALL Collinear(const br_vector3* pV1, const br_vector3* p
 
 extern tPhysicsError C2_HOOK_FASTCALL ConstructTetrahedron(tCollision_shape_polyhedron_data* pPolyhedron, tPolyhedron_edge_indexes* pEdge_planes);
 
-// CheckSignOfNormal
+extern void C2_HOOK_FASTCALL CheckSignOfNormal(br_vector4* pNormal, const br_vector4* pPlane1, const br_vector4* pPlane2);
 
-// AddNewEdge
+extern void C2_HOOK_FASTCALL AddNewEdge(tPolyhedron_edge_indexes* pEdges, int* pCount_edges, tU8 pIndex1, tU8 pIndex2, tU8 pPlane, tPolyhedron_edge_indexes* pEdge_planes);
 
-// PointOutsidePlane
+extern tPolyhedron_plane_side C2_HOOK_FASTCALL PointOutsidePlane(const br_vector4* pPlane, const br_vector3* pPoint);
 
-// AdjustEdgePlanes
+extern void C2_HOOK_FASTCALL AdjustEdgePlanes(tCollision_shape_polyhedron_data* pPolyhedron, tU8 pOld_index, tU8 pNew_index, tPolyhedron_edge_indexes* pEdge_planes);
 
 extern int C2_HOOK_FASTCALL AddPointToPolyhedron(tCollision_shape_polyhedron_data* pPolyhedron, br_vector3* pPoint, tU8 pPoint_index, tPolyhedron_edge_indexes* pEdge_planes);
 

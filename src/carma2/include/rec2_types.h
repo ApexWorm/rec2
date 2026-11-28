@@ -4081,6 +4081,12 @@ typedef struct {
     br_vector4* planes;
 } tCollision_shape_polyhedron_data;
 
+typedef enum {
+    ePolyhedron_plane_side_inside = 0,
+    ePolyhedron_plane_side_outside = 1,
+    ePolyhedron_plane_side_on = 2,
+} tPolyhedron_plane_side;
+
 typedef struct tCollision_shape_polyhedron {
     tCollision_shape_common common;
     tCollision_shape_polyhedron_data polyhedron;
@@ -6035,6 +6041,7 @@ typedef enum {
     ePhysicsError_PolyhedronHasNoPoints = 3,
     ePhysicsError_UnknownHingeType = 5,
     ePhysicsError_OutOfMemory = 6,
+    ePhysicsError_error7 = 7, /* FIXME: name (ConstructTetrahedron: all points lie in one plane) */
     ePhysicsError_error9 = 9,
     ePhysicsError_InsufficientSizedBuffer = 12
 } tPhysicsError;
