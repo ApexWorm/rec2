@@ -26,11 +26,11 @@ extern int gCount_smashable_noncar_shrapnel_actors;
 extern const char* gSmashable_track_environment_path;
 extern int gCount_track_smashable_environment_specs;
 extern int gCapacity_track_smashable_environment_specs;
-extern int gINT_006a8288;
+extern int gCount_track_smashable_environment_specs_2;
 extern tStored_smash* gNet_host_smashes;
 extern tQueued_net_smash gQueued_net_smashes[50];
 extern int gINT_006a8290;
-extern int gINT_006a8294;
+extern int gDoing_net_smash;
 extern tPowerup_queue_item gPowerup_queue[50];
 extern int gSize_powerup_queue;
 
@@ -312,6 +312,10 @@ extern float C2_HOOK_FASTCALL BashModel(tSmashable_item_spec* pSpec, tPhysics_ob
 extern int C2_HOOK_FASTCALL CalcCollObjIDFromCarSpec(tCar_spec* pCar);
 
 extern int C2_HOOK_FASTCALL CalcCollObjID(tPhysics_object* pObject);
+
+extern tCar_spec* C2_HOOK_FASTCALL GetCarSpecFromCollObjID(int pID);
+
+extern tPhysics_object* C2_HOOK_FASTCALL GetCollObjFromID(int pID);
 
 extern void C2_HOOK_FASTCALL SendNetSmash(tPhysics_object* pObject, tFace_ref* pFace, float pMagnitude, br_vector3* pPosition, br_vector3* pNormal, br_vector3* pForce, int pSnap);
 
