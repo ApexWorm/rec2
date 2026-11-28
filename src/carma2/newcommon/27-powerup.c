@@ -2716,7 +2716,7 @@ br_actor* C2_HOOK_FASTCALL CreateBillBoard(br_pixelmap* pTexture) {
     BrVector3Set(&model->vertices[2].p, width / 2, -(height / 2), -2.0f);
     BrVector3Set(&model->vertices[3].p, width / 2, height / 2, -2.0f);
 #if defined(_MSC_VER) && _MSC_VER >= 1400
-#pragma warning(pop
+#pragma warning(pop)
 #endif
     BrVector2Set(&model->vertices[0].map, 0.0f, 0.0f);
     BrVector2Set(&model->vertices[1].map, 0.0f, 1.0f);
