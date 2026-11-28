@@ -10,6 +10,11 @@
 #define GUARD_45_CUTSCENE_H
 
 #include "c2_hooks.h"
+#include "rec2_types.h"
+
+extern tS32 gLast_demo_end_anim;
+
+extern void C2_HOOK_FASTCALL ShowCutScene(int pIndex, int pWait_end, int pSound_ID, br_scalar pDelay);
 
 extern void C2_HOOK_FASTCALL DoSCILogo(void);
 
@@ -28,6 +33,12 @@ extern void C2_HOOK_FASTCALL DoEndRaceAnimation(void);
 extern void C2_HOOK_FASTCALL DoGameOverAnimation(void);
 
 extern void C2_HOOK_FASTCALL DoGameCompletedAnimation(void);
+
+extern void C2_HOOK_FASTCALL DoFeatureUnavailableInDemo(void);
+
+extern void C2_HOOK_FASTCALL DoFullVersionPowerpoint(void);
+
+extern void C2_HOOK_FASTCALL DoDemoGoodbye(void);
 
 // StartLoadingScreen
 

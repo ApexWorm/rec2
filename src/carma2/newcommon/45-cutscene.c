@@ -8,12 +8,44 @@
 
 #include "45-cutscene.h"
 
+#include "05-drmem.h"
 #include "18-graphics2.h"
 #include "18b-graphics2.h"
+#include "38-flicplay.h"
 #include "42-input.h"
 #include "41-utility.h"
 #include "69-sound.h"
 #include "globvars.h"
+#include "platform.h"
+
+// GLOBAL: CARMA2_HW 0x0058fe08
+// GLOBAL: CARMA2_SW 0x0058ae04
+// GLOBAL: CARMA2_CHEAT 0x00594f8c
+tS32 gLast_demo_end_anim = -90000;
+
+inline void C2_HOOK_FASTCALL ShowCutScene(int pIndex, int pWait_end, int pSound_ID, br_scalar pDelay) {
+
+    gProgram_state.cut_scene = 1;
+    if (pSound_ID >= 0) {
+        DRS3LoadSound(pSound_ID);
+        SetFlicSound(pSound_ID, PDGetTotalTime() + (int)(1000.0f * pDelay));
+    }
+    SetNonFatalAllocationErrors();
+    RunFlic(pIndex);
+    ResetNonFatalAllocationErrors();
+    if (pWait_end) {
+        WaitForAKey();
+    } else {
+        WaitForNoKeys();
+    }
+    FadePaletteDown();
+    ClearEntireScreen();
+    if (pSound_ID >= 0) {
+        DRS3ReleaseSound(pSound_ID);
+        SetFlicSound(0, 0);
+    }
+    gProgram_state.cut_scene = 0;
+}
 
 // FUNCTION: CARMA2_HW 0x0043e750
 // FUNCTION: CARMA2_SW 0x0043e860
@@ -83,6 +115,41 @@ void C2_HOOK_FASTCALL DoGameCompletedAnimation(void) {
 
     PlaySmackerFile("TOPRANK.SMK");
     WaitForNoKeys();
+}
+
+// FUNCTION: CARMA2_HW 0x0043f3a0
+// FUNCTION: CARMA2_SW 0x0043f480
+// FUNCTION: CARMA2_CHEAT 0x0043f650
+void C2_HOOK_FASTCALL DoFeatureUnavailableInDemo(void) {
+
+    PrintMemoryDump(0, "BEFORE DEMO-ONLY SCREEN");
+    SuspendPendingFlic();
+    FadePaletteDown();
+    ShowCutScene(7, 1, 8502, gFlic_sound_delay_not_in_demo);
+    FadePaletteDown();
+    PrintMemoryDump(0, "AFTER DEMO-ONLY SCREEN");
+}
+
+// FUNCTION: CARMA2_HW 0x0043f450
+// FUNCTION: CARMA2_SW 0x0043f530
+// FUNCTION: CARMA2_CHEAT 0x0043f700
+void C2_HOOK_FASTCALL DoFullVersionPowerpoint(void) {
+
+    FadePaletteDown();
+    DRSetPalette(gRender_palette);
+    ShowCutScene(9, 0, 8503, gFlic_sound_delay_post_demo);
+    FadePaletteDown();
+    gLast_demo_end_anim = PDGetTotalTime();
+}
+
+// FUNCTION: CARMA2_HW 0x0043f500
+// FUNCTION: CARMA2_SW 0x0043f5e0
+// FUNCTION: CARMA2_CHEAT 0x0043f7b0
+void C2_HOOK_FASTCALL DoDemoGoodbye(void) {
+
+    if ((tS32)(PDGetTotalTime() - gLast_demo_end_anim) > 90000) {
+        DoFullVersionPowerpoint();
+    }
 }
 
 // FUNCTION: CARMA2_HW 0x0043f5c0
