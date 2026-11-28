@@ -209,6 +209,8 @@ extern void C2_HOOK_FASTCALL AddNapalmBoltToPipingSession(int pIndex, tPedestria
 
 // PipeSingleCrush
 
+extern void C2_HOOK_FASTCALL PipeSingleSmudge(tU16 pCar_ID, int pModel_index, int pVertex_count, tSmudged_vertex* pCoordinates);
+
 extern void C2_HOOK_FASTCALL PipeSingleScreenWobble(int pWobble_x, int pWobble_y);
 
 extern void C2_HOOK_FASTCALL PipeSingleGrooveStop(int pGroove_index, br_matrix34* pMatrix, int pPath_interrupt, int pObject_interrupt, float pPath_resumption, float pObject_resumption);

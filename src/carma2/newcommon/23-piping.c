@@ -1214,6 +1214,24 @@ void C2_HOOK_FASTCALL AddNapalmBoltToPipingSession(int pIndex, tPedestrian* pPed
 
 // PipeSingleCrush
 
+// FUNCTION: CARMA2_HW 0x004c7fa0
+// FUNCTION: CARMA2_SW 0x004c46d0
+// FUNCTION: CARMA2_CHEAT 0x004cdac0
+void C2_HOOK_FASTCALL PipeSingleSmudge(tU16 pCar_ID, int pModel_index, int pVertex_count, tSmudged_vertex* pCoordinates) {
+    tU32 data_size;
+
+    if (gSmudge_space != NULL) {
+        if (pVertex_count > 600) {
+            pVertex_count = 600;
+        }
+        data_size = pVertex_count * sizeof(tSmudged_vertex);
+        gSmudge_space->vertex_count = pVertex_count;
+        gSmudge_space->model_index = pModel_index;
+        memcpy(gSmudge_space->vertex_changes, pCoordinates, data_size);
+        ARDoSingleSession(ePipe_chunk_smudge, pCar_ID, gSmudge_space, data_size + offsetof(tPipe_smudge_data, vertex_changes));
+    }
+}
+
 // FUNCTION: CARMA2_HW 0x004c8090
 // FUNCTION: CARMA2_SW 0x004c47c0
 // FUNCTION: CARMA2_CHEAT 0x004cdbb0
