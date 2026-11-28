@@ -108,6 +108,22 @@ int gStatic_drone_path_model_max_faces;
 // GLOBAL: CARMA2_CHEAT 0x0059b10c
 int gSelected_edit_drone_path = -1;
 
+// GLOBAL: CARMA2_HW 0x005947b0
+// GLOBAL: CARMA2_SW 0x0058f710
+// GLOBAL: CARMA2_CHEAT 0x0059b108
+int gSelected_drone_path_node_index = -1;
+
+// GLOBAL: CARMA2_HW 0x005947bc
+// GLOBAL: CARMA2_SW 0x0058f71c
+// GLOBAL: CARMA2_CHEAT 0x0059b114
+int gSelected_drone_form_index = -1;
+
+/* FIXME: name is a guess */
+// GLOBAL: CARMA2_HW 0x00684378
+// GLOBAL: CARMA2_SW 0x0067eab8
+// GLOBAL: CARMA2_CHEAT 0x0068bc20
+char gDrone_edit_message[256];
+
 // GLOBAL: CARMA2_HW 0x005947b8
 // GLOBAL: CARMA2_SW 0x0058f718
 // GLOBAL: CARMA2_CHEAT 0x0059b110
@@ -809,7 +825,49 @@ void C2_HOOK_FASTCALL WriteOutDronePaths(void) {
 #pragma auto_inline(on)
 #endif
 
-// SelectClosestDrone
+// FUNCTION: CARMA2_HW 0x004532e0
+// FUNCTION: CARMA2_SW 0x00453070
+// FUNCTION: CARMA2_CHEAT 0x00453840
+void C2_HOOK_FASTCALL SelectClosestDrone(void) {
+    int i;
+    int nearest;
+    br_scalar nearest_distance_squared;
+    br_scalar distance_squared;
+    br_vector3 v;
+
+    nearest_distance_squared = BR_SCALAR_MAX;
+    for (i = 0; i < gCount_drones; i++) {
+        BrVector3Sub(&v, &gProgram_state.current_car.car_master_actor->t.t.translate.t, &gDrone_specs[i].actor->t.t.translate.t);
+        distance_squared = BrVector3LengthSquared(&v);
+        if (distance_squared < nearest_distance_squared) {
+            nearest_distance_squared = distance_squared;
+            nearest = i;
+        }
+    }
+    if (nearest_distance_squared < 2.0f) {
+        if (gSelected_drone_path_index >= 0) {
+            gDrone_specs[gSelected_drone_path_index].actor->render_style = BR_RSTYLE_FACES;
+        }
+        gSelected_drone_path_index = nearest;
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-extra-args"
+#endif
+        sprintf(gDrone_edit_message, "Selected drone #%d", nearest, nearest_distance_squared);
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif
+        NewTextHeadupSlot(4, 0, 3000, -1, gDrone_edit_message);
+        for (i = 0; i < gCount_drone_forms; i++) {
+            if (gDrone_specs[gSelected_drone_path_index].form == &gDrone_forms[i]) {
+                gSelected_drone_form_index = i;
+                return;
+            }
+        }
+    } else {
+        NewTextHeadupSlot(4, 0, 3000, -1, "No drones close enough");
+    }
+}
 
 // FUN_00453460
 
@@ -837,11 +895,79 @@ void C2_HOOK_FASTCALL ToggleDronePaths(void) {
     }
 }
 
-// FUN_00453720
+// FUNCTION: CARMA2_HW 0x00453720
+// FUNCTION: CARMA2_SW 0x004534b0
+// FUNCTION: CARMA2_CHEAT 0x00453c80
+void C2_HOOK_FASTCALL FUN_00453720(void) {
+    int node;
+    int selected;
 
-// FindNearestNodeDrone
+    if (!gShow_drone_paths) {
+        NewTextHeadupSlot(4, 0, 3000, -1, "You must show Drone Paths first");
+    } else if (FUN_004538a0(1)) {
+        node = FindNearestNodeDrone(&gProgram_state.current_car.car_master_actor->t.t.translate.t, 2.0f);
+        if (node >= 0 && node != gSelected_drone_path_node_index) {
+            selected = gSelected_drone_path_node_index;
+            if (gDrone_path_nodes[selected].count_sections < 8) {
+                gDrone_path_nodes[selected].sections[gDrone_path_nodes[selected].count_sections].node1 = node;
+                gDrone_path_nodes[selected].count_sections++;
+            }
+            InitialiseEditModelsEtc();
+            gDrone_paths_elasticating = 0;
+            if (gDrone_path_model_actor != NULL) {
+                gDrone_path_model_actor->render_style = BR_RSTYLE_NONE;
+            }
+        }
+    }
+}
 
-// FUN_004538a0
+// FUNCTION: CARMA2_HW 0x004537d0
+// FUNCTION: CARMA2_SW 0x00453560
+// FUNCTION: CARMA2_CHEAT 0x00453d30
+int C2_HOOK_FASTCALL FindNearestNodeDrone(const br_vector3* pPosition, br_scalar pMax_distance) {
+    int i;
+    int nearest;
+    br_scalar max_distance_squared;
+    br_scalar nearest_distance_squared;
+    br_scalar distance_squared;
+    br_vector3 v;
+
+    nearest_distance_squared = BR_SCALAR_MAX;
+    max_distance_squared = pMax_distance * pMax_distance;
+    nearest = -1;
+    for (i = 0; i < gCount_drone_path_nodes; i++) {
+        BrVector3Sub(&v, pPosition, &gDrone_path_nodes[i].position);
+        distance_squared = BrVector3LengthSquared(&v);
+        if (distance_squared < nearest_distance_squared && distance_squared < max_distance_squared) {
+            nearest_distance_squared = distance_squared;
+            nearest = i;
+        }
+    }
+    if (nearest < 0) {
+        NewTextHeadupSlot(4, 0, 3000, -1, "Get nearer to a drone node");
+    }
+    return nearest;
+}
+
+// FUNCTION: CARMA2_HW 0x004538a0
+// FUNCTION: CARMA2_SW 0x00453630
+// FUNCTION: CARMA2_CHEAT 0x00453e00
+int C2_HOOK_FASTCALL FUN_004538a0(int pReport) {
+    br_vector3 v;
+
+    if (gDrone_paths_elasticating) {
+        BrVector3Sub(&v, &gProgram_state.current_car.car_master_actor->t.t.translate.t, &gDrone_path_nodes[gSelected_drone_path_node_index].position);
+        if (pReport && BrVector3Length(&v) > 255.0f) {
+            NewTextHeadupSlot(4, 0, 3000, -1, "New section too long");
+            return 0;
+        }
+        return 1;
+    }
+    if (pReport) {
+        NewTextHeadupSlot(4, 0, 3000, -1, "You must be elasticating to do that");
+    }
+    return 0;
+}
 
 // FUN_00453940
 

@@ -30,6 +30,9 @@ extern int gDrone_paths_elasticating;
 extern int gStatic_drone_path_model_max_vertices;
 extern int gStatic_drone_path_model_max_faces;
 extern int gSelected_edit_drone_path;
+extern int gSelected_drone_path_node_index;
+extern int gSelected_drone_form_index;
+extern char gDrone_edit_message[256];
 extern int gSelected_drone_path_index;
 extern int gShow_drone_paths;
 extern int gCount_drones;
@@ -221,17 +224,17 @@ extern int C2_HOOK_FASTCALL InitialiseEditModelsEtc(void);
 
 extern void C2_HOOK_FASTCALL WriteOutDronePaths(void);
 
-// SelectClosestDrone
+extern void C2_HOOK_FASTCALL SelectClosestDrone(void);
 
 // FUN_00453460
 
 extern void C2_HOOK_FASTCALL ToggleDronePaths(void);
 
-// FUN_00453720
+extern void C2_HOOK_FASTCALL FUN_00453720(void);
 
-// FindNearestNodeDrone
+extern int C2_HOOK_FASTCALL FindNearestNodeDrone(const br_vector3* pPosition, br_scalar pMax_distance);
 
-// FUN_004538a0
+extern int C2_HOOK_FASTCALL FUN_004538a0(int pReport);
 
 // FUN_00453940
 
