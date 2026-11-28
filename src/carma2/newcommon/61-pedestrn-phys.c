@@ -1289,7 +1289,7 @@ int C2_HOOK_FASTCALL DamagePedestrian(tPedestrian* pPed, int pDamage, int pArg3,
                 severing_damage = gPed_severing_damage;
             }
             damage_left -= severing_damage;
-            if (damage_left < 0.f || count >= 5) {
+            if (damage_left < 0.0f || count >= 5) {
                 break;
             }
             if (gExploding_pedestrians || gPed_dismemberfest || PercentageChance(gPed_severing_chance)) {
@@ -1397,12 +1397,12 @@ int C2_HOOK_FASTCALL DoToPeds(tCar_spec* pCar, int pOnly_alive, float pRange_squ
     for (ped = gPedestrians_in_sight; ped != NULL; ped = ped->next) {
         distance_squared = (pos->v[0] - ped->pos.v[0]) * (pos->v[0] - ped->pos.v[0]) + (pos->v[1] - ped->pos.v[1]) * (pos->v[1] - ped->pos.v[1]) + (pos->v[2] - ped->pos.v[2]) * (pos->v[2] - ped->pos.v[2]);
         if (!pOnly_alive || ped->hit_points > 0) {
-            if (pRange_squared == 0.f || distance_squared < pRange_squared) {
+            if (pRange_squared == 0.0f || distance_squared < pRange_squared) {
                 if (pCheck_visible) {
                     BrVector3Sub(&dir, &ped->pos, pos);
                     FindFace(pos, &dir, &normal, &t, &material);
                 } else {
-                    t = 100.f;
+                    t = 100.0f;
                 }
                 if (t >= 1.0) {
                     pCallback(ped, pCar, distance_squared, time, pContext);
@@ -1777,7 +1777,7 @@ void C2_HOOK_FASTCALL RenderElectroBastardRays(br_pixelmap* pRender_screen, br_p
 #endif
         AddProxRayToPipingSession(i, gProximity_rays[i].car, gProximity_rays[i].ped - gPedestrian_array, gProximity_rays[i].start_time);
         car_model = gProximity_rays[i].car->car_actor->model;
-        BrVector3Set(&car_add_c, 0.f, (car_model->bounds.max.v[1] - car_model->bounds.min.v[1]) * -.2f, 0.f);
+        BrVector3Set(&car_add_c, 0.0f, (car_model->bounds.max.v[1] - car_model->bounds.min.v[1]) * -0.2f, 0.0f);
         BrMatrix34ApplyV(&car_add, &car_add_c, &gProximity_rays[i].car->car_master_actor->t.t.mat);
         BrVector3Add(&car_pos, &gProximity_rays[i].car->pos, &car_add);
         BrVector3Copy(&ped_pos, &gProximity_rays[i].ped->pos);
@@ -1789,16 +1789,16 @@ void C2_HOOK_FASTCALL RenderElectroBastardRays(br_pixelmap* pRender_screen, br_p
         BrVector3Copy(&from_pos, &car_pos_cam);
         seed.f = ped_pos.v[0] + ped_pos.v[1] + ped_pos.v[2] + car_pos.v[0] + car_pos.v[1] + car_pos.v[2];
         srand(the_time + seed.i);
-        for (t = 0.f; t < distance; t -= -.05f) {
+        for (t = 0.0f; t < distance; t -= -0.05f) {
             to_pos.v[0] = r1.v[0] * t + car_pos_cam.v[0];
             to_pos.v[1] = r1.v[1] * t + car_pos_cam.v[1];
             to_pos.v[2] = r1.v[2] * t + car_pos_cam.v[2];
-            to_pos.v[0] += SRandomPosNeg(.1f);
-            to_pos.v[1] += SRandomPosNeg(.1f);
-            to_pos.v[2] += SRandomPosNeg(.1f);
+            to_pos.v[0] += SRandomPosNeg(0.1f);
+            to_pos.v[1] += SRandomPosNeg(0.1f);
+            to_pos.v[2] += SRandomPosNeg(0.1f);
             DrawLine3D(&to_pos, &from_pos, pRender_screen, pDepth_buffer, gProx_ray_shade_table);
             BrVector3Copy(&from_pos, &to_pos);
-            t -= -.05f;
+            t -= -0.05f;
         }
         DrawLine3D(&ped_pos_cam, &from_pos, pRender_screen, pDepth_buffer, gProx_ray_shade_table);
     }
