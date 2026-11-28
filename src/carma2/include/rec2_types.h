@@ -1243,7 +1243,7 @@ typedef struct tPolyFont {
     br_uint_32 asciiOffset;
     br_uint_32 fontCharacterHeight;
     br_uint_32 widthOfBlank;
-    br_uint_32 fontSize;
+    int fontSize;
     br_uint_32 unknown_0x5c;
     int available;
     tPolyFontGlyph glyphs[256]; /* unsure about offset */
