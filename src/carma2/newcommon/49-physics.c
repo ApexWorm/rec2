@@ -367,6 +367,9 @@ tFace_ref* C2_HOOK_FASTCALL FUN_004227a0(br_vector3* pPosition, br_vector3* pDir
     }
 }
 
+// FUNCTION: CARMA2_HW 0x00422870
+// FUNCTION: CARMA2_SW 0x004228f0
+// FUNCTION: CARMA2_CHEAT 0x004229f0
 inline tFace_ref* C2_HOOK_FASTCALL RayCastInBox(br_vector3* pPosition, br_vector3* pDirection, br_vector3* pNormal, br_scalar* pT, br_vector3* pCollision_position, tPhysics_object* pObject) {
 
     return RayCastThruFaceList(pPosition, pDirection, pNormal, pT, pCollision_position, &gFace_list__car[pObject->box_face_start], pObject->box_face_end - pObject->box_face_start);
