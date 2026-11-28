@@ -801,6 +801,8 @@ void C2_HOOK_FASTCALL DoFancyHeadup(int pIndex) {
 }
 
 // FUNCTION: CARMA2_HW 0x0044a8a0
+// FUNCTION: CARMA2_SW 0x0044aa30
+// FUNCTION: CARMA2_CHEAT 0x0044adc0
 void C2_HOOK_FASTCALL MoveHeadupTo(int pHeadup_index, int pNew_x, int pNew_y) {
     tHeadup* the_headup;
 

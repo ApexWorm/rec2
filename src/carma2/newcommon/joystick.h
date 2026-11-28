@@ -36,6 +36,20 @@ extern void C2_HOOK_FASTCALL RestoreJoystickPreferences(void);
 
 extern int C2_HOOK_FASTCALL HasCurrentJoystick(void);
 
+extern void C2_HOOK_FASTCALL FUN_0045a670(void);
+
+extern int C2_HOOK_FASTCALL AddToTextBufferCallback(const char* pPath, void* pContext);
+
+extern int C2_HOOK_FASTCALL StoreTextHeadup(tHeadup_text_buffer* pTexts, tHeadup_text* pNew, int pSorted);
+
+#ifdef REC2_HW
+extern void C2_HOOK_FASTCALL CreateAccentPolyActor(float pX, float pY, float pWidth, float pHeight);
+#endif
+
+extern void C2_HOOK_FASTCALL FUN_0045acf0(void);
+
+extern void C2_HOOK_FASTCALL FUN_0045b0a0(tHeadup_text_buffer* pText_buffer);
+
 extern void C2_HOOK_FASTCALL PeekCharacter(FILE* pF);
 
 extern int C2_HOOK_FASTCALL ReadUntilCharacter(FILE* pF, char* pBuffer, int pBuffer_size, char pLimit_char);
@@ -43,6 +57,8 @@ extern int C2_HOOK_FASTCALL ReadUntilCharacter(FILE* pF, char* pBuffer, int pBuf
 extern int C2_HOOK_FASTCALL WriteJoystickPreferences(FILE* pF, const tButtonJoystickInfo* pInfo);
 
 extern int C2_HOOK_FASTCALL CountJoystickPreferences(FILE* pF);
+
+extern void C2_HOOK_FASTCALL FUN_0045c240(void);
 
 extern int C2_HOOK_FASTCALL ToggleJoystickThrottle(void);
 
