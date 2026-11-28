@@ -705,9 +705,49 @@ inline void C2_HOOK_FASTCALL SetupAlternateFoxEffect(tCar_spec* pCar_spec) {
 }
 #endif
 #ifdef REC2_SW
-// STUB: CARMA2_SW 0x004f9b00
+// FUNCTION: CARMA2_SW 0x004f9b00
 void C2_HOOK_CDECL DoModelThing(br_actor* pActor, br_model* pModel, br_material* pMaterial, void* pArg4, br_uint_8 pArg5, int pArg6) {
-    NOT_IMPLEMENTED();
+    int i;
+    int j;
+    int alpha;
+
+    GetRaceTime();
+    for (i = 0; i < pModel->prepared->ngroups; i++) {
+        for (j = 0; j < pModel->prepared->groups[i].nvertices; j++) {
+            if (pModel->prepared->groups[i].vertex_colours[j] & 0x1000000) {
+                if ((pModel->prepared->groups[i].vertex_colours[j] & 0xff000000) < 0x14000000) {
+                    pModel->prepared->groups[i].vertex_colours[j] = 0;
+                    if (pModel->flags & BR_MODF_UPDATEABLE) {
+                        pModel->vertices[pModel->prepared->groups[i].vertex_user[j]].index = 0;
+                    }
+                } else {
+                    alpha = BR_ALPHA(pModel->prepared->groups[i].vertex_colours[j]) - 2 * IRandomBetween(5, 10);
+                    pModel->prepared->groups[i].vertex_colours[j] = alpha << 24;
+                    if (pModel->flags & BR_MODF_UPDATEABLE) {
+                        pModel->vertices[pModel->prepared->groups[i].vertex_user[j]].index = alpha;
+                    }
+                }
+            } else {
+                if ((pModel->prepared->groups[i].vertex_colours[j] & 0xff000000) > 0xc8000000) {
+                    pModel->prepared->groups[i].vertex_colours[j] = 0xc9000000;
+                    if (pModel->flags & BR_MODF_UPDATEABLE) {
+                        pModel->vertices[pModel->prepared->groups[i].vertex_user[j]].index = 0xc9;
+                    }
+                } else {
+                    alpha = BR_ALPHA(pModel->prepared->groups[i].vertex_colours[j]) + 2 * IRandomBetween(5, 10);
+                    pModel->prepared->groups[i].vertex_colours[j] = alpha << 24;
+                    if (pModel->flags & BR_MODF_UPDATEABLE) {
+                        pModel->vertices[pModel->prepared->groups[i].vertex_user[j]].index = alpha;
+                    }
+                }
+            }
+        }
+    }
+    if ((pModel->flags & BR_MODF_UPDATEABLE) && pModel->user != NULL && ((tUser_detail_level_model*)pModel->user)->field_0x0) {
+        BrModelUpdate(pModel, BR_MODU_VERTEX_POSITIONS);
+        ((tUser_detail_level_model*)pModel->user)->field_0x0 = 0;
+    }
+    BrZsModelRender(pActor, pModel, pMaterial, pArg4, pArg5, BrOnScreenCheck(&pModel->bounds), 0);
 }
 
 inline void C2_HOOK_FASTCALL SetModelShade(br_model* pModel, br_pixelmap* pIndex_shade, int pArg3) {
