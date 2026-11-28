@@ -268,6 +268,35 @@ tCrush_net_reattach_bit_list_item gNet_crush_reattach_bit_list[8];
 // GLOBAL: CARMA2_CHEAT 0x00680cf0
 undefined4 gDAT_00679440;
 
+// GLOBAL: CARMA2_HW 0x00679444
+// GLOBAL: CARMA2_SW 0x00673bb4
+// GLOBAL: CARMA2_CHEAT 0x00680cf4
+br_vertex* gDAT_00679444;
+
+// GLOBAL: CARMA2_HW 0x006796c0
+// GLOBAL: CARMA2_SW 0x00673e30
+// GLOBAL: CARMA2_CHEAT 0x00680f70
+br_vertex* gDAT_006796c0;
+
+// GLOBAL: CARMA2_HW 0x006796c4
+// GLOBAL: CARMA2_SW 0x00673e34
+// GLOBAL: CARMA2_CHEAT 0x00680f74
+br_vertex* gDAT_006796c4;
+
+typedef struct {
+    tU16 vertex1;
+    tU16 vertex2;
+    tU16 split_vertex1;
+    tU16 split_vertex2;
+    tU8 needs_update;
+    undefined field_0x9;
+} tSplit_vertex; /* FIXME: name is a guess */
+
+// GLOBAL: CARMA2_HW 0x0067a3b0
+// GLOBAL: CARMA2_SW 0x00674b20
+// GLOBAL: CARMA2_CHEAT 0x00681c60
+tSplit_vertex gSplit_vertices_0067a3b0[512]; /* FIXME: size is a guess (space up to the next known global) */
+
 // GLOBAL: CARMA2_HW 0x006796a0
 // GLOBAL: CARMA2_SW 0x00673e10
 // GLOBAL: CARMA2_CHEAT 0x00680f50
@@ -1967,7 +1996,42 @@ void C2_HOOK_FASTCALL FullyDetachBit(tCar_spec* pCar, tPhysics_object* pObject) 
 
 // CreateSplitVertex
 
-// GetSplitVertex
+// FUNCTION: CARMA2_HW 0x00430150
+// FUNCTION: CARMA2_SW 0x00430180
+// FUNCTION: CARMA2_CHEAT 0x00430320
+void C2_HOOK_FASTCALL GetSplitVertex(tU16 pVertex1, tU16 pVertex2, tU16* pSplit_vertex1, tU16* pSplit_vertex2, const float* pDistances) {
+    tSplit_vertex* split;
+    br_vertex* v;
+    float t;
+    float s;
+
+    for (split = gSplit_vertices_0067a3b0; split->split_vertex1 != 0; split++) {
+        if (split->vertex1 == pVertex1 && split->vertex2 == pVertex2) {
+            *pSplit_vertex1 = split->split_vertex1;
+            *pSplit_vertex2 = split->split_vertex2;
+            if (split->needs_update) {
+                v = &gDAT_006796c0[*pSplit_vertex1];
+                t = (float)fabs((pDistances[pVertex2] + SRandomBetween(-0.028985508f, 0.028985508f)) / (pDistances[pVertex1] - pDistances[pVertex2]));
+                if (t <= 0.0f) {
+                    t = 0.0001f;
+                } else if (t >= 1.0f) {
+                    t = 0.9999f;
+                }
+                s = 1.0f - t;
+                v->p.v[0] = gDAT_00679444[pVertex2].p.v[0] * s + gDAT_00679444[pVertex1].p.v[0] * t;
+                v->p.v[1] = gDAT_00679444[pVertex2].p.v[1] * s + gDAT_00679444[pVertex1].p.v[1] * t;
+                v->p.v[2] = gDAT_00679444[pVertex2].p.v[2] * s + gDAT_00679444[pVertex1].p.v[2] * t;
+                v->map.v[0] = gDAT_00679444[pVertex2].map.v[0] * s + gDAT_00679444[pVertex1].map.v[0] * t;
+                v->map.v[1] = gDAT_00679444[pVertex2].map.v[1] * s + gDAT_00679444[pVertex1].map.v[1] * t;
+                BrVector3Copy(&gDAT_006796c4[*pSplit_vertex2].p, &gDAT_006796c0[*pSplit_vertex1].p);
+                gDAT_006796c4[*pSplit_vertex2].map.v[0] = gDAT_006796c0[*pSplit_vertex1].map.v[0];
+                gDAT_006796c4[*pSplit_vertex2].map.v[1] = gDAT_006796c0[*pSplit_vertex1].map.v[1];
+                split->needs_update = 0;
+            }
+            return;
+        }
+    }
+}
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
