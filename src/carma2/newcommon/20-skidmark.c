@@ -121,6 +121,9 @@ void C2_HOOK_FASTCALL InitSkids(void) {
     br_model* square;
     br_pixelmap* pm;
     char* str;
+#ifdef REC2_FIX_BUGS
+    char name_buf[32];
+#endif
 
     for (mat = 0; mat < (int)REC2_ASIZE(gMaterial_names); mat++) {
         if (gProgram_state.sausage_eater_mode) {
@@ -135,6 +138,11 @@ void C2_HOOK_FASTCALL InitSkids(void) {
             } else {
                 str = (char*)gMaterial_names[mat];
             }
+#ifdef REC2_FIX_BUGS
+            /* The original edits the string literal in place; literals are read-only here */
+            strcpy(name_buf, str);
+            str = name_buf;
+#endif
 
             str = strtok(str, ".");
             sl = strlen(str);
