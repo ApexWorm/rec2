@@ -14,6 +14,7 @@
 #include "15-displays.h"
 #include "28-world3.h"
 #include "41-utility.h"
+#include "joystick.h"
 #include "55-volume.h"
 #include "61-pedestrn-phys.h"
 #include "70-packfile.h"
@@ -516,4 +517,36 @@ void C2_HOOK_FASTCALL HideSpecialVolumes(void) {
             DelSpecVolumeGraph(i);
         }
     }
+}
+
+// FUNCTION: CARMA2_HW 0x00511200
+// FUNCTION: CARMA2_SW 0x0050c650
+// FUNCTION: CARMA2_CHEAT 0x00516bf0
+void C2_HOOK_FASTCALL FUN_00511200(void) {
+
+    FUN_0045acf0();
+}
+
+// FUNCTION: CARMA2_HW 0x00511210
+// FUNCTION: CARMA2_SW 0x0050c660
+// FUNCTION: CARMA2_CHEAT 0x00516c00
+void C2_HOOK_FASTCALL FUN_00511210(void) {
+
+    FUN_0045a670();
+}
+
+// FUNCTION: CARMA2_HW 0x00511220
+// FUNCTION: CARMA2_SW 0x0050c670
+// FUNCTION: CARMA2_CHEAT 0x00516c10
+void C2_HOOK_FASTCALL FUN_00511220(void) {
+
+    FUN_0045ae20();
+}
+
+// FUNCTION: CARMA2_HW 0x00511230
+// FUNCTION: CARMA2_SW 0x0050c680
+// FUNCTION: CARMA2_CHEAT 0x00516c20
+void C2_HOOK_FASTCALL FUN_00511230(void) {
+
+    FUN_0045b150();
 }

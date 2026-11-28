@@ -67,4 +67,12 @@ extern void C2_HOOK_FASTCALL ShowSpecialVolumes(void);
 
 extern void C2_HOOK_FASTCALL HideSpecialVolumes(void);
 
+extern void C2_HOOK_FASTCALL FUN_00511200(void);
+
+extern void C2_HOOK_FASTCALL FUN_00511210(void);
+
+extern void C2_HOOK_FASTCALL FUN_00511220(void);
+
+extern void C2_HOOK_FASTCALL FUN_00511230(void);
+
 #endif // GUARD_11_WORLD1_H
