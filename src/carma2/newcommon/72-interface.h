@@ -231,6 +231,8 @@ extern int C2_HOOK_FASTCALL testDn(tFrontend_spec* pFrontend);
 
 extern int C2_HOOK_FASTCALL FRONTEND_MainMenuHandler(tFrontend_spec* pFrontend);
 
+extern int C2_HOOK_FASTCALL FUN_0046adb0(tFrontend_spec* pFrontend);
+
 extern void C2_HOOK_FASTCALL UpdateCarInfo(tFrontend_spec* pFrontend);
 
 extern int C2_HOOK_FASTCALL ChangeCarMenuInfunc(tFrontend_spec* pFrontend);
