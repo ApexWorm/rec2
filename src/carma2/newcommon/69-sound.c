@@ -115,6 +115,7 @@ int gLast_tune = -1;
 
 // GLOBAL: CARMA2_HW 0x00595c28
 // GLOBAL: CARMA2_SW 0x00590b88
+// GLOBAL: CARMA2_CHEAT 0x0059c580
 const char* gSound_periodicity_choices[3] = {
     "RANDOM",
     "PERIODIC",
@@ -177,6 +178,7 @@ int gEnvironmental_sound_sources_buffer_index = 0;
 
 // GLOBAL: CARMA2_HW 0x00595c38
 // GLOBAL: CARMA2_SW 0x00590b98
+// GLOBAL: CARMA2_CHEAT 0x0059c590
 const char* gSound_generator_type_names[3] = {
     "NONCAR",
     "ACTOR",
@@ -1055,7 +1057,7 @@ void C2_HOOK_FASTCALL BuggerModelName(tTrack_spec* pTrack_spec, const char* pNam
     char identifier[4];
 
     sprintf(identifier, "%c%02d", ')', pIndex);
-    model = BrModelFind(identifier);
+    model = BrModelFind(pName);
     if (model == NULL || model->identifier == NULL) {
 #ifdef REC2_FIX_BUGS
         FatalError(kFatalError_CannotFindModelReferencedInSoundGeneratorList_S, identifier);
@@ -1069,10 +1071,8 @@ void C2_HOOK_FASTCALL BuggerModelName(tTrack_spec* pTrack_spec, const char* pNam
 
 // FUNCTION: CARMA2_HW 0x004572f0
 // FUNCTION: CARMA2_SW 0x00457080
+// FUNCTION: CARMA2_CHEAT 0x00457770
 void C2_HOOK_FASTCALL ReadSoundGenerators(tTrack_spec* pTrack_spec, FILE* pF) {
-    float x;
-    float y;
-    float z;
     char name[32];
     tTrackSoundGenerator* generator;
     int i;
@@ -1085,10 +1085,15 @@ void C2_HOOK_FASTCALL ReadSoundGenerators(tTrack_spec* pTrack_spec, FILE* pF) {
 
             generator->type = GetALineAndInterpretCommand(pF, gSound_generator_type_names, REC2_ASIZE(gSound_generator_type_names));
             switch (generator->type) {
-            case kSoundGeneratorType_point:
+            case kSoundGeneratorType_point: {
+                float x;
+                float y;
+                float z;
+
                 GetThreeFloats(pF, &x, &y, &z);
                 BrVector3Set(&generator->point, x, y, z);
                 break;
+            }
             case kSoundGeneratorType_actor:
                 GetAString(pF, name);
                 BuggerModelName(pTrack_spec, name, i);
@@ -1109,6 +1114,7 @@ void C2_HOOK_FASTCALL ReadSoundGenerators(tTrack_spec* pTrack_spec, FILE* pF) {
 
 // FUNCTION: CARMA2_HW 0x00457450
 // FUNCTION: CARMA2_SW 0x004571e0
+// FUNCTION: CARMA2_CHEAT 0x004578d0
 void C2_HOOK_FASTCALL WriteOutSoundSpec(FILE* pF, tSpecial_volume_soundfx_data* pSpec) {
     int i;
 
@@ -1121,12 +1127,12 @@ void C2_HOOK_FASTCALL WriteOutSoundSpec(FILE* pF, tSpecial_volume_soundfx_data* 
     switch (pSpec->periodicity) {
     case kSoundFxPeriodicity_Periodic:
         fprintf(pF,"%.2f\t\t\t\t\t// period\n",
-            (double)pSpec->period / 1000.0);
+            (double)(tU32)pSpec->period / 1000.0);
         break;
     case kSoundFxPeriodicity_Random:
         fprintf(pF, "%.2f,%.2f\t\t\t\t\t// min,max gap\n",
-           (double)pSpec->random.min_gap / 1000.0,
-           (double)pSpec->random.max_gap / 1000.0);
+           (double)(tU32)pSpec->random.min_gap / 1000.0,
+           (double)(tU32)pSpec->random.max_gap / 1000.0);
         break;
 #ifdef REC2_FIX_BUGS
     default:
@@ -1137,7 +1143,7 @@ void C2_HOOK_FASTCALL WriteOutSoundSpec(FILE* pF, tSpecial_volume_soundfx_data* 
     fprintf(pF, "%d\t\t\t\t\t// num sounds\n", pSpec->count_sound_alternatives);
     for (i = 0; i < pSpec->count_sound_alternatives; i++) {
 
-        fprintf(pF, "%d\t\t\t\t\t// sound ID\n", pSpec->sound_alternatives[i]);
+        fprintf(pF, "%d\t\t\t\t\t// sound ID\n", (tU16)pSpec->sound_alternatives[i]);
     }
 }
 
