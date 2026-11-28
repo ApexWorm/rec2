@@ -6033,6 +6033,7 @@ typedef enum {
     ePhysicsError_UnknownShapeType = 1,
     ePhysicsError_WireFrameHasNoPoints = 2,
     ePhysicsError_PolyhedronHasNoPoints = 3,
+    ePhysicsError_error4 = 4,
     ePhysicsError_UnknownHingeType = 5,
     ePhysicsError_OutOfMemory = 6,
     ePhysicsError_error9 = 9,

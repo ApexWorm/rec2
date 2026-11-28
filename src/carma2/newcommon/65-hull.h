@@ -36,18 +36,7 @@ extern int C2_HOOK_FASTCALL Collinear(const br_vector3* pV1, const br_vector3* p
 
 // AddPointToPolyhedron
 
-#ifdef REC2_MATCHING
-typedef struct {
-    undefined4 field_0x00;
-    undefined4 field_0x04;
-    undefined4 field_0x08;
-    br_vector3* field_0x0c;
-    tU16* field_0x10;
-    undefined* field_0x14;
-} tFUN_00421fd0;
-
-extern tFUN_00421fd0* C2_HOOK_FASTCALL FUN_00421fd0(int pCount_points);
-#endif
+extern tCollision_shape_polyhedron_data* C2_HOOK_FASTCALL FUN_00421fd0(int pCount_points);
 
 // AdjustEdges
 
@@ -56,6 +45,8 @@ extern tFUN_00421fd0* C2_HOOK_FASTCALL FUN_00421fd0(int pCount_points);
 extern tPhysicsError C2_HOOK_FASTCALL ConvexHull3D(tCollision_shape_polyhedron_data* pPolyhedron);
 
 extern tPhysicsError C2_HOOK_FASTCALL GetPointSample(br_model* pModel, int pCount, int* pIndices);
+
+extern tPhysicsError C2_HOOK_FASTCALL FUN_004222c0(int* pCount, int* pIndices, br_model* pModel, int pMin_points, int pMax_points);
 
 extern tPhysicsError C2_HOOK_FASTCALL SampledConvexHull(tCollision_shape_polyhedron_data* pPolyhedron, int* pIndices, br_model* pModel, int pCount);
 
