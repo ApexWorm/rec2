@@ -11,6 +11,7 @@
 #include "08-loading1.h"
 #include "18-graphics2.h"
 #include "18b-graphics2.h"
+#include "28-world3.h"
 #include "41-utility.h"
 #include "69-sound.h"
 #include "70-packfile.h"
@@ -446,6 +447,34 @@ int C2_HOOK_FASTCALL CarmaCDinDriveOrFullGameInstalled(void) {
         return 1;
     }
     return OriginalCarmaCDinDrive();
+}
+
+// FUNCTION: CARMA2_HW 0x0048f6d0
+// FUNCTION: CARMA2_SW 0x0048c940
+// FUNCTION: CARMA2_CHEAT 0x0048f780
+void C2_HOOK_FASTCALL LoadSomePixelmaps(tBrender_storage* pStorage_space, FILE* pF) {
+    char s[256];
+    char* str;
+    int count;
+
+    GetALineAndDontArgue(pF, s);
+    str = strtok(s, "\t ,/");
+    sscanf(str, "%d", &count);
+    LoadNPixelmaps(pStorage_space, pF, count);
+}
+
+// FUNCTION: CARMA2_HW 0x0048f730
+// FUNCTION: CARMA2_SW 0x0048c9a0
+// FUNCTION: CARMA2_CHEAT 0x0048f7e0
+void C2_HOOK_FASTCALL LoadSomeShadeTables(tBrender_storage* pStorage_space, FILE* pF) {
+    char s[256];
+    char* str;
+    int count;
+
+    GetALineAndDontArgue(pF, s);
+    str = strtok(s, "\t ,/");
+    sscanf(str, "%d", &count);
+    LoadNShadeTables(pStorage_space, pF, count);
 }
 
 // FUNCTION: CARMA2_HW 0x0048f7f0
