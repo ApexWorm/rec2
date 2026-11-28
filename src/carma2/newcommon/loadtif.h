@@ -11,6 +11,8 @@
 
 #include "brender/brender.h"
 
+extern br_pixelmap* C2_HOOK_FASTCALL FUN_00485130(const char* pPath, int pRGB555);
+
 extern br_pixelmap* C2_HOOK_FASTCALL CreatePalettePixelmapFromRGBChannels(br_uint_16* pRed_channel, br_uint_16* pGrn_channel, br_uint_16* pBlu_channel, int pRGB555);
 
 extern br_pixelmap* C2_HOOK_FASTCALL LoadDefaultPalette(const char* pData_dir_path, int pFlags, int *pError_code);

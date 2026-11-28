@@ -24,6 +24,131 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
+// FUNCTION: CARMA2_HW 0x00485130
+// FUNCTION: CARMA2_SW 0x00482270
+// FUNCTION: CARMA2_CHEAT 0x00485450
+br_pixelmap* C2_HOOK_FASTCALL FUN_00485130(const char* pPath, int pRGB555) {
+    TIFF* tif;
+    br_pixelmap* pm;
+    br_uint_32 height;
+    br_uint_32 width;
+    br_uint_16 photometric;
+    br_uint_16 samples_per_pixel;
+    br_uint_8* scanline_buffer;
+    br_uint_8* src;
+    void* pixels;
+    br_uint_32 x;
+    br_uint_32 y;
+    br_uint_16* colorMap_Red;
+    br_uint_16* colorMap_Green;
+    br_uint_16* colorMap_Blue;
+
+    tif = TIFFOpen(pPath, "r");
+    if (tif == NULL) {
+        return NULL;
+    }
+    TIFFGetField(tif, TIFFTAG_PHOTOMETRIC, &photometric);
+    if (photometric == PHOTOMETRIC_RGB) {
+        TIFFGetField(tif, TIFFTAG_IMAGELENGTH, &height);
+        TIFFGetField(tif, TIFFTAG_IMAGEWIDTH, &width);
+        TIFFGetFieldDefaulted(tif, TIFFTAG_SAMPLESPERPIXEL, &samples_per_pixel);
+        pm = BrPixelmapAllocate(samples_per_pixel == 3 ? BR_PMT_RGB_565 : BR_PMT_RGBA_4444, width, height, NULL, 0);
+        if (pm == NULL) {
+            TIFFClose(tif);
+            return NULL;
+        }
+        pixels = pm->pixels;
+        scanline_buffer = _TIFFmalloc(TIFFScanlineSize(tif));
+        if (scanline_buffer == NULL) {
+            BrPixelmapFree(pm);
+            TIFFClose(tif);
+            return NULL;
+        }
+        for (y = 0; y < height; y++) {
+            if (TIFFReadScanline(tif, scanline_buffer, y, 0) <= 0) {
+                break;
+            }
+            if (samples_per_pixel == 3) {
+                src = scanline_buffer;
+                for (x = 0; x < width; x++) {
+                    ((br_uint_16*)pixels)[y * pm->row_bytes / 2 + x] = ((src[0] >> 3) << 11) | ((src[1] >> 2) << 5) | (src[2] >> 3);
+                    src += 3;
+                }
+            } else {
+                src = scanline_buffer;
+                for (x = 0; x < width; x++) {
+                    ((br_uint_16*)pixels)[y * pm->row_bytes / 2 + x] = ((src[3] >> 4) << 12) | ((src[0] >> 4) << 8) | ((src[1] >> 4) << 4) | (src[2] >> 4);
+                    src += 4;
+                }
+            }
+        }
+        _TIFFfree(scanline_buffer);
+        if (y != height) {
+            BrPixelmapFree(pm);
+            TIFFClose(tif);
+            return NULL;
+        }
+        TIFFClose(tif);
+        return pm;
+    } else if (photometric == PHOTOMETRIC_PALETTE) {
+        TIFFGetField(tif, TIFFTAG_IMAGELENGTH, &height);
+        TIFFGetField(tif, TIFFTAG_IMAGEWIDTH, &width);
+        TIFFGetFieldDefaulted(tif, TIFFTAG_SAMPLESPERPIXEL, &samples_per_pixel);
+        pm = BrPixelmapAllocate(BR_PMT_INDEX_8, width, height, NULL, 0);
+        if (pm == NULL) {
+            TIFFClose(tif);
+            return NULL;
+        }
+        pixels = pm->pixels;
+        if (samples_per_pixel == 1) {
+            for (y = 0; y < height; y++) {
+                if (TIFFReadScanline(tif, (br_uint_8*)pixels + y * pm->row_bytes, y, 0) <= 0) {
+                    break;
+                }
+            }
+        } else {
+            scanline_buffer = _TIFFmalloc(TIFFScanlineSize(tif));
+            if (scanline_buffer == NULL) {
+                BrPixelmapFree(pm);
+                TIFFClose(tif);
+                return NULL;
+            }
+            for (y = 0; y < height; y++) {
+                if (TIFFReadScanline(tif, scanline_buffer, y, 0) <= 0) {
+                    break;
+                }
+                for (x = 0; x < width; x++) {
+                    if (scanline_buffer[x * samples_per_pixel + 1] < 0x80) {
+                        ((br_uint_8*)pixels)[y * pm->row_bytes + x] = 0;
+                    } else {
+                        ((br_uint_8*)pixels)[y * pm->row_bytes + x] = scanline_buffer[x * samples_per_pixel];
+                    }
+                }
+            }
+            _TIFFfree(scanline_buffer);
+        }
+        if (y != height) {
+            BrPixelmapFree(pm);
+            TIFFClose(tif);
+            return NULL;
+        }
+        TIFFGetField(tif, TIFFTAG_COLORMAP, &colorMap_Red, &colorMap_Green, &colorMap_Blue);
+        pm->map = CreatePalettePixelmapFromRGBChannels(colorMap_Red, colorMap_Green, colorMap_Blue, pRGB555);
+        if (pm->map == NULL) {
+            BrPixelmapFree(pm);
+            TIFFClose(tif);
+            return NULL;
+        }
+        pm->identifier = BrResStrDup(pm, "pixelmap");
+        BrResAdd(pm, pm->map);
+        TIFFClose(tif);
+        return pm;
+    } else {
+        TIFFClose(tif);
+        return NULL;
+    }
+}
+
 // FUNCTION: CARMA2_HW 0x00485590
 // FUNCTION: CARMA2_CHEAT 0x004858b0
 br_pixelmap* C2_HOOK_FASTCALL CreatePalettePixelmapFromRGBChannels(br_uint_16* pRed_channel, br_uint_16* pGrn_channel, br_uint_16* pBlu_channel, int pRGB555) {
