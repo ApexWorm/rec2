@@ -1979,7 +1979,7 @@ void C2_HOOK_FASTCALL CheckForDeAttachmentOfNonCars(tU32 pTime) {
             if (drop) {
                 if (non_car->flags & 0x10000) {
                     BrVector3Sub(&tv, &non_car->collision_info->field_0x17c, (br_vector3*)non_car->collision_info->transform_matrix.m[3]);
-                    if (BrVector3LengthSquared(&tv) > REC2_SQR(.005f)) {
+                    if (BrVector3LengthSquared(&tv) > REC2_SQR(0.005f)) {
                         drop = 0;
                     } else {
                         BrVector3Copy((br_vector3*)non_car->collision_info->transform_matrix.m[3], &non_car->collision_info->field_0x17c);

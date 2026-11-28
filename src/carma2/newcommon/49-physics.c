@@ -68,7 +68,7 @@ int gPHIL_collision_group;
 // GLOBAL: CARMA2_HW 0x006940a4
 // GLOBAL: CARMA2_SW 0x0068e0fc
 // GLOBAL: CARMA2_CHEAT 0x0069bc1c
-int gINT_006940a4;
+int gInter_group_hit_count;
 
 // GLOBAL: CARMA2_HW 0x006940c0
 // GLOBAL: CARMA2_SW 0x0068e118
@@ -705,8 +705,6 @@ void C2_HOOK_FASTCALL CombineBounds(br_bounds* pBounds, br_bounds* pOther) {
     }
 }
 
-extern void C2_HOOK_FASTCALL GetWorldBoundingBoxForObject(tPhysics_object* pObject, br_bounds* pBounds);
-
 void C2_HOOK_FASTCALL GetWorldBoundingBoxForObjects(tPhysics_object* pObject, br_bounds* pBounds) {
 
     for (; pObject != NULL; pObject = pObject->next) {
@@ -763,8 +761,6 @@ int C2_HOOK_FASTCALL MatricesAreIdentical(br_matrix34* pMat1, br_matrix34* pMat2
     }
     return 1;
 }
-
-extern void C2_HOOK_FASTCALL PrepareForCollisions(tPhysics_object* pObject);
 
 // FUNCTION: CARMA2_HW 0x004b99e0
 // FUNCTION: CARMA2_SW 0x004b6100
@@ -1185,7 +1181,7 @@ void C2_HOOK_FASTCALL DoCollisions(tPhysics_object** pObject_list, tWorld_callba
                 gPHIL_collision_group++;
             }
             loops = 0;
-            gINT_006940a4 = 0;
+            gInter_group_hit_count = 0;
             count = 0;
             for (;;) {
                 count = DoInterGroupCollisions(pObject_list, object, forces, old_forces, count, pCallbacks);
@@ -1196,7 +1192,7 @@ void C2_HOOK_FASTCALL DoCollisions(tPhysics_object** pObject_list, tWorld_callba
                 tmp = forces;
                 forces = old_forces;
                 old_forces = tmp;
-                if (loops >= 30 || gINT_006940a4 >= 3) {
+                if (loops >= 30 || gInter_group_hit_count >= 3) {
                     break;
                 }
             }

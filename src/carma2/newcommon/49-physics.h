@@ -22,7 +22,7 @@ extern tPhysics_joint_force gFriction_forces[50];
 
 extern int gPHIL_collision_group;
 
-extern int gINT_006940a4;
+extern int gInter_group_hit_count;
 
 extern tPhysicsError_cbfn* gPhysics_error_cb;
 extern void* gPhysics_buffer1_ptr;
@@ -190,7 +190,7 @@ extern void C2_HOOK_FASTCALL TellPhysicsJointsHaveChanged(tPhysics_object* pColl
 
 // GetWorldBoundingBoxForObjects
 
-// GetWorldBoundingBoxForObject
+extern void C2_HOOK_FASTCALL GetWorldBoundingBoxForObject(tPhysics_object* pObject, br_bounds* pBounds);
 
 // MatricesAreIdentical
 
@@ -198,7 +198,7 @@ extern void C2_HOOK_FASTCALL TellPhysicsJointsHaveChanged(tPhysics_object* pColl
 
 extern void C2_HOOK_FASTCALL PrepareObject(tPhysics_object* pObject, tPhysics_object** pList);
 
-// PrepareForCollisions
+extern void C2_HOOK_FASTCALL PrepareForCollisions(tPhysics_object* pObject);
 
 extern int CheckPointVelocities(tPhysics_object* pObject, br_scalar pMax_velocity_squared);
 
