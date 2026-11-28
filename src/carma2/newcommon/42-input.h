@@ -74,6 +74,10 @@ extern int C2_HOOK_FASTCALL KeyIsDownNoMouldiness(int pKey_index);
 
 extern void C2_HOOK_FASTCALL WaitForNoKeys(void);
 
+extern void C2_HOOK_FASTCALL WaitForAKey(void);
+
+extern int C2_HOOK_FASTCALL Key1Or2AreDown(int pKey_index1, int pKey_index2);
+
 extern void C2_HOOK_FASTCALL GetMousePosition(int *pX, int *pY);
 
 extern void C2_HOOK_FASTCALL InitRollingLetters(void);
@@ -83,6 +87,10 @@ extern void C2_HOOK_FASTCALL EndRollingLetters(void);
 extern int C2_HOOK_FASTCALL AddRollingLetter(char pChar, int pX, int pY, tRolling_type rolling_type);
 
 extern void C2_HOOK_FASTCALL AddRollingString(char* pStr, int pX, int pY, tRolling_type pRolling_type);
+
+extern void C2_HOOK_FASTCALL AddRollingNumber(tU32 pNumber, int pWidth, int pX, int pY);
+
+extern void C2_HOOK_FASTCALL ChangeTextTo(int pXcoord, int pYcoord, char* pNew_str, char* pOld_str);
 
 extern void C2_HOOK_FASTCALL BlankSlot(int pIndex, int pName_length, int pVisible_length);
 
