@@ -2839,7 +2839,9 @@ int C2_HOOK_FASTCALL WrecksUpdateFunc(tFrontend_spec* pFrontend) {
 
         car = GetCarSpec(eVehicle_opponent, gFrontend_wrecks_current);
         opponent = GetOpponentSpecFromCarSpec(car);
-        if (!gWreck_gallery_sell_infos[gFrontend_wrecks_current].sold) {
+        if (gWreck_gallery_sell_infos[gFrontend_wrecks_current].sold) {
+            pFrontend->items[2].visible = 0;
+        } else {
             int got_it_already;
 
             sprintf(pFrontend->items[2].text, "%s @R%s",
@@ -2871,8 +2873,6 @@ int C2_HOOK_FASTCALL WrecksUpdateFunc(tFrontend_spec* pFrontend) {
                 gFrontend_opponent_profile_pic_needs_update = 0;
             }
             FuckWithWidths(pFrontend);
-        } else {
-            pFrontend->items[2].visible = 0;
         }
 
         if (gFrontend_mouse_down && gFrontend_wrecks_pending_hscroll == 0) {
