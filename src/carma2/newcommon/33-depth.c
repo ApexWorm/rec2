@@ -477,7 +477,7 @@ void C2_HOOK_FASTCALL ExternalSky(br_pixelmap* pRender_buffer, br_pixelmap* pDep
 
     tan_half_hori_sky = col_map->width * tan_half_hori_fov / pRender_buffer->width;
     hori_sky = 2 * BrRadianToAngle(atan2(tan_half_hori_sky, 1.0f));
-    repetitions = (int)(1.f / BrFixedToFloat(hori_sky) + 0.5f);
+    repetitions = (int)(1.0f / BrFixedToFloat(hori_sky) + 0.5f);
     hori_sky = BR_ANGLE_DEG(360) / repetitions;
     yaw = BrRadianToAngle(atan2(pCamera_to_world->m[2][0], pCamera_to_world->m[2][2]));
     hshift = -BrFixedToFloat(yaw) / BrFixedToFloat(hori_sky);
