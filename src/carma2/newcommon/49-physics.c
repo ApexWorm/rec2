@@ -38,7 +38,7 @@ int gINT_00692dc8;
 // GLOBAL: CARMA2_HW 0x00692dd8
 // GLOBAL: CARMA2_SW 0x0068ce30
 // GLOBAL: CARMA2_CHEAT 0x0069a950
-int gINT_00692dd8;
+int gJoint_limit_10_hit;
 
 // GLOBAL: CARMA2_HW 0x006940c0
 // GLOBAL: CARMA2_SW 0x0068e118
@@ -802,7 +802,7 @@ int C2_HOOK_FASTCALL GetJointLimits(tPhysics_object* pObject, tPhysics_joint_for
             switch (limit->type) {
             case eJoint_limit_10:
                 if (pObject->field_0x1e0 != 0) {
-                    gINT_00692dd8 = 1;
+                    gJoint_limit_10_hit = 1;
                     for (j = 0; j < pCount; j++) {
                         force = &pForces[j];
                         if (force->object_a == pObject) {

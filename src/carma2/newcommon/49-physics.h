@@ -14,7 +14,7 @@
 
 extern int gINT_00692dc8;
 
-extern int gINT_00692dd8;
+extern int gJoint_limit_10_hit;
 
 extern tPhysicsError_cbfn* gPhysics_error_cb;
 extern void* gPhysics_buffer1_ptr;
