@@ -1581,7 +1581,33 @@ void C2_HOOK_FASTCALL SelectClosestDrone(void) {
     }
 }
 
-// FUN_00453460
+// FUNCTION: CARMA2_HW 0x00453460
+// FUNCTION: CARMA2_SW 0x004531f0
+// FUNCTION: CARMA2_CHEAT 0x004539c0
+void C2_HOOK_FASTCALL FUN_00453460(void) {
+    int i;
+
+    if (gSelected_drone_path_index >= 0) {
+        gDrone_specs[gSelected_drone_path_index].actor->render_style = BR_RSTYLE_FACES;
+        gSelected_drone_path_index = -1;
+    }
+    if (!gShow_drone_paths) {
+        if (!InitialiseEditModelsEtc()) {
+            NewTextHeadupSlot(4, 0, 5000, -1, "Drone Path Error - Can't allocate actors/models");
+            return;
+        }
+        gShow_drone_paths = 1;
+        PutOpponentsInNeutral();
+        for (i = 0; i < gCount_drones; i++) {
+            StopProcessingThisDrone(&gDrone_specs[i], 1);
+            NewDroneState(&gDrone_specs[i], 1);
+        }
+        NewTextHeadupSlot(4, 0, 3000, -1, "Showing Drone Paths");
+        SelectClosestDrone();
+    } else {
+        NewTextHeadupSlot(4, 0, 3000, -1, "Already Showing Drone Paths");
+    }
+}
 
 // FUNCTION: CARMA2_HW 0x00453680
 // FUNCTION: CARMA2_SW 0x00453410
@@ -2327,9 +2353,45 @@ void C2_HOOK_FASTCALL FUN_00454bb0(void) {
     }
 }
 
-// SelectNextDroneForm
+// FUNCTION: CARMA2_HW 0x00454c80
+// FUNCTION: CARMA2_SW 0x00454a10
+// FUNCTION: CARMA2_CHEAT 0x004551e0
+void C2_HOOK_FASTCALL SelectNextDroneForm(void) {
+    tDrone_spec* drone;
 
-// SelectPreviousDroneForm
+    if (gSelected_drone_path_index < 0) {
+        NewTextHeadupSlot(4, 0, 3000, -4, "Select a drone first");
+        return;
+    }
+    gSelected_drone_form_index++;
+    if (gSelected_drone_form_index >= gCount_drone_forms) {
+        gSelected_drone_form_index = 0;
+    }
+    drone = &gDrone_specs[gSelected_drone_path_index];
+    drone->form = &gDrone_forms[gSelected_drone_form_index];
+    LoadDroneActorsModels(drone);
+    WriteOutDronePaths();
+}
+
+// FUNCTION: CARMA2_HW 0x00454d00
+// FUNCTION: CARMA2_SW 0x00454a90
+// FUNCTION: CARMA2_CHEAT 0x00455260
+void C2_HOOK_FASTCALL SelectPreviousDroneForm(void) {
+    tDrone_spec* drone;
+
+    if (gSelected_drone_path_index < 0) {
+        NewTextHeadupSlot(4, 0, 3000, -4, "Select a drone first");
+        return;
+    }
+    gSelected_drone_form_index--;
+    if (gSelected_drone_form_index < 0) {
+        gSelected_drone_form_index = gCount_drone_forms - 1;
+    }
+    drone = &gDrone_specs[gSelected_drone_path_index];
+    drone->form = &gDrone_forms[gSelected_drone_form_index];
+    LoadDroneActorsModels(drone);
+    WriteOutDronePaths();
+}
 
 // FUNCTION: CARMA2_HW 0x00454d70
 // FUNCTION: CARMA2_SW 0x00454b00

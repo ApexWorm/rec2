@@ -236,7 +236,7 @@ extern void C2_HOOK_FASTCALL WriteOutDronePaths(void);
 
 extern void C2_HOOK_FASTCALL SelectClosestDrone(void);
 
-// FUN_00453460
+extern void C2_HOOK_FASTCALL FUN_00453460(void);
 
 extern void C2_HOOK_FASTCALL ToggleDronePaths(void);
 
@@ -298,9 +298,9 @@ extern void C2_HOOK_FASTCALL DeleteNodeAndSections(int pNodenum);
 
 extern void C2_HOOK_FASTCALL FUN_00454bb0(void);
 
-// SelectNextDroneForm
+extern void C2_HOOK_FASTCALL SelectNextDroneForm(void);
 
-// SelectPreviousDroneForm
+extern void C2_HOOK_FASTCALL SelectPreviousDroneForm(void);
 
 extern void C2_HOOK_FASTCALL CreateNewDrone(void);
 
