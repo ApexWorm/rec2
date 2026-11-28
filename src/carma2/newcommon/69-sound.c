@@ -174,6 +174,7 @@ tS3_outlet* gIndexed_outlets[7] = { 0 };
 
 // GLOBAL: CARMA2_HW 0x0079e17c
 // GLOBAL: CARMA2_SW 0x007946dc
+// GLOBAL: CARMA2_CHEAT 0x007a581c
 int gEnvironmental_sound_sources_buffer_index = 0;
 
 // GLOBAL: CARMA2_HW 0x00595c38
@@ -197,10 +198,12 @@ int gOld_sound_detail_level = -1;
 
 // GLOBAL: CARMA2_HW 0x0079e120
 // GLOBAL: CARMA2_SW 0x00794680
+// GLOBAL: CARMA2_CHEAT 0x007a57c0
 br_vector3 gCamera_left;
 
 // GLOBAL: CARMA2_HW 0x0079e130
 // GLOBAL: CARMA2_SW 0x00794690
+// GLOBAL: CARMA2_CHEAT 0x007a57d0
 br_vector3 gCamera_position;
 
 // GLOBAL: CARMA2_HW 0x0079e180
@@ -209,14 +212,17 @@ br_vector3 gOld_camera_position;
 
 // GLOBAL: CARMA2_HW 0x0079ea60
 // GLOBAL: CARMA2_SW 0x00794fc0
+// GLOBAL: CARMA2_CHEAT 0x007a6100
 br_vector3 gCamera_velocity;
 
 // GLOBAL: CARMA2_HW 0x00684540
 // GLOBAL: CARMA2_SW 0x0067ec80
+// GLOBAL: CARMA2_CHEAT 0x0068bde8
 tU32 gNext_sound_generator_munging;
 
 // GLOBAL: CARMA2_HW 0x0079e18c
 // GLOBAL: CARMA2_SW 0x007946ec
+// GLOBAL: CARMA2_CHEAT 0x007a582c
 int gCount_environmental_sound_sources;
 
 // FUNCTION: CARMA2_HW 0x00500060

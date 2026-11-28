@@ -46,30 +46,37 @@ br_vector3 gS3_listener_left_now;
 
 // GLOBAL: CARMA2_HW 0x006b2c50
 // GLOBAL: CARMA2_SW 0x006ac3d8
+// GLOBAL: CARMA2_CHEAT 0x006ba2e0
 int gS3_listener_pos_is_brender;
 
 // GLOBAL: CARMA2_HW 0x006b2c70
 // GLOBAL: CARMA2_SW 0x006ac3f8
+// GLOBAL: CARMA2_CHEAT 0x006ba300
 br_vector3* gS3_listener_pos_ptr;
 
 // GLOBAL: CARMA2_HW 0x006b2c40
 // GLOBAL: CARMA2_SW 0x006ac3c8
+// GLOBAL: CARMA2_CHEAT 0x006ba2d0
 br_vector3 gS3_listener_position_old;
 
 // GLOBAL: CARMA2_HW 0x006b2c74
 // GLOBAL: CARMA2_SW 0x006ac3fc
+// GLOBAL: CARMA2_CHEAT 0x006ba304
 br_vector3* gS3_listener_vel_ptr;
 
 // GLOBAL: CARMA2_HW 0x006b2c64
 // GLOBAL: CARMA2_SW 0x006ac3ec
+// GLOBAL: CARMA2_CHEAT 0x006ba2f4
 int gS3_listener_vel_is_brender;
 
 // GLOBAL: CARMA2_HW 0x006b2c78
 // GLOBAL: CARMA2_SW 0x006ac400
+// GLOBAL: CARMA2_CHEAT 0x006ba308
 br_vector3* gS3_listener_left_ptr;
 
 // GLOBAL: CARMA2_HW 0x006b2c54
 // GLOBAL: CARMA2_SW 0x006ac3dc
+// GLOBAL: CARMA2_CHEAT 0x006ba2e4
 int gS3_listener_left_is_brender;
 
 
@@ -229,6 +236,7 @@ int C2_HOOK_STDCALL S3Set3DSoundEnvironment(float a1, float a2, float a3) {
 
 // FUNCTION: CARMA2_HW 0x00565ec7
 // FUNCTION: CARMA2_SW 0x00561567
+// FUNCTION: CARMA2_CHEAT 0x0056bab7
 void C2_HOOK_FASTCALL S3CopyBrVector3(br_vector3* pDest, const br_vector3* pSrc) {
 
     pDest->v[0] = pSrc->v[0];
@@ -283,6 +291,7 @@ void C2_HOOK_FASTCALL S3CopyS3Vector3(tS3_vector3* pDest, tS3_vector3* pSrc) {
 
 // FUNCTION: CARMA2_HW 0x00565faa
 // FUNCTION: CARMA2_SW 0x0056164a
+// FUNCTION: CARMA2_CHEAT 0x0056bb9a
 void C2_HOOK_FASTCALL S3BindListenerPositionBRender(br_vector3* pPos) {
 
     gS3_listener_pos_ptr = pPos;
@@ -300,6 +309,7 @@ void C2_HOOK_FASTCALL S3BindListenerVelocity(br_vector3* vel) {
 
 // FUNCTION: CARMA2_HW 0x00565ff1
 // FUNCTION: CARMA2_SW 0x00561691
+// FUNCTION: CARMA2_CHEAT 0x0056bbe1
 void C2_HOOK_FASTCALL S3BindListenerVelocityBRender(br_vector3* vel) {
 
     gS3_listener_vel_ptr = vel;
@@ -316,6 +326,7 @@ void C2_HOOK_FASTCALL S3BindListenerLeft(br_vector3* left) {
 
 // FUNCTION: CARMA2_HW 0x0056602b
 // FUNCTION: CARMA2_SW 0x005616cb
+// FUNCTION: CARMA2_CHEAT 0x0056bc1b
 void C2_HOOK_FASTCALL S3BindListenerLeftBRender(br_vector3* left) {
 
     gS3_listener_left_ptr = left;

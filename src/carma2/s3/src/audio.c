@@ -1430,6 +1430,7 @@ void C2_HOOK_FASTCALL S3EnableMidi(void) {
 
 // FUNCTION: CARMA2_HW 0x005665d4
 // FUNCTION: CARMA2_SW 0x00561c74
+// FUNCTION: CARMA2_CHEAT 0x0056c1c4
 tS3_sound_source* C2_HOOK_FASTCALL S3CreateSoundSource(void* pPosition, void* pVelocity, tS3_outlet* pBound_outlet) {
     tS3_sound_source* src;
 
@@ -1466,6 +1467,7 @@ tS3_sound_source* C2_HOOK_FASTCALL S3CreateSoundSource(void* pPosition, void* pV
 
 // FUNCTION: CARMA2_HW 0x00566590
 // FUNCTION: CARMA2_SW 0x00561c30
+// FUNCTION: CARMA2_CHEAT 0x0056c180
 tS3_sound_source* C2_HOOK_FASTCALL S3CreateSoundSourceBR(br_vector3* pPosition, br_vector3* pVelocity, tS3_outlet* pBound_outlet) {
     tS3_sound_source* source;
 
