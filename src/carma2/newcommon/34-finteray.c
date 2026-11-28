@@ -289,7 +289,12 @@ void C2_HOOK_FASTCALL StationarySphereSphereCollide(const br_vector3* pPoint, co
 
 // PointSphereCollision
 
-// SphereEdgeCollide
+// STUB: CARMA2_HW 0x0045d920
+// STUB: CARMA2_SW 0x0045d360
+// STUB: CARMA2_CHEAT 0x0045dd90
+void C2_HOOK_FASTCALL SphereEdgeCollide(br_vector3* pEdge_start, br_vector3* pEdge_end, br_vector3* pSphere_start, br_vector3* pSphere_end, tCollision_shape_sphere_data* pSphere, br_vector3* pPoint, br_vector3* pNormal, br_scalar* pT, int pStart_flags, int pEnd_flags) {
+    NOT_IMPLEMENTED();
+}
 
 // SpherePolyFaceCollide
 

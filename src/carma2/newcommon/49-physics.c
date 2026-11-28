@@ -461,9 +461,66 @@ int C2_HOOK_FASTCALL GetFaceEdgeIntersection(tPhysics_object* pObject, tPhysics_
 
 // GetSphereToFacePoints
 
-// CheckSingleEdgeWithSphere
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
 
-// GetSphereToEdgePoints
+// FUNCTION: CARMA2_HW 0x00423ce0
+// FUNCTION: CARMA2_SW 0x00423d60
+// FUNCTION: CARMA2_CHEAT 0x00423e60
+int C2_HOOK_FASTCALL CheckSingleEdgeWithSphere(br_vector3* pEdge_start, br_vector3* pEdge_end, tPhysics_object* pObject, tCollision_shape_sphere_data* pSphere, tPhysics_joint_force* pForces, int pCount, br_vector3* pSphere_start, br_vector3* pSphere_end, tFace_ref* pFace) {
+    br_vector3 point;
+    br_vector3 normal;
+    br_vector3 trial_normal;
+    br_vector3 old_normal;
+    br_vector3 direction;
+    br_vector3 surface_point;
+    br_scalar t;
+
+    SphereEdgeCollide(pEdge_start, pEdge_end, pSphere_start, pSphere_end, pSphere, &point, &normal, &t, 0, 0);
+    if (t <= 1.0f) {
+        BrMatrix34TApplyV(&trial_normal, &normal, &pObject->transform_matrix);
+        BrMatrix34TApplyV(&old_normal, &normal, &pObject->actor->t.t.mat);
+        BrVector3Scale(&old_normal, &old_normal, t);
+        BrVector3Scale(&direction, &trial_normal, 1.0f - t);
+        BrVector3Accumulate(&direction, &old_normal);
+        BrVector3Normalise(&direction, &direction);
+        BrVector3Scale(&direction, &direction, pSphere->radius);
+        BrVector3Add(&surface_point, &pSphere->center, &direction);
+        BrVector3Negate(&trial_normal, &trial_normal);
+        return AddObjectWallForce(pForces, &surface_point, t, &trial_normal, 0.0f, pCount, pObject, 4, pFace, NULL);
+    }
+    return pCount;
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
+
+// FUNCTION: CARMA2_HW 0x00423c00
+// FUNCTION: CARMA2_SW 0x00423c80
+// FUNCTION: CARMA2_CHEAT 0x00423d80
+int C2_HOOK_FASTCALL GetSphereToEdgePoints(tPhysics_object* pObject, tCollision_shape_sphere_data* pSphere, tPhysics_joint_force* pForces, int pCount, int pMax_count, br_vector3* pSphere_start, br_vector3* pSphere_end, br_matrix34* pMatrix) {
+    int i;
+    tFace_ref* face;
+
+    i = pObject->box_face_start;
+    face = &gFace_list__car[i];
+    for (; i < pObject->box_face_end; i++, face++) {
+        if (!(face->flags & 0x80)) {
+            if (!(face->flags & 0x1)) {
+                pCount = CheckSingleEdgeWithSphere(&face->v[0], &face->v[1], pObject, pSphere, pForces, pCount, pSphere_start, pSphere_end, face);
+            }
+            if (!(face->flags & 0x2)) {
+                pCount = CheckSingleEdgeWithSphere(&face->v[1], &face->v[2], pObject, pSphere, pForces, pCount, pSphere_start, pSphere_end, face);
+            }
+            if (!(face->flags & 0x4)) {
+                pCount = CheckSingleEdgeWithSphere(&face->v[2], &face->v[0], pObject, pSphere, pForces, pCount, pSphere_start, pSphere_end, face);
+            }
+        }
+    }
+    return pCount;
+}
 
 // FUNCTION: CARMA2_HW 0x00423ed0
 // FUNCTION: CARMA2_SW 0x00423f50
