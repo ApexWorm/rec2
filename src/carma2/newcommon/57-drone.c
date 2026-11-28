@@ -26,6 +26,11 @@
 
 #include <math.h>
 
+// GLOBAL: CARMA2_HW 0x006820b8
+// GLOBAL: CARMA2_SW 0x0067c7f8
+// GLOBAL: CARMA2_CHEAT 0x00689960
+int gDrones_unmodified;
+
 // GLOBAL: CARMA2_HW 0x006820c0
 // GLOBAL: CARMA2_SW 0x0067c800
 // GLOBAL: CARMA2_CHEAT 0x00689968
@@ -1484,11 +1489,141 @@ void C2_HOOK_FASTCALL FUN_00454710(void) {
     }
 }
 
-// DeleteNodeSectionsAndOrphan
+static void DeleteDrone(int pIndex) {
 
-// DeleteNodeAndSections
+    dr_dprintf("DeleteDrone(): DELETING drone %d", pIndex);
+    memmove(&gDrone_specs[pIndex], &gDrone_specs[pIndex + 1], (gCount_drones - pIndex - 1) * sizeof(tDrone_spec));
+    gCount_drones--;
+    dr_dprintf("DeleteDrone(): New number of drones %d", gCount_drones);
+}
 
-// FUN_00454bb0
+static int NodeIsReferenced(int pNode) {
+    int i;
+    int j;
+
+    for (i = 0; i < gCount_drone_path_nodes; i++) {
+        if (i != pNode) {
+            for (j = 0; j < gDrone_path_nodes[i].count_sections; j++) {
+                if (gDrone_path_nodes[i].sections[j].node1 == pNode) {
+                    DoNotDprintf_drone("NodeIsReferenced(): Node %d referenced by node %d section %d", pNode, i, j);
+                    return 1;
+                }
+            }
+        }
+    }
+    return 0;
+}
+
+// FUNCTION: CARMA2_HW 0x00454760
+// FUNCTION: CARMA2_SW 0x004544f0
+// FUNCTION: CARMA2_CHEAT 0x00454cc0
+void C2_HOOK_FASTCALL DeleteNodeSectionsAndOrphan(void) {
+    int i;
+    int node;
+    int orphan;
+
+    if (!gShow_drone_paths) {
+        NewTextHeadupSlot(4, 0, 3000, -1, "You must show Drone Paths first");
+        return;
+    }
+    if (gDrone_paths_elasticating) {
+        NewTextHeadupSlot(4, 0, 3000, -1, "Stop elasticating first");
+        return;
+    }
+    node = FindNearestNodeDrone(&gProgram_state.current_car.car_master_actor->t.t.translate.t, 2.0f);
+    if (node < 0) {
+        return;
+    }
+    DoNotDprintf_drone("DeleteNodeSectionsAndOrphans(): DELETING %d, current number of nodes %d", node, gCount_drone_path_nodes);
+    for (i = 0; i < gCount_drones; i++) {
+        if (gDrone_specs[i].field_0x8_pathnode_id == node) {
+            DoNotDprintf_drone("DeleteNodeSectionsAndOrphans(): Drone %d owns node %d, so deleting drone", i, node);
+            DeleteDrone(i);
+        }
+    }
+    DeleteNodeAndSections(node);
+    orphan = -1;
+    do {
+        if (orphan >= 0) {
+            DoNotDprintf_drone("DeleteNodeSectionsAndOrphans(): Orphan phase, DELETING orphan node %d", orphan);
+            DeleteNodeAndSections(orphan);
+            DoNotDprintf_drone("DeleteNodeSectionsAndOrphans(): Orphan phase, New number of nodes %d", gCount_drone_path_nodes);
+        }
+        orphan = -1;
+        for (i = 0; i < gCount_drone_path_nodes; i++) {
+            if (gDrone_path_nodes[i].count_sections == 0 && !NodeIsReferenced(i)) {
+                DoNotDprintf_drone("DeleteNodeSectionsAndOrphans(): Orphan phase, node %d is NOT referenced by any others and has no sections", i);
+                orphan = i;
+                break;
+            }
+        }
+    } while (orphan >= 0);
+    DoNotDprintf_drone("DeleteNodeSectionsAndOrphans(): END. New number of nodes %d, number of drones %d", gCount_drone_path_nodes, gCount_drones);
+    gDrones_unmodified = 0;
+    InitialiseEditModelsEtc();
+    sprintf(gDrone_edit_message, "DELETED node #%d. All nodes have been re-numbered.", node);
+    NewTextHeadupSlot(4, 0, 3500, -1, gDrone_edit_message);
+}
+
+// FUNCTION: CARMA2_HW 0x004549f0
+// FUNCTION: CARMA2_SW 0x00454780
+// FUNCTION: CARMA2_CHEAT 0x00454f50
+void C2_HOOK_FASTCALL DeleteNodeAndSections(int pNodenum) {
+    int i;
+    int j;
+    int link_node;
+
+    DoNotDprintf_drone("DeleteNodeAndSections(): node %d", pNodenum);
+    for (i = 0; i < gCount_drone_path_nodes; i++) {
+        if (i != pNodenum) {
+            for (j = 0; j < gDrone_path_nodes[i].count_sections; j++) {
+                link_node = gDrone_path_nodes[i].sections[j].node1;
+                if (link_node > pNodenum) {
+                    DoNotDprintf_drone("DeleteNodeAndSections(): node %d, section %d, link_node %d, being decremented", i, j, link_node);
+                    gDrone_path_nodes[i].sections[j].node1--;
+                } else if (link_node == pNodenum) {
+                    DoNotDprintf_drone("DeleteNodeAndSections(): node %d, section %d, link_node %d, being deleted", i, j, link_node);
+                    memmove(&gDrone_path_nodes[i].sections[j], &gDrone_path_nodes[i].sections[j + 1],
+                        (gDrone_path_nodes[i].count_sections - j - 1) * sizeof(tDrone_path_node_section));
+                    gDrone_path_nodes[i].count_sections--;
+                    j--;
+                }
+            }
+        }
+    }
+    DoNotDprintf_drone("DeleteNodeAndSections(): shifting nodes down 1 into node %d position, sizeof a node is %d, number of nodes to shift is %d, total mem block size %d",
+        pNodenum, sizeof(tDrone_path_node), gCount_drone_path_nodes - pNodenum - 1,
+        (gCount_drone_path_nodes - (pNodenum + 1)) * sizeof(tDrone_path_node));
+    DoNotDprintf_drone("INFO: sizeofs: tDrone_section %d, tDrone_node %d, tDrone_spec %d, gDrone_nodes[pNodenum] %d",
+        sizeof(tDrone_path_node_section), sizeof(tDrone_path_node), sizeof(tDrone_spec), sizeof(gDrone_path_nodes[pNodenum]));
+    memmove(&gDrone_path_nodes[pNodenum], &gDrone_path_nodes[pNodenum + 1], (gCount_drone_path_nodes - (pNodenum + 1)) * sizeof(tDrone_path_node));
+    gCount_drone_path_nodes--;
+    DoNotDprintf_drone("DeleteNodeAndSections(): END");
+}
+
+// FUNCTION: CARMA2_HW 0x00454bb0
+// FUNCTION: CARMA2_SW 0x00454940
+// FUNCTION: CARMA2_CHEAT 0x00455110
+void C2_HOOK_FASTCALL FUN_00454bb0(void) {
+    int node;
+
+    if (!gShow_drone_paths) {
+        NewTextHeadupSlot(4, 0, 3000, -1, "You must show Drone Paths first");
+        return;
+    }
+    if (gDrone_paths_elasticating) {
+        NewTextHeadupSlot(4, 0, 3000, -1, "Stop elasticating first");
+        return;
+    }
+    node = FindNearestNodeDrone(&gProgram_state.current_car.car_master_actor->t.t.translate.t, 2.0f);
+    if (node >= 0) {
+        BrVector3Copy(&gDrone_path_nodes[node].position, &gProgram_state.current_car.car_master_actor->t.t.translate.t);
+        PreprocessDronePaths();
+        gDrones_unmodified = 0;
+        InitialiseEditModelsEtc();
+        NewTextHeadupSlot(4, 0, 2000, -1, "BOINK!");
+    }
+}
 
 // SelectNextDroneForm
 

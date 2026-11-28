@@ -12,6 +12,8 @@
 #include "c2_hooks.h"
 #include "rec2_types.h"
 
+extern int gDrones_unmodified;
+
 extern br_vector3 gRender_bounds_centre;
 
 extern tU32 gNext_drone_edit_path_munge;
@@ -284,11 +286,11 @@ extern void C2_HOOK_FASTCALL FUN_00454690(void);
 
 extern void C2_HOOK_FASTCALL FUN_00454710(void);
 
-// DeleteNodeSectionsAndOrphan
+extern void C2_HOOK_FASTCALL DeleteNodeSectionsAndOrphan(void);
 
-// DeleteNodeAndSections
+extern void C2_HOOK_FASTCALL DeleteNodeAndSections(int pNodenum);
 
-// FUN_00454bb0
+extern void C2_HOOK_FASTCALL FUN_00454bb0(void);
 
 // SelectNextDroneForm
 
