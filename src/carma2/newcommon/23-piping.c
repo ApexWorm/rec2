@@ -1115,6 +1115,41 @@ void C2_HOOK_FASTCALL AddNapalmBoltToPipingSession(int pIndex, tPedestrian* pPed
 
 // PipeSingleCrush
 
+// FUNCTION: CARMA2_HW 0x004c8020
+// FUNCTION: CARMA2_SW 0x004c4750
+// FUNCTION: CARMA2_CHEAT 0x004cdb40
+void C2_HOOK_FASTCALL PipeSingleSpark(int pSpark_index, const br_vector3* pPos, const br_vector3* pV) {
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_chunk_spark, p, 0xc);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk_spark, v, 0xc);
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_chunk_spark, v, 0xc);
+
+    ARDoSingleVariedSession(ePipe_chunk_spark, pSpark_index, 2,
+        SIZE_OFFSET_PIPING(tPipe_chunk_spark, p), pPos,
+        SIZE_OFFSET_PIPING(tPipe_chunk_spark, v), pV);
+}
+
+// FUNCTION: CARMA2_HW 0x004c8040
+// FUNCTION: CARMA2_SW 0x004c4770
+// FUNCTION: CARMA2_CHEAT 0x004cdb60
+void C2_HOOK_FASTCALL PipeSingleShrapnel(int pShrapnel_index, const br_vector3* pPos, tU16 pAge, br_material* pMaterial) {
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk_shrapnel, pos, 0x0);
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_chunk_shrapnel, pos, 0xc);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk_shrapnel, age, 0xc);
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_chunk_shrapnel, age, 0x2);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk_shrapnel, material, 0x10);
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_chunk_shrapnel, material, 0x4);
+
+    if (pShrapnel_index & 0x8000) {
+        ARDoSingleVariedSession(ePipe_chunk_shrapnel, pShrapnel_index, 3,
+            SIZE_OFFSET_PIPING(tPipe_chunk_shrapnel, pos), pPos,
+            SIZE_OFFSET_PIPING(tPipe_chunk_shrapnel, age), pAge,
+            SIZE_OFFSET_PIPING(tPipe_chunk_shrapnel, material), pMaterial);
+    } else {
+        ARDoSingleVariedSession(ePipe_chunk_shrapnel, pShrapnel_index, 1,
+            SIZE_OFFSET_PIPING(tPipe_chunk_shrapnel, pos), pPos);
+    }
+}
+
 // FUNCTION: CARMA2_HW 0x004c8090
 // FUNCTION: CARMA2_SW 0x004c47c0
 // FUNCTION: CARMA2_CHEAT 0x004cdbb0
@@ -1167,6 +1202,111 @@ void C2_HOOK_FASTCALL PipeSingleNonCar(uintptr_t pId, br_actor* pActor) {
     ARDoSingleVariedSession(ePipe_chunk_non_car, pId, 2,
         SIZE_OFFSET_PIPING(tPipe_chunk_non_car, actor), pActor,
         SIZE_OFFSET_PIPING(tPipe_chunk_non_car, matrix), &pActor->t.t.mat);
+}
+
+// FUNCTION: CARMA2_HW 0x004c8110
+// FUNCTION: CARMA2_SW 0x004c4840
+// FUNCTION: CARMA2_CHEAT 0x004cdc30
+void C2_HOOK_FASTCALL PipeSingleSmoke(int pIndex, tU8 pType, br_vector3* pPos, br_scalar pRadius, br_scalar pStrength) {
+    tReduced_pos reduced_pos;
+
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_chunk_smoke, pos, 0x6);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk_smoke, radius, 0x6);
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_chunk_smoke, radius, 0x2);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk_smoke, strength, 0x8);
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_chunk_smoke, strength, 0x1);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk_smoke, type, 0x9);
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_chunk_smoke, type, 0x1);
+
+    SaveReducedPos(&reduced_pos, pPos);
+    ARDoSingleVariedSession(ePipe_chunk_smoke, pIndex, 4,
+        SIZE_OFFSET_PIPING(tPipe_chunk_smoke, pos), &reduced_pos,
+        SIZE_OFFSET_PIPING(tPipe_chunk_smoke, radius), (int)(pRadius * 1024.0f),
+        SIZE_OFFSET_PIPING(tPipe_chunk_smoke, strength), (int)(pStrength * 255.0f),
+        SIZE_OFFSET_PIPING(tPipe_chunk_smoke, type), pType);
+}
+
+// FUNCTION: CARMA2_HW 0x004c81c0
+// FUNCTION: CARMA2_SW 0x004c48f0
+// FUNCTION: CARMA2_CHEAT 0x004cdce0
+void C2_HOOK_FASTCALL PipeSingleSmokeColumn(int pIndex, const tSmoke_column_core* pCore, int pVertex, int pColour) {
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_chunk_smoke_column, core, 0x10);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk_smoke_column, vertex, 0x10);
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_chunk_smoke_column, vertex, 0x2);
+
+    pIndex += pColour << 14;
+    ARDoSingleVariedSession(ePipe_chunk_smoke_column, pIndex, 2,
+        SIZE_OFFSET_PIPING(tPipe_chunk_smoke_column, core), pCore,
+        SIZE_OFFSET_PIPING(tPipe_chunk_smoke_column, vertex), pVertex);
+}
+
+// FUNCTION: CARMA2_HW 0x004c81f0
+// FUNCTION: CARMA2_SW 0x004c4920
+// FUNCTION: CARMA2_CHEAT 0x004cdd10
+void C2_HOOK_FASTCALL PipeSingleFlame(int pIndex, int pFrame, br_scalar pScale_x, br_scalar pScale_y, br_scalar pOffset_x, br_scalar pOffset_z) {
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_chunk_flame, frame_count, 0x2);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk_flame, scale_x, 0x4);
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_chunk_flame, scale_x, 0x4);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk_flame, scale_y, 0x8);
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_chunk_flame, scale_y, 0x4);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk_flame, offset_x, 0xc);
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_chunk_flame, offset_x, 0x4);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk_flame, offset_z, 0x10);
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_chunk_flame, offset_z, 0x4);
+
+    (void)pScale_y;
+    (void)pOffset_x;
+    (void)pOffset_z;
+
+    gFloat_pipe_union.f = pScale_x;
+    ARDoSingleVariedSession(ePipe_chunk_flame, pIndex, 5,
+        SIZE_OFFSET_PIPING(tPipe_chunk_flame, frame_count), pFrame,
+        SIZE_OFFSET_PIPING(tPipe_chunk_flame, scale_x), gFloat_pipe_union.u32,
+        SIZE_OFFSET_PIPING(tPipe_chunk_flame, scale_y), gFloat_pipe_union.u32,
+        SIZE_OFFSET_PIPING(tPipe_chunk_flame, offset_x), gFloat_pipe_union.u32,
+        SIZE_OFFSET_PIPING(tPipe_chunk_flame, offset_z), gFloat_pipe_union.u32);
+}
+
+// FUNCTION: CARMA2_HW 0x004c8230
+// FUNCTION: CARMA2_SW 0x004c4960
+// FUNCTION: CARMA2_CHEAT 0x004cdd50
+void C2_HOOK_FASTCALL PipeSingleSplash(tPhysics_object* pObject) {
+    br_scalar water_d;
+
+    water_d = pObject->water_d;
+    gFloat_pipe_union.f = water_d;
+    ARDoSingleVariedSession(ePipe_chunk_splash, (uintptr_t)pObject, 2,
+        SIZE_OFFSET_PIPING(tPipe_chunk_splash, water_d), gFloat_pipe_union.u32,
+        SIZE_OFFSET_PIPING(tPipe_chunk_splash, normal), &pObject->water_normal);
+}
+
+// FUNCTION: CARMA2_HW 0x004c8260
+// FUNCTION: CARMA2_SW 0x004c4990
+// FUNCTION: CARMA2_CHEAT 0x004cdd80
+void C2_HOOK_FASTCALL PipeSingleExtendedSplash(tPhysics_object* pObject, void* pSubject) {
+    tU8 value;
+    br_scalar water_d;
+
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_chunk_extended_splash, field_0x0, 0x1);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk_extended_splash, water_d, 0x4);
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_chunk_extended_splash, water_d, 0x4);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk_extended_splash, normal, 0x8);
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_chunk_extended_splash, normal, 0xc);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk_extended_splash, bb, 0x14);
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_chunk_extended_splash, bb, 0x18);
+
+    if (PHILGetObjectProperty(pObject, 6) != 0.0f) {
+        value = 0xff;
+    } else {
+        value = pObject->flags_0x238;
+    }
+    water_d = pObject->water_d;
+    gFloat_pipe_union.f = water_d;
+    ARDoSingleVariedSession(ePipe_chunk_extended_splash, (uintptr_t)pSubject, 4,
+        SIZE_OFFSET_PIPING(tPipe_chunk_extended_splash, field_0x0), value,
+        SIZE_OFFSET_PIPING(tPipe_chunk_extended_splash, water_d), gFloat_pipe_union.u32,
+        SIZE_OFFSET_PIPING(tPipe_chunk_extended_splash, normal), &pObject->water_normal,
+        SIZE_OFFSET_PIPING(tPipe_chunk_extended_splash, bb), &pObject->bb2);
 }
 
 // FUNCTION: CARMA2_HW 0x004c82e0

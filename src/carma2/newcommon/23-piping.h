@@ -209,11 +209,25 @@ extern void C2_HOOK_FASTCALL AddNapalmBoltToPipingSession(int pIndex, tPedestria
 
 // PipeSingleCrush
 
+extern void C2_HOOK_FASTCALL PipeSingleSpark(int pSpark_index, const br_vector3* pPos, const br_vector3* pV);
+
+extern void C2_HOOK_FASTCALL PipeSingleShrapnel(int pShrapnel_index, const br_vector3* pPos, tU16 pAge, br_material* pMaterial);
+
 extern void C2_HOOK_FASTCALL PipeSingleScreenWobble(int pWobble_x, int pWobble_y);
 
 extern void C2_HOOK_FASTCALL PipeSingleGrooveStop(int pGroove_index, br_matrix34* pMatrix, int pPath_interrupt, int pObject_interrupt, float pPath_resumption, float pObject_resumption);
 
 extern void C2_HOOK_FASTCALL PipeSingleNonCar(uintptr_t pId, br_actor* pActor);
+
+extern void C2_HOOK_FASTCALL PipeSingleSmoke(int pIndex, tU8 pType, br_vector3* pPos, br_scalar pRadius, br_scalar pStrength);
+
+extern void C2_HOOK_FASTCALL PipeSingleSmokeColumn(int pIndex, const tSmoke_column_core* pCore, int pVertex, int pColour);
+
+extern void C2_HOOK_FASTCALL PipeSingleFlame(int pIndex, int pFrame, br_scalar pScale_x, br_scalar pScale_y, br_scalar pOffset_x, br_scalar pOffset_z);
+
+extern void C2_HOOK_FASTCALL PipeSingleSplash(tPhysics_object* pObject);
+
+extern void C2_HOOK_FASTCALL PipeSingleExtendedSplash(tPhysics_object* pObject, void* pSubject);
 
 extern void C2_HOOK_FASTCALL PipeSingleOilSpill(int pIndex, br_matrix34* pMat, br_scalar pFull_size, br_scalar pGrow_rate, tU32 pSpill_time, tU32 pStop_time, tCar_spec* pCar, br_vector3* pOriginal_pos, br_pixelmap* pPixelmap);
 
