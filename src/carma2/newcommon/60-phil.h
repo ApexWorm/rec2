@@ -15,6 +15,10 @@
 #define NET_OBJECT_HIERARCHY_DEFAULT_SIZE 72
 
 extern int gPHIL_disabled;
+
+extern br_scalar gPHIL_enter_water_drag;
+
+extern br_scalar gPHIL_leave_water_drag;
 extern tPhysics_object* gPHIL_list_collision_infos;
 extern tU32 gPHIL_last_physics_tick;
 extern int gPHIL_count_list_collision_infos;
@@ -96,13 +100,13 @@ extern int C2_HOOK_CDECL PHILSetObjectProperty(tPhysics_object* pCollision_info,
 
 extern float C2_HOOK_FASTCALL PHILGetObjectProperty(tPhysics_object* pObject, int pProperty);
 
-// FlushQueuedAddsAndRemoves
+extern void C2_HOOK_FASTCALL FlushQueuedAddsAndRemoves(void);
 
 extern void C2_HOOK_FASTCALL ChangedObjectsCallbacks(tPhysics_object* pObjects, tPhysics_callbacks* pCallbacks, tU32 pPeriod);
 
 extern void C2_HOOK_FASTCALL ProcessDrag2(tPHIL_queued_header* pObject_info, tPhysics_object* pObject, br_scalar pDrag, int pFlags, tSpecial_volume* pVolume);
 
-// ProcessDrag
+extern void C2_HOOK_FASTCALL ProcessDrag(tPHIL_queued_header* pObject_info, tPhysics_object* pObject, br_scalar pDrag);
 
 extern void C2_HOOK_FASTCALL MarkObjectAndChildrenAsPassive(tPhysics_object* pObject);
 
@@ -112,11 +116,11 @@ extern void C2_HOOK_FASTCALL ProcessGravity(tPHIL_queued_header* pObject_info, t
 
 extern void C2_HOOK_FASTCALL LevelOutOnSurface(tPhysics_object* pObject);
 
-// PHILMungeObjects
+extern void C2_HOOK_FASTCALL PHILMungeObjects(tPhysics_object* pObjects);
 
 extern void C2_HOOK_FASTCALL PHILActivatePassive(tPhysics_object* pObject, void* pContext);
 
-// PHILInterpolateObjects
+extern void C2_HOOK_FASTCALL PHILInterpolateObjects(tPhysics_object* pObjects, tU32 pTime);
 
 extern void C2_HOOK_FASTCALL PHILDoPhysics(tPhysics_callbacks* pCallbacks, tU32 pLast_tick_time, tU32 pFrame_period);
 

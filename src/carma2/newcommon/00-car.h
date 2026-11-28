@@ -27,6 +27,7 @@ extern int gNum_active_non_cars;
 extern tNon_car_spec* gActive_non_car_list[99];
 extern int gEliminate_faces;
 extern int gIn_the_sea;
+extern int gOver_shoot;
 extern int gFace_num__car;
 extern tFace_ref gFace_list__car[300];
 extern br_scalar gMin_world_y;
