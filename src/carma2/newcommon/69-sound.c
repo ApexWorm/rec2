@@ -178,6 +178,7 @@ int gEnvironmental_sound_sources_buffer_index = 0;
 
 // GLOBAL: CARMA2_HW 0x00595c38
 // GLOBAL: CARMA2_SW 0x00590b98
+// GLOBAL: CARMA2_CHEAT 0x0059c590
 const char* gSound_generator_type_names[3] = {
     "NONCAR",
     "ACTOR",
