@@ -14,6 +14,8 @@
 
 extern int gINT_00692dc8;
 
+extern int gINT_00692dd8;
+
 extern tPhysicsError_cbfn* gPhysics_error_cb;
 extern void* gPhysics_buffer1_ptr;
 extern void* gPhysics_buffer2_ptr;
@@ -146,11 +148,11 @@ extern void C2_HOOK_FASTCALL RedoQuickHingeVelocities(tPhysics_object* pObject);
 
 extern int C2_HOOK_FASTCALL GetJointForces(tPhysics_object* pObject, tPhysics_joint_force* pForces);
 
-// GetUniversalRotationAngle
+extern void C2_HOOK_FASTCALL GetUniversalRotationAngle(br_matrix34* pMat_1, br_matrix34* pMat_2, br_vector3* pV1, br_vector3* pV2, br_vector3* pV3, br_vector3* pV4, br_vector3* pOut, br_vector3* pAxis);
 
-// GetObjectsParent
+extern tPhysics_object* C2_HOOK_FASTCALL GetObjectsParent(tPhysics_object* pObject);
 
-// GetJointLimits
+extern int C2_HOOK_FASTCALL GetJointLimits(tPhysics_object* pObject, tPhysics_joint_force* pForces, int pCount, int pMax_count);
 
 // GetListJointLimits
 

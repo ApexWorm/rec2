@@ -35,6 +35,11 @@
 // GLOBAL: CARMA2_CHEAT 0x0069a940
 int gINT_00692dc8;
 
+// GLOBAL: CARMA2_HW 0x00692dd8
+// GLOBAL: CARMA2_SW 0x0068ce30
+// GLOBAL: CARMA2_CHEAT 0x0069a950
+int gINT_00692dd8;
+
 // GLOBAL: CARMA2_HW 0x006940c0
 // GLOBAL: CARMA2_SW 0x0068e118
 // GLOBAL: CARMA2_CHEAT 0x0069bc38
@@ -939,11 +944,228 @@ int C2_HOOK_FASTCALL GetJointForces(tPhysics_object* pObject, tPhysics_joint_for
 #pragma auto_inline(on)
 #endif
 
-// GetUniversalRotationAngle
+// FUNCTION: CARMA2_HW 0x004bd4f0
+// FUNCTION: CARMA2_SW 0x004b9c00
+// FUNCTION: CARMA2_CHEAT 0x004c3020
+void C2_HOOK_FASTCALL GetUniversalRotationAngle(br_matrix34* pMat_1, br_matrix34* pMat_2, br_vector3* pV1, br_vector3* pV2, br_vector3* pV3, br_vector3* pV4, br_vector3* pOut, br_vector3* pAxis) {
+    br_vector3 tv;
+    br_vector3 tv2;
+    br_scalar length;
+    br_scalar dot;
 
-// GetObjectsParent
+    BrMatrix34ApplyV(&tv, pV1, pMat_1);
+    BrMatrix34TApplyV(&tv2, &tv, pMat_2);
+    BrVector3Add(pAxis, &tv2, pV2);
+    length = BrVector3Length(pAxis);
+    if (length > 2.3841858e-7f) {
+        BrVector3Scale(pAxis, pAxis, 1.0 / length);
+    } else {
+        BrVector3Set(pAxis, 1.0f, 0.0f, 0.0f);
+    }
+    BrMatrix34ApplyV(&tv, pV3, pMat_1);
+    BrMatrix34TApplyV(pOut, &tv, pMat_2);
+    dot = 2.0f * BrVector3Dot(pOut, pAxis);
+    BrVector3Scale(&tv, pAxis, dot);
+    BrVector3Sub(pOut, pOut, &tv);
+    dot = 2.0f * BrVector3Dot(pOut, pV2);
+    BrVector3Scale(&tv, pV2, dot);
+    BrVector3Sub(pOut, pOut, &tv);
+}
 
-// GetJointLimits
+inline tPhysics_object* C2_HOOK_FASTCALL GetObjectsParent(tPhysics_object* pObject) {
+    tPhysics_object* parent;
+
+    parent = pObject->field_0x230;
+    if (parent == NULL) {
+        PhysicsError(11, "");
+    }
+    return parent;
+}
+
+// FUNCTION: CARMA2_HW 0x004bca10
+// FUNCTION: CARMA2_SW 0x004b9130
+// FUNCTION: CARMA2_CHEAT 0x004c2540
+int C2_HOOK_FASTCALL GetJointLimits(tPhysics_object* pObject, tPhysics_joint_force* pForces, int pCount, int pMax_count) {
+    tPhysics_object* parent;
+    tPhysics_joint_limit* limit;
+    tPhysics_joint_force* force;
+    br_vector3 tv;
+    br_vector3 current;
+    br_vector3 trial;
+    br_vector3 cross;
+    br_scalar current_dot;
+    br_scalar trial_dot;
+    br_scalar lower;
+    br_scalar upper;
+    br_scalar length;
+    int i;
+    int j;
+    int k;
+
+    if (pObject->physics_joint1 != NULL) {
+        parent = GetObjectsParent(pObject);
+        for (i = 0; i < pObject->physics_joint1->count_limits && pCount < pMax_count; i++) {
+            limit = &pObject->physics_joint1->limits[i];
+            switch (limit->type) {
+            case eJoint_limit_plane:
+                BrMatrix34ApplyV(&tv, &limit->child, &pObject->actor->t.t.mat);
+                BrMatrix34TApplyV(&current, &tv, &parent->actor->t.t.mat);
+                current_dot = BrVector3Dot(&current, &limit->parent);
+                if (current_dot < 0.001) {
+                    BrMatrix34ApplyV(&tv, &limit->child, &pObject->transform_matrix);
+                    BrMatrix34TApplyV(&trial, &tv, &parent->transform_matrix);
+                    trial_dot = BrVector3Dot(&trial, &limit->parent);
+                    if (trial_dot >= 0.0f && (trial_dot >= 0.001 || pObject->field_0xf0 != 0)) {
+                        force = &pForces[pCount];
+                        force->field_0x0 = current_dot - trial_dot;
+                        force->type = 11;
+                        force->object_a = pObject;
+                        force->object_b = parent;
+                        BrVector3Cross(&cross, &trial, &limit->parent);
+                        length = BrVector3Length(&cross);
+                        if (length > 1e-6) {
+                            BrVector3InvScale(&force->direction_b, &cross, length);
+                        } else {
+                            BrMatrix34ApplyV(&cross, &pObject->omega, &pObject->transform_matrix);
+                            BrMatrix34TApplyV(&force->direction_b, &cross, &parent->transform_matrix);
+                            BrVector3Sub(&force->direction_b, &force->direction_b, &parent->omega);
+                            BrVector3Normalise(&force->direction_b, &force->direction_b);
+                        }
+                        BrMatrix34ApplyV(&cross, &force->direction_b, &parent->transform_matrix);
+                        BrMatrix34TApplyV(&force->direction_a, &cross, &pObject->transform_matrix);
+                        pCount++;
+                        BrVector3Copy(&force->point_a, &pObject->physics_joint1->field_0x08);
+                        BrVector3Copy(&force->point_b, &pObject->physics_joint1->field_0x14);
+                    }
+                }
+                break;
+            case eJoint_limit_universal:
+                GetUniversalRotationAngle(&pObject->actor->t.t.mat, &parent->actor->t.t.mat,
+                    &limit->child, &limit->parent,
+                    &pObject->physics_joint1->limits[i + 1].child, &pObject->physics_joint1->limits[i + 1].parent,
+                    &current, &cross);
+                current_dot = BrVector3Dot(&current, &pObject->physics_joint1->limits[i + 1].parent);
+                if (current_dot < limit->value + 0.001) {
+                    force = &pForces[pCount];
+                    GetUniversalRotationAngle(&pObject->transform_matrix, &parent->transform_matrix,
+                        &limit->child, &limit->parent,
+                        &pObject->physics_joint1->limits[i + 1].child, &pObject->physics_joint1->limits[i + 1].parent,
+                        &trial, &force->direction_b);
+                    trial_dot = BrVector3Dot(&trial, &pObject->physics_joint1->limits[i + 1].parent);
+                    if (trial_dot > limit->value) {
+                        BrVector3Cross(&cross, &current, &trial);
+                        if (BrVector3Dot(&cross, &force->direction_b) < 0.0f) {
+                            BrVector3Negate(&force->direction_b, &force->direction_b);
+                        }
+                        BrMatrix34ApplyV(&cross, &force->direction_b, &parent->transform_matrix);
+                        BrMatrix34TApplyV(&force->direction_a, &cross, &pObject->transform_matrix);
+                        pCount++;
+                        force->field_0x0 = current_dot - trial_dot;
+                        force->type = 11;
+                        force->object_a = pObject;
+                        force->object_b = parent;
+                    }
+                }
+                i++;
+                break;
+            default:
+                PhysicsError(8, "");
+            }
+        }
+    }
+    if (pObject->physics_joint2 != NULL) {
+        for (i = 0; i < pObject->physics_joint2->count_limits; i++) {
+            limit = &pObject->physics_joint2->limits[i];
+            switch (limit->type) {
+            case eJoint_limit_10:
+                if (pObject->field_0x1e0 != 0) {
+                    gINT_00692dd8 = 1;
+                    for (j = 0; j < pCount; j++) {
+                        force = &pForces[j];
+                        if (force->object_a == pObject) {
+                            if (force->object_b == NULL) {
+                                for (k = j; k < pCount; k++) {
+                                    pForces[k] = pForces[k + 1];
+                                }
+                                pCount--;
+                                j--;
+                            } else {
+                                BrVector3Negate(&tv, &force->direction_a);
+                                BrVector3Negate(&force->direction_a, &force->direction_b);
+                                BrVector3Copy(&force->direction_b, &tv);
+                                BrVector3Copy(&tv, &force->point_a);
+                                BrVector3Copy(&force->point_a, &force->point_b);
+                                BrVector3Copy(&force->point_b, &tv);
+                                force->object_a = force->object_b;
+                                force->object_b = pObject;
+                                force->type = 14;
+                            }
+                        } else if (force->object_b == pObject) {
+                            force->type = 14;
+                        }
+                    }
+                }
+                break;
+            case eJoint_limit_plane:
+                BrMatrix34ApplyV(&current, &limit->child, &pObject->actor->t.t.mat);
+                current_dot = BrVector3Dot(&current, &limit->parent);
+                if (current_dot < 0.001) {
+                    if (pCount == pMax_count) {
+                        return pCount;
+                    }
+                    force = &pForces[pCount];
+                    force->field_0x0 = current_dot;
+                    force->type = 11;
+                    force->object_a = pObject;
+                    force->object_b = NULL;
+                    BrVector3Cross(&cross, &current, &limit->parent);
+                    length = BrVector3Length(&cross);
+                    if (length > 1e-6) {
+                        BrVector3InvScale(&force->direction_b, &cross, length);
+                    }
+                }
+                break;
+            case eJoint_limit_11:
+                BrMatrix34ApplyV(&tv, &pObject->physics_joint2->hinge_axis, &pObject->transform_matrix);
+                lower = BrVector3Dot(&tv, &pObject->field_0x17c);
+                current_dot = BrVector3Dot(&tv, &pObject->actor->t.t.translate.t);
+                upper = lower + limit->value;
+                trial_dot = BrVector3Dot(&tv, (br_vector3*)pObject->transform_matrix.m[3]);
+                if (current_dot > upper && trial_dot < upper + 0.001) {
+                    if (pCount == pMax_count) {
+                        return pCount;
+                    }
+                    force = &pForces[pCount];
+                    force->field_0x0 = (upper - trial_dot) / (current_dot - trial_dot);
+                    force->field_0xc = NULL;
+                    force->type = 2;
+                    force->object_a = pObject;
+                    force->object_b = NULL;
+                    BrVector3Negate(&force->direction_a, &pObject->physics_joint2->hinge_axis);
+                    BrVector3SetFloat(&force->point_a, 0.0f, 0.0f, 0.0f);
+                    pCount++;
+                } else if (current_dot < lower - 0.001 && trial_dot > lower - 0.002) {
+                    if (pCount == pMax_count) {
+                        return pCount;
+                    }
+                    force = &pForces[pCount];
+                    force->field_0x0 = (lower - trial_dot) / (current_dot - trial_dot);
+                    force->field_0xc = NULL;
+                    force->type = 2;
+                    force->object_a = pObject;
+                    force->object_b = NULL;
+                    BrVector3Copy(&force->direction_a, &pObject->physics_joint2->hinge_axis);
+                    BrVector3SetFloat(&force->point_a, 0.0f, 0.0f, 0.0f);
+                    pCount++;
+                }
+                break;
+            default:
+                PhysicsError(8, "");
+            }
+        }
+    }
+    return pCount;
+}
 
 // GetListJointLimits
 
