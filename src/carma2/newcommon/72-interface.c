@@ -894,6 +894,80 @@ void C2_HOOK_FASTCALL ToggleSelection(tFrontend_spec* pFrontend) {
     }
 }
 
+#ifdef REC2_MATCHING
+// FUNCTION: CARMA2_HW 0x00466460
+// FUNCTION: CARMA2_SW 0x004661f0
+// FUNCTION: CARMA2_CHEAT 0x004668e0
+void C2_HOOK_FASTCALL FUN_00466460(br_actor* pActor, int pX, int pY) {
+    br_bounds3 bounds;
+    br_scalar dx;
+    br_scalar dy;
+    br_scalar dz;
+    br_scalar max;
+    br_scalar dist;
+    br_actor* parent;
+    br_actor* camera;
+    br_actor* light;
+    br_camera* camera_data;
+    br_light* light_data;
+    br_pixelmap* pixelmap;
+
+    /* Unused */
+    if (pActor == NULL) {
+        return;
+    }
+    BrActorToBounds(&bounds, pActor);
+    dx = bounds.max.v[0] - bounds.min.v[0];
+    dy = bounds.max.v[1] - bounds.min.v[1];
+    dz = bounds.max.v[2] - bounds.min.v[2];
+    BrMatrix34PostRotateY(&pActor->t.t.mat, BR_ANGLE_DEG(10));
+    parent = BrActorAllocate(BR_ACTOR_NONE, NULL);
+    camera = BrActorAllocate(BR_ACTOR_CAMERA, NULL);
+    light = BrActorAllocate(BR_ACTOR_LIGHT, NULL);
+    camera_data = camera->type_data;
+    camera_data->type = BR_CAMERA_PERSPECTIVE_FOV;
+    camera_data->field_of_view = BR_ANGLE_DEG(30);
+    camera_data->hither_z = 0.1f;
+    camera_data->yon_z = gCamera_yon;
+    light_data = light->type_data;
+    light_data->type = BR_LIGHT_DIRECT;
+    BrMatrix34PostRotateX(&light->t.t.mat, BR_ANGLE_DEG(-5));
+    BrMatrix34PostRotateY(&light->t.t.mat, BR_ANGLE_DEG(-90));
+    light_data->colour = BR_COLOUR_RGB(255, 255, 255);
+    light_data->attenuation_c = 0.5f;
+    if (dx > dy) {
+        if (dx > dz) {
+            max = dx;
+        } else {
+            max = dz;
+        }
+    } else {
+        if (dy < dz) {
+            max = dz;
+        } else {
+            max = dy;
+        }
+    }
+    dist = (br_scalar)(max / (sin(BrAngleToRadian(BR_ANGLE_DEG(30))) / cos(BrAngleToRadian(BR_ANGLE_DEG(30)))) * 1.2);
+    BrMatrix34Translate(&camera->t.t.mat, 0.0f, (br_scalar)(MAX(dist, 0.1) * 0.577), (br_scalar)MAX(dist, 0.1));
+    BrMatrix34PreRotateX(&camera->t.t.mat, BR_ANGLE_DEG(-30));
+    BrActorAdd(parent, camera);
+    BrActorAdd(parent, light);
+    BrLightEnable(light);
+    pixelmap = BrPixelmapAllocateSub(gBack_screen, pX + 20, pY + 90, 100, 60);
+    BrPixelmapFill(gDepth_buffer, 0xffffffff);
+    BrPixelmapFill(pixelmap, 0);
+    BrZbsSceneRenderBegin(parent, camera, pixelmap, gDepth_buffer);
+    BrZbsSceneRenderAdd(pActor);
+    BrZbsSceneRenderEnd();
+    BrActorRemove(camera);
+    BrActorFree(camera);
+    BrActorRemove(light);
+    BrActorFree(light);
+    BrActorFree(parent);
+}
+#endif
+
 // FUNCTION: CARMA2_HW 0x004666f0
 // FUNCTION: CARMA2_SW 0x00466480
 // FUNCTION: CARMA2_CHEAT 0x00466b70
