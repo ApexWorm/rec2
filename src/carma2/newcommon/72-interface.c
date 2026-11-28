@@ -3900,8 +3900,6 @@ void C2_HOOK_FASTCALL DisplayJoystickSettings(tFrontend_spec *pFrontend) {
 #pragma auto_inline(on)
 #endif
 
-// SaveAllJoystickData
-
 // FUNCTION: CARMA2_HW 0x00472440
 // FUNCTION: CARMA2_SW 0x004719d0
 // FUNCTION: CARMA2_CHEAT 0x004727d0
