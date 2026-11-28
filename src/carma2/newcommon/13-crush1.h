@@ -362,7 +362,7 @@ extern void C2_HOOK_FASTCALL BendCollisionShapes(tCar_spec* pCar, const tBend_po
 
 extern intptr_t C2_HOOK_FASTCALL BendModels(br_actor* pActor, br_vector3* pTranslation, void* pContext);
 
-// BrAngleToSignedDegree
+extern br_scalar C2_HOOK_FASTCALL BrAngleToSignedDegree(br_angle pAngle);
 
 // BendWheels
 
