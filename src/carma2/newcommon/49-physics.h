@@ -14,7 +14,7 @@
 
 extern undefined4 gDAT_00679434;
 
-extern int gINT_00679438;
+extern int gTesting_sensible_place;
 
 extern int gINT_00692dc8;
 
