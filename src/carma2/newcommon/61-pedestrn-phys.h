@@ -325,7 +325,7 @@ extern void C2_HOOK_FASTCALL UpdateIfBackwardsAR(void);
 
 extern void C2_HOOK_FASTCALL ChangePedScaling(const br_vector3* pScale);
 
-// ChangeHeadScaling
+extern void C2_HOOK_FASTCALL ChangeHeadScaling(float pScale);
 
 extern void C2_HOOK_FASTCALL MakeMaterialBlendy(br_material* pMaterial);
 

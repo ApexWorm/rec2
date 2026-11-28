@@ -1818,7 +1818,12 @@ void C2_HOOK_FASTCALL ChangePedScaling(const br_vector3* pScale) {
     }
 }
 
-// ChangeHeadScaling
+// STUB: CARMA2_HW 0x004d6ab0
+// STUB: CARMA2_SW 0x004d30b0
+// STUB: CARMA2_CHEAT 0x004dc670
+void C2_HOOK_FASTCALL ChangeHeadScaling(float pScale) {
+    NOT_IMPLEMENTED();
+}
 
 // FUNCTION: CARMA2_HW 0x004d6b70
 // FUNCTION: CARMA2_SW 0x004d3170
