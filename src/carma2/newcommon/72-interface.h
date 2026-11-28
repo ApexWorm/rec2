@@ -14,6 +14,7 @@
 
 extern int gNet_storage_space_initialized;
 extern int gOrig_key_map_index;
+extern int gINT_00688444;
 extern int gBackup_key_mappings[4][77];
 extern int gOrig_joystick_index;
 extern float gOriginal_joystick_x;
@@ -51,6 +52,7 @@ extern tWreck_gallery_sell_info gWreck_gallery_sell_infos[32];
 
 extern tFrontend_brender_item gFrontend_brender_items[100];
 extern tFrontend_spec* gCurrent_frontend_spec;
+extern tFrontend_spec gFrontend_CONTROLS;
 extern int gFrontend_change_car_selected_car;
 extern int gFrontend_car_image_outdated;
 extern int gFrontend_opponent_profile_pic_needs_update;
@@ -357,13 +359,13 @@ extern void C2_HOOK_FASTCALL PolyClipName(char *pText, int pFont, int pWidth);
 
 extern int C2_HOOK_FASTCALL Ians_GetItemAtMousePos(tFrontend_spec* pFrontend, int pX, int pY);
 
-// TranslateSliderItem
+extern int C2_HOOK_FASTCALL TranslateSliderItem(tFrontend_slider* pScroller, int pIndex);
 
-// GetActiveSlider
+extern tFrontend_slider* C2_HOOK_FASTCALL GetActiveSlider(void);
 
 extern tFrontend_slider* C2_HOOK_FASTCALL GetAnyActiveSlider(void);
 
-// PrepareSliders
+extern void C2_HOOK_FASTCALL PrepareSliders(tFrontend_spec* pFrontend);
 
 extern void C2_HOOK_FASTCALL Morph_Initialise(tFrontend_spec* pCurrent, tFrontend_spec* pNext);
 
@@ -371,7 +373,7 @@ extern int C2_HOOK_FASTCALL Generic_Infunc(tFrontend_spec* pFrontend);
 
 extern int C2_HOOK_FASTCALL Generic_Outfunc(tFrontend_spec* pFrontend);
 
-// Generic_EventEffect
+extern void C2_HOOK_FASTCALL Generic_EventEffect(void);
 
 extern void C2_HOOK_FASTCALL Generic_LinkInEffect(void);
 
@@ -389,7 +391,7 @@ extern int C2_HOOK_FASTCALL ScrollSet_TranslateItemToIndex(tConnected_items* pCo
 
 extern int C2_HOOK_FASTCALL Generic_FindNextActiveItem(tFrontend_spec* pFrontend, int pItem);
 
-// Generic_FindPrevActiveItem
+extern int C2_HOOK_FASTCALL Generic_FindPrevActiveItem(tFrontend_spec* pFrontend, int pItem);
 
 // Generic_MungeActiveItems
 

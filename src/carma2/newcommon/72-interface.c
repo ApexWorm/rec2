@@ -19,6 +19,7 @@
 #include "15-displays.h"
 #include "16-graphics1.h"
 #include "18-graphics2.h"
+#include "18b-graphics2.h"
 #include "19-font.h"
 #include "24-loadsave.h"
 #include "28-world3.h"
@@ -166,6 +167,11 @@ int gFrontend_controls_count_keys;
 // GLOBAL: CARMA2_CHEAT 0x0068fce8
 int gOrig_key_map_index;
 
+// GLOBAL: CARMA2_HW 0x00688444
+// GLOBAL: CARMA2_SW 0x006829a4
+// GLOBAL: CARMA2_CHEAT 0x0068fcec
+int gINT_00688444;
+
 // GLOBAL: CARMA2_HW 0x006869e0
 // GLOBAL: CARMA2_SW 0x00681120
 // GLOBAL: CARMA2_CHEAT 0x0068e288
@@ -205,6 +211,99 @@ int gOriginal_joystick_dpad;
 // GLOBAL: CARMA2_CHEAT 0x0060b180
 int gFrontend_controls_indices[15] = {
     12, 13, 17, 18, 22, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35
+};
+
+// GLOBAL: CARMA2_HW 0x00604940
+// GLOBAL: CARMA2_SW 0x005ff870
+// GLOBAL: CARMA2_CHEAT 0x0060b1c0
+tFrontend_spec gFrontend_CONTROLS = {
+#if 0 // FIXME: enable this
+    "Controls",
+    0,
+    68,
+    Controls_Infunc,
+    Controls_Outfunc,
+    Generic_MenuHandler,
+    &gFrontend_OPTIONS,
+    0,
+    0,
+    0,
+    7,
+    0,
+    0,
+    {
+        { 0x402, temp,                          NULL,       0, 17, 18, 0, 0, 0, 0, 1, 0, },
+        { 0x402, temp,                          NULL,       0, 17, 18, 0, 0, 0, 0, 0, 1, },
+        { 0x402, temp,                          NULL,       0, 17, 18, 0, 0, 0, 0, 0, 1, },
+        { 0x402, temp,                          NULL,       0, 17, 18, 0, 0, 0, 0, 0, 1, },
+        { 0x402, temp,                          NULL,       0, 17, 18, 0, 0, 0, 0, 0, 1, },
+        { 0x402, temp,                          NULL,       0, 17, 18, 0, 0, 0, 0, 0, 1, },
+        { 0x402, temp,                          NULL,       0, 17, 18, 0, 0, 0, 0, 0, 1, },
+        { 0x402, temp,                          NULL,       0, 17, 18, 0, 0, 0, 0, 0, 1, },
+        { 0x402, temp,                          NULL,       0, 17, 18, 0, 0, 0, 0, 0, 1, },
+        { 0x402, temp,                          NULL,       0, 17, 18, 0, 0, 0, 0, 0, 1, },
+        { 0x56,  Controls_JoystickToggle,       NULL,       0, 17, 18, 0, 0, 0, 0, 1, 1, },
+        { 0x57,  Controls_JoystickToggle,       NULL,       0, 17, 18, 0, 0, 0, 0, 1, 1, },
+        { 0x59,  temp,                          NULL,       0, 0,  0,  0, 0, 0, 0, 0, 1, },
+        { 0x5b,  temp,                          NULL,       0, 17, 18, 0, 0, 0, 0, 0, 1, },
+        { 0x402, temp,                          NULL,       0, 0,  0,  0, 0, 0, 0, 1, 1, 1, 0, 1, 1, },
+        { 0x402, temp,                          NULL,       0, 0,  0,  0, 0, 0, 0, 1, 1, 1, 0, 0, 0, },
+        { 0x402, temp,                          NULL,       0, 0,  0,  0, 0, 0, 0, 1, 1, 1, 0, 0, 0, },
+        { 0x5a,  temp,                          NULL,       0, 0,  0,  0, 0, 0, 0, 0, 1, 0, 0, 0, 0, },
+        { 0x5c,  temp,                          NULL,       0, 0,  0,  0, 0, 0, 0, 0, 1, 0, 0, 0, 0, },
+        { 0x402, temp,                          NULL,       0, 0,  0,  0, 0, 0, 0, 1, 1, 1, 0, 1, 1, },
+        { 0x402, temp,                          NULL,       0, 0,  0,  0, 0, 0, 0, 1, 1, 1, 0, 0, 0, },
+        { 0x402, temp,                          NULL,       0, 0,  0,  0, 0, 0, 0, 1, 1, 1, 0, 0, 0, },
+        { 0x63,  temp,                          NULL,       0, 0,  0,  0, 0, 0, 0, 0, 1, 0, 0, 0, 0, },
+        { 0x402, temp,                          NULL,       0, 0,  0,  0, 0, 0, 0, 1, 1, 1, 0, 1, 1, },
+        { 0x402, temp,                          NULL,       0, 0,  0,  0, 0, 0, 0, 1, 1, 1, 0, 0, 0, },
+        { 0x402, temp,                          NULL,       0, 0,  0,  0, 0, 0, 0, 1, 1, 1, 0, 0, 0, },
+        { 0x61,  temp,                          NULL,       0, 17, 18, 0, 0, 0, 0, 0, 1, },
+        { 0x5f,  temp,                          NULL,       0, 17, 18, 0, 0, 0, 0, 0, 1, },
+        { 0x62,  temp,                          NULL,       0, 17, 18, 0, 0, 0, 0, 0, 1, },
+        { 0x61,  temp,                          NULL,       0, 17, 18, 0, 0, 0, 0, 0, 1, },
+        { 0x5f,  temp,                          NULL,       0, 17, 18, 0, 0, 0, 0, 0, 1, },
+        { 0x62,  temp,                          NULL,       0, 17, 18, 0, 0, 0, 0, 0, 1, },
+        { 0x61,  temp,                          NULL,       0, 17, 18, 0, 0, 0, 0, 0, 1, },
+        { 0x60,  temp,                          NULL,       0, 17, 18, 0, 0, 0, 0, 0, 1, },
+        { 0x62,  temp,                          NULL,       0, 17, 18, 0, 0, 0, 0, 0, 1, },
+        { 0xef,  temp,                          NULL,       0, 17, 18, 0, 0, 0, 0, 0, 1, },
+        { 0xf1,  Controls_JoystickDpadToggle,   NULL,       0, 17, 18, 0, 0, 0, 0, 1, 1, },
+        { 0xf2,  Controls_JoystickDpadToggle,   NULL,       0, 17, 18, 0, 0, 0, 0, 1, 1, },
+        { 0x68,  temp,                          NULL,       0, 17, 18, 0, 0, 0, 0, 0, 1, },
+        { 0xf3,  Controls_SwitchKeymapSet,      NULL,       0, 17, 18, 0, 0, 0, 0, 1, 1, },
+        { 0xf4,  Controls_SwitchKeymapSet,      NULL,       0, 17, 18, 0, 0, 0, 0, 1, 1, },
+        { 0xf5,  Controls_SwitchKeymapSet,      NULL,       0, 17, 18, 0, 0, 0, 0, 1, 1, },
+        { 0xf6,  Controls_SwitchKeymapSet,      NULL,       0, 17, 18, 0, 0, 0, 0, 1, 1, },
+        { 0x404, Controls_SlotActivated,        NULL,       0, 17, 18, 0, 0, 0, 0, 1, 1, },
+        { 0x404, Controls_SlotActivated,        NULL,       0, 17, 18, 0, 0, 0, 0, 1, 1, },
+        { 0x404, Controls_SlotActivated,        NULL,       0, 17, 18, 0, 0, 0, 0, 1, 1, },
+        { 0x404, Controls_SlotActivated,        NULL,       0, 17, 18, 0, 0, 0, 0, 1, 1, },
+        { 0x404, Controls_SlotActivated,        NULL,       0, 17, 18, 0, 0, 0, 0, 1, 1, },
+        { 0x404, Controls_SlotActivated,        NULL,       0, 17, 18, 0, 0, 0, 0, 1, 1, },
+        { 0x404, Controls_SlotActivated,        NULL,       0, 17, 18, 0, 0, 0, 0, 1, 1, },
+        { 0x404, Controls_SlotActivated,        NULL,       0, 17, 18, 0, 0, 0, 0, 1, 1, },
+        { 0x404, Controls_SlotActivated,        NULL,       0, 17, 18, 0, 0, 0, 0, 1, 1, },
+        { 0x404, Controls_SlotActivated,        NULL,       0, 17, 18, 0, 0, 0, 0, 1, 1, },
+        { 0x404, Controls_SlotActivated,        NULL,       0, 17, 18, 0, 0, 0, 0, 1, 1, },
+        { 0x404, Controls_SlotActivated,        NULL,       0, 17, 18, 0, 0, 0, 0, 1, 1, },
+        { 0x404, Controls_SlotActivated,        NULL,       0, 17, 18, 0, 0, 0, 0, 1, 1, },
+        { 0x404, Controls_SlotActivated,        NULL,       0, 17, 18, 0, 0, 0, 0, 1, 1, },
+        { 0x404, Controls_SlotActivated,        NULL,       0, 17, 18, 0, 0, 0, 0, 1, 1, },
+        { 0x404, Controls_SlotActivated,        NULL,       0, 17, 18, 0, 0, 0, 0, 1, 1, },
+        { 0x404, Controls_SlotActivated,        NULL,       0, 17, 18, 0, 0, 0, 0, 1, 1, },
+        { 0x404, Controls_SlotActivated,        NULL,       0, 17, 18, 0, 0, 0, 0, 1, 1, },
+        { 0x404, Controls_SlotActivated,        NULL,       0, 17, 18, 0, 0, 0, 0, 1, 1, },
+        { 0x404, Controls_SlotActivated,        NULL,       0, 17, 18, 0, 0, 0, 0, 1, 1, },
+        { 0x403, Controls_KeyUp,                NULL,       0, 17, 18, 0, 0, 0, 0, 1, 1, },
+        { 0x403, Controls_KeyDown,              NULL,       0, 17, 18, 0, 0, 0, 0, 1, 1, },
+        { 0xee,  temp,                          NULL,       0, 17, 18, 0, 0, 0, 0, 0, 1, },
+        { 0xf0,  temp,                          NULL,       0, 17, 18, 0, 0, 0, 0, 0, 1, },
+        { 0x7,   Controls_Ok,                   (void*)1,   0, 0,  0,  0, 0, 0, 0, 1, 1, },
+    },
+#else
+    0
+#endif
 };
 
 // GLOBAL: CARMA2_HW 0x00686f68
@@ -3428,11 +3527,35 @@ int C2_HOOK_FASTCALL Ians_GetItemAtMousePos(tFrontend_spec* pFrontend, int pX, i
     return -1;
 }
 
-// TranslateSliderItem
+inline int C2_HOOK_FASTCALL TranslateSliderItem(tFrontend_slider* pScroller, int pIndex) {
 
-// GetActiveSlider
+    if (pIndex < pScroller->itemid_left_reference || pIndex >= pScroller->itemid_left_reference + 3) {
+        return pScroller->itemid_left_reference + 2;
+    } else {
+        return pIndex;
+    }
+}
+
+inline tFrontend_slider* C2_HOOK_FASTCALL GetActiveSlider(void) {
+    tFrontend_slider* slider;
+
+    for (slider = gCurrent_frontend_scrollbars; slider != NULL; slider = slider->next) {
+        if ((slider->flags & 0x1) == 0) {
+            if (gFrontend_selected_item_index >= slider->itemid_left_reference
+                    && gFrontend_selected_item_index < slider->itemid_left_reference + 3) {
+                return slider;
+            }
+            if (gFrontend_selected_item_index >= slider->itemid_start
+                    && gFrontend_selected_item_index < slider->itemid_start + 3) {
+                return slider;
+            }
+        }
+    }
+    return NULL;
+}
 
 // FUNCTION: CARMA2_HW 0x00471cf0
+// FUNCTION: CARMA2_SW 0x00471250
 // FUNCTION: CARMA2_CHEAT 0x00472080
 tFrontend_slider* C2_HOOK_FASTCALL GetAnyActiveSlider(void) {
     tFrontend_slider* slider;
@@ -3454,7 +3577,33 @@ tFrontend_slider* C2_HOOK_FASTCALL GetAnyActiveSlider(void) {
     return NULL;
 }
 
-// PrepareSliders
+inline void C2_HOOK_FASTCALL PrepareSliders(tFrontend_spec* pFrontend) {
+    tFrontend_slider* slider;
+    br_model* model;
+    int pos;
+
+    for (slider = gCurrent_frontend_scrollbars; slider != NULL; slider = slider->next) {
+        pFrontend->items[slider->itemid_start].x = pFrontend->items[slider->itemid_left_reference].x;
+        pFrontend->items[slider->itemid_start].width = 8;
+        pFrontend->items[slider->itemid_start + 1].x = pFrontend->items[slider->itemid_left_reference].x + 8;
+        pFrontend->items[slider->itemid_start + 1].width = slider->width;
+        pFrontend->items[slider->itemid_start + 2].x = pFrontend->items[slider->itemid_left_reference].x + slider->width + 8;
+        pFrontend->items[slider->itemid_start + 2].width = 8;
+        if (slider->value < 0.0f) {
+            slider->value = 0.0f;
+        } else if (slider->value > 1.0) {
+            slider->value = 1.0f;
+        }
+        model = gFrontend_brender_items[slider->itemid_left_reference + 1].model;
+        pos = (int)(model->vertices[1].p.v[0] + slider->width * slider->value);
+        model->vertices[2].p.v[0] = model->vertices[3].p.v[0] = (float)pos;
+        BrModelUpdate(model, BR_MODU_VERTEX_POSITIONS);
+        model = gFrontend_brender_items[slider->itemid_left_reference + 2].model;
+        model->vertices[0].p.v[0] = model->vertices[1].p.v[0] = (float)pos;
+        model->vertices[2].p.v[0] = model->vertices[3].p.v[0] = (float)(pos + 8);
+        BrModelUpdate(model, BR_MODU_VERTEX_POSITIONS);
+    }
+}
 
 #ifdef REC2_HW
 // FUNCTION: CARMA2_HW 0x00470a90
@@ -3507,7 +3656,10 @@ int C2_HOOK_FASTCALL Generic_Outfunc(tFrontend_spec* pFrontend) {
     return 0;
 }
 
-// Generic_EventEffect
+inline void C2_HOOK_FASTCALL Generic_EventEffect(void) {
+
+    DRS3StartSound(gEffects_outlet, eSoundId_Done);
+}
 
 void C2_HOOK_FASTCALL Generic_LinkInEffect(void) {
 
@@ -3520,6 +3672,7 @@ void C2_HOOK_FASTCALL Generic_LinkOutEffect(void) {
 }
 
 // FUNCTION: CARMA2_HW 0x00471d30
+// FUNCTION: CARMA2_SW 0x00471290
 // FUNCTION: CARMA2_CHEAT 0x004720c0
 tConnected_items* C2_HOOK_FASTCALL GetScrollSet(int pItem) {
     tConnected_items* scrollset;
@@ -3560,6 +3713,7 @@ int C2_HOOK_FASTCALL ScrollSet_GetItem(tConnected_items* pScroll_set, int pIndex
     }
 }
 
+// FUNCTION: CARMA2_SW 0x004712d0
 inline tStruct_00686508* C2_HOOK_FASTCALL GetUpdown(int pItem) {
     tStruct_00686508* up_down;
 
@@ -3572,6 +3726,7 @@ inline tStruct_00686508* C2_HOOK_FASTCALL GetUpdown(int pItem) {
 }
 
 // FUNCTION: CARMA2_HW 0x00471d70
+// FUNCTION: CARMA2_SW 0x00471300
 // FUNCTION: CARMA2_CHEAT 0x00472100
 int C2_HOOK_FASTCALL ScrollSet_TranslateItemToIndex(tConnected_items* pConnected, int pItem) {
     int offset;
@@ -3671,7 +3826,111 @@ int C2_HOOK_FASTCALL Generic_FindNextActiveItem(tFrontend_spec* pFrontend, int p
     return 0;
 }
 
-// Generic_FindPrevActiveItem
+inline int C2_HOOK_FASTCALL Generic_FindPrevActiveItem(tFrontend_spec* pFrontend, int pItem) {
+    int original_selected_item_index;
+    tFrontend_slider* start_active_slider;
+    int start_item_group;
+    tStruct_00686508* start_up_down;
+    tConnected_items* connected;
+    tFrontend_slider* prev_active_slider;
+    tStruct_00686508* prev_up_down;
+    int prev_group;
+    int i;
+    int j;
+    int index;
+
+    original_selected_item_index = gFrontend_selected_item_index;
+    gFrontend_selected_item_index = pItem;
+    start_active_slider = GetAnyActiveSlider();
+    start_item_group = pFrontend->items[gFrontend_selected_item_index].group;
+    start_up_down = GetUpdown(pItem);
+    for (connected = gConnected_items; connected != NULL; connected = connected->next) {
+        for (i = 0; i < connected->count_ranges; i++) {
+            if (pItem == connected->range_starts[i]) {
+                break;
+            }
+        }
+        if (i < connected->count_ranges) {
+            break;
+        }
+    }
+    if (connected != NULL) {
+        index = ScrollSet_TranslateItemToIndex(connected, pItem);
+        if (index == connected->field_0x8 && connected->field_0x8 > 0) {
+            connected->field_0x8 -= 1;
+            RefreshScrollSet(pFrontend);
+            return pItem;
+        }
+    }
+    for (i = 1; i < pFrontend->count_items; i++) {
+        index = pItem - i;
+        if (index < 0) {
+            index += pFrontend->count_items;
+        }
+        if (pFrontend->items[index].enabled < kFrontendItemEnabled_enabled) {
+            continue;
+        }
+        if (!pFrontend->items[index].visible) {
+            continue;
+        }
+        gFrontend_selected_item_index = index;
+        prev_active_slider = GetAnyActiveSlider();
+        if (start_active_slider != NULL && prev_active_slider == start_active_slider) {
+            continue;
+        }
+        if (prev_active_slider != NULL && (prev_active_slider->flags & 0x1)) {
+            continue;
+        }
+        if (pFrontend->count_groups != 0 && start_item_group != 0) {
+            prev_group = pFrontend->items[index].group;
+            if (start_item_group == prev_group) {
+                continue;
+            }
+            if (prev_group != 0) {
+                j = index - 1;
+                if (j < 0) {
+                    j = pFrontend->count_items - 1;
+                }
+                while (pFrontend->items[j].group == prev_group) {
+                    index = j;
+                    j = index - 1;
+                    if (j < 0) {
+                        j = pFrontend->count_items - 1;
+                    }
+                }
+            }
+        } else if (pFrontend->count_groups != 0) {
+            prev_group = pFrontend->items[index].group;
+            if (prev_group != 0) {
+                j = index - 1;
+                if (j < 0) {
+                    j = pFrontend->count_items - 1;
+                }
+                while (pFrontend->items[j].group == prev_group) {
+                    index = j;
+                    j = index - 1;
+                    if (j < 0) {
+                        j = pFrontend->count_items - 1;
+                    }
+                }
+            }
+        }
+        if (connected != NULL && GetScrollSet(index) == connected) {
+            continue;
+        }
+        prev_up_down = GetUpdown(index);
+        if (start_up_down != NULL && start_up_down == prev_up_down) {
+            continue;
+        }
+        if (prev_up_down != NULL && prev_up_down->field_0x0 != index) {
+            continue;
+        }
+        gFrontend_selected_item_index = original_selected_item_index;
+        return index;
+    }
+    gFrontend_selected_item_index = original_selected_item_index;
+    return 0;
+}
 
 // Generic_MungeActiveItems
 
@@ -3681,11 +3940,310 @@ int C2_HOOK_FASTCALL Generic_FindNextActiveItem(tFrontend_spec* pFrontend, int p
 #pragma auto_inline(off)
 #endif
 
-// STUB: CARMA2_HW 0x00470c20
-// STUB: CARMA2_SW 0x004701b0
-// STUB: CARMA2_CHEAT 0x00470fb0
+// FUNCTION: CARMA2_HW 0x00470c20
+// FUNCTION: CARMA2_SW 0x004701b0
+// FUNCTION: CARMA2_CHEAT 0x00470fb0
 int C2_HOOK_FASTCALL Generic_MenuHandler(tFrontend_spec* pFrontend) {
-    NOT_IMPLEMENTED();
+    int timeout;
+    int original_item;
+    int selected_item;
+    int mouse_item;
+    int mouse_x;
+    int mouse_y;
+    int button_down;
+    int slider_dragged;
+    int key;
+    int value_changed;
+    int new_pos;
+    int pos;
+    int item;
+    int group;
+    int i;
+    int result;
+    int going_back;
+    br_model* model;
+    tFrontend_slider* slider;
+    tStruct_00686508* up_down;
+    tFrontend_spec* next_menu;
+
+#ifdef REC2_FIX_BUGS
+    mouse_item = -1;
+    slider_dragged = 0;
+    new_pos = 0;
+#endif
+
+    timeout = 0;
+    if (gTyping) {
+        key = ProcessInputString();
+        FuckWithWidths(pFrontend);
+        if (key < 0) {
+            NewGameToggleTyping(pFrontend);
+        }
+        FuckWithWidths(pFrontend);
+    } else {
+        if (pFrontend->timeout != 0 && PDGetTotalTime() >= gFrontend_time_last_input + pFrontend->timeout) {
+            timeout = 1;
+        }
+        if (!gFrontend_scrollbars_updated) {
+            gFrontend_scrollbars_updated = 1;
+            PrepareSliders(pFrontend);
+        }
+        original_item = gFrontend_selected_item_index;
+        button_down = 0;
+        gTyping_slot = -1;
+        EdgeTriggerModeOn();
+        KillSplashScreen();
+        PollKeys();
+        EdgeTriggerModeOff();
+        key = PDAnyKeyDown();
+        if (key != -1 && key != 4) {
+            gMouse_in_use = 0;
+            ResetInterfaceTimeout();
+        }
+        EdgeTriggerModeOn();
+        selected_item = gFrontend_selected_item_index;
+        if (gINT_00688444) {
+            GetMousePosition(&mouse_x, &mouse_y);
+            if (!EitherMouseButtonDown()) {
+                gINT_00688444 = 0;
+                if (gMouse_in_use) {
+                    ResetInterfaceTimeout();
+                    button_down = EitherMouseButtonDown();
+                    if (button_down != 0) {
+                        slider_dragged = 1;
+                    } else {
+                        slider_dragged = 0;
+                    }
+                    selected_item = 99;
+                    gFrontend_selected_item_index = Ians_GetItemAtMousePos(gCurrent_frontend_spec, mouse_x, mouse_y);
+                    if (gFrontend_selected_item_index == -1) {
+                        gFrontend_selected_item_index = 99;
+                    }
+                    mouse_item = GetItemAtMousePos(gCurrent_frontend_spec, mouse_x, mouse_y);
+                    if (mouse_item != -1) {
+                        selected_item = mouse_item;
+                    }
+                }
+            } else {
+                slider_dragged = 1;
+            }
+        } else if (gMouse_in_use) {
+            GetMousePosition(&mouse_x, &mouse_y);
+            button_down = EitherMouseButtonDown();
+            if (button_down != 0) {
+                ResetInterfaceTimeout();
+            }
+            if (original_item != mouse_x || original_item != mouse_y) {
+                ResetInterfaceTimeout();
+            }
+            if (button_down != 0) {
+                slider_dragged = 1;
+            } else {
+                slider_dragged = 0;
+            }
+            selected_item = 99;
+            gFrontend_selected_item_index = Ians_GetItemAtMousePos(gCurrent_frontend_spec, mouse_x, mouse_y);
+            if (gFrontend_selected_item_index == -1) {
+                gFrontend_selected_item_index = 99;
+            }
+            mouse_item = GetItemAtMousePos(gCurrent_frontend_spec, mouse_x, mouse_y);
+            if (mouse_item != -1) {
+                selected_item = mouse_item;
+            }
+        }
+        slider = GetActiveSlider();
+        if (slider != NULL) {
+            if (slider_dragged == 1) {
+                value_changed = 1;
+                new_pos = mouse_x - gCurrent_frontend_spec->items[slider->itemid_left_reference + 1].x;
+            } else if (PDKeyDown(70)) {
+                value_changed = 1;
+                new_pos = (int)(slider->width * slider->value - slider->width / 10);
+            } else if (PDKeyDown(71)) {
+                value_changed = 1;
+                new_pos = (int)(slider->width * slider->value + slider->width / 10);
+            } else {
+                value_changed = 0;
+            }
+            if (value_changed) {
+                gINT_00688444 = 1;
+                if (new_pos < 0) {
+                    new_pos = 0;
+                } else if (new_pos > slider->width) {
+                    new_pos = slider->width;
+                }
+                model = gFrontend_brender_items[slider->itemid_left_reference + 1].model;
+                pos = (int)(model->vertices[1].p.v[0] + (float)new_pos);
+                model->vertices[2].p.v[0] = model->vertices[3].p.v[0] = (float)pos;
+                BrModelUpdate(model, BR_MODU_VERTEX_POSITIONS);
+                model = gFrontend_brender_items[slider->itemid_left_reference + 2].model;
+                model->vertices[0].p.v[0] = model->vertices[1].p.v[0] = (float)pos;
+                model->vertices[2].p.v[0] = model->vertices[3].p.v[0] = (float)(pos + 8);
+                BrModelUpdate(model, BR_MODU_VERTEX_POSITIONS);
+                slider->value = (float)new_pos / (float)slider->width;
+                if (slider->callback != NULL) {
+                    slider->callback(slider);
+                }
+            }
+            selected_item = TranslateSliderItem(slider, gFrontend_selected_item_index);
+        }
+        gFrontend_selected_item_index = selected_item;
+
+        if (PDKeyDown(72) || PDKeyDown(89)) {
+            Generic_EventEffect();
+            gFrontend_selected_item_index = Generic_FindPrevActiveItem(gCurrent_frontend_spec, gFrontend_selected_item_index);
+            if (!gMouse_in_use
+                    && gFrontend_selected_item_index >= gCurrent_frontend_spec->scrollers[0].indexFirstScrollableItem
+                    && gFrontend_selected_item_index <= gCurrent_frontend_spec->scrollers[0].indexLastScrollableItem) {
+                ToggleSelection(pFrontend);
+                if (pFrontend->items[gFrontend_selected_item_index].action != NULL) {
+                    pFrontend->items[gFrontend_selected_item_index].action(pFrontend);
+                }
+            }
+            slider = GetActiveSlider();
+            if (slider != NULL) {
+                gFrontend_selected_item_index = TranslateSliderItem(slider, gFrontend_selected_item_index);
+            }
+        }
+        if (PDKeyDown(73) || PDKeyDown(83)) {
+            Generic_EventEffect();
+            if (gFrontend_selected_item_index >= pFrontend->count_items - 1) {
+                gFrontend_selected_item_index = -1;
+            }
+            gFrontend_selected_item_index = Generic_FindNextActiveItem(gCurrent_frontend_spec, gFrontend_selected_item_index);
+            if (!gMouse_in_use
+                    && gFrontend_selected_item_index >= gCurrent_frontend_spec->scrollers[0].indexFirstScrollableItem
+                    && gFrontend_selected_item_index <= gCurrent_frontend_spec->scrollers[0].indexLastScrollableItem) {
+                ToggleSelection(pFrontend);
+                if (pFrontend->items[gFrontend_selected_item_index].action != NULL) {
+                    pFrontend->items[gFrontend_selected_item_index].action(pFrontend);
+                }
+            }
+            slider = GetActiveSlider();
+            if (slider != NULL) {
+                gFrontend_selected_item_index = TranslateSliderItem(slider, gFrontend_selected_item_index);
+            }
+        } else if (PDKeyDown(70) || PDKeyDown(85)) {
+            up_down = GetUpdown(gFrontend_selected_item_index);
+            if (up_down != NULL && pFrontend->items[up_down->field_0x8].action != NULL) {
+                item = gFrontend_selected_item_index;
+                gFrontend_selected_item_index = up_down->field_0x8;
+                pFrontend->items[up_down->field_0x8].action(pFrontend);
+                gFrontend_selected_item_index = item;
+            }
+            group = pFrontend->items[gFrontend_selected_item_index].group;
+            if (group != 0) {
+                if (gFrontend_selected_item_index == pFrontend->radios[group - 1].indexFirstItem) {
+                    gFrontend_selected_item_index = pFrontend->radios[group - 1].indexLastItem;
+                } else {
+                    gFrontend_selected_item_index -= 1;
+                }
+            }
+        } else if (PDKeyDown(71) || PDKeyDown(87)) {
+            up_down = GetUpdown(gFrontend_selected_item_index);
+            if (up_down != NULL && pFrontend->items[up_down->field_0x4].action != NULL) {
+                item = gFrontend_selected_item_index;
+                gFrontend_selected_item_index = up_down->field_0x4;
+                pFrontend->items[up_down->field_0x4].action(pFrontend);
+                gFrontend_selected_item_index = item;
+            }
+            group = pFrontend->items[gFrontend_selected_item_index].group;
+            if (group != 0) {
+                if (gFrontend_selected_item_index == pFrontend->radios[group - 1].indexLastItem) {
+                    gFrontend_selected_item_index = pFrontend->radios[group - 1].indexFirstItem;
+                } else {
+                    gFrontend_selected_item_index += 1;
+                }
+            }
+        }
+
+        if (timeout || PDKeyDown(63)) {
+            if (pFrontend == &gFrontend_CONTROLS && Controls_Ok(pFrontend) == 4) {
+                return 0;
+            }
+            Generic_LinkOutEffect();
+            if (pFrontend->previous == NULL) {
+                return 1;
+            }
+            gCurrent_frontend_spec->default_item = gFrontend_selected_item_index;
+            FRONTEND_DestroyMenu(pFrontend);
+            gCurrent_frontend_spec = pFrontend->previous;
+            FRONTEND_CreateMenu(gCurrent_frontend_spec);
+            gFrontend_selected_item_index = gCurrent_frontend_spec->default_item;
+            for (i = 0; i < gCurrent_frontend_spec->count_scrollers; i++) {
+                gCurrent_frontend_spec->scrollers[i].indexTopItem = gCurrent_frontend_spec->scrollers[i].indexOfItemAtTop;
+            }
+            UpdateScrollPositions(gCurrent_frontend_spec);
+#ifdef REC2_HW
+            Morph_Initialise(pFrontend, gCurrent_frontend_spec);
+#endif
+            return 0;
+        } else if (PDKeyDown(51) || PDKeyDown(52) || (button_down == 1 && mouse_item != -1)) {
+            ToggleSelection(pFrontend);
+            if (pFrontend->items[gFrontend_selected_item_index].field_0xc == 1) {
+                gFrontend_leave_current_menu = 1;
+            }
+            next_menu = pFrontend->items[gFrontend_selected_item_index].menuInfo;
+            if (next_menu == (tFrontend_spec*)1) {
+                going_back = 1;
+                next_menu = pFrontend->previous;
+            } else {
+                going_back = 0;
+            }
+            if (pFrontend->items[gFrontend_selected_item_index].action == NULL) {
+                result = pFrontend->items[original_item].field_0xc;
+            } else {
+                if (next_menu == NULL && pFrontend->items[gFrontend_selected_item_index].action != temp) {
+                    Generic_EventEffect();
+                }
+                result = pFrontend->items[gFrontend_selected_item_index].action(pFrontend);
+            }
+            if (result == 4) {
+                return 0;
+            }
+            if (next_menu != NULL) {
+                if (going_back) {
+                    Generic_LinkOutEffect();
+                } else {
+                    Generic_LinkInEffect();
+                }
+                gCurrent_frontend_spec->default_item = gFrontend_selected_item_index;
+                for (i = 0; i < gCurrent_frontend_spec->count_scrollers; i++) {
+                    gCurrent_frontend_spec->scrollers[i].indexOfItemAtTop = gCurrent_frontend_spec->scrollers[i].indexTopItem;
+                }
+                FRONTEND_DestroyMenu(pFrontend);
+                gCurrent_frontend_spec = next_menu;
+                FRONTEND_CreateMenu(next_menu);
+                if (gCurrent_frontend_spec != pFrontend->previous) {
+                    gCurrent_frontend_spec->previous = pFrontend;
+                }
+#ifdef REC2_HW
+                Morph_Initialise(pFrontend, gCurrent_frontend_spec);
+#endif
+                if (gCurrent_frontend_spec == &gFrontend_QUIT) {
+                    gFrontend_selected_item_index = 0;
+                } else {
+                    gFrontend_selected_item_index = gCurrent_frontend_spec->default_item;
+                }
+                for (i = 0; i < gCurrent_frontend_spec->count_scrollers; i++) {
+                    gCurrent_frontend_spec->scrollers[i].indexTopItem = gCurrent_frontend_spec->scrollers[i].indexOfItemAtTop;
+                }
+                UpdateScrollPositions(gCurrent_frontend_spec);
+                return result;
+            }
+            if (going_back) {
+                return 1;
+            } else {
+                return result;
+            }
+        }
+    }
+    ServiceGame();
+    if (gFrontend_leave_current_menu) {
+        return 1;
+    } else {
+        return 0;
+    }
 }
 
 #ifdef REC2_MATCHING
