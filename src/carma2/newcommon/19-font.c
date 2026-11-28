@@ -106,6 +106,7 @@ tNet_game_options gFrontend_backup_net_options;
 
 // GLOBAL: CARMA2_HW 0x00686340
 // GLOBAL: CARMA2_SW 0x00680a80
+// GLOBAL: CARMA2_CHEAT 0x0068dbe8
 br_material* gPoly_font_materials[80];
 
 // GLOBAL: CARMA2_HW 0x0074cf10
@@ -910,6 +911,7 @@ void C2_HOOK_FASTCALL InitPolyFontMaterials(void) {
 
 // FUNCTION: CARMA2_HW 0x00465250
 // FUNCTION: CARMA2_SW 0x00464db0
+// FUNCTION: CARMA2_CHEAT 0x004656c0
 br_material* C2_HOOK_FASTCALL GetPolyFontMaterial(int pFont_index, char pChar) {
     tU8 uchar;
     br_material* material;
@@ -918,10 +920,12 @@ br_material* C2_HOOK_FASTCALL GetPolyFontMaterial(int pFont_index, char pChar) {
 
     // GLOBAL: CARMA2_HW 0x00686480
     // GLOBAL: CARMA2_SW 0x00680bc0
+    // GLOBAL: CARMA2_CHEAT 0x0068dd28
     static int poly_font_material_index;
 
     // GLOBAL: CARMA2_HW 0x00686498
     // GLOBAL: CARMA2_SW 0x00680bd8
+    // GLOBAL: CARMA2_CHEAT 0x0068dd40
     static tU16 poly_font_material_generation;
 
     C2_HOOK_BUG_ON(sizeof(tPolyFont) != 0x1c68);
