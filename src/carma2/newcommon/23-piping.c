@@ -1113,6 +1113,62 @@ void C2_HOOK_FASTCALL AddNapalmBoltToPipingSession(int pIndex, tPedestrian* pPed
         SIZE_OFFSET_PIPING(tPipe_chunk_napalm_bolt, positions), pPositions);
 }
 
+// FUNCTION: CARMA2_HW 0x004c7e90
+// FUNCTION: CARMA2_SW 0x004c45c0
+// FUNCTION: CARMA2_CHEAT 0x004cd9b0
+void C2_HOOK_FASTCALL AddPowerupRespawnToPipingSession(br_actor* pActor, int pPowerup_id) {
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk_powerup_respawn, index, 0x0);
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_chunk_powerup_respawn, index, 0x4);
+
+    ARAddVariedDataToSession(ePipe_chunk_powerup_respawn, (uintptr_t)pActor, 1,
+        SIZE_OFFSET_PIPING(tPipe_chunk_powerup_respawn, index), pPowerup_id);
+}
+
+// FUNCTION: CARMA2_HW 0x004c7eb0
+// FUNCTION: CARMA2_SW 0x004c45e0
+// FUNCTION: CARMA2_CHEAT 0x004cd9d0
+void C2_HOOK_FASTCALL AddShitMineToPipingSession(br_actor* pActor) {
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_chunk_shit_mine, m, 0x30);
+
+    ARAddVariedDataToSession(ePipe_chunk_shit_mine, (uintptr_t)pActor, 1,
+        SIZE_OFFSET_PIPING(tPipe_chunk_shit_mine, m), &pActor->t.t.mat);
+}
+
+// FUNCTION: CARMA2_HW 0x004c7ed0
+// FUNCTION: CARMA2_SW 0x004c4600
+// FUNCTION: CARMA2_CHEAT 0x004cd9f0
+void C2_HOOK_FASTCALL AddEndShitMineToPipingSession(br_actor* pActor) {
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_chunk_end_shit_mine, m, 0x30);
+
+    ARAddVariedDataToSession(ePipe_chunk_end_shit_mine, (uintptr_t)pActor, 1,
+        SIZE_OFFSET_PIPING(tPipe_chunk_end_shit_mine, m), &pActor->t.t.mat);
+}
+
+// FUNCTION: CARMA2_HW 0x004c7ef0
+// FUNCTION: CARMA2_SW 0x004c4620
+// FUNCTION: CARMA2_CHEAT 0x004cda10
+void C2_HOOK_FASTCALL AddTransformTypeToPipingSession(br_actor* pActor, tS16 pTransform_type) {
+    tU16 type_from = pActor->t.type;
+
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_single_transform_type, type_from, 0x1);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_single_transform_type, type_to, 0x1);
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_single_transform_type, type_to, 0x1);
+
+    ARAddVariedDataToSession(ePipe_chunk_transform_type, (uintptr_t)pActor, 2,
+        SIZE_OFFSET_PIPING(tPipe_single_transform_type, type_from), type_from,
+        SIZE_OFFSET_PIPING(tPipe_single_transform_type, type_to), (tU16)pTransform_type);
+}
+
+// FUNCTION: CARMA2_HW 0x004c7f20
+// FUNCTION: CARMA2_SW 0x004c4650
+// FUNCTION: CARMA2_CHEAT 0x004cda40
+void C2_HOOK_FASTCALL AddOppoRenderageToPipingSession(tOpponent_spec* pOpponent_spec, int pEnable) {
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_single_oppo_renderage, enable, 0x2);
+
+    ARAddVariedDataToSession(ePipe_chunk_oppo_renderage, (uintptr_t)pOpponent_spec, 1,
+        SIZE_OFFSET_PIPING(tPipe_single_oppo_renderage, enable), pEnable);
+}
+
 // PipeSingleCrush
 
 // FUNCTION: CARMA2_HW 0x004c8090

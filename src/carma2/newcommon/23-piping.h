@@ -207,6 +207,16 @@ extern void C2_HOOK_FASTCALL AddRepulseRayToPipingSession(int pIndex, br_vector3
 
 extern void C2_HOOK_FASTCALL AddNapalmBoltToPipingSession(int pIndex, tPedestrian* pPed, br_vector3* pPositions);
 
+extern void C2_HOOK_FASTCALL AddPowerupRespawnToPipingSession(br_actor* pActor, int pPowerup_id);
+
+extern void C2_HOOK_FASTCALL AddShitMineToPipingSession(br_actor* pActor);
+
+extern void C2_HOOK_FASTCALL AddEndShitMineToPipingSession(br_actor* pActor);
+
+extern void C2_HOOK_FASTCALL AddTransformTypeToPipingSession(br_actor* pActor, tS16 pTransform_type);
+
+extern void C2_HOOK_FASTCALL AddOppoRenderageToPipingSession(tOpponent_spec* pOpponent_spec, int pEnable);
+
 // PipeSingleCrush
 
 extern void C2_HOOK_FASTCALL PipeSingleScreenWobble(int pWobble_x, int pWobble_y);
