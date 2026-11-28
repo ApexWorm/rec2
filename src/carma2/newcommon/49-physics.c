@@ -1143,12 +1143,12 @@ tPhysics_object* C2_HOOK_FASTCALL SetUpTorqueHingePartners(br_vector3* pAngular,
     br_scalar factor;
     int i;
 
-    if (!(pObject->flags & 0x800)) {
+    if (pObject->flags & 0x800) {
+        BrVector3Set(pAngular, 0.0f, 0.0f, 0.0f);
+    } else {
         for (i = 0; i < 3; i++) {
             pAngular->v[i] = pTorque->v[i] / pObject->I.v[i];
         }
-    } else {
-        BrVector3Set(pAngular, 0.0f, 0.0f, 0.0f);
     }
     if (pObject->field_0x1e4 == NULL) {
         BrVector3SetFloat(pLinear, 0.0f, 0.0f, 0.0f);
