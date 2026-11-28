@@ -465,8 +465,6 @@ extern int C2_HOOK_FASTCALL NetOptions_Cancel(tFrontend_spec* pFrontend);
 
 extern void C2_HOOK_FASTCALL CheckPlayersAreResponding2(tU32 pDeadline);
 
-extern void C2_HOOK_FASTCALL CheckPlayersAreResponding(void);
-
 // MungePlayers
 
 extern int C2_HOOK_FASTCALL NetSynchRaceStart2(tNet_synch_mode pMode);

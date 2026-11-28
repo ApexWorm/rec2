@@ -11,6 +11,7 @@
 #include "rec2_macros.h"
 #include "rec2_types.h"
 
+#include "01-network.h"
 #include "04-netgame.h"
 #include "07-structur.h"
 #include "08-loading1.h"
@@ -25,11 +26,14 @@
 #include "42-input.h"
 #include "63-loading3.h"
 #include "69-sound.h"
+#include "70-packfile.h"
 #include "72-interface.h"
 
 #include "globvars.h"
 #include "globvrpb.h"
 #include "platform.h"
+
+#include <string.h>
 
 // GLOBAL: CARMA2_HW 0x006a0c74
 // GLOBAL: CARMA2_SW 0x0069accc
@@ -40,6 +44,11 @@ int gOur_starting_position;
 // GLOBAL: CARMA2_SW 0x0069ad90
 // GLOBAL: CARMA2_CHEAT 0x006a88b0
 tU32 gLast_host_query;
+
+// GLOBAL: CARMA2_HW 0x006a0c58
+// GLOBAL: CARMA2_SW 0x0069acb0
+// GLOBAL: CARMA2_CHEAT 0x006a87d0
+tU32 gNet_synch_start_racestrt;
 
 // GLOBAL: CARMA2_HW 0x006a0c5c
 // GLOBAL: CARMA2_SW 0x0069acb4
@@ -533,6 +542,63 @@ int C2_HOOK_FASTCALL SortOpponents(void) {
 
 // DoGridPosition
 
+// FUNCTION: CARMA2_HW 0x004e2c30
+// FUNCTION: CARMA2_SW 0x004defb0
+// FUNCTION: CARMA2_CHEAT 0x004e87c0
+void C2_HOOK_FASTCALL CheckPlayersAreResponding(void) {
+    int i;
+    tU32 time;
+    tNet_message* message;
+
+    time = PDGetTotalTime();
+    for (i = 0; i < gNumber_of_net_players; i++) {
+        if (i != gThis_net_player_index && time - gNet_players[i].last_heard_from_him > 20000) {
+            gNet_players[i].player_status = ePlayer_status_not_responding;
+        }
+    }
+    if (gNet_mode == eNet_mode_client && gLast_host_query == 0) {
+        message = NetBuildGuaranteedMessage(eNet_message_chunk_type_netsynch, 0);
+        NetGuaranteedSendMessageToHost(gCurrent_net_game, message, NULL);
+        gLast_host_query = time;
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x004e2cb0
+// FUNCTION: CARMA2_SW 0x004df030
+// FUNCTION: CARMA2_CHEAT 0x004e8840
+void C2_HOOK_FASTCALL NetSynchStartDraw(int pCurrent_choice, int pCurrent_mode) {
+    int i;
+    int number_ready;
+    char s[256];
+
+    number_ready = 0;
+    CheckPlayersAreResponding();
+    NetPlayerStatusChanged(ePlayer_status_ready);
+    for (i = 0; i < kMax_netplayers; i++) {
+        BrPixelmapRectangleFill(gBack_screen,
+            gCurrent_graf_data->field_0x3a4,
+            gCurrent_graf_data->field_0x3b8 * i + gCurrent_graf_data->field_0x3b4,
+            gCurrent_graf_data->field_0x3b0 - gCurrent_graf_data->field_0x3a8,
+            gFont_7->glyph_y,
+            0);
+    }
+    for (i = 0; i < gNumber_of_net_players; i++) {
+        strcpy(s, gNet_players[i].player_name);
+        if (gNet_players[i].host) {
+            strcat(s, " -");
+            strcat(s, GetMiscString(eMiscString_host));
+            strcat(s, "-");
+        }
+        if (gNet_players[i].player_status == ePlayer_status_ready) {
+            number_ready++;
+        }
+    }
+    if (gNet_mode == eNet_mode_host && number_ready == gNumber_of_net_players && gNumber_of_net_players > 1 && (!gNo_races_yet || gNumber_of_net_players == kMax_netplayers)) {
+        SignalToStartRace();
+        gStart_race_sent = 1;
+    }
+}
+
 // FUNCTION: CARMA2_HW 0x004e2ec0
 // FUNCTION: CARMA2_SW 0x004df240
 // FUNCTION: CARMA2_CHEAT 0x004e8a50
@@ -593,6 +659,181 @@ int C2_HOOK_FASTCALL ExitWhenReady(int* pCurrent_choice, int* pCurrent_mode) {
         return 1;
     }
     return 0;
+}
+
+inline tSO_result C2_HOOK_FASTCALL NetSynchRaceStart2_racestrt(tNet_synch_mode pMode) {
+    // GLOBAL: CARMA2_HW 0x0065f5b8
+    // GLOBAL: CARMA2_SW 0x00659f18
+    // GLOBAL: CARMA2_CHEAT 0x00666d68
+    static tFlicette flicker_on_hf[2] = {
+        { 321, { 219, 112 }, { 172, 362 } },
+        { 321, { 39, 480 }, { 172, 379 } },
+    };
+    // GLOBAL: CARMA2_HW 0x0065f5e0
+    // GLOBAL: CARMA2_SW 0x00659f40
+    // GLOBAL: CARMA2_CHEAT 0x00666d90
+    static tFlicette flicker_off_hf[2] = {
+        { 322, { 219, 112 }, { 172, 362 } },
+        { 322, { 39, 480 }, { 172, 379 } },
+    };
+    // GLOBAL: CARMA2_HW 0x0065f608
+    // GLOBAL: CARMA2_SW 0x00659f68
+    // GLOBAL: CARMA2_CHEAT 0x00666db8
+    static tFlicette push_hf[2] = {
+        { 206, { 219, 112 }, { 172, 362 } },
+        { 205, { 39, 480 }, { 172, 379 } },
+    };
+    // GLOBAL: CARMA2_HW 0x0065f630
+    // GLOBAL: CARMA2_SW 0x00659f90
+    // GLOBAL: CARMA2_CHEAT 0x00666de0
+    static tMouse_area mouse_areas_hf[2] = {
+        { { 219, 480 }, { 172, 379 }, { 282, 182 }, { 192, 427 }, 0, 0, 0, NULL },
+        { { 39, 112 }, { 172, 362 }, { 102, 182 }, { 192, 379 }, 1, 0, 0, NULL },
+    };
+    // GLOBAL: CARMA2_HW 0x0065f690
+    // GLOBAL: CARMA2_SW 0x00659ff0
+    // GLOBAL: CARMA2_CHEAT 0x00666e40
+    static tInterface_spec interface_spec_hf = {
+        0, 203, 0, 0, 0, 0, 8,
+        { -1, 0 }, { 1, 0 }, { 0, 0 }, { 1, 0 }, { NULL, NULL },
+        { -1, 0 }, { 1, 0 }, { 0, 0 }, { 1, 0 }, { NULL, NULL },
+        { -1, 0 }, { 1, 0 }, { 0, 0 }, { 1, 0 }, { NULL, NULL },
+        { -1, 0 }, { 1, 0 }, { 0, 0 }, { 1, 0 }, { NULL, NULL },
+        { 1, 1 }, { NetSynchStartGoAhead, NetSynchStartGoAhead }, { 1, 1 }, { NULL, NULL },
+        ExitWhenReady, NetSynchStartDraw, 0, NULL, CheckPlayersAreResponding, NetSynchStartDone, 0, { 0, 0 },
+        NULL, -1, 1, REC2_ASIZE(flicker_on_hf), flicker_on_hf, flicker_off_hf, push_hf,
+        REC2_ASIZE(mouse_areas_hf), mouse_areas_hf, 0, NULL
+    };
+    // GLOBAL: CARMA2_HW 0x0065f7c0
+    // GLOBAL: CARMA2_SW 0x0065a120
+    // GLOBAL: CARMA2_CHEAT 0x00666f70
+    static tFlicette flicker_on_hs[1] = {
+        { 321, { 219, 112 }, { 172, 362 } },
+    };
+    // GLOBAL: CARMA2_HW 0x0065f7d8
+    // GLOBAL: CARMA2_SW 0x0065a138
+    // GLOBAL: CARMA2_CHEAT 0x00666f88
+    static tFlicette flicker_off_hs[1] = {
+        { 322, { 219, 112 }, { 172, 362 } },
+    };
+    // GLOBAL: CARMA2_HW 0x0065f7f0
+    // GLOBAL: CARMA2_SW 0x0065a150
+    // GLOBAL: CARMA2_CHEAT 0x00666fa0
+    static tFlicette push_hs[1] = {
+        { 206, { 219, 112 }, { 172, 362 } },
+    };
+    // GLOBAL: CARMA2_HW 0x0065f808
+    // GLOBAL: CARMA2_SW 0x0065a168
+    // GLOBAL: CARMA2_CHEAT 0x00666fb8
+    static tMouse_area mouse_areas_hs[1] = {
+        { { 219, 480 }, { 172, 379 }, { 282, 182 }, { 192, 427 }, 0, 0, 0, NULL },
+    };
+    // GLOBAL: CARMA2_HW 0x0065f838
+    // GLOBAL: CARMA2_SW 0x0065a198
+    // GLOBAL: CARMA2_CHEAT 0x00666fe8
+    static tInterface_spec interface_spec_hs = {
+        0, 209, 0, 0, 0, 0, 8,
+        { -1, 0 }, { 1, 0 }, { 0, 0 }, { 1, 0 }, { NULL, NULL },
+        { -1, 0 }, { 1, 0 }, { 0, 0 }, { 1, 0 }, { NULL, NULL },
+        { -1, 0 }, { 1, 0 }, { 0, 0 }, { 1, 0 }, { NULL, NULL },
+        { -1, 0 }, { 1, 0 }, { 0, 0 }, { 1, 0 }, { NULL, NULL },
+        { 1, 1 }, { NetSynchStartGoAhead, NetSynchStartGoAhead }, { 1, 1 }, { NULL, NULL },
+        ExitWhenReady, NetSynchStartDraw, 0, NULL, CheckPlayersAreResponding, NetSynchStartDone, 0, { 0, 0 },
+        NULL, -1, 1, REC2_ASIZE(flicker_on_hs), flicker_on_hs, flicker_off_hs, push_hs,
+        REC2_ASIZE(mouse_areas_hs), mouse_areas_hs, 0, NULL
+    };
+    // GLOBAL: CARMA2_HW 0x0065f968
+    // GLOBAL: CARMA2_SW 0x0065a2c8
+    // GLOBAL: CARMA2_CHEAT 0x00667118
+    static tFlicette flicker_on_c[1] = {
+        { 321, { 219, 112 }, { 172, 362 } },
+    };
+    // GLOBAL: CARMA2_HW 0x0065f980
+    // GLOBAL: CARMA2_SW 0x0065a2e0
+    // GLOBAL: CARMA2_CHEAT 0x00667130
+    static tFlicette flicker_off_c[1] = {
+        { 322, { 219, 112 }, { 172, 362 } },
+    };
+    // GLOBAL: CARMA2_HW 0x0065f998
+    // GLOBAL: CARMA2_SW 0x0065a2f8
+    // GLOBAL: CARMA2_CHEAT 0x00667148
+    static tFlicette push_c[1] = {
+        { 207, { 219, 112 }, { 172, 362 } },
+    };
+    // GLOBAL: CARMA2_HW 0x0065f9b0
+    // GLOBAL: CARMA2_SW 0x0065a310
+    // GLOBAL: CARMA2_CHEAT 0x00667160
+    static tMouse_area mouse_areas_c[1] = {
+        { { 219, 112 }, { 172, 362 }, { 282, 182 }, { 192, 379 }, 0, 0, 0, NULL },
+    };
+    // GLOBAL: CARMA2_HW 0x0065f9e0
+    // GLOBAL: CARMA2_SW 0x0065a340
+    // GLOBAL: CARMA2_CHEAT 0x00667190
+    static tInterface_spec interface_spec_c = {
+        0, 204, 0, 0, 0, 0, 8,
+        { -1, 0 }, { 1, 0 }, { 0, 0 }, { 1, 0 }, { NULL, NULL },
+        { -1, 0 }, { 1, 0 }, { 0, 0 }, { 1, 0 }, { NULL, NULL },
+        { -1, 0 }, { 1, 0 }, { 0, 0 }, { 1, 0 }, { NULL, NULL },
+        { -1, 0 }, { 1, 0 }, { 0, 0 }, { 1, 0 }, { NULL, NULL },
+        { 1, 1 }, { NetSynchStartGoAhead, NetSynchStartGoAhead }, { 1, 1 }, { NULL, NULL },
+        ExitWhenReady, NetSynchStartDraw, 0, NULL, CheckPlayersAreResponding, NetSynchStartDone, 0, { 0, 0 },
+        NULL, -1, 1, REC2_ASIZE(flicker_on_c), flicker_on_c, flicker_off_c, push_c,
+        REC2_ASIZE(mouse_areas_c), mouse_areas_c, 0, NULL
+    };
+    int result;
+
+    if (pMode != eNet_synch_client) {
+        if (gCurrent_net_game->status.stage == eNet_game_stage0) {
+            gCurrent_net_game->status.stage = 1;
+        }
+        SetUpNetCarPositions();
+        gNet_synch_start_racestrt = PDGetTotalTime();
+    }
+    TurnOnPaletteConversion();
+    switch (pMode) {
+    case eNet_synch_host_first:
+        result = DoInterfaceScreen(&interface_spec_hf, 0, 1);
+        break;
+    case eNet_synch_host_subsequent:
+        result = DoInterfaceScreen(&interface_spec_hs, 0, -1);
+        break;
+    case eNet_synch_client:
+        result = DoInterfaceScreen(&interface_spec_c, 0, -1);
+        break;
+#ifdef REC2_FIX_BUGS
+    default:
+        result = 1;
+        break;
+#endif
+    }
+    TurnOffPaletteConversion();
+    FadePaletteDown();
+    switch (result) {
+    case -1:
+    case 0:
+        NetLeaveGame(gCurrent_net_game);
+        return eSO_continue;
+    case 1:
+        return eSO_continue;
+    }
+    return eSO_continue;
+}
+
+// FUNCTION: CARMA2_HW 0x004e2fb0
+// FUNCTION: CARMA2_SW 0x004df330
+// FUNCTION: CARMA2_CHEAT 0x004e8b30
+tSO_result C2_HOOK_FASTCALL NetSynchRaceStart(void) {
+
+    SuspendPendingFlic();
+    if (gNet_mode == eNet_mode_host) {
+        if (gNo_races_yet) {
+            return NetSynchRaceStart2_racestrt(eNet_synch_host_first);
+        } else {
+            return NetSynchRaceStart2_racestrt(eNet_synch_host_subsequent);
+        }
+    } else {
+        return NetSynchRaceStart2_racestrt(eNet_synch_client);
+    }
 }
 
 // ReceivedViewCar

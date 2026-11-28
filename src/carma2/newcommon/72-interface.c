@@ -4334,14 +4334,6 @@ void C2_HOOK_FASTCALL CheckPlayersAreResponding2(tU32 pDeadline) {
     }
 }
 
-// FUNCTION: CARMA2_HW 0x004e2c30
-// FUNCTION: CARMA2_SW 0x004defb0
-// FUNCTION: CARMA2_CHEAT 0x004e87c0
-void C2_HOOK_FASTCALL CheckPlayersAreResponding(void) {
-
-    CheckPlayersAreResponding2(20000);
-}
-
 // MungePlayers
 
 // FUNCTION: CARMA2_HW 0x00473570
