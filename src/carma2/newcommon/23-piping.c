@@ -1155,7 +1155,86 @@ void C2_HOOK_FASTCALL AddExtendedSplashToPipingSession(tPhysics_object* pObject,
 
 // AddCarToPipingSession
 
+// FUNCTION: CARMA2_HW 0x004c72f0
+// FUNCTION: CARMA2_SW 0x004c3a20
+// FUNCTION: CARMA2_CHEAT 0x004cce10
+void C2_HOOK_FASTCALL AddGraphicalWheelStuffToPipingSession(tCar_spec* pCar) {
+
+    ARAddVariedDataToSession(ePipe_chunk_graphical_wheel_stuff, (tU16)pCar->car_ID, 5,
+        SIZE_OFFSET_PIPING(tPipe_single_graphical_wheel_stuff, steering_angle), (int)(pCar->steering_angle * (32767.0 / 60.0)),
+        SIZE_OFFSET_PIPING(tPipe_single_graphical_wheel_stuff, lf_sus_position), (int)(pCar->lf_sus_position * 127.f * (20.0 / 3.0)),
+        SIZE_OFFSET_PIPING(tPipe_single_graphical_wheel_stuff, rf_sus_position), (int)(pCar->rf_sus_position * 127.f * (20.0 / 3.0)),
+        SIZE_OFFSET_PIPING(tPipe_single_graphical_wheel_stuff, lr_sus_position), (int)(pCar->lr_sus_position * 127.f * (20.0 / 3.0)),
+        SIZE_OFFSET_PIPING(tPipe_single_graphical_wheel_stuff, rr_sus_position), (int)(pCar->rr_sus_position * 127.f * (20.0 / 3.0)));
+}
+
+// FUNCTION: CARMA2_HW 0x004c73a0
+// FUNCTION: CARMA2_SW 0x004c3ad0
+// FUNCTION: CARMA2_CHEAT 0x004ccec0
+void C2_HOOK_FASTCALL AddSoundToPipingSession(tS3_outlet* pOutlet, int pSound, tS3_volume pL_volume, tS3_volume pR_volume, int pPitch, const br_vector3* pPosition) {
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_shunk_single_sound, pitch, 0x4);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_shunk_single_sound, position, 0x4);
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_shunk_single_sound, position, 0xc);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_shunk_single_sound, outlet, 0x10);
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_shunk_single_sound, outlet, 0x2);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_shunk_single_sound, volume, 0x12);
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_shunk_single_sound, volume, 0x2);
+
+    if (!gAction_replay_mode && gProgram_state.racing) {
+        if (pPosition == NULL) {
+            pPosition = &gZero_vector__smash;
+        }
+        ARAddVariedDataToSession(ePipe_chunk_sound, pSound, 4,
+            SIZE_OFFSET_PIPING(tPipe_shunk_single_sound, pitch), pPitch,
+            SIZE_OFFSET_PIPING(tPipe_shunk_single_sound, position), pPosition,
+            SIZE_OFFSET_PIPING(tPipe_shunk_single_sound, outlet), GetIndexFromOutlet(pOutlet),
+            SIZE_OFFSET_PIPING(tPipe_shunk_single_sound, volume), (pR_volume << 8) + pL_volume);
+    }
+}
+
 // AddDamageToPipingSession
+
+// FUNCTION: CARMA2_HW 0x004c7430
+// FUNCTION: CARMA2_SW 0x004c3b60
+// FUNCTION: CARMA2_CHEAT 0x004ccf50
+void C2_HOOK_FASTCALL AddSpecialToPipingSession(tPipe_special_action pType) {
+    ARAddVariedDataToSession(ePipe_chunk_special, pType, 0);
+}
+
+// FUNCTION: CARMA2_HW 0x004c7440
+// FUNCTION: CARMA2_SW 0x004c3b70
+// FUNCTION: CARMA2_CHEAT 0x004ccf60
+void C2_HOOK_FASTCALL AddCarIncidentToPipingSession(tCar_spec* pCar, br_vector3* pPosition, float pForce) {
+
+    gFloat_pipe_union.f = pForce;
+    ARAddVariedDataToSession(ePipe_chunk_ped_incident, 1, 3,
+        SIZE_OFFSET_PIPING(tPipe_chunk_car_incident, force), gFloat_pipe_union.u32,
+        SIZE_OFFSET_PIPING(tPipe_chunk_car_incident, car_ID), (tU16)pCar->car_ID,
+        SIZE_OFFSET_PIPING(tPipe_chunk_car_incident, position), pPosition);
+}
+
+// FUNCTION: CARMA2_HW 0x004c7480
+// FUNCTION: CARMA2_SW 0x004c3bb0
+// FUNCTION: CARMA2_CHEAT 0x004ccfa0
+void C2_HOOK_FASTCALL AddPedIncidentToPipingSession(tPedestrian* pPed, br_actor* pActor) {
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_ped_incident, field_0x0, 0x4);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_ped_incident, ped, 0x4);
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_ped_incident, ped, 0x4);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_ped_incident, actor, 0x8);
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_ped_incident, actor, 0x4);
+
+    gFloat_pipe_union.f = 0.f;
+    ARAddVariedDataToSession(ePipe_chunk_ped_incident, 0, 3,
+        SIZE_OFFSET_PIPING(tPipe_ped_incident, field_0x0), gFloat_pipe_union.u32,
+        SIZE_OFFSET_PIPING(tPipe_ped_incident, ped), pPed,
+        SIZE_OFFSET_PIPING(tPipe_ped_incident, actor), pActor);
+}
+
+// FUNCTION: CARMA2_HW 0x004c74b0
+// FUNCTION: CARMA2_SW 0x004c3be0
+// FUNCTION: CARMA2_CHEAT 0x004ccfd0
+void C2_HOOK_FASTCALL AddWallIncidentToPipingSession(float pSeverity, br_vector3* pImpact_point) {
+}
 
 // FUNCTION: CARMA2_HW 0x004c74c0
 // FUNCTION: CARMA2_SW 0x004c3bf0
@@ -1171,6 +1250,19 @@ void C2_HOOK_FASTCALL AddProxRayToPipingSession(int pRay_index, tCar_spec* pCar,
         SIZE_OFFSET_PIPING(tPipe_chunk_prox_ray, ped_index), pPed_index,
         SIZE_OFFSET_PIPING(tPipe_chunk_prox_ray, car_ID), (tU16)pCar->car_ID,
         SIZE_OFFSET_PIPING(tPipe_chunk_prox_ray, time), pTime);
+}
+
+// FUNCTION: CARMA2_HW 0x004c7500
+// FUNCTION: CARMA2_SW 0x004c3c30
+// FUNCTION: CARMA2_CHEAT 0x004cd020
+void C2_HOOK_FASTCALL AddSkidAdjustmentToPipingSession(int pSkid_num, br_matrix34* pMatrix, br_material* pMaterial) {
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_chunk_skid_adjustment, matrix, 0x30);
+    C2_HOOK_STATIC_ASSERT_STRUCT_OFFSET(tPipe_chunk_skid_adjustment, material, 0x30);
+    C2_HOOK_STATIC_ASSERT_STRUCT_MEMBER_SIZE(tPipe_chunk_skid_adjustment, material, 0x4);
+
+    ARAddVariedDataToSession(ePipe_chunk_skid_adjustment, pSkid_num, 2,
+        SIZE_OFFSET_PIPING(tPipe_chunk_skid_adjustment, matrix), pMatrix,
+        SIZE_OFFSET_PIPING(tPipe_chunk_skid_adjustment, material), pMaterial);
 }
 
 // FUNCTION: CARMA2_HW 0x004c7520

@@ -195,9 +195,23 @@ extern void C2_HOOK_FASTCALL AddExtendedSplashToPipingSession(tPhysics_object* p
 
 extern void C2_HOOK_FASTCALL AddCarToPipingSession(int pCar_ID, br_matrix34* pCar_mat, br_vector3* pCar_velocity, float pSpeedo_speed, float pRevs, int pGear, int pFrame_coll_flag, int pField_0x18cc);
 
+extern void C2_HOOK_FASTCALL AddGraphicalWheelStuffToPipingSession(tCar_spec* pCar);
+
+extern void C2_HOOK_FASTCALL AddSoundToPipingSession(tS3_outlet* pOutlet, int pSound, tS3_volume pL_volume, tS3_volume pR_volume, int pPitch, const br_vector3* pPosition);
+
 extern void C2_HOOK_FASTCALL AddDamageToPipingSession(int pCar_ID, tS8* pDamage_deltas);
 
+extern void C2_HOOK_FASTCALL AddSpecialToPipingSession(tPipe_special_action pType);
+
+extern void C2_HOOK_FASTCALL AddCarIncidentToPipingSession(tCar_spec* pCar, br_vector3* pPosition, float pForce);
+
+extern void C2_HOOK_FASTCALL AddPedIncidentToPipingSession(tPedestrian* pPed, br_actor* pActor);
+
+extern void C2_HOOK_FASTCALL AddWallIncidentToPipingSession(float pSeverity, br_vector3* pImpact_point);
+
 extern void C2_HOOK_FASTCALL AddProxRayToPipingSession(int pRay_index, tCar_spec* pCar, tU16 pPed_index, tU32 pTime);
+
+extern void C2_HOOK_FASTCALL AddSkidAdjustmentToPipingSession(int pSkid_num, br_matrix34* pMatrix, br_material* pMaterial);
 
 extern void C2_HOOK_FASTCALL AddFlapToPipingSession(br_actor* pActor, br_angle pAngle);
 
