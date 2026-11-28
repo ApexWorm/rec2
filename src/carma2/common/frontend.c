@@ -1002,6 +1002,8 @@ int C2_HOOK_FASTCALL FRONTEND_Main(tFrontendMenuType pFrontendType) {
 }
 
 // FUNCTION: CARMA2_HW 0x004708a0
+// FUNCTION: CARMA2_SW 0x0046ff50
+// FUNCTION: CARMA2_CHEAT 0x00470c30
 void C2_HOOK_FASTCALL PrintAPO(int pX, int pY, int pIndex, int pTex_index) {
     br_model *model;
 
