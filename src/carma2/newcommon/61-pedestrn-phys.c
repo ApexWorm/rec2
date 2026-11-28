@@ -215,10 +215,12 @@ inline void C2_HOOK_FASTCALL ResetPedFaceCache(void) {
 
 inline void C2_HOOK_FASTCALL SetPedCurrentFace(tPedestrian* pPed, br_vector3* pPos) {
     tPed_face_cache_0x34* face_cache;
+    br_matrix34* mat;
 
     if (pPed->field_0x0c != NULL) {
         face_cache = pPed->field_0x0c->field_0xb0;
-        face_cache->field_0x30 = CastRayDownThruFaces((br_vector3*)GetCharacterMatrixPtr(pPed->character)->m[3], face_cache->field_0x0, face_cache->field_0x4,
+        mat = GetCharacterMatrixPtr(pPed->character);
+        face_cache->field_0x30 = CastRayDownThruFaces((br_vector3*)mat->m[3], face_cache->field_0x0, face_cache->field_0x4,
             GetClearanceFromCharacterInstance(pPed->character, 0), pPos);
     }
 }
