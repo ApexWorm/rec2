@@ -236,9 +236,9 @@ extern int C2_HOOK_FASTCALL FindNearestNodeDrone(const br_vector3* pPosition, br
 
 extern int C2_HOOK_FASTCALL FUN_004538a0(int pReport);
 
-// FUN_00453940
+extern void C2_HOOK_FASTCALL FUN_00453940(void);
 
-// FUN_00453ab0
+extern int C2_HOOK_FASTCALL FUN_00453ab0(void);
 
 // FUN_00453b80
 

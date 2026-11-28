@@ -969,9 +969,66 @@ int C2_HOOK_FASTCALL FUN_004538a0(int pReport) {
     return 0;
 }
 
-// FUN_00453940
+// FUNCTION: CARMA2_HW 0x00453940
+// FUNCTION: CARMA2_SW 0x004536d0
+// FUNCTION: CARMA2_CHEAT 0x00453ea0
+void C2_HOOK_FASTCALL FUN_00453940(void) {
+    int i;
+    int node;
+    tDrone_path_node* path_node;
 
-// FUN_00453ab0
+    if (!gShow_drone_paths) {
+        NewTextHeadupSlot(4, 0, 3000, -1, "You must show Drone Paths first");
+    } else if (gDrone_paths_elasticating) {
+        NewTextHeadupSlot(4, 0, 3000, -1, "Stop elasticating first");
+    } else if (FUN_00453ab0()) {
+        path_node = &gDrone_path_nodes[gCount_drone_path_nodes];
+        node = gCount_drone_path_nodes++;
+        BrVector3Copy(&path_node->position, &gProgram_state.current_car.car_master_actor->t.t.translate.t);
+        for (i = 0; i < REC2_ASIZE(path_node->sections); i++) {
+            path_node->sections[i].node1 = -1;
+        }
+        path_node->field_0x12e = 0;
+        path_node->count_sections = 0;
+        path_node->type = -1;
+        InitialiseEditModelsEtc();
+        if (gDrone_path_model_actor != NULL && gElasticatey_drone_path_model != NULL) {
+            gDrone_paths_elasticating = 1;
+            gDrone_path_model_actor->render_style = BR_RSTYLE_FACES;
+            gSelected_drone_path_node_index = node;
+            MakeAISimpleEditSectionHere(gElasticatey_drone_path_model, 0, 0,
+                &gDrone_path_nodes[node].position,
+                &gProgram_state.current_car.car_master_actor->t.t.translate.t,
+                gMat_dk_grn, gMat_lt_grn);
+            BrModelUpdate(gElasticatey_drone_path_model, BR_MODU_ALL);
+        }
+        sprintf(gDrone_edit_message, "Shat out drone path node #%d", node);
+        NewTextHeadupSlot(4, 0, 2000, -1, gDrone_edit_message);
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x00453ab0
+// FUNCTION: CARMA2_SW 0x00453840
+// FUNCTION: CARMA2_CHEAT 0x00454010
+int C2_HOOK_FASTCALL FUN_00453ab0(void) {
+    int i;
+    br_vector3 pos;
+    br_vector3 v;
+
+    if (gCount_drone_path_nodes >= 200) {
+        NewTextHeadupSlot(4, 0, 3000, -1, "Out of spare nodes. Sorry.");
+        return 0;
+    }
+    BrVector3Copy(&pos, &gProgram_state.current_car.car_master_actor->t.t.translate.t);
+    for (i = 0; i < gCount_drone_path_nodes; i++) {
+        BrVector3Sub(&v, &pos, &gDrone_path_nodes[i].position);
+        if (BrVector3LengthSquared(&v) < 0.5f) {
+            NewTextHeadupSlot(4, 0, 3000, -1, "Too close. Move a bit.");
+            return 0;
+        }
+    }
+    return 1;
+}
 
 // FUN_00453b80
 
