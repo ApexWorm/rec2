@@ -4645,7 +4645,9 @@ typedef struct tPhysics_object {
     tPhysics_joint* physics_joint1;
     tPhysics_joint* physics_joint2;
     tU8 uid;
-    undefined field_0x191[11];
+    undefined field_0x191[3];
+    int (C2_HOOK_FASTCALL * field_0x194)(tPhysics_object*);
+    int (C2_HOOK_FASTCALL * field_0x198)(tPhysics_object*);
     int flags;
     int field_0x1a0;
     undefined4 field_0x1a4;

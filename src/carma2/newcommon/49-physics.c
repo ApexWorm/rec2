@@ -695,7 +695,45 @@ inline void C2_HOOK_FASTCALL ApplyJointForces(tPhysics_joint_force** pForces, br
 
 // SkipForces
 
-// ScaleUpObjectMI
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// FUNCTION: CARMA2_HW 0x004bc8e0
+// FUNCTION: CARMA2_SW 0x004b9000
+// FUNCTION: CARMA2_CHEAT 0x004c2410
+void C2_HOOK_FASTCALL ScaleUpObjectMI(tPhysics_object* pObject, br_scalar pFactor) {
+    tPhysics_joint_force* force_list[40];
+    tPhysics_object* partner;
+    tPhysics_object* object;
+    tPhysics_workspace* workspace;
+    int i;
+
+    BrVector3Scale(&pObject->I, &pObject->I, pFactor);
+    pObject->field_0x21c *= pFactor;
+    if (pObject->field_0x1e4 != NULL) {
+        partner = pObject->field_0x1e4->partner;
+        BrVector3Scale(&partner->I, &partner->I, pFactor);
+        partner->field_0x21c *= pFactor;
+        RedoQuickHingeVelocities(pObject);
+    }
+    object = pObject;
+    while (object->field_0x218 == NULL && object->parent != NULL) {
+        object = object->parent;
+    }
+    workspace = object->field_0x218;
+    if (workspace != NULL) {
+        for (i = 0; i < workspace->count; i++) {
+            force_list[i] = &workspace->forces[i];
+        }
+        MakeMatrix(workspace->field_0x18, workspace->count, force_list, workspace->count);
+        MatrixProcess(workspace->field_0x18, workspace->field_0x14, workspace->count);
+    }
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // CheckForTwang
 
@@ -1167,11 +1205,59 @@ int C2_HOOK_FASTCALL GetJointLimits(tPhysics_object* pObject, tPhysics_joint_for
     return pCount;
 }
 
-// GetListJointLimits
+// FUNCTION: CARMA2_HW 0x004bd6d0
+// FUNCTION: CARMA2_SW 0x004b9df0
+// FUNCTION: CARMA2_CHEAT 0x004c3200
+int C2_HOOK_FASTCALL GetListJointLimits(tPhysics_object* pObject, tPhysics_joint_force* pForces, int pCount, int pMax_count) {
+
+    for (; pObject != NULL; pObject = pObject->next) {
+        pCount = GetJointLimits(pObject, pForces, pCount, pMax_count);
+        if (pObject->child != NULL) {
+            pCount = GetListJointLimits(pObject->child, pForces, pCount, pMax_count);
+        }
+    }
+    return pCount;
+}
 
 // GetGroupJointLimits
 
-// LimitOmega
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// FUNCTION: CARMA2_HW 0x004bd720
+// FUNCTION: CARMA2_SW 0x004b9e40
+// FUNCTION: CARMA2_CHEAT 0x004c3250
+int C2_HOOK_FASTCALL LimitOmega(tPhysics_object* pObject) {
+    br_scalar ts;
+    br_scalar scale;
+    tPhysics_object* partner;
+
+    ts = BrVector3LengthSquared(&pObject->omega) * REC2_SQR(0.04f);
+    if (ts > (br_scalar)REC2_SQR(1.57)) {
+        ts = (br_scalar)sqrt(ts) * (2.0f / 1.57f);
+        scale = 2.0f * ts;
+        pObject->omega.v[0] /= scale;
+        pObject->omega.v[1] /= scale;
+        pObject->omega.v[2] /= scale;
+        if (pObject->field_0x1e4 != NULL) {
+            partner = pObject->field_0x1e4->partner;
+            partner->omega.v[0] /= scale;
+            partner->omega.v[1] /= scale;
+            partner->omega.v[2] /= scale;
+        }
+        ScaleUpObjectMI(pObject, ts * ts);
+        if (pObject->field_0x198 != NULL) {
+            pObject->field_0x198(pObject);
+        }
+        return 1;
+    }
+    return 0;
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // FUNCTION: CARMA2_HW 0x004c1840
 // FUNCTION: CARMA2_SW 0x004bdf70
@@ -1185,7 +1271,21 @@ void C2_HOOK_FASTCALL CapOmega(tPhysics_object* pObject) {
     }
 }
 
-// ListLimitOmega
+// FUNCTION: CARMA2_HW 0x004bd7f0
+// FUNCTION: CARMA2_SW 0x004b9f10
+// FUNCTION: CARMA2_CHEAT 0x004c3320
+int C2_HOOK_FASTCALL ListLimitOmega(tPhysics_object* pObject) {
+    int count;
+
+    count = 0;
+    for (; pObject != NULL; pObject = pObject->next) {
+        count += LimitOmega(pObject);
+        if (pObject->child != NULL) {
+            count += ListLimitOmega(pObject->child);
+        }
+    }
+    return count;
+}
 
 // GroupLimitOmega
 
@@ -2466,11 +2566,19 @@ void C2_HOOK_FASTCALL RQMatrixSolveWithNegatives(br_scalar* pR, br_scalar* pQ, b
 #pragma auto_inline(on)
 #endif
 
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
 // FUNCTION: CARMA2_HW 0x004c5b50
 // FUNCTION: CARMA2_SW 0x004c2280
 int C2_HOOK_FASTCALL MatrixProcess(br_scalar* pR, br_scalar* pQ, int pDim) {
     return RQDcmpV(pR, pDim, pQ);
 }
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // FUNCTION: CARMA2_HW 0x004c5b60
 void C2_HOOK_FASTCALL RqBackSub(const br_scalar* pR, const br_scalar* pQ, const br_scalar* pRhs, br_scalar* pX, int pDim) {

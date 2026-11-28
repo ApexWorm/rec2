@@ -134,7 +134,7 @@ extern void C2_HOOK_FASTCALL ApplyJointForces(tPhysics_joint_force** pForces, br
 
 // SkipForces
 
-// ScaleUpObjectMI
+extern void C2_HOOK_FASTCALL ScaleUpObjectMI(tPhysics_object* pObject, br_scalar pFactor);
 
 // CheckForTwang
 
@@ -154,15 +154,15 @@ extern tPhysics_object* C2_HOOK_FASTCALL GetObjectsParent(tPhysics_object* pObje
 
 extern int C2_HOOK_FASTCALL GetJointLimits(tPhysics_object* pObject, tPhysics_joint_force* pForces, int pCount, int pMax_count);
 
-// GetListJointLimits
+extern int C2_HOOK_FASTCALL GetListJointLimits(tPhysics_object* pObject, tPhysics_joint_force* pForces, int pCount, int pMax_count);
 
 // GetGroupJointLimits
 
-// LimitOmega
+extern int C2_HOOK_FASTCALL LimitOmega(tPhysics_object* pObject);
 
 extern void C2_HOOK_FASTCALL CapOmega(tPhysics_object* pObject);
 
-// ListLimitOmega
+extern int C2_HOOK_FASTCALL ListLimitOmega(tPhysics_object* pObject);
 
 // GroupLimitOmega
 
