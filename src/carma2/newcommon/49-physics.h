@@ -234,19 +234,19 @@ extern void C2_HOOK_FASTCALL MakeObjectDoSomething(tPhysics_object* pObject, tPh
 
 // GetReducedList
 
-// ReduceReducedList
+extern tPhysics_object** C2_HOOK_FASTCALL ReduceReducedList(tPhysics_object* pObject, tPhysics_object** pList);
 
 extern void C2_HOOK_FASTCALL SetObjectTrialPositionType(tPhysics_object* pObject, int pType);
 
-// FillInTrialWorkspace
+extern void C2_HOOK_FASTCALL FillInTrialWorkspace(tPhysics_object* pObject, tPhysics_object* pOther, tWorld_callbacks* pCallbacks);
 
 extern int C2_HOOK_FASTCALL FlagsAreGo(tPhysics_object* pCollision_1, tPhysics_object* pCollision_2);
 
-// CollideObjectWithReducedObjectList
+extern int C2_HOOK_FASTCALL CollideObjectWithReducedObjectList(tPhysics_object* pObject, tPhysics_object* pList, tPhysics_joint_force* pForces, int pCount, tPhysics_object* pDo_something_list, tWorld_callbacks* pCallbacks);
 
 extern void C2_HOOK_FASTCALL AddObjectToReducedList(tPhysics_object* pObject, tPhysics_object** pList);
 
-// ReducedFindObjectCollisions
+extern int C2_HOOK_FASTCALL ReducedFindObjectCollisions(tPhysics_object* pObject, tPhysics_object** pList, tPhysics_joint_force* pForces, int pCount, tWorld_callbacks* pCallbacks, tPhysics_object* pDo_something_list);
 
 // FindObjectCollisions
 

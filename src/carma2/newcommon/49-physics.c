@@ -2288,7 +2288,25 @@ void C2_HOOK_FASTCALL MakeObjectDoSomething(tPhysics_object* pObject, tPhysics_o
 
 // GetReducedList
 
-// ReduceReducedList
+inline tPhysics_object** C2_HOOK_FASTCALL ReduceReducedList(tPhysics_object* pObject, tPhysics_object** pList) {
+    tPhysics_object* reduced;
+    tPhysics_object** reduced_end;
+    tPhysics_object* current;
+
+    reduced_end = &reduced;
+    for (current = *pList; current != NULL; current = *pList) {
+        if (current == pObject || BoundsOverlapTest(&pObject->field_0x10c, &current->field_0x10c)) {
+            *pList = current->field_0x234;
+            *reduced_end = current;
+            reduced_end = &current->field_0x234;
+        } else {
+            pList = &current->field_0x234;
+        }
+    }
+    *reduced_end = NULL;
+    *pList = reduced;
+    return pList;
+}
 
 // FUNCTION: CARMA2_HW 0x004bd9b0
 // FUNCTION: CARMA2_SW 0x004ba0d0
@@ -2302,7 +2320,19 @@ void C2_HOOK_FASTCALL SetObjectTrialPositionType(tPhysics_object* pObject, int p
     }
 }
 
-// FillInTrialWorkspace
+inline void C2_HOOK_FASTCALL FillInTrialWorkspace(tPhysics_object* pObject, tPhysics_object* pOther, tWorld_callbacks* pCallbacks) {
+
+    while (pObject->parent != NULL && pObject->physics_joint1 != NULL && pObject->physics_joint1->type != eJoint_none) {
+        pObject = pObject->parent;
+    }
+    SetObjectTrialPositionType(pObject, 0);
+    if (pCallbacks != NULL && pCallbacks->activate_passive != NULL) {
+        pCallbacks->activate_passive(pObject, pOther);
+    }
+    if ((pObject->child != NULL || pObject->physics_joint2 != NULL) && pObject->field_0x218 == 0) {
+        MoveJointedObject(pObject, 0.0f);
+    }
+}
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
@@ -2325,7 +2355,32 @@ int C2_HOOK_FASTCALL FlagsAreGo(tPhysics_object* pCollision_1, tPhysics_object* 
 #pragma auto_inline(on)
 #endif
 
-// CollideObjectWithReducedObjectList
+inline int C2_HOOK_FASTCALL CollideObjectWithReducedObjectList(tPhysics_object* pObject, tPhysics_object* pList, tPhysics_joint_force* pForces, int pCount, tPhysics_object* pDo_something_list, tWorld_callbacks* pCallbacks) {
+    int count;
+
+    for (; pList != NULL; pList = pList->field_0x234) {
+        if (pList != pObject
+            && (pObject->field_0x1dc == 0 || pList->field_0x1dc != pObject->field_0x1dc || pObject < pList)
+            && pObject->parent != pList && pList->parent != pObject
+            && FlagsAreGo(pObject, pList)) {
+            count = GetObjectObjectForceInfo(pObject, pList, pForces, pCount);
+            if (count != 0) {
+                if (pObject->field_0xf0 == 2) {
+                    FillInTrialWorkspace(pObject, pList, pCallbacks);
+                }
+                if (pList->field_0xf0 == 2) {
+                    FillInTrialWorkspace(pList, pObject, pCallbacks);
+                }
+                if (pList->disable_move_rotate != 0) {
+                    MakeObjectDoSomething(pList, pDo_something_list);
+                }
+                GroupTogether(pObject, pList);
+                pCount += count;
+            }
+        }
+    }
+    return pCount;
+}
 
 inline void C2_HOOK_FASTCALL AddObjectToReducedList(tPhysics_object* pObject, tPhysics_object** pList) {
 
@@ -2333,7 +2388,37 @@ inline void C2_HOOK_FASTCALL AddObjectToReducedList(tPhysics_object* pObject, tP
     *pList = pObject;
 }
 
-// ReducedFindObjectCollisions
+// FUNCTION: CARMA2_HW 0x004bd9e0
+// FUNCTION: CARMA2_SW 0x004ba100
+// FUNCTION: CARMA2_CHEAT 0x004c3510
+int C2_HOOK_FASTCALL ReducedFindObjectCollisions(tPhysics_object* pObject, tPhysics_object** pList, tPhysics_joint_force* pForces, int pCount, tWorld_callbacks* pCallbacks, tPhysics_object* pDo_something_list) {
+    tPhysics_object* child;
+    int count;
+
+    gReduced_object_list = pList;
+    if (BrVector3LengthSquared(&pObject->field_0x1b4) == 0.0f) {
+        gINT_006940ac = 1;
+    } else {
+        gINT_006940ac = 0;
+    }
+    GetFacesNearObject(pObject, pCallbacks);
+    gReduced_object_list = NULL;
+    gINT_006940ac = 0;
+    count = GetObjectWallForceInfo(pObject, pForces, pCount);
+    if (count != 0) {
+        if (pObject->field_0xf0 == 2) {
+            FillInTrialWorkspace(pObject, NULL, pCallbacks);
+        }
+        pCount += count;
+    }
+    pCount = CollideObjectWithReducedObjectList(pObject, *pList, pForces, pCount, pDo_something_list, pCallbacks);
+    for (child = pObject->child; child != NULL; child = child->next) {
+        if (child->physics_joint1 != NULL && child->physics_joint1->type != eJoint_none) {
+            pCount = ReducedFindObjectCollisions(child, ReduceReducedList(child, pList), pForces, pCount, pCallbacks, pDo_something_list);
+        }
+    }
+    return pCount;
+}
 
 // FindObjectCollisions
 
