@@ -316,21 +316,21 @@ extern intptr_t C2_HOOK_CDECL MakeCarModelsMaterialsSingleSided(br_actor* pActor
 
 // IsOnNonCarHalf
 
-// SplitCar
+extern void C2_HOOK_FASTCALL SplitCar(tCar_spec* pCar, const tSplit_info* pSplit_info, int pArg3);
 
-// QuantizePlane
+extern void C2_HOOK_FASTCALL QuantizePlane(tSplit_info* pPlane);
 
-// WithinBounds
+extern int C2_HOOK_FASTCALL WithinBounds(br_scalar pValue, br_scalar pMin, br_scalar pMax);
 
-// SplitCheck
+extern int C2_HOOK_FASTCALL SplitCheck(tCar_spec* pCar, int pArg2, const br_vector3* pPlane, float pArg4, tSplit_info* pSplit_info);
 
-// FindForceEdge
+extern int C2_HOOK_FASTCALL FindForceEdge(const br_vector3* pPoint, const tPhysics_object* pObject, br_vector3* pEdge, br_scalar* pDot);
 
-// DoXZSplitting
+extern int C2_HOOK_FASTCALL DoXZSplitting(tPhysics_joint_force* pForces, br_scalar* pImpulses, int pCount);
 
-// DoYSplitting
+extern int C2_HOOK_FASTCALL DoYSplitting(tPhysics_joint_force* pForces, br_scalar* pImpulses, int pCount);
 
-// DoSplitting
+extern int C2_HOOK_FASTCALL DoSplitting(tPhysics_joint_force* pForces, br_scalar* pImpulses, int pCount);
 
 // DoJointSnapping
 
@@ -382,7 +382,7 @@ extern void C2_HOOK_CDECL JitModelUpdate(br_actor* pActor, br_model* pModel, br_
 
 extern void C2_HOOK_FASTCALL SetModelForUpdate(br_model* pModel);
 
-// RandomlyXZSplitCar
+extern void C2_HOOK_FASTCALL RandomlyXZSplitCar(tCar_spec* pCar);
 
 // RandomlyBendCar
 

@@ -1977,6 +1977,10 @@ void C2_HOOK_FASTCALL FullyDetachBit(tCar_spec* pCar, tPhysics_object* pObject) 
 
 // SplitCarCollisionShapes
 
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
 // FUNCTION: CARMA2_HW 0x00430d80
 // FUNCTION: CARMA2_SW 0x00430db0
 // FUNCTION: CARMA2_CHEAT 0x00430f50
@@ -2011,6 +2015,10 @@ int C2_HOOK_FASTCALL QuantizeWithinBounds(br_scalar pQuant, br_scalar pMin, br_s
     *pValue = (br_scalar)index * pQuant + pMin;
     return 1;
 }
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // SaveVitalBitsOfObject
 
@@ -2056,21 +2064,330 @@ intptr_t C2_HOOK_CDECL MakeCarModelsMaterialsSingleSided(br_actor* pActor, void*
 
 // IsOnNonCarHalf
 
-// SplitCar
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
 
-// QuantizePlane
+// STUB: CARMA2_HW 0x0042e2e0
+// STUB: CARMA2_SW 0x0042e350
+// STUB: CARMA2_CHEAT 0x0042e480
+void C2_HOOK_FASTCALL SplitCar(tCar_spec* pCar, const tSplit_info* pSplit_info, int pArg3) {
+    NOT_IMPLEMENTED();
+}
 
-// WithinBounds
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
-// SplitCheck
+inline void C2_HOOK_FASTCALL QuantizePlane(tSplit_info* pPlane) {
+    tCompressed_vector4 compressed;
 
-// FindForceEdge
+    CompressVector3((tCompressed_vector3*)&compressed, &pPlane->normal, -1.0f, 1.0f);
+    compressed.v[3] = DRScalarToU16(pPlane->d, -2.5f, 2.5f);
+    ExpandVector3(&pPlane->normal, (tCompressed_vector3*)&compressed, -1.0f, 1.0f);
+    pPlane->d = DRU16ToScalar(compressed.v[3], -2.5f, 2.5f);
+}
 
-// DoXZSplitting
+inline int C2_HOOK_FASTCALL WithinBounds(br_scalar pValue, br_scalar pMin, br_scalar pMax) {
 
-// DoYSplitting
+    if (pValue < pMin || pValue > pMax) {
+        return 0;
+    } else {
+        return 1;
+    }
+}
 
-// DoSplitting
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// FUNCTION: CARMA2_HW 0x004307e0
+// FUNCTION: CARMA2_SW 0x00430810
+// FUNCTION: CARMA2_CHEAT 0x004309b0
+int C2_HOOK_FASTCALL SplitCheck(tCar_spec* pCar, int pArg2, const br_vector3* pPlane, float pArg4, tSplit_info* pSplit_info) {
+    tCar_crush_spec* crush_spec;
+    br_bounds3* bounds;
+    br_bounds3* model_bounds;
+    br_vector3 size;
+    br_vector3 margin;
+    br_vector3 p;
+    br_scalar min_x;
+    br_scalar max_x;
+    br_scalar min_z;
+    br_scalar max_z;
+    br_scalar a;
+    br_scalar b;
+    br_scalar t;
+    int axis;
+    int axis1;
+    int axis2;
+    int found;
+
+    if (pCar->invulnerable_no_crushage && !pCar->knackered) {
+        return 0;
+    }
+    if (pCar->field_0x4c8 != 1.0) {
+        return 0;
+    }
+    crush_spec = pCar->car_crush_spec;
+    if (crush_spec == NULL || crush_spec->field_0x144 || crush_spec->field_0x4b8) {
+        return 0;
+    }
+    bounds = &pCar->collision_info->bb1;
+    BrVector3Sub(&size, &bounds->max, &bounds->min);
+    BrVector3Scale(&margin, &size, 0.25f);
+    min_x = bounds->min.v[0] + margin.v[0];
+    min_z = bounds->min.v[2] + margin.v[2];
+    max_x = bounds->max.v[0] - margin.v[0];
+    max_z = bounds->max.v[2] - margin.v[2];
+    switch (pArg2) {
+    case 0:
+            found = 0;
+            if ((br_scalar)fabs(pPlane->v[0]) > 0.001f) {
+                a = (pPlane->v[2] - bounds->min.v[1] * pPlane->v[1]) / pPlane->v[0];
+                b = (pPlane->v[2] - bounds->max.v[1] * pPlane->v[1]) / pPlane->v[0];
+                if (QuantizeWithinBounds(0.02f, bounds->min.v[0], bounds->max.v[0], &a)
+                    && QuantizeWithinBounds(0.02f, bounds->min.v[0], bounds->max.v[0], &b)
+                    && WithinBounds((a + b) * 0.5f, min_x, max_x)) {
+                    BrVector3Set(&pSplit_info->normal, -size.v[1], 0.0f, b - a);
+                    BrVector3Normalise(&pSplit_info->normal, &pSplit_info->normal);
+                    BrVector3Set(&p, a, 0.0f, bounds->min.v[1]);
+                    pSplit_info->d = BrVector3Dot(&pSplit_info->normal, &p);
+                    found = 1;
+                }
+            }
+            if (!found) {
+                if ((br_scalar)fabs(pPlane->v[1]) <= 0.001f) {
+                    return 0;
+                }
+                a = (pPlane->v[2] - bounds->min.v[0] * pPlane->v[0]) / pPlane->v[1];
+                b = (pPlane->v[2] - bounds->max.v[0] * pPlane->v[0]) / pPlane->v[1];
+                if (!QuantizeWithinBounds(0.02f, bounds->min.v[2], bounds->max.v[2], &a)
+                    || !QuantizeWithinBounds(0.02f, bounds->min.v[2], bounds->max.v[2], &b)
+                    || !WithinBounds((a + b) * 0.5f, min_z, max_z)) {
+                    return 0;
+                }
+                BrVector3Set(&pSplit_info->normal, b - a, 0.0f, -size.v[0]);
+                BrVector3Normalise(&pSplit_info->normal, &pSplit_info->normal);
+                BrVector3Set(&p, bounds->min.v[0], 0.0f, a);
+                pSplit_info->d = BrVector3Dot(&pSplit_info->normal, &p);
+            }
+        break;
+    case 1:
+            BrVector3Set(&pSplit_info->normal, 0.0f, 1.0f, 0.0f);
+            pSplit_info->d = pArg4;
+            if (!QuantizeWithinBounds(0.02f, bounds->min.v[1], bounds->max.v[1], &pSplit_info->d)) {
+                return 0;
+            }
+        break;
+    default:
+        return 0;
+    }
+    model_bounds = &pCar->car_actor->model->bounds;
+    axis = NearestAxis(&pSplit_info->normal);
+    p.v[axis] = 0.0f;
+    axis1 = (axis + 1) % 3;
+    axis2 = (axis + 2) % 3;
+    p.v[axis1] = (model_bounds->min.v[axis1] + model_bounds->max.v[axis1]) * 0.5f;
+    p.v[axis2] = (model_bounds->min.v[axis2] + model_bounds->max.v[axis2]) * 0.5f;
+    t = -((BrVector3Dot(&pSplit_info->normal, &p) - pSplit_info->d) / pSplit_info->normal.v[axis]);
+    if (t < model_bounds->min.v[axis] + 0.4f / WORLD_SCALE || t > model_bounds->max.v[axis] - 0.4f / WORLD_SCALE) {
+        return 0;
+    }
+    if (BrVector3Dot(&crush_spec->driver_position, &pSplit_info->normal) - pSplit_info->d < 0.0f) {
+        BrVector3Negate(&pSplit_info->normal, &pSplit_info->normal);
+        pSplit_info->d = -pSplit_info->d;
+    }
+    QuantizePlane(pSplit_info);
+    return 1;
+}
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
+
+inline int C2_HOOK_FASTCALL FindForceEdge(const br_vector3* pPoint, const tPhysics_object* pObject, br_vector3* pEdge, br_scalar* pDot) {
+    int i;
+    int j;
+    int count;
+    int faces[2];
+    tFace_ref* face;
+
+    count = 0;
+    for (i = pObject->box_face_start; i < pObject->box_face_end && count < 2; i++) {
+        face = &gFace_list__car[i];
+        for (j = 0; j < 3; j++) {
+            if (PointEdgeDistSq(pPoint, &face->v[j], &face->v[(j + 1) % 3]) < 1.1920929e-7f) {
+                faces[count] = i;
+                count++;
+                BrVector3Sub(pEdge, &face->v[j], &face->v[(j + 1) % 3]);
+                break;
+            }
+        }
+    }
+    if (count < 2) {
+        return 0;
+    }
+    *pDot = BrVector3Dot(&gFace_list__car[faces[0]].normal, &gFace_list__car[faces[1]].normal);
+    return 1;
+}
+
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
+// FUNCTION: CARMA2_HW 0x00430e30
+// FUNCTION: CARMA2_SW 0x00430e60
+// FUNCTION: CARMA2_CHEAT 0x00431000
+int C2_HOOK_FASTCALL DoXZSplitting(tPhysics_joint_force* pForces, br_scalar* pImpulses, int pCount) {
+    int i;
+    tCar_spec* car;
+    br_scalar threshold;
+    br_scalar dot;
+    br_scalar length;
+    br_vector3 edge;
+    br_vector3 edge_car;
+    br_vector3 point;
+    br_vector3 line;
+    tSplit_info split_info;
+    int index;
+
+    if (pCount > 40) {
+        pCount = 40;
+    }
+    for (i = 0; i < pCount; i++) {
+        if (pImpulses[i] < 0.01f || pForces[i].object_b != NULL || pForces[i].type != 0 || pForces[i].object_a == NULL) {
+            continue;
+        }
+        car = pForces[i].object_a->owner;
+        if (car == NULL || pForces[i].object_a->flags_0x238 != 1 || car == NULL || car->driver <= eDriver_5
+                || car->car_crush_spec == NULL || car->car_crush_spec->field_0x4b8 || car->invulnerable_no_crushage) {
+            continue;
+        }
+        threshold = car->collision_info->M * gMin_force_to_split_XZ_per_tonne / (car->softness_factor * car->car_crush_spec->snappability_factor);
+        if (pImpulses[i] < threshold) {
+            continue;
+        }
+        if (!FindForceEdge(&pForces[i].point_b, car->collision_info, &edge, &dot)) {
+            continue;
+        }
+        if (!(dot <= (br_scalar)cos(0.1744903177022934))) {
+            continue;
+        }
+        BrMatrix34TApplyV(&edge_car, &edge, &car->collision_info->actor->t.t.mat);
+        BrVector3Cross(&split_info.normal, &edge_car, &pForces[i].direction_a);
+        BrVector3Normalise(&split_info.normal, &split_info.normal);
+        if (fabs(split_info.normal.v[0]) <= 0.707107f && fabs(split_info.normal.v[2]) <= 0.707107f) {
+            continue;
+        }
+        BrVector3Add(&point, &pForces[i].point_a, &car->collision_info->cmpos);
+        split_info.d = BrVector3Dot(&split_info.normal, &point);
+        line.v[0] = split_info.normal.v[0];
+        line.v[1] = split_info.normal.v[2];
+        length = BR_LENGTH2(line.v[0], line.v[1]);
+        if (length > BR_SCALAR_EPSILON * 2) {
+            length = (br_scalar)(1.0 / length);
+            line.v[0] *= length;
+            line.v[1] *= length;
+        } else {
+            line.v[0] = 1.0f;
+            line.v[1] = 0.0f;
+        }
+        line.v[2] = line.v[0] * point.v[0] + line.v[1] * point.v[2];
+        if (SplitCheck(car, 0, &line, 0.0f, &split_info)) {
+            index = i;
+            ReduceEffectOfForces(pForces, pImpulses, pCount, &index, 1, threshold);
+            SplitCar(car, &split_info, 1);
+            return 1;
+        }
+    }
+    return 0;
+}
+
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
+
+inline int C2_HOOK_FASTCALL DoYSplitting(tPhysics_joint_force* pForces, br_scalar* pImpulses, int pCount) {
+    int i;
+    int j;
+    int split_ok;
+    int count_indices;
+    tCar_spec* car;
+    br_scalar split_y;
+    br_scalar total;
+    br_scalar threshold;
+    int used[40];
+    int indices[40];
+    tSplit_info split_info;
+
+    if (pCount > 40) {
+        pCount = 40;
+    }
+    for (i = 0; i < pCount; i++) {
+        used[i] = 0;
+    }
+    for (i = 0; i < pCount; i++) {
+        if (pImpulses[i] < 0.01f || used[i] || pForces[i].object_b != NULL || pForces[i].object_a == NULL) {
+            continue;
+        }
+        car = pForces[i].object_a->owner;
+        if (car == NULL || pForces[i].object_a->flags_0x238 != 1 || car == NULL || car->driver <= eDriver_5
+                || car->car_crush_spec == NULL || car->car_crush_spec->field_0x4b8 || car->invulnerable_no_crushage) {
+            continue;
+        }
+        split_ok = 1;
+        split_y = car->car_crush_spec->split_y_pos - car->collision_info->cmpos.v[1];
+        if (pForces[i].point_a.v[1] < split_y) {
+            split_ok = 0;
+        } else {
+            indices[0] = i;
+            count_indices = 1;
+            total = pImpulses[i];
+        }
+        used[i] = 1;
+        for (j = i + 1; j < pCount; j++) {
+            if (pImpulses[j] < 0.01f || used[j] || pForces[j].object_b != NULL || pForces[j].object_a->owner != car) {
+                continue;
+            }
+            if (split_ok) {
+                if (pForces[j].point_a.v[1] < split_y) {
+                    split_ok = 0;
+                } else {
+                    indices[count_indices] = j;
+                    total += pImpulses[j];
+                    count_indices++;
+                }
+            }
+            used[j] = 1;
+        }
+        if (split_ok) {
+            threshold = car->collision_info->M * gMin_force_to_split_Y_per_tonne / (car->softness_factor * car->car_crush_spec->snappability_factor);
+            if (total > threshold && SplitCheck(car, 1, NULL, car->car_crush_spec->split_y_pos, &split_info)) {
+                ReduceEffectOfForces(pForces, pImpulses, pCount, indices, count_indices, threshold);
+                SplitCar(car, &split_info, 1);
+                return 1;
+            }
+        }
+    }
+    return 0;
+}
+
+// FUNCTION: CARMA2_HW 0x0042dfd0
+// FUNCTION: CARMA2_SW 0x0042e040
+// FUNCTION: CARMA2_CHEAT 0x0042e170
+int C2_HOOK_FASTCALL DoSplitting(tPhysics_joint_force* pForces, br_scalar* pImpulses, int pCount) {
+
+    if (DoXZSplitting(pForces, pImpulses, pCount)) {
+        return 1;
+    }
+    if (DoYSplitting(pForces, pImpulses, pCount)) {
+        return 1;
+    }
+    return 0;
+}
 
 // DoJointSnapping
 
@@ -2157,7 +2474,24 @@ void C2_HOOK_FASTCALL SetModelForUpdate(br_model* pModel) {
     }
 }
 
-// RandomlyXZSplitCar
+// FUNCTION: CARMA2_HW 0x00435d40
+// FUNCTION: CARMA2_SW 0x00435d70
+// FUNCTION: CARMA2_CHEAT 0x00435f30
+void C2_HOOK_FASTCALL RandomlyXZSplitCar(tCar_spec* pCar) {
+    br_bounds3* bounds;
+    float angle;
+    br_vector3 plane;
+    tSplit_info split_info;
+
+    bounds = &pCar->collision_info->bb1;
+    angle = FRandomBetween(0.0f, 6.2831855f);
+    plane.v[0] = (float)sin(angle);
+    plane.v[1] = (float)cos(angle);
+    plane.v[2] = plane.v[0] * ((bounds->min.v[0] + bounds->max.v[0]) * 0.5f) + plane.v[1] * ((bounds->min.v[2] + bounds->max.v[2]) * 0.5f);
+    if (SplitCheck(pCar, 0, &plane, 0.0f, &split_info)) {
+        SplitCar(pCar, &split_info, 0);
+    }
+}
 
 // RandomlyBendCar
 
