@@ -144,6 +144,39 @@ inline void C2_HOOK_FASTCALL ResetPedFaceCache(void) {
 
 // SetCharacterDirectionAR
 
+// FUNCTION: CARMA2_HW 0x004ca470
+// FUNCTION: CARMA2_SW 0x004c6ba0
+// FUNCTION: CARMA2_CHEAT 0x004cffb0
+int C2_HOOK_FASTCALL FUN_004ca470(const tPedestrian* pPedestrian) {
+
+    if (pPedestrian->field_0x0c != NULL && pPedestrian->field_0x0c->field_0xb0 != NULL) {
+        return pPedestrian->field_0x0c->field_0xb0->field_0x4;
+    }
+    return 0;
+}
+
+// FUNCTION: CARMA2_HW 0x004ca490
+// FUNCTION: CARMA2_SW 0x004c6bc0
+// FUNCTION: CARMA2_CHEAT 0x004cffd0
+int C2_HOOK_FASTCALL FUN_004ca490(const tPedestrian* pPedestrian) {
+
+    if (pPedestrian->field_0x0c != NULL && (pPedestrian->field_0x0c->field_0x18 & 0x1) && !(pPedestrian->field_0x0c->field_0x18 & 0x2)) {
+        return 1;
+    }
+    return 0;
+}
+
+// FUNCTION: CARMA2_HW 0x004ca4b0
+// FUNCTION: CARMA2_SW 0x004c6be0
+// FUNCTION: CARMA2_CHEAT 0x004cfff0
+int C2_HOOK_FASTCALL FUN_004ca4b0(const tPedestrian* pPedestrian) {
+
+    if (pPedestrian->field_0x0c != NULL) {
+        return pPedestrian->field_0x0c->field_0x18 & 0x2;
+    }
+    return 0;
+}
+
 // FUNCTION: CARMA2_HW 0x004ca4d0
 // FUNCTION: CARMA2_SW 0x004c6c00
 // FUNCTION: CARMA2_CHEAT 0x004d0010

@@ -33,6 +33,12 @@ extern void C2_HOOK_FASTCALL ResetPedFaceCache(void);
 
 // SetCharacterDirectionAR
 
+extern int C2_HOOK_FASTCALL FUN_004ca470(const tPedestrian* pPedestrian);
+
+extern int C2_HOOK_FASTCALL FUN_004ca490(const tPedestrian* pPedestrian);
+
+extern int C2_HOOK_FASTCALL FUN_004ca4b0(const tPedestrian* pPedestrian);
+
 extern void C2_HOOK_FASTCALL PedApplyPedDir(tU32 pId, const br_vector3* pDir);
 
 extern void C2_HOOK_FASTCALL SetCharacterMoveAR(tPed_character_instance* pCharacter, int pMove_action, float pSpeed, int pArg4, int pArg5, tU32 pTime);
