@@ -59,6 +59,8 @@ extern int C2_HOOK_FASTCALL ResetJoystickHeadupSelection(tButtonJoystickInfo** p
 
 extern void C2_HOOK_FASTCALL MungeJoystickHeadups(void);
 
+extern void C2_HOOK_FASTCALL CreateKeyConfigurationHeadups(tHeadup_text_buffer* pBuffer);
+
 extern void C2_HOOK_FASTCALL PeekCharacter(FILE* pF);
 
 extern int C2_HOOK_FASTCALL ReadUntilCharacter(FILE* pF, char* pBuffer, int pBuffer_size, char pLimit_char);

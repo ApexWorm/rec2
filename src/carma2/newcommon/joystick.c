@@ -590,6 +590,23 @@ void C2_HOOK_FASTCALL MungeJoystickHeadups(void) {
     }
 }
 
+// FUNCTION: CARMA2_HW 0x0045b790
+// FUNCTION: CARMA2_SW 0x0045b210
+// FUNCTION: CARMA2_CHEAT 0x0045bc10
+void C2_HOOK_FASTCALL CreateKeyConfigurationHeadups(tHeadup_text_buffer* pBuffer) {
+    int i;
+    tHeadup_text* text;
+
+    for (i = 0; i < (int)REC2_ASIZE(gJoystick_key_names); i++) {
+        text = malloc(sizeof(tHeadup_text));
+        if (text != NULL) {
+            text->next = NULL;
+            strncpy(text->text, gJoystick_key_names[i].name, sizeof(text->text));
+            StoreTextHeadup(pBuffer, text, 0);
+        }
+    }
+}
+
 // FUNCTION: CARMA2_HW 0x0045b920
 // FUNCTION: CARMA2_SW 0x0045b3a0
 int C2_HOOK_FASTCALL WriteJoystickPreferences(FILE* pF, const tButtonJoystickInfo* pInfo) {
