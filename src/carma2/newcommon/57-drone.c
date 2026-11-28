@@ -18,6 +18,7 @@
 #include "52-errors.h"
 #include "56-aiworld.h"
 #include "60-phil.h"
+#include "70-packfile.h"
 #include "c2_string.h"
 #include "globvars.h"
 #include "c2_stdio.h"
@@ -38,6 +39,7 @@ int gCount_drones;
 
 // GLOBAL: CARMA2_HW 0x00682178
 // GLOBAL: CARMA2_SW 0x0067c8b8
+// GLOBAL: CARMA2_CHEAT 0x00689a20
 tDrone_form gDrone_forms[64];
 
 // GLOBAL: CARMA2_HW 0x0068450c
@@ -90,6 +92,18 @@ br_actor* gDrone_path_model_actor;
 // GLOBAL: CARMA2_SW 0x0067ec70
 // GLOBAL: CARMA2_CHEAT 0x0068bdd8
 int gDrone_paths_elasticating;
+
+/* FIXME: name is a guess */
+// GLOBAL: CARMA2_HW 0x00684534
+// GLOBAL: CARMA2_SW 0x0067ec74
+// GLOBAL: CARMA2_CHEAT 0x0068bddc
+int gDrone_path_output_file_chosen;
+
+/* FIXME: name and size are guesses */
+// GLOBAL: CARMA2_HW 0x00681fb8
+// GLOBAL: CARMA2_SW 0x0067c6f8
+// GLOBAL: CARMA2_CHEAT 0x00689860
+char gDrone_path_output_file[256];
 
 /* FIXME: name is a guess */
 // GLOBAL: CARMA2_HW 0x00684538
@@ -789,11 +803,67 @@ int C2_HOOK_FASTCALL InitialiseEditModelsEtc(void) {
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
 #endif
-// STUB: CARMA2_HW 0x00453050
-// STUB: CARMA2_SW 0x00452de0
-// STUB: CARMA2_CHEAT 0x004535b0
+// FUNCTION: CARMA2_HW 0x00453050
+// FUNCTION: CARMA2_SW 0x00452de0
+// FUNCTION: CARMA2_CHEAT 0x004535b0
 void C2_HOOK_FASTCALL WriteOutDronePaths(void) {
-    NOT_IMPLEMENTED();
+    int i;
+    int j;
+    FILE* f;
+    char file_name[13];
+    char path[256];
+
+    if (!gDrone_path_output_file_chosen) {
+        for (i = 0; ; i++) {
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat"
+#endif
+            sprintf(file_name, "DPATH%0.3d.TXT", i);
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif
+            PathCat(path, gApplication_path, file_name);
+            f = DRfopen(path, "r+");
+            if (f == NULL) {
+                break;
+            }
+            PFfclose(f);
+        }
+        strcpy(gDrone_path_output_file, path);
+        gDrone_path_output_file_chosen = 1;
+    }
+    f = DRfopen(gDrone_path_output_file, "wt");
+    if (f != NULL) {
+        fprintf(f, "%s\n", "START OF DRONE PATHS");
+        fprintf(f, "\n%-3d   // version\n", 2);
+        fprintf(f, "%-3d   // n_nodes\n", gCount_drone_path_nodes);
+        for (i = 0; i < gCount_drone_path_nodes; i++) {
+            fprintf(f, "\t\n// %d:\n", i);
+            fprintf(f, "\t%.3f, %.3f, %.3f\n",
+                gDrone_path_nodes[i].position.v[0],
+                gDrone_path_nodes[i].position.v[1],
+                gDrone_path_nodes[i].position.v[2]);
+            if (gDrone_path_nodes[i].type >= 0) {
+                fprintf(f, "\t%s\n", gDrone_forms[gDrone_path_nodes[i].type].name);
+            } else {
+                fprintf(f, "\t%s\n", "NONE");
+            }
+            fprintf(f, "\t%d\n", gDrone_path_nodes[i].field_0x12e);
+            fprintf(f, "\t%d\n", gDrone_path_nodes[i].count_sections);
+            for (j = 0; j < gDrone_path_nodes[i].count_sections; j++) {
+                fprintf(f, "\t\t%d, %d, %d, %d\n",
+                    gDrone_path_nodes[i].sections[j].node1,
+                    gDrone_path_nodes[i].sections[j].node2,
+                    gDrone_path_nodes[i].sections[j].field_0x21,
+                    gDrone_path_nodes[i].sections[j].type);
+            }
+        }
+        fprintf(f, "\n%s\n", "END OF DRONE PATHS");
+        PFfclose(f);
+    } else {
+        PDFatalError("Unable to open drone path output file");
+    }
 }
 #ifdef REC2_MATCHING
 #pragma auto_inline(on)

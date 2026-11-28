@@ -5280,7 +5280,7 @@ typedef struct {
 
 typedef struct tDrone_path_node_section {
     tS16 node1;
-    tS16 node2;
+    tU16 node2;
     br_vector3 field_0x04;
     br_vector3 field_0x10;
     float field_0x1c;

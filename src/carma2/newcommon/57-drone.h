@@ -27,6 +27,8 @@ extern br_model* gElasticatey_drone_path_model;
 extern br_actor* gStatic_drone_path_model_actor;
 extern br_actor* gDrone_path_model_actor;
 extern int gDrone_paths_elasticating;
+extern int gDrone_path_output_file_chosen;
+extern char gDrone_path_output_file[256];
 extern int gStatic_drone_path_model_max_vertices;
 extern int gStatic_drone_path_model_max_faces;
 extern int gSelected_edit_drone_path;
