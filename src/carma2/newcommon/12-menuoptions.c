@@ -12,13 +12,230 @@
 
 #include "16-graphics1.h"
 #include "17-world2.h"
+#include "18-graphics2.h"
+#include "18b-graphics2.h"
+#include "25-grafdata.h"
 #include "33-depth.h"
 #include "35-intrface.h"
 #include "37-brucetrk.h"
+#include "38-flicplay.h"
+#include "52-errors.h"
 #include "57-drone.h"
 #include "61-pedestrn-phys.h"
+#include "63-loading3.h"
 #include "69-sound.h"
 #include "globvars.h"
+#include "platform.h"
+
+#include "rec2_macros.h"
+
+#include <math.h>
+
+// GLOBAL: CARMA2_HW 0x00691790
+// GLOBAL: CARMA2_SW 0x0068b7e8
+// GLOBAL: CARMA2_CHEAT 0x00699178
+br_pixelmap* gDials_pix;
+
+inline void C2_HOOK_FASTCALL DrawDial(int pWhich_one, int pWhich_stage) {
+
+    RemoveTransientBitmaps(1);
+    DRPixelmapRectangleMaskedCopy(gBack_screen,
+        gCurrent_graf_data->dial__x[pWhich_one],
+        gCurrent_graf_data->dial__y[pWhich_one],
+        gDials_pix,
+        0,
+        pWhich_stage * 64,
+        gDials_pix->width,
+        64);
+    ProcessFlicQueue(gFrame_period);
+    DoMouseCursor();
+    PDScreenBufferSwap(0);
+}
+
+// FUNCTION: CARMA2_HW 0x004b1ca0
+// FUNCTION: CARMA2_SW 0x004ade10
+// FUNCTION: CARMA2_CHEAT 0x004b7570
+void C2_HOOK_FASTCALL SoundOptionsStart(void) {
+
+    DrawDial(0, 0);
+    DrawDial(1, 0);
+    MoveDialFromTo(0, 0, 4 * gProgram_state.music_volume);
+    MoveDialFromTo(1, 0, 4 * gProgram_state.effects_volume);
+}
+
+// FUNCTION: CARMA2_HW 0x004b1d80
+// FUNCTION: CARMA2_SW 0x004adef0
+// FUNCTION: CARMA2_CHEAT 0x004b7650
+void C2_HOOK_FASTCALL MoveDialFromTo(int pWhich_one, int pOld_stage, int pNew_stage) {
+    tS32 time_diff;
+    tU32 start_time;
+
+    DrawDial(pWhich_one, pOld_stage);
+    start_time = PDGetTotalTime();
+    while ((time_diff = PDGetTotalTime() - start_time) < 100) {
+        DrawDial(pWhich_one, pOld_stage + (pNew_stage - pOld_stage) * time_diff / 100);
+    }
+    DrawDial(pWhich_one, pNew_stage);
+
+    start_time = PDGetTotalTime();
+    DrawDial(pWhich_one, pNew_stage < 24 ? pNew_stage + 1 : 22);
+    while (PDGetTotalTime() - start_time < 20) {
+    }
+
+    start_time = PDGetTotalTime();
+    DrawDial(pWhich_one, pNew_stage != 0 ? pNew_stage - 1 : pNew_stage + 2);
+    while (PDGetTotalTime() - start_time < 20) {
+    }
+
+    start_time = PDGetTotalTime();
+    DrawDial(pWhich_one, pNew_stage < 24 ? pNew_stage + 1 : 22);
+    while (PDGetTotalTime() - start_time < 20) {
+    }
+
+    start_time = PDGetTotalTime();
+    DrawDial(pWhich_one, pNew_stage);
+    while (PDGetTotalTime() - start_time < 20) {
+    }
+
+    start_time = PDGetTotalTime();
+    DrawDial(pWhich_one, pNew_stage != 0 ? pNew_stage - 1 : pNew_stage + 2);
+    while (PDGetTotalTime() - start_time < 20) {
+    }
+    DrawDial(pWhich_one, pNew_stage);
+}
+
+// FUNCTION: CARMA2_HW 0x004b21a0
+// FUNCTION: CARMA2_SW 0x004ae310
+// FUNCTION: CARMA2_CHEAT 0x004b7a70
+int C2_HOOK_FASTCALL SoundOptionsDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out) {
+
+    MoveDialFromTo(0, 4 * gProgram_state.music_volume, 0);
+    MoveDialFromTo(1, 4 * gProgram_state.effects_volume, 0);
+    return pCurrent_choice;
+}
+
+// FUNCTION: CARMA2_HW 0x004b21e0
+// FUNCTION: CARMA2_SW 0x004ae350
+// FUNCTION: CARMA2_CHEAT 0x004b7ab0
+int C2_HOOK_FASTCALL SoundOptionsLeft(int* pCurrent_choice, int* pCurrent_mode) {
+    int old_value;
+    int* the_value;
+
+    if (*pCurrent_choice != 2) {
+        if (*pCurrent_choice == 0) {
+            the_value = &gProgram_state.music_volume;
+        } else {
+            the_value = &gProgram_state.effects_volume;
+        }
+        old_value = *the_value;
+        *the_value -= 1;
+        if (*the_value < 0) {
+            *the_value = 0;
+        }
+        SetSoundVolumes(0);
+        DRS3StartSound(gEffects_outlet, eSoundId_LeftButton);
+        MoveDialFromTo(*pCurrent_choice, 4 * old_value, 4 * *the_value);
+    }
+    return 0;
+}
+
+// FUNCTION: CARMA2_HW 0x004b2240
+// FUNCTION: CARMA2_SW 0x004ae3b0
+// FUNCTION: CARMA2_CHEAT 0x004b7b10
+int C2_HOOK_FASTCALL SoundOptionsRight(int* pCurrent_choice, int* pCurrent_mode) {
+    int old_value;
+    int* the_value;
+
+    if (*pCurrent_choice != 2) {
+        if (*pCurrent_choice == 0) {
+            the_value = &gProgram_state.music_volume;
+        } else {
+            the_value = &gProgram_state.effects_volume;
+        }
+        old_value = *the_value;
+        *the_value += 1;
+        if (*the_value > 6) {
+            *the_value = 6;
+        }
+        SetSoundVolumes(0);
+        DRS3StartSound(gEffects_outlet, eSoundId_LeftButton);
+        MoveDialFromTo(*pCurrent_choice, 4 * old_value, 4 * *the_value);
+    }
+    return 0;
+}
+
+// FUNCTION: CARMA2_HW 0x004b22a0
+// FUNCTION: CARMA2_SW 0x004ae410
+// FUNCTION: CARMA2_CHEAT 0x004b7b70
+int C2_HOOK_FASTCALL SoundClick(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_offset) {
+    float x_delta;
+    float y_delta;
+    float angle;
+    int old_value;
+    int* the_value;
+
+#define ANGLE_RANGE_START (20 * REC2_PI / 360)
+#define ANGLE_RANGE_END (340 * REC2_PI / 360)
+
+    x_delta = (float)(pX_offset - gCurrent_graf_data->dial__x_centre);
+    y_delta = (float)(gCurrent_graf_data->dial__y_centre - pY_offset);
+    if (y_delta > 0.0f) {
+        if (x_delta != 0.0f) {
+            angle = (float)atan(y_delta / x_delta);
+        } else {
+            angle = (float)(REC2_PI / 2);
+        }
+        if (angle < 0.0f) {
+            angle = (float)(angle + REC2_PI);
+        }
+        if (angle > ANGLE_RANGE_START && angle < ANGLE_RANGE_END) {
+            if (*pCurrent_choice == 0) {
+                the_value = &gProgram_state.music_volume;
+            } else {
+                the_value = &gProgram_state.effects_volume;
+            }
+            old_value = *the_value;
+            *the_value = (int)((ANGLE_RANGE_END - angle + 0.23300145514124296) / 0.4660029102824859);
+            if (*the_value > 6) {
+                *the_value = 6;
+            } else if (*the_value < 0) {
+                *the_value = 0;
+            }
+            if (*the_value != old_value) {
+                SetSoundVolumes(0);
+                if (*the_value > old_value) {
+                    DRS3StartSound(gEffects_outlet, eSoundId_LeftButton);
+                } else {
+                    DRS3StartSound(gEffects_outlet, eSoundId_LeftButton);
+                }
+                MoveDialFromTo(*pCurrent_choice, 4 * old_value, 4 * *the_value);
+            }
+        }
+    }
+    return 0;
+
+#undef ANGLE_RANGE_START
+#undef ANGLE_RANGE_END
+}
+
+// FUNCTION: CARMA2_HW 0x004b3900
+// FUNCTION: CARMA2_SW 0x004afa70
+// FUNCTION: CARMA2_CHEAT 0x004b91d0
+void C2_HOOK_FASTCALL LoadSoundOptionsData(void) {
+
+    gDials_pix = LoadPixelmap("DIALSTCK.PIX");
+    if (gDials_pix == NULL) {
+        FatalError(kFatalError_CannotLoadDialsImage);
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x004b3920
+// FUNCTION: CARMA2_SW 0x004afa90
+// FUNCTION: CARMA2_CHEAT 0x004b91f0
+void C2_HOOK_FASTCALL FreeSoundOptionsData(void) {
+
+    BrPixelmapFree(gDials_pix);
+}
 
 // SaveOrigKeyMapping
 

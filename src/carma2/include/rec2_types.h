@@ -1561,12 +1561,10 @@ typedef struct {
     int cock_margin_y;
     int field_0x10c;
     int field_0x110;
-    int field_0x114;
-    int field_0x118;
-    int field_0x11c;
-    int field_0x120;
-    int field_0x124;
-    int field_0x128;
+    int dial__x[2];
+    int dial__y[2];
+    int dial__x_centre;
+    int dial__y_centre;
     int field_0x12c;
     int field_0x130;
     int field_0x134;
@@ -6064,6 +6062,7 @@ enum {
     kFatalError_CannotLoadCarResolutionIndependentFile = 0x19,
     kFatalError_CannotLoadDamageImage = 0x1b,
     kFatalError_CannotLoadSpeedoImage = 0x23,
+    kFatalError_CannotLoadDialsImage = 0x2a,
     kFatalError_CannotOpenRacesFile = 0x32,
     kFatalError_CannotOpenOpponentsFile = 0x36,
     kFatalError_OpponentCountMismatchesActualNumberOfOpponents = 0x37,
