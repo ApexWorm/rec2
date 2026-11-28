@@ -513,7 +513,7 @@ void C2_HOOK_FASTCALL DeclareWinner(int pWinner_index) {
             NetSendHeadupToPlayer(s, gNet_players[i].ID);
         }
     }
-    gINT_0074a694 = 1;
+    gReceived_game_scores = 1;
     the_message = NetBuildGuaranteedMessage(eNet_message_chunk_type_game_scores, 0);
     for (i = 0; i < gNumber_of_net_players; i++) {
         the_message->contents.game_scores.players[i].field_0x0 = gNet_players[i].field_0x7c;
