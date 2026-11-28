@@ -41,6 +41,10 @@ extern void C2_HOOK_FASTCALL DropOutImageThruBottom(br_pixelmap* pImage, int pLe
 
 extern void C2_HOOK_FASTCALL DropOutImageThruTop(br_pixelmap* pImage, int pLeft, int pTop, int pTop_clip, int pBottom_clip);
 
+extern void C2_HOOK_FASTCALL TellyInImage(br_pixelmap* pImage, int pLeft, int pTop);
+
+extern void C2_HOOK_FASTCALL TellyOutImage(br_pixelmap* pImage, int pLeft, int pTop);
+
 extern int C2_HOOK_FASTCALL SwitchToHiresMode(void);
 
 extern int C2_HOOK_FASTCALL SwitchToLoresMode(void);

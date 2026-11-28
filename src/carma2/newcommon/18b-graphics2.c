@@ -601,6 +601,20 @@ void C2_HOOK_FASTCALL DropOutImageThruTop(br_pixelmap* pImage, int pLeft, int pT
     BrPixelmapRectangleFill(gBack_screen, pLeft, pTop_clip, pImage->width, pBottom_clip - pTop_clip, 0);
 }
 
+// FUNCTION: CARMA2_HW 0x0047c630
+// FUNCTION: CARMA2_SW 0x0047b8b0
+// FUNCTION: CARMA2_CHEAT 0x0047c9b0
+void C2_HOOK_FASTCALL TellyInImage(br_pixelmap* pImage, int pLeft, int pTop) {
+
+}
+
+// FUNCTION: CARMA2_HW 0x0047c640
+// FUNCTION: CARMA2_SW 0x0047b8c0
+// FUNCTION: CARMA2_CHEAT 0x0047c9c0
+void C2_HOOK_FASTCALL TellyOutImage(br_pixelmap* pImage, int pLeft, int pTop) {
+
+}
+
 // FUNCTION: CARMA2_HW 0x0047c650
 // FUNCTION: CARMA2_SW 0x0047b8d0
 // FUNCTION: CARMA2_CHEAT 0x0047c9d0
@@ -652,8 +666,9 @@ int C2_HOOK_FASTCALL SwitchToLoresMode(void) {
     return 0;
 }
 
-#ifdef REC2_SW
+// FUNCTION: CARMA2_HW 0x0047c670
 // FUNCTION: CARMA2_SW 0x0047ba20
+// FUNCTION: CARMA2_CHEAT 0x0047c9f0
 void DRPixelmapDoubledCopy(br_pixelmap* pDestn, br_pixelmap* pSource, int pSource_width, int pSource_height, int pX_offset, int pY_offset) {
     tU16* sptr;
     tU16 pixels;
@@ -692,7 +707,6 @@ void DRPixelmapDoubledCopy(br_pixelmap* pDestn, br_pixelmap* pSource, int pSourc
         sptr -= src_row_skip;
     }
 }
-#endif
 
 // FUNCTION: CARMA2_HW 0x0047c740
 // FUNCTION: CARMA2_SW 0x0047baf0
