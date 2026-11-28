@@ -1291,7 +1291,7 @@ int C2_HOOK_FASTCALL DamagePedestrian(tPedestrian* pPed, int pDamage, int pArg3,
                 severing_damage = gPed_severing_damage;
             }
             damage_left -= severing_damage;
-            if (damage_left < 0.f || count >= 5) {
+            if (damage_left < 0.0f || count >= 5) {
                 break;
             }
             if (gExploding_pedestrians || gPed_dismemberfest || PercentageChance(gPed_severing_chance)) {
@@ -1422,19 +1422,19 @@ int C2_HOOK_FASTCALL CBPassiveCollision(tPed_character_instance* pCharacter, tPh
     }
     energy = x * x + y * y + z * z;
     if (pOther_object != NULL && pOther_object->owner != NULL && pOther_object->flags_0x238 == 0x20 && pOther_object->M == gMass_mutant_tail_ball) {
-        energy *= 10.f;
+        energy *= 10.0f;
     }
     if (gExploding_pedestrians) {
         damage = gPed_severing_damage * 5;
     } else {
-        damage = energy / gPed_max_survivable_impact * 100.f;
+        damage = energy / gPed_max_survivable_impact * 100.0f;
     }
     DamagePedestrian(ped, damage, 0x5a, energy < 10.0 ? 0x5b : 0x5c, pOther_object);
     if (ped->hit_points <= 0) {
-        MakePedNoise(ped, damage > 200.f ? 2 : 1, 0, pOther_object);
+        MakePedNoise(ped, damage > 200.0f ? 2 : 1, 0, pOther_object);
         SetPedMove(ped, 0x5e, -1, 0, 0, time, ePed_action_dead);
     } else {
-        MakePedNoise(ped, damage > 66.f ? 1 : 0, 0, pOther_object);
+        MakePedNoise(ped, damage > 66.0f ? 1 : 0, 0, pOther_object);
     }
     if (pObject->flags_0x238 == 5) {
         pObject->field_0x1a0 = 0x40000;
