@@ -39,12 +39,12 @@ tU32 gUINT_00679430;
 // GLOBAL: CARMA2_HW 0x00679434
 // GLOBAL: CARMA2_SW 0x00673ba4
 // GLOBAL: CARMA2_CHEAT 0x00680ce4
-int gINT_00679434;
+undefined4 gDAT_00679434;
 
 // GLOBAL: CARMA2_HW 0x00679438
 // GLOBAL: CARMA2_SW 0x00673ba8
 // GLOBAL: CARMA2_CHEAT 0x00680ce8
-int gINT_00679438;
+int gTesting_sensible_place;
 
 // GLOBAL: CARMA2_HW 0x00692dc8
 // GLOBAL: CARMA2_SW 0x0068ce20
@@ -99,7 +99,7 @@ tPhysics_object** gReduced_object_list;
 // GLOBAL: CARMA2_HW 0x006940ac
 // GLOBAL: CARMA2_SW 0x0068e104
 // GLOBAL: CARMA2_CHEAT 0x0069bc24
-int gINT_006940ac;
+int gReduced_object_not_moving;
 
 // GLOBAL: CARMA2_HW 0x006940b8
 // GLOBAL: CARMA2_SW 0x0068e110
@@ -219,7 +219,7 @@ int gFace_count;
 // GLOBAL: CARMA2_HW 0x00679438
 // GLOBAL: CARMA2_SW 0x00673ba8
 // GLOBAL: CARMA2_CHEAT 0x00680ce8
-int gINT_00679438;
+int gTesting_sensible_place;
 
 // GLOBAL: CARMA2_HW 0x0079ecbc
 // GLOBAL: CARMA2_SW 0x00795248
@@ -728,7 +728,7 @@ int C2_HOOK_FASTCALL GetCornerToFacePoints(tPhysics_object* pObject, tPhysics_sh
     if (pMax_count < 4) {
         return 0;
     }
-    gINT_00679434 = 0;
+    gDAT_00679434 = 0;
     for (i = 0; i < pWorkspace->count_points; i++) {
         if (pWorkspace->point_flags[i] == 0) {
             BrVector3Sub(&direction, &pWorkspace->trial_points[i], &pWorkspace->old_points[i]);
@@ -905,7 +905,7 @@ int C2_HOOK_FASTCALL CheckTwoEdges(const br_vector3* pEdge_start, const br_vecto
             return CylinderCheck(&n0, &n1, pEdge_start, pEdge_direction, pOther_start, pOther_direction, pOther_velocity, pOther_direction_change, pForce, pCount, pObject, pOther);
         }
         t = -(c / b) - c * c * a / (b2 * b) * (-4.0f / 3.0f);
-        if (t < 0.0f || t > 1.0f || gINT_00679438 != 0) {
+        if (t < 0.0f || t > 1.0f || gTesting_sensible_place != 0) {
             t = -(b / a) - t;
         }
     }
@@ -1141,7 +1141,7 @@ inline void C2_HOOK_FASTCALL SetUpWorkspace(tPhysics_object* pObject, tPhysics_s
     br_vector3 corner;
     int i;
 
-    if (gINT_00679438 != 0) {
+    if (gTesting_sensible_place != 0) {
         trial_matrix = &pObject->transform_matrix;
     } else {
         trial_matrix = &pObject->actor->t.t.mat;
@@ -1203,7 +1203,7 @@ inline void C2_HOOK_FASTCALL SetUpWorkspace(tPhysics_object* pObject, tPhysics_s
         PhysicsError(ePhysicsError_UnknownShapeType, "");
         break;
     }
-    if (gINT_00679438 != 0) {
+    if (gTesting_sensible_place != 0) {
         BrMatrix34ApplyP(&pWorkspace->old_points[0], &pObject->cmpos, &pObject->transform_matrix);
         for (i = 1; i < pWorkspace->count_points; i++) {
             BrVector3Copy(&pWorkspace->old_points[i], &pWorkspace->old_points[0]);
@@ -1768,9 +1768,9 @@ int C2_HOOK_FASTCALL TestForObjectInSensiblePlace(tPhysics_object* pCollision_in
     gObject_blocking_sensible_place = NULL;
     GetNewBoundingBox(&pCollision_info_1->field_0xf4, &pCollision_info_1->bb1, &pCollision_info_1->transform_matrix);
     GetFacesNearObject(pCollision_info_1, pCar_callbacks);
-    gINT_00679438 = 1;
+    gTesting_sensible_place = 1;
     count = GetObjectWallForceInfo(pCollision_info_1, forces, 0);
-    gINT_00679438 = 0;
+    gTesting_sensible_place = 0;
     if (count != 0) {
         BrVector3Copy(&normal, &forces[0].direction_a);
         if (count > 1) {
@@ -2955,8 +2955,6 @@ void C2_HOOK_FASTCALL CombineBounds(br_bounds* pBounds, br_bounds* pOther) {
     }
 }
 
-extern void C2_HOOK_FASTCALL GetWorldBoundingBoxForObject(tPhysics_object* pObject, br_bounds* pBounds);
-
 void C2_HOOK_FASTCALL GetWorldBoundingBoxForObjects(tPhysics_object* pObject, br_bounds* pBounds) {
 
     for (; pObject != NULL; pObject = pObject->next) {
@@ -3013,8 +3011,6 @@ int C2_HOOK_FASTCALL MatricesAreIdentical(br_matrix34* pMat1, br_matrix34* pMat2
     }
     return 1;
 }
-
-extern void C2_HOOK_FASTCALL PrepareForCollisions(tPhysics_object* pObject);
 
 // FUNCTION: CARMA2_HW 0x004b99e0
 // FUNCTION: CARMA2_SW 0x004b6100
@@ -3085,7 +3081,7 @@ void C2_HOOK_FASTCALL PrepareObject(tPhysics_object* pObject, tPhysics_object** 
     InternalPrepareObject(pObject);
     gPrepared_objects = 1;
     CheckObjectsPostionInList(pObject, pList);
-    if (gINT_006940ac != 0) {
+    if (gReduced_object_not_moving != 0) {
         MakeObjectDoSomething(pObject, *pList);
     }
     if (gReduced_object_list != NULL) {
@@ -3596,13 +3592,13 @@ int C2_HOOK_FASTCALL ReducedFindObjectCollisions(tPhysics_object* pObject, tPhys
 
     gReduced_object_list = pList;
     if (BrVector3LengthSquared(&pObject->field_0x1b4) == 0.0f) {
-        gINT_006940ac = 1;
+        gReduced_object_not_moving = 1;
     } else {
-        gINT_006940ac = 0;
+        gReduced_object_not_moving = 0;
     }
     GetFacesNearObject(pObject, pCallbacks);
     gReduced_object_list = NULL;
-    gINT_006940ac = 0;
+    gReduced_object_not_moving = 0;
     count = GetObjectWallForceInfo(pObject, pForces, pCount);
     if (count != 0) {
         if (pObject->field_0xf0 == 2) {
