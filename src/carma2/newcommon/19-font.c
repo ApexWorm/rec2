@@ -1130,13 +1130,20 @@ void C2_HOOK_FASTCALL TransparentPolyFontText(const char *pText, int pX, int pY,
     }
 }
 
+#ifdef REC2_HW
 void C2_HOOK_FASTCALL DrawDigitAt(const br_pixelmap* pSource, br_pixelmap* pDest, br_uint_16 pX, br_uint_16 pY, br_uint_16 pDigit_height, int pDigit) {
 
     DRPixelmapRectangleMaskedCopy(pDest, pX, pY, pSource, 0, pDigit * pDigit_height ,pSource->width, pDigit_height);
 }
+#else
+void C2_HOOK_FASTCALL DrawDigitAt(const br_pixelmap* pSource, br_uint_16 pX, br_uint_16 pY, br_uint_16 pDigit_height, int pDigit) {
 
+    DRPixelmapRectangleMaskedCopy(gBack_screen, pX, pY, pSource, 0, pDigit * pDigit_height, pSource->width, pDigit_height);
+}
+#endif
+
+#ifdef REC2_HW
 // FUNCTION: CARMA2_HW 0x004657c0
-// FUNCTION: CARMA2_SW 0x00465320
 // FUNCTION: CARMA2_CHEAT 0x00465c40
 void C2_HOOK_FASTCALL DrawNumberAt(const br_pixelmap* pSrc, br_pixelmap* pDest, int pX, int pY, int pX_pitch, int pY_pitch, int pValue, int pDigit_count, int pLeading_zeroes) {
     int i;
@@ -1150,6 +1157,21 @@ void C2_HOOK_FASTCALL DrawNumberAt(const br_pixelmap* pSrc, br_pixelmap* pDest, 
         }
     }
 }
+#else
+// FUNCTION: CARMA2_SW 0x00465320
+void C2_HOOK_FASTCALL DrawNumberAt(const br_pixelmap* pSrc, int pX, int pY, int pX_pitch, int pY_pitch, int pValue, int pDigit_count, int pLeading_zeroes) {
+    int i;
+    int digit;
+
+    for (i = pDigit_count - 1; i >= 0; i--) {
+        digit = pValue % 10;
+        pValue /= 10;
+        if (pValue != 0 || pLeading_zeroes || i == pDigit_count - 1) {
+            DrawDigitAt(pSrc, pX + pX_pitch * i, pY, pY_pitch, digit);
+        }
+    }
+}
+#endif
 
 // FUNCTION: CARMA2_HW 0x00465850
 // FUNCTION: CARMA2_SW 0x004653b0
