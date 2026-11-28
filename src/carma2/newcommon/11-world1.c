@@ -35,10 +35,12 @@ int gDelete_count = 0;
 // GLOBAL: CARMA2_CHEAT 0x006b2658
 br_actor* gDelete_list[500];
 
+#ifdef REC2_MATCHING
 // GLOBAL: CARMA2_HW 0x006ab7ac
 // GLOBAL: CARMA2_SW 0x006a51fc
 // GLOBAL: CARMA2_CHEAT 0x006b2e3c
-int gINT_006ab7ac = 0;
+undefined4 gDAT_006ab7ac = 0;
+#endif
 
 // GLOBAL: CARMA2_HW 0x006ab7b0
 // GLOBAL: CARMA2_SW 0x006a5200
