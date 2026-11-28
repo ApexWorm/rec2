@@ -33,7 +33,6 @@ extern char gCurrent_load_name[256];
 
 extern char gDefaultCar[32];
 extern char gBasic_car_name[32];
-extern int gGoreLevel;
 extern int gAnimalsOn;
 extern int gFlameThrowerOn;
 extern int gExplosives_on;
