@@ -737,6 +737,30 @@ int C2_HOOK_FASTCALL DRS3StartSound3D(tS3_outlet* pOutlet, int pSound_id, const 
     }
 }
 
+// FUNCTION: CARMA2_HW 0x00456010
+// FUNCTION: CARMA2_SW 0x00455da0
+// FUNCTION: CARMA2_CHEAT 0x00456520
+int C2_HOOK_FASTCALL DRS3StartSoundFromSource3(tS3_sound_source* pSource, int pSound_id, int pRepeats, int pVolume, int pPitch, int pSpeed) {
+
+    if (gSound_enabled) {
+        return S3StartSoundFromSource3(pSound_id, pSource, pRepeats, pVolume, pPitch, pSpeed);
+    } else {
+        return 0;
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x00456050
+// FUNCTION: CARMA2_SW 0x00455de0
+// FUNCTION: CARMA2_CHEAT 0x00456560
+int C2_HOOK_FASTCALL DRS3StartSoundFromSource(tS3_sound_source* pSource, int pSound_id) {
+
+    if (gSound_enabled) {
+        return S3StartSoundFromSource(pSound_id, pSource);
+    } else {
+        return 0;
+    }
+}
+
 // FUNCTION: CARMA2_HW 0x00456070
 // FUNCTION: CARMA2_SW 0x00455e00
 // FUNCTION: CARMA2_CHEAT 0x00456580

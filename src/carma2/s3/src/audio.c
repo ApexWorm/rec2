@@ -106,6 +106,7 @@ tS3_sample_filter gS3_sample_filter_disable_func;
 
 // GLOBAL: CARMA2_HW 0x007a06e0
 // GLOBAL: CARMA2_SW 0x00796c80
+// GLOBAL: CARMA2_CHEAT 0x007a7d80
 tS3_channel gS3_channel_template;
 
 // GLOBAL: CARMA2_HW 0x007a075c
@@ -1223,6 +1224,8 @@ int C2_HOOK_FASTCALL S3ReleaseSound(int pSound_id) {
 }
 
 // FUNCTION: CARMA2_HW 0x00566454
+// FUNCTION: CARMA2_SW 0x00561af4
+// FUNCTION: CARMA2_CHEAT 0x0056c044
 double C2_HOOK_STDCALL S3FRandomBetween(double pMin, double pMax) {
 
     return (pMax - pMin) * (double)rand() / 32767.0 + pMin;
@@ -1248,6 +1251,8 @@ double C2_HOOK_FASTCALL S3FRandomBetween2(double pMin, double pMax) {
 }
 
 // FUNCTION: CARMA2_HW 0x005663a0
+// FUNCTION: CARMA2_SW 0x00561a40
+// FUNCTION: CARMA2_CHEAT 0x0056bf90
 int C2_HOOK_FASTCALL S3IRandomBetween__dup(int pMin, int pMax, int pDefault) {
 
     if (pMin == -1) {
@@ -1261,6 +1266,8 @@ int C2_HOOK_FASTCALL S3IRandomBetween__dup(int pMin, int pMax, int pDefault) {
 }
 
 // FUNCTION: CARMA2_HW 0x005663dd
+// FUNCTION: CARMA2_SW 0x00561a7d
+// FUNCTION: CARMA2_CHEAT 0x0056bfcd
 int C2_HOOK_FASTCALL S3IRandomBetweenLog(int pMin, int pMax, int pDefault) {
     double dbl;
 
