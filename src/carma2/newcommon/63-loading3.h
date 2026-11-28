@@ -63,6 +63,8 @@ extern void C2_HOOK_FASTCALL LoadSomePixelmaps(tBrender_storage* pStorage_space,
 
 extern void C2_HOOK_FASTCALL LoadSomeShadeTables(tBrender_storage* pStorage_space, FILE* pF);
 
+extern void C2_HOOK_FASTCALL LoadSomeTrackModels(tBrender_storage* pStorage_space, FILE* pF);
+
 extern void C2_HOOK_FASTCALL SetDefaultPixelmapFolderName(void);
 
 extern char* gPedTexturePath;

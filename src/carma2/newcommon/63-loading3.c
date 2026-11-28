@@ -477,6 +477,20 @@ void C2_HOOK_FASTCALL LoadSomeShadeTables(tBrender_storage* pStorage_space, FILE
     LoadNShadeTables(pStorage_space, pF, count);
 }
 
+// FUNCTION: CARMA2_HW 0x0048f790
+// FUNCTION: CARMA2_SW 0x0048ca00
+// FUNCTION: CARMA2_CHEAT 0x0048f840
+void C2_HOOK_FASTCALL LoadSomeTrackModels(tBrender_storage* pStorage_space, FILE* pF) {
+    char s[256];
+    char* str;
+    int count;
+
+    GetALineAndDontArgue(pF, s);
+    str = strtok(s, "	 ,/");
+    sscanf(str, "%d", &count);
+    LoadNTrackModels(pStorage_space, pF, count);
+}
+
 // FUNCTION: CARMA2_HW 0x0048f7f0
 // FUNCTION: CARMA2_SW 0x0048ca60
 // FUNCTION: CARMA2_CHEAT 0x0048f8a0
