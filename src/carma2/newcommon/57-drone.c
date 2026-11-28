@@ -388,7 +388,7 @@ void C2_HOOK_FASTCALL ProcessThisDrone(int pIndex) {
         DoDroneFunkyGroovyThings(drone);
     }
     BrVector3Sub(&drone->field_0x18, &drone->actor->t.t.translate.t, &drone->pos);
-    if ((drone->field_0x44 && DroneOrientationChanged(drone, .92f)) || (length = BrVector3Length(&drone->field_0x18)) > 1.) {
+    if ((drone->field_0x44 && DroneOrientationChanged(drone, 0.92f)) || (length = BrVector3Length(&drone->field_0x18)) > 1.) {
         BrMatrix34Copy(&drone->collision_info.transform_matrix, &drone->actor->t.t.mat);
         DoNotDprintf_drone("REASSERTING OBJECT MATRIX: v length %f, Frame %d, Drone %d, state %d: ",
             length, gFrame, drone->id, drone->current_state);
