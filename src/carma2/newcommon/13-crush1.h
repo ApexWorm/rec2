@@ -299,9 +299,9 @@ extern void C2_HOOK_FASTCALL GetSplitVertex(tU16 pVertex1, tU16 pVertex2, tU16* 
 
 extern void C2_HOOK_FASTCALL SplitModel(br_model* pModel, br_model** pModel_1, br_model** pModel_2, const br_vector4* pPlane, int pFlags);
 
-// CreateSplitPoints
+extern void C2_HOOK_FASTCALL CreateSplitPoints(br_vector3* pDest1, br_vector3* pDest2, const br_vector3* pV1, const br_vector3* pV2, float pMin, float pMax);
 
-// SplitCollisionShape
+extern void C2_HOOK_FASTCALL SplitCollisionShape(tPhysics_shape* pShape, tCollision_shape_polyhedron* pPositive, tCollision_shape_polyhedron* pNegative, const br_vector4* pPlane);
 
 // SplitCarCollisionShapes
 
