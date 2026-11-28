@@ -464,14 +464,14 @@ void C2_HOOK_FASTCALL FUN_0045ae20(void) {
             }
         }
         if (PDKeyDown(64)) {
-            gSelected_path_headup = gPath_headup_buffer.text_last_add;
-            FUN_005076a0(0, 0);
-            gSelected_path_headup = NULL;
+            gDrop_actor_name = gPath_headup_buffer.text_last_add->text;
+            DropActor(0, 0);
+            gDrop_actor_name = NULL;
             while (PDKeyDown(64)) {
             }
         }
         if (PDKeyDown(65)) {
-            FUN_005088b0();
+            DeleteAcc();
             while (PDKeyDown(65)) {
             }
         }

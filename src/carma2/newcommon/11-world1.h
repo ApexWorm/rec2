@@ -12,10 +12,9 @@
 #include "c2_hooks.h"
 #include "rec2_types.h"
 
-extern tHeadup_text* gSelected_path_headup;
-
 extern int gDelete_count;
 extern br_actor* gDelete_list[500];
+extern char* gDrop_actor_name;
 
 extern br_uint_32 C2_HOOK_FASTCALL DeleteBastards(br_actor* pActor, br_matrix34* pMatrix, void* pArg);
 
@@ -26,10 +25,6 @@ extern br_uint_32 C2_HOOK_FASTCALL ApplyTransToModels(br_actor* pActor, br_matri
 extern int C2_HOOK_FASTCALL FindSpecVolIndex(br_actor* pActor);
 
 extern void C2_HOOK_FASTCALL MungeMaterialSV(br_matrix34* pMat, br_material* pMat_1, br_material* pMat_2, int pAxis_0, int pAxis_1);
-
-extern void C2_HOOK_FASTCALL FUN_005076a0(int pArg1, int pArg2);
-
-extern void C2_HOOK_FASTCALL FUN_005088b0(void);
 
 extern void C2_HOOK_FASTCALL SetSpecVolMatSize(br_actor* pActor);
 
@@ -44,6 +39,10 @@ extern void C2_HOOK_FASTCALL SaveAdditionalActors(void);
 extern void C2_HOOK_FASTCALL DoSaveAdditionalStuff(void);
 
 extern void C2_HOOK_FASTCALL AutoSaveAdditionalStuff(void);
+
+extern void C2_HOOK_FASTCALL DropActor(int pIndex, int pPowerup);
+
+extern void C2_HOOK_FASTCALL DeleteAcc(void);
 
 extern void C2_HOOK_FASTCALL DropSpecVol0(void);
 

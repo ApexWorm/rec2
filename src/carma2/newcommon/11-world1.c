@@ -66,15 +66,15 @@ br_actor* gLast_actor;
 // GLOBAL: CARMA2_CHEAT 0x006bdcc0
 br_model* gAdditional_models[1000];
 
+// GLOBAL: CARMA2_HW 0x006ab94c
+// GLOBAL: CARMA2_SW 0x006a539c
+// GLOBAL: CARMA2_CHEAT 0x006b2fdc
+char* gDrop_actor_name;
+
 // GLOBAL: CARMA2_HW 0x006ab948
 // GLOBAL: CARMA2_SW 0x006a5398
 // GLOBAL: CARMA2_CHEAT 0x006b2fd8
 int gNumber_of_additional_models;
-
-// GLOBAL: CARMA2_HW 0x006ab94c
-// GLOBAL: CARMA2_SW 0x006a539c
-// GLOBAL: CARMA2_CHEAT 0x006b2fdc
-tHeadup_text* gSelected_path_headup;
 
 // FUNCTION: CARMA2_HW 0x00507210
 // FUNCTION: CARMA2_SW 0x00502660
@@ -204,20 +204,6 @@ inline void C2_HOOK_FASTCALL PutAdditionalNonCarsOnToNonTrackActor(void) {
     }
 }
 
-// STUB: CARMA2_HW 0x005076a0
-// STUB: CARMA2_SW 0x00502af0
-// STUB: CARMA2_CHEAT 0x0050d090
-void C2_HOOK_FASTCALL FUN_005076a0(int pArg1, int pArg2) {
-    NOT_IMPLEMENTED();
-}
-
-// STUB: CARMA2_HW 0x005088b0
-// STUB: CARMA2_SW 0x00503d00
-// STUB: CARMA2_CHEAT 0x0050e2a0
-void C2_HOOK_FASTCALL FUN_005088b0(void) {
-    NOT_IMPLEMENTED();
-}
-
 #ifdef REC2_MATCHING
 #pragma auto_inline(off)
 #endif
@@ -304,6 +290,20 @@ void C2_HOOK_FASTCALL AutoSaveAdditionalStuff(void) {
     gAdditional_actor_path[len_actor_path] = '\0';
     gAdditional_model_path[len_model_path] = '\0';
     FlushAllPedCaches();
+}
+
+// STUB: CARMA2_HW 0x005076a0
+// STUB: CARMA2_SW 0x00502af0
+// STUB: CARMA2_CHEAT 0x0050d090
+void C2_HOOK_FASTCALL DropActor(int pIndex, int pPowerup) {
+    NOT_IMPLEMENTED();
+}
+
+// STUB: CARMA2_HW 0x005088b0
+// STUB: CARMA2_SW 0x00503d00
+// STUB: CARMA2_CHEAT 0x0050e2a0
+void C2_HOOK_FASTCALL DeleteAcc(void) {
+    NOT_IMPLEMENTED();
 }
 
 // FUNCTION: CARMA2_HW 0x0050c980
