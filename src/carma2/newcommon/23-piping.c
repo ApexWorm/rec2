@@ -1214,6 +1214,19 @@ void C2_HOOK_FASTCALL PipeSingleFrameFinish(void) {
         SIZE_OFFSET_PIPING(tPipe_chunk_frame_boundary, time), GetTotalTime());
 }
 
+// FUNCTION: CARMA2_HW 0x004c8360
+// FUNCTION: CARMA2_SW 0x004c4a90
+// FUNCTION: CARMA2_CHEAT 0x004cde80
+void C2_HOOK_FASTCALL PipeSingleCar(int pCar_ID, br_matrix34* pCar_mat, br_vector3* pCar_velocity, float pSpeedo_speed, float pRevs, int pGear, int pFrame_coll_flag, int pField_0x18cc) {
+
+    ARDoSingleVariedSession(ePipe_chunk_car, pCar_ID, 5,
+        SIZE_OFFSET_PIPING(tPipe_chunk_car, mat), pCar_mat,
+        SIZE_OFFSET_PIPING(tPipe_chunk_car, v), pCar_velocity,
+        SIZE_OFFSET_PIPING(tPipe_chunk_car, speedo_speed), (int)(pSpeedo_speed * (32767.0 / 0.07)),
+        SIZE_OFFSET_PIPING(tPipe_chunk_car, flags), (((int)pRevs / 10) & 0x7ff) + ((pGear + 1) << 12) + (pFrame_coll_flag ? 0x800 : 0),
+        SIZE_OFFSET_PIPING(tPipe_chunk_car, field_0x40), pField_0x18cc);
+}
+
 // FUNCTION: CARMA2_HW 0x004c83f0
 // FUNCTION: CARMA2_SW 0x004c4b20
 // FUNCTION: CARMA2_CHEAT 0x004cdf10
