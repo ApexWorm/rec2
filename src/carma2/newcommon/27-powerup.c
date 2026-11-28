@@ -1751,9 +1751,9 @@ int C2_HOOK_FASTCALL MineExplode(tShit_mine* pMine) {
 // FUNCTION: CARMA2_HW 0x004ddc10
 // FUNCTION: CARMA2_SW 0x004da110
 // FUNCTION: CARMA2_CHEAT 0x004e37d0
-void C2_HOOK_FASTCALL TiggerMineToExplode(tCar_spec* pCar) {
+void C2_HOOK_FASTCALL TiggerMineToExplode(tShit_mine* pMine) {
 
-    pCar->index |= 0x20;
+    pMine->flags |= 0x20;
 }
 
 #ifdef REC2_MATCHING
@@ -1798,7 +1798,7 @@ void C2_HOOK_FASTCALL HitAShatOutMine(tPhysics_object* pObject1, tPhysics_object
             || (non_car->driver != eDriver_4 && non_car->driver != eDriver_detached_bit && non_car->driver != eDriver_split_car)
             || !(non_car->flags & 0x10000)) {
             if (other->flags_0x238 == 0x40) {
-                ((tShit_mine*)other->owner)->flags |= 0x20;
+                TiggerMineToExplode(other->owner);
                 return;
             }
             car = other->owner;
@@ -1814,16 +1814,16 @@ void C2_HOOK_FASTCALL HitAShatOutMine(tPhysics_object* pObject1, tPhysics_object
             } else {
                 ThisObjectHitAMineSoSpamItUpUsingThisPowerupsSettings(other, 0);
             }
-            mine->flags |= 0x20;
+            TiggerMineToExplode(mine);
             return;
         }
     }
-    if (pImpulse > mine->field_0x1c && gPinball_factor == 0.0f) {
-        mine->flags |= 0x20;
-        return;
-    }
-    if (pImpulse > 0.025f) {
-        DRS3StartSound3D(gCar_outlet, 5403, &mine->collision_info->actor->t.t.translate.t, &gZero_v__car, 1, 255, 0x10000, 0x10000);
+    if (pImpulse <= mine->field_0x1c || gPinball_factor != 0.0f) {
+        if (pImpulse > 0.025f) {
+            DRS3StartSound3D(gCar_outlet, 5403, &mine->collision_info->actor->t.t.translate.t, &gZero_v__car, 1, 255, 0x10000, 0x10000);
+        }
+    } else {
+        TiggerMineToExplode(mine);
     }
 }
 
