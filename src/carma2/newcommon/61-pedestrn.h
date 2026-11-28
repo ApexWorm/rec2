@@ -182,7 +182,7 @@ extern void C2_HOOK_FASTCALL SetObjectOmega(tPhysics_object* pObject, const br_v
 
 extern void C2_HOOK_FASTCALL MakePartPhysicallyActive(tPhysics_object* pObject, const br_vector3* pV, const br_vector3* pOmega, int pArg4);
 
-extern void C2_HOOK_FASTCALL TurnPhysicsOn(tPed_character_instance* pCharacter);
+extern tPhysics_object* C2_HOOK_FASTCALL TurnPhysicsOn(tPed_character_instance* pCharacter);
 
 extern int C2_HOOK_FASTCALL MakeCharacterPhysicworthy(tPed_character_instance* pCharacter);
 
