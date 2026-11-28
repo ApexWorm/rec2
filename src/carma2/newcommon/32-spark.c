@@ -872,7 +872,7 @@ void C2_HOOK_FASTCALL InitSmokeStuff(void) {
 
 // FUNCTION: CARMA2_HW 0x004fa8d0
 // FUNCTION: CARMA2_SW 0x004f5960
-// FUNCTION: CARMA2_CHEAET 0x00500570
+// FUNCTION: CARMA2_CHEAT 0x00500570
 void C2_HOOK_FASTCALL DustRotate(void) {
 
     gDust_rotate += 1;
@@ -1197,7 +1197,7 @@ void C2_HOOK_FASTCALL GenerateSmokeShades(void) {
 
 // FUNCTION: CARMA2_HW 0x004fb9c0
 // FUNCTION: CARMA2_SW 0x004f6f20
-// FUNCTION: CARMA2_cHEAT 0x00501660
+// FUNCTION: CARMA2_CHEAT 0x00501660
 void C2_HOOK_FASTCALL GenerateItFoxShadeTable(void) {
     if (gIt_shade_table == NULL) {
         gIt_shade_table = GenerateDarkenedShadeTable(16, gRender_palette, 0, 255, 254, .25f, .5f, .75f, .6f);

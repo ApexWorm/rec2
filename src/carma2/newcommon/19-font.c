@@ -919,10 +919,10 @@ br_material* C2_HOOK_FASTCALL GetPolyFontMaterial(int pFont_index, char pChar) {
     float f_size;
     tU32 packed_font_character;
 
-    // GLOBAL: CARMA2 0x00686480
+    // GLOBAL: CARMA2_HW 0x00686480
     static int poly_font_material_index;
 
-    // GLOBAL: CARMA2 0x00686498
+    // GLOBAL: CARMA2_HW 0x00686498
     static tU16 poly_font_material_generation;
 
     C2_HOOK_BUG_ON(sizeof(tPolyFont) != 0x1c68);
