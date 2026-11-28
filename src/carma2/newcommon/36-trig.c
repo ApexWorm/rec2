@@ -189,6 +189,7 @@ br_scalar C2_HOOK_FASTCALL FastScalarCos(int pAngle_degrees) {
 
 // FUNCTION: CARMA2_HW 0x00511780
 // FUNCTION: CARMA2_SW 0x0050cbd0
+// FUNCTION: CARMA2_CHEAT 0x00517170
 br_scalar C2_HOOK_FASTCALL FastScalarSinAngle(br_angle pAngle) {
 
     return FastScalarSin((int)((double)pAngle * (360.0 / 65536.0)));
@@ -196,6 +197,7 @@ br_scalar C2_HOOK_FASTCALL FastScalarSinAngle(br_angle pAngle) {
 
 // FUNCTION: CARMA2_HW 0x00511810
 // FUNCTION: CARMA2_SW 0x0050cc60
+// FUNCTION: CARMA2_CHEAT 0x00517200
 br_scalar C2_HOOK_FASTCALL FastScalarCosAngle(br_angle pAngle) {
 
     return FastScalarCos((int)((double)pAngle * (360.0 / 65536.0)));

@@ -141,7 +141,7 @@ extern void C2_HOOK_FASTCALL RestoreCarPixelmaps(tCar_spec* pCar);
 
 // MungeShrapnel
 
-// DrMatrix34Rotate
+extern void C2_HOOK_FASTCALL DrMatrix34Rotate(br_matrix34* mat, br_angle r, const br_vector3* a);
 
 extern int C2_HOOK_CDECL CmpSmokeZ(const void* p1, const void* p2);
 
@@ -157,7 +157,7 @@ extern void C2_HOOK_FASTCALL RenderRecordedSmokeCircles(void);
 
 // ReplaySmoke
 
-// GenerateContinuousSmoke
+extern void C2_HOOK_FASTCALL GenerateContinuousSmoke(tCar_spec* pCar, int pWheel, tU32 pTime);
 
 // RenderSmoke
 
@@ -197,7 +197,7 @@ extern void C2_HOOK_FASTCALL InitFlame(void);
 
 extern void C2_HOOK_FASTCALL InitSplash(FILE* pF);
 
-// DisposeSplash
+extern void C2_HOOK_FASTCALL DisposeSplash(void);
 
 // DrawTheGlow
 
