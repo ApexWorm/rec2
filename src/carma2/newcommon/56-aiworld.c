@@ -106,6 +106,39 @@ void C2_HOOK_FASTCALL PointActorAlongVectorWithUp(br_actor* pThe_actor, br_vecto
     BrTransformToTransform(&pThe_actor->t, &trans);
 }
 
+inline void C2_HOOK_FASTCALL AllocateMatsForOppoPathModel(void) {
+
+    gMat_dk_yel = CreateSimpleMaterial(50);
+    gMat_md_yel = CreateSimpleMaterial(51);
+    gMat_lt_yel = CreateSimpleMaterial(52);
+    gMat_dk_red = CreateSimpleMaterial(2);
+    gMat_md_red = CreateSimpleMaterial(3);
+    gMat_lt_red = CreateSimpleMaterial(4);
+    gMat_dk_grn = CreateSimpleMaterial(66);
+    gMat_md_grn = CreateSimpleMaterial(67);
+    gMat_lt_grn = CreateSimpleMaterial(68);
+    gMat_dk_blu = CreateSimpleMaterial(162);
+    gMat_lt_blu = CreateSimpleMaterial(164);
+    gMat_dk_turq = CreateSimpleMaterial(130);
+    gMat_lt_turq = CreateSimpleMaterial(132);
+    gMat_dk_gry = CreateSimpleMaterial(253);
+    gMat_md_gry = CreateSimpleMaterial(254);
+    gMat_lt_gry = CreateSimpleMaterial(255);
+    gMats_allocated = 1;
+}
+
+// FUNCTION: CARMA2_HW 0x004014a0
+// FUNCTION: CARMA2_SW 0x004014a0
+// FUNCTION: CARMA2_CHEAT 0x004014a0
+void C2_HOOK_FASTCALL FUN_004014a0(void) {
+
+    if (!gMats_allocated) {
+        AllocateMatsForOppoPathModel();
+    }
+    FUN_004af490();
+    FUN_00453460();
+}
+
 // FUNCTION: CARMA2_HW 0x00401760
 // FUNCTION: CARMA2_SW 0x00401760
 // FUNCTION: CARMA2_CHEAT 0x00401760
@@ -122,6 +155,23 @@ br_material* C2_HOOK_FASTCALL CreateSimpleMaterial(int pIndex) {
     material->identifier = NULL;
     BrMaterialAdd(material);
     return material;
+}
+
+// FUNCTION: CARMA2_HW 0x004017c0
+// FUNCTION: CARMA2_SW 0x004017c0
+// FUNCTION: CARMA2_CHEAT 0x004017c0
+void C2_HOOK_FASTCALL FUN_004017c0(void) {
+
+    if (!gMats_allocated) {
+        AllocateMatsForOppoPathModel();
+    }
+    ToggleDronePaths();
+    FUN_004af490();
+    if (gINT_0067689c++ != 0) {
+        gINT_0067689c = 0;
+    } else {
+        FUN_004af4a0();
+    }
 }
 
 // FUNCTION: CARMA2_HW 0x00401aa0

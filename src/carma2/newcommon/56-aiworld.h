@@ -36,6 +36,12 @@ extern void C2_HOOK_FASTCALL PointActorAlongThisBloodyVector(br_actor* pThe_acto
 
 extern void C2_HOOK_FASTCALL PointActorAlongVectorWithUp(br_actor* pThe_actor, br_vector3* pLook, br_vector3* pUp);
 
+extern void C2_HOOK_FASTCALL AllocateMatsForOppoPathModel(void);
+
+extern void C2_HOOK_FASTCALL FUN_004014a0(void);
+
+extern void C2_HOOK_FASTCALL FUN_004017c0(void);
+
 extern br_material* C2_HOOK_FASTCALL CreateSimpleMaterial(int pIndex);
 
 extern void C2_HOOK_FASTCALL MakeAIEditCubeHere(br_model* pModel, int pVertex_index, int pFace_index, const br_vector3* pPos, br_material* pMaterial_1, br_material* pMaterial_2, br_material* pMaterial_3);
