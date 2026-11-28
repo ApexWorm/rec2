@@ -50,10 +50,35 @@ int gINT_00679438;
 // GLOBAL: CARMA2_CHEAT 0x0069a940
 int gINT_00692dc8;
 
+// GLOBAL: CARMA2_HW 0x00692dcc
+// GLOBAL: CARMA2_SW 0x0068ce24
+// GLOBAL: CARMA2_CHEAT 0x0069a944
+int gPrepared_objects;
+
+// GLOBAL: CARMA2_HW 0x00692dd0
+// GLOBAL: CARMA2_SW 0x0068ce28
+// GLOBAL: CARMA2_CHEAT 0x0069a948
+br_scalar gPhysics_bounds_max_x;
+
+// GLOBAL: CARMA2_HW 0x00692dd4
+// GLOBAL: CARMA2_SW 0x0068ce2c
+// GLOBAL: CARMA2_CHEAT 0x0069a94c
+br_scalar gPhysics_bounds_min_x;
+
 // GLOBAL: CARMA2_HW 0x006940a0
 // GLOBAL: CARMA2_SW 0x0068e0f8
 // GLOBAL: CARMA2_CHEAT 0x0069bc18
 int gPHIL_collision_group;
+
+// GLOBAL: CARMA2_HW 0x006940a8
+// GLOBAL: CARMA2_SW 0x0068e100
+// GLOBAL: CARMA2_CHEAT 0x0069bc20
+tPhysics_object** gReduced_object_list;
+
+// GLOBAL: CARMA2_HW 0x006940ac
+// GLOBAL: CARMA2_SW 0x0068e104
+// GLOBAL: CARMA2_CHEAT 0x0069bc24
+int gINT_006940ac;
 
 // GLOBAL: CARMA2_HW 0x006940c0
 // GLOBAL: CARMA2_SW 0x0068e118
@@ -1882,19 +1907,163 @@ void C2_HOOK_FASTCALL TellPhysicsJointsHaveChanged(tPhysics_object* pCollision_i
     gINT_00692dc8 = 1;
 }
 
-// CombineBounds
+void C2_HOOK_FASTCALL CombineBounds(br_bounds* pBounds, br_bounds* pOther) {
+    int i;
 
-// GetWorldBoundingBoxForObjects
+    for (i = 0; i < 3; i++) {
+        if (pOther->min.v[i] < pBounds->min.v[i]) {
+            pBounds->min.v[i] = pOther->min.v[i];
+        }
+        if (pOther->max.v[i] > pBounds->max.v[i]) {
+            pBounds->max.v[i] = pOther->max.v[i];
+        }
+    }
+}
 
-// GetWorldBoundingBoxForObject
+extern void C2_HOOK_FASTCALL GetWorldBoundingBoxForObject(tPhysics_object* pObject, br_bounds* pBounds);
 
-// MatricesAreIdentical
+void C2_HOOK_FASTCALL GetWorldBoundingBoxForObjects(tPhysics_object* pObject, br_bounds* pBounds) {
 
-// InternalPrepareObject
+    for (; pObject != NULL; pObject = pObject->next) {
+        GetWorldBoundingBoxForObject(pObject, pBounds);
+    }
+}
 
-// PrepareObject
+// FUNCTION: CARMA2_HW 0x004b9ce0
+// FUNCTION: CARMA2_SW 0x004b6400
+// FUNCTION: CARMA2_CHEAT 0x004bf810
+void C2_HOOK_FASTCALL GetWorldBoundingBoxForObject(tPhysics_object* pObject, br_bounds* pBounds) {
+    br_bounds bounds;
+    br_scalar extent;
+    int i;
 
-// PrepareForCollisions
+    GetNewBoundingBox(&pObject->field_0xf4, &pObject->bb1, &pObject->transform_matrix);
+    GetNewBoundingBox(&bounds, &pObject->bb1, &pObject->actor->t.t.mat);
+    for (i = 0; i < 3; i++) {
+        if (pObject->field_0xf4.min.v[i] > bounds.min.v[i]) {
+            pObject->field_0xf4.min.v[i] = bounds.min.v[i];
+        }
+        if (pObject->field_0xf4.max.v[i] < bounds.max.v[i]) {
+            pObject->field_0xf4.max.v[i] = bounds.max.v[i];
+        }
+        pObject->field_0xf4.min.v[i] -= 0.0025;
+        pObject->field_0xf4.max.v[i] -= -0.0025;
+    }
+    pObject->field_0x10c = pObject->field_0xf4;
+    GetWorldBoundingBoxForObjects(pObject->child, &pObject->field_0x10c);
+    if (pBounds != NULL) {
+        CombineBounds(pBounds, &pObject->field_0x10c);
+    } else {
+        extent = pObject->field_0x10c.max.v[0] - pObject->transform_matrix.m[3][0];
+        if (gPhysics_bounds_max_x <= extent) {
+            gPhysics_bounds_max_x = extent;
+        }
+        extent = pObject->field_0x10c.min.v[0] - pObject->transform_matrix.m[3][0];
+        if (gPhysics_bounds_min_x >= extent) {
+            gPhysics_bounds_min_x = extent;
+        }
+    }
+}
+
+int C2_HOOK_FASTCALL MatricesAreIdentical(br_matrix34* pMat1, br_matrix34* pMat2) {
+    int i;
+    int j;
+
+    for (i = 3; i >= 0; i--) {
+        for (j = 0; j < 3; j++) {
+            if (pMat1->m[i][j] != pMat2->m[i][j]) {
+                return 0;
+            }
+        }
+    }
+    return 1;
+}
+
+extern void C2_HOOK_FASTCALL PrepareForCollisions(tPhysics_object* pObject);
+
+// FUNCTION: CARMA2_HW 0x004b99e0
+// FUNCTION: CARMA2_SW 0x004b6100
+// FUNCTION: CARMA2_CHEAT 0x004bf510
+void C2_HOOK_FASTCALL InternalPrepareObject(tPhysics_object* pObject) {
+    br_vector3 offset;
+
+    if (pObject->M == 0.0f) {
+        pObject->M = 0.01f;
+        BrVector3SetFloat(&pObject->I, 0.01f, 0.01f, 0.01f);
+    }
+    pObject->field_0x1de = 0;
+    pObject->collision_flag = 0;
+    pObject->field_0x1dc = 0;
+    pObject->field_0x1e4 = 0;
+    pObject->flags &= ~0x1200;
+    pObject->field_0x21c = 1.0f;
+    pObject->field183_0x1d8 = pObject;
+    pObject->field_0x218 = 0;
+    pObject->field_0x1e0 = pObject->disable_move_rotate;
+    BrMatrix34TApplyV(&pObject->velocity_car_space, &pObject->v, &pObject->transform_matrix);
+    BrVector3Copy(&pObject->field_0x1b4, &pObject->v);
+    BrVector3Copy(&pObject->field_0x1cc, &pObject->omega);
+    if (pObject->parent != NULL) {
+        pObject->disable_move_rotate = pObject->parent->disable_move_rotate;
+    }
+    if (!pObject->disable_move_rotate && pObject->field_0x1df) {
+        pObject->field_0x21c *= 50.0f;
+        BrVector3Scale(&pObject->I, &pObject->I, 50.0f);
+    }
+    if (pObject->disable_move_rotate & (pObject->field_0xf0 != 2)) {
+        BrMatrix34Copy(&pObject->actor->t.t.mat, &pObject->transform_matrix);
+        PrepareForCollisions(pObject->child);
+        if (pObject->parent == NULL) {
+            GetWorldBoundingBoxForObject(pObject, NULL);
+        }
+    } else if (pObject->field_0xf0 == 2) {
+        pObject->field_0x230 = pObject->parent;
+        BrVector3Sub(&offset, (br_vector3*)pObject->actor->t.t.mat.m[3], (br_vector3*)pObject->transform_matrix.m[3]);
+        if (BrVector3LengthSquared(&offset) > 1.0) {
+            PhysicsWarning("Stupid trial position");
+            BrMatrix34Copy(&pObject->transform_matrix, &pObject->actor->t.t.mat);
+        }
+        if (!MatricesAreIdentical(&pObject->transform_matrix, &pObject->actor->t.t.mat)) {
+            pObject->disable_move_rotate = 0;
+        }
+        PrepareForCollisions(pObject->child);
+        GetWorldBoundingBoxForObject(pObject, NULL);
+    } else {
+        if (pObject->field_0xf0 != 1) {
+            BrMatrix34LPNormalise(&pObject->actor->t.t.mat, &pObject->transform_matrix);
+        } else {
+            BrMatrix34Copy(&pObject->field_0xbc, &pObject->actor->t.t.mat);
+        }
+        PrepareForCollisions(pObject->child);
+        if (pObject->parent == NULL) {
+            MoveJointedObject(pObject, 0.04f);
+            GetWorldBoundingBoxForObject(pObject, NULL);
+        }
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x004b9770
+// FUNCTION: CARMA2_SW 0x004b5e90
+// FUNCTION: CARMA2_CHEAT 0x004bf2a0
+void C2_HOOK_FASTCALL PrepareObject(tPhysics_object* pObject, tPhysics_object** pList) {
+
+    InternalPrepareObject(pObject);
+    gPrepared_objects = 1;
+    CheckObjectsPostionInList(pObject, pList);
+    if (gINT_006940ac != 0) {
+        MakeObjectDoSomething(pObject, *pList);
+    }
+    if (gReduced_object_list != NULL) {
+        AddObjectToReducedList(pObject, gReduced_object_list);
+    }
+}
+
+void C2_HOOK_FASTCALL PrepareForCollisions(tPhysics_object* pObject) {
+
+    for (; pObject != NULL; pObject = pObject->next) {
+        InternalPrepareObject(pObject);
+    }
+}
 
 // CheckPointVelocities
 
@@ -2047,8 +2216,6 @@ void C2_HOOK_FASTCALL MakeObjectListDoSomething(tPhysics_object* pObject) {
     }
 }
 
-extern void C2_HOOK_FASTCALL MakeObjectDoSomething(tPhysics_object* pObject, tPhysics_object* pList);
-
 // FUNCTION: CARMA2_HW 0x004b9f90
 // FUNCTION: CARMA2_SW 0x004b66b0
 // FUNCTION: CARMA2_CHEAT 0x004bfac0
@@ -2160,7 +2327,11 @@ int C2_HOOK_FASTCALL FlagsAreGo(tPhysics_object* pCollision_1, tPhysics_object* 
 
 // CollideObjectWithReducedObjectList
 
-// AddObjectToReducedList
+inline void C2_HOOK_FASTCALL AddObjectToReducedList(tPhysics_object* pObject, tPhysics_object** pList) {
+
+    pObject->field_0x234 = *pList;
+    *pList = pObject;
+}
 
 // ReducedFindObjectCollisions
 
@@ -2478,9 +2649,44 @@ void C2_HOOK_FASTCALL ApplyDiminishingTorque(tPhysics_object* pObject, const br_
 
 // OrderObjectListOnX
 
-// SwapPair
+inline void C2_HOOK_FASTCALL SwapPair(tPhysics_object* pObject_1, tPhysics_object* pObject_2) {
+    tPhysics_object* prev;
+    tPhysics_object* next;
 
-// CheckObjectsPostionInList
+    prev = pObject_1->prev;
+    next = pObject_2->next;
+    if (prev != NULL) {
+        prev->next = pObject_2;
+    }
+    if (next != NULL) {
+        next->prev = pObject_1;
+    }
+    pObject_1->prev = pObject_2;
+    pObject_2->prev = prev;
+    pObject_1->next = next;
+    pObject_2->next = pObject_1;
+}
+
+inline void C2_HOOK_FASTCALL CheckObjectsPostionInList(tPhysics_object* pObject, tPhysics_object** pList) {
+    tPhysics_object* other;
+
+    other = pObject->prev;
+    if (other != NULL && pObject->transform_matrix.m[3][0] < other->transform_matrix.m[3][0]) {
+        do {
+            SwapPair(other, pObject);
+            other = pObject->prev;
+        } while (other != NULL && pObject->transform_matrix.m[3][0] < other->transform_matrix.m[3][0]);
+        if (other == NULL) {
+            *pList = pObject;
+        }
+    } else {
+        other = pObject->next;
+        while (other != NULL && other->transform_matrix.m[3][0] < pObject->transform_matrix.m[3][0]) {
+            SwapPair(pObject, other);
+            other = pObject->next;
+        }
+    }
+}
 
 // TestForWrongAnswer
 
@@ -2902,12 +3108,20 @@ void C2_NORETURN C2_HOOK_FASTCALL PhysicsError(tPhysicsError pError, const char*
     exit(pError);
 }
 
+#ifdef REC2_MATCHING
+#pragma auto_inline(off)
+#endif
+
 // FUNCTION: CARMA2_HW 0x004c61e0
 // FUNCTION: CARMA2_SW 0x004c2910
 // FUNCTION: CARMA2_CHEAT 0x004cbd00
 void C2_HOOK_FASTCALL PhysicsWarning(const char* pMessage) {
     (void)pMessage;
 }
+
+#ifdef REC2_MATCHING
+#pragma auto_inline(on)
+#endif
 
 // FUNCTION: CARMA2_HW 0x004c61f0
 // FUNCTION: CARMA2_SW 0x004c2920
