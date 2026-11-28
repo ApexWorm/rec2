@@ -890,14 +890,16 @@ void C2_HOOK_STDCALL DecreaseAngle(void) {
 }
 
 // FUNCTION: CARMA2_HW 0x00446cc0
-// STUB: CARMA2_SW 0x00446d40
+// FUNCTION: CARMA2_SW 0x00446d40
 // FUNCTION: CARMA2_CHEAT 0x004471e0
 void C2_HOOK_FASTCALL ToggleDepthMode(void) {
-#ifdef REC2_HW
+
     switch (gProgram_state.current_depth_effect.type) {
     case eDepth_effect_fog:
         InstantDepthChange(eDepth_effect_none, gProgram_state.current_depth_effect.sky_texture, 0, 0, 0, 0, 0, gProgram_state.racing);
+#ifdef REC2_HW
         InstantDepthChange(eDepth_effect_colour, gProgram_state.current_depth_effect.sky_texture, 10, 0, gTrack_depth_colour_red, gTrack_depth_colour_green, gTrack_depth_colour_blue, gProgram_state.racing);
+#endif
         NewTextHeadupSlot(4, 0, 500, -1, "Colour Fog mode");
         break;
     case eDepth_effect_colour:
@@ -915,10 +917,6 @@ void C2_HOOK_FASTCALL ToggleDepthMode(void) {
         break;
     }
     gProgram_state.default_depth_effect.type = gProgram_state.current_depth_effect.type;
-#endif
-#ifdef REC2_SW
-    NOT_IMPLEMENTED();
-#endif
 }
 
 // FUNCTION: CARMA2_HW 0x00446e00
