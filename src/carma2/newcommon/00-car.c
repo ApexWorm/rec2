@@ -1268,6 +1268,21 @@ int C2_HOOK_FASTCALL ProcessJointForcesCallBack(void* pArg1, void* pArg2, void* 
     return 0;
 }
 
+// FUNCTION: CARMA2_HW 0x0041e320
+// FUNCTION: CARMA2_SW 0x0041e350
+// FUNCTION: CARMA2_CHEAT 0x0041e580
+int C2_HOOK_FASTCALL FUN_0041e320(void) {
+
+    return 1;
+}
+
+// FUNCTION: CARMA2_HW 0x0041e330
+// FUNCTION: CARMA2_SW 0x0041e360
+// FUNCTION: CARMA2_CHEAT 0x0041e590
+void C2_HOOK_FASTCALL FUN_0041e330(void) {
+
+}
+
 // MultiFindFloorInBoxM
 
 // MultiRayCastOnObjects
@@ -1315,6 +1330,13 @@ int C2_HOOK_FASTCALL FindFloorInBoxBU(br_vector3* pPosition, br_vector3* pDirect
         }
     }
     return 0;
+}
+
+// FUNCTION: CARMA2_HW 0x0041e570
+// FUNCTION: CARMA2_SW 0x0041e5a0
+// FUNCTION: CARMA2_CHEAT 0x0041e7d0
+void C2_HOOK_FASTCALL FUN_0041e570(void) {
+
 }
 
 // FUNCTION: CARMA2_HW 0x0041e580

@@ -179,6 +179,10 @@ extern int C2_HOOK_FASTCALL ProcessForcesCallback(void* pArg1, float *pArg2, int
 
 extern int C2_HOOK_FASTCALL ProcessJointForcesCallBack(void* pArg1, void* pArg2, void* pArg3);
 
+extern int C2_HOOK_FASTCALL FUN_0041e320(void);
+
+extern void C2_HOOK_FASTCALL FUN_0041e330(void);
+
 // MultiFindFloorInBoxM
 
 // MultiRayCastOnObjects
@@ -190,6 +194,8 @@ extern void C2_HOOK_FASTCALL FindFace(br_vector3* pPosition, br_vector3* pDir, b
 // findfloor
 
 extern int C2_HOOK_FASTCALL FindFloorInBoxBU(br_vector3* pPosition, br_vector3* pDirection, br_vector3* pNormal, br_scalar* pDistance, tPhysics_object* pObject);
+
+extern void C2_HOOK_FASTCALL FUN_0041e570(void);
 
 extern void C2_HOOK_FASTCALL CancelPendingCunningStunt(void);
 
