@@ -205,7 +205,7 @@ br_pixelmap* gFlame_map[20] = { 0 };
 // GLOBAL: CARMA2_HW 0x006a8688
 // GLOBAL: CARMA2_SW 0x006a26e8
 // GLOBAL: CARMA2_CHEAT 0x006b0200
-int gINT_006a8688 = 0;
+undefined4 gDAT_006a8688 = 0;
 #endif
 
 // GLOBAL: CARMA2_HW 0x006aa570
