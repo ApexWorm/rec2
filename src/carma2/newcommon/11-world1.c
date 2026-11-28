@@ -12,15 +12,20 @@
 #include "08-loading1.h"
 
 #include "15-displays.h"
+#include "27-powerup.h"
 #include "28-world3.h"
 #include "41-utility.h"
+#include "42-input.h"
+#include "49-physics.h"
 #include "55-volume.h"
 #include "61-pedestrn-phys.h"
+#include "63-loading3.h"
 #include "70-packfile.h"
 #include "globvars.h"
 
 #include "c2_stdio.h"
 
+#include <math.h>
 #include <string.h>
 
 #include "rec2_macros.h"
@@ -84,6 +89,16 @@ tRotate_mode gCurrent_rotate_mode = eRotate_mode_y;
 // GLOBAL: CARMA2_SW 0x006a5394
 // GLOBAL: CARMA2_CHEAT 0x006b2fd4
 tScale_mode gCurrent_scale_mode;
+
+// GLOBAL: CARMA2_HW 0x006b75c4
+// GLOBAL: CARMA2_SW 0x006ae2a4
+// GLOBAL: CARMA2_CHEAT 0x006bec64
+int gDropped_powerup_index;
+
+// GLOBAL: CARMA2_HW 0x006ab94c
+// GLOBAL: CARMA2_SW 0x006a539c
+// GLOBAL: CARMA2_CHEAT 0x006b2fdc
+char* gDrop_actor_name;
 
 // GLOBAL: CARMA2_HW 0x006ab948
 // GLOBAL: CARMA2_SW 0x006a5398
@@ -289,6 +304,15 @@ void C2_HOOK_FASTCALL DoSaveAdditionalStuff(void) {
     }
 }
 
+// FUNCTION: CARMA2_HW 0x00507340
+// FUNCTION: CARMA2_SW 0x00502790
+// FUNCTION: CARMA2_CHEAT 0x0050cd30
+void C2_HOOK_FASTCALL FUN_00507340(void) {
+
+    NewTextHeadupSlot(4, 0, 2000, -2, "Saving Additional Stuff");
+    SaveAdditionalActors();
+}
+
 // FUNCTION: CARMA2_HW 0x00507360
 // FUNCTION: CARMA2_SW 0x005027b0
 // FUNCTION: CARMA2_CHEAT 0x0050cd50
@@ -304,6 +328,473 @@ void C2_HOOK_FASTCALL AutoSaveAdditionalStuff(void) {
     gAdditional_actor_path[len_actor_path] = '\0';
     gAdditional_model_path[len_model_path] = '\0';
     FlushAllPedCaches();
+}
+
+// FUNCTION: CARMA2_HW 0x00507580
+// FUNCTION: CARMA2_SW 0x005029d0
+// FUNCTION: CARMA2_CHEAT 0x0050cf70
+void C2_HOOK_FASTCALL FUN_00507580(void) {
+    int i;
+
+    if (gNum_active_non_cars != 0) {
+        NewTextHeadupSlot(4, 0, 2000, -2, "Can't load with active non cars");
+    } else {
+        NewTextHeadupSlot(4, 0, 2000, -2, "Loading Additional Stuff");
+        for (i = 0; i < gNumber_of_additional_models; i++) {
+            BrModelRemove(gAdditional_models[i]);
+            BrModelFree(gAdditional_models[i]);
+        }
+        BrActorRemove(gAdditional_actors);
+        BrActorFree(gAdditional_actors);
+        gLast_actor = NULL;
+        gNumber_of_additional_models = BrModelLoadMany(gAdditional_model_path, gAdditional_models, REC2_ASIZE(gAdditional_models));
+        for (i = 0; i < gNumber_of_additional_models; i++) {
+            gAdditional_models[i]->flags = BR_MODF_UPDATEABLE;
+        }
+        BrModelAddMany(gAdditional_models, gNumber_of_additional_models);
+        gAdditional_actors = BrActorLoad(gAdditional_actor_path);
+        if (gAdditional_actors == NULL) {
+            gAdditional_actors = BrActorAllocate(BR_ACTOR_NONE, NULL);
+        }
+        BrActorAdd(gUniverse_actor, gAdditional_actors);
+    }
+}
+
+inline void C2_HOOK_FASTCALL UniquificateActorsName(br_actor* pUniverse_actor, br_actor* pActor, int pPowerup_index) {
+    int highest;
+
+    if (pActor->identifier != NULL && pActor->identifier[0] != '@') {
+        highest = 0;
+        DRActorEnumRecurse(pUniverse_actor, CalcHighestNonAmID, &highest);
+        gDropped_powerup_index = pPowerup_index;
+        DRActorEnumRecurse(pActor, SetID, (void*)(intptr_t)(highest + 1));
+    }
+}
+
+inline void C2_HOOK_FASTCALL AccessoryHeadup(br_actor* pActor, const char* pPrefix) {
+    char s[256];
+
+    strcpy(s, pPrefix);
+    if (pActor->identifier != NULL) {
+        strcat(s, pActor->identifier);
+    }
+    NewTextHeadupSlot(4, 0, 2000, -2, s);
+}
+
+inline void C2_HOOK_FASTCALL DuplicateIfNotAmpersand(br_actor* pActor) {
+    int highest;
+
+    if (pActor->identifier != NULL && pActor->identifier[0] != '&') {
+        highest = 0;
+        DRActorEnumRecurse(gUniverse_actor, CalcHighestID, &highest);
+        DRActorEnumRecurse(pActor, SetIDAndDupModel, &highest);
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x005076a0
+// FUNCTION: CARMA2_SW 0x00502af0
+// FUNCTION: CARMA2_CHEAT 0x0050d090
+void C2_HOOK_FASTCALL DropActor(int pIndex, int pPowerup) {
+    FILE* f;
+    tPath_name the_path;
+    char s[256];
+    char s2[256];
+    int i;
+    int face_bastard;
+    int face_count;
+    tBounds kev_bounds;
+    tFace_ref the_list[50];
+    br_scalar nearest_bastard;
+    br_scalar distance_bastard;
+    br_scalar ts;
+    br_vector3 side_vector;
+    br_transform new_transform;
+
+    if (gDrop_actor_name == NULL) {
+        if (PDKeyDown(4)) {
+            pIndex += 80;
+        }
+        if (PDKeyDown(2)) {
+            pIndex += 40;
+        }
+        if (PDKeyDown(1)) {
+            pIndex += 20;
+        }
+        if (PDKeyDown(0)) {
+            pIndex += 10;
+        }
+        PathCat(the_path, gApplication_path, pPowerup ? "POWRSHIT.TXT" : "ACCESSRY.TXT");
+        f = DRfopen(the_path, "rt");
+        for (i = 0; i <= pIndex; i++) {
+            GetAString(f, s);
+        }
+    } else {
+        sprintf(s, "%s", gDrop_actor_name);
+    }
+    gLast_actor = LoadActor(s);
+    if (gLast_actor == NULL || gLast_actor->model == NULL) {
+        sprintf(s2, "CAN'T FIND %s", s);
+        NewTextHeadupSlot(4, 0, 2000, -2, s2);
+    } else if (gLast_actor->identifier != NULL && gLast_actor->identifier[0] != '&' && gLast_actor->model->nvertices == 0) {
+        sprintf(s2, "CAN'T SHIT %s BECAUSE MODEL MUST BE IN REG OR START WITH '-'", s);
+        NewTextHeadupSlot(4, 0, 2000, -2, s2);
+        gLast_actor = NULL;
+    } else {
+        if (strlen(s) > 3 && gLast_actor->identifier != NULL && strlen(gLast_actor->identifier) > 3) {
+            for (i = 0; i < 3; i++) {
+                gLast_actor->identifier[i] = s[i];
+            }
+        }
+        if (gLast_actor->identifier[0] == '&'
+            && gLast_actor->identifier[1] >= '0' && gLast_actor->identifier[1] <= '9'
+            && gNon_car_spec_list[(gLast_actor->identifier[1] - '0') * 10 + (gLast_actor->identifier[2] - '0')] == 0) {
+            sprintf(s2, "CAN'T SHIT %s BECAUSE YOU DON'T HAVE A NONCAR.TXT FILE", s);
+            NewTextHeadupSlot(4, 0, 2000, -2, s2);
+            gLast_actor = NULL;
+        }
+        if (gLast_actor != NULL) {
+            BrMatrix34Identity(&gLast_actor->t.t.mat);
+            BrVector3Set(&kev_bounds.original_bounds.min, -0.05f, -0.05f, -0.05f);
+            BrVector3Set(&kev_bounds.original_bounds.max, 0.05f, 0.05f, 0.05f);
+            kev_bounds.mat = &gProgram_state.current_car.car_master_actor->t.t.mat;
+            do {
+                face_count = FindFacesInBox(&kev_bounds, the_list, REC2_ASIZE(the_list), NULL);
+                BrVector3Scale(&kev_bounds.original_bounds.min, &kev_bounds.original_bounds.min, 2.0f);
+                BrVector3Scale(&kev_bounds.original_bounds.max, &kev_bounds.original_bounds.max, 2.0f);
+            } while (face_count == 0);
+            face_bastard = -1;
+            nearest_bastard = BR_SCALAR_MAX;
+            for (i = 0; i < face_count; i++) {
+                distance_bastard = DistanceFromFace(gOur_pos, &the_list[i]);
+                if ((float)fabs(distance_bastard) < (float)fabs(nearest_bastard)) {
+                    nearest_bastard = distance_bastard;
+                    face_bastard = i;
+                }
+            }
+            if (face_bastard >= 0) {
+                if (gLast_actor->identifier[0] == '&'
+                    && gLast_actor->identifier[1] >= '0' && gLast_actor->identifier[1] <= '9'
+                    && gLast_actor->model->bounds.min.v[1] < 0.001) {
+                    nearest_bastard += gLast_actor->model->bounds.min.v[1] - 0.001;
+                }
+                ts = -nearest_bastard;
+                gLast_actor->t.t.mat.m[3][0] = the_list[face_bastard].normal.v[0] * ts + gOur_pos->v[0];
+                gLast_actor->t.t.mat.m[3][1] = the_list[face_bastard].normal.v[1] * ts + gOur_pos->v[1];
+                gLast_actor->t.t.mat.m[3][2] = the_list[face_bastard].normal.v[2] * ts + gOur_pos->v[2];
+                if (!PDKeyDown(4)) {
+                    BrVector3Set(&side_vector, -1.0f, 0.0f, 0.0f);
+                    if ((float)fabs(BrVector3Dot(&side_vector, &the_list[face_bastard].normal)) > 0.9) {
+                        BrVector3Set(&side_vector, 0.0f, -1.0f, 0.0f);
+                    }
+                    new_transform.type = BR_TRANSFORM_LOOK_UP;
+                    BrVector3Cross(&new_transform.t.look_up.look, &side_vector, &the_list[face_bastard].normal);
+                    BrVector3Copy(&new_transform.t.look_up.up, &the_list[face_bastard].normal);
+                    BrVector3Copy(&new_transform.t.look_up.t, &gLast_actor->t.t.translate.t);
+                    BrTransformToTransform(&gLast_actor->t, &new_transform);
+                }
+                gKnown_actor = gLast_actor;
+                BrVector3Copy(&gActor_centre, &gLast_actor->t.t.translate.t);
+                if (pPowerup) {
+                    if (pIndex >= 66 && pIndex <= 85) {
+                        SetSpinningPowerup(gLast_actor, 0);
+                    }
+                    if (pIndex >= 86 && pIndex <= 87) {
+                        SetChangingPowerup(gLast_actor);
+                    }
+                }
+                if (!pPowerup) {
+                    DuplicateIfNotAmpersand(gLast_actor);
+                } else {
+                    gLast_actor->identifier[0] = '&';
+                }
+                UniquificateActorsName(gUniverse_actor, gLast_actor, pPowerup ? pIndex : -1);
+                BrActorAdd(gAdditional_actors, gLast_actor);
+                AutoSaveAdditionalStuff();
+                if (pPowerup) {
+                    sprintf(s, "SHAT OUT A %s", GetPowerupMessage(pIndex));
+                    NewTextHeadupSlot(4, 0, 2000, -2, s);
+                } else {
+                    AccessoryHeadup(gLast_actor, "Shat out ");
+                }
+            }
+        }
+    }
+    if (gDrop_actor_name == NULL) {
+        PFfclose(f);
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x00507ea0
+// FUNCTION: CARMA2_SW 0x005032f0
+// FUNCTION: CARMA2_CHEAT 0x0050d890
+intptr_t C2_HOOK_CDECL CalcHighestNonAmID(br_actor* pActor, void* pContext) {
+    char s[256];
+    int number;
+
+    if (pActor->identifier != NULL && pActor->identifier[0] == '&') {
+        if (strlen(pActor->identifier) != 12) {
+            number = 0;
+        } else {
+            strcpy(s, &pActor->identifier[4]);
+            strtok(s, ".");
+            sscanf(s, "%d", &number);
+        }
+        if (number > *(int*)pContext) {
+            *(int*)pContext = number;
+        }
+    }
+    return 0;
+}
+
+// FUNCTION: CARMA2_HW 0x00507f40
+// FUNCTION: CARMA2_SW 0x00503390
+// FUNCTION: CARMA2_CHEAT 0x0050d930
+intptr_t C2_HOOK_CDECL SetID(br_actor* pActor, void* pContext) {
+    char s[256];
+
+    if (pActor->identifier != NULL) {
+        strcpy(s, pActor->identifier);
+        strtok(s, ".");
+        if (gDropped_powerup_index >= 0) {
+            sprintf(&s[1], "\xa3%02d", gDropped_powerup_index);
+        }
+        strcat(s, "0000");
+        sprintf(&s[4], "%04d", (int)(intptr_t)pContext);
+        strcat(s, ".ACT");
+        BrResFree(pActor->identifier);
+        pActor->identifier = BrResStrDup(pActor, s);
+    }
+    return 0;
+}
+
+// FUNCTION: CARMA2_HW 0x00508050
+// FUNCTION: CARMA2_SW 0x005034a0
+// FUNCTION: CARMA2_CHEAT 0x0050da40
+intptr_t C2_HOOK_CDECL CalcHighestID(br_actor* pActor, void* pContext) {
+    char s[256];
+    int number;
+
+    if (pActor->identifier != NULL && pActor->identifier[0] == '@') {
+        strcpy(s, &pActor->identifier[4]);
+        s[4] = '\0';
+        sscanf(s, "%d", &number);
+        if (number > *(int*)pContext) {
+            *(int*)pContext = number;
+        }
+    }
+    return 0;
+}
+
+// FUNCTION: CARMA2_HW 0x005080d0
+// FUNCTION: CARMA2_SW 0x00503520
+// FUNCTION: CARMA2_CHEAT 0x0050dac0
+intptr_t C2_HOOK_CDECL SetIDAndDupModel(br_actor* pActor, void* pContext) {
+    char s[256];
+    char s2[256];
+    br_model* new_model;
+
+    if (pActor->identifier != NULL && pActor->identifier[0] != '@') {
+        *(int*)pContext += 1;
+        strcpy(s, pActor->identifier);
+        s[0] = '@';
+        strtok(s, ".");
+        strcat(s, "0000");
+        sprintf(&s[4], "%04d", *(int*)pContext);
+        strcpy(s2, s);
+        strcat(s, ".ACT");
+        BrResFree(pActor->identifier);
+        pActor->identifier = BrResStrDup(pActor, s);
+        if (pActor->model != NULL) {
+            strcat(s2, ".DAT");
+            new_model = BrModelAllocate(s2, pActor->model->nvertices, pActor->model->nfaces);
+            memcpy(new_model->vertices, pActor->model->vertices, pActor->model->nvertices * sizeof(br_vertex));
+            memcpy(new_model->faces, pActor->model->faces, pActor->model->nfaces * sizeof(br_face));
+            new_model->flags = pActor->model->flags;
+            BrModelAdd(new_model);
+            pActor->model = new_model;
+            gAdditional_models[gNumber_of_additional_models] = new_model;
+            gNumber_of_additional_models++;
+        }
+    }
+    return 0;
+}
+
+// FUNCTION: CARMA2_HW 0x005082d0
+// FUNCTION: CARMA2_SW 0x00503720
+// FUNCTION: CARMA2_CHEAT 0x0050dcc0
+void C2_HOOK_FASTCALL DropActor0(void) {
+
+    DropActor(0, 0);
+}
+
+// FUNCTION: CARMA2_HW 0x005082e0
+// FUNCTION: CARMA2_SW 0x00503730
+// FUNCTION: CARMA2_CHEAT 0x0050dcd0
+void C2_HOOK_FASTCALL DropActor1(void) {
+
+    DropActor(1, 0);
+}
+
+// FUNCTION: CARMA2_HW 0x005082f0
+// FUNCTION: CARMA2_SW 0x00503740
+// FUNCTION: CARMA2_CHEAT 0x0050dce0
+void C2_HOOK_FASTCALL DropActor2(void) {
+
+    DropActor(2, 0);
+}
+
+// FUNCTION: CARMA2_HW 0x00508300
+// FUNCTION: CARMA2_SW 0x00503750
+// FUNCTION: CARMA2_CHEAT 0x0050dcf0
+void C2_HOOK_FASTCALL DropActor3(void) {
+
+    DropActor(3, 0);
+}
+
+// FUNCTION: CARMA2_HW 0x00508310
+// FUNCTION: CARMA2_SW 0x00503760
+// FUNCTION: CARMA2_CHEAT 0x0050dd00
+void C2_HOOK_FASTCALL DropActor4(void) {
+
+    DropActor(4, 0);
+}
+
+// FUNCTION: CARMA2_HW 0x00508320
+// FUNCTION: CARMA2_SW 0x00503770
+// FUNCTION: CARMA2_CHEAT 0x0050dd10
+void C2_HOOK_FASTCALL DropActor5(void) {
+
+    DropActor(5, 0);
+}
+
+// FUNCTION: CARMA2_HW 0x00508330
+// FUNCTION: CARMA2_SW 0x00503780
+// FUNCTION: CARMA2_CHEAT 0x0050dd20
+void C2_HOOK_FASTCALL DropActor6(void) {
+
+    DropActor(6, 0);
+}
+
+// FUNCTION: CARMA2_HW 0x00508340
+// FUNCTION: CARMA2_SW 0x00503790
+// FUNCTION: CARMA2_CHEAT 0x0050dd30
+void C2_HOOK_FASTCALL DropActor7(void) {
+
+    DropActor(7, 0);
+}
+
+// FUNCTION: CARMA2_HW 0x00508350
+// FUNCTION: CARMA2_SW 0x005037a0
+// FUNCTION: CARMA2_CHEAT 0x0050dd40
+void C2_HOOK_FASTCALL DropActor8(void) {
+
+    DropActor(8, 0);
+}
+
+// FUNCTION: CARMA2_HW 0x00508360
+// FUNCTION: CARMA2_SW 0x005037b0
+// FUNCTION: CARMA2_CHEAT 0x0050dd50
+void C2_HOOK_FASTCALL DropActor9(void) {
+
+    DropActor(9, 0);
+}
+
+// FUNCTION: CARMA2_HW 0x00508370
+// FUNCTION: CARMA2_SW 0x005037c0
+// FUNCTION: CARMA2_CHEAT 0x0050dd60
+void C2_HOOK_FASTCALL FUN_00508370(void) {
+
+    DropActor(0, 1);
+}
+
+// FUNCTION: CARMA2_HW 0x00508380
+// FUNCTION: CARMA2_SW 0x005037d0
+// FUNCTION: CARMA2_CHEAT 0x0050dd70
+void C2_HOOK_FASTCALL FUN_00508380(void) {
+
+    DropActor(1, 1);
+}
+
+// FUNCTION: CARMA2_HW 0x00508390
+// FUNCTION: CARMA2_SW 0x005037e0
+// FUNCTION: CARMA2_CHEAT 0x0050dd80
+void C2_HOOK_FASTCALL FUN_00508390(void) {
+
+    DropActor(2, 1);
+}
+
+// FUNCTION: CARMA2_HW 0x005083a0
+// FUNCTION: CARMA2_SW 0x005037f0
+// FUNCTION: CARMA2_CHEAT 0x0050dd90
+void C2_HOOK_FASTCALL FUN_005083a0(void) {
+
+    DropActor(3, 1);
+}
+
+// FUNCTION: CARMA2_HW 0x005083b0
+// FUNCTION: CARMA2_SW 0x00503800
+// FUNCTION: CARMA2_CHEAT 0x0050dda0
+void C2_HOOK_FASTCALL FUN_005083b0(void) {
+
+    DropActor(4, 1);
+}
+
+// FUNCTION: CARMA2_HW 0x005083c0
+// FUNCTION: CARMA2_SW 0x00503810
+// FUNCTION: CARMA2_CHEAT 0x0050ddb0
+void C2_HOOK_FASTCALL FUN_005083c0(void) {
+
+    DropActor(5, 1);
+}
+
+// FUNCTION: CARMA2_HW 0x005083d0
+// FUNCTION: CARMA2_SW 0x00503820
+// FUNCTION: CARMA2_CHEAT 0x0050ddc0
+void C2_HOOK_FASTCALL FUN_005083d0(void) {
+
+    DropActor(6, 1);
+}
+
+// FUNCTION: CARMA2_HW 0x005083e0
+// FUNCTION: CARMA2_SW 0x00503830
+// FUNCTION: CARMA2_CHEAT 0x0050ddd0
+void C2_HOOK_FASTCALL FUN_005083e0(void) {
+
+    DropActor(7, 1);
+}
+
+// FUNCTION: CARMA2_HW 0x005083f0
+// FUNCTION: CARMA2_SW 0x00503840
+// FUNCTION: CARMA2_CHEAT 0x0050dde0
+void C2_HOOK_FASTCALL FUN_005083f0(void) {
+
+    DropActor(8, 1);
+}
+
+// FUNCTION: CARMA2_HW 0x00508400
+// FUNCTION: CARMA2_SW 0x00503850
+// FUNCTION: CARMA2_CHEAT 0x0050ddf0
+void C2_HOOK_FASTCALL FUN_00508400(void) {
+
+    DropActor(9, 1);
+}
+
+// FUNCTION: CARMA2_HW 0x00508830
+// FUNCTION: CARMA2_SW 0x00503c80
+// FUNCTION: CARMA2_CHEAT 0x0050e220
+intptr_t C2_HOOK_CDECL DelReferencedModels(br_actor* pActor, void* pContext) {
+    int i;
+
+    for (i = 0; i < gNumber_of_additional_models; i++) {
+        if (pActor->model == gAdditional_models[i]) {
+            BrModelRemove(pActor->model);
+            BrModelFree(pActor->model);
+            memcpy(&gAdditional_models[i], &gAdditional_models[i + 1], (gNumber_of_additional_models - i - 1) * sizeof(br_model*));
+            gNumber_of_additional_models--;
+            break;
+        }
+    }
+    return 0;
 }
 
 // FUNCTION: CARMA2_HW 0x00508a50

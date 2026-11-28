@@ -100,6 +100,11 @@ br_vector3 gZero_v__car;  // FIXME: make const?
 // GLOBAL: CARMA2_SW 0x00673b10
 int gFreeze_mechanics;
 
+// GLOBAL: CARMA2_HW 0x0079ef40
+// GLOBAL: CARMA2_SW 0x007954e0
+// GLOBAL: CARMA2_CHEAT 0x007a65e0
+char gNon_car_spec_list[100];
+
 // GLOBAL: CARMA2_HW 0x006793dc
 // GLOBAL: CARMA2_SW 0x00673b4c
 // GLOBAL: CARMA2_CHEAT 0x00680c8c

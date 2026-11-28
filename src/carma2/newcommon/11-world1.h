@@ -18,6 +18,8 @@ extern br_actor* gKnown_actor;
 extern br_vector3 gActor_centre;
 extern tRotate_mode gCurrent_rotate_mode;
 extern tScale_mode gCurrent_scale_mode;
+extern int gDropped_powerup_index;
+extern char* gDrop_actor_name;
 
 extern br_uint_32 C2_HOOK_FASTCALL DeleteBastards(br_actor* pActor, br_matrix34* pMatrix, void* pArg);
 
@@ -41,7 +43,69 @@ extern void C2_HOOK_FASTCALL SaveAdditionalActors(void);
 
 extern void C2_HOOK_FASTCALL DoSaveAdditionalStuff(void);
 
+extern void C2_HOOK_FASTCALL FUN_00507340(void);
+
 extern void C2_HOOK_FASTCALL AutoSaveAdditionalStuff(void);
+
+extern void C2_HOOK_FASTCALL FUN_00507580(void);
+
+extern void C2_HOOK_FASTCALL UniquificateActorsName(br_actor* pUniverse_actor, br_actor* pActor, int pPowerup_index);
+
+extern void C2_HOOK_FASTCALL AccessoryHeadup(br_actor* pActor, const char* pPrefix);
+
+extern void C2_HOOK_FASTCALL DuplicateIfNotAmpersand(br_actor* pActor);
+
+extern void C2_HOOK_FASTCALL DropActor(int pIndex, int pPowerup);
+
+extern intptr_t C2_HOOK_CDECL CalcHighestNonAmID(br_actor* pActor, void* pContext);
+
+extern intptr_t C2_HOOK_CDECL SetID(br_actor* pActor, void* pContext);
+
+extern intptr_t C2_HOOK_CDECL CalcHighestID(br_actor* pActor, void* pContext);
+
+extern intptr_t C2_HOOK_CDECL SetIDAndDupModel(br_actor* pActor, void* pContext);
+
+extern void C2_HOOK_FASTCALL DropActor0(void);
+
+extern void C2_HOOK_FASTCALL DropActor1(void);
+
+extern void C2_HOOK_FASTCALL DropActor2(void);
+
+extern void C2_HOOK_FASTCALL DropActor3(void);
+
+extern void C2_HOOK_FASTCALL DropActor4(void);
+
+extern void C2_HOOK_FASTCALL DropActor5(void);
+
+extern void C2_HOOK_FASTCALL DropActor6(void);
+
+extern void C2_HOOK_FASTCALL DropActor7(void);
+
+extern void C2_HOOK_FASTCALL DropActor8(void);
+
+extern void C2_HOOK_FASTCALL DropActor9(void);
+
+extern void C2_HOOK_FASTCALL FUN_00508370(void);
+
+extern void C2_HOOK_FASTCALL FUN_00508380(void);
+
+extern void C2_HOOK_FASTCALL FUN_00508390(void);
+
+extern void C2_HOOK_FASTCALL FUN_005083a0(void);
+
+extern void C2_HOOK_FASTCALL FUN_005083b0(void);
+
+extern void C2_HOOK_FASTCALL FUN_005083c0(void);
+
+extern void C2_HOOK_FASTCALL FUN_005083d0(void);
+
+extern void C2_HOOK_FASTCALL FUN_005083e0(void);
+
+extern void C2_HOOK_FASTCALL FUN_005083f0(void);
+
+extern void C2_HOOK_FASTCALL FUN_00508400(void);
+
+extern intptr_t C2_HOOK_CDECL DelReferencedModels(br_actor* pActor, void* pContext);
 
 extern void C2_HOOK_FASTCALL SnapAccToVertical(void);
 
