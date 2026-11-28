@@ -757,8 +757,6 @@ void C2_HOOK_FASTCALL MakeObjectListDoSomething(tPhysics_object* pObject) {
     }
 }
 
-extern void C2_HOOK_FASTCALL MakeObjectDoSomething(tPhysics_object* pObject, tPhysics_object* pList);
-
 // FUNCTION: CARMA2_HW 0x004b9f90
 // FUNCTION: CARMA2_SW 0x004b66b0
 // FUNCTION: CARMA2_CHEAT 0x004bfac0
