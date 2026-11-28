@@ -1563,6 +1563,22 @@ int C2_HOOK_FASTCALL NetworkJoinMenuOutfunc(tFrontend_spec* pFrontend) {
     return 0;
 }
 
+#ifdef REC2_MATCHING
+// FUNCTION: CARMA2_HW 0x004682a0
+// FUNCTION: CARMA2_SW 0x00468020
+// FUNCTION: CARMA2_CHEAT 0x004686c0
+int C2_HOOK_FASTCALL FUN_004682a0(tFrontend_spec* pFrontend) {
+    /* Unused */
+    if (gFrontend_net_mode == eNet_mode_thinking_about_it) {
+        gFrontend_net_mode = eNet_mode_host;
+    } else {
+        gFrontend_net_mode = eNet_mode_thinking_about_it;
+    }
+    WaitFor(6000);
+    return 0;
+}
+#endif
+
 // NetJoinChooseThisGame
 
 // FUNCTION: CARMA2_HW 0x00468d70
