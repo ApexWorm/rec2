@@ -181,8 +181,9 @@ HRESULT C2_HOOK_FASTCALL LocalWindowedDDSetup(int pWidth, int pHeight, int* pPit
 // FUNCTION: CARMA2_SW 0x004fbbb0
 // FUNCTION: CARMA2_CHEAT 0x00505f80
 void C2_HOOK_FASTCALL SSDXLogDirectDrawError(HRESULT hRes) {
+    const char* name;
 
-#define LOG_CASE_DDERR(V) case V: dr_dprintf("%s (%x)", #V, hRes); return
+#define LOG_CASE_DDERR(V) case V: name = #V; break
     switch (hRes) {
     LOG_CASE_DDERR(DDERR_UNSUPPORTED);
     LOG_CASE_DDERR(DDERR_GENERIC);
@@ -203,6 +204,7 @@ void C2_HOOK_FASTCALL SSDXLogDirectDrawError(HRESULT hRes) {
     LOG_CASE_DDERR(DDERR_IMPLICITLYCREATED);
     LOG_CASE_DDERR(DDERR_WRONGMODE);
     }
+    dr_dprintf("%s (%x)", name, hRes);
 #undef LOG_CASE_DDERR
 }
 

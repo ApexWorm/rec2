@@ -736,15 +736,15 @@ int C2_HOOK_FASTCALL PDCheckDriveExists2(const char *pThe_path, const char *pFil
     if (the_path[0] && the_path[1] == ':' && the_path[2] == '\0') {
         strcat(the_path, gDir_separator);
     }
-    if (GetFileAttributesA(pThe_path) == INVALID_FILE_ATTRIBUTES) {
-        return 0;
+    if (GetFileAttributesA(pThe_path) != INVALID_FILE_ATTRIBUTES) {
+        hFile = CreateFileA(the_path, GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+        if (hFile != INVALID_HANDLE_VALUE) {
+            file_size = GetFileSize(hFile, NULL);
+            CloseHandle(hFile);
+        }
+        return file_size >= pMin_size;
     }
-    hFile = CreateFileA(the_path, GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-    if (hFile != INVALID_HANDLE_VALUE) {
-        file_size = GetFileSize(hFile, NULL);
-        CloseHandle(hFile);
-    }
-    return file_size >= pMin_size;
+    return 0;
 }
 
 int C2_HOOK_FASTCALL PDReadSourceLocation(tPath_name pPath) {
