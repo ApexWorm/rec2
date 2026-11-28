@@ -464,6 +464,17 @@ void C2_HOOK_FASTCALL DRS3Service(void) {
     }
 }
 
+// FUNCTION: CARMA2_HW 0x004558d0
+// FUNCTION: CARMA2_SW 0x00455660
+// FUNCTION: CARMA2_CHEAT 0x00455e10
+int C2_HOOK_FASTCALL DRS3GetChannelCount(tS3_outlet* pOutlet) {
+
+    if (gSound_enabled) {
+        return S3CountActiveChannels(pOutlet);
+    }
+    return 0;
+}
+
 // FUNCTION: CARMA2_HW 0x00455880
 // FUNCTION: CARMA2_SW 0x00455610
 // FUNCTION: CARMA2_CHEAT 0x00455dc0
@@ -528,6 +539,21 @@ int C2_HOOK_FASTCALL DRS3StopOutletSound(tS3_outlet* pOutlet) {
         return S3StopOutletSound(pOutlet);
     }
     return 0;
+}
+
+// FUNCTION: CARMA2_HW 0x00455990
+// FUNCTION: CARMA2_SW 0x00455720
+// FUNCTION: CARMA2_CHEAT 0x00455ed0
+int C2_HOOK_FASTCALL DRS3StopAllOutletSounds(void) {
+    int result;
+
+    if (gSound_enabled) {
+        result = S3StopAllOutletSounds();
+        DRS3Service();
+        return result;
+    } else {
+        return 0;
+    }
 }
 
 // FUNCTION: CARMA2_HW 0x004559e0
