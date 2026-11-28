@@ -1264,19 +1264,29 @@ inline void C2_HOOK_FASTCALL MungeMoodMessage(char* pDest, const char* pSrc, int
 #endif
 
 #ifdef REC2_HW
+#define OPPOBAR_FONT (&gFonts[23])
+#else
+#define OPPOBAR_FONT (&gFonts[6])
+#endif
+
 // FUNCTION: CARMA2_HW 0x00494900
+// FUNCTION: CARMA2_SW 0x00493520
 // FUNCTION: CARMA2_CHEAT 0x00494b30
 void C2_HOOK_FASTCALL DoOpponentStatusHeadup(void) {
     // GLOBAL: CARMA2_HW 0x0068d900
+    // GLOBAL: CARMA2_SW 0x00687958
     // GLOBAL: CARMA2_CHEAT 0x006951a0
     static tU32 last_label_flash;
     // GLOBAL: CARMA2_HW 0x0068d904
+    // GLOBAL: CARMA2_SW 0x0068795c
     // GLOBAL: CARMA2_CHEAT 0x006951a4
     static tU32 last_lock_flash;
     // GLOBAL: CARMA2_HW 0x0068d908
+    // GLOBAL: CARMA2_SW 0x00687960
     // GLOBAL: CARMA2_CHEAT 0x006951a8
     static int label_flash_state;
     // GLOBAL: CARMA2_HW 0x0068d90c
+    // GLOBAL: CARMA2_SW 0x00687964
     // GLOBAL: CARMA2_CHEAT 0x006951ac
     static int lock_flash_state;
     char s[256];
@@ -1284,19 +1294,27 @@ void C2_HOOK_FASTCALL DoOpponentStatusHeadup(void) {
     int message_index;
     int colour;
     const char* label;
+#ifdef REC2_HW
     br_model* model;
+#endif
     tOpponent_Status mood;
 
     if (gLit_op_stat_bloc == NULL) {
+#ifdef REC2_HW
         gLit_op_stat_bloc = LoadPixelmap("litopstat.tif");
+#else
+        gLit_op_stat_bloc = LoadPixelmap("litbloc1.tif");
+#endif
     }
+#ifdef REC2_HW
     BRPM_convert(gLit_op_stat_bloc, gBack_screen->type);
+#endif
     Flash(250, &last_label_flash, &label_flash_state);
     if (gTarget_lock_enabled && Flash(500, &last_lock_flash, &lock_flash_state)) {
         DRPixelmapText(gBack_screen,
             gCurrent_graf_data->field_0x4d8,
             gCurrent_graf_data->field_0x4dc,
-            &gFonts[23],
+            OPPOBAR_FONT,
             GetMiscString(eMiscString_oppobar_target_locked),
             gBack_screen->width);
     } else {
@@ -1308,24 +1326,33 @@ void C2_HOOK_FASTCALL DoOpponentStatusHeadup(void) {
         DRPixelmapText(gBack_screen,
             gCurrent_graf_data->field_0x4d8,
             gCurrent_graf_data->field_0x4dc,
-            &gFonts[23],
+            OPPOBAR_FONT,
             label,
             gBack_screen->width);
     }
     DRPixelmapText(gBack_screen,
         gCurrent_graf_data->field_0x4e0,
         gCurrent_graf_data->field_0x4e4,
-        &gFonts[23],
+        OPPOBAR_FONT,
         GetMiscString(eMiscString_oppobar_condition),
         gBack_screen->width);
+#ifdef REC2_HW
     if (gNet_mode == eNet_mode_none) {
         DRPixelmapText(gBack_screen,
             gCurrent_graf_data->field_0x4e8,
             gCurrent_graf_data->field_0x4ec,
-            &gFonts[23],
+            OPPOBAR_FONT,
             GetMiscString(eMiscString_oppobar_status),
             gBack_screen->width);
     }
+#else
+    DRPixelmapText(gBack_screen,
+        gCurrent_graf_data->field_0x4e8,
+        gCurrent_graf_data->field_0x4ec,
+        OPPOBAR_FONT,
+        GetMiscString(eMiscString_oppobar_status),
+        gBack_screen->width);
+#endif
     if (gTarget_lock_car_2 == NULL) {
         return;
     }
@@ -1337,9 +1364,10 @@ void C2_HOOK_FASTCALL DoOpponentStatusHeadup(void) {
     DRPixelmapText(gBack_screen,
         gCurrent_graf_data->field_0x4f0,
         gCurrent_graf_data->field_0x4f4,
-        &gFonts[23],
+        OPPOBAR_FONT,
         s,
         gBack_screen->width);
+#ifdef REC2_HW
     BrMatrix34Translate(&gCar_icons_model_actor->t.t.mat,
         (br_scalar)gCurrent_graf_data->field_0x4f8,
         (br_scalar)-gCurrent_graf_data->field_0x4fc,
@@ -1348,6 +1376,16 @@ void C2_HOOK_FASTCALL DoOpponentStatusHeadup(void) {
     BrMaterialUpdate(gCar_icons_model_actor->material, BR_MATU_COLOURMAP);
     gCar_icons_model_actor->model = gCar_icons[gTarget_lock_car_2->index].model;
     RenderThisHeadup(gCar_icons_model_actor);
+#else
+    DRPixelmapRectangleMaskedCopy(gBack_screen,
+        gCurrent_graf_data->field_0x4f8,
+        gCurrent_graf_data->field_0x4fc,
+        gIcons_low_pix,
+        0,
+        gTarget_lock_car_2->index * gCurrent_graf_data->car_icon_height,
+        gIcons_low_pix->width,
+        gCurrent_graf_data->car_icon_height);
+#endif
     if (gTarget_lock_car_2 == NULL) {
         return;
     }
@@ -1356,9 +1394,10 @@ void C2_HOOK_FASTCALL DoOpponentStatusHeadup(void) {
     DRPixelmapText(gBack_screen,
         gCurrent_graf_data->field_0x500,
         gCurrent_graf_data->field_0x504,
-        &gFonts[23],
+        OPPOBAR_FONT,
         s,
         gBack_screen->width);
+#ifdef REC2_HW
     div(percentage, 10);
     if (gLit_op_stat_actor == NULL) {
         AllocateOppoBarActor(gCurrent_graf_data->field_0x508, gCurrent_graf_data->field_0x50c + 2);
@@ -1380,6 +1419,21 @@ void C2_HOOK_FASTCALL DoOpponentStatusHeadup(void) {
         BrModelUpdate(model, BR_MODU_VERTICES);
         RenderThisHeadup(gLit_op_stat_actor);
     }
+#else
+    if (percentage < 20) {
+        colour = 4;
+    } else if (percentage < 50) {
+        colour = 51;
+    } else {
+        colour = 82;
+    }
+    DRPixelmapShadedHRectFill(gBack_screen,
+        gCurrent_graf_data->field_0x508,
+        gCurrent_graf_data->field_0x50c,
+        (gCurrent_graf_data->field_0x500 - gCurrent_graf_data->field_0x508 - 5) * percentage / 100,
+        3,
+        colour);
+#endif
     if (gTarget_lock_car_2 == NULL || gTarget_lock_car_2->driver != eDriver_oppo) {
         return;
     }
@@ -1395,22 +1449,22 @@ void C2_HOOK_FASTCALL DoOpponentStatusHeadup(void) {
     gPrevious_opponent_message_index = message_index;
     gPrevious_opponent_status = mood;
     gTarget_lock_car_1 = gTarget_lock_car_2;
+#ifdef REC2_HW
     if ((mood != eOpponent_status_Wasted || label_flash_state) && gNet_mode == eNet_mode_none) {
+#else
+    if (mood != eOpponent_status_Wasted || label_flash_state) {
+#endif
         MungeMoodMessage(s, gOppo_status_messages[mood].messages[message_index], gTarget_lock_car_2->is_girl);
         DRPixelmapText(gBack_screen,
             gCurrent_graf_data->field_0x510,
             gCurrent_graf_data->field_0x514,
-            &gFonts[23],
+            OPPOBAR_FONT,
             s,
             gBack_screen->width);
     }
 }
-#else
-// STUB: CARMA2_SW 0x00493520
-void C2_HOOK_FASTCALL DoOpponentStatusHeadup(void) {
-    NOT_IMPLEMENTED();
-}
-#endif
+
+#undef OPPOBAR_FONT
 
 #ifdef REC2_MATCHING
 #pragma auto_inline(on)
