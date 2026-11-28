@@ -2242,8 +2242,6 @@ intptr_t C2_HOOK_FASTCALL FlapBit(br_actor* pActor, br_matrix34* pMat, void* pCo
     return 0;
 }
 
-extern void C2_HOOK_FASTCALL FlapBits(tCar_spec* pCar);
-
 inline void C2_HOOK_FASTCALL FlapBits(tCar_spec* pCar) {
     tCar_crush_spec* car_crush_spec;
     br_scalar dt;
@@ -2269,8 +2267,6 @@ inline void C2_HOOK_FASTCALL FlapBits(tCar_spec* pCar) {
         gLast_flap_bits = gPHIL_last_physics_tick;
     }
 }
-
-extern void C2_HOOK_FASTCALL StartFlapping(br_actor* pActor, tCar_spec* pCar, tU8 pBits, float pForce);
 
 inline void C2_HOOK_FASTCALL StartFlapping(br_actor* pActor, tCar_spec* pCar, tU8 pBits, float pForce) {
     tUser_crush_data* user_crush;
