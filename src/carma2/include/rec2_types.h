@@ -5137,7 +5137,8 @@ typedef struct {
 typedef struct {
     char name[24];
     char abbrev_name[56];
-    char car_file_name[64];
+    char car_file_name[32];
+    char stolen_car_flic_name[32];
     char car_name[32];
     char line1_topspeed[32];
     char line2_weight[32];
@@ -5145,8 +5146,8 @@ typedef struct {
     char line4_description[120];
     tU8* mug_shot_image_data;
     tU8* stolen_car_image_data;
-    int mug_shot_image_data_length;
-    int stolen_car_image_data_length;
+    tU32 mug_shot_image_data_length;
+    tU32 stolen_car_image_data_length;
     int car_number;
     int strength_rating;
     int price;
@@ -5758,6 +5759,9 @@ enum {
     eMiscString_completion_bonus_colon = 22,
     eMiscString_time_bonus_colon = 23,
     eMiscString_every_pedestrian_killed = 26,
+    eMiscString_no_other_cars_to_choose_from_yet = 34, /* FIXME: name from Carmageddon 1 */
+    eMiscString_original_driver_was = 35, /* FIXME: name from Carmageddon 1 */
+    eMiscString_your_original_car = 36, /* FIXME: name from Carmageddon 1 */
     eMiscString_action_replay_unavailable = 37,
     eMiscString_instant_repair = 41,
     eMiscString_final_lap = 42,
@@ -5837,6 +5841,8 @@ enum {
     eMiscString_lap_me_description = 199,
     eMiscString_curse_of_the_vampire_description = 200,
     eMiscString_fox_n_hounds_description = 201,
+    eMiscString_this_car_already_taken_by = 204, /* FIXME: name from Carmageddon 1 */
+    eMiscString_available = 205, /* FIXME: name from Carmageddon 1 */
     eMiscString_game_type = 207,
     eMiscString_player = 210,
     eMiscString_played = 211,

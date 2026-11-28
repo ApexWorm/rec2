@@ -15,7 +15,12 @@
 extern int gOur_starting_position;
 extern tU32 gLast_host_query;
 
+extern tNet_game_details* gChoose_car_net_game;
+extern tInterface_spec* gStart_interface_spec;
+extern tNet_sequence_type gNet_race_sequence_racestrt;
 extern int gChange_race_net_mode;
+extern br_pixelmap* gBullet_image;
+extern int gCurrent_race_index;
 
 extern int C2_HOOK_FASTCALL UpRace(int* pCurrent_choice, int* pCurrent_mode);
 
@@ -27,7 +32,25 @@ extern int C2_HOOK_FASTCALL UpClickRace(int* pCurrent_choice, int* pCurrent_mode
 
 extern int C2_HOOK_FASTCALL DownClickRace(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_offset);
 
+extern void C2_HOOK_FASTCALL StartChangeRace(void);
+
+extern int C2_HOOK_FASTCALL ChangeRace(int* pRace_index, int pNet_mode, tNet_sequence_type pNet_race_sequence);
+
+extern void C2_HOOK_FASTCALL DrawCar(int pCurrent_choice, int pCurrent_mode);
+
+extern void C2_HOOK_FASTCALL SetCarFlic(void);
+
+extern int C2_HOOK_FASTCALL UpCar(int* pCurrent_choice, int* pCurrent_mode);
+
+extern int C2_HOOK_FASTCALL DownCar(int* pCurrent_choice, int* pCurrent_mode);
+
+extern int C2_HOOK_FASTCALL UpClickCar(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_offset);
+
+extern int C2_HOOK_FASTCALL DownClickCar(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_offset);
+
 extern int C2_HOOK_FASTCALL ChangeCarGoAhead(int* pCurrent_choice, int* pCurrent_mode);
+
+extern int C2_HOOK_FASTCALL ChangeCar(int pNet_mode, int* pCar_index, tNet_game_details* pNet_game);
 
 extern int C2_HOOK_CDECL SortGridFunction(const void* pFirst_one, const void* pSecond_one);
 

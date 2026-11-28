@@ -8,12 +8,22 @@
 
 #include "03-racestrt.h"
 
+#include "rec2_macros.h"
 #include "rec2_types.h"
 
 #include "04-netgame.h"
+#include "07-structur.h"
+#include "08-loading1.h"
+#include "10-loading2.h"
+#include "17-world2.h"
+#include "18-graphics2.h"
+#include "18b-graphics2.h"
 #include "25-grafdata.h"
+#include "35-intrface.h"
+#include "38-flicplay.h"
 #include "41-utility.h"
 #include "42-input.h"
+#include "63-loading3.h"
 #include "69-sound.h"
 #include "72-interface.h"
 
@@ -31,10 +41,35 @@ int gOur_starting_position;
 // GLOBAL: CARMA2_CHEAT 0x006a88b0
 tU32 gLast_host_query;
 
+// GLOBAL: CARMA2_HW 0x006a0c5c
+// GLOBAL: CARMA2_SW 0x0069acb4
+// GLOBAL: CARMA2_CHEAT 0x006a87d4
+tNet_game_details* gChoose_car_net_game;
+
+// GLOBAL: CARMA2_HW 0x006a0c60
+// GLOBAL: CARMA2_SW 0x0069acb8
+// GLOBAL: CARMA2_CHEAT 0x006a87d8
+tInterface_spec* gStart_interface_spec;
+
+// GLOBAL: CARMA2_HW 0x006a0cfc
+// GLOBAL: CARMA2_SW 0x0069ad54
+// GLOBAL: CARMA2_CHEAT 0x006a8874
+tNet_sequence_type gNet_race_sequence_racestrt;
+
 // GLOBAL: CARMA2_HW 0x006a0d00
 // GLOBAL: CARMA2_SW 0x0069ad58
 // GLOBAL: CARMA2_CHEAT 0x006a8878
 int gChange_race_net_mode;
+
+// GLOBAL: CARMA2_HW 0x006a0d0c
+// GLOBAL: CARMA2_SW 0x0069ad64
+// GLOBAL: CARMA2_CHEAT 0x006a8884
+br_pixelmap* gBullet_image;
+
+// GLOBAL: CARMA2_HW 0x006a0d2c
+// GLOBAL: CARMA2_SW 0x0069ad84
+// GLOBAL: CARMA2_CHEAT 0x006a88a4
+int gCurrent_race_index;
 
 #ifdef REC2_MATCHING
 // FUNCTION: CARMA2_HW 0x004e21c0
@@ -108,20 +143,220 @@ int C2_HOOK_FASTCALL DownClickRace(int* pCurrent_choice, int* pCurrent_mode, int
     return 0;
 }
 
-#ifdef REC2_MATCHING
 // FUNCTION: CARMA2_HW 0x004e2280
 // FUNCTION: CARMA2_SW 0x004de600
 // FUNCTION: CARMA2_CHEAT 0x004e7e10
-void C2_HOOK_FASTCALL FUN_004e2280(void) {
+void C2_HOOK_FASTCALL StartChangeRace(void) {
     tS32 start_time;
     tS32 the_time;
 
-    /* Unused */
     start_time = PDGetTotalTime();
     for (the_time = PDGetTotalTime(); the_time < start_time + 400; the_time = PDGetTotalTime()) {
     }
 }
-#endif
+
+// FUNCTION: CARMA2_HW 0x004e22b0
+// FUNCTION: CARMA2_SW 0x004de630
+// FUNCTION: CARMA2_CHEAT 0x004e7e40
+int C2_HOOK_FASTCALL ChangeRace(int* pRace_index, int pNet_mode, tNet_sequence_type pNet_race_sequence) {
+    // GLOBAL: CARMA2_HW 0x0065efc8
+    // GLOBAL: CARMA2_SW 0x00659928
+    // GLOBAL: CARMA2_CHEAT 0x00666778
+    static tFlicette flicker_on[4] = {
+        { 43, { 60, 120 }, { 154, 370 } },
+        { 43, { 221, 442 }, { 154, 370 } },
+        { 221, { 30, 60 }, { 78, 187 } },
+        { 221, { 30, 60 }, { 78, 187 } },
+    };
+    // GLOBAL: CARMA2_HW 0x0065f018
+    // GLOBAL: CARMA2_SW 0x00659978
+    // GLOBAL: CARMA2_CHEAT 0x006667c8
+    static tFlicette flicker_off[4] = {
+        { 42, { 60, 120 }, { 154, 370 } },
+        { 42, { 221, 442 }, { 154, 370 } },
+        { 220, { 30, 60 }, { 78, 187 } },
+        { 220, { 30, 60 }, { 78, 187 } },
+    };
+    // GLOBAL: CARMA2_HW 0x0065f068
+    // GLOBAL: CARMA2_SW 0x006599c8
+    // GLOBAL: CARMA2_CHEAT 0x00666818
+    static tFlicette push[4] = {
+        { 154, { 60, 120 }, { 154, 370 } },
+        { 45, { 221, 442 }, { 154, 370 } },
+        { 222, { 30, 60 }, { 78, 187 } },
+        { 225, { 30, 60 }, { 118, 283 } },
+    };
+    // GLOBAL: CARMA2_HW 0x0065f0b8
+    // GLOBAL: CARMA2_SW 0x00659a18
+    // GLOBAL: CARMA2_CHEAT 0x00666868
+    static tMouse_area mouse_areas[5] = {
+        { { 60, 120 }, { 154, 370 }, { 125, 250 }, { 174, 418 }, 0, 0, 0, NULL },
+        { { 221, 442 }, { 154, 370 }, { 286, 572 }, { 174, 418 }, 1, 0, 0, NULL },
+        { { 30, 60 }, { 78, 187 }, { 45, 90 }, { 104, 250 }, -1, 0, 0, UpClickRace },
+        { { 30, 60 }, { 118, 283 }, { 45, 90 }, { 145, 348 }, -1, 0, 0, DownClickRace },
+        { { 66, 132 }, { 33, 79 }, { 278, 556 }, { 144, 346 }, -1, 0, 0, ClickOnRace },
+    };
+    // GLOBAL: CARMA2_HW 0x0065f1a8
+    // GLOBAL: CARMA2_SW 0x00659b08
+    // GLOBAL: CARMA2_CHEAT 0x00666958
+    static tInterface_spec interface_spec = {
+        0, 230, 60, 231, 231, 231, 6,
+        { -1, 0 }, { -1, 0 }, { 0, 0 }, { 1, 0 }, { NULL, NULL },
+        { -1, 0 }, { 1, 0 }, { 0, 0 }, { 1, 0 }, { NULL, NULL },
+        { -1, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { UpRace, NULL },
+        { -1, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { DownRace, NULL },
+        { 1, 1 }, { NULL, NULL }, { 1, 1 }, { NULL, NULL },
+        NULL, NULL, 0, NULL, StartChangeRace, NULL, 0, { 0, 0 },
+        NULL, 1, 1, REC2_ASIZE(flicker_on), flicker_on, flicker_off, push,
+        REC2_ASIZE(mouse_areas), mouse_areas, 0, NULL
+    };
+    int result;
+
+    gNet_race_sequence_racestrt = pNet_race_sequence;
+    gChange_race_net_mode = pNet_mode;
+    gStart_interface_spec = &interface_spec;
+    gCurrent_race_index = *pRace_index;
+    if (pNet_mode) {
+        gBullet_image = NULL;
+    } else {
+        gBullet_image = LoadPixelmap("BULLET.PIX");
+    }
+    result = DoInterfaceScreen(&interface_spec, pNet_mode != 0, 0);
+    if (result == 0) {
+        *pRace_index = gCurrent_race_index;
+    }
+    if (gBullet_image != NULL) {
+        BrPixelmapFree(gBullet_image);
+    }
+    return result == 0;
+}
+
+// FUNCTION: CARMA2_HW 0x004e2340
+// FUNCTION: CARMA2_SW 0x004de6c0
+// FUNCTION: CARMA2_CHEAT 0x004e7ed0
+void C2_HOOK_FASTCALL DrawCar(int pCurrent_choice, int pCurrent_mode) {
+    char s[64];
+    int text_x;
+    int text_width;
+
+    PollCarDetails(gChoose_car_net_game);
+    if (gChange_race_net_mode) {
+        if (gCar_details[gProgram_state.cars_available[gFrontend_change_car_selected_car]].ownership == eCar_owner_someone) {
+            sprintf(s, "%s %s", GetMiscString(eMiscString_this_car_already_taken_by), gCar_details[gProgram_state.cars_available[gFrontend_change_car_selected_car]].name);
+        } else {
+            sprintf(s, GetMiscString(eMiscString_available));
+        }
+    } else {
+        if (gProgram_state.number_of_cars == 1) {
+            sprintf(s, GetMiscString(eMiscString_no_other_cars_to_choose_from_yet));
+        } else if (gProgram_state.cars_available[gFrontend_change_car_selected_car] != 0) {
+            sprintf(s, "%s %s", GetMiscString(eMiscString_original_driver_was), gOpponents[gProgram_state.cars_available[gFrontend_change_car_selected_car]].name);
+        } else {
+            sprintf(s, GetMiscString(eMiscString_your_original_car));
+        }
+    }
+    text_width = BrPixelmapTextWidth(gBack_screen, gFont_7, s);
+    text_x = (gCurrent_graf_data->field_0x2c4 + gCurrent_graf_data->field_0x2cc - text_width) / 2;
+    BrPixelmapRectangleFill(gBack_screen,
+        gCurrent_graf_data->field_0x2c4,
+        gCurrent_graf_data->field_0x2c0,
+        gCurrent_graf_data->field_0x2cc - gCurrent_graf_data->field_0x2c4,
+        gFont_7->glyph_y,
+        0);
+    BrPixelmapText(gBack_screen,
+        text_x,
+        gCurrent_graf_data->field_0x2c0,
+        3,
+        gFont_7,
+        s);
+    BrPixelmapLine(gBack_screen,
+        gCurrent_graf_data->field_0x2c4,
+        gCurrent_graf_data->field_0x2c8,
+        gCurrent_graf_data->field_0x2cc,
+        gCurrent_graf_data->field_0x2c8,
+        6);
+}
+
+inline void C2_HOOK_FASTCALL SetCarFlic(void) {
+
+    ChangePanelFlic(0,
+        gOpponents[gProgram_state.cars_available[gFrontend_change_car_selected_car]].stolen_car_image_data,
+        gOpponents[gProgram_state.cars_available[gFrontend_change_car_selected_car]].stolen_car_image_data_length);
+}
+
+// FUNCTION: CARMA2_HW 0x004e24d0
+// FUNCTION: CARMA2_SW 0x004de850
+// FUNCTION: CARMA2_CHEAT 0x004e8060
+int C2_HOOK_FASTCALL UpCar(int* pCurrent_choice, int* pCurrent_mode) {
+
+    AddToFlicQueue(gStart_interface_spec->pushed_flics[2].flic_index,
+        gStart_interface_spec->pushed_flics[2].x[gReal_graf_data_index],
+        gStart_interface_spec->pushed_flics[2].y[gReal_graf_data_index],
+        1);
+    DRS3StartSound(gEffects_outlet, eSoundId_LeftButton);
+    if (gFrontend_change_car_selected_car != 0) {
+        RemoveTransientBitmaps(1);
+        DropOutImageThruBottom(GetPanelPixelmap(0),
+            gCurrent_graf_data->field_0x2d0,
+            gCurrent_graf_data->field_0x2d4,
+            gCurrent_graf_data->field_0x2e0,
+            gCurrent_graf_data->field_0x2e4);
+        gFrontend_change_car_selected_car--;
+        SetCarFlic();
+        DropInImageFromTop(GetPanelPixelmap(0),
+            gCurrent_graf_data->field_0x2d0,
+            gCurrent_graf_data->field_0x2d4,
+            gCurrent_graf_data->field_0x2e0,
+            gCurrent_graf_data->field_0x2e4);
+    }
+    return 0;
+}
+
+// FUNCTION: CARMA2_HW 0x004e25c0
+// FUNCTION: CARMA2_SW 0x004de940
+// FUNCTION: CARMA2_CHEAT 0x004e8150
+int C2_HOOK_FASTCALL DownCar(int* pCurrent_choice, int* pCurrent_mode) {
+
+    AddToFlicQueue(gStart_interface_spec->pushed_flics[3].flic_index,
+        gStart_interface_spec->pushed_flics[3].x[gReal_graf_data_index],
+        gStart_interface_spec->pushed_flics[3].y[gReal_graf_data_index],
+        1);
+    DRS3StartSound(gEffects_outlet, eSoundId_LeftButton);
+    if (gFrontend_change_car_selected_car < gProgram_state.number_of_cars - 1) {
+        RemoveTransientBitmaps(1);
+        DropOutImageThruTop(GetPanelPixelmap(0),
+            gCurrent_graf_data->field_0x2d0,
+            gCurrent_graf_data->field_0x2d4,
+            gCurrent_graf_data->field_0x2e0,
+            gCurrent_graf_data->field_0x2e4);
+        gFrontend_change_car_selected_car++;
+        SetCarFlic();
+        DropInImageFromBottom(GetPanelPixelmap(0),
+            gCurrent_graf_data->field_0x2d0,
+            gCurrent_graf_data->field_0x2d4,
+            gCurrent_graf_data->field_0x2e0,
+            gCurrent_graf_data->field_0x2e4);
+    }
+    return 0;
+}
+
+// FUNCTION: CARMA2_HW 0x004e26b0
+// FUNCTION: CARMA2_SW 0x004dea30
+// FUNCTION: CARMA2_CHEAT 0x004e8240
+int C2_HOOK_FASTCALL UpClickCar(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_offset) {
+
+    UpCar(pCurrent_choice, pCurrent_mode);
+    return 0;
+}
+
+// FUNCTION: CARMA2_HW 0x004e27a0
+// FUNCTION: CARMA2_SW 0x004deb20
+// FUNCTION: CARMA2_CHEAT 0x004e8330
+int C2_HOOK_FASTCALL DownClickCar(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_offset) {
+
+    DownCar(pCurrent_choice, pCurrent_mode);
+    return 0;
+}
 
 // FUNCTION: CARMA2_HW 0x004e2890
 // FUNCTION: CARMA2_SW 0x004dec10
@@ -133,6 +368,132 @@ int C2_HOOK_FASTCALL ChangeCarGoAhead(int* pCurrent_choice, int* pCurrent_mode) 
         return 0;
     } else {
         return 1;
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x004e28d0
+// FUNCTION: CARMA2_SW 0x004dec50
+// FUNCTION: CARMA2_CHEAT 0x004e8460
+int C2_HOOK_FASTCALL ChangeCar(int pNet_mode, int* pCar_index, tNet_game_details* pNet_game) {
+    // GLOBAL: CARMA2_HW 0x0065f2d8
+    // GLOBAL: CARMA2_SW 0x00659c38
+    // GLOBAL: CARMA2_CHEAT 0x00666a88
+    static tFlicette flicker_on[4] = {
+        { 43, { 60, 120 }, { 154, 370 } },
+        { 43, { 221, 442 }, { 154, 370 } },
+        { 221, { 30, 60 }, { 78, 187 } },
+        { 221, { 30, 60 }, { 78, 187 } },
+    };
+    // GLOBAL: CARMA2_HW 0x0065f328
+    // GLOBAL: CARMA2_SW 0x00659c88
+    // GLOBAL: CARMA2_CHEAT 0x00666ad8
+    static tFlicette flicker_off[4] = {
+        { 42, { 60, 120 }, { 154, 370 } },
+        { 42, { 221, 442 }, { 154, 370 } },
+        { 220, { 30, 60 }, { 78, 187 } },
+        { 220, { 30, 60 }, { 78, 187 } },
+    };
+    // GLOBAL: CARMA2_HW 0x0065f378
+    // GLOBAL: CARMA2_SW 0x00659cd8
+    // GLOBAL: CARMA2_CHEAT 0x00666b28
+    static tFlicette push[4] = {
+        { 154, { 60, 120 }, { 154, 370 } },
+        { 45, { 221, 442 }, { 154, 370 } },
+        { 222, { 30, 60 }, { 78, 187 } },
+        { 225, { 30, 60 }, { 118, 283 } },
+    };
+    // GLOBAL: CARMA2_HW 0x0065f3c8
+    // GLOBAL: CARMA2_SW 0x00659d28
+    // GLOBAL: CARMA2_CHEAT 0x00666b78
+    static tMouse_area mouse_areas[4] = {
+        { { 60, 120 }, { 154, 370 }, { 125, 250 }, { 174, 418 }, 0, 0, 0, NULL },
+        { { 221, 442 }, { 154, 370 }, { 286, 572 }, { 174, 418 }, 1, 0, 0, NULL },
+        { { 30, 60 }, { 78, 187 }, { 45, 90 }, { 104, 250 }, -1, 0, 0, UpClickCar },
+        { { 30, 60 }, { 118, 283 }, { 45, 90 }, { 145, 348 }, -1, 0, 0, DownClickCar },
+    };
+    // GLOBAL: CARMA2_HW 0x0065f488
+    // GLOBAL: CARMA2_SW 0x00659de8
+    // GLOBAL: CARMA2_CHEAT 0x00666c38
+    static tInterface_spec interface_spec = {
+        0, 236, 62, 0, 0, 0, -1,
+        { -1, 0 }, { -1, 0 }, { 0, 0 }, { 1, 0 }, { NULL, NULL },
+        { -1, 0 }, { 1, 0 }, { 0, 0 }, { 1, 0 }, { NULL, NULL },
+        { -1, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { UpCar, NULL },
+        { -1, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { DownCar, NULL },
+        { 1, 1 }, { ChangeCarGoAhead, NULL }, { 1, 1 }, { NULL, NULL },
+        NULL, DrawCar, 0, NULL, NULL, NULL, 0, { 0, 0 },
+        NULL, 1, 1, REC2_ASIZE(flicker_on), flicker_on, flicker_off, push,
+        REC2_ASIZE(mouse_areas), mouse_areas, 0, NULL
+    };
+    int i;
+    int result;
+    int power_up_levels[3];
+
+    gChoose_car_net_game = pNet_game;
+    gChange_race_net_mode = pNet_mode;
+    gStart_interface_spec = &interface_spec;
+    for (i = 0; i < gProgram_state.number_of_cars; i++) {
+        if (gProgram_state.cars_available[i] == *pCar_index) {
+            gFrontend_change_car_selected_car = i;
+            break;
+        }
+    }
+    if (gProgram_state.game_completed) {
+        gProgram_state.number_of_cars = gNumber_of_racers;
+        for (i = 0; i < gProgram_state.number_of_cars; i++) {
+            gProgram_state.cars_available[i] = i;
+        }
+    }
+    for (i = 0; i < gProgram_state.number_of_cars; i++) {
+        if (gOpponents[gProgram_state.cars_available[i]].stolen_car_image_data == NULL) {
+            LoadFlicData(gOpponents[gProgram_state.cars_available[i]].stolen_car_flic_name,
+                &gOpponents[gProgram_state.cars_available[i]].stolen_car_image_data,
+                &gOpponents[gProgram_state.cars_available[i]].stolen_car_image_data_length);
+        } else {
+            MAMSLock((void**)&gOpponents[gProgram_state.cars_available[i]].stolen_car_image_data);
+        }
+    }
+    InitialiseFlicPanel(0,
+        gCurrent_graf_data->field_0x2d0,
+        gCurrent_graf_data->field_0x2d4,
+        gCurrent_graf_data->field_0x2d8 - gCurrent_graf_data->field_0x2d0,
+        gCurrent_graf_data->field_0x2dc - gCurrent_graf_data->field_0x2d4);
+    SetCarFlic();
+    result = DoInterfaceScreen(&interface_spec, pNet_mode, 0);
+    if (pNet_mode) {
+        FadePaletteDown();
+    } else {
+        RunFlic(237);
+    }
+    for (i = 0; i < gProgram_state.number_of_cars; i++) {
+        MAMSUnlock((void**)&gOpponents[gProgram_state.cars_available[i]].stolen_car_image_data);
+    }
+    DisposeFlicPanel(0);
+    if (result == 0) {
+        if (pNet_mode == eNet_mode_none) {
+            AboutToLoadFirstCar();
+            for (i = 0; i < REC2_ASIZE(power_up_levels); i++) {
+                power_up_levels[i] = gProgram_state.current_car.power_up_levels[i];
+            }
+            LoadCar(gOpponents[gProgram_state.cars_available[gFrontend_change_car_selected_car]].car_file_name,
+                eDriver_local_human,
+                &gProgram_state.current_car,
+                gProgram_state.cars_available[gFrontend_change_car_selected_car],
+                gProgram_state.player_name,
+                &gOur_car_storage_space);
+            for (i = 0; i < REC2_ASIZE(power_up_levels); i++) {
+                gProgram_state.current_car.power_up_levels[i] = power_up_levels[i];
+            }
+            SetCarStorageTexturingLevel(&gOur_car_storage_space, GetCarTexturingLevel(), eCTL_full);
+            DisposeRaceInfo(&gCurrent_race);
+            SelectOpponents(&gCurrent_race);
+            LoadRaceInfo(gProgram_state.current_race_index, &gCurrent_race);
+        } else {
+            *pCar_index = gProgram_state.cars_available[gFrontend_change_car_selected_car];
+        }
+        return 1;
+    } else {
+        return 0;
     }
 }
 
