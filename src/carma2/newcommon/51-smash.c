@@ -204,7 +204,7 @@ int gDoing_net_smash = 0;
 // GLOBAL: CARMA2_HW 0x006a829c
 // GLOBAL: CARMA2_SW 0x006a22fc
 // GLOBAL: CARMA2_CHEAT 0x006afe14
-int gINT_006a829c = 0;
+int gShrapnel_counter = 0;
 
 // GLOBAL: CARMA2_HW 0x006a4698
 // GLOBAL: CARMA2_SW 0x0069e6f8
@@ -1163,7 +1163,7 @@ inline void C2_HOOK_FASTCALL SmashItIntoVerySmallPiecesIndeed(tCar_spec* pCar, t
         BrActorToActorMatrix34(&mat, pActor, gUniverse_actor);
         ActuallySmashPart(pCar, pSmashable, pLevel);
         DoConnotationsMultiLevel(pObject, pArg4, pSmashable, &pSmashable->levels[pLevel].connotations, seed,
-            pVelocity, pPosition, pPosition, pActor, the_time, gINT_006a829c, &mat, old_level, pLevel, pForce, pNo_side_effects);
+            pVelocity, pPosition, pPosition, pActor, the_time, gShrapnel_counter, &mat, old_level, pLevel, pForce, pNo_side_effects);
         if (pSmashable->funk_material != NULL && pSmashable->funk_material->identifier != NULL) {
             switch (pSmashable->levels[pSmashable->field_0x4c].collision_type) {
             case kTextureLevelCollisionChange_Solid:
