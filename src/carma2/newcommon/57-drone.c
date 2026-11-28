@@ -36,11 +36,6 @@ int gDrones_unmodified;
 // GLOBAL: CARMA2_CHEAT 0x00689968
 br_vector3 gRender_bounds_centre;
 
-// GLOBAL: CARMA2_HW 0x006820cc
-// GLOBAL: CARMA2_SW 0x0067c80c
-// GLOBAL: CARMA2_CHEAT 0x00689974
-tU32 gNext_drone_edit_path_munge;
-
 // GLOBAL: CARMA2_HW 0x006820d0
 // GLOBAL: CARMA2_SW 0x0067c810
 // GLOBAL: CARMA2_CHEAT 0x00689978
@@ -138,6 +133,11 @@ char gDrone_edit_message[256];
 // GLOBAL: CARMA2_SW 0x0058f718
 // GLOBAL: CARMA2_CHEAT 0x0059b110
 int gSelected_drone_path_index = -1;
+
+// GLOBAL: CARMA2_HW 0x006820cc
+// GLOBAL: CARMA2_SW 0x0067c80c
+// GLOBAL: CARMA2_CHEAT 0x00689974
+tU32 gNext_drone_edit_path_munge;
 
 // GLOBAL: CARMA2_HW 0x0068452c
 // GLOBAL: CARMA2_SW 0x0067ec6c
