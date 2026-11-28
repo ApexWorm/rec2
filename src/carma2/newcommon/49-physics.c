@@ -356,13 +356,102 @@ inline tFace_ref* C2_HOOK_FASTCALL RayCastInBox(br_vector3* pPosition, br_vector
     return RayCastThruFaceList(pPosition, pDirection, pNormal, pT, pCollision_position, &gFace_list__car[pObject->box_face_start], pObject->box_face_end - pObject->box_face_start);
 }
 
-// FaceOffCount2
+inline void C2_HOOK_FASTCALL FaceOffCount2(void) {
+}
 
-// FaceOffCount
+inline void C2_HOOK_FASTCALL FaceOffCount(void) {
+}
 
-// FaceOnCount
+inline void C2_HOOK_FASTCALL FaceOnCount(void) {
+}
 
-// EliminateFaces
+// FUNCTION: CARMA2_HW 0x00423320
+// FUNCTION: CARMA2_SW 0x004233a0
+// FUNCTION: CARMA2_CHEAT 0x004234a0
+int C2_HOOK_FASTCALL EliminateFaces(tPhysics_object* pObject, tPhysics_shape* pShape, br_matrix34* pMat) {
+    br_matrix34* mat;
+    br_bounds3* bounds;
+    br_vector3 corner;
+    br_vector3 extents[3];
+    br_vector3 tv;
+    br_scalar low;
+    br_scalar high;
+    br_scalar d;
+    br_scalar offset;
+    br_scalar limit;
+    int count;
+    int i;
+    int axis;
+    tFace_ref* face;
+
+    mat = &pObject->actor->t.t.mat;
+    bounds = &pShape->common.field_0x1c;
+    count = 0;
+    GetNewBoundingBox(bounds, &pShape->common.bb, pMat);
+    for (axis = 0; axis < 3; axis++) {
+        if (pShape->common.bb.min.v[axis] < bounds->min.v[axis]) {
+            bounds->min.v[axis] = pShape->common.bb.min.v[axis];
+        }
+        if (bounds->max.v[axis] < pShape->common.bb.max.v[axis]) {
+            bounds->max.v[axis] = pShape->common.bb.max.v[axis];
+        }
+    }
+    BrMatrix34ApplyV(&corner, &bounds->min, mat);
+    BrVector3Accumulate(&corner, (br_vector3*)mat->m[3]);
+    for (axis = 0; axis < 3; axis++) {
+        BrVector3Scale(&extents[axis], (br_vector3*)mat->m[axis], bounds->max.v[axis] - bounds->min.v[axis]);
+    }
+    face = &gFace_list__car[pObject->box_face_start];
+    for (i = 0; i < pObject->box_face_end - pObject->box_face_start; i++, face++) {
+        BrVector3Sub(&tv, &corner, &face->v[0]);
+        low = BrVector3Dot(&tv, &face->normal);
+        high = low;
+        for (axis = 0; axis < 3; axis++) {
+            d = BrVector3Dot(&extents[axis], &face->normal);
+            if (d >= 0.0f) {
+                high += d;
+            } else {
+                low += d;
+            }
+        }
+#ifdef REC2_FIX_BUGS
+        if ((high > 0.005f && low > 0.005f)
+            || (high < -0.005f && low < -0.005f)
+            || (face->material != NULL && (face->material->identifier[0] == '!' || face->material->identifier[0] == '>'))) {
+#else
+        if ((high > 0.005f && low > 0.005f)
+            || (high < -0.005f && low < -0.005f)
+            || (face->material != NULL && face->material->identifier[0] == '!')
+            || face->material->identifier[0] == '>') {
+#endif
+            face->flags |= 0x80;
+            FaceOffCount();
+        } else {
+            for (axis = 0; axis < 3; axis++) {
+                offset = BrVector3Dot((br_vector3*)mat->m[3], (br_vector3*)mat->m[axis]);
+                d = BrVector3Dot(&face->v[0], (br_vector3*)mat->m[axis]);
+                limit = bounds->min.v[axis] - 0.005f + offset;
+                if (d >= limit) {
+                    limit = bounds->max.v[axis] + offset + 0.005f;
+                    if (d > limit
+                        && BrVector3Dot(&face->v[1], (br_vector3*)mat->m[axis]) > limit
+                        && BrVector3Dot(&face->v[2], (br_vector3*)mat->m[axis]) > limit) {
+                        face->flags |= 0x80;
+                        FaceOffCount2();
+                    }
+                } else if (BrVector3Dot(&face->v[1], (br_vector3*)mat->m[axis]) < limit
+                    && BrVector3Dot(&face->v[2], (br_vector3*)mat->m[axis]) < limit) {
+                    face->flags |= 0x80;
+                    FaceOffCount2();
+                }
+            }
+            FaceOnCount();
+            count++;
+            face->flags &= ~0x80;
+        }
+    }
+    return count;
+}
 
 // GetShapePoint
 
