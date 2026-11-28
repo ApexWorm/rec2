@@ -12,6 +12,18 @@
 #include "c2_hooks.h"
 #include "rec2_types.h"
 
+extern int gKey_defns[18];
+
+extern int gKey_count;
+
+extern int gOrig_key_mapping[77];
+
+extern char* gKey_names__options[153];
+
+extern int gPending_entry;
+
+extern int gCurrent_key;
+
 extern tRadio_bastards gRadio_bastards__options[13];
 
 extern int gLast_graph_sel__options;
@@ -66,19 +78,97 @@ extern void C2_HOOK_FASTCALL EraseAGraphBox__options(int pIndex);
 
 extern void C2_HOOK_FASTCALL DrawGraphBox(int pCurrent_choice, int pCurrent_mode);
 
+extern void C2_HOOK_FASTCALL SaveOrigKeyMapping(void);
+
+extern void C2_HOOK_FASTCALL SaveKeyMapping__options(void);
+
+extern void C2_HOOK_FASTCALL ChangeKeyMapIndex(int pNew_one);
+
+extern void C2_HOOK_FASTCALL SetKeysToDefault(void);
+
+extern void C2_HOOK_FASTCALL DrawKeyAssignments(int pCurrent_choice, int pCurrent_mode);
+
+extern void C2_HOOK_FASTCALL GetKeyCoords(int pIndex, int* pY, int* pName_x, int* pKey_x, int* pEnd_box);
+
+extern int C2_HOOK_FASTCALL KeyAssignLeft(int* pCurrent_choice, int* pCurrent_mode);
+
+extern int C2_HOOK_FASTCALL KeyAssignRight(int* pCurrent_choice, int* pCurrent_mode);
+
+extern int C2_HOOK_FASTCALL KeyAssignUp(int* pCurrent_choice, int* pCurrent_mode);
+
+extern int C2_HOOK_FASTCALL KeyAssignDown(int* pCurrent_choice, int* pCurrent_mode);
+
+extern int C2_HOOK_FASTCALL KeyAssignGoAhead(int* pCurrent_choice, int* pCurrent_mode);
+
+extern int C2_HOOK_FASTCALL MouseyClickBastard(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_offset);
+
+extern void C2_HOOK_FASTCALL DrawInitialKMRadios(void);
+
 extern void C2_HOOK_FASTCALL LoadSoundOptionsData(void);
 
 extern void C2_HOOK_FASTCALL FreeSoundOptionsData(void);
 
 extern void C2_HOOK_FASTCALL DrawDisabledOptions(void);
 
+extern tFlicette gSound_options_flicker_on[3];
+
+extern tFlicette gSound_options_flicker_off[3];
+
+extern tFlicette gSound_options_push[3];
+
+extern tMouse_area gSound_options_mouse_areas[3];
+
+extern tInterface_spec gSound_options_interface_spec;
+
+extern tFlicette gGraphics_options_flicker_on[14];
+
+extern tFlicette gGraphics_options_flicker_off[14];
+
+extern tFlicette gGraphics_options_push[14];
+
+extern tMouse_area gGraphics_options_mouse_areas[14];
+
+extern tInterface_spec gGraphics_options_interface_spec;
+
+extern tFlicette gControl_options_flicker_on[4];
+
+extern tFlicette gControl_options_flicker_off[4];
+
+extern tFlicette gControl_options_push[4];
+
+extern tMouse_area gControl_options_mouse_areas[5];
+
+extern tInterface_spec gControl_options_interface_spec;
+
+extern tFlicette gOptions_flicker_on[4];
+
+extern tFlicette gOptions_flicker_off[4];
+
+extern tFlicette gOptions_push[4];
+
+extern tMouse_area gOptions_mouse_areas[4];
+
+extern tInterface_spec gOptions_interface_spec;
+
+extern void C2_HOOK_FASTCALL DoSoundOptions(void);
+
+extern void C2_HOOK_FASTCALL GetGraphicsOptions(void);
+
+extern void C2_HOOK_FASTCALL DoGraphicsOptions(void);
+
+extern void C2_HOOK_FASTCALL CalibrateJoysticks(void);
+
+extern void C2_HOOK_FASTCALL LoadKeyNames__options(void);
+
+extern void C2_HOOK_FASTCALL DoControlOptions(void);
+
+extern void C2_HOOK_FASTCALL DoOptions(void);
+
 extern void C2_HOOK_FASTCALL SetGraphicsOptions(void);
 
-// SaveOrigKeyMapping
+extern void C2_HOOK_FASTCALL DisposeKeyNames__options(void);
 
 // SaveKeyMapping (see 72-interface)
-
-// ChangeKeyMapIndex
 
 extern void C2_HOOK_FASTCALL GetGraphicsSettingsData(tFrontend_spec* pFrontend);
 

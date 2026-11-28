@@ -1738,15 +1738,15 @@ typedef struct {
     int field_0x3b8;
     int field_0x3bc;
     int field_0x3c0;
-    int field_0x3c4;
-    int field_0x3c8;
-    int field_0x3cc;
-    int field_0x3d0;
-    int field_0x3d4;
-    int field_0x3d8;
-    int field_0x3dc;
-    int field_0x3e0;
-    int field_0x3e4;
+    int key_assign_col_1;
+    int key_assign_col_1_a;
+    int key_assign_col_2;
+    int key_assign_col_2_a;
+    int key_assign_y_pitch;
+    int key_assign_y;
+    int key_assign_key_map_y;
+    int key_assign_flic_x;
+    int key_assign_flic_y;
     int map_render_x_marg;
     int map_render_y_marg;
     int field_0x3f0;
@@ -5826,6 +5826,7 @@ enum {
     eMiscString_net_games_always_accessorized = 124,
     eMiscString_recovery_cancelled = 125,
     eMiscString_task_switched = 139,
+    eMiscString_key_assignment_names = 140, /* FIXME: start of the 18 key names of the Carmageddon 1 control options screen */
     eMiscString_you_re_already_at_max_you_need_more_slots = 174,
     eMiscString_armor_strengthened = 175,
     eMiscString_engine_power_increased = 176,
@@ -5853,6 +5854,7 @@ enum {
     eMiscString_message_sent = 226,
     eMiscString_enter_message = 227,
     eMiscString_please_wait_host_has_paused = 228,
+    eMiscString_use_system_control_panel_for_joysticks = 229, /* FIXME: name from Carmageddon 1 */
     eMiscString_too_late_to_cancel = 242,
     eMiscString_could_not_find_carmageddon_cd = 243,
     eMiscString_no_target_to_lock_onto = 250,
