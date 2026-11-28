@@ -31,6 +31,11 @@
 // GLOBAL: CARMA2_CHEAT 0x00689968
 br_vector3 gRender_bounds_centre;
 
+// GLOBAL: CARMA2_HW 0x006820cc
+// GLOBAL: CARMA2_SW 0x0067c80c
+// GLOBAL: CARMA2_CHEAT 0x00689974
+tU32 gNext_drone_edit_path_munge;
+
 // GLOBAL: CARMA2_HW 0x006820d0
 // GLOBAL: CARMA2_SW 0x0067c810
 // GLOBAL: CARMA2_CHEAT 0x00689978
@@ -1342,9 +1347,66 @@ int C2_HOOK_FASTCALL FUN_00454360(int pNode) {
 #pragma auto_inline(on)
 #endif
 
-// FUN_004543d0
+// FUNCTION: CARMA2_HW 0x004543d0
+// FUNCTION: CARMA2_SW 0x00454160
+// FUNCTION: CARMA2_CHEAT 0x00454930
+void C2_HOOK_FASTCALL FUN_004543d0(void) {
+    int node;
 
-// FUN_00454470
+    if (!gShow_drone_paths) {
+        NewTextHeadupSlot(4, 0, 3000, -1, "You must show Drone Paths first");
+    } else if (gDrone_paths_elasticating) {
+        NewTextHeadupSlot(4, 0, 3000, -1, "Stop elasticating first");
+    } else {
+        node = FindNearestNodeDrone(&gProgram_state.current_car.car_master_actor->t.t.translate.t, 2.0f);
+        if (node >= 0) {
+            if (gDrone_path_nodes[node].field_0x12e & 0x10) {
+                gDrone_path_nodes[node].field_0x12e &= ~0x10;
+            } else {
+                gDrone_path_nodes[node].field_0x12e |= 0x10;
+            }
+            FUN_00454470(node);
+            gSelected_edit_drone_path = node;
+            gNext_drone_edit_path_munge = gTime_stamp_for_this_munging + 1000;
+            InitialiseEditModelsEtc();
+        }
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x00454470
+// FUNCTION: CARMA2_SW 0x00454200
+// FUNCTION: CARMA2_CHEAT 0x004549d0
+void C2_HOOK_FASTCALL FUN_00454470(int pNode) {
+    char s[256];
+    tU8* flags;
+
+    sprintf(s, "Drone node #%d, ", pNode);
+    flags = &gDrone_path_nodes[pNode].field_0x12e;
+    if (*flags & 0x10) {
+        strcat(s, "SMALL vehicles");
+    } else {
+        strcat(s, "ALL sizes");
+    }
+    strcat(s, ", ");
+    if (*flags & 0x2) {
+        strcat(s, "PRIVATE");
+    } else {
+        strcat(s, "ANY vehicle");
+    }
+    strcat(s, ", ");
+    if (*flags & 0x4) {
+        strcat(s, "PARKING SPACE");
+    } else {
+        strcat(s, "-");
+    }
+    strcat(s, ", ");
+    if (*flags & 0x8) {
+        strcat(s, "LAYBY");
+    } else {
+        strcat(s, "-");
+    }
+    NewTextHeadupSlot(4, 0, 1000, -1, s);
+}
 
 // FUNCTION: CARMA2_HW 0x00454640
 // FUNCTION: CARMA2_SW 0x004543d0
@@ -1386,9 +1448,41 @@ void C2_HOOK_FASTCALL FUN_00454680(void) {
     WriteOutDronePaths();
 }
 
-// FUN_00454690
+// FUNCTION: CARMA2_HW 0x00454690
+// FUNCTION: CARMA2_SW 0x00454420
+// FUNCTION: CARMA2_CHEAT 0x00454bf0
+void C2_HOOK_FASTCALL FUN_00454690(void) {
+    int node;
+    char s[256];
 
-// FUN_00454710
+    if (!gShow_drone_paths) {
+        NewTextHeadupSlot(4, 0, 3000, -1, "You must show Drone Paths first");
+        return;
+    }
+    node = FindNearestNodeDrone(&gProgram_state.current_car.car_master_actor->t.t.translate.t, 2.0f);
+    if (node >= 0) {
+        sprintf(s, "Drone node %d", node);
+        NewTextHeadupSlot(4, 0, 1000, -1, s);
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x00454710
+// FUNCTION: CARMA2_SW 0x004544a0
+// FUNCTION: CARMA2_CHEAT 0x00454c70
+void C2_HOOK_FASTCALL FUN_00454710(void) {
+    int node;
+
+    if (!gShow_drone_paths) {
+        NewTextHeadupSlot(4, 0, 3000, -1, "You must show Drone Paths first");
+    } else if (gDrone_paths_elasticating) {
+        NewTextHeadupSlot(4, 0, 3000, -1, "Stop elasticating first");
+    } else {
+        node = FindNearestNodeDrone(&gProgram_state.current_car.car_master_actor->t.t.translate.t, 2.0f);
+        if (node >= 0) {
+            FUN_00454470(node);
+        }
+    }
+}
 
 // DeleteNodeSectionsAndOrphan
 

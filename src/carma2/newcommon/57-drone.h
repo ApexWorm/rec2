@@ -13,6 +13,8 @@
 #include "rec2_types.h"
 
 extern br_vector3 gRender_bounds_centre;
+
+extern tU32 gNext_drone_edit_path_munge;
 extern int gINT_00681fb0;
 extern int gFrame;
 extern int gCurrent_selected_drone;
@@ -264,9 +266,9 @@ extern void C2_HOOK_FASTCALL FUN_00453f40(void);
 
 extern int C2_HOOK_FASTCALL FUN_00454360(int pNode);
 
-// FUN_004543d0
+extern void C2_HOOK_FASTCALL FUN_004543d0(void);
 
-// FUN_00454470
+extern void C2_HOOK_FASTCALL FUN_00454470(int pNode);
 
 extern void C2_HOOK_FASTCALL FUN_00454640(void);
 
@@ -278,9 +280,9 @@ extern void C2_HOOK_FASTCALL FUN_00454670(void);
 
 extern void C2_HOOK_FASTCALL FUN_00454680(void);
 
-// FUN_00454690
+extern void C2_HOOK_FASTCALL FUN_00454690(void);
 
-// FUN_00454710
+extern void C2_HOOK_FASTCALL FUN_00454710(void);
 
 // DeleteNodeSectionsAndOrphan
 
