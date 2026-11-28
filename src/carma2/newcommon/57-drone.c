@@ -2331,5 +2331,43 @@ void C2_HOOK_FASTCALL FUN_00454bb0(void) {
 
 // SelectPreviousDroneForm
 
-// CreateNewDrone
+// FUNCTION: CARMA2_HW 0x00454d70
+// FUNCTION: CARMA2_SW 0x00454b00
+// FUNCTION: CARMA2_CHEAT 0x004552d0
+void C2_HOOK_FASTCALL CreateNewDrone(void) {
+    int node;
+    tDrone_spec* drone;
+
+    if (!gShow_drone_paths) {
+        NewTextHeadupSlot(4, 0, 3000, -1, "You must show Drone Paths first");
+    } else if (gDrone_paths_elasticating) {
+        NewTextHeadupSlot(4, 0, 3000, -1, "Stop elasticating first");
+    } else {
+        node = FindNearestNodeDrone(&gProgram_state.current_car.car_master_actor->t.t.translate.t, 2.0f);
+        if (node < 0) {
+            return;
+        }
+        if (gDrone_path_nodes[node].type >= 0) {
+            sprintf(gDrone_edit_message, "Node #%d already occupied. Try selecting it.", node);
+            NewTextHeadupSlot(4, 0, 3500, -1, gDrone_edit_message);
+        } else if (gCount_drones >= 200) {
+            NewTextHeadupSlot(4, 0, 3500, -1, "Max drone limit reached");
+        } else {
+            if (gSelected_drone_form_index < 0) {
+                gSelected_drone_form_index = 0;
+            }
+            gDrone_path_nodes[node].type = gSelected_drone_form_index;
+            InitDroneSpec(&gDrone_specs[gCount_drones], node);
+            gDrone_specs[gCount_drones].id = gCount_drones;
+            gSelected_drone_path_index = gCount_drones;
+            drone = &gDrone_specs[gCount_drones];
+            drone->form = &gDrone_forms[gSelected_drone_form_index];
+            LoadDroneActorsModels(drone);
+            NewDroneState(&gDrone_specs[gCount_drones], 1);
+            gCount_drones++;
+            SelectClosestDrone();
+            WriteOutDronePaths();
+        }
+    }
+}
 

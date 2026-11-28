@@ -302,6 +302,6 @@ extern void C2_HOOK_FASTCALL FUN_00454bb0(void);
 
 // SelectPreviousDroneForm
 
-// CreateNewDrone
+extern void C2_HOOK_FASTCALL CreateNewDrone(void);
 
 #endif // GUARD_57_DRONE_H
