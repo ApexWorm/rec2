@@ -12,17 +12,20 @@
 #include "c2_hooks.h"
 #include "rec2_types.h"
 
+extern int gINT_00679434;
+
+extern int gINT_00679438;
+
 extern int gINT_00692dc8;
 
 extern int gPrepared_objects;
 
 extern int gCount_friction_forces;
-
 extern tPhysics_joint_force gFriction_forces[50];
-
 extern int gPHIL_collision_group;
-
 extern int gINT_006940a4;
+extern tPhysics_object** gReduced_object_list;
+extern int gINT_006940ac;
 
 extern tPhysicsError_cbfn* gPhysics_error_cb;
 extern void* gPhysics_buffer1_ptr;
@@ -46,13 +49,15 @@ extern tShrapnel_time_info gPed_spurt_min_max_time;
 extern void* gPhysics_other_buffer;
 extern void* gPhysics_scratch_ptr;
 extern int gFace_count;
+extern int gINT_00679438;
+extern tPhysics_object* gObject_blocking_sensible_place;
 extern tWorld_callbacks gWorld_callbacks;
 
 // count
 
 void C2_HOOK_FASTCALL DrMatrix34ApplyLPInverse(br_vector3* dest, const br_vector3* source, const br_matrix34* matrix);
 
-// AddObjectWallForce
+extern int C2_HOOK_FASTCALL AddObjectWallForce(tPhysics_joint_force* pForces, const br_vector3* pPosition, br_scalar pT, const br_vector3* pNormal, br_scalar pUnused, int pCount, tPhysics_object* pObject, int pType, tFace_ref* pFace, const br_vector3* pReference_position);
 
 extern int C2_HOOK_FASTCALL AddObjectObjectForce(tPhysics_joint_force* pForces, const br_vector3* pPoint_a, br_scalar pT, const br_vector3* pPoint_b, const br_vector3* pNormal, int pCount, tPhysics_object* pObject_a, tPhysics_object* pObject_b, int pType, void* pUnused, br_scalar pValue);
 
@@ -60,43 +65,43 @@ extern tFace_ref* C2_HOOK_FASTCALL RayCastThruFaceList(br_vector3* pPosition, br
 
 extern tFace_ref* C2_HOOK_FASTCALL RayCastThruFaceList2(br_vector3* pPosition, br_vector3* pDirection, br_vector3* pNormal, br_scalar* pT, br_vector3* pCollision_position, tFace_ref* pFaces, int pCount);
 
-// RayCastInBox
+extern tFace_ref* C2_HOOK_FASTCALL RayCastInBox(br_vector3* pPosition, br_vector3* pDirection, br_vector3* pNormal, br_scalar* pT, br_vector3* pCollision_position, tPhysics_object* pObject);
 
-// FaceOffCount2
+extern void C2_HOOK_FASTCALL FaceOffCount2(void);
 
-// FaceOffCount
+extern void C2_HOOK_FASTCALL FaceOffCount(void);
 
-// FaceOnCount
+extern void C2_HOOK_FASTCALL FaceOnCount(void);
 
-// EliminateFaces
+extern int C2_HOOK_FASTCALL EliminateFaces(tPhysics_object* pObject, tPhysics_shape* pShape, br_matrix34* pMat);
 
 // GetShapePoint
 
 // GetObjectObjectEdgeIntersections
 
-// GetFaceEdgeIntersection
+extern int C2_HOOK_FASTCALL GetFaceEdgeIntersection(tPhysics_object* pObject, tPhysics_shape* pShape, tPhysics_joint_force* pForces, int pCount, int pMax_count, tPhysics_wall_workspace* pWorkspace, void* pUnused, int* pTouched);
 
-// GetSphereToFacePoints
+extern int C2_HOOK_FASTCALL GetSphereToFacePoints(tPhysics_object* pObject, tCollision_shape_sphere_data* pSphere, tPhysics_joint_force* pForces, int pCount, int pMax_count, br_vector3* pSphere_start, br_vector3* pSphere_end, br_matrix34* pMatrix);
 
-// CheckSingleEdgeWithSphere
+extern int C2_HOOK_FASTCALL CheckSingleEdgeWithSphere(br_vector3* pEdge_start, br_vector3* pEdge_end, tPhysics_object* pObject, tCollision_shape_sphere_data* pSphere, tPhysics_joint_force* pForces, int pCount, br_vector3* pSphere_start, br_vector3* pSphere_end, tFace_ref* pFace);
 
-// GetSphereToEdgePoints
+extern int C2_HOOK_FASTCALL GetSphereToEdgePoints(tPhysics_object* pObject, tCollision_shape_sphere_data* pSphere, tPhysics_joint_force* pForces, int pCount, int pMax_count, br_vector3* pSphere_start, br_vector3* pSphere_end, br_matrix34* pMatrix);
 
-// GetCornerToFacePoints
+extern int C2_HOOK_FASTCALL GetCornerToFacePoints(tPhysics_object* pObject, tPhysics_shape* pShape, tPhysics_joint_force* pForces, int pCount, int pMax_count, tPhysics_wall_workspace* pWorkspace, void* pUnused);
 
-// CylinderCheck
+extern int C2_HOOK_FASTCALL CylinderCheck(const br_vector3* pN0, const br_vector3* pN1, const br_vector3* pEdge_start, const br_vector3* pEdge_direction, const br_vector3* pOther_start, const br_vector3* pOther_direction, const br_vector3* pOther_velocity, const br_vector3* pOther_direction_change, tPhysics_joint_force* pForce, int pCount, tPhysics_object* pObject, tPhysics_object* pOther);
 
-// CheckTwoEdges
+extern int C2_HOOK_FASTCALL CheckTwoEdges(const br_vector3* pEdge_start, const br_vector3* pEdge_direction, const br_vector3* pOther_start, const br_vector3* pOther_direction, const br_vector3* pOther_velocity, const br_vector3* pOther_direction_change, tPhysics_joint_force* pForce, int pCount, tPhysics_object* pObject, tPhysics_object* pOther);
 
-// WorldPointCollision
+extern int C2_HOOK_FASTCALL WorldPointCollision(const br_vector3* pPoint, tPhysics_object* pObject, tPhysics_shape* pShape, tPhysics_joint_force* pForces, int pCount, tFace_ref* pFace);
 
-// CheckSingleEdgeWithObjectEdges
+extern int C2_HOOK_FASTCALL CheckSingleEdgeWithObjectEdges(br_vector3* pEdge_start, br_vector3* pEdge_end, tPhysics_object* pObject, tPhysics_shape* pShape, tPhysics_joint_force* pForces, int pCount, tFace_ref* pFace, tPhysics_wall_workspace* pWorkspace);
 
-// GetEdgeToEdgePoints
+extern int C2_HOOK_FASTCALL GetEdgeToEdgePoints(tPhysics_object* pObject, tPhysics_shape* pShape, tPhysics_joint_force* pForces, int pCount, int pMax_count, tPhysics_wall_workspace* pWorkspace, void* pUnused);
 
-// SetUpWorkspace
+extern void C2_HOOK_FASTCALL SetUpWorkspace(tPhysics_object* pObject, tPhysics_shape* pShape, tPhysics_wall_workspace* pWorkspace);
 
-// GetObjectWallForceInfo
+extern int C2_HOOK_FASTCALL GetObjectWallForceInfo(tPhysics_object* pObject, tPhysics_joint_force* pForces, int pCount);
 
 // GetObjectCornerToObjectFacePoints
 
@@ -104,17 +109,17 @@ extern int C2_HOOK_FASTCALL BoundsOverlapTest(const br_bounds3* pBounds_1, const
 
 // GetObjectObjectEdgePoints
 
-// GetSphereNonSphereForceInfo
+extern int C2_HOOK_FASTCALL GetSphereNonSphereForceInfo(tPhysics_object* pObject_a, tPhysics_object* pObject_b, tPhysics_shape* pShape_a, tPhysics_shape* pShape_b, br_vector3* pPoints_a, br_vector3* pPoints_b, int pCount_a, int pCount_b, tPhysics_joint_force* pForces, int pCount, int pMax_count);
 
-// GetSphereSphereForceInfo
+extern int C2_HOOK_FASTCALL GetSphereSphereForceInfo(tPhysics_object* pObject_a, tPhysics_object* pObject_b, tPhysics_shape* pShape_a, tPhysics_shape* pShape_b, br_vector3* pPoints_a, br_vector3* pPoints_b, int pCount_a, int pCount_b, tPhysics_joint_force* pForces, int pCount, int pMax_count);
 
-// GetSphereShapeForceInfo
+extern int C2_HOOK_FASTCALL GetSphereShapeForceInfo(tPhysics_object* pObject_a, tPhysics_object* pObject_b, tPhysics_shape* pShape_a, tPhysics_shape* pShape_b, br_vector3* pPoints_a, br_vector3* pPoints_b, int pCount_a, int pCount_b, tPhysics_joint_force* pForces, int pCount, int pMax_count);
 
-// GetNonSphereNonSphereForceInfo
+extern int C2_HOOK_FASTCALL GetNonSphereNonSphereForceInfo(tPhysics_object* pObject_a, tPhysics_object* pObject_b, tPhysics_shape* pShape_a, tPhysics_shape* pShape_b, br_vector3* pPoints_a, br_vector3* pPoints_b, int pCount_a, int pCount_b, tPhysics_joint_force* pForces, int pCount, int pMax_count);
 
-// GetNonSphereShapeForceInfo
+extern int C2_HOOK_FASTCALL GetNonSphereShapeForceInfo(tPhysics_object* pObject_a, tPhysics_object* pObject_b, tPhysics_shape* pShape_a, tPhysics_shape* pShape_b, br_vector3* pPoints_a, br_vector3* pPoints_b, int pCount_a, int pCount_b, tPhysics_joint_force* pForces, int pCount, int pMax_count);
 
-// GetObjectObjectForceInfo
+extern int C2_HOOK_FASTCALL GetObjectObjectForceInfo(tPhysics_object* pObject_a, tPhysics_object* pObject_b, tPhysics_joint_force* pForces, int pCount);
 
 extern void C2_HOOK_FASTCALL GetShapePoint(br_vector3* pPoint, tPhysics_shape* pShape, tU32 pIndex);
 
@@ -124,9 +129,9 @@ extern int C2_HOOK_FASTCALL TestObjectOverlap(tPhysics_object* pCollision_1, tPh
 
 extern int C2_HOOK_FASTCALL TestShapeEdgeIntersection(tPhysics_object* pCollision_info_1, tPhysics_object* pCollision_info_2, tPhysics_shape* pCollision_shape_1, tPhysics_shape* pCollision_shape_2);
 
-// TestObjectOverlapIgnoreCloseRelatives
+extern int C2_HOOK_FASTCALL TestObjectOverlapIgnoreCloseRelatives(tPhysics_object* pCollision_1, tPhysics_object* pCollision_2);
 
-// TestObjectOverlapRecurse
+extern int C2_HOOK_FASTCALL TestObjectOverlapRecurse(tPhysics_object* pCollision_1, tPhysics_object* pCollision_2);
 
 extern int C2_HOOK_FASTCALL TestForObjectInSensiblePlace(tPhysics_object* pCollision_info_1, tPhysics_object* pCollision_info_2, br_vector3* pVec3, tWorld_callbacks* pCar_callbacks);
 
@@ -196,7 +201,7 @@ extern void C2_HOOK_FASTCALL TellPhysicsJointsHaveChanged(tPhysics_object* pColl
 
 // InternalPrepareObject
 
-// PrepareObject
+extern void C2_HOOK_FASTCALL PrepareObject(tPhysics_object* pObject, tPhysics_object** pList);
 
 // PrepareForCollisions
 
@@ -228,23 +233,23 @@ extern void C2_HOOK_FASTCALL MakeObjectListDoSomething(tPhysics_object* pObject)
 
 // CheckForObjectHierachyTouchingObjectList
 
-// MakeObjectDoSomething
+extern void C2_HOOK_FASTCALL MakeObjectDoSomething(tPhysics_object* pObject, tPhysics_object* pList);
 
 // GetReducedList
 
-// ReduceReducedList
+extern tPhysics_object** C2_HOOK_FASTCALL ReduceReducedList(tPhysics_object* pObject, tPhysics_object** pList);
 
 extern void C2_HOOK_FASTCALL SetObjectTrialPositionType(tPhysics_object* pObject, int pType);
 
-// FillInTrialWorkspace
+extern void C2_HOOK_FASTCALL FillInTrialWorkspace(tPhysics_object* pObject, tPhysics_object* pOther, tWorld_callbacks* pCallbacks);
 
 extern int C2_HOOK_FASTCALL FlagsAreGo(tPhysics_object* pCollision_1, tPhysics_object* pCollision_2);
 
-// CollideObjectWithReducedObjectList
+extern int C2_HOOK_FASTCALL CollideObjectWithReducedObjectList(tPhysics_object* pObject, tPhysics_object* pList, tPhysics_joint_force* pForces, int pCount, tPhysics_object* pDo_something_list, tWorld_callbacks* pCallbacks);
 
-// AddObjectToReducedList
+extern void C2_HOOK_FASTCALL AddObjectToReducedList(tPhysics_object* pObject, tPhysics_object** pList);
 
-// ReducedFindObjectCollisions
+extern int C2_HOOK_FASTCALL ReducedFindObjectCollisions(tPhysics_object* pObject, tPhysics_object** pList, tPhysics_joint_force* pForces, int pCount, tWorld_callbacks* pCallbacks, tPhysics_object* pDo_something_list);
 
 // FindObjectCollisions
 
@@ -334,9 +339,9 @@ extern void C2_HOOK_FASTCALL ApplyDiminishingTorque(tPhysics_object* pObject, co
 
 extern void OrderObjectListOnX(tPhysics_object** pObject_list);
 
-// SwapPair
+extern void C2_HOOK_FASTCALL SwapPair(tPhysics_object* pObject_1, tPhysics_object* pObject_2);
 
-// CheckObjectsPostionInList
+extern void C2_HOOK_FASTCALL CheckObjectsPostionInList(tPhysics_object* pObject, tPhysics_object** pList);
 
 // TestForWrongAnswer
 

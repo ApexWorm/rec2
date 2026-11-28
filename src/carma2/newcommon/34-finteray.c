@@ -283,19 +283,310 @@ void C2_HOOK_FASTCALL StationarySphereSphereCollide(const br_vector3* pPoint, co
     }
 }
 
-// SphereSphereCollide
+// FUNCTION: CARMA2_HW 0x0045d5e0
+// FUNCTION: CARMA2_SW 0x0045d020
+// FUNCTION: CARMA2_CHEAT 0x0045da50
+void C2_HOOK_FASTCALL SphereSphereCollide(const tCollision_shape_sphere_data* pSphere_1, const tCollision_shape_sphere_data* pSphere_2, const br_vector3* pStart, const br_vector3* pEnd, br_vector3* pNormal, br_scalar* pCollision_t) {
+    br_vector3 dir;
+    br_vector3 offset;
+    br_scalar dir_length_squared;
+    br_scalar radius;
+    br_scalar t;
+    br_scalar distance_squared;
+    br_scalar length;
+
+    *pCollision_t = 100.0f;
+    BrVector3Sub(&dir, pEnd, pStart);
+    BrVector3Sub(&offset, pStart, &pSphere_1->center);
+    dir_length_squared = BrVector3LengthSquared(&dir);
+    radius = pSphere_1->radius + pSphere_2->radius;
+    if (dir_length_squared < 1e-6) {
+        StationarySphereSphereCollide(&pSphere_1->center, pEnd, radius, pNormal, pCollision_t);
+        return;
+    }
+    t = -BrVector3Dot(&dir, &offset) / dir_length_squared;
+    distance_squared = BrVector3LengthSquared(&offset) - dir_length_squared * t * t;
+    if (distance_squared > (radius + 0.002) * (radius + 0.002)) {
+        return;
+    }
+    if (distance_squared > radius * radius) {
+        StationarySphereSphereCollide(&pSphere_1->center, pEnd, radius, pNormal, pCollision_t);
+        return;
+    }
+    t -= (br_scalar)sqrt((radius * radius - distance_squared) / dir_length_squared);
+    if (t < 0.0f || t > 1.0f) {
+        StationarySphereSphereCollide(&pSphere_1->center, pEnd, radius, pNormal, pCollision_t);
+        return;
+    }
+    *pCollision_t = t;
+    BrVector3Scale(pNormal, &dir, -t);
+    BrVector3Sub(pNormal, pNormal, &offset);
+    length = BrVector3Length(pNormal);
+    if (length > 2.3841858e-07f) {
+        BrVector3Scale(pNormal, pNormal, (br_scalar)(1.0 / length));
+    } else {
+        BrVector3Set(pNormal, 1.0f, 0.0f, 0.0f);
+    }
+}
 
 // StationarySphereEdgeCollide
 
 // PointSphereCollision
 
-// SphereEdgeCollide
+// STUB: CARMA2_HW 0x0045d920
+// STUB: CARMA2_SW 0x0045d360
+// STUB: CARMA2_CHEAT 0x0045dd90
+void C2_HOOK_FASTCALL SphereEdgeCollide(br_vector3* pEdge_start, br_vector3* pEdge_end, br_vector3* pSphere_start, br_vector3* pSphere_end, tCollision_shape_sphere_data* pSphere, br_vector3* pPoint, br_vector3* pNormal, br_scalar* pT, int pStart_flags, int pEnd_flags) {
+    NOT_IMPLEMENTED();
+}
 
-// SpherePolyFaceCollide
+// FUNCTION: CARMA2_HW 0x0045e200
+// FUNCTION: CARMA2_SW 0x0045dc50
+// FUNCTION: CARMA2_CHEAT 0x0045e670
+void C2_HOOK_FASTCALL SpherePolyFaceCollide(const tCollision_shape_sphere_data* pSphere, const tCollision_shape_polyhedron_data* pPolyhedron, const br_vector3* pStart, const br_vector3* pEnd, br_vector3* pPoint, br_vector3* pNormal, br_scalar* pCollision_t) {
+    int i;
+    int j;
+    br_scalar t;
+    br_vector3 tv;
+    br_scalar end_distances[124];
+    br_scalar start_distances[124];
 
-// SphereBoxFaceCollide
+    *pCollision_t = 100.0f;
+    for (i = 0; i < pPolyhedron->count_planes; i++) {
+        start_distances[i] = pPolyhedron->planes[i].v[0] * pStart->v[0]
+            + pPolyhedron->planes[i].v[1] * pStart->v[1]
+            + pPolyhedron->planes[i].v[2] * pStart->v[2]
+            + pPolyhedron->planes[i].v[3] + pSphere->radius;
+        end_distances[i] = pPolyhedron->planes[i].v[0] * pEnd->v[0]
+            + pPolyhedron->planes[i].v[1] * pEnd->v[1]
+            + pPolyhedron->planes[i].v[2] * pEnd->v[2]
+            + pPolyhedron->planes[i].v[3] + pSphere->radius;
+        if (start_distances[i] < -0.002 && end_distances[i] < -0.002) {
+            return;
+        }
+    }
+    for (i = 0; i < pPolyhedron->count_planes; i++) {
+        if (end_distances[i] > -0.002 && start_distances[i] < 0.0f) {
+            if (end_distances[i] < 0.0f) {
+                BrVector3Copy(pPoint, pEnd);
+                t = 1.0f;
+            } else {
+                t = -start_distances[i] / (end_distances[i] - start_distances[i]);
+                BrVector3Scale(pPoint, pStart, 1.0f - t);
+                BrVector3Scale(&tv, pEnd, t);
+                BrVector3Accumulate(pPoint, &tv);
+            }
+            tv.v[0] = pPolyhedron->planes[i].v[0] * pSphere->radius;
+            tv.v[1] = pPolyhedron->planes[i].v[1] * pSphere->radius;
+            tv.v[2] = pPolyhedron->planes[i].v[2] * pSphere->radius;
+            BrVector3Accumulate(pPoint, &tv);
+            for (j = 0; j < pPolyhedron->count_planes; j++) {
+                if (j != i
+                    && pPolyhedron->planes[j].v[0] * pPoint->v[0]
+                            + pPolyhedron->planes[j].v[1] * pPoint->v[1]
+                            + pPolyhedron->planes[j].v[2] * pPoint->v[2]
+                            + pPolyhedron->planes[j].v[3]
+                        <= 0.0f) {
+                    break;
+                }
+            }
+            if (j == pPolyhedron->count_planes) {
+                *pCollision_t = t;
+                pNormal->v[0] = pPolyhedron->planes[i].v[0];
+                pNormal->v[1] = pPolyhedron->planes[i].v[1];
+                pNormal->v[2] = pPolyhedron->planes[i].v[2];
+                return;
+            }
+        }
+    }
+}
 
-// SphereFaceCollide
+// FUNCTION: CARMA2_HW 0x0045e4e0
+// FUNCTION: CARMA2_SW 0x0045df30
+// FUNCTION: CARMA2_CHEAT 0x0045e950
+void C2_HOOK_FASTCALL SphereBoxFaceCollide(const tCollision_shape_sphere_data* pSphere, const tCollision_shape_box* pBox, const br_vector3* pStart, const br_vector3* pEnd, br_vector3* pPoint, br_vector3* pNormal, br_scalar* pCollision_t) {
+    int i;
+    int j;
+    br_scalar radius;
+    br_scalar limit;
+    br_scalar t;
+    br_vector3 tv;
+
+    *pCollision_t = 100.0f;
+    radius = pSphere->radius;
+    for (i = 0; i < 3; i++) {
+        limit = pBox->common.bb.max.v[i] + radius + 0.002;
+        if (pStart->v[i] > limit && pEnd->v[i] > limit) {
+            return;
+        }
+        limit = pBox->common.bb.min.v[i] - radius - 0.002;
+        if (pStart->v[i] < limit && pEnd->v[i] < limit) {
+            return;
+        }
+    }
+    for (i = 0; i < 3; i++) {
+        limit = pBox->common.bb.min.v[i] - radius;
+        if (pStart->v[i] < limit && pEnd->v[i] > limit - 0.002) {
+            if (pEnd->v[i] <= limit) {
+                BrVector3Copy(pPoint, pEnd);
+                t = 1.0f;
+            } else {
+                t = (limit - pStart->v[i]) / (pEnd->v[i] - pStart->v[i]);
+                BrVector3Scale(pPoint, pStart, 1.0f - t);
+                BrVector3Scale(&tv, pEnd, t);
+                BrVector3Accumulate(pPoint, &tv);
+                pPoint->v[i] += radius;
+            }
+            for (j = 0; j < 3; j++) {
+                if (j != i && (pPoint->v[j] < pBox->common.bb.min.v[j] || pPoint->v[j] > pBox->common.bb.max.v[j])) {
+                    break;
+                }
+            }
+            if (j == 3) {
+                *pCollision_t = t;
+                BrVector3SetFloat(pNormal, 0.0f, 0.0f, 0.0f);
+                pNormal->v[i] = 1.0f;
+                return;
+            }
+        }
+        limit = pBox->common.bb.max.v[i] + radius;
+        if (pStart->v[i] > limit && pEnd->v[i] < limit + 0.002) {
+            if (pEnd->v[i] >= limit) {
+                BrVector3Copy(pPoint, pEnd);
+                t = 1.0f;
+            } else {
+                t = (limit - pStart->v[i]) / (pEnd->v[i] - pStart->v[i]);
+                BrVector3Scale(pPoint, pStart, 1.0f - t);
+                BrVector3Scale(&tv, pEnd, t);
+                BrVector3Accumulate(pPoint, &tv);
+                pPoint->v[i] -= radius;
+            }
+            for (j = 0; j < 3; j++) {
+                if (j != i && (pPoint->v[j] < pBox->common.bb.min.v[j] || pPoint->v[j] > pBox->common.bb.max.v[j])) {
+                    break;
+                }
+            }
+            if (j == 3) {
+                *pCollision_t = t;
+                BrVector3SetFloat(pNormal, 0.0f, 0.0f, 0.0f);
+                pNormal->v[i] = -1.0f;
+                return;
+            }
+        }
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x0045e850
+// FUNCTION: CARMA2_SW 0x0045e2b0
+// FUNCTION: CARMA2_CHEAT 0x0045ecc0
+void C2_HOOK_FASTCALL SphereFaceCollide(tFace_ref* pFace, const br_vector3* pStart, const br_vector3* pEnd, br_scalar pRadius, br_vector3* pPoint, br_vector3* pNormal, br_scalar* pT) {
+    br_material* material;
+    br_vector3 n;
+    br_vector3 p;
+    br_scalar d0;
+    br_scalar d1;
+    br_scalar t;
+    br_scalar dist;
+    int axis;
+    int i0;
+    int i1;
+    br_scalar b0;
+    br_scalar b1;
+    br_scalar e1_0;
+    br_scalar e1_1;
+    br_scalar e2_0;
+    br_scalar e2_1;
+    br_scalar num;
+    br_scalar den;
+    br_scalar alpha;
+    br_scalar beta;
+
+    *pT = 100.0f;
+    material = pFace->material;
+    if (material != NULL && material->identifier != NULL
+        && (material->identifier[0] == '!' || material->identifier[0] == '>' || material->identifier[0] == '?')) {
+        return;
+    }
+    d0 = BrVector3Dot(&pFace->normal, pStart) - pFace->d;
+    if (d0 < 0.0f) {
+        if (d0 > -pRadius || material == NULL || !(material->flags & BR_MATF_TWO_SIDED)) {
+            return;
+        }
+        BrVector3Negate(&n, &pFace->normal);
+        d1 = BrVector3Dot(&n, pEnd) + pFace->d;
+    } else {
+        if (d0 < pRadius) {
+            return;
+        }
+        BrVector3Copy(&n, &pFace->normal);
+        d1 = BrVector3Dot(&n, pEnd) - pFace->d;
+    }
+    if (d1 > pRadius + 0.002) {
+        return;
+    }
+    t = (pRadius - d0) / (d1 - d0);
+    if (t > 1.0f) {
+        t = 1.0f;
+    }
+    if (t < 0.0f) {
+        t = 0.0f;
+    }
+    BrVector3Sub(&p, pEnd, pStart);
+    BrVector3Scale(&p, &p, t);
+    BrVector3Accumulate(&p, pStart);
+    dist = (pFace->v[0].v[0] - p.v[0]) * n.v[0] + (pFace->v[0].v[1] - p.v[1]) * n.v[1] + (pFace->v[0].v[2] - p.v[2]) * n.v[2];
+    p.v[0] += n.v[0] * dist;
+    p.v[1] += n.v[1] * dist;
+    p.v[2] += n.v[2] * dist;
+    if ((br_scalar)fabs(n.v[0]) < (br_scalar)fabs(n.v[1])) {
+        axis = 1;
+    } else {
+        axis = 0;
+    }
+    if ((br_scalar)fabs(n.v[axis]) < (br_scalar)fabs(n.v[2])) {
+        axis = 2;
+    }
+    switch (axis) {
+    case 0:
+        i0 = 1;
+        i1 = 2;
+        break;
+    case 1:
+        i0 = 0;
+        i1 = 2;
+        break;
+    case 2:
+        i0 = 0;
+        i1 = 1;
+        break;
+    }
+    b0 = pFace->v[0].v[i0];
+    b1 = pFace->v[0].v[i1];
+    e2_0 = pFace->v[2].v[i0] - b0;
+    e1_1 = pFace->v[1].v[i1] - b1;
+    e1_0 = pFace->v[1].v[i0] - b0;
+    e2_1 = pFace->v[2].v[i1] - b1;
+    den = e2_1 * e1_0 - e2_0 * e1_1;
+    num = (p.v[i1] - b1) * e1_0 - (p.v[i0] - b0) * e1_1;
+    if ((br_scalar)fabs(num) > (br_scalar)fabs(den) * 1.001 || den == 0.0f) {
+        return;
+    }
+    alpha = num / den;
+    if (alpha < -0.0001) {
+        return;
+    }
+    den = e1_1 * e2_0 - e1_0 * e2_1;
+    num = (p.v[i1] - b1) * e2_0 - (p.v[i0] - b0) * e2_1;
+    if ((br_scalar)fabs(num) > (br_scalar)fabs(den) * 1.001 || den == 0.0f) {
+        return;
+    }
+    beta = num / den;
+    if (beta < -0.0001 || alpha + beta > 1.0001) {
+        return;
+    }
+    *pT = t;
+    BrVector3Copy(pNormal, &n);
+}
 
 // STUB: CARMA2_HW 0x0045ecc0
 // STUB: CARMA2_SW 0x0045e730
