@@ -345,6 +345,7 @@ void C2_HOOK_STDCALL sceneRenderAdd(br_actor* tree) {
 }
 
 // FUNCTION: CARMA2_HW 0x00521c10
+// FUNCTION: CARMA2_SW 0x0051d2b0
 // FUNCTION: CARMA2_CHEAT 0x00527800
 void C2_HOOK_CDECL BrDbSceneRenderBegin(br_actor* world, br_actor* camera) {
     br_matrix34 tfm;
@@ -543,6 +544,7 @@ void C2_HOOK_CDECL BrZbsSceneRenderBegin(br_actor* world, br_actor* camera, br_p
 
     v1db.renderer->dispatch->_partSet(v1db.renderer, BRT_OUTPUT, 0, BRT_COLOUR_BUFFER_O, (uintptr_t)colour_buffer);
     v1db.renderer->dispatch->_partSet(v1db.renderer, BRT_OUTPUT, 0, BRT_DEPTH_BUFFER_O, (uintptr_t)NULL);
+    v1db.renderer->dispatch->_partSet(v1db.renderer, BRT_OUTPUT, 0, BRT_DEPTH_BUFFER_O, (uintptr_t)depth_buffer);
     v1db.heap.current = v1db.heap.base;
     camera_data = camera->type_data;
     v1db.default_order_table->max_z = camera_data->yon_z;
