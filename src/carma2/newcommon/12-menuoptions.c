@@ -357,6 +357,26 @@ int C2_HOOK_FASTCALL GraphOptUp(int* pCurrent_choice, int* pCurrent_mode) {
     }
 }
 
+// FUNCTION: CARMA2_HW 0x004b2600
+// FUNCTION: CARMA2_SW 0x004ae770
+// FUNCTION: CARMA2_CHEAT 0x004b7ed0
+int C2_HOOK_FASTCALL GraphOptDown(int* pCurrent_choice, int* pCurrent_mode) {
+
+    if (*pCurrent_mode == 0) {
+        *pCurrent_mode = 1;
+        *pCurrent_choice = 2;
+        DRS3StartSound(gEffects_outlet, eSoundId_LeftButton);
+        return 1;
+    } else if (*pCurrent_choice == 14) {
+        *pCurrent_mode = 0;
+        *pCurrent_choice = 0;
+        DRS3StartSound(gEffects_outlet, eSoundId_LeftButton);
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
 // FUNCTION: CARMA2_HW 0x004b2640
 // FUNCTION: CARMA2_SW 0x004ae7b0
 // FUNCTION: CARMA2_CHEAT 0x004b7f10

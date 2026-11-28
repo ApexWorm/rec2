@@ -52,6 +52,8 @@ extern int C2_HOOK_FASTCALL GraphOptRight(int* pCurrent_choice, int* pCurrent_mo
 
 extern int C2_HOOK_FASTCALL GraphOptUp(int* pCurrent_choice, int* pCurrent_mode);
 
+extern int C2_HOOK_FASTCALL GraphOptDown(int* pCurrent_choice, int* pCurrent_mode);
+
 extern int C2_HOOK_FASTCALL RadioClick(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_offset);
 
 extern int C2_HOOK_FASTCALL GraphOptGoAhead(int* pCurrent_choice, int* pCurrent_mode);
