@@ -46,6 +46,7 @@ extern int gKeyboardBufferLength;
 extern unsigned char gKeyboardBuffer[20];
 
 extern int gPerformanceCounterInitialized;
+extern int gINT_006acc74;
 extern LARGE_INTEGER gPerformanceCounterStart;
 extern LARGE_INTEGER gPerformanceCounterFrequency_s;
 extern LARGE_INTEGER gPerformanceCounterFrequency_ms;
@@ -105,13 +106,23 @@ extern void C2_HOOK_FASTCALL PDScreenBufferSwap(int pRendering_area_only);
 #ifdef REC2_SW
 extern void C2_HOOK_FASTCALL PDPixelmapToScreenRectangleCopy(br_pixelmap* dst, br_int_16 dx, br_int_16 dy, br_pixelmap* src, br_int_16 sx, br_int_16 sy, br_uint_16 w, br_uint_16 h);
 
-extern void C2_HOOK_FASTCALL PDPixelmapLine(br_pixelmap* pDst, int pX1, int pY1, int pX2, int pY2, br_colour pColour);
+extern void C2_HOOK_FASTCALL PDPixelmapLine(br_pixelmap* pDst, br_int_16 pX1, br_int_16 pY1, br_int_16 pX2, br_int_16 pY2, br_colour pColour);
 
-extern void C2_HOOK_FASTCALL PDPixelmapLine2(br_pixelmap* pDst, int pX1, int pY1, int pX2, int pY2, br_colour pColour);
+extern void C2_HOOK_FASTCALL PDPixelmapLine2(br_pixelmap* pDst, br_int_16 pX1, br_int_16 pY1, br_int_16 pX2, br_int_16 pY2, br_colour pColour);
 #endif
 
 #ifdef REC2_HW
 extern void C2_HOOK_FASTCALL CheckIfRunningOnServer(void);
+
+extern void C2_HOOK_FASTCALL FUN_0051c9f0(POINT* pPoint, int* pX, int* pY);
 #endif
+
+extern void C2_HOOK_FASTCALL FUN_0051c2c0(void);
+
+extern void C2_HOOK_FASTCALL FUN_0051c2d0(void);
+
+extern void C2_HOOK_FASTCALL FUN_0051d4a0(void);
+
+extern tU32 C2_HOOK_FASTCALL PDGetTotalTime2(void);
 
 #endif // C2_WIN32_WIN32_H

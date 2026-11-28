@@ -185,6 +185,10 @@ unsigned char gKeyboardBuffer[20];
 // GLOBAL: CARMA2_CHEAT 0x006b4300
 int gPerformanceCounterInitialized;
 
+// GLOBAL: CARMA2_HW 0x006acc74
+// GLOBAL: CARMA2_CHEAT 0x006b4304
+int gINT_006acc74;
+
 // GLOBAL: CARMA2_HW 0x006acc80
 // GLOBAL: CARMA2_SW 0x006a6420
 // GLOBAL: CARMA2_CHEAT 0x006b4310
@@ -873,6 +877,28 @@ tU32 C2_HOOK_FASTCALL PDGetTotalTime(void) {
 #endif
 }
 
+// FUNCTION: CARMA2_HW 0x0051d4a0
+// FUNCTION: CARMA2_SW 0x00518cc0
+// FUNCTION: CARMA2_CHEAT 0x00523090
+void C2_HOOK_FASTCALL FUN_0051d4a0(void) {
+}
+
+// FUNCTION: CARMA2_HW 0x0051d900
+// FUNCTION: CARMA2_SW 0x00518f70
+// FUNCTION: CARMA2_CHEAT 0x005234f0
+tU32 C2_HOOK_FASTCALL PDGetTotalTime2(void) {
+    if (gPerformanceCounterInitialized) {
+        LARGE_INTEGER perfCountValue;
+        DWORDLONG count;
+
+        QueryPerformanceCounter(&perfCountValue);
+        count = Int64ShllMod32(Int64ShllMod32(perfCountValue.HighPart, 16), 16) + perfCountValue.LowPart;
+        count = (count - gPerformanceCounterStart.QuadPart) / gPerformanceCounterFrequency_ms.QuadPart;
+        return (tU32)count;
+    }
+    return 0;
+}
+
 // FUNCTION: CARMA2_HW 0x0051d990
 // FUNCTION: CARMA2_SW 0x00519000
 // FUNCTION: CARMA2_CHEAT 0x00523580
@@ -1198,6 +1224,18 @@ void C2_HOOK_FASTCALL PDSaveOriginalPalette(void) {
 void C2_HOOK_FASTCALL PDInitScreen(void) {
 }
 
+// FUNCTION: CARMA2_HW 0x0051c2c0
+// FUNCTION: CARMA2_CHEAT 0x00521c50
+void C2_HOOK_FASTCALL FUN_0051c2c0(void) {
+    gINT_006acc74 = 1;
+}
+
+// FUNCTION: CARMA2_HW 0x0051c2d0
+// FUNCTION: CARMA2_CHEAT 0x00521c60
+void C2_HOOK_FASTCALL FUN_0051c2d0(void) {
+    gINT_006acc74 = 0;
+}
+
 // FUNCTION: CARMA2_HW 0x0051c300
 // FUNCTION: CARMA2_SW 0x00516420
 // FUNCTION: CARMA2_CHEAT 0x00521c90
@@ -1431,13 +1469,17 @@ void C2_HOOK_FASTCALL PDPixelmapToScreenRectangleCopy(br_pixelmap* dst, br_int_1
     }
 }
 
+// FUNCTION: CARMA2_HW 0x0051c590
 // FUNCTION: CARMA2_SW 0x005175b0
-void C2_HOOK_FASTCALL PDPixelmapLine(br_pixelmap* pDst, int pX1, int pY1, int pX2, int pY2, br_colour pColour) {
+// FUNCTION: CARMA2_CHEAT 0x00522010
+void C2_HOOK_FASTCALL PDPixelmapLine(br_pixelmap* pDst, br_int_16 pX1, br_int_16 pY1, br_int_16 pX2, br_int_16 pY2, br_colour pColour) {
     BrPixelmapLine(pDst, pX1, pY1, pX2, pY2, pColour);
 }
 
+// FUNCTION: CARMA2_HW 0x0051c5c0
 // FUNCTION: CARMA2_SW 0x005175e0
-void C2_HOOK_FASTCALL PDPixelmapLine2(br_pixelmap* pDst, int pX1, int pY1, int pX2, int pY2, br_colour pColour) {
+// FUNCTION: CARMA2_CHEAT 0x00522040
+void C2_HOOK_FASTCALL PDPixelmapLine2(br_pixelmap* pDst, br_int_16 pX1, br_int_16 pY1, br_int_16 pX2, br_int_16 pY2, br_colour pColour) {
     BrPixelmapLine(pDst, pX1, pY1, pX2, pY2, pColour);
 }
 #endif
@@ -1496,6 +1538,24 @@ void C2_HOOK_FASTCALL PDGetMousePosition(int *pX, int *pY) {
     }
 #endif
 }
+
+#ifdef REC2_HW
+// FUNCTION: CARMA2_HW 0x0051c9f0
+// FUNCTION: CARMA2_CHEAT 0x005224d0
+void C2_HOOK_FASTCALL FUN_0051c9f0(POINT* pPoint, int* pX, int* pY) {
+
+    if (gScale_mouse && strcmp(gRenderer, "D3D") != 0) {
+        *pX = (int)((double)pPoint->x / (gScreenWidth * (1.0 / 640.0)));
+        *pY = (int)((double)pPoint->y / (gScreenHeight * (1.0 / 480.0)));
+    } else {
+        ScreenToClient(gHWnd, pPoint);
+        *pX = pPoint->x;
+        *pY = pPoint->y;
+    }
+    gPD_mouse_position.x = *pX;
+    gPD_mouse_position.y = *pY;
+}
+#endif
 
 // FUNCTION: CARMA2_HW 0x0051c280
 // FUNCTION: CARMA2_SW 0x00516160
