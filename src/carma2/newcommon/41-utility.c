@@ -1643,9 +1643,6 @@ int C2_HOOK_FASTCALL PossibleUnlock(int pValue) {
 // FUNCTION: CARMA2_CHEAT 0x0051ca00
 tU16 C2_HOOK_FASTCALL PaletteEntry16Bit(br_pixelmap* pPal, int pEntry) {
     tU32* src_entry;
-    int red;
-    int green;
-    int blue;
 
     src_entry = pPal->pixels;
     switch (gBack_screen->type) {
@@ -1653,15 +1650,9 @@ tU16 C2_HOOK_FASTCALL PaletteEntry16Bit(br_pixelmap* pPal, int pEntry) {
         BrFailure("Unsupported back buffer type.");
         return 0;
     case BR_PMT_RGB_565:
-        red = (src_entry[pEntry] >> 8) & 0xf800;
-        green = (src_entry[pEntry] >> 5) & 0x07e0;
-        blue = (src_entry[pEntry] >> 3) & 0x001f;
-        return red | green | blue;
+        return ((src_entry[pEntry] >> 8) & 0xf800) | ((src_entry[pEntry] >> 5) & 0x07e0) | ((src_entry[pEntry] >> 3) & 0x001f);
     case BR_PMT_RGB_555:
-        red = (src_entry[pEntry] >> 9) & 0x7c00;
-        green = (src_entry[pEntry] >> 6) & 0x03e0;
-        blue = (src_entry[pEntry] >> 3) & 0x001f;
-        return red | green | blue;
+        return ((src_entry[pEntry] >> 9) & 0x7c00) | ((src_entry[pEntry] >> 6) & 0x03e0) | ((src_entry[pEntry] >> 3) & 0x001f);
     }
 }
 
@@ -1708,6 +1699,59 @@ br_pixelmap* C2_HOOK_FASTCALL PaletteOf16Bits(br_pixelmap* pSrc) {
 #endif
 }
 
+// FUNCTION: CARMA2_HW 0x00516c50
+// FUNCTION: CARMA2_CHEAT 0x0051c680
+void C2_HOOK_FASTCALL FUN_00516c50(br_pixelmap* pDst, br_pixelmap* pSrc, br_pixelmap* pPalette) {
+    int x;
+    int y;
+    tU8* src_start;
+    tU16* dst_start;
+    tU16* palette_entry;
+
+    palette_entry = PaletteOf16Bits(pPalette)->pixels;
+    for (y = 0; y < pSrc->height; y++) {
+        src_start = (tU8*)pSrc->pixels + pSrc->row_bytes * y;
+        dst_start = (tU16*)((tU8*)pDst->pixels + pDst->row_bytes * y);
+        for (x = 0; x < pSrc->width; x++) {
+            *dst_start = palette_entry[*src_start];
+            src_start++;
+            dst_start++;
+        }
+    }
+}
+
+// GLOBAL: CARMA2_HW 0x006ab9e0
+// GLOBAL: CARMA2_CHEAT 0x006b3070
+tU16 gDouble_line_buffer[640];
+
+// FUNCTION: CARMA2_HW 0x00516db0
+// FUNCTION: CARMA2_CHEAT 0x0051c7e0
+void C2_HOOK_FASTCALL Double8BitTo16BitPixelmap(br_pixelmap* pDst, br_pixelmap* pSrc, br_pixelmap* pPalette, tU16 pOff, tU16 pSrc_width, tU16 pSrc_height) {
+    int x;
+    int y;
+    tU8* src_start;
+    tU16* palette_entry;
+    tU16 pixel;
+
+    palette_entry = PaletteOf16Bits(pPalette)->pixels;
+    /* FIXME: gDouble_line_buffer only holds 320 doubled pixels */
+    if (pSrc_width > 640) {
+        FatalError(kFatalError_OOM_S, "Double8BitTo16BitPixelmap");
+    }
+    for (y = 0; y < pSrc_height; y++) {
+        src_start = (tU8*)pSrc->pixels + pSrc->row_bytes * y;
+        for (x = 0; x < pSrc_width; x++) {
+            pixel = palette_entry[src_start[x]];
+            gDouble_line_buffer[2 * x] = pixel;
+            gDouble_line_buffer[2 * x + 1] = pixel;
+        }
+        memcpy((tU8*)pDst->pixels + pDst->row_bytes * (pOff + 2 * y), gDouble_line_buffer, 4 * pSrc_width);
+        memcpy((tU8*)pDst->pixels + pDst->row_bytes * (pOff + 2 * y + 1), gDouble_line_buffer, 4 * pSrc_width);
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x005171b0
+// FUNCTION: CARMA2_CHEAT 0x0051cbe0
 void C2_HOOK_FASTCALL Copy8BitTo16Bit(br_pixelmap* pDst, br_pixelmap* pSrc, br_pixelmap* pPalette) {
     int x;
     int y;
@@ -1723,6 +1767,222 @@ void C2_HOOK_FASTCALL Copy8BitTo16Bit(br_pixelmap* pDst, br_pixelmap* pSrc, br_p
             *dst_start = palette_entry[*src_start];
             src_start++;
             dst_start++;
+        }
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x00517310
+// FUNCTION: CARMA2_CHEAT 0x0051cd40
+void C2_HOOK_FASTCALL Copy8BitTo16BitRectangle(br_pixelmap* pDst, tS16 pDst_x, tS16 pDst_y, br_pixelmap* pSrc, tS16 pSrc_x, tS16 pSrc_y, tS16 pWidth, tS16 pHeight, br_pixelmap* pPalette) {
+    int x;
+    int y;
+    tU8* src_start;
+    tU16* dst_start;
+    tU16* palette_entry;
+
+    palette_entry = PaletteOf16Bits(pPalette)->pixels;
+    pSrc_x += pSrc->origin_x;
+    pSrc_y += pSrc->origin_y;
+    pDst_x += pDst->origin_x;
+    pDst_y += pDst->origin_y;
+    if (pSrc_x < 0) {
+        pDst_x -= pSrc_x;
+        pWidth += pSrc_x;
+        pSrc_x = 0;
+    }
+    if (pDst_x < 0) {
+        pWidth += pDst_x;
+        pSrc_x -= pDst_x;
+        pDst_x = 0;
+    }
+    if (pSrc_y < 0) {
+        pHeight += pSrc_y;
+        pDst_y -= pSrc_y;
+        pSrc_y = 0;
+    }
+    if (pDst_y < 0) {
+        pHeight += pDst_y;
+        pSrc_y -= pDst_y;
+        pDst_y = 0;
+    }
+    if (pSrc_x + pWidth > pSrc->width) {
+        pWidth = pSrc->width - pSrc_x;
+    }
+    if (pDst_x + pWidth > pDst->width) {
+        pWidth = pDst->width - pDst_x;
+    }
+    if (pSrc_y + pHeight > pSrc->height) {
+        pHeight = pSrc->height - pSrc_y;
+    }
+    if (pDst_y + pHeight > pDst->height) {
+        pHeight = pDst->height - pDst_y;
+    }
+    if (pWidth > 0 && pHeight > 0) {
+        for (y = 0; y < pHeight; y++) {
+            src_start = (tU8*)pSrc->pixels + pSrc->row_bytes * (pSrc_y + y) + pSrc_x;
+            dst_start = (tU16*)((tU8*)pDst->pixels + pDst->row_bytes * (pDst_y + y) + 2 * pDst_x);
+            for (x = 0; x < pWidth; x++) {
+                if (*src_start != 0) {
+                    *dst_start = palette_entry[*src_start];
+                }
+                src_start++;
+                dst_start++;
+            }
+        }
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x005175f0
+// FUNCTION: CARMA2_CHEAT 0x0051d020
+void C2_HOOK_FASTCALL Copy8BitTo16BitRectangleWithTransparency(br_pixelmap* pDst, tS16 pDst_x, tS16 pDst_y, br_pixelmap* pSrc, tS16 pSrc_x, tS16 pSrc_y, tS16 pWidth, tS16 pHeight, br_pixelmap* pPalette) {
+    int x;
+    int y;
+    tU8* src_start;
+    tU16* dst_start;
+    tU16* palette_entry;
+
+    palette_entry = PaletteOf16Bits(pPalette)->pixels;
+    if (pSrc_x < 0) {
+        pWidth += pSrc_x;
+        pDst_x -= pSrc_x;
+        pSrc_x = 0;
+    }
+    if (pDst_x < 0) {
+        pWidth += pDst_x;
+        pSrc_x -= pDst_x;
+        pDst_x = 0;
+    }
+    if (pSrc_y < 0) {
+        pHeight += pSrc_y;
+        pDst_y -= pSrc_y;
+        pSrc_y = 0;
+    }
+    if (pDst_y < 0) {
+        pHeight += pDst_y;
+        pSrc_y -= pDst_y;
+        pDst_y = 0;
+    }
+    if (pSrc_x + pWidth > pSrc->width) {
+        pWidth = pSrc->width - pSrc_x;
+    }
+    if (pDst_x + pWidth > pDst->width) {
+        pWidth = pDst->width - pDst_x;
+    }
+    if (pSrc_y + pHeight > pSrc->height) {
+        pHeight = pSrc->height - pSrc_y;
+    }
+    if (pDst_y + pHeight > pDst->height) {
+        pHeight = pDst->height - pDst_y;
+    }
+    if (pWidth > 0 && pHeight > 0) {
+        for (y = 0; y < pHeight; y++) {
+            src_start = (tU8*)pSrc->pixels + pSrc->row_bytes * (pSrc_y + y) + pSrc_x;
+            dst_start = (tU16*)((tU8*)pDst->pixels + pDst->row_bytes * (pDst_y + y) + 2 * pDst_x);
+            for (x = 0; x < pWidth; x++) {
+                if (*src_start != 0) {
+                    *dst_start = palette_entry[*src_start];
+                }
+                src_start++;
+                dst_start++;
+            }
+        }
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x005178b0
+// FUNCTION: CARMA2_CHEAT 0x0051d2e0
+void C2_HOOK_FASTCALL Copy8BitToOnscreen16BitRectangleWithTransparency(br_pixelmap* pDst, tS16 pDst_x, tS16 pDst_y, br_pixelmap* pSrc, tS16 pSrc_x, tS16 pSrc_y, tS16 pWidth, tS16 pHeight, br_pixelmap* pPalette) {
+    int x;
+    int y;
+    tU8* src_start;
+    tU16* dst_start;
+    tU16* palette_entry;
+
+    palette_entry = PaletteOf16Bits(pPalette)->pixels;
+    pSrc_x += pSrc->origin_x;
+    pSrc_y += pSrc->origin_y;
+    pDst_x += pDst->origin_x;
+    pDst_y += pDst->origin_y;
+    for (y = 0; y < pHeight; y++) {
+        src_start = (tU8*)pSrc->pixels + pSrc->row_bytes * (pSrc_y + y) + pSrc_x;
+        dst_start = (tU16*)((tU8*)pDst->pixels + pDst->row_bytes * (pDst_y + y) + 2 * pDst_x);
+        for (x = 0; x < pWidth; x++) {
+            if (*src_start != 0) {
+                *dst_start = palette_entry[*src_start];
+            }
+            src_start++;
+            dst_start++;
+        }
+    }
+}
+
+// FUNCTION: CARMA2_HW 0x00517a90
+// FUNCTION: CARMA2_CHEAT 0x0051d4c0
+void C2_HOOK_FASTCALL Copy8BitRectangleTo16BitRhombusWithTransparency(br_pixelmap* pDst, tS16 pDst_x, tS16 pDst_y, br_pixelmap* pSrc, tS16 pSrc_x, tS16 pSrc_y, tS16 pWidth, tS16 pHeight, int pShear, br_pixelmap* pPalette) {
+    int x;
+    int y;
+    tU8* src_start;
+    tU16* dst_start;
+    tU16* palette_entry;
+    int total_shear;
+    tS16 sheared_x;
+    tS16 clipped_src_x;
+    tS16 clipped_width;
+
+    palette_entry = PaletteOf16Bits(pPalette)->pixels;
+    pSrc_x += pSrc->origin_x;
+    pSrc_y += pSrc->origin_y;
+    pDst_x += pDst->origin_x;
+    pDst_y += pDst->origin_y;
+    total_shear = 0;
+    if (pSrc_y < 0) {
+        pHeight += pSrc_y;
+        pDst_y -= pSrc_y;
+        pSrc_y = 0;
+    }
+    if (pDst_y < 0) {
+        pHeight += pDst_y;
+        pSrc_y -= pDst_y;
+        pDst_y = 0;
+    }
+    if (pSrc_y + pHeight > pSrc->height) {
+        pHeight = pSrc->height - pSrc_y;
+    }
+    if (pDst_y + pHeight > pDst->height) {
+        pHeight = pDst->height - pDst_y;
+    }
+    if (pHeight > 0) {
+        if (pSrc_x < 0) {
+            pWidth += pSrc_x;
+            pDst_x -= pSrc_x;
+            pSrc_x = 0;
+        }
+        if (pSrc_x + pWidth > pSrc->width) {
+            pWidth = pSrc->width - pSrc_x;
+        }
+        for (y = 0; y < pHeight; y++) {
+            sheared_x = pDst_x + (total_shear >> 16);
+            clipped_src_x = pSrc_x;
+            clipped_width = pWidth;
+            if (sheared_x < 0) {
+                clipped_width = pWidth + sheared_x;
+                clipped_src_x = pSrc_x - sheared_x;
+                sheared_x = 0;
+            }
+            if (sheared_x + clipped_width > pDst->width) {
+                clipped_width = pDst->width - sheared_x;
+            }
+            if (clipped_width > 0) {
+                src_start = (tU8*)pSrc->pixels + (pSrc_y + y) * pSrc->row_bytes + clipped_src_x;
+                dst_start = (tU16*)((tU8*)pDst->pixels + 2 * sheared_x + (pDst_y + y) * pDst->row_bytes);
+                for (x = 0; x < clipped_width; x++) {
+                    if (src_start[x] != 0) {
+                        *dst_start = palette_entry[src_start[x]];
+                    }
+                    dst_start++;
+                }
+            }
+            total_shear += pShear;
         }
     }
 }
